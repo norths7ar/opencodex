@@ -1,0 +1,99 @@
+:root {
+  color-scheme: light dark;
+  font: 16px/1.5 system-ui, sans-serif;
+  background: light-dark(#f6f6f8, #111115);
+  color: light-dark(#222228, #eeeef1);
+  --muted: light-dark(#5c5c69, #b0b0bb);
+  --line: light-dark(#dddde4, #36363f);
+  --panel: light-dark(#fff, #1b1b21);
+  --danger: light-dark(#9e2331, #ffabb5);
+  --mono: ui-monospace, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; }
+
+main {
+  width: min(100% - 2rem, 44rem);
+  margin: clamp(1.75rem, 8vh, 5rem) auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+}
+
+h1 { margin: 0; font-size: clamp(1.85rem, 6vw, 2.5rem); line-height: 1.15; }
+h2 { margin: 0; font-size: 1rem; }
+p { margin: 0; }
+.intro { margin: 0.6rem 0 1.5rem; color: var(--muted); }
+
+.panel {
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+}
+
+.panel-header, .panel-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.panel-header { justify-content: space-between; }
+.panel-footer { border-top: 1px solid var(--line); }
+
+.status {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: light-dark(#ececf0, #33333d);
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.status[data-running='true'] {
+  background: light-dark(#dff4e8, #153629);
+  color: light-dark(#235c3b, #a4e3bb);
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+  margin: 0;
+  padding: 0.5rem 1.25rem 1.25rem;
+}
+
+dt { color: var(--muted); font-size: 0.82rem; }
+dd { margin: 0.15rem 0 0; font: 0.9rem/1.5 var(--mono); overflow-wrap: anywhere; }
+.path { grid-column: 1 / -1; }
+
+.notice { padding: 0 1.25rem 1rem; }
+code { font: 0.9em var(--mono); }
+.error { color: var(--danger); }
+.scope { margin-top: 1rem; color: var(--muted); font-size: 0.9rem; }
+
+button {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid currentColor;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button:hover:enabled { background: light-dark(#fcebed, #3b2127); }
+button:disabled { color: var(--muted); border-color: var(--line); cursor: not-allowed; }
+button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
