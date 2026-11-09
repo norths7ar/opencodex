@@ -9,7 +9,7 @@ pnpm install --frozen-lockfile
 pnpm run build:runtime
 ```
 
-The build writes `frontend/dist-runtime/`, which the Python backend serves at `http://127.0.0.1:10101/` by default. Use the [root README](../README.md) for backend commands. The console shows the runtime status and can stop it; provider APIs and OAuth are not part of this stage.
+The build writes `frontend/dist-runtime/`, which the Python backend serves at `http://127.0.0.1:10101/` by default. Use the [root README](../README.md) for backend commands. The console manages runtime status, API providers, model selection, gateway access and Codex routing. OAuth is not available yet. Provider keys are write-only; paid connection checks and client configuration changes require explicit actions.
 
 For frontend development, run `pnpm run dev:runtime` in `frontend/` and open `http://127.0.0.1:5173/`. Vite forwards requests to the Python backend at `http://127.0.0.1:10101`. If you start the backend on a different port, set `OPENCODEX_PROXY_TARGET` to its loopback URL before starting Vite.
 

@@ -13,15 +13,41 @@ from urllib.parse import urlsplit
 
 import uvicorn
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 from . import __version__
+from .config import ConfigStore
+from .gateway import Gateway
+from .management import management_router
 from .runtime import WEB_ROOT, instance_lock, write_state
 
 
 def create_app(directory: Path, state: dict, stop):
-    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    store = ConfigStore(directory)
+    gateway = Gateway(store)
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=gateway.lifespan)
     started = time.monotonic()
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request: Request, exc: RequestValidationError):
+        # Pydantic's default error response includes the raw submitted credential in `input`.
+        return JSONResponse(
+            {
+                "detail": [
+                    {"loc": e["loc"], "msg": e["msg"], "type": e["type"]} for e in exc.errors()
+                ]
+            },
+            422,
+        )
+
+    @app.exception_handler(ValueError)
+    async def bad_configuration(request: Request, exc: ValueError):
+        return JSONResponse({"detail": str(exc)}, 400)
+
+    @app.exception_handler(RuntimeError)
+    async def runtime_error(request: Request, exc: RuntimeError):
+        return JSONResponse({"detail": str(exc)}, 409)
 
     def report():
         return {
@@ -56,6 +82,10 @@ def create_app(directory: Path, state: dict, stop):
             supplied = request.headers.get("authorization", "")
             if not secrets.compare_digest(supplied, f"Bearer {state['token']}"):
                 return JSONResponse({"error": "A local console session is required."}, 401)
+        if request.url.path.startswith("/v1/"):
+            supplied = request.headers.get("authorization", "")
+            if not secrets.compare_digest(supplied, f"Bearer {store.gateway_key}"):
+                return JSONResponse({"error": {"message": "A gateway API key is required."}}, 401)
         response = await call_next(request)
         response.headers.setdefault("Cache-Control", "no-store")
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -83,6 +113,9 @@ def create_app(directory: Path, state: dict, stop):
     async def stop_instance():
         asyncio.get_running_loop().call_later(0.1, stop)
         return {"status": "stopping"}
+
+    app.include_router(management_router(store, gateway, directory, state["port"]))
+    app.include_router(gateway.router())
 
     @app.api_route("/api/{route:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
     async def not_migrated(route: str):

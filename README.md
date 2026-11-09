@@ -2,7 +2,7 @@
 
 个人维护的 Windows 本地模型网关，基于 OpenCodex 2.99.0。保留 API 与订阅渠道接入，订阅每渠道单账号，API 使用独立配置。
 
-Python 后端目前已实现本机启动、停止、重启、状态查询和网页运行控制台。API 转发、渠道配置和订阅 OAuth 尚未迁移，旧 TypeScript 实现保留作参考；当前 Python 实例还不能作为模型网关使用。
+Python 后端已实现本机进程管理、独立 API 渠道配置、模型获取、Chat Completions 与原生 Responses 转发，以及 Codex CLI 配置接入和恢复。DeepSeek 已完成真实请求与 Codex CLI 接入验证。订阅 OAuth、跨协议转换及其余旧功能尚未迁移，旧 TypeScript 实现保留作参考。
 
 ## 目录
 
@@ -33,6 +33,18 @@ uv run ocx stop
 默认只监听 `127.0.0.1`，运行记录和日志位于 `%LOCALAPPDATA%\OpenCodexLite`，不读取或改写旧 Bun 配置。`--port` 指定端口，端口占用会报错而不自动换端口；`--state-dir` 或 `OPENCODEX_LITE_HOME` 可指定独立运行目录。`--json` 输出机器可读状态。`status` 区分运行、停止、失败和无响应，失败或无响应时退出码为 1。
 
 网页构建输出到 `frontend/dist-runtime/`，与旧控制台的 `dist/` 隔离。网页未构建时，后端仍可启停，首页会显示构建命令。
+
+## API 渠道与客户端
+
+在控制台添加 DeepSeek 或自定义 OpenAI 兼容渠道，保存 API 基础地址和凭据来源，再获取模型、选择默认渠道与模型并保存。模型发现不生成回复；连接检查会明确确认后发送一个短请求，可能产生上游费用。
+
+凭据可以引用进程环境变量或项目根目录 `.env` 中的变量，例如 `deepseek_api_key`。手动输入的 API Key 使用当前 Windows 用户的 DPAPI 加密后保存，不回显到网页。空白密钥输入表示保留原值；切换到环境变量来源会删除原来保存的密钥。`.env` 不进入 Git，也不会被复制到 Codex 配置。
+
+本地应用使用控制台提供的网关地址和独立网关 Key，不使用上游 Key 或网页管理会话。网关提供 `GET /v1/models`、`POST /v1/chat/completions` 和 `POST /v1/responses`；模型名使用 `渠道ID/模型ID`，如 `deepseek/deepseek-flash`。不带渠道前缀时使用默认渠道；省略模型时使用保存的默认模型。
+
+Responses 目前只直通明确启用该能力的上游，不自动转换 Chat 协议。DeepSeek 的 Responses 为无状态接口，客户端需回传完整历史。普通 JSON、工具调用字段及 SSE 事件保留上游语义；网关不自动重试生成请求。
+
+Codex 面板会先预览目标 `config.toml`，再由用户明确应用或恢复。默认目录遵循 `CODEX_HOME`，否则为用户的 `.codex`；可指定独立目录。接入仅写入 Lite 的模型路由及本地网关 Key，不改登录、历史或其他客户端。恢复会保留无关的后续编辑；如果用户修改过被管理的路由字段，则报告冲突而不覆盖。当前承接的是 Codex CLI 路由，尚未迁移旧版模型目录同步或客户端自动重启。
 
 ## 开发
 

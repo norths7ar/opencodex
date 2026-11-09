@@ -1,6 +1,10 @@
 import { StrictMode, useEffect, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import mark from '../public/favicon.svg?url'
+import { AccessPanel } from './access-panel'
+import { CodexPanel } from './codex-panel'
+import { ProviderPanel } from './provider-panel'
+import { request, sessionRequest, sessionToken } from './runtime-api'
 import './runtime-console.css'
 
 interface Health {
@@ -29,24 +33,6 @@ function instanceKey({ pid, startedAt }: Health) {
   return `${pid}:${startedAt}`
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const timeout = AbortSignal.timeout(3000)
-  const response = await fetch(path, {
-    ...options,
-    signal: options?.signal ? AbortSignal.any([options.signal, timeout]) : timeout,
-    cache: 'no-store',
-    redirect: 'error',
-  })
-  if (!response.ok) throw new Error(`Request failed (HTTP ${response.status}).`)
-  return response.json() as Promise<T>
-}
-
-async function sessionToken(signal?: AbortSignal) {
-  const { token } = await request<{ token: string }>('/opencodex-session', { signal })
-  if (typeof token !== 'string' || !token) throw new Error('No session token was returned.')
-  return token
-}
-
 function uptime(seconds: number) {
   const total = Math.floor(seconds)
   const hours = Math.floor(total / 3600)
@@ -60,6 +46,7 @@ function RuntimeConsole() {
   const [snapshot, setSnapshot] = useState<Snapshot>({ state: 'checking' })
   const [stopRequest, setStopRequest] = useState<StopRequest | null>(null)
   const [stopError, setStopError] = useState('')
+  const [configRevision, setConfigRevision] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -108,11 +95,7 @@ function RuntimeConsole() {
     setStopError('')
     setStopRequest({ phase: 'sending', instance })
     try {
-      const token = await sessionToken()
-      const { status } = await request<{ status: string }>('/api/stop', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const { status } = await sessionRequest<{ status: string }>('/api/stop', { method: 'POST' })
       if (status !== 'stopping') throw new Error('Shutdown was not confirmed.')
       setStopRequest({ phase: 'accepted', instance })
     } catch {
@@ -135,7 +118,7 @@ function RuntimeConsole() {
       </header>
 
       <h1>Runtime console</h1>
-      <p className="intro">Monitor and stop the local Python runtime.</p>
+      <p className="intro">Manage API providers, client access, and the local Python runtime.</p>
 
       <section className="panel" aria-labelledby="status-title">
         <div className="panel-header">
@@ -175,7 +158,11 @@ function RuntimeConsole() {
         </div>
       </section>
 
-      <p className="scope">Provider APIs and OAuth are not available in this migration stage.</p>
+      {running && !stopping && <>
+        <ProviderPanel key={`providers:${instanceKey(snapshot.health)}`} onSaved={() => setConfigRevision(revision => revision + 1)} />
+        <CodexPanel key={`codex:${instanceKey(snapshot.health)}`} configRevision={configRevision} />
+        <AccessPanel key={`access:${instanceKey(snapshot.health)}`} />
+      </>}
     </main>
   )
 }

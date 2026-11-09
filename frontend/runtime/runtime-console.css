@@ -80,7 +80,6 @@ dd { margin: 0.15rem 0 0; font: 0.9rem/1.5 var(--mono); overflow-wrap: anywhere;
 .notice { padding: 0 1.25rem 1rem; }
 code { font: 0.9em var(--mono); }
 .error { color: var(--danger); }
-.scope { margin-top: 1rem; color: var(--muted); font-size: 0.9rem; }
 
 button {
   padding: 0.5rem 0.85rem;

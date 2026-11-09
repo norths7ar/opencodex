@@ -3,7 +3,7 @@ name = "opencodex-lite"
 version = "2.99.0"
 description = "Personal Windows local model gateway"
 requires-python = ">=3.14"
-dependencies = ["fastapi>=0.162.2", "uvicorn>=0.54.0"]
+dependencies = ["fastapi>=0.162.2", "uvicorn>=0.54.0", "httpx>=0.28", "python-dotenv>=1.1", "tomlkit>=0.13", "anyio>=4"]
 
 [project.scripts]
 ocx = "ocx.cli:main"
