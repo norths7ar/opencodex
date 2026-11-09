@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decodeEventStream, encodeMessage } from "../../src/lib/eventstream-decoder";
+import { decodeEventStream, encodeMessage } from "../../backend/src/lib/eventstream-decoder";
 
 describe("EventStream cancellation settlement", () => {
   test("consumer return releases the reader while transport cancellation is pending", async () => {

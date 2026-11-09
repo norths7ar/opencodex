@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClaudeDesktopState } from "../../src/server/management/shared";
-import { DESKTOP_SUPPORTS_1M_THRESHOLD } from "../../src/claude/desktop-3p";
-import type { OcxConfig } from "../../src/types";
+import { buildClaudeDesktopState } from "../../backend/src/server/management/shared";
+import { DESKTOP_SUPPORTS_1M_THRESHOLD } from "../../backend/src/claude/desktop-3p";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

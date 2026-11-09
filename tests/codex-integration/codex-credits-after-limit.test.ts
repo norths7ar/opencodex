@@ -8,25 +8,25 @@ import {
   pickLowestUsageCodexAccount,
   previewCodexAccountForRequest,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { codexAccountBlockReason } from "../../src/codex/routing/selection";
+} from "../../backend/src/codex/routing";
+import { codexAccountBlockReason } from "../../backend/src/codex/routing/selection";
 import {
   codexAccountUsesCreditsAfterLimit,
   forgetCodexAccountCreditUse,
   isCodexUsageLimitReached,
   setAllCodexAccountsCreditsAfterLimit,
   setCodexAccountCreditsAfterLimit,
-} from "../../src/codex/account-credit-use";
-import { setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import type { OcxConfig } from "../../src/types";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { validateConfigCandidate } from "../../src/config/diagnostics";
+} from "../../backend/src/codex/account-credit-use";
+import { setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import type { OcxConfig } from "../../backend/src/types";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { validateConfigCandidate } from "../../backend/src/config/diagnostics";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ICACLS_OK = { success: true, exitCode: 0, timedOut: false, stdout: "" };

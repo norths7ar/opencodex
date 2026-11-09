@@ -4,17 +4,17 @@
  * reverse map, and the rule that an OAuth token is sent to `api.anthropic.com` only.
  */
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { captureAnthropicClientIdentity } from "../../../src/adapters/anthropic/client-identity";
-import { claudeCodeSessionId } from "../../../src/adapters/client-fingerprint";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { captureAnthropicClientIdentity } from "../../../backend/src/adapters/anthropic/client-identity";
+import { claudeCodeSessionId } from "../../../backend/src/adapters/client-fingerprint";
 import {
   anthropicMessagesNativeWireBody,
   anthropicOAuthWireBody,
   buildAnthropicMessagesPassthroughRequest,
-} from "../../../src/adapters/anthropic/passthrough";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import { ANTHROPIC_OAUTH_BETA, CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../../src/oauth/anthropic";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/anthropic/passthrough";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import { ANTHROPIC_OAUTH_BETA, CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../../backend/src/oauth/anthropic";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const ACCESS = "fixture-oauth-access-token";
 

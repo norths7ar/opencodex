@@ -14,20 +14,20 @@ import { join } from "node:path";
 import {
   observeActiveOAuthAccessToken,
   OAUTH_PROVIDERS,
-} from "../../src/oauth";
+} from "../../backend/src/oauth";
 import {
   gatherRoutedModels,
   gatherRoutedModelsForCatalogGather,
   fetchProviderModels,
   type CatalogGatherProviderAuthOutcome,
   type CatalogGatherProviderModelOutcome,
-} from "../../src/codex/catalog/provider-fetch";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString } from "../../src/adapters/devin/cloud-direct/wire";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { getAuthRefreshIntentPath, saveCredential } from "../../src/oauth/store";
-import { knownModelIdsForProvider } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/catalog/provider-fetch";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { getAuthRefreshIntentPath, saveCredential } from "../../backend/src/oauth/store";
+import { knownModelIdsForProvider } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 interface FileSnapshot {

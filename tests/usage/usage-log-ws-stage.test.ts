@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
   normalizeUsageEntryForTest,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
-import type { CodexWsStageRecord } from "../../src/server/responses/codex-ws-wire";
+} from "../../backend/src/usage/log";
+import type { CodexWsStageRecord } from "../../backend/src/server/responses/codex-ws-wire";
 
 /**
  * #4191: the WS stage record must survive the usage.jsonl write/read round

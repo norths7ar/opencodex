@@ -15,7 +15,7 @@
 import { mkdtempSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, resolve } from "node:path";
-import { assertRemovalOutsideProtectedTrees } from "../../src/lib/test-home-guard";
+import { assertRemovalOutsideProtectedTrees } from "../../backend/src/lib/test-home-guard";
 import { removeTreeWithRetry } from "./remove-tree";
 
 /** Canonical roots this module created and has not yet released. */

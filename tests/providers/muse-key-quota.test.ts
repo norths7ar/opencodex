@@ -6,8 +6,8 @@
  * probe that changes that, and the two rate limits that keep it from becoming a mint loop.
  */
 import { beforeEach, describe, expect, test } from "bun:test";
-import { fetchMuseKeyQuotaSnapshot, museKeyQuotaBackoffRemainingMs, resetMuseKeyQuotaBackoff } from "../../src/providers/muse-key-quota";
-import { getProviderRegistryEntry, mergeRegistryStaticHeaders } from "../../src/providers/registry";
+import { fetchMuseKeyQuotaSnapshot, museKeyQuotaBackoffRemainingMs, resetMuseKeyQuotaBackoff } from "../../backend/src/providers/muse-key-quota";
+import { getProviderRegistryEntry, mergeRegistryStaticHeaders } from "../../backend/src/providers/registry";
 
 const KEY = `LLM|${"1".repeat(16)}|${"c".repeat(27)}`;
 const TOKEN = "meta-account-" + "z".repeat(48);

@@ -4,8 +4,8 @@ import { connect, createServer, type Socket } from "node:net";
 import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { inspectDesktopRecovery, parseRecoveryAnswer, recoveryHomeIdentity,
-  type DesktopRecoveryIo } from "../../src/service/desktop-recovery";
-import { recoveryImageCandidate, recoverySibling } from "../../src/service/desktop-recovery-process";
+  type DesktopRecoveryIo } from "../../backend/src/service/desktop-recovery";
+import { recoveryImageCandidate, recoverySibling } from "../../backend/src/service/desktop-recovery-process";
 import { repoPath } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
@@ -200,8 +200,8 @@ println!("ready");
 std::thread::park(); }`;
   const entry = join(root, "probe.ts"), nativeSource = join(root, "native.rs");
   writeFileSync(nativeSource, rust);
-  writeFileSync(entry, `import { inspectDesktopRecovery } from ${JSON.stringify(repoPath("src", "service", "desktop-recovery.ts"))};
-import { runDesktopColdStart, productionDesktopColdStartDeps } from ${JSON.stringify(repoPath("src", "cli", "ensure-desktop-cold-start.ts"))};
+  writeFileSync(entry, `import { inspectDesktopRecovery } from ${JSON.stringify(repoPath("backend/src", "service", "desktop-recovery.ts"))};
+import { runDesktopColdStart, productionDesktopColdStartDeps } from ${JSON.stringify(repoPath("backend/src", "cli", "ensure-desktop-cold-start.ts"))};
 const evidence = await inspectDesktopRecovery(); const result = await runDesktopColdStart({ ...productionDesktopColdStartDeps(async () => ({ fixture: true })), desktopRecovery: async () => evidence, info: () => {} });
 console.log(JSON.stringify({ evidence, result }));`);
   // The preload sandboxes HOME; rustup must still find the installed toolchain (#7884).

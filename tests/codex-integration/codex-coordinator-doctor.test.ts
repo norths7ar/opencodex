@@ -10,19 +10,19 @@ import { Database } from "bun:sqlite";
 import {
   inspectCodexCoordinator,
   recoverZeroByteCodexCoordinator,
-} from "../../src/codex/coordinator-doctor";
+} from "../../backend/src/codex/coordinator-doctor";
 import {
   codexWriteCoordinationEligibility,
   STABLE_ZERO_BYTE_COORDINATOR_AGE_MS,
-} from "../../src/codex/inject-coordination";
+} from "../../backend/src/codex/inject-coordination";
 import {
   openCodexCoordinatorTransaction,
-} from "../../src/codex/transition-state";
+} from "../../backend/src/codex/transition-state";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
-import { formatCoordinatorDoctorLines } from "../../src/cli/doctor";
+} from "../../backend/src/codex/user-identity";
+import { formatCoordinatorDoctorLines } from "../../backend/src/cli/doctor";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let codexHome = "";

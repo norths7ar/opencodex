@@ -3,9 +3,9 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CLI_COMMANDS } from "../../src/cli/registry";
-import { helpRecoveryCandidates, resolveHelpPath } from "../../src/cli/help-catalog";
-import { formatHelpRecovery, suggestHelpPaths } from "../../src/cli/help-recovery";
+import { CLI_COMMANDS } from "../../backend/src/cli/registry";
+import { helpRecoveryCandidates, resolveHelpPath } from "../../backend/src/cli/help-catalog";
+import { formatHelpRecovery, suggestHelpPaths } from "../../backend/src/cli/help-recovery";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -44,7 +44,7 @@ function isolated(script: string, shim = false) {
 }
 
 function cli(args: string[], shim = false) {
-  const entry = repoPath("src", "cli", "index.ts");
+  const entry = repoPath("backend/src", "cli", "index.ts");
   return isolated(`process.argv = [process.execPath, ${JSON.stringify(entry)}, ...${JSON.stringify(args)}];
     await import(${JSON.stringify(entry)});`, shim);
 }
@@ -113,11 +113,11 @@ describe("CLI help recovery", () => {
 
   test("ties sort by name and cap at three destinations in an isolated catalog fixture", () => {
     const result = isolated(`import { mock } from "bun:test";
-      mock.module(${JSON.stringify(repoPath("src", "cli", "help-catalog.ts"))}, () => ({
+      mock.module(${JSON.stringify(repoPath("backend/src", "cli", "help-catalog.ts"))}, () => ({
         resolveHelpPath: path => ({ kind: "unavailable", path }),
         helpRecoveryCandidates: () => ["sturt", "stort", "stirt", "stert", "stqrt"].map(name => ({ names: [name], path: [name] })),
       }));
-      const { suggestHelpPaths } = await import(${JSON.stringify(repoPath("src", "cli", "help-recovery.ts"))});
+      const { suggestHelpPaths } = await import(${JSON.stringify(repoPath("backend/src", "cli", "help-recovery.ts"))});
       console.log(JSON.stringify(suggestHelpPaths(["start"])));`);
     expect(result.status).toBe(0);
     expect(JSON.parse(result.stdout)).toEqual([["stert"], ["stirt"], ["stort"]]);
@@ -168,7 +168,7 @@ describe("CLI help recovery", () => {
 
   test("direct dispatch independently uses the same unknown-root formatter", () => {
     const command = "modles";
-    const result = isolated(`const { dispatchCommand } = await import(${JSON.stringify(repoPath("src", "cli", "dispatch.ts"))});
+    const result = isolated(`const { dispatchCommand } = await import(${JSON.stringify(repoPath("backend/src", "cli", "dispatch.ts"))});
       const args = [${JSON.stringify(command)}, "private-operand"];
       const deps = new Proxy({}, { get() { throw new Error("unknown dispatch touched execution dependencies"); } });
       process.exitCode = await dispatchCommand({ kind: "command", command: args[0], args }, deps);`);
@@ -178,7 +178,7 @@ describe("CLI help recovery", () => {
   });
 
   test("strict unavailable help ignores a successful-render sink and never echoes operands", () => {
-    const result = isolated(`const { printSubcommandUsage } = await import(${JSON.stringify(repoPath("src", "cli", "help.ts"))});
+    const result = isolated(`const { printSubcommandUsage } = await import(${JSON.stringify(repoPath("backend/src", "cli", "help.ts"))});
       printSubcommandUsage("account", ["account", "lisst", "private-operand"], { write: console.log });`);
     expect(result.status).toBe(1);
     expect(result.stdout).toBe("");
@@ -190,16 +190,16 @@ describe("CLI help recovery", () => {
     const mockSetup = `import { mock } from "bun:test";
       const calls = [];
       let reportCalls = false;
-      mock.module(${JSON.stringify(repoPath("src", "cli", "codex-shim-autorestore.ts"))}, () => ({
+      mock.module(${JSON.stringify(repoPath("backend/src", "cli", "codex-shim-autorestore.ts"))}, () => ({
         maybeAutoRestoreCodexShimAsync: async command => { calls.push(command); if (reportCalls) console.log("preflight called"); },
       }));
       // The lifecycle skew notice probes the configured (here: default) port. A developer machine
       // with a live proxy there would answer, so keep this admission test independent of the host.
-      mock.module(${JSON.stringify(repoPath("src", "cli", "version-skew-notice.ts"))}, () => ({
+      mock.module(${JSON.stringify(repoPath("backend/src", "cli", "version-skew-notice.ts"))}, () => ({
         shouldNoticeVersionSkew: () => false,
         maybeNoticeVersionSkew: async () => {},
       }));
-      const { runCli } = await import(${JSON.stringify(repoPath("src", "cli", "root.ts"))});`;
+      const { runCli } = await import(${JSON.stringify(repoPath("backend/src", "cli", "root.ts"))});`;
     const rejected = isolated(`${mockSetup}
       reportCalls = true; await runCli(["modles"]);`);
     expect(rejected.status).toBe(1);
@@ -219,12 +219,12 @@ describe("CLI help recovery", () => {
 
 test.each([0, 1])("update dispatch preserves updater exit %s without executing the updater", code => {
   const result = isolated(`import { mock } from "bun:test";
-    const updatePath = ${JSON.stringify(repoPath("src", "update", "index.ts"))};
+    const updatePath = ${JSON.stringify(repoPath("backend/src", "update", "index.ts"))};
     const original = await import(updatePath);
     mock.module(updatePath, () => ({
       ...original, runUpdate: async () => { process.exitCode = ${code}; },
     }));
-    const { dispatchCommand } = await import(${JSON.stringify(repoPath("src", "cli", "dispatch.ts"))});
+    const { dispatchCommand } = await import(${JSON.stringify(repoPath("backend/src", "cli", "dispatch.ts"))});
     const args = ["update"];
     const status = await dispatchCommand({ kind: "command", command: "update", args }, { args });
     console.log(JSON.stringify({ status }));

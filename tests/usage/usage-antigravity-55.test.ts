@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { canonicalAntigravityUsageModel } from "../../src/providers/antigravity-models";
-import { estimateRequestCost, resolveMatchedPrice } from "../../src/usage/cost";
-import { findExpectedPriceOverlay } from "../../src/usage/expected-prices";
-import type { PersistedUsageEntry } from "../../src/usage/log";
-import { summarizeUsage } from "../../src/usage/summary";
+import { canonicalAntigravityUsageModel } from "../../backend/src/providers/antigravity-models";
+import { estimateRequestCost, resolveMatchedPrice } from "../../backend/src/usage/cost";
+import { findExpectedPriceOverlay } from "../../backend/src/usage/expected-prices";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
+import { summarizeUsage } from "../../backend/src/usage/summary";
 
 const families = [
   { base: "claude-sonnet-5-5", cost4: { input: 2, output: 10, cacheRead: 0.1, cacheWrite: 2.5 }, total: 0.012 },

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { shouldAttemptOpaqueBlobRecovery } from "../../src/server/responses/core";
-import { isLiteLlmWrappedCiphertextRejection } from "../../src/server/responses/core-opaque-recovery";
-import { causeForRecoveryKind, resendPermission } from "../../src/lib/request-failure-model";
+import { shouldAttemptOpaqueBlobRecovery } from "../../backend/src/server/responses/core";
+import { isLiteLlmWrappedCiphertextRejection } from "../../backend/src/server/responses/core-opaque-recovery";
+import { causeForRecoveryKind, resendPermission } from "../../backend/src/lib/request-failure-model";
 
 /**
  * #5245: an OpenAI-compatible gateway relays the ciphertext rejection inside its own error

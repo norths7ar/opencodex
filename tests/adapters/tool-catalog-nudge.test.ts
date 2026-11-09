@@ -3,9 +3,9 @@ import {
   buildNonOpenAIToolCatalogNudgeForTools,
   buildNonOpenAIToolCatalogNudgeFromNames,
   shouldInjectNonOpenAIToolCatalogNudge,
-} from "../../src/adapters/tool-catalog-nudge";
-import { CODE_MODE_HOST_CONTRACT_SENTENCE, CODE_MODE_RESULT_ECHO_SENTENCE, EMPTY_EXEC_OUTPUT_MESSAGE } from "../../src/adapters/exec-tool-result-normalize";
-import type { OcxTool } from "../../src/types";
+} from "../../backend/src/adapters/tool-catalog-nudge";
+import { CODE_MODE_HOST_CONTRACT_SENTENCE, CODE_MODE_RESULT_ECHO_SENTENCE, EMPTY_EXEC_OUTPUT_MESSAGE } from "../../backend/src/adapters/exec-tool-result-normalize";
+import type { OcxTool } from "../../backend/src/types";
 
 describe("non-OpenAI tool catalog nudge", () => {
   test("builds a compact catalog-grounding note from wire names", () => {

@@ -24,7 +24,7 @@ afterEach(() => {
 // appendOwnerOnly hardens the opened descriptor instead.
 test("frame log hardens a pre-existing permissive file", async () => {
   if (process.platform === "win32") return;
-  const { logLiveSidebandStage } = await import("../../src/server/live");
+  const { logLiveSidebandStage } = await import("../../backend/src/server/live");
   const frameLogPath = join(TEST_DIR, "frames-permissive.jsonl");
   const previousFrameLog = process.env.OCX_LIVE_FRAME_LOG;
   try {
@@ -43,7 +43,7 @@ test("frame log hardens a pre-existing permissive file", async () => {
 
 // A failed descriptor harden must not leave the record in a permissive file.
 test("a failed frame-log harden appends nothing", async () => {
-  const { appendOwnerOnly } = await import("../../src/server/live");
+  const { appendOwnerOnly } = await import("../../backend/src/server/live");
   const frameLogPath = join(TEST_DIR, "frames-harden-fail.jsonl");
   writeFileSync(frameLogPath, "", { mode: 0o644 });
   expect(() =>
@@ -56,7 +56,7 @@ test("a failed frame-log harden appends nothing", async () => {
 
 const windowsTest = process.platform === "win32" ? test : test.skip;
 windowsTest("a Windows ACL hardening failure appends nothing", async () => {
-  const { appendOwnerOnly } = await import("../../src/server/live");
+  const { appendOwnerOnly } = await import("../../backend/src/server/live");
   const frameLogPath = join(TEST_DIR, "frames-acl-fail.jsonl");
   writeFileSync(frameLogPath, "before\n");
   expect(() => appendOwnerOnly(frameLogPath, "after\n", (_fd, openedPath) => {
@@ -66,7 +66,7 @@ windowsTest("a Windows ACL hardening failure appends nothing", async () => {
 });
 
 test("Windows frame-log hardening runs once per file identity, not per frame", async () => {
-  const { appendOwnerOnly } = await import("../../src/server/live");
+  const { appendOwnerOnly } = await import("../../backend/src/server/live");
   const frameLogPath = join(TEST_DIR, "frames-memo.jsonl");
   const movedPath = join(TEST_DIR, "frames-memo-moved.jsonl");
   const hardened: string[] = [];
@@ -84,7 +84,7 @@ test("Windows frame-log hardening runs once per file identity, not per frame", a
 
 test("a path replacement after hardening appends nothing to the held file", async () => {
   if (process.platform === "win32") return;
-  const { appendOwnerOnly } = await import("../../src/server/live");
+  const { appendOwnerOnly } = await import("../../backend/src/server/live");
   const frameLogPath = join(TEST_DIR, "frames-replaced.jsonl");
   const movedPath = join(TEST_DIR, "frames-moved.jsonl");
   writeFileSync(frameLogPath, "before\n");
@@ -97,7 +97,7 @@ test("a path replacement after hardening appends nothing to the held file", asyn
 });
 
 test("frame diagnostics retain only metadata for text, binary, and bounded views", async () => {
-  const { logLiveSidebandFrame } = await import("../../src/server/live");
+  const { logLiveSidebandFrame } = await import("../../backend/src/server/live");
   const previousFrameLog = process.env.OCX_LIVE_FRAME_LOG;
   const frameLogPath = join(TEST_DIR, "frame-metadata.jsonl");
   const damagedText = "private-voice-�";

@@ -2,13 +2,13 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { callerCacheRetention } from "../../src/claude/inbound";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { callerCacheRetention } from "../../backend/src/claude/inbound";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 // A combo route declines the native Messages lane, so the anthropic adapter places its own

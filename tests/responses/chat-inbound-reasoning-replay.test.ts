@@ -14,9 +14,9 @@
  * the Anthropic adapter's signature filter rejects anything this path could produce.
  */
 import { describe, expect, test } from "bun:test";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { sanitizeReasoningInputContent } from "../../src/adapters/openai-responses";
-import { responsesRequestSchema } from "../../src/responses/schema";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { sanitizeReasoningInputContent } from "../../backend/src/adapters/openai-responses";
+import { responsesRequestSchema } from "../../backend/src/responses/schema";
 
 type Item = Record<string, unknown>;
 

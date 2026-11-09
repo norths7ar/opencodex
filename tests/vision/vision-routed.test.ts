@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { configuredPort, setCorsOrigin } from "../../src/server/auth-cors";
-import { parseRequest } from "../../src/responses/parser";
-import { startServer } from "../../src/server";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { planVisionSidecar, resetVisionDescriptionCache } from "../../src/vision";
+import { saveConfig } from "../../backend/src/config";
+import { configuredPort, setCorsOrigin } from "../../backend/src/server/auth-cors";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { planVisionSidecar, resetVisionDescriptionCache } from "../../backend/src/vision";
 import {
   describeImageRouted,
   routedDescribeAdmissionToken,
   routedDescribeBaseUrl,
   VISION_DESCRIBE_TERMINAL_HEADER,
-} from "../../src/vision/routed-describe";
+} from "../../backend/src/vision/routed-describe";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

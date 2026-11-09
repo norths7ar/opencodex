@@ -4,9 +4,9 @@ import {
   MOONSHOT_CN_BASE_URL,
   MOONSHOT_INTL_BASE_URL,
   matchBaseUrlChoice,
-} from "../../src/providers/base-url-choices";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { deriveProviderPresets } from "../../src/providers/derive";
+} from "../../backend/src/providers/base-url-choices";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { deriveProviderPresets } from "../../backend/src/providers/derive";
 
 describe("moonshot endpoint choices", () => {
   test("registry defaults to international and exposes china + custom choices", () => {

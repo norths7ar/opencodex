@@ -1,14 +1,14 @@
-import type { FailureVerdictSink } from "../../src/chat/failure-verdict";
-import { ownedChatErrorResponse } from "../../src/chat/outbound";
+import type { FailureVerdictSink } from "../../backend/src/chat/failure-verdict";
+import { ownedChatErrorResponse } from "../../backend/src/chat/outbound";
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
 import {
   collectChatCompletion,
   isChatCompletionsStreamError,
   responsesSseToChatCompletionsSse,
-} from "../../src/chat/outbound";
-import { encodeChatCompletionSse, foldChatCompletion } from "../../src/protocols/encoders/chat";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/chat/outbound";
+import { encodeChatCompletionSse, foldChatCompletion } from "../../backend/src/protocols/encoders/chat";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 /**

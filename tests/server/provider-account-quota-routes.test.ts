@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import { clearAccountQuotaCache, clearProviderQuotaCache } from "../../src/providers/quota";
-import * as quotaApi from "../../src/providers/quota";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import type { OcxConfig } from "../../src/types";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import { clearAccountQuotaCache, clearProviderQuotaCache } from "../../backend/src/providers/quota";
+import * as quotaApi from "../../backend/src/providers/quota";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;
@@ -52,7 +52,7 @@ async function read(path: string, config: OcxConfig) {
 }
 
 test.each([false, true])("paused Antigravity account API publishes only current model quota (replaced=%s)", async replaced => {
-  const { setAccountPaused } = await import("../../src/oauth/store");
+  const { setAccountPaused } = await import("../../backend/src/oauth/store");
   const credential = { access: "paused-api-first", refresh: "paused-api-refresh", expires: Date.now() + 3600_000,
     projectId: "paused-api-project-first", accountId: "paused-api-user", email: "paused-api@example.test" };
   await saveCredential("google-antigravity", credential);

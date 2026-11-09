@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { handleClientIntegrationCommand as command, handleCommandcodeCommand } from "../../src/cli/integrations";
-import { handleIntegrationPreviewCommand as leaf } from "../../src/cli/integration-preview";
-import { decodeIntegrationPlan, FILE_INTEGRATION_CLIENTS } from "../../src/cli/integration-plan-dto";
-import { parseIntegrationMutationPlan as guiDecode } from "../../gui/src/pages/integrations/integration-api";
-import { MANAGED_PATH_TEMPLATES } from "../../src/integrations/mutation-plan";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { loadExportModels, resetExportSnapshotForTests } from "../../src/server/management/model-rows";
-import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import type { OcxConfig } from "../../src/types";
+import { handleClientIntegrationCommand as command, handleCommandcodeCommand } from "../../backend/src/cli/integrations";
+import { handleIntegrationPreviewCommand as leaf } from "../../backend/src/cli/integration-preview";
+import { decodeIntegrationPlan, FILE_INTEGRATION_CLIENTS } from "../../backend/src/cli/integration-plan-dto";
+import { parseIntegrationMutationPlan as guiDecode } from "../../frontend/src/pages/integrations/integration-api";
+import { MANAGED_PATH_TEMPLATES } from "../../backend/src/integrations/mutation-plan";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { loadExportModels, resetExportSnapshotForTests } from "../../backend/src/server/management/model-rows";
+import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
@@ -279,7 +279,7 @@ test("closed decoder agrees with canonical template vocabulary and has no runtim
     const value = { ...plan, clientId, willChange: true, changes: [{ kind: "add", path: template.join(".") }] };
     expect(decodeIntegrationPlan(value)).toEqual(guiDecode(value));
   }
-  const source = readFileSync(repoPath("src/cli/integration-plan-dto.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/cli/integration-plan-dto.ts"), "utf8");
   expect(new Bun.Transpiler({ loader: "ts" }).scanImports(source)).toEqual([]);
 });
 

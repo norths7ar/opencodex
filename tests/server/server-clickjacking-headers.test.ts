@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { browserSecurityHeaders, corsHeaders } from "../../src/server/auth-cors";
-import { serveGuiFile } from "../../src/server/gui-static";
+import { browserSecurityHeaders, corsHeaders } from "../../backend/src/server/auth-cors";
+import { serveGuiFile } from "../../backend/src/server/gui-static";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const EXPECTED = {

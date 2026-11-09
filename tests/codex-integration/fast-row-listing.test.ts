@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { AUTO_CONTEXT_OFF, UNPAIRED_AUTO_CONTEXT } from "../../src/claude/context-windows";
-import { desktop3pAlias } from "../../src/claude/desktop-3p";
-import { buildAnthropicModelInfos } from "../../src/claude/model-info";
-import type { CatalogModel } from "../../src/codex/catalog";
+import { AUTO_CONTEXT_OFF, UNPAIRED_AUTO_CONTEXT } from "../../backend/src/claude/context-windows";
+import { desktop3pAlias } from "../../backend/src/claude/desktop-3p";
+import { buildAnthropicModelInfos } from "../../backend/src/claude/model-info";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
 
 /**
  * Fast rows on Claude Code discovery (devlog 260904_external_fast_wire/020).

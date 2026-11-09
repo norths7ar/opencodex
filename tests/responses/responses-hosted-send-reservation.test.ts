@@ -1,10 +1,10 @@
 import { expect, spyOn, test } from "bun:test";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { createAdapterPhysicalSend } from "../../src/adapters/physical-send";
-import { getActiveTurnCount } from "../../src/server/lifecycle";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { createAdapterPhysicalSend } from "../../backend/src/adapters/physical-send";
+import { getActiveTurnCount } from "../../backend/src/server/lifecycle";
 import { hostedSendFixture } from "../helpers/hosted-send-fixture";
 import { chatStream } from "../helpers/combo-failover-upstream";
-import * as keyFailover from "../../src/providers/key-failover";
+import * as keyFailover from "../../backend/src/providers/key-failover";
 
 for (const kind of ["search", "image", "video"] as const) {
   for (const strategy of ["failover", "jev"] as const) {
@@ -42,7 +42,7 @@ for (const kind of ["search", "image", "video"] as const) {
   }));
   test(`${kind} direct hosted inference preserves its existing non-Combo accounting contract`, async () => hostedSendFixture(kind, async f => {
     const req = f.request(); const body = await req.json() as Record<string, unknown>; body.model = "a/m";
-    const { handleResponses } = await import("../../src/server/responses/core");
+    const { handleResponses } = await import("../../backend/src/server/responses/core");
     const response = await handleResponses(new Request(req.url, { method: "POST", headers: req.headers, body: JSON.stringify(body) }), f.config, f.log, { sendBudget: f.budget });
     expect(await response.text()).toContain("hosted route final answer"); expect(f.inference).toBe(1);
     expect(f.budget.used).toBe(0); expect(f.charges).toBe(0); expect(f.refunds).toBe(0); expect(getActiveTurnCount()).toBe(0);

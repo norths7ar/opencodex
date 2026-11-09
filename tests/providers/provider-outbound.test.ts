@@ -3,9 +3,9 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { DestinationDnsResolutionError } from "../../src/lib/destination-policy";
-import type { ProviderOutboundDependencies } from "../../src/lib/provider-outbound";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import { DestinationDnsResolutionError } from "../../backend/src/lib/destination-policy";
+import type { ProviderOutboundDependencies } from "../../backend/src/lib/provider-outbound";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { fixturePath, repoRoot } from "../helpers/repo-root";
 
@@ -57,7 +57,7 @@ function directDependencies(
 describe("provider outbound GET transport", () => {
   test("a written fetch value is configuration, not an executor to call", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response('{"data":[]}', {
       status: 200,
       headers: { "content-type": "application/json" },
@@ -84,7 +84,7 @@ describe("provider outbound GET transport", () => {
 
   test("direct HTTPS connects only to the validated address with TLS verification", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response('{"data":[]}', {
       status: 200,
       headers: { "content-type": "application/json" },
@@ -112,7 +112,7 @@ describe("provider outbound GET transport", () => {
     process.env.https_proxy = proxyUrl;
     process.env.NO_PROXY = "localhost,127.0.0.1,::1,[::1]";
     process.env.no_proxy = "localhost,127.0.0.1,::1,[::1]";
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response(null, { status: 200 }), {
       privateNetwork: true,
       address: "192.168.1.50",
@@ -145,7 +145,7 @@ describe("provider outbound GET transport", () => {
     }) as typeof fetch;
     globalThis.fetch = fetchMock;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const resolveOptions: { allowBenchmarkAddresses?: boolean }[] = [];
       const { dependencies, captured } = directDependencies(new Response(null, { status: 500 }));
       const innerResolve = dependencies.resolveAddresses!;
@@ -181,7 +181,7 @@ describe("provider outbound GET transport", () => {
 
   test("Clash fake-IP without a configured proxy is not granted the benchmark opt-in (#1748)", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const resolveOptions: { allowBenchmarkAddresses?: boolean }[] = [];
     const { dependencies, captured } = directDependencies(new Response(null, { status: 500 }));
     dependencies.resolveAddresses = mock(async (_url: string, options?: { allowBenchmarkAddresses?: boolean }) => {
@@ -211,7 +211,7 @@ describe("provider outbound GET transport", () => {
     const fetchMock = mock(async () => new Response("unexpected", { status: 500 })) as typeof fetch;
     globalThis.fetch = fetchMock;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const resolveOptions: { allowBenchmarkAddresses?: boolean }[] = [];
       const { dependencies, captured } = directDependencies(new Response(null, { status: 500 }));
       dependencies.resolveAddresses = mock(async (_url: string, options?: { allowBenchmarkAddresses?: boolean }) => {
@@ -246,7 +246,7 @@ describe("provider outbound GET transport", () => {
       ] as const) {
         for (const key of proxyKeys) delete process.env[key];
         process.env[proxyKey] = "http://127.0.0.1:9";
-        const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+        const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
         const resolveOptions: { allowBenchmarkAddresses?: boolean }[] = [];
         const { dependencies, captured } = directDependencies(new Response(null, { status: 204 }));
         dependencies.resolveAddresses = mock(async (_url: string, options?: { allowBenchmarkAddresses?: boolean }) => {
@@ -284,7 +284,7 @@ describe("provider outbound GET transport", () => {
     const fetchMock = mock(async () => new Response("unexpected", { status: 500 })) as typeof fetch;
     globalThis.fetch = fetchMock;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const { dependencies, captured } = directDependencies(new Response(null, { status: 204 }));
 
       const response = await providerOutboundGet(
@@ -306,7 +306,7 @@ describe("provider outbound GET transport", () => {
   test("a scheme-mismatched proxy variable does not demand NO_PROXY for private providers", async () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTP_PROXY = "http://127.0.0.1:9";
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response(null, { status: 200 }), {
       privateNetwork: true,
       address: "192.168.1.50",
@@ -331,7 +331,7 @@ describe("provider outbound GET transport", () => {
     const fetchMock = mock(async () => new Response("unexpected", { status: 500 })) as typeof fetch;
     globalThis.fetch = fetchMock;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const { dependencies } = directDependencies(new Response(null, { status: 204 }));
       dependencies.resolveAddresses = mock(async () => {
         throw new DestinationDnsResolutionError("getaddrinfo ENOTFOUND provider.example");
@@ -359,7 +359,7 @@ describe("provider outbound GET transport", () => {
     const fetchMock = mock(async () => new Response('{"data":[]}', { status: 200 })) as typeof fetch;
     globalThis.fetch = fetchMock;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const { dependencies } = directDependencies(new Response(null, { status: 204 }));
       dependencies.resolveAddresses = mock(async () => {
         throw new DestinationDnsResolutionError("getaddrinfo ENOTFOUND provider.example");
@@ -385,7 +385,7 @@ describe("provider outbound GET transport", () => {
   test("a SOCKS scheme-matched variable admits and binds the proxy instead of pin-connecting to fake-IP", async () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = "socks5://127.0.0.1:9";
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response(null, { status: 204 }));
     const resolveOptions: { allowMihomoIpv6FakeIp?: boolean }[] = [];
     dependencies.resolveAddresses = mock(async (_url: string, options?: { allowMihomoIpv6FakeIp?: boolean }) => {
@@ -413,7 +413,7 @@ describe("provider outbound GET transport", () => {
 
   test("built-in ollama admits loopback discovery without an explicit allowPrivateNetwork flag (#758)", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     let sawAllowPrivate: boolean | undefined;
     const dependencies: ProviderOutboundDependencies = {
       resolveAddresses: mock(async (_url, options) => {
@@ -446,7 +446,7 @@ describe("provider outbound GET transport", () => {
     const redirectTarget = new URL("https://final.example/v1/models?token=secret#fragment");
     redirectTarget.username = "user";
     redirectTarget.password = "password";
-    const { providerOutboundGet, providerRedirectError } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet, providerRedirectError } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = directDependencies(new Response(null, {
       status: 302,
       headers: { location: redirectTarget.toString() },
@@ -481,7 +481,7 @@ describe("provider outbound GET transport", () => {
       baseUrl: "https://override.example/v1",
       fetch: override,
     } as { baseUrl: string; fetch: typeof fetch };
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
 
     const response = await providerOutboundGet(
       "override",
@@ -580,7 +580,7 @@ describe("provider outbound GET transport", () => {
 describe("provider outbound POST transport", () => {
   test("direct HTTPS posts only to the validated address with its credential and body", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundPost } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundPost } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = directDependencies(new Response('{"models":{}}', {
       status: 200,
       headers: { "content-type": "application/json" },
@@ -605,7 +605,7 @@ describe("provider outbound POST transport", () => {
   });
 
   test("blocks an unsafe POST destination before invoking a caller-owned executor", async () => {
-    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
     let calls = 0;
     const provider = {
       baseUrl: "https://provider.example",
@@ -625,7 +625,7 @@ describe("provider outbound POST transport", () => {
   });
 
   test("requires HTTPS before invoking a caller-owned executor", async () => {
-    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
     let calls = 0;
     const provider = {
       baseUrl: "https://provider.example",
@@ -646,7 +646,7 @@ describe("provider outbound POST transport", () => {
 
   test("admits a cleartext POST only for an opted-in local destination the row allows", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
     const body = JSON.stringify({ model: "tev1:4b" });
     // The real resolver classifies literals without DNS, so an admitted literal proves itself.
     const pinnedOnly = () => {
@@ -739,8 +739,8 @@ describe("provider outbound POST transport", () => {
   });
 
   test("never sends a cleartext POST through a proxy or its DNS-failure degradation", async () => {
-    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
-    const { DestinationDnsResolutionError } = await import("../../src/lib/destination-policy");
+    const { providerOutboundPost, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
+    const { DestinationDnsResolutionError } = await import("../../backend/src/lib/destination-policy");
     const url = "http://localhost:11434/v1/systemone";
     const body = JSON.stringify({ model: "tev1:4b" });
     let sends = 0;
@@ -831,7 +831,7 @@ describe("#3462 Mihomo IPv6 fake-IP admission is gated on the scheme-matched pro
       });
     }) as typeof fetch;
     try {
-      const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+      const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
       const resolveOptions: Captured[] = [];
       const { dependencies, captured } = directDependencies(new Response(null, { status: 500 }));
       dependencies.resolveAddresses = mock(async (_url: string, options?: Captured) => {
@@ -895,7 +895,7 @@ describe("#3462 Mihomo IPv6 fake-IP admission is gated on the scheme-matched pro
 
   test("canonical destination without proxy env: admitted under TUN transparentFakeIpException", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const resolveOptions: Captured[] = [];
     const { dependencies, captured } = directDependencies(new Response(null, { status: 200 }));
     dependencies.isCanonicalUrl = (name, url) => name === "opencode-go" && url === target;
@@ -913,7 +913,7 @@ describe("#3462 Mihomo IPv6 fake-IP admission is gated on the scheme-matched pro
 
 describe("effectiveProxyFor picks the variable Bun fetch actually honours", () => {
   test("scheme-matched selection; HTTP ALL_PROXY only counts for http: targets", async () => {
-    const { effectiveProxyFor } = await import("../../src/lib/proxy-env");
+    const { effectiveProxyFor } = await import("../../backend/src/lib/proxy-env");
     const https = new URL("https://opencode.ai/zen/v1/models");
     const http = new URL("http://ollama.lan:11434/v1/models");
     expect(effectiveProxyFor(https, { HTTPS_PROXY: "http://p:1" })).toBe("http://p:1");
@@ -949,7 +949,7 @@ describe("effectiveProxyFor picks the variable Bun fetch actually honours", () =
   });
 
   test("schemeMatchedProxyFor keeps the stricter fake-IP binding gate", async () => {
-    const { schemeMatchedProxyFor } = await import("../../src/lib/proxy-env");
+    const { schemeMatchedProxyFor } = await import("../../backend/src/lib/proxy-env");
     const https = new URL("https://opencode.ai/zen/v1/models");
     const http = new URL("http://ollama.lan:11434/v1/models");
     expect(schemeMatchedProxyFor(https, { HTTPS_PROXY: "http://p:1" })).toBe("http://p:1");
@@ -997,7 +997,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("direct GET fills opencodex when no caller names a User-Agent", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response('{"data":[]}', { status: 200 }));
 
     const response = await providerOutboundGet(
@@ -1015,7 +1015,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("a caller User-Agent is kept without a second User-Agent beside it", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     await providerOutboundGet(
@@ -1033,7 +1033,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("no headers at all still sends the default", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     await providerOutboundGet(
@@ -1049,7 +1049,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("the POST diagnostic path gets the same default", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundPost } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundPost } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     const response = await providerOutboundPost(
@@ -1065,7 +1065,7 @@ describe("provider outbound default User-Agent", () => {
   });
   test("a Headers object without a User-Agent gets the default", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     await providerOutboundGet(
@@ -1082,7 +1082,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("an array-form header list without a User-Agent gets the default", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     await providerOutboundGet(
@@ -1099,7 +1099,7 @@ describe("provider outbound default User-Agent", () => {
 
   test("a Headers object keeps its own User-Agent", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = userAgentDependencies(new Response(null, { status: 200 }));
 
     await providerOutboundGet(
@@ -1124,7 +1124,7 @@ describe("provider outbound default User-Agent", () => {
       captured.headers = init?.headers;
       return new Response(null, { status: 200 });
     }) as typeof fetch;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
 
     await providerOutboundGet(
       "override",

@@ -1,16 +1,16 @@
 /** Haiku 5.5 seed/snapshot parity; provider-local row shapes follow Sonnet 5.5. */
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { CURSOR_CAPABILITIES, cursorUmbrellaRows, resolveCursorSelection } from "../../src/adapters/cursor/catalog";
-import { cursorModelEffortLadder, cursorEffortSuffix } from "../../src/adapters/cursor/effort-map";
-import { DEVIN_MODEL_CONTEXT_WINDOWS } from "../../src/adapters/devin/live-models";
-import { DESKTOP_PICKER_ID_SUGGESTIONS } from "../../src/claude/intercept/model-bindings";
-import { getModelMetadata, resolveMetadataProvider } from "../../src/generated/model-metadata";
-import { effectiveModelAliases } from "../../src/providers/default-aliases";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { KIRO_MODELS, KIRO_MODEL_CONTEXT_WINDOWS, KIRO_MODEL_REASONING_EFFORTS, normalizeKiroModelId } from "../../src/providers/kiro-models";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { ANTHROPIC_MODELS, ANTHROPIC_MODEL_CONTEXT_WINDOWS, ANTHROPIC_MODEL_INPUT_MODALITIES, ANTHROPIC_MODEL_MAX_OUTPUT_TOKENS, ANTHROPIC_MODEL_REASONING_EFFORTS } from "../../src/providers/registry/model-seeds";
+import { CURSOR_CAPABILITIES, cursorUmbrellaRows, resolveCursorSelection } from "../../backend/src/adapters/cursor/catalog";
+import { cursorModelEffortLadder, cursorEffortSuffix } from "../../backend/src/adapters/cursor/effort-map";
+import { DEVIN_MODEL_CONTEXT_WINDOWS } from "../../backend/src/adapters/devin/live-models";
+import { DESKTOP_PICKER_ID_SUGGESTIONS } from "../../backend/src/claude/intercept/model-bindings";
+import { getModelMetadata, resolveMetadataProvider } from "../../backend/src/generated/model-metadata";
+import { effectiveModelAliases } from "../../backend/src/providers/default-aliases";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { KIRO_MODELS, KIRO_MODEL_CONTEXT_WINDOWS, KIRO_MODEL_REASONING_EFFORTS, normalizeKiroModelId } from "../../backend/src/providers/kiro-models";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { ANTHROPIC_MODELS, ANTHROPIC_MODEL_CONTEXT_WINDOWS, ANTHROPIC_MODEL_INPUT_MODALITIES, ANTHROPIC_MODEL_MAX_OUTPUT_TOKENS, ANTHROPIC_MODEL_REASONING_EFFORTS } from "../../backend/src/providers/registry/model-seeds";
 import { repoPath } from "../helpers/repo-root";
 
 const ID = "claude-haiku-5-5";

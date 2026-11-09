@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { defaultCodexHome } from "../../src/codex/home";
-import { currentServiceHomes, serviceCodexHomeMatchesInstall } from "../../src/service";
+import { defaultCodexHome } from "../../backend/src/codex/home";
+import { currentServiceHomes, serviceCodexHomeMatchesInstall } from "../../backend/src/service";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 

@@ -9,7 +9,7 @@ import { Database } from "bun:sqlite";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
 import {
   appendUsageEntry,
@@ -17,7 +17,7 @@ import {
   resetUsageReadCacheForTests,
   usageLogPath,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import {
   closeRequestHistoryIndex,
   openRequestHistoryIndex,
@@ -30,14 +30,14 @@ import {
   setRequestHistoryAsyncRefreshBuildsForTests,
   setRequestHistoryRebuildJobFactoryForTests,
   setRequestHistoryWorkerRebuildMinBytesForTests,
-} from "../../src/routing/history/indexer";
-import { buildFilePath, buildIndexFile } from "../../src/routing/history/build-file";
-import { ingestSourceTail, metaValue, resetAndCreateSchema, RequestHistoryIndexStaleError } from "../../src/routing/history/ingest";
-import { HISTORY_DB_FILENAME, HISTORY_META_KEYS } from "../../src/routing/history/schema";
-import { getConfigDir } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/routing/history/indexer";
+import { buildFilePath, buildIndexFile } from "../../backend/src/routing/history/build-file";
+import { ingestSourceTail, metaValue, resetAndCreateSchema, RequestHistoryIndexStaleError } from "../../backend/src/routing/history/ingest";
+import { HISTORY_DB_FILENAME, HISTORY_META_KEYS } from "../../backend/src/routing/history/schema";
+import { getConfigDir } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

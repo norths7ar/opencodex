@@ -6,9 +6,9 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { restoreCodexCatalog } from "../../src/codex/catalog";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
+import { restoreCodexCatalog } from "../../backend/src/codex/catalog";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));

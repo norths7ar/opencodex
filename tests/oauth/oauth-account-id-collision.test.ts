@@ -4,12 +4,12 @@ import { join } from "node:path";
 import {
   resetHardenedStateForTests,
   setIcaclsRunnerForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   getAccountSet,
   getCredential,
   saveCredential,
-} from "../../src/oauth/store";
+} from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-oauth-account-id-collision-test");

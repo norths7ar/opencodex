@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { parseKiroEvent } from "../../../src/adapters/kiro-events";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../src/lib/debug-settings";
+import { parseKiroEvent } from "../../../backend/src/adapters/kiro-events";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../backend/src/lib/debug-settings";
 
 const enc = new TextEncoder();
 

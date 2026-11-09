@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { guardNativeMessagesEmptyToolCatalog } from "../../src/server/messages-native-tool-guard";
-import { tapAnthropicSseForLog } from "../../src/server/messages-shared";
-import { relaySseWithPayloadRewrite } from "../../src/server/sse-payload-rewrite";
-import { createMessagesSseErrorFilter } from "../../src/server/messages-sse-error-filter";
-import { MessagesSseFrameContext, messagesSseFrameHooks } from "../../src/lib/messages-sse-error-presentation";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { claudeOverflowSsePayload } from "../../src/claude/outbound";
+import { guardNativeMessagesEmptyToolCatalog } from "../../backend/src/server/messages-native-tool-guard";
+import { tapAnthropicSseForLog } from "../../backend/src/server/messages-shared";
+import { relaySseWithPayloadRewrite } from "../../backend/src/server/sse-payload-rewrite";
+import { createMessagesSseErrorFilter } from "../../backend/src/server/messages-sse-error-filter";
+import { MessagesSseFrameContext, messagesSseFrameHooks } from "../../backend/src/lib/messages-sse-error-presentation";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { claudeOverflowSsePayload } from "../../backend/src/claude/outbound";
 import { SSE_SENTINEL, sseFrame } from "../helpers/messages-sse-cases";
 const encode = (text: string) => new TextEncoder().encode(text);
 for (const rewritten of [false, true]) for (const ending of ["", "\n", "\r", "\r\n"]) test(`local tail after unfinished upstream block: rewrite=${rewritten}, ending=${JSON.stringify(ending)}`, async () => {

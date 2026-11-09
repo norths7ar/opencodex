@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome } from "../helpers/temp-home";
 import {
   handleAnthropicResetGrantRoutes,
   type AnthropicResetGrantRouteDeps,
-} from "../../src/server/management/anthropic-reset-grant-routes";
+} from "../../backend/src/server/management/anthropic-reset-grant-routes";
 
 // Upstream is always an injected fake here. A real claim spends a one-time reset.
 

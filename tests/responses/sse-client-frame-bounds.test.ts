@@ -7,9 +7,9 @@ import {
   MAX_CLIENT_SSE_FRAME_BYTES,
   SseFrameCountLimitError,
   SseFrameTooLargeError,
-} from "../../src/server/sse-frame-buffer";
-import { relaySseWithFailedTail } from "../../src/server/relay";
-import { pumpResponsesSseToWebSocket, type WsData } from "../../src/server/ws-bridge";
+} from "../../backend/src/server/sse-frame-buffer";
+import { relaySseWithFailedTail } from "../../backend/src/server/relay";
+import { pumpResponsesSseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();

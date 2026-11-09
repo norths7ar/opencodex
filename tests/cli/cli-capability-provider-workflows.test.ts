@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { PROVIDER_MODEL_CAPABILITIES } from "../../src/cli/capabilities-provider-models";
-import { CAPABILITIES as BASE } from "../../src/cli/capabilities-base";
-import { handleProviderRuntimeCommand } from "../../src/cli/provider-runtime";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { handleAliasCommand } from "../../src/cli/alias";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { PROVIDER_MODEL_CAPABILITIES } from "../../backend/src/cli/capabilities-provider-models";
+import { CAPABILITIES as BASE } from "../../backend/src/cli/capabilities-base";
+import { handleProviderRuntimeCommand } from "../../backend/src/cli/provider-runtime";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { handleAliasCommand } from "../../backend/src/cli/alias";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 
@@ -65,7 +65,7 @@ describe("provider/model discovery follows existing handlers", () => {
     expect(capability("models add").json).toBe("envelope");
     expect(capability("models remove").flags.map(flag => flag.name)).toEqual(["--yes", "--live", "--json"]);
     // Compare the source's actual public usage constants, without executing local mutation/sync.
-    const source = readFileSync(repoPath("src", "cli", "models.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "models.ts"), "utf8");
     const removeUsage = /const REMOVE_USAGE = "Usage: ([^"]+)"/.exec(source)?.[1];
     expect(capability("models remove").usage).toBe(removeUsage);
     const listUsage = /const LIST_CUSTOM_USAGE = "Usage: ([^"]+)"/.exec(source)?.[1];

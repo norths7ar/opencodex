@@ -4,14 +4,14 @@ import {
   acknowledgeInjection, completeInjection, continuationFrame, waitForInjection, InjectionSocket, fallbackCalls,
   type Frame,
 } from "../helpers/native-injection-fixture";
-import { NativeInjectionChannel } from "../../src/server/responses/native-injection";
-import { NativeInjectionReplay } from "../../src/server/responses/native-injection-replay";
-import { NativeSteeringChannel } from "../../src/server/responses/native-steering";
-import { nativeResponseControlMode } from "../../src/server/responses/native-response-control";
+import { NativeInjectionChannel } from "../../backend/src/server/responses/native-injection";
+import { NativeInjectionReplay } from "../../backend/src/server/responses/native-injection-replay";
+import { NativeSteeringChannel } from "../../backend/src/server/responses/native-steering";
+import { nativeResponseControlMode } from "../../backend/src/server/responses/native-response-control";
 import { nativeSavedResults, nativeResultFingerprint, nativeToolRequirement, nativeResultMatches,
-  MAX_NATIVE_RESULT_PARTS } from "../../src/server/responses/native-tool-results";
-import { nativeResponseOutput } from "../../src/server/responses/native-response-output";
-import { MAX_NATIVE_INJECTION_BYTES } from "../../src/server/responses/native-injection-protocol";
+  MAX_NATIVE_RESULT_PARTS } from "../../backend/src/server/responses/native-tool-results";
+import { nativeResponseOutput } from "../../backend/src/server/responses/native-response-output";
+import { MAX_NATIVE_INJECTION_BYTES } from "../../backend/src/server/responses/native-injection-protocol";
 
 installInjectionFixture();
 

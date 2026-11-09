@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../src/adapters/openai-chat";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests } from "../../../src/lib/debug-settings";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../backend/src/adapters/openai-chat";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests } from "../../../backend/src/lib/debug-settings";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { resolveFirstUsableOpenAiSidecar } from "../../src/providers/openai-sidecar";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { resolveFirstUsableOpenAiSidecar } from "../../backend/src/providers/openai-sidecar";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { BACKGROUND_WORK_TEARDOWN_TIMEOUT_MS, removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

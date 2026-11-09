@@ -10,7 +10,7 @@ import {
   MAX_QUEUED_INBOUND_BODIES,
   type InboundBodyBudget,
   type InboundBodyLease,
-} from "../../src/server/inbound-body-budget";
+} from "../../backend/src/server/inbound-body-budget";
 
 const freshSignal = () => new AbortController().signal;
 /** Assert that every reservation, active owner, and queued waiter was released. */

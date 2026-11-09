@@ -3,29 +3,29 @@ import { mkdirSync, mkdtempSync, readFileSync, unlinkSync, writeFileSync } from 
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import * as accountStore from "../../src/codex/account-store";
-import { headersForCodexAuthContext, type CodexAuthContext } from "../../src/codex/auth-context";
-import { deleteCodexAccount, reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { captureMainQuotaWriter, clearMainAccountInfoCache } from "../../src/codex/main-account-cache";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { codexForwardTerminalOutcomeRecorder, sidecarOutcomeRecorder } from "../../src/server/responses/core-codex-account";
-import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import * as accountStore from "../../backend/src/codex/account-store";
+import { headersForCodexAuthContext, type CodexAuthContext } from "../../backend/src/codex/auth-context";
+import { deleteCodexAccount, reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { captureMainQuotaWriter, clearMainAccountInfoCache } from "../../backend/src/codex/main-account-cache";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import { codexForwardTerminalOutcomeRecorder, sidecarOutcomeRecorder } from "../../backend/src/server/responses/core-codex-account";
+import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 import {
   forgetCodexFailureWindows,
   failureWindowSteersNewThreads,
   isCodexFailureWindowDegraded,
   noteCodexFailureWindowSample,
-} from "../../src/codex/routing/failure-window";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/routing/failure-window";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const NOW = 1_700_000_000_000;

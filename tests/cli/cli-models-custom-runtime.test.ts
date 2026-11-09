@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { handleModelsCustomRuntimeCommand as command } from "../../src/cli/models-custom-runtime";
-import { parseReasoningArgs } from "../../src/cli/models-custom-input";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleModelsCustomRuntimeCommand as command } from "../../backend/src/cli/models-custom-runtime";
+import { parseReasoningArgs } from "../../backend/src/cli/models-custom-input";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { ManagementRequest } from "../helpers/management-auth";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { loadConfig, saveConfig } from "../../src/config";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
 
 const PRIVATE = "synthetic-private-do-not-print";
 const committed = { status: "committed", changed: true, degraded: false, notices: [] };

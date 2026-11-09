@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { isCodexReserveRequestEligible } from "../../src/codex/loopback-target";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import { captureMainQuotaWriter } from "../../src/codex/main-account-cache";
-import { getMainReserveAuthorization, isMainReserveAuthorizationLive } from "../../src/codex/reserve-availability";
+import { isCodexReserveRequestEligible } from "../../backend/src/codex/loopback-target";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import { captureMainQuotaWriter } from "../../backend/src/codex/main-account-cache";
+import { getMainReserveAuthorization, isMainReserveAuthorizationLive } from "../../backend/src/codex/reserve-availability";
 import { ACCESS, ACCOUNT, EXTERNAL, PROXY_KEY, reserveIngressFixture, type Counters } from "../helpers/reserve-ingress-fixture";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 

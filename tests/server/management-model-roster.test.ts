@@ -10,10 +10,10 @@ import {
   loadExportModels,
   previewExportModels,
   resetExportSnapshotForTests,
-} from "../../src/server/management/model-rows";
-import type { CatalogModel } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
-import { clearModelCache, reconcileModelCacheProviders, setCached } from "../../src/codex/model-cache";
+} from "../../backend/src/server/management/model-rows";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
+import { clearModelCache, reconcileModelCacheProviders, setCached } from "../../backend/src/codex/model-cache";
 
 /**
  * A read-only caller has to be able to see what a writer would write without performing the

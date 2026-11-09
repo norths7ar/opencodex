@@ -8,12 +8,12 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, spyOn, test
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { setRelayPlatformForTests } from "../../src/server/responses/passthrough-delivery";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { setRelayPlatformForTests } from "../../backend/src/server/responses/passthrough-delivery";
 import {
   clearAccountQuota,
   updateAccountQuota,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   clearCodexUpstreamHealth,
@@ -22,23 +22,23 @@ import {
   previewCodexAccountForRequest,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 import {
   DEFAULT_SUBAGENT_MODEL_FALLBACK_POLL_MS,
   isModelHealthBlocked,
   resetSubagentModelFallbackStateForTests,
   setSubagentQuotaPrimeForTests,
-} from "../../src/codex/subagent-model-fallback";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { getMainAccountPlan, setMainAccountPlan } from "../../src/codex/main-account";
-import { resolveCodexAuthContext, type CodexAuthContext } from "../../src/codex/auth-context";
-import { handleResponses } from "../../src/server/responses";
-import { resetAgentTaskRecoveryState } from "../../src/server/responses/agent-task-recovery";
-import { isEagerRelaySseResponse } from "../../src/server/relay";
-import type { ActiveTurnLease } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { ResponsesTerminalStatus } from "../../src/bridge";
+} from "../../backend/src/codex/subagent-model-fallback";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { getMainAccountPlan, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { resolveCodexAuthContext, type CodexAuthContext } from "../../backend/src/codex/auth-context";
+import { handleResponses } from "../../backend/src/server/responses";
+import { resetAgentTaskRecoveryState } from "../../backend/src/server/responses/agent-task-recovery";
+import { isEagerRelaySseResponse } from "../../backend/src/server/relay";
+import type { ActiveTurnLease } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { ResponsesTerminalStatus } from "../../backend/src/bridge";
 import {
   codexHeaders,
   encryptedInput as recoverableEncryptedInput,
@@ -450,7 +450,7 @@ describe("subagent fallback without primary auth cooldown failure", () => {
     updateAccountQuota("pool-a", 20, undefined, 20);
     const resetAt = Math.floor((now + 4 * 24 * 60 * 60_000) / 1000);
     recordCodexUpstreamOutcome(cfg, "pool-a", 429, { resetAt, now });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.5", "429", cfg, "pool-a");
 
     const probeAt = now + CODEX_QUOTA_PROBE_INTERVAL_MS;
@@ -512,7 +512,7 @@ describe("subagent fallback without primary auth cooldown failure", () => {
     updateAccountQuota("pool-a", 95, undefined, 20);
     const resetAt = Math.floor((now + 4 * 24 * 60 * 60_000) / 1000);
     recordCodexUpstreamOutcome(cfg, "pool-a", 429, { resetAt, now });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
 
     let fetchCalls = 0;
@@ -566,7 +566,7 @@ describe("subagent fallback final-route normalization", () => {
       subagentModelFallback: ["openai-apikey/gpt-5.6-sol-pro"],
       fastMode: true,
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.6-sol", "429", cfg);
 
     const capture = { urls: [] as string[], bodies: [] as string[], auths: [] as Array<string | null> };
@@ -623,7 +623,7 @@ describe("subagent fallback final-route normalization", () => {
         },
       },
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -677,7 +677,7 @@ describe("subagent fallback final-route normalization", () => {
         },
       },
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -716,7 +716,7 @@ describe("subagent fallback final-route normalization", () => {
       },
       subagentModelFallback: ["xai/grok-4.5"],
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.5", "rate limit exceeded", cfg);
 
     const capture = { urls: [] as string[], bodies: [] as string[], auths: [] as Array<string | null> };
@@ -796,7 +796,7 @@ describe("subagent fallback final-route normalization", () => {
       },
       subagentModelFallback: ["xai/grok-4.5"],
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.5", "rate limit exceeded", cfg);
 
     const capture = { urls: [] as string[], bodies: [] as string[], auths: [] as Array<string | null> };
@@ -830,7 +830,7 @@ describe("native fallback account preview", () => {
         { id: "pool-b", email: "b@example.test", isMain: false, chatgptAccountId: "pool_acc_b" },
       ],
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("team/gpt-5.6-sol", "429", cfg, "pool-a", now);
     // Make a stale account choice observable at the fallback boundary: preview must
     // apply the first snapshot and move to pool-b before checking model health.
@@ -1213,7 +1213,7 @@ describe("native fallback account preview", () => {
       activeCodexAccountId: "__main__",
       subagentModelFallback: ["gpt-5.5"],
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
     let selectionReleases = 0;
@@ -1292,7 +1292,7 @@ describe("native fallback account preview", () => {
     // what the route-model scope derivation inside handleResponses prevents.
     expect(previewCodexAccountForRequest(bound.affinityKey ?? null, cfg, now, undefined)).not.toBe("pool-a");
 
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -1343,7 +1343,7 @@ describe("native fallback account preview", () => {
     });
     expect(bound).toMatchObject({ kind: "pool", accountId: "pool-a" });
     cfg.activeCodexAccountId = "pool-b";
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -1410,7 +1410,7 @@ describe("native fallback account preview", () => {
       now: cooldownAt,
       resetAt: Math.floor((cooldownAt + 60 * 60_000) / 1_000),
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.6-sol", "429", cfg, "pool-a", now);
     noteSubagentModelFailure("gpt-5.6-sol", "429", cfg, "pool-b", now);
 
@@ -1481,7 +1481,7 @@ describe("native fallback account preview", () => {
       now,
       resetAt: Math.floor((now + 60 * 60_000) / 1_000),
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.6-terra", "429", cfg, "pool-b", now);
     noteSubagentModelFailure(
       "gpt-5.6-terra",
@@ -1612,7 +1612,7 @@ describe("native fallback account preview", () => {
     });
     updateAccountQuota("pool-a", 95, undefined, 20);
     updateAccountQuota("pool-b", 10, undefined, 20);
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -1676,7 +1676,7 @@ describe("native fallback account preview", () => {
     });
     updateAccountQuota("pool-a", 95, undefined, 20);
     updateAccountQuota("pool-b", 90, undefined, 20);
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("xai/grok-4.5", "429", cfg);
     noteSubagentModelFailure("grok-4.5", "429", cfg);
 
@@ -2080,7 +2080,7 @@ describe("encrypted child native-only fallback", () => {
         },
       },
     });
-    const { noteSubagentModelFailure } = await import("../../src/codex/subagent-model-fallback");
+    const { noteSubagentModelFailure } = await import("../../backend/src/codex/subagent-model-fallback");
     noteSubagentModelFailure("gpt-5.6-terra", "429", cfg);
 
     const response = await postSpawn(cfg, {

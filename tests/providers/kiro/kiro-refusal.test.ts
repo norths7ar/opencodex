@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { classifyKiroRefusal, isKiroAccountProfileRefusal } from "../../../src/adapters/kiro-refusal";
-import { kiroEvidenceIdentity } from "../../../src/providers/kiro-account-state-disk";
-import type { ProviderAccount } from "../../../src/oauth/types";
+import { classifyKiroRefusal, isKiroAccountProfileRefusal } from "../../../backend/src/adapters/kiro-refusal";
+import { kiroEvidenceIdentity } from "../../../backend/src/providers/kiro-account-state-disk";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
 
 const classified = (status: number, body: unknown) =>
   classifyKiroRefusal(status, typeof body === "string" ? body : JSON.stringify(body));

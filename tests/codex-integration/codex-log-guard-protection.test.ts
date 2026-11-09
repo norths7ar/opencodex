@@ -9,7 +9,7 @@ import {
   protectCodexLogs,
   repairCodexLogGuardProtection,
   unprotectCodexLogs,
-} from "../../src/codex/log-guard/protection";
+} from "../../backend/src/codex/log-guard/protection";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

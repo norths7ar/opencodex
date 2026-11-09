@@ -2,16 +2,16 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { tapAnthropicSseForLog } from "../../src/server/claude-messages";
-import { decodeTokPerSecondResult } from "../../src/server/management/shared";
+import { tapAnthropicSseForLog } from "../../backend/src/server/claude-messages";
+import { decodeTokPerSecondResult } from "../../backend/src/server/management/shared";
 import {
   addFinalRequestLog,
   clearRequestLogsForTests,
   inspectResponseLogSsePayload,
   type RequestLogContext,
-} from "../../src/server/request-log";
-import { generationWindowFields, recordGenerationEvent } from "../../src/server/request-log-generation-window";
-import { normalizeUsageEntryForTest, resetUsageReadCacheForTests, usageLogPath } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { generationWindowFields, recordGenerationEvent } from "../../backend/src/server/request-log-generation-window";
+import { normalizeUsageEntryForTest, resetUsageReadCacheForTests, usageLogPath } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ctx = (): RequestLogContext => ({ model: "m", provider: "openai" });

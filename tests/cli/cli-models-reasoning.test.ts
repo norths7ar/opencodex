@@ -2,8 +2,8 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parseReasoningArgs, handleModels } from "../../src/cli/models";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
+import { parseReasoningArgs, handleModels } from "../../backend/src/cli/models";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

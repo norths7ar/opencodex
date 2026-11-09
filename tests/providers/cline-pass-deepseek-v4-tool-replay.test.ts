@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createRegisteredAdapter } from "../../src/adapters/registry";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createRegisteredAdapter } from "../../backend/src/adapters/registry";
 import {
   stripClinePassDeepSeekV4ToolReplayNarration,
-} from "../../src/adapters/cline-pass-deepseek-v4-tool-replay";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/cline-pass-deepseek-v4-tool-replay";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const TARGET_MODELS = [

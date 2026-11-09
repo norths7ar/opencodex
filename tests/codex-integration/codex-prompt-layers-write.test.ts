@@ -12,15 +12,15 @@ import {
   setToggle,
   writeCustomLayers,
   type CustomLayer,
-} from "../../src/codex/prompt-layers";
+} from "../../backend/src/codex/prompt-layers";
 import {
   encodeJournal,
   hashBytes,
   type JournalRecord,
-} from "../../src/codex/prompt-journal";
+} from "../../backend/src/codex/prompt-journal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { tryAcquire, release } from "../../src/codex/prompt-lock";
-import { OCX_SECTION_MARKER } from "../../src/codex/injected-marker";
+import { tryAcquire, release } from "../../backend/src/codex/prompt-lock";
+import { OCX_SECTION_MARKER } from "../../backend/src/codex/injected-marker";
 
 // Prompt layers deliberately keep the BARE ownership marker: 'ocx restore' is not their undo,
 // so the recovery hint that routing keys carry (#5261) does not belong here. Derived from the

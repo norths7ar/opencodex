@@ -5,7 +5,7 @@ import {
   escapeCmdCommand,
   resolveWindowsCommand,
   shellInvocation,
-} from "../../src/lib/win-exec";
+} from "../../backend/src/lib/win-exec";
 
 describe("escapeCmdArg / escapeCmdCommand (cross-spawn parity)", () => {
   test("plain token is quoted, with the quotes themselves caret-escaped", () => {

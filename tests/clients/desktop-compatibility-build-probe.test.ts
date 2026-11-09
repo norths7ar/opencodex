@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, test } from "bun:test";
-import { createInstalledBuildProbe, DESKTOP_COMPATIBILITY_ASSESSED_VERSION, DESKTOP_PACKAGE_PROOF_SCRIPT, DESKTOP_PACKAGE_PATH_GUARD_SCRIPT } from "../../src/codex/desktop-compatibility/installed-build";
+import { createInstalledBuildProbe, DESKTOP_COMPATIBILITY_ASSESSED_VERSION, DESKTOP_PACKAGE_PROOF_SCRIPT, DESKTOP_PACKAGE_PATH_GUARD_SCRIPT } from "../../backend/src/codex/desktop-compatibility/installed-build";
 import { lstatSync, mkdirSync, mkdtempSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { join, parse } from "node:path";
 import { spawnTestChild } from "../helpers/spawn-test-child";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold-spawn-warmup";
-import { resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
-import type { DesktopPackageObservation as DesktopAppInstall } from "../../src/codex/desktop-compatibility/installed-build";
+import { resolveTrustedWindowsPowerShellExe } from "../../backend/src/lib/windows-elevation";
+import type { DesktopPackageObservation as DesktopAppInstall } from "../../backend/src/codex/desktop-compatibility/installed-build";
 import { desktopPackageObservation } from "../helpers/desktop-package-observation";
 import { hostedWindowsQuarantine } from "../helpers/windows-ci-quarantine";
 

@@ -6,17 +6,17 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isProtocolTraceV1, parseProtocolTraceV1, type ProtocolPlanV1, type ProtocolTraceV1 } from "../../src/protocols/dto";
-import { planProtocol, type ProtocolPlanInput } from "../../src/protocols/plan";
-import { shadowPlanMismatch } from "../../src/protocols/shadow";
-import { recordProtocolShadowPlan } from "../../src/protocols/shadow-plan";
+import { isProtocolTraceV1, parseProtocolTraceV1, type ProtocolPlanV1, type ProtocolTraceV1 } from "../../backend/src/protocols/dto";
+import { planProtocol, type ProtocolPlanInput } from "../../backend/src/protocols/plan";
+import { shadowPlanMismatch } from "../../backend/src/protocols/shadow";
+import { recordProtocolShadowPlan } from "../../backend/src/protocols/shadow-plan";
 import {
   markProtocolBlocked,
   markProtocolEntry,
   markProtocolShadowPlanInput,
   protocolTraceForRequest,
-} from "../../src/protocols/trace";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/protocols/trace";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

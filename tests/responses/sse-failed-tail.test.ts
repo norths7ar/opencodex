@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { inspectResponseLogJson, type RequestLogContext } from "../../src/server/request-log";
-import { relaySseWithFailedTail, relayWithAbort } from "../../src/server";
-import { relaySseEagerBounded, type EagerRelayHooks } from "../../src/server/relay-eager";
-import { consumeForInspection, createSseInspector, MAX_TAIL_ERROR_MESSAGE_CHARS, upstreamErrorTailFrame } from "../../src/server/relay";
-import { classifyCodexUpstreamOutcome } from "../../src/codex/routing/cooldown-math";
+import { inspectResponseLogJson, type RequestLogContext } from "../../backend/src/server/request-log";
+import { relaySseWithFailedTail, relayWithAbort } from "../../backend/src/server";
+import { relaySseEagerBounded, type EagerRelayHooks } from "../../backend/src/server/relay-eager";
+import { consumeForInspection, createSseInspector, MAX_TAIL_ERROR_MESSAGE_CHARS, upstreamErrorTailFrame } from "../../backend/src/server/relay";
+import { classifyCodexUpstreamOutcome } from "../../backend/src/codex/routing/cooldown-math";
 import { codexWsUpstreamFetch, streamingInit } from "../helpers/ws-upstream-fixtures";
-import { readCodexWsStage } from "../../src/server/responses/codex-ws-wire";
-import { TERMINAL_REFUSAL_FALLBACK_MESSAGE } from "../../src/lib/errors";
-import { TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
-import { createOutboundCredentialMask } from "../../src/server/responses/terminal-error-redaction";
+import { readCodexWsStage } from "../../backend/src/server/responses/codex-ws-wire";
+import { TERMINAL_REFUSAL_FALLBACK_MESSAGE } from "../../backend/src/lib/errors";
+import { TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
+import { createOutboundCredentialMask } from "../../backend/src/server/responses/terminal-error-redaction";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { readMuseKeychain, MUSE_KEYCHAIN_TIMEOUT_MS, type MuseKeychainProcess } from "../../src/oauth/meta-muse-keychain";
-import { MuseLoginError } from "../../src/oauth/meta-muse-errors";
+import { readMuseKeychain, MUSE_KEYCHAIN_TIMEOUT_MS, type MuseKeychainProcess } from "../../backend/src/oauth/meta-muse-keychain";
+import { MuseLoginError } from "../../backend/src/oauth/meta-muse-errors";
 
 function child(code: number, output = ""): MuseKeychainProcess {
   return { stdout: new Blob([output]).stream(), exited: Promise.resolve(code), kill() {} };

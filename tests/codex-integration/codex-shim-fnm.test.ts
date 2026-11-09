@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { findCodexOnPath, installCodexShim, lastCodexDiscoveryError, setCodexShimProbeObservationMsForTests } from "../../src/codex/shim";
-import { SHIM_MARKER } from "../../src/codex/shim-templates";
+import { findCodexOnPath, installCodexShim, lastCodexDiscoveryError, setCodexShimProbeObservationMsForTests } from "../../backend/src/codex/shim";
+import { SHIM_MARKER } from "../../backend/src/codex/shim-templates";
 import { isolateCodexShimEnvironment, prependPath } from "../helpers/codex-shim-install-fixture";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 
 const OFFICIAL_CLINE_PASS_MODELS = [
   "cline-pass/glm-5.3",

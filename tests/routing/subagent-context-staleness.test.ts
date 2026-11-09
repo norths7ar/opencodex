@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveEffectiveSubagentRoster } from "../../src/server/responses/collaboration";
+import { resolveEffectiveSubagentRoster } from "../../backend/src/server/responses/collaboration";
 import {
   NATIVE_GPT56_CONTEXT_WINDOW,
   NATIVE_GPT56_OPT_IN_CONTEXT_WINDOW,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

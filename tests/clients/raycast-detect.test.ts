@@ -3,7 +3,7 @@ import {
   detectRaycast,
   realRaycastDetectDeps,
   type RaycastDetectDeps,
-} from "../../src/integrations/raycast-detect";
+} from "../../backend/src/integrations/raycast-detect";
 
 /**
  * Stubbed deps only. The real detector spawns `defaults` and reads the

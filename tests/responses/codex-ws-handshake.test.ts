@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { CODEX_RESPONSES_HTTP_URL, prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { CODEX_RESPONSES_HTTP_URL, prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
 
 const usage = { input_tokens: 3, output_tokens: 4, total_tokens: 7 };
 const proxyKeys = ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "all_proxy", "no_proxy"];

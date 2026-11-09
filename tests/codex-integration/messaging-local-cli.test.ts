@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { messageCodexHome } from "../../src/cli/message-runtime";
-import { skipsCodexShimAutoRestore } from "../../src/cli/codex-shim-autorestore";
-import { CAPABILITIES } from "../../src/cli/capabilities";
+import { messageCodexHome } from "../../backend/src/cli/message-runtime";
+import { skipsCodexShimAutoRestore } from "../../backend/src/cli/codex-shim-autorestore";
+import { CAPABILITIES } from "../../backend/src/cli/capabilities";
 import { LOCAL_TARGET, LocalFixtureRpcError, localMessagingFixture, NO_REPLY } from "../helpers/messaging-local";
 import { repoPath } from "../helpers/repo-root";
 
@@ -19,7 +19,7 @@ test("local commands stay registered and skip global repair even on malformed us
 
 test("invalid usage allocates no timer, socket, helper or runtime-selection work", async () => {
   const script = `
-    const { runMessageCommand } = await import(${JSON.stringify(repoPath("src/cli/message-command.ts"))});
+    const { runMessageCommand } = await import(${JSON.stringify(repoPath("backend/src/cli/message-command.ts"))});
     const fail = () => { throw new Error('Unexpected resource allocation'); };
     globalThis.setTimeout = fail; Bun.spawn = fail; globalThis.WebSocket = class { constructor() { fail(); } };
     process.exitCode = await runMessageCommand(['send', '--host', 'remote', '--stdin'], { CODEX_HOME: '/must-not-read' });
@@ -46,7 +46,7 @@ test.skipIf(process.platform === "win32")("full CLI uses the daemon directly, em
     await Bun.write(preload, `const fail = () => { throw new Error('Unexpected helper spawn'); }; Bun.spawn = fail; Bun.spawnSync = fail;`);
     const env = { PATH: process.env.PATH, HOME: fixture.root, CODEX_HOME: fixture.codexHome,
       OPENCODEX_HOME: join(fixture.root, "ocx"), CODEX_CLI_PATH: "/nonexistent/native", OCX_TEST_HOME_GUARD: "1" };
-    const cli = [process.execPath, "--preload", preload, repoPath("src/cli/index.ts"), "message"];
+    const cli = [process.execPath, "--preload", preload, repoPath("backend/src/cli/index.ts"), "message"];
     const run = async (args: string[], stdin = "") => {
       const child = Bun.spawn([...cli, ...args], { env, stdin: new Blob([stdin]), stdout: "pipe", stderr: "pipe" });
       const timer = setTimeout(() => child.kill(), 10_000);

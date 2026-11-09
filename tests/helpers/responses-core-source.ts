@@ -104,7 +104,7 @@ export const RESPONSES_CORE_MODULES = [
 export type ResponsesCoreModule = typeof RESPONSES_CORE_MODULES[number];
 
 export function readResponsesCoreModule(name: ResponsesCoreModule): string {
-  return readFileSync(repoPath("src", "server", "responses", name), "utf8");
+  return readFileSync(repoPath("backend/src", "server", "responses", name), "utf8");
 }
 
 /** Preserve cross-site source assertions without reading only the thin facade. */

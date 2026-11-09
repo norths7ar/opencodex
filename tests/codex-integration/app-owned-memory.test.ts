@@ -10,28 +10,28 @@ import {
   resetAppOwnedMemoryForTests,
   type AppOwnedRetainedCategory,
   type RetainedStoreSnapshot,
-} from "../../src/lib/app-owned-memory";
-import { CURSOR_BLOB_MAX_TOTAL_BYTES } from "../../src/adapters/cursor/native-exec";
-import { MAX_STORED_RESPONSE_BYTES } from "../../src/responses/state";
-import { IMAGE_NORMALIZE_CACHE_MAX_BYTES } from "../../src/adapters/anthropic-image-normalize";
-import { VISION_DESCRIPTION_CACHE_MAX_BYTES } from "../../src/vision";
-import { ANTIGRAVITY_REPLAY_MAX_TOTAL_BYTES } from "../../src/adapters/google-antigravity-replay";
-import { MAX_NATIVE_CONTROL_REPLAY_TOTAL_BYTES } from "../../src/server/responses/native-steering-replay";
+} from "../../backend/src/lib/app-owned-memory";
+import { CURSOR_BLOB_MAX_TOTAL_BYTES } from "../../backend/src/adapters/cursor/native-exec";
+import { MAX_STORED_RESPONSE_BYTES } from "../../backend/src/responses/state";
+import { IMAGE_NORMALIZE_CACHE_MAX_BYTES } from "../../backend/src/adapters/anthropic-image-normalize";
+import { VISION_DESCRIPTION_CACHE_MAX_BYTES } from "../../backend/src/vision";
+import { ANTIGRAVITY_REPLAY_MAX_TOTAL_BYTES } from "../../backend/src/adapters/google-antigravity-replay";
+import { MAX_NATIVE_CONTROL_REPLAY_TOTAL_BYTES } from "../../backend/src/server/responses/native-steering-replay";
 import {
   clearRequestLogsForTests,
   evictOldestRequestLogForBudget,
   hydrateRequestLogsFromDisk,
   requestLogEntryFromPersistedUsage,
   requestLogRetainedStoreSnapshot,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 import {
   clearModelCache,
   evictOldestModelCacheForBudget,
   modelCacheRetainedStoreSnapshot,
   setCached,
-} from "../../src/codex/model-cache";
-import type { PersistedUsageEntry } from "../../src/usage/log";
-import { registerDefaultAppOwnedObservedBuffers } from "../../src/lib/app-owned-memory-stores";
+} from "../../backend/src/codex/model-cache";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
+import { registerDefaultAppOwnedObservedBuffers } from "../../backend/src/lib/app-owned-memory-stores";
 
 interface Row { bytes: number; at: number; pinned?: boolean }
 

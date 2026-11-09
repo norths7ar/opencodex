@@ -9,10 +9,10 @@ import {
   parseUsageSurface,
   rangeWindow,
   summarizeUsage,
-} from "../../src/usage/summary";
-import type { PersistedUsageEntry } from "../../src/usage/log";
-import { buildRouteDecisionTrace } from "../../src/routing/trace";
-import { isUnresolvedRequestedModel } from "../../src/usage/model-identity";
+} from "../../backend/src/usage/summary";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
+import { buildRouteDecisionTrace } from "../../backend/src/routing/trace";
+import { isUnresolvedRequestedModel } from "../../backend/src/usage/model-identity";
 
 const FIXED_NOW = Date.UTC(2026, 5, 28, 12, 0, 0);
 
@@ -459,7 +459,7 @@ describe("day-level estimated cost", () => {
   });
 });
 
-import { projectUsageSummary } from "../../src/usage/summary";
+import { projectUsageSummary } from "../../backend/src/usage/summary";
 
 describe("canonical range and surface constants", () => {
   test("the exported members match what the parsers accept", () => {

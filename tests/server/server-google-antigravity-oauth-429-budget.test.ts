@@ -2,16 +2,16 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import * as retry from "../../src/lib/upstream-retry";
-import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../src/lib/request-execution-budget";
+import * as retry from "../../backend/src/lib/upstream-retry";
+import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../backend/src/lib/request-execution-budget";
 
 const DAILY_API_BASE = "https://daily-cloudcode-pa.googleapis.com";
 

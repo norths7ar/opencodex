@@ -27,14 +27,14 @@ import {
  * copy of the matcher, so it proved a local literal behaved rather than that the guard did.
  */
 const PROTECTED = [
-  "src/router.ts",
-  "src/server/lifecycle.ts",
-  "src/server/responses/core.ts",
-  "src/server/management-api.ts",
+  "backend/src/router.ts",
+  "backend/src/server/lifecycle.ts",
+  "backend/src/server/responses/core.ts",
+  "backend/src/server/management-api.ts",
 ] as const;
 
 /** The two quota subsystems that observe a committed snapshot. */
-const SEAMS = ["src/codex/quota.ts", "src/providers/quota.ts"] as const;
+const SEAMS = ["backend/src/codex/quota.ts", "backend/src/providers/quota.ts"] as const;
 
 const OBSERVER_SPEC = "../quota/reset-observer";
 
@@ -77,7 +77,7 @@ describe("core / quota-reset boundary", () => {
  */
 describe("the poller edge from the composition root stays cheap", () => {
   test("the only load-time path runs through background-lifecycle to the poller", () => {
-    const chain = firstLoadTimePathTo("src/server/index.ts", isQuotaModule);
+    const chain = firstLoadTimePathTo("backend/src/server/index.ts", isQuotaModule);
     expect(chain?.join(" -> ")).toBe(
       "src/server/index.ts -> src/server/background-lifecycle.ts -> src/quota/reset-poller.ts",
     );
@@ -89,7 +89,7 @@ describe("the poller edge from the composition root stays cheap", () => {
     // static edge above costs exactly one small module. A static import added here would
     // reach ../config -- a 154-module barrel -- from every install that starts a server,
     // which is the cost this boundary exists to prevent.
-    const staticEdges = resolvedImportEdges("src/quota/reset-poller.ts").filter(
+    const staticEdges = resolvedImportEdges("backend/src/quota/reset-poller.ts").filter(
       edge => !edge.dynamic,
     );
     expect(staticEdges.map(edge => edge.spec)).toEqual([]);
@@ -128,7 +128,7 @@ describe("the quota boundary guard cannot be defeated", () => {
         isQuotaModule,
       );
       expect(chain).not.toBeNull();
-      expect(chain!.join(" -> ")).toContain("src/quota/reset-observer.ts");
+      expect(chain!.join(" -> ")).toContain("backend/src/quota/reset-observer.ts");
     } finally {
       rmSync(probe, { force: true });
     }

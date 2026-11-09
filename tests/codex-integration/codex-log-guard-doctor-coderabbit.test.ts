@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatCodexLogGuardDoctor } from "../../src/cli/codex-log-guard-doctor";
-import type { CodexLogGuardStatus } from "../../src/codex/log-guard/protection";
+import { formatCodexLogGuardDoctor } from "../../backend/src/cli/codex-log-guard-doctor";
+import type { CodexLogGuardStatus } from "../../backend/src/codex/log-guard/protection";
 
 function status(schema: CodexLogGuardStatus["schema"]): CodexLogGuardStatus {
   const supported = schema.state === "compatible";

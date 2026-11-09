@@ -5,7 +5,7 @@ import {
   isStandaloneBinary,
   isStandaloneModuleUrl,
   standaloneRoot,
-} from "../../src/lib/standalone";
+} from "../../backend/src/lib/standalone";
 
 test("source Bun processes are not identified as compiled binaries", () => {
   expect(isStandaloneBinary()).toBe(false);

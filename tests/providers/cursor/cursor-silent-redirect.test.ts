@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { nativeShellDisabledMessage } from "../../../src/adapters/cursor/native-exec-shell";
+import { nativeShellDisabledMessage } from "../../../backend/src/adapters/cursor/native-exec-shell";
 
 /**
  * Devlog 260826 gap-8: native-tool denial payloads must read as silent redirects.
@@ -17,7 +17,7 @@ describe("cursor native-denial silent-redirect framing (gap-8)", () => {
   });
 
   test("fs denial constant has no denial framing", async () => {
-    const src = await Bun.file("src/adapters/cursor/native-exec-fs.ts").text();
+    const src = await Bun.file("backend/src/adapters/cursor/native-exec-fs.ts").text();
     const constant = src.match(/NATIVE_LOCAL_EXEC_DISABLED =\s*"([^"]+)"/)?.[1] ?? "";
     expect(constant.length).toBeGreaterThan(0);
     for (const pattern of FORBIDDEN) expect(constant).not.toMatch(pattern);
@@ -25,7 +25,7 @@ describe("cursor native-denial silent-redirect framing (gap-8)", () => {
   });
 
   test("network denial constant has no denial framing", async () => {
-    const src = await Bun.file("src/adapters/cursor/native-exec-network.ts").text();
+    const src = await Bun.file("backend/src/adapters/cursor/native-exec-network.ts").text();
     for (const pattern of FORBIDDEN) expect(src.split("\n").slice(0, 15).join("\n")).not.toMatch(pattern);
   });
 });

@@ -4,8 +4,8 @@ import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { repoPath, repoRoot } from "../helpers/repo-root";
-import { rotateServiceLog, startServiceLogging, SERVICE_LOG_MAX_BYTES } from "../../src/service/logging";
-import { CONFIG_UNINSTALL_MANIFEST, ConfigUninstallInProgressError, initializeConfigOwnership, recordOwnedConfigPath } from "../../src/lib/config-ownership";
+import { rotateServiceLog, startServiceLogging, SERVICE_LOG_MAX_BYTES } from "../../backend/src/service/logging";
+import { CONFIG_UNINSTALL_MANIFEST, ConfigUninstallInProgressError, initializeConfigOwnership, recordOwnedConfigPath } from "../../backend/src/lib/config-ownership";
 
 const roots: string[] = [];
 function sandbox(): string {
@@ -21,7 +21,7 @@ async function cli(service: boolean, args = ["start", "--port", "invalid"]) {
   const env = { ...process.env, HOME: root, OPENCODEX_HOME: join(root, ".opencodex"), CODEX_HOME: join(root, ".codex") };
   delete env.OCX_SERVICE;
   if (service) env.OCX_SERVICE = "1";
-  const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), ...args], {
+  const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), ...args], {
     cwd: repoRoot(), env, stdout: "pipe", stderr: "pipe",
   });
   const [stdout, stderr, code] = await Promise.all([
@@ -71,7 +71,7 @@ describe("managed service log", () => {
   test("all console sinks prefix every line and preserve formatted arguments", async () => {
     const path = join(sandbox(), "service.log");
     const child = Bun.spawn([process.execPath, "--eval", `
-      const { startServiceLogging } = await import(${JSON.stringify(repoPath("src/service/logging.ts"))});
+      const { startServiceLogging } = await import(${JSON.stringify(repoPath("backend/src/service/logging.ts"))});
       const stop = startServiceLogging(${JSON.stringify(path)}, { OCX_SERVICE: "1" });
       console.log("hello %s\\nnext", "world");
       console.info("info"); console.debug("debug"); console.warn("warn");
@@ -347,7 +347,7 @@ describe("managed service log", () => {
     const path = join(sandbox(), "service.log");
     const child = Bun.spawn([process.execPath, "--eval", `
       const fs = await import("node:fs");
-      const { startServiceLogging, SERVICE_LOG_MAX_BYTES: cap } = await import(${JSON.stringify(repoPath("src/service/logging.ts"))});
+      const { startServiceLogging, SERVICE_LOG_MAX_BYTES: cap } = await import(${JSON.stringify(repoPath("backend/src/service/logging.ts"))});
       const path = ${JSON.stringify(path)};
       const grow = () => { fs.writeFileSync(path, ""); fs.truncateSync(path, cap + 1); };
       grow();

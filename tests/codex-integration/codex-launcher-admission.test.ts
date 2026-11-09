@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildProviderTableBlockForTarget } from "../../src/codex/inject/config-toml";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
-import { resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
+import { buildProviderTableBlockForTarget } from "../../backend/src/codex/inject/config-toml";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
+import { resolveTrustedWindowsPowerShellExe } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createCodexLaunchFixtureRoot, codexLaunchOwnershipTest, buildCodexPrivateFixtureLaunchEnv as buildCodexLaunchEnv } from "../helpers/codex-launch-private-fixture";
-import { codexLaunchSystemNamespaceIsSafe } from "../../src/cli/codex-launch-ownership";
+import { codexLaunchSystemNamespaceIsSafe } from "../../backend/src/cli/codex-launch-ownership";
 
 const token = "ocx_fixture_admission";
 const cfg = { port: 12199, hostname: "0.0.0.0" };

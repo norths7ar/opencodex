@@ -2,18 +2,18 @@ import { afterAll, beforeAll, beforeEach, describe, expect, mock, test } from "b
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import type { ProviderAdapter, IncomingMeta } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import type { AttemptRecoveryKind } from "../../src/usage/log";
-import type { ImageBridgePlan, ImageCallResult } from "../../src/images/types";
-import type { ImageBridgeDeps } from "../../src/images/loop";
+import type { ProviderAdapter, IncomingMeta } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import type { AttemptRecoveryKind } from "../../backend/src/usage/log";
+import type { ImageBridgePlan, ImageCallResult } from "../../backend/src/images/types";
+import type { ImageBridgeDeps } from "../../backend/src/images/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../src/server/responses/context-overflow";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
-import { RequestPacingQueueOverloadError } from "../../src/providers/request-pacing";
-import { bridgeToResponsesSSE as realBridgeToResponsesSSE } from "../../src/bridge";
-import { parseStreamWithProgress, WebSearchConsumerInactivityError, type ParseStreamWithProgressOptions } from "../../src/web-search/progress-stream";
-import { TRANSLATOR_MAX_CALL_ARGUMENT_BYTES, TRANSLATOR_MAX_TURN_BYTES, translatorLiveBudgetCountForTests } from "../../src/lib/translator-budget";
+import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../backend/src/server/responses/context-overflow";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
+import { RequestPacingQueueOverloadError } from "../../backend/src/providers/request-pacing";
+import { bridgeToResponsesSSE as realBridgeToResponsesSSE } from "../../backend/src/bridge";
+import { parseStreamWithProgress, WebSearchConsumerInactivityError, type ParseStreamWithProgressOptions } from "../../backend/src/web-search/progress-stream";
+import { TRANSLATOR_MAX_CALL_ARGUMENT_BYTES, TRANSLATOR_MAX_TURN_BYTES, translatorLiveBudgetCountForTests } from "../../backend/src/lib/translator-budget";
 
 const realParseStreamWithProgress = parseStreamWithProgress;
 const originalBridgeToResponsesSSE = realBridgeToResponsesSSE;
@@ -28,10 +28,10 @@ const PREV_HOME = process.env.OPENCODEX_HOME;
 let realProgressStream: Record<string, unknown> | undefined;
 let realFulfill: Record<string, unknown> | undefined;
 let realBridge: Record<string, unknown> | undefined;
-let runWithImageBridgeProduction: typeof import("../../src/images/loop")["runWithImageBridge"];
-let clampImageMaxRounds: typeof import("../../src/images/loop")["clampImageMaxRounds"];
-let DEFAULT_MAX_ROUNDS: typeof import("../../src/images/loop")["DEFAULT_MAX_ROUNDS"];
-let MAX_ROUNDS_HARD_LIMIT: typeof import("../../src/images/loop")["MAX_ROUNDS_HARD_LIMIT"];
+let runWithImageBridgeProduction: typeof import("../../backend/src/images/loop")["runWithImageBridge"];
+let clampImageMaxRounds: typeof import("../../backend/src/images/loop")["clampImageMaxRounds"];
+let DEFAULT_MAX_ROUNDS: typeof import("../../backend/src/images/loop")["DEFAULT_MAX_ROUNDS"];
+let MAX_ROUNDS_HARD_LIMIT: typeof import("../../backend/src/images/loop")["MAX_ROUNDS_HARD_LIMIT"];
 
 let fulfillResult: ImageCallResult = {
   ok: true, model: "grok-imagine-image-quality", prompt: "a cat",
@@ -41,17 +41,17 @@ let fulfillResult: ImageCallResult = {
 beforeAll(async () => {
   process.env.OPENCODEX_HOME = join(tmpdir(), "ocx-test-" + randomUUID());
   mock.restore();
-  realProgressStream = { ...(await import("../../src/web-search/progress-stream")) };
-  realFulfill = { ...(await import("../../src/images/fulfill")) };
-  realBridge = { ...(await import("../../src/bridge")) };
-  mock.module("../../src/bridge", () => ({
+  realProgressStream = { ...(await import("../../backend/src/web-search/progress-stream")) };
+  realFulfill = { ...(await import("../../backend/src/images/fulfill")) };
+  realBridge = { ...(await import("../../backend/src/bridge")) };
+  mock.module("../../backend/src/bridge", () => ({
     ...realBridge,
     bridgeToResponsesSSE: (events: AsyncIterable<AdapterEvent>, ...args: Parameters<typeof realBridgeToResponsesSSE> extends [unknown, ...infer R] ? R : never) =>
       originalBridgeToResponsesSSE((async function* () {
         for await (const event of events) { bridgeEvents.push(event); yield event; }
       })(), ...args),
   }));
-  mock.module("../../src/web-search/progress-stream", () => ({
+  mock.module("../../backend/src/web-search/progress-stream", () => ({
     ...realProgressStream,
     parseStreamWithProgress: async function* (_resp: Response, parse: ProviderAdapter["parseStream"], opts: ParseStreamWithProgressOptions) {
       if (useRealProgressStream) yield* realParseStreamWithProgress(_resp, parse, opts);
@@ -60,7 +60,7 @@ beforeAll(async () => {
     RoutedModelInactivityError: class extends Error { readonly timeoutMs = 0; },
     WebSearchStreamProtocolError: class extends Error { /* */ },
   }));
-  mock.module("../../src/images/fulfill", () => ({
+  mock.module("../../backend/src/images/fulfill", () => ({
     fulfillImageCall: async (): Promise<ImageCallResult> => { fulfillCallCount++; return fulfillResult; },
   }));
   ({
@@ -68,7 +68,7 @@ beforeAll(async () => {
     clampImageMaxRounds,
     DEFAULT_MAX_ROUNDS,
     MAX_ROUNDS_HARD_LIMIT,
-  } = await import("../../src/images/loop"));
+  } = await import("../../backend/src/images/loop"));
 });
 
 function runWithImageBridge(
@@ -85,9 +85,9 @@ function runWithImageBridge(
 afterAll(() => {
   if (PREV_HOME === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = PREV_HOME;
   mock.restore();
-  if (realProgressStream) { const real = realProgressStream; mock.module("../../src/web-search/progress-stream", () => real); }
-  if (realFulfill) { const real = realFulfill; mock.module("../../src/images/fulfill", () => real); }
-  if (realBridge) { const real = realBridge; mock.module("../../src/bridge", () => real); }
+  if (realProgressStream) { const real = realProgressStream; mock.module("../../backend/src/web-search/progress-stream", () => real); }
+  if (realFulfill) { const real = realFulfill; mock.module("../../backend/src/images/fulfill", () => real); }
+  if (realBridge) { const real = realBridge; mock.module("../../backend/src/bridge", () => real); }
 });
 
 // --- Mock adapter: yields canned events per iteration from a queue ---

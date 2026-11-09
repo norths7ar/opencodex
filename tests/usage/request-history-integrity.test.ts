@@ -9,7 +9,7 @@ import {
   resetUsageReadCacheForTests,
   usageLogPath,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import {
   closeRequestHistoryIndex,
   openRequestHistoryIndex,
@@ -25,14 +25,14 @@ import {
   setRequestHistoryRebuildJobFactoryForTests,
   setRequestHistoryWorkerRebuildMinBytesForTests,
   withRequestHistoryRead,
-} from "../../src/routing/history/indexer";
-import { HISTORY_META_KEYS, HISTORY_SCHEMA_VERSION } from "../../src/routing/history/schema";
-import { RequestHistoryIntegrityMonitor } from "../../src/routing/history/integrity";
-import { isHistoryIndexCorruption } from "../../src/routing/history/sqlite-errors";
-import { computeRoutingAnalytics } from "../../src/routing/analytics";
-import { clearHealthHistoryCacheForTests, healthEvidenceForCandidate } from "../../src/routing/health";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/routing/history/indexer";
+import { HISTORY_META_KEYS, HISTORY_SCHEMA_VERSION } from "../../backend/src/routing/history/schema";
+import { RequestHistoryIntegrityMonitor } from "../../backend/src/routing/history/integrity";
+import { isHistoryIndexCorruption } from "../../backend/src/routing/history/sqlite-errors";
+import { computeRoutingAnalytics } from "../../backend/src/routing/analytics";
+import { clearHealthHistoryCacheForTests, healthEvidenceForCandidate } from "../../backend/src/routing/health";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

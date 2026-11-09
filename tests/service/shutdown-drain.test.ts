@@ -14,7 +14,7 @@ import {
   trackStreamLifetime,
   isRecyclingForExit,
   markRecyclingForExit,
-} from "../../src/server";
+} from "../../backend/src/server";
 import {
   abortAndReleaseAllTurns,
   acquireTemporaryDrain,
@@ -28,14 +28,14 @@ import {
   tryAdmitTurn,
   codexAccountSelectionForTurn,
   getNativeMainProfileRequestCount,
-} from "../../src/server/lifecycle";
+} from "../../backend/src/server/lifecycle";
 import {
   backgroundShellAdmissionMetrics,
   backgroundShellSpawnExec,
   resetBackgroundShellStateForTests,
   setBackgroundShellRuntimeForTests,
-} from "../../src/adapters/cursor/native-exec-shell";
-import { BackgroundShellSpawnArgsSchema, ExecServerMessageSchema } from "../../src/adapters/cursor/gen/agent_pb";
+} from "../../backend/src/adapters/cursor/native-exec-shell";
+import { BackgroundShellSpawnArgsSchema, ExecServerMessageSchema } from "../../backend/src/adapters/cursor/gen/agent_pb";
 
 class ShutdownFakeChild extends EventEmitter {
   readonly stdin = new PassThrough();
@@ -237,7 +237,7 @@ describe("routing cleanup before listener release", () => {
     let cleaned = false;
     // Execute the real signal handler, not a replacement orchestration or only syncCleanup.
     // Host restoration is a fixture; drainAndShutdown and Bun's listen/stop are real.
-    const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     const from = source.indexOf("  let shuttingDown = false;");
     const to = source.indexOf('\n  process.on("SIGINT", shutdown);', from);
     try {

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { normalizeKiroImages, KIRO_IMAGE_BASE64_BUDGET, KIRO_MAX_IMAGES_PER_MESSAGE, KIRO_MAX_IMAGES_PER_REQUEST, type KiroImage } from "../../../src/adapters/kiro-images";
-import { resetNormalizeStateForTests, TIER_SPECS, type EncodeFn } from "../../../src/adapters/anthropic-image-normalize";
-import { sniffImageDimensions } from "../../../src/adapters/anthropic-image-guard";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { normalizeKiroImages, KIRO_IMAGE_BASE64_BUDGET, KIRO_MAX_IMAGES_PER_MESSAGE, KIRO_MAX_IMAGES_PER_REQUEST, type KiroImage } from "../../../backend/src/adapters/kiro-images";
+import { resetNormalizeStateForTests, TIER_SPECS, type EncodeFn } from "../../../backend/src/adapters/anthropic-image-normalize";
+import { sniffImageDimensions } from "../../../backend/src/adapters/anthropic-image-guard";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const origHome = process.env.HOME;

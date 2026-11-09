@@ -13,8 +13,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, symlink
 import { homedir, tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { createIsolatedTestEnvironment } from "../../scripts/test";
-import { claudeConfigDir, currentUserHome } from "../../src/claude/gateway-cache";
-import { protectedClaudeConfigDirsForTests } from "../../src/lib/test-home-guard";
+import { claudeConfigDir, currentUserHome } from "../../backend/src/claude/gateway-cache";
+import { protectedClaudeConfigDirsForTests } from "../../backend/src/lib/test-home-guard";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 
 const HOME_ENV = ["HOME", "USERPROFILE", "CLAUDE_CONFIG_DIR"] as const;
@@ -149,11 +149,11 @@ test("an armed guard refuses every Claude writer that resolves into the real dir
     fileLinkBuilt = false;
   }
   const modules = {
-    agents: repoPath("src", "claude", "agents-inject.ts"),
-    cache: repoPath("src", "claude", "gateway-cache.ts"),
-    catalog: repoPath("src", "claude", "intercept", "cli-catalog.ts"),
-    settings: repoPath("src", "claude", "intercept", "settings.ts"),
-    guard: repoPath("src", "lib", "test-home-guard.ts"),
+    agents: repoPath("backend/src", "claude", "agents-inject.ts"),
+    cache: repoPath("backend/src", "claude", "gateway-cache.ts"),
+    catalog: repoPath("backend/src", "claude", "intercept", "cli-catalog.ts"),
+    settings: repoPath("backend/src", "claude", "intercept", "settings.ts"),
+    guard: repoPath("backend/src", "lib", "test-home-guard.ts"),
   };
   const code = `
     const m = ${JSON.stringify(modules)};
@@ -251,7 +251,7 @@ test("an armed guard refuses every Claude writer that resolves into the real dir
 test("removal protection keeps the running checkout's own content removable when it sits inside the Claude directory", () => {
   const checkout = repoRoot();
   const code = `
-    const { protectedRemovalReason } = await import(${JSON.stringify(repoPath("src", "lib", "test-home-guard.ts"))});
+    const { protectedRemovalReason } = await import(${JSON.stringify(repoPath("backend/src", "lib", "test-home-guard.ts"))});
     const checkout = ${JSON.stringify(checkout)};
     console.log(JSON.stringify({
       content: protectedRemovalReason(checkout + "/tests/fixtures/n3-removal-probe") === null,

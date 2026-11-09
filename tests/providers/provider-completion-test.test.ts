@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { frame, chat, fixture } from "../helpers/provider-completion-fixture";
-import { runProviderCompletionTest, COMPLETION_TEST_PROMPT, COMPLETION_TEST_MAX_BYTES } from "../../src/server/management/provider-completion-test";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/key-store";
-import * as keyResolver from "../../src/providers/api-key-resolve";
-import type { OcxProviderConfig } from "../../src/types";
-import { translatorLiveBudgetCountForTests } from "../../src/lib/translator-budget";
+import { runProviderCompletionTest, COMPLETION_TEST_PROMPT, COMPLETION_TEST_MAX_BYTES } from "../../backend/src/server/management/provider-completion-test";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/key-store";
+import * as keyResolver from "../../backend/src/providers/api-key-resolve";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { translatorLiveBudgetCountForTests } from "../../backend/src/lib/translator-budget";
 
 afterEach(() => setProviderKeychainEntryFactoryForTests(null));
 

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential } from "../../../src/oauth/store";
-import { resolveKiroRequestProfile } from "../../../src/oauth/kiro";
+import { getAccountSet, saveCredential } from "../../../backend/src/oauth/store";
+import { resolveKiroRequestProfile } from "../../../backend/src/oauth/kiro";
 import { clearAccountQuotaCache, fetchProviderAccountQuotas, getCachedProviderAccountQuota,
-  setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import { fetchKiroUsageSnapshot, kiroUsageContextForAccount } from "../../../src/providers/kiro-usage";
+  setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import { fetchKiroUsageSnapshot, kiroUsageContextForAccount } from "../../../backend/src/providers/kiro-usage";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;

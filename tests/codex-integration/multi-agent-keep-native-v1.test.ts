@@ -6,17 +6,17 @@ import {
   applyMultiAgentMode,
   catalogEntryIsNativeChatGpt,
   type RawEntry,
-} from "../../src/codex/catalog/parsing";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
-import { buildCatalogEntriesFromObservedState } from "../../src/codex/catalog/sync";
-import { cmdV2 } from "../../src/cli/v2";
-import * as gate from "../../src/codex/cli-selection";
-import { loadConfig, saveConfig } from "../../src/config";
-import { MULTI_AGENT_SURFACE_ADVISORY_VERSION, SUBAGENT_SURFACE_GUIDE_URL } from "../../src/config/multi-agent-surface";
-import { isMultiAgentV2Enabled } from "../../src/codex/features";
-import { handleManagementAPI } from "../../src/server/management-api";
+} from "../../backend/src/codex/catalog/parsing";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../backend/src/codex/catalog/kinds";
+import { buildCatalogEntriesFromObservedState } from "../../backend/src/codex/catalog/sync";
+import { cmdV2 } from "../../backend/src/cli/v2";
+import * as gate from "../../backend/src/codex/cli-selection";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { MULTI_AGENT_SURFACE_ADVISORY_VERSION, SUBAGENT_SURFACE_GUIDE_URL } from "../../backend/src/config/multi-agent-surface";
+import { isMultiAgentV2Enabled } from "../../backend/src/codex/features";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("keepNativeChatGptOnV1", () => {
   test("v2 without the switch stamps every row v2", () => {

@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import * as abortModule from "../../src/lib/abort";
-import { parseRequest } from "../../src/responses/parser";
-import { planWebSearch, shouldResolveOpenAiWebSearchSidecar, webSearchStallTimeoutSec } from "../../src/web-search";
-import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../src/web-search/loop";
-import { runWebSearch as runOpenAiWebSearch } from "../../src/web-search/executor";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { headersForCodexAuthContext } from "../../src/codex/auth-context";
-import { listOpenAiForwardSidecarCandidates, resolveFirstUsableOpenAiSidecar } from "../../src/providers/openai-sidecar";
-import { handleResponses } from "../../src/server/responses/core";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import type { AdapterFetchContext, ProviderAdapter } from "../../src/adapters/base";
-import type { OcxMessage, OcxParsedRequest } from "../../src/types";
+import * as abortModule from "../../backend/src/lib/abort";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { planWebSearch, shouldResolveOpenAiWebSearchSidecar, webSearchStallTimeoutSec } from "../../backend/src/web-search";
+import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
+import { runWebSearch as runOpenAiWebSearch } from "../../backend/src/web-search/executor";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { headersForCodexAuthContext } from "../../backend/src/codex/auth-context";
+import { listOpenAiForwardSidecarCandidates, resolveFirstUsableOpenAiSidecar } from "../../backend/src/providers/openai-sidecar";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import type { AdapterFetchContext, ProviderAdapter } from "../../backend/src/adapters/base";
+import type { OcxMessage, OcxParsedRequest } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { withUpstreamHttpVersion } from "../../src/lib/upstream-http-version";
+import { withUpstreamHttpVersion } from "../../backend/src/lib/upstream-http-version";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 /**

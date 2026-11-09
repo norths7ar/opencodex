@@ -5,10 +5,10 @@ import { repoPath } from "../../helpers/repo-root";
 import {
   isCanonicalOpenAiForwardProvider as destinationIsCanonicalOpenAiForwardProvider,
   OPENAI_CODEX_PROVIDER_ID as DESTINATION_OPENAI_CODEX_PROVIDER_ID,
-} from "../../../src/providers/openai-tiers-destination";
-import { getDefaultConfig } from "../../../src/config";
-import { deriveInitProviders, deriveProviderPresets, listRegistryEntries, providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry, providerCodexAccountMode } from "../../../src/providers/registry";
+} from "../../../backend/src/providers/openai-tiers-destination";
+import { getDefaultConfig } from "../../../backend/src/config";
+import { deriveInitProviders, deriveProviderPresets, listRegistryEntries, providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry, providerCodexAccountMode } from "../../../backend/src/providers/registry";
 import {
   isCanonicalOpenAiForwardProvider,
   isOpenAiOperatedResponsesDestination,
@@ -16,8 +16,8 @@ import {
   LEGACY_OPENAI_MULTI_PROVIDER_ID,
   OPENAI_API_PROVIDER_ID,
   OPENAI_CODEX_PROVIDER_ID,
-} from "../../../src/providers/openai-tiers";
-import { OPENAI_PROVIDER_TIER_VERSION } from "../../../src/types";
+} from "../../../backend/src/providers/openai-tiers";
+import { OPENAI_PROVIDER_TIER_VERSION } from "../../../backend/src/types";
 
 describe("OpenAI single-provider option foundation", () => {
   test("locks exact ids, modes, and migration version", () => {
@@ -111,6 +111,6 @@ describe("OpenAI single-provider option foundation", () => {
 test("destination leaf preserves facade bindings without importing the facade", () => {
   expect(destinationIsCanonicalOpenAiForwardProvider).toBe(isCanonicalOpenAiForwardProvider);
   expect(DESTINATION_OPENAI_CODEX_PROVIDER_ID).toBe(OPENAI_CODEX_PROVIDER_ID);
-  const source = readFileSync(repoPath("src/providers/openai-tiers-destination.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/providers/openai-tiers-destination.ts"), "utf8");
   expect(source).not.toMatch(/(?:from\s*|import\s*(?:\(\s*)?)["']\.\/openai-tiers(?:\.ts)?["']/);
 });

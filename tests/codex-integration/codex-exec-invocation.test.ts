@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { escapeCmdArg, escapeCmdCommand } from "../../src/lib/win-exec";
-import { codexExecInvocation, isSpawnableCodexCandidate } from "../../src/codex/catalog";
+import { escapeCmdArg, escapeCmdCommand } from "../../backend/src/lib/win-exec";
+import { codexExecInvocation, isSpawnableCodexCandidate } from "../../backend/src/codex/catalog";
 
 describe("codexExecInvocation", () => {
   test("routes Windows .cmd/.bat through ComSpec with escaped args (no shell:true)", () => {

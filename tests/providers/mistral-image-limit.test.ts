@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { limitMistralChatImages, mistralMaxImages, MISTRAL_DEFAULT_MAX_IMAGES } from "../../src/adapters/openai-chat/mistral-image-limit";
-import { buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat/passthrough";
-import { handleResponses } from "../../src/server/responses/core";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { limitMistralChatImages, mistralMaxImages, MISTRAL_DEFAULT_MAX_IMAGES } from "../../backend/src/adapters/openai-chat/mistral-image-limit";
+import { buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat/passthrough";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const mistral = (overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig =>

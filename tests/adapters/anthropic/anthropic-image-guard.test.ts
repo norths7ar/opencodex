@@ -4,7 +4,7 @@ import {
   sniffImageDimensions,
   MAX_IMAGE_BASE64_LENGTH,
   TOTAL_IMAGE_BASE64_BUDGET,
-} from "../../../src/adapters/anthropic-image-guard";
+} from "../../../backend/src/adapters/anthropic-image-guard";
 
 function b64(bytes: number[]): string {
   return Buffer.from(Uint8Array.from(bytes)).toString("base64");

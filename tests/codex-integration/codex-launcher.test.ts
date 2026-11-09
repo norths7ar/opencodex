@@ -25,11 +25,11 @@ import {
   codexProxyStartEnv,
   ensureProxyForCodex,
   resolveCodexLaunchCommand,
-} from "../../src/cli/codex-launcher";
-import { CODEX_GLOBAL_OPTIONS_WITH_VALUE, CODEX_INTERNAL_COMMANDS } from "../../src/codex/shim-templates";
-import { SIBLING_HANDOFF_NONCE_ENV, SIBLING_OF_PORT_ENV } from "../../src/codex/sibling-start";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
-import { maybeAutoRestoreCodexShim } from "../../src/cli/codex-shim-autorestore";
+} from "../../backend/src/cli/codex-launcher";
+import { CODEX_GLOBAL_OPTIONS_WITH_VALUE, CODEX_INTERNAL_COMMANDS } from "../../backend/src/codex/shim-templates";
+import { SIBLING_HANDOFF_NONCE_ENV, SIBLING_OF_PORT_ENV } from "../../backend/src/codex/sibling-start";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
+import { maybeAutoRestoreCodexShim } from "../../backend/src/cli/codex-shim-autorestore";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

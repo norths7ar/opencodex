@@ -5,9 +5,9 @@ import { chmodSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, rea
 import { tmpdir } from "node:os";
 import { withLocalCredentialFixture } from "../helpers/local-credentials";
 
-const accountStoreUrl = new URL("../../src/codex/account-store.ts", import.meta.url).href;
-const inventoryUrl = new URL("../../src/local-credentials/inventory.ts", import.meta.url).href;
-const generationUrl = new URL("../../src/local-credentials/generation.ts", import.meta.url).href;
+const accountStoreUrl = new URL("../../backend/src/codex/account-store.ts", import.meta.url).href;
+const inventoryUrl = new URL("../../backend/src/local-credentials/inventory.ts", import.meta.url).href;
+const generationUrl = new URL("../../backend/src/local-credentials/generation.ts", import.meta.url).href;
 const fixtureCredential = { accessToken: "fixture-a", refreshToken: "fixture-r", expiresAt: 1, chatgptAccountId: "fixture" };
 function child(code: string): string {
   const result = spawnSync(process.execPath, ["-e", code], { env: { ...process.env }, encoding: "utf8" });
@@ -19,7 +19,7 @@ test("add then remove returns zero with a different generation through the exist
   await withLocalCredentialFixture(async f => {
     f.start();
     const before = await f.inventory.collectLocalCredentials();
-    const store = await import("../../src/codex/account-store");
+    const store = await import("../../backend/src/codex/account-store");
     store.saveCodexAccountCredential("fixture", fixtureCredential);
     expect((await f.inventory.collectLocalCredentials())?.count).toBe(1);
     store.removeCodexAccountCredential("fixture");
@@ -32,7 +32,7 @@ test("a provider key added and removed through central config persistence ends a
   await withLocalCredentialFixture(async f => {
     f.start();
     const before = await f.inventory.collectLocalCredentials();
-    const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../src/config");
+    const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../backend/src/config");
     const config = getDefaultConfig();
     const provider = Object.values(config.providers)[0];
     if (!provider) throw new Error("Default config fixture requires a provider");
@@ -50,7 +50,7 @@ test("a failed private key write remains counted until its compensating deletion
   await withLocalCredentialFixture(async f => {
     f.start();
     const before = await f.inventory.collectLocalCredentials();
-    const keys = await import("../../src/providers/api-key-resolve");
+    const keys = await import("../../backend/src/providers/api-key-resolve");
     let value: string | null = null;
     keys.setProviderKeychainEntryFactoryForTests(() => ({
       getPassword: () => value,
@@ -158,7 +158,7 @@ test("status never attests a snapshot that raced an OAuth publication, even whil
         seen += new TextDecoder().decode(value);
       }
       reader.releaseLock();
-      const { saveCredential } = await import("../../src/oauth/store");
+      const { saveCredential } = await import("../../backend/src/oauth/store");
       let racing: ReturnType<typeof f.inventory.collectLocalCredentials> | undefined;
       // Start a status read in the middle of the publication, before the OAuth store is written.
       await f.publication.publishCredentialAsync(async () => {
@@ -179,7 +179,7 @@ for (const reference of ["keychain:openai", "gcp-sa:openai/fixture-sa"] as const
   for (const observedFirst of [true, false]) {
     test(`an upgraded ${reference.split(":")[0]} reference stays counted after its provider loses it and deletion fails (${observedFirst ? "observer running" : "removed before any observer"})`, async () => {
       await withLocalCredentialFixture(async f => {
-        const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../src/config");
+        const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../backend/src/config");
         const config = getDefaultConfig();
         const provider = config.providers.openai;
         if (!provider) throw new Error("Default config fixture requires the openai provider");
@@ -190,7 +190,7 @@ for (const reference of ["keychain:openai", "gcp-sa:openai/fixture-sa"] as const
           f.start();
           expect((await f.inventory.collectLocalCredentials())?.count).toBe(1);
         }
-        const keys = await import("../../src/providers/api-key-resolve");
+        const keys = await import("../../backend/src/providers/api-key-resolve");
         keys.setProviderKeychainEntryFactoryForTests(() => ({
           getPassword: () => "fixture-secret",
           setPassword: () => {},
@@ -246,9 +246,9 @@ function memoryKeychain(initial: Record<string, string>) {
 
 test("restoring a keychain key to plaintext and then removing the plaintext returns the count to zero", async () => {
   await withLocalCredentialFixture(async f => {
-    const keys = await import("../../src/providers/api-key-resolve");
-    const { restoreProviderKeyFromKeychain } = await import("../../src/providers/key-store");
-    const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../src/config");
+    const keys = await import("../../backend/src/providers/api-key-resolve");
+    const { restoreProviderKeyFromKeychain } = await import("../../backend/src/providers/key-store");
+    const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../backend/src/config");
     const keychain = memoryKeychain({ openai: "fixture-restored-secret" });
     keys.setProviderKeychainEntryFactoryForTests(keychain.factory);
     try {
@@ -272,8 +272,8 @@ test("restoring a keychain key to plaintext and then removing the plaintext retu
 for (const observedFirst of [true, false]) {
   test(`a keychain secret deleted while its reference is still saved stops counting once the reference goes (${observedFirst ? "observer running" : "no observer yet"})`, async () => {
     await withLocalCredentialFixture(async f => {
-      const keys = await import("../../src/providers/api-key-resolve");
-      const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../src/config");
+      const keys = await import("../../backend/src/providers/api-key-resolve");
+      const { getDefaultConfig, saveConfigPreservingClaudeCode } = await import("../../backend/src/config");
       const keychain = memoryKeychain({ openai: "fixture-secret" });
       keys.setProviderKeychainEntryFactoryForTests(keychain.factory);
       try {
@@ -296,11 +296,11 @@ for (const observedFirst of [true, false]) {
   });
 }
 
-async function generationOf(inventory: typeof import("../../src/local-credentials/inventory")): Promise<string | undefined> {
+async function generationOf(inventory: typeof import("../../backend/src/local-credentials/inventory")): Promise<string | undefined> {
   return (await inventory.collectLocalCredentials())?.generation;
 }
 async function waitForNewGeneration(
-  inventory: typeof import("../../src/local-credentials/inventory"),
+  inventory: typeof import("../../backend/src/local-credentials/inventory"),
   previous: string | undefined,
   timeoutMs = 4000,
 ): Promise<string | undefined> {
@@ -314,7 +314,7 @@ async function waitForNewGeneration(
   } while (true);
 }
 async function expectStableGeneration(
-  inventory: typeof import("../../src/local-credentials/inventory"),
+  inventory: typeof import("../../backend/src/local-credentials/inventory"),
   previous: string | undefined,
   windowMs = 1500,
 ): Promise<void> {
@@ -330,7 +330,7 @@ async function expectStableGeneration(
 // return an unsettled token, so a caller can never start the ABA on a baseline
 // that was still racing events.
 async function settleGeneration(
-  inventory: typeof import("../../src/local-credentials/inventory"),
+  inventory: typeof import("../../backend/src/local-credentials/inventory"),
   quietMs = 500,
   timeoutMs = 4000,
 ): Promise<string | undefined> {
@@ -347,7 +347,7 @@ async function settleGeneration(
 }
 
 test("the watch seam classifies direct, ancestor, identity, and failure cases deterministically", async () => {
-  const inventory = await import("../../src/local-credentials/inventory");
+  const inventory = await import("../../backend/src/local-credentials/inventory");
   const dir = mkdtempSync(join(tmpdir(), "ocx-watch-seam-"));
   try {
     const ancestor = join(dir, "ancestor");
@@ -438,7 +438,7 @@ test("the watch seam classifies direct, ancestor, identity, and failure cases de
 });
 
 test("unmatched 8.3 short names resolve by identity against the install snapshot", async () => {
-  const inventory = await import("../../src/local-credentials/inventory");
+  const inventory = await import("../../backend/src/local-credentials/inventory");
   const dir = mkdtempSync(join(tmpdir(), "ocx-watch-short-"));
   try {
     // Literal tilde names stand in for the short spellings Windows may report for files.

@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
@@ -13,12 +13,12 @@ import {
   resetCodexRoutingForManualSelection,
   resolveCodexAccountForThread,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { setAccountQuotaFromParsed } from "../../src/codex/quota";
-import type { CodexThreadLineage } from "../../src/codex/lineage";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import type { CodexThreadLineage } from "../../backend/src/codex/lineage";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-round-robin-headroom-test");

@@ -3,8 +3,8 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { handleRoutePolicyWriteCommand } from "../../src/cli/route-policy-write";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleRoutePolicyWriteCommand } from "../../backend/src/cli/route-policy-write";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -198,11 +198,11 @@ const ROUTING_EDITOR_SCRIPT = `
     import { join } from "node:path";
     mkdirSync(process.env.CODEX_HOME, { recursive: true });
     globalThis.fetch = () => { throw new Error("network prohibited"); };
-    const { handleRoutePolicyWriteCommand: command } = await import(${JSON.stringify(repoPath("src/cli/route-policy-write.ts"))});
-    const { handleManagementAPI } = await import(${JSON.stringify(repoPath("src/server/management-api.ts"))});
+    const { handleRoutePolicyWriteCommand: command } = await import(${JSON.stringify(repoPath("backend/src/cli/route-policy-write.ts"))});
+    const { handleManagementAPI } = await import(${JSON.stringify(repoPath("backend/src/server/management-api.ts"))});
     const { ManagementRequest } = await import(${JSON.stringify(repoPath("tests/helpers/management-auth.ts"))});
-    const { getRoutingProfile } = await import(${JSON.stringify(repoPath("src/routing/profile.ts"))});
-    const { isLabActivated, labAutomationEnabledOnDisk, resetLabActivationForTests } = await import(${JSON.stringify(repoPath("src/lib/lab-activation.ts"))});
+    const { getRoutingProfile } = await import(${JSON.stringify(repoPath("backend/src/routing/profile.ts"))});
+    const { isLabActivated, labAutomationEnabledOnDisk, resetLabActivationForTests } = await import(${JSON.stringify(repoPath("backend/src/lib/lab-activation.ts"))});
     const home = process.env.OPENCODEX_HOME;
     mkdirSync(home, { recursive: true });
     const config = { port: 19481, defaultProvider: "alpha", providers: {

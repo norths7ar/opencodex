@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { droidConfigPath } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { readIntegrationState, readOwnedDroidReasoningDefaults } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { applyIntegration, disableIntegration, overwriteIntegration, restoreIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { droidConfigPath } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { readIntegrationState, readOwnedDroidReasoningDefaults } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { applyIntegration, disableIntegration, overwriteIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CONFIG = {

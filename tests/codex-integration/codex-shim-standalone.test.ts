@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim } from "../../src/codex/shim-templates";
+import { buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim } from "../../backend/src/codex/shim-templates";
 import { isolateCodexShimEnvironment, prependPath } from "../helpers/codex-shim-install-fixture";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
@@ -40,7 +40,7 @@ describe.skipIf(process.platform === "win32")("compiled Unix shim installation a
     const entry = join(root, "entry.ts");
     executable = join(root, "ocx app's standalone");
     writeFileSync(entry, `
-      import { installCodexShim, setCodexShimProbeObservationMsForTests } from ${JSON.stringify(repoPath("src", "codex", "shim.ts"))};
+      import { installCodexShim, setCodexShimProbeObservationMsForTests } from ${JSON.stringify(repoPath("backend/src", "codex", "shim.ts"))};
       import { writeFileSync } from "node:fs";
       setCodexShimProbeObservationMsForTests(20);
       if (process.argv[2] === "install") {

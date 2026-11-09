@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToResponsesTranslation } from "../../src/claude/inbound";
+import { anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
 
 const TASKCREATE_NUDGE = "The task tools haven't been used recently. If you're working on tasks that would benefit from tracking, consider using TaskCreate to add them. Only use these if relevant to the current work. This is just a gentle reminder - ignore if not applicable.";
 const footer = (remaining: number) => `<total_tokens>${remaining} tokens left</total_tokens>`;

@@ -5,13 +5,13 @@ import {
   CodexUserIdentityRefusal,
   resolveEffectiveUserIdentity,
   resolveWindowsSidForTests,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import {
   readWindowsCurrentSid,
   resolveWindowsCurrentSid,
   type WindowsTokenSidApi,
-} from "../../src/codex/windows-current-sid";
-import { resolveTrustedWindowsSystemDirectory } from "../../src/lib/windows-elevation";
+} from "../../backend/src/codex/windows-current-sid";
+import { resolveTrustedWindowsSystemDirectory } from "../../backend/src/lib/windows-elevation";
 
 const TOKEN = 0x1a4n;
 const SID_ADDRESS = 8192;

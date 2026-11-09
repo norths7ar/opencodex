@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
-import { fetchArtificialAnalysisTable, loadCapabilityTable } from "../../src/codex/role-capability";
-import type { OcxConfig } from "../../src/types";
+import { fetchArtificialAnalysisTable, loadCapabilityTable } from "../../backend/src/codex/role-capability";
+import type { OcxConfig } from "../../backend/src/types";
 
 const nativeFetch = globalThis.fetch;
 const analysisUrl = "https://artificialanalysis.ai/api/v2/language/models/free?page=1";

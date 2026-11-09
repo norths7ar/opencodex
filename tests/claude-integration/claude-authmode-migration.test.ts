@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { runClaudeAuthModeMigration } from "../../src/claude/auth-mode-migration";
-import type { OcxConfig } from "../../src/types";
+import { runClaudeAuthModeMigration } from "../../backend/src/claude/auth-mode-migration";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Before auto existed, "Subscription" was stored by DELETING the key. So the upgrade

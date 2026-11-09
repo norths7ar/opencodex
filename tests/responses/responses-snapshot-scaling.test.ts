@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { createResponsesSnapshotBlockRewrite } from "../../src/server/responses-snapshot-repair";
-import { MAX_COMPLETED_OUTPUT_ITEM_SOURCE_BYTES as LIMIT } from "../../src/server/relay";
+import { createResponsesSnapshotBlockRewrite } from "../../backend/src/server/responses-snapshot-repair";
+import { MAX_COMPLETED_OUTPUT_ITEM_SOURCE_BYTES as LIMIT } from "../../backend/src/server/relay";
 
 type Event = { type: string; delta?: string; text?: string; response?: { output?: Array<{ content: Array<{ text: string }> }> } };
 

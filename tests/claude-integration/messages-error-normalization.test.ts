@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { foldAnthropicMessage, encodeAnthropicMessageSse } from "../../src/protocols/encoders/messages";
+import { handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { foldAnthropicMessage, encodeAnthropicMessageSse } from "../../backend/src/protocols/encoders/messages";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const input = { model: "claude-sonnet-4-6", max_tokens: 16, messages: [{ role: "user", content: "fixture" }], stream: false };

@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { routeModel } from "../../src/router";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { codexRouteCredentialDomainHeaders } from "../../src/server/responses/core-auth";
-import type { HandleResponsesOptions } from "../../src/server/responses/core-options";
-import type { OcxConfig } from "../../src/types";
+import { routeModel } from "../../backend/src/router";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { codexRouteCredentialDomainHeaders } from "../../backend/src/server/responses/core-auth";
+import type { HandleResponsesOptions } from "../../backend/src/server/responses/core-options";
+import type { OcxConfig } from "../../backend/src/types";
 
 // Policy routing opens the history index; release it before the isolated home is removed.
 afterEach(() => closeRequestHistoryIndex());

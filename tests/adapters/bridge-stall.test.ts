@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
-import { decodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
+import { decodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
 
 async function collectSse(stream: ReadableStream<Uint8Array>): Promise<{ event?: string; data: Record<string, unknown> }[]> {
   const reader = stream.getReader();

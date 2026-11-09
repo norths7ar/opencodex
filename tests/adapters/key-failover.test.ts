@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
 import {
   getConfigPath,
   loadConfig,
   mutatePersistedConfig,
   saveConfig,
-} from "../../src/config";
+} from "../../backend/src/config";
 import {
   clearKeyCooldowns,
   getKeyCooldownUntil,
@@ -18,24 +18,24 @@ import {
   rotateKeyOn401,
   rotateProviderTransportOn429,
   rotateProviderTransportOn401,
-} from "../../src/providers/key-failover";
+} from "../../backend/src/providers/key-failover";
 import {
   forgetApiKeyRotationCursor,
   selectProactiveApiKey,
   selectProactiveApiKeyTransport,
-} from "../../src/providers/key-failover";
-import { resolveOpenCodeGoTransport } from "../../src/providers/opencode-go-transport";
-import { deriveXaiConvId } from "../../src/providers/xai-transport";
-import { routeModel, routedProviderConfig } from "../../src/router";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/key-store";
-import { setActiveProviderApiKey } from "../../src/providers/api-keys";
-import { clearProviderApiKeyQuotaCache, setCachedProviderApiKeyQuotaForTests } from "../../src/providers/quota-key-accounts";
-import { ACCOUNT_QUOTA_TTL_MS } from "../../src/providers/quota-wire";
-import { subscribeAccountSelections } from "../../src/lib/account-selection-events";
-import { providerManagementConfigError, safeConfigDTO } from "../../src/server/auth-cors";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/key-failover";
+import { resolveOpenCodeGoTransport } from "../../backend/src/providers/opencode-go-transport";
+import { deriveXaiConvId } from "../../backend/src/providers/xai-transport";
+import { routeModel, routedProviderConfig } from "../../backend/src/router";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/key-store";
+import { setActiveProviderApiKey } from "../../backend/src/providers/api-keys";
+import { clearProviderApiKeyQuotaCache, setCachedProviderApiKeyQuotaForTests } from "../../backend/src/providers/quota-key-accounts";
+import { ACCOUNT_QUOTA_TTL_MS } from "../../backend/src/providers/quota-wire";
+import { subscribeAccountSelections } from "../../backend/src/lib/account-selection-events";
+import { providerManagementConfigError, safeConfigDTO } from "../../backend/src/server/auth-cors";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../src/providers/api-key-selection";
+import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../backend/src/providers/api-key-selection";
 
 let home: string;
 const previousHome = process.env.OPENCODEX_HOME;

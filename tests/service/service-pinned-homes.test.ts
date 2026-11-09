@@ -2,10 +2,10 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
-import * as serviceState from "../../src/service/state";
-import { buildWindowsServiceScript } from "../../src/service";
-import { windowsEnvIndirectBatchValue } from "../../src/lib/win-paths";
-import { serviceApiTokenFilePath } from "../../src/lib/service-secrets";
+import * as serviceState from "../../backend/src/service/state";
+import { buildWindowsServiceScript } from "../../backend/src/service";
+import { windowsEnvIndirectBatchValue } from "../../backend/src/lib/win-paths";
+import { serviceApiTokenFilePath } from "../../backend/src/lib/service-secrets";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Pinned service-home cases, split from service.test.ts to keep that file under its line cap.

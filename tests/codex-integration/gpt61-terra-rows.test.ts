@@ -2,28 +2,28 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   buildCatalogEntries, nativeDefaultReasoningEffort, nativeInputModalities,
   nativeOpenAiContextTier, nativeReasoningEfforts, upstreamNativeEntry,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   ACCOUNT_GATED_NATIVE_OPENAI_MODELS, CONFIGURED_NATIVE_OPENAI_TEMPLATE_MODEL,
   NATIVE_MAIN_DRAIN_SENTINEL_MODELS, NATIVE_OPENAI_MODELS,
   SELF_DESCRIBED_NATIVE_OPENAI_MODELS, isEligibleConfiguredNativeOpenAiModel,
-} from "../../src/codex/catalog/native-models";
+} from "../../backend/src/codex/catalog/native-models";
 import {
   DOCUMENTED_NATIVE_OPENAI_ADDITIONS, NATIVE_OPENAI_CONTEXT_OVERRIDES,
   nativeMultiAgentVersion, nativeOpenAiMaxInputTokens,
-} from "../../src/codex/catalog/metadata";
-import { nativeEffortClamp } from "../../src/codex/catalog/effort";
-import { pinnedNativeModelRows } from "../../src/codex/catalog/pinned-models";
-import { applyNativeUltraFastTier } from "../../src/codex/catalog/native-ultrafast";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import { buildCatalogEntriesFromObservedState } from "../../src/codex/catalog/build-entries";
-import { validateDiscoveredNativeRows } from "../../src/codex/catalog/discovered-natives";
-import { CODEX_CUSTOM_MODEL_CATALOG_KIND, type RawEntry } from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/metadata";
+import { nativeEffortClamp } from "../../backend/src/codex/catalog/effort";
+import { pinnedNativeModelRows } from "../../backend/src/codex/catalog/pinned-models";
+import { applyNativeUltraFastTier } from "../../backend/src/codex/catalog/native-ultrafast";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import { buildCatalogEntriesFromObservedState } from "../../backend/src/codex/catalog/build-entries";
+import { validateDiscoveredNativeRows } from "../../backend/src/codex/catalog/discovered-natives";
+import { CODEX_CUSTOM_MODEL_CATALOG_KIND, type RawEntry } from "../../backend/src/codex/catalog/parsing";
 import {
   ENTITLEMENT_PREFERRED_NATIVE_OPENAI_MODELS, codexModelEntitlementStateForAccount,
   resetCodexModelEntitlementCacheForTests,
-} from "../../src/codex/model-entitlements";
-import { DEFAULT_SUBAGENT_MODELS, SUBAGENT_MODELS_VERSION } from "../../src/config/subagent-models";
+} from "../../backend/src/codex/model-entitlements";
+import { DEFAULT_SUBAGENT_MODELS, SUBAGENT_MODELS_VERSION } from "../../backend/src/config/subagent-models";
 
 const TERRA = "gpt-6.1-terra";
 const LADDER = ["low", "medium", "high", "xhigh", "max", "ultra"];

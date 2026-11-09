@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import net from "node:net";
 import { EventEmitter, once } from "node:events";
 import tls from "node:tls";
-import { dialTunnel, type OpaqueProxyRoute } from "../../src/lib/opaque-proxy-tunnel";
+import { dialTunnel, type OpaqueProxyRoute } from "../../backend/src/lib/opaque-proxy-tunnel";
 import { deadProxy, digest, echo, httpProxy, listen, readBytes, target, TunnelFixtureScope, until } from "../helpers/opaque-proxy-tunnel";
 
 const scope = new TunnelFixtureScope();

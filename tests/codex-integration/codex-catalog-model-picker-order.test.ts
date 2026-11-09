@@ -4,8 +4,8 @@ import {
   effectiveSubagentRoster,
   MAX_SPAWN_AGENT_MODEL_OVERRIDES,
   orderForModelPicker,
-} from "../../src/codex/catalog/sync";
-import type { CatalogModel } from "../../src/types";
+} from "../../backend/src/codex/catalog/sync";
+import type { CatalogModel } from "../../backend/src/types";
 
 // #1649: config.modelPickerOrder assigns a deterministic priority band to non-featured routed
 // rows so a catalog with more than 5 routed models keeps a stable picker order across rebuilds,

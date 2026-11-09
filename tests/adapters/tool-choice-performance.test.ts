@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import type { OcxTool } from "../../src/types";
-import { toolChoiceCandidates, toolChoiceToolPredicate } from "../../src/types";
+import type { OcxTool } from "../../backend/src/types";
+import { toolChoiceCandidates, toolChoiceToolPredicate } from "../../backend/src/types";
 
 test("allowed_tools resolves an ambiguous bare name without replaying the candidate list", () => {
   const size = 256;

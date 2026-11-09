@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { claimOwnedServiceHome } from "../helpers/owned-service-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 
 /**
  * Regression: `ocx start` + Ctrl-C must NOT orphan the Bun proxy.
@@ -21,7 +21,7 @@ import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
  * on PATH to exercise the real launcher.
  */
 
-const BIN_OCX = repoPath("bin", "ocx.mjs");
+const BIN_OCX = repoPath("backend/bin", "ocx.mjs");
 const nodeAvailable = !spawnSync("node", ["--version"], { stdio: "ignore" }).error;
 const runnable = process.platform !== "win32" && nodeAvailable;
 

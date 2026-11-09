@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { calibrateKiroEstimate, recordKiroCalibration, rekeyKiroCalibration, resetKiroCalibration } from "../../../src/adapters/kiro-calibration";
+import { calibrateKiroEstimate, recordKiroCalibration, rekeyKiroCalibration, resetKiroCalibration } from "../../../backend/src/adapters/kiro-calibration";
 
 beforeEach(() => resetKiroCalibration());
 

@@ -2,8 +2,8 @@ import { expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
+import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function candidate(redirects: unknown) {

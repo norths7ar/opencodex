@@ -3,12 +3,12 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, replaceProviderAccountSet, saveCredential } from "../../../src/oauth/store";
-import { oauthAccountLogLabel } from "../../../src/codex/account-label";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import { cachedKiroQuotaMetricRows } from "../../../src/providers/kiro-quota-metrics";
-import { sanitizeKiroQuota } from "../../../src/providers/kiro-account-state-disk";
-import { createRequestMetricsOwner } from "../../../src/server/request-metrics";
+import { getAccountSet, replaceProviderAccountSet, saveCredential } from "../../../backend/src/oauth/store";
+import { oauthAccountLogLabel } from "../../../backend/src/codex/account-label";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import { cachedKiroQuotaMetricRows } from "../../../backend/src/providers/kiro-quota-metrics";
+import { sanitizeKiroQuota } from "../../../backend/src/providers/kiro-account-state-disk";
+import { createRequestMetricsOwner } from "../../../backend/src/server/request-metrics";
 import { BACKGROUND_WORK_TEARDOWN_TIMEOUT_MS, removeTreeAfterBackgroundWork } from "../../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;
@@ -68,7 +68,7 @@ test("future, stale, reset-passed, and identity-mismatched rows are omitted", as
   seed(a.id, now, now - 1);
   expect(cachedKiroQuotaMetricRows(now)).toEqual([]);
   seed(a.id, now);
-  const { accountQuotaCache, accountCacheKey } = await import("../../../src/providers/quota/account-cache");
+  const { accountQuotaCache, accountCacheKey } = await import("../../../backend/src/providers/quota/account-cache");
   accountQuotaCache.get(accountCacheKey("kiro", a.id))!.identity = "old-login";
   expect(cachedKiroQuotaMetricRows(now)).toEqual([]);
 });
@@ -116,9 +116,9 @@ test("disk sanitizer preserves valid precise plan credits only", () => {
 
 test("a metrics scrape never hydrates the disk snapshot; routing does", async () => {
   const { writeFileSync } = await import("node:fs");
-  const { getConfigDir } = await import("../../../src/config");
-  const { kiroEvidenceIdentity } = await import("../../../src/providers/kiro-account-state-disk");
-  const { kiroAccountEvidence } = await import("../../../src/providers/kiro-usage");
+  const { getConfigDir } = await import("../../../backend/src/config");
+  const { kiroEvidenceIdentity } = await import("../../../backend/src/providers/kiro-account-state-disk");
+  const { kiroAccountEvidence } = await import("../../../backend/src/providers/kiro-usage");
   const a = await account("disk");
   const now = Date.now();
   clearAccountQuotaCache();

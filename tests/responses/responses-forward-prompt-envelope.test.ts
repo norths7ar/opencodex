@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../src/adapters/openai-responses";
-import type { OcxProviderConfig } from "../../src/types";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../backend/src/adapters/openai-responses";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createAdapter = (provider: OcxProviderConfig) =>

@@ -3,13 +3,13 @@ import {
   catalogHasRoutedEntries,
   type CatalogModel,
   type RawEntry,
-} from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/parsing";
 import {
   buildCatalogEntries,
   mergeCatalogEntriesForSync,
   mergeCatalogModelsWithNativeRecovery,
-} from "../../src/codex/catalog/sync";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
+} from "../../backend/src/codex/catalog/sync";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../backend/src/codex/catalog/kinds";
 
 function aliasModel(slug: string): CatalogModel {
   return {

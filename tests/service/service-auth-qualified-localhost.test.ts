@@ -2,10 +2,10 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { assertServiceAuthEnvironment, writeServiceApiTokenFile } from "../../src/service";
-import { serviceApiTokenFilePath } from "../../src/lib/service-secrets";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { assertServiceAuthEnvironment, writeServiceApiTokenFile } from "../../backend/src/service";
+import { serviceApiTokenFilePath } from "../../backend/src/lib/service-secrets";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

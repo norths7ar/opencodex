@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { buildCatalogEntries } from "../../src/codex/catalog";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
 import {
   buildCatalogEntriesFromObservedState,
   CANONICAL_NATIVE_CATALOG_CONTENT_POLICY,
   deriveEntry,
   mergeCatalogEntriesFromObservedState,
   mergeCatalogEntriesForSync,
-} from "../../src/codex/catalog/sync";
-import { ensureStrictCatalogFields } from "../../src/codex/catalog/parsing";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/sync";
+import { ensureStrictCatalogFields } from "../../backend/src/codex/catalog/parsing";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
 
 describe("catalog routed comp_hash (#5796)", () => {
   const template = (compHash: string | null | undefined): RawEntry => ({

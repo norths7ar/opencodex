@@ -4,9 +4,9 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { CodexLogGuardMaintenanceDeps } from "../../src/codex/log-guard/maintenance";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import type { CodexLogGuardMaintenanceDeps } from "../../backend/src/codex/log-guard/maintenance";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

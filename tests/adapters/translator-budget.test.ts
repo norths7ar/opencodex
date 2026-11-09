@@ -1,8 +1,8 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
 import {
   TRANSLATOR_MAX_CALL_ARGUMENT_BYTES,
   TRANSLATOR_MAX_TURN_BYTES,
@@ -11,8 +11,8 @@ import {
   retainTranslatedEvent,
   retainTranslatedEventBatch,
   translatorObservedBufferSnapshot,
-} from "../../src/lib/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent } from "../../backend/src/types";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
 async function textWithin(stream: ReadableStream<Uint8Array>, timeoutMs = 2_000): Promise<string> {

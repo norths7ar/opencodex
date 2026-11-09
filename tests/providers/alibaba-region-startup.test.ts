@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { AlibabaBackupIntegrityError } from "../../src/providers/alibaba-region-backup";
-import { projectAlibabaRegionMigration } from "../../src/providers/alibaba-region-migration";
-import { runAlibabaRegionStartupMigration } from "../../src/providers/alibaba-region-startup";
-import type { OcxConfig } from "../../src/types";
+import { AlibabaBackupIntegrityError } from "../../backend/src/providers/alibaba-region-backup";
+import { projectAlibabaRegionMigration } from "../../backend/src/providers/alibaba-region-migration";
+import { runAlibabaRegionStartupMigration } from "../../backend/src/providers/alibaba-region-startup";
+import type { OcxConfig } from "../../backend/src/types";
 
 const INTL_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";
 

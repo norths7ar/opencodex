@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { KIRO_COMPLETION_TOOL_NAME } from "../../../src/adapters/kiro-constants";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../src/lib/debug-settings";
-import { createTranslatorBudget, releaseTranslatedEvent } from "../../../src/lib/translator-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { KIRO_COMPLETION_TOOL_NAME } from "../../../backend/src/adapters/kiro-constants";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { createTranslatorBudget, releaseTranslatedEvent } from "../../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "kiro", baseUrl: "https://runtime.us-east-1.kiro.dev", apiKey: "ksk_test",

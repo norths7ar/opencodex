@@ -4,11 +4,11 @@ import { trustWindowsTempFixtureAncestry } from "./windows-temp-ancestry";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, parse } from "node:path";
 import { ptr } from "bun:ffi";
-import { createCodexCliWorkerLifetime } from "../../src/codex/cli-update-worker";
-import { WindowsChildNative, WIN64_CHILD_ABI } from "../../src/codex/windows-cli-child-native";
-import { WindowsChildPipe } from "../../src/codex/windows-cli-child-pipe";
+import { createCodexCliWorkerLifetime } from "../../backend/src/codex/cli-update-worker";
+import { WindowsChildNative, WIN64_CHILD_ABI } from "../../backend/src/codex/windows-cli-child-native";
+import { WindowsChildPipe } from "../../backend/src/codex/windows-cli-child-pipe";
 import { cleanupUnstartedWindowsChild, startWindowsCliChildWithNative,
-  type WindowsCliChild, type WindowsCliChildResult } from "../../src/codex/windows-cli-child";
+  type WindowsCliChild, type WindowsCliChildResult } from "../../backend/src/codex/windows-cli-child";
 import { fixturePath } from "./repo-root";
 
 type CaseId = "A3" | "A4";

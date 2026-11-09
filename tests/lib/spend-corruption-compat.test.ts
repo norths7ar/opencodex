@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
 import { spendCheckpoint, spendTestJournal, spendTestPolicy, testSpendSalt as salt } from "../helpers/shipped-spend-ledger";
 const request = (sendId: string, poolId = "P") => ({ sendId, scopes: { poolId }, inputTokens: 1, outputCeilingTokens: 0 });
 const corrupt = () => spendTestJournal([spendCheckpoint([["P", 40, 0]]), "broken middle", {v:1,kind:"forget",send:"missing",at:2}]);

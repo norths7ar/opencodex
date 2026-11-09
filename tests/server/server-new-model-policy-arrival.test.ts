@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { loadConfig, saveConfig } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import { clearModelCache } from "../../src/codex/model-cache";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { createTestCaseLifecycle } from "../helpers/test-sandbox-cleanup";
@@ -78,7 +78,7 @@ test.each(cases)("new arrival before catalog convergence: $name", policy => life
   };
   saveConfig(config);
   expect(loadConfig().modelDiscovery?.knownModels?.[provider]?.ids).toEqual(existing);
-  const { startServer } = await import("../../src/server");
+  const { startServer } = await import("../../backend/src/server");
   lifecycle.abort.signal.throwIfAborted();
   const server = startServer(0);
   lifecycle.ownStop(() => server.stop(true));
@@ -146,7 +146,7 @@ test("failed arrival persistence returns retryable HTTP 503 without publishing m
       [provider]: { ids: [...existing], removed: [], updatedAt: now },
     } },
   });
-  const { startServer } = await import("../../src/server");
+  const { startServer } = await import("../../backend/src/server");
   lifecycle.abort.signal.throwIfAborted();
   const server = startServer(0);
   lifecycle.ownStop(() => server.stop(true));

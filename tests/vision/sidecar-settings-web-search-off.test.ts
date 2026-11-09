@@ -10,8 +10,8 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -95,9 +95,9 @@ describe("web-search sidecar master switch", () => {
   });
 
   test("the Codex config write is attempted only when the switch moves", async () => {
-    const { writeRuntimePort } = await import("../../src/config/process-state");
+    const { writeRuntimePort } = await import("../../backend/src/config/process-state");
     writeRuntimePort({ pid: process.pid, port: 10100 });
-    const codexInject = await import("../../src/codex/inject");
+    const codexInject = await import("../../backend/src/codex/inject");
     const injectionSpy = spyOn(codexInject, "injectCodexConfig").mockResolvedValue({
       success: false,
       retryable: true,

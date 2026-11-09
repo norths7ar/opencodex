@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   classifyUpstreamCondition, isUpstreamCondition, UPSTREAM_CONDITIONS, upstreamConditionMessage,
-} from "../../src/lib/upstream-condition";
+} from "../../backend/src/lib/upstream-condition";
 
 // A provider key with no recognizable prefix, so pattern-based redaction cannot spot it.
 const PROVIDER_KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";

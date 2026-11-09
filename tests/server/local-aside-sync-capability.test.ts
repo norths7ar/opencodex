@@ -2,9 +2,9 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { refreshAsideProfilesThroughServer } from "../../src/cli/aside-profiles";
-import { saveConfig } from "../../src/config";
-import { writeRuntimePort } from "../../src/config/process-state";
+import { refreshAsideProfilesThroughServer } from "../../backend/src/cli/aside-profiles";
+import { saveConfig } from "../../backend/src/config";
+import { writeRuntimePort } from "../../backend/src/config/process-state";
 import {
   LOCAL_ASIDE_SYNC_CAPABILITY_HEADER,
   LOCAL_ASIDE_SYNC_EXPECTED_PID_HEADER,
@@ -13,11 +13,11 @@ import {
   LOCAL_ASIDE_SYNC_NONCE_HEADER,
   LOCAL_ASIDE_SYNC_PATH,
   createLocalAsideSyncCapability,
-} from "../../src/lib/local-aside-sync-contract";
-import { createLocalAttestationChallenge, LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER } from "../../src/lib/local-management-attestation";
-import { directLocalHttpFetch } from "../../src/server/direct-local-http";
-import { startServer } from "../../src/server";
-import { setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
+} from "../../backend/src/lib/local-aside-sync-contract";
+import { createLocalAttestationChallenge, LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER } from "../../backend/src/lib/local-management-attestation";
+import { directLocalHttpFetch } from "../../backend/src/server/direct-local-http";
+import { startServer } from "../../backend/src/server";
+import { setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
 import { currentServerFixtureConfig, settleServerAuthFixture } from "../helpers/server-auth-fixture";
 import { serverAuthConfig } from "../helpers/server-auth-config";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";

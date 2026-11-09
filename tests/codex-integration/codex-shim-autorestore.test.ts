@@ -4,17 +4,17 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, mkdtempSync, realpathSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { CodexShimAutoRestoreResult } from "../../src/codex/shim";
-import { getDefaultConfig } from "../../src/config";
+import type { CodexShimAutoRestoreResult } from "../../backend/src/codex/shim";
+import { getDefaultConfig } from "../../backend/src/config";
 import {
   maybeAutoRestoreCodexShim,
   skipsCodexShimAutoRestore,
   type CodexShimAutoRestoreCliDeps,
-} from "../../src/cli/codex-shim-autorestore";
-import { autoRestoreCodexShim, CODEX_SHIM_STATE_MAX_BYTES, installCodexShim } from "../../src/codex/shim";
+} from "../../backend/src/cli/codex-shim-autorestore";
+import { autoRestoreCodexShim, CODEX_SHIM_STATE_MAX_BYTES, installCodexShim } from "../../backend/src/codex/shim";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
-import { issueOrchestratedResultCapability } from "../../src/update/orchestrated-session.mjs";
+import { issueOrchestratedResultCapability } from "../../backend/src/update/orchestrated-session.mjs";
 
 isolateCodexShimEnvironment();
 
@@ -46,7 +46,7 @@ describe("Codex shim CLI auto-restore policy", () => {
       const stateBefore = readFileSync(statePath);
       rmSync(wrappers[0]);
       for (const args of [["models"], ["models", "list", "--json"], ["models", "list-custom", "--json"], ["model", "--json"]]) {
-        const result = spawnSync(process.execPath, [repoPath("src/cli/index.ts"), ...args], {
+        const result = spawnSync(process.execPath, [repoPath("backend/src/cli/index.ts"), ...args], {
           encoding: "utf8", env: { ...process.env, OPENCODEX_HOME: home, OPENCODEX_CODEX_SHIM_AUTO_RESTORE: "1" },
         });
         expect(result.status).toBe(0);
@@ -197,7 +197,7 @@ describe("Codex shim CLI auto-restore policy", () => {
       const beforeState = readFileSync(statePath);
 
       const result = spawnSync(process.execPath, [
-        repoPath("src", "cli", "index.ts"),
+        repoPath("backend/src", "cli", "index.ts"),
         "system", "codex-cli-update", "check", "--json",
       ], {
         encoding: "utf8",
@@ -255,7 +255,7 @@ describe("Codex shim CLI auto-restore policy", () => {
       try {
         const resultPath = join(resultDir, "result.json");
         const { capability } = issueOrchestratedResultCapability(resultPath);
-        const result = spawnSync(process.execPath, [repoPath("src/cli/index.ts"), "update", "--version", "99.0.0",
+        const result = spawnSync(process.execPath, [repoPath("backend/src/cli/index.ts"), "update", "--version", "99.0.0",
           "--orchestrated-expect", expected, "--orchestrated-result", resultPath], {
           encoding: "utf8", env: { ...process.env, USERPROFILE: home, OCX_UPDATE_ORCHESTRATED_CHILD: "1", OCX_UPDATE_RESULT_CAPABILITY: capability, OPENCODEX_CODEX_SHIM_AUTO_RESTORE: "1" },
         });

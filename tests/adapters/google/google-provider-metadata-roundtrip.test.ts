@@ -3,8 +3,8 @@ import {
   cloneProviderOpaqueToolCallMetadata,
   providerMetadataFromResponsesFunctionCall,
   responsesExtraContentFromProviderMetadata,
-} from "../../../src/responses/provider-opaque-metadata";
-import type { OcxProviderOpaqueToolCallMetadata } from "../../../src/types";
+} from "../../../backend/src/responses/provider-opaque-metadata";
+import type { OcxProviderOpaqueToolCallMetadata } from "../../../backend/src/types";
 
 const SIG_A = "sig-alpha-opaque-value";
 const SIG_B = "sig-beta-opaque-value";

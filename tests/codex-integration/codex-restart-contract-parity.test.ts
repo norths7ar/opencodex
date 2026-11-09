@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { performCodexRestart, resetCodexRestartInFlightForTests } from "../../src/codex/app-server-restart-service";
-import { isCodexRestartResponse } from "../../src/lib/codex-restart-contract";
+import { performCodexRestart, resetCodexRestartInFlightForTests } from "../../backend/src/codex/app-server-restart-service";
+import { isCodexRestartResponse } from "../../backend/src/lib/codex-restart-contract";
 
 /**
  * The GUI rejects a response that fails isCodexRestartResponse, so an invariant

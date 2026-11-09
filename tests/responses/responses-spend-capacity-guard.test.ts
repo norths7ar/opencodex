@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendDenial, type SpendReservationPolicy } from "../../src/lib/spend-reservation-ledger";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendDenial, type SpendReservationPolicy } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 function fixture(policy: Partial<SpendReservationPolicy>, rootId: string | undefined = "fixture-root", identityId: string | undefined = "fixture-account") {
   const ledger = createSpendReservationLedger({ policy: { ...DEFAULT_SPEND_RESERVATION_POLICY, ...policy }, salt: "fixture-only" });

@@ -9,7 +9,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { StorageCleanupPolicy } from "../../src/types";
+import type { StorageCleanupPolicy } from "../../backend/src/types";
 import {
   BUSY_DEFER_MS,
   computeNextRun,
@@ -21,14 +21,14 @@ import {
   runStorageCleanupPolicy,
   selectReduceToBytes,
   selectPolicyPreview,
-} from "../../src/storage/policy";
+} from "../../backend/src/storage/policy";
 import {
   listArchivedCandidates,
   selectOldestPercent,
   type ArchivedCandidate,
   type CleanupResult,
   type ExecuteCleanupOptions,
-} from "../../src/storage/cleanup";
+} from "../../backend/src/storage/cleanup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // seedHome() writes real files plus a sqlite fixture for every case it backs.

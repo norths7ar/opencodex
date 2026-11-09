@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { gatherRoutedModels } from "../../src/codex/catalog";
-import { catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
-import { clearModelCache, getFreshCached, getProviderDiscoveryStatus, getProviderLiveModelCount, setCached } from "../../src/codex/model-cache";
-import { buildModelsRequest } from "../../src/oauth";
-import { saveCredential } from "../../src/oauth/store";
-import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../src/oauth/key-providers";
-import { deriveKeyLoginMap, providerConfigSeed } from "../../src/providers/derive";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
+import { clearModelCache, getFreshCached, getProviderDiscoveryStatus, getProviderLiveModelCount, setCached } from "../../backend/src/codex/model-cache";
+import { buildModelsRequest } from "../../backend/src/oauth";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../backend/src/oauth/key-providers";
+import { deriveKeyLoginMap, providerConfigSeed } from "../../backend/src/providers/derive";
 import {
   extractProviderModelItems,
   isRegistryModelDiscoveryUrl,
@@ -17,14 +17,14 @@ import {
   readBoundedDiscoveryJson,
   resolveProviderModelDiscovery,
   resolveProviderModelDiscoveryUrl,
-} from "../../src/providers/model-discovery";
+} from "../../backend/src/providers/model-discovery";
 import {
   PROVIDER_REGISTRY,
   registryEntryForProviderDestination,
   type ProviderModelDiscoverySpec,
-} from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 import { withRegistryDiscovery } from "../helpers/provider-registry-discovery";
 import { fixturePath } from "../helpers/repo-root";

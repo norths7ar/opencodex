@@ -11,8 +11,8 @@
  * So dropping "none" silently re-enabled thinking the caller had turned off.
  */
 import { describe, expect, test } from "bun:test";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { responsesRequestSchema } from "../../src/responses/schema";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { responsesRequestSchema } from "../../backend/src/responses/schema";
 
 function chat(extra: Record<string, unknown>): Record<string, unknown> {
   return { model: "m", messages: [{ role: "user", content: "hi" }], ...extra };

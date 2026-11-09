@@ -2,12 +2,12 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   mergeConfiguredModelsIntoLiveCatalog,
   shouldRetainConfiguredProviderModel,
-} from "../../src/codex/catalog/provider-fetch";
-import { gatherRoutedModels as gatherRoutedModelsDirect, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
+} from "../../backend/src/codex/catalog/provider-fetch";
+import { gatherRoutedModels as gatherRoutedModelsDirect, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../src/types";
-import type { OcxProviderConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 

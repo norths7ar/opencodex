@@ -10,13 +10,13 @@ import {
   SpendLedgerFileRefusedError,
   resetSharedSpendLedgerForTest,
   setSpendJournalFaultForTests,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 import {
   acquireSpendLedgerOwner,
   mintSpendLedgerStorage,
   SpendLedgerOwnerError,
   type SpendLedgerOwnerLease,
-} from "../../src/lib/spend-ledger-owner";
+} from "../../backend/src/lib/spend-ledger-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** POSIX mode bits do not describe a Windows ACL, where hardenSecretPath does the work. */

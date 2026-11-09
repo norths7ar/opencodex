@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
-import type { AdapterEvent } from "../../../src/types";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 // #8101: the native usage parser dropped prompt_eval_cached_count, so cached input always read 0.

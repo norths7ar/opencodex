@@ -3,24 +3,24 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { request as httpRequest } from "node:http";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { clearMainAccountInfoCache } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/quota";
-import { clearThreadAccountMap } from "../../src/codex/routing";
-import { saveConfig } from "../../src/config";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import { CODEX_MAIN_PROFILE_MAINTENANCE_MESSAGE } from "../../src/codex/auth-context";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { startServer } from "../../src/server";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { clearMainAccountInfoCache } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/quota";
+import { clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { saveConfig } from "../../backend/src/config";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import { CODEX_MAIN_PROFILE_MAINTENANCE_MESSAGE } from "../../backend/src/codex/auth-context";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { startServer } from "../../backend/src/server";
 import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 

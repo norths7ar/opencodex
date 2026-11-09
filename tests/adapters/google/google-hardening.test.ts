@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../../src/lib/debug-settings";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

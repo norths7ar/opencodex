@@ -11,10 +11,10 @@ import {
   AgentClientMessageSchema,
   ExecServerMessageSchema,
   McpArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
-import { CursorMcpManager } from "../../../src/adapters/cursor/mcp-manager";
-import { buildMcpToolDefinitions, mcpDepsFromManager } from "../../../src/adapters/cursor/native-exec-mcp";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
+import { CursorMcpManager } from "../../../backend/src/adapters/cursor/mcp-manager";
+import { buildMcpToolDefinitions, mcpDepsFromManager } from "../../../backend/src/adapters/cursor/native-exec-mcp";
 
 /**
  * Live stdio integration: spawns a REAL MCP server as a child process over actual stdio

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../src/providers/quota";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
-import type { OcxConfig } from "../../src/types";
+import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../backend/src/providers/quota";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 const originalProxyEnv = Object.fromEntries(PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]).map(key => [key, process.env[key]]));

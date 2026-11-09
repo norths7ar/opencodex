@@ -3,15 +3,15 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { codexAccountGatedCanonicalWireModel } from "../../src/server/responses/core";
-import type { BundledCatalogDeps } from "../../src/codex/catalog/bundled";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
-import { isGpt56NativeSlug } from "../../src/codex/catalog/effort";
-import { nativeOpenAiContextTier, nativeOpenAiMaxInputTokens } from "../../src/codex/catalog";
-import { shouldUpgradeToUpstreamEntry } from "../../src/codex/catalog/metadata";
-import { applyNativeVisibility, augmentRoutedModelsWithMetadata, augmentRoutedModelsWithRegistryOpenAiApiRows, buildCatalogEntries, catalogModelSlug, clampCatalogModelsToCodexSupport, clampEntryToCodexSupportedEfforts, clampedDefaultEffort, CODEX_ACCOUNT_BOUND_CATALOG_KIND, CODEX_NATIVE_ALIAS_CATALOG_KIND, filterCatalogVisibleModels, filterSupportedNativeSlugs, gatherRoutedModels as gatherRoutedModelsDirect, isDatedVariantId, isMediaGenerationModelId, loadBundledCodexCatalog, materializeBundledCodexCatalog, mergeCatalogEntriesForSync, NATIVE_DAYBREAK_BLUE_MODEL, NATIVE_GPT6_ASTRA_MODEL, NATIVE_OPENAI_MODELS, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiCapabilitySourceSlug, nativeOpenAiContextWindow, nativeReasoningEfforts, normalizeRoutedCatalogEntry, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests, shouldExposeRoutedModel, upstreamNativeEntry } from "../../src/codex/catalog";
-import { accountBoundNativeOpenAiSlugsBySelector, observedAccountBoundNativeEntries } from "../../src/codex/catalog";
-import { applyProviderConfigHints, fetchProviderModels, mergeConfiguredModelsIntoLiveCatalog } from "../../src/codex/catalog/provider-fetch";
+import { codexAccountGatedCanonicalWireModel } from "../../backend/src/server/responses/core";
+import type { BundledCatalogDeps } from "../../backend/src/codex/catalog/bundled";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
+import { isGpt56NativeSlug } from "../../backend/src/codex/catalog/effort";
+import { nativeOpenAiContextTier, nativeOpenAiMaxInputTokens } from "../../backend/src/codex/catalog";
+import { shouldUpgradeToUpstreamEntry } from "../../backend/src/codex/catalog/metadata";
+import { applyNativeVisibility, augmentRoutedModelsWithMetadata, augmentRoutedModelsWithRegistryOpenAiApiRows, buildCatalogEntries, catalogModelSlug, clampCatalogModelsToCodexSupport, clampEntryToCodexSupportedEfforts, clampedDefaultEffort, CODEX_ACCOUNT_BOUND_CATALOG_KIND, CODEX_NATIVE_ALIAS_CATALOG_KIND, filterCatalogVisibleModels, filterSupportedNativeSlugs, gatherRoutedModels as gatherRoutedModelsDirect, isDatedVariantId, isMediaGenerationModelId, loadBundledCodexCatalog, materializeBundledCodexCatalog, mergeCatalogEntriesForSync, NATIVE_DAYBREAK_BLUE_MODEL, NATIVE_GPT6_ASTRA_MODEL, NATIVE_OPENAI_MODELS, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiCapabilitySourceSlug, nativeOpenAiContextWindow, nativeReasoningEfforts, normalizeRoutedCatalogEntry, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests, shouldExposeRoutedModel, upstreamNativeEntry } from "../../backend/src/codex/catalog";
+import { accountBoundNativeOpenAiSlugsBySelector, observedAccountBoundNativeEntries } from "../../backend/src/codex/catalog";
+import { applyProviderConfigHints, fetchProviderModels, mergeConfiguredModelsIntoLiveCatalog } from "../../backend/src/codex/catalog/provider-fetch";
 import {
   CODEX_CUSTOM_MODEL_CATALOG_KIND,
   CODEX_PROVIDER_MODEL_CATALOG_KIND,
@@ -19,7 +19,7 @@ import {
   findNativeTemplate,
   findSupportedNativeTemplate,
   normalizeServiceTiers,
-} from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/parsing";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 import {
   CURSOR_STATIC_MODELS,
@@ -28,9 +28,9 @@ import {
   cursorModelIds,
   cursorModelInputModalities,
   cursorModelReasoningEfforts,
-} from "../../src/adapters/cursor/discovery";
-import { getModelMetadata, resolveMetadataProvider } from "../../src/generated/model-metadata";
-import { resetCodexModelEntitlementCacheForTests, seedCodexModelEntitlementsForTests } from "../../src/codex/model-entitlements";
+} from "../../backend/src/adapters/cursor/discovery";
+import { getModelMetadata, resolveMetadataProvider } from "../../backend/src/generated/model-metadata";
+import { resetCodexModelEntitlementCacheForTests, seedCodexModelEntitlementsForTests } from "../../backend/src/codex/model-entitlements";
 import {
   clearModelCache,
   getProviderDiscoveryStatus,
@@ -38,34 +38,34 @@ import {
   markProviderDiscoveryFailed,
   setCached,
   type ProviderModelDiscoveryStatus,
-} from "../../src/codex/model-cache";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { providerMatchesRegistryTransportWithStaticGuards } from "../../src/providers/static-model-discovery";
-import { enrichProviderFromCatalog } from "../../src/oauth/key-providers";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
+} from "../../backend/src/codex/model-cache";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { providerMatchesRegistryTransportWithStaticGuards } from "../../backend/src/providers/static-model-discovery";
+import { enrichProviderFromCatalog } from "../../backend/src/oauth/key-providers";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
 import {
   catalogEntryEfforts,
   clampCatalogModelsToObservedCodexSupport,
   supportedCodexReasoningEffortsFromObservedCatalog,
-} from "../../src/codex/catalog/effort";
+} from "../../backend/src/codex/catalog/effort";
 import {
   CANONICAL_NATIVE_CATALOG_CONTENT_POLICY,
   mergeCatalogEntriesFromObservedState,
   syncCatalogModels,
   type ObservedCatalogMergeInput,
-} from "../../src/codex/catalog/sync";
+} from "../../backend/src/codex/catalog/sync";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { saveConfig } from "../../src/config";
-import { SUBAGENT_MODELS_VERSION } from "../../src/config/subagent-models";
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
-import { convergeCodexCatalog } from "../../src/codex/convergence";
-import { resetCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
+import { saveConfig } from "../../backend/src/config";
+import { SUBAGENT_MODELS_VERSION } from "../../backend/src/config/subagent-models";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
+import { convergeCodexCatalog } from "../../backend/src/codex/convergence";
+import { resetCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
 
 const originalFetch = globalThis.fetch;
 
@@ -2691,7 +2691,7 @@ describe("Codex catalog routed normalization", () => {
     { label: "omitted", models: undefined },
     { label: "empty", models: [] as string[] },
   ])("static $label models deduplicate default and retain ids before either OAuth resolver", async ({ models: configuredModels }) => {
-    const oauth = await import("../../src/oauth");
+    const oauth = await import("../../backend/src/oauth");
     const resolveToken = spyOn(oauth, "resolveModelsAuthToken")
       .mockRejectedValue(new Error("static catalogs must not resolve or refresh OAuth"));
     const resolveSnapshot = spyOn(oauth, "getValidAccessTokenSnapshot")
@@ -5357,7 +5357,7 @@ test("provider-configured cap applies to discovered window and does not get over
 
 describe("auto_review_model configuration (#1225)", () => {
   test("applyAutoReviewModelOverride sets auto_review_model_override across all entries", () => {
-    const { applyAutoReviewModelOverride } = require("../../src/codex/catalog/sync");
+    const { applyAutoReviewModelOverride } = require("../../backend/src/codex/catalog/sync");
     const entries = [
       { slug: "gpt-5.5", auto_review_model_override: null },
       { slug: "opencode-go/deepseek-v4-flash", auto_review_model_override: null },
@@ -5369,7 +5369,7 @@ describe("auto_review_model configuration (#1225)", () => {
   });
 
   test("applyAutoReviewModelOverride clears routed state when autoReviewModel is null or empty", () => {
-    const { applyAutoReviewModelOverride } = require("../../src/codex/catalog/sync");
+    const { applyAutoReviewModelOverride } = require("../../backend/src/codex/catalog/sync");
     const entries = [
       { slug: "gpt-5.5", auto_review_model_override: "existing-model" },
       { slug: "opencode-go/glm-5.2", auto_review_model_override: "old-model" },
@@ -5384,7 +5384,7 @@ describe("auto_review_model configuration (#1225)", () => {
   });
 
   test("applyAutoReviewModelOverride rejects invalid format with control chars or inner spaces", () => {
-    const { applyAutoReviewModelOverride, isValidAutoReviewModel } = require("../../src/codex/catalog/sync");
+    const { applyAutoReviewModelOverride, isValidAutoReviewModel } = require("../../backend/src/codex/catalog/sync");
     const entries = [
       { slug: "gpt-5.5", auto_review_model_override: "native-preserved" },
     ];
@@ -5397,13 +5397,13 @@ describe("auto_review_model configuration (#1225)", () => {
   });
 
   test("readConfiguredAutoReviewModel reads auto_review_model from config.toml", () => {
-    const { readConfiguredAutoReviewModel } = require("../../src/codex/catalog/parsing");
+    const { readConfiguredAutoReviewModel } = require("../../backend/src/codex/catalog/parsing");
     expect(typeof readConfiguredAutoReviewModel).toBe("function");
   });
 
   test("writeRetainedCatalogSync stamps auto_review_model_override into persisted catalog", () => {
-    const { applyAutoReviewModelOverride } = require("../../src/codex/catalog/sync");
-    const { readConfiguredAutoReviewModel } = require("../../src/codex/catalog/parsing");
+    const { applyAutoReviewModelOverride } = require("../../backend/src/codex/catalog/sync");
+    const { readConfiguredAutoReviewModel } = require("../../backend/src/codex/catalog/parsing");
 
     // Simulate a config-driven write path: entries are regenerated from a template,
     // then the override is stamped before serialization.
@@ -5429,7 +5429,7 @@ describe("auto_review_model configuration (#1225)", () => {
 });
 
 describe("provider-level auto_review_model overrides", () => {
-  const { applyConfiguredAutoReviewModelOverride } = require("../../src/codex/catalog/sync");
+  const { applyConfiguredAutoReviewModelOverride } = require("../../backend/src/codex/catalog/sync");
 
   function entries(): Array<Record<string, unknown>> {
     return [

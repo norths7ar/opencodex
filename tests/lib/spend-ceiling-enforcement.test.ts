@@ -25,7 +25,7 @@ import {
   type SpendJournal,
   type SpendReservationLedger,
   type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 import {
   admitWorkflowTurn,
   chargeWorkflowSends,
@@ -38,11 +38,11 @@ import {
   workflowDenialSummary,
   workflowSpendCeilingReached,
   type WorkflowBudgetPolicy,
-} from "../../src/lib/workflow-budget";
-import { workflowDecisionRefusalResponse, workflowRefusalResponse } from "../../src/server/workflow-refusal";
-import { getConfigDir } from "../../src/config/paths";
+} from "../../backend/src/lib/workflow-budget";
+import { workflowDecisionRefusalResponse, workflowRefusalResponse } from "../../backend/src/server/workflow-refusal";
+import { getConfigDir } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../src/lib/spend-ledger-owner";
+import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../backend/src/lib/spend-ledger-owner";
 
 const memoryJournal = (): SpendJournal & { lines: string[] } => {
   const lines: string[] = [];

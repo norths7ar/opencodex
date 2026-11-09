@@ -1,15 +1,15 @@
-import * as derivedRegistries from "../../src/config/derived-registries";
-import * as mutationLock from "../../src/config/mutation-lock";
+import * as derivedRegistries from "../../backend/src/config/derived-registries";
+import * as mutationLock from "../../backend/src/config/mutation-lock";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { managementFetch as fetch } from "../helpers/management-auth";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import { loadConfig, saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -491,7 +491,7 @@ describe("Anthropic account pool strategy management API", () => {
     // when reactive and proactive activation were split: `enabled: false` still refuses the
     // pre-dispatch account preference, it just can no longer refuse 429 rotation. A dashboard
     // reading `inert` as covering `enabled` would render a live control as decorative.
-    const source = await Bun.file("src/oauth/pool-settings-capability.ts").text();
+    const source = await Bun.file("backend/src/oauth/pool-settings-capability.ts").text();
     const start = source.indexOf("autoSwitchThreshold: number | null;");
     // Anchored on the CURRENT literal. When this type read `inert: true;` and the field became
     // `inert: boolean;`, indexOf returned -1 and slice(start, -1) handed back almost the whole
@@ -821,8 +821,8 @@ describe("unified pool-settings contract (#695 wp5c)", () => {
       const response = await fetch(new URL(`${endpoint}?accountId=history-row&limit=1`, server.url));
       expect(response.status).toBe(200);
       expect(await response.json()).toEqual({ accountId: "history-row", observations: [], retention: { maxObservations: 200, maxAgeDays: 30 }, truncated: false, capacity: { status: "insufficient-evidence", reason: "identity_unavailable", estimates: [], assumptions: expect.any(Array) } });
-      const { saveCodexAccountCredential, capturePoolQuotaWriter } = await import("../../src/codex/account-store");
-      const { setAccountQuotaFromParsed } = await import("../../src/codex/quota");
+      const { saveCodexAccountCredential, capturePoolQuotaWriter } = await import("../../backend/src/codex/account-store");
+      const { setAccountQuotaFromParsed } = await import("../../backend/src/codex/quota");
       const credential = { accessToken: "history-secret-access", refreshToken: "history-secret-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "private-history-account" };
       const generation = saveCodexAccountCredential("history-row", credential);
       const writer = capturePoolQuotaWriter("history-row", { ...credential, generation })!;

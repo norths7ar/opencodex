@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
-import { parseRequest } from "../../src/responses/parser";
-import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../src/web-search/loop";
-import type { OcxProviderConfig } from "../../src/types";
-import type { ProviderAdapter } from "../../src/adapters/base";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { phaseTimer } from "../helpers/phase-timing";
 

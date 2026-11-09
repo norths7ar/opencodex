@@ -7,10 +7,10 @@ import {
   cachedDeniedCodexAccountIdsForModel,
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+} from "../../backend/src/codex/model-entitlements";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

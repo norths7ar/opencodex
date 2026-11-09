@@ -4,7 +4,7 @@ import {
   decideNativeProfileRecovery,
   type NativeProfileAuthObservation,
   type NativeProfileJournalPhase,
-} from "../../src/codex/native-profile-recovery";
+} from "../../backend/src/codex/native-profile-recovery";
 
 const phases: NativeProfileJournalPhase[] = [
   "prepared",

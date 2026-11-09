@@ -13,7 +13,7 @@
  * resolves. There is deliberately no "strip everything before the first dot" rule.
  */
 import { describe, expect, test } from "bun:test";
-import { repairLegacyDottedToolCallNames } from "../../src/responses/legacy-dotted-tool-name-repair";
+import { repairLegacyDottedToolCallNames } from "../../backend/src/responses/legacy-dotted-tool-name-repair";
 
 const DAMAGED_VIEW_IMAGE = { type: "function_call", call_id: "call_a", name: "default.view_image", arguments: "{}" };
 const DAMAGED_APPLY_PATCH = { type: "function_call", call_id: "call_b", name: "default.apply_patch", arguments: "{}" };

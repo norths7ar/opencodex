@@ -83,7 +83,7 @@ describe("pinnedHttpsGet transport", () => {
     });
     mock.module("node:https", () => ({ default: { request: requestMock }, request: requestMock }));
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     const pinned = { address: "93.184.216.34", family: 4 };
     const respPromise = pinnedHttpsGet("https://cdn.example/img.png", pinned);
     // Give request() a tick to store lookup.
@@ -114,7 +114,7 @@ describe("pinnedHttpsGet transport", () => {
     const chunks = [small, small, small]; // 3 KiB total
     installHttpsMock(chunks);
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     const maxBytes = 1500; // trip on the second chunk
     const resp = await pinnedHttpsGet(
       "https://cdn.example/big.png",
@@ -169,7 +169,7 @@ describe("pinnedHttpsGet transport", () => {
     });
     mock.module("node:https", () => ({ default: { request: requestMock }, request: requestMock }));
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     await expect(pinnedHttpsGet(
       "https://cdn.example/redirect.png",
       { address: "93.184.216.34", family: 4 },
@@ -233,7 +233,7 @@ describe("pinnedHttpsGet transport", () => {
     });
     mock.module("node:https", () => ({ default: { request: requestMock }, request: requestMock }));
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     await expect(pinnedHttpsGet(
       "https://cdn.example/fail.png",
       { address: "93.184.216.34", family: 4 },
@@ -261,7 +261,7 @@ describe("pinnedHttpsGet transport", () => {
     });
     mock.module("node:https", () => ({ default: { request: requestMock }, request: requestMock }));
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     await expect(pinnedHttpsGet(
       "https://cdn.example/hang.png",
       { address: "93.184.216.34", family: 4 },
@@ -309,7 +309,7 @@ describe("pinnedHttpsGet transport", () => {
     });
     mock.module("node:https", () => ({ default: { request: requestMock }, request: requestMock }));
 
-    const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+    const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
     const resp = await pinnedHttpsGet(
       "https://cdn.example/img.png",
       { address: "93.184.216.34", family: 4 },
@@ -349,7 +349,7 @@ describe("pinnedHttpsGet transport", () => {
       return 0 as unknown as ReturnType<typeof setTimeout>;
     }) as unknown as typeof setTimeout;
     try {
-      const { pinnedHttpsGet, DOWNLOAD_CONNECT_TIMEOUT_MS } = await import("../../src/images/artifacts");
+      const { pinnedHttpsGet, DOWNLOAD_CONNECT_TIMEOUT_MS } = await import("../../backend/src/images/artifacts");
       expect(DOWNLOAD_CONNECT_TIMEOUT_MS).toBe(10_000);
       const pending = pinnedHttpsGet(
         "https://cdn.example/stalled.png",
@@ -389,7 +389,7 @@ describe("pinnedHttpsGet transport", () => {
       return 0 as unknown as ReturnType<typeof setTimeout>;
     }) as unknown as typeof setTimeout;
     try {
-      const { pinnedHttpsGet } = await import("../../src/images/artifacts");
+      const { pinnedHttpsGet } = await import("../../backend/src/images/artifacts");
       const pending = pinnedHttpsGet(
         "https://cdn.example/stalled.png",
         { address: "93.184.216.34", family: 4 },

@@ -14,10 +14,10 @@ import {
   type HermesGeneratedConfig,
   type KimiGeneratedConfig,
   type OpenclawGeneratedConfig,
-} from "../../src/clients/config-export";
-import { serializeDocument } from "../../src/integrations/serialize";
-import { readPath } from "../../src/integrations/state";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { serializeDocument } from "../../backend/src/integrations/serialize";
+import { readPath } from "../../backend/src/integrations/state";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Activation coverage for the four clients added in WP1

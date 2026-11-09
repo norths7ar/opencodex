@@ -1,4 +1,4 @@
-import type { StartupHealth } from "../../src/codex/autostart-health";
+import type { StartupHealth } from "../../backend/src/codex/autostart-health";
 
 export function startupHealthFixture(overrides: Partial<StartupHealth> = {}): StartupHealth {
   return {

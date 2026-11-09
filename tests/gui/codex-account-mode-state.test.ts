@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { codexAccountModeState } from "../../gui/src/codex-multi-state";
+import { codexAccountModeState } from "../../frontend/src/codex-multi-state";
 
 describe("OpenAI provider account-mode presentation state", () => {
   test("distinguishes absent, disabled, pool, and direct configurations", () => {

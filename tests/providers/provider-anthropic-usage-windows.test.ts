@@ -1,12 +1,12 @@
 import { afterEach, expect, test } from "bun:test";
-import { probeAnthropicUsageQuota } from "../../src/providers/claude-cli-usage";
-import { rawAnthropicUsageWindows } from "../../src/providers/quota/anthropic-decision-windows";
-import { hasAnthropicFamilyEnumeration } from "../../src/providers/quota/anthropic-family-headers";
-import { anthropicModelPercents } from "../../src/oauth/anthropic-model-quota";
-import { resolveAnthropicAccountIdentity } from "../../src/oauth/anthropic-identity";
-import { providerQuotaWindows } from "../../src/quota-pool/assemble";
-import { pooledWindows } from "../../src/quota-pool/pooled";
-import { anthropicResetGrantBlocker, parseAnthropicResetGrantStatus } from "../../src/providers/anthropic-reset-grants";
+import { probeAnthropicUsageQuota } from "../../backend/src/providers/claude-cli-usage";
+import { rawAnthropicUsageWindows } from "../../backend/src/providers/quota/anthropic-decision-windows";
+import { hasAnthropicFamilyEnumeration } from "../../backend/src/providers/quota/anthropic-family-headers";
+import { anthropicModelPercents } from "../../backend/src/oauth/anthropic-model-quota";
+import { resolveAnthropicAccountIdentity } from "../../backend/src/oauth/anthropic-identity";
+import { providerQuotaWindows } from "../../backend/src/quota-pool/assemble";
+import { pooledWindows } from "../../backend/src/quota-pool/pooled";
+import { anthropicResetGrantBlocker, parseAnthropicResetGrantStatus } from "../../backend/src/providers/anthropic-reset-grants";
 import { inactiveSessionUsage, maxTeamInactiveWeeklyUsage, maxTeamInactiveSessionUsage, legacyMax20xUsage, noResetGrant, ultraUsage, weeklyReset } from "../fixtures/anthropic-usage-shapes";
 
 const originalFetch = globalThis.fetch;

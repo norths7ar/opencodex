@@ -1,4 +1,4 @@
-import type { RestartIo } from "../../src/update/job";
+import type { RestartIo } from "../../backend/src/update/job";
 
 /** Non-home restart tests explicitly own their fake service and never touch a live manager. */
 export const sameHomeRestartIo: Pick<RestartIo, "serviceHomeAuthorityFn" | "stopServiceWrappersFn" | "restartServiceManagerFn"> = {

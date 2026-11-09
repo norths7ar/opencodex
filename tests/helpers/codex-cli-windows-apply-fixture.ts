@@ -4,8 +4,8 @@ import { trustWindowsTempFixtureAncestry } from "./windows-temp-ancestry";
 import { afterEach, expect, test } from "bun:test";
 import { cpSync, realpathSync, copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
-import { hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
+import { hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeAfterBackgroundWork } from "./remove-tree";
 import { fixtureArtifact, fixtureTar } from "./codex-cli-apply-artifact";
 import { fixturePath } from "./repo-root";
@@ -15,7 +15,7 @@ export const native = process.platform === "win32" && process.arch === "x64" ? t
 // Bound this class for a shared Windows host; keep every admission/readback assertion.
 export const WINDOWS_APPLY_BUDGET_MS = 4 * SPAWN_BUDGET_MS;
 export const WINDOWS_APPLY_CHILD_BUDGET_MS = 2 * SPAWN_BUDGET_MS;
-export type WorkerFixtureReply = { type: string; requestId?: string; cleanupConfirmed?: boolean; result?: import("../../src/codex/cli-update-apply").CodexCliApplyResult };
+export type WorkerFixtureReply = { type: string; requestId?: string; cleanupConfirmed?: boolean; result?: import("../../backend/src/codex/cli-update-apply").CodexCliApplyResult };
 export function fixtureCleanupProven(messages: readonly unknown[], requestId: string, closed: boolean, errored: boolean,
   expectedErrors: readonly string[] = []): boolean {
   if (!closed || errored) return false;

@@ -10,11 +10,11 @@
  * additional_tools envelope are exercised.
  */
 import { describe, expect, test } from "bun:test";
-import { collabSurface, multiAgentGuidanceText } from "../../src/server/responses";
-import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../src/codex/multi-agent-mode-policy";
-import { effortCapAppliesTo } from "../../src/server/effort-policy";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxConfig } from "../../src/types";
+import { collabSurface, multiAgentGuidanceText } from "../../backend/src/server/responses";
+import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../backend/src/codex/multi-agent-mode-policy";
+import { effortCapAppliesTo } from "../../backend/src/server/effort-policy";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxConfig } from "../../backend/src/types";
 
 const V1_PROACTIVE = `<multi_agent_mode>${MULTI_AGENT_MODE_HINT_RECOMMENDATION.text}</multi_agent_mode>`;
 const TICK = "`";

@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { discoverAntigravityProject, refreshAntigravityToken } from "../../../src/oauth/google-antigravity";
+import { discoverAntigravityProject, refreshAntigravityToken } from "../../../backend/src/oauth/google-antigravity";
 import { mkdirSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getCredential, saveCredential } from "../../../src/oauth/store";
-import { ANTIGRAVITY_IDE_VERSION } from "../../../src/adapters/client-fingerprint";
+import { getCredential, saveCredential } from "../../../backend/src/oauth/store";
+import { ANTIGRAVITY_IDE_VERSION } from "../../../backend/src/adapters/client-fingerprint";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import { OAuthCallbackFlow } from "../../../src/oauth/callback-server";
-import { publicOAuthAuthenticationErrorMessage, runLogin } from "../../../src/oauth";
-import { getDefaultConfig } from "../../../src/config";
-import { AntigravityProjectDiscoveryError, summarizeAntigravityDiscovery } from "../../../src/oauth/antigravity-discovery-diagnostics";
+import { OAuthCallbackFlow } from "../../../backend/src/oauth/callback-server";
+import { publicOAuthAuthenticationErrorMessage, runLogin } from "../../../backend/src/oauth";
+import { getDefaultConfig } from "../../../backend/src/config";
+import { AntigravityProjectDiscoveryError, summarizeAntigravityDiscovery } from "../../../backend/src/oauth/antigravity-discovery-diagnostics";
 
 const realFetch = globalThis.fetch;
 const secret = "PRIVATE_DISCOVERY_SENTINEL";

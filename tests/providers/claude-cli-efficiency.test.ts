@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { buildConversationInput, buildSystemPrompt } from "../../src/adapters/coding-agent/protocol";
-import { buildCodeBuddyToolBridge } from "../../src/adapters/codebuddy/tool-bridge";
-import { buildStableClaudeConversationInput, canonicalClaudeJson, CLAUDE_REPLAY_SYSTEM_PROMPT, stableClaudeToolBridge } from "../../src/adapters/claude-cli/stable-replay";
-import type { OcxMessage, OcxParsedRequest } from "../../src/types";
+import { buildConversationInput, buildSystemPrompt } from "../../backend/src/adapters/coding-agent/protocol";
+import { buildCodeBuddyToolBridge } from "../../backend/src/adapters/codebuddy/tool-bridge";
+import { buildStableClaudeConversationInput, canonicalClaudeJson, CLAUDE_REPLAY_SYSTEM_PROMPT, stableClaudeToolBridge } from "../../backend/src/adapters/claude-cli/stable-replay";
+import type { OcxMessage, OcxParsedRequest } from "../../backend/src/types";
 
 const user = (text: string): OcxMessage => ({ role: "user", content: text, timestamp: 0 });
 const assistant = (text: string): OcxMessage => ({ role: "assistant", content: [{ type: "text", text }], timestamp: 0 });

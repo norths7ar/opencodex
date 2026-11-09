@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as configStore from "../../src/config";
-import { getConfigPath, getDefaultConfig, loadConfig, readConfigDiagnostics, saveConfig } from "../../src/config";
-import { DEFAULT_SUBAGENT_MODELS, migrateSubagentModels } from "../../src/config/subagent-models";
-import { migrateStartupSubagentModels } from "../../src/server/subagent-models-startup";
-import { runClaudeAuthModeMigration } from "../../src/claude/auth-mode-migration";
+import * as configStore from "../../backend/src/config";
+import { getConfigPath, getDefaultConfig, loadConfig, readConfigDiagnostics, saveConfig } from "../../backend/src/config";
+import { DEFAULT_SUBAGENT_MODELS, migrateSubagentModels } from "../../backend/src/config/subagent-models";
+import { migrateStartupSubagentModels } from "../../backend/src/server/subagent-models-startup";
+import { runClaudeAuthModeMigration } from "../../backend/src/claude/auth-mode-migration";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Moved from config.test.ts, which sits at its file-size cap.

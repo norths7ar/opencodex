@@ -4,10 +4,10 @@
  * leaves the live config as it was, and the answer is the fresh GET /api/protocols shape.
  */
 import { describe, expect, test } from "bun:test";
-import type { ManagementContext } from "../../src/server/management/context";
-import { handleProtocolRoutes } from "../../src/server/management/protocol-routes";
-import { parseProtocolSettingsPatch } from "../../src/server/management/protocol-settings-patch";
-import type { OcxConfig } from "../../src/types";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { handleProtocolRoutes } from "../../backend/src/server/management/protocol-routes";
+import { parseProtocolSettingsPatch } from "../../backend/src/server/management/protocol-settings-patch";
+import type { OcxConfig } from "../../backend/src/types";
 
 interface Harness {
   config: OcxConfig;

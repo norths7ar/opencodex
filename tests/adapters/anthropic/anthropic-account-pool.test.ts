@@ -1,10 +1,10 @@
 import { rotateAnthropicAccountOn429 } from "../../helpers/anthropic-shared-quota";
-import { bindAnthropicRefusalCredential, rotateAnthropicAccountOnResponse } from "../../../src/oauth/anthropic-account-refusal";
+import { bindAnthropicRefusalCredential, rotateAnthropicAccountOnResponse } from "../../../backend/src/oauth/anthropic-account-refusal";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearPoolRotationState, notePoolRotationFailure, POOL_KEY_ANTHROPIC } from "../../../src/codex/pool-rotation";
+import { clearPoolRotationState, notePoolRotationFailure, POOL_KEY_ANTHROPIC } from "../../../backend/src/codex/pool-rotation";
 import {
   anthropicQuotaWindow,
   pickAlternateAnthropicAccount,
@@ -22,11 +22,11 @@ import {
   getAnthropicPoolAccessSnapshot,
   promoteAnthropicActiveAccount,
   anthropicSessionAffinitySizeForTests,
-} from "../../../src/oauth/anthropic-routing";
-import { captureOAuthAccountSelection, getAccountSet, markAccountNeedsReauth, saveCredential, saveAccountCredential, setActiveAccount } from "../../../src/oauth/store";
-import { subscribeAccountSelections } from "../../../src/lib/account-selection-events";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import type { OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy, OcxConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/anthropic-routing";
+import { captureOAuthAccountSelection, getAccountSet, markAccountNeedsReauth, saveCredential, saveAccountCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { subscribeAccountSelections } from "../../../backend/src/lib/account-selection-events";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import type { OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy, OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;
@@ -77,7 +77,7 @@ async function seedTwoAccounts() {
     email: "b@example.test",
   });
   // saveCredential activates the newly appended account (B). Pin A as active for predictable tests.
-  const { getAccountSet } = await import("../../../src/oauth/store");
+  const { getAccountSet } = await import("../../../backend/src/oauth/store");
   const set = getAccountSet("anthropic")!;
   const a = set.accounts.find(acc => acc.credential.accountId === "uuid-aaaa")!;
   const b = set.accounts.find(acc => acc.credential.accountId === "uuid-bbbb")!;
@@ -133,7 +133,7 @@ async function seedThreeAccounts() {
     accountId: "uuid-cccc",
     email: "c@example.test",
   });
-  const { getAccountSet } = await import("../../../src/oauth/store");
+  const { getAccountSet } = await import("../../../backend/src/oauth/store");
   const set = getAccountSet("anthropic")!;
   const a = set.accounts.find(acc => acc.credential.accountId === "uuid-aaaa")!;
   const b = set.accounts.find(acc => acc.credential.accountId === "uuid-bbbb")!;

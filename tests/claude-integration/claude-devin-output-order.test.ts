@@ -1,18 +1,18 @@
 import { afterAll, afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import { orderDevinMessagesOutput } from "../../src/claude/devin-output-order";
-import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { bridgeToResponsesSSE } from "../../src/bridge";
+import { orderDevinMessagesOutput } from "../../backend/src/claude/devin-output-order";
+import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { encodeDevinSignature } from "../../src/adapters/devin/reasoning-signature";
-import { mapOcxMessagesToDevin } from "../../src/adapters/devin";
-import { messagesToResponsesTranslation } from "../../src/protocols/codecs/messages";
-import { parseRequest } from "../../src/responses/parser";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { createAdapterEventQueue } from "../../src/adapters/run-turn-queue";
-import { runTurnWebSearchLoop } from "../../src/web-search/run-turn-loop";
-import { DEVIN_CLI_CREDENTIALS_ENV } from "../../src/oauth/devin/cli-import";
-import { saveCredential } from "../../src/oauth/store";
+import { encodeDevinSignature } from "../../backend/src/adapters/devin/reasoning-signature";
+import { mapOcxMessagesToDevin } from "../../backend/src/adapters/devin";
+import { messagesToResponsesTranslation } from "../../backend/src/protocols/codecs/messages";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { createAdapterEventQueue } from "../../backend/src/adapters/run-turn-queue";
+import { runTurnWebSearchLoop } from "../../backend/src/web-search/run-turn-loop";
+import { DEVIN_CLI_CREDENTIALS_ENV } from "../../backend/src/oauth/devin/cli-import";
+import { saveCredential } from "../../backend/src/oauth/store";
 import { createTempHome } from "../helpers/temp-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
@@ -23,9 +23,9 @@ const terminal: AdapterEvent = { type: "done", usage };
 let upstreamEvents: AdapterEvent[] = [];
 let afterFirstEvent: (() => Promise<void>) | undefined;
 let paceFragments = false;
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const originalResolver = { ...resolver };
-mock.module("../../src/server/adapter-resolve", () => ({ ...originalResolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...originalResolver,
   resolveAdapter(provider: OcxProviderConfig, cache?: "none" | "short" | "long") {
     if (provider.adapter !== "devin") return originalResolver.resolveAdapter(provider, cache);
     return {
@@ -42,9 +42,9 @@ mock.module("../../src/server/adapter-resolve", () => ({ ...originalResolver,
     } satisfies ProviderAdapter;
   },
 }));
-const { handleClaudeMessages } = await import("../../src/server/claude-messages");
-const { handleResponses } = await import("../../src/server/responses");
-afterAll(() => { mock.module("../../src/server/adapter-resolve", () => originalResolver); });
+const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
+const { handleResponses } = await import("../../backend/src/server/responses");
+afterAll(() => { mock.module("../../backend/src/server/adapter-resolve", () => originalResolver); });
 
 let home: ReturnType<typeof createTempHome>;
 let codexHome: ReturnType<typeof installIsolatedCodexHome>;

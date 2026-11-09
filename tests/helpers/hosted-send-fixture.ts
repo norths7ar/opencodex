@@ -1,22 +1,22 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 // providerFetch supports executor injection; persisted provider configuration does not expose it.
 type SyntheticConfig = Omit<OcxConfig, "providers"> & { providers: Record<string, OcxProviderConfig & { fetch?: typeof fetch }> };
-import type { RequestLogContext } from "../../src/server/request-log";
-import { handleResponses } from "../../src/server/responses/core";
-import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../src/lib/request-execution-budget";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { sharedSpendLedger, resetSharedSpendLedgerForTest } from "../../src/lib/spend-reservation-ledger";
-import { spendLedgerOwnerSnapshot } from "../../src/lib/spend-ledger-owner";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../backend/src/lib/request-execution-budget";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { sharedSpendLedger, resetSharedSpendLedgerForTest } from "../../backend/src/lib/spend-reservation-ledger";
+import { spendLedgerOwnerSnapshot } from "../../backend/src/lib/spend-ledger-owner";
 import { expect } from "bun:test";
 import { acquireOwnedSpendHome } from "./owned-spend-home";
 import { installIsolatedCodexHome } from "./isolated-codex-home";
 import { removeTreeWithRetry } from "./remove-tree";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
 import { chatStream } from "./combo-failover-upstream";
 
 export type HostedKind = "search" | "image" | "video";

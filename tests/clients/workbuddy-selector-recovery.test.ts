@@ -2,12 +2,12 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { agentConfigPath } from "../../src/clients/config-export/agent-clients";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import { agentConfigPath } from "../../backend/src/clients/config-export/agent-clients";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config = { hostname: "127.0.0.1", port: 10100, defaultProvider: "mock", providers: { mock: { adapter: "openai-chat", baseUrl: "http://127.0.0.1/v1", allowPrivateNetwork: true } } } as OcxConfig;

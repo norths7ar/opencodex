@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { providerConfigSeed, deriveKeyLoginMap, deriveProviderPresets } from "../../src/providers/derive";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { providerConfigSeed, deriveKeyLoginMap, deriveProviderPresets } from "../../backend/src/providers/derive";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 function minimalRequest(model: string): OcxParsedRequest {
   return {

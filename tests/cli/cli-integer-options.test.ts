@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { CliUsageError, takeIntegerOption } from "../../src/cli/runtime-api";
+import { CliUsageError, takeIntegerOption } from "../../backend/src/cli/runtime-api";
 
 describe("CLI integer options", () => {
   test.each(["", " ", ",", "_", "0x10", "1e3", "1.0", "1.5", "1__2", "1,,2", "_12", "12_", "9007199254740993", "-9007199254740993"])("rejects %j", raw => {

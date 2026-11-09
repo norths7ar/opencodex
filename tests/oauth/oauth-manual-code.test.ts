@@ -11,15 +11,15 @@ import {
   getLoginStatus,
   startLoginFlow,
   submitManualLoginCode,
-} from "../../src/oauth";
-import { parseCallbackInput } from "../../src/oauth/callback-server";
-import { loginState, waitForManualLoginCode } from "../../src/oauth/login-flow-state";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { findAvailablePort } from "../../src/server/ports";
-import type { OcxConfig } from "../../src/types";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/oauth";
+import { parseCallbackInput } from "../../backend/src/oauth/callback-server";
+import { loginState, waitForManualLoginCode } from "../../backend/src/oauth/login-flow-state";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { findAvailablePort } from "../../backend/src/server/ports";
+import type { OcxConfig } from "../../backend/src/types";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 // Per-test scratch home with both icacls runners stubbed: this file tests the manual-code
 // login flow, not Windows ACLs. With a real icacls the credential persist failed on the hosted

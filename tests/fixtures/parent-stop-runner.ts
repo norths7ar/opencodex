@@ -3,9 +3,9 @@ import { mock } from "bun:test";
 import * as childProcess from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { CodexNativeRestoreResult } from "../../src/codex/inject";
-import { createLocalAttestationProof, LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER } from "../../src/lib/local-management-attestation";
-import { LOCAL_MANAGEMENT_NONCE_HEADER } from "../../src/lib/local-management-capability";
+import type { CodexNativeRestoreResult } from "../../backend/src/codex/inject";
+import { createLocalAttestationProof, LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER } from "../../backend/src/lib/local-management-attestation";
+import { LOCAL_MANAGEMENT_NONCE_HEADER } from "../../backend/src/lib/local-management-capability";
 
 const ATTESTATION_SECRET = "C".repeat(43);
 
@@ -38,7 +38,7 @@ const fakePid = 4242;
 const calls = { killed: 0, native: 0, grok: 0, cleared: 0, exited: 0, service: 0, lifecycle: 0 };
 let receiptBlocker: import("bun:sqlite").Database | undefined;
 const { Database } = await import("bun:sqlite");
-const { prepareConfigMutationDatabasePathForWrite } = await import("../../src/config");
+const { prepareConfigMutationDatabasePathForWrite } = await import("../../backend/src/config");
 const urls: string[] = [];
 const probes: string[] = [];
 const transports: string[] = [];
@@ -71,7 +71,7 @@ mock.module("node:child_process", () => ({
   },
 }));
 
-const receipts = await import("../../src/config/pending-teardown");
+const receipts = await import("../../backend/src/config/pending-teardown");
 process.on("exit", () => {
   receiptBlocker?.close();
   writeFileSync(join(home, "parent-stop-result.json"), JSON.stringify({
@@ -81,7 +81,7 @@ process.on("exit", () => {
 });
 const claimReceipt = receipts.claimPendingTeardown;
 const clearReceipt = receipts.clearPendingTeardown;
-mock.module("../../src/config/pending-teardown", () => ({
+mock.module("../../backend/src/config/pending-teardown", () => ({
   ...receipts,
   claimPendingTeardown: (...args: Parameters<typeof claimReceipt>) => {
     if (!options.receipt) throw new Error("receipt storage unavailable");
@@ -92,23 +92,23 @@ mock.module("../../src/config/pending-teardown", () => ({
   clearPendingTeardown: (value: string) => { calls.cleared += 1; return clearReceipt(value); },
 }));
 
-const state = await import("../../src/config/process-state");
-mock.module("../../src/config/process-state", () => ({
+const state = await import("../../backend/src/config/process-state");
+mock.module("../../backend/src/config/process-state", () => ({
   ...state,
   readPid: () => options.orphan || options.alreadyStopped || (options.deadPidReadsNull && !alive) ? null : fakePid,
   readRuntimePort: () => options.alreadyStopped || options.noRuntimeRecord ? null : { ...endpoint, pid: fakePid, attestationSecret: ATTESTATION_SECRET },
   removePid() {},
   removeRuntimePort() {},
 }));
-const service = await import("../../src/service");
-mock.module("../../src/service", () => ({ ...service, stopServiceIfInstalledDetailed: () => {
+const service = await import("../../backend/src/service");
+mock.module("../../backend/src/service", () => ({ ...service, stopServiceIfInstalledDetailed: () => {
   calls.service++;
   if (options.managerCascades) { alive = false; return "stopped"; }
   return "absent";
 } }));
 if (options.orphan || options.alreadyStopped) {
-  const liveness = await import("../../src/server/proxy-liveness");
-  mock.module("../../src/server/proxy-liveness", () => ({ ...liveness,
+  const liveness = await import("../../backend/src/server/proxy-liveness");
+  mock.module("../../backend/src/server/proxy-liveness", () => ({ ...liveness,
     findLiveProxy: async () => {
       return alive ? { ...endpoint, pid: fakePid, source: "config" } : null;
     },
@@ -117,13 +117,13 @@ if (options.orphan || options.alreadyStopped) {
   }));
 }
 if (options.alreadyStopped) {
-  const guarded = await import("../../src/service/guarded-manager-target");
-  mock.module("../../src/service/guarded-manager-target", () => ({ ...guarded,
+  const guarded = await import("../../backend/src/service/guarded-manager-target");
+  mock.module("../../backend/src/service/guarded-manager-target", () => ({ ...guarded,
     observeGuardedManagerStopped: async () => options.managerState ?? "inactive",
   }));
 }
-const native = await import("../../src/codex/inject");
-mock.module("../../src/codex/inject", () => ({
+const native = await import("../../backend/src/codex/inject");
+mock.module("../../backend/src/codex/inject", () => ({
   ...native,
   restoreNativeCodexAsync: async (restoreOptions?: { withWriteGuard?: <T>(write: () => T) => T }) => {
     await Promise.resolve(); // The real restore awaits config-file/N acquisition before committing.
@@ -131,8 +131,8 @@ mock.module("../../src/codex/inject", () => ({
     return restoreOptions?.withWriteGuard ? restoreOptions.withWriteGuard(write) : write();
   },
 }));
-const grok = await import("../../src/grok/inject");
-mock.module("../../src/grok/inject", () => ({
+const grok = await import("../../backend/src/grok/inject");
+mock.module("../../backend/src/grok/inject", () => ({
   ...grok,
   stripGrokConfig: () => {
     calls.grok += 1;
@@ -143,10 +143,10 @@ mock.module("../../src/grok/inject", () => ({
     return { ok: true, changed: true, message: "Grok restored" };
   },
 }));
-const portReclaim = await import("../../src/server/port-reclaim");
-mock.module("../../src/server/port-reclaim", () => ({ ...portReclaim, reclaimListenPort: async () => {} }));
+const portReclaim = await import("../../backend/src/server/port-reclaim");
+mock.module("../../backend/src/server/port-reclaim", () => ({ ...portReclaim, reclaimListenPort: async () => {} }));
 // Only shim preflight is unrelated to this stop contract; parsing and dispatch stay real.
-mock.module("../../src/cli/codex-shim-autorestore", () => ({ async maybeAutoRestoreCodexShimAsync() {} }));
+mock.module("../../backend/src/cli/codex-shim-autorestore", () => ({ async maybeAutoRestoreCodexShimAsync() {} }));
 
 globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
   const url = String(input);
@@ -165,15 +165,15 @@ globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) =>
   urls.push(url);
   transports.push(viaDirect ? "direct" : "global");
   const body = options.serverTeardown && !options.apiFailure
-    ? await (await import("../../src/server/stop-teardown")).performStopTeardown(new URL(url))
+    ? await (await import("../../backend/src/server/stop-teardown")).performStopTeardown(new URL(url))
     : options.response;
   if (!options.nativeSignal && (options.status ?? 200) !== 409) alive = false;
   return Response.json(body, { status: options.status ?? 200 });
 }) as typeof fetch;
 
 // Only the real proxy-environment mode above exercises TCP; other cases inject responses.
-const direct = await import("../../src/server/direct-local-http");
-mock.module("../../src/server/direct-local-http", () => ({ ...direct,
+const direct = await import("../../backend/src/server/direct-local-http");
+mock.module("../../backend/src/server/direct-local-http", () => ({ ...direct,
   directLocalHttpFetch: async (input: string | URL | Request, init?: RequestInit, io?: { onResponseStatus?: (status: number) => void }) => {
     if (!alive && String(input).endsWith("/healthz")) throw Object.assign(new Error("fixture listener closed"), { code: "ECONNREFUSED" });
     if (options.stopBodyFailure && init?.method === "POST") {
@@ -195,16 +195,16 @@ if (options.exitCleanup) {
   delete process.env.OCX_SERVICE;
   // Execute the actual startup exit closure, with only host/config effects replaced.
   const { repoPath } = await import("../helpers/repo-root");
-  const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
   const from = source.indexOf("  const syncCleanup = () => {");
   const to = source.indexOf("\n  let shuttingDown", from);
   if (from < 0 || to < 0) throw new Error("startup cleanup closure missing");
-  const dispatch = await import("../../src/cli/dispatch");
+  const dispatch = await import("../../backend/src/cli/dispatch");
   const bindings = {
     catalogHealer: null, routingHealer: null, guardian: { stop() {} }, historyGuardian: null, healthSentinel: null,
     siblingStart: false, isRecyclingForExit: () => false, decideStartExitTeardown: dispatch.decideStartExitTeardown,
     isSharedTeardownDeferredOnExit: () => false,
-    stopRestoreWriteGuard: (await import("../../src/cli/stop-restore-guard")).stopRestoreWriteGuard,
+    stopRestoreWriteGuard: (await import("../../backend/src/cli/stop-restore-guard")).stopRestoreWriteGuard,
     removePid() {}, removeRuntimePort() {}, serviceEnvironmentOwnedHere: () => true,
     getCodexHome: () => "fixture", codexHomeIsAbsent: () => false,
     restoreNativeCodex: (restoreOptions?: { withWriteGuard?: <T>(write: () => T) => T }) => {
@@ -217,4 +217,4 @@ if (options.exitCleanup) {
   const succeeded = cleanup(...Object.values(bindings));
   process.exit(succeeded ? 0 : 1);
 }
-await import("../../src/cli/index");
+await import("../../backend/src/cli/index");

@@ -22,7 +22,7 @@ describe("snapshot-guarded stale-state purge", () => {
   });
 
   test("removePidIfValueIs deletes only when the file still matches the snapshot", async () => {
-    const { getPidPath, removePidIfValueIs } = await import("../../src/config");
+    const { getPidPath, removePidIfValueIs } = await import("../../backend/src/config");
 
     writeFileSync(getPidPath(), "123");
     removePidIfValueIs(999); // concurrent start rewrote the file since the snapshot
@@ -36,7 +36,7 @@ describe("snapshot-guarded stale-state purge", () => {
   });
 
   test("removeRuntimePortIfPidIs deletes matching and invalid-snapshot records, keeps fresh ones", async () => {
-    const { getConfigDir, removeRuntimePortIfPidIs } = await import("../../src/config");
+    const { getConfigDir, removeRuntimePortIfPidIs } = await import("../../backend/src/config");
     const runtimePath = join(getConfigDir(), "runtime-port.json");
 
     writeFileSync(runtimePath, JSON.stringify({ pid: 42, port: 58195 }));
@@ -53,7 +53,7 @@ describe("snapshot-guarded stale-state purge", () => {
   });
 
   test("handleStop snapshots stale state before probing and purges through the guards", () => {
-    const cliSource = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    const cliSource = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     const stopFn = cliSource.slice(cliSource.indexOf("async function handleStop("), cliSource.indexOf("async function handleUninstall()"));
 
     const snapshotAt = stopFn.indexOf("const stalePidValue = readPidFileValue()");
@@ -69,8 +69,8 @@ describe("snapshot-guarded stale-state purge", () => {
   });
 
   test("gui opens the actual bind host and recover-history surfaces a locked DB", () => {
-    const cliSource = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
-    const dispatchSource = readFileSync(repoPath("src", "cli", "dispatch.ts"), "utf8");
+    const cliSource = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
+    const dispatchSource = readFileSync(repoPath("backend/src", "cli", "dispatch.ts"), "utf8");
     // The gui URL is chosen by selectDefaultGuiUrl: a hub with the management ingress opens the
     // loopback-only dashboard, everything else still opens the actual bind host (#4236).
     expect(dispatchSource).toContain("const guiUrl = selectDefaultGuiUrl(config, live, deps.probeHostname)");

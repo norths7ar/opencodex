@@ -11,7 +11,7 @@ import {
   relateQuotaDomain,
   type CredentialIdentity,
   type DeclaredCredentialGroup,
-} from "../../src/routing/identity-domains";
+} from "../../backend/src/routing/identity-domains";
 
 function identity(
   credentialId: string,

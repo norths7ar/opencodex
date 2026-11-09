@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   DEFAULT_VISION_TIMEOUT_MS,
   MAX_VISION_TIMEOUT_MS,
   MIN_VISION_TIMEOUT_MS,
   resolveMaxDescriptionsPerTurn,
   resolveVisionTimeoutMs,
-} from "../../src/vision";
+} from "../../backend/src/vision";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

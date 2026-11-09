@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { buildCodexLaunchEnv, type CodexLaunchEnvDeps } from "../../src/cli/codex-launcher";
-import { codexCredentialDestinationIsTrusted } from "../../src/cli/codex-launch-auth";
-import { CODEX_TOKEN_REFUSALS, codexTokenWithheldDiagnostic } from "../../src/cli/codex-launch-diagnostics";
-import { codexLaunchSystemNamespaceIsSafe } from "../../src/cli/codex-launch-ownership";
-import { resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
-import { buildProviderTableBlockForTarget } from "../../src/codex/inject/config-toml";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
+import { buildCodexLaunchEnv, type CodexLaunchEnvDeps } from "../../backend/src/cli/codex-launcher";
+import { codexCredentialDestinationIsTrusted } from "../../backend/src/cli/codex-launch-auth";
+import { CODEX_TOKEN_REFUSALS, codexTokenWithheldDiagnostic } from "../../backend/src/cli/codex-launch-diagnostics";
+import { codexLaunchSystemNamespaceIsSafe } from "../../backend/src/cli/codex-launch-ownership";
+import { resolveTrustedWindowsPowerShellExe } from "../../backend/src/lib/windows-elevation";
+import { buildProviderTableBlockForTarget } from "../../backend/src/codex/inject/config-toml";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
 import { createCodexLaunchFixtureRoot, codexLaunchFixtureHasProtectedAncestors } from "../helpers/codex-launch-private-fixture";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -3,10 +3,10 @@ import {
   decodeCursorCallId,
   encodeCursorCallId,
   resetCursorCallIdProvenanceForTests,
-} from "../../../src/adapters/cursor/call-id";
-import { mapCursorServerMessage } from "../../../src/adapters/cursor/message-mapper";
-import type { CursorMessageMapperState } from "../../../src/adapters/cursor/message-mapper";
-import type { CursorKvStore } from "../../../src/adapters/cursor/kv-store";
+} from "../../../backend/src/adapters/cursor/call-id";
+import { mapCursorServerMessage } from "../../../backend/src/adapters/cursor/message-mapper";
+import type { CursorMessageMapperState } from "../../../backend/src/adapters/cursor/message-mapper";
+import type { CursorKvStore } from "../../../backend/src/adapters/cursor/kv-store";
 
 const COMPOSITE = "call-9aee6d07-edc0-442f-8466-9d3924e16e03-0\nfc_5a1a53c6-32ce-9602-bc56-459030165589_0";
 

@@ -4,10 +4,10 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { withConfigMutationLockSync } from "../../src/config/mutation-lock";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
+import { withConfigMutationLockSync } from "../../backend/src/config/mutation-lock";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
 

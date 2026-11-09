@@ -1,9 +1,9 @@
 import { afterEach, expect, test } from "bun:test";
-import { providerFetch, sendWithConnectionPolicy } from "../../src/server/responses/fetch-helpers";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { providerFetch, sendWithConnectionPolicy } from "../../backend/src/server/responses/fetch-helpers";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 import { streamingInit } from "../helpers/ws-upstream-fixtures";
 
 const realWebSocket = globalThis.WebSocket;

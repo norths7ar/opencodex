@@ -2,10 +2,10 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createAzureAdapter as createAzureAdapterProduction } from "../../src/adapters/azure";
-import { getConfigPath, loadConfig, readConfigDiagnostics } from "../../src/config";
-import { providerEditorConfigDTO, providerManagementConfigError } from "../../src/server/auth-cors";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createAzureAdapter as createAzureAdapterProduction } from "../../backend/src/adapters/azure";
+import { getConfigPath, loadConfig, readConfigDiagnostics } from "../../backend/src/config";
+import { providerEditorConfigDTO, providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -237,7 +237,7 @@ describe("Azure Responses include compatibility", () => {
   });
 
   test("normalizes Azure resource URLs configured with the plain Responses adapter", async () => {
-    const { createResponsesPassthroughAdapter } = await import("../../src/adapters/openai-responses");
+    const { createResponsesPassthroughAdapter } = await import("../../backend/src/adapters/openai-responses");
     const adapter = withTestTranslatorBudget(createResponsesPassthroughAdapter({
       adapter: "openai-responses",
       baseUrl: "https://example.openai.azure.com/openai/v1",
@@ -252,7 +252,7 @@ describe("Azure Responses include compatibility", () => {
   });
 
   test("preserves includes on unrelated and lookalike destinations", async () => {
-    const { createResponsesPassthroughAdapter } = await import("../../src/adapters/openai-responses");
+    const { createResponsesPassthroughAdapter } = await import("../../backend/src/adapters/openai-responses");
     for (const baseUrl of [
       "https://api.openai.com/v1",
       "https://gateway.example.test/v1",

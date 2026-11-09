@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config";
+import { getDefaultConfig } from "../../backend/src/config";
 import {
   ANTHROPIC_INSTANCE_IDS,
   anthropicInstanceRowShapeMatches,
@@ -7,7 +7,7 @@ import {
   isAnthropicInstanceId,
   isAnthropicOAuthInstance,
   isBuiltinAnthropicInstanceRow,
-} from "../../src/providers/anthropic-instance";
+} from "../../backend/src/providers/anthropic-instance";
 import {
   deriveJawcodeAliases,
   deriveOAuthIds,
@@ -15,11 +15,11 @@ import {
   deriveProviderPresets,
   enrichProviderFromRegistry,
   providerConfigSeed,
-} from "../../src/providers/derive";
-import { getProviderRegistryEntry, providerMatchesRegistryTransport } from "../../src/providers/registry";
-import { resolveMetadataProvider } from "../../src/generated/model-metadata";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry, providerMatchesRegistryTransport } from "../../backend/src/providers/registry";
+import { resolveMetadataProvider } from "../../backend/src/generated/model-metadata";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const builtin: OcxProviderConfig = {
   adapter: "anthropic", authMode: "oauth", baseUrl: "https://api.anthropic.com", anthropicOAuthInstance: "anthropic2",

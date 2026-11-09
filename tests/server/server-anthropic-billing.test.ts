@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { handleResponses } from "../../src/server/responses";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { clearKeyCooldowns, getKeyCooldownUntil } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest, setProviderRequestPacingLimitsForTest, setProviderRequestPacingRuntimeForTest, providerRequestPacingStatus, waitForProviderRequestSlot, type ProviderRequestSlot } from "../../src/providers/request-pacing";
-import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { clearKeyCooldowns, getKeyCooldownUntil } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest, setProviderRequestPacingLimitsForTest, setProviderRequestPacingRuntimeForTest, providerRequestPacingStatus, waitForProviderRequestSlot, type ProviderRequestSlot } from "../../backend/src/providers/request-pacing";
+import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 
 const creditMessage = "Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.";
 const refusal = (status = 400, message = creditMessage, type = "invalid_request_error") => Response.json({ type: "error", error: { type, message } }, { status });
@@ -439,7 +439,7 @@ for (const lane of ["native", "translated"] as const) describe(`${lane} Anthropi
   });
 
   for (const statuses of [[401, 400], [400, 429], [429, 402]]) test(`distributed ${statuses.join("→")} preserves billing and key recovery`, async () => {
-    const { forgetApiKeyRotationCursor, ANTHROPIC_BILLING_COOLDOWN_MS } = await import("../../src/providers/key-failover");
+    const { forgetApiKeyRotationCursor, ANTHROPIC_BILLING_COOLDOWN_MS } = await import("../../backend/src/providers/key-failover");
     forgetApiKeyRotationCursor("anth");
     const config = fixture((index, stream) => index < statuses.length
       ? refusal(statuses[index]!, [400, 402].includes(statuses[index]!) ? creditMessage : "fixture refusal",

@@ -5,21 +5,21 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, statSyn
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
-import * as clientLifecycle from "../../src/client/lifecycle-lock";
-import * as configIO from "../../src/config";
-import * as desktopLibrary from "../../src/claude/desktop-3p-library";
-import { saveConfig } from "../../src/config";
+import * as clientLifecycle from "../../backend/src/client/lifecycle-lock";
+import * as configIO from "../../backend/src/config";
+import * as desktopLibrary from "../../backend/src/claude/desktop-3p-library";
+import { saveConfig } from "../../backend/src/config";
 import {
   inspectDesktopPickerProfile,
   applyDesktopPickerProfile,
   removeDesktopPickerProfile,
-} from "../../src/claude/desktop-picker-profile";
+} from "../../backend/src/claude/desktop-picker-profile";
 import {
   inspectDesktop3pConfigLibrary,
   removeDesktop3pStandardPivot,
   writeDesktop3pConfig,
-} from "../../src/claude/desktop-3p";
-import { isOwnedDesktopEntry, isOwnedDesktopGatewayEntry, MAX_DESKTOP_PROFILE_FILE_BYTES } from "../../src/claude/desktop-3p-library";
+} from "../../backend/src/claude/desktop-3p";
+import { isOwnedDesktopEntry, isOwnedDesktopGatewayEntry, MAX_DESKTOP_PROFILE_FILE_BYTES } from "../../backend/src/claude/desktop-3p-library";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root: string;

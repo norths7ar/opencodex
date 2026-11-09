@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { adapterDefinitions } from "../../src/adapters/registry";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { resolvedAdapterWire } from "../../src/responses/continuation-ownership";
-import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
-import { resetThoughtSignatureReplayForTests } from "../../src/responses/thought-signature-replay";
-import { handleResponses } from "../../src/server/responses/core";
+import { adapterDefinitions } from "../../backend/src/adapters/registry";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { resolvedAdapterWire } from "../../backend/src/responses/continuation-ownership";
+import { clearReasoningReplayCacheForTests } from "../../backend/src/responses/reasoning-replay-cache";
+import { resetThoughtSignatureReplayForTests } from "../../backend/src/responses/thought-signature-replay";
+import { handleResponses } from "../../backend/src/server/responses/core";
 import {
   adapterSpeaksResponsesWire,
   attemptOpaqueBlobRecovery,
   shouldAttemptOpaqueBlobRecovery,
   type OpaqueBlobRecoveryGuard,
-} from "../../src/server/responses/core-opaque-recovery";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
+} from "../../backend/src/server/responses/core-opaque-recovery";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

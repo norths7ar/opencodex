@@ -5,15 +5,15 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { saveConfig } from "../../src/config";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { saveConfig } from "../../backend/src/config";
 import {
   createReadinessGate,
   runStartupReadinessSync,
   type ReadinessGate,
-} from "../../src/server/readiness";
+} from "../../backend/src/server/readiness";
 import {
   attachLiveSidebandUpstream,
   enqueueLiveSidebandPendingFrame,
@@ -23,14 +23,14 @@ import {
   openLiveSidebandUpstream,
   startServer,
   type StartServerDeps,
-} from "../../src/server";
+} from "../../backend/src/server";
 import {
   activeRegistryMetrics,
   beginShutdownDrain,
   isDraining,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
@@ -962,7 +962,7 @@ test("sideband queue enforces aggregate bytes and frame count without retaining 
 
 test("buildLiveSidebandUpstreamWsUrl maps Frameless and Realtime join shapes", async () => {
   const { buildLiveSidebandUpstreamWsUrl, forwardLiveUrl, keyedLiveUrl, parseLiveSidebandTarget } =
-    await import("../../src/server/live");
+    await import("../../backend/src/server/live");
 
   expect(forwardLiveUrl("https://chatgpt.com/backend-api/codex", true)).toBe(
     "https://chatgpt.com/backend-api/codex/realtime/calls?intent=quicksilver&architecture=avas",
@@ -1016,7 +1016,7 @@ test("buildLiveSidebandUpstreamWsUrl maps Frameless and Realtime join shapes", a
 });
 
 test("parseLiveSidebandTarget recognizes standalone realtime sessions", async () => {
-  const { parseLiveSidebandTarget } = await import("../../src/server/live");
+  const { parseLiveSidebandTarget } = await import("../../backend/src/server/live");
 
   // Desktop voice since codex 0.147.x: standalone WebSocket transport, no call_id.
   expect(
@@ -1069,7 +1069,7 @@ test("parseLiveSidebandTarget recognizes standalone realtime sessions", async ()
 });
 
 test("standalone realtime query relay drops credential-shaped keys and keeps raw bytes", async () => {
-  const { parseLiveSidebandTarget, sanitizeStandaloneRealtimeQuery } = await import("../../src/server/live");
+  const { parseLiveSidebandTarget, sanitizeStandaloneRealtimeQuery } = await import("../../backend/src/server/live");
 
   // Noncanonical encodings and bare keys survive byte-for-byte.
   expect(sanitizeStandaloneRealtimeQuery("model=a%2fb&flag&x=%20~")).toBe("model=a%2fb&flag&x=%20~");
@@ -1098,7 +1098,7 @@ test("standalone realtime query relay drops credential-shaped keys and keeps raw
 });
 
 test("buildLiveSidebandUpstreamWsUrl maps standalone realtime session shapes", async () => {
-  const { buildLiveSidebandUpstreamWsUrl } = await import("../../src/server/live");
+  const { buildLiveSidebandUpstreamWsUrl } = await import("../../backend/src/server/live");
 
   expect(
     buildLiveSidebandUpstreamWsUrl({
@@ -1131,7 +1131,7 @@ test("buildLiveSidebandUpstreamWsUrl maps standalone realtime session shapes", a
 });
 
 test("sideband URL policy: override precedence, normalization, and fail-closed bounds", async () => {
-  const { buildLiveSidebandUpstreamWsUrl } = await import("../../src/server/live");
+  const { buildLiveSidebandUpstreamWsUrl } = await import("../../backend/src/server/live");
   const frameless = { style: "frameless-path", callId: "rtc_1" } as const;
   const realtime = { style: "realtime-query", callId: "rtc 2" } as const;
 

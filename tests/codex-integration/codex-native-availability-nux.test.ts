@@ -1,24 +1,24 @@
 import { afterEach, beforeEach, expect, setDefaultTimeout, test } from "bun:test";
 import { chmodSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
-import { loadBundledCodexCatalog, resetCatalogRuntimeStateForTests, syncCatalogModels } from "../../src/codex/catalog";
-import { applyNativeAccessPrograms } from "../../src/codex/catalog/access-programs";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
-import type { RawCatalog, RawEntry } from "../../src/codex/catalog/parsing";
-import { commitCodexCatalogCandidate, gatherCodexCatalogCandidate } from "../../src/codex/convergence";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
+import { loadBundledCodexCatalog, resetCatalogRuntimeStateForTests, syncCatalogModels } from "../../backend/src/codex/catalog";
+import { applyNativeAccessPrograms } from "../../backend/src/codex/catalog/access-programs";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../backend/src/codex/catalog/kinds";
+import type { RawCatalog, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { commitCodexCatalogCandidate, gatherCodexCatalogCandidate } from "../../backend/src/codex/convergence";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   resetCodexModelEntitlementCacheForTests,
   resolveCodexModelEntitlements,
   type CodexModelEntitlementCredentialSnapshot,
-} from "../../src/codex/model-entitlements";
-import { resetCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { saveConfig } from "../../src/config";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import { resetCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { saveConfig } from "../../backend/src/config";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const MODEL = "gpt-6-astra";

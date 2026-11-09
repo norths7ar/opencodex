@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { deriveStartupHealth, startupHealthSummary } from "../../src/codex/autostart-health";
-import { deriveDesktopStartup } from "../../src/service/desktop-startup";
-import { markStartupHealthDiagnosticStale } from "../../src/server/startup-health-cache";
+import { deriveStartupHealth, startupHealthSummary } from "../../backend/src/codex/autostart-health";
+import { deriveDesktopStartup } from "../../backend/src/service/desktop-startup";
+import { markStartupHealthDiagnosticStale } from "../../backend/src/server/startup-health-cache";
 
 const base = {
   routingKind: "opencodex-local" as const, platform: "darwin" as const,

@@ -4,8 +4,8 @@ import { connect, constants, type ClientHttp2Session, type ClientHttp2Stream } f
 import type { IncomingMessage, ClientRequest, ServerResponse } from "node:http";
 import type { Duplex } from "node:stream";
 import { createServer as createTlsServer } from "node:tls";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { startPickerListener, type PickerListenerOptions } from "../../src/claude/intercept/picker-listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { startPickerListener, type PickerListenerOptions } from "../../backend/src/claude/intercept/picker-listener";
 import { observeUploadBackpressure } from "../helpers/picker-upload-backpressure";
 
 async function fixture(handler: ((req: IncomingMessage, res: ServerResponse) => void) | "early-fin",

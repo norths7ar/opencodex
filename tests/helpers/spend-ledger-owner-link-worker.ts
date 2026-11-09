@@ -1,4 +1,4 @@
-import { acquireSpendLedgerOwner, SpendLedgerOwnerError } from "../../src/lib/spend-ledger-owner";
+import { acquireSpendLedgerOwner, SpendLedgerOwnerError } from "../../backend/src/lib/spend-ledger-owner";
 
 // Acquire the owner for argv[2] in a fresh process, so a --preload can change how files are created
 // before the owner module binds its imports. Prints the outcome code.

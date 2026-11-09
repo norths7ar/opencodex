@@ -2,9 +2,9 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { appendCrashTraceForTests, crashRingEntriesForTests, formatCrashEntry, installCrashGuards, isBenignAbortTeardown, recordCrashForTests, resetBenignFoldForTests, resetCrashRingForTests } from "../../src/lib/crash-guard";
-import { RETAINED_TRUNCATION_MARKER, retainedUtf8Bytes } from "../../src/lib/admission";
-import { sidecarEnter } from "../../src/lib/sidecar-tracker";
+import { appendCrashTraceForTests, crashRingEntriesForTests, formatCrashEntry, installCrashGuards, isBenignAbortTeardown, recordCrashForTests, resetBenignFoldForTests, resetCrashRingForTests } from "../../backend/src/lib/crash-guard";
+import { RETAINED_TRUNCATION_MARKER, retainedUtf8Bytes } from "../../backend/src/lib/admission";
+import { sidecarEnter } from "../../backend/src/lib/sidecar-tracker";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("crash-guard diagnostics", () => {

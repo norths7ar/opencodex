@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 async function collectSseText(stream: ReadableStream<Uint8Array>): Promise<string> {
   const reader = stream.getReader();

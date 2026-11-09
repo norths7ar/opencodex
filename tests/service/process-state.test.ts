@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
-import * as configFacade from "../../src/config";
+import * as configFacade from "../../backend/src/config";
 import {
   getPidPath,
   getRuntimePortPath,
@@ -21,9 +21,9 @@ import {
   verifyPidIdentity,
   writePid,
   writeRuntimePort,
-} from "../../src/config/process-state";
-import { markSiblingStart, resetSiblingStartForTests, siblingRuntimeField } from "../../src/codex/sibling-start";
-import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/config/process-state";
+import { markSiblingStart, resetSiblingStartForTests, siblingRuntimeField } from "../../backend/src/codex/sibling-start";
+import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -49,7 +49,7 @@ afterEach(() => {
 
 describe("proxy process-state ownership", () => {
   test("the process-state leaf does not import the config facade", () => {
-    const source = readFileSync(repoPath("src", "config", "process-state.ts"), "utf-8");
+    const source = readFileSync(repoPath("backend/src", "config", "process-state.ts"), "utf-8");
     expect(source).not.toMatch(/from\s+["']\.\.\/config["']/);
     expect(source).toContain('from "./atomic-write"');
     expect(source).toContain('from "./paths"');

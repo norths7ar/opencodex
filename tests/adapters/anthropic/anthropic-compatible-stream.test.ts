@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import { bridgeToResponsesSSE } from "../../../src/bridge";
-import { responsesSseToAnthropicSse as responsesSseToAnthropicSseProduction } from "../../../src/claude/outbound";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import { bridgeToResponsesSSE } from "../../../backend/src/bridge";
+import { responsesSseToAnthropicSse as responsesSseToAnthropicSseProduction } from "../../../backend/src/claude/outbound";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

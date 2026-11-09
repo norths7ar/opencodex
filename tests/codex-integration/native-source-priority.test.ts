@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState } from "../../src/codex/catalog/build-entries";
-import { deriveEntry } from "../../src/codex/catalog/derive-entry";
-import { setConfiguredNativeOpenAiModels, setDiscoveredNativeOpenAiModels, resetConfiguredNativeOpenAiModelsForTests } from "../../src/codex/catalog/native-models";
-import { catalogBackupPathFor, parseCatalogJson, type RawEntry } from "../../src/codex/catalog/parsing";
-import { readNativeBaseline, retainedNativeSourcePriorities } from "../../src/codex/catalog/native-priority";
-import { stripUnsupportedReasoningSummaryDelivery } from "../../src/adapters/openai-responses/reasoning";
+import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState } from "../../backend/src/codex/catalog/build-entries";
+import { deriveEntry } from "../../backend/src/codex/catalog/derive-entry";
+import { setConfiguredNativeOpenAiModels, setDiscoveredNativeOpenAiModels, resetConfiguredNativeOpenAiModelsForTests } from "../../backend/src/codex/catalog/native-models";
+import { catalogBackupPathFor, parseCatalogJson, type RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { readNativeBaseline, retainedNativeSourcePriorities } from "../../backend/src/codex/catalog/native-priority";
+import { stripUnsupportedReasoningSummaryDelivery } from "../../backend/src/adapters/openai-responses/reasoning";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Literal wire key lets these behavioral regressions run against the pre-fix tree too.

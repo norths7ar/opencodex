@@ -3,11 +3,11 @@ import {
   addFinalRequestLog, aggregateAttemptUsage, beginRequestAttempt, finishRequestAttempt, noteProviderAttemptSend,
   recordKeyAttemptFailure, recordKeyAttemptUsage, applyResponseLogMetadata, sealRequestAttemptIdentity,
   inspectResponseLogSsePayload, type RequestLogContext, type RequestLogEntry,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import { normalizeUsageEntryForTest } from "../../src/usage/log";
-import { formatAnthropicProviderForLog } from "../../src/oauth/anthropic-routing";
+import { normalizeUsageEntryForTest } from "../../backend/src/usage/log";
+import { formatAnthropicProviderForLog } from "../../backend/src/oauth/anthropic-routing";
 
 describe("key attempt accounting", () => {
   test("a combo parent copied before streaming rotation cannot overwrite the final key's usage", () => {
@@ -35,7 +35,7 @@ describe("key attempt accounting", () => {
     // request total (300). A consumer that added them would report 600 input tokens for 300
     // that were actually spent, and the same arithmetic is what would corrupt a client's own
     // accounting if hidden attempts were folded into the response it sees.
-    const summary = readFileSync(repoPath("src/usage/summary.ts"), "utf8");
+    const summary = readFileSync(repoPath("backend/src/usage/summary.ts"), "utf8");
     const attributions = summary.slice(
       summary.indexOf("function usageAttributions("),
       summary.indexOf("function projectedComboUsage("),

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildCatalogEntries } from "../../src/codex/catalog";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
 import {
   DISCOVERED_NATIVE_MAX_FILE_BYTES,
   DISCOVERED_NATIVE_MAX_ROW_BYTES,
@@ -14,7 +14,7 @@ import {
   recordDiscoveredNativeModels,
   resetDiscoveredNativeModelsForTests,
   validateDiscoveredNativeRows,
-} from "../../src/codex/catalog/discovered-natives";
+} from "../../backend/src/codex/catalog/discovered-natives";
 import {
   ACCOUNT_GATED_NATIVE_OPENAI_MODELS,
   NATIVE_OPENAI_MODELS,
@@ -23,7 +23,7 @@ import {
   discoveredNativeOpenAiModels,
   resetConfiguredNativeOpenAiModelsForTests,
   setConfiguredNativeOpenAiModels,
-} from "../../src/codex/catalog/native-models";
+} from "../../backend/src/codex/catalog/native-models";
 import {
   nativeOpenAiContextTier,
   nativeOpenAiContextWindow,
@@ -31,16 +31,16 @@ import {
   nativeReasoningEfforts,
   upstreamNativeEntry,
   mergeCatalogEntriesForSync,
-} from "../../src/codex/catalog";
-import { refreshConfigDerivedRegistries } from "../../src/config/derived-registries";
+} from "../../backend/src/codex/catalog";
+import { refreshConfigDerivedRegistries } from "../../backend/src/config/derived-registries";
 import {
   CODEX_ROSTER_DISCOVERY_CLIENT_VERSION,
   discoverCodexNativeRoster,
   resetCodexModelEntitlementCacheForTests,
   resetCodexNativeRosterDiscoveryForTests,
   resolveCodexModelEntitlements,
-} from "../../src/codex/model-entitlements";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const FUTURE = "gpt-9-test";

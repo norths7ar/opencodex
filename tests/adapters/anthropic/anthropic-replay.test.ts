@@ -1,10 +1,10 @@
 import { test, expect } from "bun:test";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
 import {
   enableAnthropicReplayCapture, createAnthropicReplayCapture, takeAnthropicReplay,
   bindAnthropicReplay, anthropicReplayContent,
-} from "../../../src/adapters/anthropic-replay";
+} from "../../../backend/src/adapters/anthropic-replay";
 
 function start(limit = 100_000) {
   const response = new Response();

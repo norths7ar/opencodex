@@ -13,7 +13,7 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSyn
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -21,8 +21,8 @@ import {
   CODEX_WRITE_LOCK_MAX_TIMEOUT_MS,
   canonicalizeCodexHome,
   withCodexWriteLock,
-} from "../../src/codex/codex-write-lock";
-import type { AdmissionSnapshot } from "../../src/codex/convergence-types";
+} from "../../backend/src/codex/codex-write-lock";
+import type { AdmissionSnapshot } from "../../backend/src/codex/convergence-types";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath } from "../helpers/repo-root";

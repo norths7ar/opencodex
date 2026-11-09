@@ -1,5 +1,5 @@
-import { acquireSpendLedgerOwner } from "../../src/lib/spend-ledger-owner";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
+import { acquireSpendLedgerOwner } from "../../backend/src/lib/spend-ledger-owner";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
 import { compactionRequest, completedPayload, jsonResponse, sseResponse, twoAccountPoolConfig } from "./compaction-routing-fixtures";
 
 const lease = acquireSpendLedgerOwner();

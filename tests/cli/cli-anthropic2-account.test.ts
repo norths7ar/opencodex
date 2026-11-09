@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { handleAccountPolicyCommand } from "../../src/cli/account-policy";
+import { handleAccountPolicyCommand } from "../../backend/src/cli/account-policy";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 let home: TempHome;
 let out: ReturnType<typeof spyOn>, err: ReturnType<typeof spyOn>;

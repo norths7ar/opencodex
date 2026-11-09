@@ -3,19 +3,19 @@ import { installEndpointHooks, test, fetch, startServer, serveUpstream, ownClean
 import { logsFromApiBody } from "../helpers/logs-api";
 import { rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { readRecentUsageEntries } from "../../src/usage/log";
-import { buildDesktop3pRegistry } from "../../src/claude/desktop-3p";
-import type { DesktopProfile } from "../../src/claude/desktop-profile";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { clearableDeadline } from "../../src/lib/abort";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { readRecentUsageEntries } from "../../backend/src/usage/log";
+import { buildDesktop3pRegistry } from "../../backend/src/claude/desktop-3p";
+import type { DesktopProfile } from "../../backend/src/claude/desktop-profile";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { clearableDeadline } from "../../backend/src/lib/abort";
 import {
   clearRequestLogsForTests,
   addRequestLog,
   getRequestLogEntries,
   hydrateRequestLogsFromDisk,
   type RequestLogContext,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 import {
   estimateClaudeRequestTokens,
@@ -24,9 +24,9 @@ import {
   readBoundedPassthroughBody,
   resolvePassthroughBodyGuard,
   tapAnthropicSseForLog,
-} from "../../src/server/claude-messages";
-import { estimateTokens } from "../../src/lib/token-estimate";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/claude-messages";
+import { estimateTokens } from "../../backend/src/lib/token-estimate";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
@@ -35,13 +35,13 @@ import {
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
+} from "../../backend/src/server/lifecycle";
 import {
   blockNativeMainRecovery,
   completeNativeMainRecovery,
   nativeMainStartupGateSnapshot,
   waitForNativeMainStartupGate,
-} from "../../src/codex/native-profile-startup";
+} from "../../backend/src/codex/native-profile-startup";
 
 installEndpointHooks();
 

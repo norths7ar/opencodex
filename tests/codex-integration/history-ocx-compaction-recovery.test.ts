@@ -7,10 +7,10 @@ import { join } from "node:path";
 import {
   recoverOcxCompactionHistory,
   rewriteOcxCompactionsForNativeReplay,
-} from "../../src/codex/ocx-compaction-history";
-import { encodeCompactionSummary, SUMMARY_PREFIX } from "../../src/responses/compaction";
-import { encodeRetainedCompaction } from "../../src/responses/retained-compaction";
-import { applyReasoningRetention } from "../../src/responses/reasoning-retention";
+} from "../../backend/src/codex/ocx-compaction-history";
+import { encodeCompactionSummary, SUMMARY_PREFIX } from "../../backend/src/responses/compaction";
+import { encodeRetainedCompaction } from "../../backend/src/responses/retained-compaction";
+import { applyReasoningRetention } from "../../backend/src/responses/reasoning-retention";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("OpenCodeX compaction history recovery", () => {

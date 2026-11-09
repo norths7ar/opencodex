@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { decodeServerSentEvents } from "../../src/lib/sse-decoder";
+import { decodeServerSentEvents } from "../../backend/src/lib/sse-decoder";
 import {
   TRANSLATOR_MAX_SSE_EVENT_BYTES,
   TRANSLATOR_MAX_TURN_BYTES,
   createTranslatorBudget,
-} from "../../src/lib/translator-budget";
+} from "../../backend/src/lib/translator-budget";
 
 function chunkedStream(chunks: string[]): ReadableStream<Uint8Array> {
   const encoder = new TextEncoder();

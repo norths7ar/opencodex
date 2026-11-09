@@ -1,5 +1,5 @@
 import { spyOn } from "bun:test";
-import * as probes from "../../src/cli/status-probes";
+import * as probes from "../../backend/src/cli/status-probes";
 
 // Observe the human invocation's own real probe. A second CLI process can see
 // a different refusal/timeout and cannot certify what this invocation observed.

@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../../src/adapters/openai-chat";
-import { parseRequest } from "../../../src/responses/parser";
-import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../../src/providers/derive";
-import type { OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../../backend/src/adapters/openai-chat";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../../backend/src/providers/derive";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const model = "qwen3.8-27b-uncensored@q4_k_m";
 const enabled = { adapter: "openai-chat", baseUrl: "http://localhost:1234/v1", singleLeadingSystemMessage: true } as OcxProviderConfig;

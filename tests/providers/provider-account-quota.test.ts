@@ -1,11 +1,11 @@
-import { PinnedHttpError } from "../../src/lib/pinned-http";
-import { DestinationDnsResolutionError } from "../../src/lib/destination-policy";
+import { PinnedHttpError } from "../../backend/src/lib/pinned-http";
+import { DestinationDnsResolutionError } from "../../backend/src/lib/destination-policy";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import type { OcxConfig } from "../../src/types";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   clearAccountQuotaCache,
   clearProviderQuotaCache,
@@ -16,8 +16,8 @@ import {
   resetProviderQuotaReconcileStateForTests,
   supportsPerAccountQuota,
   providerOAuthAccountQuotaMode,
-} from "../../src/providers/quota";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+} from "../../backend/src/providers/quota";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;
@@ -177,7 +177,7 @@ describe("fetchProviderAccountQuotas", () => {
       access: "token-bg", refresh: "refresh-bg", expires,
       accountId: "acct-bg", email: "bg@example.com", source: "local-cli",
     });
-    const { getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const set = getAccountSet("anthropic");
     const active = set?.accounts.find(a => a.credential.email === "active@example.com");
     const background = set?.accounts.find(a => a.credential.email === "bg@example.com");
@@ -228,7 +228,7 @@ describe("fetchProviderAccountQuotas", () => {
 
   test("provider-report probe seeds the active account cache for per-account reads", async () => {
     await seedTwoAccounts();
-    const { getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const set = getAccountSet("anthropic");
     const first = set?.accounts.find(a => a.credential.email === "first@example.com");
     expect(first).toBeTruthy();
@@ -282,7 +282,7 @@ describe("fetchProviderAccountQuotas", () => {
       access: "token-bg", refresh: "refresh-bg", expires,
       accountId: "acct-bg", email: "bg@example.com", source: "oauth",
     });
-    const { getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const set = getAccountSet("anthropic");
     const active = set?.accounts.find(a => a.credential.email === "active@example.com");
     const background = set?.accounts.find(a => a.credential.email === "bg@example.com");
@@ -335,7 +335,7 @@ describe("fetchProviderAccountQuotas", () => {
 
   test("provider-report seeding binds to the probed account across an active switch", async () => {
     await seedTwoAccounts();
-    const { getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const set = getAccountSet("anthropic");
     const first = set?.accounts.find(a => a.credential.email === "first@example.com");
     const second = set?.accounts.find(a => a.credential.email === "second@example.com");
@@ -400,7 +400,7 @@ describe("fetchProviderAccountQuotas", () => {
 
   test("provider removal during an Anthropic report probe cannot recreate its account quota row", async () => {
     await seedTwoAccounts();
-    const { getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const first = getAccountSet("anthropic")?.accounts.find(account => account.credential.email === FIRST.email);
     expect(first).toBeTruthy();
     await setActiveAccount("anthropic", first!.id);
@@ -661,8 +661,8 @@ describe("explicit OAuth account quota readers", () => {
 });
 
 describe("google-antigravity per-account quota (#1082)", () => {
-  const { setAntigravityAccountQuotaTransportForTests } = require("../../src/providers/quota") as typeof import("../../src/providers/quota");
-  const { getAccountSet } = require("../../src/oauth/store") as typeof import("../../src/oauth/store");
+  const { setAntigravityAccountQuotaTransportForTests } = require("../../backend/src/providers/quota") as typeof import("../../backend/src/providers/quota");
+  const { getAccountSet } = require("../../backend/src/oauth/store") as typeof import("../../backend/src/oauth/store");
   const idFor = (email: string) => getAccountSet("google-antigravity")!.accounts.find(a => a.credential.email === email)!.id;
 
   function antigravityBody(gemRemaining: number, claRemaining: number): string {
@@ -851,7 +851,7 @@ describe("google-antigravity per-account quota (#1082)", () => {
     const rows = await fetchProviderAccountQuotas("google-antigravity");
     expect(rows[0]?.quotaFailure).toBe(failure);
     expect(JSON.stringify(rows)).not.toContain("private-error");
-    const { fetchAntigravityUsageQuota } = await import("../../src/providers/quota");
+    const { fetchAntigravityUsageQuota } = await import("../../backend/src/providers/quota");
     await expect(fetchAntigravityUsageQuota("agy-first", "proj-first")).rejects.toBe(error);
   });
 
@@ -922,7 +922,7 @@ describe("google-antigravity per-account quota (#1082)", () => {
   });
 
   test.each(["unchanged", "grant", "project", "both"] as const)("paused model quota retains only current credential and project (%s)", async replacement => {
-    const { setAccountPaused } = await import("../../src/oauth/store");
+    const { setAccountPaused } = await import("../../backend/src/oauth/store");
     const credential = { access: "paused-model-first", refresh: "paused-refresh", expires: Date.now() + 3600_000,
       projectId: "paused-project-first", accountId: "paused-model-user", email: "paused-model@example.com" };
     await saveCredential("google-antigravity", credential);
@@ -1055,7 +1055,7 @@ describe("google-antigravity Fake-IP TUN quota probes without HTTP proxy (#3781)
   // per-answer: a lookalike host, a different path, a query string, or a differently
   // named provider never arms it, and loopback/RFC1918/link-local/metadata companions
   // still fail closed as destination_blocked.
-  const { setAntigravityAccountQuotaTransportForTests, isCanonicalAntigravityQuotaUrl } = require("../../src/providers/quota") as typeof import("../../src/providers/quota");
+  const { setAntigravityAccountQuotaTransportForTests, isCanonicalAntigravityQuotaUrl } = require("../../backend/src/providers/quota") as typeof import("../../backend/src/providers/quota");
   const idFor = (email: string) => getAccountSet("google-antigravity")!.accounts.find(a => a.credential.email === email)!.id;
 
   function antigravityBody(gemRemaining: number, claRemaining: number): string {
@@ -1194,9 +1194,9 @@ describe("google-antigravity Fake-IP TUN quota probes without HTTP proxy (#3781)
 });
 
 describe("paused generic OAuth accounts are never quota-probed", () => {
-  const { setAntigravityAccountQuotaTransportForTests } = require("../../src/providers/quota") as typeof import("../../src/providers/quota");
-  const { setAccountPaused } = require("../../src/oauth/store") as typeof import("../../src/oauth/store");
-  const { getTokenForAccountQuotaProbe } = require("../../src/providers/quota/account-cache") as typeof import("../../src/providers/quota/account-cache");
+  const { setAntigravityAccountQuotaTransportForTests } = require("../../backend/src/providers/quota") as typeof import("../../backend/src/providers/quota");
+  const { setAccountPaused } = require("../../backend/src/oauth/store") as typeof import("../../backend/src/oauth/store");
+  const { getTokenForAccountQuotaProbe } = require("../../backend/src/providers/quota/account-cache") as typeof import("../../backend/src/providers/quota/account-cache");
   const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
   const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));
   beforeEach(() => { for (const key of proxyKeys) delete process.env[key]; });
@@ -1240,9 +1240,9 @@ describe("paused generic OAuth accounts are never quota-probed", () => {
 });
 
 test("a paused Meta Muse account is never used to mint a quota key", async () => {
-  const { fetchMuseKeyQuota } = require("../../src/providers/quota/vendor-probes-oauth") as typeof import("../../src/providers/quota/vendor-probes-oauth");
-  const { resetMuseKeyQuotaBackoff } = require("../../src/providers/muse-key-quota") as typeof import("../../src/providers/muse-key-quota");
-  const { setAccountPaused } = require("../../src/oauth/store") as typeof import("../../src/oauth/store");
+  const { fetchMuseKeyQuota } = require("../../backend/src/providers/quota/vendor-probes-oauth") as typeof import("../../backend/src/providers/quota/vendor-probes-oauth");
+  const { resetMuseKeyQuotaBackoff } = require("../../backend/src/providers/muse-key-quota") as typeof import("../../backend/src/providers/muse-key-quota");
+  const { setAccountPaused } = require("../../backend/src/oauth/store") as typeof import("../../backend/src/oauth/store");
   await saveCredential("meta-muse", { access: "muse-access", refresh: "muse-refresh", expires: Date.now() + 60 * 60_000,
     email: "muse@example.com", muse: { oauthAccessToken: "meta-account-" + "z".repeat(48) } });
   const id = getAccountSet("meta-muse")!.activeAccountId;

@@ -8,7 +8,7 @@ import {
   MIN_FIXED_BUN_VERSION,
   parseBunVersion,
   selectEagerPath,
-} from "../../src/lib/bun-stream-caps";
+} from "../../backend/src/lib/bun-stream-caps";
 
 describe("isWin32EagerRewrite (#864 transport gate)", () => {
   test("win32 + rewrite → eager inline rewrite; everything else stays out", () => {

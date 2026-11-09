@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, renameSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import { requestOwnedAffinityKey } from "../../src/codex/request-owned-affinity";
-import { bindThreadAffinity, clearThreadAccountMap, deleteThreadAffinity, getThreadAffinity, rememberConversationStateIssuer } from "../../src/codex/routing/thread-affinity";
-import { adoptStoredIssuer, adoptStoredThreadRows, resetCodexAffinityStoreForTests } from "../../src/codex/routing/thread-affinity-store";
-import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../src/lib/spend-ledger-owner";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import { requestOwnedAffinityKey } from "../../backend/src/codex/request-owned-affinity";
+import { bindThreadAffinity, clearThreadAccountMap, deleteThreadAffinity, getThreadAffinity, rememberConversationStateIssuer } from "../../backend/src/codex/routing/thread-affinity";
+import { adoptStoredIssuer, adoptStoredThreadRows, resetCodexAffinityStoreForTests } from "../../backend/src/codex/routing/thread-affinity-store";
+import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../backend/src/lib/spend-ledger-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let homes: string[] = [];

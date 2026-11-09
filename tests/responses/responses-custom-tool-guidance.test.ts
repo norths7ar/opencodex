@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxTool } from "../../src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxTool } from "../../backend/src/types";
 
 function inputDescription(tool: OcxTool | undefined): string | undefined {
   const properties = tool?.parameters.properties;

@@ -5,8 +5,8 @@ import {
   stripImagesInPlace,
   type VisionDescriptionCache,
   type VisionPlan,
-} from "../../src/vision";
-import { parseRequest } from "../../src/responses/parser";
+} from "../../backend/src/vision";
+import { parseRequest } from "../../backend/src/responses/parser";
 
 const originalFetch = globalThis.fetch;
 

@@ -2,23 +2,23 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, getAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, getAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   getCodexUpstreamHealth,
-} from "../../src/codex/routing";
-import { addFinalRequestLog, type RequestLogContext } from "../../src/server/request-log";
-import { createRequestMetricsOwner } from "../../src/server/request-metrics";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { addFinalRequestLog, type RequestLogContext } from "../../backend/src/server/request-log";
+import { createRequestMetricsOwner } from "../../backend/src/server/request-metrics";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { CodexWsMetadata } from "../../src/server/responses/codex-ws-metadata";
-import { applyAccountQuotaFromUpstreamHeaders, getAccountQuotaHistory } from "../../src/codex/quota";
+import { CodexWsMetadata } from "../../backend/src/server/responses/codex-ws-metadata";
+import { applyAccountQuotaFromUpstreamHeaders, getAccountQuotaHistory } from "../../backend/src/codex/quota";
 
 const originalFetch = globalThis.fetch;
 let releaseSpendHome: (() => void) | undefined;
@@ -125,7 +125,7 @@ describe("Responses account usage attribution", () => {
 
   test("immediate WS quota observation preserves disjoint windows and credits-only interleaving", async () => {
     await withPoolHome(async () => {
-      const { setAccountQuotaFromParsed } = await import("../../src/codex/quota");
+      const { setAccountQuotaFromParsed } = await import("../../backend/src/codex/quota");
       const owner = new CodexWsMetadata(headers => applyAccountQuotaFromUpstreamHeaders("window-account", headers));
       owner.consume({ type: "codex.rate_limits", rate_limits: {
         primary: { used_percent: 100, window_minutes: 300, reset_at: 1900000000 },

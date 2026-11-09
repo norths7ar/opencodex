@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseSidecarSSE } from "../../src/web-search/parse";
+import { parseSidecarSSE } from "../../backend/src/web-search/parse";
 
 /** Parse `text` as the only output text of a completed sidecar stream. */
 async function parse(text: string) {

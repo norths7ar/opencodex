@@ -3,17 +3,17 @@ import {
   createResponsesSnapshotBlockRewrite,
   hasResponsesSnapshotRepair,
   repairResponsesSnapshotJson,
-} from "../../src/server/responses-snapshot-repair";
-import { createGrokResponsesSparseTerminalBlockRewrite } from "../../src/server/grok-responses-snapshot-repair";
+} from "../../backend/src/server/responses-snapshot-repair";
+import { createGrokResponsesSparseTerminalBlockRewrite } from "../../backend/src/server/grok-responses-snapshot-repair";
 import {
   composeSseBlockRewrites,
   payloadRewriteAsBlockRewrite,
   relaySseWithBlockRewrite,
-} from "../../src/server/sse-payload-rewrite";
+} from "../../backend/src/server/sse-payload-rewrite";
 import {
   MAX_COMPLETED_OUTPUT_ITEMS,
   MAX_COMPLETED_OUTPUT_ITEM_SOURCE_BYTES,
-} from "../../src/server/relay";
+} from "../../backend/src/server/relay";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 

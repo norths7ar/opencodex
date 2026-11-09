@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential as persistCredential, setActiveAccount as selectAccount } from "../../../src/oauth/store";
-import { handleResponses as dispatchResponses } from "../../../src/server/responses";
-import { saveConfig } from "../../../src/config";
-import { setActiveProviderApiKey } from "../../../src/providers/api-keys";
-import type { OcxConfig } from "../../../src/types";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential as persistCredential, setActiveAccount as selectAccount } from "../../../backend/src/oauth/store";
+import { handleResponses as dispatchResponses } from "../../../backend/src/server/responses";
+import { saveConfig } from "../../../backend/src/config";
+import { setActiveProviderApiKey } from "../../../backend/src/providers/api-keys";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 
@@ -86,9 +86,9 @@ function setActiveAccount(...args: Parameters<typeof selectAccount>) {
   if (owner.controller.signal.aborted) return Promise.reject(owner.controller.signal.reason);
   return owner.track(selectAccount(...args).then(value => { owner.controller.signal.throwIfAborted(); return value; }));
 }
-const actualPacing = await import("../../../src/providers/request-pacing");
+const actualPacing = await import("../../../backend/src/providers/request-pacing");
 const originalWaitForSlot = actualPacing.waitForProviderRequestSlot;
-mock.module("../../../src/providers/request-pacing", () => ({
+mock.module("../../../backend/src/providers/request-pacing", () => ({
   ...actualPacing,
   waitForProviderRequestSlot: async (...args: Parameters<typeof originalWaitForSlot>) => {
     const owner = currentCase;
@@ -100,9 +100,9 @@ mock.module("../../../src/providers/request-pacing", () => ({
     return result;
   },
 }));
-const actualAdapterResolver = await import("../../../src/server/adapter-resolve");
+const actualAdapterResolver = await import("../../../backend/src/server/adapter-resolve");
 const originalResolveAdapter = actualAdapterResolver.resolveAdapter;
-mock.module("../../../src/server/adapter-resolve", () => ({
+mock.module("../../../backend/src/server/adapter-resolve", () => ({
   ...actualAdapterResolver,
   resolveAdapter: (...args: Parameters<typeof originalResolveAdapter>) => {
     const owner = currentCase;

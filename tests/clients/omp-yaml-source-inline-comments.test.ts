@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { patchOmpYamlSource } from "../../src/integrations/omp-yaml-source";
+import { patchOmpYamlSource } from "../../backend/src/integrations/omp-yaml-source";
 
 const SOURCE_WITH_NESTED_INLINE_COMMENT = [
   "providers:",

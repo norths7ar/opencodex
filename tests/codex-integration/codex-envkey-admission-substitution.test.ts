@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../src/lib/debug-settings";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../backend/src/lib/debug-settings";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

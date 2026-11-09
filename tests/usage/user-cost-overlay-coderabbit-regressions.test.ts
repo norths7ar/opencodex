@@ -8,21 +8,21 @@ import {
   loadConfig,
   readConfigDiagnostics,
   saveConfig,
-} from "../../src/config";
-import type { OcxConfig } from "../../src/types";
-import { resolveMatchedPrice } from "../../src/usage/cost";
+} from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
+import { resolveMatchedPrice } from "../../backend/src/usage/cost";
 import {
   activeUserCostOverlays,
   refreshUserCostOverlays,
   resetPreservedDiskOnlyProvidersForTests,
-} from "../../src/usage/user-cost-overlays";
+} from "../../backend/src/usage/user-cost-overlays";
 import {
   reconcileUserCostOverlaysFromDisk,
   resetUserCostOverlayReconcilerForTests,
   startUserCostOverlayReconciler,
   stopUserCostOverlayReconciler,
   userCostOverlayInvalidReconcileCountForTests,
-} from "../../src/usage/user-cost-overlay-reconciler";
+} from "../../backend/src/usage/user-cost-overlay-reconciler";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const OVERLAY = { input: 1, output: 2, cacheRead: 0.1, cacheWrite: 0 };

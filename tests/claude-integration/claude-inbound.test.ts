@@ -1,16 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { AnthropicRequestError as LeafAnthropicRequestError } from "../../src/claude/inbound-records";
+import { AnthropicRequestError as LeafAnthropicRequestError } from "../../backend/src/claude/inbound-records";
 import { repoPath } from "../helpers/repo-root";
-import { AnthropicRequestError, anthropicToResponsesBody, anthropicToResponsesTranslation, effortForThinkingBudget, extractOcxEffortDirective, resolveInboundModel } from "../../src/claude/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { inlineDocumentMarker } from "../../src/responses/inline-document";
-import { responsesRequestSchema } from "../../src/responses/schema";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { satisfiesOpenAiStrictSchema } from "../../src/adapters/anthropic-output-schema";
+import { AnthropicRequestError, anthropicToResponsesBody, anthropicToResponsesTranslation, effortForThinkingBudget, extractOcxEffortDirective, resolveInboundModel } from "../../backend/src/claude/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { inlineDocumentMarker } from "../../backend/src/responses/inline-document";
+import { responsesRequestSchema } from "../../backend/src/responses/schema";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { satisfiesOpenAiStrictSchema } from "../../backend/src/adapters/anthropic-output-schema";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import type { OcxProviderConfig } from "../../src/types";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 // The translator returns an untyped wire body. These aliases name just the fields the
 // system-message cases assert on, so the assertions read as a contract instead of a cast.
@@ -876,7 +876,7 @@ describe("bundled-skill elision for routed models (devlog 260712 060)", () => {
 });
 
 describe("ocx-route directive (devlog 072)", () => {
-  const { extractOcxRouteDirective } = require("../../src/claude/inbound") as typeof import("../../src/claude/inbound");
+  const { extractOcxRouteDirective } = require("../../backend/src/claude/inbound") as typeof import("../../backend/src/claude/inbound");
 
   test("extracts from string and block-array system; first directive wins", () => {
     expect(extractOcxRouteDirective({ system: "intro\n<!-- ocx-route: claude-ocx-native--gpt-5.6-sol[1m] -->\nrest" }))
@@ -912,7 +912,7 @@ test("inbound leaves preserve the tool_choice error identity and avoid facade ba
     .toThrow(AnthropicRequestError);
   expect(AnthropicRequestError).toBe(LeafAnthropicRequestError);
   for (const leaf of ["inbound-records.ts", "inbound-model-options.ts", "inbound-content-options.ts"]) {
-    expect(readFileSync(repoPath("src", "claude", leaf), "utf8"))
+    expect(readFileSync(repoPath("backend/src", "claude", leaf), "utf8"))
       .not.toMatch(/from\s+["']\.\/inbound["']/);
   }
 });

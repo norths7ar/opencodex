@@ -21,20 +21,20 @@ import {
   type ExportModel,
   type OpencodeGeneratedConfig,
   type PiGeneratedConfig,
-} from "../../src/clients/config-export";
-import { buildOpencodeProviderBlockFromCatalog, opencodeCatalogFromProxyRows, opencodeGlobalConfigPath } from "../../src/cli/opencode";
-import { exportModelsFromProxyRows } from "../../src/cli/export-command";
-import type { OcxConfig } from "../../src/types";
-import { configSchema } from "../../src/config/schema/config-schema";
+} from "../../backend/src/clients/config-export";
+import { buildOpencodeProviderBlockFromCatalog, opencodeCatalogFromProxyRows, opencodeGlobalConfigPath } from "../../backend/src/cli/opencode";
+import { exportModelsFromProxyRows } from "../../backend/src/cli/export-command";
+import type { OcxConfig } from "../../backend/src/types";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import * as facade from "../../src/clients/config-export";
-import { OPENCODE_PROVIDER_BLOCK_DEFAULT_CONFIG as leafDefaultConfig } from "../../src/clients/config-export/constants";
-import { normalizeExportModels as leafNormalizeExportModels } from "../../src/clients/config-export/model-metadata";
-import * as omp from "../../src/clients/config-export/omp";
-import * as dsh from "../../src/clients/config-export/dsh";
-import * as mcode from "../../src/clients/config-export/mcode";
-import * as raycast from "../../src/clients/config-export/raycast";
-import * as zcode from "../../src/clients/config-export/zcode";
+import * as facade from "../../backend/src/clients/config-export";
+import { OPENCODE_PROVIDER_BLOCK_DEFAULT_CONFIG as leafDefaultConfig } from "../../backend/src/clients/config-export/constants";
+import { normalizeExportModels as leafNormalizeExportModels } from "../../backend/src/clients/config-export/model-metadata";
+import * as omp from "../../backend/src/clients/config-export/omp";
+import * as dsh from "../../backend/src/clients/config-export/dsh";
+import * as mcode from "../../backend/src/clients/config-export/mcode";
+import * as raycast from "../../backend/src/clients/config-export/raycast";
+import * as zcode from "../../backend/src/clients/config-export/zcode";
 
 /**
  * Fixture covering the four rows that exercise every emission branch: native,
@@ -1153,8 +1153,8 @@ describe("EXPORT_CLIENTS registry", () => {
 
 
 test("renamed CommandCode gathered effort tables reach DSH and ZCode exports", async () => {
-  const { gatherRoutedModels } = await import("../../src/codex/catalog");
-  const { clearModelCache } = await import("../../src/codex/model-cache");
+  const { gatherRoutedModels } = await import("../../backend/src/codex/catalog");
+  const { clearModelCache } = await import("../../backend/src/codex/model-cache");
   const { installIsolatedCodexHome } = await import("../helpers/isolated-codex-home");
   const isolated = installIsolatedCodexHome("ocx-renamed-provider-export-");
   const known = "deepseek/deepseek-v4-flash";

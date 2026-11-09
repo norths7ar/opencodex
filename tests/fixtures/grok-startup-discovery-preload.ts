@@ -2,15 +2,15 @@
 // catalog consumers must complete normally, or the test misses the post-await check.
 import { mock } from "bun:test";
 import { existsSync, writeFileSync } from "node:fs";
-import { syncGrokConfig } from "../../src/grok/sync";
-import { injectGrokConfig } from "../../src/grok/inject";
-import { fetchAllModels } from "../../src/server/management/shared";
+import { syncGrokConfig } from "../../backend/src/grok/sync";
+import { injectGrokConfig } from "../../backend/src/grok/inject";
+import { fetchAllModels } from "../../backend/src/server/management/shared";
 
 const entered = process.env.OCX_TEST_GROK_ENTERED_FILE;
 const release = process.env.OCX_TEST_GROK_RELEASE_FILE;
 if (!entered || !release) throw new Error("Grok discovery fixture requires its owned markers");
 const actualSync = syncGrokConfig;
-mock.module("../../src/grok/sync", () => ({
+mock.module("../../backend/src/grok/sync", () => ({
   syncGrokConfig: (...args: Parameters<typeof actualSync>) => actualSync(args[0], args[1], args[2], {
     injectGrokConfig,
     fetchAllModels: async config => {

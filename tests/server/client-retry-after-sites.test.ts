@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { formatErrorResponse } from "../../src/bridge";
-import { formatUsageLimitReachedResponse } from "../../src/bridge/errors";
-import { fallbackRefusedResponse, type FallbackEvent } from "../../src/routing/fallback-policy";
-import { formatPassthroughUpstreamError } from "../../src/server/responses/passthrough-error";
-import { bufferCompactResponse } from "../../src/server/responses/compact";
-import { safeResponseHeaders } from "../../src/server/safe-response-headers";
+import { formatErrorResponse } from "../../backend/src/bridge";
+import { formatUsageLimitReachedResponse } from "../../backend/src/bridge/errors";
+import { fallbackRefusedResponse, type FallbackEvent } from "../../backend/src/routing/fallback-policy";
+import { formatPassthroughUpstreamError } from "../../backend/src/server/responses/passthrough-error";
+import { bufferCompactResponse } from "../../backend/src/server/responses/compact";
+import { safeResponseHeaders } from "../../backend/src/server/safe-response-headers";
 
 // All digits, so a Retry-After parser accepts it as a delay in seconds.
 const NUMERIC_KEY = "73915028461739205817";

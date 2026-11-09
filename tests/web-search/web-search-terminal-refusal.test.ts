@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import type { AdapterEvent, OcxUsage } from "../../src/types";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { parseRequest } from "../../src/responses/parser";
-import { runWithWebSearch } from "../../src/web-search/loop";
+import type { AdapterEvent, OcxUsage } from "../../backend/src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 /**

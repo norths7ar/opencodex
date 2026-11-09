@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { consumeForInspection, linkAbortSignal, relaySseWithFailedTail, relaySseWithHeartbeat, relayWithAbort } from "../../src/server";
+import { consumeForInspection, linkAbortSignal, relaySseWithFailedTail, relaySseWithHeartbeat, relayWithAbort } from "../../backend/src/server";
 import { pathToFileURL } from "node:url";
 import { repoRoot } from "../helpers/repo-root";
-import { relayResponsesSseWithTerminalRepair, type ResponsesTerminalRepairScheduler } from "../../src/server/responses-terminal-repair";
-import { createPassthroughWebSearchBridgeStream, type PassthroughWebSearchBridgePlan } from "../../src/web-search/passthrough-bridge";
-import { deliverPassthroughResponse } from "../../src/server/responses/passthrough-delivery";
-import { routedProviderConfig } from "../../src/router";
+import { relayResponsesSseWithTerminalRepair, type ResponsesTerminalRepairScheduler } from "../../backend/src/server/responses-terminal-repair";
+import { createPassthroughWebSearchBridgeStream, type PassthroughWebSearchBridgePlan } from "../../backend/src/web-search/passthrough-bridge";
+import { deliverPassthroughResponse } from "../../backend/src/server/responses/passthrough-delivery";
+import { routedProviderConfig } from "../../backend/src/router";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const root = pathToFileURL(repoRoot() + "/");
@@ -48,10 +48,10 @@ async function readAll(stream: ReadableStream<Uint8Array>): Promise<string> {
 
 describe("passthrough relayWithAbort (RC2, passthrough path)", () => {
   test("native passthrough SSE keeps the real platform gate and pure native relay invariants", async () => {
-    const coreSource = await readSource("src/server/responses/passthrough-delivery.ts");
-    const relaySource = await readSource("src/server/relay.ts");
-    const capsSource = await readSource("src/lib/bun-stream-caps.ts");
-    const inspectionTeeSource = await readSource("src/server/inspection-tee.ts");
+    const coreSource = await readSource("backend/src/server/responses/passthrough-delivery.ts");
+    const relaySource = await readSource("backend/src/server/relay.ts");
+    const capsSource = await readSource("backend/src/lib/bun-stream-caps.ts");
+    const inspectionTeeSource = await readSource("backend/src/server/inspection-tee.ts");
     const sseBranch = coreSource.slice(
       coreSource.indexOf("if (isEventStream && upstreamResponse.body)"),
       coreSource.indexOf("const body = relayWithAbort(upstreamResponse.body, upstream);"),

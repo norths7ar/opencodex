@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { applyProviderConfigHints, normalizeRoutedCatalogEntry } from "../../src/codex/catalog";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../src/types";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { applyProviderConfigHints, normalizeRoutedCatalogEntry } from "../../backend/src/codex/catalog";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../backend/src/types";
 
 const tools: OcxTool[] = [{ name: "shell", description: "run", parameters: { type: "object" } }];
 

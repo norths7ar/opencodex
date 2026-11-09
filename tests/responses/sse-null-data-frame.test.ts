@@ -1,9 +1,9 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../src/adapters/anthropic";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../src/adapters/google";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
-import { parseSidecarSSE } from "../../src/web-search/parse";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../backend/src/adapters/anthropic";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../backend/src/adapters/google";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
+import { parseSidecarSSE } from "../../backend/src/web-search/parse";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 // `JSON.parse` returns a value, not necessarily an object: `JSON.parse("null")` is `null` and

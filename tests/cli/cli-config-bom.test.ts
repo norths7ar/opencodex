@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -42,7 +42,7 @@ test.each(["validate", "import"])("accepts a BOM on real config %s stdin", actio
   mkdirSync(codexHome);
   const config = { port: 10100, providers: { local: { adapter: "openai-chat", baseUrl: "https://example.test/v1", note: "kept\uFEFFinside" } }, defaultProvider: "local" };
   try {
-    const args = [repoPath("src", "cli", "index.ts"), "config", action, "-", "--json"];
+    const args = [repoPath("backend/src", "cli", "index.ts"), "config", action, "-", "--json"];
     if (action === "import") args.push("--yes");
     const result = spawnSync(process.execPath, args, {
       cwd: repoRoot(), env: { ...process.env, OPENCODEX_HOME: root, CODEX_HOME: codexHome },

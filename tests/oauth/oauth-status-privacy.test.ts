@@ -17,15 +17,15 @@ import {
   OAUTH_PROVIDERS,
   publicOAuthAuthenticationErrorMessage,
   UnsupportedOAuthProviderError,
-} from "../../src/oauth";
-import { loginState } from "../../src/oauth/login-flow-state";
-import { getAccountSet, OAuthMutationBusyError, saveCredential, setAccountPaused } from "../../src/oauth/store";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth";
+import { loginState } from "../../backend/src/oauth/login-flow-state";
+import { getAccountSet, OAuthMutationBusyError, saveCredential, setAccountPaused } from "../../backend/src/oauth/store";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let TEST_DIR = "";
@@ -244,7 +244,7 @@ describe("OAuth status privacy", () => {
       accountId: "acct-xai",
       source: "local-cli",
     });
-    const { markAccountNeedsReauth, getAccountSet } = await import("../../src/oauth/store");
+    const { markAccountNeedsReauth, getAccountSet } = await import("../../backend/src/oauth/store");
     await markAccountNeedsReauth("xai", getAccountSet("xai")!.activeAccountId, true);
 
     expect(getLoginStatus("xai").loggedIn).toBe(false);

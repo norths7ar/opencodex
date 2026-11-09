@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig } from "../../src/config";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { getDefaultConfig } from "../../backend/src/config";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { baseCompactionBody, compactionRequest, completedPayload, removeCompactionFixture } from "../helpers/compaction-routing-fixtures";
 

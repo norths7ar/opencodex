@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, test } from
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { handleResponses } from "../../src/server/responses";
-import { isEagerRelaySseResponse } from "../../src/server/relay";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { handleResponses } from "../../backend/src/server/responses";
+import { isEagerRelaySseResponse } from "../../backend/src/server/relay";
 import {
   createGrokResponsesControlFrameBlockRewrite,
   createGrokResponsesTimestampBlockRewrite,
-} from "../../src/server/grok-responses-control-frame";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/grok-responses-control-frame";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";

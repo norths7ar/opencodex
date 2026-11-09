@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { mergeKeyLoginProviderRow, providerConfigFromKeyLoginProvider } from "../../src/oauth/login-cli";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import type { OcxProviderConfig } from "../../src/types";
+import { mergeKeyLoginProviderRow, providerConfigFromKeyLoginProvider } from "../../backend/src/oauth/login-cli";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 describe("key login preserves user-configured price overlays", () => {
   test("rotating the API key carries modelCosts onto the replacement row", () => {

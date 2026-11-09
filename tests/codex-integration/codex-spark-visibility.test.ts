@@ -5,13 +5,13 @@ import { join } from "node:path";
 import {
   clearAccountQuota, flushQuotaObservationsForTests, getAccountQuota, listAccountQuotas,
   setAccountQuotaFromParsed, withoutRetiredCodexQuota,
-} from "../../src/codex/quota";
-import { codexPoolQuotaEvidence } from "../../src/routing/quota";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
+} from "../../backend/src/codex/quota";
+import { codexPoolQuotaEvidence } from "../../backend/src/routing/quota";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
-import * as observer from "../../src/quota/reset-observer";
-import type { OcxConfig } from "../../src/types";
+import * as observer from "../../backend/src/quota/reset-observer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const retired = [

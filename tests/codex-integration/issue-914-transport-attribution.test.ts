@@ -8,17 +8,17 @@ import {
   isCodexAccountSoftAvoided,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 import {
   clearUpstreamHostHealth,
   getUpstreamHostHealth,
   upstreamHostHealthKey,
-} from "../../src/codex/upstream-host-health";
-import { classifyTransportFailureKind } from "../../src/lib/upstream-reachability";
-import { fetchWithResetRetry, fetchWithTransientRetry } from "../../src/lib/upstream-retry";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { getConfigPath } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/upstream-host-health";
+import { classifyTransportFailureKind } from "../../backend/src/lib/upstream-reachability";
+import { fetchWithResetRetry, fetchWithTransientRetry } from "../../backend/src/lib/upstream-retry";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { getConfigPath } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

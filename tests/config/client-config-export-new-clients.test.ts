@@ -22,8 +22,8 @@ import {
   type HermesGeneratedConfig,
   type KimiGeneratedConfig,
   type OpenclawGeneratedConfig,
-} from "../../src/clients/config-export";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * WP1 coverage for the four clients added past OpenCode and Pi

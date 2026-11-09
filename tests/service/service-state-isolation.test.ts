@@ -6,7 +6,7 @@ import { createTempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 import { spawnTestChild } from "../helpers/spawn-test-child";
 
-const stateModule = pathToFileURL(repoPath("src/service/state.ts")).href;
+const stateModule = pathToFileURL(repoPath("backend/src/service/state.ts")).href;
 
 describe("service state home isolation", () => {
   for (const guarded of [true, false]) {

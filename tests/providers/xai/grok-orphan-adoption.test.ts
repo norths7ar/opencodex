@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { injectGrokConfig, stripGrokConfig } from "../../../src/grok/inject";
+import { injectGrokConfig, stripGrokConfig } from "../../../backend/src/grok/inject";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 /**

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { MODELS_RUNTIME_SUBCOMMANDS, isModelsRuntimeSubcommand } from "../../src/cli/models-runtime-subcommands";
-import { MODELS_RUNTIME_USAGE, handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
+import { MODELS_RUNTIME_SUBCOMMANDS, isModelsRuntimeSubcommand } from "../../backend/src/cli/models-runtime-subcommands";
+import { MODELS_RUNTIME_USAGE, handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
 
 /**
  * #3094: `ocx models new-policy` and `ocx models new-arrivals` were implemented in
@@ -58,7 +58,7 @@ describe("models runtime subcommand dispatch (#3094)", () => {
   test("handleModels routes exactly the shared set to the runtime module", () => {
     // Reading the source keeps this honest without booting the CLI: the dispatch must
     // consult the shared predicate rather than re-listing names inline.
-    const source = readFileSync(new URL("../../src/cli/models.ts", import.meta.url), "utf8");
+    const source = readFileSync(new URL("../../backend/src/cli/models.ts", import.meta.url), "utf8");
     expect(source).toContain("isModelsRuntimeSubcommand(subcommand)");
     // The old inline array is what allowed the drift; it must not come back.
     expect(source).not.toMatch(/\["live",\s*"edit"/);

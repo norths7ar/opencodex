@@ -4,13 +4,13 @@ import {
   DEFAULT_VISION_TIMEOUT_MS,
   MAX_VISION_TIMEOUT_MS,
   MIN_VISION_TIMEOUT_MS,
-} from "../../src/vision";
+} from "../../backend/src/vision";
 import {
   VISION_MAX_DESCRIPTIONS_DEFAULT,
   VISION_TIMEOUT_MS_DEFAULT,
   VISION_TIMEOUT_MS_MAX,
   VISION_TIMEOUT_MS_MIN,
-} from "../../gui/src/pages/dashboard-shared";
+} from "../../frontend/src/pages/dashboard-shared";
 
 test("Dashboard timeout bounds are the runtime vision sidecar contract", () => {
   expect(VISION_TIMEOUT_MS_MIN).toBe(MIN_VISION_TIMEOUT_MS);

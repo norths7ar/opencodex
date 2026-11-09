@@ -2,7 +2,7 @@
  * The lane-to-path rule shared by the observed trace and the planner (src/protocols/path.ts).
  */
 import { describe, expect, test } from "bun:test";
-import { deliveryModeForLane, requestPathForLane, responsePathForLane } from "../../src/protocols/path";
+import { deliveryModeForLane, requestPathForLane, responsePathForLane } from "../../backend/src/protocols/path";
 
 describe("requestPathForLane", () => {
   test("Responses ingress passes through or translates through the IR", () => {

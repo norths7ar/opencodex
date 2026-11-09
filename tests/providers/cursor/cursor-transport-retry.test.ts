@@ -3,9 +3,9 @@ import {
   cursorRetryDelayMs,
   isRetryableCursorError,
   runCursorTurnWithRetry,
-} from "../../../src/adapters/cursor/transport-retry";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
-import type { CursorTransport } from "../../../src/adapters/cursor/transport";
+} from "../../../backend/src/adapters/cursor/transport-retry";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
+import type { CursorTransport } from "../../../backend/src/adapters/cursor/transport";
 
 const request = {} as CursorRunRequest;
 

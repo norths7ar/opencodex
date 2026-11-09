@@ -2,9 +2,9 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleObserveCommand } from "../../src/cli/observe";
-import { decodeRequestLogCursor, selectRequestLogPoll } from "../../src/server/request-log-cursor";
-import { parseLogPollResponse, mergeLogDelta } from "../../gui/src/pages/log-poll";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
+import { decodeRequestLogCursor, selectRequestLogPoll } from "../../backend/src/server/request-log-cursor";
+import { parseLogPollResponse, mergeLogDelta } from "../../frontend/src/pages/log-poll";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;
@@ -248,8 +248,8 @@ for (const [args, signal, code] of [
   [["observe", "logs", "--follow", "--events"], "SIGTERM", 143],
 ] as const) {
   test(`public dispatch preserves ${signal} numeric exit for ${args[0]}`, async () => {
-    const { dispatchCommand } = await import("../../src/cli/dispatch");
-    const { parseCliHead } = await import("../../src/cli/root");
+    const { dispatchCommand } = await import("../../backend/src/cli/dispatch");
+    const { parseCliHead } = await import("../../backend/src/cli/root");
     let requests = 0;
     const server = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: request => {
       expect(new URL(request.url).pathname).toBe("/api/logs");
@@ -263,7 +263,7 @@ for (const [args, signal, code] of [
       // The observed runner only owns args and discovery. Any other access fails the fixture.
       const deps = new Proxy({ args: argv, command: argv[0], findLiveProxy: async () => ({ pid: 123, hostname: "127.0.0.1", port: server.port!, source: "runtime" as const }) }, {
         get(target, key) { if (key in target) return Reflect.get(target, key); throw new Error("Unexpected dispatcher dependency"); },
-      }) as unknown as import("../../src/cli/dispatch").CliDispatchDeps;
+      }) as unknown as import("../../backend/src/cli/dispatch").CliDispatchDeps;
       expect(await dispatchCommand(parseCliHead(argv), deps)).toBe(code);
       expect(requests).toBe(1); expect(out).not.toHaveBeenCalled(); expect(err).not.toHaveBeenCalled();
       expect([process.listenerCount("SIGINT"), process.listenerCount("SIGTERM")]).toEqual(before);

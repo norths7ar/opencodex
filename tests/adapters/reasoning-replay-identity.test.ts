@@ -1,8 +1,8 @@
-import { anthropicOpaqueFingerprint, captureAnthropicRejectionPayloads, bindAnthropicRejectionResponse, rejectedAnthropicPayloads } from "../../src/adapters/anthropic-rejection-memo";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { AdapterRequest } from "../../src/adapters/base";
+import { anthropicOpaqueFingerprint, captureAnthropicRejectionPayloads, bindAnthropicRejectionResponse, rejectedAnthropicPayloads } from "../../backend/src/adapters/anthropic-rejection-memo";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
 import {
   bindReasoningReplayScope,
   clearReasoningReplayCacheForTests,
@@ -20,8 +20,8 @@ import {
   reasoningReplayServingIdentityChange,
   rememberReasoningForCall,
   rememberReasoningReplayOpaqueBlobRejection,
-} from "../../src/responses/reasoning-replay-cache";
-import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 
 const THREAD = "thread-identity";
 const CALL_ID = "call_identity_collision";

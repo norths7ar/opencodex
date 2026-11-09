@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * #796: Volcengine Ark validates an assistant message's text as a REQUIRED parameter and treats

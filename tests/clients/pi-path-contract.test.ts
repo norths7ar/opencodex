@@ -8,8 +8,8 @@ import {
   ompModelsConfigPath,
   piAgentDir,
   piConfigPath,
-} from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
+} from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function withTempHome(run: (home: string) => void): void {

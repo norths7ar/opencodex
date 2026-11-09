@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { markPreinspectedJsonResponse, responseWithDeferredRequestLog } from "../../src/server/relay";
-import { MAX_RESPONSE_LOG_INSPECTION_BYTES } from "../../src/server/response-log-body";
-import { finalizeAccountLease, finalizeOwnedTranslatorBudget } from "../../src/server/responses/core-lifetime";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { RequestLogContext, RequestLogEntry } from "../../src/server/request-log";
+import { markPreinspectedJsonResponse, responseWithDeferredRequestLog } from "../../backend/src/server/relay";
+import { MAX_RESPONSE_LOG_INSPECTION_BYTES } from "../../backend/src/server/response-log-body";
+import { finalizeAccountLease, finalizeOwnedTranslatorBudget } from "../../backend/src/server/responses/core-lifetime";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { RequestLogContext, RequestLogEntry } from "../../backend/src/server/request-log";
 
 const encoder = new TextEncoder();
 function tracked(response: Response, context?: RequestLogContext) {

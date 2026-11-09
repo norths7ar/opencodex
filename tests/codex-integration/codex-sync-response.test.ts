@@ -4,8 +4,8 @@ import type {
   CodexHistoryState,
   CodexObservedState,
   ConvergeOutcome,
-} from "../../src/codex/convergence-types";
-import { toSyncResponse } from "../../src/server/management/sync-response";
+} from "../../backend/src/codex/convergence-types";
+import { toSyncResponse } from "../../backend/src/server/management/sync-response";
 
 const history: CodexHistoryState = {
   status: "converged",

@@ -5,15 +5,15 @@ import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import * as oauth from "../../../src/oauth";
-import * as oauthStore from "../../../src/oauth/store";
-import { handleAccountAuthCommand } from "../../../src/cli/account-auth";
-import * as coupons from "../../../src/grok/reset-coupons";
-import { encodeGrpcWebEnvelope } from "../../../src/grok/grpc-web";
-import * as ledger from "../../../src/grok/reset-coupon-ledger";
-import { ConfigMutationLockError, readConfigGenerationInCurrentMutationTransaction, withConfigMutationLockSync } from "../../../src/config/mutation-lock";
-import { handleGrokCouponRoutes } from "../../../src/server/management/grok-coupon-routes";
-import type { ManagementContext } from "../../../src/server/management/context";
+import * as oauth from "../../../backend/src/oauth";
+import * as oauthStore from "../../../backend/src/oauth/store";
+import { handleAccountAuthCommand } from "../../../backend/src/cli/account-auth";
+import * as coupons from "../../../backend/src/grok/reset-coupons";
+import { encodeGrpcWebEnvelope } from "../../../backend/src/grok/grpc-web";
+import * as ledger from "../../../backend/src/grok/reset-coupon-ledger";
+import { ConfigMutationLockError, readConfigGenerationInCurrentMutationTransaction, withConfigMutationLockSync } from "../../../backend/src/config/mutation-lock";
+import { handleGrokCouponRoutes } from "../../../backend/src/server/management/grok-coupon-routes";
+import type { ManagementContext } from "../../../backend/src/server/management/context";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { repoPath } from "../../helpers/repo-root";
 import { watchdogMs } from "../../helpers/ci-watchdog";
@@ -249,7 +249,7 @@ test("confirmed redemption settles after a real child releases the config mutati
   });
   spies.push(settle);
   redeem.mockImplementation(async () => {
-    const moduleUrl = pathToFileURL(repoPath("src/config/mutation-lock.ts")).href;
+    const moduleUrl = pathToFileURL(repoPath("backend/src/config/mutation-lock.ts")).href;
     const owned = Bun.spawn([process.execPath, "-e", `import { readSync } from "node:fs";
       import { withConfigMutationLockSync } from ${JSON.stringify(moduleUrl)};
       withConfigMutationLockSync(() => { process.stdout.write("held\\n"); readSync(0, Buffer.alloc(1), 0, 1, null); });`], {
@@ -382,7 +382,7 @@ test("a route does not spend after a competing request claims during inspection"
   const auth = spyOn(oauth, "getValidAccessSnapshotForAccount").mockResolvedValue({ accessToken: "fixture-access-token" } as never);
   const remaining = spyOn(coupons, "getGrokRemainingResets").mockImplementation(async () => {
     // Claim the same shared ledger from a real second process while inspection waits.
-    const moduleUrl = pathToFileURL(repoPath("src/grok/reset-coupon-ledger.ts")).href;
+    const moduleUrl = pathToFileURL(repoPath("backend/src/grok/reset-coupon-ledger.ts")).href;
     const child = Bun.spawnSync([process.execPath, "-e", `import { markGrokResetCouponAttempt } from ${JSON.stringify(moduleUrl)};
       markGrokResetCouponAttempt(${JSON.stringify(OP)}, ${JSON.stringify(TOKEN.tokenId)}); console.log("marked");`], {
       env: { ...process.env, OPENCODEX_HOME: home }, timeout: watchdogMs(10_000), stdout: "pipe", stderr: "pipe",

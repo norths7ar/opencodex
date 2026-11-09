@@ -189,7 +189,7 @@ describe("the warmed graph is read from the child, not named by hand", () => {
 
   test("it follows the source, so a moved import moves the warm-up with it", () => {
     expect(moduleGraphSpecifiers('import "./src/codex/history-lock.ts";', resolveDir))
-      .toEqual([join(resolveDir, "src/codex/history-lock.ts")]);
+      .toEqual([join(resolveDir, "backend/src/codex/history-lock.ts")]);
     expect(moduleGraphSpecifiers('import "./src/codex/moved/history-lock.ts";', resolveDir))
       .toEqual([join(resolveDir, "src/codex/moved/history-lock.ts")]);
   });
@@ -201,7 +201,7 @@ describe("the warmed graph is read from the child, not named by hand", () => {
     expect(moduleGraphSpecifiers('const x = require("./src/cli/connect");', resolveDir))
       .toEqual([join(resolveDir, "src/cli/connect")]);
     expect(moduleGraphSpecifiers('const m = await import("./src/oauth/store.ts");', resolveDir))
-      .toEqual([join(resolveDir, "src/oauth/store.ts")]);
+      .toEqual([join(resolveDir, "backend/src/oauth/store.ts")]);
   });
 
   test("erased types are not modules, and builtins are not worth warming", () => {
@@ -213,12 +213,12 @@ describe("the warmed graph is read from the child, not named by hand", () => {
 
   test("a specifier is resolved against the directory the child resolves it against", () => {
     expect(moduleGraphSpecifiers('import "../../src/codex/shim";', repoPath("tests", "helpers")))
-      .toEqual([join(repoRoot(), "src/codex/shim")]);
+      .toEqual([join(repoRoot(), "backend/src/codex/shim")]);
   });
 
   test("the same module twice is one warm-up", () => {
     expect(moduleGraphSpecifiers('import "./src/config"; const c = require("./src/config");', resolveDir))
-      .toEqual([join(resolveDir, "src/config")]);
+      .toEqual([join(resolveDir, "backend/src/config")]);
   });
 
   test("a hoisted prologue is scanned even when it is only a top-level await import", () => {
@@ -226,7 +226,7 @@ describe("the warmed graph is read from the child, not named by hand", () => {
     // fragment with no import or export of its own can be read as a script, where top-level await
     // does not parse, so the scan has to establish module context for itself.
     expect(moduleGraphSpecifiers('const { syncCatalogModels } = await import("./src/codex/catalog/sync.ts");', resolveDir))
-      .toEqual([join(resolveDir, "src/codex/catalog/sync.ts")]);
+      .toEqual([join(resolveDir, "backend/src/codex/catalog/sync.ts")]);
   });
 
   test("a CLI entry's shebang does not stop the scan", () => {
@@ -234,16 +234,16 @@ describe("the warmed graph is read from the child, not named by hand", () => {
     // module context in front of it produced a syntax error and warmed nothing at all, which is the
     // failure mode this whole helper exists to make impossible.
     expect(moduleGraphSpecifiers('#!/usr/bin/env bun\nimport "./src/cli/status";', resolveDir))
-      .toEqual([join(resolveDir, "src/cli/status")]);
-    const entry = repoPath("src", "cli", "index.ts");
-    expect(moduleGraphSpecifiers(readFileSync(entry, "utf8"), repoPath("src", "cli")).length)
+      .toEqual([join(resolveDir, "backend/src/cli/status")]);
+    const entry = repoPath("backend/src", "cli", "index.ts");
+    expect(moduleGraphSpecifiers(readFileSync(entry, "utf8"), repoPath("backend/src", "cli")).length)
       .toBeGreaterThan(20);
   });
 
   test("a real child entry resolves to real repository modules", () => {
     const entry = repoPath("tests", "helpers", "codex-write-lock-child.ts");
     const specifiers = moduleGraphSpecifiers(readFileSync(entry, "utf8"), repoPath("tests", "helpers"));
-    expect(specifiers).toContain(join(repoRoot(), "src/codex/codex-write-lock"));
+    expect(specifiers).toContain(join(repoRoot(), "backend/src/codex/codex-write-lock"));
   });
 });
 

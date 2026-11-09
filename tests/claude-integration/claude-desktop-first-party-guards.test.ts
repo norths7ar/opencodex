@@ -6,13 +6,13 @@ import {
   applyDesktopFirstParty,
   observeClaudeDesktopMode,
   resolveClaudeDesktopMode,
-} from "../../src/claude/desktop-first-party";
-import type { writeDesktop3pConfig } from "../../src/claude/desktop-3p";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
-import { syncEnabledClientIntegrations } from "../../src/server/management/config-routes";
-import type { CatalogModel } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/desktop-first-party";
+import type { writeDesktop3pConfig } from "../../backend/src/claude/desktop-3p";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
+import { syncEnabledClientIntegrations } from "../../backend/src/server/management/config-routes";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 

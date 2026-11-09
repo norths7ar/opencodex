@@ -9,7 +9,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assertNotRealCodexHomeUnderTest, isTestHomeGuardArmed } from "../../src/lib/test-home-guard";
+import { assertNotRealCodexHomeUnderTest, isTestHomeGuardArmed } from "../../backend/src/lib/test-home-guard";
 import { helperPath, repoRoot } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
@@ -24,7 +24,7 @@ if (process.env.OCX_REAL_HOME) {
   }
   if (!refused) throw new Error("real Codex home guard identity mismatch");
 }
-const { buildProfileFileForTarget, preserveUnmanagedProfileKeys } = await import("../../src/codex/inject/config-toml");
+const { buildProfileFileForTarget, preserveUnmanagedProfileKeys } = await import("../../backend/src/codex/inject/config-toml");
 
 const loopback = { baseUrl: "http://127.0.0.1:10100/v1", requiresAdmissionToken: false, tokenEnv: "OPENCODEX_API_AUTH_TOKEN" as const };
 const remote = { baseUrl: "http://10.20.30.40:10100/v1", requiresAdmissionToken: true, tokenEnv: "OPENCODEX_API_AUTH_TOKEN" as const };

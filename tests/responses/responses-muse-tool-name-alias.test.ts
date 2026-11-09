@@ -1,17 +1,17 @@
 import { createHash } from "node:crypto";
 import { afterEach, describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
 import {
   buildMuseToolNameAliasPlan,
   museWireToolName,
   restoreMuseToolNames,
   restoreMuseToolNamesInJson,
   rewriteMuseToolNamesForUpstream,
-} from "../../src/responses/muse-tool-name-alias";
-import { expandPreviousResponseInput } from "../../src/responses/state";
-import { GROK_REFUSED_TERMINAL_EVENT_TYPE } from "../../src/server/grok-responses-snapshot-repair";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/muse-tool-name-alias";
+import { expandPreviousResponseInput } from "../../backend/src/responses/state";
+import { GROK_REFUSED_TERMINAL_EVENT_TYPE } from "../../backend/src/server/grok-responses-snapshot-repair";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 

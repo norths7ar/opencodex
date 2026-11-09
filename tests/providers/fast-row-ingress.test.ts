@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { decideTier, tierValueAfterDecision } from "../../src/providers/fastwire";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { parseFastOnlyRowId, parseSyntheticRowId } from "../../src/server/fast-row";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { decideTier, tierValueAfterDecision } from "../../backend/src/providers/fastwire";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { parseFastOnlyRowId, parseSyntheticRowId } from "../../backend/src/server/fast-row";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Ingress round-trip semantics for synthetic Fast selectors

@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resetWorkflowBudgetsForTest } from "../../src/lib/workflow-budget";
-import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
-import { resetThoughtSignatureReplayForTests } from "../../src/responses/thought-signature-replay";
-import { handleResponses } from "../../src/server/responses/core";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { resetWorkflowBudgetsForTest } from "../../backend/src/lib/workflow-budget";
+import { clearReasoningReplayCacheForTests } from "../../backend/src/responses/reasoning-replay-cache";
+import { resetThoughtSignatureReplayForTests } from "../../backend/src/responses/thought-signature-replay";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

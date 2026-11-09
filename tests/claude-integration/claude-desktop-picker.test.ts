@@ -7,14 +7,14 @@ import {
   offlinePickerStatus,
   removeDesktopPickerArtifacts,
   type DesktopPickerProfileInspection,
-} from "../../src/claude/desktop-picker";
-import type { PickerRuntime, PickerRuntimeStatus } from "../../src/claude/intercept/picker-runtime";
-import type { SecurityResult, SecurityRunner } from "../../src/claude/intercept/picker-trust";
-import { pickerCaCertPath, pickerCaFingerprints } from "../../src/claude/intercept/picker-ca";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
-import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../src/claude/intercept/picker-ca";
+} from "../../backend/src/claude/desktop-picker";
+import type { PickerRuntime, PickerRuntimeStatus } from "../../backend/src/claude/intercept/picker-runtime";
+import type { SecurityResult, SecurityRunner } from "../../backend/src/claude/intercept/picker-trust";
+import { pickerCaCertPath, pickerCaFingerprints } from "../../backend/src/claude/intercept/picker-ca";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
+import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../backend/src/claude/intercept/picker-ca";
 import { memoryPickerCaStore } from "../helpers/picker-ca-store";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 
 let root = "";

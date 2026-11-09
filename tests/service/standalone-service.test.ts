@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { buildServiceShellCommand } from "../../src/service/definition";
-import { buildWinswXml } from "../../src/lib/winsw";
-import { cliEntry } from "../../src/service/state";
-import { buildWindowsServiceScript } from "../../src/service/windows-taskxml";
+import { buildServiceShellCommand } from "../../backend/src/service/definition";
+import { buildWinswXml } from "../../backend/src/lib/winsw";
+import { cliEntry } from "../../backend/src/service/state";
+import { buildWindowsServiceScript } from "../../backend/src/service/windows-taskxml";
 
 const runtime = {
   path: "/opt/opencodex/ocx",

@@ -9,10 +9,10 @@ import {
   readDevinCliCredentialFile,
   readDevinCliCredentialOutcome,
   type DevinCliLoginDeps,
-} from "../../src/oauth/devin/cli-import";
-import { loginDevin, refreshDevinToken, resolveDevinApiServer } from "../../src/oauth/devin";
-import { saveCredential } from "../../src/oauth/store";
-import type { OAuthController } from "../../src/oauth/types";
+} from "../../backend/src/oauth/devin/cli-import";
+import { loginDevin, refreshDevinToken, resolveDevinApiServer } from "../../backend/src/oauth/devin";
+import { saveCredential } from "../../backend/src/oauth/store";
+import type { OAuthController } from "../../backend/src/oauth/types";
 
 /**
  * The measured shape of a signed-in CLI's credentials.toml. Quoted values, flat

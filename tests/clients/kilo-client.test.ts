@@ -13,16 +13,16 @@ import {
   kiloConfigPath,
   kiloHomeDir,
   type ExportContext,
-} from "../../src/clients/config-export";
-import type { KiloGeneratedConfig } from "../../src/clients/config-export/kilo";
-import { PARSE_FAILED, fileIO, parseConfig } from "../../src/integrations/config-io";
-import { inspectKiloCandidates } from "../../src/integrations/kilo-candidates";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { readIntegrationState } from "../../src/integrations/state";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { applyIntegration, disableIntegration, overwriteIntegration, restoreIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import type { KiloGeneratedConfig } from "../../backend/src/clients/config-export/kilo";
+import { PARSE_FAILED, fileIO, parseConfig } from "../../backend/src/integrations/config-io";
+import { inspectKiloCandidates } from "../../backend/src/integrations/kilo-candidates";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { applyIntegration, disableIntegration, overwriteIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const LOOPBACK: OcxConfig = {

@@ -9,10 +9,10 @@ import {
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
   createLocalAttestationSecret,
-} from "../../src/lib/local-management-attestation";
-import { SYSTEM_RESTART_CAPABILITY_VERSION, SYSTEM_RESTART_PATH } from "../../src/lib/system-restart-contract";
-import { requestBoundSystemRestart } from "../../src/cli/system-restart-client";
-import type { LiveProxy, LivenessIo } from "../../src/server/proxy-liveness";
+} from "../../backend/src/lib/local-management-attestation";
+import { SYSTEM_RESTART_CAPABILITY_VERSION, SYSTEM_RESTART_PATH } from "../../backend/src/lib/system-restart-contract";
+import { requestBoundSystemRestart } from "../../backend/src/cli/system-restart-client";
+import type { LiveProxy, LivenessIo } from "../../backend/src/server/proxy-liveness";
 
 const target: LiveProxy = { pid: 5151, port: 10100, hostname: "127.0.0.1", source: "runtime" };
 const CHALLENGE = "F".repeat(43);

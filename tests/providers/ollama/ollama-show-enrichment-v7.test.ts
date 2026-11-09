@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { gatherRoutedModels, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../../src/codex/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
+import { gatherRoutedModels, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../../backend/src/codex/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
 
 afterEach(() => {
   // The provider-model cache is keyed by provider name; without this, one test's gather would
@@ -12,9 +12,9 @@ afterEach(() => {
 });
 
 const originalFetch = globalThis.fetch;
-import { fetchOllamaShowEnrichment, ollamaShowMetadataFromPayload, showHeadersFromCaptured } from "../../../src/providers/ollama-show";
+import { fetchOllamaShowEnrichment, ollamaShowMetadataFromPayload, showHeadersFromCaptured } from "../../../backend/src/providers/ollama-show";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../../src/types";
+import type { OcxConfig } from "../../../backend/src/types";
 
 /**
  * V7: auth/outbound-policy integration, aggregate fan-out bounds, and models-API precedence.
@@ -368,8 +368,8 @@ describe("ollama /api/show — payload extraction contract (input not mutated)",
 });
 // The adapter-level third surface is exercised directly below via the real adapter factory,
 // which is what the native /api/chat route uses.
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
-import type { OcxParsedRequest } from "../../../src/types";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 function nativeParsed(modelId = "glm-5.3-flash"): OcxParsedRequest {
   return { modelId, stream: true, options: {}, context: { messages: [{ role: "user", content: "hi" }] } } as unknown as OcxParsedRequest;

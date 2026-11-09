@@ -1,4 +1,4 @@
-import { unifiedPoolSettingsDto } from "../../src/oauth/pool-settings-capability";
+import { unifiedPoolSettingsDto } from "../../backend/src/oauth/pool-settings-capability";
 /**
  * `apiSurfaces` and `protocols` resolution (src/protocols/settings.ts).
  *
@@ -11,10 +11,10 @@ import {
   protocolPolicyRevision,
   resolveApiSurfaceSettings,
   resolveProtocolSettings,
-} from "../../src/protocols/settings";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { validateConfigCandidate } from "../../src/config/diagnostics";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/protocols/settings";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { validateConfigCandidate } from "../../backend/src/config/diagnostics";
+import type { OcxConfig } from "../../backend/src/types";
 
 function cfg(extra: Record<string, unknown>): OcxConfig {
   return extra as unknown as OcxConfig;

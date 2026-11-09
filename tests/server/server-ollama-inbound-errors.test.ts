@@ -2,14 +2,14 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import { OLLAMA_MAX_RETRY_AFTER_SECONDS, ollamaRetryAfter, toOllamaRefusal } from "../../src/server/ollama-inbound";
-import { workflowDenialSummary, type WorkflowDenial } from "../../src/lib/workflow-budget";
-import { workflowRefusalResponse } from "../../src/server/workflow-refusal";
-import type { OcxConfig } from "../../src/types";
-import { usageLogPath } from "../../src/usage/log";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import { OLLAMA_MAX_RETRY_AFTER_SECONDS, ollamaRetryAfter, toOllamaRefusal } from "../../backend/src/server/ollama-inbound";
+import { workflowDenialSummary, type WorkflowDenial } from "../../backend/src/lib/workflow-budget";
+import { workflowRefusalResponse } from "../../backend/src/server/workflow-refusal";
+import type { OcxConfig } from "../../backend/src/types";
+import { usageLogPath } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // A provider key with no recognizable prefix: pattern-based redaction cannot spot it.

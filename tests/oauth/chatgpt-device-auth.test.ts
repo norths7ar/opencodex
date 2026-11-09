@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, jest, test } from "bun:test";
-import { loginChatGPT } from "../../src/oauth/chatgpt";
-import { DEVICE_FETCH_TIMEOUT_MS, loginChatGPTDevice, loginChatGPTNativeDevice } from "../../src/oauth/chatgpt-device";
-import type { OAuthController } from "../../src/oauth/types";
+import { loginChatGPT } from "../../backend/src/oauth/chatgpt";
+import { DEVICE_FETCH_TIMEOUT_MS, loginChatGPTDevice, loginChatGPTNativeDevice } from "../../backend/src/oauth/chatgpt-device";
+import type { OAuthController } from "../../backend/src/oauth/types";
 
 /**
  * The OpenAI deviceauth grant (#3366): the login path for a hub with no local

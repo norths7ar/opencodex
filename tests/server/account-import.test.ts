@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createAntigravityAccountImportAdapter } from "../../src/oauth/account-import/google-antigravity-adapter";
-import { parseCockpitAccountDocument } from "../../src/oauth/account-import/parser";
-import { importAccounts } from "../../src/oauth/account-import/service";
+import { createAntigravityAccountImportAdapter } from "../../backend/src/oauth/account-import/google-antigravity-adapter";
+import { parseCockpitAccountDocument } from "../../backend/src/oauth/account-import/parser";
+import { importAccounts } from "../../backend/src/oauth/account-import/service";
 import {
   ACCOUNT_IMPORT_FORMAT,
   ACCOUNT_IMPORT_MAX_RECORDS,
@@ -12,8 +12,8 @@ import {
   AccountImportAbortError,
   type AccountImportAdapter,
   type ValidatedAntigravityCredential,
-} from "../../src/oauth/account-import/types";
-import { getAccountSet, upsertCredentialByIdentity } from "../../src/oauth/store";
+} from "../../backend/src/oauth/account-import/types";
+import { getAccountSet, upsertCredentialByIdentity } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CANARY = "cockpit-canary-refresh-token-DO-NOT-LEAK";

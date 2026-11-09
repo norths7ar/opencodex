@@ -3,8 +3,8 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { countPendingOpencodexHistory } from "../../src/codex/history-provider";
-import { setStateDbPreflightOpenFailureForTests, type StateDbPreflightOpenPhase } from "../../src/codex/history-state-open";
+import { countPendingOpencodexHistory } from "../../backend/src/codex/history-provider";
+import { setStateDbPreflightOpenFailureForTests, type StateDbPreflightOpenPhase } from "../../backend/src/codex/history-state-open";
 
 const fixtures = new Set<string>();
 afterEach(() => {

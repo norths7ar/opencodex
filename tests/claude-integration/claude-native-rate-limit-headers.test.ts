@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import { anthropicRateLimitHeaders } from "../../src/server/anthropic-rate-limit-headers";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { anthropicRateLimitHeaders } from "../../backend/src/server/anthropic-rate-limit-headers";
+import type { OcxConfig } from "../../backend/src/types";
 
 const rateHeaders = {
   "Anthropic-Ratelimit-Unified-5h-Utilization": "0.35",

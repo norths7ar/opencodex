@@ -13,14 +13,14 @@
  */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import {
   readWindowsReplaceRetryCounters,
   renameAtomicFile,
   resetWindowsReplaceRetryCountersForTests,
   type ReplacePublisher,
-} from "../../src/lib/windows-atomic-replace";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/windows-atomic-replace";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(): OcxConfig {
   return {

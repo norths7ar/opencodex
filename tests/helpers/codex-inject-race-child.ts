@@ -9,8 +9,8 @@
  * Prints exactly one JSON line so the parent asserts on a typed result rather
  * than scraping logs.
  */
-import { injectCodexConfig } from "../../src/codex/inject";
-import { readConfigDiagnostics } from "../../src/config";
+import { injectCodexConfig } from "../../backend/src/codex/inject";
+import { readConfigDiagnostics } from "../../backend/src/config";
 
 const payload = JSON.parse(process.env.OCX_INJECT_RACE_PAYLOAD ?? "{}") as {
   port?: number;

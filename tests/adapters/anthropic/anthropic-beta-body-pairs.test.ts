@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { buildAnthropicMessagesPassthroughRequest } from "../../../src/adapters/anthropic/passthrough";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { allowlistAnthropicBetas } from "../../../src/adapters/anthropic/beta-allowlist";
-import { captureAnthropicClientIdentity } from "../../../src/adapters/anthropic/client-identity";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { buildAnthropicMessagesPassthroughRequest } from "../../../backend/src/adapters/anthropic/passthrough";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { allowlistAnthropicBetas } from "../../../backend/src/adapters/anthropic/beta-allowlist";
+import { captureAnthropicClientIdentity } from "../../../backend/src/adapters/anthropic/client-identity";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const BINDING = "thinking-binding-controls-2026-08-01";
 const CONTEXT = "context-management-2025-06-27";

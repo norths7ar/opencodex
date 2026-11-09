@@ -4,10 +4,10 @@ import {
   forbiddenToolCallMessage,
   GROK_FORBIDDEN_TOOL_CALL_REASON,
   GROK_REFUSED_TERMINAL_EVENT_TYPE,
-} from "../../src/server/grok-responses-snapshot-repair";
-import { rewriteRoutedCustomToolsForUpstream } from "../../src/responses/custom-tool-compat";
-import { rewriteRoutedNamespaceToolsForUpstream } from "../../src/responses/namespace-tool-compat";
-import type { RequestToolScopeCorrespondence } from "../../src/server/responses-request-tool-scope";
+} from "../../backend/src/server/grok-responses-snapshot-repair";
+import { rewriteRoutedCustomToolsForUpstream } from "../../backend/src/responses/custom-tool-compat";
+import { rewriteRoutedNamespaceToolsForUpstream } from "../../backend/src/responses/namespace-tool-compat";
+import type { RequestToolScopeCorrespondence } from "../../backend/src/server/responses-request-tool-scope";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function dataBlock(payload: unknown): string {

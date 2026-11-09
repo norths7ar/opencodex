@@ -10,13 +10,13 @@ import {
   resolveOpenAiCompactModel,
   resolveOpenAiVirtualModel,
   validateOpenAiVirtualModelDefinition,
-} from "../../../src/providers/openai-virtual-models";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../../src/server/adapter-resolve";
-import { loadConfig, saveConfig } from "../../../src/config";
-import { clearKeyCooldowns, rotateKeyOn429 } from "../../../src/providers/key-failover";
-import { startServer } from "../../../src/server";
-import { usageLogPath } from "../../../src/usage/log";
+} from "../../../backend/src/providers/openai-virtual-models";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../../backend/src/server/adapter-resolve";
+import { loadConfig, saveConfig } from "../../../backend/src/config";
+import { clearKeyCooldowns, rotateKeyOn429 } from "../../../backend/src/providers/key-failover";
+import { startServer } from "../../../backend/src/server";
+import { usageLogPath } from "../../../backend/src/usage/log";
 
 import { watchdogMs } from "../../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";

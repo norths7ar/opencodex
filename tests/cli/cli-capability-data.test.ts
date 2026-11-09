@@ -3,14 +3,14 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
-import * as facade from "../../src/cli/capabilities";
-import * as base from "../../src/cli/capabilities-base";
-import { PROVIDER_MODEL_CAPABILITIES } from "../../src/cli/capabilities-provider-models";
-import { ACCOUNT_CAPABILITIES } from "../../src/cli/capabilities-accounts";
-import { AGENT_ROUTING_CAPABILITIES } from "../../src/cli/capabilities-agents-routing";
-import { INTEGRATION_CAPABILITIES } from "../../src/cli/capabilities-integrations";
-import { OBSERVE_SYSTEM_CAPABILITIES } from "../../src/cli/capabilities-observe-system";
-import { ACCESS_REMOTE_CAPABILITIES } from "../../src/cli/capabilities-access-remote";
+import * as facade from "../../backend/src/cli/capabilities";
+import * as base from "../../backend/src/cli/capabilities-base";
+import { PROVIDER_MODEL_CAPABILITIES } from "../../backend/src/cli/capabilities-provider-models";
+import { ACCOUNT_CAPABILITIES } from "../../backend/src/cli/capabilities-accounts";
+import { AGENT_ROUTING_CAPABILITIES } from "../../backend/src/cli/capabilities-agents-routing";
+import { INTEGRATION_CAPABILITIES } from "../../backend/src/cli/capabilities-integrations";
+import { OBSERVE_SYSTEM_CAPABILITIES } from "../../backend/src/cli/capabilities-observe-system";
+import { ACCESS_REMOTE_CAPABILITIES } from "../../backend/src/cli/capabilities-access-remote";
 import { CAPABILITY_DATA_FILES, capabilityDataBoundary } from "../helpers/cli-capability-data";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -41,7 +41,7 @@ function checkFixture(changes: Record<string, string | undefined> = {}): string[
 
 describe("checked capability dependency boundary", () => {
   test("real graph and static type/value fixtures use the same predicate", () => {
-    expect(capabilityDataBoundary(repoPath("src", "cli"))).toEqual([]);
+    expect(capabilityDataBoundary(repoPath("backend/src", "cli"))).toEqual([]);
     expect(checkFixture()).toEqual([]);
     expect(checkFixture({
       "capabilities-base.ts": `import { type Capability as Row } from './capability-types.ts';
@@ -240,7 +240,7 @@ function discovery(mode: "absent" | "present" | "undefined" | "empty"): Discover
   // mutation, production injection seam, proxy, credentials or upstream are involved.
   const script = `
     globalThis.fetch = () => { throw new Error('discovery attempted HTTP'); };
-    const { CAPABILITIES, capabilityInvocation } = await import(${JSON.stringify(repoPath("src/cli/capabilities.ts"))});
+    const { CAPABILITIES, capabilityInvocation } = await import(${JSON.stringify(repoPath("backend/src/cli/capabilities.ts"))});
     for (const row of CAPABILITIES) delete row.usage;
     const target = CAPABILITIES.find(cap => cap.command.join(' ') === 'models set-price');
     if (!target) throw new Error('missing fixture leaf');
@@ -249,8 +249,8 @@ function discovery(mode: "absent" | "present" | "undefined" | "empty"): Discover
       value: mode === 'undefined' ? undefined : mode === 'empty' ? '' : ${JSON.stringify(completeUsage)},
       enumerable: true,
     });
-    const { runCapabilities } = await import(${JSON.stringify(repoPath("src/cli/capabilities-command.ts"))});
-    const { printSubcommandUsage } = await import(${JSON.stringify(repoPath("src/cli/help.ts"))});
+    const { runCapabilities } = await import(${JSON.stringify(repoPath("backend/src/cli/capabilities-command.ts"))});
+    const { printSubcommandUsage } = await import(${JSON.stringify(repoPath("backend/src/cli/help.ts"))});
     async function output(args) {
       const lines = [];
       const original = console.log;

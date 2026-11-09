@@ -3,8 +3,8 @@ import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpath
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BUN_RUNTIME_PATH_ENV, BUN_RUNTIME_SOURCE_ENV, isRealBunBinary, bundledBunPath, durableBunPath, durableBunRuntime, reportedBunRuntimeSource, withProcessRuntimeProvenance } from "../../src/lib/bun-runtime";
-import { findPathBun } from "../../src/lib/bun-path-runtime.mjs";
+import { BUN_RUNTIME_PATH_ENV, BUN_RUNTIME_SOURCE_ENV, isRealBunBinary, bundledBunPath, durableBunPath, durableBunRuntime, reportedBunRuntimeSource, withProcessRuntimeProvenance } from "../../backend/src/lib/bun-runtime";
+import { findPathBun } from "../../backend/src/lib/bun-path-runtime.mjs";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
@@ -97,7 +97,7 @@ describe("bundledBunPath / durableBunPath", () => {
     // Bun dotenv preserves backslashes in single quotes; JSON quoting doubles Windows separators.
     writeFileSync(join(root, ".env"), `OPENCODEX_BUN_PATH='${lateOverride}'\nOCX_BUN_RUNTIME_SOURCE=override\nOCX_BUN_RUNTIME_PATH='${lateOverride}'\nOCX_PATH_DOTENV_LOADED=yes\n`);
     const script = join(root, "consumer.ts");
-    writeFileSync(script, `import {durableBunRuntime,reportedBunRuntimeSource} from ${JSON.stringify(repoPath("src/lib/bun-runtime.ts"))};\nconsole.log(JSON.stringify({runtime:durableBunRuntime(),reported:reportedBunRuntimeSource(),dotenv:process.env.OCX_PATH_DOTENV_LOADED,override:process.env.OPENCODEX_BUN_PATH}));`);
+    writeFileSync(script, `import {durableBunRuntime,reportedBunRuntimeSource} from ${JSON.stringify(repoPath("backend/src/lib/bun-runtime.ts"))};\nconsole.log(JSON.stringify({runtime:durableBunRuntime(),reported:reportedBunRuntimeSource(),dotenv:process.env.OCX_PATH_DOTENV_LOADED,override:process.env.OPENCODEX_BUN_PATH}));`);
     const result = spawnSync(selected!.path, [script], {
       cwd: root, encoding: "utf8", timeout: 30_000, windowsHide: true,
       env: { ...env, [BUN_RUNTIME_SOURCE_ENV]: "process", [BUN_RUNTIME_PATH_ENV]: selected!.path },
@@ -295,11 +295,11 @@ describe("withProcessRuntimeProvenance (execPath relaunch paths)", () => {
     // A launcher added later that copies process.env directly would silently drop
     // provenance again, so the launch sites are pinned here rather than left to review.
     const launchers = [
-      "src/cli/index.ts",
-      "src/cli/claude.ts",
-      "src/cli/opencode.ts",
+      "backend/src/cli/index.ts",
+      "backend/src/cli/claude.ts",
+      "backend/src/cli/opencode.ts",
       // The drain-and-restart and the client recycle both spawn their replacement here.
-      "src/server/restart-replacement.ts",
+      "backend/src/server/restart-replacement.ts",
       "src/update/index.ts",
     ];
     for (const relative of launchers) {
@@ -310,7 +310,7 @@ describe("withProcessRuntimeProvenance (execPath relaunch paths)", () => {
       const preparedStampCount = relative === "src/update/index.ts"
         ? (text.match(/const runtimeEnv = withProcessRuntimeProvenance\(env\);/g) ?? []).length : 0;
       if (preparedStampCount > 0) expect(text.match(/env: runtimeEnv\b/g)).toHaveLength(preparedStampCount);
-      const detachedStartStampCount = relative === "src/cli/index.ts"
+      const detachedStartStampCount = relative === "backend/src/cli/index.ts"
         ? (text.match(/env: detachedStartEnvironment\(\)/g) ?? []).length
         : 0;
       if (detachedStartStampCount > 0) {

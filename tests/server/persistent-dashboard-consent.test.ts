@@ -4,16 +4,16 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { remoteConfig } from "../helpers/management-auth-fixture";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
 import {
   createManagementSessionControl, initializeManagementAuthState, issueGuiSession,
   managementPrincipal, managementSessionIssuance, requireManagementAuth,
-} from "../../src/server/management-auth";
-import { MANAGEMENT_ROUTES } from "../../src/server/management/route-registry";
-import { trustedLoopbackForIngress } from "../../src/server/index/serve-options";
-import * as jobs from "../../src/codex/cli-update-job";
-import * as workers from "../../src/codex/cli-update-job-worker";
-import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../src/server/gui-session";
+} from "../../backend/src/server/management-auth";
+import { MANAGEMENT_ROUTES } from "../../backend/src/server/management/route-registry";
+import { trustedLoopbackForIngress } from "../../backend/src/server/index/serve-options";
+import * as jobs from "../../backend/src/codex/cli-update-job";
+import * as workers from "../../backend/src/codex/cli-update-job-worker";
+import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../backend/src/server/gui-session";
 
 const ORIGIN = "http://127.0.0.1:10100";
 const ADMIN = "ocx_admin_consent_fixture";

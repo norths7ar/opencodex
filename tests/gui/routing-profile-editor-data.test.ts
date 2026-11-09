@@ -9,7 +9,7 @@ import {
   routingProfileResponseError,
   routingProfileResponseSucceeded,
   type RoutingProfileDto,
-} from "../../gui/src/routing-profile-editor-data";
+} from "../../frontend/src/routing-profile-editor-data";
 
 const profile: RoutingProfileDto = {
   id: "fast",

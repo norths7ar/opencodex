@@ -4,13 +4,13 @@ import { mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFileSync } from
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { codexLogGuardLockDigest } from "../../src/codex/log-guard/lock";
-import { sameLogGuardPathIdentity } from "../../src/codex/log-guard/path-safety";
+import { codexLogGuardLockDigest } from "../../backend/src/codex/log-guard/lock";
+import { sameLogGuardPathIdentity } from "../../backend/src/codex/log-guard/path-safety";
 import {
   getCodexLogGuardProtectionStatus,
   protectCodexLogs,
   unprotectCodexLogs,
-} from "../../src/codex/log-guard/protection";
+} from "../../backend/src/codex/log-guard/protection";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

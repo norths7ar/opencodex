@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 // Only fixture-owned Bun processes load this file through their private bunfig.
 // Keep the published CLI and update worker real; replace only their process view.
 if (Bun.isMainThread) {
-  const workerModule = await import("../../src/lib/worker-embed");
+  const workerModule = await import("../../backend/src/lib/worker-embed");
   const spawnOriginal = workerModule.spawnWorker;
   mock.module(import.meta.resolve("../../src/lib/worker-embed"), () => ({
     ...workerModule,
@@ -15,7 +15,7 @@ if (Bun.isMainThread) {
       : spawnOriginal(url, key),
   }));
 } else {
-  const processModule = await import("../../src/codex/app-server-processes");
+  const processModule = await import("../../backend/src/codex/app-server-processes");
   const scanOriginal = processModule.scanCodexSessionProcesses;
   const scanAsyncOriginal = processModule.scanCodexSessionProcessesAsync;
   let index = 0;

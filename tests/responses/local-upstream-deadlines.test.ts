@@ -1,19 +1,19 @@
 import { expect, spyOn, test } from "bun:test";
-import { fetchWithHeaderTimeout } from "../../src/server/responses/fetch-helpers";
-import { fetchWithHeaderDeadline } from "../../src/server/claude-messages";
-import { clearableDeadline } from "../../src/lib/abort";
-import { readBoundedResponseBody } from "../../src/lib/bounded-body";
-import { isLocalUpstream } from "../../src/lib/local-upstream";
-import { resolveConnectTimeoutMs, resolveJsonBodyReadTimeoutMs } from "../../src/stall-timeout";
-import { handleResponsesCompact } from "../../src/server/responses";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig } from "../../src/types";
-import { saveConfig } from "../../src/config";
-import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../src/providers/request-pacing";
+import { fetchWithHeaderTimeout } from "../../backend/src/server/responses/fetch-helpers";
+import { fetchWithHeaderDeadline } from "../../backend/src/server/claude-messages";
+import { clearableDeadline } from "../../backend/src/lib/abort";
+import { readBoundedResponseBody } from "../../backend/src/lib/bounded-body";
+import { isLocalUpstream } from "../../backend/src/lib/local-upstream";
+import { resolveConnectTimeoutMs, resolveJsonBodyReadTimeoutMs } from "../../backend/src/stall-timeout";
+import { handleResponsesCompact } from "../../backend/src/server/responses";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig } from "../../backend/src/types";
+import { saveConfig } from "../../backend/src/config";
+import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../backend/src/providers/request-pacing";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { compactionRequest, keyProviderConfig } from "../helpers/compaction-routing-fixtures";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
 
 // Advance only the policy's clock, without a 200-second sleep or host-speed assumptions.
 function clockAt(ms: number) {

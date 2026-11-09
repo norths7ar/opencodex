@@ -22,13 +22,13 @@ import { fileURLToPath } from "node:url";
 import {
   remoteHubConfigNote,
   remoteHubConnectionFromTokenState,
-} from "../../src/cli/config-command";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/cli/config-command";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 const isolatedCodexHome = mkdtempSync(join(tmpdir(), "ocx-config-client-codex-"));
 const CLI_CHILD_DEADLINE_MS = SPAWN_BUDGET_MS - 5_000;
 

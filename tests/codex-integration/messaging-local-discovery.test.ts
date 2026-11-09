@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { MessageBudget } from "../../src/messaging/budget";
-import { discoverLoaded, resolveLoaded } from "../../src/messaging/discovery";
-import { LocalMessageRpc } from "../../src/messaging/rpc";
+import { MessageBudget } from "../../backend/src/messaging/budget";
+import { discoverLoaded, resolveLoaded } from "../../backend/src/messaging/discovery";
+import { LocalMessageRpc } from "../../backend/src/messaging/rpc";
 import { LOCAL_OTHER, LOCAL_TARGET, localFixtureThread, localMessagingFixture } from "../helpers/messaging-local";
 
 describe.skipIf(process.platform === "win32")("local Codex discovery", () => {

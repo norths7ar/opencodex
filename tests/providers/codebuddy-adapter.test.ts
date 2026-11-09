@@ -3,10 +3,10 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { EventEmitter } from "node:events";
 import { Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { buildArgs, buildChildEnv, createCodeBuddyAdapter, type SpawnFn } from "../../src/adapters/codebuddy/adapter";
-import { guardCodeBuddyScaffolding } from "../../src/adapters/codebuddy/scaffold-guard";
-import { CODEBUDDY_CN_PROFILE, CODEBUDDY_GLOBAL_PROFILE, clearCodeBuddyBinaryCache } from "../../src/adapters/codebuddy/profiles";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { buildArgs, buildChildEnv, createCodeBuddyAdapter, type SpawnFn } from "../../backend/src/adapters/codebuddy/adapter";
+import { guardCodeBuddyScaffolding } from "../../backend/src/adapters/codebuddy/scaffold-guard";
+import { CODEBUDDY_CN_PROFILE, CODEBUDDY_GLOBAL_PROFILE, clearCodeBuddyBinaryCache } from "../../backend/src/adapters/codebuddy/profiles";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const enc = new TextEncoder();

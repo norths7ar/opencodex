@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { effortRowId } from "../../src/server/effort-row";
-import { clearHealthHistoryCacheForTests } from "../../src/routing/health";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { effortRowId } from "../../backend/src/server/effort-row";
+import { clearHealthHistoryCacheForTests } from "../../backend/src/routing/health";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

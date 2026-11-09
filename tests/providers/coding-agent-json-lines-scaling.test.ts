@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { CodingAgentProtocolError, CodingAgentStreamLimitError, readJsonLines } from "../../src/adapters/coding-agent/protocol";
+import { CodingAgentProtocolError, CodingAgentStreamLimitError, readJsonLines } from "../../backend/src/adapters/coding-agent/protocol";
 
 async function* chunks(bytes: Uint8Array, width = 1) {
   for (let offset = 0; offset < bytes.length; offset += width) yield bytes.subarray(offset, offset + width);

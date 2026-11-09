@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { buildKiroPayload } from "../../../src/adapters/kiro/payload";
-import { kiroNativeEffortField } from "../../../src/adapters/kiro/reasoning";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../../src/bridge";
-import { parseRequest } from "../../../src/responses/parser";
-import { decodeReasoningEnvelope } from "../../../src/responses/reasoning-envelope";
-import type { AdapterEvent } from "../../../src/types";
-import type { OcxProviderConfig } from "../../../src/types";
-import { createKiroAdapter as createKiroAdapterProduction } from "../../../src/adapters/kiro";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
+import { buildKiroPayload } from "../../../backend/src/adapters/kiro/payload";
+import { kiroNativeEffortField } from "../../../backend/src/adapters/kiro/reasoning";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../../backend/src/bridge";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { decodeReasoningEnvelope } from "../../../backend/src/responses/reasoning-envelope";
+import type { AdapterEvent } from "../../../backend/src/types";
+import type { OcxProviderConfig } from "../../../backend/src/types";
+import { createKiroAdapter as createKiroAdapterProduction } from "../../../backend/src/adapters/kiro";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const BLOB = "LktUUn5+ZXlKbGJtTnllWEIwYVc5dVVtVm5hVzl1SWpvaQ==";

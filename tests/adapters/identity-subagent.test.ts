@@ -8,13 +8,13 @@ import {
   repairIdentityInResponsesBody,
   repairRoutedIdentity,
   stripRoutedIdentity,
-} from "../../src/adapters/identity";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxConfig, OcxProviderConfig, OcxTextContent } from "../../src/types";
-import { handleResponses } from "../../src/server/responses/core";
-import type { RequestLogContext } from "../../src/server/request-log";
+} from "../../backend/src/adapters/identity";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxConfig, OcxProviderConfig, OcxTextContent } from "../../backend/src/types";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

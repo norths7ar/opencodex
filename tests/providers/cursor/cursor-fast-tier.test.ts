@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { cursorFastCapableBases, upgradeToFast } from "../../../src/adapters/cursor/catalog";
-import { createCursorRequest, cursorRequestEmitsFastVariant } from "../../../src/adapters/cursor/request-builder";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { decideTier } from "../../../src/providers/fastwire";
-import { fastPolicyForModel, serviceTierSupportFromPolicy } from "../../../src/providers/service-tier";
-import type { OcxParsedRequest, TierDecision } from "../../../src/types";
+import { cursorFastCapableBases, upgradeToFast } from "../../../backend/src/adapters/cursor/catalog";
+import { createCursorRequest, cursorRequestEmitsFastVariant } from "../../../backend/src/adapters/cursor/request-builder";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { decideTier } from "../../../backend/src/providers/fastwire";
+import { fastPolicyForModel, serviceTierSupportFromPolicy } from "../../../backend/src/providers/service-tier";
+import type { OcxParsedRequest, TierDecision } from "../../../backend/src/types";
 
 const FAST_DECISION: TierDecision = { kind: "set", value: "fast" };
 

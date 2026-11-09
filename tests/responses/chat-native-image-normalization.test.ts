@@ -17,14 +17,14 @@ import {
   chatBodyCarriesImage,
   chatImageUrlFromPart,
   normalizeChatImageParts,
-} from "../../src/chat/image-parts";
-import { isNativeChatRouteEligible } from "../../src/server/chat-native";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
+} from "../../backend/src/chat/image-parts";
+import { isNativeChatRouteEligible } from "../../backend/src/server/chat-native";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import type { OcxProviderConfig } from "../../src/types";
-import type { RouteResult } from "../../src/router";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import type { RouteResult } from "../../backend/src/router";
 
 const PNG = "iVBORw0KGgoAAAANSUhEUg==";
 

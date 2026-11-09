@@ -3,13 +3,13 @@ import { chmodSync, mkdirSync, mkdtempSync, realpathSync, rmSync, statSync, syml
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { execFileSync, spawnSync } from "node:child_process";
-import { resetOptionalShutdownHooksForTests, runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
-import { loadOcxPlugins, macAclListingTrustError, macAclProbeTrustError, pluginDirectoryTrustError, pluginFileTrustError, setPluginAclInspectorForTests } from "../../src/plugins/loader";
+import { resetOptionalShutdownHooksForTests, runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
+import { loadOcxPlugins, macAclListingTrustError, macAclProbeTrustError, pluginDirectoryTrustError, pluginFileTrustError, setPluginAclInspectorForTests } from "../../backend/src/plugins/loader";
 import {
   hasUpstreamRewriters,
   resetUpstreamRewritersForTests,
   rewriteUpstream,
-} from "../../src/plugins/upstream-hooks";
+} from "../../backend/src/plugins/upstream-hooks";
 
 let dir: string;
 const linuxAclToolsAvailable = process.platform === "linux"

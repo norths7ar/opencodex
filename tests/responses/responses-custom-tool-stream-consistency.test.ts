@@ -1,11 +1,11 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import * as patchEnvelope from "../../src/responses/apply-patch-envelope";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import * as patchEnvelope from "../../backend/src/responses/apply-patch-envelope";
+import type { AdapterEvent } from "../../backend/src/types";
 import {
   createRoutedCustomToolRestoreBlockRewrite,
   RoutedCustomToolProgressError,
-} from "../../src/server/responses-custom-tool-repair";
+} from "../../backend/src/server/responses-custom-tool-repair";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function dataPayload(block: string): Record<string, unknown> {

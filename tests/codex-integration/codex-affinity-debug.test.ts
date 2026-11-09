@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
   captureCodexAffinityDiagnostic,
   CODEX_AFFINITY_DEBUG_SAFE_HEADERS,
-} from "../../src/codex/affinity-debug";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../src/lib/debug-settings";
+} from "../../backend/src/codex/affinity-debug";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../backend/src/lib/debug-settings";
 
 function diagnosticPayload(): Record<string, unknown> {
   const line = getDebugLogEntries().at(-1)?.line ?? "";

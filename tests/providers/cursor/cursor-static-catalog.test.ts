@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildCatalogEntries, gatherRoutedModels } from "../../../src/codex/catalog";
+import { buildCatalogEntries, gatherRoutedModels } from "../../../backend/src/codex/catalog";
 import {
   CURSOR_STATIC_MODELS,
   cursorModelContextWindows,
   cursorModelIds,
   cursorModelInputModalities,
   cursorModelReasoningEfforts,
-} from "../../../src/adapters/cursor/discovery";
-import { cursorModelHasEffortTiers } from "../../../src/adapters/cursor/effort-map";
-import { clearModelCache } from "../../../src/codex/model-cache";
+} from "../../../backend/src/adapters/cursor/discovery";
+import { cursorModelHasEffortTiers } from "../../../backend/src/adapters/cursor/effort-map";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
 
 const originalFetch = globalThis.fetch;
 
@@ -125,8 +125,8 @@ describe("Opus Fast catalog families (devlog 300, live-verified 260822)", () => 
   // Umbrella merge (devlog 260828): the -fast rows folded into their bases.
   // The alias path still resolves them with the exact live-verified ladders.
   test("fast rows folded into bases; aliases keep resolving with tier semantics", async () => {
-    const { CURSOR_STATIC_MODELS } = await import("../../../src/adapters/cursor/discovery");
-    const { resolveCursorSelection } = await import("../../../src/adapters/cursor/catalog");
+    const { CURSOR_STATIC_MODELS } = await import("../../../backend/src/adapters/cursor/discovery");
+    const { resolveCursorSelection } = await import("../../../backend/src/adapters/cursor/catalog");
     for (const id of ["claude-opus-4-7-fast", "claude-opus-4-8-fast", "claude-opus-5-fast"]) {
       expect(CURSOR_STATIC_MODELS.some(model => model.id === id)).toBe(false);
       // Alias never sends a bare -fast id (not_found on the wire).
@@ -136,14 +136,14 @@ describe("Opus Fast catalog families (devlog 300, live-verified 260822)", () => 
   });
 
   test("tier ladders match the 260822 GetUsableModels dump", async () => {
-    const { cursorModelEffortLadder } = await import("../../../src/adapters/cursor/effort-map");
+    const { cursorModelEffortLadder } = await import("../../../backend/src/adapters/cursor/effort-map");
     expect(cursorModelEffortLadder("claude-opus-4-7-fast")).toEqual(["low", "medium", "high", "xhigh", "max"]);
     expect(cursorModelEffortLadder("claude-opus-4-8-fast")).toEqual(["low", "medium", "high", "xhigh", "max"]);
     expect(cursorModelEffortLadder("claude-opus-5-fast")).toEqual(["low", "medium", "high"]);
   });
 
   test("wire-id derivation produces the live-verified suffixed forms and never a bare -fast id", async () => {
-    const { cursorWireModelIdWithEffort, cursorEffortSuffix } = await import("../../../src/adapters/cursor/effort-map");
+    const { cursorWireModelIdWithEffort, cursorEffortSuffix } = await import("../../../backend/src/adapters/cursor/effort-map");
     expect(cursorWireModelIdWithEffort("claude-opus-4-8-fast", "high")).toBe("claude-opus-4-8-high-fast");
     expect(cursorWireModelIdWithEffort("claude-opus-5-fast", "medium")).toBe("claude-opus-5-medium-fast");
     expect(cursorWireModelIdWithEffort("claude-opus-4-7-fast", "max")).toBe("claude-opus-4-7-max-fast");

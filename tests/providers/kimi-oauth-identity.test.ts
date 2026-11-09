@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
-import { identityFromKimiTokens, refreshKimiToken } from "../../src/oauth/kimi";
-import { getCredential, listAccounts, saveCredential } from "../../src/oauth/store";
+import { identityFromKimiTokens, refreshKimiToken } from "../../backend/src/oauth/kimi";
+import { getCredential, listAccounts, saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-kimi-oauth-identity-test");

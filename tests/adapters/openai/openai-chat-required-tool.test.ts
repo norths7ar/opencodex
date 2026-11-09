@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { withRequiredChatToolResult } from "../../../src/adapters/openai-chat/required-tool-result";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { withRequiredChatToolResult } from "../../../backend/src/adapters/openai-chat/required-tool-result";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxToolChoice } from "../../../src/types";
+import type { AdapterEvent, OcxParsedRequest, OcxToolChoice } from "../../../backend/src/types";
 
 const usage = { prompt_tokens: 7, completion_tokens: 2, total_tokens: 9 };
 const tools = Array.from({ length: 151 }, (_, i) => ({ name: `marker_${i}`, description: "Synthetic marker", parameters: { type: "object", properties: {} } }));

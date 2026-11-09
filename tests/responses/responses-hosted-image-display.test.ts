@@ -6,7 +6,7 @@ import { isAbsolute } from "node:path";
 import { beforeEach, afterEach } from "bun:test";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { item } from "../fixtures/hosted-image-display";
-import { createHostedImageDisplayRewrite as factory, isLocalCodexImageClient, redactHostedImageDisplayPaths } from "../../src/server/responses-hosted-image-display";
+import { createHostedImageDisplayRewrite as factory, isLocalCodexImageClient, redactHostedImageDisplayPaths } from "../../backend/src/server/responses-hosted-image-display";
 let home: TempHome;
 beforeEach(() => { home = createTempHome("hosted-image-display-"); });
 afterEach(() => { home.remove(); });

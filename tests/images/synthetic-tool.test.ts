@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isImageGenName, extractHostedImageGeneration, buildImageTool } from "../../src/images/synthetic-tool";
+import { isImageGenName, extractHostedImageGeneration, buildImageTool } from "../../backend/src/images/synthetic-tool";
 
 describe("isImageGenName", () => {
   test("'image_gen' → true", () => {

@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { KIRO_COMPLETION_TOOL_NAME } from "../../../src/adapters/kiro-constants";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { buildResponseJSON } from "../../../src/bridge";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createTranslatorBudget, releaseTranslatedEvent } from "../../../src/lib/translator-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { KIRO_COMPLETION_TOOL_NAME } from "../../../backend/src/adapters/kiro-constants";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createTranslatorBudget, releaseTranslatedEvent } from "../../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * The model can send a real tool call and the private final-answer call in one turn, because the

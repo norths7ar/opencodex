@@ -4,7 +4,7 @@
  * in-process console capture the rest of the CLI suite uses — the code and the
  * verification URL have to be read from a real piped stdout.
  */
-import { cmdAccount, type AccountDeps } from "../../src/cli/account";
+import { cmdAccount, type AccountDeps } from "../../backend/src/cli/account";
 
 const server = Bun.serve({
   hostname: "127.0.0.1",

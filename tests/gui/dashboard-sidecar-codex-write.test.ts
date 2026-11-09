@@ -7,7 +7,7 @@
  * that leaves the switch alone, which is most of them.
  */
 import { expect, test } from "bun:test";
-import { nextSidecarCodexApply, sidecarCodexWritePending } from "../../gui/src/pages/dashboard-shared";
+import { nextSidecarCodexApply, sidecarCodexWritePending } from "../../frontend/src/pages/dashboard-shared";
 
 test("a refused Codex-config write is reported as pending, whatever the reason", () => {
   expect(sidecarCodexWritePending({ applied: false, reason: "write_lock_busy", retryable: true })).toBe(true);

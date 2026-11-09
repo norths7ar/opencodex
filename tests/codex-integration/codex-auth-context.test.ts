@@ -27,7 +27,7 @@ import {
   releaseCodexAuthContextProbeLease,
   shouldMarkAccountNeedsReauthForCodexAuthFailure,
   stripCodexRuntimeProviderFields,
-} from "../../src/codex/auth-context";
+} from "../../backend/src/codex/auth-context";
 import {
   CodexCredentialGenerationConflictError,
   CodexCredentialRefreshLockTimeoutError,
@@ -38,27 +38,27 @@ import {
   readCodexAccountRecord,
   removeCodexAccountCredential,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
-import { ConfigMutationLockError, getConfigPath } from "../../src/config";
+} from "../../backend/src/codex/account-store";
+import { ConfigMutationLockError, getConfigPath } from "../../backend/src/config";
 import {
   getMainAccountPlan,
   MAIN_CODEX_ACCOUNT_ID,
   setMainAccountPlan,
-} from "../../src/codex/main-account";
+} from "../../backend/src/codex/main-account";
 import {
   clearMainAccountInfoCache,
   observeMainQuotaCredential,
   observeMainQuotaIdentity,
-} from "../../src/codex/main-account-cache";
+} from "../../backend/src/codex/main-account-cache";
 import {
   clearAccountNeedsReauth,
   clearAccountQuota,
   isAccountNeedsReauth,
   markAccountNeedsReauth,
   setAccountQuotaFromParsed,
-} from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { __resetGuardianState, guardianSweep } from "../../src/oauth/token-guardian";
+} from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { __resetGuardianState, guardianSweep } from "../../backend/src/oauth/token-guardian";
 import {
   CODEX_THREAD_AFFINITY_IDLE_TTL_MS,
   CODEX_QUOTA_PROBE_INTERVAL_MS,
@@ -67,25 +67,25 @@ import {
   getCodexQuotaHealthSnapshot,
   recordCodexUpstreamOutcome,
   resetCodexRoutingForManualSelection,
-} from "../../src/codex/routing";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/routing";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import {
   blockNativeMainStartupForUnownedServiceHome,
   completeNativeMainRecovery,
   initializeNativeMainStartupGate,
-} from "../../src/codex/native-profile-startup";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
+} from "../../backend/src/codex/native-profile-startup";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import {
   acquireNativeMainProfileDrain,
   codexAccountSelectionForTurn,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
-import type { CodexModelEntitlementSnapshot } from "../../src/codex/model-entitlements";
-import { recordContextSessionOwner, clearContextSessionOwnersForTests } from "../../src/codex/context-owner";
-import { handleContextHistory } from "../../src/server/context-history";
-import { resetContextRelayActivationForTests } from "../../src/codex/context-compat";
-import { hasForwardableCodexBearer } from "../../src/server/auth-cors";
+} from "../../backend/src/server/lifecycle";
+import type { CodexModelEntitlementSnapshot } from "../../backend/src/codex/model-entitlements";
+import { recordContextSessionOwner, clearContextSessionOwnersForTests } from "../../backend/src/codex/context-owner";
+import { handleContextHistory } from "../../backend/src/server/context-history";
+import { resetContextRelayActivationForTests } from "../../backend/src/codex/context-compat";
+import { hasForwardableCodexBearer } from "../../backend/src/server/auth-cors";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 
 let testDir: string;
@@ -2194,7 +2194,7 @@ describe("Codex auth context", () => {
     ["busy", new CodexCredentialRefreshBusyError()],
     ["stale", new CodexCredentialRefreshStaleError()],
   ])("login returns a retryable response for a %s credential refresh failure", async (_kind, refreshError) => {
-    const oauth = await import("../../src/oauth");
+    const oauth = await import("../../backend/src/oauth");
     const startLogin = spyOn(oauth, "startLoginFlow").mockRejectedValue(refreshError);
     const cfg = config();
     try {

@@ -3,13 +3,13 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { constants, createHash, createPublicKey, publicEncrypt } from "node:crypto";
-import { createZedAdapter, zedEventStream, type ZedProvider } from "../../src/adapters/zed";
-import { translateZedOpenAiStream } from "../../src/adapters/zed-openai-stream";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { releaseCompactionCiphertextLease } from "../../src/responses/compaction";
-import { setIcaclsRunnerForTests, resetHardenedStateForTests } from "../../src/lib/windows-secret-acl";
-import { getValidAccessTokenSnapshot } from "../../src/oauth";
-import { saveCredential } from "../../src/oauth/store";
+import { createZedAdapter, zedEventStream, type ZedProvider } from "../../backend/src/adapters/zed";
+import { translateZedOpenAiStream } from "../../backend/src/adapters/zed-openai-stream";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { releaseCompactionCiphertextLease } from "../../backend/src/responses/compaction";
+import { setIcaclsRunnerForTests, resetHardenedStateForTests } from "../../backend/src/lib/windows-secret-acl";
+import { getValidAccessTokenSnapshot } from "../../backend/src/oauth";
+import { saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import {
@@ -22,13 +22,13 @@ import {
   resolveZedOrganizationId,
   scrubZedCredentials,
   zedLlmFetch,
-} from "../../src/providers/zed";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxProviderConfig } from "../../src/types";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
+} from "../../backend/src/providers/zed";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
 
 const originalFetch = globalThis.fetch;
 

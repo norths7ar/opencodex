@@ -2,15 +2,15 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { findAvailablePort } from "../../src/server/ports";
+import { findAvailablePort } from "../../backend/src/server/ports";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 import { randomBytes } from "node:crypto";
 import { createGuiPairCapability, GUI_PAIR_BROWSER_ORIGIN_HEADER, GUI_PAIR_CAPABILITY_HEADER,
-  GUI_PAIR_EXPECTED_PID_HEADER, GUI_PAIR_EXPIRES_AT_HEADER, GUI_PAIR_NONCE_HEADER, GUI_PAIR_PATH } from "../../src/lib/gui-pair-capability";
-import { GUI_PAIR_INTENT_HEADER } from "../../src/lib/gui-pair-intent";
+  GUI_PAIR_EXPECTED_PID_HEADER, GUI_PAIR_EXPIRES_AT_HEADER, GUI_PAIR_NONCE_HEADER, GUI_PAIR_PATH } from "../../backend/src/lib/gui-pair-capability";
+import { GUI_PAIR_INTENT_HEADER } from "../../backend/src/lib/gui-pair-intent";
 
 const DEADLINE = watchdogMs(30_000);
 
@@ -128,7 +128,7 @@ describe("standalone CLI pairing", () => {
   // Both children run src/cli/index.ts, whose start path loads the whole server graph. On a cold
   // Windows runner that load took most of the readiness watchdog; pay it here, not in the case.
   beforeAll(async () => {
-    await warmModuleGraph({ graph: "cli-index/gui-pair-http", entry: repoPath("src/cli/index.ts") });
+    await warmModuleGraph({ graph: "cli-index/gui-pair-http", entry: repoPath("backend/src/cli/index.ts") });
   }, COLD_SPAWN_WARMUP_HOOK_BUDGET_MS);
 
   test("standalone CLI pairing crosses real HTTP admission once and stops before SSH", async () => {
@@ -171,7 +171,7 @@ describe("standalone CLI pairing", () => {
         clientIntegrations: { codex: false, grok: false, "claude-desktop": false },
         claudeCode: { enabled: false },
       }));
-      const server = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start", "--port", String(port)], {
+      const server = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "start", "--port", String(port)], {
         cwd: root, env,
         stdin: "ignore", stdout: "ignore", stderr: "ignore",
       });
@@ -248,7 +248,7 @@ describe("standalone CLI pairing", () => {
       }
       await expectStatus(ordinary, false);
 
-      const mint = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "gui", "pair", "--origin", origin, "--json"], {
+      const mint = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "gui", "pair", "--origin", origin, "--json"], {
         cwd: root, env, stdin: "ignore", stdout: "pipe", stderr: "pipe",
       });
       children.add(mint);

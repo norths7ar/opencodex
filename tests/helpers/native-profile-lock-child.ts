@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync } from "node:fs";
 
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
 
 const codexHome = process.env.NATIVE_PROFILE_TEST_CODEX_HOME;
 const configDir = process.env.NATIVE_PROFILE_TEST_CONFIG_DIR;

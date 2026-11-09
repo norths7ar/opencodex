@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../src/codex/routing";
-import { resetDebugLogBufferForTests } from "../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests } from "../../src/lib/debug-settings";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { resetDebugLogBufferForTests } from "../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests } from "../../backend/src/lib/debug-settings";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { createPoolRetryHarness } from "../helpers/codex-pool-retry";

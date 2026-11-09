@@ -6,20 +6,20 @@ import {
   type DesktopSystemProxyAssessment,
   type DesktopSystemProxyDeps,
   type DesktopSystemProxyInput,
-} from "../../src/claude/desktop-system-proxy";
+} from "../../backend/src/claude/desktop-system-proxy";
 import {
   parseWindowsAutoDetect,
   parseWindowsProxyServer,
   readWindowsProxyBypassRegistry,
   windowsProxyOverrideBypasses,
   type WindowsProxyBypassValues,
-} from "../../src/lib/windows-system-proxy";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/windows-system-proxy";
+import type { OcxConfig } from "../../backend/src/types";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { inspectDesktopPickerProfile } from "../../src/claude/desktop-picker-profile";
-import { startConnectProxy } from "../../src/claude/intercept/connect-proxy";
+import { inspectDesktopPickerProfile } from "../../backend/src/claude/desktop-picker-profile";
+import { startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
 
 const CLASH = parseWindowsProxyServer("127.0.0.1:7897");
 const CLASH_BYPASS = "localhost;127.*;192.168.*;10.*;<local>";

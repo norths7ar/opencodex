@@ -16,32 +16,32 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { drainAndShutdown } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
-import { endStorageMutation, getActiveStorageMutation, tryBeginStorageMutation } from "../../src/storage/storage-mutation-coordinator";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { drainAndShutdown } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
+import { endStorageMutation, getActiveStorageMutation, tryBeginStorageMutation } from "../../backend/src/storage/storage-mutation-coordinator";
 import {
   resetArchivedCleanupJobForTests,
   setArchivedCleanupJobTestHooks,
-} from "../../src/storage/cleanup-job";
+} from "../../backend/src/storage/cleanup-job";
 import {
   resetStorageCleanupPolicyJobForTestsAsync,
   setStorageCleanupPolicyJobTestHooks,
-} from "../../src/storage/policy-job";
-import { stopStorageCleanupScheduler } from "../../src/storage/policy-scheduler";
+} from "../../backend/src/storage/policy-job";
+import { stopStorageCleanupScheduler } from "../../backend/src/storage/policy-scheduler";
 import {
   resetRestoreTrashJobForTestsAsync,
   runRestoreTrashEntryJob,
   setRestoreTrashJobTestHooks,
-} from "../../src/storage/restore-job";
+} from "../../backend/src/storage/restore-job";
 import {
   resetStorageMutationCoordinatorForTests,
-} from "../../src/storage/storage-mutation-coordinator";
+} from "../../backend/src/storage/storage-mutation-coordinator";
 import {
   cancelQueuedStorageWorkerSpawns,
   drainStorageWorkers,
-} from "../../src/storage/worker-lifecycle";
+} from "../../backend/src/storage/worker-lifecycle";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 

@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import { chatCompletionsToResponsesBody } from "../../../src/chat/inbound";
-import { parseRequest } from "../../../src/responses/parser";
-import { anthropicToResponsesBody } from "../../../src/claude/inbound";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import { chatCompletionsToResponsesBody } from "../../../backend/src/chat/inbound";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { anthropicToResponsesBody } from "../../../backend/src/claude/inbound";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

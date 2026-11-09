@@ -2,8 +2,8 @@ import { describe, test } from "bun:test";
 import assert from "node:assert/strict";
 import { constants as zlibConstants, createDeflate, createGzip } from "node:zlib";
 import { createServer, type AddressInfo, type Socket } from "node:net";
-import { createUploadWaiter } from "../../src/lib/socks5-upload-waiter";
-import { socks5Fetch } from "../../src/lib/socks5-fetch";
+import { createUploadWaiter } from "../../backend/src/lib/socks5-upload-waiter";
+import { socks5Fetch } from "../../backend/src/lib/socks5-fetch";
 
 const CONNECT_TIMEOUT_MS = 30_000;
 type Failure = "deadline" | "abort" | "null-abort" | "close" | "invalid-tls";

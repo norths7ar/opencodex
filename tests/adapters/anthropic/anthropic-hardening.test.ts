@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import { AnthropicTokenError, refreshAnthropicToken } from "../../../src/oauth/anthropic";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import { AnthropicTokenError, refreshAnthropicToken } from "../../../backend/src/oauth/anthropic";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });

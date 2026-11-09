@@ -18,12 +18,12 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildResponseJSON } from "../../src/bridge";
-import { createCursorRequest } from "../../src/adapters/cursor/request-builder";
-import { createCursorContextUsageTracker } from "../../src/adapters/cursor/protobuf-events";
-import { parseRequest } from "../../src/responses/parser";
-import { mergeProviderContinuationPayload } from "../../src/responses/provider-continuation";
-import { createSseInspector } from "../../src/server/relay";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { createCursorRequest } from "../../backend/src/adapters/cursor/request-builder";
+import { createCursorContextUsageTracker } from "../../backend/src/adapters/cursor/protobuf-events";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { mergeProviderContinuationPayload } from "../../backend/src/responses/provider-continuation";
+import { createSseInspector } from "../../backend/src/server/relay";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
@@ -56,7 +56,7 @@ import {
   getStoredResponseBytesForTests,
   flushPendingResponseSpillsForTests,
   pendingResponseSpillMetricsForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import {
   RESPONSE_SPILL_DIR_NAME,
   readResponseSpill,
@@ -67,8 +67,8 @@ import {
   setResponseSpillPayloadCapForTests,
   setSpillIoForTest,
   writeResponseSpillDurably,
-} from "../../src/responses/spill-store";
-import { adapterNeedsForcedContinuation, injectDeveloperMessage } from "../../src/server/responses";
+} from "../../backend/src/responses/spill-store";
+import { adapterNeedsForcedContinuation, injectDeveloperMessage } from "../../backend/src/server/responses";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -100,12 +100,12 @@ import {
   setPlatformForTests,
   setStatForTests,
   timedOutSecretPathCountForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 import { helperPath, repoRoot } from "../helpers/repo-root";
 
 /**

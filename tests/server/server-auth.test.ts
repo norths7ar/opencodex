@@ -1,5 +1,5 @@
 import { createPoolRetryHarness, POOL_RETRY_MODEL } from "../helpers/codex-pool-retry";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { logsFromApiBody } from "../helpers/logs-api";
@@ -9,10 +9,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { getTrackedCodexWebSocketCountForAccount } from "../../src/codex/websocket-registry";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { getTrackedCodexWebSocketCountForAccount } from "../../backend/src/codex/websocket-registry";
 import { INTERNAL_DEADLINE_MS, SERVER_BUDGET_MS } from "../helpers/test-budget";
-import { clearAccountNeedsReauth, clearAccountQuota, getAccountQuota, isAccountNeedsReauth, markAccountNeedsReauth, updateAccountQuota } from "../../src/codex/auth-api";
+import { clearAccountNeedsReauth, clearAccountQuota, getAccountQuota, isAccountNeedsReauth, markAccountNeedsReauth, updateAccountQuota } from "../../backend/src/codex/auth-api";
 import {
   CODEX_THREAD_AFFINITY_IDLE_TTL_MS,
   clearCodexUpstreamHealth,
@@ -21,13 +21,13 @@ import {
   getCodexUpstreamHealth,
   isCodexAccountSoftAvoided,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import { loadConfig, saveConfig } from "../../src/config";
-import { spendLedgerOwnerSnapshot } from "../../src/lib/spend-ledger-owner";
+} from "../../backend/src/codex/routing";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { spendLedgerOwnerSnapshot } from "../../backend/src/lib/spend-ledger-owner";
 import { settleServerAuthFixture, managementHeaders, startManagementServerFixture, type ManagementServerFixture } from "../helpers/server-auth-fixture";
-import { clearUpstreamHostHealth, getUpstreamHostHealth, recordUpstreamHostFailure, upstreamHostHealthKey } from "../../src/codex/upstream-host-health";
-import { deriveProviderPresets } from "../../src/providers/derive";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+import { clearUpstreamHostHealth, getUpstreamHostHealth, recordUpstreamHostFailure, upstreamHostHealthKey } from "../../backend/src/codex/upstream-host-health";
+import { deriveProviderPresets } from "../../backend/src/providers/derive";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   assertServerAuthConfig,
   corsHeaders,
@@ -39,25 +39,25 @@ import {
   rootFallbackPayload,
   safeConfigDTO,
   startServer,
-} from "../../src/server";
-import { clearRequestLogsForTests, getRequestLogEntries } from "../../src/server/request-log";
-import { setRelayPlatformForTests } from "../../src/server/responses/passthrough-delivery";
+} from "../../backend/src/server";
+import { clearRequestLogsForTests, getRequestLogEntries } from "../../backend/src/server/request-log";
+import { setRelayPlatformForTests } from "../../backend/src/server/responses/passthrough-delivery";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { readUsageEntries } from "../../src/usage/log";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { readUsageEntries } from "../../backend/src/usage/log";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
-import { configuredAdminToken } from "../../src/lib/admin-secrets";
-import { SYSTEM_RESTART_CAPABILITY_VERSION } from "../../src/lib/system-restart-contract";
-import { LOCAL_PROVIDER_RELOAD_CAPABILITY_VERSION } from "../../src/lib/local-provider-reload-contract";
-import { LOCAL_ASIDE_SYNC_CAPABILITY_VERSION } from "../../src/lib/local-aside-sync-contract";
-import { GUI_PAIR_CAPABILITY_VERSION } from "../../src/lib/gui-pair-capability";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { getDebugLogEntries } from "../../src/lib/debug-log-buffer";
-import { setDebugSettings } from "../../src/lib/debug-settings";
+import { configuredAdminToken } from "../../backend/src/lib/admin-secrets";
+import { SYSTEM_RESTART_CAPABILITY_VERSION } from "../../backend/src/lib/system-restart-contract";
+import { LOCAL_PROVIDER_RELOAD_CAPABILITY_VERSION } from "../../backend/src/lib/local-provider-reload-contract";
+import { LOCAL_ASIDE_SYNC_CAPABILITY_VERSION } from "../../backend/src/lib/local-aside-sync-contract";
+import { GUI_PAIR_CAPABILITY_VERSION } from "../../backend/src/lib/gui-pair-capability";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { getDebugLogEntries } from "../../backend/src/lib/debug-log-buffer";
+import { setDebugSettings } from "../../backend/src/lib/debug-settings";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { deferredResetSseUpstream } from "../helpers/deferred-reset-sse-upstream";
@@ -787,7 +787,7 @@ describe("server local API auth", () => {
   }, 15_000);
 
   test("safeConfigDTO exposes the freeTier badge flag (WP040)", async () => {
-    const { safeConfigDTO } = await import("../../src/server/auth-cors");
+    const { safeConfigDTO } = await import("../../backend/src/server/auth-cors");
     const dto = safeConfigDTO({
       port: 0,
       defaultProvider: "nvidia",

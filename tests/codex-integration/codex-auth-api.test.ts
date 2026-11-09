@@ -2,8 +2,8 @@ import { registerMainCollisionCases } from "../helpers/codex-main-collision";
 import { registerWarmupRateLimitCases } from "../helpers/codex-warmup-rate-limit";
 import { registerResetCreditConsumeValidationTests } from "../helpers/reset-credit-consume-validation";
 import { registerPoolReauthCauseCases } from "../helpers/pool-reauth-cause";
-import * as usageHistoryModule from "../../src/usage/log";
-import { getAccountQuotaHistory } from "../../src/codex/quota";
+import * as usageHistoryModule from "../../backend/src/usage/log";
+import { getAccountQuotaHistory } from "../../backend/src/codex/quota";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
 import { Database } from "bun:sqlite";
@@ -14,8 +14,8 @@ import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
+} from "../../backend/src/server/lifecycle";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
 import {
   updateAccountQuota, getAccountQuota,
   checkAccountIdCollision, getMainChatgptAccountId,
@@ -25,21 +25,21 @@ import {
   type CodexAuthAccountDto,
   listCodexAuthAccounts,
   setAccountQuotaFromParsed,
-} from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
+} from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
 import {
   getCodexAccountCredential,
   listCodexAccountIds,
   readCodexAccountRecord,
   removeCodexAccountCredential,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
-import * as accountStoreModule from "../../src/codex/account-store";
-import { isCodexAccountUsable } from "../../src/codex/account-usability";
-import * as reserveAvailabilityModule from "../../src/codex/reserve-availability";
-import { getMainAccountInfoCache, observeMainQuotaCredential } from "../../src/codex/main-account-cache";
-import { openManualResetCreditOperation } from "../../src/codex/reset-credit-operation-ledger";
-import { quotaRecoveryRecordForTests, resetQuotaRecoveryForTests } from "../../src/codex/quota-401-recovery";
+} from "../../backend/src/codex/account-store";
+import * as accountStoreModule from "../../backend/src/codex/account-store";
+import { isCodexAccountUsable } from "../../backend/src/codex/account-usability";
+import * as reserveAvailabilityModule from "../../backend/src/codex/reserve-availability";
+import { getMainAccountInfoCache, observeMainQuotaCredential } from "../../backend/src/codex/main-account-cache";
+import { openManualResetCreditOperation } from "../../backend/src/codex/reset-credit-operation-ledger";
+import { quotaRecoveryRecordForTests, resetQuotaRecoveryForTests } from "../../backend/src/codex/quota-401-recovery";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import {
   clearCodexUpstreamHealth,
@@ -52,27 +52,27 @@ import {
   recordCodexUpstreamOutcome,
   resetCodexRoutingForManualSelection,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { pinnedCodexAccountId, setCodexAccountPin } from "../../src/codex/account-priority";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
+} from "../../backend/src/codex/routing";
+import { pinnedCodexAccountId, setCodexAccountPin } from "../../backend/src/codex/account-priority";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
 import {
   clearCodexWebSocketRegistry,
   getTrackedCodexWebSocketCountForAccount,
   registerCodexWebSocket,
-} from "../../src/codex/websocket-registry";
-import type { OcxConfig } from "../../src/types";
-import type { WsData } from "../../src/server/ws-bridge";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { getMainPolicyQuota } from "../../src/codex/quota";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../src/codex/main-account";
-import { reconcileCodexPlansFromTokens, resetJwtPlanNotesForTests } from "../../src/codex/plan-from-token";
+} from "../../backend/src/codex/websocket-registry";
+import type { OcxConfig } from "../../backend/src/types";
+import type { WsData } from "../../backend/src/server/ws-bridge";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { getMainPolicyQuota } from "../../backend/src/codex/quota";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { reconcileCodexPlansFromTokens, resetJwtPlanNotesForTests } from "../../backend/src/codex/plan-from-token";
 import {
   deleteCodexAccount,
   reconcileMainCodexAccountRuntimeState,
   resetMainCodexAccountIdentityTrackingForTests,
-} from "../../src/codex/account-lifecycle";
+} from "../../backend/src/codex/account-lifecycle";
 import {
   ConfigMutationLockError,
   armClaudeCodeBaseline,
@@ -80,24 +80,24 @@ import {
   loadConfig,
   saveConfig,
   setPersistedConfigMutationBeforeCommitForTests,
-} from "../../src/config";
-import * as configModule from "../../src/config";
-import { setCodexAccountAutoSwitchThresholdOverride } from "../../src/codex/account-auto-switch";
-import { prepareConfigObjectChildDeletionRebase } from "../../src/config/rebase-provenance";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
-import { captureConfigGeneration, registerStateStore } from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/config";
+import * as configModule from "../../backend/src/config";
+import { setCodexAccountAutoSwitchThresholdOverride } from "../../backend/src/codex/account-auto-switch";
+import { prepareConfigObjectChildDeletionRebase } from "../../backend/src/config/rebase-provenance";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
+import { captureConfigGeneration, registerStateStore } from "../../backend/src/lib/state-store-sweeper";
 import {
   reconcileLiveStateStores,
   setLiveStateStoreConfig,
   STATE_STORE_REGISTRATIONS,
-} from "../../src/lib/state-store-registrations";
+} from "../../backend/src/lib/state-store-registrations";
 import {
   listOpenAiForwardSidecarCandidates,
   resolveFirstUsableOpenAiSidecar,
-} from "../../src/providers/openai-sidecar";
-import { BOUNDED_BODY_MAX_BYTES } from "../../src/lib/bounded-body";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/providers/openai-sidecar";
+import { BOUNDED_BODY_MAX_BYTES } from "../../backend/src/lib/bounded-body";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let TEST_DIR = "";
@@ -158,9 +158,9 @@ async function completeMockCodexOAuth(options: {
     validationPending?: boolean;
   };
 }> {
-  const oauth = await import("../../src/oauth");
-  const oauthStore = await import("../../src/oauth/store");
-  const openUrlMod = await import("../../src/lib/open-url");
+  const oauth = await import("../../backend/src/oauth");
+  const oauthStore = await import("../../backend/src/oauth/store");
+  const openUrlMod = await import("../../backend/src/lib/open-url");
   await oauthStore.saveCredential("chatgpt", {
     access: options.accessToken ?? `access-${options.requestBody.id}`,
     refresh: `refresh-${options.requestBody.id}`,
@@ -1080,7 +1080,7 @@ describe("codex-auth API", () => {
     const config = makeConfig();
     seedPoolAccount(config, { id: "capacity-a", email: "capacity@example.test", plan: "plus" });
     config.codexAccounts![0].logLabel = "pabcdef";
-    const { capturePoolQuotaWriter } = await import("../../src/codex/account-store");
+    const { capturePoolQuotaWriter } = await import("../../backend/src/codex/account-store");
     const record = readCodexAccountRecord("capacity-a")!;
     const writer = capturePoolQuotaWriter("capacity-a", { ...record.credential!, generation: record.generation })!;
     const now = Date.now();
@@ -4617,8 +4617,8 @@ describe("codex-auth API", () => {
    * type and a browser spawn that cannot work.
    */
   test("POST /api/codex-auth/login with device:true returns the code and opens no browser", async () => {
-    const oauth = await import("../../src/oauth");
-    const openUrlModule = await import("../../src/lib/open-url");
+    const oauth = await import("../../backend/src/oauth");
+    const openUrlModule = await import("../../backend/src/lib/open-url");
     const startSpy = spyOn(oauth, "startLoginFlow").mockImplementation(async () => ({
       url: "https://auth.openai.com/codex/device",
       instructions: "Enter code: ABCD-EFGH",
@@ -4649,7 +4649,7 @@ describe("codex-auth API", () => {
   test("the device poll budget covers the 15-minute grant", async () => {
     // The budget is a loop bound with no observable output, so a regression to
     // the 5-minute browser budget would pass every behavioral test above.
-    const source = await Bun.file(new URL("../../src/codex/auth-api/login-flow.ts", import.meta.url)).text();
+    const source = await Bun.file(new URL("../../backend/src/codex/auth-api/login-flow.ts", import.meta.url)).text();
     const budget = /const pollAttempts = useDeviceFlow \? (\d+) : (\d+);/.exec(source);
     expect(budget).toBeTruthy();
     // 900s is the grant; the extra margin covers post-grant settlement, so an
@@ -4659,7 +4659,7 @@ describe("codex-auth API", () => {
   });
 
   test("Codex OAuth login responses project raw provider errors", async () => {
-    const oauth = await import("../../src/oauth");
+    const oauth = await import("../../backend/src/oauth");
     const startSpy = spyOn(oauth, "startLoginFlow").mockImplementation(async () => {
       throw new Error("already in progress at C:\\Users\\Alice\\.opencodex\\auth.json.ocx-tmp sk-secret-provider-key");
     });
@@ -4682,8 +4682,8 @@ describe("codex-auth API", () => {
   });
 
   test("Codex OAuth login responses preserve actionable OAuth errors", async () => {
-    const oauth = await import("../../src/oauth");
-    const { OAuthMutationBusyError } = await import("../../src/oauth/store");
+    const oauth = await import("../../backend/src/oauth");
+    const { OAuthMutationBusyError } = await import("../../backend/src/oauth/store");
     const startSpy = spyOn(oauth, "startLoginFlow");
     const cases: Array<{ error: Error; expected: string }> = [
       {
@@ -4723,8 +4723,8 @@ describe("codex-auth API", () => {
   });
 
   test("Codex OAuth login status projects late provider errors", async () => {
-    const oauth = await import("../../src/oauth");
-    const openUrlMod = await import("../../src/lib/open-url");
+    const oauth = await import("../../backend/src/oauth");
+    const openUrlMod = await import("../../backend/src/lib/open-url");
     const originalLogin = oauth.OAUTH_PROVIDERS.chatgpt.login;
     oauth.OAUTH_PROVIDERS.chatgpt.login = async (controller) => {
       controller.onAuth({ url: "https://example.test/oauth" });
@@ -4774,9 +4774,9 @@ describe("codex-auth API", () => {
   });
 
   test("Codex OAuth login status preserves actionable late OAuth errors", async () => {
-    const oauth = await import("../../src/oauth");
-    const { OAuthMutationBusyError } = await import("../../src/oauth/store");
-    const openUrlMod = await import("../../src/lib/open-url");
+    const oauth = await import("../../backend/src/oauth");
+    const { OAuthMutationBusyError } = await import("../../backend/src/oauth/store");
+    const openUrlMod = await import("../../backend/src/lib/open-url");
     const originalLogin = oauth.OAUTH_PROVIDERS.chatgpt.login;
     const openSpy = spyOn(openUrlMod, "openUrl").mockImplementation(async () => ({ status: "started" as const }));
     const timeoutSpy = spyOn(globalThis, "setTimeout").mockImplementation(((
@@ -4843,8 +4843,8 @@ describe("codex-auth API", () => {
 
   describe("POST /api/codex-auth/login/code", () => {
     async function startPendingFlow() {
-      const oauth = await import("../../src/oauth");
-      const openUrlMod = await import("../../src/lib/open-url");
+      const oauth = await import("../../backend/src/oauth");
+      const openUrlMod = await import("../../backend/src/lib/open-url");
       const startSpy = spyOn(oauth, "startLoginFlow").mockResolvedValue({ url: "https://example.test/oauth" });
       const statusSpy = spyOn(oauth, "getLoginStatus").mockReturnValue({
         done: false,
@@ -4863,7 +4863,7 @@ describe("codex-auth API", () => {
         flowId: data.flowId,
         oauth,
         async cleanup() {
-          const { codexAuthLoginState } = await import("../../src/codex/auth-api/login-state");
+          const { codexAuthLoginState } = await import("../../backend/src/codex/auth-api/login-state");
           codexAuthLoginState.delete(data.flowId);
           startSpy.mockRestore();
           statusSpy.mockRestore();
@@ -4900,7 +4900,7 @@ describe("codex-auth API", () => {
     });
 
     test("rejects missing and unknown flow ids before submitting", async () => {
-      const oauth = await import("../../src/oauth");
+      const oauth = await import("../../backend/src/oauth");
       const submitSpy = spyOn(oauth, "submitManualLoginCode");
       try {
         for (const body of [{ input: "code" }, { flowId: "", input: "code" }, { flowId: "unknown", input: "code" }]) {
@@ -5077,7 +5077,7 @@ describe("codex-auth API", () => {
   });
 
   test("POST /api/codex-auth/login rejects an id owned by a namespace before OAuth starts", async () => {
-    const oauth = await import("../../src/oauth");
+    const oauth = await import("../../backend/src/oauth");
     const startSpy = spyOn(oauth, "startLoginFlow");
     try {
       const config = makeConfig({ codexAccountNamespaces: { work: "pool-a" } });
@@ -5166,8 +5166,8 @@ describe("codex-auth API", () => {
       chatgptAccountId: "acc-pool-reauth",
     });
 
-    const oauth = await import("../../src/oauth");
-    const openUrlMod = await import("../../src/lib/open-url");
+    const oauth = await import("../../backend/src/oauth");
+    const openUrlMod = await import("../../backend/src/lib/open-url");
     const startSpy = spyOn(oauth, "startLoginFlow").mockResolvedValue({ url: "https://example.test/oauth" });
     const statusSpy = spyOn(oauth, "getLoginStatus").mockReturnValue({
       done: true,
@@ -5464,7 +5464,7 @@ describe("codex-auth API", () => {
   });
 
   test.each([{ delay: 0, reads: 1 }, { delay: 3, reads: 1 }, { delay: 6, reads: 2 }])("validation joins before, during, and after quota settlement: %j", async ({ delay, reads }) => {
-    const { fetchPoolAccountQuota } = await import("../../src/codex/auth-api");
+    const { fetchPoolAccountQuota } = await import("../../backend/src/codex/auth-api");
     const accountId = "late-validation-join";
     const config = makeConfig({ codexAccounts: [{ id: accountId, plan: "pro", isMain: false }] });
     saveConfig(config);
@@ -5864,12 +5864,12 @@ describe("codex-auth API", () => {
   });
 
   test("OAuth pool login excludes self from collision check when reauth", async () => {
-    const source = await Bun.file("src/codex/auth-api/login-flow.ts").text();
+    const source = await Bun.file("backend/src/codex/auth-api/login-flow.ts").text();
     expect(source).toContain("checkAccountIdCollision(oauthAccountId, email, plan, reauth ? accountId : undefined)");
   });
 
   test("OAuth pool reauth binds ChatGPT identity to the existing pool slot", async () => {
-    const source = await Bun.file("src/codex/auth-api/login-flow.ts").text();
+    const source = await Bun.file("backend/src/codex/auth-api/login-flow.ts").text();
     expect(source).toContain("expectedChatgptId");
     expect(source).toContain("expectedEmail");
     expect(source).toContain("Signed-in ChatGPT account does not match this pool account");
@@ -5877,18 +5877,18 @@ describe("codex-auth API", () => {
   });
 
   test("OAuth pool login waits for the current flow to finish, not stale credentials", async () => {
-    const source = await Bun.file("src/codex/auth-api/login-flow.ts").text();
+    const source = await Bun.file("backend/src/codex/auth-api/login-flow.ts").text();
     expect(source).toContain("st.done && st.loggedIn");
     expect(source).toContain("Login timed out before OAuth completed.");
   });
 
   test("OAuth pool login stores a privacy log label at the account creation call site", async () => {
-    const source = await Bun.file("src/codex/auth-api/login-flow.ts").text();
+    const source = await Bun.file("backend/src/codex/auth-api/login-flow.ts").text();
     expect(source).toContain("withCodexAccountLogLabel({ id: accountId, email, plan, isMain: false }, accounts)");
   });
 
   test("GET /api/codex-auth/login-status projects transient flow-state emails at response boundaries", async () => {
-    const source = await Bun.file("src/codex/auth-api/login-flow.ts").text();
+    const source = await Bun.file("backend/src/codex/auth-api/login-flow.ts").text();
     // #3859 turned the unconditional mask into a policy projection. The guarantee is unchanged:
     // BOTH boundaries redact through the shared helper, and the route resolves the policy from
     // config rather than defaulting to reveal.

@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { createWorkBuddyAdapter } from "../../src/adapters/workbuddy";
-import { workBuddyToolParameters } from "../../src/adapters/workbuddy-schema";
-import { parseRequest } from "../../src/responses/parser";
+import { createWorkBuddyAdapter } from "../../backend/src/adapters/workbuddy";
+import { workBuddyToolParameters } from "../../backend/src/adapters/workbuddy-schema";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { assertWorkBuddyDestination } from "../../src/providers/workbuddy";
-import type { OcxProviderConfig } from "../../src/types";
+import { assertWorkBuddyDestination } from "../../backend/src/providers/workbuddy";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const provider: OcxProviderConfig = { adapter: "workbuddy-ai", authMode: "oauth", baseUrl: "https://www.workbuddy.ai/v2", apiKey: "fixture-access" };
 const meta = () => ({ headers: new Headers(), translatorBudget: createTestTranslatorBudget() });

@@ -4,15 +4,15 @@ import {
   cachedCurrentWindowsIdentity,
   resetWindowsPrincipalForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
-import { buildWindowsTaskXml } from "../../src/service/windows-taskxml";
+} from "../../backend/src/lib/windows-user-principal";
+import { buildWindowsTaskXml } from "../../backend/src/service/windows-taskxml";
 
 import {
   inspectGuardedManagerTarget,
   observeGuardedManagerStopped,
-} from "../../src/service/guarded-manager-target";
-import { runGuardedManagerStep } from "../../src/cli/stop-approval";
-import type { GuardedStopSnapshot } from "../../src/cli/stop-approval";
+} from "../../backend/src/service/guarded-manager-target";
+import { runGuardedManagerStep } from "../../backend/src/cli/stop-approval";
+import type { GuardedStopSnapshot } from "../../backend/src/cli/stop-approval";
 import {
   ancestorWrapperPids,
   commandLineHasPathToken,
@@ -23,7 +23,7 @@ import {
   unreadableWrappersOfManager,
   wrapperProcessesAlive,
   type WindowsProcessEntry,
-} from "../../src/service/windows-guarded-manager";
+} from "../../backend/src/service/windows-guarded-manager";
 
 const HOME = "C:\\Users\\me\\.opencodex";
 const VBS = HOME + "\\opencodex-service-launcher.vbs";

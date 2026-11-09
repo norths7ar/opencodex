@@ -5,13 +5,13 @@
  * boundary that lets operators opt out if the upstream changes.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { parseRequest } from "../../src/responses/parser";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

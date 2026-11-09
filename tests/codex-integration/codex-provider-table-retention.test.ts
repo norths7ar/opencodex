@@ -3,8 +3,8 @@ import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { deriveCodexInjectionPlan } from "../../src/codex/inject/plan";
-import { OCX_ROUTING_MARKER_LINE, OCX_SECTION_MARKER } from "../../src/codex/injected-marker";
+import { deriveCodexInjectionPlan } from "../../backend/src/codex/inject/plan";
+import { OCX_ROUTING_MARKER_LINE, OCX_SECTION_MARKER } from "../../backend/src/codex/injected-marker";
 import { repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -13,7 +13,7 @@ import {
   extractOcxProviderTableBlock,
   hasOcxProviderTable,
   removeOcxSection,
-} from "../../src/codex/inject/remove";
+} from "../../backend/src/codex/inject/remove";
 
 const header = "[model_providers.opencodex]\n";
 

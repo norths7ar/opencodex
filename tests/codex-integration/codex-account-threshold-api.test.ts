@@ -1,7 +1,7 @@
 import { registerWarmupRateLimitCases } from "../helpers/codex-warmup-rate-limit";
 import { registerResetCreditConsumeValidationTests } from "../helpers/reset-credit-consume-validation";
-import * as usageHistoryModule from "../../src/usage/log";
-import { getAccountQuotaHistory } from "../../src/codex/quota";
+import * as usageHistoryModule from "../../backend/src/usage/log";
+import { getAccountQuotaHistory } from "../../backend/src/codex/quota";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
 import { Database } from "bun:sqlite";
@@ -12,8 +12,8 @@ import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
+} from "../../backend/src/server/lifecycle";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
 import {
   updateAccountQuota, getAccountQuota,
   checkAccountIdCollision, getMainChatgptAccountId,
@@ -23,21 +23,21 @@ import {
   type CodexAuthAccountDto,
   listCodexAuthAccounts,
   setAccountQuotaFromParsed,
-} from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
+} from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
 import {
   getCodexAccountCredential,
   listCodexAccountIds,
   readCodexAccountRecord,
   removeCodexAccountCredential,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
-import * as accountStoreModule from "../../src/codex/account-store";
-import { isCodexAccountUsable } from "../../src/codex/account-usability";
-import * as reserveAvailabilityModule from "../../src/codex/reserve-availability";
-import { getMainAccountInfoCache, observeMainQuotaCredential } from "../../src/codex/main-account-cache";
-import { openManualResetCreditOperation } from "../../src/codex/reset-credit-operation-ledger";
-import { quotaRecoveryRecordForTests, resetQuotaRecoveryForTests } from "../../src/codex/quota-401-recovery";
+} from "../../backend/src/codex/account-store";
+import * as accountStoreModule from "../../backend/src/codex/account-store";
+import { isCodexAccountUsable } from "../../backend/src/codex/account-usability";
+import * as reserveAvailabilityModule from "../../backend/src/codex/reserve-availability";
+import { getMainAccountInfoCache, observeMainQuotaCredential } from "../../backend/src/codex/main-account-cache";
+import { openManualResetCreditOperation } from "../../backend/src/codex/reset-credit-operation-ledger";
+import { quotaRecoveryRecordForTests, resetQuotaRecoveryForTests } from "../../backend/src/codex/quota-401-recovery";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import {
   clearCodexUpstreamHealth,
@@ -50,27 +50,27 @@ import {
   recordCodexUpstreamOutcome,
   resetCodexRoutingForManualSelection,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { pinnedCodexAccountId, setCodexAccountPin } from "../../src/codex/account-priority";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
+} from "../../backend/src/codex/routing";
+import { pinnedCodexAccountId, setCodexAccountPin } from "../../backend/src/codex/account-priority";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
 import {
   clearCodexWebSocketRegistry,
   getTrackedCodexWebSocketCountForAccount,
   registerCodexWebSocket,
-} from "../../src/codex/websocket-registry";
-import type { OcxConfig } from "../../src/types";
-import type { WsData } from "../../src/server/ws-bridge";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { getMainPolicyQuota } from "../../src/codex/quota";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../src/codex/main-account";
-import { reconcileCodexPlansFromTokens, resetJwtPlanNotesForTests } from "../../src/codex/plan-from-token";
+} from "../../backend/src/codex/websocket-registry";
+import type { OcxConfig } from "../../backend/src/types";
+import type { WsData } from "../../backend/src/server/ws-bridge";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { getMainPolicyQuota } from "../../backend/src/codex/quota";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { reconcileCodexPlansFromTokens, resetJwtPlanNotesForTests } from "../../backend/src/codex/plan-from-token";
 import {
   deleteCodexAccount,
   reconcileMainCodexAccountRuntimeState,
   resetMainCodexAccountIdentityTrackingForTests,
-} from "../../src/codex/account-lifecycle";
+} from "../../backend/src/codex/account-lifecycle";
 import {
   ConfigMutationLockError,
   armClaudeCodeBaseline,
@@ -78,24 +78,24 @@ import {
   loadConfig,
   saveConfig,
   setPersistedConfigMutationBeforeCommitForTests,
-} from "../../src/config";
-import * as configModule from "../../src/config";
-import { setCodexAccountAutoSwitchThresholdOverride } from "../../src/codex/account-auto-switch";
-import { prepareConfigObjectChildDeletionRebase } from "../../src/config/rebase-provenance";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
-import { captureConfigGeneration, registerStateStore } from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/config";
+import * as configModule from "../../backend/src/config";
+import { setCodexAccountAutoSwitchThresholdOverride } from "../../backend/src/codex/account-auto-switch";
+import { prepareConfigObjectChildDeletionRebase } from "../../backend/src/config/rebase-provenance";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
+import { captureConfigGeneration, registerStateStore } from "../../backend/src/lib/state-store-sweeper";
 import {
   reconcileLiveStateStores,
   setLiveStateStoreConfig,
   STATE_STORE_REGISTRATIONS,
-} from "../../src/lib/state-store-registrations";
+} from "../../backend/src/lib/state-store-registrations";
 import {
   listOpenAiForwardSidecarCandidates,
   resolveFirstUsableOpenAiSidecar,
-} from "../../src/providers/openai-sidecar";
-import { BOUNDED_BODY_MAX_BYTES } from "../../src/lib/bounded-body";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/providers/openai-sidecar";
+import { BOUNDED_BODY_MAX_BYTES } from "../../backend/src/lib/bounded-body";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let TEST_DIR = "";

@@ -1,9 +1,9 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
@@ -15,13 +15,13 @@ import {
   responsesJsonToAnthropicMessage,
   responsesSseToAnthropicSse as responsesSseToAnthropicSseProduction,
   sanitizeWebSearchInput,
-} from "../../src/claude/outbound";
+} from "../../backend/src/claude/outbound";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import {
   TRANSLATOR_MAX_CALL_ARGUMENT_BYTES,
   type TranslatorBudget,
-} from "../../src/lib/translator-budget";
-import { decodeReasoningEnvelope, encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
+} from "../../backend/src/lib/translator-budget";
+import { decodeReasoningEnvelope, encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
 
 const streamBudgets = new WeakMap<ReadableStream<Uint8Array>, TranslatorBudget>();
 
@@ -1187,7 +1187,7 @@ describe("claude outbound non-stream + helpers", () => {
   });
 
   test("a 1-hour cache write survives the Responses round trip as the cache_creation split", async () => {
-    const { responsesUsage } = await import("../../src/bridge/internal");
+    const { responsesUsage } = await import("../../backend/src/bridge/internal");
     const wire = responsesUsage({
       inputTokens: 160, outputTokens: 10, cachedInputTokens: 40, cacheReadInputTokens: 40,
       cacheCreationInputTokens: 20, cacheCreation1hInputTokens: 15,

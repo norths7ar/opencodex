@@ -10,11 +10,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MODEL_NOT_ALLOWED_FOR_KEY, UNNAMED_DESTINATION_MODEL } from "../../src/server/admission-model-scope";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import { handleImages } from "../../src/server/images";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { MODEL_NOT_ALLOWED_FOR_KEY, UNNAMED_DESTINATION_MODEL } from "../../backend/src/server/admission-model-scope";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import { handleImages } from "../../backend/src/server/images";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const SCOPED_KEY = "ocx_data_" + "i".repeat(40);

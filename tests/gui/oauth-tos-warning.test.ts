@@ -4,7 +4,7 @@ import {
   oauthTosRisk,
   oauthTosRiskBodyKey,
   oauthTosRiskTitleKey,
-} from "../../gui/src/oauth-tos-risk";
+} from "../../frontend/src/oauth-tos-risk";
 
 describe("oauth ToS risk map", () => {
   test("flags high-risk subscription OAuth providers", () => {
@@ -65,11 +65,11 @@ describe("oauth ToS risk map", () => {
 describe("oauth ToS warning UI seam", () => {
   test("Providers and AddProvider gate OAuth login behind the warning modal", async () => {
     const [page, modals, modal, warn, risk] = await Promise.all([
-      Bun.file("gui/src/pages/Providers.tsx").text(),
-      Bun.file("gui/src/pages/providers-page-modals.tsx").text(),
-      Bun.file("gui/src/components/AddProviderModal.tsx").text(),
-      Bun.file("gui/src/components/OAuthTosWarningModal.tsx").text(),
-      Bun.file("gui/src/oauth-tos-risk.ts").text(),
+      Bun.file("frontend/src/pages/Providers.tsx").text(),
+      Bun.file("frontend/src/pages/providers-page-modals.tsx").text(),
+      Bun.file("frontend/src/components/AddProviderModal.tsx").text(),
+      Bun.file("frontend/src/components/OAuthTosWarningModal.tsx").text(),
+      Bun.file("frontend/src/oauth-tos-risk.ts").text(),
     ]);
     const providersSeam = page + modals;
     expect(risk).toContain('"anthropic"');
@@ -108,7 +108,7 @@ describe("oauth ToS warning UI seam", () => {
       "oauthTos.anthropicContinue",
     ];
     for (const locale of ["en", "de", "fr", "ja", "ko", "ru", "tr", "vi", "zh", "zh-TW"]) {
-      const text = await Bun.file(`gui/src/i18n/${locale}.ts`).text();
+      const text = await Bun.file(`frontend/src/i18n/${locale}.ts`).text();
       for (const key of keys) {
         expect(text).toContain(`"${key}"`);
       }

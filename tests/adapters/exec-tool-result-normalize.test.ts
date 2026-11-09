@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { parseRequest } from "../../src/responses/parser";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   CODE_MODE_HOST_CONTRACT_SENTENCE,
   CODE_MODE_HOST_FAILURE_GUIDANCE,
@@ -10,7 +10,7 @@ import {
   annotateCodeModeHostFailure,
   isEmptyExecToolResult,
   normalizeEmptyExecToolResultText,
-} from "../../src/adapters/exec-tool-result-normalize";
+} from "../../backend/src/adapters/exec-tool-result-normalize";
 
 // Live host strings (Codex 0.153.2, probed 2026-09-07) and the rule each one names. The pre-call
 // sentence and these rows are one contract in one module; a model must never be told one thing

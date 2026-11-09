@@ -1,16 +1,16 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxMessage, OcxParsedRequest } from "../../src/types";
-import { parseRequest } from "../../src/responses/parser";
-import { rewriteReplayedWebSearchCells } from "../../src/responses/web-search-replay";
-import { clearBridgeSearchReplayCacheForTests } from "../../src/responses/bridge-search-replay-cache";
-import { runWithWebSearch } from "../../src/web-search/loop";
-import { rememberSidecarSearch, restoreSidecarSearchResults, stripReplayedSearchPairs } from "../../src/web-search/sidecar-search-replay";
-import { buildWebSearchTool } from "../../src/web-search/synthetic-tool";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxMessage, OcxParsedRequest } from "../../backend/src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { rewriteReplayedWebSearchCells } from "../../backend/src/responses/web-search-replay";
+import { clearBridgeSearchReplayCacheForTests } from "../../backend/src/responses/bridge-search-replay-cache";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
+import { rememberSidecarSearch, restoreSidecarSearchResults, stripReplayedSearchPairs } from "../../backend/src/web-search/sidecar-search-replay";
+import { buildWebSearchTool } from "../../backend/src/web-search/synthetic-tool";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig } from "../../src/types";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 // #7269: a routed model searched through the sidecar, then called a client tool, which ended the

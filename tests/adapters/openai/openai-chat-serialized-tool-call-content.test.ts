@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { freeformToolsByWireName, SerializedToolCallContentBuffer } from "../../../src/adapters/openai-chat/serialized-tool-call-content";
-import type { AdapterEvent } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { freeformToolsByWireName, SerializedToolCallContentBuffer } from "../../../backend/src/adapters/openai-chat/serialized-tool-call-content";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const provider = { adapter: "openai-chat", baseUrl: "https://openrouter.ai/api/v1", apiKey: "key" } as const;

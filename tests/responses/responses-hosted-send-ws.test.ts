@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { getActiveTurnCount } from "../../src/server/lifecycle";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { getActiveTurnCount } from "../../backend/src/server/lifecycle";
 import { hostedSendFixture } from "../helpers/hosted-send-fixture";
 
 class HostedSocket {
@@ -41,7 +41,7 @@ for (const kind of ["search", "image", "video"] as const) test(`${kind} successf
     f.config.providers.a!.upstreamWebsocket = true;
     // The installed Bun version is not used as evidence for the gated WS policy.
     // Pin the bounded-relay runtime through the normal handler option.
-    const { handleResponses } = await import("../../src/server/responses/core");
+    const { handleResponses } = await import("../../backend/src/server/responses/core");
     const req = f.request();
     const response = await handleResponses(req, f.config, f.log, { sendBudget: f.budget, abortSignal: req.signal, codexWsRuntimeIdentity: "1.4.0" });
     expect(response.status).toBe(200); expect(await response.text()).toContain("hosted WebSocket final answer");

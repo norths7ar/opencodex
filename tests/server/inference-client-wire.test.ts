@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { clientWireOf, markClientWire } from "../../src/server/inference/client-wire";
+import { clientWireOf, markClientWire } from "../../backend/src/server/inference/client-wire";
 
 describe("client-wire marker", () => {
   test("a marked response reports its protocol and returns itself", () => {

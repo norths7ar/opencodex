@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatCodexLogGuardDoctor, printCodexLogGuardDoctor } from "../../src/cli/codex-log-guard-doctor";
-import type { CodexLogGuardInspection } from "../../src/codex/log-guard/inspect";
+import { formatCodexLogGuardDoctor, printCodexLogGuardDoctor } from "../../backend/src/cli/codex-log-guard-doctor";
+import type { CodexLogGuardInspection } from "../../backend/src/codex/log-guard/inspect";
 
 function report(overrides: Partial<CodexLogGuardInspection> = {}): CodexLogGuardInspection {
   return {

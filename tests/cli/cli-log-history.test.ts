@@ -2,7 +2,7 @@
  * `ocx logs history` pages GET /api/request-history; `ocx logs get` reads one canonical row.
  */
 import { describe, expect, test } from "bun:test";
-import { handleObserveCommand } from "../../src/cli/observe";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
 
 function page(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {

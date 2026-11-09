@@ -26,11 +26,11 @@ import {
   preserveOpenAiTierRollbackSnapshot,
   type OpenAiTierBackupIO,
   type OpenAiTierRollbackPreserveIO,
-} from "../../../src/config";
-import { runOpenAiTierStartupMigration } from "../../../src/providers/openai-tier-startup";
-import { OpenAiTierMigrationCollisionError, projectOpenAiTierMigration } from "../../../src/providers/openai-tiers";
-import type { OcxConfig } from "../../../src/types";
-import * as windowsAcl from "../../../src/lib/windows-secret-acl";
+} from "../../../backend/src/config";
+import { runOpenAiTierStartupMigration } from "../../../backend/src/providers/openai-tier-startup";
+import { OpenAiTierMigrationCollisionError, projectOpenAiTierMigration } from "../../../backend/src/providers/openai-tiers";
+import type { OcxConfig } from "../../../backend/src/types";
+import * as windowsAcl from "../../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const config: OcxConfig = {

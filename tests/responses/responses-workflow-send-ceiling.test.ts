@@ -1,12 +1,12 @@
 import { afterEach, expect, test } from "bun:test";
-import { createPhysicalSendReporter, createRequestExecutionBudget, createBoundedSameTargetRecovery, reportDispatchSends } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../src/lib/spend-reservation-ledger";
-import { admitWorkflowTurn, DEFAULT_WORKFLOW_BUDGET_POLICY, resetWorkflowBudgetsForTest, workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
-import { bindWorkflowBudgetConfig } from "../../src/lib/workflow-budget-config";
-import { fetchWithTransientRetry, SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { bindResponsesSpendTarget } from "../../src/server/responses/request-spend-target";
+import { createPhysicalSendReporter, createRequestExecutionBudget, createBoundedSameTargetRecovery, reportDispatchSends } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../backend/src/lib/spend-reservation-ledger";
+import { admitWorkflowTurn, DEFAULT_WORKFLOW_BUDGET_POLICY, resetWorkflowBudgetsForTest, workflowBudgetSnapshot } from "../../backend/src/lib/workflow-budget";
+import { bindWorkflowBudgetConfig } from "../../backend/src/lib/workflow-budget-config";
+import { fetchWithTransientRetry, SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { bindResponsesSpendTarget } from "../../backend/src/server/responses/request-spend-target";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 afterEach(() => { bindWorkflowBudgetConfig(null); resetWorkflowBudgetsForTest(); });

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
-import { resolveCodexCoordinatorDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
+import { resolveCodexCoordinatorDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
 
 async function waitForOutput(
   stream: ReadableStream<Uint8Array>,
@@ -50,7 +50,7 @@ describe("ocx init piped stdin (#754)", () => {
     return home;
   };
   const launch = (home: string, command = "init", bootstrap?: string) => Bun.spawn({
-    cmd: bootstrap ? [process.execPath, "--eval", bootstrap] : [process.execPath, repoPath("src", "cli", "index.ts"), command],
+    cmd: bootstrap ? [process.execPath, "--eval", bootstrap] : [process.execPath, repoPath("backend/src", "cli", "index.ts"), command],
     cwd: repoRoot(),
     env: {
       ...process.env, OPENCODEX_HOME: home, CODEX_HOME: join(home, "native"),

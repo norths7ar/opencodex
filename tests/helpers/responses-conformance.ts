@@ -1,5 +1,5 @@
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 /**
  * Shared harness for Responses tool round-trip conformance

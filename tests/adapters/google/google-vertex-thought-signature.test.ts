@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
 import {
   __resetAntigravityReplayCache,
   applyAntigravityReplay,
-} from "../../../src/adapters/google-antigravity-replay";
-import { antigravitySessionId } from "../../../src/adapters/google-antigravity-wire";
-import type { AdapterEvent, OcxContentPart, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/google-antigravity-replay";
+import { antigravitySessionId } from "../../../backend/src/adapters/google-antigravity-wire";
+import type { AdapterEvent, OcxContentPart, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

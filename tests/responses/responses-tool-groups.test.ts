@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { collectResponsesToolGroups } from "../../src/responses/tool-groups";
+import { collectResponsesToolGroups } from "../../backend/src/responses/tool-groups";
 
 describe("Responses tool-group collection", () => {
   test("collects top-level and Responses Lite tools in wire order", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { bindAnthropicAccountMetadata, deriveAnthropicAccountDeviceId } from "../../../src/adapters/anthropic/account-metadata";
-import { buildAnthropicMessagesPassthroughRequest } from "../../../src/adapters/anthropic/passthrough";
-import type { OcxProviderConfig } from "../../../src/types";
+import { bindAnthropicAccountMetadata, deriveAnthropicAccountDeviceId } from "../../../backend/src/adapters/anthropic/account-metadata";
+import { buildAnthropicMessagesPassthroughRequest } from "../../../backend/src/adapters/anthropic/passthrough";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const A = "11111111-1111-4111-8111-111111111111";
 const B = "22222222-2222-4222-8222-222222222222";

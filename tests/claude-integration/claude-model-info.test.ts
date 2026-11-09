@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { buildAnthropicModelInfos, configuredRoutedDisplayName, nativeEffectiveLadder } from "../../src/claude/model-info";
-import { gatherRoutedModels, nativeEffortClamp } from "../../src/codex/catalog";
-import { MIMO_THINKING_CAPABILITIES } from "../../src/providers/mimo-thinking";
-import { cursorFastCapableBases, cursorFastIdFor } from "../../src/adapters/cursor/catalog";
-import type { OcxConfig } from "../../src/types";
+import { buildAnthropicModelInfos, configuredRoutedDisplayName, nativeEffectiveLadder } from "../../backend/src/claude/model-info";
+import { gatherRoutedModels, nativeEffortClamp } from "../../backend/src/codex/catalog";
+import { MIMO_THINKING_CAPABILITIES } from "../../backend/src/providers/mimo-thinking";
+import { cursorFastCapableBases, cursorFastIdFor } from "../../backend/src/adapters/cursor/catalog";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("anthropic-flavor ModelInfo discovery entries (devlog 130 B4b)", () => {
   test.each(["anthropic", "anthropic-apikey"])("%s registry image inputs reach Claude discovery aliases", async (provider) => {

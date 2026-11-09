@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 import {
   OPENCODE_ZEN_OBSERVED_RPM_HINT,
   OPENCODE_ZEN_SYNTHETIC_RETRY_AFTER_SEC,
@@ -7,10 +7,10 @@ import {
   enrichOpenCodeZenUpstreamMessage,
   isTransientConsoleGoUploadRejection,
   isOpenCodeZenRateLimitProvider,
-} from "../../src/providers/opencode-zen-rate-limit";
-import { resolveClientRetryAfter } from "../../src/lib/retry-after";
-import { safeConfigDTO } from "../../src/server/auth-cors";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/opencode-zen-rate-limit";
+import { resolveClientRetryAfter } from "../../backend/src/lib/retry-after";
+import { safeConfigDTO } from "../../backend/src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("opencode-zen rate-limit guidance (#1145)", () => {
   test("registry note documents the observed short-window RPM", () => {

@@ -3,12 +3,12 @@ import { Buffer } from "node:buffer";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { __resetVertexTokenCache, gcpCredentialMarkerAccount } from "../../../src/lib/gcp-adc";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import { routedProviderConfig } from "../../../src/router";
-import { setProviderKeychainEntryFactoryForTests } from "../../../src/providers/key-store";
-import { saveConfig } from "../../../src/config";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { __resetVertexTokenCache, gcpCredentialMarkerAccount } from "../../../backend/src/lib/gcp-adc";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import { routedProviderConfig } from "../../../backend/src/router";
+import { setProviderKeychainEntryFactoryForTests } from "../../../backend/src/providers/key-store";
+import { saveConfig } from "../../../backend/src/config";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 function parsed(modelId = "gemini-3-pro"): OcxParsedRequest {

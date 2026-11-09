@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { queryRequestLogs } from "../../src/server/request-log-filter";
+import { queryRequestLogs } from "../../backend/src/server/request-log-filter";
 import { log } from "../helpers/request-log-entry";
 
 test("model filters accept the printed provider/model and the bare ID before pagination", () => {

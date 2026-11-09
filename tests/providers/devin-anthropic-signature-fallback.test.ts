@@ -2,17 +2,17 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
-import { createDevinAdapter } from "../../src/adapters/devin";
-import type { IncomingMeta } from "../../src/adapters/base";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { devinCacheIdentity, invalidateSessionIdentity } from "../../src/adapters/devin/cloud-direct/chat";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { encodeDevinSignature } from "../../src/adapters/devin/reasoning-signature";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { parseRequest } from "../../src/responses/parser";
-import type { AdapterEvent } from "../../src/types";
+import { createDevinAdapter } from "../../backend/src/adapters/devin";
+import type { IncomingMeta } from "../../backend/src/adapters/base";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { devinCacheIdentity, invalidateSessionIdentity } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { encodeDevinSignature } from "../../backend/src/adapters/devin/reasoning-signature";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { AdapterEvent } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Cognition streams Claude's thinking as a summary while the signature covers the

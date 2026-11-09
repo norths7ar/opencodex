@@ -4,7 +4,7 @@ import {
   SYSTEM_RESTART_PATH,
   createSystemRestartCapability,
   verifySystemRestartCapability,
-} from "../../src/lib/system-restart-contract";
+} from "../../backend/src/lib/system-restart-contract";
 
 const SECRET = "A".repeat(43);
 const NONCE = "B".repeat(43);

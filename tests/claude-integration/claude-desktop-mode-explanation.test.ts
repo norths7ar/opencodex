@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { gatewayModeExplanation } from "../../src/cli/claude-desktop";
+import { gatewayModeExplanation } from "../../backend/src/cli/claude-desktop";
 
 const disconnected = { kind: "disconnected" } as ClientConnectionState;
 const connected = { kind: "connected" } as unknown as ClientConnectionState;

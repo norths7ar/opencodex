@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createDshAccountAdapter, resolveDshAccountMessagesUrl, DSH_ACCOUNT_DEFAULT_MESSAGES_URL } from "../../src/adapters/dsh-account";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxProviderConfig } from "../../src/types";
+import { createDshAccountAdapter, resolveDshAccountMessagesUrl, DSH_ACCOUNT_DEFAULT_MESSAGES_URL } from "../../backend/src/adapters/dsh-account";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const dshProviderConfig: OcxProviderConfig = {

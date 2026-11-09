@@ -6,7 +6,7 @@ import {
   loginCursor,
   pollCursorAuth,
   refreshCursorToken,
-} from "../../../src/oauth/cursor";
+} from "../../../backend/src/oauth/cursor";
 
 const realFetch = globalThis.fetch;
 afterEach(() => {

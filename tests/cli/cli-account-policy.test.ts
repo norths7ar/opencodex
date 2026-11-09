@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleAccountPolicyCommand as policy } from "../../src/cli/account-policy";
+import { handleAccountPolicyCommand as policy } from "../../backend/src/cli/account-policy";
 import { repoRoot } from "../helpers/repo-root";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import { unifiedPoolSettingsDto } from "../../src/oauth/pool-settings-capability";
-import type { OcxConfig } from "../../src/types";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import { unifiedPoolSettingsDto } from "../../backend/src/oauth/pool-settings-capability";
+import type { OcxConfig } from "../../backend/src/types";
 
 let home: TempHome;
 let stdout: ReturnType<typeof spyOn>, stderr: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

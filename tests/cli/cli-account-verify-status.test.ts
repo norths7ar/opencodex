@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { cmdAccount, formatAccountTable, type AccountDeps } from "../../src/cli/account";
-import type { OcxConfig } from "../../src/types";
+import { cmdAccount, formatAccountTable, type AccountDeps } from "../../backend/src/cli/account";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The verify_account STATUS rendering.

@@ -1,17 +1,17 @@
-import * as localTokens from "../../src/oauth/local-token-detect";
-import * as storeModule from "../../src/oauth/store";
+import * as localTokens from "../../backend/src/oauth/local-token-detect";
+import * as storeModule from "../../backend/src/oauth/store";
 import { createHash } from "node:crypto";
-import { getLoginStatus, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock } from "../../src/oauth";
-import { AnthropicTokenError, loginAnthropic, refreshAnthropicToken } from "../../src/oauth/anthropic";
-import { resolveAnthropicAccountIdentity } from "../../src/oauth/anthropic-identity";
-import { captureOAuthAccountSelection, loadAuthStore, mutateStore, removeAccount, saveAccountCredential, setAccountPaused } from "../../src/oauth/store";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { getLoginStatus, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock } from "../../backend/src/oauth";
+import { AnthropicTokenError, loginAnthropic, refreshAnthropicToken } from "../../backend/src/oauth/anthropic";
+import { resolveAnthropicAccountIdentity } from "../../backend/src/oauth/anthropic-identity";
+import { captureOAuthAccountSelection, loadAuthStore, mutateStore, removeAccount, saveAccountCredential, setAccountPaused } from "../../backend/src/oauth/store";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getValidAccessToken, OAuthTokenRefreshStaleError } from "../../src/oauth";
-import { credentialGeneration, getAccountCredential, getAccountSet, readOAuthRefreshIntent, saveCredential, writeOAuthRefreshIntent } from "../../src/oauth/store";
+import { getValidAccessToken, OAuthTokenRefreshStaleError } from "../../backend/src/oauth";
+import { credentialGeneration, getAccountCredential, getAccountSet, readOAuthRefreshIntent, saveCredential, writeOAuthRefreshIntent } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalEnv = { HOME: process.env.HOME, OPENCODEX_HOME: process.env.OPENCODEX_HOME, CLAUDE_CONFIG_DIR: process.env.CLAUDE_CONFIG_DIR };

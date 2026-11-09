@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
-import { deriveAnthropicAccountDeviceId } from "../../src/adapters/anthropic/account-metadata";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { OcxConfig } from "../../src/types";
-import type { RouteResult } from "../../src/router";
-import type { GenerationContext } from "../../src/lib/state-store-sweeper";
+import { deriveAnthropicAccountDeviceId } from "../../backend/src/adapters/anthropic/account-metadata";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RouteResult } from "../../backend/src/router";
+import type { GenerationContext } from "../../backend/src/lib/state-store-sweeper";
 import {
   anthropicInstanceBarrier, createAnthropicInstanceFixture, instanceFixtureCredential, instanceFixtureUuid,
   type AnthropicInstanceFixture,
@@ -16,14 +16,14 @@ const INSTANCES = ["anthropic", "anthropic2"] as const;
 const CALLER = "sk-ant-fixture-caller";
 let f: AnthropicInstanceFixture;
 let sent: Sent[];
-let ingress: typeof import("../../src/server/claude-messages");
-let native: typeof import("../../src/server/messages-native");
-let binding: typeof import("../../src/server/messages-native-oauth");
-let planner: typeof import("../../src/protocols/plan-snapshot");
-let settings: typeof import("../../src/protocols/settings");
-let identity: typeof import("../../src/oauth/anthropic-identity");
-let pacing: typeof import("../../src/providers/request-pacing");
-let logs: typeof import("../../src/server/request-log");
+let ingress: typeof import("../../backend/src/server/claude-messages");
+let native: typeof import("../../backend/src/server/messages-native");
+let binding: typeof import("../../backend/src/server/messages-native-oauth");
+let planner: typeof import("../../backend/src/protocols/plan-snapshot");
+let settings: typeof import("../../backend/src/protocols/settings");
+let identity: typeof import("../../backend/src/oauth/anthropic-identity");
+let pacing: typeof import("../../backend/src/providers/request-pacing");
+let logs: typeof import("../../backend/src/server/request-log");
 let releaseSpend: (() => void) | undefined;
 const restorations: Array<() => void> = [];
 
@@ -31,13 +31,13 @@ beforeEach(async () => {
   // The shared fixture creates all homes and blocks network before runtime imports.
   f = await createAnthropicInstanceFixture({ anthropic: { enabled: false }, anthropic2: { enabled: false } });
   [ingress, native, binding, planner, settings, identity, pacing, logs] = await Promise.all([
-    import("../../src/server/claude-messages"), import("../../src/server/messages-native"),
-    import("../../src/server/messages-native-oauth"), import("../../src/protocols/plan-snapshot"),
-    import("../../src/protocols/settings"), import("../../src/oauth/anthropic-identity"),
-    import("../../src/providers/request-pacing"), import("../../src/server/request-log"),
+    import("../../backend/src/server/claude-messages"), import("../../backend/src/server/messages-native"),
+    import("../../backend/src/server/messages-native-oauth"), import("../../backend/src/protocols/plan-snapshot"),
+    import("../../backend/src/protocols/settings"), import("../../backend/src/oauth/anthropic-identity"),
+    import("../../backend/src/providers/request-pacing"), import("../../backend/src/server/request-log"),
   ]);
   releaseSpend = (await import("../helpers/owned-spend-home")).acquireOwnedSpendHome();
-  (await import("../../src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
+  (await import("../../backend/src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
   sent = [];
   f.config.protocols = { rollout: { managedMessagesNative: true, managedMessagesNativeOAuth: true } };
   for (const instance of INSTANCES) {
@@ -254,7 +254,7 @@ describe("B managed native Messages and caller-forward exclusion", () => {
 describe("pure native settings, count and preview parity", () => {
   for (const customName of ["ANTHROPIC2", "CLAUDE-POOL-B", "anthropic-custom"]) {
     test(`exact custom ${customName} precedes B aliases and keeps caller-forward preview`, async () => {
-      const selectors = await import("../../src/server/messages-native-selector");
+      const selectors = await import("../../backend/src/server/messages-native-selector");
       const before = existsSync(f.store.getAuthStorePath()) ? readFileSync(f.store.getAuthStorePath(), "utf8") : null;
       f.config.providers.anthropic2!.alias = customName.toLowerCase();
       f.config.providers[customName] = { adapter: "anthropic", authMode: "key", baseUrl: "https://custom.example",
@@ -287,7 +287,7 @@ describe("pure native settings, count and preview parity", () => {
   }
 
   test("orphan lowercase B does not reserve a configured uppercase custom provider", async () => {
-    const selectors = await import("../../src/server/messages-native-selector");
+    const selectors = await import("../../backend/src/server/messages-native-selector");
     delete f.config.providers.anthropic2;
     f.config.providers.ANTHROPIC2 = { adapter: "anthropic", authMode: "key", baseUrl: "https://custom.example",
       apiKey: "fixture-custom-key", models: [f.model] };
@@ -324,7 +324,7 @@ describe("pure native settings, count and preview parity", () => {
     await seed();
     const commit = spyOn(f.store, "commitOAuthAccountSelection");
     restorations.push(() => commit.mockRestore());
-    const oauth = await import("../../src/oauth");
+    const oauth = await import("../../backend/src/oauth");
     const refresh = spyOn(oauth, "getValidAccessSnapshotForAccount");
     restorations.push(() => refresh.mockRestore());
     const stored = readFileSync(f.store.getAuthStorePath(), "utf8");
@@ -577,9 +577,9 @@ describe("native physical response incarnation ownership", () => {
     test(`${instance}: pending ${status}, prior reservation=${reserved}, identical re-add cannot own the old response`, async () => {
       await seed();
       const [recovery, cache, sweeper] = await Promise.all([
-        import("../../src/providers/quota/anthropic-cooldown-recovery"),
-        import("../../src/providers/quota/account-cache"),
-        import("../../src/lib/state-store-sweeper"),
+        import("../../backend/src/providers/quota/anthropic-cooldown-recovery"),
+        import("../../backend/src/providers/quota/account-cache"),
+        import("../../backend/src/lib/state-store-sweeper"),
       ]);
       const other = instance === "anthropic" ? "anthropic2" : "anthropic";
       const id = f.ids[0];

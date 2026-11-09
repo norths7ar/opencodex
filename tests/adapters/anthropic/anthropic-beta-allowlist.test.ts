@@ -4,16 +4,16 @@
  * unknown values dropped, allowlisted values re-spelled from the list, proxy-owned betas kept.
  */
 import { describe, expect, test } from "bun:test";
-import { ANTHROPIC_OAUTH_BETA } from "../../../src/oauth/anthropic";
+import { ANTHROPIC_OAUTH_BETA } from "../../../backend/src/oauth/anthropic";
 import {
   allowlistAnthropicBetas,
   anthropicBetaAllowlist,
   CONTEXT_MANAGEMENT_BETA,
   logDroppedAnthropicBetas,
-} from "../../../src/adapters/anthropic/beta-allowlist";
-import { buildAnthropicMessagesPassthroughRequest } from "../../../src/adapters/anthropic/passthrough";
-import { captureAnthropicClientIdentity } from "../../../src/adapters/anthropic/client-identity";
-import type { OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/anthropic/beta-allowlist";
+import { buildAnthropicMessagesPassthroughRequest } from "../../../backend/src/adapters/anthropic/passthrough";
+import { captureAnthropicClientIdentity } from "../../../backend/src/adapters/anthropic/client-identity";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const ALLOWED = "interleaved-thinking-2025-05-14";
 const UNKNOWN = "fixture-unknown-beta-2099-01-01";

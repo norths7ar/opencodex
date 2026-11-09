@@ -9,11 +9,11 @@ import {
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
   windowsPrincipalPowerShellCommandForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 import {
   setTrustedWindowsElevationExecutablesForTests,
   WindowsSystemDirectoryFfiUnavailableError,
-} from "../../src/lib/windows-elevation";
+} from "../../backend/src/lib/windows-elevation";
 
 const ok = (stdout = "S-1-5-21-111-222-333-1001\r\nEXAMPLE\\Owner\r\n") => ({
   success: true,

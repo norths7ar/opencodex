@@ -14,13 +14,13 @@ import {
   buildClientContribution,
   type ExportContext,
   type PiGeneratedConfig,
-} from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS, resolveIntegrationPaths, unresolvedPathHintFor } from "../../src/integrations/registry";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { defaultIntegrationIO } from "../../src/integrations/config-io";
-import { applyIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS, resolveIntegrationPaths, unresolvedPathHintFor } from "../../backend/src/integrations/registry";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { defaultIntegrationIO } from "../../backend/src/integrations/config-io";
+import { applyIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CONFIG = {

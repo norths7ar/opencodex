@@ -1,10 +1,10 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../src/config";
-import { sanitizeOpenCodeZenOverridesForLoad } from "../../src/config/opencode-zen-upgrade";
-import { readConfigDiagnostics, readConfigFileSnapshot } from "../../src/config/diagnostics";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
+import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../backend/src/config";
+import { sanitizeOpenCodeZenOverridesForLoad } from "../../backend/src/config/opencode-zen-upgrade";
+import { readConfigDiagnostics, readConfigFileSnapshot } from "../../backend/src/config/diagnostics";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
 import { createTempHome } from "../helpers/temp-home";
 
 test("Claude saved overrides and Responses-only preferences migrate without changing unrelated models", () => {

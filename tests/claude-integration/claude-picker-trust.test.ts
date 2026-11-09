@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import {
   inspectPickerTrust, trustPickerCa, untrustPickerCa, type SecurityRunner,
-} from "../../src/claude/intercept/picker-trust";
+} from "../../backend/src/claude/intercept/picker-trust";
 
 const sha1 = "A".repeat(40);
 

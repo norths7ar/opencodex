@@ -114,7 +114,7 @@ async function main() {
     // `buildCatalogEntries` also means this script exercises the same bytes `ocx sync` writes.
     const catalogPath = join(codexHome, "opencodex-models.json");
     const build = spawnSync("bun", ["-e", `
-      const { buildCatalogEntries } = await import("./src/codex/catalog/sync.ts");
+      const { buildCatalogEntries } = await import("./backend/src/codex/catalog/sync.ts");
       const entries = buildCatalogEntries(null, [], [{
         provider: "opencodex",
         id: ${JSON.stringify(UNIQUE_MODEL)},

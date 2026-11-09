@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { deflateSync } from "node:zlib";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { qoderCnImageInputSupported } from "../../src/adapters/qoder/image-input";
-import { clearQoderBinaryCache } from "../../src/adapters/qoder/profiles";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { qoderCnImageInputSupported } from "../../backend/src/adapters/qoder/image-input";
+import { clearQoderBinaryCache } from "../../backend/src/adapters/qoder/profiles";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // A complete 1x1 PNG, including IDAT and IEND, rather than a MIME-only fixture.

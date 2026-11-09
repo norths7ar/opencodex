@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isAnthropicBillingRefusal, readAnthropicBillingRefusal } from "../../../src/providers/anthropic-billing-refusal";
+import { isAnthropicBillingRefusal, readAnthropicBillingRefusal } from "../../../backend/src/providers/anthropic-billing-refusal";
 
 const message = "Your credit balance is too low to access the Anthropic API.";
 const payload = (type = "invalid_request_error", text = message) => ({ type: "error", error: { type, message: text } });

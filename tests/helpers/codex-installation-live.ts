@@ -1,15 +1,15 @@
 import { afterAll, afterEach, beforeAll, beforeEach } from "bun:test";
 import { createHmac } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { saveConfig } from "../../src/config";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
-import { resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
+import { resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "./fake-chatgpt-jwt";
 import { createTempHome, type TempHome } from "./temp-home";
 

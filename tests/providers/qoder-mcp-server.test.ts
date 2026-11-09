@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-const serverPath = join(import.meta.dir, "../../src/adapters/coding-agent/mcp-server.ts");
+const serverPath = join(import.meta.dir, "../../backend/src/adapters/coding-agent/mcp-server.ts");
 
 describe("Qoder isolated MCP catalog", () => {
   test("lists the selected client tool name and unchanged schema", async () => {

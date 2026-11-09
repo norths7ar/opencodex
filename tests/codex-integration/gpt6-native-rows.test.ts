@@ -21,7 +21,7 @@ import {
   nativeOpenAiContextWindow,
   nativeReasoningEfforts,
   upstreamNativeEntry,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   ACCOUNT_GATED_NATIVE_OPENAI_MODELS,
   NATIVE_GPT6_ASTRA_MINOR_MODEL,
@@ -35,11 +35,11 @@ import {
   hasNativeOpenAiCapabilityMetadata,
   isNativeOpenAiCapabilityAliasModel,
   nativeOpenAiAliasPresentation,
-} from "../../src/codex/catalog/native-models";
-import { isGpt56NativeSlug, nativeLadderIncludesUltra } from "../../src/codex/catalog/effort";
-import { DOCUMENTED_NATIVE_OPENAI_ADDITIONS, nativeOpenAiCapabilityDisplayName } from "../../src/codex/catalog/metadata";
-import { pinnedNativeModelRows } from "../../src/codex/catalog/pinned-models";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
+} from "../../backend/src/codex/catalog/native-models";
+import { isGpt56NativeSlug, nativeLadderIncludesUltra } from "../../backend/src/codex/catalog/effort";
+import { DOCUMENTED_NATIVE_OPENAI_ADDITIONS, nativeOpenAiCapabilityDisplayName } from "../../backend/src/codex/catalog/metadata";
+import { pinnedNativeModelRows } from "../../backend/src/codex/catalog/pinned-models";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
 import { repoPath } from "../helpers/repo-root";
 
 afterEach(() => resetCodexModelEntitlementCacheForTests());
@@ -191,7 +191,7 @@ describe("gpt-6-astra-minor is an account-gated capability alias of gpt-6-astra"
 
 describe("roster-pinned-models.json", () => {
   test("holds GPT-6 Sol/Luna and GPT-6.1 Sol/Terra verbatim rows", () => {
-    const roster = readRows("src/codex/data/roster-pinned-models.json");
+    const roster = readRows("backend/src/codex/data/roster-pinned-models.json");
     expect(roster.map(row => row.slug)).toEqual([NATIVE_GPT6_SOL_MODEL, NATIVE_GPT6_LUNA_MODEL, NATIVE_GPT61_SOL_MODEL, NATIVE_GPT61_TERRA_MODEL]);
     expect(efforts(roster[0])).toEqual(SOL_LADDER);
     expect(efforts(roster[1])).toEqual(LUNA_LADDER);
@@ -200,8 +200,8 @@ describe("roster-pinned-models.json", () => {
   });
 
   test("never shadows a slug already in upstream-models.json", () => {
-    const upstream = readRows("src/codex/data/upstream-models.json");
-    const roster = readRows("src/codex/data/roster-pinned-models.json");
+    const upstream = readRows("backend/src/codex/data/upstream-models.json");
+    const roster = readRows("backend/src/codex/data/roster-pinned-models.json");
     const upstreamSlugs = new Set(upstream.map(row => row.slug));
     // The files are disjoint today; a codex-rs re-pin that bundles Sol or Luna must win.
     expect(roster.filter(row => upstreamSlugs.has(row.slug))).toEqual([]);

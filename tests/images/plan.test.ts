@@ -2,23 +2,23 @@ import { afterAll, beforeAll, beforeEach, describe, expect, mock, test } from "b
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import type { OcxConfig, OcxProviderConfig, OcxParsedRequest } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig, OcxParsedRequest } from "../../backend/src/types";
 
 const PREV_HOME = process.env.OPENCODEX_HOME;
-let planImageBridge: typeof import("../../src/images/plan")["planImageBridge"];
-let MAX_IMAGE_TIMEOUT_MS: typeof import("../../src/images/plan")["MAX_IMAGE_TIMEOUT_MS"];
+let planImageBridge: typeof import("../../backend/src/images/plan")["planImageBridge"];
+let MAX_IMAGE_TIMEOUT_MS: typeof import("../../backend/src/images/plan")["MAX_IMAGE_TIMEOUT_MS"];
 
 /** Mutable token that the mocked getValidAccessToken resolves to. */
 let tokenResult: string | null = null;
 
 beforeAll(async () => {
   process.env.OPENCODEX_HOME = join(tmpdir(), "ocx-test-" + randomUUID());
-  const actualOauth = await import("../../src/oauth/index");
-  mock.module("../../src/oauth/index", () => ({
+  const actualOauth = await import("../../backend/src/oauth/index");
+  mock.module("../../backend/src/oauth/index", () => ({
     ...actualOauth,
     getValidAccessToken: async () => tokenResult,
   }));
-  ({ planImageBridge, MAX_IMAGE_TIMEOUT_MS } = await import("../../src/images/plan"));
+  ({ planImageBridge, MAX_IMAGE_TIMEOUT_MS } = await import("../../backend/src/images/plan"));
 });
 afterAll(() => { if (PREV_HOME === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = PREV_HOME; mock.restore(); });
 
@@ -167,7 +167,7 @@ describe("planImageBridge", () => {
   });
 
   test("toolNames includes IMAGE_GEN_TOOL_NAME so the loop can intercept synthetic calls", async () => {
-    const { IMAGE_GEN_TOOL_NAME } = await import("../../src/images/synthetic-tool");
+    const { IMAGE_GEN_TOOL_NAME } = await import("../../backend/src/images/synthetic-tool");
     const cfg = makeConfig({ xai: { baseUrl: "https://api.x.ai", apiKey: "test-token" } }, { bridgeEnabled: true });
     const plan = await planImageBridge(cfg, makeParsed(true), routed);
     expect(plan).toBeDefined();

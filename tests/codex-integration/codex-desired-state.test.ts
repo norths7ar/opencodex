@@ -12,7 +12,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { loadConfig, saveConfig } from "../../src/config";
+import { loadConfig, saveConfig } from "../../backend/src/config";
 import {
   codexIntegrationEnabled,
   codexIntegrationEnabledNow,
@@ -22,9 +22,9 @@ import {
   shouldSyncCodexOnStart,
   shouldSyncGrokOnStart,
   syncCodexOnStartIfEnabled,
-} from "../../src/codex/desired-state";
-import { createReadinessGate } from "../../src/server/readiness";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/desired-state";
+import { createReadinessGate } from "../../backend/src/server/readiness";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testRoot = "";

@@ -7,10 +7,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   assertAsideProfileBoundary, guardAsideProfileIO, listAsideProfiles,
-} from "../../src/clients/aside-profiles";
-import { ClientPathError } from "../../src/clients/config-export";
-import { defaultIntegrationIO } from "../../src/integrations/config-io";
-import { createIntegrationStateStore } from "../../src/integrations/store";
+} from "../../backend/src/clients/aside-profiles";
+import { ClientPathError } from "../../backend/src/clients/config-export";
+import { defaultIntegrationIO } from "../../backend/src/integrations/config-io";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const accounts = [{ id: 0, name: "Cloud" }, { id: 1, name: "Local one" }, { id: 2, name: "Local two" }];

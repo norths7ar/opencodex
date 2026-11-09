@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   sanitizeGeminiToolParameters,
   sanitizeGeminiToolParametersWithReport,
-} from "../../../src/adapters/google-tool-schema";
+} from "../../../backend/src/adapters/google-tool-schema";
 
 function countSchemaNodes(value: unknown): number {
   if (!value || typeof value !== "object" || Array.isArray(value)) return 0;

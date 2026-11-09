@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { handleClientIntegrationCommand as command } from "../../src/cli/integrations";
-import { handleIntegrationPreviewCommand as leaf } from "../../src/cli/integration-preview";
+import { handleClientIntegrationCommand as command } from "../../backend/src/cli/integrations";
+import { handleIntegrationPreviewCommand as leaf } from "../../backend/src/cli/integration-preview";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 
 let home: TempHome;
 let out: ReturnType<typeof spyOn>, err: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

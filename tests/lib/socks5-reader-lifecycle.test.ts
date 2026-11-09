@@ -2,7 +2,7 @@ import { describe, spyOn, test } from "bun:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Socket } from "node:net";
-import { Socks5FetchError } from "../../src/lib/socks5-fetch";
+import { Socks5FetchError } from "../../backend/src/lib/socks5-fetch";
 import { repoPath } from "../helpers/repo-root";
 
 interface Reader {
@@ -15,7 +15,7 @@ interface Reader {
 // Execute the current private class, not a copied implementation or a new public
 // API. Emitting data synchronously makes the dispose-before-continuation ordering
 // deterministic; an actual network packet cannot guarantee that microtask boundary.
-const source = readFileSync(repoPath("src", "lib", "socks5-fetch.ts"), "utf8");
+const source = readFileSync(repoPath("backend/src", "lib", "socks5-fetch.ts"), "utf8");
 const start = source.indexOf("class SocketReader {");
 const end = source.indexOf("\nasync function socks5Connect(", start);
 const sliceLimit = source.match(/^const MAX_BODY_SLICE_BYTES = (.+);$/m)?.[0];

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { copyPlainData } from "../../src/lib/plain-data";
+import { copyPlainData } from "../../backend/src/lib/plain-data";
 
 describe("plain-data own property preservation", () => {
   test.each([null, 7, { retained: true }])("copies __proto__ as data: %j", value => {

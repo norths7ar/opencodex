@@ -2,14 +2,14 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClaudeAgentDefs, injectClaudeAgentDefs, syncClaudeAgentDefs } from "../../src/claude/agents-inject";
-import { buildClaudeContextWindows } from "../../src/claude/context-windows";
-import { buildDesktop3pRegistry } from "../../src/claude/desktop-3p";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-fetch";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
-import type { OcxConfig } from "../../src/types";
+import { buildClaudeAgentDefs, injectClaudeAgentDefs, syncClaudeAgentDefs } from "../../backend/src/claude/agents-inject";
+import { buildClaudeContextWindows } from "../../backend/src/claude/context-windows";
+import { buildDesktop3pRegistry } from "../../backend/src/claude/desktop-3p";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-fetch";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { DEFAULT_SUBAGENT_MODELS } from "../../src/config/subagent-models";
+import { DEFAULT_SUBAGENT_MODELS } from "../../backend/src/config/subagent-models";
 
 const dirs: string[] = [];
 function tempDir(): string {

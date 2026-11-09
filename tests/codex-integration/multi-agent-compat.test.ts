@@ -7,19 +7,19 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { injectDeveloperMessage, multiAgentGuidanceText, sanitizeEncryptedContentInPlace, stripAgentMessageCiphertextInPlace } from "../../src/server/responses";
-import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../src/codex/multi-agent-mode-policy";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxParsedRequest } from "../../src/types";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND, effectiveSubagentRoster } from "../../src/codex/catalog";
-import { collectCodexAppServerCatalogState, resetCodexAppServerCatalogStateCache } from "../../src/codex/app-server-processes";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
+import { injectDeveloperMessage, multiAgentGuidanceText, sanitizeEncryptedContentInPlace, stripAgentMessageCiphertextInPlace } from "../../backend/src/server/responses";
+import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../backend/src/codex/multi-agent-mode-policy";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxParsedRequest } from "../../backend/src/types";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND, effectiveSubagentRoster } from "../../backend/src/codex/catalog";
+import { collectCodexAppServerCatalogState, resetCodexAppServerCatalogStateCache } from "../../backend/src/codex/app-server-processes";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
 import { createWindowsPowerShellFixture, type WindowsPowerShellFixture } from "../helpers/windows-power-shell-fixture";
-import { clearDebugSettings, setDebugSettings } from "../../src/lib/debug-settings";
+import { clearDebugSettings, setDebugSettings } from "../../backend/src/lib/debug-settings";
 import {
   getInjectionDebugLogEntries,
   resetInjectionDebugLogBufferForTests,
-} from "../../src/lib/injection-debug-log";
+} from "../../backend/src/lib/injection-debug-log";
 
 const savedCodexHome = process.env.CODEX_HOME;
 const savedCatalogStateOverride = process.env.OPENCODEX_APP_SERVER_CATALOG_STATE_OVERRIDE;

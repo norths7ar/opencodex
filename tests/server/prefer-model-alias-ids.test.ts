@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, test } from
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { parseFastRowId, fastRowBases } from "../../src/server/fast-row";
-import { knownEffortRowIds } from "../../src/server/effort-row";
-import { collectDefaultModelExposure } from "../../src/cli/doctor";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { routeModel } from "../../src/router";
-import { gatherRoutedModels } from "../../src/codex/catalog/provider-fetch";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { parseFastRowId, fastRowBases } from "../../backend/src/server/fast-row";
+import { knownEffortRowIds } from "../../backend/src/server/effort-row";
+import { collectDefaultModelExposure } from "../../backend/src/cli/doctor";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { routeModel } from "../../backend/src/router";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog/provider-fetch";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 

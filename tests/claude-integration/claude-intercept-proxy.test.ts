@@ -1,8 +1,8 @@
 import { afterAll, expect, test } from "bun:test";
 import { connect, createServer, Socket } from "node:net";
-import { CLAUDE_INTERCEPT_HOSTS, isLoopbackTarget, parseConnectRequestLine, startConnectProxy, type ConnectProxyHandle } from "../../src/claude/intercept/connect-proxy";
-import { startClaudeInterceptListener, rewriteInterceptedRequest } from "../../src/claude/intercept/listener";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
+import { CLAUDE_INTERCEPT_HOSTS, isLoopbackTarget, parseConnectRequestLine, startConnectProxy, type ConnectProxyHandle } from "../../backend/src/claude/intercept/connect-proxy";
+import { startClaudeInterceptListener, rewriteInterceptedRequest } from "../../backend/src/claude/intercept/listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
 
 /**
  * End-to-end shape of the intercept pair: a client that only knows `HTTPS_PROXY` and trusts the

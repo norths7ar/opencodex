@@ -7,8 +7,8 @@ import {
   relaySseWithHeartbeat,
   resetInspectionCountersForTest,
   trackSseForRequestLog,
-} from "../../src/server/relay";
-import type { RequestLogContext } from "../../src/server/request-log";
+} from "../../backend/src/server/relay";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 const encoder = new TextEncoder();
 

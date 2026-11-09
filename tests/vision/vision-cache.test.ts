@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import * as oauthModule from "../../src/oauth";
+import * as oauthModule from "../../backend/src/oauth";
 
-mock.module("../../src/oauth", () => ({ ...oauthModule, getValidAccessToken: async () => "vision-cache-token" }));
+mock.module("../../backend/src/oauth", () => ({ ...oauthModule, getValidAccessToken: async () => "vision-cache-token" }));
 
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxConfig, OcxContentPart, OcxProviderConfig } from "../../src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxConfig, OcxContentPart, OcxProviderConfig } from "../../backend/src/types";
 import {
   describeImagesInPlace,
   evictOldestVisionDescriptionForBudget,
@@ -21,7 +21,7 @@ import {
   requiresVisionPreprocessing,
   visionDescriptionRetainedStoreSnapshot,
   type VisionPlan,
-} from "../../src/vision";
+} from "../../backend/src/vision";
 
 const DATA_A = "data:image/png;base64,YQ==";
 const DATA_B = "data:image/png;base64,Yg==";
@@ -456,14 +456,14 @@ describe("vision description cache and per-turn cap", () => {
 });
 
 test("vision planning and image-rewrite seams preserve boundary identity and dependency direction", async () => {
-  const boundary = await import("../../src/vision");
-  const planning = await import("../../src/vision/plan");
-  const rewrite = await import("../../src/vision/image-rewrite");
+  const boundary = await import("../../backend/src/vision");
+  const planning = await import("../../backend/src/vision/plan");
+  const rewrite = await import("../../backend/src/vision/image-rewrite");
   const { readFileSync } = await import("node:fs");
   const { repoPath } = await import("../helpers/repo-root");
 
   expect(boundary.resolveMaxDescriptionsPerTurn).toBe(planning.resolveMaxDescriptionsPerTurn);
   expect(boundary.stripImagesInPlace).toBe(rewrite.stripImagesInPlace);
-  expect(readFileSync(repoPath("src/vision/image-rewrite.ts"), "utf8")).not.toMatch(/from\s+["']\.\/(plan|index)["']/);
-  expect(readFileSync(repoPath("src/vision/plan.ts"), "utf8")).not.toMatch(/from\s+["']\.\/index["']/);
+  expect(readFileSync(repoPath("backend/src/vision/image-rewrite.ts"), "utf8")).not.toMatch(/from\s+["']\.\/(plan|index)["']/);
+  expect(readFileSync(repoPath("backend/src/vision/plan.ts"), "utf8")).not.toMatch(/from\s+["']\.\/index["']/);
 });

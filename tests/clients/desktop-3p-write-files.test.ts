@@ -3,12 +3,12 @@ import * as fs from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { atomicReplaceDesktopConfig, writeDesktop3pConfig } from "../../src/claude/desktop-3p";
-import { MAX_DESKTOP_PROFILE_FILE_BYTES, parseMetadata, readDesktopProfileForeignKeys, readDesktopProfileSnapshot } from "../../src/claude/desktop-3p-library";
-import * as desktopLibrary from "../../src/claude/desktop-3p-library";
-import { isTestHomeGuardArmed } from "../../src/lib/test-home-guard";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { atomicReplaceDesktopConfig, writeDesktop3pConfig } from "../../backend/src/claude/desktop-3p";
+import { MAX_DESKTOP_PROFILE_FILE_BYTES, parseMetadata, readDesktopProfileForeignKeys, readDesktopProfileSnapshot } from "../../backend/src/claude/desktop-3p-library";
+import * as desktopLibrary from "../../backend/src/claude/desktop-3p-library";
+import { isTestHomeGuardArmed } from "../../backend/src/lib/test-home-guard";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -269,8 +269,8 @@ for (const scenario of ["backup", "rollback"] as const) {
     const code = `
       import { spyOn } from "bun:test";
       import * as fs from "node:fs";
-      import { writeDesktop3pConfig } from ${JSON.stringify(repoPath("src/claude/desktop-3p.ts"))};
-      import { isTestHomeGuardArmed } from ${JSON.stringify(repoPath("src/lib/test-home-guard.ts"))};
+      import { writeDesktop3pConfig } from ${JSON.stringify(repoPath("backend/src/claude/desktop-3p.ts"))};
+      import { isTestHomeGuardArmed } from ${JSON.stringify(repoPath("backend/src/lib/test-home-guard.ts"))};
       if (!isTestHomeGuardArmed()) throw new Error("guard not armed");
       const profile = ${JSON.stringify(profile)}, meta = ${JSON.stringify(meta)}, fifo = ${JSON.stringify(fifo)};
       const scenario = ${JSON.stringify(scenario)};

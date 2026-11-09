@@ -28,7 +28,7 @@
  * that, armed by the same flag set below.
  */
 import { afterAll, afterEach } from "bun:test";
-import { isTestHomeGuardArmed, protectedHomeForTests } from "../src/lib/test-home-guard";
+import { isTestHomeGuardArmed, protectedHomeForTests } from "../backend/src/lib/test-home-guard";
 import { createIsolatedTestEnvironment, LIVE_INSTALL_CREDENTIAL_ENV } from "../scripts/test";
 import {
   acquireTestRunLock,
@@ -127,12 +127,12 @@ if (process.platform === "win32" && lockPath && runLock.owner) {
 // Load cleanup dependencies only AFTER home isolation, guard arming, and run-lock admission.
 const { createTestSandboxCleanup } = await import("./helpers/test-sandbox-cleanup");
 const { flushWindowsSecretAclReapsBeforeRemoval, windowsSecretAclReapPendingAtOrBelow } =
-  await import("../src/lib/windows-secret-acl");
+  await import("../backend/src/lib/windows-secret-acl");
 // Resolve cleanup owners during protected setup, not for the first time inside a timed
 // afterAll hook. Cleanup must drain existing producers rather than initialize their graph.
-const { flushConfigDirHardeningForTests } = await import("../src/config/paths");
-const { flushNativeMainStartupReleases } = await import("../src/codex/native-profile-startup");
-const { settleBackgroundWork } = await import("../src/lib/background-work");
+const { flushConfigDirHardeningForTests } = await import("../backend/src/config/paths");
+const { flushNativeMainStartupReleases } = await import("../backend/src/codex/native-profile-startup");
+const { settleBackgroundWork } = await import("../backend/src/lib/background-work");
 const cleanup = createTestSandboxCleanup({
   drainProducers: async () => {
     // Bounded: a task that never settles must not hang the worker. Throwing skips removal,

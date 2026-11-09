@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
+import { catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
 
 const OPENGATEWAY_ITEM = {
   id: "openai/o4-mini",

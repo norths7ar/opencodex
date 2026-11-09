@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, saveConfig, loadConfig, mutatePersistedConfig } from "../../src/config";
-import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../src/oauth/account-auto-pause";
-import { routedProviderConfig } from "../../src/router";
-import { saveCredential, getAccountSet } from "../../src/oauth/store";
-import { getValidAccessSnapshotForAccount } from "../../src/oauth";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+import { getDefaultConfig, saveConfig, loadConfig, mutatePersistedConfig } from "../../backend/src/config";
+import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../backend/src/oauth/account-auto-pause";
+import { routedProviderConfig } from "../../backend/src/router";
+import { saveCredential, getAccountSet } from "../../backend/src/oauth/store";
+import { getValidAccessSnapshotForAccount } from "../../backend/src/oauth";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;
@@ -72,7 +72,7 @@ function editDisk(edit: (raw: ReturnType<typeof getDefaultConfig>) => void) {
 }
 async function externalWrite(body: string) {
   const { repoPath, repoRoot } = await import("../helpers/repo-root");
-  const child = Bun.spawn([process.execPath, "-e", `import { mutatePersistedConfig } from ${JSON.stringify(repoPath("src/config.ts"))}; ${body}`],
+  const child = Bun.spawn([process.execPath, "-e", `import { mutatePersistedConfig } from ${JSON.stringify(repoPath("backend/src/config.ts"))}; ${body}`],
     { cwd: repoRoot(), env: { ...process.env }, stdout: "pipe", stderr: "pipe" });
   const error = await new Response(child.stderr).text();
   expect(await child.exited, error).toBe(0);
@@ -108,7 +108,7 @@ for (const mode of ["oauth", "key", "forward"] as const) {
     const baseline = structuredClone(f.config);
     const observe = f.capture();
     await externalWrite(`for (const enabled of [false, true]) mutatePersistedConfig(c => { c.providers[${JSON.stringify(f.name)}].accountAutoPause.enabled = enabled; return {changed: true, value: true}; });`);
-    const { reconcileLiveConfigFromDisk } = await import("../../src/config/live-reconcile");
+    const { reconcileLiveConfigFromDisk } = await import("../../backend/src/config/live-reconcile");
     reconcileLiveConfigFromDisk(f.config, baseline);
     const response = await observe(refusal());
     expect(f.paused()).toBe(false);
@@ -134,7 +134,7 @@ test("OAuth automatic commit fails fast under a separate-process config lock, th
   const f = await fixture("oauth");
   const observe = f.capture();
   const { repoPath, repoRoot } = await import("../helpers/repo-root");
-  const child = Bun.spawn([process.execPath, "-e", `import { withConfigMutationLockSync } from ${JSON.stringify(repoPath("src/config/mutation-lock.ts"))};
+  const child = Bun.spawn([process.execPath, "-e", `import { withConfigMutationLockSync } from ${JSON.stringify(repoPath("backend/src/config/mutation-lock.ts"))};
     withConfigMutationLockSync(() => { process.stdout.write("locked"); Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20000); });`],
     { cwd: repoRoot(), env: { ...process.env }, stdout: "pipe", stderr: "pipe" });
   try {
@@ -155,7 +155,7 @@ test("OAuth automatic commit fails fast under a separate-process config lock, th
 test("reload row replacement changes local generation before a stale verdict can commit", async () => {
   const f = await fixture();
   const observe = f.capture();
-  const { adoptPersistedProviderIntoLiveConfig } = await import("../../src/config/live-reconcile");
+  const { adoptPersistedProviderIntoLiveConfig } = await import("../../backend/src/config/live-reconcile");
   const row = structuredClone(f.config.providers[f.name]!);
   row.accountAutoPause!.consecutiveFailures = 3;
   // A raw editor cannot update epochs; local generation still remembers both observations.
@@ -189,7 +189,7 @@ for (const field of ["baseUrl", "adapter", "authMode"] as const) {
 
 test("OAuth policy ABA while waiting for the auth writer never commits the old pause", async () => {
   const f = await fixture("oauth");
-  const { mutateStore } = await import("../../src/oauth/store");
+  const { mutateStore } = await import("../../backend/src/oauth/store");
   let release!: () => void, entered!: () => void;
   const ready = new Promise<void>(resolve => { entered = resolve; });
   const held = mutateStore(async () => { entered(); await new Promise<void>(resolve => { release = resolve; }); });

@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
-import { appendUsageEntry, resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../src/usage/log";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import type { OcxConfig } from "../../src/types";
+import { appendUsageEntry, resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../backend/src/usage/log";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";
@@ -230,7 +230,7 @@ describe("route explainability (RI-09)", () => {
   });
 
   test("CLI logs explain encodes request ids and supports --json", async () => {
-    const { handleObserveCommand } = await import("../../src/cli/observe");
+    const { handleObserveCommand } = await import("../../backend/src/cli/observe");
     const calls: Array<{ path: string; init?: RequestInit }> = [];
     const payload = {
       requestId: "id with spaces",
@@ -253,7 +253,7 @@ describe("route explainability (RI-09)", () => {
   });
 
   test("CLI logs explain text output keeps line breaks and still escapes values", async () => {
-    const { handleObserveCommand } = await import("../../src/cli/observe");
+    const { handleObserveCommand } = await import("../../backend/src/cli/observe");
     // U+009B (C1 CSI) survives JSON.stringify, so only the terminal-safety pass can escape it.
     const payload = { requestId: "explain-text", summary: { finalModel: "m1\u009b31m" } };
     const output = spyOn(console, "log").mockImplementation(() => {});
@@ -276,7 +276,7 @@ describe("route explainability (RI-09)", () => {
   });
 
   test("CLI logs explain rejects missing request ids", async () => {
-    const { handleObserveCommand } = await import("../../src/cli/observe");
+    const { handleObserveCommand } = await import("../../backend/src/cli/observe");
     const code = await handleObserveCommand(["logs", "explain"], {
       baseUrl: "http://cli.test",
       fetchImpl: async () => {
@@ -287,7 +287,7 @@ describe("route explainability (RI-09)", () => {
   });
 
   test("CLI route policy evaluate posts dry-run evidence and rejects option-like ids", async () => {
-    const { handleRoutePolicyCommand } = await import("../../src/cli/route-policy");
+    const { handleRoutePolicyCommand } = await import("../../backend/src/cli/route-policy");
     const calls: Array<{ path: string; init?: RequestInit }> = [];
     const ok = await handleRoutePolicyCommand(["evaluate", "fast", "--tools", "--json"], {
       baseUrl: "http://cli.test",

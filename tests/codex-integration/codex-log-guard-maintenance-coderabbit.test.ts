@@ -14,7 +14,7 @@ import { join } from "node:path";
 import {
   compactCodexLogs,
   type CodexLogGuardMaintenanceDeps,
-} from "../../src/codex/log-guard/maintenance";
+} from "../../backend/src/codex/log-guard/maintenance";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

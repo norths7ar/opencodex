@@ -9,25 +9,25 @@ import {
   pickLowestUsageCodexAccount,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 import {
   CodexPoolAuthenticationError,
   headersForCodexAuthContext,
   isCodexAuthContextUsable,
   resolveCodexAuthContext,
-} from "../../src/codex/auth-context";
-import { isCodexAccountUsable } from "../../src/codex/account-usability";
+} from "../../backend/src/codex/auth-context";
+import { isCodexAccountUsable } from "../../backend/src/codex/account-usability";
 import {
   reconcileMainCodexAccountRuntimeState,
   resetMainCodexAccountIdentityTrackingForTests,
-} from "../../src/codex/account-lifecycle";
+} from "../../backend/src/codex/account-lifecycle";
 import {
   forgetCodexFailureWindows,
   isCodexFailureWindowDegraded,
   noteCodexFailureWindowSample,
-} from "../../src/codex/routing/failure-window";
-import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../src/codex/main-account";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+} from "../../backend/src/codex/routing/failure-window";
+import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   clearAccountNeedsReauth,
   clearAccountQuota,
@@ -38,8 +38,8 @@ import {
   markAccountNeedsReauth,
   primeCodexPoolQuotas,
   updateAccountQuota,
-} from "../../src/codex/auth-api";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const STORE_DIR = join(import.meta.dir, ".tmp-main-rotation-store");

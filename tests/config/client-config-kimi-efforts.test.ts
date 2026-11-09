@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { buildClientConfig, kimiModelAlias, type ExportContext, type ExportModel, type KimiGeneratedConfig } from "../../src/clients/config-export";
-import { serializeDocument } from "../../src/integrations/serialize";
-import type { OcxConfig } from "../../src/types";
+import { buildClientConfig, kimiModelAlias, type ExportContext, type ExportModel, type KimiGeneratedConfig } from "../../backend/src/clients/config-export";
+import { serializeDocument } from "../../backend/src/integrations/serialize";
+import type { OcxConfig } from "../../backend/src/types";
 
 // #8095: the Kimi Code export dropped the declared effort ladder and default, so routed models
 // such as kimi/k3.1-pro offered no thinking-effort selection in Kimi Code.

@@ -3,9 +3,9 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { OAUTH_PROVIDERS, runLogin } from "../../../src/oauth";
-import { inspectKiroCliSqlite, kiroCliInstallGuidance, loginKiro, readKiroCliSqlite, refreshKiroToken, resolveKiroApiRegion, resolveKiroProfileArn, resolveKiroRegion, settleKiroLoginTransaction } from "../../../src/oauth/kiro";
-import { KIRO_BUILDER_ID_SERVICE_PROFILE_ARN } from "../../../src/adapters/kiro-constants";
+import { OAUTH_PROVIDERS, runLogin } from "../../../backend/src/oauth";
+import { inspectKiroCliSqlite, kiroCliInstallGuidance, loginKiro, readKiroCliSqlite, refreshKiroToken, resolveKiroApiRegion, resolveKiroProfileArn, resolveKiroRegion, settleKiroLoginTransaction } from "../../../backend/src/oauth/kiro";
+import { KIRO_BUILDER_ID_SERVICE_PROFILE_ARN } from "../../../backend/src/adapters/kiro-constants";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 // Windows CI cold runners take 5-7s for the real SQLite create/inspect cycles here

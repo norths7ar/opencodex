@@ -4,13 +4,13 @@
  * candidate runs as before.
  */
 import { beforeEach, describe, expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { RouteDecisionTraceV1 } from "../../src/routing/trace";
-import { handleResponsesWithPolicyFallback } from "../../src/server/responses/policy-fallback";
-import { PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../src/server/responses/policy-request-scope";
-import { clearFallbackEventsForTests, recentFallbackEvents } from "../../src/routing/fallback-policy";
-import type { OcxFallbackConfig } from "../../src/types/fallback";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { RouteDecisionTraceV1 } from "../../backend/src/routing/trace";
+import { handleResponsesWithPolicyFallback } from "../../backend/src/server/responses/policy-fallback";
+import { PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../backend/src/server/responses/policy-request-scope";
+import { clearFallbackEventsForTests, recentFallbackEvents } from "../../backend/src/routing/fallback-policy";
+import type { OcxFallbackConfig } from "../../backend/src/types/fallback";
 
 function config(fallback?: OcxFallbackConfig, redirects?: Record<string, string>): OcxConfig {
   return {

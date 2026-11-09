@@ -1,6 +1,6 @@
-import { handleResponses } from "../../src/server/responses";
-import type { TranslatorBudget } from "../../src/lib/translator-budget";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { TranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { OcxConfig } from "../../backend/src/types";
 
 export const originalFetch = globalThis.fetch;
 

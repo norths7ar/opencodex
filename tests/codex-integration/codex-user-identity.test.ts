@@ -12,14 +12,14 @@ import {
   resolveEffectiveUserRuntimeRoot,
   probeCodexCoordinatorNamespace,
   samePathIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 import {
   readWindowsLocalAppData,
   resolveWindowsLocalAppData,
   type WindowsKnownFolderApi,
-} from "../../src/codex/windows-local-appdata";
+} from "../../backend/src/codex/windows-local-appdata";
 
 let codexHome = "";
 let previousHome: string | undefined;
@@ -115,7 +115,7 @@ test.if(process.platform === "win32" && process.arch === "x64")(
 
 const CHILD_TIMEOUT_MS = 10_000;
 const userIdentityModuleUrl = pathToFileURL(
-  repoPath("src", "codex", "user-identity.ts"),
+  repoPath("backend/src", "codex", "user-identity.ts"),
 ).href;
 const identityProbe = `
   import {

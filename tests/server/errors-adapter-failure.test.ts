@@ -5,11 +5,11 @@ import {
   extractPolicyRefusalText,
   isUpstreamPolicyRefusal,
   parseRetryAfterFromMessage,
-} from "../../src/lib/errors";
-import { bufferCompactResponse } from "../../src/server/responses";
-import { rewriteUpstreamPolicyRefusal } from "../../src/server/responses/policy-refusal";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { getActiveTurnCount, tryAdmitTurn } from "../../src/server/lifecycle";
+} from "../../backend/src/lib/errors";
+import { bufferCompactResponse } from "../../backend/src/server/responses";
+import { rewriteUpstreamPolicyRefusal } from "../../backend/src/server/responses/policy-refusal";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { getActiveTurnCount, tryAdmitTurn } from "../../backend/src/server/lifecycle";
 import { collectSse } from "../helpers/responses-conformance";
 import { repoPath } from "../helpers/repo-root";
 

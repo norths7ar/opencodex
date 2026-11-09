@@ -5,11 +5,11 @@ import { writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { clearQoderBinaryCache } from "../../src/adapters/qoder/profiles";
-import type { IncomingMeta } from "../../src/adapters/base";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { clearQoderBinaryCache } from "../../backend/src/adapters/qoder/profiles";
+import type { IncomingMeta } from "../../backend/src/adapters/base";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function completedChild(): ChildProcess {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { baseProviderLabel, poolAccountProviderLabel } from "../../src/providers/label";
-import { summarizeUsage } from "../../src/usage/summary";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+import { baseProviderLabel, poolAccountProviderLabel } from "../../backend/src/providers/label";
+import { summarizeUsage } from "../../backend/src/usage/summary";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 
 const FIXED_NOW = Date.UTC(2026, 5, 28, 12, 0, 0);
 

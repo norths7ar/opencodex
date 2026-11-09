@@ -1,14 +1,14 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { modelTitle } from "../../gui/src/pages/logs-model-title";
-import { validateConfigCandidate } from "../../src/config";
-import { createAdapterTierMetadata } from "../../src/providers/fastwire";
-import { responseTierAuthorityForProvider } from "../../src/providers/openai-tiers-destination";
-import { parseProviderEditorConfigDTO, providerEditorConfigDTO } from "../../src/server/auth-cors";
-import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../src/server/request-log";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
-import { normalizeUsageEntryForTest } from "../../src/usage/log";
+import { modelTitle } from "../../frontend/src/pages/logs-model-title";
+import { validateConfigCandidate } from "../../backend/src/config";
+import { createAdapterTierMetadata } from "../../backend/src/providers/fastwire";
+import { responseTierAuthorityForProvider } from "../../backend/src/providers/openai-tiers-destination";
+import { parseProviderEditorConfigDTO, providerEditorConfigDTO } from "../../backend/src/server/auth-cors";
+import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../backend/src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../backend/src/usage/cost";
+import { normalizeUsageEntryForTest } from "../../backend/src/usage/log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const originalFetch = globalThis.fetch;

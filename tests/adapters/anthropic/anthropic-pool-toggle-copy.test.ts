@@ -15,17 +15,17 @@
 import { describe, expect, test } from "bun:test";
 
 const LOCALE_PATHS = [
-  "gui/src/i18n/en.ts",
-  "gui/src/i18n/de.ts",
-  "gui/src/i18n/fr.ts",
-  "gui/src/i18n/ja.ts",
-  "gui/src/i18n/ko.ts",
-  "gui/src/i18n/pt.ts",
-  "gui/src/i18n/ru.ts",
-  "gui/src/i18n/tr.ts",
-  "gui/src/i18n/vi.ts",
-  "gui/src/i18n/zh.ts",
-  "gui/src/i18n/zh-TW.ts",
+  "frontend/src/i18n/en.ts",
+  "frontend/src/i18n/de.ts",
+  "frontend/src/i18n/fr.ts",
+  "frontend/src/i18n/ja.ts",
+  "frontend/src/i18n/ko.ts",
+  "frontend/src/i18n/pt.ts",
+  "frontend/src/i18n/ru.ts",
+  "frontend/src/i18n/tr.ts",
+  "frontend/src/i18n/vi.ts",
+  "frontend/src/i18n/zh.ts",
+  "frontend/src/i18n/zh-TW.ts",
 ] as const;
 
 function valueOf(source: string, key: string): string {
@@ -71,7 +71,7 @@ describe("Claude account pool toggle copy", () => {
       expect(valueOf(source, "anthropicPool.disabledDesc"), path).toContain("429");
       expect(valueOf(source, "anthropicPool.detailsFailover"), path).toContain("429");
     }
-    const source = await Bun.file("gui/src/i18n/en.ts").text();
+    const source = await Bun.file("frontend/src/i18n/en.ts").text();
     const disabled = valueOf(source, "anthropicPool.disabledDesc");
     expect(disabled).toContain("Proactive account selection is off");
     expect(disabled).toContain("can still switch after a rate-limit response (429)");
@@ -81,7 +81,7 @@ describe("Claude account pool toggle copy", () => {
     // The notice replaced an alarm ("not battle-tested ... keep this off") that told operators
     // nothing they could act on. What replaces it must name the conditions the pool is meant
     // for and still say it is experimental and unendorsed -- softer wording, not a softer claim.
-    const source = await Bun.file("gui/src/i18n/en.ts").text();
+    const source = await Bun.file("frontend/src/i18n/en.ts").text();
     const warning = valueOf(source, "anthropicPool.experimentalWarning");
     for (const claim of [
       "subscriptions you own or are authorized to use",

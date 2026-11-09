@@ -91,12 +91,12 @@ chmodSync(configPath, 0o600);
 chmodSync(v1BackupPath, 0o600);
 
 const [configModule, configPaths, startupModule, migrationModule, windowsAcl, windowsPrincipal] = await Promise.all([
-  import("../../src/config"),
-  import("../../src/config/paths"),
-  import("../../src/providers/openai-tier-startup"),
-  import("../../src/providers/openai-tiers"),
-  import("../../src/lib/windows-secret-acl"),
-  import("../../src/lib/windows-user-principal"),
+  import("../../backend/src/config"),
+  import("../../backend/src/config/paths"),
+  import("../../backend/src/providers/openai-tier-startup"),
+  import("../../backend/src/providers/openai-tiers"),
+  import("../../backend/src/lib/windows-secret-acl"),
+  import("../../backend/src/lib/windows-user-principal"),
 ]);
 windowsAcl.setIcaclsRunnerForTests(() => {
   aclSeamCalls += 1;

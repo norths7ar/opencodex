@@ -3,8 +3,8 @@
  * only on demand; every fresh body is an independent copy charged to the translator budget.
  */
 import { describe, expect, test } from "bun:test";
-import { createProtocolEnvelope } from "../../src/protocols/envelope";
-import { isTranslatorBudgetExceededError } from "../../src/lib/translator-budget";
+import { createProtocolEnvelope } from "../../backend/src/protocols/envelope";
+import { isTranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function chatBody(): Record<string, unknown> {

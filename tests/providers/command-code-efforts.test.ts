@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { commandCodeReasoningEfforts, refreshCommandCodeReasoningEfforts, resetCommandCodeReasoningEffortsForTest } from "../../src/providers/command-code-efforts";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import type { OcxParsedRequest } from "../../src/types";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { commandCodeReasoningEfforts, refreshCommandCodeReasoningEfforts, resetCommandCodeReasoningEffortsForTest } from "../../backend/src/providers/command-code-efforts";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import type { OcxParsedRequest } from "../../backend/src/types";
 
 // Issue #5096: measured accepted ladders, including the narrower exceptions.
 const measured: Array<[string, string[]]> = [

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { RUNTIME_PROVIDER_FETCH, runtimeProviderFetch } from "../../src/lib/provider-runtime-fetch";
+import { RUNTIME_PROVIDER_FETCH, runtimeProviderFetch } from "../../backend/src/lib/provider-runtime-fetch";
 
 test("runtime provider fetch is scoped to provider and exact origin", () => {
   const fetcher = async () => new Response("ok");

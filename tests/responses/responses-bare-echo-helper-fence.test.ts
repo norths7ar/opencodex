@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
-import { collectDeclaredWireToolNames } from "../../src/server/responses-undeclared-tool-guard";
-import { normalizeDeclaredToolName, declaresCodeModeExec } from "../../src/types/tools";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
+import { collectDeclaredWireToolNames } from "../../backend/src/server/responses-undeclared-tool-guard";
+import { normalizeDeclaredToolName, declaresCodeModeExec } from "../../backend/src/types/tools";
 
 /**
  * The bare echo alias is a convenience for providers that drop the namespace prefix. For the six

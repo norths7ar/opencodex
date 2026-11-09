@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { saveCredential } from "../../src/oauth/store";
-import { clearProviderQuotaCache, fetchProviderQuotaReports, QUOTA_RESPONSE_MAX_BYTES } from "../../src/providers/quota";
-import { decodeDevinUserStatus, devinQuotaFromStatus, fetchDevinQuota } from "../../src/providers/quota/devin";
-import { AUTHORITATIVE_EMPTY_QUOTA, TERMINAL_QUOTA_FAILURE } from "../../src/providers/quota/report-cache";
-import type { OcxConfig } from "../../src/types";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearProviderQuotaCache, fetchProviderQuotaReports, QUOTA_RESPONSE_MAX_BYTES } from "../../backend/src/providers/quota";
+import { decodeDevinUserStatus, devinQuotaFromStatus, fetchDevinQuota } from "../../backend/src/providers/quota/devin";
+import { AUTHORITATIVE_EMPTY_QUOTA, TERMINAL_QUOTA_FAILURE } from "../../backend/src/providers/quota/report-cache";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const KEY = "devin-session-token$synthetic.fixture.key";
@@ -376,7 +376,7 @@ describe("Devin provider quota through the aggregator", () => {
 
 describe("Devin quota cache identity", () => {
   test("a tenant host change invalidates the cached reading; a credential without one keeps its key", async () => {
-    const { quotaCredentialIdentity } = await import("../../src/providers/quota/account-cache");
+    const { quotaCredentialIdentity } = await import("../../backend/src/providers/quota/account-cache");
     const target = { adapter: "devin", authMode: "oauth" } as any;
     const base = { access: KEY, refresh: "", expires: Number.MAX_SAFE_INTEGER } as any;
     const us = quotaCredentialIdentity("devin", "a1", { ...base, apiBaseUrl: "https://server.codeium.com" }, target);
@@ -385,7 +385,7 @@ describe("Devin quota cache identity", () => {
     expect(quotaCredentialIdentity("devin", "a1", base, target)).toBe(quotaCredentialIdentity("devin", "a1", { ...base, apiBaseUrl: undefined }, target));
   });
   test("another provider's apiBaseUrl does not alter its quota credential identity", async () => {
-    const { quotaCredentialIdentity } = await import("../../src/providers/quota/account-cache");
+    const { quotaCredentialIdentity } = await import("../../backend/src/providers/quota/account-cache");
     const target = { adapter: "openai-chat", authMode: "oauth" } as any;
     const base = { access: KEY, refresh: "", expires: Number.MAX_SAFE_INTEGER } as any;
     expect(quotaCredentialIdentity("github-copilot", "a1", base, target)).toBe(

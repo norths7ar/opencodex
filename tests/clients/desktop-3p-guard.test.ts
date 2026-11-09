@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assertDesktop3pModelsValid } from "../../src/claude/desktop-3p-guard";
-import { generateDesktop3pModels, writeDesktop3pConfig } from "../../src/claude/desktop-3p";
-import type { Desktop3pModelEntry } from "../../src/claude/desktop-3p";
+import { assertDesktop3pModelsValid } from "../../backend/src/claude/desktop-3p-guard";
+import { generateDesktop3pModels, writeDesktop3pConfig } from "../../backend/src/claude/desktop-3p";
+import type { Desktop3pModelEntry } from "../../backend/src/claude/desktop-3p";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

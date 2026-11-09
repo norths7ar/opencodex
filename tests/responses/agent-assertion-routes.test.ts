@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, test } from
 import { mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { saveConfig } from "../../src/config";
-import { AGENT_ASSERTION_HEADER, AGENT_ASSERTION_UNSUPPORTED_CODE } from "../../src/lib/authorization-scheme";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { saveConfig } from "../../backend/src/config";
+import { AGENT_ASSERTION_HEADER, AGENT_ASSERTION_UNSUPPORTED_CODE } from "../../backend/src/lib/authorization-scheme";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";

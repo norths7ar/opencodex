@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { DEVIN_MODEL_CONTEXT_WINDOWS, DEVIN_STATIC_MODELS } from "../../src/adapters/devin/live-models";
-import { kiroNativeEffortField, kiroReasoningMode } from "../../src/adapters/kiro/reasoning";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig } from "../../src/types";
+import { DEVIN_MODEL_CONTEXT_WINDOWS, DEVIN_STATIC_MODELS } from "../../backend/src/adapters/devin/live-models";
+import { kiroNativeEffortField, kiroReasoningMode } from "../../backend/src/adapters/kiro/reasoning";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const TERRA = "gpt-6.1-terra";

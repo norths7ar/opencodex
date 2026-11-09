@@ -2,10 +2,10 @@ import { describe, expect, test } from "bun:test";
 import {
   createFailureProjectionAccumulator,
   failureProviderClass,
-} from "../../src/usage/failure-projection";
-import { FAILURE_FINGERPRINT_VERSION } from "../../src/usage/failure-fingerprint";
-import { REQUEST_FAILURE_CAUSES } from "../../src/lib/request-failure-model";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+} from "../../backend/src/usage/failure-projection";
+import { FAILURE_FINGERPRINT_VERSION } from "../../backend/src/usage/failure-fingerprint";
+import { REQUEST_FAILURE_CAUSES } from "../../backend/src/lib/request-failure-model";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 
 function row(overrides: Partial<PersistedUsageEntry>): PersistedUsageEntry {
   return {

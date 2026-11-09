@@ -8,9 +8,9 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../../src/types";
-import type { DataPlaneAdmission } from "../../../src/server/auth-cors";
+import type { ProviderAdapter } from "../../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
+import type { DataPlaneAdmission } from "../../../backend/src/server/auth-cors";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
@@ -20,9 +20,9 @@ let cursorLimited = false;
 let cursorModels: string[] = [];
 let cursorEfforts: unknown[] = [];
 
-const actualResolver = await import("../../../src/server/adapter-resolve");
+const actualResolver = await import("../../../backend/src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
-mock.module("../../../src/server/adapter-resolve", () => ({
+mock.module("../../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     if (provider.adapter !== "cursor") return actualResolveAdapter(provider, cacheRetention);
@@ -44,13 +44,13 @@ mock.module("../../../src/server/adapter-resolve", () => ({
   },
 }));
 
-const { handleChatCompletions } = await import("../../../src/server/chat-completions");
-const { saveCredential, getAccountSet, setActiveAccount } = await import("../../../src/oauth/store");
+const { handleChatCompletions } = await import("../../../backend/src/server/chat-completions");
+const { saveCredential, getAccountSet, setActiveAccount } = await import("../../../backend/src/oauth/store");
 const {
   clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum,
-} = await import("../../../src/oauth/anthropic-routing");
-const { clearGenericFailoverHealth } = await import("../../../src/oauth/generic-account-failover");
-const { clearAccountQuotaCache } = await import("../../../src/providers/quota");
+} = await import("../../../backend/src/oauth/anthropic-routing");
+const { clearGenericFailoverHealth } = await import("../../../backend/src/oauth/generic-account-failover");
+const { clearAccountQuotaCache } = await import("../../../backend/src/providers/quota");
 
 type Lane = "subscription" | "api-key";
 type Sent = { lane: Lane; authorization: string | null; apiKey: string | null; body: Record<string, unknown> };

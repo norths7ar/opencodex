@@ -3,7 +3,7 @@ import { hostedWindowsQuarantine } from "./windows-ci-quarantine";
 import { expect, test } from "bun:test";
 import { mkdtempSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES } from "../../src/lib/client-error-body";
+import { ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES } from "../../backend/src/lib/client-error-body";
 import { fixturePath, helperPath, repoRoot } from "./repo-root";
 import { collectOverflowChild, finishOverflowScratch, overflowScratchBase } from "./messages-overflow-child";
 import { applicableMessagesOverflowFixtures, messagesOverflowLanes, messagesOverflowCaseId, messagesOverflowCaseTableHash, type MessagesOverflowFixture } from "./messages-overflow-cases";

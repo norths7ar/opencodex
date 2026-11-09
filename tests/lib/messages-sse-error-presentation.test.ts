@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { messagesRelayedOverflowPresentation, messagesSseErrorOverflowPresentation } from "../../src/lib/messages-error-body";
-import { messagesSseErrorPayload, messagesSseOversizePayload, messagesSseEchoRenamedError } from "../../src/lib/messages-sse-error-presentation";
+import { messagesRelayedOverflowPresentation, messagesSseErrorOverflowPresentation } from "../../backend/src/lib/messages-error-body";
+import { messagesSseErrorPayload, messagesSseOversizePayload, messagesSseEchoRenamedError } from "../../backend/src/lib/messages-sse-error-presentation";
 import { pinnedMessagesObservation } from "../helpers/messages-sse-observer";
 import { messagesSseCases, SSE_SENTINEL } from "../helpers/messages-sse-cases";
 const bytes = (value: string) => new TextEncoder().encode(value);

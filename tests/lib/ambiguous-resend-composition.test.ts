@@ -9,19 +9,19 @@ import {
   type SingleUseDispatchPermit,
   type RequestExecutionBudget,
   type SendClass,
-} from "../../src/lib/request-execution-budget";
-import { authorizeResendForRecovery, type ResendDecision } from "../../src/lib/request-resend-gate";
-import type { RequestFailureStage } from "../../src/lib/request-failure-model";
+} from "../../backend/src/lib/request-execution-budget";
+import { authorizeResendForRecovery, type ResendDecision } from "../../backend/src/lib/request-resend-gate";
+import type { RequestFailureStage } from "../../backend/src/lib/request-failure-model";
 import {
   fetchWithResetRetry,
   isNonReplayableResponse,
   refetchAfterProtocolSafeReset,
   TRANSIENT_RETRY_MAX_ATTEMPTS,
-} from "../../src/lib/upstream-retry";
-import { ambiguousResendAllowanceFor } from "../../src/server/responses/reset-replay";
-import { resetReplayPolicyFor } from "../../src/providers/key-failover";
+} from "../../backend/src/lib/upstream-retry";
+import { ambiguousResendAllowanceFor } from "../../backend/src/server/responses/reset-replay";
+import { resetReplayPolicyFor } from "../../backend/src/providers/key-failover";
 import { repoPath } from "../helpers/repo-root";
-import type { OcxProviderConfig } from "../../src/types";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /*
  * Holds INV-RESEND-02 from structure/overview.md across a COMPOSITION of legs.
@@ -324,7 +324,7 @@ describe("one resend budget across composed recovery legs", () => {
     // `authorize` is optional on the helper, so this is the property that keeps a call site from
     // becoming a resend of a possibly-executed turn that no gate ever weighed. Scanned rather
     // than listed: the hazard is the call site nobody remembered to add to a list.
-    const srcDir = repoPath("src");
+    const srcDir = repoPath("backend/src");
     const unauthorized: string[] = [];
     let callSites = 0;
     for await (const relative of new Bun.Glob("**/*.ts").scan({ cwd: srcDir })) {

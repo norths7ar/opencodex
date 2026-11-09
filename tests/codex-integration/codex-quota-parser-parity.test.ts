@@ -9,11 +9,11 @@ import {
   parseUsageQuota,
   setAccountQuotaFromParsed,
   updateAccountQuota,
-} from "../../src/codex/quota";
-import { codexPoolQuotaEvidence } from "../../src/routing/quota";
-import { computeCodexUsageScore } from "../../src/codex/routing/cooldown-math";
-import { isCodexAccountHeldForCredits } from "../../src/codex/account-credit-use";
-import type { WhamUsageResponse } from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
+import { codexPoolQuotaEvidence } from "../../backend/src/routing/quota";
+import { computeCodexUsageScore } from "../../backend/src/codex/routing/cooldown-math";
+import { isCodexAccountHeldForCredits } from "../../backend/src/codex/account-credit-use";
+import type { WhamUsageResponse } from "../../backend/src/codex/quota";
 
 describe("consumable credits at an included usage limit", () => {
   const wham = (credits: unknown, allowed = true, spendControl?: unknown): WhamUsageResponse => ({

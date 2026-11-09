@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
-import { handleResponses } from "../../src/server/responses/core";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

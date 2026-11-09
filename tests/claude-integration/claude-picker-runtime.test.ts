@@ -4,24 +4,24 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { connect, createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applyDesktopFirstParty } from "../../src/claude/desktop-first-party";
-import { applyDesktopPickerProfile, inspectDesktopPickerProfile } from "../../src/claude/desktop-picker-profile";
-import { claudeDesktopIntegrationEnabled } from "../../src/codex/desired-state";
-import { ensurePickerCa, pickerCaCertPath, pickerCaFingerprints, pickerCaPendingUntrustPath, pickerStateDir, PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../src/claude/intercept/picker-ca";
-import { startConnectProxy } from "../../src/claude/intercept/connect-proxy";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
-import { readClaudeInterceptProxyToken } from "../../src/claude/intercept/proxy-auth";
-import type { PickerListenerOptions } from "../../src/claude/intercept/picker-listener";
+import { applyDesktopFirstParty } from "../../backend/src/claude/desktop-first-party";
+import { applyDesktopPickerProfile, inspectDesktopPickerProfile } from "../../backend/src/claude/desktop-picker-profile";
+import { claudeDesktopIntegrationEnabled } from "../../backend/src/codex/desired-state";
+import { ensurePickerCa, pickerCaCertPath, pickerCaFingerprints, pickerCaPendingUntrustPath, pickerStateDir, PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../backend/src/claude/intercept/picker-ca";
+import { startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
+import { readClaudeInterceptProxyToken } from "../../backend/src/claude/intercept/proxy-auth";
+import type { PickerListenerOptions } from "../../backend/src/claude/intercept/picker-listener";
 import {
   createPickerRuntime,
   pickerDesired,
   PICKER_MODELS_FILE,
   type CreatePickerRuntimeOptions,
   type PickerRuntime,
-} from "../../src/claude/intercept/picker-runtime";
-import type { SecurityRunner } from "../../src/claude/intercept/picker-trust";
-import { getClaudePickerController, getClaudePickerRuntime, startClaudeIntercept } from "../../src/claude/intercept/runtime";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/intercept/picker-runtime";
+import type { SecurityRunner } from "../../backend/src/claude/intercept/picker-trust";
+import { getClaudePickerController, getClaudePickerRuntime, startClaudeIntercept } from "../../backend/src/claude/intercept/runtime";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 

@@ -1,12 +1,12 @@
 import { test } from "bun:test";
 import assert from "node:assert/strict";
-import { createAdmittedHttpTurn } from "../../src/server/admitted-http-turn";
-import { getDefaultConfig } from "../../src/config";
-import { MAX_CONFIGURABLE_INBOUND_BODY_BYTES } from "../../src/server/request-decompress";
-import { inboundBodyBudget, configureInboundBodyBudget, MAX_QUEUED_INBOUND_BODIES } from "../../src/server/inbound-body-budget";
-import { clearRequestLogsForTests, getRequestLogEntries } from "../../src/server/request-log";
-import { getActiveTurnCount, MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../src/server/lifecycle";
-import { admitWorkflowTurn, resetWorkflowBudgetsForTest } from "../../src/lib/workflow-budget";
+import { createAdmittedHttpTurn } from "../../backend/src/server/admitted-http-turn";
+import { getDefaultConfig } from "../../backend/src/config";
+import { MAX_CONFIGURABLE_INBOUND_BODY_BYTES } from "../../backend/src/server/request-decompress";
+import { inboundBodyBudget, configureInboundBodyBudget, MAX_QUEUED_INBOUND_BODIES } from "../../backend/src/server/inbound-body-budget";
+import { clearRequestLogsForTests, getRequestLogEntries } from "../../backend/src/server/request-log";
+import { getActiveTurnCount, MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { admitWorkflowTurn, resetWorkflowBudgetsForTest } from "../../backend/src/lib/workflow-budget";
 
 const limit = MAX_CONFIGURABLE_INBOUND_BODY_BYTES;
 const policy = getDefaultConfig();

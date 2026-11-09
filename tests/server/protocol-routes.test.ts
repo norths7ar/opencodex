@@ -3,12 +3,12 @@
  * read-only, bounded input, and a validated ProtocolPlanV1 with basis "preview".
  */
 import { describe, expect, test } from "bun:test";
-import { PROTOCOL_CONTRACT_VERSION } from "../../src/protocols/contract";
-import { isProtocolPlanV1 } from "../../src/protocols/dto";
-import { PROTOCOL_FEATURES } from "../../src/protocols/features";
-import type { ManagementContext } from "../../src/server/management/context";
-import { handleProtocolRoutes, parseProtocolPlanBody } from "../../src/server/management/protocol-routes";
-import type { OcxConfig } from "../../src/types";
+import { PROTOCOL_CONTRACT_VERSION } from "../../backend/src/protocols/contract";
+import { isProtocolPlanV1 } from "../../backend/src/protocols/dto";
+import { PROTOCOL_FEATURES } from "../../backend/src/protocols/features";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { handleProtocolRoutes, parseProtocolPlanBody } from "../../backend/src/server/management/protocol-routes";
+import type { OcxConfig } from "../../backend/src/types";
 
 const config = {
   port: 10100,

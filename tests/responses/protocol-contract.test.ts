@@ -16,7 +16,7 @@ import {
   protocolNodes,
   PROTOCOLS,
   upstreamWireForAdapter,
-} from "../../src/protocols/contract";
+} from "../../backend/src/protocols/contract";
 import { repoPath } from "../helpers/repo-root";
 
 describe("protocol vocabulary mapping", () => {
@@ -68,7 +68,7 @@ describe("leaf-module boundary", () => {
 
   for (const file of LEAVES) {
     test(`src/protocols/${file} imports only protocol leaves`, () => {
-      const source = readFileSync(repoPath("src", "protocols", file), "utf8");
+      const source = readFileSync(repoPath("backend/src", "protocols", file), "utf8");
       const specifiers = [...source.matchAll(/from\s+"([^"]+)"/g)].map(match => match[1]);
       for (const specifier of specifiers) expect(ALLOWED.has(specifier!)).toBe(true);
     });

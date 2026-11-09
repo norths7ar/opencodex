@@ -10,9 +10,9 @@ import {
   resetCursorEffortTableCacheForTests,
   type CursorEffortTable,
   type CursorEffortTableDeps,
-} from "../../../src/integrations/cursor-effort-table";
-import type { CursorInstall } from "../../../src/integrations/cursor-detect";
-import { predictCursorEffort } from "../../../src/server/models-capabilities";
+} from "../../../backend/src/integrations/cursor-effort-table";
+import type { CursorInstall } from "../../../backend/src/integrations/cursor-detect";
+import { predictCursorEffort } from "../../../backend/src/server/models-capabilities";
 import { fixturePath } from "../../helpers/repo-root";
 
 const FIXTURE = readFileSync(fixturePath("cursor-agent-exec-effort-table.min.js"), "utf8");

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync } from "node:fs";
-import { handleCursorIntegrationCommand } from "../../src/cli/integration-cursor";
-import { handleIntegrationCommand } from "../../src/cli/inspect";
-import type { CursorIntegrationStatus } from "../../src/server/management/cursor-integration-routes";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleCursorIntegrationCommand } from "../../backend/src/cli/integration-cursor";
+import { handleIntegrationCommand } from "../../backend/src/cli/inspect";
+import type { CursorIntegrationStatus } from "../../backend/src/server/management/cursor-integration-routes";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const realFetch = globalThis.fetch;

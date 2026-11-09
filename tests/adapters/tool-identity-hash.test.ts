@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { compileGoogleWireBody } from "../../src/adapters/google-wire-compiler";
-import { createKiroToolNameRegistry, kiroToolName } from "../../src/adapters/kiro-wire";
-import { anthropicToolCallId, createToolCallIdAllocator } from "../../src/adapters/tool-call-id";
-import { buildMuseToolNameAliasPlan, museWireToolName } from "../../src/responses/muse-tool-name-alias";
+import { compileGoogleWireBody } from "../../backend/src/adapters/google-wire-compiler";
+import { createKiroToolNameRegistry, kiroToolName } from "../../backend/src/adapters/kiro-wire";
+import { anthropicToolCallId, createToolCallIdAllocator } from "../../backend/src/adapters/tool-call-id";
+import { buildMuseToolNameAliasPlan, museWireToolName } from "../../backend/src/responses/muse-tool-name-alias";
 
 // Known SHA-256 prefixes computed independently with Python hashlib over UTF-8 bytes.
 // Lone UTF-16 surrogates encode as U+FFFD, matching the existing Node crypto wire contract.

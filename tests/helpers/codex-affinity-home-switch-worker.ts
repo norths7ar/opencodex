@@ -1,10 +1,10 @@
 import { Database } from "bun:sqlite";
 import { join } from "node:path";
-import { codexConversationKeyFor, recordCodexThreadLineage } from "../../src/codex/lineage";
-import { acquireSpendLedgerOwner } from "../../src/lib/spend-ledger-owner";
-import { bindThreadAffinity, getThreadAffinity } from "../../src/codex/routing/thread-affinity";
-import { resolveCodexAccountForThread } from "../../src/codex/routing";
-import type { OcxConfig } from "../../src/types";
+import { codexConversationKeyFor, recordCodexThreadLineage } from "../../backend/src/codex/lineage";
+import { acquireSpendLedgerOwner } from "../../backend/src/lib/spend-ledger-owner";
+import { bindThreadAffinity, getThreadAffinity } from "../../backend/src/codex/routing/thread-affinity";
+import { resolveCodexAccountForThread } from "../../backend/src/codex/routing";
+import type { OcxConfig } from "../../backend/src/types";
 
 const homeA = process.env.OPENCODEX_HOME!;
 const homeB = process.argv[2]!;

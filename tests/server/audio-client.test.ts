@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { resolveAudioClient, type AudioClient } from "../../src/server/audio-client";
-import type { OcxConfig } from "../../src/types";
+import { resolveAudioClient, type AudioClient } from "../../backend/src/server/audio-client";
+import type { OcxConfig } from "../../backend/src/types";
 
 const KEY = "ocx_data_audio_client_fixture";
 const ROTATED_KEY = "ocx_data_rotated_fixture";

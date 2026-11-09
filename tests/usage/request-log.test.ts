@@ -9,7 +9,7 @@ import {
   requestLogSpeedLabel,
   queryRequestLogs,
   type RequestLogEntry,
-} from "../../src/server";
+} from "../../backend/src/server";
 import {
   aggregateAttemptUsage,
   addRequestLog,
@@ -27,24 +27,24 @@ import {
   inspectResponseLogSsePayload,
   httpStatusForRequestLogTerminal,
   type RequestLogContext,
-} from "../../src/server/request-log";
-import { handleResponses } from "../../src/server/responses";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import type { AdapterEvent, OcxConfig, OcxUsage } from "../../src/types";
+} from "../../backend/src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import type { AdapterEvent, OcxConfig, OcxUsage } from "../../backend/src/types";
 import {
   appendUsageEntry,
   normalizeUsageEntryForTest,
   readUsageEntries,
   resetUsageReadCacheForTests,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { log } from "../helpers/request-log-entry";
-import { decodeRequestLogCursor, selectRequestLogPoll } from "../../src/server/request-log-cursor";
+import { decodeRequestLogCursor, selectRequestLogPoll } from "../../backend/src/server/request-log-cursor";
 
 async function* replayAdapterEvents(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {
   for (const event of events) yield event;

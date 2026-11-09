@@ -25,7 +25,7 @@ beforeEach(async () => {
   home = mkdtempSync(join(tmpdir(), "ocx-quota-401-"));
   process.env.OPENCODEX_HOME = home;
   originalFetch = globalThis.fetch;
-  const { resetQuotaRecoveryForTests } = await import("../../src/codex/quota-401-recovery");
+  const { resetQuotaRecoveryForTests } = await import("../../backend/src/codex/quota-401-recovery");
   resetQuotaRecoveryForTests();
 });
 
@@ -34,12 +34,12 @@ afterEach(async () => {
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
   removeTreeWithRetry(home);
-  const { resetQuotaRecoveryForTests } = await import("../../src/codex/quota-401-recovery");
+  const { resetQuotaRecoveryForTests } = await import("../../backend/src/codex/quota-401-recovery");
   resetQuotaRecoveryForTests();
 });
 
 async function seedAccount(id: string): Promise<number> {
-  const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../src/codex/account-store");
+  const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
   saveCodexAccountCredential(id, {
     accessToken: REJECTED,
     refreshToken: "grant",
@@ -52,7 +52,7 @@ async function seedAccount(id: string): Promise<number> {
 /** Register the account in config too, so the account-list API actually returns a row. */
 async function seedListedAccount(id: string): Promise<number> {
   const generation = await seedAccount(id);
-  const { loadConfig, saveConfig } = await import("../../src/config");
+  const { loadConfig, saveConfig } = await import("../../backend/src/config");
   const config = loadConfig();
   const accounts = [...(config.codexAccounts ?? []).filter(a => a.id !== id), { id, label: id }];
   saveConfig({ ...config, codexAccounts: accounts });
@@ -60,9 +60,9 @@ async function seedListedAccount(id: string): Promise<number> {
 }
 
 test("a refresh settles the budget even when the caller cancels first", async () => {
-  const { forceRefreshCodexPoolToken } = await import("../../src/codex/account-store");
+  const { forceRefreshCodexPoolToken } = await import("../../backend/src/codex/account-store");
   const { claimQuotaRecovery, quotaRecoveryRecordForTests, settleQuotaRecovery, releaseQuotaRecovery } =
-    await import("../../src/codex/quota-401-recovery");
+    await import("../../backend/src/codex/quota-401-recovery");
   const generation = await seedAccount("cancelled-owner");
 
   let released = 0;
@@ -106,7 +106,7 @@ test("a refresh settles the budget even when the caller cancels first", async ()
 });
 
 test("exactly one of two callers on a shared flight performed the CAS", async () => {
-  const { forceRefreshCodexPoolToken } = await import("../../src/codex/account-store");
+  const { forceRefreshCodexPoolToken } = await import("../../backend/src/codex/account-store");
   const generation = await seedAccount("adopting-joiner");
 
   globalThis.fetch = (async () => {
@@ -139,14 +139,14 @@ test("exactly one of two callers on a shared flight performed the CAS", async ()
 });
 
 test("a revoked grant routes to terminal settlement, a slow one does not", async () => {
-  const { forceRefreshCodexPoolToken } = await import("../../src/codex/account-store");
-  const { claimQuotaRecovery, quotaRecoveryRecordForTests } = await import("../../src/codex/quota-401-recovery");
+  const { forceRefreshCodexPoolToken } = await import("../../backend/src/codex/account-store");
+  const { claimQuotaRecovery, quotaRecoveryRecordForTests } = await import("../../backend/src/codex/quota-401-recovery");
 
   // Drive the real primitive to a real refresh failure and route it exactly the way
   // recoverPoolQuotaFrom401 does, so a wiring that never calls terminal settlement fails.
-  const { TokenRefreshError } = await import("../../src/codex/account-store");
+  const { TokenRefreshError } = await import("../../backend/src/codex/account-store");
   const { releaseQuotaRecovery, settleQuotaRecoveryTerminal, quotaRecoveryTerminalFor } =
-    await import("../../src/codex/quota-401-recovery");
+    await import("../../backend/src/codex/quota-401-recovery");
   const route = (accountId: string, claimId: string, error: unknown) => {
     if (error instanceof TokenRefreshError && /invalid_grant|revoked|expired|invalid_refresh_token/i.test(String(error.message))) {
       settleQuotaRecoveryTerminal(accountId, claimId);
@@ -184,8 +184,8 @@ test("a revoked grant routes to terminal settlement, a slow one does not", async
 });
 
 test("a revoked grant stays needs-reauth across polls, through the real quota path", async () => {
-  const { listCodexAuthAccounts } = await import("../../src/codex/auth-api");
-  const { loadConfig } = await import("../../src/config");
+  const { listCodexAuthAccounts } = await import("../../backend/src/codex/auth-api");
+  const { loadConfig } = await import("../../backend/src/config");
   await seedListedAccount("dead-grant");
 
   // Bare WHAM 401 -> token endpoint says invalid_grant -> the account list re-polls.
@@ -207,7 +207,7 @@ test("a revoked grant stays needs-reauth across polls, through the real quota pa
   // The recovery record alone cannot carry it: by the time the next poll runs, the claim is
   // spent and a spent budget reports transient. Assert the account-level mark directly, so
   // dropping markAccountNeedsReauth fails here rather than being masked by a cached quota.
-  const { isAccountNeedsReauth } = await import("../../src/codex/auth-api");
+  const { isAccountNeedsReauth } = await import("../../backend/src/codex/auth-api");
   expect(isAccountNeedsReauth("dead-grant")).toBe(true);
 
   const second = await listCodexAuthAccounts(config, true);
@@ -217,9 +217,9 @@ test("a revoked grant stays needs-reauth across polls, through the real quota pa
 });
 
 test("a transient refresh failure does not quarantine the account", async () => {
-  const { listCodexAuthAccounts } = await import("../../src/codex/auth-api");
-  const { loadConfig } = await import("../../src/config");
-  const { quotaRecoveryRecordForTests } = await import("../../src/codex/quota-401-recovery");
+  const { listCodexAuthAccounts } = await import("../../backend/src/codex/auth-api");
+  const { loadConfig } = await import("../../backend/src/config");
+  const { quotaRecoveryRecordForTests } = await import("../../backend/src/codex/quota-401-recovery");
   await seedListedAccount("slow-grant");
 
   globalThis.fetch = (async (input: string | URL | Request) => {
@@ -231,16 +231,16 @@ test("a transient refresh failure does not quarantine the account", async () => 
   // A network failure proves nothing about the grant.
   expect(rows.find(row => row.id === "slow-grant")?.needsReauth).toBe(false);
   // Nor may it leave a durable quarantine behind.
-  const { isAccountNeedsReauth } = await import("../../src/codex/auth-api");
+  const { isAccountNeedsReauth } = await import("../../backend/src/codex/auth-api");
   expect(isAccountNeedsReauth("slow-grant")).toBe(false);
   expect(quotaRecoveryRecordForTests("slow-grant")).toMatchObject({ state: "backoff" });
 });
 
 test("same-grant aliases share one quota recovery budget after propagation", async () => {
-  const { listCodexAuthAccounts } = await import("../../src/codex/auth-api");
-  const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { loadConfig, saveConfig } = await import("../../src/config");
-  const { quotaRecoveryRecordForTests } = await import("../../src/codex/quota-401-recovery");
+  const { listCodexAuthAccounts } = await import("../../backend/src/codex/auth-api");
+  const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { loadConfig, saveConfig } = await import("../../backend/src/config");
+  const { quotaRecoveryRecordForTests } = await import("../../backend/src/codex/quota-401-recovery");
 
   const expiresAt = Date.now() + 3600_000;
   for (const id of ["alias-owner", "alias-later"]) {
@@ -300,9 +300,9 @@ test("same-grant aliases share one quota recovery budget after propagation", asy
 });
 
 test("an already-aborted caller starts no refresh at all", async () => {
-  const { forceRefreshCodexPoolToken } = await import("../../src/codex/account-store");
+  const { forceRefreshCodexPoolToken } = await import("../../backend/src/codex/account-store");
   const { claimQuotaRecovery, quotaRecoveryRecordForTests, releaseQuotaRecovery, settleQuotaRecovery } =
-    await import("../../src/codex/quota-401-recovery");
+    await import("../../backend/src/codex/quota-401-recovery");
   const generation = await seedAccount("pre-aborted");
 
   let fetches = 0;
@@ -340,8 +340,8 @@ test("an already-aborted caller starts no refresh at all", async () => {
 });
 
 test("structured terminal evidence on the FIRST 401 needs no refresh and is generation-scoped", async () => {
-  const { listCodexAuthAccounts, isAccountNeedsReauth } = await import("../../src/codex/auth-api");
-  const { loadConfig } = await import("../../src/config");
+  const { listCodexAuthAccounts, isAccountNeedsReauth } = await import("../../backend/src/codex/auth-api");
+  const { loadConfig } = await import("../../backend/src/config");
   const generation = await seedListedAccount("structured-first");
 
   let tokenCalls = 0;
@@ -360,7 +360,7 @@ test("structured terminal evidence on the FIRST 401 needs no refresh and is gene
   expect(isAccountNeedsReauth("structured-first")).toBe(true);
 
   // The evidence is about THAT credential. A replacement must not inherit the quarantine.
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
   saveCodexAccountCredential("structured-first", {
     accessToken: "fresh-login",
     refreshToken: "fresh-grant",
@@ -372,8 +372,8 @@ test("structured terminal evidence on the FIRST 401 needs no refresh and is gene
 });
 
 test("structured terminal evidence on the REPLAY is scoped to the refreshed credential", async () => {
-  const { listCodexAuthAccounts, isAccountNeedsReauth } = await import("../../src/codex/auth-api");
-  const { loadConfig } = await import("../../src/config");
+  const { listCodexAuthAccounts, isAccountNeedsReauth } = await import("../../backend/src/codex/auth-api");
+  const { loadConfig } = await import("../../backend/src/config");
   await seedListedAccount("structured-replay");
 
   let whamCalls = 0;
@@ -393,7 +393,7 @@ test("structured terminal evidence on the REPLAY is scoped to the refreshed cred
   expect(rows.find(row => row.id === "structured-replay")?.needsReauth).toBe(true);
   expect(isAccountNeedsReauth("structured-replay")).toBe(true);
 
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
   saveCodexAccountCredential("structured-replay", {
     accessToken: "fresh-login",
     refreshToken: "fresh-grant",
@@ -404,8 +404,8 @@ test("structured terminal evidence on the REPLAY is scoped to the refreshed cred
 });
 
 test("no bearer reaches the console, the debug buffer, or a serialized account row", async () => {
-  const { forceRefreshCodexPoolToken } = await import("../../src/codex/account-store");
-  const { getDebugLogEntries } = await import("../../src/lib/debug-log-buffer");
+  const { forceRefreshCodexPoolToken } = await import("../../backend/src/codex/account-store");
+  const { getDebugLogEntries } = await import("../../backend/src/lib/debug-log-buffer");
   // Registered, not just credentialed: an unlisted account produces no row at all, and the
   // serializer assertion below would then be checking an empty list.
   const generation = await seedListedAccount("quiet-refresh");
@@ -442,8 +442,8 @@ test("no bearer reaches the console, the debug buffer, or a serialized account r
 
   // And the REAL serializer, not a hand-built stand-in: a leak has to be caught in what
   // the management API actually returns.
-  const { listCodexAuthAccounts } = await import("../../src/codex/auth-api");
-  const { loadConfig } = await import("../../src/config");
+  const { listCodexAuthAccounts } = await import("../../backend/src/codex/auth-api");
+  const { loadConfig } = await import("../../backend/src/config");
   const rows = JSON.stringify(await listCodexAuthAccounts(loadConfig(), false));
   expect(rows).toContain("quiet-refresh");
   for (const secret of secrets) expect(rows).not.toContain(secret);

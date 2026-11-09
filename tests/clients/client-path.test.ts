@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { absoluteClientPath, ClientPathError } from "../../src/clients/client-path";
+import { absoluteClientPath, ClientPathError } from "../../backend/src/clients/client-path";
 import {
   clineConfigPath, commandCodeUserHome, dshHomeDir, mcodeHomeDir, ompAgentDir,
   omoAgentDir, openclawConfigPath, piAgentDir, primeAgentDir, qoderConfigPath,
   zcodeHomeDir, zcodeProviderStorePath,
-} from "../../src/clients/config-export";
-import { agentHomeDir } from "../../src/clients/config-export/agent-clients";
-import { gentleShellPaths } from "../../src/clients/gentle-shell-path";
+} from "../../backend/src/clients/config-export";
+import { agentHomeDir } from "../../backend/src/clients/config-export/agent-clients";
+import { gentleShellPaths } from "../../backend/src/clients/gentle-shell-path";
 
 describe("fully qualified client paths", () => {
   test.each(["\\Users\\me\\.codex", "/client/.codex", "\\", "/", "C:relative", "relative", "\\\\server"])(

@@ -1,6 +1,6 @@
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { CursorTransportFactoryInput } from "../../src/adapters/cursor/transport";
-import type { OcxParsedRequest } from "../../src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { CursorTransportFactoryInput } from "../../backend/src/adapters/cursor/transport";
+import type { OcxParsedRequest } from "../../backend/src/types";
 
 declare const adapter: ProviderAdapter;
 declare const parsed: OcxParsedRequest;

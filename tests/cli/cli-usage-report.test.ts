@@ -8,8 +8,8 @@
  */
 import { describe, expect, spyOn, test } from "bun:test";
 
-import { handleObserveCommand } from "../../src/cli/observe";
-import { formatUsageReport } from "../../src/cli/usage-report";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
+import { formatUsageReport } from "../../backend/src/cli/usage-report";
 
 function payload(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {

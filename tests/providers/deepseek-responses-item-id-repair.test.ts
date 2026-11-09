@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
 import {
   createResponsesItemIdPayloadRewrite,
   hasResponsesItemIdRepair,
   repairResponsesJsonItemIds,
-} from "../../src/server/responses-item-id-repair";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/responses-item-id-repair";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

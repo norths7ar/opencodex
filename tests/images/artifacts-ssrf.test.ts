@@ -5,8 +5,8 @@ import { describe, expect, mock, test } from "bun:test";
 const lookupMock = mock(async (_hostname: string, _opts: unknown): Promise<{ address: string; family: number }[]> => []);
 mock.module("node:dns/promises", () => ({ lookup: lookupMock }));
 
-const { assessUrlDestination, assertUrlResolvesPublic, resolvePublicAddresses } = await import("../../src/lib/destination-policy");
-const { downloadImageToArtifact } = await import("../../src/images/artifacts");
+const { assessUrlDestination, assertUrlResolvesPublic, resolvePublicAddresses } = await import("../../backend/src/lib/destination-policy");
+const { downloadImageToArtifact } = await import("../../backend/src/images/artifacts");
 
 const MIN_PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 

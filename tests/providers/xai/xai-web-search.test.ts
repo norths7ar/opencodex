@@ -1,22 +1,22 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../../src/oauth/store";
+import * as storeModule from "../../../backend/src/oauth/store";
 
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean; paused?: boolean }>; activeAccountId?: string }> = {};
-mock.module("../../../src/oauth/store", () => ({
+mock.module("../../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
-import * as oauthModule from "../../../src/oauth";
-mock.module("../../../src/oauth", () => ({
+import * as oauthModule from "../../../backend/src/oauth";
+mock.module("../../../backend/src/oauth", () => ({
   ...oauthModule,
   getValidAccessToken: async () => "test-token-xyz",
 }));
 
-import { parseXaiResponsesSSE, validateXaiSearchOptions } from "../../../src/web-search/xai-executor";
-import { findXaiSidecarProvider, planWebSearch, xaiSearchOptionsFromConfig } from "../../../src/web-search";
-import { MAX_SIDECAR_RESPONSE_BYTES } from "../../../src/web-search/parse";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { parseXaiResponsesSSE, validateXaiSearchOptions } from "../../../backend/src/web-search/xai-executor";
+import { findXaiSidecarProvider, planWebSearch, xaiSearchOptionsFromConfig } from "../../../backend/src/web-search";
+import { MAX_SIDECAR_RESPONSE_BYTES } from "../../../backend/src/web-search/parse";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 
 const routed: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "k" };
 const xaiProvider: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://api.x.ai/v1", authMode: "oauth" };
@@ -150,7 +150,7 @@ describe("credential pinning + loop fail-closed (review blockers)", () => {
     }) as typeof fetch;
     try {
       const evil: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://api.x.ai.evil/v1", authMode: "oauth" };
-      const { runXaiWebSearch } = await import("../../../src/web-search/xai-executor");
+      const { runXaiWebSearch } = await import("../../../backend/src/web-search/xai-executor");
       const out = await runXaiWebSearch("q", "xai", evil, { model: "grok-4.6", reasoning: "low", timeoutMs: 5000, describeImages: false }, {});
       expect(captured.length).toBeGreaterThanOrEqual(1);
       for (const url of captured) expect(new URL(url).origin).toBe("https://api.x.ai");
@@ -175,7 +175,7 @@ describe("credential pinning + loop fail-closed (review blockers)", () => {
       },
     }), { status: 500 })) as typeof fetch;
     try {
-      const { runXaiWebSearch } = await import("../../../src/web-search/xai-executor");
+      const { runXaiWebSearch } = await import("../../../backend/src/web-search/xai-executor");
       const out = await runXaiWebSearch("q", "xai", xaiProvider, { model: "grok-4.6", reasoning: "low", timeoutMs: 5000, describeImages: false });
 
       expect(out.error).toContain("response body exceeded byte bound");
@@ -189,9 +189,9 @@ describe("credential pinning + loop fail-closed (review blockers)", () => {
   });
 });
 
-import { runWithWebSearch, type WebSearchLoopDeps } from "../../../src/web-search/loop";
+import { runWithWebSearch, type WebSearchLoopDeps } from "../../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { AdapterEvent, ProviderAdapter } from "../../../src/adapters/base";
+import type { AdapterEvent, ProviderAdapter } from "../../../backend/src/adapters/base";
 
 describe("loop dispatch: xai arm fails closed without a sidecar (review blocker)", () => {
   test("missing xaiSidecar yields the invariant error tool-result; forward executor and pool recorder untouched", async () => {

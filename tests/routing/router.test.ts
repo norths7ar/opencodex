@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { openAIChatTransport } from "../../src/adapters/openai-chat/wire";
-import { mapReasoningEffort } from "../../src/reasoning-effort";
-import { NoEnabledOpenAiProviderError, routeCompactionModel, routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { openAIChatTransport } from "../../backend/src/adapters/openai-chat/wire";
+import { mapReasoningEffort } from "../../backend/src/reasoning-effort";
+import { NoEnabledOpenAiProviderError, routeCompactionModel, routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 describe("routeModel registry effort defaults", () => {
   test("allows only opted-in OAuth presets to use explicit API-key billing", () => {

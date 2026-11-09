@@ -1,8 +1,8 @@
 import { afterEach, expect, test, spyOn } from "bun:test";
 import { Readable } from "node:stream";
-import { handleSelectedKeyTest, type SelectedKeyTestDeps } from "../../src/cli/access-data-plane";
-import { handleAccessCommand } from "../../src/cli/access";
-import { projectModelResponse, type DataProtocol } from "../../src/cli/access-data-response";
+import { handleSelectedKeyTest, type SelectedKeyTestDeps } from "../../backend/src/cli/access-data-plane";
+import { handleAccessCommand } from "../../backend/src/cli/access";
+import { projectModelResponse, type DataProtocol } from "../../backend/src/cli/access-data-response";
 
 const logs: string[] = [], errors: string[] = [];
 let out = spyOn(console, "log").mockImplementation((value: unknown) => { logs.push(String(value)); });

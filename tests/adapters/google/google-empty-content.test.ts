@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { OcxParsedRequest } from "../../../src/types";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 // Antigravity translates these Gemini `contents` into Anthropic `messages` for Claude models, and
 // Anthropic rejects empty/absent text and empty content arrays. An empty Gemini text part reaches

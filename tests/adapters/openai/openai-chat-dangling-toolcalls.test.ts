@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 // 260718 dangling tool_calls hardening (devlog/_plan/260718_dangling_toolcall_hardening):
 // strict chat providers (Kimi/Moonshot) 400 unless every assistant tool_call is answered

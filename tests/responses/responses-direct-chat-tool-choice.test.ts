@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { handleResponses } from "../../src/server/responses";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 

@@ -29,8 +29,8 @@ Object.assign(process.env, {
 });
 
 const [{ saveConfig }, { startServer }] = await Promise.all([
-  import("../src/config"),
-  import("../src/server"),
+  import("../backend/src/config"),
+  import("../backend/src/server"),
 ]);
 
 saveConfig({

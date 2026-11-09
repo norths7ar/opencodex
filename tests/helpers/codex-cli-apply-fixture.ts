@@ -1,9 +1,9 @@
 import { spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { createNpmConfigIsolation, isolatedNpmTarget } from "../../src/codex/cli-update-plan";
+import { createNpmConfigIsolation, isolatedNpmTarget } from "../../backend/src/codex/cli-update-plan";
 import { fixtureArtifact, fixtureArtifactSet } from "./codex-cli-apply-artifact";
-import type { CodexCliApplyResult } from "../../src/codex/cli-update-apply";
+import type { CodexCliApplyResult } from "../../backend/src/codex/cli-update-apply";
 import { helperPath } from "./repo-root";
 
 /** Admission waits must also observe an early refusal/rejection. Otherwise a

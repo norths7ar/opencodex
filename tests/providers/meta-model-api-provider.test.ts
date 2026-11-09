@@ -13,11 +13,11 @@
  * - the note carrying the billing disclosure had no regression at all.
  */
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

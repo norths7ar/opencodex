@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { Readable } from "node:stream";
-import { handleAgentSettingsCommand } from "../../src/cli/agent-settings";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleAgentSettingsCommand } from "../../backend/src/cli/agent-settings";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome, savedToken: string | undefined;
@@ -188,17 +188,17 @@ describe("strict phase and selector semantics", () => {
 
 describe("actual settings handler state", () => {
   for (const { sub, key, args, value } of blocks) test(`${sub} replaces, reads and clears persisted overrides only`, async () => {
-    const configModule = await import("../../src/config");
-    const { handleConfigRoutes } = await import("../../src/server/management/config-routes");
-    const desktop = await import("../../src/codex/desktop-switches");
-    const runtime = await import("../../src/codex/runtime");
-    const quota = await import("../../src/codex/quota-auto-refresh");
+    const configModule = await import("../../backend/src/config");
+    const { handleConfigRoutes } = await import("../../backend/src/server/management/config-routes");
+    const desktop = await import("../../backend/src/codex/desktop-switches");
+    const runtime = await import("../../backend/src/codex/runtime");
+    const quota = await import("../../backend/src/codex/quota-auto-refresh");
     const { startupHealthFixture } = await import("../helpers/startup-health");
     const observe = spyOn(desktop, "observedCodexDesktopSwitchApply").mockResolvedValue({ applied: false, reason: "not_requested", retryable: false });
     const apply = spyOn(desktop, "applyCodexConfigInjection").mockImplementation(async () => { throw new Error("Native apply forbidden"); });
     const runtimeRead = spyOn(runtime, "getCodexRuntimeSnapshot").mockReturnValue({ runtime: { command: "codex", version: null, source: "fallback" }, failures: [] });
     const schedule = spyOn(quota, "runCodexQuotaAutoRefresh").mockImplementation(async () => { throw new Error("Scheduling forbidden"); });
-    const config: import("../../src/types").OcxConfig = {
+    const config: import("../../backend/src/types").OcxConfig = {
       port: 14501, defaultProvider: "p", providers: { p: { adapter: "openai-chat", baseUrl: "https://never.invalid/v1", apiKey: "fixture" } },
       memoryModels: { extract: { model: "p/old" }, consolidation: { model: "p/old2", reasoningEffort: "high" } },
       compactionRouting: { model: "p/old", triggers: ["auto"], sourceModels: ["old/*"] },

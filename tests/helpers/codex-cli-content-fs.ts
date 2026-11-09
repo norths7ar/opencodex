@@ -1,6 +1,6 @@
 import { posix } from "node:path";
 
-import type { CodexCliInstallProvenanceDeps } from "../../src/codex/cli-install-provenance";
+import type { CodexCliInstallProvenanceDeps } from "../../backend/src/codex/cli-install-provenance";
 
 /**
  * Minimal POSIX virtual filesystem for npm-global Codex install fixtures.

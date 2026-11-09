@@ -8,12 +8,12 @@ import {
   inspectServiceManagerInstallation,
   type ServiceManagerInstallation,
   type RawProbeRunner,
-} from "../../src/service-manager-probe";
-import { inspectNativeCodexOwnership } from "../../src/integrations/native/ownership-preflight";
-import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
-import { windowsWscript } from "../../src/service/windows-wscript";
-import { getDefaultConfig } from "../../src/config";
-import { startServer } from "../../src/server";
+} from "../../backend/src/service-manager-probe";
+import { inspectNativeCodexOwnership } from "../../backend/src/integrations/native/ownership-preflight";
+import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../backend/src/lib/windows-elevation";
+import { windowsWscript } from "../../backend/src/service/windows-wscript";
+import { getDefaultConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home = "";

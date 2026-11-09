@@ -16,13 +16,13 @@ import {
   mergeCatalogEntriesForSync,
   nativeEffortClamp,
   shouldApplyNativeEffortClamp,
-} from "../../src/codex/catalog";
-import type { ObservedCatalogMergeInput } from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
+import type { ObservedCatalogMergeInput } from "../../backend/src/codex/catalog";
 import {
   applyConfigHintsToCachedModels,
   applyProviderConfigHints,
   suppressedSyntheticMaxCatalogSlugs,
-} from "../../src/codex/catalog/model-hints";
+} from "../../backend/src/codex/catalog/model-hints";
 
 function template(): Record<string, unknown> {
   return {

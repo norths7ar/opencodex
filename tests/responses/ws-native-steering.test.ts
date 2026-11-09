@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import type { OcxConfig } from "../../src/types";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import { NativeSteeringChannel, MAX_NATIVE_STEERS, validateSteeringFrame } from "../../src/server/responses/native-steering";
-import { NativeSteeringReplay, MAX_NATIVE_STEERING_REPLAY_BYTES, nativeControlReplayRetainedStoreSnapshot, setNativeControlReplayTotalCapForTests } from "../../src/server/responses/native-steering-replay";
-import { NativeInjectionReplay } from "../../src/server/responses/native-injection-replay";
-import { type WsData } from "../../src/server/ws-bridge";
-import { getRequestLogEntries, clearRequestLogsForTests } from "../../src/server/request-log";
-import { runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
-import { MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../src/server/lifecycle";
-import { configSchema } from "../../src/config/schema/config-schema";
+import type { OcxConfig } from "../../backend/src/types";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import { NativeSteeringChannel, MAX_NATIVE_STEERS, validateSteeringFrame } from "../../backend/src/server/responses/native-steering";
+import { NativeSteeringReplay, MAX_NATIVE_STEERING_REPLAY_BYTES, nativeControlReplayRetainedStoreSnapshot, setNativeControlReplayTotalCapForTests } from "../../backend/src/server/responses/native-steering-replay";
+import { NativeInjectionReplay } from "../../backend/src/server/responses/native-injection-replay";
+import { type WsData } from "../../backend/src/server/ws-bridge";
+import { getRequestLogEntries, clearRequestLogsForTests } from "../../backend/src/server/request-log";
+import { runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
+import { MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { appOwnedBytesSnapshot, configureAppOwnedMemoryBudget, registerRetainedStore, resetAppOwnedMemoryForTests } from "../../src/lib/app-owned-memory";
+import { appOwnedBytesSnapshot, configureAppOwnedMemoryBudget, registerRetainedStore, resetAppOwnedMemoryForTests } from "../../backend/src/lib/app-owned-memory";
 
 // The websocket handler dispatches through the real request path, so it reaches the shared spend
 // journal and needs the writer lease startServer would have taken. Without it the turn is refused

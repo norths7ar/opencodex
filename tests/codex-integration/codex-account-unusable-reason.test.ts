@@ -1,4 +1,4 @@
-import { CodexPoolAuthenticationError } from "../../src/codex/auth-context";
+import { CodexPoolAuthenticationError } from "../../backend/src/codex/auth-context";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -6,13 +6,13 @@ import {
   codexAccountUnusableReason,
   isCodexAccountUsable,
   type CodexAccountUnusableReason,
-} from "../../src/codex/account-usability";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { CODEX_MAIN_SIGN_IN_REQUIRED_MESSAGE } from "../../src/server/responses/codex-auth-error";
-import { MAIN_CODEX_ACCOUNT_ID, MainAccountTokenRefreshError } from "../../src/codex/main-account";
-import { mapCodexAuthContextErrorToResponse, nativeMainRefreshFailureResponse } from "../../src/server/responses/codex-auth-error";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/account-usability";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { CODEX_MAIN_SIGN_IN_REQUIRED_MESSAGE } from "../../backend/src/server/responses/codex-auth-error";
+import { MAIN_CODEX_ACCOUNT_ID, MainAccountTokenRefreshError } from "../../backend/src/codex/main-account";
+import { mapCodexAuthContextErrorToResponse, nativeMainRefreshFailureResponse } from "../../backend/src/server/responses/codex-auth-error";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const STORE_DIR = join(import.meta.dir, ".tmp-unusable-reason-store");

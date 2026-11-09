@@ -2,26 +2,26 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCredential, getAccountSet, setActiveAccount } from "../../src/oauth/store";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
-import { handleResponses } from "../../src/server/responses";
+import { saveCredential, getAccountSet, setActiveAccount } from "../../backend/src/oauth/store";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
+import { handleResponses } from "../../backend/src/server/responses";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { budgetOwner } from "../helpers/send-budget-owner";
-import type { OcxConfig } from "../../src/types";
-import { commandCodeSessionId, createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { projectContextCache } from "../../src/adapters/command-code-project-context";
-import { loginCommandCode, parseCommandCodeCallback, shouldImportLocalCommandCodeAuth } from "../../src/oauth/command-code";
-import { buildModelsRequest, OAUTH_PROVIDERS, submitManualLoginCode } from "../../src/oauth";
-import { clearManualCodeSlot, loginState, waitForManualLoginCode } from "../../src/oauth/login-flow-state";
+import type { OcxConfig } from "../../backend/src/types";
+import { commandCodeSessionId, createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { projectContextCache } from "../../backend/src/adapters/command-code-project-context";
+import { loginCommandCode, parseCommandCodeCallback, shouldImportLocalCommandCodeAuth } from "../../backend/src/oauth/command-code";
+import { buildModelsRequest, OAUTH_PROVIDERS, submitManualLoginCode } from "../../backend/src/oauth";
+import { clearManualCodeSlot, loginState, waitForManualLoginCode } from "../../backend/src/oauth/login-flow-state";
 import {
   commandCodeReasoningEfforts,
   PROFILE_PAGE_MAX_BYTES,
   refreshCommandCodeReasoningEfforts,
   resetCommandCodeReasoningEffortsForTest,
-} from "../../src/providers/command-code-efforts";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/command-code-efforts";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const provider: OcxProviderConfig = {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { clearModelCache, setCached } from "../../src/codex/model-cache";
-import { knownEffortRowIds, parseEffortRowId, parseRequestEffortRowId } from "../../src/server/effort-row";
+import { clearModelCache, setCached } from "../../backend/src/codex/model-cache";
+import { knownEffortRowIds, parseEffortRowId, parseRequestEffortRowId } from "../../backend/src/server/effort-row";
 import {
   catalogFastRowEligible,
   effortBaseCarriesFastMarker,
@@ -11,9 +11,9 @@ import {
   parseFastOnlyRowId,
   parseFastRowId,
   parseSyntheticRowId,
-} from "../../src/server/fast-row";
-import { isDeclaredReasoningEffort } from "../../src/reasoning-effort";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/fast-row";
+import { isDeclaredReasoningEffort } from "../../backend/src/reasoning-effort";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Synthetic Fast selectors (devlog 260904_external_fast_wire/010).

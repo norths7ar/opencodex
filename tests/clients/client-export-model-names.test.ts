@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { buildClientConfig, buildClientConfigText, EXPORT_CLIENT_IDS } from "../../src/clients/config-export";
-import { previewRouteModel } from "../../src/router";
-import { parseSyntheticRowId } from "../../src/server/fast-row";
-import { loadExportModels } from "../../src/server/management/model-rows";
+import { buildClientConfig, buildClientConfigText, EXPORT_CLIENT_IDS } from "../../backend/src/clients/config-export";
+import { previewRouteModel } from "../../backend/src/router";
+import { parseSyntheticRowId } from "../../backend/src/server/fast-row";
+import { loadExportModels } from "../../backend/src/server/management/model-rows";
 import { namingConfig, namingModels, exportedKeys, ALIAS_KEYS, ROUTED_KEYS } from "../helpers/export-model-names";
 
 describe("client export model names", () => {

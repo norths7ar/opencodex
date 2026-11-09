@@ -1,15 +1,15 @@
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   getEffectiveActiveCodexAccountId,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { existsSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";

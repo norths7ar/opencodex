@@ -19,7 +19,7 @@ import {
   ReasoningArchiveBusyError,
   ReasoningArchiveError,
   ReasoningArchiveQuotaError,
-} from "../../src/responses/reasoning-retention";
+} from "../../backend/src/responses/reasoning-retention";
 
 const reasoningItem = (text: string) => ({
   type: "reasoning",

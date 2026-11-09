@@ -5,13 +5,13 @@ import { resolve } from "node:path";
 import {
   failedHistoryRestoreFromOutcome,
   formatApplyHistoryFailure,
-} from "../../src/codex/inject";
+} from "../../backend/src/codex/inject";
 import { repoPath } from "../helpers/repo-root";
 
-const injectSource = readFileSync(repoPath("src/codex/inject.ts"), "utf8")
-  + readFileSync(repoPath("src/codex/inject/restore.ts"), "utf8");
-const doctorSource = readFileSync(repoPath("src/cli/doctor.ts"), "utf8");
-const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+const injectSource = readFileSync(repoPath("backend/src/codex/inject.ts"), "utf8")
+  + readFileSync(repoPath("backend/src/codex/inject/restore.ts"), "utf8");
+const doctorSource = readFileSync(repoPath("backend/src/cli/doctor.ts"), "utf8");
+const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 const integrationGuide = readFileSync(
   repoPath("docs-site/src/content/docs/guides/codex-integration.md"),
   "utf8",

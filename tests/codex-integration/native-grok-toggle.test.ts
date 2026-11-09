@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { ManagementApiDeps } from "../../src/server/management/context";
-import { syncGrokConfig } from "../../src/grok/sync";
-import { injectGrokConfig, type GrokInjectModel } from "../../src/grok/inject";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { ManagementApiDeps } from "../../backend/src/server/management/context";
+import { syncGrokConfig } from "../../backend/src/grok/sync";
+import { injectGrokConfig, type GrokInjectModel } from "../../backend/src/grok/inject";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -335,14 +335,14 @@ test("a catalog failure refuses and writes nothing", async () => {
 });
 
 test("the route never calls syncGrokConfig, and the inspector never re-implements the parser", () => {
-  const routeSource = readFileSync(repoPath("src/server/management/native-integration-routes.ts"), "utf8");
+  const routeSource = readFileSync(repoPath("backend/src/server/management/native-integration-routes.ts"), "utf8");
   // Comments may NAME the wrapper (they explain why it is bypassed); what must
   // not exist is an import of it or a call to it.
   expect(routeSource).not.toMatch(/import\s*\{[^}]*syncGrokConfig/);
   expect(routeSource).not.toMatch(/[^A-Za-z]syncGrokConfig\s*\(/);
-  const inspectSource = readFileSync(repoPath("src/grok/inspect.ts"), "utf8");
+  const inspectSource = readFileSync(repoPath("backend/src/grok/inspect.ts"), "utf8");
   expect(inspectSource).not.toContain("function findManagedRegion");
-  const injectSource = readFileSync(repoPath("src/grok/inject.ts"), "utf8");
+  const injectSource = readFileSync(repoPath("backend/src/grok/inject.ts"), "utf8");
   expect(injectSource.match(/function findManagedRegion/g)).toHaveLength(1);
 });
 
@@ -412,12 +412,12 @@ test("a second concurrent PUT gets 409 config_busy and writes nothing", async ()
 test("no journal row and no snapshot exist for this toggle", () => {
   // The module must not touch the file-client bookkeeping at all — a static
   // check that the imports were never widened (012 §OUT).
-  const routeSource = readFileSync(repoPath("src/server/management/native-integration-routes.ts"), "utf8");
+  const routeSource = readFileSync(repoPath("backend/src/server/management/native-integration-routes.ts"), "utf8");
   expect(routeSource).not.toMatch(/import[^;]*integrations\/(journal|store|writer)/);
 });
 
 test("the ownership preflight itself is reachable, not declared", async () => {
-  const { assertNativeTeardownOwned } = await import("../../src/integrations/native/ownership-preflight");
+  const { assertNativeTeardownOwned } = await import("../../backend/src/integrations/native/ownership-preflight");
   // The beforeEach fixture already records the CURRENT homes under
   // OPENCODEX_HOME: owned.
   expect(assertNativeTeardownOwned().ok).toBe(true);

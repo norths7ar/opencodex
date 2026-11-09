@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { releaseTranslatedEvent } from "../../src/lib/translator-budget";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { releaseTranslatedEvent } from "../../backend/src/lib/translator-budget";
 import { createTestTranslatorBudget as createTranslatorBudget } from "../helpers/translator-budget";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 type ReasoningEffort = OcxParsedRequest["options"]["reasoning"];
 

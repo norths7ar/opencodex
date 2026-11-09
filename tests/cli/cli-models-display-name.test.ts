@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleModelsDisplayNameCommand } from "../../src/cli/models-order";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import { handleModelRoutes } from "../../src/server/management/model-routes";
-import { clearModelCache } from "../../src/codex/model-cache";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
-import type { OcxConfig } from "../../src/types";
+import { handleModelsDisplayNameCommand } from "../../backend/src/cli/models-order";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import { handleModelRoutes } from "../../backend/src/server/management/model-routes";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const committed: CatalogDisposition = { status: "committed", changed: true, degraded: false, notices: [] };

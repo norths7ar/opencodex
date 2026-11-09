@@ -5,11 +5,11 @@ import { tmpdir } from "node:os";
 
 import { Database } from "bun:sqlite";
 
-import { beginCodexTransition } from "../../src/codex/transition-state";
+import { beginCodexTransition } from "../../backend/src/codex/transition-state";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let codexHome = "";

@@ -5,9 +5,9 @@ import {
   setStartupInstallLaunchForTests,
   startupInstallArgv,
   type StartupInstallAction,
-} from "../../src/server/startup-action-control";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/startup-action-control";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { repoPath } from "../helpers/repo-root";
 
 const config = { port: 10100, providers: {}, defaultProvider: "openai", codexAutoStart: true } as OcxConfig;
@@ -47,7 +47,7 @@ describe("startup installer child launch (#6963)", () => {
 
   test("a source install still re-enters through cli/index.ts", async () => {
     const { argv } = await installChildArgv("install-shim", { standalone: false });
-    expect(argv).toEqual([repoPath("src", "cli", "index.ts"), "codex-shim", "install"]);
+    expect(argv).toEqual([repoPath("backend/src", "cli", "index.ts"), "codex-shim", "install"]);
   });
 
   test("a failing child still rejects with its diagnostic", async () => {

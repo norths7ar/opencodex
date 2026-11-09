@@ -1,8 +1,8 @@
 /** Haiku 5.5 base/>100K rates, official pricing and provider listings read 2026-10-08. */
 import { describe, expect, test } from "bun:test";
-import { resolveCursorSelection } from "../../src/adapters/cursor/catalog";
-import { estimateAttemptCost, estimateRequestCost, resolveMatchedPrice } from "../../src/usage/cost";
-import { CONTEXT_TIERS, EXPECTED_PRICE_OVERLAYS, findContextTier, findExpectedPriceOverlay, type Cost4 } from "../../src/usage/expected-prices";
+import { resolveCursorSelection } from "../../backend/src/adapters/cursor/catalog";
+import { estimateAttemptCost, estimateRequestCost, resolveMatchedPrice } from "../../backend/src/usage/cost";
+import { CONTEXT_TIERS, EXPECTED_PRICE_OVERLAYS, findContextTier, findExpectedPriceOverlay, type Cost4 } from "../../backend/src/usage/expected-prices";
 
 const BASE: Cost4 = { input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite: 0.125 };
 const LEVELS = ["low", "medium", "high", "xhigh", "max"];

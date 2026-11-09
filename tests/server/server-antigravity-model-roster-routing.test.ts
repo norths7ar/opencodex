@@ -1,29 +1,29 @@
-import { clientFacingModelLabel } from "../../src/lib/error-destination";
+import { clientFacingModelLabel } from "../../backend/src/lib/error-destination";
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { clearModelCache } from "../../src/codex/model-cache";
-import * as oauth from "../../src/oauth";
+import { saveConfig } from "../../backend/src/config";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import * as oauth from "../../backend/src/oauth";
 import {
   antigravityModelUnlistedMessage,
   antigravitySelectedAccountUnlistedMessage,
   clearGenericFailoverHealth,
-} from "../../src/oauth/generic-account-failover";
-import { createOAuthRefreshIntentLock, getAccountSet, saveCredential, setAccountPaused, setActiveAccount, getAccountCredentialWithStatus, mergeAccountCredential } from "../../src/oauth/store";
-import { clearPoolRotationState } from "../../src/oauth/pool-kernel";
-import { antigravityAccountSupportsModel, clearAntigravityAccountRosters, recordAntigravityAccountRoster } from "../../src/providers/antigravity-account-roster";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth/generic-account-failover";
+import { createOAuthRefreshIntentLock, getAccountSet, saveCredential, setAccountPaused, setActiveAccount, getAccountCredentialWithStatus, mergeAccountCredential } from "../../backend/src/oauth/store";
+import { clearPoolRotationState } from "../../backend/src/oauth/pool-kernel";
+import { antigravityAccountSupportsModel, clearAntigravityAccountRosters, recordAntigravityAccountRoster } from "../../backend/src/providers/antigravity-account-roster";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import * as retry from "../../src/lib/upstream-retry";
-import * as failover from "../../src/oauth/generic-account-failover";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { recoverAntigravityAccount } from "../../src/server/responses/antigravity-model-denial-recovery";
-import * as proxyEnv from "../../src/lib/proxy-env";
+import * as retry from "../../backend/src/lib/upstream-retry";
+import * as failover from "../../backend/src/oauth/generic-account-failover";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { recoverAntigravityAccount } from "../../backend/src/server/responses/antigravity-model-denial-recovery";
+import * as proxyEnv from "../../backend/src/lib/proxy-env";
 
 // #7500: an Antigravity request reaches only accounts whose own model discovery may serve it.
 const provider = "google-antigravity";

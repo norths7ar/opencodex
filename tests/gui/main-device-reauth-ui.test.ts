@@ -20,7 +20,7 @@ const NEW_KEYS = [
 
 describe("main device reauth UI contracts (#3898)", () => {
   test("the hook drives only the dedicated namespace and never the pool login route", async () => {
-    const hook = await Bun.file(repoPath("gui/src/components/use-main-device-reauth.ts")).text();
+    const hook = await Bun.file(repoPath("frontend/src/components/use-main-device-reauth.ts")).text();
     expect(hook).toContain("/api/codex-auth/main/reauth-device");
     expect(hook).not.toContain(String.fromCharCode(96) + "/api/codex-auth/login" + String.fromCharCode(96));
     expect(hook).not.toContain("/api/codex-auth/login?");
@@ -33,8 +33,8 @@ describe("main device reauth UI contracts (#3898)", () => {
 
   test("the main card renders the CTA through the hook, wired by the pool page", async () => {
     const [card, pool] = await Promise.all([
-      Bun.file(repoPath("gui/src/components/codex-account-pool-main-card.tsx")).text(),
-      Bun.file(repoPath("gui/src/components/CodexAccountPool.tsx")).text(),
+      Bun.file(repoPath("frontend/src/components/codex-account-pool-main-card.tsx")).text(),
+      Bun.file(repoPath("frontend/src/components/CodexAccountPool.tsx")).text(),
     ]);
     expect(card).toContain("mainReauth");
     expect(card).toContain("codexAuth.mainReauthDevice");
@@ -47,7 +47,7 @@ describe("main device reauth UI contracts (#3898)", () => {
 
   test("every shipped locale carries the new copy", async () => {
     for (const locale of LOCALES) {
-      const text = await Bun.file(repoPath("gui/src/i18n/" + locale + ".ts")).text();
+      const text = await Bun.file(repoPath("frontend/src/i18n/" + locale + ".ts")).text();
       for (const key of NEW_KEYS) {
         expect(text, locale + " missing " + key).toContain(String.fromCharCode(34) + key + String.fromCharCode(34) + ": ");
       }

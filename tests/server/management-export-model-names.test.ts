@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { loadExportModels, resetExportSnapshotForTests } from "../../src/server/management/model-rows";
-import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { hermesProfileStore } from "../../src/integrations/hermes-profiles";
-import { defaultIntegrationIO, parseConfig } from "../../src/integrations/config-io";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { previewRouteModel } from "../../src/router";
-import { RUNTIME_PROVIDER_FETCH, runtimeProviderFetch, type RuntimeProviderFetch } from "../../src/lib/provider-runtime-fetch";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { loadExportModels, resetExportSnapshotForTests } from "../../backend/src/server/management/model-rows";
+import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { hermesProfileStore } from "../../backend/src/integrations/hermes-profiles";
+import { defaultIntegrationIO, parseConfig } from "../../backend/src/integrations/config-io";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { previewRouteModel } from "../../backend/src/router";
+import { RUNTIME_PROVIDER_FETCH, runtimeProviderFetch, type RuntimeProviderFetch } from "../../backend/src/lib/provider-runtime-fetch";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

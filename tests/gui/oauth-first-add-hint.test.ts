@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { shouldShowLoginHint } from "../../gui/src/components/provider-catalog/login-hint-visibility";
+import { shouldShowLoginHint } from "../../frontend/src/components/provider-catalog/login-hint-visibility";
 
 /**
  * A first-time provider add is the one moment the operator has no other way in.

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createAdapterTierMetadata } from "../../src/providers/fastwire";
+import { createAdapterTierMetadata } from "../../backend/src/providers/fastwire";
 import {
   calculateCost,
   estimateAttemptCost,
@@ -9,7 +9,7 @@ import {
   normalizeCostTokens,
   resolveMatchedPrice,
   tokensPerSecond,
-} from "../../src/usage/cost";
+} from "../../backend/src/usage/cost";
 import {
   EXPECTED_PRICE_OVERLAYS,
   PRIORITY_MULTIPLIERS,
@@ -19,15 +19,15 @@ import {
   findPriorityPricingRule,
   resolvePriorityMultiplier,
   type ExpectedPriceOverlay,
-} from "../../src/usage/expected-prices";
+} from "../../backend/src/usage/expected-prices";
 import {
   activeUserCostOverlays,
   refreshUserCostOverlays,
   userCostOverlayVersion,
-} from "../../src/usage/user-cost-overlays";
-import { summarizeUsage } from "../../src/usage/summary";
-import type { PersistedUsageAttempt } from "../../src/usage/log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/usage/user-cost-overlays";
+import { summarizeUsage } from "../../backend/src/usage/summary";
+import type { PersistedUsageAttempt } from "../../backend/src/usage/log";
+import type { OcxConfig } from "../../backend/src/types";
 
 const RATE = { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 };
 

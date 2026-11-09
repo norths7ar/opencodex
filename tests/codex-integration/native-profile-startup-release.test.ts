@@ -3,13 +3,13 @@ import { mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { nativeMainOwnerSnapshot } from "../../src/codex/native-main-owner";
-import { withNativeMainExclusiveClaim } from "../../src/codex/native-main-claim";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
+import { nativeMainOwnerSnapshot } from "../../backend/src/codex/native-main-owner";
+import { withNativeMainExclusiveClaim } from "../../backend/src/codex/native-main-claim";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import type {
   NativeProfileContext,
   NativeProfileRecoveryState,
-} from "../../src/codex/native-profile-store";
+} from "../../backend/src/codex/native-profile-store";
 import {
   blockNativeMainRecovery,
   completeNativeMainRecovery,
@@ -19,7 +19,7 @@ import {
   startNativeMainStartupLifecycle,
   type NativeMainStartupGateDeps,
   type NativeMainStartupLifecycle,
-} from "../../src/codex/native-profile-startup";
+} from "../../backend/src/codex/native-profile-startup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /*

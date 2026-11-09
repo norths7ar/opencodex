@@ -2,7 +2,7 @@ import { samePath } from "../helpers/same-path";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync, symlinkSync } from "node:fs";
 import * as fs from "node:fs";
-import * as secretAcl from "../../src/lib/windows-secret-acl";
+import * as secretAcl from "../../backend/src/lib/windows-secret-acl";
 import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { repoRoot } from "../helpers/repo-root";
@@ -14,23 +14,23 @@ import {
   type CatalogWritePermit,
   withCatalogWriteSerialization,
   type CatalogWriteIntent,
-} from "../../src/codex/catalog-write-serialization";
+} from "../../backend/src/codex/catalog-write-serialization";
 import {
   appendCatalogWriteAudit,
   CATALOG_AUDIT_MAX_EVENT_BYTES,
   CATALOG_AUDIT_KEEP_RECORDS,
   CATALOG_AUDIT_MAX_BYTES,
   CODEX_CATALOG_AUDIT_FILE,
-} from "../../src/codex/catalog/write-audit";
-import { auditRefusedCatalogReplacement, replaceActiveCodexCatalog, replaceCodexModelsCache } from "../../src/codex/internal/catalog-writer";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
+} from "../../backend/src/codex/catalog/write-audit";
+import { auditRefusedCatalogReplacement, replaceActiveCodexCatalog, replaceCodexModelsCache } from "../../backend/src/codex/internal/catalog-writer";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
 import { Database } from "bun:sqlite";
-import { CODEX_HOME_JOURNAL_FILE } from "../../src/codex/codex-home-owner";
-import { initializeConfigOwnership, CONFIG_UNINSTALL_MANIFEST } from "../../src/lib/config-ownership";
-import type { CatalogWriteAuditEvent } from "../../src/codex/catalog/write-audit-contract";
+import { CODEX_HOME_JOURNAL_FILE } from "../../backend/src/codex/codex-home-owner";
+import { initializeConfigOwnership, CONFIG_UNINSTALL_MANIFEST } from "../../backend/src/lib/config-ownership";
+import type { CatalogWriteAuditEvent } from "../../backend/src/codex/catalog/write-audit-contract";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { redactUserPath } from "../../src/lib/redact";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+import { redactUserPath } from "../../backend/src/lib/redact";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 
 let root = "";
 let codexHome = "";
@@ -534,13 +534,13 @@ test("read and write IO failures leave actual publication and refusal outcomes u
 test("retained sync and convergence each audit their early removal refusal exactly once", async () => {
   const oldCodexHome = process.env.CODEX_HOME;
   process.env.CODEX_HOME = codexHome;
-  const { saveConfig } = await import("../../src/config");
-  const { captureCatalogAdmissionSnapshot } = await import("../../src/codex/catalog-admission");
-  const { gatherCodexCatalogCandidate, commitCodexCatalogCandidate } = await import("../../src/codex/convergence");
-  const { syncCatalogModels } = await import("../../src/codex/catalog/retained-sync");
-  const { resetCatalogRuntimeStateForTests } = await import("../../src/codex/catalog");
-  const { setCodexRuntimeResolveCacheForTests, resetCodexRuntimeResolveCacheForTests } = await import("../../src/codex/runtime");
-  const { setBundledCatalogCacheForTests, invalidateBundledCatalogCache } = await import("../../src/codex/catalog/bundled");
+  const { saveConfig } = await import("../../backend/src/config");
+  const { captureCatalogAdmissionSnapshot } = await import("../../backend/src/codex/catalog-admission");
+  const { gatherCodexCatalogCandidate, commitCodexCatalogCandidate } = await import("../../backend/src/codex/convergence");
+  const { syncCatalogModels } = await import("../../backend/src/codex/catalog/retained-sync");
+  const { resetCatalogRuntimeStateForTests } = await import("../../backend/src/codex/catalog");
+  const { setCodexRuntimeResolveCacheForTests, resetCodexRuntimeResolveCacheForTests } = await import("../../backend/src/codex/runtime");
+  const { setBundledCatalogCacheForTests, invalidateBundledCatalogCache } = await import("../../backend/src/codex/catalog/bundled");
   const config = { port: 10100, defaultProvider: "openai", providers: {} };
   const runtime = { source: "test", codexBin: process.execPath, version: "0.999.0",
     channel: "cli", modelSlug: "gpt-5.5", capabilities: {} };

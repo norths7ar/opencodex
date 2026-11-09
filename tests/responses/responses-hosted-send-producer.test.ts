@@ -1,11 +1,11 @@
 import { expect, spyOn, test } from "bun:test";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import type { IncomingMeta } from "../../src/adapters/base";
-import { createAdapterPhysicalSend } from "../../src/adapters/physical-send";
-import { getActiveTurnCount } from "../../src/server/lifecycle";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import type { IncomingMeta } from "../../backend/src/adapters/base";
+import { createAdapterPhysicalSend } from "../../backend/src/adapters/physical-send";
+import { getActiveTurnCount } from "../../backend/src/server/lifecycle";
 import { hostedSendFixture } from "../helpers/hosted-send-fixture";
 import { existsSync } from "node:fs";
-import * as spendOwner from "../../src/lib/spend-ledger-owner";
+import * as spendOwner from "../../backend/src/lib/spend-ledger-owner";
 
 test("hosted fixture restores both homes and removes directories even when ownership assertion fails", async () => {
   const priorHome = process.env.OPENCODEX_HOME, priorCodex = process.env.CODEX_HOME;

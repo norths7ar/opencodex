@@ -31,20 +31,20 @@ import {
   commandCodeHomeDir,
   commandCodeProviderRoot,
   type ExportContext,
-} from "../../src/clients/config-export";
-import { setPath } from "../../src/integrations/merge";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { OPENCODE_PROVIDER_ID } from "../../src/clients/config-export/constants";
-import { MANAGED_PATH_TEMPLATES } from "../../src/integrations/mutation-plan";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { readIntegrationState } from "../../src/integrations/state";
+} from "../../backend/src/clients/config-export";
+import { setPath } from "../../backend/src/integrations/merge";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { OPENCODE_PROVIDER_ID } from "../../backend/src/clients/config-export/constants";
+import { MANAGED_PATH_TEMPLATES } from "../../backend/src/integrations/mutation-plan";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { readIntegrationState } from "../../backend/src/integrations/state";
 import {
   applyIntegration,
   disableIntegration,
   restoreIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
+} from "../../backend/src/integrations/writer";
 
 /** `const o = e.provider ?? e.providers;` — verbatim from command-code@1.66.0. */
 function publishedCommandCodeRoot(document: unknown): Record<string, unknown> | undefined {

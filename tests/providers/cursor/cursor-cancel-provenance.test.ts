@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
 import {
   classifyCursorError,
   CursorUnexpectedCancelError,
   isCursorBenignCancelError,
-} from "../../../src/adapters/cursor/cursor-errors";
-import { resetCursorBlobStateForTests } from "../../../src/adapters/cursor/native-exec";
+} from "../../../backend/src/adapters/cursor/cursor-errors";
+import { resetCursorBlobStateForTests } from "../../../backend/src/adapters/cursor/native-exec";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { CursorServerMessage } from "../../../src/adapters/cursor/types";
+import type { CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 
 type OpenFn = (
   encoded: Uint8Array,

@@ -1,15 +1,15 @@
 import { Database } from "bun:sqlite";
 import { join } from "node:path";
 import { linkSync, readFileSync, symlinkSync } from "node:fs";
-import { acquireSpendLedgerOwner, assertStorageOwned, mintSpendLedgerStorage } from "../../src/lib/spend-ledger-owner";
-import { readCodexAccountRecord, removeCodexAccountCredential, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../src/codex/account-store";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import { recordCodexThreadLineage } from "../../src/codex/lineage";
-import { runPassiveRead } from "../../src/lib/passive-read";
-import { adoptStoredThreadRows, flushCodexAffinityStoreForTests } from "../../src/codex/routing/thread-affinity-store";
-import { recordCodexUpstreamOutcome, resolveCodexAccountForThread, resolveCodexAccountForThreadDetailed } from "../../src/codex/routing";
-import { bindThreadAffinity, clearConversationStateIssuerMap, clearThreadAccountMap, clearThreadAccountMapForAccount, deleteThreadAffinity, deleteThreadAffinitiesForAccount, getThreadAffinity, handOffThreadAffinityGeneration, peekConversationStateIssuer, rememberConversationStateIssuer } from "../../src/codex/routing/thread-affinity";
-import type { OcxConfig } from "../../src/types";
+import { acquireSpendLedgerOwner, assertStorageOwned, mintSpendLedgerStorage } from "../../backend/src/lib/spend-ledger-owner";
+import { readCodexAccountRecord, removeCodexAccountCredential, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../backend/src/codex/account-store";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import { recordCodexThreadLineage } from "../../backend/src/codex/lineage";
+import { runPassiveRead } from "../../backend/src/lib/passive-read";
+import { adoptStoredThreadRows, flushCodexAffinityStoreForTests } from "../../backend/src/codex/routing/thread-affinity-store";
+import { recordCodexUpstreamOutcome, resolveCodexAccountForThread, resolveCodexAccountForThreadDetailed } from "../../backend/src/codex/routing";
+import { bindThreadAffinity, clearConversationStateIssuerMap, clearThreadAccountMap, clearThreadAccountMapForAccount, deleteThreadAffinity, deleteThreadAffinitiesForAccount, getThreadAffinity, handOffThreadAffinityGeneration, peekConversationStateIssuer, rememberConversationStateIssuer } from "../../backend/src/codex/routing/thread-affinity";
+import type { OcxConfig } from "../../backend/src/types";
 
 const action = process.argv[2]!;
 let hourly: (() => void) | undefined;

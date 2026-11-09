@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { createServer, request } from "node:https";
 import { connect as tlsConnect } from "node:tls";
 import { gzipSync } from "node:zlib";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { PICKER_MAX_HEADER_BYTES, isRelayableH2Target, startPickerListener } from "../../src/claude/intercept/picker-listener";
-import type { PickerListenerHandle } from "../../src/claude/intercept/picker-listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { PICKER_MAX_HEADER_BYTES, isRelayableH2Target, startPickerListener } from "../../backend/src/claude/intercept/picker-listener";
+import type { PickerListenerHandle } from "../../backend/src/claude/intercept/picker-listener";
 import type { TLSSocket } from "node:tls";
 import type { Duplex } from "node:stream";
 import type { IncomingMessage } from "node:http";
@@ -334,7 +334,7 @@ import type { ClientHttp2Session, IncomingHttpHeaders, OutgoingHttpHeaders } fro
 import { createServer as createNetServer, connect as netConnect } from "node:net";
 import type { Socket } from "node:net";
 import type { ServerResponse } from "node:http";
-import { CLIENT_HELLO_MAX_RECORDS, clientHelloOffersH2 } from "../../src/claude/intercept/client-hello";
+import { CLIENT_HELLO_MAX_RECORDS, clientHelloOffersH2 } from "../../backend/src/claude/intercept/client-hello";
 
 type PickerFixture = Awaited<ReturnType<typeof fixture>>;
 type DeadlineWait = <T>(promise: PromiseLike<T>) => Promise<T>;

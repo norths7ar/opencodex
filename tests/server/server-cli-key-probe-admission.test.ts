@@ -4,16 +4,16 @@ import { Readable } from "node:stream";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveApiAuth, resolveResponsesApiAuth } from "../../src/server/auth-cors";
-import { formatErrorResponse } from "../../src/bridge/errors";
-import { anthropicErrorResponse } from "../../src/claude/outbound";
-import { handleResponses } from "../../src/server/responses";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { handleSelectedKeyTest } from "../../src/cli/access-data-plane";
+import { resolveApiAuth, resolveResponsesApiAuth } from "../../backend/src/server/auth-cors";
+import { formatErrorResponse } from "../../backend/src/bridge/errors";
+import { anthropicErrorResponse } from "../../backend/src/claude/outbound";
+import { handleResponses } from "../../backend/src/server/responses";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { handleSelectedKeyTest } from "../../backend/src/cli/access-data-plane";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 for (const protocol of ["responses", "chat", "messages"] as const) {
   for (const scenario of ["authless", "wrong", "valid", "changed-policy"] as const) {

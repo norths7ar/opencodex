@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { handleStorageCommand } from "../../src/cli/storage";
-import { handleInspectCommand, handleIntegrationCommand } from "../../src/cli/inspect";
+import { handleStorageCommand } from "../../backend/src/cli/storage";
+import { handleInspectCommand, handleIntegrationCommand } from "../../backend/src/cli/inspect";
 
 /**
  * wp7: the storage, inspect, and native-integration routes had no CLI caller at all.

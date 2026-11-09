@@ -1,10 +1,10 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../backend/tsconfig.json",
   "compilerOptions": {
     "rootDir": ".."
   },
   "include": [
-    "../src",
+    "../backend/src",
     "./doctor-service-memory-contract.test.ts"
   ]
 }

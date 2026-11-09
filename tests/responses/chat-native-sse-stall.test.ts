@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { nativeChatSse } from "../../src/server/chat-native-sse";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 // nativeChatSse arms its pull deadline off performance.now() rather than an injectable timer, so
 // these tests use small real wall-clock gaps: an armed budget must fire inside its window, and a

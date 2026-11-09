@@ -7,17 +7,17 @@ import {
   loadConfig,
   saveConfig,
   setPersistedConfigMutationBeforeCommitForTests,
-} from "../../src/config";
-import { computeNextRun, runStorageCleanupPolicy } from "../../src/storage/policy";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
+} from "../../backend/src/config";
+import { computeNextRun, runStorageCleanupPolicy } from "../../backend/src/storage/policy";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
 import {
   getStorageCleanupPolicyJobState,
   maybeRequestStorageCleanupPolicyRun,
   requestStorageCleanupPolicyRun,
   resetStorageCleanupPolicyJobForTestsAsync,
   setStorageCleanupPolicyJobTestHooks,
-} from "../../src/storage/policy-job";
-import type { OcxConfig, StorageCleanupPolicy } from "../../src/types";
+} from "../../backend/src/storage/policy-job";
+import type { OcxConfig, StorageCleanupPolicy } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let configHome = "";

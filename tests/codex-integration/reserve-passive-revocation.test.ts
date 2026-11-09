@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fetchMainAccountInfo } from "../../src/codex/auth-api";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { setMainAccountPlan } from "../../src/codex/main-account";
+import { fetchMainAccountInfo } from "../../backend/src/codex/auth-api";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { setMainAccountPlan } from "../../backend/src/codex/main-account";
 import {
   captureMainQuotaWriter,
   clearMainAccountInfoCache,
   getMainQuotaCredentialGeneration,
   observeMainQuotaCredential,
-} from "../../src/codex/main-account-cache";
-import { clearAccountQuota } from "../../src/codex/quota";
+} from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
 import {
   getMainReserveAuthorization,
   isMainReserveAuthorizationLive,
-} from "../../src/codex/reserve-availability";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/reserve-availability";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ACCOUNT = "fixture-passive-reserve-main";

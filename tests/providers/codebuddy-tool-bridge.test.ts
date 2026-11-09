@@ -4,8 +4,8 @@ import {
   CODEBUDDY_TOOL_LIMITS,
   buildCodeBuddyToolBridge,
   codeBuddyToolAlias,
-} from "../../src/adapters/codebuddy/tool-bridge";
-import type { OcxParsedRequest, OcxTool, OcxToolChoice } from "../../src/types";
+} from "../../backend/src/adapters/codebuddy/tool-bridge";
+import type { OcxParsedRequest, OcxTool, OcxToolChoice } from "../../backend/src/types";
 
 function tool(
   name: string,

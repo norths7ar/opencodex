@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { createLocalAttestationSecret } from "../../src/lib/local-management-attestation";
-import { removeRuntimePort, writeRuntimePort } from "../../src/config/process-state";
-import { markSiblingStart, resetSiblingStartForTests, withSiblingMarker } from "../../src/codex/sibling-start";
-import { issueSiblingHandoff } from "../../src/codex/sibling-handoff";
+import { createLocalAttestationSecret } from "../../backend/src/lib/local-management-attestation";
+import { removeRuntimePort, writeRuntimePort } from "../../backend/src/config/process-state";
+import { markSiblingStart, resetSiblingStartForTests, withSiblingMarker } from "../../backend/src/codex/sibling-start";
+import { issueSiblingHandoff } from "../../backend/src/codex/sibling-handoff";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -15,7 +15,7 @@ import {
   inspectServiceStateRecords,
   selectAuthoritativeServiceState,
   serviceStatePathsForHomes,
-} from "../../src/service/state-record.mjs";
+} from "../../backend/src/service/state-record.mjs";
 
 // Every wait here is bounded by a real `ocx start` child coming up: spawning Bun,
 // binding a port, and writing its runtime record. That is intrinsic to the
@@ -31,7 +31,7 @@ const OWNER_WAIT_MS = watchdogMs(10_000);
 // is derived from the deadline rather than pinned next to it.
 const JOURNAL_OWNERSHIP_BUDGET_MS = Math.max(30_000, OWNER_WAIT_MS * 4);
 
-const cliPath = repoPath("src/cli/index.ts");
+const cliPath = repoPath("backend/src/cli/index.ts");
 const roots: string[] = [];
 const children: Array<ReturnType<typeof Bun.spawn>> = [];
 const startupOutputs: Array<ReturnType<typeof captureStartupChildOutput>> = [];
@@ -180,15 +180,15 @@ describe("start and ensure journal ownership (#1230)", () => {
       // supplied; both command ordering and real journal restoration execute in the child.
       const bodies = cli.slice(cli.indexOf("async function findProxyOwnerBeforeJournalRecovery("), cli.indexOf("function detachedStartEnvironment("))
         + cli.slice(cli.indexOf("async function handleEnsure("), cli.indexOf("async function handleTrayProxyStart("));
-      const recovery = readFileSync(repoPath("src/cli/start-owner-fence.ts"), "utf8");
+      const recovery = readFileSync(repoPath("backend/src/cli/start-owner-fence.ts"), "utf8");
       const recheck = recovery.slice(recovery.indexOf("export async function recoverStartJournalAfterOwnerRecheck("), recovery.indexOf("/** Hold ownership stable"));
       const executable = new Bun.Transpiler({ loader: "ts" }).transformSync(bodies + recheck.replace("export ", ""));
       const script = join(fx.root, "missed-owner.ts");
       writeFileSync(script, `
-        import { reconcileStartupJournal } from ${JSON.stringify(repoPath("src/cli/cross-home-owner.ts"))};
-        import { recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("src/cli/start-owner-fence.ts"))};
-        import { decideStartWithLiveOwner } from ${JSON.stringify(repoPath("src/cli/dispatch.ts"))};
-        import { START_OWNERSHIP_LIVENESS } from ${JSON.stringify(repoPath("src/server/proxy-liveness.ts"))};
+        import { reconcileStartupJournal } from ${JSON.stringify(repoPath("backend/src/cli/cross-home-owner.ts"))};
+        import { recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("backend/src/cli/start-owner-fence.ts"))};
+        import { decideStartWithLiveOwner } from ${JSON.stringify(repoPath("backend/src/cli/dispatch.ts"))};
+        import { START_OWNERSHIP_LIVENESS } from ${JSON.stringify(repoPath("backend/src/server/proxy-liveness.ts"))};
         import { readFileSync, existsSync, unlinkSync } from "node:fs";
         const events = [];
         const scenario = ${JSON.stringify(scenario)};

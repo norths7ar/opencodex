@@ -4,16 +4,16 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import http2 from "node:http2";
-import { CursorForegroundShellOwner } from "../../../src/adapters/cursor/native-foreground-shell";
-import { shellStreamExec } from "../../../src/adapters/cursor/native-exec-shell";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
-import { decodeAvailableConnectFrames, encodeConnectFrame } from "../../../src/adapters/cursor/framing";
+import { CursorForegroundShellOwner } from "../../../backend/src/adapters/cursor/native-foreground-shell";
+import { shellStreamExec } from "../../../backend/src/adapters/cursor/native-exec-shell";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
+import { decodeAvailableConnectFrames, encodeConnectFrame } from "../../../backend/src/adapters/cursor/framing";
 import {
   AgentClientMessageSchema, AgentServerMessageSchema, ExecServerMessageSchema, ShellArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { CursorRunRequest } from "../../../src/adapters/cursor/types";
+import type { CursorRunRequest } from "../../../backend/src/adapters/cursor/types";
 
 const dirs: string[] = [];
 function marker() {

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { fromBinary, toJson } from "@bufbuild/protobuf";
 import { ValueSchema } from "@bufbuild/protobuf/wkt";
-import { normalizeArgKeys } from "../../../src/adapters/cursor/arg-normalize";
-import { buildTools } from "../../../src/responses/parser-tools";
+import { normalizeArgKeys } from "../../../backend/src/adapters/cursor/arg-normalize";
+import { buildTools } from "../../../backend/src/responses/parser-tools";
 import {
   appendCursorGenericToolUseHint,
   buildCursorToolDefinitions,
@@ -20,8 +20,8 @@ import {
   isGenericToolUseCountDemoPrompt,
   nonEmptyShellBridgeCommandFromArgs,
   responsesToolNameFromCursorWire,
-} from "../../../src/adapters/cursor/tool-definitions";
-import type { OcxTool } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/tool-definitions";
+import type { OcxTool } from "../../../backend/src/types";
 
 describe("Cursor tool definitions", () => {
   test("converts Responses tools to Cursor request context definitions", () => {
@@ -905,9 +905,9 @@ describe("Cursor code mode tool guidance", () => {
 });
 
 test("tool-definitions preserves leaf identities and naming stays the dependency root", async () => {
-  const { cursorToolWireName: leafWireName } = await import("../../../src/adapters/cursor/tool-naming");
-  const { cursorToolInputSchema: leafInputSchema } = await import("../../../src/adapters/cursor/tool-schemas");
-  const { buildCursorToolGuidanceSystemNote: leafGuidance } = await import("../../../src/adapters/cursor/tool-guidance");
+  const { cursorToolWireName: leafWireName } = await import("../../../backend/src/adapters/cursor/tool-naming");
+  const { cursorToolInputSchema: leafInputSchema } = await import("../../../backend/src/adapters/cursor/tool-schemas");
+  const { buildCursorToolGuidanceSystemNote: leafGuidance } = await import("../../../backend/src/adapters/cursor/tool-guidance");
   const { readFileSync } = await import("node:fs");
   const { repoPath } = await import("../../helpers/repo-root");
 
@@ -915,5 +915,5 @@ test("tool-definitions preserves leaf identities and naming stays the dependency
   expect(cursorToolInputSchema).toBe(leafInputSchema);
   expect(buildCursorToolGuidanceSystemNote).toBe(leafGuidance);
   // Quote-agnostic: the naming leaf is the DAG root and must not import any sibling tool-* leaf.
-  expect(readFileSync(repoPath("src/adapters/cursor/tool-naming.ts"), "utf8")).not.toMatch(/from\s+["']\.\/tool-/);
+  expect(readFileSync(repoPath("backend/src/adapters/cursor/tool-naming.ts"), "utf8")).not.toMatch(/from\s+["']\.\/tool-/);
 });

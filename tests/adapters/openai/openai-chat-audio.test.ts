@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "openai-chat",

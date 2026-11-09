@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import { buildCatalogEntries } from "../../src/codex/catalog";
-import { parseRequest } from "../../src/responses/parser";
-import { planWebSearch } from "../../src/web-search";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { planWebSearch } from "../../backend/src/web-search";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 function nativeTemplate(): Record<string, unknown> {
   return {

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
-import type { OcxConfig } from "../../src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import { applyFinalRouteRequestNormalization } from "../../backend/src/server/responses/core-normalize";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("reasoning effort preserves visible thinking when summary is omitted", () => {
   test.each(["unknown", "off", ""])("invalid effort %j does not enable visibility", effort => {

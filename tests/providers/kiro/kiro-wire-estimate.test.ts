@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { estimateKiroWireTokens, KIRO_LATIN_WIRE_EXPANSION, kiroCjkCount } from "../../../src/adapters/kiro/usage";
-import { estimateTokens } from "../../../src/lib/token-estimate";
+import { estimateKiroWireTokens, KIRO_LATIN_WIRE_EXPANSION, kiroCjkCount } from "../../../backend/src/adapters/kiro/usage";
+import { estimateTokens } from "../../../backend/src/lib/token-estimate";
 
 describe("kiro wire token estimate", () => {
   const model = "claude-opus-5";

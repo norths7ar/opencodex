@@ -3,17 +3,17 @@ import { managementFetch as fetch } from "../helpers/management-auth";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../src/config";
-import { startServer as startServerImpl } from "../../src/server";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { writeDesktop3pConfig, removeDesktop3pStandardPivot } from "../../src/claude/desktop-3p";
-import * as desktopProfiles from "../../src/claude/desktop-profile";
-import { buildClaudeDesktopState } from "../../src/server/management/shared";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import { startServer as startServerImpl } from "../../backend/src/server";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { writeDesktop3pConfig, removeDesktop3pStandardPivot } from "../../backend/src/claude/desktop-3p";
+import * as desktopProfiles from "../../backend/src/claude/desktop-profile";
+import { buildClaudeDesktopState } from "../../backend/src/server/management/shared";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
-import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../src/server/management/body";
+import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../backend/src/server/management/body";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { desktopFirstPartyTarget } from "../../src/claude/desktop-first-party";
+import { desktopFirstPartyTarget } from "../../backend/src/claude/desktop-first-party";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 
 // Full-suite Windows load: startServer + multi-PUT management flows often exceed bun's
@@ -1086,7 +1086,7 @@ test("Claude Desktop profile GET, PUT and apply round-trip four-family assignmen
  * in-process, so this test guards the route, not the delegation.)
  */
 test("Claude Desktop apply installs the alias registry in the serving process (#859)", async () => {
-  const { resolveDesktop3pAlias, activeDesktop3pAlias } = await import("../../src/claude/desktop-3p");
+  const { resolveDesktop3pAlias, activeDesktop3pAlias } = await import("../../backend/src/claude/desktop-3p");
   // A provider unique to this test: no prior test can have populated its
   // alias, so resolution proves THIS apply built the registry in-process.
   const seeded = loadConfig();

@@ -3,7 +3,7 @@ import {
   workspaceMetadataCache,
   pruneWorkspaceMetadataCache,
   MAX_WORKSPACE_METADATA_ENTRIES,
-} from "../../src/adapters/command-code";
+} from "../../backend/src/adapters/command-code";
 
 beforeEach(() => {
   workspaceMetadataCache.clear();

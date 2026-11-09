@@ -6,9 +6,9 @@ import {
   GATED_MODEL_CLIENT_VERSION_FLOOR,
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { listManagementModelRows, loadExportModels, toExportModel, type ManagementModelRow } from "../../src/server/management/model-rows";
+} from "../../backend/src/codex/model-entitlements";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { listManagementModelRows, loadExportModels, toExportModel, type ManagementModelRow } from "../../backend/src/server/management/model-rows";
 import {
   OPENCODE_API_KEY_ENV,
   OPENCODE_CONFIG_SCHEMA,
@@ -27,9 +27,9 @@ import {
   type PiGeneratedConfig,
   type RaycastGeneratedConfig,
   type ZcodeGeneratedConfig,
-} from "../../src/clients/config-export";
-import type { ClineGeneratedConfig } from "../../src/clients/config-export/cline";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import type { ClineGeneratedConfig } from "../../backend/src/clients/config-export/cline";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

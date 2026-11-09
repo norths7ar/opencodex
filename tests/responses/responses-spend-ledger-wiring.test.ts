@@ -1,4 +1,4 @@
-import { hashSpendAlias } from "../../src/lib/spend-pool-alias-validation";
+import { hashSpendAlias } from "../../backend/src/lib/spend-pool-alias-validation";
 import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -7,21 +7,21 @@ import {
   createSpendReservationLedger,
   DEFAULT_SPEND_RESERVATION_POLICY,
   type SpendJournal,
-} from "../../src/lib/spend-reservation-ledger";
-import { createRequestExecutionBudget, reportDispatchSends, createPhysicalSendReporter } from "../../src/lib/request-execution-budget";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { estimateTokens } from "../../src/lib/token-estimate";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { SpendLedgerOwnerError, type SpendLedgerOwnerErrorCode } from "../../src/lib/spend-ledger-owner";
+} from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestExecutionBudget, reportDispatchSends, createPhysicalSendReporter } from "../../backend/src/lib/request-execution-budget";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { estimateTokens } from "../../backend/src/lib/token-estimate";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { SpendLedgerOwnerError, type SpendLedgerOwnerErrorCode } from "../../backend/src/lib/spend-ledger-owner";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import { applyFinalRouteRequestNormalization } from "../../backend/src/server/responses/core-normalize";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 /**
  * The durable spend ledger had no production caller (#4707).

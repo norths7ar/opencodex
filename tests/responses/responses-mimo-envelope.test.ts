@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { functionCallArgumentsFromText, parseRequest } from "../../src/responses/parser";
+import { functionCallArgumentsFromText, parseRequest } from "../../backend/src/responses/parser";
 
 const suffix = "</function></tool_call>";
 

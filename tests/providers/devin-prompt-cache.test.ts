@@ -1,21 +1,21 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDevinAdapter } from "../../src/adapters/devin";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import type { IncomingMeta } from "../../src/adapters/base";
-import { saveCredential } from "../../src/oauth/store";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createDevinAdapter } from "../../backend/src/adapters/devin";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import type { IncomingMeta } from "../../backend/src/adapters/base";
+import { saveCredential } from "../../backend/src/oauth/store";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
   buildGetChatMessageRequestForTests,
   devinCacheIdentity,
   invalidateSessionIdentity,
-} from "../../src/adapters/devin/cloud-direct/chat";
+} from "../../backend/src/adapters/devin/cloud-direct/chat";
 
 function buildRequest(overrides: Record<string, unknown> = {}): Buffer {
   return buildGetChatMessageRequestForTests({
@@ -106,7 +106,7 @@ describe("session invalidation is scoped to one account", () => {
   test("the unsafe global clear is gone from the module surface", async () => {
     // A per-provider logout calling a global clear() would strip the session and
     // cascade of every other account mid-turn, which is why nothing ever called it.
-    const mod = await import("../../src/adapters/devin/cloud-direct/chat");
+    const mod = await import("../../backend/src/adapters/devin/cloud-direct/chat");
     expect("clearSessionIds" in mod).toBe(false);
     expect(typeof mod.invalidateSessionIdentity).toBe("function");
   });

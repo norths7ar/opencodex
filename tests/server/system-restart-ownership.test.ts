@@ -5,12 +5,12 @@ import { fixturePath, helperPath, repoRoot } from "../helpers/repo-root";
 import { ownRestartFixture } from "../helpers/restart-fixture-processes";
 import {
   getPidPath, getRuntimePortPath, readPidFileValue, readRuntimePort, writePid, writeRuntimePort,
-} from "../../src/config/process-state";
-import { inspectOwnershipMutationLease } from "../../src/service/ownership-mutation-lease.mjs";
-import { serviceStatePaths } from "../../src/service/state";
-import { retireRestartParentOwnership } from "../../src/server/restart-parent-ownership";
-import { observeProxyLiveness } from "../../src/server/proxy-liveness";
-import { isProcessAlive } from "../../src/lib/process-control";
+} from "../../backend/src/config/process-state";
+import { inspectOwnershipMutationLease } from "../../backend/src/service/ownership-mutation-lease.mjs";
+import { serviceStatePaths } from "../../backend/src/service/state";
+import { retireRestartParentOwnership } from "../../backend/src/server/restart-parent-ownership";
+import { observeProxyLiveness } from "../../backend/src/server/proxy-liveness";
+import { isProcessAlive } from "../../backend/src/lib/process-control";
 
 let home: TempHome | undefined;
 let settleProcesses: (() => Promise<void>) | undefined;

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorKvStore } from "../../../src/adapters/cursor/kv-store";
-import { mapCursorServerMessage } from "../../../src/adapters/cursor/message-mapper";
-import type { CursorClientMessage } from "../../../src/adapters/cursor/types";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
+import { createCursorKvStore } from "../../../backend/src/adapters/cursor/kv-store";
+import { mapCursorServerMessage } from "../../../backend/src/adapters/cursor/message-mapper";
+import type { CursorClientMessage } from "../../../backend/src/adapters/cursor/types";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 const kvStore = (seed: Record<string, Uint8Array> = {}) => createCursorKvStore(seed, createTranslatorBudget());

@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { clearReasoningReplayCacheForTests, commitReasoningReplayServingIdentity } from "../../src/responses/reasoning-replay-cache";
-import { parseRequest } from "../../src/responses/parser";
-import { bindRouteReasoningReplayScope } from "../../src/server/responses/core-replay";
-import { OPAQUE_COMPACTION_NOTE } from "../../src/responses/compaction";
-import { resetThoughtSignatureReplayForTests } from "../../src/responses/thought-signature-replay";
-import * as authContextModule from "../../src/codex/auth-context";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { clearReasoningReplayCacheForTests, commitReasoningReplayServingIdentity } from "../../backend/src/responses/reasoning-replay-cache";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { bindRouteReasoningReplayScope } from "../../backend/src/server/responses/core-replay";
+import { OPAQUE_COMPACTION_NOTE } from "../../backend/src/responses/compaction";
+import { resetThoughtSignatureReplayForTests } from "../../backend/src/responses/thought-signature-replay";
+import * as authContextModule from "../../backend/src/codex/auth-context";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   handleResponses,
   shouldAttemptOpaqueBlobRecovery,
-} from "../../src/server/responses/core";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { markBodyNonPersistable, rememberResponseState, previousResponseProviderState } from "../../src/responses/state";
+import { markBodyNonPersistable, rememberResponseState, previousResponseProviderState } from "../../backend/src/responses/state";
 
 const originalFetch = globalThis.fetch;
 const originalOpenCodexHome = process.env.OPENCODEX_HOME;

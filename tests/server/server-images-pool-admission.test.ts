@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   canAcquireCodexQuotaProbeLease,
@@ -9,12 +9,12 @@ import {
   clearThreadAccountMap,
   getCodexUpstreamHealth,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import { saveConfig } from "../../src/config";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import { handleImages } from "../../src/server/images";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { saveConfig } from "../../backend/src/config";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import { handleImages } from "../../backend/src/server/images";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const ADMISSION_SECRET = "pool-admission-fixture";

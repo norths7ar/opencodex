@@ -10,7 +10,7 @@ import {
   sortWorkspaceItems,
   type WorkspaceItem,
   type WorkspaceProvider,
-} from "../../gui/src/provider-workspace/catalog";
+} from "../../frontend/src/provider-workspace/catalog";
 import {
   buildAttentionItems,
   buildMostUsedProviders,
@@ -21,15 +21,15 @@ import {
   parseAvailableModels,
   parseSelectedModels,
   relativeTimeLabelsFromT,
-} from "../../gui/src/provider-workspace/usage";
+} from "../../frontend/src/provider-workspace/usage";
 import {
   formatNamespacedModelId,
   formatProviderDisplayName,
   isCatalogProviderId,
   providerIconSrc,
-} from "../../gui/src/provider-icons";
-import { en } from "../../gui/src/i18n/en";
-import { interpolate, type TFn } from "../../gui/src/i18n/shared";
+} from "../../frontend/src/provider-icons";
+import { en } from "../../frontend/src/i18n/en";
+import { interpolate, type TFn } from "../../frontend/src/i18n/shared";
 import {
   bucketPresets,
   filterPresets,
@@ -40,8 +40,8 @@ import {
   filterAccountRows,
   dropPresetsCoveredByAccounts,
   type CatalogPreset,
-} from "../../gui/src/components/provider-catalog/provider-presets";
-import { isLocalProvider, providerKind } from "../../gui/src/provider-workspace/kind";
+} from "../../frontend/src/components/provider-catalog/provider-presets";
+import { isLocalProvider, providerKind } from "../../frontend/src/provider-workspace/kind";
 
 const englishT: TFn = (key, vars) => interpolate(en[key], vars);
 

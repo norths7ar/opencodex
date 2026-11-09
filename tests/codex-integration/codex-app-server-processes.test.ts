@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { execFileSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { resolveTrustedWindowsPowerShellExe, setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
+import { resolveTrustedWindowsPowerShellExe, setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
 import {
   createWindowsPowerShellFixture,
   probeWindowsPowerShellFixture,
@@ -29,7 +29,7 @@ import {
   STALE_CODEX_APP_SERVER_HINT,
   warnIfStaleCodexAppServersAfterStartupWrite,
   WINDOWS_CODEX_BASENAME_CANDIDATE_RE,
-} from "../../src/codex/app-server-processes";
+} from "../../backend/src/codex/app-server-processes";
 import { repoPath } from "../helpers/repo-root";
 
 describe("collectCodexAppServerCatalogState (#857)", () => {
@@ -844,10 +844,10 @@ describe("Codex session process matching (#2811)", () => {
 });
 
 describe("CLI /api sync wiring for stale app-servers (#476)", () => {
-  const dispatchSource = readFileSync(repoPath("src", "cli", "dispatch.ts"), "utf8");
-  const syncSource = readFileSync(repoPath("src", "cli", "sync-command.ts"), "utf8");
+  const dispatchSource = readFileSync(repoPath("backend/src", "cli", "dispatch.ts"), "utf8");
+  const syncSource = readFileSync(repoPath("backend/src", "cli", "sync-command.ts"), "utf8");
   const configRoutesSource = readFileSync(
-    repoPath("src", "server", "management", "config-routes.ts"),
+    repoPath("backend/src", "server", "management", "config-routes.ts"),
     "utf8",
   );
 
@@ -892,7 +892,7 @@ describe("CLI /api sync wiring for stale app-servers (#476)", () => {
   });
 
   test("only --restart-app-server-only leaves the desktop app running", () => {
-    const scopeSource = readFileSync(repoPath("src", "cli", "restart-scope.ts"), "utf-8");
+    const scopeSource = readFileSync(repoPath("backend/src", "cli", "restart-scope.ts"), "utf-8");
     // The narrow scope wins a conflict. Losing live conversations is unrecoverable and a
     // stale model picker is not, so a user who asked for app-server-only keeps them even
     // if another flag says otherwise.
@@ -975,7 +975,7 @@ describe("CLI /api sync wiring for stale app-servers (#476)", () => {
 
 describe("Windows Win32_Process owner enumeration (#476)", () => {
   const processSource = readFileSync(
-    repoPath("src", "codex", "app-server-processes.ts"),
+    repoPath("backend/src", "codex", "app-server-processes.ts"),
     "utf8",
   );
 

@@ -3,7 +3,7 @@ import {
   isMuseSubscriptionUsagePayload,
   MUSE_SUBSCRIPTION_USAGE_TYPE,
   parseMuseSubscriptionUsage,
-} from "../../src/providers/muse-subscription-usage";
+} from "../../backend/src/providers/muse-subscription-usage";
 
 /** The payload measured against the live endpoint on 2026-09-03 (003 §E). */
 function measuredPayload(): unknown {

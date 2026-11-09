@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { providerTableString, rootTomlString } from "../../src/codex/injected-marker";
+import { providerTableString, rootTomlString } from "../../backend/src/codex/injected-marker";
 
 describe("Codex injected marker TOML strings", () => {
   test("decodes escaped basic strings", () => {

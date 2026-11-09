@@ -2,11 +2,11 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect } from "../../../src/codex/catalog";
-import { buildModelsRequest } from "../../../src/oauth";
-import { captureModelCacheGeneration, clearModelCache, getStaleCached } from "../../../src/codex/model-cache";
-import { registerAntigravityDiscoveredWireModels, resolveAntigravityWireModelId } from "../../../src/providers/antigravity-models";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect } from "../../../backend/src/codex/catalog";
+import { buildModelsRequest } from "../../../backend/src/oauth";
+import { captureModelCacheGeneration, clearModelCache, getStaleCached } from "../../../backend/src/codex/model-cache";
+import { registerAntigravityDiscoveredWireModels, resolveAntigravityWireModelId } from "../../../backend/src/providers/antigravity-models";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

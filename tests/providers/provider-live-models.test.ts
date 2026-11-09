@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { gatherRoutedModels } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 // Phase 2 of devlog/model_update/260709_model_refresh: live /models discovery is the
 // authoritative lineup; static config lists are the fallback seed. These tests pin the

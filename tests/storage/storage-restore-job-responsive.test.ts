@@ -8,17 +8,17 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { drainAndShutdown } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { drainAndShutdown } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
-import { stopStorageCleanupScheduler } from "../../src/storage/policy-scheduler";
+import { stopStorageCleanupScheduler } from "../../backend/src/storage/policy-scheduler";
 import {
   resetRestoreTrashJobForTestsAsync,
   setRestoreTrashJobTestHooks,
-} from "../../src/storage/restore-job";
-import { drainStorageWorkers } from "../../src/storage/worker-lifecycle";
+} from "../../backend/src/storage/restore-job";
+import { drainStorageWorkers } from "../../backend/src/storage/worker-lifecycle";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

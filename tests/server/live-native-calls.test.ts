@@ -4,7 +4,7 @@
  * client reads from the same Location, or a created call would look foreign and lose its account.
  */
 import { expect, test } from "bun:test";
-import { liveCallIdFromLocation, NativeLiveCalls } from "../../src/server/live-native-calls";
+import { liveCallIdFromLocation, NativeLiveCalls } from "../../backend/src/server/live-native-calls";
 
 const UUID = "0d6c3f1e-8b2a-4c4d-9e0f-1a2b3c4d5e6f";
 

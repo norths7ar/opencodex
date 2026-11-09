@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { acquireAccountLease, accountInFlight, KIRO_LEASE_MAX_MS } from "../../../src/oauth/kiro-account-load";
+import { acquireAccountLease, accountInFlight, KIRO_LEASE_MAX_MS } from "../../../backend/src/oauth/kiro-account-load";
 
 test("lease counts are process local and release is idempotent", async () => {
   const a = await acquireAccountLease("kiro", "load-idempotent");

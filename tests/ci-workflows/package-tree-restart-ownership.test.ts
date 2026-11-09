@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { PackageTreeObservation } from "../../src/lib/package-tree-integrity";
-import { createPackageTreeIntegrityGuardForServer } from "../../src/server/index/package-tree-guard";
-import { acceptSystemRestart, noteExplicitShutdownRequested, setSystemRestartIoForTests } from "../../src/server/management/system-restart";
-import { acquireTemporaryDrain, beginShutdownDrain, isDraining, isShutdownDraining, resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
+import type { PackageTreeObservation } from "../../backend/src/lib/package-tree-integrity";
+import { createPackageTreeIntegrityGuardForServer } from "../../backend/src/server/index/package-tree-guard";
+import { acceptSystemRestart, noteExplicitShutdownRequested, setSystemRestartIoForTests } from "../../backend/src/server/management/system-restart";
+import { acquireTemporaryDrain, beginShutdownDrain, isDraining, isShutdownDraining, resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
 
 const original: PackageTreeObservation = {
   device: 1n, inode: 1n, contentTimeNs: 1n, size: 1n,

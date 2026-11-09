@@ -13,18 +13,18 @@ import {
   MAIN_HARD_LOCK_MIN_POOL_RETRY_MS,
   cooldownErrorResponse,
   resolveCodexAuthContext,
-} from "../../src/codex/auth-context";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import * as mainAccount from "../../src/codex/main-account";
-import { captureMainQuotaWriter } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { setAccountHealth } from "../../src/codex/routing/health-store";
-import { nextCodexPoolRecoveryAt } from "../../src/codex/routing/pool-recovery";
-import { setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-context";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import * as mainAccount from "../../backend/src/codex/main-account";
+import { captureMainQuotaWriter } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { setAccountHealth } from "../../backend/src/codex/routing/health-store";
+import { nextCodexPoolRecoveryAt } from "../../backend/src/codex/routing/pool-recovery";
+import { setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const MAIN = mainAccount.MAIN_CODEX_ACCOUNT_ID;

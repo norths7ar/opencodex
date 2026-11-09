@@ -1,14 +1,14 @@
 /** Both instances enter the real translated handlers and preserve one canonical Anthropic wire. */
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createAnthropicInstanceFixture, instanceFixtureUuid, type AnthropicInstanceFixture } from "../helpers/anthropic-instance-fixture";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { RequestLogContext } from "../../src/server/request-log";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 let f: AnthropicInstanceFixture;
 let releaseSpend: (() => void) | undefined;
-let responses: typeof import("../../src/server/responses");
-let chat: typeof import("../../src/server/chat-completions");
-let messages: typeof import("../../src/server/claude-messages");
+let responses: typeof import("../../backend/src/server/responses");
+let chat: typeof import("../../backend/src/server/chat-completions");
+let messages: typeof import("../../backend/src/server/claude-messages");
 let seen: Array<{ instance: AnthropicInstanceId; body: Record<string, unknown>; headers: Headers; url: string }>;
 let toolReply: boolean;
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
@@ -19,10 +19,10 @@ const REDACTED = "synthetic-redacted-state";
 beforeEach(async () => {
   f = await createAnthropicInstanceFixture(); await f.seed();
   const { acquireOwnedSpendHome } = await import("../helpers/owned-spend-home"); releaseSpend = acquireOwnedSpendHome();
-  responses = await import("../../src/server/responses");
-  chat = await import("../../src/server/chat-completions");
-  messages = await import("../../src/server/claude-messages");
-  (await import("../../src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
+  responses = await import("../../backend/src/server/responses");
+  chat = await import("../../backend/src/server/chat-completions");
+  messages = await import("../../backend/src/server/claude-messages");
+  (await import("../../backend/src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
   seen = []; toolReply = false;
   // Explicit opt-out makes the Messages input exercise the scoped Responses bridge.
   f.config.protocols = { rollout: { managedMessagesNative: false, managedMessagesNativeOAuth: false } };
@@ -66,7 +66,7 @@ beforeEach(async () => {
 afterEach(async () => {
   try {
     f.ledger.assertNoCrossSend(); releaseSpend?.(); releaseSpend = undefined;
-    (await import("../../src/responses/state")).clearResponseStateForTests();
+    (await import("../../backend/src/responses/state")).clearResponseStateForTests();
   } finally { await f.dispose(); }
 });
 
@@ -83,7 +83,7 @@ async function send(surface: Surface, instance: AnthropicInstanceId, body: Recor
   const text = await response.text();
   expect(response.status).toBe(200);
   if (surface !== "responses") {
-    const { protocolTraceForRequest } = await import("../../src/protocols/trace");
+    const { protocolTraceForRequest } = await import("../../backend/src/protocols/trace");
     expect(protocolTraceForRequest(log, log.attempts)?.mode).toBe("legacy-bridge");
   }
   return { text, log };

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { Readable } from "node:stream";
-import { handleProviderPacingCommand, takeProviderEditSettings } from "../../src/cli/provider-settings";
-import { handleProviderRuntimeCommand } from "../../src/cli/provider-runtime";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleProviderPacingCommand, takeProviderEditSettings } from "../../backend/src/cli/provider-settings";
+import { handleProviderRuntimeCommand } from "../../backend/src/cli/provider-runtime";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 type Call = { url: string; method: string; body?: unknown };

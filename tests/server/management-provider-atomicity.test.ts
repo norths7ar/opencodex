@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { armClaudeCodeBaseline, loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../src/config";
-import * as atomicWrite from "../../src/config/atomic-write";
-import * as derivedRegistries from "../../src/config/derived-registries";
-import * as mutationLock from "../../src/config/mutation-lock";
-import * as catalogMigration from "../../src/codex/custom-model-catalog-migration";
+import { armClaudeCodeBaseline, loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import * as atomicWrite from "../../backend/src/config/atomic-write";
+import * as derivedRegistries from "../../backend/src/config/derived-registries";
+import * as mutationLock from "../../backend/src/config/mutation-lock";
+import * as catalogMigration from "../../backend/src/codex/custom-model-catalog-migration";
 import {
   configRebaseDeletionKeys, deleteConfigObjectChildKey, deleteConfigTopLevelKey,
   prepareConfigObjectChildDeletionRebase,
-} from "../../src/config/rebase-provenance";
-import { prepareConfigMutationDatabasePathForWrite } from "../../src/config/mutation-lock";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import * as stateStores from "../../src/lib/state-store-registrations";
-import { clearModelCache, getStaleCached, setCached } from "../../src/codex/model-cache";
-import { routeModel } from "../../src/router";
-import { handleProviderRoutes } from "../../src/server/management/provider-routes";
-import type { ManagementApiDeps } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config/rebase-provenance";
+import { prepareConfigMutationDatabasePathForWrite } from "../../backend/src/config/mutation-lock";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import * as stateStores from "../../backend/src/lib/state-store-registrations";
+import { clearModelCache, getStaleCached, setCached } from "../../backend/src/codex/model-cache";
+import { routeModel } from "../../backend/src/router";
+import { handleProviderRoutes } from "../../backend/src/server/management/provider-routes";
+import type { ManagementApiDeps } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

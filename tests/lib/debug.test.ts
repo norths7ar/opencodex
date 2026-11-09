@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { appendDebugLogLine, debugBufferMetrics, getDebugLogEntries, resetDebugLogBufferForTests, subscribeDebugLogEntries } from "../../src/lib/debug-log-buffer";
-import { ResourceAdmissionError, RETAINED_TRUNCATION_MARKER, retainedUtf8Bytes, truncateRetainedUtf8 } from "../../src/lib/admission";
-import { getInjectionDebugLogEntries, injectionDebugLog, resetInjectionDebugLogBufferForTests } from "../../src/lib/injection-debug-log";
-import { markActivity, activityBreadcrumb } from "../../src/lib/sidecar-tracker";
-import { debugDroppedFrame, debugProviderDiagnostic, debugProviderDiagnosticLazy } from "../../src/lib/debug";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../src/lib/debug-settings";
+import { appendDebugLogLine, debugBufferMetrics, getDebugLogEntries, resetDebugLogBufferForTests, subscribeDebugLogEntries } from "../../backend/src/lib/debug-log-buffer";
+import { ResourceAdmissionError, RETAINED_TRUNCATION_MARKER, retainedUtf8Bytes, truncateRetainedUtf8 } from "../../backend/src/lib/admission";
+import { getInjectionDebugLogEntries, injectionDebugLog, resetInjectionDebugLogBufferForTests } from "../../backend/src/lib/injection-debug-log";
+import { markActivity, activityBreadcrumb } from "../../backend/src/lib/sidecar-tracker";
+import { debugDroppedFrame, debugProviderDiagnostic, debugProviderDiagnosticLazy } from "../../backend/src/lib/debug";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../backend/src/lib/debug-settings";
 
 describe("retained UTF-8 sizing", () => {
   test("preserves TextEncoder coercion for non-string runtime inputs", () => {

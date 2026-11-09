@@ -1,15 +1,15 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { stripUnsupportedHostedTools } from "../../src/adapters/openai-responses/tool-schema";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { stripUnsupportedHostedTools } from "../../backend/src/adapters/openai-responses/tool-schema";
 import {
   DECLARABLE_HOSTED_TOOL_TYPES,
   declaredUnsupportedHostedTools,
   isHostedToolUnsupportedForModel,
-} from "../../src/responses/hosted-tool-policy";
-import { HOSTED_TOOL_TYPES } from "../../src/responses/schema";
-import { modelPreferHostedToolsConfigError } from "../../src/config";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/responses/hosted-tool-policy";
+import { HOSTED_TOOL_TYPES } from "../../backend/src/responses/schema";
+import { modelPreferHostedToolsConfigError } from "../../backend/src/config";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 /**

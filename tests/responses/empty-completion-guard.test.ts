@@ -7,9 +7,9 @@ import {
   guardEmptyCompletionEventStream,
   isContentEvent,
   observeEmptyCompletion,
-} from "../../src/server/responses/empty-completion-guard";
-import { bridgeToResponsesSSE } from "../../src/bridge/sse";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/server/responses/empty-completion-guard";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge/sse";
+import type { AdapterEvent } from "../../backend/src/types";
 
 function collect(source: AsyncIterable<AdapterEvent>): Promise<AdapterEvent[]> {
   const events: AdapterEvent[] = [];

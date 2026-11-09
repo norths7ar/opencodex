@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { saveCredential } from "../../src/oauth/store";
-import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum } from "../../src/oauth/anthropic-routing";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { nativeMessagesToolScopeDenial } from "../../src/server/messages-native-scope";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum } from "../../backend/src/oauth/anthropic-routing";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { nativeMessagesToolScopeDenial } from "../../backend/src/server/messages-native-scope";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

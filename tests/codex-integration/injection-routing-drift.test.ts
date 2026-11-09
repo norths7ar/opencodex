@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { detectCodexRoutingDrift, type JournaledCodexRouting } from "../../src/codex/routing-drift";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+import { detectCodexRoutingDrift, type JournaledCodexRouting } from "../../backend/src/codex/routing-drift";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 
 const OWN = [10100];
 const NO_JOURNAL: JournaledCodexRouting = { openaiBaseUrl: null, realtimeWsBaseUrl: null };

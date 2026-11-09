@@ -8,8 +8,8 @@ import {
   USAGE_LEDGER_BOUNDARY_DIGEST_BYTES,
   USAGE_LEDGER_MAX_LINE_BYTES,
   UsageLedgerRebuildRequiredError,
-} from "../../src/usage/ledger-scanner";
-import { normalizePersistedUsageRow, usageLogIdentityKey, usageLogPath, type PersistedUsageEntry } from "../../src/usage/log";
+} from "../../backend/src/usage/ledger-scanner";
+import { normalizePersistedUsageRow, usageLogIdentityKey, usageLogPath, type PersistedUsageEntry } from "../../backend/src/usage/log";
 
 let testDir = "";
 let previousHome: string | undefined;

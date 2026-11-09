@@ -11,16 +11,16 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
 import type {
   CatalogConditionalSourceObservations,
   CatalogConditionalSourceRole,
   CatalogRequiredSourceObservations,
   CatalogRequiredSourceRole,
   CatalogSourceEvidence,
-} from "../../src/codex/convergence-types";
-import { saveConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/convergence-types";
+import { saveConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CONDITIONAL_SOURCE_ROLES = [

@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { EventEmitter } from "node:events";
 import type { spawn } from "node:child_process";
-import { spawnCodex, type CodexSpawnDeps } from "../../src/cli/codex-launcher";
-import { handleInternalCommand } from "../../src/cli/internal-command";
-import type { CodexExecBoundaryAsyncDeps } from "../../src/codex/exec-boundary";
-import { maybeAutoRestoreCodexShim, skipsCodexShimAutoRestore } from "../../src/cli/codex-shim-autorestore";
+import { spawnCodex, type CodexSpawnDeps } from "../../backend/src/cli/codex-launcher";
+import { handleInternalCommand } from "../../backend/src/cli/internal-command";
+import type { CodexExecBoundaryAsyncDeps } from "../../backend/src/codex/exec-boundary";
+import { maybeAutoRestoreCodexShim, skipsCodexShimAutoRestore } from "../../backend/src/cli/codex-shim-autorestore";
 
 const bundle = "/Applications/ChatGPT.app";
 const binary = `${bundle}/Contents/Resources/codex`;

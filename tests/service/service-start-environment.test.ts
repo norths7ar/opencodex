@@ -21,7 +21,7 @@ import { repoPath } from "../helpers/repo-root";
  * move down.
  */
 test("service start refuses a changed install environment before it starts the launcher", () => {
-  const source = readFileSync(repoPath("src", "service", "cli.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "service", "cli.ts"), "utf8");
 
   // The guard is imported, so it cannot be satisfied by a local stub of the same name.
   expect(source).toContain('import { assertServiceEnvironmentMatchesInstall');

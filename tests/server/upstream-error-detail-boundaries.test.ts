@@ -3,11 +3,11 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { getRequestLogEntries, requestLogEntryFromPersistedUsage } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import { readUsageEntries, usageLogPath } from "../../src/usage/log";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { getRequestLogEntries, requestLogEntryFromPersistedUsage } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import { readUsageEntries, usageLogPath } from "../../backend/src/usage/log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

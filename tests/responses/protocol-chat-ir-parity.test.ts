@@ -11,17 +11,17 @@ import { describe, expect, test } from "bun:test";
 import {
   chatCompletionsToResponsesBody,
   chatSettingsToResponsesBody,
-} from "../../src/chat/inbound";
+} from "../../backend/src/chat/inbound";
 import {
   chatConversationToIr,
   chatIrRouteEvidence,
   withDirectChatConversation,
-} from "../../src/protocols/codecs/chat-ir";
-import { featureEffectsForPath, PROTOCOL_FEATURES } from "../../src/protocols/features";
-import { requestPathForLane } from "../../src/protocols/path";
-import { parseRequest } from "../../src/responses/parser";
-import { evidenceFromBody } from "../../src/routing/request-evidence";
-import type { OcxParsedRequest } from "../../src/types";
+} from "../../backend/src/protocols/codecs/chat-ir";
+import { featureEffectsForPath, PROTOCOL_FEATURES } from "../../backend/src/protocols/features";
+import { requestPathForLane } from "../../backend/src/protocols/path";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { evidenceFromBody } from "../../backend/src/routing/request-evidence";
+import type { OcxParsedRequest } from "../../backend/src/types";
 
 const MODEL = "google-antigravity/gemini-3.8-flash";
 const IDENTITY = "You are a coding agent powered by the gpt-6. If asked which model you are, identify as gpt-6. "

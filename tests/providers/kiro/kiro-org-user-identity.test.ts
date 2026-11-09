@@ -3,13 +3,13 @@ import { Database } from "bun:sqlite";
 import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { OAUTH_PROVIDERS, OAuthReauthIdentityMismatchError, publicOAuthAuthenticationErrorMessage, runLogin } from "../../../src/oauth";
-import { loginKiro, refreshKiroToken, type KiroCliRunner } from "../../../src/oauth/kiro";
-import { KiroUserIdentityUnavailableError } from "../../../src/oauth/kiro-account-identity";
-import { readKiroCliSqliteCredential } from "../../../src/oauth/kiro-credentials";
-import { getAccountCredential, getAccountSet, saveCredential } from "../../../src/oauth/store";
-import type { OAuthController, OAuthCredentials } from "../../../src/oauth/types";
-import type { OcxConfig } from "../../../src/types";
+import { OAUTH_PROVIDERS, OAuthReauthIdentityMismatchError, publicOAuthAuthenticationErrorMessage, runLogin } from "../../../backend/src/oauth";
+import { loginKiro, refreshKiroToken, type KiroCliRunner } from "../../../backend/src/oauth/kiro";
+import { KiroUserIdentityUnavailableError } from "../../../backend/src/oauth/kiro-account-identity";
+import { readKiroCliSqliteCredential } from "../../../backend/src/oauth/kiro-credentials";
+import { getAccountCredential, getAccountSet, saveCredential } from "../../../backend/src/oauth/store";
+import type { OAuthController, OAuthCredentials } from "../../../backend/src/oauth/types";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 // Issue #6641: users of one Kiro organization (IAM Identity Center) profile share its profile

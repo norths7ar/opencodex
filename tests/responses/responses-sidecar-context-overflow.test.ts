@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { PROVIDER_INPUT_TOO_LARGE_MESSAGE, isSidecarContextOverflow } from "../../src/server/responses/context-overflow";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { PROVIDER_INPUT_TOO_LARGE_MESSAGE, isSidecarContextOverflow } from "../../backend/src/server/responses/context-overflow";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // #7316: a provider refusing an oversized turn behind the web-search or image sidecar must end

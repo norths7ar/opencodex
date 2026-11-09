@@ -1,20 +1,20 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { classifyWindowsServiceStop, installedServiceRespawnRisk, isServiceOwnershipError, ServiceOwnershipError } from "../../../src/service";
-import { decideStartExitTeardown } from "../../../src/cli/dispatch";
+import { classifyWindowsServiceStop, installedServiceRespawnRisk, isServiceOwnershipError, ServiceOwnershipError } from "../../../backend/src/service";
+import { decideStartExitTeardown } from "../../../backend/src/cli/dispatch";
 import { repoPath } from "../../helpers/repo-root";
 
-const CLI_SOURCE = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
-const ENSURE_SOURCE = readFileSync(repoPath("src", "cli", "ensure-desired-integrations.ts"), "utf8");
-const DISPATCH_SOURCE = readFileSync(repoPath("src", "cli", "dispatch.ts"), "utf8");
+const CLI_SOURCE = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
+const ENSURE_SOURCE = readFileSync(repoPath("backend/src", "cli", "ensure-desired-integrations.ts"), "utf8");
+const DISPATCH_SOURCE = readFileSync(repoPath("backend/src", "cli", "dispatch.ts"), "utf8");
 // handleStop's restore helper lives beside it; its whole file is that one function.
-const STOP_RESTORE_SOURCE = readFileSync(repoPath("src", "cli", "stop-restore.ts"), "utf8");
-const SERVICE_SOURCE = readFileSync(repoPath("src", "service", "cli.ts"), "utf8");
-const MANAGEMENT_SOURCE = readFileSync(repoPath("src", "server", "management-api.ts"), "utf8");
-const PROCESS_CONTROL_SOURCE = readFileSync(repoPath("src", "lib", "process-control.ts"), "utf8");
+const STOP_RESTORE_SOURCE = readFileSync(repoPath("backend/src", "cli", "stop-restore.ts"), "utf8");
+const SERVICE_SOURCE = readFileSync(repoPath("backend/src", "service", "cli.ts"), "utf8");
+const MANAGEMENT_SOURCE = readFileSync(repoPath("backend/src", "server", "management-api.ts"), "utf8");
+const PROCESS_CONTROL_SOURCE = readFileSync(repoPath("backend/src", "lib", "process-control.ts"), "utf8");
 // The startup Desktop-3P registry build (and its catch) lives in this shared helper.
-const REGISTRY_STARTUP_SOURCE = readFileSync(repoPath("src", "claude", "desktop-3p-startup.ts"), "utf8");
+const REGISTRY_STARTUP_SOURCE = readFileSync(repoPath("backend/src", "claude", "desktop-3p-startup.ts"), "utf8");
 
 function sliceFn(source: string, start: string, end: string): string {
   const from = source.indexOf(start);
@@ -205,12 +205,12 @@ describe("Grok fence lifecycle wiring", () => {
 
   test("only Task Scheduler earns the respawn wait", () => {
     const stopFn = sliceFn(CLI_SOURCE, "async function handleStop(", "async function handleUninstall(");
-    const serviceSource = readFileSync(repoPath("src", "service", "orchestration.ts"), "utf8");
+    const serviceSource = readFileSync(repoPath("backend/src", "service", "orchestration.ts"), "utf8");
     // schtasks /end leaves the `cmd :loop` wrapper alive to respawn its child (#764).
     // launchd, systemd and WinSW are down when they report stopped, so charging them a
     // seven-second poll on every ocx stop would be a regression in ordinary use.
     expect(serviceSource).toContain('"absent" | "stopped" | "stopped-respawnable" | "failed"');
-    const windowsOps = readFileSync(repoPath("src", "service", "windows-ops.ts"), "utf8");
+    const windowsOps = readFileSync(repoPath("backend/src", "service", "windows-ops.ts"), "utf8");
     expect(windowsOps).toContain('schedulerStopped ? "stopped-respawnable" : "stopped"');
     expect(stopFn).toContain("if (schedulerCanRespawn && !ownershipBlocked)");
     // The wait is gated on the scheduler flag, not on "a service stopped".
@@ -219,8 +219,8 @@ describe("Grok fence lifecycle wiring", () => {
 
   test("ocx stop defers shared teardown so a respawn survivor keeps its config", () => {
     const stopFn = sliceFn(CLI_SOURCE, "async function handleStop(", "async function handleUninstall(");
-    const apiSource = readFileSync(repoPath("src", "server", "management-api.ts"), "utf8");
-    const controlSource = readFileSync(repoPath("src", "lib", "process-control.ts"), "utf8");
+    const apiSource = readFileSync(repoPath("backend/src", "server", "management-api.ts"), "utf8");
+    const controlSource = readFileSync(repoPath("backend/src", "lib", "process-control.ts"), "utf8");
     // POST /api/stop normally restores native Codex and strips the Grok fence itself. If
     // ocx stop let it, a scheduler wrapper that respawns seconds later would already have
     // lost its client config, and the parent ownershipBlocked guard could only prevent a
@@ -265,7 +265,7 @@ describe("Grok fence lifecycle wiring", () => {
     expect(stopFn.indexOf("await restoreSharedClientStateAfterStop(reportRetainedCodexProviderTable)"))
       .toBeLessThan(stopFn.indexOf("clearRestoredStopReceipts(record,"));
     // A receipt that survives its discharge would re-trigger recovery forever.
-    const receiptSource = readFileSync(repoPath("src", "cli", "stop-restore-guard.ts"), "utf8");
+    const receiptSource = readFileSync(repoPath("backend/src", "cli", "stop-restore-guard.ts"), "utf8");
     expect(receiptSource).toContain("if (!clearPendingTeardown(nonce)) {");
     expect(receiptSource).toContain("return withConfigMutationLockSync(() => {");
     expect(receiptSource.indexOf("const boundary = inspectStopRestoreOwnership();"))
@@ -325,9 +325,9 @@ describe("Grok fence lifecycle wiring", () => {
     // After a parent crashed mid-deferral the service, pid and runtime records can all be
     // absent while shared client config still points at a proxy that is gone. Installing
     // over that skips the recovery the receipt exists to trigger (#3008).
-    const updateSource = readFileSync(repoPath("src", "update", "index.ts"), "utf8");
+    const updateSource = readFileSync(repoPath("backend/src", "update", "index.ts"), "utf8");
     expect(updateSource).toContain("readPid() || readRuntimePort() || pendingTeardownOutstanding()");
-    const launcherSource = readFileSync(repoPath("bin", "ocx.mjs"), "utf8");
+    const launcherSource = readFileSync(repoPath("backend/bin", "ocx.mjs"), "utf8");
     // The launcher runs under plain Node, so it shares the naming rule as ESM rather than
     // spelling it out — which is how it ended up watching the retired singleton filename
     // after receipts moved to one file per claim, silently seeing none of them.
@@ -337,16 +337,16 @@ describe("Grok fence lifecycle wiring", () => {
     // Checked AFTER the stop too: a quarantined receipt lets the stop succeed, so a
     // pre-stop check alone let the retry install over a teardown that never ran.
     expect(launcherSource).toContain("teardownOutstanding: hasPendingTeardownIn(readdirSync, configDir())");
-    const updateSource2 = readFileSync(repoPath("src", "update", "index.ts"), "utf8");
+    const updateSource2 = readFileSync(repoPath("backend/src", "update", "index.ts"), "utf8");
     expect(updateSource2).toContain("teardownOutstanding: pendingTeardownOutstanding()");
-    const decisionSource = readFileSync(repoPath("src", "update", "stop-decision.mjs"), "utf8");
+    const decisionSource = readFileSync(repoPath("backend/src", "update", "stop-decision.mjs"), "utf8");
     // The gate has exactly two exemptions, both the child saying it kept its own receipt on
     // purpose: after the Codex history preflight refused (#4718), and when an update hands
     // its teardown to the proxy it restarts (#7423). Anything else — including a stop that
     // merely exited 0 — still aborts the install.
     expect(decisionSource).toContain('if (teardownOutstanding && !historyDeferred && !handedOver) return { proceed: false, reason: "teardown-outstanding" };');
     expect(decisionSource).toContain("const historyDeferred = status === STOP_HISTORY_DEFERRED_EXIT_CODE;");
-    const receiptSource = readFileSync(repoPath("src", "config", "pending-teardown.ts"), "utf8");
+    const receiptSource = readFileSync(repoPath("backend/src", "config", "pending-teardown.ts"), "utf8");
     expect(receiptSource).toContain('from "./pending-teardown-names.mjs"');
     expect(receiptSource).toContain("isPendingTeardownFileName(name)");
   });
@@ -448,14 +448,14 @@ describe("POST /api/stop teardown", () => {
     // the route still delegates to it rather than growing a second copy.
     const handler = sliceFn(MANAGEMENT_SOURCE, '"/api/stop"', "/api/codex-auth/");
     expect(handler).toContain("performStopTeardown(url, { ownsReceipt: deferralMatchesReceipt })");
-    const teardownSource = readFileSync(repoPath("src", "server", "stop-teardown.ts"), "utf8");
+    const teardownSource = readFileSync(repoPath("backend/src", "server", "stop-teardown.ts"), "utf8");
     expect(teardownSource).toContain('await import("../grok/inject")');
     expect(teardownSource).toContain("grok = guard.run(() => strip())");
     expect(teardownSource).toContain("restoreNativeCodexAsync(options)");
   });
 
   test("an unreadable scheduler state gets the same diagnosis from the CLI and the API", () => {
-    const serviceSource = readFileSync(repoPath("src", "service", "orchestration.ts"), "utf8");
+    const serviceSource = readFileSync(repoPath("backend/src", "service", "orchestration.ts"), "utf8");
     // A manager that refused to stop and a query that could not answer are different
     // problems: reporting the second as "did not stop" sends the operator looking for the
     // wrong thing, and `ocx stop` was the command the API told them to run (#3008).
@@ -548,7 +548,7 @@ describe("POST /api/stop teardown", () => {
   });
 
   test("direct service stop and uninstall fail when a shared teardown half fails", () => {
-    const serviceSource = readFileSync(repoPath("src", "service", "cli.ts"), "utf8");
+    const serviceSource = readFileSync(repoPath("backend/src", "service", "cli.ts"), "utf8");
     // These paths logged the failure and exited 0, so a script could not tell a complete
     // teardown from one that left Grok aimed at a stopped proxy.
     const stopCase = serviceSource.slice(

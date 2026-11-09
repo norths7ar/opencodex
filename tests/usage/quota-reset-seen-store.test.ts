@@ -2,8 +2,8 @@ import { afterAll, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigDir } from "../../src/config";
-import type { QuotaResetEvent } from "../../src/quota/reset-detector";
+import { getConfigDir } from "../../backend/src/config";
+import type { QuotaResetEvent } from "../../backend/src/quota/reset-detector";
 import {
   claimCountForTests,
   claimQuotaReset,
@@ -14,7 +14,7 @@ import {
   recordQuotaResetEvent,
   resetQuotaResetStoreForTests,
   swapLastObservedWindows,
-} from "../../src/quota/reset-seen-store";
+} from "../../backend/src/quota/reset-seen-store";
 
 /**
  * This file owns its config directory instead of inheriting one.
@@ -148,7 +148,7 @@ describe("quota reset claim store", () => {
 
   test("a claim survives a real second process", async () => {
     const script = join(getConfigDir(), "claim-probe.ts");
-    const storeUrl = new URL("../../src/quota/reset-seen-store.ts", import.meta.url).href;
+    const storeUrl = new URL("../../backend/src/quota/reset-seen-store.ts", import.meta.url).href;
     writeFileSync(script, [
       `const store = await import(${JSON.stringify(storeUrl)});`,
       `console.log(String(store.claimQuotaReset("cross-process", Date.now(), Date.now() + 86400000)));`,

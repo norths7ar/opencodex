@@ -1,4 +1,4 @@
-import type { RequestLogEntry } from "../../src/server";
+import type { RequestLogEntry } from "../../backend/src/server";
 
 /**
  * One request-log row with every required field already filled in.

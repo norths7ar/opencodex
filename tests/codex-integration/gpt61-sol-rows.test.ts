@@ -16,22 +16,22 @@ import {
   nativeOpenAiContextTier,
   nativeReasoningEfforts,
   upstreamNativeEntry,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   ACCOUNT_GATED_NATIVE_OPENAI_MODELS,
   NATIVE_GPT6_SOL_MODEL,
   NATIVE_GPT61_SOL_MODEL,
   NATIVE_MAIN_DRAIN_SENTINEL_MODELS,
   SELF_DESCRIBED_NATIVE_OPENAI_MODELS,
-} from "../../src/codex/catalog/native-models";
-import { DOCUMENTED_NATIVE_OPENAI_ADDITIONS, type NativeContextLimitsInput } from "../../src/codex/catalog/metadata";
-import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState } from "../../src/codex/catalog/build-entries";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { DEFAULT_SUBAGENT_MODELS } from "../../src/config/subagent-models";
-import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { CONTEXT_TIERS, EXPECTED_PRICE_OVERLAYS } from "../../src/usage/expected-prices";
+} from "../../backend/src/codex/catalog/native-models";
+import { DOCUMENTED_NATIVE_OPENAI_ADDITIONS, type NativeContextLimitsInput } from "../../backend/src/codex/catalog/metadata";
+import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState } from "../../backend/src/codex/catalog/build-entries";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { DEFAULT_SUBAGENT_MODELS } from "../../backend/src/config/subagent-models";
+import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { CONTEXT_TIERS, EXPECTED_PRICE_OVERLAYS } from "../../backend/src/usage/expected-prices";
 
 afterEach(() => resetCodexModelEntitlementCacheForTests());
 

@@ -4,8 +4,8 @@ import * as fsPromises from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough, Readable } from "node:stream";
-import { readJsonInput, serializeManagementJson } from "../../src/cli/json-input";
-import { CliUsageError } from "../../src/cli/runtime-api";
+import { readJsonInput, serializeManagementJson } from "../../backend/src/cli/json-input";
+import { CliUsageError } from "../../backend/src/cli/runtime-api";
 
 const CAP = 4 * 1024 * 1024;
 const SENTINEL = "synthetic-private-value-should-never-echo";

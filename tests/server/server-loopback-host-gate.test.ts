@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { isAllowedRequestOrigin, isLoopbackRequestHost } from "../../src/server/auth-cors";
-import type { OcxConfig } from "../../src/types";
+import { isAllowedRequestOrigin, isLoopbackRequestHost } from "../../backend/src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
 
 // A loopback bind: isApiAuthRequired() is false, so admission runs through the
 // Host/Origin branch these tests exercise.

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { detectLazyCodex } from "../../src/clients/lazycodex";
+import { detectLazyCodex } from "../../backend/src/clients/lazycodex";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ENABLED = '[plugins."omo@sisyphuslabs"]\nenabled = true\n';

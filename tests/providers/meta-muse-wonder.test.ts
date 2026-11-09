@@ -8,12 +8,12 @@
  * leak onto them, and the wire must carry minimal and max unchanged.
  */
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { buildCatalogEntries } from "../../src/codex/catalog";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { findExpectedPriceOverlay } from "../../src/usage/expected-prices";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { findExpectedPriceOverlay } from "../../backend/src/usage/expected-prices";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

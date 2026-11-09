@@ -2,21 +2,21 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   setUninstallServiceHooksForTests,
   uninstallServiceIfInstalled,
-} from "../../src/service";
+} from "../../backend/src/service";
 import { pathToFileURL } from "node:url";
 import { repoRoot } from "../helpers/repo-root";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { removeOwnedConfigAfterDesktopCleanup, type UninstallClientStateDeps } from "../../src/cli/uninstall-client-state";
-import { cleanupOwnedIntegrationsBeforeUninstall } from "../../src/cli/uninstall-integrations";
-import { assertClientLifecycleHeld, withClientLifecycle, withClientLifecycleSync, type ClientLifecycleHeld } from "../../src/client/lifecycle-lock";
-import type { UninstallObservation } from "../../src/cli/uninstall-plan";
-import type { ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegrationCoordinated } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import { removeOwnedConfigAfterDesktopCleanup, type UninstallClientStateDeps } from "../../backend/src/cli/uninstall-client-state";
+import { cleanupOwnedIntegrationsBeforeUninstall } from "../../backend/src/cli/uninstall-integrations";
+import { assertClientLifecycleHeld, withClientLifecycle, withClientLifecycleSync, type ClientLifecycleHeld } from "../../backend/src/client/lifecycle-lock";
+import type { UninstallObservation } from "../../backend/src/cli/uninstall-plan";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegrationCoordinated } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 
 const root = pathToFileURL(repoRoot() + "/");
 
@@ -28,10 +28,10 @@ describe("full uninstall command", () => {
   afterEach(() => setUninstallServiceHooksForTests(null));
 
   test("CLI exposes a one-shot local state cleanup command", async () => {
-    const dispatch = await readText("src/cli/dispatch.ts");
+    const dispatch = await readText("backend/src/cli/dispatch.ts");
 
     expect(dispatch).toContain("uninstall: async");
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     expect(cli).toContain("async function handleUninstall()");
     expect(cli).toContain("uninstallServiceIfInstalled");
     expect(cli).toContain("uninstallCodexShim");
@@ -42,7 +42,7 @@ describe("full uninstall command", () => {
   });
 
   test("an elevated-run refusal exits before the first teardown step", async () => {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const body = cli.slice(cli.indexOf("async function handleUninstall()"));
     const refusal = body.indexOf("const privilegeRefusal = uninstallPrivilegeRefusal(getConfigDir());");
     const exit = body.indexOf("if (privilegeRefusal) { console.error(`❌ ${privilegeRefusal}`); process.exit(1); }");
@@ -56,8 +56,8 @@ describe("full uninstall command", () => {
   });
 
   test("CLI exposes explicit legacy history recovery command", async () => {
-    const dispatch = await readText("src/cli/dispatch.ts");
-    const cli = await readText("src/cli/index.ts");
+    const dispatch = await readText("backend/src/cli/dispatch.ts");
+    const cli = await readText("backend/src/cli/index.ts");
 
     expect(dispatch).toContain('"recover-history": async');
     expect(cli).toContain("ocx recover-history --legacy-openai");
@@ -71,7 +71,7 @@ describe("full uninstall command", () => {
   });
 
   test("service cleanup has a quiet best-effort helper", async () => {
-    const service = await readText("src/service/orchestration.ts");
+    const service = await readText("backend/src/service/orchestration.ts");
 
     expect(service).toContain("export function uninstallServiceIfInstalled()");
     expect(service).toContain("uninstallLaunchd");
@@ -117,7 +117,7 @@ describe("full uninstall command", () => {
   });
 
   test("full uninstall kills the tracked proxy before deleting service assets", async () => {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const uninstallBody = cli.slice(cli.indexOf("async function handleUninstall()"), cli.indexOf("type HealthCheck"));
 
     expect(uninstallBody).toContain('runStep("service stopped"');
@@ -131,7 +131,7 @@ describe("full uninstall command", () => {
   });
 
   test("restore forwards the explicit provider-table removal flag and warns before mutation", async () => {
-    const dispatch = await readText("src/cli/dispatch.ts");
+    const dispatch = await readText("backend/src/cli/dispatch.ts");
     const restoreStart = dispatch.indexOf("restore: async deps => {");
     const restoreBody = dispatch.slice(restoreStart, dispatch.indexOf('"recover-history": async', restoreStart));
 
@@ -142,7 +142,7 @@ describe("full uninstall command", () => {
 });
 describe("uninstall gates shared teardown on a proven service stop", () => {
   test("the authorization rule, exercised for every failure permutation", async () => {
-    const { sharedTeardownAuthorized } = await import("../../src/cli/uninstall-plan");
+    const { sharedTeardownAuthorized } = await import("../../backend/src/cli/uninstall-plan");
     const base = {
       serviceStop: "stopped" as const,
       proxyProvenDown: true,
@@ -170,7 +170,7 @@ describe("uninstall gates shared teardown on a proven service stop", () => {
   });
 
   test("a removal failure is distinguishable from nothing being installed", async () => {
-    const { setUninstallServiceHooksForTests, uninstallServiceDetailed } = await import("../../src/service");
+    const { setUninstallServiceHooksForTests, uninstallServiceDetailed } = await import("../../backend/src/service");
     // Windows is the platform whose hooks are injectable; the darwin/linux catch arms that
     // returned the same false as absence are now typed outcomes rather than a boolean.
     setUninstallServiceHooksForTests({
@@ -184,14 +184,14 @@ describe("uninstall gates shared teardown on a proven service stop", () => {
     } as never);
     expect(uninstallServiceDetailed()).toBe("absent");
 
-    const serviceSource = await readText("src/service/orchestration.ts");
+    const serviceSource = await readText("backend/src/service/orchestration.ts");
     // The darwin and linux arms return "failed", not the absence value.
     expect(serviceSource).toContain('try { uninstallLaunchd(); removeServiceInstallState(); return "removed"; } catch { return "failed"; }');
     expect(serviceSource).toContain('try { unlinkSync(unitPath()); removeServiceInstallState(); return "removed"; } catch { return "failed"; }');
   });
 
   test("a live orphan with no pid file blocks the teardown", async () => {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const at = cli.indexOf("async function handleUninstall(");
     const fn = cli.slice(at, at + 9000);
     // A missing pid file is not proof that nothing is serving — the same discovery
@@ -208,7 +208,7 @@ describe("uninstall gates shared teardown on a proven service stop", () => {
   });
 
   async function uninstallFn(): Promise<string> {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const at = cli.indexOf("async function handleUninstall(");
     expect(at).toBeGreaterThan(-1);
     return cli.slice(at, at + 9000);
@@ -262,7 +262,7 @@ describe("uninstall gates shared teardown on a proven service stop", () => {
   });
 });
   test("proof covers every distinct endpoint, not just the preferred one", async () => {
-    const { endpointsToProve, everyEndpointProvenDown, everyEndpointProvenDownAsync } = await import("../../src/cli/uninstall-plan");
+    const { endpointsToProve, everyEndpointProvenDown, everyEndpointProvenDownAsync } = await import("../../backend/src/cli/uninstall-plan");
 
     // A stale runtime record pointing at a closed port, and the live proxy on the
     // configured one. Probing only the runtime candidate reports "dead" for a port nobody
@@ -293,7 +293,7 @@ describe("uninstall gates shared teardown on a proven service stop", () => {
   });
 
   test("the respawn window is verified by evidence, not by a silent poll", async () => {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const at = cli.indexOf("async function handleUninstall(");
     const fn = cli.slice(at, at + 9000);
     // proxyStillLiveAfterStop returns null on a timeout as well as on a genuinely dead

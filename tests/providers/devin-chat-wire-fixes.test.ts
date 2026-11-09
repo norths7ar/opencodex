@@ -8,15 +8,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDevinAdapter, mapOcxMessagesToDevin, resolveDevinContextWindowForTests } from "../../src/adapters/devin";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { buildGetChatMessageRequestForTests, type ChatHistoryItem } from "../../src/adapters/devin/cloud-direct/chat";
-import { normalizeDevinToolParameters } from "../../src/adapters/devin/cloud-direct/tool-schema";
-import { isDevinHistoryOverflow } from "../../src/adapters/devin/context-overflow";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { parseRequest } from "../../src/responses/parser";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { AdapterEvent, OcxMessage, OcxParsedRequest, OcxToolResultMessage } from "../../src/types";
+import { createDevinAdapter, mapOcxMessagesToDevin, resolveDevinContextWindowForTests } from "../../backend/src/adapters/devin";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { buildGetChatMessageRequestForTests, type ChatHistoryItem } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { normalizeDevinToolParameters } from "../../backend/src/adapters/devin/cloud-direct/tool-schema";
+import { isDevinHistoryOverflow } from "../../backend/src/adapters/devin/context-overflow";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxMessage, OcxParsedRequest, OcxToolResultMessage } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function build(messages: ChatHistoryItem[], extra: Record<string, unknown> = {}): Buffer {

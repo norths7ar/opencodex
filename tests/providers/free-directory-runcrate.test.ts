@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { FREE_PROVIDER_DIRECTORY } from "../../src/providers/free-directory";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+import { FREE_PROVIDER_DIRECTORY } from "../../backend/src/providers/free-directory";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 
 // Sibling of provider-registry-parity.test.ts, which sits at the file-size ratchet threshold.
 describe("free-provider directory: Runcrate", () => {

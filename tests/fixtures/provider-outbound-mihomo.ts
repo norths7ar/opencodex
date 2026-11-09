@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { mock } from "bun:test";
-import type { ProviderOutboundDependencies } from "../../src/lib/provider-outbound";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import type { ProviderOutboundDependencies } from "../../backend/src/lib/provider-outbound";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 
 // Isolate the DNS module mock from other tests while exercising the real classifier.
 let answers: { address: string; family: number }[] = [];
 let dnsCalls = 0;
 mock.module("node:dns/promises", () => ({ lookup: async () => { dnsCalls++; return answers; } }));
-const { providerOutboundGet, providerOutboundPost, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
+const { providerOutboundGet, providerOutboundPost, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
 const target = "https://opencode.ai/zen/v1/models";
 const fake = { address: "fdfe:dcba:9876::1", family: 6 };
 const body = '{"project":"mihomo-fixture"}';

@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat";
+import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat";
 import {
   vercelGatewayRoutingConfigError,
   vercelGatewayProviderPayload,
-} from "../../src/providers/vercel-gateway-routing";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { routeModel } from "../../src/router";
-import { safeConfigDTO, providerManagementConfigError } from "../../src/server/auth-cors";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/vercel-gateway-routing";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { routeModel } from "../../backend/src/router";
+import { safeConfigDTO, providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 function provider(baseUrl: string, overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   return { adapter: "openai-chat", baseUrl, apiKey: "test-key", ...overrides };

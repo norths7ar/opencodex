@@ -21,8 +21,8 @@ import {
   protectedHomeForTests,
   protectedRemovalReason,
   protectedRemovalTreesForTests,
-} from "../../src/lib/test-home-guard";
-import { getConfigDir } from "../../src/config";
+} from "../../backend/src/lib/test-home-guard";
+import { getConfigDir } from "../../backend/src/config";
 import { findHomeRemovalViolations, homePathResolvers } from "../helpers/home-destruction-scan";
 import { createTempHome, ownedTempRootsForTests, removeOwnedTree } from "../helpers/temp-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -287,9 +287,9 @@ const canSymlink = (() => {
     const probeId = beginProbe("01-protected-writers");
     const { realHome, opencodexHome } = sentinelHome();
     const probe = await runProbe(probeId, `
-      import { saveConfig } from "${REPO_ROOT_URL}src/config";
-      import { mutateStore } from "${REPO_ROOT_URL}src/oauth/store";
-      import { saveCodexAccountCredential } from "${REPO_ROOT_URL}src/codex/account-store";
+      import { saveConfig } from "${REPO_ROOT_URL}backend/src/config";
+      import { mutateStore } from "${REPO_ROOT_URL}backend/src/oauth/store";
+      import { saveCodexAccountCredential } from "${REPO_ROOT_URL}backend/src/codex/account-store";
       const threw: string[] = [];
       const REFUSAL = "refusing to write the real OpenCodex home";
       try { saveConfig({ providers: {}, defaultProvider: "openai", port: 10100 } as never); }
@@ -316,7 +316,7 @@ const canSymlink = (() => {
     const probeId = beginProbe("02-native-credentials");
     const { realHome, codexHome } = sentinelHome();
     const probe = await runProbe(probeId, `
-      import { assertNotRealCodexHomeUnderTest } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { assertNotRealCodexHomeUnderTest } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       try {
         // JSON.stringify, not raw interpolation: a Windows temp path is
         // C:\\Users\\..., and pasting it between quotes makes every backslash an
@@ -341,8 +341,8 @@ const canSymlink = (() => {
     // every Codex writer to os.homedir()/.codex, which is how test runs rewrote a live catalog.
     const probe = await runProbe(probeId, `
       import { join } from "node:path";
-      import { atomicWriteFile } from "${REPO_ROOT_URL}src/config/atomic-write";
-      import { withCatalogWriteSerialization } from "${REPO_ROOT_URL}src/codex/catalog-write-serialization";
+      import { atomicWriteFile } from "${REPO_ROOT_URL}backend/src/config/atomic-write";
+      import { withCatalogWriteSerialization } from "${REPO_ROOT_URL}backend/src/codex/catalog-write-serialization";
       const home = ${JSON.stringify(codexHome)};
       const results = [];
       for (const name of ["opencodex-catalog.json", "models_cache.json", "opencodex-journal.json", "config.toml"]) {
@@ -378,9 +378,9 @@ const canSymlink = (() => {
     const probe = await runProbe(probeId, `
       import { join } from "node:path";
       import { realpathSync } from "node:fs";
-      import { getCodexHome } from "${REPO_ROOT_URL}src/codex/paths";
-      import { atomicWriteFile } from "${REPO_ROOT_URL}src/config/atomic-write";
-      import { withCatalogWriteSerialization } from "${REPO_ROOT_URL}src/codex/catalog-write-serialization";
+      import { getCodexHome } from "${REPO_ROOT_URL}backend/src/codex/paths";
+      import { atomicWriteFile } from "${REPO_ROOT_URL}backend/src/config/atomic-write";
+      import { withCatalogWriteSerialization } from "${REPO_ROOT_URL}backend/src/codex/catalog-write-serialization";
       const home = getCodexHome();
       const results = [home === realpathSync(${JSON.stringify(codexHome)}) ? "home:SENTINEL" : "home:OTHER"];
       for (const name of ["opencodex-catalog.json", "models_cache.json", "opencodex-journal.json", "config.toml"]) {
@@ -423,7 +423,7 @@ const canSymlink = (() => {
     symlinkSync(protectedFile, join(dir, "config.json"));
 
     const probe = await runProbe(probeId, `
-      import { saveConfig } from "${REPO_ROOT_URL}src/config";
+      import { saveConfig } from "${REPO_ROOT_URL}backend/src/config";
       const REFUSAL = "refusing to write the real OpenCodex home";
       try {
         saveConfig({ providers: {}, defaultProvider: "openai", port: 10100 } as never);
@@ -443,7 +443,7 @@ const canSymlink = (() => {
     // The 54 suites that mkdtemp their own home must keep working with no opt-in.
     const dir = mkdtempSync(join(tmpdir(), "ocx-plain-home-"));
     const probe = await runProbe(probeId, `
-      import { saveConfig } from "${REPO_ROOT_URL}src/config";
+      import { saveConfig } from "${REPO_ROOT_URL}backend/src/config";
       saveConfig({ providers: {}, defaultProvider: "openai", port: 10100 } as never);
       console.log("wrote");
     `, { OCX_TEST_HOME_GUARD: "1", OCX_REAL_HOME: join(tmpdir(), "ocx-nonexistent-real-home"), OPENCODEX_HOME: dir });
@@ -464,7 +464,7 @@ const canSymlink = (() => {
     const modeBefore = statSync(opencodexHome).mode;
 
     const probe = await runProbe(probeId, `
-      import { atomicWriteFile, writePid } from "${REPO_ROOT_URL}src/config";
+      import { atomicWriteFile, writePid } from "${REPO_ROOT_URL}backend/src/config";
       const REFUSAL = "refusing to write the real OpenCodex home";
       try {
         // Same escaping hazard as the Codex-home probe above: JSON.stringify the
@@ -497,7 +497,7 @@ const canSymlink = (() => {
     const probeId = beginProbe("06-disarmed");
     const { realHome, opencodexHome } = sentinelHome();
     const probe = await runProbe(probeId, `
-      import { saveConfig } from "${REPO_ROOT_URL}src/config";
+      import { saveConfig } from "${REPO_ROOT_URL}backend/src/config";
       saveConfig({ providers: {}, defaultProvider: "openai", port: 10100 } as never);
       console.log("wrote");
     `, { OCX_TEST_HOME_GUARD: undefined, OCX_REAL_HOME: realHome, OPENCODEX_HOME: opencodexHome });
@@ -512,7 +512,7 @@ const canSymlink = (() => {
     const { realHome } = sentinelHome();
     const decoyHome = mkdtempSync(join(tmpdir(), "ocx-decoy-home-"));
     const probe = await runProbe(probeId, `
-      import { protectedHomeForTests } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { protectedHomeForTests } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       console.log(protectedHomeForTests());
     `, { OCX_TEST_HOME_GUARD: "1", OCX_REAL_HOME: realHome, HOME: decoyHome });
 
@@ -527,7 +527,7 @@ const canSymlink = (() => {
     const link = join(linkDir, "looks-like-temp");
     symlinkSync(opencodexHome, link);
     const probe = await runProbe(probeId, `
-      import { assertNotRealHomeUnderTest } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { assertNotRealHomeUnderTest } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       try { assertNotRealHomeUnderTest(${JSON.stringify(link)}); console.log("allowed"); }
       catch { console.log("rejected"); }
     `, { OCX_TEST_HOME_GUARD: "1", OCX_REAL_HOME: realHome });
@@ -542,7 +542,7 @@ const canSymlink = (() => {
     const { realHome } = sentinelHome();
     const aliased = realHome.startsWith("/var/") ? join("/private", realHome) : realHome.replace(/^\/private/, "");
     const probe = await runProbe(probeId, `
-      import { assertNotRealHomeUnderTest } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { assertNotRealHomeUnderTest } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       const results: string[] = [];
       for (const path of [${JSON.stringify(join(realHome, ".opencodex"))}, ${JSON.stringify(join(aliased, ".opencodex"))}]) {
         try { assertNotRealHomeUnderTest(path); results.push("allowed"); } catch { results.push("rejected"); }
@@ -613,7 +613,7 @@ const canSymlink = (() => {
     const probeId = beginProbe("10-no-lock");
     const { realHome } = sentinelHome();
     const probe = await runProbe(probeId, `
-      import { assertNotRealHomeUnderTest, isTestHomeGuardArmed } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { assertNotRealHomeUnderTest, isTestHomeGuardArmed } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       let rejected = false;
       try { assertNotRealHomeUnderTest(${JSON.stringify(join(realHome, ".opencodex"))}); } catch { rejected = true; }
       console.log(JSON.stringify({ armed: isTestHomeGuardArmed(), rejected }));
@@ -640,7 +640,7 @@ const canSymlink = (() => {
     // Derived from src/, not listed here. The predecessor scan knew getConfigDir() and nothing
     // else, so unlinkSync(getConfigPath()) and rmSync(usageLogPath()) sat outside the guard
     // while it reported green. A resolver added tomorrow is covered the day it lands.
-    const resolvers = homePathResolvers(repoPath("src"));
+    const resolvers = homePathResolvers(repoPath("backend/src"));
     for (const expected of ["getConfigDir", "getCodexHome", "getConfigPath", "usageLogPath", "getAuthStorePath"]) {
       expect(resolvers).toContain(expected);
     }
@@ -769,7 +769,7 @@ const canSymlink = (() => {
       import { symlinkSync, mkdtempSync } from "node:fs";
       import { tmpdir } from "node:os";
       import { join } from "node:path";
-      import { protectedRemovalReason } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { protectedRemovalReason } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       const dir = mkdtempSync(join(tmpdir(), "ocx-removal-symlink-"));
       const alias = join(dir, "looks-harmless");
       symlinkSync(${JSON.stringify(opencodexHome)}, alias);
@@ -796,7 +796,7 @@ const canSymlink = (() => {
       const probe = await runProbe(probeId, `
         import { mkdirSync, symlinkSync, unlinkSync } from "node:fs";
         import { dirname, join } from "node:path";
-        import { protectedRemovalReason } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+        import { protectedRemovalReason } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
         const root = ${JSON.stringify(REPO_ROOT)};
         const linkDir = join(root, ".tmp");
         mkdirSync(linkDir, { recursive: true });
@@ -844,7 +844,7 @@ const canSymlink = (() => {
     try {
       const probe = await runProbe(probeId, `
         Object.defineProperty(process, "platform", { value: "darwin" });
-        const { protectedRemovalReason } = await import("${REPO_ROOT_URL}src/lib/test-home-guard");
+        const { protectedRemovalReason } = await import("${REPO_ROOT_URL}backend/src/lib/test-home-guard");
         console.log(JSON.stringify({
           distinct: ${JSON.stringify(caseSibling)} !== ${JSON.stringify(REPO_ROOT)},
           fixture: protectedRemovalReason(${JSON.stringify(join(REPO_ROOT, "tests", ".tmp-guard-fixture"))}) === null,
@@ -864,7 +864,7 @@ const canSymlink = (() => {
     const probeId = beginProbe("15-checkout-contains-tree");
     const probe = await runProbe(probeId, `
       import { join } from "node:path";
-      import { protectedRemovalReason } from "${REPO_ROOT_URL}src/lib/test-home-guard";
+      import { protectedRemovalReason } from "${REPO_ROOT_URL}backend/src/lib/test-home-guard";
       const root = ${JSON.stringify(REPO_ROOT)};
       console.log(JSON.stringify({
         codex: protectedRemovalReason(join(root, ".codex", "sessions")) !== null,

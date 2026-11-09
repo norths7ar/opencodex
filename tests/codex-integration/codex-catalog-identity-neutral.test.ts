@@ -7,8 +7,8 @@
 // an id in — is asserted against the rows themselves, not only against the sentence that replaced
 // it. `codex-catalog.test.ts` sits at its line cap, so the coverage lives here.
 import { describe, expect, test } from "bun:test";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
-import { buildCatalogEntries, NATIVE_DAYBREAK_BLUE_MODEL, NATIVE_GPT6_ASTRA_MODEL, upstreamNativeEntry } from "../../src/codex/catalog";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
+import { buildCatalogEntries, NATIVE_DAYBREAK_BLUE_MODEL, NATIVE_GPT6_ASTRA_MODEL, upstreamNativeEntry } from "../../backend/src/codex/catalog";
 
 /** The pinned native template every routed row derives from; its identity line is Codex's own. */
 function nativeTemplate(): Record<string, unknown> {

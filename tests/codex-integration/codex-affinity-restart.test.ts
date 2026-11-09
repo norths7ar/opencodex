@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath } from "../helpers/repo-root";
 import { Database } from "bun:sqlite";
-import { removeOwnedConfigState } from "../../src/lib/config-ownership";
+import { removeOwnedConfigState } from "../../backend/src/lib/config-ownership";
 import { copySeededAffinityHome, removeSeededAffinityTemplates } from "../helpers/codex-affinity-seed";
 
 afterAll(removeSeededAffinityTemplates);

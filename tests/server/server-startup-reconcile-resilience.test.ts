@@ -17,17 +17,17 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import * as configStore from "../../src/config";
-import * as stateStores from "../../src/lib/state-store-registrations";
-import { OAUTH_PROVIDERS, reconcileOAuthProviders } from "../../src/oauth";
-import { runModelRenameStartupMigration } from "../../src/providers/model-rename-startup";
-import { startServer } from "../../src/server";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { CURSOR_STATIC_MODELS, cursorModelIds } from "../../src/adapters/cursor/discovery";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import * as configStore from "../../backend/src/config";
+import * as stateStores from "../../backend/src/lib/state-store-registrations";
+import { OAUTH_PROVIDERS, reconcileOAuthProviders } from "../../backend/src/oauth";
+import { runModelRenameStartupMigration } from "../../backend/src/providers/model-rename-startup";
+import { startServer } from "../../backend/src/server";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { CURSOR_STATIC_MODELS, cursorModelIds } from "../../backend/src/adapters/cursor/discovery";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Sandboxed agent environments deny `Bun.serve` outright ("Is port 0 in use?", EADDRINUSE on

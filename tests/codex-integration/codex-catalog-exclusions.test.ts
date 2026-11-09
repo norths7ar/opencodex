@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { shouldExposeRoutedModel } from "../../src/codex/catalog";
+import { shouldExposeRoutedModel } from "../../backend/src/codex/catalog";
 
 describe("routed catalog compatibility exclusions", () => {
   test("filters incompatible slugs while keeping live control models", () => {

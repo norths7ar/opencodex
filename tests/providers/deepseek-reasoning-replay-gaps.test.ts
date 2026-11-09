@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { buildResponseJSON } from "../../src/bridge";
-import { parseRequest } from "../../src/responses/parser";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
 import {
   clearReasoningReplayCacheForTests,
   peekReasoningForCall as peekReasoningForCallRaw,
   rememberReasoningForCall as rememberReasoningForCallRaw,
-} from "../../src/responses/reasoning-replay-cache";
-import { routeModel } from "../../src/router";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import { routeModel } from "../../backend/src/router";
 import type {
   AdapterEvent,
   OcxConfig,
   OcxParsedRequest,
   OcxReasoningReplayScopeRef,
-} from "../../src/types";
+} from "../../backend/src/types";
 
 /**
  * Regression coverage for opencodex issue #950: OpenCode Go DeepSeek V4 Flash

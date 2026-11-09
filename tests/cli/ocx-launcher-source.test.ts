@@ -7,10 +7,10 @@ import { repoPath } from "../helpers/repo-root";
  * bin/ocx.mjs is the Node bin launcher — it executes top-level logic on import, so it
  * cannot be imported by tests. Guard its Windows-critical invariants at the source level.
  */
-const source = readFileSync(repoPath("bin", "ocx.mjs"), "utf8");
-const runtimeSource = readFileSync(repoPath("src", "lib", "bun-runtime.ts"), "utf8");
+const source = readFileSync(repoPath("backend/bin", "ocx.mjs"), "utf8");
+const runtimeSource = readFileSync(repoPath("backend/src", "lib", "bun-runtime.ts"), "utf8");
 const validatorSource = readFileSync(
-  repoPath("src", "lib", "bun-binary-validator.mjs"),
+  repoPath("backend/src", "lib", "bun-binary-validator.mjs"),
   "utf8",
 );
 
@@ -58,7 +58,7 @@ describe("ocx.mjs package launcher (source invariants)", () => {
     expect(failure).toContain("An installed Desktop CLI is available:");
     expect(failure).not.toMatch(/spawn(?:Sync)?\(/);
     for (const body of [failure, resolver]) expect(body).not.toContain("desktop-supervision.mjs");
-    const pathRuntime = readFileSync(repoPath("src", "lib", "bun-path-runtime.mjs"), "utf8");
+    const pathRuntime = readFileSync(repoPath("backend/src", "lib", "bun-path-runtime.mjs"), "utf8");
     expect(pathRuntime).not.toContain("desktop-supervision.mjs");
   });
 

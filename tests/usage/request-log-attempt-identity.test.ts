@@ -5,7 +5,7 @@ import {
   finishRequestAttempt,
   noteAttemptSend,
   sealRequestAttemptIdentity,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 
 describe("request log attempt identity", () => {
   test("records ordered attempts with sealed identity, fresh estimates, and deduplicated recoveries", () => {

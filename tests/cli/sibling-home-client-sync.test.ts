@@ -2,17 +2,17 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { findCrossHomeOwner, findCrossHomeOwnerDetailed, markCrossHomeSibling, markLiveHomeSibling } from "../../src/cli/cross-home-owner";
-import { ownerRegistryDir, readOwnerRegistry, registerOwnerRegistryHome } from "../../src/config/owner-registry";
-import { removeRuntimePort, writeRuntimePort } from "../../src/config/process-state";
-import { directLocalHttpFetch } from "../../src/server/direct-local-http";
-import { resetSiblingStartForTests, siblingOfLivePort } from "../../src/codex/sibling-start";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+import { findCrossHomeOwner, findCrossHomeOwnerDetailed, markCrossHomeSibling, markLiveHomeSibling } from "../../backend/src/cli/cross-home-owner";
+import { ownerRegistryDir, readOwnerRegistry, registerOwnerRegistryHome } from "../../backend/src/config/owner-registry";
+import { removeRuntimePort, writeRuntimePort } from "../../backend/src/config/process-state";
+import { directLocalHttpFetch } from "../../backend/src/server/direct-local-http";
+import { resetSiblingStartForTests, siblingOfLivePort } from "../../backend/src/codex/sibling-start";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 import {
   LOCAL_ATTESTATION_CHALLENGE_HEADER,
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath, repoPath } from "../helpers/repo-root";
 import { createFixtureNamespaceOwner } from "../helpers/fixture-namespace-owner";
@@ -149,8 +149,8 @@ test("cross-home discovery marks only a live other-process owner", async () => {
   const path = join(fx.grok, "config.toml");
   const probe = async () => {
     // A fresh process makes node:os resolve the fixture HOME before importing the CLI.
-    const script = `const { markCrossHomeSibling } = await import(${JSON.stringify(repoPath("src/cli/cross-home-owner.ts"))});
-      const { siblingOfLivePort } = await import(${JSON.stringify(repoPath("src/codex/sibling-start.ts"))});
+    const script = `const { markCrossHomeSibling } = await import(${JSON.stringify(repoPath("backend/src/cli/cross-home-owner.ts"))});
+      const { siblingOfLivePort } = await import(${JSON.stringify(repoPath("backend/src/codex/sibling-start.ts"))});
       console.log(JSON.stringify({ marked: await markCrossHomeSibling(), port: siblingOfLivePort() }));`;
     const child = Bun.spawn([process.execPath, "-e", script], {
       cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
@@ -343,7 +343,7 @@ test("a secondary start preserves shared client bytes and records the sibling ow
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
     claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
-  const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
+  const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(child);
@@ -372,7 +372,7 @@ test("a secondary ensure parent preserves shared Grok, Codex and Claude agent by
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
     claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
-  const ensure = Bun.spawn([process.execPath, "--preload", helperPath("ensure-without-desktop-preload.ts"), repoPath("src/cli/index.ts"), "ensure"], {
+  const ensure = Bun.spawn([process.execPath, "--preload", helperPath("ensure-without-desktop-preload.ts"), repoPath("backend/src/cli/index.ts"), "ensure"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(ensure);
@@ -390,7 +390,7 @@ test("a secondary ensure parent preserves shared Grok, Codex and Claude agent by
 
   // A fresh ensure parent sees this home's live sibling after the primary goes down.
   servers.pop()?.stop(true);
-  const again = Bun.spawn([process.execPath, "--preload", helperPath("ensure-without-desktop-preload.ts"), repoPath("src/cli/index.ts"), "ensure"], {
+  const again = Bun.spawn([process.execPath, "--preload", helperPath("ensure-without-desktop-preload.ts"), repoPath("backend/src/cli/index.ts"), "ensure"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(again);
@@ -411,7 +411,7 @@ test("a lone custom-home start still syncs Grok and prunes its own Claude roster
     checkForUpdates: false, clientIntegrations: { codex: false, grok: true, "claude-desktop": false },
     claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
-  const child = Bun.spawn([process.execPath, "--preload", helperPath("fixture-windows-runtime-preload.ts"), repoPath("src/cli/index.ts"), "start"], {
+  const child = Bun.spawn([process.execPath, "--preload", helperPath("fixture-windows-runtime-preload.ts"), repoPath("backend/src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, ...namespaceOwner, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(child);
@@ -422,7 +422,7 @@ test("a lone custom-home start still syncs Grok and prunes its own Claude roster
   expect(readFileSync(grokPath, "utf8")).toContain(`127.0.0.1:${runtime.port}`);
   expect(existsSync(claudePath)).toBe(false);
   writeFileSync(claudePath, "---\ngenerated-by: opencodex\n---\nstale roster\n");
-  const ensure = Bun.spawn([process.execPath, "--preload", helperPath("fixture-windows-runtime-preload.ts"), repoPath("src/cli/index.ts"), "ensure"], {
+  const ensure = Bun.spawn([process.execPath, "--preload", helperPath("fixture-windows-runtime-preload.ts"), repoPath("backend/src/cli/index.ts"), "ensure"], {
     cwd: fx.root, env: { ...process.env, ...namespaceOwner, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(ensure);
@@ -665,7 +665,7 @@ async function secondaryStartPreservesBytes(
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
     claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
-  const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
+  const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(child);
@@ -747,7 +747,7 @@ test("a registry-only discovered owner vetoes shared writes end to end", async (
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
     claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
-  const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
+  const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
   });
   trackChild(child);

@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import {
   projectDevinProviderMerge,
   runDevinProviderMergeStartupMigration,
-} from "../../src/providers/devin-provider-merge-migration";
-import { loadAuthStore, rekeyProviderCredentials } from "../../src/oauth/store";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/devin-provider-merge-migration";
+import { loadAuthStore, rekeyProviderCredentials } from "../../backend/src/oauth/store";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

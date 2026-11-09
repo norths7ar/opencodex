@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createAdapterTierMetadata } from "../../src/providers/fastwire";
-import type { AttemptTierOutcome } from "../../src/types";
-import { estimateAttemptCost, resolveMatchedPrice } from "../../src/usage/cost";
-import { findPriorityPricingRule } from "../../src/usage/expected-prices";
+import { createAdapterTierMetadata } from "../../backend/src/providers/fastwire";
+import type { AttemptTierOutcome } from "../../backend/src/types";
+import { estimateAttemptCost, resolveMatchedPrice } from "../../backend/src/usage/cost";
+import { findPriorityPricingRule } from "../../backend/src/usage/expected-prices";
 
 const usage = {
   inputTokens: 100_000,

@@ -7,11 +7,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { acquireSpendLedgerServerLifecycle } from "../../src/server/index/spend-ledger-lifecycle";
-import { spendLedgerOwnerSnapshot } from "../../src/lib/spend-ledger-owner";
-import { resetSharedSpendLedgerForTest, sharedSpendLedger } from "../../src/lib/spend-reservation-ledger";
-import { getDefaultConfig, reconcileLiveConfigFromDisk, saveConfig } from "../../src/config";
-import { reconcileLiveStateStores, setLiveStateStoreConfig } from "../../src/lib/state-store-registrations";
+import { acquireSpendLedgerServerLifecycle } from "../../backend/src/server/index/spend-ledger-lifecycle";
+import { spendLedgerOwnerSnapshot } from "../../backend/src/lib/spend-ledger-owner";
+import { resetSharedSpendLedgerForTest, sharedSpendLedger } from "../../backend/src/lib/spend-reservation-ledger";
+import { getDefaultConfig, reconcileLiveConfigFromDisk, saveConfig } from "../../backend/src/config";
+import { reconcileLiveStateStores, setLiveStateStoreConfig } from "../../backend/src/lib/state-store-registrations";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root = "";

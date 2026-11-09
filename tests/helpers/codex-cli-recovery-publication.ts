@@ -6,9 +6,9 @@ import * as fs from "node:fs";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission,
-  finishClosedCodexCliUpdateRecovery } from "../../src/codex/cli-update-recovery";
-import { recoverClosedCodexCliUpdateWorker } from "../../src/codex/cli-update-worker-recovery";
-import * as gate from "../../src/codex/cli-update-selection-gate";
+  finishClosedCodexCliUpdateRecovery } from "../../backend/src/codex/cli-update-recovery";
+import { recoverClosedCodexCliUpdateWorker } from "../../backend/src/codex/cli-update-worker-recovery";
+import * as gate from "../../backend/src/codex/cli-update-selection-gate";
 import { removeTreeWithRetry } from "./remove-tree";
 
 const scenario = process.argv[2]!;

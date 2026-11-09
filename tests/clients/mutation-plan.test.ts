@@ -14,22 +14,22 @@ import {
   type IntegrationPlanChange,
   type PlanInput,
   type PlanFingerprintInput,
-} from "../../src/integrations/mutation-plan";
+} from "../../backend/src/integrations/mutation-plan";
 import {
   EXPORT_CLIENTS,
   EXPORT_CLIENT_IDS,
   type ExportContext,
   type ExportModel,
   type ManagedContribution,
-} from "../../src/clients/config-export";
-import type { OwnershipRecord } from "../../src/integrations/ownership";
-import { fingerprint } from "../../src/integrations/ownership";
-import type { JournalEntry } from "../../src/integrations/journal";
-import type { OcxConfig } from "../../src/types";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, restoreIntegration } from "../../src/integrations/writer";
-import { clinePendingPath } from "../../src/integrations/cline-io";
-import { resolveIntegrationPaths } from "../../src/integrations/registry";
+} from "../../backend/src/clients/config-export";
+import type { OwnershipRecord } from "../../backend/src/integrations/ownership";
+import { fingerprint } from "../../backend/src/integrations/ownership";
+import type { JournalEntry } from "../../backend/src/integrations/journal";
+import type { OcxConfig } from "../../backend/src/types";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import { clinePendingPath } from "../../backend/src/integrations/cline-io";
+import { resolveIntegrationPaths } from "../../backend/src/integrations/registry";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const FIXTURE_MODELS: ExportModel[] = [

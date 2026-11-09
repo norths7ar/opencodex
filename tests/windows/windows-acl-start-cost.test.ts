@@ -32,17 +32,17 @@ import {
   setPlatformForTests,
   setStatForTests,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 import {
   atomicWriteFile,
   atomicWriteFileAsync,
   setWindowsHardeningForTests,
-} from "../../src/config/atomic-write";
+} from "../../backend/src/config/atomic-write";
 
 const OK: IcaclsResult = { success: true, exitCode: 0, timedOut: false, stdout: "" };
 const PRINCIPAL = {

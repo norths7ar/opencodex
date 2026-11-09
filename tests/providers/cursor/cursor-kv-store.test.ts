@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorKvStore } from "../../../src/adapters/cursor/kv-store";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
+import { createCursorKvStore } from "../../../backend/src/adapters/cursor/kv-store";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 const store = (seed: Record<string, Uint8Array> = {}) => createCursorKvStore(seed, createTranslatorBudget());

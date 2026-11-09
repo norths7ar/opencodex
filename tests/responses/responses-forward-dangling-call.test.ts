@@ -7,8 +7,8 @@
  * the client sent them so the strict upstream decides, mirroring the pre-fix contract.
  */
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

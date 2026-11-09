@@ -3,13 +3,13 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, initializePersistedConfigIfMissing, loadConfig, saveConfig } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { captureAccountAutoPauseFence, accountAutoPauseFenceIsLocal, observeAccountAutoPauseRevisions, accountAutoPauseObservedSizeForTests } from "../../src/config/account-auto-pause-revisions";
-import { armClaudeCodeBaseline, reconcileLiveConfigFromDisk, saveConfigPreservingClaudeCode } from "../../src/config/live-reconcile";
-import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../src/oauth/account-auto-pause";
-import { routedProviderConfig } from "../../src/router";
-import { setPreservedDiskOnlyProviders } from "../../src/usage/user-cost-overlays";
+import { getDefaultConfig, initializePersistedConfigIfMissing, loadConfig, saveConfig } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { captureAccountAutoPauseFence, accountAutoPauseFenceIsLocal, observeAccountAutoPauseRevisions, accountAutoPauseObservedSizeForTests } from "../../backend/src/config/account-auto-pause-revisions";
+import { armClaudeCodeBaseline, reconcileLiveConfigFromDisk, saveConfigPreservingClaudeCode } from "../../backend/src/config/live-reconcile";
+import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../backend/src/oauth/account-auto-pause";
+import { routedProviderConfig } from "../../backend/src/router";
+import { setPreservedDiskOnlyProviders } from "../../backend/src/usage/user-cost-overlays";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;
@@ -163,8 +163,8 @@ test("post-publication bookkeeping failure still adopts the new policy epoch", a
   const config = fixture();
   saveConfig(config);
   const fence = captureAccountAutoPauseFence(config, "fixture")!;
-  const registries = await import("../../src/config/derived-registries");
-  const { ConfigWritePublishedError } = await import("../../src/config/persist-unlocked");
+  const registries = await import("../../backend/src/config/derived-registries");
+  const { ConfigWritePublishedError } = await import("../../backend/src/config/persist-unlocked");
   const fail = spyOn(registries, "refreshConfigDerivedRegistries").mockImplementation(() => { throw new Error("synthetic bookkeeping failure"); });
   try {
     config.providers.fixture!.accountAutoPause!.enabled = false;

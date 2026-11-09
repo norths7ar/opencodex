@@ -2,7 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { firstPartyProxyStatus } from "../../src/claude/first-party-settings";
+import { firstPartyProxyStatus } from "../../backend/src/claude/first-party-settings";
 import {
   applyClaudeInterceptSettings,
   buildClaudeInterceptEnv,
@@ -11,8 +11,8 @@ import {
   migrateClaudeInterceptSettings,
   removeClaudeInterceptSettings,
   setClaudeSettingsPersistForTests,
-} from "../../src/claude/intercept/settings";
-import { NO_PROXY_RECEIPT_FILE, setNoProxyReceiptIoForTests } from "../../src/claude/intercept/settings-no-proxy";
+} from "../../backend/src/claude/intercept/settings";
+import { NO_PROXY_RECEIPT_FILE, setNoProxyReceiptIoForTests } from "../../backend/src/claude/intercept/settings-no-proxy";
 
 // #6936: Claude Code must reach loopback MCP servers directly, not through the CONNECT-only
 // intercept proxy. NO_PROXY is shared with the user, so removal restores exactly what was there.

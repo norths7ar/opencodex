@@ -1,5 +1,5 @@
 import { describe, expect, test, mock, afterEach } from "bun:test";
-import { submitVideoJob, pollVideoJob } from "../../src/images/xai-video-client";
+import { submitVideoJob, pollVideoJob } from "../../backend/src/images/xai-video-client";
 
 const auth = { baseUrl: "https://api.x.ai/v1", token: "test-key" };
 

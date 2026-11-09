@@ -9,12 +9,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAuthStorePath } from "../../src/oauth/store";
-import { buildProtocolPlanSnapshot } from "../../src/protocols/plan-snapshot";
-import { resolveProtocolSettings } from "../../src/protocols/settings";
-import type { RouteResult } from "../../src/router";
-import { nativeMessagesDeclineReason } from "../../src/server/messages-native-eligibility";
-import type { OcxConfig } from "../../src/types";
+import { getAuthStorePath } from "../../backend/src/oauth/store";
+import { buildProtocolPlanSnapshot } from "../../backend/src/protocols/plan-snapshot";
+import { resolveProtocolSettings } from "../../backend/src/protocols/settings";
+import type { RouteResult } from "../../backend/src/router";
+import { nativeMessagesDeclineReason } from "../../backend/src/server/messages-native-eligibility";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

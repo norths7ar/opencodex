@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { mergeConfiguredModelsIntoLiveCatalog } from "../../src/codex/catalog/provider-fetch";
-import { routedMaxOutputTokens } from "../../src/codex/catalog/model-hints";
-import { projectStartupConfigRepairs } from "../../src/providers/model-rename-startup";
-import { projectStaleModelRosters, STALE_MODEL_ROSTERS } from "../../src/providers/stale-model-roster-migration";
+import { mergeConfiguredModelsIntoLiveCatalog } from "../../backend/src/codex/catalog/provider-fetch";
+import { routedMaxOutputTokens } from "../../backend/src/codex/catalog/model-hints";
+import { projectStartupConfigRepairs } from "../../backend/src/providers/model-rename-startup";
+import { projectStaleModelRosters, STALE_MODEL_ROSTERS } from "../../backend/src/providers/stale-model-roster-migration";
 import {
   ALIBABA_TOKEN_PLAN_MAX_OUTPUT_TOKENS,
   META_MODEL_API_MODELS,
@@ -11,10 +11,10 @@ import {
   META_MUSE_WONDER_MODEL,
   MINIMAX_MODELS,
   MINIMAX_MODELS_BEFORE_M31,
-} from "../../src/providers/registry/model-seeds";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/registry/model-seeds";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const PREVIEW = "MiniMax-M3.1-Flash";
 

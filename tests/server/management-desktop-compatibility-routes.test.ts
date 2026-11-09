@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { handleDesktopCompatibilityRoutes } from "../../src/server/management/desktop-compatibility-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { DesktopCertificateService } from "../../src/codex/desktop-compatibility/certificate-service";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
-import { createManagementSessionControl, type ManagementAuthState } from "../../src/server/management-auth";
-import { consumeGuiPairingGrant, createGuiPairingGrant, issueGuiSession, type GuiSessionBootstrap } from "../../src/server/gui-session";
+import { handleDesktopCompatibilityRoutes } from "../../backend/src/server/management/desktop-compatibility-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { DesktopCertificateService } from "../../backend/src/codex/desktop-compatibility/certificate-service";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
+import { createManagementSessionControl, type ManagementAuthState } from "../../backend/src/server/management-auth";
+import { consumeGuiPairingGrant, createGuiPairingGrant, issueGuiSession, type GuiSessionBootstrap } from "../../backend/src/server/gui-session";
 
 const url = new URL("http://127.0.0.1:10100/api/codex/desktop-compatibility/certificate");
 const pairedSession = { isPaired: () => true } as NonNullable<ManagementContext["sessionControl"]>;

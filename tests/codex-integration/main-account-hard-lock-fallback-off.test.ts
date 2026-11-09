@@ -5,15 +5,15 @@
  */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { readdirSync } from "node:fs";
-import { applyMainHardLockFallbackOverride } from "../../src/server/responses/main-hard-lock-routing";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, setAccountQuotaFromParsed, type StoredAccountQuota } from "../../src/codex/quota";
-import { handleResponses } from "../../src/server/responses";
-import { FallbackRefusedError, clearFallbackEventsForTests, recentFallbackEvents } from "../../src/routing/fallback-policy";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import type { OcxConfig } from "../../src/types";
-import type { OcxFallbackConfig } from "../../src/types/fallback";
+import { applyMainHardLockFallbackOverride } from "../../backend/src/server/responses/main-hard-lock-routing";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, setAccountQuotaFromParsed, type StoredAccountQuota } from "../../backend/src/codex/quota";
+import { handleResponses } from "../../backend/src/server/responses";
+import { FallbackRefusedError, clearFallbackEventsForTests, recentFallbackEvents } from "../../backend/src/routing/fallback-policy";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import type { OcxConfig } from "../../backend/src/types";
+import type { OcxFallbackConfig } from "../../backend/src/types/fallback";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

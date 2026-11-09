@@ -5,7 +5,7 @@ import { join } from "node:path";
 import {
   AlibabaBackupIntegrityError,
   backupConfigBeforeAlibabaRegionMigration,
-} from "../../src/providers/alibaba-region-backup";
+} from "../../backend/src/providers/alibaba-region-backup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 test("absent source produces no backup", () => {

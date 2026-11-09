@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
-import { fetchAnthropicUsageQuota, fetchAnthropicUsageQuotaForInstance } from "../../src/providers/quota/vendor-probes-oauth";
-import { clearAccountQuotaCache } from "../../src/providers/quota/account-cache";
+import { fetchAnthropicUsageQuota, fetchAnthropicUsageQuotaForInstance } from "../../backend/src/providers/quota/vendor-probes-oauth";
+import { clearAccountQuotaCache } from "../../backend/src/providers/quota/account-cache";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; clearAccountQuotaCache(); });

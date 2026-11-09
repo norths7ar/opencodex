@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { AUTO_COMPACT_WINDOW_DEFAULT, boundedContextWindows, buildClaudeContextWindows, claudeTierDisplayName, claudeTierDisplayNameEnv, effectiveModelEnv, nativeClaudePassthroughFor, resolveAutoContext, shouldMarkOneMillion, withOneMillionMarker } from "../../src/claude/context-windows";
-import { resolveAlias } from "../../src/claude/alias";
-import { desktop3pAlias } from "../../src/claude/desktop-3p";
-import { buildAnthropicModelInfos } from "../../src/claude/model-info";
-import type { CatalogModel } from "../../src/codex/catalog";
+import { AUTO_COMPACT_WINDOW_DEFAULT, boundedContextWindows, buildClaudeContextWindows, claudeTierDisplayName, claudeTierDisplayNameEnv, effectiveModelEnv, nativeClaudePassthroughFor, resolveAutoContext, shouldMarkOneMillion, withOneMillionMarker } from "../../backend/src/claude/context-windows";
+import { resolveAlias } from "../../backend/src/claude/alias";
+import { desktop3pAlias } from "../../backend/src/claude/desktop-3p";
+import { buildAnthropicModelInfos } from "../../backend/src/claude/model-info";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
 
 describe("claude context-window map (devlog 260712 B2)", () => {
   const routed = [

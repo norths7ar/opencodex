@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { parseStrictSemver } from "../../src/lib/strict-semver";
+import { parseStrictSemver } from "../../backend/src/lib/strict-semver";
 
 /**
  * The prerelease section used to be matched by the semver.org pattern verbatim, whose three

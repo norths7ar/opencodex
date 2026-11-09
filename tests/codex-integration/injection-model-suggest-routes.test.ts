@@ -2,16 +2,16 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { listCatalogNativeSlugs, type CatalogModel } from "../../src/codex/catalog";
-import { buildRoleProposals, classifyRoleModelCandidates } from "../../src/codex/role-auto-assign";
-import { DELEGATED_WORK_SIZING_SYSTEM_PROMPT } from "../../src/codex/role-sizing";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { RoleSizingCall } from "../../src/server/management/codex-role-auto-assign";
-import type { OcxConfig } from "../../src/types";
+import { listCatalogNativeSlugs, type CatalogModel } from "../../backend/src/codex/catalog";
+import { buildRoleProposals, classifyRoleModelCandidates } from "../../backend/src/codex/role-auto-assign";
+import { DELEGATED_WORK_SIZING_SYSTEM_PROMPT } from "../../backend/src/codex/role-sizing";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { RoleSizingCall } from "../../backend/src/server/management/codex-role-auto-assign";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { peekCodexRuntimeProcessCache, resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { bundledCatalogCacheState, resetBundledCatalogCacheForTests, setBundledCatalogCacheForTests } from "../../src/codex/catalog/bundled";
+import { peekCodexRuntimeProcessCache, resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { bundledCatalogCacheState, resetBundledCatalogCacheForTests, setBundledCatalogCacheForTests } from "../../backend/src/codex/catalog/bundled";
 
 const ENV_KEYS = ["CODEX_HOME", "OPENCODEX_HOME", "HOME", "USERPROFILE"] as const;
 let saved: Record<string, string | undefined> = {};

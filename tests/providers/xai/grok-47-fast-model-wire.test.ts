@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../../src/config";
-import { XAI_OAUTH_DISCOVERY_URL } from "../../../src/oauth/xai";
-import { saveCredential } from "../../../src/oauth/store";
-import { XAI_GROK_CLI_BASE_URL } from "../../../src/providers/xai-transport";
-import { startServer } from "../../../src/server";
+import { saveConfig } from "../../../backend/src/config";
+import { XAI_OAUTH_DISCOVERY_URL } from "../../../backend/src/oauth/xai";
+import { saveCredential } from "../../../backend/src/oauth/store";
+import { XAI_GROK_CLI_BASE_URL } from "../../../backend/src/providers/xai-transport";
+import { startServer } from "../../../backend/src/server";
 import {
   clearRequestLogsForTests,
   getRequestLogEntries,
   observeRequestLogsForTests,
   type RequestLogEntry,
-} from "../../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
-import { readUsageEntries } from "../../../src/usage/log";
+} from "../../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
+import { readUsageEntries } from "../../../backend/src/usage/log";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

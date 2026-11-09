@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { deriveEntry, mergeCatalogEntriesForSync } from "../../src/codex/catalog/sync";
+import { deriveEntry, mergeCatalogEntriesForSync } from "../../backend/src/codex/catalog/sync";
 
 for (const template of [null, { slug: "gpt-5.6-sol", supported_reasoning_levels: [{ effort: "ultra" }] }]) {
   test(`Go preserves exact configured efforts (${template ? "template" : "fallback"})`, () => {

@@ -1,5 +1,5 @@
 import { spyOn } from "bun:test";
-import * as boundedBody from "../../src/lib/bounded-body";
+import * as boundedBody from "../../backend/src/lib/bounded-body";
 
 /** Keep the upstream incomplete until the real bounded reader has timed out.
  * A wall timer started by the upstream precedes the proxy's inspection timer;

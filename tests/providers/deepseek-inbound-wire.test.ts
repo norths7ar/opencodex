@@ -12,19 +12,19 @@
  * assert the captured upstream URL, which is externally observable.
  */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
 import {
   getProviderRegistryEntry,
   providerModelResponsesTerminalRepair,
   PROVIDER_REGISTRY,
-} from "../../src/providers/registry";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import { MAX_SYNTHESIZED_OUTPUT_ITEMS } from "../../src/server/responses-json-events";
-import type { ResponsesTerminalRepairScheduler } from "../../src/server/responses-terminal-repair";
-import { sendResponseToWebSocket } from "../../src/server/ws-bridge";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/registry";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { MAX_SYNTHESIZED_OUTPUT_ITEMS } from "../../backend/src/server/responses-json-events";
+import type { ResponsesTerminalRepairScheduler } from "../../backend/src/server/responses-terminal-repair";
+import { sendResponseToWebSocket } from "../../backend/src/server/ws-bridge";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 

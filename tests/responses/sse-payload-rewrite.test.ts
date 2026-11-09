@@ -3,8 +3,8 @@
  */
 import { describe, expect, spyOn, test } from "bun:test";
 import { Buffer } from "node:buffer";
-import { createImageGenCallRestoreRewrite } from "../../src/server/responses-image-gen-repair";
-import { createResponsesItemIdPayloadRewrite } from "../../src/server/responses-item-id-repair";
+import { createImageGenCallRestoreRewrite } from "../../backend/src/server/responses-image-gen-repair";
+import { createResponsesItemIdPayloadRewrite } from "../../backend/src/server/responses-item-id-repair";
 import {
   composeSsePayloadRewrites,
   composeSseBlockRewrites,
@@ -14,9 +14,9 @@ import {
   relaySseWithBlockRewrite,
   relaySseWithPayloadRewrite,
   sseDataPayload,
-} from "../../src/server/sse-payload-rewrite";
+} from "../../backend/src/server/sse-payload-rewrite";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { relaySseWithFailedTail } from "../../src/server/relay";
+import { relaySseWithFailedTail } from "../../backend/src/server/relay";
 
 function streamFromText(text: string): ReadableStream<Uint8Array> {
   const chunk = new TextEncoder().encode(text);

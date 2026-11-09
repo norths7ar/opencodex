@@ -2,9 +2,9 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { release, stillHeld, tryAcquire, type LockDeps } from "../../src/codex/prompt-lock";
-import { withLockClaim } from "../../src/codex/prompt-lock-claim";
-import { ownerDefaults } from "../../src/codex/prompt-lock-owner";
+import { release, stillHeld, tryAcquire, type LockDeps } from "../../backend/src/codex/prompt-lock";
+import { withLockClaim } from "../../backend/src/codex/prompt-lock-claim";
+import { ownerDefaults } from "../../backend/src/codex/prompt-lock-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

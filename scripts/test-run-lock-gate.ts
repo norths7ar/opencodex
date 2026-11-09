@@ -1,8 +1,8 @@
 import { chmodSync, lstatSync, realpathSync } from "node:fs";
 import { basename, dirname, isAbsolute, join } from "node:path";
 import { constants, Database } from "bun:sqlite";
-import { samePathIdentity } from "../src/codex/user-identity";
-import { hardenSecretDir, hardenSecretPath } from "../src/lib/windows-secret-acl";
+import { samePathIdentity } from "../backend/src/codex/user-identity";
+import { hardenSecretDir, hardenSecretPath } from "../backend/src/lib/windows-secret-acl";
 
 export const TEST_RUN_LOCK_RELEASE_WAIT_MS = 10_000;
 

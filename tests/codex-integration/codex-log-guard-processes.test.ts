@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
   isCodexWriterCommandLine,
   listRunningCodexProcesses,
-} from "../../src/codex/log-guard/processes";
+} from "../../backend/src/codex/log-guard/processes";
 
 describe("Codex Log Guard process gate", () => {
   test("matches official Codex writer command lines without broad codex substring matching", () => {

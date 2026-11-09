@@ -3,17 +3,17 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
+import { saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
 import {
   SPEND_LEDGER_JOURNAL_FILENAME,
   SPEND_LEDGER_SALT_FILENAME,
   resetSharedSpendLedgerForTest,
-} from "../../src/lib/spend-reservation-ledger";
-import { acquireSpendLedgerOwner, spendLedgerOwnerSnapshot } from "../../src/lib/spend-ledger-owner";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/spend-reservation-ledger";
+import { acquireSpendLedgerOwner, spendLedgerOwnerSnapshot } from "../../backend/src/lib/spend-ledger-owner";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

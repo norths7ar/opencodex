@@ -682,15 +682,15 @@ export async function runTestLane(
 }
 
 /**
- * `gui` is not a workspace of the root package and declares React only in `gui/package.json`, so a
- * root `bun install` never creates `gui/node_modules`. Twenty-six files under `tests/` import
- * modules from `gui/src`, which makes those tests fail on a fresh clone or worktree with
+ * `gui` is not a workspace of the root package and declares React only in `frontend/package.json`, so a
+ * root `bun install` never creates `frontend/node_modules`. Twenty-six files under `tests/` import
+ * modules from `frontend/src`, which makes those tests fail on a fresh clone or worktree with
  * `Cannot find package 'react'` — reported as an "Unhandled error between tests" that names no
  * test, so the cause is not obvious from the output.
  *
  * `.github/workflows/ci.yml` already installs them explicitly for exactly this reason; the local
  * runner had no equivalent. Install on demand rather than fail, because the tests genuinely
- * require the dependency and `gui/node_modules` is a gitignored build artifact, not source.
+ * require the dependency and `frontend/node_modules` is a gitignored build artifact, not source.
  */
 export function ensureGuiDependencies(io: {
   cwd?: string;
@@ -701,11 +701,11 @@ export function ensureGuiDependencies(io: {
   const cwd = io.cwd ?? process.cwd();
   const exists = io.exists ?? existsSync;
   const log = io.log ?? (message => console.warn(message));
-  const guiDir = join(cwd, "gui");
+  const guiDir = join(cwd, "frontend");
   if (!exists(join(guiDir, "package.json"))) return { kind: "absent" };
   if (exists(join(guiDir, "node_modules", "react", "package.json"))) return { kind: "present" };
 
-  log("[test] gui dependencies are missing or incomplete; installing them so tests importing gui/src can resolve React.");
+  log("[test] gui dependencies are missing or incomplete; installing them so tests importing frontend/src can resolve React.");
   const install = io.install ?? ((dir: string) => {
     const result = Bun.spawnSync(["bun", "install", "--frozen-lockfile"], {
       cwd: dir,
@@ -732,7 +732,7 @@ if (import.meta.main) {
   const guiDependencies = ensureGuiDependencies();
   if (guiDependencies.kind === "failed") {
     console.error(
-      "[test] could not install gui/node_modules, which tests importing gui/src need to resolve React.\n"
+      "[test] could not install frontend/node_modules, which tests importing frontend/src need to resolve React.\n"
       + "       Run it manually: cd gui && bun install --frozen-lockfile\n"
       + (guiDependencies.detail ? `       ${guiDependencies.detail.trim().split("\n").slice(-3).join("\n       ")}` : ""),
     );

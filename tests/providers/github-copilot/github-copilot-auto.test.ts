@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { clearCopilotAutoModelsForTests, copilotPickerModels, copilotRequiresAuto, fetchCopilotAutoModels, resolveCopilotAuto } from "../../../src/providers/github-copilot-auto";
-import { waitForProviderRequestSlot, releaseProviderRequestSlot } from "../../../src/providers/request-pacing";
-import { redactHeaders, redactSecrets, redactSecretString } from "../../../src/lib/redact";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { clearCopilotAutoModelsForTests, copilotPickerModels, copilotRequiresAuto, fetchCopilotAutoModels, resolveCopilotAuto } from "../../../backend/src/providers/github-copilot-auto";
+import { waitForProviderRequestSlot, releaseProviderRequestSlot } from "../../../backend/src/providers/request-pacing";
+import { redactHeaders, redactSecrets, redactSecretString } from "../../../backend/src/lib/redact";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const parsed: OcxParsedRequest = { modelId: "auto", stream: true, options: {}, context: {
   messages: [{ role: "user", content: "Implement the requested change", timestamp: 0 }],

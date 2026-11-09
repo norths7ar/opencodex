@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { fetchWithHeaderTimeout } from "../../src/server/responses";
+import { fetchWithHeaderTimeout } from "../../backend/src/server/responses";
 
 const servers: Array<ReturnType<typeof Bun.serve>> = [];
 
@@ -127,7 +127,7 @@ describe("#2567 the upstream fetch disables Bun's per-request idle timeout", () 
   }
 
   test("providerFetch passes timeout: 0 to the underlying fetch", async () => {
-    const { providerFetch } = await import("../../src/server/responses/fetch-helpers");
+    const { providerFetch } = await import("../../backend/src/server/responses/fetch-helpers");
     const { calls, fetch } = recordingFetch();
     const provider = {
       adapter: "openai-chat",
@@ -170,7 +170,7 @@ describe("#2567 the upstream fetch disables Bun's per-request idle timeout", () 
   });
 
   test("fetchWithHeaderDeadline passes timeout: 0 to its injected fetch", async () => {
-    const { fetchWithHeaderDeadline } = await import("../../src/server/claude-messages");
+    const { fetchWithHeaderDeadline } = await import("../../backend/src/server/claude-messages");
     const { calls, fetch } = recordingFetch();
 
     const result = await fetchWithHeaderDeadline(
@@ -192,12 +192,12 @@ describe("#2567 the upstream fetch disables Bun's per-request idle timeout", () 
 
 describe("replacement key admission excludes the response-header deadline", () => {
   async function replacementFixture(physicalFetch: typeof fetch) {
-    const { providerFetch } = await import("../../src/server/responses/fetch-helpers");
-    const { waitForProviderRequestSlot, resetProviderRequestPacingForTest } = await import("../../src/providers/request-pacing");
+    const { providerFetch } = await import("../../backend/src/server/responses/fetch-helpers");
+    const { waitForProviderRequestSlot, resetProviderRequestPacingForTest } = await import("../../backend/src/providers/request-pacing");
     resetProviderRequestPacingForTest();
     const provider = { adapter: "openai-chat", baseUrl: "https://fixture.test/v1", authMode: "key", apiKey: "fixture-A",
       apiKeyPool: [{ id: "a", key: "fixture-A", addedAt: 1 }, { id: "b", key: "fixture-B", addedAt: 2 }],
-      requestPacing: { enabled: true, keys: { maxConcurrentRequests: 1 } } } as import("../../src/types").OcxProviderConfig;
+      requestPacing: { enabled: true, keys: { maxConcurrentRequests: 1 } } } as import("../../backend/src/types").OcxProviderConfig;
     const replacement = { ...provider, apiKey: "fixture-B" };
     const held = await waitForProviderRequestSlot("header-replacement", replacement);
     let notify!: () => void;
@@ -265,8 +265,8 @@ for (const policy of [
   { enabled: true, keySelection: "round-robin", minIntervalMs: 1 },
   { enabled: true, keys: { minIntervalMs: 1 } },
 ] as const) test(`key pacing keeps WebSocket requests on the guarded HTTP path: ${JSON.stringify(policy)}`, async () => {
-  const { providerFetch } = await import("../../src/server/responses/fetch-helpers");
-  const { resetProviderRequestPacingForTest } = await import("../../src/providers/request-pacing");
+  const { providerFetch } = await import("../../backend/src/server/responses/fetch-helpers");
+  const { resetProviderRequestPacingForTest } = await import("../../backend/src/providers/request-pacing");
   const { BOUNDED_WS_RUNTIME } = await import("../helpers/ws-upstream-fixtures");
   const previousSocket = globalThis.WebSocket;
   let sockets = 0; let overrides = 0; const sentKeys: (string | null)[] = [];
@@ -277,7 +277,7 @@ for (const policy of [
   }) as typeof fetch;
   const provider = { adapter: "openai-responses", authMode: "key", baseUrl: "https://api.openai.com/v1",
     upstreamWebsocket: true, apiKey: "fixture-A", requestPacing: policy, fetch: physical,
-  } as import("../../src/types").OcxProviderConfig;
+  } as import("../../backend/src/types").OcxProviderConfig;
   try {
     const executor = providerFetch(provider, BOUNDED_WS_RUNTIME, { providerName: "ws-key-pacing",
       dispatchOverride: async (input, init, execute, reacquire) => {

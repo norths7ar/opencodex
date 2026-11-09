@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 async function kernel32() {
   const { dlopen } = await import("bun:ffi");
-  const { resolveTrustedWindowsSystemDirectory } = await import("../../src/lib/windows-elevation");
+  const { resolveTrustedWindowsSystemDirectory } = await import("../../backend/src/lib/windows-elevation");
   return dlopen(join(resolveTrustedWindowsSystemDirectory(), "kernel32.dll"), {
     GetLastError: { args: [], returns: "u32" },
     SetLastError: { args: ["u32"], returns: "void" },
@@ -65,7 +65,7 @@ export async function ownRestartFixture(pidsPath: string, stopPath: string) {
     async stop() {
       writeFileSync(stopPath, "stop");
       const { readTestRunProcessStartBatch } = await import("../../scripts/test-run-lock");
-      const { isProcessAlive } = await import("../../src/lib/process-control");
+      const { isProcessAlive } = await import("../../backend/src/lib/process-control");
       const deadline = Date.now() + 5_000;
       for (;;) {
         const records = (existsSync(pidsPath) ? readFileSync(pidsPath, "utf8") : "")

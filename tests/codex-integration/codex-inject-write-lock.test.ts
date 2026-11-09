@@ -14,13 +14,13 @@ import { join } from "node:path";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import {
   boundProvenanceEntries,
   CODEX_PROVENANCE_MAX_BYTES,
   CODEX_PROVENANCE_MAX_TRANSACTIONS,
   STABLE_ZERO_BYTE_COORDINATOR_AGE_MS,
-} from "../../src/codex/inject-coordination";
+} from "../../backend/src/codex/inject-coordination";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";

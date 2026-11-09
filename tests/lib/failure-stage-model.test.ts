@@ -12,8 +12,8 @@ import {
   stageRank,
   type RequestFailureCause,
   type RequestFailureStage,
-} from "../../src/lib/request-failure-model";
-import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../src/usage/log";
+} from "../../backend/src/lib/request-failure-model";
+import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../backend/src/usage/log";
 
 /**
  * Roadmap items 7 and 14. None of these cases can be satisfied by a request that returned 200:

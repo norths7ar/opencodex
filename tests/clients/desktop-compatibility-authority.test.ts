@@ -1,15 +1,15 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID, X509Certificate } from "node:crypto";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ensureDesktopCompatibilityAuthority, inspectDesktopCompatibilityAuthority, loadDesktopCompatibilityAuthority, renewDesktopCompatibilityAuthority } from "../../src/codex/desktop-compatibility/certificate-store";
+import { ensureDesktopCompatibilityAuthority, inspectDesktopCompatibilityAuthority, loadDesktopCompatibilityAuthority, renewDesktopCompatibilityAuthority } from "../../backend/src/codex/desktop-compatibility/certificate-store";
 import {
   powerShellAuthorityKeyProtectionForTests, powerShellDpapiScriptForTests, usesNativeDpapiForTests,
   windowsAuthorityKeyProtection, type AuthorityKeyProtection,
-} from "../../src/codex/desktop-compatibility/windows-key-protection";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/desktop-compatibility/windows-key-protection";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 const roots: string[] = [];
 const success = () => ({ success: true, exitCode: 0, timedOut: false, stdout: "" });

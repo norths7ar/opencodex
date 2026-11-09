@@ -5,13 +5,13 @@ import {
   effectiveAdapterContract,
   getAdapterDefinition,
   type AdapterWire,
-} from "../../src/adapters/registry";
-import { resetMimoJwtCache } from "../../src/adapters/mimo-free";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
-import { MODEL_ADAPTER_OVERRIDE_ALLOWED, type OcxParsedRequest, type OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/registry";
+import { resetMimoJwtCache } from "../../backend/src/adapters/mimo-free";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
+import { MODEL_ADAPTER_OVERRIDE_ALLOWED, type OcxParsedRequest, type OcxProviderConfig } from "../../backend/src/types";
 import { TOOL_WIRE_DRIVERS } from "../helpers/adapter-conformance/wire-drivers";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

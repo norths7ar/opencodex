@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { expandUserPath, getConfigDir } from "../../src/config";
+import { expandUserPath, getConfigDir } from "../../backend/src/config";
 
 const previousOpenCodexHome = process.env.OPENCODEX_HOME;
 

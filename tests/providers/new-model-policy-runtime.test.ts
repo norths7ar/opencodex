@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { loadConfig, saveConfig } from "../../src/config";
-import { armClaudeCodeBaseline, saveConfigPreservingClaudeCode } from "../../src/config/live-reconcile";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import { clearModelCache, observeModelCacheRevision, setCached } from "../../src/codex/model-cache";
-import { captureModelDiscoveryBaseline, finalizeModelDiscovery } from "../../src/providers/new-model-policy-runtime";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { armClaudeCodeBaseline, saveConfigPreservingClaudeCode } from "../../backend/src/config/live-reconcile";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import { clearModelCache, observeModelCacheRevision, setCached } from "../../backend/src/codex/model-cache";
+import { captureModelDiscoveryBaseline, finalizeModelDiscovery } from "../../backend/src/providers/new-model-policy-runtime";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome;

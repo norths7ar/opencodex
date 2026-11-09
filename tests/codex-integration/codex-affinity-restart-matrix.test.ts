@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, truncateSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { initializeConfigOwnership, removeOwnedConfigState } from "../../src/lib/config-ownership";
+import { initializeConfigOwnership, removeOwnedConfigState } from "../../backend/src/lib/config-ownership";
 import { helperPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { copySeededAffinityHome, removeSeededAffinityTemplates } from "../helpers/codex-affinity-seed";

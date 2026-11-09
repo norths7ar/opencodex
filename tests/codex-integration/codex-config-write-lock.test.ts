@@ -11,8 +11,8 @@
  */
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, realpathSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
-import * as promptLock from "../../src/codex/prompt-lock";
-import { atomicWriteFile } from "../../src/config/atomic-write";
+import * as promptLock from "../../backend/src/codex/prompt-lock";
+import { atomicWriteFile } from "../../backend/src/config/atomic-write";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -23,16 +23,16 @@ import {
   releaseConfigWriteLock,
   withConfigWriteLock,
   withConfigWriteLockHeld,
-} from "../../src/codex/config-write-lock";
-import { release, tryAcquire, type LockDeps, type LockHandle } from "../../src/codex/prompt-lock";
+} from "../../backend/src/codex/config-write-lock";
+import { release, tryAcquire, type LockDeps, type LockHandle } from "../../backend/src/codex/prompt-lock";
 import {
   isMultiAgentV2Enabled,
   setAgentsEnabled,
   setMaxConcurrentThreads,
   setMultiAgentModeHintText,
   transitionMultiAgentV2,
-} from "../../src/codex/features";
-import { readPromptLayers, setToggle } from "../../src/codex/prompt-layers";
+} from "../../backend/src/codex/features";
+import { readPromptLayers, setToggle } from "../../backend/src/codex/prompt-layers";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
 
@@ -371,7 +371,7 @@ describe("heldConfigWriteLock handoff", () => {
 
 describe("canonical destination hardening", () => {
   const fs = require("node:fs") as typeof import("node:fs");
-  const locks = require("../../src/codex/config-write-lock") as typeof import("../../src/codex/config-write-lock");
+  const locks = require("../../backend/src/codex/config-write-lock") as typeof import("../../backend/src/codex/config-write-lock");
   test("two symlink aliases contend and both sequential edits survive", async () => {
     const config = fixtureConfig("[agents]\nmax_threads = 2\n"), a = config + ".a", b = config + ".b";
     fs.symlinkSync(config, a); fs.symlinkSync(config, b);
@@ -404,7 +404,7 @@ describe("canonical destination hardening", () => {
   });
   test("timeout zero makes exactly one immediate attempt", async () => {
     const { spyOn } = await import("bun:test");
-    const primitive = await import("../../src/codex/prompt-lock");
+    const primitive = await import("../../backend/src/codex/prompt-lock");
     const config = fixtureConfig("same"); holdLock(config);
     const spy = spyOn(primitive, "tryAcquire");
     try {
@@ -437,7 +437,7 @@ describe("canonical destination hardening", () => {
     expect(setToggle("apps", false, snapshot.revision, paths).ok).toBe(true);
   });
   test("retargeting during prompt recovery refuses and preserves the journal", async () => {
-    const { spyOn } = await import("bun:test"), prompt = await import("../../src/codex/prompt-journal");
+    const { spyOn } = await import("bun:test"), prompt = await import("../../backend/src/codex/prompt-journal");
     const config = fixtureConfig("post"), other = fixtureConfig("post"), alias = config + ".alias", store = config + ".store", journal = config + ".journal";
     fs.symlinkSync(config, alias);
     writeFileSync(journal, prompt.encodeJournal({ configPath: alias, storePath: store,
@@ -602,8 +602,8 @@ describe("SQLite order and retained recovery authority", () => {
 describe("publication and unsafe caller regressions", () => {
   test("atomic preparation swaps the destination and refuses without advancing the witness", () => {
     const fs = require("node:fs") as typeof import("node:fs");
-    const { atomicWriteFile } = require("../../src/config/atomic-write") as typeof import("../../src/config/atomic-write");
-    const { publishConfigWrite, assertConfigWriteDestination } = require("../../src/codex/config-write-lock") as typeof import("../../src/codex/config-write-lock");
+    const { atomicWriteFile } = require("../../backend/src/config/atomic-write") as typeof import("../../backend/src/config/atomic-write");
+    const { publishConfigWrite, assertConfigWriteDestination } = require("../../backend/src/codex/config-write-lock") as typeof import("../../backend/src/codex/config-write-lock");
     const config = fixtureConfig("original"), replacement = config + ".replacement";
     withConfigWriteLock(config, held => {
       expect(() => publishConfigWrite(config, held, (destination, hooks) => atomicWriteFile(destination, "ours", undefined, {
@@ -615,8 +615,8 @@ describe("publication and unsafe caller regressions", () => {
   });
   test("durable preparation retargets an alias and refuses before rename", () => {
     const fs = require("node:fs") as typeof import("node:fs");
-    const { durableWrite } = require("../../src/codex/prompt-journal") as typeof import("../../src/codex/prompt-journal");
-    const { publishConfigWrite, assertConfigWriteDestination } = require("../../src/codex/config-write-lock") as typeof import("../../src/codex/config-write-lock");
+    const { durableWrite } = require("../../backend/src/codex/prompt-journal") as typeof import("../../backend/src/codex/prompt-journal");
+    const { publishConfigWrite, assertConfigWriteDestination } = require("../../backend/src/codex/config-write-lock") as typeof import("../../backend/src/codex/config-write-lock");
     const config = fixtureConfig("original"), other = fixtureConfig("external"), alias = config + ".alias";
     fs.symlinkSync(config, alias);
     withConfigWriteLock(alias, held => {
@@ -629,8 +629,8 @@ describe("publication and unsafe caller regressions", () => {
     });
   });
   test("a confirmed rename advances the witness even if post-publication cleanup throws", () => {
-    const { atomicWriteFile } = require("../../src/config/atomic-write") as typeof import("../../src/config/atomic-write");
-    const { publishConfigWrite, assertConfigWriteDestination } = require("../../src/codex/config-write-lock") as typeof import("../../src/codex/config-write-lock");
+    const { atomicWriteFile } = require("../../backend/src/config/atomic-write") as typeof import("../../backend/src/config/atomic-write");
+    const { publishConfigWrite, assertConfigWriteDestination } = require("../../backend/src/codex/config-write-lock") as typeof import("../../backend/src/codex/config-write-lock");
     const config = fixtureConfig("original");
     withConfigWriteLock(config, held => {
       expect(() => publishConfigWrite(config, held, (destination, hooks) => atomicWriteFile(destination, "ours", undefined, {
@@ -689,7 +689,7 @@ describe("native feature children stay bound to the held home", () => {
   for (const route of ["default-input", "v2"] as const) {
     for (const childThrows of [false, true]) test(`${route}: alias retarget during child execution preserves B and stops parent publication (throws=${childThrows})`, async () => {
       const fs = await import("node:fs");
-      const { handleManagementAPI } = await import("../../src/server/management-api");
+      const { handleManagementAPI } = await import("../../backend/src/server/management-api");
       const { catalogConvergenceFactory } = await import("../helpers/catalog-convergence");
       const original = route === "v2"
         ? "[features.multi_agent_v2]\nenabled = true\nmax_concurrent_threads_per_session = 64\n"
@@ -745,9 +745,9 @@ describe("native feature children stay bound to the held home", () => {
 
 
 for (const route of ["default-input", "v2"] as const) test(`${route}: a home retarget after acquisition refuses before the child`, async () => {
-  const fs = await import("node:fs"), locks = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), locks = await import("../../backend/src/codex/config-write-lock");
   const { spyOn } = await import("bun:test");
-  const { handleManagementAPI } = await import("../../src/server/management-api");
+  const { handleManagementAPI } = await import("../../backend/src/server/management-api");
   const { catalogConvergenceFactory } = await import("../helpers/catalog-convergence");
   const original = "[features.multi_agent_v2]\nenabled = true\n";
   const a = fixtureConfig(original), b = fixtureConfig(original), aliasRoot = fs.mkdtempSync(join(tmpdir(), "ocx-before-child-"));
@@ -778,7 +778,7 @@ for (const route of ["default-input", "v2"] as const) test(`${route}: a home ret
 });
 
 test("CLI revalidates after executable resolution, immediately before spawning", async () => {
-  const fs = await import("node:fs"), { cmdV2 } = await import("../../src/cli/v2");
+  const fs = await import("node:fs"), { cmdV2 } = await import("../../backend/src/cli/v2");
   const original = "[features.multi_agent_v2]\nenabled = true\n";
   const a = fixtureConfig(original), b = fixtureConfig(original), aliasRoot = fs.mkdtempSync(join(tmpdir(), "ocx-cli-child-"));
   roots.push(aliasRoot); const alias = join(aliasRoot, "home");
@@ -801,7 +801,7 @@ test("CLI revalidates after executable resolution, immediately before spawning",
 });
 
 test("CLI passes the held home after invocation options and stops sync on post-child drift", async () => {
-  const fs = await import("node:fs"), { cmdV2 } = await import("../../src/cli/v2");
+  const fs = await import("node:fs"), { cmdV2 } = await import("../../backend/src/cli/v2");
   const original = "[features.multi_agent_v2]\nenabled = true\nmax_concurrent_threads_per_session = 64\n";
   const a = fixtureConfig(original), b = fixtureConfig(original), aliasRoot = fs.mkdtempSync(join(tmpdir(), "ocx-cli-env-"));
   roots.push(aliasRoot); const alias = join(aliasRoot, "home"), canonicalA = fs.realpathSync.native(join(a, ".."));
@@ -909,7 +909,7 @@ for (const enabled of [false, true]) test(`native transition refuses differently
 });
 
 test("default feature toggle refuses differently named symlink before spawning", async () => {
-  const fs = await import("node:fs"), { handleManagementAPI } = await import("../../src/server/management-api");
+  const fs = await import("node:fs"), { handleManagementAPI } = await import("../../backend/src/server/management-api");
   const original = "[features]\ndefault_mode_request_user_input = false\n", config = fixtureConfig(original);
   const dotfiles = fs.mkdtempSync(join(tmpdir(), "ocx-toggle-dotfiles-")); roots.push(dotfiles);
   const target = join(dotfiles, "codex.toml"); fs.renameSync(config, target); fs.symlinkSync(target, config);
@@ -939,7 +939,7 @@ test("enable transition restores the original legacy limit rather than its stage
 });
 
 for (const missing of [false, true]) test(`native child drift restores the immediate pre-spawn bytes or absence (missing=${missing})`, async () => {
-  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const a = fixtureConfig("initial"), b = fixtureConfig("B"), root = fs.mkdtempSync(join(tmpdir(), "ocx-child-preimage-")); roots.push(root);
   const alias = join(root, "home"); fs.symlinkSync(fs.realpathSync.native(join(a, "..")), alias, "junction"); if (missing) fs.unlinkSync(a);
   const bytes = Buffer.from([0xff, 0x0d, 0x0a, 0x00, 0x61]);
@@ -956,7 +956,7 @@ for (const missing of [false, true]) test(`native child drift restores the immed
 
 test("canonical recovery refuses a subsequent writer even when its inode stays the same", async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const atomic = await import("../../src/config/atomic-write"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const atomic = await import("../../backend/src/config/atomic-write"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const a = fixtureConfig("preimage"), b = fixtureConfig("B"), root = fs.mkdtempSync(join(tmpdir(), "ocx-recovery-race-")); roots.push(root);
   const alias = join(root, "home"); fs.symlinkSync(fs.realpathSync.native(join(a, "..")), alias, "junction");
   const writer = atomic.atomicWriteFileStreamed;
@@ -975,7 +975,7 @@ test("canonical recovery refuses a subsequent writer even when its inode stays t
 
 
 test("alias-only drift restores canonical bytes while holding the canonical lock", async () => {
-  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const original = Buffer.from("# original\r\n[features.multi_agent_v2]\r\nenabled = true\r\nmax_concurrent_threads_per_session = 64\r\n");
   const a = fixtureConfig(original.toString()), b = fixtureConfig("B"), root = fs.mkdtempSync(join(tmpdir(), "ocx-alias-only-")); roots.push(root);
   const alias = join(root, "home"); fs.symlinkSync(fs.realpathSync.native(join(a, "..")), alias, "junction");
@@ -990,7 +990,7 @@ test("alias-only drift restores canonical bytes while holding the canonical lock
 
 test("canonical-target replacement refuses restore and retains byte-identical recovery evidence", async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const atomic = await import("../../src/config/atomic-write"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const atomic = await import("../../backend/src/config/atomic-write"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const original = Buffer.from("# recovery\r\n[features.multi_agent_v2]\r\nenabled = true\r\nmax_concurrent_threads_per_session = 64\r\n");
   const a = fixtureConfig(original.toString()), b = fixtureConfig("B"), root = fs.mkdtempSync(join(tmpdir(), "ocx-canonical-replacement-")); roots.push(root);
   const alias = join(root, "home"), canonical = fs.realpathSync.native(a); fs.symlinkSync(fs.realpathSync.native(join(a, "..")), alias, "junction");
@@ -1016,7 +1016,7 @@ test("canonical-target replacement refuses restore and retains byte-identical re
 
 
 test("canonical target redirected by the child refuses recovery without touching its new target", async () => {
-  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const original = "[features.multi_agent_v2]\nenabled = true\nmax_concurrent_threads_per_session = 64\n";
   const a = fixtureConfig(original), b = fixtureConfig("B"), canonical = fs.realpathSync.native(a);
   const journal = join(canonical, "..", "opencodex-journal.json"); fs.writeFileSync(journal, "retained journal authority");
@@ -1034,7 +1034,7 @@ test("canonical target redirected by the child refuses recovery without touching
 
 test("canonical recovery validates the actual atomic destination before publication", async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const atomic = await import("../../src/config/atomic-write"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const atomic = await import("../../backend/src/config/atomic-write"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const a = fixtureConfig("preimage"), b = fixtureConfig("B"), root = fs.mkdtempSync(join(tmpdir(), "ocx-recovery-target-")); roots.push(root);
   const alias = join(root, "home"), canonical = fs.realpathSync.native(a); fs.symlinkSync(fs.realpathSync.native(join(a, "..")), alias, "junction");
   const writer = atomic.atomicWriteFileStreamed;
@@ -1053,7 +1053,7 @@ test("canonical recovery validates the actual atomic destination before publicat
 
 
 test("canonical dangling symlink is a changed target rather than proven absence", async () => {
-  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const a = fixtureConfig("preimage"), canonical = fs.realpathSync.native(a), missingTarget = canonical + ".missing";
   withConfigWriteLock(a, held => {
     expect(() => runConfigWriteChild(a, held, () => { fs.unlinkSync(canonical); fs.symlinkSync(missingTarget, canonical); })).toThrow("canonical preimage recovery refused");
@@ -1065,7 +1065,7 @@ test("canonical dangling symlink is a changed target rather than proven absence"
 
 for (const point of ["wrapper entry", "initial spawn validator"]) test(`transition recovers alias drift before ${point}`, async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const atomic = await import("../../src/config/atomic-write");
+  const atomic = await import("../../backend/src/config/atomic-write");
   const original = Buffer.from("# exact CRLF\r\n[agents]\r\nmax_threads = 7 # children\r\n");
   const a = fixtureConfig(original.toString()), b = fixtureConfig("model = \"B\"\n");
   const canonical = fs.realpathSync.native(a), home = join(canonical, ".."), root = fs.mkdtempSync(join(tmpdir(), "ocx-staged-entry-")); roots.push(root);
@@ -1097,7 +1097,7 @@ for (const point of ["wrapper entry", "initial spawn validator"]) test(`transiti
 
 for (const missing of [false, true]) test(`toggle initial spawn validator retains recovery protection (missing=${missing})`, async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const a = fixtureConfig("original\r\n"), b = fixtureConfig("B"), canonical = fs.realpathSync.native(a), home = join(canonical, "..");
   const root = fs.mkdtempSync(join(tmpdir(), "ocx-initial-validator-")); roots.push(root);
   const alias = join(root, "home"), bHome = fs.realpathSync.native(join(b, "..")); fs.symlinkSync(home, alias, "junction");
@@ -1119,7 +1119,7 @@ for (const missing of [false, true]) test(`toggle initial spawn validator retain
 
 for (const point of ["wrapper entry", "spawn revalidation"]) test(`changed canonical file before ${point} retains the original preimage`, async () => {
   const fs = await import("node:fs"), { spyOn } = await import("bun:test");
-  const atomic = await import("../../src/config/atomic-write");
+  const atomic = await import("../../backend/src/config/atomic-write");
   const original = Buffer.from("# preserve bytes\r\n[agents]\r\nmax_threads = 7\r\n");
   const a = fixtureConfig(original.toString()), canonical = fs.realpathSync.native(a), writer = atomic.atomicWriteFile;
   const replace = () => { fs.writeFileSync(a + ".replacement", "independent replacement"); fs.renameSync(a + ".replacement", a); };
@@ -1141,7 +1141,7 @@ for (const point of ["wrapper entry", "spawn revalidation"]) test(`changed canon
 });
 
 test("failed standalone toggle restores its exact preimage", async () => {
-  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../src/codex/config-write-lock");
+  const fs = await import("node:fs"), { runConfigWriteChild } = await import("../../backend/src/codex/config-write-lock");
   const original = Buffer.from([0xff, 0x0d, 0x0a, 0x00]), a = fixtureConfig(""); fs.writeFileSync(a, original);
   withConfigWriteLock(a, held => {
     expect(() => runConfigWriteChild(a, held, env => {

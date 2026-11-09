@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import * as retry from "../../../src/lib/upstream-retry";
-import { createRequestExecutionBudget } from "../../../src/lib/request-execution-budget";
+import * as retry from "../../../backend/src/lib/upstream-retry";
+import { createRequestExecutionBudget } from "../../../backend/src/lib/request-execution-budget";
 import { budgetOwner } from "../../helpers/send-budget-owner";
-import type { AdapterRequest } from "../../../src/adapters/base";
-import { fetchAntigravityWithRetry, fetchDirectGeminiWithRetry, fetchVertexWithRetry } from "../../../src/adapters/google-http";
-import { ANTIGRAVITY_VALIDATION_REQUIRED_PREFIX, safeVertexHttpErrorMessage, retryableGoogleStatus } from "../../../src/adapters/google-errors";
-import { isAntigravityValidationRefusal } from "../../../src/server/responses/antigravity-validation-refusal";
+import type { AdapterRequest } from "../../../backend/src/adapters/base";
+import { fetchAntigravityWithRetry, fetchDirectGeminiWithRetry, fetchVertexWithRetry } from "../../../backend/src/adapters/google-http";
+import { ANTIGRAVITY_VALIDATION_REQUIRED_PREFIX, safeVertexHttpErrorMessage, retryableGoogleStatus } from "../../../backend/src/adapters/google-errors";
+import { isAntigravityValidationRefusal } from "../../../backend/src/server/responses/antigravity-validation-refusal";
 
 describe("Antigravity 403 body boundary", () => {
   test("a complete structured reason inside 4096 bytes survives normalization", async () => {
@@ -497,7 +497,7 @@ describe("safeVertexHttpErrorMessage classification + redaction", () => {
 
 describe("adapter fetchResponse wiring", () => {
   test("vertex and antigravity adapters expose fetchResponse; ai-studio direct delegates to canonical server transport", async () => {
-    const { createGoogleAdapter } = await import("../../../src/adapters/google");
+    const { createGoogleAdapter } = await import("../../../backend/src/adapters/google");
     const vertex = createGoogleAdapter({ adapter: "google", baseUrl: "https://aiplatform.googleapis.com", googleMode: "vertex" } as never);
     const aistudio = createGoogleAdapter({ adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "k" } as never);
     const antigravity = createGoogleAdapter({ adapter: "google", baseUrl: "https://daily-cloudcode-pa.googleapis.com", googleMode: "cloud-code-assist" } as never);
@@ -510,7 +510,7 @@ describe("adapter fetchResponse wiring", () => {
   });
 
   test("Vertex and Antigravity formatter hooks are provider-classified and leak-negative", async () => {
-    const { createGoogleAdapter } = await import("../../../src/adapters/google");
+    const { createGoogleAdapter } = await import("../../../backend/src/adapters/google");
     const payload = vertexError(400, "INVALID_ARGUMENT", "Bearer secret-token at /Users/example/key.json");
     const vertex = createGoogleAdapter({ adapter: "google", googleMode: "vertex" } as never);
     const antigravity = createGoogleAdapter({ adapter: "google", googleMode: "cloud-code-assist" } as never);

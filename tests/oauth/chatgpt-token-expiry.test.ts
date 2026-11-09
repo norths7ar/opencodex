@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { CHATGPT_FETCH_TIMEOUT_MS, ChatGPTOAuthFlow, ChatGptTokenError, ChatGptTokenRequestError, refreshChatGPTToken } from "../../src/oauth/chatgpt";
+import { CHATGPT_FETCH_TIMEOUT_MS, ChatGPTOAuthFlow, ChatGptTokenError, ChatGptTokenRequestError, refreshChatGPTToken } from "../../backend/src/oauth/chatgpt";
 
 const originalFetch = globalThis.fetch;
 const originalSetTimeout = globalThis.setTimeout;

@@ -14,12 +14,12 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import {
   startNativeMainStartupLifecycle,
   type NativeMainStartupLifecycle,
-} from "../../src/codex/native-profile-startup";
-import { NativeProfileError, type NativeProfileKey, type NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
+} from "../../backend/src/codex/native-profile-startup";
+import { NativeProfileError, type NativeProfileKey, type NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
 
 const roots: string[] = [];
 const lifecycles: NativeMainStartupLifecycle[] = [];

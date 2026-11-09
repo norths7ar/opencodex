@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { applyPaginatedOpenaiCompat } from "../../src/codex/inject/paginated-openai-compat";
+import { applyPaginatedOpenaiCompat } from "../../backend/src/codex/inject/paginated-openai-compat";
 import {
   HISTORY_PAGINATED_OPENAI_NEEDS_ROOT_OVERRIDE,
   HISTORY_RELABEL_STANDS_DOWN,
-} from "../../src/codex/history-provider";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
-import type { CodexRoutingTarget } from "../../src/codex/inject/routing-target";
+} from "../../backend/src/codex/history-provider";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
+import type { CodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
 import { repoPath } from "../helpers/repo-root";
 
 const BASE_URL = "http://127.0.0.1:10100/v1";
@@ -86,7 +86,7 @@ describe("paginated openai compatibility (#5321)", () => {
     expect(decision.content).toBe(TABLE_CANDIDATE);
     // The regression was not the refusal, it was "do not retry" with nowhere to go. Both named
     // remedies must be real configuration keys, so they are asserted against the config type.
-    const configSource = readFileSync(repoPath("src", "types", "config.ts"), "utf8");
+    const configSource = readFileSync(repoPath("backend/src", "types", "config.ts"), "utf8");
     for (const key of ["syncResumeHistory", "unauthenticatedLoopbackListener"]) {
       expect(decision.message).toContain(key);
       expect(configSource).toContain(`${key}?:`);
@@ -110,10 +110,10 @@ describe("paginated openai compatibility (#5321)", () => {
   test("the refusal code is defined once and read from that definition", () => {
     // The pair drifted once already between apply and restore. A literal in a second file is
     // how it drifts again, so the only occurrences allowed are the constant and its consumers.
-    const provider = readFileSync(repoPath("src", "codex", "history-provider.ts"), "utf8");
+    const provider = readFileSync(repoPath("backend/src", "codex", "history-provider.ts"), "utf8");
     const occurrences = provider.split(HISTORY_PAGINATED_OPENAI_NEEDS_ROOT_OVERRIDE).length - 1;
     expect(occurrences).toBe(1);
-    expect(readFileSync(repoPath("src", "codex", "inject", "paginated-openai-compat.ts"), "utf8"))
+    expect(readFileSync(repoPath("backend/src", "codex", "inject", "paginated-openai-compat.ts"), "utf8"))
       .not.toContain(`"${HISTORY_PAGINATED_OPENAI_NEEDS_ROOT_OVERRIDE}"`);
   });
 });

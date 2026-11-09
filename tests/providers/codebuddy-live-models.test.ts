@@ -4,11 +4,11 @@ import {
   fetchCodeBuddyModels,
   parseCodeBuddyConfigRoster,
   setFetchCodeBuddyModelsForTests,
-} from "../../src/adapters/codebuddy/live-models";
-import { CODEBUDDY_CN_PROFILE, CODEBUDDY_GLOBAL_PROFILE } from "../../src/adapters/codebuddy/profiles";
-import { gatherRoutedModels, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
-import { clearModelCache, setCached } from "../../src/codex/model-cache";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/adapters/codebuddy/live-models";
+import { CODEBUDDY_CN_PROFILE, CODEBUDDY_GLOBAL_PROFILE } from "../../backend/src/adapters/codebuddy/profiles";
+import { gatherRoutedModels, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache, setCached } from "../../backend/src/codex/model-cache";
+import type { OcxConfig } from "../../backend/src/types";
 
 // Envelope captured 260923 from GET https://www.codebuddy.cn/v3/config with a valid CN key:
 // data.agents[0].models is the same 17-id roster the CLI prints for --model on a signed-in

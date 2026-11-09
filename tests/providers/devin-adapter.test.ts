@@ -2,17 +2,17 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDevinAdapter, mapDevinToolCallStartForTests, mapOcxMessagesToDevin, mapOcxToolsToDevin, resolveWireModelUidForTests } from "../../src/adapters/devin";
-import { buildGetChatMessageRequestForTests, sanitizeTextForCognitionForTests, sanitizeToolDescriptionForCognitionForTests } from "../../src/adapters/devin/cloud-direct/chat";
-import { DEVIN_MODEL_CONTEXT_WINDOWS, DEVIN_STATIC_MODELS, collapseDevinModelUid } from "../../src/adapters/devin/live-models";
-import { parseCatalogBuffer } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { DEPRECATED_OAUTH_PROVIDER_ALIASES, OAUTH_PROVIDERS, resolveRefreshPolicy } from "../../src/oauth";
-import { DEVIN_DEFAULT_API_SERVER } from "../../src/oauth/devin";
-import { saveCredential } from "../../src/oauth/store";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
+import { createDevinAdapter, mapDevinToolCallStartForTests, mapOcxMessagesToDevin, mapOcxToolsToDevin, resolveWireModelUidForTests } from "../../backend/src/adapters/devin";
+import { buildGetChatMessageRequestForTests, sanitizeTextForCognitionForTests, sanitizeToolDescriptionForCognitionForTests } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { DEVIN_MODEL_CONTEXT_WINDOWS, DEVIN_STATIC_MODELS, collapseDevinModelUid } from "../../backend/src/adapters/devin/live-models";
+import { parseCatalogBuffer } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { DEPRECATED_OAUTH_PROVIDER_ALIASES, OAUTH_PROVIDERS, resolveRefreshPolicy } from "../../backend/src/oauth";
+import { DEVIN_DEFAULT_API_SERVER } from "../../backend/src/oauth/devin";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("devin adapter", () => {

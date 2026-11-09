@@ -7,10 +7,10 @@
  * The proxy must expose one internally consistent, plaintext Responses stream.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { handleResponses } from "../../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { handleResponses } from "../../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 
 let releaseSpendHome: (() => void) | undefined;

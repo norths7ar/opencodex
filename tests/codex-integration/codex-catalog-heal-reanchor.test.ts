@@ -2,10 +2,10 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CATALOG_HEAL_MAX_PATH_READS, compareCatalogHealPaths, observeCatalogHealFile } from "../../src/codex/catalog/heal-observation";
-import { CATALOG_HEAL_RECHECK_MS, startCodexCatalogSelfHeal } from "../../src/codex/catalog-self-heal";
-import type { CatalogPublicationEvent } from "../../src/codex/catalog/publication-observer";
-import type { OcxConfig } from "../../src/types";
+import { CATALOG_HEAL_MAX_PATH_READS, compareCatalogHealPaths, observeCatalogHealFile } from "../../backend/src/codex/catalog/heal-observation";
+import { CATALOG_HEAL_RECHECK_MS, startCodexCatalogSelfHeal } from "../../backend/src/codex/catalog-self-heal";
+import type { CatalogPublicationEvent } from "../../backend/src/codex/catalog/publication-observer";
+import type { OcxConfig } from "../../backend/src/types";
 
 const roots: string[] = [];
 const fixture = () => {

@@ -8,8 +8,8 @@ import {
   NestedConfigMutationError,
   prepareConfigMutationDatabasePathForWrite,
   withConfigMutationLockSync,
-} from "../../src/config";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
+} from "../../backend/src/config";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
 import {
   MAX_MANUAL_RESET_CREDIT_OPERATION_IDS,
   MAX_RESET_CREDIT_OPERATION_ACCOUNTS,
@@ -21,12 +21,12 @@ import {
   settleManualResetCreditOperation,
   settleResetCreditOperation,
   type ManualResetCreditOperationIdentity,
-} from "../../src/codex/reset-credit-operation-ledger";
+} from "../../backend/src/codex/reset-credit-operation-ledger";
 import {
   compareCodexResetCreditRecoveryGenerationOrder,
   isCodexResetCreditOperationId,
   type CodexResetCreditRecoveryGeneration,
-} from "../../src/codex/reset-credit-recovery";
+} from "../../backend/src/codex/reset-credit-recovery";
 import { repoRoot } from "../helpers/repo-root";
 
 const GENERATION: CodexResetCreditRecoveryGeneration = {

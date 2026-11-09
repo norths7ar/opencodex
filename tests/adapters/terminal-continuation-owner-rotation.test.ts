@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { saveConfig } from "../../src/config";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { clearAnthropicAccountPoolState } from "../../src/oauth/anthropic-routing";
-import { getValidAccessSnapshotForAccount } from "../../src/oauth";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { reasoningReplayKeyCredentialIdentity, reasoningReplayOAuthCredentialIdentity } from "../../src/responses/reasoning-replay-cache";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { saveConfig } from "../../backend/src/config";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { clearAnthropicAccountPoolState } from "../../backend/src/oauth/anthropic-routing";
+import { getValidAccessSnapshotForAccount } from "../../backend/src/oauth";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { reasoningReplayKeyCredentialIdentity, reasoningReplayOAuthCredentialIdentity } from "../../backend/src/responses/reasoning-replay-cache";
 import {
   clearResponseStateForTests,
   previousResponseProviderState,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import type {
   AdapterEvent,
   OcxConfig,
   OcxParsedRequest,
   OcxProviderConfig,
-} from "../../src/types";
+} from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -74,10 +74,10 @@ function eventsForPhase(phase: string): AdapterEvent[] {
   throw new Error(`unexpected test phase: ${phase}`);
 }
 
-const actualResolver = await import("../../src/server/adapter-resolve");
+const actualResolver = await import("../../backend/src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 
-mock.module("../../src/server/adapter-resolve", () => ({
+mock.module("../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     // Match on the destination: the "anthropic" provider is wire-pinned to the anthropic adapter.
@@ -114,7 +114,7 @@ mock.module("../../src/server/adapter-resolve", () => ({
   },
 }));
 
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 
 describe("terminal continuation provider-owner rotation", () => {
   let originalFetch: typeof fetch;

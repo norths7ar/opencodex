@@ -10,13 +10,13 @@ import {
   ToolCallCompletedUpdateSchema,
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { canonicalCursorFreeformArgs } from "../../../src/adapters/cursor/freeform-args";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { canonicalCursorFreeformArgs } from "../../../backend/src/adapters/cursor/freeform-args";
 import {
   createCursorProtobufEventState,
   mapCursorProtobufServerMessage,
   mapSyntheticMcpExecToToolEvents,
-} from "../../../src/adapters/cursor/protobuf-events";
+} from "../../../backend/src/adapters/cursor/protobuf-events";
 
 // #7049: Cursor Opus code-mode `exec` calls were dropped before host execution because the
 // pre-emission gate accepted only `{input:string}`, while the shared Responses repair downstream

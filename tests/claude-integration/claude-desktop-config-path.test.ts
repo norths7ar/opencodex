@@ -3,13 +3,13 @@ import { managementFetch as fetch } from "../helpers/management-auth";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join, posix, win32 } from "node:path";
-import { startServer } from "../../src/server";
+import { startServer } from "../../backend/src/server";
 import {
   claudeDesktopConfigLibraryDir,
   resolveConfigLibraryDir,
   resolveElectronUserData,
   resolveUserDataDir,
-} from "../../src/claude/desktop-3p-paths";
+} from "../../backend/src/claude/desktop-3p-paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

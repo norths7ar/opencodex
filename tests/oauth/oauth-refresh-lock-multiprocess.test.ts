@@ -6,14 +6,14 @@ import { fileURLToPath } from "node:url";
 import {
   OAUTH_PROVIDERS,
   refreshGenericAccountWithLock,
-} from "../../src/oauth";
+} from "../../backend/src/oauth";
 import {
   OAUTH_REFRESH_LOCK_WAIT_MS,
   createOAuthRefreshIntentLock,
   getAccountCredential,
   getAccountSet,
   saveCredential,
-} from "../../src/oauth/store";
+} from "../../backend/src/oauth/store";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -142,8 +142,8 @@ describe("slow multi-process OAuth refresh lock", () => {
 describe("a pause committed while a refresh waits for its lock", () => {
   for (const provider of ["kimi", "xai"] as const) {
     test(`${provider} refresh re-reads pause under the lock and never calls the IdP`, async () => {
-      const oauth = await import("../../src/oauth");
-      const { setAccountPaused } = await import("../../src/oauth/store");
+      const oauth = await import("../../backend/src/oauth");
+      const { setAccountPaused } = await import("../../backend/src/oauth/store");
       await saveCredential(provider, { access: "stale", refresh: "rt", expires: Date.now() - 1_000, accountId: `${provider}-acct` });
       const accountId = getAccountSet(provider)!.activeAccountId;
       const stale = getAccountCredential(provider, accountId)!;

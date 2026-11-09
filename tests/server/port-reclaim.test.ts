@@ -12,13 +12,13 @@ import {
   parseIpv4LoopbackListenPidsFromNetstat,
   reclaimListenPort,
   type ReclaimListenPortOptions,
-} from "../../src/server/port-reclaim";
+} from "../../backend/src/server/port-reclaim";
 import {
   isBareIpv6Address,
   parseTcpQuadsForLocalPort,
   dropWindowsTcpRowsForLocalPort,
-} from "../../src/server/windows-tcp-drop";
-import { parseListenPidsFromNetstat } from "../../src/server/port-reclaim";
+} from "../../backend/src/server/windows-tcp-drop";
+import { parseListenPidsFromNetstat } from "../../backend/src/server/port-reclaim";
 
 /** Exercise several scans and the deadline without depending on wall-clock scheduling. */
 async function reclaimWithMockClock(options: ReclaimListenPortOptions): Promise<boolean> {

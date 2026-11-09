@@ -1,7 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { basename, join } from "node:path";
-import { keyringAssetForStandaloneTarget } from "../src/lib/keyring-native";
+import { keyringAssetForStandaloneTarget } from "../backend/src/lib/keyring-native";
 
 /** Stage the platform N-API addon outside Bun's virtual filesystem beside a standalone binary. */
 export function stageStandaloneKeyringAddon(repoRoot: string, output: string, target: string): string {

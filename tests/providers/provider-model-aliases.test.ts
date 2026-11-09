@@ -1,11 +1,11 @@
-import { clearModelCache } from "../../src/codex/model-cache";
-import { gatherRoutedModels } from "../../src/codex/catalog/provider-fetch";
-import { applyProviderConfigHints } from "../../src/codex/catalog/provider-fetch";
-import { buildCatalogEntries } from "../../src/codex/catalog/sync";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog/provider-fetch";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/provider-fetch";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog/sync";
 import { describe, expect, test } from "bun:test";
-import { effectiveModelAliases } from "../../src/providers/default-aliases";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { effectiveModelAliases } from "../../backend/src/providers/default-aliases";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(): OcxConfig {
   return {

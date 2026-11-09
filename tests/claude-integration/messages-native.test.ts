@@ -9,16 +9,16 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { clearKeyCooldowns, forgetApiKeyRotationCursor } from "../../src/providers/key-failover";
-import { estimateClaudeRequestTokens, handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import type { AdmissionLease } from "../../src/lib/admission";
+import { saveConfig } from "../../backend/src/config";
+import { clearKeyCooldowns, forgetApiKeyRotationCursor } from "../../backend/src/providers/key-failover";
+import { estimateClaudeRequestTokens, handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import type { AdmissionLease } from "../../backend/src/lib/admission";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { startTruncatedSseUpstream } from "../helpers/truncated-sse-upstream";
-import { configureSharedSpendLedger, spendPolicyFromConfig } from "../../src/lib/spend-reservation-ledger";
+import { configureSharedSpendLedger, spendPolicyFromConfig } from "../../backend/src/lib/spend-reservation-ledger";
 
 interface Seen {
   path: string;

@@ -2,18 +2,18 @@ import { expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
 import {
   PICKER_CA_COMMON_NAME,
   PICKER_HOST,
   pickerCaFingerprints,
-} from "../../src/claude/intercept/picker-ca";
+} from "../../backend/src/claude/intercept/picker-ca";
 import {
   inspectPickerTrust,
   trustPickerCa,
   untrustPickerCa,
-} from "../../src/claude/intercept/picker-trust";
+} from "../../backend/src/claude/intercept/picker-trust";
 import {
   buildWindowsTrustInspectScript,
   buildWindowsTrustInstallScript,
@@ -31,7 +31,7 @@ import {
   WINDOWS_TRUST_UNTRUST_TIMEOUT_MS,
   type WindowsTrustResult,
   type WindowsTrustRunner,
-} from "../../src/claude/intercept/picker-trust-windows";
+} from "../../backend/src/claude/intercept/picker-trust-windows";
 
 // Mutations use fake runners; the native parser case only parses scripts, never executing them.
 const SHA1 = "AB".repeat(20);

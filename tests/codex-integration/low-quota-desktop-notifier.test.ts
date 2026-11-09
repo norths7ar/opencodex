@@ -4,7 +4,7 @@ import {
   resolveLowQuotaDesktopSink,
   type LowQuotaNotice,
   type LowQuotaNotifierIo,
-} from "../../src/codex/low-quota-desktop-notifier";
+} from "../../backend/src/codex/low-quota-desktop-notifier";
 
 const NOTICE: LowQuotaNotice = { accountLabel: "pabc123", window: "weekly", percentUsed: 85, threshold: 80, resetAt: 1_800_000_000_000 };
 const always = () => true;

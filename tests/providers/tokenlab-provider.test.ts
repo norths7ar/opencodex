@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { gatherRoutedModels } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { buildModelsRequest } from "../../src/oauth";
-import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../src/oauth/key-providers";
-import { deriveInitProviders, deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
-import { extractProviderModelItems, resolveProviderModelDiscovery } from "../../src/providers/model-discovery";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { buildModelsRequest } from "../../backend/src/oauth";
+import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../backend/src/oauth/key-providers";
+import { deriveInitProviders, deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
+import { extractProviderModelItems, resolveProviderModelDiscovery } from "../../backend/src/providers/model-discovery";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 
 const originalFetch = globalThis.fetch;

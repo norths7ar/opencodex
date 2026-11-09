@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { planWebSearch, resolveSidecarBackend, shouldResolveOpenAiWebSearchSidecar } from "../../src/web-search";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { planWebSearch, resolveSidecarBackend, shouldResolveOpenAiWebSearchSidecar } from "../../backend/src/web-search";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import { redactSecrets } from "../../src/lib/redact";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { redactSecrets } from "../../backend/src/lib/redact";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const routed: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "routed-key" };
 const forward: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.test/v1", authMode: "forward" };

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
-import type { CodexInjectResult, InjectCodexOptions } from "../../src/codex/inject";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
+import type { CodexInjectResult, InjectCodexOptions } from "../../backend/src/codex/inject";
 import {
   ROUTING_HEAL_LOCK_TIMEOUT_MS,
   ROUTING_HEAL_MAX_ATTEMPTS,
@@ -12,9 +12,9 @@ import {
   startCodexRoutingHealer,
   type CodexRoutingHealGates,
   type CodexRoutingHealerDeps,
-} from "../../src/codex/routing-healer";
-import type { EndpointLiveness } from "../../src/server/proxy-liveness";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing-healer";
+import type { EndpointLiveness } from "../../backend/src/server/proxy-liveness";
+import type { OcxConfig } from "../../backend/src/types";
 
 const OWN_PORT = 10100;
 const DEAD_PORT = 10199;

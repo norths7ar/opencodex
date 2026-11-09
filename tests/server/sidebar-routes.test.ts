@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { writeVersionCache } from "../../src/update/notify";
+import { writeVersionCache } from "../../backend/src/update/notify";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { withManagementCors } from "../../src/server/auth-cors";
-import { invalidateStarStatusCache, setStarDepsForTests, type StarDeps } from "../../src/github/star-state";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { withManagementCors } from "../../backend/src/server/auth-cors";
+import { invalidateStarStatusCache, setStarDepsForTests, type StarDeps } from "../../backend/src/github/star-state";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Route-level proof for the two sidebar endpoints. The unit tests cover the state

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { cloudStreamHeadersMsForTests, CloudChatError } from "../../src/adapters/devin/cloud-direct/chat";
-import { devinErrorClassification } from "../../src/adapters/devin";
+import { cloudStreamHeadersMsForTests, CloudChatError } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { devinErrorClassification } from "../../backend/src/adapters/devin";
 import { repoPath } from "../helpers/repo-root";
 
-const CHAT_SRC = readFileSync(repoPath("src/adapters/devin/cloud-direct/chat.ts"), "utf8");
+const CHAT_SRC = readFileSync(repoPath("backend/src/adapters/devin/cloud-direct/chat.ts"), "utf8");
 
 function withEnv(value: string | undefined, run: () => void): void {
   const key = "OPENCODEX_DEVIN_TTFB_MS";

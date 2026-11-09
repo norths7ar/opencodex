@@ -14,29 +14,29 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { observeCodexLowQuota } from "../../src/codex/low-quota-observer";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { startServer, type StartServerDeps } from "../../src/server";
-import { registerStateSweepAfterTick } from "../../src/lib/state-store-sweeper";
-import { getActiveMemoryWatchdog } from "../../src/server/memory-watchdog";
-import { acquireServerBackgroundLifecycle } from "../../src/server/background-lifecycle";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { observeCodexLowQuota } from "../../backend/src/codex/low-quota-observer";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { startServer, type StartServerDeps } from "../../backend/src/server";
+import { registerStateSweepAfterTick } from "../../backend/src/lib/state-store-sweeper";
+import { getActiveMemoryWatchdog } from "../../backend/src/server/memory-watchdog";
+import { acquireServerBackgroundLifecycle } from "../../backend/src/server/background-lifecycle";
 import {
   getStorageCleanupPolicyJobState,
   requestStorageCleanupPolicyRun,
   resetStorageCleanupPolicyJobForTestsAsync,
   setStorageCleanupPolicyJobTestHooks,
-} from "../../src/storage/policy-job";
+} from "../../backend/src/storage/policy-job";
 import {
   normalizeStorageCleanupPolicy,
   writeStorageCleanupPolicyToConfig,
-} from "../../src/storage/policy";
-import { stopStorageCleanupScheduler } from "../../src/storage/policy-scheduler";
+} from "../../backend/src/storage/policy";
+import { stopStorageCleanupScheduler } from "../../backend/src/storage/policy-scheduler";
 import {
   drainStorageWorkers,
   liveStorageWorkerCount,
-} from "../../src/storage/worker-lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/storage/worker-lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { managementFetch } from "../helpers/management-auth";
 import {

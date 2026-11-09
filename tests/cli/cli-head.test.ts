@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { parseCliHead, runCli } from "../../src/cli/root";
-import * as autorestore from "../../src/cli/codex-shim-autorestore";
-import { DEFAULT_READY_WAIT_TIMEOUT_SECONDS } from "../../src/cli/ready";
+import { parseCliHead, runCli } from "../../backend/src/cli/root";
+import * as autorestore from "../../backend/src/cli/codex-shim-autorestore";
+import { DEFAULT_READY_WAIT_TIMEOUT_SECONDS } from "../../backend/src/cli/ready";
 
 describe("parseCliHead (pure CLI head, Phase 1)", () => {
   test("codex owns all forwarded help arguments; ocx help codex stays local", () => {

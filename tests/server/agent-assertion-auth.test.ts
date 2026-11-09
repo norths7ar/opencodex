@@ -1,22 +1,22 @@
 import { describe, expect, test } from "bun:test";
-import { buildResponsesTransport, FORWARD_HEADERS } from "../../src/adapters/openai-responses/transport";
+import { buildResponsesTransport, FORWARD_HEADERS } from "../../backend/src/adapters/openai-responses/transport";
 import {
   headersForCodexAuthContext,
   materializeCodexUpstreamAuth,
   materializeCodexUpstreamAuthAsync,
   type CodexAuthContext,
-} from "../../src/codex/auth-context";
-import { providerForwardClientHeadersConfigError } from "../../src/lib/provider-client-headers";
-import { AGENT_ASSERTION_HEADER, AgentAssertionUnsupportedError } from "../../src/lib/authorization-scheme";
+} from "../../backend/src/codex/auth-context";
+import { providerForwardClientHeadersConfigError } from "../../backend/src/lib/provider-client-headers";
+import { AGENT_ASSERTION_HEADER, AgentAssertionUnsupportedError } from "../../backend/src/lib/authorization-scheme";
 import {
   hasForwardableCodexBearer,
   resolveApiAuth,
   resolveContextPrincipal,
   resolveResponsesApiAuth,
   validateForwardAdmissionCredential,
-} from "../../src/server/auth-cors";
-import { selectForwardHeaders } from "../../src/server/ws-bridge";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/auth-cors";
+import { selectForwardHeaders } from "../../backend/src/server/ws-bridge";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 
 /**

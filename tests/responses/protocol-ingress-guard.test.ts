@@ -5,10 +5,10 @@
  * legacy default forwards the same request and only reports the loss in the trace.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let upstream: ReturnType<typeof Bun.serve> | undefined;

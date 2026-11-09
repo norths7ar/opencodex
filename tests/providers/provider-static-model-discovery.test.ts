@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { createMimoFreeAdapter, MIMO_CHAT_URL } from "../../src/adapters/mimo-free";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
+import { createMimoFreeAdapter, MIMO_CHAT_URL } from "../../backend/src/adapters/mimo-free";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
 import {
   providerMatchesRegistryTransportWithStaticGuards,
   providerSupportsLiveModelDiscovery,
   registryEntrySupportsLiveModelDiscovery,
-} from "../../src/providers/static-model-discovery";
-import { routedProviderConfig } from "../../src/router";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/static-model-discovery";
+import { routedProviderConfig } from "../../backend/src/router";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 function provider(overrides: Partial<OcxProviderConfig>): OcxProviderConfig {
   return {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { coerceIntegerToolArguments } from "../../src/lib/tool-argument-integers";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { coerceIntegerToolArguments } from "../../backend/src/lib/tool-argument-integers";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 const schema = { type: "object", properties: { count: { type: "integer" }, label: { type: "string" } } };
 
 describe("tool argument numeric preservation", () => {

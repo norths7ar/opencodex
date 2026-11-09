@@ -9,8 +9,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { localProvidersActive, providerListBaseUrl } from "../../src/cli/provider";
-import { serviceApiTokenFingerprint } from "../../src/lib/service-secrets";
+import { localProvidersActive, providerListBaseUrl } from "../../backend/src/cli/provider";
+import { serviceApiTokenFingerprint } from "../../backend/src/lib/service-secrets";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -77,12 +77,12 @@ function runList(flag: "--json" | "--jsonl") {
   const preload = join(root, "no-proxy.ts");
   writeFileSync(preload, `
     import { mock } from "bun:test";
-    const path = ${JSON.stringify(repoPath("src/server/proxy-liveness.ts"))};
+    const path = ${JSON.stringify(repoPath("backend/src/server/proxy-liveness.ts"))};
     const original = await import(path);
     mock.module(path, () => ({ ...original, findLiveProxy: async () => null }));
     globalThis.fetch = () => { throw new Error("fixture network forbidden"); };
   `);
-  return spawnSync(process.execPath, ["--preload", preload, repoPath("src/cli/index.ts"), "provider", "list", flag], {
+  return spawnSync(process.execPath, ["--preload", preload, repoPath("backend/src/cli/index.ts"), "provider", "list", flag], {
     cwd: repoPath(),
     env: {
       ...process.env,

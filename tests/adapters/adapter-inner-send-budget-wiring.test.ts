@@ -2,21 +2,21 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createCursorAdapter } from "../../src/adapters/cursor";
+import { createCursorAdapter } from "../../backend/src/adapters/cursor";
 import {
   clearCursorOverflowRemintForTests,
   clearCursorThreadContinuityForTests,
-} from "../../src/adapters/cursor/thread-continuity";
-import type { CursorTransport } from "../../src/adapters/cursor/transport";
-import { createKiroAdapter } from "../../src/adapters/kiro";
-import { createDevinAdapter, DEVIN_API_SERVER } from "../../src/adapters/devin";
-import { setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { resetKiroThrottleStateForTests } from "../../src/adapters/kiro-retry";
-import type { AdapterFetchContext } from "../../src/adapters/base";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { encodeMessage } from "../../src/lib/eventstream-decoder";
-import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../src/lib/request-execution-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/cursor/thread-continuity";
+import type { CursorTransport } from "../../backend/src/adapters/cursor/transport";
+import { createKiroAdapter } from "../../backend/src/adapters/kiro";
+import { createDevinAdapter, DEVIN_API_SERVER } from "../../backend/src/adapters/devin";
+import { setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { resetKiroThrottleStateForTests } from "../../backend/src/adapters/kiro-retry";
+import type { AdapterFetchContext } from "../../backend/src/adapters/base";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { encodeMessage } from "../../backend/src/lib/eventstream-decoder";
+import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../backend/src/lib/request-execution-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

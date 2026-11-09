@@ -3,15 +3,15 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { getConfigPath, loadConfig, saveConfig, saveConfigPreservingClaudeCode, armClaudeCodeBaseline,
-  providerModelCostsConfigError, validateConfigCandidate } from "../../src/config";
-import { sanitizeModelCostsForDisplay } from "../../src/config/schema/leaf-validators";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
-import { withModelCostRowReplacement } from "../../src/config/live-reconcile";
-import { handleModelRoutes } from "../../src/server/management/model-routes";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { activeUserCostOverlays, refreshUserCostOverlays, userCostOverlayVersion } from "../../src/usage/user-cost-overlays";
-import { reconcileUserCostOverlaysFromDisk, resetUserCostOverlayReconcilerForTests, startUserCostOverlayReconciler } from "../../src/usage/user-cost-overlay-reconciler";
-import type { OcxConfig, PromptLengthPricing } from "../../src/types";
+  providerModelCostsConfigError, validateConfigCandidate } from "../../backend/src/config";
+import { sanitizeModelCostsForDisplay } from "../../backend/src/config/schema/leaf-validators";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
+import { withModelCostRowReplacement } from "../../backend/src/config/live-reconcile";
+import { handleModelRoutes } from "../../backend/src/server/management/model-routes";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { activeUserCostOverlays, refreshUserCostOverlays, userCostOverlayVersion } from "../../backend/src/usage/user-cost-overlays";
+import { reconcileUserCostOverlaysFromDisk, resetUserCostOverlayReconcilerForTests, startUserCostOverlayReconciler } from "../../backend/src/usage/user-cost-overlay-reconciler";
+import type { OcxConfig, PromptLengthPricing } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const BASE = { input: 1, output: 2, cacheRead: 0.1, cacheWrite: 0 };

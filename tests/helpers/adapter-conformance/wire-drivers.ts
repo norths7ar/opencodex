@@ -1,23 +1,23 @@
 import { create, fromBinary } from "@bufbuild/protobuf";
-import type { ProviderAdapter } from "../../../src/adapters/base";
-import type { AdapterWire } from "../../../src/adapters/registry";
-import { decodeCursorArgsMap } from "../../../src/adapters/cursor/arg-codec";
+import type { ProviderAdapter } from "../../../backend/src/adapters/base";
+import type { AdapterWire } from "../../../backend/src/adapters/registry";
+import { decodeCursorArgsMap } from "../../../backend/src/adapters/cursor/arg-codec";
 import {
   AgentClientMessageSchema,
   ConversationStepSchema,
   ConversationTurnStructureSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   handleCursorNativeKv,
   releaseCursorBlobRequestScope,
   type CursorBlobRequestScopeToken,
-} from "../../../src/adapters/cursor/native-exec";
-import { prepareCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import type { OcxParsedRequest } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/native-exec";
+import { prepareCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../translator-budget";
 
 export interface ToolWireDriver {

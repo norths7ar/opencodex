@@ -8,7 +8,7 @@ import {
   isUsageDebugEnabled,
   resetDebugSettingsForTests,
   setDebugSettings,
-} from "../../src/lib/debug-settings";
+} from "../../backend/src/lib/debug-settings";
 
 describe("debug settings", () => {
   const prevFrames = process.env.OCX_DEBUG_FRAMES;

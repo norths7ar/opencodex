@@ -2,11 +2,11 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { findCrossHomeOwnerDetailed, markCrossHomeSibling } from "../../src/cli/cross-home-owner";
-import { loopbackFamilyAvailability, type LoopbackFamilyAvailability } from "../../src/cli/loopback-family";
-import { resetSiblingStartForTests, siblingOfLivePort } from "../../src/codex/sibling-start";
+import { findCrossHomeOwnerDetailed, markCrossHomeSibling } from "../../backend/src/cli/cross-home-owner";
+import { loopbackFamilyAvailability, type LoopbackFamilyAvailability } from "../../backend/src/cli/loopback-family";
+import { resetSiblingStartForTests, siblingOfLivePort } from "../../backend/src/codex/sibling-start";
 import { LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER,
-  createLocalAttestationProof } from "../../src/lib/local-management-attestation";
+  createLocalAttestationProof } from "../../backend/src/lib/local-management-attestation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const envKeys = ["OPENCODEX_HOME", "CODEX_HOME", "GROK_HOME", "OCX_OWNER_REGISTRY_DIR"] as const;

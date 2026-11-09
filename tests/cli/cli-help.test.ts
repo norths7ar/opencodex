@@ -5,13 +5,13 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Database } from "bun:sqlite";
-import { EXPORT_CLIENT_IDS } from "../../src/clients/config-export";
+import { EXPORT_CLIENT_IDS } from "../../backend/src/clients/config-export";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
-const binPath = join(repoRoot, "bin", "ocx.mjs");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
+const binPath = join(repoRoot, "backend/bin", "ocx.mjs");
 
 // Every case below spawns the real CLI. A hung child without a spawnSync timeout can
 // pin the whole shard for the full 15-minute CI budget (observed on Linux test 3/4

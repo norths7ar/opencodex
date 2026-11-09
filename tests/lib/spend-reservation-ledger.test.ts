@@ -4,7 +4,7 @@ import {
   parseSpendJournalRecord,
   type SpendJournal,
   type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 
 /** In-memory journal: same replay and compaction contract as the file store, without disk. */
 const memoryJournal = (): SpendJournal & { lines: string[] } => {

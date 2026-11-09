@@ -3,7 +3,7 @@ import {
   CURSOR_KNOWN_UNCALLABLE_MODEL_IDS,
   CURSOR_STATIC_MODELS,
   filterCursorConfiguredModelsByLiveDiscovery,
-} from "../../../src/adapters/cursor/discovery";
+} from "../../../backend/src/adapters/cursor/discovery";
 
 describe("cursor uncallable-model quarantine (devlog 260826 060)", () => {
   // Umbrella merge (devlog 260828): the base row RETURNED to the seed because
@@ -18,7 +18,7 @@ describe("cursor uncallable-model quarantine (devlog 260826 060)", () => {
   });
 
   test("the quarantined REGULAR variant is never sent for the bare slug (resolver-level quarantine)", async () => {
-    const { resolveCursorSelection, CURSOR_CAPABILITIES } = await import("../../../src/adapters/cursor/catalog");
+    const { resolveCursorSelection, CURSOR_CAPABILITIES } = await import("../../../backend/src/adapters/cursor/catalog");
     expect(CURSOR_CAPABILITIES["claude-opus-5"]!.variants.regular?.quarantined).toBe(true);
     // The bare slug routes the healthy thinking family, never claude-opus-5-<effort>.
     expect(resolveCursorSelection("claude-opus-5", "high").wireId).toBe("claude-opus-5-thinking-high");

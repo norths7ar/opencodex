@@ -2,11 +2,11 @@ import { describe, expect, spyOn, test } from "bun:test";
 import { ManagementRequest as Request } from "./management-auth";
 import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import type { OcxConfig } from "../../src/types";
-import * as destinationPolicy from "../../src/lib/destination-policy";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
 import { catalogConvergenceFactory } from "./catalog-convergence";
 
 export function config(hostname?: string): OcxConfig {

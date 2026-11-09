@@ -2,7 +2,7 @@ import { expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { IntegrationIO } from "../../src/integrations/config-io";
+import type { IntegrationIO } from "../../backend/src/integrations/config-io";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Capture real delegates before spying. Only fixture inode values are controlled;
@@ -61,7 +61,7 @@ test("Aside preserves high file identities without admitting shared targets or d
 
     // Load after spies so the regression also covers the native named-import seam.
     const { assertAsideProfileBoundary, guardAsideProfileIO, listAsideProfiles } =
-      await import("../../src/clients/aside-profiles");
+      await import("../../backend/src/clients/aside-profiles");
     const [selected, peer] = listAsideProfiles({}, home);
     if (!selected || !peer) throw new Error("fixture requires two profiles");
     const profiles = [selected, peer];

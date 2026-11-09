@@ -14,9 +14,9 @@ if (mode === "--generate-base") {
   if (git("rev-parse", SSE_BASE).trim() !== SSE_BASE) throw new Error("Wrong base commit");
   const existing = new Set(git("ls-tree", "-r", "--name-only", SSE_BASE, "--", "src").trim().split("\n"));
   const paths = new Set([
-    "src/server/messages-native.ts", "src/server/messages-native-tool-guard.ts", "src/server/messages-shared.ts",
-    "src/server/claude-messages.ts", "src/server/sse-payload-rewrite.ts", "src/lib/messages-error-body.ts",
-    "src/claude/outbound.ts", "src/lib/client-error-body.ts",
+    "backend/src/server/messages-native.ts", "backend/src/server/messages-native-tool-guard.ts", "backend/src/server/messages-shared.ts",
+    "backend/src/server/claude-messages.ts", "backend/src/server/sse-payload-rewrite.ts", "backend/src/lib/messages-error-body.ts",
+    "backend/src/claude/outbound.ts", "backend/src/lib/client-error-body.ts",
     ...git("diff", "--name-only", SSE_BASE, "--", "src").trim().split("\n").filter(path => existing.has(path)),
   ]);
   // Exact git-show bytes are overlaid at the original module identities, before imports.

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types/config";
-import { providerObservationAccountKeyForTests } from "../../src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types/config";
+import { providerObservationAccountKeyForTests } from "../../backend/src/providers/quota";
 
 describe("provider observation account key", () => {
   function configWithKey(apiKey: string): OcxConfig {

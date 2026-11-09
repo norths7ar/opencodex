@@ -3,10 +3,10 @@ import {
   createGrokUpstreamEnvelopeEchoBlockRewrite,
   responsesRequestMayReplayToolOutput,
   stripGrokUpstreamEnvelopeEchoFromResponsesJson,
-} from "../../src/server/grok-upstream-envelope-echo";
+} from "../../backend/src/server/grok-upstream-envelope-echo";
 import { repoPath } from "../helpers/repo-root";
-import { relaySseWithBlockRewrite } from "../../src/server/sse-payload-rewrite";
-import { ToolEnvelopeEchoFilter, stripToolEnvelopeEcho } from "../../src/lib/tool-envelope-echo-filter";
+import { relaySseWithBlockRewrite } from "../../backend/src/server/sse-payload-rewrite";
+import { ToolEnvelopeEchoFilter, stripToolEnvelopeEcho } from "../../backend/src/lib/tool-envelope-echo-filter";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const frame = (type: string, fields: Record<string, unknown>): string =>
@@ -161,7 +161,7 @@ describe("xAI echo filter arming", () => {
   });
 
   test("native passthrough delivery gates the filter on the request, not the host alone", async () => {
-    const source = await Bun.file(repoPath("src/server/responses/passthrough-delivery.ts")).text();
+    const source = await Bun.file(repoPath("backend/src/server/responses/passthrough-delivery.ts")).text();
     expect(source).toContain("isXaiResponsesDestination(route.provider)\n      && responsesRequestMayReplayToolOutput(parsed._rawBody)");
   });
 });

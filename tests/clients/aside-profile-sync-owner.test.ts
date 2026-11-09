@@ -5,11 +5,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { pathToFileURL } from "node:url";
-import type { OwnedIntegrationRefreshOutcome } from "../../src/integrations/owned-refresh";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
-import type { OcxConfig } from "../../src/types";
+import type { OwnedIntegrationRefreshOutcome } from "../../backend/src/integrations/owned-refresh";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -49,8 +49,8 @@ interface ChildMessage {
 
 /** An actual CLI module in a second process, with its own already-loaded config. */
 function startCli() {
-  const helperUrl = pathToFileURL(repoPath("src", "cli", "aside-profiles.ts")).href;
-  const configUrl = pathToFileURL(repoPath("src", "config.ts")).href;
+  const helperUrl = pathToFileURL(repoPath("backend/src", "cli", "aside-profiles.ts")).href;
+  const configUrl = pathToFileURL(repoPath("backend/src", "config.ts")).href;
   const source = `
     import { once } from "node:events";
     import { createInterface } from "node:readline";

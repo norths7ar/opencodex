@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { projectStaleContextWindows, STALE_CONTEXT_WINDOWS } from "../../src/providers/stale-context-window-migration";
-import type { OcxConfig } from "../../src/types";
+import { projectStaleContextWindows, STALE_CONTEXT_WINDOWS } from "../../backend/src/providers/stale-context-window-migration";
+import type { OcxConfig } from "../../backend/src/types";
 
 function devinConfig(windows: Record<string, number>, adapter = "devin"): OcxConfig {
   return {

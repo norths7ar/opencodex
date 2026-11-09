@@ -10,7 +10,7 @@ import { join, sep } from "node:path";
 import {
   MANAGED_SUBAGENT_DEFAULT_MARKER,
   transformManagedSubagentDefaults,
-} from "../../src/codex/subagent-defaults";
+} from "../../backend/src/codex/subagent-defaults";
 import { repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";

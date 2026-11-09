@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { chmodSync, existsSync, lstatSync, mkdirSync, readlinkSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { findPathBun, type PathBunIo } from "../../src/lib/bun-path-runtime.mjs";
+import { findPathBun, type PathBunIo } from "../../backend/src/lib/bun-path-runtime.mjs";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { TRUSTED_FIXTURE_DIR_ENV, fixtureBaseCandidates, trustedFixtureRoot, untrustedFixtureAncestor } from "../helpers/trusted-fixture-root";
 

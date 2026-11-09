@@ -3,16 +3,16 @@ import { existsSync, readFileSync, writeFileSync, openSync, closeSync } from "no
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { ptr } from "bun:ffi";
-import { applyCodexCliUpdate, type CodexCliApplyResult } from "../../src/codex/cli-update-apply";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
-import { createCodexCliWorkerLifetime, type CodexCliUpdateWorkerRunMessage } from "../../src/codex/cli-update-worker";
-import { createWorkerCommitWindow, codexCliUpdateIsCancelled } from "../../src/codex/cli-update-selection-gate";
-import { openWindowsCliApplyAuthority } from "../../src/codex/cli-update-job-store-windows";
+import { applyCodexCliUpdate, type CodexCliApplyResult } from "../../backend/src/codex/cli-update-apply";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
+import { createCodexCliWorkerLifetime, type CodexCliUpdateWorkerRunMessage } from "../../backend/src/codex/cli-update-worker";
+import { createWorkerCommitWindow, codexCliUpdateIsCancelled } from "../../backend/src/codex/cli-update-selection-gate";
+import { openWindowsCliApplyAuthority } from "../../backend/src/codex/cli-update-job-store-windows";
 import { verifyActualApplyRetentionRoot } from "./windows-cli-apply-retention-root";
-import { holdWindowsCodexCliPlanToolchain } from "../../src/codex/cli-windows-plan-provenance";
-import { WindowsChildNative, WIN64_CHILD_ABI } from "../../src/codex/windows-cli-child-native";
-import { startWindowsCliChildWithNative, type WindowsCliChild, type WindowsCliChildResult } from "../../src/codex/windows-cli-child";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
+import { holdWindowsCodexCliPlanToolchain } from "../../backend/src/codex/cli-windows-plan-provenance";
+import { WindowsChildNative, WIN64_CHILD_ABI } from "../../backend/src/codex/windows-cli-child-native";
+import { startWindowsCliChildWithNative, type WindowsCliChild, type WindowsCliChildResult } from "../../backend/src/codex/windows-cli-child";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
 import { fixturePath } from "./repo-root";
 import { prepareRetentionFixture } from "./windows-cli-apply-retention-fixture";
 

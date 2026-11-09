@@ -15,9 +15,9 @@ import {
   isRootWebSearchLine,
   ROOT_WEB_SEARCH_DISABLED_LINE,
   stripInjectedRootWebSearch,
-} from "../../src/codex/inject/config-toml";
-import { stripOpencodexConfig } from "../../src/codex/inject/remove";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+} from "../../backend/src/codex/inject/config-toml";
+import { stripOpencodexConfig } from "../../backend/src/codex/inject/remove";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";

@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import { resolveMatchedPrice } from "../../src/usage/cost";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import { resolveMatchedPrice } from "../../backend/src/usage/cost";
 import {
   activeUserCostOverlays,
   refreshUserCostOverlays,
   resetPreservedDiskOnlyProvidersForTests,
   userCostOverlayVersion,
   withPreservedDiskOnlyProviders,
-} from "../../src/usage/user-cost-overlays";
+} from "../../backend/src/usage/user-cost-overlays";
 import {
   reconcileUserCostOverlaysFromDisk,
   resetUserCostOverlayReconcilerForTests,
   startUserCostOverlayReconciler,
   stopUserCostOverlayReconciler,
   userCostOverlayInvalidReconcileCountForTests,
-} from "../../src/usage/user-cost-overlay-reconciler";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/usage/user-cost-overlay-reconciler";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 

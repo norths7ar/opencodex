@@ -1,15 +1,15 @@
 /** Real Responses recovery with colliding account IDs and an instance-owned send ledger. */
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
-import type { HandleResponsesOptions } from "../../../src/server/responses/core-options";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
+import type { HandleResponsesOptions } from "../../../backend/src/server/responses/core-options";
 import { createAnthropicInstanceFixture, instanceFixtureCredential, instanceFixtureUuid, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
 
 const instances = ["anthropic", "anthropic2"] as const;
-let store: typeof import("../../../src/oauth/store");
-let routing: typeof import("../../../src/oauth/anthropic-routing");
-let resolver: typeof import("../../../src/server/adapter-resolve");
-let handleResponses: typeof import("../../../src/server/responses").handleResponses;
+let store: typeof import("../../../backend/src/oauth/store");
+let routing: typeof import("../../../backend/src/oauth/anthropic-routing");
+let resolver: typeof import("../../../backend/src/server/adapter-resolve");
+let handleResponses: typeof import("../../../backend/src/server/responses").handleResponses;
 let fixture: AnthropicInstanceFixture;
 let releaseSpend: (() => void) | undefined;
 let ids: Record<AnthropicInstanceId, string[]>;
@@ -45,8 +45,8 @@ beforeEach(async () => {
   fixture.quota.resetProviderQuotaReconcileStateForTests();
   await fixture.seed();
   ({ store, routing, config } = fixture);
-  resolver = await import("../../../src/server/adapter-resolve");
-  ({ handleResponses } = await import("../../../src/server/responses"));
+  resolver = await import("../../../backend/src/server/adapter-resolve");
+  ({ handleResponses } = await import("../../../backend/src/server/responses"));
   const { acquireOwnedSpendHome } = await import("../../helpers/owned-spend-home");
   releaseSpend = acquireOwnedSpendHome();
   ids = { anthropic: [...fixture.ids], anthropic2: [...fixture.ids] };
@@ -73,7 +73,7 @@ afterEach(async () => {
   try {
     fixture.ledger.assertNoCrossSend();
     releaseSpend?.(); releaseSpend = undefined;
-    const { clearResponseStateForTests } = await import("../../../src/responses/state");
+    const { clearResponseStateForTests } = await import("../../../backend/src/responses/state");
     clearResponseStateForTests();
   } finally {
     try { await fixture.dispose(); }
@@ -190,7 +190,7 @@ test("unmarked canonical B OAuth fails closed even with orphan B credentials and
   delete config.providers.anthropic2!.anthropicOAuthInstance;
   delete config.providers.anthropic2!.anthropicAccountPool;
   fixture.publishConfig();
-  const oauth = await import("../../../src/oauth");
+  const oauth = await import("../../../backend/src/oauth");
   const generic = spyOn(oauth, "getValidAccessTokenSnapshot");
   try {
     const response = await post("anthropic2"); await response.text();
@@ -247,7 +247,7 @@ for (const instance of instances) {
   });
 
   test(`${instance}: exhausted recovery budget retains the original account refusal without another physical send`, async () => {
-    const { createRequestExecutionBudget } = await import("../../../src/lib/request-execution-budget");
+    const { createRequestExecutionBudget } = await import("../../../backend/src/lib/request-execution-budget");
     // The existing reset-only initial leg is not charged to this shared ledger. This fixture
     // therefore grants zero RECOVERY sends, as the fast-downgrade refusal fixture does.
     const sendBudget = createRequestExecutionBudget({ maxTotalModelSends: 0, baseSendAllowance: 0, finalRecoveryAllowance: 0,
@@ -321,12 +321,12 @@ for (const surface of ["responses", "chat"] as const) {
       expect(config.defaultProvider).toBe("anthropic");
       expect(store.getAccountSet("anthropic")!.accounts).toHaveLength(2);
       expect(store.getAccountSet("anthropic2")!.accounts).toHaveLength(2);
-      const oauth = await import("../../../src/oauth");
+      const oauth = await import("../../../backend/src/oauth");
       const activeResolver = spyOn(oauth, "getValidAccessTokenSnapshot");
       const accountResolver = spyOn(oauth, "getValidAccessSnapshotForAccount");
       try {
         const response = surface === "responses" ? await post("anthropic2", {}, { model: selector })
-          : await (await import("../../../src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
+          : await (await import("../../../backend/src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
             method: "POST", headers: { "content-type": "application/json" },
             body: JSON.stringify({ model: selector, messages: [{ role: "user", content: "Answer briefly" }], stream: false }),
           }), config, { model: "", provider: "" });
@@ -349,13 +349,13 @@ for (const selector of ["claude-sonnet-4-6", "vendor/model-with-slash"] as const
 
 for (const instance of instances) {
   test(`${instance}: search loop does not offer account-403 recovery after routed output`, async () => {
-    const { runWithWebSearch } = await import("../../../src/web-search/loop");
-    const { parseRequest } = await import("../../../src/responses/parser");
-    const { createTranslatorBudget } = await import("../../../src/lib/translator-budget");
+    const { runWithWebSearch } = await import("../../../backend/src/web-search/loop");
+    const { parseRequest } = await import("../../../backend/src/responses/parser");
+    const { createTranslatorBudget } = await import("../../../backend/src/lib/translator-budget");
     const translatorBudget = createTranslatorBudget();
     globalThis.fetch = (async () => Response.json({ results: [{ title: "Fixture", url: "https://example.test/result", content: "Synthetic result" }] })) as typeof fetch;
     let routedSends = 0; let rotations = 0;
-    const adapter: import("../../../src/adapters/base").ProviderAdapter = {
+    const adapter: import("../../../backend/src/adapters/base").ProviderAdapter = {
       name: "mock-anthropic-output",
       buildRequest: () => ({ url: "https://routed.example.test/messages", method: "POST", headers: {}, body: "{}" }),
       fetchResponse: async () => ++routedSends === 1 ? new Response("ok") : refusal(403),
@@ -382,14 +382,14 @@ for (const instance of instances) {
 
 /** The management removal boundary reconciles every account-qualified bucket before re-add. */
 let syntheticReconcileGeneration = 0;
-async function reconcileLiveAccounts(): Promise<import("../../../src/lib/state-store-sweeper").GenerationContext> {
-  const cache = await import("../../../src/providers/quota/account-cache");
-  const recovery = await import("../../../src/providers/quota/anthropic-cooldown-recovery");
-  const sweeper = await import("../../../src/lib/state-store-sweeper");
+async function reconcileLiveAccounts(): Promise<import("../../../backend/src/lib/state-store-sweeper").GenerationContext> {
+  const cache = await import("../../../backend/src/providers/quota/account-cache");
+  const recovery = await import("../../../backend/src/providers/quota/anthropic-cooldown-recovery");
+  const sweeper = await import("../../../backend/src/lib/state-store-sweeper");
   // Direct hook calls do not publish a lifecycle generation. Advance this fixture's own
   // epoch on EVERY reconciliation, including re-add, instead of presenting the same epoch twice.
   syntheticReconcileGeneration = Math.max(syntheticReconcileGeneration, sweeper.captureConfigGeneration()) + 1;
-  const context: import("../../../src/lib/state-store-sweeper").GenerationContext = {
+  const context: import("../../../backend/src/lib/state-store-sweeper").GenerationContext = {
     generation: syntheticReconcileGeneration, providerNames: new Set(instances),
     oauthAccountKeys: new Set(instances.flatMap(instance => store.getAccountSet(instance)!.accounts.map(row => cache.accountCacheKey(instance, row.id)))), codexAccountIds: new Set(), configRoots: new Set(),
   };
@@ -402,8 +402,8 @@ async function reconcileLiveAccounts(): Promise<import("../../../src/lib/state-s
 }
 
 async function expectLiveQuotaWriterAdmission(instance: AnthropicInstanceId, id: string): Promise<void> {
-  const cache = await import("../../../src/providers/quota/account-cache");
-  const sweeper = await import("../../../src/lib/state-store-sweeper");
+  const cache = await import("../../../backend/src/providers/quota/account-cache");
+  const sweeper = await import("../../../backend/src/lib/state-store-sweeper");
   // Real sends still capture the lifecycle's numeric writer generation. A restored live key
   // admits that writer through the production live-key exception, even below the fixture epoch.
   expect(cache.mayCommitAccountQuotaKey(cache.accountCacheKey(instance, id), sweeper.captureConfigGeneration())).toBe(true);
@@ -413,7 +413,7 @@ for (const instance of instances) {
   for (const previouslyReserved of [false, true]) {
     for (const status of [200, 403, 429] as const) {
       test(`${instance}: ${status} from identical credential ABA is retired (prior reservation=${previouslyReserved})`, async () => {
-        const recovery = await import("../../../src/providers/quota/anthropic-cooldown-recovery");
+        const recovery = await import("../../../backend/src/providers/quota/anthropic-cooldown-recovery");
         const ownRecovery = recovery.anthropicCooldownRecoveryFor(instance);
         const otherRecovery = recovery.anthropicCooldownRecoveryFor(other);
         const model = "claude-fable-5";
@@ -520,12 +520,12 @@ for (const surface of ["responses", "chat"] as const) {
       fixture.publishConfig();
       expect(store.getAccountSet("anthropic")!.accounts).toHaveLength(2);
       expect(store.getAccountSet("anthropic2")!.accounts).toHaveLength(2);
-      const oauth = await import("../../../src/oauth");
+      const oauth = await import("../../../backend/src/oauth");
       const activeResolver = spyOn(oauth, "getValidAccessTokenSnapshot");
       const accountResolver = spyOn(oauth, "getValidAccessSnapshotForAccount");
       const sendSelector = async (selector: string) => surface === "responses"
         ? post("anthropic2", {}, { model: selector })
-        : (await import("../../../src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
+        : (await import("../../../backend/src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
           method: "POST", headers: { "content-type": "application/json" },
           body: JSON.stringify({ model: selector, messages: [{ role: "user", content: "Answer briefly" }], stream: false }),
         }), config, { model: "", provider: "" });
@@ -569,9 +569,9 @@ for (const unavailable of ["absent-row", "unmarked-oauth", "unmarked-chat-oauth"
     fixture.publishConfig();
     expect(store.getAccountSet("anthropic")!.accounts).toHaveLength(2);
     expect(store.getAccountSet("anthropic2")!.accounts).toHaveLength(2);
-    const { handleChatCompletions } = await import("../../../src/server/chat-completions");
-    const { routeModel, routeConcreteModel } = await import("../../../src/router");
-    const oauth = await import("../../../src/oauth");
+    const { handleChatCompletions } = await import("../../../backend/src/server/chat-completions");
+    const { routeModel, routeConcreteModel } = await import("../../../backend/src/router");
+    const oauth = await import("../../../backend/src/oauth");
     const activeResolver = spyOn(oauth, "getValidAccessTokenSnapshot");
     const accountResolver = spyOn(oauth, "getValidAccessSnapshotForAccount");
     const send = (model: string) => handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
@@ -593,7 +593,7 @@ for (const unavailable of ["absent-row", "unmarked-oauth", "unmarked-chat-oauth"
       expect(activeResolver).not.toHaveBeenCalled(); expect(accountResolver).not.toHaveBeenCalled();
       // The same gateway and request shape must actually enter native Chat for an unrelated
       // slash-containing model. This prevents a bridge-only fixture from hiding the bypass.
-      const { nativeChatDeclineReason } = await import("../../../src/server/chat-native-eligibility");
+      const { nativeChatDeclineReason } = await import("../../../backend/src/server/chat-native-eligibility");
       const controlModel = "vendor/ordinary-slash-model";
       const controlBody = { model: controlModel, messages: [{ role: "user", content: "Answer briefly" }], stream: false };
       expect(nativeChatDeclineReason(routeModel(config, controlModel), controlBody, config)).toBeUndefined();

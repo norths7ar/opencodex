@@ -1,12 +1,12 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import * as directHttp from "../../src/server/direct-local-http";
-import { opencodeCatalogToken } from "../../src/lib/admin-secrets";
+import * as directHttp from "../../backend/src/server/direct-local-http";
+import { opencodeCatalogToken } from "../../backend/src/lib/admin-secrets";
 import * as childProcess from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { loadServiceTokenFromFile, serviceApiTokenFilePath } from "../../src/lib/service-secrets";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { loadServiceTokenFromFile, serviceApiTokenFilePath } from "../../backend/src/lib/service-secrets";
 import {
   OPENCODE_API_KEY_ENV,
   OPENCODE_API_KEY_ENV_REF,
@@ -35,8 +35,8 @@ import {
   parseJsonc,
   projectConfigOverridesProvider,
   serializeOpencodeRuntimeConfig,
-} from "../../src/cli/opencode";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/cli/opencode";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function cfg(extra?: Partial<OcxConfig>): OcxConfig {
@@ -259,7 +259,7 @@ describe("ocx opencode proxy model catalog", () => {
     ready.providers.pending!.selectedModels = ["chosen"];
     const rows = ["chosen", "other"].map(id => ({ provider: "pending", id, namespaced: `pending/${id}` }));
     expect(opencodeCatalogFromProxyRows(rows, pending)).toEqual([]);
-    const liveness = await import("../../src/server/proxy-liveness");
+    const liveness = await import("../../backend/src/server/proxy-liveness");
     const finder = spyOn(liveness, "findLiveProxy").mockResolvedValue({
       port: 10123, hostname: "127.0.0.1", pid: null, source: "config",
     });
@@ -343,7 +343,7 @@ describe("ocx opencode proxy model catalog", () => {
     delete process.env[ENV_KEY];
     clearModelCache(PROVIDER);
     try {
-      const { fetchAllModels } = await import("../../src/server/management/shared");
+      const { fetchAllModels } = await import("../../backend/src/server/management/shared");
       const cliModels = await fetchAllModels(config);
       const cliIds = cliModels.filter(m => m.provider === PROVIDER).map(m => m.id).sort();
       expect(cliIds).toEqual(["static-fallback"]);
@@ -353,7 +353,7 @@ describe("ocx opencode proxy model catalog", () => {
       clearModelCache(PROVIDER);
       requestedAuth = undefined;
 
-      const { handleManagementAPI } = await import("../../src/server/management-api");
+      const { handleManagementAPI } = await import("../../backend/src/server/management-api");
       const modelsRes = await handleManagementAPI(
         new Request("http://localhost/api/models"),
         new URL("http://localhost/api/models"),

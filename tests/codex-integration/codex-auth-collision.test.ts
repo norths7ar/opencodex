@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { checkAccountIdCollisionWithNativeMain as checkAccountIdCollision, CodexCollisionReadBusyError } from "../../src/codex/auth-api/login-collision";
-import { saveConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { checkAccountIdCollisionWithNativeMain as checkAccountIdCollision, CodexCollisionReadBusyError } from "../../backend/src/codex/auth-api/login-collision";
+import { saveConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-auth-collision-test");

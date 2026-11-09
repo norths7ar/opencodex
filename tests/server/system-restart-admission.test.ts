@@ -4,7 +4,7 @@ import {
   acceptSystemRestart,
   setSystemRestartIoForTests,
   noteExplicitShutdownRequested,
-} from "../../src/server/management/system-restart";
+} from "../../backend/src/server/management/system-restart";
 
 import {
   abortAndReleaseAllTurns,
@@ -16,11 +16,11 @@ import {
   resetLifecycleDrainStateForTests,
   stopServerListener,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { handleSystemRoutes } from "../../src/server/management/system-routes";
+} from "../../backend/src/server/lifecycle";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { handleSystemRoutes } from "../../backend/src/server/management/system-routes";
 import { ManagementRequest } from "../helpers/management-auth";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 afterEach(() => setSystemRestartIoForTests());
 

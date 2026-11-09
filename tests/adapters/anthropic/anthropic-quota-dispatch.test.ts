@@ -4,20 +4,20 @@ import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../src/oauth/anthropic-routing";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../src/providers/quota";
-import { clearResponseStateForTests } from "../../../src/responses/state";
-import { handleResponses } from "../../../src/server/responses";
-import type { RequestLogContext } from "../../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../backend/src/oauth/anthropic-routing";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../backend/src/providers/quota";
+import { clearResponseStateForTests } from "../../../backend/src/responses/state";
+import { handleResponses } from "../../../backend/src/server/responses";
+import type { RequestLogContext } from "../../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
-const actualResolver = await import("../../../src/server/adapter-resolve");
+const actualResolver = await import("../../../backend/src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 let adapterRequestsFollow = false;
-mock.module("../../../src/server/adapter-resolve", () => ({
+mock.module("../../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(...args: Parameters<typeof actualResolveAdapter>) {
     const adapter = actualResolveAdapter(...args);
@@ -178,9 +178,9 @@ test("an affinity reset during the OAuth commit fences stale transport admission
   const [active] = await seed();
   const config = configFor(() => answer(false));
   config.anthropicAccountPool = { enabled: true, autoSwitchThreshold: 0 };
-  const oauthStore = await import("../../../src/oauth/store");
-  const { anthropicRoutingFor } = await import("../../../src/oauth/anthropic-routing");
-  const { anthropicAffinityPath, flushAnthropicSessionAffinity } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const oauthStore = await import("../../../backend/src/oauth/store");
+  const { anthropicRoutingFor } = await import("../../../backend/src/oauth/anthropic-routing");
+  const { anthropicAffinityPath, flushAnthropicSessionAffinity } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const originalCommit = oauthStore.commitOAuthAccountSelection;
   let reset = true;
   let commits = 0;
@@ -213,9 +213,9 @@ test("an affinity reset during credential resolution avoids an obsolete OAuth co
   const [active] = await seed();
   const config = configFor(() => answer(false));
   config.anthropicAccountPool = { enabled: true, autoSwitchThreshold: 0 };
-  const oauthStore = await import("../../../src/oauth/store");
-  const oauth = await import("../../../src/oauth");
-  const { anthropicRoutingFor } = await import("../../../src/oauth/anthropic-routing");
+  const oauthStore = await import("../../../backend/src/oauth/store");
+  const oauth = await import("../../../backend/src/oauth");
+  const { anthropicRoutingFor } = await import("../../../backend/src/oauth/anthropic-routing");
   const credential = oauthStore.getAccountCredentialWithStatus("anthropic", active!)!.credential;
   await saveAccountCredential("anthropic", active!, { ...credential, expires: Date.now() + 1_000 });
   const originalCommit = oauthStore.commitOAuthAccountSelection;
@@ -240,8 +240,8 @@ test("an affinity reset during credential resolution avoids an obsolete OAuth co
 
 test.each([200, 429])("an affinity reset during a physical %i response preserves cleared bindings", async status => {
   await seed();
-  const { anthropicRoutingFor } = await import("../../../src/oauth/anthropic-routing");
-  const { anthropicAffinityPath, flushAnthropicSessionAffinity } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { anthropicRoutingFor } = await import("../../../backend/src/oauth/anthropic-routing");
+  const { anthropicAffinityPath, flushAnthropicSessionAffinity } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const config = configFor(async () => {
     if (sent.length === 1) {
       expect(await anthropicRoutingFor("anthropic").resetAnthropicSessionAffinityConfirmed()).toBe(true);
@@ -668,7 +668,7 @@ test("Claude Messages bridge fails over on account entitlement 403", async () =>
   await seed();
   const config = configFor(body => sent.length === 1 ? accountRefusal() : answer(body.stream === true));
   config.anthropicAccountPool = { enabled: true };
-  const { handleClaudeMessages } = await import("../../../src/server/claude-messages");
+  const { handleClaudeMessages } = await import("../../../backend/src/server/claude-messages");
   const response = await handleClaudeMessages(new Request("http://localhost/v1/messages", {
     method: "POST", headers: { "content-type": "application/json" },
     body: JSON.stringify({ model: "anthropic/claude-sonnet-4-5", messages: [{ role: "user", content: "Answer briefly" }], max_tokens: 64, stream: false }),

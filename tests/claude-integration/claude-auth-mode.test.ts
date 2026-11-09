@@ -1,9 +1,9 @@
 import { expect, spyOn, test } from "bun:test";
-import { buildClaudeEnv } from "../../src/cli/claude";
-import { PROXY_MARKER, type AuthDetectDeps, type AuthPresence } from "../../src/claude/auth-detect";
-import { authModeIntent, resolveClaudeAuthMode } from "../../src/claude/auth-mode";
-import { detectClaudeAuth } from "../../src/claude/auth-detect";
-import type { OcxConfig } from "../../src/types";
+import { buildClaudeEnv } from "../../backend/src/cli/claude";
+import { PROXY_MARKER, type AuthDetectDeps, type AuthPresence } from "../../backend/src/claude/auth-detect";
+import { authModeIntent, resolveClaudeAuthMode } from "../../backend/src/claude/auth-mode";
+import { detectClaudeAuth } from "../../backend/src/claude/auth-detect";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Auto is a RESOLUTION, not stored state: registering a Claude login changes the next

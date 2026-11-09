@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { fixturePath } from "../../helpers/repo-root";
 
 const contract = JSON.parse(readFileSync(fixturePath("qwen38-27b-chat-template-contract.json"), "utf8")) as {

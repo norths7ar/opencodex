@@ -38,7 +38,7 @@ test("counts disabled API keys and private references without counting an active
       ],
     } } });
     f.start();
-    const keys = await import("../../src/providers/api-key-resolve");
+    const keys = await import("../../backend/src/providers/api-key-resolve");
     keys.setProviderKeychainEntryFactoryForTests(() => { throw new Error("Passive inventory attempted keychain access"); });
     try { expect((await f.inventory.collectLocalCredentials())?.count).toBe(4); }
     finally { keys.setProviderKeychainEntryFactoryForTests(null); }
@@ -51,7 +51,7 @@ test("counts Codex pool API-key main auth and inactive native envelopes without 
       removed: { generation: 1, deletedAt: 1 },
     });
     f.put(join(f.codex, "auth.json"), { OPENAI_API_KEY: "fixture-native-key" });
-    const { nativeProfileHomeId } = await import("../../src/codex/native-profile-store");
+    const { nativeProfileHomeId } = await import("../../backend/src/codex/native-profile-store");
     const homeId = nativeProfileHomeId(f.codex);
     const dir = join(f.codex, ".opencodex-native-main-profiles");
     mkdirSync(dir);
@@ -103,7 +103,7 @@ test("a passive snapshot does not rewrite stores refresh credentials or call the
 test("the runtime observer both runtimes share attests while it serves and withdraws when it stops", async () => {
   await withLocalCredentialFixture(async f => {
     f.put(join(f.home, "config.json"), { providers: {}, runtimeRole: "client", client: { apiKey: "fixture-link-only" } });
-    const { observeLocalCredentials, withLocalCredentialObservation } = await import("../../src/local-credentials/runtime-observation");
+    const { observeLocalCredentials, withLocalCredentialObservation } = await import("../../backend/src/local-credentials/runtime-observation");
     const observation = observeLocalCredentials();
     const attested = await f.inventory.collectLocalCredentials();
     expect(attested?.count).toBe(0);

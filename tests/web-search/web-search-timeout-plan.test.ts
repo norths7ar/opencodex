@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   planWebSearch,
   resolveRoutedModelStallTimeoutMs,
   webSearchStallTimeoutSec,
-} from "../../src/web-search";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/web-search";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const routedProvider: OcxProviderConfig = {
   adapter: "openai-chat",

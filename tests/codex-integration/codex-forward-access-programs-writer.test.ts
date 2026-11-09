@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { buildCatalogEntries, mergeCatalogEntriesForSync } from "../../src/codex/catalog/build-entries";
-import { CODEX_CUSTOM_MODEL_CATALOG_KIND } from "../../src/codex/catalog/parsing";
+import { buildCatalogEntries, mergeCatalogEntriesForSync } from "../../backend/src/codex/catalog/build-entries";
+import { CODEX_CUSTOM_MODEL_CATALOG_KIND } from "../../backend/src/codex/catalog/parsing";
 
 describe("serialized Codex forward catalog", () => {
   test("keeps pinned programs on an exact forward alias through the writer merge only", () => {

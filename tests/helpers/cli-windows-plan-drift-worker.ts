@@ -1,10 +1,10 @@
 /** Test-only post-inspection drift seam; this is NOT the production Worker entry. */
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { inspectCodexCliInstall } from "../../src/codex/cli-install-provenance";
-import { codexCliUpdateInspectionDepsFromSnapshot } from "../../src/codex/cli-update-inspection-context";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
-import type { CodexCliUpdateWorkerRunMessage } from "../../src/codex/cli-update-worker";
+import { inspectCodexCliInstall } from "../../backend/src/codex/cli-install-provenance";
+import { codexCliUpdateInspectionDepsFromSnapshot } from "../../backend/src/codex/cli-update-inspection-context";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
+import type { CodexCliUpdateWorkerRunMessage } from "../../backend/src/codex/cli-update-worker";
 
 declare const self: Worker;
 if (typeof Bun !== "undefined" && Bun.isMainThread === false) {

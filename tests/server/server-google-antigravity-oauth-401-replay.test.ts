@@ -2,28 +2,28 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import * as configModule from "../../src/config";
-import { forceRefreshOAuthAccessSnapshot, getValidAccessTokenSnapshot } from "../../src/oauth";
-import { credentialGeneration, getAccountSet, getAuthStorePath, saveCredential, setAccountPaused, setActiveAccount } from "../../src/oauth/store";
-import { startServer } from "../../src/server";
-import { handleResponses } from "../../src/server/responses";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import * as requestPacing from "../../src/providers/request-pacing";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { ANTIGRAVITY_VALIDATION_REQUIRED_PREFIX } from "../../src/adapters/google-errors";
-import { readUsageEntries } from "../../src/usage/log";
-import { clearGenericFailoverHealth, eligibleFailoverAccounts, genericFailoverRetryAfterSeconds, rotateAntigravityAccountOnAuthRefusal } from "../../src/oauth/generic-account-failover";
+import { saveConfig } from "../../backend/src/config";
+import * as configModule from "../../backend/src/config";
+import { forceRefreshOAuthAccessSnapshot, getValidAccessTokenSnapshot } from "../../backend/src/oauth";
+import { credentialGeneration, getAccountSet, getAuthStorePath, saveCredential, setAccountPaused, setActiveAccount } from "../../backend/src/oauth/store";
+import { startServer } from "../../backend/src/server";
+import { handleResponses } from "../../backend/src/server/responses";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import * as requestPacing from "../../backend/src/providers/request-pacing";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { ANTIGRAVITY_VALIDATION_REQUIRED_PREFIX } from "../../backend/src/adapters/google-errors";
+import { readUsageEntries } from "../../backend/src/usage/log";
+import { clearGenericFailoverHealth, eligibleFailoverAccounts, genericFailoverRetryAfterSeconds, rotateAntigravityAccountOnAuthRefusal } from "../../backend/src/oauth/generic-account-failover";
 import {
   durableReplayCredentialIdentity,
   durableReplayDestinationIdentity,
-} from "../../src/responses/reasoning-replay-cache";
+} from "../../backend/src/responses/reasoning-replay-cache";
 import {
   rememberThoughtSignatureForReplay,
   resetThoughtSignatureReplayForTests,
   thoughtSignatureReplaySalt,
-} from "../../src/responses/thought-signature-replay";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/thought-signature-replay";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

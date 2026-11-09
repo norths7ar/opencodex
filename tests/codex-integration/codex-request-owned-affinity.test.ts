@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { bindThreadAffinity, clearThreadAccountMap } from "../../src/codex/routing/thread-affinity";
-import { requestSpendRecord } from "../../src/server/request-log";
+import { bindThreadAffinity, clearThreadAccountMap } from "../../backend/src/codex/routing/thread-affinity";
+import { requestSpendRecord } from "../../backend/src/server/request-log";
 
 describe("request-owned affinity", () => {
   test("namespaces bindings by exact bearer and conversation", async () => {
-    const { requestOwnedAffinityKey, isRequestOwnedAffinityKey } = await import("../../src/codex/request-owned-affinity");
+    const { requestOwnedAffinityKey, isRequestOwnedAffinityKey } = await import("../../backend/src/codex/request-owned-affinity");
     const a = new Headers({ authorization: "Bearer alpha", "session-id": "session", "thread-id": "thread" });
     const b = new Headers({ authorization: "Bearer beta", "session-id": "session", "thread-id": "thread" });
     const key = requestOwnedAffinityKey(a)!;
@@ -15,7 +15,7 @@ describe("request-owned affinity", () => {
     expect(key).not.toContain("session");
   });
   test("selection labels claim a bind only when the chosen account is bound", async () => {
-    const { honestAffinityDecision } = await import("../../src/codex/request-owned-affinity");
+    const { honestAffinityDecision } = await import("../../backend/src/codex/request-owned-affinity");
     clearThreadAccountMap();
     const decision = { move: "new_bind", reason: "healthy" } as const;
     expect(honestAffinityDecision(decision, undefined, "account", undefined, undefined, true)).toEqual({ move: "unbound", reason: "request_owned" });
@@ -33,11 +33,11 @@ describe("request-owned affinity", () => {
 });
 
 test("opt-in main selection binds and reuses a caller-scoped key", async () => {
-  const { resolveCodexAuthContext, codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../src/codex/auth-context");
-  const { getThreadAffinity, clearThreadAccountMap } = await import("../../src/codex/routing/thread-affinity");
-  const { conversationStateBindingFromAuth } = await import("../../src/server/responses/account-change-state");
-  const { isRequestOwnedAffinityKey } = await import("../../src/codex/request-owned-affinity");
-  const config = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext, codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../backend/src/codex/auth-context");
+  const { getThreadAffinity, clearThreadAccountMap } = await import("../../backend/src/codex/routing/thread-affinity");
+  const { conversationStateBindingFromAuth } = await import("../../backend/src/server/responses/account-change-state");
+  const { isRequestOwnedAffinityKey } = await import("../../backend/src/codex/request-owned-affinity");
+  const config = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer alpha", "session-id": "s", "thread-id": "t" });
   const options = { requestScopedMainCredential: true, primeCodexPoolQuotas: async () => {} };
   clearThreadAccountMap();
@@ -54,8 +54,8 @@ test("opt-in main selection binds and reuses a caller-scoped key", async () => {
 });
 
 test("preview derivation excludes fixed selectors and preserves parent fallback", async () => {
-  const { codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../src/codex/auth-context");
-  const config = { providers: {}, codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../backend/src/codex/auth-context");
+  const config = { providers: {}, codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer alpha", "session-id": "s", "thread-id": "t" });
   const owned = { requestScopedMainCredential: true };
   expect(codexRequestAffinityKey(headers, config, config, { ...owned, accountId: "__main__" })).toBeUndefined();
@@ -70,10 +70,10 @@ test("preview derivation excludes fixed selectors and preserves parent fallback"
 });
 
 test("bound callers remain isolated and never record lineage", async () => {
-  const { resolveCodexAuthContext, codexPoolAffinityKey } = await import("../../src/codex/auth-context");
-  const { codexLineageScopeKey, codexThreadLineageLookup, clearCodexThreadLineageForTests } = await import("../../src/codex/lineage");
-  const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
-  const config = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext, codexPoolAffinityKey } = await import("../../backend/src/codex/auth-context");
+  const { codexLineageScopeKey, codexThreadLineageLookup, clearCodexThreadLineageForTests } = await import("../../backend/src/codex/lineage");
+  const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+  const config = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const a = new Headers({ authorization: "Bearer one", "session-id": "s", "thread-id": "t" });
   const b = new Headers({ authorization: "Bearer two", "session-id": "s", "thread-id": "t" });
   const options = { requestScopedMainCredential: true };
@@ -92,7 +92,7 @@ test("bound callers remain isolated and never record lineage", async () => {
 });
 
 test("schema validates the default-off flag", async () => {
-  const { codexPoolSchema } = await import("../../src/config/schema/leaf-validators");
+  const { codexPoolSchema } = await import("../../backend/src/config/schema/leaf-validators");
   expect(codexPoolSchema.safeParse({ requestOwnedAffinity: true }).success).toBe(true);
   expect(codexPoolSchema.safeParse({ requestOwnedAffinity: "true" }).success).toBe(false);
 });
@@ -102,8 +102,8 @@ test("usage log round trips the new affinity values", async () => {
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { addRequestLog, clearRequestLogsForTests } = await import("../../src/server/request-log");
-  const { readUsageEntries, resetUsageReadCacheForTests } = await import("../../src/usage/log");
+  const { addRequestLog, clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
+  const { readUsageEntries, resetUsageReadCacheForTests } = await import("../../backend/src/usage/log");
   const previous = process.env.OPENCODEX_HOME;
   const home = mkdtempSync(join(tmpdir(), "ocx-affinity-"));
   process.env.OPENCODEX_HOME = home;
@@ -128,15 +128,15 @@ test("stored selection without a key labels the missing binding honestly", async
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
   const home = mkdtempSync(join(tmpdir(), "ocx-owned-selection-"));
   const oldHome = process.env.OPENCODEX_HOME;
   const oldCodex = process.env.CODEX_HOME;
   process.env.OPENCODEX_HOME = home; process.env.CODEX_HOME = home;
   try {
     saveCodexAccountCredential("a", { accessToken: "test-access", refreshToken: "test-refresh", expiresAt: Date.now() + 3600000, chatgptAccountId: "test-account" });
-    const config = { providers: {}, codexAccounts: [{ id: "a", email: "a@example.test", isMain: false }], activeCodexAccountId: "a", pausedCodexAccountIds: ["__main__"] } as import("../../src/types").OcxConfig;
+    const config = { providers: {}, codexAccounts: [{ id: "a", email: "a@example.test", isMain: false }], activeCodexAccountId: "a", pausedCodexAccountIds: ["__main__"] } as import("../../backend/src/types").OcxConfig;
     const options = { primeCodexPoolQuotas: async () => {} };
     clearThreadAccountMap();
     const noConversation = await resolveCodexAuthContext(new Headers(), config, "pool", options);
@@ -145,9 +145,9 @@ test("stored selection without a key labels the missing binding honestly", async
     const off = await resolveCodexAuthContext(caller, config, "pool", { ...options, requestScopedMainCredential: true });
     expect(off.affinityDecision).toEqual({ move: "unbound", reason: "request_owned" });
     expect(off.affinityKey).toBeUndefined();
-    const { codexPoolAffinityKey } = await import("../../src/codex/auth-context");
-    const { rememberServingConversationStateIssuer, conversationStateBindingFromAuth } = await import("../../src/server/responses/account-change-state");
-    const { peekConversationStateIssuer } = await import("../../src/codex/routing/thread-affinity");
+    const { codexPoolAffinityKey } = await import("../../backend/src/codex/auth-context");
+    const { rememberServingConversationStateIssuer, conversationStateBindingFromAuth } = await import("../../backend/src/server/responses/account-change-state");
+    const { peekConversationStateIssuer } = await import("../../backend/src/codex/routing/thread-affinity");
     expect(off.conversationStateKey).toStartWith("request-owned:v1:");
     expect(off.conversationStateKey).not.toBe(codexPoolAffinityKey(caller));
     rememberServingConversationStateIssuer(off, codexPoolAffinityKey(caller));
@@ -169,8 +169,8 @@ test("stored selection without a key labels the missing binding honestly", async
     expect(conversationStateBindingFromAuth(fixedPool, codexPoolAffinityKey(caller))?.bindingKey).toBe(codexPoolAffinityKey(caller));
     expect(fixedMain.affinityKey).toBeUndefined();
     expect(fixedMain.conversationStateKey).toBeUndefined();
-    const { bindModelDetourAffinity, getThreadAffinity, getModelDetourAffinity } = await import("../../src/codex/routing/thread-affinity");
-    const { honestAffinityDecision } = await import("../../src/codex/request-owned-affinity");
+    const { bindModelDetourAffinity, getThreadAffinity, getModelDetourAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+    const { honestAffinityDecision } = await import("../../backend/src/codex/request-owned-affinity");
     bindModelDetourAffinity(bound.affinityKey!, "__main__", Date.now(), "detour-model");
     expect(getThreadAffinity(bound.affinityKey!)?.accountId).toBe("a");
     expect(getModelDetourAffinity(bound.affinityKey!, "detour-model")?.accountId).toBe("__main__");
@@ -188,9 +188,9 @@ test("stored selection without a key labels the missing binding honestly", async
 });
 
 test("keyed main issuer participates in account-change scrub and file refusal", async () => {
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { conversationStateBindingFromAuth, rememberServingConversationStateIssuer, applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } = await import("../../src/server/responses/account-change-state");
-  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { conversationStateBindingFromAuth, rememberServingConversationStateIssuer, applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } = await import("../../backend/src/server/responses/account-change-state");
+  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer issuer", "session-id": "s", "thread-id": "t" });
   const options = { requestScopedMainCredential: true };
   clearThreadAccountMap();
@@ -208,9 +208,9 @@ test("keyed main issuer participates in account-change scrub and file refusal", 
 });
 
 test("a namespaced binding remains independent across quota scopes", async () => {
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
-  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer scopes", "session-id": "s", "thread-id": "t" });
   const options = { requestScopedMainCredential: true };
   clearThreadAccountMap();
@@ -226,12 +226,12 @@ test("a namespaced binding remains independent across quota scopes", async () =>
 });
 
 test("substituted admission and injected main credentials use the ordinary key", async () => {
-  const { codexRouteCredentialOwnership } = await import("../../src/server/responses/core-auth");
-  const { resolveCodexAuthContext, codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../src/codex/auth-context");
+  const { codexRouteCredentialOwnership } = await import("../../backend/src/server/responses/core-auth");
+  const { resolveCodexAuthContext, codexRequestAffinityKey, codexPoolAffinityKey } = await import("../../backend/src/codex/auth-context");
   const { fakeChatGptJwt } = await import("../helpers/agent-task-recovery");
-  const provider = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } as import("../../src/types").OcxProviderConfig;
+  const provider = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } as import("../../backend/src/types").OcxProviderConfig;
   const route = { provider, codexAccountMode: "pool" as const };
-  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: `Bearer ${fakeChatGptJwt("test-account")}`, "session-id": "s", "thread-id": "t" });
   clearThreadAccountMap();
   const first = await resolveCodexAuthContext(headers, config, "pool", { requestScopedMainCredential: true });
@@ -251,8 +251,8 @@ test("substituted admission and injected main credentials use the ordinary key",
 test("reusing a main binding never reads physical main auth", async () => {
   const fs = await import("node:fs");
   const { spyOn } = await import("bun:test");
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer fenced", "session-id": "s", "thread-id": "t" });
   const options = { requestScopedMainCredential: true };
   clearThreadAccountMap();
@@ -274,7 +274,7 @@ test("reusing a main binding never reads physical main auth", async () => {
 
 
 test("compact fixed-account Pool contexts never fall back to the raw key", async () => {
-  const { compactAlternateAffinityKey } = await import("../../src/server/responses/account-change-state");
+  const { compactAlternateAffinityKey } = await import("../../backend/src/server/responses/account-change-state");
   const pool = { kind: "pool", accountId: "a", fixedAccount: true, writerGeneration: 0, generation: 0, accessToken: "test", chatgptAccountId: "test" } as const;
   let reads = 0;
   const rawKey = () => { reads++; return "raw-key"; };
@@ -290,16 +290,16 @@ test("six request-owned round-robin turns rotate when off and bind when on", asy
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { clearPoolRotationState } = await import("../../src/codex/pool-rotation");
-  const { clearCodexUpstreamHealth } = await import("../../src/codex/routing");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { clearPoolRotationState } = await import("../../backend/src/codex/pool-rotation");
+  const { clearCodexUpstreamHealth } = await import("../../backend/src/codex/routing");
   const home = mkdtempSync(join(tmpdir(), "ocx-owned-rotation-"));
   const oldHome = process.env.OPENCODEX_HOME, oldCodex = process.env.CODEX_HOME;
   process.env.OPENCODEX_HOME = home; process.env.CODEX_HOME = home;
   try {
     for (const id of ["a", "b"]) saveCodexAccountCredential(id, { accessToken: `access-${id}`, refreshToken: `refresh-${id}`, expiresAt: Date.now() + 3600000, chatgptAccountId: `test-${id}` });
-    const config = { providers: {}, codexAccounts: ["a", "b"].map(id => ({ id, email: `${id}@example.test`, isMain: false })), accountPoolStrategy: "round-robin", accountPoolStickyLimit: 1, autoSwitchThreshold: 0 } as import("../../src/types").OcxConfig;
+    const config = { providers: {}, codexAccounts: ["a", "b"].map(id => ({ id, email: `${id}@example.test`, isMain: false })), accountPoolStrategy: "round-robin", accountPoolStickyLimit: 1, autoSwitchThreshold: 0 } as import("../../backend/src/types").OcxConfig;
     const headers = new Headers({ authorization: "Bearer rotation", "session-id": "s", "thread-id": "t" });
     const options = { requestScopedMainCredential: true, primeCodexPoolQuotas: async () => {} };
     clearThreadAccountMap(); clearPoolRotationState(); clearCodexUpstreamHealth();
@@ -314,8 +314,8 @@ test("six request-owned round-robin turns rotate when off and bind when on", asy
     expect(new Set(on.map(ctx => ctx.kind === "main" ? "__main__" : ctx.accountId)).size).toBe(1);
     expect(on.map(ctx => ctx.affinityDecision?.move)).toEqual(["new_bind", "reused", "reused", "reused", "reused", "reused"]);
     // Model the first preview and a recovery reroute that changes credential ownership.
-    const { codexRequestAffinityKey } = await import("../../src/codex/auth-context");
-    const { previewCodexAccountForRequest } = await import("../../src/codex/routing");
+    const { codexRequestAffinityKey } = await import("../../backend/src/codex/auth-context");
+    const { previewCodexAccountForRequest } = await import("../../backend/src/codex/routing");
     const firstKey = codexRequestAffinityKey(headers, config, config, { requestScopedMainCredential: true })!;
     const recoveryKey = codexRequestAffinityKey(headers, config, config, { requestScopedMainCredential: false })!;
     expect(firstKey).not.toBe(recoveryKey);
@@ -324,8 +324,8 @@ test("six request-owned round-robin turns rotate when off and bind when on", asy
     bindThreadAffinity(recoveryKey, otherAccount, Date.now());
     expect(previewCodexAccountForRequest(firstKey, config, Date.now(), undefined, { requestOwnedMainCredential: true, isMainAccountTokenLive: () => true })).toBe(firstAccount);
     expect(previewCodexAccountForRequest(recoveryKey, config, Date.now(), undefined, { isMainAccountTokenLive: () => false })).toBe(otherAccount);
-    const { resolveCodexAccountForThreadDetailed, codexQuotaScopeForModel } = await import("../../src/codex/routing");
-    const { getThreadAffinity, getModelDetourAffinity } = await import("../../src/codex/routing/thread-affinity");
+    const { resolveCodexAccountForThreadDetailed, codexQuotaScopeForModel } = await import("../../backend/src/codex/routing");
+    const { getThreadAffinity, getModelDetourAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
     const selection = { requestOwnedMainCredential: true, isMainAccountTokenLive: () => true };
     const shared = resolveCodexAccountForThreadDetailed(firstKey, config, Date.now(), "shared", selection);
     expect(shared.status).toBe("selected");
@@ -351,9 +351,9 @@ test("six request-owned round-robin turns rotate when off and bind when on", asy
 });
 
 test("pinned caller-main keeps the namespaced conversation-state issuer", async () => {
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { conversationStateBindingFromAuth, rememberServingConversationStateIssuer, applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } = await import("../../src/server/responses/account-change-state");
-  const cfg = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { conversationStateBindingFromAuth, rememberServingConversationStateIssuer, applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } = await import("../../backend/src/server/responses/account-change-state");
+  const cfg = { providers: {}, codexAccounts: [], accountPoolStrategy: "round-robin", codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer pinned", "session-id": "s", "thread-id": "t" });
   clearThreadAccountMap();
   const initial = await resolveCodexAuthContext(headers, cfg, "pool", { requestScopedMainCredential: true });
@@ -378,8 +378,8 @@ test("pinned caller-main keeps the namespaced conversation-state issuer", async 
 });
 
 test("caller-main issuer and fallback key use conversation state without routing affinity", async () => {
-  const { conversationStateAccountId } = await import("../../src/codex/request-owned-affinity");
-  const { conversationStateBindingFromAuth, compactAlternateAffinityKey } = await import("../../src/server/responses/account-change-state");
+  const { conversationStateAccountId } = await import("../../backend/src/codex/request-owned-affinity");
+  const { conversationStateBindingFromAuth, compactAlternateAffinityKey } = await import("../../backend/src/server/responses/account-change-state");
   const main = { kind: "main", accountId: null, conversationStateKey: "owned-key" } as const;
   expect(conversationStateAccountId(main)).toBe("__main__");
   expect(conversationStateBindingFromAuth(main, "raw")).toEqual({ accountId: "__main__", bindingKey: "owned-key" });
@@ -387,7 +387,7 @@ test("caller-main issuer and fallback key use conversation state without routing
 });
 
 test("fallback labels describe the caller-main detour", async () => {
-  const { callerOwnedFallbackAffinityDecision } = await import("../../src/codex/request-owned-affinity");
+  const { callerOwnedFallbackAffinityDecision } = await import("../../backend/src/codex/request-owned-affinity");
   clearThreadAccountMap();
   bindThreadAffinity("fallback-key", "__main__", Date.now());
   expect(callerOwnedFallbackAffinityDecision({ move: "reused", reason: "healthy" }, "fallback-key", undefined, undefined, false, "cooldown")).toEqual({ move: "reused", reason: "healthy" });
@@ -400,16 +400,16 @@ test("cooldown arriving after pool selection labels caller-main as a detour", as
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { recordCodexUpstreamOutcome, clearCodexUpstreamHealth } = await import("../../src/codex/routing");
-  const { noteCodexSelectionAffinity } = await import("../../src/server/request-log");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { recordCodexUpstreamOutcome, clearCodexUpstreamHealth } = await import("../../backend/src/codex/routing");
+  const { noteCodexSelectionAffinity } = await import("../../backend/src/server/request-log");
   const home = mkdtempSync(join(tmpdir(), "ocx-owned-cooldown-"));
   const oldHome = process.env.OPENCODEX_HOME, oldCodex = process.env.CODEX_HOME;
   process.env.OPENCODEX_HOME = home; process.env.CODEX_HOME = home;
   try {
     saveCodexAccountCredential("a", { accessToken: "access-a", refreshToken: "refresh-a", expiresAt: Date.now() + 3600000, chatgptAccountId: "account-a" });
-    const config = { providers: {}, codexAccounts: [{ id: "a", label: "a" }], activeCodexAccountId: "a", pausedCodexAccountIds: ["__main__"], autoSwitchThreshold: 0, codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+    const config = { providers: {}, codexAccounts: [{ id: "a", label: "a" }], activeCodexAccountId: "a", pausedCodexAccountIds: ["__main__"], autoSwitchThreshold: 0, codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
     const headers = new Headers({ authorization: "Bearer distinct-caller", "chatgpt-account-id": "distinct-account", "session-id": "s", "thread-id": "t" });
     const options = { requestScopedMainCredential: true, primeCodexPoolQuotas: async () => {} };
     clearThreadAccountMap(); clearCodexUpstreamHealth();
@@ -433,10 +433,10 @@ test("cooldown arriving after pool selection labels caller-main as a detour", as
 });
 
 test("manual selection clears affinity but retains carried-state issuers until a full reset", async () => {
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { rememberConversationStateIssuer, peekConversationStateIssuer, getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
-  const { resetCodexRoutingForManualSelection, resetCodexRoutingForClearedSelection } = await import("../../src/codex/routing/active-account");
-  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { rememberConversationStateIssuer, peekConversationStateIssuer, getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+  const { resetCodexRoutingForManualSelection, resetCodexRoutingForClearedSelection } = await import("../../backend/src/codex/routing/active-account");
+  const config = { providers: {}, codexAccounts: [], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
   const headers = new Headers({ authorization: "Bearer pin-reset", "session-id": "s", "thread-id": "t" });
   clearThreadAccountMap();
   try {
@@ -459,8 +459,8 @@ test("manual selection clears affinity but retains carried-state issuers until a
 
 test.each([[401, "unusable"], [403, "unusable"], [402, "quota_refusal"], [429, "quota_refusal"], [503, "transient"]] as const)(
   "caller-owned main refusal %s releases namespaced bindings with %s", async (status, reason) => {
-    const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../src/codex/request-owned-affinity");
-    const { bindModelDetourAffinity, getModelDetourAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease, rememberConversationStateIssuer, peekConversationStateIssuer } = await import("../../src/codex/routing/thread-affinity");
+    const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../backend/src/codex/request-owned-affinity");
+    const { bindModelDetourAffinity, getModelDetourAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease, rememberConversationStateIssuer, peekConversationStateIssuer } = await import("../../backend/src/codex/routing/thread-affinity");
     const key = requestOwnedAffinityKey(new Headers({ authorization: "Bearer outcome-test", "session-id": "s", "thread-id": "t" }))!;
     clearThreadAccountMap();
     bindThreadAffinity(key, "__main__", Date.now(), "shared");
@@ -477,8 +477,8 @@ test.each([[401, "unusable"], [403, "unusable"], [402, "quota_refusal"], [429, "
 );
 
 test.each([200, 302, 400, 499])("non-refusal %s retains the caller-owned main binding", async status => {
-  const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../src/codex/request-owned-affinity");
-  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../src/codex/routing/thread-affinity");
+  const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../backend/src/codex/request-owned-affinity");
+  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../backend/src/codex/routing/thread-affinity");
   const key = requestOwnedAffinityKey(new Headers({ authorization: "Bearer no-refusal", "session-id": "s", "thread-id": "t" }))!;
   clearThreadAccountMap(); bindThreadAffinity(key, "__main__", Date.now(), "shared");
   releaseRequestOwnedMainOnOutcome({ kind: "main", accountId: null, affinityKey: key, affinityBindingSnapshot: captureRequestOwnedAffinityBindings(key, "shared", "gpt-5.5") }, status, "gpt-5.5");
@@ -492,9 +492,9 @@ test("a failed caller-main model detour releases its ordinary and detour entries
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../src/codex/request-owned-affinity");
-  const { bindModelDetourAffinity, getModelDetourAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease } = await import("../../src/codex/routing/thread-affinity");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { requestOwnedAffinityKey, releaseRequestOwnedMainOnOutcome, captureRequestOwnedAffinityBindings } = await import("../../backend/src/codex/request-owned-affinity");
+  const { bindModelDetourAffinity, getModelDetourAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease } = await import("../../backend/src/codex/routing/thread-affinity");
   const home = mkdtempSync(join(tmpdir(), "ocx-detour-refusal-")); const previous = process.env.OPENCODEX_HOME;
   process.env.OPENCODEX_HOME = home;
   try {
@@ -531,8 +531,8 @@ test("a failed caller-main model detour releases its ordinary and detour entries
 });
 
 test("caller-main outcome cannot release a stored-credential raw binding", async () => {
-  const { releaseRequestOwnedMainOnOutcome } = await import("../../src/codex/request-owned-affinity");
-  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../src/codex/routing/thread-affinity");
+  const { releaseRequestOwnedMainOnOutcome } = await import("../../backend/src/codex/request-owned-affinity");
+  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../backend/src/codex/routing/thread-affinity");
   clearThreadAccountMap();
   bindThreadAffinity("app:stored-binding", "__main__", Date.now(), "shared");
   releaseRequestOwnedMainOnOutcome({ kind: "main", accountId: null, affinityKey: "app:stored-binding" }, 429, "gpt-5.5");
@@ -546,16 +546,16 @@ test.each(["pool", "main"] as const)("a delayed caller-main failure cannot retir
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { removeTreeWithRetry } = await import("../helpers/remove-tree");
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-  const { releaseRequestOwnedMainOnOutcome } = await import("../../src/codex/request-owned-affinity");
-  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../src/codex/routing/thread-affinity");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+  const { releaseRequestOwnedMainOnOutcome } = await import("../../backend/src/codex/request-owned-affinity");
+  const { getThreadAffinity, peekPendingReleaseReason } = await import("../../backend/src/codex/routing/thread-affinity");
   const home = mkdtempSync(join(tmpdir(), "ocx-binding-race-"));
   const oldHome = process.env.OPENCODEX_HOME, oldCodex = process.env.CODEX_HOME;
   process.env.OPENCODEX_HOME = home; process.env.CODEX_HOME = home;
   try {
     saveCodexAccountCredential("a", { accessToken: "access-a", refreshToken: "refresh-a", expiresAt: Date.now() + 3600000, chatgptAccountId: "account-a" });
-    const config = { providers: {}, codexAccounts: [{ id: "a", label: "a" }], pausedCodexAccountIds: ["a"], codexPool: { requestOwnedAffinity: true } } as import("../../src/types").OcxConfig;
+    const config = { providers: {}, codexAccounts: [{ id: "a", label: "a" }], pausedCodexAccountIds: ["a"], codexPool: { requestOwnedAffinity: true } } as import("../../backend/src/types").OcxConfig;
     const headers = new Headers({ authorization: "Bearer race-test", "session-id": "s", "thread-id": "t" });
     clearThreadAccountMap();
     const options = { requestScopedMainCredential: true, modelId: "gpt-5.5", primeCodexPoolQuotas: async () => {} };

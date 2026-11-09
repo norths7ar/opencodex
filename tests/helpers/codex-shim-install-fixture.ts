@@ -2,7 +2,7 @@ import { afterAll, beforeAll, expect } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
-import { installCodexShim } from "../../src/codex/shim";
+import { installCodexShim } from "../../backend/src/codex/shim";
 import { removeTreeWithRetry } from "./remove-tree";
 
 /**

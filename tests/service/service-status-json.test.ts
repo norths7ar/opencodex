@@ -4,19 +4,19 @@ import * as fs from "node:fs";
 import { mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { buildWindowsTaskXml, setQuerySchtasksForTests } from "../../src/service";
-import { parseServiceArgs, planServiceCommand, serviceCommand } from "../../src/service/cli";
-import { maybeAutoRestoreCodexShim, skipsCodexShimAutoRestore } from "../../src/cli/codex-shim-autorestore";
+import { buildWindowsTaskXml, setQuerySchtasksForTests } from "../../backend/src/service";
+import { parseServiceArgs, planServiceCommand, serviceCommand } from "../../backend/src/service/cli";
+import { maybeAutoRestoreCodexShim, skipsCodexShimAutoRestore } from "../../backend/src/cli/codex-shim-autorestore";
 import { repoPath } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import {
   deriveWindowsServiceDiagnostic,
   diagnoseService,
   type ServiceDiagnostic,
-} from "../../src/service/diagnostics";
-import { collectServiceStatusJson, type ServiceStatusJsonDeps } from "../../src/service/status-json";
-import { plistPath } from "../../src/service/state";
-import * as liveness from "../../src/server/proxy-liveness";
+} from "../../backend/src/service/diagnostics";
+import { collectServiceStatusJson, type ServiceStatusJsonDeps } from "../../backend/src/service/status-json";
+import { plistPath } from "../../backend/src/service/state";
+import * as liveness from "../../backend/src/server/proxy-liveness";
 
 /**
  * `ocx service status --json` is what GOAT's inventory reads from an adopted install over
@@ -387,7 +387,7 @@ describe("service status --json CLI preflight", () => {
         })
         .sort();
       const before = snapshot();
-      const run = childProcess.spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), "service", "status", "--json"], {
+      const run = childProcess.spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), "service", "status", "--json"], {
         cwd: repoPath(),
         env: { ...process.env, HOME: home, USERPROFILE: home, OPENCODEX_HOME: opencodexHome, CODEX_HOME: codexHome, XDG_CONFIG_HOME: join(home, ".config") },
         encoding: "utf8",

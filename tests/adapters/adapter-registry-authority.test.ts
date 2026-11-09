@@ -4,9 +4,9 @@ import {
   createRegisteredAdapter,
   effectiveAdapterContract,
   getAdapterDefinition,
-} from "../../src/adapters/registry";
-import { resolveAdapter } from "../../src/server/adapter-resolve";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/registry";
+import { resolveAdapter } from "../../backend/src/server/adapter-resolve";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const EXPECTED_ADAPTER_NAMES = {

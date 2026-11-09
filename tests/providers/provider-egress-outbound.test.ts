@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { DestinationDnsResolutionError } from "../../src/lib/destination-policy";
-import type { ProviderOutboundDependencies } from "../../src/lib/provider-outbound";
-import { InvalidProviderEgressError, PROVIDER_EGRESS_DIRECT } from "../../src/lib/provider-egress";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import { DestinationDnsResolutionError } from "../../backend/src/lib/destination-policy";
+import type { ProviderOutboundDependencies } from "../../backend/src/lib/provider-outbound";
+import { InvalidProviderEgressError, PROVIDER_EGRESS_DIRECT } from "../../backend/src/lib/provider-egress";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 
 /**
  * Provider discovery and quota probes share one transport chokepoint, `providerOutboundRequest`.
@@ -74,7 +74,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
     process.env.https_proxy = GLOBAL_PROXY;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -98,7 +98,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
     process.env.https_proxy = GLOBAL_PROXY;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -121,7 +121,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
     process.env.NO_PROXY = "provider.example";
     process.env.no_proxy = "provider.example";
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -138,7 +138,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
 
   test("a provider noProxy match returns the request to the pinned transport", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -158,7 +158,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
     process.env.https_proxy = GLOBAL_PROXY;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -176,7 +176,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
 
   test("a DNS failure keeps an explicit provider proxy pinned through the degradation", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = pinnedDependencies({ dnsFails: true });
     const proxied = captureProxiedFetch();
     try {
@@ -196,7 +196,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
   test("a DNS failure under direct egress surfaces instead of degrading to an unpinned fetch", async () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies } = pinnedDependencies({ dnsFails: true });
     const proxied = captureProxiedFetch();
     try {
@@ -214,7 +214,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
   test("a malformed provider egress value refuses the request rather than choosing a route", async () => {
     for (const key of proxyKeys) delete process.env[key];
     process.env.HTTPS_PROXY = GLOBAL_PROXY;
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const { dependencies, captured } = pinnedDependencies();
     const proxied = captureProxiedFetch();
     try {
@@ -233,7 +233,7 @@ describe("per-provider egress on the discovery and quota transport", () => {
 
   test("an explicit route is refused on a caller-supplied executor instead of being dropped", async () => {
     for (const key of proxyKeys) delete process.env[key];
-    const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
+    const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
     const executor = mock(async () => new Response(null, { status: 200 }));
     await expect(providerOutboundGet(
       "vendor",

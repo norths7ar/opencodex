@@ -5,8 +5,8 @@ import * as fs from "node:fs";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**
@@ -65,8 +65,8 @@ describe("codex-account-store CRUD", () => {
   afterEach(async () => { await removeScratchHome(); });
 
   test("pending validation survives credential refresh and cannot be cleared by a stale probe", async () => {
-    const store = await import("../../src/codex/account-store");
-    const { codexCredentialMutationEpoch } = await import("../../src/codex/credential-mutation-epoch");
+    const store = await import("../../backend/src/codex/account-store");
+    const { codexCredentialMutationEpoch } = await import("../../backend/src/codex/credential-mutation-epoch");
     const cred = { accessToken: "access-pending", refreshToken: "refresh-pending", expiresAt: Date.now() + 3600_000, chatgptAccountId: "acct-pending" };
     store.saveCodexAccountCredential("pending", cred, { validationPending: true });
     const generation = store.readCodexAccountRecord("pending")!.generation;
@@ -85,7 +85,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("quota history identity survives refresh but explicit publication retires the writer", async () => {
-    const store = await import("../../src/codex/account-store");
+    const store = await import("../../backend/src/codex/account-store");
     const credential = { accessToken: "history-access", refreshToken: "history-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "history-account" };
     const generation = store.saveCodexAccountCredential("history", credential);
     const writer = store.capturePoolQuotaWriter("history", { ...credential, generation })!;
@@ -110,7 +110,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("quota history aliases retain distinct publication identities through refresh", async () => {
-    const store = await import("../../src/codex/account-store");
+    const store = await import("../../backend/src/codex/account-store");
     const credential = { accessToken: "alias-access", refreshToken: "alias-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "alias-account" };
     const generation = store.saveCodexAccountCredential("owner", credential);
     store.saveCodexAccountCredential("alias", credential);
@@ -128,8 +128,8 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("legacy history identity initializes once without advancing credential generation or epoch", async () => {
-    const store = await import("../../src/codex/account-store");
-    const { codexCredentialMutationEpoch } = await import("../../src/codex/credential-mutation-epoch");
+    const store = await import("../../backend/src/codex/account-store");
+    const { codexCredentialMutationEpoch } = await import("../../backend/src/codex/credential-mutation-epoch");
     const credential = { accessToken: "legacy-history-access", refreshToken: "legacy-history-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "legacy-history-account" };
     writeFileSync(ACCOUNTS_PATH, JSON.stringify({ legacy: credential }));
     const epoch = codexCredentialMutationEpoch();
@@ -148,7 +148,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("malformed optional history metadata cannot discard an otherwise usable credential", async () => {
-    const store = await import("../../src/codex/account-store");
+    const store = await import("../../backend/src/codex/account-store");
     const credential = { accessToken: "metadata-access", refreshToken: "metadata-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "metadata-account" };
     writeFileSync(ACCOUNTS_PATH, JSON.stringify({ metadata: { credential, generation: 3, quotaHistoryIdentity: 42 } }));
     expect(store.getCodexAccountCredential("metadata")).toEqual(credential);
@@ -157,7 +157,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("an identity-changing CAS does not retain history or propagate credentials to old aliases", async () => {
-    const store = await import("../../src/codex/account-store");
+    const store = await import("../../backend/src/codex/account-store");
     const credential = { accessToken: "old-account-access", refreshToken: "shared-old-refresh", expiresAt: Date.now() + 3600_000, chatgptAccountId: "old-account" };
     const generation = store.saveCodexAccountCredential("owner", credential);
     store.saveCodexAccountCredential("alias", credential);
@@ -169,7 +169,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("save and load credential round-trip", async () => {
-    const { saveCodexAccountCredential, getCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential, getCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     const cred = { accessToken: "tk_a", refreshToken: "rf_a", expiresAt: Date.now() + 3600_000, chatgptAccountId: "acc_a" };
     saveCodexAccountCredential("work", cred);
     expect(existsSync(ACCOUNTS_PATH)).toBe(true);
@@ -178,7 +178,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("legacy flat credential JSON loads through the compatibility projection", async () => {
-    const { getCodexAccountCredential, loadCodexAccountStore, readCodexAccountRecord } = await import("../../src/codex/account-store");
+    const { getCodexAccountCredential, loadCodexAccountStore, readCodexAccountRecord } = await import("../../backend/src/codex/account-store");
     const cred = { accessToken: "legacy_tk", refreshToken: "legacy_rf", expiresAt: Date.now() + 3600_000, chatgptAccountId: "legacy_acc" };
     writeFileSync(ACCOUNTS_PATH, JSON.stringify({ legacy: cred }, null, 2));
 
@@ -188,7 +188,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("malformed credential store is backed up before a new save overwrites it", async () => {
-    const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     writeFileSync(ACCOUNTS_PATH, "{not valid json", "utf8");
 
     saveCodexAccountCredential("fresh", {
@@ -204,7 +204,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("new saves write generation wrapper records", async () => {
-    const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { readCodexAccountRecord, saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     const cred = { accessToken: "tk_a", refreshToken: "rf_a", expiresAt: Date.now() + 3600_000, chatgptAccountId: "acc_a" };
     saveCodexAccountCredential("wrapped", cred);
 
@@ -221,8 +221,8 @@ describe("codex-account-store CRUD", () => {
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
       tombstoneCodexAccount,
-    } = await import("../../src/codex/account-store");
-    const { codexCredentialMutationEpoch } = await import("../../src/codex/credential-mutation-epoch");
+    } = await import("../../backend/src/codex/account-store");
+    const { codexCredentialMutationEpoch } = await import("../../backend/src/codex/credential-mutation-epoch");
     const first = { accessToken: "epoch-a", refreshToken: "epoch-r-a", expiresAt: Date.now() + 3600_000, chatgptAccountId: "epoch-account" };
     const second = { ...first, accessToken: "epoch-b", refreshToken: "epoch-r-b" };
     const third = { ...second, accessToken: "epoch-c", refreshToken: "epoch-r-c" };
@@ -249,7 +249,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("remove credential deletes entry", async () => {
-    const { saveCodexAccountCredential, removeCodexAccountCredential, getCodexAccountCredential, listCodexAccountIds, readCodexAccountRecord } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential, removeCodexAccountCredential, getCodexAccountCredential, listCodexAccountIds, readCodexAccountRecord } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("temp", { accessToken: "t", refreshToken: "r", expiresAt: 0, chatgptAccountId: "c" });
     removeCodexAccountCredential("temp");
     expect(getCodexAccountCredential("temp")).toBeNull();
@@ -259,7 +259,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("tokenful tombstone is treated as absent", async () => {
-    const { getCodexAccountCredential, listCodexAccountIds, loadCodexAccountStore } = await import("../../src/codex/account-store");
+    const { getCodexAccountCredential, listCodexAccountIds, loadCodexAccountStore } = await import("../../backend/src/codex/account-store");
     const cred = { accessToken: "deleted_tk", refreshToken: "deleted_rf", expiresAt: Date.now() + 3600_000, chatgptAccountId: "deleted_acc" };
     writeFileSync(ACCOUNTS_PATH, JSON.stringify({
       deleted: { credential: cred, generation: 2, deletedAt: Date.now() },
@@ -271,7 +271,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("listCodexAccountIds returns stored ids", async () => {
-    const { saveCodexAccountCredential, listCodexAccountIds } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential, listCodexAccountIds } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("a", { accessToken: "1", refreshToken: "1", expiresAt: 0, chatgptAccountId: "1" });
     saveCodexAccountCredential("b", { accessToken: "2", refreshToken: "2", expiresAt: 0, chatgptAccountId: "2" });
     expect(listCodexAccountIds()).toContain("a");
@@ -279,7 +279,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("getValidCodexToken returns cached token when not expired", async () => {
-    const { saveCodexAccountCredential, getValidCodexToken } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential, getValidCodexToken } = await import("../../backend/src/codex/account-store");
     const future = Date.now() + 3600_000;
     saveCodexAccountCredential("fresh", { accessToken: "valid_tk", refreshToken: "rf", expiresAt: future, chatgptAccountId: "acc_id" });
     const result = await getValidCodexToken("fresh");
@@ -289,7 +289,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("getValidCodexToken throws when account not found", async () => {
-    const { getValidCodexToken } = await import("../../src/codex/account-store");
+    const { getValidCodexToken } = await import("../../backend/src/codex/account-store");
     try {
       await getValidCodexToken("nonexistent-local-alias");
       throw new Error("expected getValidCodexToken to reject");
@@ -305,7 +305,7 @@ describe("codex-account-store CRUD", () => {
       getValidCodexToken,
       saveCodexAccountCredential,
       TokenRefreshError,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("sensitive-local-alias", {
       accessToken: "sensitive-access-token",
       refreshToken: "sensitive-refresh-token",
@@ -342,7 +342,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const first = { accessToken: "first", refreshToken: "first-r", expiresAt: 1, chatgptAccountId: "acc" };
     const second = { accessToken: "second", refreshToken: "second-r", expiresAt: 2, chatgptAccountId: "acc" };
     saveCodexAccountCredential("cas", first);
@@ -361,7 +361,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const first = { accessToken: "first", refreshToken: "first-r", expiresAt: 1, chatgptAccountId: "acc" };
     const second = { accessToken: "second", refreshToken: "second-r", expiresAt: 2, chatgptAccountId: "acc" };
     const third = { accessToken: "third", refreshToken: "third-r", expiresAt: 3, chatgptAccountId: "acc" };
@@ -390,7 +390,7 @@ describe("codex-account-store CRUD", () => {
       markCodexAccountValidationFailed,
       readCodexAccountRecord,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("failed-warmup", { accessToken: "sensitive-access", refreshToken: "sensitive-refresh", expiresAt: 1, chatgptAccountId: "sensitive-account" });
     markCodexAccountValidated("failed-warmup", 1234);
     markCodexAccountValidationFailed("failed-warmup", "http_status:401");
@@ -408,7 +408,7 @@ describe("codex-account-store CRUD", () => {
       markCodexAccountValidationFailed,
       readCodexAccountRecord,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("fenced", { accessToken: "a1", refreshToken: "r1", expiresAt: 1, chatgptAccountId: "acc" });
     markCodexAccountValidated("fenced", 1234);
     const stale = readCodexAccountRecord("fenced")!.generation;
@@ -440,7 +440,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const dead = { accessToken: "dead", refreshToken: "dead-r", expiresAt: 1, chatgptAccountId: "acc" };
     const fresh = { accessToken: "fresh", refreshToken: "fresh-r", expiresAt: 2, chatgptAccountId: "acc" };
     const rotated = { accessToken: "rotated", refreshToken: "rotated-r", expiresAt: 3, chatgptAccountId: "acc" };
@@ -479,7 +479,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       refreshGrantFingerprintForToken,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-success", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const startGeneration = readCodexAccountRecord("refresh-success")!.generation;
     const startFingerprint = readCodexAccountRecord("refresh-success")!.refreshGrantFingerprint;
@@ -506,7 +506,7 @@ describe("codex-account-store CRUD", () => {
       getCodexAccountCredential,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-bad-expiry", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const originalFetch = globalThis.fetch;
     // JSON.stringify turns NaN into null; hand-write 1e999 so JSON.parse yields Infinity,
@@ -533,7 +533,7 @@ describe("codex-account-store CRUD", () => {
       getCodexAccountCredential,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-overflow-expiry", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const originalFetch = globalThis.fetch;
     // Number.MAX_VALUE passes Number.isFinite but overflows to Infinity when
@@ -560,7 +560,7 @@ describe("codex-account-store CRUD", () => {
       getCodexAccountCredential,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-negative-expiry", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async () => new Response(
@@ -586,7 +586,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-wait", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const generation = readCodexAccountRecord("refresh-wait")!.generation;
     const lockPath = refreshLockPathForToken("old-r");
@@ -613,7 +613,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("stale refresh lock is reclaimed", async () => {
-    const { getValidCodexToken, saveCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { getValidCodexToken, saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-stale-lock", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     writeFileSync(refreshLockPathForToken("old-r"), JSON.stringify({ acquiredAt: Date.now() - 61_000, pid: 12345 }) + "\n");
     const originalFetch = globalThis.fetch;
@@ -629,7 +629,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("a refresh lock that is still being initialized is not reclaimed as stale", async () => {
-    const { getValidCodexToken, saveCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { getValidCodexToken, saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-empty-lock", { accessToken: "old", refreshToken: "empty-r", expiresAt: 0, chatgptAccountId: "acc" });
     // The owner creates the lock file and writes its metadata as two steps, so a live lock is
     // briefly unreadable. Treating that window as stale let a waiter delete a lock whose owner
@@ -658,7 +658,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("releasing a refresh lock leaves a lock another owner recreated in place", async () => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const lockKey = "recreated-owner";
     const lockPath = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(lockKey).digest("hex").slice(0, 32)}.lock`);
     await withCodexRefreshFileLock(lockKey, new AbortController().signal, async () => {
@@ -673,7 +673,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test.each([false, true])("refresh release prevents inode reuse before comparison (callback failure=%s)", async (callbackFails) => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const key = `release-inode-reuse-${callbackFails}`;
     const path = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(key).digest("hex").slice(0, 32)}.lock`);
     const originalFstat = fs.fstatSync;
@@ -713,7 +713,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("refresh release preserves the path when descriptor identity cannot be read", async () => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const lockKey = "unknown-owner";
     const lockPath = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(lockKey).digest("hex").slice(0, 32)}.lock`);
     const original = fs.fstatSync;
@@ -737,7 +737,7 @@ describe("codex-account-store CRUD", () => {
   for (const code of ["EACCES", "EIO"]) {
     for (const callbackFails of [false, true]) {
       test(`refresh release preserves the callback outcome after ${code} path probe failure (${callbackFails})`, async () => {
-        const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+        const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
         const lockKey = `path-probe-${code}-${callbackFails}`;
         const lockPath = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(lockKey).digest("hex").slice(0, 32)}.lock`);
         const original = fs.statSync;
@@ -762,7 +762,7 @@ describe("codex-account-store CRUD", () => {
   }
 
   test.each(["ENOENT", "EACCES"])("refresh release preserves confirmed-owner unlink handling for %s", async (code) => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const lockKey = `unlink-${code}`;
     const lockPath = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(lockKey).digest("hex").slice(0, 32)}.lock`);
     const original = fs.unlinkSync;
@@ -781,7 +781,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("refresh stale reclamation excludes a second SQLite writer until acquisition finishes", async () => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const key = "serialized-stale";
     const path = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(key).digest("hex").slice(0, 32)}.lock`);
     writeFileSync(path, JSON.stringify({ acquiredAt: 0 }));
@@ -806,7 +806,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test.each([false, true])("refresh metadata failure closes its descriptor and preserves replacement=%s", async (replacement) => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const key = `metadata-write-${replacement}`;
     const path = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(key).digest("hex").slice(0, 32)}.lock`);
     const original = fs.writeFileSync;
@@ -832,7 +832,7 @@ describe("codex-account-store CRUD", () => {
   });
 
   test("refresh release keeps its result and lock when metadata coordination is busy", async () => {
-    const { withCodexRefreshFileLock } = await import("../../src/codex/account-store");
+    const { withCodexRefreshFileLock } = await import("../../backend/src/codex/account-store");
     const key = "release-coordination-busy";
     const path = join(TEST_DIR, `codex-refresh-${createHash("sha256").update(key).digest("hex").slice(0, 32)}.lock`);
     const db = new Database(join(TEST_DIR, "config-mutation.sqlite"), { create: true });
@@ -850,7 +850,7 @@ describe("codex-account-store CRUD", () => {
       getCodexAccountCredential,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("alias-a", { accessToken: "old-a", refreshToken: "shared-r", expiresAt: 0, chatgptAccountId: "acc" });
     saveCodexAccountCredential("alias-b", { accessToken: "old-b", refreshToken: "shared-r", expiresAt: 0, chatgptAccountId: "acc" });
     let fetchCalls = 0;
@@ -885,7 +885,7 @@ describe("codex-account-store CRUD", () => {
       CodexCredentialRefreshBusyError,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     for (let index = 0; index < 33; index++) {
       saveCodexAccountCredential(`flight-${index}`, {
         accessToken: `old-${index}`,
@@ -921,7 +921,7 @@ describe("codex-account-store CRUD", () => {
       CodexCredentialRefreshStaleError,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("stale-flight", {
       accessToken: "old",
       refreshToken: "stale-refresh",
@@ -962,7 +962,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const original = { accessToken: "original", refreshToken: "original-r", expiresAt: 1, chatgptAccountId: "acc" };
     const replacement = { accessToken: "replacement", refreshToken: "replacement-r", expiresAt: 2, chatgptAccountId: "acc" };
     const stale = { accessToken: "stale", refreshToken: "stale-r", expiresAt: 3, chatgptAccountId: "acc" };
@@ -981,7 +981,7 @@ describe("codex-account-store CRUD", () => {
       removeCodexAccountCredential,
       saveCodexAccountCredential,
       saveCodexAccountCredentialIfGeneration,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const original = { accessToken: "original", refreshToken: "original-r", expiresAt: 1, chatgptAccountId: "acc" };
     const stale = { accessToken: "stale", refreshToken: "stale-r", expiresAt: 2, chatgptAccountId: "acc" };
     saveCodexAccountCredential("delete-race", original);
@@ -1001,7 +1001,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       removeCodexAccountCredential,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("refresh-delete", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async () => {
@@ -1024,7 +1024,7 @@ describe("codex-account-store CRUD", () => {
       getCodexAccountCredential,
       getValidCodexToken,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const replacement = { accessToken: "replacement", refreshToken: "replacement-r", expiresAt: Date.now() + 3600_000, chatgptAccountId: "acc" };
     saveCodexAccountCredential("refresh-replace", { accessToken: "old", refreshToken: "old-r", expiresAt: 0, chatgptAccountId: "acc" });
     const originalFetch = globalThis.fetch;
@@ -1047,7 +1047,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       saveCodexAccountCredential,
     } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     // Far beyond the refresh skew: getValidCodexToken would return this untouched, which is
     // exactly why a 401 on it was unrecoverable.
     saveCodexAccountCredential("forced", {
@@ -1080,7 +1080,7 @@ describe("codex-account-store CRUD", () => {
 
   test("a forced refresh whose generation was already superseded spends no rotation (#2887)", async () => {
     const { forceRefreshCodexPoolToken, saveCodexAccountCredential, readCodexAccountRecord } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("forced-stale", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1119,7 +1119,7 @@ describe("codex-account-store CRUD", () => {
 
   test("concurrent forced refreshes of one rejected generation collapse to a single token call (#2887)", async () => {
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("forced-concurrent", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1165,7 +1165,7 @@ describe("codex-account-store CRUD", () => {
       registerCodexRefreshGenerationHandoff,
       saveCodexAccountCredential,
     } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("cancel-owner", {
       accessToken: "rejected",
       refreshToken: "cancel-grant",
@@ -1235,7 +1235,7 @@ describe("codex-account-store CRUD", () => {
     // written from the lock-acquisition hook rather than from inside `fetch`: by fetch time
     // the grant comparison has already happened and a different branch handles the case.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     const shared = { refreshToken: "shared-grant", expiresAt: Date.now() + 3600_000, chatgptAccountId: "acc" };
     saveCodexAccountCredential("owner", { ...shared, accessToken: "owner-rejected" });
     saveCodexAccountCredential("joiner", { ...shared, accessToken: "joiner-rejected" });
@@ -1290,7 +1290,7 @@ describe("codex-account-store CRUD", () => {
     // caller that quarantines on rotated===false must fence on the RETURNED generation —
     // fencing on the one it rejected silently suppresses its own quarantine.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("same-bearer", {
       accessToken: "still-rejected",
       refreshToken: "grant",
@@ -1324,7 +1324,7 @@ describe("codex-account-store CRUD", () => {
     // same-account joiner that re-writes the identical credential would move it to G+2 and
     // invalidate that handoff.
     const { forceRefreshCodexPoolToken, getValidCodexToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("double-bump", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1366,7 +1366,7 @@ describe("codex-account-store CRUD", () => {
     // Upstream sends invalid_grant with no description. Classified "unknown" it reads as
     // transient, so a dead grant is never retired and every request repeats the refresh.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential, TokenRefreshError } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("dead-grant", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1393,7 +1393,7 @@ describe("codex-account-store CRUD", () => {
 
   test("nested error object with refresh_token_invalidated classifies as revoked", async () => {
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential, TokenRefreshError } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("invalidated-grant", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1431,7 +1431,7 @@ describe("codex-account-store CRUD", () => {
 
   test("nested error object with refresh_token_expired classifies as expired", async () => {
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential, TokenRefreshError } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("expired-grant", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1474,7 +1474,7 @@ describe("codex-account-store CRUD", () => {
     // lineage from the stored record instead is tautological — the caller reads the same
     // record the check would re-read.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("external", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1515,7 +1515,7 @@ describe("codex-account-store CRUD", () => {
     // Matching the phrase anywhere in the combined code+description text would retire a
     // healthy account on an upstream blip — reintroducing the defect this path fixes.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential, TokenRefreshError } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("blip", {
       accessToken: "rejected",
       refreshToken: "grant",
@@ -1545,7 +1545,7 @@ describe("codex-account-store CRUD", () => {
 
   test("a successful refresh advances an untouched dormant same-grant alias in the same write (#2892 gap 3)", async () => {
     const { getValidCodexToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     const expiresAt = 0;
     const shared = { refreshToken: "dormant-grant", expiresAt, chatgptAccountId: "acc" };
     // Owner drives the refresh. `dormant` is an untouched duplicate that never calls in — the
@@ -1615,7 +1615,7 @@ describe("codex-account-store CRUD", () => {
 
   test("a tombstoned same-grant record is not resurrected by grant propagation (#2892 gap 3)", async () => {
     const { getValidCodexToken, readCodexAccountRecord, saveCodexAccountCredential, tombstoneCodexAccount } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     const shared = { accessToken: "tomb-old", refreshToken: "tomb-grant", expiresAt: 0, chatgptAccountId: "acc" };
     saveCodexAccountCredential("tomb-owner", { ...shared });
     saveCodexAccountCredential("tomb-deleted", { ...shared });
@@ -1645,7 +1645,7 @@ describe("codex-account-store CRUD", () => {
     // or a tombstone raced by a concurrent save, produces exactly this record. `tokenful tombstone is
     // treated as absent` earlier in this file pins the same shape for the read path.
     const { getValidCodexToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     const shared = {
       accessToken: "tokenful-old",
       refreshToken: "tokenful-grant",
@@ -1684,7 +1684,7 @@ describe("codex-account-store CRUD", () => {
 
   test("a same-grant sibling on a DIFFERENT upstream identity is never adopted (#2892 review)", async () => {
     const { forceRefreshCodexPoolToken, getCodexAccountCredential, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     // Both records share one stored grant, but they claim different upstream accounts. Adoption
     // copies BOTH tokens, so treating a shared fingerprint as proof of identity would hand this
     // caller another account's credential.
@@ -1734,7 +1734,7 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       registerCodexRefreshGenerationHandoff,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
+    } = await import("../../backend/src/codex/account-store");
     const shared = { accessToken: "aff-old", refreshToken: "aff-grant", expiresAt: 0, chatgptAccountId: "acc" };
     saveCodexAccountCredential("aff-owner", { ...shared });
     saveCodexAccountCredential("aff-alias", { ...shared });
@@ -1772,9 +1772,9 @@ describe("codex-account-store CRUD", () => {
       readCodexAccountRecord,
       registerCodexRefreshGenerationHandoff,
       saveCodexAccountCredential,
-    } = await import("../../src/codex/account-store");
-    const { loadConfig, saveConfig } = await import("../../src/config");
-    const { resetJwtPlanNotesForTests } = await import("../../src/codex/plan-from-token");
+    } = await import("../../backend/src/codex/account-store");
+    const { loadConfig, saveConfig } = await import("../../backend/src/config");
+    const { resetJwtPlanNotesForTests } = await import("../../backend/src/codex/plan-from-token");
     resetJwtPlanNotesForTests();
 
     saveConfig({
@@ -1835,9 +1835,9 @@ describe("shared refresh flight plan reconciliation (#2892 gap 2 follow-up)", ()
     // chatgpt_plan_type would otherwise commit while codexAccounts[].plan stayed stale
     // for the rest of the process, skewing plan-selected quota projection.
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
-    const { loadConfig, saveConfig } = await import("../../src/config");
-    const { resetJwtPlanNotesForTests } = await import("../../src/codex/plan-from-token");
+      await import("../../backend/src/codex/account-store");
+    const { loadConfig, saveConfig } = await import("../../backend/src/config");
+    const { resetJwtPlanNotesForTests } = await import("../../backend/src/codex/plan-from-token");
     resetJwtPlanNotesForTests();
 
     saveConfig({
@@ -1902,7 +1902,7 @@ describe("shared refresh flight plan reconciliation (#2892 gap 2 follow-up)", ()
 
   test("records with EMPTY account ids are never treated as the same identity (#2892 review)", async () => {
     const { CodexCredentialUnavailableError, getValidCodexToken, readCodexAccountRecord } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     // Grant fingerprint, access token and expiry all match, and both ids are "". Two empty strings
     // compare equal but prove nothing about which upstream account either record was meant to use,
     // so propagation must fail closed rather than write a credential into an unidentified record.

@@ -3,16 +3,16 @@ import {
   providerRequestPacingStatus, registerProviderResponseProvenance,
   resetProviderRequestPacingForTest, sendTrackingRequestSlot,
   trackProviderRequestSlotBody, waitForProviderRequestSlot,
-} from "../../src/providers/request-pacing";
+} from "../../backend/src/providers/request-pacing";
 import {
   isNativeControlResponse, markNativeControlResponse,
-} from "../../src/server/responses/native-response-control";
+} from "../../backend/src/server/responses/native-response-control";
 import {
   codexWsSocketDeathStage, isCodexWsPreludeProjection, isCodexWsQuotaObservedResponse,
   isCodexWsUpstreamResponse, markCodexWsPreludeProjection, markCodexWsResponse,
   markCodexWsSocketDeath, markCodexWsStage, readCodexWsStage, type CodexWsStageRecord,
-} from "../../src/server/responses/codex-ws-wire";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/responses/codex-ws-wire";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 afterEach(() => resetProviderRequestPacingForTest());
 

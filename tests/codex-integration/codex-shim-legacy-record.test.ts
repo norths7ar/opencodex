@@ -15,7 +15,7 @@ import {
   installCodexShim,
   setLegacyShimUninstallStepHookForTests,
   uninstallCodexShim,
-} from "../../src/codex/shim";
+} from "../../backend/src/codex/shim";
 import {
   checkLegacyShimRecord,
   legacyShimBackupPath,
@@ -23,12 +23,12 @@ import {
   resolveLegacyShimDirectory,
   setLegacyShimMutationGuard,
   validateLegacyWindowsShimRecord,
-} from "../../src/codex/shim-legacy-record";
-import { buildWindowsCodexShim } from "../../src/codex/shim-templates";
-import { stableShimPathProbe } from "../../src/codex/shim-fingerprint";
-import { refreshObsoleteWindowsShim } from "../../src/codex/shim-windows-refresh";
-import { writeShim } from "../../src/codex/shim-wrapper-write";
-import { setUninstallElevationProbeForTests, uninstallRunsElevated } from "../../src/lib/config-ownership-removal";
+} from "../../backend/src/codex/shim-legacy-record";
+import { buildWindowsCodexShim } from "../../backend/src/codex/shim-templates";
+import { stableShimPathProbe } from "../../backend/src/codex/shim-fingerprint";
+import { refreshObsoleteWindowsShim } from "../../backend/src/codex/shim-windows-refresh";
+import { writeShim } from "../../backend/src/codex/shim-wrapper-write";
+import { setUninstallElevationProbeForTests, uninstallRunsElevated } from "../../backend/src/lib/config-ownership-removal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -460,7 +460,7 @@ describe("mutations after validation stay in the validated directory", () => {
   });
 
   test("the Windows shim modules rename, unlink and link only through the guarded calls", () => {
-    for (const file of ["src/codex/shim.ts", "src/codex/shim-windows-refresh.ts"]) {
+    for (const file of ["backend/src/codex/shim.ts", "backend/src/codex/shim-windows-refresh.ts"]) {
       const source = fs.readFileSync(repoPath(file), "utf8");
       const fsImport = source.match(/import \{([^}]*)\} from "node:fs";/)?.[1] ?? "";
       for (const call of ["renameSync", "unlinkSync", "linkSync", "rmSync"]) expect(fsImport.split(",").map(name => name.trim())).not.toContain(call);
@@ -513,7 +513,7 @@ describe("on-disk checks (every OS, host filesystem)", () => {
 
 describe("ocx uninstall keeps the config when the shim needs manual restore", () => {
   test("a refused shim step counts as a failure before config removal", () => {
-    const cli = fs.readFileSync(repoPath("src/cli/index.ts"), "utf8");
+    const cli = fs.readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
     const body = cli.slice(cli.indexOf("async function handleUninstall()"));
     const shimStep = body.indexOf("const r = await uninstallCodexShimAsync();");
     const refusal = body.indexOf('if (r.refused) {', shimStep);

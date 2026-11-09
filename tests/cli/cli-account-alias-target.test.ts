@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { cmdAccount } from "../../src/cli/account";
-import type { AccountDeps } from "../../src/cli/account-api";
-import type { OcxConfig } from "../../src/types";
+import { cmdAccount } from "../../backend/src/cli/account";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Resolving an account argument that is an alias, and the reserved word `auto`.

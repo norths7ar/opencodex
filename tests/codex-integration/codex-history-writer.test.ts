@@ -8,12 +8,12 @@ import { Database } from "bun:sqlite";
 import {
   withHistoryWriteSerialization,
   type HistoryWritePermit,
-} from "../../src/codex/history-lock";
+} from "../../backend/src/codex/history-lock";
 import {
   writeHistoryProviderTransition,
   writeLegacyOpenaiHistoryRecovery,
   type HistoryWriteTarget,
-} from "../../src/codex/internal/history-writer";
+} from "../../backend/src/codex/internal/history-writer";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const sandboxes: string[] = [];

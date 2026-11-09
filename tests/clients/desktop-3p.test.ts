@@ -1,6 +1,6 @@
-import { saveConfig, readConfigDiagnostics } from "../../src/config";
-import { writeServiceApiTokenFile } from "../../src/lib/service-secrets";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig, readConfigDiagnostics } from "../../backend/src/config";
+import { writeServiceApiTokenFile } from "../../backend/src/lib/service-secrets";
+import type { OcxConfig } from "../../backend/src/types";
 import { describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -20,10 +20,10 @@ import {
   resolveDesktop3pAlias,
   writeDesktop3pConfig,
   type Desktop3pModelEntry,
-} from "../../src/claude/desktop-3p";
-import { assertDesktopLibraryTextSize, MAX_DESKTOP_PROFILE_FILE_BYTES } from "../../src/claude/desktop-3p-library";
-import { moveDesktopRoute, reconcileDesktopProfile, setDesktopFamilyDefault } from "../../src/claude/desktop-profile";
-import { resolveInboundModel } from "../../src/claude/inbound";
+} from "../../backend/src/claude/desktop-3p";
+import { assertDesktopLibraryTextSize, MAX_DESKTOP_PROFILE_FILE_BYTES } from "../../backend/src/claude/desktop-3p-library";
+import { moveDesktopRoute, reconcileDesktopProfile, setDesktopFamilyDefault } from "../../backend/src/claude/desktop-profile";
+import { resolveInboundModel } from "../../backend/src/claude/inbound";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("Claude Desktop 3P models", () => {

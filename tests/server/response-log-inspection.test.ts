@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { teeWithBoundedInspection } from "../../src/server/inspection-tee";
-import { createBoundedResponseLogBody } from "../../src/server/response-log-body";
+import { teeWithBoundedInspection } from "../../backend/src/server/inspection-tee";
+import { createBoundedResponseLogBody } from "../../backend/src/server/response-log-body";
 import {
   consumeForInspection,
   consumeForResponseLogMetadata,
   createSseInspector,
   relaySseWithFailedTail,
   type InspectionConsumerOptions,
-} from "../../src/server/relay";
-import type { RequestLogContext } from "../../src/server/request-log";
+} from "../../backend/src/server/relay";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 const encoder = new TextEncoder();
 const frame = (payload: unknown) => encoder.encode(`data: ${JSON.stringify(payload)}\n\n`);

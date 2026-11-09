@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
 import {
   clearAccountQuotaCache,
   getCachedProviderAccountQuota,
@@ -12,10 +12,10 @@ import {
   resetProviderQuotaReconcileStateForTests,
   setCachedProviderAccountQuotaForTests,
   supportsPerAccountQuota,
-} from "../../src/providers/quota";
-import { hasHeadroomEvidence, rankAccountsByHeadroom } from "../../src/oauth/account-quota-rank";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import type { ProviderQuota } from "../../src/providers/quota-types";
+} from "../../backend/src/providers/quota";
+import { hasHeadroomEvidence, rankAccountsByHeadroom } from "../../backend/src/oauth/account-quota-rank";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import type { ProviderQuota } from "../../backend/src/providers/quota-types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousOpencodexHome = process.env.OPENCODEX_HOME;
@@ -95,7 +95,7 @@ describe("passive Muse quota cache", () => {
 
   test("discards a write whose config generation has been superseded", () => {
     // Generation 0 predates any reconciliation; a stale writer must not commit.
-    const { reconcileStateGeneration } = require("../../src/lib/state-store-sweeper");
+    const { reconcileStateGeneration } = require("../../backend/src/lib/state-store-sweeper");
     reconcileStateGeneration({ generation: 0, oauthAccountKeys: new Set<string>(), providerNames: new Set<string>() });
     recordPassiveAccountQuota("meta-muse", FIRST.accountId, quotaAt(42), -1);
     expect(getCachedProviderAccountQuota("meta-muse", FIRST.accountId)).toBeNull();
@@ -198,7 +198,7 @@ describe("passive quota and routing headroom", () => {
     expect(hasHeadroomEvidence("anthropic", [FIRST.accountId])).toBe(true);
   });
 });
-import { readPersistedAccountQuotas } from "../../src/providers/account-quota-disk";
+import { readPersistedAccountQuotas } from "../../backend/src/providers/account-quota-disk";
 
 /** PERSIST_DEBOUNCE_MS is 250ms in account-quota-disk.ts; wait past it. */
 const PERSIST_SETTLE_MS = 400;

@@ -3,8 +3,8 @@ import {
   ambiguousResendAllowanceFor,
   selfContainedChatBody,
   selfContainedResponsesBody,
-} from "../../src/server/responses/reset-replay";
-import { authorizeResendForRecovery } from "../../src/lib/request-resend-gate";
+} from "../../backend/src/server/responses/reset-replay";
+import { authorizeResendForRecovery } from "../../backend/src/lib/request-resend-gate";
 
 const clientTurn = {
   store: false,

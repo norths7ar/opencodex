@@ -6,25 +6,25 @@ import {
   createKiroAdapter as createKiroAdapterProduction,
   isRetryableKiroStreamCatchError,
   parseKiroStream,
-} from "../../../src/adapters/kiro";
+} from "../../../backend/src/adapters/kiro";
 import {
   KIRO_COMPLETION_RETRY_MESSAGE,
   KIRO_COMPLETION_TOOL_NAME,
   KIRO_TOOL_RESULT_CARRIER_MESSAGE,
-} from "../../../src/adapters/kiro-constants";
-import { parseKiroEvent } from "../../../src/adapters/kiro-events";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { resetKiroCalibration } from "../../../src/adapters/kiro-calibration";
-import { buildResponseJSON } from "../../../src/bridge";
+} from "../../../backend/src/adapters/kiro-constants";
+import { parseKiroEvent } from "../../../backend/src/adapters/kiro-events";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { resetKiroCalibration } from "../../../backend/src/adapters/kiro-calibration";
+import { buildResponseJSON } from "../../../backend/src/bridge";
 import {
   clearDebugSetting,
   getDebugSettings,
   setDebugSettings,
-} from "../../../src/lib/debug-settings";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { estimateTokens } from "../../../src/lib/token-estimate";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { OcxParsedRequest, OcxProviderConfig, OcxUsage } from "../../../src/types";
+} from "../../../backend/src/lib/debug-settings";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { estimateTokens } from "../../../backend/src/lib/token-estimate";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { OcxParsedRequest, OcxProviderConfig, OcxUsage } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
@@ -103,8 +103,8 @@ function streamOf(...frames: Uint8Array[]): ReadableStream<Uint8Array> {
   });
 }
 
-async function collectAdapterEvents(events: AsyncGenerator<import("../../../src/types").AdapterEvent>) {
-  const out: import("../../../src/types").AdapterEvent[] = [];
+async function collectAdapterEvents(events: AsyncGenerator<import("../../../backend/src/types").AdapterEvent>) {
+  const out: import("../../../backend/src/types").AdapterEvent[] = [];
   for await (const event of events) out.push(event);
   return out;
 }
@@ -2217,7 +2217,7 @@ describe("kiro adapter — non-streaming parseResponse", () => {
 
 describe("surrogate safety at kiro boundaries", () => {
   test("the reasoning carry never emits a delta ending on a lone high surrogate", async () => {
-    const { InlineThinkTagParser } = await import("../../../src/adapters/inline-think-tags");
+    const { InlineThinkTagParser } = await import("../../../backend/src/adapters/inline-think-tags");
     const parser = new InlineThinkTagParser();
     // An astral char exactly at the carry/send boundary.
     const events = parser.feed("<thinking>🎆aaaaaaaaaaa");
@@ -2232,7 +2232,7 @@ describe("surrogate safety at kiro boundaries", () => {
   });
 
   test("a truncated tool description never ends on a lone high surrogate", async () => {
-    const { truncateDescriptionForTests } = await import("../../../src/adapters/kiro-tools");
+    const { truncateDescriptionForTests } = await import("../../../backend/src/adapters/kiro-tools");
     const description = "a".repeat(1022) + "🎆cd";
     const out = truncateDescriptionForTests(description, 1024);
     expect(out.endsWith("…")).toBe(true);

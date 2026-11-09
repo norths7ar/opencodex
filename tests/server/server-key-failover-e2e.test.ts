@@ -2,35 +2,35 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { apiKeyAccountLogLabel } from "../../src/codex/account-label";
-import { readUsageEntries, resetUsageReadCacheForTests } from "../../src/usage/log";
-import { loadConfig, saveConfig } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
-import { clearKeyCooldowns, getKeyCooldownUntil, rotateKeyOn429 } from "../../src/providers/key-failover";
-import { deriveXaiConvId } from "../../src/providers/xai-transport";
+import { apiKeyAccountLogLabel } from "../../backend/src/codex/account-label";
+import { readUsageEntries, resetUsageReadCacheForTests } from "../../backend/src/usage/log";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
+import { clearKeyCooldowns, getKeyCooldownUntil, rotateKeyOn429 } from "../../backend/src/providers/key-failover";
+import { deriveXaiConvId } from "../../backend/src/providers/xai-transport";
 import {
   clearReasoningReplayCacheForTests,
   reasoningReplayDestinationIdentity,
   reasoningReplayKeyCredentialIdentity,
-} from "../../src/responses/reasoning-replay-cache";
+} from "../../backend/src/responses/reasoning-replay-cache";
 import {
   bridgeSearchReplayScope,
   clearBridgeSearchReplayCacheForTests,
   rememberBridgeSearchReplay,
-} from "../../src/responses/bridge-search-replay-cache";
-import { startServer } from "../../src/server";
-import { handleResponses } from "../../src/server/responses";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/bridge-search-replay-cache";
+import { startServer } from "../../backend/src/server";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { managementFetch } from "../helpers/management-auth";
-import { resolveContextPrincipal } from "../../src/server/auth-cors";
-import { providerRequestPacingStatus, resetProviderRequestPacingForTest, setProviderRequestPacingRuntimeForTest, waitForProviderRequestSlot } from "../../src/providers/request-pacing";
-import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport, commitProviderApiKeySelection } from "../../src/providers/api-key-selection";
-import { routedProviderConfig } from "../../src/router";
-import type { OcxProviderTransport } from "../../src/providers/xai-transport";
+import { resolveContextPrincipal } from "../../backend/src/server/auth-cors";
+import { providerRequestPacingStatus, resetProviderRequestPacingForTest, setProviderRequestPacingRuntimeForTest, waitForProviderRequestSlot } from "../../backend/src/providers/request-pacing";
+import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport, commitProviderApiKeySelection } from "../../backend/src/providers/api-key-selection";
+import { routedProviderConfig } from "../../backend/src/router";
+import type { OcxProviderTransport } from "../../backend/src/providers/xai-transport";
 
 let testDir = "";
 let previousHome: string | undefined;
@@ -999,8 +999,8 @@ describe("server 429 key failover (end-to-end)", () => {
   });
 
 test.each([false, true])("chat-native attributes same-key 429 usage then the rotated key (stream=%s)", async (streaming) => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
-  const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
+  const { clearKeyCooldowns } = await import("../../backend/src/providers/key-failover");
   clearRequestLogsForTests();
   clearKeyCooldowns("mock");
   const authorizations: Array<string | null> = [];
@@ -1064,8 +1064,8 @@ test.each([false, true])("chat-native attributes same-key 429 usage then the rot
 });
 
 test("chat-native preserves same-key retry, key rotation, usage, and request logging", async () => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
-  const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
+  const { clearKeyCooldowns } = await import("../../backend/src/providers/key-failover");
   clearRequestLogsForTests();
   clearKeyCooldowns("mock");
   const authorizations: Array<string | null> = [];
@@ -1361,17 +1361,17 @@ test("a dispatch-time key switch rebuilds the bridged-search restore under the n
 import { EventEmitter } from "node:events";
 import { Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import * as runTurnResolver from "../../src/server/adapter-resolve";
-import * as runTurnKeyPool from "../../src/providers/key-failover";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { createCodeBuddyAdapter } from "../../src/adapters/codebuddy/adapter";
-import { clearQoderBinaryCache } from "../../src/adapters/qoder/profiles";
-import { clearCodeBuddyBinaryCache } from "../../src/adapters/codebuddy/profiles";
-import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
+import * as runTurnResolver from "../../backend/src/server/adapter-resolve";
+import * as runTurnKeyPool from "../../backend/src/providers/key-failover";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { createCodeBuddyAdapter } from "../../backend/src/adapters/codebuddy/adapter";
+import { clearQoderBinaryCache } from "../../backend/src/adapters/qoder/profiles";
+import { clearCodeBuddyBinaryCache } from "../../backend/src/adapters/codebuddy/profiles";
+import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 
 async function cliKeyRecoveryCase(options: {
   adapter?: "qoder" | "codebuddy"; stream?: boolean; vendorCode?: number; result?: string;
@@ -1509,7 +1509,7 @@ describe("runTurn API-key recovery", () => {
   });
 
   test("CodeBuddy multi-key healthy stream starts SSE without key-pool preflight", async () => {
-    const queueModule = await import("../../src/adapters/run-turn-queue");
+    const queueModule = await import("../../backend/src/adapters/run-turn-queue");
     const preflight = spyOn(queueModule, "preflightAdapterEvents");
     try {
       // The CLI cannot release output until the Response exists; no timing race is involved.
@@ -1542,7 +1542,7 @@ describe("runTurn API-key recovery", () => {
   });
 
   test("rechecks the failed key after adapter refresh before applying key recovery", async () => {
-    const transportModule = await import("../../src/server/responses/request-transport");
+    const transportModule = await import("../../backend/src/server/responses/request-transport");
     const prepare = transportModule.prepareResponsesTransport;
     const refreshEntered = Promise.withResolvers<void>();
     const resumeRefresh = Promise.withResolvers<void>();

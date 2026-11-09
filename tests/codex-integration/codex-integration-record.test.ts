@@ -5,13 +5,13 @@ import { join } from "node:path";
 import {
   readIntegrationRecord,
   updateIntegrationRecord,
-} from "../../src/codex/integration-record";
-import { boundProvenanceEntries } from "../../src/codex/inject-coordination";
+} from "../../backend/src/codex/integration-record";
+import { boundProvenanceEntries } from "../../backend/src/codex/inject-coordination";
 import type {
   CodexArtifactId,
   CodexIntegrationRecord,
   CodexProvenanceEntry,
-} from "../../src/codex/convergence-types";
+} from "../../backend/src/codex/convergence-types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let opencodexHome = "";

@@ -4,7 +4,7 @@ import {
   detectQuotaResets,
   MIN_SURPRISE_DROP_PERCENT,
   quotaAccountTag,
-} from "../../src/quota/reset-detector";
+} from "../../backend/src/quota/reset-detector";
 
 const NOW = 1_772_000_000_000;
 const HOUR = 60 * 60_000;

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import { responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { pumpResponsesSseToWebSocket, type WsData } from "../../src/server/ws-bridge";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import { responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { pumpResponsesSseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 async function* burstGenerator(count: number): AsyncGenerator<AdapterEvent> {

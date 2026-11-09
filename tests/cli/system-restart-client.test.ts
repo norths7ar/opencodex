@@ -4,7 +4,7 @@ import {
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
   createLocalAttestationSecret,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import {
   SYSTEM_RESTART_CAPABILITY_HEADER,
   SYSTEM_RESTART_CAPABILITY_VERSION,
@@ -13,9 +13,9 @@ import {
   SYSTEM_RESTART_NONCE_HEADER,
   SYSTEM_RESTART_PATH,
   verifySystemRestartCapability,
-} from "../../src/lib/system-restart-contract";
-import { requestBoundSystemRestart } from "../../src/cli/system-restart-client";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
+} from "../../backend/src/lib/system-restart-contract";
+import { requestBoundSystemRestart } from "../../backend/src/cli/system-restart-client";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
 
 const target: LiveProxy = {
   pid: 4242,

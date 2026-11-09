@@ -1,10 +1,10 @@
-import { upstreamFailureEvidence } from "../../src/lib/client-error-body";
+import { upstreamFailureEvidence } from "../../backend/src/lib/client-error-body";
 import { expect, test } from "bun:test";
-import { saveConfig } from "../../src/config";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
+import { saveConfig } from "../../backend/src/config";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import type { OcxConfig } from "../../src/types";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import type { OcxConfig } from "../../backend/src/types";
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const errors = [
   { type: "invalid_request_error", message: `prompt is too long ${sentinel}` },

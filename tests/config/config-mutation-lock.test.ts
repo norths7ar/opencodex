@@ -4,12 +4,12 @@ import * as fs from "node:fs";
 import { closeSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { armClaudeCodeBaseline, ConfigMutationLockError, deleteConfigTopLevelKey, getConfigPath, initializePersistedConfigIfMissing, loadConfig, observeInitialConfigState, readConfigGeneration, saveConfig, saveConfigPreservingClaudeCode, withConfigMutationLockSync } from "../../src/config";
-import { setCodexAccountAutoSwitchThresholdOverride } from "../../src/codex/account-auto-switch";
-import { InitialConfigPublicationError, publishInitialConfigNoReplace } from "../../src/config/initialize";
-import { nextAtomicTempSequence } from "../../src/config/atomic-write";
-import { CodexCredentialRefreshLockTimeoutError, getCodexAccountCredential, saveCodexAccountCredential } from "../../src/codex/account-store";
-import type { OcxConfig } from "../../src/types";
+import { armClaudeCodeBaseline, ConfigMutationLockError, deleteConfigTopLevelKey, getConfigPath, initializePersistedConfigIfMissing, loadConfig, observeInitialConfigState, readConfigGeneration, saveConfig, saveConfigPreservingClaudeCode, withConfigMutationLockSync } from "../../backend/src/config";
+import { setCodexAccountAutoSwitchThresholdOverride } from "../../backend/src/codex/account-auto-switch";
+import { InitialConfigPublicationError, publishInitialConfigNoReplace } from "../../backend/src/config/initialize";
+import { nextAtomicTempSequence } from "../../backend/src/config/atomic-write";
+import { CodexCredentialRefreshLockTimeoutError, getCodexAccountCredential, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest, managementHeaders } from "../helpers/management-auth";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -84,7 +84,7 @@ test("a live cross-process holder is not stolen and runtime writers fail immedia
   saveConfig(config());
   const readyPath = join(testRoot, "holder-ready");
   const releasePath = join(testRoot, "holder-release");
-  const configModuleUrl = pathToFileURL(repoPath("src/config.ts")).href;
+  const configModuleUrl = pathToFileURL(repoPath("backend/src/config.ts")).href;
   const childSource = `
     import { existsSync, writeFileSync } from "node:fs";
     import { withConfigMutationLockSync } from ${JSON.stringify(configModuleUrl)};
@@ -151,7 +151,7 @@ test("a live cross-process holder is not stolen and runtime writers fail immedia
 test("an abruptly exited holder releases the OS-backed transaction without stale recovery", async () => {
   saveConfig(config());
   const enteredPath = join(testRoot, "crashed-holder-entered");
-  const configModuleUrl = pathToFileURL(repoPath("src/config.ts")).href;
+  const configModuleUrl = pathToFileURL(repoPath("backend/src/config.ts")).href;
   const childSource = `
     import { writeFileSync } from "node:fs";
     import { withConfigMutationLockSync } from ${JSON.stringify(configModuleUrl)};
@@ -454,7 +454,7 @@ test("management API maps config mutation lock contention to retryable 503", asy
   saveConfig(config());
   const readyPath = join(testRoot, "mgmt-holder-ready");
   const releasePath = join(testRoot, "mgmt-holder-release");
-  const configModuleUrl = pathToFileURL(repoPath("src/config.ts")).href;
+  const configModuleUrl = pathToFileURL(repoPath("backend/src/config.ts")).href;
   const childSource = `
     import { existsSync, writeFileSync } from "node:fs";
     import { withConfigMutationLockSync } from ${JSON.stringify(configModuleUrl)};
@@ -482,7 +482,7 @@ test("management API maps config mutation lock contention to retryable 503", asy
       const stderr = await new Response(child.stderr).text().catch(() => "");
       throw new Error(`${(error as Error).message}\nchild stderr: ${stderr}`);
     }
-    const { handleManagementAPI } = await import("../../src/server/management-api");
+    const { handleManagementAPI } = await import("../../backend/src/server/management-api");
     const url = new URL("http://localhost/api/codex-auth/auto-switch");
     const response = await handleManagementAPI(
       new ManagementRequest(url, {
@@ -512,7 +512,7 @@ test("own-state writers honor the shared mutation lock (grok coupon ledger)", as
   saveConfig(config());
   const readyPath = join(testRoot, "own-state-holder-ready");
   const releasePath = join(testRoot, "own-state-holder-release");
-  const configModuleUrl = pathToFileURL(repoPath("src/config.ts")).href;
+  const configModuleUrl = pathToFileURL(repoPath("backend/src/config.ts")).href;
   const childSource = `
     import { existsSync, writeFileSync } from "node:fs";
     import { withConfigMutationLockSync } from ${JSON.stringify(configModuleUrl)};
@@ -540,7 +540,7 @@ test("own-state writers honor the shared mutation lock (grok coupon ledger)", as
       const stderr = await new Response(child.stderr).text().catch(() => "");
       throw new Error(`${(error as Error).message}\nchild stderr: ${stderr}`);
     }
-    const { openGrokResetCouponOperation } = await import("../../src/grok/reset-coupon-ledger");
+    const { openGrokResetCouponOperation } = await import("../../backend/src/grok/reset-coupon-ledger");
     const journalPath = join(testRoot, "grok-reset-coupon-ledger.json");
     expect(() => openGrokResetCouponOperation(
       { accountId: "acct-1", operationId: crypto.randomUUID() },

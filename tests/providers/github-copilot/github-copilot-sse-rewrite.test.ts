@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createGithubCopilotResponsesBlockRewrite } from "../../../src/server/github-copilot-responses-repair";
-import { relaySseWithBlockRewrite } from "../../../src/server/sse-payload-rewrite";
+import { createGithubCopilotResponsesBlockRewrite } from "../../../backend/src/server/github-copilot-responses-repair";
+import { relaySseWithBlockRewrite } from "../../../backend/src/server/sse-payload-rewrite";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 function streamFromChunks(...chunks: string[]): ReadableStream<Uint8Array> {

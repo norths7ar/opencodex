@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints } from "../../src/codex/catalog";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { mapReasoningEffort } from "../../src/reasoning-effort";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { mapReasoningEffort } from "../../backend/src/reasoning-effort";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("Xiaomi MiMo public OpenAI Chat endpoint (#1483)", () => {
   const baseUrl = "https://api.xiaomimimo.com/v1";

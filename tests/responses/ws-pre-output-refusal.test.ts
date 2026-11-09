@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
-import { codexWsUpstreamFetch } from "../../src/server/responses/ws-upstream";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import { codexWsPool } from "../../src/server/responses/codex-ws-pool";
+import { codexWsUpstreamFetch } from "../../backend/src/server/responses/ws-upstream";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import { codexWsPool } from "../../backend/src/server/responses/codex-ws-pool";
 import {
   codexWsPreOutputRefusalHold,
   codexWsPreOutputRefusalStatus,
@@ -13,8 +13,8 @@ import {
   isCodexWsUpstreamResponse,
   readCodexWsStage,
   restoreCodexWsPreOutputRefusal,
-} from "../../src/server/responses/codex-ws-wire";
-import { isNonReplayableResponse } from "../../src/lib/upstream-retry";
+} from "../../backend/src/server/responses/codex-ws-wire";
+import { isNonReplayableResponse } from "../../backend/src/lib/upstream-retry";
 import { BOUNDED_WS_RUNTIME, streamingInit } from "../helpers/ws-upstream-fixtures";
 
 /**

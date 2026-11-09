@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { buildDesktopDiscoveryInputs } from "../../src/claude/desktop-discovery-inputs";
-import { buildDesktop3pRegistry, generateDesktop3pModels, resolveDesktop3pAlias, resolvableDesktop3pAlias, desktop3pAlias } from "../../src/claude/desktop-3p";
-import { buildAnthropicModelInfos } from "../../src/claude/model-info";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import { parseDesktopProfile } from "../../src/claude/desktop-profile";
-import { desktopVisibleNativeSlugs, type CatalogModel } from "../../src/codex/catalog";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import type { CodexModelEntitlementSnapshot } from "../../src/codex/model-entitlements";
+import type { OcxConfig } from "../../backend/src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { buildDesktopDiscoveryInputs } from "../../backend/src/claude/desktop-discovery-inputs";
+import { buildDesktop3pRegistry, generateDesktop3pModels, resolveDesktop3pAlias, resolvableDesktop3pAlias, desktop3pAlias } from "../../backend/src/claude/desktop-3p";
+import { buildAnthropicModelInfos } from "../../backend/src/claude/model-info";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import { parseDesktopProfile } from "../../backend/src/claude/desktop-profile";
+import { desktopVisibleNativeSlugs, type CatalogModel } from "../../backend/src/codex/catalog";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import type { CodexModelEntitlementSnapshot } from "../../backend/src/codex/model-entitlements";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { SUBAGENT_MODELS_VERSION } from "../../src/config/subagent-models";
+import { SUBAGENT_MODELS_VERSION } from "../../backend/src/config/subagent-models";
 
 const emptyEntitlements = (): CodexModelEntitlementSnapshot => ({
   modelsByAccount: new Map(), clientVersionByAccount: new Map(),

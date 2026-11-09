@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { cmdClearCooldown, cmdPause } from "../../src/cli/account-extended";
-import type { AccountDeps } from "../../src/cli/account-api";
+import { cmdClearCooldown, cmdPause } from "../../backend/src/cli/account-extended";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
 
 interface Captured {
   method: string;

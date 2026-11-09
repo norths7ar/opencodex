@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { relaySseEagerBounded } from "../../src/server/relay-eager";
-import { appendUsageEntry, type PersistedUsageEntry } from "../../src/usage/log";
+import { relaySseEagerBounded } from "../../backend/src/server/relay-eager";
+import { appendUsageEntry, type PersistedUsageEntry } from "../../backend/src/usage/log";
 import {
   classifyCodexWsFailure,
   closedBeforeTerminalMessage,
@@ -13,15 +13,15 @@ import {
   readCodexWsStage,
   type CodexWsFailureStage,
   type CodexWsStageRecord,
-} from "../../src/server/responses/codex-ws-wire";
-import { permitsResend, resendPermission } from "../../src/lib/request-failure-model";
+} from "../../backend/src/server/responses/codex-ws-wire";
+import { permitsResend, resendPermission } from "../../backend/src/lib/request-failure-model";
 import {
   codexWsUpstreamFetch,
   CODEX_WS_RESPONSE_PRELUDE_TIMEOUT_MS,
-} from "../../src/server/responses/ws-upstream";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
+} from "../../backend/src/server/responses/ws-upstream";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
 
 /**
  * #4191: a long Codex thread died only through the proxy, and every variant of

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { serviceChildOwnershipDecision, serviceChildStayOutExitCode } from "../../src/service/service-child-ownership";
-import type { ServiceOwnershipResolution } from "../../src/service/state";
+import { serviceChildOwnershipDecision, serviceChildStayOutExitCode } from "../../backend/src/service/service-child-ownership";
+import type { ServiceOwnershipResolution } from "../../backend/src/service/state";
 
 const owned = (owner: "cli" | "desktop"): ServiceOwnershipResolution => ({
   kind: "owned",

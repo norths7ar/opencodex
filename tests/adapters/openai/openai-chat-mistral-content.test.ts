@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { buildResponseJSON } from "../../../src/bridge";
-import { createTranslatorBudget, releaseTranslatedEvent, type TranslatorBudget } from "../../../src/lib/translator-budget";
-import { parseRequest } from "../../../src/responses/parser";
-import { messagesToChatFormat, openAIChatSerializesThinking } from "../../../src/adapters/openai-chat/messages";
-import { rememberReasoningForCall, clearReasoningReplayCacheForTests } from "../../../src/responses/reasoning-replay-cache";
-import type { OcxReasoningReplayScopeRef } from "../../../src/types";
-import type { AdapterEvent } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import { createTranslatorBudget, releaseTranslatedEvent, type TranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { messagesToChatFormat, openAIChatSerializesThinking } from "../../../backend/src/adapters/openai-chat/messages";
+import { rememberReasoningForCall, clearReasoningReplayCacheForTests } from "../../../backend/src/responses/reasoning-replay-cache";
+import type { OcxReasoningReplayScopeRef } from "../../../backend/src/types";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const BASE_URL = "https://api.mistral.ai/v1";

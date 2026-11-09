@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { autoRestoreCodexShim, buildWindowsCodexShim, installCodexShim } from "../../src/codex/shim";
-import { RuntimePreflightError, type RuntimePreflightReason } from "../../src/lib/bun-runtime-preflight";
-import type { DurableBunRuntime } from "../../src/lib/bun-runtime";
-import { maybeAutoRestoreCodexShim } from "../../src/cli/codex-shim-autorestore";
-import { getDefaultConfig } from "../../src/config";
-import { windowsEnvIndirectBatchValue } from "../../src/lib/win-paths";
+import { autoRestoreCodexShim, buildWindowsCodexShim, installCodexShim } from "../../backend/src/codex/shim";
+import { RuntimePreflightError, type RuntimePreflightReason } from "../../backend/src/lib/bun-runtime-preflight";
+import type { DurableBunRuntime } from "../../backend/src/lib/bun-runtime";
+import { maybeAutoRestoreCodexShim } from "../../backend/src/cli/codex-shim-autorestore";
+import { getDefaultConfig } from "../../backend/src/config";
+import { windowsEnvIndirectBatchValue } from "../../backend/src/lib/win-paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const runtime: DurableBunRuntime = { path: process.execPath, source: "override", overrideEnv: "OPENCODEX_BUN_PATH" };

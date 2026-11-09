@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { FORWARD_HEADERS, createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { headersForCodexAuthContext } from "../../src/codex/auth-context";
+import { FORWARD_HEADERS, createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { headersForCodexAuthContext } from "../../backend/src/codex/auth-context";
 import {
   deriveCodexAccountInstallationId,
   isolateCodexPoolAccountHeaders,
   isolateCodexPoolClientMetadata,
   rewriteTurnMetadataInstallationId,
-} from "../../src/codex/forward-transport-headers";
-import { CodexInstallationIdUnavailableError } from "../../src/codex/installation-id";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/forward-transport-headers";
+import { CodexInstallationIdUnavailableError } from "../../backend/src/codex/installation-id";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>
@@ -366,7 +366,7 @@ describe("Codex request transport metadata", () => {
   const hintHeader = "x-codex-routing-hint";
 
   test("caller Lite false replaces a mixed-case configured true header", async () => {
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     const parsed = minimalParsed();
     parsed._rawBody = { model: "gpt-5.6-sol", stream: true, input: [], client_metadata: { [liteKey]: "true" } };
     const adapter = createResponsesPassthroughAdapter({
@@ -455,7 +455,7 @@ describe("Codex request transport metadata", () => {
   });
 
   test("canonical preparation copies metadata, lets explicit Lite true/false win, and preserves HTTP init", async () => {
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     for (const lite of ["true", "false"]) {
       const body = JSON.stringify({ model: "gpt-5.6-sol", service_tier: "priority", stream: true, type: "old",
         input: [], reasoning: { effort: "high" },
@@ -497,7 +497,7 @@ describe("Codex request transport metadata", () => {
   });
 
   test("absent Lite preserves native metadata, invalid HTTP Lite does not coerce it, and no identity is invented", async () => {
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     for (const lite of [undefined, "yes", "1", "TRUE", "true, false"]) {
       const headers = new Headers({ "openai-beta": "responses_websockets=existing" });
       if (lite !== undefined) headers.set(liteHeader, lite);
@@ -518,7 +518,7 @@ describe("Codex request transport metadata", () => {
   });
 
   test("noncanonical WS preparation retains its prior wire serialization and operator headers", async () => {
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     for (const target of ["https://gateway.example/v1/responses", `${url}?mode=other`, `${url}/`]) {
       const body = { model: "gpt-5.6-sol", stream: true, client_metadata: ["gateway-specific"], input: [] };
       const prepared = prepareCodexWsRequest(target, { body: JSON.stringify(body),
@@ -534,7 +534,7 @@ describe("Codex request transport metadata", () => {
   });
 
   test("malformed JSON records or native metadata retain HTTP fallback eligibility", async () => {
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     for (const body of [undefined, "{", "null", "[]", "true", "1", '"text"']) {
       expect(prepareCodexWsRequest(url, { body })).toBeNull();
     }
@@ -547,7 +547,7 @@ describe("Codex request transport metadata", () => {
   });
 
   test("routing hint removes stale values and rejects invalid model or tier components without changing the body", async () => {
-    const { applyCodexRoutingHint } = await import("../../src/codex/forward-transport-headers");
+    const { applyCodexRoutingHint } = await import("../../backend/src/codex/forward-transport-headers");
     const invalid = ["", " ", "model;service_tier=priority", "model=tier", "a b", "a\t", "a\n", "a\r", "a\0", "a\x7f", "é", null, 42];
     for (const body of [null, [], "text", {}, ...invalid.map(model => ({ model })),
       ...invalid.map(service_tier => ({ model: "gpt-5.6-luna", service_tier })),
@@ -594,7 +594,7 @@ describe("Lite follows the serialized wire model", () => {
 
   test("a retired-id body keeps its tool groups and the configured Lite header", async () => {
     // Spark's tool filtering is gone: no group is dropped or rewritten, and the static header wins.
-    const { prepareCodexWsRequest } = await import("../../src/server/responses/codex-ws-request");
+    const { prepareCodexWsRequest } = await import("../../backend/src/server/responses/codex-ws-request");
     const tools = [{ type: "namespace", name: "functions", tools: [{ type: "function", name: "lookup", parameters: { type: "object" } }] }];
     const adapter = createResponsesPassthroughAdapter({ adapter: "openai-responses", authMode: "forward",
       baseUrl: "https://chatgpt.com/backend-api/codex", headers: { [liteHeader]: "true" } });

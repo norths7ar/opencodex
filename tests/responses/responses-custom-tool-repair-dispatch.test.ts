@@ -7,8 +7,8 @@
  * file-size cap and had no room to take it.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { CANONICAL_PATCH, DECORATED_PATCH, dataPayload, frame } from "../helpers/custom-tool-repair-fixtures";
 

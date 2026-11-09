@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { writeFileSync } from "node:fs";
-import { handleClientIntegrationCommand } from "../../src/cli/integrations";
-import { handleIntegrationAsideSync, type AsideSyncCliDeps } from "../../src/cli/integration-aside-sync";
-import { asideProfileRecoveryLines } from "../../src/cli/aside-profile-recovery";
-import { getRuntimePortPath } from "../../src/config/process-state";
-import { LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER, createLocalAttestationProof } from "../../src/lib/local-management-attestation";
-import { LOCAL_ASIDE_SYNC_CAPABILITY_HEADER, LOCAL_ASIDE_SYNC_CAPABILITY_VERSION, LOCAL_ASIDE_SYNC_EXPECTED_PID_HEADER, LOCAL_ASIDE_SYNC_EXPIRES_AT_HEADER, LOCAL_ASIDE_SYNC_NONCE_HEADER, LOCAL_ASIDE_SYNC_PATH, verifyLocalAsideSyncCapability } from "../../src/lib/local-aside-sync-contract";
+import { handleClientIntegrationCommand } from "../../backend/src/cli/integrations";
+import { handleIntegrationAsideSync, type AsideSyncCliDeps } from "../../backend/src/cli/integration-aside-sync";
+import { asideProfileRecoveryLines } from "../../backend/src/cli/aside-profile-recovery";
+import { getRuntimePortPath } from "../../backend/src/config/process-state";
+import { LOCAL_ATTESTATION_CHALLENGE_HEADER, LOCAL_ATTESTATION_PROOF_HEADER, createLocalAttestationProof } from "../../backend/src/lib/local-management-attestation";
+import { LOCAL_ASIDE_SYNC_CAPABILITY_HEADER, LOCAL_ASIDE_SYNC_CAPABILITY_VERSION, LOCAL_ASIDE_SYNC_EXPECTED_PID_HEADER, LOCAL_ASIDE_SYNC_EXPIRES_AT_HEADER, LOCAL_ASIDE_SYNC_NONCE_HEADER, LOCAL_ASIDE_SYNC_PATH, verifyLocalAsideSyncCapability } from "../../backend/src/lib/local-aside-sync-contract";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome, output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

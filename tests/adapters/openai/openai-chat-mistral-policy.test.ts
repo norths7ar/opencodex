@@ -1,11 +1,11 @@
-import { normalizeNativeChatContent } from "../../../src/adapters/openai-chat/native-content";
-import { applyChatDestinationPolicy } from "../../../src/adapters/openai-chat/destination-policy";
+import { normalizeNativeChatContent } from "../../../backend/src/adapters/openai-chat/native-content";
+import { applyChatDestinationPolicy } from "../../../backend/src/adapters/openai-chat/destination-policy";
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { buildOpenAIChatPassthroughRequest } from "../../../src/adapters/openai-chat/passthrough";
-import { enrichProviderFromRegistry } from "../../../src/providers/derive";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { buildOpenAIChatPassthroughRequest } from "../../../backend/src/adapters/openai-chat/passthrough";
+import { enrichProviderFromRegistry } from "../../../backend/src/providers/derive";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const model = "deepseek-v4-1-flash-1017";
 function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {

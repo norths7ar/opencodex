@@ -3,8 +3,8 @@ import * as fs from "node:fs";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -87,12 +87,12 @@ describe("/api/codex-agent-roles", () => {
     expect(readFileSync(join(homeA, "agents", "explorer.toml"), "utf8")).toBe(ROLE);
   });
 
-  function historyRow(batch: string, role: string, model = "m", n = 1): import("../../src/codex/role-model-history").RoleModelChange & { n: number } {
+  function historyRow(batch: string, role: string, model = "m", n = 1): import("../../backend/src/codex/role-model-history").RoleModelChange & { n: number } {
     return { at: "2026-10-24T00:00:00.000Z", batch, n, role, before: { model: null, effort: null }, after: { model, effort: null } };
   }
 
   test("lists whole batches and never more than 50 rows, even when one batch id was reused past its cap", async () => {
-    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../src/codex/role-model-history");
+    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "history");
     for (let index = 0; index < 30; index++) recordRoleModelChange("home", historyRow("a", `a-${index}`, "m", index + 1), dir);
     for (let index = 0; index < 30; index++) recordRoleModelChange("home", historyRow("b", `b-${index}`, "m", index + 1), dir);
@@ -105,7 +105,7 @@ describe("/api/codex-agent-roles", () => {
   });
 
   test("a write into a batch that already holds 50 rows is refused before the role file changes", async () => {
-    const { recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../src/codex/role-model-history");
+    const { recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "ocx", "integrations");
     for (let index = 0; index < ROLE_HISTORY_LIMIT; index++) recordRoleModelChange(join(root, "codex"), historyRow("full", `role-${index}`, "m", index + 1), dir);
     const refused = await call("/api/codex-agent-roles/explorer", { method: "PUT", body: JSON.stringify({ model: "xai/grok-4.5", batch: "full" }) });
@@ -121,14 +121,14 @@ describe("/api/codex-agent-roles", () => {
 
   // explorer pinned gpt-5.5 with no effort; librarian inherited its model and held effort high.
   async function seedRestorable(dir: string, batch: string, explorerAfter: string, librarianAfter: string, start = 1): Promise<void> {
-    const { recordRoleModelChange } = await import("../../src/codex/role-model-history");
+    const { recordRoleModelChange } = await import("../../backend/src/codex/role-model-history");
     const home = join(root, "codex");
     recordRoleModelChange(home, { ...historyRow(batch, "explorer", explorerAfter, start), before: { model: "gpt-5.5", effort: null } }, dir);
     recordRoleModelChange(home, { ...historyRow(batch, "librarian", librarianAfter, start + 1), before: { model: null, effort: "high" } }, dir);
   }
 
   test("a Restore of a full 50-row batch writes every role, though its own rows push that batch out of the listing", async () => {
-    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../src/codex/role-model-history");
+    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_LIMIT } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "ocx", "integrations");
     inheritingRole(`model_reasoning_effort = "low"\n${INHERITING}`);
     writeFileSync(join(root, "codex", "agents", "explorer.toml"), ROLE.replace('model = "gpt-5.5"', 'model = "a/now"'));
@@ -143,7 +143,7 @@ describe("/api/codex-agent-roles", () => {
   });
 
   test("a compaction in the middle of a Restore keeps the batch being restored until every role is back", async () => {
-    const { recordRoleModelChange, ROLE_HISTORY_MAX_BYTES } = await import("../../src/codex/role-model-history");
+    const { recordRoleModelChange, ROLE_HISTORY_MAX_BYTES } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "ocx", "integrations");
     inheritingRole(`model_reasoning_effort = "low"\n${INHERITING}`);
     // Older batches fill most of the byte budget, and the batch to restore holds two wide rows.
@@ -163,7 +163,7 @@ describe("/api/codex-agent-roles", () => {
   });
 
   test("120 writes into the batch the server handed out stop at 50 and never lose the batch's first value", async () => {
-    const { ROLE_HISTORY_LIMIT, restorableSetting } = await import("../../src/codex/role-model-history");
+    const { ROLE_HISTORY_LIMIT, restorableSetting } = await import("../../backend/src/codex/role-model-history");
     const wide = (index: number) => `m${index}-${"w".repeat(4000)}`;
     const started = await roleCall("explorer", { model: wide(0) });
     expect(started.status).toBe(200);
@@ -184,7 +184,7 @@ describe("/api/codex-agent-roles", () => {
   }, 60_000);
 
   test("a batch id compaction dropped, or one the server never handed out, takes no rows, so Restore never offers a value from inside a batch", async () => {
-    const { recordRoleModelChange, restorableSetting } = await import("../../src/codex/role-model-history");
+    const { recordRoleModelChange, restorableSetting } = await import("../../backend/src/codex/role-model-history");
     const first = await roleCall("explorer", { model: "middle" });
     expect(first.status).toBe(200);
     const batch = await newestBatch();
@@ -201,7 +201,7 @@ describe("/api/codex-agent-roles", () => {
 
   test("a batch reused after another batch wrote keeps its first value as the one Restore offers", async () => {
     // An interleaved fragment: rows 2 and 3 of a batch whose row 1 (the original value) is gone.
-    const { listRoleModelChanges, recordRoleModelChange, restorableSetting } = await import("../../src/codex/role-model-history");
+    const { listRoleModelChanges, recordRoleModelChange, restorableSetting } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "fragment");
     recordRoleModelChange("home", { ...historyRow("cut", "explorer", "late", 2), before: { model: "middle", effort: null } }, dir);
     recordRoleModelChange("home", historyRow("whole", "worker", "m", 1), dir);
@@ -222,7 +222,7 @@ describe("/api/codex-agent-roles", () => {
   });
 
   test("keeps the history file within its byte budget by dropping the oldest whole batches", async () => {
-    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_MAX_BYTES } = await import("../../src/codex/role-model-history");
+    const { listRoleModelChanges, recordRoleModelChange, ROLE_HISTORY_MAX_BYTES } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "history");
     const wide = "m".repeat(4000);
     let batches = 0;
@@ -241,7 +241,7 @@ describe("/api/codex-agent-roles", () => {
   });
 
   test("reads only the tail of an oversized history file", async () => {
-    const { listRoleModelChanges, ROLE_HISTORY_MAX_BYTES } = await import("../../src/codex/role-model-history");
+    const { listRoleModelChanges, ROLE_HISTORY_MAX_BYTES } = await import("../../backend/src/codex/role-model-history");
     const dir = join(root, "history");
     mkdirSync(dir, { recursive: true });
     const path = join(dir, "codex-agent-roles.jsonl");

@@ -9,15 +9,15 @@ import {
   getVertexAccessToken,
   parseGcpCredentialJson,
   __resetVertexTokenCache,
-} from "../../../src/lib/gcp-adc";
-import { splitCredentialPaste, addProviderApiKey, removeProviderApiKey } from "../../../src/providers/api-keys";
-import { cleanupRemovedGcpCredentials, providerGcpCredentialMarkers } from "../../../src/providers/gcp-credential-cleanup";
-import { setProviderKeychainEntryFactoryForTests } from "../../../src/providers/key-store";
-import { loadConfig, saveConfig } from "../../../src/config";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/lib/gcp-adc";
+import { splitCredentialPaste, addProviderApiKey, removeProviderApiKey } from "../../../backend/src/providers/api-keys";
+import { cleanupRemovedGcpCredentials, providerGcpCredentialMarkers } from "../../../backend/src/providers/gcp-credential-cleanup";
+import { setProviderKeychainEntryFactoryForTests } from "../../../backend/src/providers/key-store";
+import { loadConfig, saveConfig } from "../../../backend/src/config";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import * as destinationPolicy from "../../../src/lib/destination-policy";
-import { providerEditorConfigDTO } from "../../../src/server/auth-cors";
+import * as destinationPolicy from "../../../backend/src/lib/destination-policy";
+import { providerEditorConfigDTO } from "../../../backend/src/server/auth-cors";
 
 const SERVICE_ACCOUNT_JSON = JSON.stringify({
   type: "service_account",
@@ -346,7 +346,7 @@ describe("addProviderApiKey with a pasted credential JSON", () => {
       config.providers.fallback = { adapter: "openai-chat", baseUrl: "https://api.example.test/v1", apiKey: "fixture" };
       config.defaultProvider = "fallback";
       saveConfig(config);
-      const { handleProviderCommand } = await import("../../../src/cli/provider");
+      const { handleProviderCommand } = await import("../../../backend/src/cli/provider");
       await handleProviderCommand(["remove", "p", "--json"]);
       expect(loadConfig().providers.p).toBeUndefined();
       expect(keychainStore.size).toBe(0);
@@ -360,7 +360,7 @@ describe("addProviderApiKey with a pasted credential JSON", () => {
       saveConfig(config);
       const resolver = spyOn(destinationPolicy, "providerDestinationResolvedError").mockResolvedValue(null);
       try {
-        const { handleProviderRoutes } = await import("../../../src/server/management/provider-routes");
+        const { handleProviderRoutes } = await import("../../../backend/src/server/management/provider-routes");
         const request = async (body: unknown, failSave = false) => {
           const req = new Request("http://localhost/api/providers", {
             method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -372,7 +372,7 @@ describe("addProviderApiKey with a pasted credential JSON", () => {
             } },
             convergeCodexCatalog: async () => ({ converged: true }),
             syncClaudeAgentDefsBestEffort: async () => {},
-          } as unknown as import("../../../src/server/management/context").ManagementContext);
+          } as unknown as import("../../../backend/src/server/management/context").ManagementContext);
         };
         const replacement = { adapter: "openai-chat", baseUrl: "https://replacement.example.test/v1", apiKey: "replacement" };
         const baseline = providerEditorConfigDTO(loadConfig());
@@ -400,12 +400,12 @@ describe("addProviderApiKey with a pasted credential JSON", () => {
       addProviderApiKey(config, "p", `${SERVICE_ACCOUNT_JSON}, ${SERVICE_ACCOUNT_JSON_2}`);
       config.providers.fallback = { adapter: "openai-chat", baseUrl: "https://api.example.test/v1", apiKey: "fixture" };
       saveConfig(config);
-      const { handleProviderRoutes } = await import("../../../src/server/management/provider-routes");
+      const { handleProviderRoutes } = await import("../../../backend/src/server/management/provider-routes");
       const req = new Request("http://localhost/api/providers?name=p", { method: "DELETE" });
       const response = await handleProviderRoutes({
         req, url: new URL(req.url), config, deps: {},
         convergeCodexCatalog: async () => ({ converged: true }),
-      } as unknown as import("../../../src/server/management/context").ManagementContext);
+      } as unknown as import("../../../backend/src/server/management/context").ManagementContext);
       expect(response?.status).toBe(200);
       expect(loadConfig().providers.p).toBeUndefined();
       expect(keychainStore.size).toBe(0);

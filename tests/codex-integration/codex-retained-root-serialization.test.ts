@@ -15,7 +15,7 @@ import { join, resolve } from "node:path";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { claimOwnedServiceHome, withOwnedServiceHomePreload } from "../helpers/owned-service-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -294,7 +294,7 @@ test("startup and CLI sync-cache cannot write models_cache while another process
 
     const cli = Bun.spawnSync([
       process.execPath,
-      ...withOwnedServiceHomePreload(["run", "src/cli/index.ts", "sync-cache"], sandbox.preloadPath),
+      ...withOwnedServiceHomePreload(["run", "backend/src/cli/index.ts", "sync-cache"], sandbox.preloadPath),
     ], {
       cwd: repoRoot,
       env: sandboxChildEnv(sandbox),
@@ -303,13 +303,13 @@ test("startup and CLI sync-cache cannot write models_cache while another process
     });
     expect(cli.exitCode).toBe(0);
     expect(existsSync(cachePath)).toBe(false);
-    const cliSource = readFileSync(join(repoRoot, "src/cli/dispatch.ts"), "utf8");
+    const cliSource = readFileSync(join(repoRoot, "backend/src/cli/dispatch.ts"), "utf8");
     const cliStart = cliSource.indexOf('"sync-cache": async');
     const cliRoot = cliSource.slice(cliStart, cliSource.indexOf('gui: async', cliStart));
     expect(cliRoot).toContain("withCatalogWriteSerialization(owningCodexHome");
     expect(cliRoot).toContain("invalidateCodexModelsCacheWithPermit");
 
-    const startup = readFileSync(join(repoRoot, "src/server/index.ts"), "utf8");
+    const startup = readFileSync(join(repoRoot, "backend/src/server/index.ts"), "utf8");
     const startupStart = startup.indexOf("const startupCodexHome");
     const startupRoot = startup.slice(startupStart, startup.indexOf("armClaudeCodeBaseline", startupStart));
     expect(startupRoot).toContain("withCatalogWriteSerialization(startupCodexHome");
@@ -337,7 +337,7 @@ test("native restore cannot read-transform-write the catalog while another proce
     `);
     expect(restored.exitCode).toBe(0);
     expect(readFileSync(catalogPath, "utf8")).toBe(before);
-    const source = readFileSync(join(repoRoot, "src/codex/inject/restore.ts"), "utf8");
+    const source = readFileSync(join(repoRoot, "backend/src/codex/inject/restore.ts"), "utf8");
     const restoreRoot = source.slice(source.indexOf("const owningCodexHome"), source.indexOf("// Design B", source.indexOf("const owningCodexHome")));
     expect(restoreRoot).toContain("withCatalogWriteSerialization(owningCodexHome");
     expect(restoreRoot).toContain("restoreCodexCatalogWithPermit");
@@ -729,7 +729,7 @@ for (const ownership of ["foreign", "unknown"] as const) {
     const before = readFileSync(catalogPath);
     for (const json of [false, true]) {
       const result = Bun.spawnSync([process.execPath,
-        ...withOwnedServiceHomePreload(["run", "src/cli/index.ts", "sync-cache", ...(json ? ["--json"] : [])], sandbox.preloadPath),
+        ...withOwnedServiceHomePreload(["run", "backend/src/cli/index.ts", "sync-cache", ...(json ? ["--json"] : [])], sandbox.preloadPath),
       ], { cwd: repoRoot, env: sandboxChildEnv(sandbox), stdout: "pipe", stderr: "pipe" });
       expect(result.exitCode).toBe(1);
       if (json) {

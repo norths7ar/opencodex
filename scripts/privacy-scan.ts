@@ -9,7 +9,7 @@ type Finding = {
 
 const TEXT_FILE_RE = /\.(?:cjs|css|html|js|json|jsonc|md|mjs|ps1|sh|toml|ts|tsx|txt|yml|yaml)$/;
 const EXCLUDED_PREFIXES = [
-  "gui/dist/",
+  "frontend/dist/",
   "node_modules/",
   "tests/.tmp-",
 ];

@@ -8,10 +8,10 @@ import {
   providerModelCostsConfigError,
   saveConfig,
   validateConfigCandidate,
-} from "../../src/config";
-import { providerManagementConfigError, safeConfigDTO } from "../../src/server/auth-cors";
-import { activeUserCostOverlays, refreshUserCostOverlays, userCostOverlayVersion } from "../../src/usage/user-cost-overlays";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import { providerManagementConfigError, safeConfigDTO } from "../../backend/src/server/auth-cors";
+import { activeUserCostOverlays, refreshUserCostOverlays, userCostOverlayVersion } from "../../backend/src/usage/user-cost-overlays";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const VALID_COSTS = {

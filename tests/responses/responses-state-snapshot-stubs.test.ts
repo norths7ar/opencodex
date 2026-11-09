@@ -11,9 +11,9 @@ import {
   responseStateMetrics,
   setResponseStateByteCapForTests,
   setResponseStateSnapshotByteCapForTests,
-} from "../../src/responses/state";
-import { responseSpillDirectory } from "../../src/responses/spill-store";
-import { setPlatformForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/responses/state";
+import { responseSpillDirectory } from "../../backend/src/responses/spill-store";
+import { setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function fixedResponse(id: string, output: unknown[]): { id: string; output: unknown[]; status: string } {

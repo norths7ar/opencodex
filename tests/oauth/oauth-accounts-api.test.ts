@@ -3,22 +3,22 @@ import { managementFetch as fetch } from "../helpers/management-auth";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../src/codex/catalog";
-import { clearModelCache, getStaleCached, setCached } from "../../src/codex/model-cache";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../backend/src/codex/catalog";
+import { clearModelCache, getStaleCached, setCached } from "../../backend/src/codex/model-cache";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import { getAccountSet } from "../../src/oauth/store";
-import { getValidAccessSnapshotForAccount } from "../../src/oauth";
-import { ACCOUNT_IMPORT_DEADLINE_MS, ACCOUNT_IMPORT_MAX_BYTES, ACCOUNT_IMPORT_MAX_REQUEST_BYTES } from "../../src/oauth/account-import/types";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import { createManagementSessionControl, requireManagementAuth, type ManagementAuthState } from "../../src/server/management-auth";
-import { handleSessionRoutes } from "../../src/server/management/session-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import { publishAccountSelection } from "../../src/lib/account-selection-events";
+import { getAccountSet } from "../../backend/src/oauth/store";
+import { getValidAccessSnapshotForAccount } from "../../backend/src/oauth";
+import { ACCOUNT_IMPORT_DEADLINE_MS, ACCOUNT_IMPORT_MAX_BYTES, ACCOUNT_IMPORT_MAX_REQUEST_BYTES } from "../../backend/src/oauth/account-import/types";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import { createManagementSessionControl, requireManagementAuth, type ManagementAuthState } from "../../backend/src/server/management-auth";
+import { handleSessionRoutes } from "../../backend/src/server/management/session-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { publishAccountSelection } from "../../backend/src/lib/account-selection-events";
 
 function selectionSessionFixture() {
   const origin = "http://127.0.0.1:10100";
@@ -129,7 +129,7 @@ describe("multiauth accounts API", () => {
   });
 
   test("selection event streams bound subscribers and release cancelled connections", async () => {
-    const { accountSelectionStream } = await import("../../src/server/management/account-selection-stream");
+    const { accountSelectionStream } = await import("../../backend/src/server/management/account-selection-stream");
     const streams: Response[] = [];
     try {
       for (let i = 0; i < 64; i++) {
@@ -154,7 +154,7 @@ describe("multiauth accounts API", () => {
   });
 
   test.each(["false", "throw"] as const)("selection stream denies an initial validator result of %s", async result => {
-    const { accountSelectionStream } = await import("../../src/server/management/account-selection-stream");
+    const { accountSelectionStream } = await import("../../backend/src/server/management/account-selection-stream");
     const response = accountSelectionStream(new Request("http://localhost/api/accounts/events"), () => {
       if (result === "throw") throw new Error("validator unavailable");
       return false;
@@ -1024,8 +1024,8 @@ describe("Antigravity quota diagnosis projection", () => {
     }
   });
   test("authenticated account reads expose only the current safe failure category", async () => {
-    const { saveCredential } = await import("../../src/oauth/store");
-    const { clearAccountQuotaCache, setAntigravityAccountQuotaTransportForTests } = await import("../../src/providers/quota");
+    const { saveCredential } = await import("../../backend/src/oauth/store");
+    const { clearAccountQuotaCache, setAntigravityAccountQuotaTransportForTests } = await import("../../backend/src/providers/quota");
     const cfg = baseConfig();
     cfg.providers["google-antigravity"] = { adapter: "google", baseUrl: "https://daily-cloudcode-pa.googleapis.com", authMode: "oauth" };
     saveConfig(cfg);

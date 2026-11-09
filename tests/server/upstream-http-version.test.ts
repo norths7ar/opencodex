@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { providerFetch, withUpstreamHttpVersion } from "../../src/server/responses/fetch-helpers";
-import { UpstreamHttpVersionTargetError } from "../../src/lib/upstream-http-version";
-import type { OcxProviderConfig } from "../../src/types";
+import { providerFetch, withUpstreamHttpVersion } from "../../backend/src/server/responses/fetch-helpers";
+import { UpstreamHttpVersionTargetError } from "../../backend/src/lib/upstream-http-version";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const HTTPS_URL = "https://opencode.ai/zen/go/v1/chat/completions";
 const HTTP_URL = "http://127.0.0.1:10900/zen/go/v1/chat/completions";

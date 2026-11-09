@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleModelsOrderCommand } from "../../src/cli/models-order";
-import * as cli from "../../src/cli/model-picker-ordering";
-import * as gui from "../../gui/src/model-picker-order";
-import { handleSubagentModelRoutes } from "../../src/server/management/subagent-model-routes";
-import type { OcxConfig } from "../../src/types";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleModelsOrderCommand } from "../../backend/src/cli/models-order";
+import * as cli from "../../backend/src/cli/model-picker-ordering";
+import * as gui from "../../frontend/src/model-picker-order";
+import { handleSubagentModelRoutes } from "../../backend/src/server/management/subagent-model-routes";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const committed = { status: "committed", changed: false, degraded: false, notices: [] };

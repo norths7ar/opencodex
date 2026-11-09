@@ -2,24 +2,24 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 import {
   admitWorkflowTurn,
   chargeWorkflowSends,
   DEFAULT_WORKFLOW_BUDGET_POLICY,
   resetWorkflowBudgetsForTest,
   workflowBudgetSnapshot,
-} from "../../src/lib/workflow-budget";
-import { handleResponses } from "../../src/server/responses/core";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import { saveConfig } from "../../src/config";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { bindWorkflowBudgetConfig } from "../../src/lib/workflow-budget-config";
+} from "../../backend/src/lib/workflow-budget";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import { saveConfig } from "../../backend/src/config";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { bindWorkflowBudgetConfig } from "../../backend/src/lib/workflow-budget-config";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import * as proxyEnv from "../../src/lib/proxy-env";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import * as proxyEnv from "../../backend/src/lib/proxy-env";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 const originalFetch = globalThis.fetch;
 const originalHome = process.env.OPENCODEX_HOME;

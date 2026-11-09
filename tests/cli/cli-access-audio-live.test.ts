@@ -1,10 +1,10 @@
-import type { AudioClientSocket } from "../../src/cli/access-audio-live";
+import type { AudioClientSocket } from "../../backend/src/cli/access-audio-live";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { Readable } from "node:stream";
-import { handleAccessAudioCommand, type AccessAudioDeps } from "../../src/cli/access-audio";
-import { resolveAudioClient } from "../../src/server/audio-client";
+import { handleAccessAudioCommand, type AccessAudioDeps } from "../../backend/src/cli/access-audio";
+import { resolveAudioClient } from "../../backend/src/server/audio-client";
 import { isolationBudgetMs } from "../helpers/ci-watchdog";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const KEY = "ocx_data_audio_live_synthetic";
 const argv = ["live-check", "--model", "synthetic-live", "--api-key-stdin", "--json"];

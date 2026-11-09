@@ -10,7 +10,7 @@ import {
   ShellArgsSchema,
   WriteShellStdinArgsSchema,
   type AgentClientMessage,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   CURSOR_BACKGROUND_SHELL_ABSOLUTE_MS,
   CURSOR_BACKGROUND_SHELL_IDLE_MS,
@@ -26,7 +26,7 @@ import {
   terminateAllBackgroundShells,
   terminateBackgroundShellsForSession,
   writeShellStdinExec,
-} from "../../../src/adapters/cursor/native-exec-shell";
+} from "../../../backend/src/adapters/cursor/native-exec-shell";
 
 function decodeClient(bytes: Uint8Array): AgentClientMessage {
   return fromBinary(AgentClientMessageSchema, bytes);

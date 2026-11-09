@@ -13,22 +13,22 @@ import {
   runLogin,
   startLoginFlow,
   upsertOAuthProvider,
-} from "../../src/oauth";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
-import type { OAuthController } from "../../src/oauth/types";
-import { getCredential } from "../../src/oauth/store";
-import * as oauthStore from "../../src/oauth/store";
-import * as oauth from "../../src/oauth";
-import { MuseDeviceLoginError, requestMuseDeviceAuthorization } from "../../src/oauth/meta-muse-device";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/oauth";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
+import type { OAuthController } from "../../backend/src/oauth/types";
+import { getCredential } from "../../backend/src/oauth/store";
+import * as oauthStore from "../../backend/src/oauth/store";
+import * as oauth from "../../backend/src/oauth";
+import { MuseDeviceLoginError, requestMuseDeviceAuthorization } from "../../backend/src/oauth/meta-muse-device";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 // Server-less OAuth store test: nothing drains hardenConfigDir()'s icacls flight before
 // teardown (run 33612731522 shard 3). Same treatment as oauth-reauth-bind.
 const ICACLS_OK = { success: true, exitCode: 0, timedOut: false, stdout: "" };
-import { armClaudeCodeBaseline, loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../src/config";
-import { isApiAuthRequired, requireApiAuth } from "../../src/server/auth-cors";
+import { armClaudeCodeBaseline, loadConfig, saveConfig, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import { isApiAuthRequired, requireApiAuth } from "../../backend/src/server/auth-cors";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let TEST_DIR: string;

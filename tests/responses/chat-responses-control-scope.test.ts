@@ -14,8 +14,8 @@
  * authMode "forward" AND the canonical base URL.
  */
 import { describe, expect, test } from "bun:test";
-import { stripCanonicalForwardSamplingParams } from "../../src/adapters/openai-responses";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
+import { stripCanonicalForwardSamplingParams } from "../../backend/src/adapters/openai-responses";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
 
 function chat(extra: Record<string, unknown>): Record<string, unknown> {
   return { model: "m", messages: [{ role: "user", content: "hi" }], ...extra };

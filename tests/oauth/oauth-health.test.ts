@@ -12,8 +12,8 @@ import {
   projectOAuthAccountHealth,
   projectCodexAccountHealth,
   projectMainAccountPolicyHealth,
-} from "../../src/oauth/health";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+} from "../../backend/src/oauth/health";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   credentialGeneration,
   getAccountSet,
@@ -21,19 +21,19 @@ import {
   markAccountNeedsReauthIfGeneration,
   mergeAccountCredential,
   saveCredential,
-} from "../../src/oauth/store";
+} from "../../backend/src/oauth/store";
 import {
   clearAccountNeedsReauth,
   markAccountNeedsReauth as markCodexAccountNeedsReauth,
-} from "../../src/codex/account-runtime-state";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+} from "../../backend/src/codex/account-runtime-state";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   clearCodexUpstreamHealth,
   getCodexAccountHealthSnapshot,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import type { OcxConfig } from "../../src/types";
-import { formatOAuthHealthForStatus } from "../../src/cli/status-oauth";
+} from "../../backend/src/codex/routing";
+import type { OcxConfig } from "../../backend/src/types";
+import { formatOAuthHealthForStatus } from "../../backend/src/cli/status-oauth";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER,
@@ -41,7 +41,7 @@ import {
   LOCAL_MANAGEMENT_NONCE_HEADER,
   LOCAL_MANAGEMENT_READ_PATHS,
   verifyLocalManagementReadCapability,
-} from "../../src/lib/local-management-capability";
+} from "../../backend/src/lib/local-management-capability";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const origHome = process.env.HOME;
@@ -152,7 +152,7 @@ describe("projectCodexAccountHealth", () => {
   test("a terminal validation verdict is projected as reauth_required", async () => {
     withPoolStoreDir();
     const { markCodexAccountValidationFailed, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("pool-revoked", {
       accessToken: "a", refreshToken: "r", expiresAt: Date.now() + 3_600_000, chatgptAccountId: "cg",
     });
@@ -174,7 +174,7 @@ describe("projectCodexAccountHealth", () => {
   test("a non-terminal validation failure does not claim the credential is dead", async () => {
     withPoolStoreDir();
     const { markCodexAccountValidationFailed, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("pool-warmup", {
       accessToken: "a", refreshToken: "r", expiresAt: Date.now() + 3_600_000, chatgptAccountId: "cg",
     });
@@ -190,7 +190,7 @@ describe("projectCodexAccountHealth", () => {
   ] as const)("a stored verification failure surfaces %s as %s", async (validationError, reason) => {
     withPoolStoreDir();
     const { markCodexAccountValidationFailed, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     const accountId = "pool-stored-" + reason;
     saveCodexAccountCredential(accountId, {
       accessToken: "a", refreshToken: "r", expiresAt: Date.now() + 3_600_000, chatgptAccountId: "cg",
@@ -206,7 +206,7 @@ describe("projectCodexAccountHealth", () => {
   test("the CLI collector reports the terminal verdict too", async () => {
     withPoolStoreDir();
     const { markCodexAccountValidationFailed, readCodexAccountRecord, saveCodexAccountCredential } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential("pool-cli", {
       accessToken: "a", refreshToken: "r", expiresAt: Date.now() + 3_600_000, chatgptAccountId: "cg",
     });

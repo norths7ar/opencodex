@@ -1,21 +1,21 @@
 import { expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, linkSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { armClaudeCodeBaseline, getConfigPath, getDefaultConfig, loadConfig, mutatePersistedConfig, saveConfigPreservingClaudeCode } from "../../src/config";
-import { configDiagnosticsFromRaw, readConfigAdmissionSnapshot, readConfigDiagnostics } from "../../src/config/diagnostics";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { buildClaudeReplayConfig } from "../../src/server/claude-messages";
-import { parseRequest } from "../../src/responses/parser";
-import { planVisionSidecar, shouldResolveOpenAiVisionSidecar } from "../../src/vision/plan";
-import { planWebSearch, shouldResolveOpenAiWebSearchSidecar } from "../../src/web-search";
+import { armClaudeCodeBaseline, getConfigPath, getDefaultConfig, loadConfig, mutatePersistedConfig, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import { configDiagnosticsFromRaw, readConfigAdmissionSnapshot, readConfigDiagnostics } from "../../backend/src/config/diagnostics";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { buildClaudeReplayConfig } from "../../backend/src/server/claude-messages";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { planVisionSidecar, shouldResolveOpenAiVisionSidecar } from "../../backend/src/vision/plan";
+import { planWebSearch, shouldResolveOpenAiWebSearchSidecar } from "../../backend/src/web-search";
 import { createTempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
-import { runPassiveRead } from "../../src/lib/passive-read";
-import { atomicWriteFileNoFollow } from "../../src/config/atomic-write";
+import { runPassiveRead } from "../../backend/src/lib/passive-read";
+import { atomicWriteFileNoFollow } from "../../backend/src/config/atomic-write";
 import { join } from "node:path";
-import { hardenSecretPath, hardenSecretPathAsync, resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests, verifySecretPathAcl } from "../../src/lib/windows-secret-acl";
-import { setWindowsOwnerAclRunnerForTests, verifyWindowsPrivateEntries, verifyWindowsPrivateEntriesAsync, windowsPrivateEntriesAclMatches } from "../../src/lib/windows-owner-acl";
-import { resetWindowsPrincipalForTests, setWindowsPrincipalRunnerForTests } from "../../src/lib/windows-user-principal";
+import { hardenSecretPath, hardenSecretPathAsync, resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests, verifySecretPathAcl } from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsOwnerAclRunnerForTests, verifyWindowsPrivateEntries, verifyWindowsPrivateEntriesAsync, windowsPrivateEntriesAclMatches } from "../../backend/src/lib/windows-owner-acl";
+import { resetWindowsPrincipalForTests, setWindowsPrincipalRunnerForTests } from "../../backend/src/lib/windows-user-principal";
 
 test("retired OpenCode Free entries warn once on load and an unrelated save persists their removal", () => {
   const home = createTempHome("ocx-removed-provider-");
@@ -151,7 +151,7 @@ test("a failed recovery copy warns without exposing paths or secret bytes", () =
   const home = createTempHome("ocx-failed-retirement-backup-");
   try {
     const path = getConfigPath();
-    const module = pathToFileURL(repoPath("src/config/removed-opencode-free-backup.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config/removed-opencode-free-backup.ts")).href;
     const script = `import { mock } from 'bun:test'; import * as fs from 'node:fs';
       const real = { ...fs }; mock.module('node:fs', () => ({ ...real, linkSync() { throw Object.assign(new Error('denied'), { code: 'EACCES' }); } }));
       const { preserveRemovedOpenCodeFree } = await import(${JSON.stringify(module)});
@@ -380,10 +380,10 @@ test.each(["compliant", "broad", "unverifiable"])("recovery reuse checks the exi
     const backup = `${getConfigPath()}.pre-opencode-free-removal.bak`;
     atomicWriteFileNoFollow(backup, "original", undefined, {}, { exclusive: true });
     const module = (path: string) => pathToFileURL(repoPath(path)).href;
-    const script = `import { setPlatformForTests, setIcaclsRunnerForTests } from ${JSON.stringify(module("src/lib/windows-secret-acl.ts"))};
-      import { setWindowsOwnerAclRunnerForTests } from ${JSON.stringify(module("src/lib/windows-owner-acl.ts"))};
-      import { setWindowsPrincipalRunnerForTests } from ${JSON.stringify(module("src/lib/windows-user-principal.ts"))};
-      import { preserveRemovedOpenCodeFree } from ${JSON.stringify(module("src/config/removed-opencode-free-backup.ts"))};
+    const script = `import { setPlatformForTests, setIcaclsRunnerForTests } from ${JSON.stringify(module("backend/src/lib/windows-secret-acl.ts"))};
+      import { setWindowsOwnerAclRunnerForTests } from ${JSON.stringify(module("backend/src/lib/windows-owner-acl.ts"))};
+      import { setWindowsPrincipalRunnerForTests } from ${JSON.stringify(module("backend/src/lib/windows-user-principal.ts"))};
+      import { preserveRemovedOpenCodeFree } from ${JSON.stringify(module("backend/src/config/removed-opencode-free-backup.ts"))};
       setPlatformForTests('win32');
       setWindowsPrincipalRunnerForTests(() => ({ success: true, exitCode: 0, timedOut: false, stdout: 'S-1-5-21-9-9-9-1001\\r\\nTESTHOST\\\\tester' }));
       const probes = [], commands = [];
@@ -442,7 +442,7 @@ test.each([5, 500])("overlapping loads preserve protected originals with a %i ms
   const release = home.path("publisher-release");
   const exhausted = home.path("recheck-budget-spent");
   const backup = `${getConfigPath()}.pre-opencode-free-removal.bak`;
-  const module = pathToFileURL(repoPath("src/config.ts")).href;
+  const module = pathToFileURL(repoPath("backend/src/config.ts")).href;
   const bytes = Buffer.from(JSON.stringify({ ...getDefaultConfig(), providers: { "opencode-free": {} } }));
   writeFileSync(getConfigPath(), bytes);
   const firstScript = `import { mock } from 'bun:test'; import * as fs from 'node:fs';
@@ -526,8 +526,8 @@ test.each(["saveConfig", "saveConfigPreservingClaudeCode"])("late retired disk e
   const home = createTempHome("ocx-late-retired-");
   try {
     // A fresh process makes the once-per-process notice independent of earlier tests.
-    const module = pathToFileURL(repoPath("src/config.ts")).href;
-    const generation = pathToFileURL(repoPath("src/local-credentials/generation.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config.ts")).href;
+    const generation = pathToFileURL(repoPath("backend/src/local-credentials/generation.ts")).href;
     const script = `import { strict as assert } from 'node:assert';
       import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
       import { armClaudeCodeBaseline, getConfigPath, getDefaultConfig, loadConfig, ${writer} as save } from ${JSON.stringify(module)};
@@ -590,7 +590,7 @@ test.each(["loader", "diagnostics", "admission"])("passive %s projects retired d
 test("successful recovery notices redact a secret-shaped home and retain the filename", () => {
   const home = createTempHome("ocx-sk-syntheticOnly7800-");
   try {
-    const module = pathToFileURL(repoPath("src/config/removed-opencode-free-backup.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config/removed-opencode-free-backup.ts")).href;
     const child = Bun.spawnSync([process.execPath, "--eval", `import { preserveRemovedOpenCodeFree } from ${JSON.stringify(module)};
       preserveRemovedOpenCodeFree(${JSON.stringify(getConfigPath())}, Buffer.from("synthetic-original"));`], { env: { ...process.env } });
     expect(child.exitCode).toBe(0);
@@ -603,7 +603,7 @@ test("successful recovery notices redact a secret-shaped home and retain the fil
 test("a substituted empty recovery temp never receives original secret bytes", () => {
   const home = createTempHome("ocx-recovery-substitution-");
   try {
-    const module = pathToFileURL(repoPath("src/config/removed-opencode-free-backup.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config/removed-opencode-free-backup.ts")).href;
     const script = `import { mock } from 'bun:test'; import * as fs from 'node:fs';
       const real = { ...fs }; let stolen;
       mock.module('node:fs', () => ({ ...real, openSync(path, flags, mode) {

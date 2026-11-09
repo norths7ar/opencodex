@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
-import { extractProviderModelItems } from "../../src/providers/model-discovery";
+import { catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
+import { extractProviderModelItems } from "../../backend/src/providers/model-discovery";
 
 /**
  * Regression coverage for #1797 (llama.cpp dual-envelope metadata).

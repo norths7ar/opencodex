@@ -13,8 +13,8 @@ import {
   windowsSecretAclReapPendingAtOrBelow,
   windowsSecretAclReapPendingForPath,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Directory junctions avoid Windows file-symlink privileges. Skip only if the host

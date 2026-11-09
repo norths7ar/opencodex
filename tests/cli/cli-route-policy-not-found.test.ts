@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleRoutePolicyCommand } from "../../src/cli/route-policy";
+import { handleRoutePolicyCommand } from "../../backend/src/cli/route-policy";
 
 describe("routing profile lookup exits", () => {
   test.each([["missing", 4], ["present", 0]] as const)("returns resource status for %s", async (id, expected) => {

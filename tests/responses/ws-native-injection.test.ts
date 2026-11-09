@@ -3,15 +3,15 @@ import {
   installInjectionFixture, beginInjection, injectionClient, injectionConfig, InjectionSocket,
   advertiseInjection, completeInjection, acknowledgeInjection, continuationFrame, savedResult, waitForInjection, fallbackCalls,
 } from "../helpers/native-injection-fixture";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import { createNativeSteeringLogObserver } from "../../src/server/responses/native-steering-log";
-import { NativeInjectionChannel } from "../../src/server/responses/native-injection";
-import { MAX_NATIVE_INJECTIONS, MAX_NATIVE_INJECTION_BYTES, injectionResults } from "../../src/server/responses/native-injection-protocol";
-import { nativeResponseControlEligible } from "../../src/server/responses/native-response-control";
-import { NativeInjectionReplay } from "../../src/server/responses/native-injection-replay";
-import { nativeControlReplayRetainedStoreSnapshot } from "../../src/server/responses/native-steering-replay";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import { createNativeSteeringLogObserver } from "../../backend/src/server/responses/native-steering-log";
+import { NativeInjectionChannel } from "../../backend/src/server/responses/native-injection";
+import { MAX_NATIVE_INJECTIONS, MAX_NATIVE_INJECTION_BYTES, injectionResults } from "../../backend/src/server/responses/native-injection-protocol";
+import { nativeResponseControlEligible } from "../../backend/src/server/responses/native-response-control";
+import { NativeInjectionReplay } from "../../backend/src/server/responses/native-injection-replay";
+import { nativeControlReplayRetainedStoreSnapshot } from "../../backend/src/server/responses/native-steering-replay";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 installInjectionFixture();
 

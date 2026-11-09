@@ -15,8 +15,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { ResponsesDispatchers } from "../../src/server/responses/core-options";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { ResponsesDispatchers } from "../../backend/src/server/responses/core-options";
 import {
   clearAnthropicAccountPoolState,
   getAnthropicPoolRetryAfterSeconds,
@@ -24,11 +24,11 @@ import {
   hasAnthropicFailoverQuorum,
   isAnthropicAccountPoolEnabled,
   resolveAnthropicAccountForSession,
-} from "../../src/oauth/anthropic-routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth/anthropic-routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;
@@ -172,7 +172,7 @@ describe("proactive Anthropic routing stays opt-in", () => {
     // proactive strategy, but must not reject a pool-off request before recording.
     // #6340 folded the 429 and proven-403 paths into rotateAnthropicAccountOnRefusal and
     // recordAnthropicAccountRefusal; the 429 entry points delegate to them.
-    const source = await Bun.file("src/oauth/anthropic-routing.ts").text();
+    const source = await Bun.file("backend/src/oauth/anthropic-routing.ts").text();
     // Inspect the shared instance implementation, not the legacy A delegation wrapper.
     const start = source.indexOf("  function rotateAnthropicAccountOnRefusal");
     expect(start).toBeGreaterThan(-1);

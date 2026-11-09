@@ -4,22 +4,22 @@ import {
   deriveRequestFailureCause,
   deriveRequestFailureStage,
   type RequestFailureFacts,
-} from "../../src/lib/request-failure-attribution";
+} from "../../backend/src/lib/request-failure-attribution";
 import {
   REQUEST_FAILURE_CAUSES,
   REQUEST_FAILURE_STAGES,
   permitsResend,
   resendPermission,
   stageCommitment,
-} from "../../src/lib/request-failure-model";
-import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../src/usage/telemetry-contract";
+} from "../../backend/src/lib/request-failure-model";
+import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../backend/src/usage/telemetry-contract";
 import {
   REQUEST_CLOSE_REASONS,
   REQUEST_OUTCOME_CLASSES,
   REQUEST_TERMINAL_STATUSES,
   classifyRequestOutcome,
-} from "../../src/usage/request-outcome";
-import { REQUEST_TRANSPORT_PHASES } from "../../src/usage/telemetry-contract";
+} from "../../backend/src/usage/request-outcome";
+import { REQUEST_TRANSPORT_PHASES } from "../../backend/src/usage/telemetry-contract";
 
 /**
  * The fact space this derivation is total over.

@@ -5,14 +5,14 @@ import { join } from "node:path";
 import {
   buildClientConfigText, buildClientContribution, droidConfigPath, droidHomeDir,
   type DroidGeneratedConfig, type ExportModel,
-} from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS, resolveIntegrationPaths } from "../../src/integrations/registry";
-import { readIntegrationState } from "../../src/integrations/state";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, restoreIntegration } from "../../src/integrations/writer";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS, resolveIntegrationPaths } from "../../backend/src/integrations/registry";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CONFIG = {

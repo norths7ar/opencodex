@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getMainAccountHardLockStatus, isMainAccountHardLocked, type MainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, getAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed, type StoredAccountQuota } from "../../src/codex/quota";
+import { getMainAccountHardLockStatus, isMainAccountHardLocked, type MainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, getAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed, type StoredAccountQuota } from "../../backend/src/codex/quota";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const now = Date.UTC(2026, 8, 5);

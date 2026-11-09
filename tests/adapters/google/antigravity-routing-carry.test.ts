@@ -2,22 +2,22 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { gatherRoutedModels } from "../../../src/codex/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
-import * as outbound from "../../../src/lib/provider-outbound";
-import * as oauth from "../../../src/oauth";
-import type { OAuthProviderDef } from "../../../src/oauth";
-import { createOAuthRefreshIntentLock, credentialGeneration, getAccountCredentialWithStatus, markAccountNeedsReauth } from "../../../src/oauth/store";
-import { preferredInitialAccount, routeAntigravityModel, clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
+import { gatherRoutedModels } from "../../../backend/src/codex/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
+import * as outbound from "../../../backend/src/lib/provider-outbound";
+import * as oauth from "../../../backend/src/oauth";
+import type { OAuthProviderDef } from "../../../backend/src/oauth";
+import { createOAuthRefreshIntentLock, credentialGeneration, getAccountCredentialWithStatus, markAccountNeedsReauth } from "../../../backend/src/oauth/store";
+import { preferredInitialAccount, routeAntigravityModel, clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
 import {
   ANTIGRAVITY_MODEL_DENIAL_TTL_MS, antigravityAccountSupportsModel, antigravityAccountRosterModelIds,
   captureAntigravityModelObservation, clearAntigravityAccountRosters,
   recordAntigravityAccountRoster, recordAntigravityModelDenial,
-} from "../../../src/providers/antigravity-account-roster";
-import { MODEL_DISCOVERY_MAX_MODELS } from "../../../src/providers/model-discovery";
-import { parseAntigravityAvailableModels } from "../../../src/providers/antigravity-models";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/antigravity-account-roster";
+import { MODEL_DISCOVERY_MAX_MODELS } from "../../../backend/src/providers/model-discovery";
+import { parseAntigravityAvailableModels } from "../../../backend/src/providers/antigravity-models";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { withMessagesRequestLogId, withRequestLogId } from "../../src/server/index/startup-warnings";
-import { retainUpstreamMessagesRequestId, upstreamMessagesRequestIdHeaders } from "../../src/server/messages-response-headers";
+import { withMessagesRequestLogId, withRequestLogId } from "../../backend/src/server/index/startup-warnings";
+import { retainUpstreamMessagesRequestId, upstreamMessagesRequestIdHeaders } from "../../backend/src/server/messages-response-headers";
 
 const ocxId = `ocx-${"1".repeat(32)}`;
 

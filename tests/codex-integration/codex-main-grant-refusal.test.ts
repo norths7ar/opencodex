@@ -1,4 +1,4 @@
-import { sharedStateSelectionOptions } from "../../src/codex/routing/selection";
+import { sharedStateSelectionOptions } from "../../backend/src/codex/routing/selection";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -6,23 +6,23 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   clearAccountQuota, clearMainAccountInfoCache, listCodexAuthAccounts,
-} from "../../src/codex/auth-api";
+} from "../../backend/src/codex/auth-api";
 import {
   clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth,
-} from "../../src/codex/account-runtime-state";
-import { codexAccountUnusableReason } from "../../src/codex/account-usability";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { codexCredentialMutationEpoch } from "../../src/codex/credential-mutation-epoch";
-import * as mainAccount from "../../src/codex/main-account";
+} from "../../backend/src/codex/account-runtime-state";
+import { codexAccountUnusableReason } from "../../backend/src/codex/account-usability";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { codexCredentialMutationEpoch } from "../../backend/src/codex/credential-mutation-epoch";
+import * as mainAccount from "../../backend/src/codex/main-account";
 import {
   forceRefreshMainAccountToken, getValidMainAccountToken, hasMainAccountRefreshGrant,
   isMainAccountCredentialUsable, isMainAccountRefreshGrantRejected, MAIN_CODEX_ACCOUNT_ID,
-} from "../../src/codex/main-account";
-import { headersForCodexAuthContext, resolveCodexAuthContext } from "../../src/codex/auth-context";
-import { codexAccountSelectionForTurn, tryAdmitTurn } from "../../src/server/lifecycle";
-import { CODEX_MAIN_SIGN_IN_REQUIRED_MESSAGE, mapCodexAuthContextErrorToResponse } from "../../src/server/responses/codex-auth-error";
+} from "../../backend/src/codex/main-account";
+import { headersForCodexAuthContext, resolveCodexAuthContext } from "../../backend/src/codex/auth-context";
+import { codexAccountSelectionForTurn, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { CODEX_MAIN_SIGN_IN_REQUIRED_MESSAGE, mapCodexAuthContextErrorToResponse } from "../../backend/src/server/responses/codex-auth-error";
 import { fakeChatGptJwt } from "../helpers/agent-task-recovery";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

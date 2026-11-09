@@ -1,23 +1,23 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatErrorResponse } from "../../src/bridge";
-import { isProxyError } from "../../src/lib/client-error-body";
-import { finalizeAccountLease } from "../../src/server/responses/core-lifetime";
-import { MandatoryToolChoiceUnavailableError, PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../src/server/responses/policy-request-scope";
-import { RequestPacingQueueOverloadError } from "../../src/providers/request-pacing";
-import { fetchWithTransientRetry, isNonReplayableResponse, markResponseNonReplayable } from "../../src/lib/upstream-retry";
-import { shouldRetryCodexPoolAccountQuota } from "../../src/server/responses/core-codex-account";
-import type { OcxConfig } from "../../src/types";
-import { beginRequestAttempt, noteAttemptSend, type RequestLogContext } from "../../src/server/request-log";
-import type { RouteDecisionTraceV1 } from "../../src/routing/trace";
-import { clearFallbackEventsForTests, recentFallbackEvents } from "../../src/routing/fallback-policy";
+import { formatErrorResponse } from "../../backend/src/bridge";
+import { isProxyError } from "../../backend/src/lib/client-error-body";
+import { finalizeAccountLease } from "../../backend/src/server/responses/core-lifetime";
+import { MandatoryToolChoiceUnavailableError, PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../backend/src/server/responses/policy-request-scope";
+import { RequestPacingQueueOverloadError } from "../../backend/src/providers/request-pacing";
+import { fetchWithTransientRetry, isNonReplayableResponse, markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
+import { shouldRetryCodexPoolAccountQuota } from "../../backend/src/server/responses/core-codex-account";
+import type { OcxConfig } from "../../backend/src/types";
+import { beginRequestAttempt, noteAttemptSend, type RequestLogContext } from "../../backend/src/server/request-log";
+import type { RouteDecisionTraceV1 } from "../../backend/src/routing/trace";
+import { clearFallbackEventsForTests, recentFallbackEvents } from "../../backend/src/routing/fallback-policy";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
-import { parseSyntheticRowId } from "../../src/server/fast-row";
+import { parseSyntheticRowId } from "../../backend/src/server/fast-row";
 import {
   handleResponsesWithPolicyFallback,
   rankPolicyFallbackCandidates,
   type PolicyFallbackDeps,
-} from "../../src/server/responses/policy-fallback";
+} from "../../backend/src/server/responses/policy-fallback";
 
 function fixtureConfig(): OcxConfig {
   return {

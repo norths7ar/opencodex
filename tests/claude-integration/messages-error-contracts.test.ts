@@ -2,13 +2,13 @@ import { expect, test, spyOn } from "bun:test";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { repoPath, repoRoot } from "../helpers/repo-root";
-import { OPENAI_ERROR_TYPES, OPENAI_ERROR_CODES, ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES, upstreamFailureEvidence, markProxyError, isProxyError } from "../../src/lib/client-error-body";
-import { ownedAnthropicErrorPayload, ownedAnthropicErrorResponse, messagesUnknownEndpointMessage } from "../../src/lib/messages-error-body";
-import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { collectAnthropicMessageResponse, encodeAnthropicMessageSse } from "../../src/protocols/encoders/messages";
-import type { MessagesFailureVerdictSink } from "../../src/claude/failure-verdict";
+import { OPENAI_ERROR_TYPES, OPENAI_ERROR_CODES, ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES, upstreamFailureEvidence, markProxyError, isProxyError } from "../../backend/src/lib/client-error-body";
+import { ownedAnthropicErrorPayload, ownedAnthropicErrorResponse, messagesUnknownEndpointMessage } from "../../backend/src/lib/messages-error-body";
+import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { collectAnthropicMessageResponse, encodeAnthropicMessageSse } from "../../backend/src/protocols/encoders/messages";
+import type { MessagesFailureVerdictSink } from "../../backend/src/claude/failure-verdict";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+import type { AdapterEvent } from "../../backend/src/types";
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const statusTypes = [
   [401, "authentication_error"], [402, "billing_error"], [403, "permission_error"],
@@ -36,10 +36,10 @@ test("literal vocabulary covers the writer families without accepting local bypa
   for (const code of ["translation_buffer_limit", "context_length_exceeded", "unsupported_feature", "send_budget_exhausted", "desktop_model_mapping_unavailable", "thread_unsupported_request", "upstream_reset_replay_refused", "undeclared_tool_call"]) expect(ANTHROPIC_ERROR_CODES.get(code)).toBe(code);
   for (const type of ["server_error", "model_not_allowed_for_key", "not_found"]) expect(ANTHROPIC_ERROR_TYPES.has(type)).toBe(false);
   const sourceRows: [string, string[]][] = [
-    ["src/server/messages-native.ts", ["send_budget_exhausted", "translation_buffer_limit", "unsupported_feature"]],
-    ["src/server/claude-messages.ts", ["desktop_model_mapping_unavailable", "translation_buffer_limit", "context_length_exceeded"]],
-    ["src/claude/message-threads.ts", ["thread_unsupported_request"]],
-    ["src/server/inbound-body-admission.ts", ["server_busy"]],
+    ["backend/src/server/messages-native.ts", ["send_budget_exhausted", "translation_buffer_limit", "unsupported_feature"]],
+    ["backend/src/server/claude-messages.ts", ["desktop_model_mapping_unavailable", "translation_buffer_limit", "context_length_exceeded"]],
+    ["backend/src/claude/message-threads.ts", ["thread_unsupported_request"]],
+    ["backend/src/server/inbound-body-admission.ts", ["server_busy"]],
   ];
   for (const [path, codes] of sourceRows) {
     const literals = [...readFileSync(repoPath(path), "utf8").matchAll(/"([a-z_]+)"/g)].map(match => match[1]);
@@ -90,19 +90,19 @@ test("collector preserves a parsed non-error record as its original verdict", as
 
 const deferred = [
   {
-    "path": "src/claude/outbound.ts",
+    "path": "backend/src/claude/outbound.ts",
     "start": "export function claudePromptTooLongMessage",
     "end": "/** Provider wordings",
     "sha256": "7d2a660ded84f549a47a37dcc6635d29bb94a0ef41d5f0e27de5105effbc2783"
   },
   {
-    "path": "src/claude/outbound.ts",
+    "path": "backend/src/claude/outbound.ts",
     "start": "export function claudeOverflowSsePayload",
     "end": "/**\n * A throughput",
     "sha256": "a8520a3fd8db14c72ebcfbc55c1ee102a08c14cefc887138cc0fb3ca4dc9b067"
   },
   {
-    "path": "src/claude/outbound.ts",
+    "path": "backend/src/claude/outbound.ts",
     "start": "export function anthropicErrorBody",
     "end": "/**\n * Responses usage",
     "sha256": "debec1dd561804ca1797ec69f87924dbd5589cd0266e8b971c585031a01134bd"
@@ -139,7 +139,7 @@ let sourceUses: Promise<SourceUses[]> | undefined;
 /** Scan every source once with bounded reads; retain only oracle facts, not all source text. */
 function readSourceUses(): Promise<SourceUses[]> {
   return sourceUses ??= (async () => {
-    const paths = [...new Bun.Glob("src/**/*.ts").scanSync(repoRoot())];
+    const paths = [...new Bun.Glob("backend/src/**/*.ts").scanSync(repoRoot())];
     const uses = new Array<SourceUses>(paths.length);
     let next = 0;
     await Promise.all(Array.from({ length: Math.min(8, paths.length) }, async () => {
@@ -157,12 +157,12 @@ function readSourceUses(): Promise<SourceUses[]> {
 }
 
 const ingressProducerRows: [string, number, string[]][] = [
-  ["src/claude/inbound.ts", 10, ["File-backed images require native Anthropic passthrough", "tool_result requires tool_use_id", "tool_use requires id and name", "malformed ocxr1 reasoning signature", "OpenCodex reasoning continuity cannot be replayed as an Anthropic signature", "each message must be an object", "unsupported message role: unsupported", "request body must be a JSON object", "model is required", "messages must be a non-empty array"]],
-  ["src/protocols/codecs/messages-ir.ts", 9, ["tool_result requires tool_use_id", "tool_use requires id and name", "MALFORMED_REASONING_SIGNATURE", "OpenCodex reasoning continuity cannot be replayed as an Anthropic signature", "each message must be an object", "unsupported message role: unsupported", "request body must be a JSON object", "model is required", "messages must be a non-empty array"]],
-  ["src/claude/inbound-content-options.ts", 2, ["tool_choice.tool requires a name", "Restricted web search cannot be forced on a translated route without an available search declaration"]],
-  ["src/claude/inbound-model-options.ts", 1, ["Unknown Claude Desktop alias; reapply the Desktop profile from the connected hub"]],
-  ["src/server/messages-shared.ts", 1, ["tool_use block has an empty id", "tool_result block has an empty tool_use_id"]],
-  ["src/server/claude-messages.ts", 1, ["Invalid JSON body"]],
+  ["backend/src/claude/inbound.ts", 10, ["File-backed images require native Anthropic passthrough", "tool_result requires tool_use_id", "tool_use requires id and name", "malformed ocxr1 reasoning signature", "OpenCodex reasoning continuity cannot be replayed as an Anthropic signature", "each message must be an object", "unsupported message role: unsupported", "request body must be a JSON object", "model is required", "messages must be a non-empty array"]],
+  ["backend/src/protocols/codecs/messages-ir.ts", 9, ["tool_result requires tool_use_id", "tool_use requires id and name", "MALFORMED_REASONING_SIGNATURE", "OpenCodex reasoning continuity cannot be replayed as an Anthropic signature", "each message must be an object", "unsupported message role: unsupported", "request body must be a JSON object", "model is required", "messages must be a non-empty array"]],
+  ["backend/src/claude/inbound-content-options.ts", 2, ["tool_choice.tool requires a name", "Restricted web search cannot be forced on a translated route without an available search declaration"]],
+  ["backend/src/claude/inbound-model-options.ts", 1, ["Unknown Claude Desktop alias; reapply the Desktop profile from the connected hub"]],
+  ["backend/src/server/messages-shared.ts", 1, ["tool_use block has an empty id", "tool_result block has an empty tool_use_id"]],
+  ["backend/src/server/claude-messages.ts", 1, ["Invalid JSON body"]],
 ];
 test("C1/C2 ingress constructors have explicit producer rows and local identity", async () => {
   const actual: Record<string, number> = {};
@@ -175,18 +175,18 @@ test("C1/C2 ingress constructors have explicit producer rows and local identity"
     const source = readFileSync(repoPath(path), "utf8");
     for (const diagnostic of diagnostics) expect(source).toContain(diagnostic);
   }
-  const { DesktopModelMappingUnavailableError } = await import("../../src/claude/inbound-records");
+  const { DesktopModelMappingUnavailableError } = await import("../../backend/src/claude/inbound-records");
   const local = new DesktopModelMappingUnavailableError();
   expect(isProxyError(local)).toBe(true);
   expect(local.message).toBe("Claude Desktop model mapping is unavailable; refresh model discovery or reapply the connected hub profile");
 });
 const envelopeWriterRows = [
-  ["src/claude/outbound.ts", 6, "shared baseline helpers, original verdict and incomplete/unfinished presentation construction"],
-  ["src/protocols/encoders/messages.ts", 4, "original verdict construction and fixed local collection failures"],
-  ["src/server/messages-native.ts", 5, "local/evidence legacy formatters, original combo and fold envelopes, owned workflow refusal projection"],
-  ["src/server/claude-messages.ts", 30, "mapped local ingress/bypass constructors, original combo and defensive JSON presentation envelopes"],
-  ["src/server/index/serve-options.ts", 4, "fixed endpoint auth/origin bypasses"],
-  ["src/server/messages-native-tool-guard.ts", 1, "deferred local guard terminal"],
+  ["backend/src/claude/outbound.ts", 6, "shared baseline helpers, original verdict and incomplete/unfinished presentation construction"],
+  ["backend/src/protocols/encoders/messages.ts", 4, "original verdict construction and fixed local collection failures"],
+  ["backend/src/server/messages-native.ts", 5, "local/evidence legacy formatters, original combo and fold envelopes, owned workflow refusal projection"],
+  ["backend/src/server/claude-messages.ts", 30, "mapped local ingress/bypass constructors, original combo and defensive JSON presentation envelopes"],
+  ["backend/src/server/index/serve-options.ts", 4, "fixed endpoint auth/origin bypasses"],
+  ["backend/src/server/messages-native-tool-guard.ts", 1, "deferred local guard terminal"],
 ] as const;
 test("W1/W3 envelope writers are covered by explicit dispositions", async () => {
   const actual: Record<string, number> = {};
@@ -195,8 +195,8 @@ test("W1/W3 envelope writers are covered by explicit dispositions", async () => 
   }
   expect(actual).toEqual(Object.fromEntries(envelopeWriterRows.map(([path, count]) => [path, count])));
   const bypassRows = [
-    ["src/claude/message-threads.ts", 2], ["src/server/inbound-body-admission.ts", 4],
-    ["src/server/index.ts", 4], ["src/server/admission-model-scope.ts", 0], ["src/server/workflow-refusal.ts", 1],
+    ["backend/src/claude/message-threads.ts", 2], ["backend/src/server/inbound-body-admission.ts", 4],
+    ["backend/src/server/index.ts", 4], ["backend/src/server/admission-model-scope.ts", 0], ["backend/src/server/workflow-refusal.ts", 1],
   ] as const;
   for (const [path, count] of bypassRows) {
     const actual = readFileSync(repoPath(path), "utf8").split("\n").filter(line => /type: "error"|error_code|server_busy|server_restarting|package_tree_changed|formatErrorResponse\(/.test(line)).length;
@@ -347,7 +347,7 @@ const nativeFailRows = [
   }
 ];
 test("W2 local fail calls each retain a producer disposition", () => {
-  const calls = readFileSync(repoPath("src/server/messages-native.ts"), "utf8").split("\n")
+  const calls = readFileSync(repoPath("backend/src/server/messages-native.ts"), "utf8").split("\n")
     .filter(line => /\bfail\(/.test(line)).map(line => line.trim());
   expect(calls).toEqual(nativeFailRows.map(row => row.call));
   expect(nativeFailRows.every(row => row.disposition.length > 0)).toBe(true);

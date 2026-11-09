@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { claudeInterceptProxyTokenPath } from "../../src/claude/intercept/proxy-auth";
-import { claudeInterceptProxyUrl } from "../../src/claude/intercept/settings";
-import { resolvedProxyEnv } from "../../src/service/definition";
+import { claudeInterceptProxyTokenPath } from "../../backend/src/claude/intercept/proxy-auth";
+import { claudeInterceptProxyUrl } from "../../backend/src/claude/intercept/settings";
+import { resolvedProxyEnv } from "../../backend/src/service/definition";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const token = "a".repeat(43);

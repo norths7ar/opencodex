@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { deriveJawcodeAliases, deriveProviderPresets } from "../../src/providers/derive";
-import { FREE_PROVIDER_DIRECTORY } from "../../src/providers/free-directory";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { deriveJawcodeAliases, deriveProviderPresets } from "../../backend/src/providers/derive";
+import { FREE_PROVIDER_DIRECTORY } from "../../backend/src/providers/free-directory";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 const BASE_URL = "https://open.bigmodel.cn/api/paas/v4";
 

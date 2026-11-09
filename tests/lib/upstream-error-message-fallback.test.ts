@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { ENCRYPTED_FUNCTION_OUTPUT_REJECTION, isRateLimitOrQuotaFailureMessage, upstreamErrorMessageFromPayload } from "../../src/lib/errors";
-import { codexQuotaFailureMessage } from "../../src/server/responses/core-codex-account";
-import { isEncryptedFunctionOutputRejection } from "../../src/server/responses/core-opaque-recovery";
+import { ENCRYPTED_FUNCTION_OUTPUT_REJECTION, isRateLimitOrQuotaFailureMessage, upstreamErrorMessageFromPayload } from "../../backend/src/lib/errors";
+import { codexQuotaFailureMessage } from "../../backend/src/server/responses/core-codex-account";
+import { isEncryptedFunctionOutputRejection } from "../../backend/src/server/responses/core-opaque-recovery";
 
 describe("upstream diagnostic message fallback", () => {
   test.each([null, 123, false, {}, [], "", " \t\n"].map(message => [message]))("skips unusable message %j", message => {

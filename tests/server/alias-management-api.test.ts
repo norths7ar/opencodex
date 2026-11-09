@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 
 function config(): OcxConfig {

@@ -2,15 +2,15 @@ import { expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClaudeDesktopState } from "../../src/server/management/shared";
-import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../../src/codex/catalog";
-import { generateDesktop3pModels } from "../../src/claude/desktop-3p";
-import { emptyDesktopProfile } from "../../src/claude/desktop-profile";
+import { buildClaudeDesktopState } from "../../backend/src/server/management/shared";
+import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../../backend/src/codex/catalog";
+import { generateDesktop3pModels } from "../../backend/src/claude/desktop-3p";
+import { emptyDesktopProfile } from "../../backend/src/claude/desktop-profile";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

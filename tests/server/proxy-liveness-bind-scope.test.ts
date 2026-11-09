@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { createTempHome } from "../helpers/temp-home";
-import { findLiveProxy, observeProxyLiveness, type LivenessIo } from "../../src/server/proxy-liveness";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
-import { reconcileEnsureDesiredIntegrations } from "../../src/cli/ensure-desired-integrations";
-import { injectGrokConfig, type GrokInjectResult } from "../../src/grok/inject";
-import { syncGrokConfig } from "../../src/grok/sync";
-import type { OcxConfig } from "../../src/types";
+import { findLiveProxy, observeProxyLiveness, type LivenessIo } from "../../backend/src/server/proxy-liveness";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
+import { reconcileEnsureDesiredIntegrations } from "../../backend/src/cli/ensure-desired-integrations";
+import { injectGrokConfig, type GrokInjectResult } from "../../backend/src/grok/inject";
+import { syncGrokConfig } from "../../backend/src/grok/sync";
+import type { OcxConfig } from "../../backend/src/types";
 
 const binds = [
   { label: "omitted", hostname: undefined, expected: "127.0.0.1", loopback: true },

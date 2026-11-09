@@ -3,12 +3,12 @@ import { Database } from "bun:sqlite";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import { isRequestOwnedAffinityKey, requestOwnedAffinityKey } from "../../src/codex/request-owned-affinity";
-import { bindThreadAffinity, clearThreadAccountMap, getThreadAffinity, peekConversationStateIssuer, rememberConversationStateIssuer } from "../../src/codex/routing/thread-affinity";
-import { adoptStoredIssuer, adoptStoredThreadRows, flushCodexAffinityStoreForTests, noteCodexAffinityAnchorForTests, resetCodexAffinityStoreForTests } from "../../src/codex/routing/thread-affinity-store";
-import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../src/lib/spend-ledger-owner";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import { isRequestOwnedAffinityKey, requestOwnedAffinityKey } from "../../backend/src/codex/request-owned-affinity";
+import { bindThreadAffinity, clearThreadAccountMap, getThreadAffinity, peekConversationStateIssuer, rememberConversationStateIssuer } from "../../backend/src/codex/routing/thread-affinity";
+import { adoptStoredIssuer, adoptStoredThreadRows, flushCodexAffinityStoreForTests, noteCodexAffinityAnchorForTests, resetCodexAffinityStoreForTests } from "../../backend/src/codex/routing/thread-affinity-store";
+import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../backend/src/lib/spend-ledger-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

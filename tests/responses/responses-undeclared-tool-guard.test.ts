@@ -19,11 +19,11 @@ import {
   undeclaredToolCallNameInResponse,
   UNDECLARED_TOOL_CALL_ERROR_CODE,
   type ProviderExecutedCallType,
-} from "../../src/server/responses-undeclared-tool-guard";
-import { relaySseWithBlockRewrite } from "../../src/server/sse-payload-rewrite";
-import { handleResponses } from "../../src/server/responses";
-import { expandPreviousResponseInput } from "../../src/responses/state";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/responses-undeclared-tool-guard";
+import { relaySseWithBlockRewrite } from "../../backend/src/server/sse-payload-rewrite";
+import { handleResponses } from "../../backend/src/server/responses";
+import { expandPreviousResponseInput } from "../../backend/src/responses/state";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { readAll, streamFromText } from "../helpers/sse-stream";

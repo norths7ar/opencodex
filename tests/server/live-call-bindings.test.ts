@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { EXTERNAL_CALL_PREFIX, LIVE_CALL_TTL_MS, LiveCallBindings, upstreamLiveCallId, type LiveCallBinding } from "../../src/server/live-call-bindings";
+import { EXTERNAL_CALL_PREFIX, LIVE_CALL_TTL_MS, LiveCallBindings, upstreamLiveCallId, type LiveCallBinding } from "../../backend/src/server/live-call-bindings";
 
 const binding: LiveCallBinding = { owner: "key-one", upstreamCallId: "rtc_upstream", joinStyle: "frameless-path", providerName: "openai", accountId: "account-a", chatgptAccountId: "workspace-a", callerOwned: false };
 

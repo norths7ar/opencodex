@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { isOpenCodeGoGeminiDestination } from "../../src/types/opencode-go";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { captureRouteStaticPolicy, routedProviderConfig } from "../../src/router";
-import { buildProtocolProviderSummary } from "../../src/protocols/provider-summary";
-import { parseRequest } from "../../src/responses/parser";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import { MODEL_ADAPTER_OVERRIDE_ALLOWED, type OcxConfig, type OcxProviderConfig } from "../../src/types";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { isOpenCodeGoGeminiDestination } from "../../backend/src/types/opencode-go";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { captureRouteStaticPolicy, routedProviderConfig } from "../../backend/src/router";
+import { buildProtocolProviderSummary } from "../../backend/src/protocols/provider-summary";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { MODEL_ADAPTER_OVERRIDE_ALLOWED, type OcxConfig, type OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 

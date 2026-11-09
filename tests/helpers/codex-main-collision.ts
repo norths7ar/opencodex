@@ -1,11 +1,11 @@
 import { expect, spyOn, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { getCodexAccountCredential } from "../../src/codex/account-store";
-import * as authCollision from "../../src/codex/auth-collision";
-import { acquireNativeMainProfileDrain } from "../../src/server/lifecycle";
-import { saveConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+import { getCodexAccountCredential } from "../../backend/src/codex/account-store";
+import * as authCollision from "../../backend/src/codex/auth-collision";
+import { acquireNativeMainProfileDrain } from "../../backend/src/server/lifecycle";
+import { saveConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 
 interface CollisionOAuthOptions {
   config: OcxConfig;

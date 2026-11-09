@@ -1,15 +1,15 @@
-import { registerThreadAffinityLiveState } from "../../src/codex/routing/thread-affinity";
+import { registerThreadAffinityLiveState } from "../../backend/src/codex/routing/thread-affinity";
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { codexConversationKeyFor } from "../../src/codex/lineage";
-import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../src/lib/spend-ledger-owner";
-import { runPassiveRead } from "../../src/lib/passive-read";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { codexConversationKeyFor } from "../../backend/src/codex/lineage";
+import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../backend/src/lib/spend-ledger-owner";
+import { runPassiveRead } from "../../backend/src/lib/passive-read";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { adoptStoredIssuer, adoptStoredThreadRows, codexAffinityIdentityFence, CODEX_UNKNOWN_CONVERSATION_STATE_ISSUER, flushCodexAffinityStoreForTests, recordAccountPinsCleared, recordAllCleared, recordIssuerSet, recordIssuerDelete, recordThreadDelete, recordThreadBind, recordThreadTouch, registerCodexAffinityLiveState, resetCodexAffinityStoreForTests } from "../../src/codex/routing/thread-affinity-store";
+import { adoptStoredIssuer, adoptStoredThreadRows, codexAffinityIdentityFence, CODEX_UNKNOWN_CONVERSATION_STATE_ISSUER, flushCodexAffinityStoreForTests, recordAccountPinsCleared, recordAllCleared, recordIssuerSet, recordIssuerDelete, recordThreadDelete, recordThreadBind, recordThreadTouch, registerCodexAffinityLiveState, resetCodexAffinityStoreForTests } from "../../backend/src/codex/routing/thread-affinity-store";
 
 let home: string;
 let prior: string | undefined;
@@ -222,7 +222,7 @@ test("large worst-case batch flushes and restores newest rows", () => {
 });
 
 test("scoped lookup and account delete reach rows beyond the adoption limit", async () => {
-  const affinity = await import("../../src/codex/routing/thread-affinity");
+  const affinity = await import("../../backend/src/codex/routing/thread-affinity");
   registerThreadAffinityLiveState(); lease = acquireSpendLedgerOwner(); const fence = seed(); const k = key(); const now = Date.now();
   recordThreadBind(k, "shared", { scope: "shared", accountId: "account-a", fence, createdAt: now - 100, lastUsedAt: now - 100 });
   for (let i = 0; i < 70; i++) { const scope = `model-detour:shared:model-${i}`; recordThreadBind(k, scope, { scope, accountId: "account-a", fence, createdAt: now, lastUsedAt: now }); }
@@ -254,7 +254,7 @@ test("poisoned store prunes on its hourly timer", () => {
 });
 
 test("account deletion removes unadopted scopes and blocks pending adoption", async () => {
-  const affinity = await import("../../src/codex/routing/thread-affinity");
+  const affinity = await import("../../backend/src/codex/routing/thread-affinity");
   registerThreadAffinityLiveState(); lease = acquireSpendLedgerOwner(); const fence = seed(); const k = key(); const now = Date.now();
   for (let i = 0; i < 70; i++) { const scope = `model-detour:shared:delete-${i}`; recordThreadBind(k, scope, { scope, accountId: "account-a", fence, createdAt: now, lastUsedAt: now }); }
   lease.release(); lease = acquireSpendLedgerOwner(); const restored = key();

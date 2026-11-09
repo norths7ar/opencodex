@@ -3,16 +3,16 @@ import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountQuota } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth } from "../../src/codex/routing";
-import { saveCredential } from "../../src/oauth/store";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { saveCredential } from "../../backend/src/oauth/store";
 import {
   clearProviderQuotaCache,
   fetchProviderQuotaReports,
   setProviderQuotaBeforePublishForTests,
-} from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+} from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));
 const originalFetch = globalThis.fetch;

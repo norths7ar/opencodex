@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { SerializedToolCallContentBuffer, splitAtPossibleSerializedToolCall } from "../../../src/adapters/openai-chat/serialized-tool-call-content";
-import type { AdapterEvent } from "../../../src/types";
+import { SerializedToolCallContentBuffer, splitAtPossibleSerializedToolCall } from "../../../backend/src/adapters/openai-chat/serialized-tool-call-content";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const OPEN = "<tool_call><function=exec>";

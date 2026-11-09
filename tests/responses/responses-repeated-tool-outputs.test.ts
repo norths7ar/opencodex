@@ -12,11 +12,11 @@
  * fabricated, and only the unambiguous shape (one call, all its outputs after it) is touched.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { mergeRepeatedResponsesToolOutputs } from "../../src/adapters/openai-responses/tool-output-recovery";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig } from "../../src/types";
+import { mergeRepeatedResponsesToolOutputs } from "../../backend/src/adapters/openai-responses/tool-output-recovery";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const PLACEHOLDER = JSON.stringify({ type: "reasoning", summary: [], content: [{ type: "reasoning_text", text: " " }] });

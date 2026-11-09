@@ -3,18 +3,18 @@ import { managementFetch as fetch } from "../helpers/management-auth";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig, writePid, writeRuntimePort } from "../../src/config";
-import { OAUTH_PROVIDERS, runLogin, upsertOAuthProvider } from "../../src/oauth";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import { clearGenericFailoverHealth, preferredInitialAccount } from "../../src/oauth/generic-account-failover";
+import { loadConfig, saveConfig, writePid, writeRuntimePort } from "../../backend/src/config";
+import { OAUTH_PROVIDERS, runLogin, upsertOAuthProvider } from "../../backend/src/oauth";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import { clearGenericFailoverHealth, preferredInitialAccount } from "../../backend/src/oauth/generic-account-failover";
 import {
   commitKeyLoginProvider,
   notifyRunningProxy,
   notifyRunningProxyAfterOAuthLogin,
-} from "../../src/oauth/login-cli";
-import { startServer } from "../../src/server";
-import { createLocalAttestationSecret } from "../../src/lib/local-management-attestation";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth/login-cli";
+import { startServer } from "../../backend/src/server";
+import { createLocalAttestationSecret } from "../../backend/src/lib/local-management-attestation";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 

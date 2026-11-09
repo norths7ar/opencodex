@@ -2,14 +2,14 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { configuredCredentials } from "../../src/server/configured-credentials";
-import { safeConfigDTO } from "../../src/server/auth-cors";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { configuredCredentials } from "../../backend/src/server/configured-credentials";
+import { safeConfigDTO } from "../../backend/src/server/auth-cors";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
-import { redactSecrets } from "../../src/lib/redact";
-import { diagnosticValueAllowed } from "../../src/server/request-log-terminal-status";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/api-key-resolve";
-import type { OcxConfig } from "../../src/types";
+import { redactSecrets } from "../../backend/src/lib/redact";
+import { diagnosticValueAllowed } from "../../backend/src/server/request-log-terminal-status";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/api-key-resolve";
+import type { OcxConfig } from "../../backend/src/types";
 
 test("Artificial Analysis credentials are protected and refreshed", () => {
   const dir = mkdtempSync(join(tmpdir(), "ocx-aa-credential-"));

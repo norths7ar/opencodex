@@ -3,15 +3,15 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { MANAGEMENT_ROUTES } from "../../src/server/management/route-registry";
-import { handleCodexCliUpdateRoutes } from "../../src/server/management/codex-cli-update-routes";
-import * as updateJobs from "../../src/codex/cli-update-job";
-import * as cliUpdatePlanModule from "../../src/codex/cli-update-plan";
-import * as cliUpdateWorkerModule from "../../src/codex/cli-update-job-worker";
-import type { ManagementContext } from "../../src/server/management/context";
-import { initializeNodeLauncherContext, NODE_LAUNCH_CONTEXT_ENV, NODE_LAUNCH_PROOF_PREFIX } from "../../src/cli/launcher-context";
-import { SIBLING_REFUSED_MANAGEMENT_PATHS, siblingRefusesManagementRequest } from "../../src/server/management/sibling-guard";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
+import { MANAGEMENT_ROUTES } from "../../backend/src/server/management/route-registry";
+import { handleCodexCliUpdateRoutes } from "../../backend/src/server/management/codex-cli-update-routes";
+import * as updateJobs from "../../backend/src/codex/cli-update-job";
+import * as cliUpdatePlanModule from "../../backend/src/codex/cli-update-plan";
+import * as cliUpdateWorkerModule from "../../backend/src/codex/cli-update-job-worker";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { initializeNodeLauncherContext, NODE_LAUNCH_CONTEXT_ENV, NODE_LAUNCH_PROOF_PREFIX } from "../../backend/src/cli/launcher-context";
+import { SIBLING_REFUSED_MANAGEMENT_PATHS, siblingRefusesManagementRequest } from "../../backend/src/server/management/sibling-guard";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
 import { scanRoutes, distinctRoutes } from "../helpers/management-route-scan";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -48,13 +48,13 @@ const repoRoot = resolveRepoRoot();
 /** Files that carry management routes. Kept explicit: two live outside `management/`. */
 function routeCarryingFiles(): string[] {
   const files = [
-    "src/server/management-api.ts",
+    "backend/src/server/management-api.ts",
     // Mounted outside the `??` chain (management-api.ts:284, :289), which is why a scan
     // scoped to `src/server/management/` misses 29 route literals entirely.
-    "src/codex/auth-api/routes.ts",
-    "src/codex/native-profile-api.ts",
+    "backend/src/codex/auth-api/routes.ts",
+    "backend/src/codex/native-profile-api.ts",
   ];
-  for (const f of readdirSync(join(repoRoot, "src/server/management")).sort()) {
+  for (const f of readdirSync(join(repoRoot, "backend/src/server/management")).sort()) {
     // Skip the registry itself: it is a data table whose doc comment quotes route paths,
     // so scanning it would reconcile the declaration against its own prose.
     if (f.endsWith(".ts") && f !== "route-registry.ts") files.push(`src/server/management/${f}`);
@@ -76,7 +76,7 @@ describe("management route registry reconciliation", () => {
     initializeNodeLauncherContext(["bun", "test", `${NODE_LAUNCH_PROOF_PREFIX}${proof}`], env);
     try {
       const request = new Request("http://localhost/api/codex/cli-update/plan");
-      const ctx: ManagementContext = { req: request, url: new URL(request.url), config: { port: 10100, providers: {} } as import("../../src/types").OcxConfig,
+      const ctx: ManagementContext = { req: request, url: new URL(request.url), config: { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig,
         deps: {}, version: "test", principal: "admin-token", trustedLoopbackIngress: true, guiSessionIssuance: null,
         convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
         syncClaudeAgentDefsBestEffort: async () => {} };
@@ -135,7 +135,7 @@ describe("management route registry reconciliation", () => {
     try {
       const makeCtx = (pathname: string): ManagementContext => {
         const req = new Request(`http://localhost${pathname}`);
-        return { req, url: new URL(req.url), config: { port: 10100, providers: {} } as import("../../src/types").OcxConfig,
+        return { req, url: new URL(req.url), config: { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig,
           deps: {}, version: "test", principal: "admin-token", trustedLoopbackIngress: true, guiSessionIssuance: null,
           convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
           syncClaudeAgentDefsBestEffort: async () => {} };
@@ -185,7 +185,7 @@ describe("management route registry reconciliation", () => {
       .mockRejectedValue(new Error("plan_unavailable"));
     const req = new Request("http://localhost/api/codex/cli-update/plan");
     const ctx: ManagementContext = { req, url: new URL(req.url),
-      config: { port: 10100, providers: {} } as import("../../src/types").OcxConfig,
+      config: { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig,
       deps: {}, version: "test", principal: "admin-token", trustedLoopbackIngress: true, guiSessionIssuance: null,
       convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
       syncClaudeAgentDefsBestEffort: async () => {} };
@@ -198,7 +198,7 @@ describe("management route registry reconciliation", () => {
   });
 
   test("Codex CLI HTTP apply requires a GUI session and trusted loopback before admission", async () => {
-    const config = { port: 10100, providers: {} } as import("../../src/types").OcxConfig;
+    const config = { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig;
     const request = new Request("http://localhost/api/codex/cli-update/apply", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ requestId: "retry-key-00001", planId: "a".repeat(32), confirmed: true }),
@@ -236,7 +236,7 @@ describe("management route registry reconciliation", () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ requestId: "busy-response-01", planId: "e".repeat(32), confirmed: true }) });
       const ctx: ManagementContext = { req, url: new URL(req.url),
-        config: { port: 10100, providers: {} } as import("../../src/types").OcxConfig, deps: {}, version: "test",
+        config: { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig, deps: {}, version: "test",
         principal: "gui-session", trustedLoopbackIngress: true, guiSessionIssuance: "loopback",
         sessionControl: { isPaired: () => true, isCurrent: () => true, revokeCurrent: () => true },
         convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
@@ -262,7 +262,7 @@ describe("management route registry reconciliation", () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ requestId: "lost-response-retry-01", planId: "e".repeat(32), confirmed: true }) });
       const ctx: ManagementContext = { req: makeRequest(), url: new URL("http://localhost/api/codex/cli-update/apply"),
-        config: { port: 10100, providers: {} } as import("../../src/types").OcxConfig, deps: {}, version: "test",
+        config: { port: 10100, providers: {} } as import("../../backend/src/types").OcxConfig, deps: {}, version: "test",
         principal: "gui-session", trustedLoopbackIngress: true, guiSessionIssuance: "loopback",
         sessionControl: { isPaired: () => true, isCurrent: () => true, revokeCurrent: () => true },
         convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
@@ -606,7 +606,7 @@ describe("the sibling guard refuses only declared shared-state mutations", () =>
   });
 
   test("handleManagementAPI answers 409 sibling_instance before any route runs, and only while marked", async () => {
-    const { handleManagementAPI } = await import("../../src/server/management-api");
+    const { handleManagementAPI } = await import("../../backend/src/server/management-api");
     const { ManagementRequest } = await import("../helpers/management-auth");
     const config = { port: 10199, hostname: "127.0.0.1", providers: {}, defaultProvider: "openai" } as unknown as Parameters<typeof handleManagementAPI>[2];
     const call = async (method: string, path: string, body?: unknown) => {
@@ -649,7 +649,7 @@ describe("the registry is inert data", () => {
   test("route-registry.ts imports nothing at all", () => {
     // It is imported by src/server/management-api.ts, which tests/core-lab-boundary
     // protects. A path string creates no module edge; an import would.
-    const src = readFileSync(join(repoRoot, "src/server/management/route-registry.ts"), "utf8");
+    const src = readFileSync(join(repoRoot, "backend/src/server/management/route-registry.ts"), "utf8");
     const imports = src.match(/^\s*(import|export)\s+[^;]*from\s+["'][^"']+["']/gm) ?? [];
     expect(imports).toEqual([]);
     // Check the import graph, not prose: this file's own header explains why it must not

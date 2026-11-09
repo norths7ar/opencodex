@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import { setCodexWsReuseAcrossTurns } from "../../src/config/codex-ws-reuse-setting";
-import { CODEX_RESPONSES_HTTP_URL } from "../../src/server/responses/codex-ws-request";
-import { CodexWsPool, codexWsReuseIdentity } from "../../src/server/responses/codex-ws-pool";
-import { planCodexWsDial } from "../../src/server/responses/ws-upstream";
+import { setCodexWsReuseAcrossTurns } from "../../backend/src/config/codex-ws-reuse-setting";
+import { CODEX_RESPONSES_HTTP_URL } from "../../backend/src/server/responses/codex-ws-request";
+import { CodexWsPool, codexWsReuseIdentity } from "../../backend/src/server/responses/codex-ws-pool";
+import { planCodexWsDial } from "../../backend/src/server/responses/ws-upstream";
 
 class Socket extends EventTarget {
   static all: Socket[] = [];

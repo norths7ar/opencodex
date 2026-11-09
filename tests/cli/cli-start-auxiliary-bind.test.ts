@@ -6,8 +6,8 @@ import { join } from "node:path";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { watchdogMs } from "../helpers/ci-watchdog";
-import { assertAuxiliaryListenerPortsAvailable } from "../../src/cli/auxiliary-listener-preflight";
-import { directLocalHttpFetch } from "../../src/server/direct-local-http";
+import { assertAuxiliaryListenerPortsAvailable } from "../../backend/src/cli/auxiliary-listener-preflight";
+import { directLocalHttpFetch } from "../../backend/src/server/direct-local-http";
 
 const DEADLINE = watchdogMs(20_000);
 
@@ -37,7 +37,7 @@ for (const listener of ["unauthenticatedLoopbackListener", "hub.managementIngres
           ? { runtimeRole: "hub", hub: { managementIngress: { enabled: true, port: auxiliaryPort } } }
           : { unauthenticatedLoopbackListener: { enabled: true, port: auxiliaryPort } }),
       }));
-      const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start", ...(pinned ? ["--port", String(publicPort)] : [])], {
+      const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "start", ...(pinned ? ["--port", String(publicPort)] : [])], {
         cwd: root,
         env: { HOME: home, USERPROFILE: home, OPENCODEX_HOME: ocxHome, CODEX_HOME: codexHome,
           PATH: process.env.PATH ?? "", NO_PROXY: "127.0.0.1,localhost" },

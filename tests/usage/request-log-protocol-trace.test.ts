@@ -3,8 +3,8 @@
  * through the persisted usage row, re-validated on read, and filterable by `protocolMode`.
  */
 import { describe, expect, test } from "bun:test";
-import type { ProtocolTraceV1 } from "../../src/protocols/dto";
-import { markProtocolBlocked, markProtocolEntry } from "../../src/protocols/trace";
+import type { ProtocolTraceV1 } from "../../backend/src/protocols/dto";
+import { markProtocolBlocked, markProtocolEntry } from "../../backend/src/protocols/trace";
 import {
   addFinalRequestLog,
   beginRequestAttempt,
@@ -14,8 +14,8 @@ import {
   requestLogEntryFromPersistedUsage,
   type RequestLogContext,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../backend/src/usage/log";
 
 function finalize(logCtx: RequestLogContext, status = 200): RequestLogEntry {
   let captured: RequestLogEntry | undefined;

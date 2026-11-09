@@ -1,13 +1,13 @@
 import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold-spawn-warmup";
-import { compatibilityActivationScript, launchWindowsCodexCompatibility, validatedCompatibilityPacUrl } from "../../src/codex/desktop-compatibility/windows-package-launch";
-import { WINDOWS_ACTIVATION_SOURCE } from "../../src/codex/desktop-compatibility/windows-activation-source";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
-import type { DesktopExec } from "../../src/codex/desktop-app/types";
-import { windowsDesktopAppAdapter } from "../../src/codex/desktop-app/windows";
-import { activateWindowsCodexCompatibility, captureWindowsCompatibilityContext } from "../../src/codex/desktop-compatibility/windows-package-command";
-import { acquireDesktopCompatibilityRuntime, bindDesktopCompatibilityLaunch, readDesktopCompatibilityLaunch } from "../../src/codex/desktop-compatibility/runtime-ownership";
+import { compatibilityActivationScript, launchWindowsCodexCompatibility, validatedCompatibilityPacUrl } from "../../backend/src/codex/desktop-compatibility/windows-package-launch";
+import { WINDOWS_ACTIVATION_SOURCE } from "../../backend/src/codex/desktop-compatibility/windows-activation-source";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
+import type { DesktopExec } from "../../backend/src/codex/desktop-app/types";
+import { windowsDesktopAppAdapter } from "../../backend/src/codex/desktop-app/windows";
+import { activateWindowsCodexCompatibility, captureWindowsCompatibilityContext } from "../../backend/src/codex/desktop-compatibility/windows-package-command";
+import { acquireDesktopCompatibilityRuntime, bindDesktopCompatibilityLaunch, readDesktopCompatibilityLaunch } from "../../backend/src/codex/desktop-compatibility/runtime-ownership";
 
 const powershell = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
 const install = { id: "OpenAI.Codex_fixture", root: "C:\\Program Files\\WindowsApps\\OpenAI.Codex_fixture", relaunch: "OpenAI.Codex_fixture!App" };

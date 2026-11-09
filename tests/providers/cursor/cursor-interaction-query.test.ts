@@ -18,8 +18,8 @@ import {
   ToolCallStartedUpdateSchema,
   WebSearchRequestQuerySchema,
   type InteractionQuery,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { isClientToolFrame, planInteractionQueryReply } from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { isClientToolFrame, planInteractionQueryReply } from "../../../backend/src/adapters/cursor/live-transport";
 
 function query(id: number, q: InteractionQuery["query"]): InteractionQuery {
   return create(InteractionQuerySchema, { id, query: q });
@@ -147,8 +147,8 @@ describe("isClientToolFrame", () => {
 
 describe("partialUsageFromEventState", () => {
   test("reports checkpoint-derived cumulative usage on failure", async () => {
-    const { partialUsageFromEventState } = await import("../../../src/adapters/cursor/live-transport");
-    const { createCursorProtobufEventState } = await import("../../../src/adapters/cursor/protobuf-events");
+    const { partialUsageFromEventState } = await import("../../../backend/src/adapters/cursor/live-transport");
+    const { createCursorProtobufEventState } = await import("../../../backend/src/adapters/cursor/protobuf-events");
     const state = createCursorProtobufEventState();
     state.usage.outputTokens = 42;
     state.contextTokens = 10_300;
@@ -161,16 +161,16 @@ describe("partialUsageFromEventState", () => {
   });
 
   test("reports output-only usage without a checkpoint", async () => {
-    const { partialUsageFromEventState } = await import("../../../src/adapters/cursor/live-transport");
-    const { createCursorProtobufEventState } = await import("../../../src/adapters/cursor/protobuf-events");
+    const { partialUsageFromEventState } = await import("../../../backend/src/adapters/cursor/live-transport");
+    const { createCursorProtobufEventState } = await import("../../../backend/src/adapters/cursor/protobuf-events");
     const state = createCursorProtobufEventState();
     state.usage.outputTokens = 7;
     expect(partialUsageFromEventState(state)).toEqual({ inputTokens: 0, outputTokens: 7, estimated: true });
   });
 
   test("carries prior context usage on failure when the current turn had no checkpoint", async () => {
-    const { partialUsageFromEventState } = await import("../../../src/adapters/cursor/live-transport");
-    const { createCursorContextUsageTracker, createCursorProtobufEventState } = await import("../../../src/adapters/cursor/protobuf-events");
+    const { partialUsageFromEventState } = await import("../../../backend/src/adapters/cursor/live-transport");
+    const { createCursorContextUsageTracker, createCursorProtobufEventState } = await import("../../../backend/src/adapters/cursor/protobuf-events");
     const tracker = createCursorContextUsageTracker();
     tracker.record("cursor_conv_1", 18_000);
     const state = createCursorProtobufEventState({
@@ -186,14 +186,14 @@ describe("partialUsageFromEventState", () => {
   });
 
   test("returns undefined when the stream died before any token signal", async () => {
-    const { partialUsageFromEventState } = await import("../../../src/adapters/cursor/live-transport");
-    const { createCursorProtobufEventState } = await import("../../../src/adapters/cursor/protobuf-events");
+    const { partialUsageFromEventState } = await import("../../../backend/src/adapters/cursor/live-transport");
+    const { createCursorProtobufEventState } = await import("../../../backend/src/adapters/cursor/protobuf-events");
     expect(partialUsageFromEventState(createCursorProtobufEventState())).toBeUndefined();
   });
 
   test("does not report seeded carry when a fresh turn failed before any token signal", async () => {
-    const { partialUsageFromEventState } = await import("../../../src/adapters/cursor/live-transport");
-    const { createCursorContextUsageTracker, createCursorProtobufEventState } = await import("../../../src/adapters/cursor/protobuf-events");
+    const { partialUsageFromEventState } = await import("../../../backend/src/adapters/cursor/live-transport");
+    const { createCursorContextUsageTracker, createCursorProtobufEventState } = await import("../../../backend/src/adapters/cursor/protobuf-events");
     const tracker = createCursorContextUsageTracker();
     tracker.record("cursor_conv_1", 18_000);
 

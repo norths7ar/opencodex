@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
+import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 

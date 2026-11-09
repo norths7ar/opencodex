@@ -2,32 +2,32 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MAX_ACTIVE_TURNS, abortAndReleaseAllTurns, activeRegistryMetrics, registerTurn, trackStreamLifetime, tryAdmitTurn, unregisterTurn } from "../../src/server/lifecycle";
-import { workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
+import { MAX_ACTIVE_TURNS, abortAndReleaseAllTurns, activeRegistryMetrics, registerTurn, trackStreamLifetime, tryAdmitTurn, unregisterTurn } from "../../backend/src/server/lifecycle";
+import { workflowBudgetSnapshot } from "../../backend/src/lib/workflow-budget";
 import {
   MAX_TRACKED_CODEX_WEBSOCKETS,
   getTrackedCodexWebSocketCountForAccount,
   tryReserveCodexWebSocket,
-} from "../../src/codex/websocket-registry";
+} from "../../backend/src/codex/websocket-registry";
 import {
   MAX_ACTIVE_STORAGE_HOME_SLOTS,
   tryBeginStorageMutation,
-} from "../../src/storage/storage-mutation-coordinator";
+} from "../../backend/src/storage/storage-mutation-coordinator";
 import {
   tryReserveStorageWorker,
   withStorageWorkerSpawnGate,
-} from "../../src/storage/worker-lifecycle";
+} from "../../backend/src/storage/worker-lifecycle";
 import {
   anthropicSessionAffinitySizeForTests,
   bindAnthropicSessionAffinity,
   clearAnthropicAccountPoolState,
-} from "../../src/oauth/anthropic-routing";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth/anthropic-routing";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { currentServerFixtureConfig, settleServerAuthFixture, startManagementServerFixture, type ManagementServerFixture } from "../helpers/server-auth-fixture";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import { flushAnthropicSessionAffinity } from "../../src/oauth/anthropic-session-affinity-store";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import { flushAnthropicSessionAffinity } from "../../backend/src/oauth/anthropic-session-affinity-store";
 
 describe("active registry admission", () => {
   describe("real HTTP boundaries", () => {

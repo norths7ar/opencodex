@@ -10,14 +10,14 @@ import {
   peekRoundRobinAccount,
   pickRoundRobinAccount,
   selectPriorityTier,
-} from "../../src/codex/pool-rotation";
+} from "../../backend/src/codex/pool-rotation";
 import {
   clearCodexAccountPin,
   codexAccountPriorityLookup,
   forgetCodexAccountPriority,
   getCodexAccountPriority,
   setCodexAccountPriority,
-} from "../../src/codex/account-priority";
+} from "../../backend/src/codex/account-priority";
 import {
   clearCodexUpstreamHealth,
   clearCodexUpstreamHealthForAccount,
@@ -33,13 +33,13 @@ import {
   resetCodexRoutingForManualSelection,
   resolveCodexAccountForThread,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { getConfigPath } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { getConfigPath } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";

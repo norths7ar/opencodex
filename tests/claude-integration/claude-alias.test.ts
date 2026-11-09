@@ -8,8 +8,8 @@ import {
   claudeCodeAlias,
   claudeCodeNativeAlias,
   resolveAlias,
-} from "../../src/claude/alias";
-import { resolveInboundModel } from "../../src/claude/inbound";
+} from "../../backend/src/claude/alias";
+import { resolveInboundModel } from "../../backend/src/claude/inbound";
 
 describe("claude discovery aliases", () => {
   test("round-trips every realistic provider/model shape", () => {

@@ -7,7 +7,7 @@ import {
   probeClaudeDesktopPolicyAsync,
   probeClaudeDesktopPolicy,
   type ClaudeDesktopPolicyProbeRunner,
-} from "../../src/claude/desktop-policy";
+} from "../../backend/src/claude/desktop-policy";
 
 function result(overrides: Partial<ReturnType<ClaudeDesktopPolicyProbeRunner>> = {}) {
   return {

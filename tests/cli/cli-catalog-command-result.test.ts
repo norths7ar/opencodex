@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { printCatalogResult, runCatalogAction } from "../../src/cli/catalog-command-result";
-import { CliUsageError, RuntimeApiError, runtimeRequest } from "../../src/cli/runtime-api";
+import { printCatalogResult, runCatalogAction } from "../../backend/src/cli/catalog-command-result";
+import { CliUsageError, RuntimeApiError, runtimeRequest } from "../../backend/src/cli/runtime-api";
 
 let output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>;
 beforeEach(() => {

@@ -2,8 +2,8 @@ import { afterAll, beforeAll, describe, expect, mock, test } from "bun:test";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import type { ProviderAdapter } from "../../src/adapters/base";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -40,7 +40,7 @@ let runTurnCalled = false;
 /** Controlled return value for the stubbed planWebSearch (truthy ⇒ web-search plan active). */
 let mockWsPlan: unknown = undefined;
 
-let handleResponses: typeof import("../../src/server/responses")["handleResponses"];
+let handleResponses: typeof import("../../backend/src/server/responses")["handleResponses"];
 let releaseSpendHome: (() => void) | undefined;
 // Retained so teardown can remove it. Nothing created this directory before the lease did:
 // taking ownership mkdirs the state directory, so the suite now owns its removal too.
@@ -58,8 +58,8 @@ beforeAll(async () => {
   // Take the writer lease after this suite installs its home so direct handler dispatch can open the spend journal.
   releaseSpendHome = acquireOwnedSpendHome();
 
-  realAdapterResolve = { ...(await import("../../src/server/adapter-resolve")) };
-  mock.module("../../src/server/adapter-resolve", () => ({
+  realAdapterResolve = { ...(await import("../../backend/src/server/adapter-resolve")) };
+  mock.module("../../backend/src/server/adapter-resolve", () => ({
     ...realAdapterResolve,
     resolveAdapter(provider: OcxProviderConfig) {
       const base = {
@@ -85,8 +85,8 @@ beforeAll(async () => {
     },
   }));
 
-  realImageLoop = { ...(await import("../../src/images/loop")) };
-  mock.module("../../src/images/loop", () => ({
+  realImageLoop = { ...(await import("../../backend/src/images/loop")) };
+  mock.module("../../backend/src/images/loop", () => ({
     ...realImageLoop,
     runWithImageBridge: async (args: {
       parsed: { options: { toolChoice?: unknown } };
@@ -101,8 +101,8 @@ beforeAll(async () => {
     },
   }));
 
-  realWebSearch = { ...(await import("../../src/web-search/index")) };
-  mock.module("../../src/web-search/index", () => ({
+  realWebSearch = { ...(await import("../../backend/src/web-search/index")) };
+  mock.module("../../backend/src/web-search/index", () => ({
     buildWebSearchTool: () => ({ name: "web_search", parameters: { type: "object", properties: {} } }),
     WEB_SEARCH_TOOL_NAME: "web_search",
     extractHostedWebSearch: (tools: unknown[]) => {
@@ -124,7 +124,7 @@ beforeAll(async () => {
     shouldResolveOpenAiWebSearchSidecar: () => false,
   }));
 
-  ({ handleResponses } = await import("../../src/server/responses"));
+  ({ handleResponses } = await import("../../backend/src/server/responses"));
 });
 
 afterAll(() => {
@@ -144,9 +144,9 @@ afterAll(() => {
     const adapterResolve = realAdapterResolve;
     const imageLoop = realImageLoop;
     const webSearch = realWebSearch;
-    if (adapterResolve) mock.module("../../src/server/adapter-resolve", () => adapterResolve);
-    if (imageLoop) mock.module("../../src/images/loop", () => imageLoop);
-    if (webSearch) mock.module("../../src/web-search/index", () => webSearch);
+    if (adapterResolve) mock.module("../../backend/src/server/adapter-resolve", () => adapterResolve);
+    if (imageLoop) mock.module("../../backend/src/images/loop", () => imageLoop);
+    if (webSearch) mock.module("../../backend/src/web-search/index", () => webSearch);
   }
 });
 

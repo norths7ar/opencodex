@@ -16,12 +16,12 @@ import {
   timedOutSecretPathCountForTests,
   windowsSecretAclReapPendingForPath,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 
 const native = { ...fs };
 let root = "";
@@ -42,7 +42,7 @@ const {
   atomicWriteFileStreamed,
   AtomicWriteResidualTempError,
   setWindowsHardeningForTests,
-} = await import("../../src/config/atomic-write");
+} = await import("../../backend/src/config/atomic-write");
 
 const OK: IcaclsResult = { success: true, exitCode: 0, timedOut: false, stdout: "" };
 const PRINCIPAL = { ...OK, stdout: "S-1-5-21-9-9-9-1001\r\nTESTHOST\\tester" };

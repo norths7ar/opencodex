@@ -9,20 +9,20 @@
  * refused with the same message. If either side changes alone, this file fails.
  */
 import { describe, expect, test } from "bun:test";
-import { anthropicSettingsTranslation, anthropicToResponsesTranslation } from "../../src/claude/inbound";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { anthropicSettingsTranslation, anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import {
   messagesConversationToIr,
   messagesRouteEvidence,
   withDirectMessagesConversation,
-} from "../../src/protocols/codecs/messages-ir";
-import { featureEffectsForPath, PROTOCOL_FEATURES } from "../../src/protocols/features";
-import { requestPathForLane } from "../../src/protocols/path";
-import { parseRequest } from "../../src/responses/parser";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { evidenceFromBody } from "../../src/routing/request-evidence";
-import { planMessagesAntigravityDirect } from "../../src/server/messages-antigravity-direct";
-import type { OcxClaudeCodeConfig, OcxConfig, OcxParsedRequest } from "../../src/types";
+} from "../../backend/src/protocols/codecs/messages-ir";
+import { featureEffectsForPath, PROTOCOL_FEATURES } from "../../backend/src/protocols/features";
+import { requestPathForLane } from "../../backend/src/protocols/path";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { evidenceFromBody } from "../../backend/src/routing/request-evidence";
+import { planMessagesAntigravityDirect } from "../../backend/src/server/messages-antigravity-direct";
+import type { OcxClaudeCodeConfig, OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 
 const MODEL = "google-antigravity/gemini-3.8-flash";
 const IDENTITY = "You are a coding agent powered by the gpt-6. If asked which model you are, identify as gpt-6. "

@@ -1,27 +1,27 @@
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints, gatherRoutedModels } from "../../src/codex/catalog";
-import { generatedModelMetadata } from "../../src/codex/catalog/parsing";
-import { getModelMetadata, resolveMetadataProvider } from "../../src/generated/model-metadata";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+import { applyProviderConfigHints, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { generatedModelMetadata } from "../../backend/src/codex/catalog/parsing";
+import { getModelMetadata, resolveMetadataProvider } from "../../backend/src/generated/model-metadata";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 import {
   CLINE_PASS_IMAGE_MODELS,
   CLINE_PASS_MODEL_CONTEXT_WINDOWS,
   CLINE_PASS_MODELS,
   OPENCODE_GO_THINKING_TOGGLE_MODELS,
-} from "../../src/providers/registry/model-seeds";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { resolveMatchedPrice } from "../../src/usage/cost";
-import { modelCapabilityFields } from "../../src/server/models-capabilities";
-import { deriveEntry } from "../../src/codex/catalog/derive-entry";
-import { MIMO_THINKING_MODELS } from "../../src/providers/mimo-thinking";
-import { resolveReasoningCapabilities } from "../../src/providers/reasoning-capabilities";
-import { catalogHintsFromModelsApiItem, copyReasoningHintSource, withVisionSidecarInput } from "../../src/codex/catalog/model-hints";
-import { augmentRoutedModelsWithMetadata } from "../../src/codex/catalog/routed-gather";
-import { mergeConfiguredModelsIntoLiveCatalog } from "../../src/codex/catalog/model-visibility";
-import { clearModelCache, getFreshCached, setCached } from "../../src/codex/model-cache";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
+} from "../../backend/src/providers/registry/model-seeds";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { resolveMatchedPrice } from "../../backend/src/usage/cost";
+import { modelCapabilityFields } from "../../backend/src/server/models-capabilities";
+import { deriveEntry } from "../../backend/src/codex/catalog/derive-entry";
+import { MIMO_THINKING_MODELS } from "../../backend/src/providers/mimo-thinking";
+import { resolveReasoningCapabilities } from "../../backend/src/providers/reasoning-capabilities";
+import { catalogHintsFromModelsApiItem, copyReasoningHintSource, withVisionSidecarInput } from "../../backend/src/codex/catalog/model-hints";
+import { augmentRoutedModelsWithMetadata } from "../../backend/src/codex/catalog/routed-gather";
+import { mergeConfiguredModelsIntoLiveCatalog } from "../../backend/src/codex/catalog/model-visibility";
+import { clearModelCache, getFreshCached, setCached } from "../../backend/src/codex/model-cache";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
 
 // Xiaomi's published V2.6 prices (USD per 1M tokens), as carried by models.dev on 2026-09-23.
 const PRO = { input: 0.435, output: 0.87, cacheRead: 0.0036, cacheWrite: 0 };

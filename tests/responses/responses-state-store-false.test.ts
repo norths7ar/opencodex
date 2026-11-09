@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setPlatformForTests } from "../../src/lib/windows-secret-acl";
+import { setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { buildConversationInput } from "../../src/adapters/coding-agent/protocol";
-import { buildResponseJSON } from "../../src/bridge";
-import { parseRequest } from "../../src/responses/parser";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
+import { buildConversationInput } from "../../backend/src/adapters/coding-agent/protocol";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { adapterNeedsForcedContinuation, adapterNeedsToolCallContinuation } from "../../src/server/responses/core-replay";
+import { adapterNeedsForcedContinuation, adapterNeedsToolCallContinuation } from "../../backend/src/server/responses/core-replay";
 
 import {
   clearResponseStateForTests,
@@ -21,10 +21,10 @@ import {
   rememberResponseState,
   responseStateMetrics,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 
-import { readResponseSpill, writeResponseSpillDurably } from "../../src/responses/spill-store";
-import { allowsUnforcedStoreFalseReplay } from "../../src/responses/state/unforced-store-false";
+import { readResponseSpill, writeResponseSpillDurably } from "../../backend/src/responses/spill-store";
+import { allowsUnforcedStoreFalseReplay } from "../../backend/src/responses/state/unforced-store-false";
 
 const qoderStateOptions = {
   clientThreadId: "qoder-task",
@@ -112,7 +112,7 @@ describe("Responses unforced store:false ephemeral function call state", () => {
   for (const stream of [false, true]) {
     for (const [name, toolTurn] of [["qoder", true], ["qoder", "custom"], ["qoder", false], ["codebuddy", true], ["codebuddy", "custom"]] as const) {
       test(`execution records only opted-in tool turns (${name}, tools=${toolTurn}, stream=${stream})`, async () => {
-        const resolver = { ...await import("../../src/server/adapter-resolve") };
+        const resolver = { ...await import("../../backend/src/server/adapter-resolve") };
         const release = acquireOwnedSpendHome();
         const custom = toolTurn === "custom";
         const toolName = custom ? "exec" : "probe_echo";
@@ -121,7 +121,7 @@ describe("Responses unforced store:false ephemeral function call state", () => {
           { type: "tool_call_delta", arguments: custom ? '{"input":"echo marker"}' : "{}" }, { type: "tool_call_end" },
           { type: "done", stopReason: "tool_use", endTurn: false },
         ] : [{ type: "text_delta", text: "text-only answer" }, { type: "done" }];
-        mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
+        mock.module("../../backend/src/server/adapter-resolve", () => ({ ...resolver,
           resolveAdapter(provider: OcxProviderConfig): ProviderAdapter {
             if (provider.adapter !== name) throw new Error("unexpected fixture adapter");
             return {
@@ -133,7 +133,7 @@ describe("Responses unforced store:false ephemeral function call state", () => {
           },
         }));
         try {
-          const { handleResponses } = await import("../../src/server/responses");
+          const { handleResponses } = await import("../../backend/src/server/responses");
           // The configured provider id is NOT the adapter name: policy uses the serving adapter.
           const config = { port: 0, defaultProvider: "fixture", providers: {
             fixture: { adapter: name, baseUrl: "https://fixture.invalid", authMode: "key", apiKey: "fixture-key",
@@ -164,7 +164,7 @@ describe("Responses unforced store:false ephemeral function call state", () => {
             });
           } else expect(expanded).toEqual(next);
         } finally {
-          mock.module("../../src/server/adapter-resolve", () => resolver);
+          mock.module("../../backend/src/server/adapter-resolve", () => resolver);
           release();
         }
       });

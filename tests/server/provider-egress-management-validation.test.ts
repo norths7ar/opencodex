@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { REDACTED_PROVIDER_FIELDS, providerManagementConfigError } from "../../src/server/auth-cors";
-import { PROVIDER_EGRESS_DIRECT } from "../../src/lib/provider-egress";
+import { REDACTED_PROVIDER_FIELDS, providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { PROVIDER_EGRESS_DIRECT } from "../../backend/src/lib/provider-egress";
 
 /**
  * The management write boundary for the per-provider egress fields.

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { buildClientConfig, buildClientConfigText, buildClientContribution, clineConfigPath, EXPORT_CLIENTS, type ExportContext } from "../../src/clients/config-export";
-import type { ClineGeneratedConfig } from "../../src/clients/config-export/cline";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { decodeClinePair, encodeClinePair, parseClineDocument, serializeClineDocument } from "../../src/integrations/cline-document";
-import { PARSE_FAILED } from "../../src/integrations/config-io";
+import { buildClientConfig, buildClientConfigText, buildClientContribution, clineConfigPath, EXPORT_CLIENTS, type ExportContext } from "../../backend/src/clients/config-export";
+import type { ClineGeneratedConfig } from "../../backend/src/clients/config-export/cline";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { decodeClinePair, encodeClinePair, parseClineDocument, serializeClineDocument } from "../../backend/src/integrations/cline-document";
+import { PARSE_FAILED } from "../../backend/src/integrations/config-io";
 
 const context: ExportContext = {
   baseUrl: "http://127.0.0.1:10100/v1",

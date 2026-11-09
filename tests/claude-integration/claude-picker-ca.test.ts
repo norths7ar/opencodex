@@ -5,13 +5,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { connect, createServer } from "node:tls";
-import { createCertificateAuthority, createLocalInterceptCa, issueServerLeaf, mintAuthorityWithExtensionsForTests } from "../../src/claude/intercept/local-ca";
-import { drainPendingPickerCaUntrust } from "../../src/claude/intercept/picker-ca-cleanup";
+import { createCertificateAuthority, createLocalInterceptCa, issueServerLeaf, mintAuthorityWithExtensionsForTests } from "../../backend/src/claude/intercept/local-ca";
+import { drainPendingPickerCaUntrust } from "../../backend/src/claude/intercept/picker-ca-cleanup";
 import {
   acknowledgePendingPickerCaUntrust, acceptsPickerAuthority, ensurePickerCa, issuePickerLeaf, pickerCaCertPath, pickerCaFingerprints,
   pickerCaOwnerPath, pickerCaPendingUntrustPath, pickerLeafCertPath, pickerStateDir,
   pendingPickerCaHasLivePublishedOwner, readPendingPickerCaUntrust, PICKER_CA_COMMON_NAME, PICKER_HOST,
-} from "../../src/claude/intercept/picker-ca";
+} from "../../backend/src/claude/intercept/picker-ca";
 
 function tempDir(): string { return mkdtempSync(join(tmpdir(), "ocx-picker-ca-")); }
 
@@ -260,8 +260,8 @@ test("a cached authority refuses a different certificate but republishes a missi
   expect(readFileSync(pickerCaCertPath(dir), "utf8")).toBe(ca.certPem);
 });
 
-const PICKER_CA_MODULE_URL = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-ca.ts")).href;
-const LIFECYCLE_LOCK_MODULE_URL = pathToFileURL(join(import.meta.dir, "../../src/client/lifecycle-lock.ts")).href;
+const PICKER_CA_MODULE_URL = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-ca.ts")).href;
+const LIFECYCLE_LOCK_MODULE_URL = pathToFileURL(join(import.meta.dir, "../../backend/src/client/lifecycle-lock.ts")).href;
 
 async function waitForFile(path: string): Promise<void> {
   for (let attempt = 0; attempt < 400; attempt += 1) {

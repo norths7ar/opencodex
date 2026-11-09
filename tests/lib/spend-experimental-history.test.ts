@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
 import { createShippedSpendLedger, spendAlias, spendTestJournal, spendTestPolicy, testSpendSalt as salt } from "../helpers/shipped-spend-ledger";
 const experimental = () => ({v:1,kind:"checkpoint",at:1,poolContinuity:{v:1,kind:"pool-continuity",at:1,bindings:[{alias:spendAlias("pool-current","P"),canonical:spendAlias("pool-current","P")}]},scopes:[{scope:"pool",alias:spendAlias("pool-current","P"),settled:30,unresolved:0,seenAt:1}],sends:[{send:spendAlias("send","live"),status:"dispatched",targets:[{scope:"pool",alias:spendAlias("pool-current","P")}],tokens:10,at:1,resolvedAt:1}]});
 test("experimental aliases and live targets remain conservative across compaction",()=>{

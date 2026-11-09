@@ -1,10 +1,10 @@
-import { captureAnthropicRejectionPayloads, bindAnthropicRejectionResponse } from "../../src/adapters/anthropic-rejection-memo";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { captureAnthropicRejectionPayloads, bindAnthropicRejectionResponse } from "../../backend/src/adapters/anthropic-rejection-memo";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { afterEach, expect, test } from "bun:test";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import { createAnthropicThinkingRecovery, isAnthropicThinkingSignatureBindingRejectionMessage } from "../../src/server/responses/anthropic-thinking-recovery";
-import { clearReasoningReplayCacheForTests, reasoningReplayOpaqueBlobRejectionMemoized } from "../../src/responses/reasoning-replay-cache";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import { createAnthropicThinkingRecovery, isAnthropicThinkingSignatureBindingRejectionMessage } from "../../backend/src/server/responses/anthropic-thinking-recovery";
+import { clearReasoningReplayCacheForTests, reasoningReplayOpaqueBlobRejectionMemoized } from "../../backend/src/responses/reasoning-replay-cache";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 
 const MESSAGE = "Invalid `signature` in `thinking` block. The block is bound to a different conversation.";
 const rejection: AdapterEvent = { type: "error", status: 400, message: MESSAGE };

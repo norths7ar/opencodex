@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { foldForMatching } from "../../src/lib/redact-folding";
+import { foldForMatching } from "../../backend/src/lib/redact-folding";
 import { repoPath } from "../helpers/repo-root";
 import {
   REDACTED_SECRET,
@@ -8,7 +8,7 @@ import {
   redactSecretString,
   redactSecrets,
   redactUrlForLog,
-} from "../../src/lib/redact";
+} from "../../backend/src/lib/redact";
 
 describe("redactSecretString", () => {
   test("ASCII folding preserves every byte and original offset, including literal escape syntax (#7846)", () => {
@@ -625,7 +625,7 @@ test("redact-folding folds colon confusables with aligned offsets and stays a ze
   expect(folded).toBe(":");
   expect(map).toHaveLength(2);
   expect(map).toEqual([0, 1]);
-  const source = readFileSync(repoPath("src/lib/redact-folding.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/lib/redact-folding.ts"), "utf8");
   expect(source).not.toMatch(/^import /m);
 });
 

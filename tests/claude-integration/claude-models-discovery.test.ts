@@ -2,15 +2,15 @@ import { afterEach, beforeEach, expect, setDefaultTimeout, test } from "bun:test
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
+import { saveConfig } from "../../backend/src/config";
 import {
   resetCodexModelEntitlementCacheForTests,
-} from "../../src/codex/model-entitlements";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { startServer } from "../../src/server";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { startServer } from "../../backend/src/server";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -89,7 +89,7 @@ test("anthropic-version header flips /v1/models to the discovery contract", asyn
       headers: { "anthropic-version": "2023-06-01", "authorization": "Bearer placeholder" },
     });
     expect(response.status).toBe(200);
-    const { desktop3pAlias } = await import("../../src/claude/desktop-3p");
+    const { desktop3pAlias } = await import("../../backend/src/claude/desktop-3p");
     const json = await response.json() as { data: { id: string; display_name?: string; type?: string; created_at?: string; capabilities?: Record<string, unknown>; max_tokens?: unknown }[] };
     expect(Array.isArray(json.data)).toBe(true);
     const mockAlias = desktop3pAlias("mock", "test-model");
@@ -144,7 +144,7 @@ test("?flavor=anthropic works without the header; disabled -> empty data", async
   try {
     const response = await fetch(new URL("/v1/models?flavor=anthropic", server.url));
     const json = await response.json() as { data: { id: string }[] };
-    const { desktop3pAlias } = await import("../../src/claude/desktop-3p");
+    const { desktop3pAlias } = await import("../../backend/src/claude/desktop-3p");
     expect(json.data.some(m => m.id === desktop3pAlias("mock", "other-model"))).toBe(true);
   } finally {
     await server.stop(true);
@@ -391,7 +391,7 @@ test("Codex discovery restores account rows for supported natives hidden on disk
     listCatalogNativeSlugs,
     resetCatalogRuntimeStateForTests,
     visibleNativeSlugs,
-  } = await import("../../src/codex/catalog");
+  } = await import("../../backend/src/codex/catalog");
   resetCatalogRuntimeStateForTests();
   expect(listCatalogNativeSlugs()).toContain("gpt-5.5");
   expect(listCatalogNativeSlugs()).not.toContain("gpt-99-internal");
@@ -506,8 +506,8 @@ test("Codex discovery exposes the observed native as a selector row plus one glo
     tokens: { access_token: "main-token", account_id: "main-account" },
   }), "utf8");
 
-  const { resetCatalogRuntimeStateForTests } = await import("../../src/codex/catalog");
-  const { resetCodexModelEntitlementCacheForTests } = await import("../../src/codex/model-entitlements");
+  const { resetCatalogRuntimeStateForTests } = await import("../../backend/src/codex/catalog");
+  const { resetCodexModelEntitlementCacheForTests } = await import("../../backend/src/codex/model-entitlements");
   resetCatalogRuntimeStateForTests();
   resetCodexModelEntitlementCacheForTests();
   const originalFetch = globalThis.fetch;
@@ -553,7 +553,7 @@ test("Codex discovery exposes the observed native as a selector row plus one glo
       .toMatchObject({ visibility: "list" });
     expect(catalog.models.find(model => model.slug === "gpt-daybreak-blue-latest")?.visibility).toBe("hide");
 
-    const { claudeCodeNativeAlias } = await import("../../src/claude/alias");
+    const { claudeCodeNativeAlias } = await import("../../backend/src/claude/alias");
     const anthropic = await fetch(new URL("/v1/models?flavor=anthropic&ids=cli", server.url), {
       headers: { "anthropic-version": "2023-06-01" },
     }).then(response => response.json()) as { data: Array<{ id: string }> };
@@ -641,7 +641,7 @@ test("the request's client_version reaches entitlement discovery (#2886)", async
     tokens: { access_token: "main-token", account_id: "main-account" },
   }), "utf8");
 
-  const { resetCatalogRuntimeStateForTests } = await import("../../src/codex/catalog");
+  const { resetCatalogRuntimeStateForTests } = await import("../../backend/src/codex/catalog");
   resetCatalogRuntimeStateForTests();
   resetCodexModelEntitlementCacheForTests();
 
@@ -694,8 +694,8 @@ test("with no inbound or runtime version, /v1/models still exposes the gated row
     tokens: { access_token: "main-token", account_id: "main-account" },
   }), "utf8");
 
-  const { resetCatalogRuntimeStateForTests } = await import("../../src/codex/catalog");
-  const { resetCodexModelEntitlementCacheForTests } = await import("../../src/codex/model-entitlements");
+  const { resetCatalogRuntimeStateForTests } = await import("../../backend/src/codex/catalog");
+  const { resetCodexModelEntitlementCacheForTests } = await import("../../backend/src/codex/model-entitlements");
   resetCatalogRuntimeStateForTests();
   resetCodexModelEntitlementCacheForTests();
 

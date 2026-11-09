@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { antigravityCliUserAgent } from "../../../src/adapters/client-fingerprint";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { antigravityCliUserAgent } from "../../../backend/src/adapters/client-fingerprint";
 import {
   ANTIGRAVITY_CLI_REQUEST_UA,
   ANTIGRAVITY_DISCOVERY_UA,
   ANTIGRAVITY_REQUEST_UA,
   antigravityUserAgentForWireModel,
-} from "../../../src/adapters/google-antigravity-wire";
-import { buildModelsRequest } from "../../../src/oauth";
+} from "../../../backend/src/adapters/google-antigravity-wire";
+import { buildModelsRequest } from "../../../backend/src/oauth";
 import {
   ANTIGRAVITY_KNOWN_PICKER_MODELS,
   ANTIGRAVITY_MODELS,
@@ -18,9 +18,9 @@ import {
   isAntigravitySuffixModelId,
   parseAntigravityAvailableModels,
   resolveAntigravityEffortWireModel,
-} from "../../../src/providers/antigravity-models";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/antigravity-models";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 // Verified 2026-10-14 against live CCA: Gemini 4 Argon answers only to the CLI family, and the

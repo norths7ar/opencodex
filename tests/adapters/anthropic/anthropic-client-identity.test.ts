@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { captureAnthropicClientIdentity, hasObservedAnthropicClientIdentity, type AnthropicClientIdentity } from "../../../src/adapters/anthropic/client-identity";
-import { shouldPreserveNativeClientPreamble } from "../../../src/adapters/anthropic/native-client-preamble";
-import { buildAnthropicMessagesPassthroughRequest } from "../../../src/adapters/anthropic/passthrough";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { claudeCodeSessionId } from "../../../src/adapters/client-fingerprint";
-import { CLAUDE_CLI_SDK_PACKAGE_VERSION, CLAUDE_CLI_USER_AGENT } from "../../../src/providers/claude-cli-identity";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { captureAnthropicClientIdentity, hasObservedAnthropicClientIdentity, type AnthropicClientIdentity } from "../../../backend/src/adapters/anthropic/client-identity";
+import { shouldPreserveNativeClientPreamble } from "../../../backend/src/adapters/anthropic/native-client-preamble";
+import { buildAnthropicMessagesPassthroughRequest } from "../../../backend/src/adapters/anthropic/passthrough";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { claudeCodeSessionId } from "../../../backend/src/adapters/client-fingerprint";
+import { CLAUDE_CLI_SDK_PACKAGE_VERSION, CLAUDE_CLI_USER_AGENT } from "../../../backend/src/providers/claude-cli-identity";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const SESSION = "11111111-1111-4111-8111-111111111111";
 const OTHER = "22222222-2222-4222-8222-222222222222";

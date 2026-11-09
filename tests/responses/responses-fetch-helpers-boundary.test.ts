@@ -3,14 +3,14 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createScanner, LanguageVariant, SyntaxKind } from "typescript/unstable/ast";
-import { fetchWithHeaderTimeout, providerFetch, sendWithConnectionPolicy, storedPoolReplayDispatchNotifier } from "../../src/server/responses/fetch-helpers";
+import { fetchWithHeaderTimeout, providerFetch, sendWithConnectionPolicy, storedPoolReplayDispatchNotifier } from "../../backend/src/server/responses/fetch-helpers";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
-import { createPhysicalSendReporter, createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { errorDestinationLabel, SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { physicalSendAccounting } from "../../src/server/responses/deferred-send-reporter";
+import { createPhysicalSendReporter, createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { errorDestinationLabel, SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { physicalSendAccounting } from "../../backend/src/server/responses/deferred-send-reporter";
 
 const repoRoot = resolveRepoRoot();
-const helperPath = resolve(repoRoot, "src/server/responses/fetch-helpers.ts");
+const helperPath = resolve(repoRoot, "backend/src/server/responses/fetch-helpers.ts");
 
 test("deferred accounting rejects reuse before counting an already consumed reservation", () => {
   const budget = createRequestExecutionBudget();

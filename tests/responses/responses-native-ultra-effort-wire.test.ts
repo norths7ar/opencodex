@@ -2,21 +2,21 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
+import { saveConfig } from "../../backend/src/config";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
-import { applyCompactionRoutingOverride } from "../../src/server/responses/compaction-routing";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import { applyFinalRouteRequestNormalization } from "../../backend/src/server/responses/core-normalize";
+import { applyCompactionRoutingOverride } from "../../backend/src/server/responses/compaction-routing";
 
 /**
  * #7590: the catalog offers `ultra` on native rows as a client-facing choice, but the ChatGPT

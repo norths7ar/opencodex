@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { deliverPassthroughResponse } from "../../src/server/responses/passthrough-delivery";
+import { deliverPassthroughResponse } from "../../backend/src/server/responses/passthrough-delivery";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const payload = {

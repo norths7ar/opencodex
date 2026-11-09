@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import * as barrel from "../../src/types";
-import * as tools from "../../src/types/tools";
-import * as wire from "../../src/types/wire";
+import * as barrel from "../../backend/src/types";
+import * as tools from "../../backend/src/types/tools";
+import * as wire from "../../backend/src/types/wire";
 
 /**
  * The mega-file split turned `src/types.ts` into a re-export barrel. Its correctness

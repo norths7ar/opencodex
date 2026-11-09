@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { rewriteProviderReferences } from "../../src/providers/provider-id-rewrite";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { rewriteProviderReferences } from "../../backend/src/providers/provider-id-rewrite";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

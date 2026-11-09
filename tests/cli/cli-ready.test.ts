@@ -18,7 +18,7 @@ import {
   type ReadyIo,
   type ReadyLive,
   type ReadyProbe,
-} from "../../src/cli/ready";
+} from "../../backend/src/cli/ready";
 import { repoPath } from "../helpers/repo-root";
 
 // ── parseReadyArgs ────────────────────────────────────────────────────────────
@@ -642,7 +642,7 @@ describe("runReady --wait deadline correctness", () => {
 // until the Claude roster fence settles; this source guard complements the
 // executable delayed-roster test in tests/claude-integration/claude-agent-startup-sync.test.ts.
 describe("handleStart readinessGate wiring (source-level)", () => {
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
   test("readinessGate is created, threaded into startServer, and into the startup sync — in order", () => {
     const createMatch = cliSource.match(/const\s+readinessGate\s*=\s*createReadinessGate\(\)/);
@@ -696,8 +696,8 @@ describe("handleStart readinessGate wiring (source-level)", () => {
 // CLI deepening); the dispatch switch stays in src/cli/index.ts. No
 // subprocess/network/HOME is used.
 describe("ready pre-parse before maybeAutoRestoreCodexShimAsync (source-level, P1)", () => {
-  const rootSource = readFileSync(repoPath("src/cli/root.ts"), "utf8");
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const rootSource = readFileSync(repoPath("backend/src/cli/root.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
   test("ready pre-parse call runs BEFORE maybeAutoRestoreCodexShimAsync", () => {
     const preparseIdx = rootSource.indexOf("parseReadyArgs(args.slice(1))");
@@ -754,7 +754,7 @@ describe("ready pre-parse before maybeAutoRestoreCodexShimAsync (source-level, P
     expect(rootSource).toContain("await maybeAutoRestoreCodexShimAsync(head.command, head.args)");
     // The ready runner lives in dispatch.ts (keyed "ready:"); slice its body
     // up to the next runner key, not a fixed width.
-    const dispatchSource = readFileSync(repoPath("src/cli/dispatch.ts"), "utf8");
+    const dispatchSource = readFileSync(repoPath("backend/src/cli/dispatch.ts"), "utf8");
     const readyCaseIdx = dispatchSource.indexOf("ready: async");
     expect(readyCaseIdx, 'a "ready" runner must exist in dispatch.ts').toBeGreaterThanOrEqual(0);
     // The ready runner is followed by the provider runner; slice to that key.
@@ -819,7 +819,7 @@ describe("invalid ready matrices never invoke findLive/probe (P1 counters)", () 
 // real wall-clock time, so Date.now is authoritative for the network deadline.
 // The non-wait path keeps findLiveProxy's built-in default (no deadlineAt).
 describe("runReady production findLiveProxy deadline wiring (source-level)", () => {
-  const readySource = readFileSync(repoPath("src/cli/ready.ts"), "utf8");
+  const readySource = readFileSync(repoPath("backend/src/cli/ready.ts"), "utf8");
 
   test("the --wait path derives deadlineAt from Date.now() + remainingMs (not the injected now)", () => {
     // Date.now (real wall clock) is authoritative for the AbortSignal deadline;
@@ -854,7 +854,7 @@ describe("runReady production findLiveProxy deadline wiring (source-level)", () 
 // does not respawn every 5s against a listener it can never
 // claim. Source-level pin so a future edit cannot drop the guard silently.
 describe("handleStart OCX_SERVICE exit guard (source-level)", () => {
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
   test("an already-live proxy preserves the service/refusal exit codes without bypassing cleanup", () => {
     // The `OCX_SERVICE === "1"` comparison moved into `decideStartWithLiveOwner`
@@ -873,7 +873,7 @@ describe("handleStart OCX_SERVICE exit guard (source-level)", () => {
   });
 
   test("service.ts teardown kills surviving wrapper processes on stop", () => {
-    const serviceSource = readFileSync(repoPath("src/service/orchestration.ts"), "utf8");
+    const serviceSource = readFileSync(repoPath("backend/src/service/orchestration.ts"), "utf8");
     expect(serviceSource).toMatch(/killWindowsServiceWrapperProcesses/);
     // The boolean `stopServiceIfInstalled` is gone — it collapsed a live manager into the
     // same false as "not installed" (#3008). The stop itself is the detailed function.
@@ -886,7 +886,7 @@ describe("handleStart OCX_SERVICE exit guard (source-level)", () => {
     // wrapper from another OpenCodex home (or any process whose command line
     // merely contains the name). The kill must target the exact canonical
     // paths windowsServiceScriptPath()/windowsLauncherVbsPath() produce.
-    const serviceSource = readFileSync(repoPath("src/service/windows-ops.ts"), "utf8");
+    const serviceSource = readFileSync(repoPath("backend/src/service/windows-ops.ts"), "utf8");
     expect(serviceSource).toMatch(/windowsServiceScriptPath\(\)/);
     expect(serviceSource).toMatch(/windowsLauncherVbsPath\(\)/);
     const killBody = serviceSource.match(/function killWindowsServiceWrapperProcesses\(\)[\s\S]*?\n}/);
@@ -907,7 +907,7 @@ describe("handleStart OCX_SERVICE exit guard (source-level)", () => {
     // the update job so the two teardown paths cannot drift apart again, so the
     // token-boundary rule is asserted where it is implemented.
     const sharedSource = readFileSync(
-      repoPath("src/lib/windows-service-wrappers.ts"),
+      repoPath("backend/src/lib/windows-service-wrappers.ts"),
       "utf8",
     );
     const killScript = sharedSource.match(/export function windowsWrapperKillScript\([\s\S]*?\n}/);

@@ -8,8 +8,8 @@ import {
   getValidMainAccountToken,
   isMainAccountRefreshGrantRejected,
   setMainAuthJsonBeforeRenameHookForTests,
-} from "../../src/codex/main-account";
-import { codexCredentialMutationEpoch } from "../../src/codex/credential-mutation-epoch";
+} from "../../backend/src/codex/main-account";
+import { codexCredentialMutationEpoch } from "../../backend/src/codex/credential-mutation-epoch";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

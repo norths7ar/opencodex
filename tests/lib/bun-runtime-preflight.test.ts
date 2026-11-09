@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmdirSync, symlinkSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assertSelectedRuntimeWritable, RuntimePreflightError, RUNTIME_PREFLIGHT_TIMEOUT_MS, type RuntimePreflightFs, type RuntimePreflightOptions, type RuntimePreflightReason } from "../../src/lib/bun-runtime-preflight";
-import type { DurableBunRuntime } from "../../src/lib/bun-runtime";
+import { assertSelectedRuntimeWritable, RuntimePreflightError, RUNTIME_PREFLIGHT_TIMEOUT_MS, type RuntimePreflightFs, type RuntimePreflightOptions, type RuntimePreflightReason } from "../../backend/src/lib/bun-runtime-preflight";
+import type { DurableBunRuntime } from "../../backend/src/lib/bun-runtime";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

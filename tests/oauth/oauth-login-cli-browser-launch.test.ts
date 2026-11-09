@@ -20,17 +20,17 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { handleKeyLogin, handleOAuthLogin, type LoginCliDeps } from "../../src/oauth/login-cli";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { listOAuthProviders } from "../../src/oauth";
-import { BROWSER_LAUNCH_FAILED_NOTICE, createBrowserLaunchReport } from "../../src/lib/browser-launch-notice";
-import { BROWSER_LAUNCH_FAILED_HINT } from "../../src/cli/account-auth";
+import { saveConfig } from "../../backend/src/config";
+import { handleKeyLogin, handleOAuthLogin, type LoginCliDeps } from "../../backend/src/oauth/login-cli";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { listOAuthProviders } from "../../backend/src/oauth";
+import { BROWSER_LAUNCH_FAILED_NOTICE, createBrowserLaunchReport } from "../../backend/src/lib/browser-launch-notice";
+import { BROWSER_LAUNCH_FAILED_HINT } from "../../backend/src/cli/account-auth";
 import { repoPath } from "../helpers/repo-root";
 import { readFileSync } from "node:fs";
-import type { OpenUrlResult } from "../../src/lib/open-url";
-import type { OAuthCredentials } from "../../src/oauth/types";
-import type { OcxConfig } from "../../src/types";
+import type { OpenUrlResult } from "../../backend/src/lib/open-url";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -253,7 +253,7 @@ describe("the launch report is one sentence and one order", () => {
     expect(BROWSER_LAUNCH_FAILED_HINT.startsWith(BROWSER_LAUNCH_FAILED_NOTICE)).toBe(true);
     expect(BROWSER_LAUNCH_FAILED_HINT.length).toBeGreaterThan(BROWSER_LAUNCH_FAILED_NOTICE.length);
 
-    const accountAuth = readFileSync(repoPath("src", "cli", "account-auth.ts"), "utf8");
+    const accountAuth = readFileSync(repoPath("backend/src", "cli", "account-auth.ts"), "utf8");
     expect(accountAuth).toContain("BROWSER_LAUNCH_FAILED_NOTICE");
     expect(accountAuth).not.toContain(BROWSER_LAUNCH_FAILED_NOTICE);
   });

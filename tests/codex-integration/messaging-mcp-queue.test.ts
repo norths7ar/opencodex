@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { z } from "zod";
-import { queueMcpRpc } from "../../src/messaging/mcp-queue-rpc";
-import { queueMcpSend, queueMcpThreads, queueMessageInput } from "../../src/messaging/mcp-queue-tools";
+import { queueMcpRpc } from "../../backend/src/messaging/mcp-queue-rpc";
+import { queueMcpSend, queueMcpThreads, queueMessageInput } from "../../backend/src/messaging/mcp-queue-tools";
 import { QUEUE_MCP_TARGET, queueMcpFixture } from "../helpers/messaging-mcp-queue";
 
 describe.skipIf(process.platform === "win32")("opt-in stored-thread MCP queue", () => {

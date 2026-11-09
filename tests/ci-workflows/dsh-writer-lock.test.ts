@@ -3,22 +3,22 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSy
 import { rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
 import {
   applyIntegrationCoordinated,
   disableIntegrationCoordinated,
   restoreIntegrationCoordinated,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
+} from "../../backend/src/integrations/writer";
 import {
   IntegrationWriterLockBusyError,
   IntegrationWriterLockIOError,
   withIntegrationWriterLock,
   type IntegrationWriterLockSeams,
-} from "../../src/integrations/writer-lock";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer-lock";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function eexist(): Error & { code: string } {

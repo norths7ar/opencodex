@@ -17,7 +17,7 @@ const PROBE_TIMEOUT_MS = 3_000;
 describe("Node launcher context transport", () => {
   const dir = mkdtempSync(join(tmpdir(), "ocx-launch-context-"));
   const probe = join(dir, "probe.ts");
-  const moduleUrl = pathToFileURL(repoPath("src", "cli", "launcher-context.ts")).href;
+  const moduleUrl = pathToFileURL(repoPath("backend/src", "cli", "launcher-context.ts")).href;
   writeFileSync(
     probe,
     `import { initializeNodeLauncherContext } from ${JSON.stringify(moduleUrl)};\n`

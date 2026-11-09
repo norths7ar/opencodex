@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { createTranslatorBudget, type TranslatorBudget } from "../../../src/lib/translator-budget";
-import { parseStreamWithProgress } from "../../../src/web-search/progress-stream";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { createTranslatorBudget, type TranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import { parseStreamWithProgress } from "../../../backend/src/web-search/progress-stream";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "anthropic",

@@ -28,7 +28,7 @@ mock.module("node:fs", () => ({
     native.renameSync(source, destination);
   },
 }));
-const { atomicWriteFileNoFollowStreamed } = await import("../../src/config/atomic-write");
+const { atomicWriteFileNoFollowStreamed } = await import("../../backend/src/config/atomic-write");
 let home: TempHome;
 beforeEach(() => {
   home = createTempHome("ocx-nofollow-streamed-");

@@ -15,10 +15,10 @@ import {
   rememberThoughtSignatureForReplay,
   resetThoughtSignatureReplayForTests,
   thoughtSignatureReplaySalt,
-} from "../../src/responses/thought-signature-replay";
-import { durableReplayCredentialIdentity, durableReplayDestinationIdentity } from "../../src/responses/reasoning-replay-cache";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import * as config from "../../src/config";
+} from "../../backend/src/responses/thought-signature-replay";
+import { durableReplayCredentialIdentity, durableReplayDestinationIdentity } from "../../backend/src/responses/reasoning-replay-cache";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import * as config from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const SIG = "CiQAx-credential-scope-signature-0123456789abcdef";

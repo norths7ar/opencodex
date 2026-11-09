@@ -4,7 +4,7 @@
  * parent can prove the authorization URL reaches a piped stdout while the
  * child is still polling.
  */
-import { cmdAccount, type AccountDeps } from "../../src/cli/account";
+import { cmdAccount, type AccountDeps } from "../../backend/src/cli/account";
 
 const server = Bun.serve({
   hostname: "127.0.0.1",

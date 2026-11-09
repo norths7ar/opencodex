@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { OcxConfig } from "../../src/types";
-import type { RouteResult } from "../../src/router";
-import type { GenerationContext } from "../../src/lib/state-store-sweeper";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RouteResult } from "../../backend/src/router";
+import type { GenerationContext } from "../../backend/src/lib/state-store-sweeper";
 import {
   anthropicInstanceBarrier, createAnthropicInstanceFixture, instanceFixtureCredential, instanceFixtureUuid,
   type AnthropicInstanceFixture,
@@ -15,14 +15,14 @@ const INSTANCES = ["anthropic", "anthropic2"] as const;
 const CALLER = "sk-ant-fixture-caller";
 let f: AnthropicInstanceFixture;
 let sent: Sent[];
-let ingress: typeof import("../../src/server/claude-messages");
-let native: typeof import("../../src/server/messages-native");
-let binding: typeof import("../../src/server/messages-native-oauth");
-let planner: typeof import("../../src/protocols/plan-snapshot");
-let settings: typeof import("../../src/protocols/settings");
-let identity: typeof import("../../src/oauth/anthropic-identity");
-let pacing: typeof import("../../src/providers/request-pacing");
-let logs: typeof import("../../src/server/request-log");
+let ingress: typeof import("../../backend/src/server/claude-messages");
+let native: typeof import("../../backend/src/server/messages-native");
+let binding: typeof import("../../backend/src/server/messages-native-oauth");
+let planner: typeof import("../../backend/src/protocols/plan-snapshot");
+let settings: typeof import("../../backend/src/protocols/settings");
+let identity: typeof import("../../backend/src/oauth/anthropic-identity");
+let pacing: typeof import("../../backend/src/providers/request-pacing");
+let logs: typeof import("../../backend/src/server/request-log");
 let releaseSpend: (() => void) | undefined;
 const restorations: Array<() => void> = [];
 
@@ -30,13 +30,13 @@ beforeEach(async () => {
   // The shared fixture creates all homes and blocks network before runtime imports.
   f = await createAnthropicInstanceFixture({ anthropic: { enabled: false }, anthropic2: { enabled: false } });
   [ingress, native, binding, planner, settings, identity, pacing, logs] = await Promise.all([
-    import("../../src/server/claude-messages"), import("../../src/server/messages-native"),
-    import("../../src/server/messages-native-oauth"), import("../../src/protocols/plan-snapshot"),
-    import("../../src/protocols/settings"), import("../../src/oauth/anthropic-identity"),
-    import("../../src/providers/request-pacing"), import("../../src/server/request-log"),
+    import("../../backend/src/server/claude-messages"), import("../../backend/src/server/messages-native"),
+    import("../../backend/src/server/messages-native-oauth"), import("../../backend/src/protocols/plan-snapshot"),
+    import("../../backend/src/protocols/settings"), import("../../backend/src/oauth/anthropic-identity"),
+    import("../../backend/src/providers/request-pacing"), import("../../backend/src/server/request-log"),
   ]);
   releaseSpend = (await import("../helpers/owned-spend-home")).acquireOwnedSpendHome();
-  (await import("../../src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
+  (await import("../../backend/src/responses/reasoning-replay-cache")).clearReasoningReplayCacheForTests();
   sent = [];
   f.config.protocols = { rollout: { managedMessagesNative: true, managedMessagesNativeOAuth: true } };
   for (const instance of INSTANCES) {
@@ -204,7 +204,7 @@ for (const instance of INSTANCES) {
     const pool = { enabled: true, routes: [{ name: "strict", match: f.model, accounts: [f.ids[0]] }] };
     if (instance === "anthropic") f.config.anthropicAccountPool = pool;
     else f.config.providers.anthropic2!.anthropicAccountPool = pool;
-    const route = (await import("../../src/oauth/anthropic-model-routes")).resolveAnthropicModelRouteForInstance(instance, f.config, f.model);
+    const route = (await import("../../backend/src/oauth/anthropic-model-routes")).resolveAnthropicModelRouteForInstance(instance, f.config, f.model);
     await expect(binding.resolveNativeOAuthBindingForInstance(instance, f.config, {
       model: f.model, candidateAccountId: f.ids[1], expectedRecoverySelection: selection,
       expectedRecoveryRouteDecision: route.decision,

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { MAX_SIDECAR_DECODED_CHARS, MAX_SIDECAR_STREAM_BYTES, parseSidecarSSE } from "../../src/web-search/parse";
+import { MAX_SIDECAR_DECODED_CHARS, MAX_SIDECAR_STREAM_BYTES, parseSidecarSSE } from "../../backend/src/web-search/parse";
 
 /** Keep the final data line unterminated and optionally split every UTF-8 byte. */
 function eofResponse(wire: string, fragmented = false): Response {

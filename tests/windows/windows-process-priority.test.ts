@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { constants as osConstants } from "node:os";
 
-import { raiseWindowsProxyPriority, type ProcessPriorityDeps } from "../../src/service/windows-process-priority";
+import { raiseWindowsProxyPriority, type ProcessPriorityDeps } from "../../backend/src/service/windows-process-priority";
 import { repoPath } from "../helpers/repo-root";
 
 function deps(overrides: Partial<ProcessPriorityDeps> = {}) {
@@ -43,7 +43,7 @@ describe("Windows proxy scheduling priority", () => {
   });
 
   test("the start path raises priority before it binds the server", () => {
-    const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     const raise = source.indexOf("raiseWindowsProxyPriority();");
     const bind = source.indexOf("serverModule.startServer(port,");
     expect(raise).toBeGreaterThan(-1);
@@ -51,7 +51,7 @@ describe("Windows proxy scheduling priority", () => {
   });
 
   test.skipIf(process.platform !== "win32")("the real Windows process reports ABOVE_NORMAL afterwards", () => {
-    const moduleUrl = Bun.pathToFileURL(repoPath("src", "service", "windows-process-priority.ts")).href;
+    const moduleUrl = Bun.pathToFileURL(repoPath("backend/src", "service", "windows-process-priority.ts")).href;
     const source = [
       `import { getPriority } from "node:os";`,
       `const { raiseWindowsProxyPriority } = await import(${JSON.stringify(moduleUrl)});`,

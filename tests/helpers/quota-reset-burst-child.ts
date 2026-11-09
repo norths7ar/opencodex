@@ -10,11 +10,11 @@
  * Writes monotonically RISING usage: no reset happens anywhere in this burst, so any event
  * printed here is false.
  */
-import { setQuotaResetSink } from "../../src/quota/reset-observer";
+import { setQuotaResetSink } from "../../backend/src/quota/reset-observer";
 import {
   flushQuotaObservationsForTests,
   setAccountQuotaFromParsed,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 
 const events: string[] = [];
 setQuotaResetSink(event => {

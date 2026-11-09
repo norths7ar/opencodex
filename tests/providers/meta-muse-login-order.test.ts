@@ -6,10 +6,10 @@
  * is injected as a counting stub, so the order is asserted without running a grant.
  */
 import { describe, expect, test } from "bun:test";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
-import { loginMetaMuse, refreshMetaMuseToken, type MuseImportDeps } from "../../src/oauth/meta-muse";
-import { MuseDeviceLoginError } from "../../src/oauth/meta-muse-device";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { loginMetaMuse, refreshMetaMuseToken, type MuseImportDeps } from "../../backend/src/oauth/meta-muse";
+import { MuseDeviceLoginError } from "../../backend/src/oauth/meta-muse-device";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 
 const KEY = `LLM|${"1".repeat(16)}|${"c".repeat(27)}`;
 const ACCOUNT_TOKEN = "meta-account-" + "z".repeat(48);

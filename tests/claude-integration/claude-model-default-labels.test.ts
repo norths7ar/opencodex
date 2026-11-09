@@ -2,8 +2,8 @@ import { afterEach, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applyClaudeModelDefaults, previewClaudeModelDefaults } from "../../src/claude/model-default-settings";
-import type { ClaudeTierModels } from "../../src/claude/context-windows";
+import { applyClaudeModelDefaults, previewClaudeModelDefaults } from "../../backend/src/claude/model-default-settings";
+import type { ClaudeTierModels } from "../../backend/src/claude/context-windows";
 
 const roots: string[] = [];
 const slot = "ANTHROPIC_DEFAULT_OPUS_MODEL";

@@ -1,11 +1,11 @@
 import { afterAll, afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { writeFileSync } from "node:fs";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import { getAccountSet, replaceProviderAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../src/oauth/store";
-import { forceRefreshOAuthAccessSnapshot, getValidAccessTokenSnapshot } from "../../src/oauth";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { DEVIN_CLI_CREDENTIALS_ENV } from "../../src/oauth/devin/cli-import";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { getAccountSet, replaceProviderAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../backend/src/oauth/store";
+import { forceRefreshOAuthAccessSnapshot, getValidAccessTokenSnapshot } from "../../backend/src/oauth";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { DEVIN_CLI_CREDENTIALS_ENV } from "../../backend/src/oauth/devin/cli-import";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 
@@ -39,13 +39,13 @@ const mintFetch = (async (input: Parameters<typeof fetch>[0], init?: RequestInit
     { status: 200, headers: { "content-type": "application/proto" } });
 }) as typeof fetch;
 
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const originalResolve = resolver.resolveAdapter;
 const originalResolverModule = { ...resolver };
 let sentKeys: string[] = [];
 let rateLimited = false;
 let holdDeadSend: (() => Promise<void>) | undefined;
-mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...resolver,
   resolveAdapter(provider: OcxProviderConfig, cache?: "none" | "short" | "long") {
     if (provider.adapter !== "devin") return originalResolve(provider, cache);
     return {
@@ -72,7 +72,7 @@ mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
     } satisfies ProviderAdapter;
   },
 }));
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 
 let home: ReturnType<typeof createTempHome>;
 let release: (() => void) | undefined;
@@ -95,7 +95,7 @@ beforeEach(() => {
   process.env[DEVIN_CLI_CREDENTIALS_ENV] = home.path("devin-credentials.toml");
 });
 afterAll(() => {
-  mock.module("../../src/server/adapter-resolve", () => originalResolverModule);
+  mock.module("../../backend/src/server/adapter-resolve", () => originalResolverModule);
 });
 afterEach(() => {
   try {

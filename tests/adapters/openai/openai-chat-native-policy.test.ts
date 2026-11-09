@@ -2,19 +2,19 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../../src/config";
+import { saveConfig } from "../../../backend/src/config";
 import {
   buildOpenAIChatPassthroughRequest,
   createOpenAIChatAdapter,
-} from "../../../src/adapters/openai-chat";
+} from "../../../backend/src/adapters/openai-chat";
 import {
   decideTier,
   tierValueAfterDecision,
-} from "../../../src/providers/fastwire";
-import { clearKeyCooldowns } from "../../../src/providers/key-failover";
-import { fastPolicyForModel } from "../../../src/providers/service-tier";
-import { handleChatCompletions } from "../../../src/server/chat-completions";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/fastwire";
+import { clearKeyCooldowns } from "../../../backend/src/providers/key-failover";
+import { fastPolicyForModel } from "../../../backend/src/providers/service-tier";
+import { handleChatCompletions } from "../../../backend/src/server/chat-completions";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
@@ -483,8 +483,8 @@ describe("main and native Chat tier authorization parity", () => {
 
 
 test("explicit text-only capabilities divert image-bearing native Chat requests", async () => {
-  const { isNativeChatRouteEligible } = await import("../../../src/server/chat-native");
-  const { routeModel } = await import("../../../src/router");
+  const { isNativeChatRouteEligible } = await import("../../../backend/src/server/chat-native");
+  const { routeModel } = await import("../../../backend/src/router");
   const config = { port: 10100, defaultProvider: "custom", providers: { custom: provider({ modelCapabilities: { model: { inputModalities: ["text"] } } }) } } as OcxConfig;
   const route = routeModel(config, "custom/model");
   expect(isNativeChatRouteEligible(route, { messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: "data:image/png;base64,YQ==" } }] }] }, config)).toBe(false);
@@ -492,8 +492,8 @@ test("explicit text-only capabilities divert image-bearing native Chat requests"
 });
 
 test("unknown image capability retains native Chat compatibility until capability is known", async () => {
-  const { isNativeChatRouteEligible } = await import("../../../src/server/chat-native");
-  const { routeModel } = await import("../../../src/router");
+  const { isNativeChatRouteEligible } = await import("../../../backend/src/server/chat-native");
+  const { routeModel } = await import("../../../backend/src/router");
   const config = { port: 10100, defaultProvider: "custom", providers: { custom: provider() } } as OcxConfig;
   const route = routeModel(config, "custom/model");
   const imageBody = { messages: [{ role: "user", content: [{

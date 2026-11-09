@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { decodeServerSentEvents } from "../../src/lib/sse-decoder";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { decodeServerSentEvents } from "../../backend/src/lib/sse-decoder";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 /** Decode a fragmented fixture stream and assert that the decoder releases its retained byte budget. */
 async function collect(chunks: string[]) {

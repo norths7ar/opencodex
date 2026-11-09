@@ -2,20 +2,20 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   CodexAccountCooldownError, CodexPoolAccountCreditsOffError, cooldownErrorResponse,
   resolveCodexAuthContext, materializeCodexUpstreamAuth, createCodexAuthDispatchGuard,
   applyCodexAuthContextToProvider, assertCodexAuthContextNotCooled,
-} from "../../src/codex/auth-context";
-import { createOpenAiSidecarCreditGuard } from "../../src/providers/openai-sidecar-credit";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountQuota, getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, recordCodexUpstreamOutcome } from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/auth-context";
+import { createOpenAiSidecarCreditGuard } from "../../backend/src/providers/openai-sidecar-credit";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountQuota, getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, recordCodexUpstreamOutcome } from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
 

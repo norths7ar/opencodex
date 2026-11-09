@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { isLocalUpstream } from "../../src/lib/local-upstream";
+import { isLocalUpstream } from "../../backend/src/lib/local-upstream";
 
 describe("isLocalUpstream", () => {
   test.each([

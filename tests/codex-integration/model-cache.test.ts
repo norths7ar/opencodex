@@ -5,7 +5,7 @@ import {
   getStaleCached,
   reconcileModelCacheProviders,
   setCached,
-} from "../../src/codex/model-cache";
+} from "../../backend/src/codex/model-cache";
 
 const provider = "removed-provider-generation";
 

@@ -2,15 +2,15 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, removeAccount, saveCredential } from "../../../src/oauth/store";
-import type { ProviderAccount } from "../../../src/oauth/types";
-import type { OcxProviderConfig } from "../../../src/types";
-import { fetchProviderModelsWithAuth, refreshingModelsAuthResolver } from "../../../src/codex/catalog/provider-models";
+import { getAccountSet, removeAccount, saveCredential } from "../../../backend/src/oauth/store";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
+import type { OcxProviderConfig } from "../../../backend/src/types";
+import { fetchProviderModelsWithAuth, refreshingModelsAuthResolver } from "../../../backend/src/codex/catalog/provider-models";
 import {
   awaitKiroModelRefreshForTests, clearKiroAccountModels, kiroAccountSupportsModel,
   kiroObservedContextWindow, KIRO_MODEL_CATALOG_TTL_MS, readKiroAccountModels,
   refreshKiroAccountModelsDetached,
-} from "../../../src/providers/kiro-model-catalog";
+} from "../../../backend/src/providers/kiro-model-catalog";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;
@@ -293,7 +293,7 @@ test("a first discovery failure backs off even with no last good list", async ()
 
 test("a paused account's model evidence leaves the catalog and context limits", async () => {
   setup();
-  const { setAccountPaused } = await import("../../../src/oauth/store");
+  const { setAccountPaused } = await import("../../../backend/src/oauth/store");
   const a = await add("a");
   await add("b");
   refreshKiroAccountModelsDetached(a, provider,

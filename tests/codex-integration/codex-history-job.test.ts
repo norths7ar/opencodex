@@ -11,7 +11,7 @@ import {
   describeHistoryJobFailure,
   deriveCodexHistoryOperation,
   runCodexHistoryJob,
-} from "../../src/codex/history-job";
+} from "../../backend/src/codex/history-job";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 

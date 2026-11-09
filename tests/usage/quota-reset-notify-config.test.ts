@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { resolveQuotaResetNotify } from "../../src/quota/reset-notify-config";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
+import { resolveQuotaResetNotify } from "../../backend/src/quota/reset-notify-config";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
 
 describe("quotaResetNotify schema", () => {
   function candidate(webhookUrl: string): unknown {

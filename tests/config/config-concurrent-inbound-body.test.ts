@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, getDefaultConfig, loadConfig, saveConfig, validateConfigCandidate } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
+import { getConfigPath, getDefaultConfig, loadConfig, saveConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
 import {
   DEFAULT_CONCURRENT_INBOUND_BODY_BYTES,
   MAX_CONCURRENT_INBOUND_BODY_BYTES,
   resolveConcurrentInboundBodyLimitBytes,
-} from "../../src/lib/inbound-body-policy";
+} from "../../backend/src/lib/inbound-body-policy";
 import { removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 
 const MiB = 1024 * 1024;

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { handleClaudeConfigCommand } from "../../src/cli/integrations";
+import { handleClaudeConfigCommand } from "../../backend/src/cli/integrations";
 
 for (const [value, expected] of [["on", true], ["off", false]] as const) {
   test(`--first-party ${value} sends only cliFirstParty`, async () => {

@@ -1,5 +1,5 @@
-import { getAccountQuotaHistory } from "../../src/codex/quota";
-import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
+import { getAccountQuotaHistory } from "../../backend/src/codex/quota";
+import { sessionLaneIdFromRequest } from "../../backend/src/server/request-log-conversation";
 /**
  * Issue #422: a Responses-shaped wire does not imply support for Codex's private
  * `compaction_trigger` item. Only the canonical ChatGPT backend speaks that
@@ -10,35 +10,35 @@ import { afterEach, beforeEach, describe, expect, jest, spyOn, test } from "bun:
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { OPAQUE_COMPACTION_NOTE, SUMMARY_PREFIX } from "../../src/responses/compaction";
-import { externalTaskInputContent } from "../../src/responses/task-input";
-import { looksLikeBackendCiphertext } from "../../src/server/responses/encrypted-payload";
-import * as adapterResolveModule from "../../src/server/adapter-resolve";
-import * as visionModule from "../../src/vision";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { OPAQUE_COMPACTION_NOTE, SUMMARY_PREFIX } from "../../backend/src/responses/compaction";
+import { externalTaskInputContent } from "../../backend/src/responses/task-input";
+import { looksLikeBackendCiphertext } from "../../backend/src/server/responses/encrypted-payload";
+import * as adapterResolveModule from "../../backend/src/server/adapter-resolve";
+import * as visionModule from "../../backend/src/vision";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   clearCodexUpstreamHealth,
   getCodexUpstreamHealth,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { MAIN_CODEX_ACCOUNT_ID, MainAccountTokenRefreshError } from "../../src/codex/main-account";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
-import * as authContextModule from "../../src/codex/auth-context";
+} from "../../backend/src/codex/routing";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { MAIN_CODEX_ACCOUNT_ID, MainAccountTokenRefreshError } from "../../backend/src/codex/main-account";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
+import * as authContextModule from "../../backend/src/codex/auth-context";
 import {
   releaseCodexAuthContextProbeLease,
   resolveCodexAuthContext,
-} from "../../src/codex/auth-context";
-import { clearUpstreamHostHealth } from "../../src/codex/upstream-host-health";
-import { supportsNativeResponsesCompactEndpoint } from "../../src/providers/openai-tiers";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { acquireNativeMainProfileDrain, tryAdmitTurn } from "../../src/server/lifecycle";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/codex/auth-context";
+import { clearUpstreamHostHealth } from "../../backend/src/codex/upstream-host-health";
+import { supportsNativeResponsesCompactEndpoint } from "../../backend/src/providers/openai-tiers";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { acquireNativeMainProfileDrain, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
 import { baseCompactionBody, compactionRequest, completedPayload, drainCompactionResponseState, installCompactionRoutingAclFixture, jsonResponse, keyProviderConfig, nativePoolConfig, removeCompactionFixture, sseResponse, twoAccountPoolConfig } from "../helpers/compaction-routing-fixtures";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigDir } from "../../../src/config";
+import { getConfigDir } from "../../../backend/src/config";
 import {
   antigravityCanonicalJsonBoundedForTests,
   antigravityFunctionCallKeyForTests,
@@ -24,10 +24,10 @@ import {
   setAntigravityReplaySnapshotMaxBytesForTests,
   setAntigravityReplayWriteSeamForTests,
   sweepExpiredAntigravityReplay,
-} from "../../../src/adapters/google-antigravity-replay";
-import { sanitizeAntigravityClaudeSignatures } from "../../../src/adapters/google-antigravity-wire";
+} from "../../../backend/src/adapters/google-antigravity-replay";
+import { sanitizeAntigravityClaudeSignatures } from "../../../backend/src/adapters/google-antigravity-wire";
 
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../../src/lib/windows-secret-acl";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 afterEach(() => {

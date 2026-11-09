@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { handleModels, type ModelsCommandDeps } from "../../src/cli/models";
-import type { CodexSyncResult } from "../../src/codex/sync";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
+import { handleModels, type ModelsCommandDeps } from "../../backend/src/cli/models";
+import type { CodexSyncResult } from "../../backend/src/codex/sync";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome, output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>;

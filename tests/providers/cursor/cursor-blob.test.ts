@@ -16,7 +16,7 @@ import {
   setCursorBlobLimitsForTests,
   storeCursorBlob,
   type CursorBlobRequestScopeToken,
-} from "../../../src/adapters/cursor/native-exec";
+} from "../../../backend/src/adapters/cursor/native-exec";
 import {
   clearCursorCheckpointsForTests,
   commitCursorCheckpoint,
@@ -24,13 +24,13 @@ import {
   cursorCheckpointStoreMetricsForTests,
   installCursorCheckpointClockForTests,
   invalidateCursorCheckpoint,
-} from "../../../src/adapters/cursor/checkpoint-store";
+} from "../../../backend/src/adapters/cursor/checkpoint-store";
 import {
   configureAppOwnedMemoryBudget,
   registerRetainedStore,
   resetAppOwnedMemoryForTests,
-} from "../../../src/lib/app-owned-memory";
-import { resetDebugSettingsForTests } from "../../../src/lib/debug-settings";
+} from "../../../backend/src/lib/app-owned-memory";
+import { resetDebugSettingsForTests } from "../../../backend/src/lib/debug-settings";
 import {
   CURSOR_EXTERNAL_ROOT_BYTE_LIMIT,
   CURSOR_EXTERNAL_TOOL_CONTINUATION_TEXT,
@@ -39,12 +39,12 @@ import {
   CURSOR_ROUTING_LEVEL_PARAMETER_ID,
   encodeCursorRunRequest,
   prepareCursorRunRequest,
-} from "../../../src/adapters/cursor/protobuf-request";
-import { estimateTokens } from "../../../src/lib/token-estimate";
-import type { OcxAssistantContentPart } from "../../../src/types";
-import { CursorRootEnvelopeLimitError } from "../../../src/adapters/cursor/cursor-errors";
-import { isRetryableCursorError } from "../../../src/adapters/cursor/transport-retry";
-import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../src/adapters/cursor/call-id";
+} from "../../../backend/src/adapters/cursor/protobuf-request";
+import { estimateTokens } from "../../../backend/src/lib/token-estimate";
+import type { OcxAssistantContentPart } from "../../../backend/src/types";
+import { CursorRootEnvelopeLimitError } from "../../../backend/src/adapters/cursor/cursor-errors";
+import { isRetryableCursorError } from "../../../backend/src/adapters/cursor/transport-retry";
+import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../backend/src/adapters/cursor/call-id";
 import {
   AgentClientMessageSchema,
   ConversationStepSchema,
@@ -54,7 +54,7 @@ import {
   KvServerMessageSchema,
   SetBlobArgsSchema,
   UserMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 beforeEach(() => {
   resetCursorBlobStateForTests();

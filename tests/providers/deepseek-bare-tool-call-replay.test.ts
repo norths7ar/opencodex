@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction, sanitizeReasoningInputContent } from "../../src/adapters/openai-responses";
-import { backfillBareToolCallTurnReasoning } from "../../src/adapters/openai-responses/reasoning";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction, sanitizeReasoningInputContent } from "../../backend/src/adapters/openai-responses";
+import { backfillBareToolCallTurnReasoning } from "../../backend/src/adapters/openai-responses/reasoning";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

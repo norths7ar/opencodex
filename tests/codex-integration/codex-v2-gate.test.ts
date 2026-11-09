@@ -15,12 +15,12 @@ import {
   nativeEffortClamp,
   shouldApplyNativeEffortClamp,
   type MultiAgentMode,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   buildCatalogEntriesFromObservedState,
   mergeCatalogEntriesFromObservedState,
-} from "../../src/codex/catalog/sync";
-import { nativeMultiAgentDefaults } from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/sync";
+import { nativeMultiAgentDefaults } from "../../backend/src/codex/catalog/parsing";
 import {
   getAgentsEnabled,
   getAgentsMaxDepth,
@@ -43,11 +43,11 @@ import {
   transitionMultiAgentV2,
   v1ChildLimitToV2TotalLimit,
   v2TotalLimitToV1ChildLimit,
-} from "../../src/codex/features";
-import { resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../src/codex/multi-agent-mode-policy";
-import { cmdV2, codexFeaturesInvocation, v2StatusLine, multiAgentModeLine } from "../../src/cli/v2";
-import { handleManagementAPI } from "../../src/server/management-api";
+} from "../../backend/src/codex/features";
+import { resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../backend/src/codex/multi-agent-mode-policy";
+import { cmdV2, codexFeaturesInvocation, v2StatusLine, multiAgentModeLine } from "../../backend/src/cli/v2";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 
 // Independently pinned release presets: removing a production compatibility
@@ -976,7 +976,7 @@ describe("v1<->v2 root-slot translation", () => {
 
 describe("config-surface parity: agents.enabled, max_depth, subagent_developer_instructions", () => {
   test("opencodex mirrors exactly one upstream feature key", async () => {
-    const source = await Bun.file(new URL("../../src/codex/features.ts", import.meta.url)).text();
+    const source = await Bun.file(new URL("../../backend/src/codex/features.ts", import.meta.url)).text();
     // Upstream feature keys are snake_case, so the underscore requirement is the
     // discriminator: JS member accesses on locals named `features` (features.match,
     // features.slice, features.ts) are camelCase and never match, while a mirrored

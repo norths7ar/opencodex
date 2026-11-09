@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { maskApiKey } from "../../src/providers/api-keys";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { maskApiKey } from "../../backend/src/providers/api-keys";
 import {
   PROVIDER_KEYCHAIN_SERVICE,
   probeProviderKeychain,
@@ -13,12 +13,12 @@ import {
   setProviderKeychainEntryFactoryForTests,
   storeProviderKeyInKeychain,
   type ProviderKeychainEntry,
-} from "../../src/providers/key-store";
-import { routedProviderConfig } from "../../src/router";
+} from "../../backend/src/providers/key-store";
+import { routedProviderConfig } from "../../backend/src/router";
 import { managementFetch as fetch } from "../helpers/management-auth";
-import { startServer } from "../../src/server";
+import { startServer } from "../../backend/src/server";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** In-memory keychain: service/account → secret, with optional fault injection. */

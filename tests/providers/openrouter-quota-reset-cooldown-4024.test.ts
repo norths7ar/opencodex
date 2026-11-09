@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseQuotaResetAt, readQuotaResetAt } from "../../src/providers/key-failover";
+import { parseQuotaResetAt, readQuotaResetAt } from "../../backend/src/providers/key-failover";
 
 /**
  * #4024 — a free-tier quota exhaustion is dated by the upstream, and OpenRouter

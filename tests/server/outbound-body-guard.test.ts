@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   checkOutboundBodySize,
   describeOutboundBodyRefusal,
-} from "../../src/server/responses/outbound-body-guard";
+} from "../../backend/src/server/responses/outbound-body-guard";
 
 describe("outbound body guard", () => {
   test("an unconfigured limit admits without measuring", () => {

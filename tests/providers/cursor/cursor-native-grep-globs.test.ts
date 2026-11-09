@@ -3,12 +3,12 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, sep } from "node:path";
 import { create, fromBinary } from "@bufbuild/protobuf";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
 import {
   AgentClientMessageSchema,
   ExecServerMessageSchema,
   GrepArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const roots: string[] = [];

@@ -1,4 +1,4 @@
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
 import { withTestTranslatorBudget } from "./translator-budget";
 
 /**

@@ -1,13 +1,13 @@
 
-import { candidateFailureDecision } from "../../src/routing/candidate-failure";
+import { candidateFailureDecision } from "../../backend/src/routing/candidate-failure";
 import { expect, test } from "bun:test";
-import { attachUpstreamFailureEvidence } from "../../src/lib/client-error-body";
-import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
-import { markVerifiedModelNotInPlanResponse } from "../../src/lib/errors";
-import { markResponseNonReplayable, markReplayRefusalResponse } from "../../src/lib/upstream-retry";
-import { responseWithDeferredRequestLog, markPreinspectedJsonResponse } from "../../src/server/relay";
-import { createBoundedResponseLogBody } from "../../src/server/response-log-body";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { attachUpstreamFailureEvidence } from "../../backend/src/lib/client-error-body";
+import { consumeRecoveryFailure } from "../../backend/src/server/responses/recovery-failure";
+import { markVerifiedModelNotInPlanResponse } from "../../backend/src/lib/errors";
+import { markResponseNonReplayable, markReplayRefusalResponse } from "../../backend/src/lib/upstream-retry";
+import { responseWithDeferredRequestLog, markPreinspectedJsonResponse } from "../../backend/src/server/relay";
+import { createBoundedResponseLogBody } from "../../backend/src/server/response-log-body";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 const KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 for (const length of [32700, 32800]) test(`upstream multibyte bounded evidence ${length}`, async () => {
@@ -76,8 +76,8 @@ test("deferred legacy inspection preserves numeric reset and diagnostic projecti
 });
 
 test("local auth constructors own their response and copied fields do not", async () => {
-  const { nativeMainRefreshFailureResponse } = await import("../../src/server/responses/codex-auth-error");
-  const { isProxyError } = await import("../../src/lib/client-error-body");
+  const { nativeMainRefreshFailureResponse } = await import("../../backend/src/server/responses/codex-auth-error");
+  const { isProxyError } = await import("../../backend/src/lib/client-error-body");
   const response = nativeMainRefreshFailureResponse(new Error(KEY));
   expect(response.status).toBe(401);
   const body = await response.json();
@@ -91,8 +91,8 @@ test("local auth constructors own their response and copied fields do not", asyn
 });
 
 test("non-replayable projection carries local identity without granting it to copied fields", async () => {
-  const { markProxyError, isProxyError } = await import("../../src/lib/client-error-body");
-  const { sanitizeNonReplayableUpstreamError } = await import("../../src/server/responses/non-replayable-error");
+  const { markProxyError, isProxyError } = await import("../../backend/src/lib/client-error-body");
+  const { sanitizeNonReplayableUpstreamError } = await import("../../backend/src/server/responses/non-replayable-error");
   const envelope = { error: { type: "permission_error", code: "model_not_allowed_for_key", message: KEY }, proxyAuthored: true };
   const local = markProxyError(Response.json(envelope, { status: 403 }));
   const upstream = Response.json(envelope, { status: 403 });

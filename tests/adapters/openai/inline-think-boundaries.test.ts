@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { InlineThinkTagParser, splitInlineThinkContent } from "../../../src/adapters/inline-think-tags";
-import type { AdapterEvent } from "../../../src/types";
+import { InlineThinkTagParser, splitInlineThinkContent } from "../../../backend/src/adapters/inline-think-tags";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 function projection(events: AdapterEvent[]) {

@@ -2,17 +2,17 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { desktopStopNotice, duplicateRuntimeMessage } from "../../src/cli/desktop-runtime-guidance";
-import { deriveStartupHealth } from "../../src/codex/autostart-health";
-import { assertNoDesktopSupervision, desktopServiceCommandRefusal } from "../../src/service/desktop-command-guard";
-import { desktopStartupOwnership, diagnoseDesktopStartup, diagnoseWindowsDesktopStartup } from "../../src/service/desktop-startup";
+import { desktopStopNotice, duplicateRuntimeMessage } from "../../backend/src/cli/desktop-runtime-guidance";
+import { deriveStartupHealth } from "../../backend/src/codex/autostart-health";
+import { assertNoDesktopSupervision, desktopServiceCommandRefusal } from "../../backend/src/service/desktop-command-guard";
+import { desktopStartupOwnership, diagnoseDesktopStartup, diagnoseWindowsDesktopStartup } from "../../backend/src/service/desktop-startup";
 import {
   createSupervisionLatch, inspectDesktopSupervision, windowsPowerShellPath, windowsProcessPair,
   windowsSystemDirectoryFromSharedObjects,
   type DesktopSupervisionDeps, type WindowsProcessRow,
-} from "../../src/service/desktop-supervision.mjs";
-import type { ServiceOwnershipResolution } from "../../src/service/state";
-import { planUpdateRuntimeHandling } from "../../src/update/runtime-ownership.mjs";
+} from "../../backend/src/service/desktop-supervision.mjs";
+import type { ServiceOwnershipResolution } from "../../backend/src/service/state";
+import { planUpdateRuntimeHandling } from "../../backend/src/update/runtime-ownership.mjs";
 
 // Every Windows fact is injected, so these cases run on any host (#6853).
 const APP = "C:\\Program Files\\OpenCodex\\opencodex-desktop.exe";

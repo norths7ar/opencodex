@@ -8,8 +8,8 @@ import {
   serveGuiFile,
   standaloneGuiDistCandidates,
   type GuiDistLookup,
-} from "../../src/server/gui-static";
-import type { GuiSessionBootstrap } from "../../src/server/gui-session";
+} from "../../backend/src/server/gui-static";
+import type { GuiSessionBootstrap } from "../../backend/src/server/gui-session";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -136,10 +136,10 @@ function temporaryRoot(prefix: string): string {
 
 /**
  * Discovery inputs rooted in a synthetic tree. The module directory points at a source checkout
- * inside the same tree, so this repository's own gui/dist never leaks into a fixture.
+ * inside the same tree, so this repository's own frontend/dist never leaks into a fixture.
  */
 function lookupIn(root: string, standaloneDir: string | null, platform: NodeJS.Platform): GuiDistLookup {
-  return { standaloneDir, platform, moduleDir: join(root, "checkout", "src", "server") };
+  return { standaloneDir, platform, moduleDir: join(root, "checkout", "backend", "src", "server") };
 }
 
 interface PackagedLayout {
@@ -189,11 +189,11 @@ test("OPENCODEX_GUI_DIST overrides every packaged layout", () => {
   }
 });
 
-test("a source checkout serves its own gui/dist and never consults a bundle layout", () => {
+test("a source checkout serves its own frontend/dist and never consults a bundle layout", () => {
   delete process.env.OPENCODEX_GUI_DIST;
   const root = temporaryRoot("ocx-gui-static-source-");
   writeGuiDist(root, ...bundledGui("usr"));
-  const checkout = writeGuiDist(root, "checkout", "gui", "dist");
+  const checkout = writeGuiDist(root, "checkout", "frontend", "dist");
   expect(findGuiDist(lookupIn(root, null, "win32"))).toBe(checkout);
 });
 
@@ -203,7 +203,7 @@ test("a packaged layout comes before the source-checkout fallback", () => {
   const executableDir = join(root, "usr", "bin");
   mkdirSync(executableDir, { recursive: true });
   const bundled = writeGuiDist(root, ...bundledGui("usr"));
-  writeGuiDist(root, "checkout", "gui", "dist");
+  writeGuiDist(root, "checkout", "frontend", "dist");
   expect(findGuiDist(lookupIn(root, executableDir, "win32"))).toBe(bundled);
 });
 

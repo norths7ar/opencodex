@@ -3,8 +3,8 @@ import { managementFetch as fetch } from "../helpers/management-auth";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { startServer as startServerImpl } from "../../src/server";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { startServer as startServerImpl } from "../../backend/src/server";
 import {
   desktop3pAlias,
   desktop3pModelOptions,
@@ -13,16 +13,16 @@ import {
   removeDesktop3pStandardPivot,
   resolveDesktop3pAlias,
   writeDesktop3pConfig,
-} from "../../src/claude/desktop-3p";
-import { reconcileDesktopProfile, moveDesktopRoute } from "../../src/claude/desktop-profile";
+} from "../../backend/src/claude/desktop-3p";
+import { reconcileDesktopProfile, moveDesktopRoute } from "../../backend/src/claude/desktop-profile";
 import {
   desktopRouteVisible,
   filterDesktopModelsByVisibility,
   parseDesktopModelVisibility,
-} from "../../src/claude/desktop-model-visibility";
-import type { OcxConfig } from "../../src/types";
-import { buildClaudeDesktopState } from "../../src/server/management/shared";
-import * as desktopState from "../../src/server/management/shared";
+} from "../../backend/src/claude/desktop-model-visibility";
+import type { OcxConfig } from "../../backend/src/types";
+import { buildClaudeDesktopState } from "../../backend/src/server/management/shared";
+import * as desktopState from "../../backend/src/server/management/shared";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";

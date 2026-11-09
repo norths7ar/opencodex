@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorAdapter as createCursorAdapterProduction } from "../../../src/adapters/cursor";
-import { clearCursorCheckpointsForTests, cursorCheckpointShape, getCursorCheckpoint } from "../../../src/adapters/cursor/checkpoint-store";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
+import { createCursorAdapter as createCursorAdapterProduction } from "../../../backend/src/adapters/cursor";
+import { clearCursorCheckpointsForTests, cursorCheckpointShape, getCursorCheckpoint } from "../../../backend/src/adapters/cursor/checkpoint-store";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
 import { create, toBinary } from "@bufbuild/protobuf";
-import { ConversationStateStructureSchema } from "../../../src/adapters/cursor/gen/agent_pb";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import type { CursorServerMessage } from "../../../src/adapters/cursor/types";
+import { ConversationStateStructureSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import type { CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createCursorAdapter = (...args: Parameters<typeof createCursorAdapterProduction>) =>

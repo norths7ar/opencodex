@@ -1,15 +1,15 @@
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { afterEach, describe, expect, test } from "bun:test";
 import {
   collectFunctionCallRepairSchemas,
   repairFunctionCalls,
   repairFunctionCallsInJson,
-} from "../../src/responses/function-call-compat";
-import { createResponsesFunctionToolRepairBlockRewrite } from "../../src/server/responses-function-tool-repair";
-import { createTranslatorBudget, TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
-import { sseDataPayload } from "../../src/server/sse-payload-rewrite";
-import { currentTurnWireToolCatalogBody } from "../../src/server/responses-undeclared-tool-guard";
+} from "../../backend/src/responses/function-call-compat";
+import { createResponsesFunctionToolRepairBlockRewrite } from "../../backend/src/server/responses-function-tool-repair";
+import { createTranslatorBudget, TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
+import { sseDataPayload } from "../../backend/src/server/sse-payload-rewrite";
+import { currentTurnWireToolCatalogBody } from "../../backend/src/server/responses-undeclared-tool-guard";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let releaseSpendHome: (() => void) | undefined;

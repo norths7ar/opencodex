@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatClientRetryAfter, MAX_CLIENT_RETRY_AFTER_SECONDS } from "../../src/lib/client-retry-after";
+import { formatClientRetryAfter, MAX_CLIENT_RETRY_AFTER_SECONDS } from "../../backend/src/lib/client-retry-after";
 
 const now = Date.parse("2026-11-02T00:00:00Z");
 

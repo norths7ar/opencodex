@@ -9,16 +9,16 @@ import {
   resetMainDeviceReauthForTests,
   startMainDeviceReauth,
   type MainDeviceReauthStatus,
-} from "../../src/codex/main-device-reauth";
+} from "../../backend/src/codex/main-device-reauth";
 import {
   beginNativeMainReauth,
   MainAuthJsonChangedDuringRefreshError,
   NativeMainReauthIdentityMismatchError,
   NativeMainReauthUnavailableError,
   setMainAuthJsonBeforeRenameHookForTests,
-} from "../../src/codex/main-account";
-import type { NativeDeviceLogin } from "../../src/oauth/chatgpt-device";
-import type { OAuthController } from "../../src/oauth/types";
+} from "../../backend/src/codex/main-account";
+import type { NativeDeviceLogin } from "../../backend/src/oauth/chatgpt-device";
+import type { OAuthController } from "../../backend/src/oauth/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

@@ -30,15 +30,15 @@ export function capabilityControlCalls(source: ts.SourceFile, file = ""): ts.Cal
 }
 
 export function helperControlInventory(parser?: API) {
-  const launcher = readFileSync(repoPath("bin/ocx.mjs"), "utf8");
+  const launcher = readFileSync(repoPath("backend/bin/ocx.mjs"), "utf8");
   const imports = [...launcher.matchAll(/from\s+"(\.\.\/src\/[^\"]+)"/g)].map(m =>
-    relative(repoRoot(), resolve(dirname(repoPath("bin/ocx.mjs")), m[1])).replaceAll("\\", "/"));
+    relative(repoRoot(), resolve(dirname(repoPath("backend/bin/ocx.mjs")), m[1])).replaceAll("\\", "/"));
   const helpers = [...new Set([
     ...updateModuleFiles(),
     ...imports,
   ])].filter(f => !files.includes(f)).sort();
   const nativeHelper = "src/update/npm-install-job.ps1";
-  const policyFiles = ["bin/ocx.mjs", ...updateModuleFiles()];
+  const policyFiles = ["backend/bin/ocx.mjs", ...updateModuleFiles()];
   const api = parser ?? new API(), snapshot = api.updateSnapshot({ openFiles: [...new Set([...helpers, ...policyFiles])].map(f => repoPath(f)) });
   const policyViolations: string[] = [];
   const sites: { file: string; context: string; call: string; line: number }[] = [];

@@ -8,24 +8,24 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
-import { encodeMessage, encodeString } from "../../src/adapters/devin/cloud-direct/wire";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
-import { setCodexAccountPaused } from "../../src/codex/account-pause";
+import { encodeMessage, encodeString } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { setCodexAccountPaused } from "../../backend/src/codex/account-pause";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   getCodexUpstreamHealth,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import { loadConfig, saveConfig } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { saveCredential } from "../../src/oauth/store";
-import { routeModel } from "../../src/router";
-import { startServer } from "../../src/server";
-import { clearRequestLogsForTests, getRequestLogEntries } from "../../src/server/request-log";
-import { handleSearch, SEARCH_RESPONSE_MAX_BYTES } from "../../src/server/search";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { routeModel } from "../../backend/src/router";
+import { startServer } from "../../backend/src/server";
+import { clearRequestLogsForTests, getRequestLogEntries } from "../../backend/src/server/request-log";
+import { handleSearch, SEARCH_RESPONSE_MAX_BYTES } from "../../backend/src/server/search";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

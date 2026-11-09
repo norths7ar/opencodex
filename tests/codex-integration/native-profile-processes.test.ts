@@ -8,8 +8,8 @@ import {
   listCodexClientProcesses,
   probeNativeCodexProcesses,
   type NativeProcessExecutor,
-} from "../../src/codex/native-profile-processes";
-import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/codex/native-profile-processes";
+import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 async function withTrustedWindowsPowerShell<T>(run: (powershell: string) => Promise<T>): Promise<T> {

@@ -10,8 +10,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createSseInspector } from "../../src/server/relay";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
+import { createSseInspector } from "../../backend/src/server/relay";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
 import {
   clearAccountQuotaCache,
   clearProviderQuotaCache,
@@ -19,14 +19,14 @@ import {
   getCachedProviderAccountQuota,
   recordPassiveAccountQuota,
   resetProviderQuotaReconcileStateForTests,
-} from "../../src/providers/quota";
+} from "../../backend/src/providers/quota";
 import {
   isMuseSubscriptionUsagePayload,
   MUSE_SUBSCRIPTION_USAGE_TYPE,
   parseMuseSubscriptionUsage,
-} from "../../src/providers/muse-subscription-usage";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/muse-subscription-usage";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;

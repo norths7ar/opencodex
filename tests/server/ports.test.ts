@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { createServer, type Server } from "node:net";
 import { pathToFileURL } from "node:url";
-import { AuxiliaryListenerBindError, findAvailablePort, isAddrInUse, isPortAvailable, PortUnavailableError, shouldPersistSelectedPort, waitForPortAvailable } from "../../src/server/ports";
+import { AuxiliaryListenerBindError, findAvailablePort, isAddrInUse, isPortAvailable, PortUnavailableError, shouldPersistSelectedPort, waitForPortAvailable } from "../../backend/src/server/ports";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 
 // Prototype overrides exist only inside the disposable child process.
@@ -114,7 +114,7 @@ describe("port selection", () => {
     "%s disposes accepted peers and waits for probe close completion",
     (operation) => {
       // Keep Server.prototype overrides out of this process and its real-socket tests.
-      const portsUrl = pathToFileURL(repoPath("src", "server", "ports.ts")).href;
+      const portsUrl = pathToFileURL(repoPath("backend/src", "server", "ports.ts")).href;
       const child = Bun.spawnSync([process.execPath, "--eval", PORT_PROBE_PEER_DISPOSAL_CHILD, "--", operation, portsUrl], {
         cwd: repoRoot(),
         stdout: "pipe",

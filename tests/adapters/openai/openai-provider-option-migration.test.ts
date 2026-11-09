@@ -3,8 +3,8 @@ import {
   LEGACY_OPENAI_MULTI_PROVIDER_ID,
   OpenAiTierMigrationCollisionError,
   projectOpenAiTierMigration,
-} from "../../../src/providers/openai-tiers";
-import type { OcxConfig, OcxProviderConfig, ProviderCostOverlay } from "../../../src/types";
+} from "../../../backend/src/providers/openai-tiers";
+import type { OcxConfig, OcxProviderConfig, ProviderCostOverlay } from "../../../backend/src/types";
 import { repoRoot } from "../../helpers/repo-root";
 
 const forward: OcxProviderConfig = {
@@ -32,7 +32,7 @@ function expectCanonical(result: ReturnType<typeof projectOpenAiTierMigration>, 
 
 describe("OpenAI provider option migration matrix", () => {
   test("CLI startup initializes the migration validators without an import cycle", () => {
-    const result = Bun.spawnSync([process.execPath, "run", "src/cli/index.ts", "--help"], {
+    const result = Bun.spawnSync([process.execPath, "run", "backend/src/cli/index.ts", "--help"], {
       cwd: repoRoot(), env: process.env, stdout: "pipe", stderr: "pipe", timeout: 10_000,
     });
     expect(result.stderr.toString()).not.toContain("ReferenceError");

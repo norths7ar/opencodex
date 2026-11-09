@@ -22,8 +22,8 @@ import {
   saveConfig,
   saveConfigPreservingClaudeCode,
   withExpectedConfigGenerationSync,
-} from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { captureStartupChildOutput, STARTUP_OUTPUT_TAIL_CHARS } from "../helpers/startup-child-output";
@@ -31,7 +31,7 @@ import { captureStartupChildOutput, STARTUP_OUTPUT_TAIL_CHARS } from "../helpers
 const CHILD_TIMEOUT_MS = 10_000;
 // Allow both child phases and cleanup to finish before Bun aborts the test.
 const CHILD_TEST_TIMEOUT_MS = 3 * CHILD_TIMEOUT_MS;
-const configModuleUrl = pathToFileURL(repoPath("src/config.ts")).href;
+const configModuleUrl = pathToFileURL(repoPath("backend/src/config.ts")).href;
 const generationGuardRaceScript = `
   import { existsSync, writeFileSync } from "node:fs";
   process.stderr.write("generation-race: importing config\\n");

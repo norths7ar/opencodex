@@ -5,8 +5,8 @@ import {
   materializeModelPreset,
   modelPresetFor,
   MODEL_PRESETS,
-} from "../../src/providers/model-presets";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/model-presets";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 describe("#2465 model presets", () => {
   test("rules match vendor snapshot suffixes, not just bare ids", () => {

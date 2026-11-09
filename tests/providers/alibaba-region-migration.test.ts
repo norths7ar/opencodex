@@ -2,10 +2,10 @@ import { expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { projectAlibabaRegionMigration } from "../../src/providers/alibaba-region-migration";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { projectAlibabaRegionMigration } from "../../backend/src/providers/alibaba-region-migration";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const INTL_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";

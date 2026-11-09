@@ -3,12 +3,12 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CAPABILITIES, HEAD_CAPABILITIES } from "../../src/cli/capabilities";
-import { runCapabilities } from "../../src/cli/capabilities-command";
-import { resolveHelpPath } from "../../src/cli/help-catalog";
-import { printSubcommandUsage } from "../../src/cli/help";
-import { MODELS_CONTEXT_USAGE } from "../../src/cli/help-models-context";
-import { MODELS_RUNTIME_USAGE } from "../../src/cli/models-runtime";
+import { CAPABILITIES, HEAD_CAPABILITIES } from "../../backend/src/cli/capabilities";
+import { runCapabilities } from "../../backend/src/cli/capabilities-command";
+import { resolveHelpPath } from "../../backend/src/cli/help-catalog";
+import { printSubcommandUsage } from "../../backend/src/cli/help";
+import { MODELS_CONTEXT_USAGE } from "../../backend/src/cli/help-models-context";
+import { MODELS_RUNTIME_USAGE } from "../../backend/src/cli/models-runtime";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -29,7 +29,7 @@ function help(args: string[]) {
   writeFileSync(state, JSON.stringify({ platform: process.platform, wrapperPath: wrapper, originalPath: wrapper, backupPath: backup }));
   const before = [wrapper, backup, state].map(file => readFileSync(file, "utf8"));
   try {
-    const cli = repoPath("src", "cli", "index.ts");
+    const cli = repoPath("backend/src", "cli", "index.ts");
     // The real entry point still owns argv and early exits; forbid live HTTP.
     const script = `globalThis.fetch = () => { throw new Error("help attempted HTTP"); };
       process.argv = [process.execPath, ${JSON.stringify(cli)}, ...${JSON.stringify(args)}];

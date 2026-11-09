@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { scheduleDesktopCompatibilityStartup } from "../../src/server/index/desktop-compatibility-startup";
-import { createDesktopCompatibilityService } from "../../src/codex/desktop-compatibility/service";
-import { createDesktopCompatibilityRuntime } from "../../src/codex/desktop-compatibility/runtime";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { nativeCompatibilityOwner } from "../../src/codex/desktop-compatibility/routing-binding";
-import { createReadinessGate } from "../../src/server/readiness";
+import { scheduleDesktopCompatibilityStartup } from "../../backend/src/server/index/desktop-compatibility-startup";
+import { createDesktopCompatibilityService } from "../../backend/src/codex/desktop-compatibility/service";
+import { createDesktopCompatibilityRuntime } from "../../backend/src/codex/desktop-compatibility/runtime";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { nativeCompatibilityOwner } from "../../backend/src/codex/desktop-compatibility/routing-binding";
+import { createReadinessGate } from "../../backend/src/server/readiness";
 
 test("startup captures the actual bound hostname and clears that owner on shutdown", async () => {
   const config = { ...getDefaultConfig(), hostname: "192.0.2.10" };

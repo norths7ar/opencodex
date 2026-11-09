@@ -7,23 +7,23 @@ import {
   cooldownErrorMessage, cooldownErrorResponse, headersForCodexAuthContext,
   materializeCodexUpstreamAuthAsync, resolveCodexAuthContext, shouldMarkAccountNeedsReauthForCodexAuthFailure,
   type CodexAuthContext,
-} from "../../src/codex/auth-context";
-import { NATIVE_RESERVE_MODEL } from "../../src/codex/catalog/native-models";
-import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaCredential } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth, recordCodexUpstreamOutcome } from "../../src/codex/routing";
-import * as mainAccount from "../../src/codex/main-account";
-import * as authCollision from "../../src/codex/auth-collision";
-import { isMainReserveAuthorizationLive, observeMainReserveRevocation } from "../../src/codex/reserve-availability";
-import { handleResponses } from "../../src/server/responses/core";
-import { handleResponsesCompact } from "../../src/server/responses/compact";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import type { WhamUsageResponse } from "../../src/codex/quota-types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-context";
+import { NATIVE_RESERVE_MODEL } from "../../backend/src/codex/catalog/native-models";
+import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaCredential } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth, recordCodexUpstreamOutcome } from "../../backend/src/codex/routing";
+import * as mainAccount from "../../backend/src/codex/main-account";
+import * as authCollision from "../../backend/src/codex/auth-collision";
+import { isMainReserveAuthorizationLive, observeMainReserveRevocation } from "../../backend/src/codex/reserve-availability";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { handleResponsesCompact } from "../../backend/src/server/responses/compact";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import type { WhamUsageResponse } from "../../backend/src/codex/quota-types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
@@ -183,7 +183,7 @@ describe("Reserve owned auth admission", () => {
     expect(reserve.kind).toBe("main");
     expect(reserve.affinityKey).toBeUndefined();
     expect(reserve.affinityDecision).toBeUndefined();
-    const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
+    const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
     expect(getThreadAffinity(first.affinityKey!, "reserve")).toBeUndefined();
   });
   test("unqualified Reserve pins stored main, requires capability WHAM, and carries private proof", async () => {

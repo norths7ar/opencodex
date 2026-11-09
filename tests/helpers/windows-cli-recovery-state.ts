@@ -1,7 +1,7 @@
 import { dlopen, ptr } from "bun:ffi";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { WindowsCliChild } from "../../src/codex/windows-cli-child";
+import type { WindowsCliChild } from "../../backend/src/codex/windows-cli-child";
 
 export interface WindowsRecoveryProcessIdentity { pid: number; creationTime: string }
 export interface WindowsRecoveryFixtureIdentity extends WindowsRecoveryProcessIdentity {

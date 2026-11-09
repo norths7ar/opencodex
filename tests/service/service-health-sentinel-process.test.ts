@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 
-import { HEALTH_SENTINEL_ENV, readRecoveryEntries } from "../../src/service/health-sentinel-main";
+import { HEALTH_SENTINEL_ENV, readRecoveryEntries } from "../../backend/src/service/health-sentinel-main";
 import { helperPath } from "../helpers/repo-root";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

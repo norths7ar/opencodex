@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
 import {
   issueTurnStateHandle, noteTurnStateCaller, redeemOutboundTurnState, resetTurnStateHandlesForTests,
   resolveTurnStateHandle, runTurnStateCallerScope, TURN_STATE_MISMATCH_NOTICE, turnStateBinding,
-} from "../../src/server/turn-state-handles";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/turn-state-handles";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

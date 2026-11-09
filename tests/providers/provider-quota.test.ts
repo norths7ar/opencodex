@@ -3,13 +3,13 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as authApi from "../../src/codex/auth-api";
-import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { captureMainAccountIdentityGeneration, clearMainAccountInfoCache } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, updateAccountQuota, type StoredAccountQuota } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth } from "../../src/codex/routing";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { saveCredential } from "../../src/oauth/store";
+import * as authApi from "../../backend/src/codex/auth-api";
+import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { captureMainAccountIdentityGeneration, clearMainAccountInfoCache } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, updateAccountQuota, type StoredAccountQuota } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { saveCredential } from "../../backend/src/oauth/store";
 import {
   clearProviderQuotaCache,
   fetchProviderQuotaReports,
@@ -20,12 +20,12 @@ import {
   publishKeyReportForTests,
   setAntigravityAccountQuotaTransportForTests,
   setProviderQuotaBeforePublishForTests,
-} from "../../src/providers/quota";
-import { cacheKeyWithAggregationState } from "../../src/providers/quota/report-cache";
-import type { OcxConfig } from "../../src/types";
-import { routedProviderConfig } from "../../src/router";
-import { buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+} from "../../backend/src/providers/quota";
+import { cacheKeyWithAggregationState } from "../../backend/src/providers/quota/report-cache";
+import type { OcxConfig } from "../../backend/src/types";
+import { routedProviderConfig } from "../../backend/src/router";
+import { buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 import { repoPath } from "../helpers/repo-root";
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));
@@ -140,7 +140,7 @@ describe("fetchProviderQuotaReports", () => {
 
   test("provider quota probes have no direct Response.json calls", () => {
     // Probes live in leaves now; the facade alone no longer holds one.
-    for (const p of ["quota.ts", "quota/vendor-probes-key.ts", "quota/vendor-probes-oauth.ts", "quota/antigravity.ts"]) expect(readFileSync(repoPath(`src/providers/${p}`), "utf8")).not.toMatch(/\.\s*json\s*\(/);
+    for (const p of ["quota.ts", "quota/vendor-probes-key.ts", "quota/vendor-probes-oauth.ts", "quota/antigravity.ts"]) expect(readFileSync(repoPath(`backend/src/providers/${p}`), "utf8")).not.toMatch(/\.\s*json\s*\(/);
   });
 
   test("quota JSON reading cancels a body that stalls before its first byte", async () => {

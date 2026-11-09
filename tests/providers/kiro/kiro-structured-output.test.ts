@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
 import {
   KIRO_COMPLETION_TOOL_NAME,
   KIRO_STRUCTURED_OUTPUT_TOOL_NAME,
-} from "../../../src/adapters/kiro-constants";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { parseKiroStructuredText, parseKiroStructuredToolInput, kiroStructuredOutputSpec } from "../../../src/adapters/kiro/structured-output";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createTranslatorBudget, releaseTranslatedEvent } from "../../../src/lib/translator-budget";
-import { parseRequest } from "../../../src/responses/parser";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/kiro-constants";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { parseKiroStructuredText, parseKiroStructuredToolInput, kiroStructuredOutputSpec } from "../../../backend/src/adapters/kiro/structured-output";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createTranslatorBudget, releaseTranslatedEvent } from "../../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 // Kiro has no schema-constrained response mode, so structured output is emulated through a private
 // terminal tool whose input schema is the caller's format (src/adapters/kiro/structured-output.ts).

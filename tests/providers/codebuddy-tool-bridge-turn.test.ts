@@ -6,17 +6,17 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { createCodeBuddyAdapter, type SpawnFn } from "../../src/adapters/codebuddy/adapter";
-import { buildCodeBuddyToolBridge } from "../../src/adapters/codebuddy/tool-bridge";
-import { CODEBUDDY_GLOBAL_PROFILE, clearCodeBuddyBinaryCache } from "../../src/adapters/codebuddy/profiles";
-import { runCodingAgentTurn } from "../../src/adapters/coding-agent/turn";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../src/types";
+import { createCodeBuddyAdapter, type SpawnFn } from "../../backend/src/adapters/codebuddy/adapter";
+import { buildCodeBuddyToolBridge } from "../../backend/src/adapters/codebuddy/tool-bridge";
+import { CODEBUDDY_GLOBAL_PROFILE, clearCodeBuddyBinaryCache } from "../../backend/src/adapters/codebuddy/profiles";
+import { runCodingAgentTurn } from "../../backend/src/adapters/coding-agent/turn";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
-import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { SpendLedgerOwnerError } from "../../src/lib/spend-ledger-owner";
+import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { SpendLedgerOwnerError } from "../../backend/src/lib/spend-ledger-owner";
 import { spendTestJournal, spendTestPolicy, testSpendSalt } from "../helpers/shipped-spend-ledger";
 
 const enc = new TextEncoder();

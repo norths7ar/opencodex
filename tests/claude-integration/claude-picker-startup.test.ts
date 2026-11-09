@@ -3,20 +3,20 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import { join } from "node:path";
-import * as pickerPreparation from "../../src/claude/intercept/picker-ca-startup";
-import { startClaudeIntercept, getClaudePickerController, getClaudePickerRuntime } from "../../src/claude/intercept/runtime";
-import { createPickerRuntime } from "../../src/claude/intercept/picker-runtime";
-import { startConnectProxy } from "../../src/claude/intercept/connect-proxy";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
-import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../src/claude/intercept/picker-ca";
-import { pickerCaCertPath, pickerCaFingerprints } from "../../src/claude/intercept/picker-ca";
+import * as pickerPreparation from "../../backend/src/claude/intercept/picker-ca-startup";
+import { startClaudeIntercept, getClaudePickerController, getClaudePickerRuntime } from "../../backend/src/claude/intercept/runtime";
+import { createPickerRuntime } from "../../backend/src/claude/intercept/picker-runtime";
+import { startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
+import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../backend/src/claude/intercept/picker-ca";
+import { pickerCaCertPath, pickerCaFingerprints } from "../../backend/src/claude/intercept/picker-ca";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { memoryPickerCaStore } from "../helpers/picker-ca-store";
-import { saveConfig } from "../../src/config";
-import { flushConfigDirHardeningAndReaps, hardenConfigDir } from "../../src/config/paths";
-import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setPlatformForTests } from "../../src/lib/windows-secret-acl";
+import { saveConfig } from "../../backend/src/config";
+import { flushConfigDirHardeningAndReaps, hardenConfigDir } from "../../backend/src/config/paths";
+import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 
 const roots: string[] = [];
@@ -199,10 +199,10 @@ test("gateway startup retains controller but defers credentials until explicit f
 
 test("fresh production restarts retain fingerprint and issue no trust mutations, including lost trust", () => {
   const { root } = setup();
-  const runtimeUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/runtime.ts")).href;
-  const pickerUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-runtime.ts")).href;
-  const caUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-ca.ts")).href;
-  const profileUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/desktop-picker-profile.ts")).href;
+  const runtimeUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/runtime.ts")).href;
+  const pickerUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-runtime.ts")).href;
+  const caUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-ca.ts")).href;
+  const profileUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/desktop-picker-profile.ts")).href;
   const helperUrl = pathToFileURL(join(import.meta.dir, "../helpers/picker-ca-store.ts")).href;
   const run = (trusted: boolean) => {
     const child = Bun.spawnSync({ cmd: [process.execPath, "-e", `
@@ -253,8 +253,8 @@ test("fresh production restarts retain fingerprint and issue no trust mutations,
 
 test("late first-party enable migrates a dead ephemeral predecessor before persistent activation", () => {
   const { root } = setup();
-  const caUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-ca.ts")).href;
-  const controllerUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/desktop-picker.ts")).href;
+  const caUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-ca.ts")).href;
+  const controllerUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/desktop-picker.ts")).href;
   const helperUrl = pathToFileURL(join(import.meta.dir, "../helpers/picker-ca-store.ts")).href;
   const prior = Bun.spawnSync({ cmd: [process.execPath, "-e", `
     import { ensurePickerCa } from ${JSON.stringify(caUrl)};

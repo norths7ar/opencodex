@@ -5,8 +5,8 @@ import {
   normalizeCatalogDisposition,
   recordCatalogAutoRefreshOutcome,
   resetCatalogAutoRefreshStatusForTests,
-} from "../../src/codex/catalog-refresh-status";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
+} from "../../backend/src/codex/catalog-refresh-status";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
 
 afterEach(() => {
   resetCatalogAutoRefreshStatusForTests();

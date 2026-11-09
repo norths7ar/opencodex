@@ -9,14 +9,14 @@ import {
   parseAntigravityAvailableModels,
   resolveAntigravityEffortWireModel,
   retiredAntigravityFlashTier,
-} from "../../../src/providers/antigravity-models";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import { projectModelRenames } from "../../../src/providers/model-rename-migration";
-import { EXPECTED_PRICE_OVERLAYS } from "../../../src/usage/expected-prices";
-import { mapReasoningEffort } from "../../../src/reasoning-effort";
-import { resolveMatchedPrice } from "../../../src/usage/cost";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/antigravity-models";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import { projectModelRenames } from "../../../backend/src/providers/model-rename-migration";
+import { EXPECTED_PRICE_OVERLAYS } from "../../../backend/src/usage/expected-prices";
+import { mapReasoningEffort } from "../../../backend/src/reasoning-effort";
+import { resolveMatchedPrice } from "../../../backend/src/usage/cost";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 // Google takes the previous Antigravity Flash generation off Cloud Code Assist almost
 // immediately once the next one ships. That makes 3.6 -> 3.7 a REPLACEMENT, and the

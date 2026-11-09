@@ -3,10 +3,10 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildCatalogEntries } from "../../src/codex/catalog/build-entries";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
-import type { CatalogModel, RawEntry } from "../../src/codex/catalog/parsing";
-import type { OcxProviderConfig } from "../../src/types";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog/build-entries";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
+import type { CatalogModel, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { repoRoot } from "../helpers/repo-root";
 
 const slug = "gateway/task-model";

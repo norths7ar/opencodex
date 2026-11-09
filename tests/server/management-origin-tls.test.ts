@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { isAllowedManagementOrigin, managementRequestOrigin } from "../../src/server/auth-cors";
-import type { OcxConfig } from "../../src/types";
+import { isAllowedManagementOrigin, managementRequestOrigin } from "../../backend/src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(partial: Partial<OcxConfig> = {}): OcxConfig {
   return {

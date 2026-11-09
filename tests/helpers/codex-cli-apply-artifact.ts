@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
-import type { CodexCliArtifact, CodexCliArtifactSet } from "../../src/codex/cli-update-artifacts";
-import { codexCliPlatformBacking } from "../../src/codex/cli-install-provenance";
+import type { CodexCliArtifact, CodexCliArtifactSet } from "../../backend/src/codex/cli-update-artifacts";
+import { codexCliPlatformBacking } from "../../backend/src/codex/cli-install-provenance";
 
 export function fixtureTar(files: Record<string, string | Buffer>): Buffer {
   const parts: Buffer[] = [];

@@ -13,7 +13,7 @@
  */
 import { describe, expect, test } from "bun:test";
 
-import { renameAtomicFile, type AtomicRenameIO } from "../../src/lib/windows-atomic-replace";
+import { renameAtomicFile, type AtomicRenameIO } from "../../backend/src/lib/windows-atomic-replace";
 
 /** A rename that fails `failures` times with `code`, then succeeds. */
 function io(failures: number, code = "EBUSY", platform: NodeJS.Platform = "win32") {

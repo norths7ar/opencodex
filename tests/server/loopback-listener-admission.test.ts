@@ -17,11 +17,11 @@ import {
   isAllowedRequestOrigin,
   requestPolicyView,
   resolveResponsesApiAuth,
-} from "../../src/server/auth-cors";
-import { buildProviderTableBlock, shouldInjectApiAuthHeader } from "../../src/codex/inject";
-import { effectiveLoopbackListenerPort, loopbackCompanionAllowed } from "../../src/codex/loopback-target";
-import { validateConfigCandidate } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/auth-cors";
+import { buildProviderTableBlock, shouldInjectApiAuthHeader } from "../../backend/src/codex/inject";
+import { effectiveLoopbackListenerPort, loopbackCompanionAllowed } from "../../backend/src/codex/loopback-target";
+import { validateConfigCandidate } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 
 const wildcardConfig = {
   hostname: "0.0.0.0",
@@ -64,7 +64,7 @@ describe("loopback listener policy view", () => {
     // The route branches moved into the serve-options leaf when src/server/index.ts became a
     // facade. Reading the facade would leave every indexOf at -1 and the slices empty, so the
     // toContain checks below would pass on empty strings.
-    const source = readFileSync(new URL("../../src/server/index/serve-options.ts", import.meta.url), "utf8");
+    const source = readFileSync(new URL("../../backend/src/server/index/serve-options.ts", import.meta.url), "utf8");
     const countTokensStart = source.indexOf('url.pathname === "/v1/messages/count_tokens"');
     const messagesStart = source.indexOf('url.pathname === "/v1/messages"', countTokensStart + 1);
     const chatStart = source.indexOf('url.pathname === "/v1/chat/completions"', messagesStart);
@@ -99,8 +99,8 @@ describe("local client inference wires on the loopback listener (#4236)", () => 
   // the facade left indexOf at -1 and sliced an empty branch, so the CORS assertions passed
   // without checking anything.
   const source = [
-    readFileSync(new URL("../../src/server/index.ts", import.meta.url), "utf8"),
-    readFileSync(new URL("../../src/server/index/serve-options.ts", import.meta.url), "utf8"),
+    readFileSync(new URL("../../backend/src/server/index.ts", import.meta.url), "utf8"),
+    readFileSync(new URL("../../backend/src/server/index/serve-options.ts", import.meta.url), "utf8"),
   ].join("\n");
 
   test("the allowlist admits all three wires as POST and nothing else about them", () => {

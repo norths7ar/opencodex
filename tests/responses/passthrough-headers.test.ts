@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { codexSafetyBufferingFilterOptions, sanitizePassthroughHeaders } from "../../src/server";
-import { createSseTerminalOutputBoundary } from "../../src/server/relay";
+import { codexSafetyBufferingFilterOptions, sanitizePassthroughHeaders } from "../../backend/src/server";
+import { createSseTerminalOutputBoundary } from "../../backend/src/server/relay";
 
 describe("passthrough header sanitization (RC5 / F4)", () => {
   test("content-type: text/event-stream survives sanitization", () => {

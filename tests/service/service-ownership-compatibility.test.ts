@@ -3,13 +3,13 @@ import {
   assessServiceTakeoverCompatibility,
   registeredManagingCliInvocation,
   type ManagingCliObservation,
-} from "../../src/service/ownership-compatibility";
-import type { ServiceInstallState, ServiceOwnershipSubject } from "../../src/service/state";
+} from "../../backend/src/service/ownership-compatibility";
+import type { ServiceInstallState, ServiceOwnershipSubject } from "../../backend/src/service/state";
 import {
   inspectGuardedManagerTarget,
   managerOwnsApprovedPid,
   observeGuardedManagerStopped,
-} from "../../src/service/guarded-manager-target";
+} from "../../backend/src/service/guarded-manager-target";
 
 const SUBJECT: ServiceOwnershipSubject = { kind: "none", revision: 7 };
 const OWNERSHIP_AWARE_STATE: ServiceInstallState = {

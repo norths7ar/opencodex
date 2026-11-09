@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { codexPoolQuotaEvidence, quotaEvidenceForCandidate } from "../../src/routing/quota";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { codexPoolQuotaEvidence, quotaEvidenceForCandidate } from "../../backend/src/routing/quota";
 
 afterEach(() => clearAccountQuota());
 

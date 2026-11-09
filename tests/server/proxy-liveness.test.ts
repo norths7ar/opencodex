@@ -3,7 +3,7 @@ import { createServer } from "node:net";
 import {
   createReadinessGate,
   runStartupReadinessSync,
-} from "../../src/server/readiness";
+} from "../../backend/src/server/readiness";
 import {
   DEFAULT_PROBE_TIMEOUT_MS,
   findLiveProxy,
@@ -18,7 +18,7 @@ import {
   proxyIdentityAt,
   START_OWNERSHIP_LIVENESS,
   validateReadyzBody,
-} from "../../src/server/proxy-liveness";
+} from "../../backend/src/server/proxy-liveness";
 function healthz(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
 }

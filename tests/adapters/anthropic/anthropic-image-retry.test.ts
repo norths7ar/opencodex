@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { parsedHasInlineImage, shouldAttemptImageTierRetry } from "../../../src/server/image-retry";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { resetNormalizeStateForTests } from "../../../src/adapters/anthropic-image-normalize";
-import { sniffImageDimensions } from "../../../src/adapters/anthropic-image-guard";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { parsedHasInlineImage, shouldAttemptImageTierRetry } from "../../../backend/src/server/image-retry";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { resetNormalizeStateForTests } from "../../../backend/src/adapters/anthropic-image-normalize";
+import { sniffImageDimensions } from "../../../backend/src/adapters/anthropic-image-guard";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const ONE_PX_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";

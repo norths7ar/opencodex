@@ -14,8 +14,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { tmpdir } from "node:os";
-import { openUrl } from "../../src/lib/open-url";
-import { BROWSER_LAUNCH_FAILED_HINT } from "../../src/cli/account-auth";
+import { openUrl } from "../../backend/src/lib/open-url";
+import { BROWSER_LAUNCH_FAILED_HINT } from "../../backend/src/cli/account-auth";
 
 describe("browser launch is reported, not swallowed (#5261)", () => {
   test("a URL we will not hand to a launcher is reported as such", async () => {

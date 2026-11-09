@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../src/adapters/devin/cloud-direct";
+import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../backend/src/adapters/devin/cloud-direct";
 import {
   streamChatEventsWithResetRetry,
   statedResetMaxWaitMsForTests,
-} from "../../src/adapters/devin/cloud-direct/stated-reset-retry";
+} from "../../backend/src/adapters/devin/cloud-direct/stated-reset-retry";
 
 const request = {
   apiKey: "test-only", apiServerUrl: "https://example.invalid", modelUid: "swe-2", messages: [],

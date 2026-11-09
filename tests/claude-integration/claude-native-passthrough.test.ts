@@ -4,19 +4,19 @@ import { logsFromApiBody } from "../helpers/logs-api";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { buildDesktop3pRegistry } from "../../src/claude/desktop-3p";
+import { saveConfig } from "../../backend/src/config";
+import { buildDesktop3pRegistry } from "../../backend/src/claude/desktop-3p";
 import { INTERNAL_DEADLINE_MS, SERVER_BUDGET_MS } from "../helpers/test-budget";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { startTruncatedSseUpstream } from "../helpers/truncated-sse-upstream";
-import { readRecentUsageEntries } from "../../src/usage/log";
-import { tapAnthropicSseForLog } from "../../src/server/claude-messages";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { CLAUDE_CONTEXT_OVERFLOW_MESSAGE } from "../../src/lib/client-error-body";
-import { TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
+import { readRecentUsageEntries } from "../../backend/src/usage/log";
+import { tapAnthropicSseForLog } from "../../backend/src/server/claude-messages";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { CLAUDE_CONTEXT_OVERFLOW_MESSAGE } from "../../backend/src/lib/client-error-body";
+import { TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
 
 let testDir = "";
 let previousHome: string | undefined;
@@ -188,7 +188,7 @@ test("unmapped claude model + sk-ant credential passes through verbatim", async 
 
 test("native passthrough persists conversationId from metadata.user_id", async () => {
   const { createHash } = await import("node:crypto");
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const captured: Captured[] = [];
   const upstream = mockAnthropicUpstream(captured);
@@ -443,8 +443,8 @@ test("nativePassthrough:false disables the pierce", async () => {
 
 // --- Generous image pipeline on the native branch (devlog 260714 .../040, P1-P5) ---
 
-import { resetNormalizeStateForTests } from "../../src/adapters/anthropic-image-normalize";
-import { sniffImageDimensions } from "../../src/adapters/anthropic-image-guard";
+import { resetNormalizeStateForTests } from "../../backend/src/adapters/anthropic-image-normalize";
+import { sniffImageDimensions } from "../../backend/src/adapters/anthropic-image-guard";
 
 const ONE_PX_PNG =
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
@@ -789,7 +789,7 @@ const PARTIAL_TURN_SSE = [
 ].join("");
 
 test("a mid-stream upstream reset ends the native stream with an Anthropic error event and logs a failed turn", async () => {
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const upstream = startTruncatedSseUpstream(PARTIAL_TURN_SSE);
   saveConfig(cfg(`http://127.0.0.1:${upstream.port}`));
@@ -906,7 +906,7 @@ const COMPLETE_TURN_SSE = PARTIAL_TURN_SSE + [
 ].join("");
 
 test("a reset after message_stop is a finished turn: no error event and a completed row", async () => {
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   // Only the chunked-encoding trailer is lost; the turn itself arrived whole.
   const upstream = startTruncatedSseUpstream(COMPLETE_TURN_SSE);
@@ -961,7 +961,7 @@ test("a terminal frame still in the buffer when the read fails counts as seen", 
 // --- A failed passthrough keeps its reason in the request log ---
 
 async function nativeFailureRow(upstreamBase: string, extraClaude?: Record<string, unknown>, overrides?: Partial<OcxConfig>, requestBody?: Record<string, unknown>) {
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   saveConfig({ ...cfg(upstreamBase, extraClaude), ...overrides });
   const server = startServer(0);
@@ -1254,7 +1254,7 @@ test("a non-stream body that stalls logs the stall as the reason", async () => {
 });
 
 test("a client that leaves while a non-stream body is pending logs the cancel as the reason", async () => {
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   let reached!: () => void;
   const upstreamReached = new Promise<void>(resolve => { reached = resolve; });
@@ -1291,7 +1291,7 @@ test("a client that leaves while a non-stream body is pending logs the cancel as
 // --- A stalled or over-cap stream is a visible incomplete turn, in the row and in usage.jsonl ---
 
 async function stalledStreamRow(upstream: { url: URL }, extraClaude: Record<string, unknown>) {
-  const { clearRequestLogsForTests } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const config = cfg(upstream.url.toString().replace(/\/$/, ""), extraClaude);
   saveConfig(config);

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatKiroDeviceInstructions, handleAccountAuthCommand } from "../../src/cli/account-auth";
+import { formatKiroDeviceInstructions, handleAccountAuthCommand } from "../../backend/src/cli/account-auth";
 
 interface Sent { path: string; body?: Record<string, unknown> }
 async function run(command: "login" | "cancel", args: string[]) {

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import type { AdapterEvent } from "../../src/types";
-import { guardQoderScaffolding } from "../../src/adapters/qoder/adapter";
+import type { AdapterEvent } from "../../backend/src/types";
+import { guardQoderScaffolding } from "../../backend/src/adapters/qoder/adapter";
 import {
   QoderScaffoldFilter,
   QODER_SCAFFOLD_ERROR_CODE,
-} from "../../src/adapters/qoder/scaffold-guard";
+} from "../../backend/src/adapters/qoder/scaffold-guard";
 
 /**
  * #4190: the qoder route is documented as a text and reasoning surface with the vendor CLI's

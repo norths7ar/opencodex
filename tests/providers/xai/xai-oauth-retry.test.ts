@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { discoverXaiOAuthEndpoints, postXaiToken, XaiTokenRequestError } from "../../../src/oauth/xai";
+import { discoverXaiOAuthEndpoints, postXaiToken, XaiTokenRequestError } from "../../../backend/src/oauth/xai";
 const original=globalThis.fetch; afterEach(()=>{globalThis.fetch=original;});
 function queue(items:Array<Response|Error>){let n=0;globalThis.fetch=(async()=>{const x=items[n++]!;if(x instanceof Error)throw x;return x;}) as typeof fetch;return()=>n;}
 const body={grant_type:"refresh_token",client_id:"client",refresh_token:"secret"}; const ok=()=>new Response(JSON.stringify({access_token:"a",refresh_token:"r",expires_in:3600}));

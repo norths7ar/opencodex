@@ -5,11 +5,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Database } from "bun:sqlite";
 import { afterEach, describe, expect, setDefaultTimeout, spyOn, test } from "bun:test";
-import { classifyRecoverableHistoryError, countPendingOpencodexHistory, historyBackupPathFor, isRecoverableHistoryError, legacyHistoryBackupPathFor, migrateHistoryToOpenai, resolveExistingHistoryBackupPath, restoreLegacyOpenaiHistory, restoredUserEventFor, setAfterNoopPendingCountForTests, setAfterStrictHistoryRolloutAppendForTests, setBeforeHistoryApplyTransactionForTests, setBeforeHistoryBackupConsumeForTests, setBeforeStrictHistoryRolloutAppendForTests, setHistoryDbBusyTimeoutForTests, snapshotCodexHistoryNoop, syncCodexHistoryProvider, withHistoryRetry } from "../../src/codex/history-provider";
-import { codexHistoryBackupId, legacyCodexHistoryBackupId, sameCodexHistoryPath } from "../../src/codex/history-manifest";
+import { classifyRecoverableHistoryError, countPendingOpencodexHistory, historyBackupPathFor, isRecoverableHistoryError, legacyHistoryBackupPathFor, migrateHistoryToOpenai, resolveExistingHistoryBackupPath, restoreLegacyOpenaiHistory, restoredUserEventFor, setAfterNoopPendingCountForTests, setAfterStrictHistoryRolloutAppendForTests, setBeforeHistoryApplyTransactionForTests, setBeforeHistoryBackupConsumeForTests, setBeforeStrictHistoryRolloutAppendForTests, setHistoryDbBusyTimeoutForTests, snapshotCodexHistoryNoop, syncCodexHistoryProvider, withHistoryRetry } from "../../backend/src/codex/history-provider";
+import { codexHistoryBackupId, legacyCodexHistoryBackupId, sameCodexHistoryPath } from "../../backend/src/codex/history-manifest";
 import { INVALID_HISTORY_BACKUP_FIXTURES, validHistoryBackupFixture } from "../helpers/codex-history-manifest-fixtures";
-import { preflightCodexHistoryInjection, setHistoryAppendHooksForTests } from "../../src/codex/history-provider";
-import { setStateDbPreflightOpenFailureForTests } from "../../src/codex/history-state-open";
+import { preflightCodexHistoryInjection, setHistoryAppendHooksForTests } from "../../backend/src/codex/history-provider";
+import { setStateDbPreflightOpenFailureForTests } from "../../backend/src/codex/history-state-open";
 
 // Windows CI: a transient file lock can consume the full production 5s busy timeout, tripping
 // bun's 5s default per-test timeout by itself. Fail fast into withHistoryRetry instead.

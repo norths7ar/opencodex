@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { isAnthropicOutputSchema, satisfiesOpenAiStrictSchema } from "../../src/adapters/anthropic-output-schema";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { formatFromOutputConfig } from "../../src/claude/inbound-model-options";
-import { parseRequest } from "../../src/responses/parser";
+import { isAnthropicOutputSchema, satisfiesOpenAiStrictSchema } from "../../backend/src/adapters/anthropic-output-schema";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { formatFromOutputConfig } from "../../backend/src/claude/inbound-model-options";
+import { parseRequest } from "../../backend/src/responses/parser";
 
 type Schema = Record<string, unknown>;
 

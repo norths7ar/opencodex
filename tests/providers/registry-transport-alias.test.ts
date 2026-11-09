@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import { providerMatchesRegistryTransport, registryEntryForProviderDestination } from "../../src/providers/registry";
-import { deepseekReasoningMapFor } from "../../src/providers/registry/model-seeds";
-import { captureRouteStaticPolicy, routedProviderConfig } from "../../src/router";
-import type { OcxProviderConfig } from "../../src/types";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import { providerMatchesRegistryTransport, registryEntryForProviderDestination } from "../../backend/src/providers/registry";
+import { deepseekReasoningMapFor } from "../../backend/src/providers/registry/model-seeds";
+import { captureRouteStaticPolicy, routedProviderConfig } from "../../backend/src/router";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 test("a metadata alias on another adapter does not grant registry transport ownership", () => {
   // Volcengine's canonical row moved to Responses; saved Chat rows remain Chat.

@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { handleManagementAPI } from "../../src/server/management-api";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import {
   setIntegrationMutationFlightTestHooks,
   setIntegrationPathTestHooks,
-} from "../../src/server/management/integration-routes";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/integration-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -6,18 +6,18 @@ import {
   nativeDefaultReasoningEffort,
   nativeReasoningEfforts,
   type CatalogModel,
-} from "../../../src/codex/catalog";
+} from "../../../backend/src/codex/catalog";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../../src/codex/model-entitlements";
-import { buildGrokManagedBlock, injectGrokConfig, type GrokInjectModel } from "../../../src/grok/inject";
-import { grokDefaultReasoningEffort, sanitizeGrokReasoningEfforts } from "../../../src/grok/effort";
-import { buildGrokInjectModels } from "../../../src/grok/models";
-import { syncGrokConfig } from "../../../src/grok/sync";
-import { handleManagementAPI } from "../../../src/server/management-api";
-import type { ManagementApiDeps } from "../../../src/server/management/context";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/codex/model-entitlements";
+import { buildGrokManagedBlock, injectGrokConfig, type GrokInjectModel } from "../../../backend/src/grok/inject";
+import { grokDefaultReasoningEffort, sanitizeGrokReasoningEfforts } from "../../../backend/src/grok/effort";
+import { buildGrokInjectModels } from "../../../backend/src/grok/models";
+import { syncGrokConfig } from "../../../backend/src/grok/sync";
+import { handleManagementAPI } from "../../../backend/src/server/management-api";
+import type { ManagementApiDeps } from "../../../backend/src/server/management/context";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const NATIVE_SOL = "gpt-5.6-sol";

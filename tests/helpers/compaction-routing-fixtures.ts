@@ -1,9 +1,9 @@
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { afterAll, beforeAll } from "bun:test";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 import { removeTreeAfterBackgroundWork } from "./remove-tree";
 
 /**

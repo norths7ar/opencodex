@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { handleCodexAuthLoginCancel } from "../../src/codex/auth-api/login-flow";
-import { codexAuthLoginState } from "../../src/codex/auth-api/login-state";
-import { cancelLoginFlow, clearLoginState, getLoginStatus, OAUTH_PROVIDERS, startLoginFlow } from "../../src/oauth";
+import { handleCodexAuthLoginCancel } from "../../backend/src/codex/auth-api/login-flow";
+import { codexAuthLoginState } from "../../backend/src/codex/auth-api/login-state";
+import { cancelLoginFlow, clearLoginState, getLoginStatus, OAUTH_PROVIDERS, startLoginFlow } from "../../backend/src/oauth";
 
 const OLD_ID = "cancel-ownership-old";
 const NEW_ID = "cancel-ownership-new";

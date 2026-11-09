@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { DEFAULT_CONNECT_TIMEOUT_MS, DEFAULT_STALL_TIMEOUT_SEC, MIN_JSON_BODY_READ_MS, resolveConnectTimeoutMs, resolveJsonBodyReadTimeoutMs, resolveStallTimeoutMs, resolveStallTimeoutSec } from "../../src/stall-timeout";
+import { DEFAULT_CONNECT_TIMEOUT_MS, DEFAULT_STALL_TIMEOUT_SEC, MIN_JSON_BODY_READ_MS, resolveConnectTimeoutMs, resolveJsonBodyReadTimeoutMs, resolveStallTimeoutMs, resolveStallTimeoutSec } from "../../backend/src/stall-timeout";
 
 describe("resolveStallTimeoutSec", () => {
   test("defaults to 300 seconds for a public upstream when unset", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { CAPABILITIES } from "../../src/cli/capabilities";
-import { MANAGEMENT_ROUTES } from "../../src/server/management/route-registry";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { CAPABILITIES } from "../../backend/src/cli/capabilities";
+import { MANAGEMENT_ROUTES } from "../../backend/src/server/management/route-registry";
 
 const COST = { input: 1.25, output: 5, cacheRead: 0.125, cacheWrite: 2 };
 

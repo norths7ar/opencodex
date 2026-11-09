@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decodeJwtPayload, extractAccountId, extractAccountIdClaims, extractEmail } from "../../src/oauth/chatgpt";
+import { decodeJwtPayload, extractAccountId, extractAccountIdClaims, extractEmail } from "../../backend/src/oauth/chatgpt";
 
 function fakeJwt(payload: Record<string, unknown>): string {
   const header = Buffer.from(JSON.stringify({ alg: "none" })).toString("base64url");
@@ -130,49 +130,49 @@ describe("ChatGPT OAuth JWT helpers", () => {
 
 describe("ChatGPT OAuth constants", () => {
   test("uses auth.openai.com endpoints (not auth0.openai.com)", async () => {
-    const source = await Bun.file("src/oauth/chatgpt.ts").text()
-      + await Bun.file("src/oauth/chatgpt-shared.ts").text();
+    const source = await Bun.file("backend/src/oauth/chatgpt.ts").text()
+      + await Bun.file("backend/src/oauth/chatgpt-shared.ts").text();
     expect(source).toContain('auth.openai.com/oauth/authorize');
     expect(source).toContain('auth.openai.com/oauth/token');
     expect(source).not.toContain("auth0.openai.com");
   });
 
   test("uses official Codex client_id", async () => {
-    const source = await Bun.file("src/oauth/chatgpt.ts").text()
-      + await Bun.file("src/oauth/chatgpt-shared.ts").text();
+    const source = await Bun.file("backend/src/oauth/chatgpt.ts").text()
+      + await Bun.file("backend/src/oauth/chatgpt-shared.ts").text();
     expect(source).toContain("app_EMoamEEZ73f0CkXaXp7hrann");
     expect(source).not.toContain("DRivsnm2Mu42T3KOpqdtwB3NYviHYzwD");
   });
 
   test("uses JSON content-type for token refresh and form-urlencoded for code exchange with codex_cli_rs originator", async () => {
-    const source = await Bun.file("src/oauth/chatgpt.ts").text();
+    const source = await Bun.file("backend/src/oauth/chatgpt.ts").text();
     expect(source).toContain("application/x-www-form-urlencoded");
     expect(source).toContain('"application/json"');
     expect(source).toContain('const ORIGINATOR = "codex_cli_rs"');
   });
 
   test("includes codex_cli_simplified_flow parameter", async () => {
-    const source = await Bun.file("src/oauth/chatgpt.ts").text();
+    const source = await Bun.file("backend/src/oauth/chatgpt.ts").text();
     expect(source).toContain("codex_cli_simplified_flow");
   });
 });
 
 describe("codex-account-store constants sync", () => {
   test("uses same auth.openai.com endpoint as chatgpt.ts", async () => {
-    const source = await Bun.file("src/codex/account-store.ts").text();
+    const source = await Bun.file("backend/src/codex/account-store.ts").text();
     expect(source).toContain("auth.openai.com/oauth/token");
     expect(source).not.toContain("auth0.openai.com");
   });
 
   test("uses same client_id as chatgpt.ts", async () => {
-    const source = await Bun.file("src/codex/account-store.ts").text();
+    const source = await Bun.file("backend/src/codex/account-store.ts").text();
     expect(source).toContain("app_EMoamEEZ73f0CkXaXp7hrann");
     expect(source).not.toContain("DRivsnm2Mu42T3KOpqdtwB3NYviHYzwD");
   });
 
   test("uses official JSON contract for pool and main refresh", async () => {
-    const source = await Bun.file("src/codex/account-store.ts").text();
-    const mainSource = await Bun.file("src/codex/main-account.ts").text();
+    const source = await Bun.file("backend/src/codex/account-store.ts").text();
+    const mainSource = await Bun.file("backend/src/codex/main-account.ts").text();
     expect(source).toContain('"Content-Type": "application/json"');
     expect(mainSource).toContain('"Content-Type": "application/json"');
   });

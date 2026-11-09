@@ -1,7 +1,7 @@
 import {expect,test} from 'bun:test';
-import {TurnTokenCodec} from '../../src/responses/turn-membership';
-import {parseRequest} from '../../src/responses/parser';
-import {createOpenAIChatAdapter} from '../../src/adapters/openai-chat';
+import {TurnTokenCodec} from '../../backend/src/responses/turn-membership';
+import {parseRequest} from '../../backend/src/responses/parser';
+import {createOpenAIChatAdapter} from '../../backend/src/adapters/openai-chat';
 const key=new Uint8Array(32).fill(21),scope={principal:'owned-caller',thread:'owned-thread'};
 const codec=()=>new TurnTokenCodec(new Map([['k1',key]]),'k1');
 function fixture(c=codec()){
@@ -170,7 +170,7 @@ for(const mode of ['duplicate-result','missing-result','foreign-item'])test('inv
 });
 
 
-import {responseTurnMembership} from '../../src/server/responses/turn-membership';
+import {responseTurnMembership} from '../../backend/src/server/responses/turn-membership';
 test('embedding key and verified dedicated client establish restart-stable thread scope',()=>{
  const old=process.env.OPENCODEX_API_AUTH_TOKEN;process.env.OPENCODEX_API_AUTH_TOKEN='owned-local-capability';
  try{

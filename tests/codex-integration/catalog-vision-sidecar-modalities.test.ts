@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { applyProviderConfigHints, gatherRoutedModels } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
-import type { OcxProviderConfig } from "../../src/types";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import { CURSOR_NO_VISION_MODELS, CURSOR_STATIC_MODELS } from "../../src/adapters/cursor/discovery";
-import { modelInList } from "../../src/types";
-import type { CatalogModel } from "../../src/types";
+import { applyProviderConfigHints, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import { CURSOR_NO_VISION_MODELS, CURSOR_STATIC_MODELS } from "../../backend/src/adapters/cursor/discovery";
+import { modelInList } from "../../backend/src/types";
+import type { CatalogModel } from "../../backend/src/types";
 
 const base: OcxProviderConfig = {
   adapter: "openai-chat",

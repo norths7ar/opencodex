@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential } from "../../../src/oauth/store";
+import { getAccountSet, saveCredential } from "../../../backend/src/oauth/store";
 import {
   clearAccountQuotaCache,
   clearProviderQuotaCache,
   fetchProviderAccountQuotas,
   getCachedProviderAccountQuota,
   supportsPerAccountQuota,
-} from "../../../src/providers/quota";
-import { getKiroAccountExhaustion } from "../../../src/providers/kiro-usage";
+} from "../../../backend/src/providers/quota";
+import { getKiroAccountExhaustion } from "../../../backend/src/providers/kiro-usage";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

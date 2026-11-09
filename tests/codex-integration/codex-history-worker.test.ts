@@ -5,12 +5,12 @@ import { dirname, join, resolve } from "node:path";
 
 import { Database } from "bun:sqlite";
 
-import { adoptHistoryDbBusyTimeout, currentHistoryDbBusyTimeoutMs, historyBackupPathFor, setBeforeHistoryBackupConsumeForTests, setHistoryDbBusyTimeoutForTests } from "../../src/codex/history-provider";
+import { adoptHistoryDbBusyTimeout, currentHistoryDbBusyTimeoutMs, historyBackupPathFor, setBeforeHistoryBackupConsumeForTests, setHistoryDbBusyTimeoutForTests } from "../../backend/src/codex/history-provider";
 import {
   isHistoryWorkerRunMessage,
   runHistoryUnitUnderLock,
   type HistoryWorkerRunMessage,
-} from "../../src/codex/history-worker";
+} from "../../backend/src/codex/history-worker";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";

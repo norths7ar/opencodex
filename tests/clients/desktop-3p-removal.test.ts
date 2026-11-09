@@ -2,9 +2,9 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import * as filesystem from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import { readDesktopLibraryText, readDesktopLibraryBytes, MAX_DESKTOP_PROFILE_FILE_BYTES, parseMetadata, readDesktopProfileForeignKeys } from "../../src/claude/desktop-3p-library";
-import { saveConfig, readConfigDiagnostics } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+import { readDesktopLibraryText, readDesktopLibraryBytes, MAX_DESKTOP_PROFILE_FILE_BYTES, parseMetadata, readDesktopProfileForeignKeys } from "../../backend/src/claude/desktop-3p-library";
+import { saveConfig, readConfigDiagnostics } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
@@ -14,7 +14,7 @@ import { tmpdir } from "node:os";
 import {
   inspectDesktop3pConfigLibrary,
   removeDesktop3pStandardPivot as removeDesktop3pStandardPivotProduction,
-} from "../../src/claude/desktop-3p";
+} from "../../backend/src/claude/desktop-3p";
 
 let previousHome: string | undefined;
 let fixtureHome: string;
@@ -236,7 +236,7 @@ for (const entry of ["_meta.json", "selected.json"]) {
     expect(spawnSync("mkfifo", [fifo], { timeout: 5000 }).status).toBe(0);
     // Bound the parent even if a regression opens the FIFO synchronously. The child imports
     // the real inspector and does not use a simulated read or start a production listener.
-    const code = `import { inspectDesktop3pConfigLibrary } from ${JSON.stringify(repoPath("src/claude/desktop-3p.ts"))};
+    const code = `import { inspectDesktop3pConfigLibrary } from ${JSON.stringify(repoPath("backend/src/claude/desktop-3p.ts"))};
       console.log(JSON.stringify(inspectDesktop3pConfigLibrary({env:{OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR:${JSON.stringify(library)}}})));`;
     const child = spawnSync(process.execPath, ["--no-env-file", "-e", code], {
       env: { ...process.env }, encoding: "utf8", timeout: 10000, maxBuffer: 1024 * 1024,

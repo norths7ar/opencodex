@@ -3,20 +3,20 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   AgentClientMessageSchema, BackgroundShellSpawnArgsSchema, DeleteArgsSchema, ExecServerMessageSchema,
   FetchArgsSchema, GrepArgsSchema, LsArgsSchema, ReadArgsSchema, ShellArgsSchema, WriteArgsSchema, WriteShellStdinArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { createCursorAdapter } from "../../../src/adapters/cursor";
-import { CURSOR_ROUTING_COMMENTARY_RETRY_TEXT } from "../../../src/adapters/cursor/envelope-echo";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
-import { cursorBlobTextForEstimate, cursorNativeExecRedirectHint, handleCursorNativeExec, resetCursorBlobStateForTests, type CursorNativeExecContext } from "../../../src/adapters/cursor/native-exec";
-import { nativeShellDisabledMessage } from "../../../src/adapters/cursor/native-exec-shell";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { buildCursorToolGuidanceSystemNote } from "../../../src/adapters/cursor/tool-guidance";
-import { buildCursorToolDefinitions } from "../../../src/adapters/cursor/tool-definitions";
-import { CURSOR_TOOL_CALL_CONTINUATION, cursorUsesPlainToolWording } from "../../../src/adapters/cursor/tool-wording";
-import { parseRequest } from "../../../src/responses/parser";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
-import type { AdapterEvent } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { createCursorAdapter } from "../../../backend/src/adapters/cursor";
+import { CURSOR_ROUTING_COMMENTARY_RETRY_TEXT } from "../../../backend/src/adapters/cursor/envelope-echo";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
+import { cursorBlobTextForEstimate, cursorNativeExecRedirectHint, handleCursorNativeExec, resetCursorBlobStateForTests, type CursorNativeExecContext } from "../../../backend/src/adapters/cursor/native-exec";
+import { nativeShellDisabledMessage } from "../../../backend/src/adapters/cursor/native-exec-shell";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { buildCursorToolGuidanceSystemNote } from "../../../backend/src/adapters/cursor/tool-guidance";
+import { buildCursorToolDefinitions } from "../../../backend/src/adapters/cursor/tool-definitions";
+import { CURSOR_TOOL_CALL_CONTINUATION, cursorUsesPlainToolWording } from "../../../backend/src/adapters/cursor/tool-wording";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
+import type { AdapterEvent } from "../../../backend/src/types";
 import legacy from "../../fixtures/cursor-tool-wording.json";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 

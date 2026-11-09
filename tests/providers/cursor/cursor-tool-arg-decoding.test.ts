@@ -9,12 +9,12 @@ import {
   ToolCallStartedUpdateSchema,
   ToolCallCompletedUpdateSchema,
   ToolCallSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   createCursorProtobufEventState,
   mapCursorProtobufServerMessage,
   mapSyntheticMcpExecToToolEvents,
-} from "../../../src/adapters/cursor/protobuf-events";
+} from "../../../backend/src/adapters/cursor/protobuf-events";
 
 const encoder = new TextEncoder();
 

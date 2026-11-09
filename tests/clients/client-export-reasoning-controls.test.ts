@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { buildClientConfig, type ExportModel, type KiloGeneratedConfig, type OpencodeGeneratedConfig } from "../../src/clients/config-export";
-import { deriveEntry } from "../../src/codex/catalog/derive-entry";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
+import { buildClientConfig, type ExportModel, type KiloGeneratedConfig, type OpencodeGeneratedConfig } from "../../backend/src/clients/config-export";
+import { deriveEntry } from "../../backend/src/codex/catalog/derive-entry";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
 
 const model: ExportModel = {
   namespaced: "mock/reasoner", provider: "mock", id: "reasoner", contextWindow: 100_000,

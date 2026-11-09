@@ -16,7 +16,7 @@ import { repoPath, repoRoot } from "../helpers/repo-root";
  * everywhere, including CI. Refreshing the metadata is one deliberate commit: replace the
  * snapshot and rerun `bun run generate:model-metadata`.
  */
-const GENERATED = repoPath("src/generated/model-metadata.ts");
+const GENERATED = repoPath("backend/src/generated/model-metadata.ts");
 // Mirror the generator's fixed source: the vendored snapshot next to the script, so the guard is
 // deterministic in worktrees and CI.
 const SOURCE = repoPath("scripts/model-metadata.source.json");

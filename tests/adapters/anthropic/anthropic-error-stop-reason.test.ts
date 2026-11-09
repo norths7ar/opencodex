@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import { buildResponseJSON } from "../../../src/bridge";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

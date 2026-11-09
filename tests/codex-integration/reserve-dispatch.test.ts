@@ -6,26 +6,26 @@ import {
   CodexAccountCooldownError, CodexReserveUnavailableError, CodexReserveHelperUnsupportedError,
   cooldownErrorResponse, createCodexReserveDispatchGuard,
   resolveCodexAuthContext, unwrapUpstreamRetryEvidenceError,
-} from "../../src/codex/auth-context";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
-import { clearAccountQuota } from "../../src/codex/quota";
-import { clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearCodexUpstreamHealth, getCodexUpstreamHealth, recordCodexUpstreamOutcome } from "../../src/codex/routing";
-import { isMainReserveAuthorizationLive, observeMainReserveRevocation } from "../../src/codex/reserve-availability";
+} from "../../backend/src/codex/auth-context";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearCodexUpstreamHealth, getCodexUpstreamHealth, recordCodexUpstreamOutcome } from "../../backend/src/codex/routing";
+import { isMainReserveAuthorizationLive, observeMainReserveRevocation } from "../../backend/src/codex/reserve-availability";
 import {
   isCodexReserveOptInMissing,
   isCodexReserveRequestEligible,
   CODEX_RESERVE_OPT_IN_REQUIRED_MESSAGE,
-} from "../../src/codex/loopback-target";
-import { clearUpstreamHostHealth, getUpstreamHostHealth, upstreamHostHealthKey } from "../../src/codex/upstream-host-health";
-import { providerFetch, fetchWithHeaderTimeout } from "../../src/server/responses/fetch-helpers";
-import { handleResponses } from "../../src/server/responses/core";
-import { handleResponsesCompact } from "../../src/server/responses/compact";
-import { UpstreamRetryEvidenceError } from "../../src/lib/upstream-retry";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/loopback-target";
+import { clearUpstreamHostHealth, getUpstreamHostHealth, upstreamHostHealthKey } from "../../backend/src/codex/upstream-host-health";
+import { providerFetch, fetchWithHeaderTimeout } from "../../backend/src/server/responses/fetch-helpers";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { handleResponsesCompact } from "../../backend/src/server/responses/compact";
+import { UpstreamRetryEvidenceError } from "../../backend/src/lib/upstream-retry";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

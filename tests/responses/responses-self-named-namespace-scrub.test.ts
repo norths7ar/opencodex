@@ -7,9 +7,9 @@
  * protects authorized bare custom tools on client-facing passthrough (SSE and bounded JSON).
  */
 import { afterEach, expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses";
-import { scrubSelfNamedToolCallNamespace } from "../../src/server/responses-self-named-namespace-scrub";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import { scrubSelfNamedToolCallNamespace } from "../../backend/src/server/responses-self-named-namespace-scrub";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const originalFetch = globalThis.fetch;

@@ -2,8 +2,8 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { cleanupOpenAiTierBackupAfterInit } from "../../src/cli/init";
-import { classifyOpenAiTierBackup, OpenAiTierRollbackPreserveError, preserveOpenAiTierRollbackSnapshot } from "../../src/config";
+import { cleanupOpenAiTierBackupAfterInit } from "../../backend/src/cli/init";
+import { classifyOpenAiTierBackup, OpenAiTierRollbackPreserveError, preserveOpenAiTierRollbackSnapshot } from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("cleanupOpenAiTierBackupAfterInit", () => {

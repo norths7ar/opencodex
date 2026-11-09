@@ -6,11 +6,11 @@ import {
   rewriteUpstream,
   rewriteUpstreamRecord,
   rewriteWebSocketDial,
-} from "../../src/plugins/upstream-hooks";
-import { sendWithConnectionPolicy } from "../../src/server/responses/fetch-helpers";
-import { planCodexWsDial } from "../../src/server/responses/ws-upstream";
-import { codexWsReuseIdentity } from "../../src/server/responses/codex-ws-pool";
-import { CODEX_RESPONSES_HTTP_URL } from "../../src/server/responses/codex-ws-request";
+} from "../../backend/src/plugins/upstream-hooks";
+import { sendWithConnectionPolicy } from "../../backend/src/server/responses/fetch-helpers";
+import { planCodexWsDial } from "../../backend/src/server/responses/ws-upstream";
+import { codexWsReuseIdentity } from "../../backend/src/server/responses/codex-ws-pool";
+import { CODEX_RESPONSES_HTTP_URL } from "../../backend/src/server/responses/codex-ws-request";
 
 afterEach(() => resetUpstreamRewritersForTests());
 

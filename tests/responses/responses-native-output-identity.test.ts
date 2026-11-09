@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { nativeResponseOutput } from "../../src/server/responses/native-response-output";
-import { nativeResponseFingerprint, nativeResponseOutputIdentity } from "../../src/server/responses/native-response-json";
+import { nativeResponseOutput } from "../../backend/src/server/responses/native-response-output";
+import { nativeResponseFingerprint, nativeResponseOutputIdentity } from "../../backend/src/server/responses/native-response-json";
 
 test("native output identity preserves key-order equivalence and duplicate refusal", () => {
   for (const text of ["short", "한".repeat(40), "x".repeat(1024)]) {

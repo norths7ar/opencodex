@@ -2,10 +2,10 @@ import { describe, expect, test, beforeEach, afterEach, spyOn } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
 
 /**
  * Refresh-failure classification: which upstream bodies are allowed to retire an account.
@@ -51,7 +51,7 @@ describe("codex refresh-failure classification", () => {
   async function classify(accountId: string, respond: () => Response,
     metadata?: { status: number; code: string | undefined }): Promise<string> {
     const { forceRefreshCodexPoolToken, readCodexAccountRecord, saveCodexAccountCredential, TokenRefreshError } =
-      await import("../../src/codex/account-store");
+      await import("../../backend/src/codex/account-store");
     saveCodexAccountCredential(accountId, {
       accessToken: "rejected",
       refreshToken: `grant-${accountId}`,

@@ -19,7 +19,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { windowsWrapperKillScript } from "../../src/lib/windows-service-wrappers";
+import { windowsWrapperKillScript } from "../../backend/src/lib/windows-service-wrappers";
 import { repoPath } from "../helpers/repo-root";
 
 const read = (rel: string) => readFileSync(repoPath(rel), "utf8");
@@ -131,7 +131,7 @@ describe("the generated script still implements that rule", () => {
 
 describe("both teardown paths use the shared killer", () => {
   test("neither file keeps a private matcher", () => {
-    for (const rel of ["src/service/windows-ops.ts", "src/update/job-windows-restart.ts"]) {
+    for (const rel of ["backend/src/service/windows-ops.ts", "src/update/job-windows-restart.ts"]) {
       const src = read(rel);
       if (rel === "src/update/job-windows-restart.ts") {
         expect(src).toContain("killWindowsServiceWrapperProcesses(authorizeMutation);");
@@ -146,7 +146,7 @@ describe("both teardown paths use the shared killer", () => {
 
 describe("scheduler child exit contract", () => {
   test("zero and failure exits reach the cooldown; only explicit stay-out terminates", async () => {
-    const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+    const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
     for (const cli of ["C:\\ocx\\cli.ts", null]) {
       const batch = buildWindowsServiceScript({ bun: "C:\\ocx\\bun.exe", bunRuntimeSource: "bundled", cli }, 10100, []);
       const tail = batch.slice(batch.indexOf(' start --port 10100')).split("\r\n").slice(1);
@@ -167,13 +167,13 @@ describe("scheduler child exit contract", () => {
 
 
 test("stay-out exit code is opt-in for new wrappers, preserving legacy services", async () => {
-  const { serviceStayOutExitCode } = await import("../../src/service/windows-wrapper-exit");
+  const { serviceStayOutExitCode } = await import("../../backend/src/service/windows-wrapper-exit");
   expect(serviceStayOutExitCode({})).toBe(0);
   expect(serviceStayOutExitCode({ OCX_SERVICE: "1" })).toBe(0);
   expect(serviceStayOutExitCode({ OCX_WINDOWS_WRAPPER_PROTOCOL: "1" })).toBe(0);
   expect(serviceStayOutExitCode({ OCX_SERVICE: "1", OCX_WINDOWS_WRAPPER_PROTOCOL: "1" })).toBe(42);
   expect(serviceStayOutExitCode({ OCX_SERVICE: "1", OCX_WINDOWS_WRAPPER_PROTOCOL: "2" })).toBe(0);
-  const cli = read("src/cli/index.ts");
+  const cli = read("backend/src/cli/index.ts");
   const branches = [...cli.matchAll(/if \(decision === "service-stay-out"\) \{([\s\S]*?)\n\s*\}/g)];
   expect(branches).toHaveLength(3);
   for (const branch of branches) expect(branch[1]).toContain("serviceStayOutExitCode()");
@@ -183,7 +183,7 @@ test.skipIf(process.platform !== "win32")("cmd restarts zero/crash exits and sto
   const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { spawnSync } = await import("node:child_process");
-  const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+  const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
   const dir = mkdtempSync(join(tmpdir(), "ocx-wrapper-exit-"));
   try {
     const batch = buildWindowsServiceScript({ bun: "bun.exe", bunRuntimeSource: "bundled", cli: null }, 10100, []);
@@ -209,7 +209,7 @@ for (const date of ["Wed 09/30/2026", "2026-09-30(수)", "2026/09/30 (水)"]) {
       const { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } = await import("node:fs");
       const { tmpdir } = await import("node:os");
       const { spawnSync } = await import("node:child_process");
-      const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+      const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
       const dir = mkdtempSync(join(tmpdir(), "ocx-wrapper-locale-"));
       try {
         // Every path used by recovery is disposable, including the live package.
@@ -266,7 +266,7 @@ test.skipIf(process.platform !== "win32")("cmd waits out the npm Bun placeholder
   const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { spawnSync } = await import("node:child_process");
-  const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+  const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
   const dir = mkdtempSync(join(tmpdir(), "ocx-wrapper-placeholder-"));
   try {
     const pkg = join(dir, "package");
@@ -304,7 +304,7 @@ test.skipIf(process.platform !== "win32")("cmd waits when Bun disappears between
   const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { spawnSync } = await import("node:child_process");
-  const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+  const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
   const dir = mkdtempSync(join(tmpdir(), "ocx-wrapper-vanish-"));
   try {
     const pkg = join(dir, "package");
@@ -338,8 +338,8 @@ test.skipIf(process.platform !== "win32")("cmd waits when Bun disappears between
 });
 
 test("Bun readiness guard precedes launch and preserves its retry block", async () => {
-  const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
-  const { REAL_BUN_MIN_BYTES } = await import("../../src/lib/bun-binary-validator.mjs");
+  const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
+  const { REAL_BUN_MIN_BYTES } = await import("../../backend/src/lib/bun-binary-validator.mjs");
   const guard = [
     'set "OCX_BUN_BYTES="',
     'for %%F in ("%OCX_BUN%") do set "OCX_BUN_BYTES=%%~zF"',
@@ -370,7 +370,7 @@ test("Bun readiness guard precedes launch and preserves its retry block", async 
 });
 
 test("backup success logging never expands a filesystem-derived backup name", async () => {
-  const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+  const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
   const batch = buildWindowsServiceScript({ bun: "C:\\ocx\\bun.exe", bunRuntimeSource: "bundled", cli: "C:\\ocx\\src\\cli\\index.ts" }, 10100, []);
   expect(batch).toContain('setlocal EnableExtensions DisableDelayedExpansion');
   expect(batch).not.toContain("OCX_RESTORED_BACKUP");
@@ -387,7 +387,7 @@ for (const name of [
     const { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { spawnSync } = await import("node:child_process");
-    const { buildWindowsServiceScript } = await import("../../src/service/windows-taskxml");
+    const { buildWindowsServiceScript } = await import("../../backend/src/service/windows-taskxml");
     const dir = mkdtempSync(join(tmpdir(), "ocx-wrapper-backup-name-"));
     try {
       const pkg = join(dir, "opencodex");

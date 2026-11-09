@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { aggregateCodexPoolCapacity, CODEX_CAPACITY_MAX_QUOTA_AGE_MS, type CodexCapacityAccount } from "../../src/providers/codex-capacity";
+import { aggregateCodexPoolCapacity, CODEX_CAPACITY_MAX_QUOTA_AGE_MS, type CodexCapacityAccount } from "../../backend/src/providers/codex-capacity";
 
 const NOW = 1_800_000_000_000;
 const account = (

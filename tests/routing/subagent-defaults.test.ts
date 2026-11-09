@@ -3,7 +3,7 @@ import {
   MANAGED_AGENTS_TABLE_MARKER,
   MANAGED_SUBAGENT_DEFAULT_MARKER,
   transformManagedSubagentDefaults,
-} from "../../src/codex/subagent-defaults";
+} from "../../backend/src/codex/subagent-defaults";
 
 function apply(content: string, model = "openai/gpt-5.6-sol", reasoningEffort?: string) {
   return transformManagedSubagentDefaults(content, { model, reasoningEffort });

@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { createMessagesSseErrorFilter } from "../../src/server/messages-sse-error-filter";
-import { MessagesSseFrameContext, messagesSseFrameHooks, MESSAGES_SSE_ERROR_HOLD_BYTES } from "../../src/lib/messages-sse-error-presentation";
+import { createMessagesSseErrorFilter } from "../../backend/src/server/messages-sse-error-filter";
+import { MessagesSseFrameContext, messagesSseFrameHooks, MESSAGES_SSE_ERROR_HOLD_BYTES } from "../../backend/src/lib/messages-sse-error-presentation";
 import { pinnedMessagesObservation } from "../helpers/messages-sse-observer";
 import { messagesSseCases, SSE_SENTINEL } from "../helpers/messages-sse-cases";
 const encode = (text: string) => new TextEncoder().encode(text);

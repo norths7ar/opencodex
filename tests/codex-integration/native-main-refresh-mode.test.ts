@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as nativeMainRefreshMode from "../../src/codex/native-main-refresh-mode";
+import * as nativeMainRefreshMode from "../../backend/src/codex/native-main-refresh-mode";
 import {
   CODEX_AUTH_STATUS_MIN_VERSION,
   CodexAuthStatusError,
@@ -12,7 +12,7 @@ import {
   setNativeMainRefreshResolutionForTests,
   type CodexAuthStatus,
   type NativeMainRefreshResolution,
-} from "../../src/codex/native-main-refresh-mode";
+} from "../../backend/src/codex/native-main-refresh-mode";
 import {
   forceRefreshMainAccountToken,
   getMainAccountCredentialStatus,
@@ -21,22 +21,22 @@ import {
   MAIN_CODEX_ACCOUNT_ID,
   MainAuthJsonChangedDuringRefreshError,
   MainAccountTokenRefreshError,
-} from "../../src/codex/main-account";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { NATIVE_GPT6_ASTRA_MINOR_MODEL } from "../../src/codex/catalog/native-models";
-import { codexCredentialMutationEpoch } from "../../src/codex/credential-mutation-epoch";
-import { resolveCodexAuthContext, materializeCodexUpstreamAuthAsync, CodexAuthContextError, CodexMainAccountHardLockError, CodexMainProfileDrainingError, CodexModelAvailabilityError, CodexPoolAuthenticationError } from "../../src/codex/auth-context";
-import { applyConfirmedMainCodexAccountTransition, reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { captureMainQuotaWriter, isMainQuotaDispatchLive, isMainQuotaWriterLive, matchesMainQuotaCredential, observeMainQuotaCredential } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { clearThreadAccountMap } from "../../src/codex/routing";
-import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { withNativeMainSharedClaim } from "../../src/codex/native-main-claim";
-import { resolveNativeProfileContext } from "../../src/codex/native-profile-store";
-import type { OcxConfig } from "../../src/types";
-import type { ResolveCodexRuntimeResult } from "../../src/codex/runtime";
-import type { CodexExecBoundaryAsyncDeps } from "../../src/codex/exec-boundary";
+} from "../../backend/src/codex/main-account";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { NATIVE_GPT6_ASTRA_MINOR_MODEL } from "../../backend/src/codex/catalog/native-models";
+import { codexCredentialMutationEpoch } from "../../backend/src/codex/credential-mutation-epoch";
+import { resolveCodexAuthContext, materializeCodexUpstreamAuthAsync, CodexAuthContextError, CodexMainAccountHardLockError, CodexMainProfileDrainingError, CodexModelAvailabilityError, CodexPoolAuthenticationError } from "../../backend/src/codex/auth-context";
+import { applyConfirmedMainCodexAccountTransition, reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { captureMainQuotaWriter, isMainQuotaDispatchLive, isMainQuotaWriterLive, matchesMainQuotaCredential, observeMainQuotaCredential } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { withNativeMainSharedClaim } from "../../backend/src/codex/native-main-claim";
+import { resolveNativeProfileContext } from "../../backend/src/codex/native-profile-store";
+import type { OcxConfig } from "../../backend/src/types";
+import type { ResolveCodexRuntimeResult } from "../../backend/src/codex/runtime";
+import type { CodexExecBoundaryAsyncDeps } from "../../backend/src/codex/exec-boundary";
 import { fakeChatGptJwt } from "../helpers/agent-task-recovery";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -946,7 +946,7 @@ describe("owned keyring account identity and quota", () => {
     oldAccount();
     const fresh = fakeChatGptJwt("acct-keyring-new");
     const { codexAuthStatus } = answer(fresh);
-    const context: { kind: "main"; accountId: null; mainQuotaDispatch?: import("../../src/codex/main-account-cache").MainQuotaDispatch } = { kind: "main", accountId: null };
+    const context: { kind: "main"; accountId: null; mainQuotaDispatch?: import("../../backend/src/codex/main-account-cache").MainQuotaDispatch } = { kind: "main", accountId: null };
     const headers = await materializeCodexUpstreamAuthAsync(new Headers({ authorization: "Bearer fixture-admission" }), context, {
       config: config(), substituteMainCredential: true, nativeMainRefreshDependencies: { codexAuthStatus },
     });

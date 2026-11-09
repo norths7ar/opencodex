@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 function configFor(modelId: string): OcxConfig {
   return {

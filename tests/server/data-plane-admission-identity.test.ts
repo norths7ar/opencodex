@@ -9,15 +9,15 @@ import {
   resolveDurableReplayPrincipal,
   resolveDataPlaneAdmissionSecret,
   resolveResponsesApiAuth,
-} from "../../src/server/auth-cors";
+} from "../../backend/src/server/auth-cors";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { contextRelayActivated } from "../../src/codex/context-compat";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { buildResponsesWsData } from "../../src/server/ws-bridge";
-import type { OcxConfig } from "../../src/types";
+import { contextRelayActivated } from "../../backend/src/codex/context-compat";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { buildResponsesWsData } from "../../backend/src/server/ws-bridge";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // The admission path already knew WHICH key matched and threw it away. These

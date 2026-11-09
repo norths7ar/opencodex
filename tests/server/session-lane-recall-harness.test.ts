@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import { saveConfig } from "../../src/config";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import { saveConfig } from "../../backend/src/config";
 import {
   MAX_ACTIVE_TURNS,
   MAX_ACTIVE_SESSION_LANES,
@@ -12,10 +12,10 @@ import {
   sessionLaneMetrics,
   tryAdmitTurn,
   type ActiveTurnLease,
-} from "../../src/server/lifecycle";
-import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
-import { startServer } from "../../src/server";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import { sessionLaneIdFromRequest } from "../../backend/src/server/request-log-conversation";
+import { startServer } from "../../backend/src/server";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { buildInitProviders } from "../../../src/cli/init";
-import { isOAuthProvider, listOAuthProviders } from "../../../src/oauth";
-import { deriveProviderPresets } from "../../../src/providers/derive";
+import { buildInitProviders } from "../../../backend/src/cli/init";
+import { isOAuthProvider, listOAuthProviders } from "../../../backend/src/oauth";
+import { deriveProviderPresets } from "../../../backend/src/providers/derive";
 
 // WP16 (devlog 350.100): the disabled OAuth shell was replaced by the real PKCE flow — the flow
 // itself is covered by tests/providers/cursor/cursor-oauth.test.ts. These tests cover cursor's provider-routing,
@@ -32,7 +32,7 @@ describe("Cursor provider routing + standalone OAuth module", () => {
   });
 
   test("OAuth module stays standalone — no local fs/process/http2 (network only via fetch)", async () => {
-    const source = await Bun.file("src/oauth/cursor.ts").text();
+    const source = await Bun.file("backend/src/oauth/cursor.ts").text();
 
     expect(source).not.toContain("node:fs");
     expect(source).not.toContain("node:http2");

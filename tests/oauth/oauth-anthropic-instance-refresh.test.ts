@@ -2,22 +2,22 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import { getValidAccessTokenForAccount, OAUTH_PROVIDERS, OAuthAccountPausedError, OAuthLoginRequiredError, OAuthTokenRefreshStaleError, refreshAnthropicAccountWithLock } from "../../src/oauth";
-import { AnthropicTokenError } from "../../src/oauth/anthropic";
-import { captureAnthropicCredentialOwner, captureAnthropicCredentialOwnerForInstance, newerClaudeCredentialForInstance } from "../../src/oauth/anthropic-continuity";
-import { bindAnthropicIdentity } from "../../src/oauth/anthropic-identity";
-import * as localTokens from "../../src/oauth/local-token-detect";
-import { AnthropicLocalCliImportError } from "../../src/oauth/store-anthropic-instance";
-import { __resetGuardianState, guardianSweep } from "../../src/oauth/token-guardian";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import { getValidAccessTokenForAccount, OAUTH_PROVIDERS, OAuthAccountPausedError, OAuthLoginRequiredError, OAuthTokenRefreshStaleError, refreshAnthropicAccountWithLock } from "../../backend/src/oauth";
+import { AnthropicTokenError } from "../../backend/src/oauth/anthropic";
+import { captureAnthropicCredentialOwner, captureAnthropicCredentialOwnerForInstance, newerClaudeCredentialForInstance } from "../../backend/src/oauth/anthropic-continuity";
+import { bindAnthropicIdentity } from "../../backend/src/oauth/anthropic-identity";
+import * as localTokens from "../../backend/src/oauth/local-token-detect";
+import { AnthropicLocalCliImportError } from "../../backend/src/oauth/store-anthropic-instance";
+import { __resetGuardianState, guardianSweep } from "../../backend/src/oauth/token-guardian";
 import {
   credentialGeneration, getAccountCredential, getAccountSet, getAuthRefreshIntentLockPath, getAuthRefreshIntentPath,
   mergeAccountCredential, readOAuthRefreshIntent, removeAccount, saveAccountCredential, saveCredential, setAccountPaused, setAnthropicAccountThreshold,
   setAnthropicAccountThresholdForInstance, writeOAuthRefreshIntent,
-} from "../../src/oauth/store";
-import { subscribeOAuthAccountRoutingPolicyChanges } from "../../src/lib/account-selection-events";
-import type { OAuthCredentials } from "../../src/oauth/types";
+} from "../../backend/src/oauth/store";
+import { subscribeOAuthAccountRoutingPolicyChanges } from "../../backend/src/lib/account-selection-events";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalEnv = { CODEX_HOME: process.env.CODEX_HOME, HOME: process.env.HOME, OPENCODEX_HOME: process.env.OPENCODEX_HOME, CLAUDE_CONFIG_DIR: process.env.CLAUDE_CONFIG_DIR };

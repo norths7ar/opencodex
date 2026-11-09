@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { normalizeMuseToolCatalog } from "../../src/adapters/openai-responses/muse-tool-catalog";
-import { tagHistoricalInputItems } from "../../src/responses/item-provenance";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { normalizeMuseToolCatalog } from "../../backend/src/adapters/openai-responses/muse-tool-catalog";
+import { tagHistoricalInputItems } from "../../backend/src/responses/item-provenance";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 

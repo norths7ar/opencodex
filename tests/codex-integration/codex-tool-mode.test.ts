@@ -4,12 +4,12 @@ import {
   normalizeRoutedCatalogEntry,
   ROUTED_CODEX_TOOL_MODE,
   type RawEntry,
-} from "../../src/codex/catalog/parsing";
-import { buildCatalogEntries } from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog/parsing";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
 import {
   collectDeclaredWireToolNames,
   undeclaredToolCallName,
-} from "../../src/server/responses-undeclared-tool-guard";
+} from "../../backend/src/server/responses-undeclared-tool-guard";
 
 describe("Codex tool mode configuration (#2106)", () => {
   test("applyRoutedCodexToolMode defaults to code_mode_only", () => {
@@ -100,7 +100,7 @@ describe("Codex tool mode configuration (#2106)", () => {
   });
 
   test("catalogHintsFromProviderConfig propagates codexToolMode", () => {
-    const { catalogHintsFromProviderConfig } = require("../../src/codex/catalog/provider-fetch");
+    const { catalogHintsFromProviderConfig } = require("../../backend/src/codex/catalog/provider-fetch");
     const hints = catalogHintsFromProviderConfig(
       "deepseek",
       {
@@ -114,7 +114,7 @@ describe("Codex tool mode configuration (#2106)", () => {
   });
 
   test("gatherRoutedModels custom model inherits provider codexToolMode when undiscovered", async () => {
-    const { gatherRoutedModels } = require("../../src/codex/catalog");
+    const { gatherRoutedModels } = require("../../backend/src/codex/catalog");
     const { withStubbedProviderFetch } = require("../helpers/catalog-provider-fetch");
     const config = {
       providers: {
@@ -139,7 +139,7 @@ describe("Codex tool mode configuration (#2106)", () => {
   });
 
   test("gatherRoutedModels custom model explicit codexToolMode overrides provider setting", async () => {
-    const { gatherRoutedModels } = require("../../src/codex/catalog");
+    const { gatherRoutedModels } = require("../../backend/src/codex/catalog");
     const { withStubbedProviderFetch } = require("../helpers/catalog-provider-fetch");
     const config = {
       providers: {
@@ -165,8 +165,8 @@ describe("Codex tool mode configuration (#2106)", () => {
   });
 
   test("buildCatalogEntries with codexForwardNativeCapabilityAlias applies codexToolMode = shell", () => {
-    const { buildCatalogEntries, NATIVE_DAYBREAK_BLUE_MODEL, upstreamNativeEntry } = require("../../src/codex/catalog");
-    const { CODEX_CUSTOM_MODEL_CATALOG_KIND, findNativeTemplate } = require("../../src/codex/catalog/parsing");
+    const { buildCatalogEntries, NATIVE_DAYBREAK_BLUE_MODEL, upstreamNativeEntry } = require("../../backend/src/codex/catalog");
+    const { CODEX_CUSTOM_MODEL_CATALOG_KIND, findNativeTemplate } = require("../../backend/src/codex/catalog/parsing");
     const nativeTemplate = () => findNativeTemplate({ models: [upstreamNativeEntry("gpt-5.6-sol")!] });
     const models = [{
       id: NATIVE_DAYBREAK_BLUE_MODEL,
@@ -186,7 +186,7 @@ describe("Codex tool mode configuration (#2106)", () => {
 
 
 describe("#2503 combo derivation preserves a member's verbosity opt-out", () => {
-  const { deriveComboCatalogModel } = require("../../src/codex/catalog/aggregation");
+  const { deriveComboCatalogModel } = require("../../backend/src/codex/catalog/aggregation");
   const combo = {
     name: "mixed-combo",
     targets: [

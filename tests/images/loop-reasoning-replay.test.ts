@@ -2,10 +2,10 @@ import { afterAll, beforeAll, beforeEach, describe, expect, mock, test } from "b
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import type { ImageBridgePlan } from "../../src/images/types";
-import type { ImageBridgeDeps } from "../../src/images/loop";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import type { ImageBridgePlan } from "../../backend/src/images/types";
+import type { ImageBridgeDeps } from "../../backend/src/images/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 /**
@@ -23,8 +23,8 @@ const PREV_HOME = process.env.OPENCODEX_HOME;
 // and restore only the ones captured: a setup that failed partway must not install an empty module.
 let realProgressStream: Record<string, unknown> | undefined;
 let realFulfill: Record<string, unknown> | undefined;
-let runWithImageBridgeProduction: typeof import("../../src/images/loop")["runWithImageBridge"];
-let fulfillResult: import("../../src/images/types").ImageCallResult = {
+let runWithImageBridgeProduction: typeof import("../../backend/src/images/loop")["runWithImageBridge"];
+let fulfillResult: import("../../backend/src/images/types").ImageCallResult = {
   ok: true, model: "grok-imagine-image-quality", prompt: "a cat",
   files: ["/test/img.png"], count: 1, markdown: "![image](/test/img.png)",
 };
@@ -32,9 +32,9 @@ let fulfillResult: import("../../src/images/types").ImageCallResult = {
 beforeAll(async () => {
   process.env.OPENCODEX_HOME = join(tmpdir(), "ocx-test-" + randomUUID());
   mock.restore();
-  realProgressStream = { ...(await import("../../src/web-search/progress-stream")) };
-  realFulfill = { ...(await import("../../src/images/fulfill")) };
-  mock.module("../../src/web-search/progress-stream", () => ({
+  realProgressStream = { ...(await import("../../backend/src/web-search/progress-stream")) };
+  realFulfill = { ...(await import("../../backend/src/images/fulfill")) };
+  mock.module("../../backend/src/web-search/progress-stream", () => ({
     ...realProgressStream,
     parseStreamWithProgress: async function* (_resp: Response, parse: (r: Response) => AsyncGenerator<AdapterEvent>, _opts: unknown) {
       for await (const e of parse(_resp)) yield e;
@@ -42,18 +42,18 @@ beforeAll(async () => {
     RoutedModelInactivityError: class extends Error { readonly timeoutMs = 0; },
     WebSearchStreamProtocolError: class extends Error { /* */ },
   }));
-  mock.module("../../src/images/fulfill", () => ({
-    fulfillImageCall: async (): Promise<import("../../src/images/types").ImageCallResult> => fulfillResult,
+  mock.module("../../backend/src/images/fulfill", () => ({
+    fulfillImageCall: async (): Promise<import("../../backend/src/images/types").ImageCallResult> => fulfillResult,
   }));
-  ({ runWithImageBridge: runWithImageBridgeProduction } = await import("../../src/images/loop"));
+  ({ runWithImageBridge: runWithImageBridgeProduction } = await import("../../backend/src/images/loop"));
 });
 
 afterAll(() => {
   if (PREV_HOME === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = PREV_HOME;
   mock.restore();
-  if (realProgressStream) { const real = realProgressStream; mock.module("../../src/web-search/progress-stream", () => real); }
-  if (realFulfill) { const real = realFulfill; mock.module("../../src/images/fulfill", () => real); }
+  if (realProgressStream) { const real = realProgressStream; mock.module("../../backend/src/web-search/progress-stream", () => real); }
+  if (realFulfill) { const real = realFulfill; mock.module("../../backend/src/images/fulfill", () => real); }
 });
 
 let streamQueue: AdapterEvent[][] = [];

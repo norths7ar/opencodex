@@ -2,7 +2,7 @@
 import type {
   CodexAppServerStateResponse,
   CodexRestartResponse,
-} from "../../src/lib/codex-restart-contract";
+} from "../../backend/src/lib/codex-restart-contract";
 
 export const NATIVE_OWNER_RESTART_REFUSAL = "Codex desktop restart is disabled in the native-owner fixture";
 

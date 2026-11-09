@@ -2,13 +2,13 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClaudeEnv, buildNativeClaudeEnv } from "../../src/cli/claude";
-import { entryParts, resolveSubagentForceModel, withSubagentContextMarker } from "../../src/claude/subagent-model";
-import { inspectSubagentForceStatus, subagentForceSupport } from "../../src/claude/subagent-force-status";
-import { extractOcxRouteDirective } from "../../src/claude/inbound-model-options";
-import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../src/config/diagnostics";
+import { buildClaudeEnv, buildNativeClaudeEnv } from "../../backend/src/cli/claude";
+import { entryParts, resolveSubagentForceModel, withSubagentContextMarker } from "../../backend/src/claude/subagent-model";
+import { inspectSubagentForceStatus, subagentForceSupport } from "../../backend/src/claude/subagent-force-status";
+import { extractOcxRouteDirective } from "../../backend/src/claude/inbound-model-options";
+import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../backend/src/config/diagnostics";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const config = (force?: string): OcxConfig => ({ port: 10100, providers: {}, defaultProvider: "openai", claudeCode: { ...(force === undefined ? {} : { subagentModelForce: force }) } });
 const deps = { forceAvailable: ["combo/tev-auto", "gpt-6.1-sol", "mock/model"], authDetect: {

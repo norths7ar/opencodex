@@ -7,8 +7,8 @@
  * to be made here on purpose.
  */
 import { describe, expect, test } from "bun:test";
-import { BASELINE_MATRIX, baselineCell } from "../../src/protocols/baseline";
-import { PROTOCOLS } from "../../src/protocols/contract";
+import { BASELINE_MATRIX, baselineCell } from "../../backend/src/protocols/baseline";
+import { PROTOCOLS } from "../../backend/src/protocols/contract";
 
 describe("baseline matrix shape", () => {
   test("has exactly one cell per inbound × upstream × stream", () => {

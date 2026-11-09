@@ -2,12 +2,12 @@ import { expect, test } from "bun:test";
 import { createServer, request } from "node:https";
 import { connect } from "node:tls";
 import type { Duplex } from "node:stream";
-import { createCertificateAuthority, issueServerLeaf } from "../../src/claude/intercept/local-ca";
-import { startDesktopRelay } from "../../src/codex/desktop-compatibility/relay-listener";
+import { createCertificateAuthority, issueServerLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { startDesktopRelay } from "../../backend/src/codex/desktop-compatibility/relay-listener";
 import { forwardProxy } from "../helpers/desktop-egress-fixture";
-import { UsageRelayController } from "../../src/codex/desktop-compatibility/usage-controller";
-import { createUsageControlledFetch } from "../../src/codex/desktop-compatibility/usage-controlled-fetch";
-import { controlledUsageSse } from "../../src/codex/desktop-compatibility/usage-sse-controller";
+import { UsageRelayController } from "../../backend/src/codex/desktop-compatibility/usage-controller";
+import { createUsageControlledFetch } from "../../backend/src/codex/desktop-compatibility/usage-controlled-fetch";
+import { controlledUsageSse } from "../../backend/src/codex/desktop-compatibility/usage-sse-controller";
 
 test("oversized SSE records pass through byte-for-byte and framing resumes at the next record", async () => {
   for (const lineEnding of ["\n", "\r", "\r\n"]) {

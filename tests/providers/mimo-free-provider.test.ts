@@ -1,6 +1,6 @@
 import { describe, expect, test, mock, beforeEach } from "bun:test";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { providerConfigSeed, deriveKeyLoginMap, deriveFeaturedProviderIds, deriveProviderPresets } from "../../src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { providerConfigSeed, deriveKeyLoginMap, deriveFeaturedProviderIds, deriveProviderPresets } from "../../backend/src/providers/derive";
 import {
   getMimoClientId,
   resetMimoClientIdCache,
@@ -10,13 +10,13 @@ import {
   MIMO_SYSTEM_MARKER,
   MIMO_CHAT_URL,
   createMimoFreeAdapter,
-} from "../../src/adapters/mimo-free";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/mimo-free";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 import { budgetOwner } from "../helpers/send-budget-owner";
 
 for (const phase of ["bootstrap", "chat", "401-replay"] as const) test.each([307, 308])(`MiMo ${phase} never follows %i`, async status => {

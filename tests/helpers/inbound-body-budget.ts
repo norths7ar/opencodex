@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import {
   inboundBodyBudget,
   MAX_QUEUED_INBOUND_BODIES,
-} from "../../src/server/inbound-body-budget";
+} from "../../backend/src/server/inbound-body-budget";
 
 /** Fill admission counters and its queue without allocating request-sized bodies. */
 export async function saturateInboundBodyBudget(): Promise<() => Promise<void>> {

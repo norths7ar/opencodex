@@ -2,11 +2,11 @@ import { afterEach, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { runInNewContext } from "node:vm";
-import { detectInitial, LOCALES } from "../../gui/src/i18n/shared";
+import { detectInitial, LOCALES } from "../../frontend/src/i18n/shared";
 
 // The inline <head> script in gui/index.html sets <html lang> before first paint so the
 // :lang() font stacks in styles.css apply without a flash. It must agree with detectInitial().
-const html = readFileSync(join(import.meta.dir, "../../gui/index.html"), "utf8");
+const html = readFileSync(join(import.meta.dir, "../../frontend/index.html"), "utf8");
 const bootScript = html.match(/<script>([\s\S]*?)<\/script>/)?.[1] ?? "";
 
 const originalLocalStorage = Object.getOwnPropertyDescriptor(globalThis, "localStorage");

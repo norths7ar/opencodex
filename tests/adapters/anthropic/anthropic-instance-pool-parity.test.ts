@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { createAnthropicInstanceFixture, INSTANCE_FIXTURE_INSTANCES, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
-import type { AnthropicAccountPoolConfig } from "../../../src/types/anthropic-account-pool";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
+import type { AnthropicAccountPoolConfig } from "../../../backend/src/types/anthropic-account-pool";
 
 let f: AnthropicInstanceFixture;
 beforeEach(async () => { f = await createAnthropicInstanceFixture(); await f.seed(); });
@@ -48,7 +48,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
       expect(own.resolveAnthropicAccountForSession("threshold", f.config).accountId).toBe(f.ids[1]);
       await f.store.setAnthropicAccountThresholdForInstance(instance, f.ids[0], 0);
       expect(own.resolveAnthropicAccountForSession("zero", f.config).accountId).toBe(f.ids[0]);
-      const thresholds = await import("../../../src/oauth/anthropic-account-threshold");
+      const thresholds = await import("../../../backend/src/oauth/anthropic-account-threshold");
       const row = f.store.getAccountSet(instance)!.accounts.find(account => account.id === f.ids[0])!;
       expect(thresholds.effectiveAnthropicAccountThresholdForInstance(instance, f.config, row)).toBe(0);
       expect(thresholds.effectiveAnthropicAccountThresholdForInstance(other, f.config)).toBe(80);
@@ -56,7 +56,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
     test("model rules preserve declared order and strict/fallback stay inside this instance", async () => {
       pool(instance).strategy = "round-robin";
       pool(instance).routes = [{ name: "fixture-route", match: "claude-sonnet-*", accounts: [f.ids[1]], fallback: false }];
-      const { resolveAnthropicModelRouteForInstance } = await import("../../../src/oauth/anthropic-model-routes");
+      const { resolveAnthropicModelRouteForInstance } = await import("../../../backend/src/oauth/anthropic-model-routes");
       const own = f.routing.anthropicRoutingFor(instance);
       const route = resolveAnthropicModelRouteForInstance(instance, f.config, f.model);
       expect(route.decision).toEqual({ position: 1, accounts: [f.ids[1]], fallback: false });
@@ -106,7 +106,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
       await f.store.setAccountPaused(instance, f.ids[0], true);
       await f.store.setAccountPaused(instance, f.ids[1], true);
       expect(own.resolveAnthropicAccountForSession("paused", f.config).reason).toBe("paused");
-      const { OAuthAccountPausedError } = await import("../../../src/oauth");
+      const { OAuthAccountPausedError } = await import("../../../backend/src/oauth");
       await expect(own.resolveAnthropicDispatchAccountId(f.config)).rejects.toBeInstanceOf(OAuthAccountPausedError);
       for (const id of f.ids) await f.store.setAccountPaused(instance, id, false);
       const now = Date.now();
@@ -119,7 +119,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
     });
     test("pool settings DTO and helper route use this instance's config", async () => {
       Object.assign(pool(instance), { autoSwitchThreshold: 23, quotaWindow: "weekly", routes: [{ name: "fixture-route", match: f.model, accounts: [f.ids[1]] }], nativeMessages: false });
-      const { unifiedPoolSettingsDto, poolSettingsCapability } = await import("../../../src/oauth/pool-settings-capability");
+      const { unifiedPoolSettingsDto, poolSettingsCapability } = await import("../../../backend/src/oauth/pool-settings-capability");
       expect(poolSettingsCapability(instance, f.config.providers[instance])).toBe("anthropic");
       expect(unifiedPoolSettingsDto(f.config, instance, "anthropic")).toMatchObject({ provider: instance, autoSwitchThreshold: 23, quotaWindow: "weekly", nativeMessages: false });
       expect(unifiedPoolSettingsDto(f.config, other, "anthropic")).toMatchObject({ provider: other, autoSwitchThreshold: 80, quotaWindow: "five-hour", nativeMessages: true });

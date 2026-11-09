@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { reconcileSuccessfulModelDiscoveries } from "../../src/providers/new-model-policy";
+import type { OcxConfig } from "../../backend/src/types";
+import { reconcileSuccessfulModelDiscoveries } from "../../backend/src/providers/new-model-policy";
 import {
   antigravityEffortFamilyIds, antigravityFamilyDisabled, collapseAntigravityPublicModels,
   projectAntigravitySelectedModels, type AntigravityEffortFamilyRow,
-} from "../../src/providers/antigravity-effort-families";
+} from "../../backend/src/providers/antigravity-effort-families";
 
 const provider = "google-antigravity";
 const base = "claude-opus-5-5";

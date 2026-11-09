@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { decodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { decodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import { applyFinalRouteRequestNormalization } from "../../backend/src/server/responses/core-normalize";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 // Provider policy hideRawReasoning: a routed provider's chain of thought stops reaching the

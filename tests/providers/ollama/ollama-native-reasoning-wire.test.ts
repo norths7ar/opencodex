@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
-import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect } from "../../../src/codex/catalog";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
+import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect } from "../../../backend/src/codex/catalog";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
-import { REASONING_EFFORT_OMIT_SENTINEL } from "../../../src/reasoning-effort";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { REASONING_EFFORT_OMIT_SENTINEL } from "../../../backend/src/reasoning-effort";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const gatherRoutedModels: typeof gatherRoutedModelsDirect = (config, options) =>
   gatherRoutedModelsDirect(withStubbedProviderFetch(config), options);

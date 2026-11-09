@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { tapAnthropicSseForLog, type PassthroughBodyGuard, type PassthroughFinalizeMeta } from "../../src/server/messages-shared";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { tapAnthropicSseForLog, type PassthroughBodyGuard, type PassthroughFinalizeMeta } from "../../backend/src/server/messages-shared";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 const encoder = new TextEncoder();
 const start = 'data: {"type":"message_start","message":{"usage":{"input_tokens":12,"output_tokens":0}}}';

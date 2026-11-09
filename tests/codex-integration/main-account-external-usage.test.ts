@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from "bun:test";
 import { EXTERNAL_USAGE_QUIET_MS, EXTERNAL_USAGE_TTL_MS, getMainAccountExternalUsageWarning,
-  noteMainAccountActivity, observeMainAccountUsage, resetMainAccountExternalUsageForTests } from "../../src/codex/main-account-external-usage";
+  noteMainAccountActivity, observeMainAccountUsage, resetMainAccountExternalUsageForTests } from "../../backend/src/codex/main-account-external-usage";
 const now = 2_000_000_000_000;
 const resetAtMs = now + 10 * 60 * 60_000;
 const reading = (percent: number, reset = resetAtMs) => [{ kind: "short" as const, percent, resetAtMs: reset }];

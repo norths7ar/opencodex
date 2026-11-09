@@ -9,17 +9,17 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect, mock, test } from "
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../../src/adapters/base";
-import { clearAnthropicAccountPoolState } from "../../../src/oauth/anthropic-routing";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { ProviderAdapter } from "../../../backend/src/adapters/base";
+import { clearAnthropicAccountPoolState } from "../../../backend/src/oauth/anthropic-routing";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 
 const previousHome = process.env.OPENCODEX_HOME;
 let testHome = "";
-let handleResponses: typeof import("../../../src/server/responses")["handleResponses"];
+let handleResponses: typeof import("../../../backend/src/server/responses")["handleResponses"];
 let kiroBuilds: Array<{ key: string; profileArn?: string; apiRegion?: string }> = [];
 
 function kiroContinuationEvents(phase: string): AdapterEvent[] {
@@ -69,9 +69,9 @@ function kiroFixtureAdapter(provider: OcxProviderConfig): ProviderAdapter {
 }
 
 beforeAll(async () => {
-  const actualResolver = await import("../../../src/server/adapter-resolve");
+  const actualResolver = await import("../../../backend/src/server/adapter-resolve");
   const actualResolveAdapter = actualResolver.resolveAdapter;
-  mock.module("../../../src/server/adapter-resolve", () => ({
+  mock.module("../../../backend/src/server/adapter-resolve", () => ({
     ...actualResolver,
     resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
       if (
@@ -82,7 +82,7 @@ beforeAll(async () => {
     },
   }));
 
-  ({ handleResponses } = await import("../../../src/server/responses"));
+  ({ handleResponses } = await import("../../../backend/src/server/responses"));
 });
 
 let releaseSpendHome: (() => void) | undefined;

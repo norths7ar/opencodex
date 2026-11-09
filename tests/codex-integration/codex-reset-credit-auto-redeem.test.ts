@@ -9,10 +9,10 @@ import {
   planAutoRedeem,
   resolveResetCreditAutoRedeemSettings,
   type ResetCredit,
-} from "../../src/codex/reset-credit-auto-redeem";
+} from "../../backend/src/codex/reset-credit-auto-redeem";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
-import { readConfigGeneration } from "../../src/config";
+import { readConfigGeneration } from "../../backend/src/config";
 
 const T0 = Date.parse("2026-09-02T10:00:00Z");
 const MIN = 60_000;
@@ -277,9 +277,9 @@ describe("reset-credit auto-redeemer runtime (#822)", () => {
 
   test("two processes reserve one durable id before either consume settles", async () => {
     const journalFile = join(dir, "j.json");
-    const moduleUrl = pathToFileURL(repoPath("src/codex/reset-credit-auto-redeem.ts")).href;
-    const aclUrl = pathToFileURL(repoPath("src/lib/windows-secret-acl.ts")).href;
-    const principalUrl = pathToFileURL(repoPath("src/lib/windows-user-principal.ts")).href;
+    const moduleUrl = pathToFileURL(repoPath("backend/src/codex/reset-credit-auto-redeem.ts")).href;
+    const aclUrl = pathToFileURL(repoPath("backend/src/lib/windows-secret-acl.ts")).href;
+    const principalUrl = pathToFileURL(repoPath("backend/src/lib/windows-user-principal.ts")).href;
     const deadline = performance.now() + 25_000;
     const markerPath = (name: string) => join(dir, name + ".json");
     const publish = (name: string) => {

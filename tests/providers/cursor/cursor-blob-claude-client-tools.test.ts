@@ -4,21 +4,21 @@ import {
   handleCursorNativeKv,
   resetCursorBlobStateForTests,
   setCursorBlobLimitsForTests,
-} from "../../../src/adapters/cursor/native-exec";
-import { resetAppOwnedMemoryForTests } from "../../../src/lib/app-owned-memory";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { applyCursorToolBudget, createCursorRequest, CURSOR_TOOL_BYTES_LIMIT } from "../../../src/adapters/cursor/request-builder";
-import { buildCursorToolDefinitions, cursorMcpToolEncodedSize, cursorMcpToolsEncodedSize } from "../../../src/adapters/cursor/tool-definitions";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxTool } from "../../../src/types";
-import { resetCursorCallIdProvenanceForTests } from "../../../src/adapters/cursor/call-id";
+} from "../../../backend/src/adapters/cursor/native-exec";
+import { resetAppOwnedMemoryForTests } from "../../../backend/src/lib/app-owned-memory";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { applyCursorToolBudget, createCursorRequest, CURSOR_TOOL_BYTES_LIMIT } from "../../../backend/src/adapters/cursor/request-builder";
+import { buildCursorToolDefinitions, cursorMcpToolEncodedSize, cursorMcpToolsEncodedSize } from "../../../backend/src/adapters/cursor/tool-definitions";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxTool } from "../../../backend/src/types";
+import { resetCursorCallIdProvenanceForTests } from "../../../backend/src/adapters/cursor/call-id";
 import {
   AgentClientMessageSchema,
   ConversationStepSchema,
   ConversationTurnStructureSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 beforeEach(() => {
   resetCursorBlobStateForTests();

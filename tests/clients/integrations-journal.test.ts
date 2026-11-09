@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { appendFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigDir } from "../../src/config";
-import { SNAPSHOT_RETENTION, type JournalEntry } from "../../src/integrations/journal";
-import type { OwnershipRecord } from "../../src/integrations/ownership";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
+import { getConfigDir } from "../../backend/src/config";
+import { SNAPSHOT_RETENTION, type JournalEntry } from "../../backend/src/integrations/journal";
+import type { OwnershipRecord } from "../../backend/src/integrations/ownership";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -403,9 +403,9 @@ describe("the operation-kind union agrees across the three trees that redeclare 
   }
 
   test("the store, the management envelope and the GUI adapter list the same kinds", () => {
-    const store = kindsIn("src/integrations/journal.ts", /export type OperationKind =[^;]*/);
-    const route = kindsIn("src/server/management/integration-routes.ts", /kind: "apply"[^;]*/);
-    const gui = kindsIn("gui/src/pages/integrations/integration-api.ts", /kind: "apply"[^;]*/);
+    const store = kindsIn("backend/src/integrations/journal.ts", /export type OperationKind =[^;]*/);
+    const route = kindsIn("backend/src/server/management/integration-routes.ts", /kind: "apply"[^;]*/);
+    const gui = kindsIn("frontend/src/pages/integrations/integration-api.ts", /kind: "apply"[^;]*/);
 
     // Named explicitly so a kind silently dropped from ALL THREE still fails.
     expect(store).toEqual(["apply", "disable", "overwrite", "refresh", "restore"]);
@@ -419,10 +419,10 @@ describe("the operation-kind union agrees across the three trees that redeclare 
      * is exhaustive over the GUI's own union, so a kind missing from BOTH the
      * GUI union and the map type-checks clean and renders the raw key.
      */
-    const map = readFileSync(repoPath("gui/src/pages/integrations/overview-clients.ts"), "utf8");
+    const map = readFileSync(repoPath("frontend/src/pages/integrations/overview-clients.ts"), "utf8");
     const block = map.match(/JOURNAL_KIND_KEY[^}]*}/);
     if (!block) throw new Error("JOURNAL_KIND_KEY is gone from overview-clients.ts");
-    for (const kind of kindsIn("src/integrations/journal.ts", /export type OperationKind =[^;]*/)) {
+    for (const kind of kindsIn("backend/src/integrations/journal.ts", /export type OperationKind =[^;]*/)) {
       expect(block[0]).toContain(`${kind}: "integrations.kind.${kind}"`);
     }
   });

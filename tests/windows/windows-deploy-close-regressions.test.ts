@@ -29,10 +29,10 @@ describe("update-job restart avoids the shell-less .cmd EINVAL (Windows, bun/sou
     // Service reinstall still runs (with bake) even when reclaim warns; direct start refuses to hop.
     expect(src).toContain("refusing to hop");
     expect(src).toContain("runtimeTrusted");
-    expect(read("src/cli/index.ts")).toContain("allowEphemeralFallback: !hardPin");
-    expect(read("src/cli/index.ts")).toContain("preferRetryMs: hardPin ? 5_000 : 750");
-    expect(read("src/cli/dispatch.ts")).toContain("Not opening the GUI");
-    expect(read("src/server/ports.ts")).toContain("allowEphemeralFallback");
+    expect(read("backend/src/cli/index.ts")).toContain("allowEphemeralFallback: !hardPin");
+    expect(read("backend/src/cli/index.ts")).toContain("preferRetryMs: hardPin ? 5_000 : 750");
+    expect(read("backend/src/cli/dispatch.ts")).toContain("Not opening the GUI");
+    expect(read("backend/src/server/ports.ts")).toContain("allowEphemeralFallback");
   });
   test("Windows GUI update worker is launched without inheriting the proxy LISTEN socket", () => {
     // Direct spawn() inherits Bun.serve's LISTEN handle → ghost LISTEN with dead parent PID.
@@ -64,7 +64,7 @@ describe("update-job restart avoids the shell-less .cmd EINVAL (Windows, bun/sou
     // cannot drift apart again. Follow the invariant to where it lives; the
     // matching rules themselves are covered by windows-service-wrappers.test.ts.
     expect(restart).toMatch(/const paths = \{\s*scriptPath: join\(getConfigDir\(\), "opencodex-service.cmd"\),\s*launcherPath: join\(getConfigDir\(\), "opencodex-service-launcher.vbs"\),\s*\};\s*if \(!authorizeMutation\("service"\)\) return;\s*guardedKillWindowsWrappers\(authorizeMutation, paths\);/);
-    expect(read("src/lib/windows-service-wrappers.ts")).toContain("$_.ProcessId -eq $PID");
+    expect(read("backend/src/lib/windows-service-wrappers.ts")).toContain("$_.ProcessId -eq $PID");
     // Pinned-child cleanup is exercised through the retry loop in update/update-job.test.ts,
     // including exited children, live retry/final cleanup, and successful health probes.
   });
@@ -104,11 +104,11 @@ describe("systemd detection tolerates a no-DBUS SSH session (F9)", () => {
 });
 
 describe("server bind canonicalizes explicit localhost but preserves wildcards (F4 symmetry)", () => {
-  const src = read("src/server/index.ts");
+  const src = read("backend/src/server/index.ts");
   test("literal localhost binds to 127.0.0.1; 0.0.0.0/:: exposure is untouched", () => {
     // The normalization lives in src/server/bind-host.ts so liveness probes share the same spelling.
     expect(src).toContain("const bindHost = normalizeBindHostname(config.hostname);");
-    const bindHostSrc = read("src/server/bind-host.ts");
+    const bindHostSrc = read("backend/src/server/bind-host.ts");
     expect(bindHostSrc).toContain("const configuredHost = hostname?.trim();");
     expect(bindHostSrc).toContain('!configuredHost || /^localhost\\.?$/i.test(configuredHost) ? "127.0.0.1" : configuredHost');
     // Must not blanket-rewrite the PUBLIC bind host — that would break intentional 0.0.0.0

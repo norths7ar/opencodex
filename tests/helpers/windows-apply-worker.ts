@@ -1,11 +1,11 @@
 /** Owned offline fixture driver, never a production dispatch or installer input. */
-import { applyCodexCliUpdate } from "../../src/codex/cli-update-apply";
-import { createCodexCliWorkerLifetime } from "../../src/codex/cli-update-worker";
-import { allocateCodexCliUpdateGateOwner, createWorkerCommitWindow, codexCliUpdateIsCancelled } from "../../src/codex/cli-update-selection-gate";
-import { startWindowsCliChild } from "../../src/codex/windows-cli-child";
-import { setWindowsOwnerAclAsyncRunnerForTests } from "../../src/lib/windows-owner-acl";
-import type { openWindowsCliApplyAuthority } from "../../src/codex/cli-update-job-store-windows";
-import type { WindowsApplyAcquisition, WindowsApplyAuthorityPins } from "../../src/codex/cli-update-job-store-windows";
+import { applyCodexCliUpdate } from "../../backend/src/codex/cli-update-apply";
+import { createCodexCliWorkerLifetime } from "../../backend/src/codex/cli-update-worker";
+import { allocateCodexCliUpdateGateOwner, createWorkerCommitWindow, codexCliUpdateIsCancelled } from "../../backend/src/codex/cli-update-selection-gate";
+import { startWindowsCliChild } from "../../backend/src/codex/windows-cli-child";
+import { setWindowsOwnerAclAsyncRunnerForTests } from "../../backend/src/lib/windows-owner-acl";
+import type { openWindowsCliApplyAuthority } from "../../backend/src/codex/cli-update-job-store-windows";
+import type { WindowsApplyAcquisition, WindowsApplyAuthorityPins } from "../../backend/src/codex/cli-update-job-store-windows";
 import { ptr } from "bun:ffi";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { win32 } from "node:path";

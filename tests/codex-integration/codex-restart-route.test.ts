@@ -11,22 +11,22 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { startServer } from "../../src/server";
+import { startServer } from "../../backend/src/server";
 import { helperPath } from "../helpers/repo-root";
 import { nativeOwnerRestartService, NATIVE_OWNER_RESTART_REFUSAL } from "../helpers/native-owner-restart-service";
-import { handleSystemRoutes } from "../../src/server/management/system-routes";
-import type { ManagementContext } from "../../src/server/management/context";
+import { handleSystemRoutes } from "../../backend/src/server/management/system-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
 import {
   CODEX_APP_SERVER_STATE_PATH,
   CODEX_RESTART_PATH,
   isCodexAppServerStateResponse,
   isCodexRestartResponse,
-} from "../../src/lib/codex-restart-contract";
+} from "../../backend/src/lib/codex-restart-contract";
 import type {
   CodexAppServerStateResponse,
   CodexRestartResponse,
-} from "../../src/lib/codex-restart-contract";
-import { loadConfig } from "../../src/config";
+} from "../../backend/src/lib/codex-restart-contract";
+import { loadConfig } from "../../backend/src/config";
 
 const STOPPED: CodexRestartResponse = {
   success: true,

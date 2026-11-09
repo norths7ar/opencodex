@@ -9,9 +9,9 @@ import {
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
   createLocalAttestationSecret,
-} from "../../src/lib/local-management-attestation";
-import { SYSTEM_RESTART_CAPABILITY_VERSION } from "../../src/lib/system-restart-contract";
-import { findLiveProxy, proveLiveProxyOwnedByHome, proxyIdentityAt, type LivenessIo } from "../../src/server/proxy-liveness";
+} from "../../backend/src/lib/local-management-attestation";
+import { SYSTEM_RESTART_CAPABILITY_VERSION } from "../../backend/src/lib/system-restart-contract";
+import { findLiveProxy, proveLiveProxyOwnedByHome, proxyIdentityAt, type LivenessIo } from "../../backend/src/server/proxy-liveness";
 
 const PID = 4242;
 const PORT = 10100;

@@ -7,7 +7,7 @@ import {
   responseStatePersistPendingForTests,
   runPendingResponseStatePersistForTests,
   setResponseStatePersistAttemptHookForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome;

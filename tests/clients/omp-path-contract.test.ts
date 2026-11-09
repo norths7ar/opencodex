@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ompModelsConfigPath } from "../../src/clients/config-export";
+import { ompModelsConfigPath } from "../../backend/src/clients/config-export";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function withTempHome(run: (home: string) => void): void {

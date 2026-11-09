@@ -3,9 +3,9 @@ import { describe, expect, test } from "bun:test";
 describe("Codex auth modal status feedback", () => {
   test("keeps a distinct submitted/waiting state for manual code login", async () => {
     const [reducer, oauth, waiting] = await Promise.all([
-      Bun.file("gui/src/components/add-codex-account-reducer.ts").text(),
-      Bun.file("gui/src/components/use-add-codex-account-oauth.ts").text(),
-      Bun.file("gui/src/components/add-codex-account-waiting-step.tsx").text(),
+      Bun.file("frontend/src/components/add-codex-account-reducer.ts").text(),
+      Bun.file("frontend/src/components/use-add-codex-account-oauth.ts").text(),
+      Bun.file("frontend/src/components/add-codex-account-waiting-step.tsx").text(),
     ]);
     expect(reducer).toContain('export type ManualCodeState = "idle" | "submitting" | "waiting"');
     expect(reducer).toContain('manualCodeState: "idle"');
@@ -24,12 +24,12 @@ describe("Codex auth modal status feedback", () => {
 
   test("defines the new status copy in every shipped GUI locale", async () => {
     const localePaths = [
-      "gui/src/i18n/en.ts",
-      "gui/src/i18n/de.ts",
-      "gui/src/i18n/ja.ts",
-      "gui/src/i18n/ko.ts",
-      "gui/src/i18n/ru.ts",
-      "gui/src/i18n/zh.ts",
+      "frontend/src/i18n/en.ts",
+      "frontend/src/i18n/de.ts",
+      "frontend/src/i18n/ja.ts",
+      "frontend/src/i18n/ko.ts",
+      "frontend/src/i18n/ru.ts",
+      "frontend/src/i18n/zh.ts",
     ];
     const locales = await Promise.all(localePaths.map(path => Bun.file(path).text()));
     for (const source of locales) {

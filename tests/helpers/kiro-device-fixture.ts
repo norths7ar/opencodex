@@ -1,8 +1,8 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearKiroDeviceFlowsForTests, setKiroDeviceClockForTests, setKiroDevicePostForTests } from "../../src/oauth/kiro-device-login";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { clearKiroDeviceFlowsForTests, setKiroDeviceClockForTests, setKiroDevicePostForTests } from "../../backend/src/oauth/kiro-device-login";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "./remove-tree";
 
 export const profileArn = "arn:aws:codewhisperer:us-east-1:123456789012:profile/example";

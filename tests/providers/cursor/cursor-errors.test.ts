@@ -6,14 +6,14 @@ import {
   isCursorIncompleteToolCallMessage,
   isCursorInvalidArgumentError,
   safeCursorErrorMessage,
-} from "../../../src/adapters/cursor/cursor-errors";
+} from "../../../backend/src/adapters/cursor/cursor-errors";
 import {
   inferCursorContextWindow,
   recordObservedCursorContextWindow,
   resetObservedCursorContextWindowsForTests,
-} from "../../../src/adapters/cursor/discovery";
-import { createCursorProtobufEventState, finalizeTurnEvents } from "../../../src/adapters/cursor/protobuf-events";
-import { inferHttpStatusFromAdapterMessage } from "../../../src/lib/errors";
+} from "../../../backend/src/adapters/cursor/discovery";
+import { createCursorProtobufEventState, finalizeTurnEvents } from "../../../backend/src/adapters/cursor/protobuf-events";
+import { inferHttpStatusFromAdapterMessage } from "../../../backend/src/lib/errors";
 
 describe("classifyCursorError", () => {
   test("rate limit and resource exhaustion stay distinct", () => {

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { catalogHintsFromModelsApiItem, discoveredPricingStatus } from "../../src/codex/catalog/provider-fetch";
-import { deriveEntry } from "../../src/codex/catalog/sync";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { listManagementModelRows } from "../../src/server/management/model-rows";
+import { catalogHintsFromModelsApiItem, discoveredPricingStatus } from "../../backend/src/codex/catalog/provider-fetch";
+import { deriveEntry } from "../../backend/src/codex/catalog/sync";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { listManagementModelRows } from "../../backend/src/server/management/model-rows";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Regression coverage for #3666 — no way to filter free models in the Dashboard catalog.

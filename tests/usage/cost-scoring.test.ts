@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { costEvidenceForCandidate, costScore } from "../../src/routing/cost";
-import { evaluatePolicyProfile, COST_UNKNOWN_PENALTY_SCORE } from "../../src/routing/evaluator";
-import type { OcxConfig } from "../../src/types";
+import { costEvidenceForCandidate, costScore } from "../../backend/src/routing/cost";
+import { evaluatePolicyProfile, COST_UNKNOWN_PENALTY_SCORE } from "../../backend/src/routing/evaluator";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

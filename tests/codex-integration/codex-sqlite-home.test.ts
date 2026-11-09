@@ -3,9 +3,9 @@ import { mkdtempSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-import { resolveCodexHistoryJobTarget } from "../../src/codex/history-job";
-import { legacyHistoryBackupPathFor, resolveExistingHistoryBackupPath } from "../../src/codex/history-provider";
-import { resolveCodexLogsDbPath, resolveCodexSqliteHome, resolveCodexStateDbPath } from "../../src/codex/paths";
+import { resolveCodexHistoryJobTarget } from "../../backend/src/codex/history-job";
+import { legacyHistoryBackupPathFor, resolveExistingHistoryBackupPath } from "../../backend/src/codex/history-provider";
+import { resolveCodexLogsDbPath, resolveCodexSqliteHome, resolveCodexStateDbPath } from "../../backend/src/codex/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalCodexHome = process.env.CODEX_HOME;

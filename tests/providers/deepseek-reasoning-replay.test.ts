@@ -7,16 +7,16 @@
  * still stripping proxy-minted `ocxr1` envelopes no upstream can decrypt.
  */
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction, sanitizeReasoningInputContent } from "../../src/adapters/openai-responses";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction, sanitizeReasoningInputContent } from "../../backend/src/adapters/openai-responses";
 import {
   notePlaintextReasoningDropped,
   plaintextReasoningDroppedNotice,
   resetPlaintextReasoningNoticesForTests,
-} from "../../src/adapters/openai-responses/plaintext-reasoning-notice";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { OCX_REASONING_PREFIX } from "../../src/responses/reasoning-envelope";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/openai-responses/plaintext-reasoning-notice";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { OCX_REASONING_PREFIX } from "../../backend/src/responses/reasoning-envelope";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

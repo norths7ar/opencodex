@@ -11,7 +11,7 @@ import { repoPath } from "../helpers/repo-root";
  * live owner's) and never once cleanup began; the exit cleanup stops it before anything restores
  * native Codex, so it can never re-point routing a stop teardown just put back.
  */
-const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
 function slice(from: string, to: string): string {
   const at = cliSource.indexOf(from);

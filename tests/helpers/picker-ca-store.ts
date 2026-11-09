@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import type { PickerCaStore } from "../../src/claude/intercept/picker-ca-store";
+import type { PickerCaStore } from "../../backend/src/claude/intercept/picker-ca-store";
 
 /** Test-only private fixture transport; production never stores signing keys in files. */
 export function filePickerCaStore(path: string): PickerCaStore {

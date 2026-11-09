@@ -13,15 +13,15 @@ import { join } from "node:path";
 import {
   AnthropicAccountCooldownError, anthropicPoolCooldownError, clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum,
   getAnthropicAccountHealthSnapshot, recordAnthropicAccount429, recordAnthropicAccountRefusal,
-} from "../../../src/oauth/anthropic-routing";
-import { claimAnthropicFamilyRevalidation, clearAllAnthropicFamilyQuota, observeAnthropicFamilyQuota } from "../../../src/oauth/anthropic-model-quota";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, resetProviderQuotaReconcileStateForTests } from "../../../src/providers/quota";
-import { clearResponseStateForTests } from "../../../src/responses/state";
-import { handleResponses } from "../../../src/server/responses";
-import { anthropicPoolCooldownResponse } from "../../../src/server/responses/core-errors";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/anthropic-routing";
+import { claimAnthropicFamilyRevalidation, clearAllAnthropicFamilyQuota, observeAnthropicFamilyQuota } from "../../../backend/src/oauth/anthropic-model-quota";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, resetProviderQuotaReconcileStateForTests } from "../../../backend/src/providers/quota";
+import { clearResponseStateForTests } from "../../../backend/src/responses/state";
+import { handleResponses } from "../../../backend/src/server/responses";
+import { anthropicPoolCooldownResponse } from "../../../backend/src/server/responses/core-errors";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;

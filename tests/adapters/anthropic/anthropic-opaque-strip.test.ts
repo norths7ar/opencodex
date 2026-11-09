@@ -4,10 +4,10 @@
  * redacted_thinking blocks are not replayed. Without the flag they replay verbatim.
  */
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import { parseRequest } from "../../../src/responses/parser";
-import { encodeReasoningEnvelope } from "../../../src/responses/reasoning-envelope";
-import type { OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { encodeReasoningEnvelope } from "../../../backend/src/responses/reasoning-envelope";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

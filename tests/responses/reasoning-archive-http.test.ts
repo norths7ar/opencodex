@@ -4,8 +4,8 @@ import * as fs from "node:fs";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createServeOptions } from "../../src/server/index/serve-options";
-import { reasoningArchiveErrorResponse } from "../../src/server/responses/reasoning-archive-error";
+import { createServeOptions } from "../../backend/src/server/index/serve-options";
+import { reasoningArchiveErrorResponse } from "../../backend/src/server/responses/reasoning-archive-error";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { drainCompactionResponseState, installCompactionRoutingAclFixture,
   keyProviderConfig, removeCompactionFixture } from "../helpers/compaction-routing-fixtures";

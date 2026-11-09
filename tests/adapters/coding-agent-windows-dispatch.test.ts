@@ -5,14 +5,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { PassThrough, Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { inspectBatchDispatcher } from "../../src/adapters/coding-agent/batch-dispatcher";
-import { clearCodingAgentBinaryCache, resolveCodingAgentBinary, whichFromPath } from "../../src/adapters/coding-agent/profile";
-import type { SpawnFn } from "../../src/adapters/coding-agent/turn";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { QODER_CN_PROFILE, QODER_GLOBAL_PROFILE } from "../../src/adapters/qoder/profiles";
-import { CLAUDE_CLI_PROFILE } from "../../src/adapters/claude-cli/profiles";
-import { createClaudeCliAdapter } from "../../src/adapters/claude-cli/adapter";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { inspectBatchDispatcher } from "../../backend/src/adapters/coding-agent/batch-dispatcher";
+import { clearCodingAgentBinaryCache, resolveCodingAgentBinary, whichFromPath } from "../../backend/src/adapters/coding-agent/profile";
+import type { SpawnFn } from "../../backend/src/adapters/coding-agent/turn";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { QODER_CN_PROFILE, QODER_GLOBAL_PROFILE } from "../../backend/src/adapters/qoder/profiles";
+import { CLAUDE_CLI_PROFILE } from "../../backend/src/adapters/claude-cli/profiles";
+import { createClaudeCliAdapter } from "../../backend/src/adapters/claude-cli/adapter";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // #7518: the official Qoder CN installer puts entry\qodercn.cmd (a PowerShell dispatcher) and

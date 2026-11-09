@@ -14,7 +14,7 @@ import {
   mcodeHomeDir,
   type ExportContext,
   type McodeGeneratedConfig,
-} from "../../src/clients/config-export";
+} from "../../backend/src/clients/config-export";
 import {
   buildMmxEnv,
   finishMmxClientCleanup,
@@ -26,8 +26,8 @@ import {
   isStandaloneInformationalInvocation,
   startMmxTextBridge,
   usableMinimaxLiveProxy,
-} from "../../src/cli/minimax";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/cli/minimax";
+import type { OcxConfig } from "../../backend/src/types";
 import { fixturePath } from "../helpers/repo-root";
 
 const CONFIG = {

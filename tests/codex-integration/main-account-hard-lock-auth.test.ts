@@ -13,36 +13,36 @@ import {
   materializeCodexUpstreamAuthAsync,
   resolveCodexAuthContext,
   shouldMarkAccountNeedsReauthForCodexAuthFailure,
-} from "../../src/codex/auth-context";
-import { isCodexAccountUsable } from "../../src/codex/account-usability";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import * as mainAccount from "../../src/codex/main-account";
-import * as authCollision from "../../src/codex/auth-collision";
+} from "../../backend/src/codex/auth-context";
+import { isCodexAccountUsable } from "../../backend/src/codex/account-usability";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import * as mainAccount from "../../backend/src/codex/main-account";
+import * as authCollision from "../../backend/src/codex/auth-collision";
 import {
   captureMainQuotaWriter,
   matchesMainQuotaCredential,
   observeMainQuotaCredential,
   observeMainQuotaIdentity,
-} from "../../src/codex/main-account-cache";
-import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
+} from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
 import {
   getMainAccountExternalUsageWarning,
   observeMainAccountUsage,
   resetMainAccountExternalUsageForTests,
-} from "../../src/codex/main-account-external-usage";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth, getCodexQuotaHealthSnapshot, recordCodexUpstreamOutcome } from "../../src/codex/routing";
+} from "../../backend/src/codex/main-account-external-usage";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth, getCodexQuotaHealthSnapshot, recordCodexUpstreamOutcome } from "../../backend/src/codex/routing";
 import {
   listOpenAiForwardSidecarCandidates,
   resolveCallerOwnedOpenAiSidecar,
   resolveFirstUsableOpenAiSidecar,
-} from "../../src/providers/openai-sidecar";
-import { mapCodexAuthContextErrorToResponse } from "../../src/server/responses/codex-auth-error";
-import { handleResponses } from "../../src/server/responses/core";
-import { handleResponsesCompact } from "../../src/server/responses/compact";
-import { setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/openai-sidecar";
+import { mapCodexAuthContextErrorToResponse } from "../../backend/src/server/responses/codex-auth-error";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { handleResponsesCompact } from "../../backend/src/server/responses/compact";
+import { setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";

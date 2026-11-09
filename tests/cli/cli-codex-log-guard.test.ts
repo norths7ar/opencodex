@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { handleObserveCommand } from "../../src/cli/observe";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
 
 describe("Codex Log Guard CLI", () => {
   test("ocx storage codex-logs status uses the dedicated diagnostics endpoint", async () => {

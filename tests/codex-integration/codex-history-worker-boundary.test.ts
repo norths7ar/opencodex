@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { runCodexHistoryJob } from "../../src/codex/history-job";
+import { runCodexHistoryJob } from "../../backend/src/codex/history-job";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root = "";
@@ -65,7 +65,7 @@ describe("the result validator", () => {
     // {requestId, type:"done"} with nothing else used to read as converged with
     // undefined rows. The module-level validator is the contract, exercised
     // through the job's own classification seam rather than a fabricated cast.
-    const { isPlausibleWorkerResultForTests } = await import("../../src/codex/history-job");
+    const { isPlausibleWorkerResultForTests } = await import("../../backend/src/codex/history-job");
     expect(isPlausibleWorkerResultForTests(
       { requestId: "r", type: "done" }, "r", "j",
     )).toBe(false);
@@ -131,7 +131,7 @@ describe("the result validator", () => {
   });
 
   test("blocked carries exactly its three reasons", async () => {
-    const { isPlausibleWorkerResultForTests } = await import("../../src/codex/history-job");
+    const { isPlausibleWorkerResultForTests } = await import("../../backend/src/codex/history-job");
     for (const reason of ["busy", "database", "unsafe-path"] as const) {
       expect(isPlausibleWorkerResultForTests(
         { requestId: "r", jobId: "j", type: "blocked", reason }, "r", "j",
@@ -143,7 +143,7 @@ describe("the result validator", () => {
   });
 
   test("the parent preserves partial progress from a valid worker error", async () => {
-    const { classifyWorkerResultForTests } = await import("../../src/codex/history-job");
+    const { classifyWorkerResultForTests } = await import("../../backend/src/codex/history-job");
     expect(classifyWorkerResultForTests({
       requestId: "r",
       jobId: "j",

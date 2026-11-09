@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPhaseInferenceBlockRewrite } from "../../src/server/responses-phase-inference";
+import { createResponsesPhaseInferenceBlockRewrite } from "../../backend/src/server/responses-phase-inference";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { relaySseWithBlockRewrite } from "../../src/server/sse-payload-rewrite";
+import { relaySseWithBlockRewrite } from "../../backend/src/server/sse-payload-rewrite";
 
 function sse(type: string, body: Record<string, unknown>): string {
   return "event: " + type + "\ndata: " + JSON.stringify({ type, ...body }) + "\n\n";

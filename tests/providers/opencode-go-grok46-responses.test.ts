@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import { normalizeOpenCodeGoAdditionalTools } from "../../src/adapters/opencode-go-additional-tools";
+import { normalizeOpenCodeGoAdditionalTools } from "../../backend/src/adapters/opencode-go-additional-tools";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>
   withTestTranslatorBudget(createResponsesPassthroughAdapterProduction(...args));

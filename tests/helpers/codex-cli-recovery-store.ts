@@ -6,9 +6,9 @@ import * as fs from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { removeTreeWithRetry } from "./remove-tree";
-import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission } from "../../src/codex/cli-update-recovery";
-import { recoverClosedCodexCliUpdateWorker } from "../../src/codex/cli-update-worker-recovery";
-import * as gate from "../../src/codex/cli-update-selection-gate";
+import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission } from "../../backend/src/codex/cli-update-recovery";
+import { recoverClosedCodexCliUpdateWorker } from "../../backend/src/codex/cli-update-worker-recovery";
+import * as gate from "../../backend/src/codex/cli-update-selection-gate";
 
 const root = createCodexCliTestRoot("ocx-recovery-store-");
 const uid = process.geteuid?.() ?? 1234, realStat = fs.lstatSync;
@@ -63,7 +63,7 @@ try {
   expect(codexCliUpdateRecoveryBlocksAdmission(interrupted)).toBe(false);
   interruptedOwner.arm(); // late publication cannot overwrite terminal recovery
   expect(codexCliUpdateRecoveryBlocksAdmission(interrupted)).toBe(false);
-  const { finishClosedCodexCliUpdateRecovery } = await import("../../src/codex/cli-update-recovery");
+  const { finishClosedCodexCliUpdateRecovery } = await import("../../backend/src/codex/cli-update-recovery");
   const retryRoot = join(root, "retries"); fs.mkdirSync(retryRoot);
   const retryToken = randomUUID(); createCodexCliUpdateRecovery(retryToken, retryRoot).arm();
   const retryRename = spyOn(fs, "renameSync").mockImplementation(() => { throw new Error("fixture_disk_failure"); });

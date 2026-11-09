@@ -9,7 +9,7 @@ import {
   refreshDshAccountToken,
   resolveDshCredentialsPath,
   DSH_PROFILE_MAX_BYTES,
-} from "../../src/oauth/dsh";
+} from "../../backend/src/oauth/dsh";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let tmp: string;
@@ -135,7 +135,7 @@ describe("DSH Account Validation", () => {
     const previousHome = process.env.OPENCODEX_HOME;
     process.env.OPENCODEX_HOME = join(tmp, "identity-slots");
     try {
-      const { saveCredential, getAccountSet } = await import("../../src/oauth/store");
+      const { saveCredential, getAccountSet } = await import("../../backend/src/oauth/store");
       for (const [index, id] of ["account-a", "account-b", "account-a"].entries()) {
         globalThis.fetch = async () => Response.json({
           code: 0, data: { biz_code: 0, biz_data: { id, email: "same@example.com", id_profile: { name: "Same Name" } } },
@@ -386,7 +386,7 @@ describe("DSH Account Refresh Contract (explicit import only)", () => {
     process.env.DSH_HOME = dir;
 
     // Even if credentials file exists with a newer token, background refresh MUST NOT adopt it
-    const { refreshDshAccountToken } = await import("../../src/oauth/dsh");
+    const { refreshDshAccountToken } = await import("../../backend/src/oauth/dsh");
     await expect(refreshDshAccountToken("old-token")).rejects.toThrow(
       "DeepSeek Harness account session expired or revoked. Please sign in to DeepSeek Harness Desktop and re-import.",
     );

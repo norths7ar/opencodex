@@ -4,13 +4,13 @@
  * placement, and nothing taken from the caller.
  */
 import { describe, expect, test } from "bun:test";
-import { ANTHROPIC_API_VERSION, createAnthropicAdapter } from "../../../src/adapters/anthropic";
+import { ANTHROPIC_API_VERSION, createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
 import {
   ANTHROPIC_MESSAGES_PASSTHROUGH_FIELDS,
   buildAnthropicMessagesPassthroughRequest,
-} from "../../../src/adapters/anthropic/passthrough";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/anthropic/passthrough";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   return {

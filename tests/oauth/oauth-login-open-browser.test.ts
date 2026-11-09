@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import type { OcxConfig } from "../../src/types";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The login route decides whether to spawn a browser on the machine running the
@@ -32,8 +32,8 @@ async function startLogin(
   opened: string[];
   body: { url?: string; deviceCode?: string; instructions?: string; browserLaunch?: string };
 }> {
-  const oauth = await import("../../src/oauth");
-  const openUrlMod = await import("../../src/lib/open-url");
+  const oauth = await import("../../backend/src/oauth");
+  const openUrlMod = await import("../../backend/src/lib/open-url");
   const opened: string[] = [];
   const startSpy = spyOn(oauth, "startLoginFlow").mockResolvedValue(flow);
   const openSpy = spyOn(openUrlMod, "openUrl").mockImplementation(async (url: string) => {

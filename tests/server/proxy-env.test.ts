@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { createServer } from "node:http";
 import { createServer as createTcpServer } from "node:net";
-import { applyProxyEnv } from "../../src/config";
-import { configuredOutboundFetch, noProxyMatches, resolveProxyRoute, configureSocks5Fetch, type ProxyCapableRequestInit } from "../../src/lib/proxy-env";
-import type { OcxConfig } from "../../src/types";
+import { applyProxyEnv } from "../../backend/src/config";
+import { configuredOutboundFetch, noProxyMatches, resolveProxyRoute, configureSocks5Fetch, type ProxyCapableRequestInit } from "../../backend/src/lib/proxy-env";
+import type { OcxConfig } from "../../backend/src/types";
 
 const PROXY_ENV_KEYS = ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "all_proxy", "no_proxy", "OCX_TEST_PROXY_REF", "OCX_TEST_NO_PROXY_REF"] as const;
 let saved: Record<string, string | undefined>;
@@ -448,8 +448,8 @@ describe("applyProxyEnv", () => {
 });
 
 describe("applyProxyEnv with proxy: \"auto\" (#1525)", () => {
-  const { applyProxyEnvWith } = require("../../src/config") as typeof import("../../src/config");
-  const { parseWindowsProxyServer, readWindowsSystemProxy } = require("../../src/lib/windows-system-proxy") as typeof import("../../src/lib/windows-system-proxy");
+  const { applyProxyEnvWith } = require("../../backend/src/config") as typeof import("../../backend/src/config");
+  const { parseWindowsProxyServer, readWindowsSystemProxy } = require("../../backend/src/lib/windows-system-proxy") as typeof import("../../backend/src/lib/windows-system-proxy");
 
   function capture(run: () => void): string[] {
     const lines: string[] = [];

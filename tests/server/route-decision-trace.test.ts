@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { routeModel } from "../../src/router";
-import { requestLogEntryFromPersistedUsage } from "../../src/server/request-log";
+import { routeModel } from "../../backend/src/router";
+import { requestLogEntryFromPersistedUsage } from "../../backend/src/server/request-log";
 import {
   appendUsageEntry,
   normalizeUsageEntryForTest,
@@ -11,7 +11,7 @@ import {
   readUsageEntries,
   resetUsageReadCacheForTests,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import {
   MAX_EXCLUSIONS_PER_CANDIDATE,
   MAX_TRACE_CANDIDATES,
@@ -21,8 +21,8 @@ import {
   buildRouteDecisionTrace,
   normalizeRouteDecisionTrace,
   type RouteDecisionTraceV1,
-} from "../../src/routing/trace";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/routing/trace";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** Near-budget trace: 8 candidates x 16 exclusions with max-length strings. */

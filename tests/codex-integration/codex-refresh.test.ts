@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { invalidateCodexModelsCache, syncCatalogModels } from "../../src/codex/catalog";
-import { refreshCodexModelCatalog } from "../../src/codex/refresh";
-import type { OcxConfig } from "../../src/types";
+import { invalidateCodexModelsCache, syncCatalogModels } from "../../backend/src/codex/catalog";
+import { refreshCodexModelCatalog } from "../../backend/src/codex/refresh";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config = {

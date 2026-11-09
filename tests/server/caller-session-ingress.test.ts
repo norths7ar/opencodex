@@ -1,9 +1,9 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import * as callerIdentity from "../../src/server/caller-session-identity";
-import * as lifecycle from "../../src/server/lifecycle";
-import * as bodyAdmission from "../../src/server/inbound-body-admission";
-import * as timeouts from "../../src/server/responses/fetch-helpers";
-import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
+import * as callerIdentity from "../../backend/src/server/caller-session-identity";
+import * as lifecycle from "../../backend/src/server/lifecycle";
+import * as bodyAdmission from "../../backend/src/server/inbound-body-admission";
+import * as timeouts from "../../backend/src/server/responses/fetch-helpers";
+import { sessionLaneIdFromRequest } from "../../backend/src/server/request-log-conversation";
 import { ACCESS, PROXY_KEY, reserveIngressFixture } from "../helpers/reserve-ingress-fixture";
 
 describe("caller session identity through admitted HTTP ingress", () => {

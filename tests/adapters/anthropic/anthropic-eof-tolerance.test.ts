@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import { FREE_PROVIDER_DIRECTORY } from "../../../src/providers/free-directory";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import { FREE_PROVIDER_DIRECTORY } from "../../../backend/src/providers/free-directory";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 /**

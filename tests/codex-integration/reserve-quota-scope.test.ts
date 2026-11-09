@@ -5,9 +5,9 @@ import { join } from "node:path";
 import {
   clearCodexCooldownRecoveryProbeState,
   runCodexCooldownRecoveryProbes,
-} from "../../src/codex/auth-api";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota } from "../../src/codex/quota";
+} from "../../backend/src/codex/auth-api";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   claimDueCodexQuotaRecoveryProbes,
@@ -17,8 +17,8 @@ import {
   recordCodexUpstreamOutcome,
   tryAcquireCodexQuotaScopeProbeLease,
   type CodexQuotaScope,
-} from "../../src/codex/routing";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const START = 1_800_000_000_000;

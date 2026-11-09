@@ -2,16 +2,16 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import type { ExportModel } from "../../src/clients/config-export";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { defaultIntegrationIO } from "../../src/integrations/config-io";
-import { hermesProfileEnv, hermesProfilePaths, hermesProfileStore, resolveHermesProfile } from "../../src/integrations/hermes-profiles";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { fingerprint } from "../../src/integrations/ownership";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, refreshIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { defaultIntegrationIO } from "../../backend/src/integrations/config-io";
+import { hermesProfileEnv, hermesProfilePaths, hermesProfileStore, resolveHermesProfile } from "../../backend/src/integrations/hermes-profiles";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { fingerprint } from "../../backend/src/integrations/ownership";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, refreshIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config: OcxConfig = {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { collectProviderApiKeyDiagnostics } from "../../src/cli/doctor";
+import { collectProviderApiKeyDiagnostics } from "../../backend/src/cli/doctor";
 
 const prototypePropertyNames = [
   "toString",

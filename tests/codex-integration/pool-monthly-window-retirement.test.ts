@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { capturePoolQuotaWriter, readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../src/codex/account-id";
-import { commitPoolQuotaResponse } from "../../src/codex/auth-api/pool-quota-probe";
-import { resetCodexCreditsForTests } from "../../src/codex/credits";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
+import { capturePoolQuotaWriter, readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../backend/src/codex/account-id";
+import { commitPoolQuotaResponse } from "../../backend/src/codex/auth-api/pool-quota-probe";
+import { resetCodexCreditsForTests } from "../../backend/src/codex/credits";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
 import {
   applyAccountQuotaFromUpstreamHeaders, clearAccountQuota, getAccountQuota, getMainPolicyQuota, isCodexQuotaExhausted,
   parseMainPolicyUsageQuota, parseUsageQuota, poolWhamPolicyObservation, setAccountQuotaFromParsed, type WhamUsageResponse,
-} from "../../src/codex/quota";
-import { resetQuotaQueryBackoffForTests } from "../../src/codex/quota-query-backoff";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
+} from "../../backend/src/codex/quota";
+import { resetQuotaQueryBackoffForTests } from "../../backend/src/codex/quota-query-backoff";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import { resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // #8067: a pool account that moved from a monthly-primary plan (Free) to a weekly plan

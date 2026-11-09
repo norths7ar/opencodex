@@ -5,12 +5,12 @@ import { pathToFileURL } from "node:url";
 import {
   assertClientLifecycleHeld, withClientLifecycle, withClientLifecycleSync,
   type ClientLifecycleHeld,
-} from "../../src/client/lifecycle-lock";
+} from "../../backend/src/client/lifecycle-lock";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 
 const PROCESS_TIMEOUT = 120_000;
-const lockModule = pathToFileURL(repoPath("src/client/lifecycle-lock.ts")).href;
+const lockModule = pathToFileURL(repoPath("backend/src/client/lifecycle-lock.ts")).href;
 let root = "";
 let lockPath = "";
 const children = new Set<ReturnType<typeof Bun.spawn>>();
@@ -232,7 +232,7 @@ test("SIGKILL releases the OS lock without deleting or reclaiming the database",
 }, PROCESS_TIMEOUT);
 
 test("default namespace uses OS identity despite home overrides (isolated resolver observation)", async () => {
-  const identityModule = pathToFileURL(repoPath("src/codex/user-identity.ts")).href;
+  const identityModule = pathToFileURL(repoPath("backend/src/codex/user-identity.ts")).href;
   const child = spawn(`
     import { mock } from "bun:test";
     import { existsSync } from "node:fs";

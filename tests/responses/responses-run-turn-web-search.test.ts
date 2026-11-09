@@ -2,14 +2,14 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { saveCredential } from "../../src/oauth/store";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { saveCredential } from "../../backend/src/oauth/store";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const resolveAdapter = resolver.resolveAdapter;
 let attempts: OcxParsedRequest[] = [];
 let events: AdapterEvent[][] = [];
@@ -40,24 +40,24 @@ function fetchFixture(provider: OcxProviderConfig): ProviderAdapter {
     async parseResponse() { return [{ type: "done" }] as AdapterEvent[]; },
   };
 }
-mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...resolver,
   resolveAdapter: (provider: OcxProviderConfig, cache?: "none" | "short" | "long") =>
     provider.adapter === "cursor" ? fixture(provider)
       : provider.adapter === "fetchonly" ? fetchFixture(provider)
       : resolveAdapter(provider, cache),
 }));
-const pacing = await import("../../src/providers/request-pacing");
+const pacing = await import("../../backend/src/providers/request-pacing");
 const originalWaitForSlot = pacing.waitForProviderRequestSlot;
-mock.module("../../src/providers/request-pacing", () => ({ ...pacing,
+mock.module("../../backend/src/providers/request-pacing", () => ({ ...pacing,
   waitForProviderRequestSlot: async (...args: Parameters<typeof originalWaitForSlot>) => {
     await onPacingSlotWait?.();
     return originalWaitForSlot(...args);
   },
 }));
-const sidecarAuth = await import("../../src/server/responses/request-sidecar-auth");
+const sidecarAuth = await import("../../backend/src/server/responses/request-sidecar-auth");
 const prepareResponsesSidecarAuth = sidecarAuth.prepareResponsesSidecarAuth;
 let releasedFixtureProbe = false;
-mock.module("../../src/server/responses/request-sidecar-auth", () => ({ ...sidecarAuth,
+mock.module("../../backend/src/server/responses/request-sidecar-auth", () => ({ ...sidecarAuth,
   prepareResponsesSidecarAuth: async (...args: Parameters<typeof sidecarAuth.prepareResponsesSidecarAuth>) => {
     if (args[0].req.headers.get("x-fixture-probe") !== "held") {
       return prepareResponsesSidecarAuth(...args);
@@ -69,13 +69,13 @@ mock.module("../../src/server/responses/request-sidecar-auth", () => ({ ...sidec
   },
 }));
 let fixtureSidecarResponse: Response | undefined;
-const webSearchModule = await import("../../src/web-search");
+const webSearchModule = await import("../../backend/src/web-search");
 const executeWebSearch = webSearchModule.runWithWebSearch;
-mock.module("../../src/web-search", () => ({ ...webSearchModule,
+mock.module("../../backend/src/web-search", () => ({ ...webSearchModule,
   runWithWebSearch: async (...args: Parameters<typeof executeWebSearch>) =>
     fixtureSidecarResponse ?? executeWebSearch(...args),
 }));
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 const originalHome = process.env.OPENCODEX_HOME;
 let home = "";
 let release: (() => void) | undefined;

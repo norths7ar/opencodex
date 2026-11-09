@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseJsonc } from "../../src/lib/jsonc";
+import { parseJsonc } from "../../backend/src/lib/jsonc";
 
 describe("JSONC trailing comma grammar", () => {
   test.each(["[,]", "{,}", "[ /* note */ , ]", "{ // note\n , }", "[{,}]"])("refuses a leading comma: %s", text => {

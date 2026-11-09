@@ -4,8 +4,8 @@ import * as fs from "node:fs";
 import { mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { omoJsoncPath, omoReasoningFor, readOmoRoleModels, writeOmoRoleModel } from "../../src/clients/omo-role-models";
-import { hasJsoncComments } from "../../src/lib/jsonc";
+import { omoJsoncPath, omoReasoningFor, readOmoRoleModels, writeOmoRoleModel } from "../../backend/src/clients/omo-role-models";
+import { hasJsoncComments } from "../../backend/src/lib/jsonc";
 
 let dir: string | null = null;
 afterEach(() => {
@@ -173,7 +173,7 @@ describe("omo role models", () => {
     operation => {
       const path = file();
       expect(spawnSync("mkfifo", [path], { timeout: 3000 }).status).toBe(0);
-      const moduleUrl = new URL("../../src/clients/omo-role-models.ts", import.meta.url).href;
+      const moduleUrl = new URL("../../backend/src/clients/omo-role-models.ts", import.meta.url).href;
       const script = `
         const { readOmoRoleModels, writeOmoRoleModel } = await import(${JSON.stringify(moduleUrl)});
         const result = process.argv[2] === "read"

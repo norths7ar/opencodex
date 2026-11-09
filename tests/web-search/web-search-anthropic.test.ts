@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as oauthModule from "../../src/oauth";
+import * as oauthModule from "../../backend/src/oauth";
 
 // Stub the stored-OAuth token fetch so the anthropic executor request-shape test is deterministic
 // and never touches the real credential store or network (mirrors tests/destination-policy-resolved).
 let oauthAccessError: Error | undefined;
-mock.module("../../src/oauth", () => ({
+mock.module("../../backend/src/oauth", () => ({
   ...oauthModule,
   getValidAccessToken: async () => {
     if (oauthAccessError) throw oauthAccessError;
@@ -12,27 +12,27 @@ mock.module("../../src/oauth", () => ({
   },
 }));
 
-import { parseRequest } from "../../src/responses/parser";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   findAnthropicSidecarProvider,
   planWebSearch,
   resolveSidecarBackend,
-} from "../../src/web-search";
-import { parseAnthropicSidecarSSE, runAnthropicWebSearch } from "../../src/web-search/anthropic-executor";
-import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../src/oauth/anthropic";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
-import type { ProviderAdapter } from "../../src/adapters/base";
+} from "../../backend/src/web-search";
+import { parseAnthropicSidecarSSE, runAnthropicWebSearch } from "../../backend/src/web-search/anthropic-executor";
+import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../backend/src/oauth/anthropic";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
 import { repoPath } from "../helpers/repo-root";
-import { createRequestExecutionBudget, type AuxiliaryModelSend } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { estimateTokens } from "../../src/lib/token-estimate";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { runWithWebSearch } from "../../src/web-search/loop";
-import { runTurnWebSearchLoop } from "../../src/web-search/run-turn-loop";
-import { createPassthroughWebSearchBridgeExecutor } from "../../src/web-search/passthrough-bridge";
+import { createRequestExecutionBudget, type AuxiliaryModelSend } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { estimateTokens } from "../../backend/src/lib/token-estimate";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
+import { runTurnWebSearchLoop } from "../../backend/src/web-search/run-turn-loop";
+import { createPassthroughWebSearchBridgeExecutor } from "../../backend/src/web-search/passthrough-bridge";
 
 const routedProvider: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "routed-key" };
 const forwardProvider: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.test/v1", authMode: "forward" };
@@ -575,7 +575,7 @@ describe("Anthropic sidecar byte boundaries", () => {
 
   test("synchronous empty chunks cannot starve the bounded EOF probe", async () => {
     const script = `
-      import { parseAnthropicSidecarSSE } from ${JSON.stringify(repoPath("src/web-search/anthropic-executor.ts"))};
+      import { parseAnthropicSidecarSSE } from ${JSON.stringify(repoPath("backend/src/web-search/anthropic-executor.ts"))};
       const prefix = 'data: {"type":"content_block_delta","delta":{"type":"text_delta","text":"answer"}}\\n\\n';
       const terminal = 'data: {"type":"message_stop"}\\n\\n';
       const filler = ':' + 'x'.repeat(65536 - new TextEncoder().encode(prefix + terminal).length - 3) + '\\n\\n';

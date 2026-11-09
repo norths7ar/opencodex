@@ -8,9 +8,9 @@ import {
   applyReasoningRetention,
   collectReasoningTexts,
   ReasoningArchiveError,
-} from "../../src/responses/reasoning-retention";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { estimateTokens } from "../../src/lib/token-estimate";
+} from "../../backend/src/responses/reasoning-retention";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { estimateTokens } from "../../backend/src/lib/token-estimate";
 
 const reasoningItem = (text: string) => ({
   type: "reasoning",

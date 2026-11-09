@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { lintPromptLayer } from "../../gui/src/components/codex-set/prompt-lint";
-import { composeBodies, moveLayer, utf8Length } from "../../gui/src/components/codex-set/custom-layer-state";
-import type { CustomLayerDto } from "../../gui/src/pages/codex-set-prompt";
+import { lintPromptLayer } from "../../frontend/src/components/codex-set/prompt-lint";
+import { composeBodies, moveLayer, utf8Length } from "../../frontend/src/components/codex-set/custom-layer-state";
+import type { CustomLayerDto } from "../../frontend/src/pages/codex-set-prompt";
 
 const layer = (id: string, body: string, enabled = true): CustomLayerDto => ({ id, title: id, body, enabled });
 

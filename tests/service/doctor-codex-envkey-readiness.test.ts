@@ -1,7 +1,7 @@
 import { isolateCodexShimEnvironment, withInstalledShim } from "../helpers/codex-shim-install-fixture";
 import { describe, expect, test } from "bun:test";
-import { collectCodexEnvKeyReadiness, formatCodexShimDoctorLines } from "../../src/cli/doctor";
-import { diagnoseCodexShim, type CodexShimDiagnostic } from "../../src/codex/shim";
+import { collectCodexEnvKeyReadiness, formatCodexShimDoctorLines } from "../../backend/src/cli/doctor";
+import { diagnoseCodexShim, type CodexShimDiagnostic } from "../../backend/src/codex/shim";
 import { join } from "node:path";
 
 isolateCodexShimEnvironment();

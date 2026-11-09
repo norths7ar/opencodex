@@ -1,21 +1,21 @@
-import { localManagementOrigin } from "../../src/lib/local-destinations";
-import { selectDefaultGuiUrl } from "../../src/cli/dispatch";
+import { localManagementOrigin } from "../../backend/src/lib/local-destinations";
+import { selectDefaultGuiUrl } from "../../backend/src/cli/dispatch";
 import { request as httpRequest } from "node:http";
-import { getActiveTurnCount } from "../../src/server/lifecycle";
+import { getActiveTurnCount } from "../../backend/src/server/lifecycle";
 // Holds INV-AUTH-01 from structure/overview.md; keep the id here if this file is split or renamed.
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { mkdtempSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, saveConfig } from "../../src/config";
-import { clearContextSessionOwnersForTests } from "../../src/codex/context-owner";
-import { resetContextRelayActivationForTests } from "../../src/codex/context-compat";
-import { startServer } from "../../src/server";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import type { OcxConfig } from "../../src/types";
-import { serveGuiFile, serveSessionBootstrap } from "../../src/server/gui-static";
-import { isProxyAdmissionSecret } from "../../src/server/auth-cors";
+import { getConfigPath, saveConfig } from "../../backend/src/config";
+import { clearContextSessionOwnersForTests } from "../../backend/src/codex/context-owner";
+import { resetContextRelayActivationForTests } from "../../backend/src/codex/context-compat";
+import { startServer } from "../../backend/src/server";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import type { OcxConfig } from "../../backend/src/types";
+import { serveGuiFile, serveSessionBootstrap } from "../../backend/src/server/gui-static";
+import { isProxyAdmissionSecret } from "../../backend/src/server/auth-cors";
 import {
   createManagementSessionControl,
   initializeManagementAuthState,
@@ -23,7 +23,7 @@ import {
   managementPrincipal,
   removeManagementTokenPathBestEffort,
   requireManagementAuth,
-} from "../../src/server/management-auth";
+} from "../../backend/src/server/management-auth";
 import {
   hardenSecretPath,
   hardenedSecretPathCountForTests,
@@ -33,12 +33,12 @@ import {
   setPlatformForTests,
   timedOutSecretPathCountForTests,
   hardenSecretDir,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   LOCAL_ATTESTATION_CHALLENGE_HEADER,
   LOCAL_ATTESTATION_PROOF_HEADER,
   verifyLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER,
@@ -47,11 +47,11 @@ import {
   LOCAL_MANAGEMENT_NONCE_HEADER,
   LOCAL_MANAGEMENT_READ_PATHS,
   createLocalManagementReadCapability,
-} from "../../src/lib/local-management-capability";
+} from "../../backend/src/lib/local-management-capability";
 import {
   CODEX_APP_SERVER_STATE_PATH,
   CODEX_RESTART_PATH,
-} from "../../src/lib/codex-restart-contract";
+} from "../../backend/src/lib/codex-restart-contract";
 import {
   SYSTEM_RESTART_CAPABILITY_HEADER,
   SYSTEM_RESTART_EXPECTED_PID_HEADER,
@@ -59,7 +59,7 @@ import {
   SYSTEM_RESTART_NONCE_HEADER,
   SYSTEM_RESTART_PATH,
   createSystemRestartCapability,
-} from "../../src/lib/system-restart-contract";
+} from "../../backend/src/lib/system-restart-contract";
 import {
   LOCAL_PROVIDER_RELOAD_CAPABILITY_HEADER,
   LOCAL_PROVIDER_RELOAD_CAPABILITY_TTL_MS,
@@ -71,7 +71,7 @@ import {
   LOCAL_PROVIDER_RELOAD_PATH,
   createLocalProviderReloadCapability,
   verifyLocalProviderReloadCapability,
-} from "../../src/lib/local-provider-reload-contract";
+} from "../../backend/src/lib/local-provider-reload-contract";
 import {
   GUI_PAIR_BROWSER_ORIGIN_HEADER,
   GUI_PAIR_CAPABILITY_HEADER,
@@ -82,15 +82,15 @@ import {
   GUI_PAIR_NONCE_HEADER,
   GUI_PAIR_PATH,
   createGuiPairCapability,
-} from "../../src/lib/gui-pair-capability";
+} from "../../backend/src/lib/gui-pair-capability";
 import {
   GUI_PAIRING_GRANT_TTL_MS,
   LOOPBACK_GUI_SESSION_TTL_MS,
   authorizeGuiSessionRequest,
   consumeGuiPairingGrant,
   createGuiPairingGrant,
-} from "../../src/server/gui-session";
-import { setSystemRestartIoForTests } from "../../src/server/management/system-restart";
+} from "../../backend/src/server/gui-session";
+import { setSystemRestartIoForTests } from "../../backend/src/server/management/system-restart";
 import {
   remoteConfig,
   websocketHandshakeOpens,

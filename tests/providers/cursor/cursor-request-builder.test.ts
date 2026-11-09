@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { create, toBinary } from "@bufbuild/protobuf";
-import { ConversationStateStructureSchema } from "../../../src/adapters/cursor/gen/agent_pb";
+import { ConversationStateStructureSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   clearCursorCheckpointsForTests,
   commitCursorCheckpoint,
   CURSOR_CHECKPOINT_TTL_MS,
   getCursorCheckpoint,
   installCursorCheckpointClockForTests,
-} from "../../../src/adapters/cursor/checkpoint-store";
+} from "../../../backend/src/adapters/cursor/checkpoint-store";
 import {
   applyCursorToolBudget,
   createCursorRequest,
@@ -15,16 +15,16 @@ import {
   cursorInstructionDigest,
   CURSOR_TOOL_BYTES_LIMIT,
   CURSOR_TOOL_COUNT_LIMIT,
-} from "../../../src/adapters/cursor/request-builder";
+} from "../../../backend/src/adapters/cursor/request-builder";
 import {
   clearCursorThreadContinuityForTests,
   rememberCursorThreadConversation,
-} from "../../../src/adapters/cursor/thread-continuity";
-import { cursorCheckpointModelAffinityId } from "../../../src/adapters/cursor/discovery";
-import { cursorMcpToolsEncodedSize } from "../../../src/adapters/cursor/tool-definitions";
-import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../src/adapters/cursor/call-id";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/thread-continuity";
+import { cursorCheckpointModelAffinityId } from "../../../backend/src/adapters/cursor/discovery";
+import { cursorMcpToolsEncodedSize } from "../../../backend/src/adapters/cursor/tool-definitions";
+import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../backend/src/adapters/cursor/call-id";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 const base: OcxParsedRequest = {
   modelId: "cursor/auto",

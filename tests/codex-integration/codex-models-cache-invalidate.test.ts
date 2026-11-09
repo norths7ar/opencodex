@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { invalidateCodexModelsCache } from "../../src/codex/catalog";
-import { invalidateCodexModelsCacheWithPermit, invalidateCodexModelsCacheWithPermitOutcome } from "../../src/codex/catalog/sync";
-import { withCatalogWriteSerialization } from "../../src/codex/catalog-write-serialization";
+import { invalidateCodexModelsCache } from "../../backend/src/codex/catalog";
+import { invalidateCodexModelsCacheWithPermit, invalidateCodexModelsCacheWithPermitOutcome } from "../../backend/src/codex/catalog/sync";
+import { withCatalogWriteSerialization } from "../../backend/src/codex/catalog-write-serialization";
 import {
   collectCodexAppServerCatalogStateForRequest,
   resetCodexAppServerCatalogStateCache,
   afterCatalogWriteHandleAppServers,
-} from "../../src/codex/app-server-processes";
-import { refreshCodexModelCatalog } from "../../src/codex/refresh";
-import { syncModelsToCodex } from "../../src/codex/sync";
-import { flushConfigDirHardening } from "../../src/config/paths";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/app-server-processes";
+import { refreshCodexModelCatalog } from "../../backend/src/codex/refresh";
+import { syncModelsToCodex } from "../../backend/src/codex/sync";
+import { flushConfigDirHardening } from "../../backend/src/config/paths";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** Every K acquisition states its intent (#6529); these tests exercise the lock, not the intent. */

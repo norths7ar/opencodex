@@ -2,12 +2,12 @@ import { describe, test, expect, mock, beforeEach, afterAll } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resetContextRelayActivationForTests } from "../../src/codex/context-compat";
-import type { CodexAuthContext } from "../../src/codex/auth-context";
-import { recordContextSessionOwner, clearContextSessionOwnersForTests } from "../../src/codex/context-owner";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
-import type { OcxConfig } from "../../src/types";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { resetContextRelayActivationForTests } from "../../backend/src/codex/context-compat";
+import type { CodexAuthContext } from "../../backend/src/codex/auth-context";
+import { recordContextSessionOwner, clearContextSessionOwnersForTests } from "../../backend/src/codex/context-owner";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 type Selection = { headers: Headers; mode: string; options: { modelId: string; admission?: DataPlaneAdmission; substituteMainCredentialForDirect?: boolean; accountId?: string; requestScopedMainCredential?: boolean } };
 let selection: Selection | undefined;
@@ -35,12 +35,12 @@ let probe=false;let released=0;let directError=false;let duringSelection:(()=>vo
 // `mock.module` outlives this file: Bun keeps all six overrides below for every file that runs
 // after this one in the same process. Keep the real modules, captured before anything here is
 // mocked, and put them back.
-const realAuthContext = { ...(await import("../../src/codex/auth-context")) };
-const realRouting = { ...(await import("../../src/codex/routing")) };
-const realSidecar = { ...(await import("../../src/providers/openai-sidecar")) };
-const realAuthCors = { ...(await import("../../src/server/auth-cors")) };
-const realResponses = { ...(await import("../../src/server/responses")) };
-const realLifecycle = { ...(await import("../../src/server/lifecycle")) };
+const realAuthContext = { ...(await import("../../backend/src/codex/auth-context")) };
+const realRouting = { ...(await import("../../backend/src/codex/routing")) };
+const realSidecar = { ...(await import("../../backend/src/providers/openai-sidecar")) };
+const realAuthCors = { ...(await import("../../backend/src/server/auth-cors")) };
+const realResponses = { ...(await import("../../backend/src/server/responses")) };
+const realLifecycle = { ...(await import("../../backend/src/server/lifecycle")) };
 const errors = {
   CodexAccountCooldownError: class extends Error {},
   CodexMainSubstitutionUnavailableError: class extends Error {},
@@ -50,7 +50,7 @@ const errors = {
   CodexPoolAuthenticationError: class extends Error {},
   CodexThreadAffinityExpiredError: class extends Error {},
 };
-mock.module("../../src/codex/auth-context",()=>({
+mock.module("../../backend/src/codex/auth-context",()=>({
   ...errors,
   resolveCodexAuthContext:async(headers: Headers, _config: OcxConfig, mode: string, options: Selection["options"])=>{selection={headers,mode,options};duringSelection?.();if(directError)throw new errors.CodexDirectAuthenticationError();return {kind:"pool",accountId:"test-account",chatgptAccountId:outgoingAccount,accessToken:outgoingBearer,generation:1,writerGeneration:0,...(probe?{probeLeaseId:"test-probe"}:{})};},
   isCodexAuthContextUsable:()=>true,
@@ -69,13 +69,13 @@ mock.module("../../src/codex/auth-context",()=>({
   cooldownErrorResponse:()=>new Response("cooldown",{status:429}),
   codexMainProfileDrainingResponse:()=>new Response("draining",{status:503}),
 }));
-mock.module("../../src/codex/routing",()=>({...realRouting, formatCodexProviderForLog:()=>"openai-test"}));
-mock.module("../../src/providers/openai-sidecar",()=>({listOpenAiForwardSidecarCandidates:()=>[{providerName:"openai",provider:{baseUrl:"https://chatgpt.com/backend-api/codex"},accountMode}]}));
+mock.module("../../backend/src/codex/routing",()=>({...realRouting, formatCodexProviderForLog:()=>"openai-test"}));
+mock.module("../../backend/src/providers/openai-sidecar",()=>({listOpenAiForwardSidecarCandidates:()=>[{providerName:"openai",provider:{baseUrl:"https://chatgpt.com/backend-api/codex"},accountMode}]}));
 class ForwardAdmissionCredentialError extends Error {}
-mock.module("../../src/server/auth-cors",()=>({ForwardAdmissionCredentialError,resolveContextPrincipal:(_r:Request,_c:OcxConfig,a?:{contextPrincipalId?:string})=>a?.contextPrincipalId,validateForwardAdmissionCredential:(h:Headers)=>{validated++;if(!h.has("authorization") || h.get("authorization") === "Bearer ocx_data_test_admission")throw new ForwardAdmissionCredentialError("test credential missing");}}));
-mock.module("../../src/server/responses",()=>({codexLogAccountId:()=>"test",decodeRequestErrorResponse:()=>new Response("invalid json",{status:400})}));
-mock.module("../../src/server/lifecycle",()=>({codexAccountSelectionForTurn:()=>()=>undefined}));
-const { handleContextHistory, contextSelectionHeaders } = await import("../../src/server/context-history");
+mock.module("../../backend/src/server/auth-cors",()=>({ForwardAdmissionCredentialError,resolveContextPrincipal:(_r:Request,_c:OcxConfig,a?:{contextPrincipalId?:string})=>a?.contextPrincipalId,validateForwardAdmissionCredential:(h:Headers)=>{validated++;if(!h.has("authorization") || h.get("authorization") === "Bearer ocx_data_test_admission")throw new ForwardAdmissionCredentialError("test credential missing");}}));
+mock.module("../../backend/src/server/responses",()=>({codexLogAccountId:()=>"test",decodeRequestErrorResponse:()=>new Response("invalid json",{status:400})}));
+mock.module("../../backend/src/server/lifecycle",()=>({codexAccountSelectionForTurn:()=>()=>undefined}));
+const { handleContextHistory, contextSelectionHeaders } = await import("../../backend/src/server/context-history");
 const destination = "https://chatgpt.com/backend-api/codex";
 let issuedTokens = 0;
 // A real ChatGPT credential carries a stable user claim; ownership continuity across a refresh
@@ -100,12 +100,12 @@ function setFetch(handler: (input: string | URL | Request, init?: RequestInit) =
   globalThis.fetch = Object.assign(handler, { preconnect: originalFetch.preconnect });
 }
 afterAll(()=>{try{if(previousCodexHome===undefined)delete process.env.CODEX_HOME;else process.env.CODEX_HOME=previousCodexHome;resetContextRelayActivationForTests();clearContextSessionOwnersForTests();globalThis.fetch=originalFetch;mock.restore();}finally{
-  mock.module("../../src/codex/auth-context",()=>realAuthContext);
-  mock.module("../../src/codex/routing",()=>realRouting);
-  mock.module("../../src/providers/openai-sidecar",()=>realSidecar);
-  mock.module("../../src/server/auth-cors",()=>realAuthCors);
-  mock.module("../../src/server/responses",()=>realResponses);
-  mock.module("../../src/server/lifecycle",()=>realLifecycle);
+  mock.module("../../backend/src/codex/auth-context",()=>realAuthContext);
+  mock.module("../../backend/src/codex/routing",()=>realRouting);
+  mock.module("../../backend/src/providers/openai-sidecar",()=>realSidecar);
+  mock.module("../../backend/src/server/auth-cors",()=>realAuthCors);
+  mock.module("../../backend/src/server/responses",()=>realResponses);
+  mock.module("../../backend/src/server/lifecycle",()=>realLifecycle);
 }});
 beforeEach(()=>{clearContextSessionOwnersForTests();for (const id of ["root", "root-test", "s"]) seedOwner(id);outgoingAccount="test-only";globalThis.fetch=originalFetch;materialized=undefined;materializationError=undefined;selection=undefined;validated=0;materializationOptions=undefined;outgoingBearer="test-only";accountMode="pool";probe=false;released=0;directError=false;duringSelection=undefined;setContextFeature(true);});
 
@@ -433,7 +433,7 @@ test("a context root conflicting with protocol headers is rejected without selec
 
 test("history isolates existing Pool client metadata without changing encrypted arguments", async () => {
   const key = "x-codex-installation-id";
-  const { codexInstallationIdForAccount } = await import("../../src/codex/installation-id");
+  const { codexInstallationIdForAccount } = await import("../../backend/src/codex/installation-id");
   const body = { context: { session_id: "root-test" }, encrypted_arguments: "unchanged+==", client_metadata: { [key]: "caller-id", keep: "same" } };
   let sent: Record<string, any> | undefined;
   setFetch(async (_url, init) => { sent = JSON.parse(String(init?.body)); return Response.json({ ok: true }); });
@@ -446,7 +446,7 @@ test("history isolates existing Pool client metadata without changing encrypted 
 });
 
 test("history maps installation-secret refusal before fetch", async () => {
-  const { CodexInstallationIdUnavailableError } = await import("../../src/codex/installation-id");
+  const { CodexInstallationIdUnavailableError } = await import("../../backend/src/codex/installation-id");
   materializationError = new CodexInstallationIdUnavailableError();
   let sends = 0;
   setFetch(async () => { sends++; return Response.json({}); });

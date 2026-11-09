@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { retainNativeMainOwner } from "../../src/codex/native-main-owner";
-import { flushConfigDirHardening } from "../../src/config/paths";
+import { retainNativeMainOwner } from "../../backend/src/codex/native-main-owner";
+import { flushConfigDirHardening } from "../../backend/src/config/paths";
 import {
   defaultFixtureTeardownDeps,
   drainAndRemoveFixtureRoots,

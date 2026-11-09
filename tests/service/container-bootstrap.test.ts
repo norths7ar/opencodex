@@ -8,7 +8,7 @@ import { pathToFileURL } from "node:url";
 import { readBoundedToken } from "../../docker/bootstrap-token";
 import { verifyCompatibilitySnapshot } from "../../docker/verify-compatibility";
 import type { CompatibilityVersionManifest } from "../../scripts/generate-compatibility-version";
-import type { SerializedCatalog } from "../../src/server/catalog-download";
+import type { SerializedCatalog } from "../../backend/src/server/catalog-download";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -83,7 +83,7 @@ describe("container deployment contract", () => {
     expect(ignored[0]).toBe("**");
     // The host-prepared manifest stays a supported input, so this exception must not go away.
     expect(ignored).toContain("!src/generated/compatibility-version.json");
-    expect(ignored).not.toContain("src/generated/compatibility-version.json");
+    expect(ignored).not.toContain("backend/src/generated/compatibility-version.json");
     // Exactly the two files `git ls-files` reads. A broader exception would put 1.3 GB of
     // objects in every local build context, which is why this asserts the block verbatim.
     expect(ignored.slice(ignored.indexOf("!.git/"), ignored.indexOf("!.git/") + 4)).toEqual([
@@ -130,7 +130,7 @@ describe("container deployment contract", () => {
 });
 
 const snapshotDirs: string[] = [];
-const manifestPath = "src/generated/compatibility-version.json";
+const manifestPath = "backend/src/generated/compatibility-version.json";
 const snapshotPaths = ["package.json", "bun.lock", "scripts/model-metadata.source.json", "src/main.ts"];
 // Independent SHA-256 test vector for the bytes "abc", not computed by the verifier.
 const abcDigest = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad";
@@ -150,7 +150,7 @@ function catalogHomeFixture(codexDirectory = "codex-state") {
   const codexAuth = '{"fixture":"native-codex-store"}';
   writeFileSync(join(ocxHome, "auth.json"), ocxAuth, { mode: 0o600 });
   writeFileSync(join(codexHome, "auth.json"), codexAuth, { mode: 0o600 });
-  const moduleUrl = pathToFileURL(repoPath("src/server/catalog-download.ts")).href;
+  const moduleUrl = pathToFileURL(repoPath("backend/src/server/catalog-download.ts")).href;
   const script = `
     const { serializePersistedCatalog } = await import(${JSON.stringify(moduleUrl)});
     process.stdout.write(JSON.stringify(await serializePersistedCatalog()));
@@ -233,7 +233,7 @@ function compatibilitySnapshot() {
     mkdirSync(dirname(join(root, path)), { recursive: true });
     writeFileSync(join(root, path), "abc");
   }
-  mkdirSync(join(root, "src/generated"));
+  mkdirSync(join(root, "backend/src/generated"));
   const manifest: CompatibilityVersionManifest = {
     schemaVersion: 1,
     assertionDslVersion: "1.0.0",
@@ -295,7 +295,7 @@ describe("container compatibility snapshot validation", () => {
 
   test("rejects an empty source inventory", () => {
     const { root, manifest, save } = compatibilitySnapshot();
-    manifest.files = manifest.files.filter(row => !row.path.startsWith("src/"));
+    manifest.files = manifest.files.filter(row => !row.path.startsWith("backend/src/"));
     save();
     expect(() => verifyCompatibilitySnapshot(root)).toThrow("contains no source files");
   });
@@ -307,7 +307,7 @@ describe("container compatibility snapshot validation", () => {
     expect(() => verifyCompatibilitySnapshot(root)).toThrow("Duplicate compatibility manifest entry");
   });
 
-  for (const path of ["../outside", "/src/main.ts", "src/../package.json", "src//main.ts", "src/./main.ts", "src\\main.ts", "src/", "src/zero\0.ts", "docker/bootstrap-token.ts", manifestPath]) {
+  for (const path of ["../outside", "/src/main.ts", "src/../package.json", "src//main.ts", "src/./main.ts", "src\\main.ts", "backend/src/", "src/zero\0.ts", "docker/bootstrap-token.ts", manifestPath]) {
     test(`rejects an unsafe or out-of-authority path: ${JSON.stringify(path)}`, () => {
       const { root, manifest, save } = compatibilitySnapshot();
       manifest.files.push({ path, sha256: abcDigest });
@@ -346,7 +346,7 @@ describe("container compatibility snapshot validation", () => {
     });
   }
 
-  for (const path of ["src", "src/generated", "scripts"]) {
+  for (const path of ["src", "backend/src/generated", "scripts"]) {
     test(`rejects a linked input directory: ${path}`, () => {
       const { root } = compatibilitySnapshot();
       const target = join(root, "linked-target");

@@ -10,10 +10,10 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import * as encoding from "../../src/codex/prompt-layers/encoding";
-import * as revision from "../../src/codex/prompt-layers/revision";
-import * as tomlRead from "../../src/codex/prompt-layers/toml-read";
-import { OCX_SECTION_MARKER } from "../../src/codex/injected-marker";
+import * as encoding from "../../backend/src/codex/prompt-layers/encoding";
+import * as revision from "../../backend/src/codex/prompt-layers/revision";
+import * as tomlRead from "../../backend/src/codex/prompt-layers/toml-read";
+import { OCX_SECTION_MARKER } from "../../backend/src/codex/injected-marker";
 import {
   LAYER_INVENTORY,
   TOGGLE_IDS,
@@ -24,7 +24,7 @@ import {
   inspectOwnership,
   isToggleId,
   normalizeBody,
-} from "../../src/codex/prompt-layers";
+} from "../../backend/src/codex/prompt-layers";
 
 /** TOML basic-string grammar, hand-written so it does not share code with the encoder. */
 const BASIC_STRING = /^"(?:[^"\\\u0000-\u001f]|\\["\\bfnrt]|\\u[0-9A-Fa-f]{4})*"$/;
@@ -224,11 +224,11 @@ test("prompt-layers leaf seams preserve facade identity without back-imports", (
   const body = 'line one\n"quoted" \\ path 😀';
   expect(encoding.decodeBasicString(encoding.encodeBasicString(body))).toBe(body);
 
-  const leaves = readdirSync(repoPath("src", "codex", "prompt-layers"))
+  const leaves = readdirSync(repoPath("backend/src", "codex", "prompt-layers"))
     .filter(name => name.endsWith(".ts"));
   expect(leaves.length).toBeGreaterThan(0);
   for (const leaf of leaves) {
-    const source = readFileSync(repoPath("src", "codex", "prompt-layers", leaf), "utf8");
+    const source = readFileSync(repoPath("backend/src", "codex", "prompt-layers", leaf), "utf8");
     expect(source).not.toMatch(/from\s+["']\.\.\/prompt-layers["']/);
   }
 });

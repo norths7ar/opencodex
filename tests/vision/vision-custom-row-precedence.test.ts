@@ -13,13 +13,13 @@
  * is what the sidecar picker and the web-search verbalizer read.
  */
 import { describe, expect, test } from "bun:test";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import {
   isVisionSidecarConsumer,
   modelAcceptsImageInput,
-} from "../../src/vision/eligibility";
-import { planVisionSidecar, requiresVisionPreprocessing } from "../../src/vision/plan";
-import { parseRequest } from "../../src/responses/parser";
+} from "../../backend/src/vision/eligibility";
+import { planVisionSidecar, requiresVisionPreprocessing } from "../../backend/src/vision/plan";
+import { parseRequest } from "../../backend/src/responses/parser";
 
 const PROVIDER = "zen-go";
 const MODEL = "deepseek-v4.1-flash";

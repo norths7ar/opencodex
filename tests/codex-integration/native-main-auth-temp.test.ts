@@ -13,9 +13,9 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { scrubNativeMainAuthTempResidues } from "../../src/codex/native-main-auth-temp";
-import { resolveNativeProfileContext } from "../../src/codex/native-profile-store";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
+import { scrubNativeMainAuthTempResidues } from "../../backend/src/codex/native-main-auth-temp";
+import { resolveNativeProfileContext } from "../../backend/src/codex/native-profile-store";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

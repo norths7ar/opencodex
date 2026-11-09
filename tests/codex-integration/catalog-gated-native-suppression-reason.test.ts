@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { gatedNativeReauthSuppressionReason } from "../../src/codex/catalog/sync";
-import type { CodexModelEntitlementSnapshot } from "../../src/codex/model-entitlements";
+import { gatedNativeReauthSuppressionReason } from "../../backend/src/codex/catalog/sync";
+import type { CodexModelEntitlementSnapshot } from "../../backend/src/codex/model-entitlements";
 
 /**
  * #4212: when the accounts backing an account-gated native model stop being usable, the model is

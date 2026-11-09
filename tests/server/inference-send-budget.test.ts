@@ -4,11 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
-import { createInferenceSendBudget, expandInferenceOAuthSendBudget } from "../../src/server/inference/context";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { createRequestExecutionBudget, deriveRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { fetchWithTransientRetry, TRANSIENT_RETRY_MAX_ATTEMPTS } from "../../src/lib/upstream-retry";
+import { CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
+import { createInferenceSendBudget, expandInferenceOAuthSendBudget } from "../../backend/src/server/inference/context";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { createRequestExecutionBudget, deriveRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { fetchWithTransientRetry, TRANSIENT_RETRY_MAX_ATTEMPTS } from "../../backend/src/lib/upstream-retry";
 import { budgetOwner } from "../helpers/send-budget-owner";
 
 let home: string;
@@ -222,7 +222,7 @@ test("ingress reuses its tracker only for the same request even when log context
 
 test("checking an unconfigured ingress budget does not open its journal", async () => {
   const { existsSync } = await import("node:fs");
-  const { createPhysicalSendReporter } = await import("../../src/lib/request-execution-budget");
+  const { createPhysicalSendReporter } = await import("../../backend/src/lib/request-execution-budget");
   const budget = createInferenceSendBudget(new Request("http://localhost/v1/responses"), { model: "m", provider: "p" });
   expect(budget.spendEnforced).toBe(false);
   expect(createPhysicalSendReporter(budget, () => ({ poolId: "p" })).beforeSend).toBeFunction();

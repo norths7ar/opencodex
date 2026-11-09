@@ -39,7 +39,7 @@ function workerEntries(): Map<string, string> {
 }
 
 const root = repoPath();
-const files = sourceFiles(repoPath("src")).map(path => ({
+const files = sourceFiles(repoPath("backend/src")).map(path => ({
   rel: relative(root, path).split("\\").join("/"),
   text: readFileSync(path, "utf8"),
 }));
@@ -60,7 +60,7 @@ test("every spawnWorker key is embedded for the same worker file", () => {
 
 test("workers are started through spawnWorker unless explicitly exempted", () => {
   const bare = files
-    .filter(({ rel, text }) => rel !== "src/lib/worker-embed.ts" && /new Worker\(/.test(text.replace(/^\s*(?:\*|\/\/).*$/gm, "")))
+    .filter(({ rel, text }) => rel !== "backend/src/lib/worker-embed.ts" && /new Worker\(/.test(text.replace(/^\s*(?:\*|\/\/).*$/gm, "")))
     .map(({ rel }) => rel);
   expect(bare.sort()).toEqual(Object.keys(BARE_WORKER_EXEMPTIONS).sort());
 });

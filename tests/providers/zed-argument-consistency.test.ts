@@ -1,8 +1,8 @@
 import { expect, test } from 'bun:test';
-import { translateZedOpenAiStream } from '../../src/adapters/zed-openai-stream';
-import { zedEventStream } from '../../src/adapters/zed';
-import { createTranslatorBudget, type TranslatorBudgetOptions } from '../../src/lib/translator-budget';
-import { bridgeToResponsesSSE, buildResponseJSON } from '../../src/bridge';
+import { translateZedOpenAiStream } from '../../backend/src/adapters/zed-openai-stream';
+import { zedEventStream } from '../../backend/src/adapters/zed';
+import { createTranslatorBudget, type TranslatorBudgetOptions } from '../../backend/src/lib/translator-budget';
+import { bridgeToResponsesSSE, buildResponseJSON } from '../../backend/src/bridge';
 
 async function collect(frames: unknown[], options?: TranslatorBudgetOptions) {
   const source = new Response(frames.map(event => JSON.stringify({event})+'\n').join('')+'{"status":"stream_ended"}\n').body!;

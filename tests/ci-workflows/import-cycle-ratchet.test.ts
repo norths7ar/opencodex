@@ -26,11 +26,11 @@ import { repoRoot } from "../helpers/repo-root";
  * reaches everything.
  */
 const CORE_OFF_CYCLE = [
-  "src/config.ts",
-  "src/router.ts",
-  "src/server/lifecycle.ts",
-  "src/server/responses/core.ts",
-  "src/server/management-api.ts",
+  "backend/src/config.ts",
+  "backend/src/router.ts",
+  "backend/src/server/lifecycle.ts",
+  "backend/src/server/responses/core.ts",
+  "backend/src/server/management-api.ts",
 ] as const;
 
 const graphOf = (edges: Record<string, string[]>): ImportGraph => new Map(Object.entries(edges));
@@ -56,7 +56,7 @@ describe("import-cycle ratchet: scanner", () => {
     writeFileSync(join(root, "src", "a.ts"), 'import { b } from "./nested"; export const a = b;');
     writeFileSync(join(root, "src", "nested", `index.${extension}`),
       'import { a } from "../a"; export const b = a;' + (extension === "tsx" ? " export const view = <span/>;" : ""));
-    expect(cyclicModules(scanGraph(root))).toEqual(["src/a.ts", `src/nested/index.${extension}`]);
+    expect(cyclicModules(scanGraph(root, "src"))).toEqual(["src/a.ts", `src/nested/index.${extension}`]);
   });
 
   test("directory precedence agrees with Bun when multiple indexes exist", () => {
@@ -66,7 +66,7 @@ describe("import-cycle ratchet: scanner", () => {
     writeFileSync(join(src, "a.ts"), 'import { b } from "./nested";');
     for (const ext of ["ts", "tsx", "mts"]) writeFileSync(join(src, "nested", `index.${ext}`), "export const b = 1;");
     const resolved = basename(Bun.resolveSync("./nested", src));
-    expect(scanGraph(root).get("src/a.ts")).toEqual([`src/nested/${resolved}`]);
+    expect(scanGraph(root, "src").get("src/a.ts")).toEqual([`src/nested/${resolved}`]);
   });
 
   test.each(["ts", "tsx", "mts"])("symlinked roots preserve index.%s cycle identities", extension => {
@@ -79,7 +79,7 @@ describe("import-cycle ratchet: scanner", () => {
       writeFileSync(join(physical, "src", "nested", `index.${extension}`),
         'import { a } from "../a"; export const b = a;' + (extension === "tsx" ? " export const view = <span/>;" : ""));
       symlinkSync(physical, root, process.platform === "win32" ? "junction" : "dir");
-      const graph = scanGraph(root);
+      const graph = scanGraph(root, "src");
       expect(graph.get("src/a.ts")).toEqual([`src/nested/index.${extension}`]);
       expect(graph.get(`src/nested/index.${extension}`)).toEqual(["src/a.ts"]);
       expect(cyclicModules(graph)).toEqual(["src/a.ts", `src/nested/index.${extension}`]);
@@ -124,7 +124,7 @@ describe("import-cycle ratchet: scanner", () => {
     writeFileSync(join(root, "src", "lazy.ts"), 'import type { A } from "./typed";\nexport const l = () => import("./a");\n');
     writeFileSync(join(root, "src", "typed.ts"), 'import { l } from "./lazy";\nexport type A = typeof l;\n');
     writeFileSync(join(root, "src", "ambient.d.mts"), 'export const declarationOnly: number;');
-    expect(cyclicModules(scanGraph(root))).toEqual(["src/a.ts", "src/nested/index.ts"]);
+    expect(cyclicModules(scanGraph(root, "src"))).toEqual(["src/a.ts", "src/nested/index.ts"]);
   });
 });
 

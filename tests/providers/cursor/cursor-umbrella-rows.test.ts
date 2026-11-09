@@ -6,7 +6,7 @@ import {
   recordLiveCursorMaxModeModels,
   resetLiveCursorClaudeWireIdentitiesForTests,
   resolveCursorSelection,
-} from "../../../src/adapters/cursor/catalog";
+} from "../../../backend/src/adapters/cursor/catalog";
 import {
   CURSOR_PRODUCT_MODELS,
   CURSOR_REAL_ID_EXCEPTIONS,
@@ -14,9 +14,9 @@ import {
   CURSOR_STATIC_MODELS,
   cursorModelDisplayNames,
   cursorModelReasoningEfforts,
-} from "../../../src/adapters/cursor/discovery";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import type { OcxParsedRequest } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/discovery";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 function parsedFor(modelId: string, reasoning?: string): OcxParsedRequest {
   return {

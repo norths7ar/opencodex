@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * Structured output is a capability boundary, not a formatting preference.

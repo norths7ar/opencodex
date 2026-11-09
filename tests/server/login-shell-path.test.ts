@@ -10,7 +10,7 @@ import {
   readLoginShellPath,
   resetLoginShellPathCacheForTests,
   withLoginShellPath,
-} from "../../src/server/login-shell-path";
+} from "../../backend/src/server/login-shell-path";
 
 afterEach(() => resetLoginShellPathCacheForTests());
 

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { cmdPause } from "../../src/cli/account-extended";
-import type { AccountDeps } from "../../src/cli/account-api";
+import { cmdPause } from "../../backend/src/cli/account-extended";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
 import { repoPath } from "../helpers/repo-root";
 
 async function run(requested: string, options: { failWrite?: boolean; keys?: unknown[]; json?: boolean } = {}) {
@@ -54,7 +54,7 @@ test("API-key pause JSON uses the same two-space indentation as the other pools"
 });
 
 test("the defensive pause usage fallback also names API-key pools", async () => {
-  const source = await Bun.file(repoPath("src/cli/account-extended.ts")).text();
+  const source = await Bun.file(repoPath("backend/src/cli/account-extended.ts")).text();
   const fallback = source.split("\n").find(line => line.includes("${verb} applies to"));
   expect(fallback).toContain('applies to the openai Codex account pool, a generic OAuth provider, or an API-key pool');
 });

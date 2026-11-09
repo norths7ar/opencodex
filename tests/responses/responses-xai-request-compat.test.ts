@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as productionAdapter } from "../../src/adapters/openai-responses";
-import { parseRequest } from "../../src/responses/parser";
-import { XAI_GROK_CLI_BASE_URL } from "../../src/providers/xai-transport";
+import { createResponsesPassthroughAdapter as productionAdapter } from "../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { XAI_GROK_CLI_BASE_URL } from "../../backend/src/providers/xai-transport";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof productionAdapter>) =>
   withTestTranslatorBudget(productionAdapter(...args));

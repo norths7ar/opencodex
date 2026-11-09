@@ -1,18 +1,18 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { applyProviderConfigHints, buildCatalogEntries } from "../../src/codex/catalog";
-import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { safeConfigDTO } from "../../src/server/auth-cors";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
-import { buildProviderPostBody } from "../../gui/src/provider-payload";
-import { en } from "../../gui/src/i18n/en";
-import { interpolate, type TFn } from "../../gui/src/i18n/shared";
-import { formatProviderDisplayName, isCatalogProviderId } from "../../gui/src/provider-icons";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { applyProviderConfigHints, buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { safeConfigDTO } from "../../backend/src/server/auth-cors";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
+import { buildProviderPostBody } from "../../frontend/src/provider-payload";
+import { en } from "../../frontend/src/i18n/en";
+import { interpolate, type TFn } from "../../frontend/src/i18n/shared";
+import { formatProviderDisplayName, isCatalogProviderId } from "../../frontend/src/provider-icons";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

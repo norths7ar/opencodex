@@ -9,12 +9,12 @@
  * because a resolver-only test would pass even if the handleResponses replay flipped the wire back.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const BASE_URL = "https://api.tokenlab.sh/v1";

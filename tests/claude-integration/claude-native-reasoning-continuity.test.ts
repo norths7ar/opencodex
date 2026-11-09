@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { sanitizeReasoningInputContent } from "../../src/adapters/openai-responses/reasoning";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { decodeReasoningEnvelope, encodeReasoningEnvelope, OCX_REASONING_PREFIX } from "../../src/responses/reasoning-envelope";
-import { responsesRequestSchema } from "../../src/responses/schema";
+import { sanitizeReasoningInputContent } from "../../backend/src/adapters/openai-responses/reasoning";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { decodeReasoningEnvelope, encodeReasoningEnvelope, OCX_REASONING_PREFIX } from "../../backend/src/responses/reasoning-envelope";
+import { responsesRequestSchema } from "../../backend/src/responses/schema";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const MODEL = "ocx-claude-meta-muse--muse-spark-1.3-contributor";

@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import * as childProcess from "node:child_process";
-import { WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER } from "../../src/lib/windows-elevation";
+import { WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER } from "../../backend/src/lib/windows-elevation";
 
 const execFileMock = mock((
   _file: string,
@@ -34,7 +34,7 @@ const {
   resetStartupInstallStateForTests,
   runStartupInstallAction,
   setStartupInstallFinalizeForTests,
-} = await import("../../src/server/startup-action-control");
+} = await import("../../backend/src/server/startup-action-control");
 
 describe("startup install elevation retry", () => {
   const originalPlatform = process.platform;

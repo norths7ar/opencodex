@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { gatherRoutedModels, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../../src/codex/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
+import { gatherRoutedModels, resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../../backend/src/codex/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
 
 afterEach(() => {
   // The provider-model cache is keyed by provider name; without this, one test's gather would
@@ -12,9 +12,9 @@ afterEach(() => {
 });
 
 const originalFetch = globalThis.fetch;
-import { ollamaShowMetadataFromPayload } from "../../../src/providers/ollama-show";
+import { ollamaShowMetadataFromPayload } from "../../../backend/src/providers/ollama-show";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../../src/types";
+import type { OcxConfig } from "../../../backend/src/types";
 
 /**
  * Bounded /api/show metadata enrichment for Ollama Cloud live discovery.

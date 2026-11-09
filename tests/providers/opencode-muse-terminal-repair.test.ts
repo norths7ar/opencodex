@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   getProviderRegistryEntry,
   providerModelResponsesTerminalRepair,
-} from "../../src/providers/registry";
+} from "../../backend/src/providers/registry";
 
 describe("OpenCode muse-spark terminal repair registry policy", () => {
   test("opencode-go exposes 5s grace repair for muse-spark models", () => {

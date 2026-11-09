@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { streamChatEvents, type CloudChatEvent } from "../../src/adapters/devin/cloud-direct/chat";
-import { encodeString, frameConnectStream } from "../../src/adapters/devin/cloud-direct/wire";
+import { streamChatEvents, type CloudChatEvent } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { encodeString, frameConnectStream } from "../../backend/src/adapters/devin/cloud-direct/wire";
 
 function trailer() {
   return Buffer.from([2, 0, 0, 0, 2, 123, 125]);

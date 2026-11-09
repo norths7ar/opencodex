@@ -7,7 +7,7 @@ import {
   renderYaml,
   serializeDocument,
   tomlString,
-} from "../../src/integrations/serialize";
+} from "../../backend/src/integrations/serialize";
 
 /**
  * Activation coverage for devlog/_fin/260802_client_toggle_api/011 §1.

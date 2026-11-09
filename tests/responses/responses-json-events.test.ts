@@ -4,7 +4,7 @@ import {
   responsesJsonEventSequence,
   responsesJsonToSseBody,
   responsesJsonToSseStream,
-} from "../../src/server/responses-json-events";
+} from "../../backend/src/server/responses-json-events";
 
 describe("responsesJsonEventSequence", () => {
   test("completed: created → per-item done → completed terminal", () => {

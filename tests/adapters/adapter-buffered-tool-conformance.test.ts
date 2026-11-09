@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { adapterDefinitions, createRegisteredAdapter, effectiveAdapterContract, type AdapterWire } from "../../src/adapters/registry";
-import { buildResponseJSON } from "../../src/bridge";
-import { encodeMessage } from "../../src/lib/eventstream-decoder";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
-import type { OcxProviderConfig } from "../../src/types";
+import { adapterDefinitions, createRegisteredAdapter, effectiveAdapterContract, type AdapterWire } from "../../backend/src/adapters/registry";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { encodeMessage } from "../../backend/src/lib/eventstream-decoder";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { TOOL_WIRE_DRIVERS } from "../helpers/adapter-conformance/wire-drivers";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

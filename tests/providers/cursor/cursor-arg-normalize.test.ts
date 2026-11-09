@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeArgKeys } from "../../../src/adapters/cursor/arg-normalize";
+import { normalizeArgKeys } from "../../../backend/src/adapters/cursor/arg-normalize";
 
 const schema = {
   type: "object",

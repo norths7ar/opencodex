@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { resolveTurnStateHandle } from "../../src/server/turn-state-handles";
+import { resolveTurnStateHandle } from "../../backend/src/server/turn-state-handles";
 import {
   buildWarmupCompletionFrames,
   pumpResponsesSseToWebSocket,
@@ -10,12 +10,12 @@ import {
   sendResponsesJsonAsEvents,
   sendResponseToWebSocket,
   type WsData,
-} from "../../src/server/ws-bridge";
+} from "../../backend/src/server/ws-bridge";
 import {
   MAX_WEBSOCKET_IDLE_TIMEOUT_SECONDS,
   WEBSOCKET_IDLE_TIMEOUT_SECONDS,
-} from "../../src/server/index/live-sideband";
-import { RESPONSE_TTL_MS } from "../../src/responses/state";
+} from "../../backend/src/server/index/live-sideband";
+import { RESPONSE_TTL_MS } from "../../backend/src/responses/state";
 import type { ServerWebSocket } from "bun";
 
 function mockWs(sendResult = 1): { ws: ServerWebSocket<WsData>; sent: string[] } {
@@ -50,10 +50,10 @@ describe("WS endpoint re-framer (120/132)", () => {
     // call, so it is pinned in its new form. The invariant is unchanged -- the serve options
     // declare an explicit websocket idle timeout rather than inheriting a default.
     const source = [
-      "src/server/index.ts",
-      "src/server/index/live-sideband.ts",
-      "src/server/index/serve-options.ts",
-      "src/server/index/websocket-handler.ts",
+      "backend/src/server/index.ts",
+      "backend/src/server/index/live-sideband.ts",
+      "backend/src/server/index/serve-options.ts",
+      "backend/src/server/index/websocket-handler.ts",
     ].map(rel => readFileSync(new URL("../../" + rel, import.meta.url), "utf8")).join("\n");
     expect(source).toContain("const WEBSOCKET_IDLE_TIMEOUT_SECONDS = 0;");
     expect(source).toContain("websocket: createWebsocketHandler(ctx, requestMetrics),");
@@ -73,7 +73,7 @@ describe("WS endpoint re-framer (120/132)", () => {
     }
     // The socket never closes on its own, so the refusal has to come from the request path.
     const gate = readFileSync(
-      new URL("../../src/server/responses/request-prepare.ts", import.meta.url),
+      new URL("../../backend/src/server/responses/request-prepare.ts", import.meta.url),
       "utf8",
     );
     expect(gate).toContain("hasUnexpandedPreviousResponse");

@@ -1,22 +1,22 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { join } from "node:path";
 import { tmpdir, userInfo } from "node:os";
-import type { OcxConfig } from "../../src/types";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
+import type { OcxConfig } from "../../backend/src/types";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
 import {
   codexAccountSelectionForTurn,
   resetLifecycleDrainStateForTests,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
+} from "../../backend/src/server/lifecycle";
 import {
   blockNativeMainRecovery,
   blockNativeMainStartupForUnownedServiceHome,
   completeNativeMainRecovery,
   initializeNativeMainStartupGate,
   nativeMainStartupGateSnapshot,
-} from "../../src/codex/native-profile-startup";
+} from "../../backend/src/codex/native-profile-startup";
 
 const originalCodexHome = process.env.CODEX_HOME;
 
@@ -67,7 +67,7 @@ describe("native main profile management API", () => {
     // Model a live server whose owner lease is unavailable on an unsupported filesystem.
     // The real `assertNativeMainOwner` then throws its own 503 BEFORE doctor() runs, and the
     // endpoint must preserve that error plus its admission fields.
-    const { retainNativeMainOwner } = await import("../../src/codex/native-main-owner");
+    const { retainNativeMainOwner } = await import("../../backend/src/codex/native-main-owner");
     const owner = retainNativeMainOwner(context as never, { retryMs: 10, platform: "win32" });
     const manager = { context, doctor: async () => { throw new Error("doctor must not run under a busy owner"); } } as unknown as NativeProfileManager;
     const request = new Request("http://localhost/api/native-main-profiles/doctor");

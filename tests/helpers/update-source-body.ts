@@ -1,5 +1,5 @@
 import { guardedUpdateIo } from "./update-guarded-io.mjs";
-import { createMutationAuthorizer } from "../../src/update/mutation-guard.mjs";
+import { createMutationAuthorizer } from "../../backend/src/update/mutation-guard.mjs";
 
 /** Upgrade older I/O-only policy doubles when executing the production update bodies. */
 export function updateSourceFunction(...args: string[]) {

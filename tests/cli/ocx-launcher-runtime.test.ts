@@ -4,16 +4,16 @@ import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, mkdtempSync,
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { bundledBunPath } from "../../src/lib/bun-runtime";
-import { findDesktopCli, findPathBun, type PathBunIo } from "../../src/lib/bun-path-runtime.mjs";
-import { REAL_BUN_MIN_BYTES } from "../../src/lib/bun-binary-validator.mjs";
-import { killProxy } from "../../src/lib/process-control";
+import { bundledBunPath } from "../../backend/src/lib/bun-runtime";
+import { findDesktopCli, findPathBun, type PathBunIo } from "../../backend/src/lib/bun-path-runtime.mjs";
+import { REAL_BUN_MIN_BYTES } from "../../backend/src/lib/bun-binary-validator.mjs";
+import { killProxy } from "../../backend/src/lib/process-control";
 import { repoPath } from "../helpers/repo-root";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, moduleGraphSpecifiers, warmColdSpawn } from "../helpers/cold-spawn-warmup";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { trustedFixtureRoot } from "../helpers/trusted-fixture-root";
 
-const BIN_OCX = repoPath("bin", "ocx.mjs");
+const BIN_OCX = repoPath("backend/bin", "ocx.mjs");
 const nodeAvailable = spawnSync("node", ["--version"], {
   stdio: "ignore",
   windowsHide: true,
@@ -945,7 +945,7 @@ describe.skipIf(!nodeAvailable)("Node-safe Desktop supervision update guard", ()
       mkdirSync(macos, { recursive: true });
       const app = join(macos, "opencodex-desktop"), proxy = join(macos, "ocx");
       for (const file of [app, proxy]) { writeFileSync(file, "fixture"); chmodSync(file, 0o755); }
-      const moduleUrl = pathToFileURL(repoPath("src/service/desktop-supervision.mjs")).href;
+      const moduleUrl = pathToFileURL(repoPath("backend/src/service/desktop-supervision.mjs")).href;
       const script = `
         const { inspectDesktopSupervision, createSupervisionLatch } = await import(${JSON.stringify(moduleUrl)});
         const app = ${JSON.stringify(app)}, proxy = ${JSON.stringify(proxy)};

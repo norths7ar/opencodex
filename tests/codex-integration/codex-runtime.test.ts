@@ -39,7 +39,7 @@ import {
   resetCodexRuntimeResolveCacheForTests,
   setCodexRuntimeResolveCacheForTests,
   type RuntimeExecFile,
-} from "../../src/codex/runtime";
+} from "../../backend/src/codex/runtime";
 import {
   bundledCatalogCacheState,
   invalidateBundledCatalogCache,
@@ -48,7 +48,7 @@ import {
   resolveCatalogSourceForGather,
   setBundledCatalogCacheForTests,
   type CatalogGatherEvidenceSession,
-} from "../../src/codex/catalog/bundled";
+} from "../../backend/src/codex/catalog/bundled";
 
 function tempConfigDir(): string {
   return mkdtempSync(join(tmpdir(), "ocx-runtime-"));
@@ -740,7 +740,7 @@ describe("resolveCodexRuntime", () => {
     const {
       loadBundledCodexCatalog,
       resetBundledCatalogCacheForTests,
-    } = await import("../../src/codex/catalog/bundled");
+    } = await import("../../backend/src/codex/catalog/bundled");
 
     const home = tempConfigDir();
     const binDir = join(home, "bin");
@@ -906,7 +906,7 @@ describe("resolveCodexRuntime", () => {
   });
 
   test("catalog clamp clears diagnostics inside deps.configDir when probe fails", async () => {
-    const { clampCatalogModelsToCodexSupport } = await import("../../src/codex/catalog/effort");
+    const { clampCatalogModelsToCodexSupport } = await import("../../backend/src/codex/catalog/effort");
     const nested = join(tempConfigDir(), "nested", "opencodex-home");
     const configured = join(nested, "codex.exe");
     persistEffortClamp({
@@ -937,7 +937,7 @@ describe("resolveCodexRuntime", () => {
     const {
       loadBundledCodexCatalog,
       resetBundledCatalogCacheForTests,
-    } = await import("../../src/codex/catalog/bundled");
+    } = await import("../../backend/src/codex/catalog/bundled");
 
     const home = tempConfigDir();
     const oldDir = join(home, "old");
@@ -1031,7 +1031,7 @@ describe("resolveCodexRuntime", () => {
   });
 
   test("clamp diagnostics include unsupported default_reasoning_level changes", async () => {
-    const { clampCatalogModelsToCodexSupport } = await import("../../src/codex/catalog/effort");
+    const { clampCatalogModelsToCodexSupport } = await import("../../backend/src/codex/catalog/effort");
     const diagnostics: Array<{ removedEfforts: string[]; affectedModels: string[] }> = [];
     // A genuinely unsupported (and clampable) default rung: xhigh. The exempt rungs
     // (max/ultra) are covered by the no-diagnostic case below.
@@ -1071,7 +1071,7 @@ describe("resolveCodexRuntime", () => {
   // default (no ultra rung in the ladder) is repaired down for catalog coherence, and because
   // nothing was removed from the offering the repair produces no clamp diagnostic.
   test("an orphaned ultra default is repaired without a clamp diagnostic", async () => {
-    const { clampCatalogModelsToCodexSupport } = await import("../../src/codex/catalog/effort");
+    const { clampCatalogModelsToCodexSupport } = await import("../../backend/src/codex/catalog/effort");
     const diagnostics: Array<{ removedEfforts: string[]; affectedModels: string[] }> = [];
     const models = [{
       slug: "openrouter/example",

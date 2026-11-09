@@ -8,20 +8,20 @@ import {
   resetCodexQuotaAutoRefreshForTests,
   runCodexQuotaAutoRefresh,
   type CodexQuotaAutoRefreshWindows,
-} from "../../src/codex/quota-auto-refresh";
+} from "../../backend/src/codex/quota-auto-refresh";
 import {
   clearAccountQuota,
   getAccountQuota,
   getAccountQuotaHistory,
   setAccountQuotaFromParsed,
   type StoredAccountQuota,
-} from "../../src/codex/quota";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
-import { loadConfig, readConfigDiagnostics, validateConfigCandidate } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/quota";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
+import { loadConfig, readConfigDiagnostics, validateConfigCandidate } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { startupHealthFixture } from "../helpers/startup-health";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 
 const NOW = 1_800_000_000_000;

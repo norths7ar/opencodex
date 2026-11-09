@@ -16,7 +16,7 @@ const source = join(repoRoot, "scripts", "brand", "opencodex-mark.svg");
 
 /** Dashboard favicon, by path relative to the repository root. */
 const FAVICON_SIZES: Record<string, number> = {
-  "gui/public/favicon.png": 128,
+  "frontend/public/favicon.png": 128,
 };
 
 /** Scratch files are flat, so a nested output name becomes one path segment. */

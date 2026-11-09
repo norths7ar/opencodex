@@ -11,13 +11,13 @@ import {
   isConnectFrameCompressed,
   isConnectFrameEndStream,
   tryDecodeConnectFrame,
-} from "../../../src/adapters/cursor/framing";
+} from "../../../backend/src/adapters/cursor/framing";
 import {
   CURSOR_MAX_CONNECT_FRAME_BYTES,
   CURSOR_MAX_EFFECTIVE_CONNECT_PAYLOAD_BYTES,
   CURSOR_MAX_PENDING_FRAMES,
   createTranslatorBudget,
-} from "../../../src/lib/translator-budget";
+} from "../../../backend/src/lib/translator-budget";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 

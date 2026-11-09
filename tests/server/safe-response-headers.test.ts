@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { CodexWsMetadata } from "../../src/server/responses/codex-ws-metadata";
-import { isSafeResponseHeader, normalizeSafeResponseHeader, safeResponseHeaders } from "../../src/server/safe-response-headers";
-import { resolveTurnStateHandle } from "../../src/server/turn-state-handles";
-import { buildWsErrorFrame } from "../../src/server/ws-bridge";
+import { CodexWsMetadata } from "../../backend/src/server/responses/codex-ws-metadata";
+import { isSafeResponseHeader, normalizeSafeResponseHeader, safeResponseHeaders } from "../../backend/src/server/safe-response-headers";
+import { resolveTurnStateHandle } from "../../backend/src/server/turn-state-handles";
+import { buildWsErrorFrame } from "../../backend/src/server/ws-bridge";
 
 // A provider key with no recognizable prefix, so pattern-based redaction cannot spot it.
 const PROVIDER_KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";

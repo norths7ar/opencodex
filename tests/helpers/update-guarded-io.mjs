@@ -1,4 +1,4 @@
-import { guardedRun, UpdateMutationRefusedError } from "../../src/update/mutation-guard.mjs";
+import { guardedRun, UpdateMutationRefusedError } from "../../backend/src/update/mutation-guard.mjs";
 
 /** Run the real materialization/authorization boundary with external primitive I/O
  * injected by source-body tests. An absent seam throws; it never reaches the host. */

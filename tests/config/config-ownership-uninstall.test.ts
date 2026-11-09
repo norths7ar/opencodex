@@ -7,10 +7,10 @@ import {
   CONFIG_UNINSTALL_MANIFEST,
   recordOwnedConfigPath,
   removeOwnedConfigState,
-} from "../../src/lib/config-ownership";
-import { setUninstallElevationProbeForTests } from "../../src/lib/config-ownership-removal";
-import { writePristineCatalogBackup } from "../../src/codex/catalog/parsing";
-import { getDefaultConfig, saveConfig } from "../../src/config";
+} from "../../backend/src/lib/config-ownership";
+import { setUninstallElevationProbeForTests } from "../../backend/src/lib/config-ownership-removal";
+import { writePristineCatalogBackup } from "../../backend/src/codex/catalog/parsing";
+import { getDefaultConfig, saveConfig } from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function manifestPaths(dir: string): string[] {

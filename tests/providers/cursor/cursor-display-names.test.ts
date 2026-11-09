@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { cursorModelDisplayNames, CURSOR_STATIC_MODELS, isCursorBrandedLabel } from "../../../src/adapters/cursor/discovery";
-import { cursorUmbrellaRows } from "../../../src/adapters/cursor/catalog";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { configuredModelDisplayName } from "../../../src/codex/catalog/provider-fetch";
-import type { OcxProviderConfig } from "../../../src/types";
+import { cursorModelDisplayNames, CURSOR_STATIC_MODELS, isCursorBrandedLabel } from "../../../backend/src/adapters/cursor/discovery";
+import { cursorUmbrellaRows } from "../../../backend/src/adapters/cursor/catalog";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { configuredModelDisplayName } from "../../../backend/src/codex/catalog/provider-fetch";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * `routedDisplayName` (codex/catalog/sync.ts) passes a routed slug through unchanged, so a

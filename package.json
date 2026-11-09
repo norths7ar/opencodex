@@ -4,22 +4,22 @@
   "private": true,
   "description": "Personal Windows-only OpenCodex Lite gateway",
   "type": "module",
-  "main": "./bin/package-main.mjs",
+  "main": "./backend/bin/package-main.mjs",
   "exports": {
     ".": {
-      "bun": "./src/index.ts",
-      "default": "./bin/package-main.mjs"
+      "bun": "./backend/src/index.ts",
+      "default": "./backend/bin/package-main.mjs"
     },
     "./package.json": "./package.json"
   },
   "bin": {
-    "opencodex": "./bin/ocx.mjs",
-    "ocx": "./bin/ocx.mjs"
+    "opencodex": "./backend/bin/ocx.mjs",
+    "ocx": "./backend/bin/ocx.mjs"
   },
   "files": [
-    "bin",
-    "src",
-    "gui/dist",
+    "backend/bin",
+    "backend/src",
+    "frontend/dist",
     "README.md",
     "LICENSE"
   ],
@@ -31,26 +31,26 @@
   ],
   "testRunnerBun": "1.4.4",
   "scripts": {
-    "dev": "bun run src/cli/index.ts start",
-    "dev:proxy": "bun run src/cli/index.ts start",
-    "dev:gui": "cd gui && bun run dev",
-    "start": "bun run src/cli/index.ts start",
+    "dev": "bun run backend/src/cli/index.ts start",
+    "dev:proxy": "bun run backend/src/cli/index.ts start",
+    "dev:gui": "cd frontend && bun run dev",
+    "start": "bun run backend/src/cli/index.ts start",
     "test": "bun scripts/test.ts",
     "test:changed": "bun scripts/test.ts --changed=dev",
-    "typecheck": "bun check --no-script --noEmit",
-    "typecheck:tsc": "bun x tsc --noEmit",
+    "typecheck": "bun check --no-script --noEmit --project backend/tsconfig.json",
+    "typecheck:tsc": "bun x tsc --noEmit --project backend/tsconfig.json",
     "typecheck:gui:if-changed": "bun scripts/typecheck-gui-if-changed.ts",
-    "audit:high": "bun audit --audit-level=high && cd gui && bun audit --audit-level=high",
+    "audit:high": "bun audit --audit-level=high && cd frontend && bun audit --audit-level=high",
     "privacy:scan": "bun scripts/privacy-scan.ts",
     "favicons": "bun scripts/brand-favicons.ts",
     "favicons:check": "bun scripts/brand-favicons.ts --check",
     "generate:model-metadata": "bun scripts/generate-model-metadata.ts",
-    "build:gui": "cd gui && bun run build",
+    "build:gui": "cd frontend && bun run build",
     "build:standalone": "bun scripts/build-standalone.ts",
-    "lint:gui": "cd gui && bun run lint",
+    "lint:gui": "cd frontend && bun run lint",
     "lint:gui:if-changed": "bun scripts/lint-gui-if-changed.ts",
-    "doctor:gui": "cd gui && bun run doctor",
-    "doctor:gui:full": "cd gui && bun run doctor:full",
+    "doctor:gui": "cd frontend && bun run doctor",
+    "doctor:gui:full": "cd frontend && bun run doctor:full",
     "doctor:gui:if-changed": "bun scripts/doctor-gui-if-changed.ts"
   },
   "dependencies": {

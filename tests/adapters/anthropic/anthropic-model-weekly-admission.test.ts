@@ -4,13 +4,13 @@ import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../src/oauth/anthropic-routing";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../src/providers/quota";
-import { clearResponseStateForTests } from "../../../src/responses/state";
-import { handleResponses } from "../../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../backend/src/oauth/anthropic-routing";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../backend/src/providers/quota";
+import { clearResponseStateForTests } from "../../../backend/src/responses/state";
+import { handleResponses } from "../../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;
@@ -152,11 +152,11 @@ function deferred<T>() {
 
 
 
-import { anthropicModelFamily, anthropicFamilyRejected, claimAnthropicFamilyRevalidation, observeAnthropicFamilyQuota, ANTHROPIC_PASSIVE_FAMILY_MAX_AGE_MS } from "../../../src/oauth/anthropic-model-quota";
-import { recordAnthropicAccountRefusal, getAnthropicPoolRetryAfterSeconds, resolveAnthropicAccountForSession, bindAnthropicSessionAffinity, resetAnthropicRoutingForManualSelection, commitAnthropicSelectionRouting } from "../../../src/oauth/anthropic-routing";
-import { parseAnthropicRateLimitHeaders, recordAnthropicAccountQuotaFromHeaders, setCachedProviderAccountQuotaForTests, fetchProviderAccountQuotas } from "../../../src/providers/quota";
-import { accountQuotaCache, accountCacheKey, normalizeAnthropicQuota } from "../../../src/providers/quota/account-cache";
-import { saveAccountCredential } from "../../../src/oauth/store";
+import { anthropicModelFamily, anthropicFamilyRejected, claimAnthropicFamilyRevalidation, observeAnthropicFamilyQuota, ANTHROPIC_PASSIVE_FAMILY_MAX_AGE_MS } from "../../../backend/src/oauth/anthropic-model-quota";
+import { recordAnthropicAccountRefusal, getAnthropicPoolRetryAfterSeconds, resolveAnthropicAccountForSession, bindAnthropicSessionAffinity, resetAnthropicRoutingForManualSelection, commitAnthropicSelectionRouting } from "../../../backend/src/oauth/anthropic-routing";
+import { parseAnthropicRateLimitHeaders, recordAnthropicAccountQuotaFromHeaders, setCachedProviderAccountQuotaForTests, fetchProviderAccountQuotas } from "../../../backend/src/providers/quota";
+import { accountQuotaCache, accountCacheKey, normalizeAnthropicQuota } from "../../../backend/src/providers/quota/account-cache";
+import { saveAccountCredential } from "../../../backend/src/oauth/store";
 
 const FABLE = "claude-fable-5-1";
 const SONNET = "claude-sonnet-4-5";

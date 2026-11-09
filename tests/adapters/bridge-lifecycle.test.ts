@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 import { watchdogMs } from "../helpers/ci-watchdog";
 async function* replay(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {

@@ -2,10 +2,10 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import * as filesystem from "node:fs";
 import { connect } from "node:net";
-import { startConnectProxy } from "../../src/claude/intercept/connect-proxy";
+import { startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { claudeInterceptProxyTokenPath, ensureClaudeInterceptProxyToken, readClaudeInterceptProxyToken } from "../../src/claude/intercept/proxy-auth";
+import { claudeInterceptProxyTokenPath, ensureClaudeInterceptProxyToken, readClaudeInterceptProxyToken } from "../../backend/src/claude/intercept/proxy-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];
@@ -120,8 +120,8 @@ test("a live intercept adopts an explicitly recreated token without restarting",
   mkdirSync(claudeHome);
   const previous = process.env.CLAUDE_CONFIG_DIR;
   process.env.CLAUDE_CONFIG_DIR = claudeHome;
-  const { startClaudeIntercept } = await import("../../src/claude/intercept/runtime");
-  const { applyDesktopFirstParty } = await import("../../src/claude/desktop-first-party");
+  const { startClaudeIntercept } = await import("../../backend/src/claude/intercept/runtime");
+  const { applyDesktopFirstParty } = await import("../../backend/src/claude/desktop-first-party");
   const config = { port: 10100, defaultProvider: "openai", providers: {},
     claudeCode: { intercept: { enabled: true, port: 0, picker: false } } };
   let handle: Awaited<ReturnType<typeof startClaudeIntercept>> = null;

@@ -2,15 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { listManagementModelRows } from "../../src/server/management/model-rows";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { listManagementModelRows } from "../../backend/src/server/management/model-rows";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import type { OcxConfig } from "../../src/types";
-import { resolveOpenAiVisionModel } from "../../src/vision";
+} from "../../backend/src/codex/model-entitlements";
+import type { OcxConfig } from "../../backend/src/types";
+import { resolveOpenAiVisionModel } from "../../backend/src/vision";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

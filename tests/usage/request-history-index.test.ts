@@ -12,7 +12,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
 import {
   appendUsageEntry,
@@ -21,7 +21,7 @@ import {
   resetUsageReadCacheForTests,
   usageLogPath,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import {
   closeRequestHistoryIndex,
   queryRequestHistory,
@@ -31,14 +31,14 @@ import {
   REQUEST_HISTORY_MAX_RECORD_BYTES,
   REQUEST_HISTORY_MAX_PAGE_SIZE,
   REQUEST_HISTORY_READ_CHUNK_BYTES,
-} from "../../src/routing/history/indexer";
-import { InvalidCursorError } from "../../src/routing/history/cursor";
-import { metaValue, recordSourceMeta, resetAndCreateSchema, setMeta } from "../../src/routing/history/ingest";
-import { HISTORY_DB_FILENAME, HISTORY_SCHEMA_VERSION } from "../../src/routing/history/schema";
-import { getConfigDir } from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/routing/history/indexer";
+import { InvalidCursorError } from "../../backend/src/routing/history/cursor";
+import { metaValue, recordSourceMeta, resetAndCreateSchema, setMeta } from "../../backend/src/routing/history/ingest";
+import { HISTORY_DB_FILENAME, HISTORY_SCHEMA_VERSION } from "../../backend/src/routing/history/schema";
+import { getConfigDir } from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";
@@ -210,7 +210,7 @@ describe("request-history index (RI-02)", () => {
   test("rows missing mandatory columns are skipped, not rejected", async () => {
     for (const row of seedRows(3)) appendUsageEntry(row);
     const { appendFileSync } = await import("node:fs");
-    const { usageLogPath } = await import("../../src/usage/log");
+    const { usageLogPath } = await import("../../backend/src/usage/log");
     // A complete row is indexable even with no usage details.
     appendFileSync(
       usageLogPath(),
@@ -356,7 +356,7 @@ describe("request-history index (RI-02)", () => {
   test("JSONL truncation triggers a rebuild that mirrors the truncated ledger", async () => {
     for (const row of seedRows(10)) appendUsageEntry(row);
     await queryRequestHistory({}, undefined, 10);
-    const { usageLogPath } = await import("../../src/usage/log");
+    const { usageLogPath } = await import("../../backend/src/usage/log");
     truncateSync(usageLogPath(), 0);
     const page = await queryRequestHistory({}, undefined, 10);
     expect(page.rows.length).toBe(0);
@@ -366,7 +366,7 @@ describe("request-history index (RI-02)", () => {
   test("JSONL replacement (new file identity) rebuilds from the new ledger", async () => {
     for (const row of seedRows(5, 500)) appendUsageEntry(row);
     await queryRequestHistory({}, undefined, 10);
-    const { usageLogPath } = await import("../../src/usage/log");
+    const { usageLogPath } = await import("../../backend/src/usage/log");
     // Replace the file wholesale (new inode on most platforms).
     rmSync(usageLogPath(), { force: true });
     for (const row of seedRows(7, 7000, "b")) appendUsageEntry(row);

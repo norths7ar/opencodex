@@ -11,16 +11,16 @@ import {
 import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { codexShimReadinessWarnings } from "../../src/cli/codex-shim-readiness";
-import { diagnoseCodexShim } from "../../src/codex/shim-diagnostics";
-import { WINDOWS_SHIM_REVISION_MARKER } from "../../src/codex/shim-templates";
+import { codexShimReadinessWarnings } from "../../backend/src/cli/codex-shim-readiness";
+import { diagnoseCodexShim } from "../../backend/src/codex/shim-diagnostics";
+import { WINDOWS_SHIM_REVISION_MARKER } from "../../backend/src/codex/shim-templates";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
 isolateCodexShimEnvironment();
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 // This case proves a real install followed by advisory collection, not startup latency.
 const SHIM_INSTALL_CHILD_MS = process.platform === "win32" ? SPAWN_BUDGET_MS : undefined;
 const SHIM_INSTALL_CLEANUP_MS = 5_000;

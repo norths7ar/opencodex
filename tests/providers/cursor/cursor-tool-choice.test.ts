@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { buildCursorToolDefinitions } from "../../../src/adapters/cursor/tool-definitions";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxTool } from "../../../src/types";
+import { buildCursorToolDefinitions } from "../../../backend/src/adapters/cursor/tool-definitions";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxTool } from "../../../backend/src/types";
 
 const tools: OcxTool[] = [
   { name: "read_file", namespace: "mcp__fs", description: "Read", parameters: {} },

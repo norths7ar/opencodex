@@ -8,7 +8,7 @@ import {
   isHistoryWritePermitLive,
   withHistoryWriteSerialization,
   type HistoryWritePermit,
-} from "../../src/codex/history-lock";
+} from "../../backend/src/codex/history-lock";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";

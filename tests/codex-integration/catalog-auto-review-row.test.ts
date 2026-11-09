@@ -7,22 +7,22 @@ import {
   applyFullModelPickerOrder, buildCatalogEntriesFromObservedState,
   CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, mergeCatalogEntriesFromObservedState,
   mergeCatalogModelsWithNativeRecovery, type ObservedCatalogMergeInput, type ObservedCatalogEntryBuildInput,
-} from "../../src/codex/catalog/build-entries";
-import { applyAutoReviewModelOverride, applyConfiguredAutoReviewModelOverride } from "../../src/codex/catalog/auto-review";
-import { clampCatalogModelsToObservedCodexSupport } from "../../src/codex/catalog/effort";
-import { filterSupportedNativeSlugs, type RawEntry } from "../../src/codex/catalog/parsing";
-import { desktopVisibleNativeSlugs, upstreamNativeEntry, visibleNativeSlugs } from "../../src/codex/catalog/metadata";
-import { NATIVE_RESERVE_MODEL, SUPPORTED_NATIVE_OPENAI_SLUGS } from "../../src/codex/catalog/native-models";
-import { effectiveSubagentRoster, SPAWN_PRIORITY_FIELD } from "../../src/codex/catalog/subagent-roster";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import { RESERVE_METADATA_SOURCE_FIELD } from "../../src/codex/catalog/reserve";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
-import snapshot from "../../src/codex/data/upstream-models.json";
+} from "../../backend/src/codex/catalog/build-entries";
+import { applyAutoReviewModelOverride, applyConfiguredAutoReviewModelOverride } from "../../backend/src/codex/catalog/auto-review";
+import { clampCatalogModelsToObservedCodexSupport } from "../../backend/src/codex/catalog/effort";
+import { filterSupportedNativeSlugs, type RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { desktopVisibleNativeSlugs, upstreamNativeEntry, visibleNativeSlugs } from "../../backend/src/codex/catalog/metadata";
+import { NATIVE_RESERVE_MODEL, SUPPORTED_NATIVE_OPENAI_SLUGS } from "../../backend/src/codex/catalog/native-models";
+import { effectiveSubagentRoster, SPAWN_PRIORITY_FIELD } from "../../backend/src/codex/catalog/subagent-roster";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import { RESERVE_METADATA_SOURCE_FIELD } from "../../backend/src/codex/catalog/reserve";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../backend/src/codex/catalog/kinds";
+import snapshot from "../../backend/src/codex/data/upstream-models.json";
 import { helperPath, repoPath, repoRoot } from "../helpers/repo-root";
 import { createFixtureNamespaceOwner } from "../helpers/fixture-namespace-owner";
-import { CODEX_INTERNAL_OPENAI_MODELS } from "../../src/codex/control-plane-models";
-import { NoEnabledOpenAiProviderError, routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { CODEX_INTERNAL_OPENAI_MODELS } from "../../backend/src/codex/control-plane-models";
+import { NoEnabledOpenAiProviderError, routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 const reviewer = "codex-auto-review";
 const upstream = snapshot.models.find(row => row.slug === reviewer)!;
@@ -216,7 +216,7 @@ test("an explicit override may target the hidden reviewer without stamping that 
 
 test("router keeps the exact reviewer wire id and fails without canonical OpenAI", () => {
   expect([...CODEX_INTERNAL_OPENAI_MODELS]).toEqual([reviewer]);
-  expect(readFileSync(repoPath("src/router.ts"), "utf8")).toMatch(/import\s*\{[^}]*\bCODEX_INTERNAL_OPENAI_MODELS\b[^}]*\}\s*from\s*["']\.\/codex\/control-plane-models["']/);
+  expect(readFileSync(repoPath("backend/src/router.ts"), "utf8")).toMatch(/import\s*\{[^}]*\bCODEX_INTERNAL_OPENAI_MODELS\b[^}]*\}\s*from\s*["']\.\/codex\/control-plane-models["']/);
   expect(routeModel(nativeConfig, reviewer)).toMatchObject({ providerName: "openai", modelId: reviewer });
   expect(() => routeModel(otherConfig, reviewer)).toThrow(NoEnabledOpenAiProviderError);
 });

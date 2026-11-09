@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { encodeChatCompletionSse } from "../../src/protocols/encoders/chat";
-import type { AdapterEvent } from "../../src/types";
+import { encodeChatCompletionSse } from "../../backend/src/protocols/encoders/chat";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // A local upstream resolves an unset stall budget to disabled (#5876): the bridge already

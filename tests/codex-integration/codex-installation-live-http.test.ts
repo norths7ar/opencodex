@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import * as auth from "../../src/codex/auth-context";
-import { saveConfig } from "../../src/config";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { startServer } from "../../src/server";
-import { resolveAudioClient } from "../../src/server/audio-client";
-import { handleExternalLive } from "../../src/server/audio-live";
-import { LiveCallBindings } from "../../src/server/live-call-bindings";
-import { tryAdmitTurn } from "../../src/server/lifecycle";
+import * as auth from "../../backend/src/codex/auth-context";
+import { saveConfig } from "../../backend/src/config";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { startServer } from "../../backend/src/server";
+import { resolveAudioClient } from "../../backend/src/server/audio-client";
+import { handleExternalLive } from "../../backend/src/server/audio-live";
+import { LiveCallBindings } from "../../backend/src/server/live-call-bindings";
+import { tryAdmitTurn } from "../../backend/src/server/lifecycle";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 import { callerId, clientKey, install, installationLiveFixture, liveConfig, metadata, turn, turnMetadataBytes } from "../helpers/codex-installation-live";
 

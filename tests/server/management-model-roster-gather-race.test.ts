@@ -8,11 +8,11 @@ import {
   loadExportModels,
   previewExportModels,
   resetExportSnapshotForTests,
-} from "../../src/server/management/model-rows";
-import { clearGatherRoutedModelsInflight, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
-import { clearModelCache, getStaleCached, setCached } from "../../src/codex/model-cache";
-import type { ExportModel } from "../../src/clients/config-export";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/model-rows";
+import { clearGatherRoutedModelsInflight, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache, getStaleCached, setCached } from "../../backend/src/codex/model-cache";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Things can change inside one export load, and what it retains has to be identified by the state

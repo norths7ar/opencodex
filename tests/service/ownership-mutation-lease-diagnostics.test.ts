@@ -7,7 +7,7 @@ import {
   acquireOwnershipMutationLease,
   inspectOwnershipMutationLease,
   ownershipMutationLeaseStatusLine,
-} from "../../src/service/ownership-mutation-lease.mjs";
+} from "../../backend/src/service/ownership-mutation-lease.mjs";
 
 describe("ownership mutation lease diagnostic lookup (carry #6655)", () => {
   const instance = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";

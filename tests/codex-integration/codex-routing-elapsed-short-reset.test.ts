@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, resolveCodexAccountForThread } from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../src/codex/auth-api";
-import type { OcxConfig } from "../../src/types";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, resolveCodexAccountForThread } from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 // Lives beside codex-routing.test.ts, which sits at its file-size cap (#7896).
 // A pool account whose 5-hour window filled while its weekly window was known kept

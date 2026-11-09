@@ -3,12 +3,12 @@ import {
   ensureGrokFenceMatchesDesired,
   reconcileEnsureDesiredIntegrations,
   type EnsureDesiredIntegrationsDeps,
-} from "../../src/cli/ensure-desired-integrations";
-import type { OcxConfig } from "../../src/types";
-import type { GrokInjectResult } from "../../src/grok/inject";
-import type { Desktop3pRemovalResult } from "../../src/claude/desktop-3p";
-import { syncGrokConfig } from "../../src/grok/sync";
-import type { CatalogModel } from "../../src/codex/catalog";
+} from "../../backend/src/cli/ensure-desired-integrations";
+import type { OcxConfig } from "../../backend/src/types";
+import type { GrokInjectResult } from "../../backend/src/grok/inject";
+import type { Desktop3pRemovalResult } from "../../backend/src/claude/desktop-3p";
+import { syncGrokConfig } from "../../backend/src/grok/sync";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
 
 function config(overrides: {
   grok?: boolean;

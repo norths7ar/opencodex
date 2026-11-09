@@ -1,7 +1,7 @@
-import { hasUnreadableEncryptedAgentTask, sanitizeEncryptedContentInPlace } from "../../src/server/responses/encrypted-payload";
+import { hasUnreadableEncryptedAgentTask, sanitizeEncryptedContentInPlace } from "../../backend/src/server/responses/encrypted-payload";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { warnAgentTaskRecoveryStartup } from "../../src/server";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { warnAgentTaskRecoveryStartup } from "../../backend/src/server";
 import {
   discardEncryptedAgentTaskRecovery,
   recoverEncryptedAgentTask,
@@ -9,8 +9,8 @@ import {
   resetAgentTaskRecoveryState,
   restoreCachedEncryptedAgentTasks,
   type AgentTaskRecoveryFailureReason,
-} from "../../src/server/responses/agent-task-recovery";
-import { agentTaskRecoveryWaiterCountForTests } from "../../src/server/responses/agent-task-recovery-cache";
+} from "../../backend/src/server/responses/agent-task-recovery";
+import { agentTaskRecoveryWaiterCountForTests } from "../../backend/src/server/responses/agent-task-recovery-cache";
 import {
   agentMessage,
   codexHeaders,
@@ -30,7 +30,7 @@ import {
 } from "../helpers/agent-task-recovery";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createAgentTaskRecoveryFixture } from "../helpers/agent-task-recovery-fixture";
-import { resolveCachedAgentTaskRecoveryWithResult } from "../../src/server/responses/agent-task-recovery-cache";
+import { resolveCachedAgentTaskRecoveryWithResult } from "../../backend/src/server/responses/agent-task-recovery-cache";
 
 test("fixture rejects a foreign recovery before it can advance this case's counter", async () => {
   const fixture = caseFixture;

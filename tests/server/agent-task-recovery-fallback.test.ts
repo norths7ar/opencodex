@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import {
   noteSubagentModelFailure,
   resetSubagentModelFallbackStateForTests,
-} from "../../src/codex/subagent-model-fallback";
-import { resetAgentTaskRecoveryState } from "../../src/server/responses/agent-task-recovery";
+} from "../../backend/src/codex/subagent-model-fallback";
+import { resetAgentTaskRecoveryState } from "../../backend/src/server/responses/agent-task-recovery";
 import {
   codexHeaders,
   encryptedInput,

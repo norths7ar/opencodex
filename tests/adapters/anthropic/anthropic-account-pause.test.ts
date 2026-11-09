@@ -4,25 +4,25 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearPoolRotationState } from "../../../src/codex/pool-rotation";
-import { fetchProviderModels } from "../../../src/codex/catalog/provider-models";
-import { clearModelCache } from "../../../src/codex/model-cache";
-import * as outbound from "../../../src/lib/provider-outbound";
-import { OAuthAccountPausedError, OAuthLoginRequiredError, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock } from "../../../src/oauth";
-import { AnthropicTokenError } from "../../../src/oauth/anthropic";
-import * as localTokens from "../../../src/oauth/local-token-detect";
+import { clearPoolRotationState } from "../../../backend/src/codex/pool-rotation";
+import { fetchProviderModels } from "../../../backend/src/codex/catalog/provider-models";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
+import * as outbound from "../../../backend/src/lib/provider-outbound";
+import { OAuthAccountPausedError, OAuthLoginRequiredError, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock } from "../../../backend/src/oauth";
+import { AnthropicTokenError } from "../../../backend/src/oauth/anthropic";
+import * as localTokens from "../../../backend/src/oauth/local-token-detect";
 import {
   bindAnthropicSessionAffinity, clearAnthropicAccountPoolState, getAnthropicAccountHealthSnapshot,
   getAnthropicPoolAccessSnapshot, getEligibleAnthropicAccounts, hasAnthropicFailoverQuorum,
   promoteAnthropicActiveAccount, resolveAnthropicAccountForSession,
-} from "../../../src/oauth/anthropic-routing";
+} from "../../../backend/src/oauth/anthropic-routing";
 import {
   captureOAuthAccountSelection, createOAuthRefreshIntentLock, getAccountCredential, getAccountSet,
   markAccountNeedsReauth, removeAccount, saveAccountCredential, saveCredential, setAccountPaused, setActiveAccount,
-} from "../../../src/oauth/store";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import { fetchAnthropicQuota } from "../../../src/providers/quota/vendor-probes-oauth";
-import type { OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy, OcxConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import { fetchAnthropicQuota } from "../../../backend/src/providers/quota/vendor-probes-oauth";
+import type { OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy, OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;

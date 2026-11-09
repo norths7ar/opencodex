@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolvePinnedEffort, applyPinnedEffort, prepareEffortNormalization, chatCollabSurface, applyChatEffortCap } from "../../src/server/effort-policy";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { handleResponses } from "../../src/server/responses/core";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleNativeChatCompletions } from "../../src/server/chat-native";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
+import { resolvePinnedEffort, applyPinnedEffort, prepareEffortNormalization, chatCollabSurface, applyChatEffortCap } from "../../backend/src/server/effort-policy";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleNativeChatCompletions } from "../../backend/src/server/chat-native";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../helpers/translator-budget";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 describe("model pinned reasoning effort policy", () => {
   const providerWithPinned: OcxProviderConfig = {

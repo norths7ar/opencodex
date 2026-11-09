@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { assertServiceEnvironmentMatchesInstall, parseServiceInstallState } from "../../src/service";
+import { assertServiceEnvironmentMatchesInstall, parseServiceInstallState } from "../../backend/src/service";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-service-sqlite-home-test");

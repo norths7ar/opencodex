@@ -2,18 +2,18 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { buildClientConfigText, buildClientContribution, buildQoderClientConfig, EXPORT_CLIENTS, qoderConfigPath, type ExportContext } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, overwriteIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../src/integrations/writer";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { readIntegrationState } from "../../src/integrations/state";
-import type { OcxConfig } from "../../src/types";
+import { buildClientConfigText, buildClientContribution, buildQoderClientConfig, EXPORT_CLIENTS, qoderConfigPath, type ExportContext } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, overwriteIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../backend/src/integrations/writer";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { handleExportCommand } from "../../src/cli/export-command";
-import { canonicalContribution, fingerprint, fragmentPathsOf, semanticContribution } from "../../src/integrations/ownership";
-import type { ManagedContribution } from "../../src/clients/config-export";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleExportCommand } from "../../backend/src/cli/export-command";
+import { canonicalContribution, fingerprint, fragmentPathsOf, semanticContribution } from "../../backend/src/integrations/ownership";
+import type { ManagedContribution } from "../../backend/src/clients/config-export";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 
 const config = {
   port: 10100, hostname: "127.0.0.1", defaultProvider: "mock",

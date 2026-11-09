@@ -10,20 +10,20 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, truncateSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { LAYER_INVENTORY, readPromptLayers } from "../../src/codex/prompt-layers";
-import { encodeJournal, hashBytes, type JournalRecord } from "../../src/codex/prompt-journal";
-import { journalPathFor } from "../../src/codex/prompt-layers/paths";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { LAYER_INVENTORY, readPromptLayers } from "../../backend/src/codex/prompt-layers";
+import { encodeJournal, hashBytes, type JournalRecord } from "../../backend/src/codex/prompt-journal";
+import { journalPathFor } from "../../backend/src/codex/prompt-layers/paths";
 import {
   promptTextProbeSpawnAttemptsForTests,
   resetPromptTextProbeForTests,
   setPromptTextProbeCloseBarrierForTests,
   setPromptTextProbeCommandForTests,
-} from "../../src/codex/prompt-text-probe";
-import type { ManagementPrincipal } from "../../src/server/management-auth";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/prompt-text-probe";
+import type { ManagementPrincipal } from "../../backend/src/server/management-auth";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { OCX_SECTION_MARKER } from "../../src/codex/injected-marker";
+import { OCX_SECTION_MARKER } from "../../backend/src/codex/injected-marker";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 
 // Prompt layers deliberately keep the BARE ownership marker: 'ocx restore' is not their undo,
@@ -567,7 +567,7 @@ describe("dispatch and safety", () => {
   test("20. every mapped write error carries a client-facing status", async () => {
     // A TypeScript union does not exist at runtime, so exhaustiveness is a
     // typecheck property of Record<WriteError, number>. This asserts the values.
-    const { WRITE_ERROR_STATUS_FOR_TESTS } = await import("../../src/server/management/codex-prompt-routes");
+    const { WRITE_ERROR_STATUS_FOR_TESTS } = await import("../../backend/src/server/management/codex-prompt-routes");
     const statuses = Object.values(WRITE_ERROR_STATUS_FOR_TESTS);
     expect(statuses.length).toBeGreaterThanOrEqual(10);
     for (const status of statuses) expect(status).toBeGreaterThanOrEqual(400);
@@ -695,7 +695,7 @@ describe("020 coverage completions", () => {
 
   test("20d. each write error keeps its exact status, not merely a 4xx", async () => {
     // A range assertion would still pass if unknown_layer silently became a 409.
-    const { WRITE_ERROR_STATUS_FOR_TESTS } = await import("../../src/server/management/codex-prompt-routes");
+    const { WRITE_ERROR_STATUS_FOR_TESTS } = await import("../../backend/src/server/management/codex-prompt-routes");
     expect(WRITE_ERROR_STATUS_FOR_TESTS).toEqual({
       config_unreadable: 409,
       stale_revision: 409,
@@ -918,12 +918,12 @@ describe("020 coverage completions", () => {
     // A cwd parameter let an authenticated request read any readable folder's
     // AGENTS.md through the dashboard, and described a prompt from wherever the
     // caller pointed rather than the configuration this page reports on.
-    const source = await Bun.file(new URL("../../src/server/management/codex-prompt-routes.ts", import.meta.url)).text();
+    const source = await Bun.file(new URL("../../backend/src/server/management/codex-prompt-routes.ts", import.meta.url)).text();
     const textRoute = source.slice(source.indexOf("/api/codex-prompt/text"));
     expect(textRoute).not.toContain("searchParams.get(\"cwd\")");
     expect(textRoute.slice(0, 900)).not.toContain("process.cwd()");
 
-    const probe = await Bun.file(new URL("../../src/codex/prompt-text-probe.ts", import.meta.url)).text();
+    const probe = await Bun.file(new URL("../../backend/src/codex/prompt-text-probe.ts", import.meta.url)).text();
     // The probe resolves CODEX_HOME itself; it must not accept a directory.
     expect(probe).toContain("resolveCodexHomeDir()");
     expect(probe).toMatch(/export async function probePromptText\(\s*timeoutMs/);
@@ -932,7 +932,7 @@ describe("020 coverage completions", () => {
   test("26. the probe is bounded in bytes as well as in time", async () => {
     // A 15-second window with no output ceiling let a noisy binary balloon the
     // server. Both bounds must exist, and the process must settle exactly once.
-    const probe = await Bun.file(new URL("../../src/codex/prompt-text-probe.ts", import.meta.url)).text();
+    const probe = await Bun.file(new URL("../../backend/src/codex/prompt-text-probe.ts", import.meta.url)).text();
     expect(probe).toContain("MAX_PROBE_OUTPUT_BYTES");
     expect(probe).toContain("if (settled) return;");
     // Decoding per chunk corrupts UTF-8 that straddles a chunk boundary.

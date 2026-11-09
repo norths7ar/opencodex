@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
-import { postLocalChatCompletion } from "../../src/lib/local-chat-completion";
-import { describeImageRouted } from "../../src/vision/routed-describe";
+import { postLocalChatCompletion } from "../../backend/src/lib/local-chat-completion";
+import { describeImageRouted } from "../../backend/src/vision/routed-describe";
 
 let server: ReturnType<typeof Bun.serve> | null = null;
 

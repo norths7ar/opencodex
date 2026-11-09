@@ -2,11 +2,11 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { encodeMessage, encodeString } from "../../src/adapters/devin/cloud-direct/wire";
-import { mapDevinWebSearchResponse, resolveDevinWebSearchSnapshot, runDevinWebSearch } from "../../src/web-search/devin-executor";
-import { MAX_SIDECAR_RESPONSE_BYTES } from "../../src/web-search/parse";
-import { saveCredential } from "../../src/oauth/store";
-import type { OAuthAccessSnapshot } from "../../src/oauth";
+import { encodeMessage, encodeString } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { mapDevinWebSearchResponse, resolveDevinWebSearchSnapshot, runDevinWebSearch } from "../../backend/src/web-search/devin-executor";
+import { MAX_SIDECAR_RESPONSE_BYTES } from "../../backend/src/web-search/parse";
+import { saveCredential } from "../../backend/src/oauth/store";
+import type { OAuthAccessSnapshot } from "../../backend/src/oauth";
 
 const originalFetch = globalThis.fetch;
 const snapshot: OAuthAccessSnapshot = {

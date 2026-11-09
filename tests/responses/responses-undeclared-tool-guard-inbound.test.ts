@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { UNDECLARED_TOOL_CALL_ERROR_CODE } from "../../src/server/responses-undeclared-tool-guard";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { UNDECLARED_TOOL_CALL_ERROR_CODE } from "../../backend/src/server/responses-undeclared-tool-guard";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let releaseSpendHome: (() => void) | undefined;

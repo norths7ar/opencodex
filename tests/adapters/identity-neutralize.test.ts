@@ -8,12 +8,12 @@ import {
   identifyRoutedModel,
   NEUTRAL_IDENTITY_LINE,
   neutralizeIdentity,
-} from "../../src/adapters/identity";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { createKiroAdapter } from "../../src/adapters/kiro";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/identity";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { createKiroAdapter } from "../../backend/src/adapters/kiro";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const SYS = CODEX_GPT5_IDENTITY_LINE;

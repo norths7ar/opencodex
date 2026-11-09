@@ -2,17 +2,17 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { validateConfigCandidate } from "../../src/config";
-import { NoEligiblePolicyCandidateError, routeModel, routedProviderConfig } from "../../src/router";
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { assemblePolicyCandidateEvidence } from "../../src/routing/evidence";
-import { evaluatePolicyProfile } from "../../src/routing/evaluator";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { getRoutingProfile } from "../../src/routing/profile";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { modelRecordValue } from "../../src/reasoning-effort";
-import { isModelTextOnly } from "../../src/vision";
-import type { OcxConfig, OcxProviderConfig, OcxRoutingProfileConfig } from "../../src/types";
+import { validateConfigCandidate } from "../../backend/src/config";
+import { NoEligiblePolicyCandidateError, routeModel, routedProviderConfig } from "../../backend/src/router";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
+import { assemblePolicyCandidateEvidence } from "../../backend/src/routing/evidence";
+import { evaluatePolicyProfile } from "../../backend/src/routing/evaluator";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { getRoutingProfile } from "../../backend/src/routing/profile";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { modelRecordValue } from "../../backend/src/reasoning-effort";
+import { isModelTextOnly } from "../../backend/src/vision";
+import type { OcxConfig, OcxProviderConfig, OcxRoutingProfileConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

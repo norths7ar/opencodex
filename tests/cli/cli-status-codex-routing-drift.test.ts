@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { codexRoutingDriftWarning } from "../../src/cli/status";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+import { codexRoutingDriftWarning } from "../../backend/src/cli/status";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 
 const NO_JOURNAL = () => ({ openaiBaseUrl: null, realtimeWsBaseUrl: null });
 

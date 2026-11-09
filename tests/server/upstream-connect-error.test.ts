@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { describeUpstreamConnectFailure } from "../../src/server/responses/upstream-error";
+import { describeUpstreamConnectFailure } from "../../backend/src/server/responses/upstream-error";
 
 function tlsAltnameError(url: string): Error {
   // Shape of what Bun's fetch actually rejects with on a certificate/hostname mismatch.

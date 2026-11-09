@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { storageWorkerOsJoinSettleMs } from "../../src/storage/worker-lifecycle";
+import { storageWorkerOsJoinSettleMs } from "../../backend/src/storage/worker-lifecycle";
 
 test("storage worker OS-join settle covers every Bun 1.3.14 isolate platform", () => {
   expect(storageWorkerOsJoinSettleMs("win32")).toBe(1_500);

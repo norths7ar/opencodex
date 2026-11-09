@@ -15,14 +15,14 @@ import {
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
   InteractionUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { CONNECT_FLAG_END_STREAM, encodeConnectFrame } from "../../../src/adapters/cursor/framing";
-import { fetchCursorUsableModels } from "../../../src/adapters/cursor/live-models";
-import { armTimeoutDestroyFallback, createLiveCursorTransport, createTerminalSettler } from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { CONNECT_FLAG_END_STREAM, encodeConnectFrame } from "../../../backend/src/adapters/cursor/framing";
+import { fetchCursorUsableModels } from "../../../backend/src/adapters/cursor/live-models";
+import { armTimeoutDestroyFallback, createLiveCursorTransport, createTerminalSettler } from "../../../backend/src/adapters/cursor/live-transport";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import { gatherRoutedModels } from "../../../src/codex/catalog";
-import { clearModelCache, getProviderDiscoveryStatus } from "../../../src/codex/model-cache";
-import { handleManagementAPI } from "../../../src/server/management-api";
+import { gatherRoutedModels } from "../../../backend/src/codex/catalog";
+import { clearModelCache, getProviderDiscoveryStatus } from "../../../backend/src/codex/model-cache";
+import { handleManagementAPI } from "../../../backend/src/server/management-api";
 
 async function withDiscoveryServer<T>(
   handler: (stream: http2.ServerHttp2Stream, headers: http2.IncomingHttpHeaders) => void,

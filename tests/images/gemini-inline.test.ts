@@ -2,10 +2,10 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { isAbsolute, join } from "node:path";
-import { createImageBudget, guessExtFromMagic, materializeInlineImage } from "../../src/images/artifacts";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../src/adapters/google";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
+import { createImageBudget, guessExtFromMagic, materializeInlineImage } from "../../backend/src/images/artifacts";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../backend/src/adapters/google";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

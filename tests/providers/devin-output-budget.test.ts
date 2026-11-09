@@ -2,12 +2,12 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { createDevinAdapter, resolveDevinMaxOutputTokensForTests } from "../../src/adapters/devin";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { devinCacheIdentity, invalidateSessionIdentity } from "../../src/adapters/devin/cloud-direct/chat";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createDevinAdapter, resolveDevinMaxOutputTokensForTests } from "../../backend/src/adapters/devin";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { devinCacheIdentity, invalidateSessionIdentity } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

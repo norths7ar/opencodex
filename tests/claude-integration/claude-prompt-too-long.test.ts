@@ -6,16 +6,16 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
+import { saveConfig } from "../../backend/src/config";
 import {
   anthropicErrorBody,
   claudeOverflowSsePayload,
   claudePromptTooLongMessage,
   responsesSseToAnthropicSse,
-} from "../../src/claude/outbound";
-import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../src/server/responses/context-overflow";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/outbound";
+import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../backend/src/server/responses/context-overflow";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";

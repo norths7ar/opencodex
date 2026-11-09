@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { parseProviderEditorConfigDTO, providerEditorConfigDTO, providerManagementConfigError } from "../../src/server/auth-cors";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { providerConfigSeed } from "../../src/providers/derive";
-import type { OcxProviderConfig } from "../../src/types";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { parseProviderEditorConfigDTO, providerEditorConfigDTO, providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const provider: OcxProviderConfig = { adapter: "openai-responses", authMode: "forward", baseUrl: "https://chatgpt.com/backend-api/codex" };
 const candidate = (value: unknown) => ({ ...getDefaultConfig(), providers: { openai: value } });

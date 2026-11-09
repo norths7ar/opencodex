@@ -5,8 +5,8 @@ import {
   resolvePassiveRouteSubjectId,
   hasPassiveRouteLinker,
   resetPassiveRouteLinkerForTests,
-} from "../../src/server/passive-route-linker";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/passive-route-linker";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const config = {} as OcxConfig;
 const routed = { baseUrl: "https://example.test" } as OcxProviderConfig;
@@ -75,7 +75,7 @@ describe("core request path boundary", () => {
   });
 
   test("the Lab-side registration owns the subject construction", async () => {
-    const source = await Bun.file(new URL("../../src/lib/lab-passive-linker-registration.ts", import.meta.url)).text();
+    const source = await Bun.file(new URL("../../backend/src/lib/lab-passive-linker-registration.ts", import.meta.url)).text();
     expect(source).toContain("resolveProductionRouteSubject");
     expect(source).toContain("setPassiveRouteLinker");
   });

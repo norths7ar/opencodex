@@ -12,11 +12,11 @@ import {
   performCodexRestart,
   readCodexAppServerState,
   resetCodexRestartInFlightForTests,
-} from "../../src/codex/app-server-restart-service";
-import type { CodexRestartServiceIo } from "../../src/codex/app-server-restart-service";
-import { resetCodexAppServerCatalogStateCache } from "../../src/codex/app-server-processes";
-import type { CodexAppServerProcess } from "../../src/codex/app-server-processes";
-import { isCodexRestartResponse } from "../../src/lib/codex-restart-contract";
+} from "../../backend/src/codex/app-server-restart-service";
+import type { CodexRestartServiceIo } from "../../backend/src/codex/app-server-restart-service";
+import { resetCodexAppServerCatalogStateCache } from "../../backend/src/codex/app-server-processes";
+import type { CodexAppServerProcess } from "../../backend/src/codex/app-server-processes";
+import { isCodexRestartResponse } from "../../backend/src/lib/codex-restart-contract";
 
 function proc(pid: number, commandLine = `/opt/codex app-server --pid ${pid}`): CodexAppServerProcess {
   return { pid, commandLine };

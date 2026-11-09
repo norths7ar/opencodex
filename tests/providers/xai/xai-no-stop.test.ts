@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import { routedProviderConfig } from "../../../src/router";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter, buildOpenAIChatPassthroughRequest } from "../../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../../backend/src/router";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const XAI_NO_STOP_MODELS = [

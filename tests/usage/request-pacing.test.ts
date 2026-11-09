@@ -9,11 +9,11 @@ import {
   setProviderRequestPacingRuntimeForTest,
   waitForProviderRequestSlot,
   type RequestPacingRuntime,
-} from "../../src/providers/request-pacing";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import { fetchWithHeaderTimeout } from "../../src/server/responses/fetch-helpers";
-import { requestPacingOverloadResponse } from "../../src/server/responses/pacing-overload";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/request-pacing";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { fetchWithHeaderTimeout } from "../../backend/src/server/responses/fetch-helpers";
+import { requestPacingOverloadResponse } from "../../backend/src/server/responses/pacing-overload";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 afterEach(() => resetProviderRequestPacingForTest());
 

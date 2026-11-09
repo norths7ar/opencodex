@@ -2,14 +2,14 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegrationCoordinated } from "../../src/integrations/writer";
-import { mutateAsideProfiles, previewAsideProfile } from "../../src/integrations/aside-profiles";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { loadExportModels, previewExportModels, resetExportSnapshotForTests } from "../../src/server/management/model-rows";
-import type { OcxConfig } from "../../src/types";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegrationCoordinated } from "../../backend/src/integrations/writer";
+import { mutateAsideProfiles, previewAsideProfile } from "../../backend/src/integrations/aside-profiles";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { loadExportModels, previewExportModels, resetExportSnapshotForTests } from "../../backend/src/server/management/model-rows";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

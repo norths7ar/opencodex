@@ -14,16 +14,16 @@ import {
   slugEquals,
   slugEquivalenceKey,
   slugsEquivalent,
-} from "../../src/providers/slug-codec";
-import { knownModelIdsForProvider, routeModel } from "../../src/router";
-import { buildCatalogEntries, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
-import { clearModelCache, setCached } from "../../src/codex/model-cache";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
-import { getModelMetadata } from "../../src/generated/model-metadata";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { registryModelIdKeys } from "../../src/providers/registry/model-ids";
-import type { RawEntry } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/slug-codec";
+import { knownModelIdsForProvider, routeModel } from "../../backend/src/router";
+import { buildCatalogEntries, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache, setCached } from "../../backend/src/codex/model-cache";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
+import { getModelMetadata } from "../../backend/src/generated/model-metadata";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { registryModelIdKeys } from "../../backend/src/providers/registry/model-ids";
+import type { RawEntry } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
 
 beforeEach(() => {
   clearModelCache();

@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { Readable } from "node:stream";
-import { handleClaudeDesktopProfileCommand, type DesktopProfileCliDeps } from "../../src/cli/claude-desktop-profile";
-import { handleClaudeDesktopCommand } from "../../src/cli/claude-desktop";
-import { runtimeRequest } from "../../src/cli/runtime-api";
-import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../src/server/management/body";
-import { handleAgentSettingsRoutes } from "../../src/server/management/agent-settings-routes";
-import { loadConfig, saveConfig } from "../../src/config";
-import * as profiles from "../../src/claude/desktop-profile";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeDesktopProfileCommand, type DesktopProfileCliDeps } from "../../backend/src/cli/claude-desktop-profile";
+import { handleClaudeDesktopCommand } from "../../backend/src/cli/claude-desktop";
+import { runtimeRequest } from "../../backend/src/cli/runtime-api";
+import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../backend/src/server/management/body";
+import { handleAgentSettingsRoutes } from "../../backend/src/server/management/agent-settings-routes";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import * as profiles from "../../backend/src/claude/desktop-profile";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome, output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

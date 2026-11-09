@@ -1,9 +1,9 @@
 import { afterEach, expect, test, spyOn } from "bun:test";
 import { Readable, PassThrough } from "node:stream";
-import { withSelectedDataKey, withDataCommandSignals, readBoundedDataJson, type DataClientDeps } from "../../src/cli/access-data-client";
-import { handleSelectedKeyTest } from "../../src/cli/access-data-plane";
-import { readSecretBytes } from "../../src/cli/runtime-api";
-import type { OcxClientConnectionConfig } from "../../src/types";
+import { withSelectedDataKey, withDataCommandSignals, readBoundedDataJson, type DataClientDeps } from "../../backend/src/cli/access-data-client";
+import { handleSelectedKeyTest } from "../../backend/src/cli/access-data-plane";
+import { readSecretBytes } from "../../backend/src/cli/runtime-api";
+import type { OcxClientConnectionConfig } from "../../backend/src/types";
 
 function deps(input = Readable.from([Buffer.from("key")])): DataClientDeps {
   return { stdinImpl: input, readClientConnectionState: () => ({ kind: "disconnected" }),

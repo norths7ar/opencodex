@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { observeManagingClis } from "../../src/service/managing-cli";
-import type { ServiceInstallState } from "../../src/service/state";
+import { observeManagingClis } from "../../backend/src/service/managing-cli";
+import type { ServiceInstallState } from "../../backend/src/service/state";
 import { createTempHome } from "../helpers/temp-home";
 
 describe("Windows managing CLI selection", () => {

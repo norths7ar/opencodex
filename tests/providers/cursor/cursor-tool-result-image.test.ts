@@ -1,15 +1,15 @@
 import { describe, expect, test } from "bun:test";
 import { create, fromBinary } from "@bufbuild/protobuf";
-import { handleCursorNativeKv, setCursorBlobLimitsForTests } from "../../../src/adapters/cursor/native-exec";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
+import { handleCursorNativeKv, setCursorBlobLimitsForTests } from "../../../backend/src/adapters/cursor/native-exec";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
 import {
   AgentClientMessageSchema,
   ConversationTurnStructureSchema,
   ConversationStepSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import type { OcxMessage } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { OcxMessage } from "../../../backend/src/types";
 
 const PNG_BYTES = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x01, 0x02, 0x03, 0x04]);
 const PNG_B64 = Buffer.from(PNG_BYTES).toString("base64");

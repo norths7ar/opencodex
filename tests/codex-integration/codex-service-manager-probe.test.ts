@@ -16,11 +16,11 @@ import {
   inspectServiceManagerInstallation,
   type ProbeRunner,
   type RawProbeRunner,
-} from "../../src/service-manager-probe";
-import { buildWindowsServiceScript, buildWindowsTaskXml } from "../../src/service/windows-taskxml";
-import { windowsWscript } from "../../src/service/windows-wscript";
-import { inspectNativeCodexOwnership } from "../../src/integrations/native/ownership-preflight";
-import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/service-manager-probe";
+import { buildWindowsServiceScript, buildWindowsTaskXml } from "../../backend/src/service/windows-taskxml";
+import { windowsWscript } from "../../backend/src/service/windows-wscript";
+import { inspectNativeCodexOwnership } from "../../backend/src/integrations/native/ownership-preflight";
+import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { fixturePath } from "../helpers/repo-root";
 
@@ -266,7 +266,7 @@ describe("could not ask is not an answer", () => {
    */
   test("GUI-domain exit 125 with the user domain answering 113 and no plist is absent", () => {
     const { run, calls } = recorder((_file, args) => (
-      String(args[1]).startsWith("gui/")
+      String(args[1]).startsWith("frontend/")
         ? { status: 125, stderr: "Could not print domain: 125: Domain does not support specified action" }
         : { status: 113 }
     ), "[]");
@@ -286,7 +286,7 @@ describe("could not ask is not an answer", () => {
   test("GUI-domain exit 125 still reports a staged plist with its homes", () => {
     const path = writePlist("/somewhere/.codex", "/somewhere/.opencodex");
     const { run } = recorder((_file, args) => (
-      String(args[1]).startsWith("gui/") ? { status: 125 } : { status: 113 }
+      String(args[1]).startsWith("frontend/") ? { status: 125 } : { status: 113 }
     ), "[]");
     const result = inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home });
     expect(result.kind).toBe("present");
@@ -299,7 +299,7 @@ describe("could not ask is not an answer", () => {
   test("GUI-domain exit 125 does not hide a job loaded in the user domain", () => {
     writePlist("/somewhere/.codex", null);
     const { run } = recorder((_file, args) => (
-      String(args[1]).startsWith("gui/") ? { status: 125 } : { status: 0 }
+      String(args[1]).startsWith("frontend/") ? { status: 125 } : { status: 0 }
     ), "[]");
     const result = inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home });
     expect(result.kind).toBe("present");
@@ -309,7 +309,7 @@ describe("could not ask is not an answer", () => {
 
   test("user-domain exit 125 is still unknown — the fallback failing to answer is not an answer", () => {
     const { run, calls } = recorder((_file, args) => (
-      String(args[1]).startsWith("gui/") ? { status: 113 } : { status: 125 }
+      String(args[1]).startsWith("frontend/") ? { status: 113 } : { status: 125 }
     ));
     const result = inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home });
     expect(result.kind).toBe("unknown");
@@ -318,7 +318,7 @@ describe("could not ask is not an answer", () => {
 
   test("GUI 125 with only another UID in the complete roster is absent", () => {
     const { run } = recorder((_file, args) => ({
-      status: String(args[1]).startsWith("gui/") ? 125 : 113,
+      status: String(args[1]).startsWith("frontend/") ? 125 : 113,
     }), '[{"kCGSSessionUserIDKey":502}]');
     expect(inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home })).toEqual({ kind: "absent" });
   });
@@ -337,7 +337,7 @@ describe("could not ask is not an answer", () => {
   ]) {
     test(`GUI-domain exit 125 stays unknown: ${name}`, () => {
       const { run } = recorder((_file, args) => ({
-        status: String(args[1]).startsWith("gui/") ? 125 : 113,
+        status: String(args[1]).startsWith("frontend/") ? 125 : 113,
       }), sessions);
       expect(inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home }).kind).toBe("unknown");
       expect(inspectNativeCodexOwnership({
@@ -356,7 +356,7 @@ describe("could not ask is not an answer", () => {
             timedOut: failure === "timeout", spawnFailed: failure === "spawn failure",
           };
           if (command === "/usr/sbin/ioreg") return { status: 0, stdout: "<plist/>" };
-          return { status: String(args[1]).startsWith("gui/") ? 125 : 113 };
+          return { status: String(args[1]).startsWith("frontend/") ? 125 : 113 };
         });
         expect(inspectServiceManagerInstallation({ run, platform: "darwin", uid: 501, home }).kind).toBe("unknown");
       });

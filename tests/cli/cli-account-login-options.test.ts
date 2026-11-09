@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { Readable } from "node:stream";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { handleAccountAuthCommand } from "../../src/cli/account-auth";
-import { cmdAccount } from "../../src/cli/account";
-import { noteCredentialArgv, scrubCredentialOperands } from "../../src/cli/secret-args";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleAccountAuthCommand } from "../../backend/src/cli/account-auth";
+import { cmdAccount } from "../../backend/src/cli/account";
+import { noteCredentialArgv, scrubCredentialOperands } from "../../backend/src/cli/secret-args";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 import { pathToFileURL } from "node:url";
@@ -223,7 +223,7 @@ describe("login terminal and code boundaries", () => {
   test("human instructions preserve intended lines but escape terminal controls", async () => {
     mkdirSync(home.codexHome, { recursive: true });
     // A file URL imports on every platform; a URL pathname is "/D:/..." on Windows.
-    const source = pathToFileURL(repoPath("src", "cli", "account-auth.ts")).href;
+    const source = pathToFileURL(repoPath("backend/src", "cli", "account-auth.ts")).href;
     const script = `import {handleAccountAuthCommand} from ${JSON.stringify(source)};
       globalThis.fetch = async () => { throw new Error('Network forbidden'); };
       const result = await handleAccountAuthCommand('login', ['openai','--no-wait'], {

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { outputBudgetFor } from "../../src/clients/config-export/model-metadata";
-import { toExportModel } from "../../src/server/management/model-rows";
-import { opencodeCatalogFromProxyRows } from "../../src/cli/opencode";
-import type { OcxConfig } from "../../src/types";
+import { outputBudgetFor } from "../../backend/src/clients/config-export/model-metadata";
+import { toExportModel } from "../../backend/src/server/management/model-rows";
+import { opencodeCatalogFromProxyRows } from "../../backend/src/cli/opencode";
+import type { OcxConfig } from "../../backend/src/types";
 
 // A catalog row's own maxOutputTokens is the authoritative output limit for client exports.
 // Generated metadata and the 32000 stand-in are only fallbacks when the catalog says nothing.

@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { NativeSteeringChannel } from "../../src/server/responses/native-steering";
-import { createSteeringSettingsNormalizer } from "../../src/server/responses/native-steering-policy";
-import { validSteeringSettings } from "../../src/server/responses/native-steering-settings";
-import { nativeResponseControlEligible } from "../../src/server/responses/native-response-control";
+import { NativeSteeringChannel } from "../../backend/src/server/responses/native-steering";
+import { createSteeringSettingsNormalizer } from "../../backend/src/server/responses/native-steering-policy";
+import { validSteeringSettings } from "../../backend/src/server/responses/native-steering-settings";
+import { nativeResponseControlEligible } from "../../backend/src/server/responses/native-response-control";
 import { beginInjection, injectionConfig, installInjectionFixture, waitForInjection, InjectionSocket,
   advertiseInjection, savedResult, type Frame } from "../helpers/native-injection-fixture";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 installInjectionFixture();
 const config = (api = false) => ({ ...injectionConfig(api), codexNativeSteering: true });

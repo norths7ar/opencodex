@@ -2,8 +2,8 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { addRequestLog } from "../../src/server/request-log";
-import { usageLogPath } from "../../src/usage/log";
+import { addRequestLog } from "../../backend/src/server/request-log";
+import { usageLogPath } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

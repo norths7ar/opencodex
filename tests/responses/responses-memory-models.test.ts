@@ -4,19 +4,19 @@ import {
   applyMemoryModelEffort,
   configuredMemoryModel,
   detectMemoryModelPhase,
-} from "../../src/server/responses/memory-models";
-import { handleResponses } from "../../src/server/responses";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { MODEL_NOT_ALLOWED_FOR_KEY } from "../../src/server/admission-model-scope";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { warnDegradedMemoryModels } from "../../src/config/load-degrade";
+} from "../../backend/src/server/responses/memory-models";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { MODEL_NOT_ALLOWED_FOR_KEY } from "../../backend/src/server/admission-model-scope";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { warnDegradedMemoryModels } from "../../backend/src/config/load-degrade";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 import type { ServerWebSocket } from "bun";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import type { WsData } from "../../src/server/ws-bridge";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import type { WsData } from "../../backend/src/server/ws-bridge";
 
 const originalFetch = globalThis.fetch;
 /** The spend-journal writer lease is taken by startServer, so a bare handler call needs one. */

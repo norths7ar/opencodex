@@ -2,21 +2,21 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { OPENCODE_PROVIDER_ID } from "../../src/clients/config-export";
-import { cleanupOwnedIntegrationsBeforeUninstall } from "../../src/cli/uninstall-integrations";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { HermesProfileError } from "../../src/integrations/hermes-profiles";
-import type { ManagementContext } from "../../src/server/management/context";
-import { hermesRequestScope, scopeHermesProfileRequest } from "../../src/server/management/hermes-profile-routes";
-import { disableIntegrationCoordinated, restoreIntegrationCoordinated } from "../../src/integrations/writer";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { loadExportModels } from "../../src/server/management/model-rows";
+import { OPENCODE_PROVIDER_ID } from "../../backend/src/clients/config-export";
+import { cleanupOwnedIntegrationsBeforeUninstall } from "../../backend/src/cli/uninstall-integrations";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { HermesProfileError } from "../../backend/src/integrations/hermes-profiles";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { hermesRequestScope, scopeHermesProfileRequest } from "../../backend/src/server/management/hermes-profile-routes";
+import { disableIntegrationCoordinated, restoreIntegrationCoordinated } from "../../backend/src/integrations/writer";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { loadExportModels } from "../../backend/src/server/management/model-rows";
 import {
   setIntegrationMutationFlightTestHooks,
   setIntegrationPathTestHooks,
-} from "../../src/server/management/integration-routes";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/integration-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

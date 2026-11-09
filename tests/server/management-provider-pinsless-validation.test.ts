@@ -12,11 +12,11 @@ import { config } from "../helpers/management-relative-send-paths";
 import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import * as destinationPolicy from "../../src/lib/destination-policy";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 setDefaultTimeout(60_000);
 

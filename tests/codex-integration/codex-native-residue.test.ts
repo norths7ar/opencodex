@@ -23,15 +23,15 @@ import {
   buildCatalogEntries,
   readCodexCatalogPath,
   syncCatalogModels,
-} from "../../src/codex/catalog";
-import { buildProfileFile } from "../../src/codex/inject";
-import { classifyNativeRoutedResidue } from "../../src/codex/native-residue";
-import { readCodexTransitionState } from "../../src/codex/transition-state";
+} from "../../backend/src/codex/catalog";
+import { buildProfileFile } from "../../backend/src/codex/inject";
+import { classifyNativeRoutedResidue } from "../../backend/src/codex/native-residue";
+import { readCodexTransitionState } from "../../backend/src/codex/transition-state";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/user-identity";
+import type { OcxConfig } from "../../backend/src/types";
 import { INVALID_HISTORY_BACKUP_FIXTURES, validHistoryBackupFixture } from "../helpers/codex-history-manifest-fixtures";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { SteeringProbe } from "../../scripts/steering-probe";
 import { probeTargets, runSteeringProbe, steeringProbeSelfTest } from "../../scripts/steering-smoke";
-import { nativeResponseControlMode, nativeSteeringUnavailableReason } from "../../src/server/responses/native-response-control";
-import { createSteeringSettingsNormalizer } from "../../src/server/responses/native-steering-policy";
-import { validSteeringSettings } from "../../src/server/responses/native-steering-settings";
+import { nativeResponseControlMode, nativeSteeringUnavailableReason } from "../../backend/src/server/responses/native-response-control";
+import { createSteeringSettingsNormalizer } from "../../backend/src/server/responses/native-steering-policy";
+import { validSteeringSettings } from "../../backend/src/server/responses/native-steering-settings";
 import { injectionConfig } from "../helpers/native-injection-fixture";
 
 const args = ["--direct", "wss://api.openai.com/v1/responses", "--proxy", "ws://127.0.0.1:1455/v1/responses", "--model", "fixture-model"];

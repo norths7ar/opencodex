@@ -2,14 +2,14 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { buildT3CodeClientConfig, t3codeConfigPath, type ExportContext } from "../../src/clients/config-export";
-import { PROXY_MARKER } from "../../src/claude/auth-detect";
-import { handleExportCommand } from "../../src/cli/export-command";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../src/integrations/writer";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { buildT3CodeClientConfig, t3codeConfigPath, type ExportContext } from "../../backend/src/clients/config-export";
+import { PROXY_MARKER } from "../../backend/src/claude/auth-detect";
+import { handleExportCommand } from "../../backend/src/cli/export-command";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, refreshIntegration, restoreIntegration, type IntegrationWriteInput } from "../../backend/src/integrations/writer";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config = {

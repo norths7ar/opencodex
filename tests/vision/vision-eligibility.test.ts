@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
-import type { OcxConfig } from "../../src/types";
+import { NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   BASELINE_VISION_MODELS,
   isVisionEligibleModel,
@@ -9,7 +9,7 @@ import {
   visionBackendForCandidate,
   visionEligibleModelOptions,
   type VisionCandidateModel,
-} from "../../src/vision/eligibility";
+} from "../../backend/src/vision/eligibility";
 
 const emptyConfig: Pick<OcxConfig, "providers"> = { providers: {} };
 

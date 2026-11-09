@@ -3,11 +3,11 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import { captureOAuthAccountSelection, getAccountSet, saveCredential, setActiveAccount } from "../../../src/oauth/store";
+import { captureOAuthAccountSelection, getAccountSet, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
 import { bindAnthropicSessionAffinity, clearAnthropicAccountPoolState, resolveAnthropicAccountForSession,
-  promoteAnthropicActiveAccount, recordAnthropicAccount429, resetAnthropicRoutingForManualSelection } from "../../../src/oauth/anthropic-routing";
-import type { OcxConfig } from "../../../src/types";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
+  promoteAnthropicActiveAccount, recordAnthropicAccount429, resetAnthropicRoutingForManualSelection } from "../../../backend/src/oauth/anthropic-routing";
+import type { OcxConfig } from "../../../backend/src/types";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
 
 const originalHome = process.env.OPENCODEX_HOME;
 let home: string;
@@ -16,7 +16,7 @@ const config = { providers: { anthropic: { adapter: "anthropic", authMode: "oaut
   anthropicAccountPool: { enabled: true, autoSwitchThreshold: 0 } } as unknown as OcxConfig;
 const session = "private-session-L7-never-persist-raw";
 async function accountMutation(path: "active" | "pause" | "affinity-reset", body: unknown) {
-  const { handleOauthAccountRoutes } = await import("../../../src/server/management/oauth-account-routes");
+  const { handleOauthAccountRoutes } = await import("../../../backend/src/server/management/oauth-account-routes");
   const req = new Request(`http://127.0.0.1:10100/api/oauth/accounts/${path}`, {
     method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
@@ -26,7 +26,7 @@ async function accountMutation(path: "active" | "pause" | "affinity-reset", body
   });
 }
 async function deleteAccount(id: string, retryAffinityReset = false) {
-  const { handleOauthAccountRoutes } = await import("../../../src/server/management/oauth-account-routes");
+  const { handleOauthAccountRoutes } = await import("../../../backend/src/server/management/oauth-account-routes");
   const req = new Request(`http://127.0.0.1:10100/api/oauth/accounts?provider=anthropic&id=${encodeURIComponent(id)}${retryAffinityReset ? "&retryAffinityReset=true" : ""}`, { method: "DELETE" });
   return handleOauthAccountRoutes({ req, url: new URL(req.url), config, deps: {}, version: "test", principal: "gui-session",
     syncClaudeAgentDefsBestEffort: async () => {} });
@@ -34,7 +34,7 @@ async function deleteAccount(id: string, retryAffinityReset = false) {
 async function flush() {
   // This owner exists with the implementation; keeping the regression runnable on dev
   // proves the behavioral failure rather than a missing-export failure.
-  const store = await import("../../../src/oauth/anthropic-session-affinity-store").catch(() => null);
+  const store = await import("../../../backend/src/oauth/anthropic-session-affinity-store").catch(() => null);
   await store?.flushAnthropicSessionAffinity();
 }
 beforeEach(() => {
@@ -93,12 +93,12 @@ test("inactive pause durably invalidates only its bindings before a resume and r
   const response = await accountMutation("pause", { provider: "anthropic", accountId: b, paused: true });
   expect(response?.status).toBe(200);
   expect(await response!.json()).toMatchObject({ activeAccountChanged: false });
-  const { anthropicAffinityPath, anthropicAffinityDigest } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { anthropicAffinityPath, anthropicAffinityDigest } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const snapshot = JSON.parse(readFileSync(anthropicAffinityPath(home, "anthropic"), "utf8"));
   expect(snapshot.entries.map((entry: { accountId: string }) => entry.accountId)).toEqual([a]);
   expect(snapshot.entries[0].sessionDigest).toBe(anthropicAffinityDigest("anthropic", otherSession));
   clearAnthropicAccountPoolState(); // Drop the pending timer before an auth-only resume.
-  const { setAccountPaused } = await import("../../../src/oauth/store");
+  const { setAccountPaused } = await import("../../../backend/src/oauth/store");
   await setAccountPaused("anthropic", b, false);
   expect(resolveAnthropicAccountForSession(session, config).accountId).toBe(a);
 }, 20_000);
@@ -107,7 +107,7 @@ test("inactive pause reports a committed publication failure", async () => {
   const { b } = await seed();
   bindAnthropicSessionAffinity(session, b);
   await flush();
-  const { AnthropicSessionAffinityStore } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { AnthropicSessionAffinityStore } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const confirmation = spyOn(AnthropicSessionAffinityStore.prototype, "flushConfirmed").mockResolvedValue(false);
   try {
     const response = await accountMutation("pause", { provider: "anthropic", accountId: b, paused: true });
@@ -118,7 +118,7 @@ test("inactive pause reports a committed publication failure", async () => {
   clearAnthropicAccountPoolState();
   const retry = await accountMutation("pause", { provider: "anthropic", accountId: b, paused: true });
   expect(retry?.status).toBe(200);
-  const { anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   expect(JSON.parse(readFileSync(anthropicAffinityPath(home, "anthropic"), "utf8")).entries).toEqual([]);
 }, 20_000);
 
@@ -138,7 +138,7 @@ for (const action of ["active", "pause"] as const) {
   test(`${action} reports an unpersisted reset and an unchanged retry completes it`, async () => {
     const { a, b } = await seed();
     await flush();
-    const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+    const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
     const original = AnthropicSessionAffinityStore.prototype.flushConfirmed;
     let attempts = 0;
     const confirmation = spyOn(AnthropicSessionAffinityStore.prototype, "flushConfirmed")
@@ -173,7 +173,7 @@ test("explicit pause reset retry survives loss of process-local pending state", 
   await setActiveAccount("anthropic", a);
   bindAnthropicSessionAffinity(session, c);
   await flush();
-  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const original = AnthropicSessionAffinityStore.prototype.flushConfirmed;
   let attempts = 0;
   const confirmation = spyOn(AnthropicSessionAffinityStore.prototype, "flushConfirmed")
@@ -200,7 +200,7 @@ test("explicit pause reset retry survives loss of process-local pending state", 
 test("pausing an unrelated inactive account confirms an outstanding selection reset", async () => {
   const { a, b } = await seed();
   await flush();
-  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const original = AnthropicSessionAffinityStore.prototype.flushConfirmed;
   let attempts = 0;
   const confirmation = spyOn(AnthropicSessionAffinityStore.prototype, "flushConfirmed")
@@ -226,7 +226,7 @@ test.each([false, true])("pause reset retry preserves pool strategy without an a
   const c = getAccountSet("anthropic")!.accounts.find(row => row.id !== a && row.id !== b)!.id;
   await setActiveAccount("anthropic", a);
   await promoteAnthropicActiveAccount(a, captureOAuthAccountSelection("anthropic"), { config });
-  const { setAccountPaused } = await import("../../../src/oauth/store");
+  const { setAccountPaused } = await import("../../../backend/src/oauth/store");
   await setAccountPaused("anthropic", c, paused);
   setCachedProviderAccountQuotaForTests("anthropic", a, { fiveHourPercent: 80 });
   setCachedProviderAccountQuotaForTests("anthropic", b, { fiveHourPercent: 10 });
@@ -247,7 +247,7 @@ test.each([false, true])("deleted reset target remains retryable across publicat
   await setActiveAccount("anthropic", a);
   bindAnthropicSessionAffinity(session, c);
   await flush();
-  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { AnthropicSessionAffinityStore, anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   const original = AnthropicSessionAffinityStore.prototype.flushConfirmed;
   let fail = true;
   const confirmation = spyOn(AnthropicSessionAffinityStore.prototype, "flushConfirmed")
@@ -287,7 +287,7 @@ test("ordinary deletion preserves surviving affinity, while reset-only confirmat
   bindAnthropicSessionAffinity(session, b);
   await flush();
   expect((await deleteAccount(a))?.status).toBe(200);
-  const { anthropicAffinityPath } = await import("../../../src/oauth/anthropic-session-affinity-store");
+  const { anthropicAffinityPath } = await import("../../../backend/src/oauth/anthropic-session-affinity-store");
   expect(JSON.parse(readFileSync(anthropicAffinityPath(home, "anthropic"), "utf8")).entries).toHaveLength(1);
   expect((await deleteAccount(b))?.status).toBe(200);
   const reset = await accountMutation("affinity-reset", { provider: "anthropic" });

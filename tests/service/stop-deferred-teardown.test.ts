@@ -3,11 +3,11 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { stopProxyGracefully } from "../../src/lib/process-control";
-import { performStopTeardown } from "../../src/server/stop-teardown";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
-import type { CodexNativeRestoreResult } from "../../src/codex/inject";
-import { STOP_HISTORY_DEFERRED_EXIT_CODE, STOP_HISTORY_INCOMPLETE_EXIT_CODE } from "../../src/cli/stop-report";
+import { stopProxyGracefully } from "../../backend/src/lib/process-control";
+import { performStopTeardown } from "../../backend/src/server/stop-teardown";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
+import type { CodexNativeRestoreResult } from "../../backend/src/codex/inject";
+import { STOP_HISTORY_DEFERRED_EXIT_CODE, STOP_HISTORY_INCOMPLETE_EXIT_CODE } from "../../backend/src/cli/stop-report";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { fixturePath, repoPath } from "../helpers/repo-root";
 
@@ -428,7 +428,7 @@ describe("performStopTeardown", () => {
   });
 
   test("the real ownership check accepts only a nonce with a readable receipt on disk", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     let restored = 0;
     const deferred = await performStopTeardown(new URL(`http://127.0.0.1:10100/api/stop?deferSharedTeardown=1&teardownNonce=${claimed.nonce}`), {
@@ -462,7 +462,7 @@ describe("performStopTeardown", () => {
   });
 
   test("an unreadable receipt does not authorize a deferral", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     writeFileSync(mod.pendingTeardownPathFor(claimed.nonce), "{not json");
     let restored = 0;
@@ -513,8 +513,8 @@ describe("performStopTeardown", () => {
 
 describe("receipt naming is shared by both update lanes", () => {
   test("the launcher's scan and the TypeScript listing agree on what is outstanding", async () => {
-    const mod = await import("../../src/config/pending-teardown");
-    const names = await import("../../src/config/pending-teardown-names.mjs");
+    const mod = await import("../../backend/src/config/pending-teardown");
+    const names = await import("../../backend/src/config/pending-teardown-names.mjs");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
 
     // bin/ocx.mjs runs under plain Node and cannot import the TypeScript module, so the
@@ -547,7 +547,7 @@ describe("receipt naming is shared by both update lanes", () => {
   });
 
   test("a scan that fails is not an empty scan", async () => {
-    const names = await import("../../src/config/pending-teardown-names.mjs");
+    const names = await import("../../backend/src/config/pending-teardown-names.mjs");
     // Only a missing home is honestly empty. Any other failure may be hiding an
     // obligation, and reporting "none" would let an update install over a teardown that
     // never ran — absence of proof is not proof of absence.
@@ -559,7 +559,7 @@ describe("receipt naming is shared by both update lanes", () => {
   });
 
   test("a home that cannot be scanned is its own state, not a fabricated receipt", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const previous = process.env.OPENCODEX_HOME;
     // A file where the home should be: readdir fails with ENOTDIR, which is not absence.
     const notADir = join(home, "not-a-directory");
@@ -584,7 +584,7 @@ describe("receipt naming is shared by both update lanes", () => {
 
 describe("endpoint provenance", () => {
   test("a guessed endpoint is recorded as such and is not exact evidence", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const guessed = mod.claimPendingTeardown({ hostname: "127.0.0.1", port: 10100 }, "guessed", 1234);
     const read = mod.readPendingTeardown(guessed.nonce);
     expect(read.state === "valid" && read.receipt.endpointSource).toBe("guessed");
@@ -597,7 +597,7 @@ describe("endpoint provenance", () => {
   });
 
   test("a receipt without provenance is invalid, so an old-format file cannot be trusted", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     writeFileSync(
       mod.pendingTeardownPathFor(claimed.nonce),
@@ -614,7 +614,7 @@ describe("endpoint provenance", () => {
 
 describe("pending teardown receipts", () => {
   test("a claim is durable and carries the endpoint it was stopping", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     expect(claimed.nonce).toMatch(/^[0-9a-f]{32}$/);
     expect(existsSync(mod.pendingTeardownPathFor(claimed.nonce))).toBe(true);
@@ -625,7 +625,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("a clear names one obligation, so a concurrent claim cannot be deleted by it", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     // Review round 8 reproduced the delete-the-wrong-receipt bug; round 10 pointed out
     // that a read-compare-unlink against ONE shared path is still racy, because the file
     // can be replaced between the compare and the unlink. The nonce is the filename now,
@@ -642,7 +642,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("clearing reports whether the obligation is actually gone", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     expect(mod.clearPendingTeardown(claimed.nonce)).toBe(true);
     // Already gone is still "gone" — an idempotent discharge is not a failure.
@@ -657,7 +657,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("an unreadable receipt is invalid, outstanding, and quarantinable", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     writeFileSync(mod.pendingTeardownPathFor(claimed.nonce), "{not json");
     const read = mod.readPendingTeardown(claimed.nonce);
@@ -685,7 +685,7 @@ describe("pending teardown receipts", () => {
    * blanket exemption for every obligation in the home.
    */
   test("an exact-obligation check accepts only the receipts it was given", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     // Nothing owed matches nothing expected.
     expect(mod.pendingTeardownsAreExactly([])).toBe(true);
 
@@ -713,7 +713,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("a directory where a receipt belongs is invalid, not missing", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     rmSync(mod.pendingTeardownPathFor(claimed.nonce));
     mkdirSync(mod.pendingTeardownPathFor(claimed.nonce), { recursive: true });
@@ -724,7 +724,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("a receipt whose body disagrees with its filename is invalid", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     writeFileSync(
       mod.pendingTeardownPathFor(claimed.nonce),
@@ -736,7 +736,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("a receipt without a usable endpoint is invalid, because recovery could not locate it", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 1234);
     const path = mod.pendingTeardownPathFor(claimed.nonce);
     const base = { ownerPid: 7, nonce: claimed.nonce, createdAt: "t", endpointSource: "exact" };
@@ -749,7 +749,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("only an abandoned receipt is recoverable", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 4242);
     const live = mod.readPendingTeardown(claimed.nonce);
 
@@ -764,8 +764,8 @@ describe("pending teardown receipts", () => {
   });
 
   test("a reused owner PID is abandoned, a live opencodex owner is still left alone", async () => {
-    const mod = await import("../../src/config/pending-teardown");
-    const processState = await import("../../src/config/process-state");
+    const mod = await import("../../backend/src/config/pending-teardown");
+    const processState = await import("../../backend/src/config/process-state");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 4242);
     const live = mod.readPendingTeardown(claimed.nonce);
 
@@ -798,7 +798,7 @@ describe("pending teardown receipts", () => {
   });
 
   test("deferralMatchesReceipt needs a well-formed nonce that names a readable receipt", async () => {
-    const mod = await import("../../src/config/pending-teardown");
+    const mod = await import("../../backend/src/config/pending-teardown");
     const claimed = mod.claimPendingTeardown(ENDPOINT, "exact", 7);
     expect(mod.deferralMatchesReceipt(claimed.nonce)).toBe(true);
     expect(mod.deferralMatchesReceipt(FOREIGN_NONCE)).toBe(false);
@@ -815,7 +815,7 @@ describe("self-unloading manager refusal (#4023)", () => {
     // THIS process, so the manager stop can terminate the request handler before the
     // shared teardown two statements later restores native Codex. The Windows guard that
     // prevents exactly this returned early for every non-Windows platform.
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "absent" }) as never, "darwin", {
       env: { OCX_SERVICE: "1", OCX_SERVICE_MANAGED: "1" },
       exists: () => true,
@@ -823,7 +823,7 @@ describe("self-unloading manager refusal (#4023)", () => {
   });
 
   test("linux systemd is exempted identically and gets the same answer", async () => {
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "absent" }) as never, "linux", {
       env: { OCX_SERVICE: "1", OCX_SERVICE_MANAGED: "1" },
       exists: () => true,
@@ -833,7 +833,7 @@ describe("self-unloading manager refusal (#4023)", () => {
   test("a manually started proxy is unaffected, even with a service installed", async () => {
     // Managed service definitions write OCX_SERVICE_MANAGED. Without it this process is not
     // the managed job, so no unload can reach it and the inline stop stays available.
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "absent" }) as never, "darwin", {
       env: {},
       exists: () => true,
@@ -841,7 +841,7 @@ describe("self-unloading manager refusal (#4023)", () => {
   });
 
   test("the managed job with no service definition on disk is not at risk", async () => {
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "absent" }) as never, "darwin", {
       env: { OCX_SERVICE: "1", OCX_SERVICE_MANAGED: "1" },
       exists: () => false,
@@ -849,7 +849,7 @@ describe("self-unloading manager refusal (#4023)", () => {
   });
 
   test("Windows classification is untouched by the new branch", async () => {
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "present" }) as never, "win32", {
       env: { OCX_SERVICE: "1" },
       exists: () => true,
@@ -864,7 +864,7 @@ describe("self-unloading manager refusal (#4023)", () => {
     // borrow its routing-preservation meaning (src/cli/claude.ts, src/cli/opencode.ts),
     // so that variable cannot identify the managed job. A user with the service installed
     // but stopped, running one of those commands, must keep a working dashboard Stop.
-    const { installedServiceRespawnRisk } = await import("../../src/service");
+    const { installedServiceRespawnRisk } = await import("../../backend/src/service");
     expect(installedServiceRespawnRisk(() => ({ status: "absent" }) as never, "darwin", {
       env: { OCX_SERVICE: "1" },
       exists: () => true,
@@ -877,7 +877,7 @@ describe("self-unloading manager refusal (#4023)", () => {
 
 
 test("the route refuses a self-unload before the manager is touched", () => {
-    const source = readFileSync(repoPath("src", "server", "management-api.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "server", "management-api.ts"), "utf8");
     const from = source.indexOf('"/api/stop"');
     const handler = source.slice(from, source.indexOf("/api/codex-auth/", from));
     expect(handler).toContain('code: "self_unload_service"');
@@ -892,7 +892,7 @@ test("the route refuses a self-unload before the manager is touched", () => {
   test("a receipt-backed ocx stop keeps its deferral path", () => {
     // `ocx stop` claims a receipt, defers the teardown, and performs it itself once the
     // proxy is proven down — so it must not be refused by the new branch.
-    const source = readFileSync(repoPath("src", "server", "management-api.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "server", "management-api.ts"), "utf8");
     expect(source).toContain('const respawnRisk = holdsReceipt || sibling ? "none" : installedServiceRespawnRisk();');
   });
 });

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { computeEntryCost, summarizeUsage } from "../../src/usage/summary";
-import { aggregateAttemptUsage } from "../../src/server/request-log";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+import { computeEntryCost, summarizeUsage } from "../../backend/src/usage/summary";
+import { aggregateAttemptUsage } from "../../backend/src/server/request-log";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 
 type Attempt = NonNullable<PersistedUsageEntry["attempts"]>[number];
 const measured: Attempt = {

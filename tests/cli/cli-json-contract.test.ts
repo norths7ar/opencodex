@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { CAPABILITIES } from "../../src/cli/capabilities";
+import { CAPABILITIES } from "../../backend/src/cli/capabilities";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 
 /**
@@ -23,7 +23,7 @@ const read = (rel: string): string => readFileSync(join(repoRoot, rel), "utf8");
 
 describe("--json is order-independent", () => {
   test("status does not require --json to be the lone argument", () => {
-    const src = read("src/cli/index.ts");
+    const src = read("backend/src/cli/index.ts");
     // The exact defective form, kept as a string so a revert is caught rather than merely
     // discouraged by a comment.
     expect(src).not.toContain('statusArgs.length === 1 && statusArgs[0] === "--json"');
@@ -31,7 +31,7 @@ describe("--json is order-independent", () => {
   });
 
   test("restore does not match --json positionally", () => {
-    const src = read("src/cli/dispatch.ts");
+    const src = read("backend/src/cli/dispatch.ts");
     expect(src).not.toContain('const restoreJson = deps.args[1] === "--json"');
     expect(src).not.toContain('deps.args.slice(1).includes("--json")');
     expect(src).toContain('takeFlag(restoreArgs, "--json")');
@@ -43,7 +43,7 @@ describe("--json is order-independent", () => {
     // Generalises the two known defects: any `args[<number>] === "--json"` is the same bug
     // waiting to happen in another command.
     const offenders: string[] = [];
-    for (const rel of ["src/cli/dispatch.ts", "src/cli/index.ts", "src/cli/root.ts", "src/cli/sync-command.ts"]) {
+    for (const rel of ["backend/src/cli/dispatch.ts", "backend/src/cli/index.ts", "backend/src/cli/root.ts", "backend/src/cli/sync-command.ts"]) {
       const lines = read(rel).split("\n");
       lines.forEach((line, i) => {
         if (/args\[\d+\]\s*===\s*"--json"/.test(line)) offenders.push(`${rel}:${i + 1}`);
@@ -75,7 +75,7 @@ describe("doctor can gate a script", () => {
   test("the doctor runner no longer hard-returns 0", () => {
     // A diagnostic that always succeeds cannot gate anything, which defeats running it
     // from a script at all. BREAKING for pipelines that ignored the result.
-    const src = read("src/cli/dispatch.ts");
+    const src = read("backend/src/cli/dispatch.ts");
     const runner = src.slice(src.indexOf("  doctor: async deps => {"));
     const body = runner.slice(0, runner.indexOf("\n  },"));
     expect(body).toContain("doctorFailed()");
@@ -85,16 +85,16 @@ describe("doctor can gate a script", () => {
   test("doctorFailed is exported and resets per run", async () => {
     // Reset matters: the suite drives runDoctor several times in one process, and a sticky
     // flag would fail the second call because the first saw a problem.
-    const mod = await import("../../src/cli/doctor");
+    const mod = await import("../../backend/src/cli/doctor");
     expect(typeof mod.doctorFailed).toBe("function");
-    const src = read("src/cli/doctor.ts");
+    const src = read("backend/src/cli/doctor.ts");
     expect(src).toContain("doctorSawFailure = false;");
   });
 
   test("only FAIL-level checks fail the command, not WARN", () => {
     // WARN describes a degraded-but-working install. Failing on it would break pipelines
     // that are legitimately green, which is how a useful gate gets disabled by its users.
-    const src = read("src/cli/doctor.ts");
+    const src = read("backend/src/cli/doctor.ts");
     expect(src).toContain('if (check.level === "FAIL") recordDoctorFailure();');
   });
 });

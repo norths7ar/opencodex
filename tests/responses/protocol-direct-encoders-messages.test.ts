@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
 import {
   anthropicErrorResponse,
   collectAnthropicMessage,
   responsesSseToAnthropicSse,
-} from "../../src/claude/outbound";
-import { isTranslatorBudgetExceededError } from "../../src/lib/translator-budget";
-import { encodeAnthropicMessageSse, foldAnthropicMessage } from "../../src/protocols/encoders/messages";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/claude/outbound";
+import { isTranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
+import { encodeAnthropicMessageSse, foldAnthropicMessage } from "../../backend/src/protocols/encoders/messages";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 /**

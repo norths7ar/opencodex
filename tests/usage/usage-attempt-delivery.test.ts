@@ -6,8 +6,8 @@ import {
   createAttemptDeliverySummary,
   normalizeAttemptDeliverySummary,
   type AttemptDeliveryTarget,
-} from "../../src/usage/attempt-delivery";
-import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../src/usage/log";
+} from "../../backend/src/usage/attempt-delivery";
+import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../backend/src/usage/log";
 
 const COUNTERS = Object.keys(createAttemptDeliverySummary());
 

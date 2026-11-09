@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseUsageTimeWindow } from "../../src/usage/time-range";
+import { parseUsageTimeWindow } from "../../backend/src/usage/time-range";
 
 describe("usage time window parsing", () => {
   test("accepts epoch milliseconds and normalizes explicit ISO offsets", () => {

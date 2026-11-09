@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { CLI_COMMANDS } from "../../src/cli/registry";
-import { DISPATCH_ALIASES, DISPATCH_COMMANDS, dispatchCommand, resolveDispatchCommand, decideBusyPreferredPort, decideStartExitTeardown, decideStartWithLiveOwner, selectDefaultGuiUrl, startupLeftCodexNativeLine } from "../../src/cli/dispatch";
+import { CLI_COMMANDS } from "../../backend/src/cli/registry";
+import { DISPATCH_ALIASES, DISPATCH_COMMANDS, dispatchCommand, resolveDispatchCommand, decideBusyPreferredPort, decideStartExitTeardown, decideStartWithLiveOwner, selectDefaultGuiUrl, startupLeftCodexNativeLine } from "../../backend/src/cli/dispatch";
 import {
   honorSiblingMarker,
   markSiblingStart,
@@ -12,25 +12,25 @@ import {
   siblingStopFoundOwner,
   withoutSiblingMarker,
   withSiblingMarker,
-} from "../../src/codex/sibling-start";
-import { consumeSiblingHandoff, issueSiblingHandoff } from "../../src/codex/sibling-handoff";
-import { removeRuntimePort, writeRuntimePort } from "../../src/config/process-state";
-import { createLocalAttestationSecret } from "../../src/lib/local-management-attestation";
-import type { CliDispatchDeps } from "../../src/cli/dispatch";
-import type { OcxConfig } from "../../src/types";
-import { runGuiCommand } from "../../src/cli/gui";
-import { isCodexAccountLoginName } from "../../src/cli/account-auth";
-import { listOAuthProviders } from "../../src/oauth";
-import { isKeyLoginProvider } from "../../src/oauth/key-providers";
-import { loginUsageMessage } from "../../src/oauth/login-cli";
+} from "../../backend/src/codex/sibling-start";
+import { consumeSiblingHandoff, issueSiblingHandoff } from "../../backend/src/codex/sibling-handoff";
+import { removeRuntimePort, writeRuntimePort } from "../../backend/src/config/process-state";
+import { createLocalAttestationSecret } from "../../backend/src/lib/local-management-attestation";
+import type { CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import type { OcxConfig } from "../../backend/src/types";
+import { runGuiCommand } from "../../backend/src/cli/gui";
+import { isCodexAccountLoginName } from "../../backend/src/cli/account-auth";
+import { listOAuthProviders } from "../../backend/src/oauth";
+import { isKeyLoginProvider } from "../../backend/src/oauth/key-providers";
+import { loginUsageMessage } from "../../backend/src/oauth/login-cli";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigDir } from "../../src/config";
-import { getAccountSet, removeCredential, saveCredential } from "../../src/oauth/store";
+import { getConfigDir } from "../../backend/src/config";
+import { getAccountSet, removeCredential, saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /** Minimal fake deps. dispatchCommand only touches deps for real command
  * runners, which these tests never invoke, so an empty object is enough. */
@@ -38,8 +38,8 @@ const fakeDeps = {} as unknown as CliDispatchDeps;
 
 test.each(["models", "provider"])("%s dispatch retains normal handler exit codes", async command => {
   const handler = command === "models"
-    ? spyOn(await import("../../src/cli/models"), "handleModels")
-    : spyOn(await import("../../src/cli/provider"), "handleProviderCommand");
+    ? spyOn(await import("../../backend/src/cli/models"), "handleModels")
+    : spyOn(await import("../../backend/src/cli/provider"), "handleProviderCommand");
   const previousExit = process.exitCode;
   try {
     const args = [command, "list"];
@@ -124,7 +124,7 @@ describe("dispatchCommand exit codes", () => {
   });
 
   test("Aside sync refuses a marker-only configured-port listener before sending credentials", async () => {
-    const { refreshAsideProfilesThroughServer } = await import("../../src/cli/aside-profiles");
+    const { refreshAsideProfilesThroughServer } = await import("../../backend/src/cli/aside-profiles");
     const requests: Array<{ input: string; headers: Headers }> = [];
     const directRequests: string[] = [];
     const http = spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
@@ -177,9 +177,9 @@ describe("dispatchCommand exit codes", () => {
   });
 
   test("sync refreshes already-owned OpenCode and Kilo after publishing the Codex catalog", async () => {
-    const syncModule = await import("../../src/codex/sync");
-    const catalogModule = await import("../../src/integrations/catalog-refresh");
-    const asideModule = await import("../../src/cli/aside-profiles");
+    const syncModule = await import("../../backend/src/codex/sync");
+    const catalogModule = await import("../../backend/src/integrations/catalog-refresh");
+    const asideModule = await import("../../backend/src/cli/aside-profiles");
     const order: string[] = [];
     const sync = spyOn(syncModule, "syncModelsToCodex").mockImplementation(async () => {
       order.push("catalog");
@@ -211,9 +211,9 @@ describe("dispatchCommand exit codes", () => {
     "sync with no live proxy reports Aside unavailability after Codex %s without local fallback", async status => {
       const home = mkdtempSync(join(tmpdir(), "ocx-dispatch-aside-offline-"));
       const previous = { OPENCODEX_HOME: process.env.OPENCODEX_HOME, CODEX_HOME: process.env.CODEX_HOME };
-      const syncModule = await import("../../src/codex/sync");
-      const catalogModule = await import("../../src/integrations/catalog-refresh");
-      const livenessModule = await import("../../src/server/proxy-liveness");
+      const syncModule = await import("../../backend/src/codex/sync");
+      const catalogModule = await import("../../backend/src/integrations/catalog-refresh");
+      const livenessModule = await import("../../backend/src/server/proxy-liveness");
       const warnings: string[] = [];
       const logs: string[] = [];
       const sync = spyOn(syncModule, "syncModelsToCodex").mockResolvedValue({
@@ -391,7 +391,7 @@ describe("health retries a just-started proxy", () => {
  * `handleEnsure` call site that already had it right.
  */
 describe("start probes the configured port before shadowing it (source-level)", () => {
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
   test("every findProxyOwnerBeforeJournalRecovery call site asks for the probe", () => {
     const calls = cliSource.match(/findProxyOwnerBeforeJournalRecovery\s*\(([^)]*)\)/g) ?? [];
@@ -500,7 +500,7 @@ describe("start probes the configured port before shadowing it (source-level)", 
  */
 describe("a busy preferred port never becomes a second proxy (#5004)", () => {
   // INV-START-01 (structure/overview.md).
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
 
   test("the busy-preferred-port decision matrix", () => {
     // The exact reported shape: preferred 58285 held by a live proxy, ephemeral 62254 free.
@@ -546,7 +546,7 @@ describe("a busy preferred port never becomes a second proxy (#5004)", () => {
     // The refusal text moved into the guidance leaf so a Desktop-supervised holder gets Desktop
     // guidance; the ordinary holder still hears "Use 'ocx stop' first." from the same function.
     expect(fn).toMatch(/decision === "refuse-live-proxy"[\s\S]{0,200}?duplicateRuntimeMessage\(holder\?\.pid, preferred\)/);
-    expect(readFileSync(repoPath("src/cli/desktop-runtime-guidance.ts"), "utf8")).toContain("Use 'ocx stop' first.");
+    expect(readFileSync(repoPath("backend/src/cli/desktop-runtime-guidance.ts"), "utf8")).toContain("Use 'ocx stop' first.");
     expect(fn).toMatch(/decision === "refuse-unidentified-holder"[\s\S]{0,700}?StartCommandExit\(1\)/);
     // The wrapper receives an explicit stay-out signal for a served port.
     expect(fn).toMatch(/decision === "service-stay-out"[\s\S]{0,500}?StartCommandExit\(serviceStayOutExitCode\(\)\)/);
@@ -571,7 +571,7 @@ describe("a busy preferred port never becomes a second proxy (#5004)", () => {
  * mark. The end-to-end proof that shared bytes survive is in cli-start-journal-order.test.ts.
  */
 describe("a sibling start leaves shared client routing to the live owner", () => {
-  const cliSource = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+  const cliSource = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
   const slice = (from: string, to: string): string => {
     const at = cliSource.indexOf(from);
     const end = cliSource.indexOf(to, at);
@@ -724,7 +724,7 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
     const owner = slice("async function findProxyOwnerBeforeJournalRecovery(", "async function handleStart(");
     expect(owner).not.toContain("reconcileJournal(");
     expect(start).toContain("recover: () => recoverStartJournalAfterOwnerRecheck(owner, siblingStart)");
-    const recovery = readFileSync(repoPath("src/cli/start-owner-fence.ts"), "utf8");
+    const recovery = readFileSync(repoPath("backend/src/cli/start-owner-fence.ts"), "utf8");
     expect(recovery.indexOf("markCrossHomeSibling()")).toBeGreaterThan(-1);
     expect(recovery.indexOf("markCrossHomeSibling()")).toBeLessThan(recovery.indexOf("reconcileStartupJournal()"));
     const detached = slice("function detachedStartEnvironment(", "async function handleEnsure(");
@@ -737,13 +737,13 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
     // updater's restart. A stray marker would mark them before any probe.
     const opencodeStartEnv = "env: withProcessRuntimeProvenance(opencodeProxyStartEnv(withoutSiblingMarker(process.env)) as NodeJS.ProcessEnv),";
     for (const [path, env] of [
-      ["src/cli/claude.ts", 'env: withProcessRuntimeProvenance(withoutSiblingMarker({ ...process.env, OCX_SERVICE: "1" })),'],
-      ["src/cli/opencode.ts", opencodeStartEnv],
-      ["src/cli/minimax.ts", opencodeStartEnv],
+      ["backend/src/cli/claude.ts", 'env: withProcessRuntimeProvenance(withoutSiblingMarker({ ...process.env, OCX_SERVICE: "1" })),'],
+      ["backend/src/cli/opencode.ts", opencodeStartEnv],
+      ["backend/src/cli/minimax.ts", opencodeStartEnv],
     ] as const) {
       expect(readFileSync(repoPath(path), "utf8"), path).toContain(env);
     }
-    expect(readFileSync(repoPath("src/server/management/system-restart.ts"), "utf8"))
+    expect(readFileSync(repoPath("backend/src/server/management/system-restart.ts"), "utf8"))
       .toContain("const sourceEnv: NodeJS.ProcessEnv = withSiblingMarker(process.env, issueSiblingHandoff);");
   });
 
@@ -1383,9 +1383,9 @@ describe("explicit sync restart after a committed configuration change", () => {
     { changed: true, ok: false, requested: true, expected: 0 },
     { changed: true, ok: true, requested: false, expected: 0 },
   ]) test(JSON.stringify(scenario), async () => {
-    const sync = await import("../../src/codex/sync");
-    const restart = await import("../../src/cli/restart-scope");
-    const aside = await import("../../src/cli/aside-profiles");
+    const sync = await import("../../backend/src/codex/sync");
+    const restart = await import("../../backend/src/cli/restart-scope");
+    const aside = await import("../../backend/src/cli/aside-profiles");
     const syncSpy = spyOn(sync, "syncModelsToCodex").mockResolvedValue({
       status: "applied", ok: scenario.ok, configChanged: scenario.changed,
       added: 0, catalogPath: null, catalogExists: false, catalogWritten: false, cacheSynced: false, message: "fixture",

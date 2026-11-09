@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { providerOutboundGet, ProviderOutboundPolicyError } from "../../src/lib/provider-outbound";
-import { resolvePublicAddresses } from "../../src/lib/destination-policy";
+import { providerOutboundGet, ProviderOutboundPolicyError } from "../../backend/src/lib/provider-outbound";
+import { resolvePublicAddresses } from "../../backend/src/lib/destination-policy";
 
 /**
  * #758: a stock Ollama provider passed config validation -- which consults the registry's

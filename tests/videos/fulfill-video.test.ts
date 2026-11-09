@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseVideoCallArgs, pollVideoWithHeartbeats, buildVideoResult } from "../../src/images/fulfill-video";
-import type { PollVideoJobFn } from "../../src/images/fulfill-video";
+import { parseVideoCallArgs, pollVideoWithHeartbeats, buildVideoResult } from "../../backend/src/images/fulfill-video";
+import type { PollVideoJobFn } from "../../backend/src/images/fulfill-video";
 
 const auth = { baseUrl: "https://api.x.ai/v1", token: "t" };
 const noopSleep = async (): Promise<void> => {};

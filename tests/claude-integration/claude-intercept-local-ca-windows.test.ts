@@ -3,11 +3,11 @@ import * as filesystem from "node:fs";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { claudeInterceptStateDir, ensureLocalInterceptCa } from "../../src/claude/intercept/local-ca";
-import { setLocalCaFileHooksForTests, withLocalCaPublication } from "../../src/claude/intercept/local-ca-files";
-import { setLocalCaWindowsAclRunnerForTests } from "../../src/claude/intercept/local-ca-windows";
-import { resetHardenedStateForTests, setIcaclsRunnerForTests, setPlatformForTests, type IcaclsResult } from "../../src/lib/windows-secret-acl";
-import { setWindowsPrincipalRunnerForTests } from "../../src/lib/windows-user-principal";
+import { claudeInterceptStateDir, ensureLocalInterceptCa } from "../../backend/src/claude/intercept/local-ca";
+import { setLocalCaFileHooksForTests, withLocalCaPublication } from "../../backend/src/claude/intercept/local-ca-files";
+import { setLocalCaWindowsAclRunnerForTests } from "../../backend/src/claude/intercept/local-ca-windows";
+import { resetHardenedStateForTests, setIcaclsRunnerForTests, setPlatformForTests, type IcaclsResult } from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsPrincipalRunnerForTests } from "../../backend/src/lib/windows-user-principal";
 
 const CURRENT = "S-1-5-21-1-2-3-1001";
 const FOREIGN = "S-1-5-21-9-8-7-1002";

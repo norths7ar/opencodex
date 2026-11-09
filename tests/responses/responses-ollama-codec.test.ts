@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { ollamaToChat, ollamaBufferedResponse, createOllamaStreamState, consumeOllamaChatChunk, ollamaStreamTerminal, OllamaCodecError, MAX_OLLAMA_TOOL_CALLS } from "../../src/protocols/codecs/ollama";
+import { ollamaToChat, ollamaBufferedResponse, createOllamaStreamState, consumeOllamaChatChunk, ollamaStreamTerminal, OllamaCodecError, MAX_OLLAMA_TOOL_CALLS } from "../../backend/src/protocols/codecs/ollama";
 
 const png = "iVBORw0KGgo=";
 const schema = { type: "object", properties: { q: { type: "string", enum: ["a", "b"] } }, required: ["q"], additionalProperties: false };

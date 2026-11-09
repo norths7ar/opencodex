@@ -2,18 +2,18 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
 import {
   REPLAY_REFUSAL_NO_RETRY_HEADER,
   REPLAY_REFUSAL_NO_RETRY_VALUE,
   REPLAY_REFUSED_STATUS,
   UPSTREAM_RESET_REPLAY_REFUSED_CODE,
-} from "../../src/lib/upstream-retry";
-import { DEFAULT_RETRYABLE_429_RETRY_AFTER_SEC } from "../../src/lib/retry-after";
+} from "../../backend/src/lib/upstream-retry";
+import { DEFAULT_RETRYABLE_429_RETRY_AFTER_SEC } from "../../backend/src/lib/retry-after";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The acceptance unit for the ambiguous-resend refusal is not the shape of one response: it is

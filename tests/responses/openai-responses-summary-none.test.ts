@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const targets: OcxProviderConfig[] = [

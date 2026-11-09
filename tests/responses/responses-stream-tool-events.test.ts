@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 async function* replay(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {
   for (const event of events) yield event;

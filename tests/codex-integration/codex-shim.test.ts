@@ -3,12 +3,12 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, copyFileSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { autoRestoreCodexShim, buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim, diagnoseCodexShim, findCodexOnPath, inspectCodexShimBackingForCommand, installCodexShim, isLocalAbsoluteInspectionPath, isVersionManagerOwnedCodexPath, isWindowsInteropDir, lastCodexDiscoveryError, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, setCodexShimProbeShellForTests, uninstallCodexShim } from "../../src/codex/shim";
+import { autoRestoreCodexShim, buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim, diagnoseCodexShim, findCodexOnPath, inspectCodexShimBackingForCommand, installCodexShim, isLocalAbsoluteInspectionPath, isVersionManagerOwnedCodexPath, isWindowsInteropDir, lastCodexDiscoveryError, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, setCodexShimProbeShellForTests, uninstallCodexShim } from "../../backend/src/codex/shim";
 import { isolateCodexShimEnvironment, prependPath, withInstalledShim } from "../helpers/codex-shim-install-fixture";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
-import { CODEX_SHIM_ENSURE_FAILED_DIAGNOSTIC, SHIM_MARKER, UNIX_SHIM_REVISION_MARKER } from "../../src/codex/shim-templates";
+import { CODEX_SHIM_ENSURE_FAILED_DIAGNOSTIC, SHIM_MARKER, UNIX_SHIM_REVISION_MARKER } from "../../backend/src/codex/shim-templates";
 
 
 /**
@@ -200,14 +200,14 @@ describe("Codex autostart shim", () => {
   });
 
   test("PowerShell shim is written with a UTF-8 BOM (Windows PowerShell 5.1 decodes BOM-less ps1 as ANSI)", async () => {
-    const source = readFileSync(repoPath("src", "codex", "shim-wrapper-write.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "codex", "shim-wrapper-write.ts"), "utf8");
 
     expect(source).toContain("`\\uFEFF${buildWindowsPowerShellCodexShim(realCodexPath, bun, cli, bunRuntimeSource)}`");
   });
 
   test("Windows target discovery includes the extensionless Git-Bash launcher and writeShim emits a forward-slash sh shim for it", () => {
-    const source = readFileSync(repoPath("src", "codex", "shim.ts"), "utf8");
-    const writeSource = readFileSync(repoPath("src", "codex", "shim-wrapper-write.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "codex", "shim.ts"), "utf8");
+    const writeSource = readFileSync(repoPath("backend/src", "codex", "shim-wrapper-write.ts"), "utf8");
 
     expect(source).toContain('const gitBashLauncher = join(dir, "codex");');
     expect(source).toContain("for (const path of [cmd, ps1, gitBashLauncher])");
@@ -1729,7 +1729,7 @@ exit 127
         chmodSync(wrapper, 0o644);
       }
 
-      const shimModule = repoPath("src", "codex", "shim.ts");
+      const shimModule = repoPath("backend/src", "codex", "shim.ts");
       const firstScript = `
         import { existsSync, readFileSync, readdirSync, utimesSync, writeFileSync } from "node:fs";
         import { join } from "node:path";

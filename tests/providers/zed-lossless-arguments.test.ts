@@ -1,10 +1,10 @@
 import { expect, test } from 'bun:test';
-import { translateZedOpenAiStream } from '../../src/adapters/zed-openai-stream';
-import { zedEventStream } from '../../src/adapters/zed';
-import { createTranslatorBudget } from '../../src/lib/translator-budget';
-import { bridgeToResponsesSSE, buildResponseJSON } from '../../src/bridge';
-import { ZedJsonScanner, zedJsonTokens, ZED_JSON_MAX_DEPTH } from '../../src/adapters/zed-json-tokens';
-import { ZedArgumentAuthority, reconcileZedArguments, zedArgumentFingerprint } from '../../src/adapters/zed-tool-arguments';
+import { translateZedOpenAiStream } from '../../backend/src/adapters/zed-openai-stream';
+import { zedEventStream } from '../../backend/src/adapters/zed';
+import { createTranslatorBudget } from '../../backend/src/lib/translator-budget';
+import { bridgeToResponsesSSE, buildResponseJSON } from '../../backend/src/bridge';
+import { ZedJsonScanner, zedJsonTokens, ZED_JSON_MAX_DEPTH } from '../../backend/src/adapters/zed-json-tokens';
+import { ZedArgumentAuthority, reconcileZedArguments, zedArgumentFingerprint } from '../../backend/src/adapters/zed-tool-arguments';
 
 const item = (argumentsText: string, id = 'a') => ({ type: 'function_call', id,
   call_id: 'call-' + id, name: 'fixture', status: 'completed', arguments: argumentsText });

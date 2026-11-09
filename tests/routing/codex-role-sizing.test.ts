@@ -9,7 +9,7 @@ import {
   buildRoleSizingUserMessage,
   parseRoleSizingResponse,
   roleInstructionsExcerpt,
-} from "../../src/codex/role-sizing";
+} from "../../backend/src/codex/role-sizing";
 
 const GOOD = {
   tier: "standard",

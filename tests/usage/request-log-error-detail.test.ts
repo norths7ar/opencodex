@@ -5,17 +5,17 @@ import { join } from "node:path";
 import {
   addFinalRequestLog, addRequestLog, clearRequestLogsForTests, getRequestLogEntries, requestLogEntryFromPersistedUsage,
   type RequestLogContext, type RequestLogEntry,
-} from "../../src/server/request-log";
-import { recordLocalFailureDetail, recordUpstreamValidationDetail } from "../../src/server/request-log-failure-detail";
+} from "../../backend/src/server/request-log";
+import { recordLocalFailureDetail, recordUpstreamValidationDetail } from "../../backend/src/server/request-log-failure-detail";
 import {
   appendUsageEntry, readUsageEntries, resetUsageReadCacheForTests, usageLogPath, type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import {
   boundedRateLimitResetAt, deriveRateLimitResetAt, errorDetailFor, LOG_ERROR_CODES, normalizeLogErrorCode,
   projectErrorDetail, RATE_LIMIT_RESET_MAX_MS,
-} from "../../src/usage/error-detail";
-import { museLimitReport } from "../../gui/src/muse-limit-observation";
-import { requestLogDto } from "../../src/server/management/shared";
+} from "../../backend/src/usage/error-detail";
+import { museLimitReport } from "../../frontend/src/muse-limit-observation";
+import { requestLogDto } from "../../backend/src/server/management/shared";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { log } from "../helpers/request-log-entry";
 

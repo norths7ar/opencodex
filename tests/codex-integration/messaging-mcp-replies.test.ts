@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { queueMcpRpc } from "../../src/messaging/mcp-queue-rpc";
-import { queueMcpReadReply } from "../../src/messaging/mcp-reply-tools";
+import { queueMcpRpc } from "../../backend/src/messaging/mcp-queue-rpc";
+import { queueMcpReadReply } from "../../backend/src/messaging/mcp-reply-tools";
 import { QUEUE_MCP_TARGET, REPLY_MCP_CLIENT, REPLY_MCP_TURN, queueMcpFixture } from "../helpers/messaging-mcp-queue";
 
 const input = { threadId: QUEUE_MCP_TARGET, clientMessageId: REPLY_MCP_CLIENT };

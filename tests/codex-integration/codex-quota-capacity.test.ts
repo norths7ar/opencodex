@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { estimateCodexQuotaCapacity } from "../../src/codex/quota-capacity";
-import type { QuotaHistorySample } from "../../src/codex/quota-history";
-import type { PersistedUsageEntry, PersistedUsageAttempt } from "../../src/usage/log";
+import { estimateCodexQuotaCapacity } from "../../backend/src/codex/quota-capacity";
+import type { QuotaHistorySample } from "../../backend/src/codex/quota-history";
+import type { PersistedUsageEntry, PersistedUsageAttempt } from "../../backend/src/usage/log";
 
 const label = "pabcdef";
 const shared = (model: string) => model !== "independent";

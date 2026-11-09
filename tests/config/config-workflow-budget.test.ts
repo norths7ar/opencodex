@@ -1,10 +1,10 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { warnDegradedTopLevelOptIns } from "../../src/config/load-degrade";
-import { resolveWorkflowBudgetPolicy } from "../../src/lib/workflow-budget-config";
-import { DEFAULT_WORKFLOW_BUDGET_POLICY } from "../../src/lib/workflow-budget";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { warnDegradedTopLevelOptIns } from "../../backend/src/config/load-degrade";
+import { resolveWorkflowBudgetPolicy } from "../../backend/src/lib/workflow-budget-config";
+import { DEFAULT_WORKFLOW_BUDGET_POLICY } from "../../backend/src/lib/workflow-budget";
 
 const invalid = [null, [], true, "8", { maxConcurrentChildren: 1 }, { maxConcurrentChildren: 65 },
   { maxPhysicalSends: 0 }, { maxPhysicalSends: 2.5 }, { maxDistinctChildren: "64" },

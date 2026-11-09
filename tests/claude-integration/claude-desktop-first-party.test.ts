@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join, relative, sep } from "node:path";
-import * as userIdentity from "../../src/codex/user-identity";
+import * as userIdentity from "../../backend/src/codex/user-identity";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 import {
   applyDesktopFirstParty,
@@ -10,23 +10,23 @@ import {
   removeDesktopFirstParty,
   resolveClaudeDesktopApplyMode,
   resolveClaudeDesktopMode,
-} from "../../src/claude/desktop-first-party";
-import { applyDesktop, parseDesktopApplyArgs } from "../../src/cli/claude-desktop";
-import { inspectDesktop3pConfigLibrary, removeDesktop3pStandardPivot } from "../../src/claude/desktop-3p";
-import { persistCommittedDesktopGateway } from "../../src/claude/desktop-gateway-state";
-import { armClaudeCodeBaseline, saveConfigPreservingClaudeCode } from "../../src/config";
-import { ensureClaudeDesktopMatchesDesired } from "../../src/cli/ensure-desired-integrations";
-import { claudeInterceptCaCertPath } from "../../src/claude/intercept/local-ca";
-import { claudeInterceptProxyTokenPath, readClaudeInterceptProxyToken } from "../../src/claude/intercept/proxy-auth";
-import { claudeInterceptProxyUrl } from "../../src/claude/intercept/settings";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { setIntegrationEnabled } from "../../src/codex/desired-state";
-import { firstPartyDesired } from "../../src/claude/first-party-settings";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/desktop-first-party";
+import { applyDesktop, parseDesktopApplyArgs } from "../../backend/src/cli/claude-desktop";
+import { inspectDesktop3pConfigLibrary, removeDesktop3pStandardPivot } from "../../backend/src/claude/desktop-3p";
+import { persistCommittedDesktopGateway } from "../../backend/src/claude/desktop-gateway-state";
+import { armClaudeCodeBaseline, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import { ensureClaudeDesktopMatchesDesired } from "../../backend/src/cli/ensure-desired-integrations";
+import { claudeInterceptCaCertPath } from "../../backend/src/claude/intercept/local-ca";
+import { claudeInterceptProxyTokenPath, readClaudeInterceptProxyToken } from "../../backend/src/claude/intercept/proxy-auth";
+import { claudeInterceptProxyUrl } from "../../backend/src/claude/intercept/settings";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { setIntegrationEnabled } from "../../backend/src/codex/desired-state";
+import { firstPartyDesired } from "../../backend/src/claude/first-party-settings";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
-import { setLocalCaWindowsAclRunnerForTests } from "../../src/claude/intercept/local-ca-windows";
-import { resolveCurrentWindowsPrincipal } from "../../src/lib/windows-user-principal";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
+import { setLocalCaWindowsAclRunnerForTests } from "../../backend/src/claude/intercept/local-ca-windows";
+import { resolveCurrentWindowsPrincipal } from "../../backend/src/lib/windows-user-principal";
 
 let root = "";
 let lifecycleLock: ReturnType<typeof isolateClientLifecycleLock>;

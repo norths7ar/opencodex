@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { createOpenAIChatToolNameRegistry } from "../../../src/adapters/openai-chat/tool-name-registry";
-import { compileGoogleWireBody } from "../../../src/adapters/google-wire-compiler";
-import { kiroToolName } from "../../../src/adapters/kiro-wire";
-import { buildResponseJSON } from "../../../src/bridge";
-import { parseRequest } from "../../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../../src/server/responses";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../src/types";
-import { namespacedToolName } from "../../../src/types/tools";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { createOpenAIChatToolNameRegistry } from "../../../backend/src/adapters/openai-chat/tool-name-registry";
+import { compileGoogleWireBody } from "../../../backend/src/adapters/google-wire-compiler";
+import { kiroToolName } from "../../../backend/src/adapters/kiro-wire";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../../backend/src/server/responses";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../backend/src/types";
+import { namespacedToolName } from "../../../backend/src/types/tools";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const LONG_NAMESPACE = "mcp__codex_apps__codex_document_control";

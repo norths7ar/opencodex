@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { repoPath } from "../helpers/repo-root";
-import { readBoundedRegularFileSync } from "../../src/lib/bounded-file-read";
+import { readBoundedRegularFileSync } from "../../backend/src/lib/bounded-file-read";
 
 const repoRoot = repoPath();
 let root = "";

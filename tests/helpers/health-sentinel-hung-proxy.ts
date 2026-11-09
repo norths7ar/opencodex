@@ -12,7 +12,7 @@ import net from "node:net";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { startServiceHealthSentinel } from "../../src/service/health-sentinel-launch";
+import { startServiceHealthSentinel } from "../../backend/src/service/health-sentinel-launch";
 
 const home = process.env.OPENCODEX_HOME!;
 const mode = process.env.SENTINEL_FIXTURE_MODE;

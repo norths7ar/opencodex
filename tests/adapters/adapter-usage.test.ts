@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToolCallId, MAX_TOOL_CALL_ID_LENGTH } from "../../src/adapters/tool-call-id";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../src/adapters/anthropic";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../src/adapters/google";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
+import { anthropicToolCallId, MAX_TOOL_CALL_ID_LENGTH } from "../../backend/src/adapters/tool-call-id";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../backend/src/adapters/anthropic";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../backend/src/adapters/google";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import type { OcxAssistantMessage, OcxContentPart, OcxToolResultMessage } from "../../src/types";
+import type { OcxAssistantMessage, OcxContentPart, OcxToolResultMessage } from "../../backend/src/types";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>
   withTestTranslatorBudget(createAnthropicAdapterProduction(...args));

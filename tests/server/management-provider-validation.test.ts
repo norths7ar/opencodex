@@ -4,19 +4,19 @@ import { managementFetch as fetch, ManagementRequest as Request } from "../helpe
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { getTrackedCodexWebSocketCountForAccount } from "../../src/codex/websocket-registry";
-import { clearAccountNeedsReauth, clearAccountQuota, getAccountQuota, isAccountNeedsReauth, markAccountNeedsReauth, updateAccountQuota } from "../../src/codex/auth-api";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { getTrackedCodexWebSocketCountForAccount } from "../../backend/src/codex/websocket-registry";
+import { clearAccountNeedsReauth, clearAccountQuota, getAccountQuota, isAccountNeedsReauth, markAccountNeedsReauth, updateAccountQuota } from "../../backend/src/codex/auth-api";
 import {
   CODEX_THREAD_AFFINITY_IDLE_TTL_MS,
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   getCodexUpstreamHealth,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import { loadConfig, saveConfig } from "../../src/config";
-import { deriveProviderPresets } from "../../src/providers/derive";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+} from "../../backend/src/codex/routing";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { deriveProviderPresets } from "../../backend/src/providers/derive";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   assertServerAuthConfig,
   corsHeaders,
@@ -28,34 +28,34 @@ import {
   rootFallbackPayload,
   safeConfigDTO,
   startServer,
-} from "../../src/server";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { providerEditorConfigDTO, providerManagementConfigError } from "../../src/server/auth-cors";
+} from "../../backend/src/server";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { providerEditorConfigDTO, providerManagementConfigError } from "../../backend/src/server/auth-cors";
 import {
   autoReviewModelOverridesConfigError,
   autoReviewModelTargetConfigError,
   providerEmptyToolOutputConfigError,
-} from "../../src/config/provider-validation";
-import { providerServiceTierConfigError, withProviderServiceTierDTO } from "../../src/server/management/provider-capability-config";
-import { clearModelCache, markProviderDiscoveryFailed, markProviderDiscoveryOk } from "../../src/codex/model-cache";
+} from "../../backend/src/config/provider-validation";
+import { providerServiceTierConfigError, withProviderServiceTierDTO } from "../../backend/src/server/management/provider-capability-config";
+import { clearModelCache, markProviderDiscoveryFailed, markProviderDiscoveryOk } from "../../backend/src/codex/model-cache";
 import {
   resetCodexModelEntitlementCacheForTests,
   resolveCodexModelEntitlements,
   type CodexModelEntitlementCredentialSnapshot,
-} from "../../src/codex/model-entitlements";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/model-entitlements";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import * as providerOutbound from "../../src/lib/provider-outbound";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import * as providerOutbound from "../../backend/src/lib/provider-outbound";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
-import { LOCAL_PROVIDER_RELOAD_NAME_HEADER, LOCAL_PROVIDER_RELOAD_PATH } from "../../src/lib/local-provider-reload-contract";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
+import { LOCAL_PROVIDER_RELOAD_NAME_HEADER, LOCAL_PROVIDER_RELOAD_PATH } from "../../backend/src/lib/local-provider-reload-contract";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { clearProviderQuotaCache, fetchProviderQuotaReports, setProviderQuotaBeforePublishForTests } from "../../src/providers/quota";
-import { setCachedProviderQuotaForTests } from "../../src/providers/quota-routing-cache";
+import { clearProviderQuotaCache, fetchProviderQuotaReports, setProviderQuotaBeforePublishForTests } from "../../backend/src/providers/quota";
+import { setCachedProviderQuotaForTests } from "../../backend/src/providers/quota-routing-cache";
 
 // Full-suite Windows load: startServer + multi-step provider PATCH/GET flows exceed the
 // default 5s per-test budget (same flake class as 810fa115 / claude-management-api).
@@ -1852,7 +1852,7 @@ describe("provider management validation", () => {
 
       // The stored value is only half the contract — assert the RUNTIME resolution too, since
       // router.ts backfills the registry default beneath user entries at resolve time.
-      const { routedProviderConfig } = await import("../../src/router");
+      const { routedProviderConfig } = await import("../../backend/src/router");
       const stored = loadConfig().providers.deepseek;
       expect(stored).toBeDefined();
       expect(routedProviderConfig("deepseek", stored!).annotateEmptyToolOutputs).toBe(false);
@@ -5207,7 +5207,7 @@ test("OpenAI provider cap remembers an explicit window across off, reload, and o
   live = loadConfig();
   expect(live.providerContextCaps).toBeUndefined();
   expect(await put({provider:"openai",enabled:true})).toMatchObject({caps:{openai:128_000}});
-  const {nativeModelRows} = await import("../../src/codex/catalog");
+  const {nativeModelRows} = await import("../../backend/src/codex/catalog");
   expect(nativeModelRows(live).filter(row=>row.contextWindow !== undefined).every(row=>row.contextWindow! <= 128_000)).toBe(true);
   await put({setAll:false});
   expect(loadConfig().providerContextCapValues?.openai).toBe(128_000);

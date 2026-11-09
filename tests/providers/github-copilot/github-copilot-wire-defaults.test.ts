@@ -9,15 +9,15 @@
  * the externally observable wire. Pattern mirrors tests/providers/deepseek-inbound-wire.test.ts.
  */
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import * as oauth from "../../../src/oauth";
-import { fetchProviderModels } from "../../../src/codex/catalog/provider-fetch";
-import { clearModelCache } from "../../../src/codex/model-cache";
-import { clearCopilotAutoModelsForTests } from "../../../src/providers/github-copilot-auto";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../../src/server/adapter-resolve";
-import { handleResponses } from "../../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import * as oauth from "../../../backend/src/oauth";
+import { fetchProviderModels } from "../../../backend/src/codex/catalog/provider-fetch";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
+import { clearCopilotAutoModelsForTests } from "../../../backend/src/providers/github-copilot-auto";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 

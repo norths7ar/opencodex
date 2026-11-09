@@ -7,11 +7,11 @@ import {
   providerTlsProfileDiagnostic,
   resetProviderTlsProfileForTests,
   setProviderTlsRuntimeForTest,
-} from "../../src/lib/provider-tls-profile";
-import { isEgressTransparentExecutor } from "../../src/lib/provider-egress";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/lib/provider-tls-profile";
+import { isEgressTransparentExecutor } from "../../backend/src/lib/provider-egress";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 afterEach(() => resetProviderTlsProfileForTests());
 

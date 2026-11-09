@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../src/adapters/openai-chat";
-import { bridgeToResponsesSSE } from "../../../src/bridge";
-import type { AdapterEvent } from "../../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../backend/src/adapters/openai-chat";
+import { bridgeToResponsesSSE } from "../../../backend/src/bridge";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { handleClientIntegrationCommand } from "../../src/cli/integrations";
-import { handleIntegrationJournalRemove } from "../../src/cli/integration-journal";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration } from "../../src/integrations/writer";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
-import type { OcxConfig } from "../../src/types";
+import { handleClientIntegrationCommand } from "../../backend/src/cli/integrations";
+import { handleIntegrationJournalRemove } from "../../backend/src/cli/integration-journal";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration } from "../../backend/src/integrations/writer";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

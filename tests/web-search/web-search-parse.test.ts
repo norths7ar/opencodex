@@ -4,7 +4,7 @@ import {
   MAX_SIDECAR_RESPONSE_BYTES,
   MAX_SIDECAR_STREAM_BYTES,
   parseSidecarSSE,
-} from "../../src/web-search/parse";
+} from "../../backend/src/web-search/parse";
 
 function sse(events: { type: string; [k: string]: unknown }[]): Response {
   const body = events.map(e => `event: ${e.type}\ndata: ${JSON.stringify(e)}\n\n`).join("");

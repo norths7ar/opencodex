@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { applyMultiAgentMode, MULTI_AGENT_ORIGIN_FIELD, type RawEntry } from "../../src/codex/catalog/parsing";
+import { applyMultiAgentMode, MULTI_AGENT_ORIGIN_FIELD, type RawEntry } from "../../backend/src/codex/catalog/parsing";
 
 /**
  * Issue 5636: returning from a forced multi-agent mode to default left newer native rows

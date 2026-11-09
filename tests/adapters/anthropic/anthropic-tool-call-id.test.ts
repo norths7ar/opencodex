@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToolCallId, createToolCallIdAllocator, MAX_TOOL_CALL_ID_LENGTH } from "../../../src/adapters/tool-call-id";
+import { anthropicToolCallId, createToolCallIdAllocator, MAX_TOOL_CALL_ID_LENGTH } from "../../../backend/src/adapters/tool-call-id";
 
 // #1767: Anthropic validates tool_use.id against [a-zA-Z0-9_-]. A history replayed from another
 // provider path can carry ids that do not conform, and one of them anywhere in the transcript

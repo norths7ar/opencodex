@@ -1,9 +1,9 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { protectGlmSummaryBudget } from "../../../src/adapters/openai-chat/summary-budget";
-import { chatCompletionsToResponsesBody } from "../../../src/chat/inbound";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxProviderConfig } from "../../../src/types";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { protectGlmSummaryBudget } from "../../../backend/src/adapters/openai-chat/summary-budget";
+import { chatCompletionsToResponsesBody } from "../../../backend/src/chat/inbound";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const model = "glm-5.3-flash";
 const provider: OcxProviderConfig = {

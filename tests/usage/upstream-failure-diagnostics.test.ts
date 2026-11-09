@@ -4,21 +4,21 @@ import { mkdtempSync, statSync, utimesSync, writeFileSync, type Stats } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
-import { handleResponses } from "../../src/server/responses";
-import { saveConfig } from "../../src/config";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import { registerUpstreamRewriter } from "../../src/plugins/upstream-hooks";
+import { handleResponses } from "../../backend/src/server/responses";
+import { saveConfig } from "../../backend/src/config";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { registerUpstreamRewriter } from "../../backend/src/plugins/upstream-hooks";
 import { codexWsUpstreamFetch, streamingInit } from "../helpers/ws-upstream-fixtures";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { OutboundCredentialRegistry, credentialComponents, setOutboundCredentialRegistryForTests } from "../../src/lib/outbound-credential-registry";
-import { diagnosticValueAllowed } from "../../src/server/request-log-terminal-status";
-import { INCOMPLETE_RETRY_MS, configuredCredentials } from "../../src/server/configured-credentials";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/api-key-resolve";
-import { classifyCodexUpstreamOutcome } from "../../src/codex/routing/cooldown-math";
-import { httpStatusFromTerminalError } from "../../src/lib/errors";
-import { addFinalRequestLog, httpStatusForRequestLogTerminal, inspectResponseLogJson, noteUpstreamRequestId, type RequestLogContext, type RequestLogEntry } from "../../src/server/request-log";
+import { OutboundCredentialRegistry, credentialComponents, setOutboundCredentialRegistryForTests } from "../../backend/src/lib/outbound-credential-registry";
+import { diagnosticValueAllowed } from "../../backend/src/server/request-log-terminal-status";
+import { INCOMPLETE_RETRY_MS, configuredCredentials } from "../../backend/src/server/configured-credentials";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/api-key-resolve";
+import { classifyCodexUpstreamOutcome } from "../../backend/src/codex/routing/cooldown-math";
+import { httpStatusFromTerminalError } from "../../backend/src/lib/errors";
+import { addFinalRequestLog, httpStatusForRequestLogTerminal, inspectResponseLogJson, noteUpstreamRequestId, type RequestLogContext, type RequestLogEntry } from "../../backend/src/server/request-log";
 
 function context(): RequestLogContext {
   return { model: "fixture-model", provider: "openai" };
@@ -546,7 +546,7 @@ describe("sent credentials echoed into upstream diagnostics", () => {
   });
 
   test("an OAuth token from the credential store is masked before it is ever sent", async () => {
-    const { saveCredential } = await import("../../src/oauth/store");
+    const { saveCredential } = await import("../../backend/src/oauth/store");
     const access = secret("oauth-unsent");
     const refresh = secret("oauth-refresh");
     await saveCredential("github-copilot", { access, refresh, expires: Date.now() + 3_600_000, accountId: "u", source: "oauth" });
@@ -565,7 +565,7 @@ describe("sent credentials echoed into upstream diagnostics", () => {
   });
 
   test("a per-turn header carried in a reused WebSocket frame instead of the upgrade is registered", async () => {
-    const { setCodexWsReuseAcrossTurns } = await import("../../src/config/codex-ws-reuse-setting");
+    const { setCodexWsReuseAcrossTurns } = await import("../../backend/src/config/codex-ws-reuse-setting");
     const turnSecret = secret("ws-frame");
     const unregister = registerUpstreamRewriter("ws-frame-fixture", target => {
       if (target.transport === "websocket") target.url = "ws://127.0.0.1:1/backend-api/codex/responses";
@@ -677,7 +677,7 @@ describe("sent credentials echoed into upstream diagnostics", () => {
   });
 
 test("OAuth bearers of a reselected account (custom executor, 429 rotation) are both masked", async () => {
-    const { saveCredential, getAccountSet, setActiveAccount } = await import("../../src/oauth/store");
+    const { saveCredential, getAccountSet, setActiveAccount } = await import("../../backend/src/oauth/store");
     const tokens = { a: secret("oauth-a"), b: secret("oauth-b") };
     for (const account of ["a", "b"] as const) await saveCredential("github-copilot", {
       access: tokens[account], refresh: `refresh-${account}`, expires: Date.now() + 3_600_000,

@@ -1,6 +1,6 @@
 import { expect, spyOn, test } from "bun:test";
-import { modelSelectionGuidance, modelSelectionNextSteps } from "../../src/cli/model-selection-guidance";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
+import { modelSelectionGuidance, modelSelectionNextSteps } from "../../backend/src/cli/model-selection-guidance";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
 
 test("registration guidance uses real CLI model commands and preserves exact listed IDs", () => {
   const next = modelSelectionNextSteps("openrouter");

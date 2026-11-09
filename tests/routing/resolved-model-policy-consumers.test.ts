@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { routeModel } from "../../src/router";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { applyOpenAiVirtualModel } from "../../src/providers/openai-virtual-models";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { captureProviderGather } from "../../src/codex/catalog/gather-capture";
-import { fetchProviderModelsWithAuth, refreshingModelsAuthResolver } from "../../src/codex/catalog/provider-models";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { routeModel } from "../../backend/src/router";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { applyOpenAiVirtualModel } from "../../backend/src/providers/openai-virtual-models";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { captureProviderGather } from "../../backend/src/codex/catalog/gather-capture";
+import { fetchProviderModelsWithAuth, refreshingModelsAuthResolver } from "../../backend/src/codex/catalog/provider-models";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 describe("resolved static policy consumers", () => {
   test("route capture is frozen and late credential replacement cannot change static policy", () => {

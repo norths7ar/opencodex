@@ -1,4 +1,4 @@
-import { configuredAdminToken } from "../../src/lib/admin-secrets";
+import { configuredAdminToken } from "../../backend/src/lib/admin-secrets";
 
 function isLocalManagementRequest(input: RequestInfo | URL): boolean {
   try {

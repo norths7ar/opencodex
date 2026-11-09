@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { MessageBudget } from "../../src/messaging/budget";
-import { LocalMessageRpc } from "../../src/messaging/rpc";
-import { localDaemonEndpoint, localSocket } from "../../src/messaging/socket";
+import { MessageBudget } from "../../backend/src/messaging/budget";
+import { LocalMessageRpc } from "../../backend/src/messaging/rpc";
+import { localDaemonEndpoint, localSocket } from "../../backend/src/messaging/socket";
 import { LOCAL_TARGET, localMessagingFixture, NO_REPLY } from "../helpers/messaging-local";
 import { repoPath } from "../helpers/repo-root";
 
@@ -19,7 +19,7 @@ test("transport rejects remote URLs and unsupported platforms without opening a 
 });
 
 test("importing the unactivated subsystem allocates no listener, timer, child or socket", async () => {
-  const modules = ["types", "budget", "socket", "rpc", "discovery", "envelope", "input", "send", "mcp-queue-rpc", "mcp-queue-tools", "mcp-queue-server", "mcp-reply-tools", "mcp-reply-cursor"].map(name => repoPath("src", "messaging", `${name}.ts`));
+  const modules = ["types", "budget", "socket", "rpc", "discovery", "envelope", "input", "send", "mcp-queue-rpc", "mcp-queue-tools", "mcp-queue-server", "mcp-reply-tools", "mcp-reply-cursor"].map(name => repoPath("backend/src", "messaging", `${name}.ts`));
   const script = `
     const forbidden = () => { throw new Error("unexpected messaging resource allocation"); };
     globalThis.setTimeout = forbidden;
@@ -35,22 +35,22 @@ test("importing the unactivated subsystem allocates no listener, timer, child or
 
 test("messaging activation is command-local, never on an ordinary proxy startup path", async () => {
   // Native parser inventory, not graph completeness: catches static/dynamic literal imports.
-  const allowed = new Set(["src/cli/message-args.ts", "src/cli/message-command.ts", "src/cli/message-remote-args.ts", "src/cli/message-remote-command.ts", "src/cli/message-mcp-command.ts"]);
+  const allowed = new Set(["backend/src/cli/message-args.ts", "backend/src/cli/message-command.ts", "backend/src/cli/message-remote-args.ts", "backend/src/cli/message-remote-command.ts", "backend/src/cli/message-mcp-command.ts"]);
   const transpiler = new Bun.Transpiler({ loader: "ts" });
-  for await (const scanned of new Bun.Glob("src/**/*.{ts,mts}").scan({ cwd: repoPath() })) {
+  for await (const scanned of new Bun.Glob("backend/src/**/*.{ts,mts}").scan({ cwd: repoPath() })) {
     const path = scanned.replaceAll("\\", "/"); // Bun.Glob yields native separators on Windows.
-    if (path.startsWith("src/messaging/") || /\.d\.(?:ts|mts)$/.test(path)) continue;
+    if (path.startsWith("backend/src/messaging/") || /\.d\.(?:ts|mts)$/.test(path)) continue;
     const imports = transpiler.scanImports(readFileSync(repoPath(path), "utf8").replace(/^#![^\n]*\n/, ""));
     const incoming = imports.filter(entry => /(?:^|\/)messaging(?:\/|$)/.test(entry.path));
     if (!allowed.has(path)) expect(incoming, path).toEqual([]);
     for (const entry of imports.filter(entry => /(?:^|\/)message-(?:command|args|runtime)$/.test(entry.path))) {
-      expect(["src/cli/dispatch.ts", "src/cli/message-command.ts", "src/cli/message-remote-command.ts", "src/cli/message-remote-args.ts"], path).toContain(path);
-      if (path === "src/cli/dispatch.ts") {
+      expect(["backend/src/cli/dispatch.ts", "backend/src/cli/message-command.ts", "backend/src/cli/message-remote-command.ts", "backend/src/cli/message-remote-args.ts"], path).toContain(path);
+      if (path === "backend/src/cli/dispatch.ts") {
         expect(entry.path).toBe("./message-command"); expect(entry.kind).toBe("dynamic-import");
       }
     }
   }
-  expect(readFileSync(repoPath("src/cli/dispatch.ts"), "utf8")).toContain('message: async deps => (await import("./message-command")).runMessageCommand(deps.args.slice(1))');
+  expect(readFileSync(repoPath("backend/src/cli/dispatch.ts"), "utf8")).toContain('message: async deps => (await import("./message-command")).runMessageCommand(deps.args.slice(1))');
 });
 
 describe.skipIf(process.platform === "win32")("local RPC lifecycle", () => {

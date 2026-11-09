@@ -2,26 +2,26 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   resolveCodexAuthContext, materializeCodexUpstreamAuth, applyCodexAuthContextToProvider,
   assertCodexAuthContextNotCooled, CodexPoolAccountCreditsOffError, createCodexAuthDispatchGuard,
   cooldownErrorMessage, cooldownErrorResponse, shouldMarkAccountNeedsReauthForCodexAuthFailure,
-} from "../../src/codex/auth-context";
-import { rebindPoolCreditPolicy } from "../../src/codex/pool-credit-policy";
-import { TERMINAL_SHORT_WINDOW_FRESHNESS_MS } from "../../src/codex/quota-types";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { providerFetch, fetchWithHeaderTimeout } from "../../src/server/responses/fetch-helpers";
+} from "../../backend/src/codex/auth-context";
+import { rebindPoolCreditPolicy } from "../../backend/src/codex/pool-credit-policy";
+import { TERMINAL_SHORT_WINDOW_FRESHNESS_MS } from "../../backend/src/codex/quota-types";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { providerFetch, fetchWithHeaderTimeout } from "../../backend/src/server/responses/fetch-helpers";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS, clearCodexUpstreamHealth, clearThreadAccountMap,
   recordCodexUpstreamOutcome, tryAcquireCodexQuotaProbeLease,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ID = "credit-policy-fixture";

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import { repoPath } from "../helpers/repo-root";
-import { desktopCliPageUrl, openDesktopCliPage } from "../../gui/src/lib/desktop-shell";
+import { desktopCliPageUrl, openDesktopCliPage } from "../../frontend/src/lib/desktop-shell";
 
 const read = (path: string) => readFileSync(repoPath(path), "utf8");
 const lib = read("desktop/src-tauri/src/lib.rs");

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../src/chat/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
+import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../backend/src/chat/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
 
 /**
  * #5211 case 1. A Chat Completions caller narrows the catalogue with

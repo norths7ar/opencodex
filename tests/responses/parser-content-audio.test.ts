@@ -7,7 +7,7 @@
  * case rather than letting the adapter silently drop it.
  */
 import { describe, expect, test } from "bun:test";
-import { inputContentParts, outputToToolResultContent } from "../../src/responses/parser-content";
+import { inputContentParts, outputToToolResultContent } from "../../backend/src/responses/parser-content";
 
 const AUDIO_B64 = "UklGRiQAAABXQVZF";
 const AUDIO_URL = `data:audio/wav;base64,${AUDIO_B64}`;

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { usageFromResponsesPayload } from "../../src/server";
-import { applyResponseLogMetadata, type RequestLogContext } from "../../src/server/request-log";
+import { usageFromResponsesPayload } from "../../backend/src/server";
+import { applyResponseLogMetadata, type RequestLogContext } from "../../backend/src/server/request-log";
 
 describe("usageFromResponsesPayload", () => {
   test("bridge-reported usage wins over re-parsed wire payload (provenance guard)", () => {

@@ -2,10 +2,10 @@ import { expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { claudeCodeNativeAlias } from "../../src/claude/alias";
-import { displayModelId } from "../../src/claude/desktop-3p";
-import { emptyDesktopProfile, moveDesktopRoute, reconcileDesktopProfile, renderDesktopProfile } from "../../src/claude/desktop-profile";
-import { buildPickerModels, createPickerModelSnapshot, type PickerRouteInput } from "../../src/claude/intercept/picker-models";
+import { claudeCodeNativeAlias } from "../../backend/src/claude/alias";
+import { displayModelId } from "../../backend/src/claude/desktop-3p";
+import { emptyDesktopProfile, moveDesktopRoute, reconcileDesktopProfile, renderDesktopProfile } from "../../backend/src/claude/desktop-profile";
+import { buildPickerModels, createPickerModelSnapshot, type PickerRouteInput } from "../../backend/src/claude/intercept/picker-models";
 
 const routes: PickerRouteInput = {
   nativeSlugs: ["gpt-6-sol"],

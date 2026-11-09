@@ -4,11 +4,11 @@ import { closeSync, existsSync, fsyncSync, mkdtempSync, openSync, realpathSync, 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { openCodexCoordinatorTransaction } from "../../src/codex/transition-state";
+import { openCodexCoordinatorTransaction } from "../../backend/src/codex/transition-state";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath, repoRoot } from "../helpers/repo-root";
 

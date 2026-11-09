@@ -31,17 +31,17 @@ import {
   timedOutSecretPathCountForTests,
   type HardenResult,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
-import { atomicWriteFile } from "../../src/config";
-import { hardenStableLockFile } from "../../src/codex/native-main-lock-file";
-import { nativeMainClaimPath, withNativeMainSharedClaim } from "../../src/codex/native-main-claim";
-import { NATIVE_MAIN_OWNER_DB, retainNativeMainOwner } from "../../src/codex/native-main-owner";
+} from "../../backend/src/lib/windows-secret-acl";
+import { atomicWriteFile } from "../../backend/src/config";
+import { hardenStableLockFile } from "../../backend/src/codex/native-main-lock-file";
+import { nativeMainClaimPath, withNativeMainSharedClaim } from "../../backend/src/codex/native-main-claim";
+import { NATIVE_MAIN_OWNER_DB, retainNativeMainOwner } from "../../backend/src/codex/native-main-owner";
 import {
   resetWindowsPrincipalForTests,
   resolveCurrentWindowsPrincipal,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 import { repoPath } from "../helpers/repo-root";
 
 let testDir = "";
@@ -626,7 +626,7 @@ describe("non-Windows determinism", () => {
 
 describe("icacls executable authority", () => {
   test("default runners resolve icacls from the trusted System32 path, not PATH", () => {
-    const src = readFileSync(repoPath("src", "lib", "windows-secret-acl.ts"), "utf8");
+    const src = readFileSync(repoPath("backend/src", "lib", "windows-secret-acl.ts"), "utf8");
     expect(src).toContain("resolveTrustedWindowsIcaclsExe");
     expect(src).not.toMatch(/Bun\.spawn(?:Sync)?\(\["icacls\.exe"/);
   });
@@ -639,7 +639,7 @@ describe("atomic secret temp writer portability", () => {
     // and on management-API config saves. EVERY temp writer keeps the portable
     // exclusive spelling ("wx" keeps O_EXCL; 0o600 keeps the private mode); a
     // count would go stale the next time a writer is added, so this is a set.
-    const src = readFileSync(repoPath("src", "config", "atomic-write.ts"), "utf8");
+    const src = readFileSync(repoPath("backend/src", "config", "atomic-write.ts"), "utf8");
     expect(new Set(src.match(/openSync\(path,[^)]*\)/g) ?? [])).toEqual(new Set(['openSync(path, "wx", 0o600)']));
   });
 });
@@ -651,7 +651,7 @@ describe("initial config temp writer portability", () => {
     // first-run `ocx init` failed before it could publish config.json. Exclusive
     // creation is what makes the added O_TRUNC harmless — an existing temp name
     // (or a symlink planted at one) fails the open instead of being truncated.
-    const src = readFileSync(repoPath("src", "config", "initialize.ts"), "utf8");
+    const src = readFileSync(repoPath("backend/src", "config", "initialize.ts"), "utf8");
     expect(src.match(/openSync\(temp, "wx", 0o600\)/g)).toHaveLength(1);
   });
 });

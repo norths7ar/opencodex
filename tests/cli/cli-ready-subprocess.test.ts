@@ -14,7 +14,7 @@ import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/co
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 
 interface CliResult {
   exitCode: number;

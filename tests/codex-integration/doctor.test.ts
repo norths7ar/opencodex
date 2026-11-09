@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import * as proxyLiveness from "../../src/server/proxy-liveness";
-import * as startupHealth from "../../src/codex/autostart-health";
-import * as cliStatus from "../../src/cli/status";
-import * as cliHelp from "../../src/cli/help";
-import { getDefaultConfig } from "../../src/config";
+import * as proxyLiveness from "../../backend/src/server/proxy-liveness";
+import * as startupHealth from "../../backend/src/codex/autostart-health";
+import * as cliStatus from "../../backend/src/cli/status";
+import * as cliHelp from "../../backend/src/cli/help";
+import { getDefaultConfig } from "../../backend/src/config";
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -23,9 +23,9 @@ import {
   resolveCodexHomeDir,
   runDoctor,
   type ServiceMemoryData,
-} from "../../src/cli/doctor";
-import { collectOrcaCodexHomeDiagnostic } from "../../src/codex/home";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
+} from "../../backend/src/cli/doctor";
+import { collectOrcaCodexHomeDiagnostic } from "../../backend/src/codex/home";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER,
@@ -33,10 +33,10 @@ import {
   LOCAL_MANAGEMENT_NONCE_HEADER,
   LOCAL_MANAGEMENT_READ_PATHS,
   verifyLocalManagementReadCapability,
-} from "../../src/lib/local-management-capability";
-import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../src/lib/local-management-attestation";
-import { readRuntimePort, removeRuntimePort, writeRuntimePort } from "../../src/config/process-state";
-import { fetchNativeMainAdmission, formatNativeMainAdmissionLines } from "../../src/cli/doctor";
+} from "../../backend/src/lib/local-management-capability";
+import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../backend/src/lib/local-management-attestation";
+import { readRuntimePort, removeRuntimePort, writeRuntimePort } from "../../backend/src/config/process-state";
+import { fetchNativeMainAdmission, formatNativeMainAdmissionLines } from "../../backend/src/cli/doctor";
 import { findDeadPid } from "../helpers/dead-pid";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { STORE_BUDGET_MS } from "../helpers/test-budget";
@@ -339,9 +339,9 @@ describe("live native-main admission in doctor", () => {
     const previousOpenCodexHome = process.env.OPENCODEX_HOME;
     const previousCodexHome = process.env.CODEX_HOME;
     const previousRuntime = readRuntimePort();
-    const serverUrl = new URL("../../src/server/direct-local-http.ts", import.meta.url).href;
-    const authUrl = new URL("../../src/lib/local-management-attestation.ts", import.meta.url).href;
-    const capabilityUrl = new URL("../../src/lib/local-management-capability.ts", import.meta.url).href;
+    const serverUrl = new URL("../../backend/src/server/direct-local-http.ts", import.meta.url).href;
+    const authUrl = new URL("../../backend/src/lib/local-management-attestation.ts", import.meta.url).href;
+    const capabilityUrl = new URL("../../backend/src/lib/local-management-capability.ts", import.meta.url).href;
     const source = [
       `const { directLocalHttpFetch } = await import(${JSON.stringify(serverUrl)});`,
       `const { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } = await import(${JSON.stringify(authUrl)});`,

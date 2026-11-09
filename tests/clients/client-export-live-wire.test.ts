@@ -29,11 +29,11 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClientConfig } from "../../src/clients/config-export";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { drainAndShutdown } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { buildClientConfig } from "../../backend/src/clients/config-export";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { drainAndShutdown } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 import {
   ALPHA,

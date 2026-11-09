@@ -1,6 +1,6 @@
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { runProviderCompletionTest, type ProviderCompletionTestDependencies } from "../../src/server/management/provider-completion-test";
-import { handleManagementAPI } from "../../src/server/management-api";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { runProviderCompletionTest, type ProviderCompletionTestDependencies } from "../../backend/src/server/management/provider-completion-test";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 export const frame = (data: unknown, event?: string) => `${event ? `event: ${event}\n` : ""}data: ${typeof data === "string" ? data : JSON.stringify(data)}\n\n`;
 export const chat = (model: string | undefined = "test-model", content = "OK") => frame({ model, choices: [{ delta: { content }, finish_reason: "stop" }] }) + frame("[DONE]");
 export function fixture(overrides: Partial<OcxProviderConfig> = {}, respond: (init?: RequestInit) => Response | Promise<Response> = () => new Response(chat())) {

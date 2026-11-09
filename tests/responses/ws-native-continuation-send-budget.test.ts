@@ -2,16 +2,16 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { createScanner, LanguageVariant, SyntaxKind } from "typescript/unstable/ast";
 import { repoPath } from "../helpers/repo-root";
-import { bindWorkflowBudgetConfig } from "../../src/lib/workflow-budget-config";
-import { resetWorkflowBudgetsForTest, workflowBudgetSnapshot, listWorkflowBudgetEvents, WORKFLOW_LOCAL_REFUSAL_HEADER } from "../../src/lib/workflow-budget";
-import { configureSharedSpendLedger, spendPolicyFromConfig } from "../../src/lib/spend-reservation-ledger";
-import { claimNativeContinuationSend } from "../../src/server/responses/native-continuation-send";
-import { NativeContinuationRefusalError } from "../../src/server/responses/native-continuation-refusal";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import { NativeInjectionChannel } from "../../src/server/responses/native-injection";
-import { codexWsUpstreamFetch } from "../../src/server/responses/ws-upstream";
-import { sendResponseToWebSocket, type WsData } from "../../src/server/ws-bridge";
-import { workflowRefusalResponse } from "../../src/server/workflow-refusal";
+import { bindWorkflowBudgetConfig } from "../../backend/src/lib/workflow-budget-config";
+import { resetWorkflowBudgetsForTest, workflowBudgetSnapshot, listWorkflowBudgetEvents, WORKFLOW_LOCAL_REFUSAL_HEADER } from "../../backend/src/lib/workflow-budget";
+import { configureSharedSpendLedger, spendPolicyFromConfig } from "../../backend/src/lib/spend-reservation-ledger";
+import { claimNativeContinuationSend } from "../../backend/src/server/responses/native-continuation-send";
+import { NativeContinuationRefusalError } from "../../backend/src/server/responses/native-continuation-refusal";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import { NativeInjectionChannel } from "../../backend/src/server/responses/native-injection";
+import { codexWsUpstreamFetch } from "../../backend/src/server/responses/ws-upstream";
+import { sendResponseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
+import { workflowRefusalResponse } from "../../backend/src/server/workflow-refusal";
 import type { ServerWebSocket } from "bun";
 import {
   installInjectionFixture, prepareInjectionSpendHome, beginInjection, injectionConfig,
@@ -225,7 +225,7 @@ test("an unpaced injection continuation preserves a known local refusal", async 
 // all, so it is excluded structurally rather than by name. The oracle is a token scanner,
 // not text matching, so formatting, quoted keys and newly added legs are covered.
 test("every native-capable passthrough executor routes continuations through admission", () => {
-  const legs = passthroughExecutorOptions(readFileSync(repoPath("src/server/responses/passthrough-dispatch.ts"), "utf8"))
+  const legs = passthroughExecutorOptions(readFileSync(repoPath("backend/src/server/responses/passthrough-dispatch.ts"), "utf8"))
     .filter(options => options.has("nativeControl"));
   expect(legs.length).toBeGreaterThan(0);
   for (const options of legs) expect(options.has("onContinuationDispatch")).toBe(true);

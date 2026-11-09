@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import * as adapterResolveModule from "../../src/server/adapter-resolve";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import * as adapterResolveModule from "../../backend/src/server/adapter-resolve";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const originalFetch = globalThis.fetch;

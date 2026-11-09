@@ -1,10 +1,10 @@
 /**
- * Run GUI Oxlint when this push includes gui/ changes.
+ * Run GUI Oxlint when this push includes frontend/ changes.
  * Used by `bun run prepush`.
  *
  * Mirrors `scripts/doctor-gui-if-changed.ts` so explicit local validation and
  * the CI `gates` job agree: GUI lint runs only when the push actually touches
- * `gui/`. Unlike doctor there is no engine to fetch, so lint findings always
+ * `frontend/`. Unlike doctor there is no engine to fetch, so lint findings always
  * fail the push — there is no infra-degradation path to soft-skip on.
  *
  * Test hooks: LINT_DRY_RUN=1 prints the run/skip decision without spawning;
@@ -16,12 +16,12 @@ import { join, resolve } from "node:path";
 
 /** True when any changed path is the gui directory or inside it (slash-guarded). */
 function guiPathsChanged(files: string[]): boolean {
-  return files.some(f => f === "gui" || f.startsWith("gui/"));
+  return files.some(f => f === "frontend" || f.startsWith("frontend/"));
 }
 
 if (import.meta.main) {
   const repoRoot = resolve(import.meta.dirname, "..");
-  const guiDir = join(repoRoot, "gui");
+  const guiDir = join(repoRoot, "frontend");
 
   const hasRef = (ref: string): boolean => {
     try {
@@ -73,11 +73,11 @@ if (import.meta.main) {
   }
 
   if (!shouldRun) {
-    console.log("lint:gui: skip (no gui/ changes in push range)");
+    console.log("lint:gui: skip (no frontend/ changes in push range)");
     process.exit(0);
   }
 
-  console.log("lint:gui: gui/ changed — running oxlint (trigger=gui-changed, scope=full-gui)");
+  console.log("lint:gui: frontend/ changed — running oxlint (trigger=gui-changed, scope=full-gui)");
   const [cmd, ...args] = process.env.LINT_CMD
     ? process.env.LINT_CMD.split(" ")
     : ["bun", "run", "lint"];

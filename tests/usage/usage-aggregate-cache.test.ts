@@ -9,26 +9,26 @@ import {
   enforceAppOwnedMemoryBudget,
   registerRetainedStore,
   resetAppOwnedMemoryForTests,
-} from "../../src/lib/app-owned-memory";
-import { APP_OWNED_RETAINED_STORE_REGISTRATIONS } from "../../src/lib/app-owned-memory-stores";
+} from "../../backend/src/lib/app-owned-memory";
+import { APP_OWNED_RETAINED_STORE_REGISTRATIONS } from "../../backend/src/lib/app-owned-memory-stores";
 import {
   getFilteredUsageAggregate,
   getUsageAggregate,
   resetUsageAggregateCacheForTests,
   usageAggregateRetainedStats,
   type UsageAggregateResult,
-} from "../../src/server/management/usage-aggregate-cache";
-import type { OcxConfig } from "../../src/types/config";
-import { resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../src/usage/log";
-import * as usageLedgerScannerModule from "../../src/usage/ledger-scanner";
-import { getUsageSourceFacets, SourceFacetsBusyError } from "../../src/server/management/usage-source-facets";
-import { refreshUserCostOverlays } from "../../src/usage/user-cost-overlays";
-import { buildRouteDecisionTrace } from "../../src/routing/trace";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { buildResponseJSON } from "../../src/bridge";
-import { formatUsageReport } from "../../src/cli/usage-report";
-import { addFinalRequestLog, clearRequestLogsForTests, type RequestLogContext } from "../../src/server/request-log";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/server/management/usage-aggregate-cache";
+import type { OcxConfig } from "../../backend/src/types/config";
+import { resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../backend/src/usage/log";
+import * as usageLedgerScannerModule from "../../backend/src/usage/ledger-scanner";
+import { getUsageSourceFacets, SourceFacetsBusyError } from "../../backend/src/server/management/usage-source-facets";
+import { refreshUserCostOverlays } from "../../backend/src/usage/user-cost-overlays";
+import { buildRouteDecisionTrace } from "../../backend/src/routing/trace";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { formatUsageReport } from "../../backend/src/cli/usage-report";
+import { addFinalRequestLog, clearRequestLogsForTests, type RequestLogContext } from "../../backend/src/server/request-log";
+import type { AdapterEvent } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const NOW = Date.parse("2026-09-01T10:00:00.000Z");

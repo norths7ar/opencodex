@@ -7,8 +7,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, markAccountNeedsReauth, saveCredential } from "../../src/oauth/store";
-import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderAccountQuotas, resetProviderQuotaReconcileStateForTests } from "../../src/providers/quota";
+import { getAccountSet, markAccountNeedsReauth, saveCredential } from "../../backend/src/oauth/store";
+import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderAccountQuotas, resetProviderQuotaReconcileStateForTests } from "../../backend/src/providers/quota";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

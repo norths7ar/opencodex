@@ -1,21 +1,21 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { randomBytes } from "node:crypto";
 import { gunzipSync, gzipSync, zstdDecompressSync } from "node:zlib";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { applyProxyEnvWith } from "../../src/config/proxy-env";
-import { setLiveStateStoreConfig } from "../../src/lib/state-store-registrations";
-import { OutboundCredentialRegistry, setOutboundCredentialRegistryForTests } from "../../src/lib/outbound-credential-registry";
-import { registerUpstreamRewriter, resetUpstreamRewritersForTests } from "../../src/plugins/upstream-hooks";
-import { providerFetch, sendWithConnectionPolicy } from "../../src/server/responses/fetch-helpers";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { applyProxyEnvWith } from "../../backend/src/config/proxy-env";
+import { setLiveStateStoreConfig } from "../../backend/src/lib/state-store-registrations";
+import { OutboundCredentialRegistry, setOutboundCredentialRegistryForTests } from "../../backend/src/lib/outbound-credential-registry";
+import { registerUpstreamRewriter, resetUpstreamRewritersForTests } from "../../backend/src/plugins/upstream-hooks";
+import { providerFetch, sendWithConnectionPolicy } from "../../backend/src/server/responses/fetch-helpers";
 import {
   bindUpstreamRequestCompressionConfig,
   compressUpstreamRequestBody,
   currentUpstreamRequestCompression,
   resolveUpstreamRequestCompression,
   setUpstreamRequestCompressionForTests,
-} from "../../src/server/responses/request-compression";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/responses/request-compression";
+import type { OcxConfig } from "../../backend/src/types";
 
 const endpoint = "https://chatgpt.com/backend-api/codex/responses";
 type Mode = "off" | "gzip" | "zstd";

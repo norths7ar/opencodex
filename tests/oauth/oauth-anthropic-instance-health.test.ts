@@ -8,7 +8,7 @@ afterEach(async () => { await f?.dispose(); });
 for (const instance of INSTANCE_FIXTURE_INSTANCES) {
   const other = instance === "anthropic" ? "anthropic2" : "anthropic";
   test(`${instance}: account health projection reads only its equal-ID cooldown`, async () => {
-    const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+    const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
     const now = Date.now();
     const own = f.routing.anthropicRoutingFor(instance);
     own.recordAnthropicAccountRefusal(f.config, f.ids[0], 403, "60", now);
@@ -23,7 +23,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
     expect(projectStoredOAuthAccountHealth(instance, ownAccount, now, { observeOnly: true }).status).toBe("healthy");
   });
   test(`${instance}: reset-derived quota cooldown is separate from sibling rate-limit cooldown`, async () => {
-    const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+    const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
     const now = Math.floor(Date.now() / 1000) * 1000;
     const headers = new Headers({ "anthropic-ratelimit-unified-5h-status": "rejected", "anthropic-ratelimit-unified-5h-reset": String((now + 120_000) / 1000) });
     f.routing.anthropicRoutingFor(instance).recordAnthropicAccount429(f.config, f.ids[0], null, now, headers);
@@ -36,9 +36,9 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
 }
 
 test("a settled reset lifts a retry-after cooldown and replaces the cached bars", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
-  const { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } = await import("../../src/providers/quota/account-cache");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
+  const { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } = await import("../../backend/src/providers/quota/account-cache");
   const now = Date.now();
   const instance = "anthropic" as const;
   const other = "anthropic2" as const;
@@ -76,9 +76,9 @@ test("a settled reset lifts a retry-after cooldown and replaces the cached bars"
 });
 
 test("a failed usage reread still leaves the reset account eligible", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
-  const { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } = await import("../../src/providers/quota/account-cache");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
+  const { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } = await import("../../backend/src/providers/quota/account-cache");
   const now = Date.now();
   const id = f.ids[0];
   const headers = new Headers({
@@ -95,8 +95,8 @@ test("a failed usage reread still leaves the reset account eligible", async () =
 });
 
 test("a five-hour-only reset lifts the account cooldown without releasing a model family", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
   const now = Date.now();
   const id = f.ids[0];
   const headers = new Headers({
@@ -117,8 +117,8 @@ test("a five-hour-only reset lifts the account cooldown without releasing a mode
 });
 
 test("a refusal recorded once the claim was journaled survives the reset", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
   const now = Date.now();
   const id = f.ids[0];
   let sends = 0;
@@ -143,8 +143,8 @@ test("a refusal recorded once the claim was journaled survives the reset", async
 });
 
 test("a reset lifts a quota cooldown only when its cleared windows cover the refused ones", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
   const now = Date.now();
   const id = f.ids[0];
   let sends = 0;
@@ -167,8 +167,8 @@ test("a reset lifts a quota cooldown only when its cleared windows cover the ref
 });
 
 test("a reset never lifts an entitlement refusal", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
   const now = Date.now();
   const id = f.ids[0];
   globalThis.fetch = (async () => Response.json({ limits: [] })) as typeof fetch;
@@ -179,9 +179,9 @@ test("a reset never lifts an entitlement refusal", async () => {
 });
 
 test("a reset reread sends its own usage request instead of joining an older one", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { fetchAnthropicAccountQuota } = await import("../../src/providers/quota/anthropic-account-quota");
-  const { getCachedProviderAccountQuota } = await import("../../src/providers/quota/account-cache");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { fetchAnthropicAccountQuota } = await import("../../backend/src/providers/quota/anthropic-account-quota");
+  const { getCachedProviderAccountQuota } = await import("../../backend/src/providers/quota/account-cache");
   const id = f.ids[0];
   const resetAt = new Date(Date.now() + 3_600_000).toISOString();
   const usage = (utilization: number) => Response.json({
@@ -211,8 +211,8 @@ test("a reset reread sends its own usage request instead of joining an older one
 });
 
 test("an uncovered reset-derived cooldown can still be recovered by the reset reread", async () => {
-  const { admitAnthropicAccountAfterReset } = await import("../../src/providers/anthropic-reset-admission");
-  const { projectStoredOAuthAccountHealth } = await import("../../src/oauth/health");
+  const { admitAnthropicAccountAfterReset } = await import("../../backend/src/providers/anthropic-reset-admission");
+  const { projectStoredOAuthAccountHealth } = await import("../../backend/src/oauth/health");
   const now = Date.now();
   const id = f.ids[0];
   const resetAt = new Date(now + 86_400_000).toISOString();

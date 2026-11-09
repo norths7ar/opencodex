@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { fetchLiveStartupHealth, selectStatusStartupHealth, statusServiceSummary, runtimeSupervisorLine } from "../../src/cli/status";
-import type { StartupHealth } from "../../src/codex/autostart-health";
-import { startupHealthProbeBudgetMs, startupHealthReadBudgetMs } from "../../src/codex/autostart-health";
-import { LOCAL_ATTESTATION_PROOF_HEADER, createLocalAttestationProof } from "../../src/lib/local-management-attestation";
-import type { fetchBoundLocalManagementRead } from "../../src/server/local-management-read-client";
+import { fetchLiveStartupHealth, selectStatusStartupHealth, statusServiceSummary, runtimeSupervisorLine } from "../../backend/src/cli/status";
+import type { StartupHealth } from "../../backend/src/codex/autostart-health";
+import { startupHealthProbeBudgetMs, startupHealthReadBudgetMs } from "../../backend/src/codex/autostart-health";
+import { LOCAL_ATTESTATION_PROOF_HEADER, createLocalAttestationProof } from "../../backend/src/lib/local-management-attestation";
+import type { fetchBoundLocalManagementRead } from "../../backend/src/server/local-management-read-client";
 
 const LIVE = {
   pid: 4242,

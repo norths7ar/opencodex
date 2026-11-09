@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { crc32, decodeEventStream, decodeMessage, encodeMessage } from "../../src/lib/eventstream-decoder";
+import { crc32, decodeEventStream, decodeMessage, encodeMessage } from "../../backend/src/lib/eventstream-decoder";
 
 const enc = new TextEncoder();
 const dec = new TextDecoder();

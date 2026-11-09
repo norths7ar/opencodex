@@ -11,9 +11,9 @@ import {
   getAnthropicAccountHealthSnapshot,
   resetAnthropicRoutingForManualSelection,
   resolveAnthropicAccountForSession,
-} from "../../../src/oauth/anthropic-routing";
-import { projectStoredOAuthAccountHealth } from "../../../src/oauth/health";
-import { quotaEvidenceForCandidate } from "../../../src/routing/quota";
+} from "../../../backend/src/oauth/anthropic-routing";
+import { projectStoredOAuthAccountHealth } from "../../../backend/src/oauth/health";
+import { quotaEvidenceForCandidate } from "../../../backend/src/routing/quota";
 import {
   clearAccountQuotaCache,
   fetchProviderAccountQuotas,
@@ -24,12 +24,12 @@ import {
   resetProviderQuotaReconcileStateForTests,
   setCachedProviderAccountQuotaForTests,
   sweepExpiredProviderAccountQuotaRows,
-} from "../../../src/providers/quota";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import { clearPoolRotationState } from "../../../src/codex/pool-rotation";
+} from "../../../backend/src/providers/quota";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { clearPoolRotationState } from "../../../backend/src/codex/pool-rotation";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import { settleAccountQuotaPersistForTests } from "../../../src/providers/account-quota-disk";
-import type { OcxConfig } from "../../../src/types";
+import { settleAccountQuotaPersistForTests } from "../../../backend/src/providers/account-quota-disk";
+import type { OcxConfig } from "../../../backend/src/types";
 
 const originalHome = process.env.OPENCODEX_HOME;
 const originalFetch = globalThis.fetch;

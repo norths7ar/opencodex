@@ -6,8 +6,8 @@ import {
   attachLiveSidebandUpstream,
   closeLiveSideband,
   closeLiveSidebandBeforeUpgrade,
-} from "../../src/server/index/live-sideband";
-import type { WsData } from "../../src/server/ws-bridge";
+} from "../../backend/src/server/index/live-sideband";
+import type { WsData } from "../../backend/src/server/ws-bridge";
 
 const proxyKeys = ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "NO_PROXY", "http_proxy", "https_proxy", "all_proxy", "no_proxy"];
 let savedProxyEnv: Record<string, string | undefined>;

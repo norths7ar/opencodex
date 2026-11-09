@@ -22,7 +22,7 @@ function readOriginal(path: string): string {
   return contents;
 }
 if (process.env.MESSAGES_RED_SOURCE) {
-  const instrumented = new Set(["src/server/claude-messages.ts", "src/server/messages-native.ts", "src/claude/failure-verdict.ts"]);
+  const instrumented = new Set(["backend/src/server/claude-messages.ts", "backend/src/server/messages-native.ts", "backend/src/claude/failure-verdict.ts"]);
   const paths = [...new Bun.Glob("src/**/*.ts").scanSync(process.env.MESSAGES_RED_SOURCE)].filter(path => !instrumented.has(portable(path)));
   const escape = (part: string) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const filter = new RegExp("^(?:" + paths.map(path => portable(repoPath(path)).split("/").map(escape).join("[\\\\/]")).join("|") + ")$");
@@ -41,7 +41,7 @@ const filters = {
   verdict: /src[\\/]claude[\\/]failure-verdict\.ts$/,
 };
 const filterChecks = Object.fromEntries(Object.entries(filters).map(([name, filter]) => {
-  const suffix = name === "upstream" ? "src/server/claude-messages.ts" : name === "native" ? "src/server/messages-native.ts" : "src/claude/failure-verdict.ts";
+  const suffix = name === "upstream" ? "backend/src/server/claude-messages.ts" : name === "native" ? "backend/src/server/messages-native.ts" : "backend/src/claude/failure-verdict.ts";
   return [name, { forward: filter.test("/fixture/" + suffix), backward: filter.test("C:\\fixture\\" + suffix.replaceAll("/", "\\")) }];
 }));
 Bun.plugin({ name: "Messages refusal boundary fixture", setup(build) {
@@ -68,17 +68,17 @@ Bun.plugin({ name: "Messages refusal boundary fixture", setup(build) {
       "    sink.collectedProjection = true;\n    if (sink.collected === next.legacy) globalThis.__fixtureHooks.collectedMatches++;") };
   });
 } });
-const { handleClaudeMessages, handleClaudeCountTokens } = await import("../../src/server/claude-messages");
-const { markProxyError } = await import("../../src/lib/client-error-body");
-const { formatErrorResponse } = await import("../../src/bridge/errors");
-const { saveConfig } = await import("../../src/config");
+const { handleClaudeMessages, handleClaudeCountTokens } = await import("../../backend/src/server/claude-messages");
+const { markProxyError } = await import("../../backend/src/lib/client-error-body");
+const { formatErrorResponse } = await import("../../backend/src/bridge/errors");
+const { saveConfig } = await import("../../backend/src/config");
 const KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 let config: any = { defaultProvider: "fixture", providers: { fixture: { adapter: "openai-responses", apiKey: "synthetic", baseUrl: "http://127.0.0.1:1", allowPrivateNetwork: true, models: ["model"] } } };
 let model = "fixture/model"; let absent = KEY; let produced: Response | undefined;
 let expectedBody: string | undefined;
 if (kind.startsWith("native-pacing")) {
   (await import("./owned-spend-home")).acquireOwnedSpendHome();
-  const { RequestPacingQueueOverloadError } = await import("../../src/providers/request-pacing");
+  const { RequestPacingQueueOverloadError } = await import("../../backend/src/providers/request-pacing");
   const error = new RequestPacingQueueOverloadError("anthropic", "queue_full", 1);
   absent = "provider 'anthropic'";
   config.providers.fixture.adapter = "anthropic"; config.providers.fixture.authMode = "key";
@@ -96,9 +96,9 @@ if (kind.startsWith("native-pacing")) {
 } else if (kind === "sink-direct") {
   // The delivery layer chooses whether collection owns a legacy-record sink.
 } else if (kind.startsWith("roster") || kind === "chat-roster" || kind === "oauth-login") {
-  const { saveCredential, getAccountSet } = await import("../../src/oauth/store");
-  const { recordAntigravityAccountRoster } = await import("../../src/providers/antigravity-account-roster");
-  const { setCached } = await import("../../src/codex/model-cache");
+  const { saveCredential, getAccountSet } = await import("../../backend/src/oauth/store");
+  const { recordAntigravityAccountRoster } = await import("../../backend/src/providers/antigravity-account-roster");
+  const { setCached } = await import("../../backend/src/codex/model-cache");
   const provider = "google-antigravity"; model = `${provider}/${KEY}`;
   config = { defaultProvider: provider, providers: { [provider]: { adapter: "google", authMode: "oauth", baseUrl: "https://daily-cloudcode-pa.googleapis.com", googleMode: "cloud-code-assist", fetch: async () => { throw new Error("Fixture must not dispatch"); } } } };
   if (kind !== "oauth-login") {
@@ -121,11 +121,11 @@ if (kind.startsWith("native-pacing")) {
   config = { defaultProvider: "github-copilot", providers: { "github-copilot": { adapter: "openai-chat", authMode: "key", apiKey: "synthetic", baseUrl: "https://api.githubcopilot.com", models: ["auto"], fetch: executor } } };
   globalThis.fetch = executor; model = "github-copilot/auto"; absent = "403";
 } else if (kind === "kiro-continuation") {
-  const { createAdapterContinuations } = await import("../../src/server/responses/adapter-continuation");
-  const { createTranslatorBudget } = await import("../../src/lib/translator-budget");
-  const { AdmissionModelDeniedError, admissionModelDeniedResponse } = await import("../../src/server/admission-model-scope");
-  const { clientFacingModelLabel } = await import("../../src/lib/error-destination");
-  const { encodeAnthropicMessageSse } = await import("../../src/protocols/encoders/messages");
+  const { createAdapterContinuations } = await import("../../backend/src/server/responses/adapter-continuation");
+  const { createTranslatorBudget } = await import("../../backend/src/lib/translator-budget");
+  const { AdmissionModelDeniedError, admissionModelDeniedResponse } = await import("../../backend/src/server/admission-model-scope");
+  const { clientFacingModelLabel } = await import("../../backend/src/lib/error-destination");
+  const { encodeAnthropicMessageSse } = await import("../../backend/src/protocols/encoders/messages");
   const translatorBudget = createTranslatorBudget(); const logCtx = {}; const parsed: any = { modelId: "fixture", stream: true, options: {}, context: { messages: [] } };
   const route = { providerName: "kiro", modelId: "fixture", provider: { adapter: "anthropic", authMode: "key", apiKey: "synthetic", baseUrl: "https://kiro.fixture.test" } };
   const refused = admissionModelDeniedResponse(new AdmissionModelDeniedError(clientFacingModelLabel(KEY), { providerName: "kiro", modelId: "fixture" }));
@@ -139,9 +139,9 @@ if (kind.startsWith("native-pacing")) {
   const text = await response.text(); translatorBudget.dispose();
   console.log("REFUSAL_RESULT " + JSON.stringify({ status: response.status, text, absent: KEY, code: null, fetched, hooks })); process.exit(0);
 } else if (kind === "discovery" || kind === "muse") {
-  const oauth = await import("../../src/oauth");
-  const { AntigravityProjectDiscoveryError } = await import("../../src/oauth/antigravity-discovery-diagnostics");
-  const { MuseLoginError } = await import("../../src/oauth/meta-muse-errors");
+  const oauth = await import("../../backend/src/oauth");
+  const { AntigravityProjectDiscoveryError } = await import("../../backend/src/oauth/antigravity-discovery-diagnostics");
+  const { MuseLoginError } = await import("../../backend/src/oauth/meta-muse-errors");
   const error = kind === "muse" ? new MuseLoginError("validation-http", 418) : new AntigravityProjectDiscoveryError();
   if (error instanceof AntigravityProjectDiscoveryError) error.observe("loadCodeAssist", 418, {});
   produced = (markProxyError as any)(formatErrorResponse(401, "authentication_error", oauth.publicOAuthAuthenticationErrorMessage(error)), (oauth as any).publicOAuthErrorPresentation?.(error)); absent = "418";
@@ -152,38 +152,38 @@ if (kind.startsWith("native-pacing")) {
 } else if (kind === "provider") {
   produced = Response.json({ error: { type: "permission_error", message: KEY }, proxyAuthored: true, presentation: "roster" }, { status: 403 });
 } else if (kind === "pacing") {
-  const { requestPacingOverloadResponse } = await import("../../src/server/responses/pacing-overload");
-  const { RequestPacingQueueOverloadError } = await import("../../src/providers/request-pacing");
+  const { requestPacingOverloadResponse } = await import("../../backend/src/server/responses/pacing-overload");
+  const { RequestPacingQueueOverloadError } = await import("../../backend/src/providers/request-pacing");
   produced = requestPacingOverloadResponse(new RequestPacingQueueOverloadError("anthropic", "queue_full", 1))!; absent = "anthropic";
 } else if (kind === "scope") {
-  const { AdmissionModelDeniedError, admissionModelDeniedResponse } = await import("../../src/server/admission-model-scope");
-  const { clientFacingModelLabel } = await import("../../src/lib/error-destination");
+  const { AdmissionModelDeniedError, admissionModelDeniedResponse } = await import("../../backend/src/server/admission-model-scope");
+  const { clientFacingModelLabel } = await import("../../backend/src/lib/error-destination");
   produced = admissionModelDeniedResponse(new AdmissionModelDeniedError(clientFacingModelLabel(KEY), { providerName: "fixture", modelId: "model" }));
 } else if (kind === "config") {
-  const { UnsupportedOAuthProviderError } = await import("../../src/oauth/oauth-errors");
+  const { UnsupportedOAuthProviderError } = await import("../../backend/src/oauth/oauth-errors");
   const error = new UnsupportedOAuthProviderError(KEY);
   produced = (markProxyError as any)(formatErrorResponse(400, "invalid_request_error", `${error.message}. Remove or reconfigure provider '${KEY}' in the OpenCodex configuration.`), "config");
 } else if (kind === "workflow" || kind === "workflow-unbound") {
-  const { workflowRefusalResponse } = await import("../../src/server/workflow-refusal");
+  const { workflowRefusalResponse } = await import("../../backend/src/server/workflow-refusal");
   produced = workflowRefusalResponse("workflow-spend-exhausted", undefined, undefined, undefined, { scope: "identity", limit: 987654321, projected: 987654322, ...(kind === "workflow-unbound" ? { includesUnboundPoolHistory: true } : {}) }); absent = "987,654,321";
 } else if (["cooldown", "cooldown-unpinned", "hard-lock", "recovery"].includes(kind)) {
-  const { mapCodexAuthContextErrorToResponse } = await import("../../src/server/responses/codex-auth-error");
-  const { CodexAccountCooldownError, CodexMainAccountHardLockError, CodexRecoveryWithheldError } = await import("../../src/codex/auth-context");
+  const { mapCodexAuthContextErrorToResponse } = await import("../../backend/src/server/responses/codex-auth-error");
+  const { CodexAccountCooldownError, CodexMainAccountHardLockError, CodexRecoveryWithheldError } = await import("../../backend/src/codex/auth-context");
   const until = Date.now() + 100000;
   const error = kind === "hard-lock" ? new CodexMainAccountHardLockError(until, { short: 71, long: 93 }) : kind === "recovery" ? new CodexRecoveryWithheldError(KEY, until) : new CodexAccountCooldownError(KEY, until);
   produced = mapCodexAuthContextErrorToResponse(error, { accountSelector: kind === "cooldown" ? KEY : undefined, now: Date.now() })!;
   if (kind === "hard-lock") absent = "71%";
   else if (kind !== "cooldown") absent = new Date(until).toISOString();
 } else if (kind === "pool-refresh") {
-  const { poolCredentialRefreshIncompleteResponse } = await import("../../src/server/responses/core-auth");
+  const { poolCredentialRefreshIncompleteResponse } = await import("../../backend/src/server/responses/core-auth");
   produced = poolCredentialRefreshIncompleteResponse({ authCtx: { accountId: "fixture" } as never, config: {}, accountSelector: KEY });
 } else if (kind === "storage") {
-  const { SpendLedgerFileRefusedError } = await import("../../src/lib/spend-reservation-ledger");
-  const { spendLedgerStorageErrorResponse } = await import("../../src/server/responses/spend-storage-error");
+  const { SpendLedgerFileRefusedError } = await import("../../backend/src/lib/spend-reservation-ledger");
+  const { spendLedgerStorageErrorResponse } = await import("../../backend/src/server/responses/spend-storage-error");
   produced = spendLedgerStorageErrorResponse(new SpendLedgerFileRefusedError("journal", "extra-hard-link"))!;
 } else if (kind === "model") {
-  const { CodexModelAvailabilityError } = await import("../../src/codex/auth-context");
-  const { codexModelAvailabilityErrorResponse } = await import("../../src/server/responses/codex-auth-error");
+  const { CodexModelAvailabilityError } = await import("../../backend/src/codex/auth-context");
+  const { codexModelAvailabilityErrorResponse } = await import("../../backend/src/server/responses/codex-auth-error");
   produced = codexModelAvailabilityErrorResponse(new CodexModelAvailabilityError("unsupported", `The requested model ${KEY} is unavailable`));
 } else if (kind === "input") {
   config.providers.fixture.contextWindow = 16;
@@ -204,11 +204,11 @@ saveConfig(config);
 const logCtx: any = { model: "fixture", provider: "fixture" };
 const req = new Request(`http://localhost/v1/messages${["roster-count", "body-overflow-count"].includes(kind) ? "/count_tokens" : ""}`, { method: "POST", headers: { "content-type": "application/json", ...((kind === "deep" || kind === "usage" || kind.startsWith("body-")) ? { authorization: "Bearer sk-ant-oat01-fixture" } : {}) }, body: JSON.stringify({ model, max_tokens: 16, stream: kind === "sink", messages: [{ role: "user", content: kind === "input" ? "a".repeat(4000) : "fixture" }] }) });
 const direct = kind === "sink-direct" ? await (async () => {
-  const { deliverClientEncodedResponse } = await import("../../src/server/inference/client-encoder-delivery");
-  const { createTranslatorBudget } = await import("../../src/lib/translator-budget");
+  const { deliverClientEncodedResponse } = await import("../../backend/src/server/inference/client-encoder-delivery");
+  const { createTranslatorBudget } = await import("../../backend/src/lib/translator-budget");
   return deliverClientEncodedResponse({ encoder: { protocol: "messages", stream: true, model: "fixture" }, events: (async function* () { yield { type: "error", status: 500, message: KEY } as any; })(), translatorBudget: createTranslatorBudget(), logCtx, responseModelId: "fixture", adapterName: "openai-chat", fold: {}, stopUpstream() {}, onStreamDone() {}, onCompletedResponse() {}, bindUsage() {} });
 })() : undefined;
-const chat = kind === "chat-roster" ? await (await import("../../src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model, messages: [{ role: "user", content: "fixture" }], stream: false }) }), config, logCtx) : undefined;
+const chat = kind === "chat-roster" ? await (await import("../../backend/src/server/chat-completions")).handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model, messages: [{ role: "user", content: "fixture" }], stream: false }) }), config, logCtx) : undefined;
 const response = chat ?? direct ?? (["roster-count", "body-overflow-count"].includes(kind) ? await handleClaudeCountTokens(req, config) : await handleClaudeMessages(req, config, logCtx, kind === "scope-direct" ? { requestId: crypto.randomUUID(), start: Date.now(), admission: { kind: "configured", keyId: "scoped", source: "bearer" } } : undefined));
 const text = await response.text();
 const observations = globalThis as typeof globalThis & { __localRefusalReply?: Response; __observedSinks?: { delivered?: unknown[] }[]; __copilotCalls?: string[] };

@@ -10,10 +10,10 @@ import {
   guardFallbackHop,
   recentFallbackEvents,
   resolveFallbackPolicy,
-} from "../../src/routing/fallback-policy";
-import { fallbackPolicyError, fallbackPolicySchema } from "../../src/config/schema/fallback-policy";
-import type { OcxConfig } from "../../src/types";
-import type { OcxFallbackConfig } from "../../src/types/fallback";
+} from "../../backend/src/routing/fallback-policy";
+import { fallbackPolicyError, fallbackPolicySchema } from "../../backend/src/config/schema/fallback-policy";
+import type { OcxConfig } from "../../backend/src/types";
+import type { OcxFallbackConfig } from "../../backend/src/types/fallback";
 
 const cfg = (fallback?: OcxFallbackConfig): OcxConfig => ({ fallback } as unknown as OcxConfig);
 

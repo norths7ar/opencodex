@@ -13,23 +13,23 @@ import {
   ToolCallCompletedUpdateSchema,
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   createCursorContextUsageTracker,
   createCursorProtobufEventState,
   finalizeTurnEvents,
   mapCursorProtobufServerMessage,
   mapSyntheticMcpExecToToolEvents,
-} from "../../../src/adapters/cursor/protobuf-events";
+} from "../../../backend/src/adapters/cursor/protobuf-events";
 import {
   inferCursorContextWindow,
   resetObservedCursorContextWindowsForTests,
-} from "../../../src/adapters/cursor/discovery";
-import { MAX_PENDING_TEXT_TOOLCALL_BYTES } from "../../../src/adapters/cursor/text-toolcall";
-import { resetDebugSettingsForTests } from "../../../src/lib/debug-settings";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import { observeEmptyCompletion } from "../../../src/server/responses/empty-completion-guard";
-import type { AdapterEvent } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/discovery";
+import { MAX_PENDING_TEXT_TOOLCALL_BYTES } from "../../../backend/src/adapters/cursor/text-toolcall";
+import { resetDebugSettingsForTests } from "../../../backend/src/lib/debug-settings";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import { observeEmptyCompletion } from "../../../backend/src/server/responses/empty-completion-guard";
+import type { AdapterEvent } from "../../../backend/src/types";
 
 const encoder = new TextEncoder();
 

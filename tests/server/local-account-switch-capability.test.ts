@@ -3,19 +3,19 @@ import { randomBytes } from "node:crypto";
 import {
   accountSwitchBodyDigest, createLocalAccountSwitchCapability, verifyLocalAccountSwitchCapability,
   LOCAL_ACCOUNT_SWITCH_BODY_HEADER, LOCAL_ACCOUNT_SWITCH_PATHS,
-} from "../../src/lib/local-account-switch-capability";
+} from "../../backend/src/lib/local-account-switch-capability";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER as expiryHeader,
   LOCAL_MANAGEMENT_CAPABILITY_HEADER as proofHeader,
   LOCAL_MANAGEMENT_EXPECTED_PID_HEADER as pidHeader,
   LOCAL_MANAGEMENT_NONCE_HEADER as nonceHeader,
   createLocalManagementReadCapability,
-} from "../../src/lib/local-management-capability";
-import { createLocalDesktopSnapshotCapability, desktopSnapshotBodyDigest } from "../../src/lib/local-desktop-snapshot-capability";
-import { hasLocalAccountSwitchCapability } from "../../src/server/local-account-switch-auth";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { managementPrincipal, requireManagementAuth, type ManagementAuthState } from "../../src/server/management-auth";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/local-management-capability";
+import { createLocalDesktopSnapshotCapability, desktopSnapshotBodyDigest } from "../../backend/src/lib/local-desktop-snapshot-capability";
+import { hasLocalAccountSwitchCapability } from "../../backend/src/server/local-account-switch-auth";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { managementPrincipal, requireManagementAuth, type ManagementAuthState } from "../../backend/src/server/management-auth";
+import type { OcxConfig } from "../../backend/src/types";
 
 const secret = "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc";
 const nonce = "A".repeat(43);

@@ -6,12 +6,12 @@ import {
   type RequestExecutionBudget,
   type RequestExecutionBudgetPolicy,
   type RequestSendObserver,
-} from "../../src/lib/request-execution-budget";
+} from "../../backend/src/lib/request-execution-budget";
 import {
   fetchWithResetRetry,
   fetchWithTransientRetry,
   SendBudgetExhaustedError,
-} from "../../src/lib/upstream-retry";
+} from "../../backend/src/lib/upstream-retry";
 
 const THREE_SEND_POLICY: RequestExecutionBudgetPolicy = {
   maxTotalModelSends: 3,

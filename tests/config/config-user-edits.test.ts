@@ -17,16 +17,16 @@ import {
   saveConfig,
   saveConfigPreservingClaudeCode,
   validateConfigCandidate,
-} from "../../src/config";
-import { legacyCustomModelCatalogSlugs } from "../../src/codex/custom-model-catalog-migration";
-import { setCodexAccountAutoSwitchThresholdOverride } from "../../src/codex/account-auto-switch";
-import { rateLimitRetryPolicyFor } from "../../src/providers/key-failover";
+} from "../../backend/src/config";
+import { legacyCustomModelCatalogSlugs } from "../../backend/src/codex/custom-model-catalog-migration";
+import { setCodexAccountAutoSwitchThresholdOverride } from "../../backend/src/codex/account-auto-switch";
+import { rateLimitRetryPolicyFor } from "../../backend/src/providers/key-failover";
 import {
   activeUserCostOverlays,
   refreshUserCostOverlays,
   resetPreservedDiskOnlyProvidersForTests,
-} from "../../src/usage/user-cost-overlays";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/usage/user-cost-overlays";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**
@@ -539,7 +539,7 @@ test("provider names with control characters are JSON-escaped before retryOn429 
 
 // R4-1: the request path. A 429 mid-turn rotates a key and saves, with no user action.
 test("a 429 key rotation does not clobber the hand edit", async () => {
-  const { rotateKeyOn429 } = await import("../../src/providers/key-failover");
+  const { rotateKeyOn429 } = await import("../../backend/src/providers/key-failover");
   const live = loadConfig();
   live.providers.pool = {
     adapter: "openai-chat",

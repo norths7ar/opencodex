@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleObserveCommand } from "../../src/cli/observe";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
 
 describe("human logs request identity", () => {
   test("prints persisted request IDs and omits absent IDs", async () => {

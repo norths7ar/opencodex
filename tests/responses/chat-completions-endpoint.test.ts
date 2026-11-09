@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
+import { loadConfig, saveConfig } from "../../backend/src/config";
 import { createServerTracker } from "../helpers/leftover-servers";
 import { guardWebSocketDials } from "../helpers/websocket-dial-guard";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
-import { OPENAI_PROVIDER_TIER_VERSION, type OcxConfig, type OcxProviderConfig } from "../../src/types";
+import { OPENAI_PROVIDER_TIER_VERSION, type OcxConfig, type OcxProviderConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../src/chat/inbound";
-import { chatCompletionsUsage } from "../../src/chat/outbound";
-import { parseRequest } from "../../src/responses/parser";
+import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../backend/src/chat/inbound";
+import { chatCompletionsUsage } from "../../backend/src/chat/outbound";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { TranslatorBudget } from "../../src/lib/translator-budget";
+import type { TranslatorBudget } from "../../backend/src/lib/translator-budget";
 import {
   resetProviderRequestPacingForTest,
   setProviderRequestPacingRuntimeForTest,
-} from "../../src/providers/request-pacing";
+} from "../../backend/src/providers/request-pacing";
 import {
   acquireNativeMainProfileDrain,
   activeRegistryMetrics,
@@ -26,15 +26,15 @@ import {
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
+} from "../../backend/src/server/lifecycle";
 import {
   blockNativeMainRecovery,
   completeNativeMainRecovery,
   nativeMainStartupGateSnapshot,
   waitForNativeMainStartupGate,
-} from "../../src/codex/native-profile-startup";
+} from "../../backend/src/codex/native-profile-startup";
 
-function budgetedChatOutbound(module: typeof import("../../src/chat/outbound")) {
+function budgetedChatOutbound(module: typeof import("../../backend/src/chat/outbound")) {
   const translatorBudget = createTestTranslatorBudget();
   return {
     ...module,
@@ -199,7 +199,7 @@ type ChatStreamChunk = {
 };
 
 async function convertResponsesFrames(frames: string[], model = "gpt-test") {
-  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const stream = responsesSseToChatCompletionsSse(new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
@@ -362,7 +362,7 @@ describe("chatCompletionsToResponsesBody service_tier", () => {
 async function driveChatFallbackServiceTier(
   providerOverrides: Partial<OcxProviderConfig>,
 ): Promise<Record<string, unknown>> {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   const captured: Record<string, unknown>[] = [];
   globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
     captured.push(JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>);
@@ -541,7 +541,7 @@ test("responsesSseToChatCompletionsSse relays response.heartbeat as Chat-compati
   // bridge.ts, but some upstreams emit them as typed frames). The chat-completions
   // converter must preserve their transport liveness without forwarding raw Responses-vocab
   // frames or manufacturing semantic Chat chunks.
-  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const upstream = new Response([
     `event: response.heartbeat\ndata: ${JSON.stringify({ type: "response.heartbeat" })}\n\n`,
     `event: response.output_text.delta\ndata: ${JSON.stringify({ type: "response.output_text.delta", delta: "hi" })}\n\n`,
@@ -758,7 +758,7 @@ test("responsesSseToChatCompletionsSse emits parallel tool calls once with stabl
 });
 
 test("responsesSseToChatCompletionsSse bounds upstream reads until the chat client pulls", async () => {
-  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const encoder = new TextEncoder();
   let pulls = 0;
   const upstream = new ReadableStream<Uint8Array>({
@@ -779,7 +779,7 @@ test("responsesSseToChatCompletionsSse bounds upstream reads until the chat clie
 });
 
 test("responsesSseToChatCompletionsSse delivers the first frame before a macrotask turn", async () => {
-  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const encoder = new TextEncoder();
   const upstream = new ReadableStream<Uint8Array>({
     start(controller) {
@@ -960,7 +960,7 @@ test("POST /v1/responses honors the per-model response_format opt-out", async ()
 });
 
 test("chat-native consumes pacing before the response-header timeout starts", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   let pacingTimer: (() => void) | undefined;
   let now = 0;
   setProviderRequestPacingRuntimeForTest({
@@ -1016,7 +1016,7 @@ test("chat-native consumes pacing before the response-header timeout starts", as
 });
 
 test("chat-native stays outside the Responses empty-completion retry guard", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   let upstreamCalls = 0;
   const providerExecutor = Object.assign(async () => {
     upstreamCalls += 1;
@@ -1531,7 +1531,7 @@ test("chat-native shares the transient send budget across same-target 429 recove
 });
 
 test("chat-native shares the transient send budget across key rotation", async () => {
-  const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
+  const { clearKeyCooldowns } = await import("../../backend/src/providers/key-failover");
   clearKeyCooldowns("mock");
   const authorizations: Array<string | null> = [];
   const upstream = Bun.serve({
@@ -1593,7 +1593,7 @@ test("chat-native shares the transient send budget across key rotation", async (
 });
 
 test("chat-native records terminal key cooldown after the send budget is exhausted", async () => {
-  const { clearKeyCooldowns, getKeyCooldownUntil } = await import("../../src/providers/key-failover");
+  const { clearKeyCooldowns, getKeyCooldownUntil } = await import("../../backend/src/providers/key-failover");
   clearKeyCooldowns("mock");
   let upstreamSends = 0;
   const upstream = Bun.serve({
@@ -1635,8 +1635,8 @@ test("chat-native records terminal key cooldown after the send budget is exhaust
 });
 
 test("chat-native client cancellation cancels the upstream stream and logs 499", async () => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   clearRequestLogsForTests();
   let markCancelled!: () => void;
   const cancelled = new Promise<void>(resolve => { markCancelled = resolve; });
@@ -1686,8 +1686,8 @@ test("chat-native client cancellation cancels the upstream stream and logs 499",
 });
 
 test("chat-native request abort releases its active-turn lease and logs 499", async () => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   clearRequestLogsForTests();
   let markCancelled!: () => void;
   const cancelled = new Promise<void>(resolve => { markCancelled = resolve; });
@@ -1742,7 +1742,7 @@ test("chat-native request abort releases its active-turn lease and logs 499", as
 });
 
 test("chat-native cancelled non-streaming SSE returns 499 instead of partial success", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   const clientAbort = new AbortController();
   let readStarted!: () => void;
   const started = new Promise<void>(resolve => { readStarted = resolve; });
@@ -1767,8 +1767,8 @@ test("chat-native cancelled non-streaming SSE returns 499 instead of partial suc
 });
 
 test("chat-native SSE enforces configured stall timeout despite non-progress frames", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const clientAbort = new AbortController();
   let timer: ReturnType<typeof setInterval> | undefined;
@@ -1808,7 +1808,7 @@ test("chat-native SSE enforces configured stall timeout despite non-progress fra
 });
 
 test("chat-native meaningful reasoning keeps a long stream alive and pauses the stall clock under backpressure", async () => {
-  const { nativeChatSse } = await import("../../src/server/chat-native-sse");
+  const { nativeChatSse } = await import("../../backend/src/server/chat-native-sse");
   const budget = createTestTranslatorBudget();
   const abort = new AbortController();
   const encoder = new TextEncoder();
@@ -1840,7 +1840,7 @@ test("chat-native meaningful reasoning keeps a long stream alive and pauses the 
 });
 
 test("chat-native caller abort while the stall clock is pending wins over the later deadline", async () => {
-  const { nativeChatSse } = await import("../../src/server/chat-native-sse");
+  const { nativeChatSse } = await import("../../backend/src/server/chat-native-sse");
   const budget = createTestTranslatorBudget();
   const abort = new AbortController();
   const terminals: Array<[number, string | undefined]> = [];
@@ -1878,7 +1878,7 @@ test("chat-native caller abort while the stall clock is pending wins over the la
 });
 
 test("chat-native valid terminal retains precedence over a late non-streaming abort", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   const clientAbort = new AbortController();
   globalThis.fetch = (async () => new Response(new ReadableStream<Uint8Array>({
     start(controller) {
@@ -1897,7 +1897,7 @@ test("chat-native valid terminal retains precedence over a late non-streaming ab
 });
 
 test("chat-native non-streaming SSE reports a typed stall failure instead of partial success", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   let cancels = 0;
   globalThis.fetch = (async () => new Response(new ReadableStream<Uint8Array>({
     start(controller) {
@@ -1916,7 +1916,7 @@ test("chat-native non-streaming SSE reports a typed stall failure instead of par
 });
 
 test("chat-native SSE only encodes outbound frames and releases buffered tail on cancellation", async () => {
-  const { nativeChatSse } = await import("../../src/server/chat-native-sse");
+  const { nativeChatSse } = await import("../../backend/src/server/chat-native-sse");
   const frames = Array.from({ length: 64 }, () => 'data: {"choices":[{"delta":{"content":"中文😀"}}]}\n\n');
   const wire = new TextEncoder().encode(frames.join(""));
   const budget = createTestTranslatorBudget();
@@ -1938,7 +1938,7 @@ test("chat-native SSE only encodes outbound frames and releases buffered tail on
 });
 
 test("chat-native non-streaming SSE collects CRLF multiline and split UTF-8 frames", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   const frames = [
     'data\r\n\r\ndata:\r\n\r\n',
     'data: {"choices":\r\ndata\r\ndata: [{"delta":{"content":"中文😀"}}]}\r\n\r\n',
@@ -1965,7 +1965,7 @@ test("chat-native non-streaming SSE collects CRLF multiline and split UTF-8 fram
 });
 
 test("chat-native direct streaming without an admission lease does not record a release miss", async () => {
-  const { handleChatCompletions } = await import("../../src/server/chat-completions");
+  const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
   const releaseMisses = activeRegistryMetrics().activeTurns.releaseMisses;
   globalThis.fetch = (async () => new Response(
     'data: {"choices":[{"index":0,"delta":{},"finish_reason":"stop"}]}\n\ndata: [DONE]\n\n',
@@ -2217,7 +2217,7 @@ test("chat-native skips optional main enrichment while routed work survives drai
 }, 15_000);
 
 test("POST /v1/chat/completions finalizes native passthrough request logs", async () => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const upstream = Bun.serve({
     port: 0,
@@ -2283,7 +2283,7 @@ test("POST /v1/chat/completions finalizes native passthrough request logs", asyn
 });
 
 test("POST /v1/chat/completions logs native cyber terminals as 400 cyber_policy", async () => {
-  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../src/server/request-log");
+  const { clearRequestLogsForTests, getRequestLogEntries } = await import("../../backend/src/server/request-log");
   clearRequestLogsForTests();
   const upstream = Bun.serve({
     port: 0,
@@ -2360,7 +2360,7 @@ test("POST /v1/chat/completions logs native cyber terminals as 400 cyber_policy"
 
 
 test("responsesSseToChatCompletionsSse reconciles done-frame final arguments (last-write-wins)", async () => {
-  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frames = [
     `event: response.output_item.added\ndata: ${JSON.stringify({ type: "response.output_item.added", item: { type: "function_call", id: "fc_a", call_id: "call_a", name: "alpha", arguments: "" } })}\n\n`,
     `event: response.function_call_arguments.delta\ndata: ${JSON.stringify({ type: "response.function_call_arguments.delta", item_id: "fc_a", delta: '{"q":"partial' })}\n\n`,
@@ -2383,7 +2383,7 @@ test("responsesSseToChatCompletionsSse reconciles done-frame final arguments (la
 });
 
 test("responsesSseToChatCompletionsSse emits error frame on response.failed (no clean DONE)", async () => {
-  const { responsesSseToChatCompletionsSse, collectChatCompletion, ChatCompletionsStreamError } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse, collectChatCompletion, ChatCompletionsStreamError } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frames = [
     `event: response.created\ndata: ${JSON.stringify({ type: "response.created", response: { id: "resp_fail" } })}\n\n`,
     `event: response.output_text.delta\ndata: ${JSON.stringify({ type: "response.output_text.delta", delta: "partial" })}\n\n`,
@@ -2416,7 +2416,7 @@ test("responsesSseToChatCompletionsSse emits error frame on response.failed (no 
 
 test("responsesSseToChatCompletionsSse preserves translator overflow and cancels upstream", async () => {
   const { responsesSseToChatCompletionsSse, collectChatCompletion, isChatCompletionsStreamError } =
-    budgetedChatOutbound(await import("../../src/chat/outbound"));
+    budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frame = `event: response.failed\ndata: ${JSON.stringify({
     type: "response.failed",
     response: {
@@ -2460,7 +2460,7 @@ test("responsesSseToChatCompletionsSse preserves translator overflow and cancels
 });
 
 test("collectChatCompletion enforces the per-call argument cap", async () => {
-  const module = await import("../../src/chat/outbound");
+  const module = await import("../../backend/src/chat/outbound");
   const budget = createTestTranslatorBudget({ maxCallArgumentBytes: 1024 });
   const bigArgs = "x".repeat(2048);
   const frame = `data: ${JSON.stringify({
@@ -2486,7 +2486,7 @@ test("collectChatCompletion enforces the per-call argument cap", async () => {
 });
 
 test("collectChatCompletion enforces the turn cap across many calls", async () => {
-  const module = await import("../../src/chat/outbound");
+  const module = await import("../../backend/src/chat/outbound");
   const budget = createTestTranslatorBudget({ maxCallArgumentBytes: 512, maxTurnBytes: 4096 });
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -2513,7 +2513,7 @@ test("collectChatCompletion enforces the turn cap across many calls", async () =
 });
 
 test("collectChatCompletion releases every call scope after the final owner is charged", async () => {
-  const module = await import("../../src/chat/outbound");
+  const module = await import("../../backend/src/chat/outbound");
   const budget = createTestTranslatorBudget();
   const encoder = new TextEncoder();
   const frames = [
@@ -2545,7 +2545,7 @@ test("collectChatCompletion releases every call scope after the final owner is c
 });
 
 test("collectChatCompletion accounts split surrogate content incrementally and releases it on failure", async () => {
-  const { collectChatCompletion } = await import("../../src/chat/outbound");
+  const { collectChatCompletion } = await import("../../backend/src/chat/outbound");
   for (const fail of [false, true]) {
     const budget = createTestTranslatorBudget();
     const frames = [
@@ -2577,7 +2577,7 @@ test("collectChatCompletion accounts split surrogate content incrementally and r
 });
 
 test("collectChatCompletion preserves admission for a 20 MiB frame and discards an incomplete EOF frame", async () => {
-  const { collectChatCompletion } = await import("../../src/chat/outbound");
+  const { collectChatCompletion } = await import("../../backend/src/chat/outbound");
   const text = "x".repeat(20 * 1024 * 1024);
   const completeFrame = `data: ${JSON.stringify({ choices: [{ delta: { content: text }, finish_reason: "stop" }] })}\n\n`;
   const incompleteFrame = 'data: {"choices":[{"delta":{"content":"discard me"}}]}';
@@ -2596,7 +2596,7 @@ test("collectChatCompletion preserves admission for a 20 MiB frame and discards 
 });
 
 test("collectChatCompletion final-copy overflow cleans up scopes and charges", async () => {
-  const module = await import("../../src/chat/outbound");
+  const module = await import("../../backend/src/chat/outbound");
   // Args (100 bytes) fit; args + serialized copy exceed the turn cap, so the
   // overflow fires during the final owner transfer, not mid-stream. The 250
   // threshold lets the ~213-byte frame and the 100-byte args through first.
@@ -2624,7 +2624,7 @@ test("collectChatCompletion final-copy overflow cleans up scopes and charges", a
 });
 
 test("responsesSseToChatCompletionsSse emits error frame on truncated stream", async () => {
-  const { responsesSseToChatCompletionsSse, collectChatCompletion, ChatCompletionsStreamError } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse, collectChatCompletion, ChatCompletionsStreamError } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frames = [
     `event: response.created\ndata: ${JSON.stringify({ type: "response.created", response: { id: "resp_trunc" } })}\n\n`,
     `event: response.output_text.delta\ndata: ${JSON.stringify({ type: "response.output_text.delta", delta: "half" })}\n\n`,
@@ -2772,7 +2772,7 @@ test("streaming /v1/chat/completions does not clean-DONE after response.failed",
 
 
 test("responsesSseToChatCompletionsSse emits one complete named tool call", async () => {
-  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frames = [
     `event: response.output_item.added\ndata: ${JSON.stringify({ type: "response.output_item.added", item: { type: "function_call", id: "fc_a", call_id: "call_a", name: "exec_command", arguments: "" } })}\n\n`,
     `event: response.function_call_arguments.delta\ndata: ${JSON.stringify({ type: "response.function_call_arguments.delta", item_id: "fc_a", delta: '{"cmd":' })}\n\n`,
@@ -2974,7 +2974,7 @@ test("chatCompletionsToResponsesBody indexes tool-call names once per call", () 
 // CRLF framing and a terminal event without a trailing blank line must not be reported
 // as truncation now that the shared SSE decoder drives the converter.
 test("responsesSseToChatCompletionsSse accepts CRLF-framed SSE with terminal event at EOF", async () => {
-  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse, collectChatCompletion } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const raw = [
     `event: response.created\r\ndata: ${JSON.stringify({ type: "response.created", response: { id: "resp_crlf" } })}\r\n\r\n`,
     `event: response.output_text.delta\r\ndata: ${JSON.stringify({ type: "response.output_text.delta", delta: "hello" })}\r\n\r\n`,
@@ -3002,7 +3002,7 @@ test("responsesSseToChatCompletionsSse accepts CRLF-framed SSE with terminal eve
 });
 
 test("responsesSseToChatCompletionsSse cancel promptly cancels an idle upstream", async () => {
-  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../src/chat/outbound"));
+  const { responsesSseToChatCompletionsSse } = budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   let upstreamCancelled = false;
   // Never-ending upstream: enqueues one partial frame then goes silent.
   const idleUpstream = new ReadableStream<Uint8Array>({
@@ -3072,7 +3072,7 @@ test("content_filter incomplete still maps to finish_reason content_filter with 
 
 test("collectChatCompletion throws ChatCompletionsStreamError on a stall incomplete (WP3)", async () => {
   const { responsesSseToChatCompletionsSse, collectChatCompletion, isChatCompletionsStreamError } =
-    budgetedChatOutbound(await import("../../src/chat/outbound"));
+    budgetedChatOutbound(await import("../../backend/src/chat/outbound"));
   const frames = [
     `event: response.incomplete\ndata: ${JSON.stringify({ type: "response.incomplete", response: { status: "incomplete", incomplete_details: { reason: "upstream_stall_timeout" } } })}\n\n`,
   ];

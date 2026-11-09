@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { adapterFailureFromMessage, parseRetryAfterFromMessage } from "../../src/lib/errors";
-import { formatRetryAfterAdvice } from "../../src/lib/retry-delay";
+import { adapterFailureFromMessage, parseRetryAfterFromMessage } from "../../backend/src/lib/errors";
+import { formatRetryAfterAdvice } from "../../backend/src/lib/retry-delay";
 
 describe("stated reset duration boundaries", () => {
   test("the error adapter retains a local parser binding after extraction", () => {

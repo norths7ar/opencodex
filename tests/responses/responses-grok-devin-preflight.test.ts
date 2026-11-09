@@ -1,15 +1,15 @@
 import { afterAll, afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import { saveCredential } from "../../src/oauth/store";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { SEND_BUDGET_EXHAUSTED_CODE } from "../../src/lib/errors";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { SEND_BUDGET_EXHAUSTED_CODE } from "../../backend/src/lib/errors";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const originalResolve = resolver.resolveAdapter;
 // A snapshot, not the live namespace: mock.module rewrites that namespace in place.
 const originalResolverModule = { ...resolver };
@@ -21,7 +21,7 @@ const limit: AdapterEvent = {
   retryable: true, message: "Cognition chat failed (resource_exhausted); retry after ~60s",
 };
 const clientLimitMessage = `Please try again in 60s. ${limit.message}`;
-mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...resolver,
   resolveAdapter(provider: OcxProviderConfig, cache?: "none" | "short" | "long") {
     if (provider.adapter !== "devin") return originalResolve(provider, cache);
     return {
@@ -36,8 +36,8 @@ mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
     } satisfies ProviderAdapter;
   },
 }));
-const { handleResponses } = await import("../../src/server/responses");
-const { addFinalRequestLog } = await import("../../src/server/request-log");
+const { handleResponses } = await import("../../backend/src/server/responses");
+const { addFinalRequestLog } = await import("../../backend/src/server/request-log");
 let requestLog: Parameters<typeof handleResponses>[2];
 let home: ReturnType<typeof createTempHome>;
 let release: (() => void) | undefined;
@@ -56,7 +56,7 @@ beforeEach(async () => {
 // Bun keeps a module mock for the rest of the process. Without this, every later file in a
 // non-isolated run resolves Devin through the synthetic rate-limited adapter above.
 afterAll(() => {
-  mock.module("../../src/server/adapter-resolve", () => originalResolverModule);
+  mock.module("../../backend/src/server/adapter-resolve", () => originalResolverModule);
 });
 afterEach(() => {
   try {

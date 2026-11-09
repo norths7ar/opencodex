@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { railStatusCls, statusLabel } from "../../gui/src/components/provider-workspace/ProviderRail";
-import type { WorkspaceItem } from "../../gui/src/provider-workspace/catalog";
-import type { TFn } from "../../gui/src/i18n";
+import { railStatusCls, statusLabel } from "../../frontend/src/components/provider-workspace/ProviderRail";
+import type { WorkspaceItem } from "../../frontend/src/provider-workspace/catalog";
+import type { TFn } from "../../frontend/src/i18n";
 
 const t = ((key: string) => ({
   "prov.disabledBadge": "Disabled",
@@ -41,7 +41,7 @@ describe("provider rail status semantics", () => {
 
 describe("provider rail source contract", () => {
   test("has one page-owned action surface and one option focus model", async () => {
-    const shell = await Bun.file("gui/src/components/provider-workspace/ProviderWorkspaceShell.tsx").text();
+    const shell = await Bun.file("frontend/src/components/provider-workspace/ProviderWorkspaceShell.tsx").text();
     expect(shell).not.toContain('className="pws-rail-header"');
     expect(shell).not.toContain('className="pws-rail-title"');
     expect(shell).not.toMatch(/className="pws-rail-list"[\s\S]{0,160}tabIndex=\{0\}/);
@@ -53,7 +53,7 @@ describe("provider rail source contract", () => {
   });
 
   test("uses icon, two-line copy, and trail without a chevron sibling", async () => {
-    const rail = await Bun.file("gui/src/components/provider-workspace/ProviderRail.tsx").text();
+    const rail = await Bun.file("frontend/src/components/provider-workspace/ProviderRail.tsx").text();
     expect(rail).toContain('className="providers-workspace-rail-copy"');
     expect(rail).toContain('className="providers-workspace-rail-primary"');
     expect(rail).toContain('className="providers-workspace-rail-secondary"');
@@ -63,7 +63,7 @@ describe("provider rail source contract", () => {
   });
 
   test("pins no-wrap, token, container, and overflow protections", async () => {
-    const css = await Bun.file("gui/src/styles/provider-workspace-shell.css").text();
+    const css = await Bun.file("frontend/src/styles/provider-workspace-shell.css").text();
     expect(css).not.toContain("var(--fg");
     expect(css).toContain("container-name: provider-workspace");
     expect(css).toContain(".main-inner:has(.pws-shell-container)");
@@ -73,7 +73,7 @@ describe("provider rail source contract", () => {
   });
 
   test("redirects the legacy workspace subroute and normalizes unknown suffixes", async () => {
-    const { hashBelongsToPage, resolveAppHashChange } = await import("../../gui/src/app-routing");
+    const { hashBelongsToPage, resolveAppHashChange } = await import("../../frontend/src/app-routing");
     // WP5 (Q1): the dual-layout hash is no longer a Providers route. It must not belong,
     // and it must be passively replaced so an old bookmark still lands somewhere real.
     expect(hashBelongsToPage("providers/workspace", "providers")).toBe(false);
@@ -87,9 +87,9 @@ describe("provider rail source contract", () => {
     // Unknown suffixes collapse to the bare page rather than 404.
     expect(resolveAppHashChange("providers/other").replaceTo).toBe("providers");
 
-    const routing = await Bun.file("gui/src/app-routing.ts").text();
-    const routeState = await Bun.file("gui/src/use-app-route-state.ts").text();
-    const app = await Bun.file("gui/src/App.tsx").text();
+    const routing = await Bun.file("frontend/src/app-routing.ts").text();
+    const routeState = await Bun.file("frontend/src/use-app-route-state.ts").text();
+    const app = await Bun.file("frontend/src/App.tsx").text();
     expect(routing).toContain('rawHash === "providers/workspace"');
     expect(routing).toContain("hashBelongsToPage(rawHash, nextPage)");
     /*

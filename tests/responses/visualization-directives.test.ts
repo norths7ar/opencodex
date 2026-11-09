@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { parseRequest } from "../../src/responses/parser";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   normalizeVisualizationContext,
   normalizeVisualizationText,
-} from "../../src/responses/visualization-directives";
-import type { OcxContext, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/responses/visualization-directives";
+import type { OcxContext, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Codex App visualization references (\uE200visualize\uE202{...}\uE201) are invisible to models whose

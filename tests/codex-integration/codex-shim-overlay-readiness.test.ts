@@ -3,9 +3,9 @@ import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { diagnoseCodexShim, installCodexShim, setCodexShimProbeObservationMsForTests } from "../../src/codex/shim";
-import { findFirstCodexOnPath } from "../../src/codex/shim-path-resolution";
-import { inspectCodexShimForConnect } from "../../src/cli/codex-shim-readiness";
+import { diagnoseCodexShim, installCodexShim, setCodexShimProbeObservationMsForTests } from "../../backend/src/codex/shim";
+import { findFirstCodexOnPath } from "../../backend/src/codex/shim-path-resolution";
+import { inspectCodexShimForConnect } from "../../backend/src/cli/codex-shim-readiness";
 
 function fixture(run: (f: { root: string; home: string; native: string; wrapper: string; envFile: string; earlier: string }) => void): void {
   const root = fs.mkdtempSync(join(tmpdir(), "ocx-overlay-activation-"));

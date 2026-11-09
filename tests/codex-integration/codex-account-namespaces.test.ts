@@ -1,15 +1,15 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import * as accountLabels from "../../src/codex/account-label";
+import * as accountLabels from "../../backend/src/codex/account-label";
 import {
   CODEX_ACCOUNT_LOG_LABEL_RE,
   fallbackCodexAccountLogLabel,
-} from "../../src/codex/account-label";
+} from "../../backend/src/codex/account-label";
 import {
   codexAccountIdNamespaceCollisionError,
   codexAccountNamespaceProviderCollisionError,
   codexAccountNamespaceForModel,
   hasCodexAccountNamespace,
-} from "../../src/codex/account-namespace-match";
+} from "../../backend/src/codex/account-namespace-match";
 import {
   appendDefaultCodexAccountNamespace,
   codexAccountPickerEnabled,
@@ -18,9 +18,9 @@ import {
   initializeDefaultCodexAccountNamespaces,
   isMainCodexAccountTarget,
   isValidCodexAccountNamespaceTarget,
-} from "../../src/codex/account-namespaces";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/account-namespaces";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import type { OcxConfig } from "../../backend/src/types";
 
 type InitializableAccountNamespaceConfig = Pick<
   OcxConfig,

@@ -8,10 +8,10 @@ import {
   isAccountQuotaExhausted,
   rankAccountsByHeadroom,
   rankAccountsByResetFirst,
-} from "../../src/oauth/account-quota-rank";
+} from "../../backend/src/oauth/account-quota-rank";
 import {
   clearPoolRotationState,
-} from "../../src/oauth/pool-kernel";
+} from "../../backend/src/oauth/pool-kernel";
 import {
   clearGenericFailoverHealth,
   eligibleFailoverAccounts,
@@ -19,18 +19,18 @@ import {
   noteGenericPoolSelection,
   preferredInitialAccount,
   rotateGenericOAuthAccountOn429,
-} from "../../src/oauth/generic-account-failover";
+} from "../../backend/src/oauth/generic-account-failover";
 import {
   clearAccountQuotaCache,
   setCachedProviderAccountQuotaForTests,
-} from "../../src/providers/quota";
+} from "../../backend/src/providers/quota";
 import {
   getAccountSet,
   saveCredential,
   setActiveAccount,
-} from "../../src/oauth/store";
-import { clearAntigravityAccountRosters, recordAntigravityAccountRoster } from "../../src/providers/antigravity-account-roster";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/oauth/store";
+import { clearAntigravityAccountRosters, recordAntigravityAccountRoster } from "../../backend/src/providers/antigravity-account-roster";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -357,7 +357,7 @@ describe("Antigravity family strategies behind pool.kernel", () => {
 
 describe("modular Responses model-family forwarding", () => {
   test("initial selection receives the routed model in the transport owner", () => {
-    const source = readFileSync(repoPath("src/server/responses/request-transport.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/server/responses/request-transport.ts"), "utf8");
     expect(source).toContain("preferredInitialAccount(config, route.providerName, Date.now(), route.modelId)");
   });
 
@@ -369,7 +369,7 @@ describe("modular Responses model-family forwarding", () => {
     ["run-turn-execution.ts", "null"],
   ] as const) {
     test(owner + " forwards the routed model on account rotation", () => {
-      const source = readFileSync(repoPath("src/server/responses", owner), "utf8");
+      const source = readFileSync(repoPath("backend/src/server/responses", owner), "utf8");
       expect(source.match(/\brotateGenericOAuthAccountOn429\s*\(/g)).toHaveLength(1);
       expect(source.replace(/\s+/g, " ")).toContain(
         "rotateGenericOAuthAccountOn429( config, route.providerName, "

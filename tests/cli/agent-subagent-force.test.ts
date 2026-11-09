@@ -1,6 +1,6 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import { handleAgentCommand, AGENT_USAGE } from "../../src/cli/agent";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleAgentCommand, AGENT_USAGE } from "../../backend/src/cli/agent";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 
 const spies: Array<ReturnType<typeof spyOn<typeof console, "log">>> = [];
 afterEach(() => { for (const spy of spies.splice(0)) spy.mockRestore(); });

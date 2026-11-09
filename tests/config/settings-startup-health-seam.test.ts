@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
-import { getCachedStartupHealth, invalidateStartupHealthCache } from "../../src/server/startup-health-cache";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
+import { getCachedStartupHealth, invalidateStartupHealthCache } from "../../backend/src/server/startup-health-cache";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { startupHealthFixture } from "../helpers/startup-health";
 

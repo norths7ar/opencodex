@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../src/adapters/openai-chat";
-import { stripResponsesOnlyEncryptedMarker, stripUnicodePropertyPatterns } from "../../../src/adapters/responses-tool-schema";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests } from "../../../src/lib/debug-settings";
-import { routeModel } from "../../../src/router";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../backend/src/adapters/openai-chat";
+import { stripResponsesOnlyEncryptedMarker, stripUnicodePropertyPatterns } from "../../../backend/src/adapters/responses-tool-schema";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests } from "../../../backend/src/lib/debug-settings";
+import { routeModel } from "../../../backend/src/router";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

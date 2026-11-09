@@ -3,11 +3,11 @@ import { afterEach, describe, expect, setDefaultTimeout, spyOn, test } from "bun
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { providerConfigSchema } from "../../src/config/schema/leaf-validators";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import { startServer } from "../../src/server";
-import type { OcxProviderConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { providerConfigSchema } from "../../backend/src/config/schema/leaf-validators";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import { startServer } from "../../backend/src/server";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { managementFetch as fetch } from "../helpers/management-auth";
 import { config } from "../helpers/management-relative-send-paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

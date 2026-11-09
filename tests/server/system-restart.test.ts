@@ -5,11 +5,11 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { consumeSiblingHandoff } from "../../src/codex/sibling-handoff";
-import { honorSiblingMarker, markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
-import { removeRuntimePort, writeRuntimePort } from "../../src/config/process-state";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { resetLifecycleDrainStateForTests, setDraining } from "../../src/server/lifecycle";
+import { consumeSiblingHandoff } from "../../backend/src/codex/sibling-handoff";
+import { honorSiblingMarker, markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
+import { removeRuntimePort, writeRuntimePort } from "../../backend/src/config/process-state";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { resetLifecycleDrainStateForTests, setDraining } from "../../backend/src/server/lifecycle";
 import {
   DEADLINE_LISTENER_STOP_TIMEOUT_MS,
   MEMORY_DRAIN_RESTART_MS,
@@ -18,9 +18,9 @@ import {
   replacementStartEnvironment,
   setSystemRestartIoForTests,
   waitForReplacementReady,
-} from "../../src/server/management/system-restart";
-import { SYSTEM_RESTART_EXPECTED_PID_HEADER } from "../../src/lib/system-restart-contract";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/system-restart";
+import { SYSTEM_RESTART_EXPECTED_PID_HEADER } from "../../backend/src/lib/system-restart-contract";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(): OcxConfig {
   return {

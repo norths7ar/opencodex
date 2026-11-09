@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { encodeChatCompletionSse } from "../../src/protocols/encoders/chat";
-import type { AdapterEvent } from "../../src/types";
+import { encodeChatCompletionSse } from "../../backend/src/protocols/encoders/chat";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // An explicit stallTimeoutSec of 0 disables the stall guard (#5876). The direct client encoders

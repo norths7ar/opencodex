@@ -5,12 +5,12 @@
  * every failure or cancellation path persists nothing. All provider calls are fakes.
  */
 import { describe, expect, test } from "bun:test";
-import { createAntigravityAccountImportAdapter, verifyAntigravityImportProject, type AntigravityImportAdapterDeps } from "../../src/oauth/account-import/google-antigravity-adapter";
-import { setAntigravityAccountQuotaTransportForTests } from "../../src/providers/quota/antigravity";
-import { parseCockpitAccountDocument } from "../../src/oauth/account-import/parser";
-import { importAccounts } from "../../src/oauth/account-import/service";
-import { ACCOUNT_IMPORT_FORMAT, ACCOUNT_IMPORT_PROVIDER, type ValidatedAntigravityCredential } from "../../src/oauth/account-import/types";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { createAntigravityAccountImportAdapter, verifyAntigravityImportProject, type AntigravityImportAdapterDeps } from "../../backend/src/oauth/account-import/google-antigravity-adapter";
+import { setAntigravityAccountQuotaTransportForTests } from "../../backend/src/providers/quota/antigravity";
+import { parseCockpitAccountDocument } from "../../backend/src/oauth/account-import/parser";
+import { importAccounts } from "../../backend/src/oauth/account-import/service";
+import { ACCOUNT_IMPORT_FORMAT, ACCOUNT_IMPORT_PROVIDER, type ValidatedAntigravityCredential } from "../../backend/src/oauth/account-import/types";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 
 const CANARY = "cockpit-canary-refresh-token-DO-NOT-LEAK";
 

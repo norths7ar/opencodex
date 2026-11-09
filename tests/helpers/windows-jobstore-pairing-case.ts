@@ -2,18 +2,18 @@ import { expect, spyOn } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import { realpathSync } from "node:fs";
-import type { OcxConfig } from "../../src/types";
-import type { ManagementContext } from "../../src/server/management/context";
-import { assertNotRealHomeUnderTest, isTestHomeGuardArmed, protectedHomeForTests } from "../../src/lib/test-home-guard";
-import { flushWindowsSecretAclReapsBeforeRemoval, hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { assertNotRealHomeUnderTest, isTestHomeGuardArmed, protectedHomeForTests } from "../../backend/src/lib/test-home-guard";
+import { flushWindowsSecretAclReapsBeforeRemoval, hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
 import { trustWindowsTempFixtureAncestry } from "./windows-temp-ancestry";
-import { admitCodexCliUpdateJob } from "../../src/codex/cli-update-job";
-import * as updateJobs from "../../src/codex/cli-update-job";
-import { handleCodexCliUpdateRoutes } from "../../src/server/management/codex-cli-update-routes";
-import { handleCodexCliUpdateCommand } from "../../src/cli/codex-cli-update";
+import { admitCodexCliUpdateJob } from "../../backend/src/codex/cli-update-job";
+import * as updateJobs from "../../backend/src/codex/cli-update-job";
+import { handleCodexCliUpdateRoutes } from "../../backend/src/server/management/codex-cli-update-routes";
+import { handleCodexCliUpdateCommand } from "../../backend/src/cli/codex-cli-update";
 import { createManagementSessionControl, initializeManagementAuthState, issueGuiSession,
-  managementPrincipal, managementSessionIssuance, requireManagementAuth } from "../../src/server/management-auth";
-import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../src/server/gui-session";
+  managementPrincipal, managementSessionIssuance, requireManagementAuth } from "../../backend/src/server/management-auth";
+import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../backend/src/server/gui-session";
 
 const root = realpathSync.native(process.env.OCX_TEST_OWNED_ROOT!);
 const tempParent = realpathSync.native(process.env.OCX_TEST_TEMP_PARENT!);

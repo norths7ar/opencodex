@@ -1,37 +1,37 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../src/oauth/store";
-import * as usabilityModule from "../../src/codex/account-usability";
-import * as modelRowsModule from "../../src/server/management/model-rows";
+import * as storeModule from "../../backend/src/oauth/store";
+import * as usabilityModule from "../../backend/src/codex/account-usability";
+import * as modelRowsModule from "../../backend/src/server/management/model-rows";
 
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean; credential?: { projectId?: string } }>; activeAccountId?: string }> = {};
 let usableCodexAccounts: Set<string> = new Set();
 let managementRows: Array<Record<string, unknown>> = [];
 
-mock.module("../../src/oauth/store", () => ({
+mock.module("../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
-mock.module("../../src/codex/account-usability", () => ({
+mock.module("../../backend/src/codex/account-usability", () => ({
   ...usabilityModule,
   isCodexAccountUsable: (_config: unknown, accountId: string) => usableCodexAccounts.has(accountId),
 }));
-mock.module("../../src/server/management/model-rows", () => ({
+mock.module("../../backend/src/server/management/model-rows", () => ({
   ...modelRowsModule,
   listManagementModelRows: async () => managementRows,
 }));
 
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import {
   enabledVisionBackends,
   visionCandidateRows,
   visionDescriberIsProvablyBlind,
   visionModelOptionsFrom,
-} from "../../src/server/management/vision-sidecar-options";
-import { activeVisionBackends } from "../../src/vision/backends";
-import { visionBackendForCandidate } from "../../src/vision/eligibility";
-import { resolveSidecarAuth } from "../../src/sidecar/auth";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/management/vision-sidecar-options";
+import { activeVisionBackends } from "../../backend/src/vision/backends";
+import { visionBackendForCandidate } from "../../backend/src/vision/eligibility";
+import { resolveSidecarAuth } from "../../backend/src/sidecar/auth";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const forward: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" };
 const xaiOAuth: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://api.x.ai/v1", authMode: "oauth" };

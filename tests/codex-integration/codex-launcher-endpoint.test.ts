@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { attestCodexRuntime, codexRuntimeAttestationMatchesTarget, type CodexRuntimeAttestation } from "../../src/cli/codex-launch-auth";
-import { buildCodexLaunchEnv } from "../../src/cli/codex-launcher";
-import { proveLiveProxyOwnedByHome, type LiveProxy } from "../../src/server/proxy-liveness";
-import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../src/lib/local-management-attestation";
-import { buildProviderTableBlockForTarget } from "../../src/codex/inject/config-toml";
-import { standaloneCodexRoutingTarget, validateCodexRoutingTarget } from "../../src/codex/inject/routing-target";
+import { attestCodexRuntime, codexRuntimeAttestationMatchesTarget, type CodexRuntimeAttestation } from "../../backend/src/cli/codex-launch-auth";
+import { buildCodexLaunchEnv } from "../../backend/src/cli/codex-launcher";
+import { proveLiveProxyOwnedByHome, type LiveProxy } from "../../backend/src/server/proxy-liveness";
+import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../backend/src/lib/local-management-attestation";
+import { buildProviderTableBlockForTarget } from "../../backend/src/codex/inject/config-toml";
+import { standaloneCodexRoutingTarget, validateCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
 import { createCodexLaunchFixtureRoot, codexLaunchOwnershipTest, buildCodexPrivateFixtureLaunchEnv } from "../helpers/codex-launch-private-fixture";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

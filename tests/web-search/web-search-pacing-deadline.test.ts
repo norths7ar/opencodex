@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { createAdapterPhysicalSend } from "../../src/adapters/physical-send";
-import { sleepWithAbort } from "../../src/lib/upstream-retry";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { createAdapterPhysicalSend } from "../../backend/src/adapters/physical-send";
+import { sleepWithAbort } from "../../backend/src/lib/upstream-retry";
 import {
   providerRequestPacingStatus,
   RequestPacingQueueOverloadError,
   resetProviderRequestPacingForTest,
   waitForProviderRequestSlot,
-} from "../../src/providers/request-pacing";
-import { parseRequest } from "../../src/responses/parser";
-import { providerFetch, type ProviderFetch } from "../../src/server/responses/fetch-helpers";
-import type { OcxProviderConfig } from "../../src/types";
-import { runWithWebSearch, type WebSearchLoopDeps } from "../../src/web-search/loop";
+} from "../../backend/src/providers/request-pacing";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { providerFetch, type ProviderFetch } from "../../backend/src/server/responses/fetch-helpers";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { runWithWebSearch, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // Every deadline, pacing interval and backoff here runs on Bun's fake clock, which also drives

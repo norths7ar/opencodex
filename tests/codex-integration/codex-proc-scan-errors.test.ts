@@ -7,8 +7,8 @@ import {
   restartCodexAppServers,
   scanCodexAppServerProcesses,
   scanCodexSessionProcesses,
-} from "../../src/codex/app-server-processes";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
+} from "../../backend/src/codex/app-server-processes";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
 
 const OWN_UID = 1000;
 const io = { platform: "linux" as const, getuid: () => OWN_UID };

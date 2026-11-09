@@ -33,7 +33,7 @@ function usage(fiveHour: number, weekly: number): void {
 }
 
 async function freshRead(instance: "anthropic" | "anthropic2", id: string): Promise<void> {
-  const { fetchAnthropicAccountQuota } = await import("../../../src/providers/quota/anthropic-account-quota");
+  const { fetchAnthropicAccountQuota } = await import("../../../backend/src/providers/quota/anthropic-account-quota");
   await fetchAnthropicAccountQuota(instance, id, true, undefined, true);
 }
 

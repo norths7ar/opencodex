@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { applyCompactionRoutingOverride } from "../../src/server/responses/compaction-routing";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { clearCompactHandoffRoutesForTests } from "../../src/server/responses/compact";
-import { decodeCompactionSummary, SUMMARY_PREFIX } from "../../src/responses/compaction";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { routeCompactionModel } from "../../src/router";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { warnDegradedCompactionRouting } from "../../src/config/load-degrade";
-import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
+import { applyCompactionRoutingOverride } from "../../backend/src/server/responses/compaction-routing";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { clearCompactHandoffRoutesForTests } from "../../backend/src/server/responses/compact";
+import { decodeCompactionSummary, SUMMARY_PREFIX } from "../../backend/src/responses/compaction";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { routeCompactionModel } from "../../backend/src/router";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { warnDegradedCompactionRouting } from "../../backend/src/config/load-degrade";
+import { sessionLaneIdFromRequest } from "../../backend/src/server/request-log-conversation";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 /**

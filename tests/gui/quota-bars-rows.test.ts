@@ -8,9 +8,9 @@ import {
   isQuotaWarn,
   maxQuotaUtilisation,
   quotaBarTone,
-} from "../../gui/src/components/QuotaBars";
-import { quotaAutoRefreshAvailability, type AccountQuota } from "../../gui/src/codex-quota-utils";
-import type { TFn } from "../../gui/src/i18n";
+} from "../../frontend/src/components/QuotaBars";
+import { quotaAutoRefreshAvailability, type AccountQuota } from "../../frontend/src/codex-quota-utils";
+import type { TFn } from "../../frontend/src/i18n";
 
 /** Key-echoing translator: rows carry their key so ordering is assertable. */
 const t: TFn = ((key: string, vars?: Record<string, string | number>) =>

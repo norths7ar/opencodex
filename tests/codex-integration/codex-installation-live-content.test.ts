@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { saveConfig } from "../../src/config";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { startServer } from "../../src/server";
-import { handleLive } from "../../src/server/live";
+import { saveConfig } from "../../backend/src/config";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { startServer } from "../../backend/src/server";
+import { handleLive } from "../../backend/src/server/live";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 import { callerToken, install, installationLiveFixture, liveConfig, metadata, turn } from "../helpers/codex-installation-live";
 

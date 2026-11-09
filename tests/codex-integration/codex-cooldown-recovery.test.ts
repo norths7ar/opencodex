@@ -7,8 +7,8 @@ import {
   clearAccountQuota,
   runCodexCooldownRecoveryProbes,
   seedCodexAuthAdmissionForTests,
-} from "../../src/codex/auth-api";
-import { readCodexAccountRecord, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../src/codex/account-store";
+} from "../../backend/src/codex/auth-api";
+import { readCodexAccountRecord, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../backend/src/codex/account-store";
 import {
   codexQuotaWindowForPlan,
   getAccountQuota,
@@ -16,8 +16,8 @@ import {
   parseUsageQuota,
   setAccountQuotaFromParsed,
   updateAccountQuota,
-} from "../../src/codex/quota";
-import upstreamModels from "../../src/codex/data/upstream-models.json";
+} from "../../backend/src/codex/quota";
+import upstreamModels from "../../backend/src/codex/data/upstream-models.json";
 import {
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   clearCodexUpstreamHealth,
@@ -29,10 +29,10 @@ import {
   getCodexQuotaHealthSnapshot,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { resetQuotaQueryBackoffForTests } from "../../src/codex/quota-query-backoff";
+import { resetQuotaQueryBackoffForTests } from "../../backend/src/codex/quota-query-backoff";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-cooldown-recovery-test");
 const TEST_CODEX_HOME = join(TEST_DIR, "codex");

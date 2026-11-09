@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { computeVersionSkew, isConfirmedVersionMatch } from "../../src/cli/version-skew";
-import { packageVersion } from "../../src/cli/help";
-import { shouldNoticeVersionSkew } from "../../src/cli/version-skew-notice";
+import { computeVersionSkew, isConfirmedVersionMatch } from "../../backend/src/cli/version-skew";
+import { packageVersion } from "../../backend/src/cli/help";
+import { shouldNoticeVersionSkew } from "../../backend/src/cli/version-skew-notice";
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -151,8 +151,8 @@ function freshNotice(scenario: NoticeScenario = {}) {
     mkdirSync(ocxHome); mkdirSync(codexHome);
     const script = `
       const scenario = ${JSON.stringify(scenario)};
-      const notice = await import(${JSON.stringify(repoPath("src", "cli", "version-skew-notice.ts"))});
-      const { proxyIdentityAt } = await import(${JSON.stringify(repoPath("src", "server", "proxy-liveness.ts"))});
+      const notice = await import(${JSON.stringify(repoPath("backend/src", "cli", "version-skew-notice.ts"))});
+      const { proxyIdentityAt } = await import(${JSON.stringify(repoPath("backend/src", "server", "proxy-liveness.ts"))});
       const warnings = [], calls = [], probes = [], events = [];
       let clock = 0, aborted = false;
       const started = performance.now();
@@ -194,14 +194,14 @@ function freshNotice(scenario: NoticeScenario = {}) {
       if (scenario.root) {
         const { mock } = await import("bun:test");
         const actual = notice.maybeNoticeVersionSkew;
-        mock.module(${JSON.stringify(repoPath("src", "cli", "version-skew-notice.ts"))}, () => ({
+        mock.module(${JSON.stringify(repoPath("backend/src", "cli", "version-skew-notice.ts"))}, () => ({
           shouldNoticeVersionSkew: notice.shouldNoticeVersionSkew,
           maybeNoticeVersionSkew: (cmd,argv) => { events.push("hook"); return actual(cmd,argv,io); },
         }));
-        mock.module(${JSON.stringify(repoPath("src", "cli", "codex-shim-autorestore.ts"))}, () => ({
+        mock.module(${JSON.stringify(repoPath("backend/src", "cli", "codex-shim-autorestore.ts"))}, () => ({
           maybeAutoRestoreCodexShimAsync: async () => { events.push("shim"); },
         }));
-        const { runCli } = await import(${JSON.stringify(repoPath("src", "cli", "root.ts"))});
+        const { runCli } = await import(${JSON.stringify(repoPath("backend/src", "cli", "root.ts"))});
         await runCli(args); events.push("dispatch");
       } else {
         await notice.maybeNoticeVersionSkew(command,args,io);

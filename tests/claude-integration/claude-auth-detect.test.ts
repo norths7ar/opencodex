@@ -11,7 +11,7 @@ import {
   detectClaudeAuth,
   type AuthDetectDeps,
   type AuthPresence,
-} from "../../src/claude/auth-detect";
+} from "../../backend/src/claude/auth-detect";
 
 /**
  * The safety contract: `unknown` must never collapse into `absent`, because that is

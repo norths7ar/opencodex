@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { restoreRoutedCustomCallsInJson } from "../../src/responses/custom-tool-compat";
-import { compileCodeModeHelperInput } from "../../src/responses/code-mode-helper-compat";
-import { undeclaredToolCallNameInResponse } from "../../src/server/responses-undeclared-tool-guard";
-import { normalizeDeclaredToolName } from "../../src/types/tools";
+import { restoreRoutedCustomCallsInJson } from "../../backend/src/responses/custom-tool-compat";
+import { compileCodeModeHelperInput } from "../../backend/src/responses/code-mode-helper-compat";
+import { undeclaredToolCallNameInResponse } from "../../backend/src/server/responses-undeclared-tool-guard";
+import { normalizeDeclaredToolName } from "../../backend/src/types/tools";
 
 const CODE_MODE = new Set(["exec"]);
 

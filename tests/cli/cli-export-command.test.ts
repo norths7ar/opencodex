@@ -12,14 +12,14 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { handleExportCommand, exportModelsFromProxyRows } from "../../src/cli/export-command";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleExportCommand, exportModelsFromProxyRows } from "../../backend/src/cli/export-command";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 
 const servers: Array<ReturnType<typeof Bun.serve>> = [];
 const tempDirs: string[] = [];

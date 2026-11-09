@@ -8,9 +8,9 @@ import * as fs from "node:fs";
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as serviceState from "../../src/service/state";
-import { buildWindowsServiceScript, resolvedProxyEnv } from "../../src/service";
-import { buildServiceShellCommand, resolveServiceListenPort } from "../../src/service/definition";
+import * as serviceState from "../../backend/src/service/state";
+import { buildWindowsServiceScript, resolvedProxyEnv } from "../../backend/src/service";
+import { buildServiceShellCommand, resolveServiceListenPort } from "../../backend/src/service/definition";
 
 const previousOpenCodexHome = process.env.OPENCODEX_HOME;
 beforeEach(() => {

@@ -4,7 +4,7 @@ import {
   ENSURE_READY_TIMEOUT_MS,
   ensureKeepWaiting,
   waitForLiveProxy,
-} from "../../src/cli/ensure-readiness";
+} from "../../backend/src/cli/ensure-readiness";
 
 function fakeClock() {
   let t = 1_000;

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { handleInternalCommand } from "../../src/cli/internal-command";
+import { handleInternalCommand } from "../../backend/src/cli/internal-command";
 const root = "/Volumes/Apps/ChatGPT Beta.app";
 const binary = `${root}/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex`;
 let logs: ReturnType<typeof spyOn<typeof console, "log">>;

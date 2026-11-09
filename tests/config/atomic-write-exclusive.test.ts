@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { existsSync, linkSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { atomicWriteFileNoFollow } from "../../src/config/atomic-write";
+import { atomicWriteFileNoFollow } from "../../backend/src/config/atomic-write";
 import { createTempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 
@@ -77,7 +77,7 @@ test("an error returned after link publication cannot scrub the published copy",
   const home = createTempHome("ocx-exclusive-uncertain-");
   try {
     const path = home.path("recovery.bak");
-    const module = pathToFileURL(repoPath("src/config/atomic-write.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config/atomic-write.ts")).href;
     const child = Bun.spawnSync([process.execPath, "--eval", `import { mock } from 'bun:test'; import * as fs from 'node:fs';
       const real = { ...fs }; mock.module('node:fs', () => ({ ...real, linkSync(source, target) {
         real.linkSync(source, target); throw Object.assign(new Error('uncertain publication'), { code: 'EIO' });
@@ -129,7 +129,7 @@ test("a filesystem reporting zero inode identity still accepts ordinary private 
   try {
     const ordinary = home.path("config.json");
     const exclusive = home.path("recovery.bak");
-    const module = pathToFileURL(repoPath("src/config/atomic-write.ts")).href;
+    const module = pathToFileURL(repoPath("backend/src/config/atomic-write.ts")).href;
     const child = Bun.spawnSync([process.execPath, "--eval", `import { mock } from 'bun:test'; import * as fs from 'node:fs';
       const real = { ...fs };
       const zero = stats => { if (typeof stats?.ino === 'bigint') Object.defineProperty(stats, 'ino', { value: 0n }); return stats; };

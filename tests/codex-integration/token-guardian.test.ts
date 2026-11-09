@@ -2,17 +2,17 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential, setAccountPaused } from "../../src/oauth/store";
-import { getConfigPath } from "../../src/config";
-import { flushConfigDirHardening } from "../../src/config/paths";
-import { markCodexAccountValidated, markCodexAccountValidationFailed, readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { __resetGuardianState, guardianSweep } from "../../src/oauth/token-guardian";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { getAccountSet, saveCredential, setAccountPaused } from "../../backend/src/oauth/store";
+import { getConfigPath } from "../../backend/src/config";
+import { flushConfigDirHardening } from "../../backend/src/config/paths";
+import { markCodexAccountValidated, markCodexAccountValidationFailed, readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { __resetGuardianState, guardianSweep } from "../../backend/src/oauth/token-guardian";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
+} from "../../backend/src/server/lifecycle";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const origHome = process.env.HOME;

@@ -13,7 +13,7 @@ import { repoPath } from "../helpers/repo-root";
  * requests, against a config nobody else holds.
  */
 
-const SRC = repoPath("src");
+const SRC = repoPath("backend/src");
 
 /** Modules that hold a LIVE server config and must use the wrapper. */
 const GUARDED_FILES = [
@@ -79,7 +79,7 @@ test("startServer arms the baseline before it can serve a request", () => {
 
 
 test("Anthropic model route candidate writes reject malformed rules without affecting other providers", async () => {
-  const { validateConfigCandidate } = await import("../../src/config/diagnostics");
+  const { validateConfigCandidate } = await import("../../backend/src/config/diagnostics");
   const candidate = { port: 0, defaultProvider: "anthropic", providers: {
     anthropic: { adapter: "anthropic", authMode: "oauth", baseUrl: "https://example.test" },
     deepseek: { adapter: "openai-chat", baseUrl: "https://example.test" },

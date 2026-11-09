@@ -10,18 +10,18 @@ import {
   requestSettledSends,
   requestUnresolvedSends,
   type RequestOutcomeFacts,
-} from "../../src/usage/request-outcome";
+} from "../../backend/src/usage/request-outcome";
 import {
   REQUEST_METRICS_RESULTS,
   REQUEST_METRICS_FAILURE_CAUSES,
   REQUEST_METRICS_PROTOCOLS,
   createRequestMetricsOwner,
-} from "../../src/server/request-metrics";
-import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../src/usage/telemetry-contract";
-import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../src/usage/log";
-import { requestLogDto } from "../../src/server/management/shared";
-import { requestLogEntryFromPersistedUsage } from "../../src/server/request-log";
-import { failureSummary } from "../../gui/src/pages/logs-failure-summary";
+} from "../../backend/src/server/request-metrics";
+import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../backend/src/usage/telemetry-contract";
+import { normalizeUsageEntryForTest, type PersistedUsageEntry } from "../../backend/src/usage/log";
+import { requestLogDto } from "../../backend/src/server/management/shared";
+import { requestLogEntryFromPersistedUsage } from "../../backend/src/server/request-log";
+import { failureSummary } from "../../frontend/src/pages/logs-failure-summary";
 
 /**
  * The durable ledger, the Prometheus exporter and the dashboard have to answer "how did this
@@ -100,7 +100,7 @@ describe("terminal classification is stated once", () => {
   });
 
   test("the dashboard calls the shared classifier instead of reading the status", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "Logs.tsx"), "utf8");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "Logs.tsx"), "utf8");
     expect(page).toContain("classifyRequestOutcome");
     expect(page).toContain("request-outcome");
   });
@@ -185,7 +185,7 @@ describe("send totals agree across surfaces", () => {
   });
 
   test("the dashboard shows the send total and the unresolved remainder", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "Logs.tsx"), "utf8");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "Logs.tsx"), "utf8");
     expect(page).toContain("summary.sends");
     expect(page).toContain("summary.unresolved");
   });
@@ -199,18 +199,18 @@ describe("the dashboard reaches only browser-safe contract modules", () => {
    * build, where a parameter property fails to compile. The page must reach the leaf instead.
    */
   test("it imports the vocabulary from the contract leaf, not the ledger module", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "Logs.tsx"), "utf8");
-    expect(page).toContain("src/usage/telemetry-contract");
-    expect(page).not.toContain("src/usage/log");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "Logs.tsx"), "utf8");
+    expect(page).toContain("backend/src/usage/telemetry-contract");
+    expect(page).not.toContain("backend/src/usage/log");
   });
 
   test("the contract leaf has no imports at all", () => {
-    const contract = readFileSync(repoPath("src", "usage", "telemetry-contract.ts"), "utf8");
+    const contract = readFileSync(repoPath("backend/src", "usage", "telemetry-contract.ts"), "utf8");
     expect(contract.match(/^\s*import\s/gm)).toBeNull();
   });
 
   test("the outcome module reaches nothing but the contract", () => {
-    const outcome = readFileSync(repoPath("src", "usage", "request-outcome.ts"), "utf8");
+    const outcome = readFileSync(repoPath("backend/src", "usage", "request-outcome.ts"), "utf8");
     const specifiers = [...outcome.matchAll(/from "([^"]+)"/g)].map(match => match[1]!);
     expect(specifiers).toEqual(["./telemetry-contract"]);
   });
@@ -223,14 +223,14 @@ describe("the dashboard recovery roster cannot drift from the durable one", () =
    * than a type check, because the page is compiled by a different project.
    */
   test("every durable recovery kind has a dashboard label", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "Logs.tsx"), "utf8");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "Logs.tsx"), "utf8");
     const block = page.slice(page.indexOf("const RECOVERY_KIND_KEYS"), page.indexOf("} as const satisfies Record<AttemptRecoveryKind"));
     const missing = ATTEMPT_RECOVERY_KIND_ROSTER.filter(kind => !block.includes(`"${kind}":`));
     expect(missing).toEqual([]);
   });
 
   test("the page derives the union rather than restating it", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "Logs.tsx"), "utf8");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "Logs.tsx"), "utf8");
     // Matched without depending on how the import is wrapped: the property is that the name
     // arrives from the contract leaf, not that it sits first on a single line.
     expect(/import type \{[^}]*\bAttemptRecoveryKind\b[^}]*\}\s*from\s*"[^"]*usage\/telemetry-contract"/s.test(page)).toBe(true);
@@ -239,13 +239,13 @@ describe("the dashboard recovery roster cannot drift from the durable one", () =
 
   test("every label key the page names exists in all eleven catalogs", () => {
     const page = ["Logs.tsx", "logs-failure-summary.ts"]
-      .map(file => readFileSync(repoPath("gui", "src", "pages", file), "utf8")).join("\n");
+      .map(file => readFileSync(repoPath("frontend", "src", "pages", file), "utf8")).join("\n");
     const keys = [...new Set([...page.matchAll(/"(logs\.detail\.(?:attempt\.recovery|outcome|sends|retries|cause|stage|resend)\.[a-zA-Z0-9]+)"/g)]
       .map(match => match[1]!))];
     expect(keys.length).toBeGreaterThan(ATTEMPT_RECOVERY_KIND_ROSTER.length);
     const gaps: string[] = [];
     for (const locale of LOCALES) {
-      const catalog = readFileSync(repoPath("gui", "src", "i18n", `${locale}.ts`), "utf8");
+      const catalog = readFileSync(repoPath("frontend", "src", "i18n", `${locale}.ts`), "utf8");
       for (const key of keys) if (!catalog.includes(`"${key}"`)) gaps.push(`${locale}:${key}`);
     }
     expect(gaps).toEqual([]);
@@ -310,7 +310,7 @@ describe("the failure cause is derived once and reported everywhere", () => {
   });
 
   test("every cause the recorder can derive has a dashboard label", () => {
-    const page = readFileSync(repoPath("gui", "src", "pages", "logs-failure-summary.ts"), "utf8");
+    const page = readFileSync(repoPath("frontend", "src", "pages", "logs-failure-summary.ts"), "utf8");
     const block = page.slice(page.indexOf("const FAILURE_CAUSE_KEYS"), page.indexOf("} as const satisfies Record<RequestFailureCause"));
     const missing = REQUEST_METRICS_FAILURE_CAUSES.filter(cause => !block.includes(`"${cause}":`));
     expect(missing).toEqual([]);
@@ -322,11 +322,11 @@ describe("the failure cause is derived once and reported everywhere", () => {
    * would be no way to correct it.
    */
   test("the resend verdict is never persisted", () => {
-    const ledger = readFileSync(repoPath("src", "usage", "log.ts"), "utf8");
+    const ledger = readFileSync(repoPath("backend/src", "usage", "log.ts"), "utf8");
     expect(ledger).toContain("failureStage");
     expect(ledger).toContain("failureCause");
     expect(ledger).not.toContain("resendPermission");
-    const dto = readFileSync(repoPath("src", "server", "management", "shared.ts"), "utf8");
+    const dto = readFileSync(repoPath("backend/src", "server", "management", "shared.ts"), "utf8");
     expect(dto).toContain("resendPermission");
   });
 });

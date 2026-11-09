@@ -3,11 +3,11 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { RawCatalog, RawEntry } from "../../src/codex/catalog/parsing";
+import type { RawCatalog, RawEntry } from "../../backend/src/codex/catalog/parsing";
 import { claimOwnedServiceHome, withOwnedServiceHomePreload } from "../helpers/owned-service-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
 
 const roots: string[] = [];
 const SOURCE = "opencodex_reserve_source";
@@ -40,7 +40,7 @@ function nativeRow(slug = "gpt-5.5"): RawEntry {
 }
 
 function reserveRow(qualified: boolean, efforts = ["high", "xhigh"]): RawEntry {
-  const pin = JSON.parse(readFileSync(repoPath("src/codex/data/upstream-models.json"), "utf8")) as RawCatalog;
+  const pin = JSON.parse(readFileSync(repoPath("backend/src/codex/data/upstream-models.json"), "utf8")) as RawCatalog;
   const luna = pin.models?.find(row => row.slug === "gpt-5.6-luna");
   if (!luna) throw new Error("Fixture requires the checked-in Luna source");
   // Upstream rows no longer carry top-level base_instructions (openai/codex #43604); a genuine

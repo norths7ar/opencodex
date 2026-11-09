@@ -1,6 +1,6 @@
 import { create, fromBinary } from "@bufbuild/protobuf";
 import { describe, expect, test } from "bun:test";
-import { execBytes } from "../../../src/adapters/cursor/native-exec-common";
+import { execBytes } from "../../../backend/src/adapters/cursor/native-exec-common";
 import {
   AgentClientMessageSchema,
   DiagnosticsErrorSchema,
@@ -11,7 +11,7 @@ import {
   RequestContextSuccessSchema,
   RequestContextResultSchema,
   RequestContextSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 function execServerMessage(message: Parameters<typeof create<typeof ExecServerMessageSchema>>[1]["message"]) {
   return create(ExecServerMessageSchema, { id: 7, execId: "exec-test", message });

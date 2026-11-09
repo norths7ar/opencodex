@@ -20,12 +20,12 @@
  * and the combo intersection they feed.
  */
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints, gatherRoutedModels, nativeContextLimits, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens } from "../../src/codex/catalog";
-import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { isModelVisionSidecarConsumer } from "../../src/vision/eligibility";
-import { nativeOpenAiAutoCompactTokenLimit } from "../../src/codex/catalog/metadata";
-import type { CatalogModel, OcxConfig, OcxProviderConfig } from "../../src/types";
+import { applyProviderConfigHints, gatherRoutedModels, nativeContextLimits, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens } from "../../backend/src/codex/catalog";
+import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { isModelVisionSidecarConsumer } from "../../backend/src/vision/eligibility";
+import { nativeOpenAiAutoCompactTokenLimit } from "../../backend/src/codex/catalog/metadata";
+import type { CatalogModel, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const OPENCODE_GO_NATIVE = "glm-5.3-flash";
 /**

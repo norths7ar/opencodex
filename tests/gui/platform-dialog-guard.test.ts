@@ -19,7 +19,7 @@ import { repoPath, repoRoot } from "../helpers/repo-root";
  * this file does for the source and what gui/tests/action-dialogs.test.ts does at runtime.
  */
 function dashboardSources(): string[] {
-  return execFileSync("git", ["ls-files", "gui/src"], { cwd: repoRoot(), encoding: "utf8" })
+  return execFileSync("git", ["ls-files", "frontend/src"], { cwd: repoRoot(), encoding: "utf8" })
     .split("\n")
     .filter(file => file.endsWith(".ts") || file.endsWith(".tsx"));
 }

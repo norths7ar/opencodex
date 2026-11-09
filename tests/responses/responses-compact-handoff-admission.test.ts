@@ -2,15 +2,15 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { clearCodexUpstreamHealth } from "../../src/codex/routing";
-import { clearUpstreamHostHealth } from "../../src/codex/upstream-host-health";
-import { handleResponsesCompact } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { clearCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { clearUpstreamHostHealth } from "../../backend/src/codex/upstream-host-health";
+import { handleResponsesCompact } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { configureSharedSpendLedger, sharedSpendLedger, spendPolicyFromConfig } from "../../src/lib/spend-reservation-ledger";
+import { configureSharedSpendLedger, sharedSpendLedger, spendPolicyFromConfig } from "../../backend/src/lib/spend-reservation-ledger";
 
 const originalFetch = globalThis.fetch;
 

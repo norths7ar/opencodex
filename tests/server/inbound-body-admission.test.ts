@@ -4,24 +4,24 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { getDefaultConfig, saveConfig } from "../../src/config";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { startServer } from "../../src/server";
+import { getDefaultConfig, saveConfig } from "../../backend/src/config";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { startServer } from "../../backend/src/server";
 import {
   MAX_DECOMPRESSED_BODY_BYTES,
   MAX_CONFIGURABLE_INBOUND_BODY_BYTES,
   readJsonRequestBody,
   DecompressedBodyTooLargeError,
   UnsupportedContentEncodingError,
-} from "../../src/server/request-decompress";
+} from "../../backend/src/server/request-decompress";
 import {
   withRaisedInboundBodyAdmission,
   InboundBodyCapacityError,
   CONFIGURABLE_JSON_BODY_ROUTES,
   UNGATED_LOOPBACK_ROUTES,
-} from "../../src/server/inbound-body-admission";
-import { configureInboundBodyBudget, createInboundBodyBudget, inboundBodyBudget } from "../../src/server/inbound-body-budget";
-import { OLLAMA_JSON_BODY_ROUTES } from "../../src/server/ollama-native-paths";
+} from "../../backend/src/server/inbound-body-admission";
+import { configureInboundBodyBudget, createInboundBodyBudget, inboundBodyBudget } from "../../backend/src/server/inbound-body-budget";
+import { OLLAMA_JSON_BODY_ROUTES } from "../../backend/src/server/ollama-native-paths";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 import { saturateInboundBodyBudget } from "../helpers/inbound-body-budget";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
@@ -170,7 +170,7 @@ describe("raised inbound body admission lifetime", () => {
   // both sets is how a raised `maxInboundBodyBytes` route would skip the
   // process-wide reservation while every admission test still passed.
   test("every loopback /v1 route is classified for inbound body admission", async () => {
-    const source = await Bun.file(repoPath("src", "server", "index.ts")).text();
+    const source = await Bun.file(repoPath("backend/src", "server", "index.ts")).text();
     const start = source.indexOf("function loopbackRouteAllowed");
     assert.notEqual(start, -1);
     const end = source.indexOf("\n  }", start);

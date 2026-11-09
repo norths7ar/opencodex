@@ -2,7 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { macLoginFactsFor } from "../../src/service/desktop-startup";
+import { macLoginFactsFor } from "../../backend/src/service/desktop-startup";
 import { fixturePath } from "../helpers/repo-root";
 
 // One registration judgment, two implementations: Startup safety here and the Desktop tray's

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorAdapter as createCursorAdapterProduction } from "../../../src/adapters/cursor";
+import { createCursorAdapter as createCursorAdapterProduction } from "../../../backend/src/adapters/cursor";
 import {
   CURSOR_ECHO_RETRY_CONTINUATION_TEXT,
   CURSOR_ROUTING_COMMENTARY_RETRY_TEXT,
@@ -8,7 +8,7 @@ import {
   CursorRoutingCommentarySniffer,
   MAX_MIDSTREAM_SCAN_LENGTH,
   stripAssistantEchoedToolEnvelope,
-} from "../../../src/adapters/cursor/envelope-echo";
+} from "../../../backend/src/adapters/cursor/envelope-echo";
 import {
   CURSOR_ENVELOPE_ECHO_REMINT_MAX,
   clearCursorEnvelopeEchoRemintForTests,
@@ -20,11 +20,11 @@ import {
   recordCursorIncompleteToolRemint,
   rememberCursorConversationRewrite,
   resolveCursorConversationRewrite,
-} from "../../../src/adapters/cursor/thread-continuity";
-import { resolveCursorConversationId } from "../../../src/adapters/cursor/request-builder";
-import { ToolEnvelopeEchoFilter } from "../../../src/lib/tool-envelope-echo-filter";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
+} from "../../../backend/src/adapters/cursor/thread-continuity";
+import { resolveCursorConversationId } from "../../../backend/src/adapters/cursor/request-builder";
+import { ToolEnvelopeEchoFilter } from "../../../backend/src/lib/tool-envelope-echo-filter";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createCursorAdapter = (...args: Parameters<typeof createCursorAdapterProduction>) =>

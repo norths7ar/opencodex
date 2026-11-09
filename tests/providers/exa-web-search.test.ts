@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { mapExaSearchResponse, runExaWebSearch } from "../../src/web-search/exa-executor";
-import { planWebSearch } from "../../src/web-search";
-import { parseRequest } from "../../src/responses/parser";
-import { runWithWebSearch, type WebSearchLoopDeps } from "../../src/web-search/loop";
-import { MAX_SIDECAR_RESPONSE_BYTES } from "../../src/web-search/parse";
+import { mapExaSearchResponse, runExaWebSearch } from "../../backend/src/web-search/exa-executor";
+import { planWebSearch } from "../../backend/src/web-search";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { runWithWebSearch, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
+import { MAX_SIDECAR_RESPONSE_BYTES } from "../../backend/src/web-search/parse";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent, ProviderAdapter } from "../../src/adapters/base";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { AdapterEvent, ProviderAdapter } from "../../backend/src/adapters/base";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const routed: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "k" };
 function config(overrides: Partial<OcxConfig> = {}): OcxConfig {

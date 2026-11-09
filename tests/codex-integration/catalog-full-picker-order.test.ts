@@ -1,24 +1,24 @@
 // Holds INV-AGENT-01 from structure/overview.md; keep the id here if this file is split or renamed.
-import { routedSlug } from "../../src/providers/slug-codec";
+import { routedSlug } from "../../backend/src/providers/slug-codec";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { SUBAGENT_MODELS_VERSION } from "../../src/config/subagent-models";
-import type { OcxConfig } from "../../src/types";
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
-import { convergeCodexCatalog } from "../../src/codex/convergence";
-import { loadBundledCodexCatalog, resetCatalogRuntimeStateForTests, syncCatalogModels } from "../../src/codex/catalog";
-import type { RawCatalog, RawEntry } from "../../src/codex/catalog/parsing";
-import { clearModelCache, markModelsFetchFailure } from "../../src/codex/model-cache";
-import { loadPersistedCodexRuntime, resetCodexRuntimeResolveCacheForTests, resolveCodexRuntime } from "../../src/codex/runtime";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { SUBAGENT_MODELS_VERSION } from "../../backend/src/config/subagent-models";
+import type { OcxConfig } from "../../backend/src/types";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
+import { convergeCodexCatalog } from "../../backend/src/codex/convergence";
+import { loadBundledCodexCatalog, resetCatalogRuntimeStateForTests, syncCatalogModels } from "../../backend/src/codex/catalog";
+import type { RawCatalog, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { clearModelCache, markModelsFetchFailure } from "../../backend/src/codex/model-cache";
+import { loadPersistedCodexRuntime, resetCodexRuntimeResolveCacheForTests, resolveCodexRuntime } from "../../backend/src/codex/runtime";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { buildCatalogEntries, effectiveSubagentRoster } from "../../src/codex/catalog/sync";
-import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState, CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, applyFullModelPickerOrder, deriveEntry, mergeCatalogEntriesForSync, SPAWN_PRIORITY_FIELD } from "../../src/codex/catalog/sync";
+import { buildCatalogEntries, effectiveSubagentRoster } from "../../backend/src/codex/catalog/sync";
+import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState, CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, applyFullModelPickerOrder, deriveEntry, mergeCatalogEntriesForSync, SPAWN_PRIORITY_FIELD } from "../../backend/src/codex/catalog/sync";
 
 test("native-first picker order preserves Go subagent ranks and is repeatable", () => {
   const rows: any[] = [

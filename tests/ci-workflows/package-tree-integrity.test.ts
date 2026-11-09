@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
+import { saveConfig } from "../../backend/src/config";
 import {
   createPackageTreeIntegrityGuard,
   createRuntimePackageTreeIntegrityGuard,
   type PackageTreeObservation,
-} from "../../src/lib/package-tree-integrity";
-import { startServer, waitForFailedStartRollback } from "../../src/server";
-import { stopServerListener } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/package-tree-integrity";
+import { startServer, waitForFailedStartRollback } from "../../backend/src/server";
+import { stopServerListener } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { currentServerFixtureConfig, settleServerAuthFixture } from "../helpers/server-auth-fixture";
@@ -302,7 +302,7 @@ describe("package tree integrity", () => {
       copyFileSync(process.execPath, runtime);
       chmodSync(runtime, 0o755);
       const script = join(dir, "probe.ts");
-      const guardModule = join(import.meta.dir, "../../src/lib/package-tree-integrity.ts").replaceAll("\\", "/");
+      const guardModule = join(import.meta.dir, "../../backend/src/lib/package-tree-integrity.ts").replaceAll("\\", "/");
       writeFileSync(script, `
 import { renameSync, writeFileSync } from "node:fs";
 import { createRuntimePackageTreeIntegrityGuard } from ${JSON.stringify(guardModule)};

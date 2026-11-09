@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { deriveJawcodeAliases } from "../src/providers/derive";
+import { deriveJawcodeAliases } from "../backend/src/providers/derive";
 
 const PROVIDER_ALIASES = deriveJawcodeAliases();
 
@@ -29,7 +29,7 @@ const sourcePath = resolve(import.meta.dir, "model-metadata.source.json");
 // any risk of clobbering the committed output (tests/codex-integration/model-metadata-sync.test.ts).
 const outPath = process.env.MODEL_METADATA_OUT
   ? resolve(process.env.MODEL_METADATA_OUT)
-  : resolve(import.meta.dir, "../src/generated/model-metadata.ts");
+  : resolve(import.meta.dir, "../backend/src/generated/model-metadata.ts");
 if (!existsSync(sourcePath)) {
   throw new Error(`model metadata snapshot not found: ${sourcePath}`);
 }

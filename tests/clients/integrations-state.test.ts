@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { EXPORT_CLIENTS, type ExportModel } from "../../src/clients/config-export";
-import { PARSE_FAILED, fileIO, loadTarget, parseConfig } from "../../src/integrations/config-io";
-import { serializeDocument } from "../../src/integrations/serialize";
+import { EXPORT_CLIENTS, type ExportModel } from "../../backend/src/clients/config-export";
+import { PARSE_FAILED, fileIO, loadTarget, parseConfig } from "../../backend/src/integrations/config-io";
+import { serializeDocument } from "../../backend/src/integrations/serialize";
 import {
   canonicalContribution,
   semanticContribution,
   fingerprint,
   writeRecord,
   type OwnershipRecord,
-} from "../../src/integrations/ownership";
-import { INTEGRATION_CLIENT_IDS, isLoopbackOnly } from "../../src/integrations/registry";
-import { classifyIntegration, readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/ownership";
+import { INTEGRATION_CLIENT_IDS, isLoopbackOnly } from "../../backend/src/integrations/registry";
+import { classifyIntegration, readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

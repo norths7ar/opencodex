@@ -1,6 +1,6 @@
 import { afterEach, test } from "bun:test";
 import assert from "node:assert/strict";
-import { dialTunnel, type OpaqueProxyRoute, type OpaqueTunnelOptions } from "../../src/lib/opaque-proxy-tunnel";
+import { dialTunnel, type OpaqueProxyRoute, type OpaqueTunnelOptions } from "../../backend/src/lib/opaque-proxy-tunnel";
 import { deadProxy, digest, echo, readBytes, TunnelFixtureScope, until, wait } from "../helpers/opaque-proxy-tunnel";
 import { ca, credentials, origin, protocolProxy, proxyKinds, securedClient } from "../helpers/opaque-proxy-tunnel-protocol";
 

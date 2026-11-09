@@ -2,14 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { delimiter, join, parse } from "node:path";
 import { spawnSync } from "node:child_process";
-import { codexCommandCanBypass } from "../../src/cli/codex-launch-command";
-import { codexCredentialDestinationIsTrusted } from "../../src/cli/codex-launch-auth";
-import { resolveCodexLaunchCommand } from "../../src/cli/codex-launcher";
-import { commandInvocation } from "../../src/lib/win-exec";
-import { classifyCodexRouting } from "../../src/codex/inject/routing-classify";
-import { buildProviderTableBlockForTarget } from "../../src/codex/inject/config-toml";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
-import { buildWindowsCodexShim, WINDOWS_SHIM_REVISION_MARKER } from "../../src/codex/shim-templates";
+import { codexCommandCanBypass } from "../../backend/src/cli/codex-launch-command";
+import { codexCredentialDestinationIsTrusted } from "../../backend/src/cli/codex-launch-auth";
+import { resolveCodexLaunchCommand } from "../../backend/src/cli/codex-launcher";
+import { commandInvocation } from "../../backend/src/lib/win-exec";
+import { classifyCodexRouting } from "../../backend/src/codex/inject/routing-classify";
+import { buildProviderTableBlockForTarget } from "../../backend/src/codex/inject/config-toml";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
+import { buildWindowsCodexShim, WINDOWS_SHIM_REVISION_MARKER } from "../../backend/src/codex/shim-templates";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -135,7 +135,7 @@ describe.skipIf(process.platform !== "win32")("codex launcher installed Windows 
           : 'model = "native-fixture"\n';
         writeFileSync(join(codexHome, "config.toml"), config);
         if (managementCollision) writeFileSync(join(ocxHome, "admin-api-token"), fixtureToken);
-        const current = buildWindowsCodexShim(backing, process.execPath, repoPath("src", "cli", "index.ts"), "process");
+        const current = buildWindowsCodexShim(backing, process.execPath, repoPath("backend/src", "cli", "index.ts"), "process");
         const lines = current.split("\n").filter(line => !line.includes(WINDOWS_SHIM_REVISION_MARKER));
         const bypass = lines.findIndex(line => line.includes('if not "%OCX_SHIM_BYPASS%"=="" goto run_codex'));
         const load = lines.findIndex(line => line.includes("set /p OPENCODEX_API_AUTH_TOKEN="));
@@ -161,7 +161,7 @@ describe.skipIf(process.platform !== "win32")("codex launcher installed Windows 
           expect(bypassed.status).toBe(23);
           expect(JSON.parse(bypassed.stdout.trim())).toEqual({ token: null });
         }
-        const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), "codex", ...args], {
+        const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), "codex", ...args], {
           cwd: repoRoot(), env, encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000, windowsHide: true,
         });
         expect(result.error).toBeUndefined();
@@ -176,7 +176,7 @@ describe.skipIf(process.platform !== "win32")("codex launcher installed Windows 
   }
   test("a revision marker cannot bless inserted commands, duplicate labels or trailing code", () => fixture((home) => {
     const wrapper = join(home, "codex.cmd");
-    const current = buildWindowsCodexShim(join(home, "backing.cmd"), process.execPath, repoPath("src", "cli", "index.ts"), "process");
+    const current = buildWindowsCodexShim(join(home, "backing.cmd"), process.execPath, repoPath("backend/src", "cli", "index.ts"), "process");
     for (const text of [
       current.replace("setlocal", "echo inserted\r\nsetlocal"),
       current.replace(":run_codex", ":run_codex\r\necho inserted\r\n:run_codex"),

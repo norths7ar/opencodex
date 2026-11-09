@@ -3,11 +3,11 @@ import { Buffer } from "node:buffer";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getVertexAccessToken, __resetVertexTokenCache } from "../../../src/lib/gcp-adc";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import { providerManagementConfigError } from "../../../src/server/auth-cors";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import { STATE_STORE_REGISTRATIONS } from "../../../src/lib/state-store-registrations";
+import { getVertexAccessToken, __resetVertexTokenCache } from "../../../backend/src/lib/gcp-adc";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import { providerManagementConfigError } from "../../../backend/src/server/auth-cors";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import { STATE_STORE_REGISTRATIONS } from "../../../backend/src/lib/state-store-registrations";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token";

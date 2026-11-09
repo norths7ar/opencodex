@@ -4,7 +4,7 @@ import {
   codexWarmupFailureReason,
   isCodexWarmupProvisioningFailure,
   warmCodexAccount,
-} from "../../src/codex/warmup";
+} from "../../backend/src/codex/warmup";
 
 const originalFetch = globalThis.fetch;
 

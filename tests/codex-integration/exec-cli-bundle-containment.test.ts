@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { EventEmitter } from "node:events";
 import type { spawn } from "node:child_process";
-import { spawnCodex, type CodexSpawnDeps } from "../../src/cli/codex-launcher";
-import { validatedCodexExecInvocation } from "../../src/codex/exec-boundary";
+import { spawnCodex, type CodexSpawnDeps } from "../../backend/src/cli/codex-launcher";
+import { validatedCodexExecInvocation } from "../../backend/src/codex/exec-boundary";
 
 const root = "/opt/ChatGPT Beta.app";
 const member = `${root}/Contents/Resources/codex`;

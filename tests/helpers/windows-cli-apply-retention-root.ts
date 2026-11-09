@@ -1,7 +1,7 @@
 import { lstatSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { win32 } from "node:path";
-import { verifyWindowsPrivateEntriesAsync } from "../../src/lib/windows-owner-acl";
+import { verifyWindowsPrivateEntriesAsync } from "../../backend/src/lib/windows-owner-acl";
 
 /** The session creates a canonical private child anywhere below OS temp, not
  * directly below a drive root. Keep the lexical contract portable for tests.

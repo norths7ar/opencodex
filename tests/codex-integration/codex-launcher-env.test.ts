@@ -4,10 +4,10 @@ import { chmodSync, mkdirSync, mkdtempSync, realpathSync, symlinkSync, writeFile
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
-import { buildProviderTableBlockForTarget } from "../../src/codex/inject/config-toml";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
-import { codexCredentialDestinationIsTrusted } from "../../src/cli/codex-launch-auth";
-import { codexLaunchHomeIsOwned } from "../../src/cli/codex-launch-ownership";
+import { buildProviderTableBlockForTarget } from "../../backend/src/codex/inject/config-toml";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
+import { codexCredentialDestinationIsTrusted } from "../../backend/src/cli/codex-launch-auth";
+import { codexLaunchHomeIsOwned } from "../../backend/src/cli/codex-launch-ownership";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { fixturePath } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";

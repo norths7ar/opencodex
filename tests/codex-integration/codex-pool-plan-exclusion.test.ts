@@ -9,13 +9,13 @@ import {
   isCodexAccountPlanExcluded,
   previewCodexAccountForRequest,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ICACLS_OK = { success: true, exitCode: 0, timedOut: false, stdout: "" };

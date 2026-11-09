@@ -12,13 +12,13 @@ import {
   setResponseSpillShutdownBudgetForTests,
   setResponseSpillShutdownTerminalizationPassLimitForTests,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import {
   resetHardenedStateForTests,
   setAsyncIcaclsRunnerForTests,
   setIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "./remove-tree";
 
 type Scenario = "exhaustion" | "guard";

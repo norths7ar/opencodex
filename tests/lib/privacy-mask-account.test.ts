@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { emailMaskingEnabled, maskAccountId, maskEmail, maskedAccountLabel, projectEmail } from "../../src/lib/privacy";
+import { emailMaskingEnabled, maskAccountId, maskEmail, maskedAccountLabel, projectEmail } from "../../backend/src/lib/privacy";
 
 test("account display labels omit malformed identities and mask valid addresses", () => {
   expect(maskedAccountLabel("person@example.test")).toBe("p***n@example.test");

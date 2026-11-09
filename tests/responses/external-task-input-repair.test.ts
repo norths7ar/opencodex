@@ -5,10 +5,10 @@
  * compaction read the mislabelled handover as an orphaned tool result and lost the active task.
  */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses";
-import { repairOrphanedInputItems, repairUnidentifiedToolOutputItems } from "../../src/adapters/openai-responses/tool-output-recovery";
-import { externalTaskInputResponsesContent } from "../../src/responses/task-input";
-import { parseRequest } from "../../src/responses/parser";
+import { handleResponses } from "../../backend/src/server/responses";
+import { repairOrphanedInputItems, repairUnidentifiedToolOutputItems } from "../../backend/src/adapters/openai-responses/tool-output-recovery";
+import { externalTaskInputResponsesContent } from "../../backend/src/responses/task-input";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { compactionRequest, completedPayload, drainCompactionResponseState, installCompactionRoutingAclFixture, jsonResponse, keyProviderConfig } from "../helpers/compaction-routing-fixtures";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

@@ -3,8 +3,8 @@
 // contract: local flag validation refuses before any fetch, and the read path
 // reaches the coupon listing endpoint and prints the tokens.
 import { describe, expect, test } from "bun:test";
-import { handleAccountAuthCommand } from "../../../src/cli/account-auth";
-import type { RuntimeApiDeps } from "../../../src/cli/runtime-api";
+import { handleAccountAuthCommand } from "../../../backend/src/cli/account-auth";
+import type { RuntimeApiDeps } from "../../../backend/src/cli/runtime-api";
 
 interface Captured {
   method: string;

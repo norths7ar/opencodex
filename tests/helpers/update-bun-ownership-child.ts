@@ -14,7 +14,7 @@ const [home, scenario] = process.argv.slice(2) as [string, string];
 if (!home || !scenario || process.env.OPENCODEX_HOME !== home) throw new Error("isolated fixture home required");
 const authority = join(home, "authority.json");
 const runtime = join(home, "runtime-port.json");
-const leaseModule = pathToFileURL(repoPath("src/service/ownership-mutation-lease.mjs")).href;
+const leaseModule = pathToFileURL(repoPath("backend/src/service/ownership-mutation-lease.mjs")).href;
 const trace: Array<Record<string, unknown>> = [];
 let running = (!scenario.startsWith("home-unknown") && !scenario.startsWith("parent-package-only")) || scenario === "home-unknown-live";
 if (scenario.startsWith("parent-package-only")) process.argv.push("--update-package-only");
@@ -57,8 +57,8 @@ process.on("exit", () => {
   process.stdout.write(`UPDATE_LEASE_PROBE:${JSON.stringify(trace)}\n`);
 });
 
-const service = await import("../../src/service");
-mock.module(repoPath("src/service.ts"), () => ({ ...service,
+const service = await import("../../backend/src/service");
+mock.module(repoPath("backend/src/service.ts"), () => ({ ...service,
   serviceStatePaths: () => [authority],
   isServiceInstalled: () => !direct,
   isServiceViable: () => true,
@@ -69,7 +69,7 @@ mock.module(repoPath("src/service.ts"), () => ({ ...service,
       ownership: { owner: row.owner, installId: row.installId, consentGeneration: row.consentGeneration } };
   },
 }));
-mock.module(repoPath("src/update/service-home-authority.ts"), () => ({
+mock.module(repoPath("backend/src/update/service-home-authority.ts"), () => ({
   inspectUpdateServiceHome: () => {
     homeReads++;
     if (scenario === "delegated-post-replacement") return { kind: packageReplaced ? "unknown" : "same" };
@@ -81,21 +81,21 @@ mock.module(repoPath("src/update/service-home-authority.ts"), () => ({
     return { kind: direct ? "absent" : "same" };
   },
 }));
-const state = await import("../../src/config/process-state");
-mock.module(repoPath("src/config/process-state.ts"), () => ({ ...state,
+const state = await import("../../backend/src/config/process-state");
+mock.module(repoPath("backend/src/config/process-state.ts"), () => ({ ...state,
   readPid: () => running ? 4321 : null,
   readRuntimePort: () => running ? { pid: 4321, port, hostname: "127.0.0.1" } : null,
   getRuntimePortPath: () => runtime,
 }));
 // runUpdate reads ownership (installer plus any external owner) rather than the bare installer.
-mock.module(repoPath("src/update/install-detection.mjs"), () => ({
+mock.module(repoPath("backend/src/update/install-detection.mjs"), () => ({
   detectInstallFromPath: () => "bun",
   detectInstallOwnershipFromPath: () => ({ installer: "bun" }),
 }));
-mock.module(repoPath("src/update/registry-integrity.mjs"), () => ({ checkRegistryPackageIntegrity: () => ({ ok: true, integrity: "sha512-fixture" }) }));
-const liveness = await import("../../src/server/proxy-liveness");
+mock.module(repoPath("backend/src/update/registry-integrity.mjs"), () => ({ checkRegistryPackageIntegrity: () => ({ ok: true, integrity: "sha512-fixture" }) }));
+const liveness = await import("../../backend/src/server/proxy-liveness");
 const actualIdentity = liveness.proxyIdentityAt;
-mock.module(repoPath("src/server/proxy-liveness.ts"), () => ({ ...liveness, proxyIdentityAt: async (targetPort: number, options: { hostname?: string; expectedPid?: number }, io: Parameters<typeof actualIdentity>[2]) => {
+mock.module(repoPath("backend/src/server/proxy-liveness.ts"), () => ({ ...liveness, proxyIdentityAt: async (targetPort: number, options: { hostname?: string; expectedPid?: number }, io: Parameters<typeof actualIdentity>[2]) => {
   if (!directChild || options.expectedPid === undefined) return running ? { pid: 4321 } : null;
   const result = scenario === "direct-timeout" ? null : await actualIdentity(targetPort, options, io);
   trace.push({ phase: "health", contenderBlocked: probe(unprivileged()) === 17,
@@ -103,7 +103,7 @@ mock.module(repoPath("src/server/proxy-liveness.ts"), () => ({ ...liveness, prox
   if (scenario === "direct-timeout" || scenario === "direct-foreign") clockOffset += 15_001;
   return result;
 } }));
-mock.module(repoPath("src/update/proxy-liveness-probe.mjs"), () => ({ probeProxyLiveness: () => running ? "live" : "dead" }));
+mock.module(repoPath("backend/src/update/proxy-liveness-probe.mjs"), () => ({ probeProxyLiveness: () => running ? "live" : "dead" }));
 mock.module("node:child_process", () => ({ ...processTools,
   spawn: (_bin: string, args: string[], options: { env?: NodeJS.ProcessEnv }) => {
     if (!direct || !args.includes("start")) throw new Error("fixture does not authorize this spawn");
@@ -136,7 +136,7 @@ mock.module("node:child_process", () => ({ ...processTools,
   },
   spawnSync: (_bin: string, args: string[], options: { env?: NodeJS.ProcessEnv; windowsVerbatimArguments?: boolean; input?: string } = {}) => {
     if (spawnedNpmOperation(args, options) === "view") return { status: 0, stdout: "99.0.0\n", stderr: "" };
-    const posixSupervisor = args[0] === repoPath("src/update/posix-install-supervisor-entry.mjs") && args[1] === "supervise";
+    const posixSupervisor = args[0] === repoPath("backend/src/update/posix-install-supervisor-entry.mjs") && args[1] === "supervise";
     // Windows routes the same transaction through runWindowsInstallerSync: an inline module reading
     // { invocation, timeoutMs } from stdin (src/update/npm-install.mjs).
     const windowsBridge = _bin === process.execPath && args.length === 3 && args[0] === "--input-type=module" && args[1] === "-e"

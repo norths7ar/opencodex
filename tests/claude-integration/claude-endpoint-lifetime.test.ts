@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { acquireSpendLedgerOwner } from "../../src/lib/spend-ledger-owner";
+import { acquireSpendLedgerOwner } from "../../backend/src/lib/spend-ledger-owner";
 import { createEndpointCase, installEndpointHooks, ownCleanup, test, testDir } from "../helpers/claude-endpoint-lifetime";
 
 installEndpointHooks();

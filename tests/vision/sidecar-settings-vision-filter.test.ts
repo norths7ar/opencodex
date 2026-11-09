@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import * as modelRows from "../../src/server/management/model-rows";
-import type { OcxConfig } from "../../src/types";
-import { BASELINE_VISION_MODELS } from "../../src/vision/eligibility";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import * as modelRows from "../../backend/src/server/management/model-rows";
+import type { OcxConfig } from "../../backend/src/types";
+import { BASELINE_VISION_MODELS } from "../../backend/src/vision/eligibility";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -284,7 +284,7 @@ describe("sidecar-settings vision model filter", () => {
   test("13. the reject path does not persist to disk", async () => {
     // In-memory equality alone would not prove a disk write did not happen if the
     // gate were ever reordered after the mutation block.
-    const configModule = await import("../../src/config");
+    const configModule = await import("../../backend/src/config");
     const saveSpy = spyOn(configModule, "saveConfigPreservingClaudeCode");
     try {
       const config = emptyConfig();

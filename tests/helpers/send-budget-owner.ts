@@ -1,6 +1,6 @@
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { TransientSendBudget } from "../../src/lib/upstream-retry";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { TransientSendBudget } from "../../backend/src/lib/upstream-retry";
 
 /**
  * The production send-budget owner wired the way the responses stack wires it: the adapter's

@@ -29,14 +29,14 @@ import {
   windowsSecretAclReapPendingForPath,
   type AclFailureDiagnostics,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
-import { atomicWriteFile } from "../../src/config";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/lib/windows-secret-acl";
+import { atomicWriteFile } from "../../backend/src/config";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 
 type ThrownAclError = NodeJS.ErrnoException & { aclFailure?: AclFailureDiagnostics };
 

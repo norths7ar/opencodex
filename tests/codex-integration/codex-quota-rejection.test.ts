@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { classifyCodexPreStreamRejection } from "../../src/codex/quota-rejection";
-import { BOUNDED_BODY_MAX_BYTES } from "../../src/lib/bounded-body";
+import { classifyCodexPreStreamRejection } from "../../backend/src/codex/quota-rejection";
+import { BOUNDED_BODY_MAX_BYTES } from "../../backend/src/lib/bounded-body";
 import {
   shouldRetryCodexPoolAccountQuota,
   shouldRetryCodexScopedQuotaOnAlternate,
   shouldRetryCodexPoolAccountTransient,
-} from "../../src/server/responses/core";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
+} from "../../backend/src/server/responses/core";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 
 function jsonRejection(status: number, error: Record<string, unknown>): Response {
   return Response.json({ error }, { status });

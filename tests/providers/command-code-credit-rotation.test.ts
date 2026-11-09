@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { resetCommandCodeReasoningEffortsForTest } from "../../src/providers/command-code-efforts";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { resetCommandCodeReasoningEffortsForTest } from "../../backend/src/providers/command-code-efforts";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 
-import { createCatalogConvergeRequest } from "../../src/codex/catalog-admission";
+import { createCatalogConvergeRequest } from "../../backend/src/codex/catalog-admission";
 import {
   createManagementConvergeCodex,
   projectCatalogOnlyOutcome,
-} from "../../src/codex/management-convergence";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/management-convergence";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(): OcxConfig {
   return { port: 10100, providers: {}, defaultProvider: "openai" };

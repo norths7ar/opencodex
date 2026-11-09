@@ -5,10 +5,10 @@ import {
   readResponseBodyWithInactivity,
   readResponseStreamWithInactivity,
   ResponseBodyInactivityError,
-} from "../../src/lib/response-body-inactivity";
+} from "../../backend/src/lib/response-body-inactivity";
 
 import { expect, spyOn, test } from "bun:test";
-import { idleDeadline } from "../../src/lib/abort";
+import { idleDeadline } from "../../backend/src/lib/abort";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 

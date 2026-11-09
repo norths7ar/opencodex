@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import {
   clearAccountNeedsReauth,
   setAccountQuotaFromParsed,
-} from "../../src/codex/auth-api";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-api";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * #4212 follow-up: `poolAccountDto` used to infer the reauthentication cause from overlapping

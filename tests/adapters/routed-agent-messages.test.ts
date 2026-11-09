@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { normalizeRoutedAgentMessages } from "../../src/adapters/routed-agent-messages";
-import { hasItemProvenance, isHistoricalItem, tagHistoricalInputItems } from "../../src/responses/item-provenance";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { normalizeRoutedAgentMessages } from "../../backend/src/adapters/routed-agent-messages";
+import { hasItemProvenance, isHistoricalItem, tagHistoricalInputItems } from "../../backend/src/responses/item-provenance";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const base: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://opencode.ai/zen/go/v1", authMode: "key", apiKey: "synthetic-key" };
 

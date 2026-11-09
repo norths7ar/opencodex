@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { deliverPassthroughResponse, setRelayPlatformForTests } from "../../src/server/responses/passthrough-delivery";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { deliverPassthroughResponse, setRelayPlatformForTests } from "../../backend/src/server/responses/passthrough-delivery";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { beforeEach, afterEach } from "bun:test";
 let home: TempHome;
@@ -9,12 +9,12 @@ beforeEach(() => { home = createTempHome("hosted-image-delivery-"); });
 afterEach(() => { setRelayPlatformForTests(undefined); home.remove(); });
 
 import { item } from "../fixtures/hosted-image-display";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { createHostedImageDisplayRewrite } from "../../src/server/responses-hosted-image-display";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { createHostedImageDisplayRewrite } from "../../backend/src/server/responses-hosted-image-display";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { artifactHttpUrl } from "../../src/images/artifacts";
-import { getDefaultConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+import { artifactHttpUrl } from "../../backend/src/images/artifacts";
+import { getDefaultConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 const finalMessage = { id: 'msg_final_fixture', type: 'message', role: 'assistant', status: 'completed', phase: 'final_answer', content: [{ type: 'output_text', text: 'Done.', annotations: [] }] };
 const response = { id: 'resp_image_fixture', object: 'response', model: 'fixture', created_at: 1790666489, status: 'completed', output: [item, finalMessage] };
 const nl = String.fromCharCode(10);

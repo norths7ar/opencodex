@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { computeCodexUsageScore as guiScore } from "../../gui/src/codex-quota-utils";
-import type { AccountQuota } from "../../gui/src/codex-quota-utils";
-import { computeCodexUsageScore as routerScore } from "../../src/codex/routing/cooldown-math";
-import { providerQuotaFromCodexQuota } from "../../src/providers/quota/report-cache";
-import { CODEX_UNKNOWN_USAGE_SCORE } from "../../src/codex/quota";
-import { TERMINAL_SHORT_WINDOW_FRESHNESS_MS } from "../../src/codex/quota-types";
+import { computeCodexUsageScore as guiScore } from "../../frontend/src/codex-quota-utils";
+import type { AccountQuota } from "../../frontend/src/codex-quota-utils";
+import { computeCodexUsageScore as routerScore } from "../../backend/src/codex/routing/cooldown-math";
+import { providerQuotaFromCodexQuota } from "../../backend/src/providers/quota/report-cache";
+import { CODEX_UNKNOWN_USAGE_SCORE } from "../../backend/src/codex/quota";
+import { TERMINAL_SHORT_WINDOW_FRESHNESS_MS } from "../../backend/src/codex/quota-types";
 
 /**
  * The account-switch warning and the router must reach the same verdict for one snapshot, or

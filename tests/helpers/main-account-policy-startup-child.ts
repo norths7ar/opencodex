@@ -1,7 +1,7 @@
 import { spyOn } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
 
 interface Fixture {
   scenario: "owned-97" | "owned-98" | "owned-99" | "foreign" | "unknown" | "recovery" | "second-listener"
@@ -32,29 +32,29 @@ globalThis.fetch = Object.assign(async (input: RequestInfo | URL, init?: Request
   throw new Error("Unexpected network request in startup policy fixture");
 }, { preconnect() {} }) as typeof fetch;
 
-const { setIcaclsRunnerForTests, setAsyncIcaclsRunnerForTests } = await import("../../src/lib/windows-secret-acl");
+const { setIcaclsRunnerForTests, setAsyncIcaclsRunnerForTests } = await import("../../backend/src/lib/windows-secret-acl");
 // Both runners, not only the sync one: startServer hardens its state files through the async path,
 // and on a loaded Windows runner a real icacls stall there (30 s budget) outran this child's whole
 // spawn budget. ACLs are not what this fixture measures.
 setIcaclsRunnerForTests(() => ({ success: true, exitCode: 0, timedOut: false, stdout: "" }));
 setAsyncIcaclsRunnerForTests(async () => ({ success: true, exitCode: 0, timedOut: false, stdout: "" }));
-const authCollision = await import("../../src/codex/auth-collision");
+const authCollision = await import("../../backend/src/codex/auth-collision");
 const readTokens = authCollision.readCodexTokensResult;
 const tokenReads: Array<string | undefined> = [];
 const tokenSpy = spyOn(authCollision, "readCodexTokensResult").mockImplementation(authPath => {
   tokenReads.push(authPath);
   return readTokens(authPath);
 });
-const { NativeProfileManager } = await import("../../src/codex/native-profile-manager");
-const { matchesMainQuotaCredential } = await import("../../src/codex/main-account-cache");
-const { getMainPolicyQuota } = await import("../../src/codex/quota");
-const { resolveCodexAuthContext } = await import("../../src/codex/auth-context");
-const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-const { blockNativeMainRecovery, completeNativeMainRecovery, nativeMainStartupGateSnapshot, waitForNativeMainStartupGate } = await import("../../src/codex/native-profile-startup");
-const { handleNativeProfileAPI } = await import("../../src/codex/native-profile-api");
-const { startServer } = await import("../../src/server");
-const { handleResponses } = await import("../../src/server/responses/core");
-const { loadConfig, saveConfig } = await import("../../src/config");
+const { NativeProfileManager } = await import("../../backend/src/codex/native-profile-manager");
+const { matchesMainQuotaCredential } = await import("../../backend/src/codex/main-account-cache");
+const { getMainPolicyQuota } = await import("../../backend/src/codex/quota");
+const { resolveCodexAuthContext } = await import("../../backend/src/codex/auth-context");
+const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+const { blockNativeMainRecovery, completeNativeMainRecovery, nativeMainStartupGateSnapshot, waitForNativeMainStartupGate } = await import("../../backend/src/codex/native-profile-startup");
+const { handleNativeProfileAPI } = await import("../../backend/src/codex/native-profile-api");
+const { startServer } = await import("../../backend/src/server");
+const { handleResponses } = await import("../../backend/src/server/responses/core");
+const { loadConfig, saveConfig } = await import("../../backend/src/config");
 
 let config = loadConfig();
 const observe = () => ({

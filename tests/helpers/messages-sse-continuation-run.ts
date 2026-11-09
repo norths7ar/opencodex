@@ -1,4 +1,4 @@
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { continuationLanes, continuationTails, continuationCase } from "./messages-sse-continuation-cases";
 import { sseStart } from "./messages-sse-cases";
 const mode = process.argv[2]!;
@@ -19,10 +19,10 @@ let cleanup = () => {};
 const originalFetch = globalThis.fetch;
 try {
   if (direct) {
-    const { createTranslatorBudget } = await import("../../src/lib/translator-budget");
-    const { createMessagesSseErrorFilter, filterMessagesSseErrors } = await import("../../src/server/messages-sse-error-filter");
-    const { relaySseWithPayloadRewrite } = await import("../../src/server/sse-payload-rewrite");
-    const { tapAnthropicSseForLog } = await import("../../src/server/messages-shared");
+    const { createTranslatorBudget } = await import("../../backend/src/lib/translator-budget");
+    const { createMessagesSseErrorFilter, filterMessagesSseErrors } = await import("../../backend/src/server/messages-sse-error-filter");
+    const { relaySseWithPayloadRewrite } = await import("../../backend/src/server/sse-payload-rewrite");
+    const { tapAnthropicSseForLog } = await import("../../backend/src/server/messages-shared");
     const budget = createTranslatorBudget(); cleanup = () => budget.dispose();
     const filter = createMessagesSseErrorFilter();
     const stream = mode === "direct-rewrite" ? relaySseWithPayloadRewrite(source(), value => value, budget, undefined, filter)
@@ -32,9 +32,9 @@ try {
   } else {
     const { acquireOwnedSpendHome } = await import("./owned-spend-home");
     cleanup = acquireOwnedSpendHome();
-    const { saveCredential } = await import("../../src/oauth/store");
-    const { saveConfig } = await import("../../src/config");
-    const { handleClaudeMessages, handleClaudeCountTokens } = await import("../../src/server/claude-messages");
+    const { saveCredential } = await import("../../backend/src/oauth/store");
+    const { saveConfig } = await import("../../backend/src/config");
+    const { handleClaudeMessages, handleClaudeCountTokens } = await import("../../backend/src/server/claude-messages");
     if (mode === "builtin") await saveCredential("anthropic", { access: "synthetic-access", refresh: "synthetic-refresh", expires: Date.now() + 3600000, source: "oauth", accountId: "synthetic-account" });
     const fakeFetch = (async () => { sends++; return new Response(source(), { status: mode === "count-tokens" ? 201 : 200, headers: { "content-type": "text/event-stream" } }); }) as typeof fetch;
     const provider = mode === "builtin" ? "anthropic" : "fixture";

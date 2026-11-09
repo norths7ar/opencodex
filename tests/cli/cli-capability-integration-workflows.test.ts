@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { INTEGRATION_CAPABILITIES } from "../../src/cli/capabilities-integrations";
-import { handleClientIntegrationCommand, handleClaudeConfigCommand, handleGrokCommand } from "../../src/cli/integrations";
-import { handleClaudeDesktopCommand } from "../../src/cli/claude-desktop";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { INTEGRATION_CAPABILITIES } from "../../backend/src/cli/capabilities-integrations";
+import { handleClientIntegrationCommand, handleClaudeConfigCommand, handleGrokCommand } from "../../backend/src/cli/integrations";
+import { handleClaudeDesktopCommand } from "../../backend/src/cli/claude-desktop";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -133,7 +133,7 @@ describe("declared integration workflows", () => {
 
   test("Desktop local profile writers and export declare no fictitious HTTP or JSON flag", async () => {
     // Source proof avoids invoking catalog discovery, file overwrites, or trust operations.
-    const source = await Bun.file(repoPath("src", "cli", "claude-desktop.ts")).text();
+    const source = await Bun.file(repoPath("backend/src", "cli", "claude-desktop.ts")).text();
     for (const verb of ["move", "default", "export"]) {
       const declaration = leaf("claude desktop " + verb);
       expect(declaration.routes).toEqual([]); expect(declaration.json).toBe("none");

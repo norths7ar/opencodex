@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { callerSessionId, withCallerSessionIdentity } from "../../src/server/caller-session-identity";
-import { resolveDataPlaneAdmissionSecret, type DataPlaneAdmission } from "../../src/server/auth-cors";
-import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { withGrokSessionIdentity } from "../../src/grok/session-identity";
-import { withClaudeNativeSession } from "../../src/server/responses/core-auth";
-import { handleResponses } from "../../src/server/responses/core";
-import { tryAdmitTurn } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { callerSessionId, withCallerSessionIdentity } from "../../backend/src/server/caller-session-identity";
+import { resolveDataPlaneAdmissionSecret, type DataPlaneAdmission } from "../../backend/src/server/auth-cors";
+import { sessionLaneIdFromRequest } from "../../backend/src/server/request-log-conversation";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import { withGrokSessionIdentity } from "../../backend/src/grok/session-identity";
+import { withClaudeNativeSession } from "../../backend/src/server/responses/core-auth";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -165,7 +165,7 @@ describe("Non-Codex callers reach the ChatGPT Codex backend with session_id", ()
 
 test("the public routes hand their handlers the caller-promoted request", () => {
   // Pins the three-route wiring; the cases above call the helper directly.
-  const source = readFileSync(repoPath("src", "server", "index", "serve-options.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "server", "index", "serve-options.ts"), "utf8");
   expect(source).toContain("const sessionReq = withCallerSessionIdentity(withGrokSessionIdentity(req), admission);");
   expect(source).toContain("await handleResponses(sessionReq, config, logCtx, {");
   expect(source).toContain("const sessionReq = withCallerSessionIdentity(req, admission);");

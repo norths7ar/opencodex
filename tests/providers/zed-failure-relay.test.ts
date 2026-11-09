@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { translateZedOpenAiStream } from "../../src/adapters/zed-openai-stream";
-import { zedEventStream } from "../../src/adapters/zed";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { scrubZedCredentials } from "../../src/providers/zed";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { translateZedOpenAiStream } from "../../backend/src/adapters/zed-openai-stream";
+import { zedEventStream } from "../../backend/src/adapters/zed";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { scrubZedCredentials } from "../../backend/src/providers/zed";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 const credentials = { userId: "fixture-user-42", accessToken: "fixture-token-xyz" };
 

@@ -15,7 +15,7 @@ import {
   tryAcquireTransientProbe,
   MAX_TRANSIENT_PROBE_STATES,
   TRANSIENT_PROBE_INTERVAL_MS,
-} from "../../src/routing/probe-lease";
+} from "../../backend/src/routing/probe-lease";
 
 afterEach(() => {
   clearTransientProbeLeasesForTests();

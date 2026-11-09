@@ -1,5 +1,5 @@
-import { withNativeMainExclusiveClaim } from "../../src/codex/native-main-claim";
-import type { NativeProfileContext } from "../../src/codex/native-profile-store";
+import { withNativeMainExclusiveClaim } from "../../backend/src/codex/native-main-claim";
+import type { NativeProfileContext } from "../../backend/src/codex/native-profile-store";
 
 const codexHome = process.argv[2];
 if (!codexHome) throw new Error("missing CODEX_HOME argument");

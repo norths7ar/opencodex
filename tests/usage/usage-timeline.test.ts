@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { PersistedUsageEntry } from "../../src/usage/log";
-import { createTimelineAccumulator, parseTimelineQuery } from "../../src/usage/timeline";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
+import { createTimelineAccumulator, parseTimelineQuery } from "../../backend/src/usage/timeline";
 
 const now = 1_700_000_000_000;
 function entry(overrides: Partial<PersistedUsageEntry> = {}): PersistedUsageEntry {

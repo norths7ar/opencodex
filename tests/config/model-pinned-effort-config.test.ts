@@ -5,17 +5,17 @@ import { join } from "node:path";
 import {
   deleteConfigTopLevelKey, getConfigPath, getDefaultConfig, loadConfig, readConfigDiagnostics,
   saveConfig, saveConfigPreservingClaudeCode, validateConfigCandidate,
-} from "../../src/config";
-import { modelPinnedEffortsConfigError, pinnedReasoningEffortConfigError } from "../../src/config/provider-validation";
-import { configRebaseDeletionKeys, projectConfigRebaseProvenance } from "../../src/config/rebase-provenance";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { providerEditorConfigDTO, providerManagementConfigError, safeConfigDTO } from "../../src/server/auth-cors";
-import { handleAgentSettingsRoutes } from "../../src/server/management/agent-settings-routes";
-import { handleProviderRoutes } from "../../src/server/management/provider-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import { modelPinnedEffortsConfigError, pinnedReasoningEffortConfigError } from "../../backend/src/config/provider-validation";
+import { configRebaseDeletionKeys, projectConfigRebaseProvenance } from "../../backend/src/config/rebase-provenance";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { providerEditorConfigDTO, providerManagementConfigError, safeConfigDTO } from "../../backend/src/server/auth-cors";
+import { handleAgentSettingsRoutes } from "../../backend/src/server/management/agent-settings-routes";
+import { handleProviderRoutes } from "../../backend/src/server/management/provider-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

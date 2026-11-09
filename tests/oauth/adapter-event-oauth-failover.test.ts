@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { getAccountSet, getCredential, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, getCredential, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
-const actualResolver = await import("../../src/server/adapter-resolve");
+const actualResolver = await import("../../backend/src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 let attempts: AdapterEvent[][] = [];
 let attemptKeys: string[] = [];
@@ -47,7 +47,7 @@ function fixtureAdapter(provider: OcxProviderConfig): ProviderAdapter {
   };
 }
 
-mock.module("../../src/server/adapter-resolve", () => ({
+mock.module("../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     if (provider.adapter === "cursor" || provider.googleMode === "cloud-code-assist") return fixtureAdapter(provider);
@@ -55,7 +55,7 @@ mock.module("../../src/server/adapter-resolve", () => ({
   },
 }));
 
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 const originalHome = process.env.OPENCODEX_HOME;
 let home = "";
 let releaseSpendHome: (() => void) | undefined;

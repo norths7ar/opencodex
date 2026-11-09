@@ -15,7 +15,7 @@ import {
   rememberResponseState,
   setResponseStateByteCapForTests,
   sweepOrphanedResponseSpills,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import {
   PERIODIC_SPILL_SWEEP_OPTS,
   RESPONSE_SPILL_DIR_NAME,
@@ -24,18 +24,18 @@ import {
   setSpillIoForTest,
   sweepOrphanedResponseSpillsPeriodically,
   writeResponseSpillDurably,
-} from "../../src/responses/spill-store";
+} from "../../backend/src/responses/spill-store";
 import {
   resetHardenedStateForTests,
   setAsyncIcaclsRunnerForTests,
   setIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ICACLS_OK = { success: true, exitCode: 0, timedOut: false, stdout: "" };

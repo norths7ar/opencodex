@@ -4,14 +4,14 @@ import {
   MAIN_CODEX_ACCOUNT_ID,
   MainAccountTokenRefreshError,
   MainAuthJsonChangedDuringRefreshError,
-} from "../../src/codex/main-account";
-import { resolveAdmittedCodexModelEntitlements } from "../../src/codex/model-entitlement-admission";
+} from "../../backend/src/codex/main-account";
+import { resolveAdmittedCodexModelEntitlements } from "../../backend/src/codex/model-entitlement-admission";
 import {
   ensureCodexEntitlementFreshness,
   resetCodexModelEntitlementCacheForTests,
   type CodexModelEntitlementResolveOptions,
-} from "../../src/codex/model-entitlements";
-import { NativeProfileError } from "../../src/codex/native-profile-types";
+} from "../../backend/src/codex/model-entitlements";
+import { NativeProfileError } from "../../backend/src/codex/native-profile-types";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 
 const emptySnapshot = {

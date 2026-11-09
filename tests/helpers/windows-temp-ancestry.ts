@@ -3,7 +3,7 @@ import { dirname, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import * as acl from "../../src/lib/windows-owner-acl";
+import * as acl from "../../backend/src/lib/windows-owner-acl";
 
 const roots = new Map<string, string>();
 const verify = acl.verifyWindowsEntriesAclAsync;

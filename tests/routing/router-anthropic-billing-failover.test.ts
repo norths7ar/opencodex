@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { candidateFailureDecision } from "../../src/routing/candidate-failure";
+import { candidateFailureDecision } from "../../backend/src/routing/candidate-failure";
 
 const message = "Your credit balance is too low to access the Anthropic API.";
 const envelope = (type = "invalid_request_error", text = message, code?: string) => JSON.stringify({

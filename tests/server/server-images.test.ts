@@ -6,18 +6,18 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../src/codex/routing";
-import { loadConfig, saveConfig } from "../../src/config";
-import { clearKeyCooldowns, rotateKeyOn429 } from "../../src/providers/key-failover";
-import { selectImagesProvider } from "../../src/providers/openai-sidecar";
-import { startServer } from "../../src/server";
-import { handleImages, IMAGES_RESPONSE_MAX_BYTES, readImageResponseBytes, setXaiResultPinnedDownloadForTests } from "../../src/server/images";
-import { MAX_ENCODED_BYTES_PER_IMAGE } from "../../src/images/artifacts";
-import { saveCredential } from "../../src/oauth/store";
-import type { OcxConfig } from "../../src/types";
-import { ANTIGRAVITY_REQUEST_UA } from "../../src/adapters/google-antigravity-wire";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { clearKeyCooldowns, rotateKeyOn429 } from "../../backend/src/providers/key-failover";
+import { selectImagesProvider } from "../../backend/src/providers/openai-sidecar";
+import { startServer } from "../../backend/src/server";
+import { handleImages, IMAGES_RESPONSE_MAX_BYTES, readImageResponseBytes, setXaiResultPinnedDownloadForTests } from "../../backend/src/server/images";
+import { MAX_ENCODED_BYTES_PER_IMAGE } from "../../backend/src/images/artifacts";
+import { saveCredential } from "../../backend/src/oauth/store";
+import type { OcxConfig } from "../../backend/src/types";
+import { ANTIGRAVITY_REQUEST_UA } from "../../backend/src/adapters/google-antigravity-wire";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -2126,7 +2126,7 @@ test("CCA body-read client cancellation returns 499, not 504", async () => {
   //
   // We call handleImages directly (not via server fetch) because a client-side
   // fetch abort tears down the connection before the server response can be read.
-  const { handleImages } = await import("../../src/server/images");
+  const { handleImages } = await import("../../backend/src/server/images");
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const requestUrl = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
     const url = new URL(requestUrl);
@@ -2346,7 +2346,7 @@ test("CCA client abort during OAuth preflight returns 499, not a hung response",
   // Regression for finding2-oauth-signal: when the client disconnects while
   // getValidAccessToken is refreshing the token, the request must return 499
   // promptly, not hang waiting for the refresh HTTP call to complete.
-  const { handleImages } = await import("../../src/server/images");
+  const { handleImages } = await import("../../backend/src/server/images");
   hungOauthFetchMock();
 
   // Long timeout so the deadline does NOT fire — only the client abort triggers.
@@ -2377,7 +2377,7 @@ test("CCA deadline expiry during OAuth preflight returns 504, not a hung respons
   // Regression for finding2-oauth-signal: when the deadline fires while
   // getValidAccessToken is refreshing the token, the request must return 504
   // promptly, not hang waiting for the refresh HTTP call to complete.
-  const { handleImages } = await import("../../src/server/images");
+  const { handleImages } = await import("../../backend/src/server/images");
   hungOauthFetchMock();
 
   // Short timeout so the deadline fires during the hung OAuth refresh.
@@ -2719,7 +2719,7 @@ test("CCA rejects invalid base64 and non-image bytes instead of returning b64_js
 
 test("GET /v1/opencodex/artifacts/:id serves opaque artifacts with API auth", async () => {
   process.env.OPENCODEX_API_AUTH_TOKEN = "proxy-admission-secret";
-  const { materializeInlineImage, createImageBudget, artifactHttpUrl } = await import("../../src/images/artifacts");
+  const { materializeInlineImage, createImageBudget, artifactHttpUrl } = await import("../../backend/src/images/artifacts");
   const filePath = await materializeInlineImage(CCA_TINY_PNG, createImageBudget());
   const urlPath = artifactHttpUrl(filePath);
 

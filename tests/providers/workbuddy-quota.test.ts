@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createTempHome } from "../helpers/temp-home";
-import { parseWorkBuddyCredits, normalizeWorkBuddyCredits } from "../../src/providers/workbuddy-credit-balance";
-import { fetchWorkBuddyQuota, workBuddyExpiringCredits } from "../../src/providers/quota/workbuddy";
-import { TERMINAL_QUOTA_FAILURE } from "../../src/providers/quota/report-cache";
-import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderAccountQuotas, providerOAuthAccountQuotaMode, fetchProviderQuotaReports } from "../../src/providers/quota";
-import { saveCredential, getAccountSet, setAccountPaused, mergeAccountCredential, getAccountCredential } from "../../src/oauth/store";
-import { accountHeadroomPercent } from "../../src/oauth/account-quota-rank";
-import { cachedProviderQuotaIsExhausted } from "../../src/providers/quota-exhaustion";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { parseWorkBuddyCredits, normalizeWorkBuddyCredits } from "../../backend/src/providers/workbuddy-credit-balance";
+import { fetchWorkBuddyQuota, workBuddyExpiringCredits } from "../../backend/src/providers/quota/workbuddy";
+import { TERMINAL_QUOTA_FAILURE } from "../../backend/src/providers/quota/report-cache";
+import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderAccountQuotas, providerOAuthAccountQuotaMode, fetchProviderQuotaReports } from "../../backend/src/providers/quota";
+import { saveCredential, getAccountSet, setAccountPaused, mergeAccountCredential, getAccountCredential } from "../../backend/src/oauth/store";
+import { accountHeadroomPercent } from "../../backend/src/oauth/account-quota-rank";
+import { cachedProviderQuotaIsExhausted } from "../../backend/src/providers/quota-exhaustion";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 
 const originalFetch = globalThis.fetch;
 let home: ReturnType<typeof createTempHome>;

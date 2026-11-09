@@ -147,14 +147,14 @@ try {
     { saveCodexAccountCredential },
     { updateAccountQuota },
   ] = await Promise.all([
-    import("../src/config"),
-    import("../src/providers/derive"),
-    import("../src/providers/registry"),
-    import("../src/server"),
-    import("../src/codex/sync"),
-    import("../src/codex/paths"),
-    import("../src/codex/account-store"),
-    import("../src/codex/auth-api"),
+    import("../backend/src/config"),
+    import("../backend/src/providers/derive"),
+    import("../backend/src/providers/registry"),
+    import("../backend/src/server"),
+    import("../backend/src/codex/sync"),
+    import("../backend/src/codex/paths"),
+    import("../backend/src/codex/account-store"),
+    import("../backend/src/codex/auth-api"),
   ]);
 
   const seed = (id: string) => providerConfigSeed(PROVIDER_REGISTRY.find(entry => entry.id === id)!);

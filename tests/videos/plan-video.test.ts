@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { planVideoBridge } from "../../src/images/plan";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
-import { VIDEO_GEN_TOOL_NAME } from "../../src/images/synthetic-tool";
+import { planVideoBridge } from "../../backend/src/images/plan";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
+import { VIDEO_GEN_TOOL_NAME } from "../../backend/src/images/synthetic-tool";
 
 function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
   const xai: OcxProviderConfig = {

@@ -1,15 +1,15 @@
-import { providerConfigSchema } from "../../../src/config/schema/leaf-validators";
+import { providerConfigSchema } from "../../../backend/src/config/schema/leaf-validators";
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../../src/adapters/openai-responses";
+import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../../backend/src/adapters/openai-responses";
 import {
   isXaiResponsesUrl,
   promoteResponsesAdditionalTools,
-} from "../../../src/adapters/opencode-go-additional-tools";
+} from "../../../backend/src/adapters/opencode-go-additional-tools";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { CODEX_GPT5_IDENTITY_LINE, identifyRoutedModel } from "../../../src/adapters/identity";
-import { tagHistoricalInputItems } from "../../../src/responses/item-provenance";
-import { rewriteRoutedCustomToolsForUpstream } from "../../../src/responses/custom-tool-compat";
-import type { OcxProviderConfig } from "../../../src/types";
+import { CODEX_GPT5_IDENTITY_LINE, identifyRoutedModel } from "../../../backend/src/adapters/identity";
+import { tagHistoricalInputItems } from "../../../backend/src/responses/item-provenance";
+import { rewriteRoutedCustomToolsForUpstream } from "../../../backend/src/responses/custom-tool-compat";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const lookup = {
   type: "function" as const,

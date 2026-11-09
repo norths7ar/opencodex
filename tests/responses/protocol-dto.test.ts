@@ -10,8 +10,8 @@ import {
   PROTOCOL_DTO_LIMITS,
   type ProtocolPlanV1,
   type ProtocolTraceV1,
-} from "../../src/protocols/dto";
-import { PROTOCOL_CONTRACT_VERSION } from "../../src/protocols/contract";
+} from "../../backend/src/protocols/dto";
+import { PROTOCOL_CONTRACT_VERSION } from "../../backend/src/protocols/contract";
 
 const trace: ProtocolTraceV1 = {
   v: 1,

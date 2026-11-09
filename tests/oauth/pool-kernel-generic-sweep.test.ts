@@ -5,8 +5,8 @@ import {
   peekRoundRobinAccount,
   reconcilePoolRotationState,
   seedPoolRotationAccount,
-} from "../../src/oauth/pool-kernel";
-import type { GenerationContext } from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/oauth/pool-kernel";
+import type { GenerationContext } from "../../backend/src/lib/state-store-sweeper";
 
 /**
  * The rotation primitives moved out of src/codex/pool-rotation.ts so every credential

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { mapOcxMessagesToDevin } from "../../src/adapters/devin";
-import { buildGetChatMessageRequestForTests } from "../../src/adapters/devin/cloud-direct/chat";
-import type { OcxMessage, OcxParsedRequest } from "../../src/types";
+import { mapOcxMessagesToDevin } from "../../backend/src/adapters/devin";
+import { buildGetChatMessageRequestForTests } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import type { OcxMessage, OcxParsedRequest } from "../../backend/src/types";
 
 const dataUrl = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg";
 

@@ -11,7 +11,7 @@ import {
   USAGE_DEBUG_KEEP_LINES,
   USAGE_DEBUG_MAX_LINES,
   usageDebugPath,
-} from "../../src/usage/debug";
+} from "../../backend/src/usage/debug";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

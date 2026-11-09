@@ -1,4 +1,4 @@
-import type { OwnershipInspection } from "../../src/integrations/native/ownership-preflight";
+import type { OwnershipInspection } from "../../backend/src/integrations/native/ownership-preflight";
 
 /**
  * Service-home ownership evidence for tests that sandbox CODEX_HOME /

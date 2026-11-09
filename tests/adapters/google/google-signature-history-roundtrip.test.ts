@@ -6,13 +6,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
 import {
   __resetAntigravityReplayCache,
   applyAntigravityReplay,
   observeAntigravityReplay,
-} from "../../../src/adapters/google-antigravity-replay";
-import { parseRequest } from "../../../src/responses/parser";
+} from "../../../backend/src/adapters/google-antigravity-replay";
+import { parseRequest } from "../../../backend/src/responses/parser";
 import {
   flushThoughtSignatureReplayForTests,
   forgetThoughtSignatureForReplay,
@@ -20,10 +20,10 @@ import {
   rememberExtraContentForReplay,
   rememberThoughtSignatureForReplay,
   resetThoughtSignatureReplayForTests,
-} from "../../../src/responses/thought-signature-replay";
-import { bindReasoningReplayScope, durableReplayDestinationIdentity } from "../../../src/responses/reasoning-replay-cache";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../../src/lib/windows-secret-acl";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../../src/types";
+} from "../../../backend/src/responses/thought-signature-replay";
+import { bindReasoningReplayScope, durableReplayDestinationIdentity } from "../../../backend/src/responses/reasoning-replay-cache";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../../backend/src/lib/windows-secret-acl";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

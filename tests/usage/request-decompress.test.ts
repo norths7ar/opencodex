@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { deflateRawSync, deflateSync } from "node:zlib";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import {
   DecompressedBodyTooLargeError,
   decodeRequestBody,
@@ -12,12 +12,12 @@ import {
   readJsonRequestBody,
   resolveInboundBodyLimitBytes,
   UnsupportedContentEncodingError,
-} from "../../src/server/request-decompress";
-import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../src/server/management/body";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { decodeRequestErrorResponse } from "../../src/server/responses/core";
-import { serializedJsonByteLength } from "../../src/server/json-serialized-bytes";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/request-decompress";
+import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../backend/src/server/management/body";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { decodeRequestErrorResponse } from "../../backend/src/server/responses/core";
+import { serializedJsonByteLength } from "../../backend/src/server/json-serialized-bytes";
+import type { OcxConfig } from "../../backend/src/types";
 
 const PAYLOAD = { model: "gpt-5.5", input: "hello", stream: true };
 const PAYLOAD_BYTES = new TextEncoder().encode(JSON.stringify(PAYLOAD));

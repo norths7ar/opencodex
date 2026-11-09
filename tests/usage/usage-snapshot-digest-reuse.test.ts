@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { appendFileSync, closeSync, mkdtempSync, openSync, rmSync, statSync, writeFileSync, writeSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readUsageSnapshotForManagement, resetUsageReadCacheForTests, usageLogPath, usageReadCacheStatsForTests } from "../../src/usage/log";
+import { readUsageSnapshotForManagement, resetUsageReadCacheForTests, usageLogPath, usageReadCacheStatsForTests } from "../../backend/src/usage/log";
 
 let directory: string;
 let previousHome: string | undefined;

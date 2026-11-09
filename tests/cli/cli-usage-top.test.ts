@@ -1,8 +1,8 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { dispatchCommand, type CliDispatchDeps } from "../../src/cli/dispatch";
-import * as observe from "../../src/cli/observe";
-import { parseCliHead } from "../../src/cli/root";
+import { dispatchCommand, type CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import * as observe from "../../backend/src/cli/observe";
+import { parseCliHead } from "../../backend/src/cli/root";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
@@ -26,7 +26,7 @@ describe("usage human model limit", () => {
     } finally { handler.mockRestore(); }
   });
   test.each([["usage", "--help"], ["help", "usage"], ["help", "--all"]].map(args => ({ args })))("documents --top in real CLI help %j", ({ args }) => {
-    const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), ...args], {
+    const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), ...args], {
       cwd: repoRoot(), env: process.env, encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000,
     });
     expect(result.error).toBeUndefined();

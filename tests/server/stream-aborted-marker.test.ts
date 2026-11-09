@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { consumeForInspection, trackSseForRequestLog } from "../../src/server/relay";
+import { consumeForInspection, trackSseForRequestLog } from "../../backend/src/server/relay";
 import {
   addFinalRequestLog,
   addRequestLog,
   beginRequestAttempt,
   httpStatusForRequestLogTerminal,
   type RequestLogContext,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 import {
   readUsageEntries,
   resetUsageReadCacheForTests,
   type PersistedUsageAttempt,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Port of codex-router #139's streamAborted metering marker: an upstream stream

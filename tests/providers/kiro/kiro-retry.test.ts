@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { AdapterRequest } from "../../../src/adapters/base";
+import type { AdapterRequest } from "../../../backend/src/adapters/base";
 import {
   fetchKiroWithRetry,
   noteKiroTransientThrottle,
   resetKiroThrottleStateForTests,
-} from "../../../src/adapters/kiro-retry";
+} from "../../../backend/src/adapters/kiro-retry";
 
 const realFetch = globalThis.fetch;
 
@@ -371,7 +371,7 @@ describe("kiro retry fetch", () => {
 
 describe("kiro adapter error formatter", () => {
   test("is classified, redacted, and does not copy secret headers", async () => {
-    const { createKiroAdapter } = await import("../../../src/adapters/kiro");
+    const { createKiroAdapter } = await import("../../../backend/src/adapters/kiro");
     const adapter = createKiroAdapter({ adapter: "kiro", apiKey: "unused" } as never);
     const text = adapter.formatErrorBody!(403, new Headers({
       authorization: "Bearer header-secret",

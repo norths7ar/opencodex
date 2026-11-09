@@ -4,17 +4,17 @@
  * goes everywhere else, and the source is never touched so the next destination decides again.
  */
 import { describe, expect, test } from "bun:test";
-import { buildAnthropicMessagesPassthroughRequest } from "../../src/adapters/anthropic/passthrough";
-import { createProtocolEnvelope } from "../../src/protocols/envelope";
+import { buildAnthropicMessagesPassthroughRequest } from "../../backend/src/adapters/anthropic/passthrough";
+import { createProtocolEnvelope } from "../../backend/src/protocols/envelope";
 import {
   anthropicProviderClass,
   credentialDomainFor,
   messagesBodyHasOpaqueState,
   opaqueStateForDestination,
   sameCredentialDomain,
-} from "../../src/protocols/opaque-state";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/protocols/opaque-state";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const SIGNATURE = "fixture-signature-AAAAAAAAAAAAAAAAAAAA";
 const REDACTED = "fixture-redacted-BBBBBBBBBBBBBBBBBBBB";

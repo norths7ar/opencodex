@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
-import { cancelKiroDeviceLogin, kiroDeviceFlowCountForTests, selectKiroDeviceProfile, setKiroDevicePublishForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../src/oauth/kiro-device-login";
-import { listKiroIamProfiles, parseKiroIamOptions } from "../../../src/oauth/kiro-iam-identity-center";
-import { getAccountSet } from "../../../src/oauth/store";
+import { cancelKiroDeviceLogin, kiroDeviceFlowCountForTests, selectKiroDeviceProfile, setKiroDevicePublishForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../backend/src/oauth/kiro-device-login";
+import { listKiroIamProfiles, parseKiroIamOptions } from "../../../backend/src/oauth/kiro-iam-identity-center";
+import { getAccountSet } from "../../../backend/src/oauth/store";
 import { authorization, kiroDeviceFixture, profileArn, response } from "../../helpers/kiro-device-fixture";
 import { STORE_BUDGET_MS } from "../../helpers/test-budget";
 

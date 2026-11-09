@@ -5,19 +5,19 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { ChildProcess } from "node:child_process";
 import { Readable, Writable } from "node:stream";
-import { buildChildEnv, createClaudeCliAdapter } from "../../src/adapters/claude-cli/adapter";
-import { CLAUDE_CLI_PROFILE } from "../../src/adapters/claude-cli/profiles";
+import { buildChildEnv, createClaudeCliAdapter } from "../../backend/src/adapters/claude-cli/adapter";
+import { CLAUDE_CLI_PROFILE } from "../../backend/src/adapters/claude-cli/profiles";
 import {
   checkClaudeUsageAdmission,
   formatClaudeReset,
   parseClaudeReset,
   recordClaudeUsageRefusal,
   setClaudeUsagePreflightForTests,
-} from "../../src/adapters/claude-cli/usage-admission";
-import { getAdapterDefinition } from "../../src/adapters/registry";
-import { getConfigDir } from "../../src/config/paths";
-import { handleResponses } from "../../src/server/responses";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/claude-cli/usage-admission";
+import { getAdapterDefinition } from "../../backend/src/adapters/registry";
+import { getConfigDir } from "../../backend/src/config/paths";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

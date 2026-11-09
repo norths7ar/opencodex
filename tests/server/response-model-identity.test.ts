@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses/core";
+import { handleResponses } from "../../backend/src/server/responses/core";
 import {
   inspectResponseLogJson, inspectResponseLogSsePayload, type RequestLogContext,
-} from "../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
-import { clearModelCache, getStaleCached } from "../../src/codex/model-cache";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
+import { clearModelCache, getStaleCached } from "../../backend/src/codex/model-cache";
 import { stubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import { materializeModelPreset } from "../../src/providers/model-presets";
-import { modelIdentityLogFields } from "../../src/usage/log";
+import { materializeModelPreset } from "../../backend/src/providers/model-presets";
+import { modelIdentityLogFields } from "../../backend/src/usage/log";
 
 const originalFetch = globalThis.fetch;
 let releaseSpendHome: (() => void) | undefined;

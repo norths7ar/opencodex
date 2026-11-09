@@ -7,10 +7,10 @@ import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
-import { recoverPromptJournal } from "../../src/codex/prompt-layers";
-import { journalPathFor } from "../../src/codex/prompt-layers/paths";
-import { encodeJournal, hashBytes } from "../../src/codex/prompt-journal";
-import * as atomic from "../../src/lib/windows-atomic-replace";
+import { recoverPromptJournal } from "../../backend/src/codex/prompt-layers";
+import { journalPathFor } from "../../backend/src/codex/prompt-layers/paths";
+import { encodeJournal, hashBytes } from "../../backend/src/codex/prompt-journal";
+import * as atomic from "../../backend/src/lib/windows-atomic-replace";
 
 /**
  * Whether a rename destination is this fixture file. The transaction publishes

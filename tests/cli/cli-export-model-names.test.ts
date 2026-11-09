@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { readFileSync, readdirSync } from "node:fs";
-import { handleExportCommand } from "../../src/cli/export-command";
-import { handleClientIntegrationCommand } from "../../src/cli/integrations";
-import type { OcxConfig } from "../../src/types";
+import { handleExportCommand } from "../../backend/src/cli/export-command";
+import { handleClientIntegrationCommand } from "../../backend/src/cli/integrations";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome;

@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { create, fromBinary } from "@bufbuild/protobuf";
-import type { OcxMessage, OcxToolResultMessage } from "../../../src/types";
+import type { OcxMessage, OcxToolResultMessage } from "../../../backend/src/types";
 import {
   CursorImageError,
   CURSOR_VISION_IMAGE_OMITTED,
@@ -21,18 +21,18 @@ import {
   resolveCursorImages,
   sniffCursorImageDimensions,
   sniffCursorImageFormat,
-} from "../../../src/adapters/cursor/images";
+} from "../../../backend/src/adapters/cursor/images";
 import {
   handleCursorNativeKv,
   resetCursorBlobStateForTests,
-} from "../../../src/adapters/cursor/native-exec";
-import { cursorRequestMessagesFromRaw } from "../../../src/adapters/cursor/request-builder";
-import { activePromptText, encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
+} from "../../../backend/src/adapters/cursor/native-exec";
+import { cursorRequestMessagesFromRaw } from "../../../backend/src/adapters/cursor/request-builder";
+import { activePromptText, encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
 import {
   AgentClientMessageSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 /** Minimal valid 1×1 PNG (real IHDR; not a signature-only stub). */
 const PNG_BYTES = Uint8Array.from(

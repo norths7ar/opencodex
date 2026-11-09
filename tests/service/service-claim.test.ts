@@ -1,9 +1,9 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, statSync } from "node:fs";
 import * as os from "node:os";
-import { parseClaimArgs, runServiceClaim, CLAIM_SCHEMA } from "../../src/service/claim";
-import { ServiceOwnershipSubjectMismatchError, serviceStatePath, serviceStatePaths } from "../../src/service/state";
-import type { ServiceOwnershipSubject } from "../../src/service/state";
+import { parseClaimArgs, runServiceClaim, CLAIM_SCHEMA } from "../../backend/src/service/claim";
+import { ServiceOwnershipSubjectMismatchError, serviceStatePath, serviceStatePaths } from "../../backend/src/service/state";
+import type { ServiceOwnershipSubject } from "../../backend/src/service/state";
 import { createTempHome } from "../helpers/temp-home";
 
 const VALID = [

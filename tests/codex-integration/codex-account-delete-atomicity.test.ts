@@ -1,4 +1,4 @@
-import { singleCodexAccountId, SIGNED_OUT_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
+import { singleCodexAccountId, SIGNED_OUT_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import {
   existsSync,
@@ -9,39 +9,39 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import * as fsModule from "node:fs";
-import * as accountStoreModule from "../../src/codex/account-store";
-import * as websocketRegistryModule from "../../src/codex/websocket-registry";
-import * as quotaAutoRefreshStateModule from "../../src/codex/quota-auto-refresh-state";
+import * as accountStoreModule from "../../backend/src/codex/account-store";
+import * as websocketRegistryModule from "../../backend/src/codex/websocket-registry";
+import * as quotaAutoRefreshStateModule from "../../backend/src/codex/quota-auto-refresh-state";
 import {
   getCodexAccountCredential,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
+} from "../../backend/src/codex/account-store";
 import {
   CodexAccountDeleteCleanupError,
   CodexAccountDeleteRollbackError,
   deleteCodexAccount,
-} from "../../src/codex/account-lifecycle";
+} from "../../backend/src/codex/account-lifecycle";
 import {
   isAccountNeedsReauth,
   markAccountNeedsReauth,
-} from "../../src/codex/account-runtime-state";
+} from "../../backend/src/codex/account-runtime-state";
 import {
   getAccountQuota,
   updateAccountQuota,
-} from "../../src/codex/quota";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import * as configModule from "../../src/config";
-import { setCodexAccountAutoSwitchThresholdOverride } from "../../src/codex/account-auto-switch";
-import { clearAllManualPreferences, manualPreferenceBlocks, resetCodexRoutingForManualSelection } from "../../src/codex/routing/active-account";
+} from "../../backend/src/codex/quota";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import * as configModule from "../../backend/src/config";
+import { setCodexAccountAutoSwitchThresholdOverride } from "../../backend/src/codex/account-auto-switch";
+import { clearAllManualPreferences, manualPreferenceBlocks, resetCodexRoutingForManualSelection } from "../../backend/src/codex/routing/active-account";
 import {
   failureWindowSteersNewThreads,
   forgetCodexFailureWindow,
   isCodexFailureWindowDegraded,
   noteCodexFailureWindowSample,
-} from "../../src/codex/routing/failure-window";
-import { POOL_KEY_CODEX } from "../../src/oauth/pool-kernel";
-import { prepareConfigObjectChildDeletionRebase } from "../../src/config/rebase-provenance";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing/failure-window";
+import { POOL_KEY_CODEX } from "../../backend/src/oauth/pool-kernel";
+import { prepareConfigObjectChildDeletionRebase } from "../../backend/src/config/rebase-provenance";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-account-delete-atomicity");

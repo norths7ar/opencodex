@@ -2,14 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { boundedServiceTier } from "../../src/lib/response-service-tier";
-import { boundedModelIdentity, knownModelIdentity } from "../../src/lib/model-identity";
+import { boundedServiceTier } from "../../backend/src/lib/response-service-tier";
+import { boundedModelIdentity, knownModelIdentity } from "../../backend/src/lib/model-identity";
 import {
   addFinalRequestLog, addRequestLog, clearRequestLogsForTests, getRequestLogEntries, inspectResponseLogJson,
   requestLogEntryFromPersistedUsage, type RequestLogContext, type RequestLogEntry,
-} from "../../src/server/request-log";
-import { requestLogDto } from "../../src/server/management/shared";
-import { readUsageEntries, resetUsageReadCacheForTests, usageLogPath } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { requestLogDto } from "../../backend/src/server/management/shared";
+import { readUsageEntries, resetUsageReadCacheForTests, usageLogPath } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { log } from "../helpers/request-log-entry";
 

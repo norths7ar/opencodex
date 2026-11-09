@@ -1,17 +1,17 @@
 import { mkdtempSync, mkdirSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "./remove-tree";
 
 export async function withLocalCredentialFixture(work: (f: {
   home: string;
   codex: string;
   put(path: string, value: unknown): void;
-  inventory: typeof import("../../src/local-credentials/inventory");
-  publication: typeof import("../../src/local-credentials/generation");
-  start(): ReturnType<typeof import("../../src/local-credentials/inventory").startLocalCredentialObservation>;
+  inventory: typeof import("../../backend/src/local-credentials/inventory");
+  publication: typeof import("../../backend/src/local-credentials/generation");
+  start(): ReturnType<typeof import("../../backend/src/local-credentials/inventory").startLocalCredentialObservation>;
 }) => Promise<void>): Promise<void> {
   const root = realpathSync.native(mkdtempSync(join(tmpdir(), "ocx-lc-")));
   const home = join(root, "ocx");
@@ -24,8 +24,8 @@ export async function withLocalCredentialFixture(work: (f: {
   setAsyncIcaclsRunnerForTests(async () => ok);
   let owner: { stop(): void } | undefined;
   try {
-    const inventory = await import("../../src/local-credentials/inventory");
-    const publication = await import("../../src/local-credentials/generation");
+    const inventory = await import("../../backend/src/local-credentials/inventory");
+    const publication = await import("../../backend/src/local-credentials/generation");
     await work({
       home, codex, inventory, publication,
       put: (path, value) => { writeFileSync(path, JSON.stringify(value), { mode: 0o600 }); },

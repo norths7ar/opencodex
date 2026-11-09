@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { captureRouteStaticPolicy, routedProviderConfig } from "../../src/router";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { captureRouteStaticPolicy, routedProviderConfig } from "../../backend/src/router";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const BASES = ["https://opencode.ai/zen/go/v1", "https://opencode.ai/inference/go/v1", "https://custom.invalid/v1"];

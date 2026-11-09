@@ -10,13 +10,13 @@
  * an exact (apiKey, host) match with a fresh fetchedAt.
  */
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import * as oauth from "../../src/oauth";
-import { fetchDevinUsableModels } from "../../src/adapters/devin/live-models";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString, encodeVarintField } from "../../src/adapters/devin/cloud-direct/wire";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-fetch";
-import { clearModelCache, providerCacheGenerations } from "../../src/codex/model-cache";
-import type { OcxProviderConfig } from "../../src/types";
+import * as oauth from "../../backend/src/oauth";
+import { fetchDevinUsableModels } from "../../backend/src/adapters/devin/live-models";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString, encodeVarintField } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-fetch";
+import { clearModelCache, providerCacheGenerations } from "../../backend/src/codex/model-cache";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const HOST = "https://server.codeium.com";
 const KEY = "devin-live-models-test-key";

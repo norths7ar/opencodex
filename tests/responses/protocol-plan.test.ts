@@ -3,8 +3,8 @@
  * effects from the declared dispositions, and eligibility from the unrepresentable policy.
  */
 import { describe, expect, test } from "bun:test";
-import { isProtocolPlanV1 } from "../../src/protocols/dto";
-import { planProtocol, type ProtocolPlanCandidateInput, type ProtocolPlanInput } from "../../src/protocols/plan";
+import { isProtocolPlanV1 } from "../../backend/src/protocols/dto";
+import { planProtocol, type ProtocolPlanCandidateInput, type ProtocolPlanInput } from "../../backend/src/protocols/plan";
 
 const OPEN = { responses: { enabled: true }, chat: { enabled: true }, messages: { enabled: true } } as const;
 

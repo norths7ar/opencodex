@@ -1,11 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
 import { watchdogMs } from "../helpers/ci-watchdog";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CODEX_WS_SESSION_CLOSE_GRACE_MS, CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { CODEX_RESPONSES_HTTP_URL, prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CODEX_WS_SESSION_CLOSE_GRACE_MS, CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { CODEX_RESPONSES_HTTP_URL, prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
 import {
   CODEX_WS_METADATA_MAX_BYTES, CODEX_WS_METADATA_MAX_HEADERS, CODEX_WS_METADATA_MAX_VALUE_BYTES,
-} from "../../src/server/responses/codex-ws-metadata";
+} from "../../backend/src/server/responses/codex-ws-metadata";
 
 const realWebSocket = globalThis.WebSocket;
 const flag = "x-reasoning-included";

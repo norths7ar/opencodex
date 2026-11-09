@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { parseServiceOwnershipRecord } from "../../src/service/state-record.mjs";
+import { parseServiceOwnershipRecord } from "../../backend/src/service/state-record.mjs";
 import { repoPath } from "../helpers/repo-root";
 
 /**
@@ -21,8 +21,8 @@ const SHELL = "desktop/src-tauri/src";
 const IDENTITY = repoPath(`${SHELL}/identity.rs`);
 const OWNERSHIP = repoPath(`${SHELL}/ownership.rs`);
 const STARTUP = repoPath(`${SHELL}/startup.rs`);
-const STATE = repoPath("src/service/state.ts");
-const COMPATIBILITY = repoPath("src/service/ownership-compatibility.ts");
+const STATE = repoPath("backend/src/service/state.ts");
+const COMPATIBILITY = repoPath("backend/src/service/ownership-compatibility.ts");
 const DESKTOP_SHELL_DOC = repoPath("structure/desktop-shell.md");
 const DESKTOP_SUPERVISION_DOC = repoPath("structure/ops/desktop-supervision.md");
 

@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import {
   clearMainAccountInfoCache, observeMainQuotaCredential, observeMainQuotaIdentity,
-} from "../../src/codex/main-account-cache";
+} from "../../backend/src/codex/main-account-cache";
 import {
   getMainReserveAuthorization, isMainReserveAuthorizationLive, nativeUserIdClaims,
   observeMainReserveRevocation,
-} from "../../src/codex/reserve-availability";
-import type { WhamUsageResponse } from "../../src/codex/quota-types";
+} from "../../backend/src/codex/reserve-availability";
+import type { WhamUsageResponse } from "../../backend/src/codex/quota-types";
 
 let originalFetch: typeof fetch;
 let serial = 0;

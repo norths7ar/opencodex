@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { routedProviderConfig } from "../../src/router";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../backend/src/router";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const ANNOTATION =

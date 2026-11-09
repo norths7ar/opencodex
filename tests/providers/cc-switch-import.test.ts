@@ -10,10 +10,10 @@ import {
   loadConfig,
   saveConfig,
   setPersistedConfigMutationBeforeCommitForTests,
-} from "../../src/config";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { getAuthStorePath, saveCredential } from "../../src/oauth/store";
+} from "../../backend/src/config";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { getAuthStorePath, saveCredential } from "../../backend/src/oauth/store";
 import {
   CC_SWITCH_IMPORT_JOURNAL_FILENAME,
   CcSwitchImportError,
@@ -24,9 +24,9 @@ import {
   runCcSwitchProviderImport,
   scanCcSwitchJsonBytes,
   setCcSwitchSourceOpenHookForTests,
-} from "../../src/providers/cc-switch-import";
-import { cmdProviderCcSwitchImport } from "../../src/cli/provider-cc-switch-import";
-import { readSourceRows } from "../../src/providers/cc-switch-import-source";
+} from "../../backend/src/providers/cc-switch-import";
+import { cmdProviderCcSwitchImport } from "../../backend/src/cli/provider-cc-switch-import";
+import { readSourceRows } from "../../backend/src/providers/cc-switch-import-source";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Runtime-assembled canary so privacy:scan never sees a literal token prefix in the source file.

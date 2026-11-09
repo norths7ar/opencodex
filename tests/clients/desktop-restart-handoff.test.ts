@@ -2,15 +2,15 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmdirSync, unlinkSync, writeFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { restartCodexDesktopApp, type DesktopAppRestartIo } from "../../src/codex/desktop-app-restart";
+import { restartCodexDesktopApp, type DesktopAppRestartIo } from "../../backend/src/codex/desktop-app-restart";
 import {
   handoffLogPath,
   resolveHelperCommand,
   runDesktopRestartHandoff,
   startDesktopRestartHandoff,
   type HandoffIo,
-} from "../../src/codex/desktop-app/handoff";
-import { acquireDesktopRestartLock, releaseDesktopRestartLock } from "../../src/codex/desktop-app/lock";
+} from "../../backend/src/codex/desktop-app/handoff";
+import { acquireDesktopRestartLock, releaseDesktopRestartLock } from "../../backend/src/codex/desktop-app/lock";
 
 /**
  * The handoff exists because the self-ancestry refusal fires in the NORMAL case on a

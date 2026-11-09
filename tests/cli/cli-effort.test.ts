@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleEffortCommand } from "../../src/cli/effort";
-import { dispatchCommand } from "../../src/cli/dispatch";
-import type { CliDispatchDeps } from "../../src/cli/dispatch";
-import { summarizeStopRun } from "../../src/cli/stop-report";
+import { handleEffortCommand } from "../../backend/src/cli/effort";
+import { dispatchCommand } from "../../backend/src/cli/dispatch";
+import type { CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import { summarizeStopRun } from "../../backend/src/cli/stop-report";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 let tempHome: string | null = null;
 const savedHome = process.env.OPENCODEX_HOME;

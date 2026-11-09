@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 import {
   accountHeadroomPercent,
   accountResetTimestamp,
   rankAccountsByHeadroom,
   rankAccountsByResetFirst,
-} from "../../src/oauth/account-quota-rank";
-import { cachedProviderQuotaIsExhausted } from "../../src/providers/quota-exhaustion";
-import { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
-import { sweepExpiredProviderAccountQuotaRows } from "../../src/providers/quota/account-cache";
-import { ACCOUNT_QUOTA_TTL_MS } from "../../src/providers/quota-wire";
-import { providerWindowObservations } from "../../src/quota/window-mapping";
+} from "../../backend/src/oauth/account-quota-rank";
+import { cachedProviderQuotaIsExhausted } from "../../backend/src/providers/quota-exhaustion";
+import { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } from "../../backend/src/providers/quota";
+import { sweepExpiredProviderAccountQuotaRows } from "../../backend/src/providers/quota/account-cache";
+import { ACCOUNT_QUOTA_TTL_MS } from "../../backend/src/providers/quota-wire";
+import { providerWindowObservations } from "../../backend/src/quota/window-mapping";
 import {
   probeAntigravityUsageQuota,
   setAntigravityAccountQuotaTransportForTests,
-} from "../../src/providers/quota/antigravity";
+} from "../../backend/src/providers/quota/antigravity";
 
 const proxyEnv = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyEnv.map(key => [key, process.env[key]]));

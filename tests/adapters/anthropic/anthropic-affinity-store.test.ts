@@ -3,13 +3,13 @@ import { existsSync, lstatSync, mkdtempSync, readFileSync, symlinkSync, unlinkSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import { getAccountSet, removeAccount, saveCredential, saveAccountCredential, markAccountNeedsReauth } from "../../../src/oauth/store";
+import { getAccountSet, removeAccount, saveCredential, saveAccountCredential, markAccountNeedsReauth } from "../../../backend/src/oauth/store";
 import { AnthropicSessionAffinityStore, anthropicAffinityDigest, anthropicAffinityPath,
-  AFFINITY_IDLE_TTL_MS, MAX_AFFINITY_FILE_BYTES } from "../../../src/oauth/anthropic-session-affinity-store";
-import { atomicWriteFile, atomicWriteFileNoFollow } from "../../../src/config/atomic-write";
-import { runOptionalShutdownHooks } from "../../../src/lib/optional-shutdown-hooks";
-import { settleBackgroundWork } from "../../../src/lib/background-work";
-import * as authStore from "../../../src/oauth/store";
+  AFFINITY_IDLE_TTL_MS, MAX_AFFINITY_FILE_BYTES } from "../../../backend/src/oauth/anthropic-session-affinity-store";
+import { atomicWriteFile, atomicWriteFileNoFollow } from "../../../backend/src/config/atomic-write";
+import { runOptionalShutdownHooks } from "../../../backend/src/lib/optional-shutdown-hooks";
+import { settleBackgroundWork } from "../../../backend/src/lib/background-work";
+import * as authStore from "../../../backend/src/oauth/store";
 
 const originalHome = process.env.OPENCODEX_HOME;
 let home: string;

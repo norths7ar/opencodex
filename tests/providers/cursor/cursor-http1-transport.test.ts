@@ -13,15 +13,15 @@ import {
   TextDeltaUpdateSchema,
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { decodeConnectFrame, encodeConnectFrame } from "../../../src/adapters/cursor/framing";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { decodeConnectFrame, encodeConnectFrame } from "../../../backend/src/adapters/cursor/framing";
 import {
   cursorBidiAppendRequestSize,
   encodeCursorBidiAppendRequest,
-} from "../../../src/adapters/cursor/http1-bidi";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
-import type { OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/http1-bidi";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 interface DecodedAppend {

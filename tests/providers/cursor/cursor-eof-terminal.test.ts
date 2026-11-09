@@ -10,11 +10,11 @@ import {
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
   TurnEndedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { encodeConnectFrame } from "../../../src/adapters/cursor/framing";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { encodeConnectFrame } from "../../../backend/src/adapters/cursor/framing";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 
 const PROVIDER = "opencodex-responses";
 

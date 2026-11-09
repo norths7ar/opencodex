@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { buildCursorLocalInstallerHint, platformForHost, realCursorLocalHintDeps, resetCursorLocalInstallerCacheForTests } from "../../../src/integrations/cursor-local-installer";
+import { buildCursorLocalInstallerHint, platformForHost, realCursorLocalHintDeps, resetCursorLocalInstallerCacheForTests } from "../../../backend/src/integrations/cursor-local-installer";
 
 const MANIFEST_URL = "https://api2.cursor.sh/updates/api/update/win32-x64-user/cursor-local/0.0.0/manual-check/stable";
 const REPORTED_INSTALLER = "https://downloads.cursor.com/local-mode/c4730f7d93d787d9ab120af715999f0345ee5bc5/win32/x64/user-setup/CursorUserSetup-x64-3.21.18.exe";

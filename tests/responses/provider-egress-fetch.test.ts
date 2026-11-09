@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import { CODEX_RESPONSES_HTTP_URL } from "../../src/server/responses/codex-ws-request";
-import { MIN_BOUNDED_CODEX_WS_BUN_VERSION } from "../../src/server/responses/ws-upstream";
-import { InvalidProviderEgressError, PROVIDER_EGRESS_DIRECT } from "../../src/lib/provider-egress";
-import { markEgressTransparentExecutor } from "../../src/lib/provider-egress";
+import { CODEX_RESPONSES_HTTP_URL } from "../../backend/src/server/responses/codex-ws-request";
+import { MIN_BOUNDED_CODEX_WS_BUN_VERSION } from "../../backend/src/server/responses/ws-upstream";
+import { InvalidProviderEgressError, PROVIDER_EGRESS_DIRECT } from "../../backend/src/lib/provider-egress";
+import { markEgressTransparentExecutor } from "../../backend/src/lib/provider-egress";
 import {
   __resetEgressWebsocketDowngradeNotices,
   providerFetch,
   sendWithConnectionPolicy,
-} from "../../src/server/responses/fetch-helpers";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/responses/fetch-helpers";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * The inference dispatch. Every Responses, Chat, compaction and continuation send reaches the

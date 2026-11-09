@@ -6,9 +6,9 @@ import * as fs from "node:fs";
 import * as os from "node:os";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
-import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission } from "../../src/codex/cli-update-recovery";
-import { recoverClosedCodexCliUpdateWorker } from "../../src/codex/cli-update-worker-recovery";
-import * as gate from "../../src/codex/cli-update-selection-gate";
+import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission } from "../../backend/src/codex/cli-update-recovery";
+import { recoverClosedCodexCliUpdateWorker } from "../../backend/src/codex/cli-update-worker-recovery";
+import * as gate from "../../backend/src/codex/cli-update-selection-gate";
 import { createCodexCliRecoveryTestHome } from "./codex-cli-recovery-home";
 import { removeTreeWithRetry } from "./remove-tree";
 

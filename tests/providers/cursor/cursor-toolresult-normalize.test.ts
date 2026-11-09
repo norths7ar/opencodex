@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { create, fromBinary } from "@bufbuild/protobuf";
-import { handleCursorNativeKv } from "../../../src/adapters/cursor/native-exec";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { normalizeCursorToolResultText } from "../../../src/adapters/cursor/tool-result-normalize";
+import { handleCursorNativeKv } from "../../../backend/src/adapters/cursor/native-exec";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { normalizeCursorToolResultText } from "../../../backend/src/adapters/cursor/tool-result-normalize";
 import {
   AgentClientMessageSchema,
   ConversationTurnStructureSchema,
   ConversationStepSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import type { CursorRunRequest } from "../../../src/adapters/cursor/types";
-import type { OcxMessage, OcxToolResultMessage } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { CursorRunRequest } from "../../../backend/src/adapters/cursor/types";
+import type { OcxMessage, OcxToolResultMessage } from "../../../backend/src/types";
 
 function blobData(blobId: Uint8Array): Uint8Array {
   const reply = fromBinary(AgentClientMessageSchema, handleCursorNativeKv(create(KvServerMessageSchema, {

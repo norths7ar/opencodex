@@ -2,23 +2,23 @@ import { describe, expect, test } from "bun:test";
 import {
   CODEX_TEXT_GUARDED_BUDGET_POLICY,
   createRequestExecutionBudget,
-} from "../../src/lib/request-execution-budget";
+} from "../../backend/src/lib/request-execution-budget";
 import {
   createSpendReservationLedger,
   type SpendJournal,
-} from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { createPoolBackpressureLimiter, resolveHeldAccountDispatch } from "../../src/routing/probe-lease";
-import { clearTransientProbeLeasesForTests } from "../../src/routing/probe-lease";
+} from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { createPoolBackpressureLimiter, resolveHeldAccountDispatch } from "../../backend/src/routing/probe-lease";
+import { clearTransientProbeLeasesForTests } from "../../backend/src/routing/probe-lease";
 import {
   canPortConversationState,
   collectConversationStateCarriers,
   applyAccountChangeConversationStateScrub,
-} from "../../src/server/responses/account-change-state";
+} from "../../backend/src/server/responses/account-change-state";
 import {
   clearConversationStateIssuerMap,
   rememberConversationStateIssuer,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 
 /**
  * The #4546 incident, as a system rather than as five separate fixes.

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
-import { assertLiveServiceManagerAllowed } from "../../src/service";
+import { assertLiveServiceManagerAllowed } from "../../backend/src/service";
 
 /**
  * The suite must not be able to stop the proxy the developer is running.

@@ -3,7 +3,7 @@ import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { withCodexLogGuardLock } from "../../src/codex/log-guard/lock";
+import { withCodexLogGuardLock } from "../../backend/src/codex/log-guard/lock";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

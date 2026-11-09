@@ -1,6 +1,6 @@
 import { create } from "@bufbuild/protobuf";
 import { describe, expect, test } from "bun:test";
-import type { OcxTool } from "../../../src/types";
+import type { OcxTool } from "../../../backend/src/types";
 import {
   AgentServerMessageSchema,
   ExecServerMessageSchema,
@@ -11,7 +11,7 @@ import {
   ToolCallCompletedUpdateSchema,
   ToolCallSchema,
   ToolCallStartedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   createCursorProtobufEventState,
   foldSequentialStructuredEdits,
@@ -20,11 +20,11 @@ import {
   sanitizeCodexApplyPatch,
   sanitizeEmittedApplyPatchArgs,
   translateStructuredEditCall,
-} from "../../../src/adapters/cursor/protobuf-events";
-import { planMcpArgsHandling } from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/protobuf-events";
+import { planMcpArgsHandling } from "../../../backend/src/adapters/cursor/live-transport";
 import {
   applyCursorToolBudget,
-} from "../../../src/adapters/cursor/request-builder";
+} from "../../../backend/src/adapters/cursor/request-builder";
 import {
   buildCursorToolGuidanceSystemNote,
   CURSOR_EDIT_FILE_INPUT_SCHEMA,
@@ -34,7 +34,7 @@ import {
   cursorStructuredEditTools,
   cursorToolsForActivePrompt,
   isCursorSyntheticStructuredEditTool,
-} from "../../../src/adapters/cursor/tool-definitions";
+} from "../../../backend/src/adapters/cursor/tool-definitions";
 
 const encoder = new TextEncoder();
 

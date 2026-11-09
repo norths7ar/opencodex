@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../backend/src/codex/catalog/kinds";
 import {
   routedRemovalBackedByConfigFile,
   unbackedRoutedRemovalMessage,
   unconfiguredRoutedRemoval,
-} from "../../src/codex/catalog/routed-removal";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import type { ConfigAdmissionSnapshot } from "../../src/config/diagnostics";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/catalog/routed-removal";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import type { ConfigAdmissionSnapshot } from "../../backend/src/config/diagnostics";
+import type { OcxConfig } from "../../backend/src/types";
 
 const native = (slug: string): RawEntry => ({ slug, description: "native" });
 const routed = (slug: string): RawEntry => ({ slug, description: `Routed via opencodex → ${slug} (owner).` });

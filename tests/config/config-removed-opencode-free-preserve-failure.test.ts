@@ -1,8 +1,8 @@
 import { expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { getConfigPath, getDefaultConfig, saveConfig } from "../../src/config";
-import { readRawConfigJson } from "../../src/config/persist-unlocked";
-import { readCredentialGeneration } from "../../src/local-credentials/generation";
+import { getConfigPath, getDefaultConfig, saveConfig } from "../../backend/src/config";
+import { readRawConfigJson } from "../../backend/src/config/persist-unlocked";
+import { readCredentialGeneration } from "../../backend/src/local-credentials/generation";
 import { createTempHome } from "../helpers/temp-home";
 
 // A parseable document deep enough that retired-provider pruning overflows the stack.

@@ -30,27 +30,27 @@ import {
   validateConfigCandidate,
   writeRuntimePort,
   writePid,
-} from "../../src/config";
+} from "../../backend/src/config";
 
-import * as windowsAcl from "../../src/lib/windows-secret-acl";
-import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
-import { AtomicWriteResidualTempError, atomicWriteFile, atomicWriteFileAsync, hardenConfigDir, hardenExistingSecret, renameAtomicFile, saveConfig } from "../../src/config";
-import { nextAtomicTempSequence } from "../../src/config/atomic-write";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import * as windowsAcl from "../../backend/src/lib/windows-secret-acl";
+import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../backend/src/lib/windows-elevation";
+import { AtomicWriteResidualTempError, atomicWriteFile, atomicWriteFileAsync, hardenConfigDir, hardenExistingSecret, renameAtomicFile, saveConfig } from "../../backend/src/config";
+import { nextAtomicTempSequence } from "../../backend/src/config/atomic-write";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import {
   MULTI_AGENT_SURFACE_ADVISORY_VERSION,
   SUBAGENT_SURFACE_GUIDE_URL,
   multiAgentSurfaceAdvisory,
   multiAgentSurfaceAdvisoryRequired,
   resolveMultiAgentMode,
-} from "../../src/config/multi-agent-surface";
-import { migrateXaiResponsesDefault } from "../../src/providers/xai-responses-opt-in";
-import { migrateStartupXaiResponses } from "../../src/server/xai-responses-startup";
-import { migrateZaiResponsesDefault } from "../../src/providers/zai-responses-migration";
-import { migrateStartupZaiResponses } from "../../src/server/zai-responses-startup";
-import * as configStore from "../../src/config";
-import { runRetiredCodexModelMigration, RETIRED_MODEL_MIGRATION_CUTOFF } from "../../src/codex/retired-model-migration";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
+} from "../../backend/src/config/multi-agent-surface";
+import { migrateXaiResponsesDefault } from "../../backend/src/providers/xai-responses-opt-in";
+import { migrateStartupXaiResponses } from "../../backend/src/server/xai-responses-startup";
+import { migrateZaiResponsesDefault } from "../../backend/src/providers/zai-responses-migration";
+import { migrateStartupZaiResponses } from "../../backend/src/server/zai-responses-startup";
+import * as configStore from "../../backend/src/config";
+import { runRetiredCodexModelMigration, RETIRED_MODEL_MIGRATION_CUTOFF } from "../../backend/src/codex/retired-model-migration";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 let testDir = "";
 const previousHome = process.env.OPENCODEX_HOME;

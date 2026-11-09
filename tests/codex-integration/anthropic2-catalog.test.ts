@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { writeFileSync } from "node:fs";
-import { setActiveAccount } from "../../src/oauth/store";
-import { observedModelsAuthResolver, fetchProviderModels } from "../../src/codex/catalog/provider-models";
-import { captureModelCacheGeneration, clearModelCache, getFreshCached, setCached } from "../../src/codex/model-cache";
-import type { CatalogGatherProviderAuthOutcome } from "../../src/codex/catalog/gather-capture";
-import type { OcxProviderConfig } from "../../src/types";
+import { setActiveAccount } from "../../backend/src/oauth/store";
+import { observedModelsAuthResolver, fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
+import { captureModelCacheGeneration, clearModelCache, getFreshCached, setCached } from "../../backend/src/codex/model-cache";
+import type { CatalogGatherProviderAuthOutcome } from "../../backend/src/codex/catalog/gather-capture";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 let home: TempHome;
 beforeEach(() => { home = createTempHome("ocx-anthropic2-catalog-"); clearModelCache(); });

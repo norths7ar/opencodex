@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { wrapWithZeroOutputRefetch } from "../../src/lib/upstream-retry";
+import { wrapWithZeroOutputRefetch } from "../../backend/src/lib/upstream-retry";
 
 function resetError(): Error {
   // Shape of Bun's fetch rejection on a stale pooled socket.

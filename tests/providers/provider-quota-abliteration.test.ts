@@ -12,10 +12,10 @@ import {
   fetchProviderQuotaReports,
   providerApiKeyQuotaMode,
   setProviderQuotaBeforePublishForTests,
-} from "../../src/providers/quota";
-import { parseAbliterationCredits } from "../../src/providers/quota/vendor-probes-key";
-import { AUTHORITATIVE_EMPTY_QUOTA } from "../../src/providers/quota/report-cache";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/quota";
+import { parseAbliterationCredits } from "../../backend/src/providers/quota/vendor-probes-key";
+import { AUTHORITATIVE_EMPTY_QUOTA } from "../../backend/src/providers/quota/report-cache";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 const previousOpencodexHome = process.env.OPENCODEX_HOME;

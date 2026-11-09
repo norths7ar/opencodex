@@ -2,14 +2,14 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { Window } from "../../gui/node_modules/happy-dom";
-import { createElement } from "../../gui/node_modules/react";
-import { renderToStaticMarkup } from "../../gui/node_modules/react-dom/server";
-import { DICTS, I18nContext, type TFn } from "../../gui/src/i18n/shared";
-import { StartupHeroSection } from "../../gui/src/pages/startup-sections";
-import { DashboardOverviewHead } from "../../gui/src/pages/dashboard-overview-head";
-import type { StartupHealthData } from "../../gui/src/pages/startup-shared";
-import { diagnoseMacDesktopStartup } from "../../src/service/desktop-startup";
+import { Window } from "../../frontend/node_modules/happy-dom";
+import { createElement } from "../../frontend/node_modules/react";
+import { renderToStaticMarkup } from "../../frontend/node_modules/react-dom/server";
+import { DICTS, I18nContext, type TFn } from "../../frontend/src/i18n/shared";
+import { StartupHeroSection } from "../../frontend/src/pages/startup-sections";
+import { DashboardOverviewHead } from "../../frontend/src/pages/dashboard-overview-head";
+import type { StartupHealthData } from "../../frontend/src/pages/startup-shared";
+import { diagnoseMacDesktopStartup } from "../../backend/src/service/desktop-startup";
 import { repoPath } from "../helpers/repo-root";
 import {
   PROJECT_CONFIG_DIAGNOSTICS_POLL_MS,
@@ -24,13 +24,13 @@ import {
   startupChecklistDone,
   startupPresentation,
   startupRiskDetailKey,
-} from "../../gui/src/startup-health-ui";
+} from "../../frontend/src/startup-health-ui";
 
 // Classic is a partial overlay: resolve its relative imports as Vite's classic overlay does.
-const classicRoot = repoPath("gui/classic/src");
-const sharedRoot = repoPath("gui/src");
+const classicRoot = repoPath("frontend/classic/src");
+const sharedRoot = repoPath("frontend/src");
 Bun.plugin({ name: "classic-test-overlay", setup(build) {
-  build.onLoad({ filter: /gui[\\/]classic[\\/]src[\\/].*\.tsx$/ }, ({ path }) => {
+  build.onLoad({ filter: /frontend[\\/]classic[\\/]src[\\/].*\.tsx$/ }, ({ path }) => {
     const contents = readFileSync(path, "utf8").replace(/(from\s+["'])(\.[^"']+)(["'])/g, (_match, prefix, specifier, quote) => {
       const shared = join(sharedRoot, path.slice(classicRoot.length + 1), "..", specifier);
       for (const suffix of [".ts", ".tsx", "/index.ts", "/index.tsx"]) {
@@ -74,8 +74,8 @@ describe("startup health UI decisions", () => {
       const main = wrap(createElement(DashboardOverviewHead, headProps));
       expect(main).toContain(DICTS.en["startup.summary.atRisk"]);
       expect(main).not.toContain(DICTS.en["startup.unverified"]);
-      const { DashboardOverviewHead: ClassicHead } = await import("../../gui/classic/src/pages/dashboard-overview-head");
-      const { StartupHeroSection: ClassicHero } = await import("../../gui/classic/src/pages/startup-sections");
+      const { DashboardOverviewHead: ClassicHead } = await import("../../frontend/classic/src/pages/dashboard-overview-head");
+      const { StartupHeroSection: ClassicHero } = await import("../../frontend/classic/src/pages/startup-sections");
       const window = new Window();
       const renderClassic = (health: StartupHealthData) => {
         const head = wrap(createElement(ClassicHead, { ...headProps, startupHealth: mapStartupHealthProbe(health),

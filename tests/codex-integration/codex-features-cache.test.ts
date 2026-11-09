@@ -7,11 +7,11 @@ import {
   MODE_HINT_CAPABILITY_CACHE_MAX_ENTRIES,
   modeHintCapabilityCache,
   probeCodexSupportsModeHint,
-} from "../../src/codex/features";
+} from "../../backend/src/codex/features";
 import {
   resetCodexRuntimeResolveCacheForTests,
   setCodexRuntimeResolveCacheForTests,
-} from "../../src/codex/runtime";
+} from "../../backend/src/codex/runtime";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

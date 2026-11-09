@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { clearCachedProviderQuotas, setCachedProviderQuotaForTests, replaceCachedProviderQuotas, providerQuotaRoutingBinding, type ProviderQuotaRoutingEvidence } from "../../src/providers/quota-routing-cache";
-import { quotaInactiveReason } from "../../src/providers/quota-exhaustion";
-import { buildCatalogEntries, CATALOG_INACTIVE_REASON_FIELD, deriveEntry } from "../../src/codex/catalog/sync";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import type { OcxConfig } from "../../src/types";
-import type { ProviderQuotaReport, ProviderQuota } from "../../src/providers/quota";
+import { clearCachedProviderQuotas, setCachedProviderQuotaForTests, replaceCachedProviderQuotas, providerQuotaRoutingBinding, type ProviderQuotaRoutingEvidence } from "../../backend/src/providers/quota-routing-cache";
+import { quotaInactiveReason } from "../../backend/src/providers/quota-exhaustion";
+import { buildCatalogEntries, CATALOG_INACTIVE_REASON_FIELD, deriveEntry } from "../../backend/src/codex/catalog/sync";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import type { OcxConfig } from "../../backend/src/types";
+import type { ProviderQuotaReport, ProviderQuota } from "../../backend/src/providers/quota";
 
 /**
  * Regression coverage for #1711 — zero-credit models and combos were still offered as ordinary

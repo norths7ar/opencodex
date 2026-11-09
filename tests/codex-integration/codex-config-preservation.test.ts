@@ -15,14 +15,14 @@ import {
   ensureRootWebSearchDisabled, ensureFastModeFeature, stripOpencodexCatalogPath,
   setRootModelCatalogPath,
   stripExistingModelProvider,
-} from "../../src/codex/inject/config-toml";
-import { stripOpencodexConfig } from "../../src/codex/inject/remove";
-import { deriveCodexInjectionPlan } from "../../src/codex/inject/plan";
-import { rootSourceLines, sourceAssignment, sourceAssignmentSpan } from "../../src/codex/toml-source-lines";
+} from "../../backend/src/codex/inject/config-toml";
+import { stripOpencodexConfig } from "../../backend/src/codex/inject/remove";
+import { deriveCodexInjectionPlan } from "../../backend/src/codex/inject/plan";
+import { rootSourceLines, sourceAssignment, sourceAssignmentSpan } from "../../backend/src/codex/toml-source-lines";
 import {
   hasInjectedOpenaiBaseUrl, OCX_ROUTING_MARKER_LINE, OCX_SECTION_MARKER,
   stripJournaledOpenaiBaseUrl,
-} from "../../src/codex/injected-marker";
+} from "../../backend/src/codex/injected-marker";
 
 const target = { baseUrl: "http://127.0.0.1:10100/v1", requiresAdmissionToken: false, tokenEnv: "OPENCODEX_API_AUTH_TOKEN" as const };
 const userUrl = "https://fixture.invalid/v1";

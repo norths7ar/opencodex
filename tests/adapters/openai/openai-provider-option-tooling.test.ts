@@ -6,7 +6,7 @@ import { evidenceDenyFindings, scanEvidence } from "../../../scripts/openai-prov
 import { runGateSequence, type GateResult, type GateSpec } from "../../../scripts/openai-provider-option-final-gates";
 import { evaluateLivePolicy, type LiveOutcome } from "../../../scripts/openai-hardening-live-policy";
 import { buildSanitizedRuntimeEnv } from "../../../scripts/openai-hardening-runtime-env";
-import { buildUnixCodexShim } from "../../../src/codex/shim";
+import { buildUnixCodexShim } from "../../../backend/src/codex/shim";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const roots: string[] = [];

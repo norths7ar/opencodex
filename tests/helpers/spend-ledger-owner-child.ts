@@ -1,11 +1,11 @@
 /** Real-process holder for spend-ledger single-writer tests. */
 import { existsSync, writeFileSync } from "node:fs";
-import { acquireSpendLedgerOwner, SpendLedgerOwnerError } from "../../src/lib/spend-ledger-owner";
+import { acquireSpendLedgerOwner, SpendLedgerOwnerError } from "../../backend/src/lib/spend-ledger-owner";
 import {
   configureSharedSpendLedger,
   sharedSpendLedger,
   type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 
 const payload = JSON.parse(process.env.OCX_SPEND_OWNER_CHILD ?? "{}") as {
   holdMarker?: string;

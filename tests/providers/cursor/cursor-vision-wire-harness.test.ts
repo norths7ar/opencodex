@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { fromBinary } from "@bufbuild/protobuf";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { CURSOR_VISION_IMAGE_HISTORY_MARKER } from "../../../src/adapters/cursor/images";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { CURSOR_VISION_IMAGE_HISTORY_MARKER } from "../../../backend/src/adapters/cursor/images";
 import {
   AgentClientMessageSchema,
   ConversationStepSchema,
   ConversationTurnStructureSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { handleCursorNativeKv, resetCursorBlobStateForTests } from "../../../src/adapters/cursor/native-exec";
-import { GetBlobArgsSchema, KvServerMessageSchema } from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { handleCursorNativeKv, resetCursorBlobStateForTests } from "../../../backend/src/adapters/cursor/native-exec";
+import { GetBlobArgsSchema, KvServerMessageSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import { create } from "@bufbuild/protobuf";
 
 function blobData(blobId: Uint8Array): Uint8Array {

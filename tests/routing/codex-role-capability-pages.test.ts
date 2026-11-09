@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
-import { fetchArtificialAnalysisTable, loadCapabilityTable, MAX_TABLE_BYTES, MAX_TABLE_PAGES } from "../../src/codex/role-capability";
-import type { OcxConfig } from "../../src/types";
+import { fetchArtificialAnalysisTable, loadCapabilityTable, MAX_TABLE_BYTES, MAX_TABLE_PAGES } from "../../backend/src/codex/role-capability";
+import type { OcxConfig } from "../../backend/src/types";
 
 const nativeFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = nativeFetch; });

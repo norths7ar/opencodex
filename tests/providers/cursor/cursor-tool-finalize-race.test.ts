@@ -4,10 +4,10 @@ import {
   clientToolFinalizeGraceMsForRequest,
   createLiveCursorTransport,
   shouldExtendForCheckpointCapture,
-} from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/live-transport";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import { createCursorProtobufEventState } from "../../../src/adapters/cursor/protobuf-events";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
+import { createCursorProtobufEventState } from "../../../backend/src/adapters/cursor/protobuf-events";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 import {
   AgentServerMessageSchema,
   ExecServerMessageSchema,
@@ -18,7 +18,7 @@ import {
   ToolCallCompletedUpdateSchema,
   ToolCallStartedUpdateSchema,
   InteractionUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 const PROVIDER = "opencodex-responses";
 

@@ -4,12 +4,12 @@ import {
   CURSOR_ULTRA_1M_MODEL_IDS,
   cursorUltraBaseModelId,
   filterCursorConfiguredModelsByLiveDiscovery,
-} from "../../../src/adapters/cursor/discovery";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
+} from "../../../backend/src/adapters/cursor/discovery";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
 import { fromBinary } from "@bufbuild/protobuf";
-import { AgentClientMessageSchema, type AgentRunRequest } from "../../../src/adapters/cursor/gen/agent_pb";
-import type { OcxParsedRequest } from "../../../src/types/request";
+import { AgentClientMessageSchema, type AgentRunRequest } from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { OcxParsedRequest } from "../../../backend/src/types/request";
 
 function decodeRunRequest(bytes: Uint8Array): AgentRunRequest {
   const msg = fromBinary(AgentClientMessageSchema, bytes);

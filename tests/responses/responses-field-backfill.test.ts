@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   createResponsesFieldBackfillBlockRewrite,
   backfillResponsesFieldsJson,
-} from "../../src/server/responses/responses-field-backfill";
+} from "../../backend/src/server/responses/responses-field-backfill";
 
 const rewrite = createResponsesFieldBackfillBlockRewrite();
 

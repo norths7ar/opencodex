@@ -45,7 +45,7 @@ const {
   pruneProjectContextCache,
   setCommandCodeFileOpTimeoutForTests,
   setCommandCodeBeforeOpenForTests,
-} = await import("../../src/adapters/command-code-project-context");
+} = await import("../../backend/src/adapters/command-code-project-context");
 
 const MAX_PROJECT_CONTEXT_CACHE_ENTRIES = 128;
 const PROJECT_CONTEXT_TTL_MS = 30_000;

@@ -15,7 +15,7 @@ import {
   relPath,
   readBoundedProjectConfig,
   resolveEffectiveProjectModelProvider,
-} from "../../src/codex/project-config-warnings";
+} from "../../backend/src/codex/project-config-warnings";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("relPath home containment (devlog 260715_cross_platform_audit/030)", () => {
@@ -343,7 +343,7 @@ describe("collectProjectCodexConfigWarnings", () => {
     if (process.platform === "win32") return;
     const fifo = join(testDir, "project-config-fifo");
     expect(spawnSync("mkfifo", [fifo]).status).toBe(0);
-    const moduleUrl = new URL("../../src/codex/project-config-warnings.ts", import.meta.url).href;
+    const moduleUrl = new URL("../../backend/src/codex/project-config-warnings.ts", import.meta.url).href;
     const script = `const { readBoundedProjectConfig } = await import(${JSON.stringify(moduleUrl)}); console.log(readBoundedProjectConfig(process.argv[1]));`;
     const child = spawnSync(process.execPath, ["--eval", script, fifo], { timeout: 3000, encoding: "utf8" });
     expect(child.error).toBeUndefined();

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { handleLogoutCommand, type LogoutCommandDeps } from "../../src/cli/logout-command";
+import { handleLogoutCommand, type LogoutCommandDeps } from "../../backend/src/cli/logout-command";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const SECRET = "synthetic-private-value";

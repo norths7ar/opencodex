@@ -3,17 +3,17 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getValidAccessTokenSnapshot, OAUTH_PROVIDERS, runLogin } from "../../../src/oauth";
-import { loginKiro, refreshKiroToken } from "../../../src/oauth/kiro";
+import { getValidAccessTokenSnapshot, OAUTH_PROVIDERS, runLogin } from "../../../backend/src/oauth";
+import { loginKiro, refreshKiroToken } from "../../../backend/src/oauth/kiro";
 import {
   inspectKiroCliSessionSnapshot,
   persistKiroCliSessionRecovery,
   readKiroCliSqliteCredential,
   restoreStaleKiroCliSessionRecovery,
-} from "../../../src/oauth/kiro-credentials";
-import { getAccountCredential, getAccountSet, saveCredential, saveCredentialWithReceipt, setActiveAccount } from "../../../src/oauth/store";
-import type { OAuthController, OAuthCredentials } from "../../../src/oauth/types";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/kiro-credentials";
+import { getAccountCredential, getAccountSet, saveCredential, saveCredentialWithReceipt, setActiveAccount } from "../../../backend/src/oauth/store";
+import type { OAuthController, OAuthCredentials } from "../../../backend/src/oauth/types";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const ENV_KEYS = [

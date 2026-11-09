@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { withInputMediaGuard } from "../../src/adapters/input-media-guard";
-import { createRegisteredAdapter } from "../../src/adapters/registry";
-import { parseRequest } from "../../src/responses/parser";
-import { untranslatedResponsesInputMedia } from "../../src/responses/input-media";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { withInputMediaGuard } from "../../backend/src/adapters/input-media-guard";
+import { createRegisteredAdapter } from "../../backend/src/adapters/registry";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { untranslatedResponsesInputMedia } from "../../backend/src/responses/input-media";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const AUDIO = { type: "input_audio", audio_url: "data:audio/wav;base64,YWJj" };

@@ -2,16 +2,16 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } fr
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { dispatchOllamaRoute, type OllamaRouteDeps } from "../../src/server/index/ollama-routes";
-import { resetLifecycleDrainStateForTests, setDraining } from "../../src/server/lifecycle";
-import { resetWorkflowBudgetsForTest } from "../../src/lib/workflow-budget";
-import type { NativeFinalLog, NativeFinalOutcome } from "../../src/server/native-final-log";
-import { bufferedOllama, streamOllama } from "../../src/server/ollama-inbound";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import { usageLogPath } from "../../src/usage/log";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { dispatchOllamaRoute, type OllamaRouteDeps } from "../../backend/src/server/index/ollama-routes";
+import { resetLifecycleDrainStateForTests, setDraining } from "../../backend/src/server/lifecycle";
+import { resetWorkflowBudgetsForTest } from "../../backend/src/lib/workflow-budget";
+import type { NativeFinalLog, NativeFinalOutcome } from "../../backend/src/server/native-final-log";
+import { bufferedOllama, streamOllama } from "../../backend/src/server/ollama-inbound";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import { usageLogPath } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // Dispatcher ownership: which refusals expose a request id, the timeout override, drain.

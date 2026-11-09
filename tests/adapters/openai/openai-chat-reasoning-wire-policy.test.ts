@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import {
   buildOpenAIChatPassthroughRequest,
   createOpenAIChatAdapter,
-} from "../../../src/adapters/openai-chat";
-import { chatCompletionsToResponsesBody } from "../../../src/chat/inbound";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/openai-chat";
+import { chatCompletionsToResponsesBody } from "../../../backend/src/chat/inbound";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "openai-chat",

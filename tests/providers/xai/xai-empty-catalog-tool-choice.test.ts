@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeXaiResponsesWebSearch } from "../../../src/adapters/xai-web-search";
+import { normalizeXaiResponsesWebSearch } from "../../../backend/src/adapters/xai-web-search";
 import {
   createGrokResponsesSparseTerminalBlockRewrite,
   GROK_FORBIDDEN_TOOL_CALL_REASON,
   GROK_REFUSED_TERMINAL_EVENT_TYPE,
   forbiddenToolCallMessage,
-} from "../../../src/server/grok-responses-snapshot-repair";
+} from "../../../backend/src/server/grok-responses-snapshot-repair";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const XAI_PROVIDER = { baseUrl: "https://api.x.ai/v1" };

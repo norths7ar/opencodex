@@ -2,12 +2,12 @@ import { mock } from "bun:test";
 import { mkdirSync, readFileSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import * as knownFolder from "../../src/codex/windows-local-appdata";
+import * as knownFolder from "../../backend/src/codex/windows-local-appdata";
 import {
   isTestHomeGuardArmed, protectedRemovalReason,
   protectedHomeForTests, protectedCodexHomeForTests,
   protectedClaudeConfigDirsForTests, protectedLaunchAgentsDirForTests,
-} from "../../src/lib/test-home-guard";
+} from "../../backend/src/lib/test-home-guard";
 import { FIXTURE_NAMESPACE_MARKER } from "./fixture-namespace-owner";
 
 // Match test-home-guard's nearest-existing-ancestor resolution for paths not created yet.
@@ -87,7 +87,7 @@ mkdirSync(localAppData, { recursive: true });
 
 // The production known-folder API deliberately ignores HOME/LOCALAPPDATA. Give fixture
 // children one shared private namespace while retaining the real SID, locks and ACL work.
-mock.module("../../src/codex/windows-local-appdata", () => ({
+mock.module("../../backend/src/codex/windows-local-appdata", () => ({
   ...knownFolder,
   resolveWindowsLocalAppData: () => localAppData,
 }));

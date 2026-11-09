@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { resolveOpenCodeGoTransport } from "../../src/providers/opencode-go-transport";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { handleResponses } from "../../src/server/responses/core";
-import { handleResponsesWithPolicyFallback, rankPolicyFallbackCandidates } from "../../src/server/responses/policy-fallback";
-import { getOrAllocateRequestSessionLane } from "../../src/server/request-log-conversation";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { resolveOpenCodeGoTransport } from "../../backend/src/providers/opencode-go-transport";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { handleResponsesWithPolicyFallback, rankPolicyFallbackCandidates } from "../../backend/src/server/responses/policy-fallback";
+import { getOrAllocateRequestSessionLane } from "../../backend/src/server/request-log-conversation";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const MUSE_MODEL = "muse-spark-1.3-contributor";

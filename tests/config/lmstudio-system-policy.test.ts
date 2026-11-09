@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { providerConfigSchema } from "../../src/config/schema/leaf-validators";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { routedProviderConfig } from "../../src/providers/routed-config";
-import { parseProviderEditorConfigDTO, providerEditorConfigDTO } from "../../src/server/auth-cors";
-import { applyProviderCompatPatchFields, carryProviderCompatFields, providerCompatFieldConfigError, sampleProviderOverwrite } from "../../src/server/management/provider-overwrite-carry";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { providerConfigSchema } from "../../backend/src/config/schema/leaf-validators";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../backend/src/providers/routed-config";
+import { parseProviderEditorConfigDTO, providerEditorConfigDTO } from "../../backend/src/server/auth-cors";
+import { applyProviderCompatPatchFields, carryProviderCompatFields, providerCompatFieldConfigError, sampleProviderOverwrite } from "../../backend/src/server/management/provider-overwrite-carry";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const local: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "http://localhost:1234/v1", authMode: "local" };
 

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { parseRequest } from "../../src/responses/parser";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const call = { type: "custom_tool_call", call_id: "call_history", name: "exec", input: "text(1)" };

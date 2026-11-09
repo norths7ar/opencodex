@@ -2,17 +2,17 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { assertSelectedRuntimeWritable, RuntimePreflightError, type RuntimePreflightReason } from "../../src/lib/bun-runtime-preflight";
-import { durableBunRuntime, BUN_RUNTIME_PATH_ENV, BUN_RUNTIME_SOURCE_ENV, type DurableBunRuntime } from "../../src/lib/bun-runtime";
-import { installServiceSafely, installFreshWindowsSchedulerSafely, platformOps } from "../../src/service/orchestration";
-import { installWindows, installWindowsNative, type WindowsServiceInstallDeps } from "../../src/service/windows-ops";
-import { repairService } from "../../src/service/repair";
-import { cliEntry, writeServiceInstallState } from "../../src/service/state";
-import { buildWindowsServiceScript } from "../../src/service/windows-taskxml";
-import { defaultWinswEntry } from "../../src/lib/winsw";
-import { recordOwnedConfigPath, CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST } from "../../src/lib/config-ownership";
-import type { ServiceDiagnostic } from "../../src/service/diagnostics";
-import { windowsEnvIndirectBatchValue } from "../../src/lib/win-paths";
+import { assertSelectedRuntimeWritable, RuntimePreflightError, type RuntimePreflightReason } from "../../backend/src/lib/bun-runtime-preflight";
+import { durableBunRuntime, BUN_RUNTIME_PATH_ENV, BUN_RUNTIME_SOURCE_ENV, type DurableBunRuntime } from "../../backend/src/lib/bun-runtime";
+import { installServiceSafely, installFreshWindowsSchedulerSafely, platformOps } from "../../backend/src/service/orchestration";
+import { installWindows, installWindowsNative, type WindowsServiceInstallDeps } from "../../backend/src/service/windows-ops";
+import { repairService } from "../../backend/src/service/repair";
+import { cliEntry, writeServiceInstallState } from "../../backend/src/service/state";
+import { buildWindowsServiceScript } from "../../backend/src/service/windows-taskxml";
+import { defaultWinswEntry } from "../../backend/src/lib/winsw";
+import { recordOwnedConfigPath, CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST } from "../../backend/src/lib/config-ownership";
+import type { ServiceDiagnostic } from "../../backend/src/service/diagnostics";
+import { windowsEnvIndirectBatchValue } from "../../backend/src/lib/win-paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -279,10 +279,10 @@ describe("service selected-runtime admission", () => {
   });
 
   test("preflight stays outside cliEntry and CLI reports refusal as exit 1", () => {
-    const state = readFileSync(repoPath("src/service/state.ts"), "utf8");
+    const state = readFileSync(repoPath("backend/src/service/state.ts"), "utf8");
     const entry = state.slice(state.indexOf("export function cliEntry("), state.indexOf("export function serviceLauncherPathDiagnostic"));
     expect(entry).not.toContain("assertSelectedRuntimeWritable");
-    const cli = readFileSync(repoPath("src/service/cli.ts"), "utf8");
+    const cli = readFileSync(repoPath("backend/src/service/cli.ts"), "utf8");
     expect(cli).toContain("process.exitCode = 1");
   });
 });

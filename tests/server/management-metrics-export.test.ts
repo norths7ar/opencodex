@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../src/config/diagnostics";
-import { metricsExportEnabled } from "../../src/config/feature-flags";
-import { getDefaultConfig } from "../../src/config/proxy-env";
-import * as audioUpstream from "../../src/server/audio-upstream";
-import { MAX_ACTIVE_SESSION_LANES, tryAdmitTurn } from "../../src/server/lifecycle";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { requireManagementAuth, type ManagementAuthState } from "../../src/server/management-auth";
+import { saveConfig } from "../../backend/src/config";
+import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../backend/src/config/diagnostics";
+import { metricsExportEnabled } from "../../backend/src/config/feature-flags";
+import { getDefaultConfig } from "../../backend/src/config/proxy-env";
+import * as audioUpstream from "../../backend/src/server/audio-upstream";
+import { MAX_ACTIVE_SESSION_LANES, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { requireManagementAuth, type ManagementAuthState } from "../../backend/src/server/management-auth";
 import {
   addFinalRequestLog,
   observeRequestLogsForTests,
   type RequestLogContext,
   type RequestLogEntry,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 import {
   createRequestMetricsOwner,
   REQUEST_DURATION_BUCKETS_SECONDS,
@@ -24,10 +24,10 @@ import {
   REQUEST_METRICS_FAILURE_CAUSES,
   REQUEST_METRICS_RESULTS,
   REQUEST_TTFT_BUCKETS_SECONDS,
-} from "../../src/server/request-metrics";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
-import type { AttemptRecoveryKind } from "../../src/usage/log";
+} from "../../backend/src/server/request-metrics";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
+import type { AttemptRecoveryKind } from "../../backend/src/usage/log";
 import { ManagementRequest } from "../helpers/management-auth";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -538,19 +538,19 @@ describe("metrics management boundary", () => {
 
   test("the metrics modules contain no timer, listener, network, or module-global owner", () => {
     const source = [
-      readFileSync(repoPath("src/server/request-metrics.ts"), "utf8"),
-      readFileSync(repoPath("src/server/management/metrics-routes.ts"), "utf8"),
+      readFileSync(repoPath("backend/src/server/request-metrics.ts"), "utf8"),
+      readFileSync(repoPath("backend/src/server/management/metrics-routes.ts"), "utf8"),
     ].join("\n");
     for (const forbidden of ["setInterval(", "setTimeout(", "Bun.serve(", ".listen(", "fetch("]) {
       expect(source).not.toContain(forbidden);
     }
     expect(source).not.toMatch(/(?:let|const)\s+activeRequestMetrics/);
-    const composition = readFileSync(repoPath("src/server/index/serve-options.ts"), "utf8");
+    const composition = readFileSync(repoPath("backend/src/server/index/serve-options.ts"), "utf8");
     expect(composition).toContain("metricsExportEnabled(config)");
     expect(composition).toContain("createRequestMetricsOwner(Date.now() / 1000, cachedKiroQuotaMetricRows)");
     expect(composition).toContain("requestMetrics ? { requestMetricsRecorder: requestMetrics } : {}");
     expect(composition).toContain("createWebsocketHandler(ctx, requestMetrics)");
-    expect(readFileSync(repoPath("src/server/index/websocket-handler.ts"), "utf8"))
+    expect(readFileSync(repoPath("backend/src/server/index/websocket-handler.ts"), "utf8"))
       .toContain("requestMetricsRecorder ? { requestMetricsRecorder } : {}");
   });
 });

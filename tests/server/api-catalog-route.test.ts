@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { loadConfig, saveConfig } from "../../src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { loadConfig, saveConfig } from "../../backend/src/config";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { ManagementRequest, managementHeaders } from "../helpers/management-auth";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { ManagementModelRow } from "../../src/server/management/model-rows";
-import type { KiloGeneratedConfig, OpencodeGeneratedConfig } from "../../src/clients/config-export";
+import type { ManagementModelRow } from "../../backend/src/server/management/model-rows";
+import type { KiloGeneratedConfig, OpencodeGeneratedConfig } from "../../backend/src/clients/config-export";
 
 const TEST_DIR = join(import.meta.dir, `.tmp-api-catalog-route-${process.pid}`);
 const previousOpencodexHome = process.env.OPENCODEX_HOME;
@@ -130,7 +130,7 @@ test("static Xiaomi MiMo capability truth, client exports and endpoint thinking 
     }
     return Response.json({ data: [] });
   });
-  let server: ReturnType<typeof import("../../src/server").startServer> | undefined;
+  let server: ReturnType<typeof import("../../backend/src/server").startServer> | undefined;
   try {
     saveConfig({
       port: 0, hostname: "127.0.0.1", defaultProvider: "xiaomi-mimo", fastRows: false,
@@ -139,7 +139,7 @@ test("static Xiaomi MiMo capability truth, client exports and endpoint thinking 
         apiKey: "test-only-mimo-key", authMode: "key", liveModels: false, models: ids,
       } },
     } as OcxConfig);
-    const { startServer } = await import("../../src/server");
+    const { startServer } = await import("../../backend/src/server");
     server = startServer(0);
     const publicResponse = await realFetch(new URL("/v1/models", server.url));
     expect(publicResponse.status).toBe(200);
@@ -256,7 +256,7 @@ describe("GET|HEAD /v1/catalog least-privilege data-plane route (#809)", () => {
     writeFileSync(join(isolatedCodexHome.path, "opencodex-catalog.json"), JSON.stringify(catalogFixture));
     saveConfig(dataPlaneConfig());
 
-    const { startServer } = await import("../../src/server");
+    const { startServer } = await import("../../backend/src/server");
     const server = startServer(0);
     try {
       const res = await fetch(new URL("/v1/catalog", server.url), {
@@ -312,7 +312,7 @@ describe("GET|HEAD /v1/catalog least-privilege data-plane route (#809)", () => {
     writeFileSync(join(isolatedCodexHome.path, "opencodex-catalog.json"), JSON.stringify(catalogFixture));
     saveConfig(dataPlaneConfig());
 
-    const { startServer } = await import("../../src/server");
+    const { startServer } = await import("../../backend/src/server");
     const server = startServer(0);
     try {
       const anonymous = await fetch(new URL("/v1/catalog", server.url));
@@ -365,7 +365,7 @@ describe("GET|HEAD /v1/catalog least-privilege data-plane route (#809)", () => {
     writeFileSync(join(isolatedCodexHome.path, "opencodex-catalog.json"), JSON.stringify(big));
     saveConfig(dataPlaneConfig());
 
-    const { serializePersistedCatalog, MAX_REMOTE_CATALOG_BYTES } = await import("../../src/server/catalog-download");
+    const { serializePersistedCatalog, MAX_REMOTE_CATALOG_BYTES } = await import("../../backend/src/server/catalog-download");
     const serialized = await serializePersistedCatalog();
     expect(serialized.body).not.toBeNull();
     expect(serialized.bytes!).toBeGreaterThan(32 * 1024 * 1024);
@@ -385,7 +385,7 @@ describe("GET|HEAD /v1/catalog least-privilege data-plane route (#809)", () => {
     isolatedCodexHome = installIsolatedCodexHome("ocx-v1-catalog-missing-");
     saveConfig(dataPlaneConfig());
 
-    const { startServer } = await import("../../src/server");
+    const { startServer } = await import("../../backend/src/server");
     const server = startServer(0);
     try {
       const res = await fetch(new URL("/v1/catalog", server.url), {

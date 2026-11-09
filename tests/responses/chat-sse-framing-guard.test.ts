@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

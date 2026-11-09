@@ -3,7 +3,7 @@ import {
   buildApiAccessEndpoints,
   formatAuthorityHost,
   resolveApiAccessBaseUrl,
-} from "../../src/server/management/api-access";
+} from "../../backend/src/server/management/api-access";
 
 describe("buildApiAccessEndpoints", () => {
   test("builds the external gateway URLs from hostname and port", () => {

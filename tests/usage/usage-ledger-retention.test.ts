@@ -3,12 +3,12 @@ import { appendFileSync, mkdirSync, mkdtempSync, readFileSync, renameSync, statS
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { enforceUsageLedgerSizeLimit } from "../../src/usage/ledger-retention";
+import { enforceUsageLedgerSizeLimit } from "../../backend/src/usage/ledger-retention";
 import {
   MIN_USAGE_LEDGER_MAX_BYTES,
   USAGE_LEDGER_RETENTION_TARGET_RATIO,
-} from "../../src/usage/retention-contract";
-import { usageLogPath } from "../../src/usage/log";
+} from "../../backend/src/usage/retention-contract";
+import { usageLogPath } from "../../backend/src/usage/log";
 
 let home: string;
 let previousHome: string | undefined;

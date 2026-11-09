@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { codexWsUpstreamFetch } from "../../src/server/responses/ws-upstream";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import { CodexPoolAccountCreditsOffError, CodexReserveHelperUnsupportedError, CodexReserveUnavailableError, createCodexAuthDispatchGuard, createCodexReserveDispatchGuard } from "../../src/codex/auth-context";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearCodexUpstreamHealthForAccount } from "../../src/codex/routing";
-import { clearMainAccountInfoCache, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
-import { getMainReserveAuthorization, isMainReserveAuthorizationLive } from "../../src/codex/reserve-availability";
-import type { OcxProviderConfig } from "../../src/types";
+import { codexWsUpstreamFetch } from "../../backend/src/server/responses/ws-upstream";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { CodexPoolAccountCreditsOffError, CodexReserveHelperUnsupportedError, CodexReserveUnavailableError, createCodexAuthDispatchGuard, createCodexReserveDispatchGuard } from "../../backend/src/codex/auth-context";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearCodexUpstreamHealthForAccount } from "../../backend/src/codex/routing";
+import { clearMainAccountInfoCache, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
+import { getMainReserveAuthorization, isMainReserveAuthorizationLive } from "../../backend/src/codex/reserve-availability";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const URL = "https://chatgpt.com/backend-api/codex/responses";
 const realWebSocket = globalThis.WebSocket;

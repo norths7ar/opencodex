@@ -15,15 +15,15 @@ import {
   readPickerDefaultModel,
   rootSkipPermissionsNotice,
   shouldAllowRootSkipPermissions,
-} from "../../src/cli/claude";
-import { buildClaudeContextWindows } from "../../src/claude/context-windows";
-import { buildDesktop3pRegistry, legacyDesktop3pAlias } from "../../src/claude/desktop-3p";
-import { commandInvocation } from "../../src/lib/win-exec";
+} from "../../backend/src/cli/claude";
+import { buildClaudeContextWindows } from "../../backend/src/claude/context-windows";
+import { buildDesktop3pRegistry, legacyDesktop3pAlias } from "../../backend/src/claude/desktop-3p";
+import { commandInvocation } from "../../backend/src/lib/win-exec";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { LivenessIo, LiveProxy } from "../../src/server/proxy-liveness";
-import type { OcxConfig } from "../../src/types";
+import type { LivenessIo, LiveProxy } from "../../backend/src/server/proxy-liveness";
+import type { OcxConfig } from "../../backend/src/types";
 
 function cfg(extra?: Partial<OcxConfig>): OcxConfig {
   return {

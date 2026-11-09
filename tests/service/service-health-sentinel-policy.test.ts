@@ -6,7 +6,7 @@ import {
   recentRecoveryCount,
   requiredUnhealthySpan,
   type HealthProbeOutcome,
-} from "../../src/service/health-sentinel-policy";
+} from "../../backend/src/service/health-sentinel-policy";
 
 const TARGET = 4242;
 const T = DEFAULT_HEALTH_SENTINEL_TIMING;

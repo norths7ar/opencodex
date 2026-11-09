@@ -7,14 +7,14 @@ import {
   getReasoningReplayOpaqueBlobRejection, nativeReasoningTag,
   peekReasoningForCall, reasoningReplayServingIdentityChanged,
   rememberReasoningForCall, rememberReasoningReplayOpaqueBlobRejection,
-} from "../../src/responses/reasoning-replay-cache";
-import { parseRequest } from "../../src/responses/parser";
-import { resetThoughtSignatureReplayForTests } from "../../src/responses/thought-signature-replay";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { resetThoughtSignatureReplayForTests } from "../../backend/src/responses/thought-signature-replay";
 import { bindRouteReasoningReplayScope, mandatoryResponsesReasoningReplayUnavailable,
-  nativeReasoningOwnerForRoute } from "../../src/server/responses/core-replay";
-import { handleResponses } from "../../src/server/responses/core";
-import { resolveResponsesApiAuth } from "../../src/server/auth-cors";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+  nativeReasoningOwnerForRoute } from "../../backend/src/server/responses/core-replay";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { resolveResponsesApiAuth } from "../../backend/src/server/auth-cors";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

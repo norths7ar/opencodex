@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
   hasResponsesItemIdRepair,
   relaySseWithResponsesItemIdRepair as relaySseWithResponsesItemIdRepairProduction,
-} from "../../src/server/responses-item-id-repair";
-import { finalizeTranslatorBudgetResponse } from "../../src/lib/translator-budget";
+} from "../../backend/src/server/responses-item-id-repair";
+import { finalizeTranslatorBudgetResponse } from "../../backend/src/lib/translator-budget";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function relaySseWithResponsesItemIdRepair(

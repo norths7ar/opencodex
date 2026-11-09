@@ -14,12 +14,12 @@ import { pathToFileURL } from "node:url";
 
 import { Database } from "bun:sqlite";
 
-import { openCodexCoordinatorTransaction } from "../../src/codex/transition-state";
+import { openCodexCoordinatorTransaction } from "../../backend/src/codex/transition-state";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
-import { WINDOWS_PRINCIPAL_LOOKUP_TIMEOUT_MS } from "../../src/lib/windows-user-principal";
+} from "../../backend/src/codex/user-identity";
+import { WINDOWS_PRINCIPAL_LOOKUP_TIMEOUT_MS } from "../../backend/src/lib/windows-user-principal";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { repoPath } from "../helpers/repo-root";
 
@@ -30,10 +30,10 @@ const CHILD_TIMEOUT_MS = watchdogMs(process.platform === "win32"
   ? 2 * WINDOWS_PRINCIPAL_LOOKUP_TIMEOUT_MS + 5_000
   : 10_000);
 const transitionStateModuleUrl = pathToFileURL(
-  repoPath("src", "codex", "transition-state.ts"),
+  repoPath("backend/src", "codex", "transition-state.ts"),
 ).href;
 const userIdentityModuleUrl = pathToFileURL(
-  repoPath("src", "codex", "user-identity.ts"),
+  repoPath("backend/src", "codex", "user-identity.ts"),
 ).href;
 
 const transitionProbe = `

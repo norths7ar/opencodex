@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { autoRestoreCodexShim, diagnoseCodexShim, installCodexShim, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../src/codex/shim";
-import { tryAcquireShimRestoreLock } from "../../src/codex/shim-restore-lock";
+import { autoRestoreCodexShim, diagnoseCodexShim, installCodexShim, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../backend/src/codex/shim";
+import { tryAcquireShimRestoreLock } from "../../backend/src/codex/shim-restore-lock";
 
 function fixture(run: (f: { root: string; home: string; native: string; wrapper: string; envFile: string; statePath: string }) => void): void {
   const root = fs.mkdtempSync(join(tmpdir(), "ocx-overlay-transaction-"));

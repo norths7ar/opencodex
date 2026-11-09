@@ -11,9 +11,9 @@ import {
   RemoteCatalogError,
   validateRemoteCatalogDocument,
   validateRemoteCatalogUrl,
-} from "../../src/codex/catalog/remote";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
-import { withCatalogWriteSerialization } from "../../src/codex/catalog-write-serialization";
+} from "../../backend/src/codex/catalog/remote";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
+import { withCatalogWriteSerialization } from "../../backend/src/codex/catalog-write-serialization";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -55,7 +55,7 @@ async function withProxyEnv(env: Record<string, string>, action: () => Promise<v
 
 // Absolute filesystem path, not a file:// href: the warm-up's import scan keeps specifiers
 // that are absolute paths, and the spawned --eval children resolve either form identically.
-const remoteModule = fileURLToPath(new URL("../../src/codex/catalog/remote.ts", import.meta.url));
+const remoteModule = fileURLToPath(new URL("../../backend/src/codex/catalog/remote.ts", import.meta.url));
 
 // The module graph this file's real-Bun transport children load.
 const REMOTE_TRANSPORT_EVAL_SCRIPT = `
@@ -469,7 +469,7 @@ describe("remote catalog coordinated installation", () => {
 
 describe("catalog pull CLI envelope", () => {
   test("emits a stable JSON failure without reflecting the secret environment value", async () => {
-    const { handleCatalogCommand } = await import("../../src/cli/catalog");
+    const { handleCatalogCommand } = await import("../../backend/src/cli/catalog");
     const old = process.env.OCX_CATALOG_TEST_TOKEN;
     process.env.OCX_CATALOG_TEST_TOKEN = "secret-cli-marker";
     const output: string[] = [];

@@ -1,10 +1,10 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { buildCatalogEntries } from "../../src/codex/catalog";
-import { CURSOR_NO_VISION_MODELS } from "../../src/adapters/cursor/discovery";
-import { getModelMetadata, resolveMetadataProvider } from "../../src/generated/model-metadata";
-import { buildInitProviders } from "../../src/cli/init";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
-import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS, validateApiKey } from "../../src/oauth/key-providers";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { CURSOR_NO_VISION_MODELS } from "../../backend/src/adapters/cursor/discovery";
+import { getModelMetadata, resolveMetadataProvider } from "../../backend/src/generated/model-metadata";
+import { buildInitProviders } from "../../backend/src/cli/init";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS, validateApiKey } from "../../backend/src/oauth/key-providers";
 import {
   deriveFeaturedProviderIds,
   deriveInitProviders,
@@ -13,23 +13,23 @@ import {
   deriveProviderPresets,
   enrichProviderFromRegistry,
   providerConfigSeed,
-} from "../../src/providers/derive";
-import { PROVIDER_REGISTRY, registryEntryForProviderDestination } from "../../src/providers/registry";
+} from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY, registryEntryForProviderDestination } from "../../backend/src/providers/registry";
 import {
   REGISTRY_FIELD_MODEL_ID_ROLES,
   registryModelIdKeys,
-} from "../../src/providers/registry/model-ids";
-import type { ProviderRegistryEntry } from "../../src/providers/registry/types";
-import { META_MODEL_API_MODELS } from "../../src/providers/registry/model-seeds";
-import { FREE_PROVIDER_DIRECTORY } from "../../src/providers/free-directory";
-import { applyProviderConfigHints } from "../../src/codex/catalog";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { AdapterRequest } from "../../src/adapters/base";
-import { configuredReasoningEfforts, REASONING_EFFORT_OMIT_SENTINEL } from "../../src/reasoning-effort";
-import { routeModel } from "../../src/router";
-import { resolveAdapter } from "../../src/server";
-import { isModelVisionSidecarConsumer } from "../../src/vision/eligibility";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/registry/model-ids";
+import type { ProviderRegistryEntry } from "../../backend/src/providers/registry/types";
+import { META_MODEL_API_MODELS } from "../../backend/src/providers/registry/model-seeds";
+import { FREE_PROVIDER_DIRECTORY } from "../../backend/src/providers/free-directory";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
+import { configuredReasoningEfforts, REASONING_EFFORT_OMIT_SENTINEL } from "../../backend/src/reasoning-effort";
+import { routeModel } from "../../backend/src/router";
+import { resolveAdapter } from "../../backend/src/server";
+import { isModelVisionSidecarConsumer } from "../../backend/src/vision/eligibility";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 function nativeTemplate(): Record<string, unknown> {
   return {
@@ -1240,7 +1240,7 @@ describe("provider registry parity", () => {
   });
 
   test("freeTier propagates through config seed, enrich backfill, and presets without overwriting user config", async () => {
-    const { enrichProviderFromRegistry } = await import("../../src/providers/derive");
+    const { enrichProviderFromRegistry } = await import("../../backend/src/providers/derive");
     const nvidia = PROVIDER_REGISTRY.find(entry => entry.id === "nvidia")!;
 
     // Seed propagation.

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import type { ResponsesTerminalRepairPolicy } from "../../src/providers/registry";
-import { relaySseWithFailedTail } from "../../src/server/relay";
+import type { ResponsesTerminalRepairPolicy } from "../../backend/src/providers/registry";
+import { relaySseWithFailedTail } from "../../backend/src/server/relay";
 import {
   relayResponsesSseWithTerminalRepair,
   type ResponsesTerminalRepairScheduler,
-} from "../../src/server/responses-terminal-repair";
+} from "../../backend/src/server/responses-terminal-repair";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const encoder = new TextEncoder();

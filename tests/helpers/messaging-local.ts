@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { writeTestTempOwner } from "../../scripts/test-temp";
-import { localDaemonEndpoint } from "../../src/messaging/socket";
+import { localDaemonEndpoint } from "../../backend/src/messaging/socket";
 import { removeTreeWithRetry } from "./remove-tree";
 
 export const LOCAL_TARGET = "00000000-0000-4000-8000-000000000002";

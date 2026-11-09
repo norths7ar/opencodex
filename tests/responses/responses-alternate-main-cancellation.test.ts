@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountNeedsReauth, clearAccountQuota, clearMainAccountInfoCache } from "../../src/codex/auth-api";
-import { isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { resolveCodexAuthContext } from "../../src/codex/auth-context";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { codexCredentialMutationEpoch } from "../../src/codex/credential-mutation-epoch";
-import { isMainAccountRefreshGrantRejected, MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../src/codex/main-account";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { createTranslatorBudget, type TranslatorBudget } from "../../src/lib/translator-budget";
-import { parseRequest } from "../../src/responses/parser";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { codexAccountSelectionForTurn, tryAdmitTurn } from "../../src/server/lifecycle";
-import { retryCodexPoolOnAlternateAccount } from "../../src/server/responses/core-codex-account";
-import type { OcxConfig } from "../../src/types";
+import { clearAccountNeedsReauth, clearAccountQuota, clearMainAccountInfoCache } from "../../backend/src/codex/auth-api";
+import { isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { resolveCodexAuthContext } from "../../backend/src/codex/auth-context";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { codexCredentialMutationEpoch } from "../../backend/src/codex/credential-mutation-epoch";
+import { isMainAccountRefreshGrantRejected, MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { createTranslatorBudget, type TranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { codexAccountSelectionForTurn, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { retryCodexPoolOnAlternateAccount } from "../../backend/src/server/responses/core-codex-account";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/agent-task-recovery";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -253,8 +253,8 @@ for (const entry of ["retry helper", "messages ingress"] as const) {
 }
 
 test.each([false, true])("caller-owned retry from Pool to main scrubs continuation (affinity=%s)", async enabled => {
-  const { rememberServingConversationStateIssuer, conversationStateBindingFromAuth, applyAccountChangeConversationStateScrub } = await import("../../src/server/responses/account-change-state");
-  const { peekConversationStateIssuer } = await import("../../src/codex/routing/thread-affinity");
+  const { rememberServingConversationStateIssuer, conversationStateBindingFromAuth, applyAccountChangeConversationStateScrub } = await import("../../backend/src/server/responses/account-change-state");
+  const { peekConversationStateIssuer } = await import("../../backend/src/codex/routing/thread-affinity");
   const bearer = fakeChatGptJwt("fixture-caller", { exp: 4_000_000_000 });
   const headers = new Headers({ authorization: `Bearer ${bearer}`, "session-id": "session", "thread-id": "thread" });
   config.codexPool = { requestOwnedAffinity: enabled };
@@ -302,10 +302,10 @@ test.each([false, true])("caller-owned retry from Pool to main scrubs continuati
 });
 
 test("regular Responses scrubs retained issuer on a manual main pin and on return to Pool", async () => {
-  const { rememberServingConversationStateIssuer } = await import("../../src/server/responses/account-change-state");
-  const { forgetRuntimeActiveCodexAccount, resetCodexRoutingForManualSelection } = await import("../../src/codex/routing/active-account");
-  const { handleResponses } = await import("../../src/server/responses");
-  const { rememberResponseState, clearResponseStateForTests } = await import("../../src/responses/state");
+  const { rememberServingConversationStateIssuer } = await import("../../backend/src/server/responses/account-change-state");
+  const { forgetRuntimeActiveCodexAccount, resetCodexRoutingForManualSelection } = await import("../../backend/src/codex/routing/active-account");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { rememberResponseState, clearResponseStateForTests } = await import("../../backend/src/responses/state");
   const bearer = fakeChatGptJwt("fixture-pin-caller", { exp: 4_000_000_000 });
   const headers = new Headers({ authorization: `Bearer ${bearer}`, "content-type": "application/json", "session-id": "session", "thread-id": "thread" });
   config.codexPool = { requestOwnedAffinity: true }; config.pausedCodexAccountIds = [MAIN_CODEX_ACCOUNT_ID];
@@ -339,9 +339,9 @@ test("regular Responses scrubs retained issuer on a manual main pin and on retur
 });
 
 test.each([429, 503])("caller-owned Responses main quota refusal %s releases only its conversation binding", async refusalStatus => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
-  const { getCodexQuotaHealthSnapshot } = await import("../../src/codex/routing");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+  const { getCodexQuotaHealthSnapshot } = await import("../../backend/src/codex/routing");
   const headers = new Headers({ authorization: `Bearer ${fakeChatGptJwt("owned-responses-failure")}`, "content-type": "application/json", "session-id": "s", "thread-id": "t" });
   config.codexPool = { requestOwnedAffinity: true }; config.pausedCodexAccountIds = [POOL_ID];
   config.accountPoolStrategy = "round-robin"; config.accountPoolStickyLimit = 1;
@@ -369,8 +369,8 @@ test.each([429, 503])("caller-owned Responses main quota refusal %s releases onl
 });
 
 test("websocket terminal recorder releases a caller-owned main binding on quota refusal", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
   const headers = new Headers({ authorization: `Bearer ${fakeChatGptJwt("owned-ws-failure")}`, "content-type": "application/json", "session-id": "s", "thread-id": "t" });
   config.codexPool = { requestOwnedAffinity: true }; config.pausedCodexAccountIds = [POOL_ID];
   config.accountPoolStrategy = "round-robin"; config.accountPoolStickyLimit = 1;
@@ -393,8 +393,8 @@ test("websocket terminal recorder releases a caller-owned main binding on quota 
 });
 
 test("unkeyed caller-main 5xx does not inspect quota response body", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const account = await import("../../src/server/responses/core-codex-account");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const account = await import("../../backend/src/server/responses/core-codex-account");
   const { spyOn } = await import("bun:test");
   const headers = new Headers({ authorization: `Bearer ${fakeChatGptJwt("unkeyed-inspection")}`, "content-type": "application/json" });
   config.pausedCodexAccountIds = [POOL_ID];

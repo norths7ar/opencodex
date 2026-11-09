@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildUnit } from "../../src/service/systemd";
-import { inspectServiceManagerInstallation, type ProbeRunner } from "../../src/service-manager-probe";
-import { inspectNativeCodexOwnership } from "../../src/integrations/native/ownership-preflight";
+import { buildUnit } from "../../backend/src/service/systemd";
+import { inspectServiceManagerInstallation, type ProbeRunner } from "../../backend/src/service-manager-probe";
+import { inspectNativeCodexOwnership } from "../../backend/src/integrations/native/ownership-preflight";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const envKeys = ["CODEX_HOME", "OPENCODEX_HOME", "CODEX_SQLITE_HOME", "XDG_CONFIG_HOME", "XDG_DATA_HOME"] as const;

@@ -1,25 +1,25 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import { bridgeToResponsesSSE, buildResponseJSON, formatErrorResponse } from "../../src/bridge";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import { bridgeToResponsesSSE, buildResponseJSON, formatErrorResponse } from "../../backend/src/bridge";
 import {
   chatCompletionsErrorBody,
   chatCompletionsErrorResponse,
   responsesSseToChatCompletionsSse as responsesSseToChatCompletionsSseProduction,
-} from "../../src/chat/outbound";
-import { candidateFailureDecision } from "../../src/routing/candidate-failure";
+} from "../../backend/src/chat/outbound";
+import { candidateFailureDecision } from "../../backend/src/routing/candidate-failure";
 import {
   adapterFailureFromMessage,
   classifyError,
   CYBER_POLICY_ERROR_CODE,
   CYBER_POLICY_FALLBACK_MESSAGE,
   httpStatusFromTerminalError,
-} from "../../src/lib/errors";
-import { formatPassthroughUpstreamError } from "../../src/server/responses/passthrough-error";
-import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
-import { handleResponses } from "../../src/server/responses";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/errors";
+import { formatPassthroughUpstreamError } from "../../backend/src/server/responses/passthrough-error";
+import { consumeRecoveryFailure } from "../../backend/src/server/responses/recovery-failure";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { isNonReplayableResponse, markResponseNonReplayable } from "../../src/lib/upstream-retry";
+import { isNonReplayableResponse, markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

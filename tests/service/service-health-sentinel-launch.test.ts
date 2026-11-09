@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
-import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../src/config/diagnostics";
-import { serviceHealthRecoveryEnabled } from "../../src/config/feature-flags";
-import { getDefaultConfig } from "../../src/config/proxy-env";
+import { configDiagnosticsFromRaw, validateConfigCandidate } from "../../backend/src/config/diagnostics";
+import { serviceHealthRecoveryEnabled } from "../../backend/src/config/feature-flags";
+import { getDefaultConfig } from "../../backend/src/config/proxy-env";
 import {
   HEALTH_SENTINEL_STANDALONE_ARG,
   decideHealthSentinelLaunch,
@@ -11,10 +11,10 @@ import {
   recentRecoveryNotice,
   startServiceHealthSentinel,
   stopServiceHealthSentinel,
-} from "../../src/service/health-sentinel-launch";
-import { HEALTH_SENTINEL_ENV } from "../../src/service/health-sentinel-main";
-import { resetOptionalShutdownHooksForTests, runDrainStartHooks } from "../../src/lib/optional-shutdown-hooks";
-import { WINDOWS_WRAPPER_STAY_OUT_EXIT_CODE } from "../../src/service/windows-wrapper-exit";
+} from "../../backend/src/service/health-sentinel-launch";
+import { HEALTH_SENTINEL_ENV } from "../../backend/src/service/health-sentinel-main";
+import { resetOptionalShutdownHooksForTests, runDrainStartHooks } from "../../backend/src/lib/optional-shutdown-hooks";
+import { WINDOWS_WRAPPER_STAY_OUT_EXIT_CODE } from "../../backend/src/service/windows-wrapper-exit";
 import { repoPath } from "../helpers/repo-root";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
@@ -93,7 +93,7 @@ describe("service health sentinel launch gate (#6671)", () => {
     });
     expect(handle?.pid).toBe(31337);
     expect(calls).toHaveLength(1);
-    expect(calls[0]!.argv).toEqual([process.execPath, repoPath("src", "service", "health-sentinel-main.ts")]);
+    expect(calls[0]!.argv).toEqual([process.execPath, repoPath("backend/src", "service", "health-sentinel-main.ts")]);
     expect(calls[0]!.env[HEALTH_SENTINEL_ENV.targetPid]).toBe(String(process.pid));
     expect(calls[0]!.env[HEALTH_SENTINEL_ENV.historyPath]).toBe(home.path("service-health-recovery.json"));
     expect(JSON.stringify(calls[0]!.env)).not.toContain("secret-token");
@@ -122,14 +122,14 @@ describe("service health sentinel launch gate (#6671)", () => {
       spawn: () => { throw new Error("must not spawn mid-drain"); },
       log: () => {},
     })).toBeNull();
-    const lifecycle = readFileSync(repoPath("src", "server", "lifecycle.ts"), "utf8");
+    const lifecycle = readFileSync(repoPath("backend/src", "server", "lifecycle.ts"), "utf8");
     const drain = lifecycle.indexOf("beginShutdownDrain();");
     expect(lifecycle.indexOf("runDrainStartHooks();", drain)).toBeGreaterThan(drain);
     expect(lifecycle.indexOf("runDrainStartHooks();", drain)).toBeLessThan(lifecycle.indexOf("waitForTemporaryDrainsUntil(deadline)", drain));
   });
 
   test("the start path wires the sentinel after readiness and stops it in cleanup", () => {
-    const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     // Started only after startup reconciliation closes, never between bind and readiness.
     const ready = source.indexOf("await reconcileClientStartupBeforeReady(");
     const start = source.indexOf("healthSentinel = startServiceHealthSentinel(config)");
@@ -147,11 +147,11 @@ describe("the managers restart a proxy the sentinel terminates", () => {
   test("Windows wrapper and WinSW restart after an unclean exit", () => {
     // TerminateProcess(handle, 1): the wrapper restarts on anything but its stay-out code.
     expect(WINDOWS_WRAPPER_STAY_OUT_EXIT_CODE).not.toBe(1);
-    const wrapper = readFileSync(repoPath("src", "service", "windows-taskxml.ts"), "utf8");
+    const wrapper = readFileSync(repoPath("backend/src", "service", "windows-taskxml.ts"), "utf8");
     expect(wrapper).toContain("goto stopped");
     expect(wrapper).toContain('"goto loop"');
-    expect(readFileSync(repoPath("src", "lib", "winsw.ts"), "utf8")).toContain('<onfailure action="restart"');
-    const sentinel = readFileSync(repoPath("src", "service", "health-sentinel-main.ts"), "utf8");
+    expect(readFileSync(repoPath("backend/src", "lib", "winsw.ts"), "utf8")).toContain('<onfailure action="restart"');
+    const sentinel = readFileSync(repoPath("backend/src", "service", "health-sentinel-main.ts"), "utf8");
     expect(sentinel).toContain("windowsHandle.terminate(1)");
   });
 });

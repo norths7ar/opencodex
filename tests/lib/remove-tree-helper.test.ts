@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { settleBackgroundWork, trackBackgroundWork } from "../../src/lib/background-work";
+import { settleBackgroundWork, trackBackgroundWork } from "../../backend/src/lib/background-work";
 import {
   REMOVE_RETRY_BUDGET_MS,
   REMOVE_RETRY_MAX_DELAY_MS,

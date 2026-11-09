@@ -5,7 +5,7 @@ import {
   RESPONSES_CORE_MODULES,
   readResponsesCoreModule,
 } from "../helpers/responses-core-source";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 import { budgetOwner } from "../helpers/send-budget-owner";
 
 // Existing, separately owned siblings at the extraction boundary. A new owner
@@ -30,7 +30,7 @@ function ownerGraph(): Map<string, string[]> {
   while (pending.length > 0) {
     const name = pending.pop()!;
     if (graph.has(name) || EXISTING_BOUNDARIES.has(name)) continue;
-    const source = readFileSync(repoPath("src", "server", "responses", name), "utf8");
+    const source = readFileSync(repoPath("backend/src", "server", "responses", name), "utf8");
     const children = siblingImports(source).filter(child => !EXISTING_BOUNDARIES.has(child));
     graph.set(name, children);
     pending.push(...children);

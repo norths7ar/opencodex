@@ -5,9 +5,9 @@ import { join } from "node:path";
 import {
   finalizeAutoReviewModelOverride,
   resolveAutoReviewOverrideSelector,
-} from "../../src/codex/catalog/auto-review";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/catalog/auto-review";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The global override block (Models settings -> Auto-review override) is the GUI-facing

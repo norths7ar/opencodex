@@ -15,14 +15,14 @@ import {
   resolveNativeProfileContext,
   serializeNativeProfileJournal,
   type NativeProfileContext,
-} from "../../src/codex/native-profile-store";
+} from "../../backend/src/codex/native-profile-store";
 import {
   NativeProfileError,
   type EncryptedNativeEnvelopeV1,
   type NativeMainProfileRecordV1,
   type NativeMainProfileVaultV1,
   type NativeProfileSwitchJournalV1,
-} from "../../src/codex/native-profile-types";
+} from "../../backend/src/codex/native-profile-types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];
@@ -391,7 +391,7 @@ describe("native-profile recovery journal storage", () => {
     const configDir = join(base, "opencodex");
     mkdirSync(codexHome, { mode: 0o700 });
     mkdirSync(configDir, { mode: 0o700 });
-    const moduleUrl = new URL("../../src/codex/native-profile-store.ts", import.meta.url).href;
+    const moduleUrl = new URL("../../backend/src/codex/native-profile-store.ts", import.meta.url).href;
     const childSource = `
       import { execFileSync } from "node:child_process";
       import { lstatSync, mkdirSync, unlinkSync, writeFileSync } from "node:fs";

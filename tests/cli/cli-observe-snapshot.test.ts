@@ -2,9 +2,9 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { withObserveStream } from "../../src/cli/observe-stream";
-import { handleLogFilterCommand } from "../../src/cli/log-view-filter";
-import { handleCompanionUsageCommand } from "../../src/cli/companion-usage";
+import { withObserveStream } from "../../backend/src/cli/observe-stream";
+import { handleLogFilterCommand } from "../../backend/src/cli/log-view-filter";
+import { handleCompanionUsageCommand } from "../../backend/src/cli/companion-usage";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

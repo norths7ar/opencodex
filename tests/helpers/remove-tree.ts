@@ -1,6 +1,6 @@
-import { assertRemovalOutsideProtectedTrees } from "../../src/lib/test-home-guard";
-import { pendingBackgroundWork, settleBackgroundWork } from "../../src/lib/background-work";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
+import { assertRemovalOutsideProtectedTrees } from "../../backend/src/lib/test-home-guard";
+import { pendingBackgroundWork, settleBackgroundWork } from "../../backend/src/lib/background-work";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
 import { REMOVE_RETRY_BUDGET_MS, removeTestTempTree, removeTestTempTreeAsync } from "../../scripts/test-temp";
 
 // Background settlement and removal retries each own one budget. Leave scheduling headroom;

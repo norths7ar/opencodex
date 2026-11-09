@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { buildCatalogEntries } from "../../src/codex/catalog";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { AdapterRequest } from "../../src/adapters/base";
-import { configuredReasoningEfforts, mapReasoningEffort, sanitizeCodexReasoningEfforts } from "../../src/reasoning-effort";
-import { routeModel } from "../../src/router";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
+import { configuredReasoningEfforts, mapReasoningEffort, sanitizeCodexReasoningEfforts } from "../../backend/src/reasoning-effort";
+import { routeModel } from "../../backend/src/router";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 function nativeTemplate(): Record<string, unknown> {
   return {

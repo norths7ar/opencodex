@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, test } from
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../../src/config";
+import { saveConfig } from "../../../backend/src/config";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../../src/codex/model-entitlements";
-import { startServer } from "../../../src/server";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/codex/model-entitlements";
+import { startServer } from "../../../backend/src/server";
+import type { OcxConfig } from "../../../backend/src/types";
 import { SERVER_BUDGET_MS } from "../../helpers/test-budget";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

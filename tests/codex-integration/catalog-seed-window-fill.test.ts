@@ -10,9 +10,9 @@
  * POST (#1409).
  */
 import { describe, expect, test } from "bun:test";
-import { applyRegistryCapabilitySeedFill } from "../../src/codex/catalog/provider-fetch";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { OcxProviderConfig } from "../../src/types";
+import { applyRegistryCapabilitySeedFill } from "../../backend/src/codex/catalog/provider-fetch";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 function persisted(id: string, overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   const entry = getProviderRegistryEntry(id);

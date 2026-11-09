@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { gatherRoutedModels } from "../../../src/codex/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
+import { gatherRoutedModels } from "../../../backend/src/codex/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 
 const originalFetch = globalThis.fetch;

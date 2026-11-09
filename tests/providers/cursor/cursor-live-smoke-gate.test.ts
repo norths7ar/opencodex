@@ -5,7 +5,7 @@ import {
   cursorLiveSmokeSkipMessage,
   getCursorLiveSmokeToken,
   readCursorLiveSmokeGate,
-} from "../../../src/adapters/cursor/live-smoke-gate";
+} from "../../../backend/src/adapters/cursor/live-smoke-gate";
 
 const fakeSecret = "secret-cursor-token-123";
 

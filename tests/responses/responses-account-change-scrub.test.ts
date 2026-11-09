@@ -8,14 +8,14 @@ import {
   accountChangeFileReferenceRefusal,
   conversationCarriesUploadedFiles,
   ACCOUNT_CHANGE_FILE_SCOPE_MESSAGE,
-} from "../../src/server/responses/account-change-state";
+} from "../../backend/src/server/responses/account-change-state";
 import {
   clearConversationStateIssuerMap,
   rememberConversationStateIssuer,
-} from "../../src/codex/routing";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxParsedRequest } from "../../src/types";
-import { sanitizeReasoningInputContent } from "../../src/adapters/openai-responses/reasoning";
+} from "../../backend/src/codex/routing";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxParsedRequest } from "../../backend/src/types";
+import { sanitizeReasoningInputContent } from "../../backend/src/adapters/openai-responses/reasoning";
 
 const BINDING_KEY = "thread-account-change-scrub";
 const ENCRYPTED = "gAAAA" + "A".repeat(80);

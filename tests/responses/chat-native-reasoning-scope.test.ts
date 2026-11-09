@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { chatReasoningReplayPolicy, planNativeChatReasoningReplay } from "../../src/adapters/openai-chat/reasoning-replay";
-import { nativeChatReplayScope, bindNativeChatReplayScope, nativeChatReasoningCapture } from "../../src/server/chat-native-reasoning";
-import { nativeChatSse } from "../../src/server/chat-native-sse";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
-import type { OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../src/types";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { chatReasoningReplayPolicy, planNativeChatReasoningReplay } from "../../backend/src/adapters/openai-chat/reasoning-replay";
+import { nativeChatReplayScope, bindNativeChatReplayScope, nativeChatReasoningCapture } from "../../backend/src/server/chat-native-reasoning";
+import { nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { clearReasoningReplayCacheForTests } from "../../backend/src/responses/reasoning-replay-cache";
+import type { OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 
 const MODEL = "deepseek-v4.1-flash";
 const PROVIDER: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://fixture.invalid/v1", apiKey: "fixture-key" };

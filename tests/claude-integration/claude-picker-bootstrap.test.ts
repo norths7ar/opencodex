@@ -3,7 +3,7 @@ import { brotliCompressSync, deflateSync, gzipSync } from "node:zlib";
 import {
   BOOTSTRAP_MAX_DECODED_BYTES, injectPickerModels, isPickerBootstrapRequest,
   narrowBootstrapAcceptEncoding, rewriteBootstrapBody, rewrittenHeaders,
-} from "../../src/claude/intercept/picker-bootstrap";
+} from "../../backend/src/claude/intercept/picker-bootstrap";
 
 const models = [{ id: "ocx-model", name: "Routed", contextWindow: 128_000 }];
 function fixture() {

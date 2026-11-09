@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 
 const CLINE_PASS_MODELS = [
   "cline-pass/glm-5.2",

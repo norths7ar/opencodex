@@ -8,7 +8,7 @@ import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 const isolatedCodexHome = mkdtempSync(join(tmpdir(), "ocx-prov-codex-home-"));
 
 // Every case below spawns the real CLI. Cold Bun starts on a loaded windows-latest runner
@@ -19,7 +19,7 @@ function runCli(args: string[], env: Record<string, string> = {}, noProxy = fals
   const preload = noProxy ? join(env.OPENCODEX_HOME!, "no-proxy.ts") : undefined;
   if (preload) writeFileSync(preload, `
     import { mock } from "bun:test";
-    const path = ${JSON.stringify(join(repoRoot, "src/server/proxy-liveness.ts"))};
+    const path = ${JSON.stringify(join(repoRoot, "backend/src/server/proxy-liveness.ts"))};
     const original = await import(path);
     mock.module(path, () => ({ ...original, findLiveProxy: async () => null }));
     globalThis.fetch = () => { throw new Error("fixture network forbidden"); };

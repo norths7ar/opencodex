@@ -12,13 +12,13 @@ import {
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
   LOCAL_MANAGEMENT_EXPECTED_PID_HEADER,
   LOCAL_MANAGEMENT_NONCE_HEADER,
-} from "../../src/lib/local-management-capability";
+} from "../../backend/src/lib/local-management-capability";
 import {
   SYSTEM_RESTART_METHOD,
   SYSTEM_RESTART_PATH,
   createSystemRestartCapability,
   verifySystemRestartCapability,
-} from "../../src/lib/system-restart-contract";
+} from "../../backend/src/lib/system-restart-contract";
 import { randomBytes, randomUUID } from "node:crypto";
 import {
   createLocalDesktopSnapshotCapability as mint,
@@ -28,19 +28,19 @@ import {
   verifyLocalDesktopSnapshotCapability as verify,
   createLocalDesktopSnapshotCapability,
   LOCAL_DESKTOP_SNAPSHOT_PATH,
-} from "../../src/lib/local-desktop-snapshot-capability";
+} from "../../backend/src/lib/local-desktop-snapshot-capability";
 import {
   hasLocalDesktopSnapshotCapability as admit,
   verifyLocalDesktopSnapshotBody as verifyBody,
-} from "../../src/server/local-desktop-snapshot-auth";
+} from "../../backend/src/server/local-desktop-snapshot-auth";
 import {
   managementPrincipal,
   requireManagementAuth,
   type ManagementAuthState,
-} from "../../src/server/management-auth";
-import { handleSidebarRoutes } from "../../src/server/management/sidebar-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management-auth";
+import { handleSidebarRoutes } from "../../backend/src/server/management/sidebar-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
 

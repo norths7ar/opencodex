@@ -1,29 +1,29 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { parseRequest } from "../../../src/responses/parser";
-import { XAI_GROK_CLI_BASE_URL } from "../../../src/providers/xai-transport";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { XAI_GROK_CLI_BASE_URL } from "../../../backend/src/providers/xai-transport";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { shouldExposeProviderModel } from "../../../src/codex/catalog/model-visibility";
-import { providerConfigSeed } from "../../../src/providers/derive";
+import { shouldExposeProviderModel } from "../../../backend/src/codex/catalog/model-visibility";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
 import {
   createAdapterTierMetadata,
   decideTier,
   emittedFastWire,
   fastWireDeclarationError,
   tierObservationContext,
-} from "../../../src/providers/fastwire";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { fastPolicyForModel } from "../../../src/providers/service-tier";
+} from "../../../backend/src/providers/fastwire";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { fastPolicyForModel } from "../../../backend/src/providers/service-tier";
 import {
   applyXaiOauthFastModel,
   XAI_OAUTH_FAST_MODELS,
   XAI_OAUTH_FAST_VARIANT_IDS,
   xaiOauthFastModel,
-} from "../../../src/providers/xai-fast-model";
-import type { OcxParsedRequest, OcxProviderConfig, TierDecision, TierObservationContext } from "../../../src/types";
-import { estimateAttemptCost } from "../../../src/usage/cost";
-import { normalizePersistedUsageRow, type PersistedUsageEntry } from "../../../src/usage/log";
+} from "../../../backend/src/providers/xai-fast-model";
+import type { OcxParsedRequest, OcxProviderConfig, TierDecision, TierObservationContext } from "../../../backend/src/types";
+import { estimateAttemptCost } from "../../../backend/src/usage/cost";
+import { normalizePersistedUsageRow, type PersistedUsageEntry } from "../../../backend/src/usage/log";
 
 const BASE = "grok-4.7";
 const VARIANT = "grok-4.7-build-fast";

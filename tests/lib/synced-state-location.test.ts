@@ -3,7 +3,7 @@ import {
   syncedStateLocation,
   syncedStateWarning,
   type SyncedStateLocationProbe,
-} from "../../src/lib/synced-state-location";
+} from "../../backend/src/lib/synced-state-location";
 
 const HOME = "/Users/example";
 const probe = (overrides: Partial<SyncedStateLocationProbe> = {}): SyncedStateLocationProbe => ({

@@ -1,11 +1,11 @@
 import { afterEach, expect, test } from "bun:test";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { getDefaultConfig, loadConfig } from "../../src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { getDefaultConfig, loadConfig } from "../../backend/src/config";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadCapabilityTable } from "../../src/codex/role-capability";
-import type { OcxConfig } from "../../src/types";
+import { loadCapabilityTable } from "../../backend/src/codex/role-capability";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });

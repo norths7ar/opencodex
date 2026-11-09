@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import net, { type Socket } from "node:net";
 import tls from "node:tls";
 import { once } from "node:events";
-import { createCertificateAuthority, issueServerLeaf } from "../../src/claude/intercept/local-ca";
-import type { OpaqueProxyRoute } from "../../src/lib/opaque-proxy-tunnel";
+import { createCertificateAuthority, issueServerLeaf } from "../../backend/src/claude/intercept/local-ca";
+import type { OpaqueProxyRoute } from "../../backend/src/lib/opaque-proxy-tunnel";
 import { listen, TunnelFixtureScope } from "./opaque-proxy-tunnel";
 
 // Runtime-only keys, never persisted or added to an OS trust store. Proxy and target

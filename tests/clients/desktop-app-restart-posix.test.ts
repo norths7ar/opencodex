@@ -2,12 +2,12 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isUnderRoot } from "../../src/codex/desktop-app/types";
+import { isUnderRoot } from "../../backend/src/codex/desktop-app/types";
 import {
   acquireDesktopRestartLock,
   releaseDesktopRestartLock,
   transferDesktopRestartLock,
-} from "../../src/codex/desktop-app/lock";
+} from "../../backend/src/codex/desktop-app/lock";
 
 function isolatedLock(): { lockPath: string } {
   return { lockPath: join(mkdtempSync(join(tmpdir(), "ocx-posix-restart-")), "lock") };

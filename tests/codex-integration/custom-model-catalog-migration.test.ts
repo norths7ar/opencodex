@@ -3,8 +3,8 @@ import { describe, expect, test } from "bun:test";
 import {
   projectCustomModelCatalogMigration,
   legacyCustomModelCatalogSlugs,
-} from "../../src/codex/custom-model-catalog-migration";
-import type { OcxConfig, OcxCustomModel } from "../../src/types";
+} from "../../backend/src/codex/custom-model-catalog-migration";
+import type { OcxConfig, OcxCustomModel } from "../../backend/src/types";
 
 function config(customModels?: OcxCustomModel[]): OcxConfig {
   return {

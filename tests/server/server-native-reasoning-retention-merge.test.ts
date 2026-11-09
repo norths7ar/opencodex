@@ -2,16 +2,16 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { CodexAuthContext } from "../../src/codex/auth-context";
-import { parseRequest } from "../../src/responses/parser";
+import type { CodexAuthContext } from "../../backend/src/codex/auth-context";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   clearReasoningReplayCacheForTests,
   commitReasoningReplayServingIdentity,
   nativeReasoningTag,
-} from "../../src/responses/reasoning-replay-cache";
-import { bindRouteReasoningReplayScope, nativeReasoningOwnerForRoute } from "../../src/server/responses/core-replay";
-import { renderCompactionSearchHistoryItems } from "../../src/adapters/openai-responses/compaction-search-history";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import { bindRouteReasoningReplayScope, nativeReasoningOwnerForRoute } from "../../backend/src/server/responses/core-replay";
+import { renderCompactionSearchHistoryItems } from "../../backend/src/adapters/openai-responses/compaction-search-history";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -57,7 +57,7 @@ function bind(request: ReturnType<typeof parsed>, context = account()) {
 
 describe("native reasoning retention with upstream replay ownership", () => {
   test("ingress snapshots retention alongside Claude replay and mint metadata", () => {
-    const source = readFileSync(repoPath("src/server/responses/request-prepare.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/server/responses/request-prepare.ts"), "utf8");
     // The snapshot follows the Antigravity direct-request decode, which replaces `parsed`.
     expect(source).toMatch(/parsed = parseRequest\(body\);[\s\S]{0,400}?if \(options\.directRequest\) parsed = options\.directRequest\.decode\(parsed\);\s*parsed\._nativeReasoningRetention = resolveNativeReasoningRetention\(config\);[\s\S]{0,1500}?if \(options\.inboundWire === "anthropic"\) \{\s*parsed\._nativeReasoningReplay = options\.nativeReasoningReplay;\s*parsed\._nativeReasoningMint = options\.nativeReasoningMint;/);
   });

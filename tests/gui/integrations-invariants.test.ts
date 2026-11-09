@@ -2,22 +2,22 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { EXPORT_CLIENTS, EXPORT_CLIENT_IDS, type ExportModel } from "../../src/clients/config-export";
-import { createClineIO } from "../../src/integrations/cline-io";
-import { parseClineDocument } from "../../src/integrations/cline-document";
-import { parseConfig } from "../../src/integrations/config-io";
-import { INTEGRATION_CLIENTS, INTEGRATION_CLIENT_IDS, type IntegrationClientId } from "../../src/integrations/registry";
+import { EXPORT_CLIENTS, EXPORT_CLIENT_IDS, type ExportModel } from "../../backend/src/clients/config-export";
+import { createClineIO } from "../../backend/src/integrations/cline-io";
+import { parseClineDocument } from "../../backend/src/integrations/cline-document";
+import { parseConfig } from "../../backend/src/integrations/config-io";
+import { INTEGRATION_CLIENTS, INTEGRATION_CLIENT_IDS, type IntegrationClientId } from "../../backend/src/integrations/registry";
 import {
   MANAGED_PATH_TEMPLATES,
   PLAN_UNBOUND_FINGERPRINT,
   orderPlanChanges,
   previewIntegration,
-} from "../../src/integrations/mutation-plan";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { readIntegrationState, readPath } from "../../src/integrations/state";
-import { applyIntegration, disableIntegration, restoreIntegration } from "../../src/integrations/writer";
-import { printSubcommandUsage, printFullUsage } from "../../src/cli/help";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/mutation-plan";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { readIntegrationState, readPath } from "../../backend/src/integrations/state";
+import { applyIntegration, disableIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import { printSubcommandUsage, printFullUsage } from "../../backend/src/cli/help";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**
@@ -94,9 +94,9 @@ describe("the client registries cannot drift apart", () => {
      * server-side renders no row until someone remembers the tuple, and the
      * only thing that catches forgetting is this test.
      */
-    const gui = await import("../../gui/src/components/apikeys-workspace/client-config-clients");
-    const guiIntegrations = await import("../../gui/src/pages/integrations/integration-api");
-    const guiRouting = await import("../../gui/src/app-routing");
+    const gui = await import("../../frontend/src/components/apikeys-workspace/client-config-clients");
+    const guiIntegrations = await import("../../frontend/src/pages/integrations/integration-api");
+    const guiRouting = await import("../../frontend/src/app-routing");
 
     const expected = [...EXPORT_CLIENT_IDS].sort();
     expect(expected).toHaveLength(24);
@@ -118,7 +118,7 @@ describe("the client registries cannot drift apart", () => {
   });
 
   test("a plan the server produces is one the dashboard accepts", async () => {
-    const guiIntegrations = await import("../../gui/src/pages/integrations/integration-api");
+    const guiIntegrations = await import("../../frontend/src/pages/integrations/integration-api");
     installClient("zcode");
     const input = { clientId: "zcode" as const, models: MODELS, config: CONFIG, port: 10100, env: TEST_ENV, home, store };
 
@@ -167,7 +167,7 @@ describe("the client registries cannot drift apart", () => {
   });
 
   test("every managed path the server can publish is one the dashboard accepts", async () => {
-    const guiIntegrations = await import("../../gui/src/pages/integrations/integration-api");
+    const guiIntegrations = await import("../../frontend/src/pages/integrations/integration-api");
     /*
      * The parser keeps its own set of managed schema paths, by hand, for the
      * same reason it keeps its own client list. A template the server can put in

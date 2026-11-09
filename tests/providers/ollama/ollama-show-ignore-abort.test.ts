@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { fetchOllamaShowEnrichment } from "../../../src/providers/ollama-show";
+import { fetchOllamaShowEnrichment } from "../../../backend/src/providers/ollama-show";
 
 /**
  * V10: the aggregate deadline TIMER ITSELF is the return bound.

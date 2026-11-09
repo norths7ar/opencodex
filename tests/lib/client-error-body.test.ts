@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { OPENAI_ERROR_TYPES, OPENAI_ERROR_CODES, ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES,
-  CLAUDE_CONTEXT_OVERFLOW_MESSAGE, CLIENT_ERROR_CONTRACTS, ownedChatErrorPayload, canonicalSseErrorBlock } from "../../src/lib/client-error-body";
+  CLAUDE_CONTEXT_OVERFLOW_MESSAGE, CLIENT_ERROR_CONTRACTS, ownedChatErrorPayload, canonicalSseErrorBlock } from "../../backend/src/lib/client-error-body";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
 const KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
@@ -113,8 +113,8 @@ test("Chat code oracle reads positional arguments and conditional result branche
   expect(emittedChatCodes(source, true)).toEqual(new Set(["translation_buffer_limit", "upstream_stall_timeout", "upstream_sse_error", "upstream_sse_truncated", "invalid_refusal", "upstream_incomplete", "invalid_prompt", "cyber_policy"]));
 });
 test("literal Chat writer codes are declared, including positional and conditional arguments", () => {
-  const paths = ["src/chat/outbound.ts", "src/server/chat-native.ts", "src/server/chat-native-sse.ts", "src/server/chat-completions.ts", "src/protocols/encoders/chat.ts"];
-  const sources = new Map([...paths, "src/lib/errors.ts", "src/lib/upstream-retry.ts"].map(path => [path, readFileSync(repoPath(path), "utf8")]));
+  const paths = ["backend/src/chat/outbound.ts", "backend/src/server/chat-native.ts", "backend/src/server/chat-native-sse.ts", "backend/src/server/chat-completions.ts", "backend/src/protocols/encoders/chat.ts"];
+  const sources = new Map([...paths, "backend/src/lib/errors.ts", "backend/src/lib/upstream-retry.ts"].map(path => [path, readFileSync(repoPath(path), "utf8")]));
   const bindings = new Map<string, string>();
   for (const source of sources.values()) {
     const tokens = codeTokens(source);
@@ -174,7 +174,7 @@ test("actionable plan refusal keeps a proxy-written message with the proxy's cop
 
 test("proxy error identity and messages belong to their original request", async () => {
   const { markProxyError, isProxyError, carryProxyError, rememberProxyErrorMessage, hasProxyErrorMessage,
-    fixedProxyErrorMessage } = await import("../../src/lib/client-error-body");
+    fixedProxyErrorMessage } = await import("../../backend/src/lib/client-error-body");
   const local = markProxyError(Response.json({ error: { message: "owned local refusal" } }, { status: 403 }));
   const copy = Response.json({ error: { message: "owned local refusal", proxyAuthored: true } }, { status: 403 });
   expect(local.status).toBe(403);
@@ -243,7 +243,7 @@ test("fixed proxy diagnostics retain cyber and context contract precedence", () 
 });
 
 test("committed combo context observes a local guard decision made later", async () => {
-  const { carryProxyErrorContext, rememberProxyErrorMessage, hasProxyErrorMessage } = await import("../../src/lib/client-error-body");
+  const { carryProxyErrorContext, rememberProxyErrorMessage, hasProxyErrorMessage } = await import("../../backend/src/lib/client-error-body");
   const child = {}; const parent = {}; const other = {};
   carryProxyErrorContext(child, parent);
   expect(hasProxyErrorMessage(parent, "owned late refusal", {})).toBe(false);
@@ -254,7 +254,7 @@ test("committed combo context observes a local guard decision made later", async
 });
 
 test("synthetic incomplete origins stay with the producer context", async () => {
-  const { rememberProxyIncomplete, hasProxyIncomplete, carryProxyIncompleteContext } = await import("../../src/lib/client-error-body");
+  const { rememberProxyIncomplete, hasProxyIncomplete, carryProxyIncompleteContext } = await import("../../backend/src/lib/client-error-body");
   const context = {}; const stream = {};
   carryProxyIncompleteContext(context, stream);
   expect(hasProxyIncomplete(context, "adapter_eof")).toBe(false);
@@ -270,7 +270,7 @@ test("synthetic incomplete origins stay with the producer context", async () => 
 });
 
 test("committed combo context carries later synthetic incomplete origins", async () => {
-  const { carryProxyErrorContext, rememberProxyIncomplete, hasProxyIncomplete } = await import("../../src/lib/client-error-body");
+  const { carryProxyErrorContext, rememberProxyIncomplete, hasProxyIncomplete } = await import("../../backend/src/lib/client-error-body");
   const child = {}; const parent = {};
   carryProxyErrorContext(child, parent);
   expect(hasProxyIncomplete(parent, "adapter_eof")).toBe(false);

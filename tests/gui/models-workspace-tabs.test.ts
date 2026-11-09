@@ -12,7 +12,7 @@ import {
   hashBelongsToPage,
   readPageFromHash,
   resolveAppHashChange,
-} from "../../gui/src/app-routing";
+} from "../../frontend/src/app-routing";
 import {
   MODELS_TABS,
   modelsPanelDomId,
@@ -20,7 +20,7 @@ import {
   modelsTabHash,
   readModelsTab,
   type ModelsTab,
-} from "../../gui/src/pages/models-tab";
+} from "../../frontend/src/pages/models-tab";
 
 describe("nested Models hashes", () => {
   test("all tab hashes are registered and belong to the models page", () => {

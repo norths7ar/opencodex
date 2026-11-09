@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { routeModel } from "../../../src/router";
-import { providerDestinationConfigError } from "../../../src/lib/destination-policy";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { routeModel } from "../../../backend/src/router";
+import { providerDestinationConfigError } from "../../../backend/src/lib/destination-policy";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * Regression coverage for the allowBaseUrlOverride opt-in on the

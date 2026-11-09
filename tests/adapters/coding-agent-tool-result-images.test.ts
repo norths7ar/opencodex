@@ -11,8 +11,8 @@
  * Vendor tool execution stays off for these adapters; this is a projection fix only.
  */
 import { describe, expect, test } from "bun:test";
-import { buildConversationInput } from "../../src/adapters/coding-agent/protocol";
-import type { OcxParsedRequest } from "../../src/types";
+import { buildConversationInput } from "../../backend/src/adapters/coding-agent/protocol";
+import type { OcxParsedRequest } from "../../backend/src/types";
 
 // Distinguishable payloads so ordering is provable, not merely counted.
 const OLD_IMAGE = "data:image/png;base64,T0xE";

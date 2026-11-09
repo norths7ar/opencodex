@@ -12,8 +12,8 @@
  * typed Schema form instead and is omitted when responseJsonSchema is used.
  */
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const aiStudio = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" } as unknown as OcxProviderConfig;
 const vertex = { adapter: "google", googleMode: "vertex", baseUrl: "https://aiplatform.googleapis.com", apiKey: "key" } as unknown as OcxProviderConfig;

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { captureClaudeInbound, claudeInboundDebugMetrics, clearClaudeInboundDebug, evictOldestClaudeInboundForBudget, getClaudeInboundDebugEntries } from "../../src/claude/inbound-debug";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../src/lib/debug-settings";
+import { captureClaudeInbound, claudeInboundDebugMetrics, clearClaudeInboundDebug, evictOldestClaudeInboundForBudget, getClaudeInboundDebugEntries } from "../../backend/src/claude/inbound-debug";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../backend/src/lib/debug-settings";
 
 afterEach(() => {
   resetDebugSettingsForTests();

@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import {
   CodexModelAvailabilityError,
   CodexPoolAuthenticationError,
-} from "../../src/codex/auth-context";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
+} from "../../backend/src/codex/auth-context";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
 import {
   codexModelAvailabilityErrorResponse,
   mapCodexAuthContextErrorToResponse,
-} from "../../src/server/responses/codex-auth-error";
+} from "../../backend/src/server/responses/codex-auth-error";
 
 describe("Codex model availability HTTP errors", () => {
   test("unsupported model is a request error, not invalid_api_key", async () => {

@@ -8,13 +8,13 @@ import {
   getAnthropicAccountHealthSnapshot,
   recordAnthropicAccount429,
   recordAnthropicAccountRefusal,
-} from "../../../src/oauth/anthropic-routing";
-import { getAccountSet, saveAccountCredential, saveCredential } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, fetchProviderAccountQuotas, getCachedProviderAccountQuota } from "../../../src/providers/quota";
-import { fetchAnthropicUsageQuota } from "../../../src/providers/quota/vendor-probes-oauth";
-import { setAnthropicQuotaAfterSettlementForTests } from "../../../src/providers/quota/anthropic-cooldown-recovery";
-import { accountCacheKey, accountQuotaCache } from "../../../src/providers/quota/account-cache";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/anthropic-routing";
+import { getAccountSet, saveAccountCredential, saveCredential } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, fetchProviderAccountQuotas, getCachedProviderAccountQuota } from "../../../backend/src/providers/quota";
+import { fetchAnthropicUsageQuota } from "../../../backend/src/providers/quota/vendor-probes-oauth";
+import { setAnthropicQuotaAfterSettlementForTests } from "../../../backend/src/providers/quota/anthropic-cooldown-recovery";
+import { accountCacheKey, accountQuotaCache } from "../../../backend/src/providers/quota/account-cache";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

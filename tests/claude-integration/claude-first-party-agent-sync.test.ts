@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { injectClaudeAgentDefs } from "../../src/claude/agents-inject";
-import * as desktopFirstParty from "../../src/claude/desktop-first-party";
-import { reconcileClaudeFirstPartySettings } from "../../src/claude/first-party-settings";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { injectClaudeAgentDefs } from "../../backend/src/claude/agents-inject";
+import * as desktopFirstParty from "../../backend/src/claude/desktop-first-party";
+import { reconcileClaudeFirstPartySettings } from "../../backend/src/claude/first-party-settings";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 
@@ -252,7 +252,7 @@ test("a failed save leaves the shared config on, so a retry neither prunes nor r
 });
 
 test("a save that published before failing keeps the new value, so a later On is a real transition", async () => {
-  const { ConfigWritePublishedError } = await import("../../src/config/persist-unlocked");
+  const { ConfigWritePublishedError } = await import("../../backend/src/config/persist-unlocked");
   injectClaudeAgentDefs(config, {}, claudeDir);
   config.claudeCode = { ...config.claudeCode, enabled: true };
   persist();

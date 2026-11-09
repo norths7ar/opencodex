@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { cursorBlobServeIntegrityOk, storeCursorBlob } from "../../../src/adapters/cursor/native-exec";
+import { cursorBlobServeIntegrityOk, storeCursorBlob } from "../../../backend/src/adapters/cursor/native-exec";
 
 describe("cursor blob serve-time integrity (devlog 260826 080)", () => {
   test("content-addressed blob passes when bytes match the id", () => {

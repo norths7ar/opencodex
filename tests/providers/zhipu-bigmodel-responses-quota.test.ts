@@ -3,9 +3,9 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { clearProviderQuotaCache, fetchProviderQuotaReports, providerApiKeyQuotaMode } from "../../src/providers/quota";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { clearProviderQuotaCache, fetchProviderQuotaReports, providerApiKeyQuotaMode } from "../../backend/src/providers/quota";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 // Issue #4201: the BigModel Coding Plan Responses preset is the same domestic subscription as the
 // Chat preset on a different wire, but keyQuotaReaderForProvider() admitted provider names

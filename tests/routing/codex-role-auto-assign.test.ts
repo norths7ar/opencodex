@@ -5,9 +5,9 @@ import {
   classifyRoleModelCandidates,
   mapEffortToLevel,
   type RoleModelCandidate,
-} from "../../src/codex/role-auto-assign";
-import { candidateModelKey, capabilityTableFromArtificialAnalysis, readBoundedBytes } from "../../src/codex/role-capability";
-import type { RoleSizingOutcome } from "../../src/codex/role-sizing";
+} from "../../backend/src/codex/role-auto-assign";
+import { candidateModelKey, capabilityTableFromArtificialAnalysis, readBoundedBytes } from "../../backend/src/codex/role-capability";
+import type { RoleSizingOutcome } from "../../backend/src/codex/role-sizing";
 
 const FULL = ["low", "medium", "high", "xhigh"];
 

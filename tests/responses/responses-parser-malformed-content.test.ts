@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import type { OcxProviderConfig } from "../../src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 // A message item whose content blocks do not match their strict schema fails
 // `userMessageItemSchema` / `assistantMessageItemSchema` and falls through to

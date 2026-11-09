@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { repairOrphanedInputItems, restoreBridgedWebSearchCalls } from "../../../src/adapters/openai-responses/tool-output-recovery";
-import { injectXaiResponsesXSearch } from "../../../src/adapters/xai-web-search";
-import { liftZedAdditionalTools } from "../../../src/adapters/zed-additional-tools";
-import { currentTurnWireToolCatalogBody } from "../../../src/server/responses-undeclared-tool-guard";
-import { hasItemProvenance, isHistoricalItem, tagHistoricalInputItems } from "../../../src/responses/item-provenance";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { repairOrphanedInputItems, restoreBridgedWebSearchCalls } from "../../../backend/src/adapters/openai-responses/tool-output-recovery";
+import { injectXaiResponsesXSearch } from "../../../backend/src/adapters/xai-web-search";
+import { liftZedAdditionalTools } from "../../../backend/src/adapters/zed-additional-tools";
+import { currentTurnWireToolCatalogBody } from "../../../backend/src/server/responses-undeclared-tool-guard";
+import { hasItemProvenance, isHistoricalItem, tagHistoricalInputItems } from "../../../backend/src/responses/item-provenance";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { rememberBridgeSearchReplay } from "../../../src/responses/bridge-search-replay-cache";
+import { rememberBridgeSearchReplay } from "../../../backend/src/responses/bridge-search-replay-cache";
 
 const live = { type: "function", name: "live", parameters: { type: "object", properties: {} } };
 const wrap = (tools: unknown[]) => ({ type: "additional_tools", tools });

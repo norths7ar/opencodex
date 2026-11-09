@@ -2,9 +2,9 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { listRoleModelChanges, ROLE_HISTORY_MAX_BYTES, ROLE_HISTORY_MAX_ROWS } from "../../src/codex/role-model-history";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { listRoleModelChanges, ROLE_HISTORY_MAX_BYTES, ROLE_HISTORY_MAX_ROWS } from "../../backend/src/codex/role-model-history";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

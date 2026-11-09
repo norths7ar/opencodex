@@ -1,6 +1,6 @@
-import type { OcxConfig } from "../../src/types";
-import type { CatalogModel } from "../../src/codex/catalog";
-import { loadExportModels } from "../../src/server/management/model-rows";
+import type { OcxConfig } from "../../backend/src/types";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
+import { loadExportModels } from "../../backend/src/server/management/model-rows";
 
 export function namingConfig(): OcxConfig {
   return {

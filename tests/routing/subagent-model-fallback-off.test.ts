@@ -8,11 +8,11 @@ import {
   applySubagentModelFallback,
   noteSubagentModelFailure,
   resetSubagentModelFallbackStateForTests,
-} from "../../src/codex/subagent-model-fallback";
-import { handleResponses } from "../../src/server/responses";
-import { clearFallbackEventsForTests } from "../../src/routing/fallback-policy";
-import type { OcxConfig } from "../../src/types";
-import type { OcxFallbackConfig } from "../../src/types/fallback";
+} from "../../backend/src/codex/subagent-model-fallback";
+import { handleResponses } from "../../backend/src/server/responses";
+import { clearFallbackEventsForTests } from "../../backend/src/routing/fallback-policy";
+import type { OcxConfig } from "../../backend/src/types";
+import type { OcxFallbackConfig } from "../../backend/src/types/fallback";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

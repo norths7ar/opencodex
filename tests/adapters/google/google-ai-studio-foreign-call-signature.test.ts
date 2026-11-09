@@ -4,10 +4,10 @@
  * now applies the same Gemini-only validator sentinel that Antigravity and Vertex already apply.
  */
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { THOUGHT_SIGNATURE_BYPASS } from "../../../src/adapters/google-antigravity-replay";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { THOUGHT_SIGNATURE_BYPASS } from "../../../backend/src/adapters/google-antigravity-replay";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

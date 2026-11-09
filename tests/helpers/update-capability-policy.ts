@@ -72,7 +72,7 @@ export function capabilityPolicy(source: ts.SourceFile, file = "") {
     }
     node.forEachChild(collect);
   }; collect(source);
-  const resolver = file === "bin/ocx.mjs" && functions.length === 1 ? functions[0] : undefined;
+  const resolver = file === "backend/bin/ocx.mjs" && functions.length === 1 ? functions[0] : undefined;
   const resolverBody = resolver?.body?.statements;
   const confinedResolver = resolver?.parameters.length === 1 && text(resolver.parameters[0]) === "launcherPath"
     && resolverBody?.length === 2

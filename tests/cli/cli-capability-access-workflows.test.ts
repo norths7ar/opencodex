@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ACCESS_REMOTE_CAPABILITIES } from "../../src/cli/capabilities-access-remote";
-import { OBSERVE_SYSTEM_CAPABILITIES } from "../../src/cli/capabilities-observe-system";
-import { CAPABILITIES as BASE } from "../../src/cli/capabilities-base";
-import { handleAccessCommand } from "../../src/cli/access";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { ACCESS_REMOTE_CAPABILITIES } from "../../backend/src/cli/capabilities-access-remote";
+import { OBSERVE_SYSTEM_CAPABILITIES } from "../../backend/src/cli/capabilities-observe-system";
+import { CAPABILITIES as BASE } from "../../backend/src/cli/capabilities-base";
+import { handleAccessCommand } from "../../backend/src/cli/access";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { repoPath } from "../helpers/repo-root";
 
 const envKeys = ["HOME", "USERPROFILE", "OPENCODEX_HOME", "CODEX_HOME", "OPENCODEX_ADMIN_AUTH_TOKEN"] as const;
@@ -106,7 +106,7 @@ describe("access capability workflows preserve consent and handler grammar", () 
     expect(await handleAccessCommand(["key", "rotate", operation, "fixture-id", "--json"], io.deps)).toBe(2);
     expect(io.requests).toEqual([]);
     // Source proof for destructive completion; never complete a real or fake rotation here.
-    const source = readFileSync(repoPath("src/cli/access.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/cli/access.ts"), "utf8");
     expect(source).toContain('body: JSON.stringify({ id, rotationId })');
     expect(source).toContain('method: operation === "commit" ? "POST" : "DELETE"');
   });
@@ -157,7 +157,7 @@ describe("access capability workflows preserve consent and handler grammar", () 
     const baselineKeys = new Set(BASE.map(row => row.command.join(" ")));
     expect(keys.filter(key => baselineKeys.has(key))).toEqual([]);
     for (const name of ["capabilities-observe-system.ts", "capabilities-access-remote.ts"]) {
-      const source = readFileSync(repoPath("src/cli", name), "utf8");
+      const source = readFileSync(repoPath("backend/src/cli", name), "utf8");
       expect(source.match(/^import .*$/gm)).toEqual(['import type { Capability } from "./capability-types";']);
       expect(source).not.toMatch(/import\(|require\(|process\.|Bun\./);
     }

@@ -1,6 +1,6 @@
 
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { OcxConfig } from "../../src/types";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { OcxConfig } from "../../backend/src/types";
 import { createShippedSpendLedger } from "../helpers/shipped-spend-ledger";
 import { describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
@@ -10,16 +10,16 @@ import { createHash } from "node:crypto";
 import {
   createSpendReservationLedger, configureSharedSpendLedger, DEFAULT_SPEND_RESERVATION_POLICY, parseSpendJournalRecord,
   sharedSpendLedger, type SpendJournal, type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { admitHttpWorkflowTurn, unboundPoolSpendRefusalMessage, unboundPoolSpendRefusalResponse } from "../../src/server/workflow-refusal";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { claimDispatchSpendProof, createRequestExecutionBudget, deriveRequestExecutionBudget, reportDispatchSends } from "../../src/lib/request-execution-budget";
-import { resolvePoolAliases } from "../../src/lib/spend-pool-continuity";
-import { admitWorkflowTurn, listWorkflowBudgetEvents, resetWorkflowBudgetsForTest, workflowDenialSummary, workflowSpendCeilingReached } from "../../src/lib/workflow-budget";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { admitHttpWorkflowTurn, unboundPoolSpendRefusalMessage, unboundPoolSpendRefusalResponse } from "../../backend/src/server/workflow-refusal";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { claimDispatchSpendProof, createRequestExecutionBudget, deriveRequestExecutionBudget, reportDispatchSends } from "../../backend/src/lib/request-execution-budget";
+import { resolvePoolAliases } from "../../backend/src/lib/spend-pool-continuity";
+import { admitWorkflowTurn, listWorkflowBudgetEvents, resetWorkflowBudgetsForTest, workflowDenialSummary, workflowSpendCeilingReached } from "../../backend/src/lib/workflow-budget";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 const salt = "5".repeat(64);
 const alias = (kind: string, id: string) => createHash("sha256").update(salt).update("\0").update(kind).update("\0").update(id).digest("hex").slice(0, 32);

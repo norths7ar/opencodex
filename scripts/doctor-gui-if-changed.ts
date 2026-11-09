@@ -1,5 +1,5 @@
 /**
- * Run React Doctor in gui/ when this push includes gui/ changes.
+ * Run React Doctor in frontend/ when this push includes frontend/ changes.
  * Used by `bun run prepush`.
  *
  * Gating by contract (doctor.config.json blocking: "warning"): findings fail
@@ -16,7 +16,7 @@ import { join, resolve } from "node:path";
 
 /** True when any changed path is the gui directory or inside it (slash-guarded). */
 export function guiPathsChanged(files: string[]): boolean {
-  return files.some(f => f === "gui" || f.startsWith("gui/"));
+  return files.some(f => f === "frontend" || f.startsWith("frontend/"));
 }
 
 /** True when stderr/stdout looks like a registry/network failure rather than findings. */
@@ -44,7 +44,7 @@ function resolveMaxBuffer(): number {
 
 if (import.meta.main) {
   const repoRoot = resolve(import.meta.dirname, "..");
-  const guiDir = join(repoRoot, "gui");
+  const guiDir = join(repoRoot, "frontend");
 
   const hasRef = (ref: string): boolean => {
     try {
@@ -96,11 +96,11 @@ if (import.meta.main) {
   }
 
   if (!shouldRun) {
-    console.log("doctor:gui: skip (no gui/ changes in push range)");
+    console.log("doctor:gui: skip (no frontend/ changes in push range)");
     process.exit(0);
   }
 
-  console.log("doctor:gui: gui/ changed — running React Doctor (scope=changed)");
+  console.log("doctor:gui: frontend/ changed — running React Doctor (scope=changed)");
   const [cmd, ...args] = process.env.DOCTOR_CMD
     ? process.env.DOCTOR_CMD.split(" ")
     : ["bun", "run", "doctor"];

@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
 import { createAnthropicInstanceFixture, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
 
 let f: AnthropicInstanceFixture;
-let refusal: typeof import("../../../src/oauth/anthropic-account-refusal");
-let ownership: typeof import("../../../src/oauth/anthropic-send-ownership");
+let refusal: typeof import("../../../backend/src/oauth/anthropic-account-refusal");
+let ownership: typeof import("../../../backend/src/oauth/anthropic-send-ownership");
 const instances = ["anthropic", "anthropic2"] as const;
 const message = "OAuth access token has been revoked.";
 const payload = { type: "error", error: { type: "authentication_error", message } };
@@ -12,8 +12,8 @@ const payload = { type: "error", error: { type: "authentication_error", message 
 beforeEach(async () => {
   f = await createAnthropicInstanceFixture();
   await f.seed();
-  refusal = await import("../../../src/oauth/anthropic-account-refusal");
-  ownership = await import("../../../src/oauth/anthropic-send-ownership");
+  refusal = await import("../../../backend/src/oauth/anthropic-account-refusal");
+  ownership = await import("../../../backend/src/oauth/anthropic-send-ownership");
 });
 afterEach(async () => { await f?.dispose(); });
 
@@ -198,7 +198,7 @@ for (const instance of instances) {
       if (instance === "anthropic") f.config.anthropicAccountPool = pool;
       else f.config.providers.anthropic2!.anthropicAccountPool = pool;
       const { response } = await bound(instance);
-      const decision = (await import("../../../src/oauth/anthropic-model-routes")).resolveAnthropicModelRouteForInstance(instance, f.config, f.model).decision;
+      const decision = (await import("../../../backend/src/oauth/anthropic-model-routes")).resolveAnthropicModelRouteForInstance(instance, f.config, f.model).decision;
       expect(await refusal.rotateAnthropicAccountOnResponseForInstance(instance, response, {
         config: f.config, accountId: f.ids[0], model: f.model, decision, canRetry: true,
       })).toBe(fallback ? f.ids[1] : null);

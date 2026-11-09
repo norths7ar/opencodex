@@ -7,7 +7,7 @@ import {
   createCodexAccountLogLabel,
   fallbackCodexAccountLogLabel,
   withCodexAccountLogLabel,
-} from "../../src/codex/account-label";
+} from "../../backend/src/codex/account-label";
 
 describe("codex account privacy labels", () => {
   test("key labels follow the shared consumer contract and isolate provider, slot and reference", () => {

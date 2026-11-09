@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { applyExplicitChatDeveloperRole } from "../../src/adapters/openai-chat/developer-role";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { MOONSHOT_INTL_BASE_URL } from "../../src/providers/base-url-choices";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { routedProviderConfig } from "../../src/providers/routed-config";
-import type { OcxProviderConfig } from "../../src/types";
+import { applyExplicitChatDeveloperRole } from "../../backend/src/adapters/openai-chat/developer-role";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { MOONSHOT_INTL_BASE_URL } from "../../backend/src/providers/base-url-choices";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../backend/src/providers/routed-config";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 // api.moonshot.ai answers `400 Invalid request: role 'developer' is not allowed`. The native
 // /v1/chat/completions passthrough only folds the role on an explicit record, so the registry

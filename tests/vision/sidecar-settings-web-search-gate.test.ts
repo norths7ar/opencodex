@@ -1,21 +1,21 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../src/oauth/store";
-import * as usabilityModule from "../../src/codex/account-usability";
-import * as modelRowsModule from "../../src/server/management/model-rows";
+import * as storeModule from "../../backend/src/oauth/store";
+import * as usabilityModule from "../../backend/src/codex/account-usability";
+import * as modelRowsModule from "../../backend/src/server/management/model-rows";
 
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean }>; activeAccountId?: string }> = {};
 let usableCodexAccounts: Set<string> = new Set();
 let managementRows: Array<Record<string, unknown>> = [];
 
-mock.module("../../src/oauth/store", () => ({
+mock.module("../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
-mock.module("../../src/codex/account-usability", () => ({
+mock.module("../../backend/src/codex/account-usability", () => ({
   ...usabilityModule,
   isCodexAccountUsable: (_config: unknown, accountId: string) => usableCodexAccounts.has(accountId),
 }));
-mock.module("../../src/server/management/model-rows", () => ({
+mock.module("../../backend/src/server/management/model-rows", () => ({
   ...modelRowsModule,
   listManagementModelRows: async () => managementRows,
 }));
@@ -25,12 +25,12 @@ import {
   webSearchModelIsRejected,
   webSearchModelOptionsFrom,
   webSearchModelRejection,
-} from "../../src/server/management/web-search-sidecar-options";
-import { handleManagementAPI } from "../../src/server/management-api";
+} from "../../backend/src/server/management/web-search-sidecar-options";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { xaiSearchOptionsFromConfig } from "../../src/web-search";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { xaiSearchOptionsFromConfig } from "../../backend/src/web-search";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const forward: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" };
 const anthropicOAuth: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" };

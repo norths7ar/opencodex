@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { captureProviderApiKeySelection } from "../../src/providers/api-key-selection-capture";
-import { captureProviderApiKeySelection as legacyCapture } from "../../src/providers/api-key-selection";
-import type { OcxProviderConfig } from "../../src/types";
+import { captureProviderApiKeySelection } from "../../backend/src/providers/api-key-selection-capture";
+import { captureProviderApiKeySelection as legacyCapture } from "../../backend/src/providers/api-key-selection";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { repoPath } from "../helpers/repo-root";
 
 describe("API-key selection snapshot", () => {
@@ -53,13 +53,13 @@ describe("selection capture dependency boundary", () => {
   const runtimeImports = (source: string) => transpiler.scanImports(transpiler.transformSync(source)).map(entry => entry.path);
 
   test("the leaf has no runtime imports", () => {
-    expect(runtimeImports(readFileSync(repoPath("src/providers/api-key-selection-capture.ts"), "utf8"))).toEqual([]);
+    expect(runtimeImports(readFileSync(repoPath("backend/src/providers/api-key-selection-capture.ts"), "utf8"))).toEqual([]);
   });
 
   test("the request-time resolver consumes capture without a direct import of the stateful selection module", () => {
     // The resolver moved out of router.ts (it must not import the routing graph); this is the
     // module on the request path now, so the boundary is asserted where the import lives.
-    const imports = runtimeImports(readFileSync(repoPath("src/providers/routed-config.ts"), "utf8"));
+    const imports = runtimeImports(readFileSync(repoPath("backend/src/providers/routed-config.ts"), "utf8"));
     expect(imports).toContain("./api-key-selection-capture");
     expect(imports).not.toContain("./api-key-selection");
   });

@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { runWebSearch } from "../../src/web-search/executor";
-import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../src/web-search/loop";
-import { describeImage } from "../../src/vision/describe";
-import { parseRequest } from "../../src/responses/parser";
-import { headersForCodexAuthContext } from "../../src/codex/auth-context";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { OcxProviderConfig } from "../../src/types";
+import { runWebSearch } from "../../backend/src/web-search/executor";
+import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
+import { describeImage } from "../../backend/src/vision/describe";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { headersForCodexAuthContext } from "../../backend/src/codex/auth-context";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function runWithWebSearch(

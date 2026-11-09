@@ -20,7 +20,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
  */
 
 export const BASELINE_REL = "tests/fixtures/import-cycle-baseline.json";
-export const SOURCE_ROOT = "src";
+export const SOURCE_ROOT = "backend/src";
 
 const importScanner = new Bun.Transpiler({ loader: "ts" });
 const tsxImportScanner = new Bun.Transpiler({ loader: "tsx" });

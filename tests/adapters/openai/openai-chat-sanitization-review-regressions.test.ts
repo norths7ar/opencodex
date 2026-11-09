@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { AdapterEvent, OcxParsedRequest, OcxTool } from "../../../src/types";
-import { namespacedToolName } from "../../../src/types/tools";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { AdapterEvent, OcxParsedRequest, OcxTool } from "../../../backend/src/types";
+import { namespacedToolName } from "../../../backend/src/types/tools";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const provider = {

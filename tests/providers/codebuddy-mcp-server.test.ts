@@ -5,13 +5,13 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { CODEBUDDY_TOOL_LIMITS } from "../../src/adapters/codebuddy/tool-bridge";
-import { codeBuddyMcpInvocation } from "../../src/adapters/coding-agent/turn";
+import { CODEBUDDY_TOOL_LIMITS } from "../../backend/src/adapters/codebuddy/tool-bridge";
+import { codeBuddyMcpInvocation } from "../../backend/src/adapters/coding-agent/turn";
 
 const tempDirs: string[] = [];
 const serverPath = join(
   import.meta.dir,
-  "../../src/adapters/codebuddy/mcp-server.ts",
+  "../../backend/src/adapters/codebuddy/mcp-server.ts",
 );
 
 function definition(
@@ -57,7 +57,7 @@ describe("CodeBuddy capture-only MCP server", () => {
     const dir = mkdtempSync(join(tmpdir(), "ocx-compiled-codebuddy-mcp-"));
     tempDirs.push(dir);
     const binary = join(dir, "ocx");
-    const compiled = Bun.spawnSync([process.execPath, "build", "--compile", join(import.meta.dir, "../../src/cli/index.ts"), "--outfile", binary]);
+    const compiled = Bun.spawnSync([process.execPath, "build", "--compile", join(import.meta.dir, "../../backend/src/cli/index.ts"), "--outfile", binary]);
     expect(compiled.exitCode).toBe(0);
     if (process.platform === "darwin") {
       const signed = Bun.spawnSync(["codesign", "--force", "--sign", "-", binary]);

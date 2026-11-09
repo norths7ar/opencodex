@@ -6,14 +6,14 @@ import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { isConnectionRefused, isUncleanExitEvidence, proxyHealthFailureReason, resolveStatusPid, selectListenTarget } from "../../src/cli/status";
-import * as proxyLiveness from "../../src/server/proxy-liveness";
-import * as startupHealth from "../../src/codex/autostart-health";
-import * as service from "../../src/service";
-import * as statusFacade from "../../src/cli/status";
-import * as statusProbes from "../../src/cli/status-probes";
-import { packageVersion } from "../../src/cli/help";
-import { getDefaultConfig } from "../../src/config";
+import { isConnectionRefused, isUncleanExitEvidence, proxyHealthFailureReason, resolveStatusPid, selectListenTarget } from "../../backend/src/cli/status";
+import * as proxyLiveness from "../../backend/src/server/proxy-liveness";
+import * as startupHealth from "../../backend/src/codex/autostart-health";
+import * as service from "../../backend/src/service";
+import * as statusFacade from "../../backend/src/cli/status";
+import * as statusProbes from "../../backend/src/cli/status-probes";
+import { packageVersion } from "../../backend/src/cli/help";
+import { getDefaultConfig } from "../../backend/src/config";
 import { findDeadPid } from "../helpers/dead-pid";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -21,7 +21,7 @@ import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS, STORE_BUDGET_MS } from "../helpe
 import { spawnTestChild } from "../helpers/spawn-test-child";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 const undrainedStatusHomes = new Set<string>();
 
 function runStatusJson(opencodexHome: string) {
@@ -292,7 +292,7 @@ describe("CLI status JSON", () => {
 
   test("status --json reports catalogClamp.runtimeVersion when clamp is active", async () => {
     const { chmodSync } = await import("node:fs");
-    const { persistEffortClamp, resetCodexRuntimeResolveCacheForTests } = await import("../../src/codex/runtime");
+    const { persistEffortClamp, resetCodexRuntimeResolveCacheForTests } = await import("../../backend/src/codex/runtime");
     const opencodexHome = mkdtempSync(join(tmpdir(), "ocx-status-clamp-"));
     try {
       writeFileSync(join(opencodexHome, "config.json"), JSON.stringify({

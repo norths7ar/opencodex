@@ -7,14 +7,14 @@
  * ever receiving an injection (PR #860 family).
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { applyProviderConfigHints, buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import { applyCatalogModelMetadata } from "../../src/codex/catalog/effort";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import { providerConfigSeed, enrichProviderFromRegistry } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { decideTier } from "../../src/providers/fastwire";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { applyServiceTierGate, handleResponses } from "../../src/server/responses/core";
+import { applyProviderConfigHints, buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { applyCatalogModelMetadata } from "../../backend/src/codex/catalog/effort";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { providerConfigSeed, enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { decideTier } from "../../backend/src/providers/fastwire";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { applyServiceTierGate, handleResponses } from "../../backend/src/server/responses/core";
 import {
   canForwardServiceTierForModel,
   fastPolicyForModel,
@@ -22,9 +22,9 @@ import {
   serviceTierSupportForModel,
   serviceTierSupportFromPolicy,
   supportsServiceTierForModel,
-} from "../../src/providers/service-tier";
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/service-tier";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let releaseSpendHome: (() => void) | undefined;

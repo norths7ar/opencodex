@@ -11,15 +11,15 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { bindRouteReasoningReplayScope } from "../../src/server/responses/core-replay";
+import { bindRouteReasoningReplayScope } from "../../backend/src/server/responses/core-replay";
 import {
   lookupReplayThoughtSignature,
   rememberThoughtSignatureForReplay,
   resetThoughtSignatureReplayForTests,
-} from "../../src/responses/thought-signature-replay";
-import { commitReasoningReplayServingIdentity } from "../../src/responses/reasoning-replay-cache";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/responses/thought-signature-replay";
+import { commitReasoningReplayServingIdentity } from "../../backend/src/responses/reasoning-replay-cache";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const SIG = "CiQAx-verify-rebind-signature-0123456789abcdef";

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { TranslatorBudgetExceededError } from "../../../src/lib/translator-budget";
-import { createOllamaNativeAdapter, OLLAMA_LATE_ATTRIBUTION_LIMIT_MESSAGE } from "../../../src/adapters/ollama-native";
-import { parseRequest } from "../../../src/responses/parser";
-import { handleResponses } from "../../../src/server/responses/core";
-import type { RequestLogContext } from "../../../src/server/request-log";
+import { TranslatorBudgetExceededError } from "../../../backend/src/lib/translator-budget";
+import { createOllamaNativeAdapter, OLLAMA_LATE_ATTRIBUTION_LIMIT_MESSAGE } from "../../../backend/src/adapters/ollama-native";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { handleResponses } from "../../../backend/src/server/responses/core";
+import type { RequestLogContext } from "../../../backend/src/server/request-log";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider = { adapter: "ollama-native", baseUrl: "https://ollama.com/v1", authMode: "key",
   apiKey: "inert-fixture-key", liveModels: false, models: ["deepseek-v4.1-flash"] } as OcxProviderConfig;

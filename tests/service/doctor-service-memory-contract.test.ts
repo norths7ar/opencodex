@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { fetchServiceMemory } from "../../src/cli/doctor";
+import { fetchServiceMemory } from "../../backend/src/cli/doctor";
 
 type ServiceMemoryDeps = NonNullable<Parameters<typeof fetchServiceMemory>[1]>;
 type TimeoutOptionIsHidden = "timeoutMs" extends keyof ServiceMemoryDeps ? false : true;

@@ -14,9 +14,9 @@ import {
   type HealthSentinelDeps,
   type RecoveryEntry,
   type SentinelRuntimeRecord,
-} from "../../src/service/health-sentinel-main";
-import { healthzPid, probeHealth, probeUrlHost } from "../../src/service/health-sentinel-probe";
-import type { HealthProbeOutcome } from "../../src/service/health-sentinel-policy";
+} from "../../backend/src/service/health-sentinel-main";
+import { healthzPid, probeHealth, probeUrlHost } from "../../backend/src/service/health-sentinel-probe";
+import type { HealthProbeOutcome } from "../../backend/src/service/health-sentinel-policy";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 const TARGET = 777;

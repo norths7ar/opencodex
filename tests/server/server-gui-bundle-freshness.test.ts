@@ -6,7 +6,7 @@ import {
   inspectGuiBundleFreshness,
   newestModifiedMs,
   staleGuiBundleLines,
-} from "../../src/server/gui-freshness";
+} from "../../backend/src/server/gui-freshness";
 
 /** Write `name` under `root` with an explicit mtime, creating parents as needed. */
 function writeAt(root: string, name: string, secondsSinceEpoch: number): string {

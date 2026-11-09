@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { cmdPreserveSignedIn } from "../../src/cli/account-preservation";
-import type { AccountDeps } from "../../src/cli/account-api";
+import { cmdPreserveSignedIn } from "../../backend/src/cli/account-preservation";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
 let log: ReturnType<typeof spyOn>, error: ReturnType<typeof spyOn>;
 beforeEach(() => { log = spyOn(console, "log").mockImplementation(() => {}); error = spyOn(console, "error").mockImplementation(() => {}); });
 afterEach(() => { log.mockRestore(); error.mockRestore(); });

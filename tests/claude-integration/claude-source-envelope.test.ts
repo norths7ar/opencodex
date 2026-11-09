@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { inlineDocumentMarker } from "../../src/responses/inline-document";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { inlineDocumentMarker } from "../../backend/src/responses/inline-document";
 
 describe("Claude source envelope boundaries", () => {
   test("nested tool results retain only bounded structured content", () => {

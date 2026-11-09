@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
-import { repairUrlCitationAnnotations, stripProviderInputItemMetadata } from "../../src/adapters/openai-responses/request-strips";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses/passthrough";
+import { repairUrlCitationAnnotations, stripProviderInputItemMetadata } from "../../backend/src/adapters/openai-responses/request-strips";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
 
 // OpenAI Responses requires string `title` and integer `start_index`/`end_index` on every replayed
 // url_citation. A history written without them made every later request (notably remote compaction)

@@ -3,8 +3,8 @@
  * `unsupported` disposition on the request path refuses, and only under the reject policy.
  */
 import { describe, expect, test } from "bun:test";
-import { checkRepresentable, unrepresentableMessage } from "../../src/protocols/guard";
-import type { ProtocolFeature } from "../../src/protocols/features";
+import { checkRepresentable, unrepresentableMessage } from "../../backend/src/protocols/guard";
+import type { ProtocolFeature } from "../../backend/src/protocols/features";
 
 describe("checkRepresentable", () => {
   test("n > 1 on Chat into a Responses upstream is refused under reject", () => {

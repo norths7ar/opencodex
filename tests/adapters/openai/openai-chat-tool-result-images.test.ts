@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 // Issue #888: role:"tool" content is text-only on chat-completions providers, so images inside a
 // tool result ride in a follow-up user vision message released when the tool round closes. When

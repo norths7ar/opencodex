@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { readCodexLogGuardMode, writeCodexLogGuardMode } from "../../src/codex/log-guard/policy";
-import type { OcxConfig } from "../../src/types";
+import { readCodexLogGuardMode, writeCodexLogGuardMode } from "../../backend/src/codex/log-guard/policy";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("Codex Log Guard desired-state policy", () => {
   test("defaults missing or invalid modes to off", () => {

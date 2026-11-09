@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { posix } from "node:path";
-import { buildPlist, buildUnit, buildWindowsServiceScript, repairService, stableLauncherEntry } from "../../src/service";
-import { buildWinswXml } from "../../src/lib/winsw";
-import { filterTransientServicePath, isTransientServiceLauncherPath, serviceLauncherPathDiagnostic } from "../../src/service/state";
+import { buildPlist, buildUnit, buildWindowsServiceScript, repairService, stableLauncherEntry } from "../../backend/src/service";
+import { buildWinswXml } from "../../backend/src/lib/winsw";
+import { filterTransientServicePath, isTransientServiceLauncherPath, serviceLauncherPathDiagnostic } from "../../backend/src/service/state";
 
 describe("shell-scoped service paths", () => {
   test("recognizes shell-local manager components without rejecting durable shims", () => {

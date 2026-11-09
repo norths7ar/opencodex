@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { apiErrorMessage } from "../../gui/src/api-error";
+import { apiErrorMessage } from "../../frontend/src/api-error";
 
 describe("GUI management API errors", () => {
   test("surfaces an actionable server error", async () => {

@@ -2,22 +2,22 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { handleEffortCommand } from "../../src/cli/effort";
-import { handleModels } from "../../src/cli/models";
-import { handleProviderCommand } from "../../src/cli/provider";
-import type { OcxConfig } from "../../src/types";
-import * as paths from "../../src/config/paths";
-import * as configModule from "../../src/config";
-import { armClaudeCodeBaseline, claudeCodeBaselineArmed } from "../../src/config/live-reconcile";
-import { CliUsageError } from "../../src/cli/runtime-api";
-import { readCliConfigForMutation } from "../../src/cli/config-mutation";
-import { dispatchCommand, type CliDispatchDeps } from "../../src/cli/dispatch";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/api-key-resolve";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { handleEffortCommand } from "../../backend/src/cli/effort";
+import { handleModels } from "../../backend/src/cli/models";
+import { handleProviderCommand } from "../../backend/src/cli/provider";
+import type { OcxConfig } from "../../backend/src/types";
+import * as paths from "../../backend/src/config/paths";
+import * as configModule from "../../backend/src/config";
+import { armClaudeCodeBaseline, claudeCodeBaselineArmed } from "../../backend/src/config/live-reconcile";
+import { CliUsageError } from "../../backend/src/cli/runtime-api";
+import { readCliConfigForMutation } from "../../backend/src/cli/config-mutation";
+import { dispatchCommand, type CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/api-key-resolve";
 import { resetHardenedStateForTests, setAsyncIcaclsBeltSchedulerForTests, setAsyncIcaclsRunnerForTests,
   setIcaclsRunnerForTests, setNowForTests, setPlatformForTests, windowsSecretAclReapPendingForPath,
-  type IcaclsResult } from "../../src/lib/windows-secret-acl";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+  type IcaclsResult } from "../../backend/src/lib/windows-secret-acl";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const success: IcaclsResult = { success: true, exitCode: 0, timedOut: false, stdout: "" };

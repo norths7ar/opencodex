@@ -5,23 +5,23 @@ import { join } from "node:path";
 import {
   fetchMainAccountInfo, fetchMainAccountInfoSnapshot, listCodexAuthAccounts,
   registerCodexCooldownRecoveryProbeWorker, runMainAccountHardLockRecovery,
-} from "../../src/codex/auth-api";
-import { fetchMainAccountInfoAttempt } from "../../src/codex/auth-api/main-account-probe";
-import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../src/codex/account-id";
-import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, getMainAccountInfoCache, setMainAccountInfoCache } from "../../src/codex/main-account-cache";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { isMainAccountRefreshGrantRejected, setMainAccountPlan } from "../../src/codex/main-account";
-import { clearAccountQuota, getAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, getCodexQuotaHealthSnapshot, recordCodexUpstreamOutcome } from "../../src/codex/routing";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import * as sweeper from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/codex/auth-api";
+import { fetchMainAccountInfoAttempt } from "../../backend/src/codex/auth-api/main-account-probe";
+import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../backend/src/codex/account-id";
+import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, getMainAccountInfoCache, setMainAccountInfoCache } from "../../backend/src/codex/main-account-cache";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { isMainAccountRefreshGrantRejected, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { clearAccountQuota, getAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, getCodexQuotaHealthSnapshot, recordCodexUpstreamOutcome } from "../../backend/src/codex/routing";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import * as sweeper from "../../backend/src/lib/state-store-sweeper";
 import {
   acquireNativeMainProfileDrain, getNativeMainProfileRequestCount, resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const accountId = "fixture-recovery-main";

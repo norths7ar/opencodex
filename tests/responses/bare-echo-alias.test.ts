@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
 
 function collabRequest(bareName: string) {
   return parseRequest({

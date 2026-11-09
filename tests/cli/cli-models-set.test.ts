@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { CAPABILITIES } from "../../src/cli/capabilities";
-import { MANAGEMENT_ROUTES } from "../../src/server/management/route-registry";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { CAPABILITIES } from "../../backend/src/cli/capabilities";
+import { MANAGEMENT_ROUTES } from "../../backend/src/server/management/route-registry";
 
 /**
  * `ocx models set` is the CLI half of the per-model editor. It drives the same route the

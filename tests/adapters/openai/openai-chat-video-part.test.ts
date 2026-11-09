@@ -13,8 +13,8 @@
  * passthrough and Google inline video are unaffected.
  */
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider = { adapter: "openai-chat", baseUrl: "https://gateway.example/v1", authMode: "key", apiKey: "k" } as unknown as OcxProviderConfig;
 

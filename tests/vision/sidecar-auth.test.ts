@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../src/oauth/store";
-import * as usabilityModule from "../../src/codex/account-usability";
+import * as storeModule from "../../backend/src/oauth/store";
+import * as usabilityModule from "../../backend/src/codex/account-usability";
 
 // The shared auth module reads two stores: the OAuth account store (Anthropic
 // side) and the Codex account credential state (ChatGPT side). Both are mocked
@@ -8,20 +8,20 @@ import * as usabilityModule from "../../src/codex/account-usability";
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean }>; activeAccountId?: string }> = {};
 let usableCodexAccounts: Set<string> = new Set();
 
-mock.module("../../src/oauth/store", () => ({
+mock.module("../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
-mock.module("../../src/codex/account-usability", () => ({
+mock.module("../../backend/src/codex/account-usability", () => ({
   ...usabilityModule,
   isCodexAccountUsable: (_config: unknown, accountId: string) => usableCodexAccounts.has(accountId),
 }));
 
-import { AUTH_SLOT_MODELS, resolveSidecarAuth, sidecarAuthSlots } from "../../src/sidecar/auth";
-import { findAnthropicSidecarProvider } from "../../src/web-search";
-import { findAnthropicVisionProvider } from "../../src/vision";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { AUTH_SLOT_MODELS, resolveSidecarAuth, sidecarAuthSlots } from "../../backend/src/sidecar/auth";
+import { findAnthropicSidecarProvider } from "../../backend/src/web-search";
+import { findAnthropicVisionProvider } from "../../backend/src/vision";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const forward: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" };
 const anthropicOAuth: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" };

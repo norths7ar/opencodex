@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
+import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

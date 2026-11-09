@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { clearableDeadline } from "../../src/lib/abort";
+import { clearableDeadline } from "../../backend/src/lib/abort";
 
 const delay = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 

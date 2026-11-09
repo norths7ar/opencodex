@@ -10,7 +10,7 @@ import {
   fetchAnthropicOrganizationUuid,
   fetchAnthropicResetGrantStatus,
   parseAnthropicResetGrantStatus,
-} from "../../../src/providers/anthropic-reset-grants";
+} from "../../../backend/src/providers/anthropic-reset-grants";
 import {
   ANTHROPIC_RESET_LEASE_MS,
   ANTHROPIC_RESET_RETRY_WINDOW_MS,
@@ -20,8 +20,8 @@ import {
   pendingAnthropicResetOperation,
   releaseAnthropicResetLease,
   settleAnthropicResetOperation,
-} from "../../../src/providers/anthropic-reset-grant-ledger";
-import { CLAUDE_CLI_USER_AGENT } from "../../../src/providers/claude-cli-identity";
+} from "../../../backend/src/providers/anthropic-reset-grant-ledger";
+import { CLAUDE_CLI_USER_AGENT } from "../../../backend/src/providers/claude-cli-identity";
 
 // Every upstream call in this file goes to an injected fake. No test may reach
 // api.anthropic.com: a real claim spends the user's one-time reset.

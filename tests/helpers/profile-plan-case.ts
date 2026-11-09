@@ -1,11 +1,11 @@
 import * as fs from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { spyOn } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { assertNotRealCodexHomeUnderTest, isTestHomeGuardArmed } from "../../src/lib/test-home-guard";
+import type { OcxConfig } from "../../backend/src/types";
+import { assertNotRealCodexHomeUnderTest, isTestHomeGuardArmed } from "../../backend/src/lib/test-home-guard";
 
 const owned = fs.realpathSync.native(process.env.OCX_TEST_PROFILE_OWNED_HOME!);
-const { CODEX_PROFILE_PATH } = await import("../../src/codex/paths");
+const { CODEX_PROFILE_PATH } = await import("../../backend/src/codex/paths");
 if (!isTestHomeGuardArmed()) throw new Error("test home guard is not armed");
 assertNotRealCodexHomeUnderTest(owned);
 if (process.env.OCX_REAL_HOME) {
@@ -22,7 +22,7 @@ if (relative(owned, fs.realpathSync.native(process.env.CODEX_HOME!)) !== "" ||
   throw new Error("refusing profile operation outside owned child home");
 }
 
-const { deriveCodexInjectionPlan, readCodexProfileSource } = await import("../../src/codex/inject/plan");
+const { deriveCodexInjectionPlan, readCodexProfileSource } = await import("../../backend/src/codex/inject/plan");
 const loopback = { baseUrl: "http://127.0.0.1:10100/v1", requiresAdmissionToken: false, tokenEnv: "OPENCODEX_API_AUTH_TOKEN" as const };
 const existing = 'stream_idle_timeout_ms = 60000\nfeatures = { fast_mode = false }\n\n[features]\nfast_mode = false\n';
 const plan = (fastMode = false) => deriveCodexInjectionPlan('model = "fixture-model"\n', {

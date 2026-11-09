@@ -6,7 +6,7 @@ import {
   MAX_WEB_SEARCH_URL_BYTES,
   appendSafeWebSearchSource,
   safeWebSearchSources,
-} from "../../src/web-search/sources";
+} from "../../backend/src/web-search/sources";
 
 const byteLength = (value: string): number => new TextEncoder().encode(value).byteLength;
 

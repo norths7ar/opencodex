@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, readFileSync } from "node:fs";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { managementInferencePort } from "../../src/server/management/context";
-import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../src/server/management/integration-routes";
-import { resetExportSnapshotForTests } from "../../src/server/management/model-rows";
-import type { OcxConfig } from "../../src/types";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { managementInferencePort } from "../../backend/src/server/management/context";
+import { setIntegrationMutationFlightTestHooks, setIntegrationPathTestHooks } from "../../backend/src/server/management/integration-routes";
+import { resetExportSnapshotForTests } from "../../backend/src/server/management/model-rows";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

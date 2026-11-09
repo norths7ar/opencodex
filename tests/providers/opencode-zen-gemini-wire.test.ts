@@ -1,16 +1,16 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { resolveFastPolicy } from "../../src/providers/fastwire";
-import { getProviderRegistryEntry, providerMatchesRegistryTransport } from "../../src/providers/registry";
-import { resolveModelPolicy } from "../../src/providers/resolved-model-policy";
-import { captureFastPolicyAuthority, fastPolicyForModel, serviceTierSupportForModel } from "../../src/providers/service-tier";
-import { parseRequest } from "../../src/responses/parser";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { captureWireAdapterHardPinPrefixes, isWirePinnedModel, pinnedWireAdapter } from "../../src/types/wire";
-import { openCodeZenBaseUrl, openCodeZenGeminiEndpoint } from "../../src/types/opencode-zen";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { resolveFastPolicy } from "../../backend/src/providers/fastwire";
+import { getProviderRegistryEntry, providerMatchesRegistryTransport } from "../../backend/src/providers/registry";
+import { resolveModelPolicy } from "../../backend/src/providers/resolved-model-policy";
+import { captureFastPolicyAuthority, fastPolicyForModel, serviceTierSupportForModel } from "../../backend/src/providers/service-tier";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { captureWireAdapterHardPinPrefixes, isWirePinnedModel, pinnedWireAdapter } from "../../backend/src/types/wire";
+import { openCodeZenBaseUrl, openCodeZenGeminiEndpoint } from "../../backend/src/types/opencode-zen";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 

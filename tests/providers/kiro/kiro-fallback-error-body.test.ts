@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createKiroAdapter as createKiroAdapterProduction } from "../../../src/adapters/kiro";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../src/lib/debug-settings";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter as createKiroAdapterProduction } from "../../../backend/src/adapters/kiro";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 

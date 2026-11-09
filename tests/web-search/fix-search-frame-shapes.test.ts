@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseSidecarSSE } from "../../src/web-search/parse";
+import { parseSidecarSSE } from "../../backend/src/web-search/parse";
 
 const response = (frames: unknown[]) => new Response(frames.map(frame => `data: ${JSON.stringify(frame)}\n\n`).join(""));
 describe("search SSE field shapes", () => {

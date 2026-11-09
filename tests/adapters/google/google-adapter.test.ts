@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import { summarizeGoogleWireShape } from "../../../src/adapters/google-wire-shape";
-import { chatCompletionsToResponsesBody } from "../../../src/chat/inbound";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../../src/bridge";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import { summarizeGoogleWireShape } from "../../../backend/src/adapters/google-wire-shape";
+import { chatCompletionsToResponsesBody } from "../../../backend/src/chat/inbound";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../../backend/src/bridge";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { parseRequest } from "../../../src/responses/parser";
-import { omitEarlierCompactionImages } from "../../../src/responses/compaction-images";
-import type { AdapterEvent, OcxParsedRequest } from "../../../src/types";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { omitEarlierCompactionImages } from "../../../backend/src/responses/compaction-images";
+import type { AdapterEvent, OcxParsedRequest } from "../../../backend/src/types";
 
 const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" };
 

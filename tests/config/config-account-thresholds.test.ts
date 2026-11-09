@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, getDefaultConfig, loadConfig, readConfigDiagnostics, saveConfig, validateConfigCandidate } from "../../src/config";
+import { getConfigPath, getDefaultConfig, loadConfig, readConfigDiagnostics, saveConfig, validateConfigCandidate } from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 let testDir = "";
 

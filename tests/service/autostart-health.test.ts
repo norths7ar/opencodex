@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { deriveDesktopStartup } from "../../src/service/desktop-startup";
-import { collectStartupHealth, deriveStartupHealth, formatStartupRoutingDetail, injectedRoutingRestartWarningLines, startupHealthSummary } from "../../src/codex/autostart-health";
-import { deadProxyRoutingAdviceLines, statusDeadProxyLines, statusUnusedProxyLines, unusedProxyWarningLines } from "../../src/cli/status";
-import { classifyCodexRouting, hasInjectedCodexRouting } from "../../src/codex/inject";
-import { isCodexClientProcess, listCodexClientProcesses } from "../../src/codex/native-profile-processes";
-import { collectRoutingAdoption, deriveRoutingAdoption } from "../../src/codex/routing-adoption";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { getCachedStartupHealth, getStartupHealthSnapshot, invalidateStartupHealthCache, markStartupHealthDiagnosticStale, resetStartupHealthCacheForTests } from "../../src/server/startup-health-cache";
-import type { OcxConfig } from "../../src/types";
+import { deriveDesktopStartup } from "../../backend/src/service/desktop-startup";
+import { collectStartupHealth, deriveStartupHealth, formatStartupRoutingDetail, injectedRoutingRestartWarningLines, startupHealthSummary } from "../../backend/src/codex/autostart-health";
+import { deadProxyRoutingAdviceLines, statusDeadProxyLines, statusUnusedProxyLines, unusedProxyWarningLines } from "../../backend/src/cli/status";
+import { classifyCodexRouting, hasInjectedCodexRouting } from "../../backend/src/codex/inject";
+import { isCodexClientProcess, listCodexClientProcesses } from "../../backend/src/codex/native-profile-processes";
+import { collectRoutingAdoption, deriveRoutingAdoption } from "../../backend/src/codex/routing-adoption";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { getCachedStartupHealth, getStartupHealthSnapshot, invalidateStartupHealthCache, markStartupHealthDiagnosticStale, resetStartupHealthCacheForTests } from "../../backend/src/server/startup-health-cache";
+import type { OcxConfig } from "../../backend/src/types";
 
 const base = {
   routingKind: "opencodex-local" as const,

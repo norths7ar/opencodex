@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { handleResponsesCompact } from "../../src/server/responses";
+import { handleResponsesCompact } from "../../backend/src/server/responses";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { callerToken, install, installationLiveFixture, liveConfig, turn } from "../helpers/codex-installation-live";
 

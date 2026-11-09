@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { markAccountNeedsReauth, clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { getDefaultConfig } from "../../src/config/proxy-env";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { markAccountNeedsReauth, clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { getDefaultConfig } from "../../backend/src/config/proxy-env";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
 import { clearCodexUpstreamHealth, clearThreadAccountMap, previewCodexAccountForRequest,
-  resolveCodexAccountForThread, resolveCodexAccountForThreadDetailed, resetCodexRoutingForManualSelection } from "../../src/codex/routing";
-import { bindThreadAffinity, bindModelDetourAffinity } from "../../src/codex/routing/thread-affinity";
-import type { OcxConfig } from "../../src/types";
-import type { StoredAccountQuota } from "../../src/codex/quota-types";
+  resolveCodexAccountForThread, resolveCodexAccountForThreadDetailed, resetCodexRoutingForManualSelection } from "../../backend/src/codex/routing";
+import { bindThreadAffinity, bindModelDetourAffinity } from "../../backend/src/codex/routing/thread-affinity";
+import type { OcxConfig } from "../../backend/src/types";
+import type { StoredAccountQuota } from "../../backend/src/codex/quota-types";
 
 const WINDOW = 5 * 60 * 60_000;
 let now: number;

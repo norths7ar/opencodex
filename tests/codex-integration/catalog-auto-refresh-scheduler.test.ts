@@ -14,14 +14,14 @@ import {
   selectDriftHealCatalogPath,
   startCatalogAutoRefresh,
   stopCatalogAutoRefresh,
-} from "../../src/codex/catalog-auto-refresh";
-import { lastCatalogAutoRefreshOutcome, resetCatalogAutoRefreshStatusForTests } from "../../src/codex/catalog-refresh-status";
-import type { CatalogOnlyOutcome } from "../../src/codex/convergence-types";
-import * as bundled from "../../src/codex/catalog/bundled";
-import * as entitlements from "../../src/codex/model-entitlements";
-import * as appServerProcesses from "../../src/codex/app-server-processes";
-import * as managementConvergence from "../../src/codex/management-convergence";
-import { DEFAULT_CATALOG_PATH } from "../../src/codex/paths";
+} from "../../backend/src/codex/catalog-auto-refresh";
+import { lastCatalogAutoRefreshOutcome, resetCatalogAutoRefreshStatusForTests } from "../../backend/src/codex/catalog-refresh-status";
+import type { CatalogOnlyOutcome } from "../../backend/src/codex/convergence-types";
+import * as bundled from "../../backend/src/codex/catalog/bundled";
+import * as entitlements from "../../backend/src/codex/model-entitlements";
+import * as appServerProcesses from "../../backend/src/codex/app-server-processes";
+import * as managementConvergence from "../../backend/src/codex/management-convergence";
+import { DEFAULT_CATALOG_PATH } from "../../backend/src/codex/paths";
 import {
   CATALOG_AUTO_REFRESH_MIN_INTERVAL_MS,
   armDetachedConfigBaseline,
@@ -29,8 +29,8 @@ import {
   getDefaultConfig,
   loadConfig,
   saveConfigPreservingClaudeCode,
-} from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   installIsolatedCodexHome,
   type IsolatedCodexHome,
@@ -415,11 +415,11 @@ describe("catalog auto-refresh drift heal", () => {
     ["Codex OFF", (config: OcxConfig) => { config.clientIntegrations = { ...config.clientIntegrations, codex: false }; }],
     ["picker order", (config: OcxConfig) => { config.codexAccountPriorities = { __main__: 5 }; }],
   ] as const)("real persisted config stays stable and a later %s edit blocks the client write", async (_label, edit) => {
-    const drift = await import("../../src/codex/config-drift-heal");
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const inject = await import("../../src/codex/inject");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const inject = await import("../../backend/src/codex/inject");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
     writeCatalogAutoRefreshConfig({ enabled: true, intervalMinutes: 60 });
     const fixture = JSON.parse(readFileSync(getConfigPath(), "utf8")) as Record<string, unknown>;
     fixture.apiKeys = [{ key: "fixture-key", name: "fixture", createdAt: "2026-01-01T00:00:00.000Z" }];
@@ -478,13 +478,13 @@ describe("catalog auto-refresh drift heal", () => {
 
   // Mock the writer and drift observer: a test must never reach a real Codex home.
   async function runHealTick(afterInjectDrifted: boolean) {
-    const drift = await import("../../src/codex/config-drift-heal");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
     const observeDrift = drift.codexConfigDrift;
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const sync = await import("../../src/codex/sync");
-    const inject = await import("../../src/codex/inject");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const sync = await import("../../backend/src/codex/sync");
+    const inject = await import("../../backend/src/codex/inject");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
     const configPath = join(openCodexHome, "healed-config.toml");
     const injected: Array<{ port: number; lockTimeoutMs: number | undefined }> = [];
     const info: string[] = [];
@@ -529,11 +529,11 @@ describe("catalog auto-refresh drift heal", () => {
   });
 
   test("a foreign service home prevents the drift healer from reaching the injector", async () => {
-    const drift = await import("../../src/codex/config-drift-heal");
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
-    const inject = await import("../../src/codex/inject");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
+    const inject = await import("../../backend/src/codex/inject");
     const spies = [
       spyOn(desired, "shouldSyncCodexOnStart").mockReturnValue(true),
       spyOn(drift, "codexConfigDrift").mockReturnValue({ drifted: true, missingKeys: ["openai_base_url"] }),
@@ -555,12 +555,12 @@ describe("catalog auto-refresh drift heal", () => {
   });
 
   test.each(["config", "generation"] as const)("admission refused on %s does not bypass the ownership veto on a foreign home", async (authority) => {
-    const drift = await import("../../src/codex/config-drift-heal");
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const admission = await import("../../src/codex/admission");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
-    const inject = await import("../../src/codex/inject");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const admission = await import("../../backend/src/codex/admission");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
+    const inject = await import("../../backend/src/codex/inject");
     // A write guard that derives veto from the admission result would pass here:
     // the refusal authority is not service-home. Ownership must veto on its own.
     const spies = [
@@ -589,11 +589,11 @@ describe("catalog auto-refresh drift heal", () => {
   });
 
   test("service-home ownership is rechecked at the injector write boundary", async () => {
-    const drift = await import("../../src/codex/config-drift-heal");
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
-    const inject = await import("../../src/codex/inject");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
+    const inject = await import("../../backend/src/codex/inject");
     const own = spyOn(ownership, "inspectNativeCodexOwnership")
       .mockReturnValueOnce({ ownership: "owned", reason: "fixture" })
       .mockReturnValue({ ownership: "foreign", reason: "fixture foreign install" });
@@ -620,12 +620,12 @@ describe("catalog auto-refresh drift heal", () => {
   });
 
   test.each(["stop", "restart", "settings", "off"])("a deferred injector cannot write or log success after %s", async (change) => {
-    const drift = await import("../../src/codex/config-drift-heal");
-    const desired = await import("../../src/codex/desired-state");
-    const processState = await import("../../src/config/process-state");
-    const sync = await import("../../src/codex/sync");
-    const inject = await import("../../src/codex/inject");
-    const ownership = await import("../../src/integrations/native/ownership-preflight");
+    const drift = await import("../../backend/src/codex/config-drift-heal");
+    const desired = await import("../../backend/src/codex/desired-state");
+    const processState = await import("../../backend/src/config/process-state");
+    const sync = await import("../../backend/src/codex/sync");
+    const inject = await import("../../backend/src/codex/inject");
+    const ownership = await import("../../backend/src/integrations/native/ownership-preflight");
     let entered!: () => void;
     const enteredInjector = new Promise<void>(resolve => { entered = resolve; });
     let release!: () => void;
@@ -695,21 +695,21 @@ describe("catalog auto-refresh drift heal", () => {
     const codex = join(root, "codex");
     const tmp = join(root, "tmp");
     for (const directory of [home, ocx, codex, tmp]) mkdirSync(directory);
-    const schedulerPath = fileURLToPath(new URL("../../src/codex/catalog-auto-refresh.ts", import.meta.url));
-    const driftPath = fileURLToPath(new URL("../../src/codex/config-drift-heal.ts", import.meta.url));
-    const desiredPath = fileURLToPath(new URL("../../src/codex/desired-state.ts", import.meta.url));
-    const processStatePath = fileURLToPath(new URL("../../src/config/process-state.ts", import.meta.url));
-    const syncPath = fileURLToPath(new URL("../../src/codex/sync.ts", import.meta.url));
-    const injectPath = fileURLToPath(new URL("../../src/codex/inject.ts", import.meta.url));
-    const configPath = fileURLToPath(new URL("../../src/config.ts", import.meta.url));
-    const admissionPath = fileURLToPath(new URL("../../src/codex/admission.ts", import.meta.url));
-    const ownershipPath = fileURLToPath(new URL("../../src/integrations/native/ownership-preflight.ts", import.meta.url));
+    const schedulerPath = fileURLToPath(new URL("../../backend/src/codex/catalog-auto-refresh.ts", import.meta.url));
+    const driftPath = fileURLToPath(new URL("../../backend/src/codex/config-drift-heal.ts", import.meta.url));
+    const desiredPath = fileURLToPath(new URL("../../backend/src/codex/desired-state.ts", import.meta.url));
+    const processStatePath = fileURLToPath(new URL("../../backend/src/config/process-state.ts", import.meta.url));
+    const syncPath = fileURLToPath(new URL("../../backend/src/codex/sync.ts", import.meta.url));
+    const injectPath = fileURLToPath(new URL("../../backend/src/codex/inject.ts", import.meta.url));
+    const configPath = fileURLToPath(new URL("../../backend/src/config.ts", import.meta.url));
+    const admissionPath = fileURLToPath(new URL("../../backend/src/codex/admission.ts", import.meta.url));
+    const ownershipPath = fileURLToPath(new URL("../../backend/src/integrations/native/ownership-preflight.ts", import.meta.url));
     const script = `
       const { spyOn } = require("bun:test");
       const fs = require("node:fs");
       const path = require("node:path");
       const configModule = require(${JSON.stringify(configPath)});
-      const sources = require(${JSON.stringify(fileURLToPath(new URL("../../src/codex/catalog-auto-refresh-sources.ts", import.meta.url)))});
+      const sources = require(${JSON.stringify(fileURLToPath(new URL("../../backend/src/codex/catalog-auto-refresh-sources.ts", import.meta.url)))});
       spyOn(sources, "refreshCatalogAutoRefreshSources").mockResolvedValue(undefined);
       const scheduler = require(${JSON.stringify(schedulerPath)});
       const drift = require(${JSON.stringify(driftPath)});
@@ -735,7 +735,7 @@ describe("catalog auto-refresh drift heal", () => {
       spyOn(console, "info").mockImplementation(() => {});
       await scheduler.runCatalogAutoRefreshTickForTests();
       process.stdout.write(JSON.stringify({ received }));
-      await require(${JSON.stringify(fileURLToPath(new URL("../../src/config/paths.ts", import.meta.url)))}).flushConfigDirHardeningAndReaps(process.env.OPENCODEX_HOME);
+      await require(${JSON.stringify(fileURLToPath(new URL("../../backend/src/config/paths.ts", import.meta.url)))}).flushConfigDirHardeningAndReaps(process.env.OPENCODEX_HOME);
     `;
     let childCompleted = false;
     try {
@@ -766,7 +766,7 @@ describe("catalog auto-refresh drift heal", () => {
       const fs = require("node:fs");
       const path = require("node:path");
       const config = require(${JSON.stringify(source("config.ts"))});
-      const sources = require(${JSON.stringify(fileURLToPath(new URL("../../src/codex/catalog-auto-refresh-sources.ts", import.meta.url)))});
+      const sources = require(${JSON.stringify(fileURLToPath(new URL("../../backend/src/codex/catalog-auto-refresh-sources.ts", import.meta.url)))});
       spyOn(sources, "refreshCatalogAutoRefreshSources").mockResolvedValue(undefined);
       const scheduler = require(${JSON.stringify(source("codex/catalog-auto-refresh.ts"))});
       const drift = require(${JSON.stringify(source("codex/config-drift-heal.ts"))});
@@ -799,7 +799,7 @@ describe("catalog auto-refresh drift heal", () => {
         deferred: info.some(line => line.includes("not re-injected this tick")) };
       await scheduler.runCatalogAutoRefreshTickForTests();
       process.stdout.write(JSON.stringify({ first, received, converges }));
-      await require(${JSON.stringify(fileURLToPath(new URL("../../src/config/paths.ts", import.meta.url)))}).flushConfigDirHardeningAndReaps(process.env.OPENCODEX_HOME);
+      await require(${JSON.stringify(fileURLToPath(new URL("../../backend/src/config/paths.ts", import.meta.url)))}).flushConfigDirHardeningAndReaps(process.env.OPENCODEX_HOME);
     `;
     let childCompleted = false;
     try {

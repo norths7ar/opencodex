@@ -3,13 +3,13 @@ import { existsSync, mkdtempSync, readdirSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
 import {
   clearReasoningReplayCacheForTests,
   peekReasoningForCall,
   rememberReasoningForCall,
-} from "../../src/responses/reasoning-replay-cache";
-import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -101,7 +101,7 @@ describe("reasoning replay empty-delta robustness", () => {
   test("the memory-only cache writes no reasoning state to disk even when persistence env vars are set", async () => {
     const scratch = mkdtempSync(join(tmpdir(), "ocx-reasoning-memory-only-"));
     const spill = join(scratch, "must-not-exist.json");
-    const moduleUrl = pathToFileURL(repoPath("src/responses/reasoning-replay-cache.ts")).href;
+    const moduleUrl = pathToFileURL(repoPath("backend/src/responses/reasoning-replay-cache.ts")).href;
     const script = [
       `const cache = await import(${JSON.stringify(moduleUrl)});`,
       `const scope = {clientPrincipalId:"principal-disk-guard",clientThreadId:"disk-guard",current:{providerName:"test",providerDestinationIdentity:"destination:test",adapterName:"openai-chat",modelId:"model",credentialIdentity:"key:test"}};`,

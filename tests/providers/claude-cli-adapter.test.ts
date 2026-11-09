@@ -10,18 +10,18 @@ import {
   createClaudeCliAdapter,
   withClaudeLoginHint,
   type SpawnFn,
-} from "../../src/adapters/claude-cli/adapter";
-import { CLAUDE_REPLAY_SYSTEM_PROMPT } from "../../src/adapters/claude-cli/stable-replay";
-import { baseScopedEnv } from "../../src/adapters/coding-agent/turn";
-import { CLAUDE_CLI_PROFILE, clearClaudeCliBinaryCache } from "../../src/adapters/claude-cli/profiles";
-import { effectiveAdapterContract, getAdapterDefinition } from "../../src/adapters/registry";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/claude-cli/adapter";
+import { CLAUDE_REPLAY_SYSTEM_PROMPT } from "../../backend/src/adapters/claude-cli/stable-replay";
+import { baseScopedEnv } from "../../backend/src/adapters/coding-agent/turn";
+import { CLAUDE_CLI_PROFILE, clearClaudeCliBinaryCache } from "../../backend/src/adapters/claude-cli/profiles";
+import { effectiveAdapterContract, getAdapterDefinition } from "../../backend/src/adapters/registry";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
+import { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
 import { createShippedSpendLedger, spendTestJournal, spendTestPolicy, testSpendSalt } from "../helpers/shipped-spend-ledger";
 
 const enc = new TextEncoder();

@@ -2,10 +2,10 @@ import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import * as os from "node:os";
 import { join, posix } from "node:path";
-import { assertServiceEnvironmentMatchesInstall } from "../../src/service/guards";
-import { repairService } from "../../src/service/repair";
-import { inspectNativeCodexOwnership } from "../../src/integrations/native/ownership-preflight";
-import { serviceStatePaths } from "../../src/service/state";
+import { assertServiceEnvironmentMatchesInstall } from "../../backend/src/service/guards";
+import { repairService } from "../../backend/src/service/repair";
+import { inspectNativeCodexOwnership } from "../../backend/src/integrations/native/ownership-preflight";
+import { serviceStatePaths } from "../../backend/src/service/state";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let fixtureHome: TempHome | undefined;

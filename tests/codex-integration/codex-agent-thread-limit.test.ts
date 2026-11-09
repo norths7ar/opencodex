@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { getAgentsMaxThreads, getLogicalMaxThreads, getMaxConcurrentThreads, hasAgentsMaxThreads, transitionMultiAgentV2 } from "../../src/codex/features";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { getAgentsMaxThreads, getLogicalMaxThreads, getMaxConcurrentThreads, hasAgentsMaxThreads, transitionMultiAgentV2 } from "../../backend/src/codex/features";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 
 function fixtureConfig(content: string): string {

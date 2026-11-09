@@ -11,7 +11,7 @@ import {
   loadConfig,
   resolveCatalogAutoRefreshIntervalMs,
   validateConfigCandidate,
-} from "../../src/config";
+} from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home = "";

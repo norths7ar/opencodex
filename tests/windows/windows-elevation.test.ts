@@ -21,7 +21,7 @@ import {
   setWindowsElevationProbeForTests,
   toWindowsSchtasksError,
   windowsCmdQuote,
-} from "../../src/lib/windows-elevation";
+} from "../../backend/src/lib/windows-elevation";
 
 describe("windows elevation helpers", () => {
   test("detects English and German access-denied text", () => {

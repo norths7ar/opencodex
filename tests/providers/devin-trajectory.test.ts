@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { claimDevinTrajectory } from "../../src/adapters/devin/trajectory";
+import { claimDevinTrajectory } from "../../backend/src/adapters/devin/trajectory";
 
 describe("bounded Devin trajectory claims", () => {
   const host = "https://server.codeium.com";

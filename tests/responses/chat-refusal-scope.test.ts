@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { responsesSseToChatCompletionsSse } from "../../src/chat/outbound";
+import { responsesSseToChatCompletionsSse } from "../../backend/src/chat/outbound";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 type Rec = Record<string, unknown>;

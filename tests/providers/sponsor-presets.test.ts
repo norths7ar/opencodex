@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { buildInitProviders } from "../../src/cli/init";
-import { deriveProviderPresets } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { pinSponsorRows, pinSponsorsWithinKind } from "../../src/providers/sponsor-order";
+import { buildInitProviders } from "../../backend/src/cli/init";
+import { deriveProviderPresets } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { pinSponsorRows, pinSponsorsWithinKind } from "../../backend/src/providers/sponsor-order";
 
 /**
  * The registry `sponsor` field is the only thing that marks a paid sponsor, and SPONSORS.md

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { gracefulStopHost, lastStopRefusalCode, lastStopRefusalMessage, ProxyOwnershipRefusedError, refusalNextStep, stopProxy, stopProxyGracefully } from "../../src/lib/process-control";
+import { gracefulStopHost, lastStopRefusalCode, lastStopRefusalMessage, ProxyOwnershipRefusedError, refusalNextStep, stopProxy, stopProxyGracefully } from "../../backend/src/lib/process-control";
 
 function okResponse(): Response {
   return new Response(JSON.stringify({ success: true, sharedTeardown: "performed" }), { status: 200 });

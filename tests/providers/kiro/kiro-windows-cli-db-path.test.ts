@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 
-import { resolveKiroCliNativeSessionEntries } from "../../../src/oauth/kiro-credentials";
+import { resolveKiroCliNativeSessionEntries } from "../../../backend/src/oauth/kiro-credentials";
 
 /**
  * Issue #710: `ocx login kiro` could not import an existing Windows Kiro CLI session because the

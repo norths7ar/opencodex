@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import { SerializedToolCallContentBuffer } from "../../../src/adapters/openai-chat/serialized-tool-call-content";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import { SerializedToolCallContentBuffer } from "../../../backend/src/adapters/openai-chat/serialized-tool-call-content";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 /**

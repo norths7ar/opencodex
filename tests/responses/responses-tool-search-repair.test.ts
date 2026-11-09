@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { isTranslatorBudgetExceededError } from "../../src/lib/translator-budget";
+import { isTranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
 import {
   restoreRoutedToolSearchCallsInJson,
   rewriteRoutedToolSearchForUpstream,
-} from "../../src/responses/tool-search-compat";
-import { createRoutedToolSearchRestoreBlockRewrite } from "../../src/server/responses-tool-search-repair";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/tool-search-compat";
+import { createRoutedToolSearchRestoreBlockRewrite } from "../../backend/src/server/responses-tool-search-repair";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

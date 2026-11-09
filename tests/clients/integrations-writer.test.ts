@@ -4,13 +4,13 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { buildClientContribution, type ExportModel } from "../../src/clients/config-export";
-import { assertIntegrationWriteOwnership, fileIO, type IntegrationIO } from "../../src/integrations/config-io";
-import { canonicalContribution, fingerprint } from "../../src/integrations/ownership";
-import { protectedContributionFingerprint } from "../../src/integrations/ownership-policy";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { exportContextOf, readIntegrationState } from "../../src/integrations/state";
+import { buildClientContribution, type ExportModel } from "../../backend/src/clients/config-export";
+import { assertIntegrationWriteOwnership, fileIO, type IntegrationIO } from "../../backend/src/integrations/config-io";
+import { canonicalContribution, fingerprint } from "../../backend/src/integrations/ownership";
+import { protectedContributionFingerprint } from "../../backend/src/integrations/ownership-policy";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { exportContextOf, readIntegrationState } from "../../backend/src/integrations/state";
 import {
   applyIntegration,
   disableIntegration,
@@ -18,8 +18,8 @@ import {
   refreshIntegration,
   restoreIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

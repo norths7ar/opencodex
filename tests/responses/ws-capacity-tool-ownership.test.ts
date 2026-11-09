@@ -2,16 +2,16 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
 import {
   codexWebSocketAdmissionMetrics, MAX_TRACKED_CODEX_WEBSOCKETS, tryReserveCodexWebSocket,
-} from "../../src/codex/websocket-registry";
-import type { AdmissionReservation } from "../../src/lib/admission";
-import { runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import { clearRequestLogsForTests } from "../../src/server/request-log";
-import { setRelayPlatformForTests } from "../../src/server/responses/passthrough-delivery";
-import type { WsData } from "../../src/server/ws-bridge";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/websocket-registry";
+import type { AdmissionReservation } from "../../backend/src/lib/admission";
+import { runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import { clearRequestLogsForTests } from "../../backend/src/server/request-log";
+import { setRelayPlatformForTests } from "../../backend/src/server/responses/passthrough-delivery";
+import type { WsData } from "../../backend/src/server/ws-bridge";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

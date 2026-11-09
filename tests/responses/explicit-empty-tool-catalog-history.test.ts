@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import * as adapterResolver from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import * as adapterResolver from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses";
 import {
   clearResponseStateForTests,
   expandPreviousResponseInput,
   flushResponseState,
-} from "../../src/responses/state";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest } from "../../src/types";
+} from "../../backend/src/responses/state";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 

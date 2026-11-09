@@ -24,8 +24,8 @@ import {
   localInferenceDestination,
   localLoopbackInferencePorts,
   localManagementOrigin,
-} from "../../src/lib/local-destinations";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/local-destinations";
+import type { OcxConfig } from "../../backend/src/types";
 
 const TAILNET = "100.76.170.81";
 const PUBLIC_PORT = 10_100;

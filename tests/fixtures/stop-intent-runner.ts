@@ -1,19 +1,19 @@
 /** Real management stop intent/restart admission; teardown and host effects are controlled. */
 import { mock } from "bun:test";
-import type { StopTeardownBody } from "../../src/server/stop-teardown";
+import type { StopTeardownBody } from "../../backend/src/server/stop-teardown";
 
 const mode = process.argv[2]!;
 const waiting: Array<{ resolve(body: StopTeardownBody): void; reject(error: Error): void }> = [];
-const service = await import("../../src/service");
-mock.module("../../src/service", () => ({ ...service,
+const service = await import("../../backend/src/service");
+mock.module("../../backend/src/service", () => ({ ...service,
   installedServiceRespawnRisk: () => "none", stopServiceIfInstalledDetailed: () => "absent",
 }));
-const teardown = await import("../../src/server/stop-teardown");
-mock.module("../../src/server/stop-teardown", () => ({ ...teardown,
+const teardown = await import("../../backend/src/server/stop-teardown");
+mock.module("../../backend/src/server/stop-teardown", () => ({ ...teardown,
   performStopTeardown: () => new Promise<StopTeardownBody>((resolve, reject) => { waiting.push({ resolve, reject }); }),
 }));
-const { handleManagementAPI } = await import("../../src/server/management-api");
-const { acceptSystemRestart, noteExplicitShutdownRequested } = await import("../../src/server/management/system-restart");
+const { handleManagementAPI } = await import("../../backend/src/server/management-api");
+const { acceptSystemRestart, noteExplicitShutdownRequested } = await import("../../backend/src/server/management/system-restart");
 const config = { port: 10100, hostname: "127.0.0.1", providers: {}, defaultProvider: "openai" };
 const refused: StopTeardownBody = { success: false, sharedTeardown: "refused", message: "fixture ownership pending" };
 const accepted: StopTeardownBody = { success: true, sharedTeardown: "performed", message: "fixture restored" };

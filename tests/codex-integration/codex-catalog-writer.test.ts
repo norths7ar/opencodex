@@ -19,19 +19,19 @@ import * as filesystem from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { AtomicWriteResidualTempError } from "../../src/config";
-import { syncCatalogModels } from "../../src/codex/catalog/retained-sync";
-import { catalogBackupPathFor } from "../../src/codex/catalog/parsing";
-import type { AtomicWriteIO } from "../../src/config";
+import { AtomicWriteResidualTempError } from "../../backend/src/config";
+import { syncCatalogModels } from "../../backend/src/codex/catalog/retained-sync";
+import { catalogBackupPathFor } from "../../backend/src/codex/catalog/parsing";
+import type { AtomicWriteIO } from "../../backend/src/config";
 import {
   type CatalogWritePermit,
   CatalogWritePermitRefusal,
   withCatalogWriteSerialization,
-} from "../../src/codex/catalog-write-serialization";
+} from "../../backend/src/codex/catalog-write-serialization";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import {
   type CatalogBackupWriteIO,
   type PreparedCatalogFileWrite,
@@ -39,14 +39,14 @@ import {
   publishLegacyCodexCatalogBackup,
   replaceActiveCodexCatalog,
   replaceCodexModelsCache,
-} from "../../src/codex/internal/catalog-writer";
+} from "../../backend/src/codex/internal/catalog-writer";
 import {
   CONFIG_UNINSTALL_MANIFEST,
   CONFIG_OWNER_FILE,
   initializeConfigOwnership,
   recordOwnedConfigPath,
   removeOwnedConfigState,
-} from "../../src/lib/config-ownership";
+} from "../../backend/src/lib/config-ownership";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** Every K acquisition states its intent (#6529); these tests exercise the lock, not the intent. */

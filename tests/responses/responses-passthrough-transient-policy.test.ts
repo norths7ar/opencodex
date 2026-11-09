@@ -3,11 +3,11 @@ import { readResponsesCoreModule } from "../helpers/responses-core-source";
 import {
   createResponsesSendBudget,
   transientSendCapFor,
-} from "../../src/server/responses/request-send-budget";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { TRANSIENT_RETRY_MAX_ATTEMPTS } from "../../src/lib/upstream-retry";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { ResponsesRequestContext } from "../../src/server/responses/core-options";
+} from "../../backend/src/server/responses/request-send-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { TRANSIENT_RETRY_MAX_ATTEMPTS } from "../../backend/src/lib/upstream-retry";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { ResponsesRequestContext } from "../../backend/src/server/responses/core-options";
 
 /** Whitespace-independent, so reformatting a call site cannot silently retire an assertion. */
 function dense(source: string): string {

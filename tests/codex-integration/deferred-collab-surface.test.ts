@@ -11,16 +11,16 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { collabSurface, multiAgentGuidanceText } from "../../src/server/responses";
-import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../src/codex/multi-agent-mode-policy";
-import { parseRequest } from "../../src/responses/parser";
+import { collabSurface, multiAgentGuidanceText } from "../../backend/src/server/responses";
+import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../backend/src/codex/multi-agent-mode-policy";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
   expandPreviousResponseInput,
   flushResponseState,
   rememberResponseState,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const V1_PROACTIVE = `<multi_agent_mode>${MULTI_AGENT_MODE_HINT_RECOMMENDATION.text}</multi_agent_mode>`;

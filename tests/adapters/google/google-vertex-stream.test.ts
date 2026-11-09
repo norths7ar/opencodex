@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { isVertexTruncatedTurn, isVertexTruncationReason, vertexTruncationErrorMessage } from "../../../src/adapters/google-truncation";
-import { bridgeToResponsesSSE } from "../../../src/bridge";
-import { guardEmptyCompletionEventStream } from "../../../src/server/responses/empty-completion-guard";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { isVertexTruncatedTurn, isVertexTruncationReason, vertexTruncationErrorMessage } from "../../../backend/src/adapters/google-truncation";
+import { bridgeToResponsesSSE } from "../../../backend/src/bridge";
+import { guardEmptyCompletionEventStream } from "../../../backend/src/server/responses/empty-completion-guard";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>
@@ -164,7 +164,7 @@ describe("vertex parseResponse fail-closed truncation (non-streaming)", () => {
 
 describe("usage status for google-vertex stays reported", () => {
   test("usageForFinalLog does not force-estimate google-vertex (but does for kiro)", async () => {
-    const { usageForFinalLog, usageStatusForFinalLog } = await import("../../../src/usage/log");
+    const { usageForFinalLog, usageStatusForFinalLog } = await import("../../../backend/src/usage/log");
     const usage = { inputTokens: 5, outputTokens: 2 };
     const vertex = usageForFinalLog("google-vertex", usage);
     expect(vertex?.estimated).toBeUndefined();

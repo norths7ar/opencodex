@@ -17,7 +17,7 @@ import {
   FEATURE_SOURCES,
   PROTOCOL_FEATURES,
   unrepresentableFeatures,
-} from "../../src/protocols/features";
+} from "../../backend/src/protocols/features";
 
 describe("feature extraction", () => {
   test("Chat bodies report only structural features", () => {

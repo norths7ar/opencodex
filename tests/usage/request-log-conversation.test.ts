@@ -10,13 +10,13 @@ import {
   sessionIdHeaderFromRequest,
   summarizeConversationLogs,
   unwrapLogConversationQuery,
-} from "../../src/server/request-log-conversation";
+} from "../../backend/src/server/request-log-conversation";
 import {
   filterRequestLogs,
   requestLogEntryFromPersistedUsage,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 
 function log(overrides: Partial<RequestLogEntry>): RequestLogEntry {
   return {
@@ -142,7 +142,7 @@ describe("conversationIdFromResponsesRequest", () => {
 
 test("Hermes identity is a log-only fallback that any native id replaces", async () => {
   const { assignNativeLogConversationId, fillHermesLogConversationFallback } =
-    await import("../../src/server/request-log-conversation");
+    await import("../../backend/src/server/request-log-conversation");
   const rawId = "hermes-responses-fixture";
   const headers = new Headers({ "x-hermes-conversation-id": rawId });
   const slot: { conversationId?: string; conversationIdIsHermesFallback?: boolean } = {};
@@ -159,7 +159,7 @@ test("Hermes identity is a log-only fallback that any native id replaces", async
 
 test("a caller-owned log id (routed Claude) is never replaced", async () => {
   const { assignNativeLogConversationId, fillHermesLogConversationFallback } =
-    await import("../../src/server/request-log-conversation");
+    await import("../../backend/src/server/request-log-conversation");
   const slot: { conversationId?: string; conversationIdIsHermesFallback?: boolean } = {
     conversationId: digest32("claude-metadata-user"),
   };
@@ -170,7 +170,7 @@ test("a caller-owned log id (routed Claude) is never replaced", async () => {
 
 test("Responses: empty session header does not suppress valid thread-id over Hermes fallback", async () => {
   const { nativeLogConversationIdFromHeaders, conversationIdFromResponsesRequest, sessionIdHeaderFromRequest } =
-    await import("../../src/server/request-log-conversation");
+    await import("../../backend/src/server/request-log-conversation");
   const rawThreadId = "native-thread-valid";
   const headers = new Headers({
     "session_id": "",
@@ -187,7 +187,7 @@ test("Responses: empty session header does not suppress valid thread-id over Her
 });
 
 test("Chat: empty session_id does not mask valid session-id over Hermes fallback", async () => {
-  const { nativeLogConversationIdFromHeaders } = await import("../../src/server/request-log-conversation");
+  const { nativeLogConversationIdFromHeaders } = await import("../../backend/src/server/request-log-conversation");
   const rawSessionId = "native-session-valid";
   const headers = new Headers({
     "session_id": "",

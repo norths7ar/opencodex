@@ -2,12 +2,12 @@ import { describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { resolveNativeReasoningRetention } from "../../src/config/schema/native-reasoning-retention";
-import { warnDegradedTopLevelOptIns } from "../../src/config/load-degrade";
-import { codexWsReuseAcrossTurnsEnabled, setCodexWsReuseAcrossTurns } from "../../src/config/codex-ws-reuse-setting";
+import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { resolveNativeReasoningRetention } from "../../backend/src/config/schema/native-reasoning-retention";
+import { warnDegradedTopLevelOptIns } from "../../backend/src/config/load-degrade";
+import { codexWsReuseAcrossTurnsEnabled, setCodexWsReuseAcrossTurns } from "../../backend/src/config/codex-ws-reuse-setting";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const off = { modelSwitch: false, accountSwitch: false };

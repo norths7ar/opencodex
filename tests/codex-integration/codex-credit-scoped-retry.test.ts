@@ -2,22 +2,22 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   CodexPoolAccountCreditsOffError, cooldownErrorResponse, resolveCodexAuthContext,
   materializeCodexUpstreamAuth, materializeCodexUpstreamAuthAsync,
   createCodexAuthDispatchGuard, applyCodexAuthContextToProvider, assertCodexAuthContextNotCooled,
-} from "../../src/codex/auth-context";
-import { createOpenAiSidecarCreditGuard } from "../../src/providers/openai-sidecar-credit";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
+} from "../../backend/src/codex/auth-context";
+import { createOpenAiSidecarCreditGuard } from "../../backend/src/providers/openai-sidecar-credit";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
 import {
   clearCodexUpstreamHealth, clearThreadAccountMap, getCodexQuotaHealthSnapshot, recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const ID = "scoped-credit-fixture";

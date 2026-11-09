@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints, catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
-import { deriveEntry } from "../../src/codex/catalog/sync";
-import { captureProviderGather } from "../../src/codex/catalog/gather-capture";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { OcxProviderConfig } from "../../src/types";
+import { applyProviderConfigHints, catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
+import { deriveEntry } from "../../backend/src/codex/catalog/sync";
+import { captureProviderGather } from "../../backend/src/codex/catalog/gather-capture";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Regression coverage for the Grok CLI subscription lane (cli-chat-proxy.grok.com).

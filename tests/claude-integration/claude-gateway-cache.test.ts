@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { claudeConfigDir, fetchGatewayModels, refreshGatewayModelCacheFromProxy, writeGatewayModelCache } from "../../src/claude/gateway-cache";
+import { claudeConfigDir, fetchGatewayModels, refreshGatewayModelCacheFromProxy, writeGatewayModelCache } from "../../backend/src/claude/gateway-cache";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const dirs: string[] = [];

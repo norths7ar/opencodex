@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleSystemCommand } from "../../src/cli/system-command";
-import { handleSystemRoutes } from "../../src/server/management/system-routes";
-import { resetSharedSpendLedgerForTest } from "../../src/lib/spend-reservation-ledger";
+import { handleSystemCommand } from "../../backend/src/cli/system-command";
+import { handleSystemRoutes } from "../../backend/src/server/management/system-routes";
+import { resetSharedSpendLedgerForTest } from "../../backend/src/lib/spend-reservation-ledger";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 
 const realFetch = globalThis.fetch;
 let home: TempHome, out: ReturnType<typeof spyOn>, err: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

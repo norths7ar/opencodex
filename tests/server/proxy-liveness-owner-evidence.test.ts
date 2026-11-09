@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { isConnectionRefused, loopbackProbeHosts, observeProxyLiveness, type LivenessIo } from "../../src/server/proxy-liveness";
-import { normalizeBindHostname } from "../../src/server/bind-host";
+import { isConnectionRefused, loopbackProbeHosts, observeProxyLiveness, type LivenessIo } from "../../backend/src/server/proxy-liveness";
+import { normalizeBindHostname } from "../../backend/src/server/bind-host";
 
 const refused = () => Object.assign(new Error("refused"), { code: "ECONNREFUSED" });
 const base: LivenessIo = {

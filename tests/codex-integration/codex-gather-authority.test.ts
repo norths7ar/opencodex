@@ -7,14 +7,14 @@ import { join } from "node:path";
 import {
   clearGatherRoutedModelsInflight,
   gatherRoutedModels,
-} from "../../src/codex/catalog";
-import { captureProviderGather } from "../../src/codex/catalog/gather-capture";
-import { buildModelsRequest, OAUTH_PROVIDERS } from "../../src/oauth";
-import { saveCredential } from "../../src/oauth/store";
+} from "../../backend/src/codex/catalog";
+import { captureProviderGather } from "../../backend/src/codex/catalog/gather-capture";
+import { buildModelsRequest, OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { PROVIDER_REGISTRY, type ProviderModelDiscoverySpec } from "../../src/providers/registry";
-import type { OcxConfig } from "../../src/types";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { PROVIDER_REGISTRY, type ProviderModelDiscoverySpec } from "../../backend/src/providers/registry";
+import type { OcxConfig } from "../../backend/src/types";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 import { withRegistryDiscovery } from "../helpers/provider-registry-discovery";
 

@@ -5,11 +5,11 @@ import {
   cachedAgentTaskRecovery,
   resetAgentTaskRecoveryCache,
   resolveCachedAgentTaskRecovery,
-} from "../../src/server/responses/agent-task-recovery-cache";
+} from "../../backend/src/server/responses/agent-task-recovery-cache";
 import {
   recoverEncryptedAgentTaskWithResult,
   restoreCachedEncryptedAgentTasks,
-} from "../../src/server/responses/agent-task-recovery";
+} from "../../backend/src/server/responses/agent-task-recovery";
 import {
   codexHeaders,
   encryptedInput,

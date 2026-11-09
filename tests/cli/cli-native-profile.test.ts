@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { cmdAccount } from "../../src/cli/account";
-import { apiError } from "../../src/cli/account-api";
-import { nativeMainCodexLoginInvocation } from "../../src/cli/account-main";
+import { cmdAccount } from "../../backend/src/cli/account";
+import { apiError } from "../../backend/src/cli/account-api";
+import { nativeMainCodexLoginInvocation } from "../../backend/src/cli/account-main";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalLog = console.log;

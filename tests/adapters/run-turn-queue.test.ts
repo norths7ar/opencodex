@@ -7,8 +7,8 @@ import {
   PREFLIGHT_HEARTBEAT_RETAIN_LIMIT,
   preflightAdapterEvents,
   retainedEventCodeUnits,
-} from "../../src/adapters/run-turn-queue";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/adapters/run-turn-queue";
+import type { AdapterEvent } from "../../backend/src/types";
 
 const text = (value: string): AdapterEvent => ({ type: "text_delta", text: value });
 const phasedText = (value: string, phase: "final" | "commentary"): AdapterEvent => ({ type: "text_delta", text: value, phase });

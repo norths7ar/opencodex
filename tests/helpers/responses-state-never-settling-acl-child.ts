@@ -9,12 +9,12 @@ import {
   responseStateMetrics,
   setResponseSpillAsyncAclAttemptBudgetForTests,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import {
   setAsyncIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
-import { setAsyncWindowsPrincipalRunnerForTests } from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setAsyncWindowsPrincipalRunnerForTests } from "../../backend/src/lib/windows-user-principal";
 import { removeTreeAfterBackgroundWork } from "./remove-tree";
 
 type Mode = "principal" | "icacls";

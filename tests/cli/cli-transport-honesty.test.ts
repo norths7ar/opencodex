@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { RuntimeApiError, runtimeRequest } from "../../src/cli/runtime-api";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { apiError, apiJson, proxyUnreachable } from "../../src/cli/account-api";
-import { assertNotAdminToken, assertServiceAuthEnvironment } from "../../src/service";
-import { dataPlaneCredentialCollisionCheck } from "../../src/cli/doctor";
-import type { AccountDeps } from "../../src/cli/account-api";
+import { RuntimeApiError, runtimeRequest } from "../../backend/src/cli/runtime-api";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { apiError, apiJson, proxyUnreachable } from "../../backend/src/cli/account-api";
+import { assertNotAdminToken, assertServiceAuthEnvironment } from "../../backend/src/service";
+import { dataPlaneCredentialCollisionCheck } from "../../backend/src/cli/doctor";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
 import { repoPath } from "../helpers/repo-root";
 
 /**
@@ -18,8 +18,8 @@ import { repoPath } from "../helpers/repo-root";
  * data-plane secret and fence the whole management API closed.
  */
 
-const DISPATCH_SOURCE = readFileSync(repoPath("src", "cli", "dispatch.ts"), "utf8");
-const SYNC_SOURCE = readFileSync(repoPath("src", "cli", "sync-command.ts"), "utf8");
+const DISPATCH_SOURCE = readFileSync(repoPath("backend/src", "cli", "dispatch.ts"), "utf8");
+const SYNC_SOURCE = readFileSync(repoPath("backend/src", "cli", "sync-command.ts"), "utf8");
 
 /**
  * Matches `await someHandler(...); return 0;` — the shape that silently discards a
@@ -129,7 +129,7 @@ describe("#2698 the status mapping and transport cause are actually reachable", 
    * assertions are about the CALL SITES rather than the helpers.
    */
   const SOURCES = ["account.ts", "account-extended.ts", "account-main.ts"].map(name =>
-    readFileSync(repoPath("src", "cli", name), "utf8"));
+    readFileSync(repoPath("backend/src", "cli", name), "utf8"));
 
   test("every apiError call site forwards the response status", () => {
     const bare: string[] = [];
@@ -323,12 +323,12 @@ describe("#2696 a management token is refused as the data-plane secret", () => {
   });
 
   test("handleStart asserts the token it is about to export", () => {
-    const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     expect(source).toContain("assertNotAdminToken(present)");
   });
 
   test("familyFailure forwards the transport cause", () => {
-    const source = readFileSync(repoPath("src", "cli", "account-extended.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "account-extended.ts"), "utf8");
     expect(source).toMatch(/networkDown\) return proxyUnreachable\(result\.transportError\)/);
   });
 });

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { exportDefaultReasoningEffort, exportReasoningEfforts, resolveExportReasoningAxes } from "../../src/clients/config-export/reasoning-metadata";
-import { inputBudgetFor } from "../../src/clients/config-export/model-metadata";
-import type { OpencodeCatalogModel } from "../../src/clients/config-export";
+import { exportDefaultReasoningEffort, exportReasoningEfforts, resolveExportReasoningAxes } from "../../backend/src/clients/config-export/reasoning-metadata";
+import { inputBudgetFor } from "../../backend/src/clients/config-export/model-metadata";
+import type { OpencodeCatalogModel } from "../../backend/src/clients/config-export";
 
 const model: OpencodeCatalogModel = { namespaced: "mock/model" };
 

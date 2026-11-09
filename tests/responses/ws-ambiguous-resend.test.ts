@@ -3,27 +3,27 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountNeedsReauth } from "../../src/codex/auth-api";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { handleResponses } from "../../src/server/responses";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/auth-api";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { handleResponses } from "../../backend/src/server/responses";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
 import {
   CODEX_WS_RESPONSE_PRELUDE_TIMEOUT_MS,
   codexWsSocketDeathStage,
   readCodexWsStage,
-} from "../../src/server/responses/codex-ws-wire";
+} from "../../backend/src/server/responses/codex-ws-wire";
 import {
   isNonReplayableResponse,
   REPLAY_REFUSED_STATUS,
   UPSTREAM_RESET_REPLAY_REFUSED_CODE,
-} from "../../src/lib/upstream-retry";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/lib/upstream-retry";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { BOUNDED_WS_RUNTIME, codexWsUpstreamFetch, streamingInit } from "../helpers/ws-upstream-fixtures";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

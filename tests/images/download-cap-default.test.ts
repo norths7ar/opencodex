@@ -9,10 +9,10 @@ import { afterAll, describe, expect, mock, test } from "bun:test";
 // `mock.module` outlives this file: Bun keeps both overrides below for every file that
 // runs after this one in the same process. Keep the real modules and put them back.
 const realDns = { ...(await import("node:dns/promises")) };
-const realPinnedHttp = { ...(await import("../../src/lib/pinned-http")) };
+const realPinnedHttp = { ...(await import("../../backend/src/lib/pinned-http")) };
 afterAll(() => {
   mock.module("node:dns/promises", () => realDns);
-  mock.module("../../src/lib/pinned-http", () => realPinnedHttp);
+  mock.module("../../backend/src/lib/pinned-http", () => realPinnedHttp);
 });
 
 const lookupMock = mock(async (): Promise<{ address: string; family: number }[]> => [
@@ -23,7 +23,7 @@ mock.module("node:dns/promises", () => ({ lookup: lookupMock }));
 const MIN_PNG = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const seenMaxBytes: Array<number | undefined> = [];
 
-mock.module("../../src/lib/pinned-http", () => ({
+mock.module("../../backend/src/lib/pinned-http", () => ({
   pinnedHttpGet: async (
     _url: string,
     _pinned: unknown,

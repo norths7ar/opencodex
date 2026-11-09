@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { resolveKiroCliExecutable } from "../../../src/oauth/kiro-credentials";
+import { resolveKiroCliExecutable } from "../../../backend/src/oauth/kiro-credentials";
 
 /**
  * Forced/add-account Kiro login still shells out to the local CLI. After #710 fixed Windows

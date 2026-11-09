@@ -6,18 +6,18 @@ import {
   clearAccountQuota,
   markAccountNeedsReauth,
   updateAccountQuota,
-} from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { pinnedCodexAccountId } from "../../src/codex/account-priority";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
+} from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { pinnedCodexAccountId } from "../../backend/src/codex/account-priority";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   codexAccountPinDrainReason,
-} from "../../src/codex/routing";
+} from "../../backend/src/codex/routing";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * #4521: "Use this account next" was accepted with a bare 200 for an account the very next

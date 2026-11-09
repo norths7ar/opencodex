@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { findLiveProxy, observeProxyLiveness, type LivenessIo } from "../../src/server/proxy-liveness";
+import { findLiveProxy, observeProxyLiveness, type LivenessIo } from "../../backend/src/server/proxy-liveness";
 
 const refused = () => Object.assign(new Error("connect refused"), { code: "ECONNREFUSED" });
 const timeout = () => Object.assign(new Error("timeout"), { code: "ETIMEDOUT" });

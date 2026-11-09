@@ -16,26 +16,26 @@ const restored = { success: true, message: "fixture restored", artifacts: {
 } };
 
 // Replace host mutation only. Receipt verification, handler, drain and exit remain real.
-const service = await import("../../src/service");
-mock.module("../../src/service", () => ({ ...service,
+const service = await import("../../backend/src/service");
+mock.module("../../backend/src/service", () => ({ ...service,
   installedServiceRespawnRisk: () => "none", stopServiceIfInstalledDetailed: () => { calls.service++; return "stopped"; },
 }));
-const native = await import("../../src/codex/inject");
-mock.module("../../src/codex/inject", () => ({ ...native,
+const native = await import("../../backend/src/codex/inject");
+mock.module("../../backend/src/codex/inject", () => ({ ...native,
   restoreNativeCodexAsync: async () => { calls.apiNative++; events.push("native-api"); return restored; },
 }));
-const grok = await import("../../src/grok/inject");
-mock.module("../../src/grok/inject", () => ({ ...grok,
+const grok = await import("../../backend/src/grok/inject");
+mock.module("../../backend/src/grok/inject", () => ({ ...grok,
   stripGrokConfig: () => { calls.apiGrok++; events.push("grok-api"); return { ok: true, changed: true, message: "fixture stripped" }; },
 }));
 
-const { claimPendingTeardown, readPendingTeardown } = await import("../../src/config/pending-teardown");
-const { isSharedTeardownDeferredOnExit } = await import("../../src/server/stop-teardown");
-const { stopRestoreWriteGuard } = await import("../../src/cli/stop-restore-guard");
-const { decideStartExitTeardown } = await import("../../src/cli/dispatch");
-const { setServerRef, setServerStartupLifecycleReleaseForTests, isRecyclingForExit, markRecyclingForExit } = await import("../../src/server/lifecycle");
-const { handleManagementAPI } = await import("../../src/server/management-api");
-const { directLocalHttpFetch } = await import("../../src/server/direct-local-http");
+const { claimPendingTeardown, readPendingTeardown } = await import("../../backend/src/config/pending-teardown");
+const { isSharedTeardownDeferredOnExit } = await import("../../backend/src/server/stop-teardown");
+const { stopRestoreWriteGuard } = await import("../../backend/src/cli/stop-restore-guard");
+const { decideStartExitTeardown } = await import("../../backend/src/cli/dispatch");
+const { setServerRef, setServerStartupLifecycleReleaseForTests, isRecyclingForExit, markRecyclingForExit } = await import("../../backend/src/server/lifecycle");
+const { handleManagementAPI } = await import("../../backend/src/server/management-api");
+const { directLocalHttpFetch } = await import("../../backend/src/server/direct-local-http");
 const config = { port: 0, hostname: "127.0.0.1", providers: {}, defaultProvider: "openai", shutdownTimeoutMs: 0 };
 const server = Bun.serve({ hostname: "127.0.0.1", port: 0, reusePort: false,
   async fetch(req) {
@@ -53,7 +53,7 @@ const receipt = claimPendingTeardown({ hostname: "127.0.0.1", port: config.port 
 
 // Register the real CLI cleanup body on the real exit event; do not call it as a substitute
 // for the API handler. The API's own timer must drain and invoke process.exit first.
-const source = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+const source = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
 const from = source.indexOf("  const syncCleanup = () => {");
 const to = source.indexOf("\n  let shuttingDown", from);
 if (from < 0 || to < 0) throw new Error("CLI exit cleanup missing");

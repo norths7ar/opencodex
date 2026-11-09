@@ -4,9 +4,9 @@ import { createCodexCliTestRoot } from "./codex-cli-fixture-root";
 import { expect, mock, spyOn } from "bun:test";
 import * as fs from "node:fs";
 import { join } from "node:path";
-import * as provenance from "../../src/codex/cli-install-provenance";
-import * as artifacts from "../../src/codex/cli-update-artifacts";
-import * as files from "../../src/codex/cli-update-files";
+import * as provenance from "../../backend/src/codex/cli-install-provenance";
+import * as artifacts from "../../backend/src/codex/cli-update-artifacts";
+import * as files from "../../backend/src/codex/cli-update-files";
 import { fixtureArtifactSet } from "./codex-cli-apply-artifact";
 import { removeTreeWithRetry } from "./remove-tree";
 
@@ -24,18 +24,18 @@ const report = { managed: true, packageVersion: "1.0.0", provenance: "npm-global
 if (lane === "arming") {
   // This lane tests pre-child lifetime only. Model verified target readback;
   // archive parsing and all apply control/cleanup/gate code stay real.
-  mock.module("../../src/codex/cli-update-artifacts", () => ({ ...artifacts, verifiedCodexCliContent: () => "d".repeat(64) }));
-  mock.module("../../src/codex/cli-update-files", () => ({ ...files, sameCodexCliFiles: () => true }));
+  mock.module("../../backend/src/codex/cli-update-artifacts", () => ({ ...artifacts, verifiedCodexCliContent: () => "d".repeat(64) }));
+  mock.module("../../backend/src/codex/cli-update-files", () => ({ ...files, sameCodexCliFiles: () => true }));
 }
-mock.module("../../src/codex/cli-install-provenance", () => ({ ...provenance,
+mock.module("../../backend/src/codex/cli-install-provenance", () => ({ ...provenance,
   inspectCodexCliInstall: async () => report, codexCliMutationEvidence: () => evidence,
   observeCodexCliSelectedCommand: () => evidence.launcher, codexCliMutationSelectionMatches: () => true }));
-const { applyCodexCliUpdate } = await import("../../src/codex/cli-update-apply");
-const { createCodexCliUpdatePlan } = await import("../../src/codex/cli-update-plan");
-const gate = await import("../../src/codex/cli-update-selection-gate");
-const { CodexRemoteWorkspaceRuntimeFactory, RemoteWorkspaceCoordinator } = await import("../../src/remote-control");
-const { restartCodexDesktopApp } = await import("../../src/codex/desktop-app-restart");
-const { windowsDesktopAppAdapter } = await import("../../src/codex/desktop-app/windows");
+const { applyCodexCliUpdate } = await import("../../backend/src/codex/cli-update-apply");
+const { createCodexCliUpdatePlan } = await import("../../backend/src/codex/cli-update-plan");
+const gate = await import("../../backend/src/codex/cli-update-selection-gate");
+const { CodexRemoteWorkspaceRuntimeFactory, RemoteWorkspaceCoordinator } = await import("../../backend/src/remote-control");
+const { restartCodexDesktopApp } = await import("../../backend/src/codex/desktop-app-restart");
+const { windowsDesktopAppAdapter } = await import("../../backend/src/codex/desktop-app/windows");
 
 // Model POSIX directory ownership only; actual paths, identities and operations
 // remain native. No Windows installation or real Codex child is permitted.

@@ -2,16 +2,16 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { handleResponses } from "../../src/server/responses";
-import { httpStatusFromTerminalError } from "../../src/lib/errors";
-import { errorDetailFor } from "../../src/usage/error-detail";
-import { inspectResponseLogJson, type RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { handleResponses } from "../../backend/src/server/responses";
+import { httpStatusFromTerminalError } from "../../backend/src/lib/errors";
+import { errorDetailFor } from "../../backend/src/usage/error-detail";
+import { inspectResponseLogJson, type RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { saveCredential, setActiveAccount, getAccountSet } from "../../src/oauth/store";
+import { saveCredential, setActiveAccount, getAccountSet } from "../../backend/src/oauth/store";
 
 let releaseInheritedSpendHome: (() => void) | undefined;
 // Taken per inherited-home dispatch because one row below installs a different home.

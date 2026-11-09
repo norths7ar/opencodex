@@ -1,7 +1,7 @@
 import { expect, spyOn, test } from "bun:test";
 import { NativeSteeringChannel, NATIVE_STEERING_WAIT_MS as WAIT,
-  NATIVE_STEERING_TOOL_WAIT_MS as TOOL_WAIT } from "../../src/server/responses/native-steering";
-import { NativeSteeringReplay, MAX_NATIVE_STEERING_REPLAY_BYTES as REPLAY_LIMIT } from "../../src/server/responses/native-steering-replay";
+  NATIVE_STEERING_TOOL_WAIT_MS as TOOL_WAIT } from "../../backend/src/server/responses/native-steering";
+import { NativeSteeringReplay, MAX_NATIVE_STEERING_REPLAY_BYTES as REPLAY_LIMIT } from "../../backend/src/server/responses/native-steering-replay";
 import { beginInjection, injectionConfig, installInjectionFixture, InjectionSocket,
   waitForInjection, fallbackCalls, type Frame } from "../helpers/native-injection-fixture";
 

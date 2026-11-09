@@ -1,4 +1,4 @@
-import { desktopOutboundFetch } from "../../src/lib/desktop-proxy-route";
+import { desktopOutboundFetch } from "../../backend/src/lib/desktop-proxy-route";
 const response = await desktopOutboundFetch("https://chatgpt.com/fixture", {
   method: "POST", body: new Uint8Array([0, 255, 42]), signal: AbortSignal.timeout(5000), headers: { cookie: "fixture=session" },
 });

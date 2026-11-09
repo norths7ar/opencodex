@@ -1,10 +1,10 @@
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
-import type { AnthropicAccountPoolConfig } from "../../src/types/anthropic-account-pool";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import type { OcxConfig } from "../../backend/src/types";
+import type { AnthropicAccountPoolConfig } from "../../backend/src/types/anthropic-account-pool";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 import { drainAndRemoveFixtureRoots } from "./fixture-teardown";
 
 export const INSTANCE_FIXTURE_IDS = ["shared-slot-1", "shared-slot-2"] as const;
@@ -99,10 +99,10 @@ export async function createAnthropicInstanceFixture(
   } }));
   globalThis.fetch = (async () => { throw new Error("unexpected network in isolated Anthropic fixture"); }) as typeof fetch;
   const [store, routing, quota, modelQuota, ratePolicy, identity, configStore, kernel, cleanup, history, health] = await Promise.all([
-    import("../../src/oauth/store"), import("../../src/oauth/anthropic-routing"), import("../../src/providers/quota"),
-    import("../../src/oauth/anthropic-model-quota"), import("../../src/oauth/anthropic-rate-limit-policy"),
-    import("../../src/oauth/anthropic-identity"), import("../../src/config"), import("../../src/oauth/pool-kernel"), import("../../src/lib/test-home-guard"),
-    import("../../src/routing/history/indexer"), import("../../src/routing/health"),
+    import("../../backend/src/oauth/store"), import("../../backend/src/oauth/anthropic-routing"), import("../../backend/src/providers/quota"),
+    import("../../backend/src/oauth/anthropic-model-quota"), import("../../backend/src/oauth/anthropic-rate-limit-policy"),
+    import("../../backend/src/oauth/anthropic-identity"), import("../../backend/src/config"), import("../../backend/src/oauth/pool-kernel"), import("../../backend/src/lib/test-home-guard"),
+    import("../../backend/src/routing/history/indexer"), import("../../backend/src/routing/health"),
   ]);
   // These process-local owners are shared by serial fixtures. Start each fixture
   // without a previous home's connection or provider/model health-cache entry.
@@ -118,7 +118,7 @@ export async function createAnthropicInstanceFixture(
   async function admit(instance: AnthropicInstanceId, sessionKey: string | null = INSTANCE_FIXTURE_SESSION,
     model = INSTANCE_FIXTURE_MODEL, policy = config) {
     const facade = routing.anthropicRoutingFor(instance);
-    const { resolveAnthropicModelRouteForInstance } = await import("../../src/oauth/anthropic-model-routes");
+    const { resolveAnthropicModelRouteForInstance } = await import("../../backend/src/oauth/anthropic-model-routes");
     const route = resolveAnthropicModelRouteForInstance(instance, policy, model);
     if (route.error) throw new Error(route.error);
     const expected = store.captureOAuthAccountSelection(instance);

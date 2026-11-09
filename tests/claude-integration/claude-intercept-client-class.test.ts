@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { classifyInterceptClient, interceptEntrypoint, interceptRouteFor } from "../../src/claude/intercept/client-class";
-import { startClaudeInterceptListener } from "../../src/claude/intercept/listener";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { buildInterceptDesiredClients } from "../../src/server/index/claude-intercept-lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { classifyInterceptClient, interceptEntrypoint, interceptRouteFor } from "../../backend/src/claude/intercept/client-class";
+import { startClaudeInterceptListener } from "../../backend/src/claude/intercept/listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { buildInterceptDesiredClients } from "../../backend/src/server/index/claude-intercept-lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 
 const samples: Array<[string | null, string | null, "desktop" | "cli" | "unknown"]> = [
   ["claude-cli/2.1.282 (external, cli)", "cli", "cli"],

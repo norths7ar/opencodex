@@ -9,7 +9,7 @@ import {
   recordOwnedConfigPath,
   removeOwnedConfigState,
   uninstallPrivilegeRefusal,
-} from "../../src/lib/config-ownership";
+} from "../../backend/src/lib/config-ownership";
 import {
   ELEVATED_UNINSTALL_REFUSAL,
   elevatedRemovalRefusal,
@@ -17,9 +17,9 @@ import {
   setUninstallElevationProbeForTests,
   UNKNOWN_ELEVATION_UNINSTALL_REFUSAL,
   uninstallRunsElevated,
-} from "../../src/lib/config-ownership-removal";
-import { setWindowsElevationProbeForTests } from "../../src/lib/windows-elevation";
-import { setWindowsOwnerAclRunnerForTests, windowsOwnerAclDefaultRunnerForTests, type WindowsAclEntry } from "../../src/lib/windows-owner-acl";
+} from "../../backend/src/lib/config-ownership-removal";
+import { setWindowsElevationProbeForTests } from "../../backend/src/lib/windows-elevation";
+import { setWindowsOwnerAclRunnerForTests, windowsOwnerAclDefaultRunnerForTests, type WindowsAclEntry } from "../../backend/src/lib/windows-owner-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const posix = process.platform === "win32" ? test.skip : test;

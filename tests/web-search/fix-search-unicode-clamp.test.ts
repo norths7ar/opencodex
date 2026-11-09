@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatWebSearchResult } from "../../src/web-search/format-result";
+import { formatWebSearchResult } from "../../backend/src/web-search/format-result";
 
 describe("single search result Unicode boundaries", () => {
   test.each([false, true])("never splits query or answer surrogate pairs (structured=%s)", structured => {

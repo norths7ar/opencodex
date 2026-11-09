@@ -4,8 +4,8 @@ import {
   isPreConnectReachabilityError,
   transportErrorCode,
   MAX_REACHABILITY_CAUSE_DEPTH,
-} from "../../src/lib/upstream-reachability";
-import { UpstreamRetryEvidenceError } from "../../src/lib/upstream-retry";
+} from "../../backend/src/lib/upstream-reachability";
+import { UpstreamRetryEvidenceError } from "../../backend/src/lib/upstream-retry";
 import {
   UPSTREAM_HOST_CIRCUIT_COOLDOWN_MS,
   UPSTREAM_HOST_CIRCUIT_MAX_THRESHOLD,
@@ -21,13 +21,13 @@ import {
   resetUpstreamHostHealth,
   upstreamHostHealthKey,
   type UpstreamHostAdmissionLease,
-} from "../../src/codex/upstream-host-health";
+} from "../../backend/src/codex/upstream-host-health";
 import {
   maybePrimeSubagentQuota,
   resetSubagentModelFallbackStateForTests,
   setSubagentQuotaPrimeForTests,
-} from "../../src/codex/subagent-model-fallback";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/subagent-model-fallback";
+import type { OcxConfig } from "../../backend/src/types";
 
 beforeEach(() => {
   clearUpstreamHostHealth();

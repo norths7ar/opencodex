@@ -10,12 +10,12 @@ import {
   createSseInspector,
   doneFrame,
   MAX_TAIL_ERROR_MESSAGE_CHARS,
-} from "../../src/server/relay";
-import { relaySseEagerBounded, type EagerRelayHooks } from "../../src/server/relay-eager";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { MAX_CLIENT_SSE_FRAME_BYTES } from "../../src/server/sse-frame-buffer";
-import { createRoutedCustomToolRestoreBlockRewrite } from "../../src/server/responses-custom-tool-repair";
+} from "../../backend/src/server/relay";
+import { relaySseEagerBounded, type EagerRelayHooks } from "../../backend/src/server/relay-eager";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { MAX_CLIENT_SSE_FRAME_BYTES } from "../../backend/src/server/sse-frame-buffer";
+import { createRoutedCustomToolRestoreBlockRewrite } from "../../backend/src/server/responses-custom-tool-repair";
 
 import { watchdogMs } from "../helpers/ci-watchdog";
 const enc = new TextEncoder();
@@ -130,8 +130,8 @@ describe("relaySseEagerBounded — inline payload rewrite (#864)", () => {
     // either way, which is exactly why no behavioral assertion catches a regression
     // here — relay.ts already states the rule in prose at its own drain, and this
     // pins it for both files. The sanctioned shape is: cancel the reader on abort.
-    const eager = await Bun.file(new URL("../../src/server/relay-eager.ts", import.meta.url)).text();
-    const relay = await Bun.file(new URL("../../src/server/relay.ts", import.meta.url)).text();
+    const eager = await Bun.file(new URL("../../backend/src/server/relay-eager.ts", import.meta.url)).text();
+    const relay = await Bun.file(new URL("../../backend/src/server/relay.ts", import.meta.url)).text();
 
     // Strip comments first: both files DESCRIBE the banned shape in prose, and the
     // rule is about the code, not the explanation of why the code avoids it.

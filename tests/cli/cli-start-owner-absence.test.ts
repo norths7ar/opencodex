@@ -39,19 +39,19 @@ for (const scenario of ["start", "ensure", "service", "supervised", "sibling", "
       injectedProfileHash: null, pid: 999_999, timestamp: new Date().toISOString(),
     });
     writeFileSync(journalPath, journal);
-    const cli = readFileSync(repoPath("src/cli/index.ts"), "utf8");
-    const fence = readFileSync(repoPath("src/cli/start-owner-fence.ts"), "utf8");
+    const cli = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
+    const fence = readFileSync(repoPath("backend/src/cli/start-owner-fence.ts"), "utf8");
     const commands = cli.slice(cli.indexOf("async function findProxyOwnerBeforeJournalRecovery("), cli.indexOf("function detachedStartEnvironment("))
       + cli.slice(cli.indexOf("async function handleEnsure("), cli.indexOf("async function handleTrayProxyStart("));
     const recheck = fence.slice(fence.indexOf("export async function recoverStartJournalAfterOwnerRecheck("), fence.indexOf("/** Hold ownership stable"));
     const executable = new Bun.Transpiler({ loader: "ts" }).transformSync(commands + recheck.replace("export ", ""));
     const script = join(root, "consecutive-misses.ts");
     writeFileSync(script, `
-      import * as liveness from ${JSON.stringify(repoPath("src/server/proxy-liveness.ts"))};
-      import { readAlivePid, readPidFileValue, removePidIfValueIs } from ${JSON.stringify(repoPath("src/config/process-state.ts"))};
-      import { reconcileStartupJournal, markCrossHomeSibling } from ${JSON.stringify(repoPath("src/cli/cross-home-owner.ts"))};
-      import { recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("src/cli/start-owner-fence.ts"))};
-      import { decideStartWithLiveOwner } from ${JSON.stringify(repoPath("src/cli/dispatch.ts"))};
+      import * as liveness from ${JSON.stringify(repoPath("backend/src/server/proxy-liveness.ts"))};
+      import { readAlivePid, readPidFileValue, removePidIfValueIs } from ${JSON.stringify(repoPath("backend/src/config/process-state.ts"))};
+      import { reconcileStartupJournal, markCrossHomeSibling } from ${JSON.stringify(repoPath("backend/src/cli/cross-home-owner.ts"))};
+      import { recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("backend/src/cli/start-owner-fence.ts"))};
+      import { decideStartWithLiveOwner } from ${JSON.stringify(repoPath("backend/src/cli/dispatch.ts"))};
       const events = [], messages = [];
       let probes = 0, attempts = 0, leased = false;
       const scenario = ${JSON.stringify(scenario)}, pid = ${process.pid};
@@ -147,8 +147,8 @@ test("an exited recorded owner on a refused port still recovers its journal and 
   const script = join(root, "dead-owner.ts");
   writeFileSync(script, `
     import { writeFileSync } from "node:fs";
-    import { readAlivePid } from ${JSON.stringify(repoPath("src/config/process-state.ts"))};
-    import { recoverStartJournalAfterOwnerRecheck, recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("src/cli/start-owner-fence.ts"))};
+    import { readAlivePid } from ${JSON.stringify(repoPath("backend/src/config/process-state.ts"))};
+    import { recoverStartJournalAfterOwnerRecheck, recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("backend/src/cli/start-owner-fence.ts"))};
     const dead = Bun.spawn([process.execPath, "--version"], { stdout: "ignore", stderr: "ignore" });
     if (await dead.exited !== 0) throw new Error("fixture child failed");
     const listener = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => new Response(null) });

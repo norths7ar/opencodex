@@ -14,7 +14,7 @@ import {
   nativeOpenAiMaxInputTokens,
   nativeReasoningEfforts,
   upstreamNativeEntry,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   CONFIGURED_NATIVE_OPENAI_TEMPLATE_MODEL,
   NATIVE_GPT6_CONTEXT,
@@ -26,14 +26,14 @@ import {
   hasNativeOpenAiCapabilityMetadata,
   resetConfiguredNativeOpenAiModelsForTests,
   setConfiguredNativeOpenAiModels,
-} from "../../src/codex/catalog/native-models";
-import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
-import { isGpt56NativeSlug, nativeLadderIncludesUltra } from "../../src/codex/catalog/effort";
-import { isUnsupportedOpenAiNativeSlug, nativeOpenAiCapabilityDisplayName } from "../../src/codex/catalog/metadata";
-import { CANONICAL_NATIVE_CATALOG_CONTENT_POLICY } from "../../src/codex/catalog/build-entries";
-import { configuredNativeOpenAiModelIds, refreshConfigDerivedRegistries } from "../../src/config/derived-registries";
-import { nativeVisionReasoningEfforts } from "../../src/vision/reasoning";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/codex/catalog/native-models";
+import { NEUTRAL_IDENTITY_LINE } from "../../backend/src/adapters/identity";
+import { isGpt56NativeSlug, nativeLadderIncludesUltra } from "../../backend/src/codex/catalog/effort";
+import { isUnsupportedOpenAiNativeSlug, nativeOpenAiCapabilityDisplayName } from "../../backend/src/codex/catalog/metadata";
+import { CANONICAL_NATIVE_CATALOG_CONTENT_POLICY } from "../../backend/src/codex/catalog/build-entries";
+import { configuredNativeOpenAiModelIds, refreshConfigDerivedRegistries } from "../../backend/src/config/derived-registries";
+import { nativeVisionReasoningEfforts } from "../../backend/src/vision/reasoning";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 afterEach(() => resetConfiguredNativeOpenAiModelsForTests());
 

@@ -1,15 +1,15 @@
 /** Real processes, drain, discovery, recovery fence and replacement readiness; no provider startup. */
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { recoverStartJournalAfterOwnerRecheck } from "../../src/cli/start-owner-fence";
+import { recoverStartJournalAfterOwnerRecheck } from "../../backend/src/cli/start-owner-fence";
 import {
   readPidFileValue, readRuntimePort, removePid, removeRuntimePort, writePid, writeRuntimePort,
-} from "../../src/config/process-state";
-import { acquireOwnershipMutationLease } from "../../src/service/ownership-mutation-lease.mjs";
-import { serviceStatePaths } from "../../src/service/state";
-import { acceptSystemRestart } from "../../src/server/management/system-restart";
-import { drainAndShutdown, setServerRef } from "../../src/server/lifecycle";
-import { observeProxyLiveness } from "../../src/server/proxy-liveness";
+} from "../../backend/src/config/process-state";
+import { acquireOwnershipMutationLease } from "../../backend/src/service/ownership-mutation-lease.mjs";
+import { serviceStatePaths } from "../../backend/src/service/state";
+import { acceptSystemRestart } from "../../backend/src/server/management/system-restart";
+import { drainAndShutdown, setServerRef } from "../../backend/src/server/lifecycle";
+import { observeProxyLiveness } from "../../backend/src/server/proxy-liveness";
 
 const home = process.env.OPENCODEX_HOME;
 if (!home || !process.env.CODEX_HOME || !process.env.OCX_OWNER_REGISTRY_DIR) throw new Error("isolated homes required");

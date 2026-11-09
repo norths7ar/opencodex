@@ -5,7 +5,7 @@ import {
   recoverEncryptedAgentTaskWithResult,
   resetAgentTaskRecoveryState,
   restoreCachedEncryptedAgentTasks,
-} from "../../src/server/responses/agent-task-recovery";
+} from "../../backend/src/server/responses/agent-task-recovery";
 import {
   agentMessage,
   codexHeaders,

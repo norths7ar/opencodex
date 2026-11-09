@@ -24,8 +24,8 @@ import {
   normalizeDefaultNamespaceInResponse,
   undeclaredToolCallNameInResponse,
   UNDECLARED_TOOL_CALL_ERROR_CODE,
-} from "../../src/server/responses-undeclared-tool-guard";
-import { isSchemaValidResponsesToolName } from "../../src/responses/tool-name-aliases";
+} from "../../backend/src/server/responses-undeclared-tool-guard";
+import { isSchemaValidResponsesToolName } from "../../backend/src/responses/tool-name-aliases";
 
 /** Codex code mode: the shell is one freeform `exec`; every helper lives inside it, undeclared. */
 const CODE_MODE_BODY = {

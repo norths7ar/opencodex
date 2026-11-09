@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { baseProviderLabel, canonicalUsageProviderLabel, poolAccountProviderLabel } from "../../src/providers/label";
-import { summarizeUsage, projectUsageSummary } from "../../src/usage/summary";
-import { createTimelineAccumulator, parseTimelineQuery } from "../../src/usage/timeline";
-import { resolveMatchedPrice } from "../../src/usage/cost";
-import { EXPECTED_PRICE_OVERLAYS, type ExpectedPriceOverlay } from "../../src/usage/expected-prices";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+import { baseProviderLabel, canonicalUsageProviderLabel, poolAccountProviderLabel } from "../../backend/src/providers/label";
+import { summarizeUsage, projectUsageSummary } from "../../backend/src/usage/summary";
+import { createTimelineAccumulator, parseTimelineQuery } from "../../backend/src/usage/timeline";
+import { resolveMatchedPrice } from "../../backend/src/usage/cost";
+import { EXPECTED_PRICE_OVERLAYS, type ExpectedPriceOverlay } from "../../backend/src/usage/expected-prices";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 const now = 1_700_000_000_000;
 const model = "claude-opus-5";
 const rows: PersistedUsageEntry[] = ["anthropic", "anthropic2"].map((provider, index) => ({ requestId: provider, timestamp: now - 60_000, provider: provider + "-p123abc", model, status: 200, durationMs: 10, usageStatus: "reported", usage: { inputTokens: 10 * (index + 1), outputTokens: 2 }, totalTokens: 12 + 10 * index }));

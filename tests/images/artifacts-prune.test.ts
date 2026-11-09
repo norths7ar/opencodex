@@ -9,7 +9,7 @@ const PREV_HOME = process.env.OPENCODEX_HOME;
 beforeAll(() => { process.env.OPENCODEX_HOME = join(tmpdir(), "ocx-prune-" + randomUUID()); });
 afterAll(() => { if (PREV_HOME === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = PREV_HOME; });
 
-const { pruneOldArtifacts, pruneArtifacts, DEFAULT_ARTIFACT_KEEP_COUNT } = await import("../../src/images/artifacts");
+const { pruneOldArtifacts, pruneArtifacts, DEFAULT_ARTIFACT_KEEP_COUNT } = await import("../../backend/src/images/artifacts");
 
 function touch(path: string, content: string = "x", ageMs = 0): void {
   writeFileSync(path, content);
@@ -67,7 +67,7 @@ describe("pruneOldArtifacts", () => {
 
 describe("pruneArtifacts: integration with materializeInlineImage", () => {
   test("writing >keepCount images then pruning keeps newest", async () => {
-    const { materializeInlineImage } = await import("../../src/images/artifacts");
+    const { materializeInlineImage } = await import("../../backend/src/images/artifacts");
     const KEEP = 3;
     const TOTAL = 6;
     const written: string[] = [];

@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleMainDeviceReauthAPI } from "../../src/codex/main-device-reauth-api";
-import { resetMainDeviceReauthForTests } from "../../src/codex/main-device-reauth";
-import type { OcxConfig } from "../../src/types";
+import { handleMainDeviceReauthAPI } from "../../backend/src/codex/main-device-reauth-api";
+import { resetMainDeviceReauthForTests } from "../../backend/src/codex/main-device-reauth";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

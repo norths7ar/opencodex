@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { gentleShellPaths } from "../../src/clients/gentle-shell-path";
-import { piConfigPath } from "../../src/clients/config-export";
+import { gentleShellPaths } from "../../backend/src/clients/gentle-shell-path";
+import { piConfigPath } from "../../backend/src/clients/config-export";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function fixture(run: (home: string, save: (value: unknown) => void) => void): void {

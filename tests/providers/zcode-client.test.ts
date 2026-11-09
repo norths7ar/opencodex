@@ -18,9 +18,9 @@ import {
   type ExportContext,
   type ManagedFragment,
   type ZcodeGeneratedConfig,
-} from "../../src/clients/config-export";
-import type { OcxConfig } from "../../src/types";
-import { handleZcodeCommand } from "../../src/cli/integrations";
+} from "../../backend/src/clients/config-export";
+import type { OcxConfig } from "../../backend/src/types";
+import { handleZcodeCommand } from "../../backend/src/cli/integrations";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { ProviderAdapter } from "../../../src/adapters/base";
-import { createAnthropicAdapter, formatAnthropicErrorBody } from "../../../src/adapters/anthropic";
-import { parseRequest } from "../../../src/responses/parser";
-import { responseWithDeferredRequestLog, type RequestLogEntry } from "../../../src/server";
-import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../../src/web-search/loop";
-import type { OcxProviderConfig } from "../../../src/types";
+import type { ProviderAdapter } from "../../../backend/src/adapters/base";
+import { createAnthropicAdapter, formatAnthropicErrorBody } from "../../../backend/src/adapters/anthropic";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { responseWithDeferredRequestLog, type RequestLogEntry } from "../../../backend/src/server";
+import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../../backend/src/web-search/loop";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const originalFetch = globalThis.fetch;

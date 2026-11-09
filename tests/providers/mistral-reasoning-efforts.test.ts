@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat/passthrough";
-import { buildClientConfig, type OpencodeGeneratedConfig } from "../../src/clients/config-export";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import type { OcxProviderConfig } from "../../src/types";
+import { buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat/passthrough";
+import { buildClientConfig, type OpencodeGeneratedConfig } from "../../backend/src/clients/config-export";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /** The configuration from #8254: the Mistral preset with no effort declarations of its own. */
 function mistral(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {

@@ -18,23 +18,23 @@ import { homedir, tmpdir } from "node:os";
 import { createCodexCliTestRoot } from "../helpers/codex-cli-fixture-root";
 import { helperPath } from "../helpers/repo-root";
 import { toNamespacedPath } from "node:path";
-import { readWindowsJobStore, withWindowsJobStoreLock } from "../../src/codex/cli-update-job-store-windows";
+import { readWindowsJobStore, withWindowsJobStoreLock } from "../../backend/src/codex/cli-update-job-store-windows";
 import { trustWindowsTempFixtureAncestry } from "../helpers/windows-temp-ancestry";
-import { admitCodexCliUpdateJob, finishCodexCliUpdateJob, readCodexCliUpdateJob, runCodexCliUpdateJob } from "../../src/codex/cli-update-job";
-import { codexCliUpdateUnjoinedWorkerCount, runCodexCliUpdateApplyInWorker } from "../../src/codex/cli-update-job-worker";
+import { admitCodexCliUpdateJob, finishCodexCliUpdateJob, readCodexCliUpdateJob, runCodexCliUpdateJob } from "../../backend/src/codex/cli-update-job";
+import { codexCliUpdateUnjoinedWorkerCount, runCodexCliUpdateApplyInWorker } from "../../backend/src/codex/cli-update-job-worker";
 import { FIXTURE_CONTROL_WORDS, FIXTURE_RELEASE } from "../helpers/cli-update-fixture-worker";
 import { setWindowsOwnerAclAsyncRunnerForTests, windowsEntriesAclMatches, windowsOwnerAclDefaultRunnerForTests,
-  type WindowsAclEntry } from "../../src/lib/windows-owner-acl";
-import { hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
-import { protectedHomeForTests } from "../../src/lib/test-home-guard";
+  type WindowsAclEntry } from "../../backend/src/lib/windows-owner-acl";
+import { hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
+import { protectedHomeForTests } from "../../backend/src/lib/test-home-guard";
 import { TEST_TEMP_OWNER_FILE } from "../../scripts/test-temp";
 import { settleIsolatedTestRoot } from "../../scripts/test";
-import { windowsCanonicalPathMatches } from "../../src/codex/windows-installation-files";
-import { handleCodexCliUpdateRoutes } from "../../src/server/management/codex-cli-update-routes";
-import { handleCodexCliUpdateCommand } from "../../src/cli/codex-cli-update";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
-import type { CodexCliApplyResult } from "../../src/codex/cli-update-apply";
+import { windowsCanonicalPathMatches } from "../../backend/src/codex/windows-installation-files";
+import { handleCodexCliUpdateRoutes } from "../../backend/src/server/management/codex-cli-update-routes";
+import { handleCodexCliUpdateCommand } from "../../backend/src/cli/codex-cli-update";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
+import type { CodexCliApplyResult } from "../../backend/src/codex/cli-update-apply";
 
 const USER_SID = "S-1-5-21-9-9-9-1001";
 const FOREIGN_SID = "S-1-5-21-8-8-8-2002";
@@ -574,7 +574,7 @@ describe("Windows CLI update job store backend", () => {
   test.skipIf(!winOnly)("a second process dedupes the admitted request key and conflicts on a different payload", async () => {
     const { outer, configDir } = await fixture("ocx-winjob-twoproc-");
     mkdirSync(configDir);
-    const modulePath = new URL("../../src/codex/cli-update-job.ts", import.meta.url).href;
+    const modulePath = new URL("../../backend/src/codex/cli-update-job.ts", import.meta.url).href;
     const accepted = await admitCodexCliUpdateJob({ requestId: "win-two-proc-01", planId: result.planId, confirmed: true, configDir });
     const script = `import { trustWindowsTempFixtureAncestry } from ${JSON.stringify(new URL("../helpers/windows-temp-ancestry.ts", import.meta.url).href)};
       trustWindowsTempFixtureAncestry(${JSON.stringify(outer)});
@@ -674,7 +674,7 @@ describe("Windows CLI update job store backend", () => {
         : observation === "settled" ? await pending
         : null;
       expect(observed).toMatchObject({ status: "running", ownerState: "active" });
-      const modulePath = new URL("../../src/codex/cli-update-job.ts", import.meta.url).href;
+      const modulePath = new URL("../../backend/src/codex/cli-update-job.ts", import.meta.url).href;
       const script = `import { trustWindowsTempFixtureAncestry } from ${JSON.stringify(new URL("../helpers/windows-temp-ancestry.ts", import.meta.url).href)};
         trustWindowsTempFixtureAncestry(${JSON.stringify(outer)});
         import { readCodexCliUpdateJob } from ${JSON.stringify(modulePath)};

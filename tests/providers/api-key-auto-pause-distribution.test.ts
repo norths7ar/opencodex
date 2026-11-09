@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, loadConfig, saveConfig } from "../../src/config";
-import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../src/oauth/account-auto-pause";
-import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../src/providers/api-key-selection";
-import { clearKeyCooldowns, forgetApiKeyRotationCursor, selectProactiveApiKeyTransport } from "../../src/providers/key-failover";
-import { routedProviderConfig } from "../../src/router";
+import { getDefaultConfig, loadConfig, saveConfig } from "../../backend/src/config";
+import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../backend/src/oauth/account-auto-pause";
+import { providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../backend/src/providers/api-key-selection";
+import { clearKeyCooldowns, forgetApiKeyRotationCursor, selectProactiveApiKeyTransport } from "../../backend/src/providers/key-failover";
+import { routedProviderConfig } from "../../backend/src/router";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

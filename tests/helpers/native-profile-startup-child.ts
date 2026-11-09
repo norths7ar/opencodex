@@ -1,15 +1,15 @@
 import { appendFileSync, existsSync, renameSync, writeFileSync } from "node:fs";
 
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { isCodexAccountUsable } from "../../src/codex/account-usability";
-import { isMainAccountTokenLive, MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { loadConfig } from "../../src/config";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { isCodexAccountUsable } from "../../backend/src/codex/account-usability";
+import { isMainAccountTokenLive, MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { loadConfig } from "../../backend/src/config";
 import {
   nativeMainStartupGateSnapshot,
   waitForNativeMainStartupGate,
-} from "../../src/codex/native-profile-startup";
-import type { NativeProfileKey, NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
-import { startServer } from "../../src/server";
+} from "../../backend/src/codex/native-profile-startup";
+import type { NativeProfileKey, NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
+import { startServer } from "../../backend/src/server";
 
 const launchedAt = Number(process.env.NATIVE_STARTUP_LAUNCHED_AT ?? Date.now());
 

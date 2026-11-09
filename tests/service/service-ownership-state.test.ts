@@ -13,7 +13,7 @@ import * as fs from "node:fs";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
-import { withServiceStateLocks } from "../../src/service/state-lock";
+import { withServiceStateLocks } from "../../backend/src/service/state-lock";
 import {
   desktopOwnsService,
   inspectServiceStateEvidence,
@@ -37,8 +37,8 @@ import {
   type RecordServiceOwnerDeps,
   type ServiceOwner,
   type ServiceStateSwapDeps,
-} from "../../src/service/state";
-import { assessServiceTakeoverCompatibility, type ManagingCliObservation } from "../../src/service/ownership-compatibility";
+} from "../../backend/src/service/state";
+import { assessServiceTakeoverCompatibility, type ManagingCliObservation } from "../../backend/src/service/ownership-compatibility";
 import {
   OWNERSHIP_MUTATION_LEASE_TOKEN_ENV,
   acquireOwnershipMutationLease,
@@ -46,7 +46,7 @@ import {
   ownershipMutationLeaseChildEnvironment,
   ownershipMutationLeaseStatusLine,
   unprivilegedOwnershipMutationEnvironment,
-} from "../../src/service/ownership-mutation-lease.mjs";
+} from "../../backend/src/service/ownership-mutation-lease.mjs";
 
 let home: TempHome;
 /**
@@ -140,7 +140,7 @@ describe("ownership survives every install-state writer", () => {
   });
 
   test("the writer that every subsystem calls preserves rather than rebuilds", () => {
-    const source = readFileSync(repoPath("src", "service", "state.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "service", "state.ts"), "utf8");
     const writer = source.slice(
       source.indexOf("export function writeServiceInstallState("),
       source.indexOf("export function readServiceInstallState("),
@@ -157,7 +157,7 @@ describe("ownership survives every install-state writer", () => {
    */
   test("no service module composes or commits the install record itself", () => {
     for (const file of ["orchestration.ts", "launchd.ts", "systemd.ts", "windows-ops.ts", "windows-scheduler.ts", "repair.ts"]) {
-      const source = readFileSync(repoPath("src", "service", file), "utf8");
+      const source = readFileSync(repoPath("backend/src", "service", file), "utf8");
       expect(source).toContain("writeServiceInstallState");
       expect(source).not.toContain("swapServiceInstallState");
       expect(source).not.toContain("service-state.json");

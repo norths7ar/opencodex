@@ -10,7 +10,7 @@ import {
   setTomlRootModel,
   setTomlRootReasoningEffort,
   writeCodexAgentRoleModel,
-} from "../../src/codex/agent-role-models";
+} from "../../backend/src/codex/agent-role-models";
 
 const IMPORTED_ROLE = [
   "# imported by Codex",

@@ -6,8 +6,8 @@ import {
   collapseDevinModelUid,
   devinReasoningRungsOf,
   sortDevinRungs,
-} from "../../src/adapters/devin/live-models";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+} from "../../backend/src/adapters/devin/live-models";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 
 const devinRow = () => PROVIDER_REGISTRY.find(row => row.id === "devin")!;
 

@@ -23,7 +23,7 @@ const journal = {
 };
 writeFileSync(configPath, injected);
 writeFileSync(journalPath, JSON.stringify(journal));
-const receipts = await import("../../src/config/pending-teardown");
+const receipts = await import("../../backend/src/config/pending-teardown");
 // A receipt left by an update whose stop exited long ago.
 receipts.claimPendingTeardown({ hostname: "127.0.0.1", port: 10100 }, "exact", dead + 1, "update-restart");
 // A replacement home bound to another live owner, installed after the journal was read.
@@ -40,7 +40,7 @@ const spy = spyOn(process, "kill").mockImplementation(((pid: number, signal?: No
   throw Object.assign(new Error("dead fixture owner"), { code: "ESRCH" });
 }) as typeof process.kill);
 try {
-  (await import("../../src/cli/cross-home-owner")).reconcileStartupJournal();
+  (await import("../../backend/src/cli/cross-home-owner")).reconcileStartupJournal();
 } finally {
   spy.mockRestore();
 }

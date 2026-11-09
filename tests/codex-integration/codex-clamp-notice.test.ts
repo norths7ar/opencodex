@@ -2,10 +2,10 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { codexRuntimeClampStatePath, persistEffortClamp, type EffortClampDiagnostic } from "../../src/codex/runtime";
-import { clampCatalogModelsToCodexSupport } from "../../src/codex/catalog/effort";
-import { resetBundledCatalogCacheForTests } from "../../src/codex/catalog/bundled";
-import { resetCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
+import { codexRuntimeClampStatePath, persistEffortClamp, type EffortClampDiagnostic } from "../../backend/src/codex/runtime";
+import { clampCatalogModelsToCodexSupport } from "../../backend/src/codex/catalog/effort";
+import { resetBundledCatalogCacheForTests } from "../../backend/src/codex/catalog/bundled";
+import { resetCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

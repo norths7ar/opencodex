@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../../src/codex/catalog";
-import { clearModelCache, markModelsFetchFailure, setCached } from "../../../src/codex/model-cache";
-import type { OcxConfig } from "../../../src/types";
+import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../../backend/src/codex/catalog";
+import { clearModelCache, markModelsFetchFailure, setCached } from "../../../backend/src/codex/model-cache";
+import type { OcxConfig } from "../../../backend/src/types";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 
 /** Discovery runs on the pinned transport; hand it back the stubbed global. */

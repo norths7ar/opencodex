@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { cmdV2, type V2CliDeps } from "../../src/cli/v2";
-import { parseV2Command } from "../../src/cli/v2-input";
-import { getLogicalMaxThreads, getMultiAgentModeHintText, isMultiAgentV2Enabled } from "../../src/codex/features";
-import { resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../src/codex/multi-agent-mode-policy";
-import { SUBAGENT_SURFACE_GUIDE_URL } from "../../src/config/multi-agent-surface";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { cmdV2, type V2CliDeps } from "../../backend/src/cli/v2";
+import { parseV2Command } from "../../backend/src/cli/v2-input";
+import { getLogicalMaxThreads, getMultiAgentModeHintText, isMultiAgentV2Enabled } from "../../backend/src/codex/features";
+import { resetCodexRuntimeResolveCacheForTests, setCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { MULTI_AGENT_MODE_HINT_RECOMMENDATION } from "../../backend/src/codex/multi-agent-mode-policy";
+import { SUBAGENT_SURFACE_GUIDE_URL } from "../../backend/src/config/multi-agent-surface";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 
@@ -269,8 +269,8 @@ describe("local V2 state and synchronization graph", () => {
 
 describe("live V2 accepted state through the isolated real handler", () => {
   test("real hint and mode writes report persisted fields, advisory and catalog", async () => {
-    const { handleManagementAPI } = await import("../../src/server/management-api");
-    const { loadConfig } = await import("../../src/config");
+    const { handleManagementAPI } = await import("../../backend/src/server/management-api");
+    const { loadConfig } = await import("../../backend/src/config");
     const calls: string[] = [];
     const runtimeApi: RuntimeApiDeps = { baseUrl: "http://localhost", fetchImpl: (async (url: string | URL | Request, init?: RequestInit) => {
       calls.push(String(url));
@@ -294,8 +294,8 @@ describe("live V2 accepted state through the isolated real handler", () => {
 
 describe("live V2 real-handler refusal and incomplete convergence", () => {
   test.each(["native-failure", "catalog-failure"])("reports %s without local fallback or hidden retry", async failure => {
-    const { handleManagementAPI } = await import("../../src/server/management-api");
-    const { loadConfig } = await import("../../src/config");
+    const { handleManagementAPI } = await import("../../backend/src/server/management-api");
+    const { loadConfig } = await import("../../backend/src/config");
     const before = readFileSync(path, "utf8"); let requests = 0, toggles = 0;
     const nativeResponses: unknown[] = [];
     const runtimeApi: RuntimeApiDeps = { baseUrl: "http://localhost", fetchImpl: (async (url: string | URL | Request, init?: RequestInit) => {
@@ -323,15 +323,15 @@ describe("live V2 real-handler refusal and incomplete convergence", () => {
 
 describe("root dispatch compatibility", () => {
   test("real root dispatch preserves local JSON and terminator operands", async () => {
-    const { dispatchCommand } = await import("../../src/cli/dispatch");
-    const { parseCliHead } = await import("../../src/cli/root");
+    const { dispatchCommand } = await import("../../backend/src/cli/dispatch");
+    const { parseCliHead } = await import("../../backend/src/cli/root");
     const run = async (args: string[]) => {
       const head = parseCliHead(args);
       expect(head.kind).toBe("command");
       // Only the v2 runner's declared dependency is present; accessing another is a fixture failure.
       const deps = new Proxy({ args, findLiveProxy: async () => { throw new Error("No discovery"); } }, {
         get(target, key) { if (key in target) return Reflect.get(target, key); throw new Error("Unexpected root dependency"); },
-      }) as unknown as import("../../src/cli/dispatch").CliDispatchDeps;
+      }) as unknown as import("../../backend/src/cli/dispatch").CliDispatchDeps;
       return dispatchCommand(head, deps);
     };
     expect(await run(["v2", "status", "--json"])).toBe(0);

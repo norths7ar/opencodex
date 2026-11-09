@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { EventEmitter } from "node:events";
 import { PassThrough, Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { buildQoderConversationInput as buildConversationInput } from "../../src/adapters/qoder/image-input";
-import { clearQoderBinaryCache } from "../../src/adapters/qoder/profiles";
-import type { AdapterEvent, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { buildQoderConversationInput as buildConversationInput } from "../../backend/src/adapters/qoder/image-input";
+import { clearQoderBinaryCache } from "../../backend/src/adapters/qoder/profiles";
+import type { AdapterEvent, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const enc = new TextEncoder();

@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { rmSync } from "node:fs";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { withInstalledShim } from "../helpers/codex-shim-install-fixture";
-import { setCodexShimProbeObservationMsForTests } from "../../src/codex/shim";
+import { setCodexShimProbeObservationMsForTests } from "../../backend/src/codex/shim";
 
 afterEach(() => setCodexShimProbeObservationMsForTests(null));
 
@@ -15,7 +15,7 @@ describe("version-manager shim destruction (#2412)", () => {
       rmSync(wrappers[0]);
       expect(spawnSync("mkfifo", [wrappers[0]]).status).toBe(0);
       rmSync(launchers[0]);
-      const shimModule = repoPath("src", "codex", "shim.ts");
+      const shimModule = repoPath("backend/src", "codex", "shim.ts");
       const script = `
         const { autoRestoreCodexShim } = await import(${JSON.stringify(shimModule)});
         console.log(JSON.stringify(autoRestoreCodexShim({ enabled: () => true, stabilitySleep: () => {} })));

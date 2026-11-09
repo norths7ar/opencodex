@@ -2,10 +2,10 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest, OcxUsage } from "../../src/types";
-import type { ImageBridgePlan } from "../../src/images/types";
-import { runWithImageBridge } from "../../src/images/loop";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest, OcxUsage } from "../../backend/src/types";
+import type { ImageBridgePlan } from "../../backend/src/images/types";
+import { runWithImageBridge } from "../../backend/src/images/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { parseRequest } from "../../src/responses/parser";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 // #8075: Kimi Code's native Responses endpoint answers 400 for the output.encrypted_content
 // include entry that Codex Desktop sends on every turn.

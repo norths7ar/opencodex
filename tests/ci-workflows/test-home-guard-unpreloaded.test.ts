@@ -100,16 +100,16 @@ function report(stdout: string, stderr: string): Record<string, string> {
 const ATTEMPTS = String.raw`
   const repo = ${JSON.stringify(REPO_ROOT_URL)};
   const out: Record<string, string> = {};
-  const guard = await import(repo + "src/lib/test-home-guard.ts");
+  const guard = await import(repo + "backend/src/lib/test-home-guard.ts");
   out.armed = String(guard.isTestHomeGuardArmed());
   out.flag = String(process.env.OCX_TEST_HOME_GUARD);
   out.preload = String(process.env.OCX_TEST_PRELOAD_PID);
   globalThis.fetch = (async () => { throw new Error("network disabled in this probe"); }) as never;
-  const config = await import(repo + "src/config.ts");
-  const store = await import(repo + "src/oauth/store.ts");
-  const codexStore = await import(repo + "src/codex/account-store.ts");
-  const kimi = await import(repo + "src/oauth/kimi.ts");
-  const nous = await import(repo + "src/oauth/nous.ts");
+  const config = await import(repo + "backend/src/config.ts");
+  const store = await import(repo + "backend/src/oauth/store.ts");
+  const codexStore = await import(repo + "backend/src/codex/account-store.ts");
+  const kimi = await import(repo + "backend/src/oauth/kimi.ts");
+  const nous = await import(repo + "backend/src/oauth/nous.ts");
   out.configDir = config.getConfigDir();
   const cred = { access: "fixture-access", refresh: "fixture-refresh", expires: Date.now() + 3_600_000, email: "fixture@example.test" };
   const chain = (error: unknown): string => {
@@ -152,7 +152,7 @@ const WRITE_PATHS = [
  * arm itself by name, so it is protected only if it inherits the flag the test process published.
  */
 const CHILD_HELPER = String.raw`
-  const store = await import(${JSON.stringify(REPO_ROOT_URL)} + "src/oauth/store.ts");
+  const store = await import(${JSON.stringify(REPO_ROOT_URL)} + "backend/src/oauth/store.ts");
   try {
     await store.saveCredential("anthropic", { access: "child", refresh: "child", expires: Date.now() + 3_600_000, email: "child@example.test" });
     console.log("CHILD WROTE");
@@ -250,7 +250,7 @@ describe("bun test without the preload (#7407)", () => {
     const outside = owned("ocx-7407-optout-cwd-");
     const fixture = join(outside, "optout.test.ts");
     writeFileSync(fixture, 'import { test } from "bun:test";\ntest("x", async () => {\n'
-      + "  const guard = await import(" + JSON.stringify(REPO_ROOT_URL + "src/lib/test-home-guard.ts") + ");\n"
+      + "  const guard = await import(" + JSON.stringify(REPO_ROOT_URL + "backend/src/lib/test-home-guard.ts") + ");\n"
       + '  console.log("REPORT " + JSON.stringify({ armed: String(guard.isTestHomeGuardArmed()) }));\n});\n');
 
     const result = await run(["test", fixture], outside, unsandboxedEnv(home, { OCX_TEST_HOME_GUARD: "0" }));

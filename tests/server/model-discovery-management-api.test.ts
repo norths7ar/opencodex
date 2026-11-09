@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 
 function config(): OcxConfig {

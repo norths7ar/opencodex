@@ -1,14 +1,14 @@
 import { expect, spyOn, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../../src/bridge";
-import { parseRequest } from "../../../src/responses/parser";
-import { decodeReasoningEnvelope } from "../../../src/responses/reasoning-envelope";
-import { decodeCompactionSummary } from "../../../src/responses/compaction";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../../backend/src/bridge";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { decodeReasoningEnvelope } from "../../../backend/src/responses/reasoning-envelope";
+import { decodeCompactionSummary } from "../../../backend/src/responses/compaction";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { collectAnthropicMessage, responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../../src/claude/outbound";
-import { buildContinuationRequest } from "../../../src/server/responses/terminal-guard";
-import { runWithWebSearch } from "../../../src/web-search/loop";
-import type { AdapterEvent } from "../../../src/types";
+import { collectAnthropicMessage, responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../../backend/src/claude/outbound";
+import { buildContinuationRequest } from "../../../backend/src/server/responses/terminal-guard";
+import { runWithWebSearch } from "../../../backend/src/web-search/loop";
+import type { AdapterEvent } from "../../../backend/src/types";
 
 const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "synthetic" };
 const model = "anthropic/claude-opus-5-5";

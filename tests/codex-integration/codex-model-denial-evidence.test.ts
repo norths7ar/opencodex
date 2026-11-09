@@ -5,14 +5,14 @@ import {
   recordCodexModelDenialEvidence,
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
-import { setObservedDenialGenerationCheck } from "../../src/codex/observed-model-denials";
+} from "../../backend/src/codex/model-entitlements";
+import { setObservedDenialGenerationCheck } from "../../backend/src/codex/observed-model-denials";
 import {
   codexUnsupportedModelFromDetail,
   isAllowListedCodexAccountModel400,
   shouldRetryCodexPoolAccountModel400,
-} from "../../src/server/responses/core-codex-account";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
+} from "../../backend/src/server/responses/core-codex-account";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 
 /** Credential generation these fixtures record under (#4952). */
 const GEN = 1;

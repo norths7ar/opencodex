@@ -14,11 +14,11 @@ import {
   normalizeBindingTarget,
   parseInterceptBindingPatch,
   readInterceptBindings,
-} from "../../src/claude/intercept/model-bindings";
-import { resolveInboundModel } from "../../src/claude/inbound-model-options";
-import { saveConfig, validateConfigCandidate } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxClaudeCodeConfig, OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/intercept/model-bindings";
+import { resolveInboundModel } from "../../backend/src/claude/inbound-model-options";
+import { saveConfig, validateConfigCandidate } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxClaudeCodeConfig, OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root = "";

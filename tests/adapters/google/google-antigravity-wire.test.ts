@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { antigravitySessionId, isLikelyRealThoughtSignature } from "../../../src/adapters/google-antigravity-wire";
-import { ANTIGRAVITY_MODELS, ANTIGRAVITY_MODEL_EFFORTS, canonicalAntigravityUsageModel, parseAntigravityAvailableModels, registerAntigravityDiscoveredWireModels, resolveAntigravityEffortWireModel, resolveAntigravityWireModelId } from "../../../src/providers/antigravity-models";
-import { MODEL_DISCOVERY_MAX_MODEL_ID_LENGTH, MODEL_DISCOVERY_MAX_MODELS } from "../../../src/providers/model-discovery";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { antigravitySessionId, isLikelyRealThoughtSignature } from "../../../backend/src/adapters/google-antigravity-wire";
+import { ANTIGRAVITY_MODELS, ANTIGRAVITY_MODEL_EFFORTS, canonicalAntigravityUsageModel, parseAntigravityAvailableModels, registerAntigravityDiscoveredWireModels, resolveAntigravityEffortWireModel, resolveAntigravityWireModelId } from "../../../backend/src/providers/antigravity-models";
+import { MODEL_DISCOVERY_MAX_MODEL_ID_LENGTH, MODEL_DISCOVERY_MAX_MODELS } from "../../../backend/src/providers/model-discovery";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>
@@ -787,7 +787,7 @@ describe("antigravity parseResponse unwraps response (non-streaming)", () => {
   });
 
   test("non-streaming observes thoughtSignatures so the next turn can replay them", async () => {
-    const { __resetAntigravityReplayCache, applyAntigravityReplay } = await import("../../../src/adapters/google-antigravity-replay");
+    const { __resetAntigravityReplayCache, applyAntigravityReplay } = await import("../../../backend/src/adapters/google-antigravity-replay");
     __resetAntigravityReplayCache();
     const adapter = createGoogleAdapter(provider);
     // buildRequest first to set the per-adapter model/session, then parseResponse to observe.
@@ -808,7 +808,7 @@ describe("antigravity parseResponse unwraps response (non-streaming)", () => {
   // thought part with a signed function call is the direct proof, rather than inferring it
   // from unrelated fixtures that happen to still pass.
   test("a thought part alongside a signed function call does not disturb replay", async () => {
-    const { __resetAntigravityReplayCache, applyAntigravityReplay } = await import("../../../src/adapters/google-antigravity-replay");
+    const { __resetAntigravityReplayCache, applyAntigravityReplay } = await import("../../../backend/src/adapters/google-antigravity-replay");
     __resetAntigravityReplayCache();
     const adapter = createGoogleAdapter(provider);
     await adapter.buildRequest(parsed("hello world"));

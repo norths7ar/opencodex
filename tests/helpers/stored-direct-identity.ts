@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { materializeCodexUpstreamAuth, materializeCodexUpstreamAuthAsync } from "../../src/codex/auth-context";
+import { materializeCodexUpstreamAuth, materializeCodexUpstreamAuthAsync } from "../../backend/src/codex/auth-context";
 
 export function registerStoredDirectIdentityTests(getTestDir: () => string, liveJwt: () => string): void {
   test("an admission bearer on main substitutes the stored credential, never forwards it (#1686)", () => {

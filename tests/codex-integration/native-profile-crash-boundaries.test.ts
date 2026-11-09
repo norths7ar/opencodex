@@ -3,12 +3,12 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { saveConfig } from "../../src/config";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { NativeProfileManager, type NativeProfileSwitchBoundary } from "../../src/codex/native-profile-manager";
-import { readNativeProfileJournal, readNativeProfileVault } from "../../src/codex/native-profile-store";
-import type { NativeProfileKey, NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { NativeProfileManager, type NativeProfileSwitchBoundary } from "../../backend/src/codex/native-profile-manager";
+import { readNativeProfileJournal, readNativeProfileVault } from "../../backend/src/codex/native-profile-store";
+import type { NativeProfileKey, NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
+import type { OcxConfig } from "../../backend/src/types";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

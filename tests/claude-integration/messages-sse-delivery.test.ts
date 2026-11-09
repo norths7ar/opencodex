@@ -1,7 +1,7 @@
 import { expect, spyOn, test } from "bun:test";
-import { tapAnthropicSseForLog } from "../../src/server/messages-shared";
-import { createMessagesSseErrorFilter } from "../../src/server/messages-sse-error-filter";
-import { MessagesSseFrameContext } from "../../src/lib/messages-sse-error-presentation";
+import { tapAnthropicSseForLog } from "../../backend/src/server/messages-shared";
+import { createMessagesSseErrorFilter } from "../../backend/src/server/messages-sse-error-filter";
+import { MessagesSseFrameContext } from "../../backend/src/lib/messages-sse-error-presentation";
 
 test("failed client enqueue retains original tap observation without a rescue enqueue", async () => {
   const source = new ReadableStream<Uint8Array>({ start(controller) { controller.enqueue(new TextEncoder().encode('event: message_delta\ndata: {"type":"message_delta","usage":{"output_tokens":3},"delta":{}}\n\n')); } });

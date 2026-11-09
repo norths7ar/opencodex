@@ -3,12 +3,12 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { loadConfig, saveConfig } from "../../src/config";
-import { validateConfigCandidate } from "../../src/config/diagnostics";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import { providerEditorConfigDTO } from "../../src/server/auth-cors";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { validateConfigCandidate } from "../../backend/src/config/diagnostics";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import { providerEditorConfigDTO } from "../../backend/src/server/auth-cors";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

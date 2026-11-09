@@ -2,20 +2,20 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { usageLogPath } from "../../src/usage/log";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { usageLogPath } from "../../backend/src/usage/log";
 import {
   addRequestLog,
   clearRequestLogsForTests,
   evictOldestRequestLogForBudget,
   getRequestLogEntries,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
-import { buildRouteDecisionTrace } from "../../src/routing/trace";
-import { summarizeUsage } from "../../src/usage/summary";
+} from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
+import { buildRouteDecisionTrace } from "../../backend/src/routing/trace";
+import { summarizeUsage } from "../../backend/src/usage/summary";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { refreshUserCostOverlays } from "../../src/usage/user-cost-overlays";
+import { refreshUserCostOverlays } from "../../backend/src/usage/user-cost-overlays";
 
 interface LogPollEnvelope {
   logs: Array<Record<string, unknown>>;
@@ -566,7 +566,7 @@ describe("estimated decode rate (#4038)", () => {
     // there — firstOutputMs does survive into a persisted-usage row — so the exclusion is a
     // scope decision rather than a correctness one, and it has to be asserted or it silently
     // reverses the first time someone touches the DTO.
-    const { requestLogDto } = await import("../../src/server/management/shared");
+    const { requestLogDto } = await import("../../backend/src/server/management/shared");
     const entry = baseEntry({
       durationMs: 10_000,
       firstOutputMs: 2_000,
@@ -596,7 +596,7 @@ describe("estimated decode rate (#4038)", () => {
   test("the request-history route actually passes the opt-out", async () => {
     // The DTO assertion above proves the flag works; this proves the endpoint uses it. Without
     // it, a correct flag and a route that never sets it would both look fine.
-    const source = await Bun.file("src/server/management/request-history-routes.ts").text();
+    const source = await Bun.file("backend/src/server/management/request-history-routes.ts").text();
     const calls = [...source.matchAll(/requestLogDto\(/g)];
     expect(calls.length).toBeGreaterThan(0);
     expect([...source.matchAll(/includeDecodeRate: false/g)]).toHaveLength(calls.length);

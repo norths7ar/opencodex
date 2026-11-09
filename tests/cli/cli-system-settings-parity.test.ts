@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleSystemCommand } from "../../src/cli/system-command";
+import { handleSystemCommand } from "../../backend/src/cli/system-command";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 
 let home: TempHome, output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;
 let token: string | undefined;

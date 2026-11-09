@@ -8,17 +8,17 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect, mock, test } from "
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const previousHome = process.env.OPENCODEX_HOME;
 let testHome = "";
 let releaseSpendHome: (() => void) | undefined;
-let handleResponses: typeof import("../../src/server/responses")["handleResponses"];
+let handleResponses: typeof import("../../backend/src/server/responses")["handleResponses"];
 
 function chatSse(promptTokens: number, completionTokens: number, delta: object, finishReason: string): Response {
   const chunks = [
@@ -33,8 +33,8 @@ function chatSse(promptTokens: number, completionTokens: number, delta: object, 
 
 beforeAll(async () => {
   // Copied before mocking: the live namespace would resolve to the mock itself.
-  const actualWebSearch = { ...await import("../../src/web-search") };
-  mock.module("../../src/web-search", () => ({
+  const actualWebSearch = { ...await import("../../backend/src/web-search") };
+  mock.module("../../backend/src/web-search", () => ({
     ...actualWebSearch,
     shouldResolveOpenAiWebSearchSidecar: () => false,
     // exa without a key answers each search with an error result, so no search leaves the process.
@@ -45,7 +45,7 @@ beforeAll(async () => {
       maxSearches: 1,
     }),
   }));
-  ({ handleResponses } = await import("../../src/server/responses"));
+  ({ handleResponses } = await import("../../backend/src/server/responses"));
 });
 
 beforeEach(() => {

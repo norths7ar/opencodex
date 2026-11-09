@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, formatErrorResponse } from "../../src/bridge";
+import { bridgeToResponsesSSE, formatErrorResponse } from "../../backend/src/bridge";
 import {
   adapterFailureFromMessage,
   classifyError,
   httpStatusFromTerminalError,
   isLocationUnsupportedMessage,
-} from "../../src/lib/errors";
-import { sanitizePassthroughHeaders } from "../../src/server";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/lib/errors";
+import { sanitizePassthroughHeaders } from "../../backend/src/server";
+import type { AdapterEvent } from "../../backend/src/types";
 
 async function* replay(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {
   for (const event of events) yield event;

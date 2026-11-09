@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import type { SidecarPlan } from "../../src/web-search";
-import { runWithWebSearch } from "../../src/web-search/loop";
-import { runTurnWebSearchLoop } from "../../src/web-search/run-turn-loop";
-import { buildWebSearchTool } from "../../src/web-search/synthetic-tool";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import type { SidecarPlan } from "../../backend/src/web-search";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
+import { runTurnWebSearchLoop } from "../../backend/src/web-search/run-turn-loop";
+import { buildWebSearchTool } from "../../backend/src/web-search/synthetic-tool";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const done: AdapterEvent = { type: "done" };

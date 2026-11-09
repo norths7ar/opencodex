@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import * as init from "../../src/cli/init";
+import * as init from "../../backend/src/cli/init";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -18,7 +18,7 @@ type Step = [prompt: string, action: string | "<EOF>" | "<SIGINT>"];
 async function runWizard(steps: Step[]) {
   const home = mkdtempSync(join(tmpdir(), "ocx-init-port-"));
   mkdirSync(join(home, "native"));
-  const proc = Bun.spawn([process.execPath, "--eval", "import {runInit} from " + JSON.stringify(repoPath("src", "cli", "init.ts")) + "; await runInit();"], {
+  const proc = Bun.spawn([process.execPath, "--eval", "import {runInit} from " + JSON.stringify(repoPath("backend/src", "cli", "init.ts")) + "; await runInit();"], {
     cwd: repoRoot(), env: { ...process.env, OPENCODEX_HOME: home, CODEX_HOME: join(home, "native"), HOME: home, USERPROFILE: home,
       APPDATA: join(home, "appdata"), LOCALAPPDATA: join(home, "localappdata"), XDG_CONFIG_HOME: join(home, "xdg") },
     stdin: "pipe", stdout: "pipe", stderr: "pipe",

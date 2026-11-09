@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
   clampAutoCompactTokenLimit,
   modelAutoCompactTokenLimitsConfigError,
-} from "../../src/providers/auto-compact-budget";
+} from "../../backend/src/providers/auto-compact-budget";
 
 describe("per-model auto-compaction budgets", () => {
   test("configuration only lowers the effective hard-limit envelope", () => {

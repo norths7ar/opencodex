@@ -8,7 +8,7 @@ import {
   recordCursorOverflowRemint,
   shouldSkipCursorOverflowRemint,
   shouldSurfaceCursorOverflowFirst,
-} from "../../../src/adapters/cursor/thread-continuity";
+} from "../../../backend/src/adapters/cursor/thread-continuity";
 
 describe("Cursor overflow remint retention", () => {
   test("capped activity refreshes idle expiry without replenishing the allowance", () => {

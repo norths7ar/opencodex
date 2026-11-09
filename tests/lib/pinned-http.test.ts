@@ -3,7 +3,7 @@ import { IncomingMessage } from "node:http";
 import { randomBytes } from "node:crypto";
 import { deflateSync, gzipSync } from "node:zlib";
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { PinnedHttpError, pinnedHttpGet } from "../../src/lib/pinned-http";
+import { PinnedHttpError, pinnedHttpGet } from "../../backend/src/lib/pinned-http";
 
 let server: Server | undefined;
 const sockets = new Set<Socket>();

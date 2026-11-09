@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import * as abortModule from "../../src/lib/abort";
-import type { AdapterFetchContext, ProviderAdapter } from "../../src/adapters/base";
-import { parseRequest } from "../../src/responses/parser";
-import { responseWithDeferredRequestLog, type RequestLogEntry } from "../../src/server";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
-import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../src/web-search/loop";
+import * as abortModule from "../../backend/src/lib/abort";
+import type { AdapterFetchContext, ProviderAdapter } from "../../backend/src/adapters/base";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { responseWithDeferredRequestLog, type RequestLogEntry } from "../../backend/src/server";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
+import { runWithWebSearch as runWithWebSearchProduction, type WebSearchLoopDeps } from "../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 function runWithWebSearch(

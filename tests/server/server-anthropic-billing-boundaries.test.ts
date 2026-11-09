@@ -1,18 +1,18 @@
-import { upstreamConditionMessage } from "../../src/lib/upstream-condition";
+import { upstreamConditionMessage } from "../../backend/src/lib/upstream-condition";
 /** #6958 boundaries: Chat Completions entry, cross-request skip, secret hygiene, OAuth separation. */
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { clearAnthropicAccountPoolState, getAnthropicAccountHealthSnapshot } from "../../src/oauth/anthropic-routing";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { clearKeyCooldowns, getKeyCooldownUntil } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { clearAnthropicAccountPoolState, getAnthropicAccountHealthSnapshot } from "../../backend/src/oauth/anthropic-routing";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { clearKeyCooldowns, getKeyCooldownUntil } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

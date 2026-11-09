@@ -16,8 +16,8 @@ import {
   readPromptLayers,
   selectBaseVariant,
   writeBaseVariant,
-} from "../../src/codex/prompt-layers";
-import { journalPathFor } from "../../src/codex/prompt-layers/paths";
+} from "../../backend/src/codex/prompt-layers";
+import { journalPathFor } from "../../backend/src/codex/prompt-layers/paths";
 import * as fsModule from "node:fs";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -431,7 +431,7 @@ test.skipIf(process.platform === "win32")("an import FIFO without a writer is re
   expect(Bun.spawnSync({ cmd: ["mkfifo", external] }).exitCode).toBe(0);
   writeFileSync(paths.configPath, `model_instructions_file = ${JSON.stringify(external)}\n`);
   const child = Bun.spawn({
-    cmd: [process.execPath, "--eval", `import { previewBaseImport } from ${JSON.stringify(repoPath("src/codex/prompt-layers.ts"))};
+    cmd: [process.execPath, "--eval", `import { previewBaseImport } from ${JSON.stringify(repoPath("backend/src/codex/prompt-layers.ts"))};
       console.log(JSON.stringify(previewBaseImport(${JSON.stringify(paths)})));`],
     stdout: "pipe", stderr: "pipe", timeout: 1500,
   });

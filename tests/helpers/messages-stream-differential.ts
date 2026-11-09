@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { repoPath, repoRoot } from "./repo-root";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const [mode, scratch, output] = process.argv.slice(2) as [string, string, string];
 function git(...args: string[]): string {
@@ -13,7 +13,7 @@ if (mode !== "head" && mode !== "--generate-base") throw new Error("Expected hea
 if (mode === "--generate-base") {
   // Overlay exact git-show bytes at the original module identities so relative imports resolve identically.
   const existing = new Set(git("ls-tree", "-r", "--name-only", "895a85989", "--", "src").trim().split("\n"));
-  const changed = [...new Set(["src/server/messages-native.ts", "src/server/messages-native-tool-guard.ts", "src/server/messages-shared.ts", "src/server/claude-messages.ts", "src/server/sse-payload-rewrite.ts", "src/lib/messages-error-body.ts", ...git("diff", "--name-only", "895a85989", "--", "src").trim().split("\n").filter(path => existing.has(path))])];
+  const changed = [...new Set(["backend/src/server/messages-native.ts", "backend/src/server/messages-native-tool-guard.ts", "backend/src/server/messages-shared.ts", "backend/src/server/claude-messages.ts", "backend/src/server/sse-payload-rewrite.ts", "backend/src/lib/messages-error-body.ts", ...git("diff", "--name-only", "895a85989", "--", "src").trim().split("\n").filter(path => existing.has(path))])];
   if (!changed.length) throw new Error("The differential fixture requires changed baseline modules");
   const overlays = new Map<string, string>();
   for (const path of changed) {
@@ -29,12 +29,12 @@ if (mode === "--generate-base") {
 }
 // Production imports must occur after the baseline overlay is registered.
 const { acquireOwnedSpendHome } = await import("./owned-spend-home");
-const { saveCredential } = await import("../../src/oauth/store");
-const { saveConfig } = await import("../../src/config");
-const { handleClaudeMessages } = await import("../../src/server/claude-messages");
-const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
-const { getRequestLogEntries } = await import("../../src/server/request-log");
-const { tapAnthropicSseForLog } = await import("../../src/server/messages-shared");
+const { saveCredential } = await import("../../backend/src/oauth/store");
+const { saveConfig } = await import("../../backend/src/config");
+const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
+const { clearKeyCooldowns } = await import("../../backend/src/providers/key-failover");
+const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
+const { tapAnthropicSseForLog } = await import("../../backend/src/server/messages-shared");
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const ev = (name: string, data: object) => `event: ${name}\ndata: ${JSON.stringify(data)}\n\n`;
 const error = (type: string, message: string) => ev("error", { type: "error", error: { type, message }, request_id: sentinel });
@@ -55,7 +55,7 @@ function source(name: string, raw: string, cancelled: string[]): ReadableStream<
     if (name !== "stall" && name !== "cancel" && name !== "cap") controller.close();
   }, cancel(reason) { cancelled.push(reason instanceof Error ? reason.name : typeof reason); } });
 }
-const { upstreamMessagesRequestIdHeaders } = await import("../../src/server/messages-response-headers");
+const { upstreamMessagesRequestIdHeaders } = await import("../../backend/src/server/messages-response-headers");
 const overlayProbe = upstreamMessagesRequestIdHeaders(new Headers({ "request-id": "req_fixture" }));
 const results: Record<string, unknown> = {};
 const release = acquireOwnedSpendHome();

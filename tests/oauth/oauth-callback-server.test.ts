@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { OAuthCallbackFlow, type OAuthCallbackFlowOptions } from "../../src/oauth/callback-server";
-import type { OAuthController, OAuthCredentials } from "../../src/oauth/types";
+import { OAuthCallbackFlow, type OAuthCallbackFlowOptions } from "../../backend/src/oauth/callback-server";
+import type { OAuthController, OAuthCredentials } from "../../backend/src/oauth/types";
 
 class TestFlow extends OAuthCallbackFlow {
   async generateAuthUrl(): Promise<{ url: string }> {

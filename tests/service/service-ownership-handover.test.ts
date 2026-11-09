@@ -10,12 +10,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import { foreignServiceOwnerRefusal, repairService, unknownServiceOwnerRefusal } from "../../src/service/repair";
-import type { ServiceDiagnostic } from "../../src/service/diagnostics";
-import type { ServiceOwnershipResolution } from "../../src/service/state";
-import { assertNoDesktopSupervision, createSupervisionLatch, desktopServiceCommandRefusal, desktopServiceRefusal, type DesktopSupervision } from "../../src/service/desktop-command-guard";
-import { installFreshWindowsSchedulerSafely, installServiceSafely, prepareServiceInstall, type FreshWindowsSchedulerInstallDeps } from "../../src/service/orchestration";
-import { buildWindowsTaskXml } from "../../src/service/windows-taskxml";
+import { foreignServiceOwnerRefusal, repairService, unknownServiceOwnerRefusal } from "../../backend/src/service/repair";
+import type { ServiceDiagnostic } from "../../backend/src/service/diagnostics";
+import type { ServiceOwnershipResolution } from "../../backend/src/service/state";
+import { assertNoDesktopSupervision, createSupervisionLatch, desktopServiceCommandRefusal, desktopServiceRefusal, type DesktopSupervision } from "../../backend/src/service/desktop-command-guard";
+import { installFreshWindowsSchedulerSafely, installServiceSafely, prepareServiceInstall, type FreshWindowsSchedulerInstallDeps } from "../../backend/src/service/orchestration";
+import { buildWindowsTaskXml } from "../../backend/src/service/windows-taskxml";
 
 const INSTALLED: ServiceDiagnostic = {
   supported: true, installed: true, enabled: true, running: true, viable: true,
@@ -163,7 +163,7 @@ describe("live Desktop service command guards", () => {
         expect(touched).toEqual([]);
       }
     }
-    const cli = readFileSync(repoPath("src", "service", "cli.ts"), "utf8");
+    const cli = readFileSync(repoPath("backend/src", "service", "cli.ts"), "utf8");
     const preflight = cli.indexOf("desktopServiceCommandRefusal(preliminary.sub");
     expect(preflight).toBeGreaterThan(0);
     expect(preflight).toBeLessThan(cli.indexOf("await withWindowsServiceMutationLock(execute)"));
@@ -406,7 +406,7 @@ describe("live Desktop service command guards", () => {
 });
 
 describe("which service verbs are gated", () => {
-  const cli = readFileSync(repoPath("src", "service", "cli.ts"), "utf8");
+  const cli = readFileSync(repoPath("backend/src", "service", "cli.ts"), "utf8");
   const between = (from: string, to: string): string => cli.slice(cli.indexOf(from), cli.indexOf(to));
   const installCase = between("case \"install\":", "case \"start\":");
   const startCase = between("case \"start\":", "case \"stop\"");
@@ -436,6 +436,6 @@ describe("which service verbs are gated", () => {
     expect(deactivating).not.toContain("resolveServiceOwnership");
     expect(deactivating).not.toContain("releaseServiceOwner");
     expect(startCase).not.toContain("releaseServiceOwner");
-    expect(readFileSync(repoPath("src", "service", "repair.ts"), "utf8")).not.toContain("releaseServiceOwner");
+    expect(readFileSync(repoPath("backend/src", "service", "repair.ts"), "utf8")).not.toContain("releaseServiceOwner");
   });
 });

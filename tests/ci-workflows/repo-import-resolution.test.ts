@@ -80,7 +80,7 @@ function resolvesFrom(spec: string, absoluteFile: string): boolean {
  * guard somebody deletes. Under src/ and gui/src a relative specifier in import position
  * is an import, and the dashboard is production code that moves for the same reasons.
  */
-const SCANNED_ROOTS = ["src", "gui/src"] as const;
+const SCANNED_ROOTS = ["src", "frontend/src"] as const;
 
 function trackedSourceFiles(): string[] {
   const listed = Bun.spawnSync(["git", "ls-files", ...SCANNED_ROOTS], { cwd: repoRoot });
@@ -98,7 +98,7 @@ describe("relative import resolution", () => {
   test("the resolver reports a specifier that points at nothing", () => {
     // Driven red on purpose: the offender list is only trustworthy if a miss is a miss.
     // src/config.ts exists, src/codex/config.ts does not -- exactly the round-one defect.
-    const from = resolve(repoRoot, "src/codex/routing/active-account.ts");
+    const from = resolve(repoRoot, "backend/src/codex/routing/active-account.ts");
     expect(resolvesFrom("../../config", from)).toBe(true);
     expect(resolvesFrom("../config", from)).toBe(false);
   });

@@ -9,17 +9,17 @@
  * 5-model roster.
  */
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { handleAgentSettingsRoutes } from "../../src/server/management/agent-settings-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import { deleteConfigTopLevelKey, loadConfig, saveConfigPreservingClaudeCode } from "../../src/config";
-import { configHasRebaseProvenance, configRebaseDeletionKeys, projectConfigRebaseProvenance } from "../../src/config/rebase-provenance";
-import type { OcxConfig } from "../../src/types";
+import { handleAgentSettingsRoutes } from "../../backend/src/server/management/agent-settings-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { deleteConfigTopLevelKey, loadConfig, saveConfigPreservingClaudeCode } from "../../backend/src/config";
+import { configHasRebaseProvenance, configRebaseDeletionKeys, projectConfigRebaseProvenance } from "../../backend/src/config/rebase-provenance";
+import type { OcxConfig } from "../../backend/src/types";
 
 function makeConfig(overrides: Partial<OcxConfig> = {}): OcxConfig {
   return { port: 10100, providers: {}, defaultProvider: "openai", ...overrides } as OcxConfig;

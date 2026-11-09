@@ -1,23 +1,23 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import * as authContext from "../../src/codex/auth-context";
+import * as authContext from "../../backend/src/codex/auth-context";
 import { createHash } from "node:crypto";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountNeedsReauth } from "../../src/codex/auth-api";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../src/codex/routing";
-import { clearUpstreamHostHealth } from "../../src/codex/upstream-host-health";
-import { handleResponsesCompact } from "../../src/server/responses/compact";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/auth-api";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { clearUpstreamHostHealth } from "../../backend/src/codex/upstream-host-health";
+import { handleResponsesCompact } from "../../backend/src/server/responses/compact";
 import {
   createRequestExecutionBudget,
   CODEX_TEXT_GUARDED_BUDGET_POLICY,
   type RequestSendObserver,
-} from "../../src/lib/request-execution-budget";
-import { clearPoolRecoveryState } from "../../src/routing/probe-lease";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/request-execution-budget";
+import { clearPoolRecoveryState } from "../../backend/src/routing/probe-lease";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -236,8 +236,8 @@ describe("native compact moves a surviving transient 5xx to one alternate accoun
    * the alternate's identity; charged to the first account it would be refused and never sent.
    */
   async function ledgerCompact(identityCap: number, ...answers: Answer[]) {
-    const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../src/lib/spend-reservation-ledger");
-    const { createRequestSpendTracker } = await import("../../src/server/responses/request-spend");
+    const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../backend/src/lib/spend-reservation-ledger");
+    const { createRequestSpendTracker } = await import("../../backend/src/server/responses/request-spend");
     const ledger = createSpendReservationLedger({ salt: "compact-6969", policy: {
       ...DEFAULT_SPEND_RESERVATION_POLICY, identity: { maxTokens: identityCap }, pool: { maxTokens: 1_000 },
     } });
@@ -304,8 +304,8 @@ describe("native compact moves a surviving transient 5xx to one alternate accoun
 
 test.each([false, true])("caller-owned compact Pool-to-main retry scrubs continuation (affinity=%s)", async enabled => {
   const { fakeChatGptJwt } = await import("../helpers/agent-task-recovery");
-  const { rememberServingConversationStateIssuer } = await import("../../src/server/responses/account-change-state");
-  const { peekConversationStateIssuer } = await import("../../src/codex/routing/thread-affinity");
+  const { rememberServingConversationStateIssuer } = await import("../../backend/src/server/responses/account-change-state");
+  const { peekConversationStateIssuer } = await import("../../backend/src/codex/routing/thread-affinity");
   const bearer = fakeChatGptJwt("caller-test");
   const headers = new Headers({ authorization: `Bearer ${bearer}`, "content-type": "application/json", "session-id": "test-session", "thread-id": "test-thread" });
   const config = poolConfig({ codexAccounts: [{ id: WORK, label: WORK }], pausedCodexAccountIds: ["__main__"], codexPool: { requestOwnedAffinity: enabled } });
@@ -348,7 +348,7 @@ test.each([false, true])("caller-owned compact Pool-to-main retry scrubs continu
 
 test("caller-owned compact scrubs Pool to manually pinned main and back", async () => {
   const { fakeChatGptJwt } = await import("../helpers/agent-task-recovery");
-  const { rememberServingConversationStateIssuer } = await import("../../src/server/responses/account-change-state");
+  const { rememberServingConversationStateIssuer } = await import("../../backend/src/server/responses/account-change-state");
   const bearer = fakeChatGptJwt("pin-caller");
   const headers = new Headers({ authorization: `Bearer ${bearer}`, "content-type": "application/json", "session-id": "session", "thread-id": "thread" });
   const config = poolConfig({ codexAccounts: [{ id: WORK, label: WORK }], pausedCodexAccountIds: ["__main__"], codexPool: { requestOwnedAffinity: true } });
@@ -357,7 +357,7 @@ test("caller-owned compact scrubs Pool to manually pinned main and back", async 
   const second = await authContext.resolveCodexAuthContext(headers, config, "pool", options);
   expect(first.affinityDecision?.move).toBe("new_bind"); expect(second.affinityDecision?.move).toBe("reused");
   expect(first.kind).toBe("pool"); rememberServingConversationStateIssuer(second);
-  const { resetCodexRoutingForManualSelection } = await import("../../src/codex/routing/active-account");
+  const { resetCodexRoutingForManualSelection } = await import("../../backend/src/codex/routing/active-account");
   resetCodexRoutingForManualSelection("__main__");
   config.activeCodexAccountId = "__main__"; config.activeCodexAccountPinned = "__main__"; config.pausedCodexAccountIds = [];
   const bodies: Record<string, unknown>[] = [];
@@ -379,8 +379,8 @@ test("caller-owned compact scrubs Pool to manually pinned main and back", async 
 
 test("caller-owned compact main 429 releases only its conversation binding", async () => {
   const { fakeChatGptJwt } = await import("../helpers/agent-task-recovery");
-  const { getThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
-  const { getCodexQuotaHealthSnapshot } = await import("../../src/codex/routing");
+  const { getThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
+  const { getCodexQuotaHealthSnapshot } = await import("../../backend/src/codex/routing");
   const bearer = fakeChatGptJwt("owned-compact-failure");
   const headers = new Headers({ authorization: `Bearer ${bearer}`, "content-type": "application/json", "session-id": "s", "thread-id": "t" });
   const config = poolConfig({ codexAccounts: [{ id: WORK, label: WORK }], pausedCodexAccountIds: [WORK], codexPool: { requestOwnedAffinity: true } });

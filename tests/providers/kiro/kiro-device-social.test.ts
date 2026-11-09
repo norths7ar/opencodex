@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { kiroDeviceConfigBaseline, kiroDeviceFlowCountForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../src/oauth/kiro-device-login";
-import { getAccountSet } from "../../../src/oauth/store";
+import { kiroDeviceConfigBaseline, kiroDeviceFlowCountForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../backend/src/oauth/kiro-device-login";
+import { getAccountSet } from "../../../backend/src/oauth/store";
 import { kiroDeviceFixture, profileArn, response, socialAuthorization } from "../../helpers/kiro-device-fixture";
-import type { OcxConfig } from "../../../src/types";
+import type { OcxConfig } from "../../../backend/src/types";
 import { STORE_BUDGET_MS } from "../../helpers/test-budget";
 
 let fixture: ReturnType<typeof kiroDeviceFixture> | undefined;

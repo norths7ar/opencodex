@@ -7,8 +7,8 @@ import {
   refreshGithubCopilotToken,
   resolveCopilotApiBaseUrl,
   validateCopilotApiBaseUrl,
-} from "../../../src/oauth/github-copilot";
-import type { OAuthController } from "../../../src/oauth/types";
+} from "../../../backend/src/oauth/github-copilot";
+import type { OAuthController } from "../../../backend/src/oauth/types";
 
 const realFetch = globalThis.fetch;
 afterEach(() => {
@@ -314,7 +314,7 @@ describe("github-copilot security repairs (absorb hardening)", () => {
 
 describe("github-copilot transport fail-closed host allowlist", () => {
   test("an OAuth credential without endpoints.api never sends the bearer to a foreign baseUrl", async () => {
-    const { resolveGithubCopilotTransport } = await import("../../../src/providers/github-copilot-transport");
+    const { resolveGithubCopilotTransport } = await import("../../../backend/src/providers/github-copilot-transport");
     const resolved = resolveGithubCopilotTransport({
       adapter: "openai-chat",
       authMode: "oauth",
@@ -324,7 +324,7 @@ describe("github-copilot transport fail-closed host allowlist", () => {
   });
 
   test("a valid credential apiBaseUrl still wins for OAuth transports", async () => {
-    const { resolveGithubCopilotTransport } = await import("../../../src/providers/github-copilot-transport");
+    const { resolveGithubCopilotTransport } = await import("../../../backend/src/providers/github-copilot-transport");
     const resolved = resolveGithubCopilotTransport({
       adapter: "openai-chat",
       authMode: "oauth",
@@ -336,7 +336,7 @@ describe("github-copilot transport fail-closed host allowlist", () => {
 
 describe("copilot token redaction", () => {
   test("the Copilot tid= token grammar and GitHub token prefixes are fully redacted", async () => {
-    const { redactSecretString } = await import("../../../src/lib/redact");
+    const { redactSecretString } = await import("../../../backend/src/lib/redact");
     const copilotish = "tid=abc-123;exp=1699999999;sku=copilot_pro;8kp=1:B64sig+value=";
     const redacted = redactSecretString(`upstream said: ${copilotish} and ${GH_ACCESS} plus body {"token":"${copilotish}"}`);
     expect(redacted).not.toContain("abc-123");

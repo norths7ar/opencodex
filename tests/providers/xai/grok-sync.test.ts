@@ -2,15 +2,15 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { injectGrokConfig, type GrokInjectModel } from "../../../src/grok/inject";
-import { syncGrokConfig } from "../../../src/grok/sync";
-import { nativeOpenAiContextWindow, nativeOpenAiSlugs, visibleNativeSlugs } from "../../../src/codex/catalog";
-import type { CatalogModel } from "../../../src/codex/catalog";
+import { injectGrokConfig, type GrokInjectModel } from "../../../backend/src/grok/inject";
+import { syncGrokConfig } from "../../../backend/src/grok/sync";
+import { nativeOpenAiContextWindow, nativeOpenAiSlugs, visibleNativeSlugs } from "../../../backend/src/codex/catalog";
+import type { CatalogModel } from "../../../backend/src/codex/catalog";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../../src/codex/model-entitlements";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/codex/model-entitlements";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const baseConfig = { port: 10100, defaultProvider: "openai", providers: {} } as unknown as OcxConfig;

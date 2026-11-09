@@ -6,7 +6,7 @@ import {
   createCitationMarkerFilter,
   hasCitationMarker,
   stripCitationMarkers,
-} from "../../src/responses/citation-markers";
+} from "../../backend/src/responses/citation-markers";
 
 /**
  * #3150: the ChatGPT backend delimits inline citations with private-use characters

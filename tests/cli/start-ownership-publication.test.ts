@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import { serviceChildOwnershipDecisionForClassifiedChild } from "../../src/service/service-child-ownership";
-import type { ServiceOwnershipResolution } from "../../src/service/state";
+import { serviceChildOwnershipDecisionForClassifiedChild } from "../../backend/src/service/service-child-ownership";
+import type { ServiceOwnershipResolution } from "../../backend/src/service/state";
 import {
   bindAndPublishStartOwnership,
   StartOwnershipRollbackUncertainError,
-} from "../../src/cli/start-ownership-publication";
+} from "../../backend/src/cli/start-ownership-publication";
 
 function fixture(options: {
   failPid?: boolean;
@@ -71,7 +71,7 @@ describe("start ownership publication", () => {
     expect(events).toEqual(["lease", "release"]);
   });
   test("the service-child owner is rechecked inside the lease-held bind before port choice", () => {
-    const cli = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+    const cli = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
     const bind = cli.slice(cli.indexOf("bind: async () => {", cli.indexOf("bindAndPublishStartOwnership({")));
     const recheck = bind.indexOf("serviceChildOwnershipDecisionForClassifiedChild(");
     expect(recheck).toBeGreaterThan(-1);

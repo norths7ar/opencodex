@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { startServer } from "../../src/server";
-import { initializeManagementAuthState, issueGuiSession, type ManagementAuthState } from "../../src/server/management-auth";
-import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../src/server/gui-session";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { startServer } from "../../backend/src/server";
+import { initializeManagementAuthState, issueGuiSession, type ManagementAuthState } from "../../backend/src/server/management-auth";
+import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../backend/src/server/gui-session";
+import type { OcxConfig } from "../../backend/src/types";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

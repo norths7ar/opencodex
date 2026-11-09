@@ -8,22 +8,22 @@ import { afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:te
 import { lstatSync, mkdtempSync, readdirSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
-import type { StoredAccountQuota } from "../../src/codex/quota-types";
-import { codexQuotaWindows, providerQuotaWindows, readQuotaPool } from "../../src/quota-pool/assemble";
-import { pooledWindows, type PooledAccountInput } from "../../src/quota-pool/pooled";
-import { aggregateCodexPoolCapacity, codexCapacityWeight } from "../../src/providers/codex-capacity";
+import type { OcxConfig } from "../../backend/src/types";
+import type { StoredAccountQuota } from "../../backend/src/codex/quota-types";
+import { codexQuotaWindows, providerQuotaWindows, readQuotaPool } from "../../backend/src/quota-pool/assemble";
+import { pooledWindows, type PooledAccountInput } from "../../backend/src/quota-pool/pooled";
+import { aggregateCodexPoolCapacity, codexCapacityWeight } from "../../backend/src/providers/codex-capacity";
 import {
   ensureQuotaPoolIdentity,
   quotaPoolIdentityPath,
   readQuotaPoolIdentity,
   resetQuotaPoolIdentityMemoForTests,
   setQuotaPoolIdentityHooksForTests,
-} from "../../src/quota-pool/identity";
-import { parseUpstreamQuotaHeaders } from "../../src/codex/quota";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
-import { setProviderQuotaReportCache } from "../../src/providers/quota/report-cache";
+} from "../../backend/src/quota-pool/identity";
+import { parseUpstreamQuotaHeaders } from "../../backend/src/codex/quota";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../backend/src/providers/quota";
+import { setProviderQuotaReportCache } from "../../backend/src/providers/quota/report-cache";
 import { nullPaths, QuotaPoolSchema } from "../helpers/quota-pool-schema";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
@@ -35,7 +35,7 @@ let home = "";
 let priorHome: string | undefined;
 let admissionPath = "";
 let xaiIds: string[] = [];
-const IDENTITY_RACE_SCRIPT = `const { ensureQuotaPoolIdentity } = await import(${JSON.stringify(join(import.meta.dir, "../../src/quota-pool/identity.ts"))});
+const IDENTITY_RACE_SCRIPT = `const { ensureQuotaPoolIdentity } = await import(${JSON.stringify(join(import.meta.dir, "../../backend/src/quota-pool/identity.ts"))});
 await Bun.sleep(Math.max(0, Number(process.env.QP_START_AT) - Date.now()));
 console.log(ensureQuotaPoolIdentity().homeId);`;
 beforeAll(async () => {

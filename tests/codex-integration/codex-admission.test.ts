@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { admitCodexWrite as admitRaw, hashAuthority } from "../../src/codex/admission";
+import { admitCodexWrite as admitRaw, hashAuthority } from "../../backend/src/codex/admission";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /*
@@ -23,8 +23,8 @@ import { removeTreeWithRetry } from "../helpers/remove-tree";
  */
 const admitCodexWrite = (): ReturnType<typeof admitRaw> =>
   admitRaw({ inspectOwnership: () => ({ ownership: "owned", reason: "pinned by fixture" }) });
-import { JOURNAL_PATH } from "../../src/codex/journal";
-import type { OcxConfig } from "../../src/types";
+import { JOURNAL_PATH } from "../../backend/src/codex/journal";
+import type { OcxConfig } from "../../backend/src/types";
 
 let root = "";
 let codexHome = "";

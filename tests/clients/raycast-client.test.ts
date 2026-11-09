@@ -14,13 +14,13 @@ import {
   type ExportContext,
   type ExportModel,
   type RaycastGeneratedConfig,
-} from "../../src/clients/config-export";
-import { exportPresentationLabel } from "../../src/clients/model-presentation";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, refreshIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { exportPresentationLabel } from "../../backend/src/clients/model-presentation";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, refreshIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const CONFIG = {

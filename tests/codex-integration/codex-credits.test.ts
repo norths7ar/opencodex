@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { codexCreditsDtoField, codexCreditsFor, hasCodexCreditsObservation, parseCodexCredits, pruneCodexCredits, rememberCodexCredits, resetCodexCreditsForTests } from "../../src/codex/credits";
+import { codexCreditsDtoField, codexCreditsFor, hasCodexCreditsObservation, parseCodexCredits, pruneCodexCredits, rememberCodexCredits, resetCodexCreditsForTests } from "../../backend/src/codex/credits";
 
 beforeEach(resetCodexCreditsForTests);
 

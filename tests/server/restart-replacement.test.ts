@@ -23,8 +23,8 @@ import {
   RESTART_HANDOFF_LOG_MAX_BYTES,
   spawnReplacementStart,
   type ReplacementSpawn,
-} from "../../src/server/restart-replacement";
-import { RESTART_PARENT_PID_ENV } from "../../src/lib/system-restart-contract";
+} from "../../backend/src/server/restart-replacement";
+import { RESTART_PARENT_PID_ENV } from "../../backend/src/lib/system-restart-contract";
 
 const SECRET = `ocx_data_${"s".repeat(40)}`;
 const dirs: string[] = [];

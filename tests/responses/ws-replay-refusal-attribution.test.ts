@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import { clearRequestLogsForTests, getRequestLogEntries } from "../../src/server/request-log";
-import type { WsData } from "../../src/server/ws-bridge";
-import type { OcxConfig } from "../../src/types";
-import { resendPermission } from "../../src/lib/request-failure-model";
-import { runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import { clearRequestLogsForTests, getRequestLogEntries } from "../../backend/src/server/request-log";
+import type { WsData } from "../../backend/src/server/ws-bridge";
+import type { OcxConfig } from "../../backend/src/types";
+import { resendPermission } from "../../backend/src/lib/request-failure-model";
+import { runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

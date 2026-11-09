@@ -11,25 +11,25 @@ import {
   tryAcquireTransientProbe,
   TRANSIENT_PROBE_INTERVAL_MS,
   TRANSIENT_PROBE_LEASE_MS,
-} from "../../src/routing/probe-lease";
+} from "../../backend/src/routing/probe-lease";
 import {
   CodexRecoveryWithheldError,
   cooldownErrorMessage,
   cooldownErrorResponse,
   releaseCodexAuthContextProbeLease,
-} from "../../src/codex/auth-context";
+} from "../../backend/src/codex/auth-context";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThread,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

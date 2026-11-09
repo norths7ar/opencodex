@@ -5,7 +5,7 @@ import {
   GUI_PAIR_PATH,
   createGuiPairCapability,
   verifyGuiPairCapability,
-} from "../../src/lib/gui-pair-capability";
+} from "../../backend/src/lib/gui-pair-capability";
 
 const SECRET = "A".repeat(43);
 const NONCE = "B".repeat(43);

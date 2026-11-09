@@ -23,12 +23,12 @@ import {
   loadExportModels,
   resetExportSnapshotForTests,
   toExportModel,
-} from "../../src/server/management/model-rows";
-import { CODEX_CUSTOM_MODEL_CATALOG_KIND, type CatalogModel } from "../../src/codex/catalog/parsing";
-import { exportModelsFromProxyRows } from "../../src/cli/export-command";
-import { opencodeCatalogFromProxyRows } from "../../src/cli/opencode";
-import { knownReasoningSupport, type EffectiveModelExportMetadata } from "../../src/clients/config-export/contracts";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/model-rows";
+import { CODEX_CUSTOM_MODEL_CATALOG_KIND, type CatalogModel } from "../../backend/src/codex/catalog/parsing";
+import { exportModelsFromProxyRows } from "../../backend/src/cli/export-command";
+import { opencodeCatalogFromProxyRows } from "../../backend/src/cli/opencode";
+import { knownReasoningSupport, type EffectiveModelExportMetadata } from "../../backend/src/clients/config-export/contracts";
+import type { OcxConfig } from "../../backend/src/types";
 
 function config(extra?: Partial<OcxConfig>): OcxConfig {
   return {
@@ -207,8 +207,8 @@ describe("custom rows carry an effective export projection beside the raw overri
   });
 
   test("a registry-declared ladder and window reach a rosterless custom row", async () => {
-    const { PROVIDER_REGISTRY } = await import("../../src/providers/registry");
-    const { providerConfigSeed } = await import("../../src/providers/derive");
+    const { PROVIDER_REGISTRY } = await import("../../backend/src/providers/registry");
+    const { providerConfigSeed } = await import("../../backend/src/providers/derive");
     const entry = PROVIDER_REGISTRY.find(candidate => candidate.id === "google-antigravity")!;
     const cfg = config({
       defaultProvider: "google-antigravity",

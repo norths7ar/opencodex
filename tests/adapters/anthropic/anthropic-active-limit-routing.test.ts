@@ -2,22 +2,22 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getAccountSet, saveCredential } from "../../../src/oauth/store";
+import { getAccountSet, saveCredential } from "../../../backend/src/oauth/store";
 import { captureAnthropicCooldownRecovery, clearAnthropicAccountPoolState, getAnthropicAccountHealthSnapshot,
-  pickAlternateAnthropicAccount, recordAnthropicAccount429, settleAnthropicCooldownRecovery } from "../../../src/oauth/anthropic-routing";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import { anthropicFamilyRejected, observeAnthropicFamilyQuota } from "../../../src/oauth/anthropic-model-quota";
-import { probeAnthropicQuotaWithRecovery } from "../../../src/providers/quota/anthropic-cooldown-recovery";
-import { hasAnthropicFamilyEnumeration } from "../../../src/providers/quota/anthropic-family-headers";
-import { anthropicModelPercents } from "../../../src/oauth/anthropic-model-quota";
-import { providerQuotaWindows } from "../../../src/quota-pool/assemble";
-import { probeAnthropicUsageQuota } from "../../../src/providers/claude-cli-usage";
+  pickAlternateAnthropicAccount, recordAnthropicAccount429, settleAnthropicCooldownRecovery } from "../../../backend/src/oauth/anthropic-routing";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import { anthropicFamilyRejected, observeAnthropicFamilyQuota } from "../../../backend/src/oauth/anthropic-model-quota";
+import { probeAnthropicQuotaWithRecovery } from "../../../backend/src/providers/quota/anthropic-cooldown-recovery";
+import { hasAnthropicFamilyEnumeration } from "../../../backend/src/providers/quota/anthropic-family-headers";
+import { anthropicModelPercents } from "../../../backend/src/oauth/anthropic-model-quota";
+import { providerQuotaWindows } from "../../../backend/src/quota-pool/assemble";
+import { probeAnthropicUsageQuota } from "../../../backend/src/providers/claude-cli-usage";
 import { ultraUsage } from "../../fixtures/anthropic-usage-shapes";
 
 /** A weekly reset relative to now, so cached windows never expire mid-suite on a later date. */
 const futureWeeklyReset = () => new Date(Date.now() + 7 * 86_400_000).toISOString();
 import { drainAndRemoveFixtureRoots } from "../../helpers/fixture-teardown";
-import type { OcxConfig } from "../../../src/types";
+import type { OcxConfig } from "../../../backend/src/types";
 
 const originalHome = process.env.OPENCODEX_HOME;
 const originalFetch = globalThis.fetch;

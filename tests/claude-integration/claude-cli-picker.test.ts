@@ -3,22 +3,22 @@ import { afterAll, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { activeDesktop3pAlias, buildDesktop3pRegistry, resolveDesktop3pAlias } from "../../src/claude/desktop-3p";
-import { DESKTOP_3P_REGISTRY_RETRY_MS, ensureDesktop3pRegistry } from "../../src/claude/desktop-3p-startup";
-import { reconcileClaudeFirstPartySettings } from "../../src/claude/first-party-settings";
+import { activeDesktop3pAlias, buildDesktop3pRegistry, resolveDesktop3pAlias } from "../../backend/src/claude/desktop-3p";
+import { DESKTOP_3P_REGISTRY_RETRY_MS, ensureDesktop3pRegistry } from "../../backend/src/claude/desktop-3p-startup";
+import { reconcileClaudeFirstPartySettings } from "../../backend/src/claude/first-party-settings";
 import {
   cliCatalogEligible, cliCatalogKind, injectCliBootstrapOptions, invalidateClaudeCodeServedCatalog,
   rewriteCliCatalogBody, rewriteCliCatalogResponse,
-} from "../../src/claude/intercept/cli-catalog";
-import { createCliCatalogProvider } from "../../src/claude/intercept/cli-picker";
-import { CLAUDE_INTERCEPT_HOSTS, startConnectProxy } from "../../src/claude/intercept/connect-proxy";
-import { CLAUDE_INTERCEPT_UPSTREAM, startClaudeInterceptListener } from "../../src/claude/intercept/listener";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { BOOTSTRAP_MAX_DECODED_BYTES, injectPickerModels, type PickerModelEntry } from "../../src/claude/intercept/picker-bootstrap";
-import { buildCliPickerModels, routableCliPickerModels, type PickerRouteInput } from "../../src/claude/intercept/picker-models";
-import { applyClaudeInterceptSettings, buildClaudeInterceptEnv } from "../../src/claude/intercept/settings";
+} from "../../backend/src/claude/intercept/cli-catalog";
+import { createCliCatalogProvider } from "../../backend/src/claude/intercept/cli-picker";
+import { CLAUDE_INTERCEPT_HOSTS, startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
+import { CLAUDE_INTERCEPT_UPSTREAM, startClaudeInterceptListener } from "../../backend/src/claude/intercept/listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { BOOTSTRAP_MAX_DECODED_BYTES, injectPickerModels, type PickerModelEntry } from "../../backend/src/claude/intercept/picker-bootstrap";
+import { buildCliPickerModels, routableCliPickerModels, type PickerRouteInput } from "../../backend/src/claude/intercept/picker-models";
+import { applyClaudeInterceptSettings, buildClaudeInterceptEnv } from "../../backend/src/claude/intercept/settings";
 
 /**
  * The Claude Code CLI's /model picker: which catalog requests the intercept may extend, how rows

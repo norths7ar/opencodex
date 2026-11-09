@@ -15,8 +15,8 @@ import {
   parseOllamaCloudBalance,
   parseOllamaCloudQuota,
   setProviderQuotaBeforePublishForTests,
-} from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 const previousOpencodexHome = process.env.OPENCODEX_HOME;

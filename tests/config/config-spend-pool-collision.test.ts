@@ -3,9 +3,9 @@ import { createHash } from "node:crypto";
 import { existsSync, linkSync, mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, getConfigPath, loadConfig, validateConfigCandidate } from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendReservationPolicy } from "../../src/lib/spend-reservation-ledger";
+import { getDefaultConfig, getConfigPath, loadConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendReservationPolicy } from "../../backend/src/lib/spend-reservation-ledger";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const salt = "7".repeat(64);

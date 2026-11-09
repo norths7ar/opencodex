@@ -6,9 +6,9 @@ import {
   computeFailureFingerprint,
   failureStatusClass,
   type FailureFingerprintFacts,
-} from "../../src/usage/failure-fingerprint";
-import { REQUEST_FAILURE_CAUSES } from "../../src/lib/request-failure-model";
-import { REQUEST_CLOSE_REASONS, REQUEST_TERMINAL_STATUSES } from "../../src/usage/request-outcome";
+} from "../../backend/src/usage/failure-fingerprint";
+import { REQUEST_FAILURE_CAUSES } from "../../backend/src/lib/request-failure-model";
+import { REQUEST_CLOSE_REASONS, REQUEST_TERMINAL_STATUSES } from "../../backend/src/usage/request-outcome";
 
 /**
  * A fingerprint that can carry content is not privacy-safe, and one that collides is not a

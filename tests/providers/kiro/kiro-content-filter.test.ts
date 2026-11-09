@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createKiroAdapter as createKiroAdapterProduction } from "../../../src/adapters/kiro";
-import { parseKiroEvent } from "../../../src/adapters/kiro-events";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { guardEmptyCompletionEventStream } from "../../../src/server/responses/empty-completion-guard";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter as createKiroAdapterProduction } from "../../../backend/src/adapters/kiro";
+import { parseKiroEvent } from "../../../backend/src/adapters/kiro-events";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { guardEmptyCompletionEventStream } from "../../../backend/src/server/responses/empty-completion-guard";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

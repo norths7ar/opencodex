@@ -16,7 +16,7 @@ describe("gui exhaustive-deps suppression stays scoped and effective", () => {
   // failure mode that is silent rather than loud, which is what these assertions cover.
 
   test("the oxlint override carries its own react plugin, or it resolves to nothing", async () => {
-    const oxlintrc = JSON.parse(await readText("gui/.oxlintrc.json")) as {
+    const oxlintrc = JSON.parse(await readText("frontend/.oxlintrc.json")) as {
       overrides?: Array<{ files?: string[]; rules?: Record<string, unknown>; plugins?: string[] }>;
     };
     const overrides = oxlintrc.overrides ?? [];
@@ -41,7 +41,7 @@ describe("gui exhaustive-deps suppression stays scoped and effective", () => {
   });
 
   test("react-doctor scopes the ignore to one file instead of going blind everywhere", async () => {
-    const config = JSON.parse(await readText("gui/doctor.config.json")) as {
+    const config = JSON.parse(await readText("frontend/doctor.config.json")) as {
       blocking?: string;
       ignore?: { overrides?: Array<{ files?: string[]; rules?: string[] }> };
       rules?: Record<string, unknown>;
@@ -71,7 +71,7 @@ describe("gui exhaustive-deps suppression stays scoped and effective", () => {
   });
 
   test("the effect keeps the in-file record of why the dep array stays short", async () => {
-    const models = await readText("gui/src/pages/Models.tsx");
+    const models = await readText("frontend/src/pages/Models.tsx");
     const effectEnd = models.indexOf("}, [catalogActive, loadShadowCall, loadAutoReview, loadV2]);");
     expect(effectEnd).toBeGreaterThan(-1);
 
@@ -84,8 +84,8 @@ describe("gui exhaustive-deps suppression stays scoped and effective", () => {
 
     // Both suppressions are config-side, so the note must point at the two files a reader
     // would otherwise have to find by grep.
-    expect(preceding).toContain("gui/.oxlintrc.json");
-    expect(preceding).toContain("gui/doctor.config.json");
+    expect(preceding).toContain("frontend/.oxlintrc.json");
+    expect(preceding).toContain("frontend/doctor.config.json");
 
     // An in-file react-doctor disable was tried and removed: doctor passes without it, and
     // react/react-compiler penalises a component merely for carrying suppressions. If one

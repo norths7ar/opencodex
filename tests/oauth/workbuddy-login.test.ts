@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
-import { loginWorkBuddy, refreshWorkBuddyToken, workBuddyApi } from "../../src/oauth/workbuddy";
-import { normalizeAuthStoreBuffer, credentialGeneration } from "../../src/oauth/store";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { loginWorkBuddy, refreshWorkBuddyToken, workBuddyApi } from "../../backend/src/oauth/workbuddy";
+import { normalizeAuthStoreBuffer, credentialGeneration } from "../../backend/src/oauth/store";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });

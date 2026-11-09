@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig } from "../../backend/src/types";
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 for (const count of [false, true]) for (const [type, expected] of [
   ["text/plain", "text/plain"], ["application/json", "application/json"],

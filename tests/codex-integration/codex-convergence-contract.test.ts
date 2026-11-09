@@ -15,13 +15,13 @@ import {
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
 import {
   commitCodexCatalogCandidate,
   gatherCodexCatalogCandidate,
   type CodexCatalogCandidate,
-} from "../../src/codex/convergence";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
+} from "../../backend/src/codex/convergence";
+import { CODEX_NATIVE_ALIAS_CATALOG_KIND, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
 import {
   codexRuntimeStateEpoch,
   loadPersistedCodexRuntime,
@@ -29,21 +29,21 @@ import {
   persistCodexRuntime,
   resetCodexRuntimeResolveCacheForTests,
   setCodexRuntimeResolveCacheForTests,
-} from "../../src/codex/runtime";
+} from "../../backend/src/codex/runtime";
 import {
   bundledCatalogCacheState,
   invalidateBundledCatalogCache,
   setBundledCatalogCacheForTests,
-} from "../../src/codex/catalog/bundled";
+} from "../../backend/src/codex/catalog/bundled";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
-import { saveConfig } from "../../src/config";
-import { readConfigAdmissionSnapshot } from "../../src/config/diagnostics";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/user-identity";
+import { saveConfig } from "../../backend/src/config";
+import { readConfigAdmissionSnapshot } from "../../backend/src/config/diagnostics";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
@@ -478,7 +478,7 @@ test("the route inventory retains every convergence path after separating subage
     ["agent-settings-routes.ts", 1],
     ["subagent-model-routes.ts", 1],
   ].map(([file, expected]) => {
-    const source = readFileSync(repoPath("src", "server", "management", file as string), "utf8");
+    const source = readFileSync(repoPath("backend/src", "server", "management", file as string), "utf8");
     const direct = source.match(/await convergeCodexCatalog\(\)/g)?.length ?? 0;
     const shared = source.match(/await convergeVisibleCatalogs\(\)/g)?.length ?? 0;
     if (file === "model-routes.ts") {
@@ -501,7 +501,7 @@ test("the route inventory retains every convergence path after separating subage
 });
 
 test("both model-discovery write paths converge the Codex catalog", () => {
-  const source = readFileSync(repoPath("src", "server", "management", "model-routes.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "server", "management", "model-routes.ts"), "utf8");
   const settings = source.slice(source.indexOf('url.pathname === "/api/model-discovery" && req.method === "PUT"'), source.indexOf('url.pathname === "/api/model-discovery/acknowledge"'));
   // Sliced to the NEXT route rather than to /api/catalog: the alias routes (#2463) landed
   // between them, so a fixed far boundary would swallow their convergence calls and count
@@ -512,7 +512,7 @@ test("both model-discovery write paths converge the Codex catalog", () => {
 });
 
 test("all three alias write routes converge the Codex catalog", () => {
-  const source = readFileSync(repoPath("src", "server", "management", "model-routes.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "server", "management", "model-routes.ts"), "utf8");
   for (const marker of ["providerAliasMatch && req.method", "modelAliasMatch && req.method", 'url.pathname === "/api/default-aliases"']) {
     const start = source.indexOf(marker);
     expect(start).toBeGreaterThan(-1);
@@ -532,7 +532,7 @@ test("all three alias write routes converge the Codex catalog", () => {
  */
 test("both model-preset write paths converge the Codex catalog", () => {
   const source = readFileSync(
-    repoPath("src", "server", "management", "model-routes.ts"),
+    repoPath("backend/src", "server", "management", "model-routes.ts"),
     "utf8",
   );
   const handlerStart = source.indexOf('url.pathname === "/api/model-presets" && req.method === "PUT"');
@@ -554,7 +554,7 @@ test("both model-preset write paths converge the Codex catalog", () => {
  */
 test("the per-model settings route converges the Codex catalog once", () => {
   const source = readFileSync(
-    repoPath("src", "server", "management", "model-routes.ts"),
+    repoPath("backend/src", "server", "management", "model-routes.ts"),
     "utf8",
   );
   const handlerStart = source.indexOf('url.pathname === "/api/model-settings" && req.method === "PUT"');
@@ -580,7 +580,7 @@ test("the per-model settings route converges the Codex catalog once", () => {
  */
 test("the attested reload route converges the Codex catalog like the other write paths", () => {
   const source = readFileSync(
-    repoPath("src", "server", "management", "provider-routes.ts"),
+    repoPath("backend/src", "server", "management", "provider-routes.ts"),
     "utf8",
   );
   const handlerStart = source.indexOf("LOCAL_PROVIDER_RELOAD_PATH && req.method === \"POST\"");
@@ -598,7 +598,7 @@ test("the attested reload route converges the Codex catalog like the other write
  */
 test("the atomic provider batch route converges the Codex catalog once", () => {
   const source = readFileSync(
-    repoPath("src", "server", "management", "provider-routes.ts"),
+    repoPath("backend/src", "server", "management", "provider-routes.ts"),
     "utf8",
   );
   const handlerStart = source.indexOf('url.pathname === "/api/providers" && req.method === "PUT"');

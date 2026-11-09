@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { compileCodeModeHelperInput } from "../../src/responses/code-mode-helper-compat";
+import { compileCodeModeHelperInput } from "../../backend/src/responses/code-mode-helper-compat";
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
   ...args: string[]

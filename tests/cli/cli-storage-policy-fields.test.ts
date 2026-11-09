@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { handleStorageCommand } from "../../src/cli/storage";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig, StorageCleanupPolicy } from "../../src/types";
+import { handleStorageCommand } from "../../backend/src/cli/storage";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig, StorageCleanupPolicy } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome;

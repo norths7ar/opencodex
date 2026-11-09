@@ -1,16 +1,16 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import { CodexWebSocketActivity } from "../../src/codex/websocket-activity";
+import { CodexWebSocketActivity } from "../../backend/src/codex/websocket-activity";
 import {
   MAX_TRACKED_CODEX_WEBSOCKETS, codexWebSocketAdmissionMetrics,
   registerCodexWebSocket, tryReserveCodexWebSocket, unregisterCodexWebSocket,
-} from "../../src/codex/websocket-registry";
-import type { AdmissionReservation } from "../../src/lib/admission";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import { MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../src/server/lifecycle";
-import type { NativeResponseControl } from "../../src/server/responses/native-response-control";
-import { sendResponseToWebSocket, type WsData } from "../../src/server/ws-bridge";
+} from "../../backend/src/codex/websocket-registry";
+import type { AdmissionReservation } from "../../backend/src/lib/admission";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import { MAX_ACTIVE_TURNS, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import type { NativeResponseControl } from "../../backend/src/server/responses/native-response-control";
+import { sendResponseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
 
 type Frame = Record<string, unknown>;
 const leases: AdmissionReservation<ServerWebSocket<WsData>>[] = [];

@@ -17,15 +17,15 @@
  * a Responses wire default must carry the Responses-side preservation beside it.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { routeModel } from "../../src/router";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { buildOpenAIChatPassthroughRequest } from "../../src/adapters/openai-chat/passthrough";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses } from "../../src/server/responses/core";
-import { ALIBABA_TOKEN_PLAN_PRESERVE_REASONING } from "../../src/providers/registry/model-seeds";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { routeModel } from "../../backend/src/router";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { buildOpenAIChatPassthroughRequest } from "../../backend/src/adapters/openai-chat/passthrough";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { ALIBABA_TOKEN_PLAN_PRESERVE_REASONING } from "../../backend/src/providers/registry/model-seeds";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const LIVE_VERIFIED = ["qwen3.8-flash", "qwen3.7-plus", "glm-5.3"] as const;

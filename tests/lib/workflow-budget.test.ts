@@ -3,7 +3,7 @@ import {
   createSpendReservationLedger,
   type SpendJournal,
   type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 import {
   admitWorkflowTurn,
   chargeWorkflowSends,
@@ -21,14 +21,14 @@ import {
   WORKFLOW_LOCAL_REFUSAL_HEADER,
   type WorkflowDenial,
   type WorkflowBudgetPolicy,
-} from "../../src/lib/workflow-budget";
-import { workflowRefusalResponse } from "../../src/server/workflow-refusal";
+} from "../../backend/src/lib/workflow-budget";
+import { workflowRefusalResponse } from "../../backend/src/server/workflow-refusal";
 import { repoPath } from "../helpers/repo-root";
 import {
   clearRequestLogsForTests,
   getRequestLogEntries,
   type RequestLogContext,
-} from "../../src/server/request-log";
+} from "../../backend/src/server/request-log";
 
 const memoryJournal = (): SpendJournal & { lines: string[] } => {
   const lines: string[] = [];
@@ -467,7 +467,7 @@ describe("every ceiling on this path reads the caller's clock", () => {
     // a ceiling that fired when it should not have. A function that decides admission must be
     // askable about a moment, so the clock is a parameter and never an ambient read.
     const source = await Bun.file(
-      new URL("../../src/lib/workflow-budget.ts", import.meta.url),
+      new URL("../../backend/src/lib/workflow-budget.ts", import.meta.url),
     ).text();
     const ambient = source
       .split("\n")
@@ -570,9 +570,9 @@ describe("a refusal an operator can read, name and clear (#4546)", () => {
     // three. Reading the facade alone would find no call site and the "more than one
     // surface" assertion would pass on an empty match array.
     const source = [
-      await Bun.file(repoPath("src/server/index.ts")).text(),
-      await Bun.file(repoPath("src/server/index/serve-options.ts")).text(),
-      await Bun.file(repoPath("src/server/admitted-http-turn.ts")).text(),
+      await Bun.file(repoPath("backend/src/server/index.ts")).text(),
+      await Bun.file(repoPath("backend/src/server/index/serve-options.ts")).text(),
+      await Bun.file(repoPath("backend/src/server/admitted-http-turn.ts")).text(),
     ].join("\n");
     const callSites = source.match(/return runAdmittedHttpTurn\(/g) ?? [];
     const threaded = source.match(/, \{ requestId, start, logCtx \}\);/g) ?? [];

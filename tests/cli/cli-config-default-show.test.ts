@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -154,7 +154,7 @@ test.each([["--json", "--source"], ["--source", "--json"]])(
 globalThis.fetch = () => { attempts++; throw new Error("config CLI must remain offline"); };
 process.on("exit", () => { if (attempts) process.exitCode = 97; });\n`);
       const result = spawnSync(process.execPath, [
-        "--preload", preload, repoPath("src", "cli", "index.ts"), "config", ...args,
+        "--preload", preload, repoPath("backend/src", "cli", "index.ts"), "config", ...args,
       ], {
         cwd: repoRoot(), env: { ...process.env, OPENCODEX_HOME: root, CODEX_HOME: join(root, "codex") },
         encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000,
@@ -176,7 +176,7 @@ test.each([["config", "--help"], ["help", "config"]])(
   "config help %j documents optional show and display flags",
   async (...args) => {
     await withConfig(async ({ root, configPath }) => {
-      const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), ...args], {
+      const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), ...args], {
         cwd: repoRoot(), env: { ...process.env, OPENCODEX_HOME: root, CODEX_HOME: join(root, "codex") },
         encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000,
       });

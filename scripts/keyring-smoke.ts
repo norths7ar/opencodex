@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-import { loadKeyringBinding } from "../src/lib/keyring-native";
+import { loadKeyringBinding } from "../backend/src/lib/keyring-native";
 
 export interface KeyringSmokeEntry {
   setSecret(secret: Uint8Array, signal?: AbortSignal): Promise<void>;

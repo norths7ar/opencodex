@@ -2,8 +2,8 @@ import { describe, expect, mock, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { autoRestoreCodexShim, buildUnixCodexShim, codexShimStatus, diagnoseCodexShim, installCodexShim, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../src/codex/shim";
-import { readState, type ShimState } from "../../src/codex/shim-state-file";
+import { autoRestoreCodexShim, buildUnixCodexShim, codexShimStatus, diagnoseCodexShim, installCodexShim, setCodexShimProbeHookForTests, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../backend/src/codex/shim";
+import { readState, type ShimState } from "../../backend/src/codex/shim-state-file";
 
 function fixture(run: (f: { root: string; home: string; native: string; backup: string; quarantine: string; wrapper: string; statePath: string; state: ShimState; legacyBytes: string; version: (name: string) => string }) => void, homeName = "home"): void {
   const root = fs.mkdtempSync(join(tmpdir(), "ocx-overlay-migration-"));

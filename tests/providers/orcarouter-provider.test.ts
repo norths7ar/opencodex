@@ -3,35 +3,35 @@ import { createHash } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
-import { providerDestinationConfigError } from "../../src/lib/destination-policy";
+import { catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
+import { providerDestinationConfigError } from "../../backend/src/lib/destination-policy";
 import {
   forceRefreshOAuthAccessSnapshot,
   getValidAccessTokenSnapshot,
   OAUTH_PROVIDERS,
   upsertOAuthProvider,
-} from "../../src/oauth";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
+} from "../../backend/src/oauth";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
 import {
   normalizeOrcaRouterBaseUrl,
   OrcaRouterOAuthFlow,
   orcaRouterAuthBaseUrl,
   orcaRouterInferenceBaseUrl,
   refreshOrcaRouterKey,
-} from "../../src/oauth/orcarouter";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
-import { deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
+} from "../../backend/src/oauth/orcarouter";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
+import { deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
 import {
   extractProviderModelItems,
   providerModelDiscoverySpecError,
   resolveProviderModelDiscovery,
   resolveProviderModelDiscoveryUrl,
-} from "../../src/providers/model-discovery";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import type { OcxConfig } from "../../src/types";
-import { en } from "../../gui/src/i18n/en";
-import { interpolate, type TFn } from "../../gui/src/i18n/shared";
-import { formatProviderDisplayName, providerIconSrc } from "../../gui/src/provider-icons";
+} from "../../backend/src/providers/model-discovery";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import type { OcxConfig } from "../../backend/src/types";
+import { en } from "../../frontend/src/i18n/en";
+import { interpolate, type TFn } from "../../frontend/src/i18n/shared";
+import { formatProviderDisplayName, providerIconSrc } from "../../frontend/src/provider-icons";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

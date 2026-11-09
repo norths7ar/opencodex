@@ -1,19 +1,19 @@
-# This file's PRESENCE stops npm from falling back to .gitignore (which ignores gui/dist).
+# This file's PRESENCE stops npm from falling back to .gitignore (which ignores frontend/dist).
 # The package.json "files" allowlist is the source of truth for what ships; the entries below
 # are explicit guards so dev-only content never leaks into the published tarball.
 .codex/
 
-# GUI: ship only the built gui/dist (via "files"); never the source/deps/config.
-gui/src/
-gui/public/
-gui/node_modules/
-gui/index.html
-gui/README.md
-gui/package.json
-gui/tsconfig*.json
-gui/vite.config.*
-gui/eslint.config.*
-gui/bun.lock
+# GUI: ship only the built frontend/dist (via "files"); never the source/deps/config.
+frontend/src/
+frontend/public/
+frontend/node_modules/
+frontend/index.html
+frontend/README.md
+frontend/package.json
+frontend/tsconfig*.json
+frontend/vite.config.*
+frontend/eslint.config.*
+frontend/bun.lock
 
 # misc
 *.test.ts

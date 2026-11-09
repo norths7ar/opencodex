@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { poolCredentialRefreshIncompleteResponse } from "../../src/server/responses/core";
-import type { CodexAuthContext } from "../../src/codex/auth-context";
-import type { OcxConfig } from "../../src/types";
+import { poolCredentialRefreshIncompleteResponse } from "../../backend/src/server/responses/core";
+import type { CodexAuthContext } from "../../backend/src/codex/auth-context";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * #4212: a pool credential whose forced refresh does not complete used to refuse with

@@ -1,19 +1,19 @@
 /** Anthropic fast opt-in and downgrade use the same bridge for both OAuth instances. */
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createAnthropicInstanceFixture, instanceFixtureUuid, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
-import type { RequestLogContext } from "../../../src/server/request-log";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
+import type { RequestLogContext } from "../../../backend/src/server/request-log";
 
 let f: AnthropicInstanceFixture;
 let releaseSpend: (() => void) | undefined;
-let handleResponses: typeof import("../../../src/server/responses").handleResponses;
+let handleResponses: typeof import("../../../backend/src/server/responses").handleResponses;
 let bodies: Record<string, unknown>[];
 let headers: Headers[];
 let declineFirst: boolean;
 beforeEach(async () => {
   f = await createAnthropicInstanceFixture({ anthropic: { enabled: false }, anthropic2: { enabled: false } });
   await f.seed();
-  ({ handleResponses } = await import("../../../src/server/responses"));
+  ({ handleResponses } = await import("../../../backend/src/server/responses"));
   const { acquireOwnedSpendHome } = await import("../../helpers/owned-spend-home");
   releaseSpend = acquireOwnedSpendHome();
   bodies = []; headers = []; declineFirst = false;
@@ -42,7 +42,7 @@ beforeEach(async () => {
 afterEach(async () => {
   try {
     f.ledger.assertNoCrossSend(); releaseSpend?.(); releaseSpend = undefined;
-    (await import("../../../src/responses/state")).clearResponseStateForTests();
+    (await import("../../../backend/src/responses/state")).clearResponseStateForTests();
   } finally { await f.dispose(); }
 });
 function post(instance: AnthropicInstanceId, model: string, log: RequestLogContext = { model: "", provider: "" }) {

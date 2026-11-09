@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 let testDir = "";
 let previousHome: string | undefined;

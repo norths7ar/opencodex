@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHmac } from "node:crypto";
-import { codexInstallationIdForAccount } from "../../src/codex/installation-id";
+import { codexInstallationIdForAccount } from "../../backend/src/codex/installation-id";
 
 let root: string;
 beforeEach(() => { root = mkdtempSync(join(tmpdir(), "ocx-installation-")); });
@@ -34,7 +34,7 @@ test("a corrupt secret is refused without overwrite or sensitive error details",
 });
 
 test("concurrent processes publish one complete secret and retain the same identity", async () => {
-  const modulePath = new URL("../../src/codex/installation-id.ts", import.meta.url).href;
+  const modulePath = new URL("../../backend/src/codex/installation-id.ts", import.meta.url).href;
   const script = `import { codexInstallationIdForAccount } from ${JSON.stringify(modulePath)}; process.stdout.write(codexInstallationIdForAccount("account-race", process.argv[1]));`;
   const children = Array.from({ length: 4 }, () => Bun.spawn([process.execPath, "-e", script, root], { stdout: "pipe", stderr: "pipe" }));
   const results = await Promise.all(children.map(async child => ({ id: await new Response(child.stdout).text(), error: await new Response(child.stderr).text(), exit: await child.exited })));

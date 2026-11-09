@@ -1,8 +1,8 @@
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
-import { nativeMainOwnerHomesOpenAtOrBelow } from "../../src/codex/native-main-owner";
-import { flushConfigDirHardening } from "../../src/config/paths";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
+import { nativeMainOwnerHomesOpenAtOrBelow } from "../../backend/src/codex/native-main-owner";
+import { flushConfigDirHardening } from "../../backend/src/config/paths";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { flushWindowsSecretAclReapsBeforeRemoval } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "./remove-tree";
 
 export interface FixtureRoot { path: string; remove?: (path: string) => void }

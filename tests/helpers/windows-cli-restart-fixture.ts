@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
-import { trackBackgroundWork } from "../../src/lib/background-work";
+import { hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
+import { trackBackgroundWork } from "../../backend/src/lib/background-work";
 import { createCodexCliTestRoot } from "./codex-cli-fixture-root";
 import { helperPath } from "./repo-root";
 import type { WindowsRecoveryProbe } from "./windows-cli-recovery-state";

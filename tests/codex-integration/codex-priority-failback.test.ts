@@ -1,8 +1,8 @@
-import { codexAccountPriorityFailbackEnabled, CODEX_PRIORITY_FAILBACK_REFRESH_MS } from "../../src/codex/account-priority";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { getDefaultConfig } from "../../src/config/proxy-env";
-import { codexQuotaHasFreshUsage } from "../../src/codex/quota-observation-freshness";
-import { rememberActiveCodexAccount } from "../../src/codex/routing/active-account";
+import { codexAccountPriorityFailbackEnabled, CODEX_PRIORITY_FAILBACK_REFRESH_MS } from "../../backend/src/codex/account-priority";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { getDefaultConfig } from "../../backend/src/config/proxy-env";
+import { codexQuotaHasFreshUsage } from "../../backend/src/codex/quota-observation-freshness";
+import { rememberActiveCodexAccount } from "../../backend/src/codex/routing/active-account";
 import { describe, expect, test, beforeEach, afterEach, spyOn } from "bun:test";
 import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -38,10 +38,10 @@ import {
   resolveCodexAccountForThread,
   resolveCodexAccountForThreadDetailed,
   tryAcquireCodexQuotaProbeLease,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { readCodexAccountRecord, removeCodexAccountCredential, saveCodexAccountCredential } from "../../src/codex/account-store";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import { readCodexAccountRecord, removeCodexAccountCredential, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   clearAccountNeedsReauth,
   clearAccountQuota,
@@ -50,19 +50,19 @@ import {
   parseUsageQuota,
   setAccountQuotaFromParsed,
   updateAccountQuota,
-} from "../../src/codex/auth-api";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { CODEX_UNKNOWN_USAGE_SCORE, isCodexQuotaExhausted } from "../../src/codex/quota";
-import { setCodexAccountPriority } from "../../src/codex/account-priority";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { NATIVE_RESERVE_MODEL } from "../../src/codex/catalog/native-models";
-import { routeModel } from "../../src/router";
-import { consumeForInspection } from "../../src/server/relay";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-api";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { CODEX_UNKNOWN_USAGE_SCORE, isCodexQuotaExhausted } from "../../backend/src/codex/quota";
+import { setCodexAccountPriority } from "../../backend/src/codex/account-priority";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { NATIVE_RESERVE_MODEL } from "../../backend/src/codex/catalog/native-models";
+import { routeModel } from "../../backend/src/router";
+import { consumeForInspection } from "../../backend/src/server/relay";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
-import { flushConfigDirHardeningForTests, hardenConfigDir } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests, hardenConfigDir } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 let TEST_DIR = "";
 let previousOpencodexHome: string | undefined;

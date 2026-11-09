@@ -12,13 +12,13 @@ import {
   noteCodexPoolRefreshFailure,
   resetCodexPoolRefreshFailureBackoffForTests,
   setCodexPoolRefreshFailureNowForTests,
-} from "../../src/codex/pool-refresh-backoff";
+} from "../../backend/src/codex/pool-refresh-backoff";
 import {
   CodexCredentialGenerationConflictError,
   CodexCredentialUnavailableError,
   TokenRefreshError,
   isTerminalCodexPoolRefreshFailure,
-} from "../../src/codex/account-store";
+} from "../../backend/src/codex/account-store";
 
 /**
  * #4546: a pool account whose forced refresh failed answered every subsequent request with a
@@ -158,7 +158,7 @@ describe("a replacement credential does not inherit the failed one's cooldown", 
 
   test("the login path clears it where it replaces the credential", () => {
     const source = readFileSync(
-      new URL("../../src/codex/auth-api/login-flow.ts", import.meta.url),
+      new URL("../../backend/src/codex/auth-api/login-flow.ts", import.meta.url),
       "utf8",
     );
     const save = source.indexOf("saveCodexAccountCredential(accountId, credential");
@@ -209,7 +209,7 @@ describe("a late failure from the replaced credential cannot re-cool the new one
 
   test("the refresh flight captures the fence before it settles", () => {
     const source = readFileSync(
-      new URL("../../src/codex/account-store.ts", import.meta.url),
+      new URL("../../backend/src/codex/account-store.ts", import.meta.url),
       "utf8",
     );
     const captured = source.indexOf("codexPoolRefreshFence(id)");

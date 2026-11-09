@@ -29,14 +29,14 @@ import { join } from "node:path";
 const lookupMock = mock(async (_hostname: string, _opts: unknown): Promise<{ address: string; family: number }[]> => []);
 mock.module("node:dns/promises", () => ({ lookup: lookupMock }));
 
-const { buildModelsRequest } = await import("../../src/oauth");
-const { providerOutboundGet, ProviderOutboundPolicyError } = await import("../../src/lib/provider-outbound");
-const { isRegistryModelDiscoveryUrl } = await import("../../src/providers/model-discovery");
-const { PROXY_ENV_KEYS } = await import("../../src/lib/proxy-env");
-const { gatherRoutedModels, clearGatherRoutedModelsInflight } = await import("../../src/codex/catalog/provider-fetch");
-const { clearModelCache, clearProviderDiscoveryStatus, getProviderDiscoveryStatus } = await import("../../src/codex/model-cache");
+const { buildModelsRequest } = await import("../../backend/src/oauth");
+const { providerOutboundGet, ProviderOutboundPolicyError } = await import("../../backend/src/lib/provider-outbound");
+const { isRegistryModelDiscoveryUrl } = await import("../../backend/src/providers/model-discovery");
+const { PROXY_ENV_KEYS } = await import("../../backend/src/lib/proxy-env");
+const { gatherRoutedModels, clearGatherRoutedModelsInflight } = await import("../../backend/src/codex/catalog/provider-fetch");
+const { clearModelCache, clearProviderDiscoveryStatus, getProviderDiscoveryStatus } = await import("../../backend/src/codex/model-cache");
 const { withStubbedProviderFetch } = await import("../helpers/catalog-provider-fetch");
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const FIXTURE = readFileSync(join(import.meta.dir, "../fixtures/commandcode-models.json"), "utf8");
 
@@ -128,7 +128,7 @@ describe("command-code OAuth discovery under Clash/Mihomo fake-IP DNS", () => {
     const { mkdtempSync, mkdirSync, writeFileSync } = await import("node:fs");
     const { tmpdir } = await import("node:os");
     const { join } = await import("node:path");
-    const { gatherRoutedModelsForCatalogGather } = await import("../../src/codex/catalog/provider-fetch");
+    const { gatherRoutedModelsForCatalogGather } = await import("../../backend/src/codex/catalog/provider-fetch");
     const root = mkdtempSync(join(tmpdir(), "ocx-cc-fakeip-"));
     const home = join(root, "opencodex");
     mkdirSync(home, { recursive: true });

@@ -6,13 +6,13 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
-import { configuredReasoningEfforts } from "../../src/reasoning-effort";
-import { isModelTextOnly } from "../../src/vision";
-import type { OcxProviderConfig } from "../../src/types";
+import { configuredReasoningEfforts } from "../../backend/src/reasoning-effort";
+import { isModelTextOnly } from "../../backend/src/vision";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 
 setDefaultTimeout(SPAWN_BUDGET_MS);
 
@@ -26,11 +26,11 @@ function runCli(args: string[], env: Record<string, string> = {}, recordAttempts
       import { appendFileSync } from "node:fs";
       const marker = ${JSON.stringify(join(fixtureHome!, "network-attempts.log"))};
       const record = kind => { if (${recordAttempts}) appendFileSync(marker, kind + "\\n"); };
-      const path = ${JSON.stringify(join(repoRoot, "src/server/proxy-liveness.ts"))};
+      const path = ${JSON.stringify(join(repoRoot, "backend/src/server/proxy-liveness.ts"))};
       const original = await import(path);
       mock.module(path, () => ({ ...original, findLiveProxy: async () => { record("liveness"); return null; } }));
       if (process.env.OCX_TEST_TRACK_KEYCHAIN === "1") {
-        const keys = await import(${JSON.stringify(join(repoRoot, "src/providers/api-key-resolve.ts"))});
+        const keys = await import(${JSON.stringify(join(repoRoot, "backend/src/providers/api-key-resolve.ts"))});
         keys.setProviderKeychainEntryFactoryForTests(() => ({
           getPassword: () => { appendFileSync(${JSON.stringify(join(fixtureHome!, "keychain-attempts.log"))}, "read\\n"); return "fixture-secret"; },
           setPassword: () => {}, deletePassword: () => true,
@@ -280,7 +280,7 @@ describe("ocx models", () => {
         { id: "44444444-4444-4444-8444-444444444444", provider: "test", modelId: "empty", reasoningEfforts: [] },
       ] });
     try {
-      const modulePath = join(repoRoot, "src/providers/reasoning-metadata.ts");
+      const modulePath = join(repoRoot, "backend/src/providers/reasoning-metadata.ts");
       const setup = spawnSync(process.execPath, ["-e", `
         import { recordUnsupportedReasoningEffort, flushReasoningSupportCache } from ${JSON.stringify(modulePath)};
         const provider = ${JSON.stringify(provider)};

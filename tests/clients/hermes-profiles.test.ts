@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { hermesHomeDir } from "../../src/clients/config-export";
-import { hermesRootDir, listHermesProfiles, resolveHermesProfile } from "../../src/integrations/hermes-profiles";
+import { hermesHomeDir } from "../../backend/src/clients/config-export";
+import { hermesRootDir, listHermesProfiles, resolveHermesProfile } from "../../backend/src/integrations/hermes-profiles";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** Root derivation mirrors Hermes _hermes_root_of (NousResearch/hermes-agent hermes_constants.py). */

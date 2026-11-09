@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { captureProviderGather, type ModelsAuthResolver } from "../../../src/codex/catalog/gather-capture";
-import { fetchProviderModelsWithAuth } from "../../../src/codex/catalog/provider-models";
-import { clearModelCache } from "../../../src/codex/model-cache";
-import { clearCopilotAutoModelsForTests, type CopilotModel } from "../../../src/providers/github-copilot-auto";
-import type { OcxProviderConfig } from "../../../src/types";
+import { captureProviderGather, type ModelsAuthResolver } from "../../../backend/src/codex/catalog/gather-capture";
+import { fetchProviderModelsWithAuth } from "../../../backend/src/codex/catalog/provider-models";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
+import { clearCopilotAutoModelsForTests, type CopilotModel } from "../../../backend/src/providers/github-copilot-auto";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const auth: ModelsAuthResolver = { kind: "observed",
   /** Resolve a synthetic observed catalog credential without consulting the user account store. */

@@ -16,10 +16,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { ManagementApiDeps } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
-import * as serviceManagerProbe from "../../src/service-manager-probe";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { ManagementApiDeps } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
+import * as serviceManagerProbe from "../../backend/src/service-manager-probe";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let fixtureRoot = "";

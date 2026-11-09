@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { EMPTY_COMPLETION_MAX_BUFFERED_BYTES } from "../../src/server/responses/empty-completion-guard";
-import { guardOpenGatewayCompletion } from "../../src/server/responses/opengateway-completion-guard";
-import { attachResponseToolOwnership, responseToolOwnership } from "../../src/server/responses/response-tool-ownership";
+import { EMPTY_COMPLETION_MAX_BUFFERED_BYTES } from "../../backend/src/server/responses/empty-completion-guard";
+import { guardOpenGatewayCompletion } from "../../backend/src/server/responses/opengateway-completion-guard";
+import { attachResponseToolOwnership, responseToolOwnership } from "../../backend/src/server/responses/response-tool-ownership";
 
 const url = "https://apis.opengateway.ai/v1/responses";
 const encode = (event: unknown) => new TextEncoder().encode(`data: ${JSON.stringify(event)}\n\n`);

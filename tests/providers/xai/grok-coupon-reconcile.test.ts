@@ -3,17 +3,17 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import * as oauthModule from "../../../src/oauth";
-import * as oauthStoreModule from "../../../src/oauth/store";
-import * as ledgerModule from "../../../src/grok/reset-coupon-ledger";
-import * as resetCouponsModule from "../../../src/grok/reset-coupons";
+import * as oauthModule from "../../../backend/src/oauth";
+import * as oauthStoreModule from "../../../backend/src/oauth/store";
+import * as ledgerModule from "../../../backend/src/grok/reset-coupon-ledger";
+import * as resetCouponsModule from "../../../backend/src/grok/reset-coupons";
 import {
   markGrokResetCouponAttempt,
   openGrokResetCouponOperation,
-} from "../../../src/grok/reset-coupon-ledger";
-import { handleGrokCouponRoutes } from "../../../src/server/management/grok-coupon-routes";
-import type { ManagementContext } from "../../../src/server/management/context";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/grok/reset-coupon-ledger";
+import { handleGrokCouponRoutes } from "../../../backend/src/server/management/grok-coupon-routes";
+import type { ManagementContext } from "../../../backend/src/server/management/context";
+import type { OcxConfig } from "../../../backend/src/types";
 
 function consumeRequest(operationId: string, tokenId?: string): ManagementContext {
   const url = new URL("http://localhost/api/grok/reset-coupons/consume");

@@ -4,8 +4,8 @@ import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { findFirstCodexOnPath } from "../../src/codex/shim-path-resolution";
-import { buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim } from "../../src/codex/shim-templates";
+import { findFirstCodexOnPath } from "../../backend/src/codex/shim-path-resolution";
+import { buildUnixCodexShim, buildWindowsCodexShim, buildWindowsPowerShellCodexShim } from "../../backend/src/codex/shim-templates";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -32,9 +32,9 @@ function fixture() {
 
 // Absolute filesystem paths, not file:// hrefs: the warm-up's import scan keeps specifiers
 // that are absolute paths, and the spawned --eval children resolve either form identically.
-const shimModule = fileURLToPath(new URL("../../src/codex/shim.ts", import.meta.url));
-const scannerModule = fileURLToPath(new URL("../../src/codex/shim-path-resolution.ts", import.meta.url));
-const readinessModule = fileURLToPath(new URL("../../src/cli/codex-shim-readiness.ts", import.meta.url));
+const shimModule = fileURLToPath(new URL("../../backend/src/codex/shim.ts", import.meta.url));
+const scannerModule = fileURLToPath(new URL("../../backend/src/codex/shim-path-resolution.ts", import.meta.url));
+const readinessModule = fileURLToPath(new URL("../../backend/src/cli/codex-shim-readiness.ts", import.meta.url));
 
 // The union of the repository module graphs this file's --eval children load; the other eval
 // scripts below import a subset of the same three specifiers.

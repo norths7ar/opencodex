@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { fromBinary } from "@bufbuild/protobuf";
-import { cursorBlobMetrics, cursorBlobTextForEstimate, resetCursorBlobStateForTests, storeCursorBlob } from "../../../src/adapters/cursor/native-exec";
-import { CURSOR_EXTERNAL_TOOL_CONTINUATION_TEXT, encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { parseRequest } from "../../../src/responses/parser";
-import { AgentClientMessageSchema } from "../../../src/adapters/cursor/gen/agent_pb";
+import { cursorBlobMetrics, cursorBlobTextForEstimate, resetCursorBlobStateForTests, storeCursorBlob } from "../../../backend/src/adapters/cursor/native-exec";
+import { CURSOR_EXTERNAL_TOOL_CONTINUATION_TEXT, encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { AgentClientMessageSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 beforeEach(() => resetCursorBlobStateForTests());
 

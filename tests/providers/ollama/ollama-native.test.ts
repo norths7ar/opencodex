@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
 import {
   ollamaNativeChatUrl,
   ollamaNativeEndpointKind,
-} from "../../../src/adapters/ollama-native-url";
-import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect, upstreamNativeEntry } from "../../../src/codex/catalog";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
+} from "../../../backend/src/adapters/ollama-native-url";
+import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect, upstreamNativeEntry } from "../../../backend/src/codex/catalog";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /** Discover routed test models with provider fetches stubbed to avoid live requests. */
 const gatherRoutedModels: typeof gatherRoutedModelsDirect = (config, options) =>

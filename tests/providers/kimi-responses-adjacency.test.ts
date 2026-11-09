@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { normalizeResponsesToolResultAdjacency } from "../../src/adapters/openai-responses/tool-output-recovery";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { routedProviderConfig } from "../../src/router";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { normalizeResponsesToolResultAdjacency } from "../../backend/src/adapters/openai-responses/tool-output-recovery";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../backend/src/router";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const MODEL = "kimi-k2.7-code";

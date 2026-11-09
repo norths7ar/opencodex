@@ -1,15 +1,15 @@
 /** Real Responses recovery with colliding account IDs and an instance-owned send ledger. */
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
-import type { HandleResponsesOptions } from "../../../src/server/responses/core-options";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
+import type { HandleResponsesOptions } from "../../../backend/src/server/responses/core-options";
 import { createAnthropicInstanceFixture, instanceFixtureCredential, instanceFixtureUuid, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
 
 const instances = ["anthropic", "anthropic2"] as const;
-let store: typeof import("../../../src/oauth/store");
-let routing: typeof import("../../../src/oauth/anthropic-routing");
-let resolver: typeof import("../../../src/server/adapter-resolve");
-let handleResponses: typeof import("../../../src/server/responses").handleResponses;
+let store: typeof import("../../../backend/src/oauth/store");
+let routing: typeof import("../../../backend/src/oauth/anthropic-routing");
+let resolver: typeof import("../../../backend/src/server/adapter-resolve");
+let handleResponses: typeof import("../../../backend/src/server/responses").handleResponses;
 let fixture: AnthropicInstanceFixture;
 let releaseSpend: (() => void) | undefined;
 let ids: Record<AnthropicInstanceId, string[]>;
@@ -45,8 +45,8 @@ beforeEach(async () => {
   fixture.quota.resetProviderQuotaReconcileStateForTests();
   await fixture.seed();
   ({ store, routing, config } = fixture);
-  resolver = await import("../../../src/server/adapter-resolve");
-  ({ handleResponses } = await import("../../../src/server/responses"));
+  resolver = await import("../../../backend/src/server/adapter-resolve");
+  ({ handleResponses } = await import("../../../backend/src/server/responses"));
   const { acquireOwnedSpendHome } = await import("../../helpers/owned-spend-home");
   releaseSpend = acquireOwnedSpendHome();
   ids = { anthropic: [...fixture.ids], anthropic2: [...fixture.ids] };
@@ -73,7 +73,7 @@ afterEach(async () => {
   try {
     fixture.ledger.assertNoCrossSend();
     releaseSpend?.(); releaseSpend = undefined;
-    const { clearResponseStateForTests } = await import("../../../src/responses/state");
+    const { clearResponseStateForTests } = await import("../../../backend/src/responses/state");
     clearResponseStateForTests();
   } finally {
     try { await fixture.dispose(); }

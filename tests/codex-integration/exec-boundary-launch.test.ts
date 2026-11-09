@@ -6,10 +6,10 @@ import {
   probePromptText, setPromptTextProbeRuntimeForTests, setPromptTextProbeCommandForTests,
   setPromptTextProbeExecBoundaryDepsForTests, promptTextProbeSpawnAttemptsForTests,
   resetPromptTextProbeForTests,
-} from "../../src/codex/prompt-text-probe";
-import { resolveCodexHomeDir } from "../../src/codex/home";
-import type { CodexExecBoundaryAsyncDeps } from "../../src/codex/exec-boundary";
-import { nativeMainCodexLoginValidatedInvocation, type NativeMainCodexLoginInvocationDeps } from "../../src/cli/account-main";
+} from "../../backend/src/codex/prompt-text-probe";
+import { resolveCodexHomeDir } from "../../backend/src/codex/home";
+import type { CodexExecBoundaryAsyncDeps } from "../../backend/src/codex/exec-boundary";
+import { nativeMainCodexLoginValidatedInvocation, type NativeMainCodexLoginInvocationDeps } from "../../backend/src/cli/account-main";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function deferred<T>() {

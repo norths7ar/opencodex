@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CAPABILITIES as BASE } from "../../src/cli/capabilities-base";
-import { OBSERVE_SYSTEM_CAPABILITIES } from "../../src/cli/capabilities-observe-system";
-import { handleObserveCommand } from "../../src/cli/observe";
-import { handleStorageCommand } from "../../src/cli/storage";
-import { handleSystemCommand } from "../../src/cli/system-command";
-import { handleCompanionCommand } from "../../src/cli/companion";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { planServiceCommand } from "../../src/service/cli";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import type { UsageCompareDeps } from "../../src/cli/usage-compare";
-import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../src/lib/local-management-attestation";
-import { LOCAL_MANAGEMENT_NONCE_HEADER } from "../../src/lib/local-management-capability";
-import { managementPrincipal, requireManagementAuth, type ManagementAuthState } from "../../src/server/management-auth";
+import { CAPABILITIES as BASE } from "../../backend/src/cli/capabilities-base";
+import { OBSERVE_SYSTEM_CAPABILITIES } from "../../backend/src/cli/capabilities-observe-system";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
+import { handleStorageCommand } from "../../backend/src/cli/storage";
+import { handleSystemCommand } from "../../backend/src/cli/system-command";
+import { handleCompanionCommand } from "../../backend/src/cli/companion";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { planServiceCommand } from "../../backend/src/service/cli";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import type { UsageCompareDeps } from "../../backend/src/cli/usage-compare";
+import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "../../backend/src/lib/local-management-attestation";
+import { LOCAL_MANAGEMENT_NONCE_HEADER } from "../../backend/src/lib/local-management-capability";
+import { managementPrincipal, requireManagementAuth, type ManagementAuthState } from "../../backend/src/server/management-auth";
 import { repoPath } from "../helpers/repo-root";
 
 const envKeys = ["HOME", "USERPROFILE", "OPENCODEX_HOME", "CODEX_HOME", "OPENCODEX_ADMIN_AUTH_TOKEN"] as const;
@@ -221,7 +221,7 @@ describe("operation capability workflows use existing handlers", () => {
       expect(await handleObserveCommand(["logs", action, "--invalid"], io.deps)).toBe(2);
     }
     expect(io.requests).toEqual([]);
-    const source = readFileSync(repoPath("src/routing/history/indexer.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/routing/history/indexer.ts"), "utf8");
     expect(source).toMatch(/requestHistoryIndexStatus\(\)[\s\S]*?return openRequestHistoryIndex\(\)/);
   });
   test("local config metadata keeps secret export separate and missing operands refuse", async () => {
@@ -244,10 +244,10 @@ describe("operation capability workflows use existing handlers", () => {
       expect(capability(key).mutates).toBe(true);
     }
     expect(capability("tray install").flags.map(flag => flag.name)).toEqual(["--no-start", "--json"]);
-    const tray = readFileSync(repoPath("src/tray/windows.ts"), "utf8");
+    const tray = readFileSync(repoPath("backend/src/tray/windows.ts"), "utf8");
     expect(tray).toContain('args.includes("--no-start") && sub !== "install"');
     expect(tray).toContain('process.platform !== "win32"');
-    const dispatch = readFileSync(repoPath("src/cli/dispatch.ts"), "utf8");
+    const dispatch = readFileSync(repoPath("backend/src/cli/dispatch.ts"), "utf8");
     expect(dispatch).toContain('case "install": {\n        const r = await installCodexShimAsync();');
   });
 });

@@ -5,8 +5,8 @@ import {
   getInspectionCounters,
   resetInspectionCountersForTest,
   type SseInspector,
-} from "../../src/server/relay";
-import type { RequestLogContext } from "../../src/server/request-log";
+} from "../../backend/src/server/relay";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 // Regression for issue #44: native-passthrough turns are inspected on a teed background stream.
 // Codex disconnects the instant it finishes reading, so the inspection stream is frequently

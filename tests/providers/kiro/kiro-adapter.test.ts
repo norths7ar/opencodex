@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
 import {
   KIRO_ANSWER_DELIVERED_MESSAGE,
   KIRO_COMPLETION_INSTRUCTIONS,
@@ -12,17 +12,17 @@ import {
   KIRO_CONTINUATION_MESSAGE,
   KIRO_EMPTY_TOOL_RESULT_MESSAGE,
   KIRO_TOOL_RESULT_CARRIER_MESSAGE,
-} from "../../../src/adapters/kiro-constants";
-import { EMPTY_EXEC_OUTPUT_MESSAGE, FAILED_EXEC_OUTPUT_MESSAGE } from "../../../src/adapters/exec-tool-result-normalize";
-import { MAX_KIRO_TOOL_CATALOG_BYTES, MAX_KIRO_TOOL_COUNT } from "../../../src/adapters/kiro-tools";
-import { applyProviderConfigHints, buildCatalogEntries } from "../../../src/codex/catalog";
-import { getValidAccessTokenSnapshot } from "../../../src/oauth";
-import { saveCredential } from "../../../src/oauth/store";
-import { normalizeKiroModelId } from "../../../src/providers/kiro-models";
-import { configuredReasoningEfforts, mapReasoningEffort } from "../../../src/reasoning-effort";
-import { PROVIDER_REGISTRY } from "../../../src/providers/registry";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/kiro-constants";
+import { EMPTY_EXEC_OUTPUT_MESSAGE, FAILED_EXEC_OUTPUT_MESSAGE } from "../../../backend/src/adapters/exec-tool-result-normalize";
+import { MAX_KIRO_TOOL_CATALOG_BYTES, MAX_KIRO_TOOL_COUNT } from "../../../backend/src/adapters/kiro-tools";
+import { applyProviderConfigHints, buildCatalogEntries } from "../../../backend/src/codex/catalog";
+import { getValidAccessTokenSnapshot } from "../../../backend/src/oauth";
+import { saveCredential } from "../../../backend/src/oauth/store";
+import { normalizeKiroModelId } from "../../../backend/src/providers/kiro-models";
+import { configuredReasoningEfforts, mapReasoningEffort } from "../../../backend/src/reasoning-effort";
+import { PROVIDER_REGISTRY } from "../../../backend/src/providers/registry";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const origHome = process.env.HOME;
@@ -1825,8 +1825,8 @@ describe("the completion contract survives a hostile tool catalog intact", () =>
 
 describe("boundedInjectedInstruction surrogate safety", () => {
   test("a budget cut never ends on a lone high surrogate", async () => {
-    const { boundedInjectedInstructionForTests } = await import("../../../src/adapters/kiro");
-    const { MAX_KIRO_INJECTED_INSTRUCTION_CHARS } = await import("../../../src/adapters/kiro-constants");
+    const { boundedInjectedInstructionForTests } = await import("../../../backend/src/adapters/kiro");
+    const { MAX_KIRO_INJECTED_INSTRUCTION_CHARS } = await import("../../../backend/src/adapters/kiro-constants");
     // Place an astral character exactly at the budget boundary.
     const prefix = "가".repeat(MAX_KIRO_INJECTED_INSTRUCTION_CHARS - 1);
     const text = `${prefix}🎆tail`;

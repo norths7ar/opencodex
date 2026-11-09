@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * A pinned registry entry outranks a saved `baseUrl`. That behavior is intentional and is

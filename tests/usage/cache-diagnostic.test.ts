@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { captureCodexAffinityDiagnostic } from "../../src/codex/affinity-debug";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../src/lib/debug-settings";
+import { captureCodexAffinityDiagnostic } from "../../backend/src/codex/affinity-debug";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../backend/src/lib/debug-settings";
 import {
   appendFinalCacheDiagnostic,
   cacheDiagnosticPath,
@@ -14,7 +14,7 @@ import {
   observeOutbound,
   rebindCacheDiagnosticBodyAlias,
   tagCacheDiagnosticValue,
-} from "../../src/usage/cache-diagnostic";
+} from "../../backend/src/usage/cache-diagnostic";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

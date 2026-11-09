@@ -19,11 +19,11 @@ import {
   OCX_SECTION_MARKER,
   hasInjectedCodexRouting,
   hasInjectedOpenaiBaseUrl,
-} from "../../src/codex/injected-marker";
-import { missingOwnedCatalogPath, setRootOpenaiBaseUrl, setRootRealtimeWsBaseUrl } from "../../src/codex/inject/config-toml";
-import { stripOpencodexConfig } from "../../src/codex/inject/remove";
-import { deadProxyRoutingAdviceLines, missingCodexCatalogLines } from "../../src/cli/status";
-import { findCommand } from "../../src/cli/registry";
+} from "../../backend/src/codex/injected-marker";
+import { missingOwnedCatalogPath, setRootOpenaiBaseUrl, setRootRealtimeWsBaseUrl } from "../../backend/src/codex/inject/config-toml";
+import { stripOpencodexConfig } from "../../backend/src/codex/inject/remove";
+import { deadProxyRoutingAdviceLines, missingCodexCatalogLines } from "../../backend/src/cli/status";
+import { findCommand } from "../../backend/src/cli/registry";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** A Windows catalog path as TOML stores it: a basic string doubles the separators (#1798). */

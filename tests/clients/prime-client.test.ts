@@ -13,9 +13,9 @@ import {
   primeConfigPath,
   type ExportContext,
   type PiGeneratedConfig,
-} from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import type { OcxConfig } from "../../backend/src/types";
 
 const CONFIG = {
   port: 10100,

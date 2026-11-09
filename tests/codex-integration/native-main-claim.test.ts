@@ -7,9 +7,9 @@ import {
   nativeMainClaimPath,
   withNativeMainExclusiveClaim,
   withNativeMainSharedClaim,
-} from "../../src/codex/native-main-claim";
-import { retainNativeMainOwner } from "../../src/codex/native-main-owner";
-import type { NativeProfileContext } from "../../src/codex/native-profile-store";
+} from "../../backend/src/codex/native-main-claim";
+import { retainNativeMainOwner } from "../../backend/src/codex/native-main-owner";
+import type { NativeProfileContext } from "../../backend/src/codex/native-profile-store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath, repoRoot } from "../helpers/repo-root";
 

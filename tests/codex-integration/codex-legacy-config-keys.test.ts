@@ -5,7 +5,7 @@ import { join } from "node:path";
 import {
   collectLegacyCodexConfigKeyDiagnostics,
   formatLegacyCodexConfigKeyDiagnosticsForDoctor,
-} from "../../src/codex/legacy-config-keys";
+} from "../../backend/src/codex/legacy-config-keys";
 
 describe("legacy Codex config keys", () => {
   let dir: string;

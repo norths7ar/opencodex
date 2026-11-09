@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
-import type { OcxMessage } from "../../../src/types";
-import { SUMMARY_PREFIX, OPAQUE_COMPACTION_NOTE } from "../../../src/responses/compaction";
-import { encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { AgentClientMessageSchema, ConversationStateStructureSchema } from "../../../src/adapters/cursor/gen/agent_pb";
-import { cursorBlobTextForEstimate, resetCursorBlobStateForTests } from "../../../src/adapters/cursor/native-exec";
-import { buildCursorToolGuidanceSystemNote } from "../../../src/adapters/cursor/tool-guidance";
-import { normalizeCursorToolResultText } from "../../../src/adapters/cursor/tool-result-normalize";
+import type { OcxMessage } from "../../../backend/src/types";
+import { SUMMARY_PREFIX, OPAQUE_COMPACTION_NOTE } from "../../../backend/src/responses/compaction";
+import { encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { AgentClientMessageSchema, ConversationStateStructureSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { cursorBlobTextForEstimate, resetCursorBlobStateForTests } from "../../../backend/src/adapters/cursor/native-exec";
+import { buildCursorToolGuidanceSystemNote } from "../../../backend/src/adapters/cursor/tool-guidance";
+import { normalizeCursorToolResultText } from "../../../backend/src/adapters/cursor/tool-result-normalize";
 
 const tools = [{ name: "exec", freeform: true, description: "Run JavaScript", parameters: {} }];
 const user = (content: string): OcxMessage => ({ role: "user", content, timestamp: 1 });

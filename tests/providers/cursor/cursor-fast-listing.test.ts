@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { cursorFastCapableBases, cursorFastIdFor, resolveCursorSelection } from "../../../src/adapters/cursor/catalog";
-import { buildAnthropicModelInfos } from "../../../src/claude/model-info";
-import { AUTO_CONTEXT_OFF } from "../../../src/claude/context-windows";
-import { desktop3pAlias } from "../../../src/claude/desktop-3p";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { decideTier } from "../../../src/providers/fastwire";
-import { fastPolicyForModel } from "../../../src/providers/service-tier";
-import type { CatalogModel } from "../../../src/codex/catalog";
+import { cursorFastCapableBases, cursorFastIdFor, resolveCursorSelection } from "../../../backend/src/adapters/cursor/catalog";
+import { buildAnthropicModelInfos } from "../../../backend/src/claude/model-info";
+import { AUTO_CONTEXT_OFF } from "../../../backend/src/claude/context-windows";
+import { desktop3pAlias } from "../../../backend/src/claude/desktop-3p";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { decideTier } from "../../../backend/src/providers/fastwire";
+import { fastPolicyForModel } from "../../../backend/src/providers/service-tier";
+import type { CatalogModel } from "../../../backend/src/codex/catalog";
 
 function cursorModel(id: string, contextWindow = 1_000_000): CatalogModel {
   return { provider: "cursor", id, contextWindow, reasoningEfforts: ["low", "high"] } as CatalogModel;

@@ -58,12 +58,12 @@ const CASE_TIMEOUT_MS = process.env.CI === "true" ? 150_000 : 45_000;
 
 import {
   canonicalizeCodexHome,
-} from "../../src/codex/codex-write-lock";
+} from "../../backend/src/codex/codex-write-lock";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { claimOwnedServiceHome, withOwnedServiceHomePreload } from "../helpers/owned-service-home";
 import { HISTORY_BUSY_TIMEOUT_ENV } from "../helpers/history-busy-timeout-preload";
 import { INTERNAL_DEADLINE_MS, SERVER_BUDGET_MS } from "../helpers/test-budget";
@@ -80,7 +80,7 @@ import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 const HELD_REQUEST_BUDGET_MS = SERVER_BUDGET_MS + INTERNAL_DEADLINE_MS;
 
 const repoRoot = resolveRepoRoot();
-const cliPath = resolve(repoRoot, "src/cli/index.ts");
+const cliPath = resolve(repoRoot, "backend/src/cli/index.ts");
 /** Preload that shortens only a spawned child's SQLite busy wait; see the helper's header. */
 const historyBusyTimeoutPreload = resolve(repoRoot, "tests/helpers/history-busy-timeout-preload.ts");
 const lockChildPath = resolve(repoRoot, "tests/helpers/codex-write-lock-child.ts");

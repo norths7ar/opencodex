@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { BOUNDED_BODY_MAX_BYTES } from "../../src/lib/bounded-body";
-import type { OcxConfig } from "../../src/types";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { BOUNDED_BODY_MAX_BYTES } from "../../backend/src/lib/bounded-body";
+import type { OcxConfig } from "../../backend/src/types";
 
 export function registerResetCreditConsumeValidationTests(
   makeConfig: () => OcxConfig,

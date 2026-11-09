@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { buildResponseJSON } from "../../../src/bridge";
-import type { AdapterEvent, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import type { AdapterEvent, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

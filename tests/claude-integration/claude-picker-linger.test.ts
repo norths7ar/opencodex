@@ -10,8 +10,8 @@ import { expect, test } from "bun:test";
 import { createServer } from "node:https";
 import type { AddressInfo } from "node:net";
 import { connect as tlsConnect } from "node:tls";
-import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { PICKER_ABANDONED_INPUT_LINGER_MS, startPickerListener } from "../../src/claude/intercept/picker-listener";
+import { createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { PICKER_ABANDONED_INPUT_LINGER_MS, startPickerListener } from "../../backend/src/claude/intercept/picker-listener";
 
 interface ArmedDrop { ms: number; fire(): void }
 

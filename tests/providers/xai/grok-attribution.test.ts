@@ -2,10 +2,10 @@ import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildGrokManagedBlock, injectGrokConfig } from "../../../src/grok/inject";
-import { handleChatCompletions } from "../../../src/server/chat-completions";
-import type { RequestLogContext } from "../../../src/server/request-log";
-import type { OcxConfig } from "../../../src/types";
+import { buildGrokManagedBlock, injectGrokConfig } from "../../../backend/src/grok/inject";
+import { handleChatCompletions } from "../../../backend/src/server/chat-completions";
+import type { RequestLogContext } from "../../../backend/src/server/request-log";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 /**

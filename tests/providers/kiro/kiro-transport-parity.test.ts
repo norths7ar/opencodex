@@ -1,13 +1,13 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import type { AdapterRequest } from "../../../src/adapters/base";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { safeKiroHttpErrorMessage } from "../../../src/adapters/kiro-errors";
-import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../src/lib/debug-settings";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createRequestExecutionBudget } from "../../../src/lib/request-execution-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { AdapterRequest } from "../../../backend/src/adapters/base";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { safeKiroHttpErrorMessage } from "../../../backend/src/adapters/kiro-errors";
+import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { clearDebugSetting, getDebugSettings, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createRequestExecutionBudget } from "../../../backend/src/lib/request-execution-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const request: AdapterRequest = {

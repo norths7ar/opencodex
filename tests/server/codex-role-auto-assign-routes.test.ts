@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { listCatalogNativeSlugs, type CatalogModel } from "../../src/codex/catalog";
-import { ARTIFICIAL_ANALYSIS_SOURCE, type LoadCapability } from "../../src/codex/role-capability";
-import { ROLE_SIZING_SYSTEM_PROMPT } from "../../src/codex/role-sizing";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { RoleSizingCall } from "../../src/server/management/codex-role-auto-assign";
-import type { OcxConfig } from "../../src/types";
+import { listCatalogNativeSlugs, type CatalogModel } from "../../backend/src/codex/catalog";
+import { ARTIFICIAL_ANALYSIS_SOURCE, type LoadCapability } from "../../backend/src/codex/role-capability";
+import { ROLE_SIZING_SYSTEM_PROMPT } from "../../backend/src/codex/role-sizing";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { RoleSizingCall } from "../../backend/src/server/management/codex-role-auto-assign";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent, OcxProviderContinuationState } from "../../src/types";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent, OcxProviderContinuationState } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 type Options = NonNullable<Parameters<typeof bridgeToResponsesSSE>[7]>;

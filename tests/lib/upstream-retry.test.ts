@@ -1,4 +1,4 @@
-import { formatErrorResponse as formatReplaySafetyError } from "../../src/bridge/errors";
+import { formatErrorResponse as formatReplaySafetyError } from "../../backend/src/bridge/errors";
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import {
   SendBudgetExhaustedError,
@@ -12,7 +12,7 @@ import {
   releaseResponseBodyBestEffort,
   retryBackoffDelayMs,
   sleepWithHeartbeats,
-} from "../../src/lib/upstream-retry";
+} from "../../backend/src/lib/upstream-retry";
 
 function bunResetError(): Error {
   // Shape of Bun's fetch rejection on a stale pooled socket.
@@ -911,7 +911,7 @@ for (const [input, expected] of [
 });
 
 test("pacing constructor bounds a value that is not a provider id", async () => {
-  const { RequestPacingQueueOverloadError } = await import("../../src/providers/request-pacing");
+  const { RequestPacingQueueOverloadError } = await import("../../backend/src/providers/request-pacing");
   const error = new RequestPacingQueueOverloadError(`https://${destinationSentinel}@provider.example.test/${destinationSentinel}?key=${destinationSentinel}`, "queue_full", 1);
   expect(error).toBeInstanceOf(RequestPacingQueueOverloadError);
   expect(error.reason).toBe("queue_full");
@@ -920,7 +920,7 @@ test("pacing constructor bounds a value that is not a provider id", async () => 
 });
 
 test("destination factories retain only owned origins or validated provider ids", async () => {
-  const { errorDestinationLabel, providerErrorDestinationLabel, errorDestinationText } = await import("../../src/lib/error-destination");
+  const { errorDestinationLabel, providerErrorDestinationLabel, errorDestinationText } = await import("../../backend/src/lib/error-destination");
   const label = errorDestinationLabel(`https://${destinationSentinel}@provider.example.test:8443/${destinationSentinel}?key=${destinationSentinel}`);
   expect(errorDestinationText(label)).toBe("https://provider.example.test:8443");
   expect(new SendBudgetExhaustedError(label).code).toBe("request_send_budget_exhausted");
@@ -942,7 +942,7 @@ test("destination factories retain only owned origins or validated provider ids"
 });
 
 for (const kind of ["unsupported", "login"] as const) test(`OAuth provider constructor bounds an invalid provider id kind=${kind}`, async () => {
-  const { UnsupportedOAuthProviderError, OAuthLoginRequiredError } = await import("../../src/oauth");
+  const { UnsupportedOAuthProviderError, OAuthLoginRequiredError } = await import("../../backend/src/oauth");
   const id = `https://${destinationSentinel}@provider.example.test/${destinationSentinel}?key=${destinationSentinel}`;
   const error = kind === "unsupported" ? new UnsupportedOAuthProviderError(id) : new OAuthLoginRequiredError(id);
   expect(error).toBeInstanceOf(kind === "unsupported" ? UnsupportedOAuthProviderError : OAuthLoginRequiredError);
@@ -953,7 +953,7 @@ for (const kind of ["unsupported", "login"] as const) test(`OAuth provider const
 
 for (const value of [destinationSentinel, { toString: () => destinationSentinel }, NaN, Infinity, -1]) {
   test(`invalid send-budget diagnostic bounds ${typeof value}`, async () => {
-    const { InvalidSendBudgetError } = await import("../../src/lib/upstream-retry");
+    const { InvalidSendBudgetError } = await import("../../backend/src/lib/upstream-retry");
     const error = new InvalidSendBudgetError(value);
     expect(error).toBeInstanceOf(InvalidSendBudgetError);
     expect(error.name).toBe("InvalidSendBudgetError");
@@ -962,7 +962,7 @@ for (const value of [destinationSentinel, { toString: () => destinationSentinel 
   });
 }
 for (const statuses of [[], [503]]) test(`retry evidence owns its diagnostic statuses=${statuses.length}`, async () => {
-  const { UpstreamRetryEvidenceError } = await import("../../src/lib/upstream-retry");
+  const { UpstreamRetryEvidenceError } = await import("../../backend/src/lib/upstream-retry");
   const cause = new Error(destinationSentinel);
   const error = new UpstreamRetryEvidenceError(statuses, cause);
   expect(error).toBeInstanceOf(UpstreamRetryEvidenceError);
@@ -977,7 +977,7 @@ for (const [value, expected] of [["provider/model-v1", "provider/model-v1"], ["c
   ["a".repeat(129), "the requested model"], ["model\nmetadata", "the requested model"], ["", "the requested model"],
   [{ toString: () => destinationSentinel }, "the requested model"]] as const) {
   test(`client model label projects ${typeof value}, length=${typeof value === "string" ? value.length : 0}`, async () => {
-    const { clientFacingModelLabel, clientFacingModelText } = await import("../../src/lib/error-destination");
+    const { clientFacingModelLabel, clientFacingModelText } = await import("../../backend/src/lib/error-destination");
     const label = clientFacingModelLabel(value);
     expect(typeof label).toBe("object"); expect(Object.isFrozen(label)).toBe(true);
     expect(clientFacingModelText(label)).toBe(expected);

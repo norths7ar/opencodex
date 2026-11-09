@@ -1,11 +1,11 @@
 /** Offline wire contracts for #7816; no model task-selection claim. */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
-import { CHECKPOINT_CONTINUATION_NOTE, COMPACT_PROMPT, SUMMARY_PREFIX, decodeCompactionSummary, encodeCompactionSummary } from "../../src/responses/compaction";
-import { frameCompactionHistory, HISTORICAL_REQUEST_END, HISTORICAL_REQUEST_START } from "../../src/responses/compaction-history-framing";
-import { parseRequest } from "../../src/responses/parser";
-import { encodeRetainedCompaction } from "../../src/responses/retained-compaction";
-import { handleResponses } from "../../src/server/responses";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses/passthrough";
+import { CHECKPOINT_CONTINUATION_NOTE, COMPACT_PROMPT, SUMMARY_PREFIX, decodeCompactionSummary, encodeCompactionSummary } from "../../backend/src/responses/compaction";
+import { frameCompactionHistory, HISTORICAL_REQUEST_END, HISTORICAL_REQUEST_START } from "../../backend/src/responses/compaction-history-framing";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { encodeRetainedCompaction } from "../../backend/src/responses/retained-compaction";
+import { handleResponses } from "../../backend/src/server/responses";
 import { completedPayload, compactionRequest, drainCompactionResponseState, installCompactionRoutingAclFixture, jsonResponse, keyProviderConfig, sseResponse } from "../helpers/compaction-routing-fixtures";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";

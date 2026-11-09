@@ -18,12 +18,12 @@ import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createDevinAdapter } from "../../src/adapters/devin";
-import { parseCatalogBuffer, setCachedCatalogForTests } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { saveCredential } from "../../src/oauth/store";
-import type { AdapterEvent } from "../../src/types";
+import { createDevinAdapter } from "../../backend/src/adapters/devin";
+import { parseCatalogBuffer, setCachedCatalogForTests } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString, encodeVarintField, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { saveCredential } from "../../backend/src/oauth/store";
+import type { AdapterEvent } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const apiKey = "ocx-devin-reset-wait-fixture";

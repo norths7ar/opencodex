@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import * as childProcess from "node:child_process";
-import { SUBPROCESS_KILL_GRACE_MS } from "../../src/lib/bounded-subprocess";
-import * as runtime from "../../src/codex/runtime";
-import * as bundled from "../../src/codex/catalog/bundled";
-import { clampCatalogModelsToCodexSupport } from "../../src/codex/catalog/effort";
+import { SUBPROCESS_KILL_GRACE_MS } from "../../backend/src/lib/bounded-subprocess";
+import * as runtime from "../../backend/src/codex/runtime";
+import * as bundled from "../../backend/src/codex/catalog/bundled";
+import { clampCatalogModelsToCodexSupport } from "../../backend/src/codex/catalog/effort";
 import { repoPath } from "../helpers/repo-root";
 
 const catalog = { models: [{ slug: "gpt-5.5", base_instructions: "fixture", supported_reasoning_levels: [{ effort: "medium", description: "fixture" }] }] };

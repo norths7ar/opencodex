@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
+import { saveConfig } from "../../backend/src/config";
 import {
   resetSubagentModelFallbackStateForTests,
   setSubagentQuotaPrimeForTests,
-} from "../../src/codex/subagent-model-fallback";
+} from "../../backend/src/codex/subagent-model-fallback";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
@@ -16,10 +16,10 @@ import {
   RESPONSE_TTL_MS,
   setResponseStateByteCapForTests,
   type ResponseStateMetrics,
-} from "../../src/responses/state";
-import { responseSpillDirectory } from "../../src/responses/spill-store";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/state";
+import { responseSpillDirectory } from "../../backend/src/responses/spill-store";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { INTERNAL_DEADLINE_MS, SERVER_BUDGET_MS } from "../helpers/test-budget";

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { restoreResultFromWorkerRejection } from "../../src/storage/restore-job";
+import { restoreResultFromWorkerRejection } from "../../backend/src/storage/restore-job";
 
 describe("restoreResultFromWorkerRejection", () => {
   test("maps worker timeout to restore_worker_timeout", () => {

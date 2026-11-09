@@ -4,11 +4,11 @@
  * deferred-verb exemptions.
  */
 import { afterEach, beforeEach, describe, expect, spyOn, test, type Mock } from "bun:test";
-import { handleApiCommand } from "../../src/cli/api-protocols";
-import { capabilitiesForRoute, CAPABILITIES } from "../../src/cli/capabilities";
-import { DISPATCH_COMMANDS } from "../../src/cli/dispatch";
-import { findCommand } from "../../src/cli/registry";
-import { MANAGEMENT_ROUTES } from "../../src/server/management/route-registry";
+import { handleApiCommand } from "../../backend/src/cli/api-protocols";
+import { capabilitiesForRoute, CAPABILITIES } from "../../backend/src/cli/capabilities";
+import { DISPATCH_COMMANDS } from "../../backend/src/cli/dispatch";
+import { findCommand } from "../../backend/src/cli/registry";
+import { MANAGEMENT_ROUTES } from "../../backend/src/server/management/route-registry";
 
 type Recorded = { url: string; method: string; body: unknown; contentType: string | null };
 

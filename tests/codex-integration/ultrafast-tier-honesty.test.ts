@@ -17,11 +17,11 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { repoRoot } from "../helpers/repo-root";
-import { canonicalFastTierMarker, createAdapterTierMetadata, decideTier, tierObservationContext } from "../../src/providers/fastwire";
-import { requestLogSpeedLabel } from "../../src/server/request-log";
-import { normalizeRoutedCatalogEntry } from "../../src/codex/catalog/parsing";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState, type ObservedCatalogMergeInput } from "../../src/codex/catalog/build-entries";
+import { canonicalFastTierMarker, createAdapterTierMetadata, decideTier, tierObservationContext } from "../../backend/src/providers/fastwire";
+import { requestLogSpeedLabel } from "../../backend/src/server/request-log";
+import { normalizeRoutedCatalogEntry } from "../../backend/src/codex/catalog/parsing";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { buildCatalogEntriesFromObservedState, mergeCatalogEntriesFromObservedState, type ObservedCatalogMergeInput } from "../../backend/src/codex/catalog/build-entries";
 
 describe("operator ultrafast survives the build and merge boundary", () => {
   const tier = { id: "ultrafast", name: "Ultra Fast", description: "operator supplied" };

@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
-import { configRebaseDeletionKeys } from "../../src/config/rebase-provenance";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { handleWorkflowBudgetRoutes } from "../../src/server/management/workflow-budget-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import { admitHttpWorkflowTurn } from "../../src/server/workflow-refusal";
-import { bindWorkflowBudgetConfig, currentWorkflowBudgetPolicy } from "../../src/lib/workflow-budget-config";
+import { getDefaultConfig } from "../../backend/src/config";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
+import { configRebaseDeletionKeys } from "../../backend/src/config/rebase-provenance";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { handleWorkflowBudgetRoutes } from "../../backend/src/server/management/workflow-budget-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { admitHttpWorkflowTurn } from "../../backend/src/server/workflow-refusal";
+import { bindWorkflowBudgetConfig, currentWorkflowBudgetPolicy } from "../../backend/src/lib/workflow-budget-config";
 import {
   admitWorkflowTurn,
   chargeWorkflowSends,
   resetWorkflowBudgetsForTest,
   workflowSendCeilingReached,
   type WorkflowAdmission,
-} from "../../src/lib/workflow-budget";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/workflow-budget";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
 
 const defaults = { maxConcurrentChildren: 8, maxPhysicalSends: 256, maxDistinctChildren: 64 };

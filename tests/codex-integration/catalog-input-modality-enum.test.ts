@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { ensureStrictCatalogFields } from "../../src/codex/catalog/parsing";
-import { catalogHintsFromModelsApiItem } from "../../src/codex/catalog/provider-fetch";
-import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
+import { ensureStrictCatalogFields } from "../../backend/src/codex/catalog/parsing";
+import { catalogHintsFromModelsApiItem } from "../../backend/src/codex/catalog/provider-fetch";
+import { buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Codex parses `input_modalities` as a closed enum of text | image | audio. A single out-of-enum
@@ -102,7 +102,7 @@ describe("custom-model API rejects out-of-enum input modalities", () => {
     body: unknown,
     pathname = "/api/custom-models",
   ): Promise<Response | null> {
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL(`http://127.0.0.1:10199${pathname}`);
     const req = new Request(url, {
       method,
@@ -230,7 +230,7 @@ describe("custom-model API validates reasoning-effort ladders", () => {
     body: unknown,
     pathname = "/api/custom-models",
   ): Promise<Response | null> {
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL(`http://127.0.0.1:10199${pathname}`);
     const req = new Request(url, {
       method,
@@ -464,7 +464,7 @@ describe("custom-model API allows slash model ids", () => {
     body: unknown,
     pathname = "/api/custom-models",
   ): Promise<Response | null> {
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL(`http://127.0.0.1:10199${pathname}`);
     const req = new Request(url, {
       method,
@@ -523,7 +523,7 @@ describe("custom-model API allows slash model ids", () => {
 
   test("POST rejects a slash id that encodes to an existing native id", async () => {
     persistCalls = 0;
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL("http://127.0.0.1:10199/api/custom-models");
     const req = new Request(url, {
       method: "POST",
@@ -561,7 +561,7 @@ describe("custom-model API allows slash model ids", () => {
 
   test("PUT rejects renaming onto a colliding native id", async () => {
     persistCalls = 0;
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL("http://127.0.0.1:10199/api/custom-models/existing-uuid");
     const req = new Request(url, {
       method: "PUT",
@@ -602,7 +602,7 @@ describe("custom-model API allows slash model ids", () => {
 
   test("POST rejects a slash id that encodes to defaultModel only", async () => {
     persistCalls = 0;
-    const { handleModelRoutes } = await import("../../src/server/management/model-routes");
+    const { handleModelRoutes } = await import("../../backend/src/server/management/model-routes");
     const url = new URL("http://127.0.0.1:10199/api/custom-models");
     const req = new Request(url, {
       method: "POST",

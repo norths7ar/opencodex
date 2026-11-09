@@ -2,18 +2,18 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { OAUTH_PROVIDERS, upsertOAuthProvider } from "../../src/oauth";
-import { loadConfig, saveConfig } from "../../src/config";
-import { migrateXaiResponsesDefault } from "../../src/providers/xai-responses-opt-in";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
+import { OAUTH_PROVIDERS, upsertOAuthProvider } from "../../backend/src/oauth";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { migrateXaiResponsesDefault } from "../../backend/src/providers/xai-responses-opt-in";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
 import {
   apiKeyPoolEntryId,
   listProviderApiKeys,
   removeProviderApiKey,
   setActiveProviderApiKey,
-} from "../../src/providers/api-keys";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/api-keys";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

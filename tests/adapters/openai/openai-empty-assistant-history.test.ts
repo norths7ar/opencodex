@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { parseRequest } from "../../../src/responses/parser";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "openai-responses", baseUrl: "https://api.kimi.com/coding/v1",

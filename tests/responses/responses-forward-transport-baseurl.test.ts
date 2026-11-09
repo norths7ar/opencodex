@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { buildResponsesTransport } from "../../src/adapters/openai-responses/transport";
-import type { OcxProviderConfig } from "../../src/types";
+import { buildResponsesTransport } from "../../backend/src/adapters/openai-responses/transport";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 // Regression coverage for the forward-mode baseUrl normalization: the previous implementation
 // used `replace(/\/+$/, "")`, which retries candidate end positions when a long slash run is not

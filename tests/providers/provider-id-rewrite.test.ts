@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { providerContextCap } from "../../src/providers/context-cap";
-import { dropProviderCustomModels, rewriteProviderReferences } from "../../src/providers/provider-id-rewrite";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { providerContextCap } from "../../backend/src/providers/context-cap";
+import { dropProviderCustomModels, rewriteProviderReferences } from "../../backend/src/providers/provider-id-rewrite";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const FROM = "alibaba-token-plan";
 const TO = "alibaba-token-plan-intl";

@@ -3,7 +3,7 @@ import {
   clientEncoderForDelivery,
   deliverClientEncodedResponse,
   directEncodersApply,
-} from "../../src/server/inference/client-encoder-delivery";
+} from "../../backend/src/server/inference/client-encoder-delivery";
 import {
   attachClientWireLog,
   clientWireLogOf,
@@ -11,17 +11,17 @@ import {
   createClientWireLog,
   markClientWire,
   type ClientWireLogEvent,
-} from "../../src/server/inference/client-wire";
-import { beginInferenceAttempt } from "../../src/server/inference/attempt";
-import { responseWithDeferredRequestLog } from "../../src/server/relay";
-import type { RequestLogContext, RequestLogEntry } from "../../src/server/request-log";
-import { markProtocolEntry, protocolTraceForRequest } from "../../src/protocols/trace";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
-import { createAnthropicThinkingRecovery } from "../../src/server/responses/anthropic-thinking-recovery";
-import { deliverAdapterResponse } from "../../src/server/responses/adapter-delivery";
-import { peekReasoningForCall } from "../../src/responses/reasoning-replay-cache";
-import type { AdapterEvent, OcxConfig, OcxReasoningReplayScopeRef, OcxUsage } from "../../src/types";
+} from "../../backend/src/server/inference/client-wire";
+import { beginInferenceAttempt } from "../../backend/src/server/inference/attempt";
+import { responseWithDeferredRequestLog } from "../../backend/src/server/relay";
+import type { RequestLogContext, RequestLogEntry } from "../../backend/src/server/request-log";
+import { markProtocolEntry, protocolTraceForRequest } from "../../backend/src/protocols/trace";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
+import { createAnthropicThinkingRecovery } from "../../backend/src/server/responses/anthropic-thinking-recovery";
+import { deliverAdapterResponse } from "../../backend/src/server/responses/adapter-delivery";
+import { peekReasoningForCall } from "../../backend/src/responses/reasoning-replay-cache";
+import type { AdapterEvent, OcxConfig, OcxReasoningReplayScopeRef, OcxUsage } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const ON = { protocols: { rollout: { directEncoders: true } } } as Pick<OcxConfig, "protocols">;

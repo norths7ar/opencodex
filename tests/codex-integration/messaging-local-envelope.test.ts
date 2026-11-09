@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { MessageBudget } from "../../src/messaging/budget";
-import { messageEnvelope, validateMessage } from "../../src/messaging/envelope";
-import { readMessageInput } from "../../src/messaging/input";
-import { parseMessageArgs } from "../../src/cli/message-args";
+import { MessageBudget } from "../../backend/src/messaging/budget";
+import { messageEnvelope, validateMessage } from "../../backend/src/messaging/envelope";
+import { readMessageInput } from "../../backend/src/messaging/input";
+import { parseMessageArgs } from "../../backend/src/cli/message-args";
 import { LOCAL_OTHER, LOCAL_TARGET } from "../helpers/messaging-local";
 
 const sender = { id: LOCAL_OTHER, name: "reviewer; ocx message send --thread body-is-not-routing", status: "idle" as const };

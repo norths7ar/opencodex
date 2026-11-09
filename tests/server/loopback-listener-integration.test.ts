@@ -13,17 +13,17 @@ import { spawnSync } from "node:child_process";
 import { connect } from "node:net";
 import { networkInterfaces, tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer, waitForFailedStartRollback } from "../../src/server";
-import { runListenerShutdown } from "../../src/server/lifecycle";
+import { saveConfig } from "../../backend/src/config";
+import { startServer, waitForFailedStartRollback } from "../../backend/src/server";
+import { runListenerShutdown } from "../../backend/src/server/lifecycle";
 import {
   AuxiliaryListenerBindError,
   findAvailablePort,
   isAddrInUse,
   PortUnavailableError,
   setEphemeralPortAllocatorForTests,
-} from "../../src/server/ports";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/ports";
+import type { OcxConfig } from "../../backend/src/types";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

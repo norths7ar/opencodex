@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { resetCommandCodeReasoningEffortsForTest } from "../../src/providers/command-code-efforts";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { resetCommandCodeReasoningEffortsForTest } from "../../backend/src/providers/command-code-efforts";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 const CREDITS_EXHAUSTED = {
   success: false,

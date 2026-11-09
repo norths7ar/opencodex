@@ -14,36 +14,36 @@ import {
   clearMainAccountInfoCache,
   seedCodexAuthAdmissionForTests,
   setCodexPoolQuotaTokenResolverForTests,
-} from "../../src/codex/auth-api";
+} from "../../backend/src/codex/auth-api";
 import {
   CodexCredentialGenerationConflictError,
   CodexCredentialRefreshLockTimeoutError,
   readCodexAccountRecord,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { isCodexAccountHeldForCredits } from "../../src/codex/account-credit-use";
-import * as sweeper from "../../src/lib/state-store-sweeper";
-import { registerCodexCooldownRecoveryProbeWorker } from "../../src/codex/auth-api/pool-mode-gate";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+} from "../../backend/src/codex/account-store";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { isCodexAccountHeldForCredits } from "../../backend/src/codex/account-credit-use";
+import * as sweeper from "../../backend/src/lib/state-store-sweeper";
+import { registerCodexCooldownRecoveryProbeWorker } from "../../backend/src/codex/auth-api/pool-mode-gate";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   completeNativeMainRecovery,
   flushNativeMainStartupReleases,
   initializeNativeMainStartupGate,
-} from "../../src/codex/native-profile-startup";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { resolveCodexAccountForThread, previewCodexAccountForRequest, clearThreadAccountMap } from "../../src/codex/routing";
-import { markAccountNeedsReauth, clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
+} from "../../backend/src/codex/native-profile-startup";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { resolveCodexAccountForThread, previewCodexAccountForRequest, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { markAccountNeedsReauth, clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
 import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
-} from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { flushWindowsSecretAclReapsBeforeRemoval, setIcaclsRunnerForTests, setAsyncIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { flushWindowsSecretAclReapsBeforeRemoval, setIcaclsRunnerForTests, setAsyncIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 // Phase 20 (260630_wsl-account-autoswitch): startup/lazy quota priming.
 

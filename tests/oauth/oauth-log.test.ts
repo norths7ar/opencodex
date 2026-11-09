@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { logOAuthEvent } from "../../src/oauth/log";
+import { logOAuthEvent } from "../../backend/src/oauth/log";
 
 describe("logOAuthEvent", () => {
   test("emits redacted account and never prints a token-looking field value", () => {

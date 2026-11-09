@@ -7,13 +7,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildProtocolPlanSnapshot, previewProtocolPlan } from "../../src/protocols/plan-snapshot";
-import type { RouteResult } from "../../src/router";
+import { buildProtocolPlanSnapshot, previewProtocolPlan } from "../../backend/src/protocols/plan-snapshot";
+import type { RouteResult } from "../../backend/src/router";
 import {
   isNativeMessagesRouteEligible,
   nativeMessagesDeclineReason,
-} from "../../src/server/messages-native-eligibility";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/messages-native-eligibility";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";
@@ -131,15 +131,15 @@ test("Anthropic legacy preference preserves another provider's explicit native p
   conf.anthropicAccountPool = { enabled: true, nativeMessages: false };
   const plan = previewProtocolPlan(conf, { model: "anth/claude-x", inbound: "messages", features: [] });
   expect(plan.mode).toBe("native");
-  const { nativeMessagesCountBody } = await import("../../src/server/messages-native");
+  const { nativeMessagesCountBody } = await import("../../backend/src/server/messages-native");
   const source = { model: "anth/claude-x", messages: [{ role: "user", content: "fixture" }] };
   expect(nativeMessagesCountBody(conf, undefined, source, {})).toMatchObject({ model: "claude-x", messages: source.messages });
 });
 
 
 test("pool default, explicit opt-out, preview and actual count ingress agree without credentials or network", async () => {
-  const { nativeMessagesCountBody } = await import("../../src/server/messages-native");
-  const { handleClaudeCountTokens, estimateClaudeRequestTokens } = await import("../../src/server/claude-messages");
+  const { nativeMessagesCountBody } = await import("../../backend/src/server/messages-native");
+  const { handleClaudeCountTokens, estimateClaudeRequestTokens } = await import("../../backend/src/server/claude-messages");
   const conf = config({
     defaultProvider: "anthropic",
     providers: { anthropic: { adapter: "anthropic", authMode: "oauth", baseUrl: "https://api.anthropic.com", models: ["claude-fixture"] } },

@@ -5,22 +5,22 @@ import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
-import { resetContextRelayActivationForTests } from "../../src/codex/context-compat";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
+import { resetContextRelayActivationForTests } from "../../backend/src/codex/context-compat";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import {
   accountSwitchBodyDigest,
   createLocalAccountSwitchCapability,
   LOCAL_ACCOUNT_SWITCH_BODY_HEADER,
-} from "../../src/lib/local-account-switch-capability";
+} from "../../backend/src/lib/local-account-switch-capability";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER,
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
   LOCAL_MANAGEMENT_EXPECTED_PID_HEADER,
   LOCAL_MANAGEMENT_NONCE_HEADER,
-} from "../../src/lib/local-management-capability";
-import { flushWindowsSecretAclReapsBeforeRemoval, resetHardenedStateForTests } from "../../src/lib/windows-secret-acl";
-import { startServer } from "../../src/server";
+} from "../../backend/src/lib/local-management-capability";
+import { flushWindowsSecretAclReapsBeforeRemoval, resetHardenedStateForTests } from "../../backend/src/lib/windows-secret-acl";
+import { startServer } from "../../backend/src/server";
 
 const previous = {
   home: process.env.OPENCODEX_HOME,

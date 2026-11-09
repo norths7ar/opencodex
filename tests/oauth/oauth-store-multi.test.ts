@@ -3,17 +3,17 @@ import { INTERNAL_DEADLINE_MS, STORE_BUDGET_MS } from "../helpers/test-budget";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as atomicWrite from "../../src/config/atomic-write";
-import * as oauthStore from "../../src/oauth/store";
-import * as configOwnership from "../../src/lib/config-ownership";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import * as atomicWrite from "../../backend/src/config/atomic-write";
+import * as oauthStore from "../../backend/src/oauth/store";
+import * as configOwnership from "../../backend/src/lib/config-ownership";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import {
   resetHardenedStateForTests,
   setAsyncIcaclsRunnerForTests,
   setIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 import {
   getAccountCredential,
   getAccountSet,
@@ -37,10 +37,10 @@ import {
   setAccountAlias,
   setActiveAccount,
   upsertCredentialByIdentity,
-} from "../../src/oauth/store";
-import type { OAuthCredentials } from "../../src/oauth/types";
+} from "../../backend/src/oauth/store";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { recordOwnedConfigPath, removeOwnedConfigState } from "../../src/lib/config-ownership";
+import { recordOwnedConfigPath, removeOwnedConfigState } from "../../backend/src/lib/config-ownership";
 
 let TEST_DIR: string;
 let previousOpencodexHome: string | undefined;
@@ -702,7 +702,7 @@ describe("multi-account auth store", () => {
 
   test("selection events follow persistence and omit failed commits, refreshes, and credentials", async () => {
     const { idA } = await selectionAccounts();
-    const { subscribeAccountSelections } = await import("../../src/lib/account-selection-events");
+    const { subscribeAccountSelections } = await import("../../backend/src/lib/account-selection-events");
     const events: unknown[] = [];
     const unsubscribe = subscribeAccountSelections(event => events.push(event));
     try {
@@ -724,7 +724,7 @@ describe("multi-account auth store", () => {
   });
 
   test("selection events cover login replacement, clear, and recreate", async () => {
-    const { subscribeAccountSelections } = await import("../../src/lib/account-selection-events");
+    const { subscribeAccountSelections } = await import("../../backend/src/lib/account-selection-events");
     const events: unknown[] = [];
     const unsubscribe = subscribeAccountSelections(event => events.push(event));
     try {
@@ -742,7 +742,7 @@ describe("multi-account auth store", () => {
 
   test("selection subscriber failure cannot fail a persisted selection or block other subscribers", async () => {
     await selectionAccounts();
-    const { subscribeAccountSelections } = await import("../../src/lib/account-selection-events");
+    const { subscribeAccountSelections } = await import("../../backend/src/lib/account-selection-events");
     const stopBroken = subscribeAccountSelections(() => { throw new Error("disconnected consumer"); });
     const seen: unknown[] = [];
     const stopHealthy = subscribeAccountSelections(event => seen.push(event));

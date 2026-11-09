@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, jest, spyOn, test } from "bun:
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountQuota, flushQuotaObservationsForTests, setAccountQuotaFromParsed } from "../../src/codex/quota";
+import { clearAccountQuota, flushQuotaObservationsForTests, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;

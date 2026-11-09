@@ -23,7 +23,7 @@ import {
   normalizeCursorModels,
   recordObservedCursorContextWindow,
   resetObservedCursorContextWindowsForTests,
-} from "../../../src/adapters/cursor/discovery";
+} from "../../../backend/src/adapters/cursor/discovery";
 
 describe("Cursor discovery metadata", () => {
   test("no-vision list is a curated explicit subset of the static seed", () => {

@@ -4,7 +4,7 @@ import {
   rewriteRoutedCustomToolsForUpstream,
   RoutedCustomToolCompatError,
   validateFinalCustomToolCompatibility,
-} from "../../src/responses/custom-tool-compat";
+} from "../../backend/src/responses/custom-tool-compat";
 
 function convertedInputDescription(name: string): string | undefined {
   const result = rewriteRoutedCustomToolsForUpstream({

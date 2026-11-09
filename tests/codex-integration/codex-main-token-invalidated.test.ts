@@ -2,19 +2,19 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
 import {
   clearAccountNeedsReauth, clearMainAccountInfoCache, isAccountNeedsReauth, markAccountNeedsReauth,
   type CodexAuthAccountDto,
-} from "../../src/codex/auth-api";
-import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../src/codex/main-account";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { isTerminalMainAuthResponse } from "../../src/codex/auth-api/main-account-probe";
-import { projectCodexQuotaRefreshOutcome } from "../../src/codex/quota-refresh-outcome";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-api";
+import { MAIN_CODEX_ACCOUNT_ID, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { isTerminalMainAuthResponse } from "../../backend/src/codex/auth-api/main-account-probe";
+import { projectCodexQuotaRefreshOutcome } from "../../backend/src/codex/quota-refresh-outcome";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // ChatGPT revokes every session of an account whose plan changes (Pro to Free), and the usage

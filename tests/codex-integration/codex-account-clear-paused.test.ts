@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { getDefaultConfig, loadConfig } from "../../src/config";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { pinnedCodexAccountId, setCodexAccountPin } from "../../src/codex/account-priority";
+import { getDefaultConfig, loadConfig } from "../../backend/src/config";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { pinnedCodexAccountId, setCodexAccountPin } from "../../backend/src/codex/account-priority";
 import { createTempHome } from "../helpers/temp-home";
 
 let home: ReturnType<typeof createTempHome>;

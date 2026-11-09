@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { stripProviderInputItemMetadata } from "../../src/adapters/openai-responses/request-strips";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { parseRequest } from "../../src/responses/parser";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses/passthrough";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { stripProviderInputItemMetadata } from "../../backend/src/adapters/openai-responses/request-strips";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const extra = { google: { thought_signature: "synthetic-history-signature-7111" } };
 const call = { type: "function_call", call_id: "call_probe", name: "probe", arguments: '{"value":1}' };

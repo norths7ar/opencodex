@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createAnthropicInstanceFixture, type AnthropicInstanceFixture } from "../helpers/anthropic-instance-fixture";
-import type { OcxProviderConfig } from "../../src/types";
+import type { OcxProviderConfig } from "../../backend/src/types";
 let fixture: AnthropicInstanceFixture;
-let auth: typeof import("../../src/sidecar/auth");
-let binding: typeof import("../../src/sidecar/anthropic-binding");
+let auth: typeof import("../../backend/src/sidecar/auth");
+let binding: typeof import("../../backend/src/sidecar/anthropic-binding");
 beforeEach(async () => {
   fixture = await createAnthropicInstanceFixture();
   await fixture.seed();
-  auth = await import("../../src/sidecar/auth");
-  binding = await import("../../src/sidecar/anthropic-binding");
+  auth = await import("../../backend/src/sidecar/auth");
+  binding = await import("../../backend/src/sidecar/anthropic-binding");
 });
 afterEach(async () => { await fixture?.dispose(); });
 
 test("generated descriptions cache within one instance but not across pools", async () => {
-  const vision = await import("../../src/vision");
-  const { parseRequest } = await import("../../src/responses/parser");
+  const vision = await import("../../backend/src/vision");
+  const { parseRequest } = await import("../../backend/src/responses/parser");
   vision.resetVisionDescriptionCache();
   const calls: string[] = [];
   globalThis.fetch = (async (_url, init) => {
@@ -108,8 +108,8 @@ test("a paused active account does not make a pool with another usable account u
 });
 
 test("vision planner turns an unavailable selected pool into no plan instead of failing the request", async () => {
-  const vision = await import("../../src/vision");
-  const { parseRequest } = await import("../../src/responses/parser");
+  const vision = await import("../../backend/src/vision");
+  const { parseRequest } = await import("../../backend/src/responses/parser");
   await fixture.store.mutateStore(store => { delete store.anthropic2; });
   fixture.config.visionSidecar = { backend: "anthropic", anthropicInstance: "anthropic2" };
   const target: OcxProviderConfig = { ...fixture.config.providers.anthropic!, modelCapabilities: { [fixture.model]: { inputModalities: ["text"] } } };

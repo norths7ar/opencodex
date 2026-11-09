@@ -21,10 +21,10 @@
  *    accepting either an OpenAI-style `{ data: [...] }` body or a bare array.
  */
 import { describe, expect, test } from "bun:test";
-import { getAccountCredential, getAccountSet, getCredential } from "../../src/oauth/store";
-import { NOUS_INFERENCE_BASE_URL, refreshNousToken } from "../../src/oauth/nous";
-import { refreshGenericAccountWithLock } from "../../src/oauth/index";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import { getAccountCredential, getAccountSet, getCredential } from "../../backend/src/oauth/store";
+import { NOUS_INFERENCE_BASE_URL, refreshNousToken } from "../../backend/src/oauth/nous";
+import { refreshGenericAccountWithLock } from "../../backend/src/oauth/index";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 
 const LIVE = process.env.NOUS_LIVE_TEST === "1";
 

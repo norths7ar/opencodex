@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { validateConfigCandidate } from "../../src/config";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { validateConfigCandidate } from "../../backend/src/config";
 import {
   canonicalFastTierMarker,
   cloneFastWire,
@@ -10,9 +10,9 @@ import {
   tierValueAfterDecision,
   type FastPolicyAuthority,
   type ResolvedFastPolicy,
-} from "../../src/providers/fastwire";
-import { captureFastPolicyAuthority, fastPolicyForModel } from "../../src/providers/service-tier";
-import { PROVIDER_REGISTRY, providerRegistryFastWireError } from "../../src/providers/registry";
+} from "../../backend/src/providers/fastwire";
+import { captureFastPolicyAuthority, fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { PROVIDER_REGISTRY, providerRegistryFastWireError } from "../../backend/src/providers/registry";
 import {
   captureWireAdapterHardPins,
   captureWireAdapterHardPinPrefixes,
@@ -21,7 +21,7 @@ import {
   type OcxConfig,
   type OcxParsedRequest,
   type TierDecision,
-} from "../../src/types";
+} from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const MODEL = "model";

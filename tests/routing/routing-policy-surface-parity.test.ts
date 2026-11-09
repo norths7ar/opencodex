@@ -3,13 +3,13 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { anthropicToResponsesTranslation } from "../../src/claude/inbound";
-import { evidenceFromBody } from "../../src/routing/request-evidence";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import { clearRequestLogsForTests, type RequestLogContext } from "../../src/server/request-log";
-import { readUsageEntries } from "../../src/usage/log";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
+import { evidenceFromBody } from "../../backend/src/routing/request-evidence";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { clearRequestLogsForTests, type RequestLogContext } from "../../backend/src/server/request-log";
+import { readUsageEntries } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
@@ -113,7 +113,7 @@ describe("routing policy request evidence parity (translator-level coverage)", (
 
 // ---- Handler-level parity tests (via dev handler entry points) ----
 
-const actualResolver = await import("../../src/server/adapter-resolve");
+const actualResolver = await import("../../backend/src/server/adapter-resolve");
 // Capture the real function before the override. `mock.module` rewrites the namespace's live
 // binding in place, so a lookup through `actualResolver` inside the wrapper would reach
 // whichever override is current, including this one, once another file in the same process
@@ -121,16 +121,16 @@ const actualResolver = await import("../../src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 let adapterFactory: ((provider: OcxProviderConfig) => ProviderAdapter) | undefined;
 
-mock.module("../../src/server/adapter-resolve", () => ({
+mock.module("../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     return adapterFactory?.(provider) ?? actualResolveAdapter(provider, cacheRetention);
   },
 }));
 
-const { handleResponses, handleResponsesCompact } = await import("../../src/server/responses");
-const { handleChatCompletions } = await import("../../src/server/chat-completions");
-const { handleClaudeMessages } = await import("../../src/server/claude-messages");
+const { handleResponses, handleResponsesCompact } = await import("../../backend/src/server/responses");
+const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
+const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
 let releaseSpendHome: (() => void) | undefined;
 
 // Taken only by handler rows whose fixture adapter produces a dispatched response.

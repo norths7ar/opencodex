@@ -2,13 +2,13 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createFinalRequestLog } from "../../src/server/inference/final-log";
+import { createFinalRequestLog } from "../../backend/src/server/inference/final-log";
 import {
   clearRequestLogsForTests,
   getRequestLogEntries,
   type RequestLogContext,
-} from "../../src/server/request-log";
-import { resetUsageReadCacheForTests } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { resetUsageReadCacheForTests } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function withIsolatedLogs(run: () => void): void {

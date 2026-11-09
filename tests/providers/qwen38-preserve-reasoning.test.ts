@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   return {
@@ -103,7 +103,7 @@ describe("Qwen 3.8 reasoning_content preservation", () => {
   });
 
   test("registry includes qwen3.8-max in alibaba-token-plan preserveReasoningContentModels", async () => {
-    const { PROVIDER_REGISTRY } = await import("../../src/providers/registry");
+    const { PROVIDER_REGISTRY } = await import("../../backend/src/providers/registry");
     const alibaba = PROVIDER_REGISTRY.find(e => e.id === "alibaba-token-plan");
     expect(alibaba).toBeDefined();
     expect(alibaba!.preserveReasoningContentModels).toContain("qwen3.8-max");

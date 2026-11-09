@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { isAntigravityModelNotFoundRefusal } from "../../src/server/responses/antigravity-validation-refusal";
-import { fetchAntigravityWithRetry } from "../../src/adapters/google-http";
+import { isAntigravityModelNotFoundRefusal } from "../../backend/src/server/responses/antigravity-validation-refusal";
+import { fetchAntigravityWithRetry } from "../../backend/src/adapters/google-http";
 
 const model = "gemini-3.8-flash";
 async function normalized(body: string | ReadableStream<Uint8Array>, status = 404): Promise<Response> {

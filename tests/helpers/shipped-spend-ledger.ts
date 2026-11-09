@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { fixturePath, repoPath } from "./repo-root";
-import { DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal, type SpendReservationPolicy } from "../../src/lib/spend-reservation-ledger";
+import { DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal, type SpendReservationPolicy } from "../../backend/src/lib/spend-reservation-ledger";
 
 // Freeze the complete shipped module; adapt relative imports only, never accounting code.
 const source = readFileSync(fixturePath("spend-ledger-2-80-0.ts.txt"), "utf8");
@@ -11,9 +11,9 @@ if (createHash("sha256").update(source).digest("hex") !== "fccd58e3e70fde8c4e0b0
   throw new Error("Shipped spend-ledger fixture changed");
 }
 const adapted = source.replace(/from "(\.[^"]+)"/g, (_, specifier: string) =>
-  `from ${JSON.stringify(pathToFileURL(resolve(repoPath("src/lib"), specifier + ".ts")).href)}`);
+  `from ${JSON.stringify(pathToFileURL(resolve(repoPath("backend/src/lib"), specifier + ".ts")).href)}`);
 const code = new Bun.Transpiler({ loader: "ts", target: "bun" }).transformSync(adapted);
-type ShippedModule = Pick<typeof import("../../src/lib/spend-reservation-ledger"), "createSpendReservationLedger" | "parseSpendJournalRecord" | "DEFAULT_SPEND_RESERVATION_POLICY">;
+type ShippedModule = Pick<typeof import("../../backend/src/lib/spend-reservation-ledger"), "createSpendReservationLedger" | "parseSpendJournalRecord" | "DEFAULT_SPEND_RESERVATION_POLICY">;
 const shipped = await import(`data:text/javascript;base64,${Buffer.from(code).toString("base64")}`) as ShippedModule;
 export const loadShippedSpendLedger = (): ShippedModule => shipped;
 export const createShippedSpendLedger = shipped.createSpendReservationLedger;

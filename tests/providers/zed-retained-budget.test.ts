@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { createZedAdapter, type ZedProvider } from "../../src/adapters/zed";
-import { createTranslatorBudget, releaseTranslatedEvent, TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
-import { clearZedCaches } from "../../src/providers/zed";
-import { buildResponseJSON } from "../../src/bridge";
-import { parseRequest } from "../../src/responses/parser";
+import { createZedAdapter, type ZedProvider } from "../../backend/src/adapters/zed";
+import { createTranslatorBudget, releaseTranslatedEvent, TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
+import { clearZedCaches } from "../../backend/src/providers/zed";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { parseRequest } from "../../backend/src/responses/parser";
 
 const families: ZedProvider[] = ["anthropic", "google", "open_ai", "x_ai"];
 afterEach(clearZedCaches);

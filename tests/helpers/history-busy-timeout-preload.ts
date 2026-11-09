@@ -13,7 +13,7 @@
  * module reads that variable or imports this file. The retry count, the lock, the failure
  * classification, and the reported envelope are all untouched: only the length of a sleep changes.
  */
-import { setHistoryDbBusyTimeoutForTests } from "../../src/codex/history-provider";
+import { setHistoryDbBusyTimeoutForTests } from "../../backend/src/codex/history-provider";
 
 export const HISTORY_BUSY_TIMEOUT_ENV = "OCX_TEST_HISTORY_BUSY_TIMEOUT_MS";
 

@@ -1,5 +1,5 @@
-import { clearModelCache } from "../../src/codex/model-cache";
-import { PROVIDER_REGISTRY, type ProviderModelDiscoverySpec } from "../../src/providers/registry";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { PROVIDER_REGISTRY, type ProviderModelDiscoverySpec } from "../../backend/src/providers/registry";
 
 interface RegistryDiscoveryOverrides {
   preserveCustomDestination?: boolean;

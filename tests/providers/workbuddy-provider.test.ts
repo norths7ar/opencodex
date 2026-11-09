@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createTempHome } from "../helpers/temp-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { saveCredential, getCredential } from "../../src/oauth/store";
-import { buildModelsRequest, getValidAccessTokenSnapshot, OAUTH_PROVIDERS } from "../../src/oauth";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { extractProviderModelItems, resolveProviderModelDiscovery } from "../../src/providers/model-discovery";
-import { handleResponses } from "../../src/server/responses";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { credentialPinnedProviderConfigError } from "../../src/config/provider-validation";
-import { routeModel } from "../../src/router";
-import type { OAuthCredentials } from "../../src/oauth/types";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { saveCredential, getCredential } from "../../backend/src/oauth/store";
+import { buildModelsRequest, getValidAccessTokenSnapshot, OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { extractProviderModelItems, resolveProviderModelDiscovery } from "../../backend/src/providers/model-discovery";
+import { handleResponses } from "../../backend/src/server/responses";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { credentialPinnedProviderConfigError } from "../../backend/src/config/provider-validation";
+import { routeModel } from "../../backend/src/router";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 let home: ReturnType<typeof createTempHome>, release: () => void;

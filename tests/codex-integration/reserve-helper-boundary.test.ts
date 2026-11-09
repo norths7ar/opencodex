@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, mock, spyOn, test } from "bun:test";
-import { describeImage } from "../../src/vision/describe";
-import { planVisionSidecar } from "../../src/vision";
-import { runWebSearch } from "../../src/web-search/executor";
-import { planWebSearch } from "../../src/web-search";
-import * as sidecarAuth from "../../src/sidecar/auth";
-import { parseRequest } from "../../src/responses/parser";
-import { handleSearch } from "../../src/server/search";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
+import { describeImage } from "../../backend/src/vision/describe";
+import { planVisionSidecar } from "../../backend/src/vision";
+import { runWebSearch } from "../../backend/src/web-search/executor";
+import { planWebSearch } from "../../backend/src/web-search";
+import * as sidecarAuth from "../../backend/src/sidecar/auth";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { handleSearch } from "../../backend/src/server/search";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
 
 const forward: OcxProviderConfig = {
   adapter: "openai-responses", authMode: "forward", baseUrl: "https://chatgpt.com/backend-api/codex",

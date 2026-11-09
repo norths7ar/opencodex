@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { createGoogleAdapter } from "../../src/adapters/google";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { createGoogleAdapter } from "../../backend/src/adapters/google";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { createTranslatorBudget, translatorObservedBufferSnapshot } from "../../src/lib/translator-budget";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
+import { createTranslatorBudget, translatorObservedBufferSnapshot } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * `JSON.parse("null")` returns `null` without throwing, so a `try/catch` around a body parse

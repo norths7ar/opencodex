@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import * as stateStores from "../../src/lib/state-store-registrations";
-import * as mutationLock from "../../src/config/mutation-lock";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import { handleProviderRoutes } from "../../src/server/management/provider-routes";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import * as stateStores from "../../backend/src/lib/state-store-registrations";
+import * as mutationLock from "../../backend/src/config/mutation-lock";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { handleProviderRoutes } from "../../backend/src/server/management/provider-routes";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const canonical = {

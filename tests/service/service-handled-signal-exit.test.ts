@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { handledSignalExitCode } from "../../src/lib/handled-signal-exit";
+import { handledSignalExitCode } from "../../backend/src/lib/handled-signal-exit";
 import { repoPath } from "../helpers/repo-root";
 
 describe("handled signal exit code", () => {
@@ -14,7 +14,7 @@ describe("handled signal exit code", () => {
   });
 
   test("the proxy routes its signal shutdown through it", () => {
-    const cli = readFileSync(repoPath("src/cli/index.ts"), "utf8");
+    const cli = readFileSync(repoPath("backend/src/cli/index.ts"), "utf8");
     expect(cli).toContain("process.exit(restored && shutdownSucceeded ? handledSignalExitCode(signal) : 1);");
   });
 });

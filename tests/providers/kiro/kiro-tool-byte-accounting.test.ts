@@ -1,8 +1,8 @@
 import { expect, spyOn, test } from "bun:test";
-import { parseKiroStream } from "../../../src/adapters/kiro/stream";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { AdapterEvent } from "../../../src/types";
+import { parseKiroStream } from "../../../backend/src/adapters/kiro/stream";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { AdapterEvent } from "../../../backend/src/types";
 
 /** Exercise the real Smithy decoder and Kiro parser without a provider request. */
 function responseFor(calls: string[][]): Response {

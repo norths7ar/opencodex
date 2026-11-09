@@ -3,12 +3,12 @@
  * read 2026-10-08): adaptive only, explicit disable at high effort or below, forced tools accepted.
  */
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
 import {
   rejectsForcedToolChoice, rejectsSamplingParameters, sidecarThinkingOff,
   supportsExplicitThinkingDisable, usesAdaptiveThinking, usesBetweenToolsFloor,
-} from "../../../src/adapters/anthropic-model-contract";
-import type { OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../src/types";
+} from "../../../backend/src/adapters/anthropic-model-contract";
+import type { OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../backend/src/types";
 
 const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as OcxProviderConfig;
 const TOOL = { name: "lookup", description: "Look something up", parameters: { type: "object", properties: {} } } as OcxTool;

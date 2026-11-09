@@ -3,27 +3,27 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import http2 from "node:http2";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer as startProxyServer } from "../../src/server";
-import { noteSubagentModelFailure, resetSubagentModelFallbackStateForTests } from "../../src/codex/subagent-model-fallback";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import { saveConfig } from "../../backend/src/config";
+import { startServer as startProxyServer } from "../../backend/src/server";
+import { noteSubagentModelFailure, resetSubagentModelFallbackStateForTests } from "../../backend/src/codex/subagent-model-fallback";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 import {
   acquireNativeMainProfileDrain,
   getNativeMainProfileRequestCount,
-} from "../../src/server/lifecycle";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
-import type { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
+import type { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import type { OcxConfig } from "../../backend/src/types";
 import { ownedServiceHomeInspection } from "../helpers/owned-service-home-inspection";
 import { removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
-import { resetVisionDescriptionCache } from "../../src/vision";
+import { resetVisionDescriptionCache } from "../../backend/src/vision";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
 
 // Every case starts a real server; on Windows its config-dir ACL work alone can exceed 5 s.
 setDefaultTimeout(SERVER_BUDGET_MS);
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 
 /**
  * Issue #2132: bearer admission must not require a stored ChatGPT credential.

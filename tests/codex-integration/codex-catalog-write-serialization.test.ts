@@ -8,12 +8,12 @@ import {
   isCatalogWritePermitLive,
   withCatalogWriteSerialization,
   type CatalogWritePermit,
-} from "../../src/codex/catalog-write-serialization";
+} from "../../backend/src/codex/catalog-write-serialization";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /** Every K acquisition states its intent (#6529); these tests exercise the lock, not the intent. */

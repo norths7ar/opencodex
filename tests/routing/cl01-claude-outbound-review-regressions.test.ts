@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 async function collect(stream: ReadableStream<Uint8Array>): Promise<string> {
   const reader = stream.getReader();

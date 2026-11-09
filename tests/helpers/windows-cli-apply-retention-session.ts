@@ -5,11 +5,11 @@ import { join, relative, isAbsolute } from "node:path";
 import { tmpdir } from "node:os";
 import { createCodexCliTestRoot } from "./codex-cli-fixture-root";
 import { trustWindowsTempFixtureAncestry, windowsTempAncestryPreload } from "./windows-temp-ancestry";
-import { hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
-import { admitCodexCliUpdateJob, readCodexCliUpdateJob, runCodexCliUpdateJob } from "../../src/codex/cli-update-job";
+import { hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
+import { admitCodexCliUpdateJob, readCodexCliUpdateJob, runCodexCliUpdateJob } from "../../backend/src/codex/cli-update-job";
 import { runCodexCliUpdateApplyInWorker, codexCliUpdateUnjoinedWorkerCount,
-  codexCliUpdateUnjoinedWorkerClosedTotal } from "../../src/codex/cli-update-job-worker";
-import type { CodexCliApplyResult } from "../../src/codex/cli-update-apply";
+  codexCliUpdateUnjoinedWorkerClosedTotal } from "../../backend/src/codex/cli-update-job-worker";
+import type { CodexCliApplyResult } from "../../backend/src/codex/cli-update-apply";
 
 export const ACTUAL_APPLY_SOURCE = "ea4a38ec513cc18179989833fe8290a6d1ba737d";
 const OFFICIAL_BUN = "CB1D8E6564E655E49D30CEAD359750A1CBBD12F42651CAA4B62244D7BD93C244";

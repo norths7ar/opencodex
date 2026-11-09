@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { startHistoryMigrationGuardian } from "../../src/codex/history-migration-guardian";
+import { startHistoryMigrationGuardian } from "../../backend/src/codex/history-migration-guardian";
 
 /**
  * Manual scheduler: collects scheduled callbacks so tests drive ticks

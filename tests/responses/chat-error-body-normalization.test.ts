@@ -1,10 +1,10 @@
 import { afterAll, expect, test } from "bun:test";
-import { nativeChatSse } from "../../src/server/chat-native-sse";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { foldChatCompletion } from "../../src/protocols/encoders/chat";
-import { formatErrorResponse } from "../../src/bridge/errors";
+import { nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { foldChatCompletion } from "../../backend/src/protocols/encoders/chat";
+import { formatErrorResponse } from "../../backend/src/bridge/errors";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 const releaseSpendHome = acquireOwnedSpendHome();
@@ -129,8 +129,8 @@ for (const mode of ["json-error", "transport"] as const) test(`native upstream $
 });
 
 test("listener retains CORS and the proxy log id on normalized Chat errors", async () => {
-  const { saveConfig } = await import("../../src/config");
-  const { startServer } = await import("../../src/server");
+  const { saveConfig } = await import("../../backend/src/config");
+  const { startServer } = await import("../../backend/src/server");
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => Response.json({ error: { message: KEY, type: KEY, code: KEY } }, { status: 401, headers: { "x-request-id": KEY, "retry-after": KEY } }) });
   saveConfig({ port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key", apiKey: KEY, models: ["model"] } } });
   const server = startServer(0);
@@ -145,7 +145,7 @@ test("listener retains CORS and the proxy log id on normalized Chat errors", asy
 });
 
 test("Responses ingress retains its translated upstream error message", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
+  const { handleResponses } = await import("../../backend/src/server/responses");
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => Response.json({ error: { message: `invalid api key ${KEY}`, type: "authentication_error", code: "invalid_api_key" } }, { status: 401 }) });
   try {
     const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key", apiKey: "fixture-key" } } };
@@ -176,9 +176,9 @@ function completionFacts(value: Record<string, unknown>) {
   return facts;
 }
 async function flatNativeObservation(event: FlatEvent, postOutput: boolean) {
-  const { collectChatCompletion, isChatCompletionsStreamError } = await import("../../src/chat/outbound");
+  const { collectChatCompletion, isChatCompletionsStreamError } = await import("../../backend/src/chat/outbound");
   const terminals: Array<{ status: number; message?: string }> = [];
-  const sink: import("../../src/chat/failure-verdict").FailureVerdictSink = {};
+  const sink: import("../../backend/src/chat/failure-verdict").FailureVerdictSink = {};
   const fixture = flatFixture(event, postOutput);
   const legacy = await collectChatCompletion(bytes(fixture.legacy), "fixture", createTestTranslatorBudget());
   const [wire, buffered] = nativeChatSse(bytes(fixture.input), { requestedModel: "fixture", translatorBudget: createTestTranslatorBudget(),
@@ -187,7 +187,7 @@ async function flatNativeObservation(event: FlatEvent, postOutput: boolean) {
     try { return { status: 200, completion: completionFacts(await collectChatCompletion(buffered, "fixture", createTestTranslatorBudget(), sink)) }; }
     catch (error) {
       expect(isChatCompletionsStreamError(error)).toBe(true);
-      const failure = error as import("../../src/chat/outbound").ChatCompletionsStreamError;
+      const failure = error as import("../../backend/src/chat/outbound").ChatCompletionsStreamError;
       return { status: failure.status, type: failure.type, code: failure.code };
     }
   })()]);
@@ -228,8 +228,8 @@ test("translated errors select condition wording despite an upstream local-refus
 });
 
 async function flatEndpointExchange(combo: boolean, stream: boolean, flat: boolean, withContent = false, withMetadata = false, deltaOverride: Record<string, unknown> = {}, early?: { form: EarlyErrorForm; ending: "done" | "eof" }) {
-  const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
-  const { getRequestLogEntries } = await import("../../src/server/request-log"); clearKeyCooldowns();
+  const { clearKeyCooldowns } = await import("../../backend/src/providers/key-failover");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log"); clearKeyCooldowns();
   const sends: string[] = [];
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(req) {
     const body = await req.json() as { model: string }; sends.push(body.model);
@@ -241,7 +241,7 @@ async function flatEndpointExchange(combo: boolean, stream: boolean, flat: boole
     const row = { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key" as const, apiKey: KEY, transientRetryOn5xx: { attempts: 1 } };
     const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: row, backup: { ...row, apiKey: "fixture-backup" } },
       combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "first" }, { provider: "backup", model: "backup" }] } }, protocols: { rollout: { } } };
-    const ctx: import("../../src/server/request-log").RequestLogContext = { model: "", provider: "" };
+    const ctx: import("../../backend/src/server/request-log").RequestLogContext = { model: "", provider: "" };
     const requestId = `flat-relay-${crypto.randomUUID()}`;
     const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: combo ? "combo/fixture" : "fixture/first", stream, messages: [{ role: "user", content: "hi" }] }) }), config, ctx, { requestId, start: Date.now() });
     const text = await response.text();
@@ -271,7 +271,7 @@ for (const stream of [false, true]) for (const metric of ["buffered endpoint", "
 });
 
 async function collectFlatMetadata(chunk: Record<string, unknown>) {
-  const { ChatCompletionsCollectorSource, collectChatCompletion } = await import("../../src/chat/outbound");
+  const { ChatCompletionsCollectorSource, collectChatCompletion } = await import("../../backend/src/chat/outbound");
   const budget = createTestTranslatorBudget();
   const source = new ChatCompletionsCollectorSource(budget);
   const payload = { message: "The provider failed to complete the request.", type: "server_error", code: null, param: null };
@@ -335,7 +335,7 @@ test("buffered flat metadata projection preserves numeric log facts", async () =
   expect(current.text).not.toContain(KEY);
 });
 for (const event of ["error", KEY]) test(`flat event framing uses only the fixed error name: ${event}`, async () => {
-  const sink: import("../../src/chat/failure-verdict").FailureVerdictSink = {};
+  const sink: import("../../backend/src/chat/failure-verdict").FailureVerdictSink = {};
   const terminals: number[] = [];
   const payload = { type: "error", message: KEY, code: KEY, param: KEY };
   const text = await new Response(nativeChatSse(bytes(`event: ${event}\nid: ${KEY}\nretry: ${KEY}\n: ${KEY}\n${frame(payload)}data: [DONE]\n\n`), {
@@ -378,7 +378,7 @@ function flatCompletionDelta(details: Record<string, unknown>, diagnostics = fal
 }
 for (const [name, details] of Object.entries(flatReasoningFixtures)) {
   test(`flat reasoning content matches the base collector: ${name}`, async () => {
-    const { collectChatCompletion } = await import("../../src/chat/outbound");
+    const { collectChatCompletion } = await import("../../backend/src/chat/outbound");
     const clean = { usage: numericFlatUsage, service_tier: "default", choices: [{ index: 0, finish_reason: "stop", delta: flatCompletionDelta(details) }] };
     const legacy = await collectChatCompletion(bytes(frame(clean) + "data: [DONE]\n\n"), "fixture", createTestTranslatorBudget());
     const current = await collectFlatMetadata({ ...clean, choices: [{ index: 0, finish_reason: "stop", delta: flatCompletionDelta(details, true) }] });
@@ -410,7 +410,7 @@ test("flat summary entries keep text while excluding invalid primitives and diag
   expect(JSON.stringify(body)).not.toContain(KEY);
 });
 test("flat native capture retains the reasoning alias while buffered content matches base", async () => {
-  const { ChatCompletionsCollectorSource, collectChatCompletion } = await import("../../src/chat/outbound");
+  const { ChatCompletionsCollectorSource, collectChatCompletion } = await import("../../backend/src/chat/outbound");
   const delta = { role: "assistant", content: "Answer.", reasoning: "Capture-only reasoning.",
     function_call: { name: "legacy", arguments: "{}" },
     tool_calls: [{ index: 0, id: "fixture-call", type: "function", function: { name: "lookup", arguments: "{}" } }] };
@@ -445,11 +445,11 @@ function earlyErrorTranscript(form: EarlyErrorForm, event: string, ending: "done
   return earlyErrorBlock(form, event) + after;
 }
 async function earlyNativeObservation(form: EarlyErrorForm, event: string, ending: "done" | "eof") {
-  const { collectChatCompletion, isChatCompletionsStreamError } = await import("../../src/chat/outbound");
+  const { collectChatCompletion, isChatCompletionsStreamError } = await import("../../backend/src/chat/outbound");
   const input = new TextEncoder().encode(earlyErrorTranscript(form, event, ending)); let offset = 0;
   const cancelled: unknown[] = []; const terminals: Array<{ status: number; message?: string }> = [];
   const chunks: Record<string, unknown>[] = []; const usages: unknown[] = [];
-  const sink: import("../../src/chat/failure-verdict").FailureVerdictSink = {};
+  const sink: import("../../backend/src/chat/failure-verdict").FailureVerdictSink = {};
   const body = new ReadableStream<Uint8Array>({ pull(controller) {
     if (offset >= input.length) controller.close(); else { controller.enqueue(input.slice(offset, offset + 7)); offset += 7; }
   }, cancel(reason) { cancelled.push(reason instanceof Error ? reason.message : reason); } });
@@ -462,7 +462,7 @@ async function earlyNativeObservation(form: EarlyErrorForm, event: string, endin
     try { return { status: 200, completion: completionFacts(await collectChatCompletion(buffered, "fixture", createTestTranslatorBudget(), sink)) }; }
     catch (error) {
       expect(isChatCompletionsStreamError(error)).toBe(true);
-      const failure = error as import("../../src/chat/outbound").ChatCompletionsStreamError;
+      const failure = error as import("../../backend/src/chat/outbound").ChatCompletionsStreamError;
       return { status: failure.status, type: failure.type, code: failure.code, message: failure.message };
     }
   })()]);
@@ -504,7 +504,7 @@ for (const error of [null, undefined]) test(`empty choice error retains ordinary
     onUsage() {}, onTerminal(status) { terminals.push(status); } })).text();
   expect(terminals).toEqual([200]);
   expect(output).toBe(ordinary);
-  const { collectChatCompletion } = await import("../../src/chat/outbound");
+  const { collectChatCompletion } = await import("../../backend/src/chat/outbound");
   const base = await collectChatCompletion(bytes(ordinary), "fixture", createTestTranslatorBudget());
   const actual = await collectChatCompletion(bytes(output), "fixture", createTestTranslatorBudget());
   expect(actual.choices).toEqual(base.choices);
@@ -569,7 +569,7 @@ for (const stream of [true, false]) test(`null choice error keeps full-handler S
     const text = await response.text();
     if (stream) expect(text).toBe(ordinary);
     else {
-      const { collectChatCompletion } = await import("../../src/chat/outbound");
+      const { collectChatCompletion } = await import("../../backend/src/chat/outbound");
       const base = await collectChatCompletion(bytes(ordinary), "fixture/model", createTestTranslatorBudget());
       expect(JSON.parse(text).choices).toEqual(base.choices);
       expect(JSON.parse(text).choices[0].message.content).toBe("normal answer");
@@ -579,8 +579,8 @@ for (const stream of [true, false]) test(`null choice error keeps full-handler S
 });
 
 for (const stream of [false, true]) test(`direct encoder retains an identified local recovery refusal stream=${stream}`, async () => {
-  const { rememberProxyErrorMessage } = await import("../../src/lib/client-error-body");
-  const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
+  const { rememberProxyErrorMessage } = await import("../../backend/src/lib/client-error-body");
+  const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
   const context = {}; const message = "owned local api key refusal";
   rememberProxyErrorMessage(context, message, { status: 401, type: "authentication_error", code: "invalid_api_key" });
   const options = { model: "fixture", translatorBudget: createTestTranslatorBudget(), proxyErrorContext: context };
@@ -596,8 +596,8 @@ for (const stream of [false, true]) test(`direct encoder retains an identified l
 });
 
 for (const stream of [false, true]) test(`copied recovery metadata cannot claim a local message stream=${stream}`, async () => {
-  const { rememberProxyErrorMessage } = await import("../../src/lib/client-error-body");
-  const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
+  const { rememberProxyErrorMessage } = await import("../../backend/src/lib/client-error-body");
+  const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
   const context = {}; const message = "owned local api key refusal";
   rememberProxyErrorMessage(context, message, { status: 401, type: "authentication_error", code: "invalid_api_key" });
   const options = { model: "fixture", translatorBudget: createTestTranslatorBudget(), proxyErrorContext: context };
@@ -615,8 +615,8 @@ for (const stream of [false, true]) test(`copied recovery metadata cannot claim 
 });
 
 for (const stream of [false, true]) test(`copied local message cannot claim different error fields stream=${stream}`, async () => {
-  const { rememberProxyErrorMessage, CLIENT_ERROR_CONTRACTS } = await import("../../src/lib/client-error-body");
-  const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
+  const { rememberProxyErrorMessage, CLIENT_ERROR_CONTRACTS } = await import("../../backend/src/lib/client-error-body");
+  const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
   const context = {}; const message = "owned local api key refusal";
   rememberProxyErrorMessage(context, message, { status: 401, type: "authentication_error", code: "invalid_api_key" });
   const options = { model: "fixture", translatorBudget: createTestTranslatorBudget(), proxyErrorContext: context };
@@ -635,10 +635,10 @@ for (const stream of [false, true]) test(`copied local message cannot claim diff
 for (const reason of ["adapter_eof", "upstream_stall_timeout", "missing_terminal_event"]) {
   for (const route of ["direct", "translated", "passthrough"] as const) {
     test(`copied incomplete sentence stays upstream-derived reason=${reason} route=${route}`, async () => {
-      const { CLIENT_ERROR_CONTRACTS } = await import("../../src/lib/client-error-body");
-      const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
-      const { bridgeToResponsesSSE } = await import("../../src/bridge");
-      const { responsesSseToChatCompletionsSse } = await import("../../src/chat/outbound");
+      const { CLIENT_ERROR_CONTRACTS } = await import("../../backend/src/lib/client-error-body");
+      const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
+      const { bridgeToResponsesSSE } = await import("../../backend/src/bridge");
+      const { responsesSseToChatCompletionsSse } = await import("../../backend/src/chat/outbound");
       const message = `upstream stream ended early (${reason})`;
       const events: AdapterEvent[] = [{ type: "incomplete", reason, message }];
       const context = {};
@@ -659,7 +659,7 @@ for (const reason of ["adapter_eof", "upstream_stall_timeout", "missing_terminal
 }
 
 for (const buffered of [false, true]) test(`bridge undeclared refusal uses proxy wording buffered=${buffered}`, async () => {
-  const { bridgeToResponsesSSE, buildResponseJSON } = await import("../../src/bridge");
+  const { bridgeToResponsesSSE, buildResponseJSON } = await import("../../backend/src/bridge");
   const events: AdapterEvent[] = [{ type: "tool_call_start", id: "call_fixture", name: KEY }, { type: "done" }];
   const replay = async function* () { yield* events; };
   const options = { translatorBudget: createTestTranslatorBudget(), declaredToolNames: new Set<string>() };
@@ -677,7 +677,7 @@ for (const buffered of [false, true]) test(`bridge undeclared refusal uses proxy
 
 for (const reason of ["adapter_eof", "upstream_stall_timeout", "missing_terminal_event"]) for (const stream of [false, true]) {
   test(`upstream incomplete copy is normalized by the full Chat handler reason=${reason} stream=${stream}`, async () => {
-    const { CLIENT_ERROR_CONTRACTS } = await import("../../src/lib/client-error-body");
+    const { CLIENT_ERROR_CONTRACTS } = await import("../../backend/src/lib/client-error-body");
     const message = `upstream stream ended early (${reason})`;
     const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => new Response(
       "event: response.incomplete\n" + frame({ type: "response.incomplete", response: { id: "resp_incomplete", status: "incomplete", output: [], incomplete_details: { reason, message } } }),
@@ -700,9 +700,9 @@ for (const reason of ["adapter_eof", "upstream_stall_timeout", "missing_terminal
 }
 
 test("a genuine bridge EOF retains its message through a request-owned wrapper", async () => {
-  const { bridgeToResponsesSSE } = await import("../../src/bridge");
-  const { responsesSseToChatCompletionsSse } = await import("../../src/chat/outbound");
-  const { hasProxyIncomplete } = await import("../../src/lib/client-error-body");
+  const { bridgeToResponsesSSE } = await import("../../backend/src/bridge");
+  const { responsesSseToChatCompletionsSse } = await import("../../backend/src/chat/outbound");
+  const { hasProxyIncomplete } = await import("../../backend/src/lib/client-error-body");
   const context = {};
   const budget = createTestTranslatorBudget();
   const bridge = bridgeToResponsesSSE((async function* () {})(), "fixture", undefined, undefined, undefined, undefined, 2_000,
@@ -719,10 +719,10 @@ test("a genuine bridge EOF retains its message through a request-owned wrapper",
 });
 
 for (const direct of [false, true]) test(`Zed generated EOF keeps its proxy origin direct=${direct}`, async () => {
-  const { translateZedOpenAiStream } = await import("../../src/adapters/zed-openai-stream");
-  const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
-  const { bridgeToResponsesSSE } = await import("../../src/bridge");
-  const { responsesSseToChatCompletionsSse } = await import("../../src/chat/outbound");
+  const { translateZedOpenAiStream } = await import("../../backend/src/adapters/zed-openai-stream");
+  const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
+  const { bridgeToResponsesSSE } = await import("../../backend/src/bridge");
+  const { responsesSseToChatCompletionsSse } = await import("../../backend/src/chat/outbound");
   const budget = createTestTranslatorBudget();
   const events = translateZedOpenAiStream(bytes(frame({ type: "response.output_item.added", output_index: 0,
     item: { type: "function_call", id: "fc_eof", call_id: "call_eof", name: "lookup", arguments: "", status: "in_progress" } })), budget);
@@ -739,8 +739,8 @@ for (const direct of [false, true]) test(`Zed generated EOF keeps its proxy orig
 
 for (const message of ["upstream stream ended early (adapter_eof)", KEY]) {
   test(`a prior synthetic reason cannot authorize a supplied incomplete message shape=${message === KEY ? "sentinel" : "copy"}`, async () => {
-    const { rememberProxyIncomplete, CLIENT_ERROR_CONTRACTS } = await import("../../src/lib/client-error-body");
-    const { responsesSseToChatCompletionsSse } = await import("../../src/chat/outbound");
+    const { rememberProxyIncomplete, CLIENT_ERROR_CONTRACTS } = await import("../../backend/src/lib/client-error-body");
+    const { responsesSseToChatCompletionsSse } = await import("../../backend/src/chat/outbound");
     const context = {};
     rememberProxyIncomplete(context, "adapter_eof");
     const text = await new Response(responsesSseToChatCompletionsSse(bytes("event: response.incomplete\n" + frame({
@@ -756,10 +756,10 @@ for (const message of ["upstream stream ended early (adapter_eof)", KEY]) {
 }
 
 for (const route of ["direct", "translated", "passthrough"] as const) test(`explicit incomplete contract precedes copied structural wording route=${route}`, async () => {
-  const { CLIENT_ERROR_CONTRACTS } = await import("../../src/lib/client-error-body");
-  const { encodeChatCompletionSse } = await import("../../src/protocols/encoders/chat");
-  const { bridgeToResponsesSSE } = await import("../../src/bridge");
-  const { responsesSseToChatCompletionsSse } = await import("../../src/chat/outbound");
+  const { CLIENT_ERROR_CONTRACTS } = await import("../../backend/src/lib/client-error-body");
+  const { encodeChatCompletionSse } = await import("../../backend/src/protocols/encoders/chat");
+  const { bridgeToResponsesSSE } = await import("../../backend/src/bridge");
+  const { responsesSseToChatCompletionsSse } = await import("../../backend/src/chat/outbound");
   const message = "upstream returned malformed Chat Completions JSON";
   const budget = createTestTranslatorBudget();
   const events: AdapterEvent[] = [{ type: "incomplete", reason: "adapter_eof", message }];
@@ -779,11 +779,11 @@ for (const stream of [false, true]) for (const slot of ["userinfo", "path", "que
 }
 
 for (const stream of [false, true]) test(`Antigravity cached native model stays internal stream=${stream}`, async () => {
-  const { saveCredential, getAccountSet } = await import("../../src/oauth/store");
-  const { setCached, clearModelCache } = await import("../../src/codex/model-cache");
-  const { encodeRoutedModelId } = await import("../../src/providers/slug-codec");
-  const { recordAntigravityAccountRoster, clearAntigravityAccountRosters } = await import("../../src/providers/antigravity-account-roster");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { saveCredential, getAccountSet } = await import("../../backend/src/oauth/store");
+  const { setCached, clearModelCache } = await import("../../backend/src/codex/model-cache");
+  const { encodeRoutedModelId } = await import("../../backend/src/providers/slug-codec");
+  const { recordAntigravityAccountRoster, clearAntigravityAccountRosters } = await import("../../backend/src/providers/antigravity-account-roster");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const provider = "google-antigravity"; const native = `https://${KEY}@provider.example/${KEY}?key=${KEY}`;
   await saveCredential(provider, { access: "synthetic-model-label", refresh: "synthetic-model-refresh", expires: Date.now() + 3_600_000, projectId: "synthetic-project", source: "oauth" });
   const account = getAccountSet(provider)!.activeAccountId;
@@ -803,9 +803,9 @@ for (const stream of [false, true]) test(`Antigravity cached native model stays 
 });
 
 test("input admission uses the original selector after memory routing", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const config: OcxConfig = { port: 0, defaultProvider: "gateway", providers: { gateway: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1", contextWindow: 16 } }, memoryModels: { extract: { model: `gateway/${KEY}` } } };
   const requestId = crypto.randomUUID(); const ctx = { model: "", provider: "" };
   const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json", "x-codex-turn-metadata": JSON.stringify({ request_kind: "memory", thread_source: "memory_consolidation" }) }, body: JSON.stringify({ model: "gpt-5.6-luna", input: "a".repeat(4000) }) }), config, ctx);
@@ -819,9 +819,9 @@ test("input admission uses the original selector after memory routing", async ()
 });
 
 for (const child of [false, true]) test(`compaction scope denial keeps the original client selector child=${child}`, async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const config: OcxConfig = { port: 0, defaultProvider: "gateway", providers: { gateway: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1" } }, compactionRouting: { model: `gateway/${KEY}` } };
   const requestId = crypto.randomUUID(); const ctx = { model: "", provider: "" };
   const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json", "x-codex-turn-metadata": JSON.stringify({ request_kind: "compaction", compaction: { trigger: "manual" } }) }, body: JSON.stringify({ model: child ? `gateway/${KEY}` : "gateway/client-model", input: [{ type: "compaction_trigger" }] }) }), config, ctx, { admissionScope: { providers: ["other"], models: [] }, ...(child ? { compactionRoutingOverride: { sourceModel: "gateway/client-model" } } : {}) });
@@ -839,7 +839,7 @@ for (const surface of ["responses", "chat-buffered", "chat-stream"]) test(`Comma
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(req) { wireModel = (await req.json() as { params: { model: unknown } }).params.model; return Response.json({ success: false, error: { code: "FORBIDDEN", message: "MODEL_NOT_IN_PLAN: fixture" } }, { status: 403 }); } });
   try {
     const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "command-code", models: [KEY], defaultModel: KEY, authMode: "key", apiKey: "synthetic", baseUrl: `${upstream.url}`, allowPrivateNetwork: true } }, blockedModelRedirects: { "client-model": KEY } };
-    const { handleResponses } = await import("../../src/server/responses");
+    const { handleResponses } = await import("../../backend/src/server/responses");
     const handler = surface === "responses" ? handleResponses : handleChatCompletions;
     const response = await handler(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "fixture/client-model", stream: surface === "chat-stream", ...(surface === "responses" ? { input: "hi" } : { messages: [{ role: "user", content: "hi" }] }) }) }), config, { model: "", provider: "" });
     expect(response.status).toBe(400); const text = await response.text(); const payload = JSON.parse(text);
@@ -857,7 +857,7 @@ test("Chat request read failures use a fixed local diagnostic", async () => {
 });
 
 async function assertPersistedRefusal(requestId: string, status: number, expected?: { model?: string; requestedModel?: string; errorCode?: string }): Promise<void> {
-  const { readUsageEntries, resetUsageReadCacheForTests } = await import("../../src/usage/log");
+  const { readUsageEntries, resetUsageReadCacheForTests } = await import("../../backend/src/usage/log");
   resetUsageReadCacheForTests();
   const row = readUsageEntries().find(entry => entry.requestId === requestId);
   expect(row).toBeDefined(); expect(row!.status).toBe(status);
@@ -868,7 +868,7 @@ async function assertPersistedRefusal(requestId: string, status: number, expecte
 }
 
 for (const stream of [false, true]) test(`policy alias refusal uses the client selector stream=${stream}`, async () => {
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-chat", baseUrl: "https://provider.example/v1", disabled: true } }, routingProfiles: { [KEY]: { alias: "client-policy", candidates: [{ provider: "fixture", model: "model" }] } } };
   const requestId = crypto.randomUUID();
   const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "client-policy", stream, messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" }, { requestId, start: Date.now() });
@@ -881,9 +881,9 @@ for (const stream of [false, true]) test(`policy alias refusal uses the client s
 });
 
 for (const slot of ["model", "provider"] as const) test(`scope refusals project late-bound log ${slot}`, async () => {
-  const { AdmissionModelDeniedError, admissionModelDeniedResponse, projectAdmissionModelDeniedLog } = await import("../../src/server/admission-model-scope");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { AdmissionModelDeniedError, admissionModelDeniedResponse, projectAdmissionModelDeniedLog } = await import("../../backend/src/server/admission-model-scope");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const requestId = crypto.randomUUID();
   const ctx = { model: slot === "model" ? KEY : "gpt-6", provider: slot === "provider" ? `https://${KEY}@provider.example/path` : "fixture", requestedModel: "client-selector", errorCode: "model_not_allowed_for_key", wireModel: KEY, resolvedModel: KEY, servedModel: KEY, responseModelEcho: KEY };
   // Exercise runtime callers too: an unbranded label must never authorize copied text.
@@ -901,12 +901,12 @@ for (const slot of ["model", "provider"] as const) test(`scope refusals project 
 for (const stream of [false, true])
 
 for (const selector of ["directive", "picker"] as const) test(`Messages model label precedes ${selector} decoding`, async () => {
-  const { handleClaudeMessages } = await import("../../src/server/claude-messages");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1" } }, claudeCode: { model: `fixture/${KEY}` }, apiKeys: [{ id: "scope", name: "scope", key: "synthetic-scope", createdAt: "2026-01-01T00:00:00Z", allowedProviders: ["other"] }] };
   const requestId = crypto.randomUUID();
   const original = selector === "picker" ? `ocx-claude-native--claude-${KEY}-${"x".repeat(80)}` : "client-model";
-  if (selector === "picker") { expect(original.length).toBeGreaterThan(128); expect((await import("../../src/claude/alias")).resolveAlias(original)!.length).toBeLessThanOrEqual(128); }
+  if (selector === "picker") { expect(original.length).toBeGreaterThan(128); expect((await import("../../backend/src/claude/alias")).resolveAlias(original)!.length).toBeLessThanOrEqual(128); }
   const response = await handleClaudeMessages(new Request("http://localhost/v1/messages", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: original, max_tokens: 16, ...(selector === "directive" ? { system: `<!-- ocx-route: fixture/${KEY} -->` } : {}), messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" }, { requestId, start: Date.now(), admission: { kind: "configured", keyId: "scope", source: "bearer" } });
   expect(response.status).toBe(403); const text = await response.text(); const payload = JSON.parse(text);
   expect(payload.error.type).toBe("model_not_allowed_for_key"); expect(payload.error.code).toBeUndefined();
@@ -919,9 +919,9 @@ for (const selector of ["directive", "picker"] as const) test(`Messages model la
 });
 
 for (const stream of [false, true]) test(`concrete compaction overflow uses the client model stream=${stream}`, async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch() { return Response.json({ error: { message: "fixture context overflow" } }, { status: 413 }); } });
   try {
     const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true } }, compactionRouting: { model: `fixture/${KEY}` } };
@@ -938,10 +938,10 @@ for (const stream of [false, true]) test(`concrete compaction overflow uses the 
 });
 
 for (const surface of ["chat", "claude", "compact", "native-messages"] as const) test(`scope row projection precedes final logging surface=${surface}`, async () => {
-  const { handleClaudeMessages } = await import("../../src/server/claude-messages");
-  const { handleResponsesCompact } = await import("../../src/server/responses/compact");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
+  const { handleResponsesCompact } = await import("../../backend/src/server/responses/compact");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const native = surface === "native-messages";
   const selector = surface === "compact" || native ? "fixture/client-model" : `fixture/${"x".repeat(130)}${KEY}`;
   const config: OcxConfig = { port: 0, providers: { fixture: { adapter: native ? "anthropic" : "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: native ? "https://api.anthropic.com" : "https://provider.example/v1" } }, apiKeys: [{ id: "scope-order", name: "scope", key: "synthetic-scope-order", createdAt: "2026-01-01T00:00:00Z", ...(native ? { allowedModels: [`fixture/${KEY}`] } : { allowedProviders: ["other"] }) }], ...(surface === "compact" ? { compactionRouting: { model: `fixture/${KEY}` } } : {}), ...(native ? { blockedModelRedirects: { "client-model": KEY }, protocols: { rollout: { managedMessagesNative: true } } } : {}) };
@@ -959,9 +959,9 @@ for (const surface of ["chat", "claude", "compact", "native-messages"] as const)
 });
 
 test("streaming memory admission projects the final request row", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
+  const { handleResponses } = await import("../../backend/src/server/responses");
+  const { responseWithDeferredRequestLog } = await import("../../backend/src/server/relay");
+  const { getRequestLogEntries } = await import("../../backend/src/server/request-log");
   const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1", contextWindow: 16 } }, memoryModels: { extract: { model: `fixture/${KEY}` } } };
   const requestId = crypto.randomUUID(); const ctx = { model: "", provider: "" };
   const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json", "x-codex-turn-metadata": JSON.stringify({ request_kind: "memory", thread_source: "memory_consolidation" }) }, body: JSON.stringify({ model: "client-model", stream: true, input: "a".repeat(4000) }) }), config, ctx);

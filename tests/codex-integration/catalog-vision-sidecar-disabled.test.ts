@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import { gatherFlightKey } from "../../src/codex/catalog/gather-capture";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
-import { clearModelCache } from "../../src/codex/model-cache";
-import type { CatalogModel, OcxConfig } from "../../src/types";
+import { buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { gatherFlightKey } from "../../backend/src/codex/catalog/gather-capture";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import type { CatalogModel, OcxConfig } from "../../backend/src/types";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 
 const providerName = "vision-disabled-fixture";

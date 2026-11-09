@@ -1,4 +1,4 @@
-import { resolveProtocolSettings } from "../../src/protocols/settings";
+import { resolveProtocolSettings } from "../../backend/src/protocols/settings";
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -10,9 +10,9 @@ import {
   readConfigDiagnostics,
   saveConfig,
   validateConfigCandidate,
-} from "../../src/config";
+} from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { mergeModelCapabilities, modelCapabilitiesConfigError } from "../../src/config/provider-validation";
+import { mergeModelCapabilities, modelCapabilitiesConfigError } from "../../backend/src/config/provider-validation";
 
 let home = "";
 let previousHome: string | undefined;

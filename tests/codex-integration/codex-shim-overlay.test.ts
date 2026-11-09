@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, realpathSync, renameSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { autoRestoreCodexShim, diagnoseCodexShim, inspectCodexShimBackingForCommand, installCodexShim, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../src/codex/shim";
-import { readState, stateFiles } from "../../src/codex/shim-state-file";
+import { autoRestoreCodexShim, diagnoseCodexShim, inspectCodexShimBackingForCommand, installCodexShim, setCodexShimProbeObservationMsForTests, uninstallCodexShim } from "../../backend/src/codex/shim";
+import { readState, stateFiles } from "../../backend/src/codex/shim-state-file";
 
 function fixture(run: (f: { root: string; home: string; native: string; wrapper: string; envFile: string; statePath: string; version: (name: string) => string }) => void): void {
   const root = mkdtempSync(join(tmpdir(), "ocx-overlay-contract-"));

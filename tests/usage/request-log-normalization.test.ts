@@ -2,10 +2,10 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { addRequestLog, clearRequestLogsForTests, getRequestLogEntries, requestLogEntryFromPersistedUsage } from "../../src/server/request-log";
-import { requestLogDto } from "../../src/server/management/shared";
-import { normalizeUsageEntryForTest, readUsageEntries, resetUsageReadCacheForTests } from "../../src/usage/log";
-import { failureSummary } from "../../gui/src/pages/logs-failure-summary";
+import { addRequestLog, clearRequestLogsForTests, getRequestLogEntries, requestLogEntryFromPersistedUsage } from "../../backend/src/server/request-log";
+import { requestLogDto } from "../../backend/src/server/management/shared";
+import { normalizeUsageEntryForTest, readUsageEntries, resetUsageReadCacheForTests } from "../../backend/src/usage/log";
+import { failureSummary } from "../../frontend/src/pages/logs-failure-summary";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { log } from "../helpers/request-log-entry";
 

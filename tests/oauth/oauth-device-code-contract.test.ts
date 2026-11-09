@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { loginKimi } from "../../src/oauth/kimi";
-import type { OAuthController } from "../../src/oauth/types";
+import { loginKimi } from "../../backend/src/oauth/kimi";
+import type { OAuthController } from "../../backend/src/oauth/types";
 
 /**
  * Every device-flow provider must report the human-typed user code in the

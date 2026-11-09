@@ -3,10 +3,10 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getValidAccessToken, getValidAccessTokenForAccount, OAuthLoginRequiredError, OAuthTokenRefreshBusyError, OAuthTokenRefreshStaleError, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock, seedOAuthTokenRefreshFlightsForTests } from "../../src/oauth";
-import { RefreshIntentIOError, nousRefreshIntentBlocksReplay } from "../../src/oauth/nous";
-import * as nousModule from "../../src/oauth/nous";
-import { AnthropicTokenError } from "../../src/oauth/anthropic";
+import { getValidAccessToken, getValidAccessTokenForAccount, OAuthLoginRequiredError, OAuthTokenRefreshBusyError, OAuthTokenRefreshStaleError, OAUTH_PROVIDERS, refreshAnthropicAccountWithLock, seedOAuthTokenRefreshFlightsForTests } from "../../backend/src/oauth";
+import { RefreshIntentIOError, nousRefreshIntentBlocksReplay } from "../../backend/src/oauth/nous";
+import * as nousModule from "../../backend/src/oauth/nous";
+import { AnthropicTokenError } from "../../backend/src/oauth/anthropic";
 import {
   OAuthRefreshIntentIOError,
   credentialGeneration,
@@ -19,9 +19,9 @@ import {
   readOAuthRefreshIntent,
   saveCredential,
   writeOAuthRefreshIntent,
-} from "../../src/oauth/store";
-import * as storeModule from "../../src/oauth/store";
-import * as configModule from "../../src/config";
+} from "../../backend/src/oauth/store";
+import * as storeModule from "../../backend/src/oauth/store";
+import * as configModule from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
 

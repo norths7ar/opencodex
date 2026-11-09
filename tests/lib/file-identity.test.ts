@@ -3,10 +3,10 @@ import { expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileIdentityKey, sameFileIdentity, statTimeMs } from "../../src/lib/file-identity";
-import { readCodexHomeJournal } from "../../src/codex/codex-home-owner";
-import { readBoundedCodexConfig } from "../../src/codex/inject/bounded-config-reader";
-import { readBoundedLocalFile } from "../../src/codex/orca-auth-source";
+import { fileIdentityKey, sameFileIdentity, statTimeMs } from "../../backend/src/lib/file-identity";
+import { readCodexHomeJournal } from "../../backend/src/codex/codex-home-owner";
+import { readBoundedCodexConfig } from "../../backend/src/codex/inject/bounded-config-reader";
+import { readBoundedLocalFile } from "../../backend/src/codex/orca-auth-source";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

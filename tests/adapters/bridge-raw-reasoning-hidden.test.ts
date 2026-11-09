@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { decodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { decodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
 import {
   clearReasoningReplayCacheForTests,
   peekReasoningForCall,
-} from "../../src/responses/reasoning-replay-cache";
-import { parseRequest } from "../../src/responses/parser";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 
 async function* replay(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {
   for (const event of events) yield event;

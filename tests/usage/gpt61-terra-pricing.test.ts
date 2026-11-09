@@ -1,12 +1,12 @@
 /** GPT-6.1 Terra API facts verified 2026-10-27; vendor windows retain their Sol snapshot. */
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { getModelMetadata } from "../../src/generated/model-metadata";
-import { estimateAttemptCost, estimateRequestCost } from "../../src/usage/cost";
+import { getModelMetadata } from "../../backend/src/generated/model-metadata";
+import { estimateAttemptCost, estimateRequestCost } from "../../backend/src/usage/cost";
 import {
   CONTEXT_TIERS, EXPECTED_PRICE_OVERLAYS, findContextTier, findExpectedPriceOverlay,
   findPriorityPricingRule, resolvePriorityMultiplier,
-} from "../../src/usage/expected-prices";
+} from "../../backend/src/usage/expected-prices";
 import { repoPath } from "../helpers/repo-root";
 
 const MODEL = "gpt-6.1-terra";

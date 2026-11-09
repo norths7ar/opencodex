@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { evidenceFromBody } from "../../src/routing/request-evidence";
+import { evidenceFromBody } from "../../backend/src/routing/request-evidence";
 
 describe("request evidence extraction (RI-05)", () => {
   test("top-level responses input image part is detected", () => {

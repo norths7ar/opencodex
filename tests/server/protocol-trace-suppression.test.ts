@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { addProtocolEntryReason, markAttemptProtocolPath, markProtocolBlocked, markProtocolEntry,
   markProtocolShadowPlanInput, protocolMarkFeatures, protocolTraceForRequest, protocolTraceSuppressed,
-  suppressProtocolTrace } from "../../src/protocols/trace";
-import type { ProtocolPlanInput } from "../../src/protocols/plan";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+  suppressProtocolTrace } from "../../backend/src/protocols/trace";
+import type { ProtocolPlanInput } from "../../backend/src/protocols/plan";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let server: ReturnType<typeof Bun.serve> | undefined;

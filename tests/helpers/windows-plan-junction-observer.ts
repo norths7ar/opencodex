@@ -1,8 +1,8 @@
 import { spyOn } from "bun:test";
 import * as ffi from "bun:ffi";
 import { resolve, sep } from "node:path";
-import * as acl from "../../src/lib/windows-owner-acl";
-import { windowsCanonicalPathMatches } from "../../src/codex/windows-installation-files";
+import * as acl from "../../backend/src/lib/windows-owner-acl";
+import { windowsCanonicalPathMatches } from "../../backend/src/codex/windows-installation-files";
 
 // Same temp-ancestry mapping as windows-temp-ancestry: only ancestors ABOVE
 // the hardened root are redirected. Root and all descendant checks stay real.

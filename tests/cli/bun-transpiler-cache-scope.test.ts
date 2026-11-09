@@ -3,8 +3,8 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, posix, win32 } from "node:path";
-import { scopeTranspilerCacheToRuntime, TRANSPILER_CACHE_ENV } from "../../src/lib/bun-transpiler-cache-scope.mjs";
-import { durableBunChildEnv, durableBunRuntime } from "../../src/lib/bun-runtime";
+import { scopeTranspilerCacheToRuntime, TRANSPILER_CACHE_ENV } from "../../backend/src/lib/bun-transpiler-cache-scope.mjs";
+import { durableBunChildEnv, durableBunRuntime } from "../../backend/src/lib/bun-runtime";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { COLD_SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -129,7 +129,7 @@ describe("launcher transpiler cache scope", () => {
       const cache = mkdtempSync(join(tmpdir(), "ocx-transpiler-scope-"));
       roots.push(cache);
       const bundled = JSON.parse(readFileSync(repoPath("node_modules", "bun", "package.json"), "utf8")).version as string;
-      const result = spawnSync("node", [repoPath("bin", "ocx.mjs"), "--version"], {
+      const result = spawnSync("node", [repoPath("backend/bin", "ocx.mjs"), "--version"], {
         cwd: repoRoot(), encoding: "utf8", timeout: COLD_SPAWN_BUDGET_MS - 5_000, windowsHide: true,
         env: { ...process.env, [TRANSPILER_CACHE_ENV]: cache, OPENCODEX_BUN_PATH: "" },
       });

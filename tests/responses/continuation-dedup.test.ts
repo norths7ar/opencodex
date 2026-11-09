@@ -18,7 +18,7 @@ import {
   replayOverlapSkipsForTests,
   responseStateMetrics,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

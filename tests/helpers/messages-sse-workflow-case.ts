@@ -17,8 +17,8 @@ Bun.plugin({ name: "native spend denial fixture", setup(build) {
   });
 } });
 const { acquireOwnedSpendHome } = await import("./owned-spend-home");
-const { saveConfig } = await import("../../src/config");
-const { handleClaudeMessages } = await import("../../src/server/claude-messages");
+const { saveConfig } = await import("../../backend/src/config");
+const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
 let sends = 0;
 const config: any = { defaultProvider: "fixture", providers: { fixture: { adapter: "anthropic", baseUrl: "http://127.0.0.1:1", apiKey: "fixture", authMode: "key", models: ["wire-model"], allowPrivateNetwork: true, fetch: async () => { sends++; throw new Error("Unexpected send"); } } }, protocols: { rollout: { managedMessagesNative: true } } };
 saveConfig(config);

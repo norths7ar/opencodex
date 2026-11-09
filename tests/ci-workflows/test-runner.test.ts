@@ -57,7 +57,7 @@ import {
   decodeWindowsIdentityPowerShellOutputForTests,
   windowsIdentityPowerShellCommandForTests,
   windowsIdentityPowerShellSpawnOptionsForTests,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -896,11 +896,11 @@ describe("bun test argv", () => {
 
   test("rejects an empty changed selection when the diff is non-empty", () => {
     expect(changedSelectionFailure(
-      { comparisonRef: "upstream/dev", comparisonCommit: "base-sha", changedFiles: ["src/router.ts"] },
+      { comparisonRef: "upstream/dev", comparisonCommit: "base-sha", changedFiles: ["backend/src/router.ts"] },
       "Ran 0 tests across 0 files.",
     )).toContain("--changed=base-sha (upstream/dev merge base) selected 0 tests across 0 files");
     expect(changedSelectionFailure(
-      { comparisonRef: "dev", comparisonCommit: "base-sha", changedFiles: ["src/router.ts"] },
+      { comparisonRef: "dev", comparisonCommit: "base-sha", changedFiles: ["backend/src/router.ts"] },
       "Ran 9 tests across 1 file.",
     )).toBeNull();
     expect(changedSelectionFailure(
@@ -911,7 +911,7 @@ describe("bun test argv", () => {
 
   test("rejects an unrecognized changed-mode summary for a non-empty diff", () => {
     expect(changedSelectionFailure(
-      { comparisonRef: "dev", comparisonCommit: "base-sha", changedFiles: ["src/router.ts"] },
+      { comparisonRef: "dev", comparisonCommit: "base-sha", changedFiles: ["backend/src/router.ts"] },
       "0 pass\n0 fail",
     )).toContain("did not emit a recognizable selection summary");
   });
@@ -1742,8 +1742,8 @@ describe("bun test user lock", () => {
 });
 
 describe("ensureGuiDependencies", () => {
-  // `gui` is not a workspace, so a root `bun install` leaves gui/node_modules absent and the
-  // twenty-five tests importing gui/src die on `Cannot find package 'react'` — an "Unhandled error
+  // `gui` is not a workspace, so a root `bun install` leaves frontend/node_modules absent and the
+  // twenty-five tests importing frontend/src die on `Cannot find package 'react'` — an "Unhandled error
   // between tests" that names no test. CI already installs them; this closes the local gap.
   const paths = (present: string[]) => {
     const normalized = present.map(path => path.replaceAll("\\", "/"));
@@ -1751,23 +1751,23 @@ describe("ensureGuiDependencies", () => {
   };
 
   test("mocked paths match POSIX and Windows separators", () => {
-    const exists = paths(["gui/package.json"]);
-    expect(exists("/repo/gui/package.json")).toBe(true);
+    const exists = paths(["frontend/package.json"]);
+    expect(exists("/repo/frontend/package.json")).toBe(true);
     expect(exists("C:\\repo\\gui\\package.json")).toBe(true);
   });
 
-  test("installs when gui/package.json exists but node_modules does not", () => {
+  test("installs when frontend/package.json exists but node_modules does not", () => {
     const installed: string[] = [];
     const logged: string[] = [];
     const result = ensureGuiDependencies({
       cwd: "/repo",
-      exists: paths(["gui/package.json"]),
+      exists: paths(["frontend/package.json"]),
       install: dir => { installed.push(dir); return { ok: true, detail: "" }; },
       log: message => logged.push(message),
     });
 
     expect(result).toEqual({ kind: "installed" });
-    expect(installed).toEqual([join("/repo", "gui")]);
+    expect(installed).toEqual([join("/repo", "frontend")]);
     expect(logged[0]).toContain("gui dependencies are missing or incomplete");
   });
 
@@ -1775,7 +1775,7 @@ describe("ensureGuiDependencies", () => {
     let installs = 0;
     const result = ensureGuiDependencies({
       cwd: "/repo",
-      exists: paths(["gui/package.json", "gui/node_modules"]),
+      exists: paths(["frontend/package.json", "frontend/node_modules"]),
       install: () => { installs += 1; return { ok: true, detail: "" }; },
       log: () => {},
     });
@@ -1788,7 +1788,7 @@ describe("ensureGuiDependencies", () => {
     let installs = 0;
     const result = ensureGuiDependencies({
       cwd: "/repo",
-      exists: paths(["gui/package.json", "gui/node_modules/react/package.json"]),
+      exists: paths(["frontend/package.json", "frontend/node_modules/react/package.json"]),
       install: () => { installs += 1; return { ok: true, detail: "" }; },
       log: () => {},
     });
@@ -1797,7 +1797,7 @@ describe("ensureGuiDependencies", () => {
     expect(installs).toBe(0);
   });
 
-  // A published install tree has no gui/ at all; the runner must not try to install there.
+  // A published install tree has no frontend/ at all; the runner must not try to install there.
   test("does nothing when there is no gui package", () => {
     let installs = 0;
     const result = ensureGuiDependencies({
@@ -1816,7 +1816,7 @@ describe("ensureGuiDependencies", () => {
   test("reports the failure detail instead of continuing", () => {
     const result = ensureGuiDependencies({
       cwd: "/repo",
-      exists: paths(["gui/package.json"]),
+      exists: paths(["frontend/package.json"]),
       install: () => ({ ok: false, detail: "lockfile had changes" }),
       log: () => {},
     });

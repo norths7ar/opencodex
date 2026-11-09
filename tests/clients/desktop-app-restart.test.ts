@@ -3,15 +3,15 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { listCodexDesktopShellPids, restartCodexDesktopApp, type DesktopAppRestartIo } from "../../src/codex/desktop-app-restart";
+import { listCodexDesktopShellPids, restartCodexDesktopApp, type DesktopAppRestartIo } from "../../backend/src/codex/desktop-app-restart";
 import {
   beginCodexCliSelectionParentWrite,
-} from "../../src/codex/cli-selection";
-import { classifyDesktopPicker, readCodexCatalogBinding, readCodexDesktopPickerState } from "../../src/codex/desktop-app/picker-freshness";
-import type { DesktopAppAdapter, DesktopProcess } from "../../src/codex/desktop-app/types";
-import { windowsDesktopAppAdapter } from "../../src/codex/desktop-app/windows";
-import { handleDesktopAppRestart } from "../../src/cli/restart-scope";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/codex/cli-selection";
+import { classifyDesktopPicker, readCodexCatalogBinding, readCodexDesktopPickerState } from "../../backend/src/codex/desktop-app/picker-freshness";
+import type { DesktopAppAdapter, DesktopProcess } from "../../backend/src/codex/desktop-app/types";
+import { windowsDesktopAppAdapter } from "../../backend/src/codex/desktop-app/windows";
+import { handleDesktopAppRestart } from "../../backend/src/cli/restart-scope";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

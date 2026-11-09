@@ -5,9 +5,9 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import { setClaudeUsagePreflightForTests } from "../../src/adapters/claude-cli/usage-admission";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { setClaudeUsagePreflightForTests } from "../../backend/src/adapters/claude-cli/usage-admission";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -24,21 +24,21 @@ function claudeFixture(provider: OcxProviderConfig): ProviderAdapter {
     },
   };
 }
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const resolveAdapter = resolver.resolveAdapter;
-mock.module("../../src/server/adapter-resolve", () => ({ ...resolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...resolver,
   resolveAdapter: (provider: OcxProviderConfig, cache?: "none" | "short" | "long") =>
     provider.adapter === "claude-cli" ? claudeFixture(provider) : resolveAdapter(provider, cache),
 }));
 let released = 0;
-const sidecarAuth = await import("../../src/server/responses/request-sidecar-auth");
-mock.module("../../src/server/responses/request-sidecar-auth", () => ({ ...sidecarAuth,
+const sidecarAuth = await import("../../backend/src/server/responses/request-sidecar-auth");
+mock.module("../../backend/src/server/responses/request-sidecar-auth", () => ({ ...sidecarAuth,
   prepareResponsesSidecarAuth: async () => ({
     routedCompaction: false,
     openAiSidecar: { releaseProbeLease: () => { released++; } },
   }) as Awaited<ReturnType<typeof sidecarAuth.prepareResponsesSidecarAuth>>,
 }));
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 
 const originalHome = process.env.OPENCODEX_HOME;
 let home = "";

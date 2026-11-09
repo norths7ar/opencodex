@@ -5,7 +5,7 @@ import { repoPath } from "../helpers/repo-root";
 
 describe("WinSW lifecycle stop hardening", () => {
   test("re-verifies native service state after stopwait before returning", () => {
-    const source = readFileSync(repoPath("src/lib/winsw.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/lib/winsw.ts"), "utf8");
     const start = source.indexOf("export function stopWinswService");
     const end = source.indexOf("export function uninstallWinswService", start);
     const stop = source.slice(start, end);
@@ -23,7 +23,7 @@ describe("WinSW lifecycle stop hardening", () => {
     // the CLI forever inside a guarded stop. Every execFileSync in winsw.ts must
     // pass an explicit timeout except the interactive `install /p` call, which
     // waits on the user's password input by design.
-    const source = readFileSync(repoPath("src/lib/winsw.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/lib/winsw.ts"), "utf8");
     const execs = source.match(/execFileSync\(/g) ?? [];
     const timeouts = source.match(/\btimeout:/g) ?? [];
     const interactive = source.match(/stdio: "inherit"/g) ?? [];

@@ -2,17 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
+import { saveConfig } from "../../backend/src/config";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
 import {
   openRouterRoutingConfigError,
   openRouterProviderPayload,
-} from "../../src/providers/openrouter-routing";
-import { fastPolicyForModel } from "../../src/providers/service-tier";
-import { clearKeyCooldowns, rotateProviderTransportOn429 } from "../../src/providers/key-failover";
-import { routeModel } from "../../src/router";
-import { providerManagementConfigError, safeConfigDTO } from "../../src/server/auth-cors";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/openrouter-routing";
+import { fastPolicyForModel } from "../../backend/src/providers/service-tier";
+import { clearKeyCooldowns, rotateProviderTransportOn429 } from "../../backend/src/providers/key-failover";
+import { routeModel } from "../../backend/src/router";
+import { providerManagementConfigError, safeConfigDTO } from "../../backend/src/server/auth-cors";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function provider(baseUrl: string, overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleEffortCommand } from "../../src/cli/effort";
-import { COMMAND_CODE_MODEL_REASONING_EFFORTS } from "../../src/providers/command-code-efforts";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { encodeRoutedModelId } from "../../src/providers/slug-codec";
-import type { OcxConfig } from "../../src/types";
+import { handleEffortCommand } from "../../backend/src/cli/effort";
+import { COMMAND_CODE_MODEL_REASONING_EFFORTS } from "../../backend/src/providers/command-code-efforts";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { encodeRoutedModelId } from "../../backend/src/providers/slug-codec";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

@@ -4,7 +4,7 @@ import {
   authorizeResendForRecovery,
   RESEND_REFUSALS,
   type AmbiguousResendAllowance,
-} from "../../src/lib/request-resend-gate";
+} from "../../backend/src/lib/request-resend-gate";
 import {
   causeDisposition,
   causeForRecoveryKind,
@@ -14,8 +14,8 @@ import {
   resendPermission,
   resendSendClass,
   stageCommitment,
-} from "../../src/lib/request-failure-model";
-import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../src/usage/telemetry-contract";
+} from "../../backend/src/lib/request-failure-model";
+import { ATTEMPT_RECOVERY_KIND_ROSTER } from "../../backend/src/usage/telemetry-contract";
 
 /*
  * Holds INV-RESEND-02 from structure/overview.md.

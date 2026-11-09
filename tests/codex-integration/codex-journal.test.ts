@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import {
   MANAGED_AGENTS_TABLE_MARKER,
   MANAGED_SUBAGENT_DEFAULT_MARKER,
-} from "../../src/codex/subagent-defaults";
+} from "../../backend/src/codex/subagent-defaults";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -979,7 +979,7 @@ describe("codex-journal", () => {
     // write earlier in the same function, so the call throws before the branch runs.
     // Asserting the shape is honest about what is being checked; asserting a fabricated
     // runtime failure would not be.
-    const source = readFileSync(join(repoRoot, "src/codex/journal.ts"), "utf8");
+    const source = readFileSync(join(repoRoot, "backend/src/codex/journal.ts"), "utf8");
     const restore = source.slice(source.indexOf("export function restoreJournalState"));
     const body = restore.slice(0, restore.indexOf("\nexport "));
 

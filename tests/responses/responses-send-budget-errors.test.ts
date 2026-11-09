@@ -1,32 +1,32 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { SpendLedgerFileRefusedError } from "../../src/lib/spend-reservation-ledger";
-import { formatErrorResponse } from "../../src/bridge";
-import * as resolver from "../../src/server/adapter-resolve";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import { handleResponsesCompact } from "../../src/server/responses/compact";
-import { handleResponses } from "../../src/server/responses/core";
-import { mapSpendLedgerStorageError } from "../../src/server/responses/spend-storage-error";
-import { clearUpstreamHostHealth, getUpstreamHostHealth, upstreamHostHealthKey } from "../../src/codex/upstream-host-health";
-import { resetWorkflowBudgetsForTest } from "../../src/lib/workflow-budget";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
-import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../src/server/request-log";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import * as authContext from "../../src/codex/auth-context";
-import * as hostHealth from "../../src/codex/upstream-host-health";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import type { OcxConfig } from "../../src/types";
+import { SpendLedgerFileRefusedError } from "../../backend/src/lib/spend-reservation-ledger";
+import { formatErrorResponse } from "../../backend/src/bridge";
+import * as resolver from "../../backend/src/server/adapter-resolve";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import { handleResponsesCompact } from "../../backend/src/server/responses/compact";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { mapSpendLedgerStorageError } from "../../backend/src/server/responses/spend-storage-error";
+import { clearUpstreamHostHealth, getUpstreamHostHealth, upstreamHostHealthKey } from "../../backend/src/codex/upstream-host-health";
+import { resetWorkflowBudgetsForTest } from "../../backend/src/lib/workflow-budget";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
+import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../backend/src/server/request-log";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import * as authContext from "../../backend/src/codex/auth-context";
+import * as hostHealth from "../../backend/src/codex/upstream-host-health";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { describe, expect, spyOn, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
-import { classifyError, httpStatusFromTerminalError, SEND_BUDGET_EXHAUSTED_CODE } from "../../src/lib/errors";
-import { adapterFailureFromEvent } from "../../src/bridge/internal";
-import { SendBudgetExhaustedError, providerErrorDestinationLabel, UpstreamRetryEvidenceError } from "../../src/lib/upstream-retry";
+import { classifyError, httpStatusFromTerminalError, SEND_BUDGET_EXHAUSTED_CODE } from "../../backend/src/lib/errors";
+import { adapterFailureFromEvent } from "../../backend/src/bridge/internal";
+import { SendBudgetExhaustedError, providerErrorDestinationLabel, UpstreamRetryEvidenceError } from "../../backend/src/lib/upstream-retry";
 
 /**
  * A refusal this proxy made must not be reported as a provider failure (#4708).
@@ -86,7 +86,7 @@ describe("a spent send budget is reported as this proxy's refusal", () => {
   });
 
   test("both adapter catch sites answer before the upstream-failure description", () => {
-    const dispatch = source("src/server/responses/adapter-dispatch.ts");
+    const dispatch = source("backend/src/server/responses/adapter-dispatch.ts");
     const guards = dispatch.match(/if \(err instanceof SendBudgetExhaustedError\) \{/g) ?? [];
     expect(guards).toHaveLength(2);
     // Order is the assertion: describeUpstreamConnectFailure is what launders the refusal into
@@ -102,16 +102,16 @@ describe("a spent send budget is reported as this proxy's refusal", () => {
   });
 
   test("reservation denials preserve unbound-history detail on HTTP and SSE response paths", () => {
-    const adapter = source("src/server/responses/adapter-dispatch.ts");
-    const passthrough = source("src/server/responses/passthrough-dispatch.ts");
-    const runTurn = source("src/server/responses/run-turn-execution.ts");
+    const adapter = source("backend/src/server/responses/adapter-dispatch.ts");
+    const passthrough = source("backend/src/server/responses/passthrough-dispatch.ts");
+    const runTurn = source("backend/src/server/responses/run-turn-execution.ts");
     expect(adapter.match(/unboundPoolSpendRefusalResponse\(logCtx\)/g)).toHaveLength(2);
     expect(passthrough).toContain("unboundPoolSpendRefusalResponse(logCtx)");
     expect(runTurn).toContain("unboundPoolSpendRefusalMessage(logCtx) ?? err.message");
   });
 
   test("a local 429 never rotates a credential or writes a cooldown", () => {
-    const runTurn = source("src/server/responses/run-turn-execution.ts");
+    const runTurn = source("backend/src/server/responses/run-turn-execution.ts");
     const rotate = runTurn.indexOf("const rotateRunTurnAdapterOnPreflight429");
     const guard = runTurn.indexOf("if (error.code === SEND_BUDGET_EXHAUSTED_CODE) return false;", rotate);
     const status = runTurn.indexOf("const status = error.status", rotate);
@@ -123,7 +123,7 @@ describe("a spent send budget is reported as this proxy's refusal", () => {
   });
 
   test("the continuation 429 loop consults the shared remainder before it cancels the body", () => {
-    const continuation = source("src/server/responses/adapter-continuation.ts");
+    const continuation = source("backend/src/server/responses/adapter-continuation.ts");
     const loop = continuation.indexOf("adapterExchange.rateLimitRetries < rateLimitPolicy.attempts");
     const check = continuation.indexOf("!sendBudgetExhausted()", loop);
     const wait = continuation.indexOf("prepareSameTarget429Wait", loop);

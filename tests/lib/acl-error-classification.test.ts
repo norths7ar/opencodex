@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   adapterFailureFromMessage,
   inferHttpStatusFromAdapterMessage,
-} from "../../src/lib/errors";
+} from "../../backend/src/lib/errors";
 
 describe("Windows ACL error classification", () => {
   test("maps local ACL hardening failures to 503 server errors", () => {

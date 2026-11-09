@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { createKiroAdapter } from "../../src/adapters/kiro";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { parseRequest } from "../../src/responses/parser";
-import { bindTurnTerminationScope, rememberDeliveredFinalAnswer } from "../../src/responses/turn-termination";
-import { conversationIdFromResponsesRequest } from "../../src/server/request-log-conversation";
-import type { OcxParsedRequest } from "../../src/types";
-import { recoverEncryptedAgentTask, resetAgentTaskRecoveryState, restoreCachedEncryptedAgentTasks } from "../../src/server/responses/agent-task-recovery";
+import { createKiroAdapter } from "../../backend/src/adapters/kiro";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { bindTurnTerminationScope, rememberDeliveredFinalAnswer } from "../../backend/src/responses/turn-termination";
+import { conversationIdFromResponsesRequest } from "../../backend/src/server/request-log-conversation";
+import type { OcxParsedRequest } from "../../backend/src/types";
+import { recoverEncryptedAgentTask, resetAgentTaskRecoveryState, restoreCachedEncryptedAgentTasks } from "../../backend/src/server/responses/agent-task-recovery";
 import { codexHeaders, encryptedInput, fakeChatGptJwt, FINAL_ANSWER_ENVELOPE, FERNET_TASK, SECOND_FERNET_TASK, originalFetch, recoverySse, routedConfig } from "../helpers/agent-task-recovery";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 afterEach(() => { globalThis.fetch = originalFetch; resetAgentTaskRecoveryState(); });

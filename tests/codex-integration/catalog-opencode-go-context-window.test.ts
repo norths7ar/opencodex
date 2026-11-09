@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { augmentRoutedModelsWithMetadata, buildCatalogEntries } from "../../src/codex/catalog";
-import { buildClaudeContextWindows, withOneMillionMarker } from "../../src/claude/context-windows";
-import { applyCatalogModelMetadata } from "../../src/codex/catalog/effort";
-import { applyCatalogMetadata, ensureStrictCatalogFields } from "../../src/codex/catalog/parsing";
-import type { CatalogModel, RawEntry } from "../../src/codex/catalog/parsing";
-import { getModelMetadata } from "../../src/generated/model-metadata";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { OcxProviderConfig } from "../../src/types";
+import { augmentRoutedModelsWithMetadata, buildCatalogEntries } from "../../backend/src/codex/catalog";
+import { buildClaudeContextWindows, withOneMillionMarker } from "../../backend/src/claude/context-windows";
+import { applyCatalogModelMetadata } from "../../backend/src/codex/catalog/effort";
+import { applyCatalogMetadata, ensureStrictCatalogFields } from "../../backend/src/codex/catalog/parsing";
+import type { CatalogModel, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { getModelMetadata } from "../../backend/src/generated/model-metadata";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Regression coverage for #4944.

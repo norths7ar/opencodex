@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { grokConversationSessionId, withGrokSessionIdentity } from "../../../src/grok/session-identity";
-import { handleResponses } from "../../../src/server/responses/core";
-import { tryAdmitTurn } from "../../../src/server/lifecycle";
-import type { OcxConfig } from "../../../src/types";
+import { grokConversationSessionId, withGrokSessionIdentity } from "../../../backend/src/grok/session-identity";
+import { handleResponses } from "../../../backend/src/server/responses/core";
+import { tryAdmitTurn } from "../../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../../backend/src/types";
 import { fakeChatGptJwt } from "../../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
@@ -128,7 +128,7 @@ describe("Grok turns reach the ChatGPT Codex backend with session_id", () => {
 
 test("the /v1/responses route hands handleResponses the Grok-promoted request", () => {
   // Pins the one-line wiring; the cases above call the helper directly.
-  const source = readFileSync(repoPath("src", "server", "index", "serve-options.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src", "server", "index", "serve-options.ts"), "utf8");
   expect(source).toContain("const sessionReq = withCallerSessionIdentity(withGrokSessionIdentity(req), admission);");
   expect(source).toContain("await handleResponses(sessionReq, config, logCtx, {");
 });

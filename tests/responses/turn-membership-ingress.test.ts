@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { handleResponses } from "../../src/server/responses";
-import { responseTurnMembership } from "../../src/server/responses/turn-membership";
-import type { OcxConfig } from "../../src/types";
+import { handleResponses } from "../../backend/src/server/responses";
+import { responseTurnMembership } from "../../backend/src/server/responses/turn-membership";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 test("authenticated signed history reaches the supplier as the exact buffered reference", async () => {

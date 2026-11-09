@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { providerConfigSeed } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
+import { providerConfigSeed } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
 import {
   ANTHROPIC_DEFAULT_MAX_OUTPUT_TOKENS,
   ANTHROPIC_MODELS,
   ANTHROPIC_MODEL_MAX_OUTPUT_TOKENS,
-} from "../../../src/providers/registry/model-seeds";
-import { resolveModelPolicy } from "../../../src/providers/resolved-model-policy";
-import { resolveOutputCeiling } from "../../../src/server/responses/input-admission";
+} from "../../../backend/src/providers/registry/model-seeds";
+import { resolveModelPolicy } from "../../../backend/src/providers/resolved-model-policy";
+import { resolveOutputCeiling } from "../../../backend/src/server/responses/input-admission";
 
 // Anthropic's per-model overview pages (platform.claude.com/docs/en/models/<slug>/overview,
 // read 2026-10-08) put the synchronous Messages API maximum at 128K for every seeded Claude

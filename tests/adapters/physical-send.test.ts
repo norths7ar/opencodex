@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createAdapterPhysicalSend } from "../../src/adapters/physical-send";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
+import { createAdapterPhysicalSend } from "../../backend/src/adapters/physical-send";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
 import { budgetOwner } from "../helpers/send-budget-owner";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import type { OcxProviderConfig } from "../../src/types";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 const url = "https://adapter-fixture.invalid/inference";
 afterEach(() => resetProviderRequestPacingForTest());

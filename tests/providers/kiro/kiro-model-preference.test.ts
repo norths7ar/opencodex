@@ -2,16 +2,16 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { acquireAccountLease, type AccountLease } from "../../../src/oauth/kiro-account-load";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import type { ProviderAccount } from "../../../src/oauth/types";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { acquireAccountLease, type AccountLease } from "../../../backend/src/oauth/kiro-account-load";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import {
   clearGenericFailoverHealth, preferredInitialAccount, refusalAwareInitialKiroAccount,
   rotateGenericOAuthAccountOn429,
-} from "../../../src/oauth/generic-account-failover";
+} from "../../../backend/src/oauth/generic-account-failover";
 import { awaitKiroModelRefreshForTests, clearKiroAccountModels,
-  refreshKiroAccountModelsDetached } from "../../../src/providers/kiro-model-catalog";
+  refreshKiroAccountModelsDetached } from "../../../backend/src/providers/kiro-model-catalog";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;

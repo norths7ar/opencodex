@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import type { SidecarPlan } from "../../src/web-search";
-import { runTurnWebSearchLoop } from "../../src/web-search/run-turn-loop";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import type { SidecarPlan } from "../../backend/src/web-search";
+import { runTurnWebSearchLoop } from "../../backend/src/web-search/run-turn-loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const parsed: OcxParsedRequest = {

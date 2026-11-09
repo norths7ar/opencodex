@@ -10,11 +10,11 @@ import {
   OAuthTokenRefreshStaleError,
   OAUTH_PROVIDERS,
   seedOAuthTokenRefreshFlightsForTests,
-} from "../../src/oauth";
+} from "../../backend/src/oauth";
 import { createOAuthRefreshIntentLock, credentialGeneration, getAccountCredential, getAccountSet, readOAuthRefreshIntent,
-  saveCredential, writeOAuthRefreshIntent } from "../../src/oauth/store";
-import { AnthropicTokenError } from "../../src/oauth/anthropic";
-import * as store from "../../src/oauth/store";
+  saveCredential, writeOAuthRefreshIntent } from "../../backend/src/oauth/store";
+import { AnthropicTokenError } from "../../backend/src/oauth/anthropic";
+import * as store from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const original = { home: process.env.HOME, ocx: process.env.OPENCODEX_HOME,

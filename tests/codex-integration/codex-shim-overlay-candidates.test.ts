@@ -2,10 +2,10 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { codexShimCommandCandidates } from "../../src/codex/catalog/bundled";
-import { probeCodexSupportsModeHint } from "../../src/codex/features";
-import { resetCodexRuntimeResolveCacheForTests, resolveCodexRuntime, setCodexRuntimeResolveCacheForTests } from "../../src/codex/runtime";
-import { decodeOverlayState, readStateResult } from "../../src/codex/shim-state-file";
+import { codexShimCommandCandidates } from "../../backend/src/codex/catalog/bundled";
+import { probeCodexSupportsModeHint } from "../../backend/src/codex/features";
+import { resetCodexRuntimeResolveCacheForTests, resolveCodexRuntime, setCodexRuntimeResolveCacheForTests } from "../../backend/src/codex/runtime";
+import { decodeOverlayState, readStateResult } from "../../backend/src/codex/shim-state-file";
 
 function fixture(run: (f: { root: string; home: string; native: string; wrapper: string; statePath: string; state: Record<string, unknown> }) => void): void {
   const root = mkdtempSync(join(tmpdir(), "ocx-overlay-candidates-"));

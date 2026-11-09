@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { clampGoogleMaxOutputTokens, maxOutputTokensForGoogleModel } from "../../../src/adapters/google";
+import { clampGoogleMaxOutputTokens, maxOutputTokensForGoogleModel } from "../../../backend/src/adapters/google";
 
 describe("google maxOutputTokens clamp", () => {
   test("returns model-specific max output tokens limit", () => {

@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdirSync, readFileSync } from "node:fs";
-import { handleAgentCommand } from "../../src/cli/agent";
-import { handleAgentSettingsRoutes } from "../../src/server/management/agent-settings-routes";
-import { handleConfigRoutes } from "../../src/server/management/config-routes";
-import type { OcxConfig } from "../../src/types";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleAgentCommand } from "../../backend/src/cli/agent";
+import { handleAgentSettingsRoutes } from "../../backend/src/server/management/agent-settings-routes";
+import { handleConfigRoutes } from "../../backend/src/server/management/config-routes";
+import type { OcxConfig } from "../../backend/src/types";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome, output: ReturnType<typeof spyOn>, errors: ReturnType<typeof spyOn>, network: ReturnType<typeof spyOn>;

@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { KIRO_COMPLETION_TOOL_NAME } from "../../src/adapters/kiro-constants";
-import { encodeMessage } from "../../src/lib/eventstream-decoder";
-import { saveConfig } from "../../src/config";
-import { saveCredential } from "../../src/oauth/store";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { KIRO_COMPLETION_TOOL_NAME } from "../../backend/src/adapters/kiro-constants";
+import { encodeMessage } from "../../backend/src/lib/eventstream-decoder";
+import { saveConfig } from "../../backend/src/config";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

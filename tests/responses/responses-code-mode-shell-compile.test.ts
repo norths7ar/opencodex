@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { compileCodeModeHelperInput, resolveCodeModeHelperName } from "../../src/responses/code-mode-helper-compat";
-import { restoreRoutedCustomCallsInJson } from "../../src/responses/custom-tool-compat";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
-import { createRoutedCustomToolRestoreBlockRewrite } from "../../src/server/responses-custom-tool-repair";
+import { compileCodeModeHelperInput, resolveCodeModeHelperName } from "../../backend/src/responses/code-mode-helper-compat";
+import { restoreRoutedCustomCallsInJson } from "../../backend/src/responses/custom-tool-compat";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
+import { createRoutedCustomToolRestoreBlockRewrite } from "../../backend/src/server/responses-custom-tool-repair";
 import { dataPayload, frame } from "../helpers/custom-tool-repair-fixtures";
 
 const CODE_MODE = new Set(["exec"]);

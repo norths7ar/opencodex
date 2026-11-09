@@ -1,25 +1,25 @@
-import type { OcxConfig } from "../../src/types";
-import type { CliDispatchDeps } from "../../src/cli/dispatch";
-import { runGuiCommand } from "../../src/cli/gui";
-import { createGuiPairingGrant, consumeGuiPairingGrant, issueGuiSession, authorizeGuiSessionRequest } from "../../src/server/gui-session";
-import { createManagementSessionControl, managementPrincipal, managementSessionIssuance, requireManagementAuth, type ManagementAuthState } from "../../src/server/management-auth";
-import { handleLinkRoutes, type LinkRouteState } from "../../src/server/management/link-routes";
-import type { ManagementContext } from "../../src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
+import type { CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import { runGuiCommand } from "../../backend/src/cli/gui";
+import { createGuiPairingGrant, consumeGuiPairingGrant, issueGuiSession, authorizeGuiSessionRequest } from "../../backend/src/server/gui-session";
+import { createManagementSessionControl, managementPrincipal, managementSessionIssuance, requireManagementAuth, type ManagementAuthState } from "../../backend/src/server/management-auth";
+import { handleLinkRoutes, type LinkRouteState } from "../../backend/src/server/management/link-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
 import { describe, expect, spyOn, test } from "bun:test";
-import { requestBoundGuiPairingGrant } from "../../src/cli/gui-pair-client";
+import { requestBoundGuiPairingGrant } from "../../backend/src/cli/gui-pair-client";
 import {
   LOCAL_ATTESTATION_CHALLENGE_HEADER,
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import {
   GUI_PAIR_BROWSER_ORIGIN_HEADER,
   GUI_PAIR_CAPABILITY_HEADER,
   GUI_PAIR_CAPABILITY_VERSION,
   GUI_PAIR_PATH,
   verifyGuiPairCapability,
-} from "../../src/lib/gui-pair-capability";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
+} from "../../backend/src/lib/gui-pair-capability";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
 
 const secret = "A".repeat(43);
 const nonce = "B".repeat(43);
@@ -32,10 +32,10 @@ test.each([
   ["IPv6 bind", "::1", false, "http://[::1]:10100"],
   ["auto-started default bind", undefined, true, "http://127.0.0.1:10100"],
 ] as const)("GUI dispatch opens a pairable origin for the %s", async (_label, hostname, start, expectedOrigin) => {
-  const { dispatchCommand } = await import("../../src/cli/dispatch");
-  const { probeHostname } = await import("../../src/server/proxy-liveness");
-  const launcher = await import("../../src/lib/open-url");
-  const pairingClient = await import("../../src/cli/gui-pair-client");
+  const { dispatchCommand } = await import("../../backend/src/cli/dispatch");
+  const { probeHostname } = await import("../../backend/src/server/proxy-liveness");
+  const launcher = await import("../../backend/src/lib/open-url");
+  const pairingClient = await import("../../backend/src/cli/gui-pair-client");
   const config: OcxConfig = { port: 10100, hostname, providers: {}, defaultProvider: "openai" };
   const live: LiveProxy = { ...target, hostname };
   const opened: string[] = [];

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints } from "../../src/codex/catalog";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { resolveModelPolicy } from "../../src/providers/resolved-model-policy";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { resolveModelPolicy } from "../../backend/src/providers/resolved-model-policy";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 
 // Xiaomi's model pages (mimo.mi.com/models/en-US/<id>, fetched 2026-09-24): 1M context,
 // 128K max output, and text/image/video/audio input for V2.6 Pro/Flash and V2.5 (V2.5 Pro

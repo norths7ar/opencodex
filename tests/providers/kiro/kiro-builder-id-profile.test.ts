@@ -3,10 +3,10 @@ import { Database } from "bun:sqlite";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { KIRO_BUILDER_ID_SERVICE_PROFILE_ARN } from "../../../src/adapters/kiro-constants";
-import { getValidAccessTokenSnapshot } from "../../../src/oauth";
-import { resolveKiroApiRegion, resolveKiroProfileArn, resolveKiroRequestProfileArn } from "../../../src/oauth/kiro";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { KIRO_BUILDER_ID_SERVICE_PROFILE_ARN } from "../../../backend/src/adapters/kiro-constants";
+import { getValidAccessTokenSnapshot } from "../../../backend/src/oauth";
+import { resolveKiroApiRegion, resolveKiroProfileArn, resolveKiroRequestProfileArn } from "../../../backend/src/oauth/kiro";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 /** Mirrors resolveKiroCliNativeSessionEntries so an accountless request reads a real local import. */
@@ -32,8 +32,8 @@ function seedKiroCliBuilderIdSession(): void {
   ]);
   db.close();
 }
-import { saveCredential } from "../../../src/oauth/store";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { saveCredential } from "../../../backend/src/oauth/store";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * Issue #993 follow-up: an AWS Builder ID account authenticates through SSO OIDC and never receives

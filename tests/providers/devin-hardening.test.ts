@@ -1,20 +1,20 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeDevinModelId } from "../../src/adapters/devin";
-import { mapOcxMessagesToDevin } from "../../src/adapters/devin";
-import { parseDevinAuthPaste, refreshDevinToken } from "../../src/oauth/devin";
-import { DEVIN_DEFAULT_API_SERVER, resolveDevinApiBaseUrl, validateDevinApiBaseUrl } from "../../src/oauth/devin/api-base";
-import { registerUser } from "../../src/oauth/devin/register-user";
-import { anySignal } from "../../src/lib/abort";
-import { buildGetChatMessageRequestForTests, streamChatEvents } from "../../src/adapters/devin/cloud-direct/chat";
-import { clearCachedCatalog } from "../../src/adapters/devin/cloud-direct/catalog";
-import { decodeModelUsageStats } from "../../src/adapters/devin/cloud-direct/chat";
-import { CloudChatError, decodeChatFrame } from "../../src/adapters/devin/cloud-direct/chat";
-import { connectTrailerHttpStatus } from "../../src/adapters/devin/cloud-direct/chat";
-import { devinErrorClassification, mergeDevinUsage } from "../../src/adapters/devin";
-import { iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { buildMetadata, normalizeDevinSessionToken } from "../../src/adapters/devin/cloud-direct/metadata";
-import { parseRequest } from "../../src/responses/parser";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
+import { normalizeDevinModelId } from "../../backend/src/adapters/devin";
+import { mapOcxMessagesToDevin } from "../../backend/src/adapters/devin";
+import { parseDevinAuthPaste, refreshDevinToken } from "../../backend/src/oauth/devin";
+import { DEVIN_DEFAULT_API_SERVER, resolveDevinApiBaseUrl, validateDevinApiBaseUrl } from "../../backend/src/oauth/devin/api-base";
+import { registerUser } from "../../backend/src/oauth/devin/register-user";
+import { anySignal } from "../../backend/src/lib/abort";
+import { buildGetChatMessageRequestForTests, streamChatEvents } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { clearCachedCatalog } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { decodeModelUsageStats } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { CloudChatError, decodeChatFrame } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { connectTrailerHttpStatus } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { devinErrorClassification, mergeDevinUsage } from "../../backend/src/adapters/devin";
+import { iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { buildMetadata, normalizeDevinSessionToken } from "../../backend/src/adapters/devin/cloud-direct/metadata";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
 
 /** Tag -> field for one encoded proto message. */
 function iterFieldMap(buf: Buffer): Record<number, { wire: number; value: unknown }> {

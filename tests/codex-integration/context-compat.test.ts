@@ -5,7 +5,7 @@ import { join } from "node:path";
 import {
   codexCompatibleUrl, contextEndpoint, contextCompatibleBaseLine,
   contextExperimentalEnabled, contextRelayActivated, resetContextRelayActivationForTests,
-} from "../../src/codex/context-compat";
+} from "../../backend/src/codex/context-compat";
 
 describe("route and config isolation", () => {
   test("aliases data-plane routes and preserves query; never aliases management", () => {

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { dispatchCommand, type CliDispatchDeps } from "../../src/cli/dispatch";
+import { dispatchCommand, type CliDispatchDeps } from "../../backend/src/cli/dispatch";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**
@@ -50,7 +50,7 @@ async function seedOffConfig(): Promise<void> {
   // Codex already OFF in this home, so the desired-state write reports "unchanged" and the
   // residue classifier reports clean — the no-op path under test. Written through the real
   // saver so the file satisfies the same schema the CLI validates.
-  const { loadConfig, saveConfig } = await import("../../src/config");
+  const { loadConfig, saveConfig } = await import("../../backend/src/config");
   const config = loadConfig();
   saveConfig({ ...config, clientIntegrations: { ...(config.clientIntegrations ?? {}), codex: false } });
 }
@@ -58,7 +58,7 @@ async function seedOffConfig(): Promise<void> {
 async function seedOnConfig(): Promise<void> {
   // Codex ON, so the desired-state write is a real change and restore takes its ordinary
   // forward path rather than the already-clean branch.
-  const { loadConfig, saveConfig } = await import("../../src/config");
+  const { loadConfig, saveConfig } = await import("../../backend/src/config");
   const config = loadConfig();
   const integrations = { ...(config.clientIntegrations ?? {}) };
   delete integrations.codex;

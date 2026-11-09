@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { cursorRequestUsesCodeMode } from "../../src/adapters/cursor/tool-definitions";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { cursorRequestUsesCodeMode } from "../../backend/src/adapters/cursor/tool-definitions";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 import { collectSse, jsonItemTypes, jsonToolItems, replay, streamedView } from "../helpers/responses-conformance";
 
 /**

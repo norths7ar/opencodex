@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * #5210 case 3. Gemini expresses schema-enforced function calling as

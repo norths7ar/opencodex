@@ -3,7 +3,7 @@ import {
   accountQuotaFromReport,
   filterModels,
   formatQuotaSourceLabel,
-} from "../../gui/src/provider-workspace/report";
+} from "../../frontend/src/provider-workspace/report";
 
 describe("workspace detail derived states (WP090)", () => {
   describe("filterModels", () => {

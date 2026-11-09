@@ -1,4 +1,4 @@
-import { openCodexCoordinatorTransaction } from "../../src/codex/transition-state";
+import { openCodexCoordinatorTransaction } from "../../backend/src/codex/transition-state";
 
 const payload = JSON.parse(process.env.OCX_ADOPTION_CRASH_PAYLOAD ?? "{}") as {
   coordinatorPath: string;

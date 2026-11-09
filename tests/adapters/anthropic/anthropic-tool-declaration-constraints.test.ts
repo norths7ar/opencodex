@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { createRegisteredAdapter } from "../../../src/adapters/registry";
-import { anthropicToResponsesBody } from "../../../src/claude/inbound";
-import { parseRequest } from "../../../src/responses/parser";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { createRegisteredAdapter } from "../../../backend/src/adapters/registry";
+import { anthropicToResponsesBody } from "../../../backend/src/claude/inbound";
+import { parseRequest } from "../../../backend/src/responses/parser";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * #5210. `strict` and `allowed_callers` are declaration fields Anthropic defines, and the

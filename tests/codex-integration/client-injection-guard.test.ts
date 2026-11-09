@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { delimiter, dirname, join } from "node:path";
 import { repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { resolveCodexCoordinatorDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
+import { resolveCodexCoordinatorDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
 
 const roots: string[] = [];
 const coordinators: string[] = [];

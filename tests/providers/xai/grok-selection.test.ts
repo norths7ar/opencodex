@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildGrokManagedBlock, injectGrokConfig } from "../../../src/grok/inject";
-import { syncGrokConfig } from "../../../src/grok/sync";
-import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../../../src/codex/catalog";
-import type { CatalogModel } from "../../../src/codex/catalog";
-import type { OcxConfig } from "../../../src/types";
+import { buildGrokManagedBlock, injectGrokConfig } from "../../../backend/src/grok/inject";
+import { syncGrokConfig } from "../../../backend/src/grok/sync";
+import { nativeOpenAiContextWindow, visibleNativeSlugs } from "../../../backend/src/codex/catalog";
+import type { CatalogModel } from "../../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 /**

@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { AsideProfileError, type AsideProfilesInput } from "../../src/integrations/aside-profile-context";
-import { getAsideProfileState, listAsideProfileStates, mutateAsideProfiles, refreshAsideProfiles } from "../../src/integrations/aside-profiles";
-import { asideOperationMatchesCurrent, deleteAsideOperation, findAsideOperation, listAsideOperations, restoreAsideProfile } from "../../src/integrations/aside-profile-journal";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { AsideProfileError, type AsideProfilesInput } from "../../backend/src/integrations/aside-profile-context";
+import { getAsideProfileState, listAsideProfileStates, mutateAsideProfiles, refreshAsideProfiles } from "../../backend/src/integrations/aside-profiles";
+import { asideOperationMatchesCurrent, deleteAsideOperation, findAsideOperation, listAsideOperations, restoreAsideProfile } from "../../backend/src/integrations/aside-profile-journal";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("Aside profile desired state, ownership and history", () => {

@@ -4,8 +4,8 @@
  * two can never disagree; these cases pin which reason wins when several apply.
  */
 import { describe, expect, test } from "bun:test";
-import { isNativeChatRouteEligible, nativeChatDeclineReason } from "../../src/server/chat-native";
-import type { RouteResult } from "../../src/router";
+import { isNativeChatRouteEligible, nativeChatDeclineReason } from "../../backend/src/server/chat-native";
+import type { RouteResult } from "../../backend/src/router";
 
 function route(overrides: Partial<RouteResult> & { adapter?: string; authMode?: string } = {}): RouteResult {
   const { adapter = "openai-chat", authMode, ...rest } = overrides;

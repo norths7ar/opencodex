@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
-import { CODEX_WS_LIVENESS_PING_INTERVAL_MS, codexWsUpstreamFetch } from "../../src/server/responses/ws-upstream";
-import { codexWsPool } from "../../src/server/responses/codex-ws-pool";
+import { CODEX_WS_LIVENESS_PING_INTERVAL_MS, codexWsUpstreamFetch } from "../../backend/src/server/responses/ws-upstream";
+import { codexWsPool } from "../../backend/src/server/responses/codex-ws-pool";
 import { BOUNDED_WS_RUNTIME, streamingInit } from "../helpers/ws-upstream-fixtures";
 
 /**

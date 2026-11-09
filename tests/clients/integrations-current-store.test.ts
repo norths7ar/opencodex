@@ -14,14 +14,14 @@ import {
   zcodeBootstrapSettingsPath,
   type ZcodeStoreProviderRule,
   type ExportModel,
-} from "../../src/clients/config-export";
-import { formatSelectorConjunction } from "../../src/integrations/merge";
-import { DYNAMIC_SEGMENT, previewIntegration } from "../../src/integrations/mutation-plan";
-import { fingerprint } from "../../src/integrations/ownership";
-import { INTEGRATION_CLIENTS, resolveIntegrationPaths } from "../../src/integrations/registry";
-import type { ReadResult } from "../../src/integrations/config-io";
-import { exportContextOf, readIntegrationState, readPath } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
+} from "../../backend/src/clients/config-export";
+import { formatSelectorConjunction } from "../../backend/src/integrations/merge";
+import { DYNAMIC_SEGMENT, previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { fingerprint } from "../../backend/src/integrations/ownership";
+import { INTEGRATION_CLIENTS, resolveIntegrationPaths } from "../../backend/src/integrations/registry";
+import type { ReadResult } from "../../backend/src/integrations/config-io";
+import { exportContextOf, readIntegrationState, readPath } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
 import {
   applyIntegration,
   applyIntegrationCoordinated,
@@ -30,8 +30,8 @@ import {
   refreshIntegration,
   restoreIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

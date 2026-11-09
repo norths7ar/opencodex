@@ -1,19 +1,19 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { getDefaultConfig } from "../../src/config";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import { handleResponses } from "../../src/server/responses";
-import { expandPreviousResponseInput } from "../../src/responses/state";
-import { setRelayPlatformForTests } from "../../src/server/responses/passthrough-delivery";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { getDefaultConfig } from "../../backend/src/config";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import { handleResponses } from "../../backend/src/server/responses";
+import { expandPreviousResponseInput } from "../../backend/src/responses/state";
+import { setRelayPlatformForTests } from "../../backend/src/server/responses/passthrough-delivery";
 import {
   BUFFERED_RESPONSES_TOTAL_TIMEOUT_MS,
   bufferedResponsesReadOptions,
   collectBufferedResponsesSse,
   inspectBufferedResponsesTerminal,
-} from "../../src/server/responses/buffered-sse-json";
-import type { HandleResponsesOptions } from "../../src/server/responses/core";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/responses/buffered-sse-json";
+import type { HandleResponsesOptions } from "../../backend/src/server/responses/core";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { repoPath } from "../helpers/repo-root";
@@ -461,7 +461,7 @@ describe("canonical ChatGPT transport for non-streaming Responses callers (#6162
   });
 
   test("canonical buffered serving-state commit is ordered after both validations", () => {
-    const source = readFileSync(repoPath("src/server/responses/passthrough-delivery.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/server/responses/passthrough-delivery.ts"), "utf8");
     const branch = source.indexOf("if (canonicalBufferedJson) {");
     const rawValidation = source.indexOf("if (!raw.ok)", branch);
     const clientValidation = source.indexOf("if (!client.ok)", rawValidation);

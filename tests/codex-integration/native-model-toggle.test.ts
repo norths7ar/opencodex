@@ -22,17 +22,17 @@ import {
   trustedAccountBoundNativeCatalogSlug,
   visibleCodexAccountSelectors,
   visibleNativeSlugs,
-} from "../../src/codex/catalog";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { applyMultiAgentMode, applyNativeOpenAiContextOverride } from "../../src/codex/catalog/parsing";
-import { NATIVE_GPT56_CONTEXT_WINDOW, NATIVE_GPT56_OPT_IN_CONTEXT_WINDOW, nativeOpenAiContextTier, nativeOpenAiContextWindow } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
+} from "../../backend/src/codex/catalog";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { applyMultiAgentMode, applyNativeOpenAiContextOverride } from "../../backend/src/codex/catalog/parsing";
+import { NATIVE_GPT56_CONTEXT_WINDOW, NATIVE_GPT56_OPT_IN_CONTEXT_WINDOW, nativeOpenAiContextTier, nativeOpenAiContextWindow } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
 import {
   GATED_MODEL_CLIENT_VERSION_FLOOR,
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
+} from "../../backend/src/codex/model-entitlements";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 afterEach(() => resetCodexModelEntitlementCacheForTests());

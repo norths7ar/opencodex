@@ -5,7 +5,7 @@ import {
   providerCacheGenerations,
   reconcileModelCacheProviders,
   setCached,
-} from "../../src/codex/model-cache";
+} from "../../backend/src/codex/model-cache";
 
 let reconciliationGeneration = Date.now();
 

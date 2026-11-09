@@ -2,14 +2,14 @@
  * Observed protocol trace derivation (src/protocols/trace.ts, PF-02).
  */
 import { describe, expect, test } from "bun:test";
-import { PROTOCOL_CONTRACT_VERSION } from "../../src/protocols/contract";
-import { isProtocolTraceV1, PROTOCOL_DTO_LIMITS } from "../../src/protocols/dto";
+import { PROTOCOL_CONTRACT_VERSION } from "../../backend/src/protocols/contract";
+import { isProtocolTraceV1, PROTOCOL_DTO_LIMITS } from "../../backend/src/protocols/dto";
 import {
   markAttemptProtocolPath,
   markProtocolBlocked,
   markProtocolEntry,
   protocolTraceForRequest,
-} from "../../src/protocols/trace";
+} from "../../backend/src/protocols/trace";
 
 const attempt = (ordinal: number, adapter: string) => ({ ordinal, adapter });
 

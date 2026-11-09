@@ -25,18 +25,18 @@ import {
   seedCodexModelEntitlementsForTests,
   type CodexModelEntitlementCredentialSnapshot,
   type CodexModelEntitlementState,
-} from "../../src/codex/model-entitlements";
+} from "../../backend/src/codex/model-entitlements";
 import {
   forceRefreshMainAccountToken,
   MAIN_CODEX_ACCOUNT_ID,
-} from "../../src/codex/main-account";
+} from "../../backend/src/codex/main-account";
 import {
   readCodexAccountRecord,
   saveCodexAccountCredential,
-} from "../../src/codex/account-store";
-import { clearCodexRuntimeResolveCache, loadPersistedCodexRuntime } from "../../src/codex/runtime";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
-import upstreamModelsSnapshot from "../../src/codex/data/upstream-models.json";
+} from "../../backend/src/codex/account-store";
+import { clearCodexRuntimeResolveCache, loadPersistedCodexRuntime } from "../../backend/src/codex/runtime";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
+import upstreamModelsSnapshot from "../../backend/src/codex/data/upstream-models.json";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
@@ -1931,8 +1931,8 @@ describe("the denial reader honours a caller's account read fence", () => {
    * exactly how the original violation survived review.
    */
   test("every request-path caller passes its own fence", () => {
-    const authContext = readFileSync(repoPath("src", "codex", "auth-context.ts"), "utf8");
-    const prepare = readFileSync(repoPath("src", "server", "responses", "request-prepare.ts"), "utf8");
+    const authContext = readFileSync(repoPath("backend/src", "codex", "auth-context.ts"), "utf8");
+    const prepare = readFileSync(repoPath("backend/src", "server", "responses", "request-prepare.ts"), "utf8");
 
     // Auth context reuses the very set it already built for the entitlement snapshot, so the two
     // account questions on this request can never disagree about what it may read.

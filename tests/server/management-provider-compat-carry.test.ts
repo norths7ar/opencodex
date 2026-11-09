@@ -15,24 +15,24 @@ import { afterEach, describe, expect, setDefaultTimeout, spyOn, test } from "bun
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import { loadConfig, saveConfig } from "../../src/config";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import { parseRequest } from "../../src/responses/parser";
-import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
-import { rateLimitRetryPolicyFor, resetReplayPolicyFor, transientRetryPolicyFor } from "../../src/providers/key-failover";
-import { routeModel } from "../../src/router";
-import { startServer } from "../../src/server";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { clearReasoningReplayCacheForTests } from "../../backend/src/responses/reasoning-replay-cache";
+import { rateLimitRetryPolicyFor, resetReplayPolicyFor, transientRetryPolicyFor } from "../../backend/src/providers/key-failover";
+import { routeModel } from "../../backend/src/router";
+import { startServer } from "../../backend/src/server";
 import {
   PROVIDER_COMPAT_CARRY_FIELDS,
   PROVIDER_REASONING_WIRE_FORMATS,
   providerOverwriteKeepsDestination,
   sampleProviderOverwrite,
   type ProviderCompatCarryField,
-} from "../../src/server/management/provider-overwrite-carry";
-import type { OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/server/management/provider-overwrite-carry";
+import type { OcxProviderConfig } from "../../backend/src/types";
 import { managementFetch as fetch } from "../helpers/management-auth";
 import { config } from "../helpers/management-relative-send-paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

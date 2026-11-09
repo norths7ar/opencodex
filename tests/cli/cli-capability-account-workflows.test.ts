@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { Readable } from "node:stream";
 import { readFileSync } from "node:fs";
-import { ACCOUNT_CAPABILITIES } from "../../src/cli/capabilities-accounts";
-import { CAPABILITIES as BASE } from "../../src/cli/capabilities-base";
-import { cmdAccount } from "../../src/cli/account";
-import { cmdNativeMainAccount } from "../../src/cli/account-main";
-import { handleAccountAuthCommand } from "../../src/cli/account-auth";
-import type { AccountDeps } from "../../src/cli/account-api";
-import type { OcxConfig } from "../../src/types";
+import { ACCOUNT_CAPABILITIES } from "../../backend/src/cli/capabilities-accounts";
+import { CAPABILITIES as BASE } from "../../backend/src/cli/capabilities-base";
+import { cmdAccount } from "../../backend/src/cli/account";
+import { cmdNativeMainAccount } from "../../backend/src/cli/account-main";
+import { handleAccountAuthCommand } from "../../backend/src/cli/account-auth";
+import type { AccountDeps } from "../../backend/src/cli/account-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 
@@ -62,7 +62,7 @@ function capability(key: string) {
 
 describe("account discovery follows actual family-specific workflows", () => {
   test("logout documents explicit targets without executing credential removal", () => {
-    const source = readFileSync(repoPath("src", "cli", "logout-command.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "logout-command.ts"), "utf8");
     const usage = /Usage: (ocx logout <provider> \[--live\] \[--json\])/.exec(source)?.[1];
     expect(capability("logout").usage).toBe(usage);
     expect(capability("logout").routes).toEqual([{ method: "POST", path: "/api/oauth/logout" }]);

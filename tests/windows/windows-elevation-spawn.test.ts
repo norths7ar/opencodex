@@ -24,7 +24,7 @@ import {
   setTrustedWindowsElevationExecutablesForTests,
   startElevatedSchtasksCreateAndRun,
   startPowerShellCommand,
-} from "../../src/lib/windows-elevation";
+} from "../../backend/src/lib/windows-elevation";
 import {
   evaluateSchedulerInstallRestartReconciliation,
   finalizeWindowsSchedulerServiceRegistration,
@@ -32,15 +32,15 @@ import {
   setFinalizeWindowsSchedulerHooksForTests,
   stageElevatedSchedulerRegistration,
   describeElevatedRegistrationFailure,
-} from "../../src/service";
-import type { WindowsSchedulerInstallVerification } from "../../src/service";
+} from "../../backend/src/service";
+import type { WindowsSchedulerInstallVerification } from "../../backend/src/service";
 import {
   hardenSecretDir,
   hardenSecretPath,
   resetHardenedStateForTests,
   setIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

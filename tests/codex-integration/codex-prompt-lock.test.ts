@@ -17,8 +17,8 @@ import {
   stillHeld,
   tryAcquire,
   type LockDeps,
-} from "../../src/codex/prompt-lock";
-import { createOwnerIdentity, ownEvidence, ownerDefaults, ownerState } from "../../src/codex/prompt-lock-owner";
+} from "../../backend/src/codex/prompt-lock";
+import { createOwnerIdentity, ownEvidence, ownerDefaults, ownerState } from "../../backend/src/codex/prompt-lock-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -151,7 +151,7 @@ describe("interleavings", () => {
     writeFileSync(path, JSON.stringify({ ...ownEvidence(ownerDefaults), token: "old", pid: 999999999, acquiredAt: 0 }));
     const children = Array.from({ length: 8 }, (_, i) => Bun.spawn([process.execPath, "-e", `
       const fs=await import('node:fs');
-      const {tryAcquire,release}=await import(${JSON.stringify(repoPath("src/codex/prompt-lock.ts"))});
+      const {tryAcquire,release}=await import(${JSON.stringify(repoPath("backend/src/codex/prompt-lock.ts"))});
       fs.writeFileSync(${JSON.stringify(path + ".ready-")}+${i}, 'ready');
       const barrierUntil=Date.now()+15000;
       while(!fs.existsSync(${JSON.stringify(go)})){if(Date.now()>barrierUntil)throw Error('barrier timeout');await Bun.sleep(5);}
@@ -192,7 +192,7 @@ describe("interleavings", () => {
     writeFileSync(path, JSON.stringify({ ...ownEvidence(ownerDefaults), token: "old", pid: 999999999, acquiredAt: 0 }));
     const child = Bun.spawn([process.execPath, "-e", `
       const fs = await import('node:fs');
-      const {tryAcquire} = await import(${JSON.stringify(repoPath("src/codex/prompt-lock.ts"))});
+      const {tryAcquire} = await import(${JSON.stringify(repoPath("backend/src/codex/prompt-lock.ts"))});
       tryAcquire(${JSON.stringify(path)}, {now:Date.now,isProcessAlive(){
         fs.writeFileSync(${JSON.stringify(ready)}, 'ready');
         Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,3000);
@@ -217,7 +217,7 @@ describe("interleavings", () => {
     const path = lockPath();
     writeFileSync(path, JSON.stringify({ ...ownEvidence(ownerDefaults), token: "old", pid: 999999999, acquiredAt: 0 }));
     const ready = path + ".ready", go = path + ".go", stop = path + ".stop";
-    const modulePath = repoPath("src/codex/prompt-lock.ts");
+    const modulePath = repoPath("backend/src/codex/prompt-lock.ts");
     const a = Bun.spawn([process.execPath, "-e", `
       const fs = await import('node:fs');
       const {tryAcquire} = await import(${JSON.stringify(modulePath)});
@@ -462,7 +462,7 @@ describe("owner evidence and namespace guards", () => {
       return stat;
     } };
     let ran = false;
-    const { withLockClaim } = require("../../src/codex/prompt-lock-claim") as typeof import("../../src/codex/prompt-lock-claim");
+    const { withLockClaim } = require("../../backend/src/codex/prompt-lock-claim") as typeof import("../../backend/src/codex/prompt-lock-claim");
     expect(() => withLockClaim(path, "fedcba9876543210", injected, () => { ran = true; })).toThrow("Unsafe lock state");
     expect(ran).toBe(false); expect(readFileSync(entry, "utf8")).toBe(body);
   });
@@ -477,7 +477,7 @@ describe("owner evidence and namespace guards", () => {
     const path = lockPath();
     const child = Bun.spawn([process.execPath, "-e", `
       const {readSync}=require('node:fs');
-      const {tryAcquire,release}=require(${JSON.stringify(repoPath("src/codex/prompt-lock.ts"))});
+      const {tryAcquire,release}=require(${JSON.stringify(repoPath("backend/src/codex/prompt-lock.ts"))});
       const acquired=tryAcquire(${JSON.stringify(path)},{now:Date.now,isProcessAlive:pid=>{try{process.kill(pid,0);return true}catch{return false}},
         onClaimInitialized(){console.log('initialized');readSync(0,Buffer.alloc(1),0,1,null);}});
       if(acquired.ok)release(acquired.handle);

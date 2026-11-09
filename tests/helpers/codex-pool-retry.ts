@@ -1,15 +1,15 @@
 import { expect } from "bun:test";
 import { existsSync, mkdirSync } from "node:fs";
 import { removeTreeWithRetry } from "./remove-tree";
-import { saveConfig } from "../../src/config";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearCodexWebSocketRegistry } from "../../src/codex/websocket-registry";
-import { clearAccountNeedsReauth, clearAccountQuota, markAccountNeedsReauth, updateAccountQuota } from "../../src/codex/auth-api";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { clearRequestLogsForTests } from "../../src/server/request-log";
-import { startServer } from "../../src/server";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearCodexWebSocketRegistry } from "../../backend/src/codex/websocket-registry";
+import { clearAccountNeedsReauth, clearAccountQuota, markAccountNeedsReauth, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { clearRequestLogsForTests } from "../../backend/src/server/request-log";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 export const POOL_RETRY_MODEL = "gpt-5.5";
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { proxyStillLiveAfterStop } from "../../src/service";
+import { proxyStillLiveAfterStop } from "../../backend/src/service";
 
 /**
  * #764: `ocx service stop` reported success while the proxy kept running, and native Codex was

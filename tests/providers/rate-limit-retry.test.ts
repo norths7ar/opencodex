@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   rateLimitRetryDelayMs,
   rateLimitRetryPolicyFor,
-} from "../../src/providers/key-failover";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/key-failover";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let releaseSpendHome: (() => void) | undefined;

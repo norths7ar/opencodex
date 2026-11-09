@@ -11,14 +11,14 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleResponses } from "../../src/server/responses";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleResponses } from "../../backend/src/server/responses";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import {
   INTERCEPT_TARGET_UNAVAILABLE_CODE,
   INTERCEPT_TARGET_UNAVAILABLE_STATUS,
-} from "../../src/server/responses/shadow-target-availability";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/responses/shadow-target-availability";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

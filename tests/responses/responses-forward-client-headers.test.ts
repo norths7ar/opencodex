@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
-import { providerForwardClientHeadersConfigError } from "../../src/config/provider-validation";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import type { OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses/passthrough";
+import { providerForwardClientHeadersConfigError } from "../../backend/src/config/provider-validation";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 function buildHeaders(provider: OcxProviderConfig, incoming: Record<string, string>): Record<string, string> {
   const budget = createTranslatorBudget();

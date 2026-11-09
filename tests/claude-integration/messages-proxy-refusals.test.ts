@@ -18,7 +18,7 @@ for (const kind of ["kiro-continuation", "config", "workflow-unbound", "pool-ref
   const home = mkdtempSync(join(tmpdir(), "ocx-local-refusal-")); mkdirSync(join(home, "ocx")); mkdirSync(join(home, "codex"));
   try {
     const red = kind === "config" || kind === "native-pacing-preflight" ? join(home, "red") : undefined;
-    if (red) for (const path of ["src/lib/client-error-body.ts", "src/server/claude-messages.ts", "src/server/messages-native.ts", "src/claude/failure-verdict.ts"]) {
+    if (red) for (const path of ["backend/src/lib/client-error-body.ts", "backend/src/server/claude-messages.ts", "backend/src/server/messages-native.ts", "backend/src/claude/failure-verdict.ts"]) {
       const target = join(red, path);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, "// L7_RED_SOURCE_MARKER\n" + readFileSync(repoPath(path), "utf8"));
@@ -38,12 +38,12 @@ for (const kind of ["kiro-continuation", "config", "workflow-unbound", "pool-ref
       expect(result.hooks.redFilterChecks.every((check: { forward: boolean; backward: boolean }) => check.forward && check.backward)).toBe(true);
     } else expect(result.hooks.redInputs).toEqual([]);
     if (kind === "config" || kind === "workflow-unbound") expect(result.hooks.upstreamHits).toBeGreaterThan(0);
-    if (kind === "config") for (const path of ["src/lib/client-error-body.ts", "src/server/claude-messages.ts", "src/claude/failure-verdict.ts"]) {
+    if (kind === "config") for (const path of ["backend/src/lib/client-error-body.ts", "backend/src/server/claude-messages.ts", "backend/src/claude/failure-verdict.ts"]) {
       expect(result.hooks.redInputs).toContainEqual({ path, marker: true });
     }
     if (kind === "native-pacing-preflight") {
       expect(result.hooks.nativeHits).toBeGreaterThan(0);
-      expect(result.hooks.redInputs).toContainEqual({ path: "src/server/messages-native.ts", marker: true });
+      expect(result.hooks.redInputs).toContainEqual({ path: "backend/src/server/messages-native.ts", marker: true });
     }
     if (kind === "kiro-continuation") {
       expect(result.fetched).toBe(1); expect(result.text).not.toContain(result.absent);
@@ -58,7 +58,7 @@ for (const kind of ["kiro-continuation", "config", "workflow-unbound", "pool-ref
 }, 30000);
 
 test("presentation metadata preserves construction ownership across clones", async () => {
-  const { markProxyError, carryProxyError, proxyErrorPresentation, isProxyError } = await import("../../src/lib/client-error-body");
+  const { markProxyError, carryProxyError, proxyErrorPresentation, isProxyError } = await import("../../backend/src/lib/client-error-body");
   const source = markProxyError(Response.json({ error: { message: "fixture" } }, { status: 403 }), "roster");
   const clone = carryProxyError(source, new Response(source.clone().body, { status: 403 }));
   expect(proxyErrorPresentation(clone)).toBe("roster");
@@ -67,7 +67,7 @@ test("presentation metadata preserves construction ownership across clones", asy
 });
 
 test("message registration reaches contexts carried before construction", async () => {
-  const { carryProxyErrorContext, rememberProxyErrorMessage, proxyMessagePresentation } = await import("../../src/lib/client-error-body");
+  const { carryProxyErrorContext, rememberProxyErrorMessage, proxyMessagePresentation } = await import("../../backend/src/lib/client-error-body");
   const source = {}, target = {};
   carryProxyErrorContext(source, target);
   rememberProxyErrorMessage(source, "fixture", { status: 403, type: "permission_error", presentation: "roster" });

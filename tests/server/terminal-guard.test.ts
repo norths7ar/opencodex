@@ -4,9 +4,9 @@ import {
   buildContinuationRequest,
   guardTerminalEventStream,
   isTerminalGuardPassthroughOnly,
-} from "../../src/server/responses/terminal-guard";
-import { buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
+} from "../../backend/src/server/responses/terminal-guard";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
 
 function parsed(userText: string, withTools = true): OcxParsedRequest {
   return {

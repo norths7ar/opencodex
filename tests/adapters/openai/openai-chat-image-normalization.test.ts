@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { createMimoFreeAdapter, resetMimoJwtCache } from "../../../src/adapters/mimo-free";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { createMimoFreeAdapter, resetMimoJwtCache } from "../../../backend/src/adapters/mimo-free";
 import {
   hasShrinkableOpenAIChatImages,
   normalizeOpenAIChatImages,
   OPENAI_CHAT_IMAGE_BASE64_BUDGET,
-} from "../../../src/adapters/openai-chat-images";
+} from "../../../backend/src/adapters/openai-chat-images";
 import {
   getNormalizeStatsForTests,
   resetNormalizeStateForTests,
   TIER_SPECS,
   type EncodeFn,
-} from "../../../src/adapters/anthropic-image-normalize";
-import { bunImageEncode, bunImageValidate } from "../../../src/adapters/anthropic-image-codec";
-import { sniffImageDimensions } from "../../../src/adapters/anthropic-image-guard";
-import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/anthropic-image-normalize";
+import { bunImageEncode, bunImageValidate } from "../../../backend/src/adapters/anthropic-image-codec";
+import { sniffImageDimensions } from "../../../backend/src/adapters/anthropic-image-guard";
+import type { OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 import { phaseTimer } from "../../helpers/phase-timing";
 

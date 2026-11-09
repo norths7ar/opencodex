@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
 import {
   PlaintextV2AgentMessageRestoreOverflowError,
   createPlaintextV2AgentMessageCallRestoreRewrite,
@@ -9,7 +9,7 @@ import {
   restorePlaintextV2AgentMessageCallsInJson,
   restorePlaintextV2AgentMessageCallsInJsonResult,
   shouldPreparePlaintextV2AgentMessages,
-} from "../../src/responses/plaintext-v2-agent-messages";
+} from "../../backend/src/responses/plaintext-v2-agent-messages";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

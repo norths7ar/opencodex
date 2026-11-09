@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { decodeWindowsTextBytes } from "../../src/lib/windows-text";
+import { decodeWindowsTextBytes } from "../../backend/src/lib/windows-text";
 
 describe("Windows system text decoding (#1573)", () => {
   test("preserves strict UTF-8 before considering a legacy code page", () => {

@@ -1,4 +1,4 @@
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 export function serverAuthConfig(hostname?: string): OcxConfig {
   return {

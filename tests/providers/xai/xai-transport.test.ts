@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { parseRequest } from "../../../src/responses/parser";
-import { buildModelsRequest } from "../../../src/oauth";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { buildModelsRequest } from "../../../backend/src/oauth";
 import {
   isXaiResponsesDestination,
   resolveProviderTransport,
@@ -9,12 +9,12 @@ import {
   XAI_CONV_ID_HEADER,
   XAI_GROK_CLI_BASE_URL,
   XAI_GROK_CLIENT_VERSION,
-} from "../../../src/providers/xai-transport";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { routedProviderConfig } from "../../../src/router";
-import { XAI_RESPONSES_OPT_IN_MODELS, xaiResponsesOptInState } from "../../../src/providers/xai-responses-opt-in";
-import { resolveWireProtocolOverride } from "../../../src/server/adapter-resolve";
-import type { OcxAssistantMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/xai-transport";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { routedProviderConfig } from "../../../backend/src/router";
+import { XAI_RESPONSES_OPT_IN_MODELS, xaiResponsesOptInState } from "../../../backend/src/providers/xai-responses-opt-in";
+import { resolveWireProtocolOverride } from "../../../backend/src/server/adapter-resolve";
+import type { OcxAssistantMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const OMITTED = [

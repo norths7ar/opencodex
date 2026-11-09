@@ -3,9 +3,9 @@ import {
   collectRoutedCustomToolNames,
   restoreRoutedCustomCallsInJson,
   rewriteRoutedCustomToolsForUpstream,
-} from "../../src/responses/custom-tool-compat";
-import { compileCodeModeHelperInput } from "../../src/responses/code-mode-helper-compat";
-import { createRoutedCustomToolRestoreBlockRewrite } from "../../src/server/responses-custom-tool-repair";
+} from "../../backend/src/responses/custom-tool-compat";
+import { compileCodeModeHelperInput } from "../../backend/src/responses/code-mode-helper-compat";
+import { createRoutedCustomToolRestoreBlockRewrite } from "../../backend/src/server/responses-custom-tool-repair";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { CANONICAL_PATCH, DECORATED_PATCH, WRAPPED_DECORATED_PATCH, dataPayload, frame } from "../helpers/custom-tool-repair-fixtures";
 

@@ -8,8 +8,8 @@ import {
   loadConfig,
   saveConfig,
   validateConfigCandidate,
-} from "../../src/config";
-import { resolveSkillsCatalogRefresh } from "../../src/server/responses/skills-snapshot";
+} from "../../backend/src/config";
+import { resolveSkillsCatalogRefresh } from "../../backend/src/server/responses/skills-snapshot";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home = "";

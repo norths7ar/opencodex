@@ -5,10 +5,10 @@
  * provider-wide adapter wins and the hosted tool is dropped on the way out.
  */
 import { describe, expect, test } from "bun:test";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { captureRouteStaticPolicy } from "../../src/router";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import type { OcxProviderConfig } from "../../src/types";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { captureRouteStaticPolicy } from "../../backend/src/router";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 function gateway(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   return {

@@ -6,10 +6,10 @@ import {
   hardenSecretDir, hardenSecretDirAsync, hardenElevatedStageDir, resetHardenedStateForTests,
   setPlatformForTests, setIcaclsRunnerForTests, setAsyncIcaclsRunnerForTests, setStatForTests,
   setNowForTests, hardenedSecretDirCountForTests, timedOutSecretPathCountForTests,
-} from "../../src/lib/windows-secret-acl";
-import { setWindowsOwnerAclRunnerForTests, setWindowsOwnerAclAsyncRunnerForTests, windowsEntriesAclMatches, windowsPrivateEntriesAclMatches } from "../../src/lib/windows-owner-acl";
-import { setWindowsPrincipalRunnerForTests, setAsyncWindowsPrincipalRunnerForTests, resetWindowsPrincipalForTests, resolveCurrentWindowsPrincipal } from "../../src/lib/windows-user-principal";
-import { withClientLifecycleSync } from "../../src/client/lifecycle-lock";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsOwnerAclRunnerForTests, setWindowsOwnerAclAsyncRunnerForTests, windowsEntriesAclMatches, windowsPrivateEntriesAclMatches } from "../../backend/src/lib/windows-owner-acl";
+import { setWindowsPrincipalRunnerForTests, setAsyncWindowsPrincipalRunnerForTests, resetWindowsPrincipalForTests, resolveCurrentWindowsPrincipal } from "../../backend/src/lib/windows-user-principal";
+import { withClientLifecycleSync } from "../../backend/src/client/lifecycle-lock";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const SID = "S-1-5-21-9-9-9-1001";

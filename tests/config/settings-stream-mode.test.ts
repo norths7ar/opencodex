@@ -13,29 +13,29 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import { writeRuntimePort } from "../../src/config/process-state";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
-import { invalidateStartupHealthCache } from "../../src/server/startup-health-cache";
-import { USAGE_RANGES, USAGE_SURFACES } from "../../src/usage/summary";
-import type { OcxConfig } from "../../src/types";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import { writeRuntimePort } from "../../backend/src/config/process-state";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
+import { invalidateStartupHealthCache } from "../../backend/src/server/startup-health-cache";
+import { USAGE_RANGES, USAGE_SURFACES } from "../../backend/src/usage/summary";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   appOwnedBytesSnapshot,
   configureAppOwnedMemoryBudget,
   registerRetainedStore,
   resetAppOwnedMemoryForTests,
-} from "../../src/lib/app-owned-memory";
+} from "../../backend/src/lib/app-owned-memory";
 import {
   evictOldestUsageSummaryForBudget,
   getUsageSummaryCacheEntry,
   resetUsageSummaryCacheForTests,
   setUsageSummaryCacheEntry,
   usageSummaryRetainedStoreSnapshot,
-} from "../../src/server/management/usage-summary-cache";
-import { resetUsageAggregateCacheForTests } from "../../src/server/management/usage-aggregate-cache";
+} from "../../backend/src/server/management/usage-summary-cache";
+import { resetUsageAggregateCacheForTests } from "../../backend/src/server/management/usage-aggregate-cache";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { repoRoot } from "../helpers/repo-root";
-import { MANAGED_AGENTS_TABLE_MARKER, MANAGED_SUBAGENT_DEFAULT_MARKER } from "../../src/codex/subagent-defaults";
+import { MANAGED_AGENTS_TABLE_MARKER, MANAGED_SUBAGENT_DEFAULT_MARKER } from "../../backend/src/codex/subagent-defaults";
 import { startupHealthFixture } from "../helpers/startup-health";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -235,7 +235,7 @@ describe("GET /api/settings", () => {
       persistEffortClamp,
       resetCodexRuntimeResolveCacheForTests,
       resolveCodexRuntimeAsync,
-    } = await import("../../src/codex/runtime");
+    } = await import("../../backend/src/codex/runtime");
     resetCodexRuntimeResolveCacheForTests();
 
     const fakeCodex = process.platform === "win32"
@@ -373,7 +373,7 @@ describe("settings codexRuntime snapshot", () => {
   }
 
   test("GET answers without waiting on the runtime probe and serves it once it lands", async () => {
-    const { resetCodexRuntimeResolveCacheForTests, resolveCodexRuntimeAsync } = await import("../../src/codex/runtime");
+    const { resetCodexRuntimeResolveCacheForTests, resolveCodexRuntimeAsync } = await import("../../backend/src/codex/runtime");
     resetCodexRuntimeResolveCacheForTests();
     const launcher = slowFakeCodex("0.200.0");
     try {
@@ -410,7 +410,7 @@ describe("settings codexRuntime snapshot", () => {
       peekCodexRuntimeProcessCache,
       resetCodexRuntimeResolveCacheForTests,
       resolveCodexRuntimeAsync,
-    } = await import("../../src/codex/runtime");
+    } = await import("../../backend/src/codex/runtime");
     resetCodexRuntimeResolveCacheForTests();
     const launcher = slowFakeCodex("0.200.0");
     const realNow = Date.now.bind(Date);
@@ -451,7 +451,7 @@ describe("settings codexRuntime snapshot", () => {
       peekCodexRuntimeProcessCache,
       resetCodexRuntimeResolveCacheForTests,
       resolveCodexRuntimeAsync,
-    } = await import("../../src/codex/runtime");
+    } = await import("../../backend/src/codex/runtime");
     resetCodexRuntimeResolveCacheForTests();
     const launcher = slowFakeCodex("0.200.0");
     try {
@@ -473,7 +473,7 @@ describe("settings codexRuntime snapshot", () => {
       peekCodexRuntimeProcessCache,
       resetCodexRuntimeResolveCacheForTests,
       resolveCodexRuntimeAsync,
-    } = await import("../../src/codex/runtime");
+    } = await import("../../backend/src/codex/runtime");
     resetCodexRuntimeResolveCacheForTests();
     const launcher = slowFakeCodex("0.200.0");
     try {
@@ -1131,7 +1131,7 @@ describe("manual compaction settings", () => {
   });
 
   test("failed persistence restores the override and its deletion intent", async () => {
-    const { projectConfigRebaseProvenance } = await import("../../src/config/rebase-provenance");
+    const { projectConfigRebaseProvenance } = await import("../../backend/src/config/rebase-provenance");
     const config = baseConfig();
     config.compactionRouting = { model: "gateway/cheap", reasoningEffort: "low" };
     const before = projectConfigRebaseProvenance(config);

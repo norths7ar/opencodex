@@ -1,19 +1,19 @@
 import { expect } from "bun:test";
 import { existsSync, mkdirSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
-import { applyCodexCliUpdate } from "../../src/codex/cli-update-apply";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
-import { settleBackgroundWork } from "../../src/lib/background-work";
-import { assertNotRealHomeUnderTest, isTestHomeGuardArmed, protectedHomeForTests } from "../../src/lib/test-home-guard";
-import { flushWindowsSecretAclReapsBeforeRemoval, hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
-import { setWindowsOwnerAclAsyncRunnerForTests, verifyWindowsEntriesAclAsync } from "../../src/lib/windows-owner-acl";
-import { readWindowsJobStore } from "../../src/codex/cli-update-job-store-windows";
-import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../src/server/gui-session";
+import { applyCodexCliUpdate } from "../../backend/src/codex/cli-update-apply";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
+import { settleBackgroundWork } from "../../backend/src/lib/background-work";
+import { assertNotRealHomeUnderTest, isTestHomeGuardArmed, protectedHomeForTests } from "../../backend/src/lib/test-home-guard";
+import { flushWindowsSecretAclReapsBeforeRemoval, hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsOwnerAclAsyncRunnerForTests, verifyWindowsEntriesAclAsync } from "../../backend/src/lib/windows-owner-acl";
+import { readWindowsJobStore } from "../../backend/src/codex/cli-update-job-store-windows";
+import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../backend/src/server/gui-session";
 import { createManagementSessionControl, initializeManagementAuthState, issueGuiSession,
-  managementPrincipal, managementSessionIssuance, requireManagementAuth } from "../../src/server/management-auth";
-import type { ManagementContext } from "../../src/server/management/context";
-import { handleCodexCliUpdateRoutes } from "../../src/server/management/codex-cli-update-routes";
-import type { OcxConfig } from "../../src/types";
+  managementPrincipal, managementSessionIssuance, requireManagementAuth } from "../../backend/src/server/management-auth";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { handleCodexCliUpdateRoutes } from "../../backend/src/server/management/codex-cli-update-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { assertWindowsPlanChildrenExited } from "./windows-plan-child-processes";
 import { observeWindowsPlanJunction } from "./windows-plan-junction-observer";
 

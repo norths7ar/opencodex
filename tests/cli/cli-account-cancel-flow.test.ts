@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { handleAccountAuthCommand } from "../../src/cli/account-auth";
+import { handleAccountAuthCommand } from "../../backend/src/cli/account-auth";
 
 interface SentRequest { path: string; body: unknown }
 

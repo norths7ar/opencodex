@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { buildResponseJSON } from "../../src/bridge";
-import { parseRequest } from "../../src/responses/parser";
-import { externalTaskInputContent } from "../../src/responses/task-input";
-import { buildTools } from "../../src/responses/parser-tools";
-import { parseTextFormat } from "../../src/responses/parser-text-format";
-import { buildToolBridgeMaps } from "../../src/server/responses";
+import { buildResponseJSON } from "../../backend/src/bridge";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { externalTaskInputContent } from "../../backend/src/responses/task-input";
+import { buildTools } from "../../backend/src/responses/parser-tools";
+import { parseTextFormat } from "../../backend/src/responses/parser-text-format";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
 import { repoPath } from "../helpers/repo-root";
-import { normalizeThinkingOptions, resolveThinkingEnabled } from "../../src/clients/reasoning-controls";
-import type { OcxProviderConfig } from "../../src/types";
+import { normalizeThinkingOptions, resolveThinkingEnabled } from "../../backend/src/clients/reasoning-controls";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 test.each(["tool_search", "computer_use", "image_gen", "mcp"])("preserves direct hosted selector %s in the raw Responses body", type => {
   const choice = type === "mcp" ? { type, server_label: "docs", name: null } : { type };
@@ -1333,6 +1333,6 @@ test("parser leaf seams preserve tool and format contracts without importing the
   expect(tools?.[0]?.name).toBe("missing_parameters");
   expect(parseTextFormat(undefined)).toBeUndefined();
   for (const leaf of ["parser-content.ts", "parser-tools.ts", "parser-text-format.ts"]) {
-    expect(readFileSync(repoPath("src", "responses", leaf), "utf8")).not.toMatch(/from\s+["\x27]\.\/parser["\x27]/);
+    expect(readFileSync(repoPath("backend/src", "responses", leaf), "utf8")).not.toMatch(/from\s+["\x27]\.\/parser["\x27]/);
   }
 });

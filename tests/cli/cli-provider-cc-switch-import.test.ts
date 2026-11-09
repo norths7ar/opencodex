@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { cmdProviderCcSwitchImport, type CcSwitchImportCommandDeps } from "../../src/cli/provider-cc-switch-import";
+import { cmdProviderCcSwitchImport, type CcSwitchImportCommandDeps } from "../../backend/src/cli/provider-cc-switch-import";
 
 const output: string[] = [];
 let logSpy: ReturnType<typeof spyOn>;

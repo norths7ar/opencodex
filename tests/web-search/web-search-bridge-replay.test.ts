@@ -11,16 +11,16 @@ import { afterEach, describe, expect, test } from "bun:test";
 import {
   createPassthroughWebSearchBridgeStream,
   type PassthroughWebSearchBridgePlan,
-} from "../../src/web-search/passthrough-bridge";
-import { restoreBridgedWebSearchCalls } from "../../src/adapters/openai-responses/tool-output-recovery";
+} from "../../backend/src/web-search/passthrough-bridge";
+import { restoreBridgedWebSearchCalls } from "../../backend/src/adapters/openai-responses/tool-output-recovery";
 import {
   bridgeSearchReplayScope,
   clearBridgeSearchReplayCacheForTests,
   rememberBridgeSearchReplay,
-} from "../../src/responses/bridge-search-replay-cache";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
+} from "../../backend/src/responses/bridge-search-replay-cache";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import type { OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../src/types";
+import type { OcxProviderConfig, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>
   withTestTranslatorBudget(createResponsesPassthroughAdapterProduction(...args));

@@ -11,7 +11,7 @@ describe("ocx codex real CLI handoff", () => {
   for (const arg of ["--help", "--version"]) test(`missing Codex ${arg} reports the install hint`, () => {
     const home = mkdtempSync(join(tmpdir(), "ocx-codex-missing-"));
     try {
-      const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), "codex", arg], {
+      const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), "codex", arg], {
         cwd: home, env: { ...process.env, PATH: "", OPENCODEX_HOME: home },
         encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000, windowsHide: true,
       });
@@ -49,7 +49,7 @@ describe("ocx codex real CLI handoff", () => {
         delete env.OPENCODEX_API_AUTH_TOKEN;
         delete env.OPENCODEX_ADMIN_AUTH_TOKEN;
         delete env.OCX_API_TOKEN_FILE;
-        const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), "codex", ...args], {
+        const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), "codex", ...args], {
           cwd: repoRoot(), env, encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000, windowsHide: true,
         });
         expect(result.error).toBeUndefined();

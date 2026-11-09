@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   applyProviderContextCap,
   resolveUnknownRoutedContextWindow,
-} from "../../src/providers/context-cap";
+} from "../../backend/src/providers/context-cap";
 
 describe("unknown routed context windows", () => {
   test("an enabled cap fills a missing window instead of inventing 128k", () => {

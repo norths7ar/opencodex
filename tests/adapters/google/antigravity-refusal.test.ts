@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { classifyAntigravityRefusal } from "../../../src/adapters/antigravity-refusal";
+import { classifyAntigravityRefusal } from "../../../backend/src/adapters/antigravity-refusal";
 
 const classified = (status: number, body: unknown) =>
   classifyAntigravityRefusal(status, typeof body === "string" ? body : JSON.stringify(body));

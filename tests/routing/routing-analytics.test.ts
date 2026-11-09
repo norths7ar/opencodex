@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { appendFileSync, mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
 import {
   appendUsageEntry,
   resetUsageReadCacheForTests,
   usageLogPath,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { computeRoutingAnalytics } from "../../src/routing/analytics";
-import { computeEntryCost } from "../../src/usage/summary";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/usage/log";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { computeRoutingAnalytics } from "../../backend/src/routing/analytics";
+import { computeEntryCost } from "../../backend/src/usage/summary";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

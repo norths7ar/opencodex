@@ -4,24 +4,24 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { cmdAccount, classifyAccount, formatAccountTable, type AccountDeps } from "../../src/cli/account";
-import type { AccountStdin } from "../../src/cli/account-api";
-import { projectCodexQuotaRefreshOutcome } from "../../src/codex/quota-refresh-outcome";
-import { printSubcommandUsage } from "../../src/cli/help";
+import { cmdAccount, classifyAccount, formatAccountTable, type AccountDeps } from "../../backend/src/cli/account";
+import type { AccountStdin } from "../../backend/src/cli/account-api";
+import { projectCodexQuotaRefreshOutcome } from "../../backend/src/codex/quota-refresh-outcome";
+import { printSubcommandUsage } from "../../backend/src/cli/help";
 import {
   DEFAULT_ACCOUNT_PRIORITY,
   MAX_ACCOUNT_PRIORITY,
   MIN_ACCOUNT_PRIORITY,
-} from "../../src/codex/pool-rotation";
+} from "../../backend/src/codex/pool-rotation";
 import {
   ACCOUNT_PRIORITY_PRESETS,
   accountPriorityPresetKey,
   DEFAULT_ACCOUNT_PRIORITY as GUI_DEFAULT_PRIORITY,
   MAX_ACCOUNT_PRIORITY as GUI_MAX_PRIORITY,
   MIN_ACCOUNT_PRIORITY as GUI_MIN_PRIORITY,
-} from "../../gui/src/account-priority";
-import type { OcxConfig } from "../../src/types";
-import { ACCOUNT_IMPORT_MAX_BYTES } from "../../src/oauth/account-import";
+} from "../../frontend/src/account-priority";
+import type { OcxConfig } from "../../backend/src/types";
+import { ACCOUNT_IMPORT_MAX_BYTES } from "../../backend/src/oauth/account-import";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const RAW_SENTINEL = "test-key-rawsentinel1234567890";
@@ -507,7 +507,7 @@ describe("account login --device", () => {
   test("waits out the full 15-minute grant instead of the 5-minute browser budget", async () => {
     // A budget regression to 150 attempts is invisible to an output assertion,
     // so read the loop bound from the source itself.
-    const source = await Bun.file(new URL("../../src/cli/account-auth.ts", import.meta.url)).text();
+    const source = await Bun.file(new URL("../../backend/src/cli/account-auth.ts", import.meta.url)).text();
     const budget = /const maxAttempts = device \? (\d+) : (\d+);/.exec(source);
     expect(budget).toBeTruthy();
     // 2s per attempt. 900s is the grant itself; the budget must also leave

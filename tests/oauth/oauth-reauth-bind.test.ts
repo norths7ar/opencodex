@@ -2,14 +2,14 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { OAUTH_PROVIDERS, runLogin } from "../../src/oauth";
-import { appendKiroAccountFromDeviceLogin, getAccountCredential, getAccountSet, saveAccountCredential, saveCredential } from "../../src/oauth/store";
-import type { OAuthController, OAuthCredentials } from "../../src/oauth/types";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { OAUTH_PROVIDERS, runLogin } from "../../backend/src/oauth";
+import { appendKiroAccountFromDeviceLogin, getAccountCredential, getAccountSet, saveAccountCredential, saveCredential } from "../../backend/src/oauth/store";
+import type { OAuthController, OAuthCredentials } from "../../backend/src/oauth/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 let TEST_DIR: string;
 const previousHome = process.env.OPENCODEX_HOME;
@@ -368,7 +368,7 @@ describe("OAuth account-scoped reauth", () => {
   });
 
   test("management login passes reauthAccountId into startLoginFlow", async () => {
-    const source = await Bun.file("src/server/management/oauth-account-routes.ts").text();
+    const source = await Bun.file("backend/src/server/management/oauth-account-routes.ts").text();
     expect(source).toContain("reauthAccountId: accountId");
     expect(source).toContain("Unknown account for reauth");
   });

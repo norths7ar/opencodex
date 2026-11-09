@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createConnection, createServer as createTcpServer, type AddressInfo, type Server as TcpServer, type Socket } from "node:net";
-import { pinnedHttpGet } from "../../src/lib/pinned-http";
-import { socks5Fetch } from "../../src/lib/socks5-fetch";
+import { pinnedHttpGet } from "../../backend/src/lib/pinned-http";
+import { socks5Fetch } from "../../backend/src/lib/socks5-fetch";
 
 const openSockets = new WeakMap<object, Set<Socket>>();
 

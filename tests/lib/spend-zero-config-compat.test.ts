@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
 import { createShippedSpendLedger, spendTestJournal, spendTestPolicy, testSpendSalt as salt } from "../helpers/shipped-spend-ledger";
 const req=(id:string,tokens=10)=>({sendId:id,scopes:{poolId:"P"},inputTokens:tokens,outputCeilingTokens:0});
 test("three unconfigured sends match shipped bytes for equal pool inputs",()=>{

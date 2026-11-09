@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { repoPath } from "../helpers/repo-root";
 
 const source = (relative: string): string =>
-  readFileSync(repoPath("src", ...relative.split("/")), "utf8");
+  readFileSync(repoPath("backend/src", ...relative.split("/")), "utf8");
 
 describe("reasoning replay scope propagation", () => {
   test("every production bridge call passes the provider-bound scope holder", () => {

@@ -2,15 +2,15 @@ import { afterEach, beforeEach, describe, expect, mock, spyOn, test } from "bun:
 import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, getConfigPath } from "../../src/config";
-import { buildDesktop3pRegistry, writeDesktop3pConfig, type Desktop3pConfigMode } from "../../src/claude/desktop-3p";
-import * as atomicWrites from "../../src/config/atomic-write";
-import * as desktopLibrary from "../../src/claude/desktop-3p-library";
-import { syncGrokConfig } from "../../src/grok/sync";
-import { grokManagedBlockPresent, injectGrokConfig } from "../../src/grok/inject";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
-import { syncEnabledClientIntegrations } from "../../src/server/management/config-routes";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, getConfigPath } from "../../backend/src/config";
+import { buildDesktop3pRegistry, writeDesktop3pConfig, type Desktop3pConfigMode } from "../../backend/src/claude/desktop-3p";
+import * as atomicWrites from "../../backend/src/config/atomic-write";
+import * as desktopLibrary from "../../backend/src/claude/desktop-3p-library";
+import { syncGrokConfig } from "../../backend/src/grok/sync";
+import { grokManagedBlockPresent, injectGrokConfig } from "../../backend/src/grok/inject";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
+import { syncEnabledClientIntegrations } from "../../backend/src/server/management/config-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const envKeys = ["HOME", "USERPROFILE", "OPENCODEX_HOME", "CLAUDE_CONFIG_DIR", "GROK_HOME", "OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR"] as const;
@@ -143,7 +143,7 @@ describe("unattended native and file client admission", () => {
   test("attended Grok still first-enrolls without a managed block", async () => {
     config.clientIntegrations = { grok: true, "claude-desktop": false }; persist();
     // Attended discovery keeps its existing default seam; stub just that dependency for this call.
-    const management = await import("../../src/server/management-api");
+    const management = await import("../../backend/src/server/management-api");
     const fetch = spyOn(management, "fetchAllModels").mockResolvedValue(models);
     try {
       expect(await syncEnabledClientIntegrations(12345, config, deps())).toContainEqual({ client: "grok", ok: true, changed: true });

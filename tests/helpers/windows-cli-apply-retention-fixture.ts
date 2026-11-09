@@ -1,8 +1,8 @@
 /** Private candidate; controlled artifacts only. Never executes fixture Node/npm/vendor bytes. */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { hardenSecretDirAsync } from "../../src/lib/windows-secret-acl";
-import type { CodexCliApplyDeps } from "../../src/codex/cli-update-apply";
+import { hardenSecretDirAsync } from "../../backend/src/lib/windows-secret-acl";
+import type { CodexCliApplyDeps } from "../../backend/src/codex/cli-update-apply";
 import { fixtureArtifact, fixtureTar } from "./codex-cli-apply-artifact";
 import { fixturePath } from "./repo-root";
 

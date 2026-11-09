@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { AdapterRequest } from "../../src/adapters/base";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { sanitizeLogMetadataString } from "../../src/lib/redact";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { sanitizeLogMetadataString } from "../../backend/src/lib/redact";
 import {
   createAdapterTierMetadata,
   type ResolvedFastPolicy,
-} from "../../src/providers/fastwire";
+} from "../../backend/src/providers/fastwire";
 import {
   addFinalRequestLog,
   applyResponseLogMetadata,
@@ -16,13 +16,13 @@ import {
   recordAdapterTier,
   type RequestLogContext,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import { applyServiceTierGate, handleResponses } from "../../src/server/responses/core";
-import { costResult } from "../../src/server/management/shared";
-import type { OcxConfig, OcxParsedRequest, TierObservationContext } from "../../src/types";
-import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
-import type { ExpectedPriceOverlay } from "../../src/usage/expected-prices";
-import { normalizeUsageEntryForTest } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { applyServiceTierGate, handleResponses } from "../../backend/src/server/responses/core";
+import { costResult } from "../../backend/src/server/management/shared";
+import type { OcxConfig, OcxParsedRequest, TierObservationContext } from "../../backend/src/types";
+import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../backend/src/usage/cost";
+import type { ExpectedPriceOverlay } from "../../backend/src/usage/expected-prices";
+import { normalizeUsageEntryForTest } from "../../backend/src/usage/log";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createSpendReservationLedger } from "../../src/lib/spend-reservation-ledger";
+import { createSpendReservationLedger } from "../../backend/src/lib/spend-reservation-ledger";
 import { createShippedSpendLedger, loadShippedSpendLedger, spendAlias, spendCheckpoint, spendTestJournal, spendTestPolicy, testSpendSalt as salt } from "../helpers/shipped-spend-ledger";
 
 const request = (sendId: string, poolId = "P", tokens = 10) => ({ sendId, scopes: { poolId }, inputTokens: tokens, outputCeilingTokens: 0 });

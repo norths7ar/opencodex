@@ -1,11 +1,11 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { createOllamaNativeAdapter, OllamaLateAttributionBudgetError, OLLAMA_LATE_ATTRIBUTION_LIMIT_MESSAGE } from "../../../src/adapters/ollama-native";
+import { createOllamaNativeAdapter, OllamaLateAttributionBudgetError, OLLAMA_LATE_ATTRIBUTION_LIMIT_MESSAGE } from "../../../backend/src/adapters/ollama-native";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import { REASONING_EFFORT_OMIT_SENTINEL } from "../../../src/reasoning-effort";
-import type { AdapterEvent } from "../../../src/types";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import { TranslatorBudgetExceededError } from "../../../src/lib/translator-budget";
-import { jsonStringPartsUtf8Bytes } from "../../../src/lib/json-byte-size";
+import { REASONING_EFFORT_OMIT_SENTINEL } from "../../../backend/src/reasoning-effort";
+import type { AdapterEvent } from "../../../backend/src/types";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import { TranslatorBudgetExceededError } from "../../../backend/src/lib/translator-budget";
+import { jsonStringPartsUtf8Bytes } from "../../../backend/src/lib/json-byte-size";
 
 function provider(overrides: Partial<OcxProviderConfig> = {}): OcxProviderConfig {
   return {

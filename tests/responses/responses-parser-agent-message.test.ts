@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
+import { parseRequest } from "../../backend/src/responses/parser";
 
 describe("Responses parser agent_message boundaries", () => {
   test("keeps agent_message between separate assistant reasoning turns", () => {

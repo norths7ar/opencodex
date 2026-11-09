@@ -4,17 +4,17 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { request } from "node:http";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
 import {
   abortAndReleaseAllTurns, getActiveTurnCount, sessionLaneMetrics,
   tryAdmitTurn, unregisterTurn, activeRegistryMetrics, getNativeMainProfileRequestCount,
   MAX_ACTIVE_TURNS, MAX_ACTIVE_SESSION_LANES, type ActiveTurnLease,
-} from "../../src/server/lifecycle";
-import { workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
-import * as live from "../../src/server/live";
-import * as transport from "../../src/server/responses/request-transport";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/lifecycle";
+import { workflowBudgetSnapshot } from "../../backend/src/lib/workflow-budget";
+import * as live from "../../backend/src/server/live";
+import * as transport from "../../backend/src/server/responses/request-transport";
+import type { OcxConfig } from "../../backend/src/types";
 import { defaultFixtureTeardownDeps, drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 
 afterEach(() => abortAndReleaseAllTurns(new Error("fixture cleanup")));

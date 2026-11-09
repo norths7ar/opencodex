@@ -4,7 +4,7 @@ import {
   hardenedIdentities,
   NATIVE_MAIN_HARDENED_IDENTITY_MAX_ENTRIES,
   rememberHardenedIdentity,
-} from "../../src/codex/native-main-claim";
+} from "../../backend/src/codex/native-main-claim";
 
 beforeEach(() => {
   hardenedIdentities.clear();

@@ -40,18 +40,18 @@ for (const identity of scenario.startsWith("F3") || scenario.startsWith("F5") ? 
       injectedConfigHash: createHash("sha256").update(injected).digest("hex"), injectedProfileHash: null,
       pid: 999_999, timestamp: new Date().toISOString() });
     writeFileSync(config, injected); writeFileSync(journalPath, journal);
-    const fence = readFileSync(repoPath("src/cli/start-owner-fence.ts"), "utf8");
+    const fence = readFileSync(repoPath("backend/src/cli/start-owner-fence.ts"), "utf8");
     const recheck = fence.slice(fence.indexOf("export async function recoverStartJournalAfterOwnerRecheck("), fence.indexOf("/** Hold ownership stable"));
     const executable = new Bun.Transpiler({ loader: "ts" }).transformSync(recheck.replace("export ", ""));
     mkdirSync(join(root, "src", "cli"), { recursive: true });
     const script = join(root, "src", "cli", "index.ts");
     writeFileSync(script, `
       import { writeFileSync } from "node:fs";
-      import { observeProxyLiveness as observe, START_OWNERSHIP_LIVENESS } from ${JSON.stringify(repoPath("src/server/proxy-liveness.ts"))};
-      import { recoverStartJournalAfterOwnerRecheck as actual, recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("src/cli/start-owner-fence.ts"))};
+      import { observeProxyLiveness as observe, START_OWNERSHIP_LIVENESS } from ${JSON.stringify(repoPath("backend/src/server/proxy-liveness.ts"))};
+      import { recoverStartJournalAfterOwnerRecheck as actual, recoverStartStateUnderOwnershipLease } from ${JSON.stringify(repoPath("backend/src/cli/start-owner-fence.ts"))};
       import { readPidFileValue, removePidIfValueIs, readProcessCommandLine, verifyPidIdentity, setOcxStartProcessCacheForTests,
-        setProcessCommandLineExecForTests, setProcessCommandLinePlatformForTests } from ${JSON.stringify(repoPath("src/config/process-state.ts"))};
-      import { markCrossHomeSibling, reconcileStartupJournal } from ${JSON.stringify(repoPath("src/cli/cross-home-owner.ts"))};
+        setProcessCommandLineExecForTests, setProcessCommandLinePlatformForTests } from ${JSON.stringify(repoPath("backend/src/config/process-state.ts"))};
+      import { markCrossHomeSibling, reconcileStartupJournal } from ${JSON.stringify(repoPath("backend/src/cli/cross-home-owner.ts"))};
       const scenario = ${JSON.stringify(scenario)}, dotted = scenario.startsWith("F5"), dual = scenario.startsWith("F3") || dotted;
       const identity = ${JSON.stringify(identity)};
       let foreign, listener, other;

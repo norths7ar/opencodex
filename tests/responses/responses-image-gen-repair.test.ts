@@ -3,10 +3,10 @@ import {
   imageGenToolCallAliases,
   relaySseWithImageGenCallRestore as relaySseWithImageGenCallRestoreProduction,
   restoreImageGenCallsInJson,
-} from "../../src/server/responses-image-gen-repair";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
-import { finalizeTranslatorBudgetResponse } from "../../src/lib/translator-budget";
+} from "../../backend/src/server/responses-image-gen-repair";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
+import { finalizeTranslatorBudgetResponse } from "../../backend/src/lib/translator-budget";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

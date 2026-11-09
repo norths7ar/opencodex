@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createDesktopCertificateService } from "../../src/codex/desktop-compatibility/certificate-service";
-import type { DesktopAuthorityInspection, StoredDesktopAuthority } from "../../src/codex/desktop-compatibility/certificate-store";
+import { createDesktopCertificateService } from "../../backend/src/codex/desktop-compatibility/certificate-service";
+import type { DesktopAuthorityInspection, StoredDesktopAuthority } from "../../backend/src/codex/desktop-compatibility/certificate-store";
 
 const fingerprint = "A".repeat(64);
 const authority = { fingerprint } as StoredDesktopAuthority;

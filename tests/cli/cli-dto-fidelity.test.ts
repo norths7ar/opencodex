@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { formatUsageReport } from "../../src/cli/usage-report";
+import { formatUsageReport } from "../../backend/src/cli/usage-report";
 
 /** formatUsageReport returns lines; assertions here are about rendered text. */
 const joinReport = (input: Parameters<typeof formatUsageReport>[0]): string => formatUsageReport(input).join("\n");
-import { formatAccountTable, type AccountRowForTest } from "../../src/cli/account";
-import { fetchRows, type AccountDeps } from "../../src/cli/account-api";
+import { formatAccountTable, type AccountRowForTest } from "../../backend/src/cli/account";
+import { fetchRows, type AccountDeps } from "../../backend/src/cli/account-api";
 
 /**
  * #2700, #2703: the CLI discarded fields the API already returned.
@@ -133,7 +133,7 @@ describe("#2703 the projection does not strip the 5h window", () => {
    * So this drives the real path: a server payload in, a projected row out.
    */
   async function rowsFromServer(quota: Record<string, number>): Promise<{ quota?: unknown }[]> {
-    const { fetchCodexRows } = await import("../../src/cli/account-api");
+    const { fetchCodexRows } = await import("../../backend/src/cli/account-api");
     const fetchImpl = (async (url: string | URL | Request) => {
       const href = String(url);
       if (href.includes("/api/codex-auth/active")) {
@@ -148,7 +148,7 @@ describe("#2703 the projection does not strip the 5h window", () => {
   }
 
   test("account list --quota attaches cached quota without ?refresh=1", async () => {
-    const { fetchRows } = await import("../../src/cli/account-api");
+    const { fetchRows } = await import("../../backend/src/cli/account-api");
     const hrefs: string[] = [];
     const fetchImpl = (async (url: string | URL | Request) => {
       const href = String(url);
@@ -208,7 +208,7 @@ describe("Codex account identity projection", () => {
           { id: "pool-array", slotId: "pool-array", upstreamAccountKey: [key] },
         ] },
     )) as unknown as typeof fetch;
-    const { fetchCodexRows } = await import("../../src/cli/account-api");
+    const { fetchCodexRows } = await import("../../backend/src/cli/account-api");
     const result = await fetchCodexRows({ baseUrl: "http://127.0.0.1:10100", fetchImpl },
       "http://127.0.0.1:10100");
     expect(result.rows.map(row => [row.slotId, row.slotKind, row.upstreamAccountKey])).toEqual([
@@ -224,7 +224,7 @@ describe("Codex account identity projection", () => {
 
 describe("#2705 access key usage columns", () => {
   async function listOutput(payload: Record<string, unknown>): Promise<string> {
-    const { handleAccessCommand } = await import("../../src/cli/access");
+    const { handleAccessCommand } = await import("../../backend/src/cli/access");
     const lines: string[] = [];
     const original = console.log;
     console.log = (...args: unknown[]) => { lines.push(args.map(String).join(" ")); };

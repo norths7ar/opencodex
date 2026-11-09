@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import {
   isCodexAppServerCommandLine,
   listCodexAppServerProcesses,
-} from "../../src/codex/app-server-processes";
+} from "../../backend/src/codex/app-server-processes";
 
 describe("Codex app-server flattened command lines", () => {
   test("matches unquoted official executable paths containing spaces", () => {

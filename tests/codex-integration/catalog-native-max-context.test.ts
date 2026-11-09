@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../src/codex/catalog/account-models";
-import { nativeContextLimits, type NativeContextLimitsInput } from "../../src/codex/catalog/metadata";
-import { applyNativeOpenAiContextOverride, ensureStrictCatalogFields, type RawEntry } from "../../src/codex/catalog/parsing";
+import { CODEX_ACCOUNT_BOUND_CATALOG_KIND } from "../../backend/src/codex/catalog/account-models";
+import { nativeContextLimits, type NativeContextLimitsInput } from "../../backend/src/codex/catalog/metadata";
+import { applyNativeOpenAiContextOverride, ensureStrictCatalogFields, type RawEntry } from "../../backend/src/codex/catalog/parsing";
 
 function nativeRow(slug = "gpt-6-astra"): RawEntry {
   return { slug, context_window: 272_000, max_context_window: 872_000 };

@@ -8,13 +8,13 @@ import {
   isReservedCodexForwardPreset,
   openAiAccountProviderState,
   OpenAiEnableError,
-} from "../../gui/src/provider-payload";
-import { en } from "../../gui/src/i18n/en";
-import { ko } from "../../gui/src/i18n/ko";
-import { de } from "../../gui/src/i18n/de";
-import { zh } from "../../gui/src/i18n/zh";
-import { deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+} from "../../frontend/src/provider-payload";
+import { en } from "../../frontend/src/i18n/en";
+import { ko } from "../../frontend/src/i18n/ko";
+import { de } from "../../frontend/src/i18n/de";
+import { zh } from "../../frontend/src/i18n/zh";
+import { deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 
 describe("provider dashboard payload", () => {
   test("keeps OpenAI in the account entry even when its provider is absent", () => {

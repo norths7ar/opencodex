@@ -1,12 +1,12 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { ManagementApiDeps } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { ManagementApiDeps } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import * as updateJobModule from "../../src/update/job";
-import { updateJobPath } from "../../src/update/job";
+import * as updateJobModule from "../../backend/src/update/job";
+import { updateJobPath } from "../../backend/src/update/job";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config = { port: 10100, defaultProvider: "openai", providers: {} } as OcxConfig;

@@ -3,19 +3,19 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearPoolRotationState } from "../../../src/codex/pool-rotation";
-import { subscribeAccountSelections } from "../../../src/lib/account-selection-events";
-import { effectiveAnthropicAccountThreshold, parseAnthropicAccountThreshold } from "../../../src/oauth/anthropic-account-threshold";
+import { clearPoolRotationState } from "../../../backend/src/codex/pool-rotation";
+import { subscribeAccountSelections } from "../../../backend/src/lib/account-selection-events";
+import { effectiveAnthropicAccountThreshold, parseAnthropicAccountThreshold } from "../../../backend/src/oauth/anthropic-account-threshold";
 import { bindAnthropicSessionAffinity, clearAnthropicAccountPoolState, promoteAnthropicActiveAccount,
-  resetAnthropicRoutingForManualSelection, resolveAnthropicAccountForSession,} from "../../../src/oauth/anthropic-routing";
+  resetAnthropicRoutingForManualSelection, resolveAnthropicAccountForSession,} from "../../../backend/src/oauth/anthropic-routing";
 import { captureOAuthAccountSelection, getAccountCredential, getAccountSet, removeAccount, replaceProviderAccountSet,
-  saveAccountCredential, saveCredential, setAccountPaused, setActiveAccount, setAnthropicAccountThreshold } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../src/providers/quota";
-import type { OcxConfig, OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy } from "../../../src/types";
+  saveAccountCredential, saveCredential, setAccountPaused, setActiveAccount, setAnthropicAccountThreshold } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../../backend/src/providers/quota";
+import type { OcxConfig, OcxAccountPoolQuotaWindow, OcxAccountPoolRotationStrategy } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
-import { handleAnthropicAccountThreshold } from "../../../src/server/management/anthropic-account-threshold";
-import { handleOauthAccountRoutes } from "../../../src/server/management/oauth-account-routes";
-import type { ManagementContext } from "../../../src/server/management/context";
+import { handleAnthropicAccountThreshold } from "../../../backend/src/server/management/anthropic-account-threshold";
+import { handleOauthAccountRoutes } from "../../../backend/src/server/management/oauth-account-routes";
+import type { ManagementContext } from "../../../backend/src/server/management/context";
 
 const oldHome = process.env.OPENCODEX_HOME;
 let home: string;

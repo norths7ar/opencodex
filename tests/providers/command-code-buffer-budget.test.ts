@@ -1,7 +1,7 @@
 import { expect, spyOn, test } from "bun:test";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+import type { AdapterEvent } from "../../backend/src/types";
 
 const adapter = () => createCommandCodeAdapter({ adapter: "command-code", baseUrl: "https://command.example" });
 const content = "é한😀".repeat(32);

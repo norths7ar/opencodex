@@ -4,7 +4,7 @@ import {
   createLocalAttestationProof,
   createLocalAttestationSecret,
   verifyLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 
 describe("local management listener attestation", () => {
   test("a proof authenticates one challenge, pid, and port", () => {

@@ -9,14 +9,14 @@
  * reaches a message or a status object.
  */
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
-import { loginMetaMuse, refreshMetaMuseToken } from "../../src/oauth/meta-muse";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { supportsPerAccountQuota } from "../../src/providers/quota";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { loginMetaMuse, refreshMetaMuseToken } from "../../backend/src/oauth/meta-muse";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { supportsPerAccountQuota } from "../../backend/src/providers/quota";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>

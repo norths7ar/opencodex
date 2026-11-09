@@ -12,43 +12,43 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
 import {
   CODEX_ACCOUNT_BOUND_CATALOG_KIND,
   loadBundledCodexCatalog,
   NATIVE_OPENAI_MODELS,
   resetCatalogRuntimeStateForTests,
   syncCatalogModels,
-} from "../../src/codex/catalog";
+} from "../../backend/src/codex/catalog";
 import {
   commitCodexCatalogCandidate,
   convergeCodexCatalog,
   gatherCodexCatalogCandidate,
-} from "../../src/codex/convergence";
+} from "../../backend/src/codex/convergence";
 import {
   catalogBackupPathFor,
   type RawCatalog,
   type RawEntry,
-} from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/catalog/parsing";
 import {
   resolveCodexCatalogSerializationDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
-import { getConfigPath, saveConfig } from "../../src/config";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import type { OcxConfig } from "../../src/types";
-import { setBundledCatalogCacheForTests } from "../../src/codex/catalog/bundled";
-import { catalogEntryEfforts } from "../../src/codex/catalog/effort";
+} from "../../backend/src/codex/user-identity";
+import { getConfigPath, saveConfig } from "../../backend/src/config";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import type { OcxConfig } from "../../backend/src/types";
+import { setBundledCatalogCacheForTests } from "../../backend/src/codex/catalog/bundled";
+import { catalogEntryEfforts } from "../../backend/src/codex/catalog/effort";
 import {
   loadPersistedCodexRuntime,
   resetCodexRuntimeResolveCacheForTests,
   setCodexRuntimeResolveCacheForTests,
-} from "../../src/codex/runtime";
-import { markModelsFetchFailure } from "../../src/codex/model-cache";
-import { legacyCustomModelCatalogSlugs } from "../../src/codex/custom-model-catalog-migration";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../src/codex/catalog/native-models";
-import { removeCodexAccountCredential, saveCodexAccountCredential } from "../../src/codex/account-store";
+} from "../../backend/src/codex/runtime";
+import { markModelsFetchFailure } from "../../backend/src/codex/model-cache";
+import { legacyCustomModelCatalogSlugs } from "../../backend/src/codex/custom-model-catalog-migration";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } from "../../backend/src/codex/catalog/native-models";
+import { removeCodexAccountCredential, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // The canonical-bytes case spawns real syncs and runs ~2.5s in isolation, on this

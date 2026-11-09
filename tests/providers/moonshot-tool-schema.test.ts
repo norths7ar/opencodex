@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import type { OcxParsedRequest, OcxTool } from "../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import type { OcxParsedRequest, OcxTool } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (

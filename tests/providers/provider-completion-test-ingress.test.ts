@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { chat, fixture } from "../helpers/provider-completion-fixture";
-import * as pinnedHttp from "../../src/lib/pinned-http";
-import * as destinationPolicy from "../../src/lib/destination-policy";
+import * as pinnedHttp from "../../backend/src/lib/pinned-http";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
 
 const previousAdmin = process.env.OPENCODEX_ADMIN_AUTH_TOKEN;
 const previousData = process.env.OPENCODEX_API_AUTH_TOKEN;

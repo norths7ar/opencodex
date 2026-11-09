@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { cmdAccount } from "../../src/cli/account";
-import type { OcxConfig } from "../../src/types";
+import { cmdAccount } from "../../backend/src/cli/account";
+import type { OcxConfig } from "../../backend/src/types";
 
 const codexAccounts: Array<Record<string, unknown>> = [{ id: "__main__", isMain: true }];
 async function run(args: string[]): Promise<{ code: number; stderr: string }> {

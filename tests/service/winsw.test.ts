@@ -1,14 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { buildWinswXml, ensureWinswBinary, parseWinswStatus, probeScmRegistration, sha256Hex, installWinswService, statusWinswRaw, WINSW_SHA256, WINSW_SERVICE_ID } from "../../src/lib/winsw";
-import { parseServiceArgs, serviceInstallArgs, serviceReinstallArgs } from "../../src/service";
-import { loadServiceTokenFromFile } from "../../src/lib/service-secrets";
-import { getConfigDir } from "../../src/config";
+import { buildWinswXml, ensureWinswBinary, parseWinswStatus, probeScmRegistration, sha256Hex, installWinswService, statusWinswRaw, WINSW_SHA256, WINSW_SERVICE_ID } from "../../backend/src/lib/winsw";
+import { parseServiceArgs, serviceInstallArgs, serviceReinstallArgs } from "../../backend/src/service";
+import { loadServiceTokenFromFile } from "../../backend/src/lib/service-secrets";
+import { getConfigDir } from "../../backend/src/config";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, symlinkSync, writeFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { isSupervisedServiceChild } from "../../src/service/service-child-ownership";
+import { isSupervisedServiceChild } from "../../backend/src/service/service-child-ownership";
 
 const entry = { bun: "C:\\OpenCodex\\bun.exe", bunRuntimeSource: "bundled" as const, cli: "C:\\Open Codex\\cli & co\\index.ts" };
 
@@ -111,7 +111,7 @@ describe("winsw xml", () => {
       symlinkSync(physical, alias, process.platform === "win32" ? "junction" : "dir");
       const expected = realpathSync(physical);
       const source = [
-        `const { buildWinswXml } = await import(${JSON.stringify(new URL("../../src/lib/winsw.ts", import.meta.url).href)});`,
+        `const { buildWinswXml } = await import(${JSON.stringify(new URL("../../backend/src/lib/winsw.ts", import.meta.url).href)});`,
         // Run with HOME set before Bun starts so its homedir resolver targets only this fixture.
         // Remove the test preload's explicit CODEX_HOME pin to exercise the default resolver.
         "delete process.env.CODEX_HOME;",
@@ -190,7 +190,7 @@ describe("winsw fail-closed lifecycle", () => {
     }
     // On win32 the same branch must confirm against the SCM — a quarantined/deleted
     // exe does not prove the registration is gone.
-    const winsw = readFileSync(new URL("../../src/lib/winsw.ts", import.meta.url), "utf8");
+    const winsw = readFileSync(new URL("../../backend/src/lib/winsw.ts", import.meta.url), "utf8");
     const fn = winsw.slice(winsw.indexOf("export function statusWinswRaw"), winsw.indexOf("/**", winsw.indexOf("export function statusWinswRaw")));
     expect(fn).toContain('process.platform !== "win32"');
     expect(fn).toContain("probeScmRegistration()");
@@ -216,7 +216,7 @@ describe("winsw fail-closed lifecycle", () => {
   });
 
   test("uninstall removes a stale SCM registration via sc.exe when the exe is gone", () => {
-    const winsw = readFileSync(new URL("../../src/lib/winsw.ts", import.meta.url), "utf8");
+    const winsw = readFileSync(new URL("../../backend/src/lib/winsw.ts", import.meta.url), "utf8");
     const fn = winsw.slice(winsw.indexOf("export function uninstallWinswService"), winsw.indexOf("export function winswStatusSummary"));
     expect(fn).toContain("!existsSync(winswExePath())");
     expect(fn).toContain("probeScmRegistration()");
@@ -243,7 +243,7 @@ describe("winsw install flow", () => {
   });
 
   test("install /p refuses non-interactive stdin instead of hanging", () => {
-    const winsw = readFileSync(new URL("../../src/lib/winsw.ts", import.meta.url), "utf8");
+    const winsw = readFileSync(new URL("../../backend/src/lib/winsw.ts", import.meta.url), "utf8");
     const fn = winsw.slice(winsw.indexOf("function runWinswInteractive"), winsw.indexOf("function scQc()"));
     expect(fn).toContain("process.stdin.isTTY");
     expect(fn).toContain("interactive console");

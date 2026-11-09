@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { PassThrough } from "node:stream";
-import { handleProviderCommand, type ProviderCommandDeps } from "../../src/cli/provider";
-import { syncModelsToCodex, type CodexSyncResult } from "../../src/codex/sync";
-import { refreshCodexModelCatalog } from "../../src/codex/refresh";
+import { handleProviderCommand, type ProviderCommandDeps } from "../../backend/src/cli/provider";
+import { syncModelsToCodex, type CodexSyncResult } from "../../backend/src/codex/sync";
+import { refreshCodexModelCatalog } from "../../backend/src/codex/refresh";
 import { FOREIGN_CODEX_HOME_OWNER_MESSAGE, UNKNOWN_CODEX_HOME_OWNER_MESSAGE,
-  unbackedRoutedRemovalMessage } from "../../src/codex/catalog/routed-removal";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
+  unbackedRoutedRemovalMessage } from "../../backend/src/codex/catalog/routed-removal";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
-import { validateConfigCandidate } from "../../src/config";
+import { validateConfigCandidate } from "../../backend/src/config";
 
 let home: TempHome, stdout: ReturnType<typeof spyOn>, stderr: ReturnType<typeof spyOn>;
 let previousExit: typeof process.exitCode;

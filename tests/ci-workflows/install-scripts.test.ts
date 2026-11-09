@@ -64,15 +64,15 @@ describe("install scripts", () => {
     expect(pkg.devDependencies?.typescript).toBe("7.0.2");
     // Bun's type definitions track the runtime pin rather than a literal of their own.
     expect(pkg.devDependencies?.["@types/bun"]).toBe(pkg.dependencies?.bun);
-    expect(pkg.scripts?.dev).toBe("bun run src/cli/index.ts start");
-    expect(pkg.scripts?.["dev:proxy"]).toBe("bun run src/cli/index.ts start");
-    expect(pkg.scripts?.["dev:gui"]).toBe("cd gui && bun run dev");
+    expect(pkg.scripts?.dev).toBe("bun run backend/src/cli/index.ts start");
+    expect(pkg.scripts?.["dev:proxy"]).toBe("bun run backend/src/cli/index.ts start");
+    expect(pkg.scripts?.["dev:gui"]).toBe("cd frontend && bun run dev");
   });
 
   test("Node can import the package main without executing the CLI", () => {
     const result = spawnSync("node", [
       "-e",
-      "import('./bin/package-main.mjs').then(m => { if (m.cliCommand !== 'ocx') process.exit(2); })",
+      "import('./backend/bin/package-main.mjs').then(m => { if (m.cliCommand !== 'ocx') process.exit(2); })",
     ], {
       cwd: repoRoot,
       encoding: "utf8",
@@ -83,10 +83,10 @@ describe("install scripts", () => {
 
   test("npmignore keeps GUI development docs out of the package", async () => {
     const npmignore = await readText(".npmignore");
-    const guiNpmignore = await readText("gui/.npmignore");
-    const guiReadme = await readText("gui/README.md");
+    const guiNpmignore = await readText("frontend/.npmignore");
+    const guiReadme = await readText("frontend/README.md");
 
-    expect(npmignore).toContain("gui/README.md");
+    expect(npmignore).toContain("frontend/README.md");
     expect(guiNpmignore).toContain("README.md");
     expect(guiReadme).toContain("opencodex dashboard");
     expect(guiReadme).toContain("bun run dev:proxy");

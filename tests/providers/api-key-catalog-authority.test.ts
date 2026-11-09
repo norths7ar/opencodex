@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
-import { saveConfig } from "../../src/config";
-import { clearModelCache, captureModelCacheGeneration, getStaleCached, setCached } from "../../src/codex/model-cache";
-import { commitProviderApiKeySelection } from "../../src/providers/api-key-selection";
-import { knownModelIdsForProvider, routeModel } from "../../src/router";
-import { saveCredential, getAuthStorePath } from "../../src/oauth/store";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/key-store";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { clearModelCache, captureModelCacheGeneration, getStaleCached, setCached } from "../../backend/src/codex/model-cache";
+import { commitProviderApiKeySelection } from "../../backend/src/providers/api-key-selection";
+import { knownModelIdsForProvider, routeModel } from "../../backend/src/router";
+import { saveCredential, getAuthStorePath } from "../../backend/src/oauth/store";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/key-store";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 let home: TempHome;

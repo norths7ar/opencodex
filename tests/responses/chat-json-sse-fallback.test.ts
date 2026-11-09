@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { createTranslatorBudget, isTranslatorBudgetExceededError, translatorObservedBufferSnapshot } from "../../src/lib/translator-budget";
-import type { OcxConfig } from "../../src/types";
-import { responsesJsonToChatCompletion, collectChatCompletion, responsesSseToChatCompletionsSse, isChatCompletionsStreamError } from "../../src/chat/outbound";
-import { jsonCompletionSse } from "../../src/server/chat-native-sse";
-import { getRequestLogEntries } from "../../src/server/request-log";
-import { readUsageEntries } from "../../src/usage/log";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { createTranslatorBudget, isTranslatorBudgetExceededError, translatorObservedBufferSnapshot } from "../../backend/src/lib/translator-budget";
+import type { OcxConfig } from "../../backend/src/types";
+import { responsesJsonToChatCompletion, collectChatCompletion, responsesSseToChatCompletionsSse, isChatCompletionsStreamError } from "../../backend/src/chat/outbound";
+import { jsonCompletionSse } from "../../backend/src/server/chat-native-sse";
+import { getRequestLogEntries } from "../../backend/src/server/request-log";
+import { readUsageEntries } from "../../backend/src/usage/log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 let upstream: ReturnType<typeof Bun.serve> | undefined;

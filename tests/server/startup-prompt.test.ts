@@ -20,7 +20,7 @@ describe("startup star prompt", () => {
   });
 
   test("ocx start waits for the interactive prompt before sync/injection", async () => {
-    const cli = await readText("src/cli/index.ts");
+    const cli = await readText("backend/src/cli/index.ts");
     const promptIndex = cli.indexOf("await maybeShowStarPrompt()");
     const syncIndex = cli.indexOf("await syncModelsToCodex(port)");
 
@@ -130,7 +130,7 @@ describe("startup star prompt", () => {
     // A remembered device session is minted from that same admin token, so the shared
     // consent predicate also excludes it.
     expect(routes).toMatch(/return hasHumanDashboardSession\(ctx\)/);
-    const consent = await readText("src/server/management/consent-session.ts");
+    const consent = await readText("backend/src/server/management/consent-session.ts");
     expect(consent).toMatch(/ctx\.principal === "gui-session"/);
     expect(consent).toMatch(/ctx\.guiSessionIssuance !== "remembered-admin"/);
     expect(consent).not.toMatch(/headers\.get\(/);
@@ -187,14 +187,14 @@ describe("startup star prompt", () => {
   });
 
   test("ocx init offers the Codex autostart shim by default", async () => {
-    const init = await readText("src/cli/init.ts");
+    const init = await readText("backend/src/cli/init.ts");
 
     expect(init).toContain("Install Codex autostart shim? [Y/n]");
     expect(init).toContain("installCodexShim");
   });
 
   test("ocx service install gets the prompt too, after the service is up", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const installIndex = service.indexOf("await installServiceSafely(backend, ops.install, { supervisionLatch })");
     const promptIndex = service.indexOf("await maybeShowStarPrompt()");
 

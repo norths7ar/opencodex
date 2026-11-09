@@ -10,7 +10,7 @@ import {
   setDesktopFamilyDefault,
   validDateAlias,
   type DesktopProfileModel,
-} from "../../src/claude/desktop-profile";
+} from "../../backend/src/claude/desktop-profile";
 
 const models: DesktopProfileModel[] = [
   { route: "native/gpt-5.6-sol", label: "GPT 5.6 Sol", contextWindow: 1_000_000 },

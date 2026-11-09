@@ -9,9 +9,9 @@
  * echoed, because a remote image URL can carry a signed token.
  */
 import { describe, expect, test } from "bun:test";
-import { countKiroUninlinableImages, extractKiroImages, kiroImageOmissionMarker, kiroUninlinableImageMarker } from "../../../src/adapters/kiro-images";
-import { buildKiroPayload } from "../../../src/adapters/kiro/payload";
-import type { OcxContentPart, OcxParsedRequest } from "../../../src/types";
+import { countKiroUninlinableImages, extractKiroImages, kiroImageOmissionMarker, kiroUninlinableImageMarker } from "../../../backend/src/adapters/kiro-images";
+import { buildKiroPayload } from "../../../backend/src/adapters/kiro/payload";
+import type { OcxContentPart, OcxParsedRequest } from "../../../backend/src/types";
 
 const DATA_IMAGE = "data:image/png;base64,TkVX";
 const REMOTE = "https://example.test/private.png?sig=SECRETTOKEN";

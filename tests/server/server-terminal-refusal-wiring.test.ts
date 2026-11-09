@@ -2,10 +2,10 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { waitForNativeMainStartupGate } from "../../src/codex/native-profile-startup";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { waitForNativeMainStartupGate } from "../../backend/src/codex/native-profile-startup";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { gatherRoutedModels } from "../../src/codex/catalog";
-import { enrichProviderFromRegistry } from "../../src/providers/derive";
-import { providerMatchesRegistryTransportWithStaticGuards } from "../../src/providers/static-model-discovery";
-import { routedProviderConfig } from "../../src/router";
-import type { OcxProviderConfig } from "../../src/types";
-import { getModelMetadata } from "../../src/generated/model-metadata";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { enrichProviderFromRegistry } from "../../backend/src/providers/derive";
+import { providerMatchesRegistryTransportWithStaticGuards } from "../../backend/src/providers/static-model-discovery";
+import { routedProviderConfig } from "../../backend/src/router";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { getModelMetadata } from "../../backend/src/generated/model-metadata";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });

@@ -1,15 +1,15 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { hashBelongsToPage, readPageFromHash, resolveAppHashChange, VALID_PAGES } from "../../gui/src/app-routing";
+import { hashBelongsToPage, readPageFromHash, resolveAppHashChange, VALID_PAGES } from "../../frontend/src/app-routing";
 import {
   sanitizeLogEntryRouteDecision,
   validCachedRouteDecision,
   type LogEntryBase as LogEntry,
-} from "../../gui/src/pages/log-route-decision";
+} from "../../frontend/src/pages/log-route-decision";
 import { repoPath } from "../helpers/repo-root";
 
-const guiRoot = repoPath("gui", "src");
+const guiRoot = repoPath("frontend", "src");
 
 test("routing is a Models tab with a registered nested hash", () => {
   // It used to be a first-class page. Both ids are gone from the union now, and the

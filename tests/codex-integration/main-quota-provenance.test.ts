@@ -1,20 +1,20 @@
-import { capturePoolQuotaWriter, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../src/codex/account-store";
-import { getAccountQuotaHistory, isValidWhamHistoryObservation, settleQuotaPersistenceForTests } from "../../src/codex/quota";
+import { capturePoolQuotaWriter, saveCodexAccountCredential, saveCodexAccountCredentialIfGeneration } from "../../backend/src/codex/account-store";
+import { getAccountQuotaHistory, isValidWhamHistoryObservation, settleQuotaPersistenceForTests } from "../../backend/src/codex/quota";
 import { afterEach, beforeAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { hostedWindowsQuarantine } from "../helpers/windows-ci-quarantine";
-import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../src/codex/account-id";
-import { isCodexAccountHeldForCredits } from "../../src/codex/account-credit-use";
-import { hasSpendableCodexCredits } from "../../src/codex/quota-types";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
+import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../backend/src/codex/account-id";
+import { isCodexAccountHeldForCredits } from "../../backend/src/codex/account-credit-use";
+import { hasSpendableCodexCredits } from "../../backend/src/codex/quota-types";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
 import {
   applyConfirmedMainCodexAccountTransition,
   reconcileMainCodexAccountRuntimeState,
   resetMainCodexAccountIdentityTrackingForTests,
-} from "../../src/codex/account-lifecycle";
-import * as authCollision from "../../src/codex/auth-collision";
+} from "../../backend/src/codex/account-lifecycle";
+import * as authCollision from "../../backend/src/codex/auth-collision";
 import {
   captureMainQuotaWriter,
   clearMainAccountInfoCache,
@@ -24,7 +24,7 @@ import {
   observeMainQuotaCredential,
   observeMainQuotaIdentity,
   type MainQuotaWriter,
-} from "../../src/codex/main-account-cache";
+} from "../../backend/src/codex/main-account-cache";
 import {
   applyAccountQuotaFromUpstreamHeaders,
   clearAccountQuota,
@@ -37,20 +37,20 @@ import {
   updateAccountQuota,
   type StoredAccountQuota,
   type WhamUsageResponse,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
 
 const QUOTA_PROVENANCE_IMPORT_PROLOGUE = `
-        import { getAccountQuota, getMainPolicyQuota } from ${JSON.stringify(repoPath("src/codex/quota.ts"))};
-        import { observeMainQuotaIdentity, matchesMainQuotaCredential } from ${JSON.stringify(repoPath("src/codex/main-account-cache.ts"))};
+        import { getAccountQuota, getMainPolicyQuota } from ${JSON.stringify(repoPath("backend/src/codex/quota.ts"))};
+        import { observeMainQuotaIdentity, matchesMainQuotaCredential } from ${JSON.stringify(repoPath("backend/src/codex/main-account-cache.ts"))};
 `;
 const KEYRING_QUOTA_RESTART_IMPORTS = `${QUOTA_PROVENANCE_IMPORT_PROLOGUE}
-        import { resolveCodexAuthContext } from ${JSON.stringify(repoPath("src/codex/auth-context.ts"))};
-        import { initializeMainAccountPolicyBinding } from ${JSON.stringify(repoPath("src/codex/account-lifecycle.ts"))};
-        import { setNativeMainRefreshResolutionForTests } from ${JSON.stringify(repoPath("src/codex/native-main-refresh-mode.ts"))};
+        import { resolveCodexAuthContext } from ${JSON.stringify(repoPath("backend/src/codex/auth-context.ts"))};
+        import { initializeMainAccountPolicyBinding } from ${JSON.stringify(repoPath("backend/src/codex/account-lifecycle.ts"))};
+        import { setNativeMainRefreshResolutionForTests } from ${JSON.stringify(repoPath("backend/src/codex/native-main-refresh-mode.ts"))};
 `;
 
 let testDir: string;
@@ -455,8 +455,8 @@ describe("main policy quota durability and lifecycle", () => {
       // Read the actual serializer output in a fresh process, without clearing or rewriting it.
       const script = `
         ${QUOTA_PROVENANCE_IMPORT_PROLOGUE}
-        import { hasSpendableCodexCredits } from ${JSON.stringify(repoPath("src/codex/quota-types.ts"))};
-        import { isCodexAccountHeldForCredits } from ${JSON.stringify(repoPath("src/codex/account-credit-use.ts"))};
+        import { hasSpendableCodexCredits } from ${JSON.stringify(repoPath("backend/src/codex/quota-types.ts"))};
+        import { isCodexAccountHeldForCredits } from ${JSON.stringify(repoPath("backend/src/codex/account-credit-use.ts"))};
         globalThis.fetch = () => { throw new Error("Unexpected network request"); };
         const before = getMainPolicyQuota();
         observeMainQuotaIdentity("fixture-main-b");

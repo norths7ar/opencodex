@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { releaseResponseBodyBestEffort } from "../../src/lib/upstream-retry";
+import { releaseResponseBodyBestEffort } from "../../backend/src/lib/upstream-retry";
 
 describe("retry body cancellation timer ownership", () => {
   test.each([false, true])("clears the fallback timer after cancellation (reject=%s)", async reject => {

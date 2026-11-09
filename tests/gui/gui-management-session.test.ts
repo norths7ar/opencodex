@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { installApiAuthFetch, resetApiAuthFetchForTests } from "../../gui/src/api";
+import { installApiAuthFetch, resetApiAuthFetchForTests } from "../../frontend/src/api";
 
 const originalWindow = globalThis.window;
 const originalDocument = globalThis.document;

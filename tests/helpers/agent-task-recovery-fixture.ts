@@ -1,5 +1,5 @@
 import { spyOn } from "bun:test";
-import * as cache from "../../src/server/responses/agent-task-recovery-cache";
+import * as cache from "../../backend/src/server/responses/agent-task-recovery-cache";
 import { codexHeaders, originalFetch } from "./agent-task-recovery";
 
 const resolveRecovery = cache.resolveCachedAgentTaskRecoveryWithResult;

@@ -8,8 +8,8 @@ import {
   providerEgressIsExplicit,
   resolveProviderEgress,
   sanitizeProxyUrlForLog,
-} from "../../src/lib/provider-egress";
-import { PROXY_ENV_KEYS, configuredOutboundFetch } from "../../src/lib/proxy-env";
+} from "../../backend/src/lib/provider-egress";
+import { PROXY_ENV_KEYS, configuredOutboundFetch } from "../../backend/src/lib/proxy-env";
 
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));

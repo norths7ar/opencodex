@@ -4,9 +4,9 @@ import * as nodeCrypto from "node:crypto";
 import { chmodSync, linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { claudeInterceptCaCertPath, claudeInterceptStateDir, ensureLocalInterceptCa } from "../../src/claude/intercept/local-ca";
-import { setLocalCaFileHooksForTests } from "../../src/claude/intercept/local-ca-files";
-import { hardenSecretDir } from "../../src/lib/windows-secret-acl";
+import { claudeInterceptCaCertPath, claudeInterceptStateDir, ensureLocalInterceptCa } from "../../backend/src/claude/intercept/local-ca";
+import { setLocalCaFileHooksForTests } from "../../backend/src/claude/intercept/local-ca-files";
+import { hardenSecretDir } from "../../backend/src/lib/windows-secret-acl";
 
 const roots: string[] = [];
 function fixture(): string {

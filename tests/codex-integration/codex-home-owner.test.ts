@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { CODEX_HOME_JOURNAL_FILE, currentOpencodexHome, inspectCodexHomeOwner, opencodexHomeForInjection } from "../../src/codex/codex-home-owner";
+import { CODEX_HOME_JOURNAL_FILE, currentOpencodexHome, inspectCodexHomeOwner, opencodexHomeForInjection } from "../../backend/src/codex/codex-home-owner";
 import { repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { dispatchCommand } from "../../src/cli/dispatch";
-import type { CliDispatchDeps } from "../../src/cli/dispatch";
-import type { CliHead } from "../../src/cli/root";
+import { dispatchCommand } from "../../backend/src/cli/dispatch";
+import type { CliDispatchDeps } from "../../backend/src/cli/dispatch";
+import type { CliHead } from "../../backend/src/cli/root";
 import {
   STOP_HISTORY_DEFERRED_EXIT_CODE,
   STOP_HISTORY_INCOMPLETE_EXIT_CODE,
@@ -9,7 +9,7 @@ import {
   summarizeStopRun,
   type StopRunRecord,
   type StopSummaryJson,
-} from "../../src/cli/stop-report";
+} from "../../backend/src/cli/stop-report";
 /**
  * A test batch shares ONE Bun process, and Bun does not clear process.exitCode on a
  * bare undefined assignment — the suite convention is restore-with-`?? 0`

@@ -1,8 +1,8 @@
 import { afterAll, afterEach, beforeEach, expect, mock, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import * as oauth from "../../src/oauth";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import * as oauth from "../../backend/src/oauth";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 
@@ -10,7 +10,7 @@ const PROVIDER = "orcarouter-oauth";
 const ACCESS = "fixture-refresh-capacity-access";
 const originalRefresh = oauth.OAUTH_PROVIDERS[PROVIDER]!.refresh;
 const originalForceRefresh = oauth.forceRefreshOAuthAccessSnapshot;
-const resolver = await import("../../src/server/adapter-resolve");
+const resolver = await import("../../backend/src/server/adapter-resolve");
 const originalResolver = { ...resolver };
 let rejectInference: () => Promise<void>;
 let inferenceSends = 0;
@@ -18,7 +18,7 @@ let transportMode: "adapter" | "passthrough" | "runTurn";
 let runTurnSends = 0;
 let runTurnReady = false;
 let httpPaths: string[] = [];
-mock.module("../../src/server/adapter-resolve", () => ({ ...originalResolver,
+mock.module("../../backend/src/server/adapter-resolve", () => ({ ...originalResolver,
   resolveAdapter(provider: OcxProviderConfig, cache?: "none" | "short" | "long", providerId?: string) {
     if (provider.baseUrl !== "https://fixture.invalid/v1") return originalResolver.resolveAdapter(provider, cache, providerId);
     if (transportMode !== "runTurn") return originalResolver.resolveAdapter({ ...provider,
@@ -40,7 +40,7 @@ mock.module("../../src/server/adapter-resolve", () => ({ ...originalResolver,
     } satisfies ProviderAdapter;
   },
 }));
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 
 let home: ReturnType<typeof createTempHome>;
 let releaseSpendHome: () => void;
@@ -56,7 +56,7 @@ afterEach(() => {
   releaseSpendHome();
   home.remove();
 });
-afterAll(() => { mock.module("../../src/server/adapter-resolve", () => originalResolver); });
+afterAll(() => { mock.module("../../backend/src/server/adapter-resolve", () => originalResolver); });
 
 const cases = (["adapter", "passthrough", "runTurn"] as const).flatMap(transport =>
   [false, true].flatMap(stream => [false, true].map(cancelled => ({ transport, stream, cancelled, ready: false, requestOnly: false }))));

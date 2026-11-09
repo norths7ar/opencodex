@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { decodeTokPerSecondResult, requestLogDto, tokPerSecondResult } from "../../src/server/management/shared";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { addRequestLog, clearRequestLogsForTests, hydrateRequestLogsFromDisk, type RequestLogEntry } from "../../src/server/request-log";
-import { usageLogPath } from "../../src/usage/log";
-import type { OcxConfig } from "../../src/types";
+import { decodeTokPerSecondResult, requestLogDto, tokPerSecondResult } from "../../backend/src/server/management/shared";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { addRequestLog, clearRequestLogsForTests, hydrateRequestLogsFromDisk, type RequestLogEntry } from "../../backend/src/server/request-log";
+import { usageLogPath } from "../../backend/src/usage/log";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { ManagementRequest } from "../helpers/management-auth";
 

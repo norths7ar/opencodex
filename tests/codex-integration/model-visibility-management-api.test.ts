@@ -1,17 +1,17 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { nativeModelRows } from "../../src/codex/catalog";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { nativeModelRows } from "../../backend/src/codex/catalog";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import { listManagementModelRows, type ManagementModelRow } from "../../src/server/management/model-rows";
-import { routedSlug } from "../../src/providers/slug-codec";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { fetchAllModels } from "../../src/server/management/shared";
+import { listManagementModelRows, type ManagementModelRow } from "../../backend/src/server/management/model-rows";
+import { routedSlug } from "../../backend/src/providers/slug-codec";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { fetchAllModels } from "../../backend/src/server/management/shared";
 
 const TEST_DIR = join(import.meta.dir, `.tmp-model-visibility-management-${process.pid}`);
 const previousOpencodexHome = process.env.OPENCODEX_HOME;
@@ -70,11 +70,11 @@ async function put(body: unknown): Promise<Response> {
 
 describe("atomic model visibility management", () => {
   test("catalog busy maps management and v1 models to 503 startup to warn-skip", async () => {
-    const management = await Bun.file(new URL("../../src/server/management-api.ts", import.meta.url)).text();
+    const management = await Bun.file(new URL("../../backend/src/server/management-api.ts", import.meta.url)).text();
     // The catalog-busy mapping moved into the serve-options leaf when src/server/index.ts
     // became a facade.
-    const server = await Bun.file(new URL("../../src/server/index/serve-options.ts", import.meta.url)).text();
-    const prewarm = await Bun.file(new URL("../../src/cli/catalog-prewarm.ts", import.meta.url)).text();
+    const server = await Bun.file(new URL("../../backend/src/server/index/serve-options.ts", import.meta.url)).text();
+    const prewarm = await Bun.file(new URL("../../backend/src/cli/catalog-prewarm.ts", import.meta.url)).text();
     for (const source of [management, server]) {
       expect(source).toContain("CatalogGatherBusyError");
       expect(source).toContain('"catalog_busy"');

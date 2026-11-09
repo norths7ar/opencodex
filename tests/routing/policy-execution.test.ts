@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { NoEligiblePolicyCandidateError, UnknownRoutingPolicyError, routeCompactionModel, routeConcreteModel, routeModel } from "../../src/router";
-import { isValidProviderName } from "../../src/config";
-import { getRoutingProfile } from "../../src/routing/profile";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { evidenceFromBody } from "../../src/routing/request-evidence";
-import type { OcxConfig } from "../../src/types";
+import { NoEligiblePolicyCandidateError, UnknownRoutingPolicyError, routeCompactionModel, routeConcreteModel, routeModel } from "../../backend/src/router";
+import { isValidProviderName } from "../../backend/src/config";
+import { getRoutingProfile } from "../../backend/src/routing/profile";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import { evidenceFromBody } from "../../backend/src/routing/request-evidence";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

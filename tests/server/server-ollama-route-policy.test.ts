@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { findOllamaRoute, listOllamaRoutes, preflightOllamaRoute, linkRequestSessionLane } from "../../src/server/ollama-route-policy";
-import { getOrAllocateRequestSessionLane } from "../../src/server/request-log-conversation";
+import type { OcxConfig } from "../../backend/src/types";
+import { findOllamaRoute, listOllamaRoutes, preflightOllamaRoute, linkRequestSessionLane } from "../../backend/src/server/ollama-route-policy";
+import { getOrAllocateRequestSessionLane } from "../../backend/src/server/request-log-conversation";
 
 const originalFetch = globalThis.fetch;
 let sends = 0;

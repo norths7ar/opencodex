@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { handleSearch } from "../../src/server/search";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { handleSearch } from "../../backend/src/server/search";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { callerId, install, installationLiveFixture, liveConfig, turn, turnMetadataBytes } from "../helpers/codex-installation-live";
 

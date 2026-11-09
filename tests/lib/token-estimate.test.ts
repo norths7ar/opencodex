@@ -4,7 +4,7 @@ import {
   charsPerToken,
   estimateTokens,
   estimateTokensFromCharacterCounts,
-} from "../../src/lib/token-estimate";
+} from "../../backend/src/lib/token-estimate";
 
 describe("script-segmented ratio", () => {
   const korean = "한국어 텍스트는 토큰 밀도가 높아서 영어 기준 추정이 과소계산됩니다 ".repeat(10);

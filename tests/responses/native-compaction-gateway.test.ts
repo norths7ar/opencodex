@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses/passthrough";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
 import { completedPayload } from "../helpers/compaction-routing-fixtures";
-import { providerEditorConfigDTO, parseProviderEditorConfigDTO } from "../../src/server/auth-cors";
-import { getDefaultConfig } from "../../src/config";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { providerEditorConfigDTO, parseProviderEditorConfigDTO } from "../../backend/src/server/auth-cors";
+import { getDefaultConfig } from "../../backend/src/config";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { baseCompactionBody, compactionRequest, removeCompactionFixture } from "../helpers/compaction-routing-fixtures";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { providerConfigSchema } from "../../src/config/schema/leaf-validators";
-import * as destinations from "../../src/providers/openai-tiers-destination";
-import type { OcxProviderConfig } from "../../src/types";
-import { compactionItemToText, encodeCompactionSummary } from "../../src/responses/compaction";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { providerConfigSchema } from "../../backend/src/config/schema/leaf-validators";
+import * as destinations from "../../backend/src/providers/openai-tiers-destination";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { compactionItemToText, encodeCompactionSummary } from "../../backend/src/responses/compaction";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 
 const gateway: OcxProviderConfig = {
   adapter: "openai-responses", baseUrl: "https://gateway.example/v1", authMode: "key",

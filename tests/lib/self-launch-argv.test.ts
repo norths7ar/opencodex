@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { selfLaunchArgv } from "../../src/lib/self-launch-argv";
+import { selfLaunchArgv } from "../../backend/src/lib/self-launch-argv";
 
 describe("selfLaunchArgv", () => {
   test("uses command arguments directly for a standalone executable", () => {

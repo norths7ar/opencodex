@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { injectGrokConfig } from "../../../src/grok/inject";
-import { grokFenceEndpointDrift, readGrokStatus } from "../../../src/grok/status";
+import { injectGrokConfig } from "../../../backend/src/grok/inject";
+import { grokFenceEndpointDrift, readGrokStatus } from "../../../backend/src/grok/status";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 function tempGrokHome(): { root: string; grokHome: string } {

@@ -1,9 +1,9 @@
 import { expect, spyOn, test } from "bun:test";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { createAdapterPhysicalSend } from "../../src/adapters/physical-send";
-import { getActiveTurnCount } from "../../src/server/lifecycle";
-import * as transport from "../../src/server/responses/request-transport";
-import * as oauth from "../../src/oauth/generic-account-failover";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { createAdapterPhysicalSend } from "../../backend/src/adapters/physical-send";
+import { getActiveTurnCount } from "../../backend/src/server/lifecycle";
+import * as transport from "../../backend/src/server/responses/request-transport";
+import * as oauth from "../../backend/src/oauth/generic-account-failover";
 import { hostedSendFixture } from "../helpers/hosted-send-fixture";
 import { chatStream } from "../helpers/combo-failover-upstream";
 

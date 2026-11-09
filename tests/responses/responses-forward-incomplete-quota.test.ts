@@ -2,28 +2,28 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig } from "../../src/config";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexAccountCooldownUntil } from "../../src/codex/routing";
-import type { CodexAuthContext } from "../../src/codex/auth-context";
-import { codexForwardTerminalOutcomeRecorder } from "../../src/server/responses/core";
+import { getDefaultConfig } from "../../backend/src/config";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexAccountCooldownUntil } from "../../backend/src/codex/routing";
+import type { CodexAuthContext } from "../../backend/src/codex/auth-context";
+import { codexForwardTerminalOutcomeRecorder } from "../../backend/src/server/responses/core";
 import {
   httpStatusForRequestLogTerminal,
   inspectResponseLogSsePayload,
   type RequestLogContext,
-} from "../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/quota";
+} from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/quota";
 import {
   isModelHealthBlocked,
   resetSubagentModelFallbackStateForTests,
   setSubagentQuotaPrimeForTests,
-} from "../../src/codex/subagent-model-fallback";
-import { handleResponses } from "../../src/server/responses";
-import type { HandleResponsesOptions } from "../../src/server/responses/core";
-import { isEagerRelaySseResponse } from "../../src/server/relay";
-import { sendResponseToWebSocket, type WsData } from "../../src/server/ws-bridge";
+} from "../../backend/src/codex/subagent-model-fallback";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { HandleResponsesOptions } from "../../backend/src/server/responses/core";
+import { isEagerRelaySseResponse } from "../../backend/src/server/relay";
+import { sendResponseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
@@ -342,8 +342,8 @@ describe("incomplete quota endpoint reporter wiring", () => {
 });
 
 test("caller-owned main streamed terminal releases only on a refusal", async () => {
-  const { requestOwnedAffinityKey, captureRequestOwnedAffinityBindings } = await import("../../src/codex/request-owned-affinity");
-  const { bindThreadAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease } = await import("../../src/codex/routing/thread-affinity");
+  const { requestOwnedAffinityKey, captureRequestOwnedAffinityBindings } = await import("../../backend/src/codex/request-owned-affinity");
+  const { bindThreadAffinity, getThreadAffinity, peekPendingReleaseReason, affinityAfterRelease } = await import("../../backend/src/codex/routing/thread-affinity");
   const key = requestOwnedAffinityKey(new Headers({ authorization: "Bearer stream-test", "session-id": "s", "thread-id": "t" }))!;
   clearThreadAccountMap(); bindThreadAffinity(key, "__main__", Date.now(), "shared");
   const ctx: CodexAuthContext = { kind: "main", accountId: null, affinityKey: key, affinityBindingSnapshot: captureRequestOwnedAffinityBindings(key, "shared", "gpt-test") };

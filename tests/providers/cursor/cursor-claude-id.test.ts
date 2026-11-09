@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from "bun:test";
 import {
   composeCursorClaudeWireId,
   normalizeCursorClaudeId,
-} from "../../../src/adapters/cursor/claude-id";
+} from "../../../backend/src/adapters/cursor/claude-id";
 
 describe("Cursor Claude id normalization", () => {
   test("matches the legacy regex table for both base spellings and suffix edge cases", () => {

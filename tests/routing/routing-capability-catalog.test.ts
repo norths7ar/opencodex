@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { applyCatalogModelMetadata } from "../../src/codex/catalog/effort";
-import { applyCatalogMetadata, ensureStrictCatalogFields } from "../../src/codex/catalog/parsing";
-import type { CatalogModel, RawEntry } from "../../src/codex/catalog/parsing";
-import { parseAntigravityAvailableModels } from "../../src/providers/antigravity-models";
-import type { OcxConfig } from "../../src/types";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
+import { applyCatalogModelMetadata } from "../../backend/src/codex/catalog/effort";
+import { applyCatalogMetadata, ensureStrictCatalogFields } from "../../backend/src/codex/catalog/parsing";
+import type { CatalogModel, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { parseAntigravityAvailableModels } from "../../backend/src/providers/antigravity-models";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

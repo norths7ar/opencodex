@@ -2,19 +2,19 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, saveConfig } from "../../src/config";
-import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { handleResponses } from "../../src/server/responses/core";
-import * as transport from "../../src/server/responses/request-transport";
-import { flushResponseState, clearResponseStateForTests } from "../../src/responses/state";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
+import { getDefaultConfig, saveConfig } from "../../backend/src/config";
+import { getAccountSet, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import * as transport from "../../backend/src/server/responses/request-transport";
+import { flushResponseState, clearResponseStateForTests } from "../../backend/src/responses/state";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
-import { createAutoPauseRefreshErrorMapper, recoverAutoPausedAccount } from "../../src/server/responses/account-auto-pause-recovery";
-import { createResponsesSendBudget } from "../../src/server/responses/request-send-budget";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { isPolicyCandidateRefusal, PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../src/server/responses/policy-request-scope";
+import type { OcxConfig } from "../../backend/src/types";
+import { createAutoPauseRefreshErrorMapper, recoverAutoPausedAccount } from "../../backend/src/server/responses/account-auto-pause-recovery";
+import { createResponsesSendBudget } from "../../backend/src/server/responses/request-send-budget";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { isPolicyCandidateRefusal, PolicyCandidateUnavailableError, policyCandidateRefusalResponse } from "../../backend/src/server/responses/policy-request-scope";
 
 const originalHome = process.env.OPENCODEX_HOME;
 const originalFetch = globalThis.fetch;
@@ -84,7 +84,7 @@ function configFor(name: string, oauth: boolean): OcxConfig {
   saveConfig(config);
   return config;
 }
-async function send(config: OcxConfig, name: string, sendBudget?: import("../../src/lib/request-execution-budget").RequestExecutionBudget, abortSignal?: AbortSignal, requestSignal?: AbortSignal) {
+async function send(config: OcxConfig, name: string, sendBudget?: import("../../backend/src/lib/request-execution-budget").RequestExecutionBudget, abortSignal?: AbortSignal, requestSignal?: AbortSignal) {
   const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: `${name}/fixture`, input: "synthetic", stream: false, store: false }), signal: requestSignal }), config, { model: "fixture", provider: name }, { sendBudget, abortSignal });
   const text = await response.text();
   return { status: response.status, text };
@@ -168,8 +168,8 @@ test("default-off HTTP requests preserve the refusal and never rotate/pause", as
 });
 
 test("Anthropic organization refusal pauses and rebuilds the in-flight OAuth request", async () => {
-  const { deriveOAuthProviderConfig } = await import("../../src/providers/derive");
-  const { clearAnthropicAccountPoolState } = await import("../../src/oauth/anthropic-routing");
+  const { deriveOAuthProviderConfig } = await import("../../backend/src/providers/derive");
+  const { clearAnthropicAccountPoolState } = await import("../../backend/src/oauth/anthropic-routing");
   clearAnthropicAccountPoolState();
   for (let n = 0; n < 2; n++) await saveCredential("anthropic", { access: `synthetic-${n}`, refresh: `synthetic-refresh-${n}`, expires: Date.now() + 3_600_000, accountId: `synthetic-${n}`, source: "oauth" });
   const ids = getAccountSet("anthropic")!.accounts.map(a => a.id);
@@ -196,7 +196,7 @@ test("Anthropic organization refusal pauses and rebuilds the in-flight OAuth req
 
 
 test("auto-pause never buys a sibling send when the request has only one send", async () => {
-  const { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } = await import("../../src/lib/request-execution-budget");
+  const { createRequestExecutionBudget, CODEX_TEXT_GUARDED_BUDGET_POLICY } = await import("../../backend/src/lib/request-execution-budget");
   const config = configFor("fixture", false);
   config.providers.fixture!.accountAutoPause = { enabled: true, consecutiveFailures: 1 };
   saveConfig(config);
@@ -210,9 +210,9 @@ test("auto-pause never buys a sibling send when the request has only one send", 
 });
 
 test("Codex pool permanent refusal pauses without forcing reauth and retries a sibling", async () => {
-  const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
-  const { updateAccountQuota, clearAccountNeedsReauth } = await import("../../src/codex/auth-api");
-  const { clearCodexUpstreamHealth, clearThreadAccountMap } = await import("../../src/codex/routing");
+  const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
+  const { updateAccountQuota, clearAccountNeedsReauth } = await import("../../backend/src/codex/auth-api");
+  const { clearCodexUpstreamHealth, clearThreadAccountMap } = await import("../../backend/src/codex/routing");
   const config = getDefaultConfig();
   config.providers = { openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward", codexAccountMode: "pool", upstreamWebsocket: false, accountAutoPause: { enabled: true }, models: ["gpt-5.5"] } };
   config.defaultProvider = "openai"; config.defaultModel = "gpt-5.5";
@@ -246,8 +246,8 @@ test("Codex pool permanent refusal pauses without forcing reauth and retries a s
 });
 
 test("native Messages keeps OAuth auto-pause and current-request rotation", async () => {
-  const { handleClaudeMessages } = await import("../../src/server/claude-messages");
-  const { clearAnthropicAccountPoolState } = await import("../../src/oauth/anthropic-routing");
+  const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
+  const { clearAnthropicAccountPoolState } = await import("../../backend/src/oauth/anthropic-routing");
   clearAnthropicAccountPoolState();
   for (let n = 0; n < 2; n++) await saveCredential("anthropic", { access: `synthetic-native-${n}`, refresh: `synthetic-refresh-${n}`, expires: Date.now() + 3_600_000, accountId: `synthetic-native-${n}`, source: "oauth" });
   await setActiveAccount("anthropic", getAccountSet("anthropic")!.accounts[0]!.id);
@@ -305,8 +305,8 @@ for (const wire of ["chat", "messages"] as const) for (const distributed of [fal
     const body = { model: "fixture/fixture", max_tokens: 64, messages: [{ role: "user", content: "synthetic" }], stream: false };
     const req = new Request(`http://localhost/v1/${wire === "chat" ? "chat/completions" : "messages"}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
     const response = wire === "chat"
-      ? await (await import("../../src/server/chat-completions")).handleChatCompletions(req, config, { model: "fixture", provider: "fixture" })
-      : await (await import("../../src/server/claude-messages")).handleClaudeMessages(req, config, { model: "fixture", provider: "fixture" });
+      ? await (await import("../../backend/src/server/chat-completions")).handleChatCompletions(req, config, { model: "fixture", provider: "fixture" })
+      : await (await import("../../backend/src/server/claude-messages")).handleClaudeMessages(req, config, { model: "fixture", provider: "fixture" });
     const text = await response.text();
     expect(response.status, text).toBe(200);
     expect(sends.length).toBe(3);

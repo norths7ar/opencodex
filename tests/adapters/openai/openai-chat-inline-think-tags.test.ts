@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../src/adapters/openai-chat";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../backend/src/adapters/openai-chat";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { buildResponseJSON } from "../../../src/bridge";
-import { parseRequest } from "../../../src/responses/parser";
-import { decodeReasoningEnvelope } from "../../../src/responses/reasoning-envelope";
+import { buildResponseJSON } from "../../../backend/src/bridge";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import { decodeReasoningEnvelope } from "../../../backend/src/responses/reasoning-envelope";
 
 const MODEL = "GLM-5.3-Flash";
 

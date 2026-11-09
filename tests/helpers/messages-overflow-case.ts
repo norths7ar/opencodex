@@ -1,22 +1,22 @@
 import { createHash } from "node:crypto";
-import { saveCredential } from "../../src/oauth/store";
-import { messagesConversationToIr } from "../../src/protocols/codecs/messages-ir";
-import { DesktopModelMappingUnavailableError } from "../../src/claude/inbound-records";
-import { messageThreadUnsupportedResponse } from "../../src/claude/message-threads";
-import { workflowRefusalResponse } from "../../src/server/workflow-refusal";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { AnthropicAccountCooldownError } from "../../src/oauth/anthropic-routing";
-import { OAuthAccountPausedError } from "../../src/oauth/oauth-errors";
-import { NativeOAuthModelRouteError } from "../../src/server/messages-native-oauth";
-import { TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
-import { saveConfig } from "../../src/config";
-import { handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import { collectAnthropicMessageResponse, encodeAnthropicMessageSse, foldAnthropicMessage } from "../../src/protocols/encoders/messages";
-import { responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { createTranslatorBudget, type TranslatorBudget } from "../../src/lib/translator-budget";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { messagesConversationToIr } from "../../backend/src/protocols/codecs/messages-ir";
+import { DesktopModelMappingUnavailableError } from "../../backend/src/claude/inbound-records";
+import { messageThreadUnsupportedResponse } from "../../backend/src/claude/message-threads";
+import { workflowRefusalResponse } from "../../backend/src/server/workflow-refusal";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { AnthropicAccountCooldownError } from "../../backend/src/oauth/anthropic-routing";
+import { OAuthAccountPausedError } from "../../backend/src/oauth/oauth-errors";
+import { NativeOAuthModelRouteError } from "../../backend/src/server/messages-native-oauth";
+import { TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
+import { saveConfig } from "../../backend/src/config";
+import { handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { collectAnthropicMessageResponse, encodeAnthropicMessageSse, foldAnthropicMessage } from "../../backend/src/protocols/encoders/messages";
+import { responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { createTranslatorBudget, type TranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { acquireOwnedSpendHome } from "./owned-spend-home";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import type { MessagesOverflowFixture, MessagesOverflowLane } from "./messages-overflow-cases";
 
 export const overflowSentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
@@ -85,7 +85,7 @@ export async function runMessagesOverflowCase(
   let translatorBudget: TranslatorBudget | undefined;
   try {
     if (lane === "local-envelope") {
-      const hooks = await import("../../src/server/claude-messages") as any;
+      const hooks = await import("../../backend/src/server/claude-messages") as any;
       const branch = fixture.localBranch;
       const error = fixture.thrown ? makeFault() : Object.assign(new Error(fixture.message), { detail: fixture.other, ...(branch?.startsWith("read-budget-") ? { code: "translation_buffer_limit" } : {}) });
       if (branch === "count-read-catch" || branch?.startsWith("read-") || branch?.startsWith("role-") || branch?.startsWith("policy-")) {

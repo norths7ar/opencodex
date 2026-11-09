@@ -3,11 +3,11 @@ import { managementFetch as fetch } from "../../helpers/management-auth";
 import { mkdirSync, mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../../src/config";
-import { startServer } from "../../../src/server";
-import type { OcxConfig } from "../../../src/types";
+import { loadConfig, saveConfig } from "../../../backend/src/config";
+import { startServer } from "../../../backend/src/server";
+import type { OcxConfig } from "../../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../../helpers/isolated-codex-home";
-import { GROK_APPLY_TERMINAL_MS, runGrokApplyFlightForTests, setGrokApplyFlightTestHooks } from "../../../src/server/management/agent-settings-routes";
+import { GROK_APPLY_TERMINAL_MS, runGrokApplyFlightForTests, setGrokApplyFlightTestHooks } from "../../../backend/src/server/management/agent-settings-routes";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 // Full-suite Windows load: startServer + management flows often exceed bun's default

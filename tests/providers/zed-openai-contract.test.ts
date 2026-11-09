@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { translateZedOpenAiStream } from "../../src/adapters/zed-openai-stream";
-import { createTranslatorBudget, type TranslatorBudgetOptions } from "../../src/lib/translator-budget";
-import type { AdapterEvent } from "../../src/types";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { zedEventStream } from "../../src/adapters/zed";
-import { scrubZedCredentials } from "../../src/providers/zed";
-import { foldChatCompletion } from "../../src/protocols/encoders/chat";
-import { scanEventsForWebSearch } from "../../src/web-search/loop";
-import { anthropicSearchAssistantContent } from "../../src/web-search/anthropic-history";
+import { translateZedOpenAiStream } from "../../backend/src/adapters/zed-openai-stream";
+import { createTranslatorBudget, type TranslatorBudgetOptions } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent } from "../../backend/src/types";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { zedEventStream } from "../../backend/src/adapters/zed";
+import { scrubZedCredentials } from "../../backend/src/providers/zed";
+import { foldChatCompletion } from "../../backend/src/protocols/encoders/chat";
+import { scanEventsForWebSearch } from "../../backend/src/web-search/loop";
+import { anthropicSearchAssistantContent } from "../../backend/src/web-search/anthropic-history";
 
 // Each source chunk contains one frame, so the tests measure retained state separately.
 function stream(frames: unknown[]): ReadableStream<Uint8Array> {

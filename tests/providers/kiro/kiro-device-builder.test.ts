@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../src/oauth/kiro-device-login";
-import { getAccountSet, isStorableKiroClientPart } from "../../../src/oauth/store";
+import { startKiroDeviceLogin, statusKiroDeviceLogin } from "../../../backend/src/oauth/kiro-device-login";
+import { getAccountSet, isStorableKiroClientPart } from "../../../backend/src/oauth/store";
 import { authorization, kiroDeviceFixture, response } from "../../helpers/kiro-device-fixture";
 
 let fixture: ReturnType<typeof kiroDeviceFixture> | undefined;

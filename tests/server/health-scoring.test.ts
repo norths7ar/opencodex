@@ -2,18 +2,18 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { appendUsageEntry, resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../src/usage/log";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import { appendUsageEntry, resetUsageReadCacheForTests, type PersistedUsageEntry } from "../../backend/src/usage/log";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 import {
   clearHealthHistoryCacheForTests,
   codexPoolHealthEvidence,
   healthEvidenceForCandidate,
   healthScore,
   HEALTH_SCORE_CONSTANTS,
-} from "../../src/routing/health";
-import { evaluatePolicyProfile } from "../../src/routing/evaluator";
-import { NoEligiblePolicyCandidateError, routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/routing/health";
+import { evaluatePolicyProfile } from "../../backend/src/routing/evaluator";
+import { NoEligiblePolicyCandidateError, routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";
@@ -118,7 +118,7 @@ describe("health-aware scoring (RI-06)", () => {
   });
 
   test("hard cooldown is authoritative: score 0 and evaluator exclusion", async () => {
-    const { clearCodexUpstreamHealth } = await import("../../src/codex/routing");
+    const { clearCodexUpstreamHealth } = await import("../../backend/src/codex/routing");
     clearCodexUpstreamHealth();
     const now = Date.now();
     const evidence = {
@@ -302,7 +302,7 @@ describe("health-aware scoring (RI-06)", () => {
   });
 
   test("execution path applies live codex account cooldown to openai candidates", async () => {
-    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../src/codex/routing");
+    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../backend/src/codex/routing");
     clearCodexUpstreamHealth();
     const now = Date.now();
     const cfg = config({
@@ -330,7 +330,7 @@ describe("health-aware scoring (RI-06)", () => {
   });
 
   test("mixed pool cooldown/soft-avoid states degrade to soft-avoid", async () => {
-    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../src/codex/routing");
+    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../backend/src/codex/routing");
     clearCodexUpstreamHealth();
     const now = Date.now();
     const cfg = config({

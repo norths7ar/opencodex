@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { setFetchCursorUsableModelsForTests } from "../../../src/adapters/cursor/live-models";
-import { fetchProviderModels } from "../../../src/codex/catalog/provider-fetch";
-import { clearModelCache, providerCacheGenerations } from "../../../src/codex/model-cache";
-import type { OcxProviderConfig } from "../../../src/types";
+import { setFetchCursorUsableModelsForTests } from "../../../backend/src/adapters/cursor/live-models";
+import { fetchProviderModels } from "../../../backend/src/codex/catalog/provider-fetch";
+import { clearModelCache, providerCacheGenerations } from "../../../backend/src/codex/model-cache";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * The live GetUsableModels roster is plan-specific: it is an observation made

@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { handleDesktopCompatibilityRuntimeRoutes } from "../../src/server/management/desktop-compatibility-runtime-routes";
-import { createDesktopCompatibilityRuntime } from "../../src/codex/desktop-compatibility/runtime";
-import type { ManagementContext } from "../../src/server/management/context";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleDesktopCompatibilityRuntimeRoutes } from "../../backend/src/server/management/desktop-compatibility-runtime-routes";
+import { createDesktopCompatibilityRuntime } from "../../backend/src/codex/desktop-compatibility/runtime";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 
 const url = new URL("http://127.0.0.1:10100/api/codex/desktop-compatibility/runtime");
 const pairedSession = { isPaired: () => true } as NonNullable<ManagementContext["sessionControl"]>;

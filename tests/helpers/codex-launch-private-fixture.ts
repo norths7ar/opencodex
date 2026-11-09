@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { chmodSync, existsSync, mkdtempSync, realpathSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
+import { resolveTrustedWindowsPowerShellExe } from "../../backend/src/lib/windows-elevation";
 import { dirname, join } from "node:path";
-import { buildCodexLaunchEnv } from "../../src/cli/codex-launcher";
-import { codexCredentialDestinationIsTrusted } from "../../src/cli/codex-launch-auth";
-import { codexLaunchHomeIsOwned } from "../../src/cli/codex-launch-ownership";
+import { buildCodexLaunchEnv } from "../../backend/src/cli/codex-launcher";
+import { codexCredentialDestinationIsTrusted } from "../../backend/src/cli/codex-launch-auth";
+import { codexLaunchHomeIsOwned } from "../../backend/src/cli/codex-launch-ownership";
 import { removeTreeWithRetry } from "./remove-tree";
 
 let location: { base: string; owned: boolean; refusals: string[] } | undefined;

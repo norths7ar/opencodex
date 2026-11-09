@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { isAtomicResidualError } from "../../src/codex/features";
-import { AtomicWriteResidualTempError, AtomicWriteSecretResidualError } from "../../src/config";
+import { isAtomicResidualError } from "../../backend/src/codex/features";
+import { AtomicWriteResidualTempError, AtomicWriteSecretResidualError } from "../../backend/src/config";
 
 describe("migration memo release gate", () => {
   test("both residual classes retain the destination memo", () => {

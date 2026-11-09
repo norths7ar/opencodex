@@ -1,5 +1,5 @@
-import { responseStateMetrics } from "../src/responses/state";
-import { getActiveTurnCount } from "../src/server/lifecycle";
+import { responseStateMetrics } from "../backend/src/responses/state";
+import { getActiveTurnCount } from "../backend/src/server/lifecycle";
 
 export type SampleMode =
   | "real-proxy-legacy-tee"

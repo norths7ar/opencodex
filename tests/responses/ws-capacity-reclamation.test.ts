@@ -2,14 +2,14 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { codexWebSocketAdmissionMetrics, MAX_TRACKED_CODEX_WEBSOCKETS } from "../../src/codex/websocket-registry";
+import { saveConfig } from "../../backend/src/config";
+import { codexWebSocketAdmissionMetrics, MAX_TRACKED_CODEX_WEBSOCKETS } from "../../backend/src/codex/websocket-registry";
 import {
   clearResponseStateForTests, clearResponseStateMemoryForTests, RESPONSE_TTL_MS,
   responseStateMetrics, sweepExpiredResponseStates,
-} from "../../src/responses/state";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/state";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

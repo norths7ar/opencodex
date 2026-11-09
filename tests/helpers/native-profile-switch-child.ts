@@ -3,8 +3,8 @@ import { existsSync, writeFileSync } from "node:fs";
 import {
   NativeProfileManager,
   type NativeProfileSwitchBoundary,
-} from "../../src/codex/native-profile-manager";
-import type { NativeProfileKey, NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
+} from "../../backend/src/codex/native-profile-manager";
+import type { NativeProfileKey, NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
 
 const required = (name: string): string => {
   const value = process.env[name];

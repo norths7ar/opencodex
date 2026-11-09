@@ -5,8 +5,8 @@ beforeEach(async () => { f = await createAnthropicInstanceFixture(); await f.see
 afterEach(async () => { await f?.dispose(); });
 
 test("search planner inherits B, honors explicit A and never auto-selects B without a parent", async () => {
-  const { planWebSearch } = await import("../../src/web-search");
-  const { parseRequest } = await import("../../src/responses/parser");
+  const { planWebSearch } = await import("../../backend/src/web-search");
+  const { parseRequest } = await import("../../backend/src/responses/parser");
   const parsed = parseRequest({ model: f.model, input: "Find documentation", tools: [{ type: "web_search" }] });
   f.config.webSearchSidecar = { backend: "anthropic" };
   const plan = () => planWebSearch(f.config, parsed, false, f.config.providers.anthropic2!, f.model, undefined, { providerName: "anthropic2" });
@@ -21,9 +21,9 @@ test("search planner inherits B, honors explicit A and never auto-selects B with
 });
 
 test("selected empty B refuses instead of borrowing healthy A for search", async () => {
-  const { findAnthropicSidecarProvider } = await import("../../src/web-search/sidecar-providers");
-  const { resolveAlphaSearchSidecar } = await import("../../src/web-search/alpha-search");
-  const { AnthropicHelperUnavailableError } = await import("../../src/sidecar/auth");
+  const { findAnthropicSidecarProvider } = await import("../../backend/src/web-search/sidecar-providers");
+  const { resolveAlphaSearchSidecar } = await import("../../backend/src/web-search/alpha-search");
+  const { AnthropicHelperUnavailableError } = await import("../../backend/src/sidecar/auth");
   await f.store.mutateStore(store => { delete store.anthropic2; });
   f.config.webSearchSidecar = { backend: "anthropic", anthropicInstance: "anthropic2" };
   expect(() => findAnthropicSidecarProvider(f.config)).toThrow(AnthropicHelperUnavailableError);
@@ -32,7 +32,7 @@ test("selected empty B refuses instead of borrowing healthy A for search", async
 });
 
 test("search executor sends the selected B snapshot and rejects a stale marked target", async () => {
-  const { runAnthropicWebSearch } = await import("../../src/web-search/anthropic-executor");
+  const { runAnthropicWebSearch } = await import("../../backend/src/web-search/anthropic-executor");
   const { instanceFixtureCredential } = await import("../helpers/anthropic-instance-fixture");
   const calls: string[] = [];
   globalThis.fetch = (async (_url, init) => {
@@ -54,9 +54,9 @@ test("search executor sends the selected B snapshot and rejects a stale marked t
 });
 
 test("unavailable selected pool yields no search plan and a disarmed bridge, never a thrown main request", async () => {
-  const { planWebSearch } = await import("../../src/web-search");
-  const { resolvePassthroughWebSearchBridgeAuth } = await import("../../src/web-search/passthrough-bridge");
-  const { parseRequest } = await import("../../src/responses/parser");
+  const { planWebSearch } = await import("../../backend/src/web-search");
+  const { resolvePassthroughWebSearchBridgeAuth } = await import("../../backend/src/web-search/passthrough-bridge");
+  const { parseRequest } = await import("../../backend/src/responses/parser");
   const parsed = parseRequest({ model: f.model, input: "Find documentation", tools: [{ type: "web_search" }] });
   await f.store.mutateStore(store => { delete store.anthropic2; });
   f.config.webSearchSidecar = { backend: "anthropic" };
@@ -69,7 +69,7 @@ test("unavailable selected pool yields no search plan and a disarmed bridge, nev
 });
 
 test("a trailing-slash baseUrl reaches the same Messages URL the send fence admits", async () => {
-  const { runAnthropicWebSearch } = await import("../../src/web-search/anthropic-executor");
+  const { runAnthropicWebSearch } = await import("../../backend/src/web-search/anthropic-executor");
   f.config.providers.anthropic2!.baseUrl = "https://api.anthropic.com/";
   const urls: string[] = [];
   globalThis.fetch = (async url => {

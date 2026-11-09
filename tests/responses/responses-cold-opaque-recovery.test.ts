@@ -2,12 +2,12 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isSelfIdentifiedOpaqueBlobRejection } from "../../src/server/responses/core-opaque-recovery";
-import { handleResponses } from "../../src/server/responses";
-import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
+import { isSelfIdentifiedOpaqueBlobRejection } from "../../backend/src/server/responses/core-opaque-recovery";
+import { handleResponses } from "../../backend/src/server/responses";
+import { clearReasoningReplayCacheForTests } from "../../backend/src/responses/reasoning-replay-cache";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalFetch = globalThis.fetch;
 let previousHome: string | undefined;

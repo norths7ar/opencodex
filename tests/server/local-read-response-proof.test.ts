@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { startServer } from "../../src/server";
+import { startServer } from "../../backend/src/server";
 import {
   LOCAL_ATTESTATION_PROOF_HEADER,
   verifyLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import {
   LOCAL_MANAGEMENT_CAPABILITY_EXPIRES_AT_HEADER,
   LOCAL_MANAGEMENT_CAPABILITY_HEADER,
@@ -12,7 +12,7 @@ import {
   LOCAL_MANAGEMENT_NONCE_HEADER,
   LOCAL_MANAGEMENT_READ_PATHS,
   createLocalManagementReadCapability,
-} from "../../src/lib/local-management-capability";
+} from "../../backend/src/lib/local-management-capability";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 /**

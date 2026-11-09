@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { createToolCallIdReminter, reservedToolCallIdsFromHistory } from "../../../src/adapters/openai-chat/tool-call-id-remint";
-import { MAX_TOOL_CALL_ID_LENGTH } from "../../../src/adapters/tool-call-id";
-import { withUniqueToolCallIds } from "../../../src/adapters/unique-tool-call-ids";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { createToolCallIdReminter, reservedToolCallIdsFromHistory } from "../../../backend/src/adapters/openai-chat/tool-call-id-remint";
+import { MAX_TOOL_CALL_ID_LENGTH } from "../../../backend/src/adapters/tool-call-id";
+import { withUniqueToolCallIds } from "../../../backend/src/adapters/unique-tool-call-ids";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { OcxMessage } from "../../../src/types";
+import type { OcxMessage } from "../../../backend/src/types";
 
 /**
  * Some upstreams derive a tool-call id from the call's position in the response and therefore mint

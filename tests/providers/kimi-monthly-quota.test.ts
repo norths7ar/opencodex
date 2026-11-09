@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCredential } from "../../src/oauth/store";
-import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../src/providers/quota";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
-import type { OcxConfig } from "../../src/types";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearProviderQuotaCache, fetchProviderQuotaReports } from "../../backend/src/providers/quota";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalFetch = globalThis.fetch;

@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createCodexCliUpdateRecovery, codexCliUpdateRecoveryBlocksAdmission,
-  finishClosedCodexCliUpdateRecovery } from "../../src/codex/cli-update-recovery";
+  finishClosedCodexCliUpdateRecovery } from "../../backend/src/codex/cli-update-recovery";
 import { removeTreeWithRetry } from "./remove-tree";
 
 const scenario = process.argv[2]!, mode = process.argv[3];

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { responsesRequestSchema } from "../../src/responses/schema";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { responsesRequestSchema } from "../../backend/src/responses/schema";
 
 function request(content: unknown[], isError = false) {
   return {

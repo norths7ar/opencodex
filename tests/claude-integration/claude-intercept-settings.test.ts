@@ -9,10 +9,10 @@ import {
   inspectClaudeInterceptSettings,
   migrateClaudeInterceptSettings,
   removeClaudeInterceptSettings,
-} from "../../src/claude/intercept/settings";
-import { claudeInterceptEnabled, claudeInterceptProxyPort } from "../../src/claude/intercept/runtime";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { applyClaudeModelDefaults, ModelDefaultsRecoveryError, previewClaudeModelDefaults } from "../../src/claude/model-default-settings";
+} from "../../backend/src/claude/intercept/settings";
+import { claudeInterceptEnabled, claudeInterceptProxyPort } from "../../backend/src/claude/intercept/runtime";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { applyClaudeModelDefaults, ModelDefaultsRecoveryError, previewClaudeModelDefaults } from "../../backend/src/claude/model-default-settings";
 
 const CA = "/home/u/.opencodex/claude-intercept/ca.pem";
 const env = buildClaudeInterceptEnv(8846, CA, "test-token");

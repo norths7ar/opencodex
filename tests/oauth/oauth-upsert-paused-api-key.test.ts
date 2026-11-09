@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { upsertOAuthProvider } from "../../src/oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { upsertOAuthProvider } from "../../backend/src/oauth";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 function fixture(provider: string, fields: Partial<OcxProviderConfig>): OcxConfig {
   return { port: 10100, defaultProvider: provider, providers: { [provider]: {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { ManagementRequest } from "../helpers/management-auth";
 

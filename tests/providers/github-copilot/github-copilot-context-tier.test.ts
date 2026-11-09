@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../../src/adapters/openai-responses";
-import { applyProviderConfigHints } from "../../../src/codex/catalog/provider-fetch";
-import { applyGithubCopilotContextTier } from "../../../src/providers/github-copilot-context";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../../backend/src/adapters/openai-responses";
+import { applyProviderConfigHints } from "../../../backend/src/codex/catalog/provider-fetch";
+import { applyGithubCopilotContextTier } from "../../../backend/src/providers/github-copilot-context";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

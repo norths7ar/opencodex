@@ -1,22 +1,22 @@
-import { assertServiceAuthEnvironment, assertServiceEnvironmentMatchesInstall, bakedServicePathsDiagnostic, confirmServiceServing, buildWindowsLauncherVbs, buildWindowsSchtasksCreateArgs, buildWindowsSchtasksCreateArgsForXml, buildWindowsServiceScript, buildWindowsTaskXml as buildWindowsTaskXmlProduction, buildWindowsTaskXmlDocument, deriveWindowsServiceDiagnostic, deriveWindowsServiceDiagnosticForCurrentUser, installFreshWindowsSchedulerSafely, installServiceSafely, normalizeServiceSubcommand, parseServiceArgs, parseServiceInstallState, planServiceCommand, prepareServiceInstall, probeServiceInstallation, readWindowsSchedulerXmlState, registerFreshWindowsSchedulerTask, removeNativeWindowsServiceForScheduler, repairService, reportServiceServing, resolveServiceListenPort, selectServiceSubcommand, SERVICE_INSTALL_HEALTH_MS, SERVICE_INSTALL_HEALTH_WINDOWS_MS, serviceInstallHealthMs, serviceLogPath, serviceStartableFromTray, serviceStatusReport, serviceRetryCommand, serviceStatusSummary, stableLauncherEntry, windowsListenPort, winswListenPort, windowsTaskRegistrationHealthy as windowsTaskRegistrationHealthyProduction } from "../../src/service";
+import { assertServiceAuthEnvironment, assertServiceEnvironmentMatchesInstall, bakedServicePathsDiagnostic, confirmServiceServing, buildWindowsLauncherVbs, buildWindowsSchtasksCreateArgs, buildWindowsSchtasksCreateArgsForXml, buildWindowsServiceScript, buildWindowsTaskXml as buildWindowsTaskXmlProduction, buildWindowsTaskXmlDocument, deriveWindowsServiceDiagnostic, deriveWindowsServiceDiagnosticForCurrentUser, installFreshWindowsSchedulerSafely, installServiceSafely, normalizeServiceSubcommand, parseServiceArgs, parseServiceInstallState, planServiceCommand, prepareServiceInstall, probeServiceInstallation, readWindowsSchedulerXmlState, registerFreshWindowsSchedulerTask, removeNativeWindowsServiceForScheduler, repairService, reportServiceServing, resolveServiceListenPort, selectServiceSubcommand, SERVICE_INSTALL_HEALTH_MS, SERVICE_INSTALL_HEALTH_WINDOWS_MS, serviceInstallHealthMs, serviceLogPath, serviceStartableFromTray, serviceStatusReport, serviceRetryCommand, serviceStatusSummary, stableLauncherEntry, windowsListenPort, winswListenPort, windowsTaskRegistrationHealthy as windowsTaskRegistrationHealthyProduction } from "../../backend/src/service";
 import { afterAll, afterEach, describe, expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { delimiter, isAbsolute, join, posix, win32 } from "node:path";
 import { pathToFileURL } from "node:url";
-import * as serviceModule from "../../src/service";
-import { saveConfig } from "../../src/config";
-import { windowsEnvIndirectBatchValue } from "../../src/lib/win-paths";
-import type { ServiceDiagnostic } from "../../src/service";
-import { definitionCarriesCredential, resolvedProxyEnv, writeServiceApiTokenFile, writeServiceDefinitionFile } from "../../src/service";
-import { buildWinswXml } from "../../src/lib/winsw";
-import { CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST, recordOwnedConfigPath, removeOwnedConfigState } from "../../src/lib/config-ownership";
-import { serviceApiTokenFilePath } from "../../src/lib/service-secrets";
-import { WindowsSchtasksError } from "../../src/lib/windows-elevation";
-import { resolveCurrentWindowsPrincipal, setWindowsPrincipalRunnerForTests } from "../../src/lib/windows-user-principal";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+import * as serviceModule from "../../backend/src/service";
+import { saveConfig } from "../../backend/src/config";
+import { windowsEnvIndirectBatchValue } from "../../backend/src/lib/win-paths";
+import type { ServiceDiagnostic } from "../../backend/src/service";
+import { definitionCarriesCredential, resolvedProxyEnv, writeServiceApiTokenFile, writeServiceDefinitionFile } from "../../backend/src/service";
+import { buildWinswXml } from "../../backend/src/lib/winsw";
+import { CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST, recordOwnedConfigPath, removeOwnedConfigState } from "../../backend/src/lib/config-ownership";
+import { serviceApiTokenFilePath } from "../../backend/src/lib/service-secrets";
+import { WindowsSchtasksError } from "../../backend/src/lib/windows-elevation";
+import { resolveCurrentWindowsPrincipal, setWindowsPrincipalRunnerForTests } from "../../backend/src/lib/windows-user-principal";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
 
@@ -285,7 +285,7 @@ describe("systemd service unit", () => {
       installed: true,
     })).toBe("restart");
 
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const serviceCommand = service.slice(service.indexOf("export async function serviceCommand"));
     expect(serviceCommand).toContain("const plan = planServiceCommand(filteredArgs);");
     expect(serviceCommand).toContain("const { parsed, command } = plan;");
@@ -1036,7 +1036,7 @@ describe("Windows service task", () => {
   });
 
   test("writes the launcher VBS with a UTF-16 BOM so non-ASCII paths survive WSH decoding", async () => {
-    const service = await Bun.file(new URL("../../src/service/windows-ops.ts", import.meta.url)).text();
+    const service = await Bun.file(new URL("../../backend/src/service/windows-ops.ts", import.meta.url)).text();
 
     expect(service).toContain('writeServiceAssetWithRetry(windowsLauncherVbsPath(), `\\uFEFF${buildWindowsLauncherVbs(script)}`, "utf16le")');
     // Uninstall must clean the launcher asset alongside the script and task XML.
@@ -1968,7 +1968,7 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("direct service stop kills the tracked proxy before restoring native Codex", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const stopCase = service.slice(service.indexOf('case "stop":'), service.indexOf('case "status":'));
 
     expect(stopCase).toContain("ops.stop();");
@@ -1979,7 +1979,7 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("direct service uninstall kills the tracked proxy before deleting service assets", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const uninstallCase = service.slice(service.indexOf('case "uninstall":'), service.indexOf("default:"));
 
     expect(uninstallCase).toContain("ops.stop();");
@@ -1992,7 +1992,7 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("Windows service install ends the running task before rewriting its assets, with write retry", async () => {
-    const service = await readText("src/service/windows-ops.ts");
+    const service = await readText("backend/src/service/windows-ops.ts");
     const assetsHelper = service.slice(
       service.indexOf("function writeWindowsSchedulerAssets("),
       service.indexOf("function installWindows("),
@@ -2015,7 +2015,7 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("fresh Windows scheduler wiring selects the pre-registration transaction", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const installCase = service.slice(service.indexOf('case "install":'), service.indexOf('case "start":'));
     expect(installCase).toContain('scheduler.status === "absent"');
     expect(installCase).toContain("await installFreshWindowsSchedulerSafely({ supervisionLatch })");
@@ -2025,7 +2025,7 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("Windows service uninstall verifies task deletion before removing assets", async () => {
-    const service = await readText("src/service/windows-ops.ts");
+    const service = await readText("backend/src/service/windows-ops.ts");
     const uninstallWindows = service.slice(service.indexOf("function uninstallWindows()"), service.indexOf("function classifyWindowsServiceStop("));
 
     expect(uninstallWindows).toContain("probeWindowsSchedulerTask(TASK)");
@@ -2036,14 +2036,14 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("service cleanup falls back to findLiveProxy and clears the pid file", async () => {
-    const service = await readText("src/service/orchestration.ts");
+    const service = await readText("backend/src/service/orchestration.ts");
 
     expect(service).toContain('verifyPidIdentity');
     expect(service).toContain("removeRuntimePort(pid);");
     expect(service).toContain('import { isProcessAlive, stopProxy } from "../lib/process-control";');
     expect(service).toContain('import { findLiveProxy, SERVICE_STOP_LIVENESS } from "../server/proxy-liveness";');
     expect(service).toContain('type TrackedProxyCleanupResult = "none" | "stale" | "stopped";');
-    const health = await readText("src/service/health.ts");
+    const health = await readText("backend/src/service/health.ts");
     expect(health).toContain('import { proxyIdentityAt } from "../server/proxy-liveness";');
     expect(service).toContain("async function stopTrackedProxyIfRunning(): Promise<TrackedProxyCleanupResult>");
     expect(service).toContain("...SERVICE_STOP_LIVENESS");
@@ -2057,7 +2057,7 @@ describe("service lifecycle cleanup ordering", () => {
 
 
   test("Windows scheduler stop does not wait on schtasks /end failure", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const stopCase = service.slice(service.indexOf('case "stop":'), service.indexOf('case "status":'));
     // #764 is an /end that succeeds while the wrapper respawns; waiting only when
     // /end errors cannot catch that path. Restart-window polling is proxyStillLiveAfterStop.
@@ -2068,13 +2068,13 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("tracked proxy cleanup verifies health-reported pids before stopProxy", async () => {
-    const service = await readText("src/service/orchestration.ts");
+    const service = await readText("backend/src/service/orchestration.ts");
     expect(service).toContain("function verifiedKillTarget(pid: number | null | undefined): number | null");
     expect(service).toContain("const liveKillPid = verifiedKillTarget(live?.pid);");
     expect(service).toContain("const trackedKillPid = verifiedKillTarget(pid);");
   });
   test("service stop refuses success while the proxy is still live", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const stopCase = service.slice(service.indexOf('case "stop":'), service.indexOf('case "status":'));
     expect(stopCase).toContain("await proxyStillLiveAfterStop()");
     expect(stopCase).toContain("a proxy is still listening on port");
@@ -2083,14 +2083,14 @@ describe("service lifecycle cleanup ordering", () => {
   });
 
   test("native install refuses Microsoft-account logins before removing the scheduler backend", async () => {
-    const service = await readText("src/service/windows-ops.ts");
+    const service = await readText("backend/src/service/windows-ops.ts");
     const installNative = service.slice(service.indexOf("async function installWindowsNative("), service.indexOf("function startWindows()"));
     expect(installNative.indexOf("(deps.assertNativeAccount ?? assertWindowsNativeServiceAccountSupported)()")).toBeLessThan(installNative.indexOf("(deps.uninstallScheduler ?? uninstallWindows)()"));
     expect(service).toContain("Microsoft-account Windows login");
   });
 
   test("service command cleanup logs kill failures without skipping restore/delete", async () => {
-    const service = await readText("src/service/orchestration.ts");
+    const service = await readText("backend/src/service/orchestration.ts");
 
     expect(service).toContain("async function stopTrackedProxyForServiceCommand(): Promise<TrackedProxyCleanupResult>");
     expect(service).toContain("catch (err)");
@@ -2344,7 +2344,7 @@ describe("service diagnostics", () => {
   });
 
   test("direct service status prints the diagnostics line", async () => {
-    const service = await readText("src/service/cli.ts");
+    const service = await readText("backend/src/service/cli.ts");
     const statusCase = service.slice(service.indexOf('case "status":'), service.indexOf('case "uninstall":'));
 
     expect(statusCase).toContain("Diagnostics:");

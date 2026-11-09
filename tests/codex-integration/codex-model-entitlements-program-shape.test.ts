@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import {
   MAIN_CODEX_ACCOUNT_ID,
-} from "../../src/codex/main-account";
+} from "../../backend/src/codex/main-account";
 import {
   resolveCodexModelEntitlements,
   resetCodexModelEntitlementCacheForTests,
   type CodexModelEntitlementCredentialSnapshot,
-} from "../../src/codex/model-entitlements";
-import { applyNativeAccessPrograms } from "../../src/codex/catalog/access-programs";
-import { deriveEntry } from "../../src/codex/catalog/sync";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
+} from "../../backend/src/codex/model-entitlements";
+import { applyNativeAccessPrograms } from "../../backend/src/codex/catalog/access-programs";
+import { deriveEntry } from "../../backend/src/codex/catalog/sync";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
 
 const TEST_CLIENT_VERSION = "0.146.0";
 const SOL = "gpt-5.6-sol";

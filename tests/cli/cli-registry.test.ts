@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { printFullUsage } from "../../src/cli/help";
-import { CLI_COMMANDS, findCommand } from "../../src/cli/registry";
-import { DISPATCH_ALIASES, DISPATCH_COMMANDS } from "../../src/cli/dispatch";
+import { printFullUsage } from "../../backend/src/cli/help";
+import { CLI_COMMANDS, findCommand } from "../../backend/src/cli/registry";
+import { DISPATCH_ALIASES, DISPATCH_COMMANDS } from "../../backend/src/cli/dispatch";
 
 describe("CLI command registry parity", () => {
   /** Runner keys in src/cli/dispatch.ts (the dispatch table that replaced the

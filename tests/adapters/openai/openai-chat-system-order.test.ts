@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { anthropicToResponsesBody } from "../../../src/claude/inbound";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { anthropicToResponsesBody } from "../../../backend/src/claude/inbound";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "openai-chat",

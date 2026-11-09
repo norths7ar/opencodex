@@ -2,12 +2,12 @@
  * Antigravity direct lane eligibility: the rule the Chat ingress and the protocol planner share.
  */
 import { describe, expect, test } from "bun:test";
-import { planProtocol, type ProtocolPlanInput } from "../../src/protocols/plan";
-import { antigravityDirectDeclineReason, antigravityMessagesDeclineReason, isAntigravityRoute } from "../../src/server/antigravity-direct-eligibility";
-import { cacheDiagnosticsObserving } from "../../src/server/request-log";
-import "../../src/usage/cache-diagnostic";
-import type { RouteResult } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { planProtocol, type ProtocolPlanInput } from "../../backend/src/protocols/plan";
+import { antigravityDirectDeclineReason, antigravityMessagesDeclineReason, isAntigravityRoute } from "../../backend/src/server/antigravity-direct-eligibility";
+import { cacheDiagnosticsObserving } from "../../backend/src/server/request-log";
+import "../../backend/src/usage/cache-diagnostic";
+import type { RouteResult } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const MODEL = "gemini-3.8-flash";
 const PNG = "data:image/png;base64,iVBORw0KGgo=";

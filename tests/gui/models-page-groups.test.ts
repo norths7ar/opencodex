@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildProviderModelGroups } from "../../gui/src/models-groups";
+import { buildProviderModelGroups } from "../../frontend/src/models-groups";
 
 type Row = { provider: string; id: string; native?: boolean };
 

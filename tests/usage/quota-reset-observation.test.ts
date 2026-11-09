@@ -8,21 +8,21 @@ import {
   getAccountQuota,
   flushQuotaObservationsForTests,
   setAccountQuotaFromParsed,
-} from "../../src/codex/quota";
-import type { QuotaResetEvent } from "../../src/quota/reset-detector";
+} from "../../backend/src/codex/quota";
+import type { QuotaResetEvent } from "../../backend/src/quota/reset-detector";
 import {
   hasQuotaResetSink,
   observeQuotaSnapshot,
   setQuotaResetSink,
-} from "../../src/quota/reset-observer";
-import { resetQuotaResetStoreForTests } from "../../src/quota/reset-seen-store";
+} from "../../backend/src/quota/reset-observer";
+import { resetQuotaResetStoreForTests } from "../../backend/src/quota/reset-seen-store";
 import {
   isQuotaResetPollerRunning,
   resetQuotaResetPollerForTests,
   startQuotaResetPoller,
   stopQuotaResetPoller,
-} from "../../src/quota/reset-poller";
-import { resetQuotaResetNotifyCacheForTests } from "../../src/quota/reset-notify-config";
+} from "../../backend/src/quota/reset-poller";
+import { resetQuotaResetNotifyCacheForTests } from "../../backend/src/quota/reset-notify-config";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 
 const ACCOUNT = "acct_reset_observation";
@@ -255,7 +255,7 @@ describe("idle poller", () => {
 
   test("a disabled config makes a tick a no-op", async () => {
     const { runQuotaResetPollerTickForTests, quotaResetPollerTickCountForTests } = await import(
-      "../../src/quota/reset-poller"
+      "../../backend/src/quota/reset-poller"
     );
     await runQuotaResetPollerTickForTests();
     expect(quotaResetPollerTickCountForTests()).toBe(0);
@@ -263,12 +263,12 @@ describe("idle poller", () => {
 
   test("the interval floor matches the documented per-account TTL", async () => {
     // The docstring claims the floor sits above the 10-minute per-account TTL; 60s did not.
-    const { MIN_INTERVAL_MS } = await import("../../src/quota/reset-poller");
+    const { MIN_INTERVAL_MS } = await import("../../backend/src/quota/reset-poller");
     expect(MIN_INTERVAL_MS).toBe(600_000);
   });
 
   test("the configured pollSeconds reaches the poller interval", async () => {
-    const { quotaResetPollerIntervalForTests } = await import("../../src/quota/reset-poller");
+    const { quotaResetPollerIntervalForTests } = await import("../../backend/src/quota/reset-poller");
     // Above the floor, so the configured cadence is what must survive to setInterval.
     startQuotaResetPoller(1_800_000);
     expect(quotaResetPollerIntervalForTests()).toBe(1_800_000);
@@ -284,7 +284,7 @@ describe("idle poller", () => {
     const {
       runQuotaResetPollerTickForTests,
       quotaResetPollerTickCountForTests,
-    } = await import("../../src/quota/reset-poller");
+    } = await import("../../backend/src/quota/reset-poller");
     // A real enabled config is what carries a tick past its early returns; the resolver reads
     // the config file rather than exposing an injection seam.
     const home = mkdtempSync(join(tmpdir(), "ocx-poller-"));

@@ -13,7 +13,7 @@ import {
   windowsSchedulerCsvIncludesTask,
   windowsSchedulerTaskInstalled,
   windowsTaskRegistrationHealthy,
-} from "../../src/service";
+} from "../../backend/src/service";
 
 const TEST_WINDOWS_TASK_SID = "S-1-5-21-111-222-333-1001";
 
@@ -437,7 +437,7 @@ describe("evaluateWindowsSchedulerInstallVerification", () => {
     // guarded stop. runFile is the single execFileSync site for schtasks; a
     // killed command throws into the same fail-closed classification a nonzero
     // exit would, so the bound never weakens a verdict.
-    const source = readFileSync(repoPath("src/service/windows-scheduler.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/service/windows-scheduler.ts"), "utf8");
     const runFile = source.slice(
       source.indexOf("function runFile"),
       source.indexOf("return decodeSchtasksOutput(buffer);"),

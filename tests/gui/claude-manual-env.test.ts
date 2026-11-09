@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { buildManualEnv, type ClaudeManualEnvState } from "../../gui/src/pages/claude-manual-env";
+import { buildManualEnv, type ClaudeManualEnvState } from "../../frontend/src/pages/claude-manual-env";
 
 const CONDITIONAL_FLAG_LINE = '[ -z "${CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST+x}" ] && export CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1';
 

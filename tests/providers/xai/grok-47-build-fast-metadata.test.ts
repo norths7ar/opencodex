@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { XAI_MODELS } from "../../../src/providers/registry/model-seeds";
-import type { ProviderRegistryEntry } from "../../../src/providers/registry/types";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { XAI_MODELS } from "../../../backend/src/providers/registry/model-seeds";
+import type { ProviderRegistryEntry } from "../../../backend/src/providers/registry/types";
 
 // xAI documents Grok 4.7 Fast as "the same model served on faster infrastructure", listed for
 // Cursor and Grok Build and not available on the public xAI API

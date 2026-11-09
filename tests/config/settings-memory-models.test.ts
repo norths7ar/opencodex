@@ -10,10 +10,10 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
-import { invalidateStartupHealthCache } from "../../src/server/startup-health-cache";
-import type { OcxConfig } from "../../src/types";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
+import { invalidateStartupHealthCache } from "../../backend/src/server/startup-health-cache";
+import type { OcxConfig } from "../../backend/src/types";
 import { startupHealthFixture } from "../helpers/startup-health";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

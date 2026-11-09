@@ -2,8 +2,8 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../../src/codex/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
+import { gatherRoutedModels as gatherRoutedModelsDirect } from "../../../backend/src/codex/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
 import {
   antigravityModelUnlistedMessage,
   antigravityModelRefusal,
@@ -16,21 +16,21 @@ import {
   rotateAntigravityAccountOnAuthRefusal,
   rotateGenericOAuthAccountOn429,
   routeAntigravityModel,
-} from "../../../src/oauth/generic-account-failover";
+} from "../../../backend/src/oauth/generic-account-failover";
 import {
   ANTIGRAVITY_ACCOUNT_ROSTER_TTL_MS,
   antigravityAccountRosterModelIds,
   antigravityAccountSupportsModel,
   clearAntigravityAccountRosters,
   recordAntigravityAccountRoster,
-} from "../../../src/providers/antigravity-account-roster";
+} from "../../../backend/src/providers/antigravity-account-roster";
 import {
   ANTIGRAVITY_MODELS,
   ANTIGRAVITY_MODEL_EFFORTS,
   parseAntigravityAvailableModels,
   resolveAntigravityEffortWireModel,
-} from "../../../src/providers/antigravity-models";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/providers/antigravity-models";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { withStubbedProviderFetch } from "../../helpers/catalog-provider-fetch";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 

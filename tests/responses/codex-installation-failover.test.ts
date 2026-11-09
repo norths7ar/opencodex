@@ -3,15 +3,15 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAccountNeedsReauth } from "../../src/codex/auth-api";
-import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { clearPoolRecoveryState } from "../../src/routing/probe-lease";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/auth-api";
+import { clearAccountQuota, getAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, getCodexUpstreamHealth } from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { clearPoolRecoveryState } from "../../backend/src/routing/probe-lease";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const key = "x-codex-installation-id";
 const original = "11111111-1111-4111-8111-111111111111";
@@ -104,16 +104,16 @@ for (const surface of ["search", "images", "live"] as const) test(`${surface} ma
   const req = new Request(`http://localhost/v1/${surface}`, { method: "POST", headers: { "content-type": "application/json", [key]: original }, body: JSON.stringify(surface === "search" ? { query: "test" } : surface === "images" ? { model: "gpt-image-1", prompt: "test" } : { model: "gpt-realtime", sdp: "v=0" }) });
   const cfg = config();
   const log = { model: "", provider: "" };
-  const response = surface === "search" ? await (await import("../../src/server/search")).handleSearch(req, cfg, log)
-    : surface === "images" ? await (await import("../../src/server/images")).handleImages(req, cfg, "generations", log)
-    : await (await import("../../src/server/live")).handleLive(req, cfg, log);
+  const response = surface === "search" ? await (await import("../../backend/src/server/search")).handleSearch(req, cfg, log)
+    : surface === "images" ? await (await import("../../backend/src/server/images")).handleImages(req, cfg, "generations", log)
+    : await (await import("../../backend/src/server/live")).handleLive(req, cfg, log);
   expect(response.status).toBe(503);
   expect(sends).toBe(0);
 });
 
 test("optional Responses helper disables itself on installation-secret refusal", async () => {
   writeFileSync(join(home, "codex-installation-secret"), "corrupt", { mode: 0o600 });
-  const { prepareResponsesSidecarAuth } = await import("../../src/server/responses/request-sidecar-auth");
+  const { prepareResponsesSidecarAuth } = await import("../../backend/src/server/responses/request-sidecar-auth");
   const { createTestTranslatorBudget } = await import("../helpers/translator-budget");
   const provider = { adapter: "openai-chat", baseUrl: "https://example.test/v1", apiKey: "test-key" };
   const req = new Request("http://localhost/v1/responses", { headers: { [key]: original } });
@@ -149,7 +149,7 @@ for (const status of [429, 503]) test(`compact ${status} before B identity failu
 
 test("physical WS A->B upgrades and response.create frames use each selected identity", async () => {
   const realWebSocket = globalThis.WebSocket;
-  const { codexWsPool } = await import("../../src/server/responses/codex-ws-pool");
+  const { codexWsPool } = await import("../../backend/src/server/responses/codex-ws-pool");
   const sockets: Array<{ headers: Headers; frames: string[] }> = [];
   class Socket {
     static OPEN = 1;

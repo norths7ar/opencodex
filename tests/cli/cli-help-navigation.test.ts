@@ -3,10 +3,10 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { printSubcommandUsage, printUsage } from "../../src/cli/help";
-import { CLI_COMMANDS, findCommand } from "../../src/cli/registry";
-import { CAPABILITIES } from "../../src/cli/capabilities";
-import { resolveHelpPath } from "../../src/cli/help-catalog";
+import { printSubcommandUsage, printUsage } from "../../backend/src/cli/help";
+import { CLI_COMMANDS, findCommand } from "../../backend/src/cli/registry";
+import { CAPABILITIES } from "../../backend/src/cli/capabilities";
+import { resolveHelpPath } from "../../backend/src/cli/help-catalog";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
@@ -28,7 +28,7 @@ function run(args: string[], columns = "80") {
   mkdirSync(codex);
   mkdirSync(ocx);
   try {
-    const result = spawnSync(process.execPath, [repoPath("src", "cli", "index.ts"), ...args], {
+    const result = spawnSync(process.execPath, [repoPath("backend/src", "cli", "index.ts"), ...args], {
       cwd: repoRoot(), encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5_000,
       env: { ...process.env, CODEX_HOME: codex, OPENCODEX_HOME: ocx, NO_COLOR: "1", COLUMNS: columns },
     });

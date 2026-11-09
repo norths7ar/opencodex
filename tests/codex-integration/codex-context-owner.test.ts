@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import type { CodexAuthContext } from "../../src/codex/auth-context";
+import type { CodexAuthContext } from "../../backend/src/codex/auth-context";
 import { clearContextSessionOwnersForTests, contextSessionOwnerMatches,
-  getContextSessionOwner, recordContextSessionOwner } from "../../src/codex/context-owner";
+  getContextSessionOwner, recordContextSessionOwner } from "../../backend/src/codex/context-owner";
 
 const destination = "https://chatgpt.com/backend-api/codex";
 const principal = "principal-a";

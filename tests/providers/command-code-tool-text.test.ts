@@ -2,18 +2,18 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
 import {
   CommandCodeToolTextFilter,
   MAX_HELD_TOOL_TEXT_BYTES,
   markupMatchesInput,
   parseToolCallMarkup,
   salvagedArguments,
-} from "../../src/adapters/command-code-tool-text";
-import { saveCredential } from "../../src/oauth/store";
-import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
-import { handleResponses } from "../../src/server/responses";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/command-code-tool-text";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearGenericFailoverHealth } from "../../backend/src/oauth/generic-account-failover";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";

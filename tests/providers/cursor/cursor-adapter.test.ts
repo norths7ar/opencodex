@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from "bun:test";
 import {
   createCursorAdapter as createCursorAdapterProduction,
   cursorExecDeniedMessage,
-} from "../../../src/adapters/cursor";
+} from "../../../backend/src/adapters/cursor";
 import {
   clearCursorIncompleteToolRemint,
   clearCursorIncompleteToolRemintForTests,
@@ -18,12 +18,12 @@ import {
   recordCursorOverflowRemint,
   rememberCursorThreadConversation,
   shouldSkipCursorOverflowRemint,
-} from "../../../src/adapters/cursor/thread-continuity";
+} from "../../../backend/src/adapters/cursor/thread-continuity";
 import {
   clearCursorCheckpointsForTests,
   commitCursorCheckpoint,
   getCursorCheckpoint,
-} from "../../../src/adapters/cursor/checkpoint-store";
+} from "../../../backend/src/adapters/cursor/checkpoint-store";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import {
   AgentClientMessageSchema,
@@ -32,17 +32,17 @@ import {
   ConversationTurnStructureSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
-import type { CursorClientMessage, CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
-import type { CursorTransportFactoryInput } from "../../../src/adapters/cursor/transport";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
+import type { CursorClientMessage, CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
+import type { CursorTransportFactoryInput } from "../../../backend/src/adapters/cursor/transport";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { CURSOR_INCOMPLETE_TOOL_CALL_MESSAGE_PREFIX, CursorRootEnvelopeLimitError } from "../../../src/adapters/cursor/cursor-errors";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../../src/lib/debug-settings";
-import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../src/adapters/cursor/call-id";
-import { handleCursorNativeKv, resetCursorBlobStateForTests } from "../../../src/adapters/cursor/native-exec";
-import { CURSOR_MISSING_TOOL_RESULT, encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
+import { CURSOR_INCOMPLETE_TOOL_CALL_MESSAGE_PREFIX, CursorRootEnvelopeLimitError } from "../../../backend/src/adapters/cursor/cursor-errors";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { encodeCursorCallId, resetCursorCallIdProvenanceForTests } from "../../../backend/src/adapters/cursor/call-id";
+import { handleCursorNativeKv, resetCursorBlobStateForTests } from "../../../backend/src/adapters/cursor/native-exec";
+import { CURSOR_MISSING_TOOL_RESULT, encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
 
 const createCursorAdapter = (...args: Parameters<typeof createCursorAdapterProduction>) =>
   withTestTranslatorBudget(createCursorAdapterProduction(...args));
@@ -1601,8 +1601,8 @@ describe("Cursor incomplete-tool conversation remint", () => {
   });
 
   test("CursorHttp1BidiConnection sends x-cursor-streaming: true on HTTP/1.1 RunSSE requests", async () => {
-    const { CursorHttp1BidiConnection } = await import("../../../src/adapters/cursor/http1-bidi");
-    const { createTranslatorBudget } = await import("../../../src/lib/translator-budget");
+    const { CursorHttp1BidiConnection } = await import("../../../backend/src/adapters/cursor/http1-bidi");
+    const { createTranslatorBudget } = await import("../../../backend/src/lib/translator-budget");
     let capturedHeaders: Headers | undefined;
     const budget = createTranslatorBudget();
     const conn = new CursorHttp1BidiConnection({

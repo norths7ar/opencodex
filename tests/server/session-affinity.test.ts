@@ -1,11 +1,11 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
-import { resolveCodexAccountForThread, clearThreadAccountMap, formatCodexProviderForLog } from "../../src/codex/routing";
-import { CODEX_ACCOUNT_LOG_LABEL_RE, fallbackCodexAccountLogLabel } from "../../src/codex/account-label";
-import { updateAccountQuota, clearAccountQuota } from "../../src/codex/auth-api";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import type { OcxConfig } from "../../src/types";
+import { resolveCodexAccountForThread, clearThreadAccountMap, formatCodexProviderForLog } from "../../backend/src/codex/routing";
+import { CODEX_ACCOUNT_LOG_LABEL_RE, fallbackCodexAccountLogLabel } from "../../backend/src/codex/account-label";
+import { updateAccountQuota, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-session-affinity-test");

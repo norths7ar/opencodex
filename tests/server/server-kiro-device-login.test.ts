@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { saveConfig } from "../../src/config";
-import { clearLoginState, OAUTH_PROVIDERS } from "../../src/oauth";
-import { cancelKiroDeviceLogin, setKiroDevicePublishForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../src/oauth/kiro-device-login";
-import { getAccountSet, mutateStore, oauthMutationTailSnapshot } from "../../src/oauth/store";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { clearLoginState, OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { cancelKiroDeviceLogin, setKiroDevicePublishForTests, startKiroDeviceLogin, statusKiroDeviceLogin } from "../../backend/src/oauth/kiro-device-login";
+import { getAccountSet, mutateStore, oauthMutationTailSnapshot } from "../../backend/src/oauth/store";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import { kiroDeviceFixture, profileArn, response, socialAuthorization } from "../helpers/kiro-device-fixture";
 
 let fixture: ReturnType<typeof kiroDeviceFixture> | undefined;

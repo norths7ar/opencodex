@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { openaiChatCompletionsUrl } from "../../../src/adapters/openai-chat-url";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { openaiChatCompletionsUrl } from "../../../backend/src/adapters/openai-chat-url";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 describe("openai-chat URL normalization", () => {
   test("maps the four common paste shapes to the canonical chat endpoint", () => {

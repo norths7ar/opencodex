@@ -21,7 +21,7 @@ function* walk(dir: string): Generator<string> {
 
 // fileURLToPath, not .pathname: on Windows .pathname keeps a leading slash before the
 // drive letter (\D:\a\...), which breaks fs calls on CI.
-const SRC = fileURLToPath(new URL("../../../src", import.meta.url));
+const SRC = fileURLToPath(new URL("../../../backend/src", import.meta.url));
 
 test("only src/grok/inject.ts writes a grok config.toml", () => {
   const writers: string[] = [];

@@ -2,8 +2,8 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { withConfigWriteLock, configWriteLockPath } from "../../../src/codex/config-write-lock";
-import { buildGrokManagedBlock, injectGrokConfig, stripGrokConfig } from "../../../src/grok/inject";
+import { withConfigWriteLock, configWriteLockPath } from "../../../backend/src/codex/config-write-lock";
+import { buildGrokManagedBlock, injectGrokConfig, stripGrokConfig } from "../../../backend/src/grok/inject";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 let home: string;

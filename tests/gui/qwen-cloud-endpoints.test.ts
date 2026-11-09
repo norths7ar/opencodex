@@ -3,15 +3,15 @@ import {
   baseUrlForChoice,
   matchChoiceId,
   resolvedBaseUrlForChoice,
-} from "../../gui/src/base-url-choice";
+} from "../../frontend/src/base-url-choice";
 import {
   QWEN_CLOUD_BASE_URL_CHOICES,
   QWEN_CLOUD_PAYG_BASE_URL,
   QWEN_CLOUD_TOKEN_PLAN_BASE_URL,
   matchBaseUrlChoice,
-} from "../../src/providers/base-url-choices";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { deriveProviderPresets } from "../../src/providers/derive";
+} from "../../backend/src/providers/base-url-choices";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { deriveProviderPresets } from "../../backend/src/providers/derive";
 
 const CHOICES = [...QWEN_CLOUD_BASE_URL_CHOICES];
 

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { anthropicMessagesUrl, createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../src/adapters/anthropic";
-import type { AdapterEvent } from "../../../src/types";
+import { anthropicMessagesUrl, createAnthropicAdapter as createAnthropicAdapterProduction } from "../../../backend/src/adapters/anthropic";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

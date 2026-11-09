@@ -1,22 +1,22 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../src/oauth/store";
-import * as usabilityModule from "../../src/codex/account-usability";
-import * as modelRowsModule from "../../src/server/management/model-rows";
+import * as storeModule from "../../backend/src/oauth/store";
+import * as usabilityModule from "../../backend/src/codex/account-usability";
+import * as modelRowsModule from "../../backend/src/server/management/model-rows";
 
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean }>; activeAccountId?: string }> = {};
 let usableCodexAccounts: Set<string> = new Set();
 let managementRows: Array<Record<string, unknown>> | Error = [];
 let entitlementWaitMs: number | undefined;
 
-mock.module("../../src/oauth/store", () => ({
+mock.module("../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
-mock.module("../../src/codex/account-usability", () => ({
+mock.module("../../backend/src/codex/account-usability", () => ({
   ...usabilityModule,
   isCodexAccountUsable: (_config: unknown, accountId: string) => usableCodexAccounts.has(accountId),
 }));
-mock.module("../../src/server/management/model-rows", () => ({
+mock.module("../../backend/src/server/management/model-rows", () => ({
   ...modelRowsModule,
   listManagementModelRows: async (_config: unknown, options?: { entitlementWaitMs?: number }) => {
     entitlementWaitMs = options?.entitlementWaitMs;
@@ -25,11 +25,11 @@ mock.module("../../src/server/management/model-rows", () => ({
   },
 }));
 
-import { pickerVisibleSidecarCandidates, visionSidecarCandidates } from "../../src/sidecar/candidates";
-import { resolveSidecarAuth } from "../../src/sidecar/auth";
-import { visionCandidateRows, visionDescriberIsProvablyBlind } from "../../src/server/management/vision-sidecar-options";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { pickerVisibleSidecarCandidates, visionSidecarCandidates } from "../../backend/src/sidecar/candidates";
+import { resolveSidecarAuth } from "../../backend/src/sidecar/auth";
+import { visionCandidateRows, visionDescriberIsProvablyBlind } from "../../backend/src/server/management/vision-sidecar-options";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const forward: OcxProviderConfig = { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" };
 const anthropicOAuth: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", authMode: "oauth" };

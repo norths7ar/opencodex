@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { KEY_LOGIN_PROVIDERS } from "../../src/oauth/key-providers";
-import { deriveProviderPresets, providerConfigSeed } from "../../src/providers/derive";
-import { resolveProviderModelDiscoveryUrl } from "../../src/providers/model-discovery";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
-import { en } from "../../gui/src/i18n/en";
-import { interpolate, type TFn } from "../../gui/src/i18n/shared";
-import { formatProviderDisplayName, providerIconPaint, providerIconSrc } from "../../gui/src/provider-icons";
+import { KEY_LOGIN_PROVIDERS } from "../../backend/src/oauth/key-providers";
+import { deriveProviderPresets, providerConfigSeed } from "../../backend/src/providers/derive";
+import { resolveProviderModelDiscoveryUrl } from "../../backend/src/providers/model-discovery";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
+import { en } from "../../frontend/src/i18n/en";
+import { interpolate, type TFn } from "../../frontend/src/i18n/shared";
+import { formatProviderDisplayName, providerIconPaint, providerIconSrc } from "../../frontend/src/provider-icons";
 
 const englishT: TFn = (key, vars) => interpolate(en[key], vars);
 const OPPER_BASE_URL = "https://api.opper.ai/v3/compat";

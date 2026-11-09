@@ -23,8 +23,8 @@ import {
   clearThreadAccountMap,
   recordCodexUpstreamOutcome,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { codexPoolAffinityKey, previewCodexPoolLineage } from "../../src/codex/auth-context";
+} from "../../backend/src/codex/routing";
+import { codexPoolAffinityKey, previewCodexPoolLineage } from "../../backend/src/codex/auth-context";
 import {
   CODEX_LINEAGE_IDLE_TTL_MS,
   CODEX_LINEAGE_MAX_ENTRIES,
@@ -37,14 +37,14 @@ import {
   codexThreadLineageLookup,
   recordCodexThreadLineage,
   setCodexConversationAnchorObserver,
-} from "../../src/codex/lineage";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota, updateAccountQuota } from "../../src/codex/auth-api";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/codex/lineage";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 let TEST_DIR = "";
 let previousOpencodexHome: string | undefined;

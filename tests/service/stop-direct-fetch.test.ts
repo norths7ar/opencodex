@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { createServer, type Socket } from "node:net";
-import { stopProxyGracefully } from "../../src/lib/process-control";
+import { stopProxyGracefully } from "../../backend/src/lib/process-control";
 import { repoPath } from "../helpers/repo-root";
 
 const stopRunner = `
@@ -109,9 +109,9 @@ describe("local stop transport", () => {
   // These paths mutate service/process state; exercise their shared real transport above
   // and verify each caller delegates without overriding it with the global fetch.
   for (const [file, functionName, count] of [
-    ["src/cli/index.ts", "handleStopUnlocked", 1],
-    ["src/service/orchestration.ts", "stopTrackedProxyIfRunning", 2],
-    ["src/cli/index.ts", "handleUninstall", 2],
+    ["backend/src/cli/index.ts", "handleStopUnlocked", 1],
+    ["backend/src/service/orchestration.ts", "stopTrackedProxyIfRunning", 2],
+    ["backend/src/cli/index.ts", "handleUninstall", 2],
   ] as const) {
     test(`${functionName} retains the direct stop default`, () => {
       const source = readFileSync(repoPath(file), "utf8");

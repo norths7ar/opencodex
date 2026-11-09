@@ -2,8 +2,8 @@ import { mock } from "bun:test";
 import * as dns from "node:dns/promises";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
-import type { OcxConfig } from "../../src/types";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
+import type { OcxConfig } from "../../backend/src/types";
 
 // Exercise real loopback HTTP transport without depending on the host resolver's
 // retry policy for intentionally unresolvable names. Keep destination-policy
@@ -28,10 +28,10 @@ mock.module("node:dns/promises", () => ({
 }));
 
 // Install the seam before loading production modules that capture lookup.
-const { saveConfig } = await import("../../src/config");
-const { fetchProviderModels } = await import("../../src/codex/catalog/provider-fetch");
-const { providerOutboundGet } = await import("../../src/lib/provider-outbound");
-const { handleManagementAPI } = await import("../../src/server/management-api");
+const { saveConfig } = await import("../../backend/src/config");
+const { fetchProviderModels } = await import("../../backend/src/codex/catalog/provider-fetch");
+const { providerOutboundGet } = await import("../../backend/src/lib/provider-outbound");
+const { handleManagementAPI } = await import("../../backend/src/server/management-api");
 const { ManagementRequest: Request } = await import("../helpers/management-auth");
 
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);

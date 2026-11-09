@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { CommandCodeToolTextFilter, MAX_HELD_TOOL_TEXT_BYTES } from "../../src/adapters/command-code-tool-text";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { CommandCodeToolTextFilter, MAX_HELD_TOOL_TEXT_BYTES } from "../../backend/src/adapters/command-code-tool-text";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const provider: OcxProviderConfig = {

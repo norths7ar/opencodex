@@ -5,14 +5,14 @@ import { join } from "node:path";
 import {
   clearQoderDiscoveryFlightsForTests, discoverQoderModels, fetchQoderModels, qoderDiscoveryFlightCountForTests, QODER_DISCOVERY_REUSE_MS,
   QODER_INTERACTIVE_DEADLINE_MS, QODER_MODEL_DISCOVERY_TIMEOUT_MS, setFetchQoderModelsForTests, type QoderModelsResult,
-} from "../../src/adapters/qoder/live-models";
-import { clearQoderBinaryCache, QODER_GLOBAL_PROFILE } from "../../src/adapters/qoder/profiles";
-import { collectDefaultModelExposure } from "../../src/cli/doctor";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-fetch";
-import { clearGatherRoutedModelsInflight, gatherRoutedModels } from "../../src/codex/catalog/routed-gather";
-import { clearModelCache, getProviderDiscoveryStatus, providerCacheGenerations } from "../../src/codex/model-cache";
-import { probeQoderProvider } from "../../src/server/management/qoder-provider-probe";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/adapters/qoder/live-models";
+import { clearQoderBinaryCache, QODER_GLOBAL_PROFILE } from "../../backend/src/adapters/qoder/profiles";
+import { collectDefaultModelExposure } from "../../backend/src/cli/doctor";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-fetch";
+import { clearGatherRoutedModelsInflight, gatherRoutedModels } from "../../backend/src/codex/catalog/routed-gather";
+import { clearModelCache, getProviderDiscoveryStatus, providerCacheGenerations } from "../../backend/src/codex/model-cache";
+import { probeQoderProvider } from "../../backend/src/server/management/qoder-provider-probe";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // #8115: qoder --list-models took 14.5 s on a working install, past the former 8 s bound.
@@ -338,9 +338,9 @@ describe("late result publication keeps the retained roster (#8115)", () => {
     let runs = 0;
     setFetchQoderModelsForTests(async () => { runs += 1; return { ok: true, models: ["Account-Model"] }; });
     await fetchProviderModels(NAME, provider, 60_000);
-    const revision = (await import("../../src/codex/model-cache")).observeModelCacheRevision(NAME);
+    const revision = (await import("../../backend/src/codex/model-cache")).observeModelCacheRevision(NAME);
     await fetchProviderModels(NAME, provider, 60_000);
-    expect((await import("../../src/codex/model-cache")).observeModelCacheRevision(NAME)).toBe(revision);
+    expect((await import("../../backend/src/codex/model-cache")).observeModelCacheRevision(NAME)).toBe(revision);
     expect(runs).toBe(1);
   });
 });

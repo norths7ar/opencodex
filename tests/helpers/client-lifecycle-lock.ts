@@ -1,6 +1,6 @@
 import { spyOn } from "bun:test";
 import { join, resolve } from "node:path";
-import * as clientLifecycle from "../../src/client/lifecycle-lock";
+import * as clientLifecycle from "../../backend/src/client/lifecycle-lock";
 
 const realSync = clientLifecycle.withClientLifecycleSync;
 const realAsync = clientLifecycle.withClientLifecycle;

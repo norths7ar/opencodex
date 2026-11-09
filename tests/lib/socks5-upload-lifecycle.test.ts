@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { Socket, createConnection, createServer as createTcpServer, type AddressInfo, type Server as TcpServer } from "node:net";
-import { socks5Fetch } from "../../src/lib/socks5-fetch";
+import { socks5Fetch } from "../../backend/src/lib/socks5-fetch";
 
 /**
  * The budget the transport arms for a response, mirrored from SOCKS5_RESPONSE_TIMEOUT_MS in

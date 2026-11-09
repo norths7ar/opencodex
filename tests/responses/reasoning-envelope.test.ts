@@ -1,12 +1,12 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
-import { anthropicToResponsesBody, anthropicToResponsesTranslation } from "../../src/claude/inbound";
-import { decodeReasoningEnvelope, encodeReasoningEnvelope, OCX_REASONING_PREFIX, type ReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
-import { createTranslatorBudget, TranslatorBudgetExceededError, translatorObservedBufferSnapshot } from "../../src/lib/translator-budget";
-import { jsonUtf8Bytes } from "../../src/lib/json-byte-size";
-import * as budgets from "../../src/lib/translator-budget";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
+import { anthropicToResponsesBody, anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
+import { decodeReasoningEnvelope, encodeReasoningEnvelope, OCX_REASONING_PREFIX, type ReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { responsesJsonToAnthropicMessage, responsesSseToAnthropicSse } from "../../backend/src/claude/outbound";
+import { createTranslatorBudget, TranslatorBudgetExceededError, translatorObservedBufferSnapshot } from "../../backend/src/lib/translator-budget";
+import { jsonUtf8Bytes } from "../../backend/src/lib/json-byte-size";
+import * as budgets from "../../backend/src/lib/translator-budget";
 
 describe("reasoning and tool/result envelopes", () => {
   test("preserves ordered thinking blocks and genuine signatures", () => {
@@ -682,7 +682,7 @@ describe("reasoning allocation admission", () => {
   });
 
   test.each(["thinking", "redacted_thinking", "owned"])("handler maps %s admission failure to 413 without dispatch and disposes its budget", async type => {
-    const { handleClaudeMessages } = await import("../../src/server/claude-messages");
+    const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
     const payload = "fixture".repeat(128);
     const signature = type === "owned" ? encodeReasoningEnvelope({ txt: payload }) : payload;
     const content = type === "redacted_thinking" ? { type, data: payload }
@@ -711,7 +711,7 @@ describe("reasoning allocation admission", () => {
     } finally { factory.mockRestore(); upstream.mockRestore(); reserve.mockRestore(); charge.mockRestore(); budget.dispose(); }
   });
   test("final request-copy admission returns 413 before serialization and disposes the budget", async () => {
-    const { handleClaudeMessages } = await import("../../src/server/claude-messages");
+    const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
     const request = new Request("http://localhost/v1/messages", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: "fixture/model", messages: [{ role: "user", content: "x".repeat(200) }] }),
@@ -741,7 +741,7 @@ describe("reasoning allocation admission", () => {
   });
 
   test("successful Request construction retains only its UTF-8 body after releasing temporary copies", async () => {
-    const { handleClaudeMessages } = await import("../../src/server/claude-messages");
+    const { handleClaudeMessages } = await import("../../backend/src/server/claude-messages");
     const request = new Request("http://localhost/v1/messages", {
       method: "POST", headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: "fixture/model", messages: [{ role: "user", content: "hello" }] }),

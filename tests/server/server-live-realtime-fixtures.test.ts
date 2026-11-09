@@ -18,12 +18,12 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
-import { saveConfig } from "../../src/config";
-import { MAX_WS_FRAME_BYTES, openLiveSidebandUpstream, startServer } from "../../src/server";
-import { LIVE_FRAME_LOG_ENV } from "../../src/server/live";
-import type { OcxConfig } from "../../src/types";
+import { clearAccountNeedsReauth, clearAccountQuota } from "../../backend/src/codex/auth-api";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
+import { saveConfig } from "../../backend/src/config";
+import { MAX_WS_FRAME_BYTES, openLiveSidebandUpstream, startServer } from "../../backend/src/server";
+import { LIVE_FRAME_LOG_ENV } from "../../backend/src/server/live";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";

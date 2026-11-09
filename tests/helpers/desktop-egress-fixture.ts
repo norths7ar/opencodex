@@ -1,7 +1,7 @@
 import { createServer as createHttp } from "node:http";
 import { createServer as createHttps } from "node:https";
 import { createServer as createTcp, connect, type Socket, type Server } from "node:net";
-import type { PemKeyPair } from "../../src/claude/intercept/local-ca";
+import type { PemKeyPair } from "../../backend/src/claude/intercept/local-ca";
 export async function listenFixture(server: Server, host = "127.0.0.1") {
   const sockets = new Set<Socket>();
   server.on("connection", socket => { sockets.add(socket); socket.on("error", () => {}); socket.once("close", () => sockets.delete(socket)); });

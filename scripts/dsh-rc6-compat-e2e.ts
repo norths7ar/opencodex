@@ -2,9 +2,9 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { saveConfig } from "../src/config";
-import { startServer } from "../src/server";
-import type { OcxConfig } from "../src/types";
+import { saveConfig } from "../backend/src/config";
+import { startServer } from "../backend/src/server";
+import type { OcxConfig } from "../backend/src/types";
 
 export const DSH_RC6_VERSION = "0.1.0-rc.6";
 

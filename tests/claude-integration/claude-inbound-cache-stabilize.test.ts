@@ -2,15 +2,15 @@ import { createHash } from "node:crypto";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig, OcxClaudeCodeConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig, OcxClaudeCodeConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { beforeEach, afterEach, describe, expect, test } from "bun:test";
-import { stabilizeClaudeInstructionsForPromptCache } from "../../src/claude/inbound-cache-stabilize";
-import { anthropicToResponsesTranslation } from "../../src/claude/inbound";
+import { stabilizeClaudeInstructionsForPromptCache } from "../../backend/src/claude/inbound-cache-stabilize";
+import { anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
 
 const TASKCREATE_NUDGE = [
   "The task tools haven't been used recently. If you're working on tasks that would benefit from tracking, consider using TaskCreate to add them.",

@@ -4,13 +4,13 @@ import {
   collectChatCompletion,
   responsesJsonToChatCompletion,
   responsesSseToChatCompletionsSse,
-} from "../../src/chat/outbound";
-import { jsonCompletionSse, nativeChatSse } from "../../src/server/chat-native-sse";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/chat/outbound";
+import { jsonCompletionSse, nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
 
 type Rec = Record<string, unknown>;
 type Frame = {
@@ -424,7 +424,7 @@ describe("refusal handler delivery matrix", () => {
     for (const upstreamSse of [true, false]) {
       for (const clientSse of [true, false]) {
         test(`${native ? "native" : "translated"} upstream ${upstreamSse ? "SSE" : "JSON"} -> client ${clientSse ? "SSE" : "JSON"}`, async () => {
-          const { handleChatCompletions } = await import("../../src/server/chat-completions");
+          const { handleChatCompletions } = await import("../../backend/src/server/chat-completions");
           const responseJson = { id: "resp_fixture", status: "completed", output: [message([part("fixture")], "item_fixture")] };
           const chatJson = { id: "chatcmpl_fixture", object: "chat.completion", created: 1, model,
             choices: [{ index: 0, message: { role: "assistant", content: null, refusal: "fixture" }, finish_reason: "stop" }] };

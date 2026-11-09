@@ -3,22 +3,22 @@ import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { pathToFileURL } from "node:url";
-import { createDesktopPickerController } from "../../src/claude/desktop-picker";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
+import { createDesktopPickerController } from "../../backend/src/claude/desktop-picker";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
 import {
   ensurePickerCa, pickerCaCertPath, pickerCaFingerprints, pickerCaPendingUntrustPath,
   readPendingPickerCaUntrust, PICKER_CA_COMMON_NAME, PICKER_HOST,
-} from "../../src/claude/intercept/picker-ca";
-import type { PickerRuntime } from "../../src/claude/intercept/picker-runtime";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/intercept/picker-ca";
+import type { PickerRuntime } from "../../backend/src/claude/intercept/picker-runtime";
+import type { OcxConfig } from "../../backend/src/types";
 
-const runtimeUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/runtime.ts")).href;
-const proxyUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/connect-proxy.ts")).href;
+const runtimeUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/runtime.ts")).href;
+const proxyUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/connect-proxy.ts")).href;
 const storeUrl = pathToFileURL(join(import.meta.dir, "../helpers/picker-ca-store.ts")).href;
-const caUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-ca.ts")).href;
+const caUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-ca.ts")).href;
 
 // Logical configured ports are asserted separately from kernel-owned allocations.
 const REQUESTED_PROXY_PORT = 10234;

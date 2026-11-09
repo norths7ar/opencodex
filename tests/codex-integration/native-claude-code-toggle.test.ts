@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Route contract for devlog/_fin/260803_integrations_toggle_all/011.

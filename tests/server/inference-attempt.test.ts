@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { beginInferenceAttempt } from "../../src/server/inference/attempt";
-import type { RequestLogContext } from "../../src/server/request-log";
+import { beginInferenceAttempt } from "../../backend/src/server/inference/attempt";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
 
 describe("beginInferenceAttempt", () => {
   test("opens the next ordinal as the active attempt and appends it to the request", () => {

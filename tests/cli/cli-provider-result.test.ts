@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { printProviderReceipt, runProviderAction } from "../../src/cli/provider-result";
-import { CliUsageError, RuntimeApiError } from "../../src/cli/runtime-api";
+import { printProviderReceipt, runProviderAction } from "../../backend/src/cli/provider-result";
+import { CliUsageError, RuntimeApiError } from "../../backend/src/cli/runtime-api";
 
 let stdout: ReturnType<typeof spyOn>, stderr: ReturnType<typeof spyOn>;
 beforeEach(() => {

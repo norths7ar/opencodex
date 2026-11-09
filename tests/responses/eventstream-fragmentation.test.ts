@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { crc32, decodeEventStream, encodeMessage } from "../../src/lib/eventstream-decoder";
+import { crc32, decodeEventStream, encodeMessage } from "../../backend/src/lib/eventstream-decoder";
 
 const MiB = 1024 * 1024;
 

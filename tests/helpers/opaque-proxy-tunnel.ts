@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import net, { type AddressInfo, type Server, type Socket } from "node:net";
 import { once } from "node:events";
 import { createHash } from "node:crypto";
-import type { OpaqueProxyRoute } from "../../src/lib/opaque-proxy-tunnel";
+import type { OpaqueProxyRoute } from "../../backend/src/lib/opaque-proxy-tunnel";
 
 /** Each case owns its listeners, peers, client sockets, and fixture timers. */
 export class TunnelFixtureScope {

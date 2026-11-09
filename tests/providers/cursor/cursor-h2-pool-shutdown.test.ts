@@ -1,10 +1,10 @@
 import http2 from "node:http2";
 import { afterEach, describe, expect, test } from "bun:test";
-import { CursorH2SessionPool } from "../../../src/adapters/cursor/h2-pool";
+import { CursorH2SessionPool } from "../../../backend/src/adapters/cursor/h2-pool";
 import {
   resetOptionalShutdownHooksForTests,
   runOptionalShutdownHooks,
-} from "../../../src/lib/optional-shutdown-hooks";
+} from "../../../backend/src/lib/optional-shutdown-hooks";
 
 afterEach(() => {
   resetOptionalShutdownHooksForTests();

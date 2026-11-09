@@ -6,19 +6,19 @@ import {
   MODEL_RENAMES,
   projectModelRenames,
   type ModelRename,
-} from "../../src/providers/model-rename-migration";
-import { runModelRenameStartupMigration } from "../../src/providers/model-rename-startup";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { reconcileOAuthProviders } from "../../src/oauth";
+} from "../../backend/src/providers/model-rename-migration";
+import { runModelRenameStartupMigration } from "../../backend/src/providers/model-rename-startup";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { reconcileOAuthProviders } from "../../backend/src/oauth";
 import {
   ANTIGRAVITY_MODELS,
   ANTIGRAVITY_MODEL_CONTEXT_WINDOWS,
-} from "../../src/providers/antigravity-models";
-import { getConfigPath, loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
-import { routeModel } from "../../src/router";
-import { requestPacingIntervalMs } from "../../src/providers/request-pacing";
+} from "../../backend/src/providers/antigravity-models";
+import { getConfigPath, loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
+import { routeModel } from "../../backend/src/router";
+import { requestPacingIntervalMs } from "../../backend/src/providers/request-pacing";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const INTL_BASE_URL = "https://token-plan.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1";

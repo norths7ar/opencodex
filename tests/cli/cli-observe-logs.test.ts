@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleObserveCommand } from "../../src/cli/observe";
-import { queryRequestLogs } from "../../src/server/request-log-filter";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
+import { queryRequestLogs } from "../../backend/src/server/request-log-filter";
 import { log } from "../helpers/request-log-entry";
 
 /**

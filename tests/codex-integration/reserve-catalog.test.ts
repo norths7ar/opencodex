@@ -1,39 +1,39 @@
 import { describe, expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { isLoopbackHostname as isServerLoopbackHostname } from "../../src/server/auth-cors";
+import type { OcxConfig } from "../../backend/src/types";
+import { isLoopbackHostname as isServerLoopbackHostname } from "../../backend/src/server/auth-cors";
 import {
   isEffectiveCodexDesktopAuthless,
   isLoopbackHostname,
   shouldInjectApiAuthHeader,
-} from "../../src/codex/loopback-target";
-import { NATIVE_RESERVE_MODEL } from "../../src/codex/catalog/native-models";
+} from "../../backend/src/codex/loopback-target";
+import { NATIVE_RESERVE_MODEL } from "../../backend/src/codex/catalog/native-models";
 import {
   accountBoundNativeOpenAiSlugs,
   accountBoundNativeOpenAiSlugsBySelector,
   observedAccountBoundNativeEntries,
   observedReserveCatalogSource,
   upstreamNativeEntry,
-} from "../../src/codex/catalog/metadata";
+} from "../../backend/src/codex/catalog/metadata";
 import {
   buildCatalogEntriesFromObservedState,
   finishUpstreamNativeEntry,
   mergeCatalogEntriesFromObservedState,
   type ObservedCatalogEntryBuildInput,
   type ObservedCatalogMergeInput,
-} from "../../src/codex/catalog/sync";
+} from "../../backend/src/codex/catalog/sync";
 import {
   createReserveCatalogProjection,
   isReserveCatalogProjection,
   RESERVE_METADATA_SOURCE_FIELD,
   RESERVE_LUNA_METADATA_SOURCE,
-} from "../../src/codex/catalog/reserve";
+} from "../../backend/src/codex/catalog/reserve";
 import {
   reserveCatalogSuppressionReason,
   resetReserveSuppressionWarningsForTests,
   warnReserveSuppressedOnce,
-} from "../../src/codex/catalog/reserve-warn";
-import { findSupportedNativeTemplate, type RawEntry } from "../../src/codex/catalog/parsing";
-import { clampCatalogModelsToObservedCodexSupport } from "../../src/codex/catalog/effort";
+} from "../../backend/src/codex/catalog/reserve-warn";
+import { findSupportedNativeTemplate, type RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { clampCatalogModelsToObservedCodexSupport } from "../../backend/src/codex/catalog/effort";
 
 function config(overrides: Partial<OcxConfig> = {}): OcxConfig {
   return {

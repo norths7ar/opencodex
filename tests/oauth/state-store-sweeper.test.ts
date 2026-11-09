@@ -16,40 +16,40 @@ import {
   sweepExpiredOnWrite,
   sweepLiveness,
   type GenerationContext,
-} from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/lib/state-store-sweeper";
 import {
   ocxStartProcessCacheSizeForTests,
   setOcxStartProcessCacheForTests,
   setOcxStartProcessProbeForTests,
   sweepDeadOcxStartProcessCache,
-} from "../../src/config";
-import { STATE_STORE_REGISTRATIONS, setLiveStateStoreConfig, reconcileLiveStateStores } from "../../src/lib/state-store-registrations";
-import { getAccountSet, saveCredential } from "../../src/oauth/store";
+} from "../../backend/src/config";
+import { STATE_STORE_REGISTRATIONS, setLiveStateStoreConfig, reconcileLiveStateStores } from "../../backend/src/lib/state-store-registrations";
+import { getAccountSet, saveCredential } from "../../backend/src/oauth/store";
 import {
   clearAccountQuotaCache,
   clearProviderQuotaCache,
   fetchProviderQuotaReports,
   getCachedProviderAccountQuota,
-} from "../../src/providers/quota";
-import type { OcxConfig } from "../../src/types";
-import { __resetVertexTokenCache, getVertexAccessToken } from "../../src/lib/gcp-adc";
+} from "../../backend/src/providers/quota";
+import type { OcxConfig } from "../../backend/src/types";
+import { __resetVertexTokenCache, getVertexAccessToken } from "../../backend/src/lib/gcp-adc";
 import {
   configureAppOwnedMemoryBudget,
   registerRetainedStore,
   resetAppOwnedMemoryForTests,
-} from "../../src/lib/app-owned-memory";
-import { registerAppOwnedMemorySweepFallback } from "../../src/lib/app-owned-memory-stores";
+} from "../../backend/src/lib/app-owned-memory";
+import { registerAppOwnedMemorySweepFallback } from "../../backend/src/lib/app-owned-memory-stores";
 import {
   clearResponseStateMemoryForTests,
   rememberResponseState,
   responseStateMetrics,
   RESPONSE_TTL_MS,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import {
   __resetAntigravityReplayCache,
   antigravityReplayMetrics,
   observeAntigravityReplay,
-} from "../../src/adapters/google-antigravity-replay";
+} from "../../backend/src/adapters/google-antigravity-replay";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function context(

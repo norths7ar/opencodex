@@ -1,13 +1,13 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
 import * as filesystem from "node:fs";
 import { generateKeyPairSync, X509Certificate } from "node:crypto";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
-import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../src/claude/intercept/picker-ca";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
+import { PICKER_CA_COMMON_NAME, PICKER_HOST } from "../../backend/src/claude/intercept/picker-ca";
 import { existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { discardPickerCaKey, ensurePickerCa, pickerCaCertPath, pickerCaFingerprints, readPendingPickerCaUntrust } from "../../src/claude/intercept/picker-ca";
+import { discardPickerCaKey, ensurePickerCa, pickerCaCertPath, pickerCaFingerprints, readPendingPickerCaUntrust } from "../../backend/src/claude/intercept/picker-ca";
 import { memoryPickerCaStore } from "../helpers/picker-ca-store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -23,7 +23,7 @@ function fileSymlink(target: string, path: string): boolean {
     return false;
   }
 }
-const caUrl = pathToFileURL(join(import.meta.dir, "../../src/claude/intercept/picker-ca.ts")).href;
+const caUrl = pathToFileURL(join(import.meta.dir, "../../backend/src/claude/intercept/picker-ca.ts")).href;
 const helperUrl = pathToFileURL(join(import.meta.dir, "../helpers/picker-ca-store.ts")).href;
 function fresh(dir: string, extra = "", timeout = 10_000) {
   const child = Bun.spawnSync({ cmd: [process.execPath, "-e", `
@@ -211,7 +211,7 @@ test("different config directories cannot reuse a credential payload", () => {
 test("canonical SQLite lease excludes concurrent credential initialization", () => {
   const dir = root();
   const child = fresh(dir, `
-    import { withClientLifecycleSync } from ${JSON.stringify(pathToFileURL(join(import.meta.dir, "../../src/client/lifecycle-lock.ts")).href)};
+    import { withClientLifecycleSync } from ${JSON.stringify(pathToFileURL(join(import.meta.dir, "../../backend/src/client/lifecycle-lock.ts")).href)};
     import { mkdirSync } from "node:fs";
     mkdirSync(${JSON.stringify(join(dir, "claude-picker"))});
     withClientLifecycleSync(() => {

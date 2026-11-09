@@ -2,13 +2,13 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildClientConfig, buildClientContribution, type ExportModel } from "../../src/clients/config-export";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration, disableIntegration, restoreIntegration } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+import { buildClientConfig, buildClientContribution, type ExportModel } from "../../backend/src/clients/config-export";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration, disableIntegration, restoreIntegration } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config: OcxConfig = {

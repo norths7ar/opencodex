@@ -6,9 +6,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { isProtocolPlanV1 } from "../../src/protocols/dto";
-import { buildProtocolPlanSnapshot, previewProtocolPlan } from "../../src/protocols/plan-snapshot";
-import type { OcxConfig } from "../../src/types";
+import { isProtocolPlanV1 } from "../../backend/src/protocols/dto";
+import { buildProtocolPlanSnapshot, previewProtocolPlan } from "../../backend/src/protocols/plan-snapshot";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

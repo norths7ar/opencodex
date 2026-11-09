@@ -8,12 +8,12 @@ import {
   InteractionUpdateSchema,
   TextDeltaUpdateSchema,
   TurnEndedUpdateSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { encodeConnectFrame } from "../../../src/adapters/cursor/framing";
-import { createLiveCursorTransport } from "../../../src/adapters/cursor/live-transport";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { encodeConnectFrame } from "../../../backend/src/adapters/cursor/framing";
+import { createLiveCursorTransport } from "../../../backend/src/adapters/cursor/live-transport";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 import { watchdogMs } from "../../helpers/ci-watchdog";
-import type { CursorRunRequest, CursorServerMessage } from "../../../src/adapters/cursor/types";
+import type { CursorRunRequest, CursorServerMessage } from "../../../backend/src/adapters/cursor/types";
 
 /**
  * T04 (devlog 260822_senpi_cursor_transfer/110): inbound stream-health watchdog.

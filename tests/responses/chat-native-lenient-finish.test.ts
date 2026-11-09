@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { nativeChatSse } from "../../src/server/chat-native-sse";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+import { nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 
 describe("nativeChatSse lenient EOF termination", () => {
   const encoder = new TextEncoder();

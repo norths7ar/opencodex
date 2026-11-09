@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import type { OcxParsedRequest } from "../../../src/types/request";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import type { OcxParsedRequest } from "../../../backend/src/types/request";
 
 function parsedRequest(overrides: Partial<OcxParsedRequest> = {}): OcxParsedRequest {
   return {

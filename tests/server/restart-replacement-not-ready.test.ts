@@ -5,7 +5,7 @@
  */
 import { afterEach, describe, expect, test } from "bun:test";
 import { spawn, type ChildProcess } from "node:child_process";
-import { spawnReplacementStart, type ReplacementSpawn } from "../../src/server/restart-replacement";
+import { spawnReplacementStart, type ReplacementSpawn } from "../../backend/src/server/restart-replacement";
 
 const children: ChildProcess[] = [];
 

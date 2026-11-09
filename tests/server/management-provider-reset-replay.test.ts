@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
 
 // Lives apart from management-provider-validation.test.ts because that file sits at its
 // file-size ratchet cap; the helpers it needs are small enough to repeat here.

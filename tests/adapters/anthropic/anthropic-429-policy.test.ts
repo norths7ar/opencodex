@@ -4,13 +4,13 @@ import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../src/oauth/anthropic-routing";
-import { clearGenericFailoverHealth } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../src/oauth/store";
-import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../src/providers/quota";
-import { clearResponseStateForTests } from "../../../src/responses/state";
-import { handleResponses } from "../../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum, getEligibleAnthropicAccounts, getAnthropicAccountHealthSnapshot } from "../../../backend/src/oauth/anthropic-routing";
+import { clearGenericFailoverHealth } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, saveAccountCredential, saveCredential, setActiveAccount } from "../../../backend/src/oauth/store";
+import { clearAccountQuotaCache, getCachedProviderAccountQuota, resetProviderQuotaReconcileStateForTests } from "../../../backend/src/providers/quota";
+import { clearResponseStateForTests } from "../../../backend/src/responses/state";
+import { handleResponses } from "../../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;
@@ -151,10 +151,10 @@ function deferred<T>() {
 }
 
 
-import { classifyAnthropic429, anthropicRetryAfterMs, anthropicRatePauseUntil } from "../../../src/oauth/anthropic-rate-limit-policy";
-import { bindAnthropicRefusalCredential, rotateAnthropicAccountOnResponse } from "../../../src/oauth/anthropic-account-refusal";
-import { credentialGeneration, getAccountCredential } from "../../../src/oauth/store";
-import { bindAnthropicSessionAffinity, resolveAnthropicAccountForSession } from "../../../src/oauth/anthropic-routing";
+import { classifyAnthropic429, anthropicRetryAfterMs, anthropicRatePauseUntil } from "../../../backend/src/oauth/anthropic-rate-limit-policy";
+import { bindAnthropicRefusalCredential, rotateAnthropicAccountOnResponse } from "../../../backend/src/oauth/anthropic-account-refusal";
+import { credentialGeneration, getAccountCredential } from "../../../backend/src/oauth/store";
+import { bindAnthropicSessionAffinity, resolveAnthropicAccountForSession } from "../../../backend/src/oauth/anthropic-routing";
 
 test.each([
   [{}, "request-scoped-unknown"],
@@ -253,7 +253,7 @@ test("aborted and non-replayable refusals never mutate or replay", async () => {
   expect(getAnthropicAccountHealthSnapshot(a!)).toBeNull();
 });
 
-import { markResponseNonReplayable } from "../../../src/lib/upstream-retry";
+import { markResponseNonReplayable } from "../../../backend/src/lib/upstream-retry";
 test("ambiguous-send marker forbids quota health mutation", async () => {
   const [a] = await seed();
   const response = refused({ "anthropic-ratelimit-unified-5h-status": "rejected" });
@@ -276,8 +276,8 @@ test("streamed continuation after output cannot retry a headerless refusal", asy
 });
 
 
-import { recordAnthropicAccountRefusal } from "../../../src/oauth/anthropic-routing";
-import { pauseAnthropicRateAdmission } from "../../../src/oauth/anthropic-rate-limit-policy";
+import { recordAnthropicAccountRefusal } from "../../../backend/src/oauth/anthropic-routing";
+import { pauseAnthropicRateAdmission } from "../../../backend/src/oauth/anthropic-rate-limit-policy";
 
 test.each([undefined, "invalid", "0", "past", "future"])("aggregate shared rejection uses reset %s or the default", async reset => {
   const [a] = await seed();

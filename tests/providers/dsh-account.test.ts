@@ -2,36 +2,36 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { deriveOAuthProviderConfig, deriveProviderPresets } from "../../src/providers/derive";
-import { OAUTH_PROVIDERS } from "../../src/oauth";
-import { fetchDshAccountQuota } from "../../src/providers/quota/dsh-account";
-import { AUTHORITATIVE_EMPTY_QUOTA, TERMINAL_QUOTA_FAILURE } from "../../src/providers/quota/report-cache";
-import { SENSITIVE_KEY_PATTERN, redactSecretString } from "../../src/lib/redact";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { deriveOAuthProviderConfig, deriveProviderPresets } from "../../backend/src/providers/derive";
+import { OAUTH_PROVIDERS } from "../../backend/src/oauth";
+import { fetchDshAccountQuota } from "../../backend/src/providers/quota/dsh-account";
+import { AUTHORITATIVE_EMPTY_QUOTA, TERMINAL_QUOTA_FAILURE } from "../../backend/src/providers/quota/report-cache";
+import { SENSITIVE_KEY_PATTERN, redactSecretString } from "../../backend/src/lib/redact";
 import {
   DSH_ACCOUNT_MODELS,
   DSH_ACCOUNT_DEFAULT_MODEL,
   DSH_ACCOUNT_MODEL_CONTEXT_WINDOWS,
-} from "../../src/providers/dsh-account-models";
-import { saveConfig } from "../../src/config";
-import { saveCredential, getAccountSet } from "../../src/oauth/store";
-import { startServer } from "../../src/server";
-import { stopServerListener } from "../../src/server/lifecycle";
-import { flushNativeMainStartupReleases } from "../../src/codex/native-profile-startup";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+} from "../../backend/src/providers/dsh-account-models";
+import { saveConfig } from "../../backend/src/config";
+import { saveCredential, getAccountSet } from "../../backend/src/oauth/store";
+import { startServer } from "../../backend/src/server";
+import { stopServerListener } from "../../backend/src/server/lifecycle";
+import { flushNativeMainStartupReleases } from "../../backend/src/codex/native-profile-startup";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeAfterBackgroundWork } from "../helpers/remove-tree";
 import { currentServerFixtureConfig } from "../helpers/server-auth-fixture";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { resolveAdapter, resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { credentialPinnedProviderConfigError, modelAdapterRecordConfigError } from "../../src/config/provider-validation";
-import { resolveSidecarAuth } from "../../src/sidecar/auth";
-import * as oauthIndex from "../../src/oauth";
-import { loadConfig } from "../../src/config";
-import { mayResolveModelsOAuth } from "../../src/oauth/model-discovery-auth";
-import { resolveModelsAuthToken } from "../../src/oauth";
-import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
-import { parseRequest } from "../../src/responses/parser";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { resolveAdapter, resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { credentialPinnedProviderConfigError, modelAdapterRecordConfigError } from "../../backend/src/config/provider-validation";
+import { resolveSidecarAuth } from "../../backend/src/sidecar/auth";
+import * as oauthIndex from "../../backend/src/oauth";
+import { loadConfig } from "../../backend/src/config";
+import { mayResolveModelsOAuth } from "../../backend/src/oauth/model-discovery-auth";
+import { resolveModelsAuthToken } from "../../backend/src/oauth";
+import { fetchProviderModels } from "../../backend/src/codex/catalog/provider-models";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // Runner timeouts do not finish a case's finally block before teardown starts.

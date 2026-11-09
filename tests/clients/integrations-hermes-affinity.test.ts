@@ -2,18 +2,18 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { HERMES_API_KEY_ENV_REF, type ManagedContribution } from "../../src/clients/config-export";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { refreshOwnedIntegration } from "../../src/integrations/owned-refresh";
-import { canonicalContribution, fingerprint, semanticContribution } from "../../src/integrations/ownership";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore } from "../../src/integrations/store";
+import { HERMES_API_KEY_ENV_REF, type ManagedContribution } from "../../backend/src/clients/config-export";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { refreshOwnedIntegration } from "../../backend/src/integrations/owned-refresh";
+import { canonicalContribution, fingerprint, semanticContribution } from "../../backend/src/integrations/ownership";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
 import {
   applyIntegration, disableIntegration, overwriteIntegration, refreshIntegration, restoreIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root: string;

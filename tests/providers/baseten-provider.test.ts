@@ -1,21 +1,21 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { gatherRoutedModels } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { buildInitProviders } from "../../src/cli/init";
-import { buildModelsRequest } from "../../src/oauth";
-import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../src/oauth/key-providers";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { buildInitProviders } from "../../backend/src/cli/init";
+import { buildModelsRequest } from "../../backend/src/oauth";
+import { KEY_LOGIN_PROVIDERS, validateApiKey } from "../../backend/src/oauth/key-providers";
 import {
   deriveInitProviders,
   deriveProviderPresets,
   providerConfigSeed,
-} from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { routedSlug } from "../../src/providers/slug-codec";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { routedSlug } from "../../backend/src/providers/slug-codec";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 import { fixturePath } from "../helpers/repo-root";
 

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { ExportModel, ManagedContribution } from "../../src/clients/config-export";
+import type { ExportModel, ManagedContribution } from "../../backend/src/clients/config-export";
 import {
   AmbiguousSelectorError,
   InvalidSelectorError,
@@ -11,18 +11,18 @@ import {
   formatSelectorConjunction,
   parseSegment,
   setPath,
-} from "../../src/integrations/merge";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { blockedContainerPath, readIntegrationState, readPath } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
+} from "../../backend/src/integrations/merge";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { blockedContainerPath, readIntegrationState, readPath } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
 import {
   applyIntegration,
   disableIntegration,
   overwriteIntegration,
   refreshIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

@@ -16,13 +16,13 @@ import {
 import { hostname, tmpdir } from "node:os";
 import { join, posix, win32 } from "node:path";
 import { dlopen, FFIType } from "bun:ffi";
-import type { UserIdentity } from "../src/codex/convergence-types";
+import type { UserIdentity } from "../backend/src/codex/convergence-types";
 import {
   resolveEffectiveUserIdentity,
   resolveEffectiveUserRuntimeRoot,
-} from "../src/codex/user-identity";
-import { resolveTrustedWindowsPowerShellExe } from "../src/lib/windows-elevation";
-import { hardenSecretDir } from "../src/lib/windows-secret-acl";
+} from "../backend/src/codex/user-identity";
+import { resolveTrustedWindowsPowerShellExe } from "../backend/src/lib/windows-elevation";
+import { hardenSecretDir } from "../backend/src/lib/windows-secret-acl";
 import { openTestRunLockGate, TEST_RUN_LOCK_RELEASE_WAIT_MS, withTestRunLockGate } from "./test-run-lock-gate";
 
 export const TEST_RUN_ID_ENV = "OCX_TEST_RUN_ID";

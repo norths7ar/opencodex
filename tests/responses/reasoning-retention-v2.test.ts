@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, readdirSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { decodeCompactionSummary, encodeCompactionSummary } from "../../src/responses/compaction";
-import { decodeRetainedCompaction, encodeRetainedCompaction } from "../../src/responses/retained-compaction";
-import { prepareCompactionRetention } from "../../src/server/responses/compaction-retention";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { parseRequest } from "../../src/responses/parser";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { decodeCompactionSummary, encodeCompactionSummary } from "../../backend/src/responses/compaction";
+import { decodeRetainedCompaction, encodeRetainedCompaction } from "../../backend/src/responses/retained-compaction";
+import { prepareCompactionRetention } from "../../backend/src/server/responses/compaction-retention";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { parseRequest } from "../../backend/src/responses/parser";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { compactionRequest, completedPayload, drainCompactionResponseState,
   installCompactionRoutingAclFixture, jsonResponse, keyProviderConfig,

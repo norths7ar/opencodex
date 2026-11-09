@@ -2,23 +2,23 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearModelCache, getFreshCached, setCached } from "../../src/codex/model-cache";
-import { resetCodexModelEntitlementCacheForTests } from "../../src/codex/model-entitlements";
-import { handleModelRoutes } from "../../src/server/management/model-routes";
-import { listManagementModelRows } from "../../src/server/management/model-rows";
-import type { CatalogModel } from "../../src/codex/catalog";
-import type { OcxConfig } from "../../src/types";
+import { clearModelCache, getFreshCached, setCached } from "../../backend/src/codex/model-cache";
+import { resetCodexModelEntitlementCacheForTests } from "../../backend/src/codex/model-entitlements";
+import { handleModelRoutes } from "../../backend/src/server/management/model-routes";
+import { listManagementModelRows } from "../../backend/src/server/management/model-rows";
+import type { CatalogModel } from "../../backend/src/codex/catalog";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { readCodexCatalogPath } from "../../src/codex/catalog/parsing";
-import { effectiveModelReasoningEfforts } from "../../src/server/management/model-rows";
-import { routedSlug } from "../../src/providers/slug-codec";
-import { handleAgentSettingsRoutes } from "../../src/server/management/agent-settings-routes";
-import type { ManagementContext } from "../../src/server/management/context";
+import { readCodexCatalogPath } from "../../backend/src/codex/catalog/parsing";
+import { effectiveModelReasoningEfforts } from "../../backend/src/server/management/model-rows";
+import { routedSlug } from "../../backend/src/providers/slug-codec";
+import { handleAgentSettingsRoutes } from "../../backend/src/server/management/agent-settings-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
 import { readFileSync } from "node:fs";
-import { MANAGEMENT_JSON_BODY_MAX_BYTES, managementBodyTooLargeResponse } from "../../src/server/management/body";
+import { MANAGEMENT_JSON_BODY_MAX_BYTES, managementBodyTooLargeResponse } from "../../backend/src/server/management/body";
 
 /**
  * `PUT /api/model-settings` writes per-model overrides onto a routed row.

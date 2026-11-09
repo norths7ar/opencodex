@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { getCodexAccountCredential, readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
+import type { OcxConfig } from "../../backend/src/types";
+import { getCodexAccountCredential, readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 
 interface WarmupOAuthOptions {
   config: OcxConfig;

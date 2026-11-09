@@ -10,7 +10,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { setPlatformForTests } from "../../src/lib/windows-secret-acl";
+import { setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
@@ -18,8 +18,8 @@ import {
   inspectResponseSpillStorage,
   rememberResponseState,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
-import { collectReferencedSpillFileNames } from "../../src/responses/state/spill-inspect";
+} from "../../backend/src/responses/state";
+import { collectReferencedSpillFileNames } from "../../backend/src/responses/state/spill-inspect";
 import {
   inspectResponseSpillDir,
   recoverOrphanedResponseSpills,
@@ -28,7 +28,7 @@ import {
   responseSpillDirectory,
   setSpillIoForTest,
   writeResponseSpillDurably,
-} from "../../src/responses/spill-store";
+} from "../../backend/src/responses/spill-store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function spillFileNames(home: string): string[] {

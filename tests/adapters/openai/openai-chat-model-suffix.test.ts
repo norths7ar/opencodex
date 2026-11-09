@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter, stripBracketedModelSuffix } from "../../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { parseRequest } from "../../../src/responses/parser";
+import { createOpenAIChatAdapter, stripBracketedModelSuffix } from "../../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { parseRequest } from "../../../backend/src/responses/parser";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { routeModel } from "../../../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { routeModel } from "../../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 function parsed(modelId: string): OcxParsedRequest {
   return {

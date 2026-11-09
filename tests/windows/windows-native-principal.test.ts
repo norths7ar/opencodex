@@ -7,17 +7,17 @@ import { tmpdir } from "node:os";
 import {
   createWindowsNativePrincipalLookup, readWindowsNativePrincipal, resolveWindowsNativePrincipal,
   type NativePrincipalTiming, type WindowsNativePrincipalApi,
-} from "../../src/lib/windows-native-principal";
+} from "../../backend/src/lib/windows-native-principal";
 import {
   cachedCurrentWindowsIdentity, resetWindowsPrincipalForTests, resolveCurrentWindowsPrincipal,
   resolveCurrentWindowsPrincipalAsync, setNativeWindowsPrincipalLookupsForTests,
   setWindowsPrincipalRunnerForTests, setAsyncWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
-import { resolveTrustedWindowsSystemDirectory, resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
+} from "../../backend/src/lib/windows-user-principal";
+import { resolveTrustedWindowsSystemDirectory, resolveTrustedWindowsPowerShellExe } from "../../backend/src/lib/windows-elevation";
 import {
   hardenSecretPathAsync, resetHardenedStateForTests, setAsyncIcaclsRunnerForTests,
   timedOutSecretPathCountForTests, flushWindowsSecretAclReapsBeforeRemoval,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 
 const SID = "S-1-5-21-111-222-333-1001", SID_ADDRESS = 8192, STRING_ADDRESS = 4096, TOKEN = 0x1a4n;
 const IDENTITY = { sid: SID, name: "EXAMPLE\\Owner" };

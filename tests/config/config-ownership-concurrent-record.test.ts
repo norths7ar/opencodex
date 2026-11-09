@@ -11,13 +11,13 @@ import {
   recordOwnedConfigPath,
   removeOwnedConfigState,
   setUninstallStepHookForTests,
-} from "../../src/lib/config-ownership";
+} from "../../backend/src/lib/config-ownership";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // #8093: every manifest read-modify-write runs under one cross-process lock, and uninstall
 // tombstones the manifest under that lock before it snapshots the paths it removes.
-const modulePath = repoPath("src/lib/config-ownership.ts");
+const modulePath = repoPath("backend/src/lib/config-ownership.ts");
 const BARRIER_MS = 20_000;
 // Exit codes: 0 recorded, 2 not recorded, 3 refused by the uninstall tombstone, 1 anything else.
 // With a gate, the child creates its file, announces it, and records only once the gate opens.
@@ -192,7 +192,7 @@ describe("serialized ownership manifest (#8093)", () => {
 describe("callers that create files after registering them (#8093)", () => {
   test("service log rotation goes ahead unrecorded while the ownership lock is busy", withHome(async dir => {
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
-    const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../src/service/logging");
+    const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../backend/src/service/logging");
     const path = join(dir, "service.log");
     writeFileSync(path, "x".repeat(SERVICE_LOG_MAX_BYTES + 1));
     expect(manifest(dir).paths).not.toContain("service.log.1");
@@ -217,7 +217,7 @@ describe("callers that create files after registering them (#8093)", () => {
       // A second link to the lock file is refused on every attempt: a lock fault that persists.
       linkSync(join(dir, CONFIG_OWNERSHIP_LOCK), join(dirname(dir), "lock-link"));
       expect(() => recordOwnedConfigPath(dir, join(dir, "service.log.1"))).toThrow(ConfigOwnershipLockError);
-      const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../src/service/logging");
+      const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../backend/src/service/logging");
       const path = join(dir, "service.log");
       writeFileSync(path, "x".repeat(SERVICE_LOG_MAX_BYTES + 1));
       const stop = startServiceLogging(path, { OCX_SERVICE: "1" }, 10);
@@ -233,7 +233,7 @@ describe("callers that create files after registering them (#8093)", () => {
 
   test("service log rotation stops creating generations once uninstall has started", withHome(async dir => {
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
-    const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../src/service/logging");
+    const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../backend/src/service/logging");
     const path = join(dir, "service.log");
     const grow = () => writeFileSync(path, "x".repeat(SERVICE_LOG_MAX_BYTES + 1));
     grow();
@@ -270,7 +270,7 @@ describe("manifest limits and uninstall leftovers (#8093)", () => {
   }));
 
   test("a rerun resuming from the tombstoned manifest keeps an unlisted file and reports it", withHome(async dir => {
-    const { setUninstallStepHookForTests } = await import("../../src/lib/config-ownership");
+    const { setUninstallStepHookForTests } = await import("../../backend/src/lib/config-ownership");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     writeFileSync(join(dir, "seed"), "x");
     setUninstallStepHookForTests(step => { if (step === "owner-deleted") throw new Error("stopped"); });
@@ -377,9 +377,9 @@ describe("interrupted metadata writes (#8093)", () => {
 
 describe("rerunning ocx uninstall through its cleanup flow (#8093)", () => {
   test("the uninstaller's own cleanup steps can register state, and the rerun finishes", withHome(async dir => {
-    const { removeOwnedConfigAfterDesktopCleanup } = await import("../../src/cli/uninstall-client-state");
-    const { withClientLifecycle } = await import("../../src/client/lifecycle-lock");
-    const { withConfigMutationLockSync } = await import("../../src/config/mutation-lock");
+    const { removeOwnedConfigAfterDesktopCleanup } = await import("../../backend/src/cli/uninstall-client-state");
+    const { withClientLifecycle } = await import("../../backend/src/client/lifecycle-lock");
+    const { withConfigMutationLockSync } = await import("../../backend/src/config/mutation-lock");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     writeFileSync(join(dir, "config.json"), "{}");
     // An earlier uninstall stopped after its tombstone.
@@ -409,7 +409,7 @@ describe("rerunning ocx uninstall through its cleanup flow (#8093)", () => {
 
 describe("teardown scope ends cleanly (#8093)", () => {
   test("after a failed teardown, a path registered inside the scope is refused again", withHome(async dir => {
-    const { beginConfigOwnershipTeardown } = await import("../../src/lib/config-ownership");
+    const { beginConfigOwnershipTeardown } = await import("../../backend/src/lib/config-ownership");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     writeFileSync(join(dir, CONFIG_UNINSTALL_MANIFEST), JSON.stringify({ ...manifest(dir), uninstallStartedAt: Date.now() }, null, 2) + "\n");
     const end = beginConfigOwnershipTeardown();
@@ -453,10 +453,10 @@ describe("concurrent first registrations on an absent home (#8093)", () => {
 
 describe("rerun after the owner marker was already deleted (#8093)", () => {
   test("the rerun's own cleanup can recreate an initially owned file, and the rerun still finishes", withHome(async dir => {
-    const { removeOwnedConfigAfterDesktopCleanup } = await import("../../src/cli/uninstall-client-state");
-    const { withClientLifecycle } = await import("../../src/client/lifecycle-lock");
-    const { withConfigMutationLockSync } = await import("../../src/config/mutation-lock");
-    const { setUninstallStepHookForTests } = await import("../../src/lib/config-ownership");
+    const { removeOwnedConfigAfterDesktopCleanup } = await import("../../backend/src/cli/uninstall-client-state");
+    const { withClientLifecycle } = await import("../../backend/src/client/lifecycle-lock");
+    const { withConfigMutationLockSync } = await import("../../backend/src/config/mutation-lock");
+    const { setUninstallStepHookForTests } = await import("../../backend/src/lib/config-ownership");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     // An earlier uninstall stopped after deleting the owner marker: only its tombstoned manifest
     // (and the lock) remain, and other processes keep refusing to register.
@@ -502,7 +502,7 @@ describe("rerun after the owner marker was already deleted (#8093)", () => {
 
 describe("paths recorded after the uninstall snapshot (#8093)", () => {
   test("while uninstall holds the lock, a second uninstall and any registration are refused", withHome(async dir => {
-    const { setUninstallStepHookForTests } = await import("../../src/lib/config-ownership");
+    const { setUninstallStepHookForTests } = await import("../../backend/src/lib/config-ownership");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     writeFileSync(join(dir, "seed"), "x");
     const uninstallScript = "import { removeOwnedConfigState } from " + JSON.stringify(modulePath) + ";\n"
@@ -529,7 +529,7 @@ describe("paths recorded after the uninstall snapshot (#8093)", () => {
 
   test.skipIf(process.platform === "win32")("a finishing uninstall leaves a lock file another installation created in place",
     withHome(async dir => {
-      const { setUninstallStepHookForTests } = await import("../../src/lib/config-ownership");
+      const { setUninstallStepHookForTests } = await import("../../backend/src/lib/config-ownership");
       expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
       const lock = join(dir, CONFIG_OWNERSHIP_LOCK);
       setUninstallStepHookForTests(step => {
@@ -572,7 +572,7 @@ describe("paths recorded after the uninstall snapshot (#8093)", () => {
       }
       // Fill the remaining bytes with names shorter than "service.log.1", so it cannot fit either.
       for (let i = 0; i < 400; i += 1) if (!recordOwnedConfigPath(dir, join(dir, "z" + i))) break;
-      const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../src/service/logging");
+      const { startServiceLogging, SERVICE_LOG_MAX_BYTES } = await import("../../backend/src/service/logging");
       const path = join(dir, "service.log");
       writeFileSync(path, "x".repeat(SERVICE_LOG_MAX_BYTES + 1));
       startServiceLogging(path, { OCX_SERVICE: "1" }, 60_000)();
@@ -599,7 +599,7 @@ describe("a missing manifest without uninstall evidence (#8093)", () => {
   }));
 
   test("an uninstall stopped after deleting the owner marker resumes from its exact snapshot", withHome(async dir => {
-    const { setUninstallStepHookForTests } = await import("../../src/lib/config-ownership");
+    const { setUninstallStepHookForTests } = await import("../../backend/src/lib/config-ownership");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     // A manifest from an older version may omit an initially owned name; that file is not ours.
     writeFileSync(join(dir, CONFIG_UNINSTALL_MANIFEST), JSON.stringify({ ...manifest(dir), paths: manifest(dir).paths.filter(path => path !== "config.json") }, null, 2) + "\n");
@@ -637,7 +637,7 @@ describe("a busy ownership lock (#8093)", () => {
     try {
       expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
       expect(Bun.spawnSync([process.execPath, "-e", childScript(dir, "other")]).exitCode).toBe(0);
-      const { appendUsageEntry } = await import("../../src/usage/log");
+      const { appendUsageEntry } = await import("../../backend/src/usage/log");
       const release = holdLock(dir);
       try {
         appendUsageEntry({ requestId: "busy-lock-row", timestamp: 1_700_000_000_000, provider: "a", model: "m1", status: 200, durationMs: 1, usageStatus: "reported" } as never);
@@ -669,8 +669,8 @@ describe("an uninstall stopped after deleting the owner marker (#8093)", () => {
   }));
 
   test("the rerun's cleanup records a file the snapshot lacks, and never adopts an existing one", withHome(async dir => {
-    const { beginConfigOwnershipTeardown } = await import("../../src/lib/config-ownership");
-    const { withConfigMutationLockSync } = await import("../../src/config/mutation-lock");
+    const { beginConfigOwnershipTeardown } = await import("../../backend/src/lib/config-ownership");
+    const { withConfigMutationLockSync } = await import("../../backend/src/config/mutation-lock");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     // An older snapshot without the config mutation database.
     writeFileSync(join(dir, CONFIG_UNINSTALL_MANIFEST), JSON.stringify({
@@ -742,8 +742,8 @@ describe("ownership edge cases from review (#8093)", () => {
 
   test.each(["snapshot-removed", "owner-deleted"] as const)("a rerun stopped at %s records the database its cleanup creates in a full older manifest",
     step => withHome(async dir => {
-      const { beginConfigOwnershipTeardown } = await import("../../src/lib/config-ownership");
-      const { withConfigMutationLockSync } = await import("../../src/config/mutation-lock");
+      const { beginConfigOwnershipTeardown } = await import("../../backend/src/lib/config-ownership");
+      const { withConfigMutationLockSync } = await import("../../backend/src/config/mutation-lock");
       expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
       olderManifest(dir, true);
       expect(manifest(dir).paths).toHaveLength(1024);
@@ -763,8 +763,8 @@ describe("ownership edge cases from review (#8093)", () => {
     })());
 
   test("a rerun stopped with the owner marker kept never adopts an existing unlisted database", withHome(async dir => {
-    const { beginConfigOwnershipTeardown } = await import("../../src/lib/config-ownership");
-    const { withConfigMutationLockSync } = await import("../../src/config/mutation-lock");
+    const { beginConfigOwnershipTeardown } = await import("../../backend/src/lib/config-ownership");
+    const { withConfigMutationLockSync } = await import("../../backend/src/config/mutation-lock");
     expect(recordOwnedConfigPath(dir, join(dir, "seed"))).toBe(true);
     olderManifest(dir, false);
     // A database an older version created without listing it.

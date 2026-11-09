@@ -3,12 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { create, fromBinary } from "@bufbuild/protobuf";
 import { afterEach, describe, expect, test } from "bun:test";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
 import {
   backgroundShellAdmissionMetrics,
   resetBackgroundShellStateForTests,
   setBackgroundShellRuntimeForTests,
-} from "../../../src/adapters/cursor/native-exec-shell";
+} from "../../../backend/src/adapters/cursor/native-exec-shell";
 import {
   AgentClientMessageSchema,
   BackgroundShellSpawnArgsSchema,
@@ -33,7 +33,7 @@ import {
   ShellArgsSchema,
   WriteShellStdinArgsSchema,
   WriteArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 
 function execMessage(message: Parameters<typeof create<typeof ExecServerMessageSchema>>[1]["message"]) {
   return create(ExecServerMessageSchema, {

@@ -5,27 +5,27 @@ import { connect } from "node:net";
 import { connect as tlsConnect, type TLSSocket } from "node:tls";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { flushConfigDirHardeningAndReaps, hardenConfigDir } from "../../src/config/paths";
-import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setPlatformForTests } from "../../src/lib/windows-secret-acl";
+import { saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { flushConfigDirHardeningAndReaps, hardenConfigDir } from "../../backend/src/config/paths";
+import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { supportsDesktopPicker } from "../../src/claude/desktop-picker-platform";
-import { inspectDesktopPickerProfile } from "../../src/claude/desktop-picker-profile";
-import { createPickerRuntime, pickerDesired } from "../../src/claude/intercept/picker-runtime";
-import { startPickerListener } from "../../src/claude/intercept/picker-listener";
-import { claudeInterceptCaCertPath, createLocalInterceptCa, issueLocalInterceptLeaf } from "../../src/claude/intercept/local-ca";
-import { startConnectProxy } from "../../src/claude/intercept/connect-proxy";
-import { isBrowserConnect } from "../../src/claude/intercept/connect-proxy";
-import { pickerCaCertPath, pickerCaFingerprints } from "../../src/claude/intercept/picker-ca";
+import { supportsDesktopPicker } from "../../backend/src/claude/desktop-picker-platform";
+import { inspectDesktopPickerProfile } from "../../backend/src/claude/desktop-picker-profile";
+import { createPickerRuntime, pickerDesired } from "../../backend/src/claude/intercept/picker-runtime";
+import { startPickerListener } from "../../backend/src/claude/intercept/picker-listener";
+import { claudeInterceptCaCertPath, createLocalInterceptCa, issueLocalInterceptLeaf } from "../../backend/src/claude/intercept/local-ca";
+import { startConnectProxy } from "../../backend/src/claude/intercept/connect-proxy";
+import { isBrowserConnect } from "../../backend/src/claude/intercept/connect-proxy";
+import { pickerCaCertPath, pickerCaFingerprints } from "../../backend/src/claude/intercept/picker-ca";
 import {
   getClaudePickerController,
   getClaudePickerRuntime,
   startClaudeIntercept,
-} from "../../src/claude/intercept/runtime";
-import type { SecurityResult, SecurityRunner } from "../../src/claude/intercept/picker-trust";
+} from "../../backend/src/claude/intercept/runtime";
+import type { SecurityResult, SecurityRunner } from "../../backend/src/claude/intercept/picker-trust";
 import { filePickerCaStore, memoryPickerCaStore } from "../helpers/picker-ca-store";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { isolateClientLifecycleLock } from "../helpers/client-lifecycle-lock";
 
 const roots: string[] = [];

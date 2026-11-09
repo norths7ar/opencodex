@@ -2,12 +2,12 @@ import { expect, test, spyOn } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleAccessCommand } from "../../src/cli/access";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import { saveConfig } from "../../src/config";
+import { handleAccessCommand } from "../../backend/src/cli/access";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import { saveConfig } from "../../backend/src/config";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
-import type { OcxConfig } from "../../src/types";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
+import type { OcxConfig } from "../../backend/src/types";
 const row = { id: "stable-id", name: "old", createdAt: "2026-01-01T00:00:00.000Z", allowedProviders: ["fixture"], allowedModels: ["fixture/model"] };
 async function run(args: string[], deps: RuntimeApiDeps) {
   const logs: string[] = [], errors: string[] = [];

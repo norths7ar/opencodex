@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxProviderConfig } from "../../src/types";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * Data-driven reasoning ladders (models.dev snapshot + learned refusals).
@@ -48,8 +48,8 @@ function sandbox(files: Record<string, string> = {}): string {
 
 async function load(files: Record<string, string> = {}) {
   sandbox(files);
-  const metadata = await import("../../src/providers/reasoning-metadata");
-  const effort = await import("../../src/reasoning-effort");
+  const metadata = await import("../../backend/src/providers/reasoning-metadata");
+  const effort = await import("../../backend/src/reasoning-effort");
   metadata.resetReasoningMetadataCachesForTests();
   return { metadata, effort };
 }
@@ -281,7 +281,7 @@ describe("learned rung refusals", () => {
     const { effort, metadata } = await load(metadataFile({
       "opencode-go": { [DEEPSEEK_FLASH]: { reasoning: true, options: [{ type: "effort", values: ["low", "high", "max"] }] } },
     }));
-    const keyStore = await import("../../src/providers/api-key-resolve");
+    const keyStore = await import("../../backend/src/providers/api-key-resolve");
     const store = new Map<string, string>();
     store.set("opencodex.provider-api-key.v1 zen-go", "resolved-keychain-secret");
     keyStore.setProviderKeychainEntryFactoryForTests((service, account) => ({
@@ -431,8 +431,8 @@ describe("config-root ACL admission (#7815)", () => {
   test("a refresh publishes its snapshot only after an in-flight config-root ACL flight settles", async () => {
     const { metadata } = await load();
     const home = process.env["OPENCODEX_HOME"]!;
-    const acl = await import("../../src/lib/windows-secret-acl");
-    const { setSyntheticWindowsPrincipalForTests } = await import("../../src/lib/windows-user-principal");
+    const acl = await import("../../backend/src/lib/windows-secret-acl");
+    const { setSyntheticWindowsPrincipalForTests } = await import("../../backend/src/lib/windows-user-principal");
     const { existsSync } = await import("node:fs");
     const success = { success: true, exitCode: 0, timedOut: false, stdout: "" };
     let entered!: () => void, release!: () => void, fetched!: () => void;

@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
-import { getDefaultConfig, loadConfig, readConfigDiagnostics, validateConfigCandidate } from "../../src/config";
+import { getDefaultConfig, loadConfig, readConfigDiagnostics, validateConfigCandidate } from "../../backend/src/config";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleConfigRoutes } from "../../src/server/management/config-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
-import { warnDegradedTopLevelOptIns } from "../../src/config/load-degrade";
-import { codexWsReuseAcrossTurnsEnabled, setCodexWsReuseAcrossTurns } from "../../src/config/codex-ws-reuse-setting";
+import { handleConfigRoutes } from "../../backend/src/server/management/config-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
+import { warnDegradedTopLevelOptIns } from "../../backend/src/config/load-degrade";
+import { codexWsReuseAcrossTurnsEnabled, setCodexWsReuseAcrossTurns } from "../../backend/src/config/codex-ws-reuse-setting";
 function harness(failSave = false) {
   const config = getDefaultConfig();
   let saves = 0;

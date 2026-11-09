@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import { vertexReplayModelKey } from "../../../src/adapters/google-vertex-endpoint";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import { vertexReplayModelKey } from "../../../backend/src/adapters/google-vertex-endpoint";
 import {
   __resetVertexApiKeyProjectCache,
   parseVertexProbeProjectNumber,
   resolveVertexApiKeyProject,
   VERTEX_PROBE_MAX_BYTES,
-} from "../../../src/adapters/google-vertex-key-project";
-import { markEgressTransparentExecutor } from "../../../src/lib/provider-egress";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { IncomingMeta } from "../../../src/adapters/base";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/google-vertex-key-project";
+import { markEgressTransparentExecutor } from "../../../backend/src/lib/provider-egress";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { IncomingMeta } from "../../../backend/src/adapters/base";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const PROBE = "https://aiplatform.googleapis.com/v1/publishers/google/models/ocx-project-probe:countTokens";
 const notFound = (project: string) => JSON.stringify({

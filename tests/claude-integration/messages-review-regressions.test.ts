@@ -3,14 +3,14 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "nod
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { helperPath, repoPath, repoRoot } from "../helpers/repo-root";
-import { encodeAdapterEventStream, isEncoderTransportFailure } from "../../src/protocols/encoders/adapter-events";
+import { encodeAdapterEventStream, isEncoderTransportFailure } from "../../backend/src/protocols/encoders/adapter-events";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 for (const kind of ["sink", "sink-direct", "deep", "usage"]) test(`Messages delivery ${kind}`, async () => {
   const d = mkdtempSync(join(tmpdir(), "ocx-message-review-")); mkdirSync(join(d, "ocx")); mkdirSync(join(d, "codex"));
   try {
     const red = kind === "sink-direct" ? join(d, "red") : undefined;
     if (red) {
-      const source = "src/claude/failure-verdict.ts";
+      const source = "backend/src/claude/failure-verdict.ts";
       const target = join(red, source);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, "// L7_RED_SOURCE_MARKER\n" + readFileSync(repoPath(source), "utf8"));
@@ -41,7 +41,7 @@ for (const kind of ["sink", "sink-direct", "deep", "usage"]) test(`Messages deli
         expect(result.hooks.admittedRecords).toBeGreaterThan(0);
         expect(result.hooks.collectedMatches).toBeGreaterThan(0);
       }
-      if (kind === "sink-direct") expect(result.hooks.redInputs).toContainEqual({ path: "src/claude/failure-verdict.ts", marker: true });
+      if (kind === "sink-direct") expect(result.hooks.redInputs).toContainEqual({ path: "backend/src/claude/failure-verdict.ts", marker: true });
     }
     else expect(result.text).toBe(result.expectedBody);
     if (kind === "usage") { expect(result.usage.inputTokens).toBe(42); expect(result.usage.outputTokens).toBe(7); }
@@ -59,8 +59,8 @@ for (const source of ["writer", "reader", "hook"] as const) test(`adapter ${sour
 });
 
 for (const source of ["reader", "processor"] as const) for (const overflow of [false, true]) test(`converter ${source} fault overflow=${overflow}`, async () => {
-  const { responsesSseToAnthropicSse } = await import("../../src/claude/outbound");
-  const { CLIENT_ERROR_CONTRACTS, CLAUDE_CONTEXT_OVERFLOW_MESSAGE } = await import("../../src/lib/client-error-body");
+  const { responsesSseToAnthropicSse } = await import("../../backend/src/claude/outbound");
+  const { CLIENT_ERROR_CONTRACTS, CLAUDE_CONTEXT_OVERFLOW_MESSAGE } = await import("../../backend/src/lib/client-error-body");
   const diagnostic = `${overflow ? "prompt is too long" : "fixture fault"} zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e`;
   let processed = 0;
   const upstream = source === "reader" ? new ReadableStream<Uint8Array>({ pull() { throw new Error(diagnostic); } })

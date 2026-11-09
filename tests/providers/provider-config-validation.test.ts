@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { providerManagementConfigError } from "../../src/server/auth-cors";
-import { providerConfigSchema } from "../../src/config/schema/leaf-validators";
+import { providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { providerConfigSchema } from "../../backend/src/config/schema/leaf-validators";
 import {
   apiKeyTransportConfigError,
   booleanRecordConfigError,
@@ -18,7 +18,7 @@ import {
   reasoningSummaryDeliveryRecordConfigError,
   sanitizeModelCapabilitiesForLoad,
   upstreamHttpVersionConfigError,
-} from "../../src/config/provider-validation";
+} from "../../backend/src/config/provider-validation";
 
 describe("provider config validation leaf", () => {
   test("DeepSeek upload consent is a bounded exact-model allowlist at load and write boundaries", () => {

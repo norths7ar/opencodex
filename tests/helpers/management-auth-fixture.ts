@@ -1,6 +1,6 @@
 import { expect, spyOn } from "bun:test";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
 
 export function remoteConfig(): OcxConfig {
   return {

@@ -14,8 +14,8 @@
  * The flag constrains the model's OUTPUT, not execution order.
  */
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import type { OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../src/types";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import type { OcxParsedRequest, OcxProviderConfig, OcxTool } from "../../../backend/src/types";
 
 const provider = { adapter: "anthropic", baseUrl: "https://api.anthropic.com", apiKey: "sk-x", authMode: "apiKey" } as unknown as OcxProviderConfig;
 

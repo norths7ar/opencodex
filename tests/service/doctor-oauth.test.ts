@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync, readdirSync, writeFileSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { collectOAuthDoctorChecks } from "../../src/cli/doctor";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { CODEX_REAUTH_ACTION } from "../../src/oauth/health";
-import { getAccountSet, getAuthStorePath, markAccountNeedsReauth, saveCredential } from "../../src/oauth/store";
+import { collectOAuthDoctorChecks } from "../../backend/src/cli/doctor";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { CODEX_REAUTH_ACTION } from "../../backend/src/oauth/health";
+import { getAccountSet, getAuthStorePath, markAccountNeedsReauth, saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const origHome = process.env.HOME;

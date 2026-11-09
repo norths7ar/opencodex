@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { compactionRequest, completedPayload, drainCompactionResponseState,

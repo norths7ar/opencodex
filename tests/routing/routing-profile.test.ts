@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { validateConfigCandidate } from "../../src/config";
-import { updateAccountQuota } from "../../src/codex/quota";
-import { clearAccountQuotaCache } from "../../src/providers/quota";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { validateConfigCandidate } from "../../backend/src/config";
+import { updateAccountQuota } from "../../backend/src/codex/quota";
+import { clearAccountQuotaCache } from "../../backend/src/providers/quota";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest } from "../helpers/management-auth";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 import {
   getRoutingProfile,
   listRoutingProfileIds,
@@ -16,9 +16,9 @@ import {
   policyPublicModelId,
   resolvePolicyProfileId,
   routingProfileIssues,
-} from "../../src/routing/profile";
-import { evaluatePolicyProfile } from "../../src/routing/evaluator";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/routing/profile";
+import { evaluatePolicyProfile } from "../../backend/src/routing/evaluator";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";
@@ -482,7 +482,7 @@ describe("routing profiles (RI-04)", () => {
   }
 
   test("API dry-run mirrors live codex cooldown for openai candidates", async () => {
-    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../src/codex/routing");
+    const { clearCodexUpstreamHealth, recordCodexUpstreamOutcome } = await import("../../backend/src/codex/routing");
     clearCodexUpstreamHealth();
     const now = Date.now();
     const config = baseConfig({
@@ -572,8 +572,8 @@ describe("routing profiles (RI-04)", () => {
   });
 
   test("API dry-run leaves an unbound Anthropic candidate quota unknown despite an active account", async () => {
-    const { saveCredential, getAccountSet } = await import("../../src/oauth/store");
-    const { setCachedProviderAccountQuotaForTests } = await import("../../src/providers/quota");
+    const { saveCredential, getAccountSet } = await import("../../backend/src/oauth/store");
+    const { setCachedProviderAccountQuotaForTests } = await import("../../backend/src/providers/quota");
     await saveCredential("anthropic", {
       access: "access-a",
       refresh: "refresh-a",

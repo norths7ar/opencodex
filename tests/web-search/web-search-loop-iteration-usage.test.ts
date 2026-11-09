@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest, OcxUsage } from "../../src/types";
-import { runWithWebSearch } from "../../src/web-search/loop";
-import { buildWebSearchTool } from "../../src/web-search/synthetic-tool";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest, OcxUsage } from "../../backend/src/types";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
+import { buildWebSearchTool } from "../../backend/src/web-search/synthetic-tool";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // Every routed-model iteration re-sends the full context, so the usage ledger (onUsage) must get the

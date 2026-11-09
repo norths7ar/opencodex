@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../src/adapters/google";
-import { adapterFailureFromMessage, bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { adapterFailureFromEvent } from "../../src/bridge/internal";
-import { preflightResponsesStream } from "../../src/server/responses/stream-preflight";
-import type { AdapterEvent } from "../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../backend/src/adapters/google";
+import { adapterFailureFromMessage, bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { adapterFailureFromEvent } from "../../backend/src/bridge/internal";
+import { preflightResponsesStream } from "../../backend/src/server/responses/stream-preflight";
+import type { AdapterEvent } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createOpenAIChatAdapter = (...args: Parameters<typeof createOpenAIChatAdapterProduction>) =>

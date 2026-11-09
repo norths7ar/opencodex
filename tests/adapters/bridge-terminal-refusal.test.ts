@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE } from "../../src/bridge";
-import { isTerminalRefusalCode } from "../../src/lib/errors";
-import type { AdapterEvent, OcxUsage } from "../../src/types";
+import { bridgeToResponsesSSE } from "../../backend/src/bridge";
+import { isTerminalRefusalCode } from "../../backend/src/lib/errors";
+import type { AdapterEvent, OcxUsage } from "../../backend/src/types";
 
 /**
  * #4312: codex-rs maps every `response.incomplete` to a retryable stream error and never reads

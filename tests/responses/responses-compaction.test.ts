@@ -1,9 +1,9 @@
 import { describe, expect, jest, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import { parseRequest } from "../../src/responses/parser";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import { parseRequest } from "../../backend/src/responses/parser";
 import {
   COMPACT_PROMPT,
   OPAQUE_COMPACTION_NOTE,
@@ -12,11 +12,11 @@ import {
   decodeCompactionSummary,
   encodeCompactionSummary,
   extractCompactUserMessages,
-} from "../../src/responses/compaction";
-import type { AdapterEvent, OcxMessage } from "../../src/types";
-import { COMPACTION_IMAGE_NOTE, omitEarlierCompactionImages } from "../../src/responses/compaction-images";
+} from "../../backend/src/responses/compaction";
+import type { AdapterEvent, OcxMessage } from "../../backend/src/types";
+import { COMPACTION_IMAGE_NOTE, omitEarlierCompactionImages } from "../../backend/src/responses/compaction-images";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
-import { bufferCompactResponse, COMPACT_RESPONSE_MAX_BYTES } from "../../src/server/responses/compact";
+import { bufferCompactResponse, COMPACT_RESPONSE_MAX_BYTES } from "../../backend/src/server/responses/compact";
 
 const createResponsesPassthroughAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>
   withTestTranslatorBudget(createResponsesPassthroughAdapterProduction(...args));

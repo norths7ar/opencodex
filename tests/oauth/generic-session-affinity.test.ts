@@ -3,16 +3,16 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { admitGenericSessionAccount, bindGenericSessionAccount, clearGenericSessionAffinity,
-  genericSessionAccount, genericSessionAffinityEnabled, preferredGenericSessionAccount } from "../../src/oauth/generic-session-affinity";
-import { clearGenericFailoverHealth, rotateGenericOAuthAccountOn429 } from "../../src/oauth/generic-account-failover";
-import { getValidAccessSnapshotForAccount } from "../../src/oauth";
+  genericSessionAccount, genericSessionAffinityEnabled, preferredGenericSessionAccount } from "../../backend/src/oauth/generic-session-affinity";
+import { clearGenericFailoverHealth, rotateGenericOAuthAccountOn429 } from "../../backend/src/oauth/generic-account-failover";
+import { getValidAccessSnapshotForAccount } from "../../backend/src/oauth";
 import { captureOAuthAccountSelection, getAccountSet, getAuthStorePath, markAccountNeedsReauth,
-  saveAccountCredential, saveCredential, setActiveAccount } from "../../src/oauth/store";
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
-import { acquireAccountLease } from "../../src/oauth/kiro-account-load";
-import { awaitKiroModelRefreshForTests, clearKiroAccountModels, refreshKiroAccountModelsDetached } from "../../src/providers/kiro-model-catalog";
-import { oauthSessionKeyFromParts } from "../../src/oauth/session-affinity-key";
-import type { OcxConfig } from "../../src/types";
+  saveAccountCredential, saveCredential, setActiveAccount } from "../../backend/src/oauth/store";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../backend/src/providers/quota";
+import { acquireAccountLease } from "../../backend/src/oauth/kiro-account-load";
+import { awaitKiroModelRefreshForTests, clearKiroAccountModels, refreshKiroAccountModelsDetached } from "../../backend/src/providers/kiro-model-catalog";
+import { oauthSessionKeyFromParts } from "../../backend/src/oauth/session-affinity-key";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

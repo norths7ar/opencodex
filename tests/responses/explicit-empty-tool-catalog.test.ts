@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import * as adapterResolver from "../../src/server/adapter-resolve";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import * as adapterResolver from "../../backend/src/server/adapter-resolve";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { clearResponseStateForTests, flushResponseState } from "../../backend/src/responses/state";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 

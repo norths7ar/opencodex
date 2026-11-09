@@ -1,9 +1,9 @@
 import { afterEach, expect, test } from "bun:test";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
-import type { AdapterRequest, ProviderAdapter } from "../../src/adapters/base";
-import type { AttemptRecoveryKind } from "../../src/usage/log";
-import { parseRequest } from "../../src/responses/parser";
-import { runWithWebSearch } from "../../src/web-search/loop";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
+import type { AdapterRequest, ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AttemptRecoveryKind } from "../../backend/src/usage/log";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // Moved out of web-search.test.ts, which sits at its file-size ratchet cap.

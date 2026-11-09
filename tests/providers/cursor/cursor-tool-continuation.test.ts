@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { create, fromBinary } from "@bufbuild/protobuf";
-import { handleCursorNativeKv } from "../../../src/adapters/cursor/native-exec";
-import { CURSOR_GROK_CODE_MODE_CONTINUATION_GUIDANCE, encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
+import { handleCursorNativeKv } from "../../../backend/src/adapters/cursor/native-exec";
+import { CURSOR_GROK_CODE_MODE_CONTINUATION_GUIDANCE, encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
 import {
   AgentClientMessageSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import type { OcxMessage } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { OcxMessage } from "../../../backend/src/types";
 
 function blobData(blobId: Uint8Array): Uint8Array {
   const reply = fromBinary(AgentClientMessageSchema, handleCursorNativeKv(create(KvServerMessageSchema, {
@@ -155,9 +155,9 @@ describe("363-B: tool result reaches the model via rootPromptMessagesJson", () =
 });
 
 import { create as createPb } from "@bufbuild/protobuf";
-import { ExecServerMessageSchema, McpArgsSchema } from "../../../src/adapters/cursor/gen/agent_pb";
-import { createCursorContextUsageTracker, createCursorProtobufEventState } from "../../../src/adapters/cursor/protobuf-events";
-import { planMcpArgsHandling, finalizeAfterDrain } from "../../../src/adapters/cursor/live-transport";
+import { ExecServerMessageSchema, McpArgsSchema } from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { createCursorContextUsageTracker, createCursorProtobufEventState } from "../../../backend/src/adapters/cursor/protobuf-events";
+import { planMcpArgsHandling, finalizeAfterDrain } from "../../../backend/src/adapters/cursor/live-transport";
 
 function execMcpArgs(opts: { provider?: string; toolName?: string; toolCallId?: string; args?: Record<string, Uint8Array> }) {
   return createPb(ExecServerMessageSchema, {

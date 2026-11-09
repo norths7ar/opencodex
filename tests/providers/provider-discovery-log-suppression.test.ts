@@ -4,7 +4,7 @@ import {
   markProviderDiscoveryFailed,
   markProviderDiscoveryOk,
   shouldLogDiscoveryFailure,
-} from "../../src/codex/model-cache";
+} from "../../backend/src/codex/model-cache";
 
 const P = "azure-foundry-anthropic";
 

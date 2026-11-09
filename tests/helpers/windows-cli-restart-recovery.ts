@@ -2,12 +2,12 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { trustWindowsTempFixtureAncestry } from "./windows-temp-ancestry";
 import { prepareRetentionFixture } from "./windows-cli-apply-retention-fixture";
-import { createCodexCliUpdatePlan } from "../../src/codex/cli-update-plan";
-import { applyCodexCliUpdate } from "../../src/codex/cli-update-apply";
-import { createCodexCliWorkerCommitWindow } from "../../src/codex/cli-update-worker";
+import { createCodexCliUpdatePlan } from "../../backend/src/codex/cli-update-plan";
+import { applyCodexCliUpdate } from "../../backend/src/codex/cli-update-apply";
+import { createCodexCliWorkerCommitWindow } from "../../backend/src/codex/cli-update-worker";
 import { beginCodexCliSelectionParentWrite, codexCliUpdateSelectionGate, createCodexCliUpdateFence,
-  allocateCodexCliUpdateGateOwner } from "../../src/codex/cli-update-selection-gate";
-import { startWindowsCliChild } from "../../src/codex/windows-cli-child";
+  allocateCodexCliUpdateGateOwner } from "../../backend/src/codex/cli-update-selection-gate";
+import { startWindowsCliChild } from "../../backend/src/codex/windows-cli-child";
 import { observeWindowsRecoveryFixture, windowsRecoveryFixtureIdentity } from "./windows-cli-recovery-state";
 
 const [role, root] = process.argv.slice(2) as [string, string];

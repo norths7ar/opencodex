@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import { clearModelCache, getFreshCached, setCached } from "../../src/codex/model-cache";
-import type { CatalogDisposition } from "../../src/codex/convergence-types";
-import { listManagementModelRows, toExportModel } from "../../src/server/management/model-rows";
-import { handleModelRoutes } from "../../src/server/management/model-routes";
-import type { OcxConfig } from "../../src/types";
+import { buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { clearModelCache, getFreshCached, setCached } from "../../backend/src/codex/model-cache";
+import type { CatalogDisposition } from "../../backend/src/codex/convergence-types";
+import { listManagementModelRows, toExportModel } from "../../backend/src/server/management/model-rows";
+import { handleModelRoutes } from "../../backend/src/server/management/model-routes";
+import type { OcxConfig } from "../../backend/src/types";
 
 const DISPLAY_PROVIDER = "display-test";
 

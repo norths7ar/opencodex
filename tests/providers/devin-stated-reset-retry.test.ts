@@ -5,10 +5,10 @@
  * within the replay/wait bounds.
  */
 import { describe, expect, jest, test } from "bun:test";
-import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../src/adapters/devin/cloud-direct";
-import { clearCachedCatalog } from "../../src/adapters/devin/cloud-direct/catalog";
-import { streamChatEventsWithResetRetry } from "../../src/adapters/devin/cloud-direct/stated-reset-retry";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
+import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../backend/src/adapters/devin/cloud-direct";
+import { clearCachedCatalog } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { streamChatEventsWithResetRetry } from "../../backend/src/adapters/devin/cloud-direct/stated-reset-retry";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
 
 const REQ = { apiKey: "k", apiServerUrl: "https://example.invalid", modelUid: "swe-2", messages: [] } as unknown as CloudChatRequest;
 

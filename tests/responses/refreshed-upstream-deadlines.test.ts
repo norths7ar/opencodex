@@ -1,10 +1,10 @@
 import { expect, spyOn, test } from "bun:test";
-import { saveConfig } from "../../src/config";
-import { handleResponses } from "../../src/server/responses";
-import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../src/providers/request-pacing";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { handleResponses } from "../../backend/src/server/responses";
+import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../backend/src/providers/request-pacing";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
 
 for (const trigger of ["queued", "key-rotation"] as const) for (const adapter of ["openai-chat", "openai-responses", "command-code"] as const) test.each([
   { initial: "http://127.0.0.1:8000/v1", final: "https://gateway.example/v1", clocks: 1 },

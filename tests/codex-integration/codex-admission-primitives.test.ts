@@ -19,12 +19,12 @@ import {
   readConfigGenerationInCurrentMutationTransaction,
   saveConfig,
   withConfigMutationLockSync,
-} from "../../src/config";
-import { hashAuthority } from "../../src/codex/admission";
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
-import { JOURNAL_PATH } from "../../src/codex/journal";
-import type { AdmissionSnapshot } from "../../src/codex/convergence-types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import { hashAuthority } from "../../backend/src/codex/admission";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
+import { JOURNAL_PATH } from "../../backend/src/codex/journal";
+import type { AdmissionSnapshot } from "../../backend/src/codex/convergence-types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -327,7 +327,7 @@ describe("the journal has one owner", () => {
    */
   test("admission derives no journal path of its own", async () => {
     const source = await Bun.file(
-      repoPath("src", "codex", "admission.ts"),
+      repoPath("backend/src", "codex", "admission.ts"),
     ).text();
     expect(source).toContain("JOURNAL_PATH");
     expect(source).not.toContain("codex-journal.json");

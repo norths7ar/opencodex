@@ -3,9 +3,9 @@ import {
   EMPTY_COMPLETION_MAX_BUFFERED_BYTES,
   EMPTY_COMPLETION_MAX_BUFFERED_EVENTS,
   guardEmptyCompletionEventStream,
-} from "../../src/server/responses/empty-completion-guard";
-import type { AdapterEvent } from "../../src/types";
-import { guardOpenGatewayCompletion } from "../../src/server/responses/opengateway-completion-guard";
+} from "../../backend/src/server/responses/empty-completion-guard";
+import type { AdapterEvent } from "../../backend/src/types";
+import { guardOpenGatewayCompletion } from "../../backend/src/server/responses/opengateway-completion-guard";
 
 async function collect(source: AsyncIterable<AdapterEvent>): Promise<AdapterEvent[]> {
   const events: AdapterEvent[] = [];

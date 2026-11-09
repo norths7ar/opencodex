@@ -8,14 +8,14 @@ import {
   AUTO_COMPACT_WINDOW_DEFAULT,
   effectiveModelEnv,
   resolveAutoContext,
-} from "../../src/claude/context-windows";
-import { buildPickerModels } from "../../src/claude/intercept/picker-models";
-import { buildAnthropicModelInfos } from "../../src/claude/model-info";
-import { desktop3pModelOptions, generateDesktop3pModels } from "../../src/claude/desktop-3p";
-import { withSubagentContextMarker } from "../../src/claude/subagent-model";
-import { buildClaudeEnv as buildClaudeEnvWithIo } from "../../src/cli/claude";
-import { handleClaudeConfigCommand } from "../../src/cli/integrations";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/claude/context-windows";
+import { buildPickerModels } from "../../backend/src/claude/intercept/picker-models";
+import { buildAnthropicModelInfos } from "../../backend/src/claude/model-info";
+import { desktop3pModelOptions, generateDesktop3pModels } from "../../backend/src/claude/desktop-3p";
+import { withSubagentContextMarker } from "../../backend/src/claude/subagent-model";
+import { buildClaudeEnv as buildClaudeEnvWithIo } from "../../backend/src/cli/claude";
+import { handleClaudeConfigCommand } from "../../backend/src/cli/integrations";
+import type { OcxConfig } from "../../backend/src/types";
 
 const ASTRA = "native/gpt-6-astra";
 const LONG_WINDOWS = { [ASTRA]: 872_000, "mock/huge": 1_000_000 };

@@ -38,7 +38,7 @@ function load(fixtureHome: string | undefined, guard = "1", overrides: NodeJS.Pr
     CLAUDE_CONFIG_DIR: join(realHome, ".claude"),
     OPENCODEX_HOME: fixtureHome,
     ...owner,
-    OCX_FIXTURE_KNOWN_FOLDER: repoPath("src", "codex", "windows-local-appdata.ts"),
+    OCX_FIXTURE_KNOWN_FOLDER: repoPath("backend/src", "codex", "windows-local-appdata.ts"),
     ...overrides,
   };
   return spawnSync(process.execPath, ["--preload", helperPath("fixture-windows-runtime-preload.ts"), "-e",

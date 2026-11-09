@@ -7,13 +7,13 @@ import {
   loadConfig,
   saveConfig,
   setPersistedConfigMutationBeforeCommitForTests,
-} from "../../src/config";
-import { OAUTH_PROVIDERS, reconcileOAuthProviders, upsertOAuthProvider } from "../../src/oauth";
-import { getCredential, saveCredential } from "../../src/oauth/store";
-import { routeModel } from "../../src/router";
-import { CURSOR_NO_VISION_MODELS, CURSOR_STATIC_MODELS, cursorModelIds } from "../../src/adapters/cursor/discovery";
-import { modelInList } from "../../src/types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/config";
+import { OAUTH_PROVIDERS, reconcileOAuthProviders, upsertOAuthProvider } from "../../backend/src/oauth";
+import { getCredential, saveCredential } from "../../backend/src/oauth/store";
+import { routeModel } from "../../backend/src/router";
+import { CURSOR_NO_VISION_MODELS, CURSOR_STATIC_MODELS, cursorModelIds } from "../../backend/src/adapters/cursor/discovery";
+import { modelInList } from "../../backend/src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;

@@ -3,12 +3,12 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../src/config";
-import { parseOrcaAuth, readBoundedLocalFile, assertPlainLocalPath } from "../../src/codex/orca-auth-source";
-import { importOrcaAccounts } from "../../src/codex/orca-import";
-import { capturePoolQuotaWriter, forceRefreshCodexPoolToken, getCodexAccountCredential, getValidCodexToken, isPoolQuotaWriterLive, markCodexAccountValidated, poolQuotaHistoryIdentity, readCodexAccountRecord } from "../../src/codex/account-store";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
+import { loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config";
+import { parseOrcaAuth, readBoundedLocalFile, assertPlainLocalPath } from "../../backend/src/codex/orca-auth-source";
+import { importOrcaAccounts } from "../../backend/src/codex/orca-import";
+import { capturePoolQuotaWriter, forceRefreshCodexPoolToken, getCodexAccountCredential, getValidCodexToken, isPoolQuotaWriterLive, markCodexAccountValidated, poolQuotaHistoryIdentity, readCodexAccountRecord } from "../../backend/src/codex/account-store";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let scratch: string;
@@ -252,7 +252,7 @@ describe("offline Orca import", () => {
     } finally { fetchSpy.mockRestore(); }
   });
   test.each(["removed", "rotated", "unchanged"])("deferred validation rereads a %s source after WHAM", async change => {
-    const { fetchPoolAccountQuota } = await import("../../src/codex/auth-api");
+    const { fetchPoolAccountQuota } = await import("../../backend/src/codex/auth-api");
     const path = addSource(); importOrcaAccounts({ sourceDir: source, registryPath: registry, apply: true });
     const id = importedId();
     let warmups = 0;

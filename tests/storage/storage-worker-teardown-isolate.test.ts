@@ -42,12 +42,12 @@ import {
   resetStorageCleanupPolicyJobForTests,
   resetStorageCleanupPolicyJobForTestsAsync,
   setStorageCleanupPolicyJobTestHooks,
-} from "../../src/storage/policy-job";
+} from "../../backend/src/storage/policy-job";
 import {
   drainStorageWorkers,
   liveStorageWorkerCount,
   terminateStorageWorker,
-} from "../../src/storage/worker-lifecycle";
+} from "../../backend/src/storage/worker-lifecycle";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";

@@ -6,7 +6,7 @@ import {
   registerOptionalShutdownHook,
   runOptionalShutdownHooks,
   resetOptionalShutdownHooksForTests,
-} from "../../src/lib/optional-shutdown-hooks";
+} from "../../backend/src/lib/optional-shutdown-hooks";
 
 describe("optional shutdown hooks", () => {
   beforeEach(() => resetOptionalShutdownHooksForTests());

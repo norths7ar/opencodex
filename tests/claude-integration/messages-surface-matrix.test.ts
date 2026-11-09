@@ -9,12 +9,12 @@
  * one, never the reverse.
  */
 import { describe, expect, test } from "bun:test";
-import { handleClaudeCountTokens, handleClaudeMessages } from "../../src/server/claude-messages";
-import { applyProtocolSettingsPatch } from "../../src/server/management/protocol-settings-patch";
-import { buildApiAccessEndpoints } from "../../src/server/management/api-access";
-import { resolveApiSurfaceSettings } from "../../src/protocols/settings";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeCountTokens, handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { applyProtocolSettingsPatch } from "../../backend/src/server/management/protocol-settings-patch";
+import { buildApiAccessEndpoints } from "../../backend/src/server/management/api-access";
+import { resolveApiSurfaceSettings } from "../../backend/src/protocols/settings";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 
 /** The pre-PF-04 reader, quoted: absent or anything but literal false was open. */
 function oldBinaryOpen(config: OcxConfig): boolean {

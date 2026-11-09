@@ -2,22 +2,22 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath } from "../../src/config";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import * as mutationLock from "../../src/config/mutation-lock";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
+import { getConfigPath } from "../../backend/src/config";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import * as mutationLock from "../../backend/src/config/mutation-lock";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
   getEffectiveActiveCodexAccountId,
-} from "../../src/codex/routing";
-import { bindThreadAffinity, getThreadAffinity } from "../../src/codex/routing/thread-affinity";
-import { clearAllManualPreferences, manualPreferenceBlocks, rememberActiveCodexAccount } from "../../src/codex/routing/active-account";
-import { codexPoolKeyForScope, getAccountHealth, scopedHealthFor, isIndependentCodexQuotaScope, NATIVE_MODEL_QUOTA_SCOPES, setAccountHealth, setScopedHealth } from "../../src/codex/routing/health-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { clearPoolRotationState, peekRoundRobinAccount } from "../../src/codex/pool-rotation";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { bindThreadAffinity, getThreadAffinity } from "../../backend/src/codex/routing/thread-affinity";
+import { clearAllManualPreferences, manualPreferenceBlocks, rememberActiveCodexAccount } from "../../backend/src/codex/routing/active-account";
+import { codexPoolKeyForScope, getAccountHealth, scopedHealthFor, isIndependentCodexQuotaScope, NATIVE_MODEL_QUOTA_SCOPES, setAccountHealth, setScopedHealth } from "../../backend/src/codex/routing/health-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { clearPoolRotationState, peekRoundRobinAccount } from "../../backend/src/codex/pool-rotation";
+import type { OcxConfig } from "../../backend/src/types";
 
 let TEST_DIR = "";
 let TEST_CODEX_HOME = "";

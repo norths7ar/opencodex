@@ -3,16 +3,16 @@ import {
   LOCAL_ATTESTATION_CHALLENGE_HEADER,
   LOCAL_ATTESTATION_PROOF_HEADER,
   createLocalAttestationProof,
-} from "../../src/lib/local-management-attestation";
+} from "../../backend/src/lib/local-management-attestation";
 import {
   LOCAL_PROVIDER_RELOAD_CAPABILITY_HEADER,
   LOCAL_PROVIDER_RELOAD_CAPABILITY_VERSION,
   LOCAL_PROVIDER_RELOAD_NAME_HEADER,
   LOCAL_PROVIDER_RELOAD_PATH,
   verifyLocalProviderReloadCapability,
-} from "../../src/lib/local-provider-reload-contract";
-import { requestBoundLocalProviderReload } from "../../src/server/local-provider-reload-client";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
+} from "../../backend/src/lib/local-provider-reload-contract";
+import { requestBoundLocalProviderReload } from "../../backend/src/server/local-provider-reload-client";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
 
 const secret = "A".repeat(43);
 const nonce = "B".repeat(43);

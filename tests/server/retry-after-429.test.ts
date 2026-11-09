@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { formatErrorResponse } from "../../src/bridge";
+import { formatErrorResponse } from "../../backend/src/bridge";
 import {
   DEFAULT_RETRYABLE_429_RETRY_AFTER_SEC,
   resolveClientRetryAfter,
-} from "../../src/lib/retry-after";
-import { formatPassthroughUpstreamError } from "../../src/server/responses/passthrough-error";
-import { fetchWithResetRetry } from "../../src/lib/upstream-retry";
+} from "../../backend/src/lib/retry-after";
+import { formatPassthroughUpstreamError } from "../../backend/src/server/responses/passthrough-error";
+import { fetchWithResetRetry } from "../../backend/src/lib/upstream-retry";
 
 describe("resolveClientRetryAfter (#507)", () => {
   test("prefers a validated upstream Retry-After header", () => {

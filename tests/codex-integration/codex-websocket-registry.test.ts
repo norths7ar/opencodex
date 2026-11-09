@@ -7,9 +7,9 @@ import {
   registerCodexWebSocket,
   unregisterCodexWebSocket,
   updateCodexWebSocketAuthContext,
-} from "../../src/codex/websocket-registry";
-import { applyConfirmedMainCodexAccountTransition } from "../../src/codex/account-lifecycle";
-import type { WsData } from "../../src/server/ws-bridge";
+} from "../../backend/src/codex/websocket-registry";
+import { applyConfirmedMainCodexAccountTransition } from "../../backend/src/codex/account-lifecycle";
+import type { WsData } from "../../backend/src/server/ws-bridge";
 
 function mockWs(data: WsData): {
   ws: ServerWebSocket<WsData>;

@@ -2,19 +2,19 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getDefaultConfig, loadConfig, saveConfig } from "../../src/config";
-import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../src/oauth/account-auto-pause";
-import { AccountRefusalStreaks, autoPauseThreshold, classifyPermanentAccountRefusal, permanentAccountRefusal } from "../../src/oauth/account-auto-pause-policy";
-import { getValidAccessSnapshotForAccount, OAuthAccountPausedError } from "../../src/oauth";
-import { getAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../src/oauth/store";
-import { routedProviderConfig } from "../../src/router";
-import { listProviderApiKeys } from "../../src/providers/api-keys";
-import { setProviderApiKeyPaused } from "../../src/providers/api-key-pause";
-import { rotateKeyOn401 } from "../../src/providers/key-failover";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { setCodexAccountPaused } from "../../src/codex/account-pause";
-import { configSchema } from "../../src/config/schema/config-schema";
-import type { OcxConfig } from "../../src/types";
+import { getDefaultConfig, loadConfig, saveConfig } from "../../backend/src/config";
+import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../../backend/src/oauth/account-auto-pause";
+import { AccountRefusalStreaks, autoPauseThreshold, classifyPermanentAccountRefusal, permanentAccountRefusal } from "../../backend/src/oauth/account-auto-pause-policy";
+import { getValidAccessSnapshotForAccount, OAuthAccountPausedError } from "../../backend/src/oauth";
+import { getAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../backend/src/oauth/store";
+import { routedProviderConfig } from "../../backend/src/router";
+import { listProviderApiKeys } from "../../backend/src/providers/api-keys";
+import { setProviderApiKeyPaused } from "../../backend/src/providers/api-key-pause";
+import { rotateKeyOn401 } from "../../backend/src/providers/key-failover";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { setCodexAccountPaused } from "../../backend/src/codex/account-pause";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const orgMessage = "OAuth authentication is currently not allowed for this organization";
@@ -206,8 +206,8 @@ test("replacing an environment-backed secret fences the old response", async () 
 });
 
 test("same-identity main credential replacement fences a delayed refusal", async () => {
-  const { observeMainQuotaCredential, observeMainQuotaIdentity } = await import("../../src/codex/main-account-cache");
-  const { captureConfigGeneration } = await import("../../src/lib/state-store-sweeper");
+  const { observeMainQuotaCredential, observeMainQuotaIdentity } = await import("../../backend/src/codex/main-account-cache");
+  const { captureConfigGeneration } = await import("../../backend/src/lib/state-store-sweeper");
   const config = configFor("openai", "forward");
   config.providers.openai!.accountAutoPause!.consecutiveFailures = 1;
   observeMainQuotaIdentity("synthetic-main");
@@ -233,7 +233,7 @@ test("an async OAuth pause cannot commit after policy opt-out", async () => {
 });
 
 test("removing an active key skips paused survivors, which remain deletable", async () => {
-  const { removeProviderApiKey } = await import("../../src/providers/api-keys");
+  const { removeProviderApiKey } = await import("../../backend/src/providers/api-keys");
   const config = configFor("fixture", "key");
   config.providers.fixture!.apiKey = "synthetic-B";
   config.providers.fixture!.apiKeyPool = [{ id: "A", key: "synthetic-A", disabled: true }, { id: "B", key: "synthetic-B" }, { id: "C", key: "synthetic-C" }];
@@ -286,8 +286,8 @@ test("project, model and partial Google refusals never classify as an account ba
 });
 
 test("an Antigravity Terms of Service ban pauses the sending account through normalization", async () => {
-  const { fetchGoogleWithRetry } = await import("../../src/adapters/google-http");
-  const { wasPermanentAccountRefusal } = await import("../../src/oauth/account-auto-pause");
+  const { fetchGoogleWithRetry } = await import("../../backend/src/adapters/google-http");
+  const { wasPermanentAccountRefusal } = await import("../../backend/src/oauth/account-auto-pause");
   const config = configFor("fixture", "key");
   config.providers.fixture!.apiKey = "synthetic-A";
   config.providers.fixture!.accountAutoPause!.consecutiveFailures = 1;
@@ -304,8 +304,8 @@ test("an Antigravity Terms of Service ban pauses the sending account through nor
 });
 
 test("Antigravity normalization retains permanent refusal and auto-pause ownership", async () => {
-  const { fetchGoogleWithRetry } = await import("../../src/adapters/google-http");
-  const { wasPermanentAccountRefusal } = await import("../../src/oauth/account-auto-pause");
+  const { fetchGoogleWithRetry } = await import("../../backend/src/adapters/google-http");
+  const { wasPermanentAccountRefusal } = await import("../../backend/src/oauth/account-auto-pause");
   const config = configFor("fixture", "key");
   config.providers.fixture!.apiKey = "synthetic-A";
   config.providers.fixture!.accountAutoPause!.consecutiveFailures = 1;

@@ -2,12 +2,12 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { AGENT_ROUTING_CAPABILITIES } from "../../src/cli/capabilities-agents-routing";
-import { handleAgentCommand } from "../../src/cli/agent";
-import { handleEffortCommand } from "../../src/cli/effort";
-import { handleRoutePolicyCommand } from "../../src/cli/route-policy";
-import { cmdV2 } from "../../src/cli/v2";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { AGENT_ROUTING_CAPABILITIES } from "../../backend/src/cli/capabilities-agents-routing";
+import { handleAgentCommand } from "../../backend/src/cli/agent";
+import { handleEffortCommand } from "../../backend/src/cli/effort";
+import { handleRoutePolicyCommand } from "../../backend/src/cli/route-policy";
+import { cmdV2 } from "../../backend/src/cli/v2";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

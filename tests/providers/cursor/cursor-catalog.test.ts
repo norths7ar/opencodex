@@ -7,14 +7,14 @@ import {
   recordLiveCursorClaudeModels,
   resetLiveCursorClaudeWireIdentitiesForTests,
   resolveCursorSelection,
-} from "../../../src/adapters/cursor/catalog";
-import { clearModelCache } from "../../../src/codex/model-cache";
+} from "../../../backend/src/adapters/cursor/catalog";
+import { clearModelCache } from "../../../backend/src/codex/model-cache";
 import {
   cursorEffortSuffix,
   cursorModelHasEffortTiers,
   cursorRequestWireModelIdWithEffort,
   CURSOR_THINKING_MODEL_IDS,
-} from "../../../src/adapters/cursor/effort-map";
+} from "../../../backend/src/adapters/cursor/effort-map";
 
 /**
  * The frozen legacy picker ids (discovery.ts static seed minus the 4 router

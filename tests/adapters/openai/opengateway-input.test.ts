@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeOpenGatewayResponsesInput } from "../../../src/adapters/openai-responses/opengateway-input";
+import { normalizeOpenGatewayResponsesInput } from "../../../backend/src/adapters/openai-responses/opengateway-input";
 
 const url = "https://apis.opengateway.ai/v1/responses";
 const image = (id: string, detail = "original") => ({

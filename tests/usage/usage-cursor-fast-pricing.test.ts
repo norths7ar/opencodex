@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import type { AttemptTierOutcome } from "../../src/types";
-import type { PersistedUsageEntry } from "../../src/usage/log";
-import { computeEntryCost } from "../../src/usage/summary";
-import { estimateRequestCost, resolveMatchedPrice } from "../../src/usage/cost";
+import type { AttemptTierOutcome } from "../../backend/src/types";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
+import { computeEntryCost } from "../../backend/src/usage/summary";
+import { estimateRequestCost, resolveMatchedPrice } from "../../backend/src/usage/cost";
 
 const usage = { inputTokens: 100_000, outputTokens: 10_000, cacheReadInputTokens: 20_000, cacheCreationInputTokens: 10_000 };
 const USER_ROWS = [{

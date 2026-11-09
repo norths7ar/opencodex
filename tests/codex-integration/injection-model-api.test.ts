@@ -7,11 +7,11 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, loadConfig } from "../../src/config";
-import { refreshCodexModelCatalog } from "../../src/codex/refresh";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { CODEX_REASONING_LEVELS } from "../../src/reasoning-effort";
-import type { OcxConfig } from "../../src/types";
+import { getConfigPath, loadConfig } from "../../backend/src/config";
+import { refreshCodexModelCatalog } from "../../backend/src/codex/refresh";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { CODEX_REASONING_LEVELS } from "../../backend/src/reasoning-effort";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const savedHome = process.env.OPENCODEX_HOME;

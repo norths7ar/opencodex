@@ -8,7 +8,7 @@ import {
   MAX_PROBE_TIMEOUT_MS,
   parseProbeTimeoutOverrideMs,
   probeCeilingMs,
-} from "../../src/server/proxy-liveness";
+} from "../../backend/src/server/proxy-liveness";
 import { repoPath } from "../helpers/repo-root";
 
 type Ceilings = { defaultMs: number; stopMs: number; stopAttempts: number; startMs: number; startAttempts: number };
@@ -18,7 +18,7 @@ function ceilingsUnder(value: string | undefined): Ceilings {
   if (value === undefined) delete env.OCX_PROBE_TIMEOUT_MS;
   else env.OCX_PROBE_TIMEOUT_MS = value;
   const script = [
-    `const m = await import(${JSON.stringify(repoPath("src", "server", "proxy-liveness.ts"))});`,
+    `const m = await import(${JSON.stringify(repoPath("backend/src", "server", "proxy-liveness.ts"))});`,
     "console.log(JSON.stringify({",
     "  defaultMs: m.DEFAULT_PROBE_TIMEOUT_MS,",
     "  stopMs: m.SERVICE_STOP_LIVENESS.timeoutMs, stopAttempts: m.SERVICE_STOP_LIVENESS.attempts,",

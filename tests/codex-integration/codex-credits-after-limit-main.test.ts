@@ -9,19 +9,19 @@ import {
   cooldownErrorMessage,
   resolveCodexAuthContext,
   shouldMarkAccountNeedsReauthForCodexAuthFailure,
-} from "../../src/codex/auth-context";
-import { setCodexAccountCreditsAfterLimit } from "../../src/codex/account-credit-use";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import * as mainAccount from "../../src/codex/main-account";
-import * as authCollision from "../../src/codex/auth-collision";
-import { captureMainQuotaWriter, observeMainQuotaCredential } from "../../src/codex/main-account-cache";
-import { clearAccountQuota, getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { hasSpendableCodexCredits } from "../../src/codex/quota-types";
-import { clearCodexUpstreamHealth, clearThreadAccountMap, pickLowestUsageCodexAccount } from "../../src/codex/routing";
-import { setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-context";
+import { setCodexAccountCreditsAfterLimit } from "../../backend/src/codex/account-credit-use";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountNeedsReauth, isAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { reconcileMainCodexAccountRuntimeState, resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import * as mainAccount from "../../backend/src/codex/main-account";
+import * as authCollision from "../../backend/src/codex/auth-collision";
+import { captureMainQuotaWriter, observeMainQuotaCredential } from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, getAccountQuota, parseUsageQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { hasSpendableCodexCredits } from "../../backend/src/codex/quota-types";
+import { clearCodexUpstreamHealth, clearThreadAccountMap, pickLowestUsageCodexAccount } from "../../backend/src/codex/routing";
+import { setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const MAIN = mainAccount.MAIN_CODEX_ACCOUNT_ID;

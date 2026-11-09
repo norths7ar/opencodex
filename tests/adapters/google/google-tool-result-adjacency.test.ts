@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { OcxContentPart, OcxMessage, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const provider = { adapter: "google", baseUrl: "https://generativelanguage.googleapis.com", apiKey: "key" };
 

@@ -14,15 +14,15 @@ import {
   submitManualLoginCode,
   supportsCodeLoginMode,
   waitForLoginSettled,
-} from "../../src/oauth";
-import { getAccountSet, removeCredential, resetOAuthReauthReconcileStateForTests } from "../../src/oauth/store";
-import { admitLoginFlow, classifyLoginCodeError, loginFlowKeys, loginState, resetOAuthFlowReconcileStateForTests } from "../../src/oauth/login-flow-state";
-import { ANTHROPIC_CODE_REDIRECT_URI, AnthropicOAuthFlow } from "../../src/oauth/anthropic";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import type { OcxConfig } from "../../src/types";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/oauth";
+import { getAccountSet, removeCredential, resetOAuthReauthReconcileStateForTests } from "../../backend/src/oauth/store";
+import { admitLoginFlow, classifyLoginCodeError, loginFlowKeys, loginState, resetOAuthFlowReconcileStateForTests } from "../../backend/src/oauth/login-flow-state";
+import { ANTHROPIC_CODE_REDIRECT_URI, AnthropicOAuthFlow } from "../../backend/src/oauth/anthropic";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import type { OcxConfig } from "../../backend/src/types";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
 
 // Same scratch-home + icacls stubbing as tests/oauth/oauth-manual-code.test.ts: this file tests
 // the code-display flow, not Windows ACLs, and a real icacls makes the credential persist fail.
@@ -440,8 +440,8 @@ describe("OAuth code-display login", () => {
   });
 
   test("a failed headless CLI login prints only the fixed reason, never the provider body", async () => {
-    const { handleLogin } = await import("../../src/oauth/login-cli");
-    const { AnthropicTokenError } = await import("../../src/oauth/anthropic");
+    const { handleLogin } = await import("../../backend/src/oauth/login-cli");
+    const { AnthropicTokenError } = await import("../../backend/src/oauth/anthropic");
     let stderr = "";
     const errorSpy = spyOn(console, "error").mockImplementation((...args: unknown[]) => { stderr += args.join(" "); });
     const logSpy = spyOn(console, "log").mockImplementation(() => {});
@@ -693,7 +693,7 @@ describe("OAuth code-display login", () => {
 
   // The spec's CLI half: `ocx login anthropic --headless`.
   test("ocx login --headless runs the code flow, launches nothing, and reads the code back", async () => {
-    const { handleLogin, listCodeLoginProviders } = await import("../../src/oauth/login-cli");
+    const { handleLogin, listCodeLoginProviders } = await import("../../backend/src/oauth/login-cli");
     expect(listCodeLoginProviders()).toEqual(["anthropic", "anthropic2"]);
 
     const launched: string[] = [];

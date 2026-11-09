@@ -9,10 +9,10 @@
  * string prefix with a different family.
  */
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { resolveWireModelUidForTests } from "../../src/adapters/devin";
-import { fetchDevinUsableModels, selectDevinFamilyMember } from "../../src/adapters/devin/live-models";
-import { parseCatalogBuffer, setCachedCatalogForTests, type CacheEntry } from "../../src/adapters/devin/cloud-direct/catalog";
-import { encodeMessage, encodeString, encodeVarintField } from "../../src/adapters/devin/cloud-direct/wire";
+import { resolveWireModelUidForTests } from "../../backend/src/adapters/devin";
+import { fetchDevinUsableModels, selectDevinFamilyMember } from "../../backend/src/adapters/devin/live-models";
+import { parseCatalogBuffer, setCachedCatalogForTests, type CacheEntry } from "../../backend/src/adapters/devin/cloud-direct/catalog";
+import { encodeMessage, encodeString, encodeVarintField } from "../../backend/src/adapters/devin/cloud-direct/wire";
 
 const HOST = "https://server.codeium.com";
 const KEY = "devin-family-resolution-test-key";

@@ -3,11 +3,11 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The Models settings panel needs a settable reviewer without hand-editing config.json. The

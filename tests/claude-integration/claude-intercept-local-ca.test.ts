@@ -3,7 +3,7 @@ import { X509Certificate } from "node:crypto";
 import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { withClientLifecycleSync } from "../../src/client/lifecycle-lock";
+import { withClientLifecycleSync } from "../../backend/src/client/lifecycle-lock";
 import {
   CLAUDE_INTERCEPT_CA_COMMON_NAME,
   claudeInterceptCaCertPath,
@@ -13,7 +13,7 @@ import {
   ensureLocalInterceptCa,
   ensureLocalInterceptCaForStartup,
   issueLocalInterceptLeaf,
-} from "../../src/claude/intercept/local-ca";
+} from "../../backend/src/claude/intercept/local-ca";
 
 function tmpConfigDir(): string {
   return mkdtempSync(join(tmpdir(), "ocx-intercept-ca-"));

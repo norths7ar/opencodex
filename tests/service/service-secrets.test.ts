@@ -32,10 +32,10 @@ import {
   startupDataPlaneToken,
   writeServiceApiTokenFile,
   writeTokenBackup,
-} from "../../src/lib/service-secrets";
+} from "../../backend/src/lib/service-secrets";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { loadConfig, saveConfig } from "../../src/config";
-import { removeServiceTokenAfterUninstall } from "../../src/service/cli";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { removeServiceTokenAfterUninstall } from "../../backend/src/service/cli";
 
 let home = "";
 const previousHome = process.env.OPENCODEX_HOME;

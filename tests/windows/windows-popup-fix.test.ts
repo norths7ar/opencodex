@@ -12,14 +12,14 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { readProcessStartMsBatch } from "../../src/codex/app-server-processes";
+import { readProcessStartMsBatch } from "../../backend/src/codex/app-server-processes";
 import {
   decodeWindowsIdentityPowerShellOutputForTests,
   resolveEffectiveUserIdentity,
   windowsIdentityPowerShellCommandForTests,
   windowsIdentityPowerShellSpawnOptionsForTests,
-} from "../../src/codex/user-identity";
-import { setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
+} from "../../backend/src/codex/user-identity";
+import { setTrustedWindowsElevationExecutablesForTests } from "../../backend/src/lib/windows-elevation";
 import { repoPath } from "../helpers/repo-root";
 
 const TRUSTED_POWERSHELL = "C:\\trusted-system32\\WindowsPowerShell\\v1.0\\powershell.exe";
@@ -132,7 +132,7 @@ describe("no direct PowerShell argv carries the Bun-incompatible window flag (#1
   // quote style, tolerating whitespace or a line break between them.
   const FORBIDDEN_ARGV = /["']-WindowStyle["']\s*,\s*["']Hidden["']/;
 
-  const srcRoot = repoPath("src");
+  const srcRoot = repoPath("backend/src");
 
   test("no src/**/*.ts passes -WindowStyle Hidden as an argv pair", () => {
     const offenders = runtimeFiles(srcRoot)

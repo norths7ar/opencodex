@@ -2,12 +2,12 @@ import { expect, mock, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleSubagentModelRoutes } from "../../src/server/management/subagent-model-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import { loadConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
-import { InitialConfigPublicationError } from "../../src/config/initialize";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
+import { handleSubagentModelRoutes } from "../../backend/src/server/management/subagent-model-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { loadConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
+import { InitialConfigPublicationError } from "../../backend/src/config/initialize";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function cfg(): OcxConfig {

@@ -7,22 +7,22 @@ import {
   CodexMainAccountHardLockError,
   CodexMainProfileDrainingError,
   resolveCodexAuthContext,
-} from "../../src/codex/auth-context";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { captureMainQuotaWriter, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
+} from "../../backend/src/codex/auth-context";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { captureMainQuotaWriter, observeMainQuotaCredential, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import {
   isMainAccountPolicyBindingPending,
   nativeMainStartupGateSnapshot,
   startNativeMainStartupLifecycle,
   type NativeMainStartupLifecycle,
-} from "../../src/codex/native-profile-startup";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/native-profile-startup";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { handleResponses } from "../../src/server/responses";
+import { handleResponses } from "../../backend/src/server/responses";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 /**

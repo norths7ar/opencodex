@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { captureProviderApiKeySelection, providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../src/providers/api-key-selection";
+import { saveConfig } from "../../backend/src/config";
+import { captureProviderApiKeySelection, providerApiKeySelectionIsCurrent, resolveCurrentProviderApiKeyTransport } from "../../backend/src/providers/api-key-selection";
 import { clearKeyCooldowns, forgetApiKeyRotationCursor, getKeyCooldownUntil, recordDistributedKeyFailure,
-  rotateKeyOn401, selectProactiveApiKeyTransport } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { routedProviderConfig } from "../../src/router";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+  rotateKeyOn401, selectProactiveApiKeyTransport } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { routedProviderConfig } from "../../backend/src/router";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -7,10 +7,10 @@ import {
   readPersistedAccountQuotas,
   readPersistedKiroVerdicts,
   schedulePersistAccountQuotas,
-} from "../../src/providers/account-quota-disk";
-import type { ProviderQuota } from "../../src/providers/quota-types";
-import { kiroEvidenceIdentity } from "../../src/providers/kiro-account-state-disk";
-import type { ProviderAccount } from "../../src/oauth/types";
+} from "../../backend/src/providers/account-quota-disk";
+import type { ProviderQuota } from "../../backend/src/providers/quota-types";
+import { kiroEvidenceIdentity } from "../../backend/src/providers/kiro-account-state-disk";
+import type { ProviderAccount } from "../../backend/src/oauth/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;
@@ -192,8 +192,8 @@ describe("provider quota snapshot deadlines", () => {
 // #7815: a cache write under the config root waits out an overlapping optional config-root ACL
 // flight, whose inheritance would otherwise race the new file's explicit grant.
 test("a snapshot write waits for an in-flight config-root ACL flight, then lands", async () => {
-  const acl = await import("../../src/lib/windows-secret-acl");
-  const { setSyntheticWindowsPrincipalForTests } = await import("../../src/lib/windows-user-principal");
+  const acl = await import("../../backend/src/lib/windows-secret-acl");
+  const { setSyntheticWindowsPrincipalForTests } = await import("../../backend/src/lib/windows-user-principal");
   const success = { success: true, exitCode: 0, timedOut: false, stdout: "" };
   let entered!: () => void, release!: () => void;
   const started = new Promise<void>(resolve => { entered = resolve; });
@@ -223,8 +223,8 @@ test("a snapshot write waits for an in-flight config-root ACL flight, then lands
 });
 
 test("a snapshot still waiting for ACL admission is dropped by cancellation", async () => {
-  const acl = await import("../../src/lib/windows-secret-acl");
-  const { setSyntheticWindowsPrincipalForTests } = await import("../../src/lib/windows-user-principal");
+  const acl = await import("../../backend/src/lib/windows-secret-acl");
+  const { setSyntheticWindowsPrincipalForTests } = await import("../../backend/src/lib/windows-user-principal");
   const success = { success: true, exitCode: 0, timedOut: false, stdout: "" };
   let entered!: () => void, release!: () => void;
   const started = new Promise<void>(resolve => { entered = resolve; });

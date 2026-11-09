@@ -1,6 +1,6 @@
 import { win32 } from "node:path";
 import { DESKTOP_COMPATIBILITY_ASSESSED_FAMILY, DESKTOP_COMPATIBILITY_ASSESSED_VERSION,
-  type DesktopPackageObservation } from "../../src/codex/desktop-compatibility/installed-build";
+  type DesktopPackageObservation } from "../../backend/src/codex/desktop-compatibility/installed-build";
 
 /** Synthetic registered manifest/file facts; never performs a host package query. */
 export function desktopPackageObservation(version = DESKTOP_COMPATIBILITY_ASSESSED_VERSION): DesktopPackageObservation {

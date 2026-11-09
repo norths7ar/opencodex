@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { EventEmitter } from "node:events";
 import type { spawn } from "node:child_process";
-import { spawnCodex, type CodexSpawnDeps } from "../../src/cli/codex-launcher";
+import { spawnCodex, type CodexSpawnDeps } from "../../backend/src/cli/codex-launcher";
 
 const root = "/opt/OpenAI/ChatGPT Beta.app";
 const binary = `${root}/Contents/Resources/codex`;

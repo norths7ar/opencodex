@@ -9,24 +9,24 @@ import {
   previewCodexAccountForRequest,
   resolveCodexAccountForThread,
   resolveCodexAccountForThreadDetailed,
-} from "../../src/codex/routing";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { getEffectiveActiveCodexAccountId, rememberActiveCodexAccount } from "../../src/codex/routing/active-account";
+} from "../../backend/src/codex/routing";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { getEffectiveActiveCodexAccountId, rememberActiveCodexAccount } from "../../backend/src/codex/routing/active-account";
 import {
   cachedDeniedCodexAccountIdsForModel,
   recordCodexModelDenialEvidence,
   resetCodexModelEntitlementCacheForTests,
-} from "../../src/codex/model-entitlements";
+} from "../../backend/src/codex/model-entitlements";
 import {
   clearAccountNeedsReauth,
   clearAccountQuota,
   updateAccountQuota,
-} from "../../src/codex/auth-api";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/auth-api";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

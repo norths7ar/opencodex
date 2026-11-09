@@ -1,20 +1,20 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import type { AdapterRequest } from "../../../src/adapters/base";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import type { AdapterRequest } from "../../../backend/src/adapters/base";
 import {
   fetchAntigravityWithRetry,
   fetchDirectGeminiWithRetry,
   fetchVertexWithRetry,
-} from "../../../src/adapters/google-http";
+} from "../../../backend/src/adapters/google-http";
 import {
   GOOGLE_TOOL_SCHEMA_LOSS_COUNT_LIMIT,
   sanitizeGeminiToolParametersWithReport,
   type GoogleToolSchemaEndpointClass,
-} from "../../../src/adapters/google-tool-schema";
-import { compileGoogleWireBody, GoogleToolSchemaPolicyError } from "../../../src/adapters/google-wire-compiler";
-import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../../src/lib/debug-settings";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/google-tool-schema";
+import { compileGoogleWireBody, GoogleToolSchemaPolicyError } from "../../../backend/src/adapters/google-wire-compiler";
+import { getDebugLogEntries, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

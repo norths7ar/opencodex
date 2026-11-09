@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { MessageBudget } from "../../src/messaging/budget";
-import { LocalMessageRpc } from "../../src/messaging/rpc";
-import { sendLocalMessage } from "../../src/messaging/send";
+import { MessageBudget } from "../../backend/src/messaging/budget";
+import { LocalMessageRpc } from "../../backend/src/messaging/rpc";
+import { sendLocalMessage } from "../../backend/src/messaging/send";
 import { LOCAL_OTHER, LOCAL_TARGET, LocalFixtureRpcError, localFixtureThread, localMessagingFixture, NO_REPLY } from "../helpers/messaging-local";
 
 const options = { kind: "request" as const, thread: LOCAL_TARGET, body: "PRIVATE fixture body" };

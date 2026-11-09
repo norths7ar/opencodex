@@ -7,7 +7,7 @@ import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const marker = "oauth-cli-provider-response-marker";
-const moduleUrl = (...name: string[]) => JSON.stringify(pathToFileURL(repoPath("src", ...name)).href);
+const moduleUrl = (...name: string[]) => JSON.stringify(pathToFileURL(repoPath("backend/src", ...name)).href);
 const publicMessage = "OAuth authentication failed. Check the OpenCodex account status and retry.";
 
 // Keep the real token exchange, discovery, runLogin and public reporting/settlement paths.

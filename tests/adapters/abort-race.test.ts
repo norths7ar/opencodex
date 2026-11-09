@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../src/types";
-import { TranslatorBudgetExceededError } from "../../src/lib/translator-budget";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { TranslatorBudgetExceededError } from "../../backend/src/lib/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
-const actualResolver = await import("../../src/server/adapter-resolve");
+const actualResolver = await import("../../backend/src/server/adapter-resolve");
 // Capture the real function before the override. `mock.module` rewrites the namespace's live
 // binding in place, so a lookup through `actualResolver` inside the wrapper would reach
 // whichever override is current, including this one, once another file in the same process
@@ -12,14 +12,14 @@ const actualResolver = await import("../../src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 let adapterFactory: ((provider: OcxProviderConfig) => ProviderAdapter) | undefined;
 
-mock.module("../../src/server/adapter-resolve", () => ({
+mock.module("../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     return adapterFactory?.(provider) ?? actualResolveAdapter(provider, cacheRetention);
   },
 }));
 
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 let releaseSpendHome: (() => void) | undefined;
 
 // Direct physical dispatch needs the writer lease to prevent spend-ledger ownership failures.

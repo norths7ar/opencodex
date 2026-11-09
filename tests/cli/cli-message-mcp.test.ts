@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { parseQueueMcpArgs } from "../../src/cli/message-mcp-command";
+import { parseQueueMcpArgs } from "../../backend/src/cli/message-mcp-command";
 import { QUEUE_MCP_TARGET, REPLY_MCP_CLIENT, queueMcpFixture } from "../helpers/messaging-mcp-queue";
 import { repoPath } from "../helpers/repo-root";
 
@@ -20,7 +20,7 @@ test("message mcp requires exactly one explicit absolute CLI and home", () => {
 
 describe.skipIf(process.platform === "win32")("message MCP CLI", () => {
   test("malformed invocation writes no protocol bytes and creates no home", async () => {
-    const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "message", "mcp"], { stdout: "pipe", stderr: "pipe" });
+    const child = Bun.spawn([process.execPath, repoPath("backend/src/cli/index.ts"), "message", "mcp"], { stdout: "pipe", stderr: "pipe" });
     const [code, out, err] = await Promise.all([child.exited, new Response(child.stdout).text(), new Response(child.stderr).text()]);
     expect(code).toBe(64); expect(out).toBe(""); expect(err).toContain("Usage: ocx message mcp");
   });
@@ -29,7 +29,7 @@ describe.skipIf(process.platform === "win32")("message MCP CLI", () => {
     const f = queueMcpFixture();
     const client = new Client({ name: "fixture", version: "1" });
     const transport = new StdioClientTransport({ command: process.execPath,
-      args: [repoPath("src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome], stderr: "pipe" });
+      args: [repoPath("backend/src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome], stderr: "pipe" });
     try {
       await client.connect(transport);
       const tools = await client.listTools();
@@ -49,7 +49,7 @@ describe.skipIf(process.platform === "win32")("message MCP CLI", () => {
     const f = queueMcpFixture("reply-success");
     const client = new Client({ name: "fixture", version: "1" });
     const transport = new StdioClientTransport({ command: process.execPath,
-      args: [repoPath("src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome, "--allow-reply-read"], stderr: "pipe" });
+      args: [repoPath("backend/src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome, "--allow-reply-read"], stderr: "pipe" });
     try {
       await client.connect(transport);
       expect((await client.listTools()).tools.map(t=>t.name).sort()).toEqual(["codex_queue_message","codex_read_reply","codex_threads"]);
@@ -65,7 +65,7 @@ describe.skipIf(process.platform === "win32")("message MCP CLI", () => {
     const f = queueMcpFixture("hang");
     const client = new Client({ name: "fixture", version: "1" });
     const transport = new StdioClientTransport({ command: process.execPath,
-      args: [repoPath("src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome], stderr: "pipe" });
+      args: [repoPath("backend/src/cli/index.ts"), "message", "mcp", "--codex", f.options.codex, "--codex-home", f.options.codexHome], stderr: "pipe" });
     const pending: Promise<unknown>[] = [];
     try {
       await client.connect(transport);

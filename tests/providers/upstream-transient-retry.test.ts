@@ -5,10 +5,10 @@ import {
   isNonReplayableUpstreamCode,
   isTransientUpstreamStatus,
   markResponseNonReplayable,
-} from "../../src/lib/upstream-retry";
-import { transientRetryPolicyFor } from "../../src/providers/key-failover";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/lib/upstream-retry";
+import { transientRetryPolicyFor } from "../../backend/src/providers/key-failover";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 function bodyResponse(status: number, headers?: Record<string, string>): Response {

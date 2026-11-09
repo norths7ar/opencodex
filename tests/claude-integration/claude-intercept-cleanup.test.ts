@@ -1,11 +1,11 @@
 import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import type { Server } from "bun";
-import type { OcxConfig } from "../../src/types";
-import * as paths from "../../src/config/paths";
-import * as desktop from "../../src/claude/desktop-first-party";
-import * as pickerCa from "../../src/claude/intercept/picker-ca";
-import * as runtime from "../../src/claude/intercept/runtime";
-import { createClaudeInterceptLifecycle } from "../../src/server/index/claude-intercept-lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
+import * as paths from "../../backend/src/config/paths";
+import * as desktop from "../../backend/src/claude/desktop-first-party";
+import * as pickerCa from "../../backend/src/claude/intercept/picker-ca";
+import * as runtime from "../../backend/src/claude/intercept/runtime";
+import { createClaudeInterceptLifecycle } from "../../backend/src/server/index/claude-intercept-lifecycle";
 
 // All effects are mocked: no key files, certificate trust, or sockets are used by this suite.
 const owners: Array<ReturnType<typeof createClaudeInterceptLifecycle>> = [];

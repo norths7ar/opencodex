@@ -12,14 +12,14 @@ import {
   OAuthLoginRequiredError,
   OAuthTokenRefreshStaleError,
   OAUTH_PROVIDERS,
-} from "../../src/oauth";
-import type { OAuthCredentials } from "../../src/oauth/types";
-import { ChatGptTokenError, ChatGptTokenRequestError, refreshChatGPTToken } from "../../src/oauth/chatgpt";
-import { createOAuthRefreshIntentLock, getAccountCredential, getAccountSet, markAccountNeedsReauth, saveCredential } from "../../src/oauth/store";
+} from "../../backend/src/oauth";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
+import { ChatGptTokenError, ChatGptTokenRequestError, refreshChatGPTToken } from "../../backend/src/oauth/chatgpt";
+import { createOAuthRefreshIntentLock, getAccountCredential, getAccountSet, markAccountNeedsReauth, saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { getActiveTurnCount, tryAdmitTurn } from "../../src/server/lifecycle";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { getActiveTurnCount, tryAdmitTurn } from "../../backend/src/server/lifecycle";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 
 // Gate/CAS refresh races can exceed the 5s default under windows-latest contention
 // (same flake class as kiro-oauth / oauth queue budgets).

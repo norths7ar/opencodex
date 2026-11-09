@@ -7,7 +7,7 @@ import {
   encodeGrpcWebEnvelope,
   GrpcWebError,
   parseGrpcWebTrailers,
-} from "../../../src/grok/grpc-web";
+} from "../../../backend/src/grok/grpc-web";
 import {
   getGrokRemainingResets,
   decodeGetRemainingResetsResponse,
@@ -17,13 +17,13 @@ import {
   GROK_GET_REMAINING_RESETS_ENDPOINT,
   GROK_REDEEM_RESET_ENDPOINT,
   redeemGrokResetCoupon,
-} from "../../../src/grok/reset-coupons";
+} from "../../../backend/src/grok/reset-coupons";
 import {
   grokCouponJournalPath,
   markGrokResetCouponAttempt,
   openGrokResetCouponOperation,
   recordGrokResetCouponSettlement,
-} from "../../../src/grok/reset-coupon-ledger";
+} from "../../../backend/src/grok/reset-coupon-ledger";
 
 function trailerFrame(text: string): Uint8Array<ArrayBuffer> {
   const frame = encodeGrpcWebEnvelope(new TextEncoder().encode(text)) as Uint8Array<ArrayBuffer>;

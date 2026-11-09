@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { cancelBodyOnAbort } from "../../src/lib/abort";
-import { handleLive, readBodyCapped } from "../../src/server/live";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+import { cancelBodyOnAbort } from "../../backend/src/lib/abort";
+import { handleLive, readBodyCapped } from "../../backend/src/server/live";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 // Captured once so a test that never finishes (Bun's per-test timeout) cannot leave the stubbed

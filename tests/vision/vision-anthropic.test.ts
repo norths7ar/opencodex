@@ -2,11 +2,11 @@ import { afterEach, describe, expect, mock, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as oauthModule from "../../src/oauth";
+import * as oauthModule from "../../backend/src/oauth";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let oauthAccessError: Error | undefined;
-mock.module("../../src/oauth", () => ({
+mock.module("../../backend/src/oauth", () => ({
   ...oauthModule,
   getValidAccessToken: async () => {
     if (oauthAccessError) throw oauthAccessError;
@@ -14,18 +14,18 @@ mock.module("../../src/oauth", () => ({
   },
 }));
 
-import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../src/oauth/anthropic";
-import { CLAUDE_CLI_USER_AGENT } from "../../src/providers/claude-cli-identity";
-import { parseRequest } from "../../src/responses/parser";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { CLAUDE_CODE_SYSTEM_INSTRUCTION } from "../../backend/src/oauth/anthropic";
+import { CLAUDE_CLI_USER_AGENT } from "../../backend/src/providers/claude-cli-identity";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import {
   describeImagesInPlace,
   describeImageAnthropic,
   parseAnthropicVisionSSE,
   planVisionSidecar,
   type VisionPlan,
-} from "../../src/vision";
+} from "../../backend/src/vision";
 
 const DATA_IMAGE = "data:image/png;base64,aGVsbG8=";
 const anthropicProvider: OcxProviderConfig = {

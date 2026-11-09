@@ -2,25 +2,25 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
+import { getConfigPath, loadConfig, saveConfig } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
 import {
   MAIN_ACCOUNT_HARD_LOCK_PERCENT,
   getMainAccountHardLockStatus,
   isMainAccountHardLockEnabled,
   isMainAccountHardLocked,
-} from "../../src/codex/main-account-hard-lock";
+} from "../../backend/src/codex/main-account-hard-lock";
 import {
   captureMainQuotaWriter,
   clearMainAccountInfoCache,
   observeMainQuotaIdentity,
-} from "../../src/codex/main-account-cache";
-import { clearAccountQuota, setAccountQuotaFromParsed } from "../../src/codex/quota";
-import { codexAccountUnusableReason, isCodexAccountUsable } from "../../src/codex/account-usability";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { handleManagementAPI, type ManagementApiDeps } from "../../src/server/management-api";
-import { invalidateStartupHealthCache } from "../../src/server/startup-health-cache";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/main-account-cache";
+import { clearAccountQuota, setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
+import { codexAccountUnusableReason, isCodexAccountUsable } from "../../backend/src/codex/account-usability";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { handleManagementAPI, type ManagementApiDeps } from "../../backend/src/server/management-api";
+import { invalidateStartupHealthCache } from "../../backend/src/server/startup-health-cache";
+import type { OcxConfig } from "../../backend/src/types";
 import { startupHealthFixture } from "../helpers/startup-health";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

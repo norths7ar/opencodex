@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from "bun:test
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import { callXaiImages, resolveXaiAspectRatioLiteral } from "../../src/images/xai-client";
+import { callXaiImages, resolveXaiAspectRatioLiteral } from "../../backend/src/images/xai-client";
 
 const PREV_HOME = process.env.OPENCODEX_HOME;
 beforeAll(() => { process.env.OPENCODEX_HOME = join(tmpdir(), "ocx-test-" + randomUUID()); });

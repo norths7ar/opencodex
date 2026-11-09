@@ -7,12 +7,12 @@
  */
 import { describe, expect, test } from "bun:test";
 import { repoPath } from "../helpers/repo-root";
-import { fetchWithHeaderTimeout, providerFetch } from "../../src/server/responses/fetch-helpers";
-import { fetchWithAttemptDeadline } from "../../src/lib/upstream-retry";
-import { fetchWithHeaderDeadline } from "../../src/server/claude-messages";
-import { fetchGoogleWithRetry } from "../../src/adapters/google-http";
-import { fetchKiroWithRetry } from "../../src/adapters/kiro-retry";
-import type { OcxProviderConfig } from "../../src/types";
+import { fetchWithHeaderTimeout, providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { fetchWithAttemptDeadline } from "../../backend/src/lib/upstream-retry";
+import { fetchWithHeaderDeadline } from "../../backend/src/server/claude-messages";
+import { fetchGoogleWithRetry } from "../../backend/src/adapters/google-http";
+import { fetchKiroWithRetry } from "../../backend/src/adapters/kiro-retry";
+import type { OcxProviderConfig } from "../../backend/src/types";
 
 describe("credential-bearing production transports do not follow redirects", () => {
   const nativeFetch = globalThis.fetch;
@@ -97,12 +97,12 @@ describe("credential-bearing production transports do not follow redirects", () 
 
 describe("credential-bearing sidecars refuse to follow redirects", () => {
   const sites: Array<{ file: string; label: string }> = [
-    { file: "src/server/images.ts", label: "images relay" },
-    { file: "src/images/xai-client.ts", label: "xAI images client" },
-    { file: "src/server/live.ts", label: "live relay" },
-    { file: "src/server/search.ts", label: "search relay" },
-    { file: "src/web-search/executor.ts", label: "web-search sidecar" },
-    { file: "src/vision/describe.ts", label: "vision sidecar" },
+    { file: "backend/src/server/images.ts", label: "images relay" },
+    { file: "backend/src/images/xai-client.ts", label: "xAI images client" },
+    { file: "backend/src/server/live.ts", label: "live relay" },
+    { file: "backend/src/server/search.ts", label: "search relay" },
+    { file: "backend/src/web-search/executor.ts", label: "web-search sidecar" },
+    { file: "backend/src/vision/describe.ts", label: "vision sidecar" },
   ];
 
   for (const { file, label } of sites) {

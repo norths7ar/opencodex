@@ -4,16 +4,16 @@ import { tmpdir } from "node:os";
 import * as fs from "node:fs";
 import { join } from "node:path";
 import { Database } from "bun:sqlite";
-import * as owner from "../../src/codex/codex-home-owner";
-import * as appServer from "../../src/codex/app-server-processes";
+import * as owner from "../../backend/src/codex/codex-home-owner";
+import * as appServer from "../../backend/src/codex/app-server-processes";
 import {
   catalogWritePermitContext, CatalogWritePermitRefusal, withCatalogWriteSerialization,
   type CatalogWriteIntent, type CatalogWritePermit,
-} from "../../src/codex/catalog-write-serialization";
-import { replaceActiveCodexCatalog, replaceCodexModelsCache } from "../../src/codex/internal/catalog-writer";
-import { withConfigMutationLockSync } from "../../src/config/mutation-lock";
-import { restoreCodexCatalog } from "../../src/codex/catalog/restore";
-import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../src/codex/user-identity";
+} from "../../backend/src/codex/catalog-write-serialization";
+import { replaceActiveCodexCatalog, replaceCodexModelsCache } from "../../backend/src/codex/internal/catalog-writer";
+import { withConfigMutationLockSync } from "../../backend/src/config/mutation-lock";
+import { restoreCodexCatalog } from "../../backend/src/codex/catalog/restore";
+import { resolveCodexCatalogSerializationDatabasePath, resolveEffectiveUserIdentity } from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root = "";

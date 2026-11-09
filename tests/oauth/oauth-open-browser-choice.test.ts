@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { shouldOpenBrowserForLogin } from "../../src/oauth/open-browser-choice";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import type { OcxConfig } from "../../src/types";
+import { shouldOpenBrowserForLogin } from "../../backend/src/oauth/open-browser-choice";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * The operator can stop the proxy from opening a browser on its own machine —
@@ -45,8 +45,8 @@ async function startLogin(
   body: Record<string, unknown>,
   cfg: OcxConfig,
 ): Promise<{ opened: string[]; url?: string }> {
-  const oauth = await import("../../src/oauth");
-  const openUrlMod = await import("../../src/lib/open-url");
+  const oauth = await import("../../backend/src/oauth");
+  const openUrlMod = await import("../../backend/src/lib/open-url");
   const opened: string[] = [];
   const startSpy = spyOn(oauth, "startLoginFlow").mockResolvedValue({ url: "https://accounts.x.ai/oauth/authorize?code_challenge=x" });
   const openSpy = spyOn(openUrlMod, "openUrl").mockImplementation(async (url: string) => { opened.push(url); return { status: "started" as const }; });
@@ -99,7 +99,7 @@ describe("POST /api/oauth/login honors the choice", () => {
 
 describe("the rollback path keeps the setting honest", () => {
   test("a failed save restores the previous value instead of leaving it half-applied", async () => {
-    const { handleManagementAPI } = await import("../../src/server/management-api");
+    const { handleManagementAPI } = await import("../../backend/src/server/management-api");
     const cfg = { port: 10100, defaultProvider: "openai", providers: {} } as OcxConfig;
     const req = new Request("http://127.0.0.1:10100/api/settings", {
       method: "PUT",

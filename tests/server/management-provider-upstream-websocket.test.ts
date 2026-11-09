@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, setDefaultTimeout, spyOn, test
 import { existsSync, mkdirSync, mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import * as destinationPolicy from "../../src/lib/destination-policy";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import * as destinationPolicy from "../../backend/src/lib/destination-policy";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest as Request } from "../helpers/management-auth";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";

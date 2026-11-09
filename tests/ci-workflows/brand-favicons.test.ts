@@ -106,7 +106,7 @@ describe("brand favicons", () => {
     expect(icoSizes.length).toBeGreaterThan(2);
 
     // The sizes are not free choices: these are the numbers the two sites already ask for.
-    expect(readFileSync(repoPath("gui/index.html"), "utf8")).toContain('href="/favicon.png"');
+    expect(readFileSync(repoPath("frontend/index.html"), "utf8")).toContain('href="/favicon.png"');
     const astro = readFileSync(repoPath("docs-site/astro.config.mjs"), "utf8");
     expect(astro).toContain('favicon: "/favicon.ico"');
     expect(astro).toContain('sizes: "192x192"');

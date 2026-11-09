@@ -13,24 +13,24 @@ import {
   stripInjectedOpenaiBaseUrl,
   stripOpencodexConfig,
   standaloneCodexRoutingTarget,
-} from "../../src/codex/inject";
+} from "../../backend/src/codex/inject";
 import {
   DEFAULT_CODEX_PROVIDER_DISPLAY_NAME,
   buildProfileFileForTarget,
   buildProviderTableBlockForTarget,
   preserveUnmanagedProfileKeys,
   resolveCodexProviderDisplayName,
-} from "../../src/codex/inject/config-toml";
+} from "../../backend/src/codex/inject/config-toml";
 import {
   appendOcxProviderTableBlock,
   extractOcxProviderTableBlock,
-} from "../../src/codex/inject/remove";
-import { remoteThreadListCompatibilityWarning } from "../../src/codex/inject/routing-target";
-import { OCX_ROUTING_MARKER_LINE, OCX_SECTION_MARKER, stripJournaledOpenaiBaseUrl } from "../../src/codex/injected-marker";
+} from "../../backend/src/codex/inject/remove";
+import { remoteThreadListCompatibilityWarning } from "../../backend/src/codex/inject/routing-target";
+import { OCX_ROUTING_MARKER_LINE, OCX_SECTION_MARKER, stripJournaledOpenaiBaseUrl } from "../../backend/src/codex/injected-marker";
 import {
   MANAGED_AGENTS_TABLE_MARKER,
   MANAGED_SUBAGENT_DEFAULT_MARKER,
-} from "../../src/codex/subagent-defaults";
+} from "../../backend/src/codex/subagent-defaults";
 
 describe("Codex config injection", () => {
   test("remote-list compatibility warning follows provider identity, not provider display name", () => {

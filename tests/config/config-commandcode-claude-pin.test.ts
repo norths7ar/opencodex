@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { modelAdapterRecordConfigError } from "../../src/config/provider-validation";
-import { isWirePinnedModel, pinnedWireAdapter } from "../../src/types";
+import { modelAdapterRecordConfigError } from "../../backend/src/config/provider-validation";
+import { isWirePinnedModel, pinnedWireAdapter } from "../../backend/src/types";
 
 const provider = {
   adapter: "openai-chat",

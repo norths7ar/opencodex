@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { unwrapFreeformToolInput } from "../../src/responses/apply-patch-envelope";
-import { MAX_FREEFORM_WRAPPER_SCAN_CHARS } from "../../src/responses/freeform-wrapper-scan";
-import { ProgressiveFreeformInputReader, progressiveFreeformInput } from "../../src/responses/progressive-freeform-input";
+import { unwrapFreeformToolInput } from "../../backend/src/responses/apply-patch-envelope";
+import { MAX_FREEFORM_WRAPPER_SCAN_CHARS } from "../../backend/src/responses/freeform-wrapper-scan";
+import { ProgressiveFreeformInputReader, progressiveFreeformInput } from "../../backend/src/responses/progressive-freeform-input";
 
 /**
  * #5151. The progressive decoder matched the buffer against the literal wrapper opening

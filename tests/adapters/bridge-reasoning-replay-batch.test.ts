@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
 import {
   clearReasoningReplayCacheForTests,
   peekReasoningForCall,
-} from "../../src/responses/reasoning-replay-cache";
-import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import type { AdapterEvent, OcxReasoningReplayScopeRef } from "../../backend/src/types";
 
 /**
  * Regression for issue #950's non-streaming path: chat-completions batch

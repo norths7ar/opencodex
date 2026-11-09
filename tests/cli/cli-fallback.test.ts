@@ -3,9 +3,9 @@
  * and usage refusals that never reach the proxy.
  */
 import { describe, expect, test } from "bun:test";
-import { fallbackStatusLines, handleFallbackCommand } from "../../src/cli/fallback";
-import { collectStatusFallback } from "../../src/cli/status-fallback";
-import type { OcxConfig } from "../../src/types";
+import { fallbackStatusLines, handleFallbackCommand } from "../../backend/src/cli/fallback";
+import { collectStatusFallback } from "../../backend/src/cli/status-fallback";
+import type { OcxConfig } from "../../backend/src/types";
 
 describe("ocx fallback", () => {
 

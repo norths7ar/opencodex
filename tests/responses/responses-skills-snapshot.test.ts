@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config/proxy-env";
-import { handleResponses } from "../../src/server/responses/core";
-import { resetSkillsSnapshotCacheForTests, resolveSkillsSnapshotScopeKey } from "../../src/server/responses/skills-snapshot";
-import type { OcxConfig } from "../../src/types";
+import { getDefaultConfig } from "../../backend/src/config/proxy-env";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { resetSkillsSnapshotCacheForTests, resolveSkillsSnapshotScopeKey } from "../../backend/src/server/responses/skills-snapshot";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const originalFetch = globalThis.fetch;

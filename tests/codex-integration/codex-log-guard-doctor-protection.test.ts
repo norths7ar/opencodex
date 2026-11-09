@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import { formatCodexLogGuardDoctor, printCodexLogGuardDoctor } from "../../src/cli/codex-log-guard-doctor";
-import type { CodexLogGuardStatus } from "../../src/codex/log-guard/protection";
+import { formatCodexLogGuardDoctor, printCodexLogGuardDoctor } from "../../backend/src/cli/codex-log-guard-doctor";
+import type { CodexLogGuardStatus } from "../../backend/src/codex/log-guard/protection";
 
 function status(state: CodexLogGuardStatus["protection"]): CodexLogGuardStatus {
   return {

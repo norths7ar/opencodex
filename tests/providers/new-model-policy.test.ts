@@ -4,7 +4,7 @@ import {
   effectiveNewModelPolicy,
   MODEL_REMOVAL_GRACE_FETCHES,
   reconcileSuccessfulModelDiscoveries,
-} from "../../src/providers/new-model-policy";
+} from "../../backend/src/providers/new-model-policy";
 
 const now = "2026-08-24T02:11:00Z";
 

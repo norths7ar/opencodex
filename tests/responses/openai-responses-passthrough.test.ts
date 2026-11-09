@@ -1,31 +1,31 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
 import { Buffer } from "node:buffer";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { openaiResponsesUrl } from "../../src/adapters/openai-responses-url";
-import { normalizeResponsesCodeMode } from "../../src/adapters/responses-code-mode";
-import { CODE_MODE_HOST_CONTRACT_SENTENCE, CODE_MODE_RESULT_ECHO_SENTENCE, EMPTY_EXEC_OUTPUT_MESSAGE, FAILED_EXEC_OUTPUT_MESSAGE } from "../../src/adapters/exec-tool-result-normalize";
-import { chatCompletionsToResponsesBody } from "../../src/chat/inbound";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import { XAI_GROK_CLI_BASE_URL } from "../../src/providers/xai-transport";
-import { routeModel } from "../../src/router";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { handleResponses, sanitizeEncryptedContentInPlace } from "../../src/server/responses";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { openaiResponsesUrl } from "../../backend/src/adapters/openai-responses-url";
+import { normalizeResponsesCodeMode } from "../../backend/src/adapters/responses-code-mode";
+import { CODE_MODE_HOST_CONTRACT_SENTENCE, CODE_MODE_RESULT_ECHO_SENTENCE, EMPTY_EXEC_OUTPUT_MESSAGE, FAILED_EXEC_OUTPUT_MESSAGE } from "../../backend/src/adapters/exec-tool-result-normalize";
+import { chatCompletionsToResponsesBody } from "../../backend/src/chat/inbound";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import { XAI_GROK_CLI_BASE_URL } from "../../backend/src/providers/xai-transport";
+import { routeModel } from "../../backend/src/router";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { handleResponses, sanitizeEncryptedContentInPlace } from "../../backend/src/server/responses";
 import {
   encodeCompactionSummary,
   OPAQUE_COMPACTION_NOTE,
   SUMMARY_PREFIX,
-} from "../../src/responses/compaction";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { AdapterEvent, OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/compaction";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { buildKeyAuthUrl } from "../helpers/passthrough-key-url";
-import { restoreRoutedNamespaceCalls } from "../../src/responses/namespace-tool-compat";
-import { restoreRoutedCustomCalls } from "../../src/responses/custom-tool-compat";
+import { restoreRoutedNamespaceCalls } from "../../backend/src/responses/namespace-tool-compat";
+import { restoreRoutedCustomCalls } from "../../backend/src/responses/custom-tool-compat";
 
 // A case that calls handleResponses directly never takes the writer lease startServer takes, so
 // its dispatch is refused. Dropped in teardown so a throwing case cannot leave the lease behind.

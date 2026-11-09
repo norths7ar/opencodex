@@ -4,8 +4,8 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { codexConfigDrift } from "../../src/codex/config-drift-heal";
-import { externalCodexModelProvider } from "../../src/codex/inject";
+import { codexConfigDrift } from "../../backend/src/codex/config-drift-heal";
+import { externalCodexModelProvider } from "../../backend/src/codex/inject";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 

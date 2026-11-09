@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
-import { handleProviderLifecycleRuntimeCommand as lifecycle } from "../../src/cli/provider-lifecycle-runtime";
-import type { RuntimeApiDeps } from "../../src/cli/runtime-api";
+import { handleProviderLifecycleRuntimeCommand as lifecycle } from "../../backend/src/cli/provider-lifecycle-runtime";
+import type { RuntimeApiDeps } from "../../backend/src/cli/runtime-api";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 
 type Call = { url: string; method: string; body?: unknown; redirect?: RequestRedirect };

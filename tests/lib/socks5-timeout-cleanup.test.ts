@@ -1,7 +1,7 @@
 import { describe, test } from "bun:test";
 import assert from "node:assert/strict";
 import { Socket, createServer, type AddressInfo } from "node:net";
-import { socks5Fetch } from "../../src/lib/socks5-fetch";
+import { socks5Fetch } from "../../backend/src/lib/socks5-fetch";
 
 // Identify only the callbacks owned by this transport, as in the upload lifecycle
 // tests. Do not require unrelated timeout observers on the socket to disappear.

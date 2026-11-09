@@ -1,11 +1,11 @@
 import { expect, spyOn, test } from "bun:test";
-import { chatCompletionsErrorBody, collectChatCompletion, responsesSseToChatCompletionsSse, ChatCompletionsStreamError } from "../../src/chat/outbound";
-import { nativeChatSse } from "../../src/server/chat-native-sse";
-import { encodeChatCompletionSse } from "../../src/protocols/encoders/chat";
-import { deliverClientEncodedResponse } from "../../src/server/inference/client-encoder-delivery";
-import type { FailureVerdictSink } from "../../src/chat/failure-verdict";
+import { chatCompletionsErrorBody, collectChatCompletion, responsesSseToChatCompletionsSse, ChatCompletionsStreamError } from "../../backend/src/chat/outbound";
+import { nativeChatSse } from "../../backend/src/server/chat-native-sse";
+import { encodeChatCompletionSse } from "../../backend/src/protocols/encoders/chat";
+import { deliverClientEncodedResponse } from "../../backend/src/server/inference/client-encoder-delivery";
+import type { FailureVerdictSink } from "../../backend/src/chat/failure-verdict";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+import type { AdapterEvent } from "../../backend/src/types";
 const KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const frame = (value: unknown) => `data: ${JSON.stringify(value)}\n\n`;
 async function verdict(stream: ReadableStream<Uint8Array>, sink?: FailureVerdictSink) {

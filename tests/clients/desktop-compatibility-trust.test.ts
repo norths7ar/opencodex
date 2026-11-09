@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, test } from "bun:test";
 import { randomUUID, X509Certificate } from "node:crypto";
-import { createCertificateAuthority } from "../../src/claude/intercept/local-ca";
-import type { StoredDesktopAuthority } from "../../src/codex/desktop-compatibility/certificate-store";
+import { createCertificateAuthority } from "../../backend/src/claude/intercept/local-ca";
+import type { StoredDesktopAuthority } from "../../backend/src/codex/desktop-compatibility/certificate-store";
 import {
   createPowerShellCertificateTrustRunner, createWindowsCertificateTrust, inspectWindowsCertificateTrust, TRUST_INSPECT_DEADLINE_MS,
   type DesktopCertificateTrust, type TrustCommandExec, type TrustOperation,
-} from "../../src/codex/desktop-compatibility/windows-certificate-trust";
+} from "../../backend/src/codex/desktop-compatibility/windows-certificate-trust";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold-spawn-warmup";
 
 function fixture(serverAuthOnly = true): StoredDesktopAuthority {

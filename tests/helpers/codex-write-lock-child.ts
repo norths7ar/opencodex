@@ -9,8 +9,8 @@
  * It calls the PRODUCTION module, never a copy, and prints exactly one JSON
  * line so the parent can assert on a typed result rather than on log scraping.
  */
-import { withCodexWriteLock } from "../../src/codex/codex-write-lock";
-import type { AdmissionSnapshot } from "../../src/codex/convergence-types";
+import { withCodexWriteLock } from "../../backend/src/codex/codex-write-lock";
+import type { AdmissionSnapshot } from "../../backend/src/codex/convergence-types";
 import { existsSync, writeFileSync } from "node:fs";
 
 const payload = JSON.parse(process.env.OCX_LOCK_CHILD_PAYLOAD ?? "{}") as {

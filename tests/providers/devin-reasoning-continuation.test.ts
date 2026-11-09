@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { mapOcxMessagesToDevin } from "../../src/adapters/devin";
-import { buildGetChatMessageRequestForTests, decodeChatFrame } from "../../src/adapters/devin/cloud-direct/chat";
-import { encodeString, iterFields } from "../../src/adapters/devin/cloud-direct/wire";
-import { decodeDevinSignature, encodeDevinSignature, hasAnthropicSignature } from "../../src/adapters/devin/reasoning-signature";
-import { encodeReasoningEnvelope } from "../../src/responses/reasoning-envelope";
-import { parseRequest } from "../../src/responses/parser";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { mapOcxMessagesToDevin } from "../../backend/src/adapters/devin";
+import { buildGetChatMessageRequestForTests, decodeChatFrame } from "../../backend/src/adapters/devin/cloud-direct/chat";
+import { encodeString, iterFields } from "../../backend/src/adapters/devin/cloud-direct/wire";
+import { decodeDevinSignature, encodeDevinSignature, hasAnthropicSignature } from "../../backend/src/adapters/devin/reasoning-signature";
+import { encodeReasoningEnvelope } from "../../backend/src/responses/reasoning-envelope";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 
 // Shapes measured live on GetChatMessage: swe-2-high streams reasoning, then the
 // visible answer, then one frame carrying #10 delta_signature and #21

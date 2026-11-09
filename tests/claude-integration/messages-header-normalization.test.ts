@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { anthropicRateLimitHeaders } from "../../src/server/anthropic-rate-limit-headers";
+import { anthropicRateLimitHeaders } from "../../backend/src/server/anthropic-rate-limit-headers";
 const sentinel = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
 const table: [string, string, string][] = [];
 for (const family of ["requests", "tokens", "input-tokens", "output-tokens"]) {
@@ -71,8 +71,8 @@ test("unknown family members are omitted while raw observations remain unchanged
 });
 
 test("quota decisions keep raw fractions and reset precision separately from client display", async () => {
-  const { rawAnthropicHeaderWindows } = await import("../../src/providers/quota/anthropic-decision-windows");
-  const { parseAnthropicFamilyHeaders } = await import("../../src/providers/quota/anthropic-family-headers");
+  const { rawAnthropicHeaderWindows } = await import("../../backend/src/providers/quota/anthropic-decision-windows");
+  const { parseAnthropicFamilyHeaders } = await import("../../backend/src/providers/quota/anthropic-family-headers");
   const raw = new Headers({
     "anthropic-ratelimit-unified-5h-utilization": "0.620049", "anthropic-ratelimit-unified-5h-reset": "1790913600.123456",
     "anthropic-ratelimit-unified-7d_oi-utilization": "1.01", "anthropic-ratelimit-unified-7d_oi-reset": "1790913600.123456",

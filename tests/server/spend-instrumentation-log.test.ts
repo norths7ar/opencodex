@@ -19,10 +19,10 @@ import {
   takeNoAccountAffinityReason,
   type RequestLogContext,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import { requestLogDto } from "../../src/server/management/shared";
-import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { readUsageEntries, resetUsageReadCacheForTests } from "../../src/usage/log";
+} from "../../backend/src/server/request-log";
+import { requestLogDto } from "../../backend/src/server/management/shared";
+import { createRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { readUsageEntries, resetUsageReadCacheForTests } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function attempt(

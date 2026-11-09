@@ -7,11 +7,11 @@ import { repoPath } from "../helpers/repo-root";
 import { collectOverflowChild, finishOverflowScratch, overflowScratchBase, type OverflowChild } from "../helpers/messages-overflow-child";
 import { TEST_TEMP_OWNER_FILE } from "../../scripts/test-temp";
 import { trackOverflowAsyncSpawns } from "../helpers/messages-overflow-spawn-tracker";
-import { setWindowsOwnerAclAsyncRunnerForTests, verifyWindowsEntriesAclAsync } from "../../src/lib/windows-owner-acl";
+import { setWindowsOwnerAclAsyncRunnerForTests, verifyWindowsEntriesAclAsync } from "../../backend/src/lib/windows-owner-acl";
 
 const digest = (text: string | Uint8Array) => createHash("sha256").update(text).digest("hex");
 test("#8128 shared overflow predicate changes only in the documented 5xx and conditional cases", () => {
-  const source = readFileSync(repoPath("src/claude/outbound.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/claude/outbound.ts"), "utf8");
   const start = source.indexOf("const GENERIC_FAILURE_CODES");
   const end = source.indexOf("export function anthropicErrorBody", start);
   expect(start).toBeGreaterThan(0); expect(end).toBeGreaterThan(start);

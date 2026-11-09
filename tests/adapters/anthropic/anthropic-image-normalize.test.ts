@@ -11,17 +11,17 @@ import {
   normalizeImageTargets,
   type NormalizeTarget,
   type EncodeFn,
-} from "../../../src/adapters/anthropic-image-normalize";
+} from "../../../backend/src/adapters/anthropic-image-normalize";
 import {
   enforceAnthropicImageLimits,
   sniffImageDimensions,
   TOTAL_IMAGE_BASE64_BUDGET,
-} from "../../../src/adapters/anthropic-image-guard";
+} from "../../../backend/src/adapters/anthropic-image-guard";
 import {
   recordEmittedPosition,
   recordedEmittedPosition,
   TIER0_COUNT,
-} from "../../../src/adapters/anthropic-image-codec";
+} from "../../../backend/src/adapters/anthropic-image-codec";
 
 /** 1x1 red PNG — the smallest real, fully-decodable fixture. */
 const ONE_PX_PNG =
@@ -790,13 +790,13 @@ test("image codec seam preserves hook identity and owns normalization state", as
   const {
     resetNormalizeStateForTests: resetCodecState,
     getNormalizeStatsForTests: getCodecStats,
-  } = await import("../../../src/adapters/anthropic-image-codec");
+  } = await import("../../../backend/src/adapters/anthropic-image-codec");
   const { readFileSync } = await import("node:fs");
   const { repoPath } = await import("../../helpers/repo-root");
 
   expect(resetNormalizeStateForTests).toBe(resetCodecState);
   expect(getNormalizeStatsForTests).toBe(getCodecStats);
-  const source = readFileSync(repoPath("src/adapters/anthropic-image-normalize.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/adapters/anthropic-image-normalize.ts"), "utf8");
   expect(source).not.toMatch(/^(?:const|let|var)\b[^\n]*\bnew Map</m);
   expect(source).not.toMatch(/^let encodeCalls\b/m);
 });

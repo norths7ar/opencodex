@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { deepSeekImageFileBody, needsDeepSeekImageFiles } from "../../src/server/responses/deepseek-image-files";
-import type { AdapterRequest } from "../../src/adapters/base";
-import { providerRequestPacingStatus, resetProviderRequestPacingForTest, setProviderRequestPacingRuntimeForTest, waitForProviderRequestSlot } from "../../src/providers/request-pacing";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { handleResponses } from "../../src/server/responses/core";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { OcxConfig } from "../../src/types";
+import { deepSeekImageFileBody, needsDeepSeekImageFiles } from "../../backend/src/server/responses/deepseek-image-files";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
+import { providerRequestPacingStatus, resetProviderRequestPacingForTest, setProviderRequestPacingRuntimeForTest, waitForProviderRequestSlot } from "../../backend/src/providers/request-pacing";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const optIn = { allowedModels: ["deepseek-flash"] };

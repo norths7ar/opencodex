@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, spyOn, test } from "bun:test";
-import { CodexWarmupError, warmCodexAccount } from "../../src/codex/warmup";
+import { CodexWarmupError, warmCodexAccount } from "../../backend/src/codex/warmup";
 
 const originalFetch = globalThis.fetch;
 

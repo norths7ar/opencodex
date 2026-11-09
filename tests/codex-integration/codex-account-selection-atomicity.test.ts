@@ -5,26 +5,26 @@ import { join } from "node:path";
 import {
   armClaudeCodeBaseline, deleteConfigTopLevelKey, getConfigPath, getDefaultConfig,
   loadConfig, saveConfig, saveConfigPreservingClaudeCode,
-} from "../../src/config";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import * as atomicWrite from "../../src/config/atomic-write";
-import * as derivedRegistries from "../../src/config/derived-registries";
-import * as mutationLock from "../../src/config/mutation-lock";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import { materializeCodexUpstreamAuth, resolveCodexAuthContext } from "../../src/codex/auth-context";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
-import { clearAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { getCodexAccountCredential, readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearPoolRotationState } from "../../src/codex/pool-rotation";
-import { clearAccountQuota, getAccountQuota, updateAccountQuota } from "../../src/codex/quota";
+} from "../../backend/src/config";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import * as atomicWrite from "../../backend/src/config/atomic-write";
+import * as derivedRegistries from "../../backend/src/config/derived-registries";
+import * as mutationLock from "../../backend/src/config/mutation-lock";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import { materializeCodexUpstreamAuth, resolveCodexAuthContext } from "../../backend/src/codex/auth-context";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
+import { clearAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { getCodexAccountCredential, readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearPoolRotationState } from "../../backend/src/codex/pool-rotation";
+import { clearAccountQuota, getAccountQuota, updateAccountQuota } from "../../backend/src/codex/quota";
 import {
   clearCodexUpstreamHealth, clearThreadAccountMap, getEffectiveActiveCodexAccountId,
   resolveCodexAccountForThread,
-} from "../../src/codex/routing";
-import { rememberActiveCodexAccount } from "../../src/codex/routing/active-account";
-import { bindThreadAffinity, getThreadAffinity } from "../../src/codex/routing/thread-affinity";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import { rememberActiveCodexAccount } from "../../backend/src/codex/routing/active-account";
+import { bindThreadAffinity, getThreadAffinity } from "../../backend/src/codex/routing/thread-affinity";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // These are deliberately old, flat credential records. Account order and display aliases must

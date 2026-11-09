@@ -1,12 +1,12 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../src/config";
-import { readConfigFileSnapshot } from "../../src/config/diagnostics";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { flushConfigDirHardeningAndReaps } from "../../src/config/paths";
-import { sanitizeOpenCodeOverridesForLoad } from "../../src/config/opencode-wire-upgrade";
-import { OPENCODE_GO_LEGACY_NAME_PINS, OPENCODE_GO_MODEL_WIRES } from "../../src/types/opencode-go";
-import { pinnedWireAdapter } from "../../src/types/wire";
+import { getConfigPath, getDefaultConfig, loadConfig, validateConfigCandidate } from "../../backend/src/config";
+import { readConfigFileSnapshot } from "../../backend/src/config/diagnostics";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { flushConfigDirHardeningAndReaps } from "../../backend/src/config/paths";
+import { sanitizeOpenCodeOverridesForLoad } from "../../backend/src/config/opencode-wire-upgrade";
+import { OPENCODE_GO_LEGACY_NAME_PINS, OPENCODE_GO_MODEL_WIRES } from "../../backend/src/types/opencode-go";
+import { pinnedWireAdapter } from "../../backend/src/types/wire";
 import { createTempHome } from "../helpers/temp-home";
 
 const NEW_PINS = ["gemini-4-argon-contributor", "qwen3.7-plus", "qwen3.8-max", "qwen3.8-flash"];

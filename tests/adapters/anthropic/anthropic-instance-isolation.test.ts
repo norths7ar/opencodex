@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { createAnthropicInstanceFixture, INSTANCE_FIXTURE_INSTANCES, instanceFixtureUuid, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
-import type { GenerationContext, StateStoreRegistration } from "../../../src/lib/state-store-sweeper";
+import type { GenerationContext, StateStoreRegistration } from "../../../backend/src/lib/state-store-sweeper";
 
 let f: AnthropicInstanceFixture;
 beforeEach(async () => { f = await createAnthropicInstanceFixture(); await f.seed(); });
@@ -56,7 +56,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
       expect(own.getEligibleAnthropicAccounts(now, f.model)).toEqual([...f.ids]);
     });
     test("quota-aware candidate evidence is qualified and an unmarked B never receives builtin evidence", async () => {
-      const { quotaEvidenceForCandidate } = await import("../../../src/routing/quota");
+      const { quotaEvidenceForCandidate } = await import("../../../backend/src/routing/quota");
       f.quota.setCachedProviderAccountQuotaForTests(instance, f.ids[0], quota(25));
       f.quota.setCachedProviderAccountQuotaForTests(other, f.ids[0], quota(75));
       expect(quotaEvidenceForCandidate({ provider: instance, model: f.model, accountRef: f.ids[0] }, f.config).headroom).toBe(0.75);
@@ -79,7 +79,7 @@ for (const instance of INSTANCE_FIXTURE_INSTANCES) {
       await f.store.removeAccount(instance, f.ids[0]);
       const next = context(keys);
       expect(f.routing.reconcileAnthropicRoutingState(next, f.config)).toBeGreaterThan(0);
-      const recovery = await import("../../../src/providers/quota/anthropic-cooldown-recovery");
+      const recovery = await import("../../../backend/src/providers/quota/anthropic-cooldown-recovery");
       recovery.reconcileAllAnthropicCooldownGenerations(next);
       // Re-add the same logical ID and establish new refusal evidence; the old claim remains stale.
       await f.store.mutateStore(auth => { auth[instance]!.accounts.push(retired); });
@@ -139,7 +139,7 @@ test("namespace credential API accepts an authorized explicit in-memory config d
 });
 
 test("management account-ref dry-run attributes B quota using explicit config", async () => {
-  const { handleManagementAPI } = await import("../../../src/server/management-api");
+  const { handleManagementAPI } = await import("../../../backend/src/server/management-api");
   const { ManagementRequest } = await import("../../helpers/management-auth");
   f.quota.setCachedProviderAccountQuotaForTests("anthropic", f.ids[0], quota(80));
   f.quota.setCachedProviderAccountQuotaForTests("anthropic2", f.ids[0], quota(20));
@@ -157,7 +157,7 @@ test("management account-ref dry-run attributes B quota using explicit config", 
   expect(bound.candidates[1]!.quota?.headroom).toBeCloseTo(0.8);
   // Assembly runs before an exact account is bound; it must preserve unknown rather than guess the active account.
   expect((await preview(f.config, false)).candidates.map(candidate => candidate.quota)).toEqual([{ known: false }, { known: false }]);
-  const { requestHistoryDb } = await import("../../../src/routing/history/indexer");
+  const { requestHistoryDb } = await import("../../../backend/src/routing/history/indexer");
   const ownedHistory = requestHistoryDb();
   expect(ownedHistory.query("SELECT 1 AS live").get()).toEqual({ live: 1 });
   const unmarked = structuredClone(f.config);
@@ -171,7 +171,7 @@ test("management account-ref dry-run attributes B quota using explicit config", 
 });
 
 test("registered all-bucket hooks retire non-admitted B state while retaining live A", async () => {
-  const registrations = await import("../../../src/lib/state-store-registrations");
+  const registrations = await import("../../../backend/src/lib/state-store-registrations");
   const now = Date.now();
   for (const instance of INSTANCE_FIXTURE_INSTANCES) {
     const facade = f.routing.anthropicRoutingFor(instance);

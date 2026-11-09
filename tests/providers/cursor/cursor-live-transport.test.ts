@@ -4,15 +4,15 @@ import type { ChildProcessWithoutNullStreams } from "node:child_process";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
 import { BinaryWriter } from "@bufbuild/protobuf/wire";
 import { afterEach, describe, expect, test } from "bun:test";
-import { createLiveCursorTransport, CursorMissingCredentialError, parseConnectEndStreamError, resolveCursorToken } from "../../../src/adapters/cursor/live-transport";
-import { safeCursorErrorMessage } from "../../../src/adapters/cursor/cursor-errors";
-import { isRetryableCursorError } from "../../../src/adapters/cursor/transport-retry";
+import { createLiveCursorTransport, CursorMissingCredentialError, parseConnectEndStreamError, resolveCursorToken } from "../../../backend/src/adapters/cursor/live-transport";
+import { safeCursorErrorMessage } from "../../../backend/src/adapters/cursor/cursor-errors";
+import { isRetryableCursorError } from "../../../backend/src/adapters/cursor/transport-retry";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import { CURSOR_EXTERNAL_ROOT_BLOB_LIMIT, CURSOR_EXTERNAL_ROOT_BYTE_LIMIT, CURSOR_EXTERNAL_CURRENT_REQUEST_GUIDANCE, CURSOR_EXTERNAL_TOOL_CONTINUATION_TEXT, prepareCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { classifyError, inferHttpStatusFromAdapterMessage } from "../../../src/lib/errors";
-import { estimateTokens } from "../../../src/lib/token-estimate";
-import type { OcxMessage } from "../../../src/types";
-import type { CursorRunRequest } from "../../../src/adapters/cursor/types";
+import { CURSOR_EXTERNAL_ROOT_BLOB_LIMIT, CURSOR_EXTERNAL_ROOT_BYTE_LIMIT, CURSOR_EXTERNAL_CURRENT_REQUEST_GUIDANCE, CURSOR_EXTERNAL_TOOL_CONTINUATION_TEXT, prepareCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { classifyError, inferHttpStatusFromAdapterMessage } from "../../../backend/src/lib/errors";
+import { estimateTokens } from "../../../backend/src/lib/token-estimate";
+import type { OcxMessage } from "../../../backend/src/types";
+import type { CursorRunRequest } from "../../../backend/src/adapters/cursor/types";
 import {
   CursorBlobAdmissionError,
   cursorBlobByteLength,
@@ -21,14 +21,14 @@ import {
   resetCursorBlobStateForTests,
   setCursorBlobLimitsForTests,
   storeCursorBlob,
-} from "../../../src/adapters/cursor/native-exec";
+} from "../../../backend/src/adapters/cursor/native-exec";
 import {
   backgroundShellSpawnExec,
   resetBackgroundShellStateForTests,
   setBackgroundShellRuntimeForTests,
-} from "../../../src/adapters/cursor/native-exec-shell";
-import { AgentClientMessageSchema, BackgroundShellSpawnArgsSchema, ConversationStateStructureSchema, ExecServerMessageSchema, GetBlobArgsSchema, KvServerMessageSchema, type AgentRunRequest } from "../../../src/adapters/cursor/gen/agent_pb";
-import type { CursorProtobufEventState } from "../../../src/adapters/cursor/protobuf-events";
+} from "../../../backend/src/adapters/cursor/native-exec-shell";
+import { AgentClientMessageSchema, BackgroundShellSpawnArgsSchema, ConversationStateStructureSchema, ExecServerMessageSchema, GetBlobArgsSchema, KvServerMessageSchema, type AgentRunRequest } from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { CursorProtobufEventState } from "../../../backend/src/adapters/cursor/protobuf-events";
 
 describe("Cursor Fable policy gate details (#4508)", () => {
   const title = "Review Data Policy";

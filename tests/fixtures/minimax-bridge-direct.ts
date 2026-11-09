@@ -1,4 +1,4 @@
-import { startMmxTextBridge } from "../../src/cli/minimax";
+import { startMmxTextBridge } from "../../backend/src/cli/minimax";
 
 let upstreamBody = "";
 const upstream = Bun.serve({

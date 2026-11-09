@@ -5,14 +5,14 @@ import {
   ComputerUseArgsSchema,
   ExecServerMessageSchema,
   RecordScreenArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
 import {
   desktopDepsFromConfig,
   type DesktopExecutorConfig as DesktopExecutorConfigViaImplementation,
-} from "../../../src/adapters/cursor/native-exec-desktop";
-import type { DesktopExecutorConfig } from "../../../src/adapters/cursor/desktop-executor-contract";
-import { shellInvocation } from "../../../src/lib/win-exec";
+} from "../../../backend/src/adapters/cursor/native-exec-desktop";
+import type { DesktopExecutorConfig } from "../../../backend/src/adapters/cursor/desktop-executor-contract";
+import { shellInvocation } from "../../../backend/src/lib/win-exec";
 import { readFileSync } from "node:fs";
 import { repoPath } from "../../helpers/repo-root";
 
@@ -41,10 +41,10 @@ describe("Cursor desktop executor hooks", () => {
 
     // Graph guard: the contract is dependency-free and src/types/provider.ts points at it,
     // not at native-exec-desktop.ts (that edge closed a type cycle through tool-definitions).
-    const contract = readFileSync(repoPath("src", "adapters", "cursor", "desktop-executor-contract.ts"), "utf8");
+    const contract = readFileSync(repoPath("backend/src", "adapters", "cursor", "desktop-executor-contract.ts"), "utf8");
     expect(contract).not.toMatch(/^\s*import\s/m);
     expect(contract).toMatch(/^export interface DesktopExecutorConfig \{/m);
-    const provider = readFileSync(repoPath("src", "types", "provider.ts"), "utf8");
+    const provider = readFileSync(repoPath("backend/src", "types", "provider.ts"), "utf8");
     expect(provider).toContain('import("../adapters/cursor/desktop-executor-contract").DesktopExecutorConfig');
     expect(provider).not.toContain("native-exec-desktop");
   });

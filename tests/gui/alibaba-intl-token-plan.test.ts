@@ -3,15 +3,15 @@ import {
   baseUrlForChoice,
   matchChoiceId,
   resolvedBaseUrlForChoice,
-} from "../../gui/src/base-url-choice";
+} from "../../frontend/src/base-url-choice";
 import {
   ALIBABA_INTL_BASE_URL_CHOICES,
   ALIBABA_INTL_TOKEN_PLAN_BASE_URL,
   ALIBABA_INTL_PAYG_BASE_URL,
   matchBaseUrlChoice,
-} from "../../src/providers/base-url-choices";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { deriveProviderPresets, enrichProviderFromRegistry, providerConfigSeed } from "../../src/providers/derive";
+} from "../../backend/src/providers/base-url-choices";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { deriveProviderPresets, enrichProviderFromRegistry, providerConfigSeed } from "../../backend/src/providers/derive";
 
 const CHOICES = [...ALIBABA_INTL_BASE_URL_CHOICES];
 

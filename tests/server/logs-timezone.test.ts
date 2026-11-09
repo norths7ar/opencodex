@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const config = { providers: [] } as unknown as OcxConfig;
 

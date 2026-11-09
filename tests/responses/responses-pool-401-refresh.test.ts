@@ -3,26 +3,26 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { clearAccountNeedsReauth, clearAccountQuota, isAccountNeedsReauth, updateAccountQuota } from "../../src/codex/auth-api";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import * as authContextModule from "../../src/codex/auth-context";
-import * as coreAuthModule from "../../src/server/responses/core-auth";
-import * as proxyEnvModule from "../../src/lib/proxy-env";
-import { prepareResponsesRequest } from "../../src/server/responses/request-prepare";
-import type { ResponsesAdmissionState } from "../../src/server/responses/core-options";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { createBoundedSameTargetRecovery, createRequestExecutionBudget, deriveRequestExecutionBudget } from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { admitWorkflowTurn, DEFAULT_WORKFLOW_BUDGET_POLICY, resetWorkflowBudgetsForTest, workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
-import { bindWorkflowBudgetConfig } from "../../src/lib/workflow-budget-config";
+import { clearAccountNeedsReauth, clearAccountQuota, isAccountNeedsReauth, updateAccountQuota } from "../../backend/src/codex/auth-api";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import * as authContextModule from "../../backend/src/codex/auth-context";
+import * as coreAuthModule from "../../backend/src/server/responses/core-auth";
+import * as proxyEnvModule from "../../backend/src/lib/proxy-env";
+import { prepareResponsesRequest } from "../../backend/src/server/responses/request-prepare";
+import type { ResponsesAdmissionState } from "../../backend/src/server/responses/core-options";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { createBoundedSameTargetRecovery, createRequestExecutionBudget, deriveRequestExecutionBudget } from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY, type SpendJournal } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { admitWorkflowTurn, DEFAULT_WORKFLOW_BUDGET_POLICY, resetWorkflowBudgetsForTest, workflowBudgetSnapshot } from "../../backend/src/lib/workflow-budget";
+import { bindWorkflowBudgetConfig } from "../../backend/src/lib/workflow-budget-config";
 import {
   canAcquireTransientProbe,
   clearPoolRecoveryState,
   transientProbeDiagnostics,
   TRANSIENT_PROBE_INTERVAL_MS,
-} from "../../src/routing/probe-lease";
-import { setAccountQuotaFromParsed } from "../../src/codex/quota";
+} from "../../backend/src/routing/probe-lease";
+import { setAccountQuotaFromParsed } from "../../backend/src/codex/quota";
 import {
   clearCodexUpstreamHealth,
   clearThreadAccountMap,
@@ -32,28 +32,28 @@ import {
   releaseCodexQuotaScopeProbeLease,
   resolveCodexAccountForThreadDetailed,
   tryAcquireCodexQuotaScopeProbeLease,
-} from "../../src/codex/routing";
-import { scopedHealthFor } from "../../src/codex/routing/health-store";
-import { handleResponses, handleResponsesCompact } from "../../src/server/responses";
-import { clearCompactHandoffRoutesForTests } from "../../src/server/responses/compact";
+} from "../../backend/src/codex/routing";
+import { scopedHealthFor } from "../../backend/src/codex/routing/health-store";
+import { handleResponses, handleResponsesCompact } from "../../backend/src/server/responses";
+import { clearCompactHandoffRoutesForTests } from "../../backend/src/server/responses/compact";
 import {
   REQUEST_PACING_MAX_QUEUE_DEPTH,
   resetProviderRequestPacingForTest,
   setProviderRequestPacingLimitsForTest,
   providerRequestPacingStatus,
   waitForProviderRequestSlot,
-} from "../../src/providers/request-pacing";
+} from "../../backend/src/providers/request-pacing";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
   expandPreviousResponseInput,
   responseContinuationRetainedStoreSnapshot,
   runPendingResponseStatePersistForTests,
-} from "../../src/responses/state";
-import { resetAgentTaskRecoveryState } from "../../src/server/responses/agent-task-recovery";
-import { agentTaskRecoveryCacheSnapshotForTests } from "../../src/server/responses/agent-task-recovery-cache";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/state";
+import { resetAgentTaskRecoveryState } from "../../backend/src/server/responses/agent-task-recovery";
+import { agentTaskRecoveryCacheSnapshotForTests } from "../../backend/src/server/responses/agent-task-recovery-cache";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   FERNET_TASK,
   codexHeaders,
@@ -1090,7 +1090,7 @@ describe("ordinary pool 401 refresh and replay (#2887)", () => {
     // Two requests can be in flight while an operator re-authenticates. The slower one comes
     // back 401 against a credential that no longer exists; without the generation fence it
     // takes the fresh credential out of rotation and sweeps affinities that belong to it.
-    const { recordCodexUpstreamOutcome } = await import("../../src/codex/routing");
+    const { recordCodexUpstreamOutcome } = await import("../../backend/src/codex/routing");
 
     // generation 3 is what the stored fixture was written at; 4 is the replacement.
     writeStoredAccount({
@@ -1117,7 +1117,7 @@ describe("ordinary pool 401 refresh and replay (#2887)", () => {
     // spent. The interesting case — a replacement landing WHILE the forced refresh runs — is
     // covered at the store level, where the handoff's `selfRefreshed` gate is observable
     // without racing the endpoint.
-    const { saveCodexAccountCredential } = await import("../../src/codex/account-store");
+    const { saveCodexAccountCredential } = await import("../../backend/src/codex/account-store");
     const harness = installHarness({
       refresh: () => {
         throw new Error("the token endpoint must not be reached in this scenario");

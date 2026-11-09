@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import {
   decryptNativeEnvelope,
   MAX_NATIVE_PROFILE_JOURNAL_BYTES,
@@ -12,9 +12,9 @@ import {
   probeNativeProfileRecoveryState,
   readNativeProfileVault,
   type NativeEnvelopeSnapshot,
-} from "../../src/codex/native-profile-store";
-import { NativeProfileError, type NativeProfileKey, type NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
-import { codexCredentialMutationEpoch } from "../../src/codex/credential-mutation-epoch";
+} from "../../backend/src/codex/native-profile-store";
+import { NativeProfileError, type NativeProfileKey, type NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
+import { codexCredentialMutationEpoch } from "../../backend/src/codex/credential-mutation-epoch";
 import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmModuleGraph } from "../helpers/cold-spawn-warmup";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath, repoRoot } from "../helpers/repo-root";

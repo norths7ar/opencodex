@@ -21,23 +21,23 @@ import {
   WEB_SEARCH_BRIDGE_ERROR_CODE,
   WEB_SEARCH_BRIDGE_MIXED_TOOLS_ERROR_CODE,
   type PassthroughWebSearchBridgePlan,
-} from "../../src/web-search/passthrough-bridge";
-import { providerWebSearchBridgeConfigError, validateConfigCandidate } from "../../src/config";
-import { mapOllamaSearchResponse } from "../../src/web-search/ollama-executor";
-import { UNDECLARED_TOOL_CALL_ERROR_CODE } from "../../src/server/responses-undeclared-tool-guard";
-import { handleResponses } from "../../src/server/responses";
-import { resolveContextPrincipal } from "../../src/server/auth-cors";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../src/providers/registry";
-import type { ResponsesTerminalRepairScheduler } from "../../src/server/responses-terminal-repair";
-import { bridgeSearchReplayScope, clearBridgeSearchReplayCacheForTests, peekBridgeSearchReplay } from "../../src/responses/bridge-search-replay-cache";
-import { reasoningReplayDestinationIdentity, reasoningReplayKeyCredentialIdentity } from "../../src/responses/reasoning-replay-cache";
+} from "../../backend/src/web-search/passthrough-bridge";
+import { providerWebSearchBridgeConfigError, validateConfigCandidate } from "../../backend/src/config";
+import { mapOllamaSearchResponse } from "../../backend/src/web-search/ollama-executor";
+import { UNDECLARED_TOOL_CALL_ERROR_CODE } from "../../backend/src/server/responses-undeclared-tool-guard";
+import { handleResponses } from "../../backend/src/server/responses";
+import { resolveContextPrincipal } from "../../backend/src/server/auth-cors";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../backend/src/providers/registry";
+import type { ResponsesTerminalRepairScheduler } from "../../backend/src/server/responses-terminal-repair";
+import { bridgeSearchReplayScope, clearBridgeSearchReplayCacheForTests, peekBridgeSearchReplay } from "../../backend/src/responses/bridge-search-replay-cache";
+import { reasoningReplayDestinationIdentity, reasoningReplayKeyCredentialIdentity } from "../../backend/src/responses/reasoning-replay-cache";
 import {
   resetProviderRequestPacingForTest,
   setProviderRequestPacingRuntimeForTest,
   waitForProviderRequestSlot,
-} from "../../src/providers/request-pacing";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig, ProviderWebSearchBridgeBackend, ProviderWebSearchBridgeConfig } from "../../src/types";
+} from "../../backend/src/providers/request-pacing";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig, ProviderWebSearchBridgeBackend, ProviderWebSearchBridgeConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 /** One SSE event block without its blank-line delimiter. */

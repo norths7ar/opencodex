@@ -2,24 +2,24 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { flushConfigDirHardening } from "../../src/config/paths";
-import { getCodexAccountCredential, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
-import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import type { CodexAuthAccountDto } from "../../src/codex/auth-api/account-list";
-import { withNativeMainCredentialClaim } from "../../src/codex/auth-api/http";
-import { handleCodexAuthAPI } from "../../src/codex/auth-api/routes";
-import * as codexHome from "../../src/codex/home";
+import { flushConfigDirHardening } from "../../backend/src/config/paths";
+import { getCodexAccountCredential, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
+import { clearAccountNeedsReauth, isAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import type { CodexAuthAccountDto } from "../../backend/src/codex/auth-api/account-list";
+import { withNativeMainCredentialClaim } from "../../backend/src/codex/auth-api/http";
+import { handleCodexAuthAPI } from "../../backend/src/codex/auth-api/routes";
+import * as codexHome from "../../backend/src/codex/home";
 import {
   captureMainAccountIdentityGeneration, clearMainAccountInfoCache,
   getMainAccountCredentialPresence, getMainAccountInfoCache,
-} from "../../src/codex/main-account-cache";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { getCodexHome } from "../../src/codex/paths";
-import { clearAccountQuota } from "../../src/codex/quota";
-import { resetQuotaQueryBackoffForTests } from "../../src/codex/quota-query-backoff";
-import { resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/main-account-cache";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { getCodexHome } from "../../backend/src/codex/paths";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
+import { resetQuotaQueryBackoffForTests } from "../../backend/src/codex/quota-query-backoff";
+import { resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

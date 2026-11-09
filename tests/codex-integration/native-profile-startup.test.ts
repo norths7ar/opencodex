@@ -9,11 +9,11 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { saveConfig } from "../../src/config";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { handleNativeProfileAPI } from "../../src/codex/native-profile-api";
+import { saveConfig } from "../../backend/src/config";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { handleNativeProfileAPI } from "../../backend/src/codex/native-profile-api";
 import {
   encryptNativeEnvelope,
   probeNativeProfileRecoveryState,
@@ -21,13 +21,13 @@ import {
   readNativeProfileVault,
   inspectNativeProfileJournal,
   serializeNativeProfileJournal,
-} from "../../src/codex/native-profile-store";
+} from "../../backend/src/codex/native-profile-store";
 import type {
   NativeProfileKey,
   NativeProfileKeyProvider,
   NativeProfileSwitchJournalV1,
-} from "../../src/codex/native-profile-types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/native-profile-types";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   bindNativeMainStartupLifecycle,
   blockNativeMainStartupForUnownedServiceHome,
@@ -40,18 +40,18 @@ import {
   type NativeMainStartupLifecycle,
   waitForNativeMainStartupGate,
   __resetNativeMainOwnershipRetries,
-} from "../../src/codex/native-profile-startup";
-import type { NativeCodexOwnership } from "../../src/integrations/native/ownership-preflight";
+} from "../../backend/src/codex/native-profile-startup";
+import type { NativeCodexOwnership } from "../../backend/src/integrations/native/ownership-preflight";
 import {
   tryAcquireNativeMainProfileClaim,
   tryClaimNativeMainProfileForTurn,
-} from "../../src/codex/native-main-admission";
+} from "../../backend/src/codex/native-main-admission";
 import {
   getNativeMainProfileRequestCount,
   resetLifecycleDrainStateForTests,
   tryAdmitTurn,
-} from "../../src/server/lifecycle";
-import { startServer } from "../../src/server";
+} from "../../backend/src/server/lifecycle";
+import { startServer } from "../../backend/src/server";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { helperPath, repoRoot } from "../helpers/repo-root";
 import { COLD_SPAWN_BUDGET_MS, INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";

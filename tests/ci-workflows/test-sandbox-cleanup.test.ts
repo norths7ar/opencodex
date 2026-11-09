@@ -12,8 +12,8 @@ import {
   setPlatformForTests,
   windowsSecretAclReapPendingAtOrBelow,
   type IcaclsResult,
-} from "../../src/lib/windows-secret-acl";
-import { setSyntheticWindowsPrincipalForTests } from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setSyntheticWindowsPrincipalForTests } from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createTestCaseLifecycle, createTestSandboxCleanup } from "../helpers/test-sandbox-cleanup";
 

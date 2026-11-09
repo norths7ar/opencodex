@@ -5,17 +5,17 @@ import {
   createAnthropicInstanceFixture, INSTANCE_FIXTURE_INSTANCES, anthropicInstanceBarrier,
   type AnthropicInstanceFixture,
 } from "../../helpers/anthropic-instance-fixture";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
-import type { GenerationContext } from "../../../src/lib/state-store-sweeper";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
+import type { GenerationContext } from "../../../backend/src/lib/state-store-sweeper";
 
 let f: AnthropicInstanceFixture;
-let cache: typeof import("../../../src/providers/quota/account-cache");
-let recovery: typeof import("../../../src/providers/quota/anthropic-cooldown-recovery");
-let refusal: typeof import("../../../src/oauth/anthropic-account-refusal");
-let familyHeaders: typeof import("../../../src/providers/quota/anthropic-family-headers");
-let sweeper: typeof import("../../../src/lib/state-store-sweeper");
-let retry: typeof import("../../../src/lib/upstream-retry");
-let sendOwnership: typeof import("../../../src/oauth/anthropic-send-ownership");
+let cache: typeof import("../../../backend/src/providers/quota/account-cache");
+let recovery: typeof import("../../../backend/src/providers/quota/anthropic-cooldown-recovery");
+let refusal: typeof import("../../../backend/src/oauth/anthropic-account-refusal");
+let familyHeaders: typeof import("../../../backend/src/providers/quota/anthropic-family-headers");
+let sweeper: typeof import("../../../backend/src/lib/state-store-sweeper");
+let retry: typeof import("../../../backend/src/lib/upstream-retry");
+let sendOwnership: typeof import("../../../backend/src/oauth/anthropic-send-ownership");
 let reconciliationGeneration = 0;
 
 type PendingOutcome<T> = { kind: "value"; value: T } | { kind: "error"; error: unknown };
@@ -42,13 +42,13 @@ beforeEach(async () => {
   // The shared fixture creates every configured root before importing runtime owners.
   f = await createAnthropicInstanceFixture();
   [cache, recovery, refusal, familyHeaders, sweeper, retry, sendOwnership] = await Promise.all([
-    import("../../../src/providers/quota/account-cache"),
-    import("../../../src/providers/quota/anthropic-cooldown-recovery"),
-    import("../../../src/oauth/anthropic-account-refusal"),
-    import("../../../src/providers/quota/anthropic-family-headers"),
-    import("../../../src/lib/state-store-sweeper"),
-    import("../../../src/lib/upstream-retry"),
-    import("../../../src/oauth/anthropic-send-ownership"),
+    import("../../../backend/src/providers/quota/account-cache"),
+    import("../../../backend/src/providers/quota/anthropic-cooldown-recovery"),
+    import("../../../backend/src/oauth/anthropic-account-refusal"),
+    import("../../../backend/src/providers/quota/anthropic-family-headers"),
+    import("../../../backend/src/lib/state-store-sweeper"),
+    import("../../../backend/src/lib/upstream-retry"),
+    import("../../../backend/src/oauth/anthropic-send-ownership"),
   ]);
   cache.clearAccountQuotaCache();
   cache.resetProviderQuotaReconcileStateForTests();

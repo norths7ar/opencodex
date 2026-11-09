@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatWebSearchResult, formatWebSearchResults } from "../../src/web-search/format-result";
+import { formatWebSearchResult, formatWebSearchResults } from "../../backend/src/web-search/format-result";
 
 describe("formatWebSearchResult hardening", () => {
   test("long query strings are clamped to 200 chars", () => {

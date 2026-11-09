@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { saveCredential } from "../../src/oauth/store";
-import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum } from "../../src/oauth/anthropic-routing";
-import { clearKeyCooldowns } from "../../src/providers/key-failover";
-import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
-import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import type { OcxConfig } from "../../src/types";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum } from "../../backend/src/oauth/anthropic-routing";
+import { clearKeyCooldowns } from "../../backend/src/providers/key-failover";
+import { resetProviderRequestPacingForTest } from "../../backend/src/providers/request-pacing";
+import { closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome } from "../helpers/temp-home";
 

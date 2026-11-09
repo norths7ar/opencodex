@@ -5,8 +5,8 @@ import {
   noteAttemptSend,
   type RequestLogContext,
   type RequestLogEntry,
-} from "../../src/server/request-log";
-import { createNativeFinalLog, NATIVE_FINAL_LOG_CUTOFF_CODE } from "../../src/server/native-final-log";
+} from "../../backend/src/server/request-log";
+import { createNativeFinalLog, NATIVE_FINAL_LOG_CUTOFF_CODE } from "../../backend/src/server/native-final-log";
 
 function context(): RequestLogContext {
   const attempt = beginRequestAttempt(1, "fixture", "model", "openai-chat");

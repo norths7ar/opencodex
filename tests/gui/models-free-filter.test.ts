@@ -5,7 +5,7 @@ import {
   freeOnlyInForce,
   modelPricingKnown,
   type ModelRow,
-} from "../../gui/src/pages/models-shared";
+} from "../../frontend/src/pages/models-shared";
 import { repoPath } from "../helpers/repo-root";
 
 /**
@@ -70,9 +70,9 @@ describe("Dashboard free-only model filter (#3666)", () => {
  * any value either component returns.
  */
 describe("free-only runs before the page slice (#3666)", () => {
-  const modelsPage = readFileSync(repoPath("gui", "src", "pages", "Models.tsx"), "utf8");
+  const modelsPage = readFileSync(repoPath("frontend", "src", "pages", "Models.tsx"), "utf8");
   const inventory = readFileSync(
-    repoPath("gui", "src", "components", "provider-workspace", "ProviderModels.tsx"),
+    repoPath("frontend", "src", "components", "provider-workspace", "ProviderModels.tsx"),
     "utf8",
   );
 

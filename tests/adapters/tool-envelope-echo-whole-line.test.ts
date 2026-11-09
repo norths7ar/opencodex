@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { ToolEnvelopeEchoFilter, stripToolEnvelopeEcho } from "../../src/lib/tool-envelope-echo-filter";
-import { stripGrokUpstreamEnvelopeEchoFromResponsesJson } from "../../src/server/grok-upstream-envelope-echo";
-import { stripAssistantEchoedToolEnvelope } from "../../src/adapters/cursor/envelope-echo";
+import { ToolEnvelopeEchoFilter, stripToolEnvelopeEcho } from "../../backend/src/lib/tool-envelope-echo-filter";
+import { stripGrokUpstreamEnvelopeEchoFromResponsesJson } from "../../backend/src/server/grok-upstream-envelope-echo";
+import { stripAssistantEchoedToolEnvelope } from "../../backend/src/adapters/cursor/envelope-echo";
 
 // The replayed envelope is a marker alone on its line. An answer line that only STARTS with a
 // marker is prose and must reach the client whole, on the live filter (streamed and buffered),

@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
-import { ownerRegistryDir, readOwnerRegistry, registerOwnerRegistryHome } from "../../src/config/owner-registry";
-import { setWindowsHardeningForTests } from "../../src/config/atomic-write";
-import { resetHardenedStateForTests, setIcaclsRunnerForTests, setPlatformForTests, type IcaclsResult } from "../../src/lib/windows-secret-acl";
-import { setWindowsPrincipalRunnerForTests } from "../../src/lib/windows-user-principal";
+import { ownerRegistryDir, readOwnerRegistry, registerOwnerRegistryHome } from "../../backend/src/config/owner-registry";
+import { setWindowsHardeningForTests } from "../../backend/src/config/atomic-write";
+import { resetHardenedStateForTests, setIcaclsRunnerForTests, setPlatformForTests, type IcaclsResult } from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsPrincipalRunnerForTests } from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const previousEnv = {

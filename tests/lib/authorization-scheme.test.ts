@@ -7,8 +7,8 @@ import {
   carryAgentAssertionForCallerBearer,
   hasAgentAssertionAuthorization,
   parseAuthorizationScheme,
-} from "../../src/lib/authorization-scheme";
-import { redactHeaders, redactSecretString, REDACTED_SECRET } from "../../src/lib/redact";
+} from "../../backend/src/lib/authorization-scheme";
+import { redactHeaders, redactSecretString, REDACTED_SECRET } from "../../backend/src/lib/redact";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 
 // Codex 0.164 runtime agent assertions are JWT-shaped; the bytes only have to be recognisable.

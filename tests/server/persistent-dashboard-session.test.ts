@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { initializeManagementAuthState, createManagementSessionControl, issueGuiSession, requireManagementAuth } from "../../src/server/management-auth";
-import { handleSessionRoutes } from "../../src/server/management/session-routes";
-import type { ManagementContext } from "../../src/server/management/context";
+import { initializeManagementAuthState, createManagementSessionControl, issueGuiSession, requireManagementAuth } from "../../backend/src/server/management-auth";
+import { handleSessionRoutes } from "../../backend/src/server/management/session-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
 import { remoteConfig } from "../helpers/management-auth-fixture";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

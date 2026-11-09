@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
-import { configSchema } from "../../src/config/schema/config-schema";
-import { compactionRecoverySchema } from "../../src/config/schema/compaction-recovery";
-import { handleConfigRoutes } from "../../src/server/management/config-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+import { getDefaultConfig, validateConfigCandidate } from "../../backend/src/config";
+import { configSchema } from "../../backend/src/config/schema/config-schema";
+import { compactionRecoverySchema } from "../../backend/src/config/schema/compaction-recovery";
+import { handleConfigRoutes } from "../../backend/src/server/management/config-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 
 const enabled = { enabled: true, model: "emergency/model", allowDevinInvalidArgument: true };
 function harness(failSave = false) {

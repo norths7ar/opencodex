@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, wri
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { getCodexLogGuardProtectionStatus } from "../../src/codex/log-guard/protection";
+import { getCodexLogGuardProtectionStatus } from "../../backend/src/codex/log-guard/protection";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

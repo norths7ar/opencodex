@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { getMainAccountPlan, setMainAccountPlan } from "../../src/codex/main-account";
-import { extractChatgptPlanType } from "../../src/codex/plan";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { getMainAccountPlan, setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { extractChatgptPlanType } from "../../backend/src/codex/plan";
 import {
   reconcileCodexPlansFromTokens,
   resetJwtPlanNotesForTests,
-} from "../../src/codex/plan-from-token";
-import { loadConfig, saveConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/plan-from-token";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const TEST_DIR = join(import.meta.dir, ".tmp-codex-plan-test");
@@ -202,7 +202,7 @@ describe("WHAM-wins plan provenance gate (release-audit fix)", () => {
 
 describe("rotated-JWT plan reconciliation across propagated aliases (#2892 gap 3)", () => {
   test("a plan-changing rotated JWT reconciles the alias, not just the refresh owner", async () => {
-    const { getValidCodexToken, readCodexAccountRecord } = await import("../../src/codex/account-store");
+    const { getValidCodexToken, readCodexAccountRecord } = await import("../../backend/src/codex/account-store");
     const oldJwt = chatgptPlanJwt("plus");
     const shared = { refreshToken: "plan-grant", expiresAt: 0, chatgptAccountId: "acct" };
     saveCodexAccountCredential("plan-owner", { accessToken: oldJwt, ...shared });

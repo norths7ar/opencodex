@@ -1,5 +1,5 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { handleAliasCommand } from "../../src/cli/alias";
+import { handleAliasCommand } from "../../backend/src/cli/alias";
 
 describe("alias list JSON flags", () => {
   test.each([["--json"], ["list", "--json"], ["--json", "list"]].map(args => [args]))("lists aliases for %j", async args => {

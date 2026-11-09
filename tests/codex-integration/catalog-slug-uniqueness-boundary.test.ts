@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { enforceCatalogSlugUniqueness } from "../../src/codex/catalog/aggregation";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
+import { enforceCatalogSlugUniqueness } from "../../backend/src/codex/catalog/aggregation";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
 import { repoPath } from "../helpers/repo-root";
 
 /**
@@ -64,8 +64,8 @@ describe("catalog slug uniqueness at the write boundary (#4730)", () => {
     // Source oracle rather than a second real-sync spawn: the management convergence commit needs
     // an admission snapshot, a gather session, and a write permit to reach its serialization, and
     // a test that stubbed all three would assert the stub rather than the boundary.
-    const retained = readFileSync(repoPath("src", "codex", "catalog", "retained-sync.ts"), "utf8");
-    const convergence = readFileSync(repoPath("src", "codex", "convergence.ts"), "utf8");
+    const retained = readFileSync(repoPath("backend/src", "codex", "catalog", "retained-sync.ts"), "utf8");
+    const convergence = readFileSync(repoPath("backend/src", "codex", "convergence.ts"), "utf8");
     // Both writers must call the guard; a miss here is the #4730 rejection returning by the
     // other route rather than a style violation.
     expect(retained).toContain("enforceCatalogSlugUniqueness(");

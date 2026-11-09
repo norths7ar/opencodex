@@ -15,21 +15,21 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { watchdogMs } from "../helpers/ci-watchdog";
 
-import { saveConfig } from "../../src/config";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
+import { saveConfig } from "../../backend/src/config";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
 import {
   NATIVE_MAIN_OWNER_DB,
   nativeMainOwnerFilesystemSupported,
   retainNativeMainOwner,
   withNativeMainOwnerOperation,
-} from "../../src/codex/native-main-owner";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
-import { probeNativeProfileRecoveryState } from "../../src/codex/native-profile-store";
-import type { NativeProfileKey, NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/native-main-owner";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
+import { probeNativeProfileRecoveryState } from "../../backend/src/codex/native-profile-store";
+import type { NativeProfileKey, NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
+import type { OcxConfig } from "../../backend/src/types";
 import { helperPath, repoRoot } from "../helpers/repo-root";
-import { assertStableLockFile, openStableLockFile } from "../../src/codex/native-main-lock-file";
+import { assertStableLockFile, openStableLockFile } from "../../backend/src/codex/native-main-lock-file";
 
 test("stable lock rejects adjacent large file identities", () => {
   const scratch = join(repoRoot(), ".tmp", "ino-audit");

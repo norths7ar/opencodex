@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { cheapestSufficientCandidate, classifyRoleModelCandidates, type RoleModelCandidate } from "../../src/codex/role-auto-assign";
+import { cheapestSufficientCandidate, classifyRoleModelCandidates, type RoleModelCandidate } from "../../backend/src/codex/role-auto-assign";
 
 const candidate = (model: string, unitPrice: number | null): RoleModelCandidate => ({ model, unitPrice, efforts: [] });
 

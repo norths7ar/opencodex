@@ -7,10 +7,10 @@ import {
   resetCodexQuotaAutoRefreshForTests,
   runCodexQuotaAutoRefresh,
   type CodexQuotaAutoRefreshWindows,
-} from "../../src/codex/quota-auto-refresh";
-import { clearAccountQuota, type StoredAccountQuota } from "../../src/codex/quota";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/quota-auto-refresh";
+import { clearAccountQuota, type StoredAccountQuota } from "../../backend/src/codex/quota";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Retry evidence belongs to the credential it was observed under (#6020 review). A replaced or

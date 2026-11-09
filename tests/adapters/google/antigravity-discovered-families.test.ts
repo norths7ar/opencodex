@@ -3,11 +3,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { parseAntigravityAvailableModels, registerAntigravityDiscoveredWireModels, resolveAntigravityEffortWireModel } from "../../../src/providers/antigravity-models";
-import { captureModelCacheGeneration, clearModelCache } from "../../../src/codex/model-cache";
-import { createGoogleAdapter } from "../../../src/adapters/google";
+import { parseAntigravityAvailableModels, registerAntigravityDiscoveredWireModels, resolveAntigravityEffortWireModel } from "../../../backend/src/providers/antigravity-models";
+import { captureModelCacheGeneration, clearModelCache } from "../../../backend/src/codex/model-cache";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { OcxParsedRequest } from "../../../src/types";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 const originalHome = process.env.OPENCODEX_HOME;
 let testHome: string;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { normalizeCursorToolResultText } from "../../../src/adapters/cursor/tool-result-normalize";
+import { normalizeCursorToolResultText } from "../../../backend/src/adapters/cursor/tool-result-normalize";
 
 describe("codex exec bridge empty-result normalization (devlog 260826 gap-7)", () => {
   test("empty exec cell output becomes explanatory text, not an error", () => {

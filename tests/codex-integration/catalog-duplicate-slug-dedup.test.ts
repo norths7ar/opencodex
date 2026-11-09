@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { dedupeCatalogEntriesBySlug } from "../../src/codex/catalog/retained-sync";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
+import { dedupeCatalogEntriesBySlug } from "../../backend/src/codex/catalog/retained-sync";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
 
 /**
  * #4730: one sync on 2.56.0 wrote 507 catalog rows for 72 unique slugs — the aliased

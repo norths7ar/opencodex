@@ -7,8 +7,8 @@ import {
   EXPORT_CLIENTS,
   dshConfigPath,
   dshHomeDir,
-} from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
+} from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
 
 const HOME = join(tmpdir(), "ocx-dsh-path-home");
 

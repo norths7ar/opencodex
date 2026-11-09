@@ -15,8 +15,8 @@ import {
   pollMuseDeviceToken,
   requestMuseDeviceAuthorization,
   type MuseDeviceDeps,
-} from "../../src/oauth/meta-muse-device";
-import { getCredential, saveCredential } from "../../src/oauth/store";
+} from "../../backend/src/oauth/meta-muse-device";
+import { getCredential, saveCredential } from "../../backend/src/oauth/store";
 
 const DEVICE_AUTH = "https://auth.meta.com/oidc/device/authorization/";
 const DEVICE_TOKEN = "https://auth.meta.com/oidc/device/token/";

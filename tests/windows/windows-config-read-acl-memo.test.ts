@@ -2,11 +2,11 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, readFileSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig } from "../../src/config";
-import { hardenExistingSecret } from "../../src/config/load-degrade";
-import { flushConfigDirHardeningForTests, hardenConfigDir } from "../../src/config/paths";
-import * as acl from "../../src/lib/windows-secret-acl";
-import * as principal from "../../src/lib/windows-user-principal";
+import { loadConfig } from "../../backend/src/config";
+import { hardenExistingSecret } from "../../backend/src/config/load-degrade";
+import { flushConfigDirHardeningForTests, hardenConfigDir } from "../../backend/src/config/paths";
+import * as acl from "../../backend/src/lib/windows-secret-acl";
+import * as principal from "../../backend/src/lib/windows-user-principal";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalPlatform = process.platform;

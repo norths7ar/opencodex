@@ -22,9 +22,9 @@ import { Database } from "bun:sqlite";
 import {
   HISTORY_PAGINATED_OPENAI_NEEDS_ROOT_OVERRIDE,
   HISTORY_RELABEL_STANDS_DOWN,
-} from "../../src/codex/history-provider";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
-import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-target";
+} from "../../backend/src/codex/history-provider";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
+import { standaloneCodexRoutingTarget } from "../../backend/src/codex/inject/routing-target";
 import { validHistoryBackupFixture } from "../helpers/codex-history-manifest-fixtures";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";

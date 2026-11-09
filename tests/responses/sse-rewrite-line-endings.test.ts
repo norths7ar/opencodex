@@ -1,15 +1,15 @@
 import { describe, expect, spyOn, test } from "bun:test";
 import { Buffer } from "node:buffer";
 import type { ServerWebSocket } from "bun";
-import { createSseInspector, createSseTerminalOutputBoundary } from "../../src/server/relay";
-import { createRoutedCustomToolRestoreBlockRewrite } from "../../src/server/responses-custom-tool-repair";
-import { createGithubCopilotResponsesBlockRewrite } from "../../src/server/github-copilot-responses-repair";
-import { createGrokResponsesSparseTerminalBlockRewrite, GROK_REFUSED_TERMINAL_EVENT_TYPE } from "../../src/server/grok-responses-snapshot-repair";
-import { createGrokResponsesControlFrameBlockRewrite } from "../../src/server/grok-responses-control-frame";
-import { pumpResponsesSseToWebSocket, type WsData } from "../../src/server/ws-bridge";
-import { decodeServerSentEvents } from "../../src/lib/sse-decoder";
-import { BoundedSseFrameBuffer, joinSseFrameBytes, SseFrameTooLargeError } from "../../src/server/sse-frame-buffer";
-import { createSseBlockBuffer, nextSseBlock, relaySseWithBlockRewrite, replaceSseDataPayload, sseDataPayload } from "../../src/server/sse-payload-rewrite";
+import { createSseInspector, createSseTerminalOutputBoundary } from "../../backend/src/server/relay";
+import { createRoutedCustomToolRestoreBlockRewrite } from "../../backend/src/server/responses-custom-tool-repair";
+import { createGithubCopilotResponsesBlockRewrite } from "../../backend/src/server/github-copilot-responses-repair";
+import { createGrokResponsesSparseTerminalBlockRewrite, GROK_REFUSED_TERMINAL_EVENT_TYPE } from "../../backend/src/server/grok-responses-snapshot-repair";
+import { createGrokResponsesControlFrameBlockRewrite } from "../../backend/src/server/grok-responses-control-frame";
+import { pumpResponsesSseToWebSocket, type WsData } from "../../backend/src/server/ws-bridge";
+import { decodeServerSentEvents } from "../../backend/src/lib/sse-decoder";
+import { BoundedSseFrameBuffer, joinSseFrameBytes, SseFrameTooLargeError } from "../../backend/src/server/sse-frame-buffer";
+import { createSseBlockBuffer, nextSseBlock, relaySseWithBlockRewrite, replaceSseDataPayload, sseDataPayload } from "../../backend/src/server/sse-payload-rewrite";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { readAll } from "../helpers/sse-stream";
 

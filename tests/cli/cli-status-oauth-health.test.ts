@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdirSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { formatOAuthHealthForStatus } from "../../src/cli/status-oauth";
-import { collectOAuthHealthEntries } from "../../src/oauth/health";
-import { getAccountSet, markAccountNeedsReauth, saveCredential } from "../../src/oauth/store";
+import { formatOAuthHealthForStatus } from "../../backend/src/cli/status-oauth";
+import { collectOAuthHealthEntries } from "../../backend/src/oauth/health";
+import { getAccountSet, markAccountNeedsReauth, saveCredential } from "../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const origHome = process.env.HOME;

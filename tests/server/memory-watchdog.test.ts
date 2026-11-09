@@ -8,18 +8,18 @@ import {
   observedMemoryCounter,
   startMemoryWatchdog,
   type MemorySampleBase,
-} from "../../src/server/memory-watchdog";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { selectEagerPath } from "../../src/lib/bun-stream-caps";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/memory-watchdog";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { selectEagerPath } from "../../backend/src/lib/bun-stream-caps";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   appOwnedBytesSnapshot,
   registerRetainedStore,
   resetAppOwnedMemoryForTests,
-} from "../../src/lib/app-owned-memory";
-import { registerDefaultAppOwnedMemoryStores } from "../../src/lib/app-owned-memory-stores";
-import { appendDebugLogLine, resetDebugLogBufferForTests } from "../../src/lib/debug-log-buffer";
-import { resetUsageAggregateCacheForTests } from "../../src/server/management/usage-aggregate-cache";
+} from "../../backend/src/lib/app-owned-memory";
+import { registerDefaultAppOwnedMemoryStores } from "../../backend/src/lib/app-owned-memory-stores";
+import { appendDebugLogLine, resetDebugLogBufferForTests } from "../../backend/src/lib/debug-log-buffer";
+import { resetUsageAggregateCacheForTests } from "../../backend/src/server/management/usage-aggregate-cache";
 
 function config(): OcxConfig {
   return {

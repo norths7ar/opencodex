@@ -1,6 +1,6 @@
-import { projectCatalogOnlyOutcome } from "../../src/codex/management-convergence";
-import type { CatalogDisposition, ConvergeCodex } from "../../src/codex/convergence-types";
-import type { OcxConfig } from "../../src/types";
+import { projectCatalogOnlyOutcome } from "../../backend/src/codex/management-convergence";
+import type { CatalogDisposition, ConvergeCodex } from "../../backend/src/codex/convergence-types";
+import type { OcxConfig } from "../../backend/src/types";
 
 export function catalogConvergenceFactory(
   run: () => Promise<void> | void = () => {},

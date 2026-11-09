@@ -19,8 +19,8 @@ const SHELL = "desktop/src-tauri/src";
 const RESOLVE_RS = repoPath(`${SHELL}/resolve.rs`);
 const STOP_RS = repoPath(`${SHELL}/runtime_stop.rs`);
 const STARTUP = repoPath(`${SHELL}/startup.rs`);
-const RESOLVE_TS = repoPath("src/cli/resolve.ts");
-const STOP_TS = repoPath("src/cli/stop-report.ts");
+const RESOLVE_TS = repoPath("backend/src/cli/resolve.ts");
+const STOP_TS = repoPath("backend/src/cli/stop-report.ts");
 
 function code(path: string): string {
   return readFileSync(path, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");

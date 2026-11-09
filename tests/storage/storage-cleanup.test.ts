@@ -27,7 +27,7 @@ import {
   restoreTrashEntry,
   selectOldestPercent,
   type ExecuteCleanupOptions,
-} from "../../src/storage/cleanup";
+} from "../../backend/src/storage/cleanup";
 import { STORE_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

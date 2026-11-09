@@ -3,12 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { mkdirSync, writeFileSync } from "node:fs";
-import type { ImageBridgePlan } from "../../src/images/types";
-import type { XaiImageRequest } from "../../src/images/xai-client";
+import type { ImageBridgePlan } from "../../backend/src/images/types";
+import type { XaiImageRequest } from "../../backend/src/images/xai-client";
 
 const PREV_HOME = process.env.OPENCODEX_HOME;
-let fulfillImageCall: typeof import("../../src/images/fulfill")["fulfillImageCall"];
-let imageFulfillmentTailSnapshot: typeof import("../../src/images/fulfill")["imageFulfillmentTailSnapshot"];
+let fulfillImageCall: typeof import("../../backend/src/images/fulfill")["fulfillImageCall"];
+let imageFulfillmentTailSnapshot: typeof import("../../backend/src/images/fulfill")["imageFulfillmentTailSnapshot"];
 let testHome = "";
 // `mock.restore()` does not undo `mock.module`: Bun keeps both overrides below for every
 // file that runs after this one in the same process. Keep the real modules to put back,
@@ -20,9 +20,9 @@ beforeAll(async () => {
   testHome = join(tmpdir(), "ocx-test-" + randomUUID());
   process.env.OPENCODEX_HOME = testHome;
   mock.restore();
-  realXaiClient = { ...(await import("../../src/images/xai-client")) };
-  realArtifacts = { ...(await import("../../src/images/artifacts")) };
-  mock.module("../../src/images/xai-client", () => ({
+  realXaiClient = { ...(await import("../../backend/src/images/xai-client")) };
+  realArtifacts = { ...(await import("../../backend/src/images/artifacts")) };
+  mock.module("../../backend/src/images/xai-client", () => ({
     callXaiImages: async (req: XaiImageRequest, _auth: unknown, _signal?: AbortSignal, timeoutMs?: number) => {
       xaiCalls.push(req);
       capturedTimeoutMs = timeoutMs;
@@ -36,7 +36,7 @@ beforeAll(async () => {
       return new Set(["1:1", "16:9", "9:16", "4:3", "3:4"]).has(literal) ? literal : undefined;
     },
   }));
-  mock.module("../../src/images/artifacts", () => ({
+  mock.module("../../backend/src/images/artifacts", () => ({
     createImageBudget: () => ({ spent: 0 }),
     materializeInlineImage: async () => materializeFn(matIdx++),
     downloadImageToArtifact: async () => downloadFn(dlIdx++),
@@ -47,8 +47,8 @@ beforeAll(async () => {
 afterAll(() => {
   if (PREV_HOME === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = PREV_HOME;
   mock.restore();
-  if (realXaiClient) { const real = realXaiClient; mock.module("../../src/images/xai-client", () => real); }
-  if (realArtifacts) { const real = realArtifacts; mock.module("../../src/images/artifacts", () => real); }
+  if (realXaiClient) { const real = realXaiClient; mock.module("../../backend/src/images/xai-client", () => real); }
+  if (realArtifacts) { const real = realArtifacts; mock.module("../../backend/src/images/artifacts", () => real); }
 });
 
 // --- Mutable mock state (reset() restores defaults before each test) ---

@@ -4,11 +4,11 @@
  * bounded per-model overrides, and a bounded, non-echoing query parameter.
  */
 import { describe, expect, test } from "bun:test";
-import { isProtocolProviderSummaryV1, PROTOCOL_PROVIDER_OVERRIDE_LIMIT, type ProtocolProviderSummaryV1 } from "../../src/protocols/dto";
-import { buildProtocolProviderSummary, protocolAdapterSource } from "../../src/protocols/provider-summary";
-import type { ManagementContext } from "../../src/server/management/context";
-import { handleProtocolRoutes, PROTOCOL_PROVIDER_QUERY_LIMIT } from "../../src/server/management/protocol-routes";
-import type { OcxConfig } from "../../src/types";
+import { isProtocolProviderSummaryV1, PROTOCOL_PROVIDER_OVERRIDE_LIMIT, type ProtocolProviderSummaryV1 } from "../../backend/src/protocols/dto";
+import { buildProtocolProviderSummary, protocolAdapterSource } from "../../backend/src/protocols/provider-summary";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { handleProtocolRoutes, PROTOCOL_PROVIDER_QUERY_LIMIT } from "../../backend/src/server/management/protocol-routes";
+import type { OcxConfig } from "../../backend/src/types";
 
 const manyModels = Array.from({ length: PROTOCOL_PROVIDER_OVERRIDE_LIMIT + 10 }, (_, index) => `m${String(index).padStart(3, "0")}`);
 

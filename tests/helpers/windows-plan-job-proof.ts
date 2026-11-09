@@ -1,7 +1,7 @@
 import { expect } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { dlopen, ptr } from "bun:ffi";
-import { quoteWindowsChildArg } from "../../src/codex/windows-cli-child";
+import { quoteWindowsChildArg } from "../../backend/src/codex/windows-cli-child";
 import { INTERNAL_DEADLINE_MS } from "./test-budget";
 import { createWindowsPlanFixtureJob, createWindowsPlanJobWithoutKillForTests } from "./windows-plan-fixture-job";
 import { repoRoot } from "./repo-root";

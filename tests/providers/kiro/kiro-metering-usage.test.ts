@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
-import { parseKiroStream } from "../../../src/adapters/kiro";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { normalizeUsageEntryForTest } from "../../../src/usage/log";
+import { parseKiroStream } from "../../../backend/src/adapters/kiro";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { normalizeUsageEntryForTest } from "../../../backend/src/usage/log";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const credit = 0.04582331509121062;

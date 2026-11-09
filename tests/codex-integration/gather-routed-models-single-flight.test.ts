@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { clearGatherRoutedModelsInflight, filterCatalogVisibleModels, gatherRoutedModels as gatherRoutedModelsDirect, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
+import { clearGatherRoutedModelsInflight, filterCatalogVisibleModels, gatherRoutedModels as gatherRoutedModelsDirect, resetCatalogRuntimeStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../src/types";
-import { CatalogGatherBusyError } from "../../src/codex/catalog/provider-fetch";
+import type { OcxConfig } from "../../backend/src/types";
+import { CatalogGatherBusyError } from "../../backend/src/codex/catalog/provider-fetch";
 
 const originalFetch = globalThis.fetch;
 

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { restoreRoutedCustomCalls, rewriteRoutedCustomToolsForUpstream } from "../../src/responses/custom-tool-compat";
+import { restoreRoutedCustomCalls, rewriteRoutedCustomToolsForUpstream } from "../../backend/src/responses/custom-tool-compat";
 import {
   createRoutedNamespaceCallRestoreRewrite,
   restoreRoutedNamespaceCalls,
   restoreRoutedNamespaceCallsInJson,
   rewriteRoutedNamespaceToolsForUpstream,
-} from "../../src/responses/namespace-tool-compat";
+} from "../../backend/src/responses/namespace-tool-compat";
 
 describe("Responses namespace tool compatibility", () => {
   test("flattens builtin and routed namespaces across declarations, selectors, and replay", () => {

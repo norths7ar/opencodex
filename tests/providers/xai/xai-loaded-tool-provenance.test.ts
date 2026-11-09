@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../../src/adapters/openai-responses";
-import { promoteClientLoadedTools } from "../../../src/adapters/openai-responses/tool-schema";
-import { tagHistoricalInputItems } from "../../../src/responses/item-provenance";
-import { handleResponses } from "../../../src/server/responses";
-import type { OcxConfig } from "../../../src/types";
+import { createResponsesPassthroughAdapter } from "../../../backend/src/adapters/openai-responses";
+import { promoteClientLoadedTools } from "../../../backend/src/adapters/openai-responses/tool-schema";
+import { tagHistoricalInputItems } from "../../../backend/src/responses/item-provenance";
+import { handleResponses } from "../../../backend/src/server/responses";
+import type { OcxConfig } from "../../../backend/src/types";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { prepareServiceInstall } from "../../src/service";
+import { prepareServiceInstall } from "../../backend/src/service";
 
 describe("service install preparation wrapper cleanup", () => {
   test("install preparation kills surviving scheduler wrappers before the tracked proxy stop", async () => {

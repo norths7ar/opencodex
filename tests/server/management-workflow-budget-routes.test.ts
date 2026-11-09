@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { handleManagementAPI } from "../../src/server/management-api";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
 import { ManagementRequest as Request } from "../helpers/management-auth";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   admitWorkflowTurn,
   chargeWorkflowSends,
   resetWorkflowBudgetsForTest,
-} from "../../src/lib/workflow-budget";
+} from "../../backend/src/lib/workflow-budget";
 
 const config = { providers: [] } as unknown as OcxConfig;
 

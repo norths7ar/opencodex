@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { buildConversationInput, buildInputLines, formatMessageForHistory } from "../../src/adapters/coding-agent/protocol";
-import type { OcxMessage, OcxParsedRequest } from "../../src/types";
+import { buildConversationInput, buildInputLines, formatMessageForHistory } from "../../backend/src/adapters/coding-agent/protocol";
+import type { OcxMessage, OcxParsedRequest } from "../../backend/src/types";
 
 const unsupported = { type: "image" as const, imageUrl: "ftp://example.test/image.png" };
 const user: OcxMessage = { role: "user", content: [{ type: "text", text: "inspect" }, unsupported], timestamp: 0 };

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../../src/adapters/anthropic";
-import { isAnthropicFastRefusal } from "../../../src/providers/anthropic-fast";
-import { enrichProviderFromRegistry } from "../../../src/providers/derive";
-import { getProviderRegistryEntry } from "../../../src/providers/registry";
-import { fastPolicyForModel } from "../../../src/providers/service-tier";
-import { tierObservationContext } from "../../../src/providers/fastwire";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createAnthropicAdapter } from "../../../backend/src/adapters/anthropic";
+import { isAnthropicFastRefusal } from "../../../backend/src/providers/anthropic-fast";
+import { enrichProviderFromRegistry } from "../../../backend/src/providers/derive";
+import { getProviderRegistryEntry } from "../../../backend/src/providers/registry";
+import { fastPolicyForModel } from "../../../backend/src/providers/service-tier";
+import { tierObservationContext } from "../../../backend/src/providers/fastwire";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const FAST_BETA = "fast-mode-2026-02-01";

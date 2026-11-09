@@ -12,13 +12,13 @@ import {
   openCodexCoordinatorTransaction,
   readCodexTransitionState,
   updateCodexHistoryTransition,
-} from "../../src/codex/transition-state";
-import { resolveCodexHistoryTransition } from "../../src/codex/history-transition";
-import { historyBackupPathFor } from "../../src/codex/history-provider";
+} from "../../backend/src/codex/transition-state";
+import { resolveCodexHistoryTransition } from "../../backend/src/codex/history-transition";
+import { historyBackupPathFor } from "../../backend/src/codex/history-provider";
 import {
   resolveCodexCoordinatorDatabasePath,
   resolveEffectiveUserIdentity,
-} from "../../src/codex/user-identity";
+} from "../../backend/src/codex/user-identity";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let codexHome = "";

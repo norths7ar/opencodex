@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { ProviderAccount } from "../../../src/oauth/types";
-import { kiroEvidenceIdentity } from "../../../src/providers/kiro-account-state-disk";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
+import { kiroEvidenceIdentity } from "../../../backend/src/providers/kiro-account-state-disk";
 import {
   clearKiroAccountUsageState,
   commitKiroAccountUsageState,
@@ -9,7 +9,7 @@ import {
   kiroUsageManagementUrl,
   kiroManagementHost,
   reconcileKiroAccountUsageState,
-} from "../../../src/providers/kiro-usage";
+} from "../../../backend/src/providers/kiro-usage";
 
 const realFetch = globalThis.fetch;
 

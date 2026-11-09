@@ -4,16 +4,16 @@ import * as fs from "node:fs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { OcxConfig } from "../../src/types";
-import type { GuiSessionState } from "../../src/server/gui-session";
-import { GUI_PAIR_BROWSER_ORIGIN_HEADER, GUI_PAIR_CAPABILITY_HEADER } from "../../src/lib/gui-pair-capability";
-import { consumeGuiPairIntent, createGuiPairIntent, GUI_PAIR_INTENT_HEADER } from "../../src/lib/gui-pair-intent";
-import { deliverGuiPairingGrant, GuiPairingIntentRequiredError } from "../../src/server/gui-pair-delivery";
-import { GuiPairingGrantRateLimitError } from "../../src/server/gui-session";
-import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests, setPlatformForTests } from "../../src/lib/windows-secret-acl";
-import { setWindowsOwnerAclRunnerForTests, windowsOwnerAclDefaultRunnerForTests, windowsPrivateEntriesAclMatches, type WindowsPrivateEntry } from "../../src/lib/windows-owner-acl";
-import { resetWindowsPrincipalForTests, setWindowsPrincipalRunnerForTests, setAsyncWindowsPrincipalRunnerForTests, setWindowsPrincipalLocaleForTests } from "../../src/lib/windows-user-principal";
-import { resolveTrustedWindowsIcaclsExe } from "../../src/lib/windows-elevation";
+import type { OcxConfig } from "../../backend/src/types";
+import type { GuiSessionState } from "../../backend/src/server/gui-session";
+import { GUI_PAIR_BROWSER_ORIGIN_HEADER, GUI_PAIR_CAPABILITY_HEADER } from "../../backend/src/lib/gui-pair-capability";
+import { consumeGuiPairIntent, createGuiPairIntent, GUI_PAIR_INTENT_HEADER } from "../../backend/src/lib/gui-pair-intent";
+import { deliverGuiPairingGrant, GuiPairingIntentRequiredError } from "../../backend/src/server/gui-pair-delivery";
+import { GuiPairingGrantRateLimitError } from "../../backend/src/server/gui-session";
+import { resetHardenedStateForTests, setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests, setPlatformForTests } from "../../backend/src/lib/windows-secret-acl";
+import { setWindowsOwnerAclRunnerForTests, windowsOwnerAclDefaultRunnerForTests, windowsPrivateEntriesAclMatches, type WindowsPrivateEntry } from "../../backend/src/lib/windows-owner-acl";
+import { resetWindowsPrincipalForTests, setWindowsPrincipalRunnerForTests, setAsyncWindowsPrincipalRunnerForTests, setWindowsPrincipalLocaleForTests } from "../../backend/src/lib/windows-user-principal";
+import { resolveTrustedWindowsIcaclsExe } from "../../backend/src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -217,7 +217,7 @@ describe("one-use local CLI pairing intent", () => {
       setWindowsOwnerAclRunnerForTests(null);
     }
     const intent = createGuiPairIntent(CAP), path = recordPath();
-    const code = `import { consumeGuiPairIntent } from ${JSON.stringify(repoPath("src/lib/gui-pair-intent.ts"))};
+    const code = `import { consumeGuiPairIntent } from ${JSON.stringify(repoPath("backend/src/lib/gui-pair-intent.ts"))};
       await Bun.write(Bun.stdout, "ready\\n");
       await new Response(Bun.stdin.stream()).text();
       process.exit(consumeGuiPairIntent(${JSON.stringify(CAP)}, ${JSON.stringify(intent.proof)}, ${JSON.stringify(root)}) ? 0 : 1);`;
@@ -585,7 +585,7 @@ test("pairing ACL script reads descriptors through .NET, never through module-au
   // Autoloaded cmdlets resolve through the per-profile module analysis cache; a fresh or redirected
   // LOCALAPPDATA rebuilds it by scanning every PSModulePath module and outlasted the 30 s budget on
   // hosted Windows runners. A module earlier on PSModulePath could also shadow the cmdlet.
-  const source = readFileSync(repoPath("src/lib/windows-owner-acl.ts"), "utf8");
+  const source = readFileSync(repoPath("backend/src/lib/windows-owner-acl.ts"), "utf8");
   const start = source.indexOf("const ACL_SCRIPT = String.raw`");
   const script = source.slice(start, source.indexOf("`;", start));
   expect(start).toBeGreaterThan(-1);

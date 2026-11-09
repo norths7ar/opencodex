@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { restoreRoutedCustomCallsInJson, rewriteRoutedCustomToolsForUpstream } from "../../src/responses/custom-tool-compat";
-import { compileCodeModeHelperInput } from "../../src/responses/code-mode-helper-compat";
-import { parseRequest } from "../../src/responses/parser";
-import { buildToolBridgeMaps } from "../../src/server/responses";
-import { createRoutedCustomToolRestoreBlockRewrite } from "../../src/server/responses-custom-tool-repair";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { restoreRoutedCustomCallsInJson, rewriteRoutedCustomToolsForUpstream } from "../../backend/src/responses/custom-tool-compat";
+import { compileCodeModeHelperInput } from "../../backend/src/responses/code-mode-helper-compat";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildToolBridgeMaps } from "../../backend/src/server/responses";
+import { createRoutedCustomToolRestoreBlockRewrite } from "../../backend/src/server/responses-custom-tool-repair";
 import {
   collectDeclaredBareCustomWireToolNames,
   currentTurnWireToolCatalogBody,
   undeclaredToolCallNameInResponse,
-} from "../../src/server/responses-undeclared-tool-guard";
-import type { AdapterEvent } from "../../src/types";
-import { isCodeModeMcpDirectName, normalizeDeclaredToolName } from "../../src/types/tools";
+} from "../../backend/src/server/responses-undeclared-tool-guard";
+import type { AdapterEvent } from "../../backend/src/types";
+import { isCodeModeMcpDirectName, normalizeDeclaredToolName } from "../../backend/src/types/tools";
 import { dataPayload, frame } from "../helpers/custom-tool-repair-fixtures";
 
 const CODE_MODE = new Set(["exec"]);

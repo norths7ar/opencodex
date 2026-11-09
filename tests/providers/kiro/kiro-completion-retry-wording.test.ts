@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createKiroAdapter } from "../../../src/adapters/kiro";
-import { KIRO_COMPLETION_RETRY_MESSAGE, KIRO_COMPLETION_TOOL_NAME } from "../../../src/adapters/kiro-constants";
-import { resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import { encodeMessage } from "../../../src/lib/eventstream-decoder";
-import { createTranslatorBudget } from "../../../src/lib/translator-budget";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createKiroAdapter } from "../../../backend/src/adapters/kiro";
+import { KIRO_COMPLETION_RETRY_MESSAGE, KIRO_COMPLETION_TOOL_NAME } from "../../../backend/src/adapters/kiro-constants";
+import { resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import { encodeMessage } from "../../../backend/src/lib/eventstream-decoder";
+import { createTranslatorBudget } from "../../../backend/src/lib/translator-budget";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 // claude-sonnet-5 answers a trivial request in plain text with END_TURN instead of calling the
 // private completion tool, so the bounded completion retry fires even though the held text WAS the

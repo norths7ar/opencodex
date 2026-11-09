@@ -1,15 +1,15 @@
 // Imported only by the isolated billing dispatch child to contain module fixtures.
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { describe, expect, mock, test } from "bun:test";
-import * as keys from "../../src/providers/key-failover";
-import { routedProviderConfig } from "../../src/router";
-import { anthropicBillingPhysicalFetch } from "../../src/providers/anthropic-billing-ownership";
-import { markEgressTransparentExecutor } from "../../src/lib/provider-egress";
+import * as keys from "../../backend/src/providers/key-failover";
+import { routedProviderConfig } from "../../backend/src/router";
+import { anthropicBillingPhysicalFetch } from "../../backend/src/providers/anthropic-billing-ownership";
+import { markEgressTransparentExecutor } from "../../backend/src/lib/provider-egress";
 import {
   createRequestExecutionBudget,
   CODEX_TEXT_GUARDED_BUDGET_POLICY,
-} from "../../src/lib/request-execution-budget";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
+} from "../../backend/src/lib/request-execution-budget";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
 import { budgetOwner } from "./send-budget-owner";
 
 // Retain real retry policies and billing evidence/ownership. Replace only key selection's
@@ -28,13 +28,13 @@ const rotate = (config: OcxConfig, name: string, prior: OcxProviderConfig) => {
     fetch: prior.fetch,
   };
 };
-mock.module("../../src/providers/key-failover", () => ({
+mock.module("../../backend/src/providers/key-failover", () => ({
   ...keys,
   rotateProviderTransportOn401: rotate,
   rotateProviderTransportOn429: rotate,
   rotateProviderTransportOnAnthropicBilling: rotate,
 }));
-const { prepareAdapterExchange } = await import("../../src/server/responses/adapter-dispatch");
+const { prepareAdapterExchange } = await import("../../backend/src/server/responses/adapter-dispatch");
 
 const creditMessage = "Your credit balance is too low to access the Anthropic API.";
 const terminalImageMessage = "fixture terminal image 413 from B";

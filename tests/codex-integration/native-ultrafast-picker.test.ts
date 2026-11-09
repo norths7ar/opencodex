@@ -15,12 +15,12 @@ import { join } from "node:path";
 import { repoRoot } from "../helpers/repo-root";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { RawEntry } from "../../src/codex/catalog/parsing";
-import { mergeCatalogEntriesFromObservedState, type ObservedCatalogMergeInput } from "../../src/codex/catalog/build-entries";
-import { applyNativeUltraFastTier, NATIVE_ULTRAFAST_SERVICE_TIER } from "../../src/codex/catalog/native-ultrafast";
-import type { RequestLogContext } from "../../src/server/request-log";
-import { handleResponses } from "../../src/server/responses/core";
-import type { OcxConfig } from "../../src/types";
+import type { RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { mergeCatalogEntriesFromObservedState, type ObservedCatalogMergeInput } from "../../backend/src/codex/catalog/build-entries";
+import { applyNativeUltraFastTier, NATIVE_ULTRAFAST_SERVICE_TIER } from "../../backend/src/codex/catalog/native-ultrafast";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import { handleResponses } from "../../backend/src/server/responses/core";
+import type { OcxConfig } from "../../backend/src/types";
 
 const ULTRAFAST = { id: "ultrafast", name: "Ultrafast", description: "Lower latency, increased usage; requires an eligible plan" };
 const fastTier = (description: string) => ({ id: "priority", name: "Fast", description });

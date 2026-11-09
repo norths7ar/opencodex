@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../../src/adapters/openai-responses";
-import { normalizeXaiResponsesWebSearch } from "../../../src/adapters/xai-web-search";
+import { createResponsesPassthroughAdapter as createProductionAdapter } from "../../../backend/src/adapters/openai-responses";
+import { normalizeXaiResponsesWebSearch } from "../../../backend/src/adapters/xai-web-search";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 function createXaiAdapter() {

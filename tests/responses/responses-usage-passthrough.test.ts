@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../src/adapters/openai-responses";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import type { AdapterEvent } from "../../src/types";
+import { createResponsesPassthroughAdapter as createResponsesPassthroughAdapterProduction } from "../../backend/src/adapters/openai-responses";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createAdapter = (...args: Parameters<typeof createResponsesPassthroughAdapterProduction>) =>
@@ -163,7 +163,7 @@ describe("raw usage passthrough (openai/codex#41980 parity)", () => {
   });
 
   test("empty-completion retry merge keeps the content attempt's raw usage", async () => {
-    const { mergeUsage } = await import("../../src/server/responses/empty-completion-guard");
+    const { mergeUsage } = await import("../../backend/src/server/responses/empty-completion-guard");
     const first = { inputTokens: 0, outputTokens: 0, rawUsage: { marker: "first" } };
     const second = { inputTokens: 3, outputTokens: 2, rawUsage: { subscription: { window: { used_percent: 9 } } } };
     const merged = mergeUsage(first, second);

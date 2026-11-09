@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import fixture from "../fixtures/opengateway-models.json";
-import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import { resolveSlugAliasCollisions } from "../../src/codex/catalog/aggregation";
-import { CODEX_CUSTOM_MODEL_CATALOG_KIND } from "../../src/codex/catalog/parsing";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { providerConfigSeed } from "../../src/providers/derive";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+import { buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { resolveSlugAliasCollisions } from "../../backend/src/codex/catalog/aggregation";
+import { CODEX_CUSTOM_MODEL_CATALOG_KIND } from "../../backend/src/codex/catalog/parsing";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { providerConfigSeed } from "../../backend/src/providers/derive";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 // A custom row that replaces a discovered row of a provider with declared discovery order
 // (preferFirst) keeps that row's slot; other providers keep discovered rows first, custom rows after.

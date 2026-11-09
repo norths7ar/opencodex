@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { configureSocks5Fetch } from "../../src/lib/proxy-env";
-import { shouldUseCodexWsUpstream } from "../../src/server/responses/ws-upstream";
+import { configureSocks5Fetch } from "../../backend/src/lib/proxy-env";
+import { shouldUseCodexWsUpstream } from "../../backend/src/server/responses/ws-upstream";
 
 const CODEX_URL = "https://chatgpt.com/backend-api/codex/responses";
 const BOUNDED_WS_RUNTIME = "1.4.0";

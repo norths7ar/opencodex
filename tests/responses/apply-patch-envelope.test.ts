@@ -6,8 +6,8 @@ import {
   repairFreeformToolInput,
   stableCanonicalPatchPrefix,
   unwrapFreeformToolInput,
-} from "../../src/responses/apply-patch-envelope";
-import { compileCodeModeHelperInput, resolveCodeModeHelperName } from "../../src/responses/code-mode-helper-compat";
+} from "../../backend/src/responses/apply-patch-envelope";
+import { compileCodeModeHelperInput, resolveCodeModeHelperName } from "../../backend/src/responses/code-mode-helper-compat";
 
 const DECORATED_PATCH = `*** Begin Patch ***
 *** Update File: README.md

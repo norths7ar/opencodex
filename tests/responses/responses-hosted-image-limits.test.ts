@@ -2,8 +2,8 @@ import { afterEach, beforeEach, expect, test } from 'bun:test';
 import { existsSync, readdirSync } from 'node:fs';
 import { createTempHome, type TempHome } from '../helpers/temp-home';
 import { item } from '../fixtures/hosted-image-display';
-import { createHostedImageDisplayRewrite as factory } from '../../src/server/responses-hosted-image-display';
-import { TRANSLATOR_MAX_TURN_BYTES } from '../../src/lib/translator-budget';
+import { createHostedImageDisplayRewrite as factory } from '../../backend/src/server/responses-hosted-image-display';
+import { TRANSLATOR_MAX_TURN_BYTES } from '../../backend/src/lib/translator-budget';
 
 let home: TempHome;
 beforeEach(() => { home = createTempHome('hosted-image-limits-'); });

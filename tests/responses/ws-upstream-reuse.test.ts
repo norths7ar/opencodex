@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { codexWsUpstreamFetch } from "../../src/server/responses/ws-upstream";
-import { runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
-import { CodexWsPool, codexWsPool } from "../../src/server/responses/codex-ws-pool";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
+import { codexWsUpstreamFetch } from "../../backend/src/server/responses/ws-upstream";
+import { runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
+import { CodexWsPool, codexWsPool } from "../../backend/src/server/responses/codex-ws-pool";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const URL = "https://chatgpt.com/backend-api/codex/responses";

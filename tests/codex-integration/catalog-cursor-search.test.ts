@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildCatalogEntries, normalizeRoutedCatalogEntry } from "../../src/codex/catalog";
+import { buildCatalogEntries, normalizeRoutedCatalogEntry } from "../../backend/src/codex/catalog";
 
 describe("routed catalog search advertising", () => {
   test("cursor entries enable deferred discovery without advertising hosted web search", () => {

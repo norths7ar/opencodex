@@ -2,17 +2,17 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../../src/adapters/kiro-retry";
-import type { AdapterRequest } from "../../../src/adapters/base";
-import { getAccountSet, saveCredential, setActiveAccount, credentialGeneration } from "../../../src/oauth/store";
+import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../../backend/src/adapters/kiro-retry";
+import type { AdapterRequest } from "../../../backend/src/adapters/base";
+import { getAccountSet, saveCredential, setActiveAccount, credentialGeneration } from "../../../backend/src/oauth/store";
 import { clearGenericFailoverHealth, eligibleFailoverAccounts, refusalAwareInitialKiroAccount,
   rotateGenericOAuthAccountOnRefusal, isGenericOAuthFailoverEnabled, quarantineKiroSuspendedAccount }
-  from "../../../src/oauth/generic-account-failover";
-import { clearAccountQuotaCache } from "../../../src/providers/quota";
-import { cancelPendingAccountQuotaPersist, readPersistedKiroVerdicts } from "../../../src/providers/account-quota-disk";
-import { hydrateKiroAccountState, persistKiroAccountState } from "../../../src/providers/kiro-account-state-disk";
-import { kiroAccountEvidence, noteKiroMonthlyRefusal, noteKiroServedSuccess } from "../../../src/providers/kiro-usage";
-import type { OcxConfig } from "../../../src/types";
+  from "../../../backend/src/oauth/generic-account-failover";
+import { clearAccountQuotaCache } from "../../../backend/src/providers/quota";
+import { cancelPendingAccountQuotaPersist, readPersistedKiroVerdicts } from "../../../backend/src/providers/account-quota-disk";
+import { hydrateKiroAccountState, persistKiroAccountState } from "../../../backend/src/providers/kiro-account-state-disk";
+import { kiroAccountEvidence, noteKiroMonthlyRefusal, noteKiroServedSuccess } from "../../../backend/src/providers/kiro-usage";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const oldHome = process.env.OPENCODEX_HOME;

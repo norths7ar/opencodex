@@ -8,22 +8,22 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleResponses, isShadowSourceModel } from "../../src/server/responses";
+import { handleResponses, isShadowSourceModel } from "../../backend/src/server/responses";
 import {
   shadowCallPreservesSelectedModel,
   shadowSourceModelOptions,
   shouldInterceptShadowCall,
-} from "../../src/lib/shadow-call";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/lib/shadow-call";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { repoPath } from "../helpers/repo-root";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { prepareResponsesRequest } from "../../src/server/responses/request-prepare";
+import { prepareResponsesRequest } from "../../backend/src/server/responses/request-prepare";
 
 const originalFetch = globalThis.fetch;
 let releaseSpendHome: (() => void) | undefined;

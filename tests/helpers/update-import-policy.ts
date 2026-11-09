@@ -5,7 +5,7 @@ import { orchestratedEntryReview } from "./update-review-orchestrated-entry";
 import { mergeStaticImports } from "./update-review-table";
 
 const baseStaticImports: Readonly<Record<string, readonly string[]>> = {
-  "bin/ocx.mjs": [
+  "backend/bin/ocx.mjs": [
     // Pre-mutation mutex admission and session/argument verification.
     'import { acquireSyncGuard } from "../src/update/sync-update-mutex.mjs";',
     'import { isOrchestratedUpdateArgv, parseOrchestratedUpdateArgs, parseOrchestratedChildArgs } from "../src/update/orchestrated-arguments.mjs";',

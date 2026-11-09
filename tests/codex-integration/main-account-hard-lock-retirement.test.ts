@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../src/codex/account-id";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../src/codex/main-account-cache";
+import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../backend/src/codex/account-id";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { captureMainQuotaWriter, clearMainAccountInfoCache, observeMainQuotaIdentity } from "../../backend/src/codex/main-account-cache";
 import {
   applyAccountQuotaFromUpstreamHeaders, clearAccountQuota, getAccountQuota, getMainPolicyQuota,
   parseMainPolicyUsageQuota, parseUsageQuota, setAccountQuotaFromParsed, type WhamUsageResponse,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const account = "retirement-main-fixture";

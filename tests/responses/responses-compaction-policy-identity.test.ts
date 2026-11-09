@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config";
-import { routeConcreteModel } from "../../src/router";
-import { compactionRoutingKeepsProviderIdentity } from "../../src/server/responses/compaction-routing";
-import type { OcxConfig } from "../../src/types";
+import { getDefaultConfig } from "../../backend/src/config";
+import { routeConcreteModel } from "../../backend/src/router";
+import { compactionRoutingKeepsProviderIdentity } from "../../backend/src/server/responses/compaction-routing";
+import type { OcxConfig } from "../../backend/src/types";
 
 function policyConfig(): OcxConfig {
   return {

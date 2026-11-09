@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
-import { runProviderCompletionTest, handleProviderCompletionTestRoute } from "../../src/server/management/provider-completion-test";
+import { runProviderCompletionTest, handleProviderCompletionTestRoute } from "../../backend/src/server/management/provider-completion-test";
 import { fixture, chat } from "../helpers/provider-completion-fixture";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import type { OcxProviderConfig } from "../../src/types";
-import type { ProviderOutboundDependencies } from "../../src/lib/provider-outbound";
-import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/key-store";
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import type { ProviderOutboundDependencies } from "../../backend/src/lib/provider-outbound";
+import { setProviderKeychainEntryFactoryForTests } from "../../backend/src/providers/key-store";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 import { createTempHome } from "../helpers/temp-home";
-import { saveConfig, getConfigPath } from "../../src/config";
-import { healthEvidenceForCandidate, clearHealthHistoryCacheForTests } from "../../src/routing/health";
-import { queryRequestHistory, closeRequestHistoryIndex } from "../../src/routing/history/indexer";
+import { saveConfig, getConfigPath } from "../../backend/src/config";
+import { healthEvidenceForCandidate, clearHealthHistoryCacheForTests } from "../../backend/src/routing/health";
+import { queryRequestHistory, closeRequestHistoryIndex } from "../../backend/src/routing/history/indexer";
 
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));

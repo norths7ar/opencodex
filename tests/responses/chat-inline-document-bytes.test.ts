@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
-import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
-import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../src/chat/inbound";
-import { anthropicToResponsesBody } from "../../src/claude/inbound";
-import { parseRequest } from "../../src/responses/parser";
-import { inlineDocumentDataUrl, inlineDocumentMarker, inlineDocumentFromDataUrl, isInlineDocumentDataUrl } from "../../src/responses/inline-document";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
+import { createOpenAIChatAdapter } from "../../backend/src/adapters/openai-chat";
+import { chatCompletionsToResponsesBody, ChatCompletionsRequestError } from "../../backend/src/chat/inbound";
+import { anthropicToResponsesBody } from "../../backend/src/claude/inbound";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { inlineDocumentDataUrl, inlineDocumentMarker, inlineDocumentFromDataUrl, isInlineDocumentDataUrl } from "../../backend/src/responses/inline-document";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 /**
  * #5212. Both inbound parsers reduced an attachment to its name before any adapter ran, so no

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
 
 /**
  * Regression coverage for #3666 — the CLI half.

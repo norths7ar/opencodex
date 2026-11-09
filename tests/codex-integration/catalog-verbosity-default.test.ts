@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect, upstreamNativeEntry } from "../../src/codex/catalog";
+import { buildCatalogEntries, gatherRoutedModels as gatherRoutedModelsDirect, upstreamNativeEntry } from "../../backend/src/codex/catalog";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
-import { resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../src/codex/catalog";
-import { clearModelCache } from "../../src/codex/model-cache";
+import { resetCatalogRuntimeStateForTests, resetOpenAiApiCatalogWarningStateForTests } from "../../backend/src/codex/catalog";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
 
 const gatherRoutedModels: typeof gatherRoutedModelsDirect = (config, options) =>
   gatherRoutedModelsDirect(withStubbedProviderFetch(config), options);

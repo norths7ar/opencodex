@@ -3,33 +3,33 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { INTERNAL_DEADLINE_MS, SERVER_BUDGET_MS } from "../helpers/test-budget";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { validateConfigCandidate } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { OcxConfig } from "../../src/types";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { validateConfigCandidate } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   recordQuotaResetEvent,
   resetQuotaResetStoreForTests,
-} from "../../src/quota/reset-seen-store";
-import type { QuotaResetEvent } from "../../src/quota/reset-detector";
+} from "../../backend/src/quota/reset-seen-store";
+import type { QuotaResetEvent } from "../../backend/src/quota/reset-detector";
 import {
   resetQuotaResetNotifyCacheForTests,
   resolveQuotaResetNotify,
-} from "../../src/quota/reset-notify-config";
+} from "../../backend/src/quota/reset-notify-config";
 import {
   resetQuotaResetActivationForTests,
   syncQuotaResetActivation,
-} from "../../src/quota/reset-activation";
-import { hasQuotaResetSink, setQuotaResetSink } from "../../src/quota/reset-observer";
+} from "../../backend/src/quota/reset-activation";
+import { hasQuotaResetSink, setQuotaResetSink } from "../../backend/src/quota/reset-observer";
 import {
   clearAccountQuota,
   flushQuotaObservationsForTests,
   setAccountQuotaFromParsed,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 import {
   deliverQuotaResetEvent,
   quotaResetPayloadForTests,
-} from "../../src/quota/reset-sinks";
+} from "../../backend/src/quota/reset-sinks";
 
 const NOW = Date.now();
 

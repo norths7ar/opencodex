@@ -16,7 +16,7 @@ import { repoPath } from "../helpers/repo-root";
  * mutates the database, the manifest and the rollouts; only `history-worker.ts`
  * runs inside H, so only it may reach those symbols.
  */
-const SRC = repoPath("src");
+const SRC = repoPath("backend/src");
 
 /** Modules whose exports mutate Codex history. */
 const HISTORY_WRITER = "codex/internal/history-writer.ts";

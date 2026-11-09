@@ -1,5 +1,5 @@
-import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../src/lib/spend-ledger-owner";
-import { resetSharedSpendLedgerForTest } from "../../src/lib/spend-reservation-ledger";
+import { acquireSpendLedgerOwner, type SpendLedgerOwnerLease } from "../../backend/src/lib/spend-ledger-owner";
+import { resetSharedSpendLedgerForTest } from "../../backend/src/lib/spend-reservation-ledger";
 
 /**
  * Hold the spend-journal writer lease for a case that dispatches without starting a server.

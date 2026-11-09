@@ -5,7 +5,7 @@ import {
   normalizeSocks5,
   parseStartOptions,
   StartArgsError,
-} from "../../src/cli/start-args";
+} from "../../backend/src/cli/start-args";
 
 describe("parseStartOptions", () => {
   test("accepts an empty start argv", () => {

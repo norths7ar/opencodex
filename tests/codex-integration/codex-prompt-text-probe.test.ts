@@ -22,9 +22,9 @@ import {
   setPromptTextProbeMetadataBarrierForTests,
   setPromptTextProbeRuntimeForTests,
   type PromptTextProbe,
-} from "../../src/codex/prompt-text-probe";
+} from "../../backend/src/codex/prompt-text-probe";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { displayCodexRuntimePath } from "../../src/codex/runtime";
+import { displayCodexRuntimePath } from "../../backend/src/codex/runtime";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 
 const lifecycleRoots: string[] = [];

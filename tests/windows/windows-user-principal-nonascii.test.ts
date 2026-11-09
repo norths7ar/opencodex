@@ -8,7 +8,7 @@ import {
   setAsyncWindowsPrincipalRunnerForTests,
   setWindowsPrincipalLocaleForTests,
   setWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 
 /**
  * The identity lookup shells out to `powershell.exe` and reads its stdout. Windows

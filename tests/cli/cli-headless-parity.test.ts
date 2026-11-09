@@ -3,16 +3,16 @@ import { mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { handleAccessCommand } from "../../src/cli/access";
-import { handleAgentCommand } from "../../src/cli/agent";
-import { handleConfigCommand } from "../../src/cli/config-command";
-import { handleClientIntegrationCommand, handleGrokCommand, handleClaudeInterceptCommand } from "../../src/cli/integrations";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
-import { handleProviderRuntimeCommand } from "../../src/cli/provider-runtime";
-import { providerQuotaLine } from "../../src/cli/account-extended";
-import { formatAccountTable } from "../../src/cli/account";
-import { CAPABILITIES, capabilityInvocation } from "../../src/cli/capabilities";
-import { codexRestartLines, handleSystemCommand } from "../../src/cli/system-command";
+import { handleAccessCommand } from "../../backend/src/cli/access";
+import { handleAgentCommand } from "../../backend/src/cli/agent";
+import { handleConfigCommand } from "../../backend/src/cli/config-command";
+import { handleClientIntegrationCommand, handleGrokCommand, handleClaudeInterceptCommand } from "../../backend/src/cli/integrations";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
+import { handleProviderRuntimeCommand } from "../../backend/src/cli/provider-runtime";
+import { providerQuotaLine } from "../../backend/src/cli/account-extended";
+import { formatAccountTable } from "../../backend/src/cli/account";
+import { CAPABILITIES, capabilityInvocation } from "../../backend/src/cli/capabilities";
+import { codexRestartLines, handleSystemCommand } from "../../backend/src/cli/system-command";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -519,7 +519,7 @@ function sourceFiles(root: string): string[] {
 
 describe("headless GUI parity CLI", () => {
   test("every GUI management endpoint belongs to a documented CLI resource", () => {
-    const guiRoot = repoPath("gui", "src");
+    const guiRoot = repoPath("frontend", "src");
     const endpoints = new Set<string>();
     for (const path of sourceFiles(guiRoot)) {
       const source = readFileSync(path, "utf8");

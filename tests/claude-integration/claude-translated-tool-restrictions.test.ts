@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { anthropicToResponsesTranslation } from "../../src/claude/inbound";
-import { analyzeClaudeCompatibility } from "../../src/claude/compatibility";
-import { handleClaudeMessages } from "../../src/server/claude-messages";
-import type { OcxConfig } from "../../src/types";
+import { anthropicToResponsesTranslation } from "../../backend/src/claude/inbound";
+import { analyzeClaudeCompatibility } from "../../backend/src/claude/compatibility";
+import { handleClaudeMessages } from "../../backend/src/server/claude-messages";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 

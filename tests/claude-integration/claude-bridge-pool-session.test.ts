@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import { getDefaultConfig } from "../../src/config";
-import { routeConcreteModel } from "../../src/router";
-import { codexRouteCredentialDomainHeaders } from "../../src/server/responses/core-auth";
-import { applyClaudeBridgePoolSession, completeClaudeBridgePoolIdentity, resolveClaudeBridgePoolSession } from "../../src/server/claude-bridge-pool-session";
-import type { DataPlaneAdmission } from "../../src/server/auth-cors";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import { getDefaultConfig } from "../../backend/src/config";
+import { routeConcreteModel } from "../../backend/src/router";
+import { codexRouteCredentialDomainHeaders } from "../../backend/src/server/responses/core-auth";
+import { applyClaudeBridgePoolSession, completeClaudeBridgePoolIdentity, resolveClaudeBridgePoolSession } from "../../backend/src/server/claude-bridge-pool-session";
+import type { DataPlaneAdmission } from "../../backend/src/server/auth-cors";
 
 const local: DataPlaneAdmission = { kind: "loopback", source: "loopback" };
 const remote = (principal?: string): DataPlaneAdmission => ({ kind: "configured", keyId: "fixture", source: "bearer", contextPrincipalId: principal });

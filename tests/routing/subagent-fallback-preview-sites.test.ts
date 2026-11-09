@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
  */
 describe("native fallback account preview sites (source contract)", () => {
   const requestPrepareSource = async (): Promise<string> => Bun.file(
-    fileURLToPath(new URL("../../src/server/responses/request-prepare.ts", import.meta.url)),
+    fileURLToPath(new URL("../../backend/src/server/responses/request-prepare.ts", import.meta.url)),
   ).text();
 
   /**

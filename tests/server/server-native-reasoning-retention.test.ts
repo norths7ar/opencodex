@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { ConfigWritePublishedError } from "../../src/config/persist-unlocked";
-import { configRebaseDeletionKeys } from "../../src/config/rebase-provenance";
-import { handleNativeReasoningRetentionRoutes } from "../../src/server/management/native-reasoning-retention-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import type { OcxConfig } from "../../src/types";
+import { getDefaultConfig } from "../../backend/src/config";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { ConfigWritePublishedError } from "../../backend/src/config/persist-unlocked";
+import { configRebaseDeletionKeys } from "../../backend/src/config/rebase-provenance";
+import { handleNativeReasoningRetentionRoutes } from "../../backend/src/server/management/native-reasoning-retention-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import type { OcxConfig } from "../../backend/src/types";
 import { ManagementRequest } from "../helpers/management-auth";
 
 const off = { modelSwitch: false, accountSwitch: false };

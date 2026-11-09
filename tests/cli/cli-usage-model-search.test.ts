@@ -3,12 +3,12 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { selectUsageModelView, takeUsageSearchOption } from "../../src/cli/usage-model-search";
-import { formatUsageReport } from "../../src/cli/usage-report";
-import { summarizeUsage } from "../../src/usage/summary";
+import { selectUsageModelView, takeUsageSearchOption } from "../../backend/src/cli/usage-model-search";
+import { formatUsageReport } from "../../backend/src/cli/usage-report";
+import { summarizeUsage } from "../../backend/src/usage/summary";
 import { repoPath } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { handleObserveCommand } from "../../src/cli/observe";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
 
 const rows = [
   { model: "Alpha", provider: "one", requests: 2, totalTokens: 20 },
@@ -20,7 +20,7 @@ const report = { range: "today", summary: { requests: 4, totalTokens: 120 }, mod
   filter: { provider: "exact", model: "attribution", apiKeyId: "key-1", matched: true, attemptOverlap: false } };
 
 // Execute only the checked-in pure useMemo callback, never mount the React page.
-const source = readFileSync(repoPath("gui/src/pages/Usage.tsx"), "utf8");
+const source = readFileSync(repoPath("frontend/src/pages/Usage.tsx"), "utf8");
 const body = source.split("const filteredModels = useMemo(() => {")[1]?.split("}, [data?.models, modelQuery]);")[0];
 if (!body) throw new Error("Usage model-search owner changed; inspect its new contract");
 const guiView = new Function("data", "modelQuery", body) as (data: typeof report, query: string) => typeof rows;

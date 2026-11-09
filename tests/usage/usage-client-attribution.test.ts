@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { classifyUsageClient, normalizeRecordedClient } from "../../src/usage/client";
-import { normalizePersistedUsageRow, readUsageEntries, resetUsageReadCacheForTests, usageLogPath } from "../../src/usage/log";
-import { createUsageSummaryAccumulator, projectUsageSummary, summarizeUsage } from "../../src/usage/summary";
-import { parseUsageSource } from "../../src/usage/source-filter";
-import { createSourceFacetAccumulator } from "../../src/usage/source-facets";
-import { addFinalRequestLog, addRequestLog, aggregateAttemptUsage, clearRequestLogsForTests, getRequestLogEntries, requestLogEntryFromPersistedUsage, type RequestLogEntry } from "../../src/server/request-log";
+import { classifyUsageClient, normalizeRecordedClient } from "../../backend/src/usage/client";
+import { normalizePersistedUsageRow, readUsageEntries, resetUsageReadCacheForTests, usageLogPath } from "../../backend/src/usage/log";
+import { createUsageSummaryAccumulator, projectUsageSummary, summarizeUsage } from "../../backend/src/usage/summary";
+import { parseUsageSource } from "../../backend/src/usage/source-filter";
+import { createSourceFacetAccumulator } from "../../backend/src/usage/source-facets";
+import { addFinalRequestLog, addRequestLog, aggregateAttemptUsage, clearRequestLogsForTests, getRequestLogEntries, requestLogEntryFromPersistedUsage, type RequestLogEntry } from "../../backend/src/server/request-log";
 import { log } from "../helpers/request-log-entry";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

@@ -18,10 +18,10 @@
 import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join } from "node:path";
-import { buildClientConfig } from "../../src/clients/config-export";
-import type { ExportModel } from "../../src/clients/config-export/contracts";
-import { exportModelLabel } from "../../src/clients/config-export/model-metadata";
-import { KILO_API_KEY_ENV, OPENCODE_API_KEY_ENV } from "../../src/clients/config-export/constants";
+import { buildClientConfig } from "../../backend/src/clients/config-export";
+import type { ExportModel } from "../../backend/src/clients/config-export/contracts";
+import { exportModelLabel } from "../../backend/src/clients/config-export/model-metadata";
+import { KILO_API_KEY_ENV, OPENCODE_API_KEY_ENV } from "../../backend/src/clients/config-export/constants";
 
 /** Dummy value handed to the clients through the env refs the export emits. */
 export const LIVE_WIRE_KEY_VALUE = "ocx-live-wire-key";

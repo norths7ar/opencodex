@@ -2,10 +2,10 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fetchPoolAccountQuota } from "../../src/codex/auth-api/pool-quota-probe";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { clearAccountQuota } from "../../src/codex/quota";
-import { fetchCodexUsage, nextCodexUsageQueryAt, resetQuotaQueryBackoffForTests } from "../../src/codex/quota-query-backoff";
+import { fetchPoolAccountQuota } from "../../backend/src/codex/auth-api/pool-quota-probe";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
+import { fetchCodexUsage, nextCodexUsageQueryAt, resetQuotaQueryBackoffForTests } from "../../backend/src/codex/quota-query-backoff";
 
 let home: string;
 let previousHome: string | undefined;

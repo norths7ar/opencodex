@@ -5,7 +5,7 @@ import { createServer } from "node:http";
 import { createConnection, createServer as createTcpServer, type Server, type Socket } from "node:net";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { directLocalHttpFetch } from "../../src/server/direct-local-http";
+import { directLocalHttpFetch } from "../../backend/src/server/direct-local-http";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { watchdogMs } from "../helpers/ci-watchdog";
 
@@ -436,9 +436,9 @@ describe("local management direct transport", () => {
       targetPort = await listen(target);
       proxyPort = await listen(proxy);
 
-      const proxyLivenessUrl = pathToFileURL(repoPath("src", "server", "proxy-liveness.ts")).href;
-      const localClientUrl = pathToFileURL(repoPath("src", "server", "local-management-read-client.ts")).href;
-      const capabilityUrl = pathToFileURL(repoPath("src", "lib", "local-management-capability.ts")).href;
+      const proxyLivenessUrl = pathToFileURL(repoPath("backend/src", "server", "proxy-liveness.ts")).href;
+      const localClientUrl = pathToFileURL(repoPath("backend/src", "server", "local-management-read-client.ts")).href;
+      const capabilityUrl = pathToFileURL(repoPath("backend/src", "lib", "local-management-capability.ts")).href;
       const childSource = `
         const phase = name => console.error("DIRECT_PHASE:" + name);
         phase("imports");

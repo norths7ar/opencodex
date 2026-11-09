@@ -6,9 +6,9 @@ import {
   buildResolveJson,
   parseResolveArgs,
   runResolve,
-} from "../../src/cli/resolve";
-import type { LiveProxy } from "../../src/server/proxy-liveness";
-import type { ConfigDiagnostics } from "../../src/config";
+} from "../../backend/src/cli/resolve";
+import type { LiveProxy } from "../../backend/src/server/proxy-liveness";
+import type { ConfigDiagnostics } from "../../backend/src/config";
 import { repoPath } from "../helpers/repo-root";
 
 const OWNERSHIP_NONE = { kind: "none", revision: 0 } as const;
@@ -351,7 +351,7 @@ describe("runResolve", () => {
   test("the production default probes with the ownership-safe budget", () => {
     // Source oracle: the verdict feeds the shell's launch decision, so it borrows the
     // start path's START_OWNERSHIP_LIVENESS budget instead of the 750ms single probe.
-    const src = readFileSync(repoPath("src", "cli", "resolve.ts"), "utf8");
+    const src = readFileSync(repoPath("backend/src", "cli", "resolve.ts"), "utf8");
     expect(src).toContain("findLiveProxy(START_OWNERSHIP_LIVENESS)");
   });
 

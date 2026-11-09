@@ -17,8 +17,8 @@ const validAuth = JSON.stringify({ tokens: {
   access_token: bearer, refresh_token: "bounded-read-refresh", account_id: accountId,
 } });
 
-const { initializeMainAccountPolicyBinding } = await import("../../src/codex/account-lifecycle");
-const { matchesMainQuotaCredential } = await import("../../src/codex/main-account-cache");
+const { initializeMainAccountPolicyBinding } = await import("../../backend/src/codex/account-lifecycle");
+const { matchesMainQuotaCredential } = await import("../../backend/src/codex/main-account-cache");
 
 const validPath = join(root, "auth-valid.json");
 writeFileSync(validPath, validAuth);

@@ -11,7 +11,7 @@ import {
   PACKAGED_DESKTOP_PRODUCT_NAME,
   packagedKeyringCandidates,
   type KeyringBinding,
-} from "../../src/lib/keyring-native";
+} from "../../backend/src/lib/keyring-native";
 import { repoPath } from "../helpers/repo-root";
 
 const roots: string[] = [];
@@ -269,8 +269,8 @@ describe("packaged keyring native binding", () => {
     expect(release).toContain("ocx gui keyring");
     expect(release).toContain("--os=${{ matrix.dependency_os }} --cpu=${{ matrix.dependency_cpu }}");
     const ci = readFileSync(repoPath(".github", "workflows", "ci.yml"), "utf8");
-    expect(ci).toContain("src/lib/standalone.ts");
-    const cli = readFileSync(repoPath("src", "cli", "index.ts"), "utf8");
+    expect(ci).toContain("backend/src/lib/standalone.ts");
+    const cli = readFileSync(repoPath("backend/src", "cli", "index.ts"), "utf8");
     expect(cli).toContain('process.argv[2] === "__keyring-load-check"');
   });
 });

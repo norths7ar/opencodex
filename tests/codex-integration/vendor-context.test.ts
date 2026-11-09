@@ -1,15 +1,15 @@
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, test } from "bun:test";
-import { createVendorContextLookup, vendorContextWindow, canInferVendorContext } from "../../src/codex/catalog/vendor-context";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
-import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { buildClaudeContextWindows } from "../../src/claude/context-windows";
-import type { CatalogModel } from "../../src/codex/catalog/parsing";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { createVendorContextLookup, vendorContextWindow, canInferVendorContext } from "../../backend/src/codex/catalog/vendor-context";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
+import { buildCatalogEntries, gatherRoutedModels } from "../../backend/src/codex/catalog";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { buildClaudeContextWindows } from "../../backend/src/claude/context-windows";
+import type { CatalogModel } from "../../backend/src/codex/catalog/parsing";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const provider: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://relay.invalid/v1", inferContextWindow: true };
 const optedOut: OcxProviderConfig = { adapter: "anthropic", baseUrl: "https://relay.invalid/v1" };

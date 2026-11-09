@@ -10,9 +10,9 @@
  * `/api/v1/chat/completions` answering 403.
  */
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { routeModel } from "../../../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { routeModel } from "../../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 function parsed(modelId: string): OcxParsedRequest {
   return {

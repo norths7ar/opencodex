@@ -9,7 +9,7 @@ import { captureTestOutput } from "../../scripts/test";
 import { repoPath } from "../helpers/repo-root";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
-const cliPath = join(repoRoot, "src", "cli", "index.ts");
+const cliPath = join(repoRoot, "backend/src", "cli", "index.ts");
 
 /**
  * Every subprocess in this file runs against a private temp OPENCODEX_HOME so no

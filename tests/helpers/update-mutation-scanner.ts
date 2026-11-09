@@ -8,7 +8,7 @@ import { updatePrimitiveAllowlist } from "./update-primitive-allowlist";
 import { capabilityPolicy } from "./update-capability-policy";
 import { updateProcessAllowlist } from "./update-process-allowlist";
 
-const files = ["bin/ocx.mjs", "src/update/index.ts", "src/update/job.ts", "src/update/job-update-tray.ts",
+const files = ["backend/bin/ocx.mjs", "src/update/index.ts", "src/update/job.ts", "src/update/job-update-tray.ts",
   "src/update/job-supervised-restart.ts", "src/update/job-pinned-start.ts", "src/update/job-windows-restart.ts"];
 const compact = (node: ts.Node) => node.getText().replace(/\s+/g, " ");
 
@@ -28,7 +28,7 @@ function isMutationEntryRefusal(node: ts.CallExpression): boolean {
     && compact(previous.declarationList.declarations[0]) === "entered = await session.enterMutation()";
 }
 
-export function updateModuleFiles(root = repoPath("src/update"), prefix = "src/update"): string[] {
+export function updateModuleFiles(root = repoPath("backend/src/update"), prefix = "src/update"): string[] {
   return readdirSync(root, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
     ? updateModuleFiles(join(root, entry.name), prefix + "/" + entry.name)
     : /\.(?:ts|mts|mjs|js)$/.test(entry.name) && !/\.d\.(?:ts|mts)$/.test(entry.name) ? [prefix + "/" + entry.name] : []).sort();
@@ -69,7 +69,7 @@ export function rawMutationViolations(source: ts.SourceFile, file: string): stri
   };
   const visit = (node: ts.Node) => {
     if ([ts.SyntaxKind.TypeQuery, ts.SyntaxKind.TypeReference, ts.SyntaxKind.TypeLiteral, ts.SyntaxKind.InterfaceDeclaration, ts.SyntaxKind.TypeAliasDeclaration].includes(node.kind)) return;
-    if (ts.isCallExpression(node) && file === "bin/ocx.mjs" && contextOf(node) === "runPackageManagerSelfUpdate"
+    if (ts.isCallExpression(node) && file === "backend/bin/ocx.mjs" && contextOf(node) === "runPackageManagerSelfUpdate"
       && compact(node.expression) === "process.exit" && node.pos > source.text.indexOf("const homePolicy")
       && (!node.arguments[0] || compact(node.arguments[0]) !== "1") && !isMutationEntryRefusal(node))
       failures.push("unguarded successful update exit: " + compact(node));

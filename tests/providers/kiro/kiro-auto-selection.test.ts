@@ -3,13 +3,13 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { clearGenericFailoverHealth, eligibleFailoverAccounts, kiroAutoSelection,
-  quarantineKiroSuspendedAccount, rotateGenericOAuthAccountOnRefusal } from "../../../src/oauth/generic-account-failover";
-import { getAccountSet, markAccountNeedsReauth, saveCredential, setAccountPaused } from "../../../src/oauth/store";
-import { setCachedProviderAccountQuotaForTests, clearAccountQuotaCache } from "../../../src/providers/quota";
-import { commitKiroAccountUsageState } from "../../../src/providers/kiro-usage";
-import { kiroEvidenceIdentity } from "../../../src/providers/kiro-account-state-disk";
-import type { ProviderAccount } from "../../../src/oauth/types";
-import type { OcxConfig } from "../../../src/types";
+  quarantineKiroSuspendedAccount, rotateGenericOAuthAccountOnRefusal } from "../../../backend/src/oauth/generic-account-failover";
+import { getAccountSet, markAccountNeedsReauth, saveCredential, setAccountPaused } from "../../../backend/src/oauth/store";
+import { setCachedProviderAccountQuotaForTests, clearAccountQuotaCache } from "../../../backend/src/providers/quota";
+import { commitKiroAccountUsageState } from "../../../backend/src/providers/kiro-usage";
+import { kiroEvidenceIdentity } from "../../../backend/src/providers/kiro-account-state-disk";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const previousHome = process.env.OPENCODEX_HOME;

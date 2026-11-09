@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { createMessagesSseErrorFilter, filterMessagesSseErrors } from "../../src/server/messages-sse-error-filter";
-import { MessagesSseFrameContext, messagesSseLocalFrame, MESSAGES_SSE_ERROR_HOLD_BYTES } from "../../src/lib/messages-sse-error-presentation";
+import { createMessagesSseErrorFilter, filterMessagesSseErrors } from "../../backend/src/server/messages-sse-error-filter";
+import { MessagesSseFrameContext, messagesSseLocalFrame, MESSAGES_SSE_ERROR_HOLD_BYTES } from "../../backend/src/lib/messages-sse-error-presentation";
 import { SSE_SENTINEL } from "../helpers/messages-sse-cases";
 const encode = (text: string) => new TextEncoder().encode(text);
 for (const oversized of [false, true]) test(`cancel while ${oversized ? "discarding" : "holding"} cancels once without a rescue error`, async () => {

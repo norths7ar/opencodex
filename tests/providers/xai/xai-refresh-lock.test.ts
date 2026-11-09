@@ -1,7 +1,7 @@
 import { afterEach,beforeEach,describe,expect,test } from "bun:test";
 import { mkdirSync,readFileSync,utimesSync,writeFileSync } from "node:fs";import{tmpdir}from"node:os";import{join}from"node:path";
-import { OAUTH_PROVIDERS,OAuthLoginRequiredError,refreshXaiAccountWithLock } from "../../../src/oauth";import{XaiTokenRequestError}from"../../../src/oauth/xai";
-import{createOAuthFileLock,createOAuthRefreshIntentLock,getAccountCredential,getAccountSet,getAuthRefreshIntentLockPath,OAuthFileLockError,saveCredential}from"../../../src/oauth/store";
+import { OAUTH_PROVIDERS,OAuthLoginRequiredError,refreshXaiAccountWithLock } from "../../../backend/src/oauth";import{XaiTokenRequestError}from"../../../backend/src/oauth/xai";
+import{createOAuthFileLock,createOAuthRefreshIntentLock,getAccountCredential,getAccountSet,getAuthRefreshIntentLockPath,OAuthFileLockError,saveCredential}from"../../../backend/src/oauth/store";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 const oldHome=process.env.HOME,oldOcx=process.env.OPENCODEX_HOME;let root:string;beforeEach(()=>{root=join(tmpdir(),`xai-lock-${crypto.randomUUID()}`);process.env.HOME=root;process.env.OPENCODEX_HOME=join(root,"ocx");mkdirSync(process.env.OPENCODEX_HOME,{recursive:true});});afterEach(()=>{if(oldHome===undefined)delete process.env.HOME;else process.env.HOME=oldHome;if(oldOcx===undefined)delete process.env.OPENCODEX_HOME;else process.env.OPENCODEX_HOME=oldOcx;removeTreeWithRetry(root);});
 async function seed(){await saveCredential("xai",{access:"old",refresh:"rotating",expires:1,accountId:"acct"});return getAccountSet("xai")!.activeAccountId;}function def(c:{n:number},gate?:Promise<void>){return{...OAUTH_PROVIDERS.xai!,refresh:async()=>{c.n++;if(gate)await gate;return{access:"fresh",refresh:"next",expires:Date.now()+3600000}}};}

@@ -3,10 +3,10 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearCodingAgentBinaryCache } from "../../src/adapters/coding-agent/profile";
-import { createQoderAdapter } from "../../src/adapters/qoder/adapter";
-import { commandInvocation } from "../../src/lib/win-exec";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { clearCodingAgentBinaryCache } from "../../backend/src/adapters/coding-agent/profile";
+import { createQoderAdapter } from "../../backend/src/adapters/qoder/adapter";
+import { commandInvocation } from "../../backend/src/lib/win-exec";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // #7518 on a real Windows host: the official Qoder CN layout, a native receiver that records the

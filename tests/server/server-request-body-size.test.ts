@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
-import { getDefaultConfig, saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { MAX_DECOMPRESSED_BODY_BYTES } from "../../src/server/request-decompress";
+import { getDefaultConfig, saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { MAX_DECOMPRESSED_BODY_BYTES } from "../../backend/src/server/request-decompress";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

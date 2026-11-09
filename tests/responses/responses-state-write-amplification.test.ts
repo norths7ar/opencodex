@@ -17,7 +17,7 @@ import {
   flushResponseState,
   rememberResponseState,
   setResponseStateByteCapForTests,
-} from "../../src/responses/state";
+} from "../../backend/src/responses/state";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 function remember(id: string, text: string): void {

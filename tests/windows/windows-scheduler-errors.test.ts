@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { WindowsSchtasksError, WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER } from "../../src/lib/windows-elevation";
-import { schtasks, schtasksErrorDetail, type WindowsSchedulerTaskProbe } from "../../src/service/windows-scheduler";
-import { isWindowsSchedulerEndBenign } from "../../src/service/windows-ops";
+import { WindowsSchtasksError, WINDOWS_SCHTASKS_CREATE_ACCESS_DENIED_MARKER } from "../../backend/src/lib/windows-elevation";
+import { schtasks, schtasksErrorDetail, type WindowsSchedulerTaskProbe } from "../../backend/src/service/windows-scheduler";
+import { isWindowsSchedulerEndBenign } from "../../backend/src/service/windows-ops";
 
 const task = "opencodex-proxy";
 // Literal CP949 bytes; UTF-8 decoding corrupts the child's diagnostic before formatting.

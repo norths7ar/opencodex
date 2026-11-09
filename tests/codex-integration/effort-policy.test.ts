@@ -7,16 +7,16 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { applyEffortCap, effortCapAppliesTo, effortCapFor, isThreadSpawnRequest, resolveCappedEffort, stripEmptyLadderEffort, supportedLadderFor } from "../../src/server/effort-policy";
-import { collabSurface } from "../../src/server/responses";
-import { handleManagementAPI } from "../../src/server/management-api";
-import { NoEnabledOpenAiProviderError, routeModel } from "../../src/router";
-import { mapReasoningEffort } from "../../src/reasoning-effort";
-import { nativeEffortClamp } from "../../src/codex/catalog";
-import type { OcxConfig, OcxParsedRequest } from "../../src/types";
+import { applyEffortCap, effortCapAppliesTo, effortCapFor, isThreadSpawnRequest, resolveCappedEffort, stripEmptyLadderEffort, supportedLadderFor } from "../../backend/src/server/effort-policy";
+import { collabSurface } from "../../backend/src/server/responses";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import { NoEnabledOpenAiProviderError, routeModel } from "../../backend/src/router";
+import { mapReasoningEffort } from "../../backend/src/reasoning-effort";
+import { nativeEffortClamp } from "../../backend/src/codex/catalog";
+import type { OcxConfig, OcxParsedRequest } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { prepareEffortNormalization } from "../../src/server/effort-policy";
-import { normalizeThinkingOptions } from "../../src/clients/reasoning-controls";
+import { prepareEffortNormalization } from "../../backend/src/server/effort-policy";
+import { normalizeThinkingOptions } from "../../backend/src/clients/reasoning-controls";
 
 test("a toggle-only client's choice survives strength policy and is restored on fallback", () => {
   const provider = { adapter: "openai-chat", baseUrl: "https://fixture.invalid/v1", modelCapabilities: {

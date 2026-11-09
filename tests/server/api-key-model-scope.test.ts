@@ -1,4 +1,4 @@
-import { clientFacingModelLabel } from "../../src/lib/error-destination";
+import { clientFacingModelLabel } from "../../backend/src/lib/error-destination";
 import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -6,7 +6,7 @@ import { join } from "node:path";
 // The schema this exercises is reached through `src/config`, the entry the
 // runtime evaluates first. Importing `config/schema/*` directly enters that
 // module cycle from the wrong end and throws a TDZ ReferenceError.
-import { loadConfig } from "../../src/config";
+import { loadConfig } from "../../backend/src/config";
 import {
   admissionModelDeniedBody,
   AdmissionModelDeniedError,
@@ -16,9 +16,9 @@ import {
   MODEL_NOT_ALLOWED_FOR_KEY,
   resolveAdmissionModelScope,
   routeAllowedByScope,
-} from "../../src/server/admission-model-scope";
-import { routeModel } from "../../src/router";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/admission-model-scope";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const KEY = "ocx_data_" + "a".repeat(40);

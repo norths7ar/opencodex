@@ -2,14 +2,14 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { resetContextRelayActivationForTests } from "../../src/codex/context-compat";
-import { startServer } from "../../src/server";
-import { initializeManagementAuthState } from "../../src/server/management-auth";
+import { saveConfig } from "../../backend/src/config";
+import { resetContextRelayActivationForTests } from "../../backend/src/codex/context-compat";
+import { startServer } from "../../backend/src/server";
+import { initializeManagementAuthState } from "../../backend/src/server/management-auth";
 import {
   resetHardenedStateForTests, setIcaclsRunnerForTests, setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
-import { setSystemRestartIoForTests } from "../../src/server/management/system-restart";
+} from "../../backend/src/lib/windows-secret-acl";
+import { setSystemRestartIoForTests } from "../../backend/src/server/management/system-restart";
 import { drainAndRemoveFixtureRoots } from "../helpers/fixture-teardown";
 import { remoteConfig } from "../helpers/management-auth-fixture";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";

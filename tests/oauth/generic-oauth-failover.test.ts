@@ -15,20 +15,20 @@ import {
   preferredInitialAccount,
   rotateGenericOAuthAccountOn429,
   rotateAntigravityAccountOnAuthRefusal,
-} from "../../src/oauth/generic-account-failover";
-import { getValidAccessSnapshotForAccount, OAuthAccountPausedError } from "../../src/oauth";
-import { credentialGeneration, getAccountSet, markAccountNeedsReauth, replaceProviderAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../src/oauth/store";
+} from "../../backend/src/oauth/generic-account-failover";
+import { getValidAccessSnapshotForAccount, OAuthAccountPausedError } from "../../backend/src/oauth";
+import { credentialGeneration, getAccountSet, markAccountNeedsReauth, replaceProviderAccountSet, saveCredential, setAccountPaused, setActiveAccount } from "../../backend/src/oauth/store";
 
-import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
-import { subscribeAccountSelections } from "../../src/lib/account-selection-events";
-import { resolveCopilotApiBaseUrl } from "../../src/oauth/github-copilot";
-import { resolveProviderTransport } from "../../src/providers/xai-transport";
-import { bindRouteReasoningReplayScope } from "../../src/server/responses/core-replay";
+import { clearAccountQuotaCache, setCachedProviderAccountQuotaForTests } from "../../backend/src/providers/quota";
+import { subscribeAccountSelections } from "../../backend/src/lib/account-selection-events";
+import { resolveCopilotApiBaseUrl } from "../../backend/src/oauth/github-copilot";
+import { resolveProviderTransport } from "../../backend/src/providers/xai-transport";
+import { bindRouteReasoningReplayScope } from "../../backend/src/server/responses/core-replay";
 import {
   clearReasoningReplayCacheForTests,
   commitReasoningReplayServingIdentity,
-} from "../../src/responses/reasoning-replay-cache";
-import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/responses/reasoning-replay-cache";
+import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath } from "../helpers/repo-root";
 
@@ -1042,7 +1042,7 @@ describe("Antigravity authentication refusal selection", () => {
       bindGenericSessionAccount,
       clearGenericSessionAffinityForAccount,
       genericSessionAccount,
-    } = await import("../../src/oauth/generic-session-affinity");
+    } = await import("../../backend/src/oauth/generic-session-affinity");
     const [a, b] = await seedProvider("google-antigravity", 2);
     const cfg = {
       oauthAccountFailover: { enabled: true },

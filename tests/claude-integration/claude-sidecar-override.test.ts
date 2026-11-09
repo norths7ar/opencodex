@@ -1,10 +1,10 @@
 import { expect, spyOn, test } from "bun:test";
-import { parseRequest } from "../../src/responses/parser";
-import { buildClaudeReplayConfig } from "../../src/server/claude-messages";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { planVisionSidecar } from "../../src/vision";
-import { planWebSearch } from "../../src/web-search";
-import * as sidecarAuth from "../../src/sidecar/auth";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { buildClaudeReplayConfig } from "../../backend/src/server/claude-messages";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { planVisionSidecar } from "../../backend/src/vision";
+import { planWebSearch } from "../../backend/src/web-search";
+import * as sidecarAuth from "../../backend/src/sidecar/auth";
 
 const routed: OcxProviderConfig = {
   adapter: "openai-chat",

@@ -6,14 +6,14 @@ import {
   claudeCodeSessionId,
   stainlessArchName,
   stainlessOsName,
-} from "../../src/adapters/client-fingerprint";
-import { createAnthropicAdapter } from "../../src/adapters/anthropic";
+} from "../../backend/src/adapters/client-fingerprint";
+import { createAnthropicAdapter } from "../../backend/src/adapters/anthropic";
 import {
   CLAUDE_CLI_RUNTIME_VERSION,
   CLAUDE_CLI_SDK_PACKAGE_VERSION,
   CLAUDE_CLI_USER_AGENT,
-} from "../../src/providers/claude-cli-identity";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/claude-cli-identity";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 
 function parsed(overrides: Partial<OcxParsedRequest> = {}): OcxParsedRequest {
   return {

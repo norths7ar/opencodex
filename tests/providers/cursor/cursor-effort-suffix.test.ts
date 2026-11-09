@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createCursorRequest } from "../../../src/adapters/cursor/request-builder";
-import { CANONICAL_EFFORT_SUFFIXES, cursorEffortSuffix, cursorModelEffortLadder, cursorWireModelIdWithEffort, CURSOR_THINKING_MODEL_IDS } from "../../../src/adapters/cursor/effort-map";
-import { CURSOR_STATIC_MODELS, isCursorModelAvailableForAccount } from "../../../src/adapters/cursor/discovery";
-import type { OcxParsedRequest } from "../../../src/types";
+import { createCursorRequest } from "../../../backend/src/adapters/cursor/request-builder";
+import { CANONICAL_EFFORT_SUFFIXES, cursorEffortSuffix, cursorModelEffortLadder, cursorWireModelIdWithEffort, CURSOR_THINKING_MODEL_IDS } from "../../../backend/src/adapters/cursor/effort-map";
+import { CURSOR_STATIC_MODELS, isCursorModelAvailableForAccount } from "../../../backend/src/adapters/cursor/discovery";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 // Static fixture recorded from Cursor GetUsableModels on 2026-08-06. This pins the
 // exact wire ids observed during the incident; live availability normalization is

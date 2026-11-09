@@ -3,23 +3,23 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { saveConfig } from "../../../src/config";
+import { saveConfig } from "../../../backend/src/config";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../../src/codex/model-entitlements";
-import { buildCursorIntegrationStatus } from "../../../src/server/management/cursor-integration-routes";
-import { handleChatCompletions } from "../../../src/server/chat-completions";
-import { handleClaudeMessages } from "../../../src/server/claude-messages";
+} from "../../../backend/src/codex/model-entitlements";
+import { buildCursorIntegrationStatus } from "../../../backend/src/server/management/cursor-integration-routes";
+import { handleChatCompletions } from "../../../backend/src/server/chat-completions";
+import { handleClaudeMessages } from "../../../backend/src/server/claude-messages";
 import {
   effortRowId,
   expandCursorEffortRow,
   parseEffortRowId,
-} from "../../../src/server/effort-row";
-import { handleResponses } from "../../../src/server/responses";
-import { startServer } from "../../../src/server";
-import type { RequestLogContext } from "../../../src/server/request-log";
-import type { OcxConfig } from "../../../src/types";
+} from "../../../backend/src/server/effort-row";
+import { handleResponses } from "../../../backend/src/server/responses";
+import { startServer } from "../../../backend/src/server";
+import type { RequestLogContext } from "../../../backend/src/server/request-log";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../../helpers/owned-spend-home";
 import { SERVER_BUDGET_MS } from "../../helpers/test-budget";

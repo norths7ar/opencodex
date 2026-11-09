@@ -22,7 +22,7 @@ import {
   usageReadCacheStatsForTests,
   usageLogRevisionKey,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
+} from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

@@ -4,8 +4,8 @@ import {
   normalizeRequestSpend,
   normalizeUsageEntryForTest,
   type PersistedUsageEntry,
-} from "../../src/usage/log";
-import { cacheObservationFromUsage, summarizeUsage } from "../../src/usage/summary";
+} from "../../backend/src/usage/log";
+import { cacheObservationFromUsage, summarizeUsage } from "../../backend/src/usage/summary";
 
 const NOW = Date.UTC(2026, 8, 14, 12, 0, 0);
 

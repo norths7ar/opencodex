@@ -6,12 +6,12 @@ import {
   deriveRequestExecutionBudget,
   reportDispatchSends,
   type RequestExecutionBudgetPolicy,
-} from "../../src/lib/request-execution-budget";
-import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../src/lib/spend-reservation-ledger";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { fetchWithTransientRetry, SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
+} from "../../backend/src/lib/request-execution-budget";
+import { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } from "../../backend/src/lib/spend-reservation-ledger";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { fetchWithTransientRetry, SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
 import { createShippedSpendLedger, spendTestJournal, testSpendSalt } from "../helpers/shipped-spend-ledger";
-import { SpendLedgerOwnerError } from "../../src/lib/spend-ledger-owner";
+import { SpendLedgerOwnerError } from "../../backend/src/lib/spend-ledger-owner";
 
 /**
  * The permit is the charge (#4546).
@@ -812,10 +812,10 @@ test("a reported external receipt cannot be taken over by an adapter", () => {
 });
 
 test("adapter executor rebinds its live permit to the selected account before wire", async () => {
-  const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../src/lib/spend-reservation-ledger");
-  const { createRequestSpendTracker } = await import("../../src/server/responses/request-spend");
-  const { createAdapterPhysicalSend } = await import("../../src/adapters/physical-send");
-  const { rebindPhysicalSend } = await import("../../src/lib/request-execution-budget");
+  const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../backend/src/lib/spend-reservation-ledger");
+  const { createRequestSpendTracker } = await import("../../backend/src/server/responses/request-spend");
+  const { createAdapterPhysicalSend } = await import("../../backend/src/adapters/physical-send");
+  const { rebindPhysicalSend } = await import("../../backend/src/lib/request-execution-budget");
   const ledger = createSpendReservationLedger({ salt: "permit-selected-account", policy: {
     ...DEFAULT_SPEND_RESERVATION_POLICY, identity: { maxTokens: 30 }, pool: { maxTokens: 1000 },
   } });
@@ -840,11 +840,11 @@ test("adapter executor rebinds its live permit to the selected account before wi
 });
 
 test("adapter executor refuses a reselection whose identity cannot obtain a normal seed", async () => {
-  const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../src/lib/spend-reservation-ledger");
-  const { createRequestSpendTracker } = await import("../../src/server/responses/request-spend");
-  const { createAdapterPhysicalSend } = await import("../../src/adapters/physical-send");
-  const { rebindPhysicalSend } = await import("../../src/lib/request-execution-budget");
-  const { SendBudgetExhaustedError } = await import("../../src/lib/upstream-retry");
+  const { createSpendReservationLedger, DEFAULT_SPEND_RESERVATION_POLICY } = await import("../../backend/src/lib/spend-reservation-ledger");
+  const { createRequestSpendTracker } = await import("../../backend/src/server/responses/request-spend");
+  const { createAdapterPhysicalSend } = await import("../../backend/src/adapters/physical-send");
+  const { rebindPhysicalSend } = await import("../../backend/src/lib/request-execution-budget");
+  const { SendBudgetExhaustedError } = await import("../../backend/src/lib/upstream-retry");
   const ledger = createSpendReservationLedger({ salt: "permit-selected-account", policy: {
     ...DEFAULT_SPEND_RESERVATION_POLICY, identity: { maxTokens: 30 }, pool: { maxTokens: 1000 },
   } });

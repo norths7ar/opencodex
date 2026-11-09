@@ -7,9 +7,9 @@ import {
   capabilitiesForRoute,
   capabilityInvocation,
   capabilityRouteKeys,
-} from "../../src/cli/capabilities";
-import { CLI_COMMANDS, findCommand } from "../../src/cli/registry";
-import { runCapabilities } from "../../src/cli/capabilities-command";
+} from "../../backend/src/cli/capabilities";
+import { CLI_COMMANDS, findCommand } from "../../backend/src/cli/registry";
+import { runCapabilities } from "../../backend/src/cli/capabilities-command";
 import { repoRoot as resolveRepoRoot } from "../helpers/repo-root";
 
 const repoRoot = resolveRepoRoot();
@@ -23,7 +23,7 @@ function captureStdout(): { lines: string[]; restore: () => void } {
 
 describe("capability table is a checked data graph", () => {
   test("capability discovery has only the allowed transitive data/type edges", () => {
-    expect(capabilityDataBoundary(join(repoRoot, "src/cli"))).toEqual([]);
+    expect(capabilityDataBoundary(join(repoRoot, "backend/src/cli"))).toEqual([]);
   });
 
   test("every capability renders a non-empty invocation and summary", () => {
@@ -43,7 +43,7 @@ describe("capability table is a checked data graph", () => {
     // write must not claim otherwise -- the flag is what --mutating-only filters on. The
     // registry's `mutates` decides, so a read-only POST (`POST /api/protocols/plan`, a
     // preview that sends nothing) is a read; an undeclared route falls back to its method.
-    const { MANAGEMENT_ROUTES } = await import("../../src/server/management/route-registry");
+    const { MANAGEMENT_ROUTES } = await import("../../backend/src/server/management/route-registry");
     const declared = new Map(MANAGEMENT_ROUTES.map(r => [`${r.method} ${r.path}`, r.mutates] as const));
     const wrong: string[] = [];
     for (const cap of CAPABILITIES) {
@@ -190,7 +190,7 @@ describe("ocx capabilities output", () => {
 
   test("every route a capability declares exists in the management registry", async () => {
     // The capability table must not advertise a route the server does not serve.
-    const { MANAGEMENT_ROUTES } = await import("../../src/server/management/route-registry");
+    const { MANAGEMENT_ROUTES } = await import("../../backend/src/server/management/route-registry");
     const declared = new Set(MANAGEMENT_ROUTES.map(r => `${r.method} ${r.path}`));
     const unknown = [...capabilityRouteKeys()].filter(k => !declared.has(k));
     expect(unknown).toEqual([]);
@@ -232,7 +232,7 @@ describe("capability/route parity is bidirectional", () => {
     // The reverse direction. Without it, 139 routes carried no verb and no exemption and the
     // suite stayed green -- which is how `capabilities --route /api/keys` came to return an
     // empty list while `ocx access key` worked.
-    const { MANAGEMENT_ROUTES } = await import("../../src/server/management/route-registry");
+    const { MANAGEMENT_ROUTES } = await import("../../backend/src/server/management/route-registry");
     const covered = capabilityRouteKeys();
     const ratchet = new Set(UNDECLARED_ROUTES_2026_08_28);
     const unexplained = MANAGEMENT_ROUTES
@@ -247,7 +247,7 @@ describe("capability/route parity is bidirectional", () => {
   test("the ratchet only shrinks: every listed route is still unexplained", async () => {
     // A stale entry is as bad as a missing one. Once a route gains a capability or an
     // exemption it must leave this list, or the count stops being evidence of progress.
-    const { MANAGEMENT_ROUTES } = await import("../../src/server/management/route-registry");
+    const { MANAGEMENT_ROUTES } = await import("../../backend/src/server/management/route-registry");
     const covered = capabilityRouteKeys();
     const byKey = new Map(MANAGEMENT_ROUTES.map(r => [`${r.method} ${r.path}`, r] as const));
     const stale = UNDECLARED_ROUTES_2026_08_28.filter(k => {
@@ -260,7 +260,7 @@ describe("capability/route parity is bidirectional", () => {
 
   test("desktop snapshot has an explicit internal exemption, not an operator CLI verb", async () => {
     // Only the Tauri shell holds signed-updater state; a CLI verb could only forge it.
-    const { MANAGEMENT_ROUTES } = await import("../../src/server/management/route-registry");
+    const { MANAGEMENT_ROUTES } = await import("../../backend/src/server/management/route-registry");
     const row = MANAGEMENT_ROUTES.find(r => r.method === "POST"
       && r.path === "/api/update/desktop-snapshot");
     expect(row?.exempt?.reason).toBe("desktop-internal");

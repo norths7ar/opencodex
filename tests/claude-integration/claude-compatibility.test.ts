@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { analyzeClaudeCompatibility, isClaudeCompatibilityMode } from "../../src/claude/compatibility";
+import { analyzeClaudeCompatibility, isClaudeCompatibilityMode } from "../../backend/src/claude/compatibility";
 
 // Shapes from Anthropic's thinking, tool-search, strict-tool-use and Messages docs:
 // https://platform.claude.com/docs/en/build-with-claude/thinking

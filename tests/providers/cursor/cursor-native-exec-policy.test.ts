@@ -3,12 +3,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { create, fromBinary } from "@bufbuild/protobuf";
 import { afterEach, describe, expect, test } from "bun:test";
-import { createCursorAdapter } from "../../../src/adapters/cursor";
+import { createCursorAdapter } from "../../../backend/src/adapters/cursor";
 import {
   cursorRequestDeclaresFullAccess,
   effectiveCursorNativeExecAllow,
   resolveCursorNativeExecMode,
-} from "../../../src/adapters/cursor/exec-policy";
+} from "../../../backend/src/adapters/cursor/exec-policy";
 import {
   AgentClientMessageSchema,
   BackgroundShellSpawnArgsSchema,
@@ -21,19 +21,19 @@ import {
   ShellArgsSchema,
   WriteArgsSchema,
   WriteShellStdinArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
 import {
   cursorNativeExecRedirectHint,
   handleCursorNativeExec,
-} from "../../../src/adapters/cursor/native-exec";
+} from "../../../backend/src/adapters/cursor/native-exec";
 import {
   nativeShellDisabledMessage,
   resetBackgroundShellStateForTests,
   setBackgroundShellRuntimeForTests,
-} from "../../../src/adapters/cursor/native-exec-shell";
-import type { CursorTransportFactoryInput } from "../../../src/adapters/cursor/transport";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/native-exec-shell";
+import type { CursorTransportFactoryInput } from "../../../backend/src/adapters/cursor/transport";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 const fullAccessDeclaration = "`sandbox_mode` is `danger-full-access`";
 
@@ -584,7 +584,7 @@ describe("Cursor native exec catalog-aware redirect hint", () => {
   // drafts whose hosted suite never ran, so nothing else proves this line exists.
   test("the live transport derives the hint from each turn's visible catalog", async () => {
     const { repoPath } = await import("../../helpers/repo-root");
-    const source = readFileSync(repoPath("src/adapters/cursor/live-transport.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src/adapters/cursor/live-transport.ts"), "utf8");
     const assignment = source.match(/nativeExecRedirectHint:\s*cursorNativeExecRedirectHint\(([^)]*)\)/)?.[1];
     expect(assignment).toBeDefined();
     // Derived from THIS turn's visible catalog and advertised MCP tools, not from the raw request

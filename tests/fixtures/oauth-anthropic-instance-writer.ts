@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
-import type { AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { OAuthCredentials } from "../../src/oauth/types";
+import type { AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { OAuthCredentials } from "../../backend/src/oauth/types";
 import { repoPath } from "../helpers/repo-root";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 
@@ -46,15 +46,15 @@ try {
   // the exit drain spawn icacls (30 s budget each), which the parent's completion deadline would
   // otherwise bill to registration. ACL policy has its own suites; keep it out of this budget.
   phase = "disable-acl";
-  const { setPlatformForTests }: typeof import("../../src/lib/windows-secret-acl")
-    = await import(repoPath("src", "lib", "windows-secret-acl.ts"));
+  const { setPlatformForTests }: typeof import("../../backend/src/lib/windows-secret-acl")
+    = await import(repoPath("backend/src", "lib", "windows-secret-acl.ts"));
   setPlatformForTests("linux");
 
   phase = "import-store";
-  const { getAuthStorePath, loadAuthStore, saveCredentialWithReceipt }: typeof import("../../src/oauth/store")
-    = await import(repoPath("src", "oauth", "store.ts"));
-  const { AnthropicCrossInstanceDuplicateError }: typeof import("../../src/oauth/store-anthropic-instance")
-    = await import(repoPath("src", "oauth", "store-anthropic-instance.ts"));
+  const { getAuthStorePath, loadAuthStore, saveCredentialWithReceipt }: typeof import("../../backend/src/oauth/store")
+    = await import(repoPath("backend/src", "oauth", "store.ts"));
+  const { AnthropicCrossInstanceDuplicateError }: typeof import("../../backend/src/oauth/store-anthropic-instance")
+    = await import(repoPath("backend/src", "oauth", "store-anthropic-instance.ts"));
   phase = "verify-store-path";
   if (getAuthStorePath() !== join(root, "ocx", "auth.json")) throw new Error("Auth store escaped isolation");
   phase = "read-seed";
@@ -87,7 +87,7 @@ try {
   }
   // Only typed outcome metadata crosses the process boundary; no token/error dump.
   writeFileSync(join(root, `${instance}-result.json`), JSON.stringify(result));
-  const { flushConfigDirHardeningAndReaps } = await import(repoPath("src", "config", "paths.ts"));
+  const { flushConfigDirHardeningAndReaps } = await import(repoPath("backend/src", "config", "paths.ts"));
   await flushConfigDirHardeningAndReaps(join(root, "ocx"));
 } catch (error) {
   // Report phase and stack frames, never the exception message or credential data.

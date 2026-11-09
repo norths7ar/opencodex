@@ -4,9 +4,9 @@ import {
   collectChatCompletion,
   responsesJsonToChatCompletion,
   responsesSseToChatCompletionsSse,
-} from "../../src/chat/outbound";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/chat/outbound";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 

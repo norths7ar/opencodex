@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { PassThrough } from "node:stream";
-import { interactiveConfirm } from "../../src/cli/interactive-confirm";
+import { interactiveConfirm } from "../../backend/src/cli/interactive-confirm";
 
 /**
  * A fake TTY pair: the input side supports raw mode (so the selector takes the

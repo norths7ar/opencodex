@@ -2,21 +2,21 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import type { writeDesktop3pConfig } from "../../src/claude/desktop-3p";
-import { desktopVisibleNativeSlugs, type CatalogModel } from "../../src/codex/catalog";
-import { claudeDesktopIntegrationEnabled, grokIntegrationEnabled } from "../../src/codex/desired-state";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { IntegrationMutationBusyError, runIntegrationMutationFlight, setIntegrationMutationFlightTestHook } from "../../src/integrations/mutation-flight";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import * as asideProfiles from "../../src/integrations/aside-profiles";
-import { refreshOwnedIntegration } from "../../src/integrations/owned-refresh";
-import * as ownedRefresh from "../../src/integrations/owned-refresh";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import type { IntegrationWriterLockSeams } from "../../src/integrations/writer-lock";
-import { applyIntegration, disableIntegrationCoordinated } from "../../src/integrations/writer";
-import type { OcxConfig } from "../../src/types";
-import { syncEnabledClientIntegrations } from "../../src/server/management/config-routes";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import type { writeDesktop3pConfig } from "../../backend/src/claude/desktop-3p";
+import { desktopVisibleNativeSlugs, type CatalogModel } from "../../backend/src/codex/catalog";
+import { claudeDesktopIntegrationEnabled, grokIntegrationEnabled } from "../../backend/src/codex/desired-state";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { IntegrationMutationBusyError, runIntegrationMutationFlight, setIntegrationMutationFlightTestHook } from "../../backend/src/integrations/mutation-flight";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import * as asideProfiles from "../../backend/src/integrations/aside-profiles";
+import { refreshOwnedIntegration } from "../../backend/src/integrations/owned-refresh";
+import * as ownedRefresh from "../../backend/src/integrations/owned-refresh";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import type { IntegrationWriterLockSeams } from "../../backend/src/integrations/writer-lock";
+import { applyIntegration, disableIntegrationCoordinated } from "../../backend/src/integrations/writer";
+import type { OcxConfig } from "../../backend/src/types";
+import { syncEnabledClientIntegrations } from "../../backend/src/server/management/config-routes";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**
@@ -46,7 +46,7 @@ describe("ocx sync fans out to enabled native clients and owned file integration
   });
 
   test("Codex runs before the clients that read its catalog, and a refused sync stops the fan-out", async () => {
-    const src = await Bun.file(new URL("../../src/server/management/config-routes.ts", import.meta.url)).text();
+    const src = await Bun.file(new URL("../../backend/src/server/management/config-routes.ts", import.meta.url)).text();
     const routeStart = src.indexOf('url.pathname === "/api/sync"');
     expect(routeStart).toBeGreaterThan(-1);
     const route = src.slice(routeStart, routeStart + 1400);
@@ -58,7 +58,7 @@ describe("ocx sync fans out to enabled native clients and owned file integration
   });
 
   test("each client is gated on its own toggle and its failure stays non-fatal", async () => {
-    const src = await Bun.file(new URL("../../src/server/management/config-routes.ts", import.meta.url)).text();
+    const src = await Bun.file(new URL("../../backend/src/server/management/config-routes.ts", import.meta.url)).text();
     const start = src.indexOf("async function syncEnabledClientIntegrations");
     expect(start).toBeGreaterThan(-1);
     const fn = src.slice(start, src.indexOf("\nfunction publicVisionSidecarSettings", start));
@@ -904,7 +904,7 @@ describe("owned Pi/Aside catalogs follow filtered model selections", () => {
 });
 
 test("the direct ocx sync command refreshes owned clients including OpenCode and Kilo and server-owned Aside", async () => {
-  const src = await Bun.file(new URL("../../src/cli/sync-command.ts", import.meta.url)).text();
+  const src = await Bun.file(new URL("../../backend/src/cli/sync-command.ts", import.meta.url)).text();
   const start = src.indexOf("export async function runSyncCommand");
   const command = src.slice(start, src.indexOf("async function handleConnectedSyncCatalogWrite", start));
   expect(command).toContain("refreshOwnedCatalogIntegrations");
@@ -917,7 +917,7 @@ test("the direct ocx sync command refreshes owned clients including OpenCode and
 });
 
 test("server startup owns Raycast refresh; ensure does not reuse a saved-config snapshot", async () => {
-  const src = await Bun.file(new URL("../../src/cli/index.ts", import.meta.url)).text();
+  const src = await Bun.file(new URL("../../backend/src/cli/index.ts", import.meta.url)).text();
   const start = src.slice(src.indexOf("async function handleStart"), src.indexOf("function detachedStartEnvironment"));
   const ensure = src.slice(src.indexOf("async function handleEnsure"), src.indexOf("async function handleTrayProxyStart"));
   expect(src).toContain("refreshOwnedCatalogIntegrations");
@@ -930,7 +930,7 @@ test("server startup owns Raycast refresh; ensure does not reuse a saved-config 
 test("already-running ensure leaves Raycast untouched when saved host and listener policy diverge", async () => {
   // Exercise the actual command body with external effects injected. Importing
   // index.ts directly starts CLI dispatch, so isolate only handleEnsure here.
-  const src = await Bun.file(new URL("../../src/cli/index.ts", import.meta.url)).text();
+  const src = await Bun.file(new URL("../../backend/src/cli/index.ts", import.meta.url)).text();
   const command = src.slice(src.indexOf("async function handleEnsure"), src.indexOf("async function handleTrayProxyStart"));
   const executable = new Bun.Transpiler({ loader: "ts" }).transformSync(command);
   const root = mkdtempSync(join(tmpdir(), "ocx-ensure-raycast-divergence-"));

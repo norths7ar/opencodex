@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { structurallyValidFernetTokens } from "../../src/server/responses/encrypted-payload";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { structurallyValidFernetTokens } from "../../backend/src/server/responses/encrypted-payload";
 import {
   handleResponses,
   hasUnreadableEncryptedAgentTask,
-} from "../../src/server/responses";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/responses";
+import type { OcxConfig } from "../../backend/src/types";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 

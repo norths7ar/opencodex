@@ -5,13 +5,13 @@
 // natively image-capable models do not. Plan/evidence:
 // devlog/_fin/260804_stack7_service_vision (010 design, 011 per-id audit).
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter, formatOpenAIChatErrorBody } from "../../src/adapters/openai-chat";
-import { applyProviderConfigHints, normalizeRoutedCatalogEntry } from "../../src/codex/catalog";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { parseRequest } from "../../src/responses/parser";
-import { routeModel } from "../../src/router";
-import type { OcxConfig, OcxParsedRequest, OcxTool } from "../../src/types";
-import { planVisionSidecar } from "../../src/vision";
+import { createOpenAIChatAdapter, formatOpenAIChatErrorBody } from "../../backend/src/adapters/openai-chat";
+import { applyProviderConfigHints, normalizeRoutedCatalogEntry } from "../../backend/src/codex/catalog";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { parseRequest } from "../../backend/src/responses/parser";
+import { routeModel } from "../../backend/src/router";
+import type { OcxConfig, OcxParsedRequest, OcxTool } from "../../backend/src/types";
+import { planVisionSidecar } from "../../backend/src/vision";
 
 const tools: OcxTool[] = [{ name: "shell", description: "run", parameters: { type: "object" } }];
 

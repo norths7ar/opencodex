@@ -1,11 +1,11 @@
 import { afterEach, expect, spyOn, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
-import type { AdapterEvent, OcxParsedRequest } from "../../src/types";
-import { runWithWebSearch } from "../../src/web-search/loop";
-import { buildWebSearchTool } from "../../src/web-search/synthetic-tool";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
+import type { AdapterEvent, OcxParsedRequest } from "../../backend/src/types";
+import { runWithWebSearch } from "../../backend/src/web-search/loop";
+import { buildWebSearchTool } from "../../backend/src/web-search/synthetic-tool";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../src/server/responses/context-overflow";
-import { markResponseNonReplayable } from "../../src/lib/upstream-retry";
+import { PROVIDER_INPUT_TOO_LARGE_MESSAGE } from "../../backend/src/server/responses/context-overflow";
+import { markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 
 const originalFetch = globalThis.fetch;
 afterEach(() => { globalThis.fetch = originalFetch; });

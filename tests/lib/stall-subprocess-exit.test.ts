@@ -19,7 +19,7 @@ import { join } from "node:path";
 import {
   waitForSubprocessExit,
   type KillableSubprocess,
-} from "../../src/lib/bounded-subprocess";
+} from "../../backend/src/lib/bounded-subprocess";
 import {
   flushWindowsSecretAclReapsBeforeRemoval,
   hardenSecretDirAsync,
@@ -28,16 +28,16 @@ import {
   setAsyncIcaclsRunnerForTests,
   setNowForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import {
   AtomicWriteResidualTempError,
   atomicWriteFileAsync,
   setWindowsHardeningForTests,
-} from "../../src/config/atomic-write";
+} from "../../backend/src/config/atomic-write";
 import {
   resetWindowsPrincipalForTests,
   setAsyncWindowsPrincipalRunnerForTests,
-} from "../../src/lib/windows-user-principal";
+} from "../../backend/src/lib/windows-user-principal";
 
 const DEADLINE_MS = 10;
 const REAP_REQUIRED = 1;

@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON, setOwnedBudgetAbandonedMsForTests } from "../../src/bridge";
+import { bridgeToResponsesSSE, buildResponseJSON, setOwnedBudgetAbandonedMsForTests } from "../../backend/src/bridge";
 import {
   createTranslatorBudget,
   resetTranslatorAggregateForTests,
   retainTranslatedEventBatch,
   translatorAggregateCurrentBytesForTests,
   translatorLiveBudgetCountForTests,
-} from "../../src/lib/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent } from "../../backend/src/types";
 
 async function* replay(events: AdapterEvent[]): AsyncGenerator<AdapterEvent> {
   for (const event of events) yield event;

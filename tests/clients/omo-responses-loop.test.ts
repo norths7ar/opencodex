@@ -4,11 +4,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   buildClientConfig, LOOPBACK_API_KEY_PLACEHOLDER, OPENCODE_PROVIDER_ID, type PiGeneratedConfig,
-} from "../../src/clients/config-export";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { drainAndShutdown } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { drainAndShutdown } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { streamFromText } from "../helpers/sse-stream";

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { filterCatalogVisibleModels, type CatalogModel } from "../../src/codex/catalog";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { filterCatalogVisibleModels, type CatalogModel } from "../../backend/src/codex/catalog";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 function m(provider: string, id: string): CatalogModel {
   return { provider, id, owned_by: provider };

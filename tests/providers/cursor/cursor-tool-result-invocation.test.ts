@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { create, fromBinary, toBinary } from "@bufbuild/protobuf";
-import { CURSOR_EXTERNAL_ROOT_BYTE_LIMIT, CURSOR_INVOCATION_ARGUMENTS_BYTE_LIMIT, encodeCursorRunRequest } from "../../../src/adapters/cursor/protobuf-request";
-import { handleCursorNativeKv, storeCursorBlob } from "../../../src/adapters/cursor/native-exec";
+import { CURSOR_EXTERNAL_ROOT_BYTE_LIMIT, CURSOR_INVOCATION_ARGUMENTS_BYTE_LIMIT, encodeCursorRunRequest } from "../../../backend/src/adapters/cursor/protobuf-request";
+import { handleCursorNativeKv, storeCursorBlob } from "../../../backend/src/adapters/cursor/native-exec";
 import {
   AgentClientMessageSchema,
   ConversationStepSchema,
@@ -9,8 +9,8 @@ import {
   ConversationTurnStructureSchema,
   GetBlobArgsSchema,
   KvServerMessageSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import type { OcxMessage } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import type { OcxMessage } from "../../../backend/src/types";
 
 function blobData(blobId: Uint8Array): Uint8Array {
   const reply = fromBinary(AgentClientMessageSchema, handleCursorNativeKv(create(KvServerMessageSchema, {

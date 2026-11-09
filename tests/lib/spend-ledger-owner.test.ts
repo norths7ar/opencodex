@@ -15,7 +15,7 @@ import {
   spendLedgerRestartEnvironment,
   spendLedgerOwnerSnapshot,
   type SpendLedgerOwnerLease,
-} from "../../src/lib/spend-ledger-owner";
+} from "../../backend/src/lib/spend-ledger-owner";
 import {
   SPEND_LEDGER_JOURNAL_FILENAME,
   SPEND_LEDGER_SALT_FILENAME,
@@ -26,9 +26,9 @@ import {
   sharedSpendLedger,
   spendLedgerDiagnosticsSnapshot,
   type SpendReservationPolicy,
-} from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/lib/spend-reservation-ledger";
 import { helperPath } from "../helpers/repo-root";
-import { CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST, removeOwnedConfigState } from "../../src/lib/config-ownership";
+import { CONFIG_OWNER_FILE, CONFIG_UNINSTALL_MANIFEST, removeOwnedConfigState } from "../../backend/src/lib/config-ownership";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS } from "../helpers/test-budget";
 

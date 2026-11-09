@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { applyProviderConfigHints } from "../../src/codex/catalog";
-import { applyCatalogModelMetadata } from "../../src/codex/catalog/effort";
-import type { CatalogModel, RawEntry } from "../../src/codex/catalog/parsing";
-import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { evaluatePolicyProfile } from "../../src/routing/evaluator";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog";
+import { applyCatalogModelMetadata } from "../../backend/src/codex/catalog/effort";
+import type { CatalogModel, RawEntry } from "../../backend/src/codex/catalog/parsing";
+import { candidateCapabilityEvidence } from "../../backend/src/routing/capability";
+import { evaluatePolicyProfile } from "../../backend/src/routing/evaluator";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 describe("FastWire characterization: routing profile service-tier evidence", () => {
   // FastWire #1886 B1 capability semantic migration: Chat caller-forward permission no longer

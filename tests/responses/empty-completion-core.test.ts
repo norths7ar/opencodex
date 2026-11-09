@@ -1,16 +1,16 @@
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
 import {
   providerRequestPacingStatus,
   resetProviderRequestPacingForTest,
   setProviderRequestPacingLimitsForTest,
   setProviderRequestPacingRuntimeForTest,
-} from "../../src/providers/request-pacing";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+} from "../../backend/src/providers/request-pacing";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { AdapterEvent, OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
-const actualResolver = await import("../../src/server/adapter-resolve");
+const actualResolver = await import("../../backend/src/server/adapter-resolve");
 const actualResolveAdapter = actualResolver.resolveAdapter;
 
 let attemptEvents: AdapterEvent[][] = [];
@@ -92,7 +92,7 @@ function fixtureAdapter(provider: OcxProviderConfig): ProviderAdapter & { passth
   };
 }
 
-mock.module("../../src/server/adapter-resolve", () => ({
+mock.module("../../backend/src/server/adapter-resolve", () => ({
   ...actualResolver,
   resolveAdapter(provider: OcxProviderConfig, cacheRetention?: "none" | "short" | "long") {
     if (
@@ -106,7 +106,7 @@ mock.module("../../src/server/adapter-resolve", () => ({
   },
 }));
 
-const { handleResponses } = await import("../../src/server/responses");
+const { handleResponses } = await import("../../backend/src/server/responses");
 
 function config(
   adapter: "test-run-turn" | "test-http" | "test-passthrough",

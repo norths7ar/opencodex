@@ -7,8 +7,8 @@ import {
   safeGoogleHttpErrorMessage,
   safeVertexHttpErrorMessage,
   ANTIGRAVITY_VALIDATION_REQUIRED_PREFIX,
-} from "../../../src/adapters/google-errors";
-import { adapterFailureFromMessage, classifyError } from "../../../src/lib/errors";
+} from "../../../backend/src/adapters/google-errors";
+import { adapterFailureFromMessage, classifyError } from "../../../backend/src/lib/errors";
 
 describe("Google input token overflow", () => {
   for (const [label, format] of [["Antigravity", safeAntigravityHttpErrorMessage], ["Vertex", safeVertexHttpErrorMessage]] as const) {

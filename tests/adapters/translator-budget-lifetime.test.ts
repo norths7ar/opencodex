@@ -2,21 +2,21 @@ import { expect, test } from "bun:test";
 import {
   createTranslatorBudget, finalizeTranslatorBudgetResponse, translatorLiveBudgetCountForTests,
   translatorObservedBufferSnapshot,
-} from "../../src/lib/translator-budget";
+} from "../../backend/src/lib/translator-budget";
 import {
   finalizeAccountLease, finalizeOwnedTranslatorBudget, runTurnAdapterSseResponses,
-} from "../../src/server/responses/core-lifetime";
-import { isNonReplayableResponse, markResponseNonReplayable } from "../../src/lib/upstream-retry";
+} from "../../backend/src/server/responses/core-lifetime";
+import { isNonReplayableResponse, markResponseNonReplayable } from "../../backend/src/lib/upstream-retry";
 import {
   isPolicyCandidateRefusal, PolicyCandidateUnavailableError, policyCandidateRefusalResponse,
   isMandatoryToolChoiceRefusal, MandatoryToolChoiceUnavailableError,
-} from "../../src/server/responses/policy-request-scope";
-import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
+} from "../../backend/src/server/responses/policy-request-scope";
+import { consumeRecoveryFailure } from "../../backend/src/server/responses/recovery-failure";
 import {
   markNativePassthroughSseResponse, isNativePassthroughSseResponse,
   markEagerRelaySseResponse, isEagerRelaySseResponse,
   markPreinspectedJsonResponse, isPreinspectedJsonResponse,
-} from "../../src/server/relay";
+} from "../../backend/src/server/relay";
 
 for (const [kind, wrap] of [
   ["shared Chat/Messages", finalizeTranslatorBudgetResponse],
@@ -198,10 +198,10 @@ test.each([true, false])("policy refusal authority survives lifetime wrappers on
 for (const surface of ["responses", "chat-completions", "claude-messages"] as const) {
   test(`${surface}: HTTP owner links request abort to its unread response budget`, async () => {
     const handle = surface === "responses"
-      ? (await import("../../src/server/responses")).handleResponses
+      ? (await import("../../backend/src/server/responses")).handleResponses
       : surface === "chat-completions"
-        ? (await import("../../src/server/chat-completions")).handleChatCompletions
-        : (await import("../../src/server/claude-messages")).handleClaudeMessages;
+        ? (await import("../../backend/src/server/chat-completions")).handleChatCompletions
+        : (await import("../../backend/src/server/claude-messages")).handleClaudeMessages;
     const baseline = translatorLiveBudgetCountForTests();
     const controller = new AbortController();
     const response = await handle(new Request("http://localhost/v1/fixture", {

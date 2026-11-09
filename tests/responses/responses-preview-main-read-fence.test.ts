@@ -1,41 +1,41 @@
-import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
+import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import * as fs from "node:fs";
 import { mkdtempSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
 import {
   resolveCodexAuthContext,
   type CodexAuthContext,
-} from "../../src/codex/auth-context";
-import { getMainAccountToken, MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { clearMainAccountInfoCache } from "../../src/codex/main-account-cache";
+} from "../../backend/src/codex/auth-context";
+import { getMainAccountToken, MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { clearMainAccountInfoCache } from "../../backend/src/codex/main-account-cache";
 import {
   resetCodexModelEntitlementCacheForTests,
   seedCodexModelEntitlementsForTests,
-} from "../../src/codex/model-entitlements";
+} from "../../backend/src/codex/model-entitlements";
 import {
   blockNativeMainRecovery,
   completeNativeMainRecovery,
   nativeMainStartupGateSnapshot,
-} from "../../src/codex/native-profile-startup";
-import { clearAccountQuota } from "../../src/codex/quota";
-import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../src/codex/routing";
+} from "../../backend/src/codex/native-profile-startup";
+import { clearAccountQuota } from "../../backend/src/codex/quota";
+import { clearCodexUpstreamHealth, clearThreadAccountMap } from "../../backend/src/codex/routing";
 import {
   noteSubagentModelFailure,
   resetSubagentModelFallbackStateForTests,
-} from "../../src/codex/subagent-model-fallback";
+} from "../../backend/src/codex/subagent-model-fallback";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
-} from "../../src/responses/state";
-import { handleResponses } from "../../src/server/responses";
-import { resetAgentTaskRecoveryState } from "../../src/server/responses/agent-task-recovery";
-import type { ActiveTurnLease } from "../../src/server/lifecycle";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/responses/state";
+import { handleResponses } from "../../backend/src/server/responses";
+import { resetAgentTaskRecoveryState } from "../../backend/src/server/responses/agent-task-recovery";
+import type { ActiveTurnLease } from "../../backend/src/server/lifecycle";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig } from "../../backend/src/types";
 import {
   codexHeaders,
   encryptedInput,
@@ -548,9 +548,9 @@ describe("preview and final authentication agree on the native-main read fence",
 });
 
 test("subagent preview evaluates affinity separately for Reserve candidates", async () => {
-  const routing = await import("../../src/codex/routing");
-  const auth = await import("../../src/codex/auth-context");
-  const { bindThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
+  const routing = await import("../../backend/src/codex/routing");
+  const auth = await import("../../backend/src/codex/auth-context");
+  const { bindThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
   const config = providerConfig({ codexDesktopAuthless: true, codexPool: { requestOwnedAffinity: true }, subagentModelFallback: ["gpt-reserve", "gpt-5.5"] });
   const headers = codexHeaders("caller-account", { "session-id": "preview-session", "thread-id": "preview-thread" });
   config.pausedCodexAccountIds = [MAIN_CODEX_ACCOUNT_ID];
@@ -585,11 +585,11 @@ test("subagent preview evaluates affinity separately for Reserve candidates", as
 });
 
 test("recovery preview reads the recovered ownership key and lineage", async () => {
-  const routing = await import("../../src/codex/routing");
-  const auth = await import("../../src/codex/auth-context");
-  const coreAuth = await import("../../src/server/responses/core-auth");
-  const { recordCodexThreadLineage, clearCodexThreadLineageForTests } = await import("../../src/codex/lineage");
-  const { bindThreadAffinity } = await import("../../src/codex/routing/thread-affinity");
+  const routing = await import("../../backend/src/codex/routing");
+  const auth = await import("../../backend/src/codex/auth-context");
+  const coreAuth = await import("../../backend/src/server/responses/core-auth");
+  const { recordCodexThreadLineage, clearCodexThreadLineageForTests } = await import("../../backend/src/codex/lineage");
+  const { bindThreadAffinity } = await import("../../backend/src/codex/routing/thread-affinity");
   const config = providerConfig({ defaultProvider: "xai", agentTaskRecovery: { enabled: true }, codexPool: { requestOwnedAffinity: true }, subagentModelFallback: ["gpt-5.5"] });
   const headers = codexHeaders("caller-account", { "session-id": "recovery-session", "thread-id": "recovery-thread" });
   clearCodexThreadLineageForTests();

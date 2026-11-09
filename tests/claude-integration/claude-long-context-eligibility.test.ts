@@ -4,11 +4,11 @@
  * 1M (devlog/_plan/261009_claude_1m_default/020_long_context_eligibility.md).
  */
 import { describe, expect, test } from "bun:test";
-import { claudeSurfaceSupportsOneMillion, isLongContextWindow, routeSupportsOneMillion } from "../../src/claude/long-context";
-import { AUTO_CONTEXT_OFF, UNPAIRED_AUTO_CONTEXT } from "../../src/claude/context-windows";
-import { buildAnthropicModelInfos } from "../../src/claude/model-info";
-import { generateDesktop3pModels } from "../../src/claude/desktop-3p";
-import { withSubagentContextMarker } from "../../src/claude/subagent-model";
+import { claudeSurfaceSupportsOneMillion, isLongContextWindow, routeSupportsOneMillion } from "../../backend/src/claude/long-context";
+import { AUTO_CONTEXT_OFF, UNPAIRED_AUTO_CONTEXT } from "../../backend/src/claude/context-windows";
+import { buildAnthropicModelInfos } from "../../backend/src/claude/model-info";
+import { generateDesktop3pModels } from "../../backend/src/claude/desktop-3p";
+import { withSubagentContextMarker } from "../../backend/src/claude/subagent-model";
 
 const ASTRA_872K = { modelWindows: { "gpt-6-astra": 872_000 } };
 

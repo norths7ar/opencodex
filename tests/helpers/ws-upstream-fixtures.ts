@@ -1,7 +1,7 @@
 import {
   codexWsUpstreamFetch as rawCodexWsUpstreamFetch,
   shouldUseCodexWsUpstream as rawShouldUseCodexWsUpstream,
-} from "../../src/server/responses/ws-upstream";
+} from "../../backend/src/server/responses/ws-upstream";
 
 /**
  * Runtime pin and request shapes for the Codex WebSocket upstream suite.

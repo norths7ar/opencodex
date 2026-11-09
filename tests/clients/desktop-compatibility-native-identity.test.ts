@@ -2,8 +2,8 @@ import { afterEach, expect, test } from "bun:test";
 import { mkdtempSync, rmdirSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createNativeIdentityReader } from "../../src/codex/desktop-compatibility/native-identity";
-import { UsageRelayController } from "../../src/codex/desktop-compatibility/usage-controller";
+import { createNativeIdentityReader } from "../../backend/src/codex/desktop-compatibility/native-identity";
+import { UsageRelayController } from "../../backend/src/codex/desktop-compatibility/usage-controller";
 
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) { unlinkSync(join(root, "auth.json")); rmdirSync(root); } });

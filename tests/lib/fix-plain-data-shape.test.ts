@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { canonicalPlainData } from "../../src/lib/plain-data";
+import { canonicalPlainData } from "../../backend/src/lib/plain-data";
 
 describe("canonical plain-data structural identity", () => {
   test.each([[{}, []], [{ a: 1 }, [["a", 1]]], [{ nested: {} }, { nested: [] }]])("distinguishes different container shapes: %j and %j", (left, right) => {

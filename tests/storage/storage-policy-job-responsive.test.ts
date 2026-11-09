@@ -8,17 +8,17 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { drainAndShutdown } from "../../src/server/lifecycle";
-import type { OcxConfig } from "../../src/types";
+import { saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { drainAndShutdown } from "../../backend/src/server/lifecycle";
+import type { OcxConfig } from "../../backend/src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import {
   resetStorageCleanupPolicyJobForTestsAsync,
   setStorageCleanupPolicyJobTestHooks,
-} from "../../src/storage/policy-job";
-import { stopStorageCleanupScheduler } from "../../src/storage/policy-scheduler";
-import { drainStorageWorkers } from "../../src/storage/worker-lifecycle";
+} from "../../backend/src/storage/policy-job";
+import { stopStorageCleanupScheduler } from "../../backend/src/storage/policy-scheduler";
+import { drainStorageWorkers } from "../../backend/src/storage/worker-lifecycle";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS } from "../helpers/test-budget";
 

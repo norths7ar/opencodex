@@ -10,8 +10,8 @@ import {
   preparePrivateSqliteDatabase,
   setSqlitePathReparseProbeForTests,
   UnsafeSqlitePathError,
-} from "../../src/lib/private-sqlite-path";
-import { acquireSpendLedgerOwner, SPEND_LEDGER_OWNER_FILENAME, SpendLedgerOwnerError } from "../../src/lib/spend-ledger-owner";
+} from "../../backend/src/lib/private-sqlite-path";
+import { acquireSpendLedgerOwner, SPEND_LEDGER_OWNER_FILENAME, SpendLedgerOwnerError } from "../../backend/src/lib/spend-ledger-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let root = "";

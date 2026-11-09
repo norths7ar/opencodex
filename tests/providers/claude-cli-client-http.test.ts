@@ -3,13 +3,13 @@ import { spawn } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createClaudeCliAdapter } from "../../src/adapters/claude-cli/adapter";
-import { getAdapterDefinition } from "../../src/adapters/registry";
-import { handleResponses } from "../../src/server/responses";
-import { handleChatCompletions } from "../../src/server/chat-completions";
-import { buildDshClientConfig } from "../../src/clients/config-export/dsh";
+import { createClaudeCliAdapter } from "../../backend/src/adapters/claude-cli/adapter";
+import { getAdapterDefinition } from "../../backend/src/adapters/registry";
+import { handleResponses } from "../../backend/src/server/responses";
+import { handleChatCompletions } from "../../backend/src/server/chat-completions";
+import { buildDshClientConfig } from "../../backend/src/clients/config-export/dsh";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 test("Codex/DSH Responses and Pi Chat retain host-owned tools, inclusive usage and abort cleanup", async () => {
   const home = mkdtempSync(join(tmpdir(), "ocx-claude-http-"));

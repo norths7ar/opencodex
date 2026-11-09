@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { formatUptime } from "../../gui/src/formatUptime";
+import { formatUptime } from "../../frontend/src/formatUptime";
 
 describe("dashboard uptime formatting", () => {
   test("keeps short uptimes in seconds", () => {

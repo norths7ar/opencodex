@@ -2,11 +2,11 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { createIntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration } from "../../src/integrations/writer";
-import { codexInjectLockOutcome } from "../../src/codex/inject-coordination";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { createIntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration } from "../../backend/src/integrations/writer";
+import { codexInjectLockOutcome } from "../../backend/src/codex/inject-coordination";
 import {
   localClientSkipMessage,
   localClientSkipReason,
@@ -14,15 +14,15 @@ import {
   shouldSyncCodexOnStart,
   shouldSyncGrokOnStart,
   syncCodexOnStartIfEnabled,
-} from "../../src/codex/desired-state";
-import { markSiblingStart, resetSiblingStartForTests, siblingSkipMessage } from "../../src/codex/sibling-start";
-import { createManagementConvergeCodex } from "../../src/codex/management-convergence";
-import { createCatalogConvergeRequest } from "../../src/codex/catalog-admission";
-import { injectClaudeAgentDefs } from "../../src/claude/agents-inject";
-import { refreshOwnedCatalogIntegrations } from "../../src/integrations/catalog-refresh";
-import { syncEnabledClientIntegrations } from "../../src/server/management/config-routes";
-import { createReadinessGate } from "../../src/server/readiness";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/desired-state";
+import { markSiblingStart, resetSiblingStartForTests, siblingSkipMessage } from "../../backend/src/codex/sibling-start";
+import { createManagementConvergeCodex } from "../../backend/src/codex/management-convergence";
+import { createCatalogConvergeRequest } from "../../backend/src/codex/catalog-admission";
+import { injectClaudeAgentDefs } from "../../backend/src/claude/agents-inject";
+import { refreshOwnedCatalogIntegrations } from "../../backend/src/integrations/catalog-refresh";
+import { syncEnabledClientIntegrations } from "../../backend/src/server/management/config-routes";
+import { createReadinessGate } from "../../backend/src/server/readiness";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 describe("a sibling instance never writes the live owner's client routing", () => {
@@ -74,7 +74,7 @@ describe("a sibling instance never writes the live owner's client routing", () =
 
   test("the Codex sync every caller runs reports the sibling, not the toggle", async () => {
     markSiblingStart(10_100);
-    const { syncModelsToCodex } = await import("../../src/codex/sync");
+    const { syncModelsToCodex } = await import("../../backend/src/codex/sync");
     const result = await syncModelsToCodex(10_199, plain(), null);
     expect(result).toMatchObject({ status: "skipped", skippedReason: "sibling", ok: true, catalogWritten: false, cacheSynced: false });
     expect(result.message).toBe(siblingSkipMessage());

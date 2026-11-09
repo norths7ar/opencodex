@@ -12,9 +12,9 @@ import {
   takeRestartHandoffMarkers,
   takeRestartParentMarker,
   type OwnerProbeResult,
-} from "../../src/cli/restart-handoff";
-import { RESTART_PARENT_PID_ENV, withRestartParentMarker } from "../../src/lib/system-restart-contract";
-import { RESTART_HANDOFF_LOG_ENV } from "../../src/server/restart-replacement";
+} from "../../backend/src/cli/restart-handoff";
+import { RESTART_PARENT_PID_ENV, withRestartParentMarker } from "../../backend/src/lib/system-restart-contract";
+import { RESTART_HANDOFF_LOG_ENV } from "../../backend/src/server/restart-replacement";
 
 const PARENT = 4242;
 const PORT = 10100;

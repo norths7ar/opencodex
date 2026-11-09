@@ -7,7 +7,7 @@ import { createTempHome } from "../helpers/temp-home";
 import { repoPath } from "../helpers/repo-root";
 import { spawnTestChild } from "../helpers/spawn-test-child";
 
-const registryModule = pathToFileURL(repoPath("src/config/owner-registry.ts")).href;
+const registryModule = pathToFileURL(repoPath("backend/src/config/owner-registry.ts")).href;
 
 describe("owner registry home isolation", () => {
   for (const guarded of [true, false]) {

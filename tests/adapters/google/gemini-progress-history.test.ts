@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { geminiProgressLead } from "../../../src/adapters/google-progress-history";
-import { ANTIGRAVITY_MODEL_EFFORTS } from "../../../src/providers/antigravity-models";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { geminiProgressLead } from "../../../backend/src/adapters/google-progress-history";
+import { ANTIGRAVITY_MODEL_EFFORTS } from "../../../backend/src/providers/antigravity-models";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 // Shape of a live Gemini 4 Argon tool turn (2026-10-17): a progress line in the user's language

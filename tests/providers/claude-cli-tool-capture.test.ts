@@ -5,10 +5,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable, Writable } from "node:stream";
 import type { ChildProcess } from "node:child_process";
-import { createClaudeCliAdapter, findClaudeCliBinary } from "../../src/adapters/claude-cli/adapter";
-import { CLAUDE_CLI_PROFILE, clearClaudeCliBinaryCache } from "../../src/adapters/claude-cli/profiles";
-import { buildCodeBuddyToolBridge } from "../../src/adapters/codebuddy/tool-bridge";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createClaudeCliAdapter, findClaudeCliBinary } from "../../backend/src/adapters/claude-cli/adapter";
+import { CLAUDE_CLI_PROFILE, clearClaudeCliBinaryCache } from "../../backend/src/adapters/claude-cli/profiles";
+import { buildCodeBuddyToolBridge } from "../../backend/src/adapters/codebuddy/tool-bridge";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const enc = new TextEncoder();

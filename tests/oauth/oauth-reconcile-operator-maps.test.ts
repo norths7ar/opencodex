@@ -2,9 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../src/config";
-import { OAUTH_PROVIDERS, reconcileOAuthProviders, upsertOAuthProvider } from "../../src/oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { loadConfig, saveConfig, setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config";
+import { OAUTH_PROVIDERS, reconcileOAuthProviders, upsertOAuthProvider } from "../../backend/src/oauth";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const originalHome = process.env.OPENCODEX_HOME;

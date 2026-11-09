@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { antigravityCliUserAgent, antigravityUserAgent } from "../../src/adapters/client-fingerprint";
-import { probeAntigravityUsageQuota, setAntigravityAccountQuotaTransportForTests } from "../../src/providers/quota/antigravity";
+import { antigravityCliUserAgent, antigravityUserAgent } from "../../backend/src/adapters/client-fingerprint";
+import { probeAntigravityUsageQuota, setAntigravityAccountQuotaTransportForTests } from "../../backend/src/providers/quota/antigravity";
 
-import { PROXY_ENV_KEYS } from "../../src/lib/proxy-env";
+import { PROXY_ENV_KEYS } from "../../backend/src/lib/proxy-env";
 
 const proxyKeys = PROXY_ENV_KEYS.flatMap(key => [key, key.toLowerCase()]);
 const originalProxyEnv = Object.fromEntries(proxyKeys.map(key => [key, process.env[key]]));

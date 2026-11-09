@@ -10,9 +10,9 @@ import {
   releaseOpenToolBlocks,
   type StreamParseState,
   usageFromResult,
-} from "../../src/adapters/coding-agent/protocol";
-import type { OcxParsedRequest } from "../../src/types";
-import { normalizeCostTokens } from "../../src/usage/cost";
+} from "../../backend/src/adapters/coding-agent/protocol";
+import type { OcxParsedRequest } from "../../backend/src/types";
+import { normalizeCostTokens } from "../../backend/src/usage/cost";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 // The stream-json protocol for coding-agent CLIs

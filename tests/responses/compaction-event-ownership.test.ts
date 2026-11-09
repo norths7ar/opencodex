@@ -1,9 +1,9 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { createTranslatorBudget, retainTranslatedEvent, retainTranslatedEventBatch, TranslatorBudgetExceededError, type TranslatorBudget } from "../../src/lib/translator-budget";
-import { releaseCompactionCiphertextLease } from "../../src/responses/compaction";
-import type { AdapterEvent } from "../../src/types";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { createTranslatorBudget, retainTranslatedEvent, retainTranslatedEventBatch, TranslatorBudgetExceededError, type TranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { releaseCompactionCiphertextLease } from "../../backend/src/responses/compaction";
+import type { AdapterEvent } from "../../backend/src/types";
 
 const ciphertext = "fixture-中文-ciphertext";
 const sentinelBytes = 137;

@@ -2,16 +2,16 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { loadConfig, readConfigDiagnostics, saveConfig } from "../../src/config";
-import { startServer } from "../../src/server";
-import { findAvailablePort } from "../../src/server/ports";
-import { createManagementSessionControl, initializeManagementAuthState, issueGuiSession } from "../../src/server/management-auth";
-import { createGuiPairingGrant } from "../../src/server/gui-session";
-import { handleOauthAccountRoutes } from "../../src/server/management/oauth-account-routes";
-import type { ManagementContext } from "../../src/server/management/context";
-import { isDataPlaneAdmissionSecret } from "../../src/server/auth-cors";
-import { ownAdmissionTokens } from "../../src/claude/auth-detect";
-import type { OcxConfig } from "../../src/types";
+import { loadConfig, readConfigDiagnostics, saveConfig } from "../../backend/src/config";
+import { startServer } from "../../backend/src/server";
+import { findAvailablePort } from "../../backend/src/server/ports";
+import { createManagementSessionControl, initializeManagementAuthState, issueGuiSession } from "../../backend/src/server/management-auth";
+import { createGuiPairingGrant } from "../../backend/src/server/gui-session";
+import { handleOauthAccountRoutes } from "../../backend/src/server/management/oauth-account-routes";
+import type { ManagementContext } from "../../backend/src/server/management/context";
+import { isDataPlaneAdmissionSecret } from "../../backend/src/server/auth-cors";
+import { ownAdmissionTokens } from "../../backend/src/claude/auth-detect";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // The /api/keys handlers had no direct test before this file: GET masking, POST
@@ -224,7 +224,7 @@ describe("POST /api/keys", () => {
   });
 
   test("the POST handler no longer reads provider API keys", async () => {
-    const source = readFileSync(new URL("../../src/server/management/oauth-account-routes.ts", import.meta.url), "utf-8");
+    const source = readFileSync(new URL("../../backend/src/server/management/oauth-account-routes.ts", import.meta.url), "utf-8");
     const start = source.indexOf('url.pathname === "/api/keys" && req.method === "POST"');
     const end = source.indexOf('url.pathname === "/api/keys" && req.method === "PATCH"');
     expect(start).toBeGreaterThan(-1);

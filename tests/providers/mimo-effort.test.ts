@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
 
 const entry = PROVIDER_REGISTRY.find(provider => provider.id === "mimo-free")!;
 

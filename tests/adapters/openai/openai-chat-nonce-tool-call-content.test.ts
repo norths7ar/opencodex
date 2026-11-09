@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { SerializedToolCallContentBuffer, stripDuplicatedSerializedToolCalls } from "../../../src/adapters/openai-chat/serialized-tool-call-content";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { SerializedToolCallContentBuffer, stripDuplicatedSerializedToolCalls } from "../../../backend/src/adapters/openai-chat/serialized-tool-call-content";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { AdapterEvent } from "../../../src/types";
+import type { AdapterEvent } from "../../../backend/src/types";
 
 const nonce = "36a8b94076c558de0938f7e4f3cd4f18c5490ca0";
 const input = "text(42);";

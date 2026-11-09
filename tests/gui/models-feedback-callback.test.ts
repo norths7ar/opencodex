@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { repoPath } from "../helpers/repo-root";
 
-const modelsSource = await Bun.file(repoPath("gui", "src", "pages", "Models.tsx")).text();
+const modelsSource = await Bun.file(repoPath("frontend", "src", "pages", "Models.tsx")).text();
 
 /**
  * `publishFeedback` is called from 21 sites and, more importantly, from inside

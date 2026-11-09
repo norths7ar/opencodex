@@ -8,11 +8,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { anthropicBodyElidesBlockedSkill } from "../../src/claude/inbound";
-import { buildProtocolPlanSnapshot } from "../../src/protocols/plan-snapshot";
-import type { RouteResult } from "../../src/router";
-import { nativeMessagesDeclineReason } from "../../src/server/messages-native-eligibility";
-import type { OcxConfig } from "../../src/types";
+import { anthropicBodyElidesBlockedSkill } from "../../backend/src/claude/inbound";
+import { buildProtocolPlanSnapshot } from "../../backend/src/protocols/plan-snapshot";
+import type { RouteResult } from "../../backend/src/router";
+import { nativeMessagesDeclineReason } from "../../backend/src/server/messages-native-eligibility";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir = "";

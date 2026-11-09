@@ -1,10 +1,10 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
-import type { AnthropicInstanceId } from "../../../src/providers/anthropic-instance-id";
+import type { AnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
 import { createAnthropicInstanceFixture, type AnthropicInstanceFixture } from "../../helpers/anthropic-instance-fixture";
 
 let f: AnthropicInstanceFixture;
-let refusal: typeof import("../../../src/oauth/anthropic-account-refusal");
-let ownership: typeof import("../../../src/oauth/anthropic-send-ownership");
+let refusal: typeof import("../../../backend/src/oauth/anthropic-account-refusal");
+let ownership: typeof import("../../../backend/src/oauth/anthropic-send-ownership");
 const instances = ["anthropic", "anthropic2"] as const;
 const message = "OAuth access token has been revoked.";
 const payload = { type: "error", error: { type: "authentication_error", message } };
@@ -12,8 +12,8 @@ const payload = { type: "error", error: { type: "authentication_error", message 
 beforeEach(async () => {
   f = await createAnthropicInstanceFixture();
   await f.seed();
-  refusal = await import("../../../src/oauth/anthropic-account-refusal");
-  ownership = await import("../../../src/oauth/anthropic-send-ownership");
+  refusal = await import("../../../backend/src/oauth/anthropic-account-refusal");
+  ownership = await import("../../../backend/src/oauth/anthropic-send-ownership");
 });
 afterEach(async () => { await f?.dispose(); });
 
@@ -41,9 +41,9 @@ for (const instance of instances) for (const mutation of ["uuid", "cancel", "epo
   if (mutation === "remove-readd") {
     const original = structuredClone(f.store.getAccountSet(instance)!.accounts[0]!);
     await f.store.removeAccount(instance,f.ids[0]);
-    const cache=await import("../../../src/providers/quota/account-cache");
-    const recovery=await import("../../../src/providers/quota/anthropic-cooldown-recovery");
-    const sweeper=await import("../../../src/lib/state-store-sweeper");
+    const cache=await import("../../../backend/src/providers/quota/account-cache");
+    const recovery=await import("../../../backend/src/providers/quota/anthropic-cooldown-recovery");
+    const sweeper=await import("../../../backend/src/lib/state-store-sweeper");
     const context={generation:sweeper.captureConfigGeneration()+1,providerNames:new Set(instances),
       oauthAccountKeys:new Set(instances.flatMap(i=>f.store.getAccountSet(i)!.accounts.map(a=>cache.accountCacheKey(i,a.id)))),codexAccountIds:new Set<string>(),configRoots:new Set<string>()};
     recovery.reconcileAllAnthropicCooldownGenerations(context);
@@ -77,13 +77,13 @@ test("independent Pool 2 disable while terminal writer is queued",async()=>{
 
 for (const instance of instances) {
   test(`${instance}: independent search loop does not offer revoked-401 recovery after routed output`, async () => {
-    const { runWithWebSearch } = await import("../../../src/web-search/loop");
-    const { parseRequest } = await import("../../../src/responses/parser");
-    const { createTranslatorBudget } = await import("../../../src/lib/translator-budget");
+    const { runWithWebSearch } = await import("../../../backend/src/web-search/loop");
+    const { parseRequest } = await import("../../../backend/src/responses/parser");
+    const { createTranslatorBudget } = await import("../../../backend/src/lib/translator-budget");
     const translatorBudget = createTranslatorBudget();
     globalThis.fetch = (async () => Response.json({ results: [{ title: "Fixture", url: "https://example.test/result", content: "Synthetic result" }] })) as typeof fetch;
     let routedSends = 0; let rotations = 0;
-    const adapter: import("../../../src/adapters/base").ProviderAdapter = {
+    const adapter: import("../../../backend/src/adapters/base").ProviderAdapter = {
       name: "mock-anthropic-output",
       buildRequest: () => ({ url: "https://routed.example.test/messages", method: "POST", headers: {}, body: "{}" }),
       fetchResponse: async () => ++routedSends === 1 ? new Response("ok") : Response.json(payload,{status:401}),

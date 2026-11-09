@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   normalizeUpstreamHttpErrorResponse,
   sanitizeUpstreamErrorText,
-} from "../../src/adapters/upstream-http-error";
+} from "../../backend/src/adapters/upstream-http-error";
 
 describe("sanitizeUpstreamErrorText", () => {
   test("redacts secrets and absolute paths", () => {

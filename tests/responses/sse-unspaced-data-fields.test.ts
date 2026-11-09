@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../src/adapters/openai-chat";
-import { sseFieldOffset, sseFieldValue } from "../../src/lib/sse-decoder";
-import { parseSidecarSSE } from "../../src/web-search/parse";
-import { collectChatCompletion } from "../../src/chat/outbound";
-import { collectAnthropicMessage } from "../../src/claude/outbound";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import type { AdapterEvent } from "../../src/types";
+import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "../../backend/src/adapters/openai-chat";
+import { sseFieldOffset, sseFieldValue } from "../../backend/src/lib/sse-decoder";
+import { parseSidecarSSE } from "../../backend/src/web-search/parse";
+import { collectChatCompletion } from "../../backend/src/chat/outbound";
+import { collectAnthropicMessage } from "../../backend/src/claude/outbound";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import type { AdapterEvent } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 // #1170: the space after the colon is optional in text/event-stream. Several parsers required it

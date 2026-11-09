@@ -1,9 +1,9 @@
-import { acquireSpendLedgerOwner } from "../../src/lib/spend-ledger-owner";
-import { readCodexAccountRecord, saveCodexAccountCredential } from "../../src/codex/account-store";
-import { codexPoolAffinityKey } from "../../src/codex/auth-context";
-import { resolveCodexAccountForThread, rememberConversationStateIssuer, peekConversationStateIssuer } from "../../src/codex/routing";
-import { applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } from "../../src/server/responses/account-change-state";
-import type { OcxConfig } from "../../src/types";
+import { acquireSpendLedgerOwner } from "../../backend/src/lib/spend-ledger-owner";
+import { readCodexAccountRecord, saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { codexPoolAffinityKey } from "../../backend/src/codex/auth-context";
+import { resolveCodexAccountForThread, rememberConversationStateIssuer, peekConversationStateIssuer } from "../../backend/src/codex/routing";
+import { applyAccountChangeConversationStateScrub, accountChangeFileReferenceRefusal } from "../../backend/src/server/responses/account-change-state";
+import type { OcxConfig } from "../../backend/src/types";
 
 const action = process.argv[2];
 if (action === "touch-unknown" || action === "read-unknown") {
@@ -38,7 +38,7 @@ if (process.argv[2] === "relogin") saveCodexAccountCredential(account, {
   accessToken: "new-access", refreshToken: "new-refresh", expiresAt: Date.now() + 600_000, chatgptAccountId: "new-identity",
 });
 if (process.argv[2] === "crash") {
-  const store = await import("../../src/codex/routing/thread-affinity-store").catch(() => undefined);
+  const store = await import("../../backend/src/codex/routing/thread-affinity-store").catch(() => undefined);
   store?.flushCodexAffinityStoreForTests();
   process.kill(process.pid, "SIGKILL");
 }

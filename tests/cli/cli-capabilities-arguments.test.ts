@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { runCapabilities } from "../../src/cli/capabilities-command";
-import { findCommand } from "../../src/cli/registry";
-import { CAPABILITY_CONTRACTS } from "../../src/cli/capability-contracts";
+import { runCapabilities } from "../../backend/src/cli/capabilities-command";
+import { findCommand } from "../../backend/src/cli/registry";
+import { CAPABILITY_CONTRACTS } from "../../backend/src/cli/capability-contracts";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -12,7 +12,7 @@ describe("capabilities argument validation", () => {
   test("update, sync and capabilities help expose orchestration contracts", () => {
     const home = mkdtempSync(join(tmpdir(), "ocx-help-"));
     try {
-      const launcher = spawnSync(process.execPath, [repoPath("bin/ocx.mjs"), "update", "--help"], {
+      const launcher = spawnSync(process.execPath, [repoPath("backend/bin/ocx.mjs"), "update", "--help"], {
         encoding: "utf8", env: { ...process.env, HOME: home, OPENCODEX_HOME: join(home, "ocx"), CODEX_HOME: join(home, "codex") },
       });
       expect(launcher.status).toBe(0);

@@ -1,15 +1,15 @@
 import { expect, test } from "bun:test";
-import { createSpendReservationLedger, sharedSpendLedger, type SpendReservationLedger, type SpendSeed } from "../../src/lib/spend-reservation-ledger";
+import { createSpendReservationLedger, sharedSpendLedger, type SpendReservationLedger, type SpendSeed } from "../../backend/src/lib/spend-reservation-ledger";
 import { createShippedSpendLedger, spendAlias, spendTestJournal, spendTestPolicy, testSpendSalt as salt } from "../helpers/shipped-spend-ledger";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { acquireSpendLedgerServerLifecycle } from "../../src/server/index/spend-ledger-lifecycle";
-import { SpendLedgerOwnerError, spendLedgerOwnerSnapshot } from "../../src/lib/spend-ledger-owner";
+import { acquireSpendLedgerServerLifecycle } from "../../backend/src/server/index/spend-ledger-lifecycle";
+import { SpendLedgerOwnerError, spendLedgerOwnerSnapshot } from "../../backend/src/lib/spend-ledger-owner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { createRequestSpendTracker } from "../../src/server/responses/request-spend";
-import { createRequestExecutionBudget, createPhysicalSendReporter } from "../../src/lib/request-execution-budget";
-import { fetchWithTransientRetry } from "../../src/lib/upstream-retry";
+import { createRequestSpendTracker } from "../../backend/src/server/responses/request-spend";
+import { createRequestExecutionBudget, createPhysicalSendReporter } from "../../backend/src/lib/request-execution-budget";
+import { fetchWithTransientRetry } from "../../backend/src/lib/upstream-retry";
 const request = (sendId: string, scopes = {poolId:"P"}, tokens=0) => ({sendId,scopes,inputTokens:tokens,outputCeilingTokens:0});
 const seed = (ledger: SpendReservationLedger, id="seed", scopes={poolId:"P"}, tokens=0): SpendSeed => {
   const decision=ledger.reserveSeed(request(id,scopes,tokens)); expect(decision.reserved).toBe(true);

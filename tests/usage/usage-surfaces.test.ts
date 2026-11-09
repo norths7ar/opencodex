@@ -2,9 +2,9 @@ import { expect, test } from "bun:test";
 import { mkdtempSync} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parseUsageSurface, summarizeUsage } from "../../src/usage/summary";
-import { appendUsageEntry, readUsageEntries } from "../../src/usage/log";
-import type { PersistedUsageEntry } from "../../src/usage/log";
+import { parseUsageSurface, summarizeUsage } from "../../backend/src/usage/summary";
+import { appendUsageEntry, readUsageEntries } from "../../backend/src/usage/log";
+import type { PersistedUsageEntry } from "../../backend/src/usage/log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

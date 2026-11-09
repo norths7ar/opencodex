@@ -3,12 +3,12 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { DSH_PROFILE_PROVIDER_PATH, type ExportModel } from "../../src/clients/config-export";
-import { INTEGRATION_CLIENTS } from "../../src/integrations/registry";
-import { defaultIntegrationIO } from "../../src/integrations/config-io";
-import { previewIntegration } from "../../src/integrations/mutation-plan";
-import { readIntegrationState, readPath } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
+import { DSH_PROFILE_PROVIDER_PATH, type ExportModel } from "../../backend/src/clients/config-export";
+import { INTEGRATION_CLIENTS } from "../../backend/src/integrations/registry";
+import { defaultIntegrationIO } from "../../backend/src/integrations/config-io";
+import { previewIntegration } from "../../backend/src/integrations/mutation-plan";
+import { readIntegrationState, readPath } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
 import {
   applyIntegration,
   applyIntegrationCoordinated,
@@ -18,9 +18,9 @@ import {
   restoreIntegrationCoordinated,
   overwriteIntegration,
   type IntegrationWriteInput,
-} from "../../src/integrations/writer";
-import { IntegrationWriterLockBusyError, IntegrationWriterLockIOError, type IntegrationWriterLockSeams } from "../../src/integrations/writer-lock";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/integrations/writer";
+import { IntegrationWriterLockBusyError, IntegrationWriterLockIOError, type IntegrationWriterLockSeams } from "../../backend/src/integrations/writer-lock";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

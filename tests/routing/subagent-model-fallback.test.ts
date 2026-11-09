@@ -19,20 +19,20 @@ import {
   selectAvailableSubagentModel,
   setSubagentQuotaPrimeForTests,
   subagentFallbackGuidanceText,
-} from "../../src/codex/subagent-model-fallback";
-import { saveCodexAccountCredential } from "../../src/codex/account-store";
-import { NATIVE_MAIN_DRAIN_SENTINEL_MODELS } from "../../src/codex/catalog/native-models";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../src/codex/account-runtime-state";
-import { clearAccountQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../src/codex/quota";
+} from "../../backend/src/codex/subagent-model-fallback";
+import { saveCodexAccountCredential } from "../../backend/src/codex/account-store";
+import { NATIVE_MAIN_DRAIN_SENTINEL_MODELS } from "../../backend/src/codex/catalog/native-models";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { clearAccountNeedsReauth, markAccountNeedsReauth } from "../../backend/src/codex/account-runtime-state";
+import { clearAccountQuota, setAccountQuotaFromParsed, updateAccountQuota } from "../../backend/src/codex/quota";
 import {
   canAcquireCodexQuotaProbeLease,
   canAcquireCodexQuotaScopeProbeLease,
   clearCodexUpstreamHealthForAccount,
   CODEX_QUOTA_PROBE_INTERVAL_MS,
   recordCodexUpstreamOutcome,
-} from "../../src/codex/routing";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/routing";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 // beforeEach writes three Codex credentials (NTFS ACL harden on Windows). Under

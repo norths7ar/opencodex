@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { chmodSync, fstatSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { collectCliPathDiagnostics, formatCliCommandLine, formatCliStatusHealthLabel, cliCommandDoctorChecks, type CliPathDiagnosticOptions, type CliPathObservation } from "../../src/cli/cli-path-diagnostics";
-import { readDesktopCliRecord, desktopCliRecordPath, DESKTOP_CLI_RECORD_MAX_BYTES, type DesktopCliRecordDeps, type DesktopCliRecordRead } from "../../src/lib/desktop-cli-record.mjs";
+import { collectCliPathDiagnostics, formatCliCommandLine, formatCliStatusHealthLabel, cliCommandDoctorChecks, type CliPathDiagnosticOptions, type CliPathObservation } from "../../backend/src/cli/cli-path-diagnostics";
+import { readDesktopCliRecord, desktopCliRecordPath, DESKTOP_CLI_RECORD_MAX_BYTES, type DesktopCliRecordDeps, type DesktopCliRecordRead } from "../../backend/src/lib/desktop-cli-record.mjs";
 import { repoPath } from "../helpers/repo-root";
 
 // The pending-cleanup case reads a macOS record on every CI host. NTFS reports POSIX
@@ -39,7 +39,7 @@ describe("observed ocx PATH selection", () => {
     const { result } = fixture("darwin", { PATH: `${desktopBin}:/npm/bin` }, [shim, target, "/npm/bin/ocx"]);
     expect(result.pathFirst?.path).toBe(shim); expect(result.expectedExecutable).toBe(shim);
     expect(result.desktopFirstOnPath).toBe(true); expect(result.shellResolution).toBe("unobserved"); expect(result.issues).toEqual([]);
-    const source = readFileSync(repoPath("src", "cli", "cli-path-diagnostics.ts"), "utf8");
+    const source = readFileSync(repoPath("backend/src", "cli", "cli-path-diagnostics.ts"), "utf8");
     expect(source).not.toMatch(/child_process|Bun\.spawn|execSync|spawnSync/);
   });
   test("npm first is an issue even if that launcher can hand off", () => {
@@ -169,10 +169,10 @@ describe("observed ocx PATH selection", () => {
     } finally { rmSync(root, { recursive: true, force: true }); }
   });
   test("status JSON field and human line, doctor independent registration, root dispatcher untouched", () => {
-    const status = readFileSync(repoPath("src", "cli", "status.ts"), "utf8");
+    const status = readFileSync(repoPath("backend/src", "cli", "status.ts"), "utf8");
     expect(status).toContain("cliCommand: CliPathDiagnostics;"); expect(status).toContain("      cliCommand,");
     expect(status).toContain("formatCliStatusHealthLabel(health.label, cliCommand, remoteHub.connected)");
-    const doctor = readFileSync(repoPath("src", "cli", "doctor.ts"), "utf8");
+    const doctor = readFileSync(repoPath("backend/src", "cli", "doctor.ts"), "utf8");
     expect(doctor).toContain('console.log("\\nocx command selection")'); expect(doctor).toContain('if (check.level === "FAIL") recordDoctorFailure()');
     expect(doctor.indexOf('console.log("Paths")')).toBeLessThan(doctor.indexOf('console.log("\\nocx command selection")'));
     expect(doctor.indexOf('console.log("\\nocx command selection")')).toBeLessThan(doctor.indexOf('console.log("\\nResponse-state temp files")'));

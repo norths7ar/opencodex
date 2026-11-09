@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { decideCompactionRecovery, readCompactionRecoveryConfig, type CompactionRecoveryEvidence } from "../../src/server/responses/compaction-recovery-policy";
+import { decideCompactionRecovery, readCompactionRecoveryConfig, type CompactionRecoveryEvidence } from "../../backend/src/server/responses/compaction-recovery-policy";
 
 const config = { enabled: true, model: "emergency-alias", allowDevinInvalidArgument: true };
 const failure = (patch: Partial<CompactionRecoveryEvidence> = {}): CompactionRecoveryEvidence => ({

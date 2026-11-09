@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { readBoundedCodexConfig } from "../../src/codex/inject/bounded-config-reader";
+import { readBoundedCodexConfig } from "../../backend/src/codex/inject/bounded-config-reader";
 import { watchdogMs } from "../helpers/ci-watchdog";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoRoot } from "../helpers/repo-root";
@@ -105,7 +105,7 @@ test("PUT /api/settings reports Codex write-lock contention as retryable", async
   process.env.OPENCODEX_HOME = join(root, "opencodex");
   process.env.CODEX_HOME = codexHome;
 
-  const codexInject = await import("../../src/codex/inject");
+  const codexInject = await import("../../backend/src/codex/inject");
   const injectionSpy = spyOn(codexInject, "injectCodexConfig").mockResolvedValue({
     success: false,
     retryable: true,
@@ -114,8 +114,8 @@ test("PUT /api/settings reports Codex write-lock contention as retryable", async
 
   try {
     const [{ writeRuntimePort }, { handleManagementAPI }, { catalogConvergenceFactory }, { startupHealthFixture }] = await Promise.all([
-      import("../../src/config/process-state"),
-      import("../../src/server/management-api"),
+      import("../../backend/src/config/process-state"),
+      import("../../backend/src/server/management-api"),
       import("../helpers/catalog-convergence"),
       import("../helpers/startup-health"),
     ]);

@@ -342,14 +342,14 @@ export async function runLiveAcceptance(): Promise<void> {
   try {
     await withIsolatedState(async ({ openCodexHome, codexHome, registerStop }) => {
       // Runtime modules may capture paths at import. Import only after isolation.
-      const { getConfigDir } = await import("../src/config/paths");
-      const { saveConfig } = await import("../src/config");
-      const { resolveCodexHomeDir } = await import("../src/codex/home");
-      const { providerConfigSeed } = await import("../src/providers/derive");
-      const { getProviderRegistryEntry } = await import("../src/providers/registry");
-      const { startServer } = await import("../src/server");
-      const { CODEBUDDY_PROFILES, clearCodeBuddyBinaryCache } = await import("../src/adapters/codebuddy/profiles");
-      const { resolveCodingAgentBinary } = await import("../src/adapters/coding-agent/profile");
+      const { getConfigDir } = await import("../backend/src/config/paths");
+      const { saveConfig } = await import("../backend/src/config");
+      const { resolveCodexHomeDir } = await import("../backend/src/codex/home");
+      const { providerConfigSeed } = await import("../backend/src/providers/derive");
+      const { getProviderRegistryEntry } = await import("../backend/src/providers/registry");
+      const { startServer } = await import("../backend/src/server");
+      const { CODEBUDDY_PROFILES, clearCodeBuddyBinaryCache } = await import("../backend/src/adapters/codebuddy/profiles");
+      const { resolveCodingAgentBinary } = await import("../backend/src/adapters/coding-agent/profile");
       requireCondition(getConfigDir() === resolve(openCodexHome)
         && resolveCodexHomeDir() === resolve(codexHome), "home_isolation_failed");
       const providerId = liveAcceptanceRegion(process.env) === "cn" ? "codebuddy-cn" : "codebuddy";

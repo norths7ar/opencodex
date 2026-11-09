@@ -8,7 +8,7 @@ import {
   parseClaudeOauthPayload,
   readClaudeCredentialsFile,
   shouldAdoptGrokGeneration,
-} from "../../src/oauth/local-token-detect";
+} from "../../backend/src/oauth/local-token-detect";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let tmp: string;

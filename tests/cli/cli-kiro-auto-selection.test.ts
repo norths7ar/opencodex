@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { fetchRows, type AccountDeps } from "../../src/cli/account-api";
-import { cmdAccount, formatAccountTable } from "../../src/cli/account";
+import { fetchRows, type AccountDeps } from "../../backend/src/cli/account-api";
+import { cmdAccount, formatAccountTable } from "../../backend/src/cli/account";
 
 function deps(accounts: unknown[]): AccountDeps {
   return {

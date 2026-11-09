@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { canonicalizeJsonc, hasJsoncComments, parseJsonc } from "../../src/lib/jsonc";
+import { canonicalizeJsonc, hasJsoncComments, parseJsonc } from "../../backend/src/lib/jsonc";
 
 describe("JSONC line ending compatibility", () => {
   test.each(["\r", "\n", "\r\n"])("ends line comments at %j", newline => {

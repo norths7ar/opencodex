@@ -3,29 +3,29 @@ import { readFileSync } from "node:fs";
 import { repoPath } from "../helpers/repo-root";
 
 const writerContracts: Record<string, string[]> = {
-  "src/server/management/agent-settings-routes.ts": [
+  "backend/src/server/management/agent-settings-routes.ts": [
     "multiAgentMode", "keepNativeChatGptOnV1",
     "syncCodexSubagentDefaults", "injectionModel", "injectionEffort", "injectionPrompt",
     "subagentModelFallback", "subagentModelFallbackPollMs", "grokExcludedModels",
   ],
-  "src/server/management/claude-desktop-config-writers.ts": ["clientIntegrations"],
-  "src/server/management/config-routes.ts": [
+  "backend/src/server/management/claude-desktop-config-writers.ts": ["clientIntegrations"],
+  "backend/src/server/management/config-routes.ts": [
     "streamMode", "codexAutoStart", "appOwnedMemoryBudgetMb", "codexAccountNamespaces",
     "codexAccountPickerEnabled", "oauthOpenBrowser",
   ],
   "src/server/management/combo-routes.ts": ["combos"],
-  "src/server/management/routing-profile-routes.ts": ["routingProfiles"],
-  "src/providers/context-cap.ts": ["providerContextCaps"],
-  "src/codex/account-priority.ts": ["codexAccountPriorities", "activeCodexAccountPinned"],
-  "src/codex/account-pause.ts": ["pausedCodexAccountIds"],
-  "src/codex/account-credit-use.ts": ["creditCodexAccountIds"],
-  "src/codex/desired-state.ts": ["clientIntegrations"],
-  "src/providers/provider-id-rewrite.ts": ["customModels"],
-  "src/cli/v2.ts": ["multiAgentMode", "keepNativeChatGptOnV1"],
+  "backend/src/server/management/routing-profile-routes.ts": ["routingProfiles"],
+  "backend/src/providers/context-cap.ts": ["providerContextCaps"],
+  "backend/src/codex/account-priority.ts": ["codexAccountPriorities", "activeCodexAccountPinned"],
+  "backend/src/codex/account-pause.ts": ["pausedCodexAccountIds"],
+  "backend/src/codex/account-credit-use.ts": ["creditCodexAccountIds"],
+  "backend/src/codex/desired-state.ts": ["clientIntegrations"],
+  "backend/src/providers/provider-id-rewrite.ts": ["customModels"],
+  "backend/src/cli/v2.ts": ["multiAgentMode", "keepNativeChatGptOnV1"],
 };
 
 const childWriterContracts: Record<string, string[]> = {
-  "src/codex/account-auto-switch.ts": ["codexAccountAutoSwitchThresholds"],
+  "backend/src/codex/account-auto-switch.ts": ["codexAccountAutoSwitchThresholds"],
 };
 
 function childDeletionFields(source: string): Set<string> {

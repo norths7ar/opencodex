@@ -3,20 +3,20 @@ import { createHash } from "node:crypto";
 import { linkSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { remoteConfig, hubConfig } from "../helpers/management-auth-fixture";
-import { handleManagementAPI } from "../../src/server/management-api";
-import type { ManagementApiDeps } from "../../src/server/management/context";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import type { ManagementApiDeps } from "../../backend/src/server/management/context";
 import {
   createManagementSessionControl, initializeManagementAuthState, issueGuiSession,
   managementPrincipal, managementSessionIssuance, requireManagementAuth,
-} from "../../src/server/management-auth";
-import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../src/server/gui-session";
-import { markTrustedHubManagementRequest } from "../../src/server/auth-cors";
-import { serveGuiFile, serveSessionBootstrap } from "../../src/server/gui-static";
-import * as atomic from "../../src/config/atomic-write";
-import * as accountList from "../../src/codex/auth-api/account-list";
-import { invalidateStarStatusCache, setStarDepsForTests } from "../../src/github/star-state";
-import type { OcxConfig } from "../../src/types";
-import { createDesktopCompatibilityRuntime } from "../../src/codex/desktop-compatibility/runtime";
+} from "../../backend/src/server/management-auth";
+import { consumeGuiPairingGrant, createGuiPairingGrant } from "../../backend/src/server/gui-session";
+import { markTrustedHubManagementRequest } from "../../backend/src/server/auth-cors";
+import { serveGuiFile, serveSessionBootstrap } from "../../backend/src/server/gui-static";
+import * as atomic from "../../backend/src/config/atomic-write";
+import * as accountList from "../../backend/src/codex/auth-api/account-list";
+import { invalidateStarStatusCache, setStarDepsForTests } from "../../backend/src/github/star-state";
+import type { OcxConfig } from "../../backend/src/types";
+import { createDesktopCompatibilityRuntime } from "../../backend/src/codex/desktop-compatibility/runtime";
 
 const ORIGIN = "https://dashboard.example.test";
 const ADMIN = "ocx_admin_admission_fixture";

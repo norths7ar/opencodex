@@ -20,7 +20,7 @@ const EXIT = repoPath(`${SHELL}/exit.rs`);
 const LIB = repoPath(`${SHELL}/lib.rs`);
 const STARTUP = repoPath(`${SHELL}/startup.rs`);
 const WINDOW = repoPath(`${SHELL}/window.rs`);
-const SERVE = repoPath("src/server/index/serve-options.ts");
+const SERVE = repoPath("backend/src/server/index/serve-options.ts");
 
 function code(path: string): string {
   return readFileSync(path, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");

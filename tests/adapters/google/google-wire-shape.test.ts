@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { antigravitySessionAnchor, antigravitySessionId } from "../../../src/adapters/google-antigravity-wire";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { antigravitySessionAnchor, antigravitySessionId } from "../../../backend/src/adapters/google-antigravity-wire";
 import {
   classifyGoogleWireUpstreamError,
   GOOGLE_WIRE_SHAPE_MAX_SERIALIZED_BYTES,
   GOOGLE_WIRE_SHAPE_TURN_CEILING,
   summarizeGoogleWireShape,
-} from "../../../src/adapters/google-wire-shape";
-import { debugProviderDiagnosticLazy } from "../../../src/lib/debug";
-import { getDebugLogEntries, MAX_DEBUG_LINE_BYTES, resetDebugLogBufferForTests } from "../../../src/lib/debug-log-buffer";
-import { resetDebugSettingsForTests, setDebugSettings } from "../../../src/lib/debug-settings";
-import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../../src/lib/request-execution-budget";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/google-wire-shape";
+import { debugProviderDiagnosticLazy } from "../../../backend/src/lib/debug";
+import { getDebugLogEntries, MAX_DEBUG_LINE_BYTES, resetDebugLogBufferForTests } from "../../../backend/src/lib/debug-log-buffer";
+import { resetDebugSettingsForTests, setDebugSettings } from "../../../backend/src/lib/debug-settings";
+import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../../backend/src/lib/request-execution-budget";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 import {
   callId,
   compactedToolSession,

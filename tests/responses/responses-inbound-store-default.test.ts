@@ -15,9 +15,9 @@
  * and tests/providers/github-copilot/github-copilot-wire-defaults.test.ts.
  */
 import { afterEach, describe, expect, test } from "bun:test";
-import { CODEX_FORWARD_BASE_URL } from "../../src/providers/openai-tiers";
-import { handleResponses } from "../../src/server/responses";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { CODEX_FORWARD_BASE_URL } from "../../backend/src/providers/openai-tiers";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 function providerConfig(overrides: Partial<OcxProviderConfig> = {}): OcxConfig {

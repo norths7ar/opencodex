@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
-import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { isTruncatedStopReason, truncationReasonFor } from "../../src/responses/truncated-stop-reason";
-import type { AdapterEvent } from "../../src/types";
+import { bridgeToResponsesSSE, buildResponseJSON } from "../../backend/src/bridge";
+import { createResponsesPassthroughAdapter } from "../../backend/src/adapters/openai-responses";
+import { createTranslatorBudget } from "../../backend/src/lib/translator-budget";
+import { isTruncatedStopReason, truncationReasonFor } from "../../backend/src/responses/truncated-stop-reason";
+import type { AdapterEvent } from "../../backend/src/types";
 
 async function sseText(events: AdapterEvent[]): Promise<string> {
   async function* source(): AsyncGenerator<AdapterEvent> {

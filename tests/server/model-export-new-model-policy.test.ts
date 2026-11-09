@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { loadConfig, saveConfig } from "../../src/config";
-import { setPersistedConfigMutationBeforeCommitForTests } from "../../src/config/persisted-mutation";
-import { clearModelCache } from "../../src/codex/model-cache";
-import { CatalogGatherBusyError } from "../../src/codex/catalog/routed-gather";
+import { loadConfig, saveConfig } from "../../backend/src/config";
+import { setPersistedConfigMutationBeforeCommitForTests } from "../../backend/src/config/persisted-mutation";
+import { clearModelCache } from "../../backend/src/codex/model-cache";
+import { CatalogGatherBusyError } from "../../backend/src/codex/catalog/routed-gather";
 import {
   loadExportModels,
   previewExportModels,
   resetExportSnapshotForTests,
-} from "../../src/server/management/model-rows";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/model-rows";
+import type { OcxConfig } from "../../backend/src/types";
 import { createTempHome, type TempHome } from "../helpers/temp-home";
 import { createTestCaseLifecycle } from "../helpers/test-sandbox-cleanup";
 import { SERVER_BUDGET_MS } from "../helpers/test-budget";

@@ -8,8 +8,8 @@ import {
   type HermesGeneratedConfig,
   type OpencodeGeneratedConfig,
   type PiGeneratedConfig,
-} from "../../src/clients/config-export";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/clients/config-export";
+import type { OcxConfig } from "../../backend/src/types";
 
 /**
  * Sibling of catalog-input-modality-enum.test.ts, whose incident this repeats

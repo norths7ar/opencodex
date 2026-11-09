@@ -2,8 +2,8 @@ import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { handleObserveCommand } from "../../src/cli/observe";
-import { getInjectionDebugLogEntries, injectionDebugLog, resetInjectionDebugLogBufferForTests } from "../../src/lib/injection-debug-log";
+import { handleObserveCommand } from "../../backend/src/cli/observe";
+import { getInjectionDebugLogEntries, injectionDebugLog, resetInjectionDebugLogBufferForTests } from "../../backend/src/lib/injection-debug-log";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home: string;

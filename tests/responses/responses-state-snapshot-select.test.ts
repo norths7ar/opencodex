@@ -6,8 +6,8 @@
  * strings below were produced by the previous implementation.
  */
 import { describe, expect, test } from "bun:test";
-import type { StoredResponseState } from "../../src/responses/state";
-import { selectSnapshotEntries, snapshotPayload } from "../../src/responses/state/snapshot-select";
+import type { StoredResponseState } from "../../backend/src/responses/state";
+import { selectSnapshotEntries, snapshotPayload } from "../../backend/src/responses/state/snapshot-select";
 
 const RESIDENT_ENTRY_MAX_BYTES = 200;
 

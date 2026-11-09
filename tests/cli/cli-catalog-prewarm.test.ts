@@ -1,6 +1,6 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
-import type { OcxConfig } from "../../src/types";
-import { scheduleCatalogPrewarm } from "../../src/cli/catalog-prewarm";
+import type { OcxConfig } from "../../backend/src/types";
+import { scheduleCatalogPrewarm } from "../../backend/src/cli/catalog-prewarm";
 import { pathToFileURL } from "node:url";
 import { repoRoot } from "../helpers/repo-root";
 
@@ -54,7 +54,7 @@ describe("catalog prewarm on handleStart bind", () => {
   });
 
   test("handleStart schedules catalog prewarm after ownership publication", async () => {
-    const cli = (await readText("src/cli/index.ts")).replace(/\r\n/g, "\n");
+    const cli = (await readText("backend/src/cli/index.ts")).replace(/\r\n/g, "\n");
     const transactionIdx = cli.indexOf("boundStart = await bindAndPublishStartOwnership({");
     const publishedIdx = cli.indexOf("const { server, serverModule, port, readinessGate, config } = boundStart", transactionIdx);
     const prewarmIdx = cli.indexOf("scheduleCatalogPrewarm()");

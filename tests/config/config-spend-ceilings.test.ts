@@ -14,9 +14,9 @@ import {
   getDefaultConfig,
   loadConfig,
   validateConfigCandidate,
-} from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { createSpendReservationLedger, spendCeilingsConfigured, spendPolicyFromConfig } from "../../src/lib/spend-reservation-ledger";
+} from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { createSpendReservationLedger, spendCeilingsConfigured, spendPolicyFromConfig } from "../../backend/src/lib/spend-reservation-ledger";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home = "";

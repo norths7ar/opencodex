@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import { getDefaultConfig } from "../../src/config";
-import { COMPACT_PROMPT } from "../../src/responses/compaction";
-import { applyCompactionRoutingOverride } from "../../src/server/responses/compaction-routing";
-import { handleResponses } from "../../src/server/responses";
+import { getDefaultConfig } from "../../backend/src/config";
+import { COMPACT_PROMPT } from "../../backend/src/responses/compaction";
+import { applyCompactionRoutingOverride } from "../../backend/src/server/responses/compaction-routing";
+import { handleResponses } from "../../backend/src/server/responses";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
 const meta = (trigger = "auto", implementation = "responses", request_kind = "compaction") =>

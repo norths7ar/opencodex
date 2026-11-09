@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { validatedCodexExecInvocation, validatedCodexExecInvocationAsync, type CodexExecBoundaryDeps } from "../../src/codex/exec-boundary";
+import { validatedCodexExecInvocation, validatedCodexExecInvocationAsync, type CodexExecBoundaryDeps } from "../../backend/src/codex/exec-boundary";
 
 for (const asyncMode of [false, true]) {
   test(`non-Darwin known-app spelling preserves passthrough, async=${asyncMode}`, async () => {

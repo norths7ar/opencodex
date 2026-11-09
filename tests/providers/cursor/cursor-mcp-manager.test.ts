@@ -11,12 +11,12 @@ import {
   McpArgsSchema,
   ReadMcpResourceExecArgsSchema,
   RequestContextArgsSchema,
-} from "../../../src/adapters/cursor/gen/agent_pb";
-import { handleCursorNativeExec } from "../../../src/adapters/cursor/native-exec";
-import { resolveMcpServers } from "../../../src/adapters/cursor/mcp-config";
-import { CursorMcpManager, CursorMcpPayloadTooLargeError, McpCatalogLimitError } from "../../../src/adapters/cursor/mcp-manager";
-import { buildMcpToolDefinitions, mcpDepsFromManager } from "../../../src/adapters/cursor/native-exec-mcp";
-import type { OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/adapters/cursor/gen/agent_pb";
+import { handleCursorNativeExec } from "../../../backend/src/adapters/cursor/native-exec";
+import { resolveMcpServers } from "../../../backend/src/adapters/cursor/mcp-config";
+import { CursorMcpManager, CursorMcpPayloadTooLargeError, McpCatalogLimitError } from "../../../backend/src/adapters/cursor/mcp-manager";
+import { buildMcpToolDefinitions, mcpDepsFromManager } from "../../../backend/src/adapters/cursor/native-exec-mcp";
+import type { OcxProviderConfig } from "../../../backend/src/types";
 
 const textEncoder = new TextEncoder();
 // 1x1 transparent PNG, base64 — exercises real image-content fidelity (not a placeholder).

@@ -4,12 +4,12 @@ import { createServer as createHttpServer } from "node:http";
 import net, { createConnection, createServer as createTcpServer, Socket, type Server as TcpServer } from "node:net";
 import type { AddressInfo } from "node:net";
 import { deflateSync, gzipSync } from "node:zlib";
-import { configuredOutboundFetch, effectiveProxyFor, configureSocks5Fetch } from "../../src/lib/proxy-env";
-import { providerOutboundGet } from "../../src/lib/provider-outbound";
-import { socks5Fetch } from "../../src/lib/socks5-fetch";
-import { applyProxyEnv } from "../../src/config";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { configuredOutboundFetch, effectiveProxyFor, configureSocks5Fetch } from "../../backend/src/lib/proxy-env";
+import { providerOutboundGet } from "../../backend/src/lib/provider-outbound";
+import { socks5Fetch } from "../../backend/src/lib/socks5-fetch";
+import { applyProxyEnv } from "../../backend/src/config";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 
 const proxyEnvKeys = [
   "HTTP_PROXY",

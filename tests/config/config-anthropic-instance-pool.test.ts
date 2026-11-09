@@ -9,18 +9,18 @@ import {
   readConfigDiagnostics,
   saveConfig,
   validateConfigCandidate,
-} from "../../src/config";
-import { configDiagnosticsFromRaw } from "../../src/config/diagnostics";
-import { configuredAnthropicInstance } from "../../src/providers/anthropic-instance";
-import { parseProviderEditorConfigDTO, providerEditorConfigDTO, providerManagementConfigError } from "../../src/server/auth-cors";
-import { anthropicInstancePublicationError, mergeProviderEditorRow, preserveAnthropicInstanceMarker } from "../../src/server/management/provider-instance-ownership";
+} from "../../backend/src/config";
+import { configDiagnosticsFromRaw } from "../../backend/src/config/diagnostics";
+import { configuredAnthropicInstance } from "../../backend/src/providers/anthropic-instance";
+import { parseProviderEditorConfigDTO, providerEditorConfigDTO, providerManagementConfigError } from "../../backend/src/server/auth-cors";
+import { anthropicInstancePublicationError, mergeProviderEditorRow, preserveAnthropicInstanceMarker } from "../../backend/src/server/management/provider-instance-ownership";
 import {
   isAnthropicPoolEnabledFor,
   rawAnthropicAccountPool,
   resolveAnthropicAccountPoolConfig,
-} from "../../src/oauth/anthropic-pool-config";
-import { ANTHROPIC_INSTANCE_IDS, type AnthropicInstanceId } from "../../src/providers/anthropic-instance-id";
-import type { AnthropicAccountPoolConfig, OcxConfig } from "../../src/types";
+} from "../../backend/src/oauth/anthropic-pool-config";
+import { ANTHROPIC_INSTANCE_IDS, type AnthropicInstanceId } from "../../backend/src/providers/anthropic-instance-id";
+import type { AnthropicAccountPoolConfig, OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let home = "";
@@ -74,7 +74,7 @@ function expectRejected(value: unknown, path: string): void {
 describe("Anthropic pool configuration locations", () => {
   test("CLI builtin creation publishes provenance; custom key overrides drop it and cannot be adopted by force", async () => {
     saveConfig(getDefaultConfig());
-    const { handleProviderCommand } = await import("../../src/cli/provider");
+    const { handleProviderCommand } = await import("../../backend/src/cli/provider");
     const print = spyOn(console, "log").mockImplementation(() => {});
     const error = spyOn(console, "error").mockImplementation(() => {});
     const exitCode = process.exitCode ?? 0;

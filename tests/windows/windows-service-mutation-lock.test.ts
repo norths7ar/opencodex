@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import {
   WindowsServiceMutationBusyError,
   withWindowsServiceMutationLock,
-} from "../../src/lib/windows-service-mutation-lock";
+} from "../../backend/src/lib/windows-service-mutation-lock";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 
@@ -71,7 +71,7 @@ afterEach(async () => {
 test("a second service mutation is refused while another process holds the lock", async () => {
   const readyPath = join(testRoot, "holder-ready");
   const releasePath = join(testRoot, "holder-release");
-  const lockModuleUrl = pathToFileURL(repoPath("src/lib/windows-service-mutation-lock.ts")).href;
+  const lockModuleUrl = pathToFileURL(repoPath("backend/src/lib/windows-service-mutation-lock.ts")).href;
   const child = spawnHolder(`
     import { existsSync, writeFileSync } from "node:fs";
     import { withWindowsServiceMutationLock } from ${JSON.stringify(lockModuleUrl)};
@@ -113,7 +113,7 @@ test("a second service mutation is refused while another process holds the lock"
 
 test("an abruptly exited holder releases the OS-backed transaction without stale recovery", async () => {
   const enteredPath = join(testRoot, "crashed-holder-entered");
-  const lockModuleUrl = pathToFileURL(repoPath("src/lib/windows-service-mutation-lock.ts")).href;
+  const lockModuleUrl = pathToFileURL(repoPath("backend/src/lib/windows-service-mutation-lock.ts")).href;
   const child = spawnHolder(`
     import { writeFileSync } from "node:fs";
     import { withWindowsServiceMutationLock } from ${JSON.stringify(lockModuleUrl)};

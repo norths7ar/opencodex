@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { sanitizeKiroSchema } from "../../../src/adapters/kiro-tools";
-import { kiroStructuredOutputSpec, kiroStructuredStopFailure, parseKiroStructuredText, parseKiroStructuredToolInput } from "../../../src/adapters/kiro/structured-output";
-import { kiroDecimal, readKiroJson } from "../../../src/adapters/kiro/structured-output-json";
-import { validateKiroStrictValue } from "../../../src/adapters/kiro/structured-output-schema";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxParsedRequest } from "../../../src/types";
+import { sanitizeKiroSchema } from "../../../backend/src/adapters/kiro-tools";
+import { kiroStructuredOutputSpec, kiroStructuredStopFailure, parseKiroStructuredText, parseKiroStructuredToolInput } from "../../../backend/src/adapters/kiro/structured-output";
+import { kiroDecimal, readKiroJson } from "../../../backend/src/adapters/kiro/structured-output-json";
+import { validateKiroStrictValue } from "../../../backend/src/adapters/kiro/structured-output-schema";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 
 // Strict structured output (`strict: true`) promises the caller a value that conforms to the whole
 // schema, so the emulation validates the full OpenAI strict subset before relaying a value, and

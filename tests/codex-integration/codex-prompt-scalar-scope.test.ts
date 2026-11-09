@@ -2,11 +2,11 @@ import { afterEach, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, realpathSync, renameSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { importBaseVariant, previewBaseImport, readPromptLayers, recoverPromptJournal, setToggle, writeCustomLayers } from "../../src/codex/prompt-layers";
-import { journalPathFor } from "../../src/codex/prompt-layers/paths";
-import { encodeJournal, hashBytes } from "../../src/codex/prompt-journal";
-import * as atomic from "../../src/lib/windows-atomic-replace";
-import { rootKeyValueForm, setRootBool, setRootString, setTableBool, UnsupportedTomlForm } from "../../src/codex/prompt-layers/toml-edit";
+import { importBaseVariant, previewBaseImport, readPromptLayers, recoverPromptJournal, setToggle, writeCustomLayers } from "../../backend/src/codex/prompt-layers";
+import { journalPathFor } from "../../backend/src/codex/prompt-layers/paths";
+import { encodeJournal, hashBytes } from "../../backend/src/codex/prompt-journal";
+import * as atomic from "../../backend/src/lib/windows-atomic-replace";
+import { rootKeyValueForm, setRootBool, setRootString, setTableBool, UnsupportedTomlForm } from "../../backend/src/codex/prompt-layers/toml-edit";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 /**

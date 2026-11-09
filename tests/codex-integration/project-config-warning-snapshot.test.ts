@@ -2,8 +2,8 @@ import { expect, spyOn, test } from "bun:test";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import * as bounded from "../../src/codex/inject/bounded-config-reader";
-import { collectProjectCodexConfigWarnings, discoverProjectCodexConfigPaths, isGlobalOpencodexRoutingActive } from "../../src/codex/project-config-warnings";
+import * as bounded from "../../backend/src/codex/inject/bounded-config-reader";
+import { collectProjectCodexConfigWarnings, discoverProjectCodexConfigPaths, isGlobalOpencodexRoutingActive } from "../../backend/src/codex/project-config-warnings";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 for (const kind of ["present", "absent", "unreadable"] as const) {

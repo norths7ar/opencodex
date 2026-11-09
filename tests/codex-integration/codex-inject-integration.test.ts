@@ -8,8 +8,8 @@ import { Database } from "bun:sqlite";
 import {
   MANAGED_AGENTS_TABLE_MARKER,
   MANAGED_SUBAGENT_DEFAULT_MARKER,
-} from "../../src/codex/subagent-defaults";
-import { OCX_ROUTING_MARKER_LINE } from "../../src/codex/injected-marker";
+} from "../../backend/src/codex/subagent-defaults";
+import { OCX_ROUTING_MARKER_LINE } from "../../backend/src/codex/injected-marker";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 

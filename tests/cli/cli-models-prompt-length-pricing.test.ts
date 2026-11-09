@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
+import { handleModelsRuntimeCommand } from "../../backend/src/cli/models-runtime";
 
 const BASE = { input: 1, output: 2, cacheRead: 0, cacheWrite: 0 };
 const CUSTOM = {

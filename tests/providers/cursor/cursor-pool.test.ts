@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { CursorCredentialRouter, NoAvailableCursorCredentialError } from "../../../src/providers/cursor-pool";
+import { CursorCredentialRouter, NoAvailableCursorCredentialError } from "../../../backend/src/providers/cursor-pool";
 
 describe("CursorCredentialRouter", () => {
   test("weighted round-robin distributes picks proportionally", () => {

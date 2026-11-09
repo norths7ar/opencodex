@@ -4,7 +4,7 @@ import { describe, expect, mock, test } from "bun:test";
 const lookupMock = mock(async (_hostname: string, _opts: unknown): Promise<{ address: string; family: number }[]> => []);
 mock.module("node:dns/promises", () => ({ lookup: lookupMock }));
 
-const { providerDestinationConfigError, providerDestinationResolvedError, resolvePublicAddresses } = await import("../../src/lib/destination-policy");
+const { providerDestinationConfigError, providerDestinationResolvedError, resolvePublicAddresses } = await import("../../backend/src/lib/destination-policy");
 
 const provider = (baseUrl: string, allowPrivateNetwork?: boolean) => ({ baseUrl, allowPrivateNetwork });
 

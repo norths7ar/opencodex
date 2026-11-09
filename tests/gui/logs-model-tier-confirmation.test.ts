@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { modelTitle, type ModelTitleEntry } from "../../gui/src/pages/logs-model-title";
+import { modelTitle, type ModelTitleEntry } from "../../frontend/src/pages/logs-model-title";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { repoPath } from "../helpers/repo-root";
@@ -92,7 +92,7 @@ describe("model tooltip tier confirmation (#2455)", () => {
     const LOCALE_FILES = [
       "en.ts", "de.ts", "fr.ts", "ko.ts", "zh.ts", "zh-TW.ts", "ru.ts", "ja.ts", "tr.ts",
     ];
-    const dir = repoPath("gui", "src", "i18n");
+    const dir = repoPath("frontend", "src", "i18n");
     const present = readdirSync(dir);
     for (const file of LOCALE_FILES) {
       expect(present, `${file} disappeared from i18n/`).toContain(file);

@@ -1,13 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { AdapterRequest } from "../../src/adapters/base";
-import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../src/adapters/kiro-retry";
-import { runCursorTurnWithRetry } from "../../src/adapters/cursor/transport-retry";
-import type { CursorRunRequest, CursorServerMessage } from "../../src/adapters/cursor/types";
-import type { CursorTransport } from "../../src/adapters/cursor/transport";
-import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../src/lib/request-execution-budget";
-import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
-import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../src/adapters/devin/cloud-direct";
-import { streamChatEventsWithResetRetry } from "../../src/adapters/devin/cloud-direct/stated-reset-retry";
+import type { AdapterRequest } from "../../backend/src/adapters/base";
+import { fetchKiroWithRetry, resetKiroThrottleStateForTests } from "../../backend/src/adapters/kiro-retry";
+import { runCursorTurnWithRetry } from "../../backend/src/adapters/cursor/transport-retry";
+import type { CursorRunRequest, CursorServerMessage } from "../../backend/src/adapters/cursor/types";
+import type { CursorTransport } from "../../backend/src/adapters/cursor/transport";
+import { createRequestExecutionBudget, type RequestExecutionBudgetPolicy } from "../../backend/src/lib/request-execution-budget";
+import { SendBudgetExhaustedError } from "../../backend/src/lib/upstream-retry";
+import { CloudChatError, type CloudChatEvent, type CloudChatRequest } from "../../backend/src/adapters/devin/cloud-direct";
+import { streamChatEventsWithResetRetry } from "../../backend/src/adapters/devin/cloud-direct/stated-reset-retry";
 
 /**
  * Adapters that retry INSIDE one adapter call are the layer a per-request cap cannot see from

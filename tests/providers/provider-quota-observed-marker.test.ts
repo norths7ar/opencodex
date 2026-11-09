@@ -12,16 +12,16 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { saveCredential } from "../../src/oauth/store";
+import { saveCredential } from "../../backend/src/oauth/store";
 import {
   clearAccountQuotaCache,
   clearProviderQuotaCache,
   fetchProviderQuotaReports,
   recordPassiveAccountQuota,
-} from "../../src/providers/quota";
-import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
+} from "../../backend/src/providers/quota";
+import { captureConfigGeneration } from "../../backend/src/lib/state-store-sweeper";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import type { OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../backend/src/types";
 
 const originalHome = process.env.OPENCODEX_HOME;
 const originalFetch = globalThis.fetch;
@@ -71,7 +71,7 @@ async function seedObservation(ageMs: number): Promise<void> {
     accountId: "muse-account",
     email: "muse@example.test",
   });
-  const { getAccountSet } = await import("../../src/oauth/store");
+  const { getAccountSet } = await import("../../backend/src/oauth/store");
   const accountId = getAccountSet("meta-muse")!.accounts[0]!.id;
   recordPassiveAccountQuota("meta-muse", accountId, {
     fiveHourPercent: 1,

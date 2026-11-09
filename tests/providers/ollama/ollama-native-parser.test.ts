@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
-import { createOllamaNativeAdapter } from "../../../src/adapters/ollama-native";
-import { ollamaNativeChatUrl } from "../../../src/adapters/ollama-native-url";
+import { createOllamaNativeAdapter } from "../../../backend/src/adapters/ollama-native";
+import { ollamaNativeChatUrl } from "../../../backend/src/adapters/ollama-native-url";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { AdapterEvent } from "../../../src/types";
-import type { OcxParsedRequest, OcxProviderConfig } from "../../../src/types";
+import type { AdapterEvent } from "../../../backend/src/types";
+import type { OcxParsedRequest, OcxProviderConfig } from "../../../backend/src/types";
 
 /**
  * Parser/request contract tests for the native Ollama transport.
@@ -49,7 +49,7 @@ async function collect(adapter: ReturnType<typeof createOllamaNativeAdapter>, re
 
 describe("ollama-native — observer-free streaming", () => {
   test("no structural-receipt machinery exists in the module surface", async () => {
-    const mod = await import("../../../src/adapters/ollama-native") as unknown as Record<string, unknown>;
+    const mod = await import("../../../backend/src/adapters/ollama-native") as unknown as Record<string, unknown>;
     for (const name of [
       "setOllamaNativeObservationSink",
       "createOllamaNativeObservationBuffer",

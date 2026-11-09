@@ -13,11 +13,11 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { captureCatalogAdmissionSnapshot } from "../../src/codex/catalog-admission";
+import { captureCatalogAdmissionSnapshot } from "../../backend/src/codex/catalog-admission";
 import {
   resetBundledCatalogCacheForTests,
   resolveCatalogSourceForGather,
-} from "../../src/codex/catalog/bundled";
+} from "../../backend/src/codex/catalog/bundled";
 import {
   acceptCatalogGatherSourcePath,
   captureAndSealCatalogHomeSelection,
@@ -26,10 +26,10 @@ import {
   readCatalogGatherSource,
   sealCatalogGatherEvidenceSession,
   type CatalogGatherProviderAuthEvidence,
-} from "../../src/codex/catalog/filesystem-evidence";
-import type { CatalogSourceEvidence } from "../../src/codex/convergence-types";
-import { saveConfig } from "../../src/config";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/codex/catalog/filesystem-evidence";
+import type { CatalogSourceEvidence } from "../../backend/src/codex/convergence-types";
+import { saveConfig } from "../../backend/src/config";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 interface ManifestEntry {

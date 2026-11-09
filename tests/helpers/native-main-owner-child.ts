@@ -2,16 +2,16 @@ import { appendFileSync, realpathSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { createInterface } from "node:readline";
 
-import { atomicWriteFileAsync } from "../../src/config";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
-import { nativeMainOwnerSnapshot } from "../../src/codex/native-main-owner";
-import { NativeProfileManager } from "../../src/codex/native-profile-manager";
+import { atomicWriteFileAsync } from "../../backend/src/config";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/main-account";
+import { nativeMainOwnerSnapshot } from "../../backend/src/codex/native-main-owner";
+import { NativeProfileManager } from "../../backend/src/codex/native-profile-manager";
 import {
   nativeMainStartupGateSnapshot,
-} from "../../src/codex/native-profile-startup";
-import type { NativeProfileKey, NativeProfileKeyProvider } from "../../src/codex/native-profile-types";
-import { drainAndShutdown } from "../../src/server";
-import { startServer } from "../../src/server";
+} from "../../backend/src/codex/native-profile-startup";
+import type { NativeProfileKey, NativeProfileKeyProvider } from "../../backend/src/codex/native-profile-types";
+import { drainAndShutdown } from "../../backend/src/server";
+import { startServer } from "../../backend/src/server";
 import { nativeOwnerRestartService } from "./native-owner-restart-service";
 
 const required = (name: string): string => {

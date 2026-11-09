@@ -3,19 +3,19 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { getAccountSet, mergeAccountCredential, removeAccount, saveAccountCredential,
-  saveCredential, saveCredentialWithReceipt, setActiveAccount } from "../../../src/oauth/store";
-import type { ProviderAccount } from "../../../src/oauth/types";
-import { isAccountQuotaExhausted, rankAccountsByHeadroom } from "../../../src/oauth/account-quota-rank";
-import { preferredInitialAccount } from "../../../src/oauth/generic-account-failover";
+  saveCredential, saveCredentialWithReceipt, setActiveAccount } from "../../../backend/src/oauth/store";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
+import { isAccountQuotaExhausted, rankAccountsByHeadroom } from "../../../backend/src/oauth/account-quota-rank";
+import { preferredInitialAccount } from "../../../backend/src/oauth/generic-account-failover";
 import { cancelPendingAccountQuotaPersist, readPersistedAccountQuotas,
-  readPersistedKiroVerdicts } from "../../../src/providers/account-quota-disk";
-import { kiroEvidenceIdentity } from "../../../src/providers/kiro-account-state-disk";
-import { kiroAccountEvidence, getKiroAccountExhaustion } from "../../../src/providers/kiro-usage";
-import { clearAccountQuotaCache, fetchProviderAccountQuotas, getCachedProviderAccountQuota } from "../../../src/providers/quota";
+  readPersistedKiroVerdicts } from "../../../backend/src/providers/account-quota-disk";
+import { kiroEvidenceIdentity } from "../../../backend/src/providers/kiro-account-state-disk";
+import { kiroAccountEvidence, getKiroAccountExhaustion } from "../../../backend/src/providers/kiro-usage";
+import { clearAccountQuotaCache, fetchProviderAccountQuotas, getCachedProviderAccountQuota } from "../../../backend/src/providers/quota";
 import { accountCacheKey, accountQuotaCache, persistAccountQuotaCache,
-  reconcileProviderAccountQuotaRows, resetProviderQuotaReconcileStateForTests } from "../../../src/providers/quota/account-cache";
-import { ACCOUNT_QUOTA_TTL_MS } from "../../../src/providers/quota-wire";
-import type { OcxConfig } from "../../../src/types";
+  reconcileProviderAccountQuotaRows, resetProviderQuotaReconcileStateForTests } from "../../../backend/src/providers/quota/account-cache";
+import { ACCOUNT_QUOTA_TTL_MS } from "../../../backend/src/providers/quota-wire";
+import type { OcxConfig } from "../../../backend/src/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const priorHome = process.env.OPENCODEX_HOME;

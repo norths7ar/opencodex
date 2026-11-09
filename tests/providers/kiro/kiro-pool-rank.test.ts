@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { exhaustedCooldownMs, rankAccountsByHeadroom } from "../../../src/oauth/account-quota-rank";
+import { exhaustedCooldownMs, rankAccountsByHeadroom } from "../../../backend/src/oauth/account-quota-rank";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -9,27 +9,27 @@ import {
   genericFailoverRetryAfterSeconds,
   preferredInitialAccount,
   rotateGenericOAuthAccountOn429,
-} from "../../../src/oauth/generic-account-failover";
+} from "../../../backend/src/oauth/generic-account-failover";
 import {
   getAccountSet,
   markAccountNeedsReauth,
   removeAccount,
   saveCredential,
   setActiveAccount,
-} from "../../../src/oauth/store";
-import { getValidAccessSnapshotForAccount } from "../../../src/oauth";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+} from "../../../backend/src/oauth/store";
+import { getValidAccessSnapshotForAccount } from "../../../backend/src/oauth";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 import {
   clearAccountQuotaCache,
   setCachedProviderAccountQuotaForTests,
-} from "../../../src/providers/quota";
-import { accountQuotaCache } from "../../../src/providers/quota/account-cache";
+} from "../../../backend/src/providers/quota";
+import { accountQuotaCache } from "../../../backend/src/providers/quota/account-cache";
 import {
   clearKiroAccountUsageState,
   commitKiroAccountUsageState,
-} from "../../../src/providers/kiro-usage";
-import { kiroEvidenceIdentity } from "../../../src/providers/kiro-account-state-disk";
-import type { ProviderAccount } from "../../../src/oauth/types";
+} from "../../../backend/src/providers/kiro-usage";
+import { kiroEvidenceIdentity } from "../../../backend/src/providers/kiro-account-state-disk";
+import type { ProviderAccount } from "../../../backend/src/oauth/types";
 import { removeTreeWithRetry } from "../../helpers/remove-tree";
 
 const realFetch = globalThis.fetch;
@@ -490,7 +490,7 @@ describe("pre-dispatch account preference", () => {
 });
 
 test("reset-first retains account-bound Kiro headroom and exhaustion when resets are unknown", async () => {
-  const { rankAccountsByResetFirst } = await import("../../../src/oauth/account-quota-rank");
+  const { rankAccountsByResetFirst } = await import("../../../backend/src/oauth/account-quota-rank");
   seedPercent("kiro", "a", 90);
   seedPercent("kiro", "b", 10);
   seedExhausted("c");

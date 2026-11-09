@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../src/adapters/anthropic";
-import { providerConfigFromKeyLoginProvider } from "../../src/oauth/login-cli";
-import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS, validateApiKey, type KeyLoginProvider } from "../../src/oauth/key-providers";
-import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
+import { createAnthropicAdapter as createAnthropicAdapterProduction } from "../../backend/src/adapters/anthropic";
+import { providerConfigFromKeyLoginProvider } from "../../backend/src/oauth/login-cli";
+import { enrichProviderFromCatalog, KEY_LOGIN_PROVIDERS, validateApiKey, type KeyLoginProvider } from "../../backend/src/oauth/key-providers";
+import type { AdapterEvent, OcxParsedRequest, OcxProviderConfig } from "../../backend/src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
 const createAnthropicAdapter = (...args: Parameters<typeof createAnthropicAdapterProduction>) =>

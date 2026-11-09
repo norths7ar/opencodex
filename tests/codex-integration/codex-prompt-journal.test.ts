@@ -19,13 +19,13 @@ import {
   recoverIfNeeded,
   sameRecoveryPath,
   type JournalRecord,
-} from "../../src/codex/prompt-journal";
+} from "../../backend/src/codex/prompt-journal";
 import {
   hardenedSecretPathCountForTests,
   resetHardenedStateForTests,
   setIcaclsRunnerForTests,
   setPlatformForTests,
-} from "../../src/lib/windows-secret-acl";
+} from "../../backend/src/lib/windows-secret-acl";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const roots: string[] = [];

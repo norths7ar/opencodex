@@ -2,21 +2,21 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../src/codex/account-id";
-import { getMainAccountHardLockStatus } from "../../src/codex/main-account-hard-lock";
-import { fetchMainAccountInfo } from "../../src/codex/auth-api";
-import * as authCollision from "../../src/codex/auth-collision";
-import { setMainAccountPlan } from "../../src/codex/main-account";
-import { resetLifecycleDrainStateForTests } from "../../src/server/lifecycle";
-import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../src/lib/windows-secret-acl";
-import { flushConfigDirHardeningForTests } from "../../src/config/paths";
-import { resetMainCodexAccountIdentityTrackingForTests } from "../../src/codex/account-lifecycle";
+import { MAIN_CODEX_ACCOUNT_ID as MAIN } from "../../backend/src/codex/account-id";
+import { getMainAccountHardLockStatus } from "../../backend/src/codex/main-account-hard-lock";
+import { fetchMainAccountInfo } from "../../backend/src/codex/auth-api";
+import * as authCollision from "../../backend/src/codex/auth-collision";
+import { setMainAccountPlan } from "../../backend/src/codex/main-account";
+import { resetLifecycleDrainStateForTests } from "../../backend/src/server/lifecycle";
+import { setAsyncIcaclsRunnerForTests, setIcaclsRunnerForTests } from "../../backend/src/lib/windows-secret-acl";
+import { flushConfigDirHardeningForTests } from "../../backend/src/config/paths";
+import { resetMainCodexAccountIdentityTrackingForTests } from "../../backend/src/codex/account-lifecycle";
 import {
   captureMainQuotaWriter, clearMainAccountInfoCache, matchesMainQuotaCredential, observeMainQuotaIdentity,
-} from "../../src/codex/main-account-cache";
+} from "../../backend/src/codex/main-account-cache";
 import {
   applyAccountQuotaFromUpstreamHeaders, clearAccountQuota, getAccountQuota, getMainPolicyQuota, setAccountQuotaFromParsed,
-} from "../../src/codex/quota";
+} from "../../backend/src/codex/quota";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 let testDir: string;

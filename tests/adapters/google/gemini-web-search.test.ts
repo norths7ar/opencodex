@@ -1,18 +1,18 @@
 import { afterEach, describe, expect, mock, test } from "bun:test";
-import * as storeModule from "../../../src/oauth/store";
-import { MAX_SIDECAR_RESPONSE_BYTES } from "../../../src/web-search/parse";
+import * as storeModule from "../../../backend/src/oauth/store";
+import { MAX_SIDECAR_RESPONSE_BYTES } from "../../../backend/src/web-search/parse";
 
 let accountSets: Record<string, { accounts: Array<{ id: string; needsReauth?: boolean; paused?: boolean; credential?: Record<string, unknown> }>; activeAccountId?: string }> = {};
-mock.module("../../../src/oauth/store", () => ({
+mock.module("../../../backend/src/oauth/store", () => ({
   ...storeModule,
   getAccountSet: (provider: string) => accountSets[provider] ?? null,
 }));
 
-import { mapCcaGroundedResponse } from "../../../src/web-search/gemini-executor";
-import { findGeminiSidecarProvider, planWebSearch } from "../../../src/web-search";
-import { resolveAntigravityEffortWireModel } from "../../../src/providers/antigravity-models";
-import { parseRequest } from "../../../src/responses/parser";
-import type { OcxConfig, OcxProviderConfig } from "../../../src/types";
+import { mapCcaGroundedResponse } from "../../../backend/src/web-search/gemini-executor";
+import { findGeminiSidecarProvider, planWebSearch } from "../../../backend/src/web-search";
+import { resolveAntigravityEffortWireModel } from "../../../backend/src/providers/antigravity-models";
+import { parseRequest } from "../../../backend/src/responses/parser";
+import type { OcxConfig, OcxProviderConfig } from "../../../backend/src/types";
 
 const routed: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "k" };
 const cca: OcxProviderConfig = { adapter: "google", baseUrl: "https://daily-cloudcode-pa.googleapis.com", authMode: "oauth" };
@@ -110,9 +110,9 @@ describe("planWebSearch gemini arm (L8)", () => {
   });
 });
 
-import { runGeminiWebSearch } from "../../../src/web-search/gemini-executor";
-import * as oauthModule from "../../../src/oauth";
-mock.module("../../../src/oauth", () => ({
+import { runGeminiWebSearch } from "../../../backend/src/web-search/gemini-executor";
+import * as oauthModule from "../../../backend/src/oauth";
+mock.module("../../../backend/src/oauth", () => ({
   ...oauthModule,
   getValidAccessTokenSnapshot: async () => {
     const snapshot = accessSnapshot;
@@ -120,9 +120,9 @@ mock.module("../../../src/oauth", () => ({
     return snapshot;
   },
 }));
-import { runWithWebSearch, type WebSearchLoopDeps } from "../../../src/web-search/loop";
+import { runWithWebSearch, type WebSearchLoopDeps } from "../../../backend/src/web-search/loop";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
-import type { AdapterEvent, ProviderAdapter } from "../../../src/adapters/base";
+import type { AdapterEvent, ProviderAdapter } from "../../../backend/src/adapters/base";
 
 describe("runGeminiWebSearch request shape (review P1)", () => {
   test("Argon web search keeps its suffix-only request without requested summaries", async () => {

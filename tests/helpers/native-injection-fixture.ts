@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, expect } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import type { OcxConfig } from "../../src/types";
-import { createWebsocketHandler } from "../../src/server/index/websocket-handler";
-import type { ServeOptionsContext } from "../../src/server/index/serve-options";
-import type { WsData } from "../../src/server/ws-bridge";
-import { clearRequestLogsForTests } from "../../src/server/request-log";
-import { runOptionalShutdownHooks } from "../../src/lib/optional-shutdown-hooks";
+import type { OcxConfig } from "../../backend/src/types";
+import { createWebsocketHandler } from "../../backend/src/server/index/websocket-handler";
+import type { ServeOptionsContext } from "../../backend/src/server/index/serve-options";
+import type { WsData } from "../../backend/src/server/ws-bridge";
+import { clearRequestLogsForTests } from "../../backend/src/server/request-log";
+import { runOptionalShutdownHooks } from "../../backend/src/lib/optional-shutdown-hooks";
 import { acquireOwnedSpendHome } from "./owned-spend-home";
 
 // The websocket handler dispatches through the real request path, so it reaches the shared spend

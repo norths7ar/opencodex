@@ -1,19 +1,19 @@
 import {
   PLAINTEXT_V2_AGENT_MESSAGE_RESTORE_OVERFLOW_MESSAGE,
   PLAINTEXT_V2_COLLABORATION_NAMESPACE,
-} from "../../src/responses/plaintext-v2-agent-messages";
+} from "../../backend/src/responses/plaintext-v2-agent-messages";
 import { afterEach, beforeEach, describe, expect, jest, test } from "bun:test";
-import { providerFetch } from "../../src/server/responses/fetch-helpers";
-import { handleResponses } from "../../src/server/responses";
-import { isEagerRelaySseResponse } from "../../src/server/relay";
-import { isWin32EagerRewrite } from "../../src/lib/bun-stream-caps";
-import { fetchWithTransientRetry, isNonReplayableResponse } from "../../src/lib/upstream-retry";
-import { codexWsExchange } from "../../src/server/responses/codex-ws-exchange";
-import { shouldRetryCodexPoolAccountModel400 } from "../../src/server/responses/core-codex-account";
-import { CodexWsSession } from "../../src/server/responses/codex-ws-session";
-import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
-import { readCodexWsStage } from "../../src/server/responses/codex-ws-wire";
-import { CodexWsMetadata, CODEX_WS_METADATA_MAX_BYTES, CODEX_WS_METADATA_MAX_VALUE_BYTES } from "../../src/server/responses/codex-ws-metadata";
+import { providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { handleResponses } from "../../backend/src/server/responses";
+import { isEagerRelaySseResponse } from "../../backend/src/server/relay";
+import { isWin32EagerRewrite } from "../../backend/src/lib/bun-stream-caps";
+import { fetchWithTransientRetry, isNonReplayableResponse } from "../../backend/src/lib/upstream-retry";
+import { codexWsExchange } from "../../backend/src/server/responses/codex-ws-exchange";
+import { shouldRetryCodexPoolAccountModel400 } from "../../backend/src/server/responses/core-codex-account";
+import { CodexWsSession } from "../../backend/src/server/responses/codex-ws-session";
+import { prepareCodexWsRequest } from "../../backend/src/server/responses/codex-ws-request";
+import { readCodexWsStage } from "../../backend/src/server/responses/codex-ws-wire";
+import { CodexWsMetadata, CODEX_WS_METADATA_MAX_BYTES, CODEX_WS_METADATA_MAX_VALUE_BYTES } from "../../backend/src/server/responses/codex-ws-metadata";
 import {
   bunSupportsBoundedCodexWsRelay,
   CODEX_WS_CREATE_FRAME_LIMIT_BYTES,
@@ -28,9 +28,9 @@ import {
   CODEX_WS_RESPONSE_PRELUDE_TIMEOUT_MS,
   CODEX_WS_LIVENESS_PING_INTERVAL_MS,
   shouldUseCodexWsUpstream as rawShouldUseCodexWsUpstream,
-} from "../../src/server/responses/ws-upstream";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { resolveTurnStateHandle, TURN_STATE_BINDING_INIT } from "../../src/server/turn-state-handles";
+} from "../../backend/src/server/responses/ws-upstream";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
+import { resolveTurnStateHandle, TURN_STATE_BINDING_INIT } from "../../backend/src/server/turn-state-handles";
 import { BOUNDED_WS_RUNTIME, codexWsUpstreamFetch, shouldUseCodexWsUpstream, streamingInit } from "../helpers/ws-upstream-fixtures";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { installCompactionRoutingAclFixture as installRoutingAclFixture } from "../helpers/compaction-routing-fixtures";
@@ -1353,7 +1353,7 @@ describe("codexWsUpstreamFetch", () => {
   });
 
   test("a mid-stream drop surfaces as a synthesized failed terminal through the passthrough relay", async () => {
-    const { relaySseWithFailedTail } = await import("../../src/server/relay");
+    const { relaySseWithFailedTail } = await import("../../backend/src/server/relay");
     installFake(ws => {
       ws.emit("open", {});
       ws.emit("message", { data: JSON.stringify({ type: "response.created", response: { id: "r1" } }) });
@@ -1504,7 +1504,7 @@ describe("codexWsUpstreamFetch", () => {
   });
 
   test("the first-response deadline settles a sent request as a 504 the outer retry wrapper does not resend", async () => {
-    const { fetchWithTransientRetry } = await import("../../src/lib/upstream-retry");
+    const { fetchWithTransientRetry } = await import("../../backend/src/lib/upstream-retry");
     jest.useFakeTimers();
     const opened = Promise.withResolvers<void>();
     installFake(ws => { ws.emit("open", {}); opened.resolve(); });

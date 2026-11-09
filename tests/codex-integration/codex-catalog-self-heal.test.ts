@@ -7,15 +7,15 @@ import {
   CATALOG_HEAL_MAX_ATTEMPTS, CATALOG_HEAL_MAX_HEALS, CATALOG_HEAL_RECHECK_MS,
   CATALOG_HEAL_TICK_MS, CATALOG_HEAL_WINDOW_MS, startCodexCatalogSelfHeal,
   type CatalogSelfHealDeps, type CatalogSelfHealGates, type CatalogSelfHealHandle,
-} from "../../src/codex/catalog-self-heal";
-import { CATALOG_HEAL_MAX_BYTES, CATALOG_HEAL_MAX_LINKS, CATALOG_HEAL_MAX_PATH_READS, compareCatalogHealPaths, inspectHealPath, observeCatalogHealFile, sameCatalogHealPath, selectCatalogHealPath } from "../../src/codex/catalog/heal-observation";
-import type { CatalogPublicationEvent } from "../../src/codex/catalog/publication-observer";
-import type { RawCatalog } from "../../src/codex/catalog/parsing";
-import type { OcxConfig } from "../../src/types";
-import { reconcileClientStartupBeforeReady, syncCodexBeforeCatalogObservation } from "../../src/cli/claude-agent-startup-sync";
-import { syncCodexOnStartIfEnabled } from "../../src/codex/desired-state";
-import { createReadinessGate } from "../../src/server/readiness";
-import { tryAdmitTurn } from "../../src/server/lifecycle";
+} from "../../backend/src/codex/catalog-self-heal";
+import { CATALOG_HEAL_MAX_BYTES, CATALOG_HEAL_MAX_LINKS, CATALOG_HEAL_MAX_PATH_READS, compareCatalogHealPaths, inspectHealPath, observeCatalogHealFile, sameCatalogHealPath, selectCatalogHealPath } from "../../backend/src/codex/catalog/heal-observation";
+import type { CatalogPublicationEvent } from "../../backend/src/codex/catalog/publication-observer";
+import type { RawCatalog } from "../../backend/src/codex/catalog/parsing";
+import type { OcxConfig } from "../../backend/src/types";
+import { reconcileClientStartupBeforeReady, syncCodexBeforeCatalogObservation } from "../../backend/src/cli/claude-agent-startup-sync";
+import { syncCodexOnStartIfEnabled } from "../../backend/src/codex/desired-state";
+import { createReadinessGate } from "../../backend/src/server/readiness";
+import { tryAdmitTurn } from "../../backend/src/server/lifecycle";
 
 const routed = (slug: string) => ({ slug, description: `Routed via opencodex → ${slug} (owner).` });
 const native = { slug: "gpt-5.5", description: "native" };

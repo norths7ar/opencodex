@@ -1,0 +1,236 @@
+import { existsSync, readFileSync, statSync } from "node:fs";
+import { basename, extname, isAbsolute, join, relative, resolve } from "node:path";
+import { browserSecurityHeaders } from "./auth-cors";
+import type { GuiSessionBootstrap } from "./gui-session";
+import { packageVersion } from "../lib/package-version";
+import { isStandaloneBinary, standaloneRoot } from "../lib/standalone";
+
+/** opencodex version, read from the packaged package.json (same source as the server bootstrap). */
+const VERSION = packageVersion("0.0.0");
+
+const MIME_TYPES: Record<string, string> = {
+  ".html": "text/html", ".js": "application/javascript", ".css": "text/css",
+  ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
+  ".ico": "image/x-icon",
+};
+
+/**
+ * Matches Vite's content-hashed bundle filenames (e.g. `index-B5r7LNHN.js` or `style-D5SiRo8X.css`).
+ * Unhashed static assets (e.g. `runtime-config.js` or unversioned icons) must not be cached immutably.
+ */
+const HASHED_ASSET_PATTERN = /-[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9]+$/;
+
+/** The Windows desktop and standalone archive keep gui/dist beside the executable. */
+export function standaloneGuiDistCandidates(executableDir: string, platform: NodeJS.Platform = process.platform): string[] {
+  const candidates = [join(executableDir, "gui", "dist")];
+
+
+  return candidates;
+}
+
+/** Overrides for tests; production callers pass nothing and get this process's own layout. */
+export interface GuiDistLookup {
+  /** Directory holding a compiled `ocx`, or null when running from source. */
+  standaloneDir?: string | null;
+  platform?: NodeJS.Platform;
+  /** Directory of this module; a source checkout's `frontend/dist` is resolved from it. */
+  moduleDir?: string;
+}
+
+/** Lookup only: checks for `index.html` and never creates, copies or builds anything. */
+export function findGuiDist(lookup: GuiDistLookup = {}): string | null {
+  const standaloneDir = lookup.standaloneDir === undefined
+    ? (isStandaloneBinary() ? standaloneRoot() : null)
+    : lookup.standaloneDir;
+  const moduleDir = lookup.moduleDir ?? import.meta.dir;
+  const candidates = [
+    process.env.OPENCODEX_GUI_DIST,
+    ...(standaloneDir === null ? [] : standaloneGuiDistCandidates(standaloneDir, lookup.platform)),
+    join(moduleDir, "..", "..", "..", "frontend", "dist"),
+  ].filter((candidate): candidate is string => Boolean(candidate));
+  for (const c of candidates) {
+    if (existsSync(join(c, "index.html"))) return c;
+  }
+  return null;
+}
+
+export function resolveGuiFilePath(guiDist: string, pathname: string): string | null {
+  let decodedPath: string;
+  try {
+    decodedPath = decodeURIComponent(pathname);
+  } catch {
+    return null;
+  }
+  if (decodedPath.includes("\0")) return null;
+
+  const relativePath = decodedPath === "/" || decodedPath === ""
+    ? "index.html"
+    : decodedPath.replace(/\\/g, "/").replace(/^\/+/, "");
+  const root = resolve(guiDist);
+  const filePath = resolve(root, relativePath);
+  const rel = relative(root, filePath);
+  if (rel === "" || rel.startsWith("..") || isAbsolute(rel)) return null;
+  return filePath;
+}
+
+function isFile(path: string): boolean {
+  try {
+    return statSync(path).isFile();
+  } catch {
+    return false;
+  }
+}
+
+/** HTML-attribute escape for values interpolated into meta tags. */
+function escapeHtmlAttribute(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+/** Shared session meta-tag block, escaped for quoted attribute interpolation. */
+function sessionBootstrapMeta(session: GuiSessionBootstrap): string {
+  return [
+    `<meta name="opencodex-session-token" content="${escapeHtmlAttribute(session.token)}">`,
+    `<meta name="opencodex-session-csrf" content="${escapeHtmlAttribute(session.csrfToken)}">`,
+    `<meta name="opencodex-session-origin" content="${escapeHtmlAttribute(session.browserOrigin)}">`,
+    `<meta name="opencodex-session-server-origin" content="${escapeHtmlAttribute(session.serverOrigin)}">`,
+  ].join("");
+}
+
+/**
+ * Does this bind require a typed management credential?
+ *
+ * Emitted for the same reason as the role: so the dashboard can answer a question on first
+ * paint without asking a remote-hub endpoint. It is NOT the same question as the role.
+ * `standalone` + `hostname: "0.0.0.0"` is an operator who deliberately exposed the dashboard
+ * and must type the admin token, while a `hub` on loopback still mints its own session — so
+ * the role cannot stand in for this, and using it that way locked out exactly the operator
+ * who is supposed to see the prompt.
+ *
+ * Non-secret: it restates the bind the operator chose, which `/healthz` and the dashboard
+ * already reflect.
+ */
+function managementAuthRequiredMeta(required: boolean): string {
+  return `<meta name="opencodex-management-auth-required" content="${required ? "1" : "0"}">`;
+}
+function htmlDocumentResponse(html: string): Response {
+  return new Response(html, {
+    headers: {
+      "Content-Type": "text/html",
+      "Cache-Control": "no-store",
+      Pragma: "no-cache",
+      ...browserSecurityHeaders(),
+    },
+  });
+}
+
+function htmlResponse(
+  path: string,
+  session?: GuiSessionBootstrap,
+  managementAuthRequired?: boolean,
+): Response {
+  let html = readFileSync(path, "utf8");
+  const bootstrap = [
+    managementAuthRequired === undefined ? "" : managementAuthRequiredMeta(managementAuthRequired),
+    session ? sessionBootstrapMeta(session) : "",
+  ].join("");
+  if (bootstrap) {
+    html = html.includes("</head>") ? html.replace("</head>", `${bootstrap}</head>`) : `${bootstrap}${html}`;
+  }
+  return htmlDocumentResponse(html);
+}
+
+/**
+ * Minimal session-bootstrap document, independent of any packaged GUI build. The dev
+ * GUI (Vite) proxies /opencodex-session to the backend with the original host so the
+ * backend can mint an origin-bound loopback session even when gui/dist does not exist.
+ */
+export function serveSessionBootstrap(session: GuiSessionBootstrap): Response {
+  const bootstrap = sessionBootstrapMeta(session);
+  const html = `<!doctype html><html><head><meta charset="utf-8">${bootstrap}</head><body></body></html>`;
+  return htmlDocumentResponse(html);
+}
+
+/**
+ * Serves a GUI static file from the distribution directory.
+ * Returns a Response with MIME type and appropriate Cache-Control headers:
+ * - HTML files receive `no-store` to guarantee immediate bootstrap updates.
+ * - Content-hashed bundles under `assets/` receive 1-year `immutable` caching.
+ * - Non-hashed static files (e.g. favicon, unhashed assets) receive `no-cache` for prompt revalidation.
+ * Returns null if the file cannot be found or resolved.
+ */
+export function serveGuiFile(
+  pathname: string,
+  guiDist = findGuiDist(),
+  session?: GuiSessionBootstrap,
+  managementAuthRequired?: boolean,
+): Response | null {
+  if (!guiDist) return null;
+  const filePath = resolveGuiFilePath(guiDist, pathname);
+  if (!filePath) return null;
+
+  if (!isFile(filePath)) {
+    if (!extname(pathname)) {
+      // A directory with its own index.html is a separate app (the classic dashboard at
+      // /classic/); every other extensionless path is the main dashboard's SPA fallback.
+      const nestedIndex = join(filePath, "index.html");
+      const indexPath = isFile(nestedIndex) ? nestedIndex : join(guiDist, "index.html");
+      if (isFile(indexPath)) {
+        return htmlResponse(indexPath, session, managementAuthRequired);
+      }
+    }
+    return null;
+  }
+
+  const ext = extname(filePath);
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  if (ext === ".html") return htmlResponse(filePath, session, managementAuthRequired);
+
+  const root = resolve(guiDist);
+  // "assets/" matches Vite's default assetsDir (gui/vite.config.ts). If that value is
+  // ever changed, update this prefix to match. filePath is already resolve()-normalized
+  // by resolveGuiFilePath, so rel cannot contain ".." fragments.
+  //
+  // Immutable 1-year caching is only applied when the file is under assets/ AND its basename
+  // matches Vite's content-hash pattern (e.g. index-B5r7LNHN.js). Any unhashed asset under
+  // assets/ (e.g. runtime-config.js) or elsewhere falls back to no-cache so clients revalidate,
+  // whereas index.html uses no-store above to avoid storing any bootstrap state.
+  const rel = relative(root, filePath).replace(/\\/g, "/");
+  const isHashedAsset = rel.startsWith("assets/") && HASHED_ASSET_PATTERN.test(basename(filePath));
+  const cacheControl = isHashedAsset
+    ? "public, max-age=31536000, immutable"
+    : "no-cache";
+
+  // Snapshot bytes before returning the response. Bun.file is lazy: if gui/dist is replaced
+  // after Bun frames the response but before the stream finishes, its Content-Length can
+  // describe the old file while the body comes from the new one (#2792).
+  return new Response(readFileSync(filePath), {
+    headers: {
+      "Content-Type": contentType,
+      "Cache-Control": cacheControl,
+      ...browserSecurityHeaders(),
+    },
+  });
+}
+
+export function rootFallbackPayload() {
+  return {
+    status: "ok",
+    service: "opencodex",
+    version: VERSION,
+    dashboard: {
+      available: false,
+      reason: "GUI build not found. Run `bun run build:gui` from the opencodex repo, or use `ocx gui` from a packaged install.",
+    },
+    endpoints: {
+      health: "/healthz",
+      models: "/v1/models",
+      responses: "/v1/responses",
+      chatCompletions: "/v1/chat/completions",
+      management: "/api/*",
+    },
+  };
+}

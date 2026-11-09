@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../src/adapters/google";
-import { compileGoogleWireBody, repairGoogleInvalidRequestBody } from "../../../src/adapters/google-wire-compiler";
-import type { OcxParsedRequest } from "../../../src/types";
+import { createGoogleAdapter as createGoogleAdapterProduction } from "../../../backend/src/adapters/google";
+import { compileGoogleWireBody, repairGoogleInvalidRequestBody } from "../../../backend/src/adapters/google-wire-compiler";
+import type { OcxParsedRequest } from "../../../backend/src/types";
 import { withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const createGoogleAdapter = (...args: Parameters<typeof createGoogleAdapterProduction>) =>

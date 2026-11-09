@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
-import { buildProviderWorkspace, isFreeProvider, providerTier, type WorkspaceItem } from "../../gui/src/provider-workspace/catalog";
-import { bucketPresets, presetTier, type CatalogPreset } from "../../gui/src/components/provider-catalog/provider-presets";
-import { isSubscriptionCliProvider } from "../../gui/src/provider-workspace/subscription-cli";
-import { authModeLabel } from "../../gui/src/components/provider-workspace/ProviderRail";
-import { providerAuthSurface } from "../../gui/src/provider-workspace/auth";
-import { en } from "../../gui/src/i18n/en";
-import { DICTS } from "../../gui/src/i18n/catalogs";
-import { interpolate, type TFn } from "../../gui/src/i18n/shared";
+import { buildProviderWorkspace, isFreeProvider, providerTier, type WorkspaceItem } from "../../frontend/src/provider-workspace/catalog";
+import { bucketPresets, presetTier, type CatalogPreset } from "../../frontend/src/components/provider-catalog/provider-presets";
+import { isSubscriptionCliProvider } from "../../frontend/src/provider-workspace/subscription-cli";
+import { authModeLabel } from "../../frontend/src/components/provider-workspace/ProviderRail";
+import { providerAuthSurface } from "../../frontend/src/provider-workspace/auth";
+import { en } from "../../frontend/src/i18n/en";
+import { DICTS } from "../../frontend/src/i18n/catalogs";
+import { interpolate, type TFn } from "../../frontend/src/i18n/shared";
 
 /**
  * `claude-cli` is keyless because the signed-in Claude Code CLI owns the account and bills the

@@ -11,8 +11,8 @@ import {
   type CodexResetCreditRecoveryDependencies,
   type CodexResetCreditRecoveryGeneration,
   type CodexResetCreditRevalidationResult,
-} from "../../src/codex/reset-credit-recovery";
-import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
+} from "../../backend/src/codex/reset-credit-recovery";
+import { MAIN_CODEX_ACCOUNT_ID } from "../../backend/src/codex/account-id";
 
 const BASE_GENERATION: CodexResetCreditRecoveryGeneration = {
   accountId: "account-a",

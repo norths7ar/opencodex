@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
-import { createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
-import { recoverStandaloneBareBlocks, scanSerializedToolCalls, SerializedToolCallContentBuffer } from "../../../src/adapters/openai-chat/serialized-tool-call-content";
-import { StandaloneBareToolCallBuffer } from "../../../src/adapters/openai-chat/standalone-bare-tool-calls";
-import { createOpenAIChatToolNameRegistry } from "../../../src/adapters/openai-chat/tool-name-registry";
-import type { AdapterEvent, OcxParsedRequest } from "../../../src/types";
+import { createOpenAIChatAdapter } from "../../../backend/src/adapters/openai-chat";
+import { recoverStandaloneBareBlocks, scanSerializedToolCalls, SerializedToolCallContentBuffer } from "../../../backend/src/adapters/openai-chat/serialized-tool-call-content";
+import { StandaloneBareToolCallBuffer } from "../../../backend/src/adapters/openai-chat/standalone-bare-tool-calls";
+import { createOpenAIChatToolNameRegistry } from "../../../backend/src/adapters/openai-chat/tool-name-registry";
+import type { AdapterEvent, OcxParsedRequest } from "../../../backend/src/types";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const exec = { name: "exec", description: "Code", parameters: {}, freeform: true };

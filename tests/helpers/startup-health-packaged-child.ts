@@ -1,5 +1,5 @@
-import { collectStartupHealth } from "../../src/codex/autostart-health";
-import { getCachedStartupHealth } from "../../src/server/startup-health-cache";
+import { collectStartupHealth } from "../../backend/src/codex/autostart-health";
+import { getCachedStartupHealth } from "../../backend/src/server/startup-health-cache";
 
 if (process.argv[2] === "__startup-health") {
   console.log(JSON.stringify(collectStartupHealth({})));

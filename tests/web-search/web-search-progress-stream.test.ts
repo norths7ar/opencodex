@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test";
-import type { ProviderAdapter } from "../../src/adapters/base";
+import type { ProviderAdapter } from "../../backend/src/adapters/base";
 import {
   parseStreamWithProgress,
   RoutedModelInactivityError,
   WebSearchConsumerInactivityError,
   WebSearchStreamProtocolError,
-} from "../../src/web-search/progress-stream";
+} from "../../backend/src/web-search/progress-stream";
 import {
   createPassthroughWebSearchBridgeStream,
   MAX_HELD_CALL_EVENTS,
   WEB_SEARCH_BRIDGE_ERROR_CODE,
-} from "../../src/web-search/passthrough-bridge";
-import type { AdapterEvent } from "../../src/types";
+} from "../../backend/src/web-search/passthrough-bridge";
+import type { AdapterEvent } from "../../backend/src/types";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { repoPath } from "../helpers/repo-root";
 
@@ -97,8 +97,8 @@ describe("web-search streamed-body progress collector", () => {
 
   test("synchronous empty chunks cannot starve the inactivity deadline", async () => {
     const script = `
-      import { parseStreamWithProgress } from ${JSON.stringify(repoPath("src/web-search/progress-stream.ts"))};
-      import { createTranslatorBudget } from ${JSON.stringify(repoPath("src/lib/translator-budget.ts"))};
+      import { parseStreamWithProgress } from ${JSON.stringify(repoPath("backend/src/web-search/progress-stream.ts"))};
+      import { createTranslatorBudget } from ${JSON.stringify(repoPath("backend/src/lib/translator-budget.ts"))};
       const body = new ReadableStream({ pull(c) { c.enqueue(new Uint8Array(0)); } }, { highWaterMark: 0 });
       const parse = async function* (response) {
         const reader = response.body.getReader();

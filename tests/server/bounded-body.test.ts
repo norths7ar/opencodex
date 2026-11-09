@@ -5,9 +5,9 @@ import {
 	boundedBodyDecodeFailure,
 	readBoundedResponseBytes,
 	readBoundedResponseBody,
-} from "../../src/lib/bounded-body";
-import { UPSTREAM_JSON_BODY_READ_OPTIONS } from "../../src/server/responses/core";
-import { readBoundedJsonRequestBody } from "../../src/server/request-decompress";
+} from "../../backend/src/lib/bounded-body";
+import { UPSTREAM_JSON_BODY_READ_OPTIONS } from "../../backend/src/server/responses/core";
+import { readBoundedJsonRequestBody } from "../../backend/src/server/request-decompress";
 
 const encoder = new TextEncoder();
 
@@ -402,7 +402,7 @@ describe("readBoundedResponseBody", () => {
 			// past the payload ceiling. It also never increments the growth counter above,
 			// so that test alone cannot catch it. Pin the shape, the same instrument this
 			// repository uses for the relay retention rule and the star-consent guard.
-			const source = (await Bun.file(new URL("../../src/lib/bounded-body.ts", import.meta.url)).text())
+			const source = (await Bun.file(new URL("../../backend/src/lib/bounded-body.ts", import.meta.url)).text())
 				.replace(/\/\*[\s\S]*?\*\//g, "")
 				.replace(/(^|[^:])\/\/.*$/gm, "$1");
 

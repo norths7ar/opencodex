@@ -7,7 +7,7 @@ import {
   starRepository,
   STAR_REPO,
   type StarDeps,
-} from "../../src/github/star-state";
+} from "../../backend/src/github/star-state";
 
 describe("trusted gh resolution", () => {
   test("does not search a caller-controlled POSIX PATH", () => {

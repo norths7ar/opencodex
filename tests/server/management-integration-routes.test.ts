@@ -3,22 +3,22 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import type { ExportModel } from "../../src/clients/config-export";
-import { fileIO, type IntegrationIO } from "../../src/integrations/config-io";
-import { INTEGRATION_CLIENTS, INTEGRATION_CLIENT_IDS } from "../../src/integrations/registry";
-import { readIntegrationState } from "../../src/integrations/state";
-import { createIntegrationStateStore, type IntegrationStateStore } from "../../src/integrations/store";
-import { applyIntegration } from "../../src/integrations/writer";
-import type { IntegrationWriterLockSeams } from "../../src/integrations/writer-lock";
-import { handleManagementAPI } from "../../src/server/management-api";
-import * as asideRoutes from "../../src/server/management/aside-profile-routes";
-import { loadExportModels, resetExportSnapshotForTests } from "../../src/server/management/model-rows";
+import type { ExportModel } from "../../backend/src/clients/config-export";
+import { fileIO, type IntegrationIO } from "../../backend/src/integrations/config-io";
+import { INTEGRATION_CLIENTS, INTEGRATION_CLIENT_IDS } from "../../backend/src/integrations/registry";
+import { readIntegrationState } from "../../backend/src/integrations/state";
+import { createIntegrationStateStore, type IntegrationStateStore } from "../../backend/src/integrations/store";
+import { applyIntegration } from "../../backend/src/integrations/writer";
+import type { IntegrationWriterLockSeams } from "../../backend/src/integrations/writer-lock";
+import { handleManagementAPI } from "../../backend/src/server/management-api";
+import * as asideRoutes from "../../backend/src/server/management/aside-profile-routes";
+import { loadExportModels, resetExportSnapshotForTests } from "../../backend/src/server/management/model-rows";
 import {
   setIntegrationMutationFlightTestHooks,
   setIntegrationPathTestHooks,
   setRaycastDetectTestHook,
-} from "../../src/server/management/integration-routes";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/server/management/integration-routes";
+import type { OcxConfig } from "../../backend/src/types";
 import { catalogConvergenceFactory } from "../helpers/catalog-convergence";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { repoPath, repoRoot } from "../helpers/repo-root";
@@ -42,7 +42,7 @@ let store: IntegrationStateStore;
  * fall back to the JSON root payload (which silently voids the wire test).
  */
 {
-  if (!existsSync(repoPath("gui", "dist", "index.html"))) {
+  if (!existsSync(repoPath("frontend", "dist", "index.html"))) {
     const build = Bun.spawnSync({
       cmd: ["bun", "run", "build:gui"],
       cwd: repoRoot(),
@@ -328,7 +328,7 @@ describe("GET /api/client-integrations", () => {
 
 /** The models the route itself derives, so expectations cannot drift from it. */
 async function exportModels(): Promise<ExportModel[]> {
-  const { loadExportModels } = await import("../../src/server/management/model-rows");
+  const { loadExportModels } = await import("../../backend/src/server/management/model-rows");
   return loadExportModels(config);
 }
 
@@ -1175,8 +1175,8 @@ describe("admission", () => {
     process.env.OPENCODEX_ADMIN_AUTH_TOKEN = ["admission", "secret", "fixture"].join("-");
     installHermes();
 
-    const { saveConfig } = await import("../../src/config");
-    const { startServer } = await import("../../src/server");
+    const { saveConfig } = await import("../../backend/src/config");
+    const { startServer } = await import("../../backend/src/server");
     saveConfig(config);
     const server = startServer(0);
     try {
@@ -1299,8 +1299,8 @@ describe("admission", () => {
     delete process.env.OPENCODEX_ADMIN_AUTH_TOKEN;
     installHermes();
 
-    const { saveConfig } = await import("../../src/config");
-    const { startServer } = await import("../../src/server");
+    const { saveConfig } = await import("../../backend/src/config");
+    const { startServer } = await import("../../backend/src/server");
     saveConfig(config);
     const server = startServer(0);
     try {
@@ -1334,7 +1334,7 @@ describe("admission", () => {
         // `fileURLToPath`, not `.pathname`: a Windows URL pathname is
         // `/D:/a/...`, which never exists as a filesystem path and would make
         // this guard vacuously true.
-        expect(existsSync(fileURLToPath(new URL("../../gui/dist/index.html", import.meta.url)))).toBe(false);
+        expect(existsSync(fileURLToPath(new URL("../../frontend/dist/index.html", import.meta.url)))).toBe(false);
         return;
       }
 

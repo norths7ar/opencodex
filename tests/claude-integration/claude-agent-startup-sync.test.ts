@@ -1,15 +1,15 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { markSiblingStart, resetSiblingStartForTests } from "../../src/codex/sibling-start";
+import { markSiblingStart, resetSiblingStartForTests } from "../../backend/src/codex/sibling-start";
 import { mkdtempSync, readdirSync, readFileSync} from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
   reconcileClientStartupBeforeReady,
   syncClaudeAgentDefsAtProxyStartup,
-} from "../../src/cli/claude-agent-startup-sync";
-import { injectClaudeAgentDefs } from "../../src/claude/agents-inject";
-import { createReadinessGate } from "../../src/server/readiness";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/cli/claude-agent-startup-sync";
+import { injectClaudeAgentDefs } from "../../backend/src/claude/agents-inject";
+import { createReadinessGate } from "../../backend/src/server/readiness";
+import type { OcxConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 const config = (claudeCode: OcxConfig["claudeCode"] = {}): OcxConfig => ({

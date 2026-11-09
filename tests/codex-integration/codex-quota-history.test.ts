@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { CodexQuotaHistory, QUOTA_HISTORY_LIMITS, type QuotaHistorySample } from "../../src/codex/quota-history";
-import type { PoolQuotaWriter } from "../../src/codex/quota-types";
+import { CodexQuotaHistory, QUOTA_HISTORY_LIMITS, type QuotaHistorySample } from "../../backend/src/codex/quota-history";
+import type { PoolQuotaWriter } from "../../backend/src/codex/quota-types";
 
 const now = 1_800_000_000_000;
 const identity = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";

@@ -1,19 +1,19 @@
 import { describe, expect, test } from "bun:test";
-import type { OcxProviderConfig } from "../../src/types";
-import { captureWireAdapterHardPins } from "../../src/types";
-import type { ProviderRegistryEntry } from "../../src/providers/registry/types";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { effectiveProviderAliasDecision, resolveModelAlias } from "../../src/providers/default-aliases";
-import { resolveOpenAiVirtualModel } from "../../src/providers/openai-virtual-models";
-import { routedProviderConfig } from "../../src/router";
-import { resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
-import { applyProviderConfigHints } from "../../src/codex/catalog/model-hints";
-import { captureFastPolicyAuthority } from "../../src/providers/service-tier";
+import type { OcxProviderConfig } from "../../backend/src/types";
+import { captureWireAdapterHardPins } from "../../backend/src/types";
+import type { ProviderRegistryEntry } from "../../backend/src/providers/registry/types";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { effectiveProviderAliasDecision, resolveModelAlias } from "../../backend/src/providers/default-aliases";
+import { resolveOpenAiVirtualModel } from "../../backend/src/providers/openai-virtual-models";
+import { routedProviderConfig } from "../../backend/src/router";
+import { resolveWireProtocolOverride } from "../../backend/src/server/adapter-resolve";
+import { applyProviderConfigHints } from "../../backend/src/codex/catalog/model-hints";
+import { captureFastPolicyAuthority } from "../../backend/src/providers/service-tier";
 import {
   clampObservedModelLimits,
   resolveModelPolicy,
-} from "../../src/providers/resolved-model-policy";
-import { modelRecordValue } from "../../src/reasoning-effort";
+} from "../../backend/src/providers/resolved-model-policy";
+import { modelRecordValue } from "../../backend/src/reasoning-effort";
 
 const MODEL = "vendor/model-a";
 

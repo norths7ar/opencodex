@@ -2,10 +2,10 @@ import { expect, spyOn, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { handleResponses } from "../../src/server/responses";
-import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../src/providers/request-pacing";
-import type { OcxConfig } from "../../src/types";
+import { ADAPTER_REGISTRY } from "../../backend/src/adapters/registry";
+import { handleResponses } from "../../backend/src/server/responses";
+import { providerRequestPacingStatus, resetProviderRequestPacingForTest, waitForProviderRequestSlot } from "../../backend/src/providers/request-pacing";
+import type { OcxConfig } from "../../backend/src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
@@ -76,7 +76,7 @@ test.each([false, true])("runTurn refresh releases the old key and readmits the 
 });
 
 test("a distributed runTurn does not send again after its bound key cools following output", async () => {
-  const { recordDistributedKeyFailure, clearKeyCooldowns, forgetApiKeyRotationCursor } = await import("../../src/providers/key-failover");
+  const { recordDistributedKeyFailure, clearKeyCooldowns, forgetApiKeyRotationCursor } = await import("../../backend/src/providers/key-failover");
   const previousHome = process.env.OPENCODEX_HOME;
   const home = mkdtempSync(join(tmpdir(), "ocx-runturn-cooled-"));
   process.env.OPENCODEX_HOME = home;

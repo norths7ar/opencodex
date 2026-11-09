@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from "bun:test";
-import { createGoogleAdapter } from "../../../src/adapters/google";
-import type { AdapterEvent } from "../../../src/types";
+import { createGoogleAdapter } from "../../../backend/src/adapters/google";
+import type { AdapterEvent } from "../../../backend/src/types";
 import { createTestTranslatorBudget } from "../../helpers/translator-budget";
 
 const encoder = new TextEncoder();

@@ -2,10 +2,10 @@ import { afterEach, expect, test } from "bun:test";
 import { chmodSync, mkdirSync, mkdtempSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { getPidPath, getRuntimePortPath } from "../../src/config/process-state";
-import { deriveDesktopStartup, diagnoseMacDesktopStartup, desktopStartupOwnership, desktopLoginStatusSummary } from "../../src/service/desktop-startup";
-import { createSupervisionLatch, desktopSupervisionPaths, inspectDesktopSupervision, type SupervisionEvidence } from "../../src/service/desktop-supervision.mjs";
-import type { ServiceOwnershipResolution } from "../../src/service/state";
+import { getPidPath, getRuntimePortPath } from "../../backend/src/config/process-state";
+import { deriveDesktopStartup, diagnoseMacDesktopStartup, desktopStartupOwnership, desktopLoginStatusSummary } from "../../backend/src/service/desktop-startup";
+import { createSupervisionLatch, desktopSupervisionPaths, inspectDesktopSupervision, type SupervisionEvidence } from "../../backend/src/service/desktop-supervision.mjs";
+import type { ServiceOwnershipResolution } from "../../backend/src/service/state";
 
 const roots: string[] = [];
 afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true }); });

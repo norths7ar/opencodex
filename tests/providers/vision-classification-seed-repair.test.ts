@@ -11,12 +11,12 @@ import { describe, expect, test } from "bun:test";
 import {
   projectStaleVisionClassifications,
   STALE_VISION_CLASSIFICATIONS,
-} from "../../src/providers/stale-vision-classification-migration";
-import { PROVIDER_REGISTRY } from "../../src/providers/registry";
-import { projectStaleNoVisionSeeds, STALE_NO_VISION_SEEDS } from "../../src/providers/stale-no-vision-seed-migration";
-import { projectStartupConfigRepairs } from "../../src/providers/model-rename-startup";
-import { requiresVisionPreprocessing } from "../../src/vision/plan";
-import type { OcxConfig } from "../../src/types";
+} from "../../backend/src/providers/stale-vision-classification-migration";
+import { PROVIDER_REGISTRY } from "../../backend/src/providers/registry";
+import { projectStaleNoVisionSeeds, STALE_NO_VISION_SEEDS } from "../../backend/src/providers/stale-no-vision-seed-migration";
+import { projectStartupConfigRepairs } from "../../backend/src/providers/model-rename-startup";
+import { requiresVisionPreprocessing } from "../../backend/src/vision/plan";
+import type { OcxConfig } from "../../backend/src/types";
 
 const MODEL = "deepseek-v4.1-flash";
 const SIBLING = "deepseek-v4-flash";

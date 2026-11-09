@@ -3,14 +3,14 @@ import { Database } from "bun:sqlite";
 import { mkdirSync, mkdtempSync, readdirSync, statSync, unlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { scanStorage, scanStorageAsync, type StorageBucket, type StorageReport } from "../../src/storage/scanner";
+import { scanStorage, scanStorageAsync, type StorageBucket, type StorageReport } from "../../backend/src/storage/scanner";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
-import { logGuardResultMayHaveChangedStorage, sharedStorageScan } from "../../src/server/management/storage-log-guard-routes";
+import { logGuardResultMayHaveChangedStorage, sharedStorageScan } from "../../backend/src/server/management/storage-log-guard-routes";
 import {
   noteStorageMutationCompleted,
   storageMutationEpoch,
   tryBeginStorageMutation,
-} from "../../src/storage/storage-mutation-coordinator";
+} from "../../backend/src/storage/storage-mutation-coordinator";
 
 const OLD_MTIME = new Date("2026-01-02T03:04:05Z");
 const MID_MTIME = new Date("2026-03-04T05:06:07Z");

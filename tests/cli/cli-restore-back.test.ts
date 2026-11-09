@@ -21,7 +21,7 @@ function ownedEnvironment(codexHome: string, ocxHome: string): Record<string, st
 }
 
 function runCli(args: string[], env: Record<string, string>) {
-  return spawnSync(process.execPath, withOwnedServiceHomePreload(["run", "src/cli/index.ts", ...args]), {
+  return spawnSync(process.execPath, withOwnedServiceHomePreload(["run", "backend/src/cli/index.ts", ...args]), {
     cwd: repoRoot,
     env: { ...process.env, ...env },
     encoding: "utf8",
@@ -188,7 +188,7 @@ describe("ocx restore back", () => {
       // #4812 left the escape hatch undiscoverable: the flag worked, but no help text named
       // it, so a user whose paginated restore kept the provider table had nothing to read.
       // Read the flag out of the parser rather than restating it, so a rename cannot pass.
-      const parsed = readFileSync(join(repoRoot, "src", "cli", "dispatch.ts"), "utf8")
+      const parsed = readFileSync(join(repoRoot, "backend/src", "cli", "dispatch.ts"), "utf8")
         .match(/const removeProviderTable = takeFlag\(restoreArgs, "(--[a-z-]+)"\)/)?.[1];
       expect(parsed).toBeTruthy();
       expect(`${restoreHelp.stdout}\n${restoreHelp.stderr}`).toContain(parsed!);

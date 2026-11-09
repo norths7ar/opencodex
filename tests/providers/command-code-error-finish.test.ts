@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { createCommandCodeAdapter } from "../../src/adapters/command-code";
-import { buildResponseJSON } from "../../src/bridge";
+import { createCommandCodeAdapter } from "../../backend/src/adapters/command-code";
+import { buildResponseJSON } from "../../backend/src/bridge";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
-import type { AdapterEvent, OcxProviderConfig } from "../../src/types";
+import type { AdapterEvent, OcxProviderConfig } from "../../backend/src/types";
 
 const provider: OcxProviderConfig = {
   adapter: "command-code",

@@ -1,8 +1,8 @@
 import { expect, spyOn, test } from "bun:test";
 import * as childProcess from "node:child_process";
 import net from "node:net";
-import { stopRequestFetch } from "../../src/cli/stop-restore";
-import { ProxyOwnershipRefusedError, stopProxy, stopProxyGracefully } from "../../src/lib/process-control";
+import { stopRequestFetch } from "../../backend/src/cli/stop-restore";
+import { ProxyOwnershipRefusedError, stopProxy, stopProxyGracefully } from "../../backend/src/lib/process-control";
 
 // Exercise the exact transport selected by handleStop, including its forced-stop consumer.
 for (const framing of ["truncated", "stalled"]) {

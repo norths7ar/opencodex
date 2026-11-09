@@ -7,12 +7,12 @@ import {
   resetQuotaRecoveryForTests,
   settleQuotaRecovery,
   sweepExpiredQuotaRecovery,
-} from "../../src/codex/quota-401-recovery";
+} from "../../backend/src/codex/quota-401-recovery";
 import {
   CODEX_REFRESH_FLIGHT_CEILING_MS,
   QUOTA_RECOVERY_LEASE_MS,
   WHAM_REQUEST_TIMEOUT_MS,
-} from "../../src/codex/quota-recovery-timing";
+} from "../../backend/src/codex/quota-recovery-timing";
 
 /**
  * The budget that keeps a WHAM 401 recovery from becoming a retry loop (#3019).

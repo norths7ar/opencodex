@@ -1,10 +1,10 @@
 import { afterEach, onTestFinished } from "bun:test";
-import type { IncomingMeta, ProviderAdapter } from "../../src/adapters/base";
+import type { IncomingMeta, ProviderAdapter } from "../../backend/src/adapters/base";
 import {
   createTranslatorBudget,
   resetTranslatorAggregateForTests,
   type TranslatorBudget,
-} from "../../src/lib/translator-budget";
+} from "../../backend/src/lib/translator-budget";
 
 const liveTestBudgets = new Set<TranslatorBudget>();
 

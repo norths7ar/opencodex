@@ -133,7 +133,7 @@ afterEach(() => {
 
 describe("Codex Log Guard reclaim", () => {
   test("incrementally reclaims freelist pages while preserving every logical row and trigger", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
 
@@ -157,7 +157,7 @@ describe("Codex Log Guard reclaim", () => {
   }, RECLAIM_CASE_TIMEOUT_MS);
 
   test("is a safe no-op when there is nothing reclaimable", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
 
@@ -170,7 +170,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("refuses databases that are not already auto_vacuum=INCREMENTAL", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
 
@@ -186,7 +186,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("refuses unknown log schemas before maintenance", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
 
@@ -202,7 +202,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("fails closed when Codex is running or process enumeration is uncertain", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
 
@@ -219,7 +219,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("fails closed when the Log Guard lock is busy", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
     const { codexHome } = fixture();
@@ -229,7 +229,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("requires quick_check before changing any pages", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
     const { codexHome, databasePath } = fixture();
@@ -249,7 +249,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("reports a post-maintenance quick_check failure explicitly", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
     const { codexHome } = fixture();
@@ -267,7 +267,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("stops at the per-run page budget and reports remaining work", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     expect(mod).not.toBeNull();
     if (!mod) return;
     const { codexHome } = fixture();
@@ -284,7 +284,7 @@ describe("Codex Log Guard reclaim", () => {
     expect(result.report.after.freelistPages).toBeGreaterThan(0);
   });
   test("derives batch budgets from the real page size, not a fixed page count", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     if (!mod) return;
     // The guide promises ~8 MiB batches and ~256 MiB per run, converted with the
     // database's page size. Fixed page counts meant something different at every
@@ -302,7 +302,7 @@ describe("Codex Log Guard reclaim", () => {
   });
 
   test("reports logicalBytesReclaimed alongside the physical figure", async () => {
-    const mod = await import("../../src/codex/log-guard/maintenance").catch(() => null);
+    const mod = await import("../../backend/src/codex/log-guard/maintenance").catch(() => null);
     if (!mod) return;
     // Documented before it existed. It is deliberately distinct from the
     // physical figure: an incremental vacuum can return pages to the free list

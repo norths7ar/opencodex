@@ -2,12 +2,12 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { wantsFreshConnection, providerFetch } from "../../src/server/responses/fetch-helpers";
-import { saveCredential } from "../../src/oauth/store";
-import { XAI_GROK_CLI_BASE_URL } from "../../src/providers/xai-transport";
-import { handleResponses } from "../../src/server/responses";
-import type { RequestLogContext } from "../../src/server/request-log";
-import type { OcxConfig, OcxProviderConfig } from "../../src/types";
+import { wantsFreshConnection, providerFetch } from "../../backend/src/server/responses/fetch-helpers";
+import { saveCredential } from "../../backend/src/oauth/store";
+import { XAI_GROK_CLI_BASE_URL } from "../../backend/src/providers/xai-transport";
+import { handleResponses } from "../../backend/src/server/responses";
+import type { RequestLogContext } from "../../backend/src/server/request-log";
+import type { OcxConfig, OcxProviderConfig } from "../../backend/src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
