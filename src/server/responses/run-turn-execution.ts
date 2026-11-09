@@ -282,7 +282,6 @@ export async function executeResponsesRunTurn(
       preacquiredSlot?: ProviderRequestSlot,
     ): Promise<void> => {
       const attemptSeq = ++runTurnAttemptSeq;
-      if (attemptSeq === 1 && options.comboInitialSend) options.comboInitialSend.producerOwned = true;
       let pacingSlot = preacquiredSlot;
       let sentKeyBinding: KeyBinding | undefined;
       const emit = (event: AdapterEvent) => {
@@ -345,7 +344,6 @@ export async function executeResponsesRunTurn(
           {
             headers: requestState.selectedForwardHeaders,
             abortSignal: producerAbort.signal,
-            comboAttempt: options.comboAttempt === true,
             translatorBudget,
             providerFetch: runTurnProviderFetch,
             pacingSlot,
@@ -402,7 +400,6 @@ export async function executeResponsesRunTurn(
                 message: err instanceof Error ? err.message : String(err),
               });
       } finally {
-        if (attemptSeq === 1) options.comboInitialSend?.permit.release();
         devinProducers.delete(producerAbort);
         cleanupProducerAbort?.();
         releaseProviderRequestSlot(pacingSlot);
@@ -776,7 +773,7 @@ export async function executeResponsesRunTurn(
         message: undeclaredToolCallMessage(),
       };
     };
-    const grokDevinPreflight = !options.comboAttempt && logCtx.surface === "grok" && inboundWire === "responses"
+    const grokDevinPreflight = logCtx.surface === "grok" && inboundWire === "responses"
       && transportState.runTurnAdapter.name === "devin";
     const grokRateLimitResponse = (preflight: AdapterEventPreflight): Response | undefined => {
       if (preflight.replayUnsafe || preflight.error?.status !== 429
@@ -828,30 +825,6 @@ export async function executeResponsesRunTurn(
         eventSource = preflight.stream;
         const refusal = grokRateLimitResponse(preflight);
         if (refusal) return refusal;
-      }
-      if (options.comboAttempt) {
-        const preflight = await preflightAdapterEvents(
-          eventSource, classifyUndeclaredFirstTool, { honorReady: false },
-        );
-        if (preflight.error || preflight.empty) {
-          runTurnAbort.abort();
-          queue.close();
-          const classified = adapterFailureFromEvent(preflight.error ?? {
-            type: "error", status: 502, message: "Adapter ended before producing a response",
-          });
-          const storageRefusal = preflight.error?.code === SPEND_LEDGER_STORAGE_UNAVAILABLE_CODE;
-          const failure = formatErrorResponse(storageRefusal ? 503 : classified.httpStatus,
-            storageRefusal ? SPEND_LEDGER_STORAGE_UNAVAILABLE_CODE : classified.error.type,
-            redactSecretString(classified.error.message), {
-              code: classified.error.code, classified: true, upstreamCode: preflight.error?.code ?? null,
-            });
-          // A replay-unsafe heartbeat means the adapter already ran a local side effect, so the
-          // combo must not send this turn to another target: the failure stays with this child.
-          if (preflight.replayUnsafe) markResponseNonReplayable(failure);
-          releaseSearchProbeLease();
-          return failure;
-        }
-        eventSource = preflight.stream;
       }
       // Preflight sees raw output before Messages delays text for the late signature.
       eventSource = orderMessagesOutput(eventSource);
@@ -1035,33 +1008,6 @@ export async function executeResponsesRunTurn(
         events = searched;
       }
       events = guardEmptyToolCatalogEvents(events, clientToolCatalog, translatorBudget);
-      if (options.comboAttempt) {
-        const firstMeaningfulIndex = events.findIndex(event => event.type !== "heartbeat");
-        const firstMeaningful = firstMeaningfulIndex === -1 ? undefined : events[firstMeaningfulIndex];
-        // Same boundary as the streaming preflight: a replay-unsafe heartbeat means the adapter
-        // already ran a local side effect, so an undeclared tool call after it keeps the bridge's
-        // fail-closed refusal instead of becoming a hop that sends the turn to another target.
-        const replayUnsafe = events
-          .slice(0, firstMeaningfulIndex === -1 ? events.length : firstMeaningfulIndex)
-          .some(event => event.type === "heartbeat" && event.replayUnsafe === true);
-        const classifiedError = firstMeaningful && !replayUnsafe
-          ? classifyUndeclaredFirstTool(firstMeaningful)
-          : undefined;
-        if (!firstMeaningful || firstMeaningful.type === "error" || classifiedError) {
-          const classified = adapterFailureFromEvent(classifiedError ?? (firstMeaningful?.type === "error"
-            ? firstMeaningful
-            : { type: "error", status: 502, message: "Adapter ended before producing a response" }));
-          const storageRefusal = firstMeaningful?.type === "error" && firstMeaningful.code === SPEND_LEDGER_STORAGE_UNAVAILABLE_CODE;
-          const failure = formatErrorResponse(storageRefusal ? 503 : classified.httpStatus,
-            storageRefusal ? SPEND_LEDGER_STORAGE_UNAVAILABLE_CODE : classified.error.type,
-            redactSecretString(classified.error.message), {
-              code: classified.error.code, classified: true,
-              upstreamCode: classifiedError?.code ?? (firstMeaningful?.type === "error" ? firstMeaningful.code : null) ?? null,
-            });
-          if (replayUnsafe) markResponseNonReplayable(failure);
-          return failure;
-        }
-      }
       let providerState: OcxProviderContinuationState | undefined;
       const json = buildResponseJSON(events, parsed._responseModelId ?? parsed.modelId, {
         translatorBudget,
@@ -1119,7 +1065,7 @@ export async function executeResponsesRunTurn(
     }
     } finally {
       // The buffered turn ends inside this function, so its every exit —
-      // JSON response, combo failure, or thrown error — hands the lease back.
+      // JSON response or thrown error — hands the lease back.
       releaseSearchProbeLease();
     }
 }

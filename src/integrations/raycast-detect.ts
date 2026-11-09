@@ -68,20 +68,7 @@ export function realRaycastDetectDeps(runtime: RealRaycastDetectRuntime = {}): R
     },
     readDefault: (domain, key) => {
       // `defaults` is macOS-only; elsewhere the plan is simply unknown.
-      if (platform !== "darwin") return null;
-      try {
-        const result = spawnSync([DEFAULTS_PATH, "read", domain, key], {
-          stdout: "pipe",
-          stderr: "pipe",
-          timeout: DEFAULTS_TIMEOUT_MS,
-        });
-        // A timed-out or signal-killed probe reports exitCode === null; that
-        // and any non-zero exit mean the preference was not read.
-        if (result.exitCode !== 0) return null;
-        return result.stdout.toString().trim();
-      } catch {
-        return null;
-      }
+      return null;
     },
   };
 }
@@ -90,12 +77,7 @@ function appPathFor(deps: RaycastDetectDeps): string | null {
   // Join with the target platform's separator so a test describing another OS
   // gets that OS's paths, not the host's.
   const { join } = deps.platform === "win32" ? win32 : posix;
-  if (deps.platform === "darwin") {
-    for (const candidate of ["/Applications/Raycast.app", join(deps.homedir, "Applications", "Raycast.app")]) {
-      if (deps.exists(candidate)) return candidate;
-    }
-    return null;
-  }
+
   if (deps.platform === "win32") {
     const local = deps.env.LOCALAPPDATA;
     if (!local) return null;
@@ -106,12 +88,6 @@ function appPathFor(deps: RaycastDetectDeps): string | null {
 }
 
 function planFor(deps: RaycastDetectDeps): RaycastPlan {
-  if (deps.platform !== "darwin") return "unknown";
-  // Read once: `defaults` spawns a process, and the answer cannot change
-  // between two reads inside one detection.
-  const value = deps.readDefault(RAYCAST_DEFAULTS_DOMAIN, RAYCAST_SUBSCRIPTION_KEY);
-  if (value === "1") return "pro";
-  if (value === "0") return "free";
   return "unknown";
 }
 

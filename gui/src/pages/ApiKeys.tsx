@@ -4,7 +4,6 @@ import { readUsageMetadata, type UsageReadMetadata } from "../usage-summary-reso
 import { useI18n, LOCALES } from "../i18n/shared";
 import { formatProviderDisplayName } from "../provider-icons";
 import { readJsonIfOk, readJsonOrThrow } from "../fetch-json";
-import { isConnectedRuntime } from "../api-targets";
 import {
   classifyExternalModel,
   externalModelId,
@@ -56,10 +55,6 @@ interface KeysResponse extends UsageReadMetadata {
 
 interface CreateKeyResponse {
   key?: unknown;
-}
-
-interface StartRotationResponse extends CreateKeyResponse {
-  rotationId?: unknown;
 }
 
 type CachedKeysShape = UsageReadMetadata & {
@@ -154,14 +149,10 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
   const [creating, setCreating] = useState(false);
   const [newKey, setNewKey] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [rotationSecret, setRotationSecret] = useState<{ id: string; key: string; rotationId: string } | null>(null);
-  const [rotationCopied, setRotationCopied] = useState(false);
   const creatingRef = useRef(false);
   const clearDisclosure = useCallback(() => {
     setNewKey(null);
     setCopied(false);
-    setRotationSecret(null);
-    setRotationCopied(false);
   }, []);
   const disclosure = useKeyDisclosure(apiBase, active, clearDisclosure);
 
@@ -395,71 +386,6 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
     }
   };
 
-  const handleRotationStart = async (id: string): Promise<boolean> => {
-    const generation = disclosure.generation.current;
-    setActionError(null);
-    setHiddenMutationBase(null);
-    const bounded = createBoundedFetch(MUTATION_TIMEOUT_MS);
-    try {
-      const res = await fetch(`${apiBase}/api/keys/rotate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-        signal: bounded.signal,
-      });
-      if (res.ok) {
-        if (currentApiBase.current === apiBase) refreshKeys();
-        else invalidateClientResource(keysResourceKey);
-      }
-      const data = await readJsonOrThrow<StartRotationResponse>(res, t("api.rotation.startFailed"));
-      if (!disclosure.current(generation)) {
-        setHiddenMutationBase(apiBase);
-        return true;
-      }
-      if (!data || typeof data.key !== "string" || !data.key || typeof data.rotationId !== "string" || !data.rotationId) return false;
-      setRotationSecret({ id, key: data.key, rotationId: data.rotationId });
-      return true;
-    } catch {
-      return false;
-    } finally {
-      bounded.clear();
-    }
-  };
-
-  const finishRotation = async (id: string, rotationId: string, operation: "commit" | "abort"): Promise<boolean> => {
-    setActionError(null);
-    const bounded = createBoundedFetch(MUTATION_TIMEOUT_MS);
-    try {
-      const res = await fetch(`${apiBase}${operation === "commit" ? "/api/keys/rotate/commit" : "/api/keys/rotate"}`, {
-        method: operation === "commit" ? "POST" : "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, rotationId }),
-        signal: bounded.signal,
-      });
-      if (!res.ok) return false;
-      setRotationSecret(current => current?.id === id ? null : current);
-      refreshKeys();
-      return true;
-    } catch {
-      return false;
-    } finally {
-      bounded.clear();
-    }
-  };
-
-  const copyRotationSecret = async () => {
-    if (!rotationSecret) return;
-    const generation = disclosure.generation.current;
-    try {
-      await navigator.clipboard.writeText(rotationSecret.key);
-      if (!disclosure.current(generation)) return;
-      setRotationCopied(true);
-      window.setTimeout(() => { if (disclosure.current(generation)) setRotationCopied(false); }, 2000);
-    } catch {
-      if (disclosure.current(generation)) setActionError(t("api.key.copyFailed"));
-    }
-  };
-
   const copyKey = async () => {
     if (!newKey) return;
     const generation = disclosure.generation.current;
@@ -490,7 +416,6 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
 
   const sourceLabel = (model: ExternalModelRow): string => {
     if (model.native) return t("api.sourceNative");
-    if (model.provider === "combo") return t("api.sourceCombo");
     if (model.custom) return t("api.sourceCustom");
     return formatProviderDisplayName(model.provider, t);
   };
@@ -604,8 +529,6 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
         creating={creating}
         newKey={newKey}
         copied={copied}
-        rotationSecret={rotationSecret}
-        rotationCopied={rotationCopied}
         filteredModels={filteredModels}
         planModels={models}
         modelsLoading={modelsState.showSkeleton && !modelsState.data && !cachedModels}
@@ -627,18 +550,6 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
         onDelete={handleDelete}
         onRevealKey={handleReveal}
         onRename={handleRename}
-        {...(isConnectedRuntime() ? {
-          // Key rotation is a connected-client operation: it swaps the data key this
-          // machine uses against its hub, with a commit/abort handshake the hub arbitrates.
-          // A standalone install has no hub to rotate against, so offering the control
-          // there advertises remote hub to someone who never enabled it — and the buttons
-          // would drive a handshake with nothing on the other end.
-          onRotationStart: handleRotationStart,
-          onRotationCommit: (id: string, rotationId: string) => finishRotation(id, rotationId, "commit"),
-          onRotationAbort: (id: string, rotationId: string) => finishRotation(id, rotationId, "abort"),
-          onCopyRotationSecret: () => { void copyRotationSecret(); },
-          onDismissRotationSecret: () => setRotationSecret(null),
-        } : {})}
         onModelQueryChange={setModelQuery}
         onCopyModelId={(modelId) => { void copyModelId(modelId); }}
         onTestModel={(model, protocol) => { void testModel(model, protocol); }}

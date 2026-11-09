@@ -414,67 +414,6 @@ describe("Grok 4.7 Fast serialized upstream model", () => {
     }
   });
 
-  test.each([
-    { label: "global fastMode", fastMode: true, tier: {} },
-    { label: "caller priority", fastMode: undefined, tier: { service_tier: "priority" } },
-  ])("combo OAuth child with $label sends build-fast without a tier", async ({ label, fastMode, tier }) => {
-    const comboId = label === "caller priority" ? "fast-child-caller" : "fast-child-global";
-    const config = xaiConfig("oauth", {
-      fastMode,
-      combos: { [comboId]: { strategy: "failover", targets: [{ provider: "xai", model: LOGICAL_MODEL }] } },
-    });
-    const fixture = await launch(config);
-    await post(fixture.server, responsesBody({ model: `combo/${comboId}`, ...tier }));
-    expect(fixture.sends).toHaveLength(1);
-    expect(fixture.sends[0]!.url).toBe(`${XAI_GROK_CLI_BASE_URL}/responses`);
-    assertFastSend(fixture.sends[0]!);
-    assertFastReceipts(`combo/${comboId}`);
-  });
-
-  test("combo OAuth 500 fallback keeps the backup model and its priority tier without a build-fast leak", async () => {
-    // Combo targets select provider entries, not auth modes; one xai entry cannot mix OAuth and key auth.
-    const backupModel = "backup-model";
-    const config = xaiConfig("oauth", {
-      combos: { "fast-failover": { strategy: "failover", targets: [
-        { provider: "xai", model: LOGICAL_MODEL }, { provider: "backup", model: backupModel },
-      ] } },
-    });
-    config.providers.backup = {
-      adapter: "openai-responses", baseUrl: BACKUP_BASE_URL, authMode: "key",
-      apiKey: "fake-backup-wire-key", models: [backupModel], supportsServiceTier: true,
-    };
-    const fixture = await launch(config, [], `${XAI_GROK_CLI_BASE_URL}/responses`);
-    const json = await post(fixture.server, responsesBody({
-      model: "combo/fast-failover", service_tier: "priority",
-    }));
-    const xaiSends = fixture.sends.slice(0, -1);
-    expect(xaiSends.length).toBeGreaterThan(0);
-    for (const send of xaiSends) {
-      expect(send.url).toBe(`${XAI_GROK_CLI_BASE_URL}/responses`);
-      assertFastSend(send);
-    }
-    expect(fixture.sends.at(-1)).toMatchObject({
-      url: `${BACKUP_BASE_URL}/responses`, authorization: "Bearer fake-backup-wire-key",
-      body: { model: backupModel, service_tier: "priority" },
-    });
-    expect(JSON.stringify(fixture.sends.at(-1)!.body)).not.toContain(FAST_MODEL);
-    expect(json.model).toBe(backupModel);
-    for (const receipt of [getRequestLogEntries().at(-1), readUsageEntries().at(-1)]) {
-      expect(receipt).toMatchObject({
-        model: "combo/fast-failover", resolvedModel: backupModel,
-        attempts: [
-          { provider: "xai", model: LOGICAL_MODEL, status: 500 },
-          { provider: "backup", model: backupModel, status: 200 },
-        ],
-      });
-      expect(receipt?.wireModel).not.toBe(FAST_MODEL);
-      expect(receipt?.attempts?.[0]?.sendCount).toBe(xaiSends.length);
-      expect(receipt?.attempts?.[1]?.sendCount).toBe(1);
-      expect(receipt?.attempts?.[0]?.tierOutcome).toMatchObject({ wireKind: "model-variant", wireValue: FAST_MODEL });
-      expect(receipt?.attempts?.[1]?.tierOutcome).toMatchObject({ wireKind: "service-tier", wireValue: "priority" });
-    }
-  });
-
   test.each(["low", "high", "xhigh"])("Fast sends the same reasoning as the plain request (%s)", async effort => {
     const fixture = await launch();
     await post(fixture.server, responsesBody({ model: "xai/grok-4.7", reasoning: { effort } }));

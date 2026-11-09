@@ -159,19 +159,6 @@ describe("vendor context fallback", () => {
       expect(model.contextWindowInference).toBeUndefined();
     } finally { rmSync(root, { recursive: true, force: true }); }
   });
-  test("a custom explicit window replaces inference before combo derivation", async () => {
-    const config = { providers: { "custom-relay": { ...provider, liveModels: false, models: [id] } },
-      customModels: [{ provider: "custom-relay", modelId: id, contextWindow: 200_000 }],
-      combos: { selected: { targets: [{ provider: "custom-relay", model: id }] } },
-    } as OcxConfig;
-    const models = await gatherRoutedModels(config);
-    const custom = models.find(m => m.provider === "custom-relay" && m.id === id)!;
-    const combo = models.find(m => m.provider === "combo" && m.id === "selected")!;
-    expect(custom.contextWindow).toBe(200_000);
-    expect(custom.contextWindowInference).toBeUndefined();
-    expect(combo.contextWindow).toBe(200_000);
-    expect(catalog(combo).auto_compact_token_limit).toBeLessThanOrEqual(180_000);
-  });
   test("custom-only models inherit only missing context, with caps and explicit overrides intact", async () => {
     for (const listed of [false, true]) {
       const config = { providers: { "custom-relay": { ...provider, liveModels: false, models: listed ? [id] : [] } },

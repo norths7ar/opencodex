@@ -20,23 +20,11 @@ const MIME_TYPES: Record<string, string> = {
  */
 const HASHED_ASSET_PATTERN = /-[a-zA-Z0-9_-]{8,}\.[a-zA-Z0-9]+$/;
 
-/** `productName` in desktop/src-tauri/tauri.conf.json; Linux packages install resources under `lib/<productName>`. */
-export const DESKTOP_PRODUCT_NAME = "OpenCodex";
-
-/**
- * Where a compiled `ocx` looks for `gui/dist`, given the directory holding the executable.
- *
- * Beside the binary covers a release archive and the Windows desktop install. The desktop shell
- * ships `ocx` as a sidecar and its resources where Tauri's `resource_dir` puts them: `../Resources`
- * inside a macOS app bundle, `../lib/<productName>` for a Linux package (`/usr/bin`, `/usr/local/bin`,
- * an AppImage's `usr/bin`). The shell passes that directory as OPENCODEX_GUI_DIST only to the sidecar
- * it starts itself; `ocx ensure` from the Codex shim and the login service start the same binary
- * without the variable, so they find the dashboard here.
- */
+/** The Windows desktop and standalone archive keep gui/dist beside the executable. */
 export function standaloneGuiDistCandidates(executableDir: string, platform: NodeJS.Platform = process.platform): string[] {
   const candidates = [join(executableDir, "gui", "dist")];
-  if (platform === "darwin") candidates.push(join(executableDir, "..", "Resources", "gui", "dist"));
-  if (platform === "linux") candidates.push(join(executableDir, "..", "lib", DESKTOP_PRODUCT_NAME, "gui", "dist"));
+
+
   return candidates;
 }
 
@@ -114,21 +102,6 @@ function sessionBootstrapMeta(session: GuiSessionBootstrap): string {
 }
 
 /**
- * Runtime role, emitted on every served document.
- *
- * Separate from the session block on purpose: the session exists only once a GUI session
- * has been issued, but the role has to be known on the very first paint of a plain
- * standalone install — which never issues one. Without it the GUI has to ASK, and asking
- * means a request to a remote-hub endpoint from a user who never enabled remote hub.
- *
- * Non-secret: it names which topology this proxy is running, which the operator configured
- * and which the dashboard already reflects everywhere else.
- */
-function runtimeRoleMeta(runtimeRole: string): string {
-  return `<meta name="opencodex-runtime-role" content="${escapeHtmlAttribute(runtimeRole)}">`;
-}
-
-/**
  * Does this bind require a typed management credential?
  *
  * Emitted for the same reason as the role: so the dashboard can answer a question on first
@@ -158,12 +131,10 @@ function htmlDocumentResponse(html: string): Response {
 function htmlResponse(
   path: string,
   session?: GuiSessionBootstrap,
-  runtimeRole?: string,
   managementAuthRequired?: boolean,
 ): Response {
   let html = readFileSync(path, "utf8");
   const bootstrap = [
-    runtimeRole ? runtimeRoleMeta(runtimeRole) : "",
     managementAuthRequired === undefined ? "" : managementAuthRequiredMeta(managementAuthRequired),
     session ? sessionBootstrapMeta(session) : "",
   ].join("");
@@ -196,7 +167,6 @@ export function serveGuiFile(
   pathname: string,
   guiDist = findGuiDist(),
   session?: GuiSessionBootstrap,
-  runtimeRole?: string,
   managementAuthRequired?: boolean,
 ): Response | null {
   if (!guiDist) return null;
@@ -210,7 +180,7 @@ export function serveGuiFile(
       const nestedIndex = join(filePath, "index.html");
       const indexPath = isFile(nestedIndex) ? nestedIndex : join(guiDist, "index.html");
       if (isFile(indexPath)) {
-        return htmlResponse(indexPath, session, runtimeRole, managementAuthRequired);
+        return htmlResponse(indexPath, session, managementAuthRequired);
       }
     }
     return null;
@@ -218,7 +188,7 @@ export function serveGuiFile(
 
   const ext = extname(filePath);
   const contentType = MIME_TYPES[ext] || "application/octet-stream";
-  if (ext === ".html") return htmlResponse(filePath, session, runtimeRole, managementAuthRequired);
+  if (ext === ".html") return htmlResponse(filePath, session, managementAuthRequired);
 
   const root = resolve(guiDist);
   // "assets/" matches Vite's default assetsDir (gui/vite.config.ts). If that value is

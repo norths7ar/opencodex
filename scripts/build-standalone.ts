@@ -5,7 +5,7 @@ import { isStandaloneTarget, standaloneExecutableName } from "./standalone-targe
 import { stageStandaloneKeyringAddon } from "./standalone-keyring";
 
 function hostTarget(): string {
-  const platform = process.platform === "darwin" ? "darwin" : process.platform === "win32" ? "windows" : "linux";
+  const platform = process.platform === "win32" ? "windows" : process.platform;
   const arch = process.arch === "arm64" ? "arm64" : "x64";
   return `bun-${platform}-${arch}`;
 }
@@ -84,13 +84,6 @@ if (compileExitCode !== 0) process.exit(compileExitCode);
 // N-API binaries cannot execute from Bun's virtual `$bunfs`. Keep the exact target addon outside
 // the compiled executable so source/npm resolution and packaged resolution share one binding API.
 stageStandaloneKeyringAddon(repoRoot, output, target);
-
-// bun's ad-hoc linker signature does not always cover the embedded payload;
-// macOS kills the executable on launch (SIGKILL) unless it is re-signed.
-if (process.platform === "darwin") {
-  const sign = Bun.spawnSync(["codesign", "--force", "--sign", "-", executable], { stdout: "inherit", stderr: "inherit" });
-  if (sign.exitCode !== 0) process.exit(sign.exitCode ?? 1);
-}
 
 cpSync(guiDist, join(output, "gui", "dist"), { recursive: true });
 const digest = createHash("sha256").update(readFileSync(executable)).digest("hex");

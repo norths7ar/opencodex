@@ -1,8 +1,8 @@
 /**
  * Process-local internal-call capability.
  *
- * Some requests ARE the proxy itself talking to its own data plane: the advisor sidecar's
- * loopback consultation is the first user. Such a request must be recognized as INTERNAL without
+ * Some requests ARE the proxy itself talking to its own data plane: routed helpers make
+ * authenticated loopback calls. Such a request must be recognized as INTERNAL without
  * trusting anything the client controls. A client-supplied header value is not evidence — any
  * external caller can send it — and neither is the peer address: a public listener reached
  * through Docker, WSL, a tunnel, or port forwarding can present as loopback on the last hop, as
@@ -14,22 +14,15 @@
  * process mints a new value, so a token captured from an older process is worthless. Comparison
  * is timing-safe and shape-checked, reusing the same secret shape as the local attestation
  * module.
- *
- * The same primitive is what the vision-describe fence would need for the same reason; wiring
- * that surface is deliberately left out of this change (recorded as a pre-existing analogous
- * issue) so the change stays scoped.
  */
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { isLocalAttestationSecret } from "./local-management-attestation";
-
-/** Header an internal sidecar presents on its own loopback request. */
-export const ADVISOR_INTERNAL_CAPABILITY_HEADER = "x-opencodex-advisor-internal";
 
 let processCapability: string | null = null;
 
 /**
  * The current process's internal-call capability. Minted lazily on first use (one random draw,
- * no I/O), so an install that never enables the advisor never generates one.
+ * no I/O), and only when a routed helper needs one.
  */
 export function internalCallCapability(): string {
   if (processCapability === null) processCapability = randomBytes(32).toString("base64url");

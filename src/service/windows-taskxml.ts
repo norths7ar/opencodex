@@ -97,10 +97,6 @@ export function buildWindowsServiceScript(
     windowsBatchSet("OCX_SERVICE_LOG", serviceLogPath()),
     windowsBatchSet("OCX_BUN", bun, "path"),
     windowsBatchSet("OCX_CLI", cli ?? undefined, "path"),
-    // Standalone executables have no npm package tree; recovery is "replace the executable", so no OCX_PKG_DIR/restore_backup wiring.
-    // Package root for the transactional-update restore path (#1942): cli is
-    // <pkg>\src\cli\index.ts, so the package dir is three levels up.
-    cli ? 'for %%I in ("%OCX_CLI%\\..\\..\\..") do set "OCX_PKG_DIR=%%~fI"' : null,
     'if exist "%OCX_API_TOKEN_FILE%" (',
     '  set /p OPENCODEX_API_AUTH_TOKEN=<"%OCX_API_TOKEN_FILE%"',
     ")",
@@ -112,23 +108,13 @@ export function buildWindowsServiceScript(
     '>>"%OCX_SERVICE_LOG%" echo opencodex_home="%OPENCODEX_HOME%"',
     '>>"%OCX_SERVICE_LOG%" echo codex_home="%CODEX_HOME%"',
     '>>"%OCX_SERVICE_LOG%" echo token_file="%OCX_API_TOKEN_FILE%"',
-    'if not exist "%OCX_BUN%" (',
-    "  call :restore_backup",
-    ")",
     // Locale dates can contain parentheses. Keep timestamp expansion outside blocks.
     'if not exist "%OCX_BUN%" goto bun_missing',
-    // An in-place npm install extracts the bun package's tiny placeholder before its postinstall
-    // swaps in the real binary. Executing it fails with exit 216 and, in an interactive session,
-    // a modal "Unsupported 16-Bit Application" dialog that blocks this loop until dismissed.
-    // The install can also remove the file between the exist check and this read; an empty size
-    // would turn the comparison into a syntax error that ends the wrapper.
+    // Never execute a placeholder or a file that disappeared during the size probe.
     'set "OCX_BUN_BYTES="',
     'for %%F in ("%OCX_BUN%") do set "OCX_BUN_BYTES=%%~zF"',
     'if not defined OCX_BUN_BYTES goto bun_not_ready',
     `if %OCX_BUN_BYTES% LSS ${REAL_BUN_MIN_BYTES} goto bun_not_ready`,
-    cli ? 'if not exist "%OCX_CLI%" (' : null,
-    cli ? "  call :restore_backup" : null,
-    cli ? ")" : null,
     cli ? 'if not exist "%OCX_CLI%" goto cli_missing' : null,
     cli ? `"%OCX_BUN%" "%OCX_CLI%" start --port ${port} >>"%OCX_SERVICE_LOG%" 2>&1` : `"%OCX_BUN%" start --port ${port} >>"%OCX_SERVICE_LOG%" 2>&1`,
     // Stop commands kill the wrapper; a zero child exit alone is not a stop request.
@@ -142,36 +128,15 @@ export function buildWindowsServiceScript(
     "endlocal",
     "exit /b 0",
     ":bun_not_ready",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] bundled Bun is not ready (%OCX_BUN_BYTES% bytes, npm placeholder or mid-install); waiting for its postinstall, retrying in 5s - if this persists, reinstall opencodex with bun scripts allowed',
+    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] bundled Bun is not ready (%OCX_BUN_BYTES% bytes); retrying in 5s - if this persists, repair the local Bun runtime',
     "ping -n 6 127.0.0.1 >nul",
     "goto loop",
     ":bun_missing",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] installation is incomplete: bundled Bun is missing; reinstall opencodex, then run ocx service repair',
+    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] local Bun runtime is missing; restore it, then run ocx service repair',
     "exit /b 3",
     cli ? ":cli_missing" : null,
-    cli ? '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] installation is incomplete: CLI entry is missing; reinstall opencodex, then run ocx service repair' : null,
+    cli ? '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] local CLI entry is missing; restore the checkout, then run ocx service repair' : null,
     cli ? "exit /b 3" : null,
-    "",
-    // #1942/#1849: a power loss mid-swap leaves the live package dir missing/broken and
-    // a sibling .ocx-backup-* holding the previous version. This wrapper lives OUTSIDE
-    // the package tree, so it can restore when the launcher itself is gone — the exact
-    // window the in-launcher boot probe cannot reach.
-    ":restore_backup",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] install incomplete - looking for a transactional-update backup to restore',
-    'for /f "delims=" %%B in (\'dir /b /ad /o-n "%OCX_PKG_DIR%\\..\\.ocx-backup-*" 2^>nul\') do (',
-    '  if exist "%OCX_PKG_DIR%\\..\\%%B\\opencodex\\package.json" (',
-    '    if exist "%OCX_PKG_DIR%" rmdir /s /q "%OCX_PKG_DIR%" 2>nul',
-    '    move "%OCX_PKG_DIR%\\..\\%%B\\opencodex" "%OCX_PKG_DIR%" >nul 2>&1',
-    '    if exist "%OCX_PKG_DIR%\\package.json" (',
-    "      goto backup_restored",
-    "    )",
-    "  )",
-    ")",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] no restorable backup found',
-    "goto :eof",
-    ":backup_restored",
-    '>>"%OCX_SERVICE_LOG%" echo [%DATE% %TIME%] restored previous install from transactional-update backup',
-    "goto :eof",
   ].filter((line): line is string => Boolean(line));
   return `${lines.join("\r\n")}\r\n`;
 }

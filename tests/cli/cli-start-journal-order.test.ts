@@ -63,7 +63,7 @@ function fixture(): Fixture {
     codexAutoStart: false,
     syncResumeHistory: false,
     clientIntegrations: { codex: false, grok: false, "claude-desktop": false },
-    claudeCode: { systemEnv: false },
+    claudeCode: {  },
     providers: {},
     defaultProvider: "openai",
   }));
@@ -488,7 +488,7 @@ describe("a sibling instance leaves the live owner's client routing alone", () =
       codexAutoStart: false,
       syncResumeHistory: false,
       clientIntegrations: { grok: false, "claude-desktop": false },
-      claudeCode: { systemEnv: false },
+      claudeCode: {  },
       providers: {},
       defaultProvider: "openai",
     }));
@@ -614,7 +614,7 @@ describe("a sibling instance leaves the live owner's client routing alone", () =
       codexAutoStart: false,
       syncResumeHistory: false,
       clientIntegrations: { grok: false, "claude-desktop": false },
-      claudeCode: { systemEnv: false },
+      claudeCode: {  },
       providers: {},
       defaultProvider: "openai",
     }));

@@ -2,20 +2,14 @@ import type { OcxConfig } from "../../types";
 import { isDeclaredReasoningEffort } from "../../reasoning-effort";
 import { COMPACTION_TRIGGERS, validCompactionSourceModels } from "../../config/schema/compaction-triggers";
 import { routeConcreteModel, type RouteResult } from "../../router";
-import { resolveComboId } from "../../combos/identifiers";
 import { resolvePolicyProfileId } from "../../routing/profile";
 import { parseSyntheticRowId } from "../fast-row";
-import { recallComboForLane } from "./combo-session-recall";
 import { sessionLaneIdFromRequest } from "../request-log-conversation";
 import { isLocalCompactionCheckpoint } from "../../responses/compaction-history-framing";
 
 /** `sourceModel` is the conversation's own selector before the rewrite. */
 export interface CompactionRoutingOverride {
   sourceModel: string;
-  /** Combo the lane remembers for a bare `sourceModel` (#3891); the conversation resumes there, not on the bare route. */
-  sourceCombo?: string;
-  /** Combo the configured override resolves to; its children route concretely but stay portable. */
-  targetCombo?: string;
 }
 
 function record(value: unknown): Record<string, unknown> | undefined {
@@ -99,13 +93,11 @@ export function applyCompactionRoutingOverride(
   if (trigger === undefined) return null;
 
   const sourceModel = raw.model;
-  const sourceCombo = recallComboForLane(config, sessionLaneIdFromRequest(headers), sourceSelectorOf(config, sourceModel));
-  const targetCombo = resolveComboId(config, override.model.trim()) ?? undefined;
   raw.model = override.model.trim();
   if (override.reasoningEffort !== undefined) {
     raw.reasoning = { ...record(raw.reasoning), effort: override.reasoningEffort };
   }
-  return { sourceModel, ...(sourceCombo ? { sourceCombo } : {}), ...(targetCombo ? { targetCombo } : {}) };
+  return { sourceModel };
 }
 
 /**
@@ -126,9 +118,8 @@ export function compactionRoutingKeepsProviderIdentity(
 ): boolean {
   // `sourceModel` is the selector as the client sent it, so a synthetic `--fast` or
   // effort suffix can still be attached. The base id is what the conversation routed on,
-  // and only the base can match the combo/policy guards below.
+  // and only the base can match the policy guards below.
   const sourceSelector = sourceSelectorOf(config, override.sourceModel);
-  if (route.combo || override.sourceCombo || override.targetCombo || resolveComboId(config, sourceSelector)) return false;
   // A policy selector does not identify one stable serving backend: its route depends on
   // request evidence and live candidate state that this post-rewrite check no longer has.
   // Treat it as crossing identity rather than reconstructing it through concrete routing,
@@ -141,7 +132,7 @@ export function compactionRoutingKeepsProviderIdentity(
     return false;
   }
   // The default-provider branch is where every unrecognized selector lands — including a
-  // policy/combo alias that was renamed or deleted since the conversation began. Such a
+  // policy alias that was renamed or deleted since the conversation began. Such a
   // selector cannot prove which backend served it, so it can never match an identity.
   if (source.routeReason === "default-provider") return false;
   return source.providerName === route.providerName

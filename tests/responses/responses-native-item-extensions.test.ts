@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses/passthrough";
 import { createGoogleAdapter } from "../../src/adapters/google";
 import { stripProviderInputItemMetadata } from "../../src/adapters/openai-responses/request-strips";
-import { concreteComboRequestBody } from "../../src/combos/request";
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
 import { parseRequest } from "../../src/responses/parser";
 import { prepareCodexWsRequest } from "../../src/server/responses/codex-ws-request";
@@ -80,22 +79,6 @@ describe("native Responses item extensions (#7111)", () => {
       expect(body).toEqual(before);
     });
   }
-
-  test("projects a concrete native combo child without sanitizing the parent or next gateway child", () => {
-    const parent = history();
-    const before = structuredClone(parent);
-    const child = concreteComboRequestBody(parent, { provider: "openai", model: "gpt-6-sol" }, null, undefined);
-    const nativeWire = build(native[0]!, child as ReturnType<typeof history>);
-    for (const payload of Object.values(nativeWire)) {
-      expect(payload.input.find((item: { type?: string }) => item.type === "function_call")).toEqual(call);
-    }
-    expect(child.input).toEqual(before.input);
-    const nextChild = concreteComboRequestBody(parent, { provider: "gateway", model: "custom" }, null, undefined);
-    const nextWire = build({ adapter: "openai-responses", baseUrl: "https://gateway.example/v1" }, nextChild as ReturnType<typeof history>);
-    expect(nextWire.http.input.find((item: { type?: string }) => item.type === "function_call"))
-      .toEqual({ ...call, extra_content: extra });
-    expect(parent).toEqual(before);
-  });
 
   test("native projection leaves the same history signed for a subsequent Google destination", async () => {
     const body = history();

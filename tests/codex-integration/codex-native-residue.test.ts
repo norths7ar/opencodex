@@ -609,58 +609,6 @@ test("an invalid sqlite_home is indeterminate instead of selecting a fallback da
 
 const arbitraryComboAlias = randomUUID();
 
-test(`production-generated arbitrary bare combo alias ${arbitraryComboAlias} is routed residue`, async () => {
-  const catalogPath = canonicalPathInCodexHome("opencodex-catalog.json");
-  writeFileSync(catalogPath, JSON.stringify({ models: [] }));
-  const config: OcxConfig = {
-    port: 10100,
-    defaultProvider: "fixture",
-    providers: {
-      fixture: {
-        adapter: "openai-chat",
-        baseUrl: "https://fixture.invalid/v1",
-        liveModels: false,
-        models: ["combo-member"],
-        modelContextWindows: { "combo-member": 128_000 },
-      },
-    },
-    disabledModels: ["fixture/combo-member"],
-    combos: {
-      edge: {
-        alias: arbitraryComboAlias,
-        targets: [{ provider: "fixture", model: "combo-member" }],
-      },
-    },
-  };
-
-  const sync = await syncCatalogModels(config);
-  const catalog = JSON.parse(readFileSync(catalogPath, "utf8")) as {
-    models: Array<Record<string, unknown>>;
-  };
-  const routedRows = catalog.models.filter(model =>
-    typeof model.description === "string"
-      && model.description.startsWith("Routed via opencodex → ")
-  );
-
-  expect(sync).toMatchObject({ path: catalogPath, catalogWritten: true });
-  expect(arbitraryComboAlias).not.toContain("/");
-  expect(routedRows).toEqual([
-    expect.objectContaining({
-      slug: arbitraryComboAlias,
-      description: "Routed via opencodex → combo (combo).",
-      owned_by: "combo",
-    }),
-  ]);
-  expect(classifyNativeRoutedResidue()).toMatchObject({
-    kind: "residue",
-    surface: "catalog",
-  });
-  expect(readCodexTransitionState()).toEqual({
-    kind: "legacy-ambiguous",
-    message: "A missing coordinator row cannot be initialized while native Codex routing residue exists.",
-  });
-});
-
 const arbitraryForeignSlug = `${randomUUID()}/${randomUUID()}`;
 const arbitraryForeignDescription = randomUUID();
 

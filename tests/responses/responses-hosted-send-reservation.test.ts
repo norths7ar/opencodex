@@ -21,7 +21,7 @@ for (const kind of ["search", "image", "video"] as const) {
       if (strategy === "jev") expect(f.bodies[0]?.reasoning_effort).toBe("low");
     }));
   }
-  test(`${kind} adapter-owned fetchResponse consumes once, without a duplicate receipt`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} adapter-owned fetchResponse consumes once, without a duplicate receipt`, async () => hostedSendFixture(kind, async f => {
     const create = ADAPTER_REGISTRY["openai-chat"].create;
     const override = spyOn(ADAPTER_REGISTRY["openai-chat"], "create").mockImplementation((...args) => {
       const adapter = create(...args);
@@ -40,14 +40,14 @@ for (const kind of ["search", "image", "video"] as const) {
       expect(getActiveTurnCount()).toBe(0);
     } finally { override.mockRestore(); }
   }));
-  test(`${kind} direct hosted inference preserves its existing non-Combo accounting contract`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} direct hosted inference preserves its existing non-Combo accounting contract`, async () => hostedSendFixture(kind, async f => {
     const req = f.request(); const body = await req.json() as Record<string, unknown>; body.model = "a/m";
     const { handleResponses } = await import("../../src/server/responses/core");
     const response = await handleResponses(new Request(req.url, { method: "POST", headers: req.headers, body: JSON.stringify(body) }), f.config, f.log, { sendBudget: f.budget });
     expect(await response.text()).toContain("hosted route final answer"); expect(f.inference).toBe(1);
     expect(f.budget.used).toBe(0); expect(f.charges).toBe(0); expect(f.refunds).toBe(0); expect(getActiveTurnCount()).toBe(0);
   }));
-  for (const firstOwned of [false, true]) test(`${kind} rotated ${firstOwned ? "adapter-to-generic" : "generic-to-adapter"} dispatch uses its actual accounting owner`, async () => hostedSendFixture(kind, "failover", async f => {
+  for (const firstOwned of [false, true]) test(`${kind} rotated ${firstOwned ? "adapter-to-generic" : "generic-to-adapter"} dispatch uses its actual accounting owner`, async () => hostedSendFixture(kind, async f => {
     delete f.config.providers.a!.transientRetryOn5xx;
     // Mock credential selection only; both inference dispatches use the real core/loop/executor.
     const rotate = spyOn(keyFailover, "rotateProviderTransportOn429").mockImplementation(() => {
@@ -74,7 +74,7 @@ for (const kind of ["search", "image", "video"] as const) {
       expect(f.settle()).toMatchObject({ settled: 3, reserved: 0, unresolved: 3 }); expect(getActiveTurnCount()).toBe(0);
     } finally { override.mockRestore(); rotate.mockRestore(); }
   }));
-  test(`${kind} local build rejection is unsent and refunded once`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} local build rejection is unsent and refunded once`, async () => hostedSendFixture(kind, async f => {
     const create = ADAPTER_REGISTRY["openai-chat"].create;
     const override = spyOn(ADAPTER_REGISTRY["openai-chat"], "create").mockImplementation((...args) => ({ ...create(...args),
       buildRequest() { throw new Error("synthetic local build refusal"); },
@@ -87,7 +87,7 @@ for (const kind of ["search", "image", "video"] as const) {
       expect(getActiveTurnCount()).toBe(0);
     } finally { override.mockRestore(); }
   }));
-  test(`${kind} sent failure cannot restore capacity for a next target`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} sent failure cannot restore capacity for a next target`, async () => hostedSendFixture(kind, async f => {
     // A three-target Combo has a six-send shared ceiling; prior work already occupies four.
     f.budget.used = 4;
     let first = 0, second = 0, third = 0;

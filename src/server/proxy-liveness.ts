@@ -39,8 +39,6 @@ export interface HealthzIdentity {
   providerReloadCapability?: unknown;
   asideSyncCapability?: unknown;
   guiPairCapability?: unknown;
-  /** Present on a package-tree-fenced 503: the version on disk an in-place respawn will run. */
-  installedVersion?: unknown;
   error?: unknown;
 }
 
@@ -75,17 +73,7 @@ export interface LivenessIo {
    */
   deadlineAt?: number;
   nowFn?: () => number;
-  /**
-   * Also accept a proxy whose `/healthz` is fenced by the package-tree guard (#5496).
-   *
-   * Opt-in, because such a proxy is ours but not healthy: `ocx restart` and the stop paths
-   * must find it, while ensure, update health waits and replacement waits must not count it.
-   * A fenced body is never trusted by itself. It is accepted only when this home's runtime
-   * record names the same pid and port and the listener proves possession of that record's
-   * attestation secret for a fresh challenge.
-   */
-  acceptPackageTreeFenced?: boolean;
-  /** Test seam for the fenced-identity challenge. */
+  /** Test seam for the local identity challenge. */
   createChallengeFn?: () => string;
 }
 
@@ -181,12 +169,6 @@ export interface LiveProxy {
    * on. Absent for a proxy whose healthz body predates the field.
    */
   role?: string;
-  /**
-   * The proxy answered with an attested package-tree fence (#5496): it is this home's process,
-   * but it is refusing traffic until it restarts. Only set for callers that opted in through
-   * `LivenessIo.acceptPackageTreeFenced`.
-   */
-  packageTreeFenced?: true;
 }
 
 /**
@@ -203,7 +185,7 @@ export type HomeOwnershipProof = "proven" | "refuted" | "indeterminate";
 
 export async function proveLiveProxyOwnedByHome(live: LiveProxy, io: LivenessIo = {}): Promise<HomeOwnershipProof> {
   if (live.pid === null) return "indeterminate";
-  return attestFencedIdentity(
+  return attestRuntimeIdentity(
     `http://${probeHostname(live.probeHostname ?? live.hostname)}:${live.port}/healthz`,
     live.port,
     live.pid,
@@ -249,24 +231,8 @@ export function isOpencodexHealthz(body: HealthzIdentity | null): boolean {
   return body.status === "ok" && typeof body.version === "string" && typeof body.uptime === "number";
 }
 
-/**
- * True for the exact 503 body the package-tree guard serves on `/healthz`. Shape only: this is
- * what the listener CLAIMS, and whoever holds the port can claim it. Callers must attest it.
- */
-export function isPackageTreeFencedHealthz(body: HealthzIdentity | null | undefined): boolean {
-  if (!body || body.service !== "opencodex" || body.status !== "restart_required") return false;
-  const error = body.error as { code?: unknown } | null | undefined;
-  return typeof error === "object" && error !== null && error.code === "package_tree_changed"
-    && typeof body.pid === "number" && Number.isSafeInteger(body.pid) && body.pid > 0;
-}
-
-/**
- * Prove that a fenced listener is the process this home's runtime record describes: the record
- * must name the same pid and port and carry an attestation secret, and the listener must answer a
- * fresh challenge with a proof bound to that secret, pid and port. The pid in the 503 body only
- * selects which record to check; it is never accepted on its own.
- */
-async function attestFencedIdentity(
+/** Verify the listener against this home’s per-process runtime secret. */
+async function attestRuntimeIdentity(
   url: string,
   port: number,
   pid: number,
@@ -305,8 +271,7 @@ async function attestFencedIdentity(
         signal: AbortSignal.timeout(remainingMs),
       });
       const body = (await res.json().catch(() => null)) as HealthzIdentity | null;
-      // The second answer must still be the same fenced (or by now healthy) process.
-      if (!isOpencodexHealthz(body) && !isPackageTreeFencedHealthz(body)) return "refuted";
+      if (!isOpencodexHealthz(body)) return "refuted";
       if (body?.pid !== pid) return "refuted";
       return verifyLocalAttestationProof(secret, challenge, pid, port, res.headers.get(LOCAL_ATTESTATION_PROOF_HEADER))
         ? "proven"
@@ -399,7 +364,7 @@ export async function proxyIdentityAt(
   port: number,
   opts: { hostname?: string; expectedPid?: number } = {},
   io: LivenessIo = {},
-): Promise<{ pid: number | null; version?: string; role?: string; packageTreeFenced?: true } | null> {
+): Promise<{ pid: number | null; version?: string; role?: string } | null> {
   return proxyIdentityAtObserved(port, opts, io);
 }
 
@@ -430,21 +395,6 @@ async function proxyIdentityAtObserved(
       const res = await fetchFn(url, {
         signal: AbortSignal.timeout(timeoutMs),
       });
-      if (!res.ok && io.acceptPackageTreeFenced && res.status === 503) {
-        const fenced = (await res.json().catch(() => null)) as HealthzIdentity | null;
-        if (!isPackageTreeFencedHealthz(fenced)) return negative("unknown");
-        const fencedPid = fenced!.pid as number;
-        if (opts.expectedPid !== undefined && fencedPid !== opts.expectedPid) return negative("unknown");
-        const attestMs = io.deadlineAt === undefined ? baseTimeoutMs : Math.min(baseTimeoutMs, io.deadlineAt - nowFn());
-        if (attestMs <= 0) return negative("unknown");
-        if ((await attestFencedIdentity(url, port, fencedPid, io, fetchFn, attestMs)) !== "proven") return negative("unknown");
-        const fencedVersion = isHealthzVersion(fenced?.version) ? fenced!.version as string : undefined;
-        return {
-          pid: fencedPid,
-          ...(fencedVersion === undefined ? {} : { version: fencedVersion }),
-          packageTreeFenced: true,
-        };
-      }
       if (!res.ok) return negative("unknown");
       const body = (await res.json().catch(() => undefined)) as HealthzIdentity | null | undefined;
       if (!isOpencodexHealthz(body ?? null)) return negative(res.status === 200 && body !== undefined ? "dead" : "unknown");
@@ -577,7 +527,6 @@ async function discoverLiveProxy(io: LivenessIo, observer?: {
           source: "runtime",
           ...(identity.version === undefined ? {} : { version: identity.version }),
           ...(identity.role === undefined ? {} : { role: identity.role }),
-          ...(identity.packageTreeFenced ? { packageTreeFenced: true as const } : {}),
         };
       }
     }
@@ -603,7 +552,6 @@ async function discoverLiveProxy(io: LivenessIo, observer?: {
         source: "runtime",
         ...(identity.version === undefined ? {} : { version: identity.version }),
         ...(identity.role === undefined ? {} : { role: identity.role }),
-        ...(identity.packageTreeFenced ? { packageTreeFenced: true as const } : {}),
       };
     }
   }
@@ -623,7 +571,6 @@ async function discoverLiveProxy(io: LivenessIo, observer?: {
       source: "config",
       ...(identity.version === undefined ? {} : { version: identity.version }),
       ...(identity.role === undefined ? {} : { role: identity.role }),
-      ...(identity.packageTreeFenced ? { packageTreeFenced: true as const } : {}),
     };
   }
   return null;

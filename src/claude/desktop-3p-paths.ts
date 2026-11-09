@@ -44,7 +44,7 @@ export function resolveElectronUserData(inputs: DesktopPathInputs): string {
     const appData = env.APPDATA?.trim();
     return appData ? win32.join(appData, "Claude") : win32.join(home, "AppData", "Roaming", "Claude");
   }
-  if (platform === "darwin") return posix.join(home, "Library", "Application Support", "Claude");
+
   const xdg = env.XDG_CONFIG_HOME?.trim();
   return xdg ? posix.join(xdg, "Claude") : posix.join(home, ".config", "Claude");
 }

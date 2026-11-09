@@ -1,9 +1,7 @@
 import { loadConfig } from "../config";
 import { resolveServiceListenPort } from "./definition";
 import { proxyIdentityAt } from "../server/proxy-liveness";
-import { launchdListenPort } from "./launchd";
 import { serviceLogPath } from "./state";
-import { systemdListenPort } from "./systemd";
 import { windowsListenPort, winswListenPort } from "./windows-ops";
 
 export { resolveServiceListenPort };
@@ -15,9 +13,7 @@ export { shellQuote, buildServiceShellCommand, buildServiceLauncherShellCommand,
  * platform-specific launchd command checks instead use only the plist and configured port.
  */
 export function installedServiceListenPort(): number {
-  return launchdListenPort()
-    ?? systemdListenPort()
-    ?? windowsListenPort()
+  return windowsListenPort()
     ?? winswListenPort()
     ?? resolveServiceListenPort();
 }

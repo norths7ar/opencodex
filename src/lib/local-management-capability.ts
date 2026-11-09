@@ -14,7 +14,6 @@ export const LOCAL_MANAGEMENT_READ_PATHS = {
   providerKeys: "/api/providers/keys",
   config: "/api/config",
   systemMemory: "/api/system/memory",
-  companionSettings: "/api/companion/settings",
   usage: "/api/usage",
   startupHealth: "/api/startup-health",
   providerQuotas: "/api/provider-quotas",
@@ -48,7 +47,6 @@ function isLocalManagementReadPath(path: string): path is LocalManagementReadPat
     || path === LOCAL_MANAGEMENT_READ_PATHS.providerKeys
     || path === LOCAL_MANAGEMENT_READ_PATHS.config
     || path === LOCAL_MANAGEMENT_READ_PATHS.systemMemory
-    || path === LOCAL_MANAGEMENT_READ_PATHS.companionSettings
     || path === LOCAL_MANAGEMENT_READ_PATHS.usage
     || path === LOCAL_MANAGEMENT_READ_PATHS.startupHealth
     || path === LOCAL_MANAGEMENT_READ_PATHS.providerQuotas

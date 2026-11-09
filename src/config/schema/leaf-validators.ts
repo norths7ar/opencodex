@@ -45,12 +45,8 @@ import {
   declaredUnsupportedHostedTools,
   isHostedToolUnsupportedForModel,
 } from "../../responses/hosted-tool-policy";
-import { getConfigDir } from "../paths";
 import { COMPACTION_TRIGGERS, validCompactionSourceModels } from "./compaction-triggers";
 
-// The chatgptDesktop leaf lives in its own zod-only module so the `ocx chatgpt` command can explain
-// a dropped block without loading this file's provider and account validators.
-export { chatgptDesktopConfigIssue, chatgptDesktopSchema } from "./chatgpt-desktop";
 
 /** One definition of "usable secret", shared by the schema and the warnings. */
 export function isUsableApiKeySecret(value: unknown): value is string {
@@ -833,7 +829,6 @@ export const apiKeyEntrySchema = z.object({
   allowedProviders: z.array(z.string().trim().min(1).max(256)).optional(),
   allowedModels: z.array(z.string().trim().min(1).max(256)).optional(),
   // Not `.catch`ed for the same reason: a damaged value must not grant metered spend.
-  allowMeteredComboTargets: z.boolean().optional(),
 }).passthrough();
 
 /**
@@ -887,153 +882,6 @@ export const agentTaskRecoverySchema = z.object({
   cacheEntries: z.number().int().min(1).max(512).optional(),
   retries: z.number().int().min(0).max(2).optional(),
 }).strict();
-
-export const runtimeRoleSchema = z.enum(["standalone", "hub", "client"]);
-
-function canonicalHttpOrigin(value: string): string | null {
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
-    if (parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) return null;
-    return parsed.origin;
-  } catch {
-    return null;
-  }
-}
-
-export const managementIngressSchema = z.union([
-  z.object({ enabled: z.literal(false) }).strict(),
-  z.object({ enabled: z.literal(true), port: z.number().int().min(1).max(65535) }).strict(),
-]);
-
-export const hubConfigSchema = z.object({
-  managementPublicOrigin: z.string().transform((value, ctx) => {
-    const origin = canonicalHttpOrigin(value);
-    if (!origin) {
-      ctx.addIssue({ code: "custom", message: "must be a canonical http(s) origin without credentials, path, query, or fragment" });
-      return z.NEVER;
-    }
-    return origin;
-  }).optional(),
-  // Same canonical-origin rule as managementPublicOrigin, and deliberately NOT `.catch`ed:
-  // a mistyped data origin must be rejected at write time, because silently dropping it
-  // makes `ocx hub invite` print the `http://<hostname>:<port>` fallback that the operator
-  // set this field precisely to replace.
-  dataPublicOrigin: z.string().transform((value, ctx) => {
-    const origin = canonicalHttpOrigin(value);
-    if (!origin) {
-      ctx.addIssue({ code: "custom", message: "must be a canonical http(s) origin without credentials, path, query, or fragment" });
-      return z.NEVER;
-    }
-    return origin;
-  }).optional(),
-  // A malformed hand edit disables only the optional ingress. Live writes are rejected by
-  // managementIngressConfigError before this load-time degradation can hide the mistake.
-  managementIngress: managementIngressSchema.optional().catch(undefined),
-}).strict();
-
-const tailscaleUserSchema = z.string().trim().min(1).superRefine((value, ctx) => {
-  if (new TextEncoder().encode(value).byteLength > 320) {
-    ctx.addIssue({ code: "custom", message: "must be at most 320 UTF-8 bytes" });
-  }
-  if (/[\x00-\x1f\x7f]/.test(value)) {
-    ctx.addIssue({ code: "custom", message: "must not contain ASCII control characters" });
-  }
-});
-
-export const remoteGuiConfigSchema = z.object({
-  allowedTailscaleUsers: z.array(tailscaleUserSchema).max(64).superRefine((users, ctx) => {
-    const seen = new Set<string>();
-    for (let index = 0; index < users.length; index++) {
-      const user = users[index]!;
-      if (seen.has(user)) {
-        ctx.addIssue({ code: "custom", path: [index], message: "must contain unique users after trimming" });
-      }
-      seen.add(user);
-    }
-  }).optional(),
-  // Retired (see OcxRemoteGuiConfig): accepted so an existing file still loads, ignored by
-  // the pairing path. Removing it from a strict schema would reject the whole config.
-  allowInsecureHttp: z.boolean().optional(),
-}).strict();
-
-const connectedClientIdSchema = z.enum(["codex", "claude"]);
-const clientTimestampSchema = z.string().datetime({ offset: true });
-const clientTransportSchema = z.enum(["hub", "link"]);
-const linkTransportSchema = z.object({
-  // Same range as isLinkPort in src/link/ports.ts, restated here because the config schema sits on
-  // every install's core path and must not import link code (tests/lab/core-link-boundary.test.ts).
-  tunnelPort: z.number().int().min(1024).max(65535),
-  linkId: z.string().regex(/^lnk_[0-9a-f]{16}$/),
-}).strict();
-const clientOriginSchema = z.string().transform((value, ctx) => {
-  const origin = canonicalHttpOrigin(value);
-  if (!origin) {
-    ctx.addIssue({ code: "custom", message: "must be a canonical http(s) origin without credentials, path, query, or fragment" });
-    return z.NEVER;
-  }
-  return origin;
-});
-export const clientConnectionSchema = z.object({
-  serverUrl: clientOriginSchema,
-  managementUrl: clientOriginSchema,
-  managementTransport: z.enum(["direct", "relay"]),
-  transport: clientTransportSchema.optional(),
-  link: linkTransportSchema.optional(),
-  selectedClients: z.array(connectedClientIdSchema).min(1).max(2).superRefine((clients, ctx) => {
-    if (new Set(clients).size !== clients.length) {
-      ctx.addIssue({ code: "custom", message: "must contain unique client ids" });
-    }
-  }),
-  tokenEnv: z.literal("OPENCODEX_API_AUTH_TOKEN"),
-  apiKeyId: z.string().trim().min(1).max(256),
-  tokenFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
-  protocolVersion: z.literal(1),
-  connectedAt: clientTimestampSchema,
-  catalogFingerprint: z.string().min(1).max(512).optional(),
-  // base64 of the pre-connect catalog, or "" for "there was none". Bounded above the
-  // catalog size cap so a legitimate snapshot round-trips.
-  priorCatalog: z.string().max(64 * 1024 * 1024).optional(),
-  catalogSyncedAt: clientTimestampSchema.optional(),
-  pendingOperation: z.object({
-    kind: z.literal("rotate"),
-    rotationId: z.string().trim().min(1).max(256),
-    newKeyIssuedAt: clientTimestampSchema,
-    oldKeyBackupPath: z.string().min(1),
-  }).strict().superRefine((operation, ctx) => {
-    const expected = join(getConfigDir(), "service-api-token.prev");
-    if (operation.oldKeyBackupPath !== expected) {
-      ctx.addIssue({ code: "custom", path: ["oldKeyBackupPath"], message: `must equal ${expected}` });
-    }
-  }).optional(),
-}).strict().superRefine((connection, ctx) => {
-  const transport = connection.transport ?? "hub";
-  if (transport === "hub" && connection.link !== undefined) {
-    ctx.addIssue({ code: "custom", path: ["link"], message: "link is allowed only when transport is link" });
-    return;
-  }
-  if (transport !== "link") return;
-  if (!connection.link) {
-    ctx.addIssue({ code: "custom", path: ["link"], message: "link is required when transport is link" });
-    return;
-  }
-  if (connection.managementTransport !== "direct") {
-    ctx.addIssue({ code: "custom", path: ["managementTransport"], message: "link transport requires direct management transport" });
-  }
-  if (connection.serverUrl !== connection.managementUrl) {
-    ctx.addIssue({ code: "custom", path: ["managementUrl"], message: "link transport requires serverUrl and managementUrl to match" });
-  }
-  let origin: URL;
-  try {
-    origin = new URL(connection.serverUrl);
-  } catch {
-    return;
-  }
-  if (origin.protocol !== "http:" || origin.hostname !== "127.0.0.1"
-    || origin.port !== String(connection.link.tunnelPort)) {
-    ctx.addIssue({ code: "custom", path: ["serverUrl"], message: "link transport requires http://127.0.0.1:<tunnelPort>" });
-  }
-});
 
 /**
  * Codex pool selection policy section.

@@ -424,9 +424,6 @@ function validProcessStart(value: unknown): value is string {
   return typeof value === "string" && (
     /^linux:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}:(0|[1-9]\d*)$/.test(value)
     || (/^win32:[1-9]\d{0,15}$/.test(value) && Number.isSafeInteger(Number(value.slice(6))))
-    || (/^darwin:\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(value)
-      && Number.isFinite(Date.parse(value.slice(7)))
-      && new Date(value.slice(7)).toISOString().replace(".000Z", "Z") === value.slice(7))
   );
 }
 
@@ -449,42 +446,6 @@ export function parseLinuxTestProcessStart(stat: string, bootId: string): string
   if (!ticks || !/^\d{1,20}$/.test(ticks)) return null;
   const identity = `linux:${bootId.trim().toLowerCase()}:${BigInt(ticks)}`;
   return validProcessStart(identity) ? identity : null;
-}
-
-/** Strict English ps tokens in UTC; never parse a locale-dependent local date. */
-export function parseDarwinTestProcessStart(value: string): string | null {
-  const match = /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) +(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) +(\d{1,2}) +(\d{2}):(\d{2}):(\d{2}) +(\d{4})$/.exec(value.trim());
-  if (!match) return null;
-  const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(match[2]!);
-  const parts = [Number(match[7]), month, Number(match[3]), Number(match[4]), Number(match[5]), Number(match[6])] as const;
-  const date = new Date(Date.UTC(...parts));
-  if (date.getUTCFullYear() !== parts[0] || date.getUTCMonth() !== month
-    || date.getUTCDate() !== parts[2] || date.getUTCHours() !== parts[3]
-    || date.getUTCMinutes() !== parts[4] || date.getUTCSeconds() !== parts[5]
-    || ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getUTCDay()] !== match[1]) return null;
-  return `darwin:${date.toISOString().replace(".000Z", "Z")}`;
-}
-
-function darwinProcessStartBatch(pids: readonly number[]): Map<number, string | null> {
-  const out = new Map<number, string | null>(pids.map(pid => [pid, null]));
-  if (pids.length === 0) return out;
-  try {
-    const stdout = execFileSync("/bin/ps", ["-o", "pid=,lstart=", "-p", pids.join(",")], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-      timeout: 3_000,
-      env: { ...process.env, TZ: "UTC", LC_ALL: "C" },
-    });
-    for (const raw of stdout.split(/\r?\n/)) {
-      const match = /^\s*(\d+)\s+(.+)$/.exec(raw);
-      if (!match) continue;
-      const pid = Number(match[1]);
-      if (out.has(pid)) out.set(pid, parseDarwinTestProcessStart(match[2]!));
-    }
-  } catch {
-    /* Unreadable identity keeps the live veto. */
-  }
-  return out;
 }
 
 const WINDOWS_PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
@@ -623,9 +584,7 @@ export function readTestRunProcessStartBatch(pids: readonly number[]): Map<numbe
   }
   const probed = process.platform === "win32"
     ? windowsProcessStartBatch(foreign)
-    : process.platform === "darwin"
-      ? darwinProcessStartBatch(foreign)
-      : process.platform === "linux"
+    : process.platform === "linux"
         ? new Map(foreign.map(pid => [pid, linuxProcessStart(pid)]))
         : new Map(foreign.map(pid => [pid, null]));
   for (const [pid, start] of probed) {

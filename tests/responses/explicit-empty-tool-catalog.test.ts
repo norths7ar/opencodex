@@ -3,7 +3,6 @@ import type { ProviderAdapter } from "../../src/adapters/base";
 import * as adapterResolver from "../../src/server/adapter-resolve";
 import { handleChatCompletions } from "../../src/server/chat-completions";
 import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
 import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
 import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
@@ -45,8 +44,6 @@ beforeEach(() => {
   home = createTempHome("ocx-empty-tool-catalog-");
   releaseHome = acquireOwnedSpendHome();
   clearKeyCooldowns();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearResponseStateForTests();
 });
 
@@ -61,8 +58,6 @@ afterEach(async () => {
   await flushResponseState();
   clearResponseStateForTests();
   clearKeyCooldowns();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   resetProviderRequestPacingForTest();
   home.remove();
 });
@@ -166,7 +161,7 @@ async function dispatch(lane: Lane, stream: boolean, catalog: Catalog, tool: boo
     port: 0, defaultProvider: "fixture",
     providers: { fixture: { adapter, baseUrl: `http://127.0.0.1:${upstream.port}/v1`, allowPrivateNetwork: true,
       authMode: "key", apiKey: "fixture-key", models: ["model"], liveModels: false } },
-    protocols: { rollout: { managedMessagesNative: lane.native && lane.inbound === "messages", nativeChatCombos: !!lane.combo, directEncoders: !!lane.direct } },
+    protocols: { rollout: { managedMessagesNative: lane.native && lane.inbound === "messages", directEncoders: !!lane.direct } },
     ...(lane.combo ? { combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "model" }] } } } : {}),
   };
   if (options.video) {

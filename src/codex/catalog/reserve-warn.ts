@@ -26,7 +26,6 @@ export type ReserveCatalogSuppressionReason =
 
 type ReserveSuppressionConfig = Pick<
   OcxConfig,
-  | "runtimeRole"
   | "hostname"
   | "unauthenticatedLoopbackListener"
   | "codexDesktopAuthless"

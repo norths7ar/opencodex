@@ -1792,7 +1792,6 @@ describe("3-state multi-agent mode", () => {
         featured: [],
         wsEnabled: false,
         multiAgentMode: "default",
-        exactComboSlugs: new Set(),
         accountSelectors: [],
         suppressedBareNativeSlugs: new Set(),
         disabledNativeAccountSlugs: new Set(),
@@ -1835,8 +1834,6 @@ describe("3-state multi-agent mode", () => {
         legacyCustomModelSlugs: new Set(),
         multiAgentMode: "default",
         multiAgentV2Enabled: true,
-        exactComboSlugs: new Set(),
-        hasPhysicalComboProvider: false,
         includeNativeOpenAi: true,
         accountBoundEntries,
         policy: {
@@ -1997,8 +1994,7 @@ describe("3-state multi-agent mode", () => {
     const diskNative = { ...template(), slug: "gpt-5.5", display_name: "gpt-5.5", multi_agent_version: "v2" };
     const merged = mergeCatalogEntriesForSync(
       [diskSol as never, diskLuna as never, diskNative as never],
-      [], new Map(), [], false, new Set(), null, new Set(), new Set(), "default",
-      new Set(), false, true, [], new Set(), new Set(), undefined, false,
+      [], new Map(), [], false, new Set(), null, new Set(), new Set(), "default", true, [], new Set(), new Set(), undefined, false,
       new Map<string, string | null>([
         ["gpt-5.6-sol", "v1"],
         ["gpt-5.6-luna", "v1"],
@@ -2022,8 +2018,7 @@ describe("3-state multi-agent mode", () => {
     const staleRouted = { ...template(), slug: "provider/model", display_name: "Routed", multi_agent_version: "v1" };
     const merged = mergeCatalogEntriesForSync(
       [liveNative as never, staleRouted as never],
-      [], new Map(), [], false, new Set(), null, new Set(), new Set(), "default",
-      new Set(), false, true, [], new Set(), new Set(), undefined, false,
+      [], new Map(), [], false, new Set(), null, new Set(), new Set(), "default", true, [], new Set(), new Set(), undefined, false,
       new Map([["gpt-5.6-sol", "v2"]]),
     );
     expect(merged.find(e => e.slug === "custom-native")?.multi_agent_version).toBe("v2");
@@ -2061,8 +2056,7 @@ describe("3-state multi-agent mode", () => {
     };
     const merged = mergeCatalogEntriesForSync(
       [foreignRouted as never], [], new Map(), [], false,
-      new Set(), null, new Set(), new Set(), "default",
-      new Set(), false, true, [boundSol as never, boundNative as never],
+      new Set(), null, new Set(), new Set(), "default", true, [boundSol as never, boundNative as never],
       new Set(), new Set(), undefined, false,
       new Map<string, string | null>([["gpt-5.6-sol", "v1"], ["gpt-5.5", null]]),
     );
@@ -2098,8 +2092,7 @@ describe("3-state multi-agent mode", () => {
     const liveSol = { ...template(), slug: "gpt-5.6-sol", display_name: "GPT-5.6 Sol", multi_agent_version: "v1" };
     const merged = mergeCatalogEntriesForSync(
       [liveSol as never], [], new Map(), [], false,
-      new Set(), null, new Set(), new Set(), "default",
-      new Set(), false, true, [],
+      new Set(), null, new Set(), new Set(), "default", true, [],
       new Set(), new Set(), undefined, false,
       new Map<string, string | null>([["gpt-5.5", "v1"]]),
     );

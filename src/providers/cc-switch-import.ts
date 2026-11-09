@@ -621,7 +621,6 @@ export function isProviderReferencedInConfig(config: OcxConfig, name: string): b
   if (startsWithPrefix(config.autoReviewOverride?.model)) return true;
   if (startsWithPrefix(config.codexMainAccountHardLockFallback?.model)) return true;
   if (startsWithPrefix(config.agentTaskRecovery?.model)) return true;
-  if (startsWithPrefix(config.advisor?.model)) return true;
   if (config.blockedModelRedirects) {
     for (const [k, v] of Object.entries(config.blockedModelRedirects)) {
       if (k.startsWith(prefix) || startsWithPrefix(v)) return true;

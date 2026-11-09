@@ -8,7 +8,7 @@ import { hostedSendFixture } from "../helpers/hosted-send-fixture";
 import { chatStream } from "../helpers/combo-failover-upstream";
 
 for (const kind of ["search", "image", "video"] as const) for (const owned of [false, true]) for (const unsent of [false, true]) {
-  test(`${kind} ${owned ? "adapter" : "generic"} OAuth hop ${unsent ? "unsent cleanup refunds once" : "dispatch consumes its own booking once"}`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} ${owned ? "adapter" : "generic"} OAuth hop ${unsent ? "unsent cleanup refunds once" : "dispatch consumes its own booking once"}`, async () => hostedSendFixture(kind, async f => {
     delete f.config.providers.a!.transientRetryOn5xx;
     let calls = 0, rotated = false;
     f.config.providers.a!.fetch = (async () => ++calls === 1

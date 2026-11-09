@@ -114,19 +114,6 @@ export function createWebsocketHandler(
       // Text frames. response.processed is a no-op ack. close() aborts the upstream (RC2 parity).
       // Live sideband sockets (kind=live-sideband) are a transparent bidirectional relay instead.
       open(ws: ServerWebSocket<WsData>) {
-        if (ws.data.kind === "remote-workspace-agent") {
-          const open = ws.data.remoteWorkspaceOpen;
-          if (!open) {
-            ws.close(1011, "remote workspace connection unavailable");
-            return;
-          }
-          try {
-            ws.data.remoteWorkspaceConnection = open(ws);
-          } catch {
-            ws.close(1011, "remote workspace connection failed");
-          }
-          return;
-        }
         if (ws.data.kind === "live-sideband") {
           if (!ws.data.liveTurnAdmissionLease) {
             closeLiveSideband(ws, 1013, "server busy");
@@ -143,14 +130,6 @@ export function createWebsocketHandler(
         registerCodexWebSocket(ws);
       },
       message(ws: ServerWebSocket<WsData>, raw: string | Buffer) {
-        if (ws.data.kind === "remote-workspace-agent") {
-          try {
-            ws.data.remoteWorkspaceConnection?.receive(raw);
-          } catch {
-            ws.close(1008, "remote workspace protocol error");
-          }
-          return;
-        }
         if (ws.data.kind === "live-sideband") {
           if (ws.data.liveClosing) return;
           if (ws.data.liveValidateFrame && !ws.data.liveValidateFrame(raw)) {
@@ -306,7 +285,7 @@ export function createWebsocketHandler(
         }
 
         // Only a genuinely admitted turn may receive steering or continuations.
-        const advisorAdmissionPolicy = captureAdmissionPolicy(config, ws.data.admission);
+        const sidecarAdmissionPolicy = captureAdmissionPolicy(config, ws.data.admission);
         const finishActivity = ws.data.responsesActivity?.beginTurn(frame.input);
         const payload: Record<string, unknown> = { ...frame };
         delete payload.type;
@@ -359,7 +338,7 @@ export function createWebsocketHandler(
             ws.data.nativeControl = nativeControl;
             let terminalRecorder: ((status: ResponsesTerminalStatus, httpStatusOverride?: number) => void) | undefined;
             const response = await handleResponses(req, config, logCtx, {
-              advisorAdmissionPolicy,
+              sidecarAdmissionPolicy,
               ...(wsAdmission ? { admission: wsAdmission } : {}),
               forceEmptyResponseId: true,
               inboundTransport: "websocket",
@@ -448,10 +427,6 @@ export function createWebsocketHandler(
         });
       },
       close(ws: ServerWebSocket<WsData>, code: number, reason: string) {
-        if (ws.data.kind === "remote-workspace-agent") {
-          ws.data.remoteWorkspaceClose?.();
-          return;
-        }
         if (ws.data.kind === "live-sideband") {
           // Carry the client's own close through to the upstream instead of reporting every
           // hang-up as a plain 1000.

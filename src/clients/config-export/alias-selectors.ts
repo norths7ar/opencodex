@@ -6,7 +6,7 @@ import type { OcxConfig } from "../../types";
 import { parseSyntheticRowId } from "../../server/fast-row";
 
 function concrete(route: RouteResult): boolean {
-  return !route.combo && route.routeKind !== "policy" && route.policyEligibility === undefined;
+  return route.routeKind !== "policy" && route.policyEligibility === undefined;
 }
 
 function sameIdentity(left: RouteResult, right: RouteResult): boolean {
@@ -25,7 +25,7 @@ export function attachExportAliasSelectors(config: OcxConfig, input: readonly Ex
     models: effectiveModelAliases(config, provider, knownModelIdsForProvider(name, provider, config)),
   }]));
   const candidates = models.map(model => {
-    if (model.native || model.provider === "combo") return undefined;
+    if (model.native) return undefined;
     const provider = aliases.get(model.provider);
     const alias = provider?.models.get(model.id)?.alias;
     if (!provider || !alias || !MODEL_ALIAS_PATTERN.test(provider.namespace)) return undefined;
@@ -51,7 +51,7 @@ export function attachExportAliasSelectors(config: OcxConfig, input: readonly Ex
       return undefined;
     }
   });
-  // Reserve every canonical/native/combo selector, including synthetic Fast rows.
+  // Reserve every canonical/native selector, including synthetic Fast rows.
   // A candidate must never displace a different row through first-wins normalization.
   const claims = new Map<string, Set<number>>();
   const claim = (key: string, index: number) => {

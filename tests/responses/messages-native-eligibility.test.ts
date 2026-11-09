@@ -118,13 +118,6 @@ describe("planner mirrors the native Messages rule", () => {
     expect(plan.candidates[0]).toMatchObject({ requestPath: ["messages", "messages"], eligible: true });
     expect(plan.guaranteedFeatures).toEqual(["request.top_k"]);
   });
-
-  test("switch on: OAuth and combo candidates report the rule that declined them", () => {
-    const oauth = buildProtocolPlanSnapshot(config(ON), { model: "anthoauth/claude-o", inbound: "messages", features: [] });
-    expect(oauth.candidates[0]).toMatchObject({ nativeEligible: false, declineReasons: ["auth-mode-not-native"] });
-    const combo = buildProtocolPlanSnapshot(config(ON), { model: "combo/pair", inbound: "messages", features: [] });
-    expect(combo.candidates[0]).toMatchObject({ provider: "anth", nativeEligible: false, declineReasons: ["combo-or-policy-route"] });
-  });
 });
 
 test("Anthropic pool defaults do not change native eligibility for another provider", () => {

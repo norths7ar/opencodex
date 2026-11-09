@@ -71,7 +71,7 @@ import { isXaiResponsesDestination, resolveProviderTransport } from "../../provi
 import { captureRouteStaticPolicy } from "../../router";
 import { CopilotAutoHttpError, resolveCopilotAuto } from "../../providers/github-copilot-auto";
 import { PolicyCandidateUnavailableError, MandatoryToolChoiceUnavailableError, mandatoryToolChoiceUnavailableResponse, policyCandidateRefusalResponse } from "./policy-request-scope";
-import { chatCanPreserveMandatoryToolChoice } from "./combo-required-tool-contract";
+import { chatCanPreserveMandatoryToolChoice } from "./mandatory-tool-choice";
 import {
   AdmissionModelDeniedError,
   admissionModelDeniedResponse, projectAdmissionModelDeniedLog,
@@ -114,7 +114,6 @@ import {
 } from "../request-log";
 import type { AttemptRecoveryKind } from "../../usage/log";
 import { bindAttemptDeliveryRecorder } from "../../usage/attempt-delivery";
-import { resolvePassiveRouteSubjectId } from "../passive-route-linker";
 import { anthropicPoolCooldownResponse, clientCancelledResponse } from "./core-errors";
 import { acquireAccountLease, KIRO_ACCOUNT_WAIT_MS } from "../../oauth/kiro-account-load";
 
@@ -366,7 +365,7 @@ export async function prepareResponsesTransport(
   const copilotRefusalResponse = (error: unknown): Response | undefined => {
     if (error instanceof AdmissionModelDeniedError) return admissionModelDeniedResponse(projectAdmissionModelDeniedLog(error, logCtx));
     if (error instanceof PolicyCandidateUnavailableError) {
-      if (options.comboAttempt || options.policyRequestScope?.eligibility) return policyCandidateRefusalResponse(error);
+      if (options.policyRequestScope?.eligibility) return policyCandidateRefusalResponse(error);
       return mandatoryToolChoiceUnavailableResponse();
     }
     if (!(error instanceof CopilotAutoHttpError) || ![401, 403, 429].includes(error.status)) return;
@@ -600,7 +599,6 @@ export async function prepareResponsesTransport(
       logCtx.usage = usage;
       if (logCtx.activeAttempt) logCtx.activeAttempt.usage = usage;
     }
-    options.onBridgeUsageBound?.();
   };
   const selectionIsCurrent = (binding: DispatchBinding | undefined): boolean => {
     if (!anthropicAdmissionIsCurrent()) return false;
@@ -629,7 +627,7 @@ export async function prepareResponsesTransport(
     // each build projects a copy so unselected fallbacks retain the original tool catalog.
     const discovery = options.anthropicToolLoadingSource;
     const appendOnly = inboundWire === "anthropic" && discovery && provider.adapter === "openai-responses"
-      && !options.comboAttempt && !route.combo && route.routeKind !== "combo" && route.routeKind !== "policy"
+      && route.routeKind !== "policy"
       && !options.policyFallbackCandidate && !options.policyRequestScope?.eligibility
       && appendOnlyToolLoadingMatches(config.claudeCode?.appendOnlyToolLoadingModels,
         `${route.providerName}/${parsed._wireModelOverride ?? route.modelId}`);
@@ -973,7 +971,7 @@ export async function prepareResponsesTransport(
                 && current.credential.access === snapshot.accessToken
                 && credentialGeneration(current.credential) === snapshot.generation) {
                 bindAnthropicRefusalCredentialForSend(response, physicalOwner);
-                recordAnthropicAccountQuotaFromHeadersForInstance(anthropicInstance!, snapshot.accountId, response.headers, writerGeneration, response.status, route.modelId, snapshot.generation);
+                recordAnthropicAccountQuotaFromHeadersForInstance(anthropicInstance!, snapshot.accountId, response.headers, writerGeneration, response.status, route.modelId);
               }
             } catch { /* best-effort observation cannot fail the response */ }
           }
@@ -1054,7 +1052,7 @@ export async function prepareResponsesTransport(
           if (selection.reason === "all-cooled") {
             return anthropicPoolCooldownResponse(
               anthropicRouting!.anthropicPoolCooldownError(Date.now(), anthropicRouteDecision, route.modelId),
-              { comboAttempt: options.comboAttempt, logCtx },
+              { logCtx },
             );
           }
           return markProxyError(formatErrorResponse(401, "authentication_error", anthropicRouteDecision ? "No eligible Anthropic OAuth account for this model route" : "No eligible Anthropic OAuth account available"));
@@ -1311,7 +1309,7 @@ export async function prepareResponsesTransport(
   if (!deferPhysicalAttribution) logCtx.providerAdapter = adapter.name;
   // Ordinary requests receive one durable attempt only after their final initial
   // adapter is resolved. Combo children own their attempt and retries keep it.
-  if (!options.comboAttempt && !logCtx.activeAttempt) {
+  if (!logCtx.activeAttempt) {
     const attempt = beginRequestAttempt(
       (logCtx.attempts?.length ?? 0) + 1,
       logCtx.provider,
@@ -1327,20 +1325,6 @@ export async function prepareResponsesTransport(
   runTurnAdapter = adapter;
   if (adapter.runTurn) {
     recordAdapterTierMetadata(logCtx, adapter.tierLogForRunTurn?.(parsed));
-  }
-  // Optional route-identity linkage for attempt correlation (CL-09 consumes it). The slot
-  // resolves to null unless an opt-in subsystem registered a linker, so an install without
-  // routing profiles does no work here and loads no additional module. The non-throwing
-  // guarantee lives in the slot helper.
-  if (logCtx.activeAttempt && !logCtx.activeAttempt.labRouteSubjectId) {
-    const passiveSubjectId = resolvePassiveRouteSubjectId(
-      config,
-      route.providerName,
-      route.modelId,
-      route.provider,
-      inboundWire,
-    );
-    if (passiveSubjectId) logCtx.activeAttempt.labRouteSubjectId = passiveSubjectId;
   }
   const isPassthrough = "passthrough" in adapter && !!adapter.passthrough;
 

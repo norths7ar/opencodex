@@ -32,7 +32,7 @@ function config(adapter: "openai-chat" | "openai-responses", combo = false): Ocx
   return { port: 0, defaultProvider: "fixture", providers: { fixture: {
     adapter, baseUrl: `http://127.0.0.1:${server.port}/v1`, authMode: "key", apiKey: "fixture-key",
     allowPrivateNetwork: true, models: ["model"],
-  } }, protocols: { unrepresentable: "reject", rollout: { nativeChatCombos: true, shadowPlan: true } },
+  } }, protocols: { unrepresentable: "reject", rollout: { shadowPlan: true } },
   ...(combo ? { combos: { pair: { strategy: "failover", targets: [{ provider: "fixture", model: "model" }] } } } : {}),
   } as OcxConfig;
 }
@@ -67,21 +67,6 @@ describe("protocol trace suppression", () => {
     expect(protocolMarkFeatures(ctx)).toBeUndefined();
     expect(protocolTraceForRequest(ctx, [attempt])).toBeUndefined();
     expect(protocolTraceForRequest({ inboundProtocol: "responses" }, [attempt])).toBeDefined();
-  });
-
-  for (const combo of [false, true]) test(`native ${combo ? "combo" : "direct"} success preserves the original inbound protocol`, async () => {
-    const cfg = config("openai-chat", combo);
-    const body = { model: combo ? "combo/pair" : "fixture/model", messages: [{ role: "user", content: "hi" }] };
-    const result = await send(cfg, body, true);
-    expect(result.response.status).toBe(200);
-    expect(sends).toBe(1);
-    expect(result.ctx.inboundProtocol).toBe("responses");
-    expect(result.row.inboundProtocol).toBe("responses");
-    expect(result.row.protocolTrace).toBeUndefined();
-    const ordinary = await send(cfg, body, false);
-    expect(ordinary.response.status).toBe(200);
-    if (!combo) expect(ordinary.ctx.inboundProtocol).toBe("chat");
-    expect(ordinary.row.protocolTrace).toMatchObject({ inbound: "chat", mode: "native" });
   });
 
   test("representability rejection still blocks the send with no trace", async () => {

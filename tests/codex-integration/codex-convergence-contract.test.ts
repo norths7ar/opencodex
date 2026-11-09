@@ -385,37 +385,6 @@ for (const state of ["enabled", "missing", "unreadable", "salvaged"] as const) {
 
 for (const slug of ["fast-chat", "vendor/flash"]) {
   for (const state of ["saved", "missing", "deleted"] as const) {
-    test(`combo alias ${slug} convergence ${state} config protects exact catalog/cache bytes`, async () => {
-      const path = join(codexHome, "opencodex-catalog.json");
-      const cachePath = join(codexHome, "models_cache.json");
-      const parsed = JSON.parse(sourceCatalog());
-      parsed.models.push({ ...parsed.models[0], slug, owned_by: "combo",
-        description: "Routed via opencodex → combo (combo)." });
-      const catalogBytes = `${JSON.stringify(parsed, null, 2)}\n`;
-      const cacheBytes = `${JSON.stringify({ fetched_at: "2026-01-01T00:00:00Z",
-        client_version: "fixture-cache-version", models: parsed.models }, null, 2)}\n`;
-      writeFileSync(path, catalogBytes);
-      writeFileSync(cachePath, cacheBytes);
-      if (state === "saved") {
-        saveConfig({ ...config(), defaultProvider: "ark", providers: { ark: {
-          adapter: "openai-chat", baseUrl: "https://api.example.test/v1", liveModels: false, models: ["a"],
-        } }, combos: { fast: { alias: slug, targets: [{ provider: "ark", model: "a" }] } } });
-        expect(readConfigAdmissionSnapshot().diagnostics.source).toBe("file");
-      }
-      if (state === "missing") rmSync(join(opencodexHome, "config.json"));
-      const result = await commitCodexCatalogCandidate(await candidate(), 1_000);
-      if (state === "deleted") {
-        expect(result.kind).toBe("committed");
-        for (const target of [path, cachePath]) {
-          expect(JSON.parse(readFileSync(target, "utf8")).models.some((row: { slug: string }) => row.slug === slug))
-            .toBe(false);
-        }
-      } else {
-        expect(result).toEqual({ kind: "refused", reason: "unbacked-routed-removal" });
-        expect(readFileSync(path, "utf8")).toBe(catalogBytes);
-        expect(readFileSync(cachePath, "utf8")).toBe(cacheBytes);
-      }
-    });
   }
 }
 
@@ -427,83 +396,6 @@ test("a commit drops a provider's routed rows once config.json agrees it is gone
   const slugs = (JSON.parse(readFileSync(path, "utf8")) as { models: Array<{ slug: string }> }).models.map(m => m.slug);
   expect(slugs).toContain("gpt-5.6-sol");
   expect(slugs).not.toContain("ark/glm-5.3");
-});
-
-test("management convergence restores omitted natives and retains a configured native alias", async () => {
-  const runtime = { command: "/tmp/codex", version: "0.146.0", source: "environment" as const };
-  const bundled = JSON.parse(sourceCatalog("bundled")) as { models: Array<Record<string, unknown>> };
-  bundled.models.push({
-    ...bundled.models[0],
-    slug: "gpt-5.5",
-    display_name: "GPT-5.5",
-  });
-  persistCodexRuntime(runtime, { configDir: opencodexHome, now: () => 0 });
-  setCodexRuntimeResolveCacheForTests({ runtime, failures: [] }, { discoverAlternatives: false });
-  setBundledCatalogCacheForTests(runtime, bundled, { opencodexHome });
-
-  const nativeAlias = {
-    ...bundled.models[0],
-    display_name: "Nova1 - Sol",
-    description: "Routed via opencodex → combo (combo).",
-    owned_by: "combo",
-    opencodex_catalog_kind: CODEX_NATIVE_ALIAS_CATALOG_KIND,
-    input_modalities: ["text", "image"],
-  };
-  writeFileSync(join(codexHome, "opencodex-catalog.json"), `${JSON.stringify({
-    marker: "active-native-alias",
-    models: [nativeAlias],
-  }, null, 2)}\n`);
-
-  const liveConfig: OcxConfig = {
-    port: 10100,
-    defaultProvider: "Nova1",
-    providers: {
-      openai: {
-        adapter: "openai-responses",
-        baseUrl: "https://chatgpt.com/backend-api/codex",
-        authMode: "forward",
-        codexAccountMode: "direct",
-        liveModels: false,
-        models: [],
-      },
-      Nova1: {
-        adapter: "openai-chat",
-        baseUrl: "https://nova.example/v1",
-        liveModels: false,
-        models: [],
-      },
-    },
-    combos: {
-      nova: {
-        alias: "gpt-5.6-sol",
-        nativeAlias: true,
-        displayName: "Nova1 - Sol",
-        targets: [{ provider: "Nova1", model: "codex/gpt-5.6-sol" }],
-      },
-    },
-  };
-  saveConfig(liveConfig);
-
-  const beforeGather = manifest(root);
-  const gathered = await gatherCodexCatalogCandidate(captureCatalogAdmissionSnapshot(liveConfig));
-  expect(gathered.kind).toBe("candidate");
-  expect(manifest(root)).toEqual(beforeGather);
-  if (gathered.kind !== "candidate") throw new Error(JSON.stringify(gathered));
-  expect(await commitCodexCatalogCandidate(gathered.candidate, 1_000)).toMatchObject({ kind: "committed" });
-
-  const written = JSON.parse(readFileSync(join(codexHome, "opencodex-catalog.json"), "utf8")) as {
-    models: Array<Record<string, unknown>>;
-  };
-  expect(written.models.find(entry => entry.slug === "gpt-5.5")).toMatchObject({
-    display_name: "GPT-5.5",
-  });
-  expect(written.models.filter(entry => entry.slug === "gpt-5.6-sol")).toEqual([
-    expect.objectContaining({
-      display_name: "Nova1 - Sol",
-      owned_by: "combo",
-      opencodex_catalog_kind: CODEX_NATIVE_ALIAS_CATALOG_KIND,
-    }),
-  ]);
 });
 
 test("the total lazy adapter preserves a persisted-success route when factory construction fails", async () => {

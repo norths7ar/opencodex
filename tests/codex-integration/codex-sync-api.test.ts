@@ -128,7 +128,7 @@ describe("GUI/CLI Codex sync backend", () => {
     const result = await syncModelsToCodex(12345, config, null, {
       admitCodexWrite: admittedSync,
       refreshCodexModelCatalog: async () => ({ added: 0, path: "/tmp/fixture-catalog.json", catalogExists: false,
-        catalogWritten: false, cacheSynced: false, comboOmissions: [] }),
+        catalogWritten: false, cacheSynced: false, }),
       injectCodexConfig: async () => ({ success: true, configChanged: changed, message: "fixture" }),
       currentExternalCodexModelProvider: () => null,
       collectCodexHomeDiagnostic: () => homeDiagnostic(),
@@ -152,7 +152,6 @@ describe("GUI/CLI Codex sync backend", () => {
         catalogExists: true,
         catalogWritten: true,
         cacheSynced: true,
-        comboOmissions: [],
       }),
       injectCodexConfig: async (port, _config, options) => {
         injectedPort = port;
@@ -190,7 +189,6 @@ describe("GUI/CLI Codex sync backend", () => {
         catalogExists: true,
         catalogWritten: false,
         cacheSynced: false,
-        comboOmissions: [],
         refreshOutcome: "refused" as const,
         skippedReason: "unbacked_routed_removal" as const,
         protectedRoutedNamespaces: 2,
@@ -268,7 +266,6 @@ describe("GUI/CLI Codex sync backend", () => {
           catalogExists: true,
           catalogWritten: true,
           cacheSynced: true,
-          comboOmissions: [],
         };
       },
       injectCodexConfig: async () => ({ success: true, message: "injected" }),
@@ -341,7 +338,6 @@ describe("GUI/CLI Codex sync backend", () => {
           catalogExists: true,
           catalogWritten: true,
           cacheSynced: true,
-          comboOmissions: [],
           refreshOutcome: "committed" as const,
         };
       },
@@ -381,7 +377,6 @@ describe("GUI/CLI Codex sync backend", () => {
           catalogExists: true,
           catalogWritten: false,
           cacheSynced: false,
-          comboOmissions: [],
           refreshOutcome: "refused" as const,
         };
       },
@@ -504,7 +499,6 @@ describe("GUI/CLI Codex sync backend", () => {
           catalogExists: true,
           catalogWritten: true,
           cacheSynced: true,
-          comboOmissions: [],
         };
       },
       injectCodexConfig: async () => {
@@ -545,7 +539,6 @@ describe("GUI/CLI Codex sync backend", () => {
           catalogExists: true,
           catalogWritten: true,
           cacheSynced: true,
-          comboOmissions: [],
         };
       },
       injectCodexConfig: async () => {
@@ -567,161 +560,6 @@ describe("GUI/CLI Codex sync backend", () => {
       cacheSynced: true,
     });
     expect(String(result.message)).toContain("journal untouched");
-  });
-
-  /**
-   * The lost-transition race, with a REAL second process. The caller's config
-   * snapshot says ON; while provider discovery is awaited, another process
-   * persists OFF. The under-lock re-read inside the real injector must observe
-   * the fresh persisted intent and skip — the snapshot must not win.
-   *
-   * Runs entirely in a child process with its own temp CODEX_HOME, because the
-   * injector resolves its config path at module load: an in-process variant
-   * would silently address the suite's isolated home instead of the fixture.
-   */
-  test("a competing OFF during catalog discovery becomes the discriminated skip", async () => {
-    const raceRoot = mkdtempSync(join(tmpdir(), "ocx-sync-lost-transition-"));
-    const raceCodexHome = join(raceRoot, ".codex");
-    const raceOcxHome = join(raceRoot, ".opencodex");
-    const raceHome = join(raceRoot, "home");
-    mkdirSync(raceCodexHome, { recursive: true });
-    mkdirSync(raceOcxHome, { recursive: true });
-    mkdirSync(raceHome, { recursive: true });
-    try {
-      writeFileSync(join(raceCodexHome, "config.toml"), 'model = "gpt-5"\n', "utf8");
-      writeFileSync(join(raceOcxHome, "config.json"), JSON.stringify(config));
-      claimTempHome(raceCodexHome, raceOcxHome, raceHome);
-      const script = [
-        'const { spawnSync } = require("node:child_process");',
-        'const { loadConfig } = require("./src/config");',
-        'const { syncModelsToCodex } = require("./src/codex/sync");',
-        'const { injectCodexConfig } = require("./src/codex/inject");',
-        '(async () => {',
-        '  const snapshot = loadConfig(); // admitted BEFORE the flip: reads as ON',
-        '  let flipFailure;',
-        '  const result = await syncModelsToCodex(12345, snapshot, null, {',
-        '    refreshCodexModelCatalog: async () => {',
-        '      // The provider-discovery window: a second real process persists OFF.',
-        '      // This child only flips desired state; do not propagate the service-probe flag.',
-        '      const flipEnv = { ...process.env }; delete flipEnv.OCX_TEST_SERVICE_HOME_PROBE;',
-        `      const flipBudgetMs = ${COMPETING_OFF_BOOT_MS};`,
-        '      const remainingMs = Number(process.env.OCX_TEST_COMPETING_OFF_DEADLINE) - Date.now();',
-        `      console.log("[sync-race] preparation elapsedMs=" + (${COMPETING_OFF_CHILD_MS} - remainingMs));`,
-        `      if (!Number.isFinite(remainingMs) || remainingMs < flipBudgetMs + ${COMPETING_OFF_REAP_MS}) {`,
-        '        flipFailure = new Error("competing OFF flip not started: insufficient remaining budget " + remainingMs);',
-        '        throw flipFailure;',
-        '      }',
-        '      const flip = spawnSync(process.execPath, ["--eval",',
-        '        \'const { setIntegrationEnabled } = require("./src/codex/desired-state");\'',
-        '        + \'const r = setIntegrationEnabled("codex", false);\'',
-        '        + \'if (!r.ok) { console.error(JSON.stringify(r)); process.exit(1); }\',',
-        `      ], { cwd: process.cwd(), env: flipEnv, encoding: "utf8", timeout: ${COMPETING_OFF_BOOT_MS}, killSignal: "SIGKILL", windowsHide: true });`,
-        '      if (flip.error || flip.signal !== null || flip.status !== 0) {',
-        '        flipFailure = new Error("competing OFF flip failed: status=" + flip.status + " signal=" + flip.signal + " error=" + (flip.error?.message ?? "none") + " stdout=" + flip.stdout + " stderr=" + flip.stderr);',
-        '        throw flipFailure;',
-        '      }',
-        '      return { added: 0, path: "/tmp/none.json", catalogExists: false, catalogWritten: false, cacheSynced: false, comboOmissions: [] };',
-        '    },',
-        '    // The REAL injector remains the normal path; fixture failure must not be swallowed by discovery fallback.',
-        '    injectCodexConfig: (...args) => { if (flipFailure) throw flipFailure; return injectCodexConfig(...args); },',
-        '  });',
-        '  if (flipFailure) throw flipFailure;',
-        '  console.log(JSON.stringify({ status: result.status, skippedReason: result.skippedReason, ok: result.ok }));',
-        '})().catch(error => { console.error(error); process.exitCode = 1; });',
-      ].join("\n");
-      const before = readFileSync(join(raceCodexHome, "config.toml"), "utf8");
-      const child = spawnSync(process.execPath, childArgs(["--eval", script]), {
-        cwd: repoRoot,
-        env: childEnv({
-          HOME: raceHome,
-          USERPROFILE: raceHome,
-          CODEX_HOME: raceCodexHome,
-          OPENCODEX_HOME: raceOcxHome,
-          OCX_TEST_COMPETING_OFF_DEADLINE: String(Date.now() + COMPETING_OFF_CHILD_MS),
-        }),
-        encoding: "utf8",
-        timeout: COMPETING_OFF_CHILD_MS,
-        killSignal: "SIGKILL",
-        windowsHide: true,
-      });
-      if (child.error || child.signal !== null || child.status !== 0) {
-        throw new Error(`competing OFF sync failed: status=${child.status} signal=${child.signal} error=${child.error?.message ?? "none"}\nstdout=${child.stdout}\nstderr=${child.stderr}`);
-      }
-      const line = child.stdout.trim().split("\n").filter(Boolean).pop() ?? "{}";
-      expect(JSON.parse(line)).toMatchObject({ status: "skipped", skippedReason: "desired_disabled", ok: true });
-      // Surface the measured preparation window on green runs too: the Windows reserve above is
-      // sized on one 52.7s observation, and this is what makes the next sizing an observation.
-      const prepared = child.stdout.split("\n").find(entry => entry.includes("[sync-race] preparation"));
-      if (prepared) console.info(prepared.trim());
-      // The stale ON snapshot wrote nothing: the fixture config is untouched.
-      expect(readFileSync(join(raceCodexHome, "config.toml"), "utf8")).toBe(before);
-    } finally {
-      removeTreeWithRetry(raceRoot);
-    }
-  }, COMPETING_OFF_TEST_MS);
-
-  test("surfaces combo catalog omissions in sync result and CLI stderr (#484)", async () => {
-    const logs: string[] = [];
-    const errors: string[] = [];
-    const omission = {
-      id: "k3k3",
-      targets: ["kimi/k3", "xianyu/kimi-k3"],
-      reason: "incomplete_metadata" as const,
-      message: "[opencodex] Combo \"k3k3\" is omitted from the catalog because member capabilities are incomplete: kimi/k3, xianyu/kimi-k3.",
-    };
-    const result = await syncModelsToCodex(12345, config, { log: line => logs.push(String(line)), error: line => errors.push(String(line)) }, {
-      admitCodexWrite: admittedSync,
-      refreshCodexModelCatalog: async () => ({
-        added: 1,
-        path: "/tmp/opencodex-catalog.json",
-        catalogExists: true,
-        catalogWritten: true,
-        cacheSynced: true,
-        comboOmissions: [omission],
-      }),
-      injectCodexConfig: async () => ({ success: true, message: "injected" }),
-      currentExternalCodexModelProvider: () => null,
-      collectCodexHomeDiagnostic: () => homeDiagnostic(),
-    });
-
-    expect(result.comboOmissions).toEqual([omission]);
-    expect(result.warning).toContain("1 combo omitted from the catalog");
-    expect(errors).toEqual([
-      "1 combo omitted from the catalog because member capabilities are incomplete.",
-    ]);
-  });
-
-  test("CLI sync summary uses incompatible_modalities reason, not incomplete (#516)", async () => {
-    const errors: string[] = [];
-    const omission = {
-      id: "disjoint",
-      targets: ["a/m1", "b/m2"],
-      reason: "incompatible_modalities" as const,
-      message: "[opencodex] Combo \"disjoint\" is omitted from the catalog because members have no common input modalities: a/m1, b/m2.",
-    };
-    const result = await syncModelsToCodex(12345, config, { log: () => {}, error: line => errors.push(String(line)) }, {
-      admitCodexWrite: admittedSync,
-      refreshCodexModelCatalog: async () => ({
-        added: 0,
-        path: "/tmp/opencodex-catalog.json",
-        catalogExists: true,
-        catalogWritten: true,
-        cacheSynced: true,
-        comboOmissions: [omission],
-      }),
-      injectCodexConfig: async () => ({ success: true, message: "injected" }),
-      currentExternalCodexModelProvider: () => null,
-      collectCodexHomeDiagnostic: () => homeDiagnostic(),
-    });
-
-    expect(result.comboOmissions).toEqual([omission]);
-    expect(result.warning).toBe(
-      "1 combo omitted from the catalog because members have no common input modalities.",
-    );
-    expect(errors).toEqual([
-      "1 combo omitted from the catalog because members have no common input modalities.",
-    ]);
-    expect(errors.join("\n")).not.toContain("member capabilities are incomplete");
   });
 
   test("keeps injection fallback behavior when catalog refresh throws", async () => {

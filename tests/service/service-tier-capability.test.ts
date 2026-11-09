@@ -24,7 +24,6 @@ import {
   supportsServiceTierForModel,
 } from "../../src/providers/service-tier";
 import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { resolveProductionBehaviorValues } from "../../src/routing/compatibility/behavior";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
@@ -367,38 +366,6 @@ describe("routing evidence uses the final model adapter", () => {
     supportsServiceTier: true,
     modelSupportsServiceTier: { blocked: false },
     ...overrides,
-  });
-
-  test("model declarations and wire opt-ins reach routing and compatibility evidence", () => {
-    const config = {
-      port: 10100,
-      defaultProvider: "relay",
-      providers: { relay: relay() },
-    } as OcxConfig;
-    expect(candidateCapabilityEvidence(config, "relay", "verified").serviceTier).toBe("supported");
-    expect(candidateCapabilityEvidence(config, "relay", "blocked").serviceTier).toBe("unsupported");
-    expect(candidateCapabilityEvidence({
-      ...config,
-      providers: { relay: relay({ chatServiceTier: false }) },
-    }, "relay", "verified").serviceTier).toBe("supported");
-
-    const mixedProvider = relay({
-      adapter: "openai-responses",
-      chatServiceTier: false,
-      modelAdapters: { chat: "openai-chat" },
-    });
-    const mixedConfig = { ...config, providers: { relay: mixedProvider } };
-    expect(candidateCapabilityEvidence(mixedConfig, "relay", "verified").serviceTier).toBe("supported");
-    expect(candidateCapabilityEvidence(mixedConfig, "relay", "chat").serviceTier).toBe("supported");
-
-    const behavior = resolveProductionBehaviorValues(
-      mixedConfig,
-      "relay",
-      "chat",
-      mixedProvider,
-      "service-tier-test-salt",
-    );
-    expect(behavior?.["responses.serviceTier"]?.value).toBe(true);
   });
 });
 

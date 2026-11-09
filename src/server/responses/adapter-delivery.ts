@@ -136,7 +136,7 @@ export async function deliverAdapterResponse(
     // retain their existing owners; structural membership grants no supplier-state authority.
     const outputItemIds = requestState.completedToolBlocks && transportState.activeAdapter.name === "openai-chat"
       && options.inboundWire !== "chat" && options.inboundWire !== "anthropic"
-      && !routedCompaction && !parsed._advisorGuard && !clientEncoder && upstreamResponse.headers.get("x-opencodex-tool-completion") === "block-stop-v1"
+      && !routedCompaction && !clientEncoder && upstreamResponse.headers.get("x-opencodex-tool-completion") === "block-stop-v1"
       ? requestState.turnMembership?.begin() : undefined;
 
     // The continuation legs classify a stalled body themselves; the initial stream needs the
@@ -176,30 +176,17 @@ export async function deliverAdapterResponse(
           continuation: next => fetchTerminalGuardContinuation(next, undefined, !parsed.stream),
         })
       : recoveredEvents;
-    // Optional advisor guard (registered per request by the sidecar planner; absent unless the
-    // user enabled the advisor): holds synthetic `advisor` tool calls, consults the configured
-    // expert model, and re-dispatches the worker. Sits inside the empty-completion guard so an
-    // advisor-only turn never reads as an empty completion, and outside the bridge so the
-    // synthetic call never reaches the client.
-    const advisorStream = parsed._advisorGuard
-      ? parsed._advisorGuard({
-          parsed,
-          translatorBudget,
-          firstEvents: eventStream,
-          continuation: fetchTerminalGuardContinuation,
-        })
-      : eventStream;
     // The empty-completion guard sits OUTSIDE the terminal guard: a completed
     // turn with no text and no tool call is retried with the IDENTICAL request
     // (fetchTerminalGuardContinuation(parsed) replays the cached byte-identical
     // request — same body, same headers, same signal).
     const completionGuardedEventStream = emptyCompletionGuardEnabled
       ? guardEmptyCompletionEventStream({
-          firstEvents: advisorStream,
+          firstEvents: eventStream,
           continuation: fetchGuardedEmptyCompletionRetry,
           preserveRetryError: isContinuationBodyStall,
         })
-      : advisorStream;
+      : eventStream;
     const catalogGuardedEventStream = guardEmptyToolCatalogStream(completionGuardedEventStream, clientToolCatalog, translatorBudget);
     const guardedEventStream = routedCompaction && transportState.activeAdapter.name === "anthropic"
       ? guardCompactionSummary(catalogGuardedEventStream, translatorBudget) : catalogGuardedEventStream;
@@ -331,17 +318,6 @@ export async function deliverAdapterResponse(
         })) guardedEvents.push(event);
       } else {
         guardedEvents = recoveredEvents;
-      }
-      // Optional advisor guard — same semantics as the streaming branch above.
-      if (parsed._advisorGuard) {
-        const advisorEvents: AdapterEvent[] = [];
-        for await (const event of parsed._advisorGuard({
-          parsed,
-          translatorBudget,
-          firstEvents: (async function* () { yield* guardedEvents; })(),
-          continuation: fetchTerminalGuardContinuation,
-        })) advisorEvents.push(event);
-        guardedEvents = advisorEvents;
       }
       if (emptyCompletionGuardEnabled) {
         events = [];

@@ -3,7 +3,7 @@ import { createMessagesSseErrorFilter } from "./messages-sse-error-filter";
 import type { MessagesFailureVerdictSink } from "../claude/failure-verdict";
 import { upstreamErrorIsLocal } from "./request-log-failure-detail";
 import { boundedMessagesDisplayCount, ownedAnthropicErrorPayload, ownedAnthropicErrorResponse, messagesOverflowPresentation, messagesRelayedOverflowPresentation } from "../lib/messages-error-body";
-import { attachComboFailureEvidence, isProxyError, markProxyError } from "../lib/client-error-body";
+import { attachUpstreamFailureEvidence, isProxyError, markProxyError } from "../lib/client-error-body";
 import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../oauth/account-auto-pause";
 import { createPhysicalSendReporter } from "../lib/request-execution-budget";
 import { createInferenceSendBudget } from "./inference/context";
@@ -89,7 +89,6 @@ import { configuredAnthropicInstance } from "../providers/anthropic-instance";
 import { resolveProtocolSettings } from "../protocols/settings";
 import { addProtocolEntryReason, markProtocolBlocked } from "../protocols/trace";
 import type { OcxProviderTransport } from "../providers/xai-transport";
-import { preservesPhysicalComboProvider, resolveComboId } from "../combos";
 import { captureRouteStaticPolicy, routedProviderConfig, routeModel, type RouteResult } from "../router";
 import { POLICY_NAMESPACE, resolvePolicyProfileId } from "../routing/profile";
 import type { AnthropicClientIdentity } from "../adapters/anthropic/client-identity";
@@ -714,7 +713,7 @@ export async function handleNativeMessages(options: HandleNativeMessagesOptions)
                   && credentialGeneration(current.credential) === snapshot.generation
                   && current.credential.accountId === providerAccountUuid) {
                   bindAnthropicRefusalCredentialForSend(dispatched, sendOwner, providerAccountUuid);
-                  recordAnthropicAccountQuotaFromHeadersForInstance(nativeInstance!, snapshot.accountId, dispatched.headers, writerGeneration, dispatched.status, route.modelId, snapshot.generation);
+                  recordAnthropicAccountQuotaFromHeadersForInstance(nativeInstance!, snapshot.accountId, dispatched.headers, writerGeneration, dispatched.status, route.modelId);
                 }
               } catch { /* Passive observation must not fail the response. */ }
             }
@@ -1193,7 +1192,7 @@ function nativeMessagesErrorResponse(response: Response, bodyText: string, finis
     ...(replayRefusal ? { contract: "replay_refused" as const } : {}),
     ...(clientZenMessage === undefined ? {} : { localError: markProxyError({ message: clientZenMessage }) }),
   })), { status, headers });
-  attachComboFailureEvidence(out, JSON.stringify(legacy));
+  attachUpstreamFailureEvidence(out, JSON.stringify(legacy));
   return replayRefusal ? retainReplayRefusal(out) : out;
 }
 
@@ -1216,7 +1215,6 @@ export function nativeMessagesCountBody(
     // Combo and policy selectors are never eligible, and routing them would advance round-robin
     // state or run the policy evaluator for a request that sends nothing.
     if (resolvePolicyProfileId(config, selectorId) !== null || selectorId.startsWith(`${POLICY_NAMESPACE}/`)) return undefined;
-    if (!preservesPhysicalComboProvider(config) && resolveComboId(config, selectorId) !== null) return undefined;
     const route = routeModel(config, selectorId);
     route.staticPolicy = captureRouteStaticPolicy(
       route.providerName, route.modelId, route.provider, route.staticPolicy.effectiveAlias, "anthropic",

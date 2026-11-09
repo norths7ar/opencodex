@@ -17,7 +17,6 @@
  * a preview does not have; it is reported as `caller-credential-required`, never assumed.
  */
 import { resolveInboundModel } from "../claude/inbound-model-options";
-import { getCombo, preservesPhysicalComboProvider, resolveComboId } from "../combos";
 import { captureRouteStaticPolicy, routeConcreteModel, routeModel, type RouteResult } from "../router";
 import { getRoutingProfile, POLICY_NAMESPACE, resolvePolicyProfileId } from "../routing/profile";
 import { resolveWireProtocolOverride } from "../server/adapter-resolve";
@@ -64,13 +63,6 @@ function settleTargets(config: OcxConfig, modelId: string): SettledTargets | und
   if (policyId !== null || modelId.startsWith(`${POLICY_NAMESPACE}/`)) {
     const profile = policyId ? getRoutingProfile(config, policyId) : undefined;
     return profile ? { routeKind: "policy", routes: concreteRoutes(config, profile.candidates) } : undefined;
-  }
-  if (!preservesPhysicalComboProvider(config)) {
-    const comboId = resolveComboId(config, modelId);
-    if (comboId !== null) {
-      const combo = getCombo(config, comboId);
-      return combo ? { routeKind: "combo", routes: concreteRoutes(config, combo.targets) } : undefined;
-    }
   }
   try {
     return { routeKind: "direct", routes: [routeModel(config, modelId)] };
@@ -127,15 +119,11 @@ function candidateFor(
   let declineReasons: ProtocolReasonCode[] = [];
   let nativeEligible = false;
   let directEligible = false;
-  // With `nativeChatCombos` on, the combo loop judges each Chat candidate as the concrete route it
-  // is (PF-07), so the preview must too; a policy still resolves one candidate on the bridge.
-  const comboChildNative = inbound === "chat" && routeKind === "combo"
-    && resolveProtocolSettings(config).rollout.nativeChatCombos;
   const settled: RouteResult = {
     ...route,
     provider,
     staticPolicy,
-    ...(routeKind === "direct" || comboChildNative ? {} : { routeKind }),
+    ...(routeKind === "direct" ? {} : { routeKind }),
   };
   if (inbound === "chat") {
     const body = chatBodyForFeatures(features);
@@ -143,9 +131,7 @@ function candidateFor(
     nativeEligible = reason === undefined;
     if (reason) declineReasons = [reason];
     // The Antigravity direct lane, judged by the ingress's own rule, for a standalone route only:
-    // a combo child is dispatched from the full Responses body even when `nativeChatCombos`
-    // judges it as a concrete route above. A hosted web-search tool and the other body-content
-    // declines are not described by any Chat feature, so a preview cannot predict them.
+    // Hosted tools and other body-dependent declines are not described by any Chat feature, so a preview cannot predict them.
     directEligible = !nativeEligible && routeKind === "direct"
       && antigravityDirectDeclineReason(settled, { ...body, model: rows.routeSelector }, config) === undefined;
   } else if (inbound === "messages") {

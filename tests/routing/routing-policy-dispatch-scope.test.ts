@@ -68,7 +68,6 @@ async function execute(config: OcxConfig, options: {
   const scopes: Array<ReadonlySet<string> | undefined> = [];
   const routeKinds: string[] = [];
   const log: RequestLogContext = { attempts: [] };
-  let comboDispatches = 0;
   const runCore: NonNullable<PolicyFallbackDeps["runCore"]> = async (req, currentConfig, ctx, coreOptions = {}) => {
     selectors.push((await req.clone().json() as { model: string }).model);
     const budget = createTranslatorBudget();
@@ -77,7 +76,6 @@ async function execute(config: OcxConfig, options: {
       const prepared = await prepareResponsesRequest({ req, config: currentConfig, logCtx: ctx,
         options: { ...coreOptions, translatorBudget: budget } }, admission, {
         handleResponses: async () => { throw new Error("unexpected recursive dispatch"); },
-        handleComboResponses: async () => { comboDispatches += 1; throw new Error("policy candidate entered a combo"); },
       });
       if (prepared instanceof Response) return prepared;
       destinations.push(`${prepared.route.providerName}/${prepared.parsed.modelId}`);
@@ -104,21 +102,6 @@ async function execute(config: OcxConfig, options: {
 }
 
 describe("policy scope through real request preparation", () => {
-  test.each([false, true])("a concrete retry ignores a colliding combo alias (redirects=%s)", async redirects => {
-    const config = configFor();
-    config.combos = { hijack: { alias: "b/model", strategy: "round-robin", targets: [
-      { provider: "outside", model: "model" }, { provider: "d", model: "model" },
-    ] } };
-    if (redirects) config.blockedModelRedirects = { "unrelated/model": "a/model" };
-    const result = await execute(config);
-    expect(result.response.status).toBe(200);
-    expect(result.destinations).toEqual(["a/model", "b/model"]);
-    expect(result.comboDispatches).toBe(0);
-    // Compaction recovery reads the physical route kind, not the log's preserved decision.
-    expect(result.routeKinds).toEqual(["policy", "policy"]);
-    expect(result.log.routeDecision?.routeKind).toBe("policy");
-    expect(result.scopes[1]).toBe(result.scopes[0]);
-  });
 
   test("redirected candidates do not send the same physical destination twice", async () => {
     const config = configFor();

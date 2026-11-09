@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearComboSelectionState } from "../../src/combos";
 import { isProtocolTraceV1, parseProtocolTraceV1, type ProtocolPlanV1, type ProtocolTraceV1 } from "../../src/protocols/dto";
 import { planProtocol, type ProtocolPlanInput } from "../../src/protocols/plan";
 import { shadowPlanMismatch } from "../../src/protocols/shadow";
@@ -27,11 +26,9 @@ beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   testDir = mkdtempSync(join(tmpdir(), "ocx-shadow-plan-"));
   process.env.OPENCODEX_HOME = testDir;
-  clearComboSelectionState();
 });
 
 afterEach(() => {
-  clearComboSelectionState();
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
   if (testDir) removeTreeWithRetry(testDir);
@@ -106,24 +103,6 @@ describe("shadowPlanMismatch", () => {
       responsePath: ["messages", "ir", "chat"],
     });
     expect(shadowPlanMismatch(plan, encoded, { provider: "c", model: "m9" })).toBe(false);
-  });
-
-  test("a combo is compared against the target that answered, not the first one listed", () => {
-    const plan = planProtocol(planInput({
-      routeKind: "combo",
-      candidates: [
-        { provider: "a", model: "m1", adapter: "openai-chat", nativeEligible: false, declineReasons: ["combo-or-policy-route"] },
-        { provider: "r", model: "m3", adapter: "openai-responses", nativeEligible: false, declineReasons: [] },
-      ],
-    }));
-    const failedOver = trace({
-      mode: "translated",
-      upstream: "responses",
-      requestPath: ["chat", "responses"],
-      responsePath: ["responses", "chat"],
-    });
-    expect(shadowPlanMismatch(plan, failedOver, { provider: "r", model: "m3" })).toBe(false);
-    expect(shadowPlanMismatch(plan, failedOver, {})).toBe(true);
   });
 
   test("a blocked trace agrees only with a blocked plan; a compatibility reject is not compared", () => {

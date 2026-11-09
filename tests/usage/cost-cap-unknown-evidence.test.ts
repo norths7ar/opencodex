@@ -28,7 +28,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { flushConfigDirHardeningForTests } from "../../src/config/paths";
 import { flushWindowsSecretAclReapsBeforeRemoval } from "../../src/lib/windows-secret-acl";
-import { resetLabActivationForTests } from "../../src/lib/lab-activation";
 import { costEvidenceForCandidate } from "../../src/routing/cost";
 import { clearHealthHistoryCacheForTests } from "../../src/routing/health";
 import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
@@ -52,7 +51,6 @@ beforeEach(() => {
 
 afterEach(async () => {
   try {
-    resetLabActivationForTests();
     // Dry-run health evidence opens the SQLite history index for this home. ACL
     // settlement does not close that handle or invalidate the cross-case health cache.
     closeRequestHistoryIndex();

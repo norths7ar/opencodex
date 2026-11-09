@@ -1,4 +1,3 @@
-import { Trans } from "../i18n/provider";
 import { useT } from "../i18n/shared";
 import { Select, type SelectOption } from "../ui";
 
@@ -27,46 +26,6 @@ export function SettingToggle({
       />
       <span className="slider" aria-hidden="true" />
     </label>
-  );
-}
-
-export function AutoConnectSetting({
-  supported,
-  checked,
-  onChange,
-}: {
-  supported: boolean;
-  checked: boolean;
-  onChange: (value: boolean) => void;
-}) {
-  const t = useT();
-  const unsupportedDescriptionId = supported ? undefined : "claude-system-env-unsupported";
-
-  return (
-    <div className="setting-row">
-      <div className="setting-label">
-        <span className="title">{t("claude.systemEnv")}</span>
-        {supported ? (
-          <span className="desc">{t("claude.systemEnvDesc")}</span>
-        ) : (
-          <span className="desc" id={unsupportedDescriptionId}>
-            <Trans k="claude.systemEnvUnsupported" cmd="ocx claude" />
-          </span>
-        )}
-        {supported && checked && (
-          <span className="desc" style={{ color: "var(--red)" }}>
-            {t("claude.systemEnvWarn")}
-          </span>
-        )}
-      </div>
-      <SettingToggle
-        label={t("claude.systemEnv")}
-        checked={supported && checked}
-        disabled={!supported}
-        describedBy={unsupportedDescriptionId}
-        onChange={onChange}
-      />
-    </div>
   );
 }
 

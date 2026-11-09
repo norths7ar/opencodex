@@ -8,7 +8,7 @@ export const COMPATIBILITY_DISPOSITIONS = [
 ] as const;
 
 export type CompatibilityDisposition = typeof COMPATIBILITY_DISPOSITIONS[number];
-export type CompatibilityEvidenceKind = "fixture" | "lab-scenario";
+export type CompatibilityEvidenceKind = "fixture";
 
 export interface CompatibilityEvidenceRefV1 {
   kind: CompatibilityEvidenceKind;
@@ -52,7 +52,7 @@ export interface CompatibilityManifestV1 {
 const ID_PATTERN = /^[a-z0-9][a-z0-9._-]{0,127}$/;
 const FEATURE_PATTERN = /^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)+$/;
 const DISPOSITIONS = new Set<string>(COMPATIBILITY_DISPOSITIONS);
-const EVIDENCE_KINDS = new Set<string>(["fixture", "lab-scenario"]);
+const EVIDENCE_KINDS = new Set<string>(["fixture"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
@@ -151,7 +151,7 @@ function checkEvidence(value: unknown, path: string, issues: string[]): void {
     }
     checkKnownKeys(raw, ["kind", "id", "assertionIds"], evidencePath, issues);
     if (!EVIDENCE_KINDS.has(String(raw.kind))) {
-      issues.push(`${evidencePath}.kind must be fixture or lab-scenario`);
+      issues.push(`${evidencePath}.kind must be fixture`);
     }
     const id = checkId(raw.id, `${evidencePath}.id`, issues) ? raw.id : "";
     const assertionIds = raw.assertionIds;
@@ -167,8 +167,7 @@ function checkEvidence(value: unknown, path: string, issues: string[]): void {
 }
 
 /**
- * Validate one versioned compatibility manifest without importing provider or Lab state.
- * Keeping this as a leaf lets future CLI/GUI readers load contracts without activating Lab.
+ * Validate one versioned compatibility manifest without importing provider state.
  */
 export function compatibilityManifestIssues(value: unknown): string[] {
   const issues: string[] = [];

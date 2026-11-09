@@ -79,7 +79,7 @@ export async function fetchAnthropicAccountQuota(
       ...(!result ? { unavailable: true as const } : {}), isCurrent,
       ...(!result && failure ? { quotaFailure: failure, quotaFailureIsCurrent: isCurrent } : {}),
     };
-    if (isCurrent() && mayCommitAccountQuotaKey(key, writerGeneration)) { accountQuotaCache.set(key, entry); result?.publishDecisionQuota(); sweepExpiredOnWrite(entry.ts); }
+    if (isCurrent() && mayCommitAccountQuotaKey(key, writerGeneration)) { accountQuotaCache.set(key, entry); sweepExpiredOnWrite(entry.ts); }
     return entry;
   };
   const probe = (async (): Promise<AccountQuotaCacheEntry> => {

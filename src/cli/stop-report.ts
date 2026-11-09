@@ -1,20 +1,20 @@
 /**
- * Structured summary for `ocx stop --json` (D4 of the app runtime ownership unit).
- *
- * The desktop shell drives the real `ocx stop` as a child process so the receipt-backed
- * teardown, the drain, the Windows respawn verification and the client-config restore run
- * exactly as they do from a terminal. This module makes that run's RESULT readable from
- * outside: a StopRunRecord is threaded through the existing stop path in
- * src/cli/index.ts (the same booleans that already decide the exit code), and
- * summarizeStopRun turns it into one versioned JSON document.
+ * Structured summary of the receipt-backed drain and client config restoration.
  *
  * Nothing here re-decides anything. If a field of the record is wrong, the fix belongs
  * in the stop path, not in the summarizer.
  */
-import { STOP_HISTORY_DEFERRED_EXIT_CODE } from "../update/stop-contract.mjs";
+/** Exit codes distinguish history-only failure from a teardown refused before changing state. */
+export const STOP_HISTORY_INCOMPLETE_EXIT_CODE = 79;
+export const STOP_HISTORY_DEFERRED_EXIT_CODE = 80;
 
 /** Wire version of the stop summary document. */
 export const STOP_SUMMARY_SCHEMA = "ocx-stop/1";
+
+export function parseStopArgs(argv: string[]): { ok: true; json: boolean } | { ok: false } {
+  if (!argv.every(arg => arg === "--json")) return { ok: false };
+  return { ok: true, json: argv.length > 0 };
+}
 
 export type StopServiceOutcome =
   | "absent"
@@ -67,7 +67,7 @@ export interface StopSummaryJson {
   schema: typeof STOP_SUMMARY_SCHEMA;
   /** Strict exit-code view: true only for exit 0. */
   ok: boolean;
-  outcome: "stopped" | "not-running" | "history-incomplete" | "history-deferred" | "failed" | "approval-changed" | "manager-still-active";
+  outcome: "stopped" | "not-running" | "history-incomplete" | "history-deferred" | "failed";
   exitCode: number;
   /** True when this stop left no proxy of this home running by its own paths. */
   runtimeDown: boolean;
@@ -76,11 +76,6 @@ export interface StopSummaryJson {
   sharedTeardown: StopSharedTeardownOutcome;
   /** One stable human-readable line for a caller's UI. */
   message: string;
-  /**
-   * The single guard fact that failed on a `approval-changed` refusal, when the
-   * run can name one. Additive on `ocx-stop/1`; absent on every other outcome.
-   */
-  detail?: string;
 }
 
 /** What handleStop returns: the pre-existing boolean plus the structured twin. */

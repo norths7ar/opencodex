@@ -11,7 +11,6 @@ import * as fs from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, sep } from "node:path";
 import { autoRestoreCodexShim, installCodexShim, uninstallCodexShim } from "../../src/codex/shim";
-import { createWorkerCommitWindow, createCodexCliUpdateFence, codexCliUpdateSelectionGate } from "../../src/codex/cli-update-selection-gate";
 import { sameFingerprint, stableShimPathProbe } from "../../src/codex/shim-fingerprint";
 import { ownedWrapperFingerprint, wrapperInodeIsOurs } from "../../src/codex/shim-wrapper-write";
 import { readBoundedRegularFile } from "../../src/codex/shim-state-file";
@@ -23,37 +22,6 @@ import { isolateCodexShimEnvironment } from "../helpers/codex-shim-install-fixtu
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 
 isolateCodexShimEnvironment();
-
-test("all Windows public shim writers refuse a held Worker commit gate before preflight", () => {
-  const original = Object.getOwnPropertyDescriptor(process, "platform")!;
-  Object.defineProperty(process, "platform", { value: "win32", configurable: true });
-  const window = createWorkerCommitWindow({ gate: codexCliUpdateSelectionGate(), fence: createCodexCliUpdateFence() });
-  let enabledReads = 0;
-  try {
-    expect(window.tryEnter()).toBe(true);
-    expect(installCodexShim()).toMatchObject({ installed: false, refused: true, message: "codex_cli_selection_busy" });
-    expect(autoRestoreCodexShim({ enabled: () => { enabledReads++; return true; } }))
-      .toMatchObject({ status: "deferred", message: "codex_cli_selection_busy" });
-    expect(uninstallCodexShim()).toEqual({ removed: false, message: "codex_cli_selection_busy" });
-    expect(enabledReads).toBe(0);
-  } finally { window.exit(); Object.defineProperty(process, "platform", original); }
-});
-
-const platform = Object.getOwnPropertyDescriptor(process, "platform")!;
-const previousHome = process.env.OPENCODEX_HOME;
-let dir = "";
-
-beforeEach(() => {
-  dir = fs.mkdtempSync(join(tmpdir(), "ocx-win-shim-revision-"));
-  process.env.OPENCODEX_HOME = dir;
-});
-
-afterEach(() => {
-  Object.defineProperty(process, "platform", platform);
-  if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-  else process.env.OPENCODEX_HOME = previousHome;
-  removeTreeWithRetry(dir);
-});
 
 test("shim probe rejects adjacent NTFS-sized file identities", () => {
   const path = join(dir, "launcher");

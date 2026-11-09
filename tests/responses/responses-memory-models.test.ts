@@ -11,7 +11,6 @@ import { MODEL_NOT_ALLOWED_FOR_KEY } from "../../src/server/admission-model-scop
 import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
 import { configSchema } from "../../src/config/schema/config-schema";
 import { warnDegradedMemoryModels } from "../../src/config/load-degrade";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import type { OcxConfig, OcxParsedRequest } from "../../src/types";
 import type { ServerWebSocket } from "bun";
@@ -83,8 +82,6 @@ afterEach(() => {
   releaseSpendHome?.();
   releaseSpendHome = undefined;
   globalThis.fetch = originalFetch;
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
 });
 
 describe("memory phase detection", () => {
@@ -453,26 +450,5 @@ describe("memory model routing", () => {
     expect(response.status).toBe(403);
     expect((await response.json() as { error: { type: string } }).error.type).toBe(MODEL_NOT_ALLOWED_FOR_KEY);
     expect(calls).toEqual([]);
-  });
-
-  test("the phase decision survives the combo handoff", async () => {
-    const settings = config();
-    settings.combos = { memory: { targets: [{ provider: "gateway", model: "cheap" }] } };
-    settings.memoryModels = { extract: { model: "combo/memory", reasoningEffort: "high" } };
-    const calls: Array<Record<string, any>> = [];
-    globalThis.fetch = (async (_input: unknown, init?: RequestInit) => {
-      calls.push(JSON.parse(String(init?.body)));
-      return Response.json(completion());
-    }) as typeof fetch;
-    const logCtx = { model: "", provider: "" } as RequestLogContext;
-    const response = await handleResponses(request(body(), extractMetadata()), settings, logCtx);
-    expect(response.status).toBe(200);
-    await response.text();
-    expect(calls[0]!.model).toBe("cheap");
-    expect(calls[0]!.reasoning.effort).toBe("high");
-    // The dispatcher receives the concrete target; requestedModel keeps the original client selector.
-    // The phase itself remains named in the route decision.
-    expect(logCtx.requestedModel).toBe("gpt-5.6-luna");
-    expect(logCtx.routeDecision?.selected.reason).toBe("memory-extract");
   });
 });

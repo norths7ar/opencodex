@@ -366,65 +366,12 @@ describe("routed compaction emergency integration", () => {
     } else expect(json.error.code).toBe("context_length_exceeded");
   });
 
-  test.each([false, true])("externally booked source settles once (transient=%s)", async transient => {
-    const config = settings();
-    config.providers.source = { adapter: "openai-chat", authMode: "key", apiKey: "fixture-only", baseUrl: "https://source.example/v1", ...(transient ? { transientRetryOn5xx: { attempts: 3 } } : {}) };
-    let sourceRequests = 0;
-    globalThis.fetch = (async () => {
-      sourceRequests++;
-      return Response.json({ error: { code: "context_length_exceeded", message: "Source context is full" } }, { status: 400 });
-    }) as typeof fetch;
-    const budget = createRequestExecutionBudget({ maxTotalModelSends: 2, baseSendAllowance: 2, finalRecoveryAllowance: 0, maxAlternateTargetSends: 1, maxTargetTransitions: 1 });
-    const reservation = budget.reserveDispatch({ sendClass: "initial", targetKey: "source/swe-2", countedExternally: true });
-    expect(reservation.allowed).toBe(true);
-    if (!reservation.allowed) throw new Error("synthetic source reservation refused");
-    const response = await handleResponses(request(), config, { model: "", provider: "" }, {
-      sendBudget: budget, comboDispatchPermit: reservation.permit,
-    });
-    expect((await response.json()).status).toBe("completed");
-    expect(sourceRequests).toBe(1);
-    expect(calls.map(call => call.model)).toEqual(["rescue"]);
-    expect(budget.used).toBe(2);
-    expect(reservation.permit.assumeCharge()).toBe(false);
-    reservation.permit.release();
-    expect(budget.used).toBe(2);
-  });
-
   test("runTurn emergency consumes its prepaid permit once rather than taking another send", async () => {
     const budget = createRequestExecutionBudget({ maxTotalModelSends: 2, baseSendAllowance: 2, finalRecoveryAllowance: 0, maxAlternateTargetSends: 1, maxTargetTransitions: 1 });
     const response = await handleResponses(request(), settings(), { model: "", provider: "" }, { sendBudget: budget });
     expect((await response.json()).status).toBe("completed");
     expect(calls.map(call => call.model)).toEqual(["swe-2", "rescue"]);
     expect(budget.used).toBe(2);
-  });
-
-  test.each(["error", "eof"])("retained v2 compaction combo stops after a replay-unsafe runTurn %s", async outcome => {
-    sourceEvents = [{ type: "heartbeat", replayUnsafe: true }, ...(outcome === "error" ? [sourceError] : [])];
-    const config = settings();
-    config.reasoningRetention = { enabled: true };
-    config.compactionRecovery = undefined;
-    config.combos = { [`retained-unsafe-${outcome}`]: {
-      strategy: "failover", targets: [
-        { provider: "source", model: "swe-2" },
-        { provider: "emergency", model: "rescue" },
-      ],
-    } };
-    const payload: Record<string, unknown> = { ...body(true), model: `combo/retained-unsafe-${outcome}` };
-    (payload.input as unknown[]).unshift({ type: "reasoning", summary: [
-      { type: "summary_text", text: "Preserve the exact reasoning without replaying local side effects." },
-    ] });
-    const translatorBudget = createTranslatorBudget();
-    try {
-      const response = await handleResponses(request(payload), config, { model: "", provider: "" }, { translatorBudget });
-      const text = await response.text();
-      expect(calls.map(call => call.model)).toEqual(["swe-2"]);
-      // Preserve the adapter's explicit rejection status; EOF has no such status.
-      expect(response.status).toBe(outcome === "error" ? 400 : 502);
-      expect(isNonReplayableResponse(response)).toBe(true);
-      expect(text).toContain(outcome === "error" ? "Source rejected compact fixture" : "Adapter ended before producing a response");
-    } finally {
-      translatorBudget.dispose();
-    }
   });
 
   test("emergency transient 5xx retry cannot exceed the shared cap", async () => {

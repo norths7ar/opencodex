@@ -99,7 +99,7 @@ function CompatibilityPanel({ apiBase, active }: { apiBase: string; active: bool
     {error && <InlineBanner tone="err" role="alert"><p className="m-0">{t(error in errorLabel ? errorLabel[error as keyof typeof errorLabel] : "desktopCompat.error")}</p><code className="text-[12px] text-fg-muted">{error}</code></InlineBanner>}
     {done && <InlineBanner tone="ok" role="status">{t("desktopCompat.done")}</InlineBanner>}
     {certificate.data?.supported && (!authorized || pairingStarted) && <div className="acc-desktop__card">
-      <ConnectPairingForm local target={standaloneApiTargets(apiBase).machine}
+      <ConnectPairingForm target={standaloneApiTargets(apiBase).machine}
         onPairingStart={() => { setPairingStarted(true); setChoice(null); setAcknowledged(false); setDone(false); }}
         onConnected={signal => validateCompatibilityPairing(apiBase, signal)}
         onCommitted={() => { setPairingStarted(false); void execute(); }} />
@@ -155,9 +155,8 @@ function CompatibilityPanel({ apiBase, active }: { apiBase: string; active: bool
   </section>;
 }
 
-export default function CodexDesktopCompatibility(props: { apiBase: string; active: boolean; connected?: boolean }) {
+export default function CodexDesktopCompatibility(props: { apiBase: string; active: boolean }) {
   const { t } = useI18n();
-  if (props.connected) return <section className="panel acc-desktop flex flex-col gap-4"><h2>{t("desktopCompat.title")}</h2><InlineBanner tone="warn">{t("desktopCompat.connectedUnavailable")}</InlineBanner></section>;
   // Never carry a certificate fingerprint or outstanding confirmation to another host.
   return <CompatibilityPanel key={props.apiBase} {...props} />;
 }

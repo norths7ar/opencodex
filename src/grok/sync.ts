@@ -74,6 +74,5 @@ export async function syncGrokConfig(
     excluded: new Set(config.grokExcludedModels ?? []),
     catalogModelIds: projection.catalogModelIds,
     disabledProviderNamespaces: projection.disabledProviderNamespaces,
-    comboPublicModelIds: projection.comboPublicModelIds,
   });
 }

@@ -37,11 +37,9 @@ import {
   type DesktopRestartLockIo,
 } from "./desktop-app/lock";
 import { rootShells, type DesktopAppAdapter, type DesktopExec, type DesktopProcess } from "./desktop-app/types";
-import { darwinDesktopAppAdapter, darwinDefaultExec } from "./desktop-app/darwin";
-import { linuxDesktopAppAdapter, linuxDefaultExec } from "./desktop-app/linux";
 import { windowsDesktopAppAdapter, windowsDefaultExec } from "./desktop-app/windows";
 import { isTestHomeGuardArmed } from "../lib/test-home-guard";
-import { beginCodexCliSelectionParentWrite, withCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } from "./cli-update-selection-gate";
+import { beginCodexCliSelectionParentWrite, withCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } from "./cli-selection";
 
 export type { DesktopAppExecOptions } from "./desktop-app/types";
 
@@ -105,8 +103,6 @@ export interface DesktopAppRestartResult {
 }
 
 const ADAPTERS: Partial<Record<NodeJS.Platform, { adapter: DesktopAppAdapter; exec: DesktopExec }>> = {
-  darwin: { adapter: darwinDesktopAppAdapter, exec: darwinDefaultExec },
-  linux: { adapter: linuxDesktopAppAdapter, exec: linuxDefaultExec },
   win32: { adapter: windowsDesktopAppAdapter, exec: windowsDefaultExec },
 };
 

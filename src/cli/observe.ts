@@ -23,10 +23,6 @@ import { selectUsageModelView, takeUsageSearchOption } from "./usage-model-searc
 import { USAGE_RANGES, USAGE_SURFACES, type UsageSummary, type UsageFilterEcho } from "../usage/summary";
 import { parseUsageTimeWindow, type UsageTimeWindow } from "../usage/time-range";
 import { redactSecretString } from "../lib/redact";
-import { readClientConnectionState, sameClientConnectionOwner } from "../client/state";
-import { readServiceApiTokenState } from "../lib/service-secrets";
-import { fetchHubUsage } from "../client/hub-client";
-import type { HubUsageReport } from "../remote/hub-usage";
 
 const USAGE = `Usage:
   ocx observe logs [--provider <name>] [--model <id>] [--status <code>]
@@ -206,43 +202,17 @@ async function usage(argv: string[], deps: RuntimeApiDeps): Promise<void> {
   }
   rejectArgs(args.map(redactSecretString), USAGE);
   const suffix = query({ range, surface, provider, model, apiKeyId, since: window?.since, until: window?.until });
-  const connection = readClientConnectionState();
-  let result: (UsageSummary & { filter?: UsageFilterEcho }) | HubUsageReport;
-  if (connection.kind === "invalid" || connection.kind === "mismatched") {
-    throw new Error(`Client usage unavailable: ${connection.reason}`);
-  }
-  if (connection.kind === "connected") {
-    if (apiKeyId !== undefined) throw new CliUsageError("--api-key-id is unavailable on connected clients; run on the hub for a selected key, or omit it for this client's usage", USAGE);
-    const token = readServiceApiTokenState();
-    if (token.kind !== "present" || token.fingerprint !== connection.value.tokenFingerprint) {
-      throw new Error("Client usage unavailable: the enrolled data key is missing or changed; repair the client connection");
+  let result: UsageSummary & { filter?: UsageFilterEcho };
+  if (apiKeyId === undefined) result = await runtimeRequest<UsageSummary>(`/api/usage${suffix}`, {}, deps);
+  else {
+    try {
+      result = await runtimeRequest<UsageSummary & { filter?: UsageFilterEcho }>(`/api/usage${suffix}`, { redirect: "error", credentials: "omit" }, deps);
+    } catch (error) {
+      if (error instanceof RuntimeApiError && error.code === "proxy_not_running") throw error;
+      throw new Error("Key-scoped usage could not be read. Check runtime access and retry.");
     }
-    // A Remote Link Child sends this read through the connection-bound link relay (#6957).
-    const link = connection.value.transport === "link" && connection.value.link;
-    const peerFetch = deps.fetchImpl
-      ?? (link ? (await import("../client/link-home")).linkBoundFetch(connection.value, token.token) : undefined);
-    result = await fetchHubUsage(connection.value.serverUrl, token.token, new URLSearchParams(suffix), {
-      fetchImpl: peerFetch, timeoutMs: 60_000, ...(link ? { peer: "Home" as const } : {}),
-    });
-    const current = readClientConnectionState();
-    const currentToken = readServiceApiTokenState();
-    if (current.kind !== "connected" || !sameClientConnectionOwner(current.value, connection.value)
-      || current.value.tokenFingerprint !== token.fingerprint
-      || currentToken.kind !== "present" || currentToken.fingerprint !== token.fingerprint) {
-      throw new Error("Client connection changed while reading usage; retry for the current connection");
-    }
-  } else {
-    if (apiKeyId === undefined) result = await runtimeRequest<UsageSummary>(`/api/usage${suffix}`, {}, deps);
-    else {
-      try {
-        result = await runtimeRequest<UsageSummary & { filter?: UsageFilterEcho }>(`/api/usage${suffix}`, { redirect: "error", credentials: "omit" }, deps);
-      } catch (error) {
-        if (error instanceof RuntimeApiError && error.code === "proxy_not_running") throw error;
-        throw new Error("Key-scoped usage could not be read. Check runtime access and retry.");
-      }
-      if (result?.filter?.apiKeyId !== apiKeyId) {
-        throw new Error("The server did not confirm the requested API key scope. Upgrade and restart the proxy, then retry.");
-      }
+    if (result?.filter?.apiKeyId !== apiKeyId) {
+      throw new Error("The server did not confirm the requested API key scope. Upgrade and restart the proxy, then retry.");
     }
   }
   // Older daemons ignore custom bounds and return successful preset reports.

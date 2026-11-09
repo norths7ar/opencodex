@@ -1,4 +1,3 @@
-import type { ComboExclusionReasons } from "../../combos/resolve";
 import { markProxyError } from "../../lib/client-error-body";
 import { formatClientRetryAfter } from "../../lib/client-retry-after";
 import { readBoundedResponseBody } from "../../lib/bounded-body";
@@ -11,7 +10,6 @@ import {
   DecompressedBodyTooLargeError,
   describeInboundBodyRefusal,
 } from "../request-decompress";
-import { comboCooldownRetryAfterSeconds, NoAvailableComboTargetsError } from "../../combos";
 import type { AgentTaskRecoveryFailureReason } from "./agent-task-recovery";
 
 /**
@@ -100,33 +98,6 @@ export function decodeRequestErrorResponse(err: unknown, label: string): Respons
 
 
 
-export function comboUnavailableResponse(
-  message: string,
-  options?: { retryAfter?: string | null; presentation?: "combo" },
-): Response {
-  const headers = new Headers({ "Content-Type": "application/json" });
-  // Advice leaves in this proxy's format, whatever form the earliest cooldown was recorded in.
-  const advice = formatClientRetryAfter(options?.retryAfter);
-  if (advice !== undefined) headers.set("Retry-After", advice);
-  return markProxyError(new Response(
-    JSON.stringify({
-      error: { message, type: "server_error", code: "combo_unavailable" },
-    }),
-    { status: 503, headers },
-  ), options?.presentation);
-}
-
-
-export function comboUnavailable(comboId: string, now = Date.now(), reasons?: ComboExclusionReasons): Response {
-  return comboUnavailableResponse(new NoAvailableComboTargetsError(comboId, reasons).message, {
-    retryAfter: comboCooldownRetryAfterSeconds(comboId, now),
-    presentation: reasons === undefined ? undefined : "combo",
-  });
-}
-
-
-
-
 /**
  * Build the 499 JSON error the proxy returns when the client disconnects before the
  * response completes (`client_cancelled`).
@@ -153,9 +124,9 @@ export function anthropicPoolCooldownResponse(
     retryAfterSeconds: number | null;
     usageLimit: { readonly resetsAt: number | null } | null;
   },
-  options: { comboAttempt?: boolean; logCtx?: { errorCode?: string } } = {},
+  options: { logCtx?: { errorCode?: string } } = {},
 ): Response {
-  if (refusal.usageLimit !== null && !options.comboAttempt) {
+  if (refusal.usageLimit !== null) {
     if (options.logCtx) options.logCtx.errorCode = "usage_limit_reached";
     return markProxyError(formatUsageLimitReachedResponse(refusal.message, refusal.usageLimit.resetsAt, refusal.retryAfterSeconds), refusal.usageLimit.resetsAt === null ? undefined : "usage");
   }
@@ -176,24 +147,6 @@ export function unreadableEncryptedAgentTaskResponse(reason?: AgentTaskRecoveryF
         type: "invalid_request_error",
         code: "unreadable_encrypted_agent_task",
         ...(reason === undefined ? {} : { recovery_reason: reason }),
-      },
-    }),
-    { status: 400, headers: { "Content-Type": "application/json" } },
-  ));
-}
-
-
-export const TARGET_INCOMPATIBLE_MESSAGE =
-  "No remaining combo target can continue this tool-bearing history because the reasoning required for replay is unavailable after the serving route changed. Start a new conversation or configure a combo target that can consume the available reasoning.";
-
-
-export function targetIncompatibleResponse(): Response {
-  return markProxyError(new Response(
-    JSON.stringify({
-      error: {
-        message: TARGET_INCOMPATIBLE_MESSAGE,
-        type: "invalid_request_error",
-        code: "target_incompatible",
       },
     }),
     { status: 400, headers: { "Content-Type": "application/json" } },

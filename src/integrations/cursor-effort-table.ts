@@ -40,11 +40,9 @@ export interface CursorEffortTable {
 const BUNDLE_MAX_BYTES = 32 * 1024 * 1024;
 
 /** Bundle path under the install root cursor-detect reports. */
-export function cursorAgentBundlePath(install: Pick<CursorInstall, "path">, platform: string = process.platform): string {
+export function cursorAgentBundlePath(install: Pick<CursorInstall, "path">): string {
   const tail = ["extensions", "cursor-agent-exec", "dist", "main.js"];
-  return platform === "darwin"
-    ? join(install.path, "Contents", "Resources", "app", ...tail)
-    : join(install.path, "resources", "app", ...tail);
+  return join(install.path, "resources", "app", ...tail);
 }
 
 /**
@@ -110,13 +108,11 @@ function splitStrings(list: string): string[] {
 }
 
 export interface CursorEffortTableDeps {
-  platform: string;
   readBundle(path: string, cached?: { mtimeMs: number; size: number }): { mtimeMs: number; size: number; text: string | null } | null;
 }
 
 export function realCursorEffortTableDeps(): CursorEffortTableDeps {
   return {
-    platform: process.platform,
     readBundle: readCursorBundle,
   };
 }
@@ -156,7 +152,7 @@ let cache: { key: string; path: string; mtimeMs: number; size: number; table: Cu
 /** Table from the Private Inference install, else null (caller falls back to the static mirror). */
 export function loadCursorEffortTable(install: CursorInstall | undefined, deps: CursorEffortTableDeps = realCursorEffortTableDeps()): CursorEffortTable | null {
   if (!install) return null;
-  const bundlePath = cursorAgentBundlePath(install, deps.platform);
+  const bundlePath = cursorAgentBundlePath(install);
   const cachedMetadata = cache?.path === bundlePath
     ? { mtimeMs: cache.mtimeMs, size: cache.size }
     : undefined;

@@ -9,19 +9,18 @@ export function interceptStartRefusal(ctx: ManagementContext): Response | null {
 }
 
 export async function ensureManagementClaudeIntercept(ctx: ManagementContext): Promise<ClaudeInterceptOutcome> {
-  if (ctx.config.runtimeRole === "client") return { ok: false, reason: "client_role" };
   if (!claudeInterceptEnabled(ctx.config)) return { ok: false, reason: "disabled" };
   if (ctx.deps.ensureClaudeIntercept) return ctx.deps.ensureClaudeIntercept();
   const injected = ctx.deps.getClaudeInterceptState?.();
   if (injected) return { ok: true, state: injected };
-  const listener = ctx.deps.linkListener?.();
-  if (listener?.ensureClaudeIntercept) return listener.ensureClaudeIntercept();
+  const listener = ctx.deps.claudeIntercept?.();
+  if (listener) return listener.ensure();
   const state = (ctx.deps.getClaudeInterceptState ?? getClaudeInterceptState)();
   return state ? { ok: true, state } : { ok: false, reason: "failed" };
 }
 
 export function interceptStatus(ctx: ManagementContext): { interceptReason: string | null; pickerReason: string | null; pickerFailurePort?: number; interceptFailurePort?: number } {
-  const outcome = ctx.deps.linkListener?.()?.claudeInterceptOutcome?.();
+  const outcome = ctx.deps.claudeIntercept?.()?.lastOutcome();
   const state = (ctx.deps.getClaudeInterceptState ?? getClaudeInterceptState)();
   return { ...(outcome && !outcome.ok ? { interceptFailurePort: outcome.port } : {}), interceptReason: outcome && !outcome.ok ? outcome.reason : null, pickerReason: state?.pickerReason ?? null, pickerFailurePort: state?.pickerFailurePort };
 }

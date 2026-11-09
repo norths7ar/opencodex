@@ -61,15 +61,6 @@ import { resolveQoderProfile } from "../../adapters/qoder/profiles";
 import { fetchDevinUsableModels } from "../../adapters/devin/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  quotaInactiveReason,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
-import {
   ProviderOutboundPolicyError,
   providerOutboundGet,
   providerOutboundPost,
@@ -91,9 +82,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { createAdmissionGate, ResourceAdmissionError, type AdmissionMetrics } from "../../lib/admission";
 import { CODEX_CUSTOM_MODEL_CATALOG_KIND, JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
-import { disabledNativeSlugs, hasComboTargets, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
-import type { ComboCatalogOmission } from "./aggregation";
+import { disabledNativeSlugs, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
+import { normalizedOpenAiApiSignature, openAiApiCollisionWarnings } from "./aggregation";
 import type { CatalogGatherProviderAuthEvidence } from "./filesystem-evidence";
 import type {
   CatalogAdmissionSnapshot,
@@ -105,7 +95,6 @@ import type {
   CatalogTrustedOpenAiApiPolicySnapshot,
 } from "../convergence-types";
 import { modelCapabilities, modelInputModalities } from "./model-hints";
-import { configuredComboTargetModelsByProvider } from "./combo-member";
 import { resolveModelPolicy } from "../../providers/resolved-model-policy";
 
 /** Concurrent gatherRoutedModels callers with the same catalog identity share one live discovery.
@@ -167,13 +156,6 @@ export interface CapturedProviderGather {
    * discovery started for this one, even when both accounts share an API host.
    */
   readonly refreshingOAuthAccountId?: string;
-  /**
-   * Configured model ids this provider must keep even when live discovery omits
-   * them — combo targets that are also listed in providers.*.models (OCX-111).
-   * Combo-only ids (not in models[]) stay out of the public catalog and are
-   * synthesized for combo derivation instead (#1305).
-   */
-  readonly retainConfiguredModelIds?: ReadonlySet<string>;
 }
 
 export interface GatherFlightCapture {
@@ -356,7 +338,6 @@ export function captureProviderGather(
   name: string,
   configured: OcxProviderConfig,
   authResolver: ModelsAuthResolver,
-  retainConfiguredModelIds?: ReadonlySet<string>,
   config?: Pick<OcxConfig, "providers">,
 ): CapturedProviderGather {
   const metadataConfigDir = getConfigDir();
@@ -446,9 +427,6 @@ export function captureProviderGather(
     effectiveAlias,
     ...(observedAuth ? { observedAuth: Object.freeze({ ...observedAuth }) } : {}),
     ...(refreshingOAuthAccountId ? { refreshingOAuthAccountId } : {}),
-    ...(retainConfiguredModelIds && retainConfiguredModelIds.size > 0
-      ? { retainConfiguredModelIds }
-      : {}),
   });
 }
 export function captureGatherFlight(
@@ -457,16 +435,13 @@ export function captureGatherFlight(
 ): GatherFlightCapture {
   const providerAuthOutcomes: CatalogGatherProviderAuthOutcome[] = [];
   const authResolver = createAuthResolver(providerAuthOutcomes);
-  const comboTargetsByProvider = configuredComboTargetModelsByProvider(config);
   const providers = Object.entries(config.providers)
-    // A decision service (canonical TypeSafe or a self-hosted `jev-decision` row) owns no model
     // transport: never probe its endpoint for /models and never publish its model id as routable.
-    .filter(([, provider]) => provider.disabled !== true && provider.adapter !== "jev-decision")
+    .filter(([, provider]) => provider.disabled !== true)
     .map(([name, provider]) => captureProviderGather(
       name,
       provider,
       authResolver,
-      comboTargetsByProvider.get(name),
       config,
     ));
   const discoveryPolicySnapshots = Object.freeze(providers.map(provider => provider.policy));
@@ -498,9 +473,6 @@ export function captureGatherFlight(
         // so it is dropped here rather than allowed to break every encode.
         provider: omitProviderTransportExecutor(provider.provider),
         fastPolicyAuthority: provider.fastPolicyAuthority,
-        // Combo retention is capture-time state, not a provider-row field. Two
-        // gathers that share providers but differ in combo targets must not join.
-        retainConfiguredModelIds: [...(provider.retainConfiguredModelIds ?? [])].sort(),
       }))),
     discoveryPolicySnapshots,
     providers: Object.freeze(providers),
@@ -580,7 +552,6 @@ export function gatherFlightKey(config: OcxConfig): string {
     providers,
     visionSidecarEnabled: config.visionSidecar?.enabled !== false,
     disabledModels: [...(config.disabledModels ?? [])].sort(),
-    combos: config.combos ?? {},
     customModels: (config.customModels ?? []).map((cm) => ({
       p: cm.provider,
       m: cm.modelId,

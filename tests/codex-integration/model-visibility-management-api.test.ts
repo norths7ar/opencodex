@@ -69,20 +69,18 @@ async function put(body: unknown): Promise<Response> {
 }
 
 describe("atomic model visibility management", () => {
-  test("catalog busy maps management and v1 models to 503 startup to warn-skip and system-env to skip", async () => {
+  test("catalog busy maps management and v1 models to 503 startup to warn-skip", async () => {
     const management = await Bun.file(new URL("../../src/server/management-api.ts", import.meta.url)).text();
     // The catalog-busy mapping moved into the serve-options leaf when src/server/index.ts
     // became a facade.
     const server = await Bun.file(new URL("../../src/server/index/serve-options.ts", import.meta.url)).text();
     const prewarm = await Bun.file(new URL("../../src/cli/catalog-prewarm.ts", import.meta.url)).text();
-    const systemEnv = await Bun.file(new URL("../../src/server/system-env.ts", import.meta.url)).text();
     for (const source of [management, server]) {
       expect(source).toContain("CatalogGatherBusyError");
       expect(source).toContain('"catalog_busy"');
       expect(source).toContain('"Retry-After": "1"');
     }
     expect(prewarm).toContain("startup discovery skipped");
-    expect(systemEnv).toContain('(error as { code?: unknown }).code === "catalog_busy"');
   });
   test("enables excluded or blocked models and disables without erasing the allowlist", async () => {
     expect((await put({ scope: "models", provider: "google-antigravity", targets: [{ id: "claude-sonnet-4-6" }], enabled: true })).status).toBe(200);
@@ -115,30 +113,6 @@ describe("atomic model visibility management", () => {
     expect(refreshes).toBe(2);
   });
 
-  test("all-on clears stale native ids while preserving combo selectors", async () => {
-    const config = loadConfig();
-    const targets = nativeModelRows(config).map(row => ({ id: row.slug, native: true }));
-    expect(targets.length).toBeGreaterThan(0);
-    config.disabledModels = [
-      targets[0]!.id,
-      "stale-native-model",
-      "fast-chat",
-      "combo/free",
-      "google-antigravity/keep",
-      "other/keep",
-    ];
-    saveConfig(config);
-
-    expect((await put({ scope: "provider", provider: "openai", targets, enabled: true })).status).toBe(200);
-    expect(loadConfig().disabledModels).toEqual([
-      "fast-chat",
-      "combo/free",
-      "google-antigravity/keep",
-      "other/keep",
-    ]);
-    expect(refreshes).toBe(1);
-  });
-
   test("treats a physical combo provider with no configured combos as a routed provider", async () => {
     saveConfig({
       port: 0,
@@ -153,7 +127,6 @@ describe("atomic model visibility management", () => {
           selectedModels: ["model-a"],
         },
       },
-      combos: {},
       disabledModels: ["combo/vendor-model", "combo/temporarily-missing", "other/keep"],
     });
 
@@ -182,88 +155,6 @@ describe("atomic model visibility management", () => {
     expect((await put({ scope: "provider", provider: "combo", targets, enabled: true })).status).toBe(200);
     expect(loadConfig().providers.combo.selectedModels).toBeUndefined();
     expect(loadConfig().disabledModels).toEqual(["other/keep"]);
-    expect(refreshes).toBe(4);
-  });
-
-  test("preserves provider-prefixed combo aliases until the combo provider enables them", async () => {
-    const config = loadConfig();
-    config.providers.anthropic = {
-      adapter: "openai-chat",
-      baseUrl: "https://anthropic.example.test/v1",
-      apiKey: "test-key",
-      liveModels: false,
-      models: ["claude-a"],
-      selectedModels: ["claude-a"],
-    };
-    config.combos!.free!.alias = "anthropic/fast";
-    config.disabledModels = [
-      "anthropic/claude-a",
-      "anthropic/temporarily-missing",
-      "anthropic/fast",
-      "combo/free",
-      "combo/plain",
-      "other/keep",
-      "other/provider",
-    ];
-    saveConfig(config);
-
-    expect((await put({ scope: "provider", provider: "anthropic", targets: [{ id: "claude-a" }], enabled: true })).status).toBe(200);
-    expect(loadConfig().providers.anthropic.selectedModels).toBeUndefined();
-    expect(loadConfig().disabledModels).toEqual([
-      "anthropic/fast",
-      "combo/free",
-      "combo/plain",
-      "other/keep",
-      "other/provider",
-    ]);
-    expect(refreshes).toBe(1);
-
-    expect((await put({ scope: "provider", provider: "combo", targets: [{ id: "free" }, { id: "plain" }], enabled: true })).status).toBe(200);
-    expect(loadConfig().disabledModels).toEqual(["other/keep", "other/provider"]);
-    expect(refreshes).toBe(2);
-  });
-
-  test("keeps a colliding physical combo allowlist untouched when virtual combos take precedence", async () => {
-    const config = loadConfig();
-    config.providers.combo = {
-      adapter: "openai-chat",
-      baseUrl: "https://combo.example.test/v1",
-      models: ["physical-only"],
-      selectedModels: ["physical-only"],
-    };
-    config.combos = {
-      free: { alias: "anthropic/fast", targets: [{ provider: "google-antigravity", model: "gemini-3.1-pro" }] },
-    };
-    config.disabledModels = ["anthropic/fast", "other/keep"];
-
-    expect((await putWithConfig({ scope: "models", provider: "combo", targets: [{ id: "free" }], enabled: true }, config)).status).toBe(200);
-    expect(config.providers.combo.selectedModels).toEqual(["physical-only"]);
-    expect(config.disabledModels).toEqual(["other/keep"]);
-    expect(refreshes).toBe(1);
-
-    config.disabledModels = ["combo/free", "anthropic/fast", "other/keep"];
-    expect((await putWithConfig({ scope: "provider", provider: "combo", targets: [{ id: "free" }], enabled: true }, config)).status).toBe(200);
-    expect(config.providers.combo.selectedModels).toEqual(["physical-only"]);
-    expect(config.disabledModels).toEqual(["other/keep"]);
-    expect(refreshes).toBe(2);
-  });
-
-  test("toggles canonical and aliased combo rows", async () => {
-    const config = loadConfig();
-    config.disabledModels?.push("fast-chat", "combo/plain");
-    saveConfig(config);
-    expect((await put({ scope: "models", provider: "combo", targets: [{ id: "free" }, { id: "plain" }], enabled: true })).status).toBe(200);
-    expect(loadConfig().disabledModels).toEqual(["google-antigravity/gpt-oss-120b-medium", "google-antigravity/temporarily-missing", "other/keep"]);
-    expect((await put({ scope: "models", provider: "combo", targets: [{ id: "free" }], enabled: false })).status).toBe(200);
-    expect(loadConfig().disabledModels).toContain("combo/free");
-    const beforeAllOn = loadConfig();
-    beforeAllOn.disabledModels?.push("fast-chat", "combo/plain");
-    saveConfig(beforeAllOn);
-    expect((await put({ scope: "provider", provider: "combo", targets: [{ id: "free" }, { id: "plain" }], enabled: true })).status).toBe(200);
-    expect(loadConfig().disabledModels).toEqual(["google-antigravity/gpt-oss-120b-medium", "google-antigravity/temporarily-missing", "other/keep"]);
-    expect((await put({ scope: "provider", provider: "combo", targets: [{ id: "free" }, { id: "plain" }], enabled: false })).status).toBe(200);
-    expect(loadConfig().disabledModels).toEqual(expect.arrayContaining(["combo/free", "combo/plain"]));
-    expect((await put({ scope: "models", provider: "combo", targets: [{ id: "missing" }], enabled: true })).status).toBe(400);
     expect(refreshes).toBe(4);
   });
 
@@ -466,15 +357,15 @@ test("manual models replace management rows with the same provider/id and deleti
       supported_reasoning_levels: [{ effort: "medium" }], model_messages: {},
     }],
   }));
-  // Even an exact qualified-ID collision must preserve the account-bound native route.
+  // Legacy account namespaces do not create native routes; explicit custom rows remain independent.
   config.customModels.push({ id: "manual-qualified", provider: "openai", modelId: qualifiedId });
   const rows = await listManagementModelRows(config,{entitlementWaitMs:0});
   expect(rows.filter(row=>row.provider==="openai" && row.id==="gpt-5.5")).toEqual([
     expect.objectContaining({namespaced:"openai/gpt-5.5",custom:true,customId:"manual-gpt",contextWindow:128_000,fastRowAvailable:true}),
   ]);
   expect(rows.filter(row=>row.provider==="google-antigravity" && row.id==="gemini-3.1-pro")).toHaveLength(1);
-  expect(rows.filter(row => row.id === qualifiedId && row.native)).toEqual([
-    expect.objectContaining({ namespaced: qualifiedId, provider: "openai", native: true }),
+  expect(rows.filter(row => row.id === qualifiedId)).toEqual([
+    expect.objectContaining({ namespaced: routedSlug("openai", qualifiedId), provider: "openai", customId: "manual-qualified" }),
   ]);
   config.disabledModels = ["openai/gpt-5.5"];
   const disabledRows = await listManagementModelRows(config, { entitlementWaitMs: 0 });
@@ -484,7 +375,7 @@ test("manual models replace management rows with the same provider/id and deleti
   config.disabledModels = [];
   config.customModels = [];
   const restored = await listManagementModelRows(config,{entitlementWaitMs:0});
-  expect(restored.some(row => row.id === qualifiedId && row.native)).toBe(true);
+  expect(restored.some(row => row.id === qualifiedId)).toBe(false);
   expect(restored.filter(row=>row.provider==="openai" && row.id==="gpt-5.5")).toEqual([
     expect.objectContaining({namespaced:"gpt-5.5",native:true}),
   ]);
@@ -706,7 +597,7 @@ describe("provider workspace custom-model API round trips", () => {
     expect(refreshes).toBe(2);
   });
 
-  test("DELETE of a qualified custom override preserves the independent account-native identity", async () => {
+  test("DELETE of a qualified custom model does not restore a legacy account-native identity", async () => {
     const config = loadConfig();
     config.providers.openai = {
       adapter: "openai-responses", authMode: "forward", liveModels: false,
@@ -726,15 +617,14 @@ describe("provider workspace custom-model API round trips", () => {
     }] }));
     const hidden = [...loadConfig().disabledModels!];
     const before = (await readRows()).filter(row => row.id === qualifiedId);
-    expect(before).toHaveLength(2);
-    const nativeBefore = before.find(row => row.native === true);
-    expect(nativeBefore?.namespaced).toBe(qualifiedId);
-    expect(nativeBefore?.disabled).toBe(true);
+    expect(before).toHaveLength(1);
+    expect(before[0]?.native).not.toBe(true);
+    expect(before[0]?.disabled).toBe(true);
     expect(before.find(row => row.customId === "qualified-custom")?.namespaced).toBe(routedSlug("openai", qualifiedId));
 
     expect((await request("DELETE", "/api/custom-models/qualified-custom")).status).toBe(200);
     expect(await readCustoms()).toEqual([]);
-    expect((await readRows()).filter(row => row.id === qualifiedId)).toEqual([nativeBefore!]);
+    expect((await readRows()).filter(row => row.id === qualifiedId)).toEqual([]);
     expect(loadConfig().disabledModels).toEqual(hidden);
     expect(loadConfig().codexAccountNamespaces).toEqual({ desktop: "@main" });
     expect(refreshes).toBe(1);

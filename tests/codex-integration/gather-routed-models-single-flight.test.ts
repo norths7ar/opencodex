@@ -1,11 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import {
-  clearGatherRoutedModelsInflight,
-  filterCatalogVisibleModels,
-  gatherRoutedModels as gatherRoutedModelsDirect,
-  resetCatalogRuntimeStateForTests,
-  type ComboCatalogOmission,
-} from "../../src/codex/catalog";
+import { clearGatherRoutedModelsInflight, filterCatalogVisibleModels, gatherRoutedModels as gatherRoutedModelsDirect, resetCatalogRuntimeStateForTests } from "../../src/codex/catalog";
 import { clearModelCache } from "../../src/codex/model-cache";
 import { withStubbedProviderFetch } from "../helpers/catalog-provider-fetch";
 import type { OcxConfig } from "../../src/types";
@@ -62,57 +56,6 @@ describe("gatherRoutedModels single-flight", () => {
     expect(fetchCount).toBe(1);
     expect(a.map(m => `${m.provider}/${m.id}`)).toEqual(["slow/model-a"]);
     expect(b).toEqual(a);
-  });
-
-  test("joiners still receive comboOmissions from the shared flight", async () => {
-    globalThis.fetch = (async () =>
-      new Response(JSON.stringify({ data: [{ id: "m1" }] }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      })) as typeof fetch;
-
-    const config: OcxConfig = {
-      port: 10100,
-      defaultProvider: "a",
-      providers: {
-        a: {
-          adapter: "openai-chat",
-          baseUrl: "https://api.example.test/v1",
-          models: [],
-        },
-      },
-      combos: {
-        incomplete: {
-          strategy: "failover",
-          stickyLimit: 1,
-          defaultEffort: "medium",
-          alias: null,
-          targets: [
-            { provider: "a", model: "m1", weight: 1 },
-            { provider: "missing", model: "x", weight: 1 },
-          ],
-        },
-      },
-    };
-
-    const omissionsA: ComboCatalogOmission[] = [];
-    const omissionsB: ComboCatalogOmission[] = [];
-    const outcomesA: Array<{ provider: string; state: "authoritative" | "degraded" }> = [];
-    const outcomesB: Array<{ provider: string; state: "authoritative" | "degraded" }> = [];
-    await Promise.all([
-      gatherRoutedModels(config, {
-        comboOmissions: omissionsA,
-        providerModelOutcomes: outcomesA,
-      }),
-      gatherRoutedModels(config, {
-        comboOmissions: omissionsB,
-        providerModelOutcomes: outcomesB,
-      }),
-    ]);
-    expect(omissionsA.some(item => item.id === "incomplete")).toBe(true);
-    expect(omissionsB).toEqual(omissionsA);
-    expect(outcomesA).toEqual([{ provider: "a", state: "authoritative" }]);
-    expect(outcomesB).toEqual(outcomesA);
   });
 
   test("distinct provider sets keep separate in-flight gathers (no slot eviction)", async () => {
@@ -206,48 +149,6 @@ describe("gatherRoutedModels single-flight", () => {
     expect(fetchCount).toBe(1);
     expect(registryStatic.map(model => model.id)).toEqual(["configured-static"]);
     expect(explicitLive.map(model => model.id)).toEqual(["live-only"]);
-  });
-
-  test("concurrent distinct keys keep flight-local combo omissions", async () => {
-    globalThis.fetch = (async () =>
-      new Response(JSON.stringify({ data: [{ id: "m1" }] }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      })) as typeof fetch;
-
-    const mk = (comboId: string, provider: string, baseUrl: string): OcxConfig => ({
-      port: 10100,
-      defaultProvider: provider,
-      providers: {
-        [provider]: {
-          adapter: "openai-chat",
-          baseUrl,
-          models: [],
-        },
-      },
-      combos: {
-        [comboId]: {
-          strategy: "failover",
-          stickyLimit: 1,
-          defaultEffort: "medium",
-          alias: null,
-          targets: [
-            { provider, model: "m1", weight: 1 },
-            { provider: "missing", model: "x", weight: 1 },
-          ],
-        },
-      },
-    });
-
-    const oA: ComboCatalogOmission[] = [];
-    const oB: ComboCatalogOmission[] = [];
-    await Promise.all([
-      gatherRoutedModels(mk("incomplete-a", "a", "https://a.example.test/v1"), { comboOmissions: oA }),
-      gatherRoutedModels(mk("incomplete-b", "b", "https://b.example.test/v1"), { comboOmissions: oB }),
-    ]);
-    expect(oA.some(item => item.id === "incomplete-a")).toBe(true);
-    expect(oB.some(item => item.id === "incomplete-b")).toBe(true);
-    expect(oA).not.toEqual(oB);
   });
 
   test("catalog-hint-only config changes do not join a prior flight", async () => {

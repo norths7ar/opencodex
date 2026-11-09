@@ -169,7 +169,7 @@ describe("standalone CLI pairing", () => {
           createdAt: "2026-10-06T00:00:00.000Z" }],
         codexAutoStart: false, syncResumeHistory: false,
         clientIntegrations: { codex: false, grok: false, "claude-desktop": false },
-        claudeCode: { enabled: false, systemEnv: false },
+        claudeCode: { enabled: false },
       }));
       const server = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start", "--port", String(port)], {
         cwd: root, env,

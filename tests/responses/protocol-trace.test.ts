@@ -101,17 +101,6 @@ describe("protocolTraceForRequest", () => {
     });
   });
 
-  test("combo attempts each keep their own path and the final one decides", () => {
-    const ctx = {};
-    markProtocolEntry(ctx, { inbound: "chat", lane: "bridge" });
-    const trace = protocolTraceForRequest(ctx, [attempt(1, "cursor"), attempt(2, "openai-responses")]);
-    expect(trace?.mode).toBe("translated");
-    expect(trace?.attempts?.map(a => [a.ordinal, a.upstream, a.mode])).toEqual([
-      [1, "other", "legacy-bridge"],
-      [2, "responses", "translated"],
-    ]);
-  });
-
   test("an explicit attempt mark overrides the lane-derived path", () => {
     const ctx = {};
     const live = attempt(1, "anthropic");

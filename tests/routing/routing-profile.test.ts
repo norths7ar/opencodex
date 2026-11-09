@@ -127,62 +127,6 @@ describe("routing profiles (RI-04)", () => {
     expect(partialZero.some(issue => issue.path.join(".") === "optimize")).toBe(false);
   });
 
-  test("alias collision validation covers providers, combos, account namespaces, native families", () => {
-    const config = baseConfig();
-    const providerCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "a",
-    }, config);
-    expect(providerCollision.some(issue => issue.message.includes("provider name"))).toBe(true);
-
-    const comboCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "combo/free",
-    }, config);
-    expect(comboCollision.some(issue => issue.message.includes("reserved"))).toBe(true);
-
-    const comboAliasCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "faster",
-    }, {
-      ...config,
-      combos: { ...config.combos, free: { strategy: "failover", targets: [{ provider: "a", model: "m1" }], alias: "faster" } },
-    });
-    expect(comboAliasCollision.some(issue => issue.message.includes("combo selector"))).toBe(true);
-
-    const nativeCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "gpt-5.6",
-    }, config);
-    expect(nativeCollision.some(issue => issue.message.includes("native family"))).toBe(true);
-
-    const providerNamespaceCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "a/m1",
-    }, config);
-    // Exactly one issue: the first-segment provider collision must not be
-    // reported twice with different wordings.
-    const namespaceIssues = providerNamespaceCollision.filter(
-      issue => issue.message.includes("provider routing namespace"),
-    );
-    expect(namespaceIssues.length).toBe(1);
-    expect(providerNamespaceCollision.length).toBe(1);
-
-    const accountNamespaceCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "work/anything",
-    }, config);
-    expect(accountNamespaceCollision.some(
-      issue => issue.message.includes("codex account namespace"),
-    )).toBe(true);
-
-    const siblingCollision = routingProfileIssues("p", {
-      candidates: [{ provider: "a", model: "m1" }],
-      alias: "ocx/fast",
-    }, config);
-    expect(siblingCollision.some(issue => issue.message.includes("already used"))).toBe(true);
-  });
-
   test("candidate validation rejects unconfigured/disabled providers and duplicates", () => {
     const config = baseConfig();
     const unconfigured = routingProfileIssues("p", {

@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "../codex/account-id";
 /**
  * Token Guardian — background proactive OAuth refresh.
  *
@@ -181,7 +182,7 @@ export async function guardianSweep(nowMs: number = Date.now()): Promise<Guardia
     && resolveRefreshPolicy(OPENAI_CODEX_PROVIDER_ID, config) === "proactive"
   ) {
     const mode = providerCodexAccountMode(OPENAI_CODEX_PROVIDER_ID, openai) ?? "pool";
-    if (opts.codexWarmupEnabled) {
+    if (opts.codexWarmupEnabled && singleCodexAccountId(config) === MAIN_CODEX_ACCOUNT_ID) {
       const key = `codex:${MAIN_CODEX_ACCOUNT_ID}`;
       if (!inBackoff(key, nowMs)) {
         tasks.push(async () => {
@@ -209,7 +210,8 @@ export async function guardianSweep(nowMs: number = Date.now()): Promise<Guardia
       }
     }
 
-    const addedAccountIds = mode === "pool" ? listCodexAccountIds() : [];
+    const addedAccountIds = mode === "pool"
+      ? listCodexAccountIds().filter(id => id === singleCodexAccountId(config)) : [];
     for (const id of addedAccountIds) {
       const record = readCodexAccountRecord(id);
       if (!record || record.deletedAt != null) continue;

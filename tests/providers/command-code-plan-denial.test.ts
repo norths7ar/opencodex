@@ -10,7 +10,6 @@ import { runWithWebSearch } from "../../src/web-search/loop";
 import type { ProviderAdapter } from "../../src/adapters/base";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 import { isVerifiedModelNotInPlanResponse, MODEL_NOT_IN_PLAN_CODE } from "../../src/lib/errors";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
 import { getAccountSet, saveCredential, setActiveAccount } from "../../src/oauth/store";
 import { resetCommandCodeReasoningEffortsForTest } from "../../src/providers/command-code-efforts";
@@ -19,7 +18,6 @@ import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
 import { handleChatCompletions } from "../../src/server/chat-completions";
 import { handleClaudeMessages } from "../../src/server/claude-messages";
 import { handleResponses } from "../../src/server/responses";
-import { clearComboRecallForTests } from "../../src/server/responses/combo-session-recall";
 import type { OcxConfig, OcxParsedRequest, OcxProviderConfig } from "../../src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -310,9 +308,6 @@ describe("Command Code MODEL_NOT_IN_PLAN refusal through dispatch", () => {
     process.env.OPENCODEX_HOME = fixtureHome;
     releaseSpend = acquireOwnedSpendHome();
     clearGenericFailoverHealth();
-    clearComboSelectionState();
-    clearComboRecallForTests();
-    clearComboTargetCooldowns();
     clearKeyCooldowns();
     logged = [];
     sends = [];
@@ -338,9 +333,6 @@ describe("Command Code MODEL_NOT_IN_PLAN refusal through dispatch", () => {
     releaseSpend = undefined;
     closeRequestHistoryIndex();
     clearGenericFailoverHealth();
-    clearComboSelectionState();
-    clearComboRecallForTests();
-    clearComboTargetCooldowns();
     clearKeyCooldowns();
     resetCommandCodeReasoningEffortsForTest();
     if (originalHome === undefined) delete process.env.OPENCODEX_HOME;
@@ -423,137 +415,6 @@ describe("Command Code MODEL_NOT_IN_PLAN refusal through dispatch", () => {
     expectNoCanary(messagesBody);
     expect(sends.map(send => send.model)).toEqual([REFUSED_MODEL]);
     expectNoCanary(logged.join("\n"));
-  });
-
-  test("a combo hops past the refused model and cools only that target", async () => {
-    await login(1);
-    const cfg = config({ combos: { pair: { strategy: "failover", targets: [
-      { provider: "command-code", model: REFUSED_MODEL },
-      { provider: "command-code", model: SERVED_MODEL },
-    ] } } } as Partial<OcxConfig>);
-
-    const first = await responses(cfg, "combo/pair");
-    expect(first.response.status, first.body).toBe(200);
-    expect(JSON.parse(first.body).status).toBe("completed");
-    expect(sends.map(send => send.model)).toEqual([REFUSED_MODEL, SERVED_MODEL]);
-
-    sends = [];
-    const second = await responses(cfg, "combo/pair");
-    expect(second.response.status, second.body).toBe(200);
-    expect(sends.map(send => send.model)).toEqual([SERVED_MODEL]);
-
-    // Streamed, the verified refusal must reach the same fallback through the stream wrappers.
-    clearComboTargetCooldowns();
-    sends = [];
-    const streamed = await responses(cfg, "combo/pair", true);
-    expect(streamed.response.status, streamed.body).toBe(200);
-    expect(streamed.body).toContain("response.completed");
-    expect(sends.map(send => send.model)).toEqual([REFUSED_MODEL, SERVED_MODEL]);
-    expectNoCanary(logged.join("\n"));
-  });
-
-  test("another provider echoing the code and marker cannot claim the plan-refusal hop", async () => {
-    await login(1);
-    const generate = globalThis.fetch;
-    const otherSends: string[] = [];
-    let echoedCode = "";
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (!url.startsWith("https://other.example/")) return generate(input, init);
-      otherSends.push(url);
-      // The marker header is forged as well: a header is not provenance either.
-      return Response.json({ error: { type: "invalid_request_error", code: echoedCode, message: "fixture" } },
-        { status: 400, headers: { "x-opencodex-refusal": "model-not-in-plan" } });
-    }) as typeof fetch;
-    const cfg = config({ combos: { pair: { strategy: "failover", targets: [
-      { provider: "other", model: "m1" },
-      { provider: "command-code", model: SERVED_MODEL },
-    ] } } } as Partial<OcxConfig>);
-    cfg.providers.other = { adapter: "openai-chat", baseUrl: "https://other.example/v1", authMode: "key", apiKey: "synthetic-other", models: ["m1"] };
-
-    // Every spelling combo failover folds into the hop code, including the ones it normalizes.
-    for (const spelling of ["model_not_in_plan", "MODEL_NOT_IN_PLAN", "model-not-in-plan", " Model-Not-In-Plan "]) {
-      echoedCode = spelling;
-      otherSends.length = 0;
-      sends = [];
-      clearComboTargetCooldowns();
-      const result = await responses(cfg, "combo/pair");
-      expect(result.response.status, spelling + ": " + result.body).toBe(400);
-      expect(JSON.parse(result.body).error.code).not.toBe("model_not_in_plan");
-      expect(otherSends.length, spelling).toBeGreaterThan(0);
-      expect(sends, spelling).toEqual([]);
-    }
-  });
-
-  test("a passthrough or streamed candidate forging code and marker is read like any unknown code", async () => {
-    await login(1);
-    const generate = globalThis.fetch;
-    let echo = { code: "", stream: false };
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (!url.startsWith("https://other.example/")) return generate(input, init);
-      const error = { type: "invalid_request_error", code: echo.code, message: "fixture" };
-      // Every echo also forges the adapter's marker header, which must not count as provenance.
-      const forged = { "x-opencodex-refusal": "model-not-in-plan" };
-      if (!echo.stream) return Response.json({ error }, { status: 400, headers: forged });
-      const failed = { type: "response.failed", response: { id: "resp_fixture", object: "response", status: "failed", error, output: [] } };
-      return new Response("event: response.failed\ndata: " + JSON.stringify(failed) + "\n\n", { headers: { "content-type": "text/event-stream", ...forged } });
-    }) as typeof fetch;
-    const other = { adapter: "openai-responses", baseUrl: "https://other.example/v1", authMode: "key", apiKey: "synthetic-other", models: ["m1"] } as OcxProviderConfig;
-    const candidates = [{ provider: "other", model: "m1" }, { provider: "command-code", model: SERVED_MODEL }];
-    const policy = config({ routingProfiles: { daily: { candidates } } } as Partial<OcxConfig>);
-    policy.providers.other = other;
-    const combo = config({ combos: { pair: { strategy: "failover", targets: candidates } } } as Partial<OcxConfig>);
-    combo.providers.other = other;
-
-    // The control is a code nothing recognizes; every plan-refusal spelling must route exactly like it.
-    const outcome = async (code: string, route: "policy/daily" | "combo/pair", stream: boolean) => {
-      echo = { code, stream };
-      sends = [];
-      clearComboTargetCooldowns();
-      const result = await responses(route === "policy/daily" ? policy : combo, route, stream);
-      return { status: result.response.status, sends: sends.map(send => send.model), planCode: result.body.includes('"code":"model_not_in_plan"') };
-    };
-    for (const [route, stream] of [["policy/daily", false], ["combo/pair", true]] as const) {
-      const control = await outcome("fixture_unknown_code", route, stream);
-      for (const spelling of ["model_not_in_plan", "MODEL_NOT_IN_PLAN", "model-not-in-plan"]) {
-        const observed = await outcome(spelling, route, stream);
-        expect({ ...observed, planCode: false }, route + " " + spelling).toEqual({ ...control, planCode: false });
-        expect(observed.sends, route + " " + spelling).toEqual([]);
-      }
-    }
-  });
-
-  test("a web-search sidecar combo and policy still move past the refused model", async () => {
-    await login(1);
-    const targets = [{ provider: "command-code", model: REFUSED_MODEL }, { provider: "command-code", model: SERVED_MODEL }];
-    const sidecar = { webSearchSidecar: { backend: "exa", exaApiKey: "fixture-exa" } };
-    const send = async (cfg: OcxConfig, model: string) => {
-      sends = [];
-      sentToolNames = [];
-      clearComboTargetCooldowns();
-      const response = await handleResponses(new Request("http://localhost/v1/responses", {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ model, input: "hello", stream: false, tools: [{ type: "web_search" }] }),
-      }), cfg, { model: "", provider: "" });
-      return { status: response.status, body: await response.text(), sends: sends.map(entry => entry.model),
-        // The web-search sidecar is the path under test: every send carries its injected function tool.
-        viaSidecar: sentToolNames.map(names => names.includes("web_search")) };
-    };
-    const combo = await send(config({ ...sidecar, combos: { pair: { strategy: "failover", targets } } } as Partial<OcxConfig>), "combo/pair");
-    expect(combo.status, combo.body).toBe(200);
-    expect(combo.sends).toEqual([REFUSED_MODEL, SERVED_MODEL]);
-    expect(combo.viaSidecar).toEqual([true, true]);
-    const policy = await send(config({ ...sidecar, routingProfiles: { daily: { candidates: targets } } } as Partial<OcxConfig>), "policy/daily");
-    expect(policy.status, policy.body).toBe(200);
-    expect(policy.sends).toEqual([REFUSED_MODEL, SERVED_MODEL]);
-    expect(policy.viaSidecar).toEqual([true, true]);
-    const direct = await send(config(sidecar as Partial<OcxConfig>), "command-code/" + REFUSED_MODEL);
-    expect(direct.status, direct.body).toBe(400);
-    expect(JSON.parse(direct.body).error.message).toContain("MODEL_NOT_IN_PLAN");
-    expect(direct.sends).toEqual([REFUSED_MODEL]);
-    expect(direct.viaSidecar).toEqual([true]);
-    expectNoCanary(combo.body + policy.body + direct.body + logged.join("\n"));
   });
 
   test("Chat answers a later sidecar-iteration refusal as a client error in both modes", async () => {

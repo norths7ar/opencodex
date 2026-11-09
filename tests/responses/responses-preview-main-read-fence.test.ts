@@ -27,8 +27,6 @@ import {
   noteSubagentModelFailure,
   resetSubagentModelFallbackStateForTests,
 } from "../../src/codex/subagent-model-fallback";
-import { clearComboTargetCooldowns } from "../../src/combos/failover";
-import { clearComboSelectionState } from "../../src/combos/resolve";
 import {
   clearResponseStateForTests,
   clearResponseStateMemoryForTests,
@@ -238,8 +236,6 @@ beforeEach(() => {
   clearAccountQuota();
   clearMainAccountInfoCache();
   resetMainCodexAccountIdentityTrackingForTests();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearResponseStateMemoryForTests();
   resetSubagentModelFallbackStateForTests();
   resetCodexModelEntitlementCacheForTests();
@@ -273,8 +269,6 @@ afterEach(() => {
   clearAccountQuota();
   clearMainAccountInfoCache();
   resetMainCodexAccountIdentityTrackingForTests();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearResponseStateForTests();
   resetSubagentModelFallbackStateForTests();
   resetCodexModelEntitlementCacheForTests();
@@ -394,80 +388,6 @@ describe("preview and final authentication agree on the native-main read fence",
     resetMainReadObservations();
     await postSpawn(providerConfig(), { turnAdmissionLease }, new Headers());
     expect(selectionStarts).toBeGreaterThan(0);
-    expect(authJsonReads).toBe(0);
-  });
-
-  /**
-   * A bare preferred native model can reach the request-prepare recovery re-preview only after
-   * routing has already chosen a noncanonical provider, but bare native ids are reserved to the
-   * canonical OpenAI provider. Combo recovery is the reachable response-driven boundary: the
-   * canonical target rejects, recovery decrypts once, and only then may the routed target run.
-   */
-  test("response-triggered encrypted recovery replays plaintext without post-recovery main reads", async () => {
-    calibrateMainReadCounter();
-    const config = providerConfig({
-      defaultProvider: "openai",
-      agentTaskRecovery: { enabled: true },
-      providers: {
-        openai: {
-          adapter: "openai-responses",
-          baseUrl: "https://chatgpt.com/backend-api/codex",
-          authMode: "forward",
-          codexAccountMode: "direct",
-        },
-        backup: {
-          adapter: "openai-responses",
-          baseUrl: "https://backup.example/v1",
-          authMode: "key",
-          apiKey: "backup-test-key",
-        },
-      },
-      combos: {
-        recovery: {
-          strategy: "failover",
-          targets: [
-            { provider: "openai", model: PREFERRED_MODEL },
-            { provider: "backup", model: "m2" },
-          ],
-        },
-      },
-    });
-    let recoveryCalls = 0;
-    const backupBodies: string[] = [];
-    globalThis.fetch = (async (input, init) => {
-      const body = typeof init?.body === "string" ? init.body : "";
-      if (body.includes("capture_assignment")) {
-        recoveryCalls += 1;
-        // The canonical target has already failed. Reads after this response belong only to the
-        // recovered routed replay, so the observation cannot be satisfied by pre-recovery work.
-        resetMainReadObservations();
-        return new Response(recoverySse("Use the recovered assignment."), {
-          status: 200,
-          headers: { "content-type": "text/event-stream" },
-        });
-      }
-      const url = new URL(input instanceof Request ? input.url : String(input));
-      if (url.hostname === "backup.example") {
-        backupBodies.push(body);
-        return completedResponses("m2");
-      }
-      // The canonical target is the only target allowed to receive unreadable ciphertext. Its
-      // response forces the combo owner to recover the assignment before backup becomes eligible.
-      return Response.json({ error: { message: "caller credential rejected" } }, { status: 401 });
-    }) as typeof fetch;
-
-    const response = await postSpawn(
-      config,
-      {},
-      codexHeaders("caller-account"),
-      encryptedInput(),
-      "combo/recovery",
-    );
-
-    expect(response.status).toBe(200);
-    expect(recoveryCalls).toBe(1);
-    expect(backupBodies).toHaveLength(1);
-    expect(backupBodies[0]).toContain("Use the recovered assignment.");
     expect(authJsonReads).toBe(0);
   });
 

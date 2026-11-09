@@ -21,7 +21,7 @@ import type { ResolveDeps, SpawnInvocation } from "../lib/win-exec";
 import { validatedCodexExecInvocation } from "../codex/exec-boundary";
 import { deleteConfigTopLevelKey, loadConfig, saveConfig } from "../config";
 import { resolveAndPersistCodexRuntime, type ResolveCodexRuntimeDeps } from "../codex/runtime";
-import { withCodexCliSelectionParentWriteAsync } from "../codex/cli-update-selection-gate";
+import { withCodexCliSelectionParentWriteAsync } from "../codex/cli-selection";
 
 export interface V2CliDeps {
   execFile?: (file: string, args: string[], options?: SpawnInvocation["options"] & { env?: NodeJS.ProcessEnv }) => void;

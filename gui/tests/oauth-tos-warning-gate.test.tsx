@@ -15,7 +15,7 @@ import { join } from "node:path";
 import { oauthTosRisk } from "../src/oauth-tos-risk";
 
 /** GUI tests run with `gui/` as cwd, so resolve page paths relative to this file. */
-const PROVIDERS_PAGE = join(import.meta.dir, "..", "src", "pages", "Providers.tsx");
+const PROVIDERS_PAGE = join(import.meta.dir, "../src/pages/Providers.tsx");
 
 interface Pending {
   provider: string;

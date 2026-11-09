@@ -49,27 +49,15 @@ export function createOwnerIdentity({
     hostRead = true;
     let machine: string | undefined;
     try {
-      if (platform === "linux") {
-        for (const path of ["/etc/machine-id", "/var/lib/dbus/machine-id"]) {
-          try {
-            const value = readFile(path).trim();
-            if (/^[0-9a-f]{32}$/i.test(value)) { machine = value.toLowerCase(); break; }
-          } catch { /* Try the fallback machine-id file. */ }
-        }
-      }
-      else if (platform === "darwin") machine = runCommand(["/usr/sbin/sysctl", "-n", "kern.bootsessionuuid"], 1_000);
-      else if (platform === "win32") machine = parseMachineGuid(runCommand([regExe(), "query", MACHINE_GUID_KEY, "/v", "MachineGuid"], 3_000));
+      if (platform === "win32") machine = parseMachineGuid(runCommand([regExe(), "query", MACHINE_GUID_KEY, "/v", "MachineGuid"], 3_000));
       if (machine) cachedHost = { hostname: hostname(), machine };
     } catch { /* Missing identity means no automatic takeover. */ }
     return cachedHost;
   }
   function probeProcessStart(pid: number): string | undefined {
     try {
-      if (platform === "linux") {
-        const stat = readFileSync(`/proc/${pid}/stat`, "utf8");
-        return stat.slice(stat.lastIndexOf(")") + 2).split(" ")[19];
-      }
-      if (platform === "darwin") return runCommand(["/bin/ps", "-p", String(pid), "-o", "lstart="], 1_000);
+
+
       if (platform === "win32") return runCommand([powerShellExe(), "-NoProfile", "-NonInteractive", "-Command", `(Get-Process -Id ${pid} -ErrorAction Stop).StartTime.ToUniversalTime().Ticks`], 1_000);
     } catch { /* Unknown start identity never proves death. */ }
     return undefined;

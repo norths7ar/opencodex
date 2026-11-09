@@ -20,7 +20,6 @@ const scopes: Record<string, string[]> = {
   // state format; their runtime comparisons use bigint identity and have behavioral coverage.
   "src/codex/shim-restore-lock.ts": ["readShimRestoreLockSnapshot", "tryAcquireShimRestoreLock"],
   "src/codex/shim-wrapper-write.ts": ["writeShim"],
-  "src/remote-control/workspace-executor.ts": ["assertOpenedRegularFile", "assertApprovedRootIdentity"],
   "src/config/initialize.ts": ["identifiesDescriptor"],
   "src/service/state-lock.ts": ["readLockSnapshot"],
   "src/oauth/store.ts": ["snapshot", "createOAuthFileLock"],

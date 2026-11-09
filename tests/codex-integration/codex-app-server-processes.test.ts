@@ -1,6 +1,5 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from "bun:test";
 import { execFileSync, spawn } from "node:child_process";
-import * as childProcess from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { resolveTrustedWindowsPowerShellExe, setTrustedWindowsElevationExecutablesForTests } from "../../src/lib/windows-elevation";
@@ -475,7 +474,7 @@ describe("Codex app-server process matching (#476)", () => {
       "/opt/codex/codex-x86_64-unknown-linux-musl app-server --listen unix:///tmp/c.sock",
     )).toBe(true);
     expect(isCodexAppServerCommandLine(
-      "/Applications/Codex.app/Contents/Resources/codex-aarch64-apple-darwin app-server",
+      "/opt/codex/resources/codex-aarch64-unknown-linux-musl app-server",
     )).toBe(true);
     expect(isCodexAppServerCommandLine(
       "C:\\Users\\a\\.codex\\bin\\codex-x86_64-pc-windows-msvc.exe app-server --listen pipe",
@@ -484,7 +483,7 @@ describe("Codex app-server process matching (#476)", () => {
       "\"C:\\Program Files\\Codex\\codex-aarch64-pc-windows-msvc.exe\" app-server",
     )).toBe(true);
     expect(isCodexAppServerCommandLine(
-      "codex-x86_64-apple-darwin --profile prod app-server",
+      "codex-x86_64-unknown-linux-musl --profile prod app-server",
     )).toBe(true);
   });
 
@@ -787,42 +786,6 @@ describe("Codex session process matching (#2811)", () => {
     expect(isCodexSessionCommandLine("")).toBe(false);
   });
 
-  function withDarwinProcessFixture(check: (uid: number) => void) {
-    const uid = process.getuid!();
-    const ps = spyOn(childProcess, "execFileSync").mockImplementation((file, args) => {
-      expect(file).toBe("/bin/ps");
-      const argv = Array.isArray(args) ? args : [];
-      const scoped = argv.includes("-u");
-      if (scoped) expect(argv[1]).toBe(String(uid));
-      const executable = argv.includes("pid=,comm=");
-      if (executable) return (scoped
-        ? "321 /usr/local/bin/codex\n"
-        : "321 /usr/local/bin/codex\n322 /usr/local/bin/codex\n") as never;
-      return (scoped ? "321 /usr/local/bin/codex app-server\n"
-        : `321 ${uid} /usr/local/bin/codex app-server\n322 ${uid + 1} /usr/local/bin/codex exec fixture\n`) as never;
-    });
-    try { check(uid); } finally { ps.mockRestore(); }
-  }
-
-  test.skipIf(typeof process.getuid !== "function")("read-only session scan includes other readable users by default", () => {
-    withDarwinProcessFixture(() => {
-      for (const io of [{ platform: "darwin" as const }, { platform: "darwin" as const, getuid: undefined }]) {
-        const scan = scanCodexSessionProcesses(io);
-        expect(scan.kind).toBe("observed");
-        if (scan.kind === "observed") expect(scan.processes.map(item => item.pid)).toEqual([321, 322]);
-      }
-    });
-  });
-
-  test.skipIf(typeof process.getuid !== "function")("explicit uid scan and kill-path enumeration retain their user boundary", () => {
-    withDarwinProcessFixture(uid => {
-      const scan = scanCodexSessionProcesses({ platform: "darwin", getuid: () => uid });
-      expect(scan.kind).toBe("observed");
-      if (scan.kind === "observed") expect(scan.processes.map(item => item.pid)).toEqual([321]);
-      expect(listCodexAppServerProcesses({ platform: "darwin" }).map(item => item.pid)).toEqual([321]);
-    });
-  });
-
   test("scanCodexSessionProcesses fails closed and dedupes", () => {
     const unavailable = scanCodexSessionProcesses({
       platform: "linux",
@@ -1007,18 +970,6 @@ describe("CLI /api sync wiring for stale app-servers (#476)", () => {
       catalogWritten: true,
       cacheSynced: true,
     }).staleAppServerHint).toBe(STALE_CODEX_APP_SERVER_HINT);
-  });
-});
-
-describe("process utility invocation source guards", () => {
-  const processSource = readFileSync(
-    repoPath("src", "codex", "app-server-processes.ts"),
-    "utf8",
-  );
-
-  test("pins every Darwin ps invocation to the system binary", () => {
-    expect(processSource.match(/execFileSync\(\s*["']\/bin\/ps["']/g) ?? []).toHaveLength(6);
-    expect(processSource).not.toMatch(/execFileSync\(\s*["']ps["']/);
   });
 });
 
@@ -1349,21 +1300,7 @@ describe("platform termination ladder", () => {
     expect(signals.some(entry => entry.signal === "SIGKILL")).toBe(false);
   });
 
-  test("macOS behaves like Linux", () => {
-    const execCalls: string[] = [];
-    const signals: Array<{ pid: number; signal: string }> = [];
-    restartCodexAppServers([target], {
-      platform: "darwin",
-      listSnapshots: snapshots,
-      execFile: file => { execCalls.push(file); },
-      processKill: (pid, signal) => { signals.push({ pid, signal }); },
-      isAlive: () => false,
-      waitExit: () => true,
-    });
 
-    expect(execCalls).toEqual([]);
-    expect(signals).toEqual([{ pid: 4242, signal: "SIGTERM" }]);
-  });
 });
 
 describe("request-path catalog state serves stale while revalidating (#2499)", () => {

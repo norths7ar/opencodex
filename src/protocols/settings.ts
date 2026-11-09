@@ -60,7 +60,6 @@ export function resolveApiSurfaceSettings(config: Pick<OcxConfig, "apiSurfaces" 
 export type UnrepresentablePolicy = "legacy" | "reject";
 
 export interface ProtocolRolloutSettings {
-  nativeChatCombos: boolean;
   managedMessagesNative: boolean;
   managedMessagesNativeOAuth: boolean;
   directEncoders: boolean;
@@ -97,7 +96,6 @@ export function resolveProtocolSettings(config: ProtocolConfig, providerName?: s
   return Object.freeze({
     unrepresentable: protocols.unrepresentable === "reject" ? "reject" : "legacy",
     rollout: Object.freeze({
-      nativeChatCombos: on("nativeChatCombos"),
       managedMessagesNative,
       // OAuth extension is meaningless without the key-auth path it extends.
       managedMessagesNativeOAuth: managedMessagesNative && nativeOn("managedMessagesNativeOAuth"),
@@ -144,7 +142,6 @@ export function protocolPolicyRevision(config: ProtocolConfig & Pick<OcxConfig, 
       state(secondary?.anthropicAccountPool, "nativeMessages"),
     ],
     rollout: [
-      settings.rollout.nativeChatCombos,
       settings.rollout.managedMessagesNative,
       settings.rollout.managedMessagesNativeOAuth,
       anthropicSettings.rollout.managedMessagesNative,

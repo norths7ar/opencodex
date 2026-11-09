@@ -71,7 +71,6 @@ import {
   type GuiSessionRecord,
   type GuiSessionRequestContext,
 } from "./gui-session";
-import { hasLocalDesktopSnapshotCapability } from "./local-desktop-snapshot-auth";
 import { forgetGuiDevice, rememberGuiDevice, rememberedGuiSessionIsCurrent, resumeGuiDevice } from "./persistent-gui-session";
 import { hasLocalAccountSwitchCapability } from "./local-account-switch-auth";
 import { authorizationCredential } from "../lib/authorization-scheme";
@@ -317,7 +316,7 @@ export function createManagementSessionControl(state: ManagementAuthState): Mana
     },
     canRevealDataKeys(req: Request, config: OcxConfig): boolean {
       const issuance = currentSession(req, config)?.issuance;
-      return issuance === "pairing" || issuance === "tailscale-identity";
+      return issuance === "pairing";
     },
     revokeCurrent(req: Request): boolean {
       if (!state.available) return false;
@@ -349,7 +348,6 @@ export type ManagementPrincipal =
   | "gui-session"
   | "gui-pair-capability"
   | "local-read-capability"
-  | "local-desktop-snapshot-capability"
   | "local-account-switch-capability"
   | "local-provider-reload-capability"
   | "local-aside-sync-capability"
@@ -577,7 +575,6 @@ function resolveManagementAdmission(
   if (hasSystemRestartCapability(req, local)) principal = "system-restart-capability";
   else if (hasLocalAsideSyncCapability(req, local)) principal = "local-aside-sync-capability";
   else if (hasLocalProviderReloadCapability(req, local)) principal = "local-provider-reload-capability";
-  else if (hasLocalDesktopSnapshotCapability(req, local)) principal = "local-desktop-snapshot-capability";
   else if (hasLocalAccountSwitchCapability(req, local)) principal = "local-account-switch-capability";
   else if (hasLocalReadCapability(req, local)) principal = "local-read-capability";
   else if (hasGuiPairCapability(req, local)) principal = "gui-pair-capability";

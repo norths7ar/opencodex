@@ -8,7 +8,6 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
 import { clearReasoningReplayCacheForTests } from "../../src/responses/reasoning-replay-cache";
 import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
@@ -17,7 +16,6 @@ import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
 import { resolveContextPrincipal, type DataPlaneAdmission } from "../../src/server/auth-cors";
 import { handleChatCompletions } from "../../src/server/chat-completions";
 import { handleClaudeMessages } from "../../src/server/claude-messages";
-import { clearComboRecallForTests } from "../../src/server/responses/combo-session-recall";
 import { handleResponsesCompact } from "../../src/server/responses/compact";
 import { handleResponses } from "../../src/server/responses/core";
 import type { OcxConfig } from "../../src/types";
@@ -39,8 +37,7 @@ let home: string | undefined;
 let releaseSpend: (() => void) | undefined;
 let outbound: Rec[] = [];
 
-function clearState() {
-  clearComboSelectionState(); clearComboTargetCooldowns(); clearComboRecallForTests(); clearKeyCooldowns();
+function clearState() { clearKeyCooldowns();
   clearReasoningReplayCacheForTests(); resetThoughtSignatureReplayForTests();
 }
 

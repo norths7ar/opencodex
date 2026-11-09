@@ -8,7 +8,6 @@ import { readSessionListCacheEntry, writeSessionListCacheEntry } from "../sessio
 import { useDataSurface } from "../data-surface";
 import { DataSurfaceSkeleton } from "../components/data-surface";
 import { backgroundHelperOptions } from "./claude-code-helper-options";
-import { reconcileAutoConnectState } from "./claude-autoconnect";
 import { buildManualEnv } from "./claude-manual-env";
 import {
   ClaudeCodeAliasesSection,
@@ -30,7 +29,7 @@ import {
   type ClaudeCodeEditState,
 } from "./claude-code-save";
 
-export { AutoConnectSetting, SmallFastModelSetting } from "./claude-code-settings";
+export { SmallFastModelSetting } from "./claude-code-settings";
 
 /** `superseded`: a write landed while this read was out, so it must not reach any draft. */
 type CachedClaudeCode = { state: ClaudeCodeState; rows: MapRow[]; superseded?: boolean };
@@ -161,7 +160,6 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
       // No coercion: an absent config key is AUTO, and coercing it to subscription is
       // what silently converted an untouched auto config on every save.
       authMode: r.authMode === "proxy" || r.authMode === "subscription" ? r.authMode : "auto",
-      ...reconcileAutoConnectState(r),
       fastMode: r.fastMode ?? null,
       maxContextTokens: r.maxContextTokens ?? null,
       autoContext: r.autoContext !== false,

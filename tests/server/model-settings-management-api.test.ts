@@ -108,25 +108,6 @@ function harness(config = fixture(), converge?: () => Promise<never>, save?: (sa
   return { call, config, persisted, get convergeCalls() { return convergeCalls; } };
 }
 
-test("Claude defaults route previews, validates and applies with a stale-preview refusal", async () => {
-  const config = fixture();
-  config.claudeCode = { tierModels: { opus: "combo/opus", sonnet: "combo/sonnet", haiku: "combo/haiku" } };
-  const url = new URL("http://127.0.0.1/api/claude-code/model-defaults");
-  const call = (method: string, body?: unknown) => handleAgentSettingsRoutes({
-    config, url, req: new Request(url, { method, ...(body === undefined ? {} : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }) }),
-    deps: {},
-  } as ManagementContext);
-  const previewResponse = await call("GET");
-  expect(previewResponse!.status).toBe(200);
-  const preview = await previewResponse!.json() as { fingerprint: string; changes: unknown[] };
-  expect(preview.changes).toHaveLength(3);
-  expect((await call("POST", { fingerprint: "invalid" }))!.status).toBe(400);
-  expect((await call("POST", { fingerprint: "0".repeat(64) }))!.status).toBe(409);
-  expect((await call("POST", { fingerprint: preview.fingerprint }))!.status).toBe(200);
-  expect(JSON.parse(readFileSync(join(process.env.CLAUDE_CONFIG_DIR!, "settings.json"), "utf8")).env.ANTHROPIC_DEFAULT_OPUS_MODEL).toBe("combo/opus");
-  expect((await call("POST", { fingerprint: preview.fingerprint }))!.status).toBe(409);
-});
-
 test("Claude defaults route preserves the shared request body limit", async () => {
   const config = fixture();
   const url = new URL("http://127.0.0.1/api/claude-code/model-defaults");

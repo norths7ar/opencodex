@@ -14,7 +14,6 @@ const ERRORS: Readonly<Record<string, string>> = {
   invalid_default_provider: "The default must name a configured provider.",
   default_provider_disabled: "A disabled provider cannot be the default.",
   provider_namespace_conflict: "The provider conflicts with an account namespace.",
-  provider_has_dependent_combos: "A routing combo still depends on this provider. Inspect its dependencies before removal.",
   last_provider: "The last provider cannot be removed.",
 };
 

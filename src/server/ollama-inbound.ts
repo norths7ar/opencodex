@@ -9,7 +9,7 @@
  */
 import { OllamaCodecError, consumeOllamaChatChunk, createOllamaStreamState, ollamaBufferedResponse, ollamaStreamTerminal, ollamaToChat, type OllamaKind } from "../protocols/codecs/ollama";
 import { createTranslatorBudget, isTranslatorBudgetExceededError } from "../lib/translator-budget";
-import { parseRetryAfterMs } from "../combos";
+import { parseRetryAfterMs } from "../lib/retry-after-delay";
 import { WORKFLOW_LOCAL_REFUSAL_HEADER } from "../lib/workflow-budget";
 import type { OcxConfig } from "../types";
 import type { DataPlaneAdmission } from "./auth-cors";
@@ -123,7 +123,7 @@ export interface OllamaLogIds {
   start: number;
   turnAdmissionLease?: AdmissionLease;
   admission?: DataPlaneAdmission;
-  advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+  sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
 }
 
 function failBeforeInner(ids: OllamaLogIds, logCtx: RequestLogContext, status: number, message: string): Response {

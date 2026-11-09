@@ -35,7 +35,6 @@ export interface ProxyStopOptions {
   formatStillRunning?: () => string;
   /** Shown when neither the request nor the follow-up read settled the question. */
   formatUnknown?: () => string;
-  mode?: "standalone" | "client";
   /** Budget for the follow-up liveness read. */
   livenessTimeoutMs?: number;
 }
@@ -89,25 +88,15 @@ export async function requestProxyStop(
     formatFailure = status => `Failed to stop proxy (HTTP ${status}).`,
     formatStillRunning = () => "The proxy is still answering, so it did not stop.",
     formatUnknown = () => "The proxy did not confirm the stop. Check whether it is still running.",
-    mode = "standalone",
     livenessTimeoutMs = DEFAULT_LIVENESS_TIMEOUT_MS,
   } = options;
   let response: Response;
   try {
-    const path = mode === "client" ? "/api/machine/disconnect" : "/api/stop";
-    response = await fetchFn(`${apiBase}${path}`, {
+    response = await fetchFn(`${apiBase}/api/stop`, {
       method: "POST",
-      ...(mode === "client" ? { headers: { "Content-Type": "application/json" }, body: "{}" } : {}),
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch {
-    /*
-     * Timeout, abort, a refused connection and a connection dropped mid-response all land
-     * here and are different events. Disconnecting a client does not end the process, so
-     * there is nothing to re-read and the question stays open. Stopping the proxy does end
-     * it, so its absence afterwards is the evidence.
-     */
-    if (mode === "client") return { status: "unknown", message: formatUnknown() };
     const liveness = await readLiveness(apiBase, fetchFn, livenessTimeoutMs);
     if (liveness === "gone") return { status: "accepted" };
     if (liveness === "answering") return { status: "unknown", message: formatStillRunning() };

@@ -69,7 +69,7 @@ describe("formatUsageReport", () => {
 
   test("escapes Unicode line separators on the no-match return too", () => {
     const lines = formatUsageReport(payload({
-      filter: { provider: "before\u2028after", model: null, matched: false, comboOverlap: false },
+      filter: { provider: "before\u2028after", model: null, matched: false, attemptOverlap: false },
     }) as never);
     expect(lines.every(line => !/[\x00-\x1f\x7f-\x9f\u2028\u2029]/.test(line))).toBe(true);
     expect(lines.join("\n")).toContain("before\\u2028after");
@@ -94,7 +94,7 @@ describe("formatUsageReport", () => {
     const empty = payload({ ...partial, summary: { requests: 0, totalTokens: 0 }, providers: [], models: [], days: [] });
     expect(formatUsageReport(empty as never).join("\n")).toContain("WARNING: Usage is incomplete");
     const noMatch = formatUsageReport({ ...empty,
-      filter: { provider: "nope", model: null, matched: false, comboOverlap: false },
+      filter: { provider: "nope", model: null, matched: false, attemptOverlap: false },
     } as never).join("\n");
     expect(noMatch).toContain("WARNING: Usage is incomplete");
     expect(noMatch).toContain("skipped records may contain matches");
@@ -117,12 +117,12 @@ describe("formatUsageReport", () => {
     const out = formatUsageReport(payload({
       providers: [{ provider: control, requests: 1, totalTokens: 2 }],
       models: [{ provider: control, model: control, requests: 1, totalTokens: 2 }],
-      filter: { provider: control, model: control, matched: true, comboOverlap: false },
+      filter: { provider: control, model: control, matched: true, attemptOverlap: false },
     }) as never).join("\n");
     const noMatch = formatUsageReport(payload({
       summary: { requests: 0, totalTokens: 0, estimatedCostUsd: 0 },
       providers: [], models: [], days: [],
-      filter: { provider: control, model: null, matched: false, comboOverlap: false },
+      filter: { provider: control, model: null, matched: false, attemptOverlap: false },
     }) as never).join("\n");
 
     expect(out).not.toContain("\x1b");
@@ -161,7 +161,7 @@ describe("formatUsageReport", () => {
     const out = formatUsageReport(payload({
       summary: { requests: 0, totalTokens: 0, estimatedCostUsd: 0 },
       providers: [], models: [], days: [],
-      filter: { provider: "nope", model: null, matched: false, comboOverlap: false },
+      filter: { provider: "nope", model: null, matched: false, attemptOverlap: false },
     }) as never).join("\n");
     expect(out).toContain('No usage recorded for provider "nope"');
     expect(out).not.toContain("EST. COST");
@@ -169,7 +169,7 @@ describe("formatUsageReport", () => {
 
   test("combo overlap is disclosed rather than left silent", () => {
     const out = formatUsageReport(payload({
-      filter: { provider: "xai", model: null, matched: true, comboOverlap: true },
+      filter: { provider: "xai", model: null, matched: true, attemptOverlap: true },
     }) as never).join("\n");
     expect(out).toContain("per-model request counts can overlap");
   });

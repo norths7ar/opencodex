@@ -19,14 +19,6 @@ import {
   START_OWNERSHIP_LIVENESS,
   validateReadyzBody,
 } from "../../src/server/proxy-liveness";
-import {
-  checkRemoteProtocolCompatibility,
-  parseRemoteReadyMetadata,
-  readyProtocolMetadata,
-} from "../../src/remote/protocol";
-import { getDefaultConfig } from "../../src/config";
-import { buildPeerFeatures } from "../../src/remote/features";
-
 function healthz(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status });
 }
@@ -49,34 +41,6 @@ describe("isOpencodexHealthz", () => {
     expect(isOpencodexHealthz({ service: "something-else", status: "ok", version: "1", uptime: 1 })).toBe(false);
     expect(isOpencodexHealthz({ healthy: true } as never)).toBe(false);
     expect(isOpencodexHealthz({ guiPairCapability: "v1", pid: 4242, port: 10100 })).toBe(false);
-  });
-});
-
-describe("remote protocol feature negotiation", () => {
-  test("intersects additive features and rejects incompatible floors", () => {
-    const compatible = checkRemoteProtocolCompatibility({
-      protocol: 2,
-      minimumClientProtocol: 1,
-      managementUrl: "https://hub.example.test",
-      features: ["rotation", "future"],
-    }, { protocol: 1, minimumHubProtocol: 1, features: ["rotation"] });
-    expect(compatible.ok).toBe(true);
-    if (compatible.ok) expect([...compatible.features]).toEqual(["rotation"]);
-    expect(checkRemoteProtocolCompatibility({
-      protocol: 2, minimumClientProtocol: 2, managementUrl: "https://hub.example.test",
-    }, { protocol: 1, minimumHubProtocol: 1 }).ok).toBe(false);
-    expect(checkRemoteProtocolCompatibility({
-      protocol: 1, minimumClientProtocol: 1, managementUrl: "https://hub.example.test",
-    }, { protocol: 2, minimumHubProtocol: 2 }).ok).toBe(false);
-  });
-
-  test.each([undefined, 0, Number.NaN, 1.5, -1])("rejects malformed protocol %p as invalid", protocol => {
-    const result = checkRemoteProtocolCompatibility({
-      protocol,
-      minimumClientProtocol: 1,
-      managementUrl: "https://hub.example.test",
-    });
-    expect(result).toMatchObject({ ok: false, reason: "invalid" });
   });
 });
 
@@ -865,121 +829,6 @@ describe("validateReadyzBody strict contract", () => {
     expect(validateReadyzBody(undefined, 10100)).toBeNull();
   });
 });
-
-describe("remote readiness protocol metadata", () => {
-  const metadata = {
-    protocol: 1,
-    minimumClientProtocol: 1,
-    managementUrl: "https://hub.example.test",
-  };
-  const invalidMessage = "OpenCodex hub returned invalid remote protocol metadata; upgrade or repair ocx on the hub.";
-
-  test("parses required fields, canonicalizes the origin, and ignores additive fields", () => {
-    expect(parseRemoteReadyMetadata({
-      ...metadata,
-      managementUrl: "https://hub.example.test:443/",
-      future: true,
-    })).toEqual(metadata);
-  });
-
-  test("builds one stable shape for standalone, hub, and client roles", () => {
-    for (const runtimeRole of ["standalone", "hub", "client"] as const) {
-      expect(readyProtocolMetadata(
-        { ...getDefaultConfig(), runtimeRole },
-        new Request("https://hub.example.test/readyz"),
-      )).toEqual({ ...metadata, features: buildPeerFeatures() });
-    }
-  });
-
-  test("uses the observed Host and ignores forwarding headers", () => {
-    expect(readyProtocolMetadata(getDefaultConfig(), new Request("http://127.0.0.1/readyz", {
-      headers: {
-        Host: "hub.example.test:8443",
-        Forwarded: "host=attacker.test;proto=https",
-        "X-Forwarded-Host": "attacker.test",
-        "X-Forwarded-Proto": "https",
-      },
-    }))).toEqual({
-      protocol: 1,
-      minimumClientProtocol: 1,
-      managementUrl: "http://hub.example.test:8443",
-      features: buildPeerFeatures(),
-    });
-  });
-
-  test("configured hub management origin wins while other roles keep the observed fallback", () => {
-    const request = new Request("http://127.0.0.1/readyz", {
-      headers: { Host: "observed.example.test:8443" },
-    });
-    expect(readyProtocolMetadata({
-      ...getDefaultConfig(),
-      runtimeRole: "hub",
-      hub: { managementPublicOrigin: "https://hub.example.test:443" },
-    }, request).managementUrl).toBe("https://hub.example.test");
-    expect(readyProtocolMetadata({
-      ...getDefaultConfig(),
-      runtimeRole: "client",
-      hub: { managementPublicOrigin: "https://ignored.example.test" },
-    }, request).managementUrl).toBe("http://observed.example.test:8443");
-  });
-
-  test("classifies a hub that requires a newer client with the exact message", () => {
-    expect(checkRemoteProtocolCompatibility({ ...metadata, protocol: 2, minimumClientProtocol: 2 })).toEqual({
-      ok: false,
-      reason: "hub-too-new",
-      message: "OpenCodex hub requires remote protocol 2; this client supports protocol 1. Upgrade ocx on this client.",
-    });
-  });
-
-  test("classifies a hub below the client floor with the exact message", () => {
-    expect(checkRemoteProtocolCompatibility(metadata, { protocol: 2, minimumHubProtocol: 2 })).toEqual({
-      ok: false,
-      reason: "hub-too-old",
-      message: "OpenCodex hub provides remote protocol 1; this client requires at least 2. Upgrade ocx on the hub.",
-    });
-  });
-
-  test("malformed metadata is invalid, never a version mismatch", () => {
-    const malformed = [
-      { ...metadata, protocol: 0 },
-      { minimumClientProtocol: 1, managementUrl: metadata.managementUrl },
-      { protocol: 1, managementUrl: metadata.managementUrl },
-      { ...metadata, protocol: "1" },
-      { ...metadata, protocol: Number.MAX_SAFE_INTEGER + 1 },
-      { ...metadata, minimumClientProtocol: 2 },
-      { ...metadata, managementUrl: "https://hub.example.test/path" },
-      { ...metadata, managementUrl: "https://hub.example.test/?query=1" },
-      { ...metadata, managementUrl: "https://hub.example.test/#fragment" },
-      { ...metadata, managementUrl: "https://user@hub.example.test" },
-    ];
-    for (const value of malformed) {
-      expect(parseRemoteReadyMetadata(value)).toBeNull();
-      expect(checkRemoteProtocolCompatibility(value)).toEqual({
-        ok: false,
-        reason: "invalid",
-        message: invalidMessage,
-      });
-    }
-  });
-
-  test("accepts an additive protocol level when the v1 intervals intersect", () => {
-    expect(checkRemoteProtocolCompatibility({ ...metadata, protocol: 2 })).toEqual({
-      ok: true,
-      metadata: { ...metadata, protocol: 2 },
-      features: new Set(),
-    });
-  });
-});
-
-// ── probeReadiness: strict HTTP + contract enforcement ─────────────────────────
-
-function readyz(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
-}
-
-const READY_BODY = { service: "opencodex", version: "2.6.17", uptime: 12, pid: 4242, port: 10100, status: "ready" };
-const PENDING_BODY = { service: "opencodex", version: "2.6.17", uptime: 1, pid: 4242, port: 10100, status: "pending" };
-const FAILED_BODY = { service: "opencodex", version: "2.6.17", uptime: 1, pid: 4242, port: 10100, status: "failed" };
 
 describe("probeReadiness happy path", () => {
   test("accepts a correct 200 + ready body", async () => {

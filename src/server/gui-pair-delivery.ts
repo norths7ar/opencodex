@@ -13,11 +13,9 @@ export class GuiPairingIntentRequiredError extends Error {
 /** The serving route must authenticate the existing process-bound capability first. */
 export function deliverGuiPairingGrant(req: Request, config: OcxConfig, state: GuiSessionState) {
   const origin = req.headers.get(GUI_PAIR_BROWSER_ORIGIN_HEADER) ?? "";
-  if (config.runtimeRole !== "hub") {
-    if (standaloneGuiPairingOrigin(config) !== origin
-      || !consumeGuiPairIntent(req.headers.get(GUI_PAIR_CAPABILITY_HEADER), req.headers.get(GUI_PAIR_INTENT_HEADER))) {
-      throw new GuiPairingIntentRequiredError();
-    }
+  if (standaloneGuiPairingOrigin(config) !== origin
+    || !consumeGuiPairIntent(req.headers.get(GUI_PAIR_CAPABILITY_HEADER), req.headers.get(GUI_PAIR_INTENT_HEADER))) {
+    throw new GuiPairingIntentRequiredError();
   }
   return createGuiPairingGrant(origin, config, state);
 }

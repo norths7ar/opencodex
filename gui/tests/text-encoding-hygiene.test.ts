@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const GUI_DIR = fileURLToPath(new URL("..", import.meta.url));
+const GUI_DIR = fileURLToPath(new URL("../../frontend", import.meta.url));
 const SOURCE_DIR = join(GUI_DIR, "src");
 const TEXT_EXTENSIONS = new Set([".css", ".html", ".js", ".jsx", ".ts", ".tsx"]);
 const UTF8_DECODER = new TextDecoder("utf-8", { fatal: true });

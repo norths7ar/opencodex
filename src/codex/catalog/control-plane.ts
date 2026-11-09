@@ -1,6 +1,5 @@
 import { CODEX_INTERNAL_OPENAI_MODELS, isCodexControlPlaneModel } from "../control-plane-models";
-import { COMBO_NAMESPACE } from "../../combos";
-import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "./kinds";
+import { isRetiredComboCatalogEntry } from "./ownership";
 import { NATIVE_RESERVE_MODEL, SUPPORTED_NATIVE_OPENAI_SLUGS } from "./native-models";
 import { isReserveCatalogProjection } from "./reserve";
 import { pinnedNativeModelRows } from "./pinned-models";
@@ -13,8 +12,7 @@ export function hasOrdinaryNativeOpenAiRow(entries: readonly RawEntry[]): boolea
     && SUPPORTED_NATIVE_OPENAI_SLUGS.has(entry.slug)
     && entry.slug !== NATIVE_RESERVE_MODEL
     && !isReserveCatalogProjection(entry)
-    && entry.opencodex_catalog_kind !== CODEX_NATIVE_ALIAS_CATALOG_KIND
-    && entry.owned_by !== COMBO_NAMESPACE);
+    && !isRetiredComboCatalogEntry(entry));
 }
 
 /** Keep internal reviewer metadata separate from native synthesis, picker ordering and account clones. */

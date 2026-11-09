@@ -1,7 +1,7 @@
 import { bridgeToResponsesSSE, formatErrorResponse } from "../../bridge";
 import { OLLAMA_LATE_ATTRIBUTION_LIMIT_MESSAGE } from "../../adapters/ollama-native";
 import { isThroughputLimitText } from "../../claude/outbound";
-import { isDefiniteContextOverflow } from "../../combos/failover";
+import { isDefiniteContextOverflow } from "../../lib/context-overflow-verdict";
 import { classifyError, MODEL_NOT_IN_PLAN_STREAM_CODE } from "../../lib/errors";
 import type { TranslatorBudget } from "../../lib/translator-budget";
 import type { AdapterEvent } from "../../types";

@@ -3,7 +3,7 @@ import { createOpenAIChatAdapter as createOpenAIChatAdapterProduction } from "..
 import { createGoogleAdapter as createGoogleAdapterProduction } from "../../src/adapters/google";
 import { adapterFailureFromMessage, bridgeToResponsesSSE, buildResponseJSON } from "../../src/bridge";
 import { adapterFailureFromEvent } from "../../src/bridge/internal";
-import { preflightComboStreamResponse } from "../../src/server/responses/combo-stream-preflight";
+import { preflightResponsesStream } from "../../src/server/responses/stream-preflight";
 import type { AdapterEvent } from "../../src/types";
 import { withTestTranslatorBudget } from "../helpers/translator-budget";
 
@@ -77,17 +77,6 @@ describe("typed rate-limit retry advice", () => {
     expect(response.error).toMatchObject({ code: "rate_limit_exceeded", message: `Please try again in 900s. ${event.message}` });
     expect(frames.some(frame => frame.event?.includes("reasoning") || frame.event === "response.completed")).toBe(false);
     expect(buffered.status).toBe("failed");
-  });
-
-  test("the canonical failure remains pre-output and available to combo failover", async () => {
-    async function* source() { yield refusal(); }
-    const response = new Response(bridgeToResponsesSSE(source(), "devin/swe-2"), {
-      headers: { "content-type": "text/event-stream" },
-    });
-    const preflight = await preflightComboStreamResponse(response, { provider: "devin", model: "swe-2" });
-    expect(preflight.kind).toBe("failed");
-    expect(preflight.response.status).toBe(429);
-    expect((await preflight.response.json()).error.code).toBe("rate_limit_exceeded");
   });
 });
 

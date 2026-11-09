@@ -490,6 +490,11 @@ describe("Codex auth context", () => {
 
     expect(claimCalls).toBe(1);
     expect(selectionReleases).toBe(1);
+    const paused = config();
+    paused.pausedCodexAccountIds = [MAIN_CODEX_ACCOUNT_ID];
+    await expect(resolveCodexAuthContext(new Headers(), paused, "direct", {
+      substituteMainCredentialForDirect: true,
+    })).rejects.toThrow("paused");
     expect(nativeReads).toBe(0);
   });
 

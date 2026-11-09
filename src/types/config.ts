@@ -4,7 +4,7 @@ import type { AnthropicAccountPoolConfig, OcxAccountPoolRotationStrategy } from 
 import type { AnthropicInstanceId } from "../providers/anthropic-instance-id";
 import type { OcxFallbackConfig } from "./fallback";
 export type { AnthropicAccountPoolConfig, AnthropicModelRoute, OcxAccountPoolRotationStrategy, OcxAccountPoolQuotaWindow } from "./anthropic-account-pool";
-export type { OcxFallbackConfig, OcxFallbackDeviceConfig, OcxFallbackKind, OcxFallbackSwitches } from "./fallback";
+export type { OcxFallbackConfig, OcxFallbackKind, OcxFallbackSwitches } from "./fallback";
 
 /** Public inference API exposure. Responses and Chat Completions are always served. */
 export interface OcxApiSurfacesConfig {
@@ -24,8 +24,6 @@ export interface OcxProtocolsConfig {
   unrepresentable?: "legacy" | "reject";
   /** Staged rollout switches. Every switch defaults off and changes no semantics while off. */
   rollout?: {
-    /** Eligible Chat candidates inside combos and policy routes send natively. */
-    nativeChatCombos?: boolean;
     /** Proxy-managed key-auth Anthropic targets receive `/v1/messages` natively. */
     managedMessagesNative?: boolean;
     /** Extends managed native Messages to Anthropic OAuth accounts. Requires the switch above. */
@@ -61,7 +59,7 @@ export interface OcxClaudeCodeConfig {
    * A single trailing '*' matches a provider-qualified prefix (for example 'gateway/gpt-*').
    * Replays successful client ToolSearch discoveries in place without growing the initial
    * catalog. Requires metadata.user_id. Absent/empty is off; native passthrough is unchanged.
-   * Applies only after routing settles on a direct openai-responses route; combos and policies are skipped.
+   * Applies only after routing settles on a direct openai-responses route; routing profiles are skipped.
    */
   appendOnlyToolLoadingModels?: string[];
   /** Opt-in translated Messages admission; unset keeps legacy behavior. Native passthrough is exempt. */
@@ -105,12 +103,6 @@ export interface OcxClaudeCodeConfig {
    * classifier route is not available.
    */
   classifierFallbacks?: string[];
-  /**
-  * Inject ANTHROPIC_BASE_URL etc. into the macOS user domain via `launchctl setenv`
-  * so plain `claude` commands route through the proxy without `ocx claude`. Reverted
-   * on stop/shutdown. Default: false (opt-in). macOS only.
-   */
-  systemEnv?: boolean;
   /**
    * Auth mode for Claude Code inbound requests — a THREE-state intent.
    *
@@ -367,16 +359,10 @@ export interface OcxApiKeyEntry {
    * `provider/model` pair. Absent or empty means every model.
    *
    * These name destinations, not the selectors a client sends: they are
-   * checked after alias, combo, fallback and compaction resolution, because
+   * checked after alias, fallback and compaction resolution, because
    * that is the only point at which the model about to be billed is known.
    */
   allowedModels?: string[];
-  /**
-   * Lets this key reach combo targets marked `metered`. Absent means no: an issued key stops
-   * at the last unmetered target. The environment token never qualifies. A loopback bind
-   * reads no key; local operator consent is instead declared on the combo.
-   */
-  allowMeteredComboTargets?: boolean;
 }
 
 export interface OcxPendingApiKeyRotation {
@@ -443,55 +429,6 @@ export interface OcxSkillsConfig {
   catalog_refresh?: SkillsCatalogRefresh;
 }
 
-export type OcxRuntimeRole = "standalone" | "hub" | "client";
-
-export interface OcxHubConfig {
-  /** Canonical browser-reachable management origin advertised by a hub. */
-  managementPublicOrigin?: string;
-  /**
-   * Canonical client-reachable DATA origin of this hub — what a remote machine passes as the
-   * positional URL to `ocx connect`, and what `ocx hub invite` prints.
-   *
-   * Separate from `managementPublicOrigin` because the two are genuinely different sockets on a
-   * real deployment: management is a loopback-only ingress published by an HTTPS frontend, while
-   * the data listener is bound to the hub's tailnet/LAN address and fronted on its own port
-   * (`https://hub.tailnet.ts.net:8443`). Deriving one from the other produced an origin that
-   * answered `/readyz` and nothing else.
-   *
-   * Advisory only: it is the origin the hub ADVERTISES, never a bind address. When omitted,
-   * `ocx hub invite` falls back to `http://<hostname>:<port>`, which is correct for a plain
-   * tailnet bind with no TLS frontend.
-   */
-  dataPublicOrigin?: string;
-  /**
-   * Optional management-only listener for a local HTTPS frontend such as Tailscale Serve.
-   * The hostname is deliberately not configurable: when enabled the socket is always bound
-   * to 127.0.0.1, and only GUI, session-bootstrap, and management API routes are admitted.
-   */
-  managementIngress?:
-    | { enabled: false }
-    | { enabled: true; port: number };
-}
-
-export interface OcxRemoteGuiConfig {
-  /** Exact Tailscale login identities permitted to receive an automatic remote GUI session. */
-  allowedTailscaleUsers?: string[];
-  /**
-   * Retired. Once permitted a one-time pairing exchange over non-loopback plaintext HTTP.
-   *
-   * Still parsed so an existing config file keeps loading, but it grants nothing: a pairing
-   * grant now crosses loopback or authenticated HTTPS only. A persisted `true` is reported
-   * once and otherwise ignored. Kept in the type rather than deleted because the schema is
-   * strict — dropping the key outright would make an older config fail to load entirely,
-   * which is a worse outcome than ignoring one retired field.
-   *
-   * @deprecated has no effect; remove it from your config.
-   */
-  allowInsecureHttp?: boolean;
-}
-
-export type OcxConnectedClientId = "codex" | "claude";
-
 /**
  * Redaction policy for management and CLI projections (#3859).
  *
@@ -502,72 +439,12 @@ export interface OcxPrivacyConfig {
   /**
    * Mask stored account emails before they leave the proxy. Omitted or `true` is the historical
    * behaviour and the default.
-   *
-   * Setting this to `false` is a real disclosure decision, not a display preference. Management
-   * is not always loopback — under `remoteGui` the unmasked address reaches every management
-   * principal that can reach the hub, not only someone sitting at the machine. The default
-   * therefore stays masked, and turning it off is an explicit opt-in by the operator who owns
-   * those accounts.
    */
   maskEmails?: boolean;
 }
 
-export interface OcxLinkTransportConfig {
-  tunnelPort: number;
-  linkId: string;
-}
-
-export interface OcxClientConnectionConfig {
-  serverUrl: string;
-  managementUrl: string;
-  managementTransport: "direct" | "relay";
-  transport?: "hub" | "link";
-  link?: OcxLinkTransportConfig;
-  selectedClients: OcxConnectedClientId[];
-  tokenEnv: "OPENCODEX_API_AUTH_TOKEN";
-  apiKeyId: string;
-  tokenFingerprint: string;
-  protocolVersion: 1;
-  connectedAt: string;
-  /**
-   * sha256/base64url of the catalog bytes this connection wrote, used to tell "still ours"
-   * from "edited or replaced" before removing the file on disconnect.
-   *
-   * Our own hash rather than the hub's ETag: /v1/catalog emits no validator, and this was
-   * always an ownership check on local bytes rather than a cache concern.
-   */
-  catalogFingerprint?: string;
-  /**
-   * The catalog that was on disk before connect overwrote it, base64-encoded, or the
-   * empty string when there was none.
-   *
-   * Durable because disconnect runs in a different process than connect: an in-memory
-   * snapshot only covers a connect that fails and rolls back on the spot. Without this,
-   * disconnect deletes the remote catalog and reports a restored native state while the
-   * user's own catalog is simply gone.
-   */
-  priorCatalog?: string;
-  catalogSyncedAt?: string;
-  pendingOperation?: {
-    kind: "rotate";
-    rotationId: string;
-    newKeyIssuedAt: string;
-    oldKeyBackupPath: string;
-  };
-}
-
 export interface OcxConfig {
-  /** Experimental macOS app-server stdout shim; absent or false disables it. */
-  chatgptDesktop?: { appServerShim?: boolean };
   port: number;
-  /** Runtime topology role. Absence preserves the historical standalone behavior. */
-  runtimeRole?: OcxRuntimeRole;
-  /** Hub-only public management metadata. Presence is inert outside the hub role. */
-  hub?: OcxHubConfig;
-  /** Opt-in remote dashboard issuance policy. Presence is inert outside the hub role. */
-  remoteGui?: OcxRemoteGuiConfig;
-  /** Remote-hub client state. The admission secret is stored only in service-api-token. */
-  client?: OcxClientConnectionConfig;
   /** Operator-facing redaction policy for management and CLI projections. */
   privacy?: OcxPrivacyConfig;
   /** Runtime skills catalog session snapshotting settings (#5569). */
@@ -1168,16 +1045,6 @@ export interface OcxConfig {
   cacheRetention?: "none" | "short" | "long";
   /** Web-search sidecar: route web_search for non-OpenAI models through a gpt-mini via ChatGPT passthrough. */
   webSearchSidecar?: OcxWebSearchSidecarConfig;
-  /**
-   * Advisor sidecar: an OpenCodex-owned expert consultation runtime. The proxy injects a synthetic
-   * `advisor` tool into routed worker turns, executes the configured expert model itself (loopback
-   * through the normal routing authority, so the advisor may be ANY routable provider/model), and
-   * reinjects the advice so the original worker continues. `policy: "preflight"` additionally
-   * attempts one automatic consultation per task without worker cooperation, once the task has
-   * produced orientation evidence. Task context is sent only after
-   * `contextSharingConsent` is the current version; `enabled` does not grant that consent.
-   */
-  advisor?: OcxAdvisorConfig;
   /** Vision sidecar: describe images via a gpt vision model so text-only models can "see" them. */
   visionSidecar?: OcxVisionSidecarConfig;
   /** /v1/images relay for codex's built-in image_gen tool. */
@@ -1331,6 +1198,8 @@ export interface OcxConfig {
   };
   /** Active pool account id for next session. undefined = main (passthrough as-is). */
   activeCodexAccountId?: string;
+  /** Explicit channel logout; dormant accounts and native main are not fallback credentials. */
+  codexSignedOut?: boolean;
   /** Auto-switch threshold (0-100). Default 80. 0 = disabled. */
   autoSwitchThreshold?: number;
   /** Opt-in: return bound quota-strategy tasks to recovered higher-priority accounts. */
@@ -1426,8 +1295,6 @@ export interface OcxConfig {
   oauthAccountFailover?: {
     enabled?: boolean;
   };
-  /** Virtual `combo/<id>` models spanning concrete provider/model targets (issue #133). */
-  combos?: Record<string, OcxComboConfig>;
   /**
    * Routing policy profiles (Router Intelligence, RI-04+): explicitly requested
    * `policy/<id>` (or configured alias) models select among an explicit
@@ -1444,146 +1311,6 @@ export interface OcxConfig {
    * fallback permission. Absent keeps every chain as it was. See src/routing/fallback-policy.ts.
    */
   fallback?: OcxFallbackConfig;
-}
-
-export type OcxComboStrategy = "failover" | "round-robin" | "random" | "least-used" | "reset-window" | "jev";
-export type OcxComboDefaultEffort = "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
-export type OcxComboDefaultEffortMode = "fallback" | "force";
-
-/**
- * How a combo derives the reasoning ladder it publishes to the picker.
- *
- * `strict` (default) intersects every advertised ladder, so a target that explicitly
- * advertises no effort control (`reasoningEfforts: []`) empties the combo's picker.
- * `adaptive` excludes those empty ladders from the published intersection, keeping the
- * control usable for a mixed-capability group. Unknown (`undefined`) ladders stay
- * wildcards in both modes. An explicit empty ladder removes unsupported effort controls
- * in either mode; adaptive dispatch also removes them before sending to an unknown target,
- * while each known target still resolves its own effort.
- */
-export type OcxComboReasoningEffortMode = "strict" | "adaptive";
-
-/** Policy for how target cooldowns interact with `lastResort` targets (#5691). */
-export type OcxComboCooldownWaitPolicy = "before-last-resort";
-
-export interface OcxComboTarget {
-  provider: string;
-  model: string;
-  /** Relative target weight for round-robin batches and random selection. Default 1; valid range 1..10000. */
-  weight?: number;
-  /**
-   * Exact efforts JEV may choose for this target. Omit to allow every effort the
-   * target currently advertises; an explicit list must be non-empty.
-   */
-  reasoningEfforts?: OcxComboDefaultEffort[];
-  /**
-   * Operator-authored capability description sent only to the JEV decision
-   * service for this target. The built-in model profile always applies.
-   */
-  modelProfile?: string;
-  /**
-   * Marks an emergency-only target. Inert unless the combo sets
-   * `cooldownWaitPolicy`, and never makes a target permanently ineligible —
-   * see `OcxComboConfig.cooldownWaitPolicy` (#5691).
-   */
-  lastResort?: boolean;
-  /**
-   * Pay-per-use target (for example an API-key row behind subscription targets). Only the
-   * configured keys with `allowMeteredComboTargets: true`, or a loopback-only combo
-   * with `allowMeteredTargets: true`, may reach it.
-   */
-  metered?: boolean;
-}
-
-export interface OcxComboConfig {
-  targets: OcxComboTarget[];
-  /** Operator consent for metered targets on a loopback-only proxy. Default false; public listeners still require key consent. */
-  allowMeteredTargets?: boolean;
-  /** Ordered failover (default), round-robin, weighted random, least-used, or quota reset-window selection. */
-  strategy?: OcxComboStrategy;
-  /** Successful requests retained on one RR selection batch. Default 1; range 1..100. */
-  stickyLimit?: number;
-  /**
-   * Optional per-target cooldown used only when the upstream response has no Retry-After or Codex reset signal.
-   * Unset uses the upstream fallback (5 s for request-rate 429 codes 1302/1305, otherwise 60 s);
-   * an explicit value overrides that fallback. Range 1..600000.
-   */
-  cooldownMs?: number;
-  /** Maximum wait for an eligible target cooldown to expire before failing closed. Default 0; range 0..600000, per selection attempt. */
-  waitForCooldownMs?: number;
-  /** Opt-in retry pass when all otherwise eligible targets are cooling. Disabled by default. */
-  cooldownReprobe?: {
-    enabled: boolean;
-    /** Minimum interval between recovery passes, in milliseconds. Default 300000; range 1000..86400000. */
-    intervalMs?: number;
-  };
-  /**
-   * `before-last-resort` defers targets marked `lastResort` while a normal
-   * target is merely cooling and that cooldown can be waited out inside
-   * `waitForCooldownMs`. Omitted keeps today's behavior, where a brief cooldown
-   * on a preferred target routes straight to the emergency target (#5691).
-   *
-   * It only ever defers. When no normal target can be reached — all cooling
-   * past the budget, excluded, or ruled out by the caller — the last-resort
-   * target is dispatched, because a policy that could withhold it would turn a
-   * fallback into an outage.
-   */
-  cooldownWaitPolicy?: OcxComboCooldownWaitPolicy;
-  /** Used as a fallback when the client omits reasoning.effort, or as an override in `force` mode. null/omitted leaves the target default unchanged. */
-  defaultEffort?: OcxComboDefaultEffort | null;
-  /** `force` makes the combo default override a valid client effort. Omitted / `fallback` preserves client precedence. */
-  defaultEffortMode?: OcxComboDefaultEffortMode;
-  /**
-   * Picker-ladder derivation policy. Omitted / `"strict"` keeps the legacy rule where an
-   * explicitly empty target ladder suppresses the whole combo's effort control.
-   */
-  reasoningEffortMode?: OcxComboReasoningEffortMode;
-  /**
-   * Disable image input even when every target supports it.
-   * Omitted / `"auto"` keeps automatic capability derivation (default: enabled when
-   * the target intersection includes image).
-   */
-  imageInput?: "auto" | "disabled";
-  /**
-   * Optional public model name replacing the default `combo/<id>` slug. Bare names
-   * without "/" are allowed (e.g. "deepseek-v4-flash") so the combo can answer to a
-   * mandated model id; exact-match requests route here before any provider resolution.
-   */
-  alias?: string;
-  /**
-   * Explicitly allow a bare OpenAI-native alias (for example `gpt-5.6-sol`) to
-   * be represented by this routed combo. Never inferred from `alias`.
-   */
-  nativeAlias?: boolean;
-  /** Display-only label for the public catalog row. Required for native aliases. */
-  displayName?: string;
-  /** Display-only description for the public catalog row; unset keeps the generated text (#7229). */
-  description?: string;
-  /**
-   * `strategy: "jev"` only: provider id of the decision service. Omitted or `"jev"` uses the
-   * canonical TypeSafe endpoint; any other id must name a configured `adapter: "jev-decision"`
-   * row, such as a self-hosted Ollama `tev1` endpoint. That row's baseUrl is the full decision
-   * endpoint and only its own apiKey is sent there.
-   */
-  decisionProvider?: string | null;
-  /** JEV only: an ordinary model route for decisions; null explicitly clears management input. */
-  decisionModel?: string | null;
-  /**
-   * `strategy: "jev"` only: decision deadline in milliseconds before failing open to the first
-   * eligible target. Default 4000; range 1000..120000. Raise it for a self-hosted decision model
-   * whose first call may include a cold model load.
-   */
-  decisionTimeoutMs?: number;
-  /** JEV-only advisory loaded quota evidence; off/unset leaves request bytes unchanged. */
-  decisionQuotaSignals?: boolean | null;
-  /** Partial 0..100 tier overrides; defaults limited 70/nearlyExhausted 90. null clears. */
-  decisionQuotaTiers?: import("../combos/jev-quota-config").JevQuotaTiers | null;
-  /**
-   * `strategy: "jev"` only, default off: keep an explicit client session on the target JEV chose
-   * for it while the session stays active, so the provider prompt cache stays warm (#7525).
-   * `ttlMs` is the idle window after the last successful turn (60000..86400000). null clears.
-   */
-  sessionPin?: import("../combos/jev-session-pin-config").JevSessionPinConfig | null;
 }
 
 export type OcxRoutingUnknownEvidenceMode = "allow" | "penalize" | "exclude";
@@ -1643,19 +1370,6 @@ export interface OcxRoutingProfileUnknownEvidence {
   cost?: OcxRoutingUnknownEvidenceMode;
 }
 
-export interface OcxRoutingProfileCompatibilitySuite {
-  suiteId: string;
-  evidenceLayer: "protocol_conformance" | "live_route_compatibility";
-}
-
-export interface OcxRoutingProfileCompatibility {
-  requiredSuites?: OcxRoutingProfileCompatibilitySuite[];
-  minStatus?: "PROBED" | "VERIFIED";
-  maxEvidenceAgeMs?: number;
-  unknownEvidence?: OcxRoutingUnknownEvidenceMode;
-  degradedEvidence?: OcxRoutingUnknownEvidenceMode;
-}
-
 export interface OcxRoutingProfileConfig {
   /**
    * Explicit candidate allowlist (`provider/model` refs). No implicit
@@ -1671,8 +1385,6 @@ export interface OcxRoutingProfileConfig {
   limits?: OcxRoutingProfileLimits;
   /** How unknown evidence is handled per dimension. */
   unknownEvidence?: OcxRoutingProfileUnknownEvidence;
-  /** Optional Compatibility Lab policy (CL-06). */
-  compatibility?: OcxRoutingProfileCompatibility;
 }
 
 
@@ -1750,39 +1462,6 @@ export interface OcxVisionSidecarConfig {
   maxDescriptionsPerTurn?: number;
   /** Sidecar fetch timeout (ms). */
   timeoutMs?: number;
-}
-
-/**
- * Advisor sidecar configuration. Automatic triggers require deterministic task evidence.
- */
-export interface OcxAdvisorConfig {
-  /** Master switch. Default: false — the advisor stays off the request path entirely. */
-  enabled?: boolean;
-  /**
-   * The expert model consulted by the sidecar. Any model string the routing authority accepts:
-   * a bare native model ("gpt-6-astra"), an explicit "provider/model" ("anthropic/claude-...",
-   * "xai/grok-..."), or an account-qualified native model ("<namespace>/gpt-6-astra").
-   */
-  model?: string;
-  /** Reasoning effort for the advisor call. Validated against the canonical effort ladder. */
-  effort?: "low" | "medium" | "high" | "xhigh" | "max" | "ultra";
-  /**
-   * When the advisor is consulted. "manual" (default): only when the worker explicitly calls the
-   * synthetic `advisor` tool. "preflight": OpenCodex additionally attempts one automatic
-   * consultation per task once the task has produced orientation evidence (an assistant tool call
-   * or a tool result after the latest user message).
-   */
-  policy?: "manual" | "preflight" | "adaptive";
-  /** Adaptive task consultation attempts (manual + automatic). Integer 1–3, default 3. */
-  maxConsultationsPerTask?: number;
-  /** Advisor fetch timeout (ms). Default 120000. */
-  timeoutMs?: number;
-  /**
-   * Operator consent to send task conversation and tool results to the configured Advisor
-   * provider. Only `"v1"` is current. Absent or any other value means the runtime must not
-   * send task context. `enabled: true` does not grant this, and upgrades do not write it.
-   */
-  contextSharingConsent?: "v1";
 }
 
 export interface OcxWebSearchSidecarConfig {

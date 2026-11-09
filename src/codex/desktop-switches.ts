@@ -44,7 +44,6 @@ export interface CodexDesktopSwitchReport {
 type DesktopSwitchConfig = Pick<
   OcxConfig,
   | "clientIntegrations"
-  | "runtimeRole"
   | "hostname"
   | "unauthenticatedLoopbackListener"
   | "codexDesktopAuthless"
@@ -54,16 +53,13 @@ type DesktopSwitchConfig = Pick<
 function describeSwitch(
   stored: boolean,
   effective: boolean | null,
-  config: Pick<OcxConfig, "runtimeRole">,
 ): CodexDesktopSwitchState {
   if (effective === null) return { stored, effective };
   if (!stored || effective) return { stored, effective };
   return {
     stored,
     effective,
-    inertReason: config.runtimeRole === "client"
-      ? "client_role"
-      : "non_loopback_bind_requires_admission_token",
+    inertReason: "non_loopback_bind_requires_admission_token",
   };
 }
 
@@ -83,8 +79,8 @@ export function describeCodexDesktopSwitches(
   const compactionEffective = effectiveWithheld ? null : isEffectiveCodexClientCompaction(config);
 
   return {
-    codexDesktopAuthless: describeSwitch(authlessStored, authlessEffective, config),
-    codexClientCompaction: describeSwitch(compactionStored, compactionEffective, config),
+    codexDesktopAuthless: describeSwitch(authlessStored, authlessEffective),
+    codexClientCompaction: describeSwitch(compactionStored, compactionEffective),
     apply,
     authSource: externallyOwned
       ? {

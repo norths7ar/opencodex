@@ -45,8 +45,7 @@ for (const instance of instances) for (const mutation of ["uuid", "cancel", "epo
     const recovery=await import("../../../src/providers/quota/anthropic-cooldown-recovery");
     const sweeper=await import("../../../src/lib/state-store-sweeper");
     const context={generation:sweeper.captureConfigGeneration()+1,providerNames:new Set(instances),
-      oauthAccountKeys:new Set(instances.flatMap(i=>f.store.getAccountSet(i)!.accounts.map(a=>cache.accountCacheKey(i,a.id)))),
-      comboIds:new Set<string>(),comboTargets:new Set<string>(),codexAccountIds:new Set<string>(),configRoots:new Set<string>()};
+      oauthAccountKeys:new Set(instances.flatMap(i=>f.store.getAccountSet(i)!.accounts.map(a=>cache.accountCacheKey(i,a.id)))),codexAccountIds:new Set<string>(),configRoots:new Set<string>()};
     recovery.reconcileAllAnthropicCooldownGenerations(context);
     await f.store.mutateStore(s=>{s[instance]!.accounts.unshift(original);});
   }

@@ -11,14 +11,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { baseUrlForChoice, matchChoiceId, resolvedBaseUrlForChoice } from "../../base-url-choice";
 import { readJsonIfOk } from "../../fetch-json";
-import { confirmAction } from "../../action-dialogs";
 import { createBoundedFetch } from "../../bounded-fetch";
 import { startVisibilityPoll } from "../../visibility-poll";
 import { useT } from "../../i18n/shared";
 import { IconLock } from "../../icons";
 import { Select } from "../../ui";
 import { isCatalogProviderId } from "../../provider-icons";
-import { openAiAccountProviderState } from "../../provider-payload";
 import { canConfigureResponsesReasoningReplay } from "../../responses-reasoning-replay";
 import { ResponsesReasoningReplayControl } from "../responses-reasoning-replay-control";
 import { providerSupportsLiveModelDiscovery } from "../../provider-workspace/catalog";
@@ -95,9 +93,6 @@ export default function ProviderSettings({
   const [cursorHttpVersion, setCursorHttpVersion] = useState<CursorHttpVersion>(savedCursorHttpVersion);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const [accountMode, setAccountMode] = useState<"pool" | "direct">(item.codexAccountMode ?? "pool");
-  const [modeSaving, setModeSaving] = useState(false);
-  const [modeMsg, setModeMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [baseUrlChoices, setBaseUrlChoices] = useState<CatalogPreset["baseUrlChoices"]>();
   // "" is the same-origin dashboard and must load like any other server base.
   const [choicesStatus, setChoicesStatus] = useState<ChoicesStatus>(apiBase !== undefined ? "loading" : "idle");
@@ -133,7 +128,6 @@ export default function ProviderSettings({
     setPacingConcurrency(numberDraft(item.requestPacing?.maxConcurrentRequests));
     setPacingModels({ ...(item.requestPacing?.models ?? {}) });
     setMsg(null);
-    setModeMsg(null);
     queueMicrotask(() => setEndpointChoice(matchChoiceId(baseUrlChoices, item.baseUrl)));
   }, [item.adapter, item.baseUrl, item.defaultModel, item.authMode, item.apiKeyTransport, item.keyOptional, item.note, item.allowPrivateNetwork, item.preserveResponsesReasoningContent, savedLiveModels, savedCursorHttpVersion, item.requestPacing, baseUrlChoices]);
   /* eslint-enable react-hooks/set-state-in-effect */
@@ -141,9 +135,6 @@ export default function ProviderSettings({
   // Account mode syncs on its own: a mode PATCH refresh must not reset an in-progress
   // draft, so it is deliberately kept out of the form-reset effect above.
   /* eslint-disable react-hooks/set-state-in-effect -- intentional split from the form reset */
-  useEffect(() => {
-    setAccountMode(item.codexAccountMode ?? "pool");
-  }, [item.codexAccountMode]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
@@ -239,15 +230,12 @@ export default function ProviderSettings({
   const isPreset = isCatalogProviderId(item.name);
   const hasEndpointPicker = choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
   const supportsApiKeyTransport = adapter.trim() === "anthropic" && authMode === "key";
-  const openAiState = item.name === "openai" ? openAiAccountProviderState(item) : "invalid";
-  const isCanonicalOpenAi = openAiState === "ready" || openAiState === "disabled";
   // Lock plain baseUrl for presets while loading or when there is no picker.
   // On fetch error, keep it editable so allowBaseUrlOverride providers are not trapped.
   const plainBaseUrlLocked = isPreset && choicesStatus !== "error";
 
   const save = async (): Promise<boolean> => {
     if (!onUpdateProvider) { setMsg({ ok: false, text: t("pws.updatesUnavailable") }); return false; }
-    if (modeSaving) return false;
     const nextBaseUrl = hasEndpointPicker
       ? resolvedBaseUrlForChoice(baseUrlChoices, endpointChoice, baseUrl)
       : baseUrl.trim();
@@ -308,38 +296,6 @@ export default function ProviderSettings({
     onRegisterSave(() => saveRef.current());
     return () => onRegisterSave(null);
   }, [onRegisterSave]);
-
-  const applyAccountMode = async (next: "pool" | "direct") => {
-    if (modeSaving || saving || next === accountMode) return;
-    if (!onUpdateProvider) { setModeMsg({ ok: false, text: t("pws.updatesUnavailable") }); return; }
-    setModeSaving(true);
-    setModeMsg(null);
-    try {
-      const res = await onUpdateProvider("openai", { codexAccountMode: next });
-      if (res.ok) {
-        setAccountMode(next);
-        setModeMsg({ ok: true, text: t("pws.accountModeSaved") });
-      } else {
-        setModeMsg({ ok: false, text: res.error || t("pws.accountModeFailed") });
-      }
-    } catch {
-      setModeMsg({ ok: false, text: t("pws.accountModeFailed") });
-    } finally {
-      setModeSaving(false);
-    }
-  };
-
-  /**
-   * Asks before switching, because flipping modes rebinds running threads and changes quota
-   * accounting. Written as a named async function rather than a promise chain inside the
-   * handler: a floating `.then` in a JSX handler has no rejection path and is what
-   * `no-floating-then-in-jsx-handler` exists to catch.
-   */
-  const requestAccountMode = async (next: "pool" | "direct") => {
-    // A refusal leaves `accountMode` unchanged, and the Select only ever shows that state,
-    // so the declined option never appears chosen.
-    if (await confirmAction({ message: t("pws.accountModeConfirm") })) await applyAccountMode(next);
-  };
 
   const discard = () => {
     setAdapter(item.adapter); setBaseUrl(item.baseUrl);
@@ -470,38 +426,7 @@ export default function ProviderSettings({
           ]} />
         )}
       </label>
-      {isCanonicalOpenAi && (
-        <label className="pwi-settings-field">
-          <span className="pwi-settings-label">{t("codexAuth.accountModeTitle")}</span>
-          <Select
-            fullWidth
-            label={t("codexAuth.accountModeTitle")}
-            value={accountMode}
-            disabled={modeSaving || saving}
-            onChange={value => {
-              const next = value as "pool" | "direct";
-              if (next === accountMode) return;
-              void requestAccountMode(next);
-            }}
-            options={[
-              { value: "pool", label: t("codexAuth.accountModePool") },
-              { value: "direct", label: t("codexAuth.accountModeDirect") },
-            ]}
-          />
-          <span className="pwi-settings-hint">
-            {accountMode === "direct" ? t("codexAuth.accountModeDirectDesc") : t("codexAuth.accountModePoolDesc")}
-          </span>
-          {modeSaving && <span className="muted text-label">{t("pws.accountSwitching")}</span>}
-          {modeMsg && (
-            <span
-              role={modeMsg.ok ? "status" : "alert"}
-              className={modeMsg.ok ? "pwi-settings-mode-msg pwi-settings-mode-msg--ok" : "pwi-settings-mode-msg pwi-settings-mode-msg--err"}
-            >
-              {modeMsg.text}
-            </span>
-          )}
-        </label>
-      )}
+
       {supportsApiKeyTransport && (
         <label className="pwi-settings-field">
           <span className="pwi-settings-label">{t("modal.apiKeyTransport")}</span>
@@ -569,7 +494,7 @@ export default function ProviderSettings({
           <span className="muted">{t("pws.settingsUnsavedBar")}</span>
           <div className="pwi-settings-sticky-bar-actions">
             <button type="button" className="btn btn-ghost btn-sm" onClick={discard} disabled={saving}>{t("pws.discardSettings")}</button>
-            <button type="button" className="btn btn-primary btn-sm" onClick={() => void save()} disabled={saving || modeSaving}>{saving ? t("pws.saving") : t("pws.saveSettings")}</button>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => void save()} disabled={saving}>{saving ? t("pws.saving") : t("pws.saveSettings")}</button>
           </div>
         </div>
       )}

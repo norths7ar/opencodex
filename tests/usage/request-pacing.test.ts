@@ -327,8 +327,6 @@ describe("provider request pacing queue", () => {
     expect(reconcileProviderRequestPacing({
       generation: 1,
       providerNames: new Set(["live"]),
-      comboIds: new Set(),
-      comboTargets: new Set(),
       codexAccountIds: new Set(),
       oauthAccountKeys: new Set(),
       configRoots: new Set(),

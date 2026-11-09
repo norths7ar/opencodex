@@ -1,42 +1,3 @@
-/**
- * Where a process running ON THE HUB ITSELF dials the hub (#4236).
- *
- * There are TWO destinations here, not one base URL substituted everywhere, and conflating
- * them is what broke every local integration on a tailnet-bound hub:
- *
- * 1. `localManagementOrigin` — authenticated management discovery/state (`/api/*`). It is
- *    served by the public listener and, on a hub, additionally by the loopback-only
- *    `hub.managementIngress`. Callers must still send a management credential: management
- *    authentication has no loopback bypass (structure/gui-and-management-api.md), and the unauthenticated loopback
- *    listener deliberately does not serve `/api/*` at all.
- * 2. `localInferenceDestination` — the data plane a client wire actually speaks.
- *
- * Both resolvers have the SAME three-branch shape, because the bind address is the thing that
- * decides. The first review of this module got that wrong for inference: it returned
- * `http://127.0.0.1:<public port>` unconditionally whenever the loopback listener was off, so a
- * hub with `hostname: <tailnet IP>` and no listener handed all eight call sites a socket that
- * does not exist. The bind address has to be the fallback, exactly as it already was for
- * management:
- *
- *   loopback listener enabled   → `127.0.0.1:<effective listener port>`, no credential
- *   loopback/absent `hostname`  → `127.0.0.1:<public port>`, no credential
- *   wildcard `hostname`         → `127.0.0.1:<public port>`, ADMISSION CREDENTIAL REQUIRED
- *   literal non-loopback IP     → `<probeHostname(hostname)>:<public port>`, credential REQUIRED
- *   DNS bind name               → `127.0.0.1:<public port>`, credential REQUIRED (fail closed)
- *
- * A wildcard bind does answer on 127.0.0.1, which is why its origin stays loopback, but the
- * public listener demands data-plane admission regardless of which address received the
- * request — so it lands in the same credential bucket as a tailnet bind. That is why the
- * resolver returns a STRUCT rather than a string: a caller that cannot see
- * `requiresAdmissionToken` cannot tell a free socket from one that will 401, and the only
- * honest answers are "attach the data-plane credential" or "say so in a log line".
- *
- * The credential in question is the DATA-PLANE one — `OPENCODEX_API_AUTH_TOKEN`, the hardened
- * service token file, or a configured `apiKeys` entry, the same ladder
- * `standaloneCodexRoutingTarget` / the Codex provider table already uses. Never the admin
- * token: no exported client configuration may carry management authority (reviewer constraint
- * on #4236).
- */
 import { isIP } from "node:net";
 import { effectiveLoopbackListenerPort, isLoopbackHostname, isWildcardHostname, shouldInjectApiAuthHeader } from "../codex/loopback-target";
 import { probeHostname } from "../server/proxy-liveness";
@@ -45,7 +6,7 @@ import { loadServiceTokenFromFile, serviceApiTokenFilePath } from "./service-sec
 import type { OcxConfig } from "../types";
 
 export type LocalInferenceConfig = Pick<OcxConfig, "hostname" | "unauthenticatedLoopbackListener">;
-export type LocalManagementConfig = Pick<OcxConfig, "hostname" | "runtimeRole" | "hub">;
+export type LocalManagementConfig = Pick<OcxConfig, "hostname">;
 
 export interface LocalInferenceDestination {
   /** Origin a local client wire dials, e.g. `http://127.0.0.1:10104`. */
@@ -176,7 +137,7 @@ function localAdmissionTokenCandidates(
 }
 
 /**
- * The credential an in-process self-fetch (Advisor, routed helpers) presents to `destination`.
+ * The credential an in-process self-fetch (routed helper) presents to `destination`.
  *
  * A destination that demands admission gets the `localAdmissionToken` ladder unchanged. One that
  * does not still receives the first ladder credential this data plane recognizes, because Chat
@@ -200,11 +161,6 @@ const ADMISSION_TOKEN_SHAPE = /^[A-Za-z0-9._~+/=-]{8,4096}$/;
 /**
  * The origin a local CLI dials for `/api/*`.
  *
- * A hub's management ingress is loopback-only and exists precisely so the operator's own
- * machine has a management address when the proxy listener is bound elsewhere. Everything else
- * keeps dialing a literal public bind address it can actually reach. DNS bind names fail closed
- * to loopback because resolving them again could select a different peer after startup.
- *
  * The caller still supplies the management credential. Never write that credential into an
  * exported client configuration.
  */
@@ -212,7 +168,5 @@ export function localManagementOrigin(
   config: LocalManagementConfig | undefined,
   publicPort: number,
 ): string {
-  const ingress = config?.runtimeRole === "hub" ? config.hub?.managementIngress : undefined;
-  if (ingress?.enabled) return `http://127.0.0.1:${ingress.port}`;
   return `http://${localCredentialDestinationHostname(config?.hostname)}:${publicPort}`;
 }

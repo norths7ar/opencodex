@@ -98,17 +98,6 @@ describe("Kiro single final answer (#6270)", () => {
     expect(attempts[1]).toContain('"stopReason":"other"');
     expect(attempts.join("\n")).not.toContain("private arbitrary upstream text");
   });
-  test("advisor guard survives request building and completion retry", async () => {
-    const guard: NonNullable<OcxParsedRequest["_advisorGuard"]> = async function* () {};
-    const input = { ...structuredClone(parsed), _advisorGuard: guard };
-    const answer = "The workspace is ready.";
-    const { events, physicalRequests, bodies } = await run([text(answer)], [text(answer)], false, input);
-    expect(input._advisorGuard).toBe(guard);
-    expect(physicalRequests).toBe(2);
-    expect(bodies[1]).toContain("Inspect the workspace.");
-    expect(bodies[1]).toContain("claude-opus-5.5");
-    expect(events.at(-1)).toMatchObject({ type: "done", endTurn: true });
-  });
 
   for (const buffered of [false, true]) {
     test.each(["END_TURN", "STOP_SEQUENCE", undefined])(

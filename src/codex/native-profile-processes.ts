@@ -215,29 +215,10 @@ async function unixProcessCount(run: NativeProcessExecutor, pid: number, platfor
     shell: false,
     killSignal: "SIGKILL",
   };
-  if (platform !== "darwin") {
+  {
     const output = await run("ps", ["-eo", "pid=,comm=,args="], options);
     return unixCodexClientsFromPs(output, pid).length;
   }
-  // macOS comm is a full path and may contain spaces. Read the two fields
-  // separately, as the routing-adoption snapshot collector does, then join by PID.
-  const commands = new Map<number, string>();
-  const commOutput = await run("ps", ["-eo", "pid=,comm="], options);
-  for (const line of commOutput.split("\n")) {
-    const match = /^\s*(\d+)\s+(.+)$/.exec(line);
-    if (match) commands.set(Number(match[1]), match[2]!.trim());
-  }
-  const argsOutput = await run("ps", ["-eo", "pid=,args="], options);
-  let count = 0;
-  for (const line of argsOutput.split("\n")) {
-    const match = /^\s*(\d+)\s+(.+)$/.exec(line);
-    if (!match) continue;
-    const candidatePid = Number(match[1]);
-    const command = commands.get(candidatePid);
-    if (Number.isSafeInteger(candidatePid) && candidatePid !== pid && command
-      && isCodexClientProcess(command, match[2]!)) count++;
-  }
-  return count;
 }
 
 /** Best-effort, read-only process probe. It never terminates a user process. */

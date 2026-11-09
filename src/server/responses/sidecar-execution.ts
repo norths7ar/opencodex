@@ -9,9 +9,6 @@ import type { ResponsesEffects } from "./response-effects";
 import type { ResponsesSendBudget } from "./request-send-budget";
 import { formatErrorResponse } from "../../bridge";
 import { planWebSearch, buildWebSearchTool, runWithWebSearch } from "../../web-search";
-import { createRegisteredAdvisorPlan } from "./advisor-plan-slot";
-import { ADVISOR_TOOL_NAME, createAdvisorSidecarStep } from "./advisor-slot";
-import { buildToolBridgeMaps } from "./collaboration";
 import {
   planImageBridge,
   planVideoBridge,
@@ -49,7 +46,7 @@ import {
 } from "../../oauth/anthropic-routing";
 import { resolveWireProtocolOverride } from "../adapter-resolve";
 import { bindRouteReasoningReplayScope, adapterNeedsForcedContinuation, adapterNeedsToolCallContinuation } from "./core-replay";
-import { namespacedToolName, toolChoiceToolPredicate } from "../../types";
+import { namespacedToolName } from "../../types";
 import { providerFetch } from "./fetch-helpers";
 import type { AttemptRecoveryKind } from "../../usage/log";
 import { recordAdapterReasoning, recordAdapterTier } from "../request-log";
@@ -75,8 +72,6 @@ export async function executeResponsesSidecars(
     | "toolBridgeMaps"
     | "rememberKiroDeliveredFinalAnswer"
     | "responseStateOptions"
-    | "admissionScope"
-    | "advisorAdmissionPolicy"
   >,
   transportState: Pick<
     ResponsesTransport,
@@ -129,11 +124,10 @@ export async function executeResponsesSidecars(
     translatorBudget,
     rememberKiroDeliveredFinalAnswer,
     responseStateOptions,
-    admissionScope,
   } = requestState;
   const { routedCompaction, openAiSidecar } = sidecarState;
   const { reserveCredentialHop } = sendBudgetState;
-  const sidecarBudget = createSidecarSendBudget(options, sendBudgetState, () => logCtx.usageLogInputTokens);
+  const sidecarBudget = createSidecarSendBudget(sendBudgetState);
   const {
     commitReasoningReplayServingRoute,
     continuationStateForResponse,
@@ -183,27 +177,6 @@ export async function executeResponsesSidecars(
         "tool result requires a non-empty string call_id",
       );
     }
-  }
-
-  // Advisor sidecar plan (optional subsystem; null when disabled, unconfigured, or when this
-  // request IS an advisor loopback consultation — the recursion fence). The plan carries
-  // request-scoped state only; preflight keeps fixed policy separate from user-role advice
-  // before the worker is dispatched. Registration seam: the core path sees only
-  // `parsed._advisorGuard`; only an activated factory can load the optional implementation.
-  const advisorPlan = options.advisorInternal === true
-    ? null
-    : await createRegisteredAdvisorPlan({
-      config,
-      workerIdentity: `${route.modelId} (provider ${route.providerName})`,
-      workerModelId: route.modelId,
-      admissionScope,
-      admissionPolicy: requestState.advisorAdmissionPolicy,
-      abortSignal: options.abortSignal,
-    });
-  // Preflight only on real worker turns: a routed-compaction turn is a summarization request,
-  // and injecting advice into it would pollute the summary Codex replaces its history with.
-  if (advisorPlan && !routedCompaction) {
-    await advisorPlan.preflightInject(parsed);
   }
 
   // Image / web-search sidecars: plan once, then dispatch with runTurn-aware priority.
@@ -323,8 +296,7 @@ export async function executeResponsesSidecars(
         return null;
       }
       recoveryKind = "oauth-account-403";
-      if (!options.comboInitialSend) sendBudgetState.pendingHopPermit = hop.permit;
-      else sidecarBudget.ownCredentialHop(hop.permit);
+      sendBudgetState.pendingHopPermit = hop.permit;
     }
     const rotated = !originalResponse || originalResponse.status === 429
       ? rotateProviderTransportOn429(config, route.providerName, route.provider, {
@@ -389,7 +361,7 @@ export async function executeResponsesSidecars(
         return null;
       }
       recoveryKind = "oauth-account-429";
-      if (!options.comboInitialSend && canRunWebSearch && route.providerName === "google-antigravity")
+      if (canRunWebSearch && route.providerName === "google-antigravity")
         sendBudgetState.pendingHopPermit = hop.permit;
       else sidecarBudget.ownCredentialHop(hop.permit, (canRunWebSearch || !!imgPlan || !!vidPlan) && transportState.adapter.name === "anthropic");
     } else if (
@@ -486,13 +458,9 @@ export async function executeResponsesSidecars(
         try { sendBudgetState.noteInitialDispatch(decision.permit); }
         finally { decision.permit.release(); }
       } else {
-        const existing = sidecarBudget.fetchOptions(adapter).onPhysicalDispatch;
-        if (existing) existing();
-        else {
-          const prepaid = sendBudgetState.pendingHopPermit;
-          sendBudgetState.pendingHopPermit = undefined;
-          sendBudgetState.noteInitialDispatch(prepaid);
-        }
+        const prepaid = sendBudgetState.pendingHopPermit;
+        sendBudgetState.pendingHopPermit = undefined;
+        sendBudgetState.noteInitialDispatch(prepaid);
       }
     } };
   // A loop's hidden rounds before a rotation were spent by the account it left. Bill them to that
@@ -557,16 +525,14 @@ export async function executeResponsesSidecars(
     const imageProviderFetch = providerFetch(
       route.provider,
       options.codexWsRuntimeIdentity,
-      { providerName: route.providerName, modelId: route.modelId, ...sidecarBudget.fetchOptions(transportState.adapter) },
+      { providerName: route.providerName, modelId: route.modelId },
     );
     const imgLoopResponse = await runWithImageBridge({
       parsed, adapter: transportState.adapter,
       chatRawReasoningVisible: options.chatRawReasoningVisible,
       ...(transportState.adapter.name === "anthropic" ? { thinkingRecovery } : {}),
       clientToolCatalogRestriction: route.provider.authMode === "forward" ? undefined : requestState.clientToolCatalogRestriction,
-      incomingMeta: { headers: requestState.selectedForwardHeaders, providerName: route.providerName, abortSignal: options.abortSignal, translatorBudget, ...(options.comboInitialSend ? { providerFetch: imageProviderFetch } : {}), ...sidecarBudget.incomingMeta },
-      onProducerStart: sidecarBudget.takeProducerOwnership,
-      onProducerEnd: sidecarBudget.release,
+      incomingMeta: { headers: requestState.selectedForwardHeaders, providerName: route.providerName, abortSignal: options.abortSignal, translatorBudget },
       onIterationEnd: sidecarBudget.releaseUnsentHop,
       ...(imgPlan ? { plan: imgPlan } : {}),
       ...(vidPlan ? { videoPlan: vidPlan } : {}),
@@ -586,7 +552,7 @@ export async function executeResponsesSidecars(
       fetchForRequest: (request, iterParsed, adapter, recovery) => {
         const fetch = providerFetch(route.provider, options.codexWsRuntimeIdentity, {
           dispatchOverride: oauthDispatch(request, iterParsed),
-          providerName: route.providerName, modelId: route.modelId, ...sidecarBudget.fetchOptions(adapter),
+          providerName: route.providerName, modelId: route.modelId,
           ...thinkingReceipt(request, adapter, recovery),
         });
         return fetch.unpacedFetch ?? fetch;
@@ -633,7 +599,7 @@ export async function executeResponsesSidecars(
     const imgScopeRefusal = sidecarScopeRefusal(imgLoopResponse);
     if (imgScopeRefusal) return imgScopeRefusal;
     // A provider overflow on the first iteration answers as the main path's context failure (#7316).
-    const imgResponse = options.comboAttempt ? imgLoopResponse : sidecarContextOverflowResponse(imgLoopResponse, {
+    const imgResponse = sidecarContextOverflowResponse(imgLoopResponse, {
       stream: parsed.stream, modelId: clientFacingModelText(options.clientModelLabel), translatorBudget,
     });
     if (imgResponse.body) {
@@ -658,43 +624,25 @@ export async function executeResponsesSidecars(
   // Placed BEFORE the runTurn early-return for non-runTurn adapters so dual-tool turns dispatch
   // through web-search instead of being swallowed. runTurn adapters never enter this branch.
   if (canRunWebSearch && wsPlan) {
-    const requestedTools = parsed.context.tools ?? [];
-    const advisorAllowed = advisorPlan
-      && toolChoiceToolPredicate(parsed.options.toolChoice, [...requestedTools, advisorPlan.tool])(advisorPlan.tool);
-    const webSearchAdvisor = advisorPlan && advisorAllowed && !routedCompaction
-      && typeof advisorPlan.consult === "function" && typeof advisorPlan.formatUnavailable === "function"
-      ? advisorPlan
-      : undefined;
-    parsed.context.tools = [
-      ...requestedTools.filter(tool => !webSearchAdvisor || (!tool.advisor && tool.name !== ADVISOR_TOOL_NAME)),
-      buildWebSearchTool(),
-      ...(webSearchAdvisor ? [webSearchAdvisor.tool] : []),
-    ];
-    if (webSearchAdvisor) {
-      requestState.toolBridgeMaps = buildToolBridgeMaps(parsed);
-      translatorBudget.chargeRetained(new TextEncoder().encode(ADVISOR_TOOL_NAME).byteLength * 2, {
-        kind: "retained_collectors",
-      });
-    }
+    parsed.context.tools = [...(parsed.context.tools ?? []), buildWebSearchTool()];
     // Resolve the mutable route at send time: a 429 rotation replaces route.provider, so retaining
     // one pre-rotation providerFetch would keep the old credential and transport pin.
     const routedProviderFetch = ((input: Parameters<typeof globalThis.fetch>[0], init?: RequestInit) =>
       providerFetch(route.provider, options.codexWsRuntimeIdentity, {
         providerName: route.providerName,
         modelId: route.modelId,
-        ...sidecarBudget.fetchOptions(transportState.adapter),
+
       })(input, init)) as typeof globalThis.fetch;
     const loopResponse = await runWithWebSearch({
       dispatchSidecarSend: sendBudgetState.dispatchSidecarSend,
       parsed, adapter: transportState.adapter,
-      ...(webSearchAdvisor ? { advisor: createAdvisorSidecarStep(webSearchAdvisor as Parameters<typeof createAdvisorSidecarStep>[0]) } : {}),
       chatRawReasoningVisible: options.chatRawReasoningVisible,
       ...(transportState.adapter.name === "anthropic" ? { thinkingRecovery } : {}),
       clientToolCatalogRestriction: route.provider.authMode === "forward" ? undefined : requestState.clientToolCatalogRestriction,
       onIterationEnd: sidecarBudget.releaseUnsentHop,
       fetchForRequest: (request, iterParsed, adapter, recovery) => providerFetch(route.provider, options.codexWsRuntimeIdentity, {
         dispatchOverride: oauthDispatch(request, iterParsed),
-        providerName: route.providerName, modelId: route.modelId, ...sidecarBudget.fetchOptions(adapter),
+        providerName: route.providerName, modelId: route.modelId,
         ...thinkingReceipt(request, adapter, recovery),
       }),
       incomingMeta: {
@@ -703,11 +651,11 @@ export async function executeResponsesSidecars(
         abortSignal: options.abortSignal,
         translatorBudget,
         providerFetch: routedProviderFetch,
-        ...(!options.comboInitialSend && route.providerName === "google-antigravity" ? {
+        ...(route.providerName === "google-antigravity" ? {
           sendBudget: sendBudgetState.refundableAdapterDispatchBudget,
           onPhysicalSend: (send: { ordinal: number; recovery?: AttemptRecoveryKind }) =>
             sendBudgetState.noteAdapterPhysicalSend(logCtx.usageLogInputTokens, send),
-        } : sidecarBudget.incomingMeta),
+        } : {}),
       },
       backend: wsPlan.backend,
       forwardProvider: wsPlan.forwardSidecar?.provider,
@@ -743,7 +691,7 @@ export async function executeResponsesSidecars(
       streamRoutedModelOutput: wsPlan.streamRoutedModelOutput,
       on429: rotateSidecarProviderOn429,
       onRotatedUsage: billRotatedUsage,
-      ...(!options.comboInitialSend && route.providerName === "google-antigravity" ? { onIterationEnd: () => {
+      ...(route.providerName === "google-antigravity" ? { onIterationEnd: () => {
         // The next Antigravity adapter dispatch claims this permit. If request construction,
         // admission or cancellation stopped it first, return the unused send allowance.
         const permit = sendBudgetState.pendingHopPermit;
@@ -767,14 +715,12 @@ export async function executeResponsesSidecars(
     // first iteration with a generic 429 before any search runs. Answer the usage limit instead,
     // as the main path does (#6991), so Codex stops rather than retrying the whole turn.
     const poolUsageLimit = loopResponse.status === 429 && anthropicInstance && route.provider.authMode === "oauth"
-      && !options.comboAttempt
       ? anthropicRoutingFor(anthropicInstance).anthropicPoolUsageLimitAfterRefusal(Date.now(), transportState.anthropicRouteDecision, route.modelId)
       : null;
     if (poolUsageLimit) void loopResponse.body?.cancel().catch(() => {});
     // A provider overflow on the first iteration answers as the main path's context failure (#7316).
     const wsResponse = poolUsageLimit ? anthropicPoolCooldownResponse(poolUsageLimit, { logCtx })
-      : options.comboAttempt ? loopResponse
-        : sidecarContextOverflowResponse(loopResponse, {
+      : sidecarContextOverflowResponse(loopResponse, {
           stream: parsed.stream, modelId: clientFacingModelText(options.clientModelLabel), translatorBudget,
         });
     // Register the sidecar stream as an active turn so drainAndShutdown waits for (or aborts)
@@ -791,32 +737,6 @@ export async function executeResponsesSidecars(
     }
     releaseSearchProbeLease();
     return wsResponse;
-  }
-
-  // Advisor synthetic tool + stream guard: attach ONLY when this function is about to hand the
-  // request back to the normal translated exchange (no sidecar loop claimed the turn, not a
-  // run-turn adapter, not compaction). Web-search handles advisor in its own loop above; the
-  // image/video and run-turn loops cannot intercept it. Preflight still applies to those paths.
-  if (advisorPlan && !routedCompaction && !transportState.adapter.runTurn && !wsPlan && !imgPlan && !vidPlan) {
-    // A client-declared tool named "advisor" would collide with the synthetic injection (one
-    // wire name, two schemas); the synthetic runtime owns the name for this turn.
-    parsed.context.tools = [
-      ...(parsed.context.tools ?? []).filter(t => !t.advisor && t.name !== ADVISOR_TOOL_NAME),
-      advisorPlan.tool,
-    ];
-    // The advisor tool joined AFTER prepare computed the bridge maps; recompute so the tool is
-    // declared (undeclared-tool guard, tool_choice mapping, schema repair) on this turn.
-    //
-    // Rebuild WITHOUT the budget: prepare already charged every tool in the catalog, and
-    // buildToolBridgeMaps charges each name it registers, so re-passing the budget would bill the
-    // whole catalog a second time and can trip `translation_buffer_limit` for a large MCP catalog.
-    // Charge only the one entry that is genuinely new — the synthetic advisor tool is a bare
-    // function tool, so it retains its wire name and its bare name (collaboration.ts:187, :233).
-    requestState.toolBridgeMaps = buildToolBridgeMaps(parsed);
-    translatorBudget.chargeRetained(new TextEncoder().encode(ADVISOR_TOOL_NAME).byteLength * 2, {
-      kind: "retained_collectors",
-    });
-    advisorPlan.attachGuard(parsed);
   }
 
   return undefined;

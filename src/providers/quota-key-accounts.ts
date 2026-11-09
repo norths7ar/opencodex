@@ -93,8 +93,8 @@ export async function mapQuotaRoster<T, R>(rows: readonly T[], read: (row: T) =>
 }
 
 function roster(provider: OcxProviderConfig) {
-  return provider.apiKeyPool?.length ? provider.apiKeyPool
-    : provider.apiKey ? [{ id: apiKeyPoolEntryId(provider.apiKey), key: provider.apiKey }] : [];
+  return provider.apiKey ? [provider.apiKeyPool?.find(entry => entry.key === provider.apiKey)
+    ?? { id: apiKeyPoolEntryId(provider.apiKey), key: provider.apiKey }] : [];
 }
 
 function identity(name: string, provider: OcxProviderConfig, id: string, key: string): string {

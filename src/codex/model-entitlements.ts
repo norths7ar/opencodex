@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "./account-id";
 import { createHash } from "node:crypto";
 import { readBoundedResponseBody } from "../lib/bounded-body";
 import type { CodexAccountCredentialRecord, OcxConfig } from "../types";
@@ -835,7 +836,7 @@ const DISCOVERY_ETAG_MAX_AGE_MS = 24 * 60 * 60 * 1000;
  * entitlement path and, for ungated rows, with the upstream status the request receives.
  */
 export async function discoverCodexNativeRoster(
-  config: Pick<OcxConfig, "codexAccounts">,
+  config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">,
   options: CodexNativeRosterDiscoveryOptions = {},
 ): Promise<CodexNativeRosterDiscoveryOutcome> {
   const fetcher = options.fetcher ?? fetch;
@@ -1019,16 +1020,14 @@ function admitVersionMiss(
   return admitted;
 }
 
-function candidateAccountIds(config: Pick<OcxConfig, "codexAccounts">): string[] {
-  return [
-    MAIN_CODEX_ACCOUNT_ID,
-    ...(config.codexAccounts ?? [])
-      .filter(isSelectableCodexPoolAccount)
-      .map(account => account.id),
-  ];
+function candidateAccountIds(config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">): string[] {
+  if (config.codexSignedOut === true) return [];
+  const provider = (config as Partial<OcxConfig>).providers?.openai;
+  return [provider?.codexAccountMode === "direct" ? MAIN_CODEX_ACCOUNT_ID
+    : singleCodexAccountId(config)];
 }
 
-function normalizedCandidateAccountIds(config: Pick<OcxConfig, "codexAccounts">): string[] {
+function normalizedCandidateAccountIds(config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">): string[] {
   return [...new Set(candidateAccountIds(config))].sort();
 }
 
@@ -1090,7 +1089,7 @@ function entitlementEnsureFlightKey(
 }
 
 async function refreshCodexEntitlementWorkset(
-  config: Pick<OcxConfig, "codexAccounts">,
+  config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">,
   workset: readonly string[],
   identityVector: ReadonlyMap<string, string | null>,
   clientVersion: string,
@@ -1172,7 +1171,7 @@ function waitForEntitlementEnsureFlight(
  * the cache for the first poll after the shared flight settles.
  */
 export async function ensureCodexEntitlementFreshness(
-  config: Pick<OcxConfig, "codexAccounts">,
+  config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">,
   options: CodexEntitlementFreshnessOptions = {},
 ): Promise<void> {
   try {
@@ -1234,7 +1233,7 @@ export async function ensureCodexEntitlementFreshness(
 }
 
 export function getCodexModelEntitlementStatus(
-  config: Pick<OcxConfig, "codexAccounts">,
+  config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">,
   now = Date.now(),
   clientVersion?: string | null,
 ): CodexModelEntitlementStatus {
@@ -1300,7 +1299,7 @@ export function getCodexModelEntitlementStatus(
  *   pay one bounded discovery call per account; discovery failure temporarily hides the gated row.
  */
 export async function resolveCodexModelEntitlements(
-  config: Pick<OcxConfig, "codexAccounts">,
+  config: Pick<OcxConfig, "codexAccounts" | "activeCodexAccountId" | "codexSignedOut">,
   options: CodexModelEntitlementResolveOptions = {},
 ): Promise<CodexModelEntitlementSnapshot> {
   const now = options.now ?? Date.now();

@@ -16,11 +16,10 @@ import {
   routingProfileIssues,
 } from "../../routing/profile";
 import { evaluatePolicyProfile, type PolicyCandidateEvidence, type PolicyRequestEvidence } from "../../routing/evaluator";
-import { assemblePolicyCandidateEvidence } from "../../routing/compatibility/assemble";
-import { activateLab, labActivationRequired } from "../../lib/lab-activation";
+import { assemblePolicyCandidateEvidence } from "../../routing/evidence";
 import { quotaEvidenceForCandidate } from "../../routing/quota";
 import { routedProviderConfig } from "../../router";
-import { deleteConfigTopLevelKey, saveConfigPreservingClaudeCode, getConfigDir } from "../../config";
+import { deleteConfigTopLevelKey, saveConfigPreservingClaudeCode } from "../../config";
 import { reconcileLiveStateStores } from "../../lib/state-store-registrations";
 import { isPlainRecord } from "./shared";
 import { readManagementJsonBody, rethrowManagementBodyTooLarge } from "./body";
@@ -42,7 +41,6 @@ function profileDto(config: Parameters<typeof getRoutingProfile>[0], id: string)
     optimize: profile.optimize,
     limits: profile.limits,
     unknownEvidence: profile.unknownEvidence,
-    ...(profile.compatibility ? { compatibility: profile.compatibility } : {}),
   };
 }
 
@@ -123,7 +121,7 @@ function storedProfile(
 
 /**
  * Rewrite config references from one public model id to another (alias change
- * on update). Mirrors the /api/combos migration: model-valued config that
+ * on update). Model-valued config that
  * still names the old alias must follow it, or requests fall through to
  * ordinary routing and send the obsolete alias upstream.
  */
@@ -150,7 +148,7 @@ function modelMapMigrationCollision(
 
 /**
  * Rewrite config references from one public model id to another (alias change
- * on update). Mirrors the /api/combos migration: model-valued config that
+ * on update). Model-valued config that
  * still names the old alias must follow it, or requests fall through to
  * ordinary routing and send the obsolete alias upstream.
  */
@@ -314,9 +312,6 @@ export async function handleRoutingProfileRoutes(ctx: ManagementContext): Promis
       }
     }
     config.routingProfiles = nextProfiles;
-    // Creating the first profile on a process started profile-less must install the
-    // compatibility provider now; activation is synchronous and idempotent per configDir.
-    if (labActivationRequired(config, getConfigDir())) activateLab(config, getConfigDir());
     // An alias change on update renames the public model id; rewrite config
     // references (disabledModels, subagentModels, injectionModel,
     // shadowCallIntercept, claudeCode) so they follow the new alias.
@@ -386,10 +381,6 @@ export async function handleRoutingProfileRoutes(ctx: ManagementContext): Promis
     // One clock read for both assembly and evaluation keeps freshness, health,
     // and trace timestamps mutually consistent with the production router.
     const now = Date.now();
-    // R3-1: dry-run assembles candidate evidence independently of the startup gate, so an
-    // operator preview on a process started without profiles would silently omit
-    // compatibility evidence and disagree with production. Activate first.
-    if (labActivationRequired(config, getConfigDir())) activateLab(config, getConfigDir());
     const candidateEvidence = body.candidates === undefined
       ? assembleCandidateEvidence(config, resolvedProfile, now)
       : parseCandidateEvidence(body.candidates, config);

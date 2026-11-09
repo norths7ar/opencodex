@@ -28,7 +28,7 @@ import { localAdmissionToken } from "../lib/local-destinations";
 import { localChatCompletionBaseUrl, postLocalChatCompletion } from "../lib/local-chat-completion";
 import type { DescribeOutcome, VisionSettings } from "./describe";
 import type { CapturedAdmissionPolicy } from "../types/admission-policy";
-import { registerAdvisorAdmissionPolicy, SIDECAR_ADMISSION_POLICY_HEADER, SIDECAR_INTERNAL_CAPABILITY_HEADER } from "../server/advisor-admission-scope";
+import { registerSidecarAdmissionPolicy, SIDECAR_ADMISSION_POLICY_HEADER, SIDECAR_INTERNAL_CAPABILITY_HEADER } from "../server/sidecar-admission-policy";
 import { internalCallCapability } from "../lib/local-internal-call-capability";
 
 export const VISION_DESCRIBE_TERMINAL_HEADER = "x-opencodex-vision-describe";
@@ -87,12 +87,12 @@ export async function describeImageRouted(
   settings: VisionSettings,
   abortSignal?: AbortSignal,
   baseUrlOverride?: string,
-  advisorAdmissionPolicy?: CapturedAdmissionPolicy,
+  sidecarAdmissionPolicy?: CapturedAdmissionPolicy,
 ): Promise<DescribeOutcome> {
   const invalid = validateImageUrl(imageUrl);
   if (invalid) return { text: "", error: invalid };
 
-  const registration = advisorAdmissionPolicy ? registerAdvisorAdmissionPolicy(advisorAdmissionPolicy, abortSignal) : undefined;
+  const registration = sidecarAdmissionPolicy ? registerSidecarAdmissionPolicy(sidecarAdmissionPolicy, abortSignal) : undefined;
   try {
     return await postLocalChatCompletion({
       config,

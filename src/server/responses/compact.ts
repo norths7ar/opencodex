@@ -38,21 +38,7 @@ import { expandPreviousResponseInput, previousResponseProviderState, rememberRes
 import { repairLegacyDottedToolCallNames } from "../../responses/legacy-dotted-tool-name-repair";
 import { NoEligiblePolicyCandidateError, routeCompactionModel } from "../../router";
 import { evidenceFromBody } from "../../routing/request-evidence";
-import {
-  advanceComboAfterFailure,
-  comboDefaultEffort,
-  comboFailureDecision,
-  comboIdFromRawBody,
-  concreteComboRequestBody,
-  getCombo,
-  resolveComboId,
-  isComboTargetInCooldown,
-  NoAvailableComboTargetsError,
-  noteComboSuccess,
-  parseRetryAfterMs,
-  pickComboTarget,
-  targetKey,
-} from "../../combos";
+import { parseRetryAfterMs } from "../../lib/retry-after-delay";
 import { isInjectionDebugEnabled } from "../../lib/debug-settings";
 import { injectionDebugLog } from "../../lib/injection-debug-log";
 import { modelInList, namespacedToolName } from "../../types";
@@ -141,6 +127,7 @@ import {
   hasForwardableCodexBearer,
   resolveContextPrincipal,
   validateForwardAdmissionCredential,
+  shouldSubstituteStoredCodexCredential,
 } from "../auth-cors";
 import type { DataPlaneAdmission } from "../auth-cors";
 import { listOpenAiForwardSidecarCandidates, resolveFirstUsableOpenAiSidecar, type ResolvedOpenAiForwardSidecar } from "../../providers/openai-sidecar";
@@ -235,7 +222,6 @@ import { requestPacingOverloadResponse } from "./pacing-overload";
 import { shouldRetryCodexPoolAccountQuota, shouldRetryCodexPoolAccountTransient } from "./core-codex-account";
 import { mapCodexAuthContextErrorToResponse, nativeMainRefreshFailureResponse } from "./codex-auth-error";
 import { linkRequestSessionLane, sessionLaneIdFromRequest, reasoningReplayConversationIdFromResponsesRequest, sessionIdHeaderFromRequest } from "../request-log-conversation";
-import { recallComboForLane } from "./combo-session-recall";
 import { redactHostedImageDisplayPaths } from "../responses-hosted-image-display";
 
 export const COMPACT_RESPONSE_MAX_BYTES = 32 * 1024 * 1024;
@@ -328,7 +314,7 @@ function compactHandoffRoute(
 
 export interface HandleResponsesCompactOptions {
   clientModelLabel?: ClientFacingModelLabel;
-  advisorAdmissionPolicy?: import("../../types/admission-policy").CapturedAdmissionPolicy;
+  sidecarAdmissionPolicy?: import("../../types/admission-policy").CapturedAdmissionPolicy;
   compactionRoutingOverride?: CompactionRoutingOverride | null;
   nativeMainRefreshDependencies?: NativeMainRefreshDependencies;
   /** Release the listener's idle guard only after the complete request body is accepted. */
@@ -678,7 +664,7 @@ export async function handleResponsesCompact(
   admission?: DataPlaneAdmission,
   options: HandleResponsesCompactOptions = {},
 ): Promise<Response> {
-  options = { ...options, advisorAdmissionPolicy: options.advisorAdmissionPolicy ?? captureAdmissionPolicy(config, admission) };
+  options = { ...options, sidecarAdmissionPolicy: options.sidecarAdmissionPolicy ?? captureAdmissionPolicy(config, admission) };
   let body: unknown;
   try {
     body = await readJsonRequestBody(req, undefined, resolveInboundBodyLimitBytes(config.maxInboundBodyBytes));
@@ -711,22 +697,6 @@ export async function handleResponsesCompact(
   // this the log would lose which id the client actually asked for.
   const compactRequestedModel = options.compactionRoutingOverride?.sourceModel
     ?? (compactFastRow ? compactFastRow.baseId + "--fast" : raw.model);
-
-  // Recall the last completed client-visible bare model after a combo switch (#3891).
-  // Configured selectors take precedence over this implicit session hint.
-  if (!options.compactionRoutingOverride && typeof compactModel === "string" && !compactModel.includes("/") && !compactFastRow
-    && !resolveComboId(config, compactModel)) {
-    const recalledComboId = recallComboForLane(config, sessionLaneIdFromRequest(req.headers), compactModel);
-    if (recalledComboId) {
-      (raw as Record<string, unknown>).model = `combo/${recalledComboId}`;
-      // Keep the routed identity in sync: the bare model can 404 outright (no
-      // canonical openai provider) or resolve straight onto a native-compact
-      // provider, both bypassing combo failover. The combo selector resolves
-      // through tryPickComboModel, whose route.combo skips the native compact
-      // endpoint.
-      compactModel = `combo/${recalledComboId}`;
-    }
-  }
 
   let route;
   try {
@@ -832,7 +802,7 @@ export async function handleResponsesCompact(
   const customReserveForward = selectedModelId === NATIVE_RESERVE_MODEL
     && isCodexReserveRequestEligible(config, admission)
     && isCanonicalOpenAiForwardProvider(route.provider);
-  const substituteMainCredential = admission?.source === "bearer"
+  const substituteMainCredential = shouldSubstituteStoredCodexCredential(req.headers, config, admission)
     && (route.codexAccountMode !== undefined || customReserveForward);
   const requestScopedMainCredential = route.codexAccountMode !== undefined
     && !substituteMainCredential
@@ -848,9 +818,6 @@ export async function handleResponsesCompact(
   // Native /responses/compact exists on the canonical ChatGPT backend and on the
   // official OpenAI API, or a gateway explicitly declaring the native endpoint. Other
   // Responses-shaped gateways still take the routed summarizer path (#422).
-  // Combo-resolved targets skip native compact so failover can advance through the
-  // combo target list when the picked model returns 429/5xx — the routed path below
-  // dispatches through handleResponses → handleComboResponses with full failover.
   //
   // One holder for the WHOLE logical compact, declared above the native branch because the
   // routed fallback below is not a different request: a native attempt that 404s, or a quota
@@ -862,7 +829,7 @@ export async function handleResponsesCompact(
   const manualOverrideCrossesProvider = options.compactionRoutingOverride
     ? !compactionRoutingKeepsProviderIdentity(config, options.compactionRoutingOverride, route)
     : false;
-  if (supportsNativeResponsesCompactEndpoint(route.providerName, route.provider) && !accountGatedCompactWireModel && !route.combo
+  if (supportsNativeResponsesCompactEndpoint(route.providerName, route.provider) && !accountGatedCompactWireModel
     && !manualOverrideCrossesProvider) {
     if (req.signal.aborted) {
       return formatErrorResponse(499, "client_cancelled", "Client cancelled compact request");
@@ -1090,7 +1057,7 @@ export async function handleResponsesCompact(
           poolResponse: ctx.kind === "pool" });
     };
     // Takes its context explicitly: the alternate-account flow below records a rejection
-    // against A while promoting B, then records B's own outcome. A closure over a single
+    // against A, then records B's own outcome. A closure over a single
     // `authCtx` cannot express either.
     const recordCompactPoolOutcome = (
       ctx: CodexAuthContext,
@@ -1098,7 +1065,6 @@ export async function handleResponsesCompact(
       meta: {
         retryAfter?: string | null;
         resetAt?: unknown | unknown[];
-        promoteAccountId?: string;
       } = {},
     ) => {
       // A gateway response is not evidence about any Codex account.
@@ -1569,7 +1535,6 @@ export async function handleResponsesCompact(
         recordCompactPoolOutcome(authCtx, upstream.status, {
           retryAfter: firstRetryAfter,
           resetAt: firstResetAt,
-          ...(alternate.authCtx.accountId ? { promoteAccountId: alternate.authCtx.accountId } : {}),
         });
         await upstream.body?.cancel().catch(() => undefined);
         outcomeCtx = alternate.authCtx;
@@ -1770,10 +1735,8 @@ export async function handleResponsesCompact(
       ...raw,
       // Canonical ChatGPT Responses rejects non-streaming turns. Daybreak cannot use the
       // native compact endpoint either, so run its synthetic compaction as SSE and collapse
-      // the completed event back into the v1 compact JSON contract below. Combo-dispatched
-      // turns also go out as SSE: failover can land on a canonical child that rejects a
-      // non-streaming turn, and every combo-capable provider already serves streaming traffic.
-      stream: isCanonicalOpenAiForwardProvider(route.provider) || accountGatedCompactWireModel || route.combo ? true : false,
+      // the completed event back into the v1 compact JSON contract below.
+      stream: isCanonicalOpenAiForwardProvider(route.provider) || accountGatedCompactWireModel,
       input: [...inputItems, { type: "compaction_trigger" }],
     };
     const internalHeaders = new Headers({ "content-type": "application/json" });
@@ -1793,7 +1756,7 @@ export async function handleResponsesCompact(
     // fallback spend four more.
     // internalReq keeps only FORWARD_HEADERS, so the caller principal is resolved from req.
     const replayPrincipal = { clientPrincipalId: resolveContextPrincipal(req, config, admission) };
-    const response = await handleResponses(internalReq, config, logCtx, { clientModelLabel: options.clientModelLabel, abortSignal: req.signal, turnAdmissionLease, sendBudget, compactionRecoveryKind: "compaction-v1", compactionRoutingOverride: options.compactionRoutingOverride, advisorAdmissionPolicy: options.advisorAdmissionPolicy, replayPrincipal, ...(admission ? { admission } : {}) });
+    const response = await handleResponses(internalReq, config, logCtx, { clientModelLabel: options.clientModelLabel, abortSignal: req.signal, turnAdmissionLease, sendBudget, compactionRecoveryKind: "compaction-v1", compactionRoutingOverride: options.compactionRoutingOverride, sidecarAdmissionPolicy: options.sidecarAdmissionPolicy, replayPrincipal, ...(admission ? { admission } : {}) });
     if (req.signal.aborted) {
       void response.body?.cancel(req.signal.reason).catch(() => undefined);
       return formatErrorResponse(499, "client_cancelled", "Client cancelled compact request");

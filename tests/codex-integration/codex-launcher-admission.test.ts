@@ -6,7 +6,7 @@ import { standaloneCodexRoutingTarget } from "../../src/codex/inject/routing-tar
 import { resolveTrustedWindowsPowerShellExe } from "../../src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { createCodexLaunchFixtureRoot, codexLaunchOwnershipTest, buildCodexPrivateFixtureLaunchEnv as buildCodexLaunchEnv } from "../helpers/codex-launch-private-fixture";
-import { codexLaunchSystemNamespaceIsSafe, codexPosixSystemNamespace, darwinAclInspectionIsEmpty } from "../../src/cli/codex-launch-ownership";
+import { codexLaunchSystemNamespaceIsSafe } from "../../src/cli/codex-launch-ownership";
 
 const token = "ocx_fixture_admission";
 const cfg = { port: 12199, hostname: "0.0.0.0" };
@@ -135,23 +135,6 @@ else { [System.IO.File]::SetAccessControl($path,$acl) }`;
   test("an additional system file refuses authorization", () => fixture((_root, home) => {
     writeFileSync(join(home, "config.toml"), local);
     expect(codexLaunchSystemNamespaceIsSafe(home)).toBe(false);
-  }));
-  test("Darwin ACL success, empty and inspection-error results are distinct", () => {
-    expect(darwinAclInspectionIsEmpty(0, 0, 22)).toBe(false);
-    expect(darwinAclInspectionIsEmpty(0, -1, 22)).toBe(true);
-    expect(darwinAclInspectionIsEmpty(0, -1, 13)).toBe(false);
-    expect(darwinAclInspectionIsEmpty(-1, -1, 22)).toBe(false);
-  });
-  test("production Darwin namespace uses the physical etc path", () => {
-    expect(codexPosixSystemNamespace("darwin")).toBe("/private/etc/codex");
-    expect(codexPosixSystemNamespace("linux")).toBe("/etc/codex");
-  });
-  for (const entry of ["home", "config", "ancestor"]) test.skipIf(process.platform !== "darwin")(`macOS extended ACL on ${entry} with safe mode bits refuses credentials`, () => fixture((root, home) => {
-    const path = entry === "config" ? join(home, "config.toml") : entry === "home" ? home : root;
-    chmodSync(path, entry === "config" ? 0o600 : 0o700);
-    const result = Bun.spawnSync(["/bin/chmod", "+a", "everyone allow write,delete,writeattr,writeextattr,writesecurity,chown", path]);
-    expect(result.success).toBe(true);
-    denied(home);
   }));
 
   for (const args of [[], ["-m", "fixture", "--", "hello"], ["--model=fixture", "--", "hello"], ["--no-daemon", "exec", "--skip-git-repo-check", "--ephemeral", "--json", "fixture prompt"]]) {

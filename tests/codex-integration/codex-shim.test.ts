@@ -2066,56 +2066,6 @@ exit 127
   });
 });
 
-describe("WSL PATH interop guard", () => {
-  const fakeFs = (files: string[]) => ({
-    exists: (p: string) => files.includes(p),
-    isShimFile: () => false,
-    isDirectory: () => false,
-  });
-
-  test("isWindowsInteropDir matches /mnt drive prefixes only", () => {
-    expect(isWindowsInteropDir("/mnt/c/Users/example/AppData/Roaming/npm")).toBe(true);
-    expect(isWindowsInteropDir("/mnt/d")).toBe(true);
-    expect(isWindowsInteropDir("/mnt/wsl")).toBe(false);
-    expect(isWindowsInteropDir("/usr/local/bin")).toBe(false);
-    expect(isWindowsInteropDir("/home/example/mnt/c")).toBe(false);
-  });
-
-  test("on WSL, a Windows codex reached via interop is skipped with guidance", () => {
-    const interop = "/mnt/c/Users/example/AppData/Roaming/npm";
-    const found = findCodexOnPath({
-      pathValue: `/usr/local/bin:${interop}`,
-      wsl: true,
-      ...fakeFs([`${interop}/codex`, `${interop}/codex.exe`]),
-    });
-    expect(found).toBeNull();
-    expect(lastCodexDiscoveryError()).toContain("WSL PATH interop");
-    expect(lastCodexDiscoveryError()).toContain(`${interop}/codex`);
-  });
-
-  test("on WSL, a Linux-side codex is preferred and returned", () => {
-    const interop = "/mnt/c/Users/example/AppData/Roaming/npm";
-    const linuxBin = "/usr/local/bin";
-    const found = findCodexOnPath({
-      pathValue: `${interop}:${linuxBin}`,
-      wsl: true,
-      ...fakeFs([`${interop}/codex`, `${linuxBin}/codex`]),
-    });
-    expect(found).toBe(`${linuxBin}/codex`);
-  });
-
-  test("off WSL, /mnt-like dirs are scanned normally", () => {
-    const dir = "/mnt/c/tools";
-    const found = findCodexOnPath({
-      pathValue: dir,
-      wsl: false,
-      posixPaths: true,
-      ...fakeFs([`${dir}/codex`]),
-    });
-    expect(found).toBe(`${dir}/codex`);
-  });
-});
-
 // #2412: a version-manager upgrade (mise/asdf/volta) rewrites its install tree
 // in place, destroying both the shim and its sibling .opencodex-real backup.
 // The bail was silent, and the CLI warns only when a message exists, so start /

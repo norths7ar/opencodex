@@ -1,6 +1,6 @@
 import { prepareClaudeCodePatch } from "./claude-code-settings-patch";
 import { beginCodexCliSelectionParentWriteAsync, withCodexCliSelectionParentWriteAsync,
-  CodexCliSelectionMutationBusyError, type CodexCliSelectionAsyncParentWrite } from "../../codex/cli-update-selection-gate";
+  CodexCliSelectionMutationBusyError, type CodexCliSelectionAsyncParentWrite } from "../../codex/cli-selection";
 import { readConfigForAdmittedMutation } from "../../config/persisted-mutation";
 import { mirrorDesiredEnabledOntoSnapshot, persistDesktopModeField, persistDesktopProfileField } from "./claude-desktop-config-writers";
 import { getConfigDir as configRoot, withConfigDirHardeningSettled as settleConfigRoot } from "../../config/paths";
@@ -92,10 +92,9 @@ import {
 import { drainAndShutdown } from "../lifecycle";
 import { inheritedAnthropicInstance } from "../../sidecar/auth";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
-import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
+import { estimateAttemptsCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
 import type { PersistedUsageAttempt } from "../../usage/log";
 import { isAllowedRequestOrigin, jsonResponse, providerManagementConfigError, publicProviderBaseUrl, safeConfigDTO } from "../auth-cors";
-import { applySystemEnvToggle } from "../system-env";
 
 import { isPlainRecord, parseDebugLogQuery, tokPerSecondResult, unavailableCostReason, costResult, requestLogDto, stripRegistryOnlyStaticHeaders, fetchInitializedModels as fetchAllModels, fetchGrokCandidateModels, buildClaudeDesktopState } from "./shared";
 import type { MetricUnavailableReason, TokPerSecondResult, CostEstimateReason, CostResult, MetricSource } from "./shared";
@@ -1587,8 +1586,6 @@ async function handleAgentSettingsRoutesImpl(ctx: ManagementContext): Promise<Re
       modelMap: config.claudeCode?.modelMap ?? {},
       classifierModel: config.claudeCode?.classifierModel ?? "",
       classifierFallbacks: config.claudeCode?.classifierFallbacks ?? [],
-      systemEnv: config.claudeCode?.systemEnv === true,
-      autoConnectSupported: (ctx.deps.platform ?? process.platform) === "darwin",
       maxContextTokens: config.claudeCode?.maxContextTokens ?? null,
       alwaysEnableEffort: config.claudeCode?.alwaysEnableEffort === true,
       autoContext: config.claudeCode?.autoContext !== false,
@@ -1630,7 +1627,7 @@ async function handleAgentSettingsRoutesImpl(ctx: ManagementContext): Promise<Re
       return prototype === Object.prototype || prototype === null;
     };
     if (!isPlainObject(parsedBody)) return jsonResponse({ error: "body must be an object" }, 400);
-    const body = parsedBody as { enabled?: unknown; cliFirstParty?: unknown; authMode?: unknown; model?: unknown; smallFastModel?: unknown; modelMap?: unknown; classifierModel?: unknown; classifierFallbacks?: unknown; systemEnv?: unknown; fastMode?: unknown; maxContextTokens?: unknown; alwaysEnableEffort?: unknown; tierModels?: unknown; autoContext?: unknown; autoCompactWindow?: unknown; contextAccounting?: unknown; blockedSkills?: unknown; injectAgents?: unknown; webSearchSidecar?: unknown; visionSidecar?: unknown };
+    const body = parsedBody as { enabled?: unknown; cliFirstParty?: unknown; authMode?: unknown; model?: unknown; smallFastModel?: unknown; modelMap?: unknown; classifierModel?: unknown; classifierFallbacks?: unknown; fastMode?: unknown; maxContextTokens?: unknown; alwaysEnableEffort?: unknown; tierModels?: unknown; autoContext?: unknown; autoCompactWindow?: unknown; contextAccounting?: unknown; blockedSkills?: unknown; injectAgents?: unknown; webSearchSidecar?: unknown; visionSidecar?: unknown };
     if (body.cliFirstParty !== undefined && typeof body.cliFirstParty !== "boolean")
       return jsonResponse({ error: "cliFirstParty must be a boolean" }, 400);
     if (body.cliFirstParty !== undefined && Object.keys(body).length !== 1)
@@ -1853,20 +1850,6 @@ async function handleAgentSettingsRoutesImpl(ctx: ManagementContext): Promise<Re
     });
     if (refusal) return refusal;
     const warnings: string[] = [];
-    // authMode changes must reconcile the injected system env too: switching back to
-    // Subscription has to remove the opencodex-owned dummy ANTHROPIC_AUTH_TOKEN
-    // (audit R1 blocker #1/#2, devlog 260720_claude_authmode_persist). Model slots and
-    // levers feed the same injection, so a changed or cleared slot must not linger in
-    // launchd until the next restart.
-    const systemEnvInputs = ["systemEnv", "authMode", "model", "smallFastModel", "tierModels",
-      "maxContextTokens", "alwaysEnableEffort", "autoContext", "autoCompactWindow", "contextAccounting"] as const;
-    if (systemEnvInputs.some(field => body[field] !== undefined)) {
-      try {
-        await applySystemEnvToggle(config, config.port);
-      } catch (err) {
-        warnings.push(`Failed to apply system environment setting: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    }
     // Keep the file-backed live registry symmetric: OFF prunes immediately, while
     // ON and config changes restore definitions without requiring a restart.
     await syncClaudeAgentDefsBestEffort();

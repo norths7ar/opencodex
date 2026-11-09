@@ -1,6 +1,5 @@
 import { readConfigAdmissionSnapshot } from "../config/diagnostics";
 import { readRuntimePort } from "../config/process-state";
-import { readClientConnectionState } from "../client/state";
 import { getActiveTurnCount, isDraining, isRecyclingForExit, isShutdownDraining } from "../server/lifecycle";
 import type { OcxConfig } from "../types";
 import { compareCatalogHealPaths, observeCatalogHealFile, retainCatalogHealPath, selectCatalogHealPath, type CatalogObservation } from "./catalog/heal-observation";
@@ -28,7 +27,6 @@ export interface CatalogSelfHealGates {
   /** File-backed config authority; missing, malformed or salvaged config returns null. */
   loadConfig(): OcxConfig | null;
   ownsCodexHome(): boolean;
-  clientConnected(): boolean;
   clientJournalOwner(): boolean;
 }
 export interface CatalogHealOutcome { readonly committed: boolean }
@@ -84,7 +82,7 @@ export function evaluateCatalogSelfHealGates(gates: CatalogSelfHealGates):
   const config = gates.loadConfig();
   if (config === null) return { open: false, gate: "config-unavailable" };
   if (!shouldSyncCodexOnStart(config)) return { open: false, gate: "codex-off" };
-  if (gates.clientConnected() || gates.clientJournalOwner()) return { open: false, gate: "client" };
+  if (gates.clientJournalOwner()) return { open: false, gate: "client" };
   if (!gates.ownsCodexHome()) return { open: false, gate: "not-owner" };
   return { open: true, config };
 }
@@ -117,7 +115,6 @@ export function startCodexCatalogSelfHeal(options: { port?: number; deps?: Catal
       const owner = inspectCodexHomeOwner(CODEX_HOME);
       return owner.kind === "owned" || owner.kind === "unbound";
     },
-    clientConnected: () => readClientConnectionState().kind !== "disconnected",
     clientJournalOwner: () => journalOwner({ readOnly: true })?.kind === "client",
     ...deps.gates,
   };

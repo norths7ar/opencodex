@@ -9,7 +9,6 @@ export function ConnectPairingForm({
   onConnected,
   onCommitted,
   onPairingStart,
-  local = false,
   focusOnMount = false,
 }: {
   target: ApiTarget;
@@ -18,8 +17,6 @@ export function ConnectPairingForm({
   onCommitted?: () => void;
   /** Let a secret-bearing surface expire its previous disclosure lifetime. */
   onPairingStart?: () => void;
-  /** Explicit local pairing for standalone operator actions; never an automatic bootstrap. */
-  local?: boolean;
   focusOnMount?: boolean;
 }) {
   const t = useT();
@@ -69,7 +66,7 @@ export function ConnectPairingForm({
     } catch (failure) {
       if (!controller.signal.aborted) {
         const kind = failure instanceof PairingError ? failure.kind : "unreachable";
-        if (kind === "refused" || kind === "remote-link-unauthorized" || kind === "remote-link-forbidden") {
+        if (kind === "refused") {
           pendingHandoff.current?.rollback();
           pendingHandoff.current = null;
           setValidationPending(false);
@@ -83,15 +80,13 @@ export function ConnectPairingForm({
   };
 
   return <section className="card connect-pairing" aria-labelledby="connect-pairing-title">
-    <h2 id="connect-pairing-title">{t(local ? "connection.pairing.code" : "connection.pairing.title")}</h2>
-    <p>{!local && <>{t("connection.pairing.hub")}: </>}<code>{target.serverOrigin}</code></p>
-    {!local && <p>{t("connection.pairing.getCode")}</p>}
+    <h2 id="connect-pairing-title">{t("connection.pairing.code")}</h2>
+    <p><code>{target.serverOrigin}</code></p>
     <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}><code>{command}</code></pre>
     <button type="button" className="btn btn-ghost" onClick={() => copyFeedback.copy(command, command)}>
       {t(copied === "copied" ? "startup.copied" : "startup.copy")}
     </button>
     {copied === "unavailable" && <p role="status">{t("prov.linkCopyUnavailable")}</p>}
-    {!local && <p>{t("connection.pairing.askOperator")}</p>}
     <p>{t("connection.pairing.notApiKey")}</p>
     <form onSubmit={submit} className="api-form-row">
       <label htmlFor="connect-pairing-code" className="field-label">{t("connection.pairing.code")}</label>
@@ -108,11 +103,8 @@ export function ConnectPairingForm({
           : error === "unreachable" ? "connection.pairing.networkError"
           : error === "request-failed" ? "connection.pairing.requestError"
           : error === "origin-denied" ? "connection.pairing.originDenied"
-          : error === "cloudflare-challenge" ? "connection.pairing.cloudflareChallenge"
-          : error === "remote-link-unauthorized" || error === "remote-link-forbidden" ? "connection.pairing.sessionNotAuthorized"
           : error === "invalid-response" ? "connection.pairing.responseError" : "connection.pairing.error")}
       </p>}
     </form>
-    {target.transport === "relay" && <p className="text-muted">{t("connection.pairing.relayWarning")}</p>}
   </section>;
 }

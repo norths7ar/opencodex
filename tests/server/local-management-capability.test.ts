@@ -682,16 +682,6 @@ describe("native tray provider account read grants", () => {
     });
   }
 
-  test("every native account source is covered by the explicit read allowlist", () => {
-    const source = readFileSync(repoPath("desktop/src-tauri/src/native_tray_accounts.rs"), "utf8")
-      .split("#[cfg(test)]")[0]!;
-    const paths = new Set([...source.matchAll(/"(\/api\/[^"?]+)"/g)].map(match => match[1]!));
-    expect(paths.size).toBeGreaterThan(0);
-    for (const target of paths) {
-      expect(Object.values(LOCAL_MANAGEMENT_READ_PATHS) as string[]).toContain(target);
-    }
-  });
-
   test("the desktop Auth no longer loads reusable admin credentials", () => {
     const source = readFileSync(repoPath("desktop/src-tauri/src/auth.rs"), "utf8");
     expect(source).not.toContain("OPENCODEX_ADMIN_AUTH_TOKEN");

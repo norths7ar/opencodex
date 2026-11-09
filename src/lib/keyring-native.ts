@@ -13,29 +13,13 @@ export interface KeyringNativeAsset {
   filename: string;
 }
 
-/** Must match Tauri `productName`, which names Linux's usr/lib resource directory. */
+/** Desktop product name used by packaging. */
 export const PACKAGED_DESKTOP_PRODUCT_NAME = "OpenCodex";
 
 const ASSET_BY_TARGET: Readonly<Record<string, KeyringNativeAsset>> = {
-  "bun-darwin-arm64": {
-    packageName: "@napi-rs/keyring-darwin-arm64",
-    filename: "keyring.darwin-arm64.node",
-  },
-  "bun-darwin-x64": {
-    packageName: "@napi-rs/keyring-darwin-x64",
-    filename: "keyring.darwin-x64.node",
-  },
   "bun-windows-x64": {
     packageName: "@napi-rs/keyring-win32-x64-msvc",
     filename: "keyring.win32-x64-msvc.node",
-  },
-  "bun-linux-x64": {
-    packageName: "@napi-rs/keyring-linux-x64-gnu",
-    filename: "keyring.linux-x64-gnu.node",
-  },
-  "bun-linux-arm64": {
-    packageName: "@napi-rs/keyring-linux-arm64-gnu",
-    filename: "keyring.linux-arm64-gnu.node",
   },
 };
 
@@ -45,13 +29,9 @@ export function keyringAssetForStandaloneTarget(target: string): KeyringNativeAs
 }
 
 function runtimeAsset(platform: NodeJS.Platform, arch: string): KeyringNativeAsset | undefined {
-  const target = platform === "darwin"
-    ? `bun-darwin-${arch}`
-    : platform === "win32"
+  const target = platform === "win32"
       ? `bun-windows-${arch}`
-      : platform === "linux"
-        ? `bun-linux-${arch}`
-        : "";
+      : "";
   return keyringAssetForStandaloneTarget(target);
 }
 
@@ -79,23 +59,8 @@ export function packagedKeyringCandidates({
   const { basename, dirname, join, resolve } = platform === "win32" ? win32 : posix;
   const executableDir = resolve(root);
   const adjacent = join(executableDir, "keyring", asset.filename);
-  if (platform === "linux") {
-    const usrDir = dirname(executableDir);
-    // Tauri installs resources at usr/lib/<productName> while its sidecar is usr/bin/ocx.
-    // Restrict that fallback to the exact bundle shape; ordinary standalone archives keep the
-    // executable-owned adjacent directory as their only candidate.
-    return basename(executableDir) === "bin" && basename(usrDir) === "usr"
-      ? [adjacent, join(usrDir, "lib", PACKAGED_DESKTOP_PRODUCT_NAME, "keyring", asset.filename)]
-      : [adjacent];
-  }
-  if (platform !== "darwin") return [adjacent];
-  return [
-    // Prefer the executable-owned sibling. A standalone layout must not let an unrelated
-    // app-shaped ../Resources tree override the addon distributed with that executable.
-    adjacent,
-    // Tauri resources live in Contents/Resources while its external binary lives in Contents/MacOS.
-    join(executableDir, "..", "Resources", "keyring", asset.filename),
-  ];
+
+  return [adjacent];
 }
 
 const nodeRequire = createRequire(import.meta.url);

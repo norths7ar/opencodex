@@ -1,7 +1,7 @@
 /** Wire shape of GET|PUT /api/fallback (ocx.fallback/1), as the dashboard reads it. */
 export type FallbackKind = "model" | "provider";
 export type FallbackSwitches = { model?: boolean; provider?: boolean };
-export type FallbackDeviceRow = { id: string; kind: "link" | "key"; alias?: string; localFallback: boolean; model: boolean | null; provider: boolean | null };
+export type FallbackDeviceRow = { id: string; model: boolean | null; provider: boolean | null };
 export type FallbackEventRow = { at: string; route: string; kind: FallbackKind; from: string; to: string; trigger: string; outcome: "taken" | "refused" };
 export type FallbackState = {
   schema: "ocx.fallback/1";
@@ -14,7 +14,7 @@ export type FallbackState = {
 export type FallbackWrite = {
   scope: "global" | "provider" | "route" | "device";
   key?: string;
-  setting: FallbackKind | "localFallback";
+  setting: FallbackKind;
   value: boolean | null;
 };
 

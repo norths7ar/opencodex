@@ -61,15 +61,6 @@ import { resolveQoderProfile } from "../../adapters/qoder/profiles";
 import { fetchDevinUsableModels } from "../../adapters/devin/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  quotaInactiveReason,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
-import {
   ProviderOutboundPolicyError,
   providerOutboundGet,
   providerOutboundPost,
@@ -91,9 +82,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { createAdmissionGate, ResourceAdmissionError, type AdmissionMetrics } from "../../lib/admission";
 import { CODEX_CUSTOM_MODEL_CATALOG_KIND, JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
-import { disabledNativeSlugs, hasComboTargets, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
-import type { ComboCatalogOmission } from "./aggregation";
+import { disabledNativeSlugs, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
+import { normalizedOpenAiApiSignature, openAiApiCollisionWarnings } from "./aggregation";
 import { clampObservedModelLimits, resolveModelPolicy } from "../../providers/resolved-model-policy";
 import { mapFill } from "../../providers/resolved-model-policy-merge";
 import type { CatalogGatherProviderAuthEvidence } from "./filesystem-evidence";

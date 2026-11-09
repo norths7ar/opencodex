@@ -6,7 +6,6 @@ import { getCodexRoutingKind } from "../codex/inject";
 import { diagnoseCodexShim } from "../codex/shim";
 import { durableBunChildEnv, durableBunPath } from "../lib/bun-runtime";
 import { selfLaunchArgv } from "../lib/self-launch-argv";
-import { desktopStartupOwnership } from "../service/desktop-startup";
 import type { OcxConfig } from "../types";
 import { truncateRetainedUtf8 } from "../lib/admission";
 import { isPassiveRead } from "../lib/passive-read";
@@ -91,10 +90,7 @@ export function markStartupHealthDiagnosticStale(value: StartupHealth): StartupH
     // Mirror deriveStartupHealth's choice: an already-registered service is refreshed in
     // place. Hardcoding installService here silently undid that for every stale-cache
     // read, which is the path the dashboard hits while a probe is revalidating.
-    recommendedAction: value.desktop ? "Reopen OpenCodex and check Start at Login." : value.recommendedAction,
-    recommendedCommand: value.routingKind === "opencodex-local" && value.desktop !== undefined
-      ? null
-      : value.routingKind === "custom-local" || value.routingKind === "unknown"
+    recommendedCommand: value.routingKind === "custom-local" || value.routingKind === "unknown"
       ? value.commands.restoreNative
       : value.serviceInstalled && !value.serviceConflict
         ? value.commands.repairService
@@ -105,7 +101,6 @@ export function markStartupHealthDiagnosticStale(value: StartupHealth): StartupH
 function conservativeFallback(config: Pick<OcxConfig, "codexAutoStart">): StartupHealth {
   const shim = diagnoseCodexShim();
   return deriveStartupHealth({
-    desktop: desktopStartupOwnership(),
     routingKind: getCodexRoutingKind(),
     autostartEnabled: codexAutoStartEnabled(config),
     serviceInstalled: false,
@@ -114,7 +109,7 @@ function conservativeFallback(config: Pick<OcxConfig, "codexAutoStart">): Startu
     serviceRunning: false,
     serviceStale: false,
     serviceConflict: false,
-    serviceSupported: process.platform === "win32" || process.platform === "darwin" || process.platform === "linux",
+    serviceSupported: ((process.platform === "win32")),
     shimInstalled: shim.installed,
     shimHealthy: shim.healthy,
     ...(shim.activationPending ? { shimActivationPending: true } : {}),

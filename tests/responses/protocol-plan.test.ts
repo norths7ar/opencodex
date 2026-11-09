@@ -94,22 +94,6 @@ describe("planProtocol", () => {
     expect(plan).toMatchObject({ routeKind: "unknown", mode: "blocked", candidates: [], reasonCodes: ["unknown-model"] });
   });
 
-  test("a combo splits guaranteed from partial features across eligible candidates", () => {
-    const plan = planProtocol(input({
-      inbound: "responses",
-      routeKind: "combo",
-      candidates: [candidate("openai-responses"), candidate("openai-chat")],
-      features: ["request.tools", "request.background", "request.store"],
-    }));
-    expect(isProtocolPlanV1(plan)).toBe(true);
-    expect(plan.candidates.map(c => c.mode)).toEqual(["native", "translated"]);
-    expect(plan.candidates[1]!.requestPath).toEqual(["responses", "ir", "chat"]);
-    expect(plan.guaranteedFeatures).toEqual(["request.tools"]);
-    // Responses keeps both; Chat drops background and degrades store.
-    expect(plan.partialFeatures).toEqual(["request.store", "request.background"]);
-    expect(plan.reasonCodes[0]).toBe("combo-or-policy-route");
-  });
-
   test("under reject only eligible candidates count toward the guarantee", () => {
     const plan = planProtocol(input({
       inbound: "responses",

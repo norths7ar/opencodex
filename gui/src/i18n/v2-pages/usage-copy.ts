@@ -75,7 +75,7 @@ const rows = {
     "Không có gì trong khoảng hoặc nguồn này. Lịch sử hiện có hoặc nguồn khác có thể hiển thị mức dùng cũ hơn.",
     "Nada neste período ou origem. O histórico disponível ou outra origem pode mostrar uso mais antigo.",
   ],
-  companionPreview: ["Widget preview", "위젯 미리 보기", "Widget-Vorschau", "Aperçu du widget", "小组件预览", "小工具預覽", "Предпросмотр виджета", "ウィジェットのプレビュー", "Widget önizlemesi", "Xem trước widget", "Prévia do widget"],
+  companionPreview: ["Chart preview", "차트 미리 보기", "Diagrammvorschau", "Aperçu du graphique", "图表预览", "圖表預覽", "Предпросмотр графика", "グラフのプレビュー", "Grafik önizlemesi", "Xem trước biểu đồ", "Prévia do gráfico"],
   companionSettings: ["Display settings", "표시 설정", "Anzeigeeinstellungen", "Réglages d’affichage", "显示设置", "顯示設定", "Настройки отображения", "表示設定", "Görüntü ayarları", "Cài đặt hiển thị", "Configurações de exibição"],
   companionMenuBar: ["Menu bar", "메뉴 막대", "Menüleiste", "Barre des menus", "菜单栏", "選單列", "Строка меню", "メニューバー", "Menü çubuğu", "Thanh menu", "Barra de menus"],
   companionChart: ["Chart", "차트", "Diagramm", "Graphique", "图表", "圖表", "График", "グラフ", "Grafik", "Biểu đồ", "Gráfico"],

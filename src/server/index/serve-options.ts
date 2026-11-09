@@ -2,12 +2,9 @@ import { messagesUnknownEndpointMessage } from "../../lib/messages-error-body";
 import type { Server, ServerWebSocket } from "bun";
 import { modelAliasIdPromoter } from "./model-alias-id";
 import type { StartServerDeps } from "./startup-warnings";
-import { isLinkManagementPath } from "../../link/management-routes";
 import {
   GUI_PAIRING_EXCHANGE_BODY_LIMIT,
-  REMOTE_WORKSPACE_PAIRING_BODY_LIMIT,
   readBoundedRequestText,
-  withRemoteCatalogKeyId,
 } from "./bounded-request";
 import {
   LIVE_SIDEBAND_UPSTREAM_OPEN_TIMEOUT_MS,
@@ -27,7 +24,6 @@ import {
   withMessagesRequestLogId,
 } from "./startup-warnings";
 
-import { remoteWorkspaceEnabled } from "../../remote-control/workspace-activation";
 import { isClaudeInterceptedPath } from "../../claude/intercept/listener";
 import { markActivity } from "../../lib/sidecar-tracker";
 import { knownModelIdsForProvider } from "../../router";
@@ -99,7 +95,6 @@ import {
   isAllowedManagementOrigin,
   isApiAuthRequired,
   isLoopbackHostname,
-  markTrustedHubManagementRequest,
   jsonResponse,
   admissionFields,
   resolveApiAuth,
@@ -202,7 +197,6 @@ import {
 } from "../fast-row";
 import type { OcxConfig } from "../../types";
 import { classifyUsageClient } from "../../usage/client";
-import type { PackageTreeIntegrityGuard } from "../../lib/package-tree-integrity";
 import type { ReadinessGate } from "../readiness";
 import type { WorkflowRefusalLog } from "../workflow-refusal";
 import type { AdmittedHttpTurnOptions } from "../admitted-http-turn";
@@ -210,8 +204,6 @@ import { isOllamaNativePath } from "../ollama-native-paths";
 import { ollamaError } from "../ollama-inbound";
 import { dispatchOllamaRoute } from "./ollama-routes";
 
-import { readyProtocolMetadata } from "../../remote/protocol";
-import { homeInstanceId, stampServedBy } from "../../remote/served-by";
 import { modelCapabilityFields } from "../models-capabilities";
 import { createWebsocketHandler } from "./websocket-handler";
 import { reasoningArchiveErrorResponse } from "../responses/reasoning-archive-error";
@@ -220,7 +212,7 @@ import { withCallerSessionIdentity } from "../caller-session-identity";
 import { agentAssertionUnsupportedResponse, hasAgentAssertionAuthorization } from "../../lib/authorization-scheme";
 import { runTurnStateCallerScope } from "../turn-state-handles";
 
-export type ServerIngress = "public" | "unauthenticated-loopback" | "hub-management" | "claude-intercept" | "hub-link";
+export type ServerIngress = "public" | "unauthenticated-loopback" | "claude-intercept";
 
 export function trustedLoopbackForIngress(ingress: ServerIngress, hostname: string): boolean {
   return ingress === "unauthenticated-loopback"
@@ -239,20 +231,10 @@ export function claudeInterceptRouteAllowed(url: URL, req: Request): boolean {
 export interface ServeOptionsContext {
   readonly server: Server<WsData>;
   readonly boundPort: number | null;
-  readonly remoteWorkspaceStopping: boolean;
 
   drainingResponse: (req: Request, policy: RequestPolicyView) => Response;
   ingressForServer: (requestServer: Server<WsData>) => ServerIngress;
   loopbackRouteAllowed: (url: URL, req: Request) => boolean;
-  managementIngressRouteAllowed: (url: URL, req: Request) => boolean;
-  linkRouteAllowed: (url: URL, req: Request) => boolean;
-  onAuthenticatedCatalog: (apiKeyId: string) => void;
-  linkPolicy: () => RequestPolicyView;
-  packageTreeChangedResponse: (
-    req: Request,
-    policy: RequestPolicyView,
-    message: string,
-  ) => Response;
   serverBusyResponse: (
     req: Request,
     resource: string,
@@ -270,15 +252,11 @@ export interface ServeOptionsContext {
   inboundBodyLimitBytes: number;
   listenPort: number;
   liveCallBindings: LiveCallBindings;
-  loadRemoteWorkspaceRuntime: () => Promise<
-    typeof import("../../remote-control/workspace-runtime")
-  >;
   localAttestationSecret: string;
   loopbackPolicy: () => RequestPolicyView;
   managementApiDeps: ManagementApiDeps;
   managementAuth: ManagementAuthState;
   managementSessionControl: ManagementSessionControl;
-  packageTreeIntegrity: PackageTreeIntegrityGuard;
   readinessGate: ReadinessGate;
 
   deps: StartServerDeps;
@@ -290,23 +268,17 @@ export function createServeOptions(ctx: ServeOptionsContext) {
     drainingResponse,
     ingressForServer,
     loopbackRouteAllowed,
-    managementIngressRouteAllowed,
-    linkRouteAllowed, onAuthenticatedCatalog,
-    linkPolicy,
-    packageTreeChangedResponse,
     serverBusyResponse,
     runAdmittedHttpTurn,
     config,
     inboundBodyLimitBytes,
     listenPort,
     liveCallBindings,
-    loadRemoteWorkspaceRuntime,
     localAttestationSecret,
     loopbackPolicy,
     managementApiDeps,
     managementAuth,
     managementSessionControl,
-    packageTreeIntegrity,
     readinessGate,
     deps,
     port,
@@ -328,13 +300,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
       maxRequestBodySize: inboundBodyLimitBytes,
       async fetch(req: Request, requestServer: Server<WsData>): Promise<Response> {
       const ingress = ingressForServer(requestServer);
-      // Bind management-origin trust to the actual Bun listener object resolved above.
-      // Neither Host nor any X-Forwarded-* header can manufacture this process-local mark.
-      if (ingress === "hub-management" && config.runtimeRole === "hub") {
-        markTrustedHubManagementRequest(req);
-      }
-      const requestUrl = codexCompatibleUrl(req.url);
-      const linkPolicyView = ingress === "hub-link" ? linkPolicy() : undefined;
       // The unauthenticated loopback listener (#1102) serves a fixed allowlist and nothing
       // else. Rejecting here, before any handler runs, is what keeps the surface from growing
       // silently when a route is added below.
@@ -343,22 +308,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           formatErrorResponse(404, "not_found", messagesUnknownEndpointMessage(req)),
           req,
           loopbackPolicy(),
-        );
-      }
-      if (ingress === "hub-link" && !linkRouteAllowed(requestUrl, req)) {
-        return withCors(
-          formatErrorResponse(404, "not_found", messagesUnknownEndpointMessage(req)),
-          req,
-          linkPolicyView!,
-        );
-      }
-      // Tailscale Serve terminates only on this separately bound loopback socket. Reject before
-      // dispatch so no data, readiness, health, WebSocket, or unknown-static handler can run.
-      if (ingress === "hub-management" && !managementIngressRouteAllowed(codexCompatibleUrl(req.url), req)) {
-        return withCors(
-          formatErrorResponse(404, "not_found", messagesUnknownEndpointMessage(req)),
-          req,
-          config,
         );
       }
       if (ingress === "claude-intercept" && !claudeInterceptRouteAllowed(codexCompatibleUrl(req.url), req)) {
@@ -376,33 +325,14 @@ export function createServeOptions(ctx: ServeOptionsContext) {
       // The Claude intercept listener is loopback by construction (the CONNECT proxy binds
       // 127.0.0.1 and the request was rewritten onto a loopback origin), and its callers carry
       // Anthropic credentials, not opencodex admission tokens — so it takes the loopback view too.
-      const policy: RequestPolicyView = ingress === "hub-link"
-        ? linkPolicyView!
-        : ingress === "unauthenticated-loopback" || ingress === "claude-intercept"
-          ? loopbackPolicy()
-          : config;
+      const policy: RequestPolicyView = ingress === "unauthenticated-loopback" || ingress === "claude-intercept"
+        ? loopbackPolicy()
+        : config;
       // Codex runtime agent assertion_only (Authorization: AgentAssertion) is refused before
       // admission or routing: it is never a bearer, never an admission secret, and no pool or
       // routed credential may stand in for it.
       if (hasAgentAssertionAuthorization(req.headers)) return withCors(agentAssertionUnsupportedResponse(), req, policy);
-      if (ingress === "hub-link") {
-        const admission = resolveApiAuth(req, policy);
-        if (!admission) return withCors(formatErrorResponse(401, "authentication_error", "opencodex API key required"), req, policy);
-        if (requestUrl.pathname === "/v1/catalog" && requestUrl.search === ""
-          && (req.method === "GET" || req.method === "HEAD")
-          && admission.kind === "configured") onAuthenticatedCatalog(admission.keyId);
-        // #6957: the Child's read-only view of this Home. Admitted by the link key above and by
-        // the shared table in src/link/management-routes.ts; never reachable on another ingress.
-        if (isLinkManagementPath(requestUrl.pathname)) {
-          const { handleLinkManagementRequest } = await import("./link-management");
-          return withCors(await handleLinkManagementRequest(
-            req, requestUrl, config, requestManagementApiDeps, managementSessionControl,
-            admission.kind === "configured" ? admission.keyId : undefined,
-          ), req, policy);
-        }
-      }
-      const url = requestUrl;
-      const admissionOptions = { linkIngress: policy.linkIngress?.allowedKeyIds };
+      const url = codexCompatibleUrl(req.url);
       markActivity(`${req.method} ${url.pathname}`);
 
       // Readiness is exact-GET on the literal /readyz path. Compare the DECODED
@@ -416,46 +346,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         const decoded = decodeURIComponent(url.pathname);
         if (decoded === "/readyz" || decoded === "/readyz/") readyzPath = decoded;
       } catch { /* malformed encoding — not a readiness path */ }
-
-      const packageTreeStatus = packageTreeIntegrity.status();
-      if (!packageTreeStatus.ok && (
-        url.pathname === "/healthz"
-        || readyzPath !== undefined
-        || url.pathname.startsWith("/v1/")
-        || isOllamaNativePath(url.pathname)
-      )) {
-        const message = "OpenCodex package files changed while this proxy was running; it restarts on its own, or run 'ocx restart' ('ocx service restart' for a background service).";
-        const fencedPort = ctx.boundPort ?? requestServer.port ?? listenPort;
-        const fencedHealth = url.pathname === "/healthz";
-        const fencedInstanceId = fencedHealth ? homeInstanceId() : undefined;
-        const response = fencedHealth || readyzPath !== undefined
-          ? jsonResponse({
-              status: "restart_required",
-              service: "opencodex",
-              version: VERSION,
-              ...(fencedInstanceId ? { instanceId: fencedInstanceId } : {}),
-              uptime: process.uptime(),
-              pid: process.pid,
-              port: fencedPort,
-              // Identity stays attestable while readiness is fenced (#5496): the CLI can only
-              // restart or stop what it can prove it owns, and an unverified 503 body is not proof.
-              // installedVersion is what an in-place respawn will run from the replaced tree.
-              ...(fencedHealth ? {
-                restartCapability: SYSTEM_RESTART_CAPABILITY_VERSION,
-                installedVersion: packageTreeIntegrity.installedVersion?.(),
-              } : {}),
-              error: { code: "package_tree_changed", message },
-            }, 503, req, policy)
-          : isOllamaNativePath(url.pathname)
-            ? withCors(ollamaError(503, message), req, policy)
-            : packageTreeChangedResponse(req, policy, message);
-        const headers = new Headers(response.headers);
-        headers.set("Retry-After", "5");
-        const challenge = fencedHealth ? req.headers.get(LOCAL_ATTESTATION_CHALLENGE_HEADER) : null;
-        const proof = challenge ? createLocalAttestationProof(localAttestationSecret, challenge, process.pid, fencedPort) : null;
-        if (proof) headers.set(LOCAL_ATTESTATION_PROOF_HEADER, proof);
-        return new Response(response.body, { status: 503, headers });
-      }
 
       if (req.method === "OPTIONS") {
         // /readyz is exact-GET only; OPTIONS (like POST and the trailing-slash
@@ -476,133 +366,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           status: 204,
           headers: managementPreflight ? managementCorsHeaders(req, config) : corsHeaders(req, policy),
         });
-      }
-
-      // An OCX-only executor exchanges one short-lived pairing code for a device-scoped
-      // token. This is intentionally outside /api: management auth belongs to the browser
-      // that created the grant, while the new device owns only that one-time code.
-      if (url.pathname === "/remote-workspace/pair" && req.method === "POST") {
-        if (!remoteWorkspaceEnabled(config)) {
-          return Response.json({ error: "Remote Workspace is not enabled on this OpenCodex instance." }, { status: 404 });
-        }
-        // Browser JavaScript must use the authenticated dashboard route. Refusing Origin-bearing
-        // requests leaves this exchange to an explicit OCX device process and avoids turning a
-        // copied pairing code into a cross-site enrollment action.
-        if (req.headers.get("origin") !== null) {
-          return Response.json({ error: "Remote Workspace device pairing does not accept browser-origin requests." }, {
-            status: 403,
-            headers: { "cache-control": "no-store" },
-          });
-        }
-        const [{ remoteWorkspaceHubForConfig }, { RemoteWorkspacePairingRateLimitError }] = await Promise.all([
-          loadRemoteWorkspaceRuntime(),
-          import("../../remote-control/workspace-hub"),
-        ]);
-        if (ctx.remoteWorkspaceStopping) return Response.json({ error: "Remote Workspace is stopping." }, { status: 503 });
-        const hub = deps.managementApi?.remoteWorkspaceHub ?? remoteWorkspaceHubForConfig(config);
-        // A loopback socket alone cannot prove that Tailscale Serve supplied its identity header:
-        // another local process can connect directly and forge it. Pairing therefore uses only the
-        // kernel-observed peer on every listener; proxied management users intentionally share the
-        // loopback bucket rather than gaining a header-rotation bypass.
-        const peer = requestServer.requestIP(req)?.address ?? "unknown";
-        const pairingSource = `${ingress}:${peer}`;
-        const rateLimitResponse = (error: unknown): Response | null => {
-          if (!(error instanceof RemoteWorkspacePairingRateLimitError)) return null;
-          return Response.json({ error: "Remote Workspace pairing is temporarily rate limited." }, {
-            status: 429,
-            headers: {
-              "cache-control": "no-store",
-              "retry-after": String(error.retryAfterSeconds),
-            },
-          });
-        };
-        try {
-          // Check the existing source block before reading or parsing an attacker-controlled body.
-          // pairDevice checks again after the await and records only code-shaped authentication
-          // failures, so malformed JSON cannot allocate one limiter entry per request.
-          hub.assertPairingSourceAllowed(pairingSource);
-        } catch (error) {
-          const limited = rateLimitResponse(error);
-          if (limited) return limited;
-          throw error;
-        }
-        const declaredLength = Number(req.headers.get("content-length") ?? "0");
-        if (!Number.isFinite(declaredLength) || declaredLength > REMOTE_WORKSPACE_PAIRING_BODY_LIMIT) {
-          return Response.json({ error: "Remote Workspace pairing body is too large." }, { status: 413 });
-        }
-        const text = await readBoundedRequestText(req, REMOTE_WORKSPACE_PAIRING_BODY_LIMIT);
-        if (text === null) return Response.json({ error: "Remote Workspace pairing body is too large." }, { status: 413 });
-        if (ctx.remoteWorkspaceStopping) return Response.json({ error: "Remote Workspace is stopping." }, { status: 503 });
-        let body: unknown;
-        try { body = JSON.parse(text); }
-        catch { return Response.json({ error: "Invalid Remote Workspace pairing request." }, { status: 400 }); }
-        if (!body || typeof body !== "object" || Array.isArray(body)) {
-          return Response.json({ error: "Invalid Remote Workspace pairing request." }, { status: 400 });
-        }
-        const record = body as Record<string, unknown>;
-        const required = ["code", "name", "platform", "publicKey", "roots"];
-        const allowed = new Set([...required, "capabilities"]);
-        if (required.some(key => !Object.hasOwn(record, key))
-          || Object.keys(record).some(key => !allowed.has(key))) {
-          return Response.json({ error: "Invalid Remote Workspace pairing request." }, { status: 400 });
-        }
-        try {
-          const paired = hub.pairDevice(record, pairingSource);
-          return Response.json(paired, { status: 201, headers: { "cache-control": "no-store" } });
-        } catch (error) {
-          const limited = rateLimitResponse(error);
-          if (limited) return limited;
-          const message = error instanceof Error ? error.message : "Remote Workspace pairing failed.";
-          const conflict = /already in use|limit reached/i.test(message);
-          return Response.json({ error: message }, {
-            status: conflict ? 409 : 401,
-            headers: { "cache-control": "no-store" },
-          });
-        }
-      }
-
-      // Each executor holds one device-scoped bearer and opens one outbound WSS. The token is
-      // authenticated only at upgrade and never enters ws.data; subsequent frames are bound to
-      // the device identity and per-session signed E2EE handshake.
-      if (url.pathname === "/remote-workspace/agent" && req.headers.get("upgrade")?.toLowerCase() === "websocket") {
-        if (!remoteWorkspaceEnabled(config) || req.headers.get("origin") !== null) {
-          return Response.json({ error: "Remote Workspace agent upgrade refused." }, { status: 403 });
-        }
-        const authorization = req.headers.get("authorization") ?? "";
-        const match = /^Bearer (ocxrw_[A-Za-z0-9_-]{43})$/.exec(authorization);
-        if (!match) return Response.json({ error: "Remote Workspace device authentication required." }, { status: 401 });
-        const { remoteWorkspaceHubForConfig } = await loadRemoteWorkspaceRuntime();
-        const { RemoteWorkspaceHubAgentConnection } = await import("../../remote-control/workspace-agent-connection");
-        if (ctx.remoteWorkspaceStopping) return Response.json({ error: "Remote Workspace is stopping." }, { status: 503 });
-        const hub = deps.managementApi?.remoteWorkspaceHub ?? remoteWorkspaceHubForConfig(config);
-        const device = hub.authenticateDeviceToken(match[1]!);
-        if (!device) return Response.json({ error: "Remote Workspace device authentication failed." }, { status: 401 });
-        const upgraded = requestServer.upgrade(req, {
-          data: {
-            kind: "remote-workspace-agent",
-            remoteWorkspaceOpen: socket => {
-              const connection = new RemoteWorkspaceHubAgentConnection({
-                deviceId: device.id,
-                devicePublicKey: device.publicKey,
-                hubIdentity: hub.identity(),
-                capabilities: device.capabilities,
-                onCapabilities: capabilities => hub.updateDeviceCapabilities(device.id, capabilities),
-                socket: {
-                  send: value => {
-                    if (socket.send(value) === 0) throw new Error("remote workspace socket send dropped");
-                  },
-                  close: (code, reason) => socket.close(code, reason),
-                },
-              });
-              hub.attachConnection(device.id, connection);
-              socket.data.remoteWorkspaceClose = () => hub.detachConnection(device.id, connection);
-              return connection;
-            },
-          } satisfies WsData,
-        });
-        return upgraded
-          ? undefined as unknown as Response
-          : Response.json({ error: "Remote Workspace WebSocket upgrade failed." }, { status: 426 });
       }
 
       // Responses WebSocket (phase 120.2). Codex upgrades the same /v1/responses path; auth is
@@ -648,13 +411,10 @@ export function createServeOptions(ctx: ServeOptionsContext) {
       if (url.pathname === "/healthz" && req.method === "GET") {
         // service/pid/port let CLI liveness reject foreign 200s and verify pid identity.
         const healthPort = ctx.server.port ?? listenPort;
-        // Opaque Home instance id (src/remote/served-by.ts); omitted until the identity exists.
-        const instanceId = homeInstanceId();
         const response = jsonResponse({
           status: "ok",
           service: "opencodex",
           version: VERSION,
-          ...(instanceId ? { instanceId } : {}),
           uptime: process.uptime(),
           pid: process.pid,
           port: healthPort,
@@ -695,7 +455,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           pid: process.pid,
           port: ctx.boundPort ?? listenPort,
           status,
-          ...readyProtocolMetadata(config, req),
         };
         if (status === "ready") {
           return jsonResponse(body, 200, req, policy);
@@ -837,93 +596,8 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         // reintroduce the cross-identity path above. Every request gets the full body.
         if (serialized.bytes !== undefined) headers["content-length"] = String(serialized.bytes);
         // HEAD returns identical status and headers with no body.
-        return withRemoteCatalogKeyId(
-          withCors(
-            new Response(req.method === "HEAD" ? null : serialized.body, { status: 200, headers }),
-            req,
-            policy,
-          ),
-          admission,
-        );
-      }
-
-      if (url.pathname === "/v1/usage" && req.method === "GET") {
-        const { handleHubUsage } = await import("../hub-usage");
-        return handleHubUsage(req, config, policy);
-      }
-
-      if (url.pathname === "/v1/hub-state" && (req.method === "GET" || req.method === "HEAD")) {
-        // #4236: a connected client had no way to learn which providers this hub can actually
-        // serve, so `ocx status` on the client reported the CLIENT's empty credential store as
-        // if it were the truth — "xai ✗ not logged in" on a machine whose hub has xAI logged
-        // in. The fix is one least-privilege data-plane read, in the /v1/catalog (#809)
-        // tradition: same admission resolver, same origin check, no parameters, no caller
-        // credential forwarded upstream, and a body of booleans plus model ids. Widening
-        // `/api/*` or handing the client an admin token to read `GET /api/providers` would
-        // have traded a reporting defect for a credential one.
-        //
-        // What it discloses beyond /v1/catalog and /v1/models, exactly: `hasCredential`,
-        // `loggedIn`, `authMode`, the featured roster, and the NAME and adapter of an ENABLED
-        // provider those routes omit for want of a usable credential — which is the point of
-        // the route. A `disabled` provider is NOT exported (`buildHubState` drops it), because
-        // the catalog filters it out too and naming it here would be the only place a data key
-        // learns of it.
-        //
-        // Placed between /v1/catalog and /v1/models so all three least-privilege client reads
-        // stay in sight of each other.
-        const admission = resolveApiAuth(req, policy);
-        if (!admission) return withCors(formatErrorResponse(401, "authentication_error", "opencodex API key required"), req, policy);
-        if (!isAllowedRequestOrigin(req, policy)) {
-          return withCors(formatErrorResponse(403, "origin_rejected", "cross-origin data-plane request blocked"), req, policy);
-        }
-        // Role gate AFTER admission, deliberately: answering an unauthenticated caller would
-        // turn this into a free "is that machine a hub?" probe. A standalone or client install
-        // gains no surface at all — the route simply does not exist there.
-        //
-        // Built, not formatErrorResponse'd, for the same reason /v1/catalog builds its 404: the
-        // code has to distinguish "this route exists and this host is not a hub" from "this
-        // build has no such route", which is the difference between admission proof and a
-        // vacuous pass in tests/server/api-key-attribution.test.ts.
-        if (config.runtimeRole !== "hub") {
-          return withCors(
-            new Response(JSON.stringify({
-              error: {
-                type: "invalid_request_error",
-                code: "hub_state_not_a_hub",
-                message: "hub state is served only by a host whose runtimeRole is hub",
-              },
-            }), { status: 404, headers: { "content-type": "application/json" } }),
-            req,
-            policy,
-          );
-        }
-        const { buildHubState } = await import("../hub-state");
-        const { MAX_HUB_STATE_BYTES } = await import("../../remote/hub-state");
-        const { oauthLoginSummary } = await import("../../oauth");
-        // `true` masks emails, but the projection drops the field entirely; passing the mask
-        // anyway means a future refactor that starts copying fields cannot leak a raw address.
-        const body = JSON.stringify(buildHubState(config, oauthLoginSummary(true), VERSION));
-        const bytes = Buffer.byteLength(body);
-        if (bytes > MAX_HUB_STATE_BYTES) {
-          return withCors(
-            new Response(JSON.stringify({
-              error: { type: "server_error", code: "hub_state_too_large", message: "hub state exceeds the maximum served size" },
-            }), { status: 507, headers: { "content-type": "application/json" } }),
-            req,
-            policy,
-          );
-        }
         return withCors(
-          new Response(req.method === "HEAD" ? null : body, {
-            status: 200,
-            headers: {
-              "content-type": "application/json",
-              // Varies by credential-bearing identity and by live login state: never cached,
-              // and no validator to revalidate with (same rule as /v1/catalog).
-              "cache-control": "no-store",
-              "content-length": String(bytes),
-            },
-          }),
+          new Response(req.method === "HEAD" ? null : serialized.body, { status: 200, headers }),
           req,
           policy,
         );
@@ -973,7 +647,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           }
           throw error;
         }
-        const { accountBoundNativeOpenAiSlugsBySelector, configuredNativeAliasSlugs, desktopAllowlistSuppressedNativeSlugs, disabledNativeSlugs, exactComboCatalogSlugs, NATIVE_OPENAI_MODELS, nativeContextLimits, nativeInputModalities, nativeOpenAiContextWindow, nativeOpenAiMaxOutputTokens, nativeOpenAiContextTier, nativeOpenAiSlugs, nativeReasoningEfforts, nativeDefaultReasoningEffort, shouldIncludeAccountBoundNativeOpenAi, shouldIncludeNativeOpenAi, uniqueCatalogModelsForRawPublicList, visibleCodexAccountSelectors, visibleNativeSlugs, desktopVisibleNativeSlugs } = await import("../../codex/catalog");
+        const { accountBoundNativeOpenAiSlugsBySelector, desktopAllowlistSuppressedNativeSlugs, disabledNativeSlugs, NATIVE_OPENAI_MODELS, nativeContextLimits, nativeInputModalities, nativeOpenAiContextWindow, nativeOpenAiMaxOutputTokens, nativeOpenAiContextTier, nativeOpenAiSlugs, nativeReasoningEfforts, nativeDefaultReasoningEffort, shouldIncludeAccountBoundNativeOpenAi, shouldIncludeNativeOpenAi, uniqueCatalogModelsForRawPublicList, visibleCodexAccountSelectors, visibleNativeSlugs, desktopVisibleNativeSlugs } = await import("../../codex/catalog");
         const { ACCOUNT_GATED_NATIVE_OPENAI_MODELS } = await import("../../codex/catalog/native-models");
         const includeNativeOpenAi = shouldIncludeNativeOpenAi(config);
         const includeAccountBoundNativeOpenAi = shouldIncludeAccountBoundNativeOpenAi(config);
@@ -999,8 +673,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           : [];
         const disabledNatives = disabledNativeSlugs(config);
         const disabledModels = new Set(config.disabledModels ?? []);
-        const exactComboSlugs = exactComboCatalogSlugs(config);
-        const shadowedNativeSlugs = configuredNativeAliasSlugs(config);
         const suppressedBareNativeSlugs = new Set([
           ...desktopAllowlistSuppressedNativeSlugs(config),
           ...[...ACCOUNT_GATED_NATIVE_OPENAI_MODELS].filter(slug => !availableBareGatedNativeSlugs.has(slug)),
@@ -1056,12 +728,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
 
         /**
          * Whether a routed catalog row may carry a Fast sibling.
-         *
-         * A combo is its own namespace with no `config.providers` entry — declaring a
-         * provider named `combo` is rejected (combos/types.ts:191) — so provider lookup
-         * cannot classify it. Its aggregated `supportsServiceTier` is already true only
-         * when EVERY member supports the tier (aggregation.ts:201), which is the right
-         * rule for a row that fans out to all of them.
          *
          * Declared beside nativeFastEligible, above the Claude discovery call that reads
          * both; defining it near the raw OpenAI mapper below would leave that use in its
@@ -1125,7 +791,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           const { buildCodexModelList } = await import("../codex-model-list");
           return jsonResponse(buildCodexModelList({
             config, nativeSlugs, availableAccountNativeSlugs, accountNativeSlugs,
-            accountNativeSlugsBySelector, goOrdered, exactComboSlugs, accountSelectors,
+            accountNativeSlugsBySelector, goOrdered, accountSelectors,
             suppressedBareNativeSlugs, disabledModels,
           }), 200, req, policy);
         }
@@ -1202,7 +868,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           : [];
         const visibleNatives = includeNativeOpenAi
           ? accountSelectors.length > 0
-            ? bareSelectorNativeSlugs.filter(slug => !shadowedNativeSlugs.has(slug))
+            ? bareSelectorNativeSlugs
             : visibleNativeSlugs(config)
           : [];
         const visibleAccountNatives = accountSelectors.flatMap(selector =>
@@ -1263,7 +929,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           // alias is an explicit decision and still wins.
           const fastModelId = cursorFastIdForListing?.(m.id, m.provider);
           const publicId = m.alias ?? `${m.provider}/${fastModelId ?? m.id}`;
-          const isCombo = m.provider === "combo" && exactComboSlugs.has(publicId);
           const provider = config.providers[m.provider];
           const effective = provider
             ? (await import("../../providers/default-aliases")).effectiveModelAliases(
@@ -1272,7 +937,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
                 knownModelIdsForProvider(m.provider, provider, config),
               ).get(m.id)
             : undefined;
-          const effectiveId = !isCombo && !fastModelId && effective
+          const effectiveId = !fastModelId && effective
             ? promoteAliasId(m.provider, m.id, effective.alias, catalogRowFastEligible(m)) ?? publicId
             : publicId;
           const row = {
@@ -1280,10 +945,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
             object: "model",
             created: 0,
             // This endpoint is an OpenAI-compatible inbound contract. Some clients use
-            // owned_by as an adapter selector, so a virtual combo must name that wire
-            // adapter rather than the internal catalog authority marker.
-            owned_by: isCombo ? "openai" : (m.owned_by ?? m.provider),
-            ...(isCombo ? { is_combo: true } : {}),
+            owned_by: m.owned_by ?? m.provider,
             ...(effective ? { alias_of: `${provider?.alias || m.provider}/${effective.alias}` } : {}),
             // When preferModelAliasIds promotes the alias to `id`, retain the original
             // provider/nativeId so clients that need the upstream identity can read it.
@@ -1343,12 +1005,12 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           ...admissionFields(admission),
           inboundProtocol: "responses",
         };
-        const advisorAdmissionPolicy = captureAdmissionPolicy(config, admission);
+        const sidecarAdmissionPolicy = captureAdmissionPolicy(config, admission);
         return runAdmittedHttpTurn(req, policy, async turnAdmissionLease => {
           let response: Response;
           try {
             response = await handleResponsesCompact(req, config, logCtx, turnAdmissionLease, admission, {
-              advisorAdmissionPolicy,
+              sidecarAdmissionPolicy,
               onRequestBodyRead: () => disableResponsesRequestTimeout(req, requestServer),
             });
           } catch (error) {
@@ -1442,7 +1104,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         };
         return runAdmittedHttpTurn(req, policy, async turnAdmissionLease => {
           const response = await handleContextHistory(req, config, logCtx, contextEndpoint(url.pathname)!,
-            turnAdmissionLease, admission, () => resolveApiAuth(req, ingress === "hub-link" ? linkPolicy() : policy));
+            turnAdmissionLease, admission, () => resolveApiAuth(req, policy));
           addFinalRequestLog(requestId, start, logCtx, response.status,
             response.status === 499 ? { closeReason: "client_cancel" } : undefined);
           return withCors(response, req, policy);
@@ -1505,14 +1167,14 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         };
         const sessionReq = withCallerSessionIdentity(withGrokSessionIdentity(req), admission);
         // Capture at authentication: runAdmittedHttpTurn can wait for body capacity first (#7859).
-        const advisorAdmissionPolicy = captureAdmissionPolicy(config, admission);
+        const sidecarAdmissionPolicy = captureAdmissionPolicy(config, admission);
         return runAdmittedHttpTurn(sessionReq, policy, async turnAdmissionLease => {
           let response: Response;
           try {
             response = await handleResponses(sessionReq, config, logCtx, {
               turnAdmissionLease,
               admission,
-              advisorAdmissionPolicy,
+              sidecarAdmissionPolicy,
               onRequestBodyRead: () => disableResponsesRequestTimeout(req, requestServer),
               abortSignal: req.signal,
               onFirstOutput: () => recordFirstOutput(logCtx, start),
@@ -1597,9 +1259,9 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         const claimRequestLog = (work: (lease: ActiveTurnLease) => Promise<Response>) =>
           (lease: ActiveTurnLease) => { ownsRequestLog = true; return work(lease); };
         // Capture at authentication: runAdmittedHttpTurn can wait for body capacity first (#7859).
-        const advisorAdmissionPolicy = captureAdmissionPolicy(config, admission);
+        const sidecarAdmissionPolicy = captureAdmissionPolicy(config, admission);
         const response = await runAdmittedHttpTurn(sessionReq, policy, claimRequestLog(async turnAdmissionLease => withCors(
-          await handleClaudeMessages(sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, advisorAdmissionPolicy }, policy, { claudeIntercept: ingress === "claude-intercept" }),
+          await handleClaudeMessages(sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, sidecarAdmissionPolicy }, policy, { claudeIntercept: ingress === "claude-intercept" }),
           req,
           policy,
         )), { requestId, start, logCtx, onLogged: () => { ownsRequestLog = true; } });
@@ -1635,11 +1297,11 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         // Only expose an id when the handler or a logged refusal owns its history row.
         let ownsRequestLog = false;
         // Capture at authentication: runAdmittedHttpTurn can wait for body capacity first (#7859).
-        const advisorAdmissionPolicy = captureAdmissionPolicy(config, admission);
+        const sidecarAdmissionPolicy = captureAdmissionPolicy(config, admission);
         const response = await runAdmittedHttpTurn(sessionReq, policy, async turnAdmissionLease => {
           ownsRequestLog = true;
           return withCors(
-            await handleChatCompletions(sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, advisorAdmissionPolicy }),
+            await handleChatCompletions(sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, sidecarAdmissionPolicy }),
             req,
             policy,
           );
@@ -1650,7 +1312,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
       if (url.pathname === "/v1/audio/transcriptions" && req.method === "POST") {
         disableResponsesRequestTimeout(req, requestServer);
         if (isDraining()) return drainingResponse(req, policy);
-        const admission = resolveAudioAdmission(req.headers, config, admissionOptions);
+        const admission = resolveAudioAdmission(req.headers, config);
         if (!admission) return withCors(formatErrorResponse(401, "authentication_error", "opencodex API key required"), req, policy);
         if (!isAllowedRequestOrigin(req, policy)) {
           return withCors(formatErrorResponse(403, "origin_rejected", "cross-origin audio request blocked"), req, policy);
@@ -1681,7 +1343,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         if (isDraining()) {
           return drainingResponse(req, policy);
         }
-        const audioClient = resolveAudioClient(req, config, false, admissionOptions);
+        const audioClient = resolveAudioClient(req, config, false);
         if (audioClient instanceof Response) return withCors(audioClient, req, policy);
         const admission = audioClient?.admission ?? resolveApiAuth(req, policy);
         if (!admission) return withCors(formatErrorResponse(401, "authentication_error", "opencodex API key required"), req, policy);
@@ -1725,7 +1387,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         if (isDraining()) {
           return drainingResponse(req, policy);
         }
-        const audioClient = resolveAudioClient(req, config, dictationSocket, admissionOptions);
+        const audioClient = resolveAudioClient(req, config, dictationSocket);
         if (audioClient instanceof Response) return withCors(audioClient, req, policy);
         if (!audioClient && liveSidebandTarget && "callId" in liveSidebandTarget
           && liveSidebandTarget.callId.startsWith(EXTERNAL_CALL_PREFIX)) {
@@ -1909,9 +1571,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
 
       if (url.pathname === "/opencodex-session") {
         if (req.method === "GET") {
-          const session = issueGuiSession(req, config, managementAuth, {
-            trustedTailscaleIngress: ingress === "hub-management",
-          });
+          const session = issueGuiSession(req, config, managementAuth);
           return session
             ? withManagementCors(serveSessionBootstrap(session), req, config)
             : withManagementCors(new Response(null, { status: 401, headers: { "Cache-Control": "no-store" } }), req, config);
@@ -1949,9 +1609,7 @@ export function createServeOptions(ctx: ServeOptionsContext) {
           }
           const pairing = managementAuth.available
             ? consumeGuiPairingGrant(req, body, config, managementAuth, Date.now(), {
-              ingress: ingress === "hub-management" ? "hub-management" : "public",
               peerAddress: requestServer.requestIP(req)?.address ?? null,
-              tailscaleUser: ingress === "hub-management" ? req.headers.get("Tailscale-User-Login") : null,
               browserOrigin: req.headers.get("Origin") ?? "",
             })
             : null;
@@ -1968,15 +1626,12 @@ export function createServeOptions(ctx: ServeOptionsContext) {
         return withCors(formatErrorResponse(404, "not_found", messagesUnknownEndpointMessage(req)), req, policy);
       }
       const guiSessionCandidate = req.method === "GET" && (url.pathname === "/" || !url.pathname.includes("."))
-        ? issueGuiSession(req, config, managementAuth, {
-          trustedTailscaleIngress: ingress === "hub-management",
-        })
+        ? issueGuiSession(req, config, managementAuth)
         : null;
       const guiFile = serveGuiFile(
         url.pathname,
         undefined,
         guiSessionCandidate ?? undefined,
-        config.runtimeRole ?? "standalone",
         isApiAuthRequired(policy),
       );
       if (guiFile) return guiFile;
@@ -1989,8 +1644,6 @@ export function createServeOptions(ctx: ServeOptionsContext) {
     websocket: createWebsocketHandler(ctx, requestMetrics),
   } as const;
   const routeFetch = serveOptions.fetch;
-  // x-opencodex-served-by on GET /v1/models, whichever branch answered (src/remote/served-by.ts).
   // Each request runs with its own caller slot, which admission fills for turn-state handle binding.
-  return { ...serveOptions, fetch: (req: Request, requestServer: Server<WsData>): Promise<Response> => runTurnStateCallerScope(async () =>
-    stampServedBy(req.method, codexCompatibleUrl(req.url).pathname, await routeFetch(req, requestServer))) } as const;
+  return { ...serveOptions, fetch: (req: Request, requestServer: Server<WsData>): Promise<Response> => runTurnStateCallerScope(() => routeFetch(req, requestServer)) } as const;
 }

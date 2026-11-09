@@ -341,7 +341,7 @@ test("a secondary start preserves shared client bytes and records the sibling ow
   writeFileSync(join(fx.ocx, "config.json"), JSON.stringify({
     port: 0, hostname: "127.0.0.1", codexAutoStart: false, syncResumeHistory: false,
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
-    claudeCode: { injectAgents: false, systemEnv: false }, providers: {}, defaultProvider: "openai",
+    claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
   const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
@@ -370,7 +370,7 @@ test("a secondary ensure parent preserves shared Grok, Codex and Claude agent by
   writeFileSync(join(fx.ocx, "config.json"), JSON.stringify({
     port: 0, hostname: "127.0.0.1", codexAutoStart: true, syncResumeHistory: false,
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
-    claudeCode: { injectAgents: false, systemEnv: false }, providers: {}, defaultProvider: "openai",
+    claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
   const ensure = Bun.spawn([process.execPath, "--preload", helperPath("ensure-without-desktop-preload.ts"), repoPath("src/cli/index.ts"), "ensure"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
@@ -409,7 +409,7 @@ test("a lone custom-home start still syncs Grok and prunes its own Claude roster
   writeFileSync(join(fx.ocx, "config.json"), JSON.stringify({
     port: 0, hostname: "127.0.0.1", codexAutoStart: true, syncResumeHistory: false,
     checkForUpdates: false, clientIntegrations: { codex: false, grok: true, "claude-desktop": false },
-    claudeCode: { injectAgents: false, systemEnv: false }, providers: {}, defaultProvider: "openai",
+    claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
   const child = Bun.spawn([process.execPath, "--preload", helperPath("fixture-windows-runtime-preload.ts"), repoPath("src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, ...namespaceOwner, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
@@ -663,7 +663,7 @@ async function secondaryStartPreservesBytes(
   writeFileSync(join(fx.ocx, "config.json"), JSON.stringify({
     port: 0, hostname: "127.0.0.1", codexAutoStart: false, syncResumeHistory: false,
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
-    claudeCode: { injectAgents: false, systemEnv: false }, providers: {}, defaultProvider: "openai",
+    claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
   const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",
@@ -745,7 +745,7 @@ test("a registry-only discovered owner vetoes shared writes end to end", async (
   writeFileSync(join(fx.ocx, "config.json"), JSON.stringify({
     port: 0, hostname: "127.0.0.1", codexAutoStart: false, syncResumeHistory: false,
     checkForUpdates: false, clientIntegrations: { codex: true, grok: true, "claude-desktop": false },
-    claudeCode: { injectAgents: false, systemEnv: false }, providers: {}, defaultProvider: "openai",
+    claudeCode: { injectAgents: false }, providers: {}, defaultProvider: "openai",
   }));
   const child = Bun.spawn([process.execPath, repoPath("src/cli/index.ts"), "start"], {
     cwd: fx.root, env: { ...process.env, NO_PROXY: "127.0.0.1,localhost" }, stdout: "pipe", stderr: "pipe",

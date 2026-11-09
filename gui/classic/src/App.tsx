@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type ReactElement } from "react";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useKeyedClientResource } from "./client-resource";
 import Dashboard from "./pages/Dashboard";
 import Providers from "./pages/Providers";
 import Models from "./pages/Models";
-import Advisor from "./pages/Advisor";
 import Subagents from "./pages/Subagents";
 import Logs from "./pages/Logs";
 import Usage from "./pages/Usage";
@@ -11,36 +11,24 @@ import Storage from "./pages/Storage";
 import CodexSet from "./pages/CodexSet";
 import Integrations from "./pages/Integrations";
 import Startup from "./pages/Startup";
-import RemoteWorkspace from "./pages/RemoteWorkspace";
-import RemoteLink from "./pages/RemoteLink";
 import ErrorBoundary from "./components/ErrorBoundary";
 import QuotaSummaryBar from "./components/quota-summary-bar/QuotaSummaryBar";
-import { SidebarGithubRow } from "./components/sidebar-github-row";
-import { DesktopStarOnboarding } from "./components/desktop-star-onboarding";
 import { IconMenu, IconGlobe, IconPower, IconX, IconRefresh, IconHistory } from "./icons";
 import { switchDashboardEdition } from "./lib/dashboard-edition";
 import { NAV_GROUPS, groupForPage, visibleGroupPages } from "./nav-groups";
 import { SectionSwitcher } from "./components/SectionSwitcher";
 import { useI18n, useT, LOCALES, localeDisplayName, type Locale, type TKey } from "./i18n/shared";
-import { Notice, Select, ToastNotice, type NoticeTone } from "./ui";
-import { bootstrapApiSession, configureApiTargets, DEVICE_PROOF_CHANGED_EVENT, hasApiSession, hasRememberedDashboardDevice, installApiAuthFetch, logoutApiSession, SESSION_CHANGED_EVENT, SESSION_UNAVAILABLE_EVENT } from "./api";
-import { apiBaseForPlane, discoverApiTargets, isConnectedRuntime, runtimeRoleFromDocument, standaloneApiTargets, type ApiTargets } from "./api-targets";
-import { ConnectPairingForm } from "./connect-pairing";
-import { validateRemoteLinkSession } from "./connect-pairing-transport";
+import { Select, ToastNotice, type NoticeTone } from "./ui";
+import { configureApiTargets, DEVICE_PROOF_CHANGED_EVENT, hasApiSession, hasRememberedDashboardDevice, installApiAuthFetch, logoutApiSession, SESSION_CHANGED_EVENT, SESSION_UNAVAILABLE_EVENT } from "./api";
+import { apiBaseForPlane, standaloneApiTargets } from "./api-targets";
 import { type Page } from "./app-routing";
-import { readModelsTab, type ModelsTab } from "./pages/models-tab";
 import { useAppRouteState } from "./use-app-route-state";
 import { requestProxyStop } from "./stop-proxy";
 import { useCodexRestart } from "./use-codex-restart";
 import { confirmAction } from "./action-dialogs";
-import { hostOs, isDesktopShell, isExternalLink, openDesktopCliPage, openDesktopUpdatePage } from "./lib/desktop-shell";
-import { zoomManagedOn } from "./lib/desktop-zoom";
 import { useSidebarCollapse } from "./use-sidebar-collapse";
-import { useDesktopZoom } from "./use-desktop-zoom";
-import { DesktopZoomControl } from "./components/desktop-zoom-control";
 import { ThemeSwitch, type ThemeMode } from "./components/theme-switch";
-import { MainTopStrip, SidebarTopStrip } from "./components/app-titlebar";
-import { watchMacTitlebarMetrics, windowChromeHandlers } from "./lib/window-chrome";
+import { SidebarTopStrip } from "./components/app-titlebar";
 
 type Theme = ThemeMode;
 
@@ -50,12 +38,9 @@ const PAGE_TKEY: Record<Page, TKey> = {
   providers: "nav.providers",
   models: "nav.models",
   subagents: "nav.subagents",
-  advisor: "nav.advisor",
   logs: "nav.logs",
   usage: "nav.usage",
   storage: "nav.storage",
-  remote: "nav.remote",
-  "remote-workspace": "nav.remoteWorkspace",
   "codex-set": "nav.codexSet",
   integrations: "nav.connect",
   claude: "nav.claude",
@@ -66,22 +51,6 @@ const INITIAL_TARGETS = standaloneApiTargets(API_BASE);
 configureApiTargets(INITIAL_TARGETS);
 installApiAuthFetch();
 const THEME_KEY = "ocx-theme";
-
-
-export interface RemoteWorkspaceRouteProps {
-  available: boolean;
-  apiBase: string;
-  hubOrigin: string;
-  onOpenRemoteLink: () => void;
-}
-
-export function RemoteWorkspaceRoute({ available, apiBase, hubOrigin, onOpenRemoteLink }: RemoteWorkspaceRouteProps): ReactElement {
-  const t = useT();
-  if (!available) {
-    return <section className="panel"><h2>{t("nav.remoteWorkspace")}</h2><Notice tone="warn">{t("link.workspaceUnavailable")} <button type="button" className="link-btn" onClick={onOpenRemoteLink}>{t("nav.remote")}</button></Notice></section>;
-  }
-  return <RemoteWorkspace apiBase={apiBase} hubOrigin={hubOrigin} />;
-}
 
 function readRuntimeVersion(data: unknown): string | null {
   if (!data || typeof data !== "object" || !("version" in data)) return null;
@@ -117,33 +86,12 @@ function focusAfterSwitcher(): void {
 
 export default function App() {
   const { page, navigateToPage } = useAppRouteState();
-  /*
-   * App needs the Models tab for one reason only: the full-bleed combos modifier lives
-   * on `.main-inner`, which is App's element. Models owns every other tab concern.
-   */
-  const [modelsTab, setModelsTab] = useState<ModelsTab>(readModelsTab);
-  useEffect(() => {
-    const syncModelsTab = () => setModelsTab(readModelsTab());
-    window.addEventListener("hashchange", syncModelsTab);
-    window.addEventListener("popstate", syncModelsTab);
-    return () => {
-      window.removeEventListener("hashchange", syncModelsTab);
-      window.removeEventListener("popstate", syncModelsTab);
-    };
-  }, []);
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const { locale, setLocale } = useI18n();
   const t = useT();
-  const [targets, setTargets] = useState<ApiTargets>(INITIAL_TARGETS);
-  // Standalone starts settled: there is nothing to discover, so nothing to wait for.
-  // Gating the page on discovery made a plain install show remote-hub loading copy before
-  // its own dashboard, for a feature the operator never enabled.
-  const [targetsSettled, setTargetsSettled] = useState(() => !isConnectedRuntime());
-  const [targetError, setTargetError] = useState(false);
+  const targets = INITIAL_TARGETS;
   const [sharedSessionReady, setSharedSessionReady] = useState(() => hasApiSession("shared"));
   const [sharedSessionEpoch, setSharedSessionEpoch] = useState(0);
-  const [hubPairingOpen, setHubPairingOpen] = useState(false);
-  const [remoteWorkspaceAvailableState, setRemoteWorkspaceAvailable] = useState(false);
   const [sessionLoggingOut, setSessionLoggingOut] = useState(false);
   /*
    * Results from the two sidebar orbs used to be `alert()`, which the app's webview draws
@@ -179,64 +127,19 @@ export default function App() {
     window.addEventListener(DEVICE_PROOF_CHANGED_EVENT, proofChanged);
     return () => { window.removeEventListener(SESSION_UNAVAILABLE_EVENT, unavailable); window.removeEventListener(SESSION_CHANGED_EVENT, changed); window.removeEventListener(DEVICE_PROOF_CHANGED_EVENT, proofChanged); };
   }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void discoverApiTargets(API_BASE, controller.signal).then(async next => {
-      configureApiTargets(next);
-      setTargets(next);
-      if (next.connected && !hasApiSession("shared")) {
-        await bootstrapApiSession("shared", controller.signal);
-      }
-      if (controller.signal.aborted) return;
-      setSharedSessionReady(hasApiSession("shared"));
-      setTargetError(false);
-      setTargetsSettled(true);
-    }).catch(() => {
-      if (controller.signal.aborted) return;
-      setTargetError(true);
-      setTargetsSettled(true);
-    });
-    return () => controller.abort();
-  }, []);
   const machineBase = apiBaseForPlane("machine", targets);
   const sharedBase = apiBaseForPlane("shared", targets);
-
-  useEffect(() => {
-    if (!sharedSessionReady) return;
-    const controller = new AbortController();
-    void fetch(`${sharedBase}/api/remote-workspace`, { signal: controller.signal, cache: "no-store" })
-      .then(response => response.ok ? response.json() as Promise<{ available?: unknown }> : Promise.reject(new Error("unavailable")))
-      .then(value => { if (!controller.signal.aborted) setRemoteWorkspaceAvailable(value.available === true); })
-      .catch(() => { if (!controller.signal.aborted) setRemoteWorkspaceAvailable(false); });
-    return () => controller.abort();
-  }, [page, sharedSessionReady, sharedBase]);
-  const remoteWorkspaceAvailable = sharedSessionReady && remoteWorkspaceAvailableState;
   // The sidebar row that owns this page, and the members its switcher may offer.
   const activeGroup = groupForPage(page);
-  const sectionPages = activeGroup ? visibleGroupPages(activeGroup, { remoteWorkspaceAvailable }) : [];
+  const sectionPages = activeGroup ? visibleGroupPages(activeGroup) : [];
   // Claude is a tab inside Connect: both pages render one Integrations shell under one
   // boundary, so moving between Claude and another Connect tab keeps drafts and focus.
   const shellPage: Page = page === "claude" ? "integrations" : page;
-  // A Hub can serve the dashboard on a public HTTPS origin without requiring an admin token.
-  // Such a request cannot mint the ordinary loopback session; only an operator-paired session
-  // can manage Remote Link. Pairing recovery therefore follows the actual runtime role and the
-  // RemoteLink authorization result, not the unrelated admin-token prompt policy.
-  const hubPairingAvailable = page === "remote" && runtimeRoleFromDocument() === "hub";
-  const remotePairingFormOpen = hubPairingAvailable && hubPairingOpen;
 
   // Narrow screens: the sidebar becomes an off-canvas drawer behind a hamburger toggle.
   const [navOpen, setNavOpen] = useState(false);
-  // Codex-style rail collapse on wide screens, persisted; Cmd/Ctrl+B toggles too.
-  const desktopShell = isDesktopShell();
-  const { collapsed: navCollapsed, toggle: toggleNavCollapse } = useSidebarCollapse({ shortcut: desktopShell });
-  const desktopMac = desktopShell && hostOs() === "macos";
-  const zoomManaged = desktopShell && zoomManagedOn(hostOs());
-  const desktopZoom = useDesktopZoom({ managed: zoomManaged });
+  const { collapsed: navCollapsed, toggle: toggleNavCollapse } = useSidebarCollapse({ shortcut: true });
   const appRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (desktopMac && appRef.current) return watchMacTitlebarMetrics(appRef.current);
-  }, [desktopMac]);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const navWasOpen = useRef(false);
@@ -250,23 +153,6 @@ export default function App() {
       window.removeEventListener("hashchange", dismissNav);
       window.removeEventListener("popstate", dismissNav);
     };
-  }, []);
-
-  useEffect(() => {
-    if (!isDesktopShell()) return;
-    const interceptExternalLinks = (event: MouseEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const anchor = target.closest("a[href]");
-      if (!(anchor instanceof HTMLAnchorElement)) return;
-      const href = anchor.href;
-      if (!isExternalLink(href)) return;
-      event.preventDefault();
-      // Rust denies external HTTP(S) navigation and opens it in the system browser.
-      window.location.assign(href);
-    };
-    document.addEventListener("click", interceptExternalLinks, true);
-    return () => document.removeEventListener("click", interceptExternalLinks, true);
   }, []);
 
   useEffect(() => {
@@ -285,13 +171,13 @@ export default function App() {
 
   const healthPoll = useKeyedClientResource(
     `app-healthz:${machineBase}`,
-    [machineBase, targetsSettled],
+    [machineBase],
     async (signal) => {
       const res = await fetch(`${machineBase}/healthz`, { signal });
       if (!res.ok) return null;
       return readRuntimeVersion(await res.json());
     },
-    { pollMs: 30_000, enabled: targetsSettled },
+    { pollMs: 30_000 },
   );
 
   const themeSwitch = <ThemeSwitch theme={theme} onChange={setTheme} />;
@@ -339,8 +225,8 @@ export default function App() {
 
   const handleStop = async () => {
     const consented = await confirmAction({
-      message: t(targets.connected ? "connection.disconnectConfirm" : "dash.stopConfirm"),
-      confirmLabel: t(targets.connected ? "connection.disconnect" : "dash.stop"),
+      message: t("dash.stopConfirm"),
+      confirmLabel: t("dash.stop"),
       tone: "danger",
     });
     if (!consented) return;
@@ -349,7 +235,6 @@ export default function App() {
       formatFailure: status => t("dash.stopFailed", { status: String(status) }),
       formatStillRunning: () => t("dash.stopStillRunning"),
       formatUnknown: () => t("dash.stopUnknown"),
-      mode: targets.connected ? "client" : "standalone",
     });
     /*
      * Only an accepted stop leaves the control pending, because the page is about to go
@@ -403,24 +288,22 @@ export default function App() {
     </button>
   );
 
-  const quotaSummary = targetsSettled && page !== "startup" && (!targets.connected || sharedSessionReady) && (
+  const quotaSummary = page !== "startup" && (
     <ErrorBoundary key={sharedBase} pageName={t("quotaSummary.aria")} title={t("errorBoundary.title")} message={t("errorBoundary.message")} detailsLabel={t("errorBoundary.details")} reloadLabel={t("errorBoundary.reload")}>
       <QuotaSummaryBar apiBase={sharedBase} />
     </ErrorBoundary>
   );
 
   return (
-    <div ref={appRef} className={`app${desktopShell ? " app--desktop" : ""}${desktopMac ? " app--macos" : ""}${navCollapsed ? " app--nav-collapsed" : ""}`}>
-      <DesktopStarOnboarding apiBase={sharedBase} enabled={targetsSettled && !targets.connected} />
+    <div ref={appRef} className={`app${navCollapsed ? " app--nav-collapsed" : ""}`}>
+      
       {actionFeedback && (
         <ToastNotice tone={actionFeedback.tone} onDismiss={() => setActionFeedback(null)} dismissLabel={t("common.close")}>
           {actionFeedback.text}
         </ToastNotice>
       )}
       {/* inert while the drawer is open: keeps focus and assistive tech inside the drawer */}
-      {/* At narrow widths the sidebar strip is hidden and the main strip scrolls away, so in
-          the desktop shell the sticky header is the window's drag surface. */}
-      <header className="mobile-topbar" inert={navOpen} {...(desktopShell ? windowChromeHandlers() : {})}>
+      <header className="mobile-topbar" inert={navOpen}>
         <button ref={menuBtnRef} type="button" className="menu-toggle" onClick={() => setNavOpen(o => !o)}
           aria-expanded={navOpen} aria-controls="app-sidebar"
           aria-label={t(navOpen ? "nav.closeMenu" : "nav.openMenu")} title={t(navOpen ? "nav.closeMenu" : "nav.openMenu")}>
@@ -428,14 +311,14 @@ export default function App() {
         </button>
         {brand}
         <div className="mobile-topbar-actions">
-          {(targets.connected || deviceForgetAvailable) && sharedSessionReady && (
+          {deviceForgetAvailable && sharedSessionReady && (
             <button type="button" className="sidebar-orb" onClick={() => { void handleSessionLogout(); }} disabled={sessionLoggingOut}
               aria-label={sessionLoggingOut ? t("connection.sessionLoggingOut") : endSessionLabel} title={endSessionLabel}>
               <IconX />
             </button>
           )}
           <button type="button" className="sidebar-orb sidebar-orb--danger" onClick={handleStop} disabled={stopping}
-            aria-label={t(targets.connected ? "connection.disconnect" : "dash.stop")} title={t(targets.connected ? "connection.disconnect" : "dash.stop")}>
+            aria-label={t("dash.stop")} title={t("dash.stop")}>
             <IconPower />
           </button>
           <button type="button" className="sidebar-orb"
@@ -512,22 +395,14 @@ export default function App() {
               style={{ flex: 1, minWidth: 0, width: "100%" }}
             />
           </div>
-          {zoomManaged ? (
-            <div className="sidebar-display-row">
-              {themeSwitch}
-              <DesktopZoomControl percent={desktopZoom.percent} canZoomIn={desktopZoom.canZoomIn}
-                canZoomOut={desktopZoom.canZoomOut} onStep={desktopZoom.step} />
-            </div>
-          ) : (
-            <div className="sidebar-action-row sidebar-action-row--theme">
-              <span className="sidebar-action-label">{t("theme.label")}</span>
-              {themeSwitch}
-            </div>
-          )}
+          <div className="sidebar-action-row sidebar-action-row--theme">
+            <span className="sidebar-action-label">{t("theme.label")}</span>
+            {themeSwitch}
+          </div>
           <div className="sidebar-action-row">
             <span className="sidebar-action-label">{t("dash.actions")}</span>
             <div className="sidebar-action-orbs">
-              {(targets.connected || deviceForgetAvailable) && sharedSessionReady && (
+              {deviceForgetAvailable && sharedSessionReady && (
                 <button type="button" className="sidebar-orb" onClick={() => { void handleSessionLogout(); }} disabled={sessionLoggingOut}
                   aria-label={sessionLoggingOut ? t("connection.sessionLoggingOut") : endSessionLabel}
                   title={endSessionLabel}>
@@ -536,8 +411,8 @@ export default function App() {
               )}
               <button type="button" className="sidebar-orb sidebar-orb--danger"
                 onClick={handleStop} disabled={stopping}
-                aria-label={stopping ? t("dash.stopping") : t(targets.connected ? "connection.disconnect" : "dash.stop")}
-                title={stopping ? t("dash.stopping") : t(targets.connected ? "connection.disconnect" : "dash.stop")}>
+                aria-label={stopping ? t("dash.stopping") : t("dash.stop")}
+                title={stopping ? t("dash.stopping") : t("dash.stop")}>
                 <IconPower />
               </button>
               <button type="button" className="sidebar-orb"
@@ -548,41 +423,19 @@ export default function App() {
               </button>
             </div>
           </div>
-          <SidebarGithubRow
-            apiBase={sharedBase}
-            onOpenUpdate={() => {
-              setNavOpen(false);
-              if (openDesktopUpdatePage()) return;
-              navigateToPage("dashboard", "update");
-            }}
-            onOpenTerminalCommand={() => {
-              setNavOpen(false);
-              openDesktopCliPage();
-            }}
-          />
+          
         </div>
       </aside>
 
       <main className="main" inert={navOpen}>
-        {/* Inside the desktop shell the strip is the integrated title bar's right half —
-            draggable, at the very top of the window, level with the traffic lights — so it
-            exists even while the bar inside it does not. The browser dashboard keeps the
-            bar as it was: no strip, no reserved row. */}
-        {desktopShell ? <MainTopStrip>{quotaSummary}</MainTopStrip> : quotaSummary}
-        {/*
-          Combos is full-bleed, unlike every other surface, and it is reachable only as
-          a Models tab. `.main-inner` is App's element, so App is the only place that
-          can know which tab is showing.
-        */}
-        <div className={`main-inner${
-          page === "models" && modelsTab === "combos" ? " main-inner--combos" : ""
-        }`}>
+        {quotaSummary}
+        <div className="main-inner">
           {/*
             Outside the page-keyed ErrorBoundary on purpose: that boundary remounts on
             every page change, which would destroy the button the user just activated
             and drop keyboard focus to <body>.
           */}
-          {targetsSettled && sectionPages.length > 1 && (
+          {sectionPages.length > 1 && (
             <SectionSwitcher
               items={sectionPages.map(member => ({ page: member, label: t(PAGE_TKEY[member]) }))}
               currentPage={page}
@@ -591,14 +444,7 @@ export default function App() {
               onFocusOrphaned={focusAfterSwitcher}
             />
           )}
-          {/* Outside the page boundary: a page that fails to render must not hide whose state this is. */}
-          {targetsSettled && targets.link && (
-            <Notice tone="warn">
-              {targets.link.home
-                ? t("connection.linkManaged", { home: targets.link.home, linkId: targets.link.linkId })
-                : t("connection.linkManagedUnnamed", { linkId: targets.link.linkId })}
-            </Notice>
-          )}
+          
           <ErrorBoundary
             key={shellPage}
             pageName={t(PAGE_TKEY[shellPage])}
@@ -607,44 +453,19 @@ export default function App() {
             detailsLabel={t("errorBoundary.details")}
             reloadLabel={t("errorBoundary.reload")}
           >
-            {!targetsSettled ? (
-              <div className="alert">{t("connection.discovering")}</div>
-            ) : (
-              <>
-                {/*
-                  A failed discovery is a banner, not a replacement. It used to take over the
-                  whole body, so a slow or restarting proxy cost a standalone user their
-                  dashboard over a plane they never turned on. The requests that actually
-                  need the machine plane report their own errors.
-                */}
-                {targetError && (
-                  <div className="alert alert-err" role="alert">{t("connection.machineUnavailable")}</div>
-                )}
-                {((targets.connected && !sharedSessionReady) || remotePairingFormOpen) && (
-                  <ConnectPairingForm key={`${targets.shared.serverOrigin}:${targets.shared.bootstrapPath}`} target={targets.shared} focusOnMount={remotePairingFormOpen} onConnected={async signal => {
-                    if (remotePairingFormOpen) await validateRemoteLinkSession(sharedBase, undefined, signal);
-                    signal.throwIfAborted();
-                    setHubPairingOpen(false);
-                    setSharedSessionReady(hasApiSession("shared"));
-                    setSharedSessionEpoch(epoch => epoch + 1);
-                  }} />
-                )}
-                {page === "dashboard" && <Dashboard apiBase={sharedBase} readOnly={targets.link !== undefined} connected={targets.connected}
-                  authenticationPending={targets.connected && !sharedSessionReady} refreshEpoch={sharedSessionEpoch} />}
-                {page === "startup" && <Startup apiBase={sharedBase} machineApiBase={machineBase} connected={targets.connected} />}
+                {page === "dashboard" && <Dashboard apiBase={sharedBase} refreshEpoch={sharedSessionEpoch} />}
+                {page === "startup" && <Startup apiBase={sharedBase} />}
                 {page === "providers" && <Providers apiBase={sharedBase} />}
-                {page === "models" && <Models key={sharedBase} apiBase={sharedBase} restartEpoch={codexRestartEpoch} connected={targets.connected} catalogSyncedAt={targets.catalogSyncedAt} reportRestart={report} />}
+                {page === "models" && <Models key={sharedBase} apiBase={sharedBase} restartEpoch={codexRestartEpoch} reportRestart={report} />}
                 {page === "subagents" && <Subagents key={sharedBase} apiBase={sharedBase} />}
-                {page === "advisor" && <Advisor key={sharedBase} apiBase={sharedBase} />}
+                
                 {page === "logs" && <Logs apiBase={sharedBase} />}
-                {page === "usage" && <Usage apiBase={sharedBase} connected={targets.connected} apiKeyId={targets.apiKeyId} />}
+                {page === "usage" && <Usage apiBase={sharedBase} />}
                 {page === "storage" && <Storage apiBase={sharedBase} />}
-                {page === "remote" && !remotePairingFormOpen && <RemoteLink key={`${sharedBase}:${sharedSessionEpoch}`} apiBase={sharedBase} sessionReady={sharedSessionReady} pairingRecoveryAvailable={hubPairingAvailable} onRequestPairing={() => setHubPairingOpen(true)} workspaceAvailable={remoteWorkspaceAvailable} onOpenWorkspace={() => navigateToPage("remote-workspace")} />}
-                {page === "remote-workspace" && <RemoteWorkspaceRoute available={remoteWorkspaceAvailable} apiBase={sharedBase} hubOrigin={targets.shared.serverOrigin} onOpenRemoteLink={() => navigateToPage("remote")} />}
-                {page === "codex-set" && <CodexSet apiBase={sharedBase} machineApiBase={machineBase} connected={targets.connected} />}
-                {shellPage === "integrations" && <Integrations apiBase={sharedBase} machineApiBase={machineBase} connected={targets.connected} />}
-              </>
-            )}
+                
+                
+                {page === "codex-set" && <CodexSet apiBase={sharedBase} />}
+                {shellPage === "integrations" && <Integrations apiBase={sharedBase} />}
           </ErrorBoundary>
         </div>
       </main>

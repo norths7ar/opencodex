@@ -389,10 +389,10 @@ describe("Desktop sync rechecks persisted state after discovery", () => {
   test.each([
     {
       name: "a deleted desired profile",
-      claudeCode: { desktopProfile: driftProfileA, systemEnv: false } as OcxConfig["claudeCode"],
+      claudeCode: { desktopProfile: driftProfileA, autoContext: false } as OcxConfig["claudeCode"],
       drift: (persisted: OcxConfig) => { delete persisted.claudeCode!.desktopProfile; },
       expectPersisted: (persisted: OcxConfig) => {
-        expect(persisted.claudeCode).toEqual({ systemEnv: false });
+        expect(persisted.claudeCode).toEqual({ autoContext: false });
       },
     },
     {
@@ -426,13 +426,13 @@ describe("Desktop sync rechecks persisted state after discovery", () => {
 
   test("an initially absent desired profile still stores the written fingerprint", async () => {
     const { outcome, persisted } = await runDesktopSyncWithDrift(
-      driftBaseConfig({ systemEnv: false }),
+      driftBaseConfig({ autoContext: false }),
       null,
     );
     expect(outcome).toEqual({ client: "claude-desktop", ok: true, changed: true });
     expect(persisted.claudeCode?.desktopProfile?.appliedFingerprint).toBe("0123456789abcdef");
     expect(persisted.claudeCode?.desktopProfile?.assignments).toEqual({});
-    expect(persisted.claudeCode?.systemEnv).toBe(false);
+    expect(persisted.claudeCode?.autoContext).toBe(false);
   });
 
   test("sync accepts unchanged defaults with reordered keys during the Desktop write", async () => {

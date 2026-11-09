@@ -1164,9 +1164,6 @@ export const PROVIDER_REGISTRY_CORE: readonly ProviderRegistryEntry[] = [
     authKind: "key", dashboardUrl: "https://www.orcarouter.ai/console",
     // The catalog is public, so a successful /models probe cannot validate a submitted key.
     apiKeyValidation: "unknown",
-    // Standard sponsor under SPONSORS.md (agreement signed 2026-09-07). Pins the row in the
-    // picker and adds the chip; nothing about routing or defaults changes.
-    sponsor: { tier: "standard", url: "https://www.orcarouter.ai/?utm_source=opencodex&utm_medium=readme" },
     defaultModel: "openai/gpt-5.5",
     models: ORCAROUTER_MODELS,
     liveModels: true,

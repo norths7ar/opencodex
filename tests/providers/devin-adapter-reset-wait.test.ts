@@ -161,19 +161,6 @@ describe("devin adapter stated-reset wait", () => {
     expect(trajectories[3]).toBe(trajectories[0]);
   });
 
-  test("a combo child returns the stated reset immediately despite a standalone wait allowance", async () => {
-    process.env.OPENCODEX_DEVIN_STATED_RESET_WAIT_MS = "3000";
-    stubTransport("Your limit will reset in 1 second");
-
-    const events = await runOneTurn(AbortSignal.timeout(500), true);
-
-    expect(events.find(event => event.type === "error")).toMatchObject({
-      type: "error", status: 429, errorType: "rate_limit_error", code: "resource_exhausted",
-    });
-    expect(events.some(event => event.type === "heartbeat" && event.preflightReady === true)).toBe(false);
-    expect(chatPosts).toBe(1);
-  });
-
   test("an invalid wait allowance fails closed without replay", async () => {
     process.env.OPENCODEX_DEVIN_STATED_RESET_WAIT_MS = "not-a-duration";
     stubTransport("Your limit will reset in 1 second");

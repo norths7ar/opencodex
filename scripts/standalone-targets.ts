@@ -5,11 +5,7 @@
  * verifier derives its expected standalone assets from it.
  */
 export const standaloneTargets = [
-  "bun-darwin-arm64",
-  "bun-darwin-x64",
   "bun-windows-x64",
-  "bun-linux-x64",
-  "bun-linux-arm64",
 ] as const;
 
 export function isStandaloneTarget(value: string): boolean {

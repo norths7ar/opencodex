@@ -18,8 +18,8 @@ function selectDashboardTab(next: DashboardSection) {
   navigateHash(dashboardHashForSection(next));
 }
 
-export default function Dashboard({ apiBase, readOnly = false, connected = false, authenticationPending = false, refreshEpoch = 0 }: {
-  apiBase: string; readOnly?: boolean; connected?: boolean; authenticationPending?: boolean; refreshEpoch?: number;
+export default function Dashboard({ apiBase, readOnly = false, authenticationPending = false, refreshEpoch = 0 }: {
+  apiBase: string; readOnly?: boolean; authenticationPending?: boolean; refreshEpoch?: number;
 }) {
   const d = useDashboardData(apiBase, refreshEpoch);
   const {
@@ -35,7 +35,7 @@ export default function Dashboard({ apiBase, readOnly = false, connected = false
       <EmptyState style={{ marginTop: 40 }} icon={<IconAlert />}
         title={<span style={{ color: "var(--red)" }}>{t(d.connectionFailure === "denied"
           ? "dash.permissionDenied" : d.connectionFailure === "auth" ? "dash.authRequired" : "dash.dataUnavailable")}</span>}>
-        {!connected && d.connectionFailure === "unavailable" && <Trans k="dash.runStart" cmd="ocx start" />}
+        {d.connectionFailure === "unavailable" && <Trans k="dash.runStart" cmd="ocx start" />}
         <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>{t("common.retry")}</button>
       </EmptyState>
     );

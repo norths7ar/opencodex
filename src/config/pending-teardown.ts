@@ -62,7 +62,6 @@ export type PendingTeardownReceipt = {
    * replacement discharges it after its first successful publication, and if no
    * replacement ever comes up, the next `ocx stop` finishes it like any abandoned receipt.
    */
-  handover?: "update-restart";
 };
 
 /**
@@ -120,7 +119,6 @@ function isReceipt(value: unknown, nonce: string): value is PendingTeardownRecei
     && receipt.nonce === nonce
     && typeof receipt.createdAt === "string"
     && (receipt.endpointSource === "exact" || receipt.endpointSource === "guessed")
-    && (receipt.handover === undefined || receipt.handover === "update-restart")
     && endpointOk;
 }
 
@@ -129,14 +127,12 @@ export function claimPendingTeardown(
   endpoint: { hostname: string; port: number },
   endpointSource: "exact" | "guessed",
   ownerPid: number = process.pid,
-  handover?: "update-restart",
 ): PendingTeardownReceipt {
   const dir = getConfigDir();
   assertNotRealHomeUnderTest(dir);
   const nonce = randomBytes(16).toString("hex");
   const receipt: PendingTeardownReceipt = {
     ownerPid, nonce, createdAt: new Date().toISOString(), endpoint, endpointSource,
-    ...(handover ? { handover } : {}),
   };
   atomicWriteFile(pendingTeardownPathFor(nonce), JSON.stringify(receipt, null, 2) + "\n");
   return receipt;
@@ -339,8 +335,3 @@ export function deferralMatchesReceipt(nonce: string | null): boolean {
 }
 
 /** Does this request name a valid obligation that an update handed to its replacement (#7423)? */
-export function isUpdateHandoverReceipt(nonce: string | null): boolean {
-  if (!nonce || !NONCE_RE.test(nonce)) return false;
-  const read = readPendingTeardown(nonce);
-  return read.state === "valid" && read.receipt.handover === "update-restart";
-}

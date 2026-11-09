@@ -15,15 +15,6 @@ function runtime() {
   return { calls, deps, log };
 }
 
-test("force CLI sets and clears through the management API", async () => {
-  const r = runtime();
-  expect(await handleAgentCommand(["subagents", "force", "combo/tev-auto"], r.deps)).toBe(0);
-  expect(r.calls[0]?.body).toEqual({ force: "combo/tev-auto" });
-  expect(await handleAgentCommand(["subagents", "force", "-", "--json"], r.deps)).toBe(0);
-  expect(r.calls[1]?.body).toEqual({ force: null });
-  expect(AGENT_USAGE).toContain("subagents force <model|->");
-});
-
 test("force CLI refuses bad arity without making requests", async () => {
   const r = runtime();
   for (const args of [[], ["one", "two"]]) expect(await handleAgentCommand(["subagents", "force", ...args], r.deps)).toBe(2);

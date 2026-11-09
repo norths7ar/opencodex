@@ -236,46 +236,6 @@ describe("GET /api/logs display metrics", () => {
     expect(dto!.displayMetrics.tokPerSecond).toEqual({ kind: "unavailable", reason: "output_missing" });
   });
 
-  test("enriches combo attempts and fails top-level cost closed on unmatched attempt", async () => {
-    addRequestLog(baseEntry({
-      model: "combo/my-combo",
-      provider: "combo",
-      usage: { inputTokens: 200, outputTokens: 20 },
-      attempts: [
-        {
-          ordinal: 1,
-          provider: "anthropic",
-          model: "claude-3-haiku-20240307",
-          adapter: "anthropic",
-          status: 200,
-          durationMs: 900,
-          sendCount: 1,
-          recoveryKinds: [],
-          usageStatus: "reported",
-          usage: { inputTokens: 100, outputTokens: 10 },
-        },
-        {
-          ordinal: 2,
-          provider: "unpriced-provider",
-          model: "unpriced-model",
-          adapter: "openai-chat",
-          status: 200,
-          durationMs: 1100,
-          sendCount: 1,
-          recoveryKinds: [],
-          usageStatus: "reported",
-          usage: { inputTokens: 100, outputTokens: 10 },
-        },
-      ],
-    }));
-    const [dto] = await readLogs();
-    expect(dto!.displayMetrics.cost).toEqual({ kind: "unavailable", reason: "combo_attempt_unavailable" });
-    expect(dto!.attempts).toHaveLength(2);
-    expect(dto!.attempts[0].displayMetrics.cost.kind).toBe("value");
-    expect(dto!.attempts[0].displayMetrics.tokPerSecond.kind).toBe("value");
-    expect(dto!.attempts[1].displayMetrics.cost).toEqual({ kind: "unavailable", reason: "price_unmatched" });
-  });
-
   test("legacy recoverable cache row is priced, not invalid_cache_breakdown", async () => {
     // canonical reading R=60,W=20 contradicts I=70; legacy retry recovers R=40,W=20.
     addRequestLog(baseEntry({

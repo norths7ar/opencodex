@@ -29,26 +29,20 @@ describe("Claude Desktop configLibrary resolution", () => {
   test("CLAUDE_USER_DATA_DIR drops the -3p suffix entirely", () => {
     const dir = resolveConfigLibraryDir({
       env: { CLAUDE_USER_DATA_DIR: "/custom/user-data" },
-      platform: "darwin",
+      platform: "linux",
       home: HOME,
     });
     expect(dir).toBe(posix.join("/custom/user-data", "configLibrary"));
     expect(dir).not.toContain("-3p");
   });
 
-  test("the macOS default stays Claude-3p (regression guard for existing users)", () => {
-    const dir = resolveConfigLibraryDir({ env: {}, platform: "darwin", home: HOME });
-    expect(dir).toBe(posix.join(HOME, "Library", "Application Support", "Claude-3p", "configLibrary"));
-  });
-
-  test("win32 with LOCALAPPDATA resolves under LOCALAPPDATA, not the macOS tree", () => {
+  test("win32 with LOCALAPPDATA resolves under LOCALAPPDATA, not the Linux tree", () => {
     const env = { LOCALAPPDATA: "C:\\Users\\tester\\AppData\\Local" };
     const win = resolveConfigLibraryDir({ env, platform: "win32", home: HOME });
-    const mac = resolveConfigLibraryDir({ env, platform: "darwin", home: HOME });
+    const linux = resolveConfigLibraryDir({ env, platform: "linux", home: HOME });
 
     expect(win).toBe(win32.join("C:\\Users\\tester\\AppData\\Local", "Claude-3p", "configLibrary"));
-    // The defect was returning the macOS path on Windows: prove the branch diverges.
-    expect(win).not.toBe(mac);
+    expect(win).not.toBe(linux);
     expect(win).not.toContain("Application Support");
   });
 

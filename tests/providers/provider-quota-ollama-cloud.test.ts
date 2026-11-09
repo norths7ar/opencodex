@@ -17,7 +17,6 @@ import {
   setProviderQuotaBeforePublishForTests,
 } from "../../src/providers/quota";
 import type { OcxConfig } from "../../src/types";
-import { clearComboTargetCooldowns, pickComboTarget } from "../../src/combos";
 
 const originalFetch = globalThis.fetch;
 const previousOpencodexHome = process.env.OPENCODEX_HOME;
@@ -260,22 +259,6 @@ describe("ollama cloud quota probe", () => {
       ] } },
     };
   }
-
-  test.each([
-    ["positive purchased credit keeps routing", { balance_usd: 99 }, "ollama-cloud"],
-    ["unknown purchased credit keeps routing", undefined, "ollama-cloud"],
-    ["empty purchased credit vetoes routing", { balance_usd: 0 }, "fallback"],
-  ] as const)("exhausted included allowance: %s", async (_label, purchased, expected) => {
-    clearComboTargetCooldowns();
-    globalThis.fetch = (async () => Response.json({
-      included: { allowance_usd: 10, balance_usd: 0 },
-      ...(purchased ? { purchased } : {}),
-    })) as typeof fetch;
-    const config = ollamaCombo();
-    const result = await fetchProviderQuotaReports(config, true);
-    expect(result.reports[0]?.quota.creditsUsd).toMatchObject({ percent: 100, remaining: 0 });
-    expect(pickComboTarget(config, "quota-scope")?.target.provider).toBe(expected);
-  });
 
   test("Ollama Cloud treats 404 as a no-report and keeps the last-good row", async () => {
     let missing = false;

@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { clearComboSelectionState, getCombo, noteComboFailure, pickComboTarget } from "../../src/combos";
 import { isProtocolPlanV1 } from "../../src/protocols/dto";
 import { buildProtocolPlanSnapshot, previewProtocolPlan } from "../../src/protocols/plan-snapshot";
 import type { OcxConfig } from "../../src/types";
@@ -19,11 +18,9 @@ beforeEach(() => {
   previousHome = process.env.OPENCODEX_HOME;
   testDir = mkdtempSync(join(tmpdir(), "ocx-plan-snapshot-"));
   process.env.OPENCODEX_HOME = testDir;
-  clearComboSelectionState();
 });
 
 afterEach(() => {
-  clearComboSelectionState();
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
   if (testDir) removeTreeWithRetry(testDir);
@@ -70,31 +67,6 @@ describe("buildProtocolPlanSnapshot", () => {
     expect(previewProtocolPlan(baseConfig(), { model: "m1", inbound: "chat", features: [] }).mode).toBe("native");
   });
 
-  test("a combo expands every configured target and declines the native Chat lane", () => {
-    const snapshot = buildProtocolPlanSnapshot(baseConfig(), { model: "combo/mixed", inbound: "chat", features: [] });
-    expect(snapshot.routeKind).toBe("combo");
-    expect(snapshot.candidates.map(c => [c.provider, c.adapter, c.nativeEligible])).toEqual([
-      ["a", "openai-chat", false],
-      ["r", "openai-responses", false],
-    ]);
-    expect(snapshot.candidates[0]!.declineReasons).toEqual(["combo-or-policy-route"]);
-    const plan = previewProtocolPlan(baseConfig(), { model: "combo/mixed", inbound: "chat", features: [] });
-    expect(isProtocolPlanV1(plan)).toBe(true);
-    expect(plan.basis).toBe("preview");
-    expect(plan.candidates.map(c => c.mode)).toEqual(["legacy-bridge", "translated"]);
-  });
-
-  test("with nativeChatCombos on, a combo's Chat candidate is judged as its concrete route", () => {
-    const config = baseConfig({ protocols: { rollout: { nativeChatCombos: true } } } as Partial<OcxConfig>);
-    const snapshot = buildProtocolPlanSnapshot(config, { model: "combo/mixed", inbound: "chat", features: [] });
-    expect(snapshot.candidates.map(c => [c.provider, c.nativeEligible, c.declineReasons])).toEqual([
-      ["a", true, []],
-      ["r", false, ["cross-wire-ir"]],
-    ]);
-    const plan = previewProtocolPlan(config, { model: "combo/mixed", inbound: "chat", features: [] });
-    expect(plan.candidates.map(c => c.mode)).toEqual(["native", "translated"]);
-  });
-
   test("a policy alias expands its configured candidates", () => {
     const snapshot = buildProtocolPlanSnapshot(baseConfig(), { model: "ocx/fast", inbound: "responses", features: [] });
     expect(snapshot.routeKind).toBe("policy");
@@ -136,38 +108,6 @@ describe("buildProtocolPlanSnapshot", () => {
 });
 
 describe("snapshot side effects", () => {
-  test("previewing a combo never advances its round-robin selection", () => {
-    const config = baseConfig();
-    for (let i = 0; i < 3; i++) previewProtocolPlan(config, { model: "combo/mixed", inbound: "responses", features: [] });
-    // With untouched state, clearing the first target and picking again still lands on it.
-    // Had any preview picked, the smooth-weighted counters would now favour the second
-    // target: a pick sets t0 active and leaves weights {t0:-1, t1:+1}.
-    noteComboFailure("mixed", getCombo(config, "mixed")!.targets[0]!);
-    expect(pickComboTarget(config, "mixed")?.targetIndex).toBe(0);
-  });
-
-  test("the control: one real pick does shift the next selection", () => {
-    const config = baseConfig();
-    pickComboTarget(config, "mixed");
-    noteComboFailure("mixed", getCombo(config, "mixed")!.targets[0]!);
-    expect(pickComboTarget(config, "mixed")?.targetIndex).toBe(1);
-  });
-
-  test("a preview performs no network request", () => {
-    const original = globalThis.fetch;
-    let calls = 0;
-    globalThis.fetch = (async () => {
-      calls++;
-      throw new Error("preview must not fetch");
-    }) as unknown as typeof fetch;
-    try {
-      previewProtocolPlan(baseConfig(), { model: "m1", inbound: "chat", features: ["request.tools"] });
-      previewProtocolPlan(baseConfig(), { model: "combo/mixed", inbound: "messages", features: [] });
-    } finally {
-      globalThis.fetch = original;
-    }
-    expect(calls).toBe(0);
-  });
 });
 
 

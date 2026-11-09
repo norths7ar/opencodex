@@ -54,7 +54,6 @@ describe("protocol settings resolution", () => {
     expect(resolveProtocolSettings(cfg({}))).toEqual({
       unrepresentable: "legacy",
       rollout: {
-        nativeChatCombos: false,
         managedMessagesNative: false,
         managedMessagesNativeOAuth: false,
         directEncoders: false,

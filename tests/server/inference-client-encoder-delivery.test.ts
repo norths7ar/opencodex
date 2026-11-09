@@ -42,18 +42,6 @@ describe("direct encoder gates", () => {
     expect(directEncodersApply(ON, { ...single("anthropic"), combo: { id: "c" } })).toBe(false);
     expect(directEncodersApply(ON, { ...single("anthropic"), routeKind: "policy" })).toBe(false);
   });
-
-  test("delivery re-checks the final route before encoding", () => {
-    const clientEncoder = { protocol: "chat" as const, stream: true, model: "m" };
-    const none = {};
-    expect(clientEncoderForDelivery({}, none, false, "anthropic")).toBeUndefined();
-    expect(clientEncoderForDelivery({ clientEncoder }, none, false, "anthropic")).toBe(clientEncoder);
-    expect(clientEncoderForDelivery({ clientEncoder, comboAttempt: true }, none, false, "anthropic")).toBeUndefined();
-    expect(clientEncoderForDelivery({ clientEncoder }, none, true, "anthropic")).toBeUndefined();
-    expect(clientEncoderForDelivery({ clientEncoder }, none, false, "openai-responses")).toBeUndefined();
-    const policy = { routeDecision: { routeKind: "policy" } } as unknown as Pick<RequestLogContext, "routeDecision">;
-    expect(clientEncoderForDelivery({ clientEncoder }, policy, false, "anthropic")).toBeUndefined();
-  });
 });
 
 describe("client-wire log channel", () => {

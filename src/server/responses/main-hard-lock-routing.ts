@@ -1,5 +1,4 @@
 import type { OcxConfig } from "../../types";
-import { getCombo, resolveComboId } from "../../combos";
 import { isBareOpenAiFamilyModel, previewRouteModel, routeConcreteModel } from "../../router";
 import { resolveChosenTarget } from "./shadow-target-availability";
 import { getRoutingProfile, resolvePolicyProfileId } from "../../routing/profile";
@@ -9,7 +8,7 @@ import {
   resolveMainAccountHardLockFallback,
 } from "../../codex/main-account-hard-lock";
 import { codexQuotaScopeForModel } from "../../codex/routing/health-store";
-import { getEligiblePoolAccounts } from "../../codex/routing/selection";
+import { previewCodexAccountForRequest } from "../../codex/routing";
 import { OPENAI_CODEX_PROVIDER_ID, isCanonicalOpenAiForwardProvider } from "../../providers/openai-tiers";
 import { providerCodexAccountMode } from "../../providers/registry";
 import {
@@ -19,13 +18,8 @@ import {
 /** Resolves to a synchronous ownership proof, or null when the caller does not own the locked main. */
 export type MainHardLockCallerCheck = (sourceModel: string) => Promise<(() => boolean) | null>;
 
-function isConfiguredComboSelector(config: OcxConfig, modelId: string): boolean {
-  const comboId = resolveComboId(config, modelId);
-  return Boolean(comboId && Object.hasOwn(config.combos ?? {}, comboId));
-}
-
 function targetsBlockedCanonicalOpenAi(config: OcxConfig, modelId: string): boolean {
-  if (isBareOpenAiFamilyModel(modelId) && !isConfiguredComboSelector(config, modelId)) return true;
+  if (isBareOpenAiFamilyModel(modelId)) return true;
   const slash = modelId.indexOf("/");
   if (slash <= 0) return false;
   const providerName = modelId.slice(0, slash);
@@ -40,8 +34,8 @@ function targetsBlockedCanonicalOpenAi(config: OcxConfig, modelId: string): bool
 
 /**
  * What one rewritten request carries so the log can show the model the client asked for
- * while the pipeline routes the fallback. The rewrite happens before combo dispatch reads
- * `model`, so the rest of the pipeline sees an ordinary request for the target selector.
+ * while the pipeline routes the fallback. The rest of the pipeline sees an ordinary request
+ * for the target selector.
  */
 export interface MainHardLockFallbackOverride {
   sourceModel: string;
@@ -67,12 +61,9 @@ function rawModelOf(body: unknown): { raw: Record<string, unknown>; model: strin
  * - The lock must be enabled AND reading `blocked` right now — `ready`, `unknown` and the
  *   explicit opt-out all admit, and the release is this same observation, so the reroute
  *   ends on its own the moment the blocking windows drop below their thresholds.
- * - `getEligiblePoolAccounts` is the selection choke point the dispatch itself consults,
- *   so "the pool can serve it" is one shared answer, not a second opinion: a usable pool
- *   account (or any eligible account) keeps the request on Codex, and a pool drained to
- *   empty is what makes the fallback the request's only way through. The main account is
- *   already excluded there while blocked.
- * - Only bare Codex-native selectors qualify. Provider-qualified rows, combos, account
+ * - Only the channel’s signed-in account can keep a subscription request on Codex. Inactive
+ *   stored credentials do not suppress the fallback.
+ * - Only bare Codex-native selectors qualify. Provider-qualified rows, account
  *   namespaces and policy routes name their own destination on purpose; rewriting those
  *   would override an explicit choice, so they keep the lock's refusal.
  * - A Codex-native fallback target is refused outright: rerouting gpt-* to gpt-* would
@@ -93,8 +84,7 @@ export async function applyMainHardLockFallbackOverride(
   if (!fallback) return null;
   if (targetsBlockedCanonicalOpenAi(config, fallback.model)) return null;
   if (!isBareOpenAiFamilyModel(parsed.model)
-    || parsed.model === NATIVE_RESERVE_MODEL
-    || isConfiguredComboSelector(config, parsed.model)) return null;
+    || parsed.model === NATIVE_RESERVE_MODEL ) return null;
   const accountMode = providerCodexAccountMode(
     OPENAI_CODEX_PROVIDER_ID,
     config.providers?.[OPENAI_CODEX_PROVIDER_ID],
@@ -108,21 +98,19 @@ export async function applyMainHardLockFallbackOverride(
     if (getMainAccountHardLockStatus(config, now ?? Date.now()).state !== "blocked") return null;
   } else {
     if (getMainAccountHardLockStatus(config, now ?? Date.now()).state !== "blocked") return null;
-    if (getEligiblePoolAccounts(config, undefined, now ?? Date.now(), codexQuotaScopeForModel(parsed.model)).length > 0) return null;
+    if (previewCodexAccountForRequest(null, config, now ?? Date.now(), codexQuotaScopeForModel(parsed.model)) !== null) return null;
   }
 
-  // Combos and policies keep their own dispatch admission and declared failover/evidence.
+  // Policies keep their own dispatch admission and declared failover/evidence.
   // Other chosen targets must resolve now; a removed qualifier cannot become a default send.
   const policyId = resolvePolicyProfileId(config, fallback.model);
   const profile = policyId ? getRoutingProfile(config, policyId) : undefined;
-  const comboId = resolveComboId(config, fallback.model);
-  const combo = comboId ? getCombo(config, comboId) : undefined;
-  if (profile || combo) {
+  if (profile) {
     // Match the actual first guard's selector order. This neither picks nor filters a target.
-    const denied = allDeclaredTargetsDenied(config, profile?.candidates ?? combo!.targets, {
+    const denied = allDeclaredTargetsDenied(config, profile.candidates, {
       site: "hard-lock",
-      route: profile ? parsed.model : `combo/${comboId}`,
-      aliases: profile ? [`policy/${policyId}`] : [parsed.model],
+      route: parsed.model,
+      aliases: [`policy/${policyId}`],
       from: { provider: OPENAI_CODEX_PROVIDER_ID, model: parsed.model },
       trigger: "hard_lock", admission, ...(now !== undefined ? { now } : {}),
     });
@@ -174,7 +162,7 @@ export async function applyMainHardLockFallbackOverride(
 function allDeclaredTargetsDenied(
   config: OcxConfig, targets: readonly FallbackTarget[], hop: Omit<FallbackHop, "to">,
 ): FallbackHop | undefined {
-  const deviceIds = fallbackDeviceIds(config, hop.admission, hop.now);
+  const deviceIds = fallbackDeviceIds(config, hop.admission);
   const routes = [hop.route, ...(hop.aliases ?? [])];
   let witness: FallbackHop | undefined;
   for (const target of targets) {

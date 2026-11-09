@@ -1,4 +1,4 @@
-import { collectCliPathDiagnostics, formatCliStatusHealthLabel, type CliPathDiagnostics } from "./cli-path-diagnostics";
+import { appliedCodexSettingsDigest } from "../codex/applied-settings-digest";
 import type { CodexMainAccountPolicyHealth } from "../oauth/health";
 import { durableBunRuntime } from "../lib/bun-runtime";
 import { existsSync, readFileSync } from "node:fs";
@@ -8,7 +8,6 @@ import { diagnoseCodexBundledPlugins, type CodexPluginsDiagnostic } from "../cod
 import { findLiveProxy, probeHostname, type LiveProxy } from "../server/proxy-liveness";
 import type { OcxConfig } from "../types";
 import { diagnoseService, serviceLogPath } from "../service";
-import { inspectDesktopSupervision } from "../service/desktop-supervision.mjs";
 import { collectStartupHealth, startupHealthReadBudgetMs, type StartupHealth } from "../codex/autostart-health";
 import { getCodexRoutingKind } from "../codex/inject";
 import { missingOwnedCatalogPath } from "../codex/inject/config-toml";
@@ -25,100 +24,12 @@ import { journaledInjectedOpenaiBaseUrl, journaledInjectedRealtimeWsBaseUrl } fr
 import { detectCodexRoutingDrift, type JournaledCodexRouting } from "../codex/routing-drift";
 import { claudeDesktopIntegrationEnabled } from "../codex/desired-state";
 import { claudeDesktopPolicyHealth, probeClaudeDesktopPolicy, type ClaudeDesktopPolicyHealth } from "../claude/desktop-policy";
-import { collectClientConnectionStatus, type ClientConnectionStatus } from "./connect";
-import { readClientConnectionState, sameClientConnectionOwner } from "../client/state";
-import type { HubStateOAuthEntry, HubStateProvider } from "../remote/hub-state";
-import type { HubStateSource } from "../client/hub-state";
-import { readServiceApiTokenState, serviceApiTokenFilePath } from "../lib/service-secrets";
-import { tokenCollidesWithAdmin } from "../lib/admin-secrets";
 export { proxyHealthFailureReason, isConnectionRefused, isUncleanExitEvidence, probeUncleanExitState } from "./status-probes";
 export type { ListenTarget } from "./status-probes";
 import { checkProxyHealth, probeUncleanExitState, type ListenTarget } from "./status-probes";
 import { LOCAL_MANAGEMENT_READ_PATHS } from "../lib/local-management-capability";
 import { fetchBoundLocalManagementRead } from "../server/local-management-read-client";
-import { collectAppliedCodexSettingsStatus, type CliAppliedCodexSettingsStatus } from "./status-codex-settings";
-import { installDetectionStatus, type InstallDetectionStatus } from "./status-install";
 import { collectLocalCredentials, type LocalCredentialSnapshot } from "../local-credentials/inventory";
-import { collectLinkConnectionGeneration } from "./status-link";
-
-/**
- * The state of the data-plane admission secret the SERVICE will use. State only -- never the value.
- *
- * Always about the file, because the file is what the service reads: the launchd plist and the
- * systemd unit `cat` it into `OPENCODEX_API_AUTH_TOKEN` before exec, so a token in the CLI's own
- * shell says nothing about the running hub. `present (env)` used to be reported here and was
- * simply wrong about whose environment it meant (see `dataTokenEnvInShell`).
- *
- * `admin-collision (file)` is the #4236 incident shape: the file holds the MANAGEMENT token, so
- * the server fences the whole management plane closed at boot and the hub crash-loops. It used
- * to report `present (file)`, which is how the cause stayed invisible.
- */
-export type HubDataTokenState =
-  | "present (file)"
-  | "unsafe (file)"
-  | "admin-collision (file)"
-  | "missing";
-
-export type HubStatus = {
-  /** Advertised data origin: hub.dataPublicOrigin, else derived from the bind address. */
-  dataOrigin: string;
-  /** True when dataOrigin came from config rather than being derived from the bind. */
-  dataOriginConfigured: boolean;
-  /**
-   * The unauthenticated loopback listener, in PR2's two forms: `companion` shares the public
-   * port (the one-port hub), `ported` binds its own. `off` means the hub does not serve its
-   * own local clients at all.
-   */
-  loopbackListener: { state: "off" | "companion" | "ported"; port: number | null };
-  managementIngress: { enabled: boolean; port: number | null };
-  managementPublicOrigin: string | null;
-  dataToken: HubDataTokenState;
-  dataTokenPath: string;
-  /**
-   * `OPENCODEX_API_AUTH_TOKEN` is set in the shell that ran `ocx status` — which is NOT the
-   * environment the installed service runs in. Reported separately, and honestly, because it
-   * does decide what a FOREGROUND `ocx start` in this same shell would admit.
-   */
-  dataTokenEnvInShell: boolean;
-};
-
-/**
- * What a connected client learned from its hub, and how reliable that answer is (#4236).
- *
- * `stateSource` is the load-bearing field. "hub" is a live read; "cache" is the last good read
- * from THIS connection, still the hub's state rather than this machine's; "unavailable" means
- * nothing true is known, and the consumer must say so rather than substitute local facts. A
- * client's own `providers`/`oauth` sections are empty by design, so presenting them as the
- * answer is not a degraded report — it is a wrong one.
- */
-export type CliRemoteHubStatus = {
-  connected: boolean;
-  /** The hub's advertised data origin when it publishes one, else the URL this client dials. */
-  origin: string | null;
-  stateSource: HubStateSource;
-  /** Present whenever `stateSource` is not "hub". Operator-facing, never a bare error code. */
-  reason?: string;
-  fetchedAt?: string;
-  ageSeconds?: number;
-  hubVersion: string | null;
-  providers: HubStateProvider[];
-  oauth: HubStateOAuthEntry[];
-  subagentModels: string[];
-  /** The hub hit one of its own caps, so the lists above are a prefix and the report says so. */
-  truncated: boolean;
-  /** The hub's own Claude Code toggle; a client cannot infer it from local config. */
-  claudeCodeEnabled: boolean | null;
-  /**
-   * Present on a Remote Link Child (#6957): the peer is a Home reached over the link, not a hub,
-   * and every sentence names it that way. `codexSettings` lists the Home's Codex settings the
-   * last sync applied, or why the Child's local values are in effect.
-   */
-  link?: {
-    linkId: string;
-    homePhrase: string;
-    codexSettings: { source: "home"; fetchedAt: string; lines: string[] } | { source: "local"; reason: string };
-  };
-};
 
 export type CliStatusJson = {
   /**
@@ -127,20 +38,11 @@ export type CliStatusJson = {
    * or no live runtime observes the stores; absence never means zero.
    */
   localCredentials?: LocalCredentialSnapshot;
-  /** On a Remote Link Child: the current tunnel connection (`src/cli/status-link.ts`). Omitted when unknown. */
-  link?: { connectionGeneration: string };
+  appliedCodexSettingsDigest: string;
   mainAccountHardLock?: CodexMainAccountPolicyHealth;
   /** OCX-11 fallback state; see src/cli/status-fallback.ts. */
   fallback?: import("./status-fallback").StatusFallback;
   schemaVersion: 1;
-  /**
-   * This machine's topology role, named rather than inferred (#4236).
-   *
-   * Every other field in this report was already ambiguous without it: an agent reading
-   * `providers: {}` on a client could not tell "nothing is configured" from "the provider
-   * configuration lives on the hub". Additive, so `schemaVersion` stays 1.
-   */
-  runtimeRole: "standalone" | "hub" | "client";
   proxy: {
     running: boolean;
     pid: number | null;
@@ -174,27 +76,6 @@ export type CliStatusJson = {
     source: "default" | "file" | "fallback";
     error: string | null;
   };
-  connection: {
-    state: "disconnected" | "connected" | "invalid" | "mismatched";
-    transport?: "hub" | "link";
-    reason?: string;
-    serverUrl?: string;
-    managementUrl?: string;
-    protocolVersion?: number;
-    apiKeyId?: string;
-    selectedClients?: string[];
-    catalog?: "present" | "missing" | "unsafe";
-    catalogAgeSeconds?: number;
-    credentialFile: "owned" | "missing" | "changed" | "unsafe";
-    /**
-     * #4207: whether the selected local Codex CLI can consume the catalog this client
-     * installed. Absent unless a client connection exists. `connected` alone proved only the
-     * hub and the credential, and a reader who stopped there saw a healthy connection while
-     * `codex exec` was exiting before its first request.
-     */
-    readiness?: "ready" | "unverified" | "incompatible";
-    readinessReason?: string;
-  };
   service: { summary: string };
   codexShim: { summary: string };
   codexPlugins: CodexPluginsDiagnostic;
@@ -216,37 +97,14 @@ export type CliStatusJson = {
     policy: ClaudeDesktopPolicyHealth;
   };
   /**
-   * The hub-only facts an operator needs in one place, or null on a standalone/client machine.
-   *
-   * Scattered across the report they were unusable: the public data origin came from `listen`,
-   * the management origin was folded into `dashboard.url`, the loopback companion appeared
-   * nowhere, and the data-plane token appeared nowhere at all -- so the one question a hub
-   * operator actually asks ("is this reachable, and can another machine join?") took four other
-   * commands to answer. Additive and nullable, so `schemaVersion` stays 1.
-   *
-   * Never carries a token value; only which source holds one.
-   */
-  hub: HubStatus | null;
-  /**
-   * The hub's answer on a connected client, or a not-connected placeholder (#4236).
-   *
-   * Separate from `connection`, which describes the LINK (is the key owned, is the catalog
-   * present). This describes what is on the other end of it. Additive and always present, so
-   * `schemaVersion` stays 1 and a consumer never has to branch on the key existing.
-   */
-  remoteHub: CliRemoteHubStatus;
-  /**
    * This CLI's version against the running proxy's (#2701).
    *
    * Additive and optional-by-value, so `schemaVersion` stays 1: an existing consumer that
    * ignores the key is unaffected, and `proxyVersion` is null when nothing is live.
    */
   versionSkew: VersionSkew;
-  cliCommand: CliPathDiagnostics;
-  /** Installer ownership from the updater's detector (OCX-10); additive, `schemaVersion` stays 1. */
-  install: InstallDetectionStatus;
-  startupSource: "live" | "local" | "local-supervision-override";
-} & CliAppliedCodexSettingsStatus;
+  startupSource: "live" | "local";
+};
 
 export type CliStatusView = {
   json: CliStatusJson;
@@ -255,12 +113,9 @@ export type CliStatusView = {
 };
 
 
-type StatusListenConfig = Pick<OcxConfig, "port" | "hostname" | "runtimeRole" | "hub">;
+type StatusListenConfig = Pick<OcxConfig, "port" | "hostname">;
 
-function statusDashboardUrl(config: StatusListenConfig, hostname: string | undefined, port: number): string {
-  const managementOrigin = config.runtimeRole === "hub" ? config.hub?.managementPublicOrigin : undefined;
-  if (managementOrigin) return managementOrigin.endsWith("/") ? managementOrigin : `${managementOrigin}/`;
-
+function statusDashboardUrl(hostname: string | undefined, port: number): string {
   const reachableHostname = probeHostname(hostname);
   const dashboardHostname = reachableHostname === "127.0.0.1"
     || reachableHostname === "[::1]"
@@ -290,28 +145,12 @@ export async function fetchLiveStartupHealth(
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return null;
   const row = payload as Record<string, unknown>;
   if (row.status !== "native" && row.status !== "protected" && row.status !== "at-risk") return null;
-  if (row.protection !== "service" && row.protection !== "desktop" && row.protection !== "shim" && row.protection !== "none") return null;
+  if (row.protection !== "service" && row.protection !== "shim" && row.protection !== "none") return null;
   if (row.routingKind !== "native" && row.routingKind !== "opencodex-local"
     && row.routingKind !== "custom-local" && row.routingKind !== "custom-remote" && row.routingKind !== "unknown") return null;
   if (row.shimCoverage !== "full" && row.shimCoverage !== "cli-only" && row.shimCoverage !== "none") return null;
   if (typeof row.platform !== "string") return null;
   if (row.recommendedCommand !== null && typeof row.recommendedCommand !== "string") return null;
-  if (row.recommendedAction !== undefined && row.recommendedAction !== null
-    && (typeof row.recommendedAction !== "string" || row.recommendedAction.length > 512)) return null;
-  if (row.desktop !== undefined) {
-    if (!row.desktop || typeof row.desktop !== "object" || Array.isArray(row.desktop)) return null;
-    const desktop = row.desktop as Record<string, unknown>;
-    for (const key of ["owned", "loginEnabled", "running", "viable"] as const) {
-      if (typeof desktop[key] !== "boolean") return null;
-    }
-    if (desktop.supervisor !== undefined) {
-      if (!desktop.supervisor || typeof desktop.supervisor !== "object" || Array.isArray(desktop.supervisor)) return null;
-      const supervisor = desktop.supervisor as Record<string, unknown>;
-      if (typeof supervisor.supervisorPid !== "number" || !Number.isFinite(supervisor.supervisorPid)
-        || typeof supervisor.runtimePid !== "number" || !Number.isFinite(supervisor.runtimePid)
-        || typeof supervisor.app !== "string") return null;
-    }
-  }
   if (!row.commands || typeof row.commands !== "object" || Array.isArray(row.commands)) return null;
   for (const key of ["installService", "repairService", "installShim", "restoreNative"] as const) {
     if (typeof (row.commands as Record<string, unknown>)[key] !== "string") return null;
@@ -333,40 +172,12 @@ export async function fetchLiveStartupHealth(
   return payload as StartupHealth;
 }
 
-/** Older runtimes cannot report supervision; only that missing capability permits a local override. */
 export function selectStatusStartupHealth(
   liveStartup: StartupHealth | null,
   fallback: () => StartupHealth,
-  supervision?: () => ReturnType<typeof inspectDesktopSupervision>,
-  livePid?: number | null,
 ): { startup: StartupHealth; startupSource: CliStatusJson["startupSource"] } {
   if (!liveStartup) return { startup: fallback(), startupSource: "local" };
-  if (liveStartup.desktop === undefined && supervision) {
-    let evidence: ReturnType<typeof inspectDesktopSupervision> | undefined;
-    try { evidence = supervision(); }
-    catch { /* Failed optional evidence cannot replace an attested live verdict. */ }
-    if (evidence?.kind === "desktop" && evidence.runtimePid === livePid) {
-      const local = fallback();
-      const supervisor = local.desktop?.supervisor;
-      // The local probe runs later; it must still describe the same process pair. macOS and Linux
-      // accept only an unowned pair. On Windows an older runtime never published a Desktop
-      // diagnostic, so a durable Desktop claim beside proven live parentage qualifies too.
-      const ownershipEligible = local.desktop?.owned === false
-        || (local.desktop?.owned === true && local.platform === "win32");
-      if (ownershipEligible && supervisor
-        && supervisor.runtimePid === evidence.runtimePid && supervisor.supervisorPid === evidence.supervisorPid) {
-        return { startup: local, startupSource: "local-supervision-override" };
-      }
-    }
-  }
   return { startup: liveStartup, startupSource: "live" };
-}
-
-export function runtimeSupervisorLine(startup: StartupHealth): string | null {
-  const supervisor = startup.desktop?.supervisor;
-  return supervisor
-    ? `Runtime supervisor: OpenCodex Desktop (pid ${supervisor.supervisorPid}, ${supervisor.app}); durable owner: ${startup.desktop?.owned ? "desktop" : "none"}`
-    : null;
 }
 
 /** Build the service summary from the same startup source that `ocx status` selected. */
@@ -374,319 +185,24 @@ export function statusServiceSummary(
   liveStartup: StartupHealth | null,
   service: Pick<ReturnType<typeof diagnoseService>, "installed" | "summary">,
   live: boolean,
-  // Which verdict was selected. A live proxy can still be described by the local reading when
-  // the runtime predates supervision reporting, so the label follows the verdict, not liveness.
   startupSource?: CliStatusJson["startupSource"],
 ): string {
   if (live && liveStartup) {
-    const supervisor = liveStartup.desktop?.supervisor ? "OpenCodex Desktop supervises the running proxy; " : "";
     if (liveStartup.protection === "service" && liveStartup.serviceViable) {
-      return `${supervisor}running under the live managed service (logs: ${serviceLogPath()})`;
+      return `running under the live managed service (logs: ${serviceLogPath()})`;
     }
     const state = [
       liveStartup.serviceInstalled ? "installed" : "absent",
       liveStartup.serviceRunning ? "running" : "not running",
       liveStartup.serviceViable ? "viable" : "not viable",
     ].join(", ");
-    const action = !liveStartup.desktop?.supervisor && liveStartup.recommendedCommand ? `; run '${liveStartup.recommendedCommand}'` : "";
+    const action = liveStartup.recommendedCommand ? `; run '${liveStartup.recommendedCommand}'` : "";
     const label = (startupSource ?? (live ? "live" : "local")) === "live" ? "live" : "local";
-    return `${supervisor}${label} startup reports service ${state}${action} (logs: ${serviceLogPath()})`;
+    return `${label} startup reports service ${state}${action} (logs: ${serviceLogPath()})`;
   }
   return service.installed && !live
     ? `${service.summary} — registered but NOT serving; see ${serviceLogPath()} and re-run 'ocx service repair'`
     : service.summary;
-}
-
-/**
- * The hub block, or null when this machine is not a hub.
- *
- * The token line is about the FILE, not this shell. `ocx status` used to print `present (env)`
- * whenever the calling shell happened to export `OPENCODEX_API_AUTH_TOKEN`, but the service
- * wrapper overwrites that variable from the token file before exec — so the label described the
- * operator's terminal and not the hub. The shell's variable is reported as its own flag instead.
- *
- * The token VALUE is never read into the report. `readServiceApiTokenState` returns it; the only
- * things derived from it are `kind` and the admin-token comparison, neither of which can carry
- * bytes of the secret.
- */
-export function collectHubStatus(
-  config: Pick<OcxConfig, "runtimeRole" | "hostname" | "port" | "hub" | "unauthenticatedLoopbackListener">,
-  listen: { port: number; hostname?: string | null },
-  env: NodeJS.ProcessEnv = process.env,
-): HubStatus | null {
-  if (config.runtimeRole !== "hub") return null;
-  const listener = config.unauthenticatedLoopbackListener;
-  const loopbackPort = effectiveLoopbackListenerPort(config, listen.port);
-  const ingress = config.hub?.managementIngress;
-  const configuredDataOrigin = config.hub?.dataPublicOrigin;
-  const host = probeHostname(listen.hostname ?? config.hostname);
-  const tokenState = ((): HubDataTokenState => {
-    const state = readServiceApiTokenState();
-    if (state.kind === "unsafe") return "unsafe (file)";
-    if (state.kind !== "present") return "missing";
-    return tokenCollidesWithAdmin(state.token, env) ? "admin-collision (file)" : "present (file)";
-  })();
-  return {
-    dataOrigin: configuredDataOrigin
-      ?? `http://${host === "127.0.0.1" ? "localhost" : host}:${listen.port}`,
-    dataOriginConfigured: Boolean(configuredDataOrigin),
-    loopbackListener: loopbackPort === null
-      ? { state: "off", port: null }
-      : { state: listener?.enabled && listener.port === undefined ? "companion" : "ported", port: loopbackPort },
-    managementIngress: {
-      enabled: ingress?.enabled === true,
-      port: ingress?.enabled === true ? ingress.port : null,
-    },
-    managementPublicOrigin: config.hub?.managementPublicOrigin ?? null,
-    dataToken: tokenState,
-    dataTokenPath: serviceApiTokenFilePath(),
-    dataTokenEnvInShell: Boolean(env.OPENCODEX_API_AUTH_TOKEN?.trim()),
-  };
-}
-
-/**
- * The human rendering of the hub block, owned here rather than in the `ocx status` printer so
- * the sentences are testable without spawning the CLI. Indentation is the caller's.
- */
-export function hubStatusLines(hub: HubStatus): string[] {
-  const listener = hub.loopbackListener.state === "off"
-    ? "off — this hub does not route its own local Codex/Claude clients"
-    : hub.loopbackListener.state === "companion"
-      ? `companion on http://127.0.0.1:${hub.loopbackListener.port} — same port as the public listener, no credential needed locally`
-      : `ported on http://127.0.0.1:${hub.loopbackListener.port} — a second port local clients must be pointed at`;
-  const tokenLines = [`  Data token: ${hub.dataToken}${hub.dataToken === "missing" ? "" : ` at ${hub.dataTokenPath}`}`];
-  if (hub.dataToken === "admin-collision (file)") {
-    // Naming the consequence matters more than naming the state: this is what a crash-looping
-    // hub looks like from `ocx status`, and nothing else in the report says so (#4236).
-    tokenLines.push(
-      "    that file holds the MANAGEMENT token, so the hub fences its management API closed at boot —",
-      "    delete it and run 'ocx service repair' to generate a data-plane token",
-    );
-  }
-  if (hub.dataTokenEnvInShell) {
-    tokenLines.push("    OPENCODEX_API_AUTH_TOKEN is also set in this shell; the installed service reads the file, not this");
-  }
-  return [
-    "Hub:",
-    `  Data origin: ${hub.dataOrigin}${hub.dataOriginConfigured ? " (hub.dataPublicOrigin)" : " (derived from the bind address)"}`,
-    `  Loopback listener: ${listener}`,
-    `  Management ingress: ${hub.managementIngress.enabled ? `http://127.0.0.1:${hub.managementIngress.port}` : "disabled"}`,
-    `  Management origin: ${hub.managementPublicOrigin ?? "unset — remote pairing and the remote dashboard need hub.managementPublicOrigin"}`,
-    ...tokenLines,
-    "  Invite a machine: ocx hub invite",
-  ];
-}
-
-/** The not-connected placeholder. Arrays are empty because nothing was asked, not because nothing exists. */
-export function disconnectedRemoteHubStatus(): CliRemoteHubStatus {
-  return {
-    connected: false,
-    origin: null,
-    stateSource: "unavailable",
-    hubVersion: null,
-    providers: [],
-    oauth: [],
-    subagentModels: [],
-    truncated: false,
-    claudeCodeEnabled: null,
-  };
-}
-
-/**
- * The data key this status snapshot may spend, and the cause when it may not.
- *
- * A reconnect or a rotation can replace both files between the snapshot and this read, so a
- * matching cache owner alone does not authorize sending the current token. Withholding is only
- * half the job: reporting every withheld case as "no usable data-plane token" is false for a
- * client that reconnected and holds a perfectly good token for a different hub, and a cause the
- * operator acts on has to be the real one (#4169 is the same defect in the stop path).
- */
-function boundHubStateToken(
-  current: ReturnType<typeof readClientConnectionState>,
-  token: ReturnType<typeof readServiceApiTokenState>,
-  owner: { serverUrl: string; apiKeyId: string; connectedAt: string },
-): { token: string | null; withheldReason?: string } {
-  if (current.kind !== "connected") {
-    return { token: null, withheldReason: "this client is no longer connected" };
-  }
-  if (!sameClientConnectionOwner(current.value, owner)) {
-    return { token: null, withheldReason: "the saved connection no longer matches the one this status reports" };
-  }
-  if (token.kind !== "present") {
-    return { token: null, withheldReason: "this client has no usable data-plane token" };
-  }
-  if (token.fingerprint !== current.value.tokenFingerprint) {
-    return { token: null, withheldReason: "the data-plane token no longer belongs to the saved connection" };
-  }
-  return { token: token.token };
-}
-
-/**
- * Ask the hub what it can serve, with a bounded read and a cache fallback.
- *
- * `ocx status` must answer while the hub is offline, so the fetch is bounded and a failure is
- * reported rather than thrown. It must also never answer from local provider/login state — see
- * `src/client/hub-state.ts` for why that substitution is the defect rather than a graceful
- * degradation.
- */
-export async function collectRemoteHubStatus(
-  connection: Pick<ClientConnectionStatus, "state" | "serverUrl" | "apiKeyId" | "connectedAt"> & { transport?: "hub" | "link" },
-  options: { fetchImpl?: typeof fetch; timeoutMs?: number; now?: number; findChild?: () => Promise<LiveProxy | null> } = {},
-): Promise<CliRemoteHubStatus> {
-  if (connection.state !== "connected" || !connection.serverUrl || !connection.apiKeyId || !connection.connectedAt) {
-    return disconnectedRemoteHubStatus();
-  }
-  const { resolveHubState } = await import("../client/hub-state");
-  const owner = {
-    serverUrl: connection.serverUrl,
-    apiKeyId: connection.apiKeyId,
-    connectedAt: connection.connectedAt,
-  };
-  const bound = boundHubStateToken(readClientConnectionState(), readServiceApiTokenState(), owner);
-  // Link credentials never go to the persisted tunnel URL from this CLI. Ask the local Child
-  // without a credential; its connection-bound relay authenticates the actual Home connection.
-  let fetchImpl = options.fetchImpl;
-  let allowNetwork = true;
-  let localRelayFetchImpl: typeof fetch | undefined;
-  if (connection.transport === "link") {
-    const live = await (options.findChild ?? findLiveProxy)();
-    const current = readClientConnectionState();
-    allowNetwork = live?.role === "client" && current.kind === "connected" && sameClientConnectionOwner(current.value, owner);
-    if (allowNetwork && live) {
-      const localOrigin = `http://${probeHostname(live.hostname)}:${live.port}`;
-      localRelayFetchImpl = ((_, init) => (options.fetchImpl ?? fetch)(localOrigin + "/v1/hub-state", {
-        method: "GET", redirect: "manual", signal: init?.signal, headers: { Accept: "application/json" },
-      })) as typeof fetch;
-    }
-  }
-  // #6957: the Home's name, the link id and the Codex settings the last sync applied.
-  const linkState = readClientConnectionState();
-  const linkConnection = connection.transport === "link" && linkState.kind === "connected" && linkState.value.transport === "link" && linkState.value.link
-    ? linkState.value : null;
-  const linkHome = linkConnection ? await import("../client/link-home") : null;
-  const resolved = await resolveHubState({
-    owner,
-    token: connection.transport === "link" ? null : bound.token,
-    ...(localRelayFetchImpl ? { localRelayFetchImpl } : {}),
-    ...(bound.withheldReason ? { withheldTokenReason: bound.withheldReason } : {}),
-    ...(fetchImpl ? { fetchImpl } : {}),
-    allowNetwork,
-    ...(connection.transport === "link" ? { peer: "Home" as const } : {}),
-    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
-    ...(options.now === undefined ? {} : { now: options.now }),
-  });
-  let link: CliRemoteHubStatus["link"];
-  if (linkConnection && linkHome) {
-    const { describeHomeCodexSettings } = await import("../link/codex-settings");
-    const record = linkHome.readHomeCodexSettingsRecord(linkConnection.link!.linkId);
-    link = {
-      linkId: linkConnection.link!.linkId,
-      homePhrase: linkHome.linkHomePhrase(linkConnection),
-      codexSettings: record
-        ? { source: "home", fetchedAt: record.fetchedAt, lines: describeHomeCodexSettings(record.document.settings) }
-        : { source: "local", reason: "no Home settings recorded yet; run: ocx sync" },
-    };
-  }
-  return {
-    connected: true,
-    // The hub's own advertised origin when it publishes one; otherwise the URL this client
-    // dials, which is the origin the operator would recognize.
-    origin: resolved.state?.origin ?? connection.serverUrl,
-    stateSource: resolved.stateSource,
-    ...(resolved.reason ? { reason: resolved.reason } : {}),
-    ...(resolved.fetchedAt ? { fetchedAt: resolved.fetchedAt } : {}),
-    ...(resolved.ageSeconds === undefined ? {} : { ageSeconds: resolved.ageSeconds }),
-    hubVersion: resolved.state?.hubVersion ?? null,
-    providers: resolved.state?.providers ?? [],
-    oauth: resolved.state?.oauth ?? [],
-    subagentModels: resolved.state?.subagentModels ?? [],
-    truncated: resolved.state?.truncated === true,
-    claudeCodeEnabled: resolved.state ? resolved.state.claudeCode.enabled : null,
-    ...(link ? { link } : {}),
-  };
-}
-
-/**
- * The one line that has to be read before anything else in the report.
- *
- * It goes FIRST, above the proxy line, because the failure mode is an agent or operator reading
- * the provider and login lines in isolation and concluding the hub cannot do something it can.
- * A buried `Remote hub: connected (<url>)` line — which is all this report had — does not stop
- * that, as #4236 demonstrated.
- */
-export function remoteHubBannerLine(remoteHub: CliRemoteHubStatus, transport?: "hub" | "link"): string | null {
-  if (!remoteHub.connected) return null;
-  if (remoteHub.link) {
-    const peer = `${remoteHub.link.homePhrase} over Remote Link (${remoteHub.link.linkId})`;
-    if (remoteHub.stateSource === "unavailable") {
-      return `⚠️  ${peer}: state unavailable (${remoteHub.reason ?? "unknown reason"}) — provider and login lines below are LOCAL and do not describe the Home.`;
-    }
-    const cached = remoteHub.stateSource === "cache"
-      ? ` — cached ${remoteHub.ageSeconds ?? "?"}s ago (${remoteHub.reason ?? "live read failed"})`
-      : "";
-    return `🔗 State from ${peer}${cached}: provider credentials, logins and delegable models below are the Home's, not this machine's.`;
-  }
-  if (transport === "link") {
-    const origin = remoteHub.origin ?? "unknown";
-    return remoteHub.stateSource === "unavailable"
-      ? `🔗 Remote Link Home ${origin}: provider credentials and routing come from Home. State unavailable (${remoteHub.reason ?? "unknown reason"}).`
-      : `🔗 State from Remote Link Home ${origin}${remoteHub.stateSource === "cache" ? " (cached)" : ""}: provider credentials, logins and models below come from Home.`;
-  }
-  const origin = remoteHub.origin ?? "the hub";
-  if (remoteHub.stateSource === "unavailable") {
-    return `⚠️  Hub ${origin}: state unavailable (${remoteHub.reason ?? "unknown reason"}) — provider and login lines below are LOCAL and do not describe the hub.`;
-  }
-  const staleness = remoteHub.stateSource === "cache"
-    ? ` — cached ${remoteHub.ageSeconds ?? "?"}s ago (${remoteHub.reason ?? "live read failed"})`
-    : "";
-  return `🔗 State from hub ${origin}${staleness}: provider credentials, logins and delegable models below are the HUB's, not this machine's.`;
-}
-
-/**
- * The hub-sourced provider/login/model block, owned here so the sentences are testable without
- * spawning the CLI. Indentation is the caller's. Empty when nothing true is known.
- */
-export function remoteHubStatusLines(remoteHub: CliRemoteHubStatus, transport?: "hub" | "link"): string[] {
-  if (!remoteHub.connected) return [];
-  const settings = remoteHub.link ? linkCodexSettingsLines(remoteHub.link) : [];
-  if (remoteHub.stateSource === "unavailable") return settings;
-  const isLink = Boolean(remoteHub.link) || transport === "link";
-  const peer = remoteHub.link?.homePhrase ?? `${isLink ? "Home" : "hub"} ${remoteHub.origin ?? (isLink ? "Home" : "hub")}`;
-  const subject = isLink ? "the Home" : "the hub";
-  const lines = [
-    `OAuth logins (${peer}):`,
-    ...(remoteHub.oauth.length === 0
-      ? [`  (${subject} reported no OAuth providers)`]
-      : remoteHub.oauth.map(entry => `  ${entry.provider.padEnd(10)} ${entry.loggedIn ? "✓ logged in" : "✗ not logged in"}`)),
-    `Providers (${peer}):`,
-    ...(remoteHub.providers.length === 0
-      ? [`  (${subject} reported no providers)`]
-      : remoteHub.providers.map(provider => {
-        // `authMode` is what keeps "no API key" from reading as "not configured": an `oauth`
-        // provider legitimately has no key and is still fully usable.
-        const credential = provider.hasCredential ? "credential stored" : `no API key (authMode ${provider.authMode ?? "key"})`;
-        return `  ${provider.name.padEnd(10)} ${provider.adapter} — ${credential}${provider.disabled ? ", disabled" : ""}`;
-      })),
-    `Delegable models (${peer}): ${remoteHub.subagentModels.length === 0 ? "none" : remoteHub.subagentModels.join(", ")}`,
-  ];
-  if (remoteHub.hubVersion) lines.push(`${remoteHub.link ? "Home" : "Hub"} version: ${remoteHub.hubVersion}`);
-  // The hub told us its own lists are a prefix. Saying nothing here would make this report claim
-  // completeness it does not have — the same shape of confident-and-wrong answer as #4236.
-  if (remoteHub.truncated) {
-    lines.push(`  (${subject} truncated this state to fit its response caps; some rows are not listed)`);
-  }
-  return [...lines, ...settings];
-}
-
-/** Which Codex settings the last sync took from the Home (#6957). */
-export function linkCodexSettingsLines(link: NonNullable<CliRemoteHubStatus["link"]>): string[] {
-  if (link.codexSettings.source === "local") {
-    return [`Codex settings: this machine's local values (${link.codexSettings.reason})`];
-  }
-  return [
-    `Codex settings from ${link.homePhrase} (applied ${link.codexSettings.fetchedAt}):`,
-    ...link.codexSettings.lines.map(line => `  ${line}`),
-  ];
 }
 
 export function selectListenTarget(
@@ -702,7 +218,7 @@ export function selectListenTarget(
     hostname,
     source: currentRuntimePort ? "runtime" : "config",
     healthUrl: `http://${probeHostname(hostname)}:${port}/healthz`,
-    dashboardUrl: statusDashboardUrl(config, hostname, port),
+    dashboardUrl: statusDashboardUrl(hostname, port),
   };
 }
 
@@ -726,32 +242,12 @@ export function resolveStatusPid(
  * remedy command, and `custom-remote` is a deliberate operator choice. Warning
  * on all four would teach operators to skip the line that matters.
  *
- * A connected client (hub client or Remote Link Child) needs a different remedy (#7563): its
- * runtime never writes Codex routing on start, so `ocx start` cannot re-point it — with the
- * proxy up it only answers "already running". `ocx sync --restart-codex` writes the routing
- * and restarts Codex. A client whose proxy is also down is told to start it first, because
- * nothing else in the not-running report mentions that its routing is native.
  */
 export function unusedProxyWarningLines(input: {
   proxyUp: boolean;
   routingKind: StartupHealth["routingKind"];
-  connectedClient?: { transport: "hub" | "link"; serviceInstalled: boolean };
 }): string[] {
   if (input.routingKind !== "native") return [];
-  const client = input.connectedClient;
-  if (client) {
-    const peer = client.transport === "link" ? "the Home" : "the hub";
-    if (input.proxyUp) {
-      return [
-        "⚠️  Codex routing is native — this client's proxy is unused.",
-        `   Codex requests go to OpenAI, not ${peer}. Re-point with: ocx sync --restart-codex`,
-      ];
-    }
-    return [
-      `⚠️  Codex routing is native, so Codex requests go to OpenAI, not ${peer}.`,
-      `   Start this client's proxy with '${client.serviceInstalled ? "ocx service start" : "ocx start"}', then re-point with: ocx sync --restart-codex`,
-    ];
-  }
   if (!input.proxyUp) return [];
   return [
     "⚠️  Codex routing is native — the running proxy is unused.",
@@ -779,32 +275,25 @@ export function deadProxyRoutingAdviceLines(input: {
   proxyUp: boolean;
   routingKind: StartupHealth["routingKind"];
   /** #7563: on a connected client nothing but `ocx sync` writes the routing back after a restore. */
-  connectedClient?: boolean;
 }): string[] {
   if (input.proxyUp || input.routingKind !== "opencodex-local") return [];
   return [
     "Codex is still pointed at this proxy, so sign-in and model requests both fail while it is down.",
     "To hand Codex back to its own account and endpoints without starting anything: ocx restore",
-    ...(input.connectedClient ? ["After a restore, 'ocx sync --restart-codex' points Codex back at this client."] : []),
   ];
 }
 
-type StatusRoutingView = Pick<CliStatusJson, "proxy" | "startup" | "remoteHub" | "connection">;
+type StatusRoutingView = Pick<CliStatusJson, "proxy" | "startup">;
 
 export function statusProxyUp(json: StatusRoutingView): boolean {
-  return json.remoteHub.connected && json.connection.transport === "link"
-    ? json.proxy.health.ok : Boolean(json.proxy.pid || json.proxy.health.ok);
+  return Boolean(json.proxy.pid || json.proxy.health.ok);
 }
 
-/** `unusedProxyWarningLines` for the human `ocx status` report, role taken from the report itself. */
+/** `unusedProxyWarningLines` for the human `ocx status` report. */
 export function statusUnusedProxyLines(json: StatusRoutingView): string[] {
   return unusedProxyWarningLines({
     proxyUp: statusProxyUp(json),
     routingKind: json.startup.routingKind,
-    ...(json.remoteHub.connected ? { connectedClient: {
-      transport: json.connection.transport === "link" ? "link" as const : "hub" as const,
-      serviceInstalled: json.startup.serviceInstalled && !json.startup.serviceConflict,
-    } } : {}),
   });
 }
 
@@ -817,7 +306,6 @@ export function statusDeadProxyLines(json: StatusRoutingView): string[] {
     ...deadProxyRoutingAdviceLines({
       proxyUp: false,
       routingKind: json.startup.routingKind,
-      connectedClient: json.remoteHub.connected,
     }),
   ];
 }
@@ -886,7 +374,6 @@ export function missingCodexCatalogLines(missingCatalogPath: string | null): str
 
 /** `mainAccountPolicy`: only `--json` asks; the human report reads the same accounts once via OAuth health. */
 export async function collectStatus(options: { mainAccountPolicy?: boolean } = {}): Promise<CliStatusView> {
-  const cliCommand = collectCliPathDiagnostics();
   const configDiagnostics = readConfigDiagnostics();
   const config = configDiagnostics.config;
   const claudeDesktop = {
@@ -911,13 +398,6 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
       };
     }
   })();
-  const clientConnection = collectClientConnectionStatus(Date.now(), undefined, {
-    selectedCodexCommand: resolvedRuntime.runtime.command,
-  });
-  // Asked before the local probes below so a connected client's report is hub-sourced from its
-  // first line. Bounded and failure-tolerant: an offline hub degrades the remoteHub block, it
-  // does not fail `ocx status`.
-  const remoteHub = await collectRemoteHubStatus({ ...clientConnection, transport: config.client?.transport });
   // Prefer identity-verified liveness (runtime-port + /healthz) over ocx.pid alone (#618).
   // Pass the already-resolved diagnostics config so findLiveProxy does not re-load and
   // warn on malformed config.json (status --json must stay stderr-clean).
@@ -930,29 +410,25 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
   // Same `--json`-only gate as the hard-lock read above: the human report stays one probe.
   const fallback = options.mainAccountPolicy
     ? await (await import("./status-fallback")).collectStatusFallback(config, {
-      live: Boolean(live), linkChild: config.client?.transport === "link",
+      live: Boolean(live),
       deps: { findLiveProxy: async () => live },
     })
     : undefined;
-  // Child attestations for GOAT; local reads only, never the Home's projection.
+  // Count this installation's credentials without exposing values.
   const localCredentials = options.mainAccountPolicy ? await collectLocalCredentials() : undefined;
-  const connectionGeneration = options.mainAccountPolicy ? await collectLinkConnectionGeneration(live) : undefined;
   const pidFile = readPid();
   // Preserve an authoritative null from orphan/legacy liveness — do not restore pidFile.
   const pid = resolveStatusPid(live, pidFile);
   // No extra request: findLiveProxy's identity probe already parsed and validated the
   // healthz body, so the version came back with the liveness result.
   const versionSkew = computeVersionSkew(packageVersion(), live?.version);
-  // OCX-6: what this machine applied and, on a Child, when its runtime started. Additive and
-  // always present (null when unknown), so `schemaVersion` stays 1.
-  const appliedCodexSettings = await collectAppliedCodexSettingsStatus(config, live);
   const listen = live
     ? {
       port: live.port,
       hostname: live.hostname,
       source: live.source,
       healthUrl: `http://${probeHostname(live.hostname)}:${live.port}/healthz`,
-      dashboardUrl: statusDashboardUrl(config, live.hostname, live.port),
+      dashboardUrl: statusDashboardUrl(live.hostname, live.port),
     }
     : selectListenTarget(config, pidFile, pidFile ? readRuntimePort(pidFile) : null);
   // findLiveProxy already identity-probed /healthz; avoid a second fetch that can race.
@@ -983,7 +459,7 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
     service,
     shim: codexShim,
     routingKind: getCodexRoutingKind(),
-  }), live?.pid != null ? () => inspectDesktopSupervision({ targetPid: live.pid! }) : undefined, live?.pid);
+  }));
   const serviceSummary = statusServiceSummary(startup, service, Boolean(live), startupSource);
   const codexPlugins = diagnoseCodexBundledPlugins();
   const lastClamp = loadLastEffortClamp();
@@ -1089,14 +565,13 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
 
   return {
     proxyLabel,
-    healthLabel: formatCliStatusHealthLabel(health.label, cliCommand, remoteHub.connected),
+    healthLabel: health.label,
     json: {
       ...(mainAccountHardLock ? { mainAccountHardLock } : {}),
       ...(fallback ? { fallback } : {}),
       ...(localCredentials === undefined ? {} : { localCredentials }),
-      ...(connectionGeneration === undefined ? {} : { link: { connectionGeneration } }),
       schemaVersion: 1,
-      runtimeRole: config.runtimeRole ?? "standalone",
+      appliedCodexSettingsDigest: appliedCodexSettingsDigest(config),
       proxy: {
         running: Boolean(live) || Boolean(pid && health.ok),
         pid: live?.pid ?? pid,
@@ -1122,29 +597,12 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
         source: bunRuntime.source,
         ...(bunRuntime.source === "override" ? { overrideEnv: bunRuntime.overrideEnv } : {}),
       },
-      hub: collectHubStatus(config, listen),
-      remoteHub,
       codexAutostart: codexAutoStartEnabled(config),
       startup,
       defaultProvider: typeof config.defaultProvider === "string" ? config.defaultProvider : null,
       config: {
         source: configDiagnostics.source,
         error: configDiagnostics.error,
-      },
-      connection: {
-        state: clientConnection.state,
-        ...(config.client?.transport ? { transport: config.client.transport } : {}),
-        ...(clientConnection.reason ? { reason: clientConnection.reason } : {}),
-        ...(clientConnection.serverUrl ? { serverUrl: clientConnection.serverUrl } : {}),
-        ...(clientConnection.managementUrl ? { managementUrl: clientConnection.managementUrl } : {}),
-        ...(clientConnection.protocolVersion ? { protocolVersion: clientConnection.protocolVersion } : {}),
-        ...(clientConnection.apiKeyId ? { apiKeyId: clientConnection.apiKeyId } : {}),
-        ...(clientConnection.selectedClients ? { selectedClients: [...clientConnection.selectedClients] } : {}),
-        catalog: clientConnection.catalog,
-        ...(clientConnection.catalogAgeSeconds !== undefined ? { catalogAgeSeconds: clientConnection.catalogAgeSeconds } : {}),
-        credentialFile: clientConnection.token,
-        ...(clientConnection.readiness ? { readiness: clientConnection.readiness } : {}),
-        ...(clientConnection.readinessReason ? { readinessReason: clientConnection.readinessReason } : {}),
       },
       service: { summary: serviceSummary },
       codexShim: { summary: codexShimSummary },
@@ -1156,10 +614,7 @@ export async function collectStatus(options: { mainAccountPolicy?: boolean } = {
       // fact about this install, not about the Codex runtime, and filing it there would
       // print it under the wrong heading (#2701).
       versionSkew,
-      cliCommand,
-      install: installDetectionStatus(),
       startupSource,
-      ...appliedCodexSettings,
     },
   };
 }

@@ -4,7 +4,7 @@ import { getCodexAccountCredential } from "./account-store";
 import { loadConfig } from "../config";
 import { resolveCodexHomeDir } from "./home";
 import { extractAccountId } from "../oauth/chatgpt";
-import { isSelectableCodexPoolAccount, MAIN_CODEX_ACCOUNT_ID } from "./account-id";
+import { isSelectableCodexPoolAccount, MAIN_CODEX_ACCOUNT_ID, singleCodexAccountId } from "./account-id";
 import { codexPlanKey } from "./plan";
 import { getObservedMainCodexCollisionIdentity, sameCodexCollisionIdentity, type CodexCollisionIdentity } from "./collision-identity";
 import { MAX_AUTH_BYTES, readBounded } from "./native-profile-store";
@@ -112,7 +112,11 @@ export function checkAccountIdCollision(
     return { collision: true, reason: "Account is already configured as the native Codex main account." };
   }
 
-  for (const account of loadConfig().codexAccounts ?? []) {
+  const config = loadConfig();
+  const selectedAccount = singleCodexAccountId(config);
+  for (const account of config.codexAccounts ?? []) {
+    // Historical credentials do not own the channel; a fresh explicit login may replace them.
+    if (account.id !== selectedAccount) continue;
     if (excludeAccountId && account.id === excludeAccountId) continue;
     if (!isSelectableCodexPoolAccount(account)) continue;
     if (isWorkspacePlan(account.plan) !== candidateWorkspace) continue;

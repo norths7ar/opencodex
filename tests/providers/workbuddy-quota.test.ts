@@ -6,8 +6,7 @@ import { TERMINAL_QUOTA_FAILURE } from "../../src/providers/quota/report-cache";
 import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderAccountQuotas, providerOAuthAccountQuotaMode, fetchProviderQuotaReports } from "../../src/providers/quota";
 import { saveCredential, getAccountSet, setAccountPaused, mergeAccountCredential, getAccountCredential } from "../../src/oauth/store";
 import { accountHeadroomPercent } from "../../src/oauth/account-quota-rank";
-import { cachedProviderQuotaIsExhausted } from "../../src/combos/resolve";
-import { providerDecisionWindows } from "../../src/providers/quota-decision-publication";
+import { cachedProviderQuotaIsExhausted } from "../../src/providers/quota-exhaustion";
 import type { OAuthCredentials } from "../../src/oauth/types";
 
 const originalFetch = globalThis.fetch;
@@ -109,7 +108,6 @@ test("the registered quota path is account-isolated, cached, refreshable, and di
   for (const row of rows) {
     expect(accountHeadroomPercent("workbuddy-ai", row.accountId)).toBeNull();
     expect(cachedProviderQuotaIsExhausted(row.quota, Date.now(), "free-model")).toBe(false);
-    expect(providerDecisionWindows(row.quota!)).toEqual([]);
   }
   const id = getAccountSet("workbuddy-ai")!.activeAccountId;
   const cred = getAccountCredential("workbuddy-ai", id)!;

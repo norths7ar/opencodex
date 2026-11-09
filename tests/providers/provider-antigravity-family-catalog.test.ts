@@ -100,7 +100,7 @@ test("policy off, suffix selections and retained defaults stay grouped through m
     wsEnabled: false, template: null, disabledModels: new Set(cfg.disabledModels),
     selectedModelsByProvider: new Map([[provider, new Set(projectAntigravitySelectedModels(provider, cfg.providers[provider]!.selectedModels!, rows))]]),
     gatheredProviderNames: new Set([provider]), degradedProviderNames: new Set(), legacyCustomModelSlugs: new Set(),
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(), hasPhysicalComboProvider: false,
+    multiAgentMode: "default", multiAgentV2Enabled: false,
     includeNativeOpenAi: false, accountBoundEntries: [],
     policy: { nativeBackfillSlugs: [], unsupportedNativeEntries: "drop", warningPolicy: "suppress" },
   });

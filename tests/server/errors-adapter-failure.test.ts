@@ -90,13 +90,6 @@ describe("adapterFailureFromMessage", () => {
     });
   });
 
-  test("preserves explicit client_cancelled JSON error type from compact/combo paths", () => {
-    expect(classifyError(499, "client_cancelled", "Client cancelled request")).toMatchObject({
-      type: "client_cancelled",
-      code: "client_cancelled",
-    });
-  });
-
   test("upstream failures that merely mention a closed client stay 502 (matcher is narrow)", () => {
     // A real upstream error wording — must NOT be reclassified as a client cancel.
     expect(adapterFailureFromMessage("upstream HTTP client closed idle connection")).toMatchObject({
@@ -264,22 +257,5 @@ describe("xAI policy-refusal 403", () => {
     } finally {
       budget.dispose();
     }
-  });
-
-  test("adapter-dispatch and passthrough-delivery both rewrite non-combo policy 403s", async () => {
-    const { readFile } = await import("node:fs/promises");
-    const dispatch = await readFile(repoPath("src/server/responses/adapter-dispatch.ts"), "utf8");
-    const passthrough = await readFile(repoPath("src/server/responses/passthrough-delivery.ts"), "utf8");
-    for (const source of [dispatch, passthrough]) {
-      const overflow = source.indexOf("if (upstreamResponse.status === 413)");
-      const rewrite = source.indexOf("rewriteUpstreamPolicyRefusal({", overflow);
-      expect(overflow).toBeGreaterThan(-1);
-      expect(rewrite).toBeGreaterThan(overflow);
-      expect(source.slice(rewrite, rewrite + 400)).toContain("destinationIsXai: isXaiResponsesDestination(route.provider)");
-    }
-    const combo = passthrough.indexOf("if (options.comboAttempt)");
-    const rewrite = passthrough.indexOf("rewriteUpstreamPolicyRefusal({");
-    expect(combo).toBeGreaterThan(-1);
-    expect(combo).toBeLessThan(rewrite);
   });
 });

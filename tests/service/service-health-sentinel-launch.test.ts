@@ -144,18 +144,14 @@ describe("service health sentinel launch gate (#6671)", () => {
 describe("the managers restart a proxy the sentinel terminates", () => {
   // The sentinel never restarts anything itself; it relies on each manager treating its kill as a
   // failure. Pin those contracts so a manager change cannot silently turn recovery into a stop.
-  test("Windows wrapper, launchd, systemd and WinSW all restart after an unclean exit", () => {
+  test("Windows wrapper and WinSW restart after an unclean exit", () => {
     // TerminateProcess(handle, 1): the wrapper restarts on anything but its stay-out code.
     expect(WINDOWS_WRAPPER_STAY_OUT_EXIT_CODE).not.toBe(1);
     const wrapper = readFileSync(repoPath("src", "service", "windows-taskxml.ts"), "utf8");
     expect(wrapper).toContain("goto stopped");
     expect(wrapper).toContain('"goto loop"');
-    expect(readFileSync(repoPath("src", "service", "launchd.ts"), "utf8")).toContain("<key>SuccessfulExit</key><false/>");
-    // SIGKILL, not SIGTERM: systemd treats a SIGTERM death as clean and would not restart.
-    expect(readFileSync(repoPath("src", "service", "systemd.ts"), "utf8")).toContain("Restart=on-failure");
     expect(readFileSync(repoPath("src", "lib", "winsw.ts"), "utf8")).toContain('<onfailure action="restart"');
     const sentinel = readFileSync(repoPath("src", "service", "health-sentinel-main.ts"), "utf8");
-    expect(sentinel).toContain('process.kill(targetPid, "SIGKILL")');
     expect(sentinel).toContain("windowsHandle.terminate(1)");
   });
 });

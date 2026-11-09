@@ -32,7 +32,7 @@ function hinted(config = provider(), model: CatalogModel = { provider: "gateway"
 function build(models: CatalogModel[] = [hinted()]): RawEntry[] {
   return buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: [], goModels: models, wsEnabled: false,
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
+    multiAgentMode: "default", multiAgentV2Enabled: false,
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
   });
 }
@@ -43,8 +43,7 @@ function merge(old: RawEntry[] = [], extra: Partial<ObservedCatalogMergeInput> =
     catalogModels: old, routedEntries: build(), baselineCatalogModels: [], baseline: new Map(), featured: [],
     wsEnabled: false, template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
     gatheredProviderNames: new Set(["gateway"]), degradedProviderNames: new Set(),
-    legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false,
-    exactComboSlugs: new Set(), hasPhysicalComboProvider: false, includeNativeOpenAi: false,
+    legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: false,
     accountBoundEntries: [], ultraFastTier: true, configuredUltraFastSlugs: configuredUltraFastSlugs([hinted()]),
     policy: { nativeBackfillSlugs: [], unsupportedNativeEntries: "drop", warningPolicy: "suppress" },
     ...extra,
@@ -78,14 +77,6 @@ describe("configured Ultra Fast in the native Codex speed picker", () => {
     expect(configuredUltraFastSlugs([model]).size).toBe(0);
     expect(merge([], { routedEntries: build([model]), configuredUltraFastSlugs: configuredUltraFastSlugs([model]) })[0]!
       .additional_speed_tiers ?? []).not.toContain("ultrafast");
-  });
-
-  test("a similarly named model and combo aliases do not inherit the declaration", () => {
-    const model = hinted();
-    expect(hinted(provider(), { provider: "gateway", id: "gpt-6-astra" }).supportsUltraFastTier).toBe(false);
-    expect(configuredUltraFastSlugs([{ ...model, provider: "combo", nativeAlias: true, alias: "gpt-6-astra" }]).size).toBe(0);
-    expect(configuredUltraFastSlugs([model, { ...model, supportsUltraFastTier: false }]).size).toBe(0);
-    expect([...configuredUltraFastSlugs([{ ...model, alias: "gateway/friendly" }])]).toEqual(["gateway/friendly"]);
   });
 
   test("frozen gathering uses the captured wire authority", () => {
@@ -138,19 +129,6 @@ describe("configured Ultra Fast in the native Codex speed picker", () => {
     expect(run(provider({ modelSupportsServiceTier: { "task-model": false } })).additional_speed_tiers)
       .not.toContain("flex");
     expect(stored[0]!.additional_speed_tiers).toContain("flex");
-  });
-
-  test("retained Flex policy excludes physical combo providers and combo aliases without discovery", () => {
-    const flexProvider = provider({
-      fastWire: { kind: "service-tier", canonicalToWire: { priority: "priority", flex: "flex" }, foreignCallerTiers: "verbatim" },
-    });
-    const check = (providers: Record<string, OcxProviderConfig>, rowSlug: string) =>
-      retainedFlexPolicyBySlug(providers, [{ slug: rowSlug }], []).get(rowSlug);
-
-    expect(check({ combo: flexProvider }, "combo/task-model")).toBe(false);
-    expect(check({ combo: { ...flexProvider, alias: "bundle" } }, "bundle/task-model")).toBe(false);
-    expect(check({ gateway: { ...flexProvider, alias: "combo" } }, "combo/task-model")).toBe(false);
-    expect(check({ gateway: flexProvider }, "gateway/task-model")).toBe(true);
   });
 
   test("degraded retained encoded slugs resolve adapter-only native IDs before Flex policy", () => {

@@ -1,8 +1,5 @@
 import { getConfigDir } from "../config";
-import { disconnectClient } from "../client/connect";
-import { readClientConnectionState, sameClientConnectionOwner } from "../client/state";
 import { assertClientLifecycleHeld, withClientLifecycle } from "../client/lifecycle-lock";
-import { inspectRemoteDesktopCleanup, readDesktopDisconnectReceipt } from "../claude/desktop-remote-store";
 import { beginConfigOwnershipTeardown, removeOwnedConfigState, type ConfigRemovalResult } from "../lib/config-ownership";
 import { windowsSecretAclReapPendingAtOrBelow } from "../lib/windows-secret-acl";
 import { supportsDesktopPicker } from "../claude/desktop-picker-platform";
@@ -13,10 +10,6 @@ import { cleanupOwnedIntegrationsBeforeUninstall } from "./uninstall-integration
 export interface PickerUninstallCleanup { ok: boolean; residual?: string[] }
 
 export interface UninstallClientStateDeps {
-  readConnection: typeof readClientConnectionState;
-  inspectDesktop: typeof inspectRemoteDesktopCleanup;
-  readReceipt: typeof readDesktopDisconnectReceipt;
-  disconnect: (options?: Parameters<typeof disconnectClient>[0]) => Promise<unknown>;
   withLifecycle: typeof withClientLifecycle;
   cleanupIntegrations: typeof cleanupOwnedIntegrationsBeforeUninstall;
   remove: () => ConfigRemovalResult;
@@ -44,10 +37,6 @@ async function removePickerArtifactsBeforeUninstall(): Promise<PickerUninstallCl
 }
 
 const defaults: UninstallClientStateDeps = {
-  readConnection: readClientConnectionState,
-  inspectDesktop: inspectRemoteDesktopCleanup,
-  readReceipt: readDesktopDisconnectReceipt,
-  disconnect: options => disconnectClient(options),
   withLifecycle: withClientLifecycle,
   cleanupIntegrations: cleanupOwnedIntegrationsBeforeUninstall,
   remove: () => removeOwnedConfigState(getConfigDir()),
@@ -55,7 +44,7 @@ const defaults: UninstallClientStateDeps = {
   removePickerArtifacts: removePickerArtifactsBeforeUninstall,
 };
 
-/** Restore connection-owned client artifacts before removing their ownership/recovery records. */
+/** Restore owned local integration artifacts before removing their recovery records. */
 export async function removeOwnedConfigAfterDesktopCleanup(
   observed: UninstallObservation,
   deps: UninstallClientStateDeps = defaults,
@@ -64,7 +53,7 @@ export async function removeOwnedConfigAfterDesktopCleanup(
     throw new Error("Client cleanup refused: service or proxy teardown is not proven.");
   }
   // A rerun after an interrupted uninstall finds the tombstone; this process's own cleanup steps
-  // (picker, disconnect, integrations) still register state, which the remover below then removes.
+  // (picker, integrations) still register state, which the remover below then removes.
   const endTeardown = beginConfigOwnershipTeardown();
   try {
     return await removeOwnedConfigInTeardown(deps);
@@ -74,34 +63,6 @@ export async function removeOwnedConfigAfterDesktopCleanup(
 }
 
 async function removeOwnedConfigInTeardown(deps: UninstallClientStateDeps): Promise<ConfigRemovalResult> {
-  const state = deps.readConnection();
-  if (state.kind !== "connected" && state.kind !== "disconnected") {
-    throw new Error("Client cleanup refused: connection state is invalid or mismatched.");
-  }
-  const desktop = deps.inspectDesktop();
-  const receipt = deps.readReceipt();
-  if (desktop.kind === "unsafe" || receipt.kind === "unsafe") {
-    throw new Error("Client cleanup refused: Desktop recovery state is unsafe.");
-  }
-  const interrupted = receipt.kind === "valid" && receipt.value.phase !== "complete" ? receipt.value : undefined;
-  if ((state.kind === "connected" && desktop.kind !== "absent" && !sameClientConnectionOwner(state.value, desktop.owner))
-    || (interrupted && state.kind === "connected" && !sameClientConnectionOwner(state.value, interrupted.owner))
-    || (interrupted && desktop.kind !== "absent" && !sameClientConnectionOwner(desktop.owner, interrupted.owner))) {
-    throw new Error("Client cleanup refused: Desktop recovery ownership is mismatched.");
-  }
-  if (state.kind === "connected" || interrupted) {
-    // Disconnect owns its N/L/C ordering. Do not hold L across this call, and
-    // preserve the frozen catalog choice when resuming an interrupted operation.
-    await deps.disconnect({
-      expectedOwner: state.kind === "connected" ? {
-        serverUrl: state.value.serverUrl, apiKeyId: state.value.apiKeyId, connectedAt: state.value.connectedAt,
-      } : interrupted!.owner,
-      ...(interrupted ? { keepCatalog: interrupted.keepCatalog } : {}),
-    });
-  } else if (desktop.kind !== "absent") {
-    throw new Error("Client cleanup refused: finish Desktop recovery before uninstalling.");
-  }
-
   // Picker cleanup takes L itself, so it runs before the final lock. A residual keeps every
   // record the retry needs: the config directory still names the root to untrust.
   const picker = await deps.removePickerArtifacts();
@@ -110,19 +71,9 @@ async function removeOwnedConfigInTeardown(deps: UninstallClientStateDeps): Prom
       + "approve the certificate removal prompt or run 'ocx claude desktop picker off', then rerun 'ocx uninstall'.");
   }
 
-  // A connection can appear while asynchronous cleanup is finishing. The final
-  // inspection and actual remover share L, but never hold C while deleting its DB.
+  // Exclude concurrent local Desktop writes until the ownership records are retired.
   return deps.withLifecycle(async held => {
     assertClientLifecycleHeld(held);
-    const latest = deps.readConnection();
-    const latestDesktop = deps.inspectDesktop();
-    const latestReceipt = deps.readReceipt();
-    if (latest.kind !== "disconnected"
-      || latestDesktop.kind !== "absent"
-      || latestReceipt.kind === "unsafe"
-      || (latestReceipt.kind === "valid" && latestReceipt.value.phase !== "complete")) {
-      throw new Error("Client cleanup refused: connection or Desktop state changed before removal.");
-    }
     // The async ACL belt releases its caller on a stalled `icacls.exe`, which is what keeps
     // startup and shutdown bounded. It is not evidence that the child released the directory,
     // and on Windows a live handle makes this removal fail partway instead of cleanly. Refuse

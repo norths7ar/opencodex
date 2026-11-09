@@ -27,14 +27,7 @@
  *   so exit cleanup can restore Codex/Grok fences when a stale service marker has no
  *   viable supervisor. Log only a stable errno code — never the raw message
  *   (paths in ENOENT often include the OS username).
- * - Except after a committed client connection (a join into a Child): Codex already
- *   routes to the client runtime the next start serves on this port, so the failed
- *   handoff still marks recycling and exit cleanup keeps that routing instead of
  *   silently falling back to native Codex.
- * - Desktop-supervised child (the desktop app spawned it with `OCX_DESKTOP_SUPERVISED=1`
- *   and is still its parent): no spawn. Mark recycle and exit 75; the app sees the exit
- *   and starts the replacement itself, so it keeps owning, stopping and quitting it.
- *   Checked before the service rule: that app, not a service manager, is the parent.
  */
 import {
   abortAndReleaseAllTurns,
@@ -49,17 +42,11 @@ import {
   stopServerListener,
 } from "../lifecycle";
 import { isServiceViable } from "../../service";
-import { readClientConnectionState } from "../../client/state";
 import { withSiblingMarker } from "../../codex/sibling-start";
 import { issueSiblingHandoff } from "../../codex/sibling-handoff";
 import { readRuntimePort } from "../../config/process-state";
 import { spendLedgerRestartEnvironment } from "../../lib/spend-ledger-owner";
-import {
-  DESKTOP_RESTART_EXIT_CODE,
-  DESKTOP_SUPERVISED_ENV,
-  MEMORY_DRAIN_RESTART_MS,
-  isDesktopSupervised,
-} from "../../lib/system-restart-contract";
+import { MEMORY_DRAIN_RESTART_MS } from "../../lib/system-restart-contract";
 import { spawnReplacementStart } from "../restart-replacement";
 import { retireRestartParentOwnership } from "../restart-parent-ownership";
 
@@ -76,15 +63,11 @@ export interface SystemRestartIo {
   /** True when a background service can actually respawn this process after exit(1). */
   isServiceViable?: () => boolean;
   isSupervisedServiceChild?: () => boolean;
-  /** True when the desktop app that spawned this process starts its replacement after exit 75. */
-  isDesktopSupervised?: () => boolean;
   /** Ordinary start; deadline handoff may defer health until parent exit releases OS locks. */
   spawnStart?: (port?: number, waitForHealthBeforeParentExit?: boolean) => void | Promise<void>;
   /** Idempotent listener close; must settle before an ordinary start is spawned. */
   stopListener?: () => void | Promise<void>;
   markRecycling?: () => void;
-  /** True once a client connection has committed (a join into a Child); read only after a failed handoff. */
-  isClientConnected?: () => boolean;
   exitProcess?: (code: number) => void;
   schedule?: (fn: () => void | Promise<void>, ms: number) => void;
   scheduleDeadline?: (fn: () => void, ms: number) => () => void;
@@ -234,36 +217,6 @@ function spawnFailureCode(err: unknown): string {
 }
 
 /**
- * After a failed handoff, keep Codex routing when a client connection has committed.
- *
- * `connectClient` already pointed Codex at the client runtime that the next start (a service
- * relaunch, the desktop app, or `ocx start`) serves on this same port. Restoring native Codex here
- * would be a silent local fallback while client state says connected. An unreadable state is not
- * proof of a join, so it keeps today's restore.
- */
-function keepRoutingForCommittedClient(io: SystemRestartIo): void {
-  let connected = false;
-  try {
-    connected = (io.isClientConnected ?? (() => readClientConnectionState().kind === "connected"))();
-  } catch {
-    connected = false;
-  }
-  if (connected) (io.markRecycling ?? markRecyclingForExit)();
-}
-
-/**
- * Hand the restart to the desktop app that spawned this process: keep Codex routing for the
- * replacement it starts on this port, and exit with the code it restarts on. False when nothing
- * supervises this process that way, and then nothing happened.
- */
-function handOffToDesktop(io: SystemRestartIo, exitProcess: (code: number) => void): boolean {
-  if (!(io.isDesktopSupervised ?? isDesktopSupervised)()) return false;
-  (io.markRecycling ?? markRecyclingForExit)();
-  exitProcess(DESKTOP_RESTART_EXIT_CODE);
-  return true;
-}
-
-/**
  * The replacement's environment before `spawnReplacementStart` adds the restart-parent marker and
  * the runtime provenance: never under a service marker, a sibling's replacement stays a sibling,
  * and only a parent-exit handoff marks the bounded spend-ledger lease wait.
@@ -275,8 +228,6 @@ export function replacementStartEnvironment(
   // A sibling's replacement stays a sibling even if the owner is down while it probes.
   const sourceEnv: NodeJS.ProcessEnv = withSiblingMarker(process.env, issueSiblingHandoff);
   delete sourceEnv.OCX_SERVICE;
-  // A detached replacement is not the desktop app's child; it must never exit to an app that is not waiting on it.
-  delete sourceEnv[DESKTOP_SUPERVISED_ENV];
   return spendLedgerRestartEnvironment(
     sourceEnv,
     waitForHealthBeforeParentExit ? undefined : parentPid,
@@ -316,7 +267,6 @@ async function completeDeferredParentExitHandoff(
       `Drain-and-restart ${phase} spawn failed (${spawnFailureCode(err)}); exiting without replacement`,
     );
     delete process.env.OCX_SERVICE;
-    keepRoutingForCommittedClient(io);
     exitProcess(1);
     return;
   }
@@ -334,7 +284,6 @@ async function completeDeadlineRestartHandoff(
 ): Promise<void> {
   while (automatic && pendingShutdownIntents.size > 0 && !explicitShutdownRequested) await nextShutdownIntentChange();
   if (!canHandoff()) return;
-  if (handOffToDesktop(io, exitProcess)) return;
   const supervised = (io.isSupervisedServiceChild ?? (() => isSupervisedServiceChild(io)))();
   if (supervised) {
     // Failure-only supervisors ignore exit(0); intentional non-zero triggers respawn.
@@ -473,7 +422,6 @@ export function acceptSystemRestart(io: SystemRestartIo = restartIo, admission: 
         // rejects, an accepted restart must still reach replacement or terminal exit.
         console.warn("Drain-and-restart cleanup failed; continuing terminal restart handoff");
       }
-      if (handOffToDesktop(io, exitProcess)) return;
       const supervised = (io.isSupervisedServiceChild ?? (() => isSupervisedServiceChild(io)))();
       if (supervised) {
         // Failure-only supervisors ignore exit(0); intentional non-zero triggers respawn.
@@ -512,10 +460,8 @@ export function acceptSystemRestart(io: SystemRestartIo = restartIo, admission: 
         );
         // Listen socket is already stopped; do not markRecycling — no child to inherit fences.
         // No replacement inherited the routing. Clear a stale service marker so
-        // this unsupervised parent restores clients after the failed handoff — unless a
-        // committed client connection already owns that routing.
+        // this parent restores clients after the failed handoff.
         delete process.env.OCX_SERVICE;
-        keepRoutingForCommittedClient(io);
         exitProcess(1);
         return;
       }

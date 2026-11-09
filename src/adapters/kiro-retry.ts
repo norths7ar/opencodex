@@ -4,7 +4,7 @@ import { classifyKiroHttpError, safeKiroHttpErrorMessage } from "./kiro-errors";
 import { normalizeUpstreamHttpErrorResponse } from "./upstream-http-error";
 import { readBoundedResponseBody } from "../lib/bounded-body";
 import { resolveClientRetryAfter } from "../lib/retry-after";
-import { parseRetryAfterMs } from "../combos";
+import { parseRetryAfterMs } from "../lib/retry-after-delay";
 import {
   SendBudgetExhaustedError, errorDestinationLabel,
   abortError,

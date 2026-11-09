@@ -12,9 +12,7 @@ import {
   inboundWireForProtocol,
   isDeliveryMode,
   isProtocolReasonCode,
-  labProtocolForProtocol,
   protocolFromInboundWire,
-  protocolFromLabProtocol,
   protocolNodes,
   PROTOCOLS,
   upstreamWireForAdapter,
@@ -29,14 +27,6 @@ describe("protocol vocabulary mapping", () => {
     for (const protocol of PROTOCOLS) {
       expect(protocolFromInboundWire(inboundWireForProtocol(protocol))).toBe(protocol);
     }
-  });
-
-  test("Lab protocol identities map both ways and reject unknown identities", () => {
-    for (const protocol of PROTOCOLS) {
-      expect(protocolFromLabProtocol(labProtocolForProtocol(protocol))).toBe(protocol);
-    }
-    expect(protocolFromLabProtocol("anthropic")).toBeUndefined();
-    expect(protocolFromLabProtocol("gemini")).toBeUndefined();
   });
 
   test("only the three public-wire adapters map to a protocol", () => {

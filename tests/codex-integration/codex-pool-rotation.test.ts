@@ -78,8 +78,6 @@ function generationContext(codexAccountIds: ReadonlySet<string>) {
   return {
     generation: sweepGeneration,
     providerNames: new Set<string>(),
-    comboIds: new Set<string>(),
-    comboTargets: new Set<string>(),
     codexAccountIds,
     oauthAccountKeys: new Set<string>(),
     configRoots: new Set<string>(),

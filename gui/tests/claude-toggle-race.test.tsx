@@ -50,8 +50,8 @@ function jsonResponse(body: unknown, status = 200): Response {
  */
 const CLAUDE_CODE_STATE = {
   authMode: "auto",
-  autoConnectSupported: false,
-  systemEnv: false,
+
+
   fastMode: null,
   maxContextTokens: null,
   autoContext: true,

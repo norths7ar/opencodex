@@ -32,7 +32,7 @@ afterEach(() => resetCodexModelEntitlementCacheForTests());
 function builtTerra(modelWindows?: Record<string, number>): RawEntry | undefined {
   return buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: [TERRA], goModels: [], wsEnabled: false,
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
+    multiAgentMode: "default", multiAgentV2Enabled: false,
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     openaiContextCap: { modelWindows },
   }).find(row => row.slug === TERRA);
@@ -92,7 +92,7 @@ describe("GPT-6.1 Terra native catalog", () => {
     const rows = buildCatalogEntries(null, [TERRA], [{ provider: "openai", id: TERRA,
       codexForwardNativeCapabilityAlias: true, catalogKind: CODEX_CUSTOM_MODEL_CATALOG_KIND,
       reasoningEfforts: nativeReasoningEfforts(TERRA), defaultReasoningEffort: nativeDefaultReasoningEffort(TERRA) }],
-      undefined, false, "default", new Set(), ["personal"]);
+      undefined, false, "default", ["personal"]);
     for (const [slug, maximum] of [[`personal/${TERRA}`, 872_000], [`openai/${TERRA}`, 500_000]]) {
       expect(rows.find(row => row.slug === slug)).toMatchObject({
         context_window: 500_000, max_context_window: maximum, auto_compact_token_limit: 450_000,

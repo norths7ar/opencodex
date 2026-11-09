@@ -35,7 +35,7 @@ test("--first-party off tells the operator when Claude Desktop keeps the shared 
 
 for (const args of [
   ["set", "--first-party", "maybe"],
-  ["set", "--first-party", "on", "--system-env", "on"],
+  ["set", "--first-party", "on", "--auto-context", "on"],
 ]) {
   test(`--first-party rejects invalid combination ${args.join(" ")}`, async () => {
     let requests = 0;

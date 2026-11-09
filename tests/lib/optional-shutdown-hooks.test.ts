@@ -3,12 +3,6 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  setLabAutomationDispatchDeps,
-  startLabAutomationScheduler,
-  stopLabAutomationScheduler,
-  isLabAutomationSchedulerRunning,
-} from "../../src/lab/automation/orchestrator";
-import {
   registerOptionalShutdownHook,
   runOptionalShutdownHooks,
   resetOptionalShutdownHooksForTests,
@@ -81,144 +75,16 @@ describe("optional shutdown hooks", () => {
 // drainAndShutdown, because core no longer imports the orchestrator to stop it. Proven by
 // driving this test red before the fix.
 describe("lab automation scheduler teardown registration", () => {
-  test("a scheduler started without dispatch deps is still stopped by shutdown", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-hook-"));
-    try {
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
 });
 
 // Outcome-level coverage the plan called for (010): assert a REAL Lab scheduler is stopped
 // through the registry, not just an inline closure. These are the exact cases an
 // independent review reproduced, each driven red before the scheduler-side registration.
 describe("lab automation scheduler teardown — reviewer-reproduced cases", () => {
-  // Case D: startup activates, its ownership lease is released, then the management API
-  // (PUT /api/lab/automation) restarts the scheduler with no deps installed. Needs no
-  // unusual setup, which makes it the most likely path in production.
-  test("case D: scheduler restarted by the management API after release is stopped", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-case-d-"));
-    try {
-      const release = setLabAutomationDispatchDeps({
-        configDir,
-        loadConfig: () => ({}) as never,
-        routeExecutor: undefined as never,
-      });
-      release();
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
-
-  // Case B: an empty-deps call early-returns a no-op release without registering anything.
-  test("case B: empty-deps no-op still leaves a stoppable scheduler", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-case-b-"));
-    try {
-      setLabAutomationDispatchDeps({} as never);
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
-
-  // Case C: the ordinary activation path must keep working.
-  test("case C: normal activation path is stopped by shutdown", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-case-c-"));
-    try {
-      setLabAutomationDispatchDeps({
-        configDir,
-        loadConfig: () => ({}) as never,
-        routeExecutor: undefined as never,
-      });
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
-
-  // Shutdown may run twice (drain called again, or a lease release after drain).
-  test("double shutdown is safe and leaves the scheduler stopped", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-double-"));
-    try {
-      startLabAutomationScheduler(configDir);
-      expect(() => { runOptionalShutdownHooks(); runOptionalShutdownHooks(); }).not.toThrow();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
 });
 
 // Two keys now exist for an activated config -- `lab-automation:` from the deps lease and
 // `lab-automation-scheduler:` from the timer. These pin the interaction so a future change
 // cannot make repeated starts accumulate hooks or leave a restarted timer unhooked.
 describe("scheduler hook keying", () => {
-  test("repeated starts do not accumulate and shutdown still stops the timer", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-idem-"));
-    try {
-      startLabAutomationScheduler(configDir);
-      startLabAutomationScheduler(configDir);
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
-
-  // The sweep is process-lifetime: drainAndShutdown callers exit afterwards, so a
-  // scheduler start arriving late (a policy PUT resuming past the snapshot) must be
-  // refused — not re-armed — or its timer would dispatch outside the completed sweep.
-  test("a scheduler start after the shutdown sweep is refused", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-late-start-"));
-    try {
-      runOptionalShutdownHooks();
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
-
-  // An in-process restart exists only in tests, where the reset models a fresh process;
-  // with the latch cleared a new scheduler must re-arm its hook for the next sweep.
-  test("a scheduler restarted after a test reset is stoppable again", () => {
-    resetOptionalShutdownHooksForTests();
-    const configDir = mkdtempSync(join(tmpdir(), "ocx-shutdown-restart-"));
-    try {
-      startLabAutomationScheduler(configDir);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-      resetOptionalShutdownHooksForTests();
-      startLabAutomationScheduler(configDir);
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(true);
-      runOptionalShutdownHooks();
-      expect(isLabAutomationSchedulerRunning(configDir)).toBe(false);
-    } finally {
-      stopLabAutomationScheduler(configDir);
-    }
-  });
 });

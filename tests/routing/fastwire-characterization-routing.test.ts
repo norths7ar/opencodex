@@ -3,7 +3,6 @@ import { applyProviderConfigHints } from "../../src/codex/catalog";
 import { applyCatalogModelMetadata } from "../../src/codex/catalog/effort";
 import type { CatalogModel, RawEntry } from "../../src/codex/catalog/parsing";
 import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { resolveProductionBehaviorValues } from "../../src/routing/compatibility/behavior";
 import { evaluatePolicyProfile } from "../../src/routing/evaluator";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
 
@@ -116,31 +115,6 @@ describe("FastWire characterization: compatibility fingerprint projection", () =
       },
     },
   ];
-
-  test.each(cases)("projects $label service-tier behavior", ({ label, expected, provider }) => {
-    const config = {
-      port: 0,
-      defaultProvider: label,
-      fastMode: true,
-      providers: { [label]: provider },
-    } as OcxConfig;
-    const values = resolveProductionBehaviorValues(
-      config,
-      label,
-      "model",
-      provider,
-      "fastwire-characterization-salt",
-    );
-
-    expect(values?.["responses.serviceTier"]).toEqual({
-      source: "provider_config",
-      value: expected,
-    });
-    expect(values?.["runtime.fastMode"]).toEqual({
-      source: "global_config",
-      value: true,
-    });
-  });
 });
 
 describe("FastWire characterization: catalog service-tier bytes", () => {

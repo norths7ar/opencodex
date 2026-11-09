@@ -1,7 +1,7 @@
 import { useKeyedClientResource } from "../client-resource";
 import { useT } from "../i18n/shared";
 import type { Page } from "../app-routing";
-import { IconCheck, IconKey, IconMonitor } from "../icons";
+import { IconCheck, IconKey } from "../icons";
 import { HubCard, type HubBadge } from "@/components/ui-v2/hub-card";
 import { Button } from "@/components/ui-v2/button";
 import { frame, sectionTitle } from "@/components/v2-connect/classes";
@@ -104,8 +104,7 @@ export default function SetupHub({ apiBase, navigate }: SetupHubProps) {
         <div className="grid max-w-[760px] gap-3 sm:grid-cols-2">
           <HubCard icon={<IconKey />} title={t("shellV2.setupApiKeys")} body={t("shellV2.setupApiKeysHint")}
             badge={optional} onOpen={() => navigate("integrations", "keys")} openLabel={open} />
-          <HubCard icon={<IconMonitor />} title={t("shellV2.setupRemote")} body={t("shellV2.setupRemoteHint")}
-            badge={optional} onOpen={() => navigate("remote")} openLabel={open} />
+          
         </div>
       </section>
     </div>

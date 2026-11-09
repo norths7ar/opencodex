@@ -228,43 +228,6 @@ describe("terminal routed vision helpers cannot spend Reserve", () => {
     } finally { await fixture.close(); }
   }, SERVER_BUDGET_MS);
 
-  test.each(["chat", "responses"] as const)("%s marker survives combo child reconstruction", async transport => {
-    const fixture = await reserveIngressFixture({ primaryLoopback: true, configure: config => {
-      config.combos = { helper: { strategy: "failover", targets: [{ provider: "openai", model: "gpt-reserve" }] } };
-    } });
-    try {
-      fixture.allow();
-      const before = snapshot(fixture.counters);
-      const result = await fixture.request("public", transport, "combo/helper", {
-        ...headers("dedicated"), ...terminal,
-      });
-      expect(result.status).toBe(400);
-      expect(result.text).toContain("only available as a conversation model");
-      expect(JSON.parse(result.text).error.type).toBe("invalid_request_error");
-      expect(delta(fixture.counters, before)).toMatchObject({ wham: 0, inference: 0 });
-      // Chat may enrich the unresolved combo with main auth before the concrete child is
-      // selected. Only the child's Reserve permission/inference work must remain zero.
-      fixture.assertConfigUnchanged();
-    } finally { await fixture.close(); }
-  }, SERVER_BUDGET_MS);
-
-  test.each(["chat", "responses"] as const)("%s keyed combo child is not refused because a later candidate is Reserve", async transport => {
-    const fixture = await reserveIngressFixture({ primaryLoopback: true, configure: config => {
-      config.combos = { helper: { strategy: "failover", targets: [
-        { provider: "keyed", model: "gpt-reserve" }, { provider: "openai", model: "gpt-reserve" },
-      ] } };
-    } });
-    try {
-      fixture.allow();
-      const result = await fixture.request("public", transport, "combo/helper", { ...headers("dedicated"), ...terminal });
-      expect(result.status).toBe(200);
-      expect(fixture.counters.wham).toBe(0);
-      expect(fixture.counters.inference).toHaveLength(1);
-      expect(fixture.counters.inference[0]).toMatchObject({ model: "gpt-reserve", authorization: "Bearer sk-ingress-fixture" });
-      fixture.assertConfigUnchanged();
-    } finally { await fixture.close(); }
-  }, SERVER_BUDGET_MS);
-
   test("off-to-on during owned auth refuses a helper even after positive Reserve authorization", async () => {
     const fixture = await reserveIngressFixture({ primaryLoopback: true, configure: config => {
       config.codexDesktopAuthless = false;

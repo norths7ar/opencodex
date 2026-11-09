@@ -11,12 +11,7 @@ import { codeBuddyMcpInvocation } from "../../src/adapters/coding-agent/turn";
 const tempDirs: string[] = [];
 const serverPath = join(
   import.meta.dir,
-  "..",
-  "..",
-  "src",
-  "adapters",
-  "codebuddy",
-  "mcp-server.ts",
+  "../../src/adapters/codebuddy/mcp-server.ts",
 );
 
 function definition(

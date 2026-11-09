@@ -10,12 +10,11 @@ import {
   validatedCodexExecTarget,
   validatedCodexExecTargetAsync,
 } from "./exec-boundary";
-import { macCodexAppBundleFor, macCodexAppCommands } from "./mac-app-bundle";
 import {
   beginCodexCliSelectionParentWrite,
   withCodexCliSelectionParentWriteAsync,
   CodexCliSelectionMutationBusyError,
-} from "./cli-update-selection-gate";
+} from "./cli-selection";
 import { resolveCodexHomeDir } from "./home";
 import { decodeOverlayState } from "./shim-state-file";
 import { redactSecretString, redactUserPath } from "../lib/redact";
@@ -486,9 +485,7 @@ function versionProbePrecheck(command: string, deps: ResolveCodexRuntimeDeps): V
   // `codex --version` here is ~1s of blocking exec per candidate; on the
   // dashboard probe that cost made Windows report Codex as missing even when
   // the App install was sitting under LOCALAPPDATA/OpenAI/Codex/bin (issue 4458).
-  if (!macCodexAppIdentityMatches(command, deps)) {
-    return { ok: false, reason: "Codex app bundle identity mismatch or unavailable" };
-  }
+
   if (deps.probeVersion === false) return { ok: true, version: null };
   return null;
 }
@@ -684,136 +681,6 @@ function pathCandidates(deps: ResolveCodexRuntimeDeps): string[] {
 }
 
 /**
- * Bundle-identity eligibility only. This runs inside the exec-free precheck and
- * inside deferred/passive enumeration, so it must never spawn: signature and
- * ownership trust is enforced at the execution boundary (exec-boundary.ts)
- * every time the selected command is actually run, not once at selection.
- */
-function macCodexAppIdentityMatches(command: string, deps: ResolveCodexRuntimeDeps): boolean {
-  const bundle = macCodexAppBundleFor(command, deps);
-  if (!bundle) return true;
-  try {
-    return (deps.readBundleIdentifier ?? readBoundedBundleIdentifier)(`${bundle}/Contents/Info.plist`) === "com.openai.codex";
-  } catch { return false; }
-}
-
-/** XML plist subset only: no external entity expansion, subprocess, or unbounded read. */
-function readBoundedBundleIdentifier(path: string): string | null {
-  let fd: number | undefined;
-  try {
-    fd = openSync(path, constants.O_RDONLY | constants.O_NONBLOCK);
-    const st = fstatSync(fd);
-    const limit = 64 * 1024;
-    if (!st.isFile() || st.size > limit) return null;
-    const bytes = Buffer.alloc(limit + 1);
-    let size = 0;
-    while (size < bytes.length) {
-      const count = readSync(fd, bytes, size, bytes.length - size, null);
-      if (!count) break;
-      size += count;
-    }
-    if (size > limit) return null;
-    // XML 1.0 Char: tab, LF, CR, U+0020-D7FF, U+E000-FFFD, U+10000-10FFFF (no surrogates after fatal decoding).
-    const xmlChar = (code: number): boolean => code === 9 || code === 10 || code === 13
-      || (code >= 0x20 && code <= 0xd7ff) || (code >= 0xe000 && code <= 0xfffd) || (code >= 0x10000 && code <= 0x10ffff);
-    const allXmlChars = (text: string): boolean => [...text].every(char => xmlChar(char.codePointAt(0)!));
-    const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes.subarray(0, size));
-    // Every character is checked before anything is stripped, the prolog included.
-    if (!allXmlChars(decoded)) return null;
-    // Only a well-formed UTF-8 declaration and Apple's DOCTYPE are accepted, anchored in the prolog, in that order.
-    const declaration = /^<\?xml\s+version=(["'])1\.[0-9]\1(?:\s+encoding=(["'])utf-8\2)?(?:\s+standalone=(["'])(?:yes|no)\3)?\s*\?>/i;
-    if (decoded.startsWith("<?") && !declaration.test(decoded)) return null;
-    const xml = decoded
-      .replace(declaration, "")
-      .replace(/^\s*<!DOCTYPE plist PUBLIC "-\/\/Apple\/\/DTD PLIST 1\.0\/\/EN" "http:\/\/www\.apple\.com\/DTDs\/PropertyList-1\.0\.dtd">/, "");
-    type Node = { name: string; text: string; children: Node[] };
-    const root: Node = { name: "root", text: "", children: [] };
-    const stack = [root];
-    const tokens = xml.match(/<!--[\s\S]*?-->|<[^>]*>|[^<]+/g) ?? [];
-    if (tokens.join("") !== xml) return null;
-    for (const token of tokens) {
-      if (token.startsWith("<!--")) {
-        // A comment may not contain "--" or end in "-" (XML 1.0 §2.5).
-        if (/--|-$/.test(token.slice(4, -3))) return null;
-        continue;
-      }
-      const parent = stack[stack.length - 1]!;
-      if (!token.startsWith("<")) {
-        if (token.includes("]]>")) return null;
-        parent.text += token;
-        continue;
-      }
-      const close = /^<\/(\w+)\s*>$/.exec(token);
-      if (close) {
-        if (stack.length === 1 || parent.name !== close[1]) return null;
-        stack.pop();
-        continue;
-      }
-      const open = /^<(plist|dict|array|key|string|integer|real|date|data|true|false)(?:\s+version="1\.0")?\s*(\/?)>$/.exec(token);
-      if (!open || (token.includes("version=") && open[1] !== "plist")) return null;
-      const node: Node = { name: open[1]!, text: "", children: [] };
-      parent.children.push(node);
-      if (!open[2]) stack.push(node);
-    }
-    if (stack.length !== 1 || root.text.trim() || root.children.length !== 1) return null;
-    const plist = root.children[0]!;
-    if (plist.name !== "plist" || plist.text.trim() || plist.children.length !== 1) return null;
-    const dict = plist.children[0]!;
-    if (dict.name !== "dict" || dict.text.trim() || dict.children.length % 2) return null;
-    const decode = (text: string): string => text.replace(/&([^;]*);|&/g, (_match, entity: string | undefined) => {
-      const named: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'" };
-      if (entity && Object.hasOwn(named, entity)) return named[entity]!;
-      if (!entity || !/^#(?:[0-9]+|x[0-9a-fA-F]+)$/.test(entity)) throw new Error("invalid XML entity");
-      const value = entity.startsWith("#x") ? parseInt(entity.slice(2), 16) : Number(entity.slice(1));
-      if (!xmlChar(value)) throw new Error("invalid XML character");
-      return String.fromCodePoint(value);
-    });
-    // The identity only counts inside a document that is valid as a whole: every node, entity and
-    // literal character is checked, not just the CFBundleIdentifier pair.
-    const leafFormats: Record<string, RegExp> = {
-      integer: /^\s*[+-]?(?:\d+|0x[0-9a-fA-F]+)\s*$/,
-      real: /^\s*(?:[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[+-]?(?:nan|inf(?:inity)?))\s*$/i,
-      date: /^\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\s*$/,
-      data: /^[A-Za-z0-9+/=\s]*$/,
-    };
-    const validNode = (node: Node, inDict: "key" | "value" | null): boolean => {
-      if (!allXmlChars(node.text)) return false;
-      if (inDict === "key" && node.name !== "key") return false;
-      if (inDict !== "key" && node.name === "key") return false;
-      switch (node.name) {
-        case "dict":
-          return !node.text.trim() && node.children.length % 2 === 0
-            && node.children.every((child, index) => validNode(child, index % 2 === 0 ? "key" : "value"));
-        case "array":
-          return !node.text.trim() && node.children.every(child => validNode(child, null));
-        case "key": case "string":
-          decode(node.text);
-          return node.children.length === 0;
-        case "true": case "false":
-          return node.children.length === 0 && !node.text.trim();
-        case "integer": case "real": case "date": case "data":
-          return node.children.length === 0 && leafFormats[node.name]!.test(decode(node.text));
-        default:
-          return false;
-      }
-    };
-    if (!validNode(dict, null)) return null;
-    let identifier: string | null = null;
-    let keys = 0;
-    for (let i = 0; i < dict.children.length; i += 2) {
-      const key = dict.children[i]!, value = dict.children[i + 1]!;
-      if (key.name !== "key" || key.children.length) return null;
-      if (decode(key.text) !== "CFBundleIdentifier") continue;
-      keys++;
-      if (value.name !== "string" || value.children.length) return null;
-      identifier = decode(value.text);
-    }
-    return keys === 1 ? identifier : null;
-  } catch { return null; }
-  finally { if (fd !== undefined) closeSync(fd); }
-}
-
-/**
  * Codex installs that PATH does not necessarily expose.
  *
  * The Windows Codex App writes codex.exe under
@@ -854,32 +721,7 @@ function installedCodexCandidates(deps: ResolveCodexRuntimeDeps): string[] {
     return versionDirectories(join(localAppData, "OpenAI", "Codex", "bin"))
       .map(directory => join(directory, "codex.exe"));
   }
-  const home = env.HOME?.trim() || env.USERPROFILE?.trim() || homedir();
-  const posix = [
-    join(home, ".codex", "packages", "standalone", "current", "bin", "codex"),
-    join(home, ".local", "bin", "codex"),
-    "/usr/local/bin/codex",
-    "/opt/homebrew/bin/codex",
-  ];
-  if (platform === "darwin") {
-    const exists = deps.existsSync ?? existsSync;
-    return [...posix, ...macCodexAppCommands(deps).filter(command => exists(command) && macCodexAppIdentityMatches(command, deps))];
-  }
-  if (platform !== "linux") return posix;
-  // Windows Codex Desktop in WSL app-server mode ships its Linux binary under the
-  // effective Codex home as bin/wsl/<version-hash>/codex, and a Desktop update replaces
-  // that hash directory. The service PATH usually has no codex (issue 5635), so these
-  // rank after PATH and the ordinary locations and are re-enumerated on every resolve
-  // rather than trusted from a remembered hash.
-  let codexHome: string;
-  try {
-    codexHome = resolveCodexHomeDir({ env });
-  } catch {
-    return posix;
-  }
-  const desktopWsl = versionDirectories(join(codexHome, "bin", "wsl"))
-    .map(directory => join(directory, "codex"));
-  return [...posix, ...desktopWsl];
+  return [];
 }
 
 interface RankedCandidate {
@@ -1247,7 +1089,7 @@ function* resolveCodexRuntimeSteps(
   const installed = installedCodexCandidates(deps);
   // Order by the generated app commands only: an established install path that links into the
   // app keeps its precedence, while identity and handover use the canonical classification.
-  const appCommands = new Set(macCodexAppCommands(deps));
+  const appCommands = new Set<string>();
   const appCandidates = installed.filter(command => appCommands.has(command));
   for (const command of installed.filter(command => !appCommands.has(command))) {
     ordered.push({ command, source: "installed" });
@@ -1287,7 +1129,7 @@ function* resolveCodexRuntimeSteps(
     if (
       deps.discoverAlternatives === false
       && valid.length > 0
-      && !(persistedIsUnpinned && candidate.source === "installed" && !macCodexAppBundleFor(candidate.command, deps))
+      && !(persistedIsUnpinned && candidate.source === "installed")
     ) {
       continue;
     }

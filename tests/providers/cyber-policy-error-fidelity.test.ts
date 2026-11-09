@@ -6,7 +6,7 @@ import {
   chatCompletionsErrorResponse,
   responsesSseToChatCompletionsSse as responsesSseToChatCompletionsSseProduction,
 } from "../../src/chat/outbound";
-import { comboFailureDecision } from "../../src/combos/failover";
+import { candidateFailureDecision } from "../../src/routing/candidate-failure";
 import {
   adapterFailureFromMessage,
   classifyError,
@@ -15,7 +15,7 @@ import {
   httpStatusFromTerminalError,
 } from "../../src/lib/errors";
 import { formatPassthroughUpstreamError } from "../../src/server/responses/passthrough-error";
-import { consumeComboFailure } from "../../src/server/responses/core";
+import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
 import { handleResponses } from "../../src/server/responses";
 import type { AdapterEvent, OcxConfig } from "../../src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
@@ -164,12 +164,12 @@ describe("cyber_policy error fidelity", () => {
     expect(codeOnlyResponse.headers.get("retry-after")).toBeNull();
   });
 
-  test("consumeComboFailure preserves cyber_policy code as HTTP 400", async () => {
+  test("consumeRecoveryFailure preserves cyber_policy code as HTTP 400", async () => {
     const upstream = new Response(JSON.stringify(CYBER_ERROR_BODY), {
       status: 400,
       headers: { "retry-after": "120" },
     });
-    const failure = await consumeComboFailure(upstream);
+    const failure = await consumeRecoveryFailure(upstream);
     expect(failure.response.status).toBe(400);
     expect(failure.response.headers.get("retry-after")).toBeNull();
     expect(failure.upstreamCode).toBe(CYBER_POLICY_ERROR_CODE);
@@ -187,10 +187,10 @@ describe("cyber_policy error fidelity", () => {
       ...new TextEncoder().encode(JSON.stringify(CYBER_ERROR_BODY)),
       0xff,
     ]);
-    const failure = await consumeComboFailure(new Response(bytes, { status: 502 }));
+    const failure = await consumeRecoveryFailure(new Response(bytes, { status: 502 }));
     expect(failure.response.status).toBe(400);
     expect(failure.upstreamCode).toBe(CYBER_POLICY_ERROR_CODE);
-    expect(comboFailureDecision(502, failure.classificationText, {
+    expect(candidateFailureDecision(502, failure.classificationText, {
       code: failure.upstreamCode,
     })).toBe("stop");
   });
@@ -202,7 +202,7 @@ describe("cyber_policy error fidelity", () => {
       headers: { "retry-after": "120", "x-codex-primary-reset-at": "2000000000" },
     });
     markResponseNonReplayable(upstream);
-    const failure = await consumeComboFailure(upstream);
+    const failure = await consumeRecoveryFailure(upstream);
     expect(failure.response.status).toBe(400);
     expect(failure.upstreamCode).toBe(CYBER_POLICY_ERROR_CODE);
     expect(failure.nonReplayable).toBe(true);
@@ -210,7 +210,7 @@ describe("cyber_policy error fidelity", () => {
     expect(failure.retryAfter).toBeUndefined();
     expect(failure.resetAt).toBeUndefined();
     expect(failure.response.headers.get("retry-after")).toBeNull();
-    expect(comboFailureDecision(502, failure.classificationText, { code: failure.upstreamCode })).toBe("stop");
+    expect(candidateFailureDecision(502, failure.classificationText, { code: failure.upstreamCode })).toBe("stop");
   });
 
   test("malformed UTF-8 keeps the status-only fallback for a non-cyber 5xx body", async () => {
@@ -223,7 +223,7 @@ describe("cyber_policy error fidelity", () => {
       })),
       0xff,
     ]);
-    const failure = await consumeComboFailure(new Response(bytes, { status: 502 }));
+    const failure = await consumeRecoveryFailure(new Response(bytes, { status: 502 }));
     expect(failure.response.status).toBe(502);
     expect(failure.classificationText).toBe("Provider error 502");
     expect(failure.upstreamCode).toBeUndefined();
@@ -241,7 +241,7 @@ describe("cyber_policy error fidelity", () => {
         "x-codex-tertiary-reset-at": "2026-09-03T14:00:00Z",
       },
     });
-    const failure = await consumeComboFailure(upstream);
+    const failure = await consumeRecoveryFailure(upstream);
     expect(failure.retryAfter).toBeUndefined();
     expect(failure.resetAt).toBeUndefined();
   });
@@ -293,22 +293,6 @@ describe("cyber_policy error fidelity", () => {
       releaseSpendHome();
       upstream.stop(true);
     }
-  });
-
-  test("message-only combo cyber failures preserve structured type and redact the message", async () => {
-    const upstream = new Response(JSON.stringify({
-      error: { type: "server_error", message: SECRET_CYBER_MESSAGE },
-    }), { status: 400 });
-    const failure = await consumeComboFailure(upstream);
-    expect(failure.response.status).toBe(400);
-    expect(failure.upstreamCode).toBe(CYBER_POLICY_ERROR_CODE);
-    await expect(failure.response.json()).resolves.toMatchObject({
-      error: {
-        type: "server_error",
-        code: CYBER_POLICY_ERROR_CODE,
-        message: REDACTED_CYBER_MESSAGE,
-      },
-    });
   });
 
   test("bridged openai-chat SSE cyber error becomes response.failed with cyber_policy", async () => {
@@ -480,20 +464,6 @@ describe("cyber_policy error fidelity", () => {
       status: 400,
     }]);
   });
-
-  test("httpStatusFromTerminalError and combo failover treat cyber as non-retryable 400", () => {
-    expect(httpStatusFromTerminalError({
-      type: "invalid_request_error",
-      code: CYBER_POLICY_ERROR_CODE,
-      message: OPENAI_CYBER_MESSAGE,
-    })).toBe(400);
-    expect(comboFailureDecision(400, OPENAI_CYBER_MESSAGE)).toBe("stop");
-    expect(comboFailureDecision(502, OPENAI_CYBER_MESSAGE)).toBe("stop");
-    // Structured code wins even when the truncated message lacks cyber wording.
-    expect(comboFailureDecision(502, "Provider error 502: " + "x".repeat(600), {
-      code: CYBER_POLICY_ERROR_CODE,
-    })).toBe("stop");
-  });
 });
 
 describe("#2488 nested policy identity is not hidden by an outer envelope", () => {
@@ -515,7 +485,7 @@ describe("#2488 nested policy identity is not hidden by an outer envelope", () =
   });
 
   test("a nested policy code is found behind a generic outer envelope", async () => {
-    const failure = await consumeComboFailure(new Response(nestedBody, { status: 502 }));
+    const failure = await consumeRecoveryFailure(new Response(nestedBody, { status: 502 }));
     expect(failure.upstreamCode).toBe(CYBER_POLICY_ERROR_CODE);
     expect(failure.response.status).toBe(400);
     expect(failure.response.headers.get("retry-after")).toBeNull();
@@ -526,7 +496,7 @@ describe("#2488 nested policy identity is not hidden by an outer envelope", () =
       error: { message: "Upstream request failed" },
       response: { last_error: { code: "server_error", message: "boom" } },
     });
-    const failure = await consumeComboFailure(new Response(genericBody, { status: 502 }));
+    const failure = await consumeRecoveryFailure(new Response(genericBody, { status: 502 }));
     expect(failure.upstreamCode).not.toBe(CYBER_POLICY_ERROR_CODE);
     expect(failure.response.status).toBe(502);
   });

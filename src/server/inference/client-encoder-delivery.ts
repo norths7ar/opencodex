@@ -52,10 +52,10 @@ const CLIENT_SSE_HEADERS = {
  */
 export function directEncodersApply(
   config: Pick<OcxConfig, "protocols">,
-  route: { combo?: unknown; routeKind?: string; provider: { adapter: string } } | null | undefined,
+  route: { routeKind?: string; provider: { adapter: string } } | null | undefined,
 ): boolean {
   if (!route || !resolveProtocolSettings(config).rollout.directEncoders) return false;
-  if (route.combo !== undefined || route.routeKind === "policy") return false;
+  if (route.routeKind === "policy") return false;
   return upstreamWireForAdapter(route.provider.adapter) !== "responses";
 }
 
@@ -66,14 +66,14 @@ export function directEncodersApply(
  * compaction turn must emit its synthetic item, and a Responses-wire upstream stays as it is.
  */
 export function clientEncoderForDelivery(
-  options: Pick<HandleResponsesOptions, "clientEncoder" | "comboAttempt">,
+  options: Pick<HandleResponsesOptions, "clientEncoder">,
   logCtx: Pick<RequestLogContext, "routeDecision">,
   routedCompaction: boolean,
   adapterName: string,
 ): ClientEncoderOption | undefined {
   const encoder = options.clientEncoder;
-  if (!encoder || options.comboAttempt || routedCompaction) return undefined;
-  if (logCtx.routeDecision?.routeKind === "policy" || logCtx.routeDecision?.routeKind === "combo") return undefined;
+  if (!encoder || routedCompaction) return undefined;
+  if (logCtx.routeDecision?.routeKind === "policy") return undefined;
   if (upstreamWireForAdapter(adapterName) === "responses") return undefined;
   return encoder;
 }

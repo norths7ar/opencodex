@@ -134,8 +134,8 @@ export function setPluginAclInspectorForTests(inspector?: (path: string) => stri
 /** Refuse extended ACLs: mode bits alone cannot prove who can rewrite a plugin path. */
 function aclTrustError(path: string): string | null {
   if (pluginAclInspectorForTests) return pluginAclInspectorForTests(path);
-  if (process.platform !== "darwin" && process.platform !== "linux") return null;
-  const mac = process.platform === "darwin";
+  if ((process.platform !== "linux")) return null;
+  const mac = false;
   // CI and operator PATHs may put GNU coreutils ahead of the macOS tool.
   // GNU ls does not support -e, so pin the OS ACL inspector.
   const probe = () => spawnSync(mac ? "/bin/ls" : "getfacl", mac

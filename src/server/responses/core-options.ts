@@ -1,7 +1,7 @@
 import type { ClientFacingModelLabel } from "../../lib/error-destination";
-import type { CodexAccountModelRefusal } from "../../combos/failover";
+import type { CodexAccountModelRefusal } from "../../routing/candidate-failure";
 import type { NativeResponseControl } from "./native-response-control";
-import type { AdapterEvent, OcxUsage, OcxProviderContinuationState, OcxConfig } from "../../types";
+import type { AdapterEvent, OcxConfig } from "../../types";
 import type { RouteResult } from "../../router";
 import type { SingleUseDispatchPermit } from "../../lib/request-execution-budget";
 import type { CodexAuthPolicyConfig, CodexAuthContext } from "../../codex/auth-context";
@@ -28,7 +28,7 @@ import type { PolicyRequestScope } from "./policy-request-scope";
 import type { OcxParsedRequest } from "../../types";
 import type { PolicyRequestEvidence } from "../../routing/evaluator";
 
-export interface ConsumedComboFailure {
+export interface ConsumedRecoveryFailure {
   response: Response;
   classificationText: string;
   /** Complete bounded-envelope evidence captured before display truncation; never serialized. */
@@ -39,19 +39,13 @@ export interface ConsumedComboFailure {
   upstreamMessage?: string;
   /** Complete structured provider type, retained for conservative recovery classification. */
   upstreamType?: string;
-  /** Valid numeric/date value used only for cooldown calculation. */
-  retryAfter?: string;
-  /** Upstream Codex quota-window reset timestamps used for combo cooldowns. */
-  resetAt?: string[];
-  /** Reserved for 040 usage attribution without adding another body read. */
-  usage?: OcxUsage;
   /**
    * The failed attempt's response was marked non-replayable, such as the answer to a spent
    * ambiguous-reset replacement. The re-wrapped {@link response} cannot carry that in-memory
-   * marker, so the combo loop reads it here and stops instead of sending the turn to a later target.
+   * marker, so the recovery wrapper must read it here before considering another send.
    */
   nonReplayable?: boolean;
-  /** The failed attempt was an adapter-normalized plan refusal; only this grants its combo hop. */
+  /** The failed attempt was an adapter-normalized plan refusal; only this grants candidate fallback. */
   verifiedPlanRefusal?: boolean;
 }
 
@@ -99,12 +93,10 @@ export interface DirectRequestOption {
 export interface HandleResponsesOptions {
   /** Original caller label, carried through synthetic children without route substitution. */
   clientModelLabel?: ClientFacingModelLabel;
-  /** Original client envelope label when a combo was selected by a synthetic rewrite. */
-  clientResponseModelLabel?: ClientFacingModelLabel;
   /** Immutable caller scope inherited by a capability-authenticated internal sidecar request. */
   admissionScope?: AdmissionModelScope;
   /** Captured synchronously at ingress, before parsing or child replay can suspend. */
-  advisorAdmissionPolicy?: import("../../types/admission-policy").CapturedAdmissionPolicy;
+  sidecarAdmissionPolicy?: import("../../types/admission-policy").CapturedAdmissionPolicy;
   /** Internal request-owned policy authorization; never read from client headers or body. */
   policyRequestScope?: PolicyRequestScope;
   /** Internal concrete selector chosen from the original policy evaluation. */
@@ -129,11 +121,6 @@ export interface HandleResponsesOptions {
   codexAuthPolicy?: CodexAuthPolicyConfig;
   turnAdmissionLease?: AdmissionLease;
   /**
-   * A JEV decision-model call issued by a combo. It never carries caller credentials, is never
-   * rewritten by memory or shadow-call routing, and may not dispatch into a JEV combo.
-   */
-  internalDecisionCall?: boolean;
-  /**
    * How the caller proved data-plane admission (#1686).
    *
    * A bearer-presented admission secret is one of OUR OWN secrets, so a Direct turn must
@@ -143,7 +130,7 @@ export interface HandleResponsesOptions {
    */
   admission?: DataPlaneAdmission;
   /**
-   * Internal caller identity captured before Combo strips provisional credentials. An existing
+   * Internal caller identity captured before translated requests drop caller credentials. An existing
    * holder with no principal preserves keyless replay; never populate it from client data.
    */
   replayPrincipal?: Readonly<{ clientPrincipalId: string | undefined }>;
@@ -202,10 +189,8 @@ export interface HandleResponsesOptions {
   anthropicSystemCachePrefix?: string;
   /** Metadata-qualified Messages discovery evidence, never caller JSON or a preselected destination. */
   anthropicToolLoadingSource?: Readonly<Record<string, unknown>>;
-  /** Droid's per-request effort default; each concrete combo or policy target applies it only if its ladder allows it. */
+  /** Droid's per-request effort default; each concrete policy target applies it only if its ladder allows it. */
   droidDefaultEffort?: string;
-  /** PF-07: the Chat source a combo child may send natively; set only by the Chat ingress. */
-  protocolSource?: import("./core-combo-native").ComboProtocolSource;
   /** Internal transport identity for route-scoped upstream compatibility policy. */
   inboundTransport?: "websocket";
   /**
@@ -224,70 +209,35 @@ export interface HandleResponsesOptions {
   nativeCallerAuth?: ExplicitOpenAiCallerAuth | null;
   /** Caller Direct credential under Direct\'s own predicate; restored only for the canonical OpenAI final route. */
   callerDirectAuth?: CallerDirectAuth | null;
-  /** Internal recursion guard; callers outside this module must not set it. */
-  comboAttempt?: boolean;
-  /**
-   * Set by the combo loop for each child. A child logs into its own context, which the combo
-   * copies once when the child commits, and the bridge reports usage after that, at the terminal
-   * frame. The transport calls this when it binds that usage on the child's context, so the combo
-   * can carry the binding to the context that writes the row.
-   */
-  onBridgeUsageBound?: () => void;
-  /** Child-owned prepaid initial send; capacity remains charged until dispatch or unsent release. */
-  comboInitialSend?: { permit: SingleUseDispatchPermit; producerOwned?: boolean };
-  /** Exact externally booked combo hop, used for its child's spend preflight and send reports. */
-  comboDispatchPermit?: SingleUseDispatchPermit;
-  /** Internal handoff: this combo was selected by shadow-call interception. */
+  /** Internal handoff: the selected route was rewritten by shadow-call interception. */
   shadowCallIntercepted?: boolean;
-  /** Internal handoff: the memory phase this turn belongs to, so combo children keep its routing. */
+  /** Internal handoff: the memory phase this turn belongs to, so policy fallback keeps its routing. */
   memoryModelPhase?: "extract" | "consolidation";
   compactionRoutingOverride?: CompactionRoutingOverride | null;
   /** Internal handoff: the hard-lock fallback rewrote this turn; the log shows `sourceModel`. */
   mainHardLockFallbackOverride?: MainHardLockFallbackOverride | null;
-  /** Internal combo handoff for one parent-validated continuation snapshot. */
-  comboReplaySnapshot?: {
-    sourceBody: unknown;
-    previousResponseInputExpanded: boolean;
-    providerContinuation: OcxProviderContinuationState | undefined;
-    recoveredPlaintext: boolean;
-  };
-  /** Internal combo handoff: allow a later same-provider model after a reset-derived 429/402. */
-  deferCodexResetDerivedCooldown?: boolean;
-  /** 030-owned handoff when a child consumed the original failure under bounds. */
-  onConsumedComboFailure?: (failure: ConsumedComboFailure) => void;
   /** A stored Pool credential was refreshed and its one allowed same-account replay was sent. */
   onStoredPool401ReplayDispatched?: () => void;
   /** Caller-owned for Chat/Claude replay; omitted only at genuine Responses ingress. */
   translatorBudget?: TranslatorBudget;
   /**
-   * Transient sends already spent by this logical request. Combo children inherit the parent's
-   * holder through the options spread, so a fan-out shares one allowance instead of taking a
-   * fresh one per target (#4546).
+   * Shared send budget for the logical request.
    */
   sendBudget?: TransientSendBudget;
   /**
    * Terminal vision-describe marker (roadmap 180): true when the inbound
    * request IS the vision sidecar's own loopback describe call. The plan site
    * then STRIPS images instead of planning another describe — a depth cap of 1
-   * that holds under predicate drift and combo re-resolution. The Chat surface
+   * that holds after a route change. The Chat surface
    * detects the raw `x-opencodex-vision-describe` header before its bridge
    * rebuilds headers and carries the fact through this flag.
    */
   visionDescribeTerminal?: boolean;
   /**
-   * Terminal advisor marker: true when the inbound request IS the advisor sidecar's own loopback
-   * consultation. The advisor planner then never plans a consultation — a depth cap of 1 that
-   * keeps Worker → Advisor → Advisor recursion impossible (same structure as
-   * {@linkcode visionDescribeTerminal}). The Chat surface detects the raw
-   * `x-opencodex-advisor-internal` header before its bridge rebuilds headers and carries the
-   * fact through this flag.
-   */
-  advisorInternal?: boolean;
-  /**
    * Set only by the Chat and Messages ingresses when `protocols.rollout.directEncoders` is on and
    * the settled route is one non-Responses target. Adapter delivery then encodes the adapter
    * events straight into the client's wire and returns a response marked with `markClientWire`.
-   * Passthrough, run-turn adapters, combo children and compaction turns ignore it and keep
+   * Passthrough, run-turn adapters and compaction turns ignore it and keep
    * returning a Responses body, which the ingress converts as before.
    */
   clientEncoder?: ClientEncoderOption;
@@ -315,8 +265,7 @@ export interface PassthroughAdmissionState {
   lease: UpstreamHostAdmissionLease | null;
 }
 
-/** Recursive combo children enter the same ingress without a runtime import cycle. */
+/** Recovery requests enter the same ingress without a runtime import cycle. */
 export interface ResponsesDispatchers {
   handleResponses(req: Request, config: OcxConfig, logCtx: RequestLogContext, options?: HandleResponsesOptions): Promise<Response>;
-  handleComboResponses(req: Request, body: unknown, comboId: string, config: OcxConfig, logCtx: RequestLogContext, options: HandleResponsesOptions & { translatorBudget: TranslatorBudget }): Promise<Response>;
 }

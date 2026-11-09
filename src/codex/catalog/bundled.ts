@@ -18,14 +18,6 @@ import { CODEX_GPT5_IDENTITY_LINE } from "../../adapters/identity";
 import { filterCursorConfiguredModelsByLiveDiscovery } from "../../adapters/cursor/discovery";
 import { fetchCursorUsableModels } from "../../adapters/cursor/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
-import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
 import { providerDestinationResolvedError } from "../../lib/destination-policy";
 import { redactSecretString } from "../../lib/redact";
 import { isPassiveRead } from "../../lib/passive-read";

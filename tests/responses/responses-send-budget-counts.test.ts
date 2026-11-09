@@ -1,11 +1,9 @@
 import { shouldRetryCodexPoolAccountQuota, shouldRetryCodexPoolAccountTransient } from "../../src/server/responses/core-codex-account";
-import { consumeComboFailure } from "../../src/server/responses/core-combo-failure";
+import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
 import { fetchWithResetRetry, isNonReplayableResponse } from "../../src/lib/upstream-retry";
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
 import { handleResponses } from "../../src/server/responses/core";
-import { COMBO_TARGET_BASE_SENDS, comboExecutionBudgetPolicy } from "../../src/server/responses/core-combo";
 import type { RequestLogContext } from "../../src/server/request-log";
 import type { OcxConfig } from "../../src/types";
 import { DEVIN_API_SERVER } from "../../src/adapters/devin";
@@ -43,8 +41,6 @@ const takeSpendHome = (): void => { releaseSpendHome = acquireOwnedSpendHome(); 
 const dropSpendHome = (): void => { releaseSpendHome?.(); releaseSpendHome = undefined; };
 
 beforeEach(() => {
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearKeyCooldowns();
 });
 
@@ -52,8 +48,6 @@ afterEach(() => {
   dropSpendHome();
   globalThis.fetch = originalFetch;
   setCachedCatalogForTests(null);
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearKeyCooldowns();
 });
 
@@ -282,127 +276,6 @@ describe("upstream sends per logical request", () => {
     expect(totalSends(logCtx)).toBe(3);
   });
 
-  test("a one-target combo reduces to exactly the single-target shape", async () => {
-    const upstream = alwaysFailing(502, "upstream busy");
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), comboOverTargets(1), logCtx);
-
-    expect(response.status).toBe(502);
-    await response.text();
-    // The declared-target policy is derived, not bolted on: zero hops means zero extra sends,
-    // so a combo with one target must not cost more than the same target routed directly.
-    expect(upstream.authorizations).toHaveLength(3);
-    expect(sendCounts(logCtx)).toEqual([3]);
-  });
-
-  test("a denied first combo reservation makes no upstream request", async () => {
-    const upstream = alwaysFailing(502, "upstream busy");
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    const denied = createRequestExecutionBudget();
-    // Combo derives its own policy while sharing this counter; spend past that derived cap.
-    denied.used = comboExecutionBudgetPolicy(2).maxTotalModelSends;
-
-    takeSpendHome();
-    const response = await handleResponses(
-      responsesRequest("combo/fan"), comboOverTargets(2), logCtx, { sendBudget: denied },
-    );
-    const body = await response.text();
-    expect(response.status).toBe(429);
-    expect(body).toContain("request_send_budget_exhausted");
-    expect(upstream.authorizations).toHaveLength(0);
-    expect(totalSends(logCtx)).toBe(0);
-  });
-
-  test("a denied later combo reservation returns the prior upstream failure", async () => {
-    const budget = createRequestExecutionBudget();
-    const hits: string[] = [];
-    globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-      hits.push(new Headers(init?.headers).get("authorization") ?? "");
-      budget.used = comboExecutionBudgetPolicy(2).maxTotalModelSends;
-      return Response.json({ error: { message: "first target busy", type: "rate_limit_error" } }, { status: 429 });
-    }) as typeof fetch;
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-
-    takeSpendHome();
-    const response = await handleResponses(
-      responsesRequest("combo/fan"), comboOverTargets(2), logCtx, { sendBudget: budget },
-    );
-    expect(response.status).toBe(429);
-    expect(await response.text()).toContain("first target busy");
-    expect(hits).toEqual(["Bearer sk-t0"]);
-  });
-
-  test("a denied later combo reservation preserves a classified 413 response", async () => {
-    const budget = createRequestExecutionBudget();
-    const hits: string[] = [];
-    globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-      hits.push(new Headers(init?.headers).get("authorization") ?? "");
-      budget.used = comboExecutionBudgetPolicy(2).maxTotalModelSends;
-      return Response.json({ error: { message: "maximum context length exceeded", type: "invalid_request_error" } }, { status: 413 });
-    }) as typeof fetch;
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-
-    takeSpendHome();
-    const response = await handleResponses(
-      responsesRequest("combo/fan"), comboOverTargets(2), logCtx, { sendBudget: budget },
-    );
-    expect(response.status).toBe(413);
-    expect(await response.text()).toContain("maximum context length exceeded");
-    expect(hits).toEqual(["Bearer sk-t0"]);
-  });
-
-  test("a three-target combo fan-out gives every declared target a send and stays bounded", async () => {
-    const upstream = alwaysFailing(502, "upstream busy");
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), comboOverTargets(3), logCtx);
-
-    expect(response.status).toBe(502);
-    await response.text();
-    // Asserted as the INVARIANT the derived policy guarantees, not as a fixture vector. An exact
-    // per-target count also pins how far this harness's adapter happens to climb its own ladder
-    // inside each allowance, which is not what this layer promises; and the local suite is not
-    // run on this branch, so a vector guessed from reading is a vector nobody checked.
-    const bearers = upstream.authorizations;
-    // Every declared target is reached. Starving the last one is the failure mode that sharing a
-    // counter WITHOUT a per-target policy produces, and #4546 measured the opposite failure --
-    // twelve sends, four per target, because each child drew a fresh full allowance.
-    expect(new Set(bearers).size).toBe(3);
-    expect(bearers[0]).toBe("Bearer sk-t0");
-    expect(bearers).toContain("Bearer sk-t2");
-    // The first target keeps a whole ladder to itself.
-    expect(sendCounts(logCtx)[0]).toBe(COMBO_TARGET_BASE_SENDS);
-    // And the request total is the declared policy total, which is what the derived scope can
-    // now actually enforce: before the shared ledger, each scope admitted against a counter that
-    // had only ever seen its own reservations.
-    expect(totalSends(logCtx)).toBeLessThanOrEqual(comboExecutionBudgetPolicy(3).maxTotalModelSends);
-    expect(totalSends(logCtx)).toBe(bearers.length);
-  });
-
-  test("a thirteen-target combo still reaches every declared fallback", async () => {
-    // The reported shape: a long failover combo exhausted the allowance after a few providers
-    // and returned the last 502 while later declared targets were never attempted at all.
-    const upstream = alwaysFailing(502, "upstream busy");
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), comboOverTargets(13), logCtx);
-
-    expect(response.status).toBe(502);
-    await response.text();
-    const bearers = upstream.authorizations;
-    expect(new Set(bearers).size).toBe(13);
-    for (let index = 0; index < 13; index += 1) {
-      expect(bearers).toContain(`Bearer sk-t${index}`);
-    }
-    expect(bearers[0]).toBe("Bearer sk-t0");
-    expect(sendCounts(logCtx)[0]).toBe(COMBO_TARGET_BASE_SENDS);
-    expect(totalSends(logCtx)).toBeLessThanOrEqual(comboExecutionBudgetPolicy(13).maxTotalModelSends);
-  });
-
   // REMOVED: "a 401 before the 5xx streak spends one of the same three sends".
   //
   // The row asserted a key rotation this harness never performs: the fixture records exactly one
@@ -417,62 +290,8 @@ describe("upstream sends per logical request", () => {
 describe("ambiguous reset safety across Responses recovery", () => {
   for (const adapter of ["openai-chat", "openai-responses"]) {
     for (const combo of [false, true]) {
-      test(`${adapter}: no replay or target hop after an ambiguous reset (combo=${combo})`, async () => {
-        const config = comboOverTargets(2);
-        for (const provider of Object.values(config.providers)) provider.adapter = adapter;
-        const authorizations: string[] = [];
-        globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-          authorizations.push(new Headers(init?.headers).get("authorization") ?? "");
-          throw Object.assign(new Error("The socket connection was closed unexpectedly."), { code: "ECONNRESET" });
-        }) as typeof fetch;
-        const logCtx: RequestLogContext = { model: "", provider: "" };
-        takeSpendHome();
-        const response = await handleResponses(
-          responsesRequest(combo ? "combo/fan" : "t0/model-t0"), config, logCtx,
-        );
-        expect(response.status).toBe(429);
-        const payload = await response.json();
-        expect(payload.error.code).toBe("upstream_reset_replay_refused");
-        expect(authorizations).toEqual(["Bearer sk-t0"]);
-        expect(totalSends(logCtx)).toBe(1);
-      });
     }
   }
-
-  test("a provider 503 policy is retained, but the following reset cannot reach a combo sibling", async () => {
-    const authorizations: string[] = [];
-    globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-      authorizations.push(new Headers(init?.headers).get("authorization") ?? "");
-      if (authorizations.length === 1) {
-        return new Response(JSON.stringify({ error: { message: "busy" } }), {
-          status: 503, headers: { "content-type": "application/json" },
-        });
-      }
-      throw Object.assign(new Error("connection reset by peer"), { code: "ECONNRESET" });
-    }) as typeof fetch;
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), comboOverTargets(2), logCtx);
-    expect(response.status).toBe(429);
-    expect((await response.json()).error.code).toBe("upstream_reset_replay_refused");
-    expect(authorizations).toEqual(["Bearer sk-t0", "Bearer sk-t0"]);
-    expect(totalSends(logCtx)).toBe(2);
-  });
-
-  test("reset-only providers stop too, without opting into the transient policy", async () => {
-    const config = comboOverTargets(2);
-    for (const provider of Object.values(config.providers)) delete provider.transientRetryOn5xx;
-    let sends = 0;
-    globalThis.fetch = (async () => {
-      sends += 1;
-      throw Object.assign(new Error("reset"), { code: "ECONNRESET" });
-    }) as typeof fetch;
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), config, { model: "", provider: "" });
-    expect(response.status).toBe(429);
-    expect((await response.json()).error.code).toBe("upstream_reset_replay_refused");
-    expect(sends).toBe(1);
-  });
 
   test("an OpenCode Go destination refuses an ambiguous pre-answer reset instead of replaying", async () => {
     // The removed replaySafe exception let the first send to this destination retry a
@@ -497,25 +316,6 @@ describe("ambiguous reset safety across Responses recovery", () => {
 });
 
 describe("ambiguous reset safety after outer recovery", () => {
-  test("a 429 recovery refetch cannot launder a subsequent reset into a combo hop", async () => {
-    const config = comboOverTargets(2);
-    config.providers.t0!.retryOn429 = { attempts: 1 };
-    const authorizations: string[] = [];
-    globalThis.fetch = (async (_input: string | URL | Request, init?: RequestInit) => {
-      authorizations.push(new Headers(init?.headers).get("authorization") ?? "");
-      if (authorizations.length === 1) return new Response("rate limited", {
-        status: 429, headers: { "retry-after": "0" },
-      });
-      throw Object.assign(new Error("connection reset by peer"), { code: "ECONNRESET" });
-    }) as typeof fetch;
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    takeSpendHome();
-    const response = await handleResponses(responsesRequest("combo/fan"), config, logCtx);
-    expect(response.status).toBe(429);
-    expect((await response.json()).error.code).toBe("upstream_reset_replay_refused");
-    expect(authorizations).toEqual(["Bearer sk-t0", "Bearer sk-t0"]);
-    expect(totalSends(logCtx)).toBe(2);
-  });
 
   // The row above arms ONE same-target attempt, so the refusal it produces arrives with the
   // arm already spent and nothing left to replay it. That is the case the guard at the top of
@@ -549,19 +349,4 @@ describe("ambiguous reset safety after outer recovery", () => {
       expect(totalSends(logCtx)).toBe(2);
     });
   }
-
-  test("account and combo recovery retain the no-replay verdict after one body read", async () => {
-    const response = await fetchWithResetRetry(async () => {
-      throw Object.assign(new Error("reset"), { code: "ECONNRESET" });
-    });
-    expect(shouldRetryCodexPoolAccountTransient(response)).toBe(false);
-    expect(await shouldRetryCodexPoolAccountQuota(response)).toBe(false);
-    const failure = await consumeComboFailure(response);
-    expect(failure.upstreamCode).toBe("upstream_reset_replay_refused");
-    expect(isNonReplayableResponse(failure.response)).toBe(true);
-    expect(shouldRetryCodexPoolAccountTransient(failure.response)).toBe(false);
-    expect(await shouldRetryCodexPoolAccountQuota(failure.response)).toBe(false);
-    expect(failure.response.headers.get("retry-after")).toBeNull();
-    expect((await failure.response.json()).error.code).toBe("upstream_reset_replay_refused");
-  });
 });

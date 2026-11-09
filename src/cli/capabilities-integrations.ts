@@ -139,10 +139,10 @@ export const INTEGRATION_CAPABILITIES: readonly Capability[] = [
   },
   {
     command: ["claude", "config", "set"],
-    usage: "ocx claude config set [--enabled <on|off>] [--auth-mode <auto|proxy|subscription>] [--system-env <on|off>] [--fast-mode <on|off>] [--auto-context <on|off>] [--compact-window <tokens|default>] [--context-accounting <1m|200k>] [--inject-agents <on|off>] [--small-fast-model <id|->] [--model-map <from=to,...|->] [--blocked-skills <name,name|->] [--web-model <id|->] [--web-backend <openai|anthropic|xai|gemini|exa|->] [--vision-model <id|->] [--vision-backend <openai|anthropic|->] [--json]; or ocx claude config set --first-party <on|off> [--json]",
+    usage: "ocx claude config set [--enabled <on|off>] [--auth-mode <auto|proxy|subscription>] [--fast-mode <on|off>] [--auto-context <on|off>] [--compact-window <tokens|default>] [--context-accounting <1m|200k>] [--inject-agents <on|off>] [--small-fast-model <id|->] [--model-map <from=to,...|->] [--blocked-skills <name,name|->] [--web-model <id|->] [--web-backend <openai|anthropic|xai|gemini|exa|->] [--vision-model <id|->] [--vision-backend <openai|anthropic|->] [--json]; or ocx claude config set --first-party <on|off> [--json]",
     summary: "Change Claude Code settings through the runtime owner.",
     routes: [{"method": "PUT", "path": "/api/claude-code"}],
-    flags: [{"name": "--enabled", "value": "string", "summary": "on or off."}, {"name": "--auth-mode", "value": "string", "summary": "auto, proxy or subscription."}, {"name": "--system-env", "value": "string", "summary": "on or off."}, {"name": "--fast-mode", "value": "string", "summary": "on or off."}, {"name": "--auto-context", "value": "string", "summary": "on or off."}, {"name": "--compact-window", "value": "string", "summary": "Positive token count or default to clear."}, {"name": "--context-accounting", "value": "string", "summary": "1m (default) or 200k."}, {"name": "--inject-agents", "value": "string", "summary": "on or off."}, {"name": "--small-fast-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--model-map", "value": "string", "summary": "Comma-separated from=to mappings; - clears."}, {"name": "--blocked-skills", "value": "string", "summary": "Comma-separated names; - clears."}, {"name": "--web-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--web-backend", "value": "string", "summary": "openai, anthropic, xai, gemini, exa or -."}, {"name": "--vision-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--vision-backend", "value": "string", "summary": "openai, anthropic or -."}, {"name": "--first-party", "value": "string", "summary": "on or off; must be the only setting."}, {"name": "--json", "value": "boolean", "summary": "Emit the result as JSON."}],
+    flags: [{"name": "--enabled", "value": "string", "summary": "on or off."}, {"name": "--auth-mode", "value": "string", "summary": "auto, proxy or subscription."}, {"name": "--fast-mode", "value": "string", "summary": "on or off."}, {"name": "--auto-context", "value": "string", "summary": "on or off."}, {"name": "--compact-window", "value": "string", "summary": "Positive token count or default to clear."}, {"name": "--context-accounting", "value": "string", "summary": "1m (default) or 200k."}, {"name": "--inject-agents", "value": "string", "summary": "on or off."}, {"name": "--small-fast-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--model-map", "value": "string", "summary": "Comma-separated from=to mappings; - clears."}, {"name": "--blocked-skills", "value": "string", "summary": "Comma-separated names; - clears."}, {"name": "--web-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--web-backend", "value": "string", "summary": "openai, anthropic, xai, gemini, exa or -."}, {"name": "--vision-model", "value": "string", "summary": "Model ID; - clears."}, {"name": "--vision-backend", "value": "string", "summary": "openai, anthropic or -."}, {"name": "--first-party", "value": "string", "summary": "on or off; must be the only setting."}, {"name": "--json", "value": "boolean", "summary": "Emit the result as JSON."}],
     mutates: true,
     json: "payload",
     details: ["At least one setting is required. --first-party must be set alone and writes Claude settings immediately.", "Clear both helper model and backend with - to restore inheritance. Preserve shared_proxy_retained warnings."],
@@ -266,15 +266,5 @@ export const INTEGRATION_CAPABILITIES: readonly Capability[] = [
     mutates: false,
     json: "payload",
     details: ["Status can gather model inventory but does not install or toggle Cursor. A displayed placeholder does not authorize a credential-required listener."],
-  },
-  {
-    command: ["integration","native","cursor","local-installer"],
-    usage: "ocx integration native cursor local-installer [--json]",
-    summary: "Read the available Cursor installer link without downloading or installing it.",
-    routes: [{"method":"GET","path":"/api/native-integrations/cursor/local-installer"}],
-    flags: [{"name":"--json","value":"boolean","summary":"Emit one validated task result as JSON."}],
-    mutates: false,
-    json: "payload",
-    details: ["May fetch the public update manifest. available:false and nullable reason are valid observations; no installation or trust change is performed."],
   },
 ];

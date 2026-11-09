@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { PROVIDER_REGISTRY } from "../../src/providers/registry";
 import { providerIconSrc } from "../src/provider-icons";
 
-const PUBLIC_DIR = join(import.meta.dir, "..", "public", "provider-icons");
+const PUBLIC_DIR = join(import.meta.dir, "../public/provider-icons");
 
 /**
  * Asset filenames that could plausibly belong to a provider id.

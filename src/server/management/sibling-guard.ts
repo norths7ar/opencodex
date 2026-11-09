@@ -9,7 +9,7 @@ import { CODEX_RESTART_PATH } from "../../lib/codex-restart-contract";
  * routes reach shared client state through paths those gates do not cover, so the sibling's own
  * management API refuses them outright: toggling or stripping the live owner's Codex, Grok or Claude
  * integrations, rewriting client files at this port, the Codex prompt layers and `[features]`
- * written into the shared `config.toml`, killing the user's Codex app-servers, joining a link (which
+ * written into the shared `config.toml`, killing the user's Codex app-servers (which
  * writes the shared catalog and restarts as a client), staging or switching the physical native-main
  * login, baking the machine service, PATH shim or tray from this home, replacing the global package
  * (the live proxy drains on its package-tree refresh), Codex's own log database, and the
@@ -37,12 +37,8 @@ export const SIBLING_REFUSED_MANAGEMENT_PATHS: readonly { readonly path: string;
   { path: "/api/codex-prompt", children: true },
   { path: "/api/codex-agent-roles", children: true },
   { path: CODEX_RESTART_PATH, children: false },
-  { path: "/api/link/join", children: false },
-  { path: "/api/native-main-profiles", children: true },
   { path: "/api/codex-auth/main", children: true },
   { path: "/api/startup-action", children: false },
-  { path: "/api/windows-tray", children: false },
-  { path: "/api/update/run", children: false },
   { path: "/api/v2", children: false },
   { path: "/api/codex-auth/features", children: true },
   { path: "/api/storage/codex-logs", children: true },

@@ -5,7 +5,6 @@ import DefaultModeRequestUserInputSetting from "../components/DefaultModeRequest
 import UltraFastTierSetting from "../components/UltraFastTierSetting";
 import MainAccountHardLockSetting from "../components/MainAccountHardLockSetting";
 import { useCodexAccountPool } from "../hooks/useCodexAccountPool";
-import CodexAccountPickerSetting from "../components/CodexAccountPickerSetting";
 import { codexAccountModeState, type CodexAccountModeState } from "../codex-multi-state";
 import { navigateHash } from "../hash-routing";
 import { ensureOpenAiProvider, openAiAccountProviderState, OpenAiEnableError } from "../provider-payload";
@@ -15,58 +14,14 @@ import { createBoundedFetch } from "../bounded-fetch";
 
 export type OpenAiAccountBannerState = CodexAccountModeState | "invalid" | null;
 
-export function OpenAiAccountModeBanner({
-  state,
-  busy,
-  onEnable,
-}: {
-  state: OpenAiAccountBannerState;
-  busy: boolean;
-  onEnable: () => void;
-}) {
+export function OpenAiAccountModeBanner({ state, busy, onEnable }: { state: OpenAiAccountBannerState; busy: boolean; onEnable: () => void }) {
   const t = useT();
-  // Nothing is known yet: an empty titled card is a blank slab that later jumps when
-  // /api/config arrives. Render nothing and let the pool section own the space.
-  if (state === null) return null;
-  return (
-    <div className="panel openai-account-mode-banner" style={{ marginBottom: 16 }}>
-      <div className="row">
-        <strong>{t("codexAuth.accountModeTitle")}</strong>
-        {state === "pool" ? (
-          <span className="badge badge-accent openai-account-mode-banner__badge-slot">{t("codexAuth.accountModePool")}</span>
-        ) : state === "direct" ? (
-          <span className="badge badge-green openai-account-mode-banner__badge-slot">{t("codexAuth.accountModeDirect")}</span>
-        ) : null}
-      </div>
-      {state === "pool" && (
-        <p className="card-sub openai-account-mode-banner__desc">{t("codexAuth.accountModePoolDesc")}</p>
-      )}
-      {state === "direct" && (
-        <p className="card-sub openai-account-mode-banner__desc">
-          {t("codexAuth.accountModeDirectDesc")}{" "}
-          <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>
-            {t("codexAuth.openProviders")}
-          </button>
-        </p>
-      )}
-      {(state === "absent" || state === "disabled") && (
-        <div className="row" style={{ alignItems: "center", marginTop: 8 }}>
-          <p className="card-sub" style={{ flex: 1, margin: 0 }}>{t("codexAuth.openaiUnavailableDesc")}</p>
-          <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={onEnable}>
-            {busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}
-          </button>
-        </div>
-      )}
-      {state === "invalid" && (
-        <p className="card-sub openai-account-mode-banner__desc">
-          {t("codexAuth.openaiMissing")}{" "}
-          <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>
-            {t("codexAuth.openProviders")}
-          </button>
-        </p>
-      )}
-    </div>
-  );
+  if (state === null || state === "pool" || state === "direct") return null;
+  return <div className="panel openai-account-mode-banner">
+    <p className="card-sub">{t(state === "invalid" ? "codexAuth.openaiMissing" : "codexAuth.openaiUnavailableDesc")}</p>
+    {state === "invalid" ? <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>{t("codexAuth.openProviders")}</button>
+      : <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={onEnable}>{busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}</button>}
+  </div>;
 }
 
 function openaiProviderFromConfig(config: unknown): {
@@ -215,7 +170,6 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
         accountModeState={accountModeState}
         banner={banner}
         advancedExtras={<>
-          <CodexAccountPickerSetting apiBase={apiBase} />
           <DefaultModeRequestUserInputSetting apiBase={apiBase} />
           <UltraFastTierSetting apiBase={apiBase} />
           <MainAccountHardLockSetting apiBase={apiBase} onSaved={onHardLockSaved} />

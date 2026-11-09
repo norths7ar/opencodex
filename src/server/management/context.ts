@@ -1,7 +1,5 @@
 import type { OcxConfig } from "../../types";
 import type { LowQuotaEvent } from "../../codex/low-quota-events";
-import type { Channel } from "../../update/index";
-import type { UpdateCheckResult } from "../../update/job";
 import type { NativeProfileApiDeps } from "../../codex/native-profile-api";
 import type { CodexLogGuardProtectionDeps } from "../../codex/log-guard/protection";
 import type { CodexLogGuardMaintenanceDeps } from "../../codex/log-guard/maintenance";
@@ -24,20 +22,7 @@ import type {
 } from "../../codex/app-server-restart-service";
 import type { RequestMetricsSnapshotter } from "../request-metrics";
 
-import type { RemoteWorkspaceHub } from "../../remote-control/workspace-hub";
-import type { RemoteWorkspaceSessionService } from "../../remote-control/workspace-sessions";
-import type { LinkSupervisor } from "../../link/supervisor";
-import type { LinkListenerLifecycle } from "../index/link-listener";
-import type { SshRunner } from "../../link/ssh-runner";
-import type { LinkStore } from "../../link/store";
 import type { IssuedApiKey } from "./oauth-account-routes";
-
-export type RemoteWorkspaceHubApi = Pick<RemoteWorkspaceHub,
-  "identity" | "createPairingGrant" | "assertPairingSourceAllowed" | "pairDevice"
-  | "authenticateDeviceToken" | "attachConnection" | "updateDeviceCapabilities"
-  | "detachConnection" | "listDevices" | "revokeDevice" | "closeAllConnections">;
-export type RemoteWorkspaceSessionsApi = Pick<RemoteWorkspaceSessionService,
-  "availability" | "list" | "create" | "prompt" | "submitPrompt" | "stop" | "shutdown">;
 
 export interface ManagementRequestIngress {
   trustedLoopback: boolean;
@@ -53,19 +38,12 @@ export interface ManagementApiDeps {
   listLowQuotaEvents?: (limit?: number) => LowQuotaEvent[];
   /** Bound Claude intercept state, injectable for isolated management-route tests. */
   ensureClaudeIntercept?: () => Promise<import("../../claude/intercept/runtime").ClaudeInterceptOutcome>;
+  claudeIntercept?: () => Pick<import("../index/claude-intercept-lifecycle").ClaudeInterceptLifecycle<unknown>, "ensure" | "lastOutcome">;
   getClaudeInterceptState?: typeof import("../../claude/intercept/runtime").getClaudeInterceptState;
   /** Reconciliation seam for field-scoped rollback tests. */
   reconcileClaudeFirstPartySettings?: typeof import("../../claude/first-party-settings").reconcileClaudeFirstPartySettings;
   /** Read-only process-local aggregate metrics; absent keeps the scrape route unavailable. */
   requestMetrics?: RequestMetricsSnapshotter;
-  checkPackageUpdate?: (channel: Channel) => Promise<UpdateCheckResult>;
-  /** Test seam for the dashboard restart supervisor check (src/update/worker-launch.ts). */
-  dashboardRestartRefusal?: typeof import("../../update/worker-launch").dashboardRestartRefusal;
-  remoteWorkspaceHub?: RemoteWorkspaceHubApi;
-  remoteWorkspaceSessions?: RemoteWorkspaceSessionsApi;
-  /** The listener retains and awaits teardown only after this optional subsystem activates. */
-  remoteWorkspaceStopping?: () => boolean;
-  onRemoteWorkspaceShutdown?: (shutdown: () => Promise<void>) => void;
   /** Isolates automatic owned-client writes in route tests. */
   refreshOwnedCatalogIntegrations?: typeof refreshOwnedCatalogIntegrations;
   /** Platform seam for capability projections; does not alter host-level startup behavior. */
@@ -157,16 +135,8 @@ export interface ManagementApiDeps {
    * `saveConfigPreservingClaudeCode` above exists to prevent.
    */
   codexPromptPaths?: CodexPromptPaths;
-  /** Link seams are getters so the optional listener and supervisor are singletons. */
-  linkSupervisor?: () => LinkSupervisor;
-  linkListener?: () => Pick<LinkListenerLifecycle<unknown>, "ensureStarted" | "status" | "close" | "onAuthenticatedCatalog"> & Partial<Pick<LinkListenerLifecycle<unknown>, "peerObservation">> & Partial<Pick<import("../index/optional-listeners").OptionalListenerSet<unknown>, "ensureClaudeIntercept" | "claudeInterceptOutcome">>;
-  readLinkStore?: () => LinkStore;
-  writeLinkStore?: (store: LinkStore) => void;
-  linkKnownHostsPath?: () => string;
-  sshRunner?: SshRunner;
   issueApiKey?: (config: OcxConfig, name: string) => IssuedApiKey;
   revokeApiKey?: (config: OcxConfig, id: string) => boolean;
-  loadLinkCandidates?: () => Array<{ alias: string; source: "ssh_config" | "tailscale" }>;
   /** Bound public inference port, not the ingress receiving this management request. */
   liveListenPort?: () => number | undefined;
   now?: () => number;

@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { comboConfigError } from "../../src/combos";
 import { providerContextCap } from "../../src/providers/context-cap";
 import { dropProviderCustomModels, rewriteProviderReferences } from "../../src/providers/provider-id-rewrite";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
@@ -35,22 +34,6 @@ test("rewrites every routed-string site", () => {
   expect(config.disabledModels).toContain("anthropic/claude-sonnet-5");
 });
 
-test("rewrites a decisionModel provider prefix while preserving model and synthetic suffixes", () => {
-  const config: OcxConfig = { port: 10100, defaultProvider: TO, providers: {
-    [TO]: { adapter: "openai-chat", baseUrl: "https://provider.example/v1" },
-  }, combos: {
-    auto: { strategy: "jev", targets: [{ provider: TO, model: "target" }], decisionModel: `${FROM}/judge--fast` },
-    foreign: { strategy: "jev", targets: [{ provider: TO, model: "target" }], decisionModel: `${FROM}-extra/judge` },
-    trimmed: { strategy: "jev", targets: [{ provider: TO, model: "target" }], decisionModel: ` ${FROM}/judge--high ` },
-    clear: { strategy: "jev", targets: [{ provider: TO, model: "target" }], decisionModel: null },
-  } };
-  expect(rewriteProviderReferences(config, FROM, TO)).toEqual({ changed: 2, collisions: [] });
-  expect(config.combos?.auto?.decisionModel).toBe(`${TO}/judge--fast`);
-  expect(config.combos?.foreign?.decisionModel).toBe(`${FROM}-extra/judge`);
-  expect(config.combos?.clear?.decisionModel).toBeNull();
-  expect(config.combos?.trimmed?.decisionModel).toBe(`${TO}/judge--high`);
-});
-
 test("moves a providerContextCaps entry by key, not by prefix", () => {
   const config = { providerContextCaps: { [FROM]: 500_000, anthropic: 200_000 } } as unknown as OcxConfig;
   expect(rewriteProviderReferences(config, FROM, TO)).toEqual({ changed: 1, collisions: [] });
@@ -66,51 +49,6 @@ test("reports a providerContextCaps collision instead of overwriting it", () => 
   expect(result.collisions).toEqual([`providerContextCaps.${TO}`]);
   expect(providerContextCap(config, TO)).toBe(900_000);
   expect(providerContextCap(config, FROM)).toBe(500_000);
-});
-
-test("re-points combo targets so the migrated config still validates", () => {
-  const providers = { [TO]: { adapter: "openai-chat" } } as unknown as Record<string, OcxProviderConfig>;
-  const combo = { targets: [{ provider: FROM, model: "qwen3.7-max" }] };
-  const config = { providers, combos: { fast: combo } } as unknown as OcxConfig;
-
-  expect(comboConfigError("fast", combo, providers)).toContain("not configured");
-  rewriteProviderReferences(config, FROM, TO);
-  expect(comboConfigError("fast", config.combos!.fast!, providers)).toBeNull();
-});
-
-test("re-points a JEV combo decisionProvider so the migrated config still validates", () => {
-  const providers = {
-    model: { adapter: "openai-chat" },
-    [TO]: { adapter: "jev-decision", baseUrl: "http://127.0.0.1:11434/v1/systemone" },
-  } as unknown as Record<string, OcxProviderConfig>;
-  const combo = { strategy: "jev", decisionProvider: FROM, targets: [{ provider: "model", model: "m" }] };
-  const untouched = { strategy: "jev", decisionProvider: "jev", targets: [{ provider: "model", model: "m" }] };
-  const config = { providers, combos: { local: combo, canonical: untouched } } as unknown as OcxConfig;
-
-  expect(comboConfigError("local", combo, providers)).toContain("not configured");
-  expect(rewriteProviderReferences(config, FROM, TO).changed).toBe(1);
-  expect(config.combos!.local!.decisionProvider).toBe(TO);
-  expect(config.combos!.canonical!.decisionProvider).toBe("jev");
-  expect(comboConfigError("local", config.combos!.local!, providers)).toBeNull();
-});
-
-test("re-points routingProfiles candidates, a bare provider id like combo targets", () => {
-  // candidates[].provider is validated against configured providers
-  // (src/routing/profile.ts), so a stale id is the same load-failing dangling
-  // reference a combo target is — this site was the gap the devin-cli merge
-  // migration needed covered.
-  const config = {
-    routingProfiles: {
-      policy: {
-        candidates: [
-          { provider: FROM, model: "qwen3.7-max" },
-          { provider: "anthropic", model: "claude-sonnet-5" },
-        ],
-      },
-    },
-  } as unknown as OcxConfig;
-  expect(rewriteProviderReferences(config, FROM, TO).changed).toBe(1);
-  expect(config.routingProfiles!.policy!.candidates.map(c => c.provider)).toEqual([TO, "anthropic"]);
 });
 
 test("re-points customModels[].provider", () => {

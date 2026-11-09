@@ -5,79 +5,24 @@ import DefaultModeRequestUserInputSetting from "../components/DefaultModeRequest
 import UltraFastTierSetting from "../components/UltraFastTierSetting";
 import MainAccountHardLockSetting from "../components/MainAccountHardLockSetting";
 import { useCodexAccountPool } from "../hooks/useCodexAccountPool";
-import CodexAccountPickerSetting from "../components/CodexAccountPickerSetting";
 import { codexAccountModeState, type CodexAccountModeState } from "../codex-multi-state";
 import { navigateHash } from "../hash-routing";
 import { ensureOpenAiProvider, openAiAccountProviderState, OpenAiEnableError } from "../provider-payload";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { startVisibilityPoll } from "../visibility-poll";
 import { createBoundedFetch } from "../bounded-fetch";
-import { HelpButton, HelpRegion, InlineBanner } from "../components/v2-accounts/surface";
-import { useHelp } from "../components/v2-accounts/use-help";
+import { InlineBanner } from "../components/v2-accounts/surface";
 
 export type OpenAiAccountBannerState = CodexAccountModeState | "invalid" | null;
 
-export function OpenAiAccountModeBanner({
-  state,
-  busy,
-  onEnable,
-}: {
-  state: OpenAiAccountBannerState;
-  busy: boolean;
-  onEnable: () => void;
-}) {
+export function OpenAiAccountModeBanner({ state, busy, onEnable }: { state: OpenAiAccountBannerState; busy: boolean; onEnable: () => void }) {
   const t = useT();
-  const help = useHelp();
-  // Nothing is known yet: an empty titled card is a blank slab that later jumps when
-  // /api/config arrives. Render nothing and let the pool section own the space.
-  if (state === null) return null;
-  const settled = state === "pool" || state === "direct";
-  return (
-    // One quiet line when the mode is settled: the mode is the state, its explanation sits
-    // behind the "?". A missing or disabled provider is a problem, so it stays spelled out.
-    <div className={`openai-account-mode-banner acc-mode flex flex-col gap-2 rounded-[12px] px-4 py-3 ring-1 ring-line ${settled ? "bg-transparent" : "bg-surface"}`}>
-      <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1.5">
-        <span className="text-[13px] font-medium text-fg-muted">{t("codexAuth.accountModeTitle")}</span>
-        {state === "pool" ? (
-          <span className="badge openai-account-mode-banner__badge-slot">{t("codexAuth.accountModePool")}</span>
-        ) : state === "direct" ? (
-          <span className="badge openai-account-mode-banner__badge-slot">{t("codexAuth.accountModeDirect")}</span>
-        ) : null}
-        {settled && (
-          <HelpButton open={help.open} controls={help.id} name={t("codexAuth.accountModeTitle")} onToggle={help.toggle} />
-        )}
-        {(state === "absent" || state === "disabled") && (
-          <button type="button" className="btn btn-primary btn-sm ml-auto" disabled={busy} onClick={onEnable}>
-            {busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}
-          </button>
-        )}
-      </div>
-      {settled && (
-        <HelpRegion id={help.id} open={help.open}>
-          {state === "pool" && t("codexAuth.accountModePoolDesc")}
-          {state === "direct" && (
-            <>
-              {t("codexAuth.accountModeDirectDesc")}{" "}
-              <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>
-                {t("codexAuth.openProviders")}
-              </button>
-            </>
-          )}
-        </HelpRegion>
-      )}
-      {(state === "absent" || state === "disabled") && (
-        <p className="card-sub m-0 text-[13px] text-fg-muted">{t("codexAuth.openaiUnavailableDesc")}</p>
-      )}
-      {state === "invalid" && (
-        <p className="card-sub openai-account-mode-banner__desc m-0 text-[13px] text-fg-muted">
-          {t("codexAuth.openaiMissing")}{" "}
-          <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>
-            {t("codexAuth.openProviders")}
-          </button>
-        </p>
-      )}
-    </div>
-  );
+  if (state === null || state === "pool" || state === "direct") return null;
+  return <div className="panel openai-account-mode-banner">
+    <p className="card-sub">{t(state === "invalid" ? "codexAuth.openaiMissing" : "codexAuth.openaiUnavailableDesc")}</p>
+    {state === "invalid" ? <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>{t("codexAuth.openProviders")}</button>
+      : <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={onEnable}>{busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}</button>}
+  </div>;
 }
 
 function openaiProviderFromConfig(config: unknown): {
@@ -226,7 +171,6 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
         accountModeState={accountModeState}
         banner={banner}
         advancedExtras={<>
-          <CodexAccountPickerSetting apiBase={apiBase} />
           <DefaultModeRequestUserInputSetting apiBase={apiBase} />
           <UltraFastTierSetting apiBase={apiBase} />
           <MainAccountHardLockSetting apiBase={apiBase} onSaved={onHardLockSaved} />

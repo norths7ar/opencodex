@@ -16,7 +16,6 @@ import * as atomic from "../../src/config/atomic-write";
 import * as accountList from "../../src/codex/auth-api/account-list";
 import { invalidateStarStatusCache, setStarDepsForTests } from "../../src/github/star-state";
 import type { OcxConfig } from "../../src/types";
-import { startMachineListener } from "../../src/client/machine-listener";
 import { createDesktopCompatibilityRuntime } from "../../src/codex/desktop-compatibility/runtime";
 
 const ORIGIN = "https://dashboard.example.test";
@@ -105,29 +104,6 @@ function hubListenerRequest(path: string, method: string, headers: HeadersInit, 
   return req;
 }
 
-test("the process-marked hub management listener can remember; unmarked and relayed planes cannot", async () => {
-  config = hubConfig(); state = initializeManagementAuthState(config);
-  const response = await dispatch(hubListenerRequest("/api/session/remember", "POST", {}));
-  expect(response.status).toBe(200);
-  const body = await response.json() as { device: { proof: string } };
-  const cookie = response.headers.get("Set-Cookie")!;
-  expect(cookie.startsWith("__Host-")).toBe(true);
-  expect(cookie).toContain("Secure");
-  const resumed = issueGuiSession(hubListenerRequest("/opencodex-session", "GET",
-    { Cookie: cookie.split(";")[0]!, [PROOF_HEADER]: body.device.proof }, null), config, state);
-  expect(resumed?.issuance).toBe("remembered-admin");
-  const withoutProof = issueGuiSession(hubListenerRequest("/opencodex-session", "GET", { Cookie: cookie.split(";")[0]! }, null), config, state);
-  expect(withoutProof?.issuance).not.toBe("remembered-admin");
-  // Forwarded headers cannot manufacture the listener mark: an unmarked plain-HTTP request claiming TLS is refused.
-  const forged = new Request("http://hub.example.test/api/session/remember", { method: "POST", headers: {
-    Host: "hub.example.test", Origin: "https://hub.example.test", "User-Agent": "dashboard-admission-fixture",
-    "X-OpenCodex-API-Key": ADMIN, "X-Forwarded-Proto": "https", "X-Forwarded-Host": "hub.example.test" } });
-  expect((await dispatch(forged)).status).toBe(403);
-  config = remoteConfig(); state = initializeManagementAuthState(config);
-  const relayed = request("/api/session/remember"); markTrustedHubManagementRequest(relayed);
-  expect((await dispatch(relayed)).status).toBe(403);
-});
-
 test("all issueGuiSession bootstrap shapes require proof before remembered issuance", async () => {
   const device = await remember(); state = initializeManagementAuthState(config);
   for (const path of ["/opencodex-session", "/", "/settings"]) {
@@ -143,40 +119,6 @@ test("all issueGuiSession bootstrap shapes require proof before remembered issua
   expect(issueGuiSession(request("/opencodex-session", { origin: ORIGIN + ":444", method: "GET", token: null,
     headers: { Cookie: device.cookie, [PROOF_HEADER]: device.body.device.proof } }), config, state)).toBeNull();
   expect(resume(device, device.body.device.proof, "/", { Cookie: device.cookie + "; " + device.cookie })).toBeNull();
-});
-
-test("the live machine listener checks proof on fetch bootstrap and navigation", async () => {
-  writeFileSync(home.path("config.json"), JSON.stringify(config));
-  const oldDist = process.env.OPENCODEX_GUI_DIST;
-  mkdirSync(home.path("machine-gui"));
-  writeFileSync(home.path("machine-gui", "index.html"), "<html><head></head><body></body></html>");
-  process.env.OPENCODEX_GUI_DIST = home.path("machine-gui");
-  const listener = startMachineListener(0, { managementAuthState: state, state: {
-    serverUrl: "https://hub.example.test", managementUrl: "https://hub.example.test", managementTransport: "direct",
-    selectedClients: ["codex"], tokenEnv: "OPENCODEX_API_AUTH_TOKEN", apiKeyId: "fixture-client",
-    tokenFingerprint: "a".repeat(64), protocolVersion: 1, connectedAt: "2026-10-18T00:00:00Z",
-    catalogSyncedAt: "2026-10-18T00:00:00Z",
-  } });
-  try {
-    const origin = `http://127.0.0.1:${listener.port}`;
-    const device = await remember(origin);
-    for (const path of ["/opencodex-session", "/"]) {
-      for (const proof of [null, "ocx_proof_" + "x".repeat(43), device.body.device.proof]) {
-        const response = await fetch(origin + path, { headers: { Cookie: device.cookie,
-          "User-Agent": "dashboard-admission-fixture", ...(proof === null ? {} : { [PROOF_HEADER]: proof }) } });
-        expect(response.status).toBe(200);
-        const html = await response.text();
-        expect(html).not.toContain(device.body.device.proof);
-        const token = /name="opencodex-session-token" content="([^"]+)"/.exec(html)?.[1];
-        expect(token).toBeDefined();
-        expect(state.available && state.sessions.get(token!)?.issuance).toBe(proof === device.body.device.proof ? "remembered-admin" : "loopback");
-      }
-    }
-  } finally {
-    await listener.stop(true);
-    if (oldDist === undefined) delete process.env.OPENCODEX_GUI_DIST;
-    else process.env.OPENCODEX_GUI_DIST = oldDist;
-  }
 });
 
 test("proof stays out of cookies, bootstrap HTML, URLs, disk plaintext and logs", async () => {
@@ -391,12 +333,3 @@ test("account refresh validates pending accounts only for ordinary dashboard ses
   expect(validations).toEqual([false, false, true]);
 });
 
-test("remembered sessions cannot pair, reveal data keys, or authorize local links", async () => {
-  const device = await remember("http://127.0.0.1:10100");
-  const req = deviceRequest(device, "/api/keys/reveal", { body: { id: "fixture" } });
-  const control = createManagementSessionControl(state);
-  expect(control.isPaired(req, config)).toBe(false); expect(control.canRevealDataKeys?.(req, config)).toBe(false);
-  expect((await dispatch(req)).status).toBe(403);
-  const link = await dispatch(deviceRequest(device, "/api/link/join", { body: {} }), {}, true);
-  expect(link.status).toBe(403);
-});

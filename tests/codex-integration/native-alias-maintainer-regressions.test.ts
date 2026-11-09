@@ -61,30 +61,11 @@ test("native recovery copies nested reasoning metadata instead of mutating the s
 test("disabled native slugs do not leak through account-qualified clones", () => {
   const slug = "gpt-5.5";
   const rows = buildCatalogEntries(
-    null, [slug], [], undefined, false, "default", new Set(), ["main"],
+    null, [slug], [], undefined, false, "default", ["main"],
     new Set([slug]), new Set([slug]),
   );
   expect(rows.find(row => row.slug === slug)).toBeUndefined();
   expect(rows.find(row => row.slug === `main/${slug}`)).toBeUndefined();
-});
-
-test("disabling a shadowed native row keeps its compatibility combo but removes the account clone", () => {
-  const slug = "gpt-5.6-sol";
-  const rows = buildCatalogEntries(
-    null, [slug], [aliasModel(slug)], undefined, false, "default", new Set([slug]), ["main"],
-    new Set([slug]), new Set([slug]),
-  );
-  expect(rows.find(row => row.slug === slug)?.opencodex_catalog_kind).toBe(CODEX_NATIVE_ALIAS_CATALOG_KIND);
-  expect(rows.find(row => row.slug === `main/${slug}`)).toBeUndefined();
-});
-
-test("duplicate native aliases keep the first combo deterministically", () => {
-  const slug = "gpt-5.6-sol";
-  const first = { ...aliasModel(slug), id: "first", displayName: "First" };
-  const second = { ...aliasModel(slug), id: "second", displayName: "Second" };
-  const rows = buildCatalogEntries(null, [slug], [first, second], undefined, false, "default", new Set([slug]));
-  expect(rows.filter(row => row.slug === slug)).toHaveLength(1);
-  expect(rows.find(row => row.slug === slug)?.display_name).toBe("First");
 });
 
 test("transient preservation keeps a native alias without input modalities", () => {
@@ -98,7 +79,7 @@ test("transient preservation keeps a native alias without input modalities", () 
   };
   const rows = mergeCatalogEntriesForSync(
     [existing], [], new Map(), [], false, new Set(), null, new Set(), new Set(),
-    "default", new Set([slug]), false, true, [], new Set([slug]),
+    "default", true, [], new Set([slug]),
   );
   expect(rows.find(row => row.slug === slug)).toBeDefined();
 });
@@ -112,7 +93,6 @@ test("native aliases retain upstream multi-agent pins in default mode", () => {
       undefined,
       false,
       "default",
-      new Set([slug]),
     );
     expect(rows.find(row => row.slug === slug)?.multi_agent_version).toBe(expected);
   }
@@ -127,7 +107,6 @@ test("a featured bare native alias does not feature its account-qualified OpenAI
     [slug],
     false,
     "default",
-    new Set([slug]),
     ["main"],
   );
   const routed = rows.find(row => row.slug === slug)!;
@@ -142,7 +121,6 @@ test("a featured bare native alias does not feature its account-qualified OpenAI
     [`main/${slug}`],
     false,
     "default",
-    new Set([slug]),
     ["main"],
   );
   expect(exactRows.find(row => row.slug === `main/${slug}`)?.priority).toBe(0);

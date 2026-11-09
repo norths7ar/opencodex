@@ -7,7 +7,6 @@
  */
 import type { AccountQuota } from "./codex-quota-utils";
 import type { TKey } from "./i18n/en";
-import { quotaWindows, resetTimestamp } from "./pages/tray-data";
 import { accountQuotaFromReport, type ProviderQuotaReportView } from "./provider-workspace/report";
 
 export const QUOTA_SUMMARY_WARN_PERCENT = 70;
@@ -38,6 +37,28 @@ export interface QuotaSummaryRow {
 }
 
 const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
+
+function resetTimestamp(value: unknown): number | null {
+  if (!finite(value) || value <= 0) return null;
+  const ms = value < 1e12 ? value * 1000 : value;
+  return Number.isFinite(new Date(ms).getTime()) ? ms : null;
+}
+
+function quotaWindows(quota: AccountQuota) {
+  const windows = [
+    { id: "quota.fiveHourLimit", key: "quota.fiveHourLimit" as const, percent: quota.fiveHourPercent ?? quota.shortPercent, reset: quota.fiveHourResetAt ?? quota.shortResetAt },
+    { id: "quota.weeklyLimit", key: "quota.weeklyLimit" as const, percent: quota.weeklyPercent, reset: quota.weeklyResetAt },
+    { id: "quota.monthlyLimit", key: "quota.monthlyLimit" as const, percent: quota.monthlyPercent, reset: quota.monthlyResetAt },
+    ...(Array.isArray(quota.customWindows) ? quota.customWindows.filter(w => w && typeof w.label === "string").map(w => ({ id: w.label, label: w.label, modelId: w.modelId, percent: w.percent, reset: w.resetAt })) : []),
+  ];
+  const kept = windows.filter(w => (finite(w.percent) && w.percent >= 0) || resetTimestamp(w.reset) !== null);
+  const seen = new Map<string, number>();
+  return kept.map(w => {
+    const taken = seen.get(w.id) ?? 0;
+    seen.set(w.id, taken + 1);
+    return taken === 0 ? w : { ...w, id: `${w.id}#${taken}` };
+  });
+}
 
 export function quotaSeverity(percent: number | undefined): QuotaSummarySeverity {
   if (!finite(percent)) return "normal";

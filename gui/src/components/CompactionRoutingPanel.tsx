@@ -4,7 +4,6 @@ import { IconAlert } from "../icons";
 import { Select } from "../ui";
 import { createBoundedFetch } from "../bounded-fetch";
 import { requireJson, type ModelInfo } from "../pages/dashboard-shared";
-import { comboModelId, parseComboList } from "../combo-workspace-data";
 import { formatNamespacedModelId } from "../provider-icons";
 
 type Setting = { model: string; reasoningEffort?: string; triggers?: string[]; sourceModels?: string[] } | null;
@@ -42,26 +41,6 @@ function choiceToTriggers(choice: string): string[] | undefined {
   if (choice === "auto") return ["auto"];
   if (choice === "manual+auto") return ["manual", "auto"];
   return undefined;
-}
-
-/**
- * Target providers keyed by the selector a client actually requests.
- *
- * Keyed by the combo's public model id rather than its raw id, because a combo reached through
- * an alias carries no `combo/` prefix: the panel used to test for that prefix, fail to
- * recognize an aliased combo, and describe it as an ordinary provider while naming none of its
- * targets (#5216). `parseComboList` is the same reader the combo workspace uses, so the
- * selector rule lives in one place instead of being spelled out again here.
- */
-function readComboProviders(payload: unknown): Map<string, string[]> {
-  // A Map, not an object: the key is a combo's public model id, which is caller-configured and
-  // free-form. Writing that into an object literal is a prototype-pollution sink, and reading it
-  // back would return an inherited member for an alias of `constructor` or `toString`.
-  const result = new Map<string, string[]>();
-  for (const combo of parseComboList(payload)) {
-    result.set(combo.model, [...new Set(combo.targets.flatMap(target => target.provider ? [target.provider] : []))]);
-  }
-  return result;
 }
 
 function readSetting(payload: { compactionRouting?: unknown }): Setting {
@@ -118,7 +97,6 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
   const [busy, setBusy] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [feedback, setFeedback] = useState<"saved" | "failed" | null>(null);
-  const [comboProviders, setComboProviders] = useState<Map<string, string[]>>(() => new Map());
   const active = useRef(false);
   const pending = useRef<ReturnType<typeof createBoundedFetch> | null>(null);
 
@@ -147,9 +125,6 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
       const response = await fetch(`${apiBase}/api/settings`, { signal: request.signal });
       const value = readSetting(await requireJson(response));
       if (active.current && pending.current === request) accept(value);
-      const combos = await fetch(`${apiBase}/api/combos`, { signal: request.signal })
-        .then(requireJson).then(readComboProviders).catch(() => new Map<string, string[]>());
-      if (active.current && pending.current === request) setComboProviders(combos);
     } catch {
       if (active.current && pending.current === request) setLoadError(true);
     } finally {
@@ -240,27 +215,15 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
       <span>{selector}</span>
     </label>
   );
-  // Ask what the selection resolves to instead of reading its name. An aliased combo answers
-  // here exactly like a prefixed one (#5216).
-  const comboTargets = comboProviders.get(model);
-  // The canonical prefix stays a combo signal of its own. It is the only one left when
-  // /api/combos has not answered yet or failed, and losing it there would describe a combo as
-  // an ordinary provider named "combo" — worse than the alias gap this fixes.
-  const isCombo = comboTargets !== undefined || model.startsWith(comboModelId(""));
   const namespace = model.slice(0, Math.max(model.indexOf("/"), 0));
   const endpointHosts = new Map(providerList.map(entry => [entry.name, hostOf(entry.baseUrl)] as const).filter(([, host]) => host));
-  const provider = isCombo ? "" : endpointLabel(namespace || model, endpointHosts);
-  const providers = comboTargets?.map(name => endpointLabel(name, endpointHosts)).join(", ") || t("compactionRouting.comboProvidersUnknown");
+  const provider = endpointLabel(namespace || model, endpointHosts);
   const routesAutomatic = triggers !== "manual";
   const scopedSources = sources.join(", ");
   // A scoped override only covers the checked sources, so the disclosure names them instead of
   // claiming every request; an empty selection covers nothing and shows no destination claim.
   const warningText = !model || scopeEmpty ? null
-    : isCombo
-      ? (scope === "selected"
-        ? t("compactionRouting.comboWarningScoped", { combo: model, providers, sources: scopedSources })
-        : t("compactionRouting.comboWarning", { combo: model, providers }))
-      : (scope === "selected"
+    : (scope === "selected"
         ? t("compactionRouting.providerWarningScoped", { provider, sources: scopedSources })
         : t("compactionRouting.providerWarning", { provider }));
 

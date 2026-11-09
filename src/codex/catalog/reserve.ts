@@ -17,7 +17,7 @@ export interface ReserveCatalogProjection {
 
 /** The caller supplies a validated actual observation and an already context-capped Luna pin. */
 export function createReserveCatalogProjection(
-  config: Pick<OcxConfig, "runtimeRole" | "hostname" | "unauthenticatedLoopbackListener" | "codexDesktopAuthless">,
+  config: Pick<OcxConfig, "hostname" | "unauthenticatedLoopbackListener" | "codexDesktopAuthless">,
   mainSelectors: readonly string[],
   observedSource: RawEntry | null,
   lunaSource: RawEntry | null,

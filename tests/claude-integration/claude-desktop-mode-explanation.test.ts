@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { gatewayModeExplanation } from "../../src/cli/claude-desktop";
-import type { ClientConnectionState } from "../../src/client/state";
 
 const disconnected = { kind: "disconnected" } as ClientConnectionState;
 const connected = { kind: "connected" } as unknown as ClientConnectionState;
@@ -32,14 +31,6 @@ describe("gateway apply explains the first-party alternative", () => {
       requestedExplicitly: true,
       config: { claudeCode: { desktopProfile: { appliedFingerprint: "abc123" } } },
       connection: disconnected,
-    })).toEqual([]);
-  });
-
-  test("a connected client says nothing, because first-party cannot run there", () => {
-    expect(gatewayModeExplanation({
-      requestedExplicitly: false,
-      config: { claudeCode: { desktopProfile: { appliedFingerprint: "abc123" } } },
-      connection: connected,
     })).toEqual([]);
   });
 

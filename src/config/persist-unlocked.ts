@@ -8,8 +8,7 @@ import { withPreservedDiskOnlyProviders } from "../usage/user-cost-overlays";
 import { refreshConfigDerivedRegistries } from "./derived-registries";
 import { atomicWriteFile, isMissingPathError } from "./atomic-write";
 import { getConfigPath } from "./paths";
-import { configRebaseDeletionKeys, projectConfigRebaseProvenance } from "./rebase-provenance";
-import { clientConnectionSchema } from "./schema/leaf-validators";
+import { projectConfigRebaseProvenance } from "./rebase-provenance";
 import { projectRemovedOpenCodeFreeSnapshot } from "./removed-opencode-free-backup";
 
 /** The requested bytes are current; callers must not roll back only live state. */
@@ -38,7 +37,7 @@ export function readRawConfigJson(projectRetired: boolean | "preserve-only" = fa
   }
   if (projectRetired === "preserve-only") {
     // Preservation is optional; its failure must not discard the parsed snapshot that the
-    // client-state guard and OS-store reference accounting depend on.
+    // OS-store reference accounting depend on.
     try {
       projectRemovedOpenCodeFreeSnapshot(structuredClone(parsed), { path: configPath, bytes });
     } catch {
@@ -55,31 +54,6 @@ export function readRawConfigJson(projectRetired: boolean | "preserve-only" = fa
   return parsed as Record<string, unknown>;
 }
 
-function failClosedClientPersistenceError(
-  raw: Record<string, unknown> | undefined,
-  candidate: OcxConfig,
-): string | null {
-  if (!raw) return null;
-  const rawHasClient = Object.hasOwn(raw, "client") && raw.client !== undefined;
-  const rawRole = raw.runtimeRole;
-  const rawRoleValid = rawRole === undefined
-    || rawRole === "standalone"
-    || rawRole === "hub"
-    || rawRole === "client";
-  const rawClientValid = !rawHasClient || clientConnectionSchema.safeParse(raw.client).success;
-  const rawPairValid = rawRoleValid
-    && ((rawRole === "client" && rawHasClient && rawClientValid)
-      || (rawRole !== "client" && !rawHasClient));
-  if (rawPairValid) return null;
-
-  const candidateValid = candidate.runtimeRole === "client"
-    && clientConnectionSchema.safeParse(candidate.client).success;
-  const deletions = configRebaseDeletionKeys(candidate);
-  const explicitClear = deletions.has("client") && deletions.has("runtimeRole");
-  if (candidateValid || explicitClear) return null;
-  return "config write refused: malformed or mismatched remote client state must be repaired or explicitly cleared";
-}
-
 /**
  * Atomic config.json write WITHOUT the mutation lock; callers must hold
  * `withConfigMutationLockSync`. Returns true when bytes changed. Refreshes the
@@ -92,8 +66,6 @@ export function persistConfigUnlocked(config: OcxConfig): boolean {
   const configPath = getConfigPath();
   // Protect late disk edits from these same bytes, retaining raw rows for guards and credential accounting.
   const rawBeforeWrite = readRawConfigJson("preserve-only");
-  const clientPersistenceError = failClosedClientPersistenceError(rawBeforeWrite, config);
-  if (clientPersistenceError) throw new Error(clientPersistenceError);
   // External editors can add provider rows the live config deliberately does
   // not route with yet; merge them at the serialization boundary so an
   // unrelated in-process save cannot erase the provider or its overlay.

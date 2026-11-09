@@ -3,9 +3,6 @@ import { isValidCodexAccountId } from "./account-id";
 /** Config-only sentinel for the Codex Desktop account; outside the pool-account id grammar. */
 export const MAIN_CODEX_ACCOUNT_NAMESPACE_TARGET = "@main";
 
-export const CODEX_ACCOUNT_NAMESPACE_COMBO_ALIAS_COLLISION_ERROR =
-  "combo alias must not use a configured Codex account namespace";
-
 const CODEX_ACCOUNT_ID_NAMESPACE_COLLISION_ERROR =
   "account id must not collide with a configured Codex account namespace";
 

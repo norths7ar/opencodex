@@ -25,7 +25,6 @@ import {
   nativeReasoningTagMatches,
   type NativeReasoningOwner,
   bindReasoningReplayScope,
-  reasoningReplayServingIdentityChanged,
   reasoningReplayServingIdentityChange,
   reasoningReplayItemStoreChanged,
   reasoningReplayOpaqueBlobRejectionMemoized,
@@ -34,7 +33,6 @@ import type { OAuthAccessSnapshot } from "../../oauth";
 import type { CodexAuthContext } from "../../codex/auth-context";
 import { thoughtSignatureReplaySalt } from "../../responses/thought-signature-replay";
 import { randomUUID } from "node:crypto";
-import { requiresPlaintextReasoningReplay } from "../../adapters/openai-responses/passthrough";
 import { isCanonicalOpenAiForwardProvider } from "../../providers/openai-tiers";
 
 /**
@@ -332,62 +330,6 @@ function routeReasoningReplayIdentity(args: {
         ...(credentialDurableIdentity ? { credentialDurableIdentity } : {}),
       }
     : undefined;
-}
-
-
-/**
- * Whether this exact route cannot satisfy its documented plaintext reasoning replay contract.
- *
- * A generic plaintext-preserving gateway is not made ineligible. Unknown serving provenance also
- * stays eligible; only a proven route mismatch may suppress a combo candidate.
- */
-export function mandatoryResponsesReasoningReplayUnavailable(args: {
-  body: unknown;
-  clientThreadId: string | undefined;
-  clientPrincipalId?: string;
-  providerName: string;
-  provider: OcxProviderConfig;
-  adapterName: string;
-  modelId: string;
-}): boolean {
-  const { body, clientThreadId, provider, adapterName } = args;
-  if (
-    adapterName !== "openai-responses"
-    || !requiresPlaintextReasoningReplay(provider)
-    || !clientThreadId
-    || !requestCarriesTools(body)
-    || !hasOpaqueOnlyReasoningItem(body)
-  ) return false;
-
-  const current = routeReasoningReplayIdentity(args);
-  return reasoningReplayServingIdentityChanged({ clientThreadId, clientPrincipalId: args.clientPrincipalId, current });
-}
-
-
-function requestCarriesTools(body: unknown): boolean {
-  if (!body || typeof body !== "object" || Array.isArray(body)) return false;
-  return Array.isArray((body as { tools?: unknown }).tools)
-    && (body as { tools: unknown[] }).tools.length > 0;
-}
-
-
-function hasOpaqueOnlyReasoningItem(body: unknown): boolean {
-  if (!body || typeof body !== "object" || Array.isArray(body)) return false;
-  const input = (body as { input?: unknown }).input;
-  if (!Array.isArray(input)) return false;
-  return input.some(item => {
-    if (!item || typeof item !== "object" || Array.isArray(item)) return false;
-    const reasoning = item as Record<string, unknown>;
-    if (reasoning.type !== "reasoning" || typeof reasoning.encrypted_content !== "string") return false;
-    const content = reasoning.content;
-    const hasPlaintext = Array.isArray(content) && content.some(part =>
-      !!part && typeof part === "object" && !Array.isArray(part)
-      && (part as Record<string, unknown>).type === "reasoning_text"
-      && typeof (part as Record<string, unknown>).text === "string"
-      && ((part as Record<string, unknown>).text as string).length > 0
-    );
-    return !hasPlaintext;
-  });
 }
 
 

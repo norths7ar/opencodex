@@ -4,9 +4,8 @@ import type { OcxConfig } from "../types";
 import { getCodexRoutingKind, type CodexRoutingKind } from "./inject";
 import { collectRoutingAdoption, type RoutingAdoptionEvidence } from "./routing-adoption";
 import { diagnoseCodexShim, type CodexShimDiagnostic } from "./shim";
-import { diagnoseDesktopStartup, type DesktopStartupDiagnostic } from "../service/desktop-startup";
 
-export type StartupProtection = "service" | "desktop" | "shim" | "none";
+export type StartupProtection = "service" | "shim" | "none";
 export type StartupHealthStatus = "native" | "protected" | "at-risk";
 export type ShimCoverage = "full" | "cli-only" | "none";
 
@@ -21,7 +20,6 @@ export function startupHealthReadBudgetMs(platform: NodeJS.Platform = process.pl
 }
 
 export interface StartupHealthInputs {
-  desktop?: DesktopStartupDiagnostic;
   routingKind: CodexRoutingKind;
   autostartEnabled: boolean;
   serviceInstalled: boolean;
@@ -40,7 +38,6 @@ export interface StartupHealthInputs {
 }
 
 export interface StartupHealth {
-  desktop?: DesktopStartupDiagnostic;
   status: StartupHealthStatus;
   routingKind: CodexRoutingKind;
   routingInjected: boolean;
@@ -63,7 +60,6 @@ export interface StartupHealth {
   platform: NodeJS.Platform;
   diagnosticStale: boolean;
   recommendedCommand: string | null;
-  recommendedAction?: string | null;
   commands: {
     installService: string;
     repairService: string;
@@ -94,23 +90,18 @@ export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth 
   // We can only credit an opencodex service/shim for routing that opencodex owns.
   // An arbitrary localhost gateway has an independent lifecycle that OCX cannot repair.
   const ownsLocalRouting = inputs.routingKind === "opencodex-local";
-  const desktopEffective = (inputs.platform === "darwin" || inputs.platform === "linux") && !inputs.diagnosticStale
-    && inputs.desktop !== undefined && (inputs.desktop.owned || inputs.desktop.supervisor !== undefined)
-    && inputs.desktop.loginEnabled
-    && inputs.desktop.running && inputs.desktop.viable;
   const protection: StartupProtection = ownsLocalRouting && inputs.serviceViable
     ? "service"
-    : ownsLocalRouting && desktopEffective ? "desktop"
     : ownsLocalRouting && shimEffective
       ? "shim"
       : "none";
-  const rebootSafe = !localRoutingDependency || (ownsLocalRouting && (inputs.serviceViable || desktopEffective));
+  const rebootSafe = !localRoutingDependency || (ownsLocalRouting && inputs.serviceViable);
   const status: StartupHealthStatus = !localRoutingDependency
     ? "native"
     : rebootSafe
       ? "protected"
       : "at-risk";
-  const recommendedCommand = status !== "at-risk" || (ownsLocalRouting && inputs.desktop !== undefined)
+  const recommendedCommand = status !== "at-risk"
     ? null
     : inputs.routingKind === "custom-local" || inputs.routingKind === "unknown"
       ? COMMANDS.restoreNative
@@ -122,11 +113,6 @@ export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth 
       // gets the registering command.
       ? (inputs.serviceInstalled && !inputs.serviceConflict ? COMMANDS.repairService : COMMANDS.installService)
       : COMMANDS.restoreNative;
-  const recommendedAction = status === "at-risk" && ownsLocalRouting && inputs.desktop !== undefined
-    ? inputs.diagnosticStale || inputs.desktop.loginEnabled
-      ? "Reopen OpenCodex and check Start at Login."
-      : "Check Start at Login in the OpenCodex menu and follow its guidance."
-    : null;
   return {
     ...inputs,
     diagnosticStale: inputs.diagnosticStale ?? false,
@@ -137,13 +123,11 @@ export function deriveStartupHealth(inputs: StartupHealthInputs): StartupHealth 
     protection,
     shimCoverage,
     recommendedCommand,
-    recommendedAction,
     commands: { ...COMMANDS },
   };
 }
 
 export interface StartupHealthDiagnostics {
-  desktop?: DesktopStartupDiagnostic;
   routingKind?: CodexRoutingKind;
   service?: ServiceDiagnostic;
   shim?: CodexShimDiagnostic;
@@ -158,11 +142,9 @@ export function collectStartupHealth(
   const shim = diagnostics.shim ?? diagnoseCodexShim();
   const service = diagnostics.service ?? diagnoseService();
   const routingKind = diagnostics.routingKind ?? getCodexRoutingKind();
-  const desktop = diagnostics.desktop ?? diagnoseDesktopStartup();
   const routingAdoption = diagnostics.routingAdoption
     ?? (routingKind === "opencodex-local" ? collectRoutingAdoption({ routingKind }) : undefined);
   return deriveStartupHealth({
-    ...(desktop ? { desktop } : {}),
     routingKind,
     autostartEnabled: codexAutoStartEnabled(config),
     serviceInstalled: service.installed,
@@ -219,16 +201,9 @@ function classifyStartupHealthSummary(health: StartupHealth): string {
     ? "custom remote Codex routing (no local restart dependency)"
     : "native Codex routing (no opencodex restart dependency)";
   if (health.protection === "service") return "protected by background service";
-  if (health.protection === "desktop") return health.desktop?.loginRegistration === "registered-not-loaded"
-    ? "protected by desktop app at next login and its proxy supervisor (Start at Login registered; not loaded in this session)"
-    : "protected by desktop app at login and its proxy supervisor";
   const command = health.recommendedCommand ?? health.commands.restoreNative;
   if (health.routingKind === "unknown") return `AT RISK after restart (Codex routing could not be verified; run '${command}')`;
   if (health.routingKind === "custom-local") return `AT RISK after restart (custom local gateway lifecycle is not managed by opencodex; run '${command}')`;
-  if (health.desktop?.supervisor && !health.desktop.loginEnabled && !health.diagnosticStale) return health.desktop.loginState === "disabled"
-    ? "AT RISK after restart (OpenCodex Desktop runs this proxy; Start at Login is disabled; check the OpenCodex menu)"
-    : "AT RISK after restart (OpenCodex Desktop runs this proxy; Start at Login could not be verified; check the OpenCodex menu)";
-  if (health.desktop) return "AT RISK after restart (desktop startup could not be verified; reopen OpenCodex and check Start at Login)";
   if (health.shimCoverage === "cli-only") return `AT RISK for Codex Desktop after restart (launcher shim covers CLI scripts only; run '${command}')`;
   if (health.serviceConflict) return `AT RISK after restart (background service managers conflict; run '${command}')`;
   if (health.serviceStale) return `AT RISK after restart (background service files are stale; run '${command}')`;

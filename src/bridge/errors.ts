@@ -16,7 +16,6 @@ import {
   isModelNotInPlanRefusal,
   markVerifiedModelNotInPlanResponse,
   MODEL_NOT_IN_PLAN_CODE,
-  REQUIRED_TOOL_CONTRACT_CODE,
   SPEND_LEDGER_STORAGE_UNAVAILABLE_CODE,
   UNDECLARED_TOOL_CALL_ERROR_CODE,
   type OcxErrorPayload,
@@ -29,7 +28,7 @@ const PINNED_VERDICT_CODES = new Set([CYBER_POLICY_ERROR_CODE, "client_closed_re
 const formattedQuotaSources = new WeakMap<Response, string | null>();
 const STRUCTURED_QUOTA_CODES = new Set(["usage_limit_exceeded", "usage_limit_reached", "1308", "insufficient_quota"]);
 
-export function upstreamCodeForComboFailure(response: Response, bodyCode: string | undefined): string | undefined {
+export function trustedUpstreamErrorCode(response: Response, bodyCode: string | undefined): string | undefined {
   return bodyCode === "insufficient_quota" && formattedQuotaSources.has(response)
     ? formattedQuotaSources.get(response) ?? undefined
     : bodyCode;
@@ -82,7 +81,6 @@ export function formatErrorResponse(
   // survives so the Anthropic translator can classify it instead of folding it into a
   // retryable overload (and so clients see the SSE path's rejection identity).
   if (options?.code === UNDECLARED_TOOL_CALL_ERROR_CODE) error.code = options.code;
-  if (options?.code === REQUIRED_TOOL_CONTRACT_CODE && error.code !== CYBER_POLICY_ERROR_CODE) error.code = options.code;
   // A plan refusal keeps its wire code so clients can branch on it. The code is not provenance:
   // run-turn combo children pass an adapter event's own code here, so only the boundary that
   // verified the refusal marks the envelope (`markVerifiedModelNotInPlanResponse`).
@@ -114,7 +112,6 @@ export function formatErrorResponse(
   // and no wait of its own does not stop a client that retries every 429 by default.
   const refusal = isReplayRefusalCode(error.code) && replayBlocked;
   if (refusal) applyReplayRefusalClientHeaders(headers);
-  if (error.code === REQUIRED_TOOL_CONTRACT_CODE && finalStatus === 400) applyReplayRefusalClientHeaders(headers);
   const response = new Response(JSON.stringify({ error }), {
     status: finalStatus,
     headers,

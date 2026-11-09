@@ -440,33 +440,6 @@ describe("empty-completion core integration", () => {
     expect(body).not.toContain("upstream_stall_timeout");
   });
 
-  test("combo and routed-compaction turns are excluded from the retry", async () => {
-    attemptEvents = [[{ type: "done" }], [{ type: "text_delta", text: "must not run" }, { type: "done" }]];
-    takeSpendHome();
-    const combo = await handleResponses(
-      request(false),
-      config("test-run-turn"),
-      { model: "", provider: "" },
-      { comboAttempt: true },
-    );
-    await combo.text();
-    expect(runTurnCalls).toBe(1);
-
-    runTurnCalls = 0;
-    attemptEvents = [[{ type: "done" }], [{ type: "text_delta", text: "must not run" }, { type: "done" }]];
-    const compactionInput = [
-      { type: "message", role: "user", content: [{ type: "input_text", text: "earlier" }] },
-      { type: "compaction_trigger" },
-    ];
-    const compaction = await handleResponses(
-      request(false, compactionInput),
-      config("test-run-turn"),
-      { model: "", provider: "" },
-    );
-    await compaction.text();
-    expect(runTurnCalls).toBe(1);
-  });
-
   test("an identical empty retry still receives terminal-guard repair", async () => {
     attemptEvents = [
       [{ type: "done" }],

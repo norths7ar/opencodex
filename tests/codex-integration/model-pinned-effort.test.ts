@@ -525,24 +525,6 @@ describe("operator pins on the actual request wire", () => {
     expect((await request(c, "responses", { model: "fixture/pin-model--high" })).reasoning_effort).toBe("medium");
   });
 
-  test("combo failover recomputes each destination's default without leaking the first pin", async () => {
-    failFirst = true;
-    const c = config({}, {
-      providers: {
-        first: provider({ pinnedReasoningEffort: "max", reasoningEfforts: ["low", "high", "max"] }),
-        second: provider({ reasoningEfforts: ["low", "medium"] }),
-      },
-      defaultProvider: "first",
-      modelPinnedEfforts: { "combo/pin-default": "low" },
-      combos: { "pin-default": { strategy: "failover", defaultEffort: "high", targets: [
-        { provider: "first", model: "pin-model" }, { provider: "second", model: "pin-model" },
-      ] } },
-    });
-    const wire = await request(c, "responses", { model: "combo/pin-default", reasoning: { summary: "auto" } });
-    expect(captured.map(({ body }) => body.reasoning_effort)).toEqual(["max", "medium"]);
-    expect(wire.reasoning_effort).toBe("medium");
-  });
-
   test("native repeated destinations restore only original effort and keep credential-retry decisions", async () => {
     const c = config({}, { providers: {
       first: provider({ pinnedReasoningEffort: "high" }),

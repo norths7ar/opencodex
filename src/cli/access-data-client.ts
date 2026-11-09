@@ -1,6 +1,4 @@
 /** Explicit data credentials never use management headers or the enrolled secret. */
-import { readClientConnectionState, assertClientConnectionUnchanged } from "../client/state";
-import { normalizeHubOrigin } from "../client/hub-client";
 import { findLiveProxy, probeHostname, type LiveProxy } from "../server/proxy-liveness";
 import { readBoundedResponseBytes } from "../lib/bounded-body";
 import { CliUsageError, readSecretBytes, type RuntimeApiDeps } from "./runtime-api";
@@ -11,36 +9,22 @@ export interface SelectedDataTarget {
 }
 export interface DataClientDeps extends RuntimeApiDeps {
   signal?: AbortSignal;
-  readClientConnectionState?: typeof readClientConnectionState;
-  assertClientConnectionUnchanged?: typeof assertClientConnectionUnchanged;
 }
 
 async function selectTarget(deps: DataClientDeps, signal: AbortSignal): Promise<SelectedDataTarget> {
   signal.throwIfAborted();
-  const readState = deps.readClientConnectionState ?? readClientConnectionState;
-  const state = readState();
-  if (state.kind === "connected") {
-    const expected = structuredClone(state.value);
-    const origin = normalizeHubOrigin(expected.serverUrl);
-    const check = deps.assertClientConnectionUnchanged ?? assertClientConnectionUnchanged;
-    const assertCurrent = async () => { signal.throwIfAborted(); check(expected); };
-    await assertCurrent();
-    return { origin, assertCurrent };
-  }
-  if (state.kind !== "disconnected") throw new Error("Selected target is unavailable.");
   const discover = deps.findLiveProxy ?? findLiveProxy;
   const live = await discover();
   signal.throwIfAborted();
   if (!live || live.role === "client") throw new Error("Selected target is unavailable.");
-  const originOf = (value: LiveProxy) => normalizeHubOrigin(`http://${probeHostname(value.hostname)}:${value.port}`);
+  const originOf = (value: LiveProxy) => new URL("http://" + probeHostname(value.hostname) + ":" + value.port).origin;
   const origin = originOf(live);
   const assertCurrent = async () => {
     signal.throwIfAborted();
-    if (readState().kind !== "disconnected") throw new Error("Selected target changed.");
     const current = await discover();
     signal.throwIfAborted();
     if (!current || current.pid !== live.pid || current.port !== live.port || current.role !== live.role
-      || originOf(current) !== origin || readState().kind !== "disconnected") {
+      || originOf(current) !== origin) {
       throw new Error("Selected target changed.");
     }
   };

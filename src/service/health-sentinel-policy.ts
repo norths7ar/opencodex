@@ -2,8 +2,7 @@
  * Health-unresponsiveness recovery policy for the opt-in service health sentinel (#6671).
  *
  * Every supervisor this repository installs restarts the proxy only when it exits: the Windows
- * Task Scheduler batch loop, launchd `KeepAlive`/`SuccessfulExit=false`, systemd
- * `Restart=on-failure` and the desktop app's `on_exit`. A proxy that stays alive with its port
+ * Task Scheduler batch loop, WinSW restart policy and the desktop app's `on_exit`. A proxy that stays alive with its port
  * listening while its event loop answers nothing is invisible to all of them. The sentinel turns
  * that state into an exit, and this module is the whole of its judgement: pure, clock-injected,
  * and free of I/O so every false-positive guard is testable on any platform.

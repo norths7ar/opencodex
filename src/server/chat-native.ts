@@ -1,12 +1,11 @@
 import { recordUpstreamValidationDetail } from "./request-log-failure-detail";
 import { normalizeNativeChatContent } from "../adapters/openai-chat/native-content";
-import { attachComboFailureEvidence, ownedChatErrorPayload, type ClientErrorContract } from "../lib/client-error-body";
+import { attachUpstreamFailureEvidence, ownedChatErrorPayload, type ClientErrorContract } from "../lib/client-error-body";
 import type { FailureVerdictSink } from "../chat/failure-verdict";
 import { normalizeChatChoiceErrors } from "./chat-native-sse";
 import { captureAccountAutoPauseAttempt, wasAccountAutoPaused } from "../oauth/account-auto-pause";
 import { createPhysicalSendReporter } from "../lib/request-execution-budget";
 import { createInferenceSendBudget } from "./inference/context";
-import { observeAdvisorNativeReasoning } from "./inference/advisor-diagnostics";
 import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../adapters/openai-chat";
 import type { AdapterRequest, ProviderAdapter } from "../adapters/base";
 import { isNativeChatRouteEligible } from "./chat-native-eligibility";
@@ -90,7 +89,6 @@ import { createFinalRequestLog } from "./inference/final-log";
 import { registerTurn, unregisterTurn } from "./lifecycle";
 import { attachRequestSpendTracker } from "./responses/request-spend";
 import { workflowRefusalResponse, workflowSendCeilingRefusalResponse } from "./workflow-refusal";
-import type { ComboProtocolSource } from "./responses/core-combo-native";
 import type { ProtocolEnvelope } from "../protocols/envelope";
 import { protocolTraceSuppressed } from "../protocols/trace";
 import { nativeChatReplayScope, bindNativeChatReplayScope, nativeChatReasoningCapture } from "./chat-native-reasoning";
@@ -213,7 +211,6 @@ export interface NativeChatExecution extends HandleNativeChatOptions {
    * the parent row, replace the one the final log settles.
    */
   sendBudget?: RequestExecutionBudget;
-  comboDispatchPermit?: SingleUseDispatchPermit;
   /** The shared observer records a Combo child's refusal on its parent's context. */
   workflowRefusalContext?: Pick<RequestLogContext, "localTerminalReason">;
   /** Replaces the request-relative first-output mark; a combo child records its own. */
@@ -253,44 +250,6 @@ export async function handleNativeChatCompletions(options: HandleNativeChatOptio
 }
 
 /**
- * The Chat source a combo hands its native children (PF-07). A child runs on the attempt the
- * combo opened and reports through the combo's callbacks, so the final row stays the parent's.
- */
-export function createNativeChatComboSource(input: {
-  req: Request;
-  config: OcxConfig;
-  envelope: ProtocolEnvelope;
-  requestedModel: string;
-  requestedStream: boolean;
-  translatorBudget: TranslatorBudget;
-  workflowRefusalContext?: Pick<RequestLogContext, "localTerminalReason">;
-  /** The request's data-plane admission; native children inherit it for replay scope. */
-  admission?: DataPlaneAdmission;
-}): ComboProtocolSource {
-  return {
-    inbound: "chat",
-    envelope: input.envelope,
-    dispatchNativeChild: child => runNativeChatAttempt({
-      req: input.req,
-      config: input.config,
-      logCtx: child.childLog,
-      route: child.route,
-      chatBody: child.body,
-      requestedModel: input.requestedModel,
-      requestedStream: input.requestedStream,
-      translatorBudget: input.translatorBudget,
-      finishLog: child.finishLog,
-      sendBudget: child.sendBudget,
-      comboDispatchPermit: child.comboDispatchPermit,
-      workflowRefusalContext: input.workflowRefusalContext,
-      onFirstOutput: child.onFirstOutput,
-      ...(child.turnAdmissionLease ? { turnAdmissionLease: child.turnAdmissionLease } : {}),
-      ...(input.admission ? { admission: input.admission } : {}),
-    }, child.attemptHandle),
-  };
-}
-
-/**
  * One native Chat attempt on an already-open attempt row: effort normalization, the send
  * loop with key failover and 429 replay, relay and usage. Every outcome is reported through
  * `execution.finishLog`, so the caller decides which final row it lands on.
@@ -321,7 +280,7 @@ export async function runNativeChatAttempt(
     finishLog(status, redactSecretString(message));
     const error = legacy.error as { type: string; code: string | null };
     const finalStatus = error.code === CYBER_POLICY_ERROR_CODE ? 400 : status;
-    return attachComboFailureEvidence(new Response(JSON.stringify(ownedChatErrorPayload({ status: finalStatus, type: error.type, code: error.code, contract,
+    return attachUpstreamFailureEvidence(new Response(JSON.stringify(ownedChatErrorPayload({ status: finalStatus, type: error.type, code: error.code, contract,
       evidence: { status, type, code: code ?? undefined, message } })),
       { status: finalStatus, headers: { "Content-Type": "application/json" } }), JSON.stringify(legacy));
   };
@@ -402,7 +361,6 @@ export async function runNativeChatAttempt(
       undefined,
       translatorBudget,
     );
-    observeAdvisorNativeReasoning(req.headers, logCtx, request.body);
     return request;
   };
   try {
@@ -427,11 +385,10 @@ export async function runNativeChatAttempt(
   // until this child's first physical send has started and settled the booking.
   const sharedSendCap = requestTransientPolicy?.attempts ?? TRANSIENT_RETRY_MAX_ATTEMPTS;
   let physicalSends = 0;
-  let initialSendStarted = false;
   const remainingSharedSends = (): number => {
     if (!sendBudget) return Number.POSITIVE_INFINITY;
     const remaining = sendBudget.remainingBaseSends(sharedSendCap);
-    return Math.min(sharedSendCap, remaining + (!initialSendStarted && execution.comboDispatchPermit ? 1 : 0));
+    return remaining;
   };
   const remainingTransientSends = (): number => Math.min(
     requestTransientPolicy
@@ -468,7 +425,6 @@ export async function runNativeChatAttempt(
   );
 
   // Non-enforced accounting for one physical send. Enforced spend is owned by the reporter.
-  const comboReceipt = Boolean(sendBudget && execution.comboDispatchPermit);
   const settleNonEnforcedSend = (url: string): void => {
     if (sendBudget) {
       // Backstop for sends the helper cannot see coming (a reset replay). The first
@@ -477,8 +433,7 @@ export async function runNativeChatAttempt(
         throw new SendBudgetExhaustedError(errorDestinationLabel(url));
       }
       physicalSends += 1;
-      reportDispatchSends(sendBudget, 1, execution.comboDispatchPermit, true);
-      initialSendStarted = true;
+      reportDispatchSends(sendBudget, 1, undefined, true);
     } else if (!spendTracker?.charge({ workflowAlreadyCounted: true })) throw new NativeChatSpendRefusal();
   };
 
@@ -512,9 +467,6 @@ export async function runNativeChatAttempt(
           providerFetch(activeProvider, undefined, {
             providerName: route.providerName,
             modelId: route.modelId,
-            onPhysicalDispatch: comboReceipt
-              ? () => { if (!physicalBudget.spendEnforced) settleNonEnforcedSend(request.url); }
-              : undefined,
             dispatchOverride: async (_input, init, execute, reacquirePacing) => {
               for (let attempt = 0; !providerApiKeySelectionIsCurrent(config, route.providerName, activeProvider); attempt++) {
                 if (outputDelivered) throw new Error("Provider key selection is unavailable during the native Chat turn");
@@ -551,7 +503,7 @@ export async function runNativeChatAttempt(
               if (init.signal?.aborted) throw init.signal.reason;
               const spendReport = createPhysicalSendReporter(physicalBudget, () => ({
                 poolId: logCtx.spendPoolId ?? route.providerName, identityId: logCtx.accountLogLabel,
-              }), execution.comboDispatchPermit);
+              }));
               const observeAutoPause = captureAccountAutoPauseAttempt(route.providerName, activeProvider, { config, oauth: undefined }, headers);
               let dispatched: Response;
               try {
@@ -561,11 +513,7 @@ export async function runNativeChatAttempt(
                   if ((logCtx.spendTracker as { refusals?: number } | undefined)?.refusals) throw new NativeChatSpendRefusal();
                   throw new SendBudgetExhaustedError();
                 }
-                // Enforced spend started this send at `beforeSend`. A Combo child's non-enforced
-                // send is booked by the physical-dispatch receipt instead, so a local refusal
-                // before the wire refunds the booking rather than charging it.
-                if (physicalBudget.spendEnforced) initialSendStarted = true;
-                else if (!comboReceipt) settleNonEnforcedSend(request.url);
+                if (!physicalBudget.spendEnforced) settleNonEnforcedSend(request.url);
                 noteProviderAttemptSend(logCtx, route.providerName, activeProvider, logCtx.usageLogInputTokens, transportRecovery ?? recovery);
                 // A reselected provider transport is still a physical send: the connection policy
                 // and manual-redirect ownership wrap the selected implementation (#4992).
@@ -810,7 +758,7 @@ export async function runNativeChatAttempt(
         ...(replayRefusal ? REPLAY_REFUSAL_CLIENT_HEADERS : {}),
       },
     });
-    attachComboFailureEvidence(rewritten, JSON.stringify(chatCompletionsErrorBody(status, classified.message, classified.type, classified.code)));
+    attachUpstreamFailureEvidence(rewritten, JSON.stringify(chatCompletionsErrorBody(status, classified.message, classified.type, classified.code)));
     return replayRefusal ? retainReplayRefusal(rewritten) : rewritten;
   }
 

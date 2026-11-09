@@ -3,15 +3,6 @@ import type { CodexAccountMode, OcxConfig, OcxProviderConfig } from "./types";
 import { createHash } from "node:crypto";
 import { peekAuthStore } from "./oauth/store";
 import { resolveDevinApiBaseUrl, validateDevinApiBaseUrl } from "./oauth/devin/api-base";
-import {
-  getCombo,
-  isComboTargetInCooldown,
-  preservesPhysicalComboProvider,
-  targetKey,
-  tryPickComboModel,
-  type ComboPick,
-} from "./combos";
-import type { NormalizedComboConfig } from "./combos/types";
 import { hasOwnProvider } from "./config/provider-name";
 import { anthropicInstanceRowShapeMatches } from "./providers/anthropic-instance-id";
 import { reconcileRouterWarningMemos, routedProviderConfig } from "./providers/routed-config";
@@ -40,11 +31,10 @@ import {
   buildRouteDecisionTrace,
   type RouteDecisionKind,
   type RouteDecisionTraceV1,
-  type TraceCandidateInput,
 } from "./routing/trace";
 import { getRoutingProfile, resolvePolicyProfileId, POLICY_NAMESPACE } from "./routing/profile";
 import { evaluatePolicyProfile, type PolicyRequestEvidence } from "./routing/evaluator";
-import { assemblePolicyCandidateEvidence } from "./routing/compatibility/assemble";
+import { assemblePolicyCandidateEvidence } from "./routing/evidence";
 import { resolveModelPolicy, type ResolvedModelPolicy } from "./providers/resolved-model-policy";
 
 /** Explicit Pool 2 admission refusal; ingress must not recover it through default routing. */
@@ -88,7 +78,6 @@ export interface RouteResult {
   codexAccountId?: string;
   /** Public namespace used by the account-qualified selector. */
   codexAccountNamespace?: string;
-  combo?: ComboPick;
   /** Bounded route-decision trace (RI-01); never contains secrets. */
   routeDecision?: RouteDecisionTraceV1;
   /**
@@ -100,7 +89,7 @@ export interface RouteResult {
   /**
    * Set when a blocked-model redirect moved the request to a different
    * provider. Caller credentials addressed to the source route must not follow
-   * it, exactly as for combo and policy routes.
+   * it, as on policy routes.
    */
   credentialDomainRewrite?: true;
 }
@@ -257,34 +246,6 @@ export class NoEnabledOpenAiProviderError extends Error {
   }
 }
 
-/**
- * One immutable selection trace for a combo request: built once from the
- * initial pick, before any child dispatch. Fallback execution stays in the
- * usage entry's `attempts[]`; the trace never changes after selection.
- */
-export function comboRouteDecisionTrace(
-  config: OcxConfig,
-  comboId: string,
-  pick: ComboPick,
-  requestedModel: string,
-): RouteDecisionTraceV1 {
-  const combo = getCombo(config, comboId);
-  return buildRouteDecisionTrace({
-    requestedModel,
-    routeKind: "combo",
-    selected: {
-      provider: pick.target.provider,
-      model: pick.target.model,
-      reason: "combo-pick",
-      candidateIndex: pick.targetIndex,
-      ...(combo
-        ? { tieBreak: combo.strategy }
-        : {}),
-    },
-    candidates: combo ? comboRouteCandidates(config, pick, combo) : undefined,
-  });
-}
-
 const MAX_BLOCKED_MODEL_REDIRECT_EDGES = 5;
 
 interface BlockedModelRedirectState {
@@ -361,7 +322,7 @@ function routeResult(
     }
     redirectState.visited.add(source);
     redirectState.edges += 1;
-    const targetRoute = routeModelInternal(config, crossTarget, true, undefined, false, false, redirectState);
+    const targetRoute = routeModelInternal(config, crossTarget, true, undefined, false, redirectState);
     return { ...targetRoute, routeReason: "blocked-model-redirect", credentialDomainRewrite: true };
   }
   // Existing bare mappings remain one post-resolution, same-provider substitution.
@@ -384,64 +345,24 @@ function routeResult(
   };
 }
 
-/**
- * Candidate evidence for a combo route: every configured target with its
- * selection-time eligibility and exclusion reasons. Purely observational; the
- * pick already happened and this never re-selects.
- */
-function comboRouteCandidates(
-  config: OcxConfig,
-  pick: NonNullable<RouteResult["combo"]>,
-  combo: NormalizedComboConfig,
-): TraceCandidateInput[] {
-  const now = Date.now();
-  return combo.targets.map((target, index) => {
-    const key = targetKey(target);
-    const provider = config.providers[target.provider];
-    const configured = provider !== undefined;
-    const enabled = configured && provider.disabled !== true;
-    const inCooldown = isComboTargetInCooldown(pick.comboId, target, now);
-    const isSelected = index === pick.targetIndex;
-    // The pick's `attempted` list includes the winner itself; only non-selected
-    // targets can be "already-attempted" (fallback picks exclude earlier tries).
-    const alreadyAttempted = !isSelected && pick.attempted.includes(key);
-    const exclusions: TraceCandidateInput["exclusions"] = [];
-    if (!configured) exclusions.push({ code: "unconfigured" });
-    if (configured && !enabled) exclusions.push({ code: "disabled" });
-    if (inCooldown) exclusions.push({ code: "cooldown" });
-    if (isSelected && inCooldown) exclusions.push({ code: "selected-despite-cooldown" });
-    if (!isSelected && alreadyAttempted && exclusions.length === 0) {
-      exclusions.push({ code: "already-attempted" });
-    }
-    if (!isSelected && exclusions.length === 0) exclusions.push({ code: "not-selected" });
-    return {
-      provider: target.provider,
-      model: target.model,
-      eligible: enabled && !inCooldown && !alreadyAttempted,
-      exclusions,
-    };
-  });
-}
-
 function routeModelInternal(
   config: OcxConfig,
   modelId: string,
-  bypassCombos: boolean,
+  bypassPolicy: boolean,
   policyEvidence?: PolicyRequestEvidence,
   allowCompactionNativeFallback = false,
-  preview = false,
   redirectState: BlockedModelRedirectState = { visited: new Set<string>(), edges: 0 },
 ): RouteResult {
   const slash = modelId.indexOf("/");
   // Policy namespace is system-reserved: an explicit `policy/<id>` or a
   // configured profile alias executes the policy evaluator and routes the
   // selected candidate. Only explicit requests reach this branch; concrete
-  // recursive targets skip policy resolution entirely (bypassCombos) so an
+  // recursive targets skip policy resolution entirely (bypassPolicy) so an
   // alias matching a selected candidate can never recurse. Missing reserved
   // policy selectors fail before ordinary provider/default resolution.
-  const policyId = !bypassCombos ? resolvePolicyProfileId(config, modelId) : null;
+  const policyId = !bypassPolicy ? resolvePolicyProfileId(config, modelId) : null;
   const profile = policyId ? getRoutingProfile(config, policyId) : undefined;
-  if (!bypassCombos && !profile && (policyId !== null || modelId.startsWith(`${POLICY_NAMESPACE}/`))) {
+  if (!bypassPolicy && !profile && (policyId !== null || modelId.startsWith(`${POLICY_NAMESPACE}/`))) {
     throw new UnknownRoutingPolicyError(policyId ?? modelId.slice(POLICY_NAMESPACE.length + 1));
   }
   if (profile && policyId) {
@@ -457,7 +378,7 @@ function routeModelInternal(
     }
     const selected = evaluation.candidates[evaluation.selectedIndex]!;
     const concrete = `${selected.provider}/${selected.model}`;
-    const routed = routeModelInternal(config, concrete, true, undefined, false, preview, redirectState);
+    const routed = routeModelInternal(config, concrete, true, undefined, false, redirectState);
     if (routed.routeReason === "blocked-model-redirect" && !evaluation.candidates.some(candidate =>
       candidate.provider === routed.providerName && candidate.model === routed.modelId && candidate.eligible
     )) {
@@ -514,17 +435,6 @@ function routeModelInternal(
         codexAccountId: binding[1],
         codexAccountNamespace: namespace,
       };
-    }
-  }
-
-  if (!bypassCombos && !preservesPhysicalComboProvider(config)) {
-    const combo = tryPickComboModel(config, modelId, preview);
-    if (combo) {
-      const concrete = `${combo.target.provider}/${combo.target.model}`;
-      // The selected target is already a concrete provider/model reference. Resolve it without
-      // consulting combo aliases again, otherwise an alias that shadows the target can recurse.
-      const routed = routeModelInternal(config, concrete, true, undefined, false, preview, redirectState);
-      return { ...routed, combo, routeKind: "combo" as const, routeReason: routed.routeReason === "blocked-model-redirect" ? "blocked-model-redirect" : "combo-pick" };
     }
   }
 
@@ -600,9 +510,9 @@ function routeModelInternal(
         : resolveModelAlias(config, prov, known, requestedModel)
           // Last resort for direct requests while the live roster is cold: display-name keys are
           // operator-declared native ids, consulted only here so they never claim aliases or shadow
-          // known or retained ids. Concrete policy/combo/redirect targets (bypassCombos) keep the
+          // known or retained ids. Concrete policy/redirect targets (bypassPolicy) keep the
           // exact model their evaluator selected, so evidence and eligibility describe what is sent.
-          ?? (bypassCombos ? decoded : decodeDisplayNameFallback(prov, decoded));
+          ?? (bypassPolicy ? decoded : decodeDisplayNameFallback(prov, decoded));
       return routeResult(
         config,
         provName,
@@ -696,11 +606,10 @@ function routeModelInternal(
   throw new Error(`No provider configured for model: ${modelId}`);
 }
 
-function routeWithDecisionTrace(config: OcxConfig, modelId: string, route: RouteResult): RouteResult {
+function routeWithDecisionTrace(modelId: string, route: RouteResult): RouteResult {
   // Policy routes carry a full evaluation trace already; never rebuild it.
   if (route.routeDecision) return route;
   const accountRef = route.codexAccountNamespace;
-  const combo = route.combo ? getCombo(config, route.combo.comboId) : undefined;
   route.routeDecision = buildRouteDecisionTrace({
     requestedModel: modelId,
     routeKind: route.routeKind,
@@ -709,14 +618,7 @@ function routeWithDecisionTrace(config: OcxConfig, modelId: string, route: Route
       model: route.modelId,
       ...(accountRef ? { accountRef } : {}),
       reason: route.routeReason,
-      ...(route.combo ? { candidateIndex: route.combo.targetIndex } : {}),
-      ...(combo
-        ? { tieBreak: combo.strategy }
-        : {}),
     },
-    candidates: route.routeKind === "combo" && route.combo && combo
-      ? comboRouteCandidates(config, route.combo, combo)
-      : undefined,
   });
   return route;
 }
@@ -727,12 +629,12 @@ export function routeModel(
   policyEvidence?: PolicyRequestEvidence,
 ): RouteResult {
   const route = routeModelInternal(config, modelId, false, policyEvidence);
-  return routeWithDecisionTrace(config, modelId, route);
+  return routeWithDecisionTrace(modelId, route);
 }
 
-/** Resolve a route for capability inspection without creating combo selection state. */
+/** Resolve a route for capability inspection without dispatching a request. */
 export function previewRouteModel(config: OcxConfig, modelId: string): RouteResult {
-  return routeWithDecisionTrace(config, modelId, routeModelInternal(config, modelId, false, undefined, false, true));
+  return routeModel(config, modelId);
 }
 
 /**
@@ -748,10 +650,10 @@ export function routeCompactionModel(
   policyEvidence?: PolicyRequestEvidence,
 ): RouteResult {
   const route = routeModelInternal(config, modelId, false, policyEvidence, true);
-  return routeWithDecisionTrace(config, modelId, route);
+  return routeWithDecisionTrace(modelId, route);
 }
 
-/** Resolve a combo-selected provider/model target without consulting public combo aliases again. */
+/** Resolve a concrete provider/model without consulting routing-profile aliases. */
 export function routeConcreteModel(config: OcxConfig, modelId: string): RouteResult {
   return routeModelInternal(config, modelId, true, undefined);
 }

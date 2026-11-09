@@ -99,11 +99,10 @@ test("the toggle preserves every other claudeCode field", async () => {
   // It is a toggle, not a settings surface: the Claude tab owns these and a
   // switch that quietly dropped them would be a data-loss bug.
   const config = baseConfig({
-    claudeCode: { enabled: true, model: "anthropic/claude-opus-5", systemEnv: true, injectAgents: false },
+    claudeCode: { enabled: true, model: "anthropic/claude-opus-5", injectAgents: false },
   });
   await put(config, false);
   expect(config.claudeCode?.model).toBe("anthropic/claude-opus-5");
-  expect(config.claudeCode?.systemEnv).toBe(true);
   expect(config.claudeCode?.injectAgents).toBe(false);
 });
 

@@ -1,7 +1,7 @@
 import { carryReplayRefusal, isNonReplayableResponse, markResponseNonReplayable } from "./upstream-retry";
 import {
   ANTHROPIC_ERROR_CODES, ANTHROPIC_ERROR_TYPES, CLAUDE_CONTEXT_OVERFLOW_MESSAGE,
-  CLIENT_ERROR_CONTRACTS, clientErrorCodeMessage, actionableRefusalMessage, isProxyError, attachComboFailureEvidence, carryProxyError, proxyErrorPresentation, comboFailureEvidence, markProxyError, type ProxyErrorPresentation, type ClientErrorContract,
+  CLIENT_ERROR_CONTRACTS, clientErrorCodeMessage, actionableRefusalMessage, isProxyError, attachUpstreamFailureEvidence, carryProxyError, proxyErrorPresentation, upstreamFailureEvidence, markProxyError, type ProxyErrorPresentation, type ClientErrorContract,
 } from "./client-error-body";
 import { classifyUpstreamCondition, upstreamConditionMessage, type UpstreamCondition, type UpstreamConditionEvidence } from "./upstream-condition";
 
@@ -89,7 +89,7 @@ export function ownedAnthropicErrorPayload(options: OwnedAnthropicErrorOptions):
 }
 export function ownedAnthropicErrorResponse(options: OwnedAnthropicErrorOptions, legacy?: Rec): Response {
   const response = Response.json(ownedAnthropicErrorPayload(options), { status: options.status, headers: { "Content-Type": "application/json" } });
-  return legacy === undefined ? response : attachComboFailureEvidence(response, JSON.stringify(legacy));
+  return legacy === undefined ? response : attachUpstreamFailureEvidence(response, JSON.stringify(legacy));
 }
 /** Admission and presentation use separate numbers; this bounds display only. */
 export function boundedMessagesDisplayCount(value: number): string | undefined {
@@ -129,7 +129,6 @@ const FIXED_MESSAGES: ReadonlyMap<ProxyErrorPresentation, string> = new Map([
   ["scope", "The requested model is not allowed for this API key."],
   ["body_stall", "anthropic passthrough body stalled: no upstream bytes arrived before the configured timeout"],
   ["body_overflow", "anthropic passthrough body exceeded the safe limit"],
-  ["combo", "No available targets for combo; review target availability, quota and cooldowns before retrying."],
   ["pool_refresh", "Codex credential refresh did not complete for the selected Codex pool account; retry this request. If it keeps failing, sign in to that account again."],
   ["copilot", "GitHub Copilot Auto negotiation failed; retry or check your Copilot account permissions."],
 ]);
@@ -157,6 +156,6 @@ export async function normalizeMessagesProxyRefusal(req: Request, response: Resp
   const headers = new Headers(response.headers); headers.delete("content-length");
   const out = carryProxyError(response, carryReplayRefusal(response, new Response(JSON.stringify({ ...original, error: next }), { status: response.status, headers })));
   if (isNonReplayableResponse(response)) markResponseNonReplayable(out);
-  const evidence = comboFailureEvidence(response);
-  return evidence === undefined ? out : attachComboFailureEvidence(out, evidence);
+  const evidence = upstreamFailureEvidence(response);
+  return evidence === undefined ? out : attachUpstreamFailureEvidence(out, evidence);
 }

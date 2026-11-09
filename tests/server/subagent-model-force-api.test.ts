@@ -23,37 +23,6 @@ function context(config: OcxConfig, body: unknown): ManagementContext {
 }
 const apply = async () => {};
 
-test("force-only set/clear preserves roster and siblings without catalog or agent writes", async () => {
-  for (const force of ["combo/tev-auto", null]) {
-    const config = cfg(); const ctx = context(config, { force });
-    const result = await handleSubagentModelRoutes(ctx, apply);
-    expect(result?.status).toBe(200);
-    expect(await result!.json()).toMatchObject({ force, applied: ["retired/model"] });
-    expect(config.claudeCode).toMatchObject({ model: "keep", subagentEffort: "high" });
-    expect(config.claudeCode?.subagentModelForce).toBe(force ?? undefined);
-    expect(ctx.convergeCodexCatalog).not.toHaveBeenCalled();
-    expect(ctx.syncClaudeAgentDefsBestEffort).not.toHaveBeenCalled();
-  }
-});
-
-test("roster-only and mixed updates preserve partial-update semantics", async () => {
-  const config = cfg();
-  expect((await handleSubagentModelRoutes(context(config, { models: [] }), apply))?.status).toBe(200);
-  expect(config.claudeCode?.subagentModelForce).toBe("combo/tev-auto");
-  expect((await handleSubagentModelRoutes(context(config, { force: null, models: ["retained/model"] }), apply))?.status).toBe(200);
-  expect(config.subagentModels).toEqual(["retained/model"]);
-  expect(config.claudeCode?.subagentModelForce).toBeUndefined();
-});
-
-test("malformed, hidden and retained unavailable targets are rejected without writing", async () => {
-  for (const force of [42, "", "bad\nmodel", "retired/model", "combo/tev-auto"]) {
-    const config = cfg(); config.disabledModels = ["combo/tev-auto"];
-    const ctx = context(config, { force });
-    expect((await handleSubagentModelRoutes(ctx, apply))?.status).toBe(400);
-    expect(ctx.deps.saveConfigPreservingClaudeCode).not.toHaveBeenCalled();
-  }
-});
-
 test("persistence failure restores both Claude and roster state", async () => {
   const config = cfg(); const before = structuredClone(config);
   const ctx = context(config, { force: null, models: [] });
@@ -113,34 +82,7 @@ for (const force of ["combo/tev-auto", null]) {
 }
 
 for (const kind of ["corrupt", "directory", "dangling-link", "appeared", "deleted", "mutation-race"] as const) {
-  test(`force persistence refuses ${kind} config without overwriting or recreating it`, () => isolatedForceHome(async path => {
-    if (kind === "corrupt") writeFileSync(path, "{broken");
-    if (kind === "directory") mkdirSync(path);
-    if (kind === "dangling-link") symlinkSync(join(path, "..", "missing-target"), path);
-    if (kind === "deleted" || kind === "mutation-race") writeFileSync(path, JSON.stringify(cfg()));
-    const live = cfg(); const before = structuredClone(live);
-    const ctx = context(live, { force: "combo/tev-auto" }); delete ctx.deps.saveConfigPreservingClaudeCode;
-    ctx.deps.fetchAllModels = async () => {
-      if (kind === "appeared") writeFileSync(path, JSON.stringify({ ...cfg(), port: 17777 }));
-      if (kind === "deleted") unlinkSync(path);
-      return [{ provider: "combo", id: "tev-auto" }];
-    };
-    if (kind === "mutation-race") setPersistedConfigMutationBeforeCommitForTests(() => writeFileSync(path, "{raced"));
-    expect((await handleSubagentModelRoutes(ctx, apply))?.status).toBe(409);
-    expect(live).toEqual(before);
-    if (kind === "corrupt") expect(readFileSync(path, "utf8")).toBe("{broken");
-    if (kind === "mutation-race") expect(readFileSync(path, "utf8")).toBe("{raced");
-    if (kind === "appeared") expect(JSON.parse(readFileSync(path, "utf8")).port).toBe(17777);
-    if (kind === "deleted") expect(existsSync(path)).toBe(false);
-  }));
 }
-
-test("force API rejects an unadvertised million-context suffix", async () => {
-  const config = cfg();
-  const ctx = context(config, { force: "combo/tev-auto[1m]" });
-  expect((await handleSubagentModelRoutes(ctx, apply))?.status).toBe(400);
-  expect(ctx.deps.saveConfigPreservingClaudeCode).not.toHaveBeenCalled();
-});
 
 
 test.skipIf(process.platform === "win32")("unreadable config is preserved and force mutation fails closed", () => isolatedForceHome(async path => {
@@ -152,18 +94,6 @@ test.skipIf(process.platform === "win32")("unreadable config is preserved and fo
     expect(live).toEqual(before);
   } finally { chmodSync(path, 0o600); }
   expect(readFileSync(path, "utf8")).toBe(original);
-}));
-
-test("first-run mixed force and roster writes persist together", () => isolatedForceHome(async path => {
-  const live = loadConfig();
-  const ctx = context(live, { force: "combo/tev-auto", models: ["retained/model"], pickerOrder: null });
-  delete ctx.deps.saveConfigPreservingClaudeCode;
-  expect((await handleSubagentModelRoutes(ctx, apply))?.status).toBe(200);
-  const saved = JSON.parse(readFileSync(path, "utf8"));
-  expect(saved.claudeCode.subagentModelForce).toBe("combo/tev-auto");
-  expect(saved.subagentModels).toEqual(["retained/model"]);
-  expect(saved.modelPickerOrder).toBeUndefined();
-  expect(ctx.convergeCodexCatalog).toHaveBeenCalledTimes(1);
 }));
 
 for (const publication of ["not-published", "published", "uncertain"] as const) {
@@ -182,14 +112,4 @@ test("existing-file published write error does not restore only live force state
   ctx.deps.saveConfigPreservingClaudeCode = () => { throw new ConfigWritePublishedError(new Error("fixture post-publication")); };
   await expect(handleSubagentModelRoutes(ctx, apply)).rejects.toBeInstanceOf(ConfigWritePublishedError);
   expect(live.claudeCode?.subagentModelForce).toBeUndefined();
-});
-
-
-test("force API keeps genuine marked catalog entries and ordinary unmarked writes", async () => {
-  for (const force of ["combo/tev-auto", "kimi/k3[1m]"]) {
-    const live = cfg(); const ctx = context(live, { force });
-    ctx.deps.fetchAllModels = async () => [{ provider: "combo", id: "tev-auto" }, { provider: "kimi", id: "k3[1m]", contextWindow: 262144 }];
-    expect((await handleSubagentModelRoutes(ctx, apply))?.status).toBe(200);
-    expect(live.claudeCode?.subagentModelForce).toBe(force);
-  }
 });

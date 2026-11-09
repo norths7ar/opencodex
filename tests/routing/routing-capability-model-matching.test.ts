@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { validateConfigCandidate } from "../../src/config";
 import { NoEligiblePolicyCandidateError, routeModel, routedProviderConfig } from "../../src/router";
 import { candidateCapabilityEvidence } from "../../src/routing/capability";
-import { assemblePolicyCandidateEvidence } from "../../src/routing/compatibility/assemble";
+import { assemblePolicyCandidateEvidence } from "../../src/routing/evidence";
 import { evaluatePolicyProfile } from "../../src/routing/evaluator";
 import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
 import { getRoutingProfile } from "../../src/routing/profile";

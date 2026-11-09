@@ -17,7 +17,6 @@ import { interactiveConfirm } from "./interactive-confirm";
 import { takeProviderEditSettings } from "./provider-settings";
 import { printProviderReceipt, runProviderAction } from "./provider-result";
 import { providerQuotaLine } from "./account-extended";
-import { pinSponsorRows } from "../providers/sponsor-order";
 import type { ProviderQuotaReportDto } from "./account-api";
 
 interface ProviderQuotasDto {
@@ -52,7 +51,6 @@ const USAGE = `Usage:
   ocx provider quota [--refresh] [--json]
   ocx provider resets [--limit <n>] [--json]
   ocx provider presets [--json]
-  ocx provider account-mode <pool|direct> [--json]
   ocx provider selected <name> [--set <model,model...>] [--clear] [--json]
   ocx provider keychain <name> [status|store|restore] [--json]`;
 
@@ -304,32 +302,10 @@ async function presets(argv: string[], deps: RuntimeApiDeps): Promise<void> {
   rejectArgs(args, USAGE);
   const result = await runtimeRequest<{ providers?: unknown[] } | unknown[]>("/api/provider-presets", {}, deps);
   const rows = Array.isArray(result) ? result : result.providers ?? [];
-  const pinned = pinSponsorRows(
-    rows,
-    row => {
-      const tier = (row as Record<string, unknown>)?.sponsor;
-      return tier === "main" || tier === "standard" ? tier : undefined;
-    },
-    row => String((row as Record<string, unknown>)?.label ?? (row as Record<string, unknown>)?.id ?? ""),
-  );
-  printData(result, wantsJson, pinned.map(row => {
+  printData(result, wantsJson, rows.map(row => {
     const record = row as Record<string, unknown>;
-    const sponsor = record.sponsor ? `  (sponsor: ${String(record.sponsor)})` : "";
-    return `${String(record.id ?? record.name ?? "?")}  ${String(record.label ?? record.adapter ?? "")}${sponsor}`.trimEnd();
+    return `${String(record.id ?? record.name ?? "?")}  ${String(record.label ?? record.adapter ?? "")}`.trimEnd();
   }));
-}
-
-async function accountMode(argv: string[], deps: RuntimeApiDeps): Promise<void> {
-  const args = [...argv];
-  const mode = args.shift();
-  const wantsJson = takeFlag(args, "--json");
-  if (mode !== "pool" && mode !== "direct") throw new CliUsageError("mode must be pool or direct", USAGE);
-  rejectArgs(args, USAGE);
-  const result = await runtimeRequest("/api/providers?name=openai", {
-    method: "PATCH",
-    body: JSON.stringify({ codexAccountMode: mode }),
-  }, deps);
-  printData(result, wantsJson, [`OpenAI Codex account mode: ${mode}`]);
 }
 
 async function selected(argv: string[], deps: RuntimeApiDeps): Promise<void> {
@@ -386,7 +362,6 @@ export async function handleProviderRuntimeCommand(sub: string, argv: string[], 
     quota,
     resets,
     presets,
-    "account-mode": accountMode,
     selected,
     keychain,
   };

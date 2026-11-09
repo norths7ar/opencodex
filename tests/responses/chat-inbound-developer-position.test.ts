@@ -23,8 +23,6 @@ import { parseRequest } from "../../src/responses/parser";
 import { responsesRequestSchema } from "../../src/responses/schema";
 import { handleChatCompletions } from "../../src/server/chat-completions";
 import { handleResponses } from "../../src/server/responses";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
-import { clearComboRecallForTests } from "../../src/server/responses/combo-session-recall";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
 import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
 import { resetProviderRequestPacingForTest } from "../../src/providers/request-pacing";
@@ -173,9 +171,6 @@ describe("Chat, combo and Responses paths agree on instruction placement", () =>
     process.env.OPENCODEX_HOME = testDir;
     // Taken after this suite installs its home so the physical dispatch owns that journal.
     releaseSpendHome = acquireOwnedSpendHome();
-    clearComboSelectionState();
-    clearComboRecallForTests();
-    clearComboTargetCooldowns();
     clearKeyCooldowns();
     clearResponseStateForTests();
     captured = [];
@@ -200,9 +195,6 @@ describe("Chat, combo and Responses paths agree on instruction placement", () =>
     upstream = null;
     await flushResponseState();
     clearResponseStateForTests();
-    clearComboSelectionState();
-    clearComboRecallForTests();
-    clearComboTargetCooldowns();
     clearKeyCooldowns();
     resetProviderRequestPacingForTest();
     if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
@@ -265,10 +257,6 @@ describe("Chat, combo and Responses paths agree on instruction placement", () =>
 
   test("the native Chat route forwards the transcript unchanged", async () => {
     expect(await chatWireMessages("chat/m1")).toEqual(TRANSCRIPT);
-  });
-
-  test("a combo route translates and still sends the transcript unchanged", async () => {
-    expect(await chatWireMessages("combo/pair")).toEqual(TRANSCRIPT);
   });
 
   test("the Responses path sends the same transcript", async () => {

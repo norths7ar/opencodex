@@ -1,8 +1,8 @@
-import { COMBO_NAMESPACE } from "../../combos/identifiers";
+
 import { isPlainObject } from "../../lib/plain-data";
 import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "./kinds";
 import { SUPPORTED_NATIVE_OPENAI_SLUGS } from "./native-models";
-import { hasOcxRoutedAuthorship } from "./ownership";
+import { hasOcxRoutedAuthorship, isRetiredComboCatalogEntry } from "./ownership";
 import type { RawCatalog, RawEntry } from "./parsing";
 
 /** Internal source evidence, outside the emitted model collection. */
@@ -14,7 +14,7 @@ function isSupportedNativeTemplate(row: RawEntry): boolean {
     && !row.slug.includes("/")
     && "base_instructions" in row
     && row.opencodex_catalog_kind !== CODEX_NATIVE_ALIAS_CATALOG_KIND
-    && row.owned_by !== COMBO_NAMESPACE
+    && !isRetiredComboCatalogEntry(row)
     && !hasOcxRoutedAuthorship(row);
 }
 

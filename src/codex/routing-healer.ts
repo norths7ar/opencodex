@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { loadConfig } from "../config";
 import { readRuntimePort } from "../config/process-state";
-import { readClientConnectionState } from "../client/state";
 import { appendDebugLogLine } from "../lib/debug-log-buffer";
 import { redactUserPath } from "../lib/redact";
 import { isRecyclingForExit, isShutdownDraining } from "../server/lifecycle";
@@ -77,7 +76,6 @@ export interface CodexRoutingHealGates {
   runtimePortOfThisProcess(): number | null;
   loadConfig(): OcxConfig;
   /** Any client-connection state other than disconnected (connected, link, invalid). */
-  clientConnected(): boolean;
   /** The journal names a connected client as its owner (read-only). */
   clientJournalOwner(): boolean;
 }
@@ -96,12 +94,12 @@ export function evaluateCodexRoutingHealGates(
   if (gates.exiting()) return { open: false, gate: "exiting" };
   if (gates.runtimePortOfThisProcess() !== port) return { open: false, gate: "runtime-record" };
   const config = gates.loadConfig();
-  // Codex ON and not hub-gated; the injector re-checks this under its lock.
+  // Codex ON; the injector re-checks this under its lock.
   if (!shouldSyncCodexOnStart(config)) return { open: false, gate: "codex-off" };
   if (shouldInjectApiAuthHeader(config)) return { open: false, gate: "admission-token" };
   const targetPort = Number(new URL(standaloneCodexRoutingTarget(port, config).baseUrl).port);
   if (!ownPorts.has(targetPort)) return { open: false, gate: "target-not-served" };
-  if (gates.clientConnected() || gates.clientJournalOwner()) return { open: false, gate: "client" };
+  if (gates.clientJournalOwner()) return { open: false, gate: "client" };
   return { open: true, config, targetPort };
 }
 
@@ -160,7 +158,6 @@ const defaultGates: CodexRoutingHealGates = {
   exiting: () => isRecyclingForExit() || isShutdownDraining(),
   runtimePortOfThisProcess: () => readRuntimePort(process.pid)?.port ?? null,
   loadConfig,
-  clientConnected: () => readClientConnectionState().kind !== "disconnected",
   clientJournalOwner: () => journalOwner({ readOnly: true })?.kind === "client",
 };
 
@@ -355,7 +352,7 @@ export function startCodexRoutingHealer(options: {
     if (result.retryable) return;
     streak = null;
     cache = null;
-    // Skipped under the lock (Codex OFF, hub, sibling), an external provider appeared, or a race.
+    // Skipped under the lock (Codex OFF or sibling), an external provider appeared, or a race.
     if (result.success || raced()) return;
     backoffUntil = clock() + ROUTING_HEAL_REFUSED_BACKOFF_MS;
     warn(`Codex routing self-heal was refused (${logDetail(result.message)}); retrying in 10 minutes. Run 'ocx sync' to repair now.`);

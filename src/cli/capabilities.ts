@@ -12,7 +12,6 @@ import { AGENT_ROUTING_CAPABILITIES } from "./capabilities-agents-routing";
 import { INTEGRATION_CAPABILITIES } from "./capabilities-integrations";
 import { OBSERVE_SYSTEM_CAPABILITIES } from "./capabilities-observe-system";
 import { ACCESS_REMOTE_CAPABILITIES } from "./capabilities-access-remote";
-import { LAB_CAPABILITIES } from "./capabilities-lab";
 
 export const CAPABILITIES: readonly Capability[] = [
   ...BASE_CAPABILITIES,
@@ -22,7 +21,6 @@ export const CAPABILITIES: readonly Capability[] = [
   ...INTEGRATION_CAPABILITIES,
   ...OBSERVE_SYSTEM_CAPABILITIES,
   ...ACCESS_REMOTE_CAPABILITIES,
-  ...LAB_CAPABILITIES,
 ];
 
 export { HEAD_CAPABILITIES } from "./capabilities-base";

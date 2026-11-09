@@ -104,6 +104,6 @@ export function shadowInterceptProviderDependency(config: OcxConfig, providerNam
   } catch {
     return null;
   }
-  if (target.routeKind === "combo" || target.routeKind === "policy") return null;
+  if (target.routeKind === "policy") return null;
   return target.providerName === providerName ? dependency : null;
 }

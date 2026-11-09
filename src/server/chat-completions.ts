@@ -29,11 +29,11 @@ import {
   responsesJsonToChatCompletion,
   responsesSseToChatCompletionsSse,
 } from "../chat/outbound";
-import { ADVISOR_INTERNAL_CAPABILITY_HEADER, isInternalCallCapability } from "../lib/local-internal-call-capability";
+import { isInternalCallCapability } from "../lib/local-internal-call-capability";
 import type { CapturedAdmissionPolicy } from "../types/admission-policy";
-import { ADVISOR_ADMISSION_SCOPE_HEADER, decodeAdvisorAdmissionScope, ADVISOR_ADMISSION_POLICY_HEADER, readAdvisorAdmissionPolicy, SIDECAR_ADMISSION_POLICY_HEADER, SIDECAR_INTERNAL_CAPABILITY_HEADER } from "./advisor-admission-scope";
+import { readSidecarAdmissionPolicy, SIDECAR_ADMISSION_POLICY_HEADER, SIDECAR_INTERNAL_CAPABILITY_HEADER } from "./sidecar-admission-policy";
 import {
-  captureAdmissionPolicy, captureSelfFetchCredentialPolicy, inheritAdmissionPolicy, intersectAdmissionPolicies, selfFetchHostPolicy,
+  captureAdmissionPolicy, captureSelfFetchCredentialPolicy, inheritAdmissionPolicy, intersectAdmissionPolicies,
 } from "./capture-admission-policy";
 import { classifyError, cyberPolicyErrorType, CYBER_POLICY_ERROR_CODE, isCyberPolicyCode, UNDECLARED_TOOL_CALL_ERROR_CODE } from "../lib/errors";
 import { redactSecretString } from "../lib/redact";
@@ -70,7 +70,6 @@ import {
 } from "./request-log";
 import { createFinalRequestLog } from "./inference/final-log";
 import { clientWireLogOf, clientWireOf } from "./inference/client-wire";
-import { attachAdvisorReasoning } from "./inference/advisor-diagnostics";
 import { directEncodersApply } from "./inference/client-encoder-delivery";
 import { responseWithDeferredRequestLog } from "./relay";
 import { handleResponses } from "./responses";
@@ -94,7 +93,7 @@ import {
   isTranslatorBudgetExceededError,
   type TranslatorBudget,
 } from "../lib/translator-budget";
-import { createNativeChatComboSource, handleNativeChatCompletions, nativeChatDeclineReason } from "./chat-native";
+import { handleNativeChatCompletions, nativeChatDeclineReason } from "./chat-native";
 import { upstreamWireForAdapter, type ProtocolReasonCode } from "../protocols/contract";
 import { createProtocolEnvelope } from "../protocols/envelope";
 import { featuresFromChatBody } from "../protocols/features";
@@ -135,7 +134,7 @@ export async function handleChatCompletions(
   logCtx: RequestLogContext,
   logIds?: {
     requestId: string; start: number; turnAdmissionLease?: AdmissionLease; admission?: DataPlaneAdmission;
-    advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+    sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
     suppressProtocolTrace?: boolean;
   },
 ): Promise<Response> {
@@ -146,8 +145,7 @@ export async function handleChatCompletions(
   fillHermesLogConversationFallback(logCtx, req.headers);
   const translatorBudget = createTranslatorBudget();
   try {
-    let response = await handleChatCompletionsWithBudget(req, config, logCtx, translatorBudget, logIds);
-    if (isInternalCallCapability(req.headers.get(ADVISOR_INTERNAL_CAPABILITY_HEADER))) response = attachAdvisorReasoning(response, logCtx);
+    const response = await handleChatCompletionsWithBudget(req, config, logCtx, translatorBudget, logIds);
     return finalizeTranslatorBudgetResponse(
       response,
       translatorBudget,
@@ -174,33 +172,26 @@ async function handleChatCompletionsWithBudget(
   translatorBudget: TranslatorBudget,
   logIds?: {
     requestId: string; start: number; turnAdmissionLease?: AdmissionLease; admission?: DataPlaneAdmission;
-    advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+    sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
   },
 ): Promise<Response> {
-  const advisorInternal = isInternalCallCapability(req.headers.get(ADVISOR_INTERNAL_CAPABILITY_HEADER));
   const sidecarInternal = isInternalCallCapability(req.headers.get(SIDECAR_INTERNAL_CAPABILITY_HEADER));
-  const callerPolicy = advisorInternal
-    ? readAdvisorAdmissionPolicy(req.headers.get(ADVISOR_ADMISSION_POLICY_HEADER), req.headers.get(ADVISOR_INTERNAL_CAPABILITY_HEADER))
-    : readAdvisorAdmissionPolicy(req.headers.get(SIDECAR_ADMISSION_POLICY_HEADER), req.headers.get(SIDECAR_INTERNAL_CAPABILITY_HEADER));
-  const decodedScope = advisorInternal
-    ? decodeAdvisorAdmissionScope(req.headers.get(ADVISOR_ADMISSION_SCOPE_HEADER))
-    : undefined;
+  const callerPolicy = readSidecarAdmissionPolicy(req.headers.get(SIDECAR_ADMISSION_POLICY_HEADER), req.headers.get(SIDECAR_INTERNAL_CAPABILITY_HEADER));
   // Only a validated internal hop gets its presented credential resolved; loopback admission for
   // every other caller is untouched. An unknown credential fails closed (#7894).
   const selfFetchPolicy = callerPolicy ? captureSelfFetchCredentialPolicy(req, config) : undefined;
-  if ((advisorInternal || sidecarInternal) && (!callerPolicy || selfFetchPolicy === null
-    || advisorInternal && req.headers.has(ADVISOR_ADMISSION_SCOPE_HEADER) && !decodedScope)) {
+  if (sidecarInternal && (!callerPolicy || selfFetchPolicy === null)) {
     // Refused requests still own a final log row like every other early rejection.
     if (logIds) addFinalRequestLog(logIds.requestId, logIds.start, logCtx, 403, { closeReason: "non_stream" });
-    return chatCompletionsErrorResponse(403, "invalid inherited advisor admission scope", "permission_error", MODEL_NOT_ALLOWED_FOR_KEY);
+    return chatCompletionsErrorResponse(403, "invalid inherited sidecar admission scope", "permission_error", MODEL_NOT_ALLOWED_FOR_KEY);
   }
   // The listener snapshot was captured at authentication; internal hops add the policy of the
   // credential they selected (which loopback admission never read) and their frozen registration.
-  const listenerPolicy = logIds?.advisorAdmissionPolicy ?? captureAdmissionPolicy(config, logIds?.admission);
-  const hostPolicy = selfFetchPolicy ? selfFetchHostPolicy(listenerPolicy, selfFetchPolicy, logIds?.admission) : listenerPolicy;
-  const advisorAdmissionPolicy = callerPolicy ? intersectAdmissionPolicies(hostPolicy, callerPolicy) : hostPolicy;
-  const admission = callerPolicy ? inheritAdmissionPolicy(logIds?.admission, advisorAdmissionPolicy) : logIds?.admission;
-  const inheritedAdmissionScope = callerPolicy ? advisorAdmissionPolicy.modelScope : undefined;
+  const listenerPolicy = logIds?.sidecarAdmissionPolicy ?? captureAdmissionPolicy(config, logIds?.admission);
+  const hostPolicy = selfFetchPolicy ? intersectAdmissionPolicies(listenerPolicy, selfFetchPolicy) : listenerPolicy;
+  const sidecarAdmissionPolicy = callerPolicy ? intersectAdmissionPolicies(hostPolicy, callerPolicy) : hostPolicy;
+  const admission = callerPolicy ? inheritAdmissionPolicy(logIds?.admission, sidecarAdmissionPolicy) : logIds?.admission;
+  const inheritedAdmissionScope = callerPolicy ? sidecarAdmissionPolicy.modelScope : undefined;
   let chatBody: Rec;
   try {
     const rawBody = await readChatBody(req, translatorBudget, resolveInboundBodyLimitBytes(config.maxInboundBodyBytes));
@@ -270,7 +261,7 @@ async function handleChatCompletionsWithBudget(
       getOrAllocateRequestSessionLane(req),
       routedProvider,
     );
-    if (!route.combo && route.routeKind !== "policy") {
+    if (route.routeKind !== "policy") {
       applyDroidReasoningDefault(chatBody, droidDefaultEffort, { provider: route.provider, modelId: route.modelId });
     }
     logCtx.model = route.modelId;
@@ -280,7 +271,7 @@ async function handleChatCompletionsWithBudget(
     logCtx.provider = route.providerName;
     logCtx.routeDecision = route.routeDecision;
     settledRoute = route;
-    routeMayChangeCredentialDomain = route.combo !== undefined || route.routeKind === "policy"
+    routeMayChangeCredentialDomain = route.routeKind === "policy"
       || route.credentialDomainRewrite === true;
     callerAuthorizationRoute = !routeMayChangeCredentialDomain
       && providerConsumesCallerAuthorization(route.provider);
@@ -290,10 +281,7 @@ async function handleChatCompletionsWithBudget(
       if (chatBody.tools !== undefined) parts.push(JSON.stringify(chatBody.tools));
       logCtx.usageLogInputTokens = Math.max(1, estimateTokens(parts.join("\n"), requestedModel));
     }
-    // Combos must enter the Responses routing path so child selection, forced default
-    // effort, failover, and per-attempt telemetry run before any native Chat send.
-    nativeDecline = route.combo ? "combo-or-policy-route"
-      : effortRow ? "effort-row"
+    nativeDecline = effortRow ? "effort-row"
       : nativeChatDeclineReason(route, chatBody, config);
     if (nativeDecline === undefined) {
       chatNativeRoute = route;
@@ -338,23 +326,18 @@ async function handleChatCompletionsWithBudget(
     /* unknown model: let handleResponses shape the 404 */
   }
 
-  // Off by default: under the legacy policy with `nativeChatCombos` off nothing below is built
-  // and the request is unchanged. An effort row keeps its effort on the Responses body only, so
-  // its combo stays on the bridge.
   const protocolSettings = resolveProtocolSettings(config);
-  const nativeChatCombos = protocolSettings.rollout.nativeChatCombos
-    && settledRoute?.combo !== undefined && !effortRow;
   // Antigravity direct lane (off by default): the conversation is decoded straight into the IR
   // and the answer is encoded straight into Chat, with no internal Responses body either way.
   const antigravityDecline = settledRoute && !chatNativeRoute
     ? antigravityDirectDeclineReason(settledRoute, chatBody, config, { cacheDiagnostics: cacheDiagnosticsObserving() })
     : undefined;
   const directRoute = settledRoute && !chatNativeRoute && antigravityDecline === undefined ? settledRoute : null;
-  const envelope = protocolSettings.unrepresentable === "reject" || nativeChatCombos
+  const envelope = protocolSettings.unrepresentable === "reject"
     ? createProtocolEnvelope({ inbound: "chat", body: chatBody, translatorBudget })
     : undefined;
   // Combo and policy children are judged per candidate (PF-07); an unknown model has no route.
-  if (envelope && settledRoute && !settledRoute.combo && settledRoute.routeKind !== "policy") {
+  if (envelope && settledRoute && settledRoute.routeKind !== "policy") {
     const verdict = checkRepresentable({
       inbound: "chat",
       requestPath: chatNativeRoute
@@ -466,7 +449,7 @@ async function handleChatCompletionsWithBudget(
   } else if (internalBody.store === undefined) {
     internalBody.store = false;
   }
-  if (settledRoute && !settledRoute.combo && settledRoute.routeKind !== "policy"
+  if (settledRoute && settledRoute.routeKind !== "policy"
     && internalBody.reasoning !== undefined) {
     const { stripEmptyLadderEffort, supportedLadderFor } = await import("./effort-policy");
     const ladder = supportedLadderFor({ provider: settledRoute.provider, modelId: settledRoute.modelId });
@@ -476,19 +459,8 @@ async function handleChatCompletionsWithBudget(
   }
 
   const visionDescribeTerminal = req.headers.get("x-opencodex-vision-describe") === "1";
-  // Terminal advisor marker: the advisor sidecar's own loopback consultation re-enters through
-  // this surface. The bridge rebuilds headers from the FORWARD_HEADERS allowlist, which would
-  // drop the raw marker header — so the fact is detected here and carried as an option flag
-  // (same structure as the vision-describe fence above, depth cap 1).
-  //
-  // The header value is NOT evidence by itself: any external caller can send it, and the peer
-  // address proves nothing (Docker/WSL/tunnels/port-forwarding end on loopback). Internal
-  // authority comes from a process-owned capability minted at random per process and compared in
-  // constant time, so a forged header — or a token captured from an older process — is treated
-  // as an ordinary external request.
   // Concrete helper targets must fail before optional stored-main credential enrichment.
-  // Unresolved combos are checked after their concrete child route is selected in Responses.
-  if (settledRoute && !settledRoute.combo && isCanonicalOpenAiForwardProvider(settledRoute.provider)
+  if (settledRoute && isCanonicalOpenAiForwardProvider(settledRoute.provider)
     && isCodexReserveHelperUnsupported(config, settledRoute.modelId, logIds?.admission, visionDescribeTerminal)) {
     if (logIds) addFinalRequestLog(logIds.requestId, logIds.start, logCtx, 400, { closeReason: "non_stream" });
     return chatCompletionsErrorResponse(400, CODEX_RESERVE_HELPER_UNSUPPORTED_MESSAGE, "invalid_request_error");
@@ -570,7 +542,7 @@ async function handleChatCompletionsWithBudget(
     // #1686: the Chat surface translates its body and replays here, so the admission fact has
     // to ride along or a bearer-admitted Chat caller would still be refused by Direct.
     ...(admission ? { admission } : {}),
-    advisorAdmissionPolicy,
+    sidecarAdmissionPolicy,
     // The bridge request carries no caller credential, so resolve the replay principal here.
     replayPrincipal: { clientPrincipalId: resolveContextPrincipal(req, config, logIds?.admission) },
     abortSignal: req.signal,
@@ -581,24 +553,13 @@ async function handleChatCompletionsWithBudget(
     // translation drops along with the whole catalog. Carried separately so the
     // undeclared-tool guard can still enforce it; absent/partial catalogs stay deferred.
     clientDeclaredEmptyToolCatalog: Array.isArray(chatBody.tools) && chatBody.tools.length === 0,
-    ...((settledRoute?.combo || settledRoute?.routeKind === "policy") && droidDefaultEffort
+    ...(settledRoute?.routeKind === "policy" && droidDefaultEffort
       ? { droidDefaultEffort }
       : {}),
-    // PF-07: the combo sends eligible candidates natively from this envelope.
-    ...(envelope && nativeChatCombos ? {
-      protocolSource: createNativeChatComboSource({
-        req, config, envelope, requestedModel, requestedStream: stream, translatorBudget,
-        workflowRefusalContext: logCtx,
-        // Children run without logIds; the request's admission rides the source so their
-        // replay scope resolves the same caller principal as every other surface.
-        ...(admission ? { admission } : {}),
-      }),
-    } : {}),
     // Terminal vision-describe marker (roadmap 180): the bridge rebuilds
     // headers from the FORWARD_HEADERS allowlist, which would drop the raw
     // header — so the fact is detected here and carried as an option flag.
     ...(visionDescribeTerminal ? { visionDescribeTerminal: true } : {}),
-    ...(advisorInternal ? { advisorInternal: true } : {}),
     ...(inheritedAdmissionScope ? { admissionScope: inheritedAdmissionScope } : {}),
     translatorBudget,
     ...(logIds ? { onFirstOutput: () => recordFirstOutput(logCtx, logIds.start) } : {}),

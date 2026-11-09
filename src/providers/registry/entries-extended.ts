@@ -130,21 +130,6 @@ import {
 
 export const PROVIDER_REGISTRY_EXTENDED: readonly ProviderRegistryEntry[] = [
   {
-    // Verified 2026-09-21: docs.typesafe.ai/introduction/quickstart and /api document the fixed
-    // endpoint, Bearer auth, jev-latest, and TYPESAFE_API_KEY; typesafe.ai/legal/mca permits API integration.
-    id: "jev",
-    label: "TypeSafe JEV",
-    baseUrl: "https://api.typesafe.ai/v1/systemone",
-    adapter: "jev-decision",
-    authKind: "key",
-    credentialOnly: true,
-    dashboardUrl: "https://console.typesafe.ai",
-    liveModels: false,
-    apiKeyValidation: "unknown",
-    preserveCustomDestination: true,
-    note: "TypeSafe JEV decision service for the optional JEV Combo strategy. This credential-only preset does not publish a directly routable model.",
-  },
-  {
     id: "baseten",
     label: "Baseten Model APIs",
     baseUrl: "https://inference.baseten.co/v1",
@@ -1263,9 +1248,6 @@ export const PROVIDER_REGISTRY_EXTENDED: readonly ProviderRegistryEntry[] = [
     baseUrl: "https://api.tokenlab.sh/v1",
     authKind: "key",
     dashboardUrl: "https://tokenlab.sh/dashboard/api?tab=keys",
-    // Standard sponsor under SPONSORS.md (agreement dated 2026-09-29). Pins the row in the
-    // picker and adds the chip; nothing about routing, discovery or defaults changes.
-    sponsor: { tier: "standard", url: "https://tokenlab.sh/r/OPENCODEX" },
     liveModels: true,
     preserveCustomDestination: true,
     defaultModel: "gpt-5.6-terra",

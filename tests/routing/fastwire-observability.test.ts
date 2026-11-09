@@ -2,13 +2,11 @@ import { afterEach, describe, expect, test } from "bun:test";
 import type { AdapterRequest } from "../../src/adapters/base";
 import { createOpenAIChatAdapter } from "../../src/adapters/openai-chat";
 import { createResponsesPassthroughAdapter } from "../../src/adapters/openai-responses";
-import { buildBehaviorFingerprintV1 } from "../../src/lab/subject/behavior-fingerprint";
 import { sanitizeLogMetadataString } from "../../src/lib/redact";
 import {
   createAdapterTierMetadata,
   type ResolvedFastPolicy,
 } from "../../src/providers/fastwire";
-import { resolveProductionBehaviorValues } from "../../src/routing/compatibility/behavior";
 import {
   addFinalRequestLog,
   applyResponseLogMetadata,
@@ -22,7 +20,7 @@ import {
 import { applyServiceTierGate, handleResponses } from "../../src/server/responses/core";
 import { costResult } from "../../src/server/management/shared";
 import type { OcxConfig, OcxParsedRequest, TierObservationContext } from "../../src/types";
-import { estimateComboCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
+import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
 import type { ExpectedPriceOverlay } from "../../src/usage/expected-prices";
 import { normalizeUsageEntryForTest } from "../../src/usage/log";
 import { createTestTranslatorBudget, withTestTranslatorBudget } from "../helpers/translator-budget";
@@ -559,7 +557,7 @@ describe("FastWire per-attempt cost", () => {
       requestedServiceTier: "priority",
     });
 
-    const estimate = estimateComboCost([
+    const estimate = estimateAttemptsCost([
       {
         ordinal: 1,
         provider: "openai",
@@ -573,52 +571,8 @@ describe("FastWire per-attempt cost", () => {
     expect(estimate.cost.total).toBeCloseTo(3.2, 9);
   });
 
-  test("combo prices each attempt from its own outcome before the top-level tier", () => {
-    const attempts = [
-      {
-        ordinal: 1,
-        provider: "openai",
-        model: "gpt-5.6-sol",
-        usageStatus: "reported" as const,
-        usage,
-        tierOutcome: {
-          canonical: "priority" as const,
-          wireKind: "service-tier" as const,
-          wireValue: "priority",
-          fastOutcome: "applied" as const,
-          confirmation: "confirmed" as const,
-          responseServiceTier: "priority",
-        },
-      },
-      {
-        ordinal: 2,
-        provider: "openai",
-        model: "gpt-5.6-sol",
-        usageStatus: "reported" as const,
-        usage,
-        tierOutcome: {
-          wireKind: "service-tier" as const,
-          wireValue: "priority",
-          fastOutcome: "downgraded" as const,
-          fastDowngradeReason: "response-declined" as const,
-          confirmation: "downgraded" as const,
-          responseServiceTier: "default",
-        },
-      },
-    ];
-    const estimate = estimateComboCost(
-      attempts,
-      overlays,
-      { requestedServiceTier: "priority" },
-    )!;
-    expect(estimate.attempts?.[0]?.cost.total).toBeCloseTo(3.2, 9);
-    expect(estimate.attempts?.[1]?.cost.total).toBeCloseTo(1.6, 9);
-    expect(estimate.cost.total).toBeCloseTo(4.8, 9);
-    expect(estimate.cost.total).not.toBeCloseTo(6.4, 9);
-  });
-
   test("old attempts without outcomes retain the top-level fallback", () => {
-    const estimate = estimateComboCost([
+    const estimate = estimateAttemptsCost([
       { ordinal: 1, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported", usage },
       { ordinal: 2, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported", usage },
     ], overlays, { requestedServiceTier: "priority" })!;
@@ -652,7 +606,7 @@ describe("FastWire per-attempt cost", () => {
       responseServiceTier: "default",
     };
 
-    const priority = estimateComboCost([{
+    const priority = estimateAttemptsCost([{
       ordinal: 1,
       provider: "openrouter",
       model: "openai/gpt-5.6-sol",
@@ -665,7 +619,7 @@ describe("FastWire per-attempt cost", () => {
     expect(priority.priorityLowerBound).toBe(true);
     expect(priority.attempts?.[0]?.priorityLowerBound).toBe(true);
 
-    const standard = estimateComboCost([{
+    const standard = estimateAttemptsCost([{
       ordinal: 1,
       provider: "openrouter",
       model: "openai/gpt-5.6-sol",
@@ -676,7 +630,7 @@ describe("FastWire per-attempt cost", () => {
     expect(standard.cost.total).toBeCloseTo(1.6, 9);
     expect(standard.priorityLowerBound).toBeUndefined();
 
-    const flex = estimateComboCost([{
+    const flex = estimateAttemptsCost([{
       ordinal: 1,
       provider: "openrouter",
       model: "openai/gpt-5.6-sol",
@@ -687,7 +641,7 @@ describe("FastWire per-attempt cost", () => {
     expect(flex.cost.total).toBeCloseTo(1.6, 9);
     expect(flex.priorityLowerBound).toBeUndefined();
 
-    const openAi = estimateComboCost([{
+    const openAi = estimateAttemptsCost([{
       ordinal: 1,
       provider: "openai",
       model: "gpt-5.6-sol",
@@ -723,7 +677,7 @@ describe("FastWire per-attempt cost", () => {
       status: "verified",
     }];
 
-    const assumed = estimateComboCost([{
+    const assumed = estimateAttemptsCost([{
       ordinal: 1,
       provider: "openrouter",
       model: "openai/gpt-5.6-sol",
@@ -798,44 +752,6 @@ describe("FastWire gate and compatibility fingerprint", () => {
     );
     expect(passthroughBody.service_tier).toBe("flex");
     expect(passthroughOptions.serviceTier).toBe("flex");
-  });
-
-  test("Fast wire projections change the digest without changing serviceTier projection", () => {
-    const config = {
-      port: 10100,
-      defaultProvider: "fixture",
-      providers: {
-        fixture: {
-          adapter: "openai-responses",
-          baseUrl: "https://example.test/v1",
-          supportsServiceTier: true,
-        },
-      },
-    } as OcxConfig;
-    const base = resolveProductionBehaviorValues(
-      config,
-      "fixture",
-      "model",
-      config.providers.fixture!,
-      "salt",
-    )!;
-    const performanceProvider = {
-      ...config.providers.fixture!,
-      fastWire: { ...SERVICE_WIRE, canonicalToWire: { priority: "performance" } },
-    };
-    const performance = resolveProductionBehaviorValues(
-      { ...config, providers: { fixture: performanceProvider } },
-      "fixture",
-      "model",
-      performanceProvider,
-      "salt",
-    )!;
-
-    expect(base["responses.serviceTier"]).toEqual(performance["responses.serviceTier"]);
-    expect(base["responses.fastWireKind"]?.value).toBe("service-tier");
-    expect(base["responses.fastWireValue"]?.value).toBe("priority");
-    expect(performance["responses.fastWireValue"]?.value).toBe("performance");
-    expect(buildBehaviorFingerprintV1(base)).not.toBe(buildBehaviorFingerprintV1(performance));
   });
 });
 

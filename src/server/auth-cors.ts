@@ -51,19 +51,6 @@ import { authorizationCredential } from "../lib/authorization-scheme";
 import { noteTurnStateCaller } from "./turn-state-handles";
 
 let _corsOrigin = "http://localhost:10100";
-// Listener identity is process-local. Never infer this trust from forwarded headers: the
-// request handler marks a Request only after resolving the actual Bun Server instance.
-const trustedHubManagementRequests = new WeakSet<Request>();
-export function isTrustedHubManagementRequest(req: Request): boolean { return trustedHubManagementRequests.has(req); }
-
-export function markTrustedHubManagementRequest(req: Request): void {
-  trustedHubManagementRequests.add(req);
-}
-
-export function inheritTrustedHubManagementRequest(source: Request, target: Request): void {
-  if (trustedHubManagementRequests.has(source)) trustedHubManagementRequests.add(target);
-}
-
 export function setCorsOrigin(port: number): void { _corsOrigin = `http://localhost:${port}`; }
 /** The proxy's own listening port. No admission check uses it: both loopback predicates key on hostname alone. */
 export function configuredPort(): string {
@@ -161,38 +148,7 @@ export function managementRequestOrigin(req: Request, config: OcxConfig): string
       return null;
     }
   }
-  if (trustedHubManagementRequests.has(req)) {
-    if (config.runtimeRole !== "hub") return null;
-    const canonical = canonicalHubManagementOrigin(config.hub?.managementPublicOrigin);
-    if (!canonical) return null;
-    try {
-      // The dedicated listener may receive HTTP from a local TLS terminator, so its URL
-      // scheme is not authoritative. Host must still name exactly the configured public
-      // authority; forwarded host/proto headers are deliberately ignored.
-      const requestAuthority = new URL(`https://${host}`);
-      if (requestAuthority.username || requestAuthority.password || requestAuthority.pathname !== "/"
-        || requestAuthority.search || requestAuthority.hash || requestAuthority.host !== new URL(canonical).host) {
-        return null;
-      }
-      return canonical;
-    } catch {
-      return null;
-    }
-  }
   if (!isApiAuthRequired(config)) return null;
-  if (config.runtimeRole === "hub" && config.hub?.managementPublicOrigin) {
-    try {
-      const configured = new URL(config.hub.managementPublicOrigin);
-      if (
-        (configured.protocol === "http:" || configured.protocol === "https:")
-        && !configured.username
-        && !configured.password
-        && configured.pathname === "/"
-        && !configured.search
-        && !configured.hash
-      ) return configured.origin;
-    } catch { /* malformed direct fixture: fall through to observed origin */ }
-  }
   try {
     const protocol = new URL(req.url).protocol;
     if (protocol !== "http:" && protocol !== "https:") return null;
@@ -351,29 +307,17 @@ export function isApiAuthRequired(config: Pick<OcxConfig, "hostname">): boolean 
  * So this type is deliberately narrow: it cannot masquerade as a business config, and a policy
  * view that leaks into a routing path fails to typecheck rather than silently taking effect.
  */
-export interface LinkIngressPolicy {
-  allowedKeyIds: ReadonlySet<string>;
-}
-
-export type RequestPolicyView = Pick<OcxConfig, "hostname" | "corsAllowOrigins" | "apiKeys"> & {
-  linkIngress?: LinkIngressPolicy;
-};
-
-export type DataPlaneAdmissionOptions = {
-  linkIngress?: ReadonlySet<string>;
-};
+export type RequestPolicyView = Pick<OcxConfig, "hostname" | "corsAllowOrigins" | "apiKeys">;
 
 /** Derive the per-request policy view for a listener. Cheap enough to build per request. */
 export function requestPolicyView(
   config: OcxConfig,
   bindHostname: string,
-  linkIngress?: LinkIngressPolicy,
 ): RequestPolicyView {
   return {
     hostname: bindHostname,
     ...(config.corsAllowOrigins ? { corsAllowOrigins: config.corsAllowOrigins } : {}),
     ...(config.apiKeys ? { apiKeys: config.apiKeys } : {}),
-    ...(linkIngress ? { linkIngress } : {}),
   };
 }
 
@@ -453,15 +397,13 @@ export function resolveDataPlaneAdmissionSecret(
   token: string,
   config: Pick<OcxConfig, "apiKeys">,
   source: DataPlaneAdmissionSource = "dedicated",
-  options: DataPlaneAdmissionOptions = {},
 ): DataPlaneAdmission | null {
   const actual = token.trim();
   if (!actual) return null;
-  if (!options.linkIngress && secretEquals(actual, configuredApiAuthToken(config))) {
+  if (secretEquals(actual, configuredApiAuthToken(config))) {
     return { kind: "environment", source, contextPrincipalId: mintContextPrincipal("environment", "", actual) };
   }
   for (const k of config.apiKeys ?? []) {
-    if (options.linkIngress && !options.linkIngress.has(k.id)) continue;
     if (secretEquals(actual, k.key)) {
       return { kind: "configured", keyId: k.id, source, contextPrincipalId: mintContextPrincipal("configured", k.id, actual) };
     }
@@ -471,18 +413,6 @@ export function resolveDataPlaneAdmissionSecret(
     }
   }
   return null;
-}
-
-function canonicalHubManagementOrigin(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.pathname !== "/"
-      || parsed.search || parsed.hash) return null;
-    return parsed.origin;
-  } catch {
-    return null;
-  }
 }
 
 /** The principal an authenticated admission belongs to, or undefined for loopback. */
@@ -599,13 +529,6 @@ export const AUTH_MATRIX: readonly ApiAuthMatrixRow[] = [
   // /v1/models and for the same reason — it forwards no caller credential upstream — so a
   // remote client no longer needs an admin token just to read the model catalog.
   { endpoint: "/v1/catalog", bearer: "accepted", dedicated: "accepted", xApiKey: "accepted" },
-  // #4236: the hub-state read a connected client uses instead of reporting its own empty
-  // credential store. Same admission set and the same justification as the two rows above —
-  // it forwards no caller credential upstream and its body is booleans plus model ids — and it
-  // 404s on any host whose runtimeRole is not "hub", so no standalone install gains a surface.
-  { endpoint: "/v1/hub-state", bearer: "accepted", dedicated: "accepted", xApiKey: "accepted" },
-  // Usage additionally requires a configured key identity; unscoped environment keys are refused.
-  { endpoint: "/v1/usage", bearer: "rejected", dedicated: "accepted", xApiKey: "rejected" },
 ];
 
 /** Whether `token` is the environment-provided management secret. */
@@ -634,6 +557,14 @@ export function validateForwardAdmissionCredential(headers: Headers, config: Ocx
   if (bearer && isProxyAdmissionSecret(bearer, config)) throw new ForwardAdmissionCredentialError();
 }
 
+/** Local gateway admission uses stored auth only without a caller bearer or for our own key. */
+export function shouldSubstituteStoredCodexCredential(headers: Headers, config: OcxConfig, admission: DataPlaneAdmission | undefined): boolean {
+  if (admission?.source === "bearer") return true;
+  if (admission?.source !== "loopback") return false;
+  const bearer = authorizationCredential(headers);
+  return !bearer || isProxyAdmissionSecret(bearer, config);
+}
+
 /** Whether Authorization carries a caller-owned native Codex credential safe to forward. */
 export function hasForwardableCodexBearer(headers: Headers, config: OcxConfig): boolean {
   const bearer = authorizationCredential(headers);
@@ -650,12 +581,12 @@ export function resolveApiAuth(req: Request, config: RequestPolicyView): DataPla
   // A loopback bind never reads a token at all, so there is no key to name.
   if (!isApiAuthRequired(config)) return { kind: "loopback", source: "loopback" };
   const dedicated = req.headers.get("x-opencodex-api-key")?.trim();
-  if (dedicated) return resolveDataPlaneAdmissionSecret(dedicated, config, "dedicated", { linkIngress: config.linkIngress?.allowedKeyIds });
+  if (dedicated) return resolveDataPlaneAdmissionSecret(dedicated, config, "dedicated");
   const bearer = authorizationCredential(req.headers);
-  if (bearer) return resolveDataPlaneAdmissionSecret(bearer, config, "bearer", { linkIngress: config.linkIngress?.allowedKeyIds });
+  if (bearer) return resolveDataPlaneAdmissionSecret(bearer, config, "bearer");
   // Anthropic-SDK clients (Claude Code with ANTHROPIC_API_KEY) authenticate via x-api-key.
   const apiKey = req.headers.get("x-api-key")?.trim();
-  if (apiKey) return resolveDataPlaneAdmissionSecret(apiKey, config, "x-api-key", { linkIngress: config.linkIngress?.allowedKeyIds });
+  if (apiKey) return resolveDataPlaneAdmissionSecret(apiKey, config, "x-api-key");
   return null;
 }
 
@@ -677,14 +608,14 @@ export function resolveResponsesApiAuth(req: Request, config: RequestPolicyView)
   if (!isApiAuthRequired(config)) return { kind: "loopback", source: "loopback" };
   // The dedicated header still WINS, because it is unambiguous.
   const dedicated = req.headers.get("x-opencodex-api-key")?.trim();
-  if (dedicated) return resolveDataPlaneAdmissionSecret(dedicated, config, "dedicated", { linkIngress: config.linkIngress?.allowedKeyIds });
+  if (dedicated) return resolveDataPlaneAdmissionSecret(dedicated, config, "dedicated");
   // #1686: a bearer may also be one of OUR admission secrets. Rejecting it outright meant a
   // Codex client configured with `env_key` could not reach Direct at all. Admitting it is only
   // safe because the upstream credential is then SUBSTITUTED rather than forwarded -- see
   // materializeCodexUpstreamAuth. A bearer that is NOT our secret stays unadmitted here and
   // remains Codex Direct passthrough, so the two bearer domains still never mix.
   const bearer = authorizationCredential(req.headers);
-  if (bearer) return resolveDataPlaneAdmissionSecret(bearer, config, "bearer", { linkIngress: config.linkIngress?.allowedKeyIds });
+  if (bearer) return resolveDataPlaneAdmissionSecret(bearer, config, "bearer");
   // `x-api-key` is deliberately NOT accepted on this transport.
   return null;
 }

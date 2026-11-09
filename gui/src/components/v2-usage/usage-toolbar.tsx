@@ -49,23 +49,6 @@ export function UsageFilters({
   );
 }
 
-/** Hub scope: only shown when connected, because only then are there two stores to choose from. */
-export function UsageScopeControl({ scope, onScope, t }: { scope: "machine" | "hub"; onScope: (scope: "machine" | "hub") => void; t: TFn }) {
-  return (
-    <div className="usage-source-row m-0 flex items-center gap-2 text-[13px] text-fg-muted">
-      <span>{t("usage.source.connected")}</span>
-      <div className="usage-segmented usage-scope-control" role="group" aria-label={t("usage.scope.label")}>
-        {(["machine", "hub"] as const).map(choice => (
-          <button key={choice} type="button" className={cn(`usage-segmented-btn${scope === choice ? " active" : ""}`, SEGMENT_BUTTON)}
-            aria-pressed={scope === choice} onClick={() => onScope(choice)}>
-            {t(choice === "machine" ? "usage.scope.machine" : "usage.scope.hub")}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function UsageRangeToggle({ open, active, onToggle, t }: { open: boolean; active: boolean; onToggle: () => void; t: TFn }) {
   return (
     <button

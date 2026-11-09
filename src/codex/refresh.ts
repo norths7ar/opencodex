@@ -1,7 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { invalidateCodexModelsCache, syncCatalogModels } from "./catalog/retained-sync";
-import type { ComboCatalogOmission } from "./catalog/aggregation";
 import { getCodexHome } from "./paths";
 import { withCatalogWriteSerialization, CatalogWritePermitRefusal } from "./catalog-write-serialization";
 import { replaceCodexModelsCache } from "./internal/catalog-writer";
@@ -14,7 +13,6 @@ export interface CodexCatalogRefreshResult {
   catalogExists: boolean;
   catalogWritten: boolean;
   cacheSynced: boolean;
-  comboOmissions: ComboCatalogOmission[];
   refreshOutcome?: "committed" | "refused";
   /**
    * Desired OFF observed under K during the catalog commit, or a write refused because it would
@@ -60,15 +58,14 @@ export async function refreshCodexModelCatalog(
   const result = await deps.syncCatalogModels(config, options);
   const catalogExists = deps.existsSync(result.path);
   const catalogWritten = result.catalogWritten === true;
-  const comboOmissions = result.comboOmissions ?? [];
   if (result.skippedReason !== undefined || result.refreshOutcome === "refused") {
     // The commit path observed OFF, or an unbacked routed removal, under K. Invalidate
     // nothing: rewriting the models cache here would be exactly the write the skip refused.
-    return { ...result, catalogExists, catalogWritten: false, cacheSynced: false, comboOmissions };
+    return { ...result, catalogExists, catalogWritten: false, cacheSynced: false };
   }
   if (!catalogExists) {
-    return { ...result, catalogExists, catalogWritten: false, cacheSynced: false, comboOmissions };
+    return { ...result, catalogExists, catalogWritten: false, cacheSynced: false };
   }
   const cacheSynced = deps.invalidateCodexModelsCache(options);
-  return { ...result, catalogExists, catalogWritten, cacheSynced, comboOmissions };
+  return { ...result, catalogExists, catalogWritten, cacheSynced };
 }

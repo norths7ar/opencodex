@@ -164,47 +164,6 @@ describe("syncGrokConfig", () => {
     }
   });
 
-  test("does not reinterpret a slash-shaped combo alias as a disabled provider model", async () => {
-    const { root, grokHome } = tempGrokHome();
-    try {
-      const config = {
-        ...baseConfig,
-        providers: {
-          "disabled-provider": {
-            adapter: "openai-responses",
-            baseUrl: "https://example.invalid/v1",
-            disabled: true,
-          },
-        },
-        combos: {
-          fallback: {
-            alias: "disabled-provider/legacy",
-            targets: [{ provider: "other", model: "m1" }],
-          },
-        },
-      } as unknown as OcxConfig;
-      const manual = [
-        "[model.ocx-disabled-provider-legacy]",
-        'model = "disabled-provider/legacy"',
-        'base_url = "http://127.0.0.1:10100/v1"',
-        'api_backend = "responses"',
-        'api_key = "opencodex-loopback"',
-        'extra_headers = { "x-opencodex-grok" = "1" }',
-        "",
-      ].join("\n");
-      writeFileSync(join(grokHome, "config.toml"), manual);
-
-      const result = await syncGrokConfig(10190, config, { grokHome }, {
-        fetchAllModels: async () => [],
-        injectGrokConfig,
-      });
-      expect(result).toMatchObject({ ok: true, changed: true });
-      expect(readFileSync(join(grokHome, "config.toml"), "utf8")).toContain(manual);
-    } finally {
-      removeTreeWithRetry(root);
-    }
-  });
-
   test("keeps disabled native ids in the orphan-classification catalog", async () => {
     const hiddenNative = nativeOpenAiSlugs()[0]!;
     let emitted: GrokInjectModel[] | undefined;

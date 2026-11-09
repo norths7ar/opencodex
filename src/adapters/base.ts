@@ -18,8 +18,6 @@ export interface IncomingMeta {
   pacingSlot?: ProviderRequestSlot;
   /** Internal queued rebuild already owns the outer provider fetch admission. */
   dispatchPacingHeld?: boolean;
-  /** Combo children must surface a pre-output refusal so the selector can try the next target. */
-  comboAttempt?: boolean;
   /**
    * Provider-scoped fetch prepared by the Responses router. Stateful transports that emit more
    * than one physical HTTP request per logical turn must reuse it so every request participates in

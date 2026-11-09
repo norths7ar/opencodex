@@ -31,7 +31,6 @@ mock.module("../../src/grok/inject", () => ({ ...grok,
 
 const { claimPendingTeardown, readPendingTeardown } = await import("../../src/config/pending-teardown");
 const { isSharedTeardownDeferredOnExit } = await import("../../src/server/stop-teardown");
-const { preserveConnectedClientRoutingOnExit } = await import("../../src/cli/stop-restore");
 const { stopRestoreWriteGuard } = await import("../../src/cli/stop-restore-guard");
 const { decideStartExitTeardown } = await import("../../src/cli/dispatch");
 const { setServerRef, setServerStartupLifecycleReleaseForTests, isRecyclingForExit, markRecyclingForExit } = await import("../../src/server/lifecycle");
@@ -60,7 +59,7 @@ const to = source.indexOf("\n  let shuttingDown", from);
 if (from < 0 || to < 0) throw new Error("CLI exit cleanup missing");
 const bindings = {
   catalogHealer: null, routingHealer: null, guardian: { stop() {} }, historyGuardian: null, healthSentinel: null,
-  siblingStart: false, isRecyclingForExit, decideStartExitTeardown, preserveConnectedClientRoutingOnExit, stopRestoreWriteGuard,
+  siblingStart: false, isRecyclingForExit, decideStartExitTeardown, isSharedTeardownDeferredOnExit, stopRestoreWriteGuard,
   revertSystemEnv() { calls.env++; }, removePid() { calls.pid++; }, removeRuntimePort() { calls.runtime++; },
   serviceEnvironmentOwnedHere: () => true, getCodexHome: () => process.env.CODEX_HOME!, codexHomeIsAbsent: () => false,
   restoreNativeCodex: (options?: { withWriteGuard?: <T>(write: () => T) => T }) => {
@@ -85,32 +84,12 @@ process.on("exit", () => {
 });
 
 const url = new URL("/api/stop", server.url);
-if (query === "pending") (await import("../../src/client/state")).markClientConnectPending("b".repeat(64));
 if (query !== "none") url.searchParams.set("deferSharedTeardown", "1");
 if (query === "valid") url.searchParams.set("teardownNonce", receipt.nonce);
 if (query === "foreign") url.searchParams.set("teardownNonce", "ffffffffffffffffffffffffffffffff");
 const response = await directLocalHttpFetch(url, { method: "POST", signal: AbortSignal.timeout(5_000) }, { timeoutMs: 5_000 });
 responseStatus = response.status;
 body = await response.json();
-if (query === "pending") {
-  await Bun.sleep(350); // An accepted stop would already have drained and exited.
-  const probe = await directLocalHttpFetch(new URL("/api/stop", server.url), { method: "GET", signal: AbortSignal.timeout(2000) }, { timeoutMs: 2000 });
-  refusedKeptServing = probe.status === 200;
-  await probe.body?.cancel();
-  (await import("../../src/client/state")).clearClientConnectPending("b".repeat(64));
-  let scheduled!: () => void | Promise<void>;
-  (await import("../../src/server/management/system-restart")).acceptSystemRestart({
-    isShutdownDraining: () => false, getActiveTurnCount: () => 0,
-    acquireTemporaryDrain: () => ({ release() {} }), beginShutdownDrain() {},
-    schedule: work => { scheduled = work; }, scheduleDeadline: () => () => {},
-    drainAndShutdown: async () => true, stopListener() {}, listenPort: () => config.port,
-    isDesktopSupervised: () => false, isSupervisedServiceChild: () => false,
-    spawnStart() { automaticRestarted = true; }, markRecycling: markRecyclingForExit, exitProcess() {},
-  }, { onAccepted() {}, beforeScheduledDrain: () => true });
-  await scheduled();
-  await server.stop(true);
-  process.exit(0);
-}
 if (response.status !== 200) {
   await server.stop(true);
   throw new Error(`unexpected API stop status: ${response.status}`);

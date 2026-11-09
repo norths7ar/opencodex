@@ -11,7 +11,6 @@ import { clearAccountQuota, setAccountQuotaFromParsed, type StoredAccountQuota }
 import { handleResponses } from "../../src/server/responses";
 import { FallbackRefusedError, clearFallbackEventsForTests, recentFallbackEvents } from "../../src/routing/fallback-policy";
 import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
-import { clearComboSelectionState, getCombo, noteComboSuccess, pickComboTarget } from "../../src/combos";
 import { createRequestExecutionBudget } from "../../src/lib/request-execution-budget";
 import type { OcxConfig } from "../../src/types";
 import type { OcxFallbackConfig } from "../../src/types/fallback";
@@ -29,7 +28,6 @@ beforeEach(() => {
   clearAccountQuota();
   clearMainAccountInfoCache();
   clearFallbackEventsForTests();
-  clearComboSelectionState();
   observeMainQuotaIdentity("fallback-account-a");
 });
 
@@ -155,24 +153,6 @@ describe("hard-lock first-dispatch policy", () => {
     expect(recentFallbackEvents()).toMatchObject([{ site: "combo", outcome: "refused", kind: "provider" }]);
     expect(recentFallbackEvents()).toHaveLength(1);
   });
-
-  test("unknown preflight does not authorize an unresolved actual destination", async () => {
-    observe({ weeklyPercent: 98 });
-    const cfg = comboDispatchConfig({ provider: false, model: false });
-    cfg.combos!["random-rescue"]!.targets = [{ provider: "deepseek", model: "deepseek-chat" }];
-    cfg.providers.backup = { adapter: "openai-responses", authMode: "key", apiKey: "fixture-unused-key" };
-    cfg.blockedModelRedirects = { "deepseek/deepseek-chat": "backup/model-backup", "backup/model-backup": "deepseek/deepseek-chat" };
-    let sends = 0;
-    globalThis.fetch = (async () => { sends++; throw new Error("Must not send an unresolved destination"); }) as typeof fetch;
-    const budget = createRequestExecutionBudget();
-    await expect(handleResponses(new Request("http://localhost/v1/responses", {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ model: "gpt-5.3", stream: false, input: "hello" }),
-    }), cfg, { model: "", provider: "" }, { sendBudget: budget })).rejects.toThrow("redirect cycle");
-    expect(sends).toBe(0);
-    expect(budget.used).toBe(0);
-    expect(recentFallbackEvents()).toEqual([]);
-  });
 });
 
 function observe(quota: Omit<StoredAccountQuota, "updatedAt">): void {
@@ -254,23 +234,6 @@ describe("hard-lock selection-free preflight", () => {
       expect(recentFallbackEvents()).toEqual([]);
     });
 
-    test(`${kind} alias=${alias}: exact actual-route precedence and device refusal`, async () => {
-      observe({ weeklyPercent: 98 });
-      const cfg = declared(kind, { provider: false, model: false, routes: {
-        "combo/rescue": { provider: true, model: true },
-        "gpt-5.3": { provider: false, model: false },
-        "policy/rescue": { provider: true, model: true },
-      } }, alias);
-      if (kind === "combo") expect(await applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg)).not.toBeNull();
-      else await expect(applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg)).rejects.toBeInstanceOf(FallbackRefusedError);
-      clearFallbackEventsForTests();
-      cfg.fallback!.devices = { fixture_device: { provider: false, model: false } };
-      await expect(applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg, undefined, undefined,
-        { kind: "configured", keyId: "fixture_device" })).rejects.toBeInstanceOf(FallbackRefusedError);
-      expect(recentFallbackEvents()).toMatchObject([{ scope: "device", scopeKey: "fixture_device" }]);
-      expect(recentFallbackEvents()).toHaveLength(1);
-    });
-
     test(`${kind} alias=${alias}: source-provider policy and a no-hop candidate are preserved`, async () => {
       observe({ weeklyPercent: 98 });
       const cfg = declared(kind, { provider: true, model: true, providers: { openai: { provider: false, model: false } } }, alias);
@@ -286,31 +249,6 @@ describe("hard-lock selection-free preflight", () => {
   }
 
   for (const strategy of ["random", "round-robin", "least-used"] as const) {
-    test(`${strategy}: preflight preserves weighted selection and sticky history`, async () => {
-      observe({ weeklyPercent: 98 });
-      const cfg = declared("combo", { provider: true, model: true });
-      cfg.combos!.rescue!.strategy = strategy;
-      cfg.combos!.rescue!.stickyLimit = 2;
-      cfg.combos!.rescue!.targets = [{ ...targets[0]!, weight: 3 }, { ...targets[1]!, weight: 1 }];
-      const random = Math.random;
-      const sequence = async (preflight: boolean) => {
-        clearComboSelectionState();
-        let samples = 0;
-        Math.random = () => [0.1, 0.9, 0.5, 0.8][samples++ % 4]!;
-        const picks: string[] = [];
-        for (let index = 0; index < 8; index++) {
-          if (preflight) await applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg);
-          const pick = pickComboTarget(cfg, "rescue")!;
-          picks.push(`${pick.target.provider}/${pick.target.model}`);
-          noteComboSuccess("rescue", getCombo(cfg, "rescue")!, pick.target, pick.writerGeneration);
-        }
-        return { picks, samples };
-      };
-      try {
-        expect(await sequence(true)).toEqual(await sequence(false));
-        expect(recentFallbackEvents()).toEqual([]);
-      } finally { Math.random = random; clearComboSelectionState(); }
-    });
   }
 });
 

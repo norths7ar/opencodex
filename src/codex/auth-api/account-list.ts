@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "../account-id";
 import { getMainAccountExternalUsageWarning, type MainAccountExternalUsageWarning } from "../main-account-external-usage";
 import { codexCreditsDtoField, hasCodexCreditsObservation, pruneCodexCredits } from "../credits";
 import type { CodexCredits } from "../credits";
@@ -294,7 +295,9 @@ export async function listCodexAuthAccountsSnapshot(
   options: CodexAuthAccountsListOptions = {},
 ): Promise<CodexAuthAccountsSnapshot> {
   const runtimeConfig = getRuntimeConfig(config);
-  const poolAccounts = (runtimeConfig.codexAccounts ?? []).filter(isSelectableCodexPoolAccount);
+  if (runtimeConfig.codexSignedOut === true) return { accounts: [], mainIdentityGeneration: captureMainAccountIdentityGeneration() };
+  const poolAccounts = (runtimeConfig.codexAccounts ?? []).filter(account =>
+    account.id === singleCodexAccountId(runtimeConfig) && isSelectableCodexPoolAccount(account));
   pruneCodexCredits([MAIN_CODEX_ACCOUNT_ID, ...poolAccounts.map(account => account.id)]);
   // One redaction decision for the whole snapshot, read once from the operator's config (#3859).
   const maskEmails = emailMaskingEnabled(runtimeConfig);
@@ -302,7 +305,7 @@ export async function listCodexAuthAccountsSnapshot(
   // A passive read (a Remote Link Child's, #6959) reports what this machine already observed: no
   // token refresh, no WHAM probe, and so none of the plan or credential writes they make.
   const passive = isPassiveRead();
-  const mainResult: Awaited<ReturnType<typeof fetchMainAccountInfoAttempt>> = passive
+  const mainResult: Awaited<ReturnType<typeof fetchMainAccountInfoAttempt>> = (passive || singleCodexAccountId(runtimeConfig) !== MAIN_CODEX_ACCOUNT_ID)
     ? { info: getMainAccountInfoCache() ?? EMPTY_MAIN_ACCOUNT_INFO, credentialChecked: false, hasCredential: false,
       identityGeneration: captureMainAccountIdentityGeneration() }
     : await fetchMainAccountInfoAttempt(forceRefresh, 1, undefined, false, forceRefresh, false, runtimeConfig);
@@ -521,7 +524,8 @@ export interface PauseExhaustedResult {
 }
 
 export function selectFallbackAfterPause(config: OcxConfig, pausedActiveId: string): void {
-  reconcileCodexActiveAfterExclusion(config, pausedActiveId);
+  // Pausing the channel does not change its signed-in account.
+  return;
 }
 
 export async function pauseExhaustedCodexAccounts(

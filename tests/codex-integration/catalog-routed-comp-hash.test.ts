@@ -40,8 +40,6 @@ describe("catalog routed comp_hash (#5796)", () => {
       legacyCustomModelSlugs: new Set(),
       multiAgentMode: "default",
       multiAgentV2Enabled: false,
-      exactComboSlugs: new Set(),
-      hasPhysicalComboProvider: false,
       includeNativeOpenAi: true,
       accountBoundEntries: [],
       policy: { ...CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, warningPolicy: "suppress" },
@@ -103,8 +101,7 @@ describe("catalog routed comp_hash (#5796)", () => {
     oldHash => {
     const fresh = buildCatalogEntriesFromObservedState({
       template: null, gptSlugs: [], goModels: [{ provider: "local", id: "qwen3-coder" }],
-      featured: [], modelPickerOrder: [], wsEnabled: false, multiAgentMode: "default",
-      exactComboSlugs: new Set(), accountSelectors: [], suppressedBareNativeSlugs: new Set(),
+      featured: [], modelPickerOrder: [], wsEnabled: false, multiAgentMode: "default", accountSelectors: [], suppressedBareNativeSlugs: new Set(),
       disabledNativeAccountSlugs: new Set(), multiAgentV2Enabled: false,
     });
     const saved = fresh.map(entry => entry.slug === "local/qwen3-coder"
@@ -125,8 +122,7 @@ describe("catalog routed comp_hash (#5796)", () => {
     const built = buildCatalogEntriesFromObservedState({
       template: template("3000"), gptSlugs: [alias],
       goModels: [{ provider: "combo", id: "nova-sol", alias, nativeAlias: true, owned_by: "combo" }],
-      featured: [], modelPickerOrder: [], wsEnabled: false, multiAgentMode: "default",
-      exactComboSlugs: new Set([alias]), accountSelectors: [], suppressedBareNativeSlugs: new Set(),
+      featured: [], modelPickerOrder: [], wsEnabled: false, multiAgentMode: "default", accountSelectors: [], suppressedBareNativeSlugs: new Set(),
       disabledNativeAccountSlugs: new Set(), multiAgentV2Enabled: false,
     });
     const freshAlias = built.find(entry => entry.slug === alias)!;
@@ -137,8 +133,7 @@ describe("catalog routed comp_hash (#5796)", () => {
       catalogModels: [staleAlias], routedEntries: [], baselineCatalogModels: [], baseline: new Map(),
       featured: [], wsEnabled: false, template: null, disabledModels: new Set(),
       selectedModelsByProvider: new Map(), gatheredProviderNames: new Set(), degradedProviderNames: new Set(),
-      legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false,
-      exactComboSlugs: new Set([alias]), hasPhysicalComboProvider: false, includeNativeOpenAi: true,
+      legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: true,
       suppressedBareNativeSlugs: new Set([alias]), accountBoundEntries: [],
       policy: { ...CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, warningPolicy: "suppress" },
     }).find(entry => entry.slug === alias)!;

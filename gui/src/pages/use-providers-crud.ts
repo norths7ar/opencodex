@@ -3,7 +3,7 @@ import type { TFn } from "../i18n/shared";
 import type { ProviderUpdatePatch, ProviderUpdateResult } from "../components/provider-workspace/types";
 import { apiErrorMessage } from "../api-error";
 
-type ProviderError = { code?: unknown; combos?: unknown; error?: unknown };
+type ProviderError = { code?: unknown; error?: unknown };
 type ShadowDependency = { model: string; enabled: boolean };
 
 /** The shadow-call target a disable or delete left without its provider, when interception is on. */
@@ -16,10 +16,6 @@ function activeShadowDependency(data: { dependentShadowIntercept?: unknown }): S
 function providerErrorMessage(data: ProviderError, t: TFn, fallback: string): string {
   switch (data.code) {
     case "last_provider": return t("prov.removeLastProvider");
-    case "provider_has_dependent_combos": {
-      const combos = Array.isArray(data.combos) ? data.combos.filter((id): id is string => typeof id === "string").join(", ") : "";
-      return t("prov.removeHasDependentCombos", { combos: combos || "—" });
-    }
     case "default_provider_disabled": return t("prov.defaultDisabled");
     default:
       return typeof data.error === "string" && data.error.trim() ? data.error.trim() : fallback;

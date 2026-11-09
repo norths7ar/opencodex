@@ -20,7 +20,7 @@ import { formatCreatedDate, type ApiKeyEntry, type RevealKeyResult } from "../..
 import type { UsageReadMetadata } from "../../usage-summary-resource";
 import { UsageIncompleteNotice } from "../usage-incomplete-notice";
 import { Notice } from "../../ui";
-import { isStandaloneRuntime, standaloneApiTargets } from "../../api-targets";
+import { standaloneApiTargets } from "../../api-targets";
 import { ConnectPairingForm } from "../../connect-pairing";
 import { useKeyDisclosure, type DisclosureResetReason } from "../../use-key-disclosure";
 
@@ -111,8 +111,7 @@ export default function ApiKeysListPanel({
   // An alias URL does not reveal the configured bind host, so never invent
   // a recovery URL from it; keep the generic denial guidance.
   const localPairingTarget = standaloneApiTargets(apiBase).shared;
-  const canPairLocally = isStandaloneRuntime()
-    && window.location.protocol === "http:"
+  const canPairLocally = window.location.protocol === "http:"
     && ["127.0.0.1", "[::1]"].includes(window.location.hostname)
     && localPairingTarget.serverOrigin === window.location.origin;
 
@@ -216,7 +215,6 @@ export default function ApiKeysListPanel({
           {/* Pairing authorizes the browser, but never discloses a value itself. */}
           {canPairLocally && (
             <ConnectPairingForm
-              local
               target={localPairingTarget}
               onPairingStart={() => {
                 disclosure.invalidate();

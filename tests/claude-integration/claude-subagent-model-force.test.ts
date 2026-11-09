@@ -17,28 +17,6 @@ const deps = { forceAvailable: ["combo/tev-auto", "gpt-6.1-sol", "mock/model"], 
 const MODEL = "CLAUDE_CODE_SUBAGENT_MODEL";
 const FORCE = "CLAUDE_CODE_SUBAGENT_MODEL_FORCE";
 
-test("unset preserves env exactly; routed force uses shared combo alias and native launch adds neither", () => {
-  const baseline = buildClaudeEnv(config(), 10100, {}, {}, deps);
-  expect(baseline[MODEL]).toBeUndefined();
-  expect(baseline[FORCE]).toBeUndefined();
-  const forced = buildClaudeEnv(config("combo/tev-auto"), 10100, {}, {}, deps);
-  expect(forced[MODEL]).toBe("ocx-claude-combo--tev-auto");
-  expect(forced[FORCE]).toBe("1");
-  delete forced[MODEL]; delete forced[FORCE];
-  expect(forced).toEqual(baseline);
-  const native = buildNativeClaudeEnv(config("combo/tev-auto"), {}, deps);
-  expect(native[MODEL]).toBeUndefined(); expect(native[FORCE]).toBeUndefined();
-});
-
-test("exported values independently win and native launches retain exports", () => {
-  for (const base of [{ [MODEL]: "exported" }, { [FORCE]: "0" }, { [MODEL]: "exported", [FORCE]: "0" }]) {
-    const env = buildClaudeEnv(config("combo/tev-auto"), 10100, base, {}, deps);
-    expect(env[MODEL]).toBe(base[MODEL] ?? "ocx-claude-combo--tev-auto");
-    expect(env[FORCE]).toBe(base[FORCE] ?? "1");
-    expect(buildNativeClaudeEnv(config("combo/tev-auto"), base, deps)).toMatchObject(base);
-  }
-});
-
 test("alias resolution reuses roster provider/native semantics and the long-context boundary", () => {
   for (const entry of deps.forceAvailable) {
     const c = config(entry);
@@ -46,15 +24,6 @@ test("alias resolution reuses roster provider/native semantics and the long-cont
     expect(resolveSubagentForceModel(c, { [alias]: 829_799 }, { entries: deps.forceAvailable })).toBe(alias);
     expect(resolveSubagentForceModel(c, { [alias]: 829_800 }, { entries: deps.forceAvailable })).toBe(`${alias}[1m]`);
     expect(resolveSubagentForceModel(c, { [alias]: 1000000 }, { entries: deps.forceAvailable })).toBe(`${alias}[1m]`);
-  }
-});
-
-test("unsafe, stale and retained unavailable targets warn and inject neither variable", () => {
-  for (const force of ["bad\nmodel", "missing/model", "combo/tev-auto"]) {
-    const warnings: string[] = [];
-    const env = buildClaudeEnv({ ...config(force), subagentModels: [force] }, 10100, {}, {}, { ...deps, forceAvailable: [], warn: line => warnings.push(line) });
-    expect(env[MODEL]).toBeUndefined(); expect(env[FORCE]).toBeUndefined(); expect(warnings).toHaveLength(1);
-    expect(warnings[0]).not.toContain(force);
   }
 });
 
@@ -88,21 +57,6 @@ test("version boundary and read-only settings key presence are bounded and priva
     writeFileSync(join(dir, "settings.json"), "{");
     expect(await inspectSubagentForceStatus(false, dir, async () => null)).toMatchObject({ targetValid: false, support: "unknown", settingsReadable: false });
   } finally { removeTreeWithRetry(dir); }
-});
-
-
-test("wire selection survives exported overrides and saved force changed or cleared after launch", () => {
-  const launched = buildClaudeEnv(config("combo/tev-auto"), 10100, { [MODEL]: "ocx-claude-mock--model" }, {}, deps);
-  const body = { model: launched[MODEL], system: "<!-- ocx-route: ocx-claude-other--roster -->" };
-  // The request resolver no longer receives mutable config. New launches may
-  // differ while this already-launched request keeps its own selector.
-  for (const current of [config("combo/tev-auto"), config("mock/model"), config()]) {
-    const next = buildClaudeEnv(current, 10100, {}, {}, deps);
-    expect(next[MODEL]).toBe(current.claudeCode?.subagentModelForce === "combo/tev-auto"
-      ? "ocx-claude-combo--tev-auto" : current.claudeCode?.subagentModelForce ? "ocx-claude-mock--model" : undefined);
-    expect(extractOcxRouteDirective(body)).toBe("ocx-claude-mock--model");
-  }
-  expect(buildClaudeEnv(config("combo/tev-auto"), 10100, { [FORCE]: "0" }, {}, deps)[FORCE]).toBe("0");
 });
 
 test("legacy bare fallback stays intact and main turns have no route override", () => {

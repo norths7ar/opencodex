@@ -26,7 +26,6 @@ import type { OcxConfig, OcxProviderConfig } from "../../src/types";
 import { resolveAdapter, resolveWireProtocolOverride } from "../../src/server/adapter-resolve";
 import { credentialPinnedProviderConfigError, modelAdapterRecordConfigError } from "../../src/config/provider-validation";
 import { resolveSidecarAuth } from "../../src/sidecar/auth";
-import { buildLabProviderAuthHeaders } from "../../src/lib/lab-live-route-production";
 import * as oauthIndex from "../../src/oauth";
 import { loadConfig } from "../../src/config";
 import { mayResolveModelsOAuth } from "../../src/oauth/model-discovery-auth";
@@ -590,19 +589,5 @@ describe("dsh-account row stays pinned for every helper that resolves its token"
     } as unknown as OcxConfig);
     expect(auth.isAnthropicAuth).toBe(false);
     expect(auth.anthropicProviderName).toBeUndefined();
-  });
-
-  test("Compatibility Lab refuses dsh-account before resolving its token", async () => {
-    const snapshot = spyOn(oauthIndex, "getValidAccessTokenSnapshot");
-    try {
-      for (const baseUrl of ["https://api.deepseek.com/anthropic", "https://evil.example"]) {
-        const config = { providers: { "dsh-account": { adapter: "dsh-account", authMode: "oauth", baseUrl } } } as unknown as OcxConfig;
-        await expect(buildLabProviderAuthHeaders({ providerId: "dsh-account", baseUrl } as never, config))
-          .rejects.toMatchObject({ message: expect.stringContaining("dsh-account probes are not supported") });
-      }
-      expect(snapshot).not.toHaveBeenCalled();
-    } finally {
-      snapshot.mockRestore();
-    }
   });
 });

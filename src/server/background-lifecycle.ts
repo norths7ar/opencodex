@@ -81,7 +81,7 @@ async function refreshConnectedClientsAfterCatalogChange(isCurrent: () => boolea
   const runtime = readRuntimePort(process.pid);
   const config = loadConfig();
   // An explicit catalog tick on a hub is not permission to enroll its local clients.
-  if (!runtime || !current() || !localClientSyncAllowed(config)) return [];
+  if (!runtime || !current() || !localClientSyncAllowed()) return [];
   return syncEnabledClientIntegrations(runtime.port, config, {}, { unattended: { isCurrent: current } });
 }
 

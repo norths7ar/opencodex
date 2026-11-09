@@ -19,7 +19,7 @@ import type { IntegrationClientId } from "../integrations/registry";
 const CLAUDE_USAGE = `Usage:
   ocx claude config [status] [--json]
   ocx claude config set [--enabled <on|off>] [--auth-mode <auto|proxy|subscription>]
-      [--system-env <on|off>] [--fast-mode <on|off>] [--auto-context <on|off>]
+      [--fast-mode <on|off>] [--auto-context <on|off>]
       [--compact-window <tokens|default>] [--context-accounting <1m|200k>] [--inject-agents <on|off>]
       [--small-fast-model <id|->] [--model-map <from=to,from=to|->]
       [--blocked-skills <name,name|->] [--web-model <id|->] [--web-backend <openai|anthropic|xai|gemini|exa|->]
@@ -73,7 +73,6 @@ export async function handleClaudeConfigCommand(argv: string[], deps: RuntimeApi
     const enabled = takeBooleanOption(args, "--enabled");
     const firstParty = takeBooleanOption(args, "--first-party");
     const authMode = takeOption(args, "--auth-mode");
-    const systemEnv = takeBooleanOption(args, "--system-env");
     const fastMode = takeBooleanOption(args, "--fast-mode");
     const autoContext = takeBooleanOption(args, "--auto-context");
     const compact = takeOption(args, "--compact-window");
@@ -89,7 +88,6 @@ export async function handleClaudeConfigCommand(argv: string[], deps: RuntimeApi
     rejectArgs(args, CLAUDE_USAGE);
     if (enabled !== undefined) body.enabled = enabled;
     if (authMode !== undefined) body.authMode = authMode;
-    if (systemEnv !== undefined) body.systemEnv = systemEnv;
     if (fastMode !== undefined) body.fastMode = fastMode;
     if (autoContext !== undefined) body.autoContext = autoContext;
     if (compact !== undefined) {

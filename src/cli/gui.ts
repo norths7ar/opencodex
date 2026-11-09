@@ -22,12 +22,6 @@ export interface GuiCommandDeps extends RuntimeApiDeps {
   ) => Promise<GuiPairRequestResult>;
 }
 
-function allowedPairingOrigin(origin: string, config: OcxConfig): boolean {
-  if (config.runtimeRole !== "hub") return standaloneGuiPairingOrigin(config) === origin;
-  if (canonicalGuiBrowserOrigin(config.hub?.managementPublicOrigin) === origin) return true;
-  return (config.corsAllowOrigins ?? []).some(value => canonicalGuiBrowserOrigin(value) === origin);
-}
-
 function parsePairArgs(args: string[]): { origin: string; json: boolean } | null {
   let origin: string | undefined;
   let json = false;
@@ -61,8 +55,8 @@ export async function runGuiCommand(args: string[], deps: GuiCommandDeps): Promi
     return 1;
   }
   const config = deps.loadConfig();
-  if (!allowedPairingOrigin(canonicalOrigin, config)) {
-    console.error("Pairing requires the standalone configured literal loopback origin, or an allowed hub origin.");
+  if (standaloneGuiPairingOrigin(config) !== canonicalOrigin) {
+    console.error("Pairing requires the configured literal loopback origin.");
     return 1;
   }
   const target = await (deps.findLiveProxy ?? findLiveProxy)();
@@ -70,14 +64,13 @@ export async function runGuiCommand(args: string[], deps: GuiCommandDeps): Promi
     console.error("No running attested OpenCodex proxy is available for GUI pairing.");
     return 1;
   }
-  if ((config.runtimeRole ?? "standalone") === "standalone"
-    && (target.port !== config.port || (target.hostname ?? "127.0.0.1") !== (config.hostname ?? "127.0.0.1"))) {
+  if (target.port !== config.port || (target.hostname ?? "127.0.0.1") !== (config.hostname ?? "127.0.0.1")) {
     console.error("Standalone pairing requires the running proxy to use its configured loopback address and port.");
     return 1;
   }
   const result = await (deps.requestPairingGrant ?? requestBoundGuiPairingGrant)(target, canonicalOrigin, {
     ...(deps.fetchImpl ? { fetchImpl: deps.fetchImpl } : {}),
-    requireLocalIntent: config.runtimeRole !== "hub",
+    requireLocalIntent: true,
   });
   if (result.kind !== "created") {
     console.error(result.reason === "local-intent"

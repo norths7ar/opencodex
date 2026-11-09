@@ -5,14 +5,12 @@ import { join } from "node:path";
 import { Readable } from "node:stream";
 import { handleAccessCommand } from "../../src/cli/access";
 import { handleAgentCommand } from "../../src/cli/agent";
-import { handleComboCommand } from "../../src/cli/combo";
 import { handleConfigCommand } from "../../src/cli/config-command";
 import { handleClientIntegrationCommand, handleGrokCommand, handleClaudeInterceptCommand } from "../../src/cli/integrations";
 import { handleModelsRuntimeCommand } from "../../src/cli/models-runtime";
 import { handleProviderRuntimeCommand } from "../../src/cli/provider-runtime";
 import { providerQuotaLine } from "../../src/cli/account-extended";
 import { formatAccountTable } from "../../src/cli/account";
-import { handleConnectCommand } from "../../src/cli/connect";
 import { CAPABILITIES, capabilityInvocation } from "../../src/cli/capabilities";
 import { codexRestartLines, handleSystemCommand } from "../../src/cli/system-command";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -846,187 +844,6 @@ describe("headless GUI parity CLI", () => {
     expect(rejectedRuntime.requests).toEqual([]);
   });
 
-  test("combo set parses ordered weighted targets", async () => {
-    const runtime = fakeRuntime();
-    const code = await handleComboCommand([
-      "set", "fast", "--targets", "ark/model-a:2,openai/gpt-5.5", "--strategy", "failover", "--json",
-    ], runtime.deps);
-    expect(code).toBe(0);
-    expect(runtime.requests.find(request => request.method === "PUT")?.body).toEqual({
-      id: "fast",
-      combo: {
-        strategy: "failover",
-        stickyLimit: 1,
-        targets: [
-          { provider: "ark", model: "model-a", weight: 2 },
-          { provider: "openai", model: "gpt-5.5" },
-        ],
-      },
-    });
-  });
-
-  test("combo set accepts the jev strategy without changing target order", async () => {
-    const runtime = fakeRuntime();
-    const code = await handleComboCommand([
-      "set", "jev-auto", "--targets", "openai/gpt-6-astra,openai/gpt-5.6-sol", "--strategy", "jev", "--json",
-    ], runtime.deps);
-    expect(code).toBe(0);
-    expect(runtime.requests.find(request => request.method === "PUT")?.body).toMatchObject({
-      id: "jev-auto",
-      combo: {
-        strategy: "jev",
-        targets: [
-          { provider: "openai", model: "gpt-6-astra" },
-          { provider: "openai", model: "gpt-5.6-sol" },
-        ],
-      },
-    });
-  });
-
-  test("combo set forwards a JEV decision provider and timeout, clears them with -, and rejects other strategies", async () => {
-    const runtime = fakeRuntime();
-    expect(await handleComboCommand([
-      "set", "jev-local", "--targets", "openai/gpt-6-astra,openai/gpt-5.6-sol", "--strategy", "jev",
-      "--decision-provider", "ollama-tev1", "--decision-timeout", "60000", "--json",
-    ], runtime.deps)).toBe(0);
-    expect(await handleComboCommand([
-      "set", "jev-local", "--targets", "openai/gpt-6-astra", "--strategy", "jev",
-      "--decision-provider", "-", "--decision-timeout", "-", "--json",
-    ], runtime.deps)).toBe(0);
-    const puts = runtime.requests.filter(request => request.method === "PUT").map(request => request.body);
-    expect(puts[0]).toMatchObject({
-      id: "jev-local",
-      combo: { strategy: "jev", decisionProvider: "ollama-tev1", decisionTimeoutMs: 60_000 },
-    });
-    expect(puts[1]).toMatchObject({ combo: { decisionProvider: null, decisionTimeoutMs: null } });
-
-    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
-    try {
-      // Without --strategy the stored strategy decides (#7579), so only the read may precede the refusal.
-      for (const [args, methods] of [
-        [["--decision-provider", "ollama-tev1"], ["GET"]],
-        [["--strategy", "jev", "--decision-timeout", "999"], []],
-        [["--decision-timeout", "5000"], ["GET"]],
-      ] as const) {
-        const rejected = fakeRuntime();
-        expect(await handleComboCommand(["set", "demo", "--targets", "a/m1", ...args], rejected.deps)).toBe(2);
-        expect(rejected.requests.map(request => request.method)).toEqual([...methods]);
-      }
-    } finally {
-      errorSpy.mockRestore();
-    }
-  });
-
-  test("combo set exposes the opt-in force-default policy", async () => {
-    const runtime = fakeRuntime();
-    expect(await handleComboCommand([
-      "set", "deep", "--targets", "ark/model-a", "--effort", "max", "--effort-mode", "force", "--json",
-    ], runtime.deps)).toBe(0);
-    expect(runtime.requests.find(request => request.method === "PUT")?.body).toMatchObject({
-      id: "deep",
-      combo: { defaultEffort: "max", defaultEffortMode: "force" },
-    });
-  });
-
-  test("combo set sends fallback when clearing an existing forced default effort", async () => {
-    const runtime = fakeRuntime(req => req.method === "GET" ? {
-      combos: [{
-        id: "deep",
-        strategy: "failover",
-        stickyLimit: 1,
-        defaultEffort: "max",
-        defaultEffortMode: "force",
-        targets: [{ provider: "ark", model: "old-model" }],
-      }],
-    } : undefined);
-    expect(await handleComboCommand([
-      "set", "deep", "--targets", "ark/model-a", "--effort", "-", "--json",
-    ], runtime.deps)).toBe(0);
-    expect(runtime.requests).toEqual([
-      { path: "/api/combos", method: "GET", body: null },
-      {
-        path: "/api/combos",
-        method: "PUT",
-        body: {
-          id: "deep",
-          combo: {
-            strategy: "failover",
-            stickyLimit: 1,
-            targets: [{ provider: "ark", model: "model-a" }],
-            defaultEffort: null,
-            defaultEffortMode: "fallback",
-          },
-        },
-      },
-    ]);
-  });
-
-  test("combo set rejects --sticky outside round-robin instead of dropping it", async () => {
-    const runtime = fakeRuntime();
-    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
-    try {
-      const code = await handleComboCommand([
-        "set", "demo", "--targets", "a/m1", "--strategy", "random", "--sticky", "5",
-      ], runtime.deps);
-      expect(code).toBe(2);
-      expect(runtime.requests).toEqual([]);
-    } finally {
-      errorSpy.mockRestore();
-    }
-  });
-
-  test("combo set forwards the explicit native-alias compatibility contract", async () => {
-    const runtime = fakeRuntime();
-    const code = await handleComboCommand([
-      "set", "nova-sol",
-      "--targets", "Nova1/codex/gpt-5.6-sol",
-      "--alias", "gpt-5.6-sol",
-      "--native-alias",
-      "--display-name", "Nova1 - codex-gpt-5.6-sol",
-      "--json",
-    ], runtime.deps);
-    expect(code).toBe(0);
-    expect(runtime.requests.find(request => request.method === "PUT")?.body).toMatchObject({
-      id: "nova-sol",
-      combo: {
-        alias: "gpt-5.6-sol",
-        nativeAlias: true,
-        displayName: "Nova1 - codex-gpt-5.6-sol",
-        targets: [{ provider: "Nova1", model: "codex/gpt-5.6-sol" }],
-      },
-    });
-  });
-
-  test("combo set round-trips an existing disabled image-input capability", async () => {
-    let persisted: Record<string, unknown> = {
-      id: "text-only",
-      imageInput: "disabled",
-      targets: [{ provider: "ark", model: "old-model" }],
-    };
-    const runtime = fakeRuntime((req, body) => {
-      if (req.method === "GET") return { combos: [persisted] };
-      if (req.method === "PUT") {
-        const update = body as { id: string; combo: Record<string, unknown> };
-        persisted = { id: update.id, ...update.combo };
-        return { success: true, id: update.id, model: `combo/${update.id}`, combo: update.combo,
-          catalogRefresh: { status: "committed", changed: true, degraded: false, notices: [] } };
-      }
-      return undefined;
-    });
-
-    expect(await handleComboCommand([
-      "set", "text-only", "--targets", "ark/new-model", "--json",
-    ], runtime.deps)).toBe(0);
-    expect(await handleComboCommand(["show", "text-only", "--json"], runtime.deps)).toBe(0);
-
-    expect(persisted).toMatchObject({
-      id: "text-only",
-      imageInput: "disabled",
-      targets: [{ provider: "ark", model: "new-model" }],
-    });
-    expect(runtime.requests.map(request => request.method)).toEqual(["GET", "PUT", "GET"]);
-  });
-
   test("agent effort and roster use the same live mutation routes as GUI", async () => {
     const runtime = fakeRuntime();
     expect(await handleAgentCommand(["effort", "set", "--main", "high", "--subagent", "medium", "--json"], runtime.deps)).toBe(0);
@@ -1233,30 +1050,6 @@ describe("headless GUI parity CLI", () => {
       : undefined);
     expect(await handleAccessCommand(["key", "create", "deploy", "--json"], runtime.deps)).toBe(0);
     expect(runtime.requests[0]).toEqual({ path: "/api/keys", method: "POST", body: { name: "deploy" } });
-  });
-
-  test("remote connect status is headless and revoke refuses disconnected state before hub traffic", async () => {
-    let requests = 0;
-    const lockRoot = mkdtempSync(join(tmpdir(), "ocx-connect-parity-lock-"));
-    const lifecycleLockDeps = { lockPath: join(lockRoot, "client-lifecycle.sqlite") };
-    const logSpy = spyOn(console, "log").mockImplementation(() => {});
-    const errorSpy = spyOn(console, "error").mockImplementation(() => {});
-    try {
-      expect(await handleConnectCommand(["status", "--json"], {
-        lifecycleLockDeps,
-        fetchImpl: async () => { requests += 1; return new Response(); },
-      })).toBe(0);
-      expect(await handleConnectCommand(["revoke", "--admin-token-stdin", "--json"], {
-        lifecycleLockDeps,
-        stdinImpl: Readable.from(["ocx_admin_test\n"]),
-        fetchImpl: async () => { requests += 1; return new Response(); },
-      })).toBe(1);
-      expect(requests).toBe(0);
-    } finally {
-      logSpy.mockRestore();
-      errorSpy.mockRestore();
-      removeTreeWithRetry(lockRoot);
-    }
   });
 
   test("Grok include edits the persisted exclusion set before apply", async () => {

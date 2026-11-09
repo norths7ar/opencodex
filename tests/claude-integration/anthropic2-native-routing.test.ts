@@ -619,8 +619,7 @@ describe("native physical response incarnation ownership", () => {
       const reconcile = () => {
         const context: GenerationContext = { generation: ++contextGeneration,
           providerNames: new Set(INSTANCES), oauthAccountKeys: new Set(INSTANCES.flatMap(pool =>
-            f.store.getAccountSet(pool)!.accounts.map(row => cache.accountCacheKey(pool, row.id)))),
-          comboIds: new Set(), comboTargets: new Set(), codexAccountIds: new Set(), configRoots: new Set() };
+            f.store.getAccountSet(pool)!.accounts.map(row => cache.accountCacheKey(pool, row.id)))), codexAccountIds: new Set(), configRoots: new Set() };
         f.modelQuota.reconcileAllAnthropicFamilyQuota(context);
         f.ratePolicy.reconcileAllAnthropicRatePauses(context);
         recovery.reconcileAllAnthropicCooldownGenerations(context);

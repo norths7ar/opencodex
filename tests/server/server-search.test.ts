@@ -9,7 +9,6 @@ import { afterEach, beforeEach, expect, test } from "bun:test";
 import { existsSync, mkdirSync} from "node:fs";
 import { join } from "node:path";
 import { encodeMessage, encodeString } from "../../src/adapters/devin/cloud-direct/wire";
-import { clearComboSelectionState } from "../../src/combos";
 import { saveCodexAccountCredential } from "../../src/codex/account-store";
 import { clearAccountNeedsReauth, clearAccountQuota } from "../../src/codex/auth-api";
 import { setCodexAccountPaused } from "../../src/codex/account-pause";
@@ -543,51 +542,6 @@ test("routes every Devin model family through the native search RPC without a se
   expect(requests.every(request => !request.body.includes(Buffer.from("claude-sonnet-5"))
     && !request.body.includes(Buffer.from("grok-4-7"))
     && !request.body.includes(Buffer.from("swe-2")))).toBe(true);
-});
-
-test("native search route preview does not claim a round-robin combo turn", async () => {
-  await saveCredential("devin", {
-    access: "devin-native-search-key",
-    refresh: "devin-native-search-key",
-    expires: Number.MAX_SAFE_INTEGER,
-    apiBaseUrl: "https://server.codeium.com",
-  });
-  globalThis.fetch = (async () => new Response(encodeMessage(1, Buffer.concat([
-    encodeString(3, "https://example.test"),
-    encodeString(4, "Result"),
-  ])), { status: 200 })) as typeof fetch;
-  const config = {
-    port: 0,
-    defaultProvider: "devin",
-    providers: {
-      devin: { adapter: "devin", authMode: "oauth", baseUrl: "https://server.codeium.com" },
-      other: { adapter: "openai-chat", baseUrl: "https://example.test/v1", apiKey: "test" },
-    },
-    combos: {
-      search: {
-        strategy: "round-robin",
-        stickyLimit: 1,
-        targets: [
-          { provider: "devin", model: "swe-2" },
-          { provider: "other", model: "other-model" },
-        ],
-      },
-    },
-  } as OcxConfig;
-  clearComboSelectionState();
-  try {
-    const first = routeModel(config, "combo/search");
-    expect(first.providerName).toBe("devin");
-    const response = await handleSearch(
-      alphaSearchRequest({ model: "combo/search", query: "current docs" }),
-      config,
-      { model: "", provider: "" },
-    );
-    expect(response.status).toBe(200);
-    expect(routeModel(config, "combo/search").combo?.targetIndex).toBe(first.combo?.targetIndex);
-  } finally {
-    clearComboSelectionState();
-  }
 });
 
 test("falls back to a configured exa sidecar when no ChatGPT forward provider exists", async () => {

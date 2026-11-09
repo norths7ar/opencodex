@@ -250,7 +250,7 @@ export function syncClaudeAgentDefs(defs: readonly ClaudeAgentDef[], configDir =
   }
 }
 
-/** Launch-time hook: gate + build + sync in one call (used by ocx claude and systemEnv). */
+/** Launch-time hook: gate + build + sync in one call (used by ocx claude). */
 export function injectClaudeAgentDefs(
   config: OcxConfig,
   windows: Record<string, number>,

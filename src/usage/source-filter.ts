@@ -51,7 +51,7 @@ export function parseUsageSource(params: URLSearchParams): ParsedUsageSource {
   if (params.getAll("client").length !== 1 || params.getAll("device").length !== 1
     || params.getAll("surface").length > 1 || params.getAll("apiKeyId").length > 1
     || (params.has("surface") && params.get("surface") !== "all")
-    || params.has("jev") || params.has("failures")) return { kind: "invalid" };
+    || params.has("failures")) return { kind: "invalid" };
   const client = params.get("client");
   const device = params.get("device");
   if (!client || !(USAGE_SOURCE_CLIENTS as readonly string[]).includes(client)) return { kind: "invalid" };

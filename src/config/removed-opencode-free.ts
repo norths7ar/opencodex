@@ -29,18 +29,16 @@ export function sanitizeRemovedOpenCodeFreeForLoad(parsed: unknown): boolean {
   const retired = (value: unknown): boolean => typeof value === "string"
     && (retiredProviders.has(value.trim()) || retiredProviders.has(value.trim().split("/")[0]!) || retiredRoutes.has(value.trim()));
 
-  // Prune references in arrays/maps as well as structured provider/model targets. A decision
-  // model is required operator intent: disable that combo instead of choosing another service.
+  // Prune references in arrays/maps as well as structured provider/model targets.
   function prune(value: unknown, preserveContainer = false): unknown {
     if (retired(value)) { changed = true; return undefined; }
     if (Array.isArray(value)) return value.map(item => prune(item)).filter(item => item !== undefined);
     const row = record(value);
     if (!row) return value;
-    if (!preserveContainer && [row.provider, row.model, row.decisionModel, row.decisionProvider].some(retired)) {
+    if (!preserveContainer && [row.provider, row.model].some(retired)) {
       changed = true;
       return undefined;
     }
-    const hadTargets = Array.isArray(row.targets) && row.targets.length > 0;
     const hadCandidates = Array.isArray(row.candidates) && row.candidates.length > 0;
     const hadSourceModels = Array.isArray(row.sourceModels) && row.sourceModels.length > 0;
     for (const [key, child] of Object.entries(row)) {
@@ -50,29 +48,23 @@ export function sanitizeRemovedOpenCodeFreeForLoad(parsed: unknown): boolean {
       if (next === undefined) { delete row[key]; changed = true; }
       else row[key] = next;
     }
-    // Empty combos/profiles cannot pass schema validation or execute a request.
-    if ((hadTargets && Array.isArray(row.targets) && row.targets.length === 0)
-      || (hadCandidates && Array.isArray(row.candidates) && row.candidates.length === 0)
+    if ((hadCandidates && Array.isArray(row.candidates) && row.candidates.length === 0)
       || (hadSourceModels && Array.isArray(row.sourceModels) && row.sourceModels.length === 0)) return undefined;
     return row;
   }
 
-  // Register removed public aliases before pruning remaining references, including a
-  // combo whose decision model points to another combo disabled later in the map.
+  // Register removed profile aliases before pruning the remaining references.
   let removedRoute: boolean;
   do {
     removedRoute = false;
-    for (const [section, namespace] of [["combos", "combo"], ["routingProfiles", "policy"]] as const) {
-      const routes = record(config[section]);
-      if (!routes) continue;
-      for (const [id, value] of Object.entries(routes)) {
-        const alias = record(value)?.alias;
-        if (prune(value) !== undefined) continue;
-        delete routes[id];
-        retiredRoutes.add(`${namespace}/${id}`);
-        if (typeof alias === "string") retiredRoutes.add(alias.trim());
-        changed = removedRoute = true;
-      }
+    const routes = record(config.routingProfiles);
+    for (const [id, value] of Object.entries(routes ?? {})) {
+      const alias = record(value)?.alias;
+      if (prune(value) !== undefined) continue;
+      delete routes![id];
+      retiredRoutes.add(`policy/${id}`);
+      if (typeof alias === "string") retiredRoutes.add(alias.trim());
+      changed = removedRoute = true;
     }
   } while (removedRoute);
   // A retired default falls back to the standard built-in OAuth route, without moving a
@@ -106,7 +98,7 @@ export function sanitizeRemovedOpenCodeFreeForLoad(parsed: unknown): boolean {
     }
   }
   for (const [key, value] of Object.entries(config)) {
-    if (key === "providers" || !/model|provider|combo|routing|claudeCode|fallback|redirect|compaction|autoReview|advisor|tokenGuardian|images|codexRoleTiers|sidecar|shadowCallIntercept/i.test(key)) continue;
+    if (key === "providers" || !/model|provider|routing|claudeCode|fallback|redirect|compaction|autoReview|tokenGuardian|images|codexRoleTiers|sidecar|shadowCallIntercept/i.test(key)) continue;
     const next = prune(value, key === "claudeCode");
     if (next === undefined) delete config[key];
     else config[key] = next;

@@ -14,7 +14,7 @@ export type {
   SubagentRosterExclusion,
   EffectiveSubagentRoster,
 } from "./subagent-roster";
-export { finishUpstreamNativeEntry, isExactComboCatalogModel, deriveEntry } from "./derive-entry";
+export { finishUpstreamNativeEntry, deriveEntry } from "./derive-entry";
 export {
   buildCatalogEntries,
   buildCatalogEntriesFromObservedState,

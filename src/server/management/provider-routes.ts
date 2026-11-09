@@ -75,9 +75,7 @@ import { routedSlug, slugEquals } from "../../providers/slug-codec";
 import { clearAccountQuotaCache, clearProviderQuotaCache, fetchProviderQuotaReports } from "../../providers/quota";
 import { getCachedProviderRoutingQuota } from "../../providers/quota-routing-cache";
 import { PROVIDER_QUOTA_MAX_AGE_MS, type ProviderRoutingQuota } from "../../providers/quota-types";
-import { cachedProviderQuotaIsExhausted } from "../../combos/resolve";
-import { probeJevDecisionProvider } from "../../combos/jev";
-import { comboDependsOnProviderRoute } from "./decision-model-validation";
+import { cachedProviderQuotaIsExhausted } from "../../providers/quota-exhaustion";
 import { clearKeyCooldowns, forgetApiKeyRotationCursor } from "../../providers/key-failover";
 import { handleProviderKeyPacingRoutes } from "./provider-key-pacing-routes";
 import { CODEX_FORWARD_BASE_URL, isCanonicalOpenAiForwardProvider } from "../../providers/openai-tiers";
@@ -106,7 +104,7 @@ import {
 import type { OcxClaudeCodeConfig, OcxConfig, OcxCustomModel, OcxProviderConfig } from "../../types";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
-import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
+import { estimateAttemptsCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
 import type { PersistedUsageAttempt } from "../../usage/log";
 import {
   isAllowedRequestOrigin,
@@ -120,7 +118,6 @@ import {
 } from "../auth-cors";
 import { providerCatalogCapabilityConfigError } from "./provider-capability-config";
 import { providerEmptyToolOutputConfigError } from "../../config/provider-validation";
-import { applySystemEnvToggle } from "../system-env";
 import {
   LOCAL_PROVIDER_RELOAD_NAME_HEADER,
   LOCAL_PROVIDER_RELOAD_PATH,
@@ -222,23 +219,7 @@ function providerEditorCandidate(
   next: ProviderEditorConfigDTO,
 ): ProviderEditorCandidateResult {
   const candidate = structuredClone(persisted);
-  const removedProviders = Object.keys(persisted.providers)
-    .filter(name => !Object.hasOwn(next.providers, name));
-
-  for (const name of removedProviders) {
-    const dependentCombos = Object.entries(persisted.combos ?? {})
-      .filter(([, combo]) => comboDependsOnProviderRoute(persisted, combo, name))
-      .map(([id]) => id)
-      .sort((a, b) => a.localeCompare(b));
-    if (dependentCombos.length > 0) {
-      return {
-        ok: false,
-        status: 409,
-        error: `cannot delete provider ${JSON.stringify(redactSecretString(name))} while combos depend on it`,
-        code: "provider_has_dependent_combos",
-      };
-    }
-  }
+  const removedProviders = Object.keys(persisted.providers).filter(name => !Object.hasOwn(next.providers, name));
 
   const providers: Record<string, OcxProviderConfig> = Object.create(null);
   for (const [name, publicProvider] of Object.entries(next.providers)) {
@@ -277,10 +258,6 @@ function providerEditorCandidate(
 
   candidate.defaultProvider = defaultProvider;
   candidate.providers = providers;
-  for (const name of removedProviders) {
-    dropProviderCustomModels(candidate, name);
-    forgetProviderContextCap(candidate, name);
-  }
   const validated = validateConfigCandidate(candidate);
   if (!validated.ok) {
     return { ok: false, status: 400, error: validated.error, code: "invalid_provider_editor_config" };
@@ -1486,15 +1463,6 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
     const next = applied.next;
 
     const pacingOnly = keys.every(key => key === "requestPacing");
-    // A combo naming this row as its decisionProvider is only as valid as the row: an adapter
-    // or baseUrl edit could fail the combo's load-time checks and get it salvaged away on the
-    // next reload. Disabling the row stays allowed (not editorTouched; runtime fails open).
-    const decisionDependent = () => Object.values(config.combos ?? {})
-      .some(combo => (typeof combo.decisionProvider === "string" && combo.decisionProvider.trim() === name)
-        || (typeof combo.decisionModel === "string" && combo.decisionModel.trim().startsWith(`${name}/`)));
-    const { decisionModelProviderPatchError } = await import("./decision-model-validation");
-    const decisionModelError = applied.editorTouched ? decisionModelProviderPatchError(config, name, next) : null;
-    if (decisionModelError) return jsonResponse({ error: decisionModelError }, 400);
     if (applied.editorTouched && !pacingOnly) {
       const providerError = canonicalBudgetOnly
         ? canonicalOpenAiBudgetPatchError(next, rawBody, keys, config)
@@ -1519,10 +1487,6 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
         const allowBenchmarkAddresses = name === "openai" && isCanonicalOpenAiForwardProvider(next);
         const resolvedError = await providerDestinationResolvedError(name, next, { allowBenchmarkAddresses });
         if (resolvedError) return jsonResponse({ error: resolvedError }, 400);
-      }
-      if (decisionDependent()) {
-        const validation = validateConfigCandidate({ ...config, providers: { ...config.providers, [name]: next } });
-        if (!validation.ok) return jsonResponse({ error: validation.error }, 400);
       }
     } else if (applied.enablingOpenAi) {
       // Same DNS gate as POST: Clash fake-IP only. Never honor a persisted
@@ -1577,10 +1541,8 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
       // A PATCH that managed headers owns the resulting block: the clear path restores
       // registry static headers, so exact-match stripping must not erase them again.
       const candidate = replay.headersTouched ? replay.next : stripRegistryOnlyStaticHeaders(name, replay.next);
-      const decisionModelError = replay.editorTouched ? decisionModelProviderPatchError(config, name, candidate) : null;
-      if (decisionModelError) { replayError = decisionModelError; return; }
       const pinsTouched = Object.hasOwn(rawBody, "pinnedReasoningEffort") || Object.hasOwn(rawBody, "modelPinnedReasoningEfforts");
-      if (pinsTouched || (replay.editorTouched && !pacingOnly && decisionDependent())) {
+      if (pinsTouched) {
         const validation = validateConfigCandidate({ ...config, providers: { ...config.providers, [name]: candidate } });
         if (!validation.ok) { replayError = validation.error; return; }
       }
@@ -1630,14 +1592,6 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
         latencyMs: 0,
         message: "Passthrough provider is configured (forwards your Codex login; no upstream /models).",
       });
-    }
-    // Decision services answer through the bounded JEV client. A retargeted `jev` row is neither
-    // TypeSafe nor a self-hosted service, so it is not probed at all: its key stays unsent.
-    if (prov.adapter === "jev-decision") {
-      if (name === "jev" && !providerMatchesRegistryTransport(name, prov)) {
-        return jsonResponse({ applicable: false, reason: "retargeted_decision_service", latencyMs: 0 });
-      }
-      return jsonResponse(await probeJevDecisionProvider(config, name, { signal: req.signal }));
     }
     if (prov.liveModels === false) {
       // A static catalog has no live discovery endpoint to test. This is neither
@@ -1822,17 +1776,6 @@ export async function handleProviderRoutes(ctx: ManagementContext): Promise<Resp
       return jsonResponse({
         error: "cannot delete the default provider when no enabled replacement remains",
         code: "last_provider",
-      }, 409);
-    }
-    const dependentCombos = Object.entries(config.combos ?? {})
-      .filter(([, combo]) => comboDependsOnProviderRoute(config, combo, name))
-      .map(([id]) => id)
-      .sort((a, b) => a.localeCompare(b));
-    if (dependentCombos.length > 0) {
-      return jsonResponse({
-        error: `cannot delete provider "${name}" while combos depend on it`,
-        code: "provider_has_dependent_combos",
-        combos: dependentCombos,
       }, 409);
     }
     const { saveConfigPreservingClaudeCode: save } = await import("../../config");

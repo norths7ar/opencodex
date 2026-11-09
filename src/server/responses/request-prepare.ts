@@ -18,11 +18,9 @@ import { readJsonRequestBody, resolveInboundBodyLimitBytes } from "../request-de
 import {
   clientCancelledResponse,
   decodeRequestErrorResponse,
-  comboUnavailable,
   unreadableEncryptedAgentTaskResponse,
 } from "./core-errors";
 import { parseSyntheticRowId } from "../fast-row";
-import { resolveComboId, comboIdFromRawBody, comboExclusionReasons, NoAvailableComboTargetsError, pickComboTarget } from "../../combos";
 import { INTERCEPT_TARGET_UNAVAILABLE_CODE, interceptTargetUnavailableResponse, resolveChosenTarget, resolveShadowCallTarget } from "./shadow-target-availability";
 import {
   MEMORY_MODEL_TARGET_UNAVAILABLE_CODE,
@@ -31,7 +29,6 @@ import {
   memoryModelRouteReason,
   memoryModelTargetUnavailableResponse,
 } from "./memory-models";
-import { recallComboForLane } from "./combo-session-recall";
 import {
   sessionLaneIdFromRequest,
   conversationIdFromResponsesRequest,
@@ -74,7 +71,7 @@ import {
   previousResponseProviderState,
 } from "../../responses/state";
 import { formatErrorResponse } from "../../bridge";
-import { chatCanPreserveMandatoryToolChoice } from "./combo-required-tool-contract";
+import { chatCanPreserveMandatoryToolChoice } from "./mandatory-tool-choice";
 import { mapCodexAuthContextErrorToResponse } from "./codex-auth-error";
 import type { OcxParsedRequest } from "../../types";
 import { buildToolBridgeMaps } from "./collaboration";
@@ -144,9 +141,8 @@ import {
   CODEX_RESERVE_HELPER_UNSUPPORTED_MESSAGE,
   CODEX_RESERVE_OPT_IN_REQUIRED_MESSAGE,
 } from "../../codex/loopback-target";
-import { checkComboTargetInputAdmission, checkInputAdmission } from "./input-admission";
+import { checkInputAdmission } from "./input-admission";
 import {
-  admissionMayUseMeteredComboTargets,
   admissionModelDeniedResponse, projectAdmissionModelDeniedLog,
   AdmissionModelDeniedError,
   assertRouteAllowedByScope,
@@ -233,7 +229,7 @@ export async function prepareResponsesRequest(
 ) {
   const { options, config, req, logCtx } = requestContext;
   const policyScope = options.policyRequestScope ?? { triedDestinations: new Set<string>() };
-  const concreteSelection = options.comboAttempt || options.policyFallbackCandidate !== undefined;
+  const concreteSelection = options.policyFallbackCandidate !== undefined;
 
   // The Chat and Anthropic surfaces replay through here with a Responses-shaped body,
   // so an omitted value means a genuine Responses inbound.
@@ -251,7 +247,7 @@ export async function prepareResponsesRequest(
   }
   // Remove display-only artifact paths before helpers, combo dispatch and upstream replay.
   const originalSelector = options.mainHardLockFallbackOverride?.sourceModel ?? options.compactionRoutingOverride?.sourceModel
-    ?? (options.comboAttempt || options.policyFallbackCandidate || options.internalDecisionCall || options.memoryModelPhase
+    ?? (options.policyFallbackCandidate || options.memoryModelPhase
       || options.visionDescribeTerminal || options.shadowCallIntercepted ? undefined
       : body && typeof body === "object" ? (body as { model?: unknown }).model : undefined);
   options.clientModelLabel ??= clientFacingModelLabel(originalSelector);
@@ -274,115 +270,59 @@ export async function prepareResponsesRequest(
   // metadata, never from the model id: Phase 1 shares `gpt-5.6-luna` with the app's title/commit
   // helper calls. Read here, ahead of the shadow intercept below, because the phase decision is the
   // more specific of the two settings and must be the one that survives when both match one request.
-  // A JEV decision-model call is the router's own auxiliary turn, never a Codex memory phase.
-  const memoryModelPhase = options.internalDecisionCall ? undefined : options.memoryModelPhase
+  const memoryModelPhase = options.memoryModelPhase
     ?? ((config.memoryModels?.extract || config.memoryModels?.consolidation)
       && !concreteSelection && !options.compactionRoutingOverride && inboundWire === "responses"
       ? detectMemoryModelPhase(body, req.headers, { transport: options.inboundTransport }) ?? undefined
       : undefined);
   const memoryModelTarget = memoryModelPhase ? configuredMemoryModel(config, memoryModelPhase) : undefined;
-  // A combo child is a synthetic replay of the parent's decision: its model is already the target's
-  // concrete provider/model, so neither site below may rewrite or re-resolve it. It keeps the phase
-  // through `options.memoryModelPhase` instead, which is what applies the phase effort.
   const memoryModelApplies = memoryModelTarget !== undefined && !concreteSelection;
   options.onRequestBodyParsed?.(body);
-  // An effort row naming a table-less combo (`combo/x--high`) must reach the combo dispatcher
-  // as its base id, so the selector is normalized here, before comboIdFromRawBody reads model.
-  const comboRows = !concreteSelection && body && typeof body === "object" && !Array.isArray(body)
+  const syntheticRows = !concreteSelection && body && typeof body === "object" && !Array.isArray(body)
     && typeof (body as { model?: unknown }).model === "string"
     // One parse for both grammars, from the selector as the client sent it. Parsing them
     // separately made the outcome depend on which ran first.
     ? parseSyntheticRowId((body as { model: string }).model, config)
     : { fastRow: null, effortRow: null };
-  const comboEffortRow = comboRows.effortRow;
-  if (comboRows.fastRow) {
-    // Same reason as the effort row above: the combo dispatcher reads `model` next, so the
-    // selector has to be normalized before it, or a combo child is built from a synthetic id.
+  const syntheticEffortRow = syntheticRows.effortRow;
+  if (syntheticRows.fastRow) {
     const raw = body as Record<string, unknown>;
-    raw.model = comboRows.fastRow.baseId;
+    raw.model = syntheticRows.fastRow.baseId;
     // A caller INTENT, not a decision. decideTier still rules on eligibility downstream, so
     // fastMode:false and an ineligible route both still suppress it.
     raw.service_tier = "priority";
   }
-  if (comboEffortRow) {
+  if (syntheticEffortRow) {
     const raw = body as Record<string, unknown>;
-    raw.model = comboEffortRow.baseId;
+    raw.model = syntheticEffortRow.baseId;
     const rawReasoning = raw.reasoning;
     raw.reasoning = {
       ...(rawReasoning && typeof rawReasoning === "object" && !Array.isArray(rawReasoning)
         ? rawReasoning as Record<string, unknown>
         : {}),
-      effort: comboEffortRow.effort,
+      effort: syntheticEffortRow.effort,
     };
   }
   const isCompactionTrigger = body !== null && typeof body === "object" && !Array.isArray(body)
     && Array.isArray((body as { input?: unknown }).input)
     && ((body as { input: unknown[] }).input).some((item: unknown) =>
       typeof item === "object" && item !== null && (item as { type?: string }).type === "compaction_trigger");
-  // Compaction may send the last client-visible bare model after a combo switch.
-  // Configured selectors take precedence; otherwise recall before combo dispatch (#3891).
-  if (!concreteSelection && !options.compactionRoutingOverride && body && typeof body === "object" && !Array.isArray(body)) {
-    const rawModel = (body as { model?: unknown }).model;
-    if (typeof rawModel === "string" && !rawModel.includes("/") && isCompactionTrigger
-      && !comboRows.fastRow && !comboEffortRow
-      && !resolveComboId(config, rawModel)) {
-      const recalledComboId = recallComboForLane(config, sessionLaneIdFromRequest(req.headers), rawModel);
-      if (recalledComboId) {
-        (body as Record<string, unknown>).model = `combo/${recalledComboId}`;
-      }
-    }
-  }
-  // A shadow-call replacement that names a COMBO is routing policy, not the identity of any
-  // one pick. The late intercept site below resolves it through routeModel/tryPickComboModel,
-  // which collapses the table to a single target while still tagging `routeKind: "combo"`, so
-  // the combo gate on the next line never fires, handleComboResponses never runs, and 429/5xx
-  // hops — which only exist inside that loop — are unreachable (#4129). Rewrite the selector
-  // here instead, before comboIdFromRawBody reads `model`, and identify the combo by CONFIG
-  // LOOKUP so the check can never observe a one-candidate collapse.
-  // A memory target that names a combo has to reach the combo dispatcher as `model`, or its own
-  // failover loop is unreachable (#4129) — the same reason the shadow intercept rewrites its combo
-  // target here. Every other target is resolved at the late site, where the admission scope exists.
-  let memoryModelComboRouted = false;
-  if (memoryModelApplies && memoryModelTarget && body && typeof body === "object" && !Array.isArray(body)) {
-    const memoryComboId = resolveComboId(config, memoryModelTarget.model);
-    if (memoryComboId && Object.hasOwn(config.combos ?? {}, memoryComboId)) {
-      memoryModelComboRouted = true;
-      (body as Record<string, unknown>).model = memoryModelTarget.model;
-    }
-  }
-  let shadowCallIntercepted = false;
   let shadowCallMatches = false;
   // Luna is also selectable by users/children. Both intercept sites use the same
   // per-turn provenance; WS frames must not inherit the handshake's classification.
   const threadSpawn = isThreadSpawnRequest(req.headers);
   const preserveShadowModel = shadowCallPreservesSelectedModel(body, req.headers, options.inboundTransport);
-  if (!concreteSelection && !options.compactionRoutingOverride && !options.internalDecisionCall && !preserveShadowModel && !memoryModelApplies && body && typeof body === "object" && !Array.isArray(body)) {
+  if (!concreteSelection && !options.compactionRoutingOverride && !preserveShadowModel && !memoryModelApplies && body && typeof body === "object" && !Array.isArray(body)) {
     const shadowIntercept = config.shadowCallIntercept;
     const rawShadowModel = (body as { model?: unknown }).model;
     if (shadowIntercept?.enabled && shadowIntercept.model && typeof rawShadowModel === "string"
       && isShadowSourceModel(rawShadowModel, shadowIntercept.sourceModels)) {
       shadowCallMatches = true;
-      const shadowComboId = resolveComboId(config, shadowIntercept.model);
-      if (shadowComboId && Object.hasOwn(config.combos ?? {}, shadowComboId)) {
-        shadowCallIntercepted = true;
-        (body as Record<string, unknown>).model = shadowIntercept.model;
-        // Same rule as the late intercept site: record the operator-configured prefix that
-        // matched, never the caller's raw model string. Matching is by prefix, so the raw
-        // value is caller-controlled and reaches usage.jsonl and /api/logs.
-        logCtx.shadowCallRewrittenFrom = sanitizeLogMetadataString(
-          shadowSourceModelPrefix(rawShadowModel, shadowIntercept.sourceModels),
-        );
-      }
     }
   }
-  // The hard-lock fallback owns ordinary turns only, and only after every more specific
-  // routing setting had its chance above: a shadow-intercepted, memory-phased, compaction
-  // or decision turn keeps its own destination, and an intercepted combo selector is
-  // already owned by the intercept. A spawned sub-agent turn names its model on purpose,
-  // the same reason the shadow intercept leaves it alone. Like the sites above it, this
-  // must run before comboIdFromRawBody reads `model`.
-  if (!concreteSelection && !options.compactionRoutingOverride && !isCompactionTrigger && !options.internalDecisionCall
-    && !shadowCallIntercepted && !shadowCallMatches && !memoryModelApplies && !threadSpawn && inboundWire === "responses") {
+  // Hard-lock fallback owns ordinary turns only, not a helper or explicit child task.
+  if (!concreteSelection && !options.compactionRoutingOverride && !isCompactionTrigger
+    && !shadowCallMatches && !memoryModelApplies && !threadSpawn && inboundWire === "responses") {
     try {
       options.mainHardLockFallbackOverride = await applyMainHardLockFallbackOverride(
         body, config, undefined, mainHardLockFallbackCallerCheck(req, config, options), options.admission,
@@ -395,30 +335,6 @@ export async function prepareResponsesRequest(
       throw error;
     }
   }
-  const comboId = !concreteSelection ? comboIdFromRawBody(body, config) : null;
-  // A decision model may be a plain model or a non-JEV combo. A JEV combo here would recurse
-  // into another decision, so the call is refused and the parent decision fails open.
-  if (options.internalDecisionCall && comboId && config.combos?.[comboId]?.strategy === "jev") {
-    return markProxyError(formatErrorResponse(400, "invalid_request_error", "A JEV decision model cannot be a JEV combo"));
-  }
-  if (comboId && Object.hasOwn(config.combos ?? {}, comboId)) {
-    options.onRequestBodyRead?.();
-    // The Antigravity direct lane is decided for one concrete route; a body that reached a combo
-    // goes through the combo's own child loop with the full bridge conversation.
-    restoreDirectRequestConversation(options, body, logCtx);
-    return requestDispatchers.handleComboResponses(req, body, comboId, config, logCtx, {
-      ...options,
-      // Concrete combo child selectors no longer match the shadow source model. Carry the
-      // interception decision explicitly so provider-specific helper isolation still applies.
-      shadowCallIntercepted,
-      // Same handoff for a memory phase whose target is a combo: the child keeps the phase's effort
-      // override and stays out of the parent conversation.
-      memoryModelPhase: memoryModelComboRouted ? memoryModelPhase : undefined,
-      // The original request body was accepted above. Combo children are synthetic
-      // replays and must not repeat the caller-owned timeout transition.
-      onRequestBodyRead: undefined,
-    });
-  }
   let unreadableEncryptedAgentTask = hasUnreadableEncryptedAgentTask(
     (body as { input?: unknown } | undefined)?.input,
   );
@@ -429,27 +345,22 @@ export async function prepareResponsesRequest(
   const inboundOwnThreadId = req.headers.get("thread-id")?.trim() || undefined;
   const cursorClientThreadId = codexPoolAffinityKey(req.headers);
   const originalBody = body;
-  if (options.comboReplaySnapshot) {
-    copyPreviousResponseReplayProvenance(options.comboReplaySnapshot.sourceBody, body);
-  } else {
-    body = expandPreviousResponseInput(body, inboundClientThreadId);
-    const replayFailure = previousResponseReplayFailure(body);
-    if (replayFailure?.reason === "scope_mismatch") {
-      // Bounded and content-free: no task scope and nothing about the retained entry.
-      console.warn("[opencodex] refusing continuation because the client task scope does not match replay state");
-    }
-    // Local replay failures require full client replay.
-    if (replayFailure) {
-      return markProxyError(formatErrorResponse(
-        400,
-        "previous_response_not_found",
-        "Continuation state is unavailable or corrupt; resend the full conversation without previous_response_id.",
-      ));
-    }
+  body = expandPreviousResponseInput(body, inboundClientThreadId);
+  const replayFailure = previousResponseReplayFailure(body);
+  if (replayFailure?.reason === "scope_mismatch") {
+    // Bounded and content-free: no task scope and nothing about the retained entry.
+    console.warn("[opencodex] refusing continuation because the client task scope does not match replay state");
   }
-  const previousResponseInputExpanded = options.comboReplaySnapshot?.previousResponseInputExpanded
-    ?? (body !== originalBody
-      && typeof (body as { previous_response_id?: unknown }).previous_response_id === "string");
+  // Local replay failures require full client replay.
+  if (replayFailure) {
+    return markProxyError(formatErrorResponse(
+      400,
+      "previous_response_not_found",
+      "Continuation state is unavailable or corrupt; resend the full conversation without previous_response_id.",
+    ));
+  }
+  const previousResponseInputExpanded = body !== originalBody
+    && typeof (body as { previous_response_id?: unknown }).previous_response_id === "string";
 
   // Spawn-message compatibility (both directions): agent_message task payloads ride in
   // encrypted_content slots as plaintext. Rewrite them to input_text on the RAW body BEFORE
@@ -546,14 +457,9 @@ export async function prepareResponsesRequest(
         effort: effortRow.effort,
       };
     }
-    if (options.comboReplaySnapshot?.recoveredPlaintext) {
-      markBodyNonPersistable(parsed._rawBody);
-    }
     toolBridgeMaps = buildToolBridgeMaps(parsed, translatorBudget);
     if (previousResponseInputExpanded) parsed._previousResponseInputExpanded = true;
-    const providerContinuationCandidate = options.comboReplaySnapshot
-      ? options.comboReplaySnapshot.providerContinuation
-      : previousResponseProviderState(parsed.previousResponseId);
+    const providerContinuationCandidate = previousResponseProviderState(parsed.previousResponseId);
     if (providerContinuationCandidate) parsed._providerContinuationCandidate = providerContinuationCandidate;
     if (inboundOwnThreadId) parsed._codexOwnThreadId = inboundOwnThreadId;
     if (inboundClientThreadId) {
@@ -686,26 +592,10 @@ export async function prepareResponsesRequest(
     return markProxyError(formatErrorResponse(401, "authentication_error", "Anthropic Pool 2 requires an enabled configured provider"));
   }
   const admissionScope = options.admissionScope ?? resolveAdmissionModelScope(config, options.admission);
-  const advisorAdmissionPolicy = options.advisorAdmissionPolicy;
+  const sidecarAdmissionPolicy = options.sidecarAdmissionPolicy;
   const captureInboundRoutePolicy = (candidate: RouteResult, captureRequestPolicy = true): RouteResult => {
-    // Router-collapsed aliases bypass the combo loop. Re-pick before capturing destination
-    // policy so random/RR cannot refuse while an unmetered target is still usable.
-    if (candidate.combo?.target.metered && !admissionMayUseMeteredComboTargets(
-      config, options.admission, config.combos?.[candidate.combo.comboId],
-    )) {
-      const pick = pickComboTarget(config, candidate.combo.comboId, {
-        eligible: target => !target.metered,
-        allowCooldownReprobe: false,
-      });
-      if (!pick) {
-        throw new NoAvailableComboTargetsError(candidate.combo.comboId,
-          comboExclusionReasons(config, candidate.combo.comboId, target => !target.metered));
-      }
-      const routed = routeConcreteModel(config, `${pick.target.provider}/${pick.target.model}`);
-      candidate = { ...routed, combo: pick, routeKind: "combo", routeReason: routed.routeReason === "blocked-model-redirect" ? "blocked-model-redirect" : "combo-pick" };
-    }
     // Every route this request path produces passes through here: the direct
-    // name, an alias, a policy or combo selection, a compaction override, a
+    // name, an alias, a policy selection, a compaction override, a
     // shadow-intercept target and both subagent-fallback re-routes. Checking
     // the key's scope at this one point is what stops a rewrite from reaching
     // a destination the front door would have refused.
@@ -770,7 +660,7 @@ export async function prepareResponsesRequest(
     }
     const _sci = config.shadowCallIntercept;
     let shadowRoute: RouteResult | undefined;
-    if (!concreteSelection && !memoryRoute && !options.memoryModelPhase && !options.compactionRoutingOverride && !options.mainHardLockFallbackOverride && !options.internalDecisionCall && !preserveShadowModel && _sci?.enabled && _sci.model && isShadowSourceModel(parsed.modelId, _sci.sourceModels)) {
+    if (!concreteSelection && !memoryRoute && !options.memoryModelPhase && !options.compactionRoutingOverride && !options.mainHardLockFallbackOverride && !preserveShadowModel && _sci?.enabled && _sci.model && isShadowSourceModel(parsed.modelId, _sci.sourceModels)) {
       const sourcePrefix = shadowSourceModelPrefix(parsed.modelId, _sci.sourceModels)!;
       let sourceIdentity = { providerName: OPENAI_CODEX_PROVIDER_ID, modelId: sourcePrefix };
       try {
@@ -865,9 +755,6 @@ export async function prepareResponsesRequest(
     const policyRefusal = policyCandidateRefusalResponse(err);
     if (policyRefusal) return policyRefusal;
     if (err instanceof AdmissionModelDeniedError) return admissionModelDeniedResponse(projectAdmissionModelDeniedLog(err, logCtx));
-    if (err instanceof NoAvailableComboTargetsError) {
-      return comboUnavailable(err.comboId, undefined, err.reasons);
-    }
     if (err instanceof NoEligiblePolicyCandidateError) {
       // Persist the evaluation trace (per-candidate exclusions + the
       // no-eligible reason) so failed policy requests stay auditable.
@@ -881,11 +768,10 @@ export async function prepareResponsesRequest(
   // Exact account selectors are isolated from Pool-wide quota work. A canonical replay miss must
   // also fail closed without polling quota upstream. Cached fallback state can still select a
   // provider with native continuation support below.
-  const initialSubagentFallbackChain = threadSpawn && !options.comboAttempt
+  const initialSubagentFallbackChain = threadSpawn
     ? resolveSubagentFallbackChain(parsed, config)
     : null;
   const previewSelectionAdmission = threadSpawn
-    && !options.comboAttempt
     && (route.codexAccountId === undefined || initialSubagentFallbackChain !== null)
     ? codexAccountSelectionForTurn(options.turnAdmissionLease)?.()
     : undefined;
@@ -1005,7 +891,6 @@ export async function prepareResponsesRequest(
   // tokens — auth is resolved only after the final route is selected.
   if (
     threadSpawn
-    && !options.comboAttempt
     && (route.codexAccountId === undefined || initialSubagentFallbackChain !== null)
   ) {
     // The final resolveCodexAuthContext binds under codexQuotaScopeForModel(route.modelId),
@@ -1085,9 +970,6 @@ export async function prepareResponsesRequest(
         const policyRefusal = policyCandidateRefusalResponse(err);
         if (policyRefusal) return policyRefusal;
         if (err instanceof AdmissionModelDeniedError) return admissionModelDeniedResponse(projectAdmissionModelDeniedLog(err, logCtx));
-        if (err instanceof NoAvailableComboTargetsError) {
-          return comboUnavailable(err.comboId, undefined, err.reasons);
-        }
         if (err instanceof NoEligiblePolicyCandidateError) {
           logCtx.routeDecision = err.trace;
         }
@@ -1117,7 +999,6 @@ export async function prepareResponsesRequest(
     inboundWire === "responses"
     && agentTaskRecovery
     && !isCanonicalOpenAiForwardProvider(route.provider)
-    && !options.comboAttempt
     && !canPassThroughEncryptedV2AgentTask(route, inboundWire)
   ) {
     let recovered = restoreCachedEncryptedAgentTasks(
@@ -1307,9 +1188,6 @@ export async function prepareResponsesRequest(
               const policyRefusal = policyCandidateRefusalResponse(err);
               if (policyRefusal) return policyRefusal;
               if (err instanceof AdmissionModelDeniedError) return admissionModelDeniedResponse(projectAdmissionModelDeniedLog(err, logCtx));
-              if (err instanceof NoAvailableComboTargetsError) {
-                return comboUnavailable(err.comboId, undefined, err.reasons);
-              }
               if (err instanceof NoEligiblePolicyCandidateError) {
                 logCtx.routeDecision = err.trace;
               }
@@ -1343,10 +1221,9 @@ export async function prepareResponsesRequest(
   // Encrypted child tasks may reach the canonical native backend or an explicitly trusted
   // direct Responses route. This runs against the FINAL route so native-only fallback can
   // rescue an incompatible primary without weakening combo behavior.
-  const finalRouteCanPassThroughEncryptedTask = !options.comboAttempt
-    && canPassThroughEncryptedV2AgentTask(route, inboundWire);
+  const finalRouteCanPassThroughEncryptedTask = canPassThroughEncryptedV2AgentTask(route, inboundWire);
   if (
-    (route.combo !== undefined || !isCanonicalOpenAiForwardProvider(route.provider))
+    !isCanonicalOpenAiForwardProvider(route.provider)
     && !finalRouteCanPassThroughEncryptedTask
     && unreadableEncryptedAgentTask
   ) {
@@ -1466,7 +1343,7 @@ export async function prepareResponsesRequest(
       && !chatCanPreserveMandatoryToolChoice(parsed._rawBody, route.provider, route.modelId, parsed.context.tools ?? [])) {
       // Combo children carry the refusal's local identity too, so a compatible sibling target
       // can still be tried; a direct request keeps the client-facing 400 below.
-      if (policyScope.eligibility || options.comboAttempt) throw new MandatoryToolChoiceUnavailableError();
+      if (policyScope.eligibility) throw new MandatoryToolChoiceUnavailableError();
       return mandatoryToolChoiceUnavailableResponse();
     }
   } catch (error) {
@@ -1483,10 +1360,10 @@ export async function prepareResponsesRequest(
     ? route
     : { providerName: route.providerName, modelId: parsed._wireModelOverride };
   // Synthetic turns keep the original client envelope label across provider normalization.
-  if (options.compactionRoutingOverride || options.mainHardLockFallbackOverride || options.clientResponseModelLabel
-    || options.internalDecisionCall || options.memoryModelPhase || options.visionDescribeTerminal
+  if (options.compactionRoutingOverride || options.mainHardLockFallbackOverride
+    || options.memoryModelPhase || options.visionDescribeTerminal
     || options.policyFallbackCandidate || parsed._memoryModelPhase || logCtx.shadowCallRewrittenFrom) {
-    parsed._responseModelId = clientFacingModelText(options.clientResponseModelLabel ?? inboundSelector);
+    parsed._responseModelId = clientFacingModelText(inboundSelector);
   }
   if (!routeAllowedByScope(admissionScope, scopedDestination)) {
     return admissionModelDeniedResponse(projectAdmissionModelDeniedLog(new AdmissionModelDeniedError(inboundSelector, scopedDestination), logCtx));
@@ -1498,7 +1375,7 @@ export async function prepareResponsesRequest(
   }
 
   if (options.abortSignal?.aborted) return clientCancelledResponse();
-  // Resolve aliases/combo children before refusing helpers; do not spend main auth or host budget.
+  // Resolve aliases before refusing helpers; do not spend main auth or host budget.
   if (isCanonicalOpenAiForwardProvider(route.provider)
     && isCodexReserveHelperUnsupported(options.codexAuthPolicy ?? config, route.modelId,
       options.admission, options.visionDescribeTerminal === true)) {
@@ -1509,7 +1386,7 @@ export async function prepareResponsesRequest(
   // on the send. Forwarding `gpt-reserve` as an ordinary native model therefore buys nothing but a
   // 429 "The usage limit has been reached", which names neither the real cause nor the setting the
   // operator would have to change. Refuse here instead, on the same terms and in the same place as
-  // the helper refusal above: after alias/combo resolution, before auth, host-circuit budget or any
+  // the helper refusal above: after alias resolution, before auth, host-circuit budget or any
   // upstream byte.
   //
   // Two narrowings beyond the predicate, both about not answering a question this refusal cannot
@@ -1532,12 +1409,7 @@ export async function prepareResponsesRequest(
   // refusing the turn that shrinks the context would deadlock the client against the very
   // limit this gate reports — it would be told to compact and then denied the compaction.
   if (parsed._compactionRequest !== true) {
-    // A combo child is the one caller that can afford a strict gate: skipping a target it
-    // cannot fit is safe before any upstream bytes are sent, and the ladder continues. A
-    // direct request has nowhere to go, so it keeps the loose pathological-input gate.
-    const inputAdmission = options.comboAttempt
-      ? checkComboTargetInputAdmission(parsed, route.provider, route.providerName, parsed.modelId, nativeContextLimits(config))
-      : checkInputAdmission(parsed, route.provider, route.providerName, parsed.modelId, nativeContextLimits(config));
+    const inputAdmission = checkInputAdmission(parsed, route.provider, route.providerName, parsed.modelId, nativeContextLimits(config));
     if (!inputAdmission.admitted) {
       // #1524: this is a LOCAL preflight refusal, not an upstream verdict. A policy or combo
       // fallback must be able to skip this candidate and try one whose context window fits,
@@ -1545,7 +1417,7 @@ export async function prepareResponsesRequest(
       // distinct code is what lets the fallback layer tell the two apart -- an upstream
       // `context_length_exceeded` still stops, because retrying it elsewhere is guesswork.
       projectLocalModelRefusalLog(logCtx, inboundSelector);
-      if (clientRequestedStream && !options.comboAttempt) {
+      if (clientRequestedStream) {
         return streamingContextOverflowResponse(
           clientFacingModelText(inboundSelector),
           translatorBudget,
@@ -1660,7 +1532,7 @@ export async function prepareResponsesRequest(
     // the key scope as it stood when this request was admitted.
     inboundSelector,
     admissionScope,
-    advisorAdmissionPolicy,
+    sidecarAdmissionPolicy,
     translatorBudget,
     parsed,
     toolBridgeMaps,

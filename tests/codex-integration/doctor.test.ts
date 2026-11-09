@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import * as proxyLiveness from "../../src/server/proxy-liveness";
 import * as startupHealth from "../../src/codex/autostart-health";
 import * as cliStatus from "../../src/cli/status";
-import * as desktopSupervision from "../../src/service/desktop-supervision.mjs";
 import * as cliHelp from "../../src/cli/help";
 import { getDefaultConfig } from "../../src/config";
 import { spawn, spawnSync } from "node:child_process";
@@ -11,18 +10,14 @@ import { join } from "node:path";
 import { homedir, tmpdir } from "node:os";
 import {
   collectPaths,
-  detectFsType,
   collectConfiguredProxy,
   collectDefaultModelExposure,
   collectProxyEnv,
-  collectRunningProxyEnv,
   chatgptPublicEndpointHint,
-  collectWslDualInstall,
   fetchServiceMemory,
   formatResponseSpillLines,
   formatResponseTempLines,
   formatServiceMemoryLines,
-  parseProcessEnvBlock,
   probeWham,
   proxyDownRestartHint,
   resolveCodexHomeDir,
@@ -146,125 +141,6 @@ describe("doctor", () => {
     expect(intentionalCustom.mismatch).toBe(false);
   });
 
-  test("resolveCodexHomeDir discovers a single Windows Codex Desktop home from WSL", () => {
-    delete process.env.CODEX_HOME;
-    const wslHome = join(TEST_DIR, "wsl-home");
-    const usersRoot = join(TEST_DIR, "mnt-c", "Users");
-    const windowsCodexHome = join(usersRoot, "example", ".codex");
-    mkdirSync(windowsCodexHome, { recursive: true });
-    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"opencodex\"\n");
-
-    expect(resolveCodexHomeDir({
-      env: { WSL_DISTRO_NAME: "Ubuntu" },
-      platform: "linux",
-      homedir: () => wslHome,
-      usersRoot,
-    })).toBe(windowsCodexHome);
-  });
-
-  test("resolveCodexHomeDir keeps Linux CODEX_HOME default when it already has config.toml", () => {
-    delete process.env.CODEX_HOME;
-    const wslHome = join(TEST_DIR, "wsl-home");
-    const linuxCodexHome = join(wslHome, ".codex");
-    const usersRoot = join(TEST_DIR, "mnt-c", "Users");
-    const windowsCodexHome = join(usersRoot, "example", ".codex");
-    mkdirSync(linuxCodexHome, { recursive: true });
-    mkdirSync(windowsCodexHome, { recursive: true });
-    writeFileSync(join(linuxCodexHome, "config.toml"), "model_provider = \"linux\"\n");
-    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"windows\"\n");
-
-    expect(resolveCodexHomeDir({
-      env: { WSL_DISTRO_NAME: "Ubuntu" },
-      platform: "linux",
-      homedir: () => wslHome,
-      usersRoot,
-    })).toBe(linuxCodexHome);
-  });
-
-  test("collectWslDualInstall reports both sides plus interop codex on PATH", () => {
-    delete process.env.CODEX_HOME;
-    const wslHome = join(TEST_DIR, "wsl-home");
-    const linuxCodexHome = join(wslHome, ".codex");
-    const usersRoot = join(TEST_DIR, "mnt-c", "Users");
-    const windowsCodexHome = join(usersRoot, "example", ".codex");
-    mkdirSync(linuxCodexHome, { recursive: true });
-    mkdirSync(windowsCodexHome, { recursive: true });
-    writeFileSync(join(linuxCodexHome, "config.toml"), "model_provider = \"linux\"\n");
-    writeFileSync(join(windowsCodexHome, "config.toml"), "model_provider = \"windows\"\n");
-
-    const interopBin = "/mnt/c/Users/example/AppData/Roaming/npm";
-    const diag = collectWslDualInstall({
-      env: { WSL_DISTRO_NAME: "Ubuntu" },
-      platform: "linux",
-      homedir: () => wslHome,
-      usersRoot,
-      effectiveCodexHome: linuxCodexHome,
-      pathValue: interopBin,
-      existsSync: (p: string) => p.startsWith(interopBin) ? p === `${interopBin}/codex.exe` : existsSync(p),
-    });
-
-    expect(diag.wsl).toBe(true);
-    expect(diag.dualInstall).toBe(true);
-    expect(diag.linuxCodexConfigured).toBe(true);
-    expect(diag.windowsCodexHomes).toEqual([windowsCodexHome]);
-    expect(diag.effectiveIsWindowsMount).toBe(false);
-    expect(diag.interopCodexOnPath).toBe(`${interopBin}/codex.exe`);
-  });
-
-  test("collectWslDualInstall is inert off WSL", () => {
-    const diag = collectWslDualInstall({ platform: "darwin", effectiveCodexHome: TEST_CODEX_HOME });
-    expect(diag.wsl).toBe(false);
-    expect(diag.dualInstall).toBe(false);
-    expect(diag.interopCodexOnPath).toBeNull();
-  });
-
-  test("collectWslDualInstall honors a custom wsl.conf automount root", () => {
-    delete process.env.CODEX_HOME;
-    const wslHome = join(TEST_DIR, "wsl-home-root");
-    const linuxCodexHome = join(wslHome, ".codex");
-    mkdirSync(linuxCodexHome, { recursive: true });
-    writeFileSync(join(linuxCodexHome, "config.toml"), "model_provider = \"linux\"\n");
-
-    const interopBin = "/win/c/Users/example/AppData/Roaming/npm";
-    const diag = collectWslDualInstall({
-      env: { WSL_DISTRO_NAME: "Ubuntu" },
-      platform: "linux",
-      homedir: () => wslHome,
-      wslConf: "[automount]\nroot = /win/\n",
-      effectiveCodexHome: linuxCodexHome,
-      pathValue: interopBin,
-      existsSync: (p: string) => p.startsWith("/win/") ? p === `${interopBin}/codex` : existsSync(p),
-      readdirSync: (p: string) => p === "/win/c/Users" ? [] : [],
-    });
-
-    expect(diag.automountRoot).toBe("/win");
-    expect(diag.interopCodexOnPath).toBe(`${interopBin}/codex`);
-  });
-
-  test("detectFsType flags /mnt drvfs mounts and leaves ext4 home alone", () => {
-    const mounts = [
-      "rootfs / wslroot rw 0 0",
-      "/dev/sdc /home ext4 rw,relatime 0 0",
-      "drivers /mnt/c drvfs rw,noatime 0 0",
-    ].join("\n");
-
-    const c = detectFsType("/mnt/c/Users/test/.opencodex", mounts);
-    expect(c.isDrvfs).toBe(true);
-    expect(c.isMntDrive).toBe(true);
-    expect(c.fstype).toBe("drvfs");
-
-    const home = detectFsType("/home/test/.opencodex", mounts);
-    expect(home.isDrvfs).toBe(false);
-    expect(home.isMntDrive).toBe(false);
-    expect(home.fstype).toBe("ext4");
-  });
-
-  test("detectFsType returns n/a when mounts content is unavailable", () => {
-    const info = detectFsType("/home/test/.codex", null);
-    expect(info.fstype).toBe("n/a");
-    expect(info.isDrvfs).toBe(false);
-  });
-
   test("collectProxyEnv reports presence without leaking the value", () => {
     let rows = collectProxyEnv();
     expect(rows.find(r => r.key === "HTTPS_PROXY")!.present).toBe(false);
@@ -275,63 +151,6 @@ describe("doctor", () => {
     expect(https.present).toBe(true);
     // The row exposes only a boolean; the secret value is never carried.
     expect(JSON.stringify(rows)).not.toContain("secret");
-  });
-
-  test("parseProcessEnvBlock supports proxy presence without carrying secret values", () => {
-    const env = parseProcessEnvBlock([
-      "HTTP_PROXY=http://user:secret@proxy.example.test:8080",
-      "NO_PROXY=localhost,127.0.0.1",
-      "",
-    ].join("\0"));
-
-    const rows = collectProxyEnv(env);
-    expect(rows.find(r => r.key === "HTTP_PROXY")!.present).toBe(true);
-    expect(rows.find(r => r.key === "NO_PROXY")!.present).toBe(true);
-    expect(JSON.stringify(rows)).not.toContain("secret");
-  });
-
-  test("parseProcessEnvBlock stores prototype-like names as own keys", () => {
-    const names = [
-      "toString",
-      "valueOf",
-      "constructor",
-      "hasOwnProperty",
-      "__proto__",
-      "isPrototypeOf",
-      "propertyIsEnumerable",
-      "toLocaleString",
-    ];
-    const env = parseProcessEnvBlock(names.map(name => `${name}=set-${name}`).join("\0"));
-
-    expect(Object.getPrototypeOf(env)).toBeNull();
-    for (const name of names) {
-      expect(Object.hasOwn(env, name)).toBe(true);
-      expect(env[name]).toBe(`set-${name}`);
-    }
-  });
-
-  test("collectRunningProxyEnv separates no pid, unreadable pid env, and pid env presence", () => {
-    const none = collectRunningProxyEnv({ readPidFn: () => null });
-    expect(none.status).toBe("not_running");
-    expect(none.rows.every(row => !row.present)).toBe(true);
-
-    const unreadable = collectRunningProxyEnv({
-      readPidFn: () => 4242,
-      readEnvironFn: () => null,
-      platform: "linux",
-    });
-    expect(unreadable.status).toBe("unavailable");
-    expect(unreadable.rows.every(row => !row.present)).toBe(true);
-
-    const running = collectRunningProxyEnv({
-      readPidFn: () => 4242,
-      readEnvironFn: () => "HTTPS_PROXY=http://user:secret@proxy.example.test:8080\0NO_PROXY=localhost\0",
-      platform: "linux",
-    });
-    expect(running.status).toBe("ok");
-    expect(running.rows.find(row => row.key === "HTTPS_PROXY")!.present).toBe(true);
-    expect(running.rows.find(row => row.key === "NO_PROXY")!.present).toBe(true);
-    expect(JSON.stringify(running)).not.toContain("secret");
   });
 
   test("collectConfiguredProxy reports effective config proxy without leaking values", () => {
@@ -580,8 +399,6 @@ describe("live native-main admission in doctor", () => {
       restore.push(() => live.mockRestore());
       const startup = spyOn(cliStatus, "fetchLiveStartupHealth").mockResolvedValue(null);
       restore.push(() => startup.mockRestore());
-      const inspect = spyOn(desktopSupervision, "inspectDesktopSupervision").mockReturnValue({ kind: "unsupported" });
-      restore.push(() => inspect.mockRestore());
       const fetch = spyOn(globalThis, "fetch").mockImplementation(async () => new Response(null, { status: 503 }));
       restore.push(() => fetch.mockRestore());
       const log = spyOn(console, "log").mockImplementation((...args: unknown[]) => { logs.push(args.map(String).join(" ")); });
@@ -1569,60 +1386,3 @@ describe("doctor Codex default model exposure (#4646)", () => {
 });
 
 
-describe("doctor desktop supervision projection", () => {
-  test.each(["live", "local-supervision-override", "stale"] as const)("%s uses Desktop recovery without service or restore hints", async source => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-doctor-supervision-"));
-    const previousHome = process.env.OPENCODEX_HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
-    const previousExitCode = process.exitCode;
-    const restore: Array<() => void> = [];
-    try {
-      const codexHome = join(home, "codex");
-      mkdirSync(codexHome);
-      process.env.OPENCODEX_HOME = home;
-      process.env.CODEX_HOME = codexHome;
-      writeFileSync(join(home, "config.json"), JSON.stringify({ ...getDefaultConfig(), port: 9, codexAutoStart: false }));
-      const health = startupHealth.deriveStartupHealth({ routingKind: "opencodex-local", platform: "darwin",
-        autostartEnabled: true, serviceInstalled: false, serviceViable: false, serviceEnabled: false,
-        serviceRunning: false, serviceStale: false, serviceConflict: false, serviceSupported: true,
-        shimInstalled: false, shimHealthy: false, diagnosticStale: source === "stale",
-        desktop: { owned: false, loginEnabled: false, running: true, viable: false,
-          supervisor: { supervisorPid: 3131, runtimePid: 4242, app: "/fixture/opencodex-desktop" } } });
-      const old = { ...health, desktop: undefined, recommendedAction: undefined, recommendedCommand: "ocx service install" };
-      const logs: string[] = [];
-      const log = spyOn(console, "log").mockImplementation((...args: unknown[]) => logs.push(args.map(String).join(" ")));
-      restore.push(() => log.mockRestore());
-      const fetch = spyOn(globalThis, "fetch").mockImplementation(async () => new Response(null, { status: 503 }));
-      restore.push(() => fetch.mockRestore());
-      const live = spyOn(proxyLiveness, "findLiveProxy").mockResolvedValue({ pid: 4242, port: 9, source: "runtime" });
-      restore.push(() => live.mockRestore());
-      const liveStartup = spyOn(cliStatus, "fetchLiveStartupHealth").mockResolvedValue(source === "local-supervision-override" ? old : health);
-      restore.push(() => liveStartup.mockRestore());
-      let localCalls = 0;
-      const collect = spyOn(startupHealth, "collectStartupHealth").mockImplementation(() => { localCalls++; return health; });
-      restore.push(() => collect.mockRestore());
-      let probes = 0;
-      const inspect = spyOn(desktopSupervision, "inspectDesktopSupervision").mockImplementation(deps => {
-        expect(deps?.targetPid).toBe(4242);
-        probes++;
-        return { kind: "desktop", supervisorPid: 3131, runtimePid: 4242, app: "/fixture/opencodex-desktop", proxy: "/fixture/ocx" };
-      });
-      restore.push(() => inspect.mockRestore());
-      await runDoctor([]);
-      const hint = logs.find(line => line.includes("without persistent startup protection"));
-      expect(hint).toContain(health.recommendedAction!);
-      expect(hint).not.toContain("ocx service install");
-      expect(hint).not.toContain("ocx restore");
-      expect(probes).toBe(source === "local-supervision-override" ? 1 : 0);
-      expect(localCalls).toBe(source === "local-supervision-override" ? 1 : 0);
-    } finally {
-      for (const cleanup of restore.reverse()) cleanup();
-      process.exitCode = previousExitCode;
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
-      if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
-      else process.env.CODEX_HOME = previousCodexHome;
-      removeTreeWithRetry(home);
-    }
-  }, STORE_BUDGET_MS);
-});

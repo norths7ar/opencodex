@@ -37,8 +37,7 @@ function merge(catalogModels: RawEntry[], ultraFastTier: boolean, extra: Partial
     catalogModels, routedEntries: [], baselineCatalogModels: [], baseline: new Map(), featured: [],
     wsEnabled: false, template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
     gatheredProviderNames: new Set(), degradedProviderNames: new Set(), legacyCustomModelSlugs: new Set(),
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
-    hasPhysicalComboProvider: false, includeNativeOpenAi: true, accountBoundEntries: [], ultraFastTier,
+    multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: true, accountBoundEntries: [], ultraFastTier,
     policy: { nativeBackfillSlugs: [], unsupportedNativeEntries: "preserve", warningPolicy: "suppress" },
     ...extra,
   });

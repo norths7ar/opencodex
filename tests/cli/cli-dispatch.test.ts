@@ -581,16 +581,16 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
   };
 
   test("the exit-teardown matrix", () => {
-    const none = { revertSystemEnv: false, restoreNativeCodex: false, stripGrokConfig: false };
-    const all = { revertSystemEnv: true, restoreNativeCodex: true, stripGrokConfig: true };
+    const none = { restoreNativeCodex: false, stripGrokConfig: false };
+    const all = { restoreNativeCodex: true, stripGrokConfig: true };
     // A sibling owns nothing it could tear down, under any launcher.
     expect(decideStartExitTeardown({ sibling: true, recycling: false, ocxService: undefined })).toEqual(none);
     expect(decideStartExitTeardown({ sibling: true, recycling: false, ocxService: "1" })).toEqual(none);
     // A drain-and-restart keeps everything for the replacement (#563).
     expect(decideStartExitTeardown({ sibling: false, recycling: true, ocxService: undefined })).toEqual(none);
-    // Service context keeps routing and the fence; only the env comes down.
+    // Service context keeps routing and the fence.
     expect(decideStartExitTeardown({ sibling: false, recycling: false, ocxService: "1" }))
-      .toEqual({ revertSystemEnv: true, restoreNativeCodex: false, stripGrokConfig: false });
+      .toEqual({ restoreNativeCodex: false, stripGrokConfig: false });
     // Only the exact "1" sentinel is service context.
     expect(decideStartExitTeardown({ sibling: false, recycling: false, ocxService: "0" })).toEqual(all);
     expect(decideStartExitTeardown({ sibling: false, recycling: false, ocxService: undefined })).toEqual(all);
@@ -620,7 +620,6 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
     expect(start).not.toContain("re-points this home's Codex config");
     expect(start).toContain("...siblingRuntimeField(),");
     expect(start).toContain("if (!siblingStart) await maybeShowUpdatePrompt();");
-    expect(start).toContain("if (!siblingStart) reportShellHookFailure(reconcileShellHook(systemEnv.injected));");
     expect(start).toContain("if (!siblingStart && !currentExternalCodexModelProvider() && !shouldInjectApiAuthHeader(config)");
     expect(start).toContain("startupLeftCodexNativeLine(localClientSkipReason(config), server.port ?? port)");
   });
@@ -628,7 +627,6 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
   test("the exit cleanup routes every shared teardown through the decision", () => {
     const cleanup = slice("const syncCleanup = () => {", "let shuttingDown = false;");
     expect(cleanup).toContain("decideStartExitTeardown({ sibling: siblingStart, recycling: isRecyclingForExit(), ocxService: process.env.OCX_SERVICE })");
-    expect(cleanup).toContain("if (teardown.revertSystemEnv) {");
     expect(cleanup).toContain("if (teardown.restoreNativeCodex) {");
     expect(cleanup).toContain("if (teardown.stripGrokConfig && serviceEnvironmentOwnedHere()) {");
     expect(cleanup).not.toContain("preserveRouting");
@@ -645,9 +643,6 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
     expect(stop).toContain("const restoreBlocked = ownershipBlocked || inheritedBlocks || nativeRestoreHandledByProxy || stoppingSibling || connectedClientSkip !== null;");
     expect(stop).toContain('if (nativeRestoreHandledByProxy && !stoppingSibling && !connectedClientSkip) record.sharedTeardown = "performed-by-proxy";');
     expect(stop).not.toContain("fetchFn:");
-    // The system env was never the sibling's to set, so its stop does not roll it back either.
-    expect(stop).toContain("if (!stoppingSibling) { try { revertSystemEnv(); } catch { /* best-effort */ } }");
-    expect(stop).not.toMatch(/\n {2}try \{ revertSystemEnv\(\); \}/);
     // A sibling never runs under a service manager, so an installed one is the live owner's. Asking
     // it failed the ownership check from the sibling's home: exit 1, and after a hard kill the
     // stale sibling records were never purged.
@@ -745,23 +740,11 @@ describe("a sibling start leaves shared client routing to the live owner", () =>
       ["src/cli/claude.ts", 'env: withProcessRuntimeProvenance(withoutSiblingMarker({ ...process.env, OCX_SERVICE: "1" })),'],
       ["src/cli/opencode.ts", opencodeStartEnv],
       ["src/cli/minimax.ts", opencodeStartEnv],
-      ["src/update/job-pinned-start.ts", "const env: NodeJS.ProcessEnv = withoutSiblingMarker(process.env);"],
-      ["src/update/index.ts", "const env = mutation.controlEnvironment(withoutSiblingMarker(process.env));"],
     ] as const) {
       expect(readFileSync(repoPath(path), "utf8"), path).toContain(env);
     }
-    const worker = readFileSync(repoPath("src/update/job.ts"), "utf8");
-    expect(worker).toContain('import { spawnWorkerPinnedStart } from "./job-pinned-start"');
-    expect(worker).toContain("return spawnWorkerPinnedStart(restartCommand(false, installer, launcher, port), authorizeMutation,");
-    // The package launcher's own post-update restart cannot import the helper; it deletes inline.
-    expect(readFileSync(repoPath("bin/ocx.mjs"), "utf8")).toContain("delete env.OCX_SIBLING_OF_PORT;");
-    expect(readFileSync(repoPath("bin/ocx.mjs"), "utf8")).toContain("delete env.OCX_SIBLING_HANDOFF_NONCE;");
     expect(readFileSync(repoPath("src/server/management/system-restart.ts"), "utf8"))
       .toContain("const sourceEnv: NodeJS.ProcessEnv = withSiblingMarker(process.env, issueSiblingHandoff);");
-    const runtime = readFileSync(repoPath("src/client/runtime.ts"), "utf8");
-    const prepareAt = runtime.indexOf("withSiblingMarker(standaloneRecycleEnv(process.env, disconnectedTokenFingerprint), issueSiblingHandoff)");
-    expect(prepareAt).toBeGreaterThan(-1);
-    expect(prepareAt).toBeLessThan(runtime.indexOf("  cleanup();", prepareAt));
   });
 
   test("a sibling handoff is bound to its live runtime and home, then consumed once", () => {
@@ -1400,11 +1383,9 @@ describe("explicit sync restart after a committed configuration change", () => {
     { changed: true, ok: false, requested: true, expected: 0 },
     { changed: true, ok: true, requested: false, expected: 0 },
   ]) test(JSON.stringify(scenario), async () => {
-    const state = await import("../../src/client/state");
     const sync = await import("../../src/codex/sync");
     const restart = await import("../../src/cli/restart-scope");
     const aside = await import("../../src/cli/aside-profiles");
-    const stateSpy = spyOn(state, "readClientConnectionState").mockReturnValue({ kind: "disconnected" });
     const syncSpy = spyOn(sync, "syncModelsToCodex").mockResolvedValue({
       status: "applied", ok: scenario.ok, configChanged: scenario.changed,
       added: 0, catalogPath: null, catalogExists: false, catalogWritten: false, cacheSynced: false, message: "fixture",
@@ -1423,7 +1404,7 @@ describe("explicit sync restart after a committed configuration change", () => {
       if (scenario.expected) expect(restartSpy.mock.calls[0]![0]).toEqual({ appServers: true, desktopApp: true });
       expect(network).not.toHaveBeenCalled();
     } finally {
-      stateSpy.mockRestore(); syncSpy.mockRestore(); restartSpy.mockRestore(); asideSpy.mockRestore();
+      syncSpy.mockRestore(); restartSpy.mockRestore(); asideSpy.mockRestore();
       log.mockRestore(); error.mockRestore(); network.mockRestore();
     }
   });

@@ -43,18 +43,6 @@ describe("Antigravity effort family projections", () => {
     ]) expect(antigravityEffortFamilyIds(row)).toBeUndefined();
   });
 
-  test("public collapse preserves custom, combo and unrelated rows and does not mutate internal targets", () => {
-    const custom = { ...wireRows[0]!, custom: true };
-    const catalogCustom = { ...wireRows[1]!, catalogKind: "custom-model-v1" };
-    const combo = { provider: "combo", id: tiers[2]! };
-    const unrelated = { provider: "other", id: tiers[0]! };
-    const rows = [...wireRows, custom, family, catalogCustom, combo, unrelated];
-    const before = structuredClone(rows);
-    expect(collapseAntigravityPublicModels(rows)).toEqual([custom, family, catalogCustom, combo, unrelated]);
-    expect(rows).toEqual(before);
-    expect(collapseAntigravityPublicModels(wireRows)).toEqual(wireRows);
-  });
-
   test("suffix allowlist admits the base once while preserving the saved selection", () => {
     const selected = [tiers[2]!, "unrelated"];
     expect(projectAntigravitySelectedModels(provider, selected, retainedRows)).toEqual([...selected, base]);
@@ -138,23 +126,6 @@ describe("Antigravity effort family reconciliation", () => {
       config.disabledModels.push("google-antigravity/claude-opus-5-5");
       expect(antigravityFamilyDisabled(config, family)).toBe(true);
     }
-  });
-
-  test("retained combo targets never return as arrivals and reconciliation is a byte-stable no-op", () => {
-    const config = configFor();
-    config.providers[provider]!.selectedModels = [tiers[2]!];
-    config.providers[provider]!.defaultModel = tiers[0]!;
-    config.combos = { pinned: { targets: [{ provider, model: tiers[1]! }] } };
-    const untouched = structuredClone({ providers: config.providers, combos: config.combos });
-    expect(reconcile(config)).toBe(true);
-    expect(config.modelDiscovery!.knownModels![provider]!.ids).toEqual([base]);
-    expect(config.modelDiscovery!.recentArrivals).toBeUndefined();
-    expect({ providers: config.providers, combos: config.combos }).toEqual(untouched);
-    const before = JSON.stringify(config);
-    expect(reconcileSuccessfulModelDiscoveries({
-      config, models: retainedRows, authoritativeProviders: [provider], now: "2026-10-04T01:00:00Z",
-    })).toBe(false);
-    expect(JSON.stringify(config)).toBe(before);
   });
 
   test("active, removed and missing suffix identities all normalize without false arrivals", () => {

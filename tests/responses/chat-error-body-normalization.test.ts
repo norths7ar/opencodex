@@ -128,24 +128,6 @@ for (const mode of ["json-error", "transport"] as const) test(`native upstream $
   } finally { globalThis.fetch = originalFetch; }
 });
 
-test("cached disabled-catalog preflight normalizes a zero-send combo failure", async () => {
-  const { parseCatalogBuffer, setCachedCatalogForTests } = await import("../../src/adapters/devin/cloud-direct/catalog");
-  const { encodeMessage, encodeString, encodeVarintField } = await import("../../src/adapters/devin/cloud-direct/wire");
-  const host = "https://server.codeium.com";
-  setCachedCatalogForTests(parseCatalogBuffer(encodeMessage(1, Buffer.concat([encodeString(1, KEY), encodeString(22, "fixture-model"), encodeVarintField(4, 1)])), KEY, host));
-  const originalFetch = globalThis.fetch;
-  let sends = 0;
-  globalThis.fetch = (async () => { sends++; throw new Error("Unexpected network call"); }) as typeof fetch;
-  try {
-    const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "devin", baseUrl: host, authMode: "key", apiKey: KEY, models: ["fixture-model"], liveModels: false } }, combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "fixture-model" }] } } };
-    const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "combo/fixture", messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" });
-    expect(response.status).toBe(502);
-    const body = await response.json(); expect(body.error.type).toBe("server_error"); expect(body.error.code).toBe("upstream_server_error");
-    expect(sends).toBe(0);
-    expect(JSON.stringify(body)).not.toContain(KEY);
-  } finally { globalThis.fetch = originalFetch; setCachedCatalogForTests(null); }
-});
-
 test("listener retains CORS and the proxy log id on normalized Chat errors", async () => {
   const { saveConfig } = await import("../../src/config");
   const { startServer } = await import("../../src/server");
@@ -178,26 +160,6 @@ test("local validation retains its zero-send message", async () => {
   const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "fixture/model", messages: [] }) }), config, { model: "", provider: "" });
   expect(response.status).toBe(400); const body = await response.json();
   expect(body.error.type).toBe("invalid_request_error"); expect(body.error.message).toBe("messages must be a non-empty array");
-});
-
-for (const kind of ["quota", "cyber"]) test(`native combo preserves ${kind} routing with normalized client text`, async () => {
-  const { clearComboTargetCooldowns, clearComboSelectionState } = await import("../../src/combos");
-  clearComboTargetCooldowns(); clearComboSelectionState();
-  const sends: string[] = [];
-  const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(req) {
-    const body = await req.json() as { model: string }; sends.push(body.model);
-    return body.model === "first" ? Response.json({ error: { message: `${kind === "quota" ? "quota exhausted" : "cyber policy"} ${KEY}`, type: "upstream_error", code: kind === "quota" ? "insufficient_quota" : "cyber_policy" } }, { status: 500 })
-      : Response.json({ id: "fixture-completion", object: "chat.completion", created: 1, model: "next", choices: [{ index: 0, message: { role: "assistant", content: "ok" }, finish_reason: "stop" }] });
-  } });
-  try {
-    const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key", apiKey: KEY, transientRetryOn5xx: { attempts: 1 } }, backup: { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key", apiKey: "fixture-backup" } }, combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "first" }, { provider: "backup", model: "next" }] } }, protocols: { rollout: { nativeChatCombos: true } } };
-    const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "combo/fixture", messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" });
-    expect(response.status).toBe(kind === "quota" ? 200 : 400);
-    const body = await response.json();
-    if (kind === "quota") { expect(body.choices[0].message.content).toBe("ok"); expect(sends).toEqual(["first", "next"]); }
-    else { expect(body.error.type).toBe("upstream_error"); expect(body.error.code).toBe("cyber_policy"); expect(sends).toEqual(["first"]); }
-    expect(JSON.stringify(body)).not.toContain(KEY);
-  } finally { await upstream.stop(true); clearComboTargetCooldowns(); clearComboSelectionState(); }
 });
 
 type FlatEvent = "error" | "message";
@@ -266,10 +228,8 @@ test("translated errors select condition wording despite an upstream local-refus
 });
 
 async function flatEndpointExchange(combo: boolean, stream: boolean, flat: boolean, withContent = false, withMetadata = false, deltaOverride: Record<string, unknown> = {}, early?: { form: EarlyErrorForm; ending: "done" | "eof" }) {
-  const { clearComboTargetCooldowns, clearComboSelectionState } = await import("../../src/combos");
   const { clearKeyCooldowns } = await import("../../src/providers/key-failover");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
-  clearComboTargetCooldowns(); clearComboSelectionState(); clearKeyCooldowns();
+  const { getRequestLogEntries } = await import("../../src/server/request-log"); clearKeyCooldowns();
   const sends: string[] = [];
   const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, async fetch(req) {
     const body = await req.json() as { model: string }; sends.push(body.model);
@@ -280,7 +240,7 @@ async function flatEndpointExchange(combo: boolean, stream: boolean, flat: boole
   try {
     const row = { adapter: "openai-chat", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key" as const, apiKey: KEY, transientRetryOn5xx: { attempts: 1 } };
     const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: row, backup: { ...row, apiKey: "fixture-backup" } },
-      combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "first" }, { provider: "backup", model: "backup" }] } }, protocols: { rollout: { nativeChatCombos: true } } };
+      combos: { fixture: { strategy: "failover", targets: [{ provider: "fixture", model: "first" }, { provider: "backup", model: "backup" }] } }, protocols: { rollout: { } } };
     const ctx: import("../../src/server/request-log").RequestLogContext = { model: "", provider: "" };
     const requestId = `flat-relay-${crypto.randomUUID()}`;
     const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: combo ? "combo/fixture" : "fixture/first", stream, messages: [{ role: "user", content: "hi" }] }) }), config, ctx, { requestId, start: Date.now() });
@@ -293,7 +253,7 @@ async function flatEndpointExchange(combo: boolean, stream: boolean, flat: boole
       status: log.status, errorCode: log.errorCode, upstreamCondition: log.upstreamCondition, terminalStatus: log.terminalStatus, usage: log.usage,
       closeReason: log.closeReason, attempts: log.attempts?.map(attempt => ({ status: attempt.status, errorCode: attempt.errorCode, sendCount: attempt.sendCount })),
     } };
-  } finally { await upstream.stop(true); clearComboTargetCooldowns(); clearComboSelectionState(); clearKeyCooldowns(); }
+  } finally { await upstream.stop(true); clearKeyCooldowns(); }
 }
 for (const stream of [false, true]) for (const metric of ["buffered endpoint", "log facts"]) test(`flat native ${metric} matches legacy relay stream=${stream}`, async () => {
   const legacy = await flatEndpointExchange(false, stream, false);
@@ -308,28 +268,6 @@ for (const stream of [false, true]) for (const metric of ["buffered endpoint", "
     } else { expect(current.text).toContain("data: [DONE]"); }
     expect(current.text).not.toContain(KEY);
   }
-});
-test("flat native combo send sequence matches legacy relay", async () => {
-  const legacy = await flatEndpointExchange(true, false, false);
-  const current = await flatEndpointExchange(true, false, true);
-  expect(legacy.status).toBe(200); expect(legacy.sends).toEqual(["first"]);
-  expect(current.status).toBe(legacy.status); expect(current.sends).toEqual(legacy.sends);
-  expect(current.facts).toEqual(legacy.facts);
-  const body = JSON.parse(current.text); expect(body.object).toBe("chat.completion"); expect(body.choices).toHaveLength(1);
-  expect(completionFacts(body)).toEqual(completionFacts(JSON.parse(legacy.text)));
-  expect(current.text).not.toContain(KEY);
-});
-for (const combo of [false, true]) test(`flat native buffered data matches legacy relay combo=${combo}`, async () => {
-  const legacy = await flatEndpointExchange(combo, false, false, true);
-  const current = await flatEndpointExchange(combo, false, true, true);
-  expect(legacy.status).toBe(200);
-  const baselineBody = JSON.parse(legacy.text);
-  expect(baselineBody.choices[0].message.content).toBe("retained content"); expect(baselineBody.usage.total_tokens).toBe(5);
-  expect(current.status).toBe(legacy.status);
-  const body = JSON.parse(current.text); expect(body.object).toBe("chat.completion"); expect(body.choices).toHaveLength(1);
-  expect(completionFacts(body)).toEqual(completionFacts(baselineBody));
-  expect(current.facts).toEqual(legacy.facts); expect(current.sends).toEqual(["first"]);
-  expect(current.text).not.toContain(KEY);
 });
 
 async function collectFlatMetadata(chunk: Record<string, unknown>) {
@@ -549,26 +487,6 @@ for (const { form, ending } of earlyErrorCases) test(`named early error frame pr
   expect(current.text).not.toContain(KEY);
 });
 for (const { form, ending } of earlyErrorCases) for (const stream of [false, true]) for (const combo of [false, true]) {
-  test(`named early error frame preserves handler facts: ${form} ${ending} stream=${stream} combo=${combo}`, async () => {
-    const legacy = await flatEndpointExchange(combo, stream, false, false, false, {}, { form, ending });
-    const current = await flatEndpointExchange(combo, stream, true, false, false, {}, { form, ending });
-    expect(current.status).toBe(legacy.status); expect(current.sends).toEqual(legacy.sends); expect(current.facts).toEqual(legacy.facts);
-    expect(legacy.sends).toEqual(combo && !stream && ending === "eof" ? ["first", "backup"] : ["first"]);
-    if (stream) {
-      expect(current.status).toBe(200);
-      expect(current.text.startsWith(fixedEarlyErrorBlock(form))).toBe(true);
-    } else {
-      const body = JSON.parse(current.text); const expected = JSON.parse(legacy.text);
-      if (ending === "eof" && !combo) {
-        expect(current.status).toBe(502); expect(body.error.type).toBe("upstream_error"); expect(body.error.code).toBe("upstream_sse_truncated");
-        expect(body).toEqual(expected);
-      } else {
-        expect(current.status).toBe(200); expect(body.object).toBe("chat.completion"); expect(body.choices).toHaveLength(1);
-        expect(completionFacts(body)).toEqual(completionFacts(expected));
-      }
-    }
-    expect(current.text).not.toContain(KEY);
-  });
 }
 for (const form of ["absent", "empty", "done"] as const) test(`ordinary early block retains its control lines: ${form}`, async () => {
   const result = await earlyNativeObservation(form, "message", "done");
@@ -657,28 +575,6 @@ for (const stream of [true, false]) test(`null choice error keeps full-handler S
       expect(JSON.parse(text).choices[0].message.content).toBe("normal answer");
     }
     expect((context as Record<string, unknown>).upstreamError).toBeUndefined();
-  } finally { await upstream.stop(true); }
-});
-
-for (const stream of [false, true]) test(`combo retains its locally constructed tool refusal stream=${stream}`, async () => {
-  const comboId = `owned-tool-${stream}`;
-  const tool = { type: "function_call", id: "fc_owned", call_id: "call_owned", name: "Write", arguments: "{}" };
-  const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => new Response(
-    frame({ type: "response.created", response: { id: "resp_owned", status: "in_progress", output: [] } })
-      + frame({ type: "response.output_item.added", item: tool, output_index: 0 }),
-    { headers: { "content-type": "text/event-stream" } }) });
-  try {
-    const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: { fixture: {
-      adapter: "openai-responses", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true, authMode: "key", apiKey: KEY } },
-      combos: { [comboId]: { strategy: "failover", targets: [{ provider: "fixture", model: "model" }] } } };
-    const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
-        model: `combo/${comboId}`, stream, tools: [], messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" });
-    expect(response.status).toBe(502);
-    const body = await response.json();
-    expect(body.error.code).toBe("undeclared_tool_call");
-    expect(body.error.message).toContain("undeclared client tool");
-    expect(body.error.message).not.toContain("Write");
   } finally { await upstream.stop(true); }
 });
 
@@ -880,25 +776,6 @@ for (const route of ["direct", "translated", "passthrough"] as const) test(`expl
 });
 
 for (const stream of [false, true]) for (const slot of ["userinfo", "path", "query", "provider"] as const) {
-  test(`combo refusal bounds configured target ${slot}, stream=${stream}`, async () => {
-    const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-    const { getRequestLogEntries } = await import("../../src/server/request-log");
-    clearComboSelectionState(); clearComboTargetCooldowns();
-    const model = slot === "userinfo" ? `https://${KEY}@provider.example/model` : slot === "query" ? `https://provider.example/model?key=${KEY}` : `https://provider.example/${KEY}`;
-    const provider = slot === "provider" ? `https://${KEY}@provider.example` : "missing";
-    const config: OcxConfig = { port: 0, providers: {}, combos: { bounded: { strategy: "failover", targets: [{ provider, model }] } } };
-    const requestId = crypto.randomUUID();
-    const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "combo/bounded", stream, messages: [{ role: "user", content: "hi" }] }) }), config, { model: "", provider: "" }, { requestId, start: Date.now() });
-    expect(response.status).toBe(503);
-    const text = await response.text(); const payload = JSON.parse(text);
-    expect(payload.error.type).toBe("server_error"); expect(payload.error.code).toBe("server_is_overloaded");
-    expect(text).not.toContain(KEY);
-    expect(payload.error.message).toContain("target 1");
-    const rows = getRequestLogEntries().filter(row => row.requestId === requestId);
-    expect(rows).toHaveLength(1); expect(rows[0]!.status).toBe(503);
-    expect(JSON.stringify(rows)).not.toContain(KEY);
-    await assertPersistedRefusal(requestId, 503);
-  });
 }
 
 for (const stream of [false, true]) test(`Antigravity cached native model stays internal stream=${stream}`, async () => {
@@ -1021,41 +898,7 @@ for (const slot of ["model", "provider"] as const) test(`scope refusals project 
   expect(JSON.stringify(row)).not.toContain(KEY); await assertPersistedRefusal(requestId, 403);
 });
 
-for (const stream of [false, true]) for (const endpoint of ["responses", "compact", "compact-recall"] as const) test(`original model labels survive combo overflow endpoint=${endpoint} stream=${stream}`, async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { handleResponsesCompact } = await import("../../src/server/responses/compact");
-  const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
-  const { getRequestLogEntries } = await import("../../src/server/request-log");
-  const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  let sends = 0;
-  const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch() { sends++; return Response.json({ error: { message: "fixture input too large", type: "invalid_request_error", code: "context_length_exceeded" } }, { status: 413 }); } });
-  try {
-    const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true } }, combos: { [KEY]: { strategy: endpoint === "responses" ? "jev" : "failover", targets: [{ provider: "fixture", model: "model" }] } }, compactionRouting: { model: `combo/${KEY}` } };
-    config.providers.jev = { adapter: "jev-decision", apiKey: "synthetic", baseUrl: "https://api.typesafe.ai/v1/systemone", fetch: (async () => Response.json({ answers: { route: { choice: "fixture/model:none" } } })) as typeof fetch };
-    config.providers.fixture!.reasoningEfforts = [];
-    const requestId = crypto.randomUUID(); const ctx = { model: "", provider: "" };
-    if (endpoint === "compact-recall") {
-      delete config.compactionRouting;
-      const { rememberComboForLane, clearComboRecallForTests } = await import("../../src/server/responses/combo-session-recall");
-      const { sessionLaneIdFromRequest } = await import("../../src/server/request-log-conversation");
-      const { captureConfigGeneration } = await import("../../src/lib/state-store-sweeper");
-      clearComboRecallForTests();
-      rememberComboForLane(sessionLaneIdFromRequest(new Headers({ session_id: requestId })), KEY, { provider: "fixture", model: "model" }, "client-model", captureConfigGeneration());
-    }
-    const req = new Request(`http://localhost/v1/responses${endpoint !== "responses" ? "/compact" : ""}`, { method: "POST", headers: { "content-type": "application/json", session_id: requestId, ...(endpoint === "compact-recall" ? {} : { "x-codex-turn-metadata": JSON.stringify({ request_kind: "compaction", compaction: { trigger: "manual" } }) }) }, body: JSON.stringify({ model: "client-model", stream, input: [{ type: "compaction_trigger" }] }) });
-    const response = endpoint !== "responses" ? await handleResponsesCompact(req, config, ctx) : await handleResponses(req, config, ctx);
-    expect(response.status).toBe(endpoint !== "responses" ? 502 : stream ? 200 : 413);
-    const text = await responseWithDeferredRequestLog(response, requestId, Date.now(), ctx).text();
-    const payload = stream && endpoint === "responses" ? text.split("\n").filter(line => line.startsWith("data: {")).map(line => JSON.parse(line.slice(6))).find(value => value.type === "response.failed")?.response : JSON.parse(text);
-    expect(payload).toBeDefined(); expect(payload.error.type).toBe(endpoint !== "responses" ? "server_error" : "invalid_request_error"); expect(payload.error.code).toBe(endpoint !== "responses" ? "upstream_server_error" : "context_length_exceeded"); expect(sends).toBe(1);
-    if (stream && endpoint === "responses") { expect(payload.status).toBe("failed"); expect(payload.model).toBe("client-model"); }
-    expect(text).not.toContain(KEY);
-    const row = getRequestLogEntries().find(row => row.requestId === requestId);
-    expect(row).toBeDefined(); expect(row!.status).toBe(endpoint !== "responses" ? 502 : stream ? 400 : 413); expect(row!.model).toBe("client-model"); expect(row!.requestedModel).toBe("client-model"); expect(JSON.stringify(row)).not.toContain(KEY);
-    await assertPersistedRefusal(requestId, endpoint !== "responses" ? 502 : stream ? 400 : 413, { model: "client-model", requestedModel: "client-model" });
-  } finally { await upstream.stop(true); }
-});
+for (const stream of [false, true])
 
 for (const selector of ["directive", "picker"] as const) test(`Messages model label precedes ${selector} decoding`, async () => {
   const { handleClaudeMessages } = await import("../../src/server/claude-messages");
@@ -1075,26 +918,6 @@ for (const selector of ["directive", "picker"] as const) test(`Messages model la
   expect(row).toBeDefined(); expect(row!.status).toBe(403); expect(JSON.stringify(row)).not.toContain(KEY); await assertPersistedRefusal(requestId, 403, { requestedModel: selector === "picker" ? "the requested model" : "client-model", errorCode: "permission_denied" });
 });
 
-for (const slot of ["combo", "model", "url"] as const) test(`combo service diagnostics bound configured ${slot}`, async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const output: string[] = []; const warn = console.warn; const debug = console.debug;
-  console.warn = (...args) => output.push(args.map(arg => typeof arg === "string" ? arg : JSON.stringify(arg)).join(" "));
-  console.debug = console.warn;
-  const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch() { return Response.json({ error: { message: "fixture failure" } }, { status: 500 }); } });
-  try {
-    const combo = slot === "combo" ? KEY : "bounded-diagnostics";
-    const model = slot === "url" ? `https://${KEY}@provider.example/model?key=${KEY}` : slot === "model" ? KEY : "model";
-    const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true } }, combos: { [combo]: { strategy: "failover", targets: [{ provider: "fixture", model }] } } };
-    const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: `combo/${combo}`, input: "hi" }) }), config, { model: "", provider: "" });
-    expect(response.status).toBe(500); const payload = await response.json(); expect(payload.error).toBeDefined(); expect(payload.error.type).toBe("server_error"); expect(payload.error.code).toBe("upstream_server_error");
-    expect(output.some(line => line.includes("failed with 500"))).toBe(true);
-    expect(output.join("\n")).not.toContain(KEY);
-    expect(output.join("\n")).toContain("target 1 (fixture)");
-  } finally { console.warn = warn; console.debug = debug; await upstream.stop(true); }
-});
-
 for (const stream of [false, true]) test(`concrete compaction overflow uses the client model stream=${stream}`, async () => {
   const { handleResponses } = await import("../../src/server/responses");
   const { responseWithDeferredRequestLog } = await import("../../src/server/relay");
@@ -1112,37 +935,6 @@ for (const stream of [false, true]) test(`concrete compaction overflow uses the 
     const row = getRequestLogEntries().find(row => row.requestId === requestId);
     expect(row).toBeDefined(); expect(row!.status).toBe(stream ? 400 : 413); expect(JSON.stringify(row)).not.toContain(KEY);
   } finally { await upstream.stop(true); }
-});
-
-test("combo effort diagnostics omit the configured model", async () => {
-  const { concreteComboRequestBody } = await import("../../src/combos/request");
-  const output: unknown[][] = []; const debug = console.debug;
-  console.debug = (...args) => { output.push(args); };
-  try {
-    const body = concreteComboRequestBody({ input: "hi" }, { provider: "fixture", model: KEY }, "high", []);
-    expect(body.model).toBe(`fixture/${KEY}`);
-    expect(output).toHaveLength(1); expect(output[0]![0]).toBe("[opencodex] combo default effort omitted");
-    expect(JSON.stringify(output)).not.toContain(KEY);
-  } finally { console.debug = debug; }
-});
-
-for (const mode of ["wait", "last-resort", "reprobe"] as const) test(`combo cooldown diagnostics use positions mode=${mode}`, async () => {
-  const { clearComboSelectionState, pickComboTargetWithWait } = await import("../../src/combos/resolve");
-  const { clearComboTargetCooldowns, coolComboTarget } = await import("../../src/combos/failover");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const model = `https://${KEY}@provider.example/${KEY}?key=${KEY}`;
-  const target = { provider: "fixture", model };
-  const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-chat", baseUrl: "https://provider.example/v1" } }, combos: { [KEY]: { strategy: "failover", targets: [target, ...(mode === "last-resort" ? [{ provider: "fixture", model: "backup", lastResort: true }] : [])], ...(mode === "last-resort" ? { cooldownWaitPolicy: "before-last-resort" } : {}), ...(mode === "reprobe" ? { cooldownReprobe: { enabled: true, intervalMs: 1000 } } : {}) } } };
-  const now = Date.now(); coolComboTarget(KEY, target, { now, cooldownMs: 10 });
-  const output: string[] = []; const warn = console.warn;
-  console.warn = (...args) => { output.push(args.join(" ")); };
-  try {
-    const pick = await pickComboTargetWithWait(config, KEY, { now, waitForCooldownMs: 100, sleep: async () => {} });
-    expect(pick).not.toBeNull(); expect(pick!.target.model).toBe(model);
-    expect(output).toHaveLength(1); expect(output[0]).toContain(mode === "reprobe" ? "reserving all-cooled" : mode === "last-resort" ? "deferring last resort" : "all targets cooling");
-    expect(output.join("\n")).not.toContain(KEY);
-    if (mode !== "reprobe") expect(output[0]).toContain("target 1 (fixture)");
-  } finally { console.warn = warn; clearComboTargetCooldowns(); clearComboSelectionState(); }
 });
 
 for (const surface of ["chat", "claude", "compact", "native-messages"] as const) test(`scope row projection precedes final logging surface=${surface}`, async () => {
@@ -1180,49 +972,3 @@ test("streaming memory admission projects the final request row", async () => {
   expect(row).toBeDefined(); expect(row!.status).toBe(400); expect(JSON.stringify(row)).not.toContain(KEY); await assertPersistedRefusal(requestId, 400);
 });
 
-for (const combo of [false, true]) for (const capped of [false, true]) test(`input refusal distinguishes the input cap combo=${combo} capped=${capped}`, async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1", contextWindow: 100, ...(capped ? { modelMaxInputTokens: { model: 16 } } : {}) } }, ...(combo ? { combos: { bounded: { strategy: "failover", targets: [{ provider: "fixture", model: "model" }] } } } : {}) };
-  const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: combo ? "combo/bounded" : "fixture/model", input: "a".repeat(4000), ...(combo ? { max_output_tokens: 8 } : {}) }) }), config, { model: "", provider: "" });
-  expect(response.status).toBe(413); const body = await response.json(); expect(body.error.type).toBe("invalid_request_error"); expect(body.error.code).toBe(combo ? "context_length_exceeded" : "input_admission_refused");
-  expect(body.error.message).toContain(capped ? "input limit" : "context window");
-  expect(body.error.message).toContain("100 tokens");
-  if (capped) { expect(body.error.message).toContain("16 tokens"); expect(body.error.message).not.toContain("context window of fixture/model (16 tokens)"); }
-  if (combo) expect(body.error.message).toContain("No target of this combo");
-});
-
-test("combo outbound-size diagnostics use the original client label", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const output: string[] = []; const warn = console.warn;
-  console.warn = (...args) => { output.push(args.join(" ")); };
-  try {
-    const config: OcxConfig = { port: 0, maxUpstreamBodyBytes: 1, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: "https://provider.example/v1" } }, combos: { bounded: { strategy: "failover", targets: [{ provider: "fixture", model: KEY }] } } };
-    const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "combo/bounded", input: "hi" }) }), config, { model: "", provider: "" });
-    expect(response.status).toBe(413); const body = await response.json(); expect(body.error.type).toBe("upstream_error"); expect(body.error.code).toBe("upstream_error");
-    expect(output.some(line => line.includes("refused an oversized outbound body"))).toBe(true);
-    expect(output.join("\n")).not.toContain(KEY);
-  } finally { console.warn = warn; }
-});
-
-test("committed combo failure keeps the original model in its request row", async () => {
-  const { handleResponses } = await import("../../src/server/responses");
-  const { getRequestLogEntries, addFinalRequestLog } = await import("../../src/server/request-log");
-  const { clearComboSelectionState, clearComboTargetCooldowns } = await import("../../src/combos");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const upstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch() { let next = 0; return new Response(new ReadableStream({ async pull(controller) { if (next++ === 0) controller.enqueue(new TextEncoder().encode("event: response.output_text.delta\n" + frame({ type: "response.output_text.delta", delta: "fixture output", item_id: "msg_fixture", output_index: 0, content_index: 0 }))); else { await Bun.sleep(10); controller.enqueue(new TextEncoder().encode("event: response.failed\n" + frame({ type: "response.failed", response: { status: "failed", model: "model", output: [], error: { type: "server_error", code: "upstream_server_error", message: "fixture failed" } } }))); controller.close(); } } }), { headers: { "content-type": "text/event-stream" } }); } });
-  try {
-    const config: OcxConfig = { port: 0, providers: { fixture: { adapter: "openai-responses", authMode: "key", apiKey: "synthetic", baseUrl: `${upstream.url}v1`, allowPrivateNetwork: true } }, combos: { [KEY]: { strategy: "failover", targets: [{ provider: "fixture", model: "model" }] } } };
-    const requestId = crypto.randomUUID(); const ctx = { model: "", provider: "" };
-    const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: `combo/${KEY}`, stream: true, input: "hi" }) }), config, ctx, { clientModelLabel: (await import("../../src/lib/error-destination")).clientFacingModelLabel("client-model") });
-    expect(response.status).toBe(200); const text = await response.text();
-    const failed = text.split("\n").filter(line => line.startsWith("data: {")).map(line => JSON.parse(line.slice(6))).find(value => value.type === "response.failed");
-    expect(text).toContain("fixture output"); expect(failed).toBeDefined(); expect(failed.response.status).toBe("failed"); expect(failed.response.error.type).toBe("server_error"); expect(failed.response.error.code).toBe("upstream_server_error"); expect(text).not.toContain(KEY);
-    addFinalRequestLog(requestId, Date.now(), ctx, 500, { closeReason: "terminal", terminalStatus: "failed" });
-    const row = getRequestLogEntries().find(row => row.requestId === requestId);
-    expect(row).toBeDefined(); expect(row!.status).toBe(500); expect(row!.errorCode).toBe("upstream_server_error"); expect(JSON.stringify(row)).not.toContain(KEY); await assertPersistedRefusal(requestId, 500);
-  } finally { await upstream.stop(true); }
-});

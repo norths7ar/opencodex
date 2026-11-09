@@ -93,7 +93,7 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
 
 function getDeviceModel(): string {
   const platform = os.platform();
-  const label = platform === "darwin" ? "macOS" : platform === "win32" ? "Windows" : platform === "linux" ? "Linux" : platform;
+  const label = platform === "win32" ? "Windows" : platform;
   return [label, os.release(), os.arch()].filter(Boolean).join(" ").trim();
 }
 

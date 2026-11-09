@@ -10,7 +10,6 @@ import {
   managerOwnsApprovedPid,
   observeGuardedManagerStopped,
 } from "../../src/service/guarded-manager-target";
-import { probeSystemdUnitInactive, unitPath } from "../../src/service/systemd";
 
 const SUBJECT: ServiceOwnershipSubject = { kind: "none", revision: 7 };
 const OWNERSHIP_AWARE_STATE: ServiceInstallState = {
@@ -124,73 +123,9 @@ describe("guarded service-manager binding", () => {
     expect(managerOwnsApprovedPid(7, 42, parentOf)).toBe(false);
   });
 
-  test("launchd binds exactly one current loaded job to the approved PID", () => {
-    const response = (status: number, stdout = "") => ({
-      ok: status === 0, status, stdout, stderr: "",
-    });
-    const current = "arguments = command-marker\n pid = 7\n";
-    const deps = {
-      platform: "darwin" as const,
-      verifyPid: (pid: number) => pid,
-      parentOf: (pid: number) => pid === 42 ? 7 : null,
-      expectedCommand: () => "command-marker",
-    };
-    const one = inspectGuardedManagerTarget(42, 10100, {
-      ...deps,
-      launchctl: ((args: string[]) => args[1]?.startsWith("gui/")
-        ? response(0, current) : response(113)) as typeof import("../../src/service/launchd").runLaunchctl,
-    });
-    expect(one).toMatchObject({ kind: "bound", pid: 42, managerPid: 7 });
-    const two = inspectGuardedManagerTarget(42, 10100, {
-      ...deps,
-      launchctl: (() => response(0, current)) as typeof import("../../src/service/launchd").runLaunchctl,
-    });
-    expect(two.kind).toBe("unknown");
-  });
 
-  test("post-stop manager status refuses loaded and unreadable jobs", async () => {
-    const manager = {
-      kind: "bound" as const, pid: 42, managerPid: 7,
-      backend: "launchd" as const, childNeedsSeparateStop: false as const,
-    };
-    for (const [state, expected] of [
-      ["not-loaded", "inactive"],
-      ["loaded-current", "active"],
-      ["loaded-stale", "active"],
-      ["unknown", "unknown"],
-    ] as const) {
-      expect(await observeGuardedManagerStopped(manager, {
-        platform: "darwin",
-        launchd: () => ({ state }),
-      })).toBe(expected);
-    }
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=inactive\nMainPID=0" })).toBe("inactive");
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=failed\nMainPID=0" })).toBe("unknown");
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=failed\nMainPID=42" })).toBe("active");
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=active\nMainPID=42" })).toBe("active");
-    for (const state of ["activating", "deactivating", "reloading"]) {
-      expect(probeSystemdUnitInactive({ show: () => `ActiveState=${state}\nMainPID=0` })).toBe("active");
-    }
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=broken\nMainPID=0" })).toBe("unknown");
-    expect(probeSystemdUnitInactive({ show: () => "ActiveState=failed\nMainPID=oops" })).toBe("unknown");
-    expect(probeSystemdUnitInactive({ show: () => { throw new Error("unreadable"); } })).toBe("unknown");
-  });
 
-  test("systemd binds the current unit ancestry; present Windows managers fail closed", () => {
-    const output = ["LoadState=loaded", "ActiveState=active", "MainPID=7",
-      `FragmentPath=${unitPath()}`, "NeedDaemonReload=no"].join("\n");
-    const bound = inspectGuardedManagerTarget(42, 10100, {
-      platform: "linux", verifyPid: pid => pid,
-      parentOf: pid => pid === 42 ? 7 : null,
-      systemdShow: () => output,
-    });
-    expect(bound).toMatchObject({ kind: "bound", pid: 42, managerPid: 7 });
-    const stale = inspectGuardedManagerTarget(42, 10100, {
-      platform: "linux", verifyPid: pid => pid,
-      parentOf: pid => pid === 42 ? 7 : null,
-      systemdShow: () => output.replace("NeedDaemonReload=no", "NeedDaemonReload=yes"),
-    });
-    expect(stale.kind).toBe("unknown");
+  test("present Windows managers fail closed", () => {
     const windows = inspectGuardedManagerTarget(42, 10100, {
       platform: "win32", verifyPid: pid => pid,
       scheduler: () => ({ status: "present" }),
@@ -199,14 +134,5 @@ describe("guarded service-manager binding", () => {
     expect(windows.kind).toBe("unknown");
   });
 
-  test("a failed systemd unit with or without a PID blocks takeover", () => {
-    const failed = ["LoadState=loaded", "ActiveState=failed", "MainPID=0"].join("\n");
-    const deps = { platform: "linux" as const, verifyPid: (pid: number) => pid };
-    expect(inspectGuardedManagerTarget(42, 10100, {
-      ...deps, systemdShow: () => failed,
-    }).kind).toBe("unknown");
-    expect(inspectGuardedManagerTarget(42, 10100, {
-      ...deps, systemdShow: () => failed.replace("MainPID=0", "MainPID=7"),
-    }).kind).toBe("unknown");
-  });
+
 });

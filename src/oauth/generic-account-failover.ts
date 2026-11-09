@@ -1,20 +1,8 @@
 import { clientFacingModelText, type ClientFacingModelLabel } from "../lib/error-destination";
 import { isBuiltinAnthropicInstanceRow } from "../providers/anthropic-instance";
 /**
- * Generic OAuth multi-account 429 failover (#2568).
- *
- * The API-key twin (`providers/key-failover.ts`) rotates by default for any key provider with a
- * 2+ pool, but it returns false for `authMode === "oauth"`, and the only OAuth rotator that
- * exists is Anthropic's — behind its own opt-in. So xAI, Cursor, Kimi, GitHub Copilot,
- * Antigravity and Nous have no recovery path on a 429 even with several accounts logged in.
- *
- * Conversation ownership lives in generic-session-affinity.ts; this module owns account
- * eligibility, quota-ranked preference and bounded refusal recovery. Probe leases remain
- * provider-specific.
- *
- * NOT a home for Codex (`codex/routing.ts` owns quota scopes and probe leases) or Anthropic
- * (`oauth/anthropic-routing.ts` owns affinity and a fail-closed local-cli credential rule).
- * Both are excluded by `isGenericFailoverProvider`.
+ * Shared OAuth refusal classification and provider metadata helpers. Lite exposes one active
+ * account per provider/channel and disables proactive and reactive alternate-account selection.
  */
 import { credentialGeneration, getAccountSet } from "./store";
 import { accountInFlight } from "./kiro-account-load";
@@ -38,7 +26,7 @@ import {
   pickRoundRobinAccount,
   seedPoolRotationAccount,
 } from "./pool-kernel";
-import { parseRetryAfterMs } from "../combos/failover";
+import { parseRetryAfterMs } from "../lib/retry-after-delay";
 import type { KiroRefusalKind } from "../adapters/kiro-refusal";
 import { kiroAccountEvidence } from "../providers/kiro-usage";
 import { kiroEvidenceIdentity } from "../providers/kiro-account-state-disk";
@@ -187,34 +175,13 @@ function eligibleAccountCount(providerName: string, now: number): number {
   return eligible;
 }
 
-/**
- * Presence IS consent (#2568d).
- *
- * `hasKeyPoolFailover` already reads a 2+ key pool as the operator asking for rotation, and a
- * second OAuth login is the same statement. One account stays a strict no-op either way, so this
- * only changes behaviour for someone who deliberately logged in twice.
- */
+/** Lite has no alternate subscription account quorum. */
 export function hasFailoverAccountQuorum(providerName: string, now = Date.now()): boolean {
-  return eligibleAccountCount(providerName, now) >= 2;
+  // Lite has one subscription credential per provider/channel.
+  return false;
 }
 
-/**
- * Whether REACTIVE 429 rotation is active for this provider.
- *
- * Presence is the only rule: two or more eligible stored accounts. The
- * `oauthAccountFailover.enabled` booleans no longer suppress it.
- *
- * That is a deliberate narrowing of #2568d. Rotation here runs only after upstream has already
- * refused the request, so the choice the old knob offered was between "retry on the second
- * account you deliberately logged in" and "return a 429 while that account sits idle". The
- * second is a defect, not a preference — and an operator who does not want rotation expresses
- * that by not storing a second account, exactly as they do for `apiKeyPool`.
- *
- * The knob is not gone. It still governs {@link isProactivePreferenceEnabled}, which decides
- * whether a HEALTHY request may be steered to a different account before dispatch — a real
- * behavioural choice that remains refusable — and it still carries `strategy` and
- * `autoSwitchThreshold`.
- */
+/** Compatibility predicate for shared transports; alternate-account recovery is unavailable. */
 export function isGenericOAuthFailoverEnabled(
   config: OcxConfig,
   providerName: string,
@@ -225,25 +192,9 @@ export function isGenericOAuthFailoverEnabled(
   return hasFailoverAccountQuorum(providerName, now);
 }
 
-/**
- * Whether the pre-dispatch account PREFERENCE may run for this provider.
- *
- * Unlike reactive rotation, this moves a request that upstream has not refused, so it stays
- * refusable: an explicit provider value wins over the global default, and a global `false`
- * turns it off only when the provider has no override. A malformed value falls through rather
- * than taking a provider out of service.
- */
+/** Lite does not steer healthy requests to other stored accounts. */
 export function isProactivePreferenceEnabled(config: OcxConfig, providerName: string, now: number): boolean {
-  const provider = config.providers?.[providerName];
-  if (!provider || !isGenericFailoverProvider(providerName, provider)) return false;
-  const perProvider = provider.oauthAccountFailover?.enabled;
-  // Preserve the published narrow-over-broad precedence. A provider-specific true may
-  // opt this provider into proactive preference even when the global default is false;
-  // a provider-specific false refuses it even when the global setting is true.
-  if (typeof perProvider === "boolean") {
-    return perProvider && hasFailoverAccountQuorum(providerName, now);
-  }
-  return config.oauthAccountFailover?.enabled === true && hasFailoverAccountQuorum(providerName, now);
+  return false;
 }
 
 /** Accounts that may serve traffic right now: not cooled, not flagged for reauth. */

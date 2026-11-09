@@ -9,7 +9,7 @@ import {
   sidecarSelectValue,
   type SidecarSelectValue,
 } from "./claude-code-sidecar";
-import { AutoConnectSetting, SettingToggle } from "./claude-code-settings";
+import { SettingToggle } from "./claude-code-settings";
 import type { ClaudeCodeState, MapRow } from "./claude-code-types";
 import { newClientId } from "./claude-code-types";
 import type { TFn, TKey } from "../i18n/shared";
@@ -19,7 +19,7 @@ import type { TFn, TKey } from "../i18n/shared";
  * unrecognised source id from a newer backend never renders a raw key.
  */
 function authSourceLabel(source: string | undefined, t: TFn): string {
-  const known = ["claude-json-oauth", "claude-credentials-file", "macos-keychain", "exported-env"];
+  const known = ["claude-json-oauth", "claude-credentials-file", "exported-env"];
   return source && known.includes(source)
     ? t(`claude.authSource.${source}` as TKey)
     : t("claude.authSource.unknown");
@@ -85,12 +85,6 @@ export function ClaudeCodeSettingsCard({
           </span>
         </div>
       )}
-
-      <AutoConnectSetting
-        supported={state.autoConnectSupported}
-        checked={state.systemEnv}
-        onChange={systemEnv => onStateChange({ ...state, systemEnv })}
-      />
 
       <div className="setting-row">
         <div className="setting-label">

@@ -67,7 +67,7 @@ function scan(source: string, file: string): { offenders: string[]; seen: number
 test("every role=switch control uses one of the sanctioned switch classes", async () => {
   const offenders: string[] = [];
   let seen = 0;
-  for await (const file of new Glob("src/**/*.tsx").scan(new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"))) {
+  for await (const file of new Glob("src/**/*.tsx").scan(new URL("../../frontend", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"))) {
     const path = new URL(`../${file.replace(/\\/g, "/")}`, import.meta.url);
     const src = await Bun.file(path).text();
     const result = scan(src, file);

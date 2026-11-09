@@ -5,7 +5,7 @@ import { INTEGRATION_MARKS, MASKED_MARKS } from "../src/components/integration-m
 import { CLIENT_MARKS, MONOCHROME_CLIENT_MARKS } from "../src/components/apikeys-workspace/client-config-clients";
 import { TABS } from "../src/pages/integrations/integration-tabs";
 
-const PUBLIC_DIR = join(import.meta.dir, "..", "public");
+const PUBLIC_DIR = join(import.meta.dir, "../public");
 
 function bodyOf(src: string): string {
   return readFileSync(join(PUBLIC_DIR, src.replace(/^\//, "")), "utf8");
@@ -190,7 +190,7 @@ test("the three newest marks are painted the way their artwork requires", () => 
  * asserted as text.
  */
 test("the consequence dialog lets a long path break mid-token", () => {
-  const css = readFileSync(join(import.meta.dir, "..", "src", "styles-integrations.css"), "utf8");
+  const css = readFileSync(join(import.meta.dir, "../src/styles-integrations.css"), "utf8");
   const rule = css.match(/\.integration-consequence-body code \{[^}]*\}/);
   expect(rule).not.toBeNull();
   expect(rule![0]).toMatch(/overflow-wrap:\s*anywhere/);

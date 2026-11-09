@@ -8,7 +8,6 @@ import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useT } from "../../i18n/shared";
 import {
   bucketPresets,
-  pinSponsors,
   noteNeedsReveal,
   matchesCatalogQuery,
   sortCatalogMatches,
@@ -130,7 +129,7 @@ export default function ProviderCatalog({
     });
   }, [catalog, usageRank]);
 
-  const buckets = useMemo(() => bucketPresets(pinSponsors(ranked)), [ranked]);
+  const buckets = useMemo(() => bucketPresets(ranked), [ranked]);
   const tierList = buckets[tier];
 
   /**
@@ -240,10 +239,7 @@ export default function ProviderCatalog({
     const free = (p.freeTier || p.keyOptional) && p.auth === "key" && !subscriptionCli
       ? <span className="badge badge-green">{t("modal.badge.free")}</span>
       : null;
-    const sponsor = p.sponsor
-      ? <span className="badge badge-accent provider-catalog-sponsor" title={p.sponsorUrl}>{t("modal.badge.sponsor")}</span>
-      : null;
-    return <>{sponsor}{free}{auth}</>;
+    return <>{free}{auth}</>;
   };
 
   return (

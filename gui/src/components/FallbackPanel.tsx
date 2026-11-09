@@ -6,13 +6,8 @@ import { Notice } from "../ui";
 import { parseFallbackState, type FallbackState, type FallbackSwitches, type FallbackWrite } from "../fallback-api";
 import "../styles-fallback.css";
 
-/**
- * OCX-11 fallback controls. `routing` shows the global switches, scoped overrides and the last
- * fallback; `devices` shows per-device local fallback and chains (read-only on a Child, whose
- * settings live on its Home).
- */
-export default function FallbackPanel({ apiBase, section, readOnly = false, embedded = false }: {
-  apiBase: string; section: "routing" | "devices"; readOnly?: boolean;
+export default function FallbackPanel({ apiBase, readOnly = false, embedded = false }: {
+  apiBase: string; readOnly?: boolean;
   /** Inside a titled settings section (Proxy details): the section already names it, so no own heading. */
   embedded?: boolean;
 }): ReactElement | null {
@@ -79,56 +74,11 @@ export default function FallbackPanel({ apiBase, section, readOnly = false, embe
   const locked = saving || readOnly;
 
   if (!state) {
-    // The device rows are an addition to Remote Link: a Home or Child without the fallback state
-    // (an older OpenCodex, or a read that failed) shows nothing rather than a second error.
-    if (section === "devices") return null;
     return (
       <section className="panel fallback-panel" aria-busy={!loadFailed || undefined}>
-        {!embedded && <h3>{t(section === "routing" ? "fallback.title" : "fallback.devices.title")}</h3>}
+        {!embedded && <h3>{t("fallback.title")}</h3>}
         <p className="card-sub" role="status">{loadFailed ? t("fallback.loadFailed") : t("common.loading")}</p>
         {loadFailed && <button type="button" className="btn btn-ghost btn-sm" onClick={() => { void load(); }}>{t("common.retry")}</button>}
-      </section>
-    );
-  }
-
-  if (section === "devices") {
-    return (
-      <section className="panel fallback-panel">
-        <h3>{t("fallback.devices.title")}</h3>
-        <p className="card-sub">{t(readOnly ? "fallback.devices.childNote" : "fallback.devices.desc")}</p>
-        {state.devices.length === 0
-          ? <p className="card-sub">{t("fallback.devices.empty")}</p>
-          : <table className="fallback-devices" aria-label={t("fallback.devices.title")}>
-            <thead>
-              <tr className="fallback-device-head">
-                <th scope="col">{t("fallback.devices.device")}</th>
-                <th scope="col">{t("fallback.devices.local")}</th>
-                <th scope="col">{t("fallback.devices.chains")}</th>
-              </tr>
-            </thead>
-            <tbody>
-            {state.devices.map(device => {
-              const chainsOn = device.model !== false && device.provider !== false;
-              const name = device.alias ?? device.id;
-              return (
-                <tr key={device.id}>
-                  <td><strong>{name}</strong>{device.alias && <code className="fallback-device-id">{device.id}</code>}</td>
-                  <td><FallbackToggle label={t("fallback.devices.localFor", { name })} on={device.localFallback} disabled={locked}
-                    onToggle={() => { void write([{ scope: "device", key: device.id, setting: "localFallback", value: device.localFallback ? null : true }]); }} /></td>
-                  <td><FallbackToggle label={t("fallback.devices.chainsFor", { name })} on={chainsOn} disabled={locked}
-                    onToggle={() => {
-                    const value = chainsOn ? false : null;
-                    void write([
-                      { scope: "device", key: device.id, setting: "model", value },
-                      { scope: "device", key: device.id, setting: "provider", value },
-                    ]);
-                    }} /></td>
-                </tr>
-              );
-            })}
-            </tbody>
-          </table>}
-        {saveFailed && <Notice tone="err">{t("fallback.saveFailed")}</Notice>}
       </section>
     );
   }
@@ -141,7 +91,7 @@ export default function FallbackPanel({ apiBase, section, readOnly = false, embe
   return (
     <section className="panel fallback-panel" aria-label={embedded ? t("fallback.title") : undefined}>
       {!embedded && <h3>{t("fallback.title")}</h3>}
-      <p className="card-sub">{t(readOnly ? "fallback.devices.childNote" : "fallback.desc")}</p>
+      <p className="card-sub">{t("fallback.desc")}</p>
       {(["model", "provider"] as const).map(kind => (
         <div className="fallback-switch-row" key={kind}>
           <div>

@@ -14,7 +14,7 @@ import { codexSetTabKeyDown, readCodexSetTabFromHash, selectCodexSetTab } from "
  * user is editing prompts. Prompt lazy-mounts on first visit and stays mounted
  * afterwards, so hopping between tabs does not refetch either side.
  */
-export default function CodexSet({ apiBase, machineApiBase = apiBase, connected = false }: { apiBase: string; machineApiBase?: string; connected?: boolean }) {
+export default function CodexSet({ apiBase }: { apiBase: string; machineApiBase?: string; connected?: boolean }) {
   const t = useT();
   const [tab, setTab] = useState(readCodexSetTabFromHash);
   const [promptMounted, setPromptMounted] = useState(() => readCodexSetTabFromHash() === "prompt");
@@ -56,7 +56,7 @@ export default function CodexSet({ apiBase, machineApiBase = apiBase, connected 
           onClick={() => selectCodexSetTab("multiauth")}
           onKeyDown={codexSetTabKeyDown}
         >
-          {t("codexSet.tab.multiauth")}
+          {t("modal.accountLogin")}
         </button>
         <button
           type="button"
@@ -99,7 +99,7 @@ export default function CodexSet({ apiBase, machineApiBase = apiBase, connected 
         </div>
       )}
       {showDesktop && <div role="tabpanel" id="codex-set-panel-desktop" aria-labelledby="codex-set-tab-desktop" hidden={tab !== "desktop"}>
-        <CodexDesktopCompatibility apiBase={machineApiBase} active={tab === "desktop"} connected={connected} />
+        <CodexDesktopCompatibility apiBase={apiBase} active={tab === "desktop"} />
       </div>}
     </>
   );

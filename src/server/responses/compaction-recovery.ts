@@ -19,8 +19,8 @@ import { finishRequestAttempt, usageFromResponsesPayload, type RequestLogContext
 import { linkRequestSessionLane } from "../request-log-conversation";
 import { isNativePassthroughSseResponse, markNativePassthroughSseResponse, isEagerRelaySseResponse, markEagerRelaySseResponse } from "../relay";
 import type { HandleResponsesOptions } from "./core-options";
-import { consumeComboFailure, createChildPassthroughCallbackGate } from "./core-combo-failure";
-import { preflightComboStreamResponse } from "./combo-stream-preflight";
+import { consumeRecoveryFailure, createChildPassthroughCallbackGate } from "./recovery-failure";
+import { preflightResponsesStream } from "./stream-preflight";
 import { conversationCarriesUploadedFiles } from "./account-change-state";
 import { selfContainedResponsesBody } from "./reset-replay";
 import { decideCompactionRecovery, readCompactionRecoveryConfig } from "./compaction-recovery-policy";
@@ -66,7 +66,7 @@ function portableBody(body: Record<string, unknown>): boolean {
 }
 
 function routed(route: RouteResult, kind: "compaction-v1" | "compaction-v2"): boolean {
-  return !route.combo && route.routeKind !== "policy" && route.routeReason !== "default-provider"
+  return route.routeKind !== "policy" && route.routeReason !== "default-provider"
     && !isCanonicalOpenAiForwardProvider(route.provider)
     && !(kind === "compaction-v1"
       ? supportsNativeResponsesCompactEndpoint(route.providerName, route.provider)
@@ -91,14 +91,14 @@ async function bufferedJson(response: Response, signal: AbortSignal): Promise<{ 
 
 /**
  * Opt-in recovery for routed compaction only. Native compact/ciphertext, stored continuations,
- * policy/combo routes and hosted tools retain their original failure. This owns no credentials.
+ * policy routes and hosted tools retain their original failure. This owns no credentials.
  */
 export async function runWithCompactionRecovery(
   req: Request, config: OcxConfig, logCtx: RequestLogContext, options: Options, dispatch: Dispatch,
 ): Promise<Response> {
   const recovery = readCompactionRecoveryConfig(config.compactionRecovery);
   const kind = options.compactionRecoveryKind ?? "compaction-v2";
-  if (!recovery || options.compactionRecoveryAttempted || options.comboAttempt || (options.inboundWire && options.inboundWire !== "responses")) {
+  if (!recovery || options.compactionRecoveryAttempted || (options.inboundWire && options.inboundWire !== "responses")) {
     return dispatch(req, config, logCtx, options);
   }
   let snapshot: Record<string, unknown> | undefined;
@@ -168,7 +168,7 @@ export async function runWithCompactionRecovery(
     if (response.ok && hasResponseMediaType(response.headers, "text/event-stream")) {
       const native = isNativePassthroughSseResponse(response);
       const eager = isEagerRelaySseResponse(response);
-      const preflight = await preflightComboStreamResponse(response, logCtx);
+      const preflight = await preflightResponsesStream(response, logCtx);
       response = preflight.response;
       if (preflight.kind !== "failed") {
         if (native) markNativePassthroughSseResponse(response);
@@ -187,7 +187,7 @@ export async function runWithCompactionRecovery(
       if (replayUnsafe) markResponseNonReplayable(response);
       return keep(response);
     }
-    const failure = await consumeComboFailure(response, signal);
+    const failure = await consumeRecoveryFailure(response, signal);
     response = failure.response;
     const code = token(adapterError?.code) ?? token(failure.upstreamCode);
     const errorType = token(adapterError?.errorType) ?? token(failure.upstreamType);
@@ -210,7 +210,7 @@ export async function runWithCompactionRecovery(
     if (!decision.recover || !budget || !isRequestExecutionBudget(budget)) return keep(response);
     const fallbackBeforeSends = physicalSends(logCtx);
     const fallbackBeforeUsed = budget.used;
-    const reservation = budget.reserveDispatch({ sendClass: "combo-failover", targetKey: `compaction:${identity(target)}`, countedExternally: true, replaySafe: true });
+    const reservation = budget.reserveDispatch({ sendClass: "compaction", targetKey: `compaction:${identity(target)}`, countedExternally: true, replaySafe: true });
     if (!reservation.allowed) return keep(response);
     recoveryPermit = reservation.permit;
     sourceFailure = response;

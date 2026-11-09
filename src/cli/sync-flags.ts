@@ -1,10 +1,12 @@
-export type SyncFanoutFlags = { ok: true; localOnly: boolean; json: boolean } | { ok: false; message: string };
+export type SyncFlags = { ok: true; json: boolean } | { ok: false; message: string };
 
-export function parseSyncFanoutFlags(args: readonly string[]): SyncFanoutFlags {
-  for (const flag of ["--local-only", "--json"]) {
-    if (args.filter(arg => arg === flag).length > 1 || args.some(arg => arg.startsWith(`${flag}=`))) {
-      return { ok: false, message: `ocx sync accepts ${flag} once without a value.` };
-    }
+export function parseSyncFlags(args: readonly string[]): SyncFlags {
+  const allowed = new Set(["--json", "--restart-codex", "--restart-app-server-only", "--restart-desktop-app"]);
+  if (args.some(arg => !allowed.has(arg))) {
+    return { ok: false, message: "Unknown ocx sync argument. Use --json, --restart-codex, or --restart-app-server-only." };
   }
-  return { ok: true, localOnly: args.includes("--local-only"), json: args.includes("--json") };
+  if (args.filter(arg => arg === "--json").length > 1) {
+    return { ok: false, message: "ocx sync accepts --json once without a value." };
+  }
+  return { ok: true, json: args.includes("--json") };
 }

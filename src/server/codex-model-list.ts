@@ -14,7 +14,6 @@ interface CodexModelListInput {
   accountNativeSlugs: string[];
   accountNativeSlugsBySelector: ReadonlyMap<string, readonly string[]>;
   goOrdered: CatalogModel[];
-  exactComboSlugs: ReadonlySet<string>;
   accountSelectors: string[];
   suppressedBareNativeSlugs: ReadonlySet<string>;
   disabledModels: ReadonlySet<string>;
@@ -23,7 +22,7 @@ interface CodexModelListInput {
 /** Read-only Codex-shaped discovery; publication and backup creation belong to sync. */
 export function buildCodexModelList({
   config, nativeSlugs, availableAccountNativeSlugs, accountNativeSlugs,
-  accountNativeSlugsBySelector, goOrdered, exactComboSlugs, accountSelectors,
+  accountNativeSlugsBySelector, goOrdered, accountSelectors,
   suppressedBareNativeSlugs, disabledModels,
 }: CodexModelListInput) {
   const catalogPath = readCodexCatalogPath();
@@ -38,7 +37,7 @@ export function buildCodexModelList({
     : nativeSlugs;
   const entries = buildCatalogEntries(
     loadCatalogTemplate(), catalogNativeSlugs, goOrdered, config.subagentModels,
-    websocketsEnabled(config), maMode, exactComboSlugs, accountSelectors,
+    websocketsEnabled(config), maMode, accountSelectors,
     suppressedBareNativeSlugs, new Set(), nativeContextLimits(config), accountNativeSlugs,
     accountNativeSlugsBySelector, config.keepNativeChatGptOnV1 === true, config.modelPickerOrder,
     nativeSource,

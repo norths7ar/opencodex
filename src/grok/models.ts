@@ -17,7 +17,7 @@ import type { GrokInjectModel } from "./inject";
  * rungs — this function forwards the same lists `/v1/models` already advertises.
  */
 export function buildGrokInjectModels(
-  config: Pick<OcxConfig, "disabledModels" | "combos" | "providers" | "providerContextCaps">,
+  config: Pick<OcxConfig, "disabledModels" | "providers" | "providerContextCaps">,
   routed: CatalogModel[],
 ): GrokInjectModel[] {
   const contextLimits = nativeContextLimits(config);

@@ -20,14 +20,7 @@
  * and the combo intersection they feed.
  */
 import { describe, expect, test } from "bun:test";
-import {
-  applyProviderConfigHints,
-  deriveComboCatalogModel,
-  gatherRoutedModels,
-  nativeContextLimits,
-  nativeOpenAiContextWindow,
-  nativeOpenAiMaxInputTokens,
-} from "../../src/codex/catalog";
+import { applyProviderConfigHints, gatherRoutedModels, nativeContextLimits, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens } from "../../src/codex/catalog";
 import { getProviderRegistryEntry, PROVIDER_REGISTRY } from "../../src/providers/registry";
 import { providerConfigSeed } from "../../src/providers/derive";
 import { isModelVisionSidecarConsumer } from "../../src/vision/eligibility";
@@ -162,124 +155,7 @@ describe("flash-route combo intersection (#4505)", () => {
       provider,
       contextWindow: 1_000_000,
     });
-
-  test("a combo over the four advertised-image routes keeps image input", () => {
-    const members = [
-      hintedMember("opencode-go", OPENCODE_GO_NATIVE),
-      hintedMember("opencode-go", OPENCODE_GO_DEEPSEEK),
-      hintedMember("command-code", COMMAND_CODE_NATIVE),
-      hintedMember("command-code", COMMAND_CODE_DEEPSEEK),
-    ];
-    const derived = deriveComboCatalogModel("flash_failover", combo, members);
-    expect(derived?.inputModalities).toEqual(["text", "image"]);
-  });
-
-  test("one text-only member collapses the combo to text", () => {
-    // Intersection semantics are the guardrail: a member we cannot prove takes
-    // images must not let the combo advertise image input, or the app would
-    // accept an attachment one leg silently drops.
-    const members = [
-      hintedMember("opencode-go", OPENCODE_GO_NATIVE),
-      hintedMember("opencode-go", OPENCODE_GO_DEEPSEEK),
-      hintedMember("command-code", COMMAND_CODE_NATIVE),
-      { ...hintedMember("command-code", COMMAND_CODE_DEEPSEEK), inputModalities: ["text"] },
-    ];
-    const derived = deriveComboCatalogModel("flash_failover", combo, members);
-    expect(derived?.inputModalities).toEqual(["text"]);
-  });
 });
 
 describe("custom-model combo capability alignment (#4689)", () => {
-  test("combo derivation sees the explicit custom row before intersecting members", async () => {
-    const config: OcxConfig = {
-      port: 10100,
-      defaultProvider: "issue-4689-custom",
-      providers: {
-        "issue-4689-custom": {
-          adapter: "openai-chat",
-          baseUrl: "https://custom.example/v1",
-          liveModels: false,
-          models: ["manually-added-image-model"],
-          modelContextWindows: { "manually-added-image-model": 256_000 },
-        },
-        "issue-4689-image": {
-          adapter: "openai-chat",
-          baseUrl: "https://image.example/v1",
-          liveModels: false,
-          models: ["image-model"],
-          modelContextWindows: { "image-model": 128_000 },
-          modelInputModalities: { "image-model": ["text", "image"] },
-          modelReasoningEfforts: { "image-model": ["low", "high"] },
-          codexToolMode: "shell",
-        },
-      },
-      customModels: [{
-        id: "custom-image-row",
-        provider: "issue-4689-custom",
-        modelId: "manually-added-image-model",
-        contextWindow: 96_000,
-        inputModalities: ["text", "image"],
-        reasoningEfforts: ["low", "high"],
-        codexToolMode: "shell",
-      }],
-      combos: {
-        image_failover: {
-          strategy: "failover",
-          targets: [
-            { provider: "issue-4689-custom", model: "manually-added-image-model" },
-            { provider: "issue-4689-image", model: "image-model" },
-          ],
-        },
-      },
-    };
-
-    const models = await gatherRoutedModels(config);
-    expect(models.find(model => (
-      model.provider === "issue-4689-custom" && model.id === "manually-added-image-model"
-    ))?.inputModalities).toEqual(["text", "image"]);
-    expect(models.find(model => (
-      model.provider === "combo" && model.id === "image_failover"
-    ))).toMatchObject({
-      contextWindow: 96_000,
-      inputModalities: ["text", "image"],
-      reasoningEfforts: ["low", "high"],
-      codexToolMode: "shell",
-    });
-  });
-
-  test("a sparse custom native row retains native limits in an ordinary combo", async () => {
-    const slug = "gpt-5.6-luna";
-    const config: OcxConfig = {
-      port: 10100,
-      defaultProvider: "openai",
-      providers: {
-        openai: {
-          adapter: "openai-responses",
-          baseUrl: "https://chatgpt.com/backend-api/codex",
-          authMode: "forward",
-        },
-      },
-      customModels: [{ id: "sparse-native-row", provider: "openai", modelId: slug }],
-      combos: {
-        luna_failover: {
-          strategy: "failover",
-          targets: [{ provider: "openai", model: slug }],
-        },
-      },
-    };
-    const limits = nativeContextLimits(config);
-    const expectedContext = nativeOpenAiContextWindow(slug, limits);
-    const expectedMaxInput = nativeOpenAiMaxInputTokens(slug, limits);
-    const expectedAutoCompact = nativeOpenAiAutoCompactTokenLimit(slug, limits);
-
-    const models = await gatherRoutedModels(config);
-    expect(models.find(model => (
-      model.provider === "combo" && model.id === "luna_failover"
-    ))).toMatchObject({
-      contextWindow: expectedContext,
-      maxInputTokens: expectedMaxInput,
-      autoCompactTokenLimit: expectedAutoCompact,
-      inputModalities: ["text", "image"],
-    });
-  });
 });

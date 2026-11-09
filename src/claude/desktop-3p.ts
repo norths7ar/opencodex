@@ -1,8 +1,4 @@
-import { readClientConnectionState } from "../client/state";
-import { readServiceApiTokenState, readTokenBackupState } from "../lib/service-secrets";
 import { withClientLifecycleSync, type ClientLifecycleLockDeps } from "../client/lifecycle-lock";
-import { applyRemoteDesktopStore, inspectRemoteDesktopCleanup, restoreRemoteDesktopStore } from "./desktop-remote-store";
-import { canonicalDirectory } from "./desktop-remote-store-io";
 import {
   resolveDesktop3pConfigLibraryPath, parseMetadata, SAFE_DESKTOP_PROFILE_ID, isRecord,
   isOwnedDesktopEntry, isOwnedDesktopGatewayEntry, profilePath, readDesktopProfileSnapshot, readDesktopLibraryText, readDesktopLibraryBytes,
@@ -581,15 +577,7 @@ export function removeDesktop3pStandardPivot(
 ): Desktop3pRemovalResult {
   const libraryPath = resolveDesktop3pConfigLibraryPath(options);
   try {
-    return withClientLifecycleSync<Desktop3pRemovalResult>(held => withConfigMutationLockSync(() => {
-      const connection = readClientConnectionState();
-      if (connection.kind === "invalid" || connection.kind === "mismatched") {
-        return { ok: false, changed: false, kind: "unsafe", libraryPath, reason: `desktop_client_state_${connection.kind}` };
-      }
-      if (connection.kind === "connected"
-        && canonicalDirectory(libraryPath) !== canonicalDirectory(resolveDesktop3pConfigLibraryPath())) {
-        return { ok: false, changed: false, kind: "unsafe", libraryPath, reason: "desktop_library_identity_changed" };
-      }
+    return withClientLifecycleSync<Desktop3pRemovalResult>(() => withConfigMutationLockSync(() => {
       const latest = readConfigDiagnostics();
       if (latest.source === "fallback") return { ok: false, changed: false, kind: "unsafe", libraryPath, reason: "desktop_config_invalid" };
       if (!options.replaceWhileEnabled && claudeDesktopIntegrationEnabled(latest.config)) {
@@ -599,28 +587,7 @@ export function removeDesktop3pStandardPivot(
         }
         return { ok: false, changed: false, kind: "unsafe", libraryPath, reason: "desired_state_changed" };
       }
-      const cleanup = inspectRemoteDesktopCleanup();
-      if (cleanup.kind === "absent") {
-        if (connection.kind === "disconnected") return removeDesktop3pStandardPivotLocal(options);
-        const client = connection.value;
-        const known = [readServiceApiTokenState(), readTokenBackupState()].flatMap(token => token.kind === "present" ? [token.fingerprint] : []);
-        const result = restoreRemoteDesktopStore(held, {
-          owner: { serverUrl: new URL(client.serverUrl).origin, apiKeyId: client.apiKeyId, connectedAt: client.connectedAt },
-          knownTokenFingerprints: known,
-        });
-        return result.ok
-          ? { ok: true, changed: result.changed, kind: result.changed ? "removed" : "noop", libraryPath }
-          : { ok: false, changed: result.changed, kind: "unsafe", reason: result.reason, libraryPath };
-      }
-      if (cleanup.kind === "unsafe" || canonicalDirectory(libraryPath) !== canonicalDirectory(resolveDesktop3pConfigLibraryPath())) {
-        return { ok: false, changed: false, kind: "unsafe", libraryPath };
-      }
-      const known = [readServiceApiTokenState(), readTokenBackupState()]
-        .flatMap(token => token.kind === "present" ? [token.fingerprint] : []);
-      const result = restoreRemoteDesktopStore(held, { owner: cleanup.owner, knownTokenFingerprints: known });
-      return result.ok
-        ? { ok: true, changed: result.changed, kind: result.changed ? "removed" : "noop", libraryPath }
-        : { ok: false, changed: result.changed, kind: result.reason === "cleanup_pending" ? "cleanup_incomplete" : "unsafe", reason: result.reason, libraryPath };
+      return removeDesktop3pStandardPivotLocal(options);
     }), options.lifecycleLockDeps);
   } catch (error) {
     return { ok: false, changed: false, kind: "write_failed", libraryPath, reason: desktopMutationFailureReason(error) };
@@ -727,10 +694,6 @@ export function writeDesktop3pConfig(
 ): { written: boolean; path: string; reason?: string; fingerprint?: string } {
   try {
     return withClientLifecycleSync(() => withConfigMutationLockSync(() => {
-      const connection = readClientConnectionState();
-      if (connection.kind === "invalid" || connection.kind === "mismatched") {
-        return { written: false, path: resolveDesktop3pConfigLibraryPath(), reason: `desktop_client_state_${connection.kind}` };
-      }
       const latest = readConfigDiagnostics();
       if (latest.source === "fallback") return { written: false, path: resolveDesktop3pConfigLibraryPath(), reason: "desktop_config_invalid" };
       if (!claudeDesktopIntegrationEnabled(latest.config)) {
@@ -738,9 +701,6 @@ export function writeDesktop3pConfig(
       }
       if (refreshOnly && !desktopRefreshPathsSafe(resolveDesktop3pConfigLibraryPath())) {
         return { written: false, path: resolveDesktop3pConfigLibraryPath(), reason: "desktop_refresh_only_skipped" };
-      }
-      if (connection.kind === "connected" || inspectRemoteDesktopCleanup().kind !== "absent") {
-        return { written: false, path: resolveDesktop3pConfigLibraryPath(), reason: "desktop_remote_store_active" };
       }
       let requiredId: string | undefined;
       if (refreshOnly) {
@@ -787,34 +747,6 @@ export function writeDesktop3pConfig(
       ), requiredId && refreshOnly ? { requiredId, expectedFingerprint: refreshOnly.appliedFingerprint, admit: refreshOnly.admit } : undefined);
     }), lifecycleLockDeps);
   } catch { return { written: false, path: resolveDesktop3pConfigLibraryPath(), reason: "desktop_lifecycle_busy_or_unsafe" }; }
-}
-
-/** Write the hub's exact entries without constructing a client-local alias registry. */
-export function writeRemoteDesktop3pConfig(options: {
-  baseUrl: string;
-  apiKey: string;
-  mode: Desktop3pConfigMode;
-  models: Desktop3pModelEntry[];
-  lifecycleLockDeps?: ClientLifecycleLockDeps;
-}): { written: boolean; path: string; reason?: string; fingerprint?: string } {
-  try {
-    return withClientLifecycleSync(held => {
-      const connection = readClientConnectionState();
-      const token = readServiceApiTokenState();
-      if (connection.kind !== "connected" || token.kind !== "present") {
-        return { written: false, path: "", reason: "desktop_remote_connection_required" };
-      }
-      const client = connection.value;
-      const result = applyRemoteDesktopStore(held, {
-        baseUrl: options.baseUrl, apiKey: options.apiKey, mode: options.mode, models: options.models,
-        owner: { serverUrl: new URL(client.serverUrl).origin, apiKeyId: client.apiKeyId, connectedAt: client.connectedAt },
-        expectedTokenFingerprint: token.fingerprint,
-      });
-      return result.ok
-        ? { written: result.status === "applied", path: result.path ?? "", fingerprint: result.fingerprint }
-        : { written: false, path: "", reason: result.reason };
-    }, options.lifecycleLockDeps);
-  } catch { return { written: false, path: "", reason: "desktop_lifecycle_busy_or_unsafe" }; }
 }
 
 /** Refresh-only writes never follow links, including a dangling backup link. */

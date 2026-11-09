@@ -113,30 +113,6 @@ describe("Codex tool mode configuration (#2106)", () => {
     expect(hints.codexToolMode).toBe("shell");
   });
 
-  test("deriveComboCatalogModel sets codexToolMode = shell when all members specify shell", () => {
-    const { deriveComboCatalogModel } = require("../../src/codex/catalog/aggregation");
-    const combo = {
-      name: "all-shell-combo",
-      targets: [
-        { provider: "deepseek", model: "v4" },
-        { provider: "qwen", model: "max" },
-      ],
-    };
-    const members = [
-      { id: "v4", provider: "deepseek", contextWindow: 128000, codexToolMode: "shell" as const },
-      { id: "max", provider: "qwen", contextWindow: 128000, codexToolMode: "shell" as const },
-    ];
-    const derived = deriveComboCatalogModel("all-shell-combo", combo, members);
-    expect(derived?.codexToolMode).toBe("shell");
-
-    const mixedMembers = [
-      { id: "v4", provider: "deepseek", contextWindow: 128000, codexToolMode: "shell" as const },
-      { id: "max", provider: "qwen", contextWindow: 128000 },
-    ];
-    const mixedDerived = deriveComboCatalogModel("all-shell-combo", combo, mixedMembers);
-    expect(mixedDerived?.codexToolMode).toBeUndefined();
-  });
-
   test("gatherRoutedModels custom model inherits provider codexToolMode when undiscovered", async () => {
     const { gatherRoutedModels } = require("../../src/codex/catalog");
     const { withStubbedProviderFetch } = require("../helpers/catalog-provider-fetch");
@@ -218,23 +194,4 @@ describe("#2503 combo derivation preserves a member's verbosity opt-out", () => 
       { provider: "openai", model: "gpt-5.6-sol" },
     ],
   };
-
-  test("one member that cannot honour text.verbosity makes the combo advertise false", () => {
-    // A combo is only as capable as its least capable member: routing a turn to the xAI member
-    // would re-advertise a control the upstream accepts and ignores. Same conservative rule
-    // supportsReasoningSummaries already uses.
-    const derived = deriveComboCatalogModel("mixed-combo", combo, [
-      { id: "grok-4.6", provider: "xai", contextWindow: 256000, supportsVerbosity: false },
-      { id: "gpt-5.6-sol", provider: "openai", contextWindow: 272000 },
-    ]);
-    expect(derived?.supportsVerbosity).toBe(false);
-  });
-
-  test("a combo whose members all support verbosity does not force the flag", () => {
-    const derived = deriveComboCatalogModel("mixed-combo", combo, [
-      { id: "a", provider: "openai", contextWindow: 272000 },
-      { id: "b", provider: "openai", contextWindow: 272000, supportsVerbosity: true },
-    ]);
-    expect(derived?.supportsVerbosity).toBeUndefined();
-  });
 });

@@ -1,7 +1,5 @@
 import { saveConfig, readConfigDiagnostics } from "../../src/config";
 import { writeServiceApiTokenFile } from "../../src/lib/service-secrets";
-import { withClientLifecycleSync } from "../../src/client/lifecycle-lock";
-import { applyRemoteDesktopStore } from "../../src/claude/desktop-remote-store";
 import type { OcxConfig } from "../../src/types";
 import { describe, expect, spyOn, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, readFileSync, writeFileSync } from "node:fs";
@@ -21,7 +19,6 @@ import {
   resolveDesktop3pConfigLibraryPath,
   resolveDesktop3pAlias,
   writeDesktop3pConfig,
-  writeRemoteDesktop3pConfig,
   type Desktop3pModelEntry,
 } from "../../src/claude/desktop-3p";
 import { assertDesktopLibraryTextSize, MAX_DESKTOP_PROFILE_FILE_BYTES } from "../../src/claude/desktop-3p-library";
@@ -52,58 +49,7 @@ describe("Claude Desktop 3P models", () => {
     } finally { buildDesktop3pRegistry([], []); }
   });
 
-  test("remote apply preserves exact hub entries and foreign keys without installing aliases", () => {
-    const dir = realpathSync(mkdtempSync(join(tmpdir(), "ocx-desktop-remote-")));
-    const previous = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-    const previousHome = process.env.OPENCODEX_HOME;
-    process.env.OPENCODEX_HOME = join(dir, "ocx");
-    process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = dir;
-    const models: Desktop3pModelEntry[] = [{
-      name: "claude-opus-4-8-20260304", labelOverride: "Hub model",
-      anthropicFamilyTier: "fable", isFamilyDefault: true, supports1m: true, prefer1m: true,
-    }];
-    try {
-      saveConfig({ providers: { test: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", allowPrivateNetwork: true, liveModels: false, models: ["fixture-model"] } }, defaultProvider: "test", port: 4096 } as OcxConfig);
-      expect(readConfigDiagnostics().source).toBe("file");
-      const local = writeDesktop3pConfig(4096, ["gpt-5.6-sol"], [], "old-key", "static", undefined, undefined, { lockPath: join(dir, "locks", "desktop.sqlite") });
-      expect(local.written).toBe(true);
-      const prior = JSON.parse(readFileSync(local.path, "utf8"));
-      writeFileSync(local.path, JSON.stringify({ ...prior, foreignSetting: { retained: true } }));
-      const token = writeServiceApiTokenFile("remote-fixture-key");
-      const owner = { serverUrl: "https://hub.example.test", apiKeyId: "desktop-fixture", connectedAt: "2026-09-06T00:00:00.000Z" };
-      saveConfig({ providers: { test: { adapter: "openai-chat", baseUrl: "http://127.0.0.1:1/v1", allowPrivateNetwork: true, liveModels: false, models: ["fixture-model"] } }, defaultProvider: "test", port: 4096, runtimeRole: "client", client: {
-        ...owner, managementUrl: owner.serverUrl, managementTransport: "direct", selectedClients: ["claude"],
-        tokenEnv: "OPENCODEX_API_AUTH_TOKEN", tokenFingerprint: token.fingerprint, protocolVersion: 1,
-      } } as OcxConfig);
-      expect(readConfigDiagnostics().source).toBe("file");
-      for (const mode of ["static", "hybrid", "discovery"] as const) {
-        const result = withClientLifecycleSync(held => applyRemoteDesktopStore(held, {
-          owner, expectedTokenFingerprint: token.fingerprint,
-          baseUrl: owner.serverUrl, apiKey: "remote-fixture-key", mode, models,
-        }), { lockPath: join(dir, "locks", "desktop.sqlite") });
-        expect(result.ok).toBe(true);
-        if (!result.ok) throw new Error(result.reason);
-        expect(result.path).toBe(local.path);
-        const written = JSON.parse(readFileSync(result.path!, "utf8"));
-        expect(written.inferenceGatewayBaseUrl).toBe("https://hub.example.test");
-        expect(written.inferenceGatewayApiKey).toBe("remote-fixture-key");
-        expect(written.modelDiscoveryEnabled).toBe(mode !== "static");
-        expect(written.inferenceModels).toEqual(mode === "discovery" ? undefined : models);
-        expect(written.foreignSetting).toEqual({ retained: true });
-        expect(resolveDesktop3pAlias(models[0]!.name)).toBeNull();
-        expect(resolveDesktop3pAlias("claude-opus-4-8-ncb")).toBe("native/gpt-5.6-sol");
-      }
-    } finally {
-      if (previous === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-      else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = previous;
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
-      buildDesktop3pRegistry([], []);
-      removeTreeWithRetry(dir);
-    }
-  });
-
-  test("local generation and unbound remote failures retain result semantics and existing file bytes", () => {
+  test("local generation failures retain result semantics and existing file bytes", () => {
     const dir = mkdtempSync(join(tmpdir(), "ocx-desktop-generation-"));
     const previous = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
     const previousHome = process.env.OPENCODEX_HOME;
@@ -117,16 +63,9 @@ describe("Claude Desktop 3P models", () => {
       const before = readFileSync(initial.path, "utf8");
       const beforeMeta = readFileSync(join(dir, "_meta.json"), "utf8");
       const local = writeDesktop3pConfig(4096, [], [{ provider: "test", id: "x".repeat(90) }], undefined, "static", undefined, undefined, { lockPath: join(dir, "locks", "desktop.sqlite") });
-      const remote = writeRemoteDesktop3pConfig({
-        baseUrl: "https://hub.example.test", apiKey: "fixture-key", mode: "static",
-        lifecycleLockDeps: { lockPath: join(dir, "locks", "desktop.sqlite") },
-        models: [{ name: "invalid", labelOverride: "Hub", anthropicFamilyTier: "opus" }],
-      });
       expect(local.written).toBe(false);
       expect(local.path).toBe(initial.path);
       expect(local.reason).toContain("exceeds 80 chars");
-      // An unbound caller is refused before selecting or touching a Desktop file.
-      expect(remote).toMatchObject({ written: false, path: "", reason: "desktop_remote_connection_required" });
       expect(readFileSync(initial.path, "utf8")).toBe(before);
       expect(readFileSync(join(dir, "_meta.json"), "utf8")).toBe(beforeMeta);
     } finally {

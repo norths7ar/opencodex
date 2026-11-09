@@ -23,7 +23,7 @@ const INFO = {
   },
   settings: {
     unrepresentable: "legacy",
-    rollout: { nativeChatCombos: false, managedMessagesNative: false, managedMessagesNativeOAuth: false, directEncoders: false, shadowPlan: false },
+    rollout: { managedMessagesNative: false, managedMessagesNativeOAuth: false, directEncoders: false, shadowPlan: false },
   },
   features: ["request.tools", "request.seed"],
 };

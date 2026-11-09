@@ -16,7 +16,6 @@ import {
   loadConfig,
   withConfigMutationLockSync,
 } from "../config";
-import { notifyCodexStoreLoaded } from "../lib/decision-quota-sink";
 import { assertNotRealHomeUnderTest } from "../lib/test-home-guard";
 import type { CodexAccount, CodexAccountCredentialRecord, CodexAccountCredentials } from "../types";
 import { advanceCodexCredentialMutationEpoch } from "./credential-mutation-epoch";
@@ -157,7 +156,7 @@ export function peekCodexAccountRecordStore(): Record<string, CodexAccountCreden
   return normalized;
 }
 
-/** Read the Codex account record store from disk with hardened permissions, and hand it to the opt-in decision-quota slot (a no-op unless JEV quota signals are active). */
+/** Read the Codex account record store from disk with hardened permissions. */
 function loadCodexAccountRecordStore(): CodexAccountStore {
   const result = loadCodexAccountRecordStoreResult();
   return result.status === "ok" ? result.records : {};
@@ -180,15 +179,12 @@ function loadCodexAccountRecordStoreResult(): CodexAccountRecordStoreResult {
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      notifyCodexStoreLoaded({});
       return { status: "ok", records: {} };
     }
     backupInvalidConfig(path);
-    notifyCodexStoreLoaded({});
     return { status: "failed" };
   }
   // Outside the parse try: roster publication is advisory and must never route a loaded store into the invalid-config backup path.
-  notifyCodexStoreLoaded(normalized);
   return { status: "ok", records: normalized };
 }
 
@@ -198,7 +194,6 @@ function persist(store: CodexAccountStore): void {
   assertNotRealHomeUnderTest(dir);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
   publishCredentialSync(() => atomicWriteFile(codexAccountsPath(), JSON.stringify(store, null, 2) + "\n"));
-  notifyCodexStoreLoaded(store);
 }
 
 function persistCredentialMutation(store: CodexAccountStore): void {

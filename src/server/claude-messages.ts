@@ -1,7 +1,7 @@
 import { MessagesSseFrameContext } from "../lib/messages-sse-error-presentation";
 import { createMessagesSseErrorFilter } from "./messages-sse-error-filter";
 import { normalizeMessagesProxyRefusal, ownedAnthropicErrorPayload, ownedAnthropicErrorResponse, boundedMessagesDisplayCount, messagesOverflowPresentation, messagesRelayedOverflowPresentation } from "../lib/messages-error-body";
-import { CLAUDE_CONTEXT_OVERFLOW_MESSAGE, isProxyError, markProxyError, carryProxyError, attachComboFailureEvidence, comboFailureEvidence } from "../lib/client-error-body";
+import { CLAUDE_CONTEXT_OVERFLOW_MESSAGE, isProxyError, markProxyError, carryProxyError, attachUpstreamFailureEvidence, upstreamFailureEvidence } from "../lib/client-error-body";
 import type { MessagesFailureVerdictSink } from "../claude/failure-verdict";
 import { clientFacingModelLabel, clientFacingModelText } from "../lib/error-destination";
 import { classifyUpstreamCondition } from "../lib/upstream-condition";
@@ -474,7 +474,7 @@ async function anthropicNativePassthrough(
     status: upstream.status,
     headers: { ...rateLimitHeaders, "Content-Type": isError ? "application/json" : messagesSuccessContentType(upstream.headers), ...(retryAfter ? { "Retry-After": retryAfter } : {}) },
   });
-  return isError ? attachComboFailureEvidence(out, text) : out;
+  return isError ? attachUpstreamFailureEvidence(out, text) : out;
 }
 
 type BoundedPassthroughBody =
@@ -589,7 +589,7 @@ export async function handleClaudeMessages(
   logCtx: RequestLogContext,
   logIds?: {
     requestId: string; start: number; turnAdmissionLease?: AdmissionLease; admission?: DataPlaneAdmission;
-    advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+    sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
   },
   requestPolicy: RequestPolicyView = config,
   ingress: ClaudeIngressOptions = {},
@@ -598,8 +598,8 @@ export async function handleClaudeMessages(
   try {
     const response = await handleClaudeMessagesWithBudget(req, config, logCtx, translatorBudget, logIds, requestPolicy, ingress);
     const finalized = carryProxyError(response, finalizeTranslatorBudgetResponse(response, translatorBudget, req.signal));
-    const evidence = comboFailureEvidence(response);
-    return normalizeMessagesProxyRefusal(req, evidence === undefined ? finalized : attachComboFailureEvidence(finalized, evidence));
+    const evidence = upstreamFailureEvidence(response);
+    return normalizeMessagesProxyRefusal(req, evidence === undefined ? finalized : attachUpstreamFailureEvidence(finalized, evidence));
   } catch (error) {
     translatorBudget.dispose();
     throw error;
@@ -636,7 +636,7 @@ async function handleClaudeMessagesWithBudget(
   translatorBudget: TranslatorBudget,
   logIds?: {
     requestId: string; start: number; turnAdmissionLease?: AdmissionLease; admission?: DataPlaneAdmission;
-    advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+    sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
   },
   requestPolicy: RequestPolicyView = config,
   ingress: ClaudeIngressOptions = {},
@@ -670,8 +670,8 @@ async function handleClaudeMessagesWithBudget(
   // Built only under the reject policy; the legacy default leaves this request untouched.
   let envelope: ProtocolEnvelope | undefined;
   let messagesFeatures: () => Iterable<ProtocolFeature> = () => [];
-  // The Advisor caller policy is the admitted snapshot: capture it before the first await (#7859).
-  const advisorAdmissionPolicy = logIds?.advisorAdmissionPolicy ?? captureAdmissionPolicy(config, logIds?.admission);
+  // The sidecar caller policy is the admitted snapshot: capture it before the first await (#7859).
+  const sidecarAdmissionPolicy = logIds?.sidecarAdmissionPolicy ?? captureAdmissionPolicy(config, logIds?.admission);
   try {
     anthropicBody = await readAnthropicBody(req, translatorBudget, resolveInboundBodyLimitBytes(config.maxInboundBodyBytes));
     clientModelLabel = clientFacingModelLabel(isRec(anthropicBody) ? anthropicBody.model : undefined);
@@ -1127,7 +1127,7 @@ async function handleClaudeMessagesWithBudget(
     });
   }
   // Combo and policy children are judged per candidate (PF-07); an unknown model has no route.
-  if (envelope && settledRoute && !settledRoute.combo && settledRoute.routeKind !== "policy") {
+  if (envelope && settledRoute && settledRoute.routeKind !== "policy") {
     const verdict = checkRepresentable({
       inbound: "messages",
       requestPath: requestPathForLane(
@@ -1265,7 +1265,7 @@ async function handleClaudeMessagesWithBudget(
     // Routing keeps Claude-only sidecar overrides; admission policy must follow the live owner.
     codexAuthPolicy: config,
     ...(logIds?.admission ? { admission: logIds.admission } : {}),
-    advisorAdmissionPolicy,
+    sidecarAdmissionPolicy,
     // The translated request never forwards the caller credential; resolve the principal first.
     replayPrincipal: { clientPrincipalId: resolveContextPrincipal(req, config, logIds?.admission) },
     ...(logIds?.turnAdmissionLease ? { turnAdmissionLease: logIds.turnAdmissionLease } : {}),
@@ -1395,7 +1395,7 @@ async function handleClaudeMessagesWithBudget(
       status: outStatus,
       headers: outHeaders,
     });
-    return attachComboFailureEvidence(carryProxyError(response, carryReplayRefusal(response, out)), legacyBody);
+    return attachUpstreamFailureEvidence(carryProxyError(response, carryReplayRefusal(response, out)), legacyBody);
   }
 
   const contentType = response.headers.get("content-type") ?? "";

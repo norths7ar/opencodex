@@ -133,13 +133,11 @@ import { autoReviewOverrideConfigError } from "../../config/provider-validation"
 import { ConfigWritePublishedError } from "../../config/persist-unlocked";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
-import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
+import { estimateAttemptsCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
 import type { PersistedUsageAttempt } from "../../usage/log";
 import { isAllowedRequestOrigin, jsonResponse, providerManagementConfigError, publicProviderBaseUrl, safeConfigDTO } from "../auth-cors";
 import { withProviderCatalogCapabilityDTO } from "./provider-capability-config";
-import { applySystemEnvToggle } from "../system-env";
 import { getCachedStartupHealth, getStartupHealthSnapshot, invalidateStartupHealthCache } from "../startup-health-cache";
-import { runWindowsTrayAction } from "../windows-tray-control";
 import { runStartupInstallAction, type StartupInstallAction } from "../startup-action-control";
 import { displayCodexRuntimePath, effortClampAppliesToRuntime, getCodexRuntimeSnapshot, liveRemovedEfforts, loadLastEffortClamp } from "../../codex/runtime";
 
@@ -250,7 +248,7 @@ export async function syncEnabledClientIntegrations(
   const admit = () => {
     if (!unattended!.isCurrent()) return false;
     const fresh = loadConfig();
-    return localClientSyncAllowed(fresh) && isDeepStrictEqual(clientProjectionConfig(fresh), projectionConfig);
+    return localClientSyncAllowed() && isDeepStrictEqual(clientProjectionConfig(fresh), projectionConfig);
   };
   const stale = () => unattended !== undefined && !admit();
   if (stale()) return out;
@@ -512,30 +510,6 @@ async function handleConfigRoutesImpl(ctx: ManagementContext): Promise<Response 
       const result = await (deps.runStartupInstallAction ?? runStartupInstallAction)(action, { repair });
       invalidateStartupHealthCache();
       return jsonResponse({ ok: true, action, repair, message: result.message });
-    } catch (error) {
-      return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 500);
-    }
-  }
-
-  if (url.pathname === "/api/windows-tray" && req.method === "GET") {
-    if (process.platform !== "win32") return jsonResponse({ supported: false, installed: false, running: false, stale: false, summary: `unsupported on ${process.platform}` });
-    try {
-      return jsonResponse(await runWindowsTrayAction("status"));
-    } catch (error) {
-      return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 500);
-    }
-  }
-
-  if (url.pathname === "/api/windows-tray" && req.method === "POST") {
-    let body: { action?: unknown };
-    try { body = await readManagementJsonBody(req); } catch (error) { rethrowManagementBodyTooLarge(error); return jsonResponse({ error: "invalid JSON body" }, 400); }
-    if (!body || !["install", "start", "stop", "uninstall"].includes(String(body.action))) {
-      return jsonResponse({ error: "action must be install, start, stop, or uninstall" }, 400);
-    }
-    if (process.platform !== "win32") return jsonResponse({ error: "Windows tray is only supported on Windows" }, 400);
-    try {
-      const status = await runWindowsTrayAction(body.action as "install" | "start" | "stop" | "uninstall");
-      return jsonResponse({ ok: true, status });
     } catch (error) {
       return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 500);
     }
@@ -943,68 +917,6 @@ async function handleConfigRoutesImpl(ctx: ManagementContext): Promise<Response 
       ...(integrations.length > 0 ? { integrations } : {}),
       ...(result.ok ? {} : { error: result.message }),
     }, status);
-  }
-
-  if (url.pathname === "/api/update/check" && req.method === "GET") {
-    const { normalizeUpdateChannel } = await import("../../update/job");
-    const { packageRefresh } = await import("../../update/refresh-scheduler");
-    const rawTag = url.searchParams.get("tag");
-    if (rawTag && rawTag !== "latest" && rawTag !== "preview") {
-      return jsonResponse({ error: "tag must be latest or preview" }, 400);
-    }
-    return jsonResponse(await (deps.checkPackageUpdate ?? packageRefresh.check)(normalizeUpdateChannel(rawTag)));
-  }
-
-  if (url.pathname === "/api/update/run" && req.method === "POST") {
-    const { normalizeUpdateChannel, startUpdateJob, UpdateJobError, spawnGuiUpdateWorker } = await import("../../update/job");
-    let body: { tag?: unknown; restart?: unknown };
-    try { body = await readManagementJsonBody(req); } catch (error) { rethrowManagementBodyTooLarge(error); return jsonResponse({ error: "invalid JSON body" }, 400); }
-    if (body.tag !== undefined && body.tag !== "latest" && body.tag !== "preview") {
-      return jsonResponse({ error: "tag must be latest or preview" }, 400);
-    }
-    if (body.restart !== undefined && typeof body.restart !== "boolean") {
-      return jsonResponse({ error: "restart boolean is required" }, 400);
-    }
-    try {
-      const channel = normalizeUpdateChannel(body.tag as string | undefined);
-      const { packageRefresh } = await import("../../update/refresh-scheduler");
-      const checked = await (deps.checkPackageUpdate ?? packageRefresh.check)(channel);
-      // Resolve the systemd-scope launcher before spawning: the first request
-      // would otherwise run up to four sequential five-second probes inside
-      // spawnSync on the shared event loop.
-      const { resolveSystemdRunAsync, dashboardRestartRefusal } = await import("../../update/worker-launch");
-      const systemdRun = process.platform === "linux" && process.env.INVOCATION_ID
-        ? await resolveSystemdRunAsync()
-        : undefined;
-      const restart = body.restart !== false;
-      // Refuse before any package mutation, with or without restart: the update stops the proxy
-      // first, so a worker that dies with the service cgroup, or a restart aimed at a unit that
-      // does not own this proxy, leaves the dashboard down (#7967).
-      // Only an update that would actually run is refused; an unavailable update or a source
-      // checkout keeps its own refusal from startUpdateJob.
-      if (checked.canUpdate) {
-        const { TASK } = await import("../../service/state");
-        const refusal = (deps.dashboardRestartRefusal ?? dashboardRestartRefusal)({ systemdRun, unitName: TASK });
-        if (refusal) return jsonResponse({ error: refusal, code: "update_restart_unsupervised" }, 409);
-      }
-      return jsonResponse({ ok: true, job: startUpdateJob(channel, restart, {
-        checkForUpdateFn: () => checked,
-        spawnWorkerFn: (jobId, runChannel, runRestart) =>
-          spawnGuiUpdateWorker(jobId, runChannel, runRestart, { resolveSystemdRun: () => systemdRun }),
-      }) });
-    } catch (err) {
-      if (err instanceof UpdateJobError) {
-        return jsonResponse({ error: err.message, code: err.code }, err.status);
-      }
-      return jsonResponse({ error: err instanceof Error ? err.message : String(err) }, 500);
-    }
-  }
-
-  if (url.pathname === "/api/update/status" && req.method === "GET") {
-    const { readUpdateJobForStatus } = await import("../../update/job");
-    const job = readUpdateJobForStatus(url.searchParams.get("jobId"));
-    if (!job) return jsonResponse({ error: "update job not found" }, 404);
-    return jsonResponse({ ok: true, job });
   }
 
   if (url.pathname === "/api/sidecar-settings" && req.method === "GET") {

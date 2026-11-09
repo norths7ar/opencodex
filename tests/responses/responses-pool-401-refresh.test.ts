@@ -9,7 +9,6 @@ import * as authContextModule from "../../src/codex/auth-context";
 import * as coreAuthModule from "../../src/server/responses/core-auth";
 import * as proxyEnvModule from "../../src/lib/proxy-env";
 import { prepareResponsesRequest } from "../../src/server/responses/request-prepare";
-import { handleComboResponses } from "../../src/server/responses/core";
 import type { ResponsesAdmissionState } from "../../src/server/responses/core-options";
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
 import { createBoundedSameTargetRecovery, createRequestExecutionBudget, deriveRequestExecutionBudget } from "../../src/lib/request-execution-budget";
@@ -454,7 +453,7 @@ describe("stored-account credit refusal before Responses dispatch (#6606)", () =
       return await prepareResponsesRequest({
         req, config: cfg, logCtx: { model: "", provider: "" } as RequestLogContext,
         options: { translatorBudget, abortSignal },
-      }, state, { handleResponses, handleComboResponses });
+      }, state, { handleResponses });
     } finally {
       translatorBudget.dispose();
     }
@@ -911,109 +910,6 @@ describe("ordinary pool 401 refresh and replay (#2887)", () => {
     expect(harness.refreshes).toEqual(["refresh-grant"]);
   });
 
-  test("a combo stops after a stored-account replay consumes the recovery budget", async () => {
-    const cfg = recoveryComboConfig();
-    const harness = installHarness({
-      responseForSend: (authorization, _sendNumber, url) => {
-        if (url.hostname === "backup.example") {
-          return Response.json({ id: "must-not-run", object: "response", status: "completed", output: [] });
-        }
-        if (authorization === "Bearer rejected-access") {
-          return Response.json({ error: { message: "rejected bearer" } }, { status: 401 });
-        }
-        if (authorization === "Bearer refreshed-access") {
-          return Response.json({ error: { message: "pool exhausted" } }, { status: 429 });
-        }
-        return undefined;
-      },
-    });
-
-    const response = await handleResponses(
-      request("/v1/responses", { model: "combo/recovery" }),
-      cfg,
-      { model: "", provider: "" } as RequestLogContext,
-    );
-
-    expect(response.status).toBe(429);
-    expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-    expect(harness.refreshes).toEqual(["refresh-grant"]);
-  });
-
-  test("a combo stops when the stored-account replay hits a transport error", async () => {
-    const cfg = recoveryComboConfig();
-    const harness = installHarness({
-      responseForSend: (authorization, _sendNumber, url) => {
-        if (url.hostname === "backup.example") {
-          return Response.json({ id: "must-not-run", object: "response", status: "completed", output: [] });
-        }
-        if (authorization === "Bearer rejected-access") {
-          return Response.json({ error: { message: "rejected bearer" } }, { status: 401 });
-        }
-        if (authorization === "Bearer refreshed-access") {
-          throw new TypeError("stored replay transport failure");
-        }
-        return undefined;
-      },
-    });
-
-    const response = await handleResponses(
-      request("/v1/responses", { model: "combo/recovery" }),
-      cfg,
-      { model: "", provider: "" } as RequestLogContext,
-    );
-
-    expect(response.status).toBe(502);
-    expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-    expect(harness.refreshes).toEqual(["refresh-grant"]);
-  });
-
-  test("a combo stops on a zero-output failure from the stored-account replay stream", async () => {
-    const cfg = recoveryComboConfig();
-    const harness = installHarness({
-      responseForSend: (authorization, _sendNumber, url) => {
-        if (url.hostname === "backup.example") {
-          return Response.json({ id: "must-not-run", object: "response", status: "completed", output: [] });
-        }
-        if (authorization === "Bearer rejected-access") {
-          return Response.json({ error: { message: "rejected bearer" } }, { status: 401 });
-        }
-        if (authorization === "Bearer refreshed-access") {
-          const events = [
-            { type: "response.created", response: { id: "replay", status: "in_progress" } },
-            {
-              type: "response.failed",
-              response: {
-                id: "replay",
-                status: "failed",
-                error: { type: "server_error", code: "upstream_server_error", message: "busy" },
-              },
-            },
-          ];
-          return new Response(
-            events.map(event => `data: ${JSON.stringify(event)}\n\n`).join(""),
-            { headers: { "content-type": "text/event-stream" } },
-          );
-        }
-        return undefined;
-      },
-    });
-
-    const response = await handleResponses(
-      request("/v1/responses", { model: "combo/recovery", stream: true }),
-      cfg,
-      { model: "", provider: "" } as RequestLogContext,
-    );
-
-    expect(response.status).toBe(502);
-    const failure = await response.clone().json() as {
-      error?: { code?: string; message?: string };
-    };
-    expect(failure.error?.code).toBe("upstream_server_error");
-    expect(failure.error?.message).toContain("busy");
-    expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-    expect(harness.refreshes).toEqual(["refresh-grant"]);
-  });
-
   for (const replayStatus of [429, 402] as const) {
     test(`compact does not compose a stored-account replay ${replayStatus} with another account or remembered model`, async () => {
       const headers = { "x-codex-parent-thread-id": `compact-refresh-budget-${replayStatus}` };
@@ -1400,40 +1296,6 @@ describe("ordinary pool 401 refresh and replay (#2887)", () => {
     // The 400 is surfaced rather than paid for out of the other account.
     expect(response.status).toBe(400);
     expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-  });
-
-  test("a combo stops after a stored replay 4xx that is neither quota nor a gated-model 400", async () => {
-    // The contributor's original bound was a single `status >= 400` break in the passthrough loop,
-    // which stopped combo fallback for EVERY stored replay 4xx. Removing it to keep same-account
-    // rescue alive means the outer layers now rely on the dispatch signal instead. This pins that
-    // substitution on the case the break used to cover and the pool-retry site does not: a plain
-    // 403 is not a quota status, so it never reaches the quota bound at all.
-    const cfg = recoveryComboConfig();
-    const harness = installHarness({
-      responseForSend: (authorization, _sendNumber, url) => {
-        if (url.hostname === "backup.example") {
-          return Response.json({ id: "must-not-run", object: "response", status: "completed", output: [] });
-        }
-        if (authorization === "Bearer rejected-access") {
-          return Response.json({ error: { message: "rejected bearer" } }, { status: 401 });
-        }
-        if (authorization === "Bearer refreshed-access") {
-          return Response.json({ error: { message: "forbidden" } }, { status: 403 });
-        }
-        return undefined;
-      },
-    });
-
-    const response = await handleResponses(
-      request("/v1/responses", { model: "combo/recovery" }),
-      cfg,
-      { model: "", provider: "" } as RequestLogContext,
-    );
-
-    expect(response.status).toBe(403);
-    // The backup target is never sent to, and the account is charged exactly twice.
-    expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-    expect(harness.refreshes).toEqual(["refresh-grant"]);
   });
 
   test("a replay that never leaves the pacing queue does not spend the recovery budget", async () => {
@@ -1905,34 +1767,6 @@ describe("stored pool 401 replay then encrypted combo recovery", () => {
     expect(harness.backupAuths).toEqual([]);
     expect(harness.sends).toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
     expect(harness.canonicalAliasSends).toBe(0);
-  });
-
-  test("a hop-class backup failure cannot reopen later combo or native hops", async () => {
-    writeWorkAndOtherAccounts();
-    const headers = codexHeaders();
-    const cfg = encryptedRecoveryComboConfig({ extraCanonical: true, extraSpare: true });
-    const logCtx = { model: "", provider: "" } as RequestLogContext;
-    const harness = installHarness({
-      responseForSend: (authorization, _sendNumber, url) => {
-        if (url.hostname === "backup.example") {
-          return Response.json({ error: { message: "backup overloaded" } }, { status: 503 });
-        }
-        return storedReplay401(authorization, url);
-      },
-    });
-
-    const response = await postEncryptedCombo(cfg, headers, undefined, logCtx);
-    expect(response.status).toBe(503);
-    expect(harness.recoveryAuths).toHaveLength(1);
-    expect(harness.sends.filter(send => send === "Bearer rejected-access" || send === "Bearer refreshed-access"))
-      .toEqual(["Bearer rejected-access", "Bearer refreshed-access"]);
-    expect(harness.sends).not.toContain("Bearer other-access");
-    expect(harness.canonicalAliasSends).toBe(0);
-    expect(harness.backupAuths).toContain("Bearer backup-test-key");
-    expect(harness.backupAuths).not.toContain("Bearer spare-test-key");
-    expect((logCtx.attempts ?? []).filter(attempt => attempt.provider === "backup")).toHaveLength(1);
-    expect((logCtx.attempts ?? []).some(attempt => attempt.provider === "spare")).toBe(false);
-    expect((logCtx.attempts ?? []).filter(attempt => attempt.provider === "chatgpt")).toHaveLength(0);
   });
 
   test.each(["cyber_policy", "invalid_request_error"])("encrypted replay %s remains a terminal 400 without recovery or backup", async (code) => {

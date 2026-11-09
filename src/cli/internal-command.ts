@@ -4,7 +4,7 @@
  * Deliberately NOT in `src/cli/registry.ts` and NOT in `src/cli/capabilities.ts`, so it
  * is absent from help, from the generated skill surface, and from the registry-parity
  * gate. These are implementation entrypoints for the detached restart helper and
- * experimental ChatGPT stdout filter; compiled builds re-enter the same CLI binary.
+ * executable-target helper; compiled builds re-enter the same CLI binary.
  *
  * It is routed before the dispatch table for the same reason `help` is - adding it as a
  * runner key would make it a command the registry-parity test expects to find
@@ -18,7 +18,7 @@
  */
 import type { CodexExecBoundaryAsyncDeps } from "../codex/exec-boundary";
 
-const USAGE = "Usage: ocx internal desktop-restart-handoff --plan <path> | chatgpt-app-server-filter [--self-test] | codex-exec-target [--bundle-root <path>] -- <path>";
+const USAGE = "Usage: ocx internal desktop-restart-handoff --plan <path> | codex-exec-target [--bundle-root <path>] -- <path>";
 
 function optionValue(args: readonly string[], name: string): string | undefined {
   const index = args.indexOf(name);
@@ -51,14 +51,6 @@ export async function handleInternalCommand(args: readonly string[], execBoundar
       console.error(`OpenCodex refused the app-server executable: ${error instanceof Error ? error.message : "verification failed"}`);
       return 1;
     }
-  }
-  if (sub === "chatgpt-app-server-filter") {
-    if (args.length > 2 || (args[1] !== undefined && args[1] !== "--self-test")) {
-      console.error(USAGE);
-      return 2;
-    }
-    const { runChatgptAppServerFilter } = await import("../chatgpt/app-server-shim/filter");
-    return await runChatgptAppServerFilter({ selfTest: args[1] === "--self-test" });
   }
   if (sub !== "desktop-restart-handoff") {
     console.error(`Unknown internal command: ${sub ?? "(none)"}. ${USAGE}`);

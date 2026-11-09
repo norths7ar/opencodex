@@ -1,7 +1,8 @@
-import { comboFailureDecision, comboFailureCooldownScope } from "../../src/combos/failover";
+
+import { candidateFailureDecision } from "../../src/routing/candidate-failure";
 import { expect, test } from "bun:test";
-import { attachComboFailureEvidence } from "../../src/lib/client-error-body";
-import { consumeComboFailure } from "../../src/server/responses/core-combo-failure";
+import { attachUpstreamFailureEvidence } from "../../src/lib/client-error-body";
+import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
 import { markVerifiedModelNotInPlanResponse } from "../../src/lib/errors";
 import { markResponseNonReplayable, markReplayRefusalResponse } from "../../src/lib/upstream-retry";
 import { responseWithDeferredRequestLog, markPreinspectedJsonResponse } from "../../src/server/relay";
@@ -9,37 +10,10 @@ import { createBoundedResponseLogBody } from "../../src/server/response-log-body
 import type { RequestLogContext } from "../../src/server/request-log";
 
 const KEY = "zq7Vb2LmN4pX9tR1sK8wD3fH6jY0cA5e";
-for (const [status, code, message] of [[429, "rate_limit_exceeded", "rate limit"], [500, "insufficient_quota", "quota exhausted"],
-  [400, "cyber_policy", "cyber policy"], [400, "model_not_in_plan", "plan refusal"], [429, "upstream_reset_replay_refused", "connection closed"],
-  [403, "model_not_allowed_for_key", "not allowed"], [400, "usage_limit_reached", "usage limit reached"], [401, "invalid_api_key", "invalid api key"]] as const) {
-  for (const size of [0, 65535, 65536, 65537]) test(`combo legacy evidence ${code}, bytes=${size || "small"}`, async () => {
-    let legacy = JSON.stringify({ error: { message: `${message} ${KEY}`, type: code === "model_not_allowed_for_key" ? code : "upstream_error", code }, usage: { input_tokens: 3, output_tokens: 2 } });
-    if (size) legacy += " ".repeat(size - Buffer.byteLength(legacy));
-    const make = (text: string) => {
-      const response = new Response(text, { status, headers: { "retry-after": "7", "x-codex-primary-reset-at": "2000000000" } });
-      if (code === "model_not_in_plan") markVerifiedModelNotInPlanResponse(response);
-      if (code === "upstream_reset_replay_refused") markReplayRefusalResponse(response);
-      if (code === "model_not_allowed_for_key") markResponseNonReplayable(response);
-      return response;
-    };
-    const before = await consumeComboFailure(make(legacy), undefined, 1800000000000);
-    const after = await consumeComboFailure(attachComboFailureEvidence(make(JSON.stringify({ error: { message: "The provider failed to complete the request.", type: "server_error", code: null } })), legacy), undefined, 1800000000000);
-    expect(after.response.status).toBe(before.response.status);
-    const beforeBody = await before.response.text(); const afterBody = await after.response.text();
-    expect(afterBody).toBe(beforeBody);
-    const { response: a, ...factsA } = after; const { response: b, ...factsB } = before;
-    expect(factsA).toEqual(factsB);
-    expect(comboFailureDecision(after.response.status, after.classificationText, { code: after.upstreamCode, verifiedPlanRefusal: after.verifiedPlanRefusal }))
-      .toBe(comboFailureDecision(before.response.status, before.classificationText, { code: before.upstreamCode, verifiedPlanRefusal: before.verifiedPlanRefusal }));
-    expect(comboFailureCooldownScope(after.response.status, after.classificationText, { code: after.upstreamCode }))
-      .toBe(comboFailureCooldownScope(before.response.status, before.classificationText, { code: before.upstreamCode }));
-    expect([...a.headers]).toEqual([...b.headers]);
-  });
-}
-for (const length of [32700, 32800]) test(`combo multibyte bounded evidence ${length}`, async () => {
+for (const length of [32700, 32800]) test(`upstream multibyte bounded evidence ${length}`, async () => {
   const legacy = JSON.stringify({ error: { message: `quota exhausted ${KEY}`, type: "é".repeat(length), code: KEY } });
-  const before = await consumeComboFailure(new Response(legacy, { status: 500 }));
-  const after = await consumeComboFailure(attachComboFailureEvidence(new Response("{}", { status: 500 }), legacy));
+  const before = await consumeRecoveryFailure(new Response(legacy, { status: 500 }));
+  const after = await consumeRecoveryFailure(attachUpstreamFailureEvidence(new Response("{}", { status: 500 }), legacy));
   expect(after.classificationText).toBe(before.classificationText);
   expect(after.upstreamCode).toBe(before.upstreamCode);
 });
@@ -99,17 +73,6 @@ test("deferred legacy inspection preserves numeric reset and diagnostic projecti
     return { row, ctx };
   }
   expect(await project(true)).toEqual(await project(false));
-});
-
-test("combo rebuilding carries only the original local response identity", async () => {
-  const { markProxyError, isProxyError } = await import("../../src/lib/client-error-body");
-  const envelope = { error: { type: "authentication_error", code: "invalid_api_key", message: "owned local refusal" } };
-  const local = await consumeComboFailure(markProxyError(Response.json(envelope, { status: 401 })));
-  const upstream = await consumeComboFailure(Response.json({ ...envelope, proxyAuthored: true }, { status: 401 }));
-  expect(local.response.status).toBe(401);
-  expect(upstream.response.status).toBe(401);
-  expect(isProxyError(upstream.response)).toBe(false);
-  expect(isProxyError(local.response)).toBe(true);
 });
 
 test("local auth constructors own their response and copied fields do not", async () => {

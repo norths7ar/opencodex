@@ -304,22 +304,6 @@ test("direct B with an empty B namespace never borrows a populated A namespace",
   expect(store.getAccountSet("anthropic")!.accounts).toHaveLength(2);
 });
 
-test("an explicit B then A combo retains its declared cross-instance transition", async () => {
-  // Pause B's second account so the first target has no implicit recovery candidate.
-  await store.setAccountPaused("anthropic2", ids.anthropic2[1]!, true);
-  config.combos = { explicit: { strategy: "failover", targets: [
-    { provider: "anthropic2", model: fixture.model }, { provider: "anthropic", model: fixture.model },
-  ] } };
-  fixture.publishConfig();
-  reply = instance => instance === "anthropic2" ? refusal(429) : answer();
-  const response = await handleResponses(new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ model: "combo/explicit", input: "Answer briefly", stream: false }),
-  }), config, { model: "", provider: "" });
-  await response.text(); expect(response.status).toBe(200);
-  expect(sends.map(send => send.instance)).toEqual(["anthropic2", "anthropic"]);
-  expect(sends.map(send => send.token)).toEqual((["anthropic2", "anthropic"] as const).map(instance => `Bearer ${instanceFixtureCredential(instance, 1).access}`));
-});
-
 for (const surface of ["responses", "chat"] as const) {
   for (const unavailable of ["absent-row", "unmarked-alias", "disabled-alias"] as const) {
     test(`${surface}: ${unavailable} B selector refuses before any OAuth resolver or default-A send`, async () => {
@@ -407,8 +391,7 @@ async function reconcileLiveAccounts(): Promise<import("../../../src/lib/state-s
   syntheticReconcileGeneration = Math.max(syntheticReconcileGeneration, sweeper.captureConfigGeneration()) + 1;
   const context: import("../../../src/lib/state-store-sweeper").GenerationContext = {
     generation: syntheticReconcileGeneration, providerNames: new Set(instances),
-    oauthAccountKeys: new Set(instances.flatMap(instance => store.getAccountSet(instance)!.accounts.map(row => cache.accountCacheKey(instance, row.id)))),
-    comboIds: new Set(), comboTargets: new Set(), codexAccountIds: new Set(), configRoots: new Set(),
+    oauthAccountKeys: new Set(instances.flatMap(instance => store.getAccountSet(instance)!.accounts.map(row => cache.accountCacheKey(instance, row.id)))), codexAccountIds: new Set(), configRoots: new Set(),
   };
   fixture.modelQuota.reconcileAllAnthropicFamilyQuota(context);
   fixture.ratePolicy.reconcileAllAnthropicRatePauses(context);

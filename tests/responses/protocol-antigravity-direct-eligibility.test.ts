@@ -60,11 +60,6 @@ describe("antigravityDirectDeclineReason", () => {
     expect(isAntigravityRoute(route({ googleMode: undefined }, {}, "google-vertex"))).toBe(false);
   });
 
-  test("combo and policy routes keep the bridge", () => {
-    expect(antigravityDirectDeclineReason(route({}, { combo: { id: "c" } } as never), chat(), config())).toBe("combo-or-policy-route");
-    expect(antigravityDirectDeclineReason(route({}, { routeKind: "policy" } as never), chat(), config())).toBe("combo-or-policy-route");
-  });
-
   test("a hosted web-search tool keeps the bridge for the sidecar", () => {
     expect(antigravityDirectDeclineReason(route(), chat({ tools: [{ type: "web_search" }] }), config())).toBe("hosted-tool");
     expect(antigravityDirectDeclineReason(route(), chat({ tools: [{ type: "web_search_preview" }] }), config())).toBe("hosted-tool");
@@ -79,12 +74,6 @@ describe("antigravityDirectDeclineReason", () => {
     expect(antigravityDirectDeclineReason(textOnly, chat(), config())).toBeUndefined();
     const vision = route({ modelCapabilities: { [MODEL]: { inputModalities: ["text", "image"] } } } as never);
     expect(antigravityDirectDeclineReason(vision, image, config())).toBeUndefined();
-  });
-
-  test("a shadow-call intercept that could move the request keeps the bridge", () => {
-    const intercept = { shadowCallIntercept: { enabled: true, model: "combo/helpers", sourceModels: ["gemini-"] } } as Partial<OcxConfig>;
-    expect(antigravityDirectDeclineReason(route(), chat({ model: MODEL }), config(intercept))).toBe("bridge-only-policy");
-    expect(antigravityDirectDeclineReason(route(), chat(), config(intercept))).toBeUndefined();
   });
 
   test("text the core rewrites on the bridge body keeps the bridge", () => {
@@ -155,12 +144,6 @@ describe("antigravityMessagesDeclineReason", () => {
     const inResult = messages({ messages: [{ role: "user", content: [{ type: "tool_result", tool_use_id: "t", content: [image] }] }] });
     expect(antigravityMessagesDeclineReason(textOnly, inResult, RESOLVED, config())).toBe("vision-preprocessing");
     expect(antigravityMessagesDeclineReason(textOnly, messages(), RESOLVED, config())).toBeUndefined();
-  });
-
-  test("the shadow-call intercept is matched on the resolved model", () => {
-    const intercept = { shadowCallIntercept: { enabled: true, model: "combo/helpers", sourceModels: ["gemini-"] } } as Partial<OcxConfig>;
-    expect(antigravityMessagesDeclineReason(route(), messages(), MODEL, config(intercept))).toBe("bridge-only-policy");
-    expect(antigravityMessagesDeclineReason(route(), messages(), RESOLVED, config(intercept))).toBeUndefined();
   });
 
   test("text the core rewrites on the bridge body, or an observing recorder, keeps the bridge", () => {

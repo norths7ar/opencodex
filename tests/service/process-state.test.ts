@@ -22,11 +22,6 @@ import {
   writePid,
   writeRuntimePort,
 } from "../../src/config/process-state";
-import {
-  describeTrackedRuntimeTarget,
-  inspectTrackedRuntimeRecord,
-} from "../../src/config/tracked-runtime-inspection";
-import type { TrackedRecordProbeDeps } from "../../src/config/tracked-runtime-inspection";
 import { markSiblingStart, resetSiblingStartForTests, siblingRuntimeField } from "../../src/codex/sibling-start";
 import { setTrustedWindowsSystemDirectoryResolverForTests } from "../../src/lib/windows-elevation";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -148,7 +143,7 @@ describe("proxy process-state ownership", () => {
     // The stop-side teardown recovery asks this about a PID recorded in a receipt. Bare
     // liveness said "still running" for any process that inherited the number, so the
     // obligation was never recovered while both updater gates kept refusing (#4897).
-    setProcessCommandLinePlatformForTests("darwin");
+    setProcessCommandLinePlatformForTests("win32");
 
     setProcessCommandLineExecForTests(() => "node /usr/local/lib/node_modules/@bitkyc08/opencodex/bin/ocx.mjs update\n");
     expect(isLikelyOcxProcess(4242)).toBe(true);
@@ -174,36 +169,6 @@ describe("proxy process-state ownership", () => {
   test("writes pid state through the shared atomic writer", () => {
     writePid(process.pid);
     expect(readFileSync(getPidPath(), "utf-8")).toBe(String(process.pid));
-  });
-
-  test("pid validation never resolves ps through PATH", () => {
-    const attackerDir = join(testDir, "attacker-bin");
-    const fakePs = join(attackerDir, "ps");
-    const markerPath = `${fakePs}.executed`;
-    const previousPath = process.env.PATH;
-    const probes: string[] = [];
-    mkdirSync(attackerDir);
-    writeFileSync(fakePs, `#!/bin/sh\ntouch "$0.executed"\necho 'ocx start'\n`, { mode: 0o755 });
-
-    try {
-      setProcessCommandLinePlatformForTests("darwin");
-      setProcessCommandLineExecForTests(executable => {
-        probes.push(executable);
-        throw new Error("fixed ps probe unavailable");
-      });
-      process.env.PATH = `${attackerDir}${delimiter}${previousPath ?? ""}`;
-      writePid(process.pid);
-
-      expect(readPid()).toBeNull();
-      expect(probes).toEqual(["/bin/ps", "/usr/bin/ps"]);
-      expect(existsSync(markerPath)).toBe(false);
-    } finally {
-      if (previousPath === undefined) delete process.env.PATH;
-      else process.env.PATH = previousPath;
-    }
-
-    expect(process.env.PATH).toBe(previousPath);
-    expect(ocxStartProcessCacheSizeForTests()).toBe(0);
   });
 
   test("pid validation selects only trusted Windows process probes", () => {
@@ -315,22 +280,7 @@ describe("proxy process-state ownership", () => {
   });
 });
 
-describe("tracked runtime record inspection", () => {
-  // Injected deps keep every probe input fake: no process.kill, no WMIC/PowerShell/ps,
-  // and no real stop ever runs. Record reads default to the real temp-home files. The
-  // cache-sharing cases below drive the same exec seams production uses -- with faked
-  // native answers and a real signal-0 read on this process only.
-  const errno = (code: string): NodeJS.ErrnoException =>
-    Object.assign(new Error("fake " + code), { code });
-  const liveOcx: TrackedRecordProbeDeps = { signal: () => {}, identity: () => "match" };
-  const trackedPid = () => writeFileSync(getPidPath(), "4242", "utf-8");
-  test("an omitted tracked hostname remains distinct from an explicitly empty hostname", () => {
-    trackedPid();
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 4242, port: 58195 }), "utf-8");
-    expect(describeTrackedRuntimeTarget(liveOcx)).toEqual({ pid: 4242, port: 58195, hostname: undefined });
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 4242, port: 58195, hostname: "" }), "utf-8");
-    expect(describeTrackedRuntimeTarget(liveOcx)).toEqual({ pid: 4242, port: 58195, hostname: "" });
-  });
+describe("runtime identity caching", () => {
   const trustedProbePaths = () => {
     const trustedSystem32 = join(testDir, "trusted", "System32");
     const trustedPowerShell = join(trustedSystem32, "WindowsPowerShell", "v1.0", "powershell.exe");
@@ -347,112 +297,6 @@ describe("tracked runtime record inspection", () => {
     writeFileSync(getPidPath(), String(process.pid), "utf-8");
     writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: process.pid, port: 58195, hostname }), "utf-8");
   };
-
-  test("a verified record pair returns the tracked target", () => {
-    trackedPid();
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 4242, port: 58195, hostname: "0.0.0.0" }), "utf-8");
-    expect(inspectTrackedRuntimeRecord(liveOcx)).toEqual(
-      { status: "verified", pid: 4242, port: 58195, hostname: "0.0.0.0" });
-    expect(describeTrackedRuntimeTarget(liveOcx)).toEqual({ pid: 4242, port: 58195, hostname: "0.0.0.0" });
-  });
-
-  test("an absent or invalid pid record is named before any process probe", () => {
-    const probes: string[] = [];
-    const deps: TrackedRecordProbeDeps = {
-      signal: () => { probes.push("signal"); },
-      identity: () => { probes.push("identity"); return "match"; },
-    };
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "pid-record-absent" });
-    expect(probes).toEqual([]);
-
-    writeFileSync(getPidPath(), "not-a-pid", "utf-8");
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "pid-record-invalid" });
-    expect(probes).toEqual([]);
-  });
-
-  test("pid-record read errors separate real permission denials from other failures", () => {
-    const denied = (code: string) => inspectTrackedRuntimeRecord({
-      readFile: () => { throw errno(code); },
-      signal: () => {},
-      identity: () => "match",
-    });
-    expect(denied("EACCES")).toEqual({ status: "refused", reason: "pid-record-permission-denied" });
-    expect(denied("EPERM")).toEqual({ status: "refused", reason: "pid-record-permission-denied" });
-    expect(denied("EIO")).toEqual({ status: "refused", reason: "pid-record-unreadable" });
-  });
-
-  test("a dead recorded pid reports not-running; other signal errors stay unverifiable", () => {
-    trackedPid();
-    const withSignal = (signal: (pid: number) => void) =>
-      inspectTrackedRuntimeRecord({ signal, identity: () => "match" });
-    expect(withSignal(() => { throw errno("ESRCH"); })).toEqual(
-      { status: "refused", reason: "process-not-running" });
-    expect(withSignal(() => { throw errno("EINVAL"); })).toEqual(
-      { status: "refused", reason: "process-unverifiable" });
-    expect(withSignal(() => { throw new Error("signal probe failed"); })).toEqual(
-      { status: "refused", reason: "process-unverifiable" });
-  });
-
-  test("an unverifiable identity observation is never permission evidence", () => {
-    trackedPid();
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 4242, port: 58195 }), "utf-8");
-    // Whether the liveness signal was clean or EPERM, an identity that cannot be
-    // observed only means it could not be verified. The unelevated-desktop case
-    // behind #7771 is one possibility, not a proven cause.
-    for (const signal of [() => {}, () => { throw errno("EPERM"); }]) {
-      expect(inspectTrackedRuntimeRecord({ signal, identity: () => "unverifiable" })).toEqual(
-        { status: "refused", reason: "process-unverifiable" });
-    }
-    // And a foreign process holding the recorded pid is a different fact entirely.
-    expect(inspectTrackedRuntimeRecord({
-      signal: () => {},
-      identity: () => "mismatch",
-    })).toEqual({ status: "refused", reason: "process-identity-mismatch" });
-  });
-
-  test("runtime record failures distinguish absent, denied, invalid and pid-mismatch", () => {
-    trackedPid();
-    const deps: TrackedRecordProbeDeps = { signal: () => {}, identity: () => "match" };
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "runtime-record-absent" });
-
-    writeFileSync(getRuntimePortPath(), "{not json", "utf-8");
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "runtime-record-invalid" });
-
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 4242, port: 99999 }), "utf-8");
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "runtime-record-invalid" });
-
-    writeFileSync(getRuntimePortPath(), JSON.stringify({ pid: 9999, port: 58195 }), "utf-8");
-    expect(inspectTrackedRuntimeRecord(deps)).toEqual(
-      { status: "refused", reason: "runtime-record-pid-mismatch" });
-
-    expect(inspectTrackedRuntimeRecord({
-      readFile: path => path.endsWith("ocx.pid")
-        ? "4242"
-        : (() => { throw errno("EACCES"); })(),
-      signal: () => {},
-      identity: () => "match",
-    })).toEqual({ status: "refused", reason: "runtime-record-permission-denied" });
-  });
-
-  test("refusal details are fixed sentences and never leak the observed error text", () => {
-    const marker = "t0ken-c0mmand-l1ne";
-    const mismatched = describeTrackedRuntimeTarget({
-      readFile: () => { throw Object.assign(new Error("open failed " + marker), { code: "EPERM" }); },
-      signal: () => {},
-      identity: () => "mismatch",
-    });
-    expect(mismatched).toEqual({ untracked: "reading the recorded PID file was denied" });
-    expect(JSON.stringify(mismatched)).not.toContain(marker);
-
-    trackedPid();
-    expect(describeTrackedRuntimeTarget(liveOcx)).toEqual(
-      { untracked: "the tracked runtime record is absent" });
-  });
 
   test("a cached start identity serves both readers after the native probe dies", () => {
     const { trustedWmic } = trustedProbePaths();
@@ -474,51 +318,7 @@ describe("tracked runtime record inspection", () => {
     });
     expect(readPid()).toBe(process.pid);
     expect(readRuntimePort(process.pid)?.port).toBe(58195);
-    expect(describeTrackedRuntimeTarget()).toEqual({ pid: process.pid, port: 58195, hostname: "0.0.0.0" });
     expect(calls).toEqual([trustedWmic]);
   });
 
-  test("a cached foreign verdict still refuses both readers while a fresh probe could answer", () => {
-    trustedProbePaths();
-    trackedSelf("0.0.0.0");
-    setOcxStartProcessCacheForTests([[process.pid, false]]);
-    const calls: string[] = [];
-    setProcessCommandLineExecForTests(executable => {
-      calls.push(executable);
-      return "CommandLine=ocx.exe start\r\n";
-    });
-    expect(readPid()).toBeNull();
-    expect(describeTrackedRuntimeTarget()).toEqual(
-      { untracked: "the recorded process does not match the expected start command" });
-    expect(calls).toEqual([]);
-  });
-
-  test("an unreadable identity answer is cached by neither reader and recovers together", () => {
-    const { trustedWmic, trustedPowerShell } = trustedProbePaths();
-    trackedSelf("0.0.0.0");
-    const calls: string[] = [];
-    setProcessCommandLineExecForTests(executable => {
-      calls.push(executable);
-      throw new Error("native probe unavailable");
-    });
-    expect(readPid()).toBeNull();
-    expect(describeTrackedRuntimeTarget()).toEqual(
-      { untracked: "the recorded process identity could not be verified" });
-    // Each reader asked the identical dead sequence: WMIC, then both CIM retries.
-    expect(calls).toEqual([
-      trustedWmic, trustedPowerShell, trustedPowerShell,
-      trustedWmic, trustedPowerShell, trustedPowerShell,
-    ]);
-    expect(ocxStartProcessCacheSizeForTests()).toBe(0);
-    // Recovery: the next miss re-probes once and the shared answer then serves both.
-    calls.length = 0;
-    setProcessCommandLineExecForTests(executable => {
-      calls.push(executable);
-      if (executable === trustedWmic) return "CommandLine=ocx.exe start\r\n";
-      throw new Error("unexpected process probe: " + executable);
-    });
-    expect(readPid()).toBe(process.pid);
-    expect(describeTrackedRuntimeTarget()).toEqual({ pid: process.pid, port: 58195, hostname: "0.0.0.0" });
-    expect(calls).toEqual([trustedWmic]);
-  });
 });

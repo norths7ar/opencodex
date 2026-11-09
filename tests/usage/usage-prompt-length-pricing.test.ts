@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { AttemptTierOutcome, OcxUsage } from "../../src/types";
 import type { PromptLengthPricing } from "../../src/types/provider";
-import { estimateAttemptCost, estimateComboCost, estimateRequestCost, type ServiceTierInput } from "../../src/usage/cost";
+import { estimateAttemptCost, estimateAttemptsCost, estimateRequestCost, type ServiceTierInput } from "../../src/usage/cost";
 import { CONTEXT_TIERS, type Cost4, type ExpectedPriceOverlay } from "../../src/usage/expected-prices";
 
 const BASE: Cost4 = { input: 0.1, output: 0.5, cacheRead: 0.01, cacheWrite: 0.125 };
@@ -206,13 +206,13 @@ describe("user prompt-length pricing", () => {
       { ...common, ordinal: 1, usage: { inputTokens: 90_000, outputTokens: 100 } },
       { ...common, ordinal: 2, usage: { inputTokens: 100_001, outputTokens: 100 } },
     ];
-    const result = estimateComboCost(attempts, undefined, undefined, rows(custom()));
+    const result = estimateAttemptsCost(attempts, undefined, undefined, rows(custom()));
     expectCharges(result?.attempts?.[0] ?? null, attempts[0]!.usage, BASE);
     expectCharges(result?.attempts?.[1] ?? null, attempts[1]!.usage, ABOVE);
     expect(result?.cost.total).toBeCloseTo(0.00905 + 0.0502505, 12);
     expect(result?.customThresholdApplied).toBe(true);
     expect(result?.contextTier).toBeUndefined();
-    expect(estimateComboCost([...attempts, { ...common, ordinal: 3 }], undefined, undefined, rows(custom()))).toBeNull();
+    expect(estimateAttemptsCost([...attempts, { ...common, ordinal: 3 }], undefined, undefined, rows(custom()))).toBeNull();
   });
 
   test("invalid token evidence remains unavailable instead of falling through to a custom price", () => {

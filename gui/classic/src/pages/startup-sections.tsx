@@ -1,11 +1,9 @@
 import { useI18n, type TKey } from "../i18n/shared";
-import { confirmAction } from "../action-dialogs";
-import { desktopBadgeKey, desktopManagesStartup, desktopSupervisionFailed, startupPresentation, startupRiskDetailKey } from "../startup-health-ui";
+import { startupPresentation, startupRiskDetailKey } from "../startup-health-ui";
 import { IconAlert, IconCheck, IconInfo, IconPower, IconTerminal } from "../icons";
 import type {
   StartupHealthData,
   StartupInstallAction,
-  TrayStatusData,
 } from "./startup-shared";
 import {
   PROTECTION_KEYS,
@@ -49,9 +47,8 @@ export function StartupHeroSection({
           <span className={`badge ${unverified ? "badge-muted" : failed || data.status === "at-risk" ? "badge-amber" : "badge-green"}`}>
             {t(unverified ? "startup.unverified" : failed ? "startup.status.atRisk" : STATUS_KEYS[data.status])}
           </span>
-          <h3>{t(unverified ? desktopManagesStartup(data) ? "startup.loginUnverifiedTitle" : "startup.unverified" : failed ? "startup.error" : SUMMARY_KEYS[data.status])}</h3>
-          <p>{unverified ? t(desktopManagesStartup(data) ? "startup.loginUnverifiedAction" : "startup.subtitle") : (data.status === "at-risk" && data.routingKind === "opencodex-local" && desktopManagesStartup(data) && !desktopSupervisionFailed(data))
-            ? t("startup.loginUnverifiedAction") : failed
+          <h3>{t(unverified ? "startup.unverified" : failed ? "startup.error" : SUMMARY_KEYS[data.status])}</h3>
+          <p>{unverified ? t("startup.subtitle") : failed
             ? t("startup.staleData")
             : data.status === "at-risk"
               ? t(startupRiskDetailKey(data))
@@ -93,9 +90,6 @@ export function StartupDetailsSection({
   const shimAwaitingActivation = data.shimInstalled && !data.shimHealthy && data.shimActivationPending === true;
   const shimNeedsRepair = data.shimInstalled && !data.shimHealthy && !shimAwaitingActivation;
   const shimActionsDisabled = installBusy !== null || failed || loading;
-  // Desktop owns startup, so a second supervisor stays off. The shim is safe under Desktop: its
-  // `ocx ensure` waits for or starts the Desktop app instead of a competing CLI proxy (#6971).
-  const serviceActionsDisabled = shimActionsDisabled || desktopManagesStartup(data);
 
   return (
     <section className="panel startup-details">
@@ -103,14 +97,6 @@ export function StartupDetailsSection({
         <h3 className="panel-title">{t("startup.details")}</h3>
         <span className="muted mono">{data.platform}</span>
       </div>
-      {data.desktop && (
-        <div className="startup-detail-row">
-          <div><strong>{t("startup.protection.desktop")}</strong>{!failed && data.desktop.viable ? <span>{t("startup.desktopHint")}</span> : !failed && data.desktop.running ? <span>{t("startup.desktopRunning")}</span> : null}</div>
-          <div className="startup-detail-actions">
-            {startupPresentation(data, failed) === "unverified" ? <span className="badge badge-muted">{t("startup.loginUnverifiedTitle")}</span> : <StartupStateBadge ok={!failed && data.desktop.viable} yes={t("startup.viable")} no={t(desktopBadgeKey(data.desktop, failed))} />}
-          </div>
-        </div>
-      )}
       <div className="startup-detail-row">
         <div><strong>{t("startup.service")}</strong><span>{t("startup.serviceHint")}</span></div>
         <div className="startup-detail-actions">
@@ -120,12 +106,12 @@ export function StartupDetailsSection({
             no={t(data.serviceConflict ? "startup.conflict" : data.serviceStale ? "startup.stale" : data.serviceInstalled ? "startup.unhealthy" : data.serviceSupported ? "startup.notInstalled" : "startup.unsupported")}
           />
           {data.serviceSupported && !data.serviceInstalled && (
-            <button type="button" className="btn btn-primary btn-sm" aria-label={`${t("startup.service")} - ${t("startup.install")}`} disabled={serviceActionsDisabled} onClick={() => onInstall("install-service")}>
+            <button type="button" className="btn btn-primary btn-sm" aria-label={`${t("startup.service")} - ${t("startup.install")}`} disabled={shimActionsDisabled} onClick={() => onInstall("install-service")}>
               {t(installBusy === "install-service" ? "startup.installing" : "startup.install")}
             </button>
           )}
           {serviceNeedsRepair && (
-            <button type="button" className="btn btn-primary btn-sm" aria-label={`${t("startup.service")} - ${t("startup.repair")}`} disabled={serviceActionsDisabled} onClick={() => onInstall("install-service", { repair: true })}>
+            <button type="button" className="btn btn-primary btn-sm" aria-label={`${t("startup.service")} - ${t("startup.repair")}`} disabled={shimActionsDisabled} onClick={() => onInstall("install-service", { repair: true })}>
               {t(installBusy === "install-service" ? "startup.repairing" : "startup.repair")}
             </button>
           )}
@@ -167,73 +153,6 @@ export function StartupDetailsSection({
   );
 }
 
-export function StartupTraySection({
-  tray,
-  trayLoading,
-  trayError,
-  trayBusy,
-  onTrayAction,
-}: {
-  tray: TrayStatusData | null;
-  trayLoading: boolean;
-  trayError: boolean;
-  trayBusy: boolean;
-  onTrayAction: (action: "install" | "start" | "stop" | "uninstall") => void;
-}) {
-  const { t } = useI18n();
-
-  /**
-   * Uninstalling removes the tray helper, so it asks first. Written as a named async
-   * function rather than a promise chain inside the handler: a floating `.then` in a JSX
-   * handler has no rejection path, which is what `no-floating-then-in-jsx-handler` catches.
-   */
-  const requestTrayUninstall = async () => {
-    if (await confirmAction({ message: t("startup.tray.uninstall"), tone: "danger" })) {
-      onTrayAction("uninstall");
-    }
-  };
-
-  return (
-    <section className="panel startup-actions">
-      <div className="panel-head">
-        <h3 className="panel-title">{t("startup.tray.title")}</h3>
-        <IconPower />
-      </div>
-      <p className="muted">{t("startup.tray.hint")}</p>
-      <div className="startup-detail-row">
-        <div>
-          <strong>{t("startup.tray.login")}</strong>
-          <span>{t("startup.tray.notProtection")}</span>
-        </div>
-        {trayLoading || trayError || !tray
-          ? <span className="badge badge-amber">{t(trayLoading ? "startup.tray.loading" : "startup.tray.unavailable")}</span>
-          : <StartupStateBadge
-            ok={tray.running && !tray.stale}
-            yes={t("startup.tray.running")}
-            no={t(tray.stale ? "startup.tray.stale" : tray.installed ? "startup.tray.stopped" : "startup.tray.notInstalled")}
-          />}
-      </div>
-      <div className="startup-tray-buttons">
-        {!trayLoading && !trayError && tray && !tray.installed && !tray.stale && (
-          <button type="button" className="btn btn-primary" disabled={trayBusy} onClick={() => onTrayAction("install")}>{t("startup.tray.install")}</button>
-        )}
-        {!trayLoading && !trayError && tray?.installed && !tray.stale && !tray.running && (
-          <button type="button" className="btn btn-primary" disabled={trayBusy} onClick={() => onTrayAction("start")}>{t("startup.tray.start")}</button>
-        )}
-        {!trayLoading && !trayError && tray?.running && !tray.stale && (
-          <button type="button" className="btn btn-ghost" disabled={trayBusy} onClick={() => onTrayAction("stop")}>{t("startup.tray.stop")}</button>
-        )}
-        {!trayLoading && !trayError && tray && (tray.installed || tray.stale) && (
-          <button type="button" className="btn btn-danger" disabled={trayBusy} onClick={() => { void requestTrayUninstall(); }}>{t("startup.tray.uninstall")}</button>
-        )}
-      </div>
-      {(trayError || tray?.stale) && (
-        <div className="notice notice-warn startup-tray-error" role="alert">{t("startup.tray.error")}</div>
-      )}
-    </section>
-  );
-}
-
 export function StartupRecoverySection({
   data,
   copied,
@@ -264,9 +183,9 @@ export function StartupRecoverySection({
         commands are the fallback. Open by default only while protection is missing.
       */}
       <details className="startup-recovery-details" open={startupPresentation(data) === "at-risk"}>
-        <summary className="muted">{t(desktopManagesStartup(data) ? "startup.protection.desktop" : "startup.recoveryHint")}</summary>
+        <summary className="muted">{t("startup.recoveryHint")}</summary>
       <div className="startup-command-list">
-        {data.serviceSupported && !desktopManagesStartup(data) && (
+        {data.serviceSupported && (
           <div className="startup-command-row">
             <div>
               <strong>{t("startup.command.service")}</strong>
@@ -296,7 +215,7 @@ export function StartupRecoverySection({
           </button>
         </div>
       </div>
-      {data.status === "at-risk" && data.recommendedCommand && !desktopManagesStartup(data) && (
+      {data.status === "at-risk" && data.recommendedCommand && (
         <div className="notice notice-warn startup-action-notice" role="alert">
           <IconPower /> {t("startup.recommended", { cmd: data.recommendedCommand })}
         </div>

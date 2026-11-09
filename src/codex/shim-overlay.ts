@@ -8,7 +8,7 @@ import { getConfigDir } from "../config";
 import {
   beginCodexCliSelectionParentWrite,
   CodexCliSelectionMutationBusyError,
-} from "./cli-update-selection-gate";
+} from "./cli-selection";
 import { durableBunRuntime } from "../lib/bun-runtime";
 import { recordOwnedConfigPath } from "../lib/config-ownership";
 import { truncateRetainedUtf8 } from "../lib/admission";

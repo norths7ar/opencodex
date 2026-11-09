@@ -105,30 +105,30 @@ beforeEach(() => {
 test("an edit back to the old value survives a read that lands before Save answers", async () => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const server = { systemEnv: false, cliFirstParty: false };
+  const server = { injectAgents: false, cliFirstParty: false };
   globalThis.fetch = (async (input, init) => {
     if (!String(input).endsWith("/api/claude-code")) return new Response(null, { status: 404 });
     if (init?.method === "PUT") {
       const body = JSON.parse(String(init.body)) as Record<string, unknown>;
       Object.assign(server, body);
       // The server commits the Save at once, but its answer is late.
-      if ("systemEnv" in body) await gate;
+      if ("injectAgents" in body) await gate;
       return Response.json({ ok: true });
     }
-    return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+    return Response.json({ ...SERVER, ...server, modelMap: {} });
   }) as typeof fetch;
   const page = await mount();
-  const autoConnect = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!;
+  const injectAgentsToggle = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!;
   try {
-    await page.click(autoConnect());
+    await page.click(injectAgentsToggle());
     await act(async () => { page.button("Save").click(); });
-    await page.click(autoConnect());
+    await page.click(injectAgentsToggle());
     await page.click(page.button("Toggle Claude Code CLI first-party"));
-    expect(autoConnect().checked).toBe(false);
+    expect(injectAgentsToggle().checked).toBe(false);
     release();
     await settle(page.testWindow);
-    expect(server.systemEnv).toBe(true);
-    expect(autoConnect().checked).toBe(false);
+    expect(server.injectAgents).toBe(true);
+    expect(injectAgentsToggle().checked).toBe(false);
     expect(page.barState()).toBe("Unsaved changes");
   } finally {
     release();
@@ -140,32 +140,32 @@ test("an edit back to the old value survives a read that lands before Save answe
 test("a late Save from an unmounted page reaches the page on screen even when its refresh fails", async () => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const server = { systemEnv: false };
+  const server = { injectAgents: false };
   let offline = false;
   globalThis.fetch = (async (input, init) => {
     if (!String(input).endsWith("/api/claude-code")) return new Response(null, { status: 404 });
     if (init?.method === "PUT") {
-      const body = JSON.parse(String(init.body)) as { systemEnv: boolean };
+      const body = JSON.parse(String(init.body)) as { injectAgents: boolean };
       await gate;
-      server.systemEnv = body.systemEnv;
+      server.injectAgents = body.injectAgents;
       offline = true;
       return Response.json({ ok: true });
     }
     if (offline) return Response.json({ error: "offline" }, { status: 503 });
-    return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+    return Response.json({ ...SERVER, ...server, modelMap: {} });
   }) as typeof fetch;
   const page = await mount();
-  const autoConnect = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!;
+  const injectAgentsToggle = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!;
   try {
-    await page.click(autoConnect());
+    await page.click(injectAgentsToggle());
     await act(async () => { page.button("Save").click(); });
     await act(async () => { page.root.render(<LanguageProvider><ClaudeCode key="new" apiBase="http://localhost" /></LanguageProvider>); });
     await settle(page.testWindow);
-    expect(autoConnect().checked).toBe(false);
+    expect(injectAgentsToggle().checked).toBe(false);
     release();
     await settle(page.testWindow);
-    expect(server.systemEnv).toBe(true);
-    expect(autoConnect().checked).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    expect(injectAgentsToggle().checked).toBe(true);
     expect(page.barState()).toBe("No changes");
   } finally {
     release();
@@ -211,29 +211,29 @@ test("a late connection acknowledgement from an unmounted page reaches the page 
 test("a late Save refresh from an unmounted page reaches the page on screen", async () => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const server = { systemEnv: false };
+  const server = { injectAgents: false };
   globalThis.fetch = (async (input, init) => {
     if (!String(input).endsWith("/api/claude-code")) return new Response(null, { status: 404 });
     if (init?.method === "PUT") {
-      const body = JSON.parse(String(init.body)) as { systemEnv: boolean };
+      const body = JSON.parse(String(init.body)) as { injectAgents: boolean };
       await gate;
-      server.systemEnv = body.systemEnv;
+      server.injectAgents = body.injectAgents;
       return Response.json({ ok: true });
     }
-    return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+    return Response.json({ ...SERVER, ...server, modelMap: {} });
   }) as typeof fetch;
   const page = await mount();
-  const autoConnect = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!;
+  const injectAgentsToggle = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!;
   try {
-    await page.click(autoConnect());
+    await page.click(injectAgentsToggle());
     await act(async () => { page.button("Save").click(); });
     await act(async () => { page.root.render(<LanguageProvider><ClaudeCode key="new" apiBase="http://localhost" /></LanguageProvider>); });
     await settle(page.testWindow);
     release();
     await settle(page.testWindow);
-    expect(server.systemEnv).toBe(true);
-    expect(readSessionListCacheEntry<{ state: { systemEnv: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state.systemEnv).toBe(true);
-    expect(autoConnect().checked).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    expect(readSessionListCacheEntry<{ state: { injectAgents: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state.injectAgents).toBe(true);
+    expect(injectAgentsToggle().checked).toBe(true);
     expect(page.barState()).toBe("No changes");
   } finally {
     release();
@@ -245,7 +245,7 @@ test("a late Save refresh from an unmounted page reaches the page on screen", as
 test("a late Save from an unmounted page keeps a newer page's connection switch", async () => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const server = { systemEnv: false, enabled: true };
+  const server = { injectAgents: false, enabled: true };
   let offline = false;
   globalThis.fetch = (async (input, init) => {
     const url = String(input);
@@ -261,12 +261,12 @@ test("a late Save from an unmounted page keeps a newer page's connection switch"
       return Response.json({ ok: true });
     }
     if (offline) return Response.json({ error: "offline" }, { status: 503 });
-    return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+    return Response.json({ ...SERVER, ...server, modelMap: {} });
   }) as typeof fetch;
   const page = await mount();
-  const cached = () => readSessionListCacheEntry<{ state: { systemEnv: boolean; enabled: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state;
+  const cached = () => readSessionListCacheEntry<{ state: { injectAgents: boolean; enabled: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state;
   try {
-    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!);
+    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!);
     await act(async () => { page.button("Save").click(); });
     // The page is replaced while its Save is out, and the new page turns Claude off.
     await act(async () => { page.root.render(<LanguageProvider><ClaudeCode key="new" apiBase="http://localhost" /></LanguageProvider>); });
@@ -275,8 +275,8 @@ test("a late Save from an unmounted page keeps a newer page's connection switch"
     expect(server.enabled).toBe(false);
     release();
     await settle(page.testWindow);
-    expect(server.systemEnv).toBe(true);
-    expect(cached()?.systemEnv).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    expect(cached()?.injectAgents).toBe(true);
     expect(cached()?.enabled).toBe(false);
   } finally {
     release();
@@ -288,7 +288,7 @@ test("a late Save from an unmounted page keeps a newer page's connection switch"
 test("a 1P reread from an unmounted page cannot overwrite a newer page's Save", async () => {
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
-  const server = { systemEnv: false, cliFirstParty: false };
+  const server = { injectAgents: false, cliFirstParty: false };
   let hold = false;
   let offline = false;
   globalThis.fetch = (async (input, init) => {
@@ -296,11 +296,11 @@ test("a 1P reread from an unmounted page cannot overwrite a newer page's Save", 
     if (init?.method === "PUT") {
       const body = JSON.parse(String(init.body)) as Record<string, unknown>;
       Object.assign(server, body);
-      if ("systemEnv" in body) offline = true;
+      if ("injectAgents" in body) offline = true;
       return Response.json({ ok: true });
     }
     if (offline) return Response.json({ error: "offline" }, { status: 503 });
-    const snapshot = { ...SERVER, autoConnectSupported: true, ...server, modelMap: {} };
+    const snapshot = { ...SERVER, ...server, modelMap: {} };
     if (hold) {
       hold = false;
       await gate;
@@ -308,7 +308,7 @@ test("a 1P reread from an unmounted page cannot overwrite a newer page's Save", 
     return Response.json(snapshot);
   }) as typeof fetch;
   const page = await mount();
-  const cachedSystemEnv = () => readSessionListCacheEntry<{ state: { systemEnv: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state.systemEnv;
+  const cachedInjectAgents = () => readSessionListCacheEntry<{ state: { injectAgents: boolean } }>("ocx.claude-code.v1:http://localhost")?.data?.state.injectAgents;
   try {
     hold = true;
     await act(async () => { page.button("Toggle Claude Code CLI first-party").click(); });
@@ -316,13 +316,13 @@ test("a 1P reread from an unmounted page cannot overwrite a newer page's Save", 
     // A new page replaces the old one while its reread is still out.
     await act(async () => { page.root.render(<LanguageProvider><ClaudeCode key="new" apiBase="http://localhost" /></LanguageProvider>); });
     await settle(page.testWindow);
-    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!);
+    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!);
     await page.click(page.button("Save"));
-    expect(server.systemEnv).toBe(true);
-    expect(cachedSystemEnv()).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    expect(cachedInjectAgents()).toBe(true);
     release();
     await settle(page.testWindow);
-    expect(cachedSystemEnv()).toBe(true);
+    expect(cachedInjectAgents()).toBe(true);
   } finally {
     release();
     await act(async () => page.root.unmount());
@@ -375,7 +375,7 @@ for (const control of ["first-party", "connection"] as const) {
   test(`a ${control} switch confirmed during Save survives in the session copy`, async () => {
     let releaseSave!: () => void;
     const saveGate = new Promise<void>(resolve => { releaseSave = resolve; });
-    const server = { systemEnv: false, cliFirstParty: false, enabled: true };
+    const server = { injectAgents: false, cliFirstParty: false, enabled: true };
     let offline = false;
     globalThis.fetch = (async (input, init) => {
       const url = String(input);
@@ -391,23 +391,23 @@ for (const control of ["first-party", "connection"] as const) {
           return Response.json({ ok: true });
         }
         await saveGate;
-        Object.assign(server, { systemEnv: body.systemEnv });
+        Object.assign(server, { injectAgents: body.injectAgents });
         offline = true;
         return Response.json({ ok: true });
       }
       if (offline) return Response.json({ error: "offline" }, { status: 503 });
-      return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+      return Response.json({ ...SERVER, ...server, modelMap: {} });
     }) as typeof fetch;
     const page = await mount();
     try {
-      await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!);
+      await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!);
       await act(async () => { page.button("Save").click(); });
       await page.click(page.button(control === "first-party" ? "Toggle Claude Code CLI first-party" : "Toggle Claude connection"));
       expect(control === "first-party" ? server.cliFirstParty : server.enabled).toBe(control === "first-party");
       releaseSave();
       await settle(page.testWindow);
-      const cached = readSessionListCacheEntry<{ state: { systemEnv: boolean; cliFirstParty: boolean; enabled: boolean } }>("ocx.claude-code.v1:http://localhost");
-      expect(cached?.data?.state.systemEnv).toBe(true);
+      const cached = readSessionListCacheEntry<{ state: { injectAgents: boolean; cliFirstParty: boolean; enabled: boolean } }>("ocx.claude-code.v1:http://localhost");
+      expect(cached?.data?.state.injectAgents).toBe(true);
       if (control === "first-party") expect(cached?.data?.state.cliFirstParty).toBe(true);
       else expect(cached?.data?.state.enabled).toBe(false);
     } finally {
@@ -419,7 +419,7 @@ for (const control of ["first-party", "connection"] as const) {
 }
 
 test("a successful Save replaces the session copy even when its refresh fails", async () => {
-  const server = { systemEnv: false };
+  const server = { injectAgents: false };
   let offline = false;
   globalThis.fetch = (async (input, init) => {
     if (!String(input).endsWith("/api/claude-code")) return new Response(null, { status: 404 });
@@ -429,15 +429,15 @@ test("a successful Save replaces the session copy even when its refresh fails", 
       return Response.json({ ok: true });
     }
     if (offline) return Response.json({ error: "offline" }, { status: 503 });
-    return Response.json({ ...SERVER, autoConnectSupported: true, ...server, modelMap: {} });
+    return Response.json({ ...SERVER, ...server, modelMap: {} });
   }) as typeof fetch;
   const page = await mount();
   try {
-    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!);
+    await page.click(page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!);
     await page.click(page.button("Save"));
-    expect(server.systemEnv).toBe(true);
-    const cached = readSessionListCacheEntry<{ state: { systemEnv: boolean } }>("ocx.claude-code.v1:http://localhost");
-    expect(cached?.data?.state.systemEnv).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    const cached = readSessionListCacheEntry<{ state: { injectAgents: boolean } }>("ocx.claude-code.v1:http://localhost");
+    expect(cached?.data?.state.injectAgents).toBe(true);
   } finally {
     await act(async () => page.root.unmount());
     page.testWindow.close();
@@ -449,7 +449,7 @@ test("a read begun before a successful Save cannot undo it", async () => {
   // after it fails, so only the read epoch keeps the stale response out of the draft.
   let releaseStale!: () => void;
   const stale = new Promise<void>(resolve => { releaseStale = resolve; });
-  const server = { systemEnv: false, cliFirstParty: false };
+  const server = { injectAgents: false, cliFirstParty: false };
   let holdNextGet = false;
   let staleReleased = false;
   globalThis.fetch = (async (input, init) => {
@@ -458,7 +458,7 @@ test("a read begun before a successful Save cannot undo it", async () => {
       Object.assign(server, JSON.parse(String(init.body)));
       return Response.json({ ok: true });
     }
-    const snapshot = { ...SERVER, autoConnectSupported: true, ...server, modelMap: {} };
+    const snapshot = { ...SERVER, ...server, modelMap: {} };
     // Once the stale read is released, the network fails: nothing later can paper over it.
     if (staleReleased) return Response.json({ error: "offline" }, { status: 503 });
     if (holdNextGet) {
@@ -470,17 +470,17 @@ test("a read begun before a successful Save cannot undo it", async () => {
   }) as typeof fetch;
   const page = await mount();
   try {
-    const autoConnect = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-connect"]')!;
-    await page.click(autoConnect());
+    const injectAgentsToggle = () => page.container.querySelector<HTMLInputElement>('input[aria-label="Auto-register subagents"]')!;
+    await page.click(injectAgentsToggle());
     expect(page.barState()).toBe("Unsaved changes");
     holdNextGet = true;
     await act(async () => { page.button("Toggle Claude Code CLI first-party").click(); });
     await page.click(page.button("Save"));
-    expect(server.systemEnv).toBe(true);
-    expect(autoConnect().checked).toBe(true);
+    expect(server.injectAgents).toBe(true);
+    expect(injectAgentsToggle().checked).toBe(true);
     releaseStale();
     await settle(page.testWindow);
-    expect(autoConnect().checked).toBe(true);
+    expect(injectAgentsToggle().checked).toBe(true);
     expect(page.barState()).toBe("No changes");
   } finally {
     releaseStale();
@@ -504,13 +504,12 @@ const SERVER = {
   interceptEligible: true,
   sharedProxy: "none",
   authMode: "proxy",
-  autoConnectSupported: false,
-  systemEnv: false,
+
   fastMode: null,
   maxContextTokens: null,
   autoContext: true,
   autoCompactWindow: null,
-  injectAgents: true,
+  injectAgents: false,
   smallFastModel: "",
   effectiveModelEnv: {},
   available: ["mock/model"],

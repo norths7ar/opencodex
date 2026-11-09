@@ -6,7 +6,6 @@ import { readConfigDiagnostics, websocketsEnabled } from "../config";
 import { readBoundedCodexConfig } from "../codex/inject/bounded-config-reader";
 import { buildProviderTableBlockForTarget } from "../codex/inject/config-toml";
 import { standaloneCodexRoutingTarget, validateCodexRoutingTarget } from "../codex/inject/routing-target";
-import { readClientConnectionState } from "../client/state";
 import { normalizeBindHostname } from "../server/bind-host";
 import { probeHostname, proveLiveProxyOwnedByHome, type LiveProxy } from "../server/proxy-liveness";
 import { codexHasOtherTokenConsumers, codexTokenConfigShapeIsSafe } from "./codex-launch-policy";
@@ -66,21 +65,11 @@ export function codexCredentialDestinationIsTrusted(home: string, systemNamespac
     const diagnostics = readConfigDiagnostics();
     if (diagnostics.error || diagnostics.source === "fallback") return refuse("installationConfig");
     const cfg = diagnostics.config;
-    let target = standaloneCodexRoutingTarget(cfg.port, cfg);
-    // A direct client's proof comes from its own machine listener, never from the hub it
-    // dials, so only a standalone destination can be compared with the proven origin.
-    let destinationIsProvenListener = true;
-    if (cfg.runtimeRole === "client") {
-      // Direct clients bind to persisted connection state; link clients use an authless relay.
-      const connection = readClientConnectionState();
-      if (connection.kind !== "connected" || connection.value.transport === "link") return refuse("connection");
-      target = validateCodexRoutingTarget({ baseUrl: `${connection.value.serverUrl}/v1`, requiresAdmissionToken: true, tokenEnv: "OPENCODEX_API_AUTH_TOKEN" });
-      destinationIsProvenListener = false;
-    }
+    const target = standaloneCodexRoutingTarget(cfg.port, cfg);
     const url = new URL(target.baseUrl);
     if (!target.requiresAdmissionToken) return refuse("admission");
     if (url.protocol !== "http:" || !["127.0.0.1", "[::1]"].includes(url.hostname)) return refuse("loopback");
-    if (destinationIsProvenListener && !codexRuntimeAttestationMatchesTarget(target.baseUrl, runtimeAttestation)) return refuse("destination");
+    if (!codexRuntimeAttestationMatchesTarget(target.baseUrl, runtimeAttestation)) return refuse("destination");
     const content = readBoundedCodexConfig(join(home, "config.toml"));
     if (content === null) return refuse("configRead");
     const config = Bun.TOML.parse(content) as Record<string, unknown>;

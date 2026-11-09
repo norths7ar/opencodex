@@ -3,12 +3,10 @@ import { DestinationDnsResolutionError } from "../../lib/destination-policy";
 import { PinnedHttpError, type PinnedHttpErrorCode } from "../../lib/pinned-http";
 import { ProviderOutboundPolicyError, providerOutboundPost, providerRedirectError, type ProviderOutboundDependencies } from "../../lib/provider-outbound";
 import { getValidAccessToken } from "../../oauth";
-import { getAccountCredential, getAccountSet, getCredential } from "../../oauth/store";
+import { getAccountCredential, getCredential } from "../../oauth/store";
 import { asRecord, normalizePercent, normalizeResetAt, readQuotaJson, REQUEST_TIMEOUT_MS, toFiniteNumber } from "../quota-wire";
-import { antigravityEvidence, report, type ProviderQuotaReport } from "./report-cache";
-import { captureAntigravityQuotaReceipt, decisionQuotaSinkActive } from "../../lib/decision-quota-sink";
-import { antigravityDecisionWindows } from "../quota-decision-publication";
-import { antigravityQuotaCredentialGeneration, isAntigravityArgonIdentity } from "../antigravity-quota-identity";
+import { report, type ProviderQuotaReport } from "./report-cache";
+import { isAntigravityArgonIdentity } from "../antigravity-quota-identity";
 import type { OcxProviderConfig } from "../../types";
 import { quotaCredentialIdentity } from "./account-cache";
 import type { ProviderQuota, ProviderQuotaWindow, QuotaFailureCode } from "../quota-types";
@@ -362,24 +360,13 @@ export async function fetchAntigravityUsageQuota(accessToken: string, projectId:
 }
 
 /** Every store read uses `provider`, the same key inference resolves, so a row never probes another row's account. */
-export async function fetchAntigravityQuota(provider: string, config: OcxProviderConfig): Promise<ProviderQuotaReport | null> {
+export async function fetchAntigravityQuota(provider: string): Promise<ProviderQuotaReport | null> {
   const credential = getCredential(provider);
   if (!credential?.projectId) return null;
   let accessToken: string;
   try { accessToken = await getValidAccessToken(provider); } catch { return null; }
-  const set = decisionQuotaSinkActive() ? getAccountSet(provider) : undefined;
-  const account = set?.accounts.find(row => row.id === set.activeAccountId);
-  const probed = account?.credential.access === accessToken && account.credential.projectId === credential.projectId ? account : undefined;
-  const receipt = probed ? captureAntigravityQuotaReceipt(provider, config, probed.id, antigravityQuotaCredentialGeneration(probed.credential)) : undefined;
   const result = await probeAntigravityUsageQuota(accessToken, credential.projectId);
-  if (result.kind === "available") {
-    const value = report(provider, result.source, result.quota);
-    // Only the summary endpoint reports real family buckets. The models fallback labels one model's
-    // counter Gem/Cla, so it stays display-only: no windows, and retained summary clocks survive.
-    const windows = result.source === "google-antigravity:retrieveUserQuotaSummary" ? antigravityDecisionWindows(result.quota) : [];
-    if (value && receipt) antigravityEvidence.set(value, { receipt, windows: Object.freeze(windows.map(row => Object.freeze(row))) });
-    return value;
-  }
+  if (result.kind === "available") return report(provider, result.source, result.quota);
   if (result.legacy.kind === "throw") throw result.legacy.error;
   return null;
 }

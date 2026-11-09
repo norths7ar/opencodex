@@ -226,19 +226,6 @@ async function eventually(check: () => boolean, label: string) {
 }
 
 describe("Ollama generation lifecycle", () => {
-  test("combo, policy and synthetic selectors refuse natively with zero sends and one logged row each", async () => {
-    await withServer(async (base, rowsSince) => {
-      for (const [model, status] of [["combo/group", 403], ["group", 403], ["policy/daily", 403], ["daily", 403], ["fx/m1--fast", 400]] as const) {
-        const res = await post(base, "/api/chat", { model, messages: [{ role: "user", content: "hi" }], stream: false });
-        expect({ model, status: res.status }).toEqual({ model, status });
-        expect(typeof (await res.json() as { error: unknown }).error).toBe("string");
-        const row = rowsSince().find(entry => entry.requestId === res.headers.get("x-opencodex-request-id"));
-        expect(row?.status).toBe(status);
-      }
-      expect(sends).toBe(0);
-      expect(rowsSince()).toHaveLength(5);
-    });
-  });
 
   test("client cancellation mid-stream aborts upstream and logs one 499 row", async () => {
     mode = "hang";

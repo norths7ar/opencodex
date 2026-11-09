@@ -91,8 +91,8 @@ test("global web-search and vision pool controls submit B and explicit deletion;
 
 const claude: ClaudeCodeState = {
   enabled: true, cliFirstParty: false, cliFirstPartyApplied: false, desktopFirstParty: false,
-  interceptRunning: false, interceptEligible: true, sharedProxy: "none", authMode: "proxy", autoConnectSupported: false,
-  systemEnv: false, fastMode: null, maxContextTokens: null, autoContext: true, autoCompactWindow: null,
+  interceptRunning: false, interceptEligible: true, sharedProxy: "none", authMode: "proxy",
+  fastMode: null, maxContextTokens: null, autoContext: true, autoCompactWindow: null,
   contextAccounting: "1m", injectAgents: true, smallFastModel: "", effectiveModelEnv: {}, available: [], aliases: [], port: 10100,
   webSearchSidecar: { backend: "anthropic" }, visionSidecar: { backend: "anthropic" },
   sidecarPools: { webSearchSidecar: { parent: "anthropic", mixed: false, available: ["anthropic", "anthropic2"] },

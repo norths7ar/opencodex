@@ -617,7 +617,7 @@ describe("projectUsageSummary", () => {
     const retained = projected.models[0]!;
     expect(retained.totalTokens).toBe(alone.models[0]!.totalTokens);
     expect(retained.estimatedCostUsd).toBeCloseTo(alone.summary.estimatedCostUsd, 10);
-    expect(projected.filter?.comboOverlap).toBe(true);
+    expect(projected.filter?.attemptOverlap).toBe(true);
   });
 
   test("matched reflects the requested window, not the whole log", () => {

@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "./account-id";
 import { formatClientRetryAfter } from "../lib/client-retry-after";
 import { requestOwnedAffinityKey, honestAffinityDecision, callerOwnedFallbackAffinityDecision, captureRequestOwnedAffinityBindings, type RequestOwnedBindingSnapshot } from "./request-owned-affinity";
 import { requestOwnedMainPinState, mainCreditsHoldResetAt, callerMatchesObservedMain } from "./request-owned-main-pin";
@@ -48,10 +49,7 @@ import {
   releaseCodexQuotaScopeProbeLease,
   tryAcquireCodexQuotaProbeLease,
   tryAcquireCodexQuotaScopeProbeLease,
-  pickAlternateCodexAccount,
-  resolveCodexAccountForThreadDetailed,
   type CodexAffinityDecision,
-  type CodexThreadResolution,
   type TransientProbeGrant,
 } from "./routing";
 // The half-open TRANSIENT-HOLD lease (#4701). Not the quota-cooldown probe lease imported from
@@ -65,7 +63,6 @@ import {
   type CodexThreadLineage,
 } from "./lineage";
 import {
-  cachedDeniedCodexAccountIdsForModel,
   entitledCodexAccountIdsForModel,
   isDirectCallerEntitledToCodexModel,
   resolveCodexModelEntitlements,
@@ -74,8 +71,7 @@ import { ACCOUNT_GATED_NATIVE_OPENAI_MODELS, NATIVE_RESERVE_MODEL } from "./cata
 import type { CodexCooldownSource, CodexQuotaScope } from "./routing";
 import { maskAccountId } from "../lib/privacy";
 import { formatErrorResponse, formatUsageLimitReachedResponse } from "../bridge";
-import { nextCodexPoolRecoveryAt } from "./routing/pool-recovery";
-import { getAccountQuota, isValidWhamHistoryObservation, parseUsageQuota, parseMainPolicyUsageQuota, setAccountQuotaFromParsed } from "./quota";
+import { getAccountQuota, parseUsageQuota, parseMainPolicyUsageQuota, setAccountQuotaFromParsed } from "./quota";
 import { codexAccountUsesCreditsAfterLimit } from "./account-credit-use";
 import type { CodexAccountMode, OcxConfig, OcxProviderConfig } from "../types";
 import { FORWARD_HEADERS } from "../adapters/openai-responses";
@@ -479,12 +475,6 @@ export class CodexAccountCooldownError extends Error {
 
 export class CodexMainAccountHardLockError extends CodexAccountCooldownError {
   readonly resetAt?: number;
-  /**
-   * Earliest known recovery of another stored pool account, set only when an unpinned pool
-   * selection reached main (#7046). A hint for the client's retry time; never routing input.
-   */
-  poolRecoveryAt?: number;
-
   constructor(resetAt?: number, thresholds = resolveMainAccountHardLockThresholds(undefined)) {
     super(MAIN_CODEX_ACCOUNT_ID, resetAt ?? 0);
     this.name = "CodexMainAccountHardLockError";
@@ -587,7 +577,7 @@ export class CodexRecoveryWithheldError extends CodexAccountCooldownError {
 }
 
 export type CodexAuthPolicyConfig = Readonly<Pick<OcxConfig,
-  "codexMainAccountHardLock" | "codexMainAccountHardLockThresholds" | "codexDesktopAuthless" | "runtimeRole" | "pausedCodexAccountIds"
+  "codexMainAccountHardLock" | "codexMainAccountHardLockThresholds" | "codexDesktopAuthless" | "pausedCodexAccountIds"
   | "creditCodexAccountIds" | "codexAccounts" | "codexUseRemainingQuotaAccountIds"
 >>;
 
@@ -638,11 +628,11 @@ async function authorizeReserveCredential(
   const authorization = isMainReserveAuthorizationLive(existing, token) ? existing
     : await getMainReserveAuthorization({
       token, writer, signal,
-      /** Publish the ordinary usage observed during the reserve capability read: parse it once and reuse that observation as the advisory decision evidence when it is a valid history observation. */
+      /** Publish the ordinary usage observed during the reserve capability read. */
       observeOrdinaryQuota(data, capturedWriter) {
         const parsed = parseUsageQuota(data);
         setAccountQuotaFromParsed(MAIN_CODEX_ACCOUNT_ID, parsed, writerGeneration,
-          capturedWriter, parseMainPolicyUsageQuota(data), undefined, false, false, isValidWhamHistoryObservation(data) ? parsed : null);
+          capturedWriter, parseMainPolicyUsageQuota(data));
       },
     });
   // The capability read also publishes ordinary quota. A new 99% reading or cooldown wins.
@@ -892,21 +882,10 @@ export function cooldownErrorMessage(err: CodexAccountCooldownError, accountSele
     + ` (source: ${err.cooldownSource ?? "default"}).${recovery}`;
 }
 
-/**
- * The soonest a main hard-lock refusal is worth retrying: a sibling pool account's known
- * recovery when it comes first, otherwise main's own reset (#7046). A pool hint is held to at
- * least {@link MAIN_HARD_LOCK_MIN_POOL_RETRY_MS} so a hold about to lapse cannot turn the refusal
- * into a tight retry loop. Null when neither time is known and still in the future.
- */
-export const MAIN_HARD_LOCK_MIN_POOL_RETRY_MS = 60_000;
+/** The selected main credential’s next known quota reset, if it is still in the future. */
 export function mainHardLockRetryAt(err: CodexMainAccountHardLockError, now: number): number | null {
-  const future = (value: number | undefined): number | null =>
-    typeof value === "number" && Number.isFinite(value) && value > now ? value : null;
-  const main = future(err.resetAt);
-  const pool = future(err.poolRecoveryAt);
-  const poolRetryAt = pool === null ? null : Math.max(pool, now + MAIN_HARD_LOCK_MIN_POOL_RETRY_MS);
-  if (poolRetryAt !== null && (main === null || poolRetryAt < main)) return poolRetryAt;
-  return main;
+  const reset = err.resetAt;
+  return typeof reset === "number" && Number.isFinite(reset) && reset > now ? reset : null;
 }
 
 /** HTTP form of {@link cooldownErrorMessage}, carrying Retry-After for well-behaved clients. */
@@ -1053,54 +1032,15 @@ export async function mainAccountHardLockCallerProof(
   return options.substituteMainCredentialForDirect === true ? () => true : () => callerMatchesObservedMain(headers);
 }
 
-/**
- * Resolve the credential for one Codex turn. A main hard-lock reached through unpinned pool
- * selection is annotated with the earliest known pool recovery, so the refusal can name a retry
- * time that a sibling account may meet (#7046).
- */
 export async function resolveCodexAuthContext(
   headers: Headers,
   config: OcxConfig,
   mode: CodexAccountMode,
   options: ResolveCodexAuthContextOptions = {},
 ): Promise<CodexAuthContext> {
-  // Filled by the inner resolver with the request's own fenced model evidence, so the hint obeys it.
-  const eligibility: RecoveryHintEligibility = {};
-  try {
-    return await resolveCodexAuthContextUnannotated(headers, config, mode, options, eligibility);
-  } catch (error) {
-    if (error instanceof CodexMainAccountHardLockError && mode === "pool" && options.accountId === undefined
-      && options.excludeAccountId !== MAIN_CODEX_ACCOUNT_ID
-      && !requiresReserveAuthorization(options.codexAuthPolicy ?? config, options.modelId, options.admission)
-      // An account-gated model with no resolved roster has no known eligible sibling.
-      && (!options.modelId || !ACCOUNT_GATED_NATIVE_OPENAI_MODELS.has(options.modelId)
-        || eligibility.modelEligibleAccountIds !== undefined)) {
-      try {
-        const now = Date.now();
-        error.poolRecoveryAt = nextCodexPoolRecoveryAt(config, now, codexQuotaScopeForModel(options.modelId), {
-          deniedAccountIds: eligibility.deniedModelAccountIds,
-          eligibleAccountIds: eligibility.modelEligibleAccountIds,
-        });
-      } catch { /* the hint is optional; the refusal stands without it */ }
-    }
-    throw error;
-  }
-}
-
-interface RecoveryHintEligibility {
-  modelEligibleAccountIds?: ReadonlySet<string>;
-  deniedModelAccountIds?: ReadonlySet<string>;
-}
-
-async function resolveCodexAuthContextUnannotated(
-  headers: Headers,
-  config: OcxConfig,
-  mode: CodexAccountMode,
-  options: ResolveCodexAuthContextOptions = {},
-  eligibility: RecoveryHintEligibility = {},
-): Promise<CodexAuthContext> {
   const writerGeneration = captureConfigGeneration();
   const policy = options.codexAuthPolicy ?? config;
+  if (config.codexSignedOut === true) throw new CodexPoolAuthenticationError("This channel is signed out; sign in before sending requests");
   const requestScopedMainCredential = options.requestScopedMainCredential === true
     && hasCallerCodexBearer(headers);
   const reserve = requiresReserveAuthorization(policy, options.modelId, options.admission);
@@ -1108,7 +1048,14 @@ async function resolveCodexAuthContextUnannotated(
     || (options.accountId !== undefined && options.accountId !== MAIN_CODEX_ACCOUNT_ID))) {
     throw new CodexReserveUnavailableError();
   }
-  const fixedAccountId = reserve ? MAIN_CODEX_ACCOUNT_ID : options.accountId;
+  const selectedAccountId = mode === "direct" ? MAIN_CODEX_ACCOUNT_ID : singleCodexAccountId(config);
+  if (options.accountId !== undefined && options.accountId !== selectedAccountId) {
+    throw new CodexPoolAuthenticationError("This channel uses its signed-in account only");
+  }
+  if (options.excludeAccountId === selectedAccountId) {
+    throw new CodexPoolAuthenticationError("The signed-in account is unavailable; automatic account switching is not supported");
+  }
+  const fixedAccountId = reserve ? MAIN_CODEX_ACCOUNT_ID : selectedAccountId;
   const quotaScope = codexQuotaScopeForModel(options.modelId);
   // Pool pins and fallback must not resurrect an observed main credential that is cooling
   // down. Unrelated caller-owned credentials and explicit Direct keep their own policy.
@@ -1136,11 +1083,14 @@ async function resolveCodexAuthContextUnannotated(
     await awaitMainAccountPolicyBindingSettled(options);
   }
   const preserveRequestOwnedMainPin = () => mainPinState().preserve;
-  if (fixedAccountId !== undefined && options.excludeAccountId !== undefined) {
+  if (fixedAccountId !== undefined && options.excludeAccountId === fixedAccountId) {
     throw new Error("Codex auth context cannot select and exclude an account simultaneously");
   }
   const resolveCallerOwnedMainContext = async (): Promise<CodexAuthContext> => {
     const substituteStoredMain = options.substituteMainCredentialForDirect === true;
+    if (substituteStoredMain && policy.pausedCodexAccountIds?.includes(MAIN_CODEX_ACCOUNT_ID)) {
+      throw new CodexPoolAuthenticationError("The signed-in account is paused");
+    }
     // An internal route change can strip the admission bearer before this point.
     // Trusted substitution still has to claim and validate stored main below.
     if (!substituteStoredMain && !hasCallerCodexBearer(headers)) throw new CodexDirectAuthenticationError();
@@ -1242,7 +1192,7 @@ async function resolveCodexAuthContextUnannotated(
   // durable health, quota, and affinity state, while this credential exists for one request only.
   if ((reserve && hasCallerCodexBearer(headers) && !options.substituteMainCredentialForDirect
       && (requestScopedMainCredential || mode === "direct"))
-    || (mode === "direct" && fixedAccountId === undefined)
+    || (mode === "direct" && fixedAccountId === MAIN_CODEX_ACCOUNT_ID)
     || (requestScopedMainCredential && fixedAccountId === MAIN_CODEX_ACCOUNT_ID)) {
     return resolveCallerOwnedMainContext();
   }
@@ -1287,11 +1237,7 @@ async function resolveCodexAuthContextUnannotated(
     && selectionAdmission?.mainProfileDraining === true;
   let accountId: string;
   let mainDiscoveryFailure: unknown;
-  // Answering this with the manual-pin predicate made `codexAccountUnusableReason` report
-  // `main_credential_unavailable` for every UNPINNED request, so `getEligiblePoolAccounts` never
-  // listed main and the strategy compared only the stored accounts. With one stored sibling the
-  // pool degraded to "stored account until it cannot serve, then main", discarding the usage,
-  // priority and reset ordering the operator configured (#5019).
+  // A caller-owned credential proves liveness without reading the native profile.
   const requestOwnedMainCredentialLive = () => requestOwnedMainCredentialIsLive({
     preserveRequestOwnedMainPin: preserveRequestOwnedMainPin(),
     requestScopedMainCredential,
@@ -1334,25 +1280,6 @@ async function resolveCodexAuthContextUnannotated(
     const modelEligibleAccountIds = entitledAccountIds
       ? new Set([...entitledAccountIds].filter(candidate => !excludeAccountIds?.has(candidate)))
       : undefined;
-    eligibility.modelEligibleAccountIds = modelEligibleAccountIds;
-    // #4768: the flagships stay visible and never fail closed, so this is evidence routing may
-    // ORDER by, not evidence it may refuse on. Read synchronously from rosters discovery has
-    // already gathered -- no upstream fetch joins the request path for the most commonly
-    // requested models in the product -- and passed to selection as a preference that is dropped
-    // whenever honouring it would leave no candidate.
-    //
-    // Under the SAME exclusion the entitlement snapshot above uses. The reader validates each
-    // cached roster against the account's current credential, and for native main that is a
-    // synchronous read of the physical stored token -- exactly what this request is forbidden to
-    // touch while a profile switch drains it or while it is served by a request-owned credential.
-    // Excluding main here costs nothing: the preference is an ordering hint, so main becomes
-    // unknown rather than denied, and unknown leaves selection exactly as it was.
-    const deniedModelAccountIds = cachedDeniedCodexAccountIdsForModel(
-      options.modelId,
-      undefined,
-      { excludeAccountIds },
-    );
-    eligibility.deniedModelAccountIds = deniedModelAccountIds;
     const selectionOptions = {
       // Temporary switch drain keeps the candidate until the atomic claim rejects
       // it. Retained recovery makes main wholly ineligible so pool routing continues.
@@ -1365,7 +1292,6 @@ async function resolveCodexAuthContextUnannotated(
         ? requestOwnedMainCredentialLive
         : options.isMainAccountTokenLive,
       modelEligibleAccountIds,
-      deniedModelAccountIds,
       requestOwnedMainCredential: requestScopedMainCredential,
       // Request-scoped and deliberately absent from `sharedStateSelectionOptions`: one
       // conversation's attachments say nothing about where unrelated threads should be served.
@@ -1376,123 +1302,8 @@ async function resolveCodexAuthContextUnannotated(
     // and may still route to non-main pool accounts without touching switch state.
     if (reserve && !nativeMainReadsForbidden && !selectionAdmission) throw new CodexMainProfileDrainingError();
     if (!nativeMainReadsForbidden) reconcileMainCodexAccountRuntimeState();
-    // Annotated, not inferred. The two literals below carry neither `affinity` nor
-    // `transientProbe`, so an inferred union makes `"k" in resolution` widen those reads to
-    // `unknown` and a discriminant narrowing fail outright. Contextually typing every branch to
-    // the resolver's own union is what lets the reads below stay total.
-    const resolution: CodexThreadResolution = fixedAccountId !== undefined
-      ? { status: "selected" as const, accountId: fixedAccountId }
-      : options.excludeAccountId
-      ? (() => {
-          const selected = pickAlternateCodexAccount(
-            config,
-            options.excludeAccountId!,
-            Date.now(),
-            quotaScope,
-            selectionOptions,
-          );
-          return selected
-            ? { status: "selected" as const, accountId: selected }
-            : { status: "none" as const };
-        })()
-      : resolveCodexAccountForThreadDetailed(
-          affinityKey ?? null,
-          config,
-          Date.now(),
-          quotaScope,
-          selectionOptions,
-          options.modelId,
-          lineage,
-        );
-    if (resolution.status === "expired") throw new CodexThreadAffinityExpiredError(resolution.accountId);
-    // THE REFUSAL. Every candidate is held, the recovery budget is spent, and no detour is
-    // left -- so this request must not reach upstream at all. Returning the held account here
-    // is what #4701 is about: under a provider-wide 503 that is every bound request piling
-    // onto an account already known to be failing. Thrown before any credential is read, so
-    // nothing is sent and nothing is spent.
-    if (resolution.status === "withheld") {
-      throw new CodexRecoveryWithheldError(resolution.accountId, resolution.retryAt, resolution.detourAccountId);
-    }
-    const selected = resolution.status === "selected" ? resolution.accountId : null;
-    affinityDecision = selected ? honestAffinityDecision(resolution.affinity, affinityKey, selected, quotaScope, options.modelId, requestScopedMainCredential && config.codexPool?.requestOwnedAffinity !== true) : resolution.affinity;
-    transientProbe = resolution.status === "selected" ? resolution.transientProbe : undefined;
-    // Main now takes part in ordering when the request carries its own main bearer (#5019), so
-    // selection can name it outright rather than only through the no-candidate fallback below.
-    // Serve that selection from the credential the request arrived with: the read fence above
-    // forbids this request from claiming, reading or reconciling the stored main profile, and a
-    // request-owned credential owns no shared health state, so there is nothing here to claim,
-    // prime or cool down. Hand back any trial first -- no Pool account is being sent to.
-    if (selected === MAIN_CODEX_ACCOUNT_ID && requestScopedMainCredential) {
-      releaseTransientProbeGrant();
-      const context = await resolveKeyedCallerMain();
-      console.info("[codex] Pool selected caller-owned main credential.");
-      return context;
-    }
-    if (!selected) {
-      // After an entitlement-await recovery, current selection evidence outranks the saved
-      // probe failure; retain it only while main is still unusable (as for fixed selection).
-      if (mainDiscoveryFailure !== undefined && !getMainAccountCredentialStatus().usable) {
-        throw new CodexAuthContextError(MAIN_CODEX_ACCOUNT_ID, mainDiscoveryFailure);
-      }
-      // A retry that excluded a failed Pool account may still use the validated caller-owned
-      // main credential. Treating every exclusion as if main itself had failed strands a healthy
-      // native bearer after the first Pool attempt. Preserve the exactly-once boundary by refusing
-      // this fallback only when the excluded credential is main.
-      if (
-        requestScopedMainCredential
-        && fixedAccountId === undefined
-        && !(callerMatchesObservedMain(headers) && policy.pausedCodexAccountIds?.includes(MAIN_CODEX_ACCOUNT_ID))
-        && options.excludeAccountId !== MAIN_CODEX_ACCOUNT_ID
-      ) {
-        const context = await resolveKeyedCallerMain("unusable");
-        console.info("[codex] Pool used caller-owned main credential: no selectable stored account.");
-        return context;
-      }
-      if (fixedAccountId !== undefined) {
-        if (modelEligibleAccountIds && !modelEligibleAccountIds.has(fixedAccountId)) {
-          throw new CodexModelAvailabilityError(
-            "unsupported",
-            "Selected Codex account does not support this model",
-          );
-        }
-        const mainReason = fixedAccountId === MAIN_CODEX_ACCOUNT_ID && !nativeMainReadsForbidden
-          && !policy.pausedCodexAccountIds?.includes(fixedAccountId)
-          ? codexAccountUnusableReason(config, fixedAccountId, selectionOptions) : undefined;
-        throw new CodexPoolAuthenticationError("Selected Codex account is unavailable", {
-          quarantinedMain: mainReason === "needs_reauth",
-        });
-      }
-      // Recovery or a turn drain deliberately makes physical main unobservable.
-      // If no healthy pool route is available, report the temporary fence rather
-      // than turning a credential we were forbidden to inspect into a permanent
-      // model-entitlement denial.
-      // A configured pool retry/exclusion that finds no alternate preserves its
-      // ordinary pool-auth failure instead of being mislabeled as a main fence.
-      if (nativeMainReadsForbidden && !options.excludeAccountId) {
-        throw new CodexMainProfileDrainingError();
-      }
-      if (!nativeMainReadsForbidden && options.excludeAccountId !== MAIN_CODEX_ACCOUNT_ID
-        && !policy.pausedCodexAccountIds?.includes(MAIN_CODEX_ACCOUNT_ID)
-        && (!modelEligibleAccountIds || modelEligibleAccountIds.has(MAIN_CODEX_ACCOUNT_ID))) {
-        assertMainAccountPolicy(policy);
-      }
-      if (modelEligibleAccountIds !== undefined) {
-        const unsupported = entitledAccountIds?.size === 0 && !mainModelGrantUnobserved;
-        throw new CodexModelAvailabilityError(
-          unsupported ? "unsupported" : "temporarily_unavailable",
-          unsupported
-            ? "No eligible Codex account supports this model"
-            : "Codex accounts that support this model are currently unavailable",
-        );
-      }
-      throw new CodexPoolAuthenticationError(undefined, {
-        quarantinedMain: !nativeMainReadsForbidden
-          && options.excludeAccountId !== MAIN_CODEX_ACCOUNT_ID
-          && !policy.pausedCodexAccountIds?.includes(MAIN_CODEX_ACCOUNT_ID)
-          && codexAccountUnusableReason(config, MAIN_CODEX_ACCOUNT_ID, selectionOptions) === "needs_reauth",
-      });
-    }
-    accountId = selected;
+    // Lite sends through the channel's configured credential, never a pool candidate.
+    accountId = fixedAccountId;
     if (accountId === MAIN_CODEX_ACCOUNT_ID) assertMainAccountPolicy(policy);
     if (accountId === MAIN_CODEX_ACCOUNT_ID && nativeMainTrafficBlocked) {
       throw new CodexMainProfileDrainingError();

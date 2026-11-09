@@ -12,7 +12,6 @@ import { saveCodexAccountCredential } from "../../src/codex/account-store";
 import { NATIVE_RESERVE_MODEL } from "../../src/codex/catalog/native-models";
 import { deleteAllScopedHealth, setScopedHealth } from "../../src/codex/routing/health-store";
 import { handleResponses } from "../../src/server/responses";
-import { clearComboRecallForTests, recallComboForLane, rememberComboForLane } from "../../src/server/responses/combo-session-recall";
 import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
 import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
 import type { RequestLogContext } from "../../src/server/request-log";
@@ -35,7 +34,6 @@ beforeEach(() => {
   clearAccountQuota();
   clearMainAccountInfoCache();
   deleteAllScopedHealth("pool-a");
-  clearComboRecallForTests();
   observeMainQuotaIdentity("fallback-account-a");
 });
 
@@ -46,7 +44,6 @@ afterEach(async () => {
   clearAccountQuota();
   clearMainAccountInfoCache();
   deleteAllScopedHealth("pool-a");
-  clearComboRecallForTests();
   // Saving a pool account starts the config-dir ACL harden without awaiting it; the
   // shared teardown settles that flight and its icacls child before removing the home.
   await drainAndRemoveFixtureRoots({
@@ -79,21 +76,6 @@ function withPoolAccount(target: OcxConfig): OcxConfig {
 }
 
 describe("main-account hard-lock fallback resolution", () => {
-  test("a malformed section disables the reroute instead of half-applying", () => {
-    expect(resolveMainAccountHardLockFallback(config())).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { model: "  " } } as OcxConfig)).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { model: " deepseek/deepseek-chat" } } as OcxConfig)).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { model: "a b" } } as OcxConfig)).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { model: "deepseek/deepseek-chat", reasoningEffort: "extreme" } } as OcxConfig)).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: FALLBACK } as OcxConfig)).toEqual(FALLBACK);
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { model: "combo/x" } } as OcxConfig))
-      .toEqual({ model: "combo/x" });
-    // The dashboard row keeps the configured model while its switch is off: enabled false
-    // pauses the reroute without forgetting the destination, and a malformed enabled flag
-    // is a hand edit the section boundary never accepts.
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { ...FALLBACK, enabled: false } } as OcxConfig)).toBeUndefined();
-    expect(resolveMainAccountHardLockFallback({ codexMainAccountHardLockFallback: { ...FALLBACK, enabled: true } } as OcxConfig)).toEqual(FALLBACK);
-  });
 });
 
 describe("Direct hard-lock fallback caller identity", () => {
@@ -323,26 +305,6 @@ describe("applyMainHardLockFallbackOverride", async () => {
     expect(body).toEqual({ model: "gpt-5.3", reasoning: { effort: "high" } });
   });
 
-  test("only bare Codex-native selectors qualify", async () => {
-    observe({ weeklyPercent: 100 });
-    const cfg = config({
-      codexMainAccountHardLockFallback: FALLBACK,
-      combos: {
-        nativeMasquerade: {
-          alias: "gpt-5.4",
-          nativeAlias: true,
-          displayName: "GPT-5.4 Combo",
-          targets: [{ provider: "deepseek", model: "deepseek-chat" }],
-        },
-      },
-    } as Partial<OcxConfig>);
-    for (const model of ["deepseek/deepseek-chat", "combo/x", "openai-codex/gpt-5.3", NATIVE_RESERVE_MODEL, "gpt-5.4"]) {
-      const body: Record<string, unknown> = { model };
-      expect(await applyMainHardLockFallbackOverride(body, cfg)).toBeNull();
-      expect(body.model).toBe(model);
-    }
-  });
-
   test("a Codex-native fallback target never applies: the refusal is the honest answer", async () => {
     observe({ weeklyPercent: 100 });
     for (const target of ["gpt-5.4", "openai/gpt-5.4"]) {
@@ -370,21 +332,6 @@ describe("applyMainHardLockFallbackOverride", async () => {
     expect(await applyMainHardLockFallbackOverride({ model: 42 }, cfg)).toBeNull();
   });
 
-  test("unavailable chosen targets keep the blocked source and reasoning intact", async () => {
-    observe({ weeklyPercent: 100 });
-    const gateway = { adapter: "openai-responses", authMode: "key", baseUrl: "https://gateway.example.test/v1" } as const;
-    for (const target of ["private/secret-model", "former/secret-model", "combo/removed", "policy/removed", "retired-account/gpt-5.3"]) {
-      for (const providers of [{ gateway }, {}]) {
-        const cfg = config({ providers, defaultProvider: "gateway", codexMainAccountHardLockFallback: { model: target, reasoningEffort: "low" } } as Partial<OcxConfig>);
-        const body = { model: "gpt-5.3", reasoning: { effort: "high" } };
-        expect(await applyMainHardLockFallbackOverride(body, cfg)).toBeNull();
-        expect(body).toEqual({ model: "gpt-5.3", reasoning: { effort: "high" } });
-      }
-    }
-    const cfg = config({ providers: { gateway, private: { ...gateway, disabled: true } }, defaultProvider: "gateway", codexMainAccountHardLockFallback: { model: "private/secret-model" } } as Partial<OcxConfig>);
-    expect(await applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg)).toBeNull();
-  });
-
   test("target admission is rechecked after provider removal, re-addition and alias changes", async () => {
     observe({ weeklyPercent: 100 });
     const provider = { adapter: "openai-responses", authMode: "key", baseUrl: "https://chosen.example.test/v1", alias: "chosen" } as const;
@@ -406,21 +353,6 @@ describe("applyMainHardLockFallbackOverride", async () => {
     const provider = { adapter: "openai-responses", authMode: "key", baseUrl: "https://chosen.example.test/v1", models: ["vendor/native-model"] } as const;
     for (const model of ["bare-model", "vendor/native-model", "private/vendor/native-model"]) {
       const cfg = config({ providers: { private: { ...provider, models: [...provider.models] } }, defaultProvider: "private", codexMainAccountHardLockFallback: { model } } as Partial<OcxConfig>);
-      expect((await applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg))?.targetModel).toBe(model);
-    }
-  });
-
-  test("configured combo aliases, policy profiles and account namespaces keep their admission", async () => {
-    observe({ weeklyPercent: 100 });
-    const cfg = config({
-      providers: { private: { adapter: "openai-responses", authMode: "key", baseUrl: "https://chosen.example.test/v1" },
-        openai: { adapter: "openai-responses", authMode: "forward", baseUrl: "https://chatgpt.com/backend-api/codex" } },
-      combos: { rescue: { alias: "chosen-combo", targets: [{ provider: "private", model: "secret-model" }] } },
-      routingProfiles: { rescue: { alias: "chosen-policy", candidates: [{ provider: "private", model: "secret-model" }], require: { tools: true } } },
-      codexAccountNamespaces: { pinned: "pool-a" },
-    } as Partial<OcxConfig>);
-    for (const model of ["combo/rescue", "chosen-combo", "policy/rescue", "chosen-policy", "pinned/gpt-5.3"]) {
-      cfg.codexMainAccountHardLockFallback = { model };
       expect((await applyMainHardLockFallbackOverride({ model: "gpt-5.3" }, cfg))?.targetModel).toBe(model);
     }
   });
@@ -452,111 +384,5 @@ describe("applyMainHardLockFallbackOverride", async () => {
     expect(sentUrls).toEqual([]);
     expect(sends).toBe(0);
     expect(response.status).toBeGreaterThanOrEqual(400);
-  });
-
-  test("handleResponses strips caller credentials, preserves requestedModel on combo fallback, and yields to shadow/compaction turns", async () => {
-    observe({ weeklyPercent: 100 });
-    // This caller is the observed main credential that actually owes the hard lock.
-    observeMainQuotaCredential("caller-chatgpt-token", "fallback-account-a");
-    const cfg = config({
-      defaultProvider: "gateway",
-      providers: {
-        openai: {
-          adapter: "openai-responses",
-          authMode: "forward",
-          codexAccountMode: "direct",
-          baseUrl: "https://chatgpt.com/backend-api/codex",
-        },
-        gateway: {
-          adapter: "openai-responses",
-          authMode: "forward",
-          baseUrl: "https://gateway.example/v1",
-        },
-        shadow: {
-          adapter: "openai-responses",
-          authMode: "key",
-          baseUrl: "https://shadow.example/v1",
-          apiKey: "shadow-key",
-        },
-      },
-      combos: {
-        prior: { targets: [{ provider: "gateway", model: "prior-model" }] },
-        rescue: { targets: [{ provider: "gateway", model: "combo-target" }] },
-      },
-      shadowCallIntercept: {
-        enabled: true,
-        model: "shadow/helper-model",
-        sourceModels: ["gpt-5.6-luna"],
-      },
-      codexMainAccountHardLockFallback: { model: "combo/rescue", reasoningEffort: "low" },
-    } as Partial<OcxConfig>);
-
-    const seen: Array<{ url: string; auth: string | null; accountId: string | null; body: Record<string, unknown> }> = [];
-    globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
-      const headers = new Headers(init?.headers);
-      const parsedBody = JSON.parse(String(init?.body ?? "{}")) as Record<string, unknown>;
-      seen.push({
-        url: String(input),
-        auth: headers.get("authorization"),
-        accountId: headers.get("chatgpt-account-id"),
-        body: parsedBody,
-      });
-      return Response.json({
-        id: "resp_fallback_fixture",
-        status: "completed",
-        model: String(parsedBody.model ?? "combo-target"),
-        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "ok" }] }],
-        usage: { input_tokens: 4, output_tokens: 2, total_tokens: 6 },
-      });
-    }) as typeof fetch;
-
-    const headers = new Headers({
-      "content-type": "application/json",
-      "session_id": "lane-hard-lock-fallback",
-      "authorization": "Bearer caller-chatgpt-token",
-      "chatgpt-account-id": "fallback-account-a",
-    });
-    const lane = sessionLaneIdFromRequest(headers);
-    rememberComboForLane(lane, "prior", { provider: "gateway", model: "prior-model" }, "prior-model", captureConfigGeneration());
-
-    const comboLog: RequestLogContext = { model: "", provider: "" };
-    const comboRes = await handleResponses(new Request("http://localhost/v1/responses", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model: "gpt-5.3",
-        stream: false,
-        input: [
-          { type: "reasoning", id: "rs_1", summary: [], encrypted_content: "gAAAAABm0_native_ciphertext" },
-          { type: "message", role: "user", content: [{ type: "input_text", text: "hello" }] },
-        ],
-      }),
-    }), cfg, comboLog);
-    expect(comboRes.status).toBe(200);
-    await comboRes.text();
-    expect(comboLog.requestedModel).toBe("gpt-5.3");
-    expect(seen[0]!.url).toBe("https://gateway.example/v1/responses");
-    expect(seen[0]!.body.model).toBe("combo-target");
-    expect(seen[0]!.auth).toBeNull();
-    expect(seen[0]!.accountId).toBeNull();
-    expect(JSON.stringify(seen[0]!.body.input)).not.toContain("gAAAAABm0_native_ciphertext");
-    expect(recallComboForLane(cfg, lane, "prior-model")).toBe("prior");
-
-    // Non-combo shadow-intercept target keeps ownership of helper calls even while hard-locked.
-    const shadowLog: RequestLogContext = { model: "", provider: "" };
-    const shadowRes = await handleResponses(new Request("http://localhost/v1/responses", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        model: "gpt-5.6-luna",
-        stream: false,
-        input: [{ type: "message", role: "user", content: [{ type: "input_text", text: "Generate a concise title" }] }],
-      }),
-    }), cfg, shadowLog);
-    expect(shadowRes.status).toBe(200);
-    await shadowRes.text();
-    expect(seen[1]!.url).toBe("https://shadow.example/v1/responses");
-    expect(seen[1]!.body.model).toBe("helper-model");
-    expect(shadowLog.shadowCallRewrittenFrom).toBe("gpt-5.6-luna");
   });
 });

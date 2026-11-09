@@ -45,7 +45,7 @@ export interface UsageSummaryTotals {
   totalTokens: number;
   coverageRatio: number;
   /** Display-time estimated cost in USD for the filtered window (WP6, devlog 004).
-   *  Sums per-request estimateRequestCost / per-attempt combo costs; requests whose
+   *  Sums per-request estimateRequestCost / per-attempt attempt costs; requests whose
    *  price is unmatched are excluded from the sum and counted separately. */
   estimatedCostUsd: number;
   pricedRequests: number;
@@ -55,7 +55,7 @@ export interface UsageSummaryTotals {
   unmeteredRequests: number;
   /**
    * Physical upstream sends aggregated per logical request (#4546, devlog 040 slice D): attempts
-   * and combo children summed on the row, then summed over rows. `attemptCount` answers how many
+   * summed on the row, then summed over rows. `attemptCount` answers how many
    * attempts were recorded, which is a smaller number — retry layers re-send inside one attempt.
    *
    * These are optional because the management read-failure fallback emits a zeroed summary of its
@@ -239,12 +239,12 @@ export interface UsageFilterEcho {
   apiKeyId: string | null;
   matched: boolean;
   /**
-   * True when a retained row came from a combo attribution. Cost partitions
-   * cleanly across attempts, but a combo request is counted once per
+   * True when a retained row came from multi-attempt attribution. Cost partitions
+   * cleanly across attempts, but a request is counted once per
    * participating model, so a filtered REQUEST count can exceed the number of
    * distinct requests. Cost is unaffected.
    */
-  comboOverlap: boolean;
+  attemptOverlap: boolean;
 }
 
 export interface EntryCostInfo {
@@ -526,7 +526,7 @@ export function usageAttributions(entry: PersistedUsageEntry): UsageAttribution[
   });
 }
 
-function projectedComboUsage(
+function projectedAttemptUsage(
   attempts: readonly NonNullable<PersistedUsageEntry["attempts"]>[number][],
 ): { usage?: PersistedUsageEntry["usage"]; totalTokens?: number } {
   let inputTokens = 0;
@@ -1081,13 +1081,13 @@ function filterMatchesAttribution(
 function projectedEntryForFilter(
   entry: PersistedUsageEntry,
   filter: NormalizedUsageFilter,
-): { entry: PersistedUsageEntry; comboOverlap: boolean } | null {
+): { entry: PersistedUsageEntry; attemptOverlap: boolean } | null {
   if (filter.apiKeyId !== null && entry.apiKeyId !== filter.apiKeyId) return null;
   if (filter.sourceFilter && !matchesUsageSource(entry, filter.sourceFilter, filter.configuredApiKeyIdSet)) return null;
   if (!entry.attempts?.length) {
     const identity = usageModelIdentity(entry.provider, entry.model, entry.resolvedModel);
     return filterMatchesAttribution(filter, entry.provider, identity.model)
-      ? { entry, comboOverlap: false }
+      ? { entry, attemptOverlap: false }
       : null;
   }
   const attempts = entry.attempts.filter(attempt => {
@@ -1100,15 +1100,15 @@ function projectedEntryForFilter(
   return {
     entry: {
       ...withoutParentUsage,
-      // The spend record counts the whole logical request. A projection that dropped a combo
+      // The spend record counts the whole logical request. A projection that dropped an
       // child no longer describes it, so the record is dropped with the child rather than
       // reporting a full-request send count against a partial row.
       ...(parentSpend && attempts.length === entry.attempts.length ? { spend: parentSpend } : {}),
       attempts,
       ...(projectedStatus ? { usageStatus: statusFromRequestFacts(attempts.reduce((facts, attempt) => facts | attemptStatusFact(attempt), 0)) } : {}),
-      ...projectedComboUsage(attempts),
+      ...projectedAttemptUsage(attempts),
     },
-    comboOverlap: entry.attempts.length > 1,
+    attemptOverlap: entry.attempts.length > 1,
   };
 }
 
@@ -1309,7 +1309,7 @@ class StreamingUsageSummaryAccumulator implements UsageSummaryAccumulator {
   private nextOrdinal = 0;
   private snapshotStart: number | null = null;
   private snapshotEnd: number | null = null;
-  private comboOverlap = false;
+  private attemptOverlap = false;
   private estimatedRetainedBytes = ESTIMATED_ACCUMULATOR_BASE_BYTES;
 
   constructor(options?: {
@@ -1358,7 +1358,7 @@ class StreamingUsageSummaryAccumulator implements UsageSummaryAccumulator {
     cloned.nextOrdinal = this.nextOrdinal;
     cloned.snapshotStart = this.snapshotStart;
     cloned.snapshotEnd = this.snapshotEnd;
-    cloned.comboOverlap = this.comboOverlap;
+    cloned.attemptOverlap = this.attemptOverlap;
     cloned.estimatedRetainedBytes = this.estimatedRetainedBytes;
     if (this.requestIds && cloned.requestIds) {
       for (const [requestId, key] of this.requestIds) cloned.requestIds.set(requestId, key);
@@ -1604,10 +1604,10 @@ class StreamingUsageSummaryAccumulator implements UsageSummaryAccumulator {
     if (!this.filter?.sourceFilter) this.noteSnapshot(sourceEntry);
     if (this.window && (!Number.isFinite(sourceEntry.timestamp)
       || sourceEntry.timestamp < this.window.since || sourceEntry.timestamp > this.window.until)) return;
-    const projected = this.filter ? projectedEntryForFilter(sourceEntry, this.filter) : { entry: sourceEntry, comboOverlap: false };
+    const projected = this.filter ? projectedEntryForFilter(sourceEntry, this.filter) : { entry: sourceEntry, attemptOverlap: false };
     if (!projected) return;
     if (this.filter?.sourceFilter) this.noteSnapshot(sourceEntry);
-    this.comboOverlap ||= projected.comboOverlap;
+    this.attemptOverlap ||= projected.attemptOverlap;
     const entry = projected.entry;
     const partition = this.partitionFor(entry);
     if (this.filter?.sourceFilter && isLegacyCodexUsage(entry)) partition.legacyUnclassifiedRequests += 1;
@@ -1807,7 +1807,7 @@ class StreamingUsageSummaryAccumulator implements UsageSummaryAccumulator {
         model: this.filter.model,
         apiKeyId: this.filter.apiKeyId,
         matched: summary.summary.requests > 0,
-        comboOverlap: this.comboOverlap,
+        attemptOverlap: this.attemptOverlap,
       },
     };
   }
@@ -1849,10 +1849,10 @@ function normalizeExactFilterValue(input: string | null | undefined): string | n
  * accumulator. The management route can use the same accumulator directly and
  * still keep filtered results outside its unfiltered `range:surface` cache.
  *
- * Totals are recomputed from the retained rows. For combo traffic a request is
+ * Totals are recomputed from the retained rows. A multi-attempt request can be
  * counted once per participating model, so a filtered request count can exceed
- * the number of distinct requests; `comboOverlap` reports when that is
- * possible. Cost is unaffected — combo cost is attributed per attempt, so it
+ * the number of distinct requests; `attemptOverlap` reports when that is
+ * possible. Cost is unaffected — attempt cost is attributed per attempt, so it
  * partitions across models rather than repeating.
  *
  * `accounts` is emptied whenever a filter is active: account rows are not

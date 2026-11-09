@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
 import { accessSync, constants, lstatSync, readlinkSync, realpathSync, statSync } from "node:fs";
-import { homedir } from "node:os";
 import { posix, win32 } from "node:path";
 import { performance } from "node:perf_hooks";
 import { isRealBunBinary } from "./bun-binary-validator.mjs";
@@ -136,20 +135,3 @@ export function findPathBun({
   return null;
 }
 
-/** Failure-text pointer only. Never execute or delegate to this binary. */
-export function findDesktopCli({ platform = process.platform, home = homedir(), io = {} } = {}) {
-  if (platform !== "darwin") return null;
-  const stat = io.stat ?? statSync;
-  const access = io.access ?? accessSync;
-  for (const path of [
-    "/Applications/OpenCodex.app/Contents/MacOS/ocx",
-    posix.join(home, "Applications/OpenCodex.app/Contents/MacOS/ocx"),
-  ]) {
-    try {
-      if (!stat(path).isFile()) continue;
-      access(path, constants.X_OK);
-      return path;
-    } catch { /* Missing or not executable: no pointer for this candidate. */ }
-  }
-  return null;
-}

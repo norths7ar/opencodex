@@ -73,10 +73,6 @@ export function prepareClaudeCodePatch(config: OcxConfig, body: Record<string, u
     if (body.authMode === "auto") delete next.authMode;
     else next.authMode = body.authMode;
   }
-  if (body.systemEnv !== undefined) {
-    if (typeof body.systemEnv !== "boolean") return jsonResponse({ error: "systemEnv must be a boolean" }, 400);
-    next.systemEnv = body.systemEnv;
-  }
   if (body.alwaysEnableEffort !== undefined) {
     if (typeof body.alwaysEnableEffort !== "boolean") return jsonResponse({ error: "alwaysEnableEffort must be a boolean" }, 400);
     if (body.alwaysEnableEffort) next.alwaysEnableEffort = true;

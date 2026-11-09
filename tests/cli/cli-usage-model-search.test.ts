@@ -17,7 +17,7 @@ const rows = [
   { model: "Delta", provider: "four", requests: 1, totalTokens: 40 },
 ];
 const report = { range: "today", summary: { requests: 4, totalTokens: 120 }, models: rows, providers: [], days: [], accounts: [], usageIncomplete: true as const,
-  filter: { provider: "exact", model: "attribution", apiKeyId: "key-1", matched: true, comboOverlap: false } };
+  filter: { provider: "exact", model: "attribution", apiKeyId: "key-1", matched: true, attemptOverlap: false } };
 
 // Execute only the checked-in pure useMemo callback, never mount the React page.
 const source = readFileSync(repoPath("gui/src/pages/Usage.tsx"), "utf8");

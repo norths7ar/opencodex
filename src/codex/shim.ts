@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { beginCodexCliSelectionParentWrite, withCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } from "./cli-update-selection-gate";
+import { beginCodexCliSelectionParentWrite, withCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } from "./cli-selection";
 import {
   existsSync,
   lstatSync,
@@ -11,7 +11,6 @@ import { durableBunRuntime, type DurableBunRuntime } from "../lib/bun-runtime";
 import type { FileIdentity } from "../lib/file-identity";
 import { assertSelectedRuntimeWritable, RuntimePreflightError, type RuntimePreflightDeps } from "../lib/bun-runtime-preflight";
 import { getConfigDir } from "../config";
-import { isWslRuntime, wslAutomountRoot } from "./home";
 import { truncateRetainedUtf8 } from "../lib/admission";
 import { SHIM_MARKER, UNIX_SHIM_REVISION_MARKER } from "./shim-templates";
 import {
@@ -47,7 +46,6 @@ import {
 import { tryAcquireShimRestoreLock } from "./shim-restore-lock";
 import { refreshAdmittedWindowsShims, refreshObsoleteWindowsShim } from "./shim-windows-refresh";
 import {
-  isWindowsInteropDir,
   isExecutableCodexCandidate,
   inspectShimFile,
   realIsDirectory,
@@ -74,7 +72,6 @@ export { CODEX_SHIM_STATE_MAX_BYTES } from "./shim-state-file";
 export { setCodexShimProbeHookForTests, setCodexShimProbeShellForTests, setCodexShimProbeObservationMsForTests } from "./shim-probe";
 export type { CodexShimBackingForCommand } from "./shim-inspect";
 export type { CodexPathScanDeps } from "./shim-path-resolution";
-export { isWindowsInteropDir } from "./shim-path-resolution";
 export { isLocalAbsoluteInspectionPath, inspectCodexShimBackingForCommand } from "./shim-inspect";
 
 import { isShim, diagnoseCodexShim } from "./shim-diagnostics";
@@ -125,31 +122,16 @@ export function findCodexOnPath(deps: CodexPathScanDeps = {}): string | null {
   const shimFile = deps.isShimFile ?? (process.platform === "win32" ? isShim : (path: string) => inspectShimFile(path) !== false);
   const isDir = deps.isDirectory ?? realIsDirectory;
   const eligible = deps.executableEligible ?? (deps.exists ? () => true : isExecutableCodexCandidate);
-  const wsl = deps.wsl ?? (process.platform === "linux" && isWslRuntime());
-  const usePosix = deps.posixPaths ?? (wsl || process.platform !== "win32");
+  const usePosix = deps.posixPaths ?? (process.platform !== "win32");
   // The injected path flavour governs join and separator alike; host-native `join` and
   // `delimiter` made a Windows-flavoured scan split `C:\...` on a Linux host.
   const joinPath = usePosix ? posix.join : win32.join;
   const pathSep = usePosix ? ":" : win32.delimiter;
-  const automountRoot = deps.automountRoot ?? (wsl ? wslAutomountRoot() : "/mnt");
   // Windows npm prefixes ship codex.exe/codex.cmd next to the extensionless sh launcher.
-  const interopNames = ["codex", "codex.exe", "codex.cmd", "codex.ps1"];
-  let skippedInterop: string | null = null;
 
   for (const dir of (deps.pathValue ?? process.env.PATH ?? "").split(pathSep).filter(Boolean)) {
-    if (wsl && isWindowsInteropDir(dir, automountRoot)) {
-      // A Windows-side codex reached through WSL PATH interop: a Unix shim written
-      // here would embed WSL-only paths and break every Windows-side invocation.
-      if (!skippedInterop) {
-        for (const name of interopNames) {
-          const path = joinPath(dir, name);
-          if (exists(path) && !shimFile(path) && !isDir(path)) { skippedInterop = path; break; }
-        }
-      }
-      continue;
-    }
     // Interop dirs carry Windows launcher names even when the scan is not skipping them.
-    const names = isWindowsInteropDir(dir, automountRoot) ? interopNames : commandNames("codex");
+    const names = commandNames("codex");
     for (const name of names) {
       const path = joinPath(dir, name);
       if (!exists(path)) continue;
@@ -163,14 +145,6 @@ export function findCodexOnPath(deps: CodexPathScanDeps = {}): string | null {
     }
   }
 
-  if (skippedInterop) {
-    lastShimDiscoveryError = truncateRetainedUtf8(
-      `Found a Windows codex at ${skippedInterop} via WSL PATH interop, but no Linux-side codex. ` +
-      "Refusing to shim a Windows launcher from WSL (a WSL shim breaks Windows invocations). " +
-      "Install codex inside WSL (npm i -g @openai/codex), or run 'ocx ensure' from Windows to shim the Windows side.",
-      MAX_DIAGNOSTIC_VALUE_BYTES,
-    );
-  }
   return null;
 }
 

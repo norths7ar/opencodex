@@ -15,15 +15,6 @@ export interface OcxFallbackSwitches {
   provider?: boolean;
 }
 
-export interface OcxFallbackDeviceConfig extends OcxFallbackSwitches {
-  /**
-   * Permission only: true tells GOAT it may move this device's work to the device's own
-   * providers while the Home is unreachable. OpenCodex itself never serves a Child or Hub client
-   * from local providers; absent or false means no permission.
-   */
-  localFallback?: boolean;
-}
-
 export interface OcxFallbackConfig extends OcxFallbackSwitches {
   /**
    * Keyed by the provider a hop leaves: the resolved provider of the target that just failed or
@@ -31,8 +22,8 @@ export interface OcxFallbackConfig extends OcxFallbackSwitches {
    * b to c is refused.
    */
   providers?: Record<string, OcxFallbackSwitches>;
-  /** Keyed by an exact public selector: combo/<id>, policy/<id>, provider/model or an alias. */
+  /** Keyed by an exact public selector: policy/<id>, provider/model or an alias. */
   routes?: Record<string, OcxFallbackSwitches>;
   /** Keyed by a Remote Link id (lnk_…) or a Hub-client data key id. Read on the Home. */
-  devices?: Record<string, OcxFallbackDeviceConfig>;
+  devices?: Record<string, OcxFallbackSwitches>;
 }

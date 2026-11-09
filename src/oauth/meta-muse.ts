@@ -155,21 +155,7 @@ export async function loginMetaMuse(
   // rate-limited endpoint, so starting one while a working credential sits on disk spends
   // a request to arrive at the same key. `forceLogin` maps to "off" upstream because
   // reimporting is how an add-account silently re-adds the account the user already has.
-  if (platform === "darwin" && options.importLocal !== "off") {
-    try {
-      const imported = await importFromKeychain(ctrl, deps);
-      if (imported) return imported;
-    } catch (error) {
-      if (isCancellation(error, ctrl)) throw error;
-      const reason = publicMuseLoginErrorMessage(error);
-      // Recovery requires an explicit paste, never an automatic grant or key mint.
-      if (!reason || !ctrl.onManualCodeInput) throw error;
-      const pasted = await manualKeyCredential(ctrl, reason);
-      if (ctrl.signal?.aborted) throw new MuseLoginError("cancelled");
-      if (pasted === null) throw error;
-      return await validatedMetaMuseCredential(pasted, ctrl, deps, undefined, "manual");
-    }
-  }
+
 
   // fetchImpl/sleep/now are FORWARDED. Without this the device module would carry its own
   // deps object and any test reaching this path would call auth.meta.com for real.
@@ -291,9 +277,7 @@ function deviceFailureReason(error: unknown): string {
  * would tell a Linux user something false about their own machine.
  */
 function noPasteSurfaceError(platform: string, reason: string): Error {
-  const platformClause = platform === "darwin"
-    ? ""
-    : platform === "win32"
+  const platformClause = platform === "win32"
       ? " The Windows Muse Code credential store has not been verified, so there is no credential to import through this reader."
       : " The Muse Code CLI runs here, but where it stores its credential has not been measured, "
         + "so importing one is refused rather than guessed.";

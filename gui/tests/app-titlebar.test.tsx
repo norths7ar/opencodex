@@ -11,7 +11,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { SidebarTopStrip } from "../src/components/app-titlebar";
 import { useSidebarCollapse } from "../src/use-sidebar-collapse";
 import { LanguageProvider } from "../src/i18n/provider";
-import { watchMacTitlebarMetrics } from "../src/lib/window-chrome";
 
 const globals = ["document", "window", "navigator", "localStorage", "HTMLElement", "Element", "IS_REACT_ACT_ENVIRONMENT"] as const;
 const WINDOW_EVENT_STUB: { event: undefined } = { event: undefined };
@@ -145,85 +144,6 @@ test("the shortcut stays off in the plain browser shell", async () => {
   expect(app.className).not.toContain("app--nav-collapsed");
 });
 
-test("the traffic-light position and the CSS row stay in step", () => {
-  // desktop/src-tauri/src/lib.rs parks the lights with `traffic_light_position` at the
-  // values in traffic_lights.rs; the strips' height and the lights inset live in
-  // app-titlebar.css. Drift between them puts the lights on top of the toggle — this is
-  // the check for that.
-  const lib = readFileSync(new URL("../../desktop/src-tauri/src/lib.rs", import.meta.url), "utf8");
-  const lights = readFileSync(new URL("../../desktop/src-tauri/src/traffic_lights.rs", import.meta.url), "utf8");
-  const css = readFileSync(new URL("../src/components/app-titlebar.css", import.meta.url), "utf8");
-  const styles = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8");
-  expect(lib).toMatch(/traffic_light_position\(tauri::Position::Logical\(tauri::LogicalPosition::new\(\s*traffic_lights::X,\s*traffic_lights::y_for\(traffic_lights::macos_major\(\)\),/);
-  const constant = (name: string) => Number(lights.match(new RegExp(`pub const ${name}: f64 = ([\\d.]+);`))?.[1]);
-  const [lightX, lightY, preTahoeY] = [constant("X"), constant("Y_TAHOE"), constant("Y_PRE_TAHOE")];
-  const inset = Number(css.match(/--tl-inset:\s*(\d+)px/)?.[1]);
-  const row = Number(css.match(/--titlebar-h:\s*(\d+)px/)?.[1]);
-  const clear = Number(css.match(/\.app--macos\s*\{\s*--chrome-clear:\s*(\d+)px/)?.[1]);
-  // 52px of lights + 10px of air after the lead inset; the collapsed indent clears
-  // inset + toggle (28px) + padding (16px).
-  expect(inset).toBe(lightX + 52 + 10);
-  // Measured on-device: tao treats y like a container inset, not the buttons' top
-  // edge — the light centers land ~2px BELOW y. Verified center = row/2 at y=22.
-  expect(row).toBe(2 * (lightY - 2));
-  // macOS 15 and earlier draw 16pt-tall buttons that sit 4pt lower for the same y, so
-  // their y is 4pt smaller to land on the same center line (#8280).
-  expect(preTahoeY).toBe(lightY - 4);
-  expect(clear).toBeGreaterThanOrEqual(inset + 28 + 16);
-  // The expanded strip floats over exactly the sidebar column (.app's first grid track).
-  const column = Number(styles.match(/\.app\s*\{[^}]*grid-template-columns:\s*(\d+)px/)?.[1]);
-  const stripWidth = Number(css.match(/\.sidebar-top\s*\{[^}]*width:\s*(\d+)px/)?.[1]);
-  expect(stripWidth).toBe(column);
-});
-
-test("macOS titlebar clearance follows page zoom and monitor scale", async () => {
-  let monitorScale = 2;
-  const calls: string[] = [];
-  Object.defineProperty(win, "devicePixelRatio", { configurable: true, value: 2 });
-  win.__TAURI__ = { core: { invoke: async (command) => {
-    calls.push(command);
-    return monitorScale;
-  } } };
-  const stop = watchMacTitlebarMetrics(host);
-  await Promise.resolve();
-  expect(host.style.getPropertyValue("--tl-inset")).toBe("80px");
-  expect(host.style.getPropertyValue("--titlebar-h")).toBe("40px");
-  expect(host.classList.contains("app--reduced-zoom")).toBe(false);
-
-  // WKWebView pageZoom=0.2 on a Retina display reports DPR=0.4. The
-  // controls stay in window points, so CSS clearance must grow fivefold.
-  Object.defineProperty(win, "devicePixelRatio", { configurable: true, value: 0.4 });
-  win.dispatchEvent(new win.Event("resize"));
-  expect(host.style.getPropertyValue("--tl-inset")).toBe("400px");
-  expect(host.style.getPropertyValue("--titlebar-h")).toBe("200px");
-  expect(host.style.getPropertyValue("--chrome-clear")).toBe("620px");
-  expect(host.classList.contains("app--reduced-zoom")).toBe(true);
-
-  // Moving to a non-Retina monitor at the same zoom changes the native scale.
-  monitorScale = 1;
-  Object.defineProperty(win, "devicePixelRatio", { configurable: true, value: 0.2 });
-  win.dispatchEvent(new win.Event("resize"));
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  expect(host.style.getPropertyValue("--tl-inset")).toBe("400px");
-  expect(calls).toContain("plugin:window|scale_factor");
-  stop();
-});
-
-test("zooming in shrinks only the lights' clearance so the narrow menu stays on screen", async () => {
-  win.__TAURI__ = { core: { invoke: async () => 2 } };
-  // 300% page zoom on a Retina window: DPR 6, so one CSS pixel is a third of a point.
-  Object.defineProperty(win, "devicePixelRatio", { configurable: true, value: 6 });
-  const stop = watchMacTitlebarMetrics(host);
-  await Promise.resolve();
-  expect(host.style.getPropertyValue("--tl-inset")).toBe("27px");
-  expect(host.style.getPropertyValue("--chrome-clear")).toBe("71px");
-  expect(host.style.getPropertyValue("--titlebar-h")).toBe("40px");
-  expect(host.classList.contains("app--reduced-zoom")).toBe(false);
-  // A 360pt window at 300% is 120 CSS pixels: the inset plus the 44px menu must fit.
-  expect(27 + 44).toBeLessThanOrEqual(120);
-  stop();
-});
-
 test("the strip yields to the mobile header and still sizes the desktop Combos shell", () => {
   const css = readFileSync(new URL("../src/components/app-titlebar.css", import.meta.url), "utf8");
   const app = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
@@ -232,16 +152,4 @@ test("the strip yields to the mobile header and still sizes the desktop Combos s
   expect(css).toContain(".main:has(> .main-top):has(> .main-inner--combos .combos-workspace-shell) {");
   expect(css).toContain(".main:has(> .main-top) > .main-inner.main-inner--combos:has(.combos-workspace-shell) {");
   expect(app).toContain('<header className="mobile-topbar" inert={navOpen} {...(desktopShell ? windowChromeHandlers() : {})}>');
-});
-
-test("the narrow macOS strip and drawer reserve the native controls", () => {
-  const css = readFileSync(new URL("../src/components/app-titlebar.css", import.meta.url), "utf8");
-  const lib = readFileSync(new URL("../../desktop/src-tauri/src/lib.rs", import.meta.url), "utf8");
-  const mobile = css.slice(css.indexOf("@media (max-width: 760px)"));
-  expect(mobile).toContain(".app--macos .mobile-topbar { padding-left: var(--tl-inset, 80px); }");
-  expect(mobile).toContain(".app--macos .sidebar.open { padding-top: calc(var(--titlebar-h, 40px) + 18px); }");
-  expect(css).toContain("--sidebar-column: max(232px, calc(var(--tl-inset) + 52px))");
-  expect(css).toContain(".app--macos.app--reduced-zoom { transition: none; }");
-  expect(css).toContain(".app--macos .mobile-topbar { flex-wrap: wrap; }");
-  expect(lib).toContain(".min_inner_size(360.0, 320.0)");
 });

@@ -16,8 +16,6 @@ import type { AccountQuotaReading, ProviderUsageTotals } from "./types";
 import { authModeLabel } from "./ProviderRail";
 import type { ProviderUpdatePatch, ProviderUpdateResult } from "./types";
 import ProviderCurrentQuota from "./ProviderCurrentQuota";
-import type { CatalogPreset } from "../provider-catalog/provider-presets";
-import ProviderSponsor from "./ProviderSponsor";
 import ProviderCompletionTest, { type CompletionProbeStatus } from "./ProviderCompletionTest";
 import { useProviderProbeState, type ProviderProbeController } from "./use-provider-probe-state";
 
@@ -37,15 +35,13 @@ type ConnectionTestState = {
 };
 
 export default function ProviderOverview({
-  item, preset, usageTotals, quotaReport, currentQuotaReading, onRefreshQuota, oauthEmail, oauth,
+  item, usageTotals, quotaReport, currentQuotaReading, onRefreshQuota, oauthEmail, oauth,
   apiBase, connectionIdentity, probeController, availableModels = [], selectedModels, modelRows, modelRowsReady = false,
   modelsLoading = false, modelsLoadFailed = false, onRetryModels, onOpenAccounts, onOpenModelsTab, onOpenModels, onOpenConnect,
   onEditSettings, onViewUsage, onUpdateProvider,
-  onCreateJevAuto,
   onReauthenticate, onCancelLogin, reauthBusy = false,
 }: {
   item: WorkspaceItem;
-  preset?: CatalogPreset;
   usageTotals?: ProviderUsageTotals;
   quotaReport?: ProviderQuotaReportView;
   currentQuotaReading?: AccountQuotaReading;
@@ -70,7 +66,6 @@ export default function ProviderOverview({
   connectionIdentity?: string;
   onEditSettings?: () => void;
   onViewUsage?: () => void;
-  onCreateJevAuto?: () => void;
   onUpdateProvider?: (name: string, patch: ProviderUpdatePatch) => Promise<ProviderUpdateResult>;
   onReauthenticate?: () => void;
   onCancelLogin?: () => void;
@@ -251,7 +246,6 @@ export default function ProviderOverview({
 
   return (
     <>
-    <ProviderSponsor item={item} preset={preset} />
     <div className="pws-overview-layout">
       <div className="pws-overview-main">
       <section className="pws-section" aria-label={t("pws.connection")}>
@@ -399,15 +393,7 @@ export default function ProviderOverview({
         )}
       </section>
 
-      {item.adapter === "jev-decision" && onCreateJevAuto && (
-        <section className="pws-section" aria-label={t("cws.jev.create")}>
-          <h3 className="pws-section-title">{t("cws.jev.create")}</h3>
-          <p className="muted" style={{ marginTop: 0 }}>{t("cws.jev.setupHint")}</p>
-          <button type="button" className="btn btn-primary btn-sm" onClick={onCreateJevAuto}>
-            {t("cws.jev.create")}
-          </button>
-        </section>
-      )}
+      
 
       <section className="pws-section" aria-label={t("pws.authSummary")}>
         <h3 className="pws-section-title">{t("pws.authSummary")}</h3>

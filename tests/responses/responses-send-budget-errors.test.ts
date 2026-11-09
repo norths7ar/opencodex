@@ -271,14 +271,6 @@ describe("Responses spend-ledger storage refusals", () => {
     expect(result.text).not.toContain("Provider unreachable");
   });
 
-  test("runTurn: Combo preflight preserves the local 503 before committing SSE", async () => {
-    assertStorage(await dispatch("cursor", new UpstreamRetryEvidenceError([503], refusal()), false, true, true, true));
-  });
-
-  test("runTurn: buffered Combo preflight preserves the local 503", async () => {
-    assertStorage(await dispatch("cursor", new UpstreamRetryEvidenceError([503], refusal()), false, true, false, true));
-  });
-
   test("structured runTurn terminal and formatter retain the storage code and status", async () => {
     const mapped = mapSpendLedgerStorageError(new UpstreamRetryEvidenceError([503], refusal()));
     expect(mapped).toBeDefined();

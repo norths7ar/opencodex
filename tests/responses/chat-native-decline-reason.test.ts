@@ -33,10 +33,6 @@ describe("native Chat decline reasons", () => {
     expect(nativeChatDeclineReason(route({ authMode: "oauth" }), {})).toBe("auth-mode-not-native");
   });
 
-  test("combo and policy routes stay on the Responses pipeline", () => {
-    expect(nativeChatDeclineReason(route({ routeKind: "policy" } as Partial<RouteResult>), {})).toBe("combo-or-policy-route");
-  });
-
   test("Responses-only features and hosted tools are named", () => {
     expect(nativeChatDeclineReason(route(), { store: true })).toBe("responses-only-feature");
     expect(nativeChatDeclineReason(route(), { previous_response_id: "resp_1" })).toBe("responses-only-feature");

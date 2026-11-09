@@ -4,7 +4,6 @@ import http2 from "node:http2";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../../src/config";
-import { clearComboTargetCooldowns } from "../../src/combos/failover";
 import { startServer as startProxyServer } from "../../src/server";
 import { noteSubagentModelFailure, resetSubagentModelFallbackStateForTests } from "../../src/codex/subagent-model-fallback";
 import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
@@ -203,7 +202,6 @@ async function withCursorCaptureServer<T>(
 
 beforeEach(() => {
   resetVisionDescriptionCache();
-  clearComboTargetCooldowns();
   resetSubagentModelFallbackStateForTests();
   delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
   ocxHome = mkdtempSync(join(tmpdir(), "ocx-2132-home-"));
@@ -245,7 +243,6 @@ afterEach(async () => {
   } finally {
     resetVisionDescriptionCache();
     closeRequestHistoryIndex();
-    clearComboTargetCooldowns();
     resetSubagentModelFallbackStateForTests();
     if (previousCursorTestToken === undefined) delete process.env.OPENCODEX_CURSOR_TEST_TOKEN;
     else process.env.OPENCODEX_CURSOR_TEST_TOKEN = previousCursorTestToken;
@@ -1319,56 +1316,6 @@ describe("bearer admission is not reused as a Cursor upstream credential", () =>
     }
   });
 
-  test.each([false, true])("Chat combos never assign caller auth to a Cursor target (OpenAI pair: %s)", async openAiPair => {
-    await withCursorCaptureServer(async (baseUrl, capturedAuth) => {
-      const config = cursorForwardConfig(baseUrl);
-      config.combos = {
-        free: { strategy: "failover", targets: [{ provider: "cursorcustom", model: "auto" }] },
-      };
-      saveConfig(config);
-      writeFileSync(join(codexHome, "auth.json"), JSON.stringify({
-        tokens: { access_token: liveJwt(), account_id: "stored_main_acc" },
-      }));
-
-      const server = await startOwnedServer();
-      try {
-        const response = await postChatCompletions(server.url, "combo/free", {
-          "x-opencodex-api-key": ADMISSION_SECRET,
-          authorization: `Bearer ${openAiPair ? fakeChatGptJwt({ chatgpt_account_id: "caller-openai" }) : "cursor-upstream-token"}`,
-          ...(openAiPair ? { "chatgpt-account-id": "caller-openai" } : {}),
-        });
-        expect(response.status).not.toBe(200);
-        expect(capturedAuth).toEqual([]);
-      } finally {
-        await server.stop(true);
-      }
-    });
-  });
-
-  test.each([false, true])("Responses combos never assign caller auth to a Cursor target (OpenAI pair: %s)", async openAiPair => {
-    await withCursorCaptureServer(async (baseUrl, capturedAuth) => {
-      const config = cursorForwardConfig(baseUrl);
-      config.combos = {
-        free: { strategy: "failover", targets: [{ provider: "cursorcustom", model: "auto" }] },
-      };
-      saveConfig(config);
-      writeFileSync(join(codexHome, "auth.json"), JSON.stringify({ tokens: {} }));
-
-      const server = startServer(0, { inspectNativeCodexOwnership });
-      try {
-        const response = await postResponses(server.url, "combo/free", {
-          "x-opencodex-api-key": ADMISSION_SECRET,
-          authorization: `Bearer ${openAiPair ? fakeChatGptJwt({ chatgpt_account_id: "caller-openai" }) : "cursor-upstream-token"}`,
-          ...(openAiPair ? { "chatgpt-account-id": "caller-openai" } : {}),
-        });
-        expect(response.status).not.toBe(200);
-        expect(capturedAuth).toEqual([]);
-      } finally {
-        await server.stop(true);
-      }
-    });
-  });
-
   // A present reserved namespace carries the marker whatever its shape, so every broken
   // shape is untrustworthy rather than foreign, and is denied restore.
   const brokenNamespaces: Record<string, unknown> = {
@@ -1391,68 +1338,6 @@ describe("bearer admission is not reused as a Cursor upstream credential", () =>
     ...Object.fromEntries(Object.entries(brokenNamespaces)
       .map(([name, shape]) => [name, fakeChatGptJwt({ "https://api.openai.com/auth": shape })])),
   };
-
-  test("a bearer-admitted Responses combo still substitutes stored main on its final Direct target", async () => {
-    const config = mixedConfig();
-    config.combos = {
-      native: { strategy: "failover", targets: [{ provider: "openai", model: "gpt-5.6-luna" }] },
-    };
-    const stored = liveJwt();
-    saveConfig(config);
-    writeFileSync(
-      join(codexHome, "auth.json"),
-      JSON.stringify({ tokens: { access_token: stored, account_id: "stored_main_acc" } }),
-    );
-
-    const server = await startOwnedServer();
-    try {
-      const response = await postResponses(server.url, "combo/native");
-      expect(response.status).toBe(200);
-      expect(nativeAuth).toEqual([`Bearer ${stored}`]);
-      expect(nativeAuth.join("|")).not.toContain(ADMISSION_SECRET);
-    } finally {
-      await server.stop(true);
-    }
-  });
-
-  test.each(["jwt-only", "jwt-with-account", "ns-claim-only", "opaque-with-account", "jwt-mismatched-account", "org-only-jwt", "conflicting-claims", "namespace-empty-object", "namespace-primitive", "namespace-null", "namespace-array", "namespace-without-claim", "blank-account-id", "numeric-account-id"])(
-    "a dedicated-admission Responses combo scopes caller auth (%s) to its final Direct target",
-    async form => {
-      const config = mixedConfig();
-      config.combos = {
-        native: { strategy: "failover", targets: [{ provider: "openai", model: "gpt-5.6-luna" }] },
-      };
-      saveConfig(config);
-      writeFileSync(join(codexHome, "auth.json"), JSON.stringify({ tokens: {} }));
-      const callerBearer = callerBearers[form] ?? fakeChatGptJwt({ chatgpt_account_id: "caller-openai" });
-      const accountHeader = form === "jwt-only" || form === "ns-claim-only" ? undefined
-        : form === "jwt-mismatched-account" ? "other-account"
-        : form === "org-only-jwt" ? "org-foreign"
-        : "caller-openai";
-
-      const server = await startOwnedServer();
-      try {
-        const response = await postResponses(server.url, "combo/native", {
-          "x-opencodex-api-key": ADMISSION_SECRET,
-          authorization: `Bearer ${callerBearer}`,
-          ...(accountHeader ? { "chatgpt-account-id": accountHeader } : {}),
-        });
-        const body = await response.json() as { status?: string };
-        if (form === "jwt-only" || form === "jwt-with-account" || form === "ns-claim-only") {
-          expect(response.status).toBe(200);
-          expect(body).toMatchObject({ status: "completed" });
-          expect(nativeAuth).toEqual([`Bearer ${callerBearer}`]);
-          expect(nativeAccountIds).toEqual(["caller-openai"]);
-        } else {
-          expect(response.status >= 400 || body.status === "failed").toBe(true);
-          expect(nativeAuth).toEqual([]);
-          expect(nativeAccountIds).toEqual([]);
-        }
-      } finally {
-        await server.stop(true);
-      }
-    },
-  );
 
   test("Chat thread-spawn fallback never carries the provisional Cursor bearer into Direct", async () => {
     await withCursorCaptureServer(async (baseUrl, capturedAuth) => {
@@ -1592,55 +1477,6 @@ describe("bearer admission is not reused as a Cursor upstream credential", () =>
       const response = await postClaudeMessages(server.url, "policy/native");
       expect(response.status).toBe(200);
       expect(nativeAuth).toEqual([`Bearer ${stored}`]);
-    } finally {
-      await server.stop(true);
-    }
-  });
-
-  test("Claude Combo routing reconstructs trusted main auth for its final Direct target", async () => {
-    const config = mixedConfig();
-    config.combos = {
-      native: { strategy: "failover", targets: [{ provider: "openai", model: "gpt-5.6-luna" }] },
-    };
-    const stored = liveJwt();
-    saveConfig(config);
-    writeFileSync(
-      join(codexHome, "auth.json"),
-      JSON.stringify({ tokens: { access_token: stored, account_id: "stored_main_acc" } }),
-    );
-
-    const server = await startOwnedServer();
-    try {
-      const response = await postClaudeMessages(server.url, "combo/native");
-      expect(response.status).toBe(200);
-      expect(nativeAuth).toEqual([`Bearer ${stored}`]);
-    } finally {
-      await server.stop(true);
-    }
-  });
-
-  test("Claude Combo routing cannot reconstruct main auth when the profile claim was fenced", async () => {
-    const config = mixedConfig();
-    config.combos = {
-      native: { strategy: "failover", targets: [{ provider: "openai", model: "gpt-5.6-luna" }] },
-    };
-    saveConfig(config);
-    writeFileSync(
-      join(codexHome, "auth.json"),
-      JSON.stringify({ tokens: { access_token: liveJwt(), account_id: "stored_main_acc" } }),
-    );
-
-    const server = startServer(0, {
-      inspectNativeCodexOwnership: () => ({ ownership: "foreign", reason: "fixture-owned by another service" }),
-    });
-    try {
-      expect(await waitForNativeMainStartupGate()).toMatchObject({
-        status: "blocked",
-        reason: "foreign-ownership",
-      });
-      const response = await postClaudeMessages(server.url, "combo/native");
-      expect(response.status).toBe(401);
-      expect(nativeAuth).toEqual([]);
     } finally {
       await server.stop(true);
     }

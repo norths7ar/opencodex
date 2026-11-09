@@ -7,8 +7,6 @@ import { getDefaultConfig, validateConfigCandidate } from "../../src/config";
 import { routeCompactionModel } from "../../src/router";
 import { configSchema } from "../../src/config/schema/config-schema";
 import { warnDegradedCompactionRouting } from "../../src/config/load-degrade";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
-import { clearComboRecallForTests, recallComboForLane, rememberComboForLane } from "../../src/server/responses/combo-session-recall";
 import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
 import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
 import { fakeChatGptJwt } from "../helpers/fake-chatgpt-jwt";
@@ -88,9 +86,6 @@ afterEach(() => {
   releaseSpendHome?.();
   releaseSpendHome = undefined;
   globalThis.fetch = originalFetch;
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
-  clearComboRecallForTests();
   clearCompactHandoffRoutesForTests();
 });
 
@@ -318,32 +313,6 @@ describe("manual compaction reuses existing handlers", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]!.model).toBe("gpt-6.1-sol");
     expect(calls[0]!.reasoning).toMatchObject({ effort: "low", summary: "auto" });
-  });
-
-  test("combo failover normalizes the second native target before its first send", async () => {
-    const settings = config();
-    delete settings.compactionRouting;
-    settings.providers.openai = { adapter: "openai-responses", authMode: "forward", codexAccountMode: "direct", baseUrl: "https://chatgpt.com/backend-api/codex" };
-    settings.combos = { fail: { strategy: "failover", targets: [
-      { provider: "gateway", model: "normal" }, { provider: "openai", model: "gpt-6.1-sol" },
-    ] } };
-    const calls: Array<Record<string, any>> = [];
-    globalThis.fetch = (async (_url: unknown, init?: RequestInit) => {
-      const outbound = JSON.parse(String(init?.body));
-      calls.push(outbound);
-      if (outbound.model === "normal") return Response.json({ error: { message: "quota", type: "rate_limit_error" } }, { status: 429 });
-      return outbound.reasoning?.effort === "none"
-        ? Response.json({ error: { code: "unsupported_value", param: "reasoning.effort" } }, { status: 400 })
-        : upstreamCompletion(outbound);
-    }) as typeof fetch;
-    const req = request({ ...body(false), model: "combo/fail", reasoning: { effort: "none", summary: "auto" } });
-    req.headers.set("authorization", `Bearer ${fakeChatGptJwt({ chatgpt_account_id: "fixture-account" })}`);
-    const response = await handleResponses(req, settings, { model: "", provider: "" });
-    await response.text();
-    expect(response.status).toBe(200);
-    expect(calls.map(call => [call.model, call.reasoning?.effort])).toEqual([
-      ["normal", "none"], ["gpt-6.1-sol", "low"],
-    ]);
   });
 
   test("an ordinary turn carrying manual metadata stays on the conversation model", async () => {
@@ -597,94 +566,6 @@ describe("manual compaction reuses existing handlers", () => {
     expect(automatic.status).toBe(200);
     await automatic.text();
     expect(calls).toEqual(["normal", "gpt-5.6-luna", "gpt-6-astra", "normal"]);
-  });
-
-  test.each(["v1", "v2"])("%s combo override preserves failover and the conversation's remembered combo", async version => {
-    const settings = config();
-    settings.combos = {
-      normal: { targets: [{ provider: "gateway", model: "normal" }] },
-      compact: { strategy: "failover", targets: [{ provider: "gateway", model: "unavailable" }, { provider: "gateway", model: "cheap" }] },
-    };
-    settings.compactionRouting = { model: "combo/compact", reasoningEffort: "low" };
-    const req = request(body(version !== "v1"), "manual");
-    const lane = sessionLaneIdFromRequest(req.headers);
-    rememberComboForLane(lane, "normal", { provider: "gateway", model: "normal" }, "normal", captureConfigGeneration());
-    const calls: string[] = [];
-    globalThis.fetch = (async (_input: unknown, init?: RequestInit) => {
-      const model = JSON.parse(String(init?.body)).model;
-      calls.push(model);
-      if (model === "unavailable") return Response.json({ error: {
-        type: "invalid_request_error", code: "unsupported_value", param: "reasoning.effort",
-        message: "Unsupported value: 'low' is not supported with this model. Supported values are: 'medium', 'high'.",
-      } }, { status: 400 });
-      return upstreamCompletion(JSON.parse(String(init?.body)));
-    }) as typeof fetch;
-    const handler = version === "v1" ? handleResponsesCompact : handleResponses;
-    const response = await handler(req, settings, { model: "", provider: "" });
-    expect(response.status).toBe(200);
-    await response.text();
-    expect(calls).toEqual(["unavailable", "cheap"]);
-    expect(recallComboForLane(settings, lane, "normal")).toBe("normal");
-  });
-
-  test("a bare source model remembered as a combo target takes the portable path even on a same-provider native override", async () => {
-    const settings = config();
-    settings.providers["openai-apikey"] = {
-      adapter: "openai-responses", authMode: "key", baseUrl: "https://api.openai.com/v1", apiKey: "fixture-key",
-    };
-    settings.combos = { fast: { targets: [{ provider: "gateway", model: "normal" }] } };
-    settings.defaultProvider = "openai-apikey";
-    settings.compactionRouting = { model: "openai-apikey/gpt-5.6-luna", reasoningEffort: "low" };
-    const req = request({ ...body(false), model: "normal" }, "manual", "responses/compact");
-    const lane = sessionLaneIdFromRequest(req.headers);
-    rememberComboForLane(lane, "fast", { provider: "gateway", model: "normal" }, "normal", captureConfigGeneration());
-    const calls: string[] = [];
-    globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
-      calls.push(String(url));
-      if (String(url).endsWith("/compact")) return Response.json({ output: [{ type: "compaction", encrypted_content: "native-ciphertext" }] });
-      return upstreamCompletion(JSON.parse(String(init?.body)));
-    }) as typeof fetch;
-    const response = await handleResponsesCompact(req, settings, { model: "", provider: "" });
-    expect(response.status).toBe(200);
-    const text = await response.text();
-    expect(text).not.toContain("native-ciphertext");
-    expect(text).toContain(SUMMARY_PREFIX);
-    expect(calls).toEqual(["https://api.openai.com/v1/responses"]);
-    expect(recallComboForLane(settings, lane, "normal")).toBe("fast");
-  });
-
-  test("a combo override whose same-provider child is canonical ChatGPT still runs the portable summarizer", async () => {
-    const settings = config();
-    settings.providers.openai = {
-      adapter: "openai-responses", authMode: "forward", codexAccountMode: "direct",
-      baseUrl: "https://chatgpt.com/backend-api/codex",
-    };
-    settings.combos = { compact: { targets: [{ provider: "openai", model: "gpt-5.6-luna" }] } };
-    settings.compactionRouting = { model: "combo/compact", reasoningEffort: "low" };
-    const calls: Array<{ url: string; input: string }> = [];
-    globalThis.fetch = (async (url: unknown, init?: RequestInit) => {
-      const input = JSON.parse(String(init?.body));
-      calls.push({ url: String(url), input: JSON.stringify(input.input) });
-      if (calls.at(-1)!.input.includes("compaction_trigger")) {
-        const response = { ...completion(), model: input.model, output: [{ type: "compaction", encrypted_content: "native-ciphertext" }] };
-        return new Response(`event: response.completed\ndata: ${JSON.stringify({ type: "response.completed", response })}\n\n`, {
-          headers: { "content-type": "text/event-stream" },
-        });
-      }
-      return upstreamCompletion(input);
-    }) as typeof fetch;
-    const req = request({ ...body(), model: "gpt-6-astra" }, "manual");
-    req.headers.set("authorization", `Bearer ${fakeChatGptJwt({ chatgpt_account_id: "fixture-account" })}`);
-    req.headers.set("chatgpt-account-id", "fixture-account");
-    const response = await handleResponses(req, settings, { model: "", provider: "" });
-    expect(response.status).toBe(200);
-    const text = await response.text();
-    expect(text).not.toContain("native-ciphertext");
-    const output = (JSON.parse(text) as { output: Array<Record<string, any>> }).output;
-    expect(decodeCompactionSummary(output.find(item => item.type === "compaction")!.encrypted_content)).toContain("Retain progress");
-    expect(calls).toHaveLength(1);
-    expect(calls[0]!.url).toBe("https://chatgpt.com/backend-api/codex/responses");
-    expect(calls[0]!.input).not.toContain("compaction_trigger");
   });
 });
 

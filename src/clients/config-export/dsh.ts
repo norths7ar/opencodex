@@ -72,33 +72,11 @@ function dshReasoningEfforts(model: ExportModel): DshModelEntry["reasoningEffort
   return Object.fromEntries(entries);
 }
 
-function isKnownSafeDshCombo(model: ExportModel, config: OcxConfig): boolean {
-  const combos = (config as { combos?: unknown }).combos;
-  if (typeof combos !== "object" || combos === null || Array.isArray(combos)) return false;
-  const combo = (combos as Record<string, unknown>)[model.id];
-  if (typeof combo !== "object" || combo === null || Array.isArray(combo)) return false;
-  const targets = (combo as { targets?: unknown }).targets;
-  if (!Array.isArray(targets) || targets.length === 0) return false;
-  return targets.every(target => {
-    if (typeof target !== "object" || target === null || Array.isArray(target)) return false;
-    const provider = (target as { provider?: unknown }).provider;
-    const modelId = (target as { model?: unknown }).model;
-    return typeof provider === "string"
-      && provider.length > 0
-      && provider === provider.trim()
-      && provider !== "openai"
-      && typeof modelId === "string"
-      && modelId.length > 0
-      && modelId === modelId.trim();
-  });
-}
-
 export function buildDshClientConfig(ctx: ExportContext): DshGeneratedConfig {
   const direct = providerCodexAccountMode("openai", ctx.config?.providers?.openai) === "direct";
   const models: DshModelEntry[] = [];
   for (const model of normalizeExportModels(ctx.models)) {
     if (direct && (model.native === true || model.provider === "openai")) continue;
-    if (direct && model.provider === "combo" && (!ctx.config || !isKnownSafeDshCombo(model, ctx.config))) continue;
     const input = dshInputModalities(model.inputModalities);
     if (input === null) continue;
     const contextWindow = authoritativeContextWindow(model.contextWindow);

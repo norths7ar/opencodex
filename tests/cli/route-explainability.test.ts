@@ -161,31 +161,6 @@ describe("route explainability (RI-09)", () => {
     expect(body.summary?.routeKind).toBeNull();
   });
 
-  test("combo rows report the physical final attempt, not the virtual combo model", async () => {
-    appendUsageEntry({
-      requestId: "combo-row",
-      timestamp: 1_700_000_000_000,
-      provider: "combo",
-      model: "fast-fallback",
-      requestedModel: "combo/fast-fallback",
-      status: 200,
-      durationMs: 900,
-      usageStatus: "reported",
-      attempts: [
-        { ordinal: 1, provider: "a", model: "m1", adapter: "openai-chat", status: 503, durationMs: 100, sendCount: 1, recoveryKinds: ["transient-5xx"], usageStatus: "unreported" },
-        { ordinal: 2, provider: "b", model: "m2", adapter: "openai-chat", status: 200, durationMs: 800, sendCount: 1, recoveryKinds: [], usageStatus: "reported" },
-      ],
-    });
-    const response = await apiGet("/api/request-history/combo-row/route-decision", config());
-    expect(response.status).toBe(200);
-    const body = await response.json() as {
-      summary?: { finalProvider?: string; finalModel?: string };
-      attemptSequence?: Array<{ provider?: string; model?: string }>;
-    };
-    expect(body.attemptSequence).toHaveLength(2);
-    expect(body.summary).toMatchObject({ finalProvider: "b", finalModel: "m2" });
-  });
-
   test("dry-run without candidate evidence assembles canonical evidence", async () => {
     const cfg = config();
     const req = new ManagementRequest("http://localhost/api/routing-profiles/dry-run", {

@@ -27,7 +27,6 @@ export type ParsedProtocolSettingsPatch =
 
 const PATCH_KEYS = new Set(["messagesEnabled", "unrepresentable", "rollout"]);
 export const PROTOCOL_ROLLOUT_KEYS = [
-  "nativeChatCombos",
   "managedMessagesNative",
   "managedMessagesNativeOAuth",
   "directEncoders",

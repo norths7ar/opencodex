@@ -1,7 +1,6 @@
 import { chmodSync, copyFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import * as z from "zod/v4";
-import { CODEX_ACCOUNT_NAMESPACE_COMBO_ALIAS_COLLISION_ERROR } from "../codex/account-namespace-match";
 import { redactSecretString } from "../lib/redact";
 import { isPassiveRead } from "../lib/passive-read";
 import { hasWarnedConfigFallback, markWarnedConfigFallback } from "./warn-memo";
@@ -19,14 +18,14 @@ export function warnConfigRepaired(configPath: string, error: z.ZodError): void 
  * Sections whose entries are independent of one another, so one bad entry is
  * safe to drop without changing what the rest mean.
  *
- * Both are validated entry-by-entry in the `superRefine` above, which raises
+ * Routing profiles are validated entry-by-entry in the config schema, which raises
  * every finding as a *document*-level issue. That is what made a single routing
  * candidate naming a disabled provider discard the operator's whole config —
  * all eleven providers, every API key, and the entire `modelCosts` table —
  * while the proxy carried on serving from built-in defaults and reporting
  * healthy.
  */
-const SALVAGEABLE_CONFIG_SECTIONS = ["routingProfiles", "combos"] as const;
+const SALVAGEABLE_CONFIG_SECTIONS = ["routingProfiles"] as const;
 
 /** Optional nested fields that can be dropped whole without changing the rest of the document. */
 const SALVAGEABLE_OPTIONAL_FIELDS: ReadonlyArray<readonly [string, string]> = [
@@ -62,11 +61,10 @@ function dropInvalidConfigSections(
 
   const doomed = new Map<string, Set<string>>();
   for (const issue of error.issues) {
-    if (isUnsalvageableIssue(issue)) return null;
     const [section, id] = issue.path;
     if (typeof section !== "string" || typeof id !== "string") return null;
     if (!isSalvageableConfigPath(section, id)) return null;
-    // A complaint about the container itself ("combos must be an object") is
+    // A complaint about the container itself ("routingProfiles must be an object") is
     // not about one entry, so there is nothing selective to drop.
     if (issue.path.length < 2) return null;
     let ids = doomed.get(section);
@@ -90,37 +88,7 @@ function dropInvalidConfigSections(
   return dropped.length > 0 ? { candidate, dropped } : null;
 }
 
-/**
- * Salvage until the document parses, not just once.
- *
- * One pass is not enough because the sections depend on each other: routing
- * profiles are validated against the combo map, so dropping an invalid combo can
- * expose a profile that referenced it. A single-pass salvage sees that second
- * failure and gives up, discarding the whole config -- the exact outcome this
- * code exists to prevent.
- *
- * `rawDocument` is the operator's document before defaults were merged in. When
- * supplied, the same entries are deleted from it too, so a diagnostics caller can
- * still tell an absent optional setting from one we injected.
- */
-
-/**
- * Findings that must never be salvaged away.
- *
- * Salvage removes the entry a finding blamed, which is right for an ordinary
- * validation mistake and wrong for a namespace collision: the collision is a
- * *relationship* between a combo/profile and a Codex account selector, and it is
- * reported on the combo. Dropping that combo makes the document parse and quietly
- * admits the account selector the schema just refused, turning a hard admission
- * boundary into a config that loads. Refuse the whole document instead.
- */
-const UNSALVAGEABLE_ISSUE_MESSAGES: readonly string[] = [
-  CODEX_ACCOUNT_NAMESPACE_COMBO_ALIAS_COLLISION_ERROR,
-];
-
-function isUnsalvageableIssue(issue: z.ZodIssue): boolean {
-  return UNSALVAGEABLE_ISSUE_MESSAGES.some(message => issue.message.includes(message));
-}
+/** Drop invalid entries and retry parsing without changing the rest of the document. */
 export function salvageConfigCandidate(
   merged: unknown,
   initialError: z.ZodError,

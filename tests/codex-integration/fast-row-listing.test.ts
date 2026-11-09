@@ -121,13 +121,4 @@ describe("fast rows on Claude discovery", () => {
     expect(ownerOf([routed("foo"), routed("foo--fast")])).toEqual(["foo--fast (fixture)"]);
     expect(ownerOf([routed("foo--fast"), routed("foo")])).toEqual(["foo--fast (fixture)"]);
   });
-
-  test("a combo row is classified by its aggregated capability, not a provider lookup", () => {
-    // A combo has no config.providers entry - declaring a provider named `combo` is
-    // rejected outright - so a (provider, id) lookup can never classify it. The predicate
-    // receives the whole row for exactly this reason.
-    const combo = { provider: "combo", id: "c1", contextWindow: 200_000, supportsServiceTier: true } as CatalogModel;
-    const ids = build([], [combo], m => (m as { supportsServiceTier?: boolean }).supportsServiceTier === true);
-    expect(ids.some(id => id.endsWith("--fast"))).toBe(true);
-  });
 });

@@ -313,20 +313,3 @@ test("a spent model family is quota, but a family revalidation in flight is not"
   expect(revalidating.usageLimit).toBeNull();
   expect(revalidating.retryAfterSeconds).toBe(1);
 });
-
-test("a combo child keeps the retryable form and wording so its combo still owns the hop and target cooldown", async () => {
-  const now = Date.now();
-  const refusal = new AnthropicAccountCooldownError(60, undefined, { resetsAt: now + MINUTE });
-  const logCtx: { errorCode?: string } = {};
-  const combo = anthropicPoolCooldownResponse(refusal, { comboAttempt: true, logCtx });
-  // Byte-for-byte what a combo child answered before: combo exhaustion also matches usage-limit prose.
-  expect(await errorOf(combo)).toEqual({
-    type: "rate_limit_error", code: "rate_limit_exceeded", message: "All Anthropic OAuth accounts are temporarily rate-limited",
-  });
-  expect(combo.headers.get("retry-after")).toBe("60");
-  expect(logCtx.errorCode).toBeUndefined();
-
-  const direct = anthropicPoolCooldownResponse(refusal, { logCtx });
-  expect(await errorOf(direct)).toMatchObject({ type: "usage_limit_reached", resets_at: Math.ceil((now + MINUTE) / 1000) });
-  expect(logCtx.errorCode).toBe("usage_limit_reached");
-});

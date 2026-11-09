@@ -177,26 +177,6 @@ describe("disabling or deleting the shadow-call target's provider", () => {
 });
 
 describe("targets that keep an approved route", () => {
-  test("a combo target fails over to its next declared member", async () => {
-    useTempHome();
-    releaseSpendHome = acquireOwnedSpendHome();
-    const config = {
-      ...lifecycleConfig("combo/shadow"),
-      combos: {
-        shadow: {
-          strategy: "failover",
-          targets: [{ provider: "helper", model: TARGET_MODEL }, { provider: "spare", model: "spare-fast" }],
-        },
-      },
-    } as unknown as OcxConfig;
-    config.providers.helper!.disabled = true;
-    const sent = captureUpstream();
-
-    const response = await helperCall(config);
-    expect(response.status).toBe(200);
-    expect(sent).toHaveLength(1);
-    expect(sent[0]!.url).toContain("spare.example.test");
-  });
 
   test("a bare target resolved through the default provider is still intercepted", async () => {
     useTempHome();

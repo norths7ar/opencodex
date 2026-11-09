@@ -5,7 +5,6 @@ import {
   resolveClientRetryAfter,
 } from "../../src/lib/retry-after";
 import { formatPassthroughUpstreamError } from "../../src/server/responses/passthrough-error";
-import { consumeComboFailure } from "../../src/server/responses/core";
 import { fetchWithResetRetry } from "../../src/lib/upstream-retry";
 
 describe("resolveClientRetryAfter (#507)", () => {
@@ -287,26 +286,5 @@ describe("formatPassthroughUpstreamError Retry-After (#507)", () => {
     expect(response.headers.get("Retry-After")).toBe("0");
     expect(response.headers.get("x-pool-retry-test")).toBe("keep-me");
     expect(await response.text()).toBe(body);
-  });
-});
-
-describe("consumeComboFailure Retry-After separation (#507 review)", () => {
-  test("missing Retry-After attaches client fallback but omits it from cooldown metadata", async () => {
-    const upstream = new Response(JSON.stringify({ error: { message: "Too many requests" } }), {
-      status: 429,
-    });
-    const failure = await consumeComboFailure(upstream);
-    expect(failure.response.headers.get("Retry-After")).toBe(DEFAULT_RETRYABLE_429_RETRY_AFTER_SEC);
-    expect(failure.retryAfter).toBeUndefined();
-  });
-
-  test("valid upstream Retry-After is kept for both client and cooldown metadata", async () => {
-    const upstream = new Response(JSON.stringify({ error: { message: "Too many requests" } }), {
-      status: 429,
-      headers: { "retry-after": "45" },
-    });
-    const failure = await consumeComboFailure(upstream);
-    expect(failure.response.headers.get("Retry-After")).toBe("45");
-    expect(failure.retryAfter).toBe("45");
   });
 });

@@ -73,15 +73,6 @@ import { resolveDevinApiBaseUrl } from "../../oauth/devin/api-base";
 import { resolveZedModels } from "../../providers/zed";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  quotaInactiveReason,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
-import {
   ProviderOutboundPolicyError,
   ProviderOutboundSendCancelledError,
   providerOutboundGet,
@@ -105,9 +96,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { createAdmissionGate, ResourceAdmissionError, type AdmissionMetrics } from "../../lib/admission";
 import { CODEX_CUSTOM_MODEL_CATALOG_KIND, JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
-import { disabledNativeSlugs, hasComboTargets, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
-import type { ComboCatalogOmission } from "./aggregation";
+import { disabledNativeSlugs, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
+import { normalizedOpenAiApiSignature, openAiApiCollisionWarnings } from "./aggregation";
 import type { CatalogGatherProviderAuthEvidence } from "./filesystem-evidence";
 import type {
   CatalogAdmissionSnapshot,
@@ -218,17 +208,15 @@ export async function fetchProviderModelsWithAuth(
   ));
   const withConfiguredRetention = (
     models: CatalogModel[],
-    options?: { retainComboTargets?: boolean; warnDrops?: boolean },
+    options?: { warnDrops?: boolean },
   ): CatalogModel[] => {
     const { models: merged, droppedConfiguredIds } = mergeConfiguredModelsIntoLiveCatalog({
       name,
       provider: prov,
       models,
       configured,
-      retainConfiguredModelIds: captured.retainConfiguredModelIds,
       contextCap,
       seedVertexDefault,
-      retainComboTargets: options?.retainComboTargets,
       metadataModelIdCaseFold,
       metadataConfigDir,
       includeVisionSidecar: false,
@@ -304,7 +292,7 @@ export async function fetchProviderModelsWithAuth(
       }, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, undefined, false));
       if (!isCurrentCacheGeneration()) return observed(configured, "degraded");
       markProviderDiscoveryOk(name, picker.length);
-      // Retain callable manual/combo selectors, but do not advertise named selection
+      // Retain callable manual selectors, but do not advertise named selection
       // for an Auto-only account even when its saved configuration still contains it.
       return observed(copilotRequiresAuto(prov, models)
         ? picker : withConfiguredRetention(picker, { warnDrops: true }), "authoritative");
@@ -369,7 +357,7 @@ export async function fetchProviderModelsWithAuth(
         provider: name,
         ...catalogHintsFromProviderConfig(name, prov, id, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, metadataConfigDir, false),
       }));
-      const forCache = withConfiguredRetention(discovered, { retainComboTargets: false });
+      const forCache = withConfiguredRetention(discovered);
       if (!setCached(name, forCache, Date.now(), cacheGeneration, authorityIdentity)) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -426,7 +414,7 @@ export async function fetchProviderModelsWithAuth(
           ...catalogHintsFromProviderConfig(name, prov, model.id, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, metadataConfigDir, false),
         } as CatalogModel;
       });
-      const forCache = withConfiguredRetention(discovered, { retainComboTargets: false });
+      const forCache = withConfiguredRetention(discovered);
       if (!setCached(name, forCache, Date.now(), cacheGeneration, authorityIdentity)) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -477,7 +465,7 @@ export async function fetchProviderModelsWithAuth(
         provider: name,
         ...catalogHintsFromProviderConfig(name, prov, id, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, metadataConfigDir, false),
       }));
-      const forCache = withConfiguredRetention(discovered, { retainComboTargets: false });
+      const forCache = withConfiguredRetention(discovered);
       if (!setCached(name, forCache, Date.now(), cacheGeneration, authorityIdentity)) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -560,7 +548,7 @@ export async function fetchProviderModelsWithAuth(
           ...catalogHintsFromProviderConfig(name, prov, id, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, metadataConfigDir, false),
         } as CatalogModel;
       });
-      const forCache = withConfiguredRetention(result, { retainComboTargets: false });
+      const forCache = withConfiguredRetention(result);
       if (!setCached(name, forCache, Date.now(), cacheGeneration, authorityIdentity)) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -617,9 +605,9 @@ export async function fetchProviderModelsWithAuth(
         liveResult.maxModeModels ?? [],
       );
       const result = available.length > 0 ? available : configured;
-      // Cache the discovery-filtered roster without combo retention so a later
+      // Cache the discovery-filtered roster so a later
       // gather can re-apply the current capture's retain set on read.
-      const forCache = withConfiguredRetention(result, { retainComboTargets: false });
+      const forCache = withConfiguredRetention(result);
       if (!setCached(name, forCache, Date.now(), cacheGeneration, authorityIdentity)) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -827,7 +815,7 @@ export async function fetchProviderModelsWithAuth(
         ...(model.inputModalities ? { inputModalities: model.inputModalities } : {}),
       }));
       const live = applyConfigHintsToCachedModels(name, prov, upstream, contextCap, metadataModelIdCaseFold, captured.effectiveAlias, metadataConfigDir, false);
-      const forCache = azureMetadata ? upstream : withConfiguredRetention(live, { retainComboTargets: false });
+      const forCache = azureMetadata ? upstream : withConfiguredRetention(live);
       if (!isCurrentCacheGeneration()) {
         return observed(withConfiguredRetention(configured), "degraded");
       }
@@ -911,12 +899,11 @@ export async function fetchProviderModelsWithAuth(
     // Capture the count BEFORE the alias/configured augmentation below pushes extra rows into
     // `live`; otherwise configured entries would be reported as discovered ones.
     const liveModelCount = live.length;
-    // Dated-release aliases + configured retention (compat allow-list, combo targets,
-    // Vertex default). Cache without combo retention so a later gather re-applies the
+    // Dated-release aliases + configured retention (compat allow-list and Vertex default). A later gather re-applies the
     // current capture's retain set on read (warm-cache OCX-111 / #1308).
     // Azure hints depend on the admitted config root. Keep only upstream evidence in the
     // shared TTL/stale cache; every read reapplies metadata and retention for its own root.
-    const forCache = azureMetadata ? upstream : withConfiguredRetention(live, { retainComboTargets: false });
+    const forCache = azureMetadata ? upstream : withConfiguredRetention(live);
     const returned = withConfiguredRetention(azureMetadata ? live : forCache, { warnDrops: true });
     const droppedConfiguredIds = configured
       .map(model => model.id)

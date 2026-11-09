@@ -86,24 +86,19 @@ describe("account discovery follows actual family-specific workflows", () => {
     expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({ provider: "anthropic", type: "oauth", activeId: "oauth-1", account: { id: "oauth-1" } });
   });
 
-  test("a real auto ID remains selectable while clear sends null without a roster read", async () => {
-    expect(capability("account use").routes).toContainEqual({ method: "PUT", path: "/api/codex-auth/active" });
-    expect(capability("account clear").routes).toEqual([{ method: "PUT", path: "/api/codex-auth/active" }]);
+  test("retired selection commands are absent from capabilities and make no requests", async () => {
     const calls: Captured[] = [];
-    expect(await cmdAccount(["use", "openai", "auto", "--json"], fake(calls))).toBe(0);
-    expect(calls.filter(call => call.method === "PUT")).toEqual([{ method: "PUT", path: "/api/codex-auth/active", body: { accountId: "auto" } }]);
-    calls.length = 0;
-    expect(await cmdAccount(["clear", "openai", "--json"], fake(calls))).toBe(0);
-    expect(calls).toEqual([{ method: "PUT", path: "/api/codex-auth/active", body: { accountId: null } }]);
+    for (const verb of ["use", "clear", "pool", "priority", "auto-switch", "strategy", "sticky", "routes"]) {
+      expect([...BASE, ...ACCOUNT_CAPABILITIES].some(row => row.command.join(" ") === "account " + verb)).toBe(false);
+      expect(await cmdAccount([verb, "openai", "auto", "--json"], fake(calls))).not.toBe(0);
+    }
+    expect(calls).toEqual([]);
   });
 
   test.each([
-    { args: ["use", "anthropic", "oauth-1", "--json"], route: "/api/oauth/accounts/active", body: { provider: "anthropic", accountId: "oauth-1" } },
-    { args: ["use", "fixture", "key-1", "--json"], route: "/api/providers/keys/active", body: { name: "fixture", id: "key-1" } },
     { args: ["alias", "fixture", "key-1", "-", "--json"], route: "/api/providers/keys/alias", body: { name: "fixture", id: "key-1", alias: "" } },
     { args: ["alias", "anthropic", "oauth-1", "label", "--json"], route: "/api/oauth/accounts/alias", body: { provider: "anthropic", accountId: "oauth-1", alias: "label" } },
     { args: ["alias", "openai", "work", "-", "--json"], route: "/api/codex-auth/accounts/alias", body: { id: "acct-1", alias: "" } },
-    { args: ["priority", "openai", "work", "reset", "--json"], route: "/api/codex-auth/accounts/priority", body: { id: "acct-1", priority: null } },
   ])("$args uses the correct family body", async ({ args, route, body }) => {
     expect(capability(`account ${args[0]}`).routes).toContainEqual({ method: "PUT", path: route });
     const calls: Captured[] = [];
@@ -122,8 +117,6 @@ describe("account discovery follows actual family-specific workflows", () => {
   });
 
   test.each([
-    { key: "account main doctor", args: ["doctor", "--json"], route: "/api/native-main-profiles/doctor" },
-    { key: "account main list", args: ["list", "--json"], route: "/api/native-main-profiles" },
     { key: "account main reauth status", args: ["reauth", "status", "--flow", "flow/id", "--json"], route: "/api/codex-auth/main/reauth-device?flowId=flow%2Fid" },
   ])("$key reads its own namespace", async ({ key, args, route }) => {
     expect(capability(key).routes).toEqual([{ method: "GET", path: route.split("?")[0] }]);
@@ -133,11 +126,10 @@ describe("account discovery follows actual family-specific workflows", () => {
     expect(calls).toEqual([{ method: "GET", path: route }]);
   });
 
-  test("safe non-rollback recovery has its own explicit POST contract", async () => {
-    expect(capability("account main recover").mutates).toBe(true);
+  test("removed profile recovery makes no request", async () => {
     const calls: Captured[] = [];
-    expect(await cmdNativeMainAccount(["recover", "--json"], fake(calls, () => ({ recovered: false })))).toBe(0);
-    expect(calls).toEqual([{ method: "POST", path: "/api/native-main-profiles/recover", body: { rollback: false } }]);
+    expect(await cmdNativeMainAccount(["recover", "--json"], fake(calls))).not.toBe(0);
+    expect(calls).toEqual([]);
   });
 
   test("reset-credit reads never consume and map main to the native ID", async () => {
@@ -151,15 +143,12 @@ describe("account discovery follows actual family-specific workflows", () => {
     const calls: Captured[] = [];
     const deps = fake(calls);
     expect(capability("account remove").flags.find(flag => flag.name === "--yes")?.required).toBe(true);
-    expect(capability("account main switch").flags.find(flag => flag.name === "--yes")?.required).toBe(true);
-    expect(capability("account main add").json).toBe("none");
     expect(await cmdAccount(["remove", "openai", "work", "--json"], deps)).not.toBe(0);
     expect(await cmdAccount(["remove", "openai", "main", "--yes", "--json"], deps)).not.toBe(0);
-    expect(await cmdNativeMainAccount(["switch", "profile", "--json"], deps)).not.toBe(0);
+    expect(await cmdNativeMainAccount(["switch", "profile", "--yes", "--json"], deps)).not.toBe(0);
     expect(await cmdNativeMainAccount(["recover", "--rollback", "--json"], deps)).not.toBe(0);
     expect(await cmdNativeMainAccount(["add", "profile", "--json"], deps)).not.toBe(0);
     expect(await cmdNativeMainAccount(["register"], deps)).not.toBe(0);
-    expect(capability("account main register").usage).toBe("ocx account main register <label> [--json]");
     expect(calls).toEqual([]);
   });
 
@@ -173,7 +162,6 @@ describe("account discovery follows actual family-specific workflows", () => {
     expect(await cmdNativeMainAccount(["reauth", "cancel", "--json"], deps)).not.toBe(0);
     expect(capability("account main reauth cancel").flags.find(flag => flag.name === "--flow")?.required).toBe(true);
     expect(await handleAccountAuthCommand("reset-credits", ["main", "--consume", "--json"], deps)).not.toBe(0);
-    expect(capability("account import").usage).toContain("google-antigravity --format cockpit-tools");
     expect(await cmdAccount(["import", "unsupported", "--format", "cockpit-tools", "--file", home.path("nonexistent")], deps)).not.toBe(0);
     expect(capability("account add-key").routes).toEqual([{ method: "POST", path: "/api/providers/keys" }]);
     const stdin = Object.assign(Readable.from([]), { isTTY: true });

@@ -3,8 +3,6 @@ import { spawnSync } from "node:child_process";
 import * as filesystem from "node:fs";
 import { repoPath } from "../helpers/repo-root";
 import { readDesktopLibraryText, readDesktopLibraryBytes, MAX_DESKTOP_PROFILE_FILE_BYTES, parseMetadata, readDesktopProfileForeignKeys } from "../../src/claude/desktop-3p-library";
-import { StoreIO } from "../../src/claude/desktop-remote-store-io";
-import { DesktopStoreError } from "../../src/claude/desktop-remote-store-state";
 import { saveConfig, readConfigDiagnostics } from "../../src/config";
 import type { OcxConfig } from "../../src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -369,32 +367,6 @@ test.each([true, false])("oversized removal metadata preserves all files with se
   expect(filesystem.readdirSync(library).sort()).toEqual(namesBefore);
   for (const [name, content] of originals) expect(readFileSync(join(library, name), "utf8")).toBe(content);
 }, 20_000);
-
-test("StoreIO limits a growing read to its tighter cap plus one sentinel byte", () => {
-  const path = join(fixtureHome, "store-growing.json");
-  const maxBytes = 64;
-  const original = "{}\n";
-  const appended = " ".repeat(maxBytes + 1);
-  writeFileSync(path, original);
-  const read = filesystem.readSync;
-  let grew = false;
-  let consumed = 0;
-  const reading = spyOn(filesystem, "readSync").mockImplementation((fd, buffer, offset, length, position) => {
-    if (!grew) { grew = true; filesystem.appendFileSync(path, appended); }
-    const count = read(fd, buffer, offset, length, position);
-    consumed += count;
-    return count;
-  });
-  try {
-    let failure: unknown;
-    try { new StoreIO().read(path, maxBytes); } catch (error) { failure = error; }
-    expect(failure).toBeInstanceOf(DesktopStoreError);
-    expect(failure).toMatchObject({ reason: "unsafe" });
-    expect(grew).toBe(true);
-    expect(consumed).toBe(maxBytes + 1);
-  } finally { reading.mockRestore(); }
-  expect(readFileSync(path, "utf8")).toBe(original + appended);
-});
 
 test("bounded reader accepts an empty regular file unchanged", () => {
   const path = join(fixtureHome, "empty.json");

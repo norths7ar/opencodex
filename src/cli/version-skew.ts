@@ -18,8 +18,7 @@ const PLACEHOLDERS = new Set(["unknown", "0.0.0"]);
  * Which side of the comparison runs newer, so a consumer does not reparse the warning to
  * find the direction. `"match"` is a real, non-placeholder equality; placeholders and a
  * missing proxy version are `"unknown"`, and `"incomparable"` covers versions that
- * differ but do not order under strict semver. The desktop shell reads this field to
- * keep a takeover from silently downgrading a newer runtime.
+ * differ but do not order under strict semver.
  */
 export type VersionRelation =
   | "match"

@@ -198,7 +198,6 @@ function windowsTrust(state: { trusted: boolean }) {
 
 test("win32 is a supported picker platform with first-party desired", () => {
   expect(supportsDesktopPicker("win32")).toBe(true);
-  expect(supportsDesktopPicker("darwin")).toBe(true);
   expect(supportsDesktopPicker("linux")).toBe(false);
   const firstParty = { claudeCode: { desktopMode: "first-party" } } as OcxConfig;
   expect(pickerDesired(firstParty, "first-party", "win32")).toBe(true);

@@ -2,7 +2,7 @@
  * The sidebar's rows, in order.
  *
  * A row is a navigation group, not a page. Most rows hold one page; Subagents, Usage & Logs
- * and Remote Link each hold several existing pages, reached through the section switcher
+ * and Route each hold several existing pages, reached through the section switcher
  * App renders above the page. Grouping changes no route: every member keeps the hash it
  * always had, so bookmarks and deep links still open the same page, and the row that
  * owns that page lights up.
@@ -15,7 +15,7 @@
  */
 import type { Page } from "./app-routing";
 import type { TKey } from "./i18n/shared";
-import { IconActivity, IconBot, IconBoxes, IconCodex, IconGrid, IconLink, IconMonitor, IconServer } from "./icons";
+import { IconActivity, IconBot, IconBoxes, IconCodex, IconGrid, IconLink, IconServer } from "./icons";
 
 export type NavGroupId =
   | "dashboard"
@@ -25,7 +25,6 @@ export type NavGroupId =
   | "models"
   | "subagents"
   | "usage-logs"
-  | "remote";
 
 export interface NavGroup {
   id: NavGroupId;
@@ -43,9 +42,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   { id: "models", tkey: "nav.models", Icon: IconBoxes, pages: ["models"] },
   // Advisor is another way a worker reaches a second model, so it sits beside Subagents
   // in the switcher instead of taking a sidebar row of its own.
-  { id: "subagents", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents", "advisor"] },
+  { id: "subagents", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents"] },
   { id: "usage-logs", tkey: "nav.usageLogs", Icon: IconActivity, pages: ["usage", "logs", "storage"] },
-  { id: "remote", tkey: "nav.remote", Icon: IconMonitor, pages: ["remote", "remote-workspace"] },
 ];
 
 /** The row that owns a page, or null for pages outside the sidebar (Startup). */
@@ -53,11 +51,6 @@ export function groupForPage(page: Page): NavGroup | null {
   return NAV_GROUPS.find(group => group.pages.includes(page) || group.embedded?.includes(page)) ?? null;
 }
 
-/**
- * Members the switcher may offer right now. Remote Workspace exists only while a hub
- * exposes it; a bookmark to it still opens its own recovery notice, but the switcher
- * does not advertise a page that cannot load.
- */
-export function visibleGroupPages(group: NavGroup, opts: { remoteWorkspaceAvailable: boolean }): Page[] {
-  return group.pages.filter(page => page !== "remote-workspace" || opts.remoteWorkspaceAvailable);
+export function visibleGroupPages(group: NavGroup): Page[] {
+  return [...group.pages];
 }

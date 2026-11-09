@@ -32,7 +32,7 @@ import { withProcessRuntimeProvenance } from "../lib/bun-runtime";
 import { tokenCollidesWithAdmin } from "../lib/admin-secrets";
 import { selfLaunchArgv } from "../lib/self-launch-argv";
 import { loadServiceTokenFromFile, serviceApiTokenFilePath } from "../lib/service-secrets";
-import { findExecutableOnPath } from "../remote-control/workspace-executable";
+import { findExecutableOnPath } from "../lib/find-executable-on-path";
 import { findLiveProxy, type LiveProxy } from "../server/proxy-liveness";
 import { attestCodexRuntime, codexCredentialDestinationIsTrusted, resolveCodexLaunchHome, type CodexRuntimeAttestation } from "./codex-launch-auth";
 import { codexCommandCanBypass, CODEX_UNVERIFIED_SHIM } from "./codex-launch-command";

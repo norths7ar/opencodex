@@ -19,7 +19,7 @@ import type { OcxFallbackConfig, OcxFallbackKind, OcxFallbackSwitches } from "..
 import { FALLBACK_DEVICE_ID, FALLBACK_SELECTOR } from "../config/schema/fallback-policy";
 
 export type FallbackScope = "device" | "route" | "provider" | "global" | "default";
-export type FallbackSite = "combo" | "subagent" | "hard-lock" | "routing-profile";
+export type FallbackSite = "subagent" | "hard-lock" | "routing-profile";
 export type FallbackTrigger =
   | "rate_limited" | "quota_exhausted" | "auth_refused" | "upstream_5xx" | "upstream_error"
   | "cooldown" | "unavailable" | "hard_lock";
@@ -101,53 +101,11 @@ export function resolveFallbackPolicy(
   return { allowed: true, scope: "default" };
 }
 
-/**
- * Core-owned slot (AGENTS.md "optional subsystems stay off the core path"): the link listener
- * lifecycle registers how a data key id maps to its Remote Link id, so this request-path module
- * never imports link state. With nothing registered a key id is its own device id (a Hub client).
- */
-export type FallbackLinkResolver = (keyId: string) => string | undefined;
-let linkResolver: FallbackLinkResolver | undefined;
-
-/** Register the key-to-link resolver; returns a disposer that clears it if still current. */
-export function registerFallbackLinkResolver(resolver: FallbackLinkResolver): () => void {
-  linkResolver = resolver;
-  linkCache = undefined;
-  return () => {
-    if (linkResolver === resolver) linkResolver = undefined;
-    linkCache = undefined;
-  };
-}
-
-let linkCache: { at: number; byKey: Map<string, string | undefined> } | undefined;
-const LINK_CACHE_MS = 5_000;
-
-/** Test seam: forget the cached link-key map. */
-export function resetFallbackLinkCacheForTests(): void {
-  linkCache = undefined;
-}
-
-function linkIdForKey(keyId: string, now: number): string | undefined {
-  if (!linkResolver) return undefined;
-  if (!linkCache || now - linkCache.at > LINK_CACHE_MS) linkCache = { at: now, byKey: new Map() };
-  if (!linkCache.byKey.has(keyId)) {
-    let linkId: string | undefined;
-    try { linkId = linkResolver(keyId); } catch { /* unreadable store: the key id alone still identifies the device */ }
-    linkCache.byKey.set(keyId, linkId);
-  }
-  return linkCache.byKey.get(keyId);
-}
-
-/**
- * Device ids for a request: the Remote Link id its data key belongs to, then the key id itself
- * (a Hub client). The registered link resolver runs only when a device override exists.
- */
-export function fallbackDeviceIds(config: Pick<OcxConfig, "fallback">, admission: FallbackAdmission, now = Date.now()): string[] {
+export function fallbackDeviceIds(config: Pick<OcxConfig, "fallback">, admission: FallbackAdmission): string[] {
   const devices = policyOf(config)?.devices;
   if (!devices || Object.keys(devices).length === 0) return [];
   if (!admission || admission.kind !== "configured" || typeof admission.keyId !== "string") return [];
-  const linkId = linkIdForKey(admission.keyId, now);
-  return linkId ? [linkId, admission.keyId] : [admission.keyId];
+  return [admission.keyId];
 }
 
 /** A coarse trigger code for a failed upstream status. */
@@ -174,7 +132,7 @@ export function clearFallbackEventsForTests(): void {
 
 export interface FallbackHop {
   site: FallbackSite;
-  /** The public selector the client asked for (combo/<id>, policy/<id>, a model). */
+  /** The public selector the client asked for (policy/<id>, a model). */
   route: string;
   /** Further selectors that name the same route, such as a resolved alias. */
   aliases?: readonly string[];
@@ -211,7 +169,7 @@ export function guardFallbackHop(config: OcxConfig, hop: FallbackHop): FallbackG
   const kind = fallbackHopKind(hop.from, hop.to);
   if (kind === null) return { ok: true, kind: null, commit: NO_COMMIT };
   const now = hop.now ?? Date.now();
-  let deviceIds = fallbackDeviceIds(config, hop.admission, now);
+  let deviceIds = fallbackDeviceIds(config, hop.admission);
   const routes = [hop.route, ...(hop.aliases ?? [])].filter((value, index, all) => value && all.indexOf(value) === index);
   let decision = resolveFallbackPolicy(config, { kind, routes, provider: hop.from.provider, deviceIds });
   for (const captured of hop.admission?.callerPolicy?.fallbackPolicies ?? []) {

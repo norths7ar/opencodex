@@ -117,7 +117,7 @@ describe("codex auth account collision", async () => {
   });
 
   test("excludeAccountId skips self so reauth of the same pool row is not a collision", async () => {
-    seedAccount("pool-reauth", "member-a@example.test", "chatgpt-reauth-acct");
+    const config = seedAccount("pool-reauth", "member-a@example.test", "chatgpt-reauth-acct");
 
     const withoutExclude = await checkAccountIdCollision("chatgpt-reauth-acct", "member-a@example.test");
     expect(withoutExclude.collision).toBe(true);
@@ -131,6 +131,9 @@ describe("codex auth account collision", async () => {
       undefined,
       "pool-reauth",
     )).toEqual({ collision: false });
+    config.codexSignedOut = true;
+    saveConfig(config);
+    expect(await checkAccountIdCollision("chatgpt-reauth-acct", "member-a@example.test")).toEqual({ collision: false });
   });
 
   test("rejects pool registration matching the main Codex login in the same plan bucket and email", async () => {

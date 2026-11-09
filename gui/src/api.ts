@@ -35,9 +35,7 @@ function sourceInventoryMutation(path: string | null, method: string): boolean {
   if (path === "/api/keys") return ["POST", "PATCH", "DELETE"].includes(method);
   if (path === "/api/keys/rotate") return method === "POST" || method === "DELETE";
   if (path === "/api/keys/rotate/commit") return method === "POST";
-  if (["/api/link/apply", "/api/link/issue", "/api/link/join"].includes(path)) return method === "POST";
-  if (/^\/api\/link\/[^/]+$/.test(path)) return method === "DELETE";
-  return /^\/api\/link\/[^/]+\/reconnect$/.test(path) && method === "POST";
+  return false;
 }
 
 export function sourceInventoryEventMatches(event: Event, apiBase: string): boolean {
@@ -61,12 +59,9 @@ const DEVICE_PROOF_KEY = "opencodex.dashboard-device-proof";
 const DEVICE_PROOF_PATTERN = /^ocx_proof_[A-Za-z0-9_-]{43}$/;
 // Any guarded route answers 401 for a bad token; this one is a cheap config read. /api/settings
 // also resolves the Codex runtime and startup health, which made the token prompt hang.
-const ADMIN_TOKEN_VALIDATION_PATH = "/api/combos";
+const ADMIN_TOKEN_VALIDATION_PATH = "/api/providers";
 const SESSION_REBOOTSTRAP_TIMEOUT_MS = 10_000;
 const RESOLUTION_WATCHDOG_MS = 15_000;
-const MACHINE_SESSION_HEADER = "X-OpenCodex-Machine-Session";
-const MACHINE_GUI_ORIGIN_HEADER = "X-OpenCodex-Machine-GUI-Origin";
-const MACHINE_CSRF_HEADER = "X-OpenCodex-Machine-CSRF-Token";
 
 interface ApiSessionState {
   token: string | null;
@@ -162,7 +157,7 @@ function ensureTargets(): ApiTargets {
 }
 
 function sameTarget(left: ApiTarget, right: ApiTarget): boolean {
-  return left.baseUrl === right.baseUrl && left.serverOrigin === right.serverOrigin && left.transport === right.transport;
+  return left.baseUrl === right.baseUrl && left.serverOrigin === right.serverOrigin;
 }
 
 export function configureApiTargets(targets: ApiTargets): void {
@@ -360,7 +355,7 @@ function clearLegacySessionToken(): void {
 
 export function canRememberDashboardDevice(plane: ApiPlane): boolean {
   const target = runtime(plane).target;
-  return target.transport !== "relay" && target.serverOrigin === window.location.origin
+  return target.serverOrigin === window.location.origin
     && (window.location.protocol === "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname));
 }
 
@@ -395,9 +390,8 @@ function classify(input: RequestInfo | URL): { plane: ApiPlane; bootstrap: boole
   } catch { return null; }
   const targets = ensureTargets();
   if (url.href === new URL(targets.shared.bootstrapPath, window.location.href).href) return { plane: "shared", bootstrap: true };
-  if (targets.shared.transport === "relay" && targetMatchesUrl(targets.shared, url)) return { plane: "shared", bootstrap: false };
   const machinePath = relativeTargetPath(targets.machine, url);
-  if (machinePath?.startsWith("/api/machine/") || machinePath?.startsWith("/api/codex/desktop-compatibility/")) return { plane: "machine", bootstrap: false };
+  if (machinePath?.startsWith("/api/codex/desktop-compatibility/")) return { plane: "machine", bootstrap: false };
   const sharedPath = relativeTargetPath(targets.shared, url);
   if (sharedPath?.startsWith("/api/")) return { plane: "shared", bootstrap: false };
   if (url.href === new URL(targets.machine.bootstrapPath, window.location.href).href) return { plane: "machine", bootstrap: true };
@@ -413,12 +407,6 @@ function sessionHeaders(plane: ApiPlane, input: RequestInfo | URL, init?: Reques
   if (token?.startsWith("ocx_session_") && state.session.browserOrigin && state.session.csrfToken) {
     headers.set("X-OpenCodex-GUI-Origin", state.session.browserOrigin);
     if (method !== "GET" && method !== "HEAD") headers.set("X-OpenCodex-CSRF-Token", state.session.csrfToken);
-  }
-  if (plane === "shared" && state.target.transport === "relay") {
-    const machine = runtime("machine").session;
-    if (machine.token) headers.set(MACHINE_SESSION_HEADER, machine.token);
-    if (machine.browserOrigin) headers.set(MACHINE_GUI_ORIGIN_HEADER, machine.browserOrigin);
-    if (method !== "GET" && method !== "HEAD" && machine.csrfToken) headers.set(MACHINE_CSRF_HEADER, machine.csrfToken);
   }
   return headers;
 }
@@ -521,7 +509,7 @@ async function resolveTokenAfter401(plane: ApiPlane, failedToken: string | null,
       if (renewed.kind === "failed") return sessionSnapshot(state);
       if (!isCurrentRecovery(recovery)) return null;
       if (renewed.kind === "minted") return sessionSnapshot(state);
-      // A non-hub deployment has no admin token the user could supply: the server mints the
+      // A loopback deployment does not need the user to enter an admin token: the server mints the
       // session itself, so a refusal is a Host/Origin misconfiguration. Surface that instead
       // of a password box the user cannot answer (#3353, #3483).
       if (!adminTokenPromptAllowed()) {
@@ -581,7 +569,7 @@ export function installApiAuthFetch(): void {
       const url = new URL(input instanceof Request ? input.url : String(input), window.location.href);
       const path = relativeTargetPath(state.target, url);
       mutation = classified.plane === "shared" && sourceInventoryMutation(path, method);
-      usageRequest = path === "/api/usage" || path === "/api/usage/devices" || path === "/api/usage/source-facets";
+      usageRequest = path === "/api/usage" || path === "/api/usage/source-facets";
     } catch { /* A malformed URL cannot name an inventory mutation. */ }
     const mutationBase = state.target.baseUrl;
     const finish = (result: Response) => {
@@ -648,7 +636,7 @@ export function installApiAuthFetch(): void {
   };
 }
 
-/** Audio is data-plane traffic, even when the connected management target is a relay. */
+/** Audio is data-plane traffic; never attach dashboard credentials. */
 export function fetchAudioUpload(endpoint: string, init: RequestInit): Promise<Response> {
   const url = new URL(endpoint);
   if (!["http:", "https:"].includes(url.protocol) || url.pathname !== "/v1/audio/transcriptions"

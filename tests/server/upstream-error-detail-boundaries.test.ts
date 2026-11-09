@@ -1,4 +1,4 @@
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
+
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -147,8 +147,6 @@ describe("schema rejections preserve only closed operator diagnostics", () => {
   for (const [path, model] of [["/v1/chat/completions", "fxc/m1"], ["/v1/responses", "fxc/m1"], ["/v1/responses", "combo/schema"]]) {
     test(path + " " + model + " retains fields through live logs, disk and hydration", async () => {
       saveProviders(false);
-      clearComboSelectionState("schema");
-      clearComboTargetCooldowns("schema");
       status = 422;
       validationBody = { type: "invalid_request_error", detail: [
         { type: "extra_forbidden", loc: ["body", "max_completion_tokens"], msg: PROVIDER_KEY, input: "private fixture prompt", ctx: { key: PROVIDER_KEY } },

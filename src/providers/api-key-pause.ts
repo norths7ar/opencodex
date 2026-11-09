@@ -21,11 +21,7 @@ export function setProviderApiKeyPaused(config: OcxConfig, name: string, id: str
     entry.pauseRevision = randomUUID();
     if (automatic) entry.pauseDetails = automatic.details;
     else delete entry.pauseDetails;
-    if (paused && provider.apiKey === entry.key) {
-      const next = provider.apiKeyPool?.find(e => !e.disabled);
-      if (next) provider.apiKey = next.key;
-      else delete provider.apiKey;
-    } else if (!paused && !provider.apiKey) provider.apiKey = entry.key;
+    // Keep the configured key visible while disabled so it can be resumed.
     return { changed: true, selectionChanged: true, value: true };
   }, automatic?.selection);
   return result.status === "committed" && result.value;

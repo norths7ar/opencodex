@@ -8,23 +8,6 @@ import { collectStatusFallback } from "../../src/cli/status-fallback";
 import type { OcxConfig } from "../../src/types";
 
 describe("ocx fallback", () => {
-  test("status lines name every scope, the device permission and the last event", () => {
-    expect(fallbackStatusLines({
-      global: { model: true, provider: false },
-      providers: { anthropic: { model: false } },
-      routes: { "combo/coding": { provider: true } },
-      devices: [{ id: "lnk_0123456789abcdef", alias: "mac-studio", localFallback: true, model: false, provider: null }],
-      last: { at: "2026-10-22T00:00:00.000Z", outcome: "refused", kind: "provider", route: "combo/coding", from: "a/m", to: "b/n", trigger: "rate_limited", scope: "device" },
-    })).toEqual([
-      "model fallback: on (global)",
-      "provider fallback: off (global)",
-      "provider anthropic: model off",
-      "route combo/coding: provider on",
-      "device lnk_0123456789abcdef (mac-studio): local fallback allowed, model off, provider inherit",
-      "last: 2026-10-22T00:00:00.000Z refused provider fallback on combo/coding: a/m -> b/n (rate_limited, device)",
-    ]);
-    expect(fallbackStatusLines({}).at(-1)).toBe("last: no fallback since this proxy started");
-  });
 
   test("status --json reports the local policy when no proxy answers; a Child claims nothing locally", async () => {
     const config = { fallback: { model: false } } as OcxConfig;

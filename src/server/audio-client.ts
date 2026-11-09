@@ -2,7 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 import { formatErrorResponse } from "../bridge";
 import type { OcxConfig } from "../types";
 import { captureExplicitOpenAiCallerAuth, selectOpenAiImagesProvider } from "../providers/openai-sidecar";
-import { isProxyAdmissionSecret, type DataPlaneAdmission, type DataPlaneAdmissionOptions } from "./auth-cors";
+import { isProxyAdmissionSecret, type DataPlaneAdmission } from "./auth-cors";
 import { resolveAudioAdmission } from "./audio-upstream";
 import { authorizationCredential } from "../lib/authorization-scheme";
 
@@ -21,7 +21,6 @@ export function resolveAudioClient(
   req: Request,
   config: OcxConfig,
   required = false,
-  options: DataPlaneAdmissionOptions = {},
 ): AudioClient | Response | null {
   const headers = new Headers(req.headers);
   let protocol: string | undefined;
@@ -49,7 +48,7 @@ export function resolveAudioClient(
       }
     }
   }
-  const admission = resolveAudioAdmission(headers, config, options);
+  const admission = resolveAudioAdmission(headers, config);
   if (!admission) {
     const bearer = /^Bearer\s+([^\s,]+)$/i.exec(headers.get("authorization") ?? "")?.[1];
     const platformKey = selectOpenAiImagesProvider(config).keyed?.apiKey;

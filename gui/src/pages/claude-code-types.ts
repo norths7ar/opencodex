@@ -50,8 +50,6 @@ export interface ClaudeCodeState {
   admissionKeyActive?: boolean;
   /** "daemon": detection cannot see a key exported only in the user's terminal. */
   detectionScope?: string;
-  autoConnectSupported: boolean;
-  systemEnv: boolean;
   fastMode: boolean | null;
   /** Legacy config override (no GUI control anymore) — still disables auto-context when hand-set. */
   maxContextTokens: number | null;

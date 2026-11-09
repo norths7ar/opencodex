@@ -3,8 +3,6 @@ export const STATE_SWEEP_INTERVAL_MS = 60_000;
 export interface GenerationContext {
   generation: number;
   providerNames: ReadonlySet<string>;
-  comboIds: ReadonlySet<string>;
-  comboTargets: ReadonlySet<string>;
   codexAccountIds: ReadonlySet<string>;
   oauthAccountKeys: ReadonlySet<string>;
   configRoots: ReadonlySet<string>;

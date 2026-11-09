@@ -12,7 +12,6 @@ import { pendingModelSelectionProviders } from "../../providers/initial-model-se
 import { captureModelDiscoveryBaseline, finalizeModelDiscovery } from "../../providers/new-model-policy-runtime";
 import { OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import { providerCodexAccountMode } from "../../providers/registry";
-import { COMBO_NAMESPACE } from "../../combos";
 import { codexAccountNamespaceEntries, isMainCodexAccountTarget } from "../account-namespaces";
 import { MAIN_CODEX_ACCOUNT_ID } from "../main-account";
 import { applyNativeAccessPrograms } from "./access-programs";
@@ -62,7 +61,7 @@ import { isMultiAgentV2Enabled } from "../features";
 import { clampCatalogModelsToCodexSupport } from "./effort";
 import { suppressedSyntheticMaxCatalogSlugs } from "./model-hints";
 import { filterCatalogVisibleModels, gatherRoutedModels, type CatalogGatherProviderModelOutcome } from "./provider-fetch";
-import { comboCatalogDescriptions, dedupeCatalogEntriesBySlug, enforceCatalogSlugUniqueness, exactComboCatalogSlugs, type ComboCatalogOmission } from "./aggregation";
+import { dedupeCatalogEntriesBySlug, enforceCatalogSlugUniqueness } from "./aggregation";
 import {
   withCatalogWriteSerialization,
   type CatalogWritePermit,
@@ -109,7 +108,6 @@ interface RetainedCatalogSyncResult {
   added: number;
   path: string;
   catalogWritten: boolean;
-  comboOmissions: ComboCatalogOmission[];
   /** Validated catalog commit (including identical bytes), or a refused refresh. */
   refreshOutcome?: "committed" | "refused";
   /**
@@ -141,7 +139,6 @@ interface RetainedCatalogSyncWrite {
   readonly config: OcxConfig;
   readonly goModels: CatalogModel[];
   readonly providerModelOutcomes: readonly CatalogGatherProviderModelOutcome[];
-  readonly comboOmissions: ComboCatalogOmission[];
   readonly read: RetainedCatalogSyncRead;
   readonly permit: CatalogWritePermit;
   readonly owningCodexHome: string;
@@ -288,7 +285,6 @@ function writeRetainedCatalogSync({
   config,
   goModels,
   providerModelOutcomes,
-  comboOmissions,
   read,
   permit,
   owningCodexHome,
@@ -335,7 +331,6 @@ function writeRetainedCatalogSync({
   );
   const modelPickerOrder = config.modelPickerOrder ?? [];
   const multiAgentMode: MultiAgentMode = config.multiAgentMode === "v1" || config.multiAgentMode === "v2" ? config.multiAgentMode : "default";
-  const exactComboSlugs = exactComboCatalogSlugs(config);
   const bareEligibleAccountIds = providerCodexAccountMode(
     OPENAI_CODEX_PROVIDER_ID,
     config.providers[OPENAI_CODEX_PROVIDER_ID],
@@ -379,7 +374,6 @@ function writeRetainedCatalogSync({
     && !desktopAllowlistSuppressedNativeSlugs({ ...config, omitDisabledNativeModels: false }).has(String(template.slug))) {
     suppressedBareNativeSlugs.delete(String(template.slug));
   }
-  const hasPhysicalComboProvider = Object.hasOwn(config.providers, COMBO_NAMESPACE);
   const includeNativeOpenAi = shouldIncludeNativeOpenAi(config);
   const includeAccountBoundNativeOpenAi = shouldIncludeAccountBoundNativeOpenAi(config);
   // Both user levers. Passing only the cap here is what let a per-model window the dashboard
@@ -459,7 +453,6 @@ function writeRetainedCatalogSync({
     modelPickerOrder,
     wsEnabled,
     multiAgentMode,
-    exactComboSlugs,
     accountSelectors,
     suppressedBareNativeSlugs,
     disabledNativeAccountSlugs: new Set(),
@@ -505,7 +498,6 @@ function writeRetainedCatalogSync({
       featured,
       wsEnabled,
       multiAgentMode,
-      exactComboSlugs,
       accountSelectors,
       suppressedBareNativeSlugs,
       disabledNativeAccountSlugs: new Set([...disabledNativeSlugs(config)].filter(slug => suppressedBareNativeSlugs.has(slug))),
@@ -539,9 +531,6 @@ function writeRetainedCatalogSync({
     multiAgentMode,
     multiAgentV2Enabled,
     keepNativeChatGptOnV1: config.keepNativeChatGptOnV1 === true,
-    exactComboSlugs,
-    comboDescriptions: comboCatalogDescriptions(config),
-    hasPhysicalComboProvider,
     includeNativeOpenAi,
     accountBoundEntries,
     suppressedBareNativeSlugs,
@@ -578,7 +567,7 @@ function writeRetainedCatalogSync({
   // carries, because they are on disk either way.
   const preparedCatalog: PreparedCatalogFileWrite = { path: catalogPath, content };
   if (!preparedBytesDifferFromDisk(preparedCatalog)) {
-    return { added, path: catalogPath, catalogWritten: false, comboOmissions };
+    return { added, path: catalogPath, catalogWritten: false };
   }
   // A refresh may drop a provider's rows only when config.json on disk agrees the provider is gone.
   // Without that, a config that is not the user's (missing or unreadable file read as defaults,
@@ -587,7 +576,6 @@ function writeRetainedCatalogSync({
     added: 0,
     path: catalogPath,
     catalogWritten: false,
-    comboOmissions,
     skippedReason: "unbacked_routed_removal",
     protectedRoutedNamespaces,
   });
@@ -620,7 +608,6 @@ function writeRetainedCatalogSync({
     added,
     path: catalogPath,
     catalogWritten: replacement?.kind === "written",
-    comboOmissions,
   };
 }
 
@@ -646,12 +633,10 @@ export async function syncCatalogModels(
       added: 0,
       path: readCodexCatalogPath(),
       catalogWritten: false,
-      comboOmissions: [],
       refreshOutcome: "refused",
     };
   }
 
-  const comboOmissions: ComboCatalogOmission[] = [];
   const providerModelOutcomes: CatalogGatherProviderModelOutcome[] = [];
   // Settle the bundled template, then baseline, and only then await. Reading it
   // here makes the memo ours before anyone else can move it, so a bundled swap
@@ -669,7 +654,6 @@ export async function syncCatalogModels(
   const providerContentRevisions = new Map<string, string>();
   const [goModels, modelEntitlements] = await Promise.all([
     gatherRoutedModels(config, {
-      comboOmissions,
       providerModelOutcomes,
       providerContentRevisions,
     }),
@@ -688,7 +672,6 @@ export async function syncCatalogModels(
         added: 0,
         path: prepared.catalogPath,
         catalogWritten: false,
-        comboOmissions,
         skippedReason: "desired_disabled" as const,
       };
     }
@@ -704,7 +687,6 @@ export async function syncCatalogModels(
       config,
       goModels,
       providerModelOutcomes,
-      comboOmissions,
       read: current,
       permit,
       owningCodexHome,
@@ -721,7 +703,6 @@ export async function syncCatalogModels(
     added: 0,
     path: prepared.catalogPath,
     catalogWritten: false,
-    comboOmissions,
     refreshOutcome: "refused",
     ...(committed.kind === "unavailable" && committed.reason === "foreign-owner"
       ? { skippedReason: "foreign_owner" as const } : {}),

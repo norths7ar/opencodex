@@ -1,6 +1,5 @@
 import { parseProtocolTraceV1 } from "../../../../src/protocols/dto";
 import type { TFn } from "../../i18n/shared";
-import { openCompatibilityPair, protocolPairUpstream } from "../../protocol-deep-links";
 import { FEATURE_DISPOSITION_KEYS, PROTOCOL_MODE_KEYS, protocolHopLabel, protocolPathLabel } from "./protocol-labels";
 
 /**
@@ -64,13 +63,7 @@ export function ProtocolTracePanel({ trace, t }: { trace: unknown; t: TFn }) {
               </>
             )}
           </div>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm protocol-deep-link"
-            onClick={() => openCompatibilityPair({ inbound: parsed.inbound, upstream: protocolPairUpstream(parsed.upstream) })}
-          >
-            {t("protocolLinks.labEvidence")}
-          </button>
+          
         </>
       ) : (
         <p className="log-detail-notes-line muted">{t("logs.detail.protocol.none")}</p>

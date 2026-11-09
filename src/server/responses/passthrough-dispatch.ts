@@ -168,7 +168,7 @@ import {
   reasoningEffortRejectionText,
 } from "./core-opaque-recovery";
 import type { RequestLogContext } from "../request-log";
-import { deferProtocolSafeResetRecovery, preflightComboStreamResponse } from "./combo-stream-preflight";
+import { deferProtocolSafeResetRecovery, preflightResponsesStream } from "./stream-preflight";
 import { authorizeResendForRecovery } from "../../lib/request-resend-gate";
 import { ambiguousResendAllowanceFor, selfContainedResponsesBody } from "./reset-replay";
 import { upstreamErrorMessageFromPayload, ENCRYPTED_FUNCTION_OUTPUT_REJECTION } from "../../lib/errors";
@@ -329,7 +329,7 @@ export async function preparePassthroughExchange(
         rememberResponseState(parsed._rawBody, response, undefined, responseStateOptions(true))
       : undefined;
     if (options.nativeControl && nativeResponseControlEligible(route.provider, options.nativeControl)
-      && options.inboundTransport === "websocket" && !options.comboAttempt) {
+      && options.inboundTransport === "websocket") {
       const body = parsed._rawBody as Record<string, unknown>;
       if (options.nativeControl.kind === "steering") {
         options.nativeControl.normalizeContinuation = createSteeringSettingsNormalizer(parsed, route, config, req.headers);
@@ -946,7 +946,7 @@ export async function preparePassthroughExchange(
           return markProxyError(formatErrorResponse(401, "authentication_error", publicOAuthAuthenticationErrorMessage(refusal)), publicOAuthErrorPresentation(refusal));
         }
         if (refusal instanceof AnthropicAccountCooldownError) {
-          return anthropicPoolCooldownResponse(refusal, { comboAttempt: options.comboAttempt, logCtx });
+          return anthropicPoolCooldownResponse(refusal, { logCtx });
         }
         return markProxyError(formatErrorResponse(403, "permission_error", publicOAuthAuthenticationErrorMessage(refusal)), publicOAuthErrorPresentation(refusal));
       }
@@ -997,15 +997,10 @@ export async function preparePassthroughExchange(
     };
     const initialBodyRefusal = refuseOversizedOutboundBody(request);
     if (initialBodyRefusal) return initialBodyRefusal;
-    // A combo-owned first send is settled by the physical-dispatch receipt unless spend
-    // enforcement is on, where the shared reporter already owns the permit lifecycle.
-    // Stable per request: the Combo booking (`reserveDispatch`) already started and froze the spend
-    // policy, so `spendEnforced` cannot change before dispatch even though no reporter starts it here.
-    const receiptMode = !sendBudgetState.adapterSendBudget?.spendEnforced && Boolean(options.comboInitialSend);
     const initialAccounting = copilotSendAccounting();
     // #6969: Pool sends hold empty lifecycle frames so a pre-output refusal reaches the ladder below.
     const preOutputRefusals = new PoolPreOutputRefusals();
-    const preOutputRefusalHold = () => poolPreOutputRefusalHold(admissionState.authCtx, route.provider, connectMs, options.comboAttempt);
+    const preOutputRefusalHold = () => poolPreOutputRefusalHold(admissionState.authCtx, route.provider, connectMs);
     const onContinuationDispatch = createNativeContinuationDispatch(sendBudgetState, logCtx);
     try {
       // Transient-5xx pre-stream retry (devlog/_plan/260716_claudecode_hardening/010):
@@ -1027,13 +1022,13 @@ export async function preparePassthroughExchange(
           }, recovery), upstream.signal, sendConnectMs(), upstreamRequestsStream,
             providerFetch(route.provider, options.codexWsRuntimeIdentity, {
               httpOnly: canonicalBufferedJson,
-              nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket" && !options.comboAttempt
+              nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket"
                 && responseEffects.plaintextV2AgentMessageToolNames.size === 0
                 ? options.nativeControl : undefined,
               dispatchOverride: oauthDispatch(request, parsed, "passthrough"),
               providerName: route.providerName,
               modelId: route.modelId,
-              onPhysicalDispatch: receiptMode ? sendBudgetState.noteInitialDispatch : initialAccounting.onPhysicalDispatch,
+              onPhysicalDispatch: initialAccounting.onPhysicalDispatch,
               onContinuationDispatch,
               accountAutoPause: (name, provider, headers) => captureAccountAutoPauseAttempt(name, provider, { config, codex: admissionState.authCtx }, headers),
               onCodexWsQuota: codexWsQuotaObserver(admissionState.authCtx, route.provider, route.modelId),
@@ -1050,7 +1045,7 @@ export async function preparePassthroughExchange(
           attempts: sendBudgetState.initialSendAllowance(transientSendAttempts()),
           // Reporter path: direct requests and enforced spend. Receipt-mode sends are settled
           // by `onPhysicalDispatch`; a reporter as well would count them twice.
-          ...(receiptMode ? {} : { onSendsConsumed: initialAccounting.report }),
+          onSendsConsumed: initialAccounting.report,
           claimAmbiguousResend: claimPreHeaderResend,
         },
       );
@@ -1164,7 +1159,7 @@ export async function preparePassthroughExchange(
             }, innerRecovery), upstream.signal, sendConnectMs(), upstreamRequestsStream,
               providerFetch(route.provider, options.codexWsRuntimeIdentity, {
                 httpOnly: canonicalBufferedJson,
-                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket" && !options.comboAttempt
+                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket"
                   && responseEffects.plaintextV2AgentMessageToolNames.size === 0
                   ? options.nativeControl : undefined,
                 dispatchOverride: oauthDispatch(request, parsed, "passthrough"),
@@ -1285,7 +1280,7 @@ export async function preparePassthroughExchange(
         let replayNotified = false;
         const oauthReplayExecutor = providerFetch(route.provider, options.codexWsRuntimeIdentity, {
             httpOnly: canonicalBufferedJson,
-            nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket" && !options.comboAttempt
+            nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket"
               && responseEffects.plaintextV2AgentMessageToolNames.size === 0
               ? options.nativeControl : undefined,
             dispatchOverride: oauthDispatch(request, parsed, "passthrough"),
@@ -1434,7 +1429,7 @@ export async function preparePassthroughExchange(
             }, recovery), upstream.signal, sendConnectMs(), upstreamRequestsStream,
               providerFetch(route.provider, options.codexWsRuntimeIdentity, {
                 httpOnly: canonicalBufferedJson,
-                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket" && !options.comboAttempt
+                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket"
                   && responseEffects.plaintextV2AgentMessageToolNames.size === 0
                   ? options.nativeControl : undefined,
                 dispatchOverride: oauthDispatch(request, parsed, "passthrough"),
@@ -1584,7 +1579,7 @@ export async function preparePassthroughExchange(
             }, recovery), upstream.signal, sendConnectMs(), upstreamRequestsStream,
               providerFetch(route.provider, options.codexWsRuntimeIdentity, {
                 httpOnly: canonicalBufferedJson,
-                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket" && !options.comboAttempt
+                nativeControl: nativeResponseControlEligible(route.provider, options.nativeControl) && options.inboundTransport === "websocket"
                   && responseEffects.plaintextV2AgentMessageToolNames.size === 0
                   ? options.nativeControl : undefined,
                 dispatchOverride: oauthDispatch(request, parsed, "passthrough"),
@@ -1753,7 +1748,7 @@ export async function preparePassthroughExchange(
       && (outboundResponsesBodyCarriesEncryptedFunctionOutput(request.body) || (!sendBudgetState.ambiguousResendSpent && retainedReasoningStreamCandidate(parsed, request.body)));
     if (streamedFunctionOutputCandidate) {
       const preflightLog: RequestLogContext = { model: logCtx.model, provider: logCtx.provider };
-      const preflight = await preflightComboStreamResponse(upstreamResponse, preflightLog,
+      const preflight = await preflightResponsesStream(upstreamResponse, preflightLog,
         payload => {
           if (!payload || typeof payload !== "object" || Array.isArray(payload)) return false;
           const type = (payload as { type?: unknown }).type;

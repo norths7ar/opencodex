@@ -85,7 +85,6 @@ export function createClaudeInterceptLifecycle<T>(): ClaudeInterceptLifecycle<T>
     const run = async (): Promise<ClaudeInterceptOutcome> => {
       // Legacy key cleanup is independent of listener eligibility, including on-demand retries.
       try { discardPickerCaKey(opts.configDir ?? getConfigDir()); } catch { /* best-effort; retried on the next attempt */ }
-      if (opts.config.runtimeRole === "client") return { ok: false, reason: "client_role" };
       if (!claudeInterceptEnabled(opts.config)) return { ok: false, reason: "disabled" };
       if (opts.requestedPort === 0 && typeof opts.config.claudeCode?.intercept?.port !== "number")
         return { ok: false, reason: "ephemeral_port" };

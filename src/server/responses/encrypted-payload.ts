@@ -10,20 +10,6 @@ import { buildCompactV1Output, COMPACT_PROMPT, decodeCompactionSummary, extractC
 import { FORWARD_HEADERS, sanitizeReasoningInputContent } from "../../adapters/openai-responses";
 import { expandPreviousResponseInput, previousResponseProviderState, rememberResponseState } from "../../responses/state";
 import { routeModel } from "../../router";
-import {
-  advanceComboAfterFailure,
-  comboDefaultEffort,
-  comboFailureDecision,
-  comboIdFromRawBody,
-  concreteComboRequestBody,
-  getCombo,
-  isComboTargetInCooldown,
-  NoAvailableComboTargetsError,
-  noteComboSuccess,
-  parseRetryAfterMs,
-  pickComboTarget,
-  targetKey,
-} from "../../combos";
 import { isInjectionDebugEnabled } from "../../lib/debug-settings";
 import { injectionDebugLog } from "../../lib/injection-debug-log";
 import { modelInList, namespacedToolName } from "../../types";

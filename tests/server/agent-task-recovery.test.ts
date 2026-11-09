@@ -953,35 +953,6 @@ describe("agent task recovery (opt-in, default off)", () => {
     expect(forwardedBody).toContain(FERNET_TASK);
     expect(forwardedBody).not.toContain("capture_assignment");
   });
-
-  test("fails closed after a single failed combo recovery pass", async () => {
-    const config = routedConfig();
-    config.combos = {
-      routed: {
-        strategy: "failover",
-        targets: [{ provider: "xai", model: "grok-4.5" }],
-      },
-    };
-    const fetchedUrls: string[] = [];
-    globalThis.fetch = (async (input) => {
-      fetchedUrls.push(String(input));
-      throw new Error("every upstream call must fail");
-    }) as typeof fetch;
-
-    const response = await post(
-      config,
-      "combo/routed",
-      encryptedInput(),
-      codexHeaders(),
-    );
-
-    expect(response.status).toBe(400);
-    expect(fetchedUrls).toHaveLength(1);
-    expect(fetchedUrls[0]).toContain("chatgpt.com/backend-api/codex/responses");
-    expect(await response.json()).toMatchObject({
-      error: { code: "unreadable_encrypted_agent_task", recovery_reason: "recovery_transport_error" },
-    });
-  });
 });
 
 /**

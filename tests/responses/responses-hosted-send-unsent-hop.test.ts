@@ -46,7 +46,7 @@ async function withSyntheticRotation(run: (rotated: () => boolean) => Promise<vo
   finally { snapshot.mockRestore(); rotate.mockRestore(); enabled.mockRestore(); prepared.mockRestore(); }
 }
 
-test("real Vertex hosted search refunds replay cancelled after reservation while queued for pacing", async () => hostedSendFixture("search", "failover", async f => {
+test("real Vertex hosted search refunds replay cancelled after reservation while queued for pacing", async () => hostedSendFixture("search", async f => {
   const controller = new AbortController();
   let physical = 0, sawQueuedReservation = false, poll: ReturnType<typeof setInterval> | undefined;
   Object.assign(f.config.providers.a!, { adapter: "google", googleMode: "vertex",
@@ -75,7 +75,7 @@ test("real Vertex hosted search refunds replay cancelled after reservation while
 }));
 
 for (const kind of ["search", "image", "video"] as const) for (const sent of [false, true]) {
-  test(`${kind} adapter OAuth replay ${sent ? "cancelled after dispatch stays charged" : "beforeDispatch failure refunds only unsent hop"}`, async () => hostedSendFixture(kind, "failover", async f => {
+  test(`${kind} adapter OAuth replay ${sent ? "cancelled after dispatch stays charged" : "beforeDispatch failure refunds only unsent hop"}`, async () => hostedSendFixture(kind, async f => {
     delete f.config.providers.a!.transientRetryOn5xx;
     const controller = new AbortController();
     let physical = 0, replayPrepared = false;
@@ -112,44 +112,7 @@ for (const kind of ["search", "image", "video"] as const) for (const sent of [fa
   }));
 }
 
-for (const claimed of [false, true]) for (const sent of [false, true]) test(`sidecar iteration cannot release active producer hop (claimed=${claimed}, sent=${sent})`, async () => {
-  let refunds = 0, physical = 0;
-  const budget = createRequestExecutionBudget(undefined, undefined, { charge: () => true, refund: () => { refunds++; } });
-  const initial = budget.reserveDispatch({ sendClass: "initial", targetKey: "endpoint-one", countedExternally: true });
-  if (!initial.allowed) throw new Error("synthetic initial denied");
-  const translatorBudget = createTranslatorBudget();
-  const options = { sendBudget: budget, translatorBudget, comboInitialSend: { permit: initial.permit } };
-  const owner = createResponsesSendBudget({ req: new Request("http://localhost/v1/responses"),
-    logCtx: { provider: "a", model: "m" }, options });
-  if (owner instanceof Response) throw new Error("synthetic owner refused");
-  const sidecar = createSidecarSendBudget(options, owner, () => undefined);
-  let resume!: () => void, entered!: () => void;
-  const gate = new Promise<void>(resolve => { resume = resolve; });
-  const waiting = new Promise<void>(resolve => { entered = resolve; });
-  try {
-    sidecar.takeProducerOwnership();
-    const first = owner.adapterDispatchBudget!.reserveDispatch({ sendClass: "initial", targetKey: "endpoint-one" });
-    if (!first.allowed || !first.permit.use()) throw new Error("synthetic initial dispatch denied");
-    sidecar.ownCredentialHop(owner.reserveCredentialHop("auth-recovery", "endpoint-one", true).permit);
-    const send = createAdapterPhysicalSend({ sendBudget: owner.adapterDispatchBudget,
-      executor: (async () => { physical++; return Response.json({ ok: true }); }) as unknown as typeof fetch });
-    const producer = claimed ? send({ url: "endpoint-one", beforeDispatch: async () => {
-      entered(); await gate;
-      if (!sent) throw new Error("synthetic abandoned producer");
-    }, dispatch: executor => executor("https://synthetic.invalid") }) : undefined;
-    const result = producer?.then(() => undefined, error => error);
-    if (claimed) await waiting;
-    sidecar.releaseUnsentHop();
-    expect(budget.used).toBe(2); expect(refunds).toBe(0);
-    resume();
-    if (claimed && sent) expect(await result).toBeUndefined();
-    else if (claimed) expect(await result).toBeInstanceOf(Error);
-    sidecar.release(); sidecar.releaseUnsentHop(); sidecar.release();
-    expect(owner.pendingHopPermit).toBeUndefined();
-    expect(physical).toBe(claimed && sent ? 1 : 0);
-    expect(budget.used).toBe(claimed && sent ? 2 : 1); expect(refunds).toBe(claimed && sent ? 0 : 1);
-  } finally { resume(); sidecar.release(); translatorBudget.dispose(); }
-});
+for (const claimed of [false, true]) for (const sent of [false, true])
 
 /** Reserve a recovery hop after a consumed initial send with observable refunds. */
 function hopOwner(maxTargetTransitions = 1) {

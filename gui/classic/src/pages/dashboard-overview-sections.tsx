@@ -16,7 +16,6 @@ import {
   type SidecarPatch,
   shadowCallModelOptions,
   webSearchSidecarSelectionForModel,
-  updateJobLabel,
   webSearchEnabledPatch,
   sidecarCodexWritePending,
   visionEnabledPatch,
@@ -166,8 +165,8 @@ export function DashboardInjectionPanel({ d }: { apiBase: string; d: Dash }) {
 
 export function DashboardMaintenancePanel({ d }: { d: Dash }) {
   const {
-    t, runSync, syncing, settingsSaving, updateTriggerRef, openUpdateDialog, updateLoading, updateOpen,
-    syncResult, syncError, updateJob, reconnecting, clearSyncFeedback,
+    t, runSync, syncing, settingsSaving,
+    syncResult, syncError, clearSyncFeedback,
   } = d;
   const syncHoldsWarning = !!syncResult && (
     !!syncResult.warning
@@ -217,31 +216,8 @@ export function DashboardMaintenancePanel({ d }: { d: Dash }) {
             <button type="button" className="btn btn-ghost btn-sm" onClick={handleRunSync} disabled={syncing || settingsSaving}>
               <IconRefresh className={syncing ? "spin-icon" : undefined} /> {syncing ? t("dash.syncing") : t("dash.syncRun")}
             </button>
-            <button
-              ref={updateTriggerRef}
-              type="button"
-              className="maintenance-update-anchor"
-              onClick={openUpdateDialog}
-              disabled={updateLoading}
-              aria-haspopup="dialog"
-              aria-controls="dashboard-update-dialog"
-              aria-expanded={updateOpen}
-              aria-label={t("dash.checkUpdate")}
-              tabIndex={-1}
-            />
           </div>
         </div>
-        {updateJob && (
-          <div className={`notice ${updateJob.status === "failed" ? "notice-err" : "notice-ok"} maintenance-notice`} role="status">
-            {updateJob.status === "failed" ? <IconAlert /> : <IconRefresh />}
-            <span>
-              {updateJobLabel(updateJob.status, t)}
-              {updateJob.latestVersion ? ` ${t("dash.updateVersionTransition", { currentVersion: updateJob.currentVersion, latestVersion: updateJob.latestVersion })}` : ""}
-              {reconnecting ? ` ${t("dash.updateReconnecting")}` : ""}
-              {updateJob.error ? ` ${updateJob.error}` : ""}
-            </span>
-          </div>
-        )}
       </div>
       {!syncToastDismissed && syncResult && (
         <div className={`action-toast notice ${syncHoldsWarning ? "notice-warn" : "notice-ok"}`} role="status" aria-live="polite">

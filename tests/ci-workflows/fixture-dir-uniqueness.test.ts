@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { repoPath } from "../helpers/repo-root";
-import { currentPath, loadLayout } from "../../scripts/test-layout/schema";
 
 /**
  * A fixed fixture directory shared by two test files is a silent flake factory.
@@ -82,16 +81,5 @@ describe("test fixture directories", () => {
       .map(([literal, files]) => `${literal} <- ${files.join(", ")}`);
 
     expect(shared).toEqual([]);
-  });
-
-  test("the two files behind the original flake no longer use a fixed path", () => {
-    // Regression pin for the specific pair. Both now derive a per-run directory, which also
-    // makes two concurrent runs of the SAME file safe — something a rename alone would miss.
-    const layout = loadLayout();
-    for (const file of ["server-auth.test.ts", "management-provider-validation.test.ts"]) {
-      const source = withoutComments(readFileSync(join(TESTS_DIR, currentPath(layout, file)), "utf8"));
-      expect(source).not.toContain('join(import.meta.dir, ".tmp-server-auth-test")');
-      expect(source).toContain("mkdtempSync(join(tmpdir()");
-    }
   });
 });

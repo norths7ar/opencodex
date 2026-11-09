@@ -11,7 +11,6 @@ import {
   tryAdmitTurn, unregisterTurn, activeRegistryMetrics, getNativeMainProfileRequestCount,
   MAX_ACTIVE_TURNS, MAX_ACTIVE_SESSION_LANES, type ActiveTurnLease,
 } from "../../src/server/lifecycle";
-import { createJevModelInvoker } from "../../src/server/responses/jev-model-invoke";
 import { workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
 import * as live from "../../src/server/live";
 import * as transport from "../../src/server/responses/request-transport";
@@ -273,31 +272,6 @@ test("normal completion detaches cancellation listeners", () => {
   client.abort(new Error("fixture request disposed"));
   expect(upstream.signal.aborted).toBe(false);
   remove.mockRestore();
-});
-
-
-test("internal decision cancellation releases admission while dispatch remains pending", async () => {
-  const before = getActiveTurnCount();
-  const entered = deferred<void>();
-  const unblock = deferred<Response>();
-  const client = new AbortController();
-  const invoke = createJevModelInvoker({
-    req: { headers: new Headers() },
-    config: { port: 0, defaultProvider: "fixture", providers: {} } as OcxConfig,
-    options: {},
-    async handleResponses() { entered.resolve(); return unblock.promise; },
-  });
-  const pending = invoke({ model: "fixture", instructions: "fixture", input: "fixture", signal: client.signal });
-  const settled = pending.catch(() => undefined);
-  await entered.promise;
-  expect(getActiveTurnCount()).toBe(before + 1);
-  try {
-    client.abort(new Error("fixture decision closed"));
-    expect(getActiveTurnCount()).toBe(before);
-  } finally {
-    unblock.resolve(new Response(null, { status: 499 }));
-    await settled;
-  }
 });
 
 

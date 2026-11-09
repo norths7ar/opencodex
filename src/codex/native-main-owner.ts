@@ -83,11 +83,7 @@ export function nativeMainOwnerFilesystemSupported(
     if (normalized.startsWith("\\\\?\\UNC\\")) return false;
     if (normalized.startsWith("\\\\") && !normalized.startsWith("\\\\?\\")) return false;
   }
-  if (
-    platform === "linux"
-    && (env.WSL_INTEROP !== undefined || env.WSL_DISTRO_NAME !== undefined)
-    && /^\/mnt\/[a-z](?:\/|$)/i.test(codexHome)
-  ) return false;
+
   return true;
 }
 

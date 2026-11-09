@@ -651,7 +651,7 @@ export function estimateAttemptCost(
  * Combo: price every attempt with its own rate and sum. Fail closed — if ANY
  * attempt is unpriced or unnormalizable, return null rather than a partial sum.
  */
-export function estimateComboCost(
+export function estimateAttemptsCost(
   attempts: readonly AttemptCostInput[],
   overlays: readonly ExpectedPriceOverlay[] = EXPECTED_PRICE_OVERLAYS,
   serviceTier?: ServiceTierInput,

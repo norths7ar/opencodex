@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { buildCatalogEntries, gatherRoutedModels, resolveComboCatalogMember } from "../../src/codex/catalog";
+import { buildCatalogEntries, gatherRoutedModels } from "../../src/codex/catalog";
 import { gatherFlightKey } from "../../src/codex/catalog/gather-capture";
 import { fetchProviderModels } from "../../src/codex/catalog/provider-models";
 import { clearModelCache } from "../../src/codex/model-cache";
@@ -69,35 +69,6 @@ describe("catalog respects the disabled vision sidecar", () => {
     expect(modalities(rows, "no-vision")).toEqual(["text", "image"]);
   });
 
-  test.each([false, true])("missing combo members use enabled=%s", enabled => {
-    const fixture = config(enabled);
-    const member = resolveComboCatalogMember(
-      { provider: providerName, model: "declared-text" }, new Map(),
-      new Map(Object.entries(fixture.providers)), undefined, undefined, undefined, undefined, enabled,
-    );
-    expect(member?.inputModalities).toEqual(enabled ? ["text", "image"] : ["text"]);
-  });
-
-  test.each([false, true])("gathered combos follow enabled=%s", async enabled => {
-    const fixture = config(enabled);
-    fixture.combos = { selected: { targets: [{ provider: providerName, model: "declared-text" }] } };
-    const rows = buildCatalogEntries(null, [], await gatherRoutedModels(fixture));
-    expect(rows.find(row => row.slug === "combo/selected")?.input_modalities)
-      .toEqual(enabled ? ["text", "image"] : ["text"]);
-  });
-
-  test.each(["declared-text", "custom-text"])("disabled sidecar preserves explicit custom image input in combo target %s", async modelId => {
-    const fixture = config(false);
-    fixture.customModels = [
-      { id: "custom", provider: providerName, modelId, inputModalities: ["text", "image"], addedAt: "2026-01-01" },
-    ];
-    fixture.combos = { selected: { targets: [{ provider: providerName, model: modelId }] } };
-    const models = await gatherRoutedModels(fixture);
-    expect(modalities(models, modelId)).toEqual(["text", "image"]);
-    expect(buildCatalogEntries(null, [], models).find(row => row.slug === "combo/selected")?.input_modalities)
-      .toEqual(["text", "image"]);
-  });
-
   test("warm live cache does not retain synthetic image input across disable and re-enable", async () => {
     let calls = 0;
     globalThis.fetch = (async () => { calls++; return modelsResponse(); }) as typeof fetch;
@@ -151,18 +122,6 @@ describe("catalog respects the disabled vision sidecar", () => {
       expect(modalities(rows, "live-native")).toEqual(["text", "image"]);
       expect(modalities(rows, "live-text")).toEqual(["text"]);
     }
-  });
-
-  test.each([false, true])("mixed native and exact text-only combo uses enabled=%s", async enabled => {
-    const fixture = config(enabled);
-    fixture.providers[providerName]!.modelCapabilities!["declared-text"] = { inputModalities: ["text"] };
-    fixture.combos = { mixed: { targets: [
-      { provider: providerName, model: "declared-text" },
-      { provider: providerName, model: "vision-native" },
-    ] } };
-    const entries = buildCatalogEntries(null, [], await gatherRoutedModels(fixture));
-    expect(entries.find(row => row.slug === "combo/mixed")?.input_modalities)
-      .toEqual(enabled ? ["text", "image"] : ["text"]);
   });
 
   test("opposite settings cannot join the same pending gather", async () => {

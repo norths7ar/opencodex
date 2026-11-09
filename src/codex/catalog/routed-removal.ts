@@ -1,4 +1,4 @@
-import { COMBO_NAMESPACE } from "../../combos";
+
 import { readConfigAdmissionSnapshot, type ConfigAdmissionSnapshot } from "../../config/diagnostics";
 import type { OcxConfig } from "../../types";
 import { trustedAccountBoundNativeCatalogSlug } from "./account-models";
@@ -18,17 +18,17 @@ export interface UnconfiguredRoutedRemoval {
   readonly namespaces: readonly string[];
 }
 
-type RoutedNamespaceConfig = Pick<OcxConfig, "providers" | "combos">;
+type RoutedNamespaceConfig = Pick<OcxConfig, "providers">;
 
 function routedNamespace(entry: RawEntry): string | null {
   if (!entry || typeof entry !== "object" || typeof entry.slug !== "string") return null;
   // Account-bound native rows follow the account pool, not provider config.
   if (trustedAccountBoundNativeCatalogSlug(entry) !== undefined) return null;
-  if (isNativeAliasCatalogEntry(entry)) return COMBO_NAMESPACE;
+  if (isNativeAliasCatalogEntry(entry)) return "combo";
   // Combo aliases may be bare or use an unrelated provider namespace. Ownership selects the
   // combo namespace only with the same authorship signal as routed rows (generated description or
   // the #7229 marker a custom combo description carries).
-  if (entry.owned_by === COMBO_NAMESPACE && hasOcxRoutedAuthorship(entry)) return COMBO_NAMESPACE;
+  if (entry.owned_by === "combo" && hasOcxRoutedAuthorship(entry)) return "combo";
   // Foreign rows (Cursor, user tooling) are never removed by the provider rule.
   if (!isOcxAuthoredRoutedEntry(entry)) return null;
   return entry.slug.slice(0, entry.slug.indexOf("/"));
@@ -54,7 +54,6 @@ export function ocxRoutedRowCount(catalog: unknown): number | null {
 
 /** Whether a config still produces routed rows for a namespace: an enabled provider, or any combo. */
 export function configEnablesRoutedNamespace(config: RoutedNamespaceConfig, namespace: string): boolean {
-  if (namespace === COMBO_NAMESPACE && Object.keys(config.combos ?? {}).length > 0) return true;
   const provider = config.providers?.[namespace];
   return provider !== undefined && provider.disabled !== true;
 }

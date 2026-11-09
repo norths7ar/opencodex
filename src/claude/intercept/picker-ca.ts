@@ -1,5 +1,5 @@
 import { createHash, randomUUID, X509Certificate } from "node:crypto";
-import { chmodSync, lstatSync, mkdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { chmodSync, lstatSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { canonicalPickerConfigDir, ensurePersistentPickerCa } from "./picker-ca-persistence";
 import type { PickerCaStore } from "./picker-ca-store";
@@ -22,7 +22,6 @@ export interface PendingPickerCaUntrust { certPem: string; sha1: string; sha256:
 
 const processAuthorities = new Map<string, PickerCa>();
 const MAX_PENDING_CA_BYTES = 64 * 1024;
-const LEGACY_OWNER_MTIME_TOLERANCE_MS = 2_000;
 
 export function pickerStateDir(configDir: string): string { return join(configDir, PICKER_STATE_DIR); }
 export function pickerCaCertPath(configDir: string): string { return join(pickerStateDir(configDir), "ca.pem"); }
@@ -209,35 +208,10 @@ function currentProcessOwnsPublishedCa(configDir: string, ca: PickerCa): boolean
 }
 
 /** The OS process start identity prevents a recycled PID from impersonating the recorded owner. */
-function processStartIdentity(pid: number, utc = false): string | null {
-  if (process.platform === "linux") {
-    try {
-      const stat = readFileSync(`/proc/${pid}/stat`, "utf8");
-      const afterCommand = stat.lastIndexOf(") ");
-      const ticks = afterCommand < 0 ? undefined : stat.slice(afterCommand + 2).trim().split(/\s+/)[19];
-      return ticks && /^\d+$/.test(ticks) ? ticks : null;
-    } catch { return null; }
-  }
-  if (process.platform === "darwin") {
-    try {
-      const result = Bun.spawnSync(["/bin/ps", "-o", "lstart=", "-p", String(pid)], {
-        stdin: "ignore", stdout: "pipe", stderr: "ignore",
-        ...(utc ? { env: { ...process.env, TZ: "UTC" } } : {}),
-      });
-      const value = result.stdout.toString().trim();
-      return result.exitCode === 0 && value.length > 0 && value.length <= 128 ? value : null;
-    } catch { return null; }
-  }
-  return null;
-}
+function processStartIdentity(pid: number): string | null {
 
-/** Darwin's lstart is local wall-clock time; Linux's /proc start ticks are not comparable to mtime. */
-function processStartEpochMs(pid: number): number | null {
-  if (process.platform !== "darwin") return null;
-  const identity = processStartIdentity(pid, true);
-  if (identity === null) return null;
-  const epoch = Date.parse(`${identity} UTC`);
-  return Number.isFinite(epoch) ? epoch : null;
+
+  return null;
 }
 
 function processAlive(pid: number): boolean {
@@ -265,16 +239,8 @@ function livePublishedOwner(configDir: string, published: string): boolean {
     if (typeof pid !== "number" || typeof sha256 !== "string") return false;
     if (sha256 !== pickerCaFingerprints(published).sha256) return false;
     if (!processAlive(pid)) return false;
-    // Older records have no start identity. On Darwin, wall-clock start after the owner
-    // file proves PID reuse; otherwise preserve the conservative live-owner decision.
-    if (startTime === undefined || startTime === null) {
-      const startedAt = processStartEpochMs(pid);
-      if (startedAt === null) return true;
-      let mtime: number;
-      try { mtime = statSync(pickerCaOwnerPath(configDir)).mtimeMs; }
-      catch { return true; }
-      return !Number.isFinite(mtime) || startedAt <= mtime + LEGACY_OWNER_MTIME_TOLERANCE_MS;
-    }
+    // An older record without a start identity is still valid while its PID is live.
+    if (startTime === undefined || startTime === null) return true;
     if (typeof startTime !== "string" || startTime.length === 0 || startTime.length > 128) return false;
     const actual = processStartIdentity(pid);
     return actual === null || actual === startTime;

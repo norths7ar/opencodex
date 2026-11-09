@@ -30,7 +30,6 @@ import type { RuntimeApiDeps } from "./runtime-api";
 import { redactSecretArgs } from "./secret-args";
 import { projectLocalSyncResult, type LocalSyncResult } from "./local-sync-result";
 import { providerManagementConfigError } from "../server/auth-cors";
-import { readClientConnectionState, type ClientConnectionState } from "../client/state";
 import { SENSITIVE_KEY_PATTERN } from "../lib/redact";
 
 export interface ProviderCommandDeps extends RuntimeApiDeps {
@@ -106,20 +105,6 @@ function validateAndSave(config: ReturnType<typeof loadConfig>): void {
 // provider list
 // ---------------------------------------------------------------------------
 
-/**
- * Does this device's own provider config serve requests? A device linked to a Home — a Remote
- * Link Child or a Hub-mode client — routes through the Home, so its local rows are shadowed.
- * A standalone device and a Hub serve their own rows. An unreadable or inconsistent client
- * state is not a link, the same reading `readLinkChildContext` takes.
- */
-export function localProvidersActive(read: () => ClientConnectionState = readClientConnectionState): boolean {
-  try {
-    return read().kind !== "connected";
-  } catch {
-    return true;
-  }
-}
-
 const SENSITIVE_QUERY_KEY = /key|token|secret|password|passwd|signature|^sig$|auth|credential/i;
 
 /**
@@ -145,7 +130,7 @@ export function providerListBaseUrl(baseUrl: string): string {
   return changed ? parsed.toString() : baseUrl;
 }
 
-function handleList(args: string[], active: boolean = localProvidersActive()): void {
+function handleList(args: string[]): void {
   const wantsJson = consumeFlag(args, "--json");
   const wantsJsonl = consumeFlag(args, "--jsonl");
   rejectUnknownArgs(args, "Usage: ocx provider list [--json|--jsonl]");
@@ -169,7 +154,7 @@ function handleList(args: string[], active: boolean = localProvidersActive()): v
       isDefault: name === config.defaultProvider,
       source: registryEntry ? "registry" : "custom",
       models: prov.models ?? [],
-      active,
+      active: true,
     };
   });
 
@@ -501,15 +486,6 @@ function handleRemove(args: string[]): void {
     process.exit(1);
   }
 
-  const dependentCombos = Object.entries(config.combos ?? {})
-    .filter(([, combo]) => combo.targets.some(target => target.provider === name))
-    .map(([id]) => id)
-    .sort();
-  if (dependentCombos.length > 0) {
-    console.error(`Cannot remove "${name}" — combo(s) depend on it: ${dependentCombos.join(", ")}`);
-    process.exit(1);
-  }
-
   const droppedCustomModels = commitProviderGcpCredentialRemoval(config, name, () => {
     delete config.providers[name];
     const dropped = dropProviderCustomModels(config, name);
@@ -661,19 +637,8 @@ export async function handleProviderCommand(args: string[], deps: ProviderComman
     return;
   }
 
-  // #6957: a link Child's local providers are inactive; changing them is refused like any other
-  // provider change, which belongs to the Home.
-  if (sub === "add" || sub === "remove" || sub === "set-default") {
-    const refusal = (await import("./link-child")).linkChildProviderChangeRefusal(`ocx provider ${sub}`);
-    if (refusal) {
-      console.error(refusal);
-      process.exitCode = 1;
-      return;
-    }
-  }
   switch (sub) {
     case "list":
-      await (await import("./link-child")).printLinkChildLocalNotice("The providers");
       handleList(subArgs);
       break;
     case "add":
@@ -683,7 +648,6 @@ export async function handleProviderCommand(args: string[], deps: ProviderComman
       await withConfigDirHardeningSettled(getConfigDir(), () => handleRemove(subArgs));
       break;
     case "show":
-      await (await import("./link-child")).printLinkChildLocalNotice("The provider settings");
       handleShow(subArgs);
       break;
     case "set-default":

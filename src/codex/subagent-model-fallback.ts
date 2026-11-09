@@ -379,7 +379,6 @@ export function selectAvailableSubagentModel(
       const route = tryRouteFallbackModel(config, candidate);
       if (
         !route
-        || route.combo !== undefined
         || (
           !isCanonicalOpenAiForwardProvider(route.provider)
           && restrictedRouteEligible?.(route) !== true

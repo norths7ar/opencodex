@@ -115,21 +115,6 @@ describe("catalog-sourced capability evidence (#1796)", () => {
     expect(candidateCapabilityEvidence(config, "p", "a/b").contextWindow).toBe(111000);
     expect(candidateCapabilityEvidence(config, "p", "a-b").contextWindow).toBe(222000);
   });
-
-  test("synthesized combo rows are not stamped with capability provenance", () => {
-    // Combo members fall back to a generic 128k/text synthesis, so those values
-    // are placeholders rather than assertions.
-    const entry = serialize({
-      provider: "combo",
-      id: "synthetic",
-      contextWindow: 128000,
-      inputModalities: ["text"],
-    } as CatalogModel);
-
-    expect(entry.opencodex_capability_provenance).toBeUndefined();
-    // The synthesized value still ships to Codex, which is what makes it parse.
-    expect(entry.context_window).toBe(128000);
-  });
 });
 
 describe("provenance sources beyond the CatalogModel (#1796)", () => {

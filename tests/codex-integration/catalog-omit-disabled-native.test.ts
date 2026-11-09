@@ -44,8 +44,7 @@ const read = (): RawCatalog => JSON.parse(readFileSync(path, "utf8"));
 const routed = (catalog: RawCatalog) => JSON.stringify(catalog.models?.filter(row => row.slug === "fixture/model"));
 const liveList = (next: OcxConfig): RawCatalog => buildCodexModelList({
   config: next, nativeSlugs: ["gpt-5.5"], availableAccountNativeSlugs: [], accountNativeSlugs: [],
-  accountNativeSlugsBySelector: new Map(), goOrdered: [{ provider: "fixture", id: "model" }],
-  exactComboSlugs: new Set(), accountSelectors: [],
+  accountNativeSlugsBySelector: new Map(), goOrdered: [{ provider: "fixture", id: "model" }], accountSelectors: [],
   suppressedBareNativeSlugs: desktopAllowlistSuppressedNativeSlugs(next),
   disabledModels: new Set(next.disabledModels),
 });
@@ -137,21 +136,6 @@ test("omitting every native row keeps the only supported source through converge
   expect(second[SOURCE_FIELD]).toEqual(native());
 });
 
-test("exact selector disables omit only their native row and do not consume a combo alias", () => {
-  const entries = [
-    native(),
-    { ...native(), slug: "first/gpt-5.5", opencodex_catalog_kind: CODEX_ACCOUNT_BOUND_CATALOG_KIND },
-    { ...native(), slug: "second/gpt-5.5", opencodex_catalog_kind: CODEX_ACCOUNT_BOUND_CATALOG_KIND },
-    { ...native(), slug: "gpt-5.6-sol", opencodex_catalog_kind: "combo-native-alias-v1" },
-  ];
-  const next = { omitDisabledNativeModels: true, disabledModels: ["first/gpt-5.5", "gpt-5.6-sol"] };
-  expect(omitDisabledNativeCatalogEntries(entries, next).map(row => row.slug))
-    .toEqual(["gpt-5.5", "second/gpt-5.5", "gpt-5.6-sol"]);
-  expect(omitDisabledNativeCatalogEntries(entries, { ...next, disabledModels: ["gpt-5.5"] }).map(row => row.slug))
-    .toEqual(["gpt-5.6-sol"]);
-  expect(omitDisabledNativeCatalogEntries(entries, { ...next, omitDisabledNativeModels: false })).toBe(entries);
-});
-
 test("an omission pass that drops nothing leaves control-plane rows in place", () => {
   const entries = [
     { ...native(), slug: "gpt-5.6-sol", opencodex_catalog_kind: "combo-native-alias-v1" },
@@ -171,17 +155,6 @@ test("no supported native source keeps the existing null-template behavior", asy
   expect(on[SOURCE_FIELD]).toBeUndefined();
   expect(routed(on)).toBe(routed(off));
   expect(findSupportedNativeTemplate({ models: [unknown] })).toBeNull();
-});
-
-test("config loading and salvage preserve the opt-in and malformed values stay off", () => {
-  for (const flag of [true, false, "true", 1, null, {}]) {
-    writeFileSync(getConfigPath(), JSON.stringify({ ...config(), omitDisabledNativeModels: flag }), "utf8");
-    expect((loadConfig() as OcxConfig & { omitDisabledNativeModels?: boolean }).omitDisabledNativeModels).toBe(flag === true);
-  }
-  writeFileSync(getConfigPath(), JSON.stringify({ ...config(true), combos: { broken: { strategy: "invalid", targets: [] } } }), "utf8");
-  const salvaged = loadConfig() as OcxConfig & { omitDisabledNativeModels?: boolean };
-  expect(salvaged.omitDisabledNativeModels).toBe(true);
-  expect(salvaged.providers.fixture?.models).toEqual(["model"]);
 });
 
 test("retained sync and serve-options omit the same rows without changing routed bytes", async () => {

@@ -193,7 +193,7 @@ export interface VisionPlan {
   routedModel?: string;
   /** Loopback dispatch inputs for the routed backend (the listener decides WHICH local port). */
   routedConfig?: Pick<OcxConfig, "port" | "hostname" | "apiKeys" | "unauthenticatedLoopbackListener">;
-  advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+  sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
   settings: VisionSettings;
   maxDescriptionsPerTurn: number;
 }
@@ -216,7 +216,7 @@ export function planVisionSidecar(
     admission?: Pick<DataPlaneAdmission, "source">;
     codexAuthPolicy?: CodexAuthPolicyConfig;
     providerName?: string;
-    advisorAdmissionPolicy?: CapturedAdmissionPolicy;
+    sidecarAdmissionPolicy?: CapturedAdmissionPolicy;
   } = {},
 ): VisionPlan | undefined {
   if (!requiresVisionPreprocessing(config, provider, modelId, options.providerName)) return undefined;
@@ -234,7 +234,7 @@ export function planVisionSidecar(
     return {
       backend: "routed",
       routedModel,
-      advisorAdmissionPolicy: options.advisorAdmissionPolicy,
+      sidecarAdmissionPolicy: options.sidecarAdmissionPolicy,
       routedConfig: {
         port: config.port,
         ...(config.apiKeys ? { apiKeys: config.apiKeys } : {}),

@@ -7,7 +7,7 @@ import { nativeCompatibilityOwner, type NativeCompatibilityOwner } from "./routi
 const record = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);
 // These are routing inputs, not proof of a conversation's final provider. Their
 // changes revoke the observed context even if the loopback URL stays the same.
-const ROUTING_KEYS = ["providers", "defaultProvider", "defaultModelAliases", "customModels", "combos", "routingProfiles",
+const ROUTING_KEYS = ["providers", "defaultProvider", "defaultModelAliases", "customModels", "routingProfiles",
   "subagentModelFallback", "subagentModelFallbackByModel", "injectionModel", "compactionRouting", "compactionRecovery",
   "blockedModelRedirects", "shadowCallIntercept", "protocols", "memoryModels", "codexMainAccountHardLockFallback"] as const satisfies readonly (keyof OcxConfig)[];
 function routingDigest(text: string, owner: NativeCompatibilityOwner): string {
@@ -24,7 +24,7 @@ function routingDigest(text: string, owner: NativeCompatibilityOwner): string {
 }
 /** Validates the effective root/profile routing only; it does not prove a thread's selected provider. */
 export function matchesNativeCompatibilityRouting(text: string, owner: NativeCompatibilityOwner | null): boolean {
-  if (!owner || owner.config.codexDesktopAuthless === true || owner.config.runtimeRole === "client") return false;
+  if (!owner || owner.config.codexDesktopAuthless === true) return false;
   try {
     const root: unknown = Bun.TOML.parse(text);
     if (!record(root)) return false;

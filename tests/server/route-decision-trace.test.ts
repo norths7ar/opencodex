@@ -124,63 +124,11 @@ describe("route decision traces (RI-01)", () => {
     expect(JSON.stringify(route.routeDecision)).not.toContain("acct-1");
   });
 
-  test("combo route records every target with eligibility and exclusion reasons", () => {
-    const config = baseConfig();
-    const route = routeModel(config, "combo/free");
-    const trace = route.routeDecision!;
-    expect(trace.routeKind).toBe("combo");
-    expect(trace.requestedModel).toBe("combo/free");
-    expect(trace.candidates.length).toBe(2);
-    const selected = trace.candidates[trace.selected.candidateIndex]!;
-    expect(selected.eligible).toBe(true);
-    for (const candidate of trace.candidates) {
-      if (candidate === selected) continue;
-      // Failover: the not-selected target is eligible but skipped.
-      expect(candidate.eligible).toBe(true);
-      expect(candidate.exclusions.map(exclusion => exclusion.code)).toContain("not-selected");
-    }
-  });
-
   test("default-provider fallback records a default-provider trace", () => {
     const route = routeModel(baseConfig(), "totally-unknown-model");
     expect(route.providerName).toBe("a");
     expect(route.routeDecision!.routeKind).toBe("default-provider");
     expect(route.routeDecision!.selected.reason).toBe("default-provider");
-  });
-
-  test("combo candidates are capped and the selected candidate survives truncation", () => {
-    const targets = Array.from({ length: 12 }, (_, index) => ({
-      provider: index % 2 === 0 ? "a" : "b",
-      model: `m${index}`,
-    }));
-    const config = baseConfig({ combos: { big: { strategy: "failover", targets } } });
-    const route = routeModel(config, "combo/big");
-    const trace = route.routeDecision!;
-    expect(trace.candidates.length).toBeLessThanOrEqual(MAX_TRACE_CANDIDATES);
-    expect(trace.truncated?.candidates).toBe(true);
-    expect(trace.candidates[trace.selected.candidateIndex]).toMatchObject({
-      provider: "a",
-      model: "m0",
-    });
-  });
-
-  test("a selected candidate beyond the cap survives truncation at the last slot", () => {
-    const candidates = Array.from({ length: 12 }, (_, index) => ({
-      provider: "a",
-      model: `m${index}`,
-      eligible: index === 11,
-      exclusions: index === 11 ? [] : [{ code: "not-selected" }],
-    }));
-    const trace = buildRouteDecisionTrace({
-      requestedModel: "combo/big",
-      routeKind: "combo",
-      selected: { provider: "a", model: "m11", reason: "combo-pick", candidateIndex: 11 },
-      candidates,
-    });
-    expect(trace.candidates.length).toBe(MAX_TRACE_CANDIDATES);
-    expect(trace.truncated?.candidates).toBe(true);
-    expect(trace.selected.candidateIndex).toBe(MAX_TRACE_CANDIDATES - 1);
-    expect(trace.candidates[trace.selected.candidateIndex]).toMatchObject({ model: "m11" });
   });
 
   test("the byte-budget fallback keeps the selected candidate and re-points the index", () => {
@@ -378,27 +326,6 @@ describe("route decision traces (RI-01)", () => {
     expect(serialized).not.toContain("baseUrl");
     expect(serialized).not.toContain("https://a.example/v1");
     expect(serialized).not.toContain("prompt");
-  });
-
-  test("trace round-trips through usage.jsonl and request-log hydration", () => {
-    const route = routeModel(baseConfig(), "combo/free");
-    const entry: PersistedUsageEntry = {
-      requestId: "ocx-trace-roundtrip",
-      timestamp: 1700000000000,
-      provider: "combo",
-      model: "combo/free",
-      status: 200,
-      durationMs: 42,
-      usageStatus: "reported",
-      routeDecision: route.routeDecision,
-    };
-    appendUsageEntry(entry);
-    const persisted = readUsageEntries();
-    expect(persisted.length).toBe(1);
-    expect(persisted[0]!.routeDecision).toEqual(route.routeDecision);
-
-    const hydrated = requestLogEntryFromPersistedUsage(persisted[0]!);
-    expect(hydrated.routeDecision).toEqual(route.routeDecision);
   });
 
   test("old JSONL rows without a trace parse unchanged", () => {

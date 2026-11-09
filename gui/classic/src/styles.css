@@ -24,7 +24,6 @@
 @import "./styles-apikeys-workspace.css";
 @import "./styles-codex-set.css";
 @import "./styles-compatibility-matrix.css";
-@import "./styles-remote-workspace.css";
 
 :root {
   /* default: follow the OS; [data-theme] below pins color-scheme so light-dark() obeys it */
@@ -344,15 +343,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
 .sidebar-link:hover { background: var(--accent-soft); color: var(--text); text-decoration: none; }
 .sidebar-link svg { width: 16px; height: 16px; }
 
-/* GitHub row: the label keeps the full-width link affordance, the two circular
-   satellites (star, update) sit at the trailing edge without shrinking the label's
-   hover target. That edge is the sidebar's 10px content inset, not the rail wall, so
-   the orbs stack under the lang chevron and the proxy orbs instead of hanging 10px
-   further out than both. The update orb only exists when an update is available, so the row
-   is one or two circles wide — never a placeholder. */
-.sidebar-github-row { display: flex; align-items: center; gap: 4px; min-width: 0; padding-right: 10px; }
-.sidebar-github-link { flex: 1 1 auto; min-width: 0; }
-.sidebar-github-actions { display: flex; align-items: center; gap: 4px; flex: 0 0 auto; }
 .sidebar-orb {
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;
@@ -364,29 +354,6 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
 .sidebar-orb svg { width: 14px; height: 14px; }
 .sidebar-orb:hover:not(:disabled) { background: var(--accent-soft); color: var(--text); border-color: var(--accent-ring); }
 .sidebar-orb:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
-/* Already starred: a settled state, not a disabled control that looks broken. */
-.sidebar-orb--starred { color: var(--amber); cursor: default; opacity: 1; }
-/* Update pending: the one blue accent in the sidebar, so a waiting release is visible
-   at a glance without shouting like an error state. */
-.sidebar-orb--update {
-  color: var(--blue);
-  border-color: var(--blue);
-  background: var(--blue-soft);
-}
-.sidebar-orb--update:hover:not(:disabled) {
-  color: var(--blue);
-  border-color: var(--blue);
-  background: var(--blue-soft);
-  filter: brightness(1.06);
-}
-/* The dot repeats the "new" signal alongside the accessible name, so the meaning is
-   not carried by color alone. */
-.sidebar-orb-dot {
-  position: absolute; top: 1px; right: 1px;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--blue); border: 1.5px solid var(--rail);
-}
-
 .lang-toggle { display: flex; align-items: center; gap: 9px; padding: 8px 10px; width: 100%; color: var(--muted); font-size: var(--text-control); border-radius: var(--radius-sm); transition: background var(--motion-fast), color var(--motion-fast); position: relative; }
 .lang-toggle:hover { background: var(--accent-soft); color: var(--text); }
 .lang-toggle svg { width: 16px; height: 16px; flex-shrink: 0; }
@@ -777,20 +744,6 @@ a.btn, a.btn:hover { text-decoration: none; }
   flex: 0 0 auto;
   justify-content: flex-end;
 }
-/*
-  Focus anchor for the update dialog, not a control: the visible entry point is the sidebar
-  footer orb, which also reports whether an update is waiting. This keeps `#dashboard/update`
-  openable and gives the dialog somewhere to return focus on close, without painting a second
-  button that does the same thing.
-*/
-.maintenance-update-anchor {
-  width: 0;
-  height: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  overflow: hidden;
-}
 .maintenance-notice { margin: 14px 0 0; align-items: flex-start; }
 /*
   Transient action feedback (sync result, model-apply confirmation, …) as a fixed toast.
@@ -848,24 +801,6 @@ a.btn, a.btn:hover { text-decoration: none; }
 }
 .action-toast-dismiss:hover { color: var(--text); background: color-mix(in srgb, var(--muted) 14%, transparent); }
 .action-toast-dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.update-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.update-row .field-label { margin: 0; }
-.update-empty { padding: 18px; margin-bottom: 14px; }
-.update-box { display: flex; flex-direction: column; gap: 12px; }
-.update-command { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; font-size: var(--text-label); }
-.update-command .chip {
-  max-width: 100%;
-  min-width: 0;
-  flex: 1 1 auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  overflow-wrap: anywhere;
-  line-height: 1.5;
-}
-.update-recheck { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.update-recheck .btn { flex: 0 0 auto; }
-.update-recheck-reason { flex: 1 1 200px; min-width: 0; font-size: var(--text-label); color: var(--muted); }
-.update-restart { border-top: 1px solid var(--border-soft); padding-top: 12px; }
 .injection-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .injection-label { font-weight: var(--weight-semibold); }
 

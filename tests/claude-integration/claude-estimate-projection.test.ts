@@ -21,7 +21,6 @@ import { estimateClaudeRequestTokens, handleClaudeCountTokens, handleClaudeMessa
 import { estimateTokens } from "../../src/lib/token-estimate";
 import { CLAUDE_NATIVE_THINKING, projectClaudeRequest } from "../../src/lib/claude-request-projection";
 import { openAIChatSerializesThinking } from "../../src/adapters/openai-chat/messages";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
@@ -341,8 +340,6 @@ async function comboFailoverFloor(second: {
   preserveReasoningContentModels?: string[];
 }): Promise<{ published: number; secondBodies: Array<Record<string, unknown>> }> {
   setUpIsolatedHome();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   const firstBodies: Array<Record<string, unknown>> = [];
   const first = Bun.serve({
     hostname: "127.0.0.1",
@@ -404,89 +401,6 @@ async function comboFailoverFloor(second: {
   } finally {
     first.stop(true);
     secondServer.stop(true);
-    clearComboSelectionState();
-    clearComboTargetCooldowns();
     restoreIsolatedHome();
   }
 }
-
-test("a combo failover publishes the floor of the target that answered, not the ingress pick", async () => {
-  // The ingress route names the combo's first target; the physical send names whichever target
-  // answered. Those are different bodies when the targets sit on different wires, and a memo read
-  // from the ingress pick prices the wrong one: here target A is a Chat wire that would drop the
-  // replayed thinking entirely, while target B is an Anthropic wire that forwards it verbatim.
-  // A floor left at the ingress pick therefore understates a prompt B really received — the
-  // mirror image of the over-count this file pins, and just as wrong for a context meter.
-  const { published, secondBodies } = await comboFailoverFloor({
-    provider: "b", model: "m2", adapter: "anthropic", frames: ANTHROPIC_SSE_FRAMES,
-  });
-  // B's body is the caller's, replayed thinking and signature included.
-  const forwarded = JSON.stringify(secondBodies[0]!.messages);
-  expect(forwarded).toContain("replayed reasoning");
-  expect(forwarded).toContain("S".repeat(64));
-
-  const nativeWire = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", CLAUDE_NATIVE_THINKING);
-  const chatWire = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", { text: false, signature: false, redacted: false });
-  // The ablation: the ingress pick is the Chat target, whose projection prices this body at a
-  // rounding error next to what B received. Holding the floor above it is what a memo keyed on
-  // the settled wire buys.
-  expect(chatWire).toBeLessThan(nativeWire / 100);
-  expect(published).toBeGreaterThan(chatWire * 20);
-  expect(published).toBeLessThan(nativeWire * 1.5);
-  expect(published).toBeGreaterThan(nativeWire * 0.5);
-}, { timeout: SERVER_BUDGET_MS });
-
-test("a combo failover to a registry provider prices its merged preserve list", async () => {
-  // `preserveReasoningContentModels` is not a config-row field on most providers: it is merged
-  // in from the registry by `routedProviderConfig`. A dispatch that reads the raw row therefore
-  // prices a preserve-listed model as if its reasoning were dropped, which is the under-count
-  // this pair of cases exists to prevent. `moonshot` is a real registry entry whose endpoint a
-  // user may override, so a loopback row reaches the same merge path production does.
-  const { published, secondBodies } = await comboFailoverFloor({
-    provider: "moonshot", model: "kimi-k3", adapter: "openai-chat", frames: CHAT_SSE_FRAMES,
-  });
-  // The merged list is what made the adapter serialize the replayed text at all.
-  const forwarded = JSON.stringify(secondBodies[0]!.messages);
-  expect(forwarded).toContain("reasoning_content");
-  expect(forwarded).toContain("replayed reasoning");
-  // The signature has no Chat representation, so it is the one field the list does not buy.
-  expect(forwarded).not.toContain("S".repeat(64));
-
-  const textKept = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", { text: true, signature: false, redacted: false });
-  const textDropped = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", { text: false, signature: false, redacted: false });
-  expect(textKept).toBeGreaterThan(textDropped * 20);
-  expect(published).toBeGreaterThan(textDropped * 20);
-  expect(published).toBeLessThan(textKept * 1.5);
-  expect(published).toBeGreaterThan(textKept * 0.5);
-}, { timeout: SERVER_BUDGET_MS });
-
-test("a combo target named by alias prices the preserve list under its resolved id", async () => {
-  // A combo target may name a model by alias (`am`), and the Chat adapter resolves that to the
-  // provider's native id before it decides whether the wire serializes replayed thinking — its
-  // preserve list holds native ids, and matching is exact. An attempt that records the alias
-  // therefore reads the preserve list under a name that is not in it, prices the replayed text as
-  // dropped, and understates a prompt the upstream really received. The attempt row has to carry
-  // the id the adapter will actually send, which is what the routing result already holds.
-  const { published, secondBodies } = await comboFailoverFloor({
-    provider: "aliased",
-    model: "am",
-    adapter: "openai-chat",
-    frames: CHAT_SSE_FRAMES,
-    models: ["aliased-model"],
-    modelAliases: { "aliased-model": "am" },
-    preserveReasoningContentModels: ["aliased-model"],
-  });
-  // The wire received the resolved id, and with it the replayed text the preserve list buys.
-  expect(secondBodies[0]!.model).toBe("aliased-model");
-  const forwarded = JSON.stringify(secondBodies[0]!.messages);
-  expect(forwarded).toContain("reasoning_content");
-  expect(forwarded).toContain("replayed reasoning");
-
-  const textKept = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", { text: true, signature: false, redacted: false });
-  const textDropped = estimateClaudeRequestTokens({ messages: COMBO_MESSAGES }, "combo/pair", { text: false, signature: false, redacted: false });
-  expect(textKept).toBeGreaterThan(textDropped * 20);
-  // The alias must not cost the projection the preserve list's verdict.
-  expect(published).toBeGreaterThan(textDropped * 20);
-  expect(published).toBeLessThan(textKept * 1.5);
-  expect(published).toBeGreaterThan(textKept * 0.5);
-}, { timeout: SERVER_BUDGET_MS });

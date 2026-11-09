@@ -21,9 +21,7 @@ import { routeModel } from "../../src/router";
 import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
 import type { RequestLogContext } from "../../src/server/request-log";
 import type { OcxConfig } from "../../src/types";
-import { executeComboResponses } from "../../src/server/responses/core-combo";
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 
 /**
  * The durable spend ledger had no production caller (#4707).
@@ -290,59 +288,6 @@ describe("the request path books every physical send on the durable ledger", () 
     expect(ledger.snapshot("pool", "stale-route")).toBeUndefined();
     expect(ledger.snapshot("root", "fallback-root")?.unresolved).toBe(400);
     expect(ledger.snapshot("root", "fallback-root")?.settled).toBe(400);
-  });
-
-  test.each(["first", "second"])("combo reservations charge the resolved %s provider pool", async next => {
-    const config: OcxConfig = { port: 0, defaultProvider: "first", providers: {
-      first: { adapter: "openai-chat", apiKey: "fixture-first", baseUrl: "https://first.example.test/v1" },
-      second: { adapter: "openai-chat", apiKey: "fixture-second", baseUrl: "https://second.example.test/v1" },
-    }, combos: { spend: { strategy: "failover", targets: [
-      { provider: "first", model: "model-a" }, { provider: next, model: "model-b" },
-    ] } } };
-    const ledger = createSpendReservationLedger({ journal: memoryJournal(), policy: {
-      ...DEFAULT_SPEND_RESERVATION_POLICY, pool: { maxTokens: 500 },
-      poolAliases: { [hashSpendAlias("wiring-fixture", "pool", "first")]: "first", [hashSpendAlias("wiring-fixture", "pool", "second")]: "second" },
-    }, salt: "wiring-fixture" });
-    const logCtx: RequestLogContext = { model: "", provider: "", spendPoolId: "stale-route",
-      usageLogInputTokens: 100, spendOutputCeilingTokens: 300 };
-    const tracker = createRequestSpendTracker(logCtx, "combo-root", ledger);
-    const sendBudget = createRequestExecutionBudget(undefined, "combo-spend", tracker);
-    const translatorBudget = createTranslatorBudget();
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = (() => { throw new Error("unexpected external fetch"); }) as typeof fetch;
-    clearComboSelectionState();
-    clearComboTargetCooldowns();
-    let children = 0;
-    try {
-      const body = { model: "combo/spend", input: [] };
-      const response = await executeComboResponses(new Request("http://localhost/v1/responses", {
-        method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
-      }), body, "spend", config, logCtx, { sendBudget, translatorBudget }, {
-        handleResponses: async (_req, _config, childLog, options) => {
-          children += 1;
-          const reporter = createPhysicalSendReporter(options!.sendBudget!, () => ({ poolId: childLog.spendPoolId,
-            identityId: childLog.accountLogLabel }), options!.comboDispatchPermit);
-          expect(reporter.beforeSend?.()).toBe(true); reporter(1); reporter.close?.();
-          childLog.provider += `-account-${children}`;
-          return children === 1
-            ? Response.json({ error: { message: "fixture outage" } }, { status: 503 })
-            : Response.json({ id: "fixture-response", output: [] });
-        },
-        handleComboResponses: async () => { throw new Error("unexpected nested combo"); },
-      });
-      expect(response.status).toBe(next === "first" ? 503 : 200);
-      expect(children).toBe(next === "first" ? 1 : 2);
-      expect(sendBudget.used).toBe(children);
-      expect(ledger.snapshot("pool", "first")?.reserved).toBe(400);
-      expect(ledger.snapshot("pool", "second")?.reserved).toBe(next === "second" ? 400 : undefined);
-      expect(ledger.snapshot("pool", "combo")).toBeUndefined();
-      expect(ledger.snapshot("pool", "stale-route")).toBeUndefined();
-    } finally {
-      globalThis.fetch = originalFetch;
-      translatorBudget.dispose();
-      clearComboSelectionState();
-      clearComboTargetCooldowns();
-    }
   });
 
   test("a reservation the budget hands back releases its tokens instead of booking spend", () => {

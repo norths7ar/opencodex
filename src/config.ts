@@ -105,7 +105,6 @@ export {
   CODEX_SHIM_AUTO_RESTORE_ENV,
   codexShimAutoRestoreEnabled,
   multiAgentGuidanceEnabled,
-  runtimeRole,
   getDefaultConfig,
   resolveEnvValue,
   applyProxyEnv,
@@ -189,8 +188,6 @@ import {
   warnDegradedUpstreamHostCircuitThreshold,
   warnDegradedPlaintextV2AgentMessages,
   warnDegradedAgentTaskRecovery,
-  warnDegradedRuntimeRole,
-  warnDegradedOptionalRemoteBlocks,
   warnDegradedQuotaResetNotify,
   warnDegradedCatalogAutoRefresh,
   warnDegradedCodexPool,
@@ -249,8 +246,6 @@ function loadConfigUnobserved(): OcxConfig {
       warnDegradedUpstreamHostCircuitThreshold(parsed);
       warnDegradedPlaintextV2AgentMessages(parsed);
       warnDegradedAgentTaskRecovery(parsed);
-      warnDegradedRuntimeRole(parsed);
-      warnDegradedOptionalRemoteBlocks(parsed);
       warnDegradedQuotaResetNotify(parsed);
       warnDegradedCatalogAutoRefresh(parsed);
       warnDegradedCodexPool(parsed);
@@ -285,8 +280,6 @@ function loadConfigUnobserved(): OcxConfig {
       warnDegradedUpstreamHostCircuitThreshold(parsed);
       warnDegradedPlaintextV2AgentMessages(parsed);
       warnDegradedAgentTaskRecovery(parsed);
-      warnDegradedRuntimeRole(parsed);
-      warnDegradedOptionalRemoteBlocks(parsed);
       warnDegradedQuotaResetNotify(parsed);
       warnDegradedCatalogAutoRefresh(parsed);
       warnDegradedCodexPool(parsed);
@@ -315,8 +308,6 @@ function loadConfigUnobserved(): OcxConfig {
         warnDegradedUpstreamHostCircuitThreshold(parsed);
         warnDegradedPlaintextV2AgentMessages(parsed);
         warnDegradedAgentTaskRecovery(parsed);
-        warnDegradedRuntimeRole(parsed);
-        warnDegradedOptionalRemoteBlocks(parsed);
         warnDegradedQuotaResetNotify(parsed);
         warnDegradedCatalogAutoRefresh(parsed);
         warnDegradedCodexPool(parsed);

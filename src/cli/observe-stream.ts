@@ -7,7 +7,7 @@ import { runtimeBaseUrl, type RuntimeApiDeps } from "./runtime-api";
 const POLL_MS = 1_000;
 const REQUEST_MS = 10_000;
 const RESPONSE_BYTES = 32 * 1024 * 1024;
-type ObservationPath = "/api/logs" | "/api/debug/injection-logs" | "/api/companion/settings" | "/api/usage";
+type ObservationPath = "/api/logs" | "/api/debug/injection-logs" | "/api/usage";
 
 export interface ObserveStreamDeps extends RuntimeApiDeps {
   signal?: AbortSignal;
@@ -91,12 +91,6 @@ export async function withObserveStream(
       // Snapshot recovery comes from our observed target, never arbitrary transport text.
       if (context.kind === "snapshot") {
         if (!found) throw new ObservationError("Proxy is not running. Start it with: ocx start");
-        if (found.role === "client") {
-          const { readLinkChildContext, linkChildRefusal } = await import("./link-child");
-          const link = readLinkChildContext();
-          throw new ObservationError(link ? linkChildRefusal(link)
-            : "This listener runs in the client role and has no management API. Run this command on its serving hub, or open the hub dashboard.");
-        }
       }
       return found;
     } }), signal);

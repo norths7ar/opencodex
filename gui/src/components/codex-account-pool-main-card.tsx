@@ -1,51 +1,37 @@
+import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
-import { IconLock, IconPause, IconPlay, IconPlus, IconRefresh } from "../icons";
-import AccountPriorityControl, { AccountPriorityBadge } from "./AccountPriorityControl";
-import AccountAutoSwitchControl from "./AccountAutoSwitchControl";
-import { AccountCreditsToggle, CreditsOnBadge } from "./CodexCreditSpend";
-import CodexCreditsRow from "./CodexCreditsRow";
-import { useI18n } from "../i18n/shared";
-import { CodexPauseToggleLabel, CodexPinnedBadge, CodexTicketBadge } from "./codex-account-pool-helpers";
-import type { CodexAccountEntry, CodexAccountLoadState } from "./codex-account-pool-types";
-import type { CodexAccountModeState } from "../codex-multi-state";
-import type { TFn } from "../i18n/shared";
-import type { MainDeviceReauthState } from "./use-main-device-reauth";
-import { LoginHint } from "./login-url-block";
-import type { NoticeTone } from "../ui";
 import { navigateHash } from "../hash-routing";
 import { hardLockThresholds } from "../hooks/useCodexAccountPool";
-import QuotaBars from "./QuotaBars";
-import { AccountMore, AccountRow, AccountSetting } from "./v2-accounts/account-row";
-import { InlineBanner } from "./v2-accounts/surface";
-import { cn } from "@/lib/utils";
+import type { TFn } from "../i18n/shared";
+import { useI18n } from "../i18n/shared";
+import { IconLock,IconPause,IconPlay,IconPlus,IconRefresh } from "../icons";
 import {
-  doctorCopyButtonLabel,
-  formatOAuthHealthLabel,
-  formatOAuthHealthSummary,
-  oauthHealthBadgeClass,
-  oauthHealthIsCooldown,
-  oauthHealthShowsDoctor,
-  oauthHealthShowsReauth,
+doctorCopyButtonLabel,
+formatOAuthHealthLabel,
+formatOAuthHealthSummary,
+oauthHealthBadgeClass,
+oauthHealthIsCooldown,
+oauthHealthShowsDoctor,
+oauthHealthShowsReauth,
 } from "../oauth-health-display";
+import type { NoticeTone } from "../ui";
+import { CodexPauseToggleLabel,CodexTicketBadge } from "./codex-account-pool-helpers";
+import type { CodexAccountEntry,CodexAccountLoadState } from "./codex-account-pool-types";
+import { AccountCreditsToggle,CreditsOnBadge } from "./CodexCreditSpend";
+import CodexCreditsRow from "./CodexCreditsRow";
+import { LoginHint } from "./login-url-block";
+import QuotaBars from "./QuotaBars";
+import type { MainDeviceReauthState } from "./use-main-device-reauth";
+import { AccountMore,AccountRow,AccountSetting } from "./v2-accounts/account-row";
+import { InlineBanner } from "./v2-accounts/surface";
 
 export function CodexAccountPoolMainCard({
   t,
   main,
   isMainActive,
-  accountModeState,
-  threshold,
-  switchActionLabel,
-  onSwitch,
   onTogglePause,
   pauseUpdatingId,
   pauseBusy,
-  onPriorityChange,
-  priorityUpdatingId,
-  onAutoSwitchThresholdChange,
-  autoSwitchDisabled,
-  switchingId,
-  pinnedId = null,
-  onUnpin,
   onOpenReset,
   onCopyDoctor,
   doctorCopyOutcomeFor,
@@ -61,27 +47,9 @@ export function CodexAccountPoolMainCard({
   creditsVisible?: boolean;
   loading?: boolean;
   isMainActive: boolean;
-  accountModeState: CodexAccountModeState | null;
-  threshold: number;
-  switchActionLabel: string;
-  onSwitch: (entry: CodexAccountEntry) => void;
   onTogglePause: (entry: CodexAccountEntry) => void;
   pauseUpdatingId: string | null;
   pauseBusy: boolean;
-  onPriorityChange: (entry: CodexAccountEntry, priority: number) => void;
-  priorityUpdatingId: string | null;
-  onAutoSwitchThresholdChange: (entry: CodexAccountEntry, threshold: number | null) => Promise<boolean>;
-  autoSwitchDisabled: boolean;
-  /** In-flight manual switch, which writes the same pin an order write clears. */
-  switchingId: string | null;
-  /**
-   * The account carrying the pin, which is not always the one routing is on: the pin caps
-   * selection at its own tier, and under round-robin or fill-first the cursor still moves
-   * within that tier. Badge the account the operator chose, not wherever routing landed.
-   */
-  pinnedId?: string | null;
-  /** Opens the release confirm when the pinned badge is selected again. */
-  onUnpin: (account: CodexAccountEntry) => void;
   onOpenReset: (account: CodexAccountEntry) => void;
   /** Writes the main login's "use credits after limit" switch, shown in its "more" disclosure. */
   onToggleCreditsAfterLimit?: (entry: CodexAccountEntry, enabled: boolean) => void;
@@ -142,7 +110,7 @@ export function CodexAccountPoolMainCard({
       chips={<>
         {!main?.paused && !hardLocked && isMainActive && (
           <span className="badge badge-primary">
-            {t(accountModeState === "direct" ? "codexAuth.poolPrepared" : "codexAuth.nextSession")}
+            {t("prov.accountActive")}
           </span>
         )}
         <span className="badge badge-plan acc-main-tag" title={t("codexAuth.appLogin")}>
@@ -154,9 +122,9 @@ export function CodexAccountPoolMainCard({
             {t("codexAuth.paused")}
           </span>
         )}
-        <AccountPriorityBadge value={mainSwitchEntry.priority} />
+
         <CreditsOnBadge enabled={main?.creditsAfterLimit} />
-        {pinnedId === "__main__" && !main?.paused && <CodexPinnedBadge t={t} onUnpin={() => onUnpin(mainSwitchEntry)} />}
+
         {main && <CodexTicketBadge t={t} account={{ ...main, id: "__main__" } as CodexAccountEntry} onClick={() => onOpenReset({ ...main, id: "__main__" } as CodexAccountEntry)} />}
         {healthLabel && (
           <span className={oauthHealthBadgeClass(main?.health?.status)}>{healthLabel}</span>
@@ -167,11 +135,7 @@ export function CodexAccountPoolMainCard({
         )}
       </>}
       actions={<>
-        {!main?.paused && !hardLocked && (!isMainActive || pinnedId !== "__main__") && !showReauth && !inCooldown && (
-          <button type="button" className="btn btn-ghost btn-sm codex-account-switch" onClick={() => onSwitch(mainSwitchEntry)}>
-            {switchActionLabel}
-          </button>
-        )}
+
         {main && (
           <button
             type="button"
@@ -201,32 +165,8 @@ export function CodexAccountPoolMainCard({
           label={`${t("codexAuth.moreActions")} — ${t("codexAuth.mainAccount")}`}
           title={t("codexAuth.moreActions")}
         >
-          <AccountSetting>
-            <AccountPriorityControl
-              value={mainSwitchEntry.priority}
-              // Derived from the synthesized id rather than hardcoded as "-main": a pool account
-              // may legitimately be named `main` (the id pattern allows it), and that account's
-              // control would then claim the same DOM id, pointing this label at its dropdown.
-              selectId={`codex-account-priority-${mainSwitchEntry.id}`}
-              // Any in-flight order write, not just this card's: order writes share one mutation
-              // ref, so a pick made during another card's write returns "busy" and is dropped
-              // silently. Mirrors pauseBusy. A pending switch counts too — it writes the same
-              // pin this clears, so the controller refuses to overlap them, just as silently.
-              disabled={priorityUpdatingId !== null || switchingId !== null}
-              onChange={(priority) => onPriorityChange(mainSwitchEntry, priority)}
-            />
-          </AccountSetting>
-          <AccountSetting>
-            <AccountAutoSwitchControl
-              key={mainSwitchEntry.id}
-              accountLabel={mainSwitchEntry.email}
-              globalThreshold={threshold}
-              override={mainSwitchEntry.autoSwitchThresholdOverride}
-              inputId={`codex-account-auto-switch-${mainSwitchEntry.id}`}
-              disabled={autoSwitchDisabled}
-              onChange={(next) => onAutoSwitchThresholdChange(mainSwitchEntry, next)}
-            />
-          </AccountSetting>
+
+
           {main.hasCredential && onToggleCreditsAfterLimit && (
             <AccountSetting>
               <AccountCreditsToggle
@@ -309,10 +249,9 @@ export function CodexAccountPoolMainCard({
       )}
       {!showReauth && !inCooldown && (
         <div className="acc-row__meters">
-          <QuotaBars
+          <QuotaBars threshold={0}
             quota={main?.quota ?? null}
             plan={main?.plan}
-            threshold={mainSwitchEntry.autoSwitchThresholdOverride ?? threshold}
             t={t}
             pending={main != null && main.quota == null && (loading || !showCredits)}
             afterWeekly={showCredits && !loading ? <CodexCreditsRow credits={main?.credits} t={t} locale={locale} /> : undefined}
@@ -327,12 +266,10 @@ export function CodexAccountPoolPageHead({
   t,
   embedded,
   refreshingQuota,
-  pausingExhausted,
   pauseBusy,
   actionFeedback,
   actionFeedbackTone,
   onRefresh,
-  onPauseExhausted,
   creditsVisible,
   creditsBusy,
   onToggleCredits,
@@ -347,12 +284,10 @@ export function CodexAccountPoolPageHead({
   /** The global "use credits" switch, rendered beside the credits display switch. */
   creditSpendControl?: ReactNode;
   refreshingQuota: boolean;
-  pausingExhausted: boolean;
   pauseBusy?: boolean;
   actionFeedback?: string | null;
   actionFeedbackTone?: NoticeTone | null;
   onRefresh: () => void;
-  onPauseExhausted: () => void;
 }) {
   return (
     <div
@@ -391,10 +326,8 @@ export function CodexAccountPoolPageHead({
           <CodexAccountPoolActionButtons
             t={t}
             refreshingQuota={refreshingQuota}
-            pausingExhausted={pausingExhausted}
             pauseBusy={pauseBusy}
             onRefresh={onRefresh}
-            onPauseExhausted={onPauseExhausted}
           />
         )}
       </div>
@@ -406,33 +339,21 @@ export function CodexAccountPoolPageHead({
 export function CodexAccountPoolActionButtons({
   t,
   refreshingQuota,
-  pausingExhausted,
   pauseBusy,
   onRefresh,
-  onPauseExhausted,
 }: {
   t: TFn;
   refreshingQuota: boolean;
-  pausingExhausted: boolean;
   pauseBusy?: boolean;
   onRefresh: () => void;
-  onPauseExhausted: () => void;
 }) {
   return (
     <>
       <button
         type="button"
         className="btn btn-sm btn-ghost codex-auth-action-btn"
-        onClick={onPauseExhausted}
-        disabled={refreshingQuota || pausingExhausted || !!pauseBusy}
-      >
-        <IconPause width={14} /> {pausingExhausted ? t("codexAuth.pausingExhausted") : t("codexAuth.pauseExhausted")}
-      </button>
-      <button
-        type="button"
-        className="btn btn-sm btn-ghost codex-auth-action-btn"
         onClick={onRefresh}
-        disabled={refreshingQuota || pausingExhausted || !!pauseBusy}
+        disabled={refreshingQuota || !!pauseBusy}
       >
         <span className={cn("inline-flex", refreshingQuota && "animate-spin")}><IconRefresh width={14} /></span> {refreshingQuota ? t("codexAuth.refreshingQuota") : t("codexAuth.refreshQuota")}
       </button>
@@ -447,10 +368,8 @@ export function CodexAccountPoolActionButtons({
 export function CodexAccountPoolActions(props: {
   t: TFn;
   refreshingQuota: boolean;
-  pausingExhausted: boolean;
   pauseBusy?: boolean;
   onRefresh: () => void;
-  onPauseExhausted: () => void;
 }) {
   return (
     <div className="codex-auth-actions-row">
@@ -484,7 +403,7 @@ export function CodexAccountPoolLoadStates({
             <span className="acc-skel h-4 w-16 rounded-full" />
           </div>
           <div className="acc-row__meters">
-            <QuotaBars quota={null} threshold={0} t={t} pending />
+            <QuotaBars threshold={0} quota={null} t={t} pending />
           </div>
         </div>
         <span className="sr-only">{t("pws.accountsLoading")}</span>
@@ -517,7 +436,7 @@ export function CodexAccountPoolLoadStates({
 export function CodexAccountPoolAddButton({ t, onAdd }: { t: TFn; onAdd: () => void }) {
   return (
     <button type="button" className="btn btn-ghost btn-sm acc-add-btn" onClick={onAdd}>
-      <IconPlus width={14} /> {t("codexAuth.add")}
+      <IconPlus width={14} /> {t("prov.login")}
     </button>
   );
 }

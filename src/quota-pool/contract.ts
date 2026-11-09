@@ -13,7 +13,7 @@ export type QuotaPoolWindowKind = "burst_5h" | "daily" | "weekly" | "monthly" | 
 export type QuotaPoolSource = "measured" | "header" | "estimated";
 export type QuotaPoolUnit = "requests" | "tokens" | "credits" | "usd";
 export type QuotaPoolAccountState = "available" | "exhausted" | "paused" | "reauth" | "unknown";
-export type QuotaPoolRole = "standalone" | "hub" | "client";
+export type QuotaPoolRole = "standalone";
 
 export interface QuotaPoolWindow {
   id: string;

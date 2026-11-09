@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CLIENT_MARKS, CLIENTS, MONOCHROME_CLIENT_MARKS } from "../src/components/apikeys-workspace/client-config-clients";
 
-const PUBLIC_DIR = join(import.meta.dir, "..", "public");
+const PUBLIC_DIR = join(import.meta.dir, "../public");
 
 /** Every literal color a mark paints with, lowercased; `currentColor` is not one. */
 function inksOf(body: string): Set<string> {

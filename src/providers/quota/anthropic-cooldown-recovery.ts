@@ -1,5 +1,3 @@
-import { boundDecisionWindows } from "../quota-decision-publication";
-import { decisionQuotaSinkActive, publishDecisionAccountQuota } from "../../lib/decision-quota-sink";
 import { mergeAnthropicFamilyWindows, hasAnthropicFamilyEnumeration } from "./anthropic-family-headers";
 import { getCachedProviderAccountQuota, captureProviderAccountQuotaEpoch } from "./account-cache";
 import { anthropicModelQuotaFor } from "../../oauth/anthropic-model-quota";
@@ -24,7 +22,6 @@ export type AnthropicQuotaRecoveryResult = Readonly<{
   instance: AnthropicInstanceId;
   quota: ProviderQuota;
   /** Publishes secret-free advisory evidence for the primary pool only; a no-op for Pool 2. */
-  publishDecisionQuota(): void;
   /** Must be checked synchronously at each publication boundary. */
   isCurrent(): boolean;
 }>;
@@ -195,14 +192,6 @@ function createAnthropicCooldownRecovery(instance: AnthropicInstanceId) {
       instance,
       quota,
       isCurrent,
-      publishDecisionQuota: () => {
-        // Activation first: ownership validation reads the auth store and must not run for signals-off installs.
-        if (instance !== "anthropic" || !decisionQuotaSinkActive() || !isCurrent()) return;
-        // An unbound probe result was parsed while inactive: unknown, never display fallback.
-        const windows = boundDecisionWindows(rawQuota);
-        if (windows) publishDecisionAccountQuota("anthropic", accountId, probe.generation,
-          windows.filter(row => ownsFamily || ["5h", "weekly", "monthly"].includes(row.window)), !authoritative);
-      },
     };
   }
 

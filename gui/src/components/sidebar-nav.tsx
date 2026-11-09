@@ -11,7 +11,7 @@ import type { Page } from "../app-routing";
 import type { TFn } from "../i18n/shared";
 import { IconChevron, IconSearch, IconX } from "../icons";
 import { NAV_GROUPS, NAV_TIERS, type NavGroup, type NavGroupId, type NavTier } from "../nav-groups";
-import { isEditableTarget, numberModifierHeld, searchShortcutLabel, settingsShortcutLabel, shortcutLabel, shortcutStyle } from "../lib/nav-shortcuts";
+import { isEditableTarget, numberModifierHeld, searchShortcutLabel, shortcutLabel, shortcutStyle } from "../lib/nav-shortcuts";
 
 const ADVANCED_OPEN_KEY = "ocx-nav-advanced-open";
 /** The tier that folds. Everything in it stays reachable through search and the active row. */
@@ -34,7 +34,7 @@ interface SearchEntry {
   haystack: string;
 }
 
-export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate, onReveal, desktopShell, t }: {
+export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate, onReveal, t }: {
   activeGroupId: NavGroupId | null;
   pageLabel: (page: Page) => string;
   /** Search offers only pages that can load now (Remote Workspace needs a hub). */
@@ -42,10 +42,9 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
   onNavigate: (page: Page) => void;
   /** Make the sidebar visible (expand a collapsed rail, open the phone drawer) before focusing search. */
   onReveal: () => void;
-  desktopShell: boolean;
   t: TFn;
 }) {
-  const style = useMemo(() => shortcutStyle(desktopShell), [desktopShell]);
+  const style = shortcutStyle();
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [highlight, setHighlight] = useState(0);
@@ -160,16 +159,10 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
         openSearch();
         return;
       }
-      // Settings live under the platform's settings shortcut in the desktop app.
-      if (desktopShell && (style === "desktop-mac" ? event.metaKey : event.ctrlKey) && !event.altKey && !event.shiftKey && event.key === ",") {
-        event.preventDefault();
-        onNavigate("advanced");
-        return;
-      }
       const digit = /^Digit([1-9])$/.exec(event.code)?.[1];
-      if (!digit || !numberModifierHeld(style, event)) return;
+      if (!digit || !numberModifierHeld(event)) return;
       // Option+digit types a character on a Mac; leave text fields alone in the browser.
-      if (style.startsWith("browser") && isEditableTarget(event.target)) return;
+      if (isEditableTarget(event.target)) return;
       const group = daily[Number(digit) - 1];
       if (!group) return;
       event.preventDefault();
@@ -177,7 +170,7 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [daily, desktopShell, onNavigate, openSearch, searching, style]);
+  }, [daily, onNavigate, openSearch, searching, style]);
 
   const onDialogKey = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.nativeEvent.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -306,7 +299,7 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
               <span className="nav-tier-label">{t(tierKey)}</span>
               <IconChevron aria-hidden="true" className="nav-tier-chevron" />
             </button>
-            {visible.map(group => row(group, desktopShell && group.id === "advanced" ? settingsShortcutLabel(style) : null))}
+            {visible.map(group => row(group, null))}
           </div>
         );
       })}

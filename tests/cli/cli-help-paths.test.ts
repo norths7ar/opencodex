@@ -120,16 +120,6 @@ describe("explicit CLI help paths", () => {
     expect(output).not.toContain("Parent help:");
   });
 
-  test("route family help names combo and policy and retains policy topic links", () => {
-    const result = help(["route", "--help"]);
-    expect(result.status).toBe(0);
-    expect(result.stderr).toBe("");
-    expect(result.stdout).toContain("Usage: ocx route <combo|policy> <subcommand>");
-    expect(result.stdout).toContain("Manage combo routing and routing profiles.");
-    expect(result.stdout).toContain("ocx help route policy list");
-    expect(result.stdout).not.toContain("combo is currently the supported routing resource");
-  });
-
   test("restart help distinguishes verified restart, newer-CLI restrictions and ensure fallback", () => {
     const result = help(["restart", "--help"]);
     expect(result.status).toBe(0);

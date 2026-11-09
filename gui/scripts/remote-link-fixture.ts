@@ -4,7 +4,7 @@ import { join, normalize } from "node:path";
 
 const portFlag = Bun.argv.indexOf("--port");
 const port = portFlag >= 0 ? Number(Bun.argv[portFlag + 1]) : 5199;
-const root = join(import.meta.dir, "..", "dist");
+const root = join(import.meta.dir, "../dist");
 const json = (value: unknown, init: ResponseInit = {}) => Response.json(value, { headers: { "cache-control": "no-store", ...init.headers }, ...init });
 const standaloneFixtures = new Set(["standalone", "standalone-find-home", "standalone-joining", "standalone-join-failure", "standalone-restart-waiting"]);
 const status = (fixture: string) => {

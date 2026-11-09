@@ -176,19 +176,4 @@ describe("blocked-model redirect compatibility and provider changes", () => {
     const prototypeKey = JSON.parse('{"__proto__":"google/g1"}') as Record<string, string>;
     expect(routeModel(config(prototypeKey), "__proto__")).toMatchObject({ providerName: "openai", modelId: "__proto__" });
   });
-
-  test("policy trace and combo reason describe a redirected physical destination", () => {
-    const configured: OcxConfig = {
-      ...config({ m1: "google/g1" }),
-      routingProfiles: { fast: { candidates: [{ provider: "openai", model: "m1" }, { provider: "google", model: "g1" }] } },
-      combos: { quick: { alias: "quick-combo", strategy: "failover", targets: [{ provider: "openai", model: "m1" }] } },
-    };
-    const policy = routeModel(configured, "policy/fast");
-    expect(policy).toMatchObject({ providerName: "google", modelId: "g1", routeKind: "policy", routeReason: "blocked-model-redirect" });
-    expect(policy.routeDecision?.selected).toMatchObject({ provider: "google", model: "g1", reason: "blocked-model-redirect" });
-    expect(policy.routeDecision?.candidates[0]).toMatchObject({ provider: "openai", model: "m1" });
-    const combo = routeModel(configured, "quick-combo");
-    expect(combo).toMatchObject({ providerName: "google", modelId: "g1", routeKind: "combo", routeReason: "blocked-model-redirect" });
-    expect(combo.routeDecision?.selected).toMatchObject({ provider: "google", model: "g1", reason: "blocked-model-redirect" });
-  });
 });

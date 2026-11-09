@@ -82,8 +82,7 @@ test("fresh routed rows do not inherit a previously ordered native template's gu
       reasoningEfforts: ["high", "xhigh"], defaultReasoningEffort: "xhigh",
     })),
     featured, modelPickerOrder: order,
-    wsEnabled: false, multiAgentMode: "v2", multiAgentV2Enabled: true,
-    exactComboSlugs: new Set(), accountSelectors: [],
+    wsEnabled: false, multiAgentMode: "v2", multiAgentV2Enabled: true, accountSelectors: [],
     suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
   });
 
@@ -130,8 +129,7 @@ test.each([
     const fresh = (modelPickerOrder: readonly string[], featured: readonly string[] = []) => buildCatalogEntriesFromObservedState({
       template: null, gptSlugs: [],
       goModels: [{ id: modelId, provider: "opencode-go", displayName: "GLM 5.3", reasoningEfforts: ["high", "max"] }],
-      featured, modelPickerOrder, wsEnabled: false, multiAgentMode: "default",
-      exactComboSlugs: new Set(), accountSelectors, suppressedBareNativeSlugs: new Set(),
+      featured, modelPickerOrder, wsEnabled: false, multiAgentMode: "default", accountSelectors, suppressedBareNativeSlugs: new Set(),
       disabledNativeAccountSlugs: new Set(), multiAgentV2Enabled: false,
     });
     const merge = (catalogModels: Record<string, unknown>[], routedEntries: Record<string, unknown>[], modelPickerOrder: readonly string[], degraded: boolean, featured: readonly string[] = []) =>
@@ -141,8 +139,7 @@ test.each([
         template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
         gatheredProviderNames: new Set(["opencode-go"]),
         degradedProviderNames: new Set(degraded ? ["opencode-go"] : []),
-        legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false,
-        exactComboSlugs: new Set(), hasPhysicalComboProvider: false, includeNativeOpenAi: true,
+        legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: true,
         accountBoundEntries: [],
         policy: { ...CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, warningPolicy: "suppress" },
       });
@@ -451,7 +448,7 @@ test("public catalog wrapper applies saved full order while preserving guidance 
   const routed = ["a", "b", "c", "d", "e", "f"].map(id => ({ provider: "p", id }));
   const featured = ["p/a", "p/b", "p/c", "p/d", "p/e"];
   const build = (order: string[]) => buildCatalogEntries(
-    null, ["gpt-5.5"], routed, featured, false, "default", new Set(), [],
+    null, ["gpt-5.5"], routed, featured, false, "default", [],
     new Set(), new Set(), undefined, undefined, undefined, false, order,
   );
   const natural = build([]);

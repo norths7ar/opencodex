@@ -12,14 +12,9 @@ export function ProviderKeyPacing({ value, onChange, status = [] }: {
     const keys = { ...value.keys };
     if (!raw.trim()) delete keys[field];
     else keys[field] = Number(raw);
-    onChange({ ...value, keys: Object.keys(keys).length ? keys : undefined });
+    onChange({ ...value, keySelection: "active", keys: Object.keys(keys).length ? keys : undefined });
   };
   return <>
-    <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.keySelection")}</span>
-      <select className="input" value={value.keySelection ?? "active"} onChange={event => onChange({ ...value, keySelection: event.target.value as "active" | "round-robin" })}>
-        <option value="active">{t("pws.keyActive")}</option><option value="round-robin">{t("pws.keyRoundRobin")}</option>
-      </select>
-    </label>
     <h4>{t("pws.keyLimits")}</h4>
     <div className="pwi-key-limits" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
       {(["requestsPerMinute", "minIntervalMs", "maxConcurrentRequests"] as const).map((field, index) => <label key={field} className="pwi-settings-field" style={{ flex: "1 1 160px", minWidth: 0 }}>

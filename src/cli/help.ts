@@ -44,7 +44,6 @@ Usage:
   ocx uninstall               Remove service/shim/config and restore native Codex (alias: remove)
   ocx service [sub]           Run as a background service (default: install if absent, otherwise repair)
   ocx codex-shim <sub>        Auto-start proxy when \`codex\` launches (install|status|uninstall|remove)
-  ocx tray <sub>              Windows status tray (install|start|stop|status|uninstall)
   ocx ensure                  Ensure the proxy is running and Codex config/cache are current
   ocx connect <url>           Connect this machine to a remote OpenCodex hub (credential via stdin)
   ocx remote-workspace <sub>  Pair/run an OCX-only remote execution computer
@@ -68,7 +67,6 @@ Usage:
   ocx hub invite [--json]     Print a ready-to-run \`ocx connect\` line for one more machine
                               (hub only; see \`ocx help hub\` for the one-port topology)
   ocx link <sub>              Machine links over SSH (port|issue|revoke|status)
-  ocx update [--tag <tag>]    Update opencodex (keeps preview installs on @preview)
   ocx restart                  Stop and restart the proxy
   ocx v2 <sub>                multi_agent_v2 surface (status|on|off|mode|keep-native-v1|threads|mode-hint)
   ocx health [--json]          Check proxy health (exit 0=healthy, 1=not)
@@ -79,14 +77,13 @@ Usage:
   ocx account <sub>           Accounts, login/reauth, key pools, and quota controls
   ocx models <sub>            Live/custom models, visibility, context, and shadow calls
   ocx alias <sub>             Short names for providers and models (list, set, rm, defaults)
-  ocx combo <sub>             Combo routing strategies and failover
   ocx agent <sub>             Subagents, injection, effort caps, and sidecars
   ocx message <sub>           Codex queued messages, explicit SSH peers and foreground ownership
   ocx effort [sub]            Inspect and configure reasoning effort caps and defaults
   ocx fallback <sub>          Turn model or provider fallback off per scope; per-device local fallback
   ocx observe <sub>           Logs, usage, storage, memory, and debug data
   ocx inspect <sub>           Effective config, catalog, analytics, pacing, client-config
-  ocx route <sub>             Routing features (combo, policy)
+  ocx route <sub>             Routing profiles
   ocx logs [filters]          Alias of ocx observe logs
   ocx usage [--range <today|1d|7d|30d|all>] [--provider <name>] [--model <id>] [--top <1-1000>]
                               Token and estimated-cost report (alias of ocx observe usage)
@@ -98,13 +95,10 @@ Usage:
   ocx export --client <id>    Print a client config wired to the running proxy (${EXPORT_CLIENT_IDS.length} clients)
   ocx integration client <sub> Enable, disable, inspect or roll back a client integration
   ocx grok <sub>              Grok Build model selection and apply
-  ocx system <sub>            Runtime settings, startup, sync, OpenCodex updates, and Codex CLI inspection
+  ocx system <sub>            Runtime settings, startup, client synchronization, and diagnostics
   ocx config [sub]            Validated configuration show/get/set/import/export
-  ocx advisor <status|on|off|set|consent>  Advisor sidecar settings and context-sharing consent
   ocx companion <show|set|reset>  Menu-bar and widget companion usage settings
-  ocx lab <sub>               Inspect Lab evidence and control local automation
   ocx codex-provider <sub>    Confirm custom Codex provider routing: status|allow|revoke
-  ocx chatgpt <sub>          Experimental app-server shim: launch|restore|status (macOS)
   ocx claude [args...]        Launch Claude Code wired to the proxy (model discovery on)
   ocx claude desktop [sub]    Manage and apply Claude Desktop's four-family profile
   ocx codex [args...]         Launch Codex through the proxy's routing (pass-through when disabled)

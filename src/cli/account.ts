@@ -1,27 +1,18 @@
-/** `ocx account` — list and switch provider credentials (issue #180). */
+/** `ocx account` — inspect and manage each provider channel's credential. */
 import { apiKeyQuotaText } from "./account-key-quota";
 import { redactSecretArgs } from "./secret-args";
 import { emptyAccountNextAction, recoveryAccountLabel } from "./account-next-actions";
 import { loadConfig } from "../config";
-import { explainCodexUseOutcome, reportCodexAccountTargetError, resolveCodexUseTarget } from "./account-target";
-import { providerCodexAccountMode } from "../providers/registry";
 import type { OcxConfig } from "../types";
 import {
   cmdAddKey,
   cmdAlias,
-  cmdAutoSwitch,
   cmdClearCooldown,
-  cmdImport,
   cmdPause,
-  cmdPauseExhausted,
-  cmdPriority,
   cmdRefresh,
   cmdRemove,
-  cmdSticky,
-  cmdRoutes,
-  cmdStrategy,
 } from "./account-extended";
-import { accountClassificationConfig, apiError, apiJson, classifyAccount, fetchRows, proxyUnreachable, resolveBaseUrl, type AccountDeps, type AccountRow, type AccountType, type ApiResult }
+import { apiError, apiJson, classifyAccount, fetchRows, proxyUnreachable, resolveBaseUrl, type AccountDeps, type AccountRow, type AccountType }
   from "./account-api";
 
 export { classifyAccount } from "./account-api";
@@ -30,62 +21,31 @@ type TargetProvenance = "live-oauth-list" | "config" | "codex";
 
 const MAIN_ALIAS = "main";
 const MAIN_CODEX_ID = "__main__";
-/**
- * Replacement-style single-slot OAuth (no stable identity; not HTTP-derivable).
- *
- * Empty since `d82b3049d` gave Kiro a quota-aware account pool: multiple Kiro accounts are
- * stored under multiauth, ranked by remaining headroom in `rankAccountsByHeadroom`, and
- * rotated on 429 by the generic OAuth failover path, which does not exclude Kiro. Printing a
- * "single login slot" note alongside a list of several pooled accounts told operators the
- * opposite of what the runtime does.
- *
- * Kept as a named seam rather than deleted: the replacement-style shape is a real category,
- * and a future provider without stable per-account identity belongs here.
- */
-const REPLACEMENT_STYLE_OAUTH = new Set<string>();
-
 const ACCOUNT_USAGE = `Usage:
   ocx account list [provider] [--json] [--all] [--quota [--refresh]]
-  ocx account history openai <pool-account-id> [--limit <1-200>] [--json]
+  ocx account history openai <account-id> [--limit <1-200>] [--json]
   ocx account current <provider> [--json]
-  ocx account use <provider> <account-or-key-id|alias|main|auto> [--json]
-  ocx account clear <provider> [--json]
   ocx account refresh <provider> [--json]
-  ocx account auto-switch <provider> <on|off|status|threshold <0-100>> [--json]
-  ocx account auto-switch <anthropic|anthropic2> <on|off|status|inherit|threshold <0-100>> --account <id> [--json]
   ocx account alias <provider> <account-or-key-id|alias> <display-name|-> [--json]
-  ocx account preserve-signed-in openai [on|off|status] [--apply-to-bound] [--json]
-  ocx account priority <provider> <account-id|alias|main> [<-100..100|first|earlier|normal|later|last|reset>] [--json]
   ocx account pause <provider> <account-id|alias|main> [--json]
   ocx account resume <provider> <account-id|alias|main> [--json]
-  ocx account reset-affinity <anthropic|anthropic2> [--json]
-  ocx account pause-exhausted <provider> [--json]
-  ocx account strategy <provider> [<quota|round-robin|fill-first|least-loaded|reset-first>] [--json]
-  ocx account sticky <provider> [<1-100>] [--json]
-  ocx account routes <anthropic|anthropic2> [--file <json-file>|--clear] [--json]
   ocx account remove <provider> <account-or-key-id|alias|main> --yes [--json]
   ocx account clear-cooldown <provider> <account-id|alias|main> [--json]
   ocx account add-key <provider> [--label <label>] [--json]
-  ocx account import <provider> --format <format> (--file <path>|--stdin) [--json]
-  ocx account import-orca --source <orca-data-directory> --registry <orca-data.json> [--apply] [--json]
   ocx account login <provider> [--id <account-id>] [--reauth] [--open-browser on|off] [--add-account on|off] [--code -] [--no-wait] [--json]
-  ocx account pool <provider> [--enabled on|off] [--threshold N] [--strategy NAME] [--sticky N] [--quota-window W] [--json]
-  ocx account credits openai <ID on|off|--all on|off> [--json]
-  ocx account use-remaining openai <ID|main> <on|off|status> [--json]
+  ocx account credits openai <id|alias|main> <on|off> [--json]
   ocx account quota-activation openai ID --window fiveHour|weekly <on|off> [--json]
   ocx account anthropic-reset-grants [ID] [--provider anthropic|anthropic2] [--json]
   ocx account code <provider> [--flow <flow-id>] [--json]   (reads the code from stdin)
   ocx account cancel <provider> [--flow <flow-id>] [--json] (--flow required for codex)
   ocx account reset-credits <account-id|main> [--consume --yes] [--json]
   ocx account grok-reset-coupons [<account-id>] [--consume --yes] [--token-id <token-id>] [--json]
-  ocx account main <doctor|list|register|add|reauth|switch|recover> ...
+  ocx account reauth <provider> [--id <account-id>] [--device] [--code -] [--no-wait] [--json]
+  ocx account main reauth --device [--no-wait] [--json]
+  ocx account main reauth <status|cancel> --flow <id> [--json]
 
-List and switch provider accounts and API-key pools (masked output only).
-'main' selects the Codex App login for the openai account pool; 'auto' clears the
-selection so the pool places work by its own strategy — unless an account actually
-carries that id, which wins, so 'ocx account clear' is the spelling that always
-clears. A Codex account can be named by the alias set with 'ocx account alias'
-wherever an id is accepted.`;
+Each provider channel uses one account or API key. Configure separate channels to keep separate credentials.
+Use ocx logout <provider> to remove a stored OAuth login.`;
 
 function consumeFlag(args: string[], flag: string): boolean {
   const idx = args.indexOf(flag);
@@ -117,30 +77,15 @@ function displayId(id: string): string {
 
 function statusText(row: AccountRow): string {
   const parts: string[] = [];
-  // `paused` leads, and does NOT replace `selected`. A paused-but-selected account is the
-  // state an operator most needs named -- requests route to it while the pool believes it is
-  // held out -- so printing only one of the two would hide exactly the confusing case (#2703).
   if (row.paused) parts.push(row.pauseDetails ? `paused(${row.pauseDetails.reason})` : "paused");
-  if (row.active) parts.push(row.type === "codex" ? "selected" : "active");
+  if (row.active) parts.push("active");
   if (row.needsReauth && !(row.provider === "kiro" && row.skipReason === "needs_reauth")) {
     parts.push(row.needsReauthReason === "verify_account" ? "needs-reauth(verify)" : "needs-reauth");
   }
-  // A paused Kiro row already says "paused"; repeating it as a skip reason adds nothing.
-  if (row.provider === "kiro" && row.autoSelectable === false && !(row.paused && row.skipReason === "paused"))
-    parts.push(row.skipReason ? `not-auto-selected(${row.skipReason})` : "not-auto-selected");
   if (row.validationPending) parts.push("validation-pending");
   if (row.health && row.health !== "Healthy" && !row.needsReauth && !row.validationPending) parts.push(row.health.toLowerCase());
   if (row.creditsAfterLimit === true) parts.push("paid-credits: on");
-  if (row.selectionExcludedReason === "plan_excluded") {
-    parts.push(`not-auto-selected(plan=${row.selectionExcludedPlan ?? row.plan ?? "unknown"})`);
-  }
   return parts.join(" ");
-}
-
-/** Signed so the sort direction reads off the column; "-" where ordering does not apply. */
-function priorityText(row: AccountRow): string {
-  if (row.priority === undefined) return "-";
-  return row.priority > 0 ? `+${row.priority}` : String(row.priority);
 }
 
 /**
@@ -165,7 +110,7 @@ function quotaText(row: AccountRow): string {
 }
 
 export function formatAccountTable(rows: AccountRow[], withQuota = false): string {
-  const header = ["PROVIDER", "TYPE", "ID", "PLAN/LABEL", "PRIORITY", "STATUS"];
+  const header = ["PROVIDER", "TYPE", "ID", "PLAN/LABEL", "STATUS"];
   if (withQuota) header.push("QUOTA");
   const data = rows.map(r => {
     const keyLabel = r.masked && r.label !== r.masked ? `${r.masked} (${r.label})` : r.masked;
@@ -174,7 +119,6 @@ export function formatAccountTable(rows: AccountRow[], withQuota = false): strin
       r.type,
       displayId(r.id),
       r.type === "api-key" ? keyLabel ?? "-" : r.label ?? "-",
-      priorityText(r),
       statusText(r),
     ];
     if (withQuota) cols.push(quotaText(r));
@@ -202,12 +146,7 @@ async function cmdList(rest: string[], deps: AccountDeps): Promise<number> {
     console.error(ACCOUNT_USAGE);
     return 1;
   }
-  const classification = await accountClassificationConfig(deps, deps.loadConfigImpl?.() ?? loadConfig());
-  if ("error" in classification) {
-    console.error(`Error: ${classification.error}`);
-    return 1;
-  }
-  const config = classification.config;
+  const config = (deps.loadConfigImpl?.() ?? loadConfig());
   const baseUrl = await resolveBaseUrl(deps);
   if (!baseUrl) return proxyUnreachable();
 
@@ -264,15 +203,7 @@ async function cmdList(rest: string[], deps: AccountDeps): Promise<number> {
       continue;
     }
     rows.push(...r.rows);
-    if (t.type === "codex") {
-      if (r.activeId === null) notes.push("openai: auto (no pin — lowest-usage account is selected per request)");
-      if (providerCodexAccountMode("openai", config.providers?.openai) === "direct") {
-        notes.push("openai is in direct mode — the selection takes effect when pool mode is enabled");
-      }
-    }
-    if (t.type === "oauth" && REPLACEMENT_STYLE_OAUTH.has(t.name)) {
-      notes.push(`${t.name}: single login slot — re-login replaces the current account`);
-    }
+
   }
 
   if (rows.length === 0 && !name) notes.push("No stored accounts or keys.", emptyAccountNextAction());
@@ -297,12 +228,7 @@ async function cmdCurrent(rest: string[], deps: AccountDeps): Promise<number> {
     console.error(ACCOUNT_USAGE);
     return 1;
   }
-  const classification = await accountClassificationConfig(deps, deps.loadConfigImpl?.() ?? loadConfig());
-  if ("error" in classification) {
-    console.error(`Error: ${classification.error}`);
-    return 1;
-  }
-  const config = classification.config;
+  const config = (deps.loadConfigImpl?.() ?? loadConfig());
   const c = classifyAccount(config, name);
   if ("error" in c) {
     console.error(`Error: ${c.error}. Known candidates: ${candidateNames(config)}`);
@@ -320,153 +246,24 @@ async function cmdCurrent(rest: string[], deps: AccountDeps): Promise<number> {
       provider: name,
       type: c.type,
       activeId: r.activeId,
-      autoSwitchThreshold: r.autoSwitchThreshold,
       account: activeRow,
     }, null, 2));
     return 0;
   }
   if (activeRow) {
     console.log(formatAccountTable([activeRow]));
-  } else if (c.type === "codex" && r.activeId === null) {
-    console.log("openai: auto (no pin — lowest-usage account is selected per request)");
   } else {
     console.log(`${name}: no active account or key`);
   }
   return 0;
 }
 
-async function cmdUse(rest: string[], deps: AccountDeps): Promise<number> {
-  const wantsJson = consumeFlag(rest, "--json");
-  const name = rest.shift();
-  const id = rest.shift();
-  const leftover = leftoverArgsError(rest);
-  if (!name || !id || leftover) {
-    if (leftover) console.error(leftover);
-    console.error(ACCOUNT_USAGE);
-    return 1;
-  }
-  // #6957: an account change on a link Child is refused before any Home read.
-  if (!deps.baseUrl) {
-    const refusal = (await import("./link-child")).linkChildProviderChangeRefusal("ocx account use");
-    if (refusal) {
-      console.error(`Error: ${refusal}`);
-      return 1;
-    }
-  }
-  const classification = await accountClassificationConfig(deps, deps.loadConfigImpl?.() ?? loadConfig());
-  if ("error" in classification) {
-    console.error(`Error: ${classification.error}`);
-    return 1;
-  }
-  const config = classification.config;
-  const c = classifyAccount(config, name);
-  if ("error" in c) {
-    console.error(`Error: ${c.error}. Known candidates: ${candidateNames(config)}`);
-    return 1;
-  }
-  const baseUrl = await resolveBaseUrl(deps);
-  if (!baseUrl) return proxyUnreachable();
-
-  let res: ApiResult;
-  let activeId: string | null;
-  if (c.type === "codex") {
-    const target = await resolveCodexUseTarget(deps, baseUrl, id);
-    if ("networkDown" in target) return proxyUnreachable(target.transportError);
-    if ("error" in target) return reportCodexAccountTargetError(target);
-    activeId = target.accountId;
-    res = await apiJson(deps, baseUrl, "PUT", "/api/codex-auth/active", { accountId: activeId });
-  } else if (c.type === "oauth") {
-    activeId = id;
-    res = await apiJson(deps, baseUrl, "PUT", "/api/oauth/accounts/active", { provider: name, accountId: id });
-  } else {
-    activeId = id;
-    res = await apiJson(deps, baseUrl, "PUT", "/api/providers/keys/active", { name, id });
-  }
-  if (res.status === 0) return proxyUnreachable(res.transportError);
-  if (res.status !== 200) return apiError(res.json, `failed to switch ${name}`, res.status);
-
-  // The route reports this only when routing would drop the pin it just recorded, so an
-  // absent field means the pin survives (#4521).
-  const pinDrainReason = typeof res.json.pinDrainReason === "string" ? res.json.pinDrainReason : undefined;
-  if (wantsJson) {
-    console.log(JSON.stringify({
-      ok: true,
-      provider: name,
-      type: c.type,
-      activeId,
-      ...(pinDrainReason !== undefined ? { pinDrained: true, pinDrainReason } : {}),
-    }, null, 2));
-  } else {
-    console.log(activeId === null
-      ? `${name}: automatic account selection (pin cleared)`
-      : `${name}: active ${c.type === "api-key" ? "key" : "account"} is now ${displayId(activeId)}`);
-  }
-  if (c.type === "codex") await explainCodexUseOutcome(deps, baseUrl, name, activeId, pinDrainReason);
-  return 0;
-}
-
-/** `ocx account clear` never resolves its argument as an account id, so an account literally
- * named `auto` cannot shadow the verb that returns the pool to automatic selection. */
-async function cmdClear(rest: string[], deps: AccountDeps): Promise<number> {
-  const wantsJson = consumeFlag(rest, "--json");
-  // An option-shaped token is never the provider: leave it for the leftover check so a
-  // credential option keeps its operand redacted.
-  const name = rest[0]?.startsWith("-") ? undefined : rest.shift();
-  const leftover = leftoverArgsError(rest);
-  if (!name || leftover) {
-    if (leftover) console.error(leftover);
-    console.error(ACCOUNT_USAGE);
-    return 1;
-  }
-  // #6957: an account change on a link Child is refused before any Home read.
-  if (!deps.baseUrl) {
-    const refusal = (await import("./link-child")).linkChildProviderChangeRefusal("ocx account clear");
-    if (refusal) {
-      console.error(`Error: ${refusal}`);
-      return 1;
-    }
-  }
-  const classification = await accountClassificationConfig(deps, deps.loadConfigImpl?.() ?? loadConfig());
-  if ("error" in classification) {
-    console.error(`Error: ${classification.error}`);
-    return 1;
-  }
-  const config = classification.config;
-  const c = classifyAccount(config, name);
-  if ("error" in c) {
-    console.error(`Error: ${c.error}. Known candidates: ${candidateNames(config)}`);
-    return 1;
-  }
-  if (c.type !== "codex") {
-    console.error(`Error: ${name} has no automatic-selection pin to clear; clear applies to Codex account pools`);
-    return 1;
-  }
-  const baseUrl = await resolveBaseUrl(deps);
-  if (!baseUrl) return proxyUnreachable();
-  const res = await apiJson(deps, baseUrl, "PUT", "/api/codex-auth/active", { accountId: null });
-  if (res.status === 0) return proxyUnreachable(res.transportError);
-  if (res.status !== 200) return apiError(res.json, `failed to clear ${name}`, res.status);
-  const pinDrainReason = typeof res.json.pinDrainReason === "string" ? res.json.pinDrainReason : undefined;
-  if (wantsJson) {
-    console.log(JSON.stringify({
-      ok: true, provider: name, type: c.type, activeId: null,
-      ...(pinDrainReason !== undefined ? { pinDrained: true, pinDrainReason } : {}),
-    }, null, 2));
-  } else {
-    console.log(`${name}: automatic account selection (pin cleared)`);
-  }
-  await explainCodexUseOutcome(deps, baseUrl, name, null, pinDrainReason);
-  return 0;
-}
-
 export async function cmdAccount(args: string[], deps: AccountDeps = {}): Promise<number> {
   const [sub, ...rest] = args;
   try {
-    if (["pool", "credits", "quota-activation", "anthropic-reset-grants", "use-remaining"].includes(sub ?? "")
-      || (sub === "auto-switch" && rest[0]?.trim().toLowerCase() === "openai"
-        && rest.some(arg => arg === "--account" || arg.startsWith("--account=")))) {
+    if (sub === "credits" || sub === "quota-activation" || sub === "anthropic-reset-grants") {
       const { handleAccountPolicyCommand } = await import("./account-policy");
-      return handleAccountPolicyCommand(sub as "pool" | "auto-switch" | "credits" | "quota-activation" | "anthropic-reset-grants" | "use-remaining", rest, deps);
+      return await handleAccountPolicyCommand(sub, rest, deps);
     }
     if (sub === "list") return await cmdList(rest, deps);
     if (sub === "history") {
@@ -474,36 +271,15 @@ export async function cmdAccount(args: string[], deps: AccountDeps = {}): Promis
       return await cmdAccountHistory(rest, deps);
     }
     if (sub === "current") return await cmdCurrent(rest, deps);
-    if (sub === "use") return await cmdUse(rest, deps);
-    if (sub === "clear") return await cmdClear(rest, deps);
     if (sub === "refresh") return await cmdRefresh(rest, deps);
-    if (sub === "auto-switch") return await cmdAutoSwitch(rest, deps);
     if (sub === "alias" || sub === "rename") return await cmdAlias(rest, deps);
-    if (sub === "preserve-signed-in") {
-      const { cmdPreserveSignedIn } = await import("./account-preservation");
-      return cmdPreserveSignedIn(rest, deps);
-    }
-    if (sub === "priority") return await cmdPriority(rest, deps);
     // #2702: the server routes existed and only the CLI caller was missing, so these were
     // dashboard-only capabilities.
     if (sub === "pause") return await cmdPause(rest, deps, true);
     if (sub === "resume") return await cmdPause(rest, deps, false);
-    if (sub === "reset-affinity") {
-      const { cmdResetAffinity } = await import("./account-affinity-reset");
-      return await cmdResetAffinity(rest, deps);
-    }
-    if (sub === "pause-exhausted") return await cmdPauseExhausted(rest, deps);
-    if (sub === "strategy") return await cmdStrategy(rest, deps);
-    if (sub === "sticky") return await cmdSticky(rest, deps);
-    if (sub === "routes") return await cmdRoutes(rest, deps);
     if (sub === "remove") return await cmdRemove(rest, deps);
     if (sub === "clear-cooldown") return await cmdClearCooldown(rest, deps);
     if (sub === "add-key") return await cmdAddKey(rest, deps);
-    if (sub === "import") return await cmdImport(rest, deps);
-    if (sub === "import-orca") {
-      const { cmdOrcaImport } = await import("./account-orca-import");
-      return await cmdOrcaImport(rest);
-    }
     if (sub === "main") {
       const { cmdNativeMainAccount } = await import("./account-main");
       return await cmdNativeMainAccount(rest, deps);

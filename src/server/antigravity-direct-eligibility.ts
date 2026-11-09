@@ -28,7 +28,7 @@ export type AntigravityDirectDeclineReason = Extract<
   ProtocolReasonCode,
   | "rollout-disabled"
   | "not-migrated"
-  | "combo-or-policy-route"
+  | "policy-route"
   | "hosted-tool"
   | "vision-preprocessing"
   | "bridge-only-policy"
@@ -39,7 +39,7 @@ function isRec(value: unknown): value is Rec {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-type RouteShape = Pick<RouteResult, "providerName" | "modelId" | "provider" | "combo" | "routeKind">;
+type RouteShape = Pick<RouteResult, "providerName" | "modelId" | "provider" | "routeKind">;
 
 /** A Google adapter route in Cloud Code Assist mode: the Antigravity wire. */
 export function isAntigravityRoute(route: Pick<RouteResult, "providerName" | "provider">): boolean {
@@ -102,7 +102,7 @@ export interface AntigravityDirectRuntime {
  *
  * - the `protocols.rollout.antigravityDirect` switch is explicitly off (it defaults on);
  * - the final adapter is not Google in Cloud Code Assist mode;
- * - a combo or policy route owns multi-candidate execution in the Responses pipeline;
+ * - a policy route owns multi-candidate execution in the Responses pipeline;
  * - a hosted web-search tool would engage the sidecar, which reads the Responses body;
  * - an image would reach a model the operator declared unable to read it (the vision sidecar
  *   rewrites images on the Responses body as well as the IR);
@@ -131,7 +131,7 @@ export function antigravityDirectDeclineReason(
 function antigravityRouteDeclineReason(route: RouteShape, config: OcxConfig): AntigravityDirectDeclineReason | undefined {
   if (!resolveProtocolSettings(config).rollout.antigravityDirect) return "rollout-disabled";
   if (!isAntigravityRoute(route)) return "not-migrated";
-  if (route.combo !== undefined || route.routeKind === "combo" || route.routeKind === "policy") return "combo-or-policy-route";
+  if (route.routeKind === "policy") return "policy-route";
   return undefined;
 }
 

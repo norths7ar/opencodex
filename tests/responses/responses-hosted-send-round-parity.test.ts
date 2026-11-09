@@ -14,7 +14,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { OcxConfig } from "../../src/types";
 import { handleResponses } from "../../src/server/responses/core";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -31,7 +30,6 @@ beforeEach(() => {
   process.env.OPENCODEX_HOME = home;
   codex = installIsolatedCodexHome("hosted-round-parity-codex-");
   releaseSpend = acquireOwnedSpendHome();
-  clearComboSelectionState(); clearComboTargetCooldowns();
 });
 
 afterEach(() => {
@@ -39,7 +37,6 @@ afterEach(() => {
     releaseSpend();
   } finally {
     globalThis.fetch = originalFetch;
-    clearComboSelectionState(); clearComboTargetCooldowns();
     codex.restore();
     if (priorHome === undefined) delete process.env.OPENCODEX_HOME;
     else process.env.OPENCODEX_HOME = priorHome;
@@ -104,11 +101,3 @@ async function hostedSearchTurn(model: "a/m" | "combo/auto") {
   const terminal = terminalEvent(await response.text());
   return { status: response.status, terminal, modelSends, searches };
 }
-
-test("a hosted search turn sends both model rounds for a direct request and a Combo target alike", async () => {
-  const direct = await hostedSearchTurn("a/m");
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const combo = await hostedSearchTurn("combo/auto");
-  expect(direct).toEqual({ status: 200, terminal: "response.completed", modelSends: 2, searches: 1 });
-  expect(combo).toEqual({ status: 200, terminal: "response.completed", modelSends: 2, searches: 1 });
-});

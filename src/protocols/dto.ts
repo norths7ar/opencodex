@@ -66,7 +66,7 @@ export interface ProtocolPlanV1 {
   policyRevision: string;
   inbound: Protocol;
   requestedModel: string;
-  routeKind: "direct" | "combo" | "policy" | "unknown";
+  routeKind: "direct" | "policy" | "unknown";
   /** Mode of the first eligible candidate, or `blocked` when none is eligible. */
   mode: DeliveryMode;
   reasonCodes: ProtocolReasonCode[];
@@ -185,7 +185,7 @@ export function isProtocolPlanV1(value: unknown): value is ProtocolPlanV1 {
     && typeof value.policyRevision === "string"
     && isProtocol(value.inbound)
     && isIdentifier(value.requestedModel)
-    && (value.routeKind === "direct" || value.routeKind === "combo" || value.routeKind === "policy" || value.routeKind === "unknown")
+    && (value.routeKind === "direct" || value.routeKind === "policy" || value.routeKind === "unknown")
     && isDeliveryMode(value.mode)
     && isReasonCodes(value.reasonCodes)
     && boundedArray(value.candidates, PROTOCOL_DTO_LIMITS.candidates, isProtocolPlanCandidateV1)

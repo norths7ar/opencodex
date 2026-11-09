@@ -64,18 +64,6 @@ describe("Responses core module boundaries", () => {
     visit("core.ts");
   });
 
-  test("recursive combo dispatch enters the public ingress without a reverse core import", () => {
-    const combo = readResponsesCoreModule("core-combo.ts");
-    const prepare = readResponsesCoreModule("request-prepare.ts");
-    expect(combo).toContain("requestDispatchers.handleResponses(");
-    expect(prepare).toContain("requestDispatchers.handleComboResponses(");
-    for (const name of RESPONSES_CORE_MODULES) {
-      if (name !== "core.ts") expect(siblingImports(readResponsesCoreModule(name))).not.toContain("core.ts");
-    }
-    expect(readResponsesCoreModule("core.ts"))
-      .toContain("const requestDispatchers: ResponsesDispatchers = { handleResponses, handleComboResponses };");
-  });
-
   test("lease transfer retains both finally owners until response construction settles", () => {
     const ingress = readResponsesCoreModule("core-pipeline.ts");
     const native = readResponsesCoreModule("passthrough-execution.ts");

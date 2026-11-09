@@ -34,19 +34,6 @@ function migratableConfig(): OcxConfig {
 }
 
 describe("devin provider merge projection", () => {
-  test("moves the providers key and re-points every reference shape", () => {
-    const p = projectDevinProviderMerge(migratableConfig());
-    expect(p.changed).toBe(true);
-    expect(p.config.providers!["devin-cli"]).toBeUndefined();
-    const moved = p.config.providers!["devin"]!;
-    expect(moved.baseUrl).toBe("https://server.codeium.com");
-    expect(p.config.defaultProvider).toBe("devin");
-    expect(p.config.disabledModels).toEqual(["devin/swe-2", "anthropic/claude-sonnet-5"]);
-    expect(p.config.customModels![0]!.provider).toBe("devin");
-    expect(p.config.combos!.fast!.targets![0]!.provider).toBe("devin");
-    expect(p.config.providerContextCaps).toEqual({ devin: 262_000, anthropic: 200_000 });
-    expect(p.warnings.join(" ")).toContain('"devin-cli"');
-  });
 
   test("re-points routingProfiles candidates, which the rewriter used to miss", () => {
     // candidates[].provider is a bare provider id validated against configured

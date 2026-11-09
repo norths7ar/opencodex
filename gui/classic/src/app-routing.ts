@@ -8,12 +8,9 @@ export type Page =
   | "providers"
   | "models"
   | "subagents"
-  | "advisor"
   | "logs"
   | "usage"
   | "storage"
-  | "remote"
-  | "remote-workspace"
   | "codex-set"
   | "integrations"
   | "claude";
@@ -24,12 +21,9 @@ export const VALID_PAGES = new Set<Page>([
   "providers",
   "models",
   "subagents",
-  "advisor",
   "logs",
   "usage",
   "storage",
-  "remote",
-  "remote-workspace",
   "codex-set",
   "integrations",
   "claude",
@@ -48,11 +42,7 @@ export function readPageFromHash(hash?: string): Page {
   // page straight from the hash, so without this an old bookmark lands on an
   // unknown page.
   if (pageId === ("codex-auth" as Page)) return "codex-set";
-  // Legacy: Combos, Routing, and Lab are Models tabs now. Resolve the destination page
-  // immediately so a cold legacy hash never flashes Dashboard before replacement.
-  if (pageId === ("combos" as Page)
-    || pageId === ("routing" as Page)
-    || pageId === ("lab" as Page)) return "models";
+  if (pageId === ("routing" as Page)) return "models";
   // Legacy integration pages now live below one Integrations route. Returning
   // the destination page here keeps the initial hook state aligned until the
   // resolver replaces the hash with the exact nested destination.
@@ -84,38 +74,9 @@ export function canonicalHashPath(hash: string): string {
  */
 export const DASHBOARD_TAB_HASHES = ["dashboard/providers", "dashboard/models"] as const;
 
-/**
- * Models owns four tabs: the catalog, Combos, Routing, and Compatibility. The catalog
- * is the bare `#models`, so it has no suffix entry here - same convention Dashboard
- * uses for Overview and Logs uses for the log list.
- */
-export const MODELS_TAB_HASHES = ["models/combos", "models/routing", "models/compatibility"] as const;
-/** Action deep link that opens the editable JEV Auto template in the Combos tab. */
-export const JEV_AUTO_CREATE_HASH = "models/combos/jev-auto";
+/** Models keeps the catalog and explicit routing configuration. */
+export const MODELS_TAB_HASHES = ["models/routing"] as const;
 
-/** JEV Auto deep link; a self-hosted `jev-decision` row rides along as `?decisionProvider=`. */
-export function jevAutoCreateHash(decisionProvider?: string | null): string {
-  const id = decisionProvider?.trim();
-  return id && id !== "jev"
-    ? `${JEV_AUTO_CREATE_HASH}?${new URLSearchParams({ decisionProvider: id })}`
-    : JEV_AUTO_CREATE_HASH;
-}
-
-/** The decision provider a JEV Auto deep link pre-fills, or undefined when it is not one. */
-export function jevAutoCreateDecisionProvider(hash: string): string | null | undefined {
-  const { path, query } = splitHashQuery(normalizeHashPath(hash));
-  if (path !== JEV_AUTO_CREATE_HASH) return undefined;
-  const id = new URLSearchParams(query).get("decisionProvider")?.trim();
-  return id && id !== "jev" ? id : null;
-}
-
-/**
- * `#dashboard/update` is an action deep link, not a tab: the sidebar update button uses
- * it to open the maintenance update dialog over the Overview section. It is listed as a
- * valid dashboard hash so route normalization does not strip it before the dashboard
- * reads it.
- */
-export const DASHBOARD_UPDATE_HASH = "dashboard/update";
 
 /**
  * Integrations uses a wrapping outer tab strip. Claude Desktop is a nested
@@ -155,14 +116,8 @@ export const INTEGRATION_TAB_HASHES = [
   "integrations/t3code",
 ] as const;
 
-/**
- * Routes that own a `?query` suffix: provider settings for one provider
- * (`#providers?provider=<name>`), a protocol-pair prefilter on the compatibility matrix
- * (`#models/compatibility?inbound=chat&upstream=messages`), and the decision service a JEV Auto
- * deep link pre-fills (`#models/combos/jev-auto?decisionProvider=<name>`). Anywhere else the
- * query is dropped.
- */
-export const QUERY_HASH_PATHS: readonly string[] = ["providers", "models/compatibility", JEV_AUTO_CREATE_HASH];
+/** Preserve query parameters for provider settings links. */
+export const QUERY_HASH_PATHS: readonly string[] = ["providers"];
 
 /** Where the retired `#claude/account` bookmark lands: Anthropic's Accounts tab on Providers. */
 export const CLAUDE_ACCOUNT_REDIRECT = "providers?provider=anthropic&tab=accounts";
@@ -171,14 +126,12 @@ export function hashBelongsToPage(rawHash: string, page: Page): boolean {
   return rawHash === page
     || (page === "claude" && ["claude/code", "claude/desktop"].includes(rawHash))
     || (page === "logs" && rawHash === "logs/debug")
-    || (page === "usage" && rawHash === "usage/companion")
     || (page === "codex-set" && (rawHash === "codex-set/prompt" || rawHash === "codex-set/desktop"))
     || (page === "models" && (
       (MODELS_TAB_HASHES as readonly string[]).includes(rawHash)
-      || rawHash === JEV_AUTO_CREATE_HASH
     ))
     || (page === "dashboard"
-      && (rawHash === DASHBOARD_UPDATE_HASH || (DASHBOARD_TAB_HASHES as readonly string[]).includes(rawHash)))
+      && (DASHBOARD_TAB_HASHES as readonly string[]).includes(rawHash))
     || (page === "integrations"
       && (INTEGRATION_TAB_HASHES as readonly string[]).includes(rawHash));
 }
@@ -215,16 +168,8 @@ export function resolveAppHashChange(rawHash: string): AppHashChangeAction {
   if (rawHash === "codex-auth" || rawHash.startsWith("codex-auth/")) {
     return { page: "codex-set", replaceTo: "codex-set" };
   }
-
-  /* Legacy Models pages. Delimiter-aware prefix arms preserve nested legacy bookmarks. */
-  if (rawHash === "combos" || rawHash.startsWith("combos/")) {
-    return { page: "models", replaceTo: "models/combos" };
-  }
   if (rawHash === "routing" || rawHash.startsWith("routing/")) {
     return { page: "models", replaceTo: "models/routing" };
-  }
-  if (rawHash === "lab" || rawHash.startsWith("lab/")) {
-    return { page: "models", replaceTo: "models/compatibility" };
   }
 
   /* Legacy top-level integration pages. */

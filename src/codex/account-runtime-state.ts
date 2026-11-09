@@ -1,4 +1,3 @@
-import { setDecisionAccountUsable } from "../lib/decision-quota-sink";
 import { captureConfigGeneration, type GenerationContext } from "../lib/state-store-sweeper";
 import { isCodexAccountGenerationLive } from "./account-store";
 
@@ -47,7 +46,6 @@ export function markAccountNeedsReauth(
   credentialGeneration?: number,
 ): void {
   if (writerGeneration < lastReconciledGeneration && !liveAccountIds.has(id)) return;
-  setDecisionAccountUsable(id === "__main__" ? "codex-main" : "codex", id, false, credentialGeneration);
   // An account-wide mark supersedes a generation-scoped one: it is the stronger claim.
   if (credentialGeneration === undefined || !reauthAccounts.has(id)) {
     reauthAccounts.set(id, credentialGeneration);
@@ -92,5 +90,4 @@ export function clearAccountNeedsReauth(id: string, credentialGeneration?: numbe
     && (reauthAccounts.get(id) !== credentialGeneration
       || !isCodexAccountGenerationLive(id, credentialGeneration))) return;
   reauthAccounts.delete(id);
-  setDecisionAccountUsable(id === "__main__" ? "codex-main" : "codex", id, true, credentialGeneration);
 }

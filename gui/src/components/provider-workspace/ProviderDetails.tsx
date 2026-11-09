@@ -14,7 +14,6 @@ import { Switch } from "../../ui";
 import { IconChevron, IconTrash } from "../../icons";
 import ProviderOverview from "./ProviderOverview";
 import { useProviderProbeState } from "./use-provider-probe-state";
-import type { CatalogPreset } from "../provider-catalog/provider-presets";
 import type { ModelRow } from "../../pages/models-shared";
 import ProviderModels from "./ProviderModels";
 import ProviderUsage from "./ProviderUsage";
@@ -29,7 +28,6 @@ type Tab = "overview" | "models" | "usage" | "accounts" | "settings";
 
 export default function ProviderDetails({
   item,
-  preset,
   usageTotals,
   modelUsage,
   quotaReport,
@@ -41,7 +39,6 @@ export default function ProviderDetails({
   modelRowsReady,
   onOpenModels,
   onOpenConnect,
-  onCreateJevAuto,
   modelsLoading,
   modelsLoadFailed,
   onRetryModels,
@@ -71,7 +68,6 @@ export default function ProviderDetails({
   onRefreshQuota,
 }: {
   item: WorkspaceItem;
-  preset?: CatalogPreset;
   usageTotals?: ProviderUsageTotals;
   modelUsage?: ProviderModelUsageRow[];
   quotaReport?: ProviderQuotaReportView;
@@ -84,7 +80,6 @@ export default function ProviderDetails({
   modelRowsReady: boolean;
   onOpenModels: () => void;
   onOpenConnect?: () => void;
-  onCreateJevAuto?: () => void;
   modelsLoading?: boolean;
   modelsLoadFailed?: boolean;
   onRetryModels?: () => void;
@@ -352,7 +347,6 @@ export default function ProviderDetails({
         {tab === "overview" && (
           <ProviderOverview
             item={item}
-            preset={preset}
             apiBase={apiBase}
             connectionIdentity={connectionIdentity}
             probeController={probeController}
@@ -375,7 +369,6 @@ export default function ProviderDetails({
             oauth={oauth}
             onEditSettings={() => switchTab("settings")}
             onViewUsage={() => switchTab("usage")}
-            onCreateJevAuto={onCreateJevAuto}
             onUpdateProvider={handleUpdateProvider}
             reauthBusy={busyProvider === item.name}
             onCancelLogin={authHandlers?.onCancelLogin ? () => void authHandlers.onCancelLogin?.(item.name) : undefined}

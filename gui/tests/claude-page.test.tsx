@@ -12,7 +12,7 @@ const globals = ["window", "document", "navigator", "localStorage", "IS_REACT_AC
 const CLAUDE_CODE_OK = {
   enabled: true, cliFirstParty: false, cliFirstPartyApplied: false, desktopFirstParty: false,
   interceptRunning: false, interceptEligible: true, sharedProxy: "none", authMode: "proxy",
-  autoConnectSupported: false, systemEnv: false, fastMode: null, maxContextTokens: null,
+  fastMode: null, maxContextTokens: null,
   autoContext: true, autoCompactWindow: null, injectAgents: true, smallFastModel: "",
   effectiveModelEnv: {}, available: ["mock/model"], aliases: [], port: 10100, modelMap: {},
 };

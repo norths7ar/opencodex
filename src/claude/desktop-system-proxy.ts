@@ -163,7 +163,7 @@ async function livePickerRelayAvailable(proxyUrl: string): Promise<boolean> {
 }
 
 function liveFirstPartyState(
-  config: Pick<OcxConfig, "claudeCode" | "clientIntegrations" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "clientIntegrations" | "port">,
 ): DesktopFirstPartySettingsState {
   try {
     const settings = inspectDesktopFirstParty(config).settings.kind;
@@ -176,7 +176,7 @@ function liveFirstPartyState(
 
 /** Registry reads run only on Windows with a Desktop first-party env and no verified picker relay. */
 export async function collectDesktopSystemProxy(
-  config: Pick<OcxConfig, "claudeCode" | "clientIntegrations" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "clientIntegrations" | "port">,
   deps: DesktopSystemProxyDeps = {},
 ): Promise<DesktopSystemProxyAssessment> {
   const platform = deps.platform ?? process.platform;

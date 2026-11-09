@@ -15,8 +15,6 @@ import { DataSurfaceSkeleton } from "../components/data-surface";
 import { SectionTabs } from "../components/section-tabs";
 import { sectionAnchorId } from "../section-anchors";
 import { parseUsageTimeRange, type UsageRangeError, type UsageTimeWindow } from "../usage-time-range";
-import UsageCompanionView from "./usage-companion-view";
-import { readUsageTab, selectUsageTab, usageTabKeyDown } from "./usage-tab-keydown";
 
 type Range = "all" | "30d" | "7d";
 type UsageSurface = "all" | "codex" | "claude" | "grok";
@@ -1062,34 +1060,25 @@ function UsageWorkspaceBody({
 /** Held usage payloads so provider/surface tab switches skip a cold ~5s refetch. */
 const usageMemoryCache = new Map<string, UsageResponse>();
 
-type UsageScope = "machine" | "hub";
-
-function usageCacheKey(apiBase: string, range: Range, surface: UsageSurface, connected: boolean, scope: UsageScope, apiKeyId?: string): string {
-  return `ocx.usage.v2:${apiBase}:${connected ? "connected" : "standalone"}:${scope}:${apiKeyId ?? ""}:${range}:${surface}`;
+function usageCacheKey(apiBase: string, range: Range, surface: UsageSurface): string {
+  return `ocx.usage.v2:${apiBase}:${range}:${surface}`;
 }
 
-function readHeldUsage(apiBase: string, range: Range, surface: UsageSurface, connected: boolean, scope: UsageScope, apiKeyId?: string): UsageResponse | null {
-  const key = usageCacheKey(apiBase, range, surface, connected, scope, apiKeyId);
+function readHeldUsage(apiBase: string, range: Range, surface: UsageSurface): UsageResponse | null {
+  const key = usageCacheKey(apiBase, range, surface);
   return usageMemoryCache.get(key) ?? readSessionListCache<UsageResponse>(key);
 }
 
-function writeHeldUsage(apiBase: string, range: Range, surface: UsageSurface, connected: boolean, scope: UsageScope, apiKeyId: string | undefined, value: UsageResponse) {
-  const key = usageCacheKey(apiBase, range, surface, connected, scope, apiKeyId);
+function writeHeldUsage(apiBase: string, range: Range, surface: UsageSurface, value: UsageResponse) {
+  const key = usageCacheKey(apiBase, range, surface);
   usageMemoryCache.set(key, value);
   writeSessionListCache(key, value);
 }
 
-export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBase: string; connected?: boolean; apiKeyId?: string }) {
+export default function Usage({ apiBase }: { apiBase: string }) {
   const { t, locale } = useI18n();
-  const [tab, setTab] = useState(readUsageTab);
-  useEffect(() => {
-    const onHash = () => setTab(readUsageTab());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
   const [range, setRange] = useState<Range>("30d");
   const [surface, setSurface] = useState<UsageSurface>("all");
-  const [scope, setScope] = useState<UsageScope>("machine");
   const [modelQuery, setModelQuery] = useState("");
   const [draftWindow, setDraftWindow] = useState({ since: "", until: "" });
   const [customWindow, setCustomWindow] = useState<UsageTimeWindow | null>(null);
@@ -1110,7 +1099,6 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
 
   const loadUsage = useCallback(async (signal: AbortSignal): Promise<UsageResponse> => {
     const query = new URLSearchParams({ range, surface });
-    if (connected && scope === "machine" && apiKeyId) query.set("apiKeyId", apiKeyId);
     if (since !== undefined && until !== undefined) {
       query.set("since", String(since));
       query.set("until", String(until));
@@ -1121,19 +1109,19 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
     if (since !== undefined && (next?.customWindow !== true || next.since !== since || next.until !== until)) {
       throw new UsageWindowMismatchError();
     }
-    if (since === undefined) writeHeldUsage(apiBase, range, surface, connected, scope, apiKeyId, next);
+    if (since === undefined) writeHeldUsage(apiBase, range, surface, next);
     return next;
-  }, [apiBase, apiKeyId, connected, range, scope, surface, since, until]);
+  }, [apiBase, range, surface, since, until]);
 
-  const presetKey = usageCacheKey(apiBase, range, surface, connected, scope, apiKeyId);
+  const presetKey = usageCacheKey(apiBase, range, surface);
   const resourceKey = customWindow ? JSON.stringify([presetKey, since, until]) : presetKey;
   // Arbitrary custom windows belong only to the subscription-scoped resource store.
-  const cached = customWindow ? null : readHeldUsage(apiBase, range, surface, connected, scope, apiKeyId);
+  const cached = customWindow ? null : readHeldUsage(apiBase, range, surface);
   // Range and surface identify different reports, so the key changes with both. That prevents
   // a force-loading dependency revalidation from ever showing a previous report as this one.
   const resource = useDataSurface<UsageResponse>(
     resourceKey,
-    [apiBase, apiKeyId, connected, range, scope, surface, since, until],
+    [apiBase, range, surface, since, until],
     loadUsage,
     { isEmpty: () => false, initialData: cached ?? undefined },
   );
@@ -1164,24 +1152,10 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
     <>
       <div className="page-head usage-head">
         <h2 id="usage-page-title">{t("usage.title")}</h2>
-        {tab === "report" && <UsageFilters surface={surface} range={customWindow ? null : range} onSurface={setSurface} onRange={selectRange} t={t} />}
+        {<UsageFilters surface={surface} range={customWindow ? null : range} onSurface={setSurface} onRange={selectRange} t={t} />}
       </div>
-      <div className="page-tabs" role="tablist" aria-label={t("nav.usage")}>
-        {(["report", "companion"] as const).map(item => (
-          <button key={item} type="button" role="tab" id={`usage-tab-${item}`}
-            aria-selected={tab === item} aria-controls={`usage-panel-${item}`}
-            tabIndex={tab === item ? 0 : -1}
-            className={`page-tab${tab === item ? " page-tab--active" : ""}`}
-            onClick={() => selectUsageTab(item)} onKeyDown={usageTabKeyDown}>
-            {t(item === "report" ? "usage.workspace.report" : "usage.section.companion")}
-          </button>
-        ))}
-      </div>
-      {tab === "companion" ? (
-        <div role="tabpanel" id="usage-panel-companion" aria-labelledby="usage-tab-companion">
-          <UsageCompanionView apiBase={apiBase} providers={data?.providers ?? []} />
-        </div>
-      ) : <div role="tabpanel" id="usage-panel-report" aria-labelledby="usage-tab-report">
+      
+      {<div id="usage-panel-report">
       <p className="page-sub">{t("usage.subtitle")}</p>
       {/*
         An explicit interval is the rare path — the presets answer the question almost every
@@ -1262,23 +1236,6 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
           </form>
         )}
       </section>
-      {/*
-        Only shown when connected. Naming the source is a two-plane concept: it answers
-        "which store served these numbers", and that question only exists once there are
-        two. A standalone install has exactly one, so the row says nothing the page does
-        not already imply — while still being a line about topology that a user who never
-        enabled remote hub has to read past.
-      */}
-      {connected && (
-        <div className="usage-source-row">
-          <span>{t("usage.source.connected")}</span>
-          <div className="usage-scope-control" role="group" aria-label={t("usage.scope.label")}>
-            <button type="button" className={`btn btn-sm${scope === "machine" ? " btn-primary" : " btn-ghost"}`} aria-pressed={scope === "machine"} onClick={() => setScope("machine")}>{t("usage.scope.machine")}</button>
-            <button type="button" className={`btn btn-sm${scope === "hub" ? " btn-primary" : " btn-ghost"}`} aria-pressed={scope === "hub"} onClick={() => setScope("hub")}>{t("usage.scope.hub")}</button>
-          </div>
-        </div>
-      )}
-
       {state.showSkeleton && !data ? (
         <DataSurfaceSkeleton label={t("usage.loading")} rows={5} />
       ) : state.kind === "failed-cold" ? (
@@ -1286,7 +1243,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
           {state.error instanceof UsageWindowMismatchError
             ? `${t("usage.loadError")} ${t("dash.codexRestartMalformed")}`
             : state.error instanceof UsageReadFailedError ? t("usage.loadError")
-            : connected ? t("usage.hubOffline") : state.error instanceof Error ? `${t("usage.loadError")} ${state.error.message}` : t("usage.loadError")}{" "}
+            : state.error instanceof Error ? `${t("usage.loadError")} ${state.error.message}` : t("usage.loadError")}{" "}
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => resource.refresh()}>
             {t("common.retry")}
           </button>
@@ -1295,7 +1252,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId }: { apiBas
         <>
           {state.showError && (
             <Notice tone="err">
-              {t(connected && !(state.error instanceof UsageReadFailedError) ? "usage.hubOffline" : "usage.loadError")}
+              {t("usage.loadError")}
             </Notice>
           )}
           <UsageIncompleteNotice data={data} />

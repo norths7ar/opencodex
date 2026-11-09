@@ -230,15 +230,6 @@ describe("initial provider model switches", () => {
     expect(configStore.loadConfig().modelDiscovery?.recentArrivals?.vendor).toBeUndefined();
   });
 
-  test("new-registration cleanup preserves a current combo alias sharing the namespace", () => {
-    const config = fixture();
-    config.disabledModels = ["vendor/combo-alias", "vendor/orphan", "other/keep"];
-    config.combos = { retained: { alias: "vendor/combo-alias", targets: [{ provider: "other", model: "keep" }] } };
-    const provider: OcxProviderConfig = { adapter: "openai-chat", baseUrl: "https://models.example.test/v1" };
-    initializeProviderModelSelection("vendor", provider, undefined, config);
-    expect(config.disabledModels).toEqual(["vendor/combo-alias", "other/keep"]);
-  });
-
   test("key-login commit initializes new rows and preserves choices during key replacement", async () => {
     const config: OcxConfig = { ...configStore.getDefaultConfig(), port: 0, clientIntegrations: { codex: false } };
     configStore.saveConfig(config);

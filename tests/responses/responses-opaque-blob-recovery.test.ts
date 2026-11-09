@@ -602,49 +602,6 @@ describe("opaque blob recovery through /v1/responses", () => {
     expect(parsed._stripNativeCompactionEncryptedContent).toBe(true);
   });
 
-  test("a foreign Combo candidate cannot clear reasoning for a later native candidate", async () => {
-    const threadId = "thread-native-retention-combo";
-    seedNativeReplayIdentity(threadId);
-    saveCodexAccountCredential("pool-retention", {
-      accessToken: "test-native-retention-token", refreshToken: "test-native-retention-refresh",
-      expiresAt: Date.now() + 300_000, chatgptAccountId: "workspace-retention",
-    });
-    const settings = nativeConfig();
-    settings.providers.openai!.codexAccountMode = "pool";
-    settings.nativeReasoningRetention = { modelSwitch: true, accountSwitch: true };
-    settings.codexAccounts = [{ id: "pool-retention", email: "retention@example.test", chatgptAccountId: "workspace-retention", isMain: false }];
-    settings.providers.foreign = {
-      adapter: "openai-responses", baseUrl: "https://foreign.example.test/v1", authMode: "key",
-      apiKey: "test-foreign-retention-key",
-    };
-    settings.combos = { "retention-fallback": {
-      strategy: "failover", targets: [{ provider: "foreign", model: "model-a" }, { provider: "openai", model: "gpt-6-astra" }],
-    } };
-    const outbound: Array<{ url: string; body: Record<string, unknown> }> = [];
-    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      outbound.push({ url, body: JSON.parse(String(init?.body)) });
-      return url.includes("foreign.example.test")
-        ? Response.json({ error: { type: "invalid_request_error", code: "model_not_found", message: "model not found" } }, { status: 404 })
-        : success("resp-native-combo-retention");
-    }) as typeof fetch;
-    const authSpy = spyOn(authContextModule, "resolveCodexAuthContext").mockResolvedValue(nativeReplayAuth());
-    try {
-      const response = await handleResponses(new Request("http://localhost/v1/responses", {
-        method: "POST", headers: { "content-type": "application/json", "x-codex-parent-thread-id": threadId },
-        body: JSON.stringify({ model: "combo/retention-fallback", stream: false, store: false, input: reasoningReplayInput() }),
-      }), settings, { model: "", provider: "" });
-      expect(response.status).toBe(200);
-      await response.text();
-    } finally { authSpy.mockRestore(); }
-    expect(outbound).toHaveLength(2);
-    expect(outbound[0]!.url).toContain("foreign.example.test");
-    expect(hasBlob(outbound[0]!.body)).toBe(false);
-    expect(outbound[1]!.url).toContain("chatgpt.com");
-    expect((outbound[1]!.body.input as Array<Record<string, unknown>>)[1]!.encrypted_content).toBe(BLOB);
-    expect((outbound[1]!.body.input as Array<Record<string, unknown>>)[2]!.type).toBe("message");
-  });
-
   test("lowers Fernet-shaped agent plaintext before native dispatch", async () => {
     const outbound: Array<Record<string, unknown>> = [];
     globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {

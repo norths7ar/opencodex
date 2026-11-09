@@ -28,14 +28,6 @@ import { CODEX_GPT5_IDENTITY_LINE } from "../../adapters/identity";
 import { filterCursorConfiguredModelsByLiveDiscovery } from "../../adapters/cursor/discovery";
 import { fetchCursorUsableModels } from "../../adapters/cursor/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
-import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
 import { providerDestinationResolvedError } from "../../lib/destination-policy";
 import { redactSecretString } from "../../lib/redact";
 import upstreamModelsSnapshot from "../data/upstream-models.json";
@@ -45,7 +37,7 @@ import { NATIVE_OPENAI_CONTEXT_OVERRIDES, SUPPORTED_NATIVE_OPENAI_SLUGS, UPSTREA
 import { clampAutoCompactTokenLimit } from "../../providers/auto-compact-budget";
 import { trustedAccountBoundNativeCatalogSlug } from "./account-models";
 import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "./kinds";
-import { hasComboRoutedOriginMarker, hasOcxRoutedAuthorship } from "./ownership";
+import { hasComboRoutedOriginMarker, hasOcxRoutedAuthorship, isRetiredComboCatalogEntry } from "./ownership";
 import { NATIVE_GPT6_ASTRA_MODEL } from "./native-models";
 import { recordOwnedConfigPath } from "../../lib/config-ownership";
 
@@ -307,7 +299,7 @@ export function findNativeTemplate(catalog: RawCatalog | null): RawEntry | null 
       && !m.slug.includes("/")
       && "base_instructions" in m
       && m.opencodex_catalog_kind !== CODEX_NATIVE_ALIAS_CATALOG_KIND
-      && m.owned_by !== COMBO_NAMESPACE
+      && !isRetiredComboCatalogEntry(m)
       && !hasOcxRoutedAuthorship(m),
   ) ?? retainedNativeInheritanceTemplate(catalog);
 }

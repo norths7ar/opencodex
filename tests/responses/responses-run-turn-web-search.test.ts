@@ -118,13 +118,6 @@ async function run(stream: boolean, retry = false, media?: "image" | "video", se
   return response.text();
 }
 for (const streaming of [true, false]) {
-  test(`combo preflight permits the injected search tool (stream=${streaming})`, async () => {
-    events = [[{ type: "tool_call_start", id: "search", name: "web_search" },
-      { type: "tool_call_delta", arguments: '{"query":"fixture"}' }, { type: "tool_call_end" },
-      { type: "error", message: "fixture terminal failure" }]];
-    expect(await run(streaming, false, undefined, true, true)).toContain("fixture terminal failure");
-    expect(attempts).toHaveLength(1);
-  });
   for (const media of ["image", "video"] as const) {
     test(`search takes priority over ${media} bridge (stream=${streaming})`, async () => {
       events = [[{ type: "text_delta", text: "search-enabled answer" }, { type: "done" }]];

@@ -284,7 +284,7 @@ class Fixture {
       port: 0,
       hostname: "127.0.0.1",
       syncResumeHistory: false,
-      claudeCode: { systemEnv: false },
+      claudeCode: {  },
       providers: {
         fixture: {
           adapter: "openai-chat",

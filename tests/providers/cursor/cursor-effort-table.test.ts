@@ -16,7 +16,7 @@ import { predictCursorEffort } from "../../../src/server/models-capabilities";
 import { fixturePath } from "../../helpers/repo-root";
 
 const FIXTURE = readFileSync(fixturePath("cursor-agent-exec-effort-table.min.js"), "utf8");
-const INSTALL: CursorInstall = { build: "private-inference", path: "/Applications/Cursor Private Inference.app", version: "3.18.25" };
+const INSTALL: CursorInstall = { build: "private-inference", path: "/opt/cursor-private-inference", version: "3.18.25" };
 
 function parsedFixtureTable(): CursorEffortTable {
   const parsed = parseCursorEffortTable(FIXTURE);
@@ -67,13 +67,11 @@ describe("Cursor installed-bundle effort table", () => {
 
   test("activates the static fallback for missing installs, missing literals, and malformed regexes", () => {
     const missingStat: CursorEffortTableDeps = {
-      platform: "darwin",
       readBundle: () => null,
     };
     expect(loadCursorEffortTable(INSTALL, missingStat)).toBeNull();
 
     const loadSource = (source: string, mtimeMs: number) => loadCursorEffortTable(INSTALL, {
-      platform: "darwin",
       readBundle: () => ({ mtimeMs, size: source.length, text: source }),
     });
     expect(loadSource("function unrelated(){}", 1)).toBeNull();
@@ -102,7 +100,6 @@ describe("Cursor installed-bundle effort table", () => {
     let mtimeMs = 1;
     let reads = 0;
     const deps: CursorEffortTableDeps = {
-      platform: "darwin",
       readBundle: (_path, cached) => {
         if (cached?.mtimeMs === mtimeMs && cached.size === FIXTURE.length) {
           return { ...cached, text: null };
@@ -121,7 +118,6 @@ describe("Cursor installed-bundle effort table", () => {
 
   test("refreshes the reported version on a bundle cache hit", () => {
     const deps: CursorEffortTableDeps = {
-      platform: "darwin",
       readBundle: () => ({ mtimeMs: 1, size: FIXTURE.length, text: FIXTURE }),
     };
     expect(loadCursorEffortTable(INSTALL, deps)?.version).toBe("3.18.25");
@@ -133,7 +129,7 @@ describe("Cursor installed-bundle effort table", () => {
     if (process.platform === "win32") return;
     const root = `${tmpdir()}/ocx-cursor-bundle-${process.pid}-${Date.now()}`;
     const install = { ...INSTALL, path: root };
-    const bundlePath = cursorAgentBundlePath(install, process.platform);
+    const bundlePath = cursorAgentBundlePath(install);
     const target = `${root}/target.js`;
     mkdirSync(bundlePath.slice(0, bundlePath.lastIndexOf("/")), { recursive: true });
     writeFileSync(target, FIXTURE);

@@ -215,39 +215,6 @@ describe("independent reasoning capabilities", () => {
       expect(hints).not.toHaveProperty(field);
     }
   });
-  test.each([
-    { efforts: [], cap: undefined, sidecar: false },
-    { efforts: ["high"], cap: undefined, sidecar: false },
-    { efforts: [], cap: 350_000, sidecar: true },
-    { efforts: ["high"], cap: 350_000, sidecar: true },
-  ])("custom reasoning overrides remain authoritative for combo members: %j", async ({ efforts, cap, sidecar }) => {
-    const provider = "custom-reasoning-provenance";
-    const config: OcxConfig = {
-      port: 10100, defaultProvider: provider,
-      providers: { [provider]: { ...base, authMode: "key", apiKey: "test-key", liveModels: true, models: [id],
-        modelCapabilities: { [id]: { supportsThinkingToggle: true } }, ...(sidecar ? { noVisionModels: [id] } : {}),
-        fetch: (() => { throw new Error("cached discovery must not fetch"); }) as typeof fetch,
-      } },
-      ...(cap !== undefined ? { providerContextCaps: { [provider]: cap } } : {}),
-      customModels: [{ id: "custom", provider, modelId: id, reasoningEfforts: efforts,
-        addedAt: "2026-10-23T00:00:00.000Z" }],
-      combos: { solo: { targets: [{ provider, model: id }] } },
-    };
-    try {
-      setCached(provider, [{ provider, id, reasoningEfforts: ["low", "high"] }]);
-      const discovered = await gatherRoutedModels({ ...config, customModels: [], combos: undefined });
-      expect(discovered.find(row => row.provider === provider && row.id === id)?.reasoningEfforts).toEqual(["low", "high"]);
-      const models = await gatherRoutedModels(config);
-      const custom = models.find(row => row.provider === provider && row.id === id);
-      const combo = models.find(row => row.provider === "combo" && row.id === "solo");
-      expect(custom).toBeDefined();
-      expect(combo).toBeDefined();
-      expect(custom!.reasoningEfforts).toEqual(efforts);
-      expect(combo!.reasoningEfforts).toEqual(efforts);
-    } finally {
-      clearModelCache(provider);
-    }
-  });
   test("chained public model flags preserve false and unknown independently of efforts", () => {
     const hints = catalogHintsFromModelsApiItem("chain", { id, capabilities: {
       supports_reasoning: true, supports_thinking_toggle: true, supports_reasoning_effort: false,

@@ -10,15 +10,12 @@ import { maybeAutoRestoreCodexShim, skipsCodexShimAutoRestore } from "../../src/
 import { repoPath } from "../helpers/repo-root";
 import { SPAWN_BUDGET_MS } from "../helpers/test-budget";
 import {
-  deriveLaunchdServiceDiagnostic,
-  deriveSystemdServiceDiagnostic,
   deriveWindowsServiceDiagnostic,
   diagnoseService,
   type ServiceDiagnostic,
 } from "../../src/service/diagnostics";
 import { collectServiceStatusJson, type ServiceStatusJsonDeps } from "../../src/service/status-json";
 import { plistPath } from "../../src/service/state";
-import { unitPath } from "../../src/service/systemd";
 import * as liveness from "../../src/server/proxy-liveness";
 
 /**
@@ -43,62 +40,11 @@ function fixedDeps(diag: ServiceDiagnostic, platform: NodeJS.Platform, serving =
 }
 
 describe("service status JSON shape per platform branch", () => {
-  test("macOS launchd, loaded from the current plist and serving", async () => {
-    const diag = deriveLaunchdServiceDiagnostic({
-      installed: true, stale: false, load: { state: "loaded-current" }, diagnostics: `logs: ${LOG}`,
-    });
-    expect(await collectServiceStatusJson(fixedDeps(diag, "darwin"))).toEqual({
-      schemaVersion: 1,
-      platform: "darwin",
-      supported: true,
-      backend: "launchd",
-      label: "com.opencodex.proxy",
-      installed: true,
-      enabled: true,
-      running: true,
-      viable: true,
-      stale: false,
-      conflict: false,
-      serving: { probed: true, ok: true, port: 10100 },
-      summary: `installed and loaded (launchd; logs: ${LOG})`,
-      logPath: LOG,
-      ownershipLease: null,
-      desktopLogin: null,
-    });
-  });
 
-  test("macOS launchd whose state launchctl could not report stays installed but not running", async () => {
-    const diag = deriveLaunchdServiceDiagnostic({
-      installed: true, stale: false, load: { state: "unknown", detail: "launchctl timed out" }, diagnostics: `logs: ${LOG}`,
-    });
-    const json = await collectServiceStatusJson(fixedDeps(diag, "darwin", { ok: false, port: 10100 }));
-    expect(json).toMatchObject({ backend: "launchd", installed: true, running: false, viable: true });
-    expect(json.serving).toEqual({ probed: true, ok: false, port: 10100 });
-  });
 
-  test("Linux systemd user unit, enabled but not running", async () => {
-    const diag = deriveSystemdServiceDiagnostic({
-      installed: true, enabled: true, running: false, stale: false, diagnostics: `logs: ${LOG}`,
-    });
-    expect(await collectServiceStatusJson(fixedDeps(diag, "linux", { ok: false, port: 10100 }))).toEqual({
-      schemaVersion: 1,
-      platform: "linux",
-      supported: true,
-      backend: "systemd",
-      label: "opencodex-proxy.service",
-      installed: true,
-      enabled: true,
-      running: false,
-      viable: false,
-      stale: false,
-      conflict: false,
-      serving: { probed: true, ok: false, port: 10100 },
-      summary: `installed, but not running (systemd user; logs: ${LOG})`,
-      logPath: LOG,
-      ownershipLease: null,
-      desktopLogin: null,
-    });
-  });
+
+
+
 
   test("Windows Task Scheduler reports the schtasks backend", async () => {
     const diag = deriveWindowsServiceDiagnostic({
@@ -150,11 +96,12 @@ describe("service status JSON shape per platform branch", () => {
 
   test("nothing registered: backend none, no serving probe", async () => {
     let probed = false;
-    const diag = deriveSystemdServiceDiagnostic({
-      installed: false, enabled: false, running: false, stale: false, diagnostics: `logs: ${LOG}`,
+    const diag = deriveWindowsServiceDiagnostic({
+      schedulerXml: "", schedulerAssetsPresent: false, nativeStatus: "nonexistent", recordedBackend: null,
+      staleBakedPaths: false, nativeRepairAssetsOnly: false, diagnostics: `logs: ${LOG}`,
     });
     const json = await collectServiceStatusJson({
-      ...fixedDeps(diag, "linux"),
+      ...fixedDeps(diag, "win32"),
       serving: async () => { probed = true; return { ok: true, port: 10100 }; },
     });
     expect(probed).toBe(false);
@@ -162,17 +109,7 @@ describe("service status JSON shape per platform branch", () => {
     expect(json.serving).toEqual({ probed: false, ok: false, port: null });
   });
 
-  test("a serving probe that throws still yields the document", async () => {
-    const diag = deriveSystemdServiceDiagnostic({
-      installed: true, enabled: true, running: true, stale: false, diagnostics: `logs: ${LOG}`,
-    });
-    const json = await collectServiceStatusJson({
-      ...fixedDeps(diag, "linux"),
-      serving: async () => { throw new Error("port resolution failed"); },
-    });
-    expect(json).toMatchObject({ installed: true, running: true, backend: "systemd" });
-    expect(json.serving).toEqual({ probed: true, ok: false, port: null });
-  });
+
 
   test("an unsupported platform still answers with a document", async () => {
     const diag: ServiceDiagnostic = {
@@ -311,7 +248,7 @@ describe("service status --json is passive", () => {
    */
   function withRegistration<T>(platform: NodeJS.Platform, installed: boolean, run: () => Promise<T>): Promise<T> {
     return onPlatform(platform, () => {
-      const definition = platform === "darwin" ? plistPath() : platform === "linux" ? unitPath() : null;
+      const definition = null;
       const exists = spyOn(fs, "existsSync").mockImplementation(((path: fs.PathLike) =>
         String(path) === "/.dockerenv" ? false
           : definition !== null && String(path) === definition ? installed : realExists(path)) as never);
@@ -319,7 +256,7 @@ describe("service status --json is passive", () => {
     });
   }
 
-  for (const platform of ["darwin", "linux", "win32"] as const) {
+  for (const platform of ["win32"] as const) {
     test(`${platform}: an installed registration is read without one mutating manager call`, async () => {
       const json = await withRegistration(platform, true, () =>
         collectServiceStatusJson({ diagnose: diagnoseService, serving: async () => ({ ok: false, port: 1 }) }));

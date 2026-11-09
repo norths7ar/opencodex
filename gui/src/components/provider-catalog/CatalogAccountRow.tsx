@@ -63,13 +63,13 @@ export default function CatalogAccountRow({
               {loggedIn && (
                 <a className="btn btn-ghost" href={row.href ?? "#codex-set"}>{t("modal.accountManage")}</a>
               )}
-              {onLogin && (
+              {onLogin && !loggedIn && (
                 <button type="button"
                   className={loggedIn ? "btn btn-ghost" : "btn btn-primary"}
                   disabled={busy}
                   onClick={() => { if (!busy) onLogin(row.id); }}
                 >
-                  {busy ? t("codexAuth.enablingOpenai") : loggedIn ? t("modal.accountAdd") : t("modal.accountLogin")}
+                  {busy ? t("codexAuth.enablingOpenai") : t("modal.accountLogin")}
                 </button>
               )}
             </>
@@ -78,16 +78,6 @@ export default function CatalogAccountRow({
               {onManage && (
                 <button type="button" className="btn btn-ghost" onClick={() => onManage(row.id)}>
                   {t("modal.accountManage")}
-                </button>
-              )}
-              {onLogin && (
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  disabled={busy}
-                  onClick={() => { if (!busy) onLogin(row.id, true); }}
-                >
-                  {busy ? t("prov.waitingBrowser") : t("modal.accountAdd")}
                 </button>
               )}
               {busy && onCancelLogin && (

@@ -63,8 +63,6 @@ function mergeObserved(
     legacyCustomModelSlugs: new Set(),
     multiAgentMode: "default",
     multiAgentV2Enabled: false,
-    exactComboSlugs: new Set(),
-    hasPhysicalComboProvider: false,
     includeNativeOpenAi: true,
     accountBoundEntries: [],
     policy: {

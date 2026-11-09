@@ -1,3 +1,4 @@
+import { singleCodexAccountId, SIGNED_OUT_CODEX_ACCOUNT_ID } from "../../src/codex/account-id";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import {
   existsSync,
@@ -213,6 +214,8 @@ describe("Codex account delete persistence ordering", () => {
       const persisted = loadConfig();
       expect(persisted.port).toBe(12345);
       expect(persisted.codexAccounts?.some(account => account.id === ACCOUNT_ID)).toBe(false);
+    expect(persisted.codexSignedOut).toBe(true);
+    expect(singleCodexAccountId(persisted)).toBe(SIGNED_OUT_CODEX_ACCOUNT_ID);
       expect(config).toEqual(before);
       expect(getCodexAccountCredential(ACCOUNT_ID)).not.toBeNull();
       expect(isAccountNeedsReauth(ACCOUNT_ID)).toBe(true);

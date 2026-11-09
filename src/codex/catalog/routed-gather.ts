@@ -1,3 +1,4 @@
+import { quotaInactiveReason } from "../../providers/quota-exhaustion";
 import { canInferVendorContext } from "./vendor-context";
 import { effectiveProviderAlias, effectiveProviderAliasDecision } from "../../providers/default-aliases";
 import { initialModelSelectionPending } from "../../providers/initial-model-selection";
@@ -58,15 +59,6 @@ import { resolveQoderProfile } from "../../adapters/qoder/profiles";
 import { fetchDevinUsableModels } from "../../adapters/devin/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  quotaInactiveReason,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
-import {
   ProviderOutboundPolicyError,
   providerOutboundGet,
   providerOutboundPost,
@@ -88,9 +80,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { createAdmissionGate, ResourceAdmissionError, type AdmissionMetrics } from "../../lib/admission";
 import { CODEX_CUSTOM_MODEL_CATALOG_KIND, JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
-import { disabledNativeSlugs, hasComboTargets, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
-import type { ComboCatalogOmission } from "./aggregation";
+import { disabledNativeSlugs, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
+import { normalizedOpenAiApiSignature, openAiApiCollisionWarnings } from "./aggregation";
 import type { CatalogGatherProviderAuthEvidence } from "./filesystem-evidence";
 import type {
   CatalogAdmissionSnapshot,
@@ -103,12 +94,10 @@ import type {
 } from "../convergence-types";
 import type { CatalogGatherProviderAuthOutcome, CatalogGatherProviderModelOutcome, GatherFlightCapture, ModelsAuthResolverFactory } from "./gather-capture";
 import { applyProviderConfigHints, configuredAutoCompactTokenLimit, configuredMaxInputTokens, configuredModelDisplayName, configuredReasoningSummarySupport, copyReasoningHintSource, modelInputModalities, routedMaxOutputTokens, withVisionSidecarInput } from "./model-hints";
-import { resolveComboCatalogMember } from "./combo-member";
 import { captureGatherFlight, captureTrustedOpenAiApiPolicy, gatherFlightKey, keyedGatherBytesIdentity, withCanonicalOpenAiForwardAuthDefault } from "./gather-capture";
 import { fetchProviderModelsWithAuth, observedModelsAuthResolver, refreshingModelsAuthResolver } from "./provider-models";
 
 export interface GatherRoutedModelsOptions {
-  comboOmissions?: ComboCatalogOmission[];
   providerAuthOutcomes?: CatalogGatherProviderAuthOutcome[];
   /** Flight-local authority of each provider's returned model rows. */
   providerModelOutcomes?: CatalogGatherProviderModelOutcome[];
@@ -127,7 +116,6 @@ export interface GatherRoutedModelsOptions {
 
 interface GatherFlightResult {
   models: CatalogModel[];
-  comboOmissions: ComboCatalogOmission[];
   providerAuthOutcomes: readonly CatalogGatherProviderAuthOutcome[];
   providerModelOutcomes: readonly CatalogGatherProviderModelOutcome[];
   discoveryPolicySnapshots: readonly CatalogProviderDiscoveryPolicySnapshot[];
@@ -263,16 +251,11 @@ async function gatherRoutedModelsWithAuth(
   }
   const {
     models,
-    comboOmissions,
     providerAuthOutcomes,
     providerModelOutcomes,
     discoveryPolicySnapshots,
     providerContentRevisions,
   } = await entry.promise;
-  if (options?.comboOmissions) {
-    options.comboOmissions.length = 0;
-    options.comboOmissions.push(...comboOmissions);
-  }
   if (options?.providerAuthOutcomes) {
     options.providerAuthOutcomes.length = 0;
     options.providerAuthOutcomes.push(...providerAuthOutcomes);
@@ -325,7 +308,6 @@ async function gatherRoutedModelsUncached(
   capture: GatherFlightCapture,
 ): Promise<GatherFlightResult> {
   // Flight-local list: joiners copy from the resolved promise, not a process-global last write.
-  const localOmissions: ComboCatalogOmission[] = [];
   const localProviderAuthOutcomes = capture.providerAuthOutcomes;
   const resolveAuth = capture.authResolver;
   const ttlMs = config.modelCacheTtlMs ?? DEFAULT_MODEL_CACHE_TTL_MS;
@@ -388,159 +370,6 @@ async function gatherRoutedModelsUncached(
     // intentionally mirrors Cursor's public model table, including Gemini image preview, so the
     // exposure decision goes through shouldExposeRoutedModel (single choke point).
     .filter(shouldExposeRoutedModel);
-  const memberByKey = new Map(all.map(model => [`${model.provider}/${model.id}`, model]));
-  // [Decision Log]
-  // - 목적과 의도: 콤보 타겟에 native OpenAI(Codex login) 모델이 포함될 때 카탈로그에서
-  //   누락되는 버그(issue #268)를 수정. "openai" provider는 forward-auth(Codex login
-  //   passthrough)이므로 fetchProviderModels가 항상 []를 반환하고, native slugs는
-  //   별도 정적 경로(nativeOpenAiSlugs)로만 노출됨. 따라서 memberByKey에
-  //   openai/<slug> 키가 존재하지 않아 콤보가 조용히 drop됨.
-  // - 기존 구현 및 제약 조건: memberByKey는 routed provider /models fetch 결과로만 구성.
-  // - 검토한 주요 대안: (A) native slugs를 all 배열에 직접 push — /v1/models와 온디스크
-  //   카탈로그에서 native 모델이 중복 노출되는 부작용 발생. (B) memberByKey에만 synthetic
-  //   CatalogModel을 주입 — 콤보 멤버 해석에만 사용하고 all에는 추가하지 않으므로 기존
-  //   노출 경로에 영향 없음.
-  // - 선택한 방식: (B) — synthetic entries를 memberByKey에만 주입.
-  // - 다른 대안 대신 이 방식을 선택한 이유: 기존 native 모델 노출 경로(/v1/models, 온디스크
-  //   카탈로그 sync, management API)를 전혀 변경하지 않고 콤보 resolution만 수선하기 때문.
-  // - 장점, 단점 및 영향: 장점 — 최소 수정, 기존 경로 무변경. 단점 — synthetic entries의
-  //   capability 데이터가 static/upstream snapshot 기반이므로, 사용자가 커스텀 config
-  //   힌트(modelContextWindows 등)로 native 모델의 context window를 오버라이드한 경우
-  //   반영되지 않음. 하지만 nativeOpenAiContextWindow가 이미 config 오버라이드를
-  //   우선시하므로 실제 충돌 가능성은 낮음.
-  if (!hasComboTargets(config)) {
-    // Skip the native slug injection entirely when no combos are configured — avoids
-    // calling nativeOpenAiSlugs() (which reads the live Codex catalog from disk) for
-    // configs that will never need it.
-  } else {
-    const disabled = disabledNativeSlugs(config);
-    const openaiContextCap = nativeContextLimits(config);
-    const requiredNativeComboTargets = new Set(listComboIds(config).flatMap(id => {
-      const combo = getCombo(config, id);
-      return combo?.targets.flatMap(target => (
-        target.provider === "openai" ? [target.model] : []
-      )) ?? [];
-    }));
-    for (const slug of nativeOpenAiSlugs()) {
-      // A bare native disable key hides the native row, not a combo that targets it.
-      // Keep synthetic native metadata available to those combos.
-      if (disabled.has(slug) && !requiredNativeComboTargets.has(slug)) continue;
-      const contextWindow = nativeOpenAiContextWindow(slug, openaiContextCap);
-      if (contextWindow === undefined) continue;
-      const synthetic: CatalogModel = {
-        provider: "openai",
-        id: slug,
-        owned_by: "openai",
-        contextWindow,
-        // Input limit, not the total window. These coincide for native GPT-5.6 today (the
-        // advertised 922,000 window is already capped at its measured ceiling), but the two
-        // stay separate fields because routed/API rows of the same family run a wider window.
-        // Falls back to the window for slugs with no separate ceiling.
-        maxInputTokens: Math.min(nativeOpenAiMaxInputTokens(slug, openaiContextCap) ?? contextWindow, contextWindow),
-        ...(nativeOpenAiMaxOutputTokens(slug) !== undefined
-          ? { maxOutputTokens: nativeOpenAiMaxOutputTokens(slug) }
-          : {}),
-        autoCompactTokenLimit: nativeOpenAiAutoCompactTokenLimit(slug, openaiContextCap),
-        inputModalities: nativeInputModalities(slug),
-        reasoningEfforts: nativeReasoningEfforts(slug),
-        ...(nativeParallelToolCalls(slug) ? { parallelToolCalls: true } : {}),
-      };
-      const key = `openai/${slug}`;
-      // Only inject when not already present from a routed provider (an API-key
-      // "openai" provider could shadow the native one).
-      if (!memberByKey.has(key)) memberByKey.set(key, synthetic);
-    }
-  }
-  // [Decision Log]
-  // - 목적과 의도: combo derivation must see the same explicit custom-model capabilities that the
-  //   final Models inventory publishes. Previously customModels were materialized only after this
-  //   map had already derived every combo, so one row could say image while its combo said text.
-  // - 기존 구현 및 제약 조건: provider/discovery rows remain the inheritance source, and native
-  //   OpenAI synthesis must run first so a sparse custom row cannot hide native hard limits.
-  // - 검토한 주요 대안: move the full custom-row materializer ahead of combos, or overlay only the
-  //   explicit custom fields onto this private derivation map after provider/native inheritance.
-  // - 선택한 방식: use the scoped post-inheritance overlay; the existing final materializer stays
-  //   the single owner of public custom-row construction and deduplication.
-  // - 다른 대안 대신 이 방식을 선택한 이유: moving the large materializer would reorder public
-  //   catalog production and warning behavior, while this map is already private to combo input.
-  // - 장점, 단점 및 영향: custom context/modality/reasoning/tool-mode declarations now constrain
-  //   their combos without widening unrelated rows; omitted fields retain provider/native limits.
-  for (const custom of config.customModels ?? []) {
-    const key = `${custom.provider}/${custom.modelId}`;
-    const inherited = memberByKey.get(key) ?? {
-      provider: custom.provider,
-      id: custom.modelId,
-      owned_by: custom.provider,
-    };
-    memberByKey.set(key, {
-      ...inherited,
-      catalogKind: CODEX_CUSTOM_MODEL_CATALOG_KIND,
-      ...(typeof custom.contextWindow === "number" && custom.contextWindow > 0
-        ? { contextWindow: custom.contextWindow, contextWindowInference: undefined }
-        : {}),
-      ...(Array.isArray(custom.inputModalities)
-        ? { inputModalities: [...custom.inputModalities] }
-        : {}),
-      ...(Array.isArray(custom.reasoningEfforts)
-        ? { reasoningEfforts: [...custom.reasoningEfforts] }
-        : {}),
-      ...(custom.codexToolMode !== undefined ? { codexToolMode: custom.codexToolMode } : {}),
-    });
-  }
-  for (const id of listComboIds(config)) {
-    const combo = getCombo(config, id);
-    if (!combo) continue;
-    const comboNativeLimits = nativeContextLimits(config);
-    const nativeContextWindow = combo.nativeAlias && combo.alias
-      ? nativeOpenAiContextWindow(combo.alias, comboNativeLimits)
-      : undefined;
-    const nativeAliasMaxInput = combo.nativeAlias && combo.alias
-      ? (combo.alias.startsWith("gpt-5.6-") || combo.alias.includes("daybreak")
-        ? NATIVE_GPT56_MAX_INPUT_TOKENS
-        : nativeOpenAiMaxInputTokens(combo.alias, comboNativeLimits) ?? nativeOpenAiContextWindow(combo.alias, comboNativeLimits))
-      : undefined;
-    const nativeAliasAutoCompact = combo.nativeAlias && combo.alias
-      ? nativeOpenAiAutoCompactTokenLimit(combo.alias, comboNativeLimits)
-      : undefined;
-    const nativeAliasFallback = combo.nativeAlias && combo.alias && nativeContextWindow !== undefined
-      ? {
-        contextWindow: nativeContextWindow,
-        ...(nativeAliasMaxInput !== undefined ? { maxInputTokens: nativeAliasMaxInput } : {}),
-        ...(nativeOpenAiMaxOutputTokens(combo.alias) !== undefined
-          ? { maxOutputTokens: nativeOpenAiMaxOutputTokens(combo.alias) }
-          : {}),
-        ...(nativeAliasAutoCompact !== undefined ? { autoCompactTokenLimit: nativeAliasAutoCompact } : {}),
-        inputModalities: nativeInputModalities(combo.alias),
-        reasoningEfforts: nativeReasoningEfforts(combo.alias),
-      }
-      : undefined;
-    const members = combo.targets
-      .map(target => resolveComboCatalogMember(
-        target,
-        memberByKey,
-        enrichedByName,
-        providerContextCap(config, target.provider),
-        nativeAliasFallback,
-        metadataModelIdCaseFoldByProvider.get(target.provider),
-        metadataConfigDirByProvider.get(target.provider),
-        visionSidecarEnabled,
-      ))
-      .filter((member): member is CatalogModel => member !== undefined);
-    const derived = deriveComboCatalogModel(id, combo, members);
-    if (derived) {
-      const nativeDefault = combo.nativeAlias && combo.alias
-        ? nativeDefaultReasoningEffort(combo.alias)
-        : undefined;
-      if (combo.defaultEffort === null
-        && nativeDefault
-        && derived.reasoningEfforts?.includes(nativeDefault)) {
-        derived.defaultReasoningEffort = nativeDefault;
-      }
-      all.push(derived);
-    }
-    else warnUncataloguedComboOnce(id, combo, members, localOmissions);
-  }
-  replaceLastComboCatalogOmissions(localOmissions);
   // Preserve declaratively ordered discovery (and cold-start seed order); other presets
   // retain their historical alphabetical order. Renamed/custom transport scoping still applies.
   // Read the captured discovery policy, never the live registry: a flight must keep the
@@ -812,18 +641,10 @@ async function gatherRoutedModelsUncached(
   return {
     models: models.map(model => {
       const displayName = aliasDisplayNames.get(`${model.provider}/${model.id}`);
-      // #1711: one stamping point for every row this gather produces — routed, combo, and custom
-      // alike — because it is the only place that has both the finished list and the config the
-      // quota rules need. A combo votes over its own targets; anything else votes over the single
-      // provider that would serve it.
-      const targets = model.provider === COMBO_NAMESPACE
-        ? config.combos?.[model.id]?.targets ?? []
-        : [{ provider: model.provider }];
-      const inactive = quotaInactiveReason(config, targets);
+      const inactive = quotaInactiveReason(config, [{ provider: model.provider }]);
       const named = displayName && !model.displayName ? copyReasoningHintSource(model, { ...model, displayName }) : model;
       return inactive ? copyReasoningHintSource(named, { ...named, quotaInactiveReason: inactive }) : named;
     }),
-    comboOmissions: localOmissions,
     providerAuthOutcomes: localProviderAuthOutcomes,
     providerModelOutcomes,
     discoveryPolicySnapshots: capture.discoveryPolicySnapshots,

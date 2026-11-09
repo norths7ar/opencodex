@@ -1,4 +1,3 @@
-import { comboModelId, comboPublicModelId } from "../combos/types";
 import { detectCursorInstalls } from "../integrations/cursor-detect";
 import {
   loadCursorEffortTable,
@@ -65,10 +64,6 @@ export function knownEffortRowIds(config: OcxConfig): Set<string> {
       addAlias(alias);
       for (const namespace of namespaces) addAlias(`${namespace}/${alias}`);
     }
-  }
-  for (const [id, combo] of Object.entries(config.combos ?? {})) {
-    ids.add(comboModelId(id));
-    ids.add(comboPublicModelId(id, combo));
   }
   for (const [id, profile] of Object.entries(config.routingProfiles ?? {})) {
     ids.add(policyModelId(id));

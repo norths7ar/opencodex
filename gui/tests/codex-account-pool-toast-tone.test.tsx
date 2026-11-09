@@ -75,7 +75,7 @@ function makeController(overrides: Partial<CodexAccountPoolController> = {}): Co
       },
       account,
     ],
-    activeId: null,
+    activeId: "pool-1",
     loadState: "ready",
     switchingId: null,
     pauseUpdatingId: null,
@@ -238,7 +238,7 @@ function activationController() {
     ...account, id, isMain: id === "__main__", email: `${id}@example.test`,
     quotaAutoRefresh: { fiveHourAvailable: fiveHour, weeklyAvailable: weekly, fiveHourEnabled: false, weeklyEnabled: false },
   });
-  return makeController({ accounts: [entry("__main__", false, true), entry("both", true, true), entry("none", false, false)] });
+  return makeController({ activeId: "both", accounts: [entry("__main__", false, true), entry("both", true, true), entry("none", false, false)] });
 }
 function activationApi(initial: ActivationSettings = {}) {
   const fallback = globalThis.fetch;
@@ -271,14 +271,13 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-test("bulk activation enables and disables all supported current account windows, not unavailable windows", async () => {
+test("activation changes only the selected account’s supported windows", async () => {
   const api = activationApi();
   await mountPool(activationController());
   await activationOpen();
   expect(activationToggle().getAttribute("aria-pressed")).toBe("false");
   await activationClick('#codex-quota-activation .toggle');
   expect(api.writes).toEqual([
-    { id: "__main__", window: "weekly", enabled: true },
     { id: "both", window: "fiveHour", enabled: true },
     { id: "both", window: "weekly", enabled: true },
   ]);
@@ -286,7 +285,6 @@ test("bulk activation enables and disables all supported current account windows
   api.writes.length = 0;
   await activationClick('#codex-quota-activation .toggle');
   expect(api.writes).toEqual([
-    { id: "__main__", window: "weekly", enabled: false },
     { id: "both", window: "fiveHour", enabled: false },
     { id: "both", window: "weekly", enabled: false },
   ]);
@@ -294,12 +292,11 @@ test("bulk activation enables and disables all supported current account windows
 });
 
 test("mixed activation enables remaining windows without revoking temporarily unavailable opt-ins", async () => {
-  const api = activationApi({ __main__: { weekly: true }, none: { fiveHour: true } });
+  const api = activationApi({ both: { fiveHour: true }, none: { fiveHour: true } });
   await mountPool(activationController()); await activationOpen();
   expect(activationToggle().getAttribute("aria-pressed")).toBe("mixed");
   await activationClick('#codex-quota-activation .toggle');
   expect(api.writes).toEqual([
-    { id: "both", window: "fiveHour", enabled: true },
     { id: "both", window: "weekly", enabled: true },
   ]);
   expect(api.settings.none.fiveHour).toBe(true);
@@ -307,7 +304,8 @@ test("mixed activation enables remaining windows without revoking temporarily un
   expect(host.textContent).toContain("Automatic window activation updated");
   api.writes.length = 0;
   await activationClick('#codex-quota-activation .toggle');
-  expect(api.writes).toContainEqual({ id: "none", window: "fiveHour", enabled: false });
+  expect(api.writes.some(write => write.id === "none")).toBe(false);
+  expect(api.settings.none.fiveHour).toBe(true);
   expect(api.writes.every(write => !write.enabled)).toBe(true);
 });
 
@@ -348,7 +346,7 @@ test("delayed settings and duplicate clicks stay blocked through final reconcili
   expect(api.writes.length).toBe(1);
   expect(activationToggle().disabled).toBe(true);
   await act(async () => { write.resolve(); });
-  expect(api.writes.length).toBe(3);
+  expect(api.writes.length).toBe(2);
   expect(activationToggle().disabled).toBe(true);
   await act(async () => { final.resolve(Response.json({ codexQuotaAutoRefresh: api.settings })); });
   expect(activationToggle().disabled).toBe(false);
@@ -371,7 +369,7 @@ test("lost reconciliation stays unknown and reloads without repeating already sa
 });
 
 test("no-window accounts cannot enable, but stale enabled windows can always be disabled", async () => {
-  const api = activationApi(); const controller = activationController(); controller.accounts = [controller.accounts[2]];
+  const api = activationApi(); const controller = activationController(); controller.accounts = [controller.accounts[2]]; controller.activeId = "none";
   await mountPool(controller); await activationOpen();
   expect(activationToggle().disabled).toBe(true);
   expect(host.textContent).toContain("No supported quota windows");
@@ -419,34 +417,9 @@ test("A to B to A never revives the old A snapshot while its new read is pending
   await activationClick('#codex-quota-activation .toggle');
   expect(activationToggle().disabled).toBe(true);
   await act(async () => { off.resolve(); });
-  expect(api.writes.length).toBe(3);
+  expect(api.writes.length).toBe(2);
   expect(api.writes.every(write => !write.enabled)).toBe(true);
   expect(activationToggle().getAttribute("aria-pressed")).toBe("false");
-});
-
-test("a legacy account without quota activation data keeps selection order usable", async () => {
-  expect("quotaAutoRefresh" in legacyAccount).toBe(false);
-  legacyApiPayload = { accounts: [legacyAccount] };
-  await mountPool();
-
-  await chooseOrder("codex-account-priority-pool-1", "2");
-
-  expect(priorityWrites).toEqual([{ id: "pool-1", priority: 2 }]);
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-ok")?.textContent).toContain("pool@example.test");
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-err")).toBeNull();
-});
-
-test("a rejected selection order reports in the error tone", async () => {
-  await mountPool(makeController({
-    setAccountPriority: async () => ({ ok: false, reason: "request" }),
-  }));
-
-  await chooseOrder("codex-account-priority-__main__", "-1");
-
-  const error = host.querySelector(".codex-auth-page-head__feedback.is-err");
-  expect(error).toBeTruthy();
-  expect(error?.textContent).toContain("main@example.test");
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-ok")).toBeNull();
 });
 
 test("a saved removal with pending catalog refresh renders a warning tone", async () => {
@@ -468,38 +441,6 @@ test("a saved removal with pending catalog refresh renders a warning tone", asyn
   const warning = host.querySelector(".codex-auth-page-head__feedback.is-warn");
   expect(warning?.textContent).toContain("ocx sync");
   expect(warning?.textContent).not.toContain("pool@example.test");
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-err")).toBeNull();
-});
-
-test("a busy selection order write shows no toast at all", async () => {
-  await mountPool(makeController({
-    setAccountPriority: async () => ({ ok: false, reason: "busy" }),
-  }));
-
-  await chooseOrder("codex-account-priority-pool-1", "-2");
-
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-err")).toBeNull();
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-ok")).toBeNull();
-});
-
-test("picking the order an account already has writes nothing", async () => {
-  const saved: { id: string; priority: number | null }[] = [];
-  await mountPool(makeController({
-    setAccountPriority: async (id, priority) => {
-      saved.push({ id, priority });
-      return { ok: true };
-    },
-  }));
-
-  // pool-1 is already Normal (0). Select fires onChange for the clicked option whether or
-  // not it was the selected one, and commits the highlighted option on Tab-out of an open
-  // menu, so this is reachable by an ordinary mis-click. It must not reach the server: the
-  // route releases the pin on every accepted write, so a no-op order pick would silently
-  // unpin the account the operator chose, reporting success while doing it.
-  await chooseOrder("codex-account-priority-pool-1", "0");
-
-  expect(saved).toEqual([]);
-  expect(host.querySelector(".codex-auth-page-head__feedback.is-ok")).toBeNull();
   expect(host.querySelector(".codex-auth-page-head__feedback.is-err")).toBeNull();
 });
 
@@ -548,7 +489,7 @@ test("successful redeem clears a stale error toast tone", async () => {
  * and the order select renders on demand (inside the disclosure) unless the account already
  * carries a non-default order.
  */
-test("a pool card folds alias/id/remove behind a ⋯ disclosure and shows the order select on demand", async () => {
+test("the selected account keeps alias/id/remove behind a disclosure", async () => {
   const removed: string[] = [];
   await mountPool(makeController({
     removeAccount: async (id) => { removed.push(id); return { ok: true }; },
@@ -572,7 +513,7 @@ test("a pool card folds alias/id/remove behind a ⋯ disclosure and shows the or
   await act(async () => { await new Promise((r) => setTimeout(r, 0)); });
   expect(more.open).toBe(true);
   expect([...more.querySelectorAll("button")].map(b => b.textContent?.trim())).toContain("Edit alias");
-  expect(card.querySelector("#codex-account-priority-pool-1")).not.toBeNull();
+  expect(card.querySelector("#codex-account-priority-pool-1")).toBeNull();
   const copy = [...card.querySelectorAll<HTMLButtonElement>("button")].find(b => b.textContent?.trim() === "Copy account ID")!;
   expect(copy).toBeDefined();
   // Clicking writes the FULL id (the visible text is masked) and flips only this card's label.
@@ -587,16 +528,4 @@ test("a pool card folds alias/id/remove behind a ⋯ disclosure and shows the or
   await act(async () => { remove.click(); });
   await consentToRemoval();
   expect(removed).toEqual(["pool-1"]);
-});
-
-test("a pool card with a non-default order keeps its order select inline", async () => {
-  await mountPool(makeController({
-    accounts: [
-      { id: "main", email: "main@example.test", isMain: true, paused: false, priority: 0, hasCredential: true, quota: null },
-      { ...account, priority: 2 },
-    ],
-  }));
-  const card = [...host.querySelectorAll<HTMLElement>(".card")].find(c => c.textContent?.includes("pool@example.test"))!;
-  expect(card.querySelector<HTMLDetailsElement>("details.codex-account-more")!.open).toBe(false);
-  expect(card.querySelector("#codex-account-priority-pool-1")).not.toBeNull();
 });

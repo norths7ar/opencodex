@@ -204,15 +204,7 @@ export function defaultAuthDetectDeps(
       return existsSync(join(configDir, ".credentials.json"));
     },
     keychainProbe() {
-      if (process.platform !== "darwin") return "absent";
-      const result = spawnSync("security", ["find-generic-password", "-s", KEYCHAIN_SERVICE], {
-        timeout: KEYCHAIN_TIMEOUT_MS,
-        stdio: ["ignore", "ignore", "ignore"],
-      });
-      if (result.error || result.signal !== null) return "unknown";
-      if (result.status === 0) return "present";
-      if (result.status === KEYCHAIN_ITEM_NOT_FOUND) return "absent";
-      return "unknown";
+      return "absent";
     },
     env: () => env,
     ownTokens,

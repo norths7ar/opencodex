@@ -37,22 +37,16 @@ import {
   agentTaskRecoverySchema,
   asideProfileSyncSchema,
   catalogAutoRefreshSchema,
-  clientConnectionSchema,
   isUsableApiKeySecret,
-  managementIngressSchema,
   codexPoolSchema,
   codexAccountAutoSwitchThresholdsSchema,
   providerModelCostsConfigError,
   credentialGroupsSchema,
-  hubConfigSchema,
   quotaResetNotifySchema,
-  remoteGuiConfigSchema,
   retryOn429PolicySchema,
   retryOnResetPolicySchema,
   transientRetryOn5xxPolicySchema,
-  runtimeRoleSchema,
   spendSchema,
-  chatgptDesktopConfigIssue,
 } from "./schema/leaf-validators";
 import { hasWarnedInheritedFastWireConflict, markWarnedInheritedFastWireConflict } from "./warn-memo";
 
@@ -147,8 +141,6 @@ export function warnDegradedTopLevelOptIns(rawParsed: unknown, validated: OcxCon
   if (blockedModelRedirectsError(rawParsed)) console.warn("⚠️  invalid blockedModelRedirects ignored; provider routing remains available");
   if (mainAccountHardLockFallbackError(rawParsed)) console.warn("⚠️  invalid codexMainAccountHardLockFallback ignored; the main-account hard lock still refuses while blocked");
   if (fallbackPolicyError(rawParsed)) console.warn("⚠️  invalid fallback leaves ignored; those scopes keep today's fallback behavior");
-  const chatgptDesktop = chatgptDesktopConfigIssue(rawParsed);
-  if (chatgptDesktop) console.warn(`⚠️  config.json ${chatgptDesktop} — the whole chatgptDesktop block is ignored, so the ChatGPT desktop integration reads as off`);
   warnDegradedStreamMode(rawParsed, validated);
   warnDegradedCompactionRouting(rawParsed, validated);
   warnDegradedMemoryModels(rawParsed, validated);
@@ -487,10 +479,6 @@ export function degradedListenerWarnings(rawParsed: unknown, validated: OcxConfi
   if (raw.unauthenticatedLoopbackListener !== undefined && validated.unauthenticatedLoopbackListener === undefined) {
     warnings.push("unauthenticatedLoopbackListener ignored: invalid listener configuration; repair config.json before enabling the listener");
   }
-  const hub = rawConfigRecord(raw.hub);
-  if (hub?.managementIngress !== undefined && !managementIngressSchema.safeParse(hub.managementIngress).success) {
-    warnings.push("hub.managementIngress ignored: invalid management listener configuration; repair config.json before enabling the listener");
-  }
   return warnings;
 }
 
@@ -763,47 +751,6 @@ export function warnDegradedAgentTaskRecovery(rawParsed: unknown): void {
   if (warning) console.warn(`⚠️  config.json ${warning}. Other settings were preserved.`);
 }
 
-export function malformedRuntimeRoleWarning(rawParsed: unknown): string | null {
-  const raw = rawConfigRecord(rawParsed);
-  if (!raw || !Object.hasOwn(raw, "runtimeRole") || raw.runtimeRole === undefined) return null;
-  if (runtimeRoleSchema.safeParse(raw.runtimeRole).success) return null;
-  return 'runtimeRole ignored: expected "standalone", "hub", or "client"; falling back to "standalone"';
-}
-
-export function warnDegradedRuntimeRole(rawParsed: unknown): void {
-  const warning = malformedRuntimeRoleWarning(rawParsed);
-  if (warning) console.warn(`⚠️  config.json ${warning}. Other settings were preserved.`);
-}
-
-export function malformedOptionalRemoteBlockWarning(
-  rawParsed: unknown,
-  key: "hub" | "remoteGui",
-): string | null {
-  const raw = rawConfigRecord(rawParsed);
-  if (!raw || !Object.hasOwn(raw, key) || raw[key] === undefined) return null;
-  const schema = key === "hub" ? hubConfigSchema : remoteGuiConfigSchema;
-  const result = schema.safeParse(raw[key]);
-  if (result.success) return null;
-  const field = result.error.issues[0]?.path.join(".");
-  return `${key}${field ? `.${field}` : ""} ignored: invalid remote GUI configuration`;
-}
-
-export function malformedClientConnectionWarning(rawParsed: unknown): string | null {
-  const raw = rawConfigRecord(rawParsed);
-  if (!raw || !Object.hasOwn(raw, "client") || raw.client === undefined) return null;
-  const result = clientConnectionSchema.safeParse(raw.client);
-  if (result.success) return null;
-  const field = result.error.issues[0]?.path.join(".");
-  return `client${field ? `.${field}` : ""} invalid: remote client mode is disabled until config.json is repaired`;
-}
-
-export function warnDegradedOptionalRemoteBlocks(rawParsed: unknown): void {
-  for (const key of ["hub", "remoteGui"] as const) {
-    const warning = malformedOptionalRemoteBlockWarning(rawParsed, key);
-    if (warning) console.warn(`⚠️  config.json ${warning}. Other settings were preserved.`);
-  }
-}
-
 export function malformedQuotaResetNotifyWarning(rawParsed: unknown): string | null {
   const raw = rawConfigRecord(rawParsed);
   if (!raw || !Object.hasOwn(raw, "quotaResetNotify")) return null;
@@ -1013,14 +960,12 @@ export function sanitizeAliasesForLoad(raw: unknown, warn: (message: string) => 
   const providers = root.providers as Record<string, Record<string, unknown>>;
   const providerNames = new Set(Object.keys(providers).map(name => name.toLowerCase()));
   const claimedProviders = new Set<string>();
-  const comboAliases = new Set(Object.values((root.combos as Record<string, { alias?: unknown }> | undefined) ?? {})
-    .map(combo => typeof combo?.alias === "string" ? combo.alias.toLowerCase() : "").filter(Boolean));
   const accountNamespaces = new Set(Object.keys((root.codexAccountNamespaces as Record<string, unknown> | undefined) ?? {}).map(name => name.toLowerCase()));
   for (const provider of Object.values(providers)) {
     const alias = provider.alias;
     if (typeof alias !== "string" || !isValidProviderName(alias)
       || providerNames.has(alias.toLowerCase()) || claimedProviders.has(alias.toLowerCase())
-      || comboAliases.has(alias.toLowerCase()) || accountNamespaces.has(alias.toLowerCase())) {
+      || accountNamespaces.has(alias.toLowerCase())) {
       if (alias !== undefined) warn("Ignoring invalid or colliding provider alias in config.json");
       delete provider.alias;
     } else claimedProviders.add(alias.toLowerCase());
@@ -1034,7 +979,7 @@ export function sanitizeAliasesForLoad(raw: unknown, warn: (message: string) => 
     for (const [id, value] of Object.entries(aliases)) {
       const lower = typeof value === "string" ? value.toLowerCase() : "";
       if (typeof value !== "string" || !MODEL_ALIAS_PATTERN.test(value) || claimed.has(lower)
-        || nativeIds.has(lower) || comboAliases.has(lower) || /^(?:gpt-|o1-|o3-|o4-|codex-)/i.test(value)) {
+        || nativeIds.has(lower) || /^(?:gpt-|o1-|o3-|o4-|codex-)/i.test(value)) {
         warn(`Ignoring invalid or colliding model alias for ${id} in config.json`);
         delete aliases[id];
       } else claimed.add(lower);

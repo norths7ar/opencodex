@@ -9,8 +9,7 @@ afterEach(async () => { await f?.dispose(); });
 const sibling = (instance: typeof INSTANCE_FIXTURE_INSTANCES[number]) => instance === "anthropic" ? "anthropic2" : "anthropic";
 
 function context(keys: readonly string[]): GenerationContext {
-  return { generation: 100, providerNames: new Set(INSTANCE_FIXTURE_INSTANCES), oauthAccountKeys: new Set(keys),
-    comboIds: new Set(), comboTargets: new Set(), codexAccountIds: new Set(), configRoots: new Set() };
+  return { generation: 100, providerNames: new Set(INSTANCE_FIXTURE_INSTANCES), oauthAccountKeys: new Set(keys), codexAccountIds: new Set(), configRoots: new Set() };
 }
 function quota(percent: number) { return { updatedAt: Date.now(), fiveHourPercent: percent, weeklyPercent: percent }; }
 
@@ -137,25 +136,6 @@ test("namespace credential API accepts an authorized explicit in-memory config d
   expect(await b.resolveAnthropicDispatchAccountId(f.config)).toBe(f.ids[0]);
   const frozen = Object.freeze(structuredClone(f.config));
   expect(b.resolveAnthropicAccountForSession(f.sessionKey, frozen).accountId).toBe(f.ids[0]);
-});
-
-test("explicit combo targets retain both requested instances", async () => {
-  const { pickComboTarget, clearComboSelectionState } = await import("../../../src/combos/resolve");
-  f.config.combos = { explicit: { targets: [
-    { provider: "anthropic2", model: f.model }, { provider: "anthropic", model: f.model },
-  ] } };
-  try {
-    const first = pickComboTarget(f.config, "explicit")!;
-    expect(first.target.provider).toBe("anthropic2");
-    const second = pickComboTarget(f.config, "explicit", { exclude: [`anthropic2/${f.model}`] })!;
-    expect(second.target.provider).toBe("anthropic");
-    for (const target of [first.target, second.target]) {
-      const instance = target.provider === "anthropic2" ? "anthropic2" : "anthropic";
-      const snapshot = await f.routing.anthropicRoutingFor(instance).getAnthropicPoolAccessSnapshot(f.ids[0]);
-      f.ledger.record({ instance, accountId: snapshot.accountId, token: snapshot.accessToken });
-    }
-    expect(f.ledger.sends.map(send => send.instance)).toEqual(["anthropic2", "anthropic"]);
-  } finally { clearComboSelectionState("explicit"); }
 });
 
 test("management account-ref dry-run attributes B quota using explicit config", async () => {

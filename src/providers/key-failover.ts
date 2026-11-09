@@ -1,12 +1,6 @@
 /**
- * Multi-key 429 failover for non-OpenAI providers.
- *
- * When a provider's upstream returns 429, this module picks the next available key
- * from `apiKeyPool`, puts the exhausted key into cooldown (respecting Retry-After),
- * and returns a fresh provider config with the swapped key. If all keys are in
- * cooldown, returns null so the caller surfaces the 429 to the client.
- *
- * Modelled after src/codex/routing.ts cooldown logic but scoped to plain API-key pools.
+ * Shared API-key retry classification and transport compatibility. Lite never selects another
+ * key after refusal; retained rotation entry points return no replacement.
  */
 import { isKeyInCooldown, getKeyCooldownUntil, setKeyCooldown } from "./api-key-cooldowns";
 export { clearKeyCooldowns, getKeyCooldownUntil, sweepExpiredApiKeyCooldowns } from "./api-key-cooldowns";
@@ -376,13 +370,9 @@ function parseRetryAfterMs(value: string | null | undefined, now = Date.now()): 
  */
 // ---- public API ----
 
-/**
- * Check whether a provider has multiple keys available for failover.
- * Returns true only for key-auth providers with 2+ pool entries.
- */
+/** Lite routes each provider row through its configured key only. */
 export function hasKeyPoolFailover(provider: OcxProviderConfig): boolean {
-  if (provider.authMode === "oauth" || provider.authMode === "forward") return false;
-  return (provider.apiKeyPool?.length ?? 0) >= 2;
+  return false;
 }
 
 /**
@@ -485,56 +475,7 @@ export function selectProactiveApiKey(
   providerName: string,
   now = Date.now(),
 ): OcxProviderConfig | null {
-  const provider = config.providers?.[providerName];
-  if (!provider) return null;
-  const strategy = provider.apiKeyPoolStrategy;
-  if (!strategy) return null;
-  if (!hasKeyPoolFailover(provider)) return null;
-  const pool = provider.apiKeyPool ?? [];
-
-  const activeEntry = pool.find(entry => entry.key === provider.apiKey);
-  // A healthy committed key wins, whether the operator chose it or a previous rotation did.
-  if (activeEntry && !activeEntry.disabled && !isKeyInCooldown(providerName, activeEntry.id, now)) return null;
-
-  const eligible = pool.filter(entry => !entry.disabled && !isKeyInCooldown(providerName, entry.id, now));
-  if (eligible.length === 0) return null;
-
-  let chosen = eligible[0]!;
-  if (strategy === "round-robin") {
-    const lastId = keyRotationCursor.get(providerName);
-    const lastIndex = lastId ? pool.findIndex(entry => entry.id === lastId) : -1;
-    for (let offset = 1; offset <= pool.length; offset += 1) {
-      const candidate = pool[(lastIndex + offset) % pool.length]!;
-      if (candidate.disabled || isKeyInCooldown(providerName, candidate.id, now)) continue;
-      chosen = candidate;
-      break;
-    }
-  } else if (strategy === "quota") {
-    // else-if, deliberately. `fill-first` is not a named branch here -- it is the eligible[0]
-    // default above, so replacing that default would silently retarget it.
-    chosen = rankKeysByHeadroom(providerName, provider, eligible)[0] ?? chosen;
-  }
-  if (chosen.key === provider.apiKey) return null;
-
-  const outcome = commitProviderApiKeySelection<string | null>(config, providerName, freshProvider => {
-    const freshPool = freshProvider.apiKeyPool ?? [];
-    const target = freshPool.find(entry => entry.id === chosen.id);
-    if (!target || target.disabled) return { changed: false, value: null };
-    if (freshProvider.apiKey === target.key) return { changed: false, value: null };
-    const freshActive = freshPool.find(entry => entry.key === freshProvider.apiKey);
-    // Re-check under the lock: a concurrent manual selection may have landed a healthy key.
-    if (freshActive && !freshActive.disabled && !isKeyInCooldown(providerName, freshActive.id, now)) {
-      return { changed: false, value: null };
-    }
-    freshProvider.apiKey = target.key;
-    return { changed: true, value: target.id };
-  });
-  if (outcome.status !== "committed" || outcome.value === null) return null;
-
-  keyRotationCursor.set(providerName, outcome.value);
-  const committed = structuredClone(outcome.provider);
-  config.providers[providerName] = committed;
-  return structuredClone(committed);
+  return null;
 }
 
 /**
@@ -740,102 +681,7 @@ function rotateKeyAfterFailure(
   quotaResetAt?: number,
   acceptsFreshProvider?: (provider: OcxProviderConfig) => boolean,
 ): OcxProviderConfig | null {
-  const provider = config.providers[providerName];
-  if (!provider) return null;
-  if (provider.authMode === "oauth" || provider.authMode === "forward") return null;
-
-  if (attemptedSelection?.distributed) {
-    if (acceptsFreshProvider && !acceptsFreshProvider(provider)) return null;
-    if (!recordDistributedKeyFailure(config, providerName, attemptedSelection, failureStatus, now, retryAfterHeader, quotaResetAt)) return null;
-    if (!(provider.apiKeyPool ?? []).some(entry => !entry.disabled && !isKeyInCooldown(providerName, entry.id, now))) return null;
-    return allocateDistributedKey(providerName, provider, now);
-  }
-
-  const failedKey = attemptedSelection?.reference ?? attemptedKey ?? provider.apiKey;
-  type Rotation =
-    | { failedId?: string; candidateId?: string }
-    | { exhaustedCount: number; failedId?: string };
-  const outcome = commitProviderApiKeySelection<Rotation | null>(config, providerName, freshProvider => {
-    // Run on every persisted transaction attempt, including a freshness rebase.
-    if (acceptsFreshProvider) {
-      try { if (!acceptsFreshProvider(freshProvider)) return { changed: false, value: null }; }
-      catch { return { changed: false, value: null }; }
-    }
-    const pool = freshProvider.apiKeyPool;
-    if (!pool || pool.length < 2) return { changed: false, value: null };
-
-    // The callback can be rerun after rebasing, so identify the failed key here but
-    // defer the in-memory cooldown side effect until persistence has succeeded.
-    const failedEntry = attemptedSelection?.entryId
-      ? pool.find(entry => entry.id === attemptedSelection.entryId && entry.key === failedKey)
-      : pool.find(entry => entry.key === failedKey);
-
-    if (freshProvider.apiKey !== failedKey) {
-      const activeEntry = pool.find(entry => entry.key === freshProvider.apiKey);
-      if (activeEntry && !activeEntry.disabled && !isKeyInCooldown(providerName, activeEntry.id, now)) {
-        return {
-          changed: false,
-          value: { failedId: failedEntry?.id },
-        };
-      }
-    }
-
-    const currentIndex = failedEntry ? pool.indexOf(failedEntry) : -1;
-    const candidateCount = failedEntry ? pool.length - 1 : pool.length;
-    for (let offset = 1; offset <= candidateCount; offset += 1) {
-      const candidate = pool[(currentIndex + offset) % pool.length]!;
-      if (candidate.disabled || isKeyInCooldown(providerName, candidate.id, now)) continue;
-      freshProvider.apiKey = candidate.key;
-      return {
-        changed: true,
-        value: {
-          failedId: failedEntry?.id,
-          candidateId: candidate.id,
-        },
-      };
-    }
-    return { changed: false, value: { exhaustedCount: pool.length, failedId: failedEntry?.id } };
-  }, attemptedSelection);
-  if (outcome.status === "unavailable") return null;
-  if (outcome.status === "superseded") {
-    // Billing authority is bound to the sent selection; a newer manual choice grants no replay.
-    if (acceptsFreshProvider) return null;
-    // A newer manual selection (including A→B→A) owns subsequent dispatch. Reusing the
-    // same failed key here would loop forever; preserve its original failure instead.
-    return outcome.provider.apiKey !== failedKey ? structuredClone(outcome.provider) : null;
-  }
-  if (outcome.value === null) return null;
-  if (outcome.value.failedId) {
-    // A 401 is a verdict about the credential itself, not a timing signal: the key is rejected
-    // until an operator replaces it, and upstreams send no Retry-After for it. Hold it for the
-    // full cap instead of the 429 default so a dead key is not re-tried once a minute.
-    const cooldownMs = failureStatus === "billing"
-      ? ANTHROPIC_BILLING_COOLDOWN_MS
-      : failureStatus === 401
-      ? MAX_COOLDOWN_MS
-      // A reset instant the upstream dated outranks both the header and the
-      // default: it is the only one of the three that knows when the quota
-      // actually returns (#4024).
-      : quotaResetAt !== undefined
-        ? Math.max(quotaResetAt - now, 1)
-        : parseRetryAfterMs(retryAfterHeader, now) ?? DEFAULT_COOLDOWN_MS;
-    setKeyCooldown(providerName, outcome.value.failedId, now + cooldownMs);
-    sweepExpiredOnWrite(now);
-  }
-  if ("exhaustedCount" in outcome.value) {
-    console.warn(`[key-failover] ${providerName}: all ${outcome.value.exhaustedCount} keys in cooldown after ${failureLabel(failureStatus)}; returning the upstream status to the client`);
-    return null;
-  }
-
-  const committed = structuredClone(outcome.provider);
-  config.providers[providerName] = committed;
-  if (outcome.value.candidateId) {
-    console.warn(
-      // Log ids only — labels are user-supplied free text and could carry secret material.
-      `[key-failover] ${providerName}: ${failureLabel(failureStatus)} on key ${outcome.value.failedId ?? "?"}; rotating to key ${outcome.value.candidateId}`,
-    );
-  }
-  return structuredClone(committed);
+  return null;
 }
 
 function failureLabel(failureStatus: 401 | 429 | "billing"): string {

@@ -56,7 +56,7 @@ export const PROTOCOL_REASON_CODES = [
   "same-wire-native",
   "cross-wire-codec",
   "cross-wire-ir",
-  "combo-or-policy-route",
+  "policy-route",
   "responses-only-feature",
   "hosted-tool",
   "vision-preprocessing",
@@ -118,31 +118,6 @@ export function protocolFromInboundWire(wire: InboundWireSpelling): Protocol {
 
 export function inboundWireForProtocol(protocol: Protocol): InboundWireSpelling {
   return protocol === "messages" ? "anthropic" : protocol;
-}
-
-/** Lab protocol identities (`src/lab/conformance/fixtures/*`) to the public vocabulary. */
-export function protocolFromLabProtocol(identity: string): Protocol | undefined {
-  switch (identity) {
-    case "openai-responses":
-      return "responses";
-    case "openai-chat":
-      return "chat";
-    case "anthropic-messages":
-      return "messages";
-    default:
-      return undefined;
-  }
-}
-
-export function labProtocolForProtocol(protocol: Protocol): string {
-  switch (protocol) {
-    case "responses":
-      return "openai-responses";
-    case "chat":
-      return "openai-chat";
-    case "messages":
-      return "anthropic-messages";
-  }
 }
 
 /**

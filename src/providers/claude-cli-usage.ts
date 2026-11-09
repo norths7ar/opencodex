@@ -1,8 +1,5 @@
 import { markAnthropicFamilyEnumeration } from "./quota/anthropic-family-headers";
-import { rawAnthropicUsageWindows } from "./quota/anthropic-decision-windows";
 import { anthropicUsageBuckets } from "./quota/anthropic-usage-windows";
-import { bindRawDecisionWindows } from "./quota-decision-publication";
-import { decisionQuotaSinkActive } from "../lib/decision-quota-sink";
 import { CLAUDE_CLI_USER_AGENT } from "./claude-cli-identity";
 import { asRecord, normalizePercent, normalizeResetAt, readQuotaJson, REQUEST_TIMEOUT_MS } from "./quota-wire";
 import type { ProviderQuota, ProviderQuotaWindow, QuotaFailureCode } from "./quota-types";
@@ -56,7 +53,6 @@ export async function probeAnthropicUsageQuota(accessToken: string): Promise<Ant
     ...(customWindows.length > 0 ? { customWindows } : {}),
     updatedAt: Date.now(),
   };
-  if (decisionQuotaSinkActive()) bindRawDecisionWindows(quota, rawAnthropicUsageWindows(body, quota.updatedAt));
   // Empty / schema-changed payloads must not cache as "success with no bars".
   if (!hasQuotaRows(quota)) return { quota: null, failure: "response_unusable" };
   return { quota: markAnthropicFamilyEnumeration(quota, familyEnumeration) };

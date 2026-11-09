@@ -565,13 +565,13 @@ test("our own change wins a conflict and rebases the baseline", () => {
   const live = loadConfig();
   armClaudeCodeBaseline(live);
   writeDiskConfig({ claudeCode: { authMode: "proxy" } });
-  live.claudeCode = { authMode: "subscription", systemEnv: true };
+  live.claudeCode = { authMode: "subscription", autoContext: true };
 
   saveConfigPreservingClaudeCode(live);
   expect((diskConfig().claudeCode as Record<string, unknown>).authMode).toBe("subscription");
 
   // Rebased: a fresh hand edit on top of OUR value is preserved by the next save.
-  writeDiskConfig({ claudeCode: { authMode: "proxy", systemEnv: true } });
+  writeDiskConfig({ claudeCode: { authMode: "proxy", autoContext: true } });
   live.port = 10102;
   saveConfigPreservingClaudeCode(live);
   expect((diskConfig().claudeCode as Record<string, unknown>).authMode).toBe("proxy");
@@ -597,7 +597,7 @@ test("OAuth reconciliation keeps a pending live Claude subtree authoritative", (
   const live = loadConfig();
   armClaudeCodeBaseline(live);
   const persistedBaseline = loadConfig();
-  live.claudeCode = { authMode: "subscription", systemEnv: true };
+  live.claudeCode = { authMode: "subscription", autoContext: true };
   live.disabledModels = ["pending/model"];
   writeDiskConfig({
     claudeCode: { authMode: "proxy" },
@@ -606,12 +606,12 @@ test("OAuth reconciliation keeps a pending live Claude subtree authoritative", (
 
   reconcileLiveConfigFromDisk(live, persistedBaseline);
 
-  expect(live.claudeCode).toEqual({ authMode: "subscription", systemEnv: true });
+  expect(live.claudeCode).toEqual({ authMode: "subscription", autoContext: true });
   expect(live.disabledModels).toEqual(["pending/model"]);
   expect(live.contextCapValue).toBe(240_000);
 
   saveConfigPreservingClaudeCode(live);
-  expect(diskConfig().claudeCode).toEqual({ authMode: "subscription", systemEnv: true });
+  expect(diskConfig().claudeCode).toEqual({ authMode: "subscription", autoContext: true });
   expect(diskConfig().disabledModels).toEqual(["pending/model"]);
   expect(diskConfig().contextCapValue).toBe(240_000);
 });
@@ -675,12 +675,12 @@ test("OAuth reconciliation adopts a modelCosts edit and refreshes the overlay re
 // Structural compare, not JSON.stringify: key order must not fake an external edit.
 test("a key-order-only difference is not treated as an external edit", () => {
   const live = loadConfig();
-  live.claudeCode = { authMode: "subscription", systemEnv: true };
+  live.claudeCode = { authMode: "subscription", autoContext: true };
   saveConfig(live);
   armClaudeCodeBaseline(live);
-  writeDiskConfig({ claudeCode: { systemEnv: true, authMode: "subscription" } });
+  writeDiskConfig({ claudeCode: { autoContext: true, authMode: "subscription" } });
 
-  live.claudeCode = { authMode: "proxy", systemEnv: true };
+  live.claudeCode = { authMode: "proxy", autoContext: true };
   saveConfigPreservingClaudeCode(live);
   // No spurious "their edit wins" branch: our real change lands.
   expect((diskConfig().claudeCode as Record<string, unknown>).authMode).toBe("proxy");

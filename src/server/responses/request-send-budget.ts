@@ -64,20 +64,15 @@ export function createResponsesSendBudget(
   // to the root as well (#4546).
   const workflowRootId = req.headers.get("x-codex-parent-thread-id")?.trim() || undefined;
   const physicalWorkflowAccounting = hasWorkflowSendObserver(sendBudget);
-  // A child that owns its Combo booking settles that exact permit through the reporter, even
-  // when its caller handed ownership over only as `comboInitialSend`.
-  const inheritedPermit = options.compactionRecoveryPermit ?? options.comboDispatchPermit
-    ?? options.comboInitialSend?.permit;
-  let pendingHopPermit: SingleUseDispatchPermit | undefined = options.compactionRecoveryPermit;
-  let initialPermit = options.comboInitialSend?.permit;
+  const inheritedPermit = options.compactionRecoveryPermit;
+  let pendingHopPermit = inheritedPermit;
   // Count this owner's physical sends, not later bookings made by other shared-ledger owners.
   // Direct callers retain sends reported before this owner was constructed.
-  let targetSendsUsed = initialPermit ? 0 : Math.max(0,
+  let targetSendsUsed = Math.max(0,
     sendBudget.used - (options.compactionRecoveryPermit ? 1 : 0));
   /** Attribute reported physical sends to this owner; the prepaid booking is spent once reported. */
   const noteTargetSends = (charged: number): void => {
     targetSendsUsed += charged;
-    if (charged > 0) initialPermit = undefined;
   };
   const recordTransientSends = (used: number, permit?: SingleUseDispatchPermit, workflowAlreadyCounted = false): void => {
     const charged = Math.max(0, used);
@@ -167,7 +162,7 @@ export function createResponsesSendBudget(
     return workflowRefusalResponse(continuityRefusal, logCtx, undefined, workflowRootId);
   }
   const prepaid = isRequestExecutionBudget(sendBudget)
-    ? claimDispatchSpendProof(sendBudget, options.compactionRecoveryPermit ?? options.comboDispatchPermit) : undefined;
+    ? claimDispatchSpendProof(sendBudget, options.compactionRecoveryPermit) : undefined;
   const admissionPolicy = isRequestExecutionBudget(sendBudget) ? sendBudget.spendAdmissionPolicy : undefined;
   const spentCeiling = workflowSpendCeilingReached(workflowRootId, undefined, logCtx.spendPoolId ?? logCtx.provider, prepaid, admissionPolicy);
   if (spentCeiling) {
@@ -267,11 +262,6 @@ export function createResponsesSendBudget(
    */
   const permits = {
     /** Transfer the initial booking once to the adapter dispatch owner. */
-    claimInitialPermit: () => {
-      const permit = initialPermit;
-      initialPermit = undefined;
-      return permit;
-    },
     /** Transfer a pending recovery booking once, without creating a new allowance. */
     claimHopPermit: () => {
       const permit = pendingHopPermit;
@@ -389,9 +379,9 @@ export function createResponsesSendBudget(
     remainingTransientSendBudget,
     /** Only this child's prepaid send, not every pending external booking, is spendable here. */
     initialSendAllowance: (cap: number): number => Math.min(cap,
-      remainingTransientSendBudget(cap) + (initialPermit ? 1 : 0)),
+      remainingTransientSendBudget(cap)),
     /** At final executor admission, settle only the owning booking or reserve this send. */
-    noteInitialDispatch: (prepaid = initialPermit): void => {
+    noteInitialDispatch: (prepaid?: SingleUseDispatchPermit): void => {
       const policy = currentWorkflowBudgetPolicy();
       if (!physicalWorkflowAccounting && workflowSendCeilingReached(workflowRootId, policy)) {
         prepaid?.release();
@@ -399,8 +389,7 @@ export function createResponsesSendBudget(
       }
       if (prepaid) {
         if (!prepaid.assumeCharge()) { prepaid.release(); throw new SendBudgetExhaustedError(); }
-        if (prepaid === initialPermit) initialPermit = undefined;
-      } else if (adapterSendBudget && (options.comboInitialSend || options.compactionRecoveryPermit)) {
+      } else if (adapterSendBudget && options.compactionRecoveryPermit) {
         const decision = adapterSendBudget.reserveDispatch({ sendClass: "transient",
           targetKey: adapterSendBudget.lastTargetKey ?? `${logCtx.provider}/${logCtx.model}` });
         if (!decision.allowed) throw new SendBudgetExhaustedError();
@@ -462,7 +451,6 @@ export type ResponsesSendBudget = Exclude<ReturnType<typeof createResponsesSendB
 function adapterDispatchBudgetView(
   budget: RequestExecutionBudget,
   hop: {
-    claimInitialPermit: () => SingleUseDispatchPermit | undefined;
     claimHopPermit: () => SingleUseDispatchPermit | undefined;
   },
   legacyHopReplacement = false,
@@ -495,19 +483,6 @@ function adapterDispatchBudgetView(
       // A dispatch whose upstream state is unknown is refused on its own merits. A hop that
       // already paid does not make an unsafe replay safe, so that check stays with the budget.
       if (intent.replaySafe !== false) {
-        // The Combo reserves a logical provider/model identity. The child's first actual
-        // endpoint is not a recovery transition; retain the original refundable permit.
-        const initialPermit = hop.claimInitialPermit();
-        if (initialPermit) {
-          budget.bindPrepaidTarget?.(intent.targetKey);
-          return { allowed: true, permit: {
-            sendClass: initialPermit.sendClass,
-            execute: run => initialPermit.execute ? initialPermit.execute(run) : run(),
-            use: () => initialPermit.assumeCharge(),
-            assumeCharge: () => initialPermit.assumeCharge(),
-            release: () => initialPermit.release(),
-          } };
-        }
         const hopPermit = hop.claimHopPermit();
         if (hopPermit && intent.targetKey !== budget.lastTargetKey) {
           // The rotated credential can select a different regional endpoint. Replace the

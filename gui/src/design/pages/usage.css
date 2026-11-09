@@ -66,23 +66,6 @@
 .usage-v2-tbl .tbl.usage-models-tbl tbody td:nth-child(2) { box-shadow: inset -1px 0 0 var(--ocx-line); }
 .usage-v2-tbl .usage-cost-note { margin-top: 2px; font-family: var(--font-ui); font-size: 11px; color: var(--ocx-fg-subtle); }
 
-/* ---- menu bar & widget tab ---------------------------------------------------- */
-.usage-companion-panel { padding-top: 0; }
-.usage-companion-panel .usage-companion-chart svg { height: auto; max-height: 240px; }
-.usage-companion-panel .usage-companion-axis { stroke: var(--ocx-line-strong); }
-.usage-companion-panel .usage-companion-axis-label { fill: var(--ocx-fg-subtle); font-size: 11px; }
-.usage-companion-panel .usage-companion-legend-item { color: var(--ocx-fg-muted); font-size: 12px; }
-.usage-companion-panel :is(.usage-companion-chart-skeleton, .usage-companion-chart-state) {
-  border: 0;
-  border-radius: 8px;
-}
-.usage-companion-panel .usage-companion-chart-state { justify-content: center; font-size: 13px; color: var(--ocx-fg-muted); }
-.usage-companion-panel .usage-companion-model-group + .usage-companion-model-group { border-top-color: var(--ocx-line); }
-.usage-companion-panel .usage-companion-model-group-header { background: var(--ocx-surface); }
-.usage-companion-panel .usage-companion-model-chip { border-color: var(--ocx-line-strong); color: var(--ocx-fg-subtle); }
-.usage-companion-panel .usage-companion-model-row code { font-size: 12.5px; }
-.usage-companion-panel .usage-companion-install-guide > summary { list-style-position: inside; }
-
 /* ---- chart tooltips--------------------------------------------------------- */
 :is(.daybar-tip, .heatmap-tip).chart-overlay {
   padding: 8px 10px;

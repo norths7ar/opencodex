@@ -11,15 +11,13 @@
 import { printFullUsage, printSubcommandUsage, printUsage, printVersion } from "./help";
 import { parseReadyArgs, type ReadyArgs } from "./ready";
 import { parseResolveArgs, type ResolveArgs } from "./resolve";
-import { parseStopApproval } from "./stop-approval";
-import { parseSyncExpectation, SYNC_EXPECTATION_USAGE_EXIT } from "./sync-expectation";
-import { parseSyncFanoutFlags } from "./sync-flags";
+import { parseStopArgs } from "./stop-report";
+import { parseSyncFlags } from "./sync-flags";
 import { maybeAutoRestoreCodexShimAsync } from "./codex-shim-autorestore";
 import { findCommand } from "./registry";
 import { printUnknownCommand } from "./help-recovery";
 import { noteCredentialArgv, redactSecretArgs } from "./secret-args";
 import { maybeNoticeVersionSkew } from "./version-skew-notice";
-import { isOrchestratedUpdateArgv } from "../update/orchestrated-arguments.mjs";
 
 export interface CliHead {
   kind: "version" | "help" | "ready" | "resolve" | "command";
@@ -42,7 +40,6 @@ export function parseCliHead(argv: string[]): CliHead {
   const args = argv;
   // Codex owns its forwarded grammar; wrapper documentation is `ocx help codex`.
   if (command === "codex") return { kind: "command", command, args };
-  if (command === "update" && isOrchestratedUpdateArgv(args.slice(1))) return { kind: "command", command, args };
   if (command === "--version" || command === "-v" || command === "version") {
     return { kind: "version", command, args };
   }
@@ -139,8 +136,8 @@ export async function runCli(argv: string[]): Promise<CliHead> {
         printUnknownCommand(head.command);
         process.exit(1);
       }
-      if (head.command === "stop" && !parseStopApproval(head.args.slice(1)).ok) {
-        console.error("Usage: ocx stop [--json [--expect-pid <pid> --expect-port <port> --expect-hostname <host> --expect-config-home <home> --expect-cli-version <version> --expect-compatibility-token <hex>]]");
+      if (head.command === "stop" && !parseStopArgs(head.args.slice(1)).ok) {
+        console.error("Usage: ocx stop [--json]");
         process.exit(64);
       }
       const uninstallError = uninstallArgsError(head.command, head.args);
@@ -148,17 +145,11 @@ export async function runCli(argv: string[]): Promise<CliHead> {
         console.error(uninstallError);
         process.exit(2);
       }
-      // #7694: a malformed pinned sync is refused before any preflight reads or repairs anything.
       if (head.command === "sync") {
-        const flags = parseSyncFanoutFlags(head.args.slice(1));
+        const flags = parseSyncFlags(head.args.slice(1));
         if (!flags.ok) {
           console.error(flags.message);
-          process.exit(SYNC_EXPECTATION_USAGE_EXIT);
-        }
-        const pinned = parseSyncExpectation(head.args.slice(1));
-        if (!pinned.ok) {
-          console.error(pinned.message);
-          process.exit(SYNC_EXPECTATION_USAGE_EXIT);
+          process.exit(2);
         }
       }
       await maybeNoticeVersionSkew(head.command, head.args);

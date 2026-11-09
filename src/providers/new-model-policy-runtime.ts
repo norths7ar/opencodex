@@ -16,7 +16,7 @@ function inventory(config: OcxConfig): unknown {
     initialModelSelection: provider.initialModelSelection?.registrationId,
   }]));
   // Compare normalized persisted data, not injected fetch functions. Never log this identity.
-  return JSON.parse(JSON.stringify({ providers, combos: validated.config.combos,
+  return JSON.parse(JSON.stringify({ providers,
     policy: validated.config.modelDiscovery?.newModelPolicy }));
 }
 

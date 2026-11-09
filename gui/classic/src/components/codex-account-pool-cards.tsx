@@ -1,48 +1,33 @@
 import { useState } from "react";
 import { formatAccountPauseTooltip } from "../account-pause-display";
-import { useT, useI18n } from "../i18n/shared";
-import { useCopyFeedback } from "./use-copy-feedback";
-import { IconAlert, IconPause, IconPlay, IconX } from "../icons";
+import { useI18n,useT } from "../i18n/shared";
+import { IconAlert,IconPause,IconPlay,IconX } from "../icons";
 import { displayAccountId } from "../lib/privacy";
-import AccountPriorityControl, { AccountPriorityBadge } from "./AccountPriorityControl";
-import { DEFAULT_ACCOUNT_PRIORITY, normalizeAccountPriority } from "../account-priority";
-import AccountAutoSwitchControl from "./AccountAutoSwitchControl";
-import { AccountCreditsToggle, CreditsOnBadge } from "./CodexCreditSpend";
-import type { CodexAccountEntry } from "./codex-account-pool-types";
-import type { CodexAccountModeState } from "../codex-multi-state";
-import QuotaBars from "./QuotaBars";
-import CodexCreditsRow from "./CodexCreditsRow";
-import { CodexPauseToggleLabel, CodexPinnedBadge, CodexTicketBadge } from "./codex-account-pool-helpers";
 import {
-  doctorCopyButtonLabel,
-  formatOAuthHealthLabel,
-  formatOAuthHealthSummary,
-  oauthHealthBadgeClass,
-  oauthHealthIsCooldown,
-  oauthHealthShowsDoctor,
-  oauthHealthShowsReauth,
+doctorCopyButtonLabel,
+formatOAuthHealthLabel,
+formatOAuthHealthSummary,
+oauthHealthBadgeClass,
+oauthHealthIsCooldown,
+oauthHealthShowsDoctor,
+oauthHealthShowsReauth,
 } from "../oauth-health-display";
+import { AccountCreditsToggle,CreditsOnBadge } from "./CodexCreditSpend";
+import CodexCreditsRow from "./CodexCreditsRow";
+import QuotaBars from "./QuotaBars";
+import { CodexPauseToggleLabel,CodexTicketBadge } from "./codex-account-pool-helpers";
+import type { CodexAccountEntry } from "./codex-account-pool-types";
+import { useCopyFeedback } from "./use-copy-feedback";
 
 export function CodexAccountPoolCards({
   pool,
   creditsVisible,
   loading = false,
   activeId,
-  accountModeState,
-  switchActionLabel,
-  threshold,
   onOpenReset,
-  onSwitch,
   onTogglePause,
   pauseUpdatingId,
   pauseBusy,
-  onPriorityChange,
-  priorityUpdatingId,
-  onAutoSwitchThresholdChange,
-  autoSwitchDisabled,
-  switchingId,
-  pinnedId = null,
-  onUnpin,
   onReauth,
   onEditAlias,
   onRemove,
@@ -55,29 +40,10 @@ export function CodexAccountPoolCards({
   creditsVisible?: boolean;
   loading?: boolean;
   activeId: string | null;
-  accountModeState: CodexAccountModeState | null;
-  switchActionLabel: string;
-  threshold: number;
   onOpenReset: (account: CodexAccountEntry) => void;
-  onSwitch: (account: CodexAccountEntry) => void;
   onTogglePause: (account: CodexAccountEntry) => void;
   pauseUpdatingId: string | null;
   pauseBusy: boolean;
-  onPriorityChange: (account: CodexAccountEntry, priority: number) => void;
-  priorityUpdatingId: string | null;
-  onAutoSwitchThresholdChange: (account: CodexAccountEntry, threshold: number | null) => Promise<boolean>;
-  autoSwitchDisabled: boolean;
-  /** In-flight manual switch, which writes the same pin an order write clears. */
-  switchingId: string | null;
-  /**
-   * The account an operator pinned by hand, which is not always the selected one: under
-   * round-robin and fill-first the pin caps selection at its own tier while the cursor
-   * moves inside that tier. Marking the pinned card rather than the selected one keeps the
-   * badge on the account the operator actually chose.
-   */
-  pinnedId?: string | null;
-  /** Opens the release confirm for the pinned card: selecting the badge again unpins. */
-  onUnpin: (account: CodexAccountEntry) => void;
   onReauth: (id: string) => void;
   onEditAlias: (account: CodexAccountEntry) => void;
   onRemove: (id: string) => void;
@@ -123,9 +89,9 @@ export function CodexAccountPoolCards({
                   {t("codexAuth.paused")}
                 </span>
               )}
-              <AccountPriorityBadge value={a.priority} />
+
               <CreditsOnBadge enabled={a.creditsAfterLimit} />
-              {a.id === pinnedId && !a.paused && <CodexPinnedBadge t={t} onUnpin={() => onUnpin(a)} />}
+
               <CodexTicketBadge t={t} account={a} onClick={() => onOpenReset(a)} />
               {healthLabel && (
                 <span className={oauthHealthBadgeClass(healthStatus)}>{healthLabel}</span>
@@ -133,15 +99,11 @@ export function CodexAccountPoolCards({
               {showReauth && !healthLabel && <span className="badge badge-amber">{t("codexAuth.needsReauth")}</span>}
               {isNext(a) && !planExcluded && !showReauth && !inCooldown && !validationPending && (
                 <span className="badge badge-primary">
-                  {t(accountModeState === "direct" ? "codexAuth.poolPrepared" : "codexAuth.nextSession")}
+                  {t("prov.accountActive")}
                 </span>
               )}
             </span>
-            {!a.paused && !planExcluded && (!isNext(a) || pinnedId !== a.id) && !showReauth && !inCooldown && !validationPending && (
-              <button type="button" className="btn btn-ghost btn-sm codex-account-switch" onClick={() => onSwitch(a)}>
-                {switchActionLabel}
-              </button>
-            )}
+
             {showReauth && (
               <button type="button" className="btn btn-primary btn-sm" onClick={() => onReauth(a.id)}>
                 {t("codexAuth.reauthenticate")}
@@ -213,28 +175,8 @@ export function CodexAccountPoolCards({
           <div className="codex-account-identity">
             <div className="codex-account-identity-copy">{a.email}{a.plan ? ` · ${a.plan}` : ""}</div>
             <div className="codex-account-controls">
-              {(normalizeAccountPriority(a.priority) !== DEFAULT_ACCOUNT_PRIORITY || moreOpen.has(a.id)) && (
-                <AccountPriorityControl
-                  value={a.priority}
-                  selectId={`codex-account-priority-${a.id}`}
-                  // Every row, not just the one being written: the controller serializes order
-                  // writes behind one mutation ref, so a second row's pick would come back "busy"
-                  // and be dropped with no toast. Same global lock the pause button uses.
-                  // A pending switch counts too — it writes the same pin this clears, so the
-                  // controller refuses to overlap them, and that refusal is equally silent.
-                  disabled={priorityUpdatingId !== null || switchingId !== null}
-                  onChange={(priority) => onPriorityChange(a, priority)}
-                />
-              )}
-              <AccountAutoSwitchControl
-                key={a.id}
-                accountLabel={a.alias ?? a.email}
-                globalThreshold={threshold}
-                override={a.autoSwitchThresholdOverride}
-                inputId={`codex-account-auto-switch-${a.id}`}
-                disabled={autoSwitchDisabled}
-                onChange={(next) => onAutoSwitchThresholdChange(a, next)}
-              />
+
+
             </div>
           </div>
           {healthSummary && (
@@ -246,10 +188,9 @@ export function CodexAccountPoolCards({
           {showReauth
             ? <div className="card-sub faint">{t("codexAuth.tokenExpired")}</div>
             : !inCooldown && <>
-                <QuotaBars
+                <QuotaBars threshold={0}
                   quota={a.quota}
                   plan={a.plan}
-                  threshold={a.autoSwitchThresholdOverride ?? threshold}
                   t={t}
                   pending={a.quota == null && (loading || !showCredits)}
                   afterWeekly={showCredits && !loading ? <CodexCreditsRow credits={a.credits} t={t} locale={locale} /> : undefined}

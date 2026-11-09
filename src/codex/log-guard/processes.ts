@@ -1,5 +1,3 @@
-import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
 
 import {
   listWindowsSnapshots,
@@ -93,79 +91,6 @@ export function isCodexWriterCommandLine(commandLine: string, executable?: strin
     && isCodeModeHostExecutable(tokens[1]!);
 }
 
-function statusUid(status: string): number | undefined {
-  const match = /^Uid:\s+(\d+)/m.exec(status);
-  if (!match) return undefined;
-  const value = Number(match[1]);
-  return Number.isSafeInteger(value) ? value : undefined;
-}
-
-function listLinuxSnapshots(uid: number | undefined): ProcessSnapshot[] {
-  if (!existsSync("/proc")) throw new Error("procfs_unavailable");
-  const rows: ProcessSnapshot[] = [];
-  for (const entry of readdirSync("/proc")) {
-    if (!/^\d+$/.test(entry)) continue;
-    const pid = Number(entry);
-    if (!Number.isSafeInteger(pid) || pid <= 0) continue;
-    try {
-      const procUid = statusUid(readFileSync(`/proc/${pid}/status`, "utf8"));
-      if (uid !== undefined && procUid !== undefined && procUid !== uid) continue;
-      const argv = readFileSync(`/proc/${pid}/cmdline`)
-        .toString("utf8")
-        .split("\0")
-        .filter(Boolean);
-      const commandLine = argv.join(" ").trim();
-      if (commandLine) rows.push({ pid, commandLine, executable: argv[0], uid: procUid });
-    } catch {
-      // A process disappearing mid-enumeration is normal. A top-level procfs
-      // failure is handled before the loop and fails closed.
-    }
-  }
-  return rows;
-}
-
-function listDarwinSnapshots(uid: number | undefined): ProcessSnapshot[] {
-  const commandOutput = uid !== undefined
-    ? execFileSync("/bin/ps", ["-u", String(uid), "-o", "pid=,command="], {
-      encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    })
-    : execFileSync("/bin/ps", ["-axo", "pid=,uid=,command="], {
-      encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    });
-  const executableOutput = uid !== undefined
-    ? execFileSync("/bin/ps", ["-u", String(uid), "-o", "pid=,comm="], {
-      encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    })
-    : execFileSync("/bin/ps", ["-axo", "pid=,comm="], {
-      encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    });
-  const executableByPid = new Map<number, string>();
-  for (const raw of executableOutput.split(/\r?\n/)) {
-    const match = /^\s*(\d+)\s+(.+)$/.exec(raw);
-    if (!match) continue;
-    const pid = Number(match[1]);
-    const executable = match[2]?.trim() ?? "";
-    if (Number.isSafeInteger(pid) && pid > 0 && executable) executableByPid.set(pid, executable);
-  }
-  const rows: ProcessSnapshot[] = [];
-  for (const raw of commandOutput.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line) continue;
-    const match = uid !== undefined
-      ? /^(\d+)\s+(.*)$/.exec(line)
-      : /^(\d+)\s+(\d+)\s+(.*)$/.exec(line);
-    if (!match) continue;
-    const pid = Number(match[1]);
-    const commandLine = (uid !== undefined ? match[2] : match[3])?.trim() ?? "";
-    if (!Number.isSafeInteger(pid) || pid <= 0 || !commandLine) continue;
-    rows.push({
-      pid, commandLine, executable: executableByPid.get(pid),
-      uid: uid ?? (Number.isSafeInteger(Number(match[2])) ? Number(match[2]) : undefined),
-    });
-  }
-  return rows;
-}
-
 function effectiveUid(getuid?: () => number | undefined): number | undefined {
   try {
     return getuid ? getuid() : process.getuid?.();
@@ -176,8 +101,8 @@ function effectiveUid(getuid?: () => number | undefined): number | undefined {
 
 function defaultSnapshots(platform: NodeJS.Platform, uid: number | undefined): ProcessSnapshot[] {
   if (platform === "win32") return listWindowsSnapshots();
-  if (platform === "darwin") return listDarwinSnapshots(uid);
-  if (platform === "linux") return listLinuxSnapshots(uid);
+
+
   throw new Error("unsupported_process_enumeration_platform");
 }
 

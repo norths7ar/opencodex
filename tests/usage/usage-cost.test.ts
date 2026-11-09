@@ -3,7 +3,7 @@ import { createAdapterTierMetadata } from "../../src/providers/fastwire";
 import {
   calculateCost,
   estimateAttemptCost,
-  estimateComboCost,
+  estimateAttemptsCost,
   estimateRequestCost,
   effectiveServiceTier,
   normalizeCostTokens,
@@ -478,7 +478,7 @@ describe("resolveMatchedPrice", () => {
       expect(resolveMatchedPrice(provider, input.model, undefined, [])).toBeNull();
       expect(estimateRequestCost(input, undefined, [])).toBeNull();
       expect(estimateAttemptCost({ ...input, ordinal: 1 }, undefined, undefined, [])).toBeNull();
-      expect(estimateComboCost([
+      expect(estimateAttemptsCost([
         { ...input, model: "k3", ordinal: 1 },
         { ...input, ordinal: 2 },
       ], undefined, undefined, [])).toBeNull();
@@ -766,41 +766,6 @@ describe("resolveMatchedPrice", () => {
   });
 });
 
-describe("combo", () => {
-  const overlays: ExpectedPriceOverlay[] = [
-    { provider: "pa", modelId: "ma", cost4: { input: 1, output: 10, cacheRead: 0.1, cacheWrite: 0 }, source: "a", verifiedAt: "2026-07-20", status: "verified" },
-    { provider: "pb", modelId: "mb", cost4: { input: 2, output: 20, cacheRead: 0.2, cacheWrite: 0 }, source: "b", verifiedAt: "2026-07-20", status: "verified-derived" },
-  ];
-
-  test("10. per-attempt rates summed; derived propagates estimated", () => {
-    const combo = estimateComboCost([
-      { ordinal: 1, provider: "pa", model: "ma", usageStatus: "reported", usage: { inputTokens: 1_000_000, outputTokens: 100_000 } },
-      { ordinal: 2, provider: "pb", model: "mb", usageStatus: "reported", usage: { inputTokens: 500_000, outputTokens: 50_000 } },
-    ], overlays);
-    expect(combo).not.toBeNull();
-    // pa: 1*1 + 10*0.1 = 2.0 ; pb: 2*0.5 + 20*0.05 = 2.0
-    expect(combo!.cost.total).toBeCloseTo(4.0, 9);
-    expect(combo!.estimated).toBe(true); // pb is verified-derived
-    expect(combo!.attempts).toHaveLength(2);
-  });
-
-  test("11. fail-closed: any unpriced attempt nulls the whole combo", () => {
-    const combo = estimateComboCost([
-      { ordinal: 1, provider: "pa", model: "ma", usageStatus: "reported", usage: { inputTokens: 100, outputTokens: 10 } },
-      { ordinal: 2, provider: "nope", model: "nope", usageStatus: "reported", usage: { inputTokens: 100, outputTokens: 10 } },
-    ], overlays);
-    expect(combo).toBeNull();
-  });
-
-  test("14. usage-less attempt and empty combo are null", () => {
-    expect(estimateAttemptCost({ ordinal: 1, provider: "pa", model: "ma", usageStatus: "unreported" }, overlays)).toBeNull();
-    expect(estimateComboCost([], overlays)).toBeNull();
-    expect(estimateComboCost([
-      { ordinal: 1, provider: "pa", model: "ma", usageStatus: "unreported" },
-    ], overlays)).toBeNull();
-  });
-});
-
 describe("estimateRequestCost", () => {
   test("estimated usage propagates", () => {
     const overlays: ExpectedPriceOverlay[] = [
@@ -898,7 +863,7 @@ describe("OpenAI API-reference pricing", () => {
       expect(fast.estimated).toBe(provider !== "openai-apikey");
       const attempt = { ordinal: 1, provider, model, usage, usageStatus: "reported" as const };
       expect(estimateAttemptCost(attempt, undefined, "priority")?.cost.total).toBeCloseTo(6.5, 9);
-      expect(estimateComboCost([attempt, { ...attempt, ordinal: 2 }], undefined, "priority")?.cost.total).toBeCloseTo(13, 9);
+      expect(estimateAttemptsCost([attempt, { ...attempt, ordinal: 2 }], undefined, "priority")?.cost.total).toBeCloseTo(13, 9);
     }
   });
 
@@ -937,7 +902,7 @@ describe("OpenAI API-reference pricing", () => {
     const tier = { responseServiceTier: "priority" };
     const attempt = { ordinal: 1, provider: "openai-apikey", model, usage, usageStatus: "reported" as const };
     expect(estimateAttemptCost(attempt, undefined, tier)?.cost.total).toBeCloseTo(6.5, 9);
-    expect(estimateComboCost([attempt, { ...attempt, ordinal: 2 }], undefined, tier)?.cost.total).toBeCloseTo(13, 9);
+    expect(estimateAttemptsCost([attempt, { ...attempt, ordinal: 2 }], undefined, tier)?.cost.total).toBeCloseTo(13, 9);
     expect(estimateRequestCost({ ...attempt, serviceTier: { responseServiceTier: "default", requestedServiceTier: "fast" } })?.cost.total).toBeCloseTo(3.25, 9);
   });
 
@@ -948,7 +913,7 @@ describe("OpenAI API-reference pricing", () => {
         const serviceTier = { responseServiceTier: "priority" };
         expect(estimateRequestCost({ ...attempt, serviceTier })?.cost.total).toBeCloseTo(expected, 9);
         expect(estimateAttemptCost(attempt, undefined, serviceTier)?.cost.total).toBeCloseTo(expected, 9);
-        expect(estimateComboCost([attempt], undefined, serviceTier)?.cost.total).toBeCloseTo(expected, 9);
+        expect(estimateAttemptsCost([attempt], undefined, serviceTier)?.cost.total).toBeCloseTo(expected, 9);
       }
       expect(findPriorityPricingRule("openai", model)).toBeUndefined();
       expect(findPriorityPricingRule("cursor", model)).toBeUndefined();
@@ -1049,7 +1014,7 @@ describe("priority (Fast) service tier multiplier", () => {
   });
 
   test("P6. combo with priority tier applies multiplier per attempt", () => {
-    const combo = estimateComboCost([
+    const combo = estimateAttemptsCost([
       { ordinal: 1, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported", usage },
     ], overlays, "priority");
     expect(combo).not.toBeNull();
@@ -1280,8 +1245,8 @@ describe("xAI Priority Processing pricing", () => {
       usage,
     };
 
-    expect(estimateComboCost([lowerBoundAttempt, { ...lowerBoundAttempt, ordinal: 2 }])?.priorityLowerBound).toBe(true);
-    expect(estimateComboCost([lowerBoundAttempt, ordinaryAttempt])?.priorityLowerBound).toBeUndefined();
+    expect(estimateAttemptsCost([lowerBoundAttempt, { ...lowerBoundAttempt, ordinal: 2 }])?.priorityLowerBound).toBe(true);
+    expect(estimateAttemptsCost([lowerBoundAttempt, ordinaryAttempt])?.priorityLowerBound).toBeUndefined();
   });
 });
 
@@ -1415,7 +1380,7 @@ describe("long-context pricing tiers (#908)", () => {
   });
 
   test("L9. combo carries the tier when any attempt is long", () => {
-    const combo = estimateComboCost([
+    const combo = estimateAttemptsCost([
       { ordinal: 1, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported", usage: { inputTokens: 300_000, outputTokens: 10_000 } },
       { ordinal: 2, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported", usage: { inputTokens: 1_000, outputTokens: 10_000 } },
     ], SOL);
@@ -1615,7 +1580,7 @@ describe("provider cost overlay (user-configured)", () => {
     const input = { provider: "deepseek", model: "deepseek-chat", usageStatus: "reported" as const,
       usage: { inputTokens: 1_000_000, outputTokens: 100_000 } };
     expect(estimateRequestCost(input, undefined, zero)?.cost.total).toBe(0);
-    expect(estimateComboCost([{ ...input, ordinal: 1 }], undefined, undefined, zero)?.cost.total).toBe(0);
+    expect(estimateAttemptsCost([{ ...input, ordinal: 1 }], undefined, undefined, zero)?.cost.total).toBe(0);
     expect(resolveMatchedPrice("deepseek", "deepseek-chat", undefined, [])?.cost4.input).toBeGreaterThan(0);
   });
 
@@ -1624,9 +1589,9 @@ describe("provider cost overlay (user-configured)", () => {
       { ordinal: 1, provider: "deepseek", model: "deepseek-chat", usageStatus: "reported" as const, usage: { inputTokens: 100, outputTokens: 10 } },
       { ordinal: 2, provider: "blsc", model: "unknown-model", usageStatus: "reported" as const, usage: { inputTokens: 100, outputTokens: 10 } },
     ];
-    expect(estimateComboCost(attempts, undefined, undefined, USER_ROWS)).toBeNull();
+    expect(estimateAttemptsCost(attempts, undefined, undefined, USER_ROWS)).toBeNull();
     const priced = [attempts[0]];
-    const combo = estimateComboCost(priced, undefined, undefined, USER_ROWS);
+    const combo = estimateAttemptsCost(priced, undefined, undefined, USER_ROWS);
     expect(combo?.attempts[0].price.source).toBe("user");
     expect(combo?.attempts[0].cost.total).toBeCloseTo((0.5 * 100 + 2 * 10) / 1e6, 12);
   });
@@ -1847,7 +1812,7 @@ describe("Codex account pricing identity", () => {
         const input = { provider, model: "gpt-6-astra", usageStatus: "reported" as const, usage, serviceTier };
         const request = estimateRequestCost(input)!;
         const attempt = estimateAttemptCost({ ...input, ordinal: 1 }, undefined, serviceTier)!;
-        const combo = estimateComboCost([{ ...input, ordinal: 1 }, { ...input, ordinal: 2 }], undefined, serviceTier)!;
+        const combo = estimateAttemptsCost([{ ...input, ordinal: 1 }, { ...input, ordinal: 2 }], undefined, serviceTier)!;
         // 300k * $20/M input + 10k * $75/M output; Fast doubles both.
         const expected = serviceTier?.responseServiceTier === "priority" ? 13.5 : 6.75;
         expect(request.cost.total).toBeCloseTo(expected, 9);
@@ -1879,7 +1844,7 @@ describe("Codex account pricing identity", () => {
     expect(direct?.cost.total).toBeCloseTo(1.05, 9);
     expect(direct?.contextTier).toBeUndefined();
     expect(direct?.priorityMultiplier).toBeUndefined();
-    const combo = estimateComboCost([{ ...input, ordinal: 1 }], [], "priority", [literal]);
+    const combo = estimateAttemptsCost([{ ...input, ordinal: 1 }], [], "priority", [literal]);
     expect(combo?.cost.total).toBeCloseTo(1.05, 9);
     expect(combo?.contextTier).toBeUndefined();
     expect(combo?.priorityMultiplier).toBeUndefined();
@@ -1904,7 +1869,7 @@ describe("Codex account pricing identity", () => {
     expect(request).not.toBeNull();
     expect(request?.priorityLowerBound).toBeUndefined();
     expect(estimateAttemptCost(input, [literal], undefined, [])?.priorityLowerBound).toBeUndefined();
-    expect(estimateComboCost([input], [literal], undefined, [])?.priorityLowerBound).toBeUndefined();
+    expect(estimateAttemptsCost([input], [literal], undefined, [])?.priorityLowerBound).toBeUndefined();
   });
 });
 
@@ -1928,7 +1893,7 @@ describe("aggregator vendor-prefixed model ids (#3136)", () => {
     const input = { provider: "kimi", model, usageStatus: "reported" as const, usage: { inputTokens: 100, outputTokens: 10 }, ...restricted };
     expect(estimateRequestCost(input)).toBeNull();
     expect(estimateAttemptCost({ ...input, ordinal: 1 })).toBeNull();
-    expect(estimateComboCost([{ ...input, ordinal: 1 }])).toBeNull();
+    expect(estimateAttemptsCost([{ ...input, ordinal: 1 }])).toBeNull();
     expect(estimateRequestCost(input, [], [overlay])?.price?.source).toBe("user");
   });
   // CommandCode serves "deepseek/deepseek-v4-flash"; the cost catalog stores the bare id.

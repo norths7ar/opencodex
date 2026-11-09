@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { ServerWebSocket } from "bun";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import {
   codexWebSocketAdmissionMetrics, MAX_TRACKED_CODEX_WEBSOCKETS, tryReserveCodexWebSocket,
 } from "../../src/codex/websocket-registry";
@@ -39,8 +38,6 @@ async function until(condition: () => boolean): Promise<void> {
 }
 
 beforeEach(() => {
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearKeyCooldowns();
   home = createTempHome("ocx-ws-tool-ownership-");
   releaseSpendHome = acquireOwnedSpendHome();
@@ -65,8 +62,6 @@ afterEach(async () => {
     for (const finish of finishBusy.splice(0)) finish();
     for (const lease of extraLeases.splice(0)) lease.release();
     clients.length = 0;
-    clearComboSelectionState();
-    clearComboTargetCooldowns();
     clearKeyCooldowns();
     try {
       runOptionalShutdownHooks();
@@ -216,39 +211,4 @@ test("switching provider on the same socket does not retain the prior turn's hos
   expect(frames.find(frame => frame.type === "response.output_item.done")?.item).toMatchObject(hostedCall);
   expect(fillBusyAndReserve()).toBeNull();
   expect(target.closed).toEqual([]);
-});
-
-test.each([
-  ["darwin", false], ["darwin", true], ["win32", false], ["win32", true],
-] as const)("combo fallback uses the final response's tool ownership; relay=%s hosted final=%s", async (platform, hostedFinal) => {
-  // Exercise the eager Windows relay without changing filesystem/platform identity.
-  setRelayPlatformForTests(platform);
-  const settings = twoProviderConfig();
-  const targets = [{ provider: "fixture", model: "grok-4.6" }, { provider: "ordinary", model: "fixture-model" }];
-  if (hostedFinal) targets.reverse();
-  settings.combos = { ownership: { strategy: "failover", targets } };
-  const target = client(settings);
-  const hosts: string[] = [];
-  upstream = (_body, url) => {
-    hosts.push(url.host);
-    if (hosts.length === 1) {
-      const response = { id: "resp_failed", status: "failed", output: [],
-        error: { type: "server_error", code: "upstream_server_error", message: "fixture first target unavailable" } };
-      return new Response(`data: ${JSON.stringify({ type: "response.failed", response })}\n\n`,
-        { headers: { "content-type": "text/event-stream" } });
-    }
-    return toolStream("resp_fallback", hostedCall, true);
-  };
-  const frames = await turn(target, { model: "combo/ownership", tools: [clientTool, { type: "x_search" }] });
-  expect(hosts).toEqual(hostedFinal ? ["provider.example", "api.x.ai"] : ["api.x.ai", "provider.example"]);
-  expect(outbound).toHaveLength(2);
-  expect(frames.find(frame => frame.type === "response.output_item.done")?.item).toMatchObject(hostedCall);
-  const replacement = fillBusyAndReserve();
-  if (hostedFinal) {
-    expect(replacement).not.toBeNull();
-    expect(target.closed).toEqual([1001]);
-  } else {
-    expect(replacement).toBeNull();
-    expect(target.closed).toEqual([]);
-  }
 });

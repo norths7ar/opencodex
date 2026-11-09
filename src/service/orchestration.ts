@@ -4,26 +4,21 @@ import { durableBunRuntime, type DurableBunRuntime } from "../lib/bun-runtime";
 import { assertSelectedRuntimeWritable, type RuntimePreflightDeps } from "../lib/bun-runtime-preflight";
 import { getConfigDir } from "../config";
 import { readPid, removePid, removeRuntimePort, verifyPidIdentity } from "../config/process-state";
-import { isWslRuntime } from "../codex/home";
 import { isProcessAlive, stopProxy } from "../lib/process-control";
 import { randomUUID } from "node:crypto";
 import { startWinswService, stopWinswService, statusWinswRaw, uninstallWinswService, winswStatusSummary, type WinswStatus } from "../lib/winsw";
 import { diagnoseService } from "./diagnostics";
 import type { ServiceDiagnostic } from "./diagnostics";
 import { assertServiceEnvironmentMatchesInstall } from "./guards";
-import { runLaunchctl, launchdEvictionTargets, launchctlBootoutBenign, probeLaunchdLoadState, installLaunchd, startLaunchd, stopLaunchd, statusLaunchd, uninstallLaunchd } from "./launchd";
 import { assertSchedulerRegistrationBeforeStart } from "./repair";
-import { SERVICE_MANAGED_ENV, TASK, plistPath, removeServiceInstallStateRecords, writeServiceInstallState } from "./state";
+import { SERVICE_MANAGED_ENV, TASK, removeServiceInstallStateRecords, writeServiceInstallState } from "./state";
 import type { ServiceBackend } from "./state";
-import { unitPath, isSystemd, installSystemd, startSystemd, stopSystemd, statusSystemd, uninstallSystemd, systemdServiceInstallCleanupOps } from "./systemd";
 import { writeWindowsSchedulerAssets, stageWindowsSchedulerRegistrationXml, removeWindowsSchedulerRegistrationStage, registerFreshWindowsSchedulerTask, recordWindowsSchedulerOwnership, removeNativeWindowsServiceForScheduler, commitWindowsInstall, commitWindowsNativeInstall, type WindowsServiceInstallDeps, startWindows, isWindowsSchedulerEndBenign, stopWindows, stopWindowsChecked, statusWindows, statusWindowsXml, killWindowsServiceWrapperProcesses, uninstallWindows, classifyWindowsServiceStop } from "./windows-ops";
 import { schtasks, probeWindowsSchedulerTask, rollbackWindowsSchedulerTaskOwnedByAttempt, settleDelay } from "./windows-scheduler";
 import type { WindowsSchedulerTaskProbe } from "./windows-scheduler";
 import { windowsTaskRegistrationOwnedByAttempt, windowsTaskRegistrationHealthy } from "./windows-taskxml";
 import { win32 } from "node:path";
-import { launchdGuiDomain } from "./launchd";
 import { LABEL } from "./state";
-import { assertNoDesktopSupervision, createSupervisionLatch, type SupervisionInspector, type SupervisionLatch } from "./desktop-command-guard";
 
 type ServiceOps = {
   install: (runtime: DurableBunRuntime) => void | Promise<void>; start: () => void; stop: () => void;
@@ -37,30 +32,13 @@ export type ServiceInstallCleanupOps = {
 
 export function platformOps(backend: ServiceBackend = "scheduler", deps: { platform?: NodeJS.Platform; windowsInstall?: WindowsServiceInstallDeps } = {}): ServiceOps | null {
   const platform = deps.platform ?? process.platform;
-  if (platform === "darwin")
-    // Wrapped, not passed: `installLaunchd` reports whether it reloaded launchd, and only
-    // `repairService` (for the `restart` verb) has any use for that. `ServiceOps.install` is
-    // the generic install seam and deliberately promises nothing about a return value.
-    return { install: () => { installLaunchd(); }, start: startLaunchd, stop: stopLaunchd, status: statusLaunchd, uninstall: uninstallLaunchd };
+
   if (platform === "win32") {
     if (backend === "native")
       return { install: runtime => commitWindowsNativeInstall(runtime, deps.windowsInstall), start: startWinswService, stop: stopWinswService, status: winswStatusSummary, uninstall: uninstallWinswService };
     return { install: runtime => commitWindowsInstall(runtime, deps.windowsInstall), start: startWindows, stop: stopWindows, status: statusWindows, uninstall: uninstallWindows };
   }
-  if (platform === "linux") {
-    if (existsSync("/.dockerenv")) {
-      console.error("Docker detected. Run 'ocx start' directly instead of using the service manager.");
-      process.exit(1);
-    }
-    if (!isSystemd() && !existsSync(unitPath())) {
-      console.error("systemd not found. Run 'ocx start' under your process supervisor.");
-      if (isWslRuntime()) {
-        console.error("WSL detected: enable systemd by adding [boot] systemd=true to /etc/wsl.conf, then run 'wsl --shutdown' from Windows and reopen the distro (WSL 0.67.6+).");
-      }
-      process.exit(1);
-    }
-    return { install: installSystemd, start: startSystemd, stop: stopSystemd, status: statusSystemd, uninstall: uninstallSystemd };
-  }
+
   return null;
 }
 
@@ -71,33 +49,7 @@ export function platformOps(backend: ServiceBackend = "scheduler", deps: { platf
  * unknown because an old manager may still respawn a listener on the target port.
  */
 function platformServiceInstallCleanupOps(backend: ServiceBackend): ServiceInstallCleanupOps | null {
-  if (process.platform === "darwin") {
-    return {
-      // Same probe as `diagnoseService`, so the two answers to one question can no longer
-      // have opposite failure semantics: this one used to throw on a launchctl error while
-      // `statusLaunchd` swallowed it into "absent". Installing over an unverifiable
-      // manager is the unsafe case, so `unknown` fails closed here.
-      status: () => {
-        const probe = probeLaunchdLoadState();
-        if (probe.state === "unknown") {
-          throw new Error(`launchd job status could not be verified: ${probe.detail ?? "launchctl could not be asked"}`);
-        }
-        return probe.state === "not-loaded" ? null : `${LABEL} loaded in ${probe.domain ?? launchdGuiDomain()}`;
-      },
-      // `unload` is legacy and CANNOT evict a gui-domain job, which is what this cleanup
-      // exists to do before new assets are installed. Both user domains, because the probe
-      // above reports `user/<uid>` too: a gui-only bootout exits 3 against one of those,
-      // which this function would have read as "already stopped" and installed over a live
-      // job (see `launchdEvictionTargets`).
-      stop: () => {
-        for (const target of launchdEvictionTargets()) {
-          const booted = runLaunchctl(["bootout", target]);
-          if (launchctlBootoutBenign(booted.status)) continue;
-          throw new Error(`launchctl bootout ${target} failed: ${booted.stderr || `exit ${String(booted.status)}`}`);
-        }
-      },
-    };
-  }
+
   if (process.platform === "win32") {
     if (backend === "native") {
       return {
@@ -124,15 +76,7 @@ function platformServiceInstallCleanupOps(backend: ServiceBackend): ServiceInsta
       },
     };
   }
-  if (process.platform === "linux") {
-    // `list-unit-files <name>` exits non-zero when the unit has never been
-    // installed, which made a clean first install look like an unknown manager
-    // failure. `show LoadState` gives us the tri-state we actually need: a
-    // healthy user manager returns `not-found` for a missing unit, while an
-    // unreachable/permission-denied manager still makes `sh()` throw and the
-    // caller therefore fails closed.
-    return systemdServiceInstallCleanupOps();
-  }
+
   return null;
 }
 
@@ -176,8 +120,7 @@ export async function proxyStillLiveAfterStop(deps: {
     const probeDeadline = canRespawn
       ? deadline
       : now() + (SERVICE_STOP_LIVENESS.timeoutMs! * SERVICE_STOP_LIVENESS.attempts! + 250);
-    // A package-tree-fenced proxy (#5496) still holds the port; stop must not call it gone.
-    return findLiveProxy({ ...SERVICE_STOP_LIVENESS, deadlineAt: probeDeadline, nowFn: now, acceptPackageTreeFenced: true });
+    return findLiveProxy({ ...SERVICE_STOP_LIVENESS, deadlineAt: probeDeadline, nowFn: now });
   });
   for (;;) {
     try {
@@ -210,7 +153,6 @@ async function stopTrackedProxyIfRunning(): Promise<TrackedProxyCleanupResult> {
   const live = await findLiveProxy({
     ...SERVICE_STOP_LIVENESS,
     deadlineAt: Date.now() + 7000,
-    acceptPackageTreeFenced: true,
   });
   const liveKillPid = verifiedKillTarget(live?.pid);
   if (liveKillPid !== null) {
@@ -234,8 +176,6 @@ export async function stopTrackedProxyForServiceCommand(): Promise<TrackedProxyC
 }
 
 export interface ServiceInstallPreparationDeps extends RuntimePreflightDeps {
-  inspectSupervision?: SupervisionInspector;
-  supervisionLatch?: SupervisionLatch;
   diagnose?: () => ServiceDiagnostic;
   managerOps?: (backend: ServiceBackend) => ServiceInstallCleanupOps | null;
   /**
@@ -256,8 +196,6 @@ export async function prepareServiceInstall(
   requestedBackend: ServiceBackend,
   deps: ServiceInstallPreparationDeps = {},
 ): Promise<void> {
-  const latch = deps.supervisionLatch ?? createSupervisionLatch();
-  assertNoDesktopSupervision(deps.inspectSupervision, latch);
   const diagnostic = (deps.diagnose ?? diagnoseService)();
   const platform = deps.platform ?? process.platform;
   const resolveOps = deps.managerOps ?? platformServiceInstallCleanupOps;
@@ -304,19 +242,14 @@ export async function installServiceSafely(
   install: (runtime: DurableBunRuntime) => void | Promise<void>,
   deps: ServiceInstallPreparationDeps = {},
 ): Promise<void> {
-  const latch = deps.supervisionLatch ?? createSupervisionLatch();
-  assertNoDesktopSupervision(deps.inspectSupervision, latch);
   const runtime = Object.freeze({ ...(deps.selectRuntime ?? durableBunRuntime)() });
   const configDir = (deps.configDir ?? getConfigDir)();
   (deps.assertRuntimeWritable ?? assertSelectedRuntimeWritable)(runtime, configDir, { platform: deps.platform, rootWasAbsent: !existsSync(configDir) });
-  await prepareServiceInstall(requestedBackend, { ...deps, supervisionLatch: latch });
-  assertNoDesktopSupervision(deps.inspectSupervision, latch);
+  await prepareServiceInstall(requestedBackend, deps);
   await install(runtime);
 }
 
 export interface FreshWindowsSchedulerInstallDeps extends RuntimePreflightDeps {
-  inspectSupervision?: SupervisionInspector;
-  supervisionLatch?: SupervisionLatch;
   stageRegistrationXml?: (attemptNonce: string) => string;
   register?: (xmlPath: string, attemptNonce: string) => Promise<void>;
   recordOwnership?: () => boolean;
@@ -345,13 +278,10 @@ export interface FreshWindowsSchedulerInstallDeps extends RuntimePreflightDeps {
 export async function installFreshWindowsSchedulerSafely(
   deps: FreshWindowsSchedulerInstallDeps = {},
 ): Promise<void> {
-  const latch = deps.supervisionLatch ?? createSupervisionLatch();
-  assertNoDesktopSupervision(deps.inspectSupervision, latch);
   const stage = deps.stageRegistrationXml ?? stageWindowsSchedulerRegistrationXml;
   const register = deps.register ?? registerFreshWindowsSchedulerTask;
   const recordOwnership = deps.recordOwnership ?? recordWindowsSchedulerOwnership;
   const prepare = deps.prepare ?? (() => prepareServiceInstall("scheduler", {
-    inspectSupervision: deps.inspectSupervision, supervisionLatch: latch,
   }));
   const removeNativeService = deps.removeNativeService ?? removeNativeWindowsServiceForScheduler;
   const publishAssets = deps.publishAssets ?? writeWindowsSchedulerAssets;
@@ -387,7 +317,6 @@ export async function installFreshWindowsSchedulerSafely(
     stagedXml = stage(attemptNonce);
     await register(stagedXml, attemptNonce);
     registered = true;
-    assertNoDesktopSupervision(deps.inspectSupervision, latch);
 
     // The destructive boundary begins only after Task Scheduler accepted the definition.
     // The registration has consumed its temporary XML. Remove it before claiming a newly
@@ -403,11 +332,9 @@ export async function installFreshWindowsSchedulerSafely(
     }
     (deps.assertRuntimeWritable ?? assertSelectedRuntimeWritable)(runtime, configDir, { platform: deps.platform, rootWasAbsent: false });
     await prepare();
-    assertNoDesktopSupervision(deps.inspectSupervision, latch);
     removeNativeService();
     publishAssets(runtime);
     await verifyBeforeRun(attemptNonce);
-    assertNoDesktopSupervision(deps.inspectSupervision, latch);
     runTask();
     started = true;
     writeState(runtime);
@@ -483,8 +410,8 @@ export function installedServiceRespawnRisk(
     // and refusing their dashboard stop would break a proxy that no manager supervises.
     if (env[SERVICE_MANAGED_ENV] !== "1") return "none";
     const exists = io.exists ?? existsSync;
-    if (platform === "darwin") return exists(plistPath()) ? "self-unload" : "none";
-    if (platform === "linux") return exists(unitPath()) ? "self-unload" : "none";
+
+
     return "none";
   }
   try {
@@ -530,11 +457,7 @@ export type ServiceStopOutcome = "absent" | "stopped" | "stopped-respawnable" | 
 
 export function stopServiceIfInstalledDetailed(): ServiceStopOutcome {
   assertServiceEnvironmentMatchesInstall();
-  if (process.platform === "darwin") {
-    if (existsSync(plistPath())) {
-      try { stopLaunchd(); return "stopped"; } catch { return "failed"; }
-    }
-  } else if (process.platform === "win32") {
+  if (process.platform === "win32") {
     // Query BOTH backends regardless of state: a failed switch or stale state can leave
     // two managers installed, and either one would respawn the proxy after `ocx stop`.
     let stopped = false;
@@ -564,13 +487,11 @@ export function stopServiceIfInstalledDetailed(): ServiceStopOutcome {
     // safe to update over.
     const outcome = classifyWindowsServiceStop({ stopped, failed, schedulerStopped, stateUnknown });
     if (outcome !== "absent") return outcome;
-  } else if (process.platform === "linux" && isSystemd() && existsSync(unitPath())) {
-    try { stopSystemd(); return "stopped"; } catch { return "failed"; }
   }
   return "absent";
 }
 
-/** Delete install-state files; stale state would make `ocx update` "reinstall" a service that no longer exists. */
+/** Remove install-state records for a service that no longer exists. */
 export function removeServiceInstallState(): void {
   removeServiceInstallStateRecords();
 }
@@ -611,11 +532,7 @@ export function uninstallServiceDetailed(): ServiceUninstallOutcome {
   const hooks = uninstallServiceHooksForTests;
   (hooks?.assertEnvironment ?? assertServiceEnvironmentMatchesInstall)();
   const platform = hooks?.platform ?? process.platform;
-  if (platform === "darwin") {
-    if (existsSync(plistPath())) {
-      try { uninstallLaunchd(); removeServiceInstallState(); return "removed"; } catch { return "failed"; }
-    }
-  } else if (platform === "win32") {
+  if (platform === "win32") {
     let removed = false;
     const scheduler = (hooks?.probeWindowsTask ?? probeWindowsSchedulerTask)();
     if (scheduler.status === "unknown") {
@@ -630,10 +547,6 @@ export function uninstallServiceDetailed(): ServiceUninstallOutcome {
       removed = true;
     }
     if (removed) { (hooks?.removeInstallState ?? removeServiceInstallState)(); return "removed"; }
-  } else if (platform === "linux" && existsSync(unitPath())) {
-    try { uninstallSystemd(); removeServiceInstallState(); return "removed"; } catch {
-      try { unlinkSync(unitPath()); removeServiceInstallState(); return "removed"; } catch { return "failed"; }
-    }
   }
   return "absent";
 }

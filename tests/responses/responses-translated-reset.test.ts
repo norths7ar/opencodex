@@ -347,21 +347,6 @@ describe("reset replacement error confidentiality", () => {
     expect(result.bodies).toHaveLength(3);
   });
 
-  test.each(["openai-chat", "openai-responses"] as const)("%s keeps a replacement terminal through combo consumption", async adapter => {
-    const result = await probe({ provider: { adapter, apiKey: credential, models: ["test", "other"] },
-      config: { combos: { pair: { strategy: "failover", targets: [
-        { provider: "mock", model: "test" }, { provider: "mock", model: "other" },
-      ] } } }, body: { model: "combo/pair" }, answer: ordinal => ordinal === 1 ? reset()
-        : ordinal === 2 ? Response.json({ error: { code: "context_length_exceeded", message: `context length exceeded: ${credential}` } }, { status: 400 })
-          : chatSuccess() });
-    expect(result.status).toBe(400);
-    expect(result.text).not.toContain(credential);
-    // The combo owner reformats the consumed failure; it can only restate the sanitized projection.
-    expect(JSON.parse(result.text).error.message).toContain(genericBody.error.message);
-    expect(result.text).not.toContain("context length exceeded");
-    expect(result.bodies).toHaveLength(2);
-  });
-
   test("the client projection preserves marker provenance before lifetime wrapping", async () => {
     const upstream = Response.json({ error: { message: `invalid request: ${credential}` } }, { status: 400 });
     markResponseNonReplayable(upstream);

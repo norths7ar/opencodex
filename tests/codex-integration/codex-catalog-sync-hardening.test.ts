@@ -277,79 +277,6 @@ describe("Codex catalog sync hardening", () => {
     }, { timeout: 20_000 },
   );
 
-  test("native-alias suppression preserves authoritative metadata on account-qualified rows", () => {
-    const catalogPath = join(codexHome, "catalog.json");
-    writeFileSync(join(codexHome, "config.toml"), 'model_catalog_json = "catalog.json"\n', "utf8");
-    writeFileSync(catalogPath, JSON.stringify({
-      models: [
-        {
-          ...nativeEntry("gpt-5.5", 0),
-          display_name: "Original GPT-5.5",
-          comp_hash: "native-sol-hash",
-          base_instructions: "Native Sol instructions",
-          model_messages: { instructions_template: "Native Sol instructions" },
-          tool_mode: "code_mode_only",
-        },
-      ],
-    }, null, 2) + "\n");
-
-    const r = runScript(codexHome, opencodexHome, `
-      const { syncCatalogModels } = require("./src/codex/catalog");
-      const config = {
-        port: 10100,
-        defaultProvider: "Nova1",
-        providers: {
-          openai: {
-            adapter: "openai-responses",
-            baseUrl: "https://chatgpt.com/backend-api/codex",
-            liveModels: false
-          },
-          Nova1: {
-            adapter: "openai-chat",
-            baseUrl: "https://api.example.test/v1",
-            liveModels: false,
-            models: ["codex/gpt-5.5"]
-          }
-        },
-        codexAccounts: [{ id: "stored-team-account", isMain: false }],
-        codexAccountNamespaces: { team: "stored-team-account" },
-        combos: {
-          "nova-sol": {
-            alias: "gpt-5.5",
-            nativeAlias: true,
-            displayName: "Nova GPT-5.5",
-            targets: [{ provider: "Nova1", model: "codex/gpt-5.5" }]
-          }
-        }
-      };
-      syncCatalogModels(config).then(res => console.log(JSON.stringify(res)));
-    `);
-    expect(r.status).toBe(0);
-
-    const rows = JSON.parse(readFileSync(catalogPath, "utf8")).models as Array<{
-      slug: string;
-      display_name?: string;
-      comp_hash?: string;
-      base_instructions?: string;
-      model_messages?: { instructions_template?: string };
-      tool_mode?: string | null;
-      opencodex_catalog_kind?: string;
-    }>;
-    expect(rows.filter(row => row.slug === "gpt-5.5")).toEqual([
-      expect.objectContaining({
-        display_name: "Nova GPT-5.5",
-        opencodex_catalog_kind: "combo-native-alias-v1",
-      }),
-    ]);
-    expect(rows.find(row => row.slug === "team/gpt-5.5")).toMatchObject({
-      comp_hash: "native-sol-hash",
-      base_instructions: "Native Sol instructions",
-      model_messages: { instructions_template: "Native Sol instructions" },
-      tool_mode: "code_mode_only",
-      opencodex_catalog_kind: "account-selector-v1",
-    });
-  });
-
   test("providers absent from config preserve foreign routed entries without an outage warning", () => {
     const catalogPath = join(codexHome, "catalog.json");
     writeFileSync(join(codexHome, "config.toml"), 'model_catalog_json = "catalog.json"\n', "utf8");
@@ -1139,58 +1066,6 @@ describe("Codex catalog sync hardening", () => {
     expect(slugs).toContain("cursor/composer-2.5");
   });
 
-  test("drops legacy combo-alias ghost rows in both gather branches", () => {
-    const legacyComboAlias = {
-      ...routedEntry("vendor/fast", 5),
-      description: "Routed via opencodex → combo (combo).",
-      owned_by: "combo",
-    };
-    const seed = () => writeFileSync(catalogPath, JSON.stringify({
-      models: [
-        nativeEntry("gpt-5.5", 0),
-        legacyComboAlias,
-        routedEntry("cursor/composer-2.5", 6),
-      ],
-    }, null, 2) + "\n");
-    const catalogPath = join(codexHome, "catalog.json");
-    writeFileSync(join(codexHome, "config.toml"), 'model_catalog_json = "catalog.json"\n', "utf8");
-
-    // Partial-gather branch: a PHYSICAL combo provider bypasses the generic
-    // combo cleanup, so only the ownership matcher can remove the alias.
-    seed();
-    const partial = syncWithSavedConfig(codexHome, opencodexHome, {
-      providers: {
-        combo: {
-          adapter: "openai-chat",
-          baseUrl: "https://api.example.test/v1",
-          liveModels: false,
-          models: ["fresh-model"],
-        },
-      },
-    });
-    expect(partial.status).toBe(0);
-    let slugs = (JSON.parse(readFileSync(catalogPath, "utf8")).models as Array<{ slug: string }>).map(m => m.slug);
-    expect(slugs).not.toContain("vendor/fast");
-    expect(slugs).toContain("cursor/composer-2.5");
-
-    // Empty-gather branch: physical combo present but gathers zero rows.
-    seed();
-    const empty = syncWithSavedConfig(codexHome, opencodexHome, {
-      providers: {
-        combo: {
-          adapter: "openai-chat",
-          baseUrl: "https://api.example.test/v1",
-          liveModels: false,
-          models: [],
-        },
-      },
-    });
-    expect(empty.status).toBe(0);
-    slugs = (JSON.parse(readFileSync(catalogPath, "utf8")).models as Array<{ slug: string }>).map(m => m.slug);
-    expect(slugs).not.toContain("vendor/fast");
-    expect(slugs).toContain("cursor/composer-2.5");
-  });
-
   describe("a refresh that would empty a provider without config.json agreeing (#6529)", () => {
     const seeded = () => JSON.stringify({
       models: [
@@ -1293,46 +1168,6 @@ describe("Codex catalog sync hardening", () => {
 
   for (const slug of ["fast-chat", "vendor/flash"]) {
     for (const state of ["saved", "missing", "deleted"] as const) {
-      test(`combo alias ${slug} retained sync ${state} config protects exact catalog/cache bytes`, () => {
-        const catalogPath = join(codexHome, "catalog.json");
-        const cachePath = join(codexHome, "models_cache.json");
-        writeFileSync(join(codexHome, "config.toml"), 'model_catalog_json = "catalog.json"\n');
-        const models = [nativeEntry("gpt-5.5", 0), { ...ocxAuthoredEntry(slug, 5), owned_by: "combo" }];
-        const catalogBytes = `${JSON.stringify({ models }, null, 2)}\n`;
-        const cacheBytes = `${JSON.stringify({ fetched_at: "2026-01-01T00:00:00Z",
-          client_version: "fixture-cache-version", models }, null, 2)}\n`;
-        writeFileSync(catalogPath, catalogBytes);
-        writeFileSync(cachePath, cacheBytes);
-        if (state !== "missing") writeFileSync(join(opencodexHome, "config.json"), JSON.stringify({
-          defaultProvider: "ark", providers: { ark: {
-            adapter: "openai-chat", baseUrl: "https://api.example.test/v1", liveModels: false, models: ["a"],
-          } }, combos: state === "saved"
-            ? { fast: { alias: slug, targets: [{ provider: "ark", model: "a" }] } } : {},
-        }));
-        const r = runScript(codexHome, opencodexHome, `
-          globalThis.fetch = async () => { throw new Error("unexpected fetch"); };
-          const { readConfigAdmissionSnapshot } = require("./src/config/diagnostics");
-          if (${state !== "missing"} && readConfigAdmissionSnapshot().diagnostics.source !== "file") {
-            throw new Error("fixture config must parse without salvage");
-          }
-          const { refreshCodexModelCatalog } = require("./src/codex/refresh");
-          refreshCodexModelCatalog({ providers: {} }).then(res => console.log(JSON.stringify(res)));
-        `, { CODEX_CLI_PATH: createCodexCatalogFixture(opencodexHome) });
-        expect(r.status, r.stderr).toBe(0);
-        const result = JSON.parse(r.stdout.split("\n").at(-1) ?? "{}");
-        if (state === "deleted") {
-          expect(result.catalogWritten).toBe(true);
-          for (const target of [catalogPath, cachePath]) {
-            expect(JSON.parse(readFileSync(target, "utf8")).models.some((row: { slug: string }) => row.slug === slug))
-              .toBe(false);
-          }
-        } else {
-          expect(result.skippedReason).toBe("unbacked_routed_removal");
-          expect(result.cacheSynced).toBe(false);
-          expect(readFileSync(catalogPath, "utf8")).toBe(catalogBytes);
-          expect(readFileSync(cachePath, "utf8")).toBe(cacheBytes);
-        }
-      });
     }
   }
 

@@ -44,23 +44,6 @@ describe("Ollama route preflight", () => {
     }
     expect(listOllamaRoutes(c, req()).every(row => !row.selector.startsWith("policy/"))).toBe(true);
   });
-  test("rejects synthetic selectors before combo or policy handling", () => {
-    const c = config(); c.cursorEffortRows = true;
-    for (const selector of ["keyed/model--fast", "combo/group--fast", "policy/daily--fast", "daily--fast", "group--high", "daily--high"]) {
-      rejected(c, selector, "unsupported_synthetic_selector", 400);
-    }
-    rejected(c, "combo/group", "unsupported_credential_domain", 403);
-  });
-  test("rejects configured shadow sources irrespective of provenance and target", () => {
-    const c = config();
-    for (const target of ["keyed/model", "combo/group"]) {
-      c.shadowCallIntercept = { enabled: true, model: target, sourceModels: ["model"] };
-      for (const headers of [{}, { "x-openai-subagent": "collab_spawn", "x-openai-parent-turn-id": "fixture" }]) {
-        rejected(c, "model", "unsupported_shadow_rewrite", 400, req(headers));
-      }
-      expect(listOllamaRoutes(c, req()).map(row => row.selector)).toEqual(["keyed/model"]);
-    }
-  });
   test("rejects cross-provider blocked-model rewrites", () => {
     const c = config(); c.providers.other = { adapter: "openai-chat", baseUrl: "https://other.example/v1", authMode: "key", apiKey: "fixture", models: ["model"] }; c.blockedModelRedirects = { "keyed/model": "other/model" };
     rejected(c, "keyed/model", "unsupported_credential_domain", 403);
@@ -80,20 +63,6 @@ describe("Ollama route preflight", () => {
     expect(again.ok && again.route.provider.headers?.["x-opencode-session"]).toBe(result.route.provider.headers?.["x-opencode-session"]);
     const other = preflightOllamaRoute(c, "opencode-go/glm-5.2", original);
     expect(other.ok && other.route.provider.adapter).toBe("openai-responses");
-    expect(sends).toBe(0);
-  });
-  test("the point lookup matches the list for every selector and refuses everything else", () => {
-    const c = config();
-    c.customModels = [{ id: "custom", provider: "keyed", modelId: "vendor/custom" }];
-    c.providers.off = { adapter: "openai-chat", baseUrl: "https://off.example/v1", authMode: "key", apiKey: "fixture", models: ["model"], disabled: true };
-    const listed = listOllamaRoutes(c, req());
-    expect(listed.map(row => row.selector)).toContain("keyed/vendor/custom");
-    for (const row of listed) expect(findOllamaRoute(c, row.selector, req())?.selector).toBe(row.selector);
-    for (const selector of ["keyed/absent", "off/model", "cursorless/model", "policy/daily", "daily", "combo/group", "model", "/model", "constructor/model", "__proto__/model"]) {
-      expect({ selector, found: findOllamaRoute(c, selector, req()) }).toEqual({ selector, found: undefined });
-    }
-    c.providers.keyed!.selectedModels = ["model"];
-    expect(findOllamaRoute(c, "keyed/vendor/custom", req())).toBeUndefined();
     expect(sends).toBe(0);
   });
 });

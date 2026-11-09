@@ -2,7 +2,7 @@ import { useDeferredValue, useState } from "react";
 import { useT, type TKey } from "../i18n/shared";
 import { en } from "../i18n/en";
 import type { Page } from "../app-routing";
-import { IconActivity, IconBot, IconClaude, IconCodex, IconHardDrive, IconList, IconSearch, IconServer, IconShuffle, IconStar, IconTerminal } from "../icons";
+import { IconActivity, IconBot, IconClaude, IconCodex, IconHardDrive, IconList, IconSearch, IconServer, IconShuffle, IconTerminal } from "../icons";
 import { HubCard } from "@/components/ui-v2/hub-card";
 
 /*
@@ -36,8 +36,6 @@ interface Entry {
 const ENTRIES: readonly Entry[] = [
   { id: "subagents", title: "shellV2.advSubagents", when: "shellV2.advSubagentsWhen", term: { name: "Subagents" }, Icon: IconBot, page: "subagents",
     finds: ["dash.injectionLabel", "dash.multiAgent"], words: ["delegation", "agents"] },
-  { id: "advisor", title: "shellV2.advAdvisor", when: "shellV2.advAdvisorWhen", term: { name: "Advisor" }, Icon: IconStar, page: "advisor",
-    finds: ["nav.advisor", "advisor.policy", "proxyV2.consentTitle"], words: ["consult", "preflight"] },
   { id: "proxy", title: "shellV2.advProxy", when: "shellV2.advProxyWhen", term: { key: "proxyV2.advTermProxy" }, Icon: IconActivity, page: "dashboard",
     finds: [
       "dash.webSearchSidecar", "dash.visionSidecar", "dash.shadowCallIntercept", "compactionRouting.title",

@@ -106,7 +106,6 @@ import {
   enrichOpenCodeZenUpstreamMessage,
 } from "../../providers/opencode-zen-rate-limit";
 import { planReasoningEffortDowngrade } from "../../providers/reasoning-metadata";
-import { consumeComboFailure } from "./core-combo-failure";
 import { streamingContextOverflowResponse, jsonContextOverflowResponse, lateAttributionLimitResponse } from "./context-overflow";
 import { OllamaLateAttributionBudgetError } from "../../adapters/ollama-native";
 import { isFixedCodexAccount } from "./core-codex-account";
@@ -405,7 +404,7 @@ export async function prepareAdapterExchange(
   const autoPauseEnabled = config.providers[route.providerName]?.accountAutoPause?.enabled === true;
   const billingPoolRequest = isAnthropicBillingKeyPool(route.provider);
   let billingRecoveryActive = false;
-  const genericRefetchCountsSends = () => !!sendBudgetState.workflowRootId || options.comboAttempt === true || sendBudgetState.adapterSendBudget?.spendEnforced === true
+  const genericRefetchCountsSends = () => !!sendBudgetState.workflowRootId || sendBudgetState.adapterSendBudget?.spendEnforced === true
     || transientRetryPolicyFor(route.provider) !== null || resetReplayPolicyFor(route.provider) !== null
     || billingPoolRequest || billingRecoveryActive || autoPauseEnabled;
   let handoffPermit: ResponsesSendBudget["pendingHopPermit"];
@@ -468,19 +467,18 @@ export async function prepareAdapterExchange(
       // Stable per request: a Combo or compaction permit comes from `reserveDispatch`, which starts
       // (and freezes) the spend policy first, so `spendEnforced` cannot change before dispatch.
       const receiptMode = !sendBudgetState.adapterSendBudget?.spendEnforced
-        && Boolean(options.comboInitialSend || compactPrepaid);
+        && Boolean(compactPrepaid);
       // Combo and emergency compaction admission already book this target's first send.
       // Its configured initial ceiling is target-local; the shared remainder below still
       // accounts for earlier targets without deducting their sends from this target twice.
       const initialSendCap = transientPolicy || resetPolicy
-        || (options.comboAttempt && route.provider.adapter === "google")
         ? transientSendCapFor(transientPolicy?.attempts,
-          (options.comboAttempt || compactPrepaid) ? 0 : sendBudgetState.sendsUsed)
+          compactPrepaid ? 0 : sendBudgetState.sendsUsed)
         : 1;
       const fetchWithRetryPolicy = (route.provider.adapter === "google" || transientPolicy)
         ? fetchWithTransientRetry
         : fetchWithResetRetry;
-      const initialReporter = transientSendReporter(compactPrepaid ?? options.comboDispatchPermit);
+      const initialReporter = transientSendReporter(compactPrepaid);
       const deferredInitial = (billingPoolRequest || route.providerName === "github-copilot" && route.provider.authMode !== "forward") && !receiptMode ? deferPhysicalSendReporter(initialReporter) : undefined;
       try { upstreamResponse = await fetchWithRetryPolicy(
         recovery => {
@@ -526,11 +524,11 @@ export async function prepareAdapterExchange(
           abortSignal: upstream.signal,
           label: safeHostLabel(builtInitialRequest.url), destination: errorDestinationLabel(builtInitialRequest.url),
           claimAmbiguousResend: claimPreHeaderResend,
-          ...(sendBudgetState.workflowRootId || sendBudgetState.adapterSendBudget?.spendEnforced || options.comboDispatchPermit || transientPolicy || resetPolicy || compactPrepaid || options.comboAttempt
+          ...(sendBudgetState.workflowRootId || sendBudgetState.adapterSendBudget?.spendEnforced || transientPolicy || resetPolicy || compactPrepaid
             || billingPoolRequest || autoPauseEnabled
             ? {
               // A pending compaction permit already booked this leg's first physical send.
-              ...(transientPolicy || resetPolicy || compactPrepaid || options.comboAttempt || autoPauseEnabled
+              ...(transientPolicy || resetPolicy || compactPrepaid || autoPauseEnabled
                 ? {
                   attempts: Math.min(initialSendCap,
                     sendBudgetState.initialSendAllowance(initialSendCap) + (compactPrepaid ? 1 : 0)),
@@ -575,7 +573,7 @@ export async function prepareAdapterExchange(
       return markProxyError(formatErrorResponse(401, "authentication_error", publicOAuthAuthenticationErrorMessage(refusal)), publicOAuthErrorPresentation(refusal));
     }
     if (refusal instanceof AnthropicAccountCooldownError) {
-      return anthropicPoolCooldownResponse(refusal, { comboAttempt: options.comboAttempt, logCtx });
+      return anthropicPoolCooldownResponse(refusal, { logCtx });
     }
     // A budget refusal is a decision this process made, not an upstream fault. Reporting it as
     // 502 does more than mislabel it: the Codex client retries 5xx and does not retry a 429, so
@@ -768,7 +766,7 @@ export async function prepareAdapterExchange(
             : undefined;
           let refetchPermitUsed = false;
           const refetchReporter = refetchAllowance ? transientSendReporter(refetchAllowance.permit) : undefined;
-          const deferredRefetch = (billingPoolRequest || options.comboAttempt || route.providerName === "github-copilot" && route.provider.authMode !== "forward") && refetchReporter
+          const deferredRefetch = (billingPoolRequest || route.providerName === "github-copilot" && route.provider.authMode !== "forward") && refetchReporter
             ? deferPhysicalSendReporter(refetchReporter) : undefined;
           const pendingKeyMetadata = deferredRefetch && transportState.attemptSendDeferred();
           try {
@@ -866,7 +864,7 @@ export async function prepareAdapterExchange(
           return { failed: markProxyError(formatErrorResponse(401, "authentication_error", publicOAuthAuthenticationErrorMessage(refusal)), publicOAuthErrorPresentation(refusal)) };
         }
         if (refusal instanceof AnthropicAccountCooldownError) {
-          return { failed: anthropicPoolCooldownResponse(refusal, { comboAttempt: options.comboAttempt, logCtx }) };
+          return { failed: anthropicPoolCooldownResponse(refusal, { logCtx }) };
         }
         // Same rule on the recovery leg: the ladder refused to send again, so the answer names
         // this proxy rather than the provider it never reached.
@@ -1863,16 +1861,6 @@ export async function prepareAdapterExchange(
     if (!upstreamResponse.ok) {
       if (route.providerName === "kiro")
         upstreamResponse = await normalizeFinalKiroHttpError(upstreamResponse, upstream.signal);
-      if (options.comboAttempt) {
-        // No pre-read guard: `consumeComboFailure` -> `readBoundedResponseBody` reads
-        // `response.body` itself with the abort signal threaded through, and the combo
-        // contract is that this body's getter is touched exactly once. A guard here would be
-        // a second `.body` access for no gain, since the bounded reader owns settlement.
-        const failure = await consumeComboFailure(upstreamResponse, options.abortSignal, Date.now(), logCtx)
-          .finally(cleanupUpstreamAbort);
-        options.onConsumedComboFailure?.(failure);
-        return failure.response;
-      }
       let errorText: string;
       try {
         errorText = await readDisplaySafeErrorText(
@@ -1922,8 +1910,7 @@ export async function prepareAdapterExchange(
       const poolUsageLimit = upstreamResponse.status === 429 && anthropicInstance && route.provider.authMode === "oauth"
         ? anthropicRoutingFor(anthropicInstance).anthropicPoolUsageLimitAfterRefusal(Date.now(), transportState.anthropicRouteDecision, route.modelId)
         : null;
-      // Combo children returned above; the flag is passed anyway so this site states the same rule.
-      if (poolUsageLimit) return anthropicPoolCooldownResponse(poolUsageLimit, { comboAttempt: options.comboAttempt, logCtx });
+      if (poolUsageLimit) return anthropicPoolCooldownResponse(poolUsageLimit, { logCtx });
       // Upstreams occasionally echo request details in error bodies — scrub token-shaped
       // material before it reaches the client-facing error surface.
       const upstreamRetryAfter = upstreamResponse.headers.get("retry-after");

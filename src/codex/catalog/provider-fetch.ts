@@ -24,10 +24,6 @@ export {
   QUIET_AUTHORITATIVE_CATALOG_PROVIDERS,
 } from "./model-hints";
 
-export {
-  configuredComboTargetModelsByProvider,
-  resolveComboCatalogMember,
-} from "./combo-member";
 
 export {
   filterCatalogVisibleModels,

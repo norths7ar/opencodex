@@ -332,15 +332,7 @@ export function readProcessCommandLine(pid: number): string | undefined {
   if (!Number.isSafeInteger(pid) || pid <= 0) return undefined;
   const platform = processCommandLinePlatformForTests ?? process.platform;
   try {
-    if (platform === "linux") {
-      try {
-        const output = readFileSync(`/proc/${pid}/cmdline`, "utf-8");
-        const value = output.replace(/\0/g, " ").trim();
-        if (value) return value;
-      } catch {
-        /* procfs unavailable — use the fixed ps fallback below */
-      }
-    }
+
     if (platform === "win32") {
       // WMIC is the fast path. Newer Windows images may omit it, so fall back to
       // the trusted fixed PowerShell binary without consulting PATH or env roots.
@@ -372,20 +364,6 @@ export function readProcessCommandLine(pid: number): string | undefined {
         }
       }
       return undefined;
-    }
-    for (const ps of ["/bin/ps", "/usr/bin/ps"]) {
-      try {
-        const output = processCommandLineExec(ps, ["-p", String(pid), "-o", "command="], {
-          encoding: "utf-8",
-          stdio: ["ignore", "pipe", "ignore"],
-          timeout: 1000,
-          windowsHide: true,
-        });
-        const value = output.trim();
-        if (value) return value;
-      } catch {
-        /* try the other fixed system path */
-      }
     }
     return undefined;
   } catch {

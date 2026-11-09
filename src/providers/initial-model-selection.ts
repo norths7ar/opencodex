@@ -2,7 +2,6 @@ import type { OcxConfig, OcxProviderConfig } from "../types";
 import { randomUUID } from "node:crypto";
 import { getProviderRegistryEntry, providerMatchesRegistryTransport } from "./registry";
 import { routedSlug, slugEquivalenceKey } from "./slug-codec";
-import { comboDisabledModelSelectors } from "../combos/types";
 import { providerUsesKeyAuthOverride } from "./key-store";
 
 export const INITIAL_MODEL_SELECTION_THRESHOLD = 20;
@@ -42,7 +41,7 @@ export function initializeProviderModelSelection(
   name: string,
   next: OcxProviderConfig,
   existing?: OcxProviderConfig,
-  config?: Pick<OcxConfig, "disabledModels" | "combos" | "modelDiscovery">,
+  config?: Pick<OcxConfig, "disabledModels" | "modelDiscovery">,
 ): void {
   delete next.initialModelSelection;
   if (existing) {
@@ -57,10 +56,8 @@ export function initializeProviderModelSelection(
     if (config?.modelDiscovery?.knownModels) delete config.modelDiscovery.knownModels[name];
     if (config?.modelDiscovery?.recentArrivals) delete config.modelDiscovery.recentArrivals[name];
     if (config?.disabledModels) {
-      const comboSelectors = new Set(Object.entries(config.combos ?? {})
-        .flatMap(([id, combo]) => comboDisabledModelSelectors(id, combo)));
       config.disabledModels = config.disabledModels.filter(selector =>
-        !selector.startsWith(`${name}/`) || comboSelectors.has(selector));
+        !selector.startsWith(`${name}/`));
     }
     if (!loginConnection(name, next)) {
       next.initialModelSelection = { version: 1, registrationId: randomUUID(), status: "pending" };

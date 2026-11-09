@@ -1,25 +1,11 @@
 import { accessSync, closeSync, constants, existsSync, fstatSync, lstatSync, openSync, readSync, realpathSync, statSync } from "node:fs";
 import { posix, win32 } from "node:path";
-import { isWslRuntime, wslAutomountRoot } from "./home";
 import { SHIM_MARKER } from "./shim-templates";
-
-/**
- * A PATH entry that reaches Windows through WSL drive interop
- * (`<automount-root>/<drive>/...`; root defaults to /mnt, configurable via
- * /etc/wsl.conf [automount] root).
- */
-export function isWindowsInteropDir(dir: string, automountRoot = "/mnt"): boolean {
-  const root = automountRoot.replace(/\/+$/, "");
-  const escaped = root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`^${escaped}/[a-z](/|$)`, "i").test(dir);
-}
 
 export type CodexPathScanDeps = {
   pathValue?: string;
-  wsl?: boolean;
-  /** Treat PATH entries as POSIX paths (WSL context). Defaults to wsl || non-win32. */
+  /** Treat injected PATH entries as POSIX paths for portable path parsing. */
   posixPaths?: boolean;
-  automountRoot?: string;
   exists?: (path: string) => boolean;
   isShimFile?: (path: string) => boolean;
   isDirectory?: (path: string) => boolean;
@@ -97,16 +83,12 @@ export function findFirstCodexOnPath(deps: CodexPathScanDeps = {}): CodexPathCan
   const exists = deps.exists ?? existsSync;
   const shimFile = deps.isShimFile ?? inspectShimFile;
   const isDir = deps.isDirectory ?? realIsDirectory;
-  const wsl = deps.wsl ?? (process.platform === "linux" && isWslRuntime());
-  const usePosix = deps.posixPaths ?? (wsl || process.platform !== "win32");
+  const usePosix = deps.posixPaths ?? (process.platform !== "win32");
   const joinPath = usePosix ? posix.join : win32.join;
   const pathSep = usePosix ? ":" : win32.delimiter;
-  const automountRoot = deps.automountRoot ?? (wsl ? wslAutomountRoot() : "/mnt");
-  const interopNames = ["codex", "codex.exe", "codex.cmd", "codex.ps1"];
 
   for (const dir of (deps.pathValue ?? process.env.PATH ?? "").split(pathSep).filter(Boolean)) {
-    if (wsl && isWindowsInteropDir(dir, automountRoot)) continue;
-    const names = isWindowsInteropDir(dir, automountRoot) ? interopNames : commandNames("codex");
+    const names = commandNames("codex");
     for (const name of names) {
       const path = joinPath(dir, name);
       if (!exists(path) || isDir(path)) continue;

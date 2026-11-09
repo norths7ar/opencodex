@@ -87,13 +87,11 @@ export function warnFastWireCapabilityGap(providerName: string, modelId: string)
 /**
  * Keep this trust boundary deliberately narrow: only a key-auth Responses route may consume
  * opaque child-task ciphertext, and the model's final wire override must still be Responses.
- * Callers keep combo attempts on their existing native-only recovery/fail-closed behavior.
  */
 export function canPassThroughEncryptedV2AgentTask(
   route: RouteResult,
   inboundWire: InboundWire,
 ): boolean {
-  if (route.combo !== undefined) return false;
   const provider = route.provider;
   if (
     inboundWire !== "responses"
@@ -174,7 +172,7 @@ export async function applyFinalRouteRequestNormalization(args: {
   // not run when it read the body, and only the adapters that build their own system text rename
   // it afterwards. Settle it on the id this request really sends, here where that id is final —
   // every dispatch path (passthrough, runTurn, adapter request build) reads the context after
-  // this, and a combo child runs this for its own target.
+  // this.
   parsed.context = renameRoutedIdentityInContext(parsed.context, route.modelId);
   // Transport-neutral reliability policy (#875): applies to any Responses
   // upstream whose final adapter is openai-responses, not only WS turns.

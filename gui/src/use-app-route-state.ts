@@ -53,7 +53,7 @@ export function useAppRouteState() {
 
   /**
    * Deliberate navigation. `subPath` deep-links a page sub-view (for example the
-   * sidebar's `dashboard/update` action link); `hashBelongsToPage` must accept it,
+   * a dashboard section anchor); `hashBelongsToPage` must accept it,
    * otherwise the normalization effect below strips it right back off.
    */
   const navigateToPage = (id: Page, subPath?: string) => {

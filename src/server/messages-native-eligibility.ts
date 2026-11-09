@@ -24,7 +24,7 @@ export type NativeMessagesDeclineReason = Extract<
   | "cross-wire-ir"
   | "auth-mode-not-native"
   | "oauth-account-pool"
-  | "combo-or-policy-route"
+  | "policy-route"
   | "effort-row"
   | "fast-row"
   | "vision-preprocessing"
@@ -122,7 +122,7 @@ function credentialDeclineReason(
  * - the final adapter is not `anthropic`;
  * - the credential is neither a proxy-managed key nor an eligible Anthropic OAuth account
  *   (`credentialDeclineReason`); a pooled OAuth account set is `oauth-account-pool`;
- * - a combo or policy route owns multi-candidate execution in the Responses pipeline;
+ * - a policy route owns multi-candidate execution in the Responses pipeline;
  * - a synthetic effort or fast row needs the adapter that owns its wire rewrite;
  * - an image would reach a model the operator declared unable to read it;
  * - operator policy only the bridge applies would engage (pinned effort, blocked-skill elision,
@@ -139,7 +139,7 @@ export function nativeMessagesDeclineReason(
   if (provider.adapter !== "anthropic") return "cross-wire-ir";
   const credentialDecline = credentialDeclineReason(route, config, selector);
   if (credentialDecline) return credentialDecline;
-  if (route.combo || route.routeKind === "combo" || route.routeKind === "policy") return "combo-or-policy-route";
+  if (route.routeKind === "policy") return "policy-route";
   if (selector.effortRow) return "effort-row";
   if (selector.fastRow) return "fast-row";
   if (featuresFromMessagesBody(body).has("request.images")

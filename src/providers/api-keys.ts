@@ -1,10 +1,7 @@
 /**
- * Multi-key pool for key-auth providers (the API-key twin of OAuth multiauth).
- *
- * `provider.apiKey` stays the single source of truth for routing — it always mirrors the
- * ACTIVE pool entry, so the router/adapters never learn about the pool. The pool itself
- * lives in `provider.apiKeyPool` in config.json (same file that already holds apiKey).
- * A legacy bare `apiKey` is projected as one row on reads and seeded on first mutation.
+ * One API credential per provider/channel. provider.apiKey owns routing; optional single-entry
+ * apiKeyPool metadata retains labels, pause state and legacy configuration compatibility.
+ * Additional API credentials belong in independent provider rows.
  */
 import { createHash } from "node:crypto";
 import { saveConfigPreservingClaudeCode } from "../config";
@@ -13,7 +10,7 @@ import { GCP_CREDENTIAL_MARKER_PREFIX, isGcpCredentialMaterial, parseGcpCredenti
 import { invalidateResolvedProviderKeyCache, probeProviderKeychain, providerKeychainEntry } from "./api-key-resolve";
 import type { AccountQuotaFields } from "./quota-types";
 import { commitProviderApiKeySelection } from "./api-key-selection";
-import { cleanupRemovedGcpCredentials } from "./gcp-credential-cleanup";
+import { cleanupRemovedGcpCredentials, snapshotProviderGcpCredentialMarkers } from "./gcp-credential-cleanup";
 
 export interface ProviderApiKeyInfo extends AccountQuotaFields {
   id: string;
@@ -216,9 +213,8 @@ export function listProviderApiKeys(config: OcxConfig, name: string): { activeId
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return { activeId: null, keys: [] };
   // A GET projects a legacy key without seeding/mutating live configuration.
-  const pool = provider.apiKeyPool?.length
-    ? provider.apiKeyPool
-    : provider.apiKey ? [{ id: apiKeyPoolEntryId(provider.apiKey), key: provider.apiKey }] : [];
+  const pool = provider.apiKey ? [provider.apiKeyPool?.find(entry => entry.key === provider.apiKey)
+    ?? { id: apiKeyPoolEntryId(provider.apiKey), key: provider.apiKey }] : [];
   const activeId = pool.find(entry => entry.key === provider.apiKey)?.id ?? null;
   return {
     activeId,
@@ -239,12 +235,14 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
   const provider = config.providers[name];
   if (!provider || !isKeyAuthProvider(provider)) return { error: "provider does not use API-key auth" };
   if (typeof key !== "string" || !key.trim()) return { error: "key is required" };
+  const displacedCredentials = snapshotProviderGcpCredentialMarkers(name, provider);
   // GCP credential JSON never enters the literal-key path: it is diverted to the OS keychain and
   // only the `gcp-sa:` marker is stored. splitCredentialPaste runs FIRST (before the CRLF
   // rejection) because pretty-printed JSON contains line breaks, and it also catches the
   // file-path paste mistake with its own guidance before anything is stored.
   try {
     const parts = splitCredentialPaste(key);
+    if (parts.length !== 1) return { error: "Use one credential per channel; create another provider for another API key" };
     const first = parts[0];
     const isJsonPaste = first !== undefined && typeof first !== "string";
     if (!isJsonPaste) {
@@ -266,7 +264,7 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
             if (!existedBefore) created.push(`${GCP_CREDENTIAL_MARKER_PREFIX}${account}`);
             stored.push({ id, marker: storeGcpCredentialJson(config, name, credentialJson, existedBefore) });
           }
-          const pool = ensurePool(fresh);
+          const pool = fresh.apiKeyPool = [] as NonNullable<OcxProviderConfig["apiKeyPool"]>;
           for (const { id, marker } of stored) {
             const existing = pool.find(e => e.id === id);
             if (existing) {
@@ -280,6 +278,7 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
           return { changed: true, selectionChanged: true, value: stored[0]!.id };
         });
         if (committed.status === "committed") {
+          cleanupRemovedGcpCredentials(displacedCredentials);
           invalidateResolvedProviderKeyCache();
           return { id: committed.value };
         }
@@ -297,7 +296,7 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
   if (!trimmed) return { error: "key must not include line breaks" };
   const id = apiKeyPoolEntryId(trimmed);
   const committed = commitProviderApiKeySelection(config, name, fresh => {
-    const pool = ensurePool(fresh);
+    const pool = fresh.apiKeyPool = [] as NonNullable<OcxProviderConfig["apiKeyPool"]>;
     const existing = pool.find(e => e.id === id);
     if (existing) {
       if (label?.trim()) existing.label = label.trim();
@@ -308,21 +307,13 @@ export function addProviderApiKey(config: OcxConfig, name: string, key: string, 
     return { changed: true, selectionChanged: true, value: id };
   });
   if (committed.status !== "committed") return { error: "provider selection unavailable" };
+  cleanupRemovedGcpCredentials(displacedCredentials);
   return { id };
 }
 
 /** Switch the ACTIVE key (mirrors into `provider.apiKey`). Persists config. */
 export function setActiveProviderApiKey(config: OcxConfig, name: string, id: string): boolean {
-  const committed = commitProviderApiKeySelection(config, name, provider => {
-    const entry = provider.apiKeyPool?.find(e => e.id === id)
-      ?? (!provider.apiKeyPool?.length && provider.apiKey && apiKeyPoolEntryId(provider.apiKey) === id
-        ? { id, key: provider.apiKey } : undefined);
-    if (!entry || entry.disabled) return { changed: false, value: false };
-    ensurePool(provider);
-    provider.apiKey = entry.key;
-    return { changed: true, selectionChanged: true, value: true };
-  });
-  return committed.status === "committed" && committed.value;
+  return listProviderApiKeys(config, name).activeId === id;
 }
 
 /** Rename a key slot without changing its id, secret, or active routing state. */
@@ -348,9 +339,7 @@ export function removeProviderApiKey(config: OcxConfig, name: string, id: string
     removed = entry.key;
     provider.apiKeyPool = pool.filter(e => e.id !== id);
     if (provider.apiKey === entry.key) {
-      const next = provider.apiKeyPool.find(candidate => !candidate.disabled);
-      if (next) provider.apiKey = next.key;
-      else delete provider.apiKey;
+      delete provider.apiKey;
     }
     if (provider.apiKeyPool.length === 0) delete provider.apiKeyPool;
     return { changed: true, value: true };

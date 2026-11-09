@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "../account-id";
 import { withCodexAccountLogLabel } from "../account-label";
 import { getCodexAccountCredential, markCodexAccountValidated, readCodexAccountRecord, saveCodexAccountCredential, CodexCredentialRefreshLockTimeoutError, CodexCredentialRefreshBusyError, CodexCredentialRefreshStaleError } from "../account-store";
 import { clearAccountQuota, isCodexQuotaExhausted, parseUsageQuota, poolWhamPolicyObservation, setAccountQuotaFromParsed } from "../quota";
@@ -34,6 +35,7 @@ export function codexAccountPersistenceConflict(
       ? undefined
       : "Pool account was removed while login was in progress. Add it again as a new account.";
   }
+  if (configuredPoolAccount(config, accountId) && singleCodexAccountId(config) !== accountId) return undefined;
   const namespaceCollision = codexAccountIdNamespaceCollisionError(config.codexAccountNamespaces, accountId);
   if (namespaceCollision) return namespaceCollision;
   return (config.codexAccounts ?? []).some(account => account.id === accountId)
@@ -98,6 +100,25 @@ export function codexCredentialPersistenceFailure(accountId: string, catalogRefr
   };
 }
 
+
+/** A verified fresh credential is durable before its channel selection is published. */
+function publishLoggedInCodexAccount(sourceConfig: OcxConfig, runtimeConfig: OcxConfig, accountId: string): void {
+  const selectionBefore = runtimeConfig.activeCodexAccountId;
+  const providersBefore = runtimeConfig.providers;
+  const signedOutBefore = runtimeConfig.codexSignedOut;
+  runtimeConfig.codexSignedOut = false;
+  runtimeConfig.activeCodexAccountId = accountId;
+  if (runtimeConfig.providers.openai) runtimeConfig.providers = { ...runtimeConfig.providers,
+    openai: { ...runtimeConfig.providers.openai, codexAccountMode: "pool" } };
+  try { saveRuntimeConfig(sourceConfig, runtimeConfig); }
+  catch (error) {
+    runtimeConfig.activeCodexAccountId = selectionBefore;
+    runtimeConfig.providers = providersBefore;
+    runtimeConfig.codexSignedOut = signedOutBefore;
+    throw error;
+  }
+}
+
 /** Persist config before publishing secret or runtime state under the shared mutation coordinator. */
 export function persistNewCodexAccount(
   sourceConfig: OcxConfig,
@@ -114,6 +135,8 @@ export function persistNewCodexAccount(
         && Object.values(runtimeConfig.codexAccountNamespaces ?? {}).includes(addedAccount.id);
       accounts.push(addedAccount);
       runtimeConfig.codexAccounts = accounts;
+      runtimeConfig.activeCodexAccountId = previousConfig.codexSignedOut === true
+        ? previousConfig.activeCodexAccountId : singleCodexAccountId(previousConfig);
 
       // Presence of the explicit flag distinguishes a dashboard-managed map from
       // a hand-authored legacy map. Preserve manual maps exactly.
@@ -139,6 +162,7 @@ export function persistNewCodexAccount(
       });
       if (staged.validatedAt !== undefined) markCodexAccountValidated(addedAccount.id, staged.validatedAt, generation);
       clearAccountNeedsReauth(addedAccount.id);
+      publishLoggedInCodexAccount(sourceConfig, runtimeConfig, addedAccount.id);
     } catch {
       // Config is already durable. Return the failure outcome through the coordinator so its
       // generation commit is not rolled back while config.json remains changed.
@@ -283,7 +307,7 @@ export async function handleCodexAuthLoginStart(req: Request, config: OcxConfig,
               } catch { /* wham fetch is non-blocking */ }
               // Reauth must refresh the same ChatGPT identity already bound to this pool slot.
               // Otherwise a different login would silently overwrite credentials under a trusted id.
-              if (reauth) {
+              if (reauth || configuredPoolAccount(getRuntimeConfig(config), accountId)) {
                 const existingCred = getCodexAccountCredential(accountId);
                 const poolAccount = configuredPoolAccount(getRuntimeConfig(config), accountId);
                 const expectedChatgptId = existingCred?.chatgptAccountId?.trim();
@@ -323,7 +347,7 @@ export async function handleCodexAuthLoginStart(req: Request, config: OcxConfig,
               }
 
               // 1.2: Duplicate check is scoped by personal vs workspace plan bucket.
-              const collision = await checkAccountIdCollision(oauthAccountId, email, plan, reauth ? accountId : undefined);
+              const collision = await checkAccountIdCollision(oauthAccountId, email, plan, (reauth || configuredPoolAccount(getRuntimeConfig(config), accountId)) ? accountId : undefined);
               if (collision.collision) {
                 setCodexLoginState(flowId, {
                   status: "error", error: collision.reason, doneAt: Date.now(),
@@ -404,7 +428,7 @@ export async function handleCodexAuthLoginStart(req: Request, config: OcxConfig,
                   isMain: false,
                 }, accounts);
                 latestConfig.codexAccounts = accounts;
-                saveRuntimeConfig(config, latestConfig);
+                publishLoggedInCodexAccount(config, latestConfig, accountId);
               } else {
                 const addedAccount = withCodexAccountLogLabel({ id: accountId, email, plan, isMain: false }, accounts);
                 newAccountPersistence = persistNewCodexAccount(

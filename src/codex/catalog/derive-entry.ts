@@ -1,13 +1,11 @@
 import type { OcxConfig } from "../../types";
 import { effectiveProviderAlias } from "../../providers/default-aliases";
 import { neutralizeIdentity } from "../../adapters/identity";
-import { COMBO_NAMESPACE } from "../../combos";
 import {
   CODEX_CUSTOM_MODEL_CATALOG_KIND,
   applyCatalogMetadata,
   applyNativeOpenAiContextOverride,
   applyRoutedCodexToolMode,
-  catalogModelSlug,
   ensureStrictCatalogFields,
   normalizeRoutedCatalogEntry,
   normalizeServiceTiers,
@@ -37,22 +35,6 @@ export function finishUpstreamNativeEntry(clone: RawEntry, priority: number, con
   // (wire-clamped to xhigh). Ultra is always advertised regardless of v2 toggle.
   if (!isGpt56NativeSlug(String(clone.slug ?? ""))) ensureUltraReasoningLevel(clone);
   return ensureStrictCatalogFields(normalizeServiceTiers(clone));
-}
-
-export function isExactComboCatalogModel(
-  model: CatalogModel | undefined,
-  exactComboSlugs: ReadonlySet<string>,
-): boolean {
-  return model?.provider === COMBO_NAMESPACE && exactComboSlugs.has(catalogModelSlug(model));
-}
-
-export function isExactComboCatalogEntry(
-  entry: RawEntry,
-  exactComboSlugs: ReadonlySet<string>,
-): boolean {
-  return entry.owned_by === COMBO_NAMESPACE
-    && typeof entry.slug === "string"
-    && exactComboSlugs.has(entry.slug);
 }
 
 /**
@@ -106,12 +88,10 @@ export function deriveEntry(
   desc: string,
   priority: number,
   model?: CatalogModel,
-  exactComboSlugs: ReadonlySet<string> = new Set(),
   contextCap?: NativeContextLimitsInput,
 ): RawEntry {
-  const preserveExact = isExactComboCatalogModel(model, exactComboSlugs);
   // Go exposes model-specific upstream enums; synthetic tiers mislead subagent overrides.
-  const preserveExactReasoning = preserveExact || model?.provider === "opencode-go";
+  const preserveExactReasoning = model?.provider === "opencode-go";
   const codexForwardNativeCapabilityAlias = model?.codexForwardNativeCapabilityAlias === true
     ? upstreamNativeEntry(model.id)
     : null;
@@ -131,7 +111,7 @@ export function deriveEntry(
     delete e[OCX_NATIVE_SOURCE_PRIORITY_FIELD];
     e.slug = slug;
     e.display_name = routedDisplayName(slug, model);
-    applyRoutedDescription(e, desc, model);
+    applyRoutedDescription(e, desc);
     e.priority = priority;
     e.visibility = "list";
     if ("upgrade" in e) e.upgrade = null;
@@ -195,7 +175,6 @@ export function deriveEntry(
       }
     }
     return ensureStrictCatalogFields(normalizeServiceTiers(e), {
-      preserveExactInputModalities: preserveExact,
       isRouted,
       preserveNativeAccessPrograms: codexForwardNativeCapabilityAlias !== null,
     });
@@ -215,7 +194,7 @@ export function deriveEntry(
         : { web_search_tool_type: "text_and_image", supports_search_tool: true }
       : {}),
   };
-  applyRoutedDescription(entry, desc, model);
+  applyRoutedDescription(entry, desc);
   if (isRouted) {
     applyRoutedCodexToolMode(entry, model?.codexToolMode);
     applyReasoningLevels(
@@ -239,7 +218,6 @@ export function deriveEntry(
   if (model?.quotaInactiveReason) entry[CATALOG_INACTIVE_REASON_FIELD] = model.quotaInactiveReason;
   if (!isRouted) applyNativeOpenAiContextOverride(entry, contextCap);
   return ensureStrictCatalogFields(normalizeServiceTiers(entry), {
-    preserveExactInputModalities: preserveExact,
     isRouted,
   });
 }

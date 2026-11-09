@@ -49,7 +49,6 @@ import {
   type QuotaPoolAccount,
   type QuotaPoolAccountState,
   type QuotaPoolProvider,
-  type QuotaPoolRole,
   type QuotaPoolSource,
   type QuotaPoolWindow,
 } from "./contract";
@@ -292,10 +291,6 @@ function claudeCliAccounts(identity: QuotaPoolIdentity, provider: string, deps: 
   }];
 }
 
-function role(config: OcxConfig): QuotaPoolRole {
-  return config.runtimeRole === "hub" || config.runtimeRole === "client" ? config.runtimeRole : "standalone";
-}
-
 function enabled(provider: OcxProviderConfig | undefined): provider is OcxProviderConfig {
   return !!provider && provider.disabled !== true;
 }
@@ -340,7 +335,7 @@ async function assemble(config: OcxConfig, identity: QuotaPoolIdentity, deps: Qu
   }
   return {
     schema: QUOTA_POOL_SCHEMA,
-    producer: { version: VERSION, role: role(config), homeId: identity.homeId },
+    producer: { version: VERSION, role: "standalone", homeId: identity.homeId },
     generatedAt: iso(now) ?? new Date().toISOString(),
     providers,
   };

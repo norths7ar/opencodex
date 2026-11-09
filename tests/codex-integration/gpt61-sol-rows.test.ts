@@ -41,7 +41,7 @@ const API_LADDER = ["low", "medium", "high", "xhigh", "max"];
 function builtSol(limits?: NativeContextLimitsInput): RawEntry | undefined {
   return buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: [NATIVE_GPT61_SOL_MODEL], goModels: [], wsEnabled: false,
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
+    multiAgentMode: "default", multiAgentV2Enabled: false,
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     openaiContextCap: limits,
   }).find(entry => entry.slug === NATIVE_GPT61_SOL_MODEL);
@@ -54,7 +54,7 @@ function mergeRetainedSol(retained: RawEntry, limits?: NativeContextLimitsInput)
     baseline: new Map(), featured: [], wsEnabled: false, template: null,
     disabledModels: new Set(), selectedModelsByProvider: new Map(), gatheredProviderNames: new Set(),
     degradedProviderNames: new Set(), legacyCustomModelSlugs: new Set(), multiAgentMode: "default",
-    multiAgentV2Enabled: false, exactComboSlugs: new Set(), hasPhysicalComboProvider: false,
+    multiAgentV2Enabled: false,
     includeNativeOpenAi: true, accountBoundEntries: accountBound ? [retained] : [],
     // No backfill: the test must repair the retained row rather than replace it with a fresh one.
     policy: { nativeBackfillSlugs: [], unsupportedNativeEntries: "drop", warningPolicy: "suppress" },

@@ -52,27 +52,6 @@ describe("Copilot catalog configuration projection", () => {
     expect(provider.retainModels).toEqual(["retained-model"]);
   });
 
-  test("detected Auto applies hints while saved retain/combo models stay out of the picker", async () => {
-    const { provider, requests } = fixture([{ id: "live-model", model_picker_enabled: false }]);
-    const result = await gather(provider);
-    expect(result.models.map(model => model.id)).toEqual(["auto"]);
-    expectHints(result.models[0]!, "Configured Auto");
-    expect(requests()).toBe(1);
-  });
-
-  test("manual-capable discovery applies config hints/cap and retains explicit and combo selectors on warm reads", async () => {
-      const { provider, requests } = fixture([{ id: "live-model", model_picker_enabled: true,
-        context_length: 128_000, capabilities: { vision: false } }]);
-      for (let read = 0; read < 2; read++) {
-        const result = await gather(provider);
-        expect(result.outcome.state).toBe("authoritative");
-        expect(result.models.map(model => model.id)).toEqual(["live-model", "combo-model", "retained-model"]);
-        expectHints(result.models[0]!, "Configured live");
-        expect(result.models.find(model => model.id === "retained-model")?.contextWindow).toBe(32_000);
-      }
-      expect(requests()).toBe(1);
-  });
-
   test("legacy discovery without permission metadata preserves the shared retention contract", async () => {
     const { provider } = fixture([{ id: "live-model", context_length: 128_000 }]);
     const result = await gather(provider);

@@ -3,7 +3,6 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { saveConfig } from "../../src/config";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { startServer } from "../../src/server";
 import {
   REPLAY_REFUSAL_NO_RETRY_HEADER,
@@ -34,8 +33,6 @@ let previousHome: string | undefined;
 let isolatedCodexHome: IsolatedCodexHome | null = null;
 
 beforeEach(() => {
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   previousHome = process.env.OPENCODEX_HOME;
   isolatedCodexHome = installIsolatedCodexHome("ocx-replay-refusal-");
   testDir = mkdtempSync(join(tmpdir(), "ocx-replay-refusal-"));
@@ -44,8 +41,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   globalThis.fetch = originalFetch;
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
@@ -236,81 +231,6 @@ function comboReplayConfig(): OcxConfig {
   } as unknown as OcxConfig;
 }
 
-test("a combo refuses replay after a spent replacement's zero-output stream failure", async () => {
-  saveConfig(comboReplayConfig());
-  let firstSends = 0;
-  let secondSends = 0;
-  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-    if (url.includes(COMBO_FIRST_HOST)) {
-      firstSends += 1;
-      if (firstSends === 1) preHeaderReset();
-      const failure = { type: "response.failed", response: {
-        id: "resp_failed", object: "response", status: "failed", output: [],
-        error: { code: "server_is_overloaded", message: "Server is overloaded" },
-      } };
-      return new Response(`event: response.failed\ndata: ${JSON.stringify(failure)}\n\n`, {
-        headers: { "content-type": "text/event-stream" },
-      });
-    }
-    if (url.includes(COMBO_SECOND_HOST)) {
-      secondSends += 1;
-      return Response.json({ error: { code: "unexpected_second_target" } }, { status: 400 });
-    }
-    return originalFetch(input as RequestInfo, init);
-  }) as typeof fetch;
-  const server = startServer(0);
-  try {
-    const { response, attempts, json } = await sendWithClientRetries(new URL("/v1/responses", server.url), {
-      model: "combo/pair", store: false, stream: true, ...RESPONSES_TURN,
-    });
-    expect({ firstSends, secondSends, attempts }).toEqual({ firstSends: 2, secondSends: 0, attempts: 1 });
-    expect(response.status).toBe(REPLAY_REFUSED_STATUS);
-    expect(json.error?.code).toBe(UPSTREAM_RESET_REPLAY_REFUSED_CODE);
-    expect(response.headers.get(REPLAY_REFUSAL_NO_RETRY_HEADER)).toBe(REPLAY_REFUSAL_NO_RETRY_VALUE);
-  } finally {
-    await server.stop(true);
-  }
-});
-
-test("a combo keeps a spent replacement's zero-output context overflow", async () => {
-  saveConfig(comboReplayConfig());
-  let firstSends = 0;
-  let secondSends = 0;
-  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-    if (url.includes(COMBO_FIRST_HOST)) {
-      firstSends += 1;
-      if (firstSends === 1) preHeaderReset();
-      const failure = { type: "response.failed", response: {
-        id: "resp_overflow", object: "response", status: "failed", output: [],
-        error: { type: "invalid_request_error", code: "context_length_exceeded",
-          message: "Input exceeds the model context window." },
-      } };
-      return new Response(`event: response.failed\ndata: ${JSON.stringify(failure)}\n\n`, {
-        headers: { "content-type": "text/event-stream" },
-      });
-    }
-    if (url.includes(COMBO_SECOND_HOST)) {
-      secondSends += 1;
-      return Response.json({ error: { code: "unexpected_second_target" } }, { status: 400 });
-    }
-    return originalFetch(input as RequestInfo, init);
-  }) as typeof fetch;
-  const server = startServer(0);
-  try {
-    const { response, attempts, json } = await sendWithClientRetries(new URL("/v1/responses", server.url), {
-      model: "combo/pair", store: false, stream: true, ...RESPONSES_TURN,
-    });
-    expect({ firstSends, secondSends, attempts }).toEqual({ firstSends: 2, secondSends: 0, attempts: 1 });
-    expect(response.status).toBe(400);
-    expect(json.error?.code).toBe("context_length_exceeded");
-    expect(JSON.stringify(json)).toContain("Input exceeds the model context window.");
-  } finally {
-    await server.stop(true);
-  }
-});
-
 test("the direct path refuses replay after a spent replacement's decrypt failure", async () => {
   const config = parityConfig();
   config.providers.bridged.retryOnReset = {};
@@ -354,46 +274,6 @@ test("the direct path refuses replay after a spent replacement's decrypt failure
     expect(response.status).toBe(REPLAY_REFUSED_STATUS);
     expect((await response.json()).error.code).toBe(UPSTREAM_RESET_REPLAY_REFUSED_CODE);
     expect(response.headers.get(REPLAY_REFUSAL_NO_RETRY_HEADER)).toBe(REPLAY_REFUSAL_NO_RETRY_VALUE);
-  } finally {
-    await server.stop(true);
-  }
-});
-
-test.each([
-  { name: "a context overflow", status: 400, expectedStatus: 400 },
-  { name: "a 413", status: 413, expectedStatus: REPLAY_REFUSED_STATUS },
-])("a combo never sends a spent replacement's $name to its next target", async ({ status, expectedStatus }) => {
-  saveConfig(comboReplayConfig());
-  let firstSends = 0;
-  let secondSends = 0;
-  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-    if (url.includes(COMBO_FIRST_HOST)) {
-      firstSends += 1;
-      // The first send leaves and resets before any header; the granted replacement is answered.
-      if (firstSends === 1) preHeaderReset();
-      return new Response(JSON.stringify({ error: {
-        message: "context_length_exceeded", type: "invalid_request_error", code: "context_length_exceeded",
-      } }), { status, headers: { "content-type": "application/json" } });
-    }
-    if (url.includes(COMBO_SECOND_HOST)) {
-      secondSends += 1;
-      return Response.json({
-        id: "resp_second", object: "response", status: "completed", model: "model",
-        output: [{ type: "message", id: "msg_second", role: "assistant", status: "completed",
-          content: [{ type: "output_text", text: "duplicate", annotations: [] }] }],
-        usage: { input_tokens: 1, output_tokens: 1, total_tokens: 2 },
-      });
-    }
-    return originalFetch(input as RequestInfo, init);
-  }) as typeof fetch;
-  const server = startServer(0);
-  try {
-    const { response, attempts } = await sendWithClientRetries(new URL("/v1/responses", server.url), {
-      model: "combo/pair", store: false, stream: false, ...RESPONSES_TURN,
-    });
-    expect({ firstSends, secondSends, attempts }).toEqual({ firstSends: 2, secondSends: 0, attempts: 1 });
-    expect(response.status).toBe(expectedStatus);
   } finally {
     await server.stop(true);
   }

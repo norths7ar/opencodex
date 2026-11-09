@@ -16,7 +16,7 @@ export type NativeChatDeclineReason = Extract<
   ProtocolReasonCode,
   | "cross-wire-ir"
   | "auth-mode-not-native"
-  | "combo-or-policy-route"
+  | "policy-route"
   | "responses-only-feature"
   | "tool-result-image"
   | "vision-preprocessing"
@@ -38,7 +38,7 @@ export function nativeChatDeclineReason(
   if (provider.adapter !== "openai-chat") return "cross-wire-ir";
   if (provider.authMode !== undefined && provider.authMode !== "key" && provider.authMode !== "local") return "auth-mode-not-native";
   // Combo and policy execution own multi-candidate retries in the Responses pipeline.
-  if (route.combo || route.routeKind === "combo" || route.routeKind === "policy") return "combo-or-policy-route";
+  if (route.routeKind === "policy") return "policy-route";
   if (rawBody.store === true || rawBody.background === true) return "responses-only-feature";
   if (typeof rawBody.previous_response_id === "string" && rawBody.previous_response_id.length > 0) return "responses-only-feature";
   if (rawBody.compaction_trigger !== undefined) return "responses-only-feature";

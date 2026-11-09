@@ -10,9 +10,6 @@ import { captureExplicitOpenAiCallerAuth } from "../../providers/openai-sidecar"
 import { captureCallerDirectAuth } from "../../providers/caller-authorization";
 import { createInferenceSendBudget } from "../inference/context";
 import { finalizeOwnedTranslatorBudget, finalizeAccountLease } from "./core-lifetime";
-import type { TranslatorBudget } from "../../lib/translator-budget";
-import { executeComboResponses } from "./core-combo";
-import { registerTurn, unregisterTurn } from "../lifecycle";
 import { runWithCompactionRecovery } from "./compaction-recovery";
 import { captureAdmissionPolicy } from "../capture-admission-policy";
 /**
@@ -36,19 +33,19 @@ export async function handleResponses(
   try {
     const response = await runWithCompactionRecovery(req, config, logCtx, {
       ...options, abortSignal,
-      advisorAdmissionPolicy: options.advisorAdmissionPolicy ?? captureAdmissionPolicy(config, options.admission, options.admissionScope),
+      sidecarAdmissionPolicy: options.sidecarAdmissionPolicy ?? captureAdmissionPolicy(config, options.admission, options.admissionScope),
       openAiSidecarAuth: options.openAiSidecarAuth === undefined
         ? captureExplicitOpenAiCallerAuth(req.headers, config) : options.openAiSidecarAuth,
       nativeCallerAuth: options.nativeCallerAuth === undefined
         ? captureExplicitOpenAiCallerAuth(req.headers, config) : options.nativeCallerAuth,
       callerDirectAuth: options.callerDirectAuth === undefined
         ? captureCallerDirectAuth(req.headers, config) : options.callerDirectAuth,
-      // Capture before combo replay rebuilds the Request headers; children carry options.
+      // Capture before a retry wrapper rebuilds the Request headers.
       visionDescribeTerminal: options.visionDescribeTerminal === true
         || req.headers.get("x-opencodex-vision-describe") === "1",
       translatorBudget,
       accountLoad,
-      // Once at ingress, spend observer included: a combo child inherits the parent's holder.
+      // Install one execution budget at ingress, including the spend observer.
       sendBudget: options.sendBudget ?? createInferenceSendBudget(req, logCtx),
     }, (req, config, logCtx, options) => handleResponsesInner(req, config, logCtx, options, requestDispatchers));
     const finalResponse = ownsBudget ? finalizeOwnedTranslatorBudget(response, translatorBudget, abortSignal) : response;
@@ -58,31 +55,10 @@ export async function handleResponses(
     release();
     if (ownsBudget) translatorBudget.dispose();
     throw error;
-  } finally {
-    if (!options.comboInitialSend?.producerOwned) options.comboInitialSend?.permit.release();
   }
 }
-export async function handleComboResponses(
-  req: Request,
-  rawBody: unknown,
-  comboId: string,
-  config: OcxConfig,
-  logCtx: RequestLogContext,
-  options: HandleResponsesOptions & { translatorBudget: TranslatorBudget },
-): Promise<Response> {
-  // Each child relay binds the turn's lease and unbinds it when its stream ends; the lease is
-  // released once nothing is bound. Hold it for the whole ladder so a refused child's relay
-  // cannot settle the turn the next target still runs in ("turn already settled"). An accepted
-  // child's stream is bound before this returns and keeps the lease until it ends.
-  const ladder = new AbortController();
-  registerTurn(ladder, options.turnAdmissionLease);
-  try {
-    return await executeComboResponses(req, rawBody, comboId, config, logCtx, options, requestDispatchers);
-  } finally {
-    if (options.turnAdmissionLease && "bindAbortController" in options.turnAdmissionLease) unregisterTurn(ladder);
-  }
-}
-const requestDispatchers: ResponsesDispatchers = { handleResponses, handleComboResponses };
+const requestDispatchers: ResponsesDispatchers = { handleResponses };
+
 export { adapterNeedsForcedContinuation } from "./core-replay";
 export {
   sidecarOutcomeRecorder, codexLogAccountId, usesCodexForwardPoolAuth, preAuthUpstreamHostCircuitKey,
@@ -90,12 +66,8 @@ export {
   shouldRetryCodexPoolAccountTransient, codexAccountGatedCanonicalWireModel, codexForwardTerminalOutcomeRecorder,
 } from "./core-codex-account";
 export { shouldAttemptOpaqueBlobRecovery } from "./core-opaque-recovery";
-export { readDisplaySafeErrorText, decodeRequestErrorResponse, comboUnavailableResponse, clientCancelledResponse } from "./core-errors";
-export type { ConsumedComboFailure, HandleResponsesOptions } from "./core-options";
-export {
-  sanitizedRetryAfter, consumeComboFailure, usageFromComboFailureText, createChildPassthroughCallbackGate,
-  buildComboChildHeaders,
-} from "./core-combo-failure";
+export { readDisplaySafeErrorText, decodeRequestErrorResponse, clientCancelledResponse } from "./core-errors";
+export type { HandleResponsesOptions } from "./core-options";
 export { UPSTREAM_JSON_BODY_READ_OPTIONS, linkAbortSignal } from "./core-lifetime";
 export { poolCredentialRefreshIncompleteResponse } from "./core-auth";
 export { applyServiceTierGate } from "./core-normalize";

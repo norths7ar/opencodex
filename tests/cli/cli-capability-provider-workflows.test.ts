@@ -84,7 +84,6 @@ describe("provider/model discovery follows existing handlers", () => {
   });
 
   test.each([
-    { key: "provider account-mode", sub: "account-mode", args: ["direct", "--json"], expected: { method: "PATCH", path: "/api/providers?name=openai", body: { codexAccountMode: "direct" } } },
     { key: "provider selected", sub: "selected", args: ["fixture", "--clear", "--json"], expected: { method: "PUT", path: "/api/selected-models", body: { provider: "fixture", models: [] } } },
     { key: "provider presets", sub: "presets", args: ["--json"], expected: { method: "GET", path: "/api/provider-presets" } },
     { key: "provider quota", sub: "quota", args: ["--refresh", "--json"], expected: { method: "GET", path: "/api/provider-quotas?refresh=1" } },

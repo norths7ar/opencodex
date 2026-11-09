@@ -9,7 +9,6 @@ import { newClientId } from "./claude-code-types";
  */
 export const EDITABLE_KEYS = [
   "authMode",
-  "systemEnv",
   "fastMode",
   "autoContext",
   "autoCompactWindow",
@@ -42,7 +41,6 @@ export function normalizedModelMap(rows: readonly MapRow[]): Record<string, stri
 export function claudeCodeSaveBody(state: ClaudeCodeState, rows: readonly MapRow[]) {
   return {
     authMode: state.authMode,
-    systemEnv: state.systemEnv,
     fastMode: state.fastMode,
     autoContext: state.autoContext,
     autoCompactWindow: state.autoCompactWindow,

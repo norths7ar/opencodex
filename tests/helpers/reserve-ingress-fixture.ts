@@ -3,7 +3,6 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadConfig, saveConfig } from "../../src/config";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { MAIN_CODEX_ACCOUNT_NAMESPACE_TARGET } from "../../src/codex/account-namespace-match";
 import { flushConfigDirHardeningForTests } from "../../src/config/paths";
 import * as mainAccount from "../../src/codex/main-account";
@@ -43,8 +42,6 @@ export function deferred<T>() {
 }
 
 function clearState(): void {
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearAccountQuota(); // Cancels pending quota persistence before fixture-home teardown.
   clearMainAccountInfoCache();
   clearCodexUpstreamHealth();

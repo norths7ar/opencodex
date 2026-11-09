@@ -38,18 +38,6 @@ function fakeDeps(platform: string, tree: Record<string, string | string[]>, env
 }
 
 describe("detectCursorInstalls", () => {
-  test("tells Private Inference apart from regular Cursor by product.json nameLong on macOS", () => {
-    const deps = fakeDeps("darwin", {
-      "/Applications": ["Cursor.app", "Cursor Private Inference.app", "Xcode.app"],
-      "/Applications/Cursor.app/Contents/Resources/app/product.json": JSON.stringify({ nameLong: "Cursor", version: "3.18.9" }),
-      "/Applications/Cursor Private Inference.app/Contents/Resources/app/product.json": JSON.stringify({ nameLong: "Cursor Private Inference", version: "3.18.25" }),
-    });
-    expect(detectCursorInstalls(deps)).toEqual([
-      { build: "regular", path: "/Applications/Cursor.app", version: "3.18.9" },
-      { build: "private-inference", path: "/Applications/Cursor Private Inference.app", version: "3.18.25" },
-    ]);
-  });
-
   test("looks under LOCALAPPDATA/Programs on Windows and skips malformed product.json", () => {
     const deps = fakeDeps("win32", {
       "C:\\Users\\u\\AppData\\Local\\Programs": ["cursor", "cursor-private-inference"],
@@ -61,16 +49,6 @@ describe("detectCursorInstalls", () => {
     const installs = detectCursorInstalls(deps);
     expect(installs.map(install => install.build)).toEqual(["private-inference"]);
     expect(installs[0].version).toBeNull();
-  });
-
-  test("finds the /usr/share distro-style tarball layout on Linux", () => {
-    const deps = fakeDeps("linux", {
-      "/usr/share": ["cursor"],
-      "/usr/share/cursor/resources/app/product.json": JSON.stringify({ nameLong: "Cursor Private Inference", version: "3.22.9" }),
-    });
-    expect(detectCursorInstalls(deps)).toEqual([
-      { build: "private-inference", path: "/usr/share/cursor", version: "3.22.9" },
-    ]);
   });
 
   test("finds nothing when no candidate directory exists", () => {
@@ -366,11 +344,11 @@ describe("GET /api/native-integrations/cursor", () => {
     resetCursorLocalInstallerCacheForTests();
     const asked: string[] = [];
     const deps = {
-      platform: "linux",
+      platform: "win32",
       arch: "x64",
       fetchJson: async (url: string) => {
         asked.push(url);
-        return { version: "3.22.7", url: "https://downloads.cursor.com/local-mode/c/linux/x64/Cursor_Private_Inference-3.22.7-x86_64.AppImage" };
+        return { version: "3.22.7", url: "https://downloads.cursor.com/local-mode/c/win32/x64/Cursor_Private_Inference-3.22.7.exe" };
       },
     };
     const regular = { build: "regular" as const, path: "/opt/cursor", version: null };

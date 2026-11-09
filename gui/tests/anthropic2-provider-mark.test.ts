@@ -5,7 +5,7 @@ import { providerIconSrc } from "../src/provider-icons";
 import { poolSettingsRequestBody } from "../src/pool-settings";
 
 test("Pool 2 retains the Claude shape with a distinct green mark", () => {
-  const root = join(import.meta.dir, "..", "public", "provider-icons");
+  const root = join(import.meta.dir, "../public/provider-icons");
   const primary = readFileSync(join(root, "claude-color.svg"), "utf8");
   const secondary = readFileSync(join(root, "claude-green.svg"), "utf8");
   expect(secondary.match(/ d="([^"]+)"/)?.[1]).toBe(primary.match(/ d="([^"]+)"/)?.[1]);

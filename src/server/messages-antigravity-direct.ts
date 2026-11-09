@@ -132,7 +132,7 @@ export function planMessagesAntigravityDirect(
 
 /** Whether a route may carry this body on the direct lane, judged as the ingress judges it. */
 export function messagesDirectRouteHolds(
-  route: Pick<RouteResult, "providerName" | "modelId" | "provider" | "combo" | "routeKind">,
+  route: Pick<RouteResult, "providerName" | "modelId" | "provider" | "routeKind">,
   body: Rec,
   model: string,
   config: OcxConfig,

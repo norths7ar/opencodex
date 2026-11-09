@@ -158,7 +158,6 @@ export interface CodexInjectResult {
   status?: "skipped";
   /** Busy write lock, emitted by `codexInjectLockOutcome` and undeclared here until #4809. */
   retryable?: boolean;
-  /** `hub-gated` is the hub-role gate (#4236), distinct from the user's own OFF switch. */
   skippedReason?: LocalClientSkipReason | "desired_enabled";
   nativeSubagentDefaultsWarning?: string;
 }
@@ -576,11 +575,9 @@ async function injectCodexConfigImpl(
         return {
           success: true,
           status: "skipped",
-          skippedReason: localClientSkipReason(legacyGateSnapshot),
+          skippedReason: localClientSkipReason(),
           message: localClientSkipMessage(
-            legacyGateSnapshot,
             "Codex integration is OFF; no Codex config, catalog, cache, or history was changed.",
-            "No Codex config, catalog, cache, or history was changed.",
           ),
         };
       }
@@ -637,7 +634,7 @@ async function injectCodexConfigImpl(
         if (!shouldSyncCodexOnStart(gateSnapshot)) {
           // Carry WHY under the lock: "the hub does not write its own clients" and "the user
           // turned Codex off" produce the same no-write and must not produce the same sentence.
-          throw new CodexWriteLockSkipped(localClientSkipReason(gateSnapshot));
+          throw new CodexWriteLockSkipped(localClientSkipReason());
         }
         // N and C are held here. Reject stale client work before publishing a
         // transition or capturing preimages; rejection must not compensate over

@@ -6,8 +6,6 @@ import { handleConfigCommand } from "../../src/cli/config-command";
 import { handleEffortCommand } from "../../src/cli/effort";
 import { handleModels } from "../../src/cli/models";
 import { handleProviderCommand } from "../../src/cli/provider";
-import { handleAdvisorRoutes } from "../../src/server/management/advisor-routes";
-import * as advisorActivation from "../../src/lib/advisor-activation";
 import type { OcxConfig } from "../../src/types";
 import * as paths from "../../src/config/paths";
 import * as configModule from "../../src/config";
@@ -15,7 +13,6 @@ import { armClaudeCodeBaseline, claudeCodeBaselineArmed } from "../../src/config
 import { CliUsageError } from "../../src/cli/runtime-api";
 import { readCliConfigForMutation } from "../../src/cli/config-mutation";
 import { dispatchCommand, type CliDispatchDeps } from "../../src/cli/dispatch";
-import { advisorRunnable, resolveAdvisorSettings } from "../../src/advisor/settings";
 import { setProviderKeychainEntryFactoryForTests } from "../../src/providers/api-key-resolve";
 import { resetHardenedStateForTests, setAsyncIcaclsBeltSchedulerForTests, setAsyncIcaclsRunnerForTests,
   setIcaclsRunnerForTests, setNowForTests, setPlatformForTests, windowsSecretAclReapPendingForPath,
@@ -95,24 +92,8 @@ function holdParent() {
   return { entered: entered.promise, reached: reached.promise, arrive: reached.resolve, descendants,
     release() { held = false; released.resolve(); } };
 }
-const operations = ["set", "unset", "import", "effort", "model-add", "model-remove", "provider-add", "provider-remove", "provider-default", "advisor"] as const;
-function requestAdvisor(liveConfig = fixture() as OcxConfig, patch: Record<string, unknown> = { enabled: true }) {
-  const url = new URL("http://localhost/api/advisor/settings");
-  advisorConfig = liveConfig;
-  if (!claudeCodeBaselineArmed(advisorConfig)) armClaudeCodeBaseline(advisorConfig);
-  return handleAdvisorRoutes({ url, req: new Request(url, { method: "PUT", body: JSON.stringify(patch) }),
-    config: advisorConfig, deps: {}, version: "test", trustedLoopbackIngress: false, guiSessionIssuance: null,
-    convergeCodexCatalog: async () => ({ status: "skipped", reason: "not-requested", retryable: false }),
-    syncClaudeAgentDefsBestEffort: async () => {},
-  });
-}
+const operations = ["set", "unset", "import", "effort", "model-add", "model-remove", "provider-add", "provider-remove", "provider-default"] as const;
 function run(operation: typeof operations[number]) {
-  if (operation === "advisor") {
-    return requestAdvisor().then(async response => {
-      if (response?.status === 500) { expect(await response.json()).toEqual({ error: { code: "write_failed", message: "The configuration could not be saved." } }); return 1; }
-      expect(response?.status).toBe(200); return 0;
-    });
-  }
   if (operation === "effort") return handleEffortCommand(["high", "--json"], { findLiveProxy: async () => null });
   if (operation.startsWith("model-") || operation.startsWith("provider-")) {
     const work = operation === "model-add" ? handleModels(["add", "mock", "custom-after", "--json"], { findLiveProxy: async () => null })
@@ -186,17 +167,6 @@ test.each(["changed", "removed"])("custom-model removal refuses a %s confirmed r
     expect(readFileSync(join(root, "config.json"), "utf8")).toBe(bytes);
     expect(existsSync(join(root, "config-mutation.sqlite"))).toBe(false);
   } finally { parent.release(); await work; }
-});
-
-test("Advisor response snapshots the admitted phase before queued live edits", async () => {
-  const hook = spyOn(advisorActivation, "activateAdvisor").mockImplementation(config => {
-    queueMicrotask(() => { config.advisor!.enabled = false; });
-  });
-  restores.push(() => hook.mockRestore());
-  const response = await requestAdvisor();
-  expect(response?.status).toBe(200);
-  expect((await response!.json()).settings.enabled).toBe(true);
-  expect(advisorConfig?.advisor?.enabled).toBe(false);
 });
 
 const cliOperations = operations.filter(operation => operation !== "advisor");
@@ -289,73 +259,6 @@ for (const operation of cliOperations) {
   });
 }
 
-test("Advisor preserves a disk edit between admitted read and saver lock", async () => {
-  const live = configModule.readConfigDiagnostics().config;
-  armClaudeCodeBaseline(live);
-  const persist = configModule.saveConfigPreservingClaudeCode;
-  let received: OcxConfig | undefined;
-  const hook = spyOn(configModule, "saveConfigPreservingClaudeCode").mockImplementation(candidate => {
-    received = candidate;
-    const disk = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-    disk.subagentEffortCap = "medium";
-    disk.advisor = { timeoutMs: 4321 };
-    writeFileSync(join(root, "config.json"), JSON.stringify(disk));
-    persist(candidate);
-  });
-  restores.push(() => hook.mockRestore());
-  const response = await requestAdvisor(live);
-  expect(response?.status).toBe(200);
-  const saved = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-  expect(saved.subagentEffortCap).toBe("medium");
-  expect(saved.advisor).toEqual({ enabled: true, timeoutMs: 4321 });
-  expect((await response!.json()).settings.timeoutMs).toBe(4321);
-  expect(received).toBeDefined();
-  expect(claudeCodeBaselineArmed(received!)).toBe(true);
-});
-
-// R2 probes: the real saver must recognize a committed grant as baseline, not pending intent.
-test.each(["consent", "enabled", "disabled", "subtree"])("Advisor keeps disk revocation (%s) on a later live save", async revoke => {
-  const hook = spyOn(advisorActivation, "activateAdvisor").mockImplementation(() => {});
-  restores.push(() => hook.mockRestore());
-  const initial = { ...fixture(), advisor: { model: "mock/test-model" } };
-  writeFileSync(join(root, "config.json"), JSON.stringify(initial));
-  const live = configModule.readConfigDiagnostics().config;
-  expect((await requestAdvisor(live, { enabled: true, contextSharingConsent: "v1" }))?.status).toBe(200);
-  const disk = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-  expect(disk.advisor.contextSharingConsent).toBe("v1");
-  if (revoke === "consent") delete disk.advisor.contextSharingConsent;
-  else if (revoke === "enabled") delete disk.advisor.enabled;
-  else if (revoke === "disabled") disk.advisor.enabled = false;
-  else delete disk.advisor;
-  writeFileSync(join(root, "config.json"), JSON.stringify(disk));
-  live.effortCap = "high";
-  configModule.saveConfigPreservingClaudeCode(live);
-  const saved = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-  expect(saved.advisor).toEqual(disk.advisor);
-  expect(saved.effortCap).toBe("high");
-  expect(advisorRunnable(resolveAdvisorSettings(live))).toBe(false);
-});
-
-test("Advisor adoption retains unrelated pending live intent and handles reset absence", async () => {
-  const hook = spyOn(advisorActivation, "activateAdvisor").mockImplementation(() => {});
-  restores.push(() => hook.mockRestore());
-  const live = configModule.readConfigDiagnostics().config;
-  armClaudeCodeBaseline(live);
-  live.effortCap = "high";
-  expect((await requestAdvisor(live, { reset: true }))?.status).toBe(200);
-  expect(live.advisor).toBeUndefined();
-  expect(live.effortCap).toBe("high");
-  const disk = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-  expect(disk.effortCap).toBe("low");
-  disk.effortCap = "medium";
-  disk.advisor = { enabled: false, timeoutMs: 4321 };
-  writeFileSync(join(root, "config.json"), JSON.stringify(disk));
-  configModule.saveConfigPreservingClaudeCode(live);
-  const saved = JSON.parse(readFileSync(join(root, "config.json"), "utf8"));
-  expect(saved.effortCap).toBe("high");
-  expect(saved.advisor).toEqual(disk.advisor);
-});
-
 const nonObjectRoots = ["[]", '[{"operator-original":"synthetic-data-that-must-survive"}]', "null", "true", "42", '"operator-original"'];
 test.each(nonObjectRoots)("mutation reader refuses non-object authority %s", raw => {
   writeFileSync(join(root, "config.json"), raw);
@@ -381,27 +284,6 @@ for (const operation of cliOperations) {
     expect(exit).not.toHaveBeenCalled();
   });
 }
-
-test("Advisor refuses file diagnostics with an Anthropic provenance error", async () => {
-  const live = configModule.readConfigDiagnostics().config;
-  const raw = JSON.stringify({ ...fixture(), providers: { ...fixture().providers, anthropic: {
-    adapter: "anthropic", authMode: "oauth", baseUrl: "https://api.anthropic.com",
-    anthropicOAuthInstance: "anthropic2",
-  } } });
-  writeFileSync(join(root, "config.json"), raw);
-  const diagnostics = configModule.readConfigDiagnostics({ passive: true });
-  expect(diagnostics.source).toBe("file");
-  expect(diagnostics.error).toContain("anthropicOAuthInstance");
-  const activation = spyOn(advisorActivation, "activateAdvisor").mockImplementation(() => {});
-  restores.push(() => activation.mockRestore());
-  const response = await requestAdvisor(live);
-  expect(response?.status).toBe(500);
-  expect(await response!.json()).toEqual({ error: { code: "write_failed", message: "The configuration could not be saved." } });
-  expect(readFileSync(join(root, "config.json"), "utf8")).toBe(raw);
-  expect(live.advisor).toBeUndefined();
-  expect(activation).not.toHaveBeenCalled();
-  expect(existsSync(join(root, "config-mutation.sqlite"))).toBe(false);
-});
 
 test.each(["models", "provider"])("%s dispatch reports invalid authority with standard exit two", async command => {
   const raw = '{"providers":';

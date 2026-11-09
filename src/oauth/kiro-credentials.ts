@@ -163,10 +163,8 @@ export function resolveKiroCliNativeSessionEntries(
       || win32.join(home, "AppData", "Local");
     return [{ location: "kiro-cli-windows-data", path: win32.join(base, "Kiro-Cli", "data.sqlite3") }];
   }
-  if (platform === "darwin") {
-    return [{ location: "kiro-cli-data", path: posix.join(home, "Library", "Application Support", "kiro-cli", "data.sqlite3") }];
-  }
-  return [{ location: "kiro-cli-linux-data", path: posix.join(home, ".local", "share", "kiro-cli", "data.sqlite3") }];
+
+  return [];
 }
 
 /**
@@ -234,12 +232,6 @@ export function resolveKiroCliExecutable(
     for (const base of [localBase, programFiles]) {
       if (/^[A-Za-z]:[\\/]/.test(base)) shortInstallCandidates.push(win32.join(base, "Kiro-Cli", "kiro.exe"));
     }
-  } else if (inputs.platform === "darwin") {
-    installCandidates.push(
-      posix.join(inputs.home, ".local", "bin", "kiro-cli"),
-      "/usr/local/bin/kiro-cli",
-      "/opt/homebrew/bin/kiro-cli",
-    );
   } else {
     installCandidates.push(
       posix.join(inputs.home, ".local", "bin", "kiro-cli"),

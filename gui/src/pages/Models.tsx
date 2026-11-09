@@ -30,9 +30,7 @@ import { useModelVisibility } from "../use-model-visibility";
 import { useDataSurface } from "../data-surface";
 import { DataSurfaceSkeleton } from "../components/data-surface";
 import ErrorBoundary from "../components/ErrorBoundary";
-import Combos from "./Combos";
 import RoutingProfiles from "./RoutingProfiles";
-import CompatibilityMatrix from "./CompatibilityMatrix";
 import { ModelsTabStrip } from "./models-tab-strip";
 import { ProviderFastRow } from "./models-fast-row";
 import {
@@ -113,9 +111,7 @@ type CachedModelsPage = {
 /** One plain lead line per tab; a longer description (if any) opens from the "?" beside it. */
 const SUBTITLE_TKEY: Record<ModelsTab, [lede: TKey, about?: TKey]> = {
   catalog: ["modelsV2.ledeCatalog", "models.subtitle"],
-  combos: ["modelsV2.ledeCombos", "models.subtitle.combos"],
   routing: ["models.subtitle.routing"],
-  compatibility: ["models.subtitle.compatibility"],
 };
 
 interface ModelDiscoveryView {
@@ -130,7 +126,7 @@ interface AliasView {
   defaults: { global: boolean; providers: Record<string, boolean> };
 }
 
-export default function Models({ apiBase, restartEpoch = 0, connected = false, catalogSyncedAt, reportRestart }: { apiBase: string; restartEpoch?: number; connected?: boolean; catalogSyncedAt?: string; reportRestart: (message: string, tone: NoticeTone) => void }) {
+export default function Models({ apiBase, restartEpoch = 0, reportRestart }: { apiBase: string; restartEpoch?: number; reportRestart: (message: string, tone: NoticeTone) => void }) {
   // Codex app-server staleness (devlog/_fin/260815_gui_codex_restart). Named
   // appServerState, not catalogState: this file already binds that name to the
   // model-catalog resource state, which is an unrelated concept. (Spelling the
@@ -226,11 +222,7 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
   }, [activateTab]);
 
   const catalogActive = tab === "catalog";
-
-  /** Counts reported up by the panels that own the underlying lists. */
-  const [comboCount, setComboCount] = useState<number | null>(null);
   const [routingCount, setRoutingCount] = useState<number | null>(null);
-  const [compatibilityCount, setCompatibilityCount] = useState<number | null>(null);
 
   const t: TFn = useT();
   const cacheKey = `ocx.models.catalog.v1:${apiBase}`;
@@ -570,7 +562,6 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
       return next;
     },
     // Gated on the catalog tab: a 10-second poll that keeps running while the user
-    // reads Combos or Routing is exactly the hidden work this workspace avoids.
     // Live model discovery is slow; the catalog gets a raised deadline so a slow
     // response is never misread as a hung one.
     { isEmpty: () => false, pollMs: 10_000, initialData: cached ?? undefined, enabled: catalogActive, deadlineMs: 60_000 },
@@ -910,10 +901,8 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
     catalog: catalogCountReady
       ? t("models.active", { active: effectiveVisibleCount, total: models.length })
       : undefined,
-    combos: comboCount === null ? undefined : String(comboCount),
     routing: routingCount === null ? undefined : String(routingCount),
-    compatibility: compatibilityCount === null ? undefined : String(compatibilityCount),
-  }), [catalogCountReady, comboCount, compatibilityCount, effectiveVisibleCount, models.length, routingCount, t]);
+  }), [catalogCountReady, effectiveVisibleCount, models.length, routingCount, t]);
 
   const applyVisibility = async (
     scope: ModelVisibilityScope,
@@ -2582,7 +2571,7 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
           </div>
           <div className="page-head-actions">
             {SUBTITLE_TKEY[tab][1] && <ModelsAbout key={tab} text={t(SUBTITLE_TKEY[tab][1])}>
-              {tab === "catalog" && <ModelCatalogDelivery connected={connected} catalogSyncedAt={catalogSyncedAt} />}
+              {tab === "catalog" && <ModelCatalogDelivery />}
             </ModelsAbout>}
             {appServerState !== "stale" && <Button data-models-reload-action ref={reloadHeadRef} variant="outline" size="sm" onClick={() => { void handleCodexRestart(); }} disabled={codexRestarting}>
               <span className={codexRestarting ? "inline-flex animate-spin" : "inline-flex"}><IconRefresh aria-hidden="true" /></span>
@@ -2636,25 +2625,7 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
         wrapper left the tab's `aria-controls` pointing at an element that did not exist
         until the tab had been visited once.
       */}
-      <div
-        className="models-tab-panel models-tab-panel--fill"
-        role="tabpanel"
-        id={modelsPanelDomId("combos")}
-        aria-labelledby={modelsTabDomId("combos")}
-        hidden={tab !== "combos"}
-      >
-        {mounted.has("combos") && (
-          <ErrorBoundary
-            pageName={t("models.tab.combos")}
-            title={t("errorBoundary.title")}
-            message={t("errorBoundary.message")}
-            detailsLabel={t("errorBoundary.details")}
-            reloadLabel={t("errorBoundary.reload")}
-          >
-            <Combos apiBase={apiBase} active={tab === "combos"} onCountChange={setComboCount} />
-          </ErrorBoundary>
-        )}
-      </div>
+      
 
       <div
         className="models-tab-panel"
@@ -2676,25 +2647,7 @@ export default function Models({ apiBase, restartEpoch = 0, connected = false, c
         )}
       </div>
 
-      <div
-        className="models-tab-panel"
-        role="tabpanel"
-        id={modelsPanelDomId("compatibility")}
-        aria-labelledby={modelsTabDomId("compatibility")}
-        hidden={tab !== "compatibility"}
-      >
-        {mounted.has("compatibility") && (
-          <ErrorBoundary
-            pageName={t("models.tab.compatibility")}
-            title={t("errorBoundary.title")}
-            message={t("errorBoundary.message")}
-            detailsLabel={t("errorBoundary.details")}
-            reloadLabel={t("errorBoundary.reload")}
-          >
-            <CompatibilityMatrix apiBase={apiBase} active={tab === "compatibility"} onCountChange={setCompatibilityCount} />
-          </ErrorBoundary>
-        )}
-      </div>
+      
 
       {displayNameModel && (
         <ModelDisplayNameDialog

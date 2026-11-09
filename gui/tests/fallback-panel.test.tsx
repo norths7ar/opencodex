@@ -55,7 +55,7 @@ describe("FallbackPanel", () => {
     await testWindow.happyDOM?.close?.();
   });
 
-  async function mount(fetchMock: typeof fetch, section: "routing" | "devices", readOnly = false): Promise<HTMLElement> {
+  async function mount(fetchMock: typeof fetch | "devices", readOnly = false): Promise<HTMLElement> {
     globalThis.fetch = fetchMock;
     const host = testWindow.document.createElement("div");
     testWindow.document.body.appendChild(host as never);
@@ -91,56 +91,6 @@ describe("FallbackPanel", () => {
     await act(async () => { providerToggle.click(); await flush(); });
     expect(writes).toEqual([{ scope: "global", setting: "provider", value: false }]);
     expect(host.querySelector('button[aria-label="Provider fallback"]')!.getAttribute("aria-pressed")).toBe("false");
-  });
-
-  test("devices: local fallback writes the device permission; chains off refuses both kinds", async () => {
-    const requests: unknown[] = [];
-    const host = await mount((async (_url: string, init?: RequestInit) => {
-      if (init?.method === "PUT") {
-        requests.push(JSON.parse(String(init.body)));
-        return json(baseState);
-      }
-      return json(baseState);
-    }) as unknown as typeof fetch, "devices");
-    expect(host.textContent).toContain("mac-studio");
-    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="Local fallback for mac-studio"]')!.click(); await flush(); });
-    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="Fallback chains for mac-studio"]')!.click(); await flush(); });
-    // One request per switch; the chains switch writes both kinds in one batch.
-    expect(requests).toEqual([
-      { writes: [{ scope: "device", key: LINK, setting: "localFallback", value: true }] },
-      { writes: [
-        { scope: "device", key: LINK, setting: "model", value: false },
-        { scope: "device", key: LINK, setting: "provider", value: false },
-      ] },
-    ]);
-  });
-
-  test("devices: turning local fallback off sends a clearing write and the toggle shows off", async () => {
-    const requests: unknown[] = [];
-    const allowed = { ...baseState, devices: [{ ...baseState.devices[0]!, localFallback: true }] };
-    const host = await mount((async (_url: string, init?: RequestInit) => {
-      if (init?.method === "PUT") {
-        requests.push(JSON.parse(String(init.body)));
-        return json({ ...allowed, devices: [{ ...allowed.devices[0]!, localFallback: false }] });
-      }
-      return json(allowed);
-    }) as unknown as typeof fetch, "devices");
-    await act(async () => { host.querySelector<HTMLButtonElement>('button[aria-label="Local fallback for mac-studio"]')!.click(); await flush(); });
-    expect(requests).toEqual([{ writes: [{ scope: "device", key: LINK, setting: "localFallback", value: null }] }]);
-    expect(host.querySelector('button[aria-label="Local fallback for mac-studio"]')!.getAttribute("aria-pressed")).toBe("false");
-  });
-
-  test("on a Child the device rows are read-only and nothing is written", async () => {
-    let puts = 0;
-    const host = await mount((async (_url: string, init?: RequestInit) => {
-      if (init?.method === "PUT") puts += 1;
-      return json(baseState);
-    }) as unknown as typeof fetch, "devices", true);
-    const buttons = [...host.querySelectorAll<HTMLButtonElement>("button.toggle")];
-    expect(buttons.length).toBe(2);
-    expect(buttons.every(button => button.disabled)).toBe(true);
-    expect(host.textContent).toContain("kept on this device's Home");
-    expect(puts).toBe(0);
   });
 
   test("a failed load says so and offers a retry", async () => {

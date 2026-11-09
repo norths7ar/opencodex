@@ -6,7 +6,6 @@ import { refreshCodexModelCatalog } from "./refresh";
 import { applyProxyEnv, loadConfig } from "../config";
 import type { OcxConfig } from "../types";
 import { collectOrcaCodexHomeDiagnostic } from "./home";
-import { summarizeComboCatalogOmissions, type ComboCatalogOmission } from "./catalog/aggregation";
 import {
   localClientSkipMessage,
   localClientSkipReason,
@@ -26,7 +25,6 @@ export interface CodexSyncResult {
    */
   status: "applied" | "skipped" | "catalog-only" | "refused";
   ok: boolean;
-  /** `hub-gated` is the hub-role gate, not the user's toggle — the two read very differently. */
   skippedReason?: LocalClientSkipReason;
   /** Present when unattended convergence refused another service's native home. */
   authority?: "service-home";
@@ -45,7 +43,6 @@ export interface CodexSyncResult {
   refreshOutcome?: "committed" | "refused";
   message: string;
   warning?: string;
-  comboOmissions?: ComboCatalogOmission[];
   nativeSubagentDefaultsWarning?: string;
   projectConfigWarnings?: ProjectCodexConfigWarning[];
   projectConfigGrouped?: { path: string; issues: string[]; bypass: string }[];
@@ -117,7 +114,7 @@ export async function syncModelsToCodex(
   if (desiredDisabled && !catalogEvenWhenNotInjected) {
     return {
       status: "skipped",
-      skippedReason: localClientSkipReason(gateSnapshot),
+      skippedReason: localClientSkipReason(),
       ok: true,
       added: 0,
       catalogPath: null,
@@ -125,9 +122,7 @@ export async function syncModelsToCodex(
       catalogWritten: false,
       cacheSynced: false,
       message: localClientSkipMessage(
-        gateSnapshot,
         "Codex integration is OFF; no Codex config, catalog, cache, or history was changed.",
-        "No Codex config, catalog, cache, or history was changed.",
       ),
     };
   }
@@ -173,21 +168,16 @@ export async function syncModelsToCodex(
     const refreshed = await refreshCatalogForSync(config, deps, { allowWhenDesiredDisabled: true }, log);
     const message = refreshed.catalogWritten || refreshed.cacheSynced
       ? localClientSkipMessage(
-        gateSnapshot,
         "Codex integration is OFF; catalog and models cache refreshed, Codex config untouched.",
-        "Catalog and models cache refreshed, Codex config untouched.",
       )
       : localClientSkipMessage(
-        gateSnapshot,
         "Codex integration is OFF; catalog refresh skipped, Codex config untouched.",
-        "Catalog refresh skipped, Codex config untouched.",
       );
     return {
       status: "catalog-only",
       ok: true,
       ...refreshed,
       message,
-      ...(refreshed.comboOmissions.length > 0 ? { comboOmissions: refreshed.comboOmissions } : {}),
     };
   }
 
@@ -207,7 +197,6 @@ export async function syncModelsToCodex(
         ok: true,
         ...refreshed,
         message,
-        ...(refreshed.comboOmissions.length > 0 ? { comboOmissions: refreshed.comboOmissions } : {}),
       };
     }
     const result = await deps.injectCodexConfig(p, config, {});
@@ -266,7 +255,6 @@ export async function syncModelsToCodex(
   let catalogWritten = false;
   let cacheSynced = false;
   let warning: string | undefined;
-  let comboOmissions: ComboCatalogOmission[] = [];
   let refreshOutcome: "committed" | "refused" | undefined;
 
   try {
@@ -278,7 +266,6 @@ export async function syncModelsToCodex(
     cacheSynced = cat.cacheSynced;
     catalogPathForInjection = cat.catalogExists ? cat.path : null;
     catalogPath = catalogPathForInjection;
-    comboOmissions = cat.comboOmissions ?? [];
     if (cat.skippedReason === "unbacked_routed_removal" || cat.skippedReason === "foreign_owner" || cat.skippedReason === "owner_unknown") {
       // The catalog on disk is kept as it was; say so, or a native-only refresh refused for safety
       // reads exactly like a successful sync (#6529).
@@ -293,13 +280,6 @@ export async function syncModelsToCodex(
       warning = "catalog sync skipped: no Codex catalog source found; keeping Codex's native catalog.";
       log?.error(warning);
     }
-    if (comboOmissions.length > 0) {
-      // Individual omission lines already went through console.warn during gather;
-      // keep a single summary on the sync logger to avoid duplicate stderr noise.
-      const summary = summarizeComboCatalogOmissions(comboOmissions);
-      log?.error(summary);
-      warning = warning ? `${warning} ${summary}` : summary;
-    }
   } catch (e) {
     warning = `catalog sync skipped: ${e instanceof Error ? e.message : String(e)}`;
     log?.error(warning);
@@ -309,9 +289,7 @@ export async function syncModelsToCodex(
   if (result.status === "skipped") {
     return {
       status: "skipped",
-      // The apply direction's only policy skips are desired OFF, the hub gate and a sibling
-      // instance; carry whichever the injector reported so the caller can say the honest thing.
-      skippedReason: result.skippedReason === "hub-gated" || result.skippedReason === "sibling"
+      skippedReason: result.skippedReason === "sibling"
         ? result.skippedReason
         : "desired_disabled",
       ok: true,
@@ -345,7 +323,6 @@ export async function syncModelsToCodex(
     cacheSynced,
     message: result.message,
     ...(warning ? { warning } : {}),
-    ...(comboOmissions.length > 0 ? { comboOmissions } : {}),
     ...(result.nativeSubagentDefaultsWarning ? { nativeSubagentDefaultsWarning: result.nativeSubagentDefaultsWarning } : {}),
     ...(projectConfigWarnings.length > 0 ? {
       projectConfigWarnings,
@@ -365,7 +342,6 @@ async function refreshCatalogForSync(
   catalogExists: boolean;
   catalogWritten: boolean;
   cacheSynced: boolean;
-  comboOmissions: ComboCatalogOmission[];
   refreshOutcome?: "committed" | "refused";
   warning?: string;
 }> {
@@ -376,7 +352,6 @@ async function refreshCatalogForSync(
   let cacheSynced = false;
   let warning: string | undefined;
   let refreshOutcome: "committed" | "refused" | undefined;
-  let comboOmissions: ComboCatalogOmission[] = [];
   try {
     await refreshReasoningMetadataForSync(config, deps);
     const cat = await deps.refreshCodexModelCatalog(config, undefined, catalogOptions);
@@ -386,7 +361,6 @@ async function refreshCatalogForSync(
     catalogWritten = cat.catalogWritten;
     cacheSynced = cat.cacheSynced;
     catalogPath = cat.catalogExists ? cat.path : null;
-    comboOmissions = cat.comboOmissions ?? [];
     if (cat.skippedReason === "unbacked_routed_removal" || cat.skippedReason === "foreign_owner" || cat.skippedReason === "owner_unknown") {
       // The catalog on disk is kept as it was; say so, or a native-only refresh refused for safety
       // reads exactly like a successful sync (#6529).
@@ -401,15 +375,10 @@ async function refreshCatalogForSync(
       warning = "catalog sync skipped: no Codex catalog source found; keeping Codex's native catalog.";
       log?.error(warning);
     }
-    if (comboOmissions.length > 0) {
-      const summary = summarizeComboCatalogOmissions(comboOmissions);
-      log?.error(summary);
-      warning = warning ? `${warning} ${summary}` : summary;
-    }
   } catch (e) {
     warning = `catalog sync skipped: ${e instanceof Error ? e.message : String(e)}`;
     log?.error(warning);
   }
-  return { added, catalogPath, catalogExists, catalogWritten, cacheSynced, comboOmissions,
+  return { added, catalogPath, catalogExists, catalogWritten, cacheSynced,
     ...(refreshOutcome ? { refreshOutcome } : {}), ...(warning ? { warning } : {}) };
 }

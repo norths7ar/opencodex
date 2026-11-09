@@ -11,10 +11,13 @@ const RESERVED_CODEX_ACCOUNT_IDS = new Set(["__proto__", "prototype", "construct
  * It is reserved and must never be used as a public namespace target or pool-account id.
  */
 export const MAIN_CODEX_ACCOUNT_ID = "__main__";
+/** Internal result for an explicitly signed-out channel, never a stored account id. */
+export const SIGNED_OUT_CODEX_ACCOUNT_ID = "__signed_out__";
 
 export function isValidCodexAccountId(accountId: unknown): accountId is string {
   return typeof accountId === "string"
     && accountId !== MAIN_CODEX_ACCOUNT_ID
+    && accountId !== SIGNED_OUT_CODEX_ACCOUNT_ID
     && CODEX_ACCOUNT_ID_RE.test(accountId)
     && !RESERVED_CODEX_ACCOUNT_IDS.has(accountId.toLowerCase());
 }
@@ -31,4 +34,13 @@ export function hasLegacyMainCodexPoolAccount(
   accounts: readonly CodexAccountIdentityRow[] | undefined,
 ): boolean {
   return accounts?.some(account => !account.isMain && account.id === MAIN_CODEX_ACCOUNT_ID) ?? false;
+}
+
+/** The configured channel identity, including a legacy single managed login. */
+export function singleCodexAccountId(config: { codexSignedOut?: boolean; activeCodexAccountId?: string; codexAccounts?: readonly { id: string; isMain: boolean }[]; providers?: { openai?: { codexAccountMode?: string } } }): string {
+  if (config.codexSignedOut === true) return SIGNED_OUT_CODEX_ACCOUNT_ID;
+  if (config.providers?.openai?.codexAccountMode === "direct") return MAIN_CODEX_ACCOUNT_ID;
+  if (config.activeCodexAccountId !== undefined) return config.activeCodexAccountId;
+  const managed = (config.codexAccounts ?? []).filter(isSelectableCodexPoolAccount);
+  return managed.length === 1 ? managed[0]!.id : MAIN_CODEX_ACCOUNT_ID;
 }

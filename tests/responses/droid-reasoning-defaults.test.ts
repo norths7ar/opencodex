@@ -227,7 +227,7 @@ async function sendFallback(route: FallbackRoute, extraBody: Record<string, unkn
     ...(route === "policy"
       ? { routingProfiles: { [routeId]: { candidates: targets } } }
       : { combos: { [routeId]: { strategy: "failover", targets } } }),
-    ...(route === "native combo" ? { protocols: { rollout: { nativeChatCombos: true } } } : {}),
+    ...(route === "native combo" ? { protocols: { rollout: { } } } : {}),
   } as OcxConfig;
   const response = await handleChatCompletions(new Request("http://localhost/v1/chat/completions", {
     method: "POST",

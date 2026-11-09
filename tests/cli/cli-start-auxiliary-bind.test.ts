@@ -32,7 +32,7 @@ for (const listener of ["unauthenticatedLoopbackListener", "hub.managementIngres
         port: publicPort, hostname: "127.0.0.1", providers: {}, defaultProvider: "openai",
         codexAutoStart: false, syncResumeHistory: false,
         clientIntegrations: { codex: false, grok: false, "claude-desktop": false },
-        claudeCode: { systemEnv: false },
+        claudeCode: {  },
         ...(listener === "hub.managementIngress"
           ? { runtimeRole: "hub", hub: { managementIngress: { enabled: true, port: auxiliaryPort } } }
           : { unauthenticatedLoopbackListener: { enabled: true, port: auxiliaryPort } }),

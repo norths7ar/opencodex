@@ -22,7 +22,6 @@ export function createResponsesCompletionPolicy(
   // intentionally outside this guard and retain their existing one-send wire behavior.
   const emptyCompletionGuardEnabled =
     emptyCompletionRetryEnabled(config)
-    && !options.comboAttempt
     && !routedCompaction;
 
   return {

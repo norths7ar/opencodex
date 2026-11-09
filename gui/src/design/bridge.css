@@ -319,9 +319,9 @@
   padding-top: 8px;
   border-top: 1px solid var(--ocx-line);
 }
-.sidebar-foot :is(.lang-toggle, .sidebar-github-link) { min-height: 32px; padding: 0 8px 0 10px; font-size: 13px; color: var(--ocx-fg-muted); }
-.sidebar-foot :is(.lang-toggle, .sidebar-github-link):hover { color: var(--ocx-fg); }
-.sidebar-foot :is(.lang-toggle, .sidebar-github-link) svg { width: 16px; height: 16px; }
+.sidebar-foot .lang-toggle { min-height: 32px; padding: 0 8px 0 10px; font-size: 13px; color: var(--ocx-fg-muted); }
+.sidebar-foot .lang-toggle:hover { color: var(--ocx-fg); }
+.sidebar-foot .lang-toggle svg { width: 16px; height: 16px; }
 .sidebar-pref-row {
   display: flex;
   align-items: center;
@@ -425,7 +425,6 @@
   .ocx-sweep { display: none; }
 }
 .sidebar-pref-row > .lang-toggle { flex: 1 1 auto; min-width: 0; }
-.sidebar-github-row > .sidebar-github-link { flex: 0 0 auto; padding-right: 3px; }
 /* one line beside "GitHub": a long prerelease id ellipsizes, and the tooltip holds it whole */
 .sidebar-version {
   flex: 1 1 auto;
@@ -491,8 +490,7 @@ a:hover { text-decoration-color: var(--ocx-highlight); }
    Theme, star, update and terminal sit in text rows, so at rest they are icons
    like the globe and GitHub mark beside them. The phone top bar keeps its
    bordered 44px targets (it is not in .sidebar-foot). */
-.sidebar-foot .sidebar-orb,
-.sidebar-foot .sidebar-orb--update {
+.sidebar-foot .sidebar-orb {
   border-color: transparent;
   border-radius: 0.5rem;
   background: transparent;
@@ -503,7 +501,6 @@ a:hover { text-decoration-color: var(--ocx-highlight); }
   color: var(--ocx-fg);
   filter: none;
 }
-.sidebar-foot .sidebar-orb--update:hover:not(:disabled) { color: var(--blue); }
 .sidebar-foot .sidebar-orb svg { width: 15px; height: 15px; }
 
 /* ---- shadow-call source levers: the same switch as every other lever -------
@@ -652,12 +649,12 @@ details > summary::before { flex-shrink: 0; margin-top: calc((1lh - 8px) / 2); }
 
 /* ---- one switch ----------------------------------------------------------------
    v1 grew three switch drawings (.switch with a knob span, .toggle with a
-   .toggle-knob or an input + .slider, and Remote Link's own ::after switch), each
+   .toggle-knob or an input + .slider), each
    with its own size and knob colour. All of them draw the .switch spec now:
    34×20 track, 14px knob, raised track with a hairline when off, the primary
    track with a contrasting knob when on. gui/tests/switch-rule.test.ts keeps new
    switches on one of these three classes. */
-:is(.switch:where(:not(.switch-labeled)), .toggle, .remote-link-switch) {
+:is(.switch:where(:not(.switch-labeled)), .toggle) {
   width: 34px;
   height: 20px;
   flex: 0 0 auto;
@@ -668,7 +665,7 @@ details > summary::before { flex-shrink: 0; margin-top: calc((1lh - 8px) / 2); }
 /* On and mixed states for every drawing. The spec above sits in the bridge layer, so it
    outranks v1's own `.switch.on` fill: each state has to be restated here, or an "on"
    switch keeps the off track (dark on dark). switch-rule.test.ts checks all three. */
-:is(.switch.on:where(:not(.switch-labeled)), .toggle.on, .remote-link-switch[aria-checked="true"]) { background: var(--toggle-on-bg); border-color: var(--toggle-on-bg); }
+:is(.switch.on:where(:not(.switch-labeled)), .toggle.on) { background: var(--toggle-on-bg); border-color: var(--toggle-on-bg); }
 .switch.mixed:where(:not(.switch-labeled)) { background: var(--amber-soft); border-color: var(--amber); }
 .toggle-knob { width: 14px; height: 14px; left: 2px; background: light-dark(#ffffff, #ececec); box-shadow: 0 0 0 1px rgb(16 24 40 / 0.08), 0 1px 1px rgb(16 24 40 / 0.18); }
 .toggle.on .toggle-knob { left: 16px; background: var(--toggle-dot-color); }
@@ -677,9 +674,6 @@ details > summary::before { flex-shrink: 0; margin-top: calc((1lh - 8px) / 2); }
 .toggle .slider::after { left: 2px; width: 14px; height: 14px; background: light-dark(#ffffff, #ececec); }
 .toggle input:checked + .slider { background: var(--toggle-on-bg); border-color: var(--toggle-on-bg); }
 .toggle input:checked + .slider::after { transform: translate(14px, -50%); background: var(--toggle-dot-color); }
-.remote-link-switch { display: inline-flex; align-items: center; padding: 2px; }
-.remote-link-switch::after { width: 14px; height: 14px; background: light-dark(#ffffff, #ececec); box-shadow: 0 0 0 1px rgb(16 24 40 / 0.08), 0 1px 1px rgb(16 24 40 / 0.18); }
-.remote-link-switch[aria-checked="true"]::after { transform: translateX(14px); background: var(--toggle-dot-color); }
 
 /* ---- control sizes: two heights, and neighbours match ------------------------
    Every button, field, select and segmented track is 34px (md) or 28px (sm);

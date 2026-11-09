@@ -18,14 +18,6 @@ import {
 } from "../codex/routing";
 import { sweepExpiredSubagentModelHealth } from "../codex/subagent-model-fallback";
 import {
-  reconcileComboTargetCooldowns,
-  sweepExpiredComboTargetCooldowns,
-} from "../combos/failover";
-import { reconcileComboWarningMemos } from "../combos/request";
-import { reconcileComboRotationState } from "../combos/resolve";
-import { reconcileComboRecall, sweepExpiredComboRecall } from "../server/responses/combo-session-recall";
-import { listLiveComboTargetKeys } from "../combos/types";
-import {
   listLiveConfigOwnershipRoots,
   reconcileConfigOwnershipRoots,
 } from "./config-ownership";
@@ -59,37 +51,16 @@ import {
 
 let liveServerConfig: OcxConfig | null = null;
 
-const liveConfigObservers = new Map<string, (config: OcxConfig) => void>();
-
-/**
- * Core-owned slot for optional subsystems that follow the adopted live config (for example JEV
- * advisory quota activation). Keyed; the returned detach removes only this registration.
- * Detached config reads never notify: only live adoption and live reconciliation do.
- */
-export function registerLiveConfigObserver(key: string, observer: (config: OcxConfig) => void): () => void {
-  liveConfigObservers.set(key, observer);
-  return () => { if (liveConfigObservers.get(key) === observer) liveConfigObservers.delete(key); };
-}
-
-/** Notify live-config observers; never throws. Also used where a published write skips reconciliation. */
-export function notifyLiveConfigObservers(config: OcxConfig): void {
-  for (const observer of [...liveConfigObservers.values()]) {
-    try { observer(config); } catch { /* an optional observer never alters live adoption */ }
-  }
-}
-
 export function setLiveStateStoreConfig(config: OcxConfig): void {
   liveServerConfig = config;
   // The one place the server's live config object is installed; detached configs (catalog sync)
   // never come through here, so the outbound compression opt-in follows the running server only.
   bindUpstreamRequestCompressionConfig(config);
   bindWorkflowBudgetConfig(config);
-  notifyLiveConfigObservers(config);
 }
 
 export function reconcileLiveStateStores() {
   if (!liveServerConfig) return { storesVisited: 0, rowsRemoved: 0 };
-  notifyLiveConfigObservers(liveServerConfig);
   // Only adopted live providers own canonical pools; detached disk snapshots may
   // contain providers the routing instance deliberately has not activated yet.
   configureSharedSpendLedger(spendPolicyFromConfig(liveServerConfig.spend,
@@ -107,8 +78,6 @@ export function buildGenerationContext(): GenerationContext {
   return {
     generation: 0,
     providerNames,
-    comboIds: new Set(Object.keys(liveServerConfig.combos ?? {})),
-    comboTargets: listLiveComboTargetKeys(liveServerConfig),
     codexAccountIds: listLiveCodexAccountIds(liveServerConfig),
     oauthAccountKeys,
     configRoots: listLiveConfigOwnershipRoots(getConfigDir()),
@@ -119,11 +88,6 @@ export const STATE_STORE_REGISTRATIONS = [
   { name: "subagent-model-health", sweepExpired: sweepExpiredSubagentModelHealth },
   { name: "api-key-cooldowns", sweepExpired: sweepExpiredApiKeyCooldowns },
   { name: "provider-request-pacing", reconcileGeneration: reconcileProviderRequestPacing },
-  {
-    name: "combo-target-cooldowns",
-    sweepExpired: sweepExpiredComboTargetCooldowns,
-    reconcileGeneration: reconcileComboTargetCooldowns,
-  },
   { name: "anthropic-routing-health", sweepExpired: sweepAllAnthropicRoutingHealth,
     reconcileGeneration: context => reconcileAnthropicRoutingState(context, liveServerConfig ?? undefined) },
   { name: "anthropic-family-quota", reconcileGeneration: reconcileAllAnthropicFamilyQuota },
@@ -148,19 +112,12 @@ export const STATE_STORE_REGISTRATIONS = [
   { name: "config-warning-memos", reconcileGeneration: (context: GenerationContext) => reconcileConfigWarningMemos(context.generation) },
   { name: "catalog-warning-memos", reconcileGeneration: (context: GenerationContext) => reconcileCatalogWarningMemos(context.generation) },
   { name: "provider-fetch-warning-memos", reconcileGeneration: (context: GenerationContext) => reconcileProviderFetchWarnings(context.generation) },
-  { name: "combo-warning-memos", reconcileGeneration: (context: GenerationContext) => reconcileComboWarningMemos(context.generation) },
   { name: "router-warning-memos", reconcileGeneration: (context: GenerationContext) => reconcileRouterWarningMemos(context.generation) },
   { name: "codex-quota", reconcileGeneration: reconcileCodexQuotaAccounts },
   { name: "provider-quota-history", reconcileGeneration: reconcileProviderAccountQuotaRows },
   { name: "codex-routing-health", reconcileGeneration: reconcileCodexRoutingHealth },
   { name: "model-cache-history", reconcileGeneration: reconcileModelCacheGeneration },
   { name: "pool-rotation", reconcileGeneration: reconcilePoolRotationState },
-  { name: "combo-rotation", reconcileGeneration: reconcileComboRotationState },
-  {
-    name: "combo-session-recall",
-    sweepExpired: sweepExpiredComboRecall,
-    reconcileGeneration: reconcileComboRecall,
-  },
   { name: "guardian-backoff", reconcileGeneration: reconcileGuardianBackoff },
   { name: "codex-reauth", reconcileGeneration: reconcileCodexReauthState },
   { name: "oauth-reauth", reconcileGeneration: reconcileOAuthReauthState },

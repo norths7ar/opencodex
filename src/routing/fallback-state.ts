@@ -5,19 +5,14 @@
  * The request path only resolves (`src/routing/fallback-policy.ts`).
  */
 import type { OcxConfig } from "../types";
-import type { OcxFallbackConfig, OcxFallbackDeviceConfig, OcxFallbackSwitches } from "../types/fallback";
+import type { OcxFallbackConfig, OcxFallbackSwitches } from "../types/fallback";
 import { FALLBACK_DEVICE_ID, FALLBACK_SELECTOR } from "../config/schema/fallback-policy";
-import type { LinkRecord } from "../link/store";
 import { recentFallbackEvents, type FallbackEvent } from "./fallback-policy";
 
 export const FALLBACK_STATE_SCHEMA = "ocx.fallback/1";
 
 export interface FallbackDeviceView {
   id: string;
-  kind: "link" | "key";
-  alias?: string;
-  /** Permission for GOAT to move this device's work to its own providers while the Home is down. */
-  localFallback: boolean;
   /** false: refused for this device whatever the other scopes say; null: not set. */
   model: boolean | null;
   provider: boolean | null;
@@ -54,38 +49,25 @@ function cleanMap(value: unknown, pattern: RegExp): Record<string, OcxFallbackSw
   return out;
 }
 
-/**
- * Build the read model. `passive` (a Remote Link Child's read through the management relay)
- * drops link aliases and per-event device ids, so a Child learns its own row by link id only.
- */
 export function buildFallbackState(
   config: Pick<OcxConfig, "fallback">,
-  options: { links?: readonly Pick<LinkRecord, "id" | "alias" | "apiKeyId">[]; passive?: boolean } = {},
 ): FallbackStateView {
   const policy: OcxFallbackConfig = config.fallback ?? {};
   const devicesRaw = policy.devices && typeof policy.devices === "object" ? policy.devices : {};
   const rows = new Map<string, FallbackDeviceView>();
-  const deviceRow = (id: string, kind: "link" | "key", alias?: string): FallbackDeviceView => {
-    const raw = (Object.hasOwn(devicesRaw, id) ? devicesRaw[id] : undefined) as OcxFallbackDeviceConfig | undefined;
+  const deviceRow = (id: string): FallbackDeviceView => {
+    const raw = (Object.hasOwn(devicesRaw, id) ? devicesRaw[id] : undefined);
     return {
       id,
-      kind,
-      ...(alias && !options.passive ? { alias } : {}),
-      localFallback: raw?.localFallback === true,
       model: typeof raw?.model === "boolean" ? raw.model : null,
       provider: typeof raw?.provider === "boolean" ? raw.provider : null,
     };
   };
-  for (const link of options.links ?? []) rows.set(link.id, deviceRow(link.id, "link", link.alias));
   for (const id of Object.keys(devicesRaw)) {
     if (!FALLBACK_DEVICE_ID.test(id) || rows.has(id)) continue;
-    rows.set(id, deviceRow(id, id.startsWith("lnk_") ? "link" : "key"));
+    rows.set(id, deviceRow(id));
   }
-  const recent = recentFallbackEvents().map(event => {
-    if (!options.passive || event.deviceId === undefined) return event;
-    const { deviceId: _omitted, ...rest } = event;
-    return rest;
-  });
+  const recent = recentFallbackEvents();
   return {
     schema: FALLBACK_STATE_SCHEMA,
     global: { model: policy.model !== false, provider: policy.provider !== false },
@@ -98,7 +80,7 @@ export function buildFallbackState(
 }
 
 export type FallbackWriteScope = "global" | "provider" | "route" | "device";
-export type FallbackWriteSetting = "model" | "provider" | "localFallback";
+export type FallbackWriteSetting = "model" | "provider";
 
 export interface FallbackWrite {
   scope: FallbackWriteScope;
@@ -118,11 +100,10 @@ export function parseFallbackWrite(body: unknown): { ok: true; write: FallbackWr
   if (scope !== "global" && scope !== "provider" && scope !== "route" && scope !== "device") {
     return { ok: false, error: "scope must be global, provider, route or device" };
   }
-  if (setting !== "model" && setting !== "provider" && setting !== "localFallback") {
-    return { ok: false, error: "setting must be model, provider or localFallback" };
+  if (setting !== "model" && setting !== "provider") {
+    return { ok: false, error: "setting must be model or provider" };
   }
   if (value !== true && value !== false && value !== null) return { ok: false, error: "value must be true, false or null" };
-  if (setting === "localFallback" && scope !== "device") return { ok: false, error: "localFallback is set per device" };
   if (scope === "global") {
     if (raw.key !== undefined) return { ok: false, error: "a global write takes no key" };
     return { ok: true, write: { scope, setting, value } };

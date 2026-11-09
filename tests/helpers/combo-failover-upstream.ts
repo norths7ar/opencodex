@@ -1,10 +1,4 @@
-/**
- * Upstream response shapes for the combo failover suite.
- *
- * Moved verbatim out of tests/server/server-combo-failover-e2e.test.ts: that file is one line
- * under its file-size cap and needed room to take the spend-journal lease. These builders
- * decide nothing; each returns exactly the payload its callers were already constructing.
- */
+/** Upstream fixture payloads for Chat and Responses tests. */
 export function chatSuccess(text: string, model = "model"): Response {
   return Response.json({
     id: `chatcmpl-${model}`,

@@ -120,22 +120,6 @@ test("validation is read-only, revocation restores managed URL and removes futur
 });
 
 
-test("explicit sync applies an approved provider instead of taking the external catalog-only path", () => {
-  run(`
-    allow();
-    const { syncModelsToCodex } = await import("./src/codex/sync");
-    const result = await syncModelsToCodex(10103, { providers: {} }, null, {
-      admitCodexWrite: () => ({ kind: "admitted" }),
-      injectCodexConfig,
-      currentExternalCodexModelProvider: () => id,
-      refreshCodexModelCatalog: async () => ({ added: 0, path: join(process.env.CODEX_HOME, "opencodex-catalog.json"), catalogExists: false, catalogWritten: false, cacheSynced: false, comboOmissions: [] }),
-    }, { catalogEvenWhenNotInjected: true });
-    if (!result.ok || result.status === "catalog-only") throw new Error("approved sync skipped injection");
-    if (Bun.TOML.parse(readFileSync(path, "utf8")).model_providers[id].base_url !== "http://127.0.0.1:10103/v1") throw new Error("sync did not publish URL");
-  `);
-});
-
-
 test("approving a provider in one Codex home does not approve the same ID in another", () => {
   run("allow();");
   const other = join(root, "other-codex");

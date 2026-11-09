@@ -1,9 +1,9 @@
+import { isRetiredComboCatalogEntry } from "./ownership";
 import { isMainCodexAccountTarget } from "../account-namespaces";
-import { COMBO_NAMESPACE } from "../../combos";
 import { MAIN_CODEX_ACCOUNT_ID } from "../main-account";
 import type { CodexModelEntitlementSnapshot } from "../model-entitlements";
 import { trustedAccountBoundNativeCatalogSlug } from "./account-models";
-import { isNativeAliasCatalogEntry, SUPPORTED_NATIVE_OPENAI_SLUGS } from "./metadata";
+import { SUPPORTED_NATIVE_OPENAI_SLUGS } from "./metadata";
 import type { RawEntry } from "./parsing";
 
 /** Project access programs per native account, and availability prompts only onto bare main rows. */
@@ -13,13 +13,7 @@ export function applyNativeAccessPrograms(
   accountTargets: ReadonlyMap<string, string>,
 ): void {
   for (const entry of entries) {
-    // A combo may deliberately claim a bare native slug. It is still a routed combo row,
-    // so the matching native Codex roster must not project its access programs onto it.
-    if (isNativeAliasCatalogEntry(entry)) {
-      delete entry.availability_nux;
-      continue;
-    }
-    if (entry.owned_by === COMBO_NAMESPACE) {
+    if (isRetiredComboCatalogEntry(entry)) {
       delete entry.available_access_programs;
       delete entry.availability_nux;
       continue;

@@ -125,32 +125,6 @@ test.each([undefined, { client: "codex", device: { kind: "all" } }, { client: "a
   expect(host.textContent).not.toContain("WRONG");
 });
 
-test("link and unknown connections never request inventory or broad data; missing key fails closed", async () => {
-  await mount({ connected: true, apiKeyId: "key-a", topology: "link" });
-  expect(calls[0]!.url).toContain("client=all&device=key&apiKeyId=key-a");
-  await click(trigger());
-  expect(calls.some(call => call.url.includes("source-facets") || call.url.includes("/devices"))).toBe(false);
-  expect(host.textContent).not.toContain("Hub-wide");
-  await act(async () => root.unmount());
-  calls.length = 0;
-  await mount({ connected: true, topology: "unknown" });
-  expect(calls).toHaveLength(0);
-  expect(host.textContent).toContain("Could not load usage data");
-});
-
-test.each(["link", "unknown", "hub"] as const)("a restricted %s connection with a missing device key has no implied Codex choice", async topology => {
-  await mount({ connected: true, topology });
-  expect(calls).toHaveLength(0);
-  expect(host.textContent).toContain("Could not load usage data");
-  expect(trigger().textContent).toContain("All apps");
-  expect(trigger().textContent).not.toContain("Codex");
-  await click(trigger());
-  expect(radio("Codex").getAttribute("aria-checked")).toBe("false");
-  expect(radio("All apps").tabIndex).toBe(0);
-  expect(document.querySelector('[role="radiogroup"][aria-label="Devices"] [role="radio"]')).toBeNull();
-  expect(calls).toHaveLength(0);
-});
-
 test("discards old facet responses after selection and rejects mismatched facet echoes", async () => {
   const waiting: { url: string; resolve: (value: Response) => void }[] = [];
   globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
@@ -282,22 +256,6 @@ test("radio groups respond to arrow keys and keep independent selections", async
   expect(calls.some(call => call.url.includes("client=claude_code&device=all"))).toBe(true);
 });
 
-test("source popup describes apps and ambiguous linked devices without disclosing key ids", async () => {
-  globalThis.fetch = (async (input: RequestInfo | URL) => {
-    const url = String(input); calls.push({ url });
-    if (url.includes("source-facets")) return response(facets(url));
-    if (url.includes("/devices")) return response({ devices: [{ apiKeyId: "key-a", alias: null }] });
-    return response(report(url));
-  }) as typeof fetch;
-  await mount(); await click(trigger());
-  expect(radio("Codex").textContent).toContain("CLI · Desktop · IDE");
-  expect(radio("Other").textContent).toContain("Chat API");
-  expect(document.body.textContent).toContain("Unknown linked device");
-  expect(document.body.textContent).toContain("Remote Link");
-  expect(document.body.textContent).not.toContain("key-a");
-  expect([...document.querySelectorAll('[role="radiogroup"]')].every(group => group.textContent?.includes("Last 30 days"))).toBe(true);
-});
-
 test("a successful local key mutation immediately fences active unconfigured reports and facets", async () => {
   await mount(); await click(trigger()); await click(radio("Unconfigured keys"));
   const reportCalls = () => calls.filter(call => call.url.includes("/api/usage?") && call.url.includes("unconfigured")).length;
@@ -330,24 +288,6 @@ test.each([{ range: "all" }, { surface: "codex" }])("mismatched report range or 
   await mount();
   expect(host.textContent).toContain("Could not load usage data");
   expect(host.textContent).not.toContain("WRONG WINDOW");
-});
-
-test("no-key uses Mac, device, and connected Home context labels", async () => {
-  Object.defineProperty(win.navigator, "userAgent", { configurable: true, value: "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_0)" });
-  await mount(); await click(trigger());
-  expect(radio("This Mac")).toBeTruthy();
-  await click(radio("This Mac"));
-  expect(calls.some(call => call.url.includes("client=all&device=no-key"))).toBe(true);
-  expect(document.body.textContent).toContain("does not prove the originating device");
-  await act(async () => root.unmount());
-  Object.defineProperty(win.navigator, "userAgent", { configurable: true, value: "Mozilla/5.0 (X11; Linux x86_64)" });
-  await mount(); await click(trigger());
-  expect(radio("This device")).toBeTruthy();
-  await act(async () => root.unmount());
-  await mount({ connected: true, apiKeyId: "key-a", topology: "hub" });
-  const hub = [...host.querySelectorAll<HTMLButtonElement>(".usage-scope-control button")].find(button => button.textContent === "Hub-wide")!;
-  await click(hub); await click(trigger());
-  expect(radio("Home device")).toBeTruthy();
 });
 
 test("shared popup has a valid dialog relationship and releases focus outside", async () => {
@@ -398,26 +338,6 @@ test("a mutation fences in-flight facets and unconfigured report before they can
   await act(async () => { for (const gate of gates.slice(2)) gate.resolve(response(gate.url.includes("source-facets") ? facets(gate.url) : report(gate.url))); });
   expect(host.textContent).toContain("No usage recorded yet");
   expect(radio("Codex").textContent).toContain("30");
-});
-
-test("ambiguous linked device labels remain distinct after selecting and closing", async () => {
-  globalThis.fetch = (async (input: RequestInfo | URL) => {
-    const url = String(input); calls.push({ url });
-    if (url.includes("source-facets")) {
-      const body = facets(url);
-      body.devices.push({ device: { kind: "key", id: "key-b" }, requests: 7 });
-      return response(body);
-    }
-    if (url.includes("/devices")) return response({ devices: [{ apiKeyId: "key-a", alias: null }, { apiKeyId: "key-b", alias: null }] });
-    return response(report(url));
-  }) as typeof fetch;
-  await mount(); await click(trigger());
-  expect(radio("Unknown linked device 1")).toBeTruthy();
-  expect(radio("Unknown linked device 2")).toBeTruthy();
-  await click(radio("Unknown linked device 2"));
-  await click(trigger());
-  expect(trigger().textContent).toContain("Unknown linked device 2");
-  expect(trigger().textContent).not.toContain("key-b");
 });
 
 test.each([
@@ -595,29 +515,6 @@ test.each([401])("a %s facet denial clears active report, counts, and inventory 
   expect(host.textContent).not.toContain("No usage recorded yet");
   expect(document.body.textContent).not.toContain("Private laptop");
   expect(radio("Codex").textContent).not.toContain("30");
-});
-
-test("a session expiring during facet refresh clears previously shown device aliases", async () => {
-  installSharedSession("ocx_session_facet_expiry");
-  let release: ((value: Response) => void) | undefined;
-  let scans = 0;
-  globalThis.fetch = ((input: RequestInfo | URL) => {
-    const url = String(input);
-    if (url.includes("source-facets")) {
-      if (++scans === 1) return Promise.resolve(response(facets(url)));
-      return new Promise<Response>(resolve => { release = resolve; });
-    }
-    if (url.includes("/devices")) return Promise.resolve(response({ devices: [{ apiKeyId: "key-a", alias: "Private laptop" }] }));
-    return Promise.resolve(response(report(url)));
-  }) as typeof fetch;
-  await mount(); await click(trigger());
-  expect(document.body.textContent).toContain("Private laptop");
-  await act(async () => win.dispatchEvent(new win.Event("focus")));
-  expect(release).toBeDefined();
-  await act(async () => release!(Response.json({ error: "session_expired" }, { status: 401 })));
-  expect(document.body.textContent).not.toContain("Private laptop");
-  expect(host.textContent).not.toContain("No usage recorded yet");
-  expect(usageSessionSnapshot().blocked).toBe(true);
 });
 
 test("a new shared session rejects a previous session's late success", async () => {

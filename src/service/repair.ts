@@ -8,18 +8,14 @@ import { resolveWindowsTaskDiagnosticUserId, diagnoseService } from "./diagnosti
 import type { ServiceDiagnostic } from "./diagnostics";
 import { assertServiceAuthEnvironment } from "./auth-preflight";
 import { assertServiceEnvironmentMatchesInstall } from "./guards";
-import { installLaunchd, restartLaunchdJob } from "./launchd";
-import type { LaunchdInstallOutcome } from "./launchd";
 import { TASK, writeServiceInstallState, serviceSourceDir, resolveServiceOwnership, serviceLauncherPathDiagnostic } from "./state";
 import type { ServiceOwnership, ServiceOwnershipResolution } from "./state";
-import { installSystemd } from "./systemd";
 import { writeWindowsSchedulerAssets, reregisterWindowsSchedulerTask, windowsSchedulerRegistrationMatchesSnapshot, restoreWindowsSchedulerTaskIfAbsent, startWindows, stopWindows, statusWindowsXml } from "./windows-ops";
 import { probeWindowsSchedulerTask, SCHEDULER_SETTLE_DELAYS_MS, settleDelay } from "./windows-scheduler";
 import type { WindowsSchedulerTaskProbe } from "./windows-scheduler";
 import { taskXmlSection, taskXmlWithoutCommentsAndCdata, taskXmlElementCount, taskXmlOptionalValueEquals, windowsTaskRegistrationOwnedByAttempt, windowsTaskHasSessionRecoveryTriggers, windowsTaskRegistrationHealthy, windowsTaskRegistrationRefreshableLegacy } from "./windows-taskxml";
 import type { ExpectedWindowsTaskUserId } from "./windows-taskxml";
 import { win32 } from "node:path";
-import { assertNoDesktopSupervision, createSupervisionLatch, type SupervisionInspector, type SupervisionLatch } from "./desktop-command-guard";
 
 /**
  * The two CLI verbs `repairService` serves. They differ on ONE platform and ONE case: a
@@ -29,8 +25,6 @@ import { assertNoDesktopSupervision, createSupervisionLatch, type SupervisionIns
 export type ServiceRepairVerb = "repair" | "restart";
 
 export interface RepairServiceDeps extends RuntimePreflightDeps {
-  inspectSupervision?: SupervisionInspector;
-  supervisionLatch?: SupervisionLatch;
   diagnose?: () => ServiceDiagnostic;
   assertEnv?: () => void;
   assertAuth?: () => void;
@@ -40,10 +34,8 @@ export interface RepairServiceDeps extends RuntimePreflightDeps {
   writeSchedulerState?: (runtime: DurableBunRuntime) => void;
   writeNativeState?: (runtime: DurableBunRuntime) => void;
   repairNative?: (runtime: DurableBunRuntime) => void | Promise<void>;
-  repairLaunchd?: () => LaunchdInstallOutcome | void;
   repairSystemd?: () => void;
   /** Restarts a launchd job the install path deliberately left alone. `restart` only. */
-  restartLaunchd?: () => void;
   /** Resolves the recorded runtime owner across every state path. */
   readOwnership?: () => ServiceOwnershipResolution;
   /**
@@ -77,18 +69,14 @@ export interface RepairServiceDeps extends RuntimePreflightDeps {
 /**
  * Why a repair stops when something other than this CLI owns the runtime.
  *
- * The npm service registration is KEPT — the maintainer's decision is that a user's install
- * is never deleted — so the recorded owner is the only thing standing between a takeover the
- * user consented to and the next `ocx service repair`, which would re-enable and restart the
- * npm launcher without mentioning it. Repair runs incidentally: a tray helper, `ocx update`,
- * a doctor suggestion. `install` is the deliberate act, so `install` is the verb that takes
- * ownership back.
+ * A legacy foreign ownership record prevents incidental activation of an existing service.
+ * Only a deliberate service install takes ownership back.
  */
 export function foreignServiceOwnerRefusal(ownership: ServiceOwnership, action = "repair"): string {
-  return `Background service ${action} stopped: the desktop app owns the runtime `
+  return `Background service ${action} stopped: another installation owns the runtime `
     + `(install ${ownership.installId}, consent generation ${ownership.consentGeneration}).\n`
     + "The service registration was left exactly as it is — not re-enabled, not rewritten and not restarted.\n"
-    + "Quit the desktop app and run 'ocx service install' to hand the runtime back to this CLI.";
+    + "Stop the owning installation before running 'ocx service install' to take ownership back.";
 }
 
 /**
@@ -156,8 +144,6 @@ export async function assertSchedulerRegistrationBeforeStart(
  * macOS/Linux: re-run the user-level install/reload path.
  */
 export async function repairService(deps: RepairServiceDeps = {}): Promise<void> {
-  const latch = deps.supervisionLatch ?? createSupervisionLatch();
-  assertNoDesktopSupervision(deps.inspectSupervision, latch);
   const diagnose = deps.diagnose ?? diagnoseService;
   const platform = deps.platform ?? process.platform;
   const diag = diagnose();
@@ -196,7 +182,6 @@ export async function repairService(deps: RepairServiceDeps = {}): Promise<void>
   if (platform === "win32") {
     if (diag.backend === "native") {
       await (deps.repairNative ?? ((selected: DurableBunRuntime) => installWinswService(defaultWinswEntry(serviceSourceDir, selected))))(runtime);
-      assertNoDesktopSupervision(deps.inspectSupervision, latch);
       (deps.writeNativeState ?? ((selected: DurableBunRuntime) => writeServiceInstallState("native", undefined, {}, selected)))(runtime);
       return;
     }
@@ -325,7 +310,6 @@ export async function repairService(deps: RepairServiceDeps = {}): Promise<void>
             }
             if (probe.status === "absent") {
               try {
-                assertNoDesktopSupervision(deps.inspectSupervision, latch);
                 await (deps.restoreSchedulerIfAbsent ?? restoreWindowsSchedulerTaskIfAbsent)(registeredXml);
                 restartExpectedXml = registeredXml;
               } catch (error) {
@@ -348,7 +332,6 @@ export async function repairService(deps: RepairServiceDeps = {}): Promise<void>
               "The Task Scheduler registration changed again before restart; the newer definition was preserved and not started.",
               "Task Scheduler state remained unreadable before restart; the registration was preserved and not started.",
             );
-            assertNoDesktopSupervision(deps.inspectSupervision, latch);
             (deps.startScheduler ?? startWindows)();
           } catch (error) {
             recoveryErrors.push(error);
@@ -374,27 +357,11 @@ export async function repairService(deps: RepairServiceDeps = {}): Promise<void>
       "Task Scheduler registration changed before restart; the current definition was preserved and not started.",
       "Task Scheduler registration became unreadable before restart; it was preserved and not started.",
     );
-    assertNoDesktopSupervision(deps.inspectSupervision, latch);
     (deps.startScheduler ?? startWindows)();
     (deps.writeSchedulerState ?? ((selected: DurableBunRuntime) => writeServiceInstallState("scheduler", undefined, {}, selected)))(runtime);
     return;
   }
-  if (platform === "darwin") {
-    const outcome = (deps.repairLaunchd ?? installLaunchd)();
-    // `installLaunchd` is the only function that knows whether it published anything, and its
-    // no-op path leaves the live process running on purpose. `repair` wants exactly that;
-    // `restart` would otherwise restart NOTHING on a healthy hub and send the operator to run
-    // `launchctl kickstart -k` by hand, which is the opposite of what these verbs are for.
-    if ((deps.verb ?? "repair") === "restart" && outcome?.reloaded === false) {
-      (deps.restartLaunchd ?? restartLaunchdJob)();
-    }
-    return;
-  }
-  if (platform === "linux") {
-    // `installSystemd` ends in `systemctl --user restart`, unconditionally, so the unit is
-    // restarted whichever verb asked — there is no no-op path here to compensate for.
-    (deps.repairSystemd ?? installSystemd)();
-    return;
-  }
+
+
   throw new Error(`Background service repair is unsupported on ${platform}.`);
 }

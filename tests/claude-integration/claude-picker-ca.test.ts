@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { X509Certificate } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -355,30 +355,6 @@ test("a live foreign owner is never clobbered; a dead one is reclaimed", async (
   }
 });
 
-test("a legacy live PID is reclaimed only when it started after the owner file", () => {
-  if (process.platform !== "darwin") return; // Linux's /proc start ticks are not wall-clock time.
-  const dir = tempDir();
-  const ours = ensurePickerCa(dir);
-  const foreign = createCertificateAuthority({ commonName: PICKER_CA_COMMON_NAME, permittedDnsNames: [PICKER_HOST] });
-  const ownerPath = pickerCaOwnerPath(dir);
-  writeFileSync(pickerCaCertPath(dir), foreign.certPem);
-  writeFileSync(ownerPath, JSON.stringify({ pid: process.pid, sha256: pickerCaFingerprints(foreign.certPem).sha256 }));
-
-  utimesSync(ownerPath, new Date(0), new Date(0));
-  ensurePickerCa(dir, { rotation: "startup" });
-  expect(readFileSync(pickerCaCertPath(dir), "utf8")).toBe(ours.certPem);
-  expect(readPendingPickerCaUntrust(dir)?.certPem).toBe(foreign.certPem);
-
-  const newerDir = tempDir();
-  ensurePickerCa(newerDir);
-  writeFileSync(pickerCaCertPath(newerDir), foreign.certPem);
-  writeFileSync(pickerCaOwnerPath(newerDir), JSON.stringify({ pid: process.pid, sha256: pickerCaFingerprints(foreign.certPem).sha256 }));
-  const future = new Date(Date.now() + 10_000);
-  utimesSync(pickerCaOwnerPath(newerDir), future, future);
-  expect(() => ensurePickerCa(newerDir, { rotation: "startup" })).toThrow("picker_ca_live_owner");
-  expect(readFileSync(pickerCaCertPath(newerDir), "utf8")).toBe(foreign.certPem);
-});
-
 test("a held picker CA lock never permits publication outside the critical section", async () => {
   const dir = tempDir();
   const held = join(dir, "lock-held");
@@ -449,7 +425,7 @@ test("two competing processes leave one matching public certificate and owner", 
       pid: number; startTime: string | null; sha256: string;
     };
     expect(owner).toMatchObject({ pid: winner.pid, sha256: winner.sha256 });
-    if (process.platform === "darwin" || process.platform === "linux") expect(owner.startTime).toBeTruthy();
+    if (process.platform === "linux") expect(owner.startTime).toBeTruthy();
     expect(pickerCaFingerprints(readFileSync(pickerCaCertPath(dir), "utf8")).sha256).toBe(owner.sha256);
     // Contention alone can make the loser fail. A later process must independently see and
     // refuse the live published owner, rather than relying on the racing failure.
@@ -504,16 +480,13 @@ test("failed untrust leaves the pending record byte-for-byte intact", async () =
   ensurePickerCa(dir, { rotation: "startup" });
   const path = pickerCaPendingUntrustPath(dir);
   const before = readFileSync(path);
-  const sha1 = pickerCaFingerprints(old.certPem).sha1;
-  const calls: string[] = [];
-  const drained = await drainPendingPickerCaUntrust(dir, async args => {
-    calls.push(args[0]!);
-    return args[0] === "find-certificate"
-      ? { code: 0, stdout: `SHA-1 hash: ${sha1}\n`, stderr: "" }
-      : { code: 1, stdout: "", stderr: "" };
-  }, "darwin");
+  let calls = 0;
+  const drained = await drainPendingPickerCaUntrust(dir, async () => {
+    calls++;
+    return { code: 1, stdout: "", stderr: "" };
+  }, "win32");
   expect(drained).toBe(false);
-  expect(calls).toContain("remove-trusted-cert");
+  expect(calls).toBe(1);
   expect(readFileSync(path)).toEqual(before);
 });
 
@@ -606,7 +579,7 @@ test("a malformed pending record blocks publication and an actively published pe
   expect(pendingPickerCaHasLivePublishedOwner(dir, pending)).toBe(true);
   const owner = JSON.parse(readFileSync(pickerCaOwnerPath(dir), "utf8")) as Record<string, unknown>;
   writeFileSync(pickerCaOwnerPath(dir), JSON.stringify({ ...owner, startTime: "recycled-pid" }));
-  if (process.platform === "darwin" || process.platform === "linux") {
+  if (process.platform === "linux") {
     expect(pendingPickerCaHasLivePublishedOwner(dir, pending)).toBe(false);
   }
   expect(() => ensurePickerCa(dir, { rotation: "startup" })).toThrow("picker_ca_pending_untrust");

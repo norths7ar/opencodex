@@ -88,18 +88,6 @@ describe("decision-method management routes", () => {
     expect(await response.json()).toMatchObject({ ok: false, backend: "model", gate: "malformed" });
   });
 
-  test("decision-test rejects invalid selections before sending anything", async () => {
-    const config = makeConfig();
-    for (const body of [
-      { decisionProvider: "jev", decisionModel: "judge/judge-small" },
-      { decisionProvider: "judge" },
-      { decisionModel: "combo/auto" },
-      { decisionTimeoutMs: 10 },
-    ]) {
-      expect((await call(config, "POST", "/api/combos/decision-test", body)).status).toBe(400);
-    }
-  });
-
   test("decision-test refuses an unusable System One row by name instead of probing it", async () => {
     const config = makeConfig();
     config.providers.tev = { adapter: "jev-decision", baseUrl: "https://tev.example.test/v1/systemone", liveModels: false, disabled: true, defaultModel: "tev1" };

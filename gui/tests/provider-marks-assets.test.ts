@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { PROVIDER_REGISTRY } from "../../src/providers/registry";
 import { providerIconPaint, providerIconSrc } from "../src/provider-icons";
 
-const PUBLIC_DIR = join(import.meta.dir, "..", "public", "provider-icons");
+const PUBLIC_DIR = join(import.meta.dir, "../public/provider-icons");
 
 function bodyOf(src: string): string {
   return readFileSync(join(PUBLIC_DIR, src.replace(/^\/provider-icons\//, "")), "utf8");

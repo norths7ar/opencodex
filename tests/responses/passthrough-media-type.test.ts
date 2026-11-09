@@ -1,6 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { deliverPassthroughResponse } from "../../src/server/responses/passthrough-delivery";
-import { guardBufferedComboRequiredTool } from "../../src/server/responses/combo-required-tool-contract";
 import { createTestTranslatorBudget } from "../helpers/translator-budget";
 
 const payload = {
@@ -81,21 +80,7 @@ describe("native passthrough exact media types", () => {
 
 describe("buffered required-tool media type boundary", () => {
   const request = { tools: [{ type: "function", name: "fixture_tool" }], tool_choice: "required" };
-  test("mixed-case JSON is checked for the required call", async () => {
-    const response = await guardBufferedComboRequiredTool(new Response(JSON.stringify(payload), {
-      headers: { "content-type": "Application/JSON; charset=UTF-8" },
-    }), request, "openai-responses");
-    expect(response.status).toBe(502);
-    expect(await response.json()).toMatchObject({ error: { code: "required_tool_contract_unsatisfied" } });
-  });
 
   for (const contentType of ["application/json-seq", 'application/octet-stream; profile="application/json"']) {
-    test(`an unrelated body is not consumed or classified as required-tool failure: ${contentType}`, async () => {
-      const original = new Response(JSON.stringify(payload), { headers: { "content-type": contentType } });
-      const result = await guardBufferedComboRequiredTool(original, request, "openai-responses");
-      expect(result).toBe(original);
-      expect(original.bodyUsed).toBe(false);
-      expect(await original.json()).toEqual(payload);
-    });
   }
 });

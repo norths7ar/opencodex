@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChartHistogramIcon } from "@hugeicons/core-free-icons";
 import { useI18n, type TFn, type Locale } from "../i18n/shared";
@@ -18,16 +18,13 @@ import { UsageSummaryCards } from "../components/v2-usage/usage-metrics";
 import { UsageHeatmapPanel } from "../components/v2-usage/usage-activity";
 import { UsageAppsTable, UsageCoveragePanel, UsageModelsTable, UsageProvidersTable } from "../components/v2-usage/usage-breakdown";
 import {
-  UsageAppliedWindow, UsageFilters, UsageRangePanel, UsageRangeToggle, UsageScopeControl, UsageToolbarRow,
+  UsageAppliedWindow, UsageFilters, UsageRangePanel, UsageRangeToggle, UsageToolbarRow,
 } from "../components/v2-usage/usage-toolbar";
-import UsageCompanionView from "./usage-companion-view";
-import { readUsageTab, selectUsageTab, usageTabKeyDown } from "./usage-tab-keydown";
 
 import { useUsageSession } from "../components/v2-usage/use-usage-session";
 import { useUsageReport, UsageAccessDeniedError, UsageWindowMismatchError } from "../components/v2-usage/use-usage-report";
 import { UsageSourcePicker } from "../components/v2-usage/usage-source-picker";
 import type { SourceClient, SourceDevice, SourceFilter } from "../components/v2-usage/usage-source";
-import type { UsageTopology } from "../api-targets";
 
 /** Empty report: say so plainly, and when a filter is narrowing it, say that too. */
 function UsageEmpty({ filtered, t }: { filtered: boolean; t: TFn }) {
@@ -113,20 +110,11 @@ function UsageWorkspaceBody({
   );
 }
 
-type UsageScope = "machine" | "hub";
-
-export default function Usage({ apiBase, connected = false, apiKeyId, topology = connected ? "unknown" : "home" }: { apiBase: string; connected?: boolean; apiKeyId?: string; topology?: UsageTopology }) {
+export default function Usage({ apiBase }: { apiBase: string }) {
   const { t, locale } = useI18n();
-  const [tab, setTab] = useState(readUsageTab);
-  useEffect(() => {
-    const onHash = () => setTab(readUsageTab());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
   const [range, setRange] = useState<Range>("30d");
   const [client, setClient] = useState<SourceClient>("all");
   const [device, setDevice] = useState<SourceDevice>({ kind: "all" });
-  const [scope, setScope] = useState<UsageScope>("machine");
   const [modelQuery, setModelQuery] = useState("");
   const [draftWindow, setDraftWindow] = useState({ since: "", until: "" });
   const [customWindow, setCustomWindow] = useState<UsageTimeWindow | null>(null);
@@ -153,10 +141,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
     setRangeError(null);
     setCustomWindow(result.window);
   };
-
-  const restricted = connected && (scope === "machine" || topology === "link" || topology === "unknown");
-  const effectiveDevice: SourceDevice | null = restricted ? (apiKeyId?.trim() && apiKeyId === apiKeyId.trim() ? { kind: "key", id: apiKeyId } : null) : device;
-  const filter: SourceFilter | null = effectiveDevice ? { client, device: effectiveDevice } : null;
+  const filter: SourceFilter = { client, device };
   const session = useUsageSession();
   const resource = useUsageReport(apiBase, range, filter, session, since, until);
   const { state } = resource;
@@ -192,33 +177,18 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
       <div className="page-head usage-head">
         <h2 id="usage-page-title">{t("usage.title")}</h2>
       </div>
-      <div className="page-tabs" role="tablist" aria-label={t("nav.usage")}>
-        {(["report", "companion"] as const).map(item => (
-          <button key={item} type="button" role="tab" id={`usage-tab-${item}`}
-            aria-selected={tab === item} aria-controls={`usage-panel-${item}`}
-            tabIndex={tab === item ? 0 : -1}
-            className={`page-tab${tab === item ? " page-tab--active" : ""}`}
-            onClick={() => selectUsageTab(item)} onKeyDown={usageTabKeyDown}>
-            {t(item === "report" ? "usage.workspace.report" : "usage.section.companion")}
-          </button>
-        ))}
-      </div>
-      {tab === "companion" ? (
-        <div role="tabpanel" id="usage-panel-companion" aria-labelledby="usage-tab-companion">
-          <UsageCompanionView apiBase={apiBase} providers={data?.providers ?? []} />
-        </div>
-      ) : <div role="tabpanel" id="usage-panel-report" aria-labelledby="usage-tab-report" className="usage-v2 usage-workspace-shell flex flex-col gap-4">
+      <div className="usage-v2 usage-workspace-shell flex flex-col gap-4">
       <p className="page-sub m-0 text-[13px]">{t("usage.subtitle")}</p>
       {/*
         One toolbar: source, window, and the custom interval as a disclosure at the end of the
         row. An explicit interval is the rare path, so its two date fields open on request; the
         applied interval stays printed under the row so collapsing the form never hides which
-        window the totals below actually cover. The hub scope only exists when connected.
+        window the totals below actually cover.
       */}
       <section className="usage-range flex flex-col gap-3">
         <UsageToolbarRow>
           <UsageSourcePicker apiBase={apiBase} filter={filter} onClient={setClient} onDevice={setDevice}
-            session={session} deviceLocked={restricted} facetsAllowed={topology === "home" || topology === "hub"} homeScope={connected} t={t} locale={locale} />
+            session={session} deviceLocked={false} facetsAllowed={true} t={t} locale={locale} />
           <UsageFilters range={customWindow ? null : range} onRange={selectRange} t={t} />
           <UsageRangeToggle
             open={rangeOpen}
@@ -231,7 +201,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
             }}
             t={t}
           />
-          {connected && topology === "hub" && <div className="ml-auto"><UsageScopeControl scope={scope} onScope={next => { setScope(next); setDevice({ kind: "all" }); }} t={t} /></div>}
+          
           {customWindow && <UsageAppliedWindow window={customWindow} locale={locale} t={t} />}
         </UsageToolbarRow>
         {rangeOpen && (
@@ -258,7 +228,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
             {state.error instanceof UsageWindowMismatchError
               ? `${t("usage.loadError")} ${t("dash.codexRestartMalformed")}`
               : state.error instanceof UsageReadFailedError || state.error instanceof UsageAccessDeniedError ? t("usage.loadError")
-              : connected ? t("usage.hubOffline") : state.error instanceof Error ? `${t("usage.loadError")} ${state.error.message}` : t("usage.loadError")}
+              : state.error instanceof Error ? `${t("usage.loadError")} ${state.error.message}` : t("usage.loadError")}
           </p>
           <Button variant="outline" size="sm" onClick={() => resource.refresh()}>{t("common.retry")}</Button>
         </div>
@@ -266,7 +236,7 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
         <>
           {state.showError && (
             <Notice tone="err">
-              {t(connected && !(state.error instanceof UsageReadFailedError) ? "usage.hubOffline" : "usage.loadError")}
+              {t("usage.loadError")}
             </Notice>
           )}
           <UsageIncompleteNotice data={data} />
@@ -301,13 +271,13 @@ export default function Usage({ apiBase, connected = false, apiKeyId, topology =
             onModelQuery={setModelQuery}
             sortedProviders={sortedProviders}
             allApps={client === "all"}
-            filtered={client !== "all" || effectiveDevice?.kind !== "all" || range !== "all" || customWindow !== null}
+            filtered={client !== "all" || device?.kind !== "all" || range !== "all" || customWindow !== null}
             locale={locale}
             t={t}
           />
         </>
       )}
-      </div>}
+      </div>
     </>
   );
 }

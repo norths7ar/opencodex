@@ -24,7 +24,7 @@ export type SendClass =
   | "auth-recovery"
   | "repair"
   | "account-failover"
-  | "combo-failover"
+  | "compaction"
   | "auxiliary"
   | "prewarm";
 
@@ -246,7 +246,7 @@ export interface RequestExecutionBudget extends TransientSendBudget {
 
 const RESERVE_FUNDED_CLASSES: ReadonlySet<SendClass> = new Set<SendClass>([
   "account-failover",
-  "combo-failover",
+  "compaction",
   "repair",
   "auth-recovery",
 ]);
@@ -561,7 +561,7 @@ function createRequestExecutionBudgetWithLedger(
       const countedExternally = !auxiliary && intent.countedExternally === true;
       const changesTarget = !auxiliary && lastTargetKey !== undefined && lastTargetKey !== intent.targetKey;
       const isAlternateTarget = changesTarget || intent.sendClass === "account-failover"
-        || intent.sendClass === "combo-failover";
+        || intent.sendClass === "compaction";
       const chargesTransition = changesTarget && intent.rebasedTarget !== true;
       const chargesAlternateTarget = isAlternateTarget && intent.rebasedTarget !== true;
       if (isAlternateTarget && chargesTransition && targetTransitions >= policy.maxTargetTransitions) {

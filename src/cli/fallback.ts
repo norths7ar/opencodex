@@ -12,13 +12,12 @@ import {
 
 export const FALLBACK_USAGE = `Usage:
   ocx fallback status [--json]
-  ocx fallback off   [--kind model|provider|all] [--provider <name> | --route <selector> | --device <id|alias>] [--json]
-  ocx fallback on    [--kind model|provider|all] [--provider <name> | --route <selector> | --device <id|alias>] [--json]
-  ocx fallback clear [--kind model|provider|all] [--provider <name> | --route <selector> | --device <id|alias>] [--json]
-  ocx fallback local <on|off> --device <id|alias> [--json]`;
+  ocx fallback off   [--kind model|provider|all] [--provider <name> | --route <selector> | --device <key-id>] [--json]
+  ocx fallback on    [--kind model|provider|all] [--provider <name> | --route <selector> | --device <key-id>] [--json]
+  ocx fallback clear [--kind model|provider|all] [--provider <name> | --route <selector> | --device <key-id>] [--json]`;
 
 type Switches = { model?: boolean; provider?: boolean };
-interface DeviceRow { id?: string; alias?: string; localFallback?: boolean; model?: boolean | null; provider?: boolean | null }
+interface DeviceRow { id?: string; model?: boolean | null; provider?: boolean | null }
 interface EventRow { at?: string; site?: string; route?: string; kind?: string; from?: string; to?: string; trigger?: string; outcome?: string; scope?: string }
 interface FallbackState {
   global?: { model?: boolean; provider?: boolean };
@@ -45,9 +44,8 @@ export function fallbackStatusLines(state: FallbackState): string[] {
   for (const [name, value] of Object.entries(state.providers ?? {})) lines.push(switchesLine("provider " + name, value));
   for (const [name, value] of Object.entries(state.routes ?? {})) lines.push(switchesLine("route " + name, value));
   for (const device of state.devices ?? []) {
-    const label = "device " + (device.id ?? "?") + (device.alias ? " (" + device.alias + ")" : "");
-    lines.push(terminalSafeText(label) + ": local fallback " + (device.localFallback ? "allowed" : "off")
-      + ", model " + onOff(device.model) + ", provider " + onOff(device.provider));
+    const label = "API key " + (device.id ?? "?");
+    lines.push(terminalSafeText(label) + ": model " + onOff(device.model) + ", provider " + onOff(device.provider));
   }
   const last = state.last;
   lines.push(last
@@ -102,18 +100,6 @@ async function setSwitch(argv: string[], value: boolean | null, deps: RuntimeApi
   printData(state, wantsJson, fallbackStatusLines(state));
 }
 
-async function local(argv: string[], deps: RuntimeApiDeps): Promise<void> {
-  const args = [...argv];
-  const wantsJson = takeFlag(args, "--json");
-  const mode = args.shift();
-  if (mode !== "on" && mode !== "off") throw new CliUsageError("fallback local needs on or off", FALLBACK_USAGE);
-  const device = takeOption(args, "--device");
-  if (!device) throw new CliUsageError("fallback local needs --device <id|alias>", FALLBACK_USAGE);
-  rejectArgs(args, FALLBACK_USAGE);
-  const state = await put({ scope: "device", key: device, setting: "localFallback", value: mode === "on" }, deps);
-  printData(state, wantsJson, fallbackStatusLines(state));
-}
-
 export async function handleFallbackCommand(argv: string[], deps: RuntimeApiDeps = {}): Promise<number> {
   return runCliAction(async () => {
     const [sub, ...rest] = argv;
@@ -121,7 +107,6 @@ export async function handleFallbackCommand(argv: string[], deps: RuntimeApiDeps
     else if (sub === "off") await setSwitch(rest, false, deps);
     else if (sub === "on") await setSwitch(rest, true, deps);
     else if (sub === "clear") await setSwitch(rest, null, deps);
-    else if (sub === "local") await local(rest, deps);
     else throw new CliUsageError("unknown fallback command: " + sub, FALLBACK_USAGE);
   });
 }

@@ -1,10 +1,9 @@
 /** Read-only Cursor integration observations; never downloads or configures Cursor. */
 import type { CursorIntegrationStatus } from "../server/management/cursor-integration-routes";
-import type { CursorLocalInstallerHint } from "../integrations/cursor-local-installer";
 import { runCatalogAction } from "./catalog-command-result";
 import { CliUsageError, printData, runtimeRequest, takeFlag, type RuntimeApiDeps } from "./runtime-api";
 
-const USAGE = "Usage: ocx integration native cursor [status|local-installer] [--json]";
+const USAGE = "Usage: ocx integration native cursor [status] [--json]";
 const GUIDE_URL = "https://lidge-jun.github.io/opencodex/guides/cursor-private-inference/";
 const PLACEHOLDER = "opencodex-loopback";
 
@@ -56,51 +55,27 @@ function statusDto(raw: unknown): CursorIntegrationStatus {
   };
 }
 
-function installerDto(raw: unknown): CursorLocalInstallerHint {
-  const value = record(raw), available = boolean(value.available);
-  if (value.reason !== null && (typeof value.reason !== "string" || !["no-regular-install", "unsupported-platform", "unreachable", "unusable-response"].includes(value.reason))) {
-    throw new Error("Invalid Cursor installer reason");
-  }
-  const url = nullableText(value.url), version = nullableText(value.version);
-  if (available) {
-    if (url === null || version === null || value.reason !== null || url.length > 4096 || version.length > 256) throw new Error("Invalid Cursor installer");
-    const parsed = new URL(url);
-    if (parsed.protocol !== "https:" || parsed.hostname !== "downloads.cursor.com" || parsed.port || parsed.username || parsed.password
-      || !parsed.pathname.startsWith("/local-mode/")) throw new Error("Invalid Cursor installer URL");
-  } else if (url !== null || version !== null) throw new Error("Invalid unavailable installer");
-  return { available, url, version, reason: value.reason as CursorLocalInstallerHint["reason"] };
-}
-
 /** Arguments start immediately after `integration native cursor`. */
 export async function handleCursorIntegrationCommand(argv: string[], deps: RuntimeApiDeps = {}): Promise<number> {
   return runCatalogAction(async () => {
     const args = [...argv], wantsJson = takeFlag(args, "--json"), action = args.shift() ?? "status";
-    if (args.length || (action !== "status" && action !== "local-installer")) {
-      throw new CliUsageError("Cursor supports only status and local-installer reads.", USAGE);
+    if (args.length || action !== "status") {
+      throw new CliUsageError("Cursor supports only status reads.", USAGE);
     }
-    const raw = await runtimeRequest(`/api/native-integrations/cursor${action === "local-installer" ? "/local-installer" : ""}`,
-      { method: "GET", redirect: "error" }, deps);
-    if (action === "local-installer") {
-      const result = installerDto(raw);
-      printData(result, wantsJson, result.available
-        ? [`Cursor installer available: ${result.version}`, `URL: ${result.url}`, "Nothing was downloaded or installed."]
-        : [`No installer advertised. Reason: ${result.reason ?? "none (Private Inference is already installed)"}.`, "Nothing was downloaded or installed."]);
-    } else {
-      const result = statusDto(raw);
-      printData(result, wantsJson, [
-        `Cursor Private Inference: ${result.privateInference.installed ? "installed" : "not found"}`,
-        `Regular Cursor: ${result.regularCursor.installed ? "installed" : "not found"}`,
-        `Gateway: ${result.gateway.baseUrl}`,
-        result.gateway.apiKeyMode === "credential"
-          ? "API key: an existing proxy credential is required. The placeholder is not an access credential."
-          : `API key placeholder: ${PLACEHOLDER} (not a secret).`,
-        `Last seen: ${result.lastSeen ? `${result.lastSeen.userAgent} at ${result.lastSeen.at}` : "no Cursor request observed since proxy startup"}`,
-        `Models: ${result.models.length}`,
-        ...result.models.map(model => `${model.id}: reasoning ${model.reasoning?.join(", ") ?? "not advertised"}`),
-        `Guide: ${result.guideUrl}`,
-        ...(!result.privateInference.installed ? ["Next: ocx integration native cursor local-installer"] : []),
-      ]);
-    }
+    const raw = await runtimeRequest("/api/native-integrations/cursor", { method: "GET", redirect: "error" }, deps);
+    const result = statusDto(raw);
+    printData(result, wantsJson, [
+      `Cursor Private Inference: ${result.privateInference.installed ? "installed" : "not found"}`,
+      `Regular Cursor: ${result.regularCursor.installed ? "installed" : "not found"}`,
+      `Gateway: ${result.gateway.baseUrl}`,
+      result.gateway.apiKeyMode === "credential"
+        ? "API key: an existing proxy credential is required. The placeholder is not an access credential."
+        : `API key placeholder: ${PLACEHOLDER} (not a secret).`,
+      `Last seen: ${result.lastSeen ? `${result.lastSeen.userAgent} at ${result.lastSeen.at}` : "no Cursor request observed since proxy startup"}`,
+      `Models: ${result.models.length}`,
+      ...result.models.map(model => `${model.id}: reasoning ${model.reasoning?.join(", ") ?? "not advertised"}`),
+      `Guide: ${result.guideUrl}`,
+    ]);
     return 0;
   });
 }

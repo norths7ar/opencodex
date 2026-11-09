@@ -50,31 +50,6 @@ test("moves a Beijing entry holding an international endpoint", () => {
     .toContain("ap-southeast-1");
 });
 
-test("the migrated config survives a reload", () => {
-  // A stale combo target would fail validation and make loadConfig fall back to
-  // defaults — this is the assertion that catches it.
-  const config = migratableConfig();
-  (config as unknown as Record<string, unknown>).combos = {
-    fast: { targets: [{ provider: "alibaba-token-plan", model: "qwen3.7-max" }] },
-  };
-  const projection = projectAlibabaRegionMigration(config);
-  expect(projection.changed).toBe(true);
-
-  const home = mkdtempSync(join(tmpdir(), "ocx-alibaba-"));
-  const prev = process.env.OPENCODEX_HOME;
-  process.env.OPENCODEX_HOME = home;
-  try {
-    saveConfig(projection.config);
-    const reloaded = loadConfig();
-    expect(reloaded.providers["alibaba-token-plan-intl"]?.apiKey).toBe("sk-intl-key");
-    expect(reloaded.combos?.fast?.targets[0]?.provider).toBe("alibaba-token-plan-intl");
-  } finally {
-    if (prev === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = prev;
-    removeTreeWithRetry(home);
-  }
-});
-
 test("a genuine Beijing config is untouched", () => {
   for (const baseUrl of ["https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1", undefined]) {
     const config = {

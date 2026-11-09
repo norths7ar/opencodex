@@ -1,5 +1,4 @@
 import { diagnoseService, type ServiceDiagnostic } from "./diagnostics";
-import { desktopLoginStatusSummary, diagnoseDesktopStartup } from "./desktop-startup";
 import { confirmServiceServing } from "./health";
 import { ownershipMutationLeaseStatusLine } from "./ownership-mutation-lease.mjs";
 import { LABEL, TASK, serviceLogPath, serviceStatePaths } from "./state";
@@ -7,7 +6,7 @@ import { WINSW_SERVICE_ID } from "../lib/winsw";
 import { runPassiveRead } from "../lib/passive-read";
 
 /** The service manager holding the registration; `none` when nothing is registered. */
-export type ServiceStatusBackend = "launchd" | "systemd" | "schtasks" | "winsw" | "none";
+export type ServiceStatusBackend = "schtasks" | "winsw" | "none";
 
 /**
  * `ocx service status --json`. Additive within `schemaVersion: 1`.
@@ -33,7 +32,6 @@ export interface ServiceStatusJson {
   summary: string;
   logPath: string;
   ownershipLease: string | null;
-  desktopLogin: string | null;
 }
 
 export interface ServiceStatusJsonDeps {
@@ -42,14 +40,11 @@ export interface ServiceStatusJsonDeps {
   serving?: () => Promise<{ ok: boolean; port: number }>;
   logPath?: () => string;
   leaseLine?: () => string | null;
-  desktopLogin?: () => string | null;
 }
 
 export function serviceStatusBackend(diag: ServiceDiagnostic): ServiceStatusBackend {
   if (!diag.supported || !diag.installed) return "none";
   switch (diag.backend) {
-    case "launchd": return "launchd";
-    case "systemd": return "systemd";
     case "scheduler": return "schtasks";
     case "native": return "winsw";
     default: return "none";
@@ -57,8 +52,6 @@ export function serviceStatusBackend(diag: ServiceDiagnostic): ServiceStatusBack
 }
 
 const BACKEND_LABEL: Record<ServiceStatusBackend, string | null> = {
-  launchd: LABEL,
-  systemd: `${TASK}.service`,
   schtasks: TASK,
   winsw: WINSW_SERVICE_ID,
   none: null,
@@ -91,10 +84,6 @@ async function collectPassively(deps: ServiceStatusJsonDeps): Promise<ServiceSta
       serving = { probed: true, ok: false, port: null };
     }
   }
-  const desktopLogin = deps.desktopLogin ?? (() => {
-    const desktop = diagnoseDesktopStartup();
-    return desktop ? desktopLoginStatusSummary(desktop) : null;
-  });
   return {
     schemaVersion: 1,
     platform: deps.platform ?? process.platform,
@@ -111,6 +100,5 @@ async function collectPassively(deps: ServiceStatusJsonDeps): Promise<ServiceSta
     summary: diag.summary,
     logPath: (deps.logPath ?? serviceLogPath)(),
     ownershipLease: (deps.leaseLine ?? (() => ownershipMutationLeaseStatusLine(serviceStatePaths())))() ?? null,
-    desktopLogin: desktopLogin(),
   };
 }

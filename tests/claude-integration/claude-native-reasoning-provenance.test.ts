@@ -283,32 +283,6 @@ describe("Claude native reasoning provenance", () => {
     expect(JSON.stringify(sent.wires)).not.toContain(BLOB);
   });
 
-  test("streamed passthrough failover strips the failed route's blob and tags the serving route", async () => {
-    const a = provider("https://route-a.example/v1", "key-a");
-    const b = provider("https://route-b.example/v1", "key-b");
-    const cfg = { defaultProvider: "a", providers: { a, b }, combos: { pair: {
-      strategy: "failover", targets: [{ provider: "a", model: MODEL }, { provider: "b", model: MODEL }],
-    } } } as OcxConfig;
-    const first = await send(cfg, turn(undefined, "combo/pair"));
-    const signed = signature(first.body);
-    expect(decodeReasoningEnvelope(signed)?.nat).toBeDefined();
-    const servedBlob = "fixture-serving-route-ciphertext";
-    const second = await send(cfg, turn(signed, "combo/pair"), (_wire, url) => {
-      if (url.includes("route-a.example")) return Response.json({ error: { message: "busy" } }, { status: 429 });
-      return new Response(
-        `event: response.output_item.done\ndata: ${JSON.stringify({ output_index: 0, item: { type: "reasoning", id: "rs_second", summary: [], encrypted_content: servedBlob } })}\n\n`
-        + `event: response.completed\ndata: ${JSON.stringify({ response: { status: "completed", usage: { input_tokens: 2, output_tokens: 1, total_tokens: 3 } } })}\n\n`,
-        { headers: { "content-type": "text/event-stream" } },
-      );
-    });
-    expect(second.wires).toHaveLength(2);
-    expect(JSON.stringify(second.wires[0])).toContain(BLOB);
-    expect(JSON.stringify(second.wires[1])).not.toContain(BLOB);
-    const tag = decodeReasoningEnvelope(signature(second.body))?.nat?.tag;
-    expect(tag).toBe(nativeReasoningTag(nativeReasoningOwnerForRoute({ provider: b }), servedBlob));
-    expect(tag).not.toBe(nativeReasoningTag(nativeReasoningOwnerForRoute({ provider: a }), servedBlob));
-  });
-
   test("both native Anthropic sends strip translated blobs, including escaped and undecodable envelopes", async () => {
     const signed = signature((await send(config(), turn())).body);
     const nat = decodeReasoningEnvelope(signed)!.nat!;

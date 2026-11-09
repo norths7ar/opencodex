@@ -9,15 +9,11 @@ test("standalone build script exposes supported targets and packaging contract",
   // the build script consumes it rather than restating it.
   expect(script).toContain("./standalone-targets");
   for (const target of [
-    "bun-darwin-arm64",
-    "bun-darwin-x64",
     "bun-windows-x64",
-    "bun-linux-x64",
-    "bun-linux-arm64",
   ]) expect(targets).toContain(target);
   expect(script).toContain("--compile");
   expect(script).toContain("--outfile");
-  expect(script).toContain("gui/dist");
+  expect(script).toContain('join(output, "gui", "dist")');
   expect(script).toContain("stageStandaloneKeyringAddon");
   expect(script).toContain("SHA256SUMS");
 });

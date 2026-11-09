@@ -11,7 +11,6 @@ import { AGENT_ROUTING_CAPABILITIES } from "../../src/cli/capabilities-agents-ro
 import { INTEGRATION_CAPABILITIES } from "../../src/cli/capabilities-integrations";
 import { OBSERVE_SYSTEM_CAPABILITIES } from "../../src/cli/capabilities-observe-system";
 import { ACCESS_REMOTE_CAPABILITIES } from "../../src/cli/capabilities-access-remote";
-import { LAB_CAPABILITIES } from "../../src/cli/capabilities-lab";
 import { CAPABILITY_DATA_FILES, capabilityDataBoundary } from "../helpers/cli-capability-data";
 import { repoPath, repoRoot } from "../helpers/repo-root";
 import { removeTreeWithRetry } from "../helpers/remove-tree";
@@ -296,29 +295,6 @@ function discovery(mode: "absent" | "present" | "undefined" | "empty"): Discover
 }
 
 describe("capability facade and optional usage consumers", () => {
-  test("public runtime exports and base array/row identities remain stable", () => {
-    expect(Object.keys(facade).sort()).toEqual([
-      "CAPABILITIES", "HEAD_CAPABILITIES", "capabilitiesForRoute", "capabilityInvocation", "capabilityRouteKeys",
-    ].sort());
-    expect(facade.CAPABILITIES.slice(0, base.CAPABILITIES.length)).toEqual(base.CAPABILITIES);
-    base.CAPABILITIES.forEach((row, index) => expect(facade.CAPABILITIES[index]).toBe(row));
-    expect(new Set(facade.CAPABILITIES.map(row => row.command.join(" "))).size).toBe(facade.CAPABILITIES.length);
-    expect(facade.CAPABILITIES.slice(base.CAPABILITIES.length)).toEqual([
-      ...PROVIDER_MODEL_CAPABILITIES,
-      ...ACCOUNT_CAPABILITIES,
-      ...AGENT_ROUTING_CAPABILITIES,
-      ...INTEGRATION_CAPABILITIES,
-      ...OBSERVE_SYSTEM_CAPABILITIES,
-      ...ACCESS_REMOTE_CAPABILITIES,
-      ...LAB_CAPABILITIES,
-    ]);
-    expect(facade.HEAD_CAPABILITIES).toBe(base.HEAD_CAPABILITIES);
-    const matches = facade.capabilitiesForRoute("/api/providers/{provider}/model-costs");
-    expect(matches.map(facade.capabilityInvocation)).toEqual(["ocx models price", "ocx models set-price"]);
-    for (const row of matches) expect(base.CAPABILITIES.includes(row)).toBe(true);
-    expect(facade.capabilityRouteKeys().has("PUT /api/providers/{provider}/model-costs")).toBe(true);
-    expect(facade.CAPABILITIES.some(row => Object.hasOwn(row, "usage"))).toBe(true);
-  });
 
   test("absent usage preserves exact legacy JSON shape, help and alias output", () => {
     const result = discovery("absent");

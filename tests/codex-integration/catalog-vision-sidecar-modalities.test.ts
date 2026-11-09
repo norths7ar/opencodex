@@ -2,7 +2,6 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { applyProviderConfigHints, gatherRoutedModels } from "../../src/codex/catalog";
 import { clearModelCache } from "../../src/codex/model-cache";
 import type { OcxProviderConfig } from "../../src/types";
-import { deriveComboCatalogModel } from "../../src/codex/catalog";
 import { PROVIDER_REGISTRY } from "../../src/providers/registry";
 import { enrichProviderFromRegistry } from "../../src/providers/derive";
 import { CURSOR_NO_VISION_MODELS, CURSOR_STATIC_MODELS } from "../../src/adapters/cursor/discovery";
@@ -306,47 +305,6 @@ describe("vision-capable provider models feed combo modalities", () => {
     }
   });
 
-  test("a combo of two vision-capable members still advertises image", () => {
-    const member = (provider: string, contextWindow: number): CatalogModel => ({
-      provider,
-      id: "grok-4.5",
-      contextWindow,
-      inputModalities: ["text", "image"],
-    } as CatalogModel);
-    const derived = deriveComboCatalogModel(
-      "xai_grok_fallback",
-      {
-        targets: [
-          { provider: "xai", model: "grok-4.5" },
-          { provider: "cursor", model: "grok-4.5" },
-        ],
-        defaultEffort: "high",
-      } as never,
-      [member("xai", 500_000), member("cursor", 200_000)],
-    );
-    expect(derived?.inputModalities).toEqual(["text", "image"]);
-  });
-
-  test("a member with unknown modalities still narrows the combo to text", () => {
-    // Intersection semantics are intentional: a member we cannot prove is
-    // vision-capable must not let the combo advertise image input.
-    const derived = deriveComboCatalogModel(
-      "mixed",
-      {
-        targets: [
-          { provider: "xai", model: "grok-4.5" },
-          { provider: "other", model: "text-only" },
-        ],
-        defaultEffort: "high",
-      } as never,
-      [
-        { provider: "xai", id: "grok-4.5", contextWindow: 500_000, inputModalities: ["text", "image"] } as CatalogModel,
-        { provider: "other", id: "text-only", contextWindow: 100_000 } as CatalogModel,
-      ],
-    );
-    expect(derived?.inputModalities).toEqual(["text"]);
-  });
-
   test("a partial user modality map does not hide registry vision defaults", () => {
     // Regression: enrichProviderFromRegistry filled modelInputModalities all-or-nothing, so a
     // single customized model suppressed the registry's knowledge about every other model and
@@ -364,31 +322,6 @@ describe("vision-capable provider models feed combo modalities", () => {
     expect(prov.modelInputModalities?.["grok-4.5"]).toEqual(["text", "image"]);
     const hinted = applyProviderConfigHints("xai", prov, { provider: "xai", id: "grok-4.5" });
     expect(hinted.inputModalities).toEqual(["text", "image"]);
-  });
-
-  test("a combo of modelInputModalities-declared text-only members advertises image through the hints", () => {
-    // End-to-end shape of the /planners bug: every member is sidecar-covered via
-    // modelInputModalities (not noVisionModels). The hinted members all carry image, so the
-    // derived combo keeps image input instead of collapsing to text-only.
-    const memberFor = (provider: string, id: string): CatalogModel => applyProviderConfigHints(provider, {
-      adapter: "openai-chat",
-      baseUrl: `https://${provider}.example/v1`,
-      modelInputModalities: { [id]: ["text"] },
-    }, { id, provider, contextWindow: 200_000 });
-    const memberA = memberFor("azu-lab2", "deepseek-chat");
-    const memberB = memberFor("vdi", "glm-5.2");
-    const derived = deriveComboCatalogModel(
-      "planners",
-      {
-        targets: [
-          { provider: "azu-lab2", model: "deepseek-chat" },
-          { provider: "vdi", model: "glm-5.2" },
-        ],
-        defaultEffort: "high",
-      } as never,
-      [memberA, memberB],
-    );
-    expect(derived?.inputModalities).toEqual(["text", "image"]);
   });
 });
 

@@ -132,15 +132,15 @@ export function actionableRefusalMessage(
   return undefined;
 }
 export function canonicalSseErrorBlock(payload: unknown): string { return `data: ${JSON.stringify(payload)}\n\n`; }
-const comboEvidence = new WeakMap<Response, string>();
-export function attachComboFailureEvidence(response: Response, legacyBodyText: string): Response {
-  comboEvidence.set(response, legacyBodyText); return response;
+const upstreamEvidence = new WeakMap<Response, string>();
+export function attachUpstreamFailureEvidence(response: Response, legacyBodyText: string): Response {
+  upstreamEvidence.set(response, legacyBodyText); return response;
 }
-export function comboFailureEvidence(response: Response): string | undefined { return comboEvidence.get(response); }
+export function upstreamFailureEvidence(response: Response): string | undefined { return upstreamEvidence.get(response); }
 
 /** Identity belongs to the locally constructed object, never to serialized fields. */
 const proxyErrors = new WeakSet<object>();
-export type ProxyErrorPresentation = "roster" | "pacing" | "input" | "outbound" | "inbound" | "send" | "cooldown" | "cooldown_pinned" | "hard_lock" | "recovery" | "usage" | "model_availability" | "oauth_login" | "discovery" | "muse_http" | "config" | "workflow" | "workflow_unbound" | "scope" | "body_stall" | "body_overflow" | "combo" | "copilot" | "pool_refresh";
+export type ProxyErrorPresentation = "roster" | "pacing" | "input" | "outbound" | "inbound" | "send" | "cooldown" | "cooldown_pinned" | "hard_lock" | "recovery" | "usage" | "model_availability" | "oauth_login" | "discovery" | "muse_http" | "config" | "workflow" | "workflow_unbound" | "scope" | "body_stall" | "body_overflow" | "copilot" | "pool_refresh";
 const proxyPresentations = new WeakMap<object, ProxyErrorPresentation>();
 export function proxyErrorPresentation(value: object): ProxyErrorPresentation | undefined { return proxyPresentations.get(value); }
 export function markProxyError<T extends object>(value: T, presentation?: ProxyErrorPresentation): T {

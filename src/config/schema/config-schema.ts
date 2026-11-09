@@ -14,20 +14,15 @@ import { fallbackPolicySchema } from "./fallback-policy";
 import {
   agentTaskRecoverySchema,
   catalogAutoRefreshSchema,
-  clientConnectionSchema,
   CODEX_ACCOUNT_PIN_PATTERN,
   codexAccountPrioritiesSchema,
   salvageCodexAccountAutoSwitchThresholds,
   codexPoolSchema,
   codexQuotaAutoRefreshSchema,
   credentialGroupsSchema,
-  hubConfigSchema,
   providerConfigSchema,
   quotaResetNotifySchema,
-  remoteGuiConfigSchema,
-  runtimeRoleSchema,
   spendSchema,
-  chatgptDesktopSchema,
   skillsConfigSchema,
   configuredCodexPoolAccountIds,
   apiKeyEntrySchema,
@@ -63,7 +58,6 @@ import {
   credentialPinnedProviderConfigError,
 } from "../provider-validation";
 import {
-  CODEX_ACCOUNT_NAMESPACE_COMBO_ALIAS_COLLISION_ERROR,
   codexAccountNamespaceForModel,
   codexProviderNamespaceKey,
   MAIN_CODEX_ACCOUNT_NAMESPACE_TARGET,
@@ -72,7 +66,6 @@ import { UPSTREAM_HOST_CIRCUIT_MAX_THRESHOLD } from "../../codex/upstream-host-h
 import { MIN_USAGE_LEDGER_MAX_BYTES } from "../../usage/retention-contract";
 // The schema boundary uses a string-only stand-in for the ingress grammar: importing the server
 // parser here would cycle back through config loading and run Cursor detection during validation.
-import { COMBO_NAMESPACE, comboConfigIssues, lexicalDecisionModelBase } from "../../combos/types";
 import { routingProfileIssues } from "../../routing/profile";
 import { POLICY_NAMESPACE } from "../../routing/profile-namespace";
 import { providerDestinationConfigError } from "../../lib/destination-policy";
@@ -93,7 +86,6 @@ import { DEFAULT_APP_OWNED_MEMORY_BUDGET_BYTES, MAX_APP_OWNED_MEMORY_BUDGET_MB, 
 export const protocolConfigSchema = z.object({
   unrepresentable: z.enum(["legacy", "reject"]).optional(),
   rollout: z.object({
-    nativeChatCombos: z.boolean().optional(),
     managedMessagesNative: z.boolean().optional(),
     managedMessagesNativeOAuth: z.boolean().optional(),
     directEncoders: z.boolean().optional(),
@@ -103,17 +95,9 @@ export const protocolConfigSchema = z.object({
 }).strict();
 
 export const configSchema = z.object({
-  chatgptDesktop: chatgptDesktopSchema.optional().catch(undefined),
   codexNativeSteering: z.boolean().optional().catch(false),
   codexNativeInjection: z.boolean().optional().catch(false),
   port: z.number().int().min(0).max(65535).default(10100),
-  // A malformed hand edit must disable only remote-role behavior, not discard
-  // providers or data-plane keys. Live writes are rejected explicitly below.
-  runtimeRole: runtimeRoleSchema.optional().catch(undefined),
-  // Malformed optional remote blocks disable only remote GUI behavior. Live
-  // candidates are rejected explicitly by remoteGuiConfigError below.
-  hub: hubConfigSchema.optional().catch(undefined),
-  remoteGui: remoteGuiConfigSchema.optional().catch(undefined),
   // A malformed privacy block must never be read as "unmask": .catch(undefined) drops it and
   // emailMaskingEnabled then falls back to masked, which is also what an absent block means.
   privacy: z.object({ maskEmails: z.boolean().optional() }).strict().optional().catch(undefined),
@@ -135,7 +119,6 @@ export const configSchema = z.object({
     return {
       unrepresentable: protocols.unrepresentable === "reject" ? "reject" as const : "legacy" as const,
       rollout: {
-        nativeChatCombos: fields.nativeChatCombos === true,
         managedMessagesNative: false,
         managedMessagesNativeOAuth: false,
         directEncoders: fields.directEncoders === true,
@@ -144,9 +127,6 @@ export const configSchema = z.object({
       },
     };
   }),
-  // A malformed present client block must remain diagnosable from raw config and
-  // fail closed through src/client/state.ts; unrelated provider state still loads.
-  client: clientConnectionSchema.optional().catch(undefined),
   managementUsageMaxReadBytes: z.number().int().positive().default(64 * 1024 * 1024).describe(
     "Deprecated compatibility limit for bounded legacy usage readers; GET /api/usage always aggregates the complete ledger",
   ),
@@ -380,6 +360,7 @@ export const configSchema = z.object({
   // A malformed hand edit must degrade to false without discarding providers, accounts,
   // or the exact selector map. Live writes remain strict.
   codexAccountPickerEnabled: z.boolean().optional().catch(false),
+  codexSignedOut: z.boolean().optional(),
   resetCreditAutoRedeem: z.object({
     enabled: z.boolean().optional(),
     leadTimeMinutes: z.number().int().min(1).max(60).optional(),
@@ -502,7 +483,6 @@ export const configSchema = z.object({
   if (accountNamespaces) {
     const configuredAccountIds = configuredCodexPoolAccountIds(config.codexAccounts);
     const configuredProviderNamespaces = new Set([
-      COMBO_NAMESPACE,
       OPENAI_CODEX_PROVIDER_ID,
       POLICY_NAMESPACE,
       ...Object.keys(config.providers),
@@ -516,7 +496,7 @@ export const configSchema = z.object({
         ctx.addIssue({
           code: "custom",
           path: ["codexAccountNamespaces", namespace],
-          message: "account selectors must not collide with configured provider, combo, or routing policy namespaces",
+          message: "account selectors must not collide with configured provider or routing policy namespaces",
         });
       }
       if (configuredAccountIds.has(namespace) || namespaceTargets.has(namespace)) {
@@ -868,38 +848,6 @@ export const configSchema = z.object({
       message: "defaultProvider must exist in providers",
     });
   }
-  const combos = (config as { combos?: unknown }).combos;
-  if (combos !== undefined) {
-    if (!combos || typeof combos !== "object" || Array.isArray(combos)) {
-      ctx.addIssue({ code: "custom", path: ["combos"], message: "combos must be an object" });
-    } else {
-      for (const [id, raw] of Object.entries(combos as Record<string, unknown>)) {
-        const alias = raw && typeof raw === "object" && !Array.isArray(raw)
-          ? (raw as { alias?: unknown }).alias
-          : undefined;
-        if (typeof alias === "string" && codexAccountNamespaceForModel(accountNamespaces, alias.trim())) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["combos", id, "alias"],
-            message: CODEX_ACCOUNT_NAMESPACE_COMBO_ALIAS_COLLISION_ERROR,
-          });
-        }
-        // Pass the full map so cross-combo rules (alias uniqueness) apply at load time
-        // too, not just via the management API; each combo is excluded from its own check.
-        for (const issue of comboConfigIssues(id, raw, config.providers, {
-          combos: combos as Record<string, import("../../types").OcxComboConfig>,
-          excludeComboId: id,
-          normalizeDecisionModel: model => lexicalDecisionModelBase(model, config.cursorEffortRows === true),
-        })) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["combos", id, ...issue.path],
-            message: issue.message,
-          });
-        }
-      }
-    }
-  }
   const routingProfiles = (config as { routingProfiles?: unknown }).routingProfiles;
   if (routingProfiles !== undefined) {
     if (!routingProfiles || typeof routingProfiles !== "object" || Array.isArray(routingProfiles)) {
@@ -908,7 +856,6 @@ export const configSchema = z.object({
       for (const [id, raw] of Object.entries(routingProfiles as Record<string, unknown>)) {
         for (const issue of routingProfileIssues(id, raw, {
           providers: config.providers,
-          combos: combos as Record<string, import("../../types").OcxComboConfig> | undefined,
           routingProfiles: routingProfiles as Record<string, import("../../types").OcxRoutingProfileConfig>,
           codexAccountNamespaces: accountNamespaces,
         }, { excludeProfileId: id })) {

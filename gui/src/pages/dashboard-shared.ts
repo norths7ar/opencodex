@@ -6,19 +6,12 @@ import {
   MIN_VISION_TIMEOUT_MS,
 } from "../../../src/vision/timeout-bounds";
 import { readJsonOrThrow } from "../fetch-json";
-import type { TKey } from "../i18n/shared";
 import type { StartupHealthStatus } from "../startup-health-ui";
 import { shadowSourceModelList, type ShadowCallSourceOption } from "./shadow-call-source";
 import type { AnthropicInstanceId, AnthropicPoolOptions } from "./claude-manual-env";
 
 export type DashboardSection = "overview" | "providers" | "models";
 
-/**
- * `#dashboard/update` is the sidebar's action deep link. It is not a tab, so it resolves
- * to Overview (where the maintenance panel lives) and separately asks the dashboard to
- * open the update dialog.
- */
-export const DASHBOARD_UPDATE_HASH = "dashboard/update";
 
 export function readDashboardSectionFromHash(): DashboardSection {
   const raw = window.location.hash.replace(/^#\/?/, "");
@@ -27,10 +20,6 @@ export function readDashboardSectionFromHash(): DashboardSection {
   return "overview";
 }
 
-/** True while the location hash is the sidebar update deep link. */
-export function hashRequestsUpdateDialog(): boolean {
-  return window.location.hash.replace(/^#\/?/, "") === DASHBOARD_UPDATE_HASH;
-}
 
 /** Overview is the bare `#dashboard`; the other sections carry a suffix. */
 export function dashboardHashForSection(section: DashboardSection): string {
@@ -64,7 +53,6 @@ export interface SettingsData {
     autostartEnabled: boolean;
     shimCoverage: "full" | "cli-only" | "none";
     diagnosticStale: boolean;
-    desktop?: { owned?: boolean; supervisor?: unknown; loginState?: unknown; running?: boolean; viable?: boolean; supervisionUnknown?: boolean };
   };
 }
 export type SidecarBackend = "openai" | "anthropic";
@@ -146,9 +134,6 @@ export interface ShadowCallData {
   sourceModelOptions?: ShadowCallSourceOption[];
 }
 export type UsageSummary30d = import("../usage-summary-resource").UsageReadMetadata & { summary: { requests: number; totalTokens: number; coverageRatio: number } };
-export type UpdateChannel = "latest" | "preview";
-export type Installer = "bun" | "mise" | "npm" | "pnpm" | "source";
-export type UpdateJobStatus = "running" | "restarting" | "succeeded" | "failed";
 export interface SyncResult {
   ok: boolean;
   status?: "applied" | "skipped" | "catalog-only" | "refused";
@@ -173,59 +158,7 @@ export interface ProjectCodexConfigGroup {
   issues: string[];
   bypass: string;
 }
-export interface UpdateCheckData {
-  currentVersion: string;
-  latestVersion: string | null;
-  channel: UpdateChannel;
-  installer: Installer;
-  updateAvailable: boolean;
-  canUpdate: boolean;
-  command: string;
-  releaseNotesUrl: string;
-  reason?: string;
-}
-export interface UpdateJob {
-  id: string;
-  status: UpdateJobStatus;
-  currentVersion: string;
-  latestVersion: string | null;
-  channel: UpdateChannel;
-  installer: Installer;
-  restart: boolean;
-  command: string;
-  log: string[];
-  error?: string;
-  restarted?: boolean;
-}
-
 export const EFFORT_CAP_LEVELS = ["low", "medium", "high", "xhigh"];
-export const UPDATE_CHECK_MAX_AUTO_RETRIES = 2;
-export const UPDATE_CHECK_RETRY_BASE_MS = 800;
-
-export function defaultUpdateChannel(version: string | undefined): UpdateChannel {
-  return version?.includes("-preview.") ? "preview" : "latest";
-}
-
-export function updateReasonLabel(reason: string | undefined, t: (key: TKey) => string): string {
-  switch (reason) {
-    case "source_checkout": return t("dash.updateReason.source_checkout");
-    case "latest_unavailable": return t("dash.updateReason.latest_unavailable");
-    case "already_latest": return t("dash.updateReason.already_latest");
-    case "externally_managed": return t("dash.updateReason.externally_managed");
-    case "external_ownership_invalid": return t("dash.updateReason.external_ownership_invalid");
-    default: return t("dash.updateReason.unknown");
-  }
-}
-
-export function updateJobLabel(status: UpdateJobStatus, t: (key: TKey) => string): string {
-  switch (status) {
-    case "running": return t("dash.updateStatus.running");
-    case "restarting": return t("dash.updateStatus.restarting");
-    case "succeeded": return t("dash.updateStatus.succeeded");
-    case "failed": return t("dash.updateStatus.failed");
-  }
-}
-
 export function mergeSidecarSetting(
   current: SidecarSetting,
   update?: {

@@ -611,21 +611,6 @@ for (const output of [guid, `HKEY_LOCAL_MACHINE\\OTHER\r\n    MachineGuid    REG
   });
 }
 
-for (const primary of ["missing", "invalid", "valid"] as const) test(`Linux machine identity reads files without spawning (${primary})`, () => {
-  const reads: string[] = [], machine = "0123456789abcdef0123456789abcdef";
-  const identity = createOwnerIdentity({ platform: "linux",
-    runCommand: () => { throw Error("must not spawn"); }, readFile: path => {
-      reads.push(path);
-      if (path === "/etc/machine-id") {
-        if (primary === "missing") throw Error("missing");
-        return primary === "invalid" ? "not-machine-id" : machine + "\n";
-      }
-      return machine + "\n";
-    } });
-  expect(identity.hostIdentity()?.machine).toBe(machine); identity.hostIdentity();
-  expect(reads).toEqual(primary === "valid" ? ["/etc/machine-id"] : ["/etc/machine-id", "/var/lib/dbus/machine-id"]);
-});
-
 test.skipIf(process.platform !== "win32")("native Windows own evidence has a registry host and unknown start", () => {
   const evidence = ownEvidence(ownerDefaults);
   expect(evidence.host?.machine).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);

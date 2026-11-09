@@ -1,34 +1,6 @@
-import { accessSync, constants, statSync } from "node:fs";
-import { posix } from "node:path";
 import { codexExecInvocation } from "./exec-invocation";
 import type { SpawnInvocation } from "../lib/win-exec";
-import { macCodexAppBundleFor, realpathOrNull } from "./mac-app-bundle";
-import {
-  untrustedChatgptBundleReason,
-  untrustedChatgptBundleReasonAsync,
-} from "../chatgpt/app-server-shim/bundle-trust";
 
-/**
- * macOS execution-boundary trust for a resolved Codex target.
- *
- * Discovery and the resolver memo answer "which command would we run"; they are
- * deliberately exec-free and never prove trust. Every actual spawn/exec of a
- * Codex binary goes through this module instead: on darwin the command is
- * resolved with real execvp semantics (empty PATH segment = spawn cwd,
- * relative PATH entries resolve against that cwd, a slash in the command makes
- * it cwd/absolute-relative and PATH is skipped), classified by the shared
- * known-Codex-bundle classifier, and — when the lexical or canonical path sits
- * inside a ChatGPT.app or Codex.app bundle at any location — checked by the shared
- * signature/ownership policy before the same canonical target is returned for
- * execution. CLI handoffs additionally classify any enclosing lexical or canonical .app,
- * independent of bundle name or identifier. Other callers retain the known-app
- * policy; non-bundle executables pass through to the shared launcher unchanged.
- *
- * The check is one-shot per invocation and deliberately not memoized:
- * directory-service group membership, signature state, and directory-entry
- * ownership can change between resolve and exec, so a cached "trusted" answer
- * would invent a trust lifetime the platform does not provide.
- */
 export class CodexExecTrustError extends Error {
   readonly reason: string;
   readonly code = "CODEX_EXEC_UNTRUSTED";
@@ -38,9 +10,6 @@ export class CodexExecTrustError extends Error {
     this.reason = reason;
   }
 }
-
-/** Default execvp search path on darwin when the spawn env carries no PATH (_CS_PATH). */
-const DARWIN_DEFAULT_PATH = "/usr/bin:/bin:/usr/sbin:/sbin";
 
 export interface CodexExecBoundaryDeps {
   /** Spawn environment; PATH resolution uses exactly this list. */
@@ -73,84 +42,6 @@ export interface CodexExecBoundaryAsyncDeps extends Omit<CodexExecBoundaryDeps, 
   macBundleTrustReasonAsync?: (bundleRoot: string, binary: string, signal?: AbortSignal) => Promise<string | null>;
 }
 
-/** Same contract as workspace-executable's candidate check: regular file and executable bit. */
-function executableTarget(path: string): boolean {
-  try {
-    if (!statSync(path).isFile()) return false;
-    accessSync(path, constants.X_OK);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function spawnError(command: string, code: "ENOENT" | "EACCES"): Error {
-  return Object.assign(new Error("spawn " + command + " " + code), { code });
-}
-
-/** Non-executability alone must not masquerade as "not found"; existence is probed separately. */
-function existsTarget(path: string, deps: CodexExecBoundaryDeps): boolean {
-  if (deps.exists) { try { return deps.exists(path); } catch { return false; } }
-  try { statSync(path); return true; } catch { return false; }
-}
-
-/** execvp-style PATH resolution: first executable regular file wins; empty segment means cwd. */
-function resolveDarwinExecPath(command: string, deps: CodexExecBoundaryDeps): { path: string } | { error: Error } {
-  const env = deps.env ?? process.env;
-  const cwd = deps.cwd ?? process.cwd();
-  const executable = deps.executable ?? executableTarget;
-  const dirOf = (segment: string): string =>
-    segment === "" ? cwd : segment.startsWith("/") ? segment : posix.resolve(cwd, segment);
-  if (command.includes("/")) {
-    const candidate = dirOf(command);
-    if (executable(candidate)) return { path: candidate };
-    return { error: spawnError(command, existsTarget(candidate, deps) ? "EACCES" : "ENOENT") };
-  }
-  const pathValue = env.PATH === undefined ? DARWIN_DEFAULT_PATH : env.PATH;
-  let denied = false;
-  for (const segment of pathValue.split(":")) {
-    const candidate = dirOf(segment) + "/" + command;
-    if (executable(candidate)) return { path: candidate };
-    if (existsTarget(candidate, deps)) denied = true;
-  }
-  return { error: spawnError(command, denied ? "EACCES" : "ENOENT") };
-}
-
-/**
- * Canonical (bundleRoot, binary) pair when the resolved path classifies into a
- * known Codex desktop bundle (or any enclosing app for CLI handoffs), else null. The pair is always consistent:
- * both halves are canonicalized together so a symlinked HOME or a PATH alias
- * cannot split the containment check, and a bundle member that cannot be
- * canonicalized refuses rather than escaping the known-bundle classification.
- */
-function darwinBundleTarget(resolved: string, deps: CodexExecBoundaryDeps): { bundle: string; binary: string } | null {
-  const realpath = deps.realpath ?? realpathOrNull;
-  if (deps.expectedBundleRoot !== undefined && !posix.isAbsolute(deps.expectedBundleRoot)) {
-    throw new CodexExecTrustError("the recorded app bundle must be an absolute path");
-  }
-  const binary = realpath(resolved);
-  const enclosingApp = (path: string) => /^(.*?\/[^/]*\.app)(?:\/|$)/i.exec(path)?.[1];
-  const lexicalBundle = deps.verifyAnyAppBundle && deps.expectedBundleRoot === undefined ? enclosingApp(resolved) : undefined;
-  // Verify the outer canonical app for nested layouts, but retain lexical containment.
-  const enclosing = deps.verifyAnyAppBundle && binary !== null ? enclosingApp(binary) : undefined;
-  const bundle = deps.expectedBundleRoot ?? enclosing ?? lexicalBundle ?? macCodexAppBundleFor(resolved, { env: deps.env, platform: deps.platform, realpath });
-  if (!bundle) return null;
-  if (binary === null) throw new CodexExecTrustError("cannot canonicalize the app-bundle exec target");
-  const canonicalBundle = realpath(bundle);
-  if (canonicalBundle === null) throw new CodexExecTrustError("cannot canonicalize the app bundle");
-  if (!binary.startsWith(canonicalBundle + "/Contents/")) {
-    throw new CodexExecTrustError("the app-bundle exec target is outside bundle Contents");
-  }
-  if (lexicalBundle && lexicalBundle !== bundle) {
-    const canonicalLexicalBundle = realpath(lexicalBundle);
-    if (canonicalLexicalBundle === null) throw new CodexExecTrustError("cannot canonicalize the app bundle");
-    if (!binary.startsWith(canonicalLexicalBundle + "/Contents/")) {
-      throw new CodexExecTrustError("the app-bundle exec target is outside bundle Contents");
-    }
-  }
-  return { bundle: canonicalBundle, binary };
-}
-
 /** Classification of this exact validated invocation, not a reusable trust grant. */
 interface ValidatedCodexExecTarget {
   readonly invocation: SpawnInvocation;
@@ -162,19 +53,8 @@ export function validatedCodexExecTarget(
   args: readonly string[],
   deps: CodexExecBoundaryDeps = {},
 ): ValidatedCodexExecTarget {
-  if ((deps.platform ?? process.platform) !== "darwin") {
-    if (deps.expectedBundleRoot !== undefined) throw new CodexExecTrustError("recorded app bundles require macOS verification");
-    return { invocation: codexExecInvocation(command, args, deps.platform ?? process.platform, { env: deps.env, exists: deps.exists }), macAppBundle: false };
-  }
-  const resolved = resolveDarwinExecPath(command, deps);
-  if ("error" in resolved) throw resolved.error;
-  const target = darwinBundleTarget(resolved.path, deps);
-  if (target) {
-    const reason = (deps.macBundleTrustReason ?? untrustedChatgptBundleReason)(target.bundle, target.binary);
-    if (reason) throw new CodexExecTrustError(reason);
-    return { invocation: { file: target.binary, args: [...args], options: {} }, macAppBundle: true };
-  }
-  return { invocation: { file: resolved.path, args: [...args], options: {} }, macAppBundle: false };
+  if (deps.expectedBundleRoot !== undefined) throw new CodexExecTrustError("macOS app bundles are not supported");
+  return { invocation: codexExecInvocation(command, args, deps.platform ?? process.platform, { env: deps.env, exists: deps.exists }), macAppBundle: false };
 }
 
 export async function validatedCodexExecTargetAsync(
@@ -183,23 +63,8 @@ export async function validatedCodexExecTargetAsync(
   deps: CodexExecBoundaryAsyncDeps = {},
 ): Promise<ValidatedCodexExecTarget> {
   deps.signal?.throwIfAborted();
-  if ((deps.platform ?? process.platform) !== "darwin") {
-    if (deps.expectedBundleRoot !== undefined) throw new CodexExecTrustError("recorded app bundles require macOS verification");
-    return { invocation: codexExecInvocation(command, args, deps.platform ?? process.platform, { env: deps.env, exists: deps.exists }), macAppBundle: false };
-  }
-  const resolved = resolveDarwinExecPath(command, deps);
-  if ("error" in resolved) throw resolved.error;
-  const target = darwinBundleTarget(resolved.path, deps);
-  if (target) {
-    const reason = await (deps.macBundleTrustReasonAsync
-      ? deps.macBundleTrustReasonAsync(target.bundle, target.binary, deps.signal)
-      : untrustedChatgptBundleReasonAsync(target.bundle, target.binary, undefined, deps.signal));
-    if (reason) throw new CodexExecTrustError(reason);
-    deps.signal?.throwIfAborted();
-    return { invocation: { file: target.binary, args: [...args], options: {} }, macAppBundle: true };
-  }
-  deps.signal?.throwIfAborted();
-  return { invocation: { file: resolved.path, args: [...args], options: {} }, macAppBundle: false };
+  if (deps.expectedBundleRoot !== undefined) throw new CodexExecTrustError("macOS app bundles are not supported");
+  return { invocation: codexExecInvocation(command, args, deps.platform ?? process.platform, { env: deps.env, exists: deps.exists }), macAppBundle: false };
 }
 
 export function validatedCodexExecInvocation(

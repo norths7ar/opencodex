@@ -143,26 +143,6 @@ describe("Codex account namespace foundations", () => {
       .toBe("p888888-3");
   });
 
-  test("avoids provider and combo prefixes when allocating defaults", () => {
-    const namespaces = defaultCodexAccountNamespaces({
-      providers: { p111111: { adapter: "openai-chat", baseUrl: "https://example.test/v1" } },
-      combos: {
-        primary: {
-          alias: "main/gpt-5.5",
-          targets: [{ provider: "p111111", model: "gpt-5.5" }],
-        },
-      },
-      codexAccounts: [{
-        id: "stored-account-id",
-        email: "account@example.test",
-        logLabel: "p111111",
-        isMain: false,
-      }],
-    });
-
-    expect(namespaces).toEqual({ "main-2": "@main", "p111111-2": "stored-account-id" });
-  });
-
   test("avoids routing-profile alias prefixes when allocating defaults", () => {
     const namespaces = defaultCodexAccountNamespaces({
       providers: {},

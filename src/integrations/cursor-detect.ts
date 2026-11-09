@@ -19,7 +19,7 @@ export type CursorBuild = "private-inference" | "regular";
 
 export interface CursorInstall {
   build: CursorBuild;
-  /** The install root (the .app bundle, install directory, or AppImage extraction root). */
+  /** The install directory or AppImage extraction root. */
   path: string;
   version: string | null;
 }
@@ -66,16 +66,7 @@ export function cursorProductJsonCandidates(deps: CursorDetectDeps): Array<{ roo
   // Join with the target platform's separator so the candidate list is stable in tests
   // that describe another OS from this one.
   const { join } = deps.platform === "win32" ? win32 : posix;
-  if (deps.platform === "darwin") {
-    for (const dir of ["/Applications", join(deps.homedir, "Applications")]) {
-      for (const entry of deps.listDir(dir)) {
-        if (!/^Cursor.*\.app$/i.test(entry)) continue;
-        const root = join(dir, entry);
-        out.push({ root, productJson: join(root, "Contents", "Resources", "app", "product.json") });
-      }
-    }
-    return out;
-  }
+
   if (deps.platform === "win32") {
     const bases = [
       deps.env.LOCALAPPDATA ? join(deps.env.LOCALAPPDATA, "Programs") : null,
@@ -90,16 +81,7 @@ export function cursorProductJsonCandidates(deps: CursorDetectDeps): Array<{ roo
     }
     return out;
   }
-  // Linux: AppImages carry product.json only once extracted, so this covers the tarball /
-  // package layouts and stays best-effort. /usr/share covers distro-style installs of the
-  // tarball (e.g. /usr/share/cursor), which is where the Private Inference .deb lands.
-  for (const dir of ["/opt", "/usr/share", join(deps.homedir, ".local", "share")]) {
-    for (const entry of deps.listDir(dir)) {
-      if (!/^cursor/i.test(entry)) continue;
-      const root = join(dir, entry);
-      out.push({ root, productJson: join(root, "resources", "app", "product.json") });
-    }
-  }
+
   return out;
 }
 

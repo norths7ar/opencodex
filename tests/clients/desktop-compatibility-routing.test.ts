@@ -70,7 +70,7 @@ test("model and fallback edits revoke routing until a new observation context is
     { compactionRecovery: { enabled: true, model: "openai/gpt-6-luna" } },
     { blockedModelRedirects: { "external/model": "openai/gpt-6-luna" } },
     { providers: { external: { baseUrl: "https://changed.example.test/v1" } } },
-    { combos: {} }, { routingProfiles: {} },
+    { }, { routingProfiles: {} },
     { memoryModels: { extract: { model: "openai/gpt-6-luna" } } },
     { codexMainAccountHardLockFallback: { model: "external/model" } },
   ];

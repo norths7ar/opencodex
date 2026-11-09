@@ -24,10 +24,7 @@
 @import "../styles/lazycodex-role-models.css" layer(legacy);
 @import "../styles/claude-desktop-picker.css" layer(legacy);
 @import "../styles/anthropic-reset-grants.css" layer(legacy);
-@import "../styles/star-onboarding.css" layer(legacy);
-@import "../styles/sidebar-zoom.css" layer(legacy);
 @import "../styles/protocol-evidence.css" layer(legacy);
-@import "../pages/tray.css" layer(legacy);
 
 /* v1 classes repainted with v2 tokens while pages migrate (see bridge.css) */
 @import "./bridge.css" layer(bridge);
@@ -37,7 +34,6 @@
 @import "./pages/usage.css" layer(bridge);
 @import "./pages/logs.css" layer(bridge);
 @import "./pages/connect.css" layer(bridge);
-@import "./pages/startup.css" layer(bridge);
 @import "./pages/proxy.css" layer(bridge);
 
 @import "@fontsource-variable/geist";

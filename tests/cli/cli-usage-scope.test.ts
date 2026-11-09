@@ -30,7 +30,7 @@ afterEach(() => {
 });
 const report = (apiKeyId: string | null = "Key-A") => ({
   range: "all", surface: "all", since: null, summary: { requests: 0, totalTokens: 0 },
-  filter: { apiKeyId, provider: null, model: null, matched: false, comboOverlap: false },
+  filter: { apiKeyId, provider: null, model: null, matched: false, attemptOverlap: false },
 });
 
 test("exact trimmed key scope is encoded alongside existing filters and acknowledged unchanged", async () => {

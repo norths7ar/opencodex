@@ -63,20 +63,6 @@ describe("live Codex catalog Ultra Fast", () => {
       expect(row.opencodex_managed_ultrafast).toBeUndefined();
     }
   });
-
-  test("exact routed aliases receive the choice while combos and native/account rows keep their policy", () => {
-    const supported = model();
-    const combo = { ...supported, provider: "combo", id: "task-combo", alias: "friendly-combo", nativeAlias: true };
-    const entries = buildCatalogEntries(null, ["gpt-6.1-sol"], [
-      { ...supported, alias: "gateway/friendly" }, combo,
-    ], undefined, false, "default", new Set(["friendly-combo"]), ["main"]);
-    expect(entries.find(row => row.slug === "gateway/friendly")!.additional_speed_tiers).toEqual(["fast", "ultrafast"]);
-    for (const nativeSlug of ["friendly-combo", "gpt-6.1-sol", "main/gpt-6.1-sol"]) {
-      const row = entries.find(entry => entry.slug === nativeSlug)!;
-      expect(row).toBeDefined();
-      expect(row.opencodex_managed_ultrafast).toBeUndefined();
-    }
-  });
 });
 
 test("the real HTTP catalog repeatedly publishes only the declared routed tier", () => {
@@ -161,20 +147,6 @@ describe("declared Flex choice on routed models", () => {
     ];
     for (const candidate of candidates) {
       const row = build([candidate]).find(entry => entry.slug === slug)!;
-      expect(row.service_tiers?.some((tier: { id: string }) => tier.id === "flex") ?? false).toBe(false);
-      expect(row.additional_speed_tiers ?? []).not.toContain("flex");
-    }
-  });
-
-  test("a provider's declared Flex does not leak into unrelated native or combo rows", () => {
-    const declared = model({ fastWire: flexWire });
-    const combo = { ...declared, provider: "combo", id: "task-combo", alias: "friendly-combo", nativeAlias: true };
-    const rows = buildCatalogEntries(null, ["gpt-6.1-sol"], [declared, combo], undefined, false, "default",
-      new Set(["friendly-combo"]), ["main"]);
-    expect(rows.find(row => row.slug === slug)!.additional_speed_tiers).toContain("flex");
-    for (const id of ["friendly-combo", "gpt-6.1-sol", "main/gpt-6.1-sol"]) {
-      const row = rows.find(row => row.slug === id)!;
-      expect(row).toBeDefined();
       expect(row.service_tiers?.some((tier: { id: string }) => tier.id === "flex") ?? false).toBe(false);
       expect(row.additional_speed_tiers ?? []).not.toContain("flex");
     }

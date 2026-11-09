@@ -22,9 +22,8 @@ import { translatorAggregateCurrentBytesForTests } from "../../src/lib/translato
 import { configureSharedSpendLedger, spendPolicyFromConfig } from "../../src/lib/spend-reservation-ledger";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
 import { listWorkflowBudgetEvents, resetWorkflowBudgetsForTest, workflowBudgetSnapshot } from "../../src/lib/workflow-budget";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import * as proxyEnv from "../../src/lib/proxy-env";
-import { consumeComboFailure } from "../../src/server/responses/core-combo-failure";
+import { consumeRecoveryFailure } from "../../src/server/responses/recovery-failure";
 import { workflowRefusalResponse } from "../../src/server/workflow-refusal";
 
 let previousHome: string | undefined;
@@ -70,7 +69,6 @@ afterEach(async () => {
   resetProviderRequestPacingForTest();
   clearKeyCooldowns();
   resetWorkflowBudgetsForTest();
-  clearComboSelectionState(); clearComboTargetCooldowns();
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
   isolatedCodexHome?.restore();
@@ -138,82 +136,15 @@ function pinLoopbackUpstream() {
 }
 
 for (const enforced of [false, true]) for (const combo of [false, true]) {
-  test(`native Chat workflow admissions count each retry once (spend=${enforced}, combo=${combo})`, async () => {
-    let sends = 0, backupSends = 0;
-    activeUpstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch(req) {
-      sends++;
-      if (new URL(req.url).pathname.startsWith("/backup/")) backupSends++;
-      return Response.json({ error: { message: "temporary fixture refusal" } }, { status: 503, headers: { "retry-after": "0" } });
-    } });
-    const transport = pinLoopbackUpstream();
-    try {
-      const config = mockConfig(new URL("/v1", activeUpstream.url).href, { transientRetryOn5xx: { attempts: 3 }, liveModels: false, models: ["test-model"] });
-      config.workflowBudget = { maxPhysicalSends: 2 };
-      if (enforced) config.spend = { pool: { maxTokens: 100_000 } };
-      if (combo) {
-        config.protocols = { rollout: { nativeChatCombos: true } };
-        config.providers.backup = { ...config.providers.mock!, baseUrl: new URL("/backup/v1", activeUpstream.url).href };
-        config.combos = { fixture: { strategy: "failover", targets: [{ provider: "mock", model: "test-model" }, { provider: "backup", model: "test-model" }] } };
-      }
-      saveConfig(config);
-      activeServer = startServer(0);
-      const response = await transport.fetch(new URL("/v1/chat/completions", activeServer.url), {
-        method: "POST", headers: { "content-type": "application/json", "x-codex-parent-thread-id": "native-count-root" },
-        body: JSON.stringify({ model: combo ? "combo/fixture" : "mock/test-model", messages: [{ role: "user", content: "fixture" }], max_tokens: 1 }),
-      });
-      const body = await response.json();
-      expect(sends).toBe(2);
-      expect(backupSends).toBe(0);
-      expect(workflowBudgetSnapshot("native-count-root")?.sends).toBe(2);
-      expect(listWorkflowBudgetEvents().filter(event => event.reason === "workflow-sends-exhausted")).toHaveLength(1);
-      expect(response.status).toBe(429);
-      expect(response.headers.get("x-opencodex-local-refusal")).toBe("workflow_sends_exhausted");
-      expect(body.error.code).toBe("rate_limit_exceeded");
-      expect(body.error.message).toContain("no additional provider request was sent");
-      expect(body.error.message).not.toContain("no provider was contacted");
-      if (combo) expect(getRequestLogEntries().findLast(row => row.inboundProtocol === "chat")?.protocolTrace?.attempts?.[0]?.requestPath)
-        .toEqual(["chat", "chat"]);
-    } finally { transport.restore(); }
-  }, 10_000);
 }
 
-for (const enforced of [false, true]) test(`native Chat combo still fails over after a genuine upstream 429 (spend=${enforced})`, async () => {
-  const paths: string[] = [];
-  activeUpstream = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch(req) {
-    const path = new URL(req.url).pathname;
-    paths.push(path);
-    if (!path.startsWith("/backup/")) return Response.json({ error: { type: "rate_limit_error", message: "fixture upstream rate limit" } },
-      { status: 429, headers: { "retry-after": "0", "x-opencodex-local-refusal": "workflow_sends_exhausted" } });
-    return Response.json({ id: "chat_fixture", object: "chat.completion", model: "test-model",
-      choices: [{ index: 0, message: { role: "assistant", content: "backup fixture" }, finish_reason: "stop" }],
-      usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } });
-  } });
-  const transport = pinLoopbackUpstream();
-  try {
-    const config = mockConfig(new URL("/v1", activeUpstream.url).href, { liveModels: false, models: ["test-model"] });
-    config.providers.backup = { ...config.providers.mock!, baseUrl: new URL("/backup/v1", activeUpstream.url).href };
-    config.protocols = { rollout: { nativeChatCombos: true } };
-    config.workflowBudget = { maxPhysicalSends: 3 };
-    if (enforced) config.spend = { pool: { maxTokens: 100_000 } };
-    config.combos = { fixture: { strategy: "failover", targets: [{ provider: "mock", model: "test-model" }, { provider: "backup", model: "test-model" }] } };
-    saveConfig(config); activeServer = startServer(0);
-    const response = await transport.fetch(new URL("/v1/chat/completions", activeServer.url), {
-      method: "POST", headers: { "content-type": "application/json", "x-codex-parent-thread-id": "genuine-rate-root" },
-      body: JSON.stringify({ model: "combo/fixture", messages: [{ role: "user", content: "fixture" }], max_tokens: 1 }),
-    });
-    expect(response.status).toBe(200);
-    expect(await response.text()).toContain("backup fixture");
-    expect(response.headers.has("x-opencodex-local-refusal")).toBe(false);
-    expect(paths).toEqual(["/v1/chat/completions", "/backup/v1/chat/completions"]);
-    expect(workflowBudgetSnapshot("genuine-rate-root")?.sends).toBe(2);
-  } finally { transport.restore(); }
-});
+for (const enforced of [false, true])
 
 for (const local of [false, true]) test(`workflow refusal projection requires local provenance (local=${local})`, async () => {
   const response = local ? workflowRefusalResponse("workflow-sends-exhausted")
     : Response.json({ error: { code: "rate_limit_exceeded", message: "fixture provider rate limit" } },
       { status: 429, headers: { "x-opencodex-local-refusal": "workflow_sends_exhausted" } });
-  const failure = await consumeComboFailure(response);
+  const failure = await consumeRecoveryFailure(response);
   expect(failure.response.headers.get("x-opencodex-local-refusal")).toBe(local ? "workflow_sends_exhausted" : null);
   expect(failure.nonReplayable === true).toBe(local);
 });

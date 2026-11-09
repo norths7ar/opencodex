@@ -11,10 +11,6 @@ import { recordOwnedConfigPath } from "../lib/config-ownership";
 import { sanitizeLogMetadataString } from "../lib/redact";
 import { usageDisplayTotalTokens } from "./totals";
 import { normalizeRecordedClient, type UsageClient } from "./client";
-import {
-  normalizePersistedJevDecision,
-  type PersistedJevDecisionV1,
-} from "./jev-stats";
 import { normalizeAttemptDeliverySummary } from "./attempt-delivery";
 import {
   isRequestCloseReason,
@@ -180,8 +176,6 @@ export interface PersistedUsageAttempt {
    * existed, where `classifyCacheTelemetryProvenance` reconstructs the pre-existing reading.
    */
   cacheProvenance?: CacheTelemetryProvenance;
-  /** Installation-local exact Compatibility Lab route-subject digest for this attempt. */
-  labRouteSubjectId?: string;
   /** Target-specific reasoning intent and exact adapter-normalized wire parameter. */
   requestedEffort?: string;
   effectiveEffort?: string;
@@ -411,8 +405,6 @@ export interface PersistedUsageEntry {
    * contains prompts, credentials, or hidden reasoning.
    */
   routeDecision?: RouteDecisionTraceV1;
-  /** Privacy-bounded JEV selection metadata; model usage remains in attempts[]. */
-  jevDecision?: PersistedJevDecisionV1;
   /** Closed Claude protocol codes only; absent on older rows. */
   claudeCompatibility?: PersistedClaudeCompatibilityLog;
   /**
@@ -632,10 +624,6 @@ const FAST_DOWNGRADE_REASONS = new Set<NonNullable<AttemptTierOutcome["fastDowng
   "route-unsupported", "wire-unavailable", "response-declined",
 ]);
 
-export function isLabRouteSubjectId(value: unknown): value is string {
-  return typeof value === "string" && LAB_ROUTE_SUBJECT_ID_RE.test(value);
-}
-
 function isNonNegativeFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;
 }
@@ -802,9 +790,6 @@ function normalizeUsageAttempt(raw: unknown): PersistedUsageAttempt | null {
     ...(attemptErrorCode ? { errorCode: attemptErrorCode } : {}),
     ...(isKnownCacheTelemetryProvenance(attempt.cacheProvenance)
       ? { cacheProvenance: attempt.cacheProvenance }
-      : {}),
-    ...(isLabRouteSubjectId(attempt.labRouteSubjectId)
-      ? { labRouteSubjectId: attempt.labRouteSubjectId }
       : {}),
     ...(typeof attempt.requestedEffort === "string" && attempt.requestedEffort
       ? { requestedEffort: capMetadataString(attempt.requestedEffort) }
@@ -1033,7 +1018,6 @@ function normalizeUsageEntry(entry: PersistedUsageEntry): PersistedUsageEntry {
   const routeDecision = entry.routeDecision
     ? normalizeRouteDecisionTrace(entry.routeDecision)
     : undefined;
-  const jevDecision = normalizePersistedJevDecision(entry.jevDecision);
   const spend = normalizeRequestSpend(entry.spend);
   const protocolTrace = parseProtocolTraceV1(entry.protocolTrace);
   const normalized: PersistedUsageEntry = {
@@ -1131,7 +1115,6 @@ function normalizeUsageEntry(entry: PersistedUsageEntry): PersistedUsageEntry {
     ...(isRequestTerminalStatus(entry.terminalStatus) ? { terminalStatus: entry.terminalStatus } : {}),
     ...(isRequestCloseReason(entry.closeReason) ? { closeReason: entry.closeReason } : {}),
     ...(routeDecision ? { routeDecision } : {}),
-    ...(jevDecision ? { jevDecision } : {}),
     ...(claudeCompatibility ? { claudeCompatibility } : {}),
     ...(protocolTrace ? { protocolTrace } : {}),
     ...normalizeRequestFailureAttribution(entry),

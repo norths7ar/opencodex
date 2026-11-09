@@ -63,25 +63,6 @@ describe("client export model names", () => {
     }
   });
 
-  test("provider namespace ambiguity and combo-key collisions preserve the full roster", async () => {
-    const config = namingConfig();
-    const build = async () => {
-      const models = await namingModels(config);
-      const ctx = { baseUrl: "http://127.0.0.1:10100/v1", models, config, modelNames: "alias" as const };
-      return buildClientConfig("hermes", ctx);
-    };
-    config.providers.beta!.alias = "AC";
-    expect(exportedKeys("hermes", await build())).toContain("acme/vendor-model-x");
-    delete config.providers.beta!.alias;
-    config.combos!["AC-combo"]!.alias = "AC/AC-model-x";
-    const models = await namingModels(config);
-    const ctx = { baseUrl: "http://127.0.0.1:10100/v1", models, config, modelNames: "alias" as const };
-    const keys = exportedKeys("hermes", buildClientConfig("hermes", ctx));
-    expect(keys).toHaveLength(5);
-    expect(keys).toContain("acme/vendor-model-x");
-    expect(keys).toContain("AC/AC-model-x");
-  });
-
   test("builtin aliases, unsafe provider namespaces, preference changes and metadata stay scoped", async () => {
     const config = namingConfig();
     config.defaultModelAliases = true;
@@ -131,33 +112,6 @@ describe("client export model names", () => {
       expect(keys).toHaveLength(5);
       const route = previewRouteModel(config, "AC/pick");
       expect([route.providerName, route.modelId]).toEqual(["acme", "model-y:free"]);
-    });
-
-    test(`${client}: registry namespace effort-suffix alias falls back before ingress can select another model`, async () => {
-      const config = namingConfig();
-      config.fastRows = false;
-      config.cursorEffortRows = true;
-      config.defaultProvider = "google-antigravity";
-      config.combos = {};
-      config.providers = {
-        "google-antigravity": { adapter: "google", baseUrl: "https://example.invalid", liveModels: false,
-          models: ["gemini-3.8-pro", "gemini-3.8-flash"],
-          modelAliases: { "gemini-3.8-pro": "pick--high", "gemini-3.8-flash": "pick" } },
-      };
-      const direct = previewRouteModel(config, "agy/pick--high");
-      expect(direct.modelId).toBe("gemini-3.8-pro");
-      const parsed = parseSyntheticRowId("agy/pick--high", config);
-      expect(parsed.effortRow?.baseId).toBe("agy/pick");
-      expect(previewRouteModel(config, parsed.effortRow!.baseId).modelId).toBe("gemini-3.8-flash");
-      const models = await loadExportModels(config, [
-        { provider: "google-antigravity", id: "gemini-3.8-pro" },
-        { provider: "google-antigravity", id: "gemini-3.8-flash" },
-      ]);
-      const ctx = { baseUrl: "http://127.0.0.1:10100/v1", config, models, modelNames: "alias" as const };
-      const keys = exportedKeys(client, buildClientConfig(client, ctx));
-      expect(keys).toContain("google-antigravity/gemini-3.8-pro");
-      expect(keys).not.toContain("agy/pick--high");
-      expect(keys).toContain("agy/pick");
     });
   }
 });

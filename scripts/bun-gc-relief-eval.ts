@@ -13,7 +13,7 @@
  * Arms: control (matched idle wait) vs gc (SIGUSR2 to the child, which runs
  * Bun.gc(true) in-process and reports {type:"gc",at,durationMs} on stdout).
  *
- * This orchestrator reuses macos-rss-retention-harness-child.ts (the real
+ * This orchestrator reuses rss-retention-harness-child.ts (the real
  * startServer proxy) and an inline SSE fixture upstream. It is NOT the locked
  * 7h retention protocol; runs are short and labeled. Smoke mode
  * (OCX_GC_EVAL_SMOKE=1) shortens durations for pipeline verification only.
@@ -121,7 +121,7 @@ async function startChild(upstreamUrl: string, dir: string): Promise<ChildHandle
   mkdirSync(codexHome, { recursive: true });
   const child = Bun.spawn([
     process.execPath,
-    join(import.meta.dir, "macos-rss-retention-harness-child.ts"),
+    join(import.meta.dir, "rss-retention-harness-child.ts"),
     home,
     codexHome,
     upstreamUrl,

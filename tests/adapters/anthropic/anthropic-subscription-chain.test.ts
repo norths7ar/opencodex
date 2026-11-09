@@ -49,8 +49,6 @@ const { saveCredential, getAccountSet, setActiveAccount } = await import("../../
 const {
   clearAnthropicAccountPoolState, forgetAnthropicFailoverQuorum,
 } = await import("../../../src/oauth/anthropic-routing");
-const { clearComboSelectionState } = await import("../../../src/combos/resolve");
-const { clearComboTargetCooldowns } = await import("../../../src/combos/failover");
 const { clearGenericFailoverHealth } = await import("../../../src/oauth/generic-account-failover");
 const { clearAccountQuotaCache } = await import("../../../src/providers/quota");
 
@@ -111,7 +109,7 @@ function config(options: { combo?: boolean; allowMetered?: boolean } = {}): OcxC
     apiKeys: [{
       id: ISSUED_KEY_ID, name: "issued", key: "ocx_data_issued_key_for_chain_test", createdAt: "2026-10-09T00:00:00.000Z",
       allowedModels: [MODEL],
-      ...(options.allowMetered ? { allowMeteredComboTargets: true } : {}),
+      ...(options.allowMetered ? { } : {}),
     }],
     ...(options.combo === false ? {} : {
       combos: {
@@ -170,15 +168,13 @@ beforeEach(async () => {
   await setActiveAccount("anthropic", getAccountSet("anthropic")!.accounts[0]!.id);
   await saveCredential("cursor", { access: "cursor-access", refresh: "cursor-refresh", expires: Date.now() + 3_600_000, accountId: "cursor-account" });
   sent = []; cursorModels = []; cursorEfforts = [];
-  subscriptionSpent = false; cursorLimited = false; apiKeyLimited = false;
-  clearComboSelectionState(); clearComboTargetCooldowns(); clearAnthropicAccountPoolState();
+  subscriptionSpent = false; cursorLimited = false; apiKeyLimited = false; clearAnthropicAccountPoolState();
   forgetAnthropicFailoverQuorum(); clearGenericFailoverHealth(); clearAccountQuotaCache();
 });
 
 afterEach(() => {
   releaseSpendHome?.();
-  releaseSpendHome = undefined;
-  clearComboSelectionState(); clearComboTargetCooldowns(); clearAnthropicAccountPoolState();
+  releaseSpendHome = undefined; clearAnthropicAccountPoolState();
   forgetAnthropicFailoverQuorum(); clearGenericFailoverHealth(); clearAccountQuotaCache();
   if (originalHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = originalHome;
@@ -250,17 +246,6 @@ test("an issued key that opts in may reach the metered target", async () => {
   expect(sent.filter(entry => entry.lane === "api-key")).toHaveLength(1);
 });
 
-test("buffered combo preflight preserves Cursor's structured rate-limit status", async () => {
-  cursorLimited = true;
-  const cfg = config();
-  const combo = cfg.combos?.["claude-chain"];
-  if (!combo) throw new Error("Missing fixture combo");
-  combo.targets = [{ provider: "cursor", model: MODEL }];
-  const response = await chat(cfg);
-  expect(response.status).toBe(429);
-  expect(JSON.parse(response.text).error.code).toBe("rate_limit_exceeded");
-});
-
 for (const admission of [LOOPBACK, { kind: "environment", source: "bearer" } as const]) {
   test(`${admission.kind} admission cannot spend on a metered fallback without configured-key consent`, async () => {
     subscriptionSpent = true;
@@ -280,16 +265,6 @@ test("metered consent does not bypass destination model scope", async () => {
   expect(sent.filter(entry => entry.lane === "api-key")).toHaveLength(0);
 });
 
-
-test("streaming combo preflight preserves Cursor's structured rate-limit status", async () => {
-  cursorLimited = true;
-  const cfg = config();
-  cfg.combos!["claude-chain"]!.targets = [{ provider: "cursor", model: MODEL }];
-  const response = await chat(cfg, LOOPBACK, true);
-  expect(response.status).toBe(429);
-  expect(JSON.parse(response.text).error.code).toBe("rate_limit_exceeded");
-});
-
 for (const stream of [false, true]) {
   test(`loopback operator opt-in reaches the API key after subscription exhaustion (stream=${stream})`, async () => {
     subscriptionSpent = true;
@@ -301,15 +276,3 @@ for (const stream of [false, true]) {
     expect(sent.filter(entry => entry.lane === "api-key")).toHaveLength(1);
   });
 }
-
-test("public listener plus combo opt-in still refuses the metered fallback for local and unconsented keyed callers", async () => {
-  subscriptionSpent = true;
-  cursorLimited = true;
-  const cfg = config();
-  cfg.hostname = "0.0.0.0";
-  cfg.combos!["claude-chain"]!.allowMeteredTargets = true;
-  for (const admission of [LOOPBACK, ISSUED]) {
-    expect((await chat(cfg, admission)).status).toBe(429);
-    expect(sent.filter(entry => entry.lane === "api-key")).toHaveLength(0);
-  }
-});

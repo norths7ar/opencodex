@@ -35,7 +35,7 @@ const { createCodexCliUpdatePlan } = await import("../../src/codex/cli-update-pl
 const gate = await import("../../src/codex/cli-update-selection-gate");
 const { CodexRemoteWorkspaceRuntimeFactory, RemoteWorkspaceCoordinator } = await import("../../src/remote-control");
 const { restartCodexDesktopApp } = await import("../../src/codex/desktop-app-restart");
-const { linuxDesktopAppAdapter } = await import("../../src/codex/desktop-app/linux");
+const { windowsDesktopAppAdapter } = await import("../../src/codex/desktop-app/windows");
 
 // Model POSIX directory ownership only; actual paths, identities and operations
 // remain native. No Windows installation or real Codex child is permitted.
@@ -120,7 +120,7 @@ async function refusedCallers() {
     .rejects.toThrow("codex_cli_selection_busy");
   expect(spawn).toHaveBeenCalledTimes(0);
   let discoveries = 0;
-  const restart = restartCodexDesktopApp({ platform: "linux", execFile: () => { discoveries++; return null; },
+  const restart = restartCodexDesktopApp({ platform: "win32", execFile: () => { discoveries++; return null; },
     lock: { lockPath: join(root, "restart.lock") } });
   expect(restart.reason).toBe("selection_mutation_busy");
   expect(discoveries).toBe(0);
@@ -163,7 +163,7 @@ try {
       } catch (error) { remoteFailure = (error as Error).message; }
       let discoveries = 0;
       const restarted = restartCodexDesktopApp({ platform: "linux", execFile: () => null,
-        adapter: { ...linuxDesktopAppAdapter, discover: () => { discoveries++; return null; } },
+        adapter: { ...windowsDesktopAppAdapter, discover: () => { discoveries++; return null; } },
         lock: { lockPath: join(root, "restart.lock") } });
       expect({ remoteFailure, desktopReason: restarted.reason }).toEqual({
         remoteFailure: "unexpected_owned_spawn", desktopReason: "package_discovery_failed" });

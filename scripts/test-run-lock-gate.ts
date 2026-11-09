@@ -41,13 +41,7 @@ function openGate(lockPath: string): { db: Database; identity: { dev: number | b
   // without silently accepting a junction/symlink anywhere in its ancestry.
   for (let ancestor = requestedParent;; ancestor = dirname(ancestor)) {
     const entry = lstatSync(ancestor);
-    if (entry.isSymbolicLink()) {
-      // macOS exposes its OS-owned temp hierarchy through these system aliases.
-      const systemAlias = process.platform === "darwin" && (ancestor === "/var" || ancestor === "/tmp")
-        && entry.uid === 0 && realpathSync.native(ancestor) === `/private${ancestor}`
-        && lstatSync(`/private${ancestor}`).uid === 0;
-      if (!systemAlias) refuse();
-    }
+    if (entry.isSymbolicLink()) refuse();
     if (dirname(ancestor) === ancestor) break;
   }
   const parent = realpathSync.native(requestedParent);

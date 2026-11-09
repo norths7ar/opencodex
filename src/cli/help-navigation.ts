@@ -8,7 +8,7 @@ const ACTION_GROUPS = [
 
 const FAMILY_GROUPS = [
   ["provider", "account", "models", "alias"],
-  ["combo", "route", "agent", "effort"],
+  ["route", "agent", "effort"],
   ["observe", "inspect", "access", "api"],
   ["config", "system", "integration"],
 ] as const;

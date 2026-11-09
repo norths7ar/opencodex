@@ -1,13 +1,11 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { clearCodexAccountPin } from "../codex/account-priority";
 import { getConfigPath, mutatePersistedConfig, readConfigDiagnostics, sanitizeModelCostsForDisplay, saveConfig, validateConfigCandidate, withConfigMutationLockSync } from "../config";
-import { readClientConnectionState } from "../client/state";
 import { getConfigDir, withConfigDirHardeningSettled } from "../config/paths";
 import { readCliConfigForMutation } from "./config-mutation";
 import { VISION_REASONING_EFFORTS, isVisionReasoningEffort } from "../reasoning-effort";
 import type { OcxConfig } from "../types";
 import { normalizeVisionReasoningForModel } from "../vision/reasoning";
-import type { ServiceApiTokenState } from "../lib/service-secrets";
 import { redactUrlForLog } from "../lib/redact";
 import { CliUsageError, printData, rejectArgs, runCliAction, takeFlag } from "./runtime-api";
 
@@ -32,78 +30,6 @@ const USAGE = `Usage:
 const SECRET_KEYS = /^(apiKey|key|accessToken|refreshToken|idToken|token|password|clientSecret|webhookUrl)$/i;
 const BLOCKED_SEGMENTS = new Set(["__proto__", "prototype", "constructor"]);
 
-/**
- * The synthetic `_remoteHub` note printed by `ocx config show` on a client (#4236).
- *
- * `runtimeRole: "client"` and the `client` block were already printed, and were already ignored:
- * an agent read a client's `config.json`, saw an empty `providers` map and no grok, and concluded
- * the hub could not serve grok. Naming the situation in the config output costs one key.
- *
- * `connected` is OBSERVED, never assumed. It was briefly hardcoded `true` for any config with a
- * `client` block, which is the same defect in miniature: the presence of configuration is not
- * evidence that the connection works, and a machine whose data-plane token was revoked, rotated
- * away or deleted would have been labelled `connected: true` while it could not reach the hub at
- * all. The read-only projection compares the bounded token file's fingerprint against the
- * connection record, and passes that answer in so this formatter stays pure and testable.
- *
- * Synthetic and NOT persisted, for two reasons. `clientConnectionSchema` is `.strict()`, so a
- * `client.note` field would not validate; and persisted prose drifts from the behaviour it
- * describes. The leading underscore marks it as an annotation rather than a setting, and
- * `config export` emits the real config untouched so round-trips still validate.
- */
-export function remoteHubConfigNote(
-  config: OcxConfig,
-  readConnection: () => RemoteHubConnectionObservation,
-): { connected: boolean; origin: string; note: string } | null {
-  if (config.runtimeRole !== "client" || !config.client) return null;
-  // A thunk, so a standalone or hub install pays nothing: the guard above returns first and the
-  // connection probe (three file reads) never runs.
-  const connection = readConnection();
-  // Both halves are required: a settled connection record AND the token it recorded. Either one
-  // alone describes a machine that cannot read its hub, and `ocx status` is still the command
-  // that has the facts — so the note points there in every case, connected or not.
-  const connected = connection.state === "connected" && connection.token === "owned";
-  const link = config.client.transport === "link";
-  const note = connection.state !== "connected"
-    ? `this machine is configured as a client but its connection is ${connection.state}${connection.reason ? ` (${connection.reason})` : ""}; run ocx connect status`
-    : connection.token !== "owned"
-      ? `this machine is configured as a client but its ${link ? "Remote Link key" : "hub data-plane token"} is ${connection.token}; run ocx connect status`
-      : link
-        ? "this machine is a Remote Link Child: provider credentials, model availability and the Codex settings OpenCodex writes come from its Home; the settings in this file are local and inactive while linked; run ocx status"
-        : "provider credentials and model availability live on the hub; run ocx status";
-  return { connected, origin: config.client.serverUrl, note };
-}
-
-export type RemoteHubConnectionObservation = {
-  state: "disconnected" | "connected" | "invalid" | "mismatched";
-  reason?: string;
-  token: "owned" | "missing" | "changed" | "unsafe";
-};
-
-export function remoteHubConnectionFromTokenState(
-  config: Pick<OcxConfig, "client">,
-  tokenState: ServiceApiTokenState,
-): RemoteHubConnectionObservation {
-  const token = tokenState.kind === "absent"
-    ? "missing"
-    : tokenState.kind === "unsafe"
-      ? "unsafe"
-      : tokenState.fingerprint === config.client?.tokenFingerprint ? "owned" : "changed";
-  return { state: "connected", token };
-}
-
-async function readRemoteHubConfigNote(config: OcxConfig): Promise<ReturnType<typeof remoteHubConfigNote>> {
-  if (config.runtimeRole !== "client" || !config.client) return null;
-  // This display command needs only connection ownership, not lifecycle recovery, catalog
-  // readiness, or any write-capable connect machinery. Keep the read on the bounded token
-  // observer so a cold `config show` never imports the full connect command graph.
-  const { readServiceApiTokenState } = await import("../lib/service-secrets");
-  return remoteHubConfigNote(
-    config,
-    () => remoteHubConnectionFromTokenState(config, readServiceApiTokenState()),
-  );
-}
-
 function redact(value: unknown, key = ""): unknown {
   if (key === "proxy" && typeof value === "string") {
     // "direct" and credential-less proxy URLs carry no secret and stay readable; only a
@@ -119,13 +45,6 @@ function redact(value: unknown, key = ""): unknown {
     }
   }
   if (SECRET_KEYS.test(key) && typeof value === "string") return value ? "********" : value;
-  // `client.priorCatalog` is the base64 catalog snapshot connect took before overwriting the
-  // local one — up to 64 MB of it (src/config.ts). Printed in full it buried `runtimeRole` and
-  // the `client` block under a wall of base64, which is how a reader came to miss that this
-  // machine is a client at all. Size only, mirroring sanitizeModelCostsForDisplay.
-  if (key === "priorCatalog" && typeof value === "string") {
-    return value ? `<omitted: ${Buffer.byteLength(value)} bytes>` : value;
-  }
   // modelCosts rows are keyed by model id; a pasted API key in a key position
   // must not be echoed back by config show/get (values are already redacted).
   if (key === "modelCosts") return sanitizeModelCostsForDisplay(value);
@@ -226,13 +145,7 @@ export async function handleConfigCommand(argv: string[]): Promise<number> {
         console.error(`Warning: Config at ${getConfigPath()} is invalid or unreadable; defaults are being shown for invalid settings. Run: ocx config validate. Inspect: ocx config show --source.`);
         if (!source) outcome = 1;
       }
-      const redacted = redact(diagnostics.config);
-      const note = await readRemoteHubConfigNote(diagnostics.config);
-      // First key, not last: it has to be read before the empty `providers` map that misled a
-      // reader into concluding nothing was configured anywhere.
-      const config = note && redacted && typeof redacted === "object" && !Array.isArray(redacted)
-        ? { _remoteHub: note, ...redacted as Record<string, unknown> }
-        : redacted;
+      const config = redact(diagnostics.config);
       const result = source ? { config, source: diagnostics.source, error: diagnostics.error, warnings: diagnostics.warnings ?? [] } : config;
       printData(result, true);
       return;
@@ -241,7 +154,6 @@ export async function handleConfigCommand(argv: string[]): Promise<number> {
       const path = args.shift();
       if (!path) throw new CliUsageError("config path is required", USAGE);
       rejectArgs(args, USAGE);
-      await (await import("./link-child")).printLinkChildLocalNotice("The values");
       const diagnostics = readConfigDiagnostics();
       if (diagnostics.source === "fallback" || diagnostics.error) {
         console.error(`Warning: Config at ${getConfigPath()} is invalid or unreadable; defaults are being shown for invalid settings. Run: ocx config validate. Inspect: ocx config show --source.`);
@@ -253,7 +165,6 @@ export async function handleConfigCommand(argv: string[]): Promise<number> {
       return;
     }
     if (action === "set" || action === "unset") {
-      await (await import("./link-child")).printLinkChildLocalWriteNotice();
       const path = args.shift();
       const raw = action === "set" ? args.shift() : undefined;
       if (!path || (action === "set" && raw === undefined)) throw new CliUsageError(action === "unset" ? "config path is required" : "config path and value are required", USAGE);
@@ -324,7 +235,6 @@ export async function handleConfigCommand(argv: string[]): Promise<number> {
       return;
     }
     if (action === "import") {
-      await (await import("./link-child")).printLinkChildLocalWriteNotice();
       const path = args.shift();
       const yes = takeFlag(args, "--yes");
       if (!path) throw new CliUsageError("import path is required", USAGE);
@@ -334,11 +244,6 @@ export async function handleConfigCommand(argv: string[]): Promise<number> {
         readCliConfigForMutation();
         const imported = validate(loadInput(path));
         withConfigMutationLockSync(() => {
-          const client = readClientConnectionState();
-          if (client.kind === "connected" && (imported.runtimeRole !== "client"
-            || JSON.stringify(imported.client) !== JSON.stringify(client.value))) {
-            throw new Error("config import refused: disconnect the active client before replacing its connection");
-          }
           saveConfig(imported);
         });
       });

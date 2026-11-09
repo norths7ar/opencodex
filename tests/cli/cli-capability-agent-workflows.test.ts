@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { AGENT_ROUTING_CAPABILITIES } from "../../src/cli/capabilities-agents-routing";
 import { handleAgentCommand } from "../../src/cli/agent";
-import { handleComboCommand } from "../../src/cli/combo";
 import { handleEffortCommand } from "../../src/cli/effort";
 import { handleRoutePolicyCommand } from "../../src/cli/route-policy";
 import { cmdV2 } from "../../src/cli/v2";
@@ -120,30 +119,6 @@ describe("declared agent and routing workflows", () => {
     expect(saved.effortCap).toBeUndefined(); expect(saved.subagentEffortCap).toBeUndefined();
     expect(saved.injectionEffort).toBe("minimal");
     expect(JSON.parse(String(output.mock.calls[0][0])).source).toBe("config");
-  });
-
-  test("combo set reads the collection and sends independent target/rename fields", async () => {
-    const { requests, deps } = runtime(request => {
-      if (request.method === "GET") return { combos: [] };
-      const body = request.body as { id: string; combo: Record<string, unknown> };
-      return { success: true, id: body.id, model: `combo/${body.id}`, combo: body.combo,
-        catalogRefresh: { status: "committed", changed: true, degraded: false, notices: [] } };
-    });
-    expect(leaf("combo set").usage).toContain("--rename-from <id>");
-    expect(await handleComboCommand(["set", "new", "--targets", "demo/a:2,demo/b", "--strategy", "round-robin", "--sticky", "3", "--rename-from", "old", "--json"], deps)).toBe(0);
-    expect(requests).toEqual([
-      { path: "/api/combos", method: "GET", body: null },
-      { path: "/api/combos", method: "PUT", body: { id: "new", renameFrom: "old", combo: { strategy: "round-robin", stickyLimit: 3, targets: [{ provider: "demo", model: "a", weight: 2 }, { provider: "demo", model: "b" }] } } },
-    ]);
-    expect(leaf("combo set").routes).toEqual([{ method: "GET", path: "/api/combos" }, { method: "PUT", path: "/api/combos" }]);
-  });
-
-  test("combo remove refuses without confirmation before sending any DELETE", async () => {
-    const { requests, deps } = runtime();
-    expect(leaf("combo remove").flags.find(f => f.name === "--yes")?.required).toBe(true);
-    expect(await handleComboCommand(["remove", "fixture", "--json"], deps)).toBe(2);
-    expect(requests).toEqual([]);
-    expect(errors.mock.calls.flat().join(" ")).toContain("requires --yes");
   });
 
   test.each(["dry-run", "evaluate"])("route policy %s preserves exact evidence and marks possible Lab activation", async verb => {

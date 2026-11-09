@@ -28,8 +28,6 @@ import {
 } from "../claude/desktop-first-party";
 import {
   claudeDesktopIntegrationEnabled,
-  grokIntegrationEnabled,
-  HUB_GATED_SKIP_MESSAGE,
   shouldSyncGrokOnStart,
 } from "../codex/desired-state";
 import type { OcxConfig } from "../types";
@@ -107,14 +105,6 @@ export async function ensureGrokFenceMatchesDesired(
   const { log, error } = io(deps);
   if (siblingOfLivePort() !== null) {
     log(`   ${siblingSkipMessage()} ~/.grok/config.toml was left exactly as it is.`);
-    return;
-  }
-  // A hub-gated skip is NOT "the user turned Grok off" (#4236). Stripping the managed block
-  // there deleted a fence the operator still wants — and `ocx ensure` reported it as the
-  // Grok toggle doing its job. Only an explicit OFF authorizes the strip; the gate just
-  // declines to write, and says which key would let it.
-  if (!shouldSyncGrokOnStart(config) && grokIntegrationEnabled(config)) {
-    log(`   ${HUB_GATED_SKIP_MESSAGE} ~/.grok/config.toml was left exactly as it is.`);
     return;
   }
   if (!shouldSyncGrokOnStart(config)) {

@@ -370,29 +370,4 @@ describe("append-only tools at the actual Messages HTTP boundary", () => {
     expect(captured).toHaveLength(1);
     expect(captured[0].tools.map((t: any) => t.function.name)).toEqual(["ToolSearch", "lookup"]);
   });
-
-  test("a selected combo route keeps the original catalog even when its target is Responses", async () => {
-    const captured: any[] = [];
-    globalThis.fetch = (async (_url: RequestInfo | URL, init?: RequestInit) => {
-      captured.push(JSON.parse(String(init?.body)));
-      return Response.json({ id: "resp_combo", object: "response", status: "completed",
-        output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "ok" }] }],
-        usage: { input_tokens: 20, output_tokens: 5, total_tokens: 25 } });
-    }) as typeof fetch;
-    const config = {
-      ...configBase,
-      combos: { pick: { strategy: "failover", targets: [{ provider: "gateway", model: "gpt-test" }] } },
-      claudeCode: { appendOnlyToolLoadingModels: ["combo/pick", "gateway/gpt-test"] },
-    } as unknown as OcxConfig;
-    const raw = { ...request(["lookup"], search("call_search", ["lookup"])), model: "combo/pick" };
-    const response = await handleClaudeMessages(new Request("http://localhost/v1/messages", {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ...raw, stream: false }),
-    }), config, { model: "", provider: "" });
-    await response.text();
-    expect(response.status).toBe(200);
-    expect(captured).toHaveLength(1);
-    expect(captured[0].tools.map((t: any) => t.name)).toEqual(["ToolSearch", "lookup"]);
-    expect(captured[0].input.some((x: any) => x.type === "additional_tools")).toBe(false);
-  });
 });

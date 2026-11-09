@@ -20,15 +20,6 @@ import { neutralizeIdentity } from "../../adapters/identity";
 import { filterCursorConfiguredModelsByLiveDiscovery } from "../../adapters/cursor/discovery";
 import { fetchCursorUsableModels } from "../../adapters/cursor/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
-import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  isNativeAliasCombo,
-  listComboIds,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
 import { providerDestinationResolvedError } from "../../lib/destination-policy";
 import { redactSecretString } from "../../lib/redact";
 import { pinnedNativeModelRows } from "./pinned-models";
@@ -105,26 +96,14 @@ export const DOCUMENTED_NATIVE_OPENAI_ADDITIONS = [
   NATIVE_GPT61_TERRA_MODEL,
 ];
 
-export function configuredNativeAliasSlugs(
-  config: Pick<OcxConfig, "combos">,
-): Set<string> {
-  const aliases = new Set<string>();
-  for (const raw of Object.values(config.combos ?? {})) {
-    if (!isNativeAliasCombo(raw)) continue;
-    const alias = raw.alias!.trim();
-    if (SUPPORTED_NATIVE_OPENAI_SLUGS.has(alias)) aliases.add(alias);
-  }
-  return aliases;
-}
-
 /**
  * Bare native rows omitted by native-alias compatibility or explicit native-omission opt-in.
  * Codex Desktop's remote allowlist can ignore `visibility: "hide"`.
  */
 export function desktopAllowlistSuppressedNativeSlugs(
-  config: Pick<OcxConfig, "combos" | "disabledModels" | "omitDisabledNativeModels">,
+  config: Pick<OcxConfig, "disabledModels" | "omitDisabledNativeModels">,
 ): Set<string> {
-  const suppressed = configuredNativeAliasSlugs(config);
+  const suppressed = new Set<string>();
   if (suppressed.size === 0 && config.omitDisabledNativeModels !== true) return suppressed;
   const disabled = disabledNativeSlugs(config);
   for (const slug of NATIVE_OPENAI_MODELS) {
@@ -460,20 +439,13 @@ export function nativeParallelToolCalls(slug: string): boolean {
     || false;
 }
 
-export function hasComboTargets(config: { combos?: Record<string, { targets?: unknown[] }> }): boolean {
-  const combos = config.combos;
-  if (!combos) return false;
-  return Object.values(combos).some(c => Array.isArray(c?.targets) && c!.targets!.length > 0);
-}
-
 export function disabledNativeSlugs(config: Pick<OcxConfig, "disabledModels">): Set<string> {
   return new Set((config.disabledModels ?? []).filter(id => !id.includes("/")));
 }
 
-export function visibleNativeSlugs(config: Pick<OcxConfig, "disabledModels" | "combos">): string[] {
+export function visibleNativeSlugs(config: Pick<OcxConfig, "disabledModels">): string[] {
   const disabled = disabledNativeSlugs(config);
-  const shadowed = configuredNativeAliasSlugs(config);
-  return nativeOpenAiSlugs().filter(slug => !disabled.has(slug) && !shadowed.has(slug));
+  return nativeOpenAiSlugs().filter(slug => !disabled.has(slug));
 }
 
 /** Whether an enabled canonical OpenAI provider can serve exact account-qualified routes. */
@@ -511,7 +483,7 @@ function mainAccountSelectors(config: AccountSelectorConfig): string[] {
 
 /** Native slugs exposed to Claude Desktop show/export/apply (opt-out via claudeCode.desktopNativeModels). */
 export function desktopVisibleNativeSlugs(
-  config: Pick<OcxConfig, "claudeCode" | "disabledModels" | "combos" | "providers"
+  config: Pick<OcxConfig, "claudeCode" | "disabledModels" | "providers"
     | "codexAccounts" | "codexAccountNamespaces" | "codexAccountPickerEnabled">,
 ): string[] {
   if (config.claudeCode?.desktopNativeModels === false) return [];
@@ -529,9 +501,8 @@ export function desktopVisibleNativeSlugs(
   ]);
 }
 
-export function nativeModelRows(config: Pick<OcxConfig, "disabledModels" | "combos" | "providerContextCaps" | "providers">): Array<{ slug: string; disabled: boolean; contextWindow?: number; maxInputTokens?: number; autoCompactTokenLimit?: number }> {
+export function nativeModelRows(config: Pick<OcxConfig, "disabledModels" | "providerContextCaps" | "providers">): Array<{ slug: string; disabled: boolean; contextWindow?: number; maxInputTokens?: number; autoCompactTokenLimit?: number }> {
   const disabled = disabledNativeSlugs(config);
-  const shadowed = configuredNativeAliasSlugs(config);
   // Both user levers, not just the cap: a per-model window set from the dashboard has to show
   // up on the row the dashboard itself renders.
   const limits = nativeContextLimits(config);
@@ -542,7 +513,7 @@ export function nativeModelRows(config: Pick<OcxConfig, "disabledModels" | "comb
   const availableGated = cachedAvailableAccountGatedNativeModels(Date.now(), bareEligibleAccountIds);
   return NATIVE_OPENAI_MODELS
     .filter(slug => !ACCOUNT_GATED_NATIVE_OPENAI_MODELS.has(slug) || availableGated.has(slug))
-    .filter(slug => !shadowed.has(slug)).map(slug => {
+    .map(slug => {
     const contextWindow = nativeOpenAiContextWindow(slug, limits);
     const maxInputTokens = nativeOpenAiMaxInputTokens(slug, limits);
     const autoCompactTokenLimit = nativeOpenAiAutoCompactTokenLimit(slug, limits);

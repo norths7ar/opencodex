@@ -6,7 +6,6 @@ import { callerSessionId, withCallerSessionIdentity } from "../../src/server/cal
 import { resolveDataPlaneAdmissionSecret, type DataPlaneAdmission } from "../../src/server/auth-cors";
 import { sessionLaneIdFromRequest } from "../../src/server/request-log-conversation";
 import { captureConfigGeneration } from "../../src/lib/state-store-sweeper";
-import { clearComboRecallForTests, recallComboForLane, rememberComboForLane } from "../../src/server/responses/combo-session-recall";
 import { withGrokSessionIdentity } from "../../src/grok/session-identity";
 import { withClaudeNativeSession } from "../../src/server/responses/core-auth";
 import { handleResponses } from "../../src/server/responses/core";
@@ -222,24 +221,6 @@ describe("trusted caller namespaces", () => {
       }) });
       expect(withCallerSessionIdentity(request, admission)).toBe(request);
     }
-  });
-
-  test("real combo recall separates equal markers across principals and keeps same-principal continuity", () => {
-    clearComboRecallForTests();
-    const config: OcxConfig = { port: 0, defaultProvider: "fixture", providers: {
-      fixture: { adapter: "openai-responses", baseUrl: "https://fixture.example.test/v1" },
-    }, combos: { alpha: { targets: [{ provider: "fixture", model: "model-a" }] },
-      beta: { targets: [{ provider: "fixture", model: "model-b" }] } } };
-    const lane = (key: string) => sessionLaneIdFromRequest(promoted(admitted(key)).headers);
-    try {
-      rememberComboForLane(lane("recall-fixture-a"), "alpha", { provider: "fixture", model: "model-a" }, "visible-model", captureConfigGeneration());
-      expect(recallComboForLane(config, lane("recall-fixture-a"), "visible-model")).toBe("alpha");
-      expect(recallComboForLane(config, lane("recall-fixture-b"), "visible-model")).toBeUndefined();
-      rememberComboForLane(lane("recall-fixture-b"), "beta", { provider: "fixture", model: "model-b" }, "visible-model", captureConfigGeneration());
-      expect(recallComboForLane(config, lane("recall-fixture-a"), "visible-model")).toBe("alpha");
-      expect(recallComboForLane(config, lane("recall-fixture-b"), "visible-model")).toBe("beta");
-      expect(recallComboForLane(config, lane("recall-fixture-rotated"), "visible-model")).toBeUndefined();
-    } finally { clearComboRecallForTests(); }
   });
 });
 

@@ -579,7 +579,6 @@ async function handleGrokToggle(ctx: ManagementContext): Promise<Response> {
       // current. Otherwise a hidden model is mistaken for retired state and survives outside.
       catalogModelIds: projection.catalogModelIds,
       disabledProviderNamespaces: projection.disabledProviderNamespaces,
-      comboPublicModelIds: projection.comboPublicModelIds,
     });
 
     if (result.skippedReason === "non-loopback") {

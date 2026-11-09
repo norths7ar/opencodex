@@ -37,7 +37,7 @@ export function scheduleDesktopCompatibilityStartup(config: OcxConfig, io: Start
   const unbind = io.boundPort === undefined || io.boundHostname === undefined ? () => {} : bindNativeCompatibilityOwner({ config, hostname: io.boundHostname, port: io.boundPort, loopbackPort: io.loopbackPort });
   const enabled = config.desktopCompatibility?.startOnProxyStart === true && (io.platform ?? process.platform) === "win32"
     && !(io.testGuard ?? isTestHomeGuardArmed()) && !(io.sibling ?? siblingOfLivePort() !== null)
-    && config.runtimeRole !== "client";
+   ;
   const pending = enabled ? Promise.resolve().then(async () => {
     if (stopped) return;
     if (io.readiness) {

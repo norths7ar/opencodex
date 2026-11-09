@@ -33,7 +33,7 @@ import {
   isProviderQuotaReportCurrent,
   LAST_GOOD_MAX_AGE_MS,
   providerQuotaBeforePublishForTests,
-  routingEvidence, publishCollectedDecisionQuota,
+  routingEvidence,
   setProviderQuotaReportCache,
   TERMINAL_QUOTA_FAILURE,
   type CodexAuthAccountsSnapshotPromise,
@@ -125,7 +125,7 @@ async function maybeFetchProviderQuota(
     }
     if (provider.authMode === "oauth" && explicitAccountReader(name)) return await fetchExplicitCurrentQuota(name, provider, config);
     if (provider.authMode === "oauth" && configuredAnthropicInstance(config, name)) return fetchAnthropicQuota(name, config);
-    if (provider.authMode === "oauth" && name === ANTIGRAVITY_OAUTH_STORE_KEY) return await fetchAntigravityQuota(name, { ...provider });
+    if (provider.authMode === "oauth" && name === ANTIGRAVITY_OAUTH_STORE_KEY) return await fetchAntigravityQuota(name);
     if (provider.authMode === "oauth" && name === "kiro") return fetchKiroQuota(name);
     // meta-muse: a device-logged-in account can be probed at the key endpoint; an
     // imported or pasted one cannot, and falls back to its last in-band observation.
@@ -230,7 +230,7 @@ export function flushProviderQuotaObservationsForTests(): Promise<void> {
   return pendingProviderObservation;
 }
 
-/** Collect provider quota reports, using the cache unless refresh is forced, and publish the secret-free decision evidence from the collected reports. */
+/** Collect provider quota reports, using the cache unless refresh is forced. */
 export async function fetchProviderQuotaReports(config: OcxConfig, forceRefresh = false): Promise<ProviderQuotaResponse> {
   // A passive read (a Remote Link Child's, #6959) shows the held reports and starts nothing.
   if (isPassiveRead()) return heldProviderQuotaReports(Object.keys(config.providers));
@@ -331,7 +331,7 @@ export async function fetchProviderQuotaReports(config: OcxConfig, forceRefresh 
     ) {
       const reports = response.reports.filter(item => mayCommitProviderQuotaKey(item.provider, writerGeneration));
       setProviderQuotaReportCache({ key, ts: Date.now(), response: { ...response, reports } });
-      replaceCachedProviderQuotas(reports, routingEvidence); publishCollectedDecisionQuota(reports, config);
+      replaceCachedProviderQuotas(reports, routingEvidence);
       notifyProviderQuotaSnapshot(reports, config);
     }
     return response;

@@ -456,9 +456,8 @@ function isLegacyGeneratedTable(alias: string, keys: ReadonlyMap<string, string>
 function isDisabledProviderModelId(
   modelId: string,
   disabledProviderNamespaces: ReadonlySet<string> | undefined,
-  comboPublicModelIds: ReadonlySet<string> | undefined,
 ): boolean {
-  if (!disabledProviderNamespaces || comboPublicModelIds?.has(modelId)) return false;
+  if (!disabledProviderNamespaces) return false;
   const slash = modelId.indexOf("/");
   return slash > 0
     && slash < modelId.length - 1
@@ -1126,8 +1125,6 @@ export function injectGrokConfig(
     catalogModelIds?: ReadonlySet<string>;
     /** Canonical provider keys disabled in config and therefore absent from catalog fetching. */
     disabledProviderNamespaces?: ReadonlySet<string>;
-    /** Configured combo public ids that may syntactically resemble provider/model ids. */
-    comboPublicModelIds?: ReadonlySet<string>;
   } = {},
 ): GrokInjectResult {
   const grokHome = resolveGrokHome(opts.grokHome);
@@ -1208,7 +1205,6 @@ export function injectGrokConfig(
               || isDisabledProviderModelId(
                 orphan.modelId,
                 opts.disabledProviderNamespaces,
-                opts.comboPublicModelIds,
               )));
       const content = removeOrphanTables(originalContent, orphans);
       // Removing bytes above the fence MOVES it: recompute rather than adjust arithmetic,

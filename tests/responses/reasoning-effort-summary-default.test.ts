@@ -1,9 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { parseRequest } from "../../src/responses/parser";
-import { concreteComboRequestBody } from "../../src/combos/request";
 import { routeModel } from "../../src/router";
 import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
-import type { OcxComboTarget, OcxConfig } from "../../src/types";
+import type { OcxConfig } from "../../src/types";
 
 describe("reasoning effort preserves visible thinking when summary is omitted", () => {
   test.each(["unknown", "off", ""])("invalid effort %j does not enable visibility", effort => {
@@ -22,21 +21,6 @@ describe("reasoning effort preserves visible thinking when summary is omitted", 
   test.each([undefined, "none", "off", "invalid"])("explicit auto is independent of effort %s", effort => {
     expect(parseRequest({ model: "test", input: [], reasoning: { effort, summary: "auto" } })
       .options.hideThinkingSummary).toBeUndefined();
-  });
-  test("combo preserves caller summaries, none/minimal, fallback, and adaptive boundaries", () => {
-    const target = { provider: "test", model: "model" };
-    for (const summary of ["none", "auto"]) {
-      expect(concreteComboRequestBody({ reasoning: { summary } }, target, "high", ["high"]).reasoning)
-        .toEqual({ effort: "high", summary });
-    }
-    for (const effort of ["none", "minimal", "medium"]) {
-      expect(concreteComboRequestBody({ reasoning: { effort } }, target, "high", ["high"]).reasoning)
-        .toEqual({ effort });
-    }
-    expect(concreteComboRequestBody({ reasoning: { effort: "medium", summary: "none" } }, target, "high", ["high"], "strict", "force").reasoning)
-      .toEqual({ effort: "high", summary: "none" });
-    expect(concreteComboRequestBody({ reasoning: { effort: "high", summary: "none" } }, target, "high", undefined, "adaptive").reasoning)
-      .toEqual({ summary: "none" });
   });
   test("reasoning with active effort does not default to hideThinkingSummary", () => {
     const parsed = parseRequest({
@@ -99,16 +83,6 @@ describe("reasoning effort preserves visible thinking when summary is omitted", 
       });
       expect(parsed.options.hideThinkingSummary).toBe(hidden);
     }
-  });
-
-  test("combo injected effort defaults summary to auto", () => {
-    const target: Pick<OcxComboTarget, "provider" | "model"> = {
-      provider: "test-provider",
-      model: "test-model",
-    };
-    const body = { model: "combo/test", input: [] };
-    const child = concreteComboRequestBody(body, target, "high", ["high"]);
-    expect(child.reasoning).toEqual({ effort: "high", summary: "auto" });
   });
 
   test("final route removes a rejected thinking toggle from native passthrough", async () => {

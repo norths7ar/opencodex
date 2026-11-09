@@ -45,7 +45,7 @@ interface UsageReportInput {
   models?: CostRow[];
   providers?: CostRow[];
   days?: { date: string; requests: number; totalTokens: number; estimatedCostUsd?: number }[];
-  filter?: { apiKeyId?: string | null; provider: string | null; model: string | null; matched: boolean; comboOverlap: boolean };
+  filter?: { apiKeyId?: string | null; provider: string | null; model: string | null; matched: boolean; attemptOverlap: boolean };
   /**
    * Per-account totals the API already returns and the CLI discarded (#2700).
    *
@@ -202,9 +202,9 @@ export function formatUsageReport(data: UsageReportInput, options?: { modelView?
     }
   }
 
-  if (data.filter?.comboOverlap) {
+  if (data.filter?.attemptOverlap) {
     lines.push("");
-    lines.push("Some requests ran as combos, so per-model request counts can overlap. Cost does not.");
+    lines.push("Some requests had multiple attempts, so per-model request counts can overlap. Cost does not.");
   }
 
   lines.push("");

@@ -8,14 +8,7 @@
 // it. `codex-catalog.test.ts` sits at its line cap, so the coverage lives here.
 import { describe, expect, test } from "bun:test";
 import { NEUTRAL_IDENTITY_LINE } from "../../src/adapters/identity";
-import {
-  buildCatalogEntries,
-  deriveComboCatalogModel,
-  NATIVE_DAYBREAK_BLUE_MODEL,
-  NATIVE_GPT6_ASTRA_MODEL,
-  upstreamNativeEntry,
-} from "../../src/codex/catalog";
-import type { NormalizedComboConfig } from "../../src/combos/types";
+import { buildCatalogEntries, NATIVE_DAYBREAK_BLUE_MODEL, NATIVE_GPT6_ASTRA_MODEL, upstreamNativeEntry } from "../../src/codex/catalog";
 
 /** The pinned native template every routed row derives from; its identity line is Codex's own. */
 function nativeTemplate(): Record<string, unknown> {
@@ -29,23 +22,6 @@ function nativeTemplate(): Record<string, unknown> {
     model_messages: { instructions_template: "You are Codex, a coding agent based on GPT-5." },
     tool_mode: "code",
     multi_agent_version: "v2",
-  };
-}
-
-function comboConfig(): NormalizedComboConfig {
-  return {
-    strategy: "failover",
-    stickyLimit: 1,
-    defaultEffort: "medium",
-    reasoningEffortMode: "strict",
-    imageInput: "auto",
-    alias: null,
-    nativeAlias: false,
-    displayName: null,
-    targets: [
-      { provider: "a", model: "m1", weight: 1 },
-      { provider: "b", model: "m2", weight: 1 },
-    ],
   };
 }
 
@@ -79,13 +55,6 @@ describe("catalog identity text is model-neutral on disk (#5217)", () => {
     const astra = rows.find(row => row.slug === `openai/${NATIVE_GPT6_ASTRA_MODEL}`)!;
     expect(astra.base_instructions).toContain(NEUTRAL_IDENTITY_LINE);
     expect(astra.base_instructions).not.toContain("powered by the");
-  });
-
-  test("a combo alias row names the alias nowhere in its instructions", () => {
-    const combo = deriveComboCatalogModel("mixed", comboConfig(), members)!;
-    const rows = buildCatalogEntries(nativeTemplate(), [], [combo], undefined, false, "default", new Set(["mixed"]));
-    expect(rows[0]!.base_instructions).toContain(NEUTRAL_IDENTITY_LINE);
-    expect(rows[0]!.base_instructions).not.toContain("powered by the");
   });
 
   test("a native capability alias row is neutral in both instruction fields", () => {

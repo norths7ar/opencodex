@@ -1,5 +1,5 @@
 import { publishCredentialSync } from "../local-credentials/generation";
-import { captureMainAccountIdentityGeneration, getMainQuotaCredentialGeneration, isMainAccountIdentityGenerationLive, isMainQuotaWriterLive, matchesMainQuotaCredential, observeMainDecisionCredentialUsable, type MainQuotaWriter } from "./main-account-cache";
+import { captureMainAccountIdentityGeneration, getMainQuotaCredentialGeneration, isMainAccountIdentityGenerationLive, isMainQuotaWriterLive, matchesMainQuotaCredential, type MainQuotaWriter } from "./main-account-cache";
 import { classifyChatgptRefreshFailure, noteChatgptRefreshFailure } from "./chatgpt-refresh-failure";
 import { readBoundedResponseBody } from "../lib/bounded-body";
 import { createHash } from "node:crypto";
@@ -281,7 +281,6 @@ export function getMainAccountCredentialStatus(now = Date.now()): MainAccountCre
   const ownedUsable = !!owned && owned.expiresAt > now;
   const usable = !refreshGrantRejected
     && (hasRefreshGrant || mainAccessTokenFresh(current?.accessToken, now, 0) || ownedUsable);
-  observeMainDecisionCredentialUsable(usable);
   return {
     refreshGrantRejected,
     hasRefreshGrant,
@@ -650,7 +649,7 @@ async function resolveMainAccountToken(
           if (signal.aborted) throw signal.reason;
           if (reason === "reauth") {
             assertMainAuthJsonSnapshotUnchanged(locked);
-            markMainRefreshGrantRejected(mainRefreshGrantKey(locked)!); observeMainDecisionCredentialUsable(false);
+            markMainRefreshGrantRejected(mainRefreshGrantKey(locked)!);
           }
           throw new MainAccountTokenRefreshError(reason, { cause });
         }

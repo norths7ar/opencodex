@@ -182,8 +182,8 @@ export function planProtocol(input: ProtocolPlanInput): ProtocolPlanV1 {
   const eligible = candidates.filter(candidate => candidate.eligible);
   const first = eligible[0];
   const { guaranteed, partial } = featureSplit(eligible, features);
-  const routeReasons: ProtocolReasonCode[] = input.routeKind === "combo" || input.routeKind === "policy"
-    ? ["combo-or-policy-route"]
+  const routeReasons: ProtocolReasonCode[] = input.routeKind === "policy"
+    ? ["policy-route"]
     : [];
   return {
     ...base,

@@ -44,7 +44,7 @@ export type ClaudeFirstPartyReconcileResult =
 
 // Synchronous leaf: async callers wrap reconciliation in withConfigDirHardeningSettled.
 export function reconcileClaudeFirstPartySettings(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole" | "clientIntegrations">,
+  config: Pick<OcxConfig, "claudeCode" | "port" | "clientIntegrations">,
   desired: ClaudeFirstPartyDesired,
   options: DesktopFirstPartyOptions = {},
 ): ClaudeFirstPartyReconcileResult {
@@ -57,7 +57,7 @@ export function reconcileClaudeFirstPartySettings(
 }
 
 function reconcileSettingsEnv(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole" | "clientIntegrations">,
+  config: Pick<OcxConfig, "claudeCode" | "port" | "clientIntegrations">,
   desired: ClaudeFirstPartyDesired,
   options: DesktopFirstPartyOptions,
 ): ClaudeFirstPartyReconcileResult {
@@ -104,7 +104,7 @@ export function firstPartyProxyStatus({ settings, boundProxyPort, eligible }: Fi
 
 /** Read-only: inspectDesktopFirstParty reads an existing token; it never creates one. */
 export function readFirstPartyProxyStatus(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "port">,
   boundProxyPort: number | null,
   options: DesktopFirstPartyOptions = {},
 ): FirstPartyProxyStatus {

@@ -4,7 +4,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { MAIN_CODEX_ACCOUNT_ID } from "../../src/codex/main-account";
 import { clearMainAccountInfoCache } from "../../src/codex/auth-api";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { handleClaudeMessages } from "../../src/server/claude-messages";
 import { handleResponses } from "../../src/server/responses/core";
 import { handleResponsesWithPolicyFallback } from "../../src/server/responses/policy-fallback";
@@ -38,8 +37,6 @@ beforeEach(() => {
   isolated = installIsolatedCodexHome("ocx-native-affinity-codex-");
   token = fakeChatGptJwt({ exp: Math.floor(Date.now() / 1000) + 86400, chatgpt_account_id: "fixture-native-main" });
   writeFileSync(join(isolated.path, "auth.json"), JSON.stringify({ tokens: { access_token: token, account_id: "fixture-native-main" } }));
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   // Dispatches without starting a server, so the spend-journal lease is taken here.
   releaseSpendHome = acquireOwnedSpendHome();
 });
@@ -51,8 +48,6 @@ afterEach(() => {
   releaseSpendHome?.();
   releaseSpendHome = undefined;
   globalThis.fetch = originalFetch;
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   isolated.restore();
   if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = previousHome;
@@ -74,39 +69,6 @@ function completed(): Response {
 describe("Claude final canonical native affinity after a Go preliminary pick", () => {
   for (const strategy of ["random", "failover"] as const) {
     for (const explicit of [undefined, "session_id", "session-id", "thread-id"] as const) {
-      test(`${strategy} preserves ${explicit ?? "metadata native identity"}`, async () => {
-        const cfg = config();
-        cfg.combos = { reverse: { strategy, targets: [
-          { provider: "go", model: "glm-5.2" }, { provider: "openai", model: "gpt-5.6-luna" },
-        ] } };
-        const seen: Array<{ url: string; headers: Headers; body: Record<string, unknown> }> = [];
-        globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-          const url = String(input);
-          seen.push({ url, headers: new Headers(init?.headers), body: JSON.parse(String(init?.body)) });
-          return url.startsWith("https://opencode.ai/")
-            ? Response.json({ error: { message: "model retired", code: "model_not_found" } }, { status: 404 }) : completed();
-        }) as typeof fetch;
-        const entropy = spyOn(Math, "random").mockReturnValue(0.9).mockReturnValueOnce(0);
-        const lease = tryAdmitTurn();
-        expect(lease).not.toBeNull();
-        try {
-          const req = new Request("http://localhost/v1/messages", { method: "POST",
-            headers: { "content-type": "application/json", ...(explicit ? { [explicit]: "caller-conversation" } : {}) },
-            body: JSON.stringify({ model: "combo/reverse", max_tokens: 32, stream: false,
-              metadata: { user_id: metadata }, messages: [{ role: "user", content: "ping" }] }) });
-          const response = await handleClaudeMessages(req, cfg, { model: "", provider: "" },
-            { requestId: `affinity-${strategy}-${explicit ?? "metadata"}`, start: Date.now(), turnAdmissionLease: lease! });
-          await response.text();
-          expect(response.status).toBe(200);
-          const wire = seen.at(-1)!;
-          expect(wire.url).toBe("https://chatgpt.com/backend-api/codex/responses");
-          expect(wire.headers.get("session_id")).toBe(explicit ? "caller-conversation" : expectedSession);
-          if (explicit) expect(wire.headers.get(explicit)).toBe("caller-conversation");
-          expect(wire.headers.has("x-opencode-session")).toBe(false);
-          expect(wire.body.prompt_cache_key).toBe(key);
-          expect(req.headers.get("session_id")).toBe(explicit === "session_id" ? "caller-conversation" : null);
-        } finally { entropy.mockRestore(); lease?.release(); }
-      });
     }
   }
 

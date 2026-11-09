@@ -221,13 +221,9 @@ const UNDECLARED_ROUTES_2026_08_28: readonly string[] = [
   "GET /api/codex-auth/quota",
   "GET /api/system/windows-replace-retries",
   "GET /api/update/badge",
-  "PATCH /api/codex-auth/pool-strategy",
-  "PATCH /api/oauth/accounts/pool",
-  "POST /api/codex-auth/accounts",
   "POST /api/model-discovery/acknowledge",
   "POST /api/system/restart",
   "POST /api/windows-tray",
-  "PUT /api/codex-auth/failover",
   "PUT /api/disabled-models",
 ];
 

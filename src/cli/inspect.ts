@@ -5,11 +5,6 @@
  * inspecting effective configuration, reading the generated client-config snippet, toggling the
  * native client integrations, checking request pacing and routing analytics, and reading the
  * Codex system prompt.
- *
- * One route here is deliberately READ-ONLY forever. `POST /api/github/star` spends the operator's
- * GitHub identity, and no CLI flag can carry that consent — the server requires a real dashboard
- * session for it. So `star` reads status and says what it cannot do, rather than offering a
- * `--yes` that would be a lie.
  */
 import {
   CliUsageError,
@@ -31,11 +26,9 @@ const USAGE = `Usage:
   ocx inspect key-providers [--json]
   ocx inspect codex-prompt [--text] [--json]
   ocx inspect client-config --client <id> [--json]
-  ocx inspect star [--json]
-  ocx inspect windows-tray [--json]
   ocx integration native [list] [--json]
   ocx integration native <claude|claude-desktop|codex|grok> <on|off> [--json]
-  ocx integration native cursor [status|local-installer] [--json]
+  ocx integration native cursor [status] [--json]
   ocx agent request-user-input [on|off] [--json]`;
 
 /** A read that takes no arguments beyond `--json`. */
@@ -186,22 +179,6 @@ async function codexPrompt(argv: string[], deps: RuntimeApiDeps): Promise<void> 
   printData(result, wantsJson, summaryLines(result));
 }
 
-async function star(argv: string[], deps: RuntimeApiDeps): Promise<void> {
-  const args = [...argv];
-  const wantsJson = takeFlag(args, "--json");
-  rejectArgs(args, USAGE);
-  const result = await runtimeRequest<Record<string, unknown>>("/api/github/star", {}, deps);
-  if (wantsJson) {
-    printData(result, true);
-    return;
-  }
-  printData(result, false, summaryLines(result));
-  // Said plainly, because the natural next question is "then star it", and the answer is that no
-  // CLI invocation can: the POST requires a dashboard session precisely so an agent cannot spend
-  // the operator's identity on their behalf.
-  console.log("Starring is not available from the CLI: it uses your GitHub identity, so only you can do it from the dashboard.");
-}
-
 export async function handleInspectCommand(argv: string[], deps: RuntimeApiDeps = {}): Promise<number> {
   return runCliAction(async () => {
     const hasSub = argv[0] !== undefined && !argv[0].startsWith("-");
@@ -211,11 +188,9 @@ export async function handleInspectCommand(argv: string[], deps: RuntimeApiDeps 
     else if (sub === "catalog") await read("/api/catalog", rest, deps);
     else if (sub === "routing-analytics") await read("/api/routing-analytics", rest, deps);
     else if (sub === "key-providers") await read("/api/key-providers", rest, deps);
-    else if (sub === "windows-tray") await read("/api/windows-tray", rest, deps);
     else if (sub === "pacing") await pacing(rest, deps);
     else if (sub === "client-config") await clientConfig(rest, deps);
     else if (sub === "codex-prompt") await codexPrompt(rest, deps);
-    else if (sub === "star") await star(rest, deps);
     else throw new CliUsageError(`unknown inspect command ${sub}`, USAGE);
   });
 }

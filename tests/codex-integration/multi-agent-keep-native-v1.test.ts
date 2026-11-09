@@ -10,8 +10,7 @@ import {
 import { CODEX_NATIVE_ALIAS_CATALOG_KIND } from "../../src/codex/catalog/kinds";
 import { buildCatalogEntriesFromObservedState } from "../../src/codex/catalog/sync";
 import { cmdV2 } from "../../src/cli/v2";
-import * as recovery from "../../src/codex/cli-update-recovery";
-import * as gate from "../../src/codex/cli-update-selection-gate";
+import * as gate from "../../src/codex/cli-selection";
 import { loadConfig, saveConfig } from "../../src/config";
 import { MULTI_AGENT_SURFACE_ADVISORY_VERSION, SUBAGENT_SURFACE_GUIDE_URL } from "../../src/config/multi-agent-surface";
 import { isMultiAgentV2Enabled } from "../../src/codex/features";
@@ -28,22 +27,6 @@ describe("keepNativeChatGptOnV1", () => {
     applyMultiAgentMode(entries, "v2");
     expect(entries[0]!.multi_agent_version).toBe("v2");
     expect(entries[1]!.multi_agent_version).toBe("v2");
-  });
-
-  test("v2 + keepNativeChatGptOnV1 leaves ChatGPT-native on v1 and routed on v2", () => {
-    const entries: RawEntry[] = [
-      { slug: "gpt-5.6-sol" },
-      { slug: "gpt-5.6-terra" },
-      { slug: "xai/grok-4.6" },
-      { slug: "anthropic/claude-fable-5" },
-      { slug: "combo/grok_4.6_fast_cursor_xai_fallback" },
-    ];
-    applyMultiAgentMode(entries, "v2", false, { keepNativeChatGptOnV1: true });
-    expect(entries.find(e => e.slug === "gpt-5.6-sol")!.multi_agent_version).toBe("v1");
-    expect(entries.find(e => e.slug === "gpt-5.6-terra")!.multi_agent_version).toBe("v1");
-    expect(entries.find(e => e.slug === "xai/grok-4.6")!.multi_agent_version).toBe("v2");
-    expect(entries.find(e => e.slug === "anthropic/claude-fable-5")!.multi_agent_version).toBe("v2");
-    expect(entries.find(e => e.slug === "combo/grok_4.6_fast_cursor_xai_fallback")!.multi_agent_version).toBe("v2");
   });
 
   test("the switch does nothing in v1 or default mode", () => {
@@ -202,7 +185,6 @@ describe("keep-native-v1 restamp path", () => {
       featured: [],
       wsEnabled: false,
       multiAgentMode: "v2",
-      exactComboSlugs: new Set(),
       accountSelectors: [],
       suppressedBareNativeSlugs: new Set(),
       disabledNativeAccountSlugs: new Set(),
@@ -219,7 +201,6 @@ describe("keep-native-v1 restamp path", () => {
       featured: [],
       wsEnabled: false,
       multiAgentMode: "v1",
-      exactComboSlugs: new Set(),
       accountSelectors: [],
       suppressedBareNativeSlugs: new Set(),
       disabledNativeAccountSlugs: new Set(),
@@ -535,70 +516,6 @@ describe("/api/v2 sub-agent surface advisory", () => {
 
 describe("ocx v2 revalidates state once the awaited admission enters", () => {
   const fixtureSync = async () => ({ status: "applied" as const, ok: true, added: 0, catalogPath: null, catalogExists: true, catalogWritten: false, cacheSynced: false, message: "fixture" });
-  function holdAdmission() {
-    let entered!: () => void, release!: (blocked: boolean) => void;
-    const started = new Promise<void>(resolve => { entered = resolve; });
-    const proof = new Promise<boolean>(resolve => { release = resolve; });
-    const spy = spyOn(recovery, "codexCliUpdateRecoveryBlocksAdmissionAsync").mockImplementation(() => { entered(); return proof; });
-    return { started, release: () => release(false), restore: () => spy.mockRestore() };
-  }
-
-  test("v2 on refuses when the hybrid pin was enabled while admission waited", async () => {
-    isolateHomes();
-    saveConfig({ ...loadConfig(), multiAgentMode: "v2" });
-    const codexConfig = join(process.env.CODEX_HOME!, "config.toml");
-    writeFileSync(codexConfig, "[features.multi_agent_v2]\nenabled = false\n");
-    const hold = holdAdmission();
-    const { errors, log } = captureLog();
-    let toggles = 0;
-    try {
-      const running = cmdV2(["on"], { execFile: () => { toggles++; }, sync: async () => { throw new Error("must not sync"); }, log });
-      await hold.started;
-      saveConfig({ ...loadConfig(), keepNativeChatGptOnV1: true });
-      hold.release();
-      expect(await running).toBe(1);
-    } finally { hold.restore(); }
-    expect(toggles).toBe(0);
-    expect(isMultiAgentV2Enabled(codexConfig)).toBe(false);
-    expect(errors.join("\n")).toContain("global multi_agent_v2 overrides the native v1 catalog pin");
-  });
-
-  test("threads keeps a feature state changed while admission waited", async () => {
-    isolateHomes();
-    const codexConfig = join(process.env.CODEX_HOME!, "config.toml");
-    writeFileSync(codexConfig, "[features.multi_agent_v2]\nenabled = false\n");
-    const hold = holdAdmission();
-    const actions: string[] = [];
-    try {
-      const running = cmdV2(["threads", "4"], {
-        featuresInvocation: action => ({ file: "fixture-codex", args: ["features", action, "multi_agent_v2"], options: {} }),
-        execFile: (_file, args) => { actions.push(featureActionOf(args)); },
-        log: captureLog().log,
-      });
-      await hold.started;
-      writeFileSync(codexConfig, "[features.multi_agent_v2]\nenabled = true\n");
-      hold.release();
-      expect(await running).toBe(0);
-    } finally { hold.restore(); }
-    expect(actions).toEqual([]);
-    expect(isMultiAgentV2Enabled(codexConfig)).toBe(true);
-  });
-
-  test("mode saves the config read once admitted, keeping a setting saved meanwhile", async () => {
-    isolateHomes();
-    writeFileSync(join(process.env.CODEX_HOME!, "config.toml"), "[features.multi_agent_v2]\nenabled = false\n");
-    const hold = holdAdmission();
-    try {
-      const running = cmdV2(["mode", "v1"], { execFile: () => {}, sync: fixtureSync, log: captureLog().log });
-      await hold.started;
-      saveConfig({ ...loadConfig(), keepNativeChatGptOnV1: true });
-      hold.release();
-      expect(await running).toBe(0);
-    } finally { hold.restore(); }
-    expect(loadConfig().multiAgentMode).toBe("v1");
-    expect(loadConfig().keepNativeChatGptOnV1).toBe(true);
-  });
-
   test("mode saves inside admission, so a save landing after the callback is kept", async () => {
     isolateHomes();
     writeFileSync(join(process.env.CODEX_HOME!, "config.toml"), "[features.multi_agent_v2]\nenabled = false\n");

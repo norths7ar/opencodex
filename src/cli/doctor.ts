@@ -1,19 +1,9 @@
-/**
- * `ocx doctor` - read-only environment diagnostics.
- *
- * Explains WHY ChatGPT quota may never populate (and thus why account
- * auto-switch can appear stuck), especially on WSL2 where outbound fetch to
- * chatgpt.com can be blocked by NAT/DNS/VPN/proxy differences. Observe-only:
- * it never sets proxy env, relocates state dirs, mutates quota, or changes
- * networking. See devlog/_plan/260630_wsl-account-autoswitch/30_*.
- */
-import { cliCommandDoctorChecks, collectCliPathDiagnostics } from "./cli-path-diagnostics";
+/** Read-only environment, connectivity, runtime and credential diagnostics. */
 import { accessSync, constants, existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { getConfigDir, getConfigPath, readConfigDiagnostics } from "../config";
 import { readPid } from "../config/process-state";
-import { inspectDesktopSupervision } from "../service/desktop-supervision.mjs";
 import { fetchLiveStartupHealth, probeUncleanExitState, selectStatusStartupHealth } from "./status";
 import { findLiveProxy, probeHostname, type LiveProxy } from "../server/proxy-liveness";
 import { directLocalHttpFetch } from "../server/direct-local-http";
@@ -28,13 +18,13 @@ import { readCodexTokens } from "../codex/auth-collision";
 import { withNativeMainSharedClaim } from "../codex/native-main-claim";
 import { probeNativeProfileRecoveryState, resolveNativeProfileContext } from "../codex/native-profile-store";
 import { NativeProfileError } from "../codex/native-profile-types";
-import { collectOrcaCodexHomeDiagnostic, resolveCodexHomeDir as resolveCodexHomeDirImpl, isWslRuntime, listWslWindowsCodexHomes, wslAutomountRoot, type CodexHomeDeps } from "../codex/home";
+import { collectOrcaCodexHomeDiagnostic, resolveCodexHomeDir as resolveCodexHomeDirImpl, type CodexHomeDeps } from "../codex/home";
 import {
   scanCodexAgentRolesWithTomlModelFallback,
   scanOpencodexDerivedCodexAgentRolesWithoutModelPin,
 } from "../codex/subagent-model-fallback";
 import { readCatalog, readCodexCatalogPath, readConfiguredDefaultModel } from "../codex/catalog/parsing";
-import { diagnoseCodexShim, findCodexOnPath, isWindowsInteropDir, type CodexShimDiagnostic } from "../codex/shim";
+import { diagnoseCodexShim, findCodexOnPath, type CodexShimDiagnostic } from "../codex/shim";
 import { overlayActivationHint } from "../codex/shim-overlay";
 import { providerTableString, rootTomlString } from "../codex/injected-marker";
 import { countPendingOpencodexHistory } from "../codex/history-provider";
@@ -397,109 +387,6 @@ export function collectPaths(): PathRow[] {
   ];
 }
 
-export type FsTypeInfo = { fstype: string; mount: string; isDrvfs: boolean; isMntDrive: boolean };
-
-/**
- * Parse `/proc/mounts`-shaped content and return the longest mount-point prefix
- * covering `path`. `mountsContent` is injectable for testing; in production the
- * caller passes the real file (or null off-Linux -> "n/a").
- */
-export function detectFsType(path: string, mountsContent: string | null): FsTypeInfo {
-  const isMntDrive = /^\/mnt\/[a-z]\//i.test(path) || /^\/mnt\/[a-z]$/i.test(path);
-  if (!mountsContent) {
-    return { fstype: "n/a", mount: "", isDrvfs: false, isMntDrive };
-  }
-  let best: { mount: string; fstype: string } | null = null;
-  for (const line of mountsContent.split("\n")) {
-    const parts = line.split(/\s+/);
-    if (parts.length < 3) continue;
-    const mount = parts[1]!;
-    const fstype = parts[2]!;
-    if (path === mount || path.startsWith(mount.endsWith("/") ? mount : `${mount}/`) || mount === "/") {
-      if (!best || mount.length > best.mount.length) best = { mount, fstype };
-    }
-  }
-  const fstype = best?.fstype ?? "unknown";
-  return {
-    fstype,
-    mount: best?.mount ?? "",
-    isDrvfs: fstype === "drvfs" || fstype === "9p",
-    isMntDrive,
-  };
-}
-
-function readMounts(): string | null {
-  try {
-    return process.platform === "linux" ? readFileSync("/proc/mounts", "utf-8") : null;
-  } catch {
-    return null;
-  }
-}
-
-export type WslDualInstallDiagnostic = {
-  wsl: boolean;
-  automountRoot: string;
-  effectiveCodexHome: string;
-  effectiveIsWindowsMount: boolean;
-  linuxCodexConfigured: boolean;
-  windowsCodexHomes: string[];
-  dualInstall: boolean;
-  interopCodexOnPath: string | null;
-};
-
-type WslDualInstallDeps = CodexHomeDeps & {
-  pathValue?: string;
-  effectiveCodexHome?: string;
-};
-
-/**
- * WSL + Windows dual-install visibility: which `.codex` home each side owns,
- * whether the effective home sits on a Windows mount, and whether the `codex`
- * on PATH is actually the Windows launcher reached through drive interop.
- * Read-only; hints are printed by runDoctor, never applied.
- */
-export function collectWslDualInstall(deps: WslDualInstallDeps = {}): WslDualInstallDiagnostic {
-  const wsl = isWslRuntime(deps);
-  const effectiveCodexHome = deps.effectiveCodexHome ?? resolveCodexHomeDirImpl(deps);
-  if (!wsl) {
-    return {
-      wsl: false,
-      automountRoot: "/mnt",
-      effectiveCodexHome,
-      effectiveIsWindowsMount: false,
-      linuxCodexConfigured: false,
-      windowsCodexHomes: [],
-      dualInstall: false,
-      interopCodexOnPath: null,
-    };
-  }
-  const automountRoot = wslAutomountRoot(deps);
-  const exists = deps.existsSync ?? existsSync;
-  const home = (deps.homedir ?? homedir)();
-  const linuxCodexConfigured = !!home && exists(join(home, ".codex", "config.toml"));
-  const windowsCodexHomes = listWslWindowsCodexHomes(deps);
-  const onPath = findCodexOnPath({
-    pathValue: deps.pathValue ?? process.env.PATH,
-    wsl: false, // scan everything; classify interop ourselves
-    posixPaths: true, // WSL PATH entries are POSIX regardless of the host running doctor
-    automountRoot,
-    // When a fake fs is injected (tests), the real lstat/readFile would miss its
-    // synthetic paths; treat every injected hit as a plain non-shim file.
-    ...(deps.existsSync ? { exists: deps.existsSync, isShimFile: () => false, isDirectory: () => false } : {}),
-  });
-  const interopCodexOnPath = onPath && isWindowsInteropDir(onPath, automountRoot) ? onPath : null;
-  return {
-    wsl,
-    automountRoot,
-    effectiveCodexHome,
-    effectiveIsWindowsMount: isWindowsInteropDir(effectiveCodexHome, automountRoot),
-    linuxCodexConfigured,
-    windowsCodexHomes,
-    dualInstall: linuxCodexConfigured && windowsCodexHomes.length > 0,
-    interopCodexOnPath,
-  };
-}
-
 export type ProxyEnvRow = { key: string; present: boolean };
 export type EnvMap = Record<string, string | undefined>;
 
@@ -642,74 +529,6 @@ export function collectConfiguredProxy(): ConfiguredProxyDiagnostic {
     configured: true,
     source: diagnostics.source,
     detail: envName ? `env reference ${envName} is unset` : "empty after resolution",
-  };
-}
-
-export function parseProcessEnvBlock(content: string): EnvMap {
-  const env: EnvMap = Object.create(null);
-  for (const entry of content.split("\0")) {
-    if (!entry) continue;
-    const separator = entry.indexOf("=");
-    if (separator <= 0) continue;
-    env[entry.slice(0, separator)] = entry.slice(separator + 1);
-  }
-  return env;
-}
-
-export type RunningProxyEnvDiagnostic =
-  | { status: "not_running"; rows: ProxyEnvRow[] }
-  | { status: "ok"; pid: number; rows: ProxyEnvRow[] }
-  | { status: "unavailable"; pid: number; reason: string; rows: ProxyEnvRow[] };
-
-type RunningProxyEnvDeps = {
-  readPidFn?: () => number | null;
-  readEnvironFn?: (pid: number) => string | null;
-  platform?: NodeJS.Platform | string;
-};
-
-function readProcessEnviron(pid: number): string | null {
-  try {
-    return readFileSync(`/proc/${pid}/environ`, "utf-8");
-  } catch {
-    return null;
-  }
-}
-
-/*
- * [Decision Log]
- * - Purpose: Make `ocx doctor` distinguish the current shell env from the already-running proxy process env.
- * - Alternatives: Rename the old section only; parse service-manager env for each OS; read the recorded proxy PID's env presence.
- * - Rationale: PID env presence is the narrowest useful diagnostic on Linux/WSL, avoids secret value output, and keeps unsupported platforms explicit.
- */
-export function collectRunningProxyEnv(deps: RunningProxyEnvDeps = {}): RunningProxyEnvDiagnostic {
-  const rowsWhenEmpty = () => collectProxyEnv({});
-  const pid = (deps.readPidFn ?? readPid)();
-  if (!pid) return { status: "not_running", rows: rowsWhenEmpty() };
-
-  const platform = deps.platform ?? process.platform;
-  if (platform !== "linux" && !deps.readEnvironFn) {
-    return {
-      status: "unavailable",
-      pid,
-      reason: "process env inspection is only supported on Linux",
-      rows: rowsWhenEmpty(),
-    };
-  }
-
-  const content = (deps.readEnvironFn ?? readProcessEnviron)(pid);
-  if (content === null) {
-    return {
-      status: "unavailable",
-      pid,
-      reason: "could not read process environment",
-      rows: rowsWhenEmpty(),
-    };
-  }
-
-  return {
-    status: "ok",
-    pid,
-    rows: collectProxyEnv(parseProcessEnvBlock(content)),
   };
 }
 
@@ -1406,20 +1225,12 @@ export async function runDoctor(args: string[] = []): Promise<void> {
   // process proxy env" below; helpers live above runDoctor for testability.
 
   const paths = collectPaths();
-  const mounts = readMounts();
   console.log("Paths");
   for (const row of paths) {
-    const fs = detectFsType(row.path, mounts);
-    const flags = [fs.fstype !== "n/a" ? `fs=${fs.fstype}` : null, fs.isDrvfs || fs.isMntDrive ? "WSL /mnt drive" : null]
-      .filter(Boolean).join(", ");
-    console.log(`  ${row.exists ? "ok " : "-- "} ${row.label}: ${row.path}${flags ? `  (${flags})` : ""}`);
+    console.log(`  ${row.exists ? "ok " : "-- "} ${row.label}: ${row.path}`);
   }
 
   console.log("\nocx command selection");
-  for (const check of cliCommandDoctorChecks(collectCliPathDiagnostics())) {
-    console.log(`  ${check.level === "OK" ? "ok " : "!! "} ${check.message}`);
-    if (check.level === "FAIL") recordDoctorFailure();
-  }
 
   // Runs without the proxy on purpose: the worst accumulation happens when the proxy will
   // not start, which is exactly when the in-process periodic reclaim never ticks.
@@ -1476,8 +1287,7 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     configFn: () => ({ port: doctorConfig.port, hostname: doctorConfig.hostname }),
   });
   const liveStartup = live ? await fetchLiveStartupHealth(live) : null;
-  const { startup } = selectStatusStartupHealth(liveStartup, () => collectStartupHealth(doctorConfig),
-    live?.pid != null ? () => inspectDesktopSupervision({ targetPid: live.pid! }) : undefined, live?.pid);
+  const { startup } = selectStatusStartupHealth(liveStartup, () => collectStartupHealth(doctorConfig));
   console.log("\nCodex restart safety");
   console.log(`  ${startup.rebootSafe ? "ok " : "!! "} ${startupHealthSummary(startup)}`);
   console.log(`       ${formatStartupRoutingDetail(startup)}`);
@@ -1546,10 +1356,6 @@ export async function runDoctor(args: string[] = []): Promise<void> {
 
   const currentProxyEnv = collectProxyEnv();
   const configuredProxy = collectConfiguredProxy();
-  const runningProxyEnv = collectRunningProxyEnv({
-    readPidFn: () => (live ? live.pid : readPid()),
-  });
-
   console.log("\nCurrent doctor process proxy env (presence only)");
   for (const row of currentProxyEnv) {
     console.log(`  ${row.present ? "set    " : "unset  "} ${row.key}`);
@@ -1582,18 +1388,6 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     console.log(`         Action: ${codexEnvKeyReadiness.action}`);
   } else {
     console.log("  ok     no broken OpenCodex env_key launch path detected");
-  }
-
-  console.log("\nRunning proxy process proxy env (presence only)");
-  if (runningProxyEnv.status === "not_running") {
-    console.log("  --     no running ocx proxy process found");
-  } else if (runningProxyEnv.status === "unavailable") {
-    console.log(`  --     pid ${runningProxyEnv.pid}: ${runningProxyEnv.reason}`);
-  } else {
-    console.log(`  ok     pid ${runningProxyEnv.pid}`);
-    for (const row of runningProxyEnv.rows) {
-      console.log(`  ${row.present ? "set    " : "unset  "} ${row.key}`);
-    }
   }
 
   console.log("\nMemory / runtime");
@@ -1724,21 +1518,6 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     }
   }
 
-  const dual = collectWslDualInstall();
-  if (dual.wsl) {
-    console.log("\nWSL Codex installs");
-    console.log(`  ${dual.linuxCodexConfigured ? "ok " : "-- "} Linux ~/.codex/config.toml`);
-    if (dual.windowsCodexHomes.length > 0) {
-      for (const winHome of dual.windowsCodexHomes) console.log(`  ok  Windows ${winHome}`);
-    } else {
-      console.log("  --  no Windows-profile .codex detected under /mnt/c/Users");
-    }
-    console.log(`      effective CODEX_HOME: ${dual.effectiveCodexHome}${dual.effectiveIsWindowsMount ? " (Windows mount)" : ""}`);
-    if (dual.interopCodexOnPath) {
-      console.log(`  --  codex on PATH is the Windows launcher via interop: ${dual.interopCodexOnPath}`);
-    }
-  }
-
   // OAuth reliability: observe-only (no mutations / auto-repair).
   console.log("\nOAuth reliability");
   for (const check of await collectOAuthDoctorChecks()) {
@@ -1793,22 +1572,14 @@ export async function runDoctor(args: string[] = []): Promise<void> {
   if (defaultModelExposure.status === "not_exposed") {
     hints.push(`${defaultModelExposure.detail}. ${defaultModelExposure.action}.`);
   }
-  const anyDrvfs = paths.some(p => detectFsType(p.path, mounts).isDrvfs || detectFsType(p.path, mounts).isMntDrive);
   const noProxy = currentProxyEnv.every(p => !p.present) && !configuredProxy.present;
   if (!startup.rebootSafe) {
-    if (startup.recommendedAction || startup.desktop?.supervisor) {
-      hints.push(`Codex is pinned to the local proxy without persistent startup protection. ${startup.recommendedAction ?? "Reopen OpenCodex and check Start at Login."}`);
-    } else {
-      const command = startup.recommendedCommand ?? startup.commands.restoreNative;
-      hints.push(`Codex is pinned to the local proxy without persistent startup protection. After restart, requests can reconnect indefinitely. Run '${command}'.`);
-    }
-  }
-  if (anyDrvfs) {
-    hints.push("State dir is on a Windows-mounted (/mnt) drive. Prefer the Linux home (~) under WSL for token/lock reliability.");
+    const command = startup.recommendedCommand ?? startup.commands.restoreNative;
+    hints.push(`Codex is pinned to the local proxy without persistent startup protection. After restart, requests can reconnect indefinitely. Run '${command}'.`);
   }
   if (!probe.ok) {
     if (probe.classification === "timeout" || probe.classification === "connect_error") {
-      hints.push("WHAM probe could not reach chatgpt.com. On WSL2 this is often NAT/DNS/VPN. Quota cannot prime, so auto-switch stays on unknown scores.");
+      hints.push("WHAM probe could not reach chatgpt.com. Check DNS, VPN and proxy connectivity; quota is unavailable until the probe succeeds.");
       if (noProxy) {
         hints.push("No proxy is visible to this doctor process and config.proxy is unset or unresolved. If Windows uses a proxy/VPN, set config.proxy or start ocx from a shell with HTTP(S)_PROXY.");
       }
@@ -1822,13 +1593,6 @@ export async function runDoctor(args: string[] = []): Promise<void> {
     hints.push("The history manifest or its target is invalid or changed. Preserve both, inspect the manifest/database/rollout identity, and do not repeatedly run 'ocx sync' until the mismatch is understood. Untracked routed history is not relabeled.");
   } else if (pending.backupEntries > 0) {
     hints.push("Backed-up history metadata is pending. The running proxy retries exact restoration automatically; to force it now, close the Codex app and run 'ocx sync'. Untracked routed history is not relabeled.");
-  }
-  if (dual.dualInstall && !dual.effectiveIsWindowsMount) {
-    hints.push(`Codex is installed on BOTH WSL and Windows. Each side keeps its own ~/.codex (logins, config, catalog are separate); ocx here manages the Linux one. To share a single home, set CODEX_HOME=${dual.windowsCodexHomes[0] ?? `${dual.automountRoot}/c/Users/<you>/.codex`} in WSL (drvfs file locking is less reliable).`);
-    hints.push("localhost is one-way in WSL2 NAT mode: Windows-side codex reaches this WSL proxy via localhost (localhostForwarding, on by default), but a Windows-side proxy is NOT reachable from WSL via localhost — use networkingMode=mirrored in .wslconfig for both directions.");
-  }
-  if (dual.interopCodexOnPath) {
-    hints.push("The `codex` found on PATH is the Windows launcher reached through WSL interop; ocx will not shim it (a WSL shim breaks Windows invocations). Install codex inside WSL (npm i -g @openai/codex) or run 'ocx ensure' from Windows.");
   }
   if (hints.length > 0) {
     console.log("\nHints");

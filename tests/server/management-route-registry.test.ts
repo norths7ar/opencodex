@@ -454,12 +454,6 @@ describe("management route registry reconciliation", () => {
     }
   });
 
-  test("a multi-method disjunction expands into one route per method", () => {
-    // `PUT || PATCH` on one guard is two routes. A count keyed on line hits saw one.
-    const poolStrategy = MANAGEMENT_ROUTES.filter(r => r.path === "/api/codex-auth/pool-strategy");
-    expect(poolStrategy.map(r => r.method).sort()).toEqual(["PATCH", "PUT"]);
-  });
-
   test("the negated-guard routes are declared, and the dead duplicate is GONE", () => {
     // An equality scan cannot see a `pathname !== x` guard at all, so both of these are
     // declared by hand. `/api/storage` previously had TWO declarations: the live guard and a
@@ -515,10 +509,9 @@ describe("route exemptions stay honest", () => {
     });
   });
 
-  test("account-switch and key pause routes remain ordinary management mutations", () => {
+  test("account and key pause routes remain ordinary management mutations", () => {
     for (const path of [
-      "/api/codex-auth/active", "/api/oauth/accounts/active", "/api/providers/keys/active",
-      "/api/providers/keys/pause",
+      "/api/codex-auth/accounts/pause", "/api/oauth/accounts/pause", "/api/providers/keys/pause",
     ]) {
       const row = MANAGEMENT_ROUTES.find(r => r.method === "PUT" && r.path === path);
       expect(row?.mutates, path).toBe(true);
@@ -580,7 +573,6 @@ describe("the sibling guard refuses only declared shared-state mutations", () =>
         ["PUT", "/api/client-integrations/raycast"],
         ["POST", "/api/sync"],
         ["POST", "/api/link/join"],
-        ["POST", "/api/native-main-profiles/switch"],
         ["POST", "/api/codex-auth/main/reauth-device"],
         ["POST", "/api/startup-action"],
         ["PUT", "/api/v2"],

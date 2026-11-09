@@ -313,25 +313,6 @@ describe("hosted web search Anthropic thinking-signature recovery", () => {
     expect(bodies).toHaveLength(1);
   });
   for (const combo of [false, true]) for (const rawSse of [false, true]) {
-    test(`shared budget denies recovery without another physical send (Combo=${combo}, SSE=${rawSse})`, async () => {
-      const budget = createRequestExecutionBudget({ maxTotalModelSends: combo ? 1 : 0,
-        baseSendAllowance: combo ? 1 : 0, finalRecoveryAllowance: 0,
-        maxAlternateTargetSends: 0, maxTargetTransitions: 0 }, "search-recovery-refused");
-      const options: Parameters<typeof handleResponses>[3] = { sendBudget: budget };
-      if (combo) {
-        const booking = budget.reserveDispatch({ sendClass: "initial", targetKey: "anthropic-test|https://anthropic.example.test/v1/messages|claude-sonnet-4-5", countedExternally: true });
-        if (!booking.allowed) throw new Error("Synthetic initial booking refused");
-        options.comboAttempt = true;
-        options.comboInitialSend = { permit: booking.permit };
-      }
-      const { bodies } = transport(index => index === 1 ? rawSse ? streamRejection() : rejection() : success());
-      await send(options);
-      expect(bodies).toHaveLength(1);
-      expect(budget.used).toBe(1);
-      await send();
-      expect(bodies).toHaveLength(2);
-      expect(bodies[1]).toContain(SIGNATURE);
-    });
   }
   for (const rawSse of [false, true]) {
     test(`cancellation before recovery prevents dispatch and memo (SSE=${rawSse})`, async () => {
@@ -393,25 +374,6 @@ describe("hosted web search Anthropic thinking-signature recovery", () => {
     expect(bodies[3]).toContain(SIGNATURE);
   });
   for (const combo of [false, true]) for (const rawSse of [false, true]) {
-    test(`successful recovery charges each physical send once (Combo=${combo}, SSE=${rawSse})`, async () => {
-      let charges = 0, refunds = 0;
-      const budget = createRequestExecutionBudget({ maxTotalModelSends: 2, baseSendAllowance: 2,
-        finalRecoveryAllowance: 0, maxAlternateTargetSends: 0, maxTargetTransitions: 0 }, "search-recovery-charged",
-      { charge: () => { charges++; return true; }, refund: () => { refunds++; } });
-      const options: Parameters<typeof handleResponses>[3] = { sendBudget: budget };
-      if (combo) {
-        const booking = budget.reserveDispatch({ sendClass: "initial", targetKey: "anthropic-test|https://anthropic.example.test/v1/messages|claude-sonnet-4-5", countedExternally: true });
-        if (!booking.allowed) throw new Error("Synthetic initial booking refused");
-        options.comboAttempt = true; options.comboInitialSend = { permit: booking.permit };
-      }
-      const { bodies } = transport(index => index === 1 ? rawSse ? streamRejection() : rejection() : success());
-      const result = await send(options);
-      expect(result.text).toContain("Recovered search answer");
-      expect(bodies).toHaveLength(2);
-      expect(budget.used).toBe(2);
-      expect(charges).toBe(2);
-      expect(refunds).toBe(0);
-    });
   }
   for (const rawSse of [false, true]) {
     test(`enforced spend owner refuses unproven recovery even with numeric headroom (SSE=${rawSse})`, async () => {

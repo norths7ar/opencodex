@@ -24,12 +24,6 @@ import {
 import type { ServiceStateRecordEvidence } from "./state-record.mjs";
 import { assertServiceStateLocksOwned, withServiceStateLocks, type ServiceStateLockHooks } from "./state-lock";
 import { withOwnershipMutationLease, type OwnershipMutationLeaseOptions } from "./ownership-mutation-lease.mjs";
-import {
-  assessServiceTakeoverCompatibility,
-  sameServiceTakeoverCompatibility,
-  type ManagingCliObservation,
-  type ServiceTakeoverCompatibility,
-} from "./ownership-compatibility";
 
 /**
  * Written only by the launchd plist and the systemd unit. `OCX_SERVICE=1` cannot stand in
@@ -327,7 +321,7 @@ export interface ServiceOwnership {
   /**
    * Opaque identity of the owning INSTALLATION — not of the user, the machine or the
    * account. The desktop app keeps the same value in its own app-local store, and comparing
-   * the two through {@link ownershipGrantedTo} is how a reinstalled app tells its own prior
+   * the install ID and generation distinguishes old records from newer ones, including prior
    * consent from another installation's.
    */
   readonly installId: string;
@@ -666,147 +660,6 @@ export class ServiceOwnershipSubjectUnknownError extends Error {
     super(`service ownership could not be revalidated after consent (${reason}); nothing was written`);
     this.name = "ServiceOwnershipSubjectUnknownError";
   }
-}
-
-export class ServiceTakeoverCompatibilityChangedError extends Error {
-  readonly code = "service-takeover-compatibility-changed" as const;
-  constructor(readonly actual: ServiceTakeoverCompatibility) {
-    super("the managing CLI compatibility changed after consent; resolve again and ask for fresh approval");
-    this.name = "ServiceTakeoverCompatibilityChangedError";
-  }
-}
-
-/**
- * Whether the packaged desktop app owns the runtime.
- *
- * This is the predicate `ocx service repair` and `ocx update` consult before they would
- * re-enable, rewrite or restart the npm service registration. The registration itself is
- * kept either way — the maintainer's decision is that the user's install is never deleted,
- * so this marker is the only thing that makes the takeover durable.
- */
-export function desktopOwnsService(state: ServiceInstallState | null = readServiceInstallState()): boolean {
-  return serviceOwnership(state)?.owner === "desktop";
-}
-
-/**
- * THE COMPARISON RULE. An installation holds the recorded grant only when both the kind of
- * owner and the install id match its own.
- *
- * The desktop app calls this at launch with the install id from its app-local store. True
- * means this very installation already has consent and must not ask again. False with a
- * non-null `ownership` means a DIFFERENT installation owns the runtime — a reinstalled app,
- * or a second copy — and consent has to be asked before taking over. Null means nothing is
- * recorded and the npm install still owns it.
- */
-export function ownershipGrantedTo(
-  ownership: ServiceOwnership | null,
-  owner: ServiceOwner,
-  installId: string,
-): boolean {
-  return ownership !== null && ownership.owner === owner && ownership.installId === installId;
-}
-
-/**
- * The record an ownership write lands on when no install state exists yet.
- *
- * Deliberately carries no `bunPath`, `cliPath` or `launcherPath`: those are baked BY AN
- * INSTALL, and a takeover is not one. Recording the claiming process's own paths as install
- * provenance would make `ocx service status` describe a registration nobody created.
- */
-function ownershipBaseRecord(current: ServiceInstallState | null): ServiceInstallState {
-  if (current) return current;
-  const codexHome = currentCodexHome();
-  return {
-    version: 2,
-    codexHome,
-    opencodexHome: currentOpenCodexHome(),
-    codexSqliteHome: resolveCodexSqliteHome({ codexHome }),
-    backend: "scheduler",
-  };
-}
-
-/**
- * Record `claim` as the runtime's owner and return what was written.
- *
- * Idempotent by design: re-recording the same owner and install id leaves the consent
- * generation alone, so every relaunch of an app that already has consent is a no-op on the
- * number. A different owner or a different install id is a new grant and increments it once.
- */
-export interface RecordServiceOwnerRequest {
-  readonly owner: ServiceOwner;
-  readonly installId: string;
-  readonly expectedSubject: ServiceOwnershipSubject;
-  readonly expectedCompatibility: Extract<ServiceTakeoverCompatibility, { kind: "supported" }>;
-}
-
-export interface RecordServiceOwnerDeps extends ServiceStateSwapDeps {
-  /** Re-observes BOTH the registered manager and the current PATH manager inside the lock. */
-  readonly observeManagers: () => Readonly<Record<"service-registration" | "path", ManagingCliObservation>>;
-}
-
-export function recordServiceOwner(
-  request: RecordServiceOwnerRequest,
-  deps: RecordServiceOwnerDeps,
-): Extract<ServiceOwnershipSubject, { kind: "owned" }> {
-  if (!request.installId) throw new Error("refusing to record service ownership without an install id");
-  if (!request.expectedSubject || request.expectedCompatibility?.kind !== "supported") {
-    throw new Error("refusing to record service ownership without the exact approved subject and compatibility token");
-  }
-  if (!deps || typeof deps.observeManagers !== "function") {
-    throw new Error("refusing to record service ownership without a managing-CLI revalidation callback");
-  }
-  const { observeManagers, ...swapDeps } = deps;
-  let recorded: ServiceOwnership | null = null;
-  const committed = swapServiceInstallState((current, context) => {
-    const actualSubject = serviceOwnershipSubject(current, context.revision);
-    if (!sameServiceOwnershipSubject(request.expectedSubject, actualSubject)) {
-      throw new ServiceOwnershipSubjectMismatchError(request.expectedSubject, actualSubject);
-    }
-    let managers: Readonly<Record<"service-registration" | "path", ManagingCliObservation>>;
-    try { managers = observeManagers(); }
-    catch (error) {
-      throw new ServiceTakeoverCompatibilityChangedError({
-        kind: "blocked",
-        reason: "managing-cli-unknown",
-        detail: error instanceof Error ? error.message : String(error),
-        minimumCliVersion: SERVICE_OWNERSHIP_MINIMUM_CLI_VERSION,
-      });
-    }
-    const compatibility = assessServiceTakeoverCompatibility({
-      state: current,
-      subject: actualSubject,
-      managers,
-    });
-    if (!sameServiceTakeoverCompatibility(request.expectedCompatibility, compatibility)) {
-      throw new ServiceTakeoverCompatibilityChangedError(compatibility);
-    }
-    const previous = current?.ownership ?? null;
-    // The ceiling, not just the live claim: a grant that was released left its number
-    // behind on purpose, so a later grant cannot reuse it.
-    const floor = Math.max(previous?.consentGeneration ?? 0, current?.consentGenerationCeiling ?? 0);
-    if (floor >= Number.MAX_SAFE_INTEGER) {
-      throw new Error("service ownership consent generation is exhausted; nothing was written");
-    }
-    recorded = {
-      owner: request.owner,
-      installId: request.installId,
-      consentGeneration: previous && ownershipGrantedTo(previous, request.owner, request.installId)
-        ? previous.consentGeneration
-        : floor + 1,
-    };
-    return {
-      ...ownershipBaseRecord(current),
-      ownership: recorded,
-      consentGenerationCeiling: Math.max(floor, recorded.consentGeneration),
-    };
-  }, {
-    ...swapDeps,
-    unknownStateError: reason => new ServiceOwnershipSubjectUnknownError(request.expectedSubject, reason),
-  });
-  if (recorded === null || !committed?.ownership || committed.revision === undefined) {
-    throw new Error("service ownership was not recorded");
-  }
-  return { kind: "owned", ownership: committed.ownership, revision: committed.revision };
 }
 
 /**

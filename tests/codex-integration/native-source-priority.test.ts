@@ -25,7 +25,7 @@ const get = (rows: RawEntry[], slug: string) => rows.find(row => row.slug === sl
 const priorities = (rows: RawEntry[]) => ids.map(id => get(rows, id).priority);
 function build(picks = featured, selectors: string[] = [], template: RawEntry | null = null) {
   return buildCatalogEntriesFromObservedState({ template, gptSlugs: ids, goModels: routed,
-    featured: picks, wsEnabled: false, multiAgentMode: "default", exactComboSlugs: new Set(),
+    featured: picks, wsEnabled: false, multiAgentMode: "default",
     accountSelectors: selectors, suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     multiAgentV2Enabled: false });
 }
@@ -34,8 +34,7 @@ function merge(rows: RawEntry[], baseline = new Map<string, number>(), picks = f
     routedEntries: build(picks).filter(row => String(row.slug).includes("/")), baseline, featured: picks,
     wsEnabled: false, template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
     gatheredProviderNames: new Set(["fixture"]), degradedProviderNames: new Set(), legacyCustomModelSlugs: new Set(),
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
-    hasPhysicalComboProvider: false, includeNativeOpenAi: true, accountBoundEntries: [],
+    multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: true, accountBoundEntries: [],
     policy: { nativeBackfillSlugs: ids, unsupportedNativeEntries: "preserve", warningPolicy: "suppress" } });
 }
 beforeEach(() => {
@@ -129,7 +128,7 @@ test("a template cloned into another native or routed identity loses source prov
 
 test("unfeatured baseline nine is assigned after upstream derivation and overrides retained three", () => {
   const rows = buildCatalogEntriesFromObservedState({ template: null, gptSlugs: ["gpt-5.6-sol"], goModels: [],
-    featured: [], wsEnabled: false, multiAgentMode: "default", exactComboSlugs: new Set(),
+    featured: [], wsEnabled: false, multiAgentMode: "default",
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     multiAgentV2Enabled: false, nativeSource: { baseline: new Map([["gpt-5.6-sol", 9]]), retainedBySlug: new Map([["gpt-5.6-sol", 3]]) } });
   expect(get(rows, "gpt-5.6-sol").priority).toBe(9);

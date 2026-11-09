@@ -2584,34 +2584,6 @@ describe("opencodex config defaults", () => {
       }
     });
 
-    test("salvage repeats when dropping one entry exposes a new failure", () => {
-      // Sections are not independent of each other: a profile alias is validated against the
-      // combo map, so removing an invalid combo can surface a NEW failure in a profile that
-      // was fine while that combo existed. A single-pass salvage saw that second failure and
-      // discarded the whole config -- the outcome this exists to stop.
-      configWith({
-        combos: {
-          badCombo: { members: [{ provider: "nope-not-configured", model: "m" }] },
-        },
-        routingProfiles: {
-          alsoBad: { candidates: [{ provider: "TR", model: "m" }] },
-          good:    { candidates: [{ provider: "keep2", model: "m" }] },
-        },
-      });
-      const errorSpy = spyOn(console, "error").mockImplementation(() => {});
-      try {
-        const loaded = loadConfig() as Record<string, any>;
-
-        // Everything unrelated survives, and both bad entries are gone.
-        expect(Object.keys(loaded.providers)).toEqual(expect.arrayContaining(["TR", "keep1", "keep2"]));
-        expect(loaded.modelCosts).toHaveProperty("keep1/m");
-        expect(Object.keys(loaded.combos ?? {})).not.toContain("badCombo");
-        expect(Object.keys(loaded.routingProfiles ?? {})).toEqual(["good"]);
-      } finally {
-        errorSpy.mockRestore();
-      }
-    });
-
     test("a token-shaped entry id is not echoed into the warning", () => {
       // Entry ids are operator-chosen and can be pasted secrets. The warning names the
       // section so the operator knows where to look, but nothing dynamic goes out raw.
@@ -2627,22 +2599,6 @@ describe("opencodex config defaults", () => {
         const logged = errorSpy.mock.calls.map(call => String(call[0])).join("\n");
         expect(logged).toContain("routingProfiles.");
         expect(logged).not.toContain(tokenId);
-      } finally {
-        errorSpy.mockRestore();
-      }
-    });
-    test("combos are salvaged the same way", () => {
-      configWith({
-        combos: {
-          good: { members: [{ provider: "keep1", model: "m" }] },
-          bad:  { members: [{ provider: "nope-not-configured", model: "m" }] },
-        },
-      });
-      const errorSpy = spyOn(console, "error").mockImplementation(() => {});
-      try {
-        const loaded = loadConfig() as Record<string, any>;
-        expect(Object.keys(loaded.providers)).toEqual(expect.arrayContaining(["keep1", "keep2"]));
-        expect(Object.keys(loaded.combos ?? {})).not.toContain("bad");
       } finally {
         errorSpy.mockRestore();
       }

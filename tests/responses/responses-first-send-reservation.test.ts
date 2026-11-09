@@ -1,12 +1,10 @@
 import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
-import { createNativeChatComboSource } from "../../src/server/chat-native";
 import { createProtocolEnvelope } from "../../src/protocols/envelope";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { handleResponses } from "../../src/server/responses/core";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { closeRequestHistoryIndex } from "../../src/routing/history/indexer";
 import { clearResponseStateForTests, flushResponseState } from "../../src/responses/state";
 import { clearKeyCooldowns } from "../../src/providers/key-failover";
@@ -17,7 +15,6 @@ import { createResponsesSendBudget, transientSendCapFor } from "../../src/server
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
 import { SendBudgetExhaustedError } from "../../src/lib/upstream-retry";
 import { sharedSpendLedger } from "../../src/lib/spend-reservation-ledger";
-import { comboExecutionBudgetPolicy } from "../../src/server/responses/core-combo";
 import type { RequestLogContext } from "../../src/server/request-log";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
@@ -32,14 +29,12 @@ beforeEach(() => {
   home = mkdtempSync(join(tmpdir(), "first-send-reservation-"));
   process.env.OPENCODEX_HOME = home;
   codex = installIsolatedCodexHome("first-send-codex-");
-  release = acquireOwnedSpendHome();
-  clearComboSelectionState(); clearComboTargetCooldowns(); clearKeyCooldowns();
+  release = acquireOwnedSpendHome(); clearKeyCooldowns();
 });
 afterEach(async () => {
   release();
   for (const server of servers.splice(0)) await server.stop(true);
-  closeRequestHistoryIndex(); await flushResponseState(); clearResponseStateForTests();
-  clearComboSelectionState(); clearComboTargetCooldowns(); clearKeyCooldowns();
+  closeRequestHistoryIndex(); await flushResponseState(); clearResponseStateForTests(); clearKeyCooldowns();
   resetProviderRequestPacingForTest();
   if (prior === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = prior;
@@ -89,17 +84,6 @@ async function send(f: ReturnType<typeof fixture>, signal?: AbortSignal) {
 }
 
 for (const strategy of ["jev", "failover", "direct"] as const) {
-  test(`${strategy}: one-send policy reaches real Responses upstream exactly once`, async () => {
-    const f = fixture(strategy);
-    const { response, log } = await send(f);
-    expect(response.status).toBe(200); expect(f.inference.bodies).toHaveLength(1);
-    expect(f.budget.used).toBe(1); expect(f.charges).toBe(1); expect(f.refunds).toBe(0);
-    expect(f.judgeCalls).toBe(strategy === "jev" ? 1 : 0);
-    if (strategy === "jev") {
-      expect(log.jevDecision?.selected.effort).toBe("low");
-      expect((f.inference.bodies[0]!.reasoning as Record<string, unknown>).effort).toBe("low");
-    }
-  });
   test(`${strategy}: configured one-send 5xx cannot buy a retry or final recovery`, async () => {
     const f = fixture(strategy, 503);
     const { response, text } = await send(f);
@@ -116,80 +100,9 @@ for (const strategy of ["jev", "failover", "direct"] as const) {
 }
 
 for (const attempts of [1, 3, 10]) {
-  test(`ordinary Combo: later target keeps its configured allowance under shared ceiling (${attempts})`, async () => {
-    const f = fixture("failover", 503, attempts);
-    const second = upstream(503), third = upstream(503);
-    f.config.providers.b = provider(second.baseUrl, attempts); f.config.providers.c = provider(third.baseUrl, attempts);
-    f.config.combos!.auto!.targets.push({ provider: "b", model: "m" }, { provider: "c", model: "m" });
-    const { response, log } = await send(f);
-    expect(response.status).toBe(503);
-    const counts = [f.inference.bodies.length, second.bodies.length, third.bodies.length];
-    expect(counts.every(count => count >= 1 && count <= attempts)).toBe(true);
-    const sent = counts.reduce((sum, count) => sum + count, 0);
-    expect(sent).toBeLessThanOrEqual(comboExecutionBudgetPolicy(3).maxTotalModelSends);
-    expect(f.budget.used).toBe(sent); expect(f.charges).toBe(sent); expect(f.refunds).toBe(0);
-    expect(log.attempts!.map(attempt => attempt.sendCount)).toEqual(counts);
-  }, 15_000);
 }
 
-test("unconfigured Google Combo ladder respects prepaid allowance and later-target holdback", async () => {
-  const f = fixture("failover", 503);
-  const second = upstream(503), third = upstream(503);
-  for (const [name, baseUrl] of [["a", f.inference.baseUrl], ["b", second.baseUrl], ["c", third.baseUrl]] as const) {
-    const row = provider(baseUrl); delete row.transientRetryOn5xx; row.adapter = "google";
-    f.config.providers[name] = row;
-  }
-  f.config.combos!.auto!.targets.push({ provider: "b", model: "m" }, { provider: "c", model: "m" });
-  expect((await send(f)).response.status).toBe(503);
-  const counts = [f.inference.bodies.length, second.bodies.length, third.bodies.length];
-  expect(counts).toEqual([3, 2, 1]);
-  expect(f.budget.used).toBe(comboExecutionBudgetPolicy(3).maxTotalModelSends);
-  expect(f.charges).toBe(6); expect(f.refunds).toBe(0);
-}, 10_000);
-
-test("later translated Combo target retains configured recovery total", async () => {
-  const f = fixture("failover", 503, 1);
-  let sent = 0;
-  f.config.providers.b = Object.assign({ ...provider("https://fixture.invalid", 2), adapter: "openai-chat",
-    retryOn429: { attempts: 1, intervalMs: 1, maxIntervalMs: 1 } }, { fetch: (async () => {
-      sent++;
-      return sent === 1 ? Response.json({ error: { message: "fixture limited" } }, { status: 429 })
-        : chatSuccess("fixture recovery", "m");
-    }) as unknown as typeof fetch });
-  f.config.combos!.auto!.targets.push({ provider: "b", model: "m" });
-  expect((await send(f)).response.status).toBe(200);
-  expect(sent).toBe(2); expect(f.budget.used).toBe(3); expect(f.charges).toBe(3);
-});
-
-for (const attempts of [1, 2]) for (const refused of [false, true]) test(`native Chat receipt owns pending booking (attempts=${attempts}, refused=${refused})`, async () => {
-  const f = fixture("failover", 200, attempts);
-  let sends = 0;
-  f.config.providers.a = Object.assign({ ...f.config.providers.a!, adapter: "openai-chat",
-    ...(refused ? { proxy: "direct" as const } : {}) }, {
-    fetch: (async () => {
-      sends++;
-      return attempts === 2 && sends === 1 ? Response.json({ error: { message: "fixture transient" } }, { status: 503 })
-        : chatSuccess("fixture native", "m");
-    }) as unknown as typeof fetch });
-  f.config.protocols = { rollout: { nativeChatCombos: true } };
-  const other = f.budget.reserveDispatch({ sendClass: "initial", targetKey: "unrelated", countedExternally: true });
-  if (!other.allowed) throw new Error("fixture refused");
-  const translatorBudget = createTranslatorBudget();
-  const body = { model: "combo/auto", messages: [{ role: "user", content: "fixture" }], stream: false };
-  const req = new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ model: "combo/auto", input: "fixture", stream: false }) });
-  const protocolSource = createNativeChatComboSource({ req, config: f.config,
-    envelope: createProtocolEnvelope({ inbound: "chat", body, translatorBudget }),
-    requestedModel: "combo/auto", requestedStream: false, translatorBudget });
-  try {
-    const response = await handleResponses(req, f.config, { model: "", provider: "" }, {
-      sendBudget: f.budget, translatorBudget, protocolSource });
-    expect(response.ok).toBe(!refused); await response.text(); expect(sends).toBe(refused ? 0 : attempts);
-    expect(f.budget.used).toBe(refused ? 1 : attempts + 1); expect(f.charges).toBe(refused ? 2 : attempts + 1);
-    expect(f.refunds).toBe(refused ? 1 : 0);
-    other.permit.release(); expect(f.budget.used).toBe(refused ? 0 : attempts); expect(f.refunds).toBe(refused ? 2 : 1);
-  } finally { other.permit.release(); translatorBudget.dispose(); }
-});
+for (const attempts of [1, 2]) for (const refused of [false, true])
 
 test("pre-dispatch body refusal refunds prepaid reservation and observer charge", async () => {
   const f = fixture("failover"); f.config.maxUpstreamBodyBytes = 1;
@@ -219,76 +132,6 @@ test("caller abort during queued dispatch refunds unsent booking", async () => {
     expect(f.inference.bodies).toHaveLength(1); expect(f.budget.used).toBe(before);
     expect(f.charges).toBe(1); expect(f.refunds).toBe(1);
   } finally { clearTimeout(timer); }
-});
-
-test("detached Responses model judge keeps its own one-send booking and lease", async () => {
-  const f = fixture("jev");
-  delete f.config.providers.jev;
-  const judge = upstream();
-  let judgeSends = 0;
-  // A model judge needs the choice in its output text rather than in the service envelope.
-  f.config.providers.judge = Object.assign(provider(judge.baseUrl), { fetch: (async () => {
-    judgeSends++;
-    expect(getActiveTurnCount()).toBe(turns + 1);
-    return Response.json(responsesSuccess('{"choice":"a/m:low"}', "m"));
-  }) as unknown as typeof fetch });
-  f.config.combos!.auto!.decisionModel = "judge/m";
-  const turns = getActiveTurnCount();
-  const { response, log } = await send(f);
-  expect(response.status).toBe(200); expect(f.inference.bodies).toHaveLength(1);
-  expect(log.jevDecision).toMatchObject({ backend: "model", gate: "apply" });
-  expect(f.budget.used).toBe(1); expect(f.charges).toBe(1); expect(judgeSends).toBe(1);
-  expect(sharedSpendLedger().snapshot("pool", "judge")).toMatchObject({ reserved: 0, settled: 3, unresolved: 0 });
-  expect(getActiveTurnCount()).toBe(turns);
-});
-
-for (const abort of [false, true]) test(`translated Chat Combo consumes or refunds prepaid initial send (${abort})`, async () => {
-  const f = fixture("failover");
-  let sent = 0;
-  f.config.providers.a = Object.assign({ ...f.config.providers.a!, adapter: "openai-chat",
-    requestPacing: { enabled: true, minIntervalMs: 1000 } }, {
-    fetch: (async () => { sent++; return chatSuccess("fixture translated answer", "m"); }) as unknown as typeof fetch });
-  if (!abort) {
-    expect((await send(f)).response.status).toBe(200);
-    expect(sent).toBe(1); expect(f.budget.used).toBe(1); expect(f.charges).toBe(1); expect(f.refunds).toBe(0);
-    return;
-  }
-  expect((await send({ ...f, budget: createRequestExecutionBudget() })).response.status).toBe(200);
-  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 40);
-  try {
-    expect((await send(f, controller.signal)).response.status).toBe(499);
-    expect(sent).toBe(1); expect(f.budget.used).toBe(0); expect(f.charges).toBe(1); expect(f.refunds).toBe(1);
-  } finally { clearTimeout(timer); }
-});
-
-test("streaming runTurn producer retains prepaid send after ingress returns", async () => {
-  const f = fixture("failover");
-  f.config.providers.a = { ...f.config.providers.a!, adapter: "openai-chat" };
-  let finish!: () => void, sent!: () => void;
-  const gate = new Promise<void>(resolve => { finish = resolve; });
-  const dispatched = new Promise<void>(resolve => { sent = resolve; });
-  const adapter = spyOn(ADAPTER_REGISTRY["openai-chat"], "create").mockImplementation(() => ({
-    name: "fixture-runturn", reportsPhysicalSends: true,
-    buildRequest: () => ({ url: f.inference.baseUrl, method: "POST", headers: {}, body: "{}" }),
-    async *parseStream() { yield { type: "done" as const }; },
-    async runTurn(_parsed, incoming, emit) {
-      emit({ type: "text_delta", text: "fixture preliminary output" });
-      await gate;
-      const booking = incoming.sendBudget!.reserveDispatch({ sendClass: "initial", targetKey: "fixture-endpoint" });
-      expect(booking.allowed).toBe(true); if (!booking.allowed) throw new Error("prepaid send lost");
-      expect(booking.permit.use()).toBe(true);
-      incoming.onPhysicalSend?.({ ordinal: 1 }); sent();
-      emit({ type: "done" });
-    },
-  }));
-  try {
-    const req = new Request("http://localhost/v1/responses", { method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ model: "combo/auto", input: "fixture", stream: true }) });
-    const response = await handleResponses(req, f.config, { model: "", provider: "" }, { sendBudget: f.budget });
-    expect(response.status).toBe(200); expect(f.budget.used).toBe(1); expect(f.refunds).toBe(0);
-    finish(); await dispatched; await response.text();
-    expect(f.budget.used).toBe(1); expect(f.charges).toBe(1); expect(f.refunds).toBe(0);
-  } finally { finish(); adapter.mockRestore(); }
 });
 
 /** Construct a child-local owner over one externally counted shared reservation. */

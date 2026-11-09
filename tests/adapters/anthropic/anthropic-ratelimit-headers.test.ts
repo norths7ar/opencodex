@@ -316,8 +316,6 @@ describe("Anthropic rate-limit headers feed the routing cache", () => {
     reconcileProviderAccountQuotaRows({
       generation: 5,
       providerNames: new Set(),
-      comboIds: new Set(),
-      comboTargets: new Set(),
       codexAccountIds: new Set(),
       oauthAccountKeys: new Set(),
       configRoots: new Set(),

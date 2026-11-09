@@ -289,8 +289,7 @@ function context(keys?: ReadonlySet<string>): GenerationContext {
     generation: reconciliationGeneration,
     providerNames: new Set(INSTANCE_FIXTURE_INSTANCES),
     oauthAccountKeys: keys ?? new Set(INSTANCE_FIXTURE_INSTANCES.flatMap(instance =>
-      f.store.getAccountSet(instance)!.accounts.map(row => cache.accountCacheKey(instance, row.id)))),
-    comboIds: new Set(), comboTargets: new Set(), codexAccountIds: new Set(), configRoots: new Set(),
+      f.store.getAccountSet(instance)!.accounts.map(row => cache.accountCacheKey(instance, row.id)))), codexAccountIds: new Set(), configRoots: new Set(),
   };
 }
 function reconcile(ctx: GenerationContext): void {

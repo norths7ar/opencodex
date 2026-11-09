@@ -12,12 +12,10 @@
 import { findLiveProxy, probeHostname, type LivenessIo, type LiveProxy } from "../server/proxy-liveness";
 import { runningProxyUpdateHeaders } from "../oauth/login-cli";
 import { redactSecretArgs } from "./secret-args";
-import type { LinkHomeDeps } from "../client/link-home";
 export { redactSecretArgs };
 
 export type CliStdin = NodeJS.ReadableStream & { isTTY?: boolean; readableEnded?: boolean };
 
-export const MAX_LINK_CREDENTIAL_BYTES = 4 * 1024;
 
 export interface RuntimeApiDeps {
   baseUrl?: string;
@@ -29,8 +27,6 @@ export interface RuntimeApiDeps {
   stdinSignal?: AbortSignal;
   /** Optional proxy liveness probe injection for commands that check or fall back around live runtime state. */
   findLiveProxy?: (io?: LivenessIo) => Promise<LiveProxy | null>;
-  /** Remote Link Child: how allowlisted reads reach the Home (#6957). */
-  linkHome?: LinkHomeDeps;
 }
 
 export class CliUsageError extends Error {
@@ -48,50 +44,17 @@ export class RuntimeApiError extends Error {
     readonly status: number,
     readonly body: unknown,
     /** Local discovery refusals occur before the management request is sent. */
-    readonly code?: "proxy_not_running" | "client_role_management_unavailable" | "link_child_management_unavailable",
+    readonly code?: "proxy_not_running",
   ) {
     super(message);
     this.name = "RuntimeApiError";
   }
 }
 
-/**
- * Refusal for a management request that resolved to a connected-client machine listener.
- *
- * A connected client runs `src/client/machine-listener.ts`, which binds the SAME address the
- * standalone proxy would (`port ?? config.port ?? 10100`) and answers `/healthz` as opencodex.
- * Liveness therefore finds it — correctly, it is our process — but it serves only
- * `/api/machine/*` and returns a JSON 404 for every other `/api/*` path. Before this refusal
- * every management-backed subcommand on such a machine died on that opaque 404:
- * `{"error":"not_found","method":"PUT","path":"/api/custom-models/<id>"}`, one character away
- * from the real handler's unknown-id `{"error":"not found"}` and indistinguishable from it
- * (#4662). The role was already on the wire; only the parser was throwing it away.
- *
- * 503 rather than 404: the management plane is unavailable here, the resource is not missing,
- * and `runCliAction` maps 404 to exit 4 ("no such thing") — the wrong answer to give a script.
- */
-function clientRoleManagementRefusal(port: number): string {
-  return [
-    `The opencodex listener on port ${port} is running in the client role. It serves only the machine routes (/api/machine/*), so this machine has no management API to call.`,
-    "Custom-model edits and other management changes are made on the hub this machine is connected to: run the command there, or use the hub dashboard (the dashboard on this machine relays to it when the connection uses the relay transport).",
-    "To change this machine's own configuration instead: edit customModels in config.json, then run: ocx sync",
-  ].join("\n");
-}
-
 export async function runtimeBaseUrl(deps: RuntimeApiDeps = {}): Promise<string> {
   if (deps.baseUrl) return deps.baseUrl.replace(/\/$/, "");
   const live = await (deps.findLiveProxy ?? findLiveProxy)();
   if (!live) throw new RuntimeApiError(PROXY_NOT_RUNNING_MESSAGE, 503, null, "proxy_not_running");
-  // The role comes from the same identity-checked /healthz body liveness already parsed, so
-  // this costs no extra request. Only the client role is refused: an absent role is a
-  // standalone or hub proxy (or a legacy body that predates the field), and both serve /api/*.
-  if (live.role === "client") {
-    // A Remote Link Child has no relay transport to point at; it names its Home instead (#6957).
-    const { readLinkChildContext, linkChildRefusal } = await import("./link-child");
-    const link = readLinkChildContext();
-    if (link) throw new RuntimeApiError(linkChildRefusal(link), 503, null, "link_child_management_unavailable");
-    throw new RuntimeApiError(clientRoleManagementRefusal(live.port), 503, null, "client_role_management_unavailable");
-  }
   return `http://${probeHostname(live.hostname)}:${live.port}`;
 }
 
@@ -187,25 +150,7 @@ export async function runtimeRequest<T = unknown>(
   init: RequestInit = {},
   deps: RuntimeApiDeps = {},
 ): Promise<T> {
-  let baseUrl: string;
-  try {
-    baseUrl = await runtimeBaseUrl(deps);
-  } catch (error) {
-    if (!(error instanceof RuntimeApiError) || error.code !== "link_child_management_unavailable") throw error;
-    // #6957: on a Remote Link Child an allowlisted read is answered by the Home over the link;
-    // every other request is refused with the operation named, before anything is sent.
-    const method = (init.method ?? "GET").toUpperCase();
-    const { readLinkChildContext, linkChildReadable, linkChildRefusal, readLinkHomeJson } = await import("./link-child");
-    const link = readLinkChildContext();
-    if (!link) throw error;
-    const pathname = new URL(path.startsWith("/") ? path : `/${path}`, "http://cli.invalid").pathname;
-    if (!linkChildReadable(method, path)) {
-      throw new RuntimeApiError(linkChildRefusal(link, `${method} ${pathname}`), 503, null, "link_child_management_unavailable");
-    }
-    const { status, body } = await readLinkHomeJson(link, path, deps.linkHome, init.signal ? { signal: init.signal } : {});
-    if (status < 200 || status >= 300) throw new RuntimeApiError(responseMessage(body, status), status, body);
-    return body as T;
-  }
+  const baseUrl = await runtimeBaseUrl(deps);
   const headers = runningProxyUpdateHeaders();
   for (const [key, value] of new Headers(init.headers).entries()) headers.set(key, value);
   const fetchImpl = deps.fetchImpl ?? fetch;
@@ -396,7 +341,7 @@ export async function readSecretLine(deps: RuntimeApiDeps, label: string): Promi
 export async function readSecretBytes(
   deps: RuntimeApiDeps,
   label: string,
-  maxBytes = MAX_LINK_CREDENTIAL_BYTES,
+  maxBytes = 4 * 1024,
 ): Promise<Uint8Array<ArrayBuffer>> {
   const input: CliStdin = deps.stdinImpl ?? process.stdin;
   const timeoutMs = deps.stdinTimeoutMs ?? 120_000;

@@ -185,7 +185,7 @@ export function createAdapterContinuations(
   // so it stays off for the shared openai-chat adapter unless a provider enables it).
   const terminalGuardEnabled = (transportState.activeAdapter.name === "anthropic"
       || (transportState.activeAdapter.name === "openai-chat" && route.provider.terminalContinuationGuard === true))
-    && !options.comboAttempt && !routedCompaction;
+    && !routedCompaction;
   /**
    * One bounded internal re-ask for Anthropic end_turn-without-tool-call turns. Replays the
    * continuation on a 429 with the same-key retry budget (hoisted per request), then falls
@@ -781,14 +781,7 @@ export function createAdapterContinuations(
           continuation: next => fetchTerminalGuardContinuation(next, undefined, !parsed.stream),
         })
       : retryEvents;
-    return parsed._advisorGuard
-      ? parsed._advisorGuard({
-          parsed,
-          translatorBudget,
-          firstEvents: terminalGuardedRetry,
-          continuation: fetchTerminalGuardContinuation,
-        })
-      : terminalGuardedRetry;
+    return terminalGuardedRetry;
   };
 
   return {

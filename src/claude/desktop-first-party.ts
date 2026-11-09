@@ -107,7 +107,7 @@ export function recordClaudeDesktopMode(
  * names the fix, instead of silently replacing the operator's mode.
  */
 export function resolveClaudeDesktopApplyMode(
-  config: Pick<OcxConfig, "claudeCode" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode">,
   observed: ClaudeDesktopModeObservation = {},
 ): ClaudeDesktopMode {
   return resolveClaudeDesktopMode(config, observed);
@@ -168,7 +168,7 @@ export function captureDesktopFirstPartyRollback(
 }
 
 export function inspectDesktopFirstParty(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "port">,
   options: DesktopFirstPartyOptions = {},
 ): DesktopFirstPartyInspection {
   const opencodexConfigDir = options.opencodexConfigDir ?? getConfigDir();
@@ -192,7 +192,7 @@ export function inspectDesktopFirstParty(
  * settings file is no evidence, and a foreign proxy env is never mistaken for ours.
  */
 export function observeClaudeDesktopMode(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "port">,
   options: DesktopFirstPartyOptions = {},
 ): ClaudeDesktopModeObservation {
   const observed: ClaudeDesktopModeObservation = {};
@@ -260,7 +260,7 @@ export async function rollbackDesktopFirstPartySettled(configDir: string, rollba
  * path we point `NODE_EXTRA_CA_CERTS` at exists before Claude Code ever reads it.
  */
 export function applyDesktopFirstParty(
-  config: Pick<OcxConfig, "claudeCode" | "port" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode" | "port">,
   options: DesktopFirstPartyOptions = {},
 ): DesktopFirstPartyApplyResult {
   const opencodexConfigDir = options.opencodexConfigDir ?? getConfigDir();
@@ -283,7 +283,7 @@ export function applyDesktopFirstParty(
 
 /** Remove Desktop's share of the env, retaining the shared pair for a desired CLI. */
 export function removeDesktopFirstParty(
-  config: Pick<OcxConfig, "claudeCode" | "runtimeRole">,
+  config: Pick<OcxConfig, "claudeCode">,
   options: DesktopFirstPartyOptions = {},
 ): ClaudeInterceptSettingsWrite & { retainedFor?: "cli" } {
   if (config.claudeCode?.cliFirstParty === true) {
@@ -301,7 +301,7 @@ export function removeDesktopFirstParty(
  * exceptions return the existing unreadable refusal so a committed gateway remains explicit.
  */
 export async function removeDesktopFirstPartySettled(
-  readConfig: () => Pick<OcxConfig, "claudeCode" | "runtimeRole">,
+  readConfig: () => Pick<OcxConfig, "claudeCode">,
   options: DesktopFirstPartyOptions = {},
   remove: typeof removeDesktopFirstParty = removeDesktopFirstParty,
 ): Promise<ReturnType<typeof removeDesktopFirstParty>> {

@@ -20,8 +20,8 @@ export type OpenUrlResult =
 /**
  * How long to watch a launcher that did spawn before calling it started.
  *
- * `spawn` only proves a process began. `xdg-open` with no desktop handler, and rundll32 given a
- * broken association, both spawn happily and exit nonzero a moment later without opening
+ * `spawn` only proves a process began. Rundll32 given a
+ * broken association can spawn and exit nonzero a moment later without opening
  * anything — so resolving on `spawn` alone would report a launch that did not happen. Those
  * failures are immediate, and the only caller that awaits this is a login start, so a short
  * window buys a true answer cheaply. A launcher still running when it elapses has started.
@@ -35,13 +35,9 @@ const LAUNCHER_SETTLE_MS = 400;
  */
 export function openUrl(url: string): Promise<OpenUrlResult> {
   if (!/^https?:\/\//i.test(url)) return Promise.resolve({ status: "failed", reason: "invalid-url" });
-  const cmd =
-    process.platform === "darwin" ? "open"
-    : process.platform === "win32" ? windowsRundll32()
-    : "xdg-open";
-  const args = process.platform === "win32"
-    ? ["url.dll,FileProtocolHandler", url]
-    : [url];
+  if (process.platform !== "win32") return Promise.resolve({ status: "failed", reason: "spawn-error" });
+  const cmd = windowsRundll32();
+  const args = ["url.dll,FileProtocolHandler", url];
   return new Promise<OpenUrlResult>(resolve => {
     let settled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -52,7 +48,7 @@ export function openUrl(url: string): Promise<OpenUrlResult> {
       resolve(result);
     };
     const child = spawn(cmd, args, { detached: true, stdio: "ignore", shell: false });
-    // Headless hosts (no xdg-open) emit ENOENT as an async 'error' event; without a
+    // A missing launcher emits ENOENT as an async error event; without a
     // listener that is an uncaught exception that kills the whole proxy/login flow.
     // It is also the signal itself: on Windows this is how a missing rundll32 arrives.
     child.on("error", () => settle({ status: "failed", reason: "spawn-error" }));

@@ -1,4 +1,4 @@
-import { remoteWorkspaceEnabled } from "../remote-control/workspace-activation";
+
 import { randomUUID } from "node:crypto";
 import type { CatalogModel } from "../codex/catalog";
 import { catalogModelSlug, invalidateCodexModelsCache, nativeContextLimits, nativeModelRows, uniqueCatalogModelsForPublicList } from "../codex/catalog";
@@ -52,10 +52,9 @@ import type { DesktopProfileModel } from "../claude/desktop-profile";
 import { drainAndShutdown } from "./lifecycle";
 import { acquireExplicitShutdownIntent, noteExplicitShutdownRequested } from "./management/system-restart";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "./request-log";
-import { estimateComboCost, estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../usage/cost";
+import { estimateRequestCost, normalizeCostTokens, tokensPerSecond } from "../usage/cost";
 import type { PersistedUsageAttempt } from "../usage/log";
-import { inheritTrustedHubManagementRequest, isAllowedManagementOrigin, jsonResponse, providerManagementConfigError, publicProviderBaseUrl, safeConfigDTO } from "./auth-cors";
-import { applySystemEnvToggle } from "./system-env";
+import { isAllowedManagementOrigin, jsonResponse, providerManagementConfigError, publicProviderBaseUrl, safeConfigDTO } from "./auth-cors";
 
 import type { ManagementApiDeps } from "./management/context";
 import { handleConfigRoutes } from "./management/config-routes";
@@ -70,12 +69,8 @@ import { handleModelRoutes } from "./management/model-routes";
 import { handleClaudeInterceptRoutes } from "./management/claude-intercept-routes";
 import { handleAgentSettingsRoutes } from "./management/agent-settings-routes";
 import { handleOauthAccountRoutes } from "./management/oauth-account-routes";
-import { handleComboRoutes } from "./management/combo-routes";
-import { handleDecisionRoutes } from "./management/decision-routes";
 import { handleSystemRoutes } from "./management/system-routes";
-import { handleSidebarRoutes } from "./management/sidebar-routes";
 import { handleUsageTimelineRoutes } from "./management/usage-timeline-routes";
-import { handleCompanionRoutes } from "./management/companion-routes";
 import { handleCodexPromptRoutes } from "./management/codex-prompt-routes";
 import { handleIntegrationRoutes } from "./management/integration-routes";
 import { handleNativeIntegrationRoutes } from "./management/native-integration-routes";
@@ -83,7 +78,6 @@ import { handleClaudeDesktopPickerRoutes } from "./management/claude-desktop-pic
 import { handleDesktopCompatibilityRoutes } from "./management/desktop-compatibility-routes";
 import { handleDesktopCompatibilityRuntimeRoutes } from "./management/desktop-compatibility-runtime-routes";
 import { handleDesktopCompatibilitySettingsRoutes } from "./management/desktop-compatibility-settings-routes";
-import { handleCodexCliUpdateRoutes } from "./management/codex-cli-update-routes";
 import { handleCursorIntegrationRoutes } from "./management/cursor-integration-routes";
 import type { ManagementContext } from "./management/context";
 import type { ManagementPrincipal, ManagementSessionControl } from "./management-auth";
@@ -112,20 +106,14 @@ const managementConvergenceBindings = new WeakMap<object, Readonly<{
 
 /**
  * Namespace match for management route prefixes: exact hit or a child path, never a
- * prefix collision (`/api/labfoo` must not match `/api/lab`).
+ * prefix collision between unrelated routes.
  */
 function pathInManagementNamespace(pathname: string, prefix: string, includeChildren = true): boolean {
   return pathname === prefix || (includeChildren && pathname.startsWith(`${prefix}/`));
 }
 
 /**
- * Routing-profile and Compatibility Lab handlers statically import the Lab module graph,
- * so mounting them eagerly would pull ~70 `src/lab/` modules into every management
- * request -- including installs that never opted into Lab. Loading them per namespace
- * keeps `management-api.ts` on the same footing as the three protected core files.
- *
- * Cherry-picked from @Wibias's PR #1676, which solved this before the boundary work
- * reached it. See devlog/_fin/260814_lab_core_decoupling/.
+ * Load routing-profile management only for its own namespace.
  */
 async function handleRoutingProfileRoutesOnDemand(ctx: ManagementContext): Promise<Response | null> {
   if (!pathInManagementNamespace(ctx.url.pathname, "/api/routing-profiles")) return null;
@@ -133,20 +121,8 @@ async function handleRoutingProfileRoutesOnDemand(ctx: ManagementContext): Promi
   return handleRoutingProfileRoutes(ctx);
 }
 
-async function handleLabRoutesOnDemand(ctx: ManagementContext): Promise<Response | null> {
-  if (!pathInManagementNamespace(ctx.url.pathname, "/api/lab")) return null;
-  // Automation is checked first so its narrower namespace keeps its own handler, matching
-  // the eager chain's ordering.
-  if (pathInManagementNamespace(ctx.url.pathname, "/api/lab/automation")) {
-    const { handleLabAutomationRoutes } = await import("./management/lab-automation-routes");
-    return handleLabAutomationRoutes(ctx);
-  }
-  const { handleLabRoutes } = await import("./management/lab-routes");
-  return handleLabRoutes(ctx);
-}
-
 /**
- * Lazy like the Lab and routing-profile handlers, and for the same recorded reason: this file is
+ * Lazy like the routing-profile handler, and for the same recorded reason: this file is
  * mounted for every dashboard request, so a static import would put the quota-reset store and
  * its config resolution on all of them.
  */
@@ -177,7 +153,7 @@ async function handleFallbackRoutesOnDemand(ctx: ManagementContext): Promise<Res
 }
 
 /**
- * Lazy like the Lab and routing-profile handlers, and for the same recorded reason: this file is
+ * Lazy like the routing-profile handler, and for the same recorded reason: this file is
  * mounted for every dashboard request, so a static import would put the workflow-budget ledger
  * on all of them.
  */
@@ -194,7 +170,7 @@ async function handleCodexAgentRoleRoutesOnDemand(ctx: ManagementContext): Promi
 }
 
 /**
- * Lazy like the Lab and routing-profile handlers: the protocol planner reaches the router and
+ * Lazy like the routing-profile handler: the protocol planner reaches the router and
  * the ingress eligibility rules, which no other dashboard request needs.
  */
 async function handleProtocolRoutesOnDemand(ctx: ManagementContext): Promise<Response | null> {
@@ -213,29 +189,6 @@ async function handleAnthropicResetGrantRoutesOnDemand(ctx: ManagementContext): 
   if (!pathInManagementNamespace(ctx.url.pathname, "/api/anthropic/reset-grants", true)) return null;
   const { handleAnthropicResetGrantRoutes } = await import("./management/anthropic-reset-grant-routes");
   return handleAnthropicResetGrantRoutes(ctx);
-}
-
-async function handleRemoteWorkspaceRoutesOnDemand(ctx: ManagementContext): Promise<Response | null> {
-  if (!pathInManagementNamespace(ctx.url.pathname, "/api/remote-workspace")) return null;
-  if (!remoteWorkspaceEnabled(ctx.config)) {
-    return Response.json({ available: false, reason: "Remote Workspace requires Hub mode and OCX_REMOTE_WORKSPACE_ENABLED=1.", devices: [], runtimes: {}, sessions: [] }, {
-      status: ctx.req.method === "GET" ? 200 : 404, headers: { "cache-control": "no-store" },
-    });
-  }
-  if (ctx.req.method !== "GET" && (
-    ctx.principal !== "gui-session"
-    || ctx.sessionControl?.isPaired(ctx.req, ctx.config) !== true
-  )) {
-    return Response.json({ error: "A paired dashboard session is required for Remote Workspace changes." }, { status: 403 });
-  }
-  const { handleRemoteWorkspaceRoutes } = await import("./management/remote-workspace-routes");
-  return handleRemoteWorkspaceRoutes(ctx);
-}
-
-async function handleLinkRoutesOnDemand(ctx: ManagementContext): Promise<Response | null> {
-  if (!pathInManagementNamespace(ctx.url.pathname, "/api/link")) return null;
-  const { handleLinkRoutes } = await import("./management/link-routes");
-  return handleLinkRoutes(ctx);
 }
 
 export async function handleManagementAPI(
@@ -263,7 +216,6 @@ export async function handleManagementAPI(
     }
     const sourceReq = req;
     req = new Request(req.url, { method: req.method, headers: req.headers, body: Buffer.from(verified.body) });
-    inheritTrustedHubManagementRequest(sourceReq, req);
   }
   // Management bodies are small JSON (provider names, key ids, settings). Reject oversized
   // payloads before any handler buffers them — the data plane has its own decompression cap.
@@ -357,8 +309,6 @@ export async function handleManagementAPI(
   try {
     routed = await handleClaudeInterceptRoutes(ctx)
     ??     handleSessionRoutes(ctx)
-    ??     (await handleLinkRoutesOnDemand(ctx))
-    ??     (await handleRemoteWorkspaceRoutesOnDemand(ctx))
     ??     (await handleConfigRoutes(ctx))
     ??     (await handleNativeReasoningRetentionRoutes(ctx))
     ??     (await handleStorageLogGuardRoutes(ctx))
@@ -385,17 +335,11 @@ export async function handleManagementAPI(
     ??     (await handleDesktopCompatibilityRoutes(ctx))
     ??     (await handleDesktopCompatibilityRuntimeRoutes(ctx))
     ??     (await handleDesktopCompatibilitySettingsRoutes(ctx))
-    ??     (await handleCodexCliUpdateRoutes(ctx))
     ??     (await handleAgentSettingsRoutes(ctx))
     ??     (await handleCodexPromptRoutes(ctx))
     ??     (await handleOauthAccountRoutes(ctx))
-    ??     (await handleDecisionRoutes(ctx))
-    ??     (await handleComboRoutes(ctx))
     ??     (await handleSystemRoutes(ctx))
-    ??     (await handleLabRoutesOnDemand(ctx))
-      ?? (await handleUsageTimelineRoutes(ctx))
-      ?? (await handleCompanionRoutes(ctx))
-      ?? (await handleSidebarRoutes(ctx));
+      ?? (await handleUsageTimelineRoutes(ctx));
   } catch (error) {
     const tooLarge = managementBodyTooLargeResponse(error, req, config);
     if (tooLarge) return tooLarge;
@@ -412,12 +356,6 @@ export async function handleManagementAPI(
     });
   }
   if (routed) return routed;
-
-  if (url.pathname === "/api/stop" && req.method === "GET") {
-    const response = jsonResponse((await import("./stop-teardown")).stopCapabilities(), 200, req, config);
-    response.headers.set("Cache-Control", "no-store");
-    return response;
-  }
   if (url.pathname === "/api/stop" && req.method === "POST") {
     const { installedServiceRespawnRisk, stopServiceIfInstalledDetailed, isServiceOwnershipError } = await import("../service");
     // `ocx stop` performs its own shared teardown AFTER verifying the scheduler did not
@@ -436,11 +374,7 @@ export async function handleManagementAPI(
     // outcome. This process cannot verify its own post-exit respawn window; only the
     // receipt-backed parent `ocx stop` can, which is what the deferral exists for.
     const { deferralMatchesReceipt } = await import("../config/pending-teardown");
-    const { deferralHonored, desktopSupervisedStopRefusal, performStopTeardown, preflightStopTeardownOwnership } = await import("./stop-teardown");
-    // The desktop app would start this proxy again within seconds; refuse before anything is
-    // touched and point at its tray, whose Stop it honours (#3008 refuses an undone stop the same way).
-    const desktopRefusal = desktopSupervisedStopRefusal(principal);
-    if (desktopRefusal) return jsonResponse(desktopRefusal, 409, req, config);
+    const { deferralHonored, performStopTeardown, preflightStopTeardownOwnership } = await import("./stop-teardown");
     const holdsReceipt = deferralHonored(url, deferralMatchesReceipt);
     // A sibling never runs under a service manager, and the installed service is the live
     // owner's: asking the manager to stop from here would refuse, or boot the owner's job out.

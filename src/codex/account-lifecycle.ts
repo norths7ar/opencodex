@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "./account-id";
 import { observeSignedInCodexIdentity } from "./signed-in-identity";
 import { observeMainCodexCollisionIdentity } from "./collision-identity";
 import { existsSync, readFileSync } from "node:fs";
@@ -208,6 +209,7 @@ export function deleteCodexAccount(runtimeConfig: OcxConfig, accountId: string):
   let cleanupFailed = false;
   const pickerVisibilityChanged = withConfigMutationLockSync(() => {
     const previousConfig = structuredClone(runtimeConfig);
+    const removingCurrentAccount = singleCodexAccountId(runtimeConfig) === accountId;
     const restoreDeletionProvenance = captureConfigTopLevelRollback(runtimeConfig, []);
     const configPath = getConfigPath();
     const hasPersistedConfig = existsSync(configPath);
@@ -233,7 +235,10 @@ export function deleteCodexAccount(runtimeConfig: OcxConfig, accountId: string):
       else deleteConfigTopLevelKey(runtimeConfig, "codexQuotaAutoRefresh");
     }
     clearCodexAccountPin(runtimeConfig, accountId);
-    if (runtimeConfig.activeCodexAccountId === accountId) runtimeConfig.activeCodexAccountId = undefined;
+    if (removingCurrentAccount) {
+      runtimeConfig.codexSignedOut = true;
+      deleteConfigTopLevelKey(runtimeConfig, "activeCodexAccountId");
+    }
 
     if (previousPersistedConfig !== undefined) {
       try {

@@ -18,8 +18,6 @@ function generation(n: number, oauthAccountKeys: string[]): GenerationContext {
   return {
     generation: n,
     providerNames: new Set<string>(),
-    comboIds: new Set<string>(),
-    comboTargets: new Set<string>(),
     codexAccountIds: new Set<string>(),
     oauthAccountKeys: new Set(oauthAccountKeys),
     configRoots: new Set<string>(),

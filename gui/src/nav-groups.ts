@@ -2,7 +2,7 @@
  * The sidebar's rows, in order.
  *
  * A row is a navigation group, not a page. Most rows hold one page; Usage & Logs,
- * Route and Remote Link each hold several existing pages, reached through the section switcher
+ * Route each hold several existing pages, reached through the section switcher
  * App renders above the page. Grouping changes no route: every member keeps the hash it
  * always had, so bookmarks and deep links still open the same page, and the row that
  * owns that page lights up.
@@ -15,7 +15,7 @@
  */
 import type { Page } from "./app-routing";
 import type { TKey } from "./i18n/shared";
-import { IconActivity, IconBot, IconBoxes, IconCodex, IconGrid, IconList, IconMonitor, IconPlug, IconRoute, IconServer, IconStar } from "./icons";
+import { IconActivity, IconBot, IconBoxes, IconCodex, IconGrid, IconList, IconPlug, IconRoute, IconServer } from "./icons";
 
 export type NavGroupId =
   | "home"
@@ -25,9 +25,7 @@ export type NavGroupId =
   | "subagents"
   | "usage-logs"
   | "connect"
-  | "remote"
   | "proxy"
-  | "advisor"
   | "advanced";
 
 /**
@@ -67,12 +65,9 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   // Which model a helper agent runs on is changed as often as the main model.
   { id: "subagents", tier: "daily", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents"] },
   { id: "usage-logs", tier: "daily", tkey: "nav.usageLogs", Icon: IconActivity, pages: ["usage", "logs", "storage"] },
-  // Remote Link follows Usage & Logs: other machines' traffic shows up in that report.
-  { id: "remote", tier: "daily", tkey: "nav.remote", Icon: IconMonitor, pages: ["remote", "remote-workspace"] },
   // Fine-tuning keeps its surfaces visible too; the All settings hub is the searchable index
   // of every one of them, including the ones that live inside other pages.
   { id: "proxy", tier: "advanced", tkey: "shellV2.pageProxyDetails", Icon: IconServer, pages: ["dashboard"] },
-  { id: "advisor", tier: "advanced", tkey: "nav.advisor", Icon: IconStar, pages: ["advisor"] },
   { id: "advanced", tier: "advanced", tkey: "shellV2.pageAllSettings", Icon: IconList, pages: ["advanced"] },
 ];
 
@@ -81,11 +76,6 @@ export function groupForPage(page: Page): NavGroup | null {
   return NAV_GROUPS.find(group => group.pages.includes(page) || group.embedded?.includes(page)) ?? null;
 }
 
-/**
- * Members the switcher may offer right now. Remote Workspace exists only while a hub
- * exposes it; a bookmark to it still opens its own recovery notice, but the switcher
- * does not advertise a page that cannot load.
- */
-export function visibleGroupPages(group: NavGroup, opts: { remoteWorkspaceAvailable: boolean }): Page[] {
-  return group.pages.filter(page => page !== "remote-workspace" || opts.remoteWorkspaceAvailable);
+export function visibleGroupPages(group: NavGroup): Page[] {
+  return [...group.pages];
 }

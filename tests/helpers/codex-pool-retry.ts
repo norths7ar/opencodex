@@ -79,7 +79,6 @@ export function createPoolRetryHarness(context: {
       pausedAccountIds?: string[];
       reauthAccountIds?: string[];
       omitCredentialAccountIds?: string[];
-      combos?: OcxConfig["combos"];
       modelRosterByAccount?: Record<string, string[]>;
     } = {},
   ): Promise<PoolRetryHarness> {
@@ -147,7 +146,6 @@ export function createPoolRetryHarness(context: {
       ...(options.visionSidecarModel ? { visionSidecar: { model: options.visionSidecarModel } } : {}),
       ...(options.websockets ? { websockets: true } : {}),
       ...(options.streamMode ? { streamMode: options.streamMode } : {}),
-      ...(options.combos ? { combos: options.combos } : {}),
     } as OcxConfig;
     saveConfig(config);
     if (!options.omitCredentialAccountIds?.includes("pool-a")) {

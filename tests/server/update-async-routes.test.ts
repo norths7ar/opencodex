@@ -66,7 +66,6 @@ describe("asynchronous package update routes", () => {
     // The supervisor check must not preempt the checkout's own refusal, even when the test
     // process itself runs inside a systemd service (a CI runner, for example).
     const response = await call("POST", "/api/update/run", { tag: "latest", restart: false }, {
-      dashboardRestartRefusal: () => "must not be consulted",
     });
     expect(response?.status).toBe(409);
     const body = await response!.json() as Record<string, unknown>;
@@ -81,29 +80,7 @@ describe("dashboard update restart supervision (#7967)", () => {
     command: "npm install -g @bitkyc08/opencodex@2.7.44", releaseNotesUrl: "https://example.test/releases",
   });
 
-  test.each([true, false])("a refused supervisor answers 409 before any update job starts (restart=%p)", async restart => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-update-supervisor-"));
-    const previous = process.env.OPENCODEX_HOME;
-    process.env.OPENCODEX_HOME = home;
-    // Hard barriers: a regression must fail here, never launch a real updater.
-    const start = spyOn(updateJobModule, "startUpdateJob").mockImplementation(() => { throw new Error("must not start a job"); });
-    const spawn = spyOn(updateJobModule, "spawnGuiUpdateWorker").mockImplementation(() => { throw new Error("must not spawn a worker"); });
-    try {
-      const response = await call("POST", "/api/update/run", { tag: "latest", restart }, {
-        checkPackageUpdate: available,
-        dashboardRestartRefusal: () => "Dashboard update is unavailable: fixture",
-      });
-      expect(response?.status).toBe(409);
-      expect(await response!.json()).toEqual({ error: "Dashboard update is unavailable: fixture", code: "update_restart_unsupervised" });
-      expect(start).not.toHaveBeenCalled();
-      expect(spawn).not.toHaveBeenCalled();
-      expect(existsSync(updateJobPath())).toBe(false);
-    } finally {
-      start.mockRestore(); spawn.mockRestore();
-      if (previous === undefined) delete process.env.OPENCODEX_HOME; else process.env.OPENCODEX_HOME = previous;
-      removeTreeWithRetry(home);
-    }
-  });
+
 
   test("status reports an active job whose worker died as failed, without writing", async () => {
     const home = mkdtempSync(join(tmpdir(), "ocx-update-status-"));

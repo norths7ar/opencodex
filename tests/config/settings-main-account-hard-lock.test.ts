@@ -170,14 +170,6 @@ describe("main-account hard-lock setting", () => {
     expect(await (await request(cfg))!.json()).toMatchObject({ codexMainAccountHardLockFallback: { model: "deepseek/deepseek-chat" } });
   });
 
-  test("PUT null clears the section instead of persisting an empty decision", async () => {
-    const cfg = config();
-    cfg.codexMainAccountHardLockFallback = { model: "combo/x" };
-    expect((await request(cfg, { codexMainAccountHardLockFallback: null }))!.status).toBe(200);
-    expect(Object.hasOwn(cfg, "codexMainAccountHardLockFallback")).toBe(false);
-    expect(Object.hasOwn(JSON.parse(readFileSync(getConfigPath(), "utf8")), "codexMainAccountHardLockFallback")).toBe(false);
-  });
-
   test("PUT enabled false pauses the reroute and keeps the model; enabled true resumes", async () => {
     const cfg = config();
     expect((await request(cfg, { codexMainAccountHardLockFallback: { model: "deepseek/deepseek-chat", enabled: false } }))!.status).toBe(200);
@@ -197,18 +189,6 @@ describe("main-account hard-lock setting", () => {
       expect(cfg.codexMainAccountHardLock).toBeUndefined();
       expect(cfg.codexMainAccountHardLockFallback).toBeUndefined();
     });
-
-  test("fallback save failure restores absent and present sections exactly", async () => {
-    for (const previous of [undefined, { model: "combo/x" }]) {
-      const cfg = config();
-      if (previous) cfg.codexMainAccountHardLockFallback = previous;
-      await expect(request(cfg, { codexMainAccountHardLockFallback: { model: "deepseek/deepseek-chat" } }, {
-        saveConfigPreservingClaudeCode: () => { throw new Error("fixture save failure"); },
-      })).rejects.toThrow("fixture save failure");
-      expect(cfg.codexMainAccountHardLockFallback).toEqual(previous);
-      expect(Object.hasOwn(cfg, "codexMainAccountHardLockFallback")).toBe(previous !== undefined);
-    }
-  });
 
   test("malformed hand-edited fallback sections degrade to off without touching the lock", async () => {
     saveConfig(config());

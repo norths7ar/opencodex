@@ -1,5 +1,4 @@
-import { executeComboResponses } from "../../src/server/responses/core-combo";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
+
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
 import type { OcxConfig } from "../../src/types";
 import { createShippedSpendLedger } from "../helpers/shipped-spend-ledger";
@@ -488,50 +487,6 @@ test("actual old-reader compaction preserves raw spend; compatible rollback reso
 
 for (const kind of ["compaction", "combo"] as const) {
   for (const rootId of [undefined, "reservation-root"]) {
-    test(`${kind} child spends its own exact-limit reservation (${rootId ?? "rootless"})`, () => {
-      const previous = process.env.OPENCODEX_HOME;
-      const home = mkdtempSync(join(tmpdir(), "ocx-prepaid-spend-"));
-      process.env.OPENCODEX_HOME = home;
-      const release = acquireOwnedSpendHome();
-      try {
-        configureSharedSpendLedger(policy(undefined, { root: { maxTokens: 100 } }));
-        const logCtx = { model: "fixture", provider: "provider-display", spendPoolId: "provider", usageLogInputTokens: 100 };
-        const tracker = createRequestSpendTracker(logCtx, rootId);
-        const sendBudget = createRequestExecutionBudget(undefined, undefined, tracker);
-        const reservation = sendBudget.reserveDispatch({ sendClass: "initial", targetKey: "provider/fixture", countedExternally: true });
-        expect(reservation.allowed).toBe(true);
-        if (!reservation.allowed) throw new Error("synthetic reservation refused");
-        if (kind === "combo") expect(reservation.permit.use()).toBe(true);
-        expect(sharedSpendLedger().snapshot("pool", "provider")?.reserved).toBe(100);
-        const req = new Request("https://fixture.example.test/v1/responses", {
-          headers: rootId ? { "x-codex-parent-thread-id": rootId } : {},
-        });
-        const options = { sendBudget, ...(kind === "compaction"
-          ? { compactionRecoveryPermit: reservation.permit } : { comboDispatchPermit: reservation.permit }) };
-        const child = createResponsesSendBudget({ req, options, logCtx });
-        expect(child).not.toBeInstanceOf(Response);
-        if (child instanceof Response) throw new Error("own reservation refused");
-        expect(createResponsesSendBudget({ req, options, logCtx })).toBeInstanceOf(Response); // proof is single-use
-        if (kind === "compaction") {
-          const dispatch = child.adapterDispatchBudget!.reserveDispatch({ sendClass: "initial", targetKey: "provider/fixture" });
-          expect(dispatch.allowed).toBe(true);
-          if (dispatch.allowed) expect(dispatch.permit.use()).toBe(true);
-        } else {
-          const report = child.transientSendReporter();
-          expect(report.beforeSend?.()).toBe(true); // synthetic executor reaches its before-wire seam
-          report(1); report.close?.();
-        }
-        expect(sendBudget.used).toBe(1);
-        tracker.settle({ inputTokens: 100, outputTokens: 0 });
-        expect(sharedSpendLedger().snapshot("pool", "provider")).toMatchObject({ settled: 100, reserved: 0 });
-        expect(createResponsesSendBudget({ req, options: {}, logCtx })).toBeInstanceOf(Response);
-      } finally {
-        release();
-        if (previous === undefined) delete process.env.OPENCODEX_HOME;
-        else process.env.OPENCODEX_HOME = previous;
-        removeTreeWithRetry(home);
-      }
-    });
   }
 }
 
@@ -677,88 +632,6 @@ test("prepaid exclusion follows only its canonical pool and retains settled/unre
   expect(workflowSpendCeilingReached(undefined, ledger, "unrelated", proof)).toMatchObject({ scope: "pool" });
   ledger.reconfigure(policy(undefined, { pool: { maxTokens: 40 } }));
   expect(workflowSpendCeilingReached(undefined, ledger, "renamed", proof)).toMatchObject({ scope: "pool" });
-});
-
-
-test("actual combo dispatch forwards only its own prepaid permit into the child preflight", async () => {
-  const previous = process.env.OPENCODEX_HOME;
-  const home = mkdtempSync(join(tmpdir(), "ocx-combo-prepaid-"));
-  process.env.OPENCODEX_HOME = home;
-  const release = acquireOwnedSpendHome();
-  const originalFetch = globalThis.fetch;
-  globalThis.fetch = (() => { throw new Error("unexpected network in synthetic combo"); }) as typeof fetch;
-  const translatorBudget = createTranslatorBudget();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
-  try {
-    configureSharedSpendLedger(policy());
-    const config: OcxConfig = { port: 0, defaultProvider: "provider", providers: {
-      provider: { adapter: "openai-chat", apiKey: "fixture-only", baseUrl: "https://provider.example.test/v1" },
-    }, combos: { prepaid: { strategy: "failover", targets: [{ provider: "provider", model: "fixture" }] } } };
-    const logCtx = { model: "", provider: "", usageLogInputTokens: 100 };
-    const tracker = createRequestSpendTracker(logCtx, undefined);
-    const sendBudget = createRequestExecutionBudget(undefined, undefined, tracker);
-    const body = { model: "combo/prepaid", input: [] };
-    let sends = 0;
-    const response = await executeComboResponses(new Request("https://fixture.example.test/v1/responses", {
-      method: "POST", body: JSON.stringify(body), headers: { "content-type": "application/json" },
-    }), body, "prepaid", config, logCtx, { sendBudget, translatorBudget }, {
-      handleResponses: async (req, _config, childLog, options) => {
-        const child = createResponsesSendBudget({ req, logCtx: childLog, options: options! });
-        expect(child).not.toBeInstanceOf(Response);
-        if (child instanceof Response) return child;
-        sends += 1;
-        const report = child.transientSendReporter();
-        expect(report.beforeSend?.()).toBe(true);
-        report(1); report.close?.();
-        return Response.json({ id: "synthetic-response", output: [] });
-      },
-      handleComboResponses: async () => { throw new Error("unexpected nested combo"); },
-    });
-    expect(response.status).toBe(200);
-    expect(sends).toBe(1);
-    expect(sendBudget.used).toBe(1);
-    tracker.settle({ inputTokens: 100, outputTokens: 0 });
-    expect(sharedSpendLedger().snapshot("pool", "provider")).toMatchObject({ settled: 100, reserved: 0 });
-  } finally {
-    globalThis.fetch = originalFetch;
-    translatorBudget.dispose();
-    clearComboSelectionState();
-    clearComboTargetCooldowns();
-    release();
-    if (previous === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = previous;
-    removeTreeWithRetry(home);
-  }
-});
-
-test("a later child report preserves the earlier receipt and refunds its exact pool", () => {
-  const ledger = createSpendReservationLedger({ salt,
-    policy: policy({ [pool("earlier")]: "earlier", [pool("later")]: "later" }, { pool: {} }) });
-  const logCtx = { provider: "earlier", usageLogInputTokens: 10 };
-  const tracker = createRequestSpendTracker(logCtx, "root", ledger);
-  const budget = createRequestExecutionBudget(undefined, undefined, tracker);
-  const first = budget.reserveDispatch({ sendClass: "initial", targetKey: "same", countedExternally: true });
-  logCtx.provider = "later";
-  logCtx.usageLogInputTokens = 30;
-  const second = budget.reserveDispatch({ sendClass: "initial", targetKey: "same", countedExternally: true });
-  if (!first.allowed || !second.allowed) throw new Error("synthetic reservation refused");
-  const child = createResponsesSendBudget({
-    req: new Request("http://localhost/v1/responses"), logCtx: {},
-    options: { sendBudget: deriveRequestExecutionBudget(budget, budget.policy), comboDispatchPermit: second.permit },
-  });
-  if (child instanceof Response) throw new Error("synthetic child refused");
-  child.noteTransientSends(1);
-  expect(claimDispatchSpendProof(budget, first.permit)).toBeDefined();
-  expect(claimDispatchSpendProof(budget, second.permit)).toBeUndefined();
-  second.permit.release();
-  expect(budget.used).toBe(2);
-  first.permit.release();
-  expect(budget.used).toBe(1);
-  expect(ledger.snapshot("pool", "earlier")).toMatchObject({ reserved: 0, unresolved: 0 });
-  expect(ledger.snapshot("pool", "later")).toMatchObject({ reserved: 30, unresolved: 0 });
-  tracker.settle({ inputTokens: 25, outputTokens: 0 });
-  expect(ledger.snapshot("pool", "later")).toMatchObject({ settled: 25, reserved: 0, unresolved: 0 });
 });
 
 test("captured reporters retain receipt ownership across handoffs, cancellation and retries", () => {

@@ -43,9 +43,6 @@ import {
   malformedUpstreamHostCircuitThresholdWarning,
   malformedPlaintextV2AgentMessagesWarning,
   malformedAgentTaskRecoveryWarning,
-  malformedRuntimeRoleWarning,
-  malformedOptionalRemoteBlockWarning,
-  malformedClientConnectionWarning,
   malformedQuotaResetNotifyWarning,
   malformedCatalogAutoRefreshWarning,
   malformedCodexPoolWarning,
@@ -64,20 +61,14 @@ import { configSchema } from "./schema/config-schema";
 import {
   agentTaskRecoverySchema,
   catalogAutoRefreshSchema,
-  clientConnectionSchema,
   CODEX_ACCOUNT_PIN_PATTERN,
   codexAccountPrioritiesSchema,
   codexAccountAutoSwitchThresholdsSchema,
   codexPoolSchema,
   codexQuotaAutoRefreshSchema,
   credentialGroupsSchema,
-  hubConfigSchema,
   quotaResetNotifySchema,
-  remoteGuiConfigSchema,
-  runtimeRoleSchema,
   spendSchema,
-  chatgptDesktopSchema,
-  chatgptDesktopConfigIssue,
   compactionRoutingSchema,
   reasoningRetentionSchema,
   skillsConfigSchema,
@@ -136,11 +127,6 @@ function validFileConfigDiagnostics(config: OcxConfig, rawParsed: unknown): Conf
   const normalized = normalizeClaudeSubagentEffort(normalizeNativeSubagentSync(config, rawParsed), rawParsed);
   const warnings = configPlaceholderWarnings(normalized);
   if (rawForce !== undefined && !isSubagentModelEntry(rawForce)) warnings.push("claudeCode.subagentModelForce ignored: expected a safe roster-style model id");
-  if (normalized.chatgptDesktop?.appServerShim === true && process.platform !== "darwin") {
-    warnings.push("chatgptDesktop.appServerShim is experimental and macOS only; ignored on this platform");
-  }
-  const chatgptDesktopIssue = chatgptDesktopConfigIssue(rawParsed);
-  if (chatgptDesktopIssue) warnings.push(`${chatgptDesktopIssue}; the whole chatgptDesktop block is ignored, so the ChatGPT desktop integration reads as off`);
   warnings.push(...inheritedFastWireConflictProviderNames(normalized).map(inheritedFastWireConflictWarning));
   warnings.push(...degradedCodexAccountPriorityWarnings(rawParsed, normalized));
   warnings.push(...degradedListenerWarnings(rawParsed, normalized));
@@ -161,14 +147,6 @@ function validFileConfigDiagnostics(config: OcxConfig, rawParsed: unknown): Conf
   if (hostCircuitWarning) warnings.push(hostCircuitWarning);
   const recoveryWarning = malformedAgentTaskRecoveryWarning(rawParsed);
   if (recoveryWarning) warnings.push(recoveryWarning);
-  const runtimeRoleWarning = malformedRuntimeRoleWarning(rawParsed);
-  if (runtimeRoleWarning) warnings.push(runtimeRoleWarning);
-  const hubWarning = malformedOptionalRemoteBlockWarning(rawParsed, "hub");
-  if (hubWarning) warnings.push(hubWarning);
-  const remoteGuiWarning = malformedOptionalRemoteBlockWarning(rawParsed, "remoteGui");
-  if (remoteGuiWarning) warnings.push(remoteGuiWarning);
-  const clientWarning = malformedClientConnectionWarning(rawParsed);
-  if (clientWarning) warnings.push(clientWarning);
   const notifyWarning = malformedQuotaResetNotifyWarning(rawParsed);
   if (notifyWarning) warnings.push(notifyWarning);
   const catalogRefreshWarning = malformedCatalogAutoRefreshWarning(rawParsed);
@@ -296,53 +274,6 @@ function agentTaskRecoveryError(value: unknown): string | null {
   const issue = result.error.issues[0];
   const field = issue?.path.join(".");
   return `schema_invalid: agentTaskRecovery${field ? `.${field}` : ""}: ${issue?.message ?? "invalid configuration"}`;
-}
-
-function runtimeRoleError(value: unknown): string | null {
-  const raw = rawConfigRecord(value);
-  if (!raw || !Object.hasOwn(raw, "runtimeRole") || raw.runtimeRole === undefined) return null;
-  if (runtimeRoleSchema.safeParse(raw.runtimeRole).success) return null;
-  return 'schema_invalid: runtimeRole: must be one of "standalone", "hub", or "client"';
-}
-
-function remoteGuiConfigError(value: unknown): string | null {
-  const raw = rawConfigRecord(value);
-  if (!raw) return null;
-  for (const [key, schema] of [
-    ["hub", hubConfigSchema],
-    ["remoteGui", remoteGuiConfigSchema],
-  ] as const) {
-    if (!Object.hasOwn(raw, key) || raw[key] === undefined) continue;
-    const result = schema.safeParse(raw[key]);
-    if (result.success) continue;
-    const issue = result.error.issues[0];
-    const field = issue?.path.join(".");
-    return `schema_invalid: ${key}${field ? `.${field}` : ""}: ${issue?.message ?? "invalid configuration"}`;
-  }
-  return null;
-}
-
-function clientConnectionConfigError(value: unknown): string | null {
-  const raw = rawConfigRecord(value);
-  if (!raw || !Object.hasOwn(raw, "client") || raw.client === undefined) return null;
-  const result = clientConnectionSchema.safeParse(raw.client);
-  if (result.success) return null;
-  const issue = result.error.issues[0];
-  const field = issue?.path.join(".");
-  return `schema_invalid: client${field ? `.${field}` : ""}: ${issue?.message ?? "invalid client connection"}`;
-}
-
-function clientRolePairError(value: unknown): string | null {
-  const raw = rawConfigRecord(value);
-  if (!raw) return null;
-  const hasClient = Object.hasOwn(raw, "client") && raw.client !== undefined;
-  if (raw.runtimeRole === "client" && !hasClient) {
-    return "schema_invalid: runtimeRole client requires a complete client connection";
-  }
-  if (hasClient && raw.runtimeRole !== "client") {
-    return "schema_invalid: client connection requires runtimeRole client";
-  }
-  return null;
 }
 
 function quotaResetNotifyError(value: unknown): string | null {
@@ -622,52 +553,6 @@ export function loopbackCompanionBindError(
     + "loopback bind already admits local callers without a credential.";
 }
 
-/**
- * Validate the hub management ingress at the live-write boundary.
- *
- * The persisted schema intentionally degrades a malformed hand edit to disabled so a typo in
- * this opt-in listener cannot discard providers or credentials. A live config mutation must not
- * get that leniency: it receives an exact field error before the degrading schema is applied.
- */
-function managementIngressConfigError(value: unknown): string | null {
-  const raw = rawConfigRecord(value);
-  if (!raw) return null;
-  const hub = rawConfigRecord(raw.hub);
-  if (!hub || !Object.hasOwn(hub, "managementIngress") || hub.managementIngress === undefined) return null;
-  const ingress = rawConfigRecord(hub.managementIngress);
-  if (!ingress) {
-    return "schema_invalid: hub.managementIngress: must be an object or omitted";
-  }
-  if (typeof ingress.enabled !== "boolean") {
-    return "schema_invalid: hub.managementIngress.enabled: must be a boolean";
-  }
-  const keys = Object.keys(ingress);
-  if (ingress.enabled === false) {
-    return keys.length === 1
-      ? null
-      : "schema_invalid: hub.managementIngress: disabled ingress accepts only enabled";
-  }
-  if (keys.some(key => key !== "enabled" && key !== "port")) {
-    return "schema_invalid: hub.managementIngress: contains an unsupported field";
-  }
-  const ingressPort = ingress.port;
-  if (typeof ingressPort !== "number" || !Number.isInteger(ingressPort) || ingressPort < 1 || ingressPort > 65535) {
-    return "schema_invalid: hub.managementIngress.port: must be an integer port when enabled";
-  }
-  if (raw.runtimeRole !== "hub") {
-    return "schema_invalid: hub.managementIngress: enabled ingress requires runtimeRole hub";
-  }
-  const proxyPort = typeof raw.port === "number" ? raw.port : 10100;
-  if (proxyPort === ingressPort) {
-    return "schema_invalid: hub.managementIngress.port: must differ from the proxy port";
-  }
-  const loopback = rawConfigRecord(raw.unauthenticatedLoopbackListener);
-  if (loopback?.enabled === true && loopback.port === ingressPort) {
-    return "schema_invalid: hub.managementIngress.port: must differ from unauthenticatedLoopbackListener.port";
-  }
-  return null;
-}
-
 /** Load degrades malformed metrics export config to off; live writes reject the same shape. */
 export function metricsExportConfigError(value: unknown): string | null {
   const raw = rawConfigRecord(value);
@@ -710,10 +595,6 @@ function skillsConfigError(value: unknown): string | null {
 }
 
 export function validateConfigCandidate(value: unknown): { ok: true; config: OcxConfig } | { ok: false; error: string } {
-  const chatgptDesktop = rawConfigRecord(value)?.chatgptDesktop;
-  if (chatgptDesktop !== undefined && !chatgptDesktopSchema.safeParse(chatgptDesktop).success) {
-    return { ok: false, error: "schema_invalid: chatgptDesktop: requires an optional boolean appServerShim and no other fields" };
-  }
   const compactionRouting = rawConfigRecord(value)?.compactionRouting;
   const reasoningRetention = rawConfigRecord(value)?.reasoningRetention;
   if (reasoningRetention !== undefined && !reasoningRetentionSchema.safeParse(reasoningRetention).success) {
@@ -765,12 +646,7 @@ export function validateConfigCandidate(value: unknown): { ok: true; config: Ocx
     ?? showCodexCreditsError(value)
     ?? creditCodexAccountIdsError(value)
     ?? remainingQuotaAccountIdsError(value)
-    ?? runtimeRoleError(value)
-    ?? remoteGuiConfigError(value)
-    ?? clientConnectionConfigError(value)
-    ?? clientRolePairError(value)
     ?? loopbackListenerPortError(value)
-    ?? managementIngressConfigError(value)
     ?? metricsExportConfigError(value)
     ?? serviceHealthRecoveryConfigError(value)
     ?? skillsConfigError(value);
@@ -826,8 +702,6 @@ function configDiagnosticsFromText(raw: string, file?: { path: string; bytes: Ui
     if (salvaged) {
       const config = normalizeApiKeyIds(salvaged.parsed);
       const warnings = degradedListenerWarnings(parsed, config);
-      const chatgptDesktopIssue = chatgptDesktopConfigIssue(parsed);
-      if (chatgptDesktopIssue) warnings.push(`${chatgptDesktopIssue}; the whole chatgptDesktop block is ignored, so the ChatGPT desktop integration reads as off`);
       return {
         config,
         source: "fallback",

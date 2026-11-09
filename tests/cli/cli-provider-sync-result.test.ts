@@ -123,7 +123,7 @@ describe("provider add keeps requested local sync independent of JSON output", (
       refreshCodexModelCatalog: async () => {
         if (kind === "throw") throw new Error("fixture-private-catalog-failure");
         return { added: 0, path: home.path("catalog.json"), catalogExists: true,
-          catalogWritten: false, cacheSynced: false, comboOmissions: [],
+          catalogWritten: false, cacheSynced: false,
           refreshOutcome: kind === "refused" ? "refused" : "committed" };
       },
     });
@@ -162,8 +162,7 @@ describe("provider add keeps requested local sync independent of JSON output", (
         refreshCodexModelCatalog: async () => refreshCodexModelCatalog(config, {
           existsSync: () => true,
           invalidateCodexModelsCache: () => { invalidations++; return true; },
-          syncCatalogModels: async () => ({ added: 0, path: home.path("catalog.json"), catalogWritten: false,
-            comboOmissions: [], refreshOutcome: "refused", skippedReason: reason, protectedRoutedNamespaces: 2 }),
+          syncCatalogModels: async () => ({ added: 0, path: home.path("catalog.json"), catalogWritten: false, refreshOutcome: "refused", skippedReason: reason, protectedRoutedNamespaces: 2 }),
         }),
       }, { catalogEvenWhenNotInjected: mode !== "applied" });
       const status = mode === "applied" ? "applied" : "catalog-only";

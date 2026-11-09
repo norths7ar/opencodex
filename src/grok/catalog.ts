@@ -1,4 +1,3 @@
-import { comboPublicModelId } from "../combos";
 import {
   filterCatalogVisibleModels,
   nativeContextLimits,
@@ -16,7 +15,6 @@ export interface GrokCatalogProjection {
   models: GrokInjectModel[];
   catalogModelIds: ReadonlySet<string>;
   disabledProviderNamespaces: ReadonlySet<string>;
-  comboPublicModelIds: ReadonlySet<string>;
 }
 
 /**
@@ -38,10 +36,6 @@ export function projectGrokCatalog(
       Object.entries(config.providers)
         .filter(([, provider]) => provider?.disabled === true)
         .map(([name]) => name),
-    ),
-    comboPublicModelIds: new Set(
-      Object.entries(config.combos ?? {})
-        .map(([id, combo]) => comboPublicModelId(id, combo)),
     ),
     models: [
       ...visibleNativeSlugs(config).map(id => {

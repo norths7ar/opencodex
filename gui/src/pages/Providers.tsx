@@ -3,7 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import ProviderWorkspaceShell, { type AddProviderIntent } from "../components/provider-workspace/ProviderWorkspaceShell";
 import ProviderDetails from "../components/provider-workspace/ProviderDetails";
 import type { ProviderAuthHandlers } from "../components/provider-workspace/types";
-import { matchingWorkspacePreset, type CatalogPreset } from "../components/provider-catalog/provider-presets";
+import { type CatalogPreset } from "../components/provider-catalog/provider-presets";
 import { isAccountProvider, type WorkspaceProvider } from "../provider-workspace/catalog";
 import { ensureOpenAiProvider, openAiAccountProviderState, OpenAiEnableError } from "../provider-payload";
 import { oauthTosRisk } from "../oauth-tos-risk";
@@ -24,8 +24,6 @@ import { buildAccountLoginStatus, buildAddModalAccountRows } from "./providers-p
 import type { CodexAccountMutationCompletion } from "../codex-account-mutation";
 import { useProviderModelsNotice } from "./use-provider-models-notice";
 import { navigateHash } from "../hash-routing";
-import { jevAutoCreateHash } from "../app-routing";
-import { canCreateJevAutoFrom } from "../jev-decision-service";
 import { useProviderSettingsDeepLink } from "./providers-deep-link";
 import { subscribeKiroDeviceFinal } from "../kiro-device-login-finalizer";
 import type { BrowserLaunch } from "../oauth-browser-launch";
@@ -305,7 +303,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
   // modal does not wait on a cold /api/provider-presets round-trip (~same key as
   // AddProviderModal). Prefetch usage too so the catalog does not paint alpha then
   // re-rank when the slow usage probe (~5s cold) finally returns.
-  const presetResource = useKeyedClientResource(
+  useKeyedClientResource(
     `add-provider-presets:${apiBase}`,
     [apiBase],
     async (signal) => {
@@ -647,7 +645,6 @@ export default function Providers({ apiBase }: { apiBase: string }) {
           <ProviderDetails
             key={item.name}
             item={item}
-            preset={matchingWorkspacePreset(item, presetResource.data ?? [])}
             usageTotals={data.usageTotals}
             modelUsage={data.modelUsage}
             quotaReport={data.quotaReport}
@@ -659,9 +656,6 @@ export default function Providers({ apiBase }: { apiBase: string }) {
             modelRowsReady={data.modelRowsReady}
             onOpenModels={() => navigateHash("models")}
             onOpenConnect={() => navigateHash("integrations")}
-            onCreateJevAuto={canCreateJevAutoFrom(item)
-              ? () => navigateHash(jevAutoCreateHash(item.name))
-              : undefined}
             modelsLoading={data.modelsLoading}
             modelsLoadFailed={data.modelsLoadFailed}
             onRetryModels={data.onRetryModels}

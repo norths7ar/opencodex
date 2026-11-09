@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { clearCachedProviderQuotas, setCachedProviderQuotaForTests, replaceCachedProviderQuotas, providerQuotaRoutingBinding, type ProviderQuotaRoutingEvidence } from "../../src/providers/quota-routing-cache";
-import { quotaInactiveReason } from "../../src/combos/resolve";
+import { quotaInactiveReason } from "../../src/providers/quota-exhaustion";
 import { buildCatalogEntries, CATALOG_INACTIVE_REASON_FIELD, deriveEntry } from "../../src/codex/catalog/sync";
 import type { RawEntry } from "../../src/codex/catalog/parsing";
 import type { OcxConfig } from "../../src/types";

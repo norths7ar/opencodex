@@ -255,7 +255,7 @@ const ROUTING_EDITOR_SCRIPT = `
       assert.ok(saved.at(-1).routingProfiles["new-profile"]);
       assert.equal(await run("remove", ["fast", "--yes"]), 4); assert.equal(saves, 3);
       originalLog(JSON.stringify({ scenarios: 9, saves, refreshes, requests: requests.length, automationEnabled: false }));
-    } finally { resetLabActivationForTests(); }
+    } finally {  }
   `;
 
 describe("routing editor child", () => {

@@ -427,8 +427,6 @@ describe("fetchProviderAccountQuotas", () => {
     reconcileProviderAccountQuotaRows({
       generation: 10_000,
       providerNames: new Set(),
-      comboIds: new Set(),
-      comboTargets: new Set(),
       codexAccountIds: new Set(),
       oauthAccountKeys: new Set(),
       configRoots: new Set(),

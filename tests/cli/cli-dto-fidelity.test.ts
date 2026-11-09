@@ -61,7 +61,7 @@ describe("#2700 usage report renders per-account totals", () => {
     const out = joinReport({
       ...base,
       accounts: [],
-      filter: { provider: "xai", model: null, matched: true, comboOverlap: false },
+      filter: { provider: "xai", model: null, matched: true, attemptOverlap: false },
     });
     expect(out).toContain("not reported under a provider or model filter");
   });
@@ -70,7 +70,7 @@ describe("#2700 usage report renders per-account totals", () => {
     const out = joinReport({
       ...base,
       accounts: [],
-      filter: { provider: null, model: "grok-4", matched: true, comboOverlap: false },
+      filter: { provider: null, model: "grok-4", matched: true, attemptOverlap: false },
     });
     expect(out).toContain("not reported under a provider or model filter");
   });
@@ -81,7 +81,7 @@ describe("#2700 usage report renders per-account totals", () => {
     const out = joinReport({
       ...base,
       accounts: [{ accountLogLabel: "work", requests: 5, totalTokens: 500 }],
-      filter: { provider: "xai", model: null, matched: true, comboOverlap: false },
+      filter: { provider: "xai", model: null, matched: true, attemptOverlap: false },
     });
     expect(out).toContain("not reported under a provider or model filter");
   });

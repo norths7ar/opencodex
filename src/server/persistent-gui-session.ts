@@ -5,7 +5,7 @@ import { getConfigDir } from "../config/paths";
 import { withConfigMutationLockSync } from "../config/mutation-lock";
 import { atomicWriteFileNoFollowStreamed } from "../config/atomic-write";
 import type { OcxConfig } from "../types";
-import { isLoopbackHostname, isTrustedHubManagementRequest, managementRequestOrigin } from "./auth-cors";
+import { isLoopbackHostname, managementRequestOrigin } from "./auth-cors";
 import { mintSession, type GuiSessionRecord, type GuiSessionState } from "./gui-session";
 
 export const REMEMBERED_GUI_TTL_MS = 30 * 86400_000;
@@ -29,7 +29,7 @@ function directOrigin(req: Request, config: OcxConfig): string | null {
   const url = new URL(origin);
   // The process-marked hub management listener sits behind a local TLS terminator, so its
   // request URL is http: while the canonical public origin is https:. Nothing forwarded is trusted.
-  if (new URL(req.url).origin !== origin && !isTrustedHubManagementRequest(req)) return null;
+  if (new URL(req.url).origin !== origin) return null;
   if (url.protocol !== "https:" && !(url.protocol === "http:" && isLoopbackHostname(url.hostname))) return null;
   const browser = req.headers.get("Origin");
   if (browser !== null && browser !== origin) return null;

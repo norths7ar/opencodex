@@ -40,15 +40,14 @@ function merge(catalogModels: RawEntry[] = [], includeNativeOpenAi = true, extra
     featured: [reviewer], modelPickerOrder: [reviewer, "gpt-5.5"], wsEnabled: false,
     template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
     gatheredProviderNames: new Set(), degradedProviderNames: new Set(), legacyCustomModelSlugs: new Set(),
-    multiAgentMode: "v2", multiAgentV2Enabled: true, exactComboSlugs: new Set(),
-    hasPhysicalComboProvider: false, includeNativeOpenAi, accountBoundEntries: [],
+    multiAgentMode: "v2", multiAgentV2Enabled: true, includeNativeOpenAi, accountBoundEntries: [],
     policy: { ...CANONICAL_NATIVE_CATALOG_CONTENT_POLICY, warningPolicy: "suppress" }, ...extra,
   });
 }
 function build(extra: Partial<ObservedCatalogEntryBuildInput> = {}): RawEntry[] {
   return buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: ["gpt-5.5"], goModels: [], wsEnabled: false,
-    multiAgentMode: "v2", multiAgentV2Enabled: true, exactComboSlugs: new Set(),
+    multiAgentMode: "v2", multiAgentV2Enabled: true,
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     ...extra,
   });
@@ -111,8 +110,7 @@ function reviewRow(rows: RawEntry[]): RawEntry {
 test("build backfills the hidden reviewer with its exact upstream ladder and no picker/spawn rank", () => {
   const rows = buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: ["gpt-5.5", reviewer], goModels: [], featured: [reviewer],
-    wsEnabled: false, multiAgentMode: "v2", multiAgentV2Enabled: true,
-    exactComboSlugs: new Set(), accountSelectors: ["account"],
+    wsEnabled: false, multiAgentMode: "v2", multiAgentV2Enabled: true, accountSelectors: ["account"],
     suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
   });
   const row = reviewRow(rows);
@@ -131,7 +129,7 @@ test("routed-only build and merge do not add or retain the native reviewer", () 
   expect(merge([{ ...structuredClone(upstream), visibility: "list" }], false).some(row => row.slug === reviewer)).toBe(false);
   const rows = buildCatalogEntriesFromObservedState({
     template: null, gptSlugs: [], goModels: [], wsEnabled: false,
-    multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
+    multiAgentMode: "default", multiAgentV2Enabled: false,
     accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
   });
   expect(rows.some(row => row.slug === reviewer)).toBe(false);

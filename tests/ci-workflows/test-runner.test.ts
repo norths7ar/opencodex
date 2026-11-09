@@ -35,7 +35,6 @@ import {
 import { helperPath, repoPath, repoRoot } from "../helpers/repo-root";
 import {
   acquireTestRunLock,
-  parseDarwinTestProcessStart,
   parseLinuxTestProcessStart,
   readTestRunProcessStartBatch,
   resolveBareTestRunIdentity,
@@ -1678,17 +1677,9 @@ describe("bun test user lock", () => {
 
   test("the platform identity reader reports a stable own identity", () => {
     const first = readTestRunProcessStartBatch([process.pid]).get(process.pid);
-    if (!["win32", "darwin", "linux"].includes(process.platform)) return;
+    if (!["win32", "linux"].includes(process.platform)) return;
     expect(first?.startsWith(`${process.platform}:`)).toBe(true);
     expect(readTestRunProcessStartBatch([process.pid]).get(process.pid)).toBe(first);
-  });
-
-  test("macOS process starts use strict English UTC tokens", () => {
-    expect(parseDarwinTestProcessStart("Thu Oct 22 10:03:04 2026")).toBe("darwin:2026-10-22T10:03:04Z");
-    for (const value of ["Thu Oct 22 10:03:04 2026 PST", "Thu Oct 22 25:03:04 2026",
-      "Thu Feb 31 10:03:04 2026", "Wed Oct 22 10:03:04 2026", "jeu. oct. 22 10:03:04 2026"]) {
-      expect(parseDarwinTestProcessStart(value)).toBeNull();
-    }
   });
 
   test("Linux identity uses normalized start ticks and boot UUID without a wall clock", () => {

@@ -9,7 +9,6 @@ import { handleManagementAPI } from "../../src/server/management-api";
 import { writeDesktop3pConfig, removeDesktop3pStandardPivot } from "../../src/claude/desktop-3p";
 import * as desktopProfiles from "../../src/claude/desktop-profile";
 import { buildClaudeDesktopState } from "../../src/server/management/shared";
-import * as systemEnv from "../../src/server/system-env";
 import type { OcxConfig } from "../../src/types";
 import { installIsolatedCodexHome, type IsolatedCodexHome } from "../helpers/isolated-codex-home";
 import { MANAGEMENT_JSON_BODY_MAX_BYTES } from "../../src/server/management/body";
@@ -741,68 +740,6 @@ test("PUT rejects invalid authMode values (invalid string + non-string)", async 
   }
 });
 
-test("authMode-only PUT triggers system-env reconciliation (audit R2 #1)", async () => {
-  const applySpy = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false, reason: "test" });
-  const server = startServer(0);
-  try {
-    const r = await fetch(new URL("/api/claude-code", server.url), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ authMode: "proxy" }), // no systemEnv field in the body
-    });
-    expect(r.status).toBe(200);
-    expect(applySpy).toHaveBeenCalled();
-  } finally {
-    applySpy.mockRestore();
-    await server.stop(true);
-  }
-});
-
-// Model-slot and lever fields feed injectSystemEnv, so changing one must reconcile launchd too;
-// before, only systemEnv/authMode did, and a cleared smallFastModel stayed injected until restart.
-test.each([
-  ["smallFastModel", ""],
-  ["model", ""],
-  ["tierModels", { opus: "mock/test-model" }],
-  ["maxContextTokens", 1_000_000],
-  ["alwaysEnableEffort", true],
-  ["autoContext", false],
-  ["autoCompactWindow", 400_000],
-  ["contextAccounting", "200k"],
-] as const)("%s-only PUT triggers system-env reconciliation", async (field, value) => {
-  const applySpy = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false, reason: "test" });
-  const server = startServer(0);
-  try {
-    const r = await fetch(new URL("/api/claude-code", server.url), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ [field]: value }),
-    });
-    expect(r.status).toBe(200);
-    expect(applySpy).toHaveBeenCalled();
-  } finally {
-    applySpy.mockRestore();
-    await server.stop(true);
-  }
-});
-
-test("a PUT that touches no system-env input does not reconcile launchd", async () => {
-  const applySpy = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false, reason: "test" });
-  const server = startServer(0);
-  try {
-    const r = await fetch(new URL("/api/claude-code", server.url), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blockedSkills: null }),
-    });
-    expect(r.status).toBe(200);
-    expect(applySpy).not.toHaveBeenCalled();
-  } finally {
-    applySpy.mockRestore();
-    await server.stop(true);
-  }
-});
-
 test("Claude sidecar overrides round-trip, partially update, clear, and reject unknown backends", async () => {
   const server = startServer(0);
   const put = (body: unknown) => fetch(new URL("/api/claude-code", server.url), {
@@ -956,7 +893,7 @@ test("PUT/GET round-trips the context/effort levers (devlog 136 B6)", async () =
 });
 
 test("PUT/GET round-trips contextAccounting; 1m drops the key, anything else is a 400", async () => {
-  const applySpy = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false, reason: "test" });
+
   const server = startServer(0);
   const put = (contextAccounting: unknown) => fetch(new URL("/api/claude-code", server.url), {
     method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contextAccounting }),
@@ -972,7 +909,7 @@ test("PUT/GET round-trips contextAccounting; 1m drops the key, anything else is 
     expect(await get()).toBe("1m");
     expect((await put("500k")).status).toBe(400);
   } finally {
-    applySpy.mockRestore();
+
     await server.stop(true);
   }
 });
@@ -1090,35 +1027,6 @@ test("PUT validation rejects bad shapes", async () => {
       expect(((await r.json()) as { error: string }).error).toBe(error);
     }
     expect(loadConfig().claudeCode).toBeUndefined(); // nothing persisted on rejects
-  } finally {
-    await server.stop(true);
-  }
-});
-
-test("GET /api/claude-code reports Auto-connect support on Darwin", async () => {
-  const server = startServer(0, { managementApi: { platform: "darwin" } });
-  try {
-    const r = await fetch(new URL("/api/claude-code", server.url));
-    expect(r.status).toBe(200);
-    const d = await r.json() as Record<string, any>;
-    expect(d.autoConnectSupported).toBe(true);
-  } finally {
-    await server.stop(true);
-  }
-});
-
-test("GET /api/claude-code reports Auto-connect unsupported outside Darwin", async () => {
-  saveConfig({
-    ...loadConfig(),
-    claudeCode: { systemEnv: true },
-  } as OcxConfig);
-  const server = startServer(0, { managementApi: { platform: "linux" } });
-  try {
-    const r = await fetch(new URL("/api/claude-code", server.url));
-    expect(r.status).toBe(200);
-    const d = await r.json() as Record<string, any>;
-    expect(d.systemEnv).toBe(true);              // raw stored preference
-    expect(d.autoConnectSupported).toBe(false);  // effective capability
   } finally {
     await server.stop(true);
   }

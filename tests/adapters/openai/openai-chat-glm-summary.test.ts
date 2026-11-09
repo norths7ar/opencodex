@@ -2,7 +2,6 @@ import { describe, expect, spyOn, test } from "bun:test";
 import { buildOpenAIChatPassthroughRequest, createOpenAIChatAdapter } from "../../../src/adapters/openai-chat";
 import { protectGlmSummaryBudget } from "../../../src/adapters/openai-chat/summary-budget";
 import { chatCompletionsToResponsesBody } from "../../../src/chat/inbound";
-import { concreteComboRequestBody } from "../../../src/combos/request";
 import { parseRequest } from "../../../src/responses/parser";
 import type { OcxProviderConfig } from "../../../src/types";
 
@@ -33,20 +32,6 @@ describe("GLM tiny standalone summary compatibility", () => {
       expect(body.reasoning_effort).toBe("low");
       expect(body.messages).toEqual(messages);
     }
-  });
-  test("final adapter wins after successive combo force overrides", () => {
-    let raw = chatCompletionsToResponsesBody({ model, messages, max_tokens: 819, reasoning_effort: "high" });
-    for (const target of [{ provider: "proxy", model: "inner" }, { provider: "zai", model }]) {
-      raw = concreteComboRequestBody(raw, target, "max", provider.reasoningEfforts, "strict", "force");
-    }
-    const parsed = parseRequest(raw);
-    parsed.modelId = model;
-    expect(parsed.options.reasoning).toBe("max");
-    const body = JSON.parse(createOpenAIChatAdapter(provider).buildRequest(parsed).body);
-    expect(body.max_tokens).toBe(8192);
-    expect(body.reasoning_effort).toBe("low");
-    expect(parsed.options.maxOutputTokens).toBe(819);
-    expect(parsed.options.reasoning).toBe("max");
   });
   test.each([0, -1, 1025, 4096, undefined])("preserves cap outside the mitigation: %s", cap => {
     for (const body of bodies({ max_tokens: cap })) {

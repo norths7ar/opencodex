@@ -11,6 +11,7 @@ import {
   validateForwardAdmissionCredential,
   isProxyAdmissionSecret,
   ForwardAdmissionCredentialError,
+  shouldSubstituteStoredCodexCredential,
 } from "../auth-cors";
 import {
   providerConsumesCallerAuthorization,
@@ -142,10 +143,7 @@ function codexRouteCredentialDomainHeadersFor(
   }
   // Route-changing recursion retains typed admission, never an unscoped raw
   // caller credential. Bearer admission is substituted or stripped below.
-  const routeMayChangeCredentialDomain = options.comboAttempt === true
-    // A JEV decision-model turn is a new credential domain even though it starts headerless.
-    || options.internalDecisionCall === true
-    || route.routeKind === "policy"
+  const routeMayChangeCredentialDomain = route.routeKind === "policy"
     || route.credentialDomainRewrite === true
     || credentialDomainWasRewritten;
   if (routeMayChangeCredentialDomain && options.admission?.source !== "bearer") {
@@ -188,7 +186,7 @@ export function codexRouteCredentialOwnership(
   route: Pick<RouteResult, "provider" | "codexAccountMode">,
   options: CodexCredentialOwnershipOptions,
 ): { substituteMainCredential: boolean; requestScopedMainCredential: boolean } {
-  const substituteMainCredential = options.admission?.source === "bearer"
+  const substituteMainCredential = shouldSubstituteStoredCodexCredential(authInputHeaders, config, options.admission)
     && (route.codexAccountMode !== undefined || isCanonicalOpenAiForwardProvider(route.provider));
   return {
     substituteMainCredential,

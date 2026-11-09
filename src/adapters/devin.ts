@@ -815,7 +815,7 @@ export function createDevinAdapter(
         );
         // A combo child has not committed an outer response yet. Holding its preflight through
         // a reset wait would also hold the next-target fallback with no client keepalive.
-        const resetWaitMs = incoming.comboAttempt ? 0 : devinStatedResetWaitMs();
+        const resetWaitMs = devinStatedResetWaitMs();
         // An admitted HTTP turn owns globally shared capacity until this call
         // emits. Without an explicit wait allowance, preserve the typed reset
         // delay in generated diagnostic wording and return immediately.

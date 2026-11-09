@@ -76,7 +76,7 @@ describe("provider API key pool", () => {
     }
   });
 
-  test("POST adds + activates; PUT switches; DELETE removes and promotes", async () => {
+  test("POST replaces the channel key; pool switching is unavailable; DELETE clears it", async () => {
     const server = startServer(0);
     try {
       const add = await fetch(new URL("/api/providers/keys", server.url), {
@@ -87,14 +87,14 @@ describe("provider API key pool", () => {
       const { id: secondId } = await add.json() as { id: string };
 
       let list = await fetch(new URL("/api/providers/keys?name=opencode-go", server.url)).then(r => r.json()) as { activeId: string; keys: Array<{ id: string; active: boolean }> };
-      expect(list.keys.length).toBe(2);
+      expect(list.keys.length).toBe(1);
       expect(list.activeId).toBe(secondId); // new key becomes active
 
       // config.json mirrors the active key into apiKey
       const cfg = JSON.parse(readFileSync(join(testDir, "config.json"), "utf-8"));
       expect(cfg.providers["opencode-go"].apiKey).toBe("key-second-444555666777");
 
-      const firstId = list.keys.find(k => k.id !== secondId)!.id;
+      const firstId = "retired-key";
       const rename = await fetch(new URL("/api/providers/keys/alias", server.url), {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "opencode-go", id: secondId, alias: "Work key" }),
@@ -106,18 +106,18 @@ describe("provider API key pool", () => {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: "opencode-go", id: firstId }),
       });
-      expect(put.status).toBe(200);
+      expect(put.status).toBe(410);
       list = await fetch(new URL("/api/providers/keys?name=opencode-go", server.url)).then(r => r.json()) as typeof list;
-      expect(list.activeId).toBe(firstId);
+      expect(list.activeId).toBe(secondId);
 
-      // Remove the active key: the other one is promoted.
-      const del = await fetch(new URL(`/api/providers/keys?name=opencode-go&id=${firstId}`, server.url), { method: "DELETE" });
+      // Removing the only configured key leaves this channel unauthenticated.
+      const del = await fetch(new URL(`/api/providers/keys?name=opencode-go&id=${secondId}`, server.url), { method: "DELETE" });
       expect(del.status).toBe(200);
       list = await fetch(new URL("/api/providers/keys?name=opencode-go", server.url)).then(r => r.json()) as typeof list;
-      expect(list.keys.length).toBe(1);
-      expect(list.activeId).toBe(secondId);
+      expect(list.keys.length).toBe(0);
+      expect(list.activeId).toBeNull();
       const cfg2 = JSON.parse(readFileSync(join(testDir, "config.json"), "utf-8"));
-      expect(cfg2.providers["opencode-go"].apiKey).toBe("key-second-444555666777");
+      expect(cfg2.providers["opencode-go"].apiKey).toBeUndefined();
     } finally {
       await server.stop(true);
     }
@@ -154,7 +154,7 @@ function keyQuotaResponse(percent: number): Response {
 }
 
 describe("credential-scoped key quota", () => {
-  test("the integrated Ollama Cloud reader supports each key without changing active configuration", async () => {
+  test("the integrated Ollama Cloud reader probes only the channel key without changing configuration", async () => {
     const provider = { adapter: "openai-chat", authMode: "key" as const, baseUrl: "https://ollama.com", apiKey: "fixture-first",
       apiKeyPool: [{ id: "first", key: "fixture-first" }, { id: "second", key: "fixture-second" }] };
     const config: OcxConfig = { port: 0, defaultProvider: "cloud-copy", providers: { "cloud-copy": provider } };
@@ -170,8 +170,8 @@ describe("credential-scoped key quota", () => {
       return Response.json({ included: { monthly: { remaining_percent: first ? 75 : 25 } } });
     }) as typeof globalThis.fetch;
     const rows = await fetchProviderApiKeyQuotas(config, "cloud-copy");
-    expect(rows.map(row => row.quota?.monthlyPercent)).toEqual([25, 75]);
-    expect(seen).toEqual(["https://ollama.com/api/balance", "https://ollama.com/api/balance"]);
+    expect(rows.map(row => row.quota?.monthlyPercent)).toEqual([25]);
+    expect(seen).toEqual(["https://ollama.com/api/balance"]);
     expect(JSON.stringify(config)).toBe(before);
     expect(providerApiKeyQuotaMode("cloud-copy", { ...provider, baseUrl: "https://ollama.example.invalid" })).toBe("unsupported");
   });
@@ -281,6 +281,7 @@ describe("credential-scoped key quota", () => {
     const previous = process.env[envName];
     const config = quotaKeyConfig(2);
     config.providers.openrouter!.apiKeyPool![1]!.key = `$${envName}`;
+    config.providers.openrouter!.apiKey = `$${envName}`;
     const seen: string[] = [];
     globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
       seen.push(new Headers(init?.headers).get("authorization") ?? "");
@@ -290,35 +291,35 @@ describe("credential-scoped key quota", () => {
       process.env[envName] = "env-first-fixture";
       const first = await fetchProviderApiKeyQuotas(config, "openrouter");
       process.env[envName] = "env-second-fixture";
-      expect(first[1]!.isCurrent()).toBe(false);
+      expect(first[0]!.isCurrent()).toBe(false);
       await fetchProviderApiKeyQuotas(config, "openrouter");
-      expect(seen).toEqual(["Bearer fixture-key-0", "Bearer env-first-fixture", "Bearer env-second-fixture"]);
+      expect(seen).toEqual(["Bearer env-first-fixture", "Bearer env-second-fixture"]);
       delete process.env[envName];
       const missing = await fetchProviderApiKeyQuotas(config, "openrouter");
-      expect(missing[1]?.quota).toBeNull();
-      expect(missing[1]?.unavailable).toBe(true);
-      expect(seen).toHaveLength(3);
+      expect(missing[0]?.quota).toBeNull();
+      expect(missing[0]?.unavailable).toBe(true);
+      expect(seen).toHaveLength(2);
     } finally {
       if (previous === undefined) delete process.env[envName];
       else process.env[envName] = previous;
     }
   });
 
-  test("key quota cache is bounded and a different provider cannot reuse the same slot", async () => {
+  test("dormant keys are not probed and different providers have independent quota caches", async () => {
     const config = quotaKeyConfig(257);
     let calls = 0;
     globalThis.fetch = (async () => { calls++; return keyQuotaResponse(11); }) as typeof globalThis.fetch;
     await fetchProviderApiKeyQuotas(config, "openrouter");
-    expect(calls).toBe(257);
+    expect(calls).toBe(1);
     config.providers.openrouter!.apiKeyPool = [config.providers.openrouter!.apiKeyPool![0]!];
     await fetchProviderApiKeyQuotas(config, "openrouter");
-    expect(calls).toBe(258);
+    expect(calls).toBe(1);
     config.providers.synthetic = { ...config.providers.openrouter!, baseUrl: "https://api.synthetic.new/v2" };
     await fetchProviderApiKeyQuotas(config, "synthetic");
-    expect(calls).toBe(259);
+    expect(calls).toBe(2);
   });
 
-  test("isolates inactive keys and leaves provider reports, config and active key unchanged", async () => {
+  test("ignores inactive keys and leaves provider reports, config and active key unchanged", async () => {
     const config = quotaKeyConfig();
     const before = JSON.stringify(config);
     globalThis.fetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
@@ -327,7 +328,7 @@ describe("credential-scoped key quota", () => {
     }) as typeof globalThis.fetch;
     const current = await fetchProviderQuotaReports(config, true);
     const rows = await fetchProviderApiKeyQuotas(config, "openrouter");
-    expect(rows.map(row => row.quota?.customWindows?.[0]?.percent)).toEqual([10, 75]);
+    expect(rows.map(row => row.quota?.customWindows?.[0]?.percent)).toEqual([10]);
     expect(rows.every(row => row.isCurrent())).toBe(true);
     expect(Object.keys(rows[0]!)).toEqual(["keyId", "quota"]);
     expect(JSON.stringify(rows)).not.toContain("fixture-key");
@@ -342,6 +343,7 @@ describe("credential-scoped key quota", () => {
     const [first] = await fetchProviderApiKeyQuotas(config, "openrouter");
     expect(first!.isCurrent()).toBe(true);
     config.providers.openrouter!.apiKeyPool![0]!.key = "replacement-fixture";
+    config.providers.openrouter!.apiKey = "replacement-fixture";
     expect(first!.isCurrent()).toBe(false);
     const [replacement] = await fetchProviderApiKeyQuotas(config, "openrouter");
     expect(replacement!.isCurrent()).toBe(true);
@@ -382,33 +384,6 @@ describe("credential-scoped key quota", () => {
     status = 200;
     expect((await fetchProviderApiKeyQuotas(config, "openrouter", true))[0]?.unavailable).toBeUndefined();
     expect(calls).toBe(4);
-  });
-
-  test("four workers bound a key roster and late removed rows cannot publish", async () => {
-    const config = quotaKeyConfig(7);
-    let release!: () => void;
-    const gate = new Promise<void>(resolve => { release = resolve; });
-    let fourStarted!: () => void;
-    const entered = new Promise<void>(resolve => { fourStarted = resolve; });
-    let active = 0;
-    let peak = 0;
-    let calls = 0;
-    globalThis.fetch = (async () => {
-      active += 1; calls += 1; peak = Math.max(peak, active);
-      if (calls === 4) fourStarted();
-      await gate;
-      active -= 1;
-      return keyQuotaResponse(33);
-    }) as typeof globalThis.fetch;
-    const pending = fetchProviderApiKeyQuotas(config, "openrouter");
-    await entered;
-    config.providers.openrouter!.apiKeyPool = config.providers.openrouter!.apiKeyPool!.filter(row => row.id !== "slot-0");
-    release();
-    const rows = await pending;
-    expect(peak).toBe(4);
-    expect(rows).toHaveLength(7);
-    expect(rows[0]!.isCurrent()).toBe(false);
-    expect(rows[0]!.quota).toBeNull();
   });
 
   test("unsupported modes/destinations never fetch and capability does not need a key", async () => {

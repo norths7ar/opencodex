@@ -4,7 +4,6 @@ import * as store from "../../src/oauth/store";
 import * as modelRows from "../../src/server/management/model-rows";
 import * as managementShared from "../../src/server/management/shared";
 import { armClaudeCodeBaseline, getConfigPath, loadConfig, saveConfig } from "../../src/config";
-import * as systemEnv from "../../src/server/system-env";
 import { buildClaudeReplayConfig } from "../../src/server/claude-messages";
 import { parseRequest } from "../../src/responses/parser";
 import { planVisionSidecar } from "../../src/vision";
@@ -64,7 +63,7 @@ function persisted(): OcxConfig {
 test.each([false, true])("normal Claude management saves retain retired disable intent; explicit reset and model edits work (backend: %s)", async withBackend => {
   let outbound = 0;
   const network = spyOn(globalThis, "fetch").mockImplementation(async () => { outbound++; throw new Error("Network forbidden in settings roundtrip"); });
-  const env = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false });
+
   try {
     const global = { enabled: true, backend: "openai" as const, model: "gpt-5.6-luna" };
     const provider: OcxConfig["providers"][string] = { adapter: "openai-chat", baseUrl: "https://routed.test/v1", apiKey: "fixture-key", noVisionModels: ["blind"] };
@@ -133,7 +132,7 @@ test.each([false, true])("normal Claude management saves retain retired disable 
     expect(live.claudeCode?.webSearchSidecar?.enabled).toBe(true);
     checkPlans(live, true);
     expect(outbound).toBe(0);
-  } finally { env.mockRestore(); network.mockRestore(); }
+  } finally { network.mockRestore(); }
 }, 60_000);
 
 test("Claude sidecar enabled writes reject non-booleans without changing config", async () => {
@@ -150,7 +149,7 @@ test("Claude sidecar enabled writes reject non-booleans without changing config"
 test.each(["backend", "model", "both"] as const)("Claude Auto edits clear persisted %s while retaining activation intent", async scenario => {
   let outbound = 0;
   const network = spyOn(globalThis, "fetch").mockImplementation(async () => { outbound++; throw new Error("Network forbidden in Auto roundtrip"); });
-  const env = spyOn(systemEnv, "applySystemEnvToggle").mockResolvedValue({ reverted: false });
+
   try {
     const global = { enabled: true, backend: "openai" as const, model: "gpt-5.6-luna" };
     for (const field of ["visionSidecar", "webSearchSidecar"] as const) {
@@ -179,7 +178,7 @@ test.each(["backend", "model", "both"] as const)("Claude Auto edits clear persis
       expect(reloaded.fastMode).toBe(true);
     }
     expect(outbound).toBe(0);
-  } finally { env.mockRestore(); network.mockRestore(); }
+  } finally { network.mockRestore(); }
 }, 60_000);
 
 for (const instance of ["anthropic", "anthropic2"] as const) {

@@ -22,8 +22,8 @@ const STATE = {
   interceptEligible: true,
   sharedProxy: "none",
   authMode: "auto",
-  autoConnectSupported: true,
-  systemEnv: false,
+
+
   fastMode: null,
   maxContextTokens: null,
   autoContext: true,

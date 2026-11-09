@@ -198,8 +198,6 @@ describe("desktop CLI command surface", () => {
 
   test("dashboard CLI entry is gated by isDesktopShell on every supported OS", () => {
     for (const [platform, url] of [
-      ["Macintosh", "tauri://localhost/cli.html"],
-      ["X11; Linux", "tauri://localhost/cli.html"],
       ["Windows NT", "http://tauri.localhost/cli.html"],
     ]) {
       expect(desktopCliPageUrl(`Mozilla/5.0 (${platform})`)).toBeNull();

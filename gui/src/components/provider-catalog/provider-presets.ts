@@ -6,7 +6,7 @@
  * predicates), search filtering, and deterministic sorting. No React, no fetch.
  */
 
-import { providerTier, type ProviderTier, type WorkspaceProvider, type WorkspaceItem } from "../../provider-workspace/catalog";
+import { providerTier, type ProviderTier, type WorkspaceProvider } from "../../provider-workspace/catalog";
 import { isLocalProvider } from "../../provider-workspace/kind";
 import type { ProviderPayload } from "../../provider-payload";
 
@@ -29,9 +29,6 @@ export interface CatalogPreset {
   keyOptional?: boolean;
   /** Free pricing — may still require an API key (e.g. NVIDIA NIM). */
   freeTier?: boolean;
-  /** Sponsor tier (SPONSORS.md). Sponsor rows are pinned to the top of their tab and chipped. */
-  sponsor?: "main" | "standard";
-  sponsorUrl?: string;
   /**
    * Endpoint picker (e.g. Qwen Cloud). Choice without `baseUrl` = Custom (show text field).
    */
@@ -40,20 +37,6 @@ export interface CatalogPreset {
   provider?: ProviderPayload;
 }
 
-/** A configured name alone cannot identify a sponsor after its endpoint is edited. */
-export function matchingWorkspacePreset(item: WorkspaceItem, presets: CatalogPreset[]): CatalogPreset | undefined {
-  const endpoint = (value: string) => {
-    try {
-      const url = new URL(value.trim());
-      if (url.username || url.password || url.search || url.hash) return undefined;
-      return `${url.origin}${url.pathname.replace(/\/+$/, "")}`;
-    } catch { return undefined; }
-  };
-  const base = endpoint(item.baseUrl);
-  if (!base) return undefined;
-  return presets.find(preset => preset.id === item.name && preset.adapter === item.adapter
-    && endpoint(preset.baseUrl) === base);
-}
 
 /**
  * Adapt a preset row to the WorkspaceProvider shape the tier predicates expect
@@ -154,9 +137,7 @@ export function matchesCatalogQuery(preset: CatalogPreset, query: string): boole
 /**
  * Order matched rows WITHIN one group: exact id or label first, then a label/id prefix,
  * then everything else in the order the caller already established — which carries the
- * sponsor pin, then usage rank, then label. Deliberately never applied across groups: a
- * paid sponsor sorted above free NVIDIA on the query `nim` reads as an ad slot, and the
- * sponsor already has a badge and a pin inside its own group.
+ * usage rank, then label. Results stay within their groups.
  */
 export function sortCatalogMatches(presets: CatalogPreset[], query: string): CatalogPreset[] {
   const q = query.trim().toLowerCase();
@@ -209,19 +190,3 @@ export function dropPresetsCoveredByAccounts(
   return presets.filter(preset => !covered.has(preset.id));
 }
 
-const SPONSOR_RANK: Record<NonNullable<CatalogPreset["sponsor"]>, number> = { main: 0, standard: 1 };
-
-/**
- * Sponsor rows first — Main before Standard, alphabetical by label within a tier — then the
- * caller's order untouched. Stable, so usage ranking still decides the non-sponsor tail.
- * Alphabetical among sponsors is deliberate: it is the one order no sponsor can buy.
- */
-export function pinSponsors(presets: CatalogPreset[]): CatalogPreset[] {
-  const sponsors = presets.filter(p => p.sponsor);
-  if (sponsors.length === 0) return presets;
-  sponsors.sort((a, b) =>
-    SPONSOR_RANK[a.sponsor!] - SPONSOR_RANK[b.sponsor!]
-    || a.label.localeCompare(b.label, undefined, { sensitivity: "base" })
-    || a.id.localeCompare(b.id));
-  return [...sponsors, ...presets.filter(p => !p.sponsor)];
-}

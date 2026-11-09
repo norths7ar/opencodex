@@ -1,5 +1,4 @@
 import { useT } from "../../i18n/shared";
-import { Select } from "../../ui";
 import type { WorkspaceItem } from "./types";
 
 export type KeyPacingDraft = Pick<NonNullable<WorkspaceItem["requestPacing"]>, "keySelection" | "keys">;
@@ -13,14 +12,9 @@ export function ProviderKeyPacing({ value, onChange, status = [] }: {
     const keys = { ...value.keys };
     if (!raw.trim()) delete keys[field];
     else keys[field] = Number(raw);
-    onChange({ ...value, keys: Object.keys(keys).length ? keys : undefined });
+    onChange({ ...value, keySelection: "active", keys: Object.keys(keys).length ? keys : undefined });
   };
   return <>
-    <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.keySelection")}</span>
-      <Select fullWidth label={t("pws.keySelection")} value={value.keySelection ?? "active"}
-        options={[{ value: "active", label: t("pws.keyActive") }, { value: "round-robin", label: t("pws.keyRoundRobin") }]}
-        onChange={keySelection => onChange({ ...value, keySelection: keySelection as "active" | "round-robin" })} />
-    </label>
     <h4>{t("pws.keyLimits")}</h4>
     <div className="pwi-key-limits" style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
       {(["requestsPerMinute", "minIntervalMs", "maxConcurrentRequests"] as const).map((field, index) => <label key={field} className="pwi-settings-field" style={{ flex: "1 1 160px", minWidth: 0 }}>

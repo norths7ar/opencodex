@@ -330,61 +330,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
     });
   });
 
-  test("native aliases suppress their native dashboard row and activate Desktop allowlist pruning", () => {
-    const config = makeConfig({
-      disabledModels: ["gpt-5.6-sol", "gpt-5.5"],
-      combos: {
-        nova: {
-          alias: "gpt-5.6-sol",
-          nativeAlias: true,
-          displayName: "Nova1 - Sol",
-          targets: [{ provider: "nova", model: "codex/gpt-5.6-sol" }],
-        },
-      },
-    });
-    const rows = nativeModelRows(config);
-    expect(rows.some(row => row.slug === "gpt-5.6-sol")).toBe(false);
-    expect(rows.find(row => row.slug === "gpt-5.5")?.disabled).toBe(true);
-    expect(desktopAllowlistSuppressedNativeSlugs(config))
-      .toEqual(new Set(["gpt-5.6-sol", "gpt-5.5"]));
-    expect(desktopAllowlistSuppressedNativeSlugs(makeConfig({
-      disabledModels: ["gpt-5.5"],
-    }))).toEqual(new Set());
-  });
-
-  // #4646 asked for disabled native slugs to be omitted outright. They are retained as
-  // `visibility: "hide"` on purpose, and this pins the whole shape of that contract in one
-  // place, because it is what the operator-facing note in
-  // docs-site/.../codex-app-models.md and structure/catalog.md now describe: the row is gone
-  // from the availability list, still present in the catalog so a later re-enable restores real
-  // upstream metadata, and omitted outright only once a native-alias combo exists.
-  test("without a native alias a disabled native is hidden-but-retained; the alias is what omits it", () => {
-    const disabled = { disabledModels: ["gpt-5.6-terra"] };
-    // Not vacuous: terra is a candidate native on both the live-catalog and fallback paths
-    // (NATIVE_OPENAI_MODELS and DOCUMENTED_NATIVE_OPENAI_ADDITIONS both carry it).
-    expect(visibleNativeSlugs({ disabledModels: [] })).toContain("gpt-5.6-terra");
-    expect(visibleNativeSlugs(disabled)).not.toContain("gpt-5.6-terra");
-    expect(desktopAllowlistSuppressedNativeSlugs(disabled)).toEqual(new Set());
-
-    const entries = [{ slug: "gpt-5.6-terra", visibility: "list" }, { slug: "gpt-5.6-sol", visibility: "list" }];
-    applyNativeVisibility(entries, new Set(disabled.disabledModels));
-    // Retained rather than dropped: the row survives with its upstream metadata.
-    expect(entries.find(entry => entry.slug === "gpt-5.6-terra")?.visibility).toBe("hide");
-    expect(entries.find(entry => entry.slug === "gpt-5.6-sol")?.visibility).toBe("list");
-
-    expect(desktopAllowlistSuppressedNativeSlugs(makeConfig({
-      ...disabled,
-      combos: {
-        nova: {
-          alias: "gpt-5.6-sol",
-          nativeAlias: true,
-          displayName: "Nova1 - Sol",
-          targets: [{ provider: "nova", model: "codex/gpt-5.6-sol" }],
-        },
-      },
-    })).has("gpt-5.6-terra")).toBe(true);
-  });
-
   test("configured public selectors replace bare picker rows with account-qualified native clones", () => {
     const template = nativeTemplate();
     template.comp_hash = "native-compaction-hash";
@@ -395,7 +340,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
       ["gpt-5.5"],
       false,
       "default",
-      new Set(),
       ["main-account", "side.account"],
     );
     applyNativeVisibility(entries, new Set(), true);
@@ -441,7 +385,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
       [],
       false,
       "default",
-      new Set(),
       ["team"],
       new Set(),
       new Set(),
@@ -472,7 +415,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
       [],
       false,
       "default",
-      new Set(),
       [],
       new Set(),
       new Set(),
@@ -523,7 +465,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
       [],
       false,
       "default",
-      new Set(),
       ["desktop", "team"],
     );
     applyNativeVisibility(entries, new Set(["team/gpt-5.5"]), true);
@@ -545,7 +486,6 @@ describe("native GPT model toggles (bare slugs in disabledModels)", () => {
       ["gpt-5.5", "vendor/model"],
       false,
       "default",
-      new Set(),
       ["one", "two", "three"],
     );
     applyNativeVisibility(entries, new Set(), true);

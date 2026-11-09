@@ -247,7 +247,7 @@ async function executeDescription(
       plan.settings,
       abortSignal,
       undefined,
-      plan.advisorAdmissionPolicy,
+      plan.sidecarAdmissionPolicy,
     );
   }
   if (plan.backend === "anthropic") {

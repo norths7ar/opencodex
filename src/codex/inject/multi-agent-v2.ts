@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import type { OcxConfig } from "../../types";
 import { ConfigWriteDestinationChanged, type LockHandle } from "../config-write-lock";
 import { CODEX_CONFIG_PATH } from "../paths";
-import type { CodexCliSelectionAsyncParentWrite } from "../cli-update-selection-gate";
+import type { CodexCliSelectionAsyncParentWrite } from "../cli-selection";
 
 /**
  * Reconcile the native `features.multi_agent_v2` override when an injection carries an
@@ -78,11 +78,11 @@ export async function prepareInjectedV1SurfaceReconcile(
     toggle = (enabled, env, validate) => runCodexFeaturesCommand(enabled ? "enable" : "disable", "multi_agent_v2", env, validate);
   }
   const resolvedToggle = toggle;
-  const { beginCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } = await import("../cli-update-selection-gate");
+  const { beginCodexCliSelectionParentWriteAsync, CodexCliSelectionMutationBusyError } = await import("../cli-selection");
   let selection: CodexCliSelectionAsyncParentWrite | undefined;
   const busy = (): InjectedV1SurfaceReconcile => ({
     ok: false, retryable: true,
-    message: "Codex config injection refused: the v1 transition has no current CLI selection admission. Retry the injection after the CLI update finishes.",
+    message: "Codex config injection refused: the v1 transition has no current CLI selection admission. Retry the injection after the concurrent Codex operation finishes.",
   });
   return {
     enabledAtPrepare,

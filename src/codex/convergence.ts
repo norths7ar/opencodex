@@ -6,7 +6,6 @@ import { compareCatalogHealPaths } from "./catalog/heal-observation";
 import { getConfigDir, saveConfigPreservingClaudeCode, ultraFastTierEnabled, websocketsEnabled, withExpectedConfigGenerationSync } from "../config";
 import { reconcileSuccessfulModelDiscoveries } from "../providers/new-model-policy";
 import { pendingModelSelectionProviders } from "../providers/initial-model-selection";
-import { COMBO_NAMESPACE } from "../combos";
 import { getAuthStorePath } from "../oauth/store";
 import type { OcxConfig } from "../types";
 import { captureCatalogAdmissionSnapshot } from "./catalog-admission";
@@ -52,7 +51,7 @@ import {
   orderForSubagents,
   } from "./catalog/sync";
   import { multiAgentV2EnabledFromConfigText } from "./features";
-  import { comboCatalogDescriptions, enforceCatalogSlugUniqueness, exactComboCatalogSlugs } from "./catalog/aggregation";
+  import { enforceCatalogSlugUniqueness } from "./catalog/aggregation";
   import {
   isNativeAliasCatalogEntry,
   accountBoundNativeOpenAiSlugs,
@@ -278,7 +277,6 @@ function prepareCatalog(
   const modelPickerOrder = config.modelPickerOrder ?? [];
   const multiAgentMode = config.multiAgentMode === "v1" || config.multiAgentMode === "v2"
     ? config.multiAgentMode : "default";
-  const exactComboSlugs = exactComboCatalogSlugs(config);
   const bareEligibleAccountIds = providerCodexAccountMode(
     OPENAI_CODEX_PROVIDER_ID,
     config.providers[OPENAI_CODEX_PROVIDER_ID],
@@ -305,7 +303,6 @@ function prepareCatalog(
     && !desktopAllowlistSuppressedNativeSlugs({ ...config, omitDisabledNativeModels: false }).has(String(template.slug))) {
     suppressedBareNativeSlugs.delete(String(template.slug));
   }
-  const hasPhysicalComboProvider = Object.hasOwn(config.providers, COMBO_NAMESPACE);
   const enabledProviders = Object.entries(config.providers).filter(([, provider]) => provider.disabled !== true);
   const includeNativeOpenAi = shouldIncludeNativeOpenAi(config);
   const accountSelectors = shouldIncludeAccountBoundNativeOpenAi(config)
@@ -345,7 +342,6 @@ function prepareCatalog(
     modelPickerOrder,
     wsEnabled: websocketsEnabled(config),
     multiAgentMode,
-    exactComboSlugs,
     accountSelectors,
     suppressedBareNativeSlugs,
     disabledNativeAccountSlugs: new Set(),
@@ -361,7 +357,6 @@ function prepareCatalog(
       featured,
       wsEnabled: websocketsEnabled(config),
       multiAgentMode,
-      exactComboSlugs,
       accountSelectors,
       suppressedBareNativeSlugs,
       disabledNativeAccountSlugs: new Set([...disabledNative].filter(slug => suppressedBareNativeSlugs.has(slug))),
@@ -401,9 +396,6 @@ function prepareCatalog(
     multiAgentMode,
     multiAgentV2Enabled,
     keepNativeChatGptOnV1: config.keepNativeChatGptOnV1 === true,
-    exactComboSlugs,
-    comboDescriptions: comboCatalogDescriptions(config),
-    hasPhysicalComboProvider,
     includeNativeOpenAi,
     accountBoundEntries,
     suppressedBareNativeSlugs,
@@ -456,9 +448,6 @@ export async function gatherCodexCatalogCandidate(
     const keyedBackupBytes = readCatalogGatherSource(session, "hashed-backup-fallback");
     const legacyBackupBytes = paths.legacyBackup
       ? readCatalogGatherSource(session, "legacy-backup-fallback") : null;
-    if (Object.keys(snapshot.config.combos ?? {}).length > 0) {
-      readCatalogGatherSource(session, "native-catalog-selection");
-    }
     const authOutcomes: CatalogGatherProviderAuthOutcome[] = [];
     const providerModelOutcomes: CatalogGatherProviderModelOutcome[] = [];
     const discoveryPolicies: CatalogProviderDiscoveryPolicySnapshot[] = [];

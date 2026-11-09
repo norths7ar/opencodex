@@ -32,8 +32,7 @@ export function DashboardOverviewPanels({ readOnly = false, ...props }: Dash & {
         <MemoryObservabilityCard apiBase={props.apiBase} />
       </SettingsSection>
       <SettingsSection id="proxy-fallback" title={t("proxyV2.secFallback")} lede={t("proxyV2.secFallbackLede")}>
-        {/* A Remote Link Child shows its Home's settings; they are changed on the Home. */}
-        <FallbackPanel apiBase={props.apiBase} section="routing" readOnly={readOnly} embedded />
+        <FallbackPanel apiBase={props.apiBase} readOnly={readOnly} embedded />
       </SettingsSection>
     </>
   );

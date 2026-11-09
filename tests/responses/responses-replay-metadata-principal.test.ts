@@ -93,18 +93,6 @@ test("principal and thread tuple encoding is unambiguous", () => {
   expect(reasoningReplayServingIdentityChanged(bound('a","b', "second", "c")._reasoningReplayScope)).toBe(true);
 });
 
-test.each(["principal-a", undefined])("strict Combo eligibility checks its own serving namespace (%s)", principal => {
-  commitReasoningReplayServingIdentity(bound(principal)._reasoningReplayScope);
-  const args = {
-    body: { tools: [{}], input: [{ type: "reasoning", encrypted_content: BLOB }] },
-    clientThreadId: THREAD, clientPrincipalId: principal, providerName: "second",
-    provider: { ...provider("second"), preserveResponsesReasoningContent: true, requiresAdjacentResponsesToolResults: true },
-    adapterName: "openai-responses", modelId: "model-a",
-  };
-  expect(mandatoryResponsesReasoningReplayUnavailable(args)).toBe(true);
-  expect(mandatoryResponsesReasoningReplayUnavailable({ ...args, clientPrincipalId: "foreign-principal" })).toBe(false);
-});
-
 test("a foreign owner tag still strips a blob regardless of principal metadata", () => {
   const parsed = bound("principal-a");
   const raw = { input: [{ type: "reasoning", encrypted_content: BLOB }] };

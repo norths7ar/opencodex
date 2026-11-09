@@ -1,5 +1,4 @@
 import { beforeAll, beforeEach, describe, expect, spyOn, test } from "bun:test";
-import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readdirSync, readFileSync, writeFileSync, mkdirSync, unlinkSync } from "node:fs";
 import { createConnection, createServer } from "node:net";
@@ -7,11 +6,10 @@ import type { AddressInfo } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { collectHubStatus, hubStatusLines, isConnectionRefused, isUncleanExitEvidence, proxyHealthFailureReason, resolveStatusPid, selectListenTarget } from "../../src/cli/status";
+import { isConnectionRefused, isUncleanExitEvidence, proxyHealthFailureReason, resolveStatusPid, selectListenTarget } from "../../src/cli/status";
 import * as proxyLiveness from "../../src/server/proxy-liveness";
 import * as startupHealth from "../../src/codex/autostart-health";
 import * as service from "../../src/service";
-import * as supervision from "../../src/service/desktop-supervision.mjs";
 import * as statusFacade from "../../src/cli/status";
 import * as statusProbes from "../../src/cli/status-probes";
 import { packageVersion } from "../../src/cli/help";
@@ -21,9 +19,6 @@ import { COLD_SPAWN_WARMUP_HOOK_BUDGET_MS, warmColdSpawn } from "../helpers/cold
 import { removeTreeWithRetry } from "../helpers/remove-tree";
 import { INTERNAL_DEADLINE_MS, SPAWN_BUDGET_MS, STORE_BUDGET_MS } from "../helpers/test-budget";
 import { spawnTestChild } from "../helpers/spawn-test-child";
-import { inspectClientRotationRecoveryGate, readClientConnectionState } from "../../src/client/state";
-import * as lifecycleLock from "../../src/client/lifecycle-lock";
-import { writeDesktopDisconnectReceipt } from "../../src/claude/desktop-remote-store";
 
 const repoRoot = dirname(fileURLToPath(new URL("../../package.json", import.meta.url)));
 const cliPath = join(repoRoot, "src", "cli", "index.ts");
@@ -157,131 +152,6 @@ describe("status version skew projection", () => {
   }, SPAWN_BUDGET_MS);
 });
 
-function withRecoveryStatusFixture(work: (fixture: {
-  home: string;
-  lockDeps: { lockPath: string };
-  tokenPath: string;
-  backupPath: string;
-  config: ReturnType<typeof recoveryStatusConfig>;
-  writeConfig: () => void;
-}) => void): void {
-  const home = mkdtempSync(join(tmpdir(), "ocx-status-recovery-"));
-  const previousHome = process.env.OPENCODEX_HOME;
-  const previousDesktop = process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-  process.env.OPENCODEX_HOME = home;
-  process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = join(home, "desktop");
-  const tokenPath = join(home, "service-api-token");
-  const config = recoveryStatusConfig();
-  const writeConfig = () => writeFileSync(join(home, "config.json"), JSON.stringify(config));
-  try {
-    writeConfig();
-    writeFileSync(tokenPath, "status-fixture-token", { mode: 0o600 });
-    work({ home, config, writeConfig, tokenPath, backupPath: `${tokenPath}.prev`,
-      lockDeps: { lockPath: join(home, "locks", "lifecycle.sqlite") } });
-  } finally {
-    if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-    else process.env.OPENCODEX_HOME = previousHome;
-    if (previousDesktop === undefined) delete process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR;
-    else process.env.OPENCODEX_CLAUDE_DESKTOP_CONFIG_DIR = previousDesktop;
-    removeTreeWithRetry(home);
-  }
-}
-
-function recoveryStatusConfig() {
-  return {
-    port: 9, defaultProvider: "openai",
-    providers: { openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", authMode: "forward" } },
-    runtimeRole: "client",
-    client: {
-      serverUrl: "https://hub.example.test", managementUrl: "https://hub.example.test",
-      managementTransport: "direct", selectedClients: ["claude"], tokenEnv: "OPENCODEX_API_AUTH_TOKEN",
-      apiKeyId: "status-fixture", tokenFingerprint: createHash("sha256").update("status-fixture-token").digest("hex"),
-      protocolVersion: 1, connectedAt: "2026-09-06T00:00:00.000Z",
-    },
-  };
-}
-
-describe("status recovery inspection is read-only unless an orphan needs cleanup", () => {
-  test.each(["clean", "disconnected", "malformed", "pending", "unsafe-backup", "unsafe-receipt", "unsafe-desktop"])(
-    "%s observation creates neither lifecycle nor config database", scenario => {
-      withRecoveryStatusFixture(f => {
-        if (scenario === "disconnected") writeFileSync(join(f.home, "config.json"), JSON.stringify({ port: 9, providers: {} }));
-        if (scenario === "malformed") writeFileSync(join(f.home, "config.json"), "{malformed");
-        if (scenario === "pending") {
-          Object.assign(f.config.client, { pendingOperation: {
-            kind: "rotate", rotationId: "fixture-rotation", newKeyIssuedAt: "2026-09-06T00:00:01.000Z", oldKeyBackupPath: f.backupPath,
-          } });
-          f.writeConfig();
-          writeFileSync(f.backupPath, "status-fixture-token", { mode: 0o600 });
-        }
-        if (scenario === "unsafe-backup") mkdirSync(f.backupPath);
-        if (scenario === "unsafe-receipt" || scenario === "unsafe-desktop") {
-          mkdirSync(join(f.home, "desktop-remote"), { mode: 0o700 });
-          writeFileSync(join(f.home, "desktop-remote", scenario === "unsafe-receipt" ? "disconnect.json" : "state.json"), "{bad", { mode: 0o600 });
-          writeFileSync(f.backupPath, "status-fixture-token", { mode: 0o600 });
-        }
-        const before = readdirSync(f.home).sort();
-        const configBefore = readFileSync(join(f.home, "config.json"), "utf8");
-        const result = inspectClientRotationRecoveryGate(undefined, f.lockDeps);
-        expect(result.kind).toBe(scenario === "pending" || scenario === "unsafe-desktop" ? "recovery-required"
-          : scenario.startsWith("unsafe-") ? "unsafe" : "clean");
-        expect(readdirSync(f.home).sort()).toEqual(before);
-        expect(readFileSync(join(f.home, "config.json"), "utf8")).toBe(configBefore);
-        expect(existsSync(join(f.home, "locks"))).toBe(false);
-        expect(existsSync(join(f.home, "config-mutation.sqlite"))).toBe(false);
-        if (scenario === "pending" || scenario.startsWith("unsafe-")) expect(existsSync(f.backupPath)).toBe(true);
-      });
-    },
-  );
-
-  test("only a proven orphan takes L/C; a held L preserves its backup", () => {
-    withRecoveryStatusFixture(f => {
-      writeFileSync(f.backupPath, "status-fixture-token", { mode: 0o600 });
-      lifecycleLock.withClientLifecycleSync(() => {
-        expect(inspectClientRotationRecoveryGate(undefined, f.lockDeps)).toEqual({ kind: "recovery-required", reason: "client_lifecycle_busy" });
-        expect(existsSync(f.backupPath)).toBe(true);
-        expect(existsSync(join(f.home, "config-mutation.sqlite"))).toBe(false);
-      }, f.lockDeps);
-      expect(inspectClientRotationRecoveryGate(undefined, f.lockDeps)).toEqual({ kind: "orphan-cleaned" });
-      expect(existsSync(f.backupPath)).toBe(false);
-      expect(existsSync(join(f.home, "config-mutation.sqlite"))).toBe(true);
-      expect(inspectClientRotationRecoveryGate(undefined, f.lockDeps)).toEqual({ kind: "clean" });
-    });
-  }, STORE_BUDGET_MS);
-
-  test.each(["rotation", "token-changed", "disconnect", "backup-removed"])(
-    "revalidates %s after acquiring L rather than using the initial observation", transition => {
-      withRecoveryStatusFixture(f => {
-        writeFileSync(f.backupPath, "status-fixture-token", { mode: 0o600 });
-        const stale = readClientConnectionState();
-        const actualLock = lifecycleLock.withClientLifecycleSync;
-        let entered = false;
-        const lock = spyOn(lifecycleLock, "withClientLifecycleSync").mockImplementation((work, deps) => actualLock(held => {
-          entered = true;
-          if (transition === "rotation") {
-            Object.assign(f.config.client, { pendingOperation: {
-              kind: "rotate", rotationId: "fixture-rotation", newKeyIssuedAt: "2026-09-06T00:00:01.000Z", oldKeyBackupPath: f.backupPath,
-            } });
-            f.writeConfig();
-          } else if (transition === "token-changed") writeFileSync(f.tokenPath, "replacement-fixture-token");
-          else if (transition === "backup-removed") unlinkSync(f.backupPath);
-          else writeDesktopDisconnectReceipt(held, null, {
-            version: 1, owner: { serverUrl: f.config.client.serverUrl, apiKeyId: f.config.client.apiKeyId, connectedAt: f.config.client.connectedAt },
-            tokenFingerprint: f.config.client.tokenFingerprint, keepCatalog: false, phase: "prepared",
-          });
-          return work(held);
-        }, deps));
-        try {
-          const result = inspectClientRotationRecoveryGate(stale, f.lockDeps);
-          expect(entered).toBe(true);
-          expect(result.kind).toBe(transition === "token-changed" ? "unsafe" : transition === "backup-removed" ? "clean" : "recovery-required");
-          expect(existsSync(f.backupPath)).toBe(transition !== "backup-removed");
-        } finally { lock.mockRestore(); }
-      });
-    }, STORE_BUDGET_MS,
-  );
-});
-
 describe("CLI status JSON", () => {
   test("status facade preserves probe identity without exposing its health helper", () => {
     expect(statusFacade.proxyHealthFailureReason).toBe(statusProbes.proxyHealthFailureReason);
@@ -410,15 +280,6 @@ describe("CLI status JSON", () => {
       expect(typeof parsed.codexHome?.appCodexHome).toBe("string");
       expect(typeof parsed.codexHome?.mismatch).toBe("boolean");
       expect(parsed.codexHome?.warning === null || typeof parsed.codexHome?.warning === "string").toBe(true);
-      expect(parsed.connection).toMatchObject({
-        state: "disconnected",
-        credentialFile: "missing",
-      });
-      // #4207 gave a connected client a local-runtime readiness verdict. Observing that runtime
-      // spawns a Codex process, so a machine with no client connection must not carry the field
-      // at all; its absence is what keeps every ordinary `ocx status` off that probe.
-      expect(parsed.connection).not.toHaveProperty("readiness");
-      expect(parsed.connection).not.toHaveProperty("readinessReason");
 
       const serialized = JSON.stringify(parsed).toLowerCase();
       for (const forbidden of ["apikey", "sk-test-secret", "token", "refreshtoken", "authorization", "email"]) {
@@ -586,21 +447,6 @@ describe("CLI status JSON", () => {
     expect(target.dashboardUrl).toBe("http://localhost:10100/");
   });
 
-  test("hub listen target prefers its management public origin", () => {
-    const target = selectListenTarget(
-      {
-        port: 10100,
-        hostname: "100.64.0.10",
-        runtimeRole: "hub",
-        hub: { managementPublicOrigin: "https://hub.example.test" },
-      },
-      null,
-      null,
-    );
-
-    expect(target.dashboardUrl).toBe("https://hub.example.test/");
-  });
-
   test("non-loopback listen target uses its configured hostname", () => {
     const target = selectListenTarget(
       { port: 10100, hostname: "100.64.0.11" },
@@ -660,162 +506,6 @@ describe("CLI status JSON", () => {
  * it. These cases pin the predicate, including the two false-positive shapes that a
  * naive implementation gets wrong.
  */
-/**
- * The hub block (#4236).
- *
- * A hub operator's first question is "is this reachable, and can another machine join?", and the
- * report used to answer it in four places and not at all for the data token. These tests pin the
- * projection and the sentences, and -- the one that matters for a security boundary -- that no
- * token VALUE is ever in either.
- */
-describe("status hub block", () => {
-  const TOKEN = "b".repeat(64);
-
-  function withHome<T>(setup: (home: string) => void, body: () => T): T {
-    const home = mkdtempSync(join(tmpdir(), "ocx-status-hub-"));
-    const previous = process.env.OPENCODEX_HOME;
-    const previousToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-    process.env.OPENCODEX_HOME = home;
-    delete process.env.OPENCODEX_API_AUTH_TOKEN;
-    try {
-      mkdirSync(join(home), { recursive: true });
-      setup(home);
-      return body();
-    } finally {
-      if (previous === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previous;
-      if (previousToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = previousToken;
-      removeTreeWithRetry(home);
-    }
-  }
-
-  const hub = (overrides: Record<string, unknown> = {}) => ({
-    port: 10100,
-    hostname: "100.64.0.10",
-    runtimeRole: "hub" as const,
-    hub: { managementPublicOrigin: "https://hub.tailnet.ts.net", managementIngress: { enabled: true as const, port: 10101 } },
-    unauthenticatedLoopbackListener: { enabled: true as const },
-    ...overrides,
-  });
-
-  test("there is no hub block on a standalone or client machine", () => {
-    for (const role of [undefined, "standalone", "client"] as const) {
-      const config = { ...hub(), runtimeRole: role } as Parameters<typeof collectHubStatus>[0];
-      expect(collectHubStatus(config, { port: 10100, hostname: "127.0.0.1" }, {})).toBeNull();
-    }
-  });
-
-  test("the companion form is named as sharing the public port; a ported one is not", () => {
-    const companion = collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100, hostname: "100.64.0.10" }, {});
-    expect(companion?.loopbackListener).toEqual({ state: "companion", port: 10100 });
-    expect(hubStatusLines(companion!).join("\n")).toContain("same port as the public listener");
-
-    const ported = collectHubStatus(
-      hub({ unauthenticatedLoopbackListener: { enabled: true, port: 10104 } }) as Parameters<typeof collectHubStatus>[0],
-      { port: 10100, hostname: "100.64.0.10" },
-      {},
-    );
-    expect(ported?.loopbackListener).toEqual({ state: "ported", port: 10104 });
-    expect(hubStatusLines(ported!).join("\n")).toContain("http://127.0.0.1:10104");
-
-    const off = collectHubStatus(
-      hub({ unauthenticatedLoopbackListener: { enabled: false } }) as Parameters<typeof collectHubStatus>[0],
-      { port: 10100, hostname: "100.64.0.10" },
-      {},
-    );
-    expect(off?.loopbackListener).toEqual({ state: "off", port: null });
-    expect(hubStatusLines(off!).join("\n")).toContain("does not route its own local");
-  });
-
-  test("the data origin prefers hub.dataPublicOrigin and says which it used", () => {
-    const derived = collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100, hostname: "100.64.0.10" }, {});
-    expect(derived?.dataOrigin).toBe("http://100.64.0.10:10100");
-    expect(derived?.dataOriginConfigured).toBe(false);
-    expect(hubStatusLines(derived!).join("\n")).toContain("derived from the bind address");
-
-    const configured = collectHubStatus(
-      hub({ hub: { managementPublicOrigin: "https://hub.tailnet.ts.net", dataPublicOrigin: "https://hub.tailnet.ts.net:8443" } }) as Parameters<typeof collectHubStatus>[0],
-      { port: 10100, hostname: "100.64.0.10" },
-      {},
-    );
-    expect(configured?.dataOrigin).toBe("https://hub.tailnet.ts.net:8443");
-    expect(hubStatusLines(configured!).join("\n")).toContain("hub.dataPublicOrigin");
-  });
-
-  test("the token state is about the file the service reads, never about this shell", () => {
-    withHome(home => writeFileSync(join(home, "service-api-token"), `${TOKEN}\n`, "utf8"), () => {
-      const fromFile = collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100 }, {});
-      expect(fromFile?.dataToken).toBe("present (file)");
-      expect(fromFile?.dataTokenEnvInShell).toBe(false);
-
-      // `present (env)` used to be reported here whenever the CALLING shell exported the
-      // variable -- but the launchd plist and the systemd unit overwrite it from the file
-      // before exec, so the label described the operator's terminal, not the hub.
-      const withShellVar = collectHubStatus(
-        hub() as Parameters<typeof collectHubStatus>[0],
-        { port: 10100 },
-        { OPENCODEX_API_AUTH_TOKEN: "from-the-shell" },
-      );
-      expect(withShellVar?.dataToken).toBe("present (file)");
-      expect(withShellVar?.dataTokenEnvInShell).toBe(true);
-      expect(hubStatusLines(withShellVar!).join("\n")).toContain("the installed service reads the file, not this");
-
-      for (const status of [fromFile!, withShellVar!]) {
-        const rendered = [JSON.stringify(status), ...hubStatusLines(status)].join("\n");
-        expect(rendered).not.toContain(TOKEN);
-        expect(rendered).not.toContain("from-the-shell");
-      }
-    });
-  });
-
-  test("a token file holding the ADMIN token is called out, not reported as present", () => {
-    // The #4236 incident read `present (file)` while the hub crash-looped, because the file
-    // held the MANAGEMENT token and nothing in the report compared the two.
-    const admin = `ocx_admin_${"f".repeat(43)}`;
-    withHome(home => writeFileSync(join(home, "service-api-token"), `${admin}\n`, "utf8"), () => {
-      const status = collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100 }, {});
-      expect(status?.dataToken).toBe("admin-collision (file)");
-      const lines = hubStatusLines(status!).join("\n");
-      expect(lines).toContain(status!.dataTokenPath);
-      expect(lines).toContain("MANAGEMENT token");
-      expect(lines).toContain("ocx service repair");
-      expect([JSON.stringify(status), lines].join("\n")).not.toContain(admin);
-    });
-    // The same comparison doctor and the service chokepoint use: byte-equal to the configured
-    // admin token counts too, not only the minted prefix.
-    withHome(home => {
-      writeFileSync(join(home, "service-api-token"), "hand-pasted-management-key\n", "utf8");
-    }, () => {
-      const status = collectHubStatus(
-        hub() as Parameters<typeof collectHubStatus>[0],
-        { port: 10100 },
-        { OPENCODEX_ADMIN_AUTH_TOKEN: "hand-pasted-management-key" },
-      );
-      expect(status?.dataToken).toBe("admin-collision (file)");
-    });
-  });
-
-  test("a missing and an unusable token file are distinguished", () => {
-    withHome(() => {}, () => {
-      expect(collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100 }, {})?.dataToken).toBe("missing");
-    });
-    withHome(home => writeFileSync(join(home, "service-api-token"), "\n", "utf8"), () => {
-      const status = collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100 }, {});
-      expect(status?.dataToken).toBe("unsafe (file)");
-      expect(hubStatusLines(status!).join("\n")).toContain(status!.dataTokenPath);
-    });
-  });
-
-  test("the block always ends with the invite hint", () => {
-    withHome(() => {}, () => {
-      const lines = hubStatusLines(collectHubStatus(hub() as Parameters<typeof collectHubStatus>[0], { port: 10100 }, {})!);
-      expect(lines[0]).toBe("Hub:");
-      expect(lines.at(-1)).toBe("  Invite a machine: ocx hub invite");
-    });
-  });
-});
-
 describe("unclean prior exit evidence", () => {
   const base = {
     live: false,
@@ -1079,61 +769,6 @@ describe("status reports stale process records end to end", () => {
       removeTreeWithRetry(home);
     }
   });
-});
-
-
-describe("status selected supervision verdict", () => {
-  test.each(["local", "live", "local-supervision-override"] as const)("JSON and service summary use %s", async source => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-status-supervision-"));
-    const previousHome = process.env.OPENCODEX_HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
-    const restore: Array<() => void> = [];
-    try {
-      mkdirSync(join(home, "codex"));
-      process.env.OPENCODEX_HOME = home;
-      process.env.CODEX_HOME = join(home, "codex");
-      writeFileSync(join(home, "config.json"), JSON.stringify({ ...getDefaultConfig(), port: 9 }));
-      const local = startupHealth.deriveStartupHealth({ routingKind: "opencodex-local", platform: "darwin",
-        autostartEnabled: true, serviceInstalled: false, serviceViable: false, serviceEnabled: false,
-        serviceRunning: false, serviceStale: false, serviceConflict: false, serviceSupported: true,
-        shimInstalled: false, shimHealthy: false,
-        desktop: { owned: false, loginEnabled: false, running: true, viable: false,
-          supervisor: { supervisorPid: 3131, runtimePid: 4242, app: "/fixture/opencodex-desktop" } } });
-      const old = { ...local, desktop: undefined, recommendedAction: undefined, recommendedCommand: "ocx service install" };
-      const find = spyOn(proxyLiveness, "findLiveProxy").mockResolvedValue(source === "local" ? null
-        : { pid: 4242, port: 9, source: "runtime" });
-      restore.push(() => find.mockRestore());
-      const read = spyOn(statusFacade, "fetchLiveStartupHealth").mockResolvedValue(source === "local-supervision-override" ? old : local);
-      restore.push(() => read.mockRestore());
-      const collect = spyOn(startupHealth, "collectStartupHealth").mockReturnValue(local);
-      restore.push(() => collect.mockRestore());
-      let probes = 0;
-      const inspect = spyOn(supervision, "inspectDesktopSupervision").mockImplementation(deps => {
-        expect(deps?.targetPid).toBe(4242);
-        probes++;
-        return { kind: "desktop", supervisorPid: 3131, runtimePid: 4242, app: "/fixture/opencodex-desktop", proxy: "/fixture/ocx" };
-      });
-      restore.push(() => inspect.mockRestore());
-      const result = (await statusFacade.collectStatus()).json;
-      expect(result.startupSource).toBe(source);
-      expect(result.startup).toBe(local);
-      if (source === "local") {
-        expect(result.service.summary).not.toContain("OpenCodex Desktop supervises the running proxy");
-        expect(result.service.summary).not.toContain("running under the live managed service");
-      } else {
-        expect(result.service.summary).toContain("OpenCodex Desktop supervises the running proxy");
-        expect(result.service.summary).not.toContain("run '");
-      }
-      expect(probes).toBe(source === "local-supervision-override" ? 1 : 0);
-    } finally {
-      for (const cleanup of restore.reverse()) cleanup();
-      if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = previousHome;
-      if (previousCodexHome === undefined) delete process.env.CODEX_HOME;
-      else process.env.CODEX_HOME = previousCodexHome;
-      removeTreeWithRetry(home);
-    }
-  }, STORE_BUDGET_MS);
 });
 
 

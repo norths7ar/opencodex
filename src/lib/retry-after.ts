@@ -1,4 +1,4 @@
-import { parseRetryAfterMs } from "../combos";
+import { parseRetryAfterMs } from "./retry-after-delay";
 import { classifyError, parseRetryAfterFromMessage } from "./errors";
 import { formatClientRetryAfter } from "./client-retry-after";
 
@@ -31,7 +31,7 @@ export function validateClientRetryAfterHeader(
  * default — hammering a spent quota is not a backoff problem.
  *
  * Pass `includeDefault: false` when the value feeds cooldown/failover metadata:
- * the synthetic client fallback must not shorten combo cooldowns from 60s to 2s.
+ * the synthetic client fallback must not shorten cooldowns from 60s to 2s.
  */
 export function resolveClientRetryAfter(opts: {
   status: number;

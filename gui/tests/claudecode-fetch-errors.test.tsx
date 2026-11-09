@@ -53,8 +53,8 @@ const CLAUDE_OK = {
   interceptEligible: true,
   sharedProxy: "none",
   authMode: "proxy",
-  autoConnectSupported: false,
-  systemEnv: false,
+
+
   fastMode: null,
   maxContextTokens: null,
   autoContext: true,

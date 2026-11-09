@@ -864,7 +864,7 @@ describe("legacy ChatGPT OAuth public-surface exclusion", () => {
       const editedAgain = loadConfig();
       editedAgain.hostname = "127.0.0.1";
       editedAgain.port = 11445;
-      editedAgain.claudeCode = { authMode: "subscription", systemEnv: true };
+      editedAgain.claudeCode = { authMode: "subscription", autoContext: true };
       saveConfig(editedAgain);
 
       saveConfigPreservingClaudeCode(liveConfig);
@@ -876,8 +876,8 @@ describe("legacy ChatGPT OAuth public-surface exclusion", () => {
       expect(afterLaterSave.providers.concurrent).toBeDefined();
       expect(afterLaterSave.providers.xai).toBeUndefined();
       expect(afterLaterSave.disabledModels).toEqual(["pending/provider-model"]);
-      expect(afterLaterSave.claudeCode).toEqual({ authMode: "subscription", systemEnv: true });
-      expect(liveConfig.claudeCode).toEqual({ authMode: "subscription", systemEnv: true });
+      expect(afterLaterSave.claudeCode).toEqual({ authMode: "subscription", autoContext: true });
+      expect(liveConfig.claudeCode).toEqual({ authMode: "subscription", autoContext: true });
       // Runtime admission remains tied to the open socket, but the next-start
       // binding adopted from disk must survive this unrelated live save.
       expect(liveConfig.hostname).toBe("0.0.0.0");

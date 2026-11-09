@@ -10,8 +10,7 @@ export function DashboardOverviewSection({ readOnly = false, ...d }: Dash & { re
     <div className="dash-overview-stack">
       <DashboardOverviewHead {...d} />
       <DashboardOverviewPanels {...d} />
-      {/* A Remote Link Child shows its Home's settings; they are changed on the Home. */}
-      <FallbackPanel apiBase={d.apiBase} section="routing" readOnly={readOnly} />
+      <FallbackPanel apiBase={d.apiBase} readOnly={readOnly} />
     </div>
   );
 }

@@ -11,8 +11,7 @@ import type { OcxConfig } from "../../types";
 
 export const CLAUDE_INTERCEPT_PORT_OFFSET = 100;
 
-export function claudeInterceptEnabled(config: Pick<OcxConfig, "claudeCode" | "runtimeRole">): boolean {
-  if (config.runtimeRole === "client") return false;
+export function claudeInterceptEnabled(config: Pick<OcxConfig, "claudeCode">): boolean {
   if (config.claudeCode?.enabled === false) return false;
   return config.claudeCode?.intercept?.enabled !== false;
 }

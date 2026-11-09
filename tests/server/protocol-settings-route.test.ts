@@ -100,7 +100,7 @@ describe("PATCH /api/protocols/settings", () => {
     expect(h.saves[0]!.protocols).toEqual({ unrepresentable: "reject", rollout: { directEncoders: true, shadowPlan: true } });
     const body = await res.json() as { settings: { unrepresentable: string; rollout: Record<string, boolean> } };
     expect(body.settings.unrepresentable).toBe("reject");
-    expect(body.settings.rollout).toMatchObject({ directEncoders: true, shadowPlan: true, nativeChatCombos: false });
+    expect(body.settings.rollout).toMatchObject({ directEncoders: true, shadowPlan: true, });
   });
 
   test("the OAuth native-Messages switch cannot be turned on without the key-auth one", async () => {

@@ -736,40 +736,6 @@ describe("server terminal guard integration", () => {
     }
   });
 
-  test("combo attempts do not run an opted-in openai-chat terminal guard", async () => {
-    takeInheritedSpendHome();
-    const comboConfig = {
-      ...openAiChatConfig(true),
-      combos: {
-        guarded: {
-          strategy: "failover",
-          targets: [{ provider: "glm-gw", model: "glm-5.2" }],
-        },
-      },
-    } as OcxConfig;
-    let sends = 0;
-    globalThis.fetch = (async () => {
-      sends += 1;
-      return chatSse(chatFirstTurn);
-    }) as typeof fetch;
-
-    const response = await handleResponses(new Request("http://localhost/v1/responses", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        model: "combo/guarded",
-        input: "请检查这个问题并修复代码",
-        stream: true,
-        tools: [{ type: "function", name: "exec_command", description: "run a command", parameters: { type: "object" } }],
-      }),
-    }), comboConfig, { model: "", provider: "" });
-
-    const text = await response.text();
-    expect(response.status).toBe(200);
-    expect(sends).toBe(1);
-    expect(text).toContain("response.completed");
-  });
-
   test("routed compaction does not run an opted-in openai-chat terminal guard", async () => {
     takeInheritedSpendHome();
     const chatConfig = openAiChatConfig(true);

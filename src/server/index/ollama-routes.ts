@@ -75,11 +75,11 @@ export async function dispatchOllamaRoute(req: Request, url: URL, deps: OllamaRo
   const sessionReq = withCallerSessionIdentity(req, admission);
   // Expose an id only when the handler or a logged refusal owns the history row.
   let ownsRequestLog = false;
-  const advisorAdmissionPolicy = captureAdmissionPolicy(config, admission);
+  const sidecarAdmissionPolicy = captureAdmissionPolicy(config, admission);
   const response = await deps.runAdmittedHttpTurn(sessionReq, policy, async turnAdmissionLease => {
     ownsRequestLog = true;
     return withCors(
-      await handleOllamaGeneration(kind, sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, advisorAdmissionPolicy }),
+      await handleOllamaGeneration(kind, sessionReq, config, logCtx, { requestId, start, turnAdmissionLease, admission, sidecarAdmissionPolicy }),
       req,
       policy,
     );

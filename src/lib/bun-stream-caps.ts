@@ -106,7 +106,7 @@ export function selectEagerPath(
   version: string = Bun.version,
   minFixed: string | null = MIN_FIXED_BUN_VERSION,
 ): EagerRelayDecision | null {
-  if (platform !== "win32" && platform !== "darwin") {
+  if ((platform !== "win32")) {
     return null;
   }
 

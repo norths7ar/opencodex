@@ -1,5 +1,4 @@
 import type { CodexAccount, OcxConfig } from "../types";
-import { COMBO_NAMESPACE } from "../combos/types";
 import { OPENAI_CODEX_PROVIDER_ID } from "../providers/openai-tiers";
 import {
   POLICY_NAMESPACE,
@@ -23,19 +22,10 @@ const RESERVED_NAMESPACE_KEYS = new Set([
   "__proto__",
   "prototype",
   "constructor",
-  COMBO_NAMESPACE,
   OPENAI_CODEX_PROVIDER_ID,
   POLICY_NAMESPACE,
 ].map(codexProviderNamespaceKey));
 const PUBLIC_ACCOUNT_SELECTOR_MAX_ATTEMPTS = 16;
-
-function comboAliasNamespaces(config: Pick<OcxConfig, "combos">): string[] {
-  return Object.values(config.combos ?? {}).flatMap((combo) => {
-    const alias = typeof combo?.alias === "string" ? combo.alias.trim() : "";
-    const slash = alias.indexOf("/");
-    return slash > 0 ? [alias.slice(0, slash)] : [];
-  });
-}
 
 function privateAccountSelectorCandidates(accountIds: Iterable<string>): Set<string> {
   const candidates = new Set<string>();
@@ -75,11 +65,10 @@ function claimNamespace(requested: string, used: Set<string>): string {
 
 /** Collect every public namespace that a generated account selector must not claim. */
 function occupiedNamespaces(
-  config: Pick<OcxConfig, "combos" | "providers" | "routingProfiles">,
+  config: Pick<OcxConfig, "providers" | "routingProfiles">,
 ): Set<string> {
   return new Set([
     ...Object.keys(config.providers).map(codexProviderNamespaceKey),
-    ...comboAliasNamespaces(config),
     ...routingProfileAliasNamespacePrefixes(config),
     ...RESERVED_NAMESPACE_KEYS,
   ]);
@@ -87,7 +76,7 @@ function occupiedNamespaces(
 
 /** Build an initial account-selector map without deriving public selectors from aliases or ids. */
 export function defaultCodexAccountNamespaces(
-  config: Pick<OcxConfig, "codexAccounts" | "combos" | "providers" | "routingProfiles">,
+  config: Pick<OcxConfig, "codexAccounts" | "providers" | "routingProfiles">,
 ): Record<string, string> {
   const namespaces: Record<string, string> = {};
   const used = occupiedNamespaces(config);
@@ -118,7 +107,6 @@ export function initializeDefaultCodexAccountNamespaces(
     | "codexAccountPickerEnabled"
     | "codexAccountNamespaces"
     | "codexAccounts"
-    | "combos"
     | "providers"
     | "routingProfiles"
   >,
@@ -139,7 +127,7 @@ export function initializeDefaultCodexAccountNamespaces(
 export function appendDefaultCodexAccountNamespace(
   config: Pick<
     OcxConfig,
-    "codexAccountNamespaces" | "codexAccounts" | "combos" | "providers" | "routingProfiles"
+    "codexAccountNamespaces" | "codexAccounts" | "providers" | "routingProfiles"
   >,
   account: Pick<CodexAccount, "id" | "isMain" | "logLabel">,
 ): boolean {

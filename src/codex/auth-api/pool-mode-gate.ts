@@ -1,3 +1,4 @@
+import { singleCodexAccountId } from "../account-id";
 import { codexAccountUsesCreditsAfterLimit, codexUsageLimitResetAt } from "../account-credit-use";
 import { nextCodexUsageQueryAt, nextQuotaQueryDelay, pruneRemovedCodexPoolUsageAccounts } from "../quota-query-backoff";
 import { CODEX_PRIORITY_FAILBACK_REFRESH_MS } from "../account-priority";
@@ -314,7 +315,7 @@ export async function primeCodexPoolQuotas(
   // within POOL_CACHE_TTL would then read that old failure as current and skip the
   // retry the restored credential is entitled to.
   const runtimeConfig = getRuntimeConfig(config);
-  const configuredPoolIds = new Set((runtimeConfig.codexAccounts ?? []).map(account => account.id));
+  const configuredPoolIds = new Set((runtimeConfig.codexAccounts ?? []).filter(account => account.id === singleCodexAccountId(runtimeConfig)).map(account => account.id));
   pruneRemovedCodexPoolUsageAccounts(configuredPoolIds);
   for (const accountId of poolQuotaPrimeAttemptedAt.keys()) {
     if (!configuredPoolIds.has(accountId)) poolQuotaPrimeAttemptedAt.delete(accountId);
@@ -338,7 +339,7 @@ export async function primeCodexPoolQuotas(
   // Tracked because most callers do not await it, yet it holds the native-main claim
   // database open; whoever removes that directory settles it first (see background-work).
   primeInFlight = trackBackgroundWork(`codex-pool-quota-prime:${reason}`, (async () => {
-    const pool = (runtimeConfig.codexAccounts ?? []).filter(isSelectableCodexPoolAccount);
+    const pool = (runtimeConfig.codexAccounts ?? []).filter(account => account.id === singleCodexAccountId(runtimeConfig) && isSelectableCodexPoolAccount(account));
     const stale = pool.filter(a => {
       if (reason === "credit-renewal") return poolCreditRenewalDue(runtimeConfig, a.id);
       const q = getAccountQuota(a.id);
@@ -356,6 +357,7 @@ export async function primeCodexPoolQuotas(
     });
     if (reason === "credit-renewal" && stale.length === 0) return;
     const primeMain = async () => {
+      if (singleCodexAccountId(runtimeConfig) !== MAIN_CODEX_ACCOUNT_ID) return;
       // Main renewal owns its physical-identity claims and passive probe separately.
       if (reason === "credit-renewal") return;
       const mainLease = tryAcquireNativeMainPrimeLease();

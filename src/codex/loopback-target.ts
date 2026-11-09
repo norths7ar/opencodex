@@ -28,17 +28,17 @@ export const CODEX_RESERVE_OPT_IN_REQUIRED_MESSAGE =
  * routed `gpt-reserve` onto some other provider owns a path that works, and it must keep working.
  */
 export function isCodexReserveOptInMissing(
-  config: Pick<OcxConfig, "codexDesktopAuthless" | "runtimeRole">,
+  config: Pick<OcxConfig, "codexDesktopAuthless">,
   modelId: string,
   admission: Pick<DataPlaneAdmission, "source"> | undefined,
 ): boolean {
   return modelId === NATIVE_RESERVE_MODEL && config.codexDesktopAuthless !== true
-    && config.runtimeRole !== "client" && admission?.source === "loopback";
+    && admission?.source === "loopback";
 }
 
 /** Callers classify the concrete destination as canonical forward before using this predicate. */
 export function isCodexReserveHelperUnsupported(
-  config: Pick<OcxConfig, "codexDesktopAuthless" | "runtimeRole">,
+  config: Pick<OcxConfig, "codexDesktopAuthless">,
   modelId: string,
   admission: Pick<DataPlaneAdmission, "source"> | undefined,
   terminalHelper: boolean,
@@ -48,10 +48,10 @@ export function isCodexReserveHelperUnsupported(
 
 /** Runtime authority comes from the receiving listener, not the catalog's injection target. */
 export function isCodexReserveRequestEligible(
-  config: Pick<OcxConfig, "codexDesktopAuthless" | "runtimeRole">,
+  config: Pick<OcxConfig, "codexDesktopAuthless">,
   admission: Pick<DataPlaneAdmission, "source"> | undefined,
 ): boolean {
-  return config.codexDesktopAuthless === true && config.runtimeRole !== "client"
+  return config.codexDesktopAuthless === true
     && admission?.source === "loopback";
 }
 
@@ -122,18 +122,16 @@ export function shouldInjectApiAuthHeader(
 
 /** Match standalone injection, never a remote client's independently supplied routing target. */
 export function isEffectiveCodexDesktopAuthless(
-  config: Pick<OcxConfig, "runtimeRole" | "hostname" | "unauthenticatedLoopbackListener" | "codexDesktopAuthless"> | undefined,
+  config: Pick<OcxConfig, "hostname" | "unauthenticatedLoopbackListener" | "codexDesktopAuthless"> | undefined,
 ): boolean {
   return config?.codexDesktopAuthless === true
-    && config.runtimeRole !== "client"
     && !shouldInjectApiAuthHeader(config);
 }
 
 /** Keep reporting aligned with the admission-token gate used by standalone injection. */
 export function isEffectiveCodexClientCompaction(
-  config: Pick<OcxConfig, "runtimeRole" | "hostname" | "unauthenticatedLoopbackListener" | "codexClientCompaction"> | undefined,
+  config: Pick<OcxConfig, "hostname" | "unauthenticatedLoopbackListener" | "codexClientCompaction"> | undefined,
 ): boolean {
   return config?.codexClientCompaction === true
-    && config.runtimeRole !== "client"
     && !shouldInjectApiAuthHeader(config);
 }

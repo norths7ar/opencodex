@@ -1,9 +1,5 @@
 import type { OcxConfig } from "../../types";
-import {
-  codexAccountNamespaceEntries,
-  codexAccountPickerEnabled,
-  isMainCodexAccountTarget,
-} from "../account-namespaces";
+
 import type { RawEntry } from "./parsing";
 
 /** Stable nonsemantic marker used to distinguish generated rows from provider-owned rows. */
@@ -20,17 +16,8 @@ export const CODEX_ACCOUNT_BOUND_CATALOG_KIND = "account-selector-v1";
 export function visibleCodexAccountSelectors(
   config: Pick<OcxConfig, "codexAccounts" | "codexAccountNamespaces" | "codexAccountPickerEnabled">,
 ): string[] {
-  if (!codexAccountPickerEnabled(config)) return [];
-  const storedPoolAccounts = new Set(
-    (config.codexAccounts ?? [])
-      .filter(account => !account.isMain)
-      .map(account => account.id),
-  );
-  return codexAccountNamespaceEntries(config)
-    .filter(([, accountId]) =>
-      isMainCodexAccountTarget(accountId) || storedPoolAccounts.has(accountId)
-    )
-    .map(([selector]) => selector);
+  // A channel has one account; publish ordinary model names, not account variants.
+  return [];
 }
 
 export function accountBoundNativeDisplayName(selector: string, native: RawEntry): string {

@@ -225,12 +225,11 @@ describe("both shadow intercept sites preserve user turns (#6921)", () => {
   // Stop at routing: no native OpenAI provider is configured, a concrete helper
   // target is deliberately unavailable, and combo dispatch is injected. No send,
   // account selection, auth-store mutation or spend journal is needed.
-  async function probe(target: "concrete" | "combo", metadata?: string, options: {
+  async function probe(target: "concrete", metadata?: string, options: {
     websocket?: boolean; frameMetadata?: unknown; subagent?: string;
   } = {}) {
     return withTempHome(async () => {
-      const config = target === "combo"
-        ? comboInterceptConfig([{ provider: "xai", model: "grok-4.5" }]) : interceptConfig();
+      const config = interceptConfig();
       if (target === "concrete") config.providers.xai.disabled = true;
       const input = {
         model: "gpt-6-luna", input: "hi", stream: false,
@@ -239,7 +238,6 @@ describe("both shadow intercept sites preserve user turns (#6921)", () => {
       };
       const logCtx: RequestLogContext = { model: "", provider: "" };
       let parsedBody: unknown;
-      let comboBody: unknown;
       const response = await prepareResponsesRequest({
         req: new Request("http://localhost/v1/responses", {
           method: "POST",
@@ -255,35 +253,24 @@ describe("both shadow intercept sites preserve user turns (#6921)", () => {
         },
       }, { pendingHostAdmissionLease: null, authCtx: { kind: "main", accountId: null } }, {
         handleResponses: () => Promise.reject(new Error("unexpected recursion")),
-        handleComboResponses: async (_req, body, comboId, _config, _log, comboOptions) => {
-          expect(comboId).toBe("shadow");
-          expect(comboOptions.shadowCallIntercepted).toBe(true);
-          comboBody = body;
-          return new Response(null, { status: 202 });
-        },
       });
       expect(response).toBeInstanceOf(Response);
       if (!(response instanceof Response)) throw new Error("expected routing to stop before dispatch");
-      return { response, logCtx, parsedBody, comboBody };
+      return { response, logCtx, parsedBody };
     });
   }
 
-  for (const target of ["concrete", "combo"] as const) {
+  for (const target of ["concrete"] as const) {
     async function assertPreserved(metadata: string | undefined, options?: Parameters<typeof probe>[2]) {
       const result = await probe(target, metadata, options);
       expect(result.response.status).toBe(404); // original bare Luna needs an OpenAI route
       expect(await result.response.text()).toContain("gpt-6-luna");
       expect(result.parsedBody).toMatchObject({ model: "gpt-6-luna" });
       expect(result.logCtx.shadowCallRewrittenFrom).toBeUndefined();
-      expect(result.comboBody).toBeUndefined();
     }
     async function assertIntercepted(metadata: string | undefined, options?: Parameters<typeof probe>[2]) {
       const result = await probe(target, metadata, options);
-      expect(result.logCtx.shadowCallRewrittenFrom).toBe("gpt-6-luna");
-      if (target === "combo") {
-        expect(result.response.status).toBe(202);
-        expect(result.comboBody).toMatchObject({ model: "combo/shadow" });
-      } else {
+      expect(result.logCtx.shadowCallRewrittenFrom).toBe("gpt-6-luna");{
         expect(result.response.status).toBe(409);
         expect(result.logCtx.errorCode).toBe("intercept_target_unavailable");
       }
@@ -575,204 +562,12 @@ describe("shadow call intercept request path (issue #311)", () => {
   });
 });
 
-/**
- * A shadow-call replacement naming a COMBO used to run exactly one attempt and never enter
- * the failover loop (#4129). Two cooperating causes: the combo gate reads the UN-rewritten
- * body, where the model is still the bare helper slug, and the late intercept resolved the
- * replacement through routeModel/tryPickComboModel, which collapses the combo table to a
- * single target while still tagging routeKind "combo" — so the reported "combo route, one
- * attempt" was a collapsed native pick, and 429/5xx hops (which only exist inside
- * handleComboResponses) were unreachable.
- */
-function comboInterceptConfig(
-  targets: Array<{ provider: string; model: string }>,
-  shadowCallIntercept: Record<string, unknown> = { enabled: true, model: "combo/shadow" },
-): OcxConfig {
-  return {
-    port: 0,
-    defaultProvider: "xai",
-    providers: {
-      xai: {
-        adapter: "openai-chat",
-        baseUrl: "https://api.x.ai/v1",
-        authMode: "key",
-        apiKey: "test-xai-key",
-      },
-      alt: {
-        adapter: "openai-chat",
-        baseUrl: "https://alt.example/v1",
-        authMode: "key",
-        apiKey: "test-alt-key",
-      },
-    },
-    combos: {
-      shadow: { strategy: "failover", targets },
-    },
-    shadowCallIntercept,
-  } as unknown as OcxConfig;
-}
-
 function chatOk(text: string): Response {
   return Response.json({
     choices: [{ index: 0, message: { role: "assistant", content: text }, finish_reason: "stop" }],
     usage: { prompt_tokens: 1, completion_tokens: 1 },
   });
 }
-
-describe("a combo shadow-call target enters the failover loop (#4129)", () => {
-  test("a combo child of a shadow-intercepted call gets Cursor conversation isolation", async () => {
-    const config = comboInterceptConfig([{ provider: "xai", model: "grok-4.5" }]);
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    const mkreq = () => new Request("http://localhost/v1/responses", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        model: "grok-4.5",
-        input: [{ type: "message", role: "user", content: [{ type: "input_text", text: "hi" }] }],
-        stream: false,
-      }),
-    });
-    const dispatchers = {
-      handleResponses: () => Promise.reject(new Error("unexpected recursion")),
-      handleComboResponses: () => Promise.reject(new Error("unexpected combo dispatch")),
-    };
-    const admission = () => ({ pendingHostAdmissionLease: null, authCtx: { kind: "main", accountId: null } }) as never;
-
-    const intercepted = await prepareResponsesRequest(
-      { req: mkreq(), config, logCtx, options: { comboAttempt: true, shadowCallIntercepted: true, translatorBudget: createTestTranslatorBudget() } },
-      admission(),
-      dispatchers,
-    );
-    expect(intercepted).not.toBeInstanceOf(Response);
-    if (intercepted instanceof Response) throw new Error("expected a prepared request, got HTTP " + intercepted.status);
-    expect(intercepted.parsed._cursorIsolateConversation).toBe(true);
-
-    // A plain combo child (no interception marker) must not be isolated.
-    const plain = await prepareResponsesRequest(
-      { req: mkreq(), config, logCtx, options: { comboAttempt: true, translatorBudget: createTestTranslatorBudget() } },
-      admission(),
-      dispatchers,
-    );
-    expect(plain).not.toBeInstanceOf(Response);
-    if (plain instanceof Response) throw new Error("expected a prepared request, got HTTP " + plain.status);
-    expect(plain.parsed._cursorIsolateConversation).not.toBe(true);
-  });
-
-  test("carries helper conversation isolation into concrete combo children", () => {
-    const prepare = readFileSync(repoPath("src/server/responses/request-prepare.ts"), "utf8");
-    const comboDispatchStart = prepare.indexOf("return requestDispatchers.handleComboResponses(");
-    const comboDispatchEnd = prepare.indexOf("let unreadableEncryptedAgentTask", comboDispatchStart);
-    expect(comboDispatchStart).toBeGreaterThanOrEqual(0);
-    expect(comboDispatchEnd).toBeGreaterThan(comboDispatchStart);
-    const comboDispatch = prepare.slice(comboDispatchStart, comboDispatchEnd);
-    const parsedHandoff = prepare.slice(
-      prepare.indexOf("if (cursorClientThreadId) parsed._cursorClientThreadId"),
-      prepare.indexOf("} catch (err)", prepare.indexOf("if (cursorClientThreadId) parsed._cursorClientThreadId")),
-    );
-
-    expect(comboDispatch).toContain("shadowCallIntercepted,");
-    expect(parsedHandoff).toContain(
-      "if (options.shadowCallIntercepted === true) parsed._cursorIsolateConversation = true;",
-    );
-  });
-
-  test("a helper call rewritten to a combo hops past a 429 to the second target", async () => {
-    takeSpendHome();
-    const urls: string[] = [];
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    globalThis.fetch = (async (url: unknown) => {
-      urls.push(String(url));
-      return urls.length === 1
-        ? Response.json({ error: { message: "rate limited" } }, { status: 429 })
-        : chatOk("ok");
-    }) as typeof fetch;
-
-    const config = comboInterceptConfig([
-      { provider: "xai", model: "grok-4.5" },
-      { provider: "alt", model: "grok-4.5" },
-    ]);
-    const response = await post(config, "gpt-5.6-luna", "turn", logCtx);
-
-    expect(response.ok).toBe(true);
-    // The whole point: two upstream attempts, in configured order.
-    expect(urls).toHaveLength(2);
-    expect(urls[0]).toContain("api.x.ai");
-    expect(urls[1]).toContain("alt.example");
-    expect(logCtx.provider).toBe("combo");
-    expect(logCtx.comboId).toBe("shadow");
-    expect(logCtx.routeDecision?.routeKind).toBe("combo");
-    expect(logCtx.shadowCallRewrittenFrom).toBe("gpt-5.6-luna");
-    const attempts = (logCtx.attempts ?? []) as Array<{ provider?: string; model?: string }>;
-    expect(attempts).toHaveLength(2);
-    expect(attempts.map(a => `${a.provider}/${a.model}`))
-      .toEqual(["xai/grok-4.5", "alt/grok-4.5"]);
-  });
-
-  test("a spawned sub-agent turn never takes the early combo rewrite either", async () => {
-    takeSpendHome();
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    globalThis.fetch = (async () => chatOk("ok")) as typeof fetch;
-
-    const config = comboInterceptConfig([{ provider: "xai", model: "grok-4.5" }]);
-    await post(config, "gpt-6-luna", undefined, logCtx, { "x-openai-subagent": "collab_spawn" });
-
-    expect(logCtx.comboId).toBeUndefined();
-    expect(logCtx.shadowCallRewrittenFrom).toBeUndefined();
-  });
-
-  test("a combo whose first target intersects the source still routes as a combo", async () => {
-    takeSpendHome();
-    const urls: string[] = [];
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    globalThis.fetch = (async (url: unknown) => {
-      urls.push(String(url));
-      return chatOk("ok");
-    }) as typeof fetch;
-
-    // The #2706 self-target shape: the source model routes to xai, and the combo's FIRST
-    // target is that same provider+model. shadowCallTargetsIntersect is therefore true for
-    // the collapsed one-candidate pick, which is what used to suppress the intercept
-    // outright and leave the request on a plain native route.
-    const config = comboInterceptConfig(
-      [
-        { provider: "xai", model: "custom-helper" },
-        { provider: "alt", model: "grok-4.5" },
-      ],
-      { enabled: true, model: "combo/shadow", sourceModels: ["custom-helper"] },
-    );
-    const response = await post(config, "custom-helper", "turn", logCtx);
-
-    expect(response.ok).toBe(true);
-    // A healthy first target still costs exactly one upstream call.
-    expect(urls).toHaveLength(1);
-    expect(urls[0]).toContain("api.x.ai");
-    expect(logCtx.provider).toBe("combo");
-    expect(logCtx.comboId).toBe("shadow");
-    expect(logCtx.routeDecision?.routeKind).toBe("combo");
-    // Red before the fix: shouldInterceptShadowCall saw the collapsed pick as a self-target,
-    // skipped the rewrite, and the request left as a plain native route with no marker.
-    expect(logCtx.shadowCallRewrittenFrom).toBe("custom-helper");
-  });
-
-  test("a non-combo replacement still takes the ordinary late intercept", async () => {
-    takeSpendHome();
-    const urls: string[] = [];
-    const logCtx: RequestLogContext = { model: "", provider: "" };
-    globalThis.fetch = (async (url: unknown) => {
-      urls.push(String(url));
-      return chatOk("ok");
-    }) as typeof fetch;
-
-    const config = comboInterceptConfig([{ provider: "xai", model: "grok-4.5" }]);
-    config.shadowCallIntercept = { enabled: true, model: "xai/grok-4.5" };
-    const response = await post(config, "gpt-5.6-luna", "turn", logCtx);
-
-    expect(response.ok).toBe(true);
-    expect(urls).toHaveLength(1);
-    expect(logCtx.comboId).toBeUndefined();
-    expect(logCtx.shadowCallRewrittenFrom).toBe("gpt-5.6-luna");
-  });
-});
 
 /**
  * The GUI badge/tooltip used to hard-code "5.4-mini", so it kept naming a model

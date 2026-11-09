@@ -1,10 +1,8 @@
-import { remoteWorkspaceEnabled } from "../remote-control/workspace-activation";
 import { scheduleDesktopCompatibilityStartup } from "./index/desktop-compatibility-startup";
 import { AuxiliaryListenerBindError } from "./ports";
 import { normalizeBindHostname } from "./bind-host";
 import { configureInboundBodyBudget } from "./inbound-body-admission";
 import { createAdmittedHttpTurn } from "./admitted-http-turn";
-import { isOllamaNativePath } from "./ollama-native-paths";
 import {
   buildWarmupCompletionFrames,
   buildWsErrorFrame,
@@ -66,9 +64,6 @@ import {
   registerDefaultAppOwnedObservedBuffers,
 } from "../lib/app-owned-memory-stores";
 import { acquireServerBackgroundLifecycle } from "./background-lifecycle";
-import { startPackageRefresh, stopPackageRefresh } from "../update/refresh-scheduler";
-import { activateAdvisor } from "../lib/advisor-activation";
-import { activateLab, labActivationRequired } from "../lib/lab-activation";
 import { runOpenAiTierStartupMigration } from "../providers/openai-tier-startup";
 import { runAlibabaRegionStartupMigration } from "../providers/alibaba-region-startup";
 import { runModelRenameStartupMigration } from "../providers/model-rename-startup";
@@ -80,7 +75,6 @@ import { MAIN_CODEX_ACCOUNT_ID } from "../codex/main-account";
 export {
   clearThreadAccountMap,
   formatCodexProviderForLog,
-  resolveCodexAccountForThread,
 } from "../codex/routing";
 import { resolveGuiFilePath, rootFallbackPayload, serveGuiFile, serveSessionBootstrap } from "./gui-static";
 export { resolveGuiFilePath, rootFallbackPayload } from "./gui-static";
@@ -198,8 +192,7 @@ import {
 } from "../lib/local-management-attestation";
 import { createReadinessGate, type ReadinessGate } from "./readiness";
 import { createServeOptions, type ServerIngress } from "./index/serve-options";
-import { createOptionalListenerSet, LINK_INGRESS_HOSTNAME } from "./index/optional-listeners";
-import { createPackageTreeIntegrityGuardForServer } from "./index/package-tree-guard";
+import { createClaudeInterceptLifecycle } from "./index/claude-intercept-lifecycle";
 import { inspectStartupOwnership, logProxyEndpoints, resolveInboundBodyLimitWithWarning, setStartupCacheInvalidationWrite, warnAgentTaskRecoveryStartup, warnPlaintextV2AgentMessagesStartup, type StartServerDeps } from "./index/startup-warnings";
 import { acquireSpendLedgerServerLifecycle, recordFailedStartRollback, type SpendLedgerServerLifecycle } from "./index/spend-ledger-lifecycle";
 import { withLocalCredentialObservation } from "../local-credentials/runtime-observation";
@@ -339,11 +332,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     if (companionError) throw new Error(companionError);
   }
   const loopbackListenerPort = effectiveLoopbackListenerPort(config, listenPort);
-  // Hub management ingress is a third, management-only listener. Its address is intentionally
-  // fixed: the kernel loopback bind is the trust boundary that permits Tailscale identity headers.
-  const managementIngress = config.runtimeRole === "hub" ? config.hub?.managementIngress : undefined;
-  const managementIngressPort = managementIngress?.enabled ? managementIngress.port : null;
-
   /**
    * Which listener a request arrived on, expressed as the only thing that differs: the bind
    * address the auth and CORS decisions should see.
@@ -435,38 +423,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     return false;
   }
 
-  /**
-   * Routes the loopback hub-management listener will serve. This is default-deny so adding a
-   * data-plane or health route to the public handler cannot silently expose it through Tailscale
-   * Serve. A dotted GUI path is admitted only when it resolves to a packaged file; extensionless
-   * GETs intentionally retain the existing SPA fallback.
-   */
-  function managementIngressRouteAllowed(url: URL, req: Request): boolean {
-    const rawPath = url.pathname;
-    if (req.headers.get("upgrade")?.toLowerCase() === "websocket") {
-      return remoteWorkspaceEnabled(config) && rawPath === "/remote-workspace/agent";
-    }
-    if (rawPath === "/remote-workspace/pair") return remoteWorkspaceEnabled(config) && req.method === "POST";
-    if (rawPath === "/opencodex-session") return req.method === "GET" || req.method === "POST";
-    // Ollama-compatible inference paths are data plane, not management: never via Tailscale Serve.
-    if (isOllamaNativePath(rawPath)) return false;
-    if (rawPath.startsWith("/api/")) return true;
-    if (req.method !== "GET" && req.method !== "HEAD") return false;
-    let decodedPath: string;
-    try {
-      decodedPath = decodeURIComponent(rawPath);
-    } catch {
-      return false;
-    }
-    if (
-      decodedPath.startsWith("/v1/")
-      || decodedPath === "/healthz"
-      || decodedPath === "/readyz"
-    ) return false;
-    if (decodedPath === "/" || !decodedPath.includes(".")) return true;
-    return serveGuiFile(rawPath) !== null;
-  }
-
   // Codex maps 503 + server_is_overloaded to ServerOverloaded ("model at capacity"), retried
   // only with retry advice that older clients ignore (#6642); server_restarting is a
   // retryable UnexpectedStatus in every version and never reads as model capacity.
@@ -491,15 +447,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     }), req, policy);
   }
 
-  function packageTreeChangedResponse(req: Request, policy: RequestPolicyView, message: string): Response {
-    return withCors(new Response(JSON.stringify({
-      error: { type: "server_error", code: "package_tree_changed", message },
-    }), {
-      status: 503,
-      headers: { "Content-Type": "application/json" },
-    }), req, policy);
-  }
-
   const runAdmittedHttpTurn = createAdmittedHttpTurn(() => config.maxInboundBodyBytes, serverBusyResponse);
 
   // Readiness gate: one PRIVATE controller per startServer invocation, captured
@@ -508,7 +455,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
   // passes it in, and transitions it after the post-startup sync settles. When
   // no gate is supplied (tests, ad-hoc starts) a fresh pending gate is created.
   const readinessGate = deps.readinessGate ?? createReadinessGate();
-  const packageTreeIntegrity = createPackageTreeIntegrityGuardForServer(deps);
   // Actual bound port, filled in after Bun.serve binds so /readyz reports the
   // real ephemeral port for startServer(0). /healthz keeps its existing port
   // field (the requested listenPort) byte-for-byte.
@@ -596,41 +542,23 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     };
   let server: Server<WsData>;
   let loopbackServer: Server<WsData> | null = null;
-  let managementIngressServer: Server<WsData> | null = null;
-  const optionalListeners = createOptionalListenerSet<WsData>();
+  const claudeIntercept = createClaudeInterceptLifecycle<WsData>();
   const inboundBodyLimitBytes = resolveInboundBodyLimitWithWarning(config);
 
   function ingressForServer(requestServer: Server<WsData>): ServerIngress {
-    const optionalIngress = optionalListeners.ingressOf(requestServer);
-    if (optionalIngress !== undefined) return optionalIngress;
+    if (claudeIntercept.ownsListener(requestServer)) return "claude-intercept";
     if (requestServer === loopbackServer) return "unauthenticated-loopback";
-    if (requestServer === managementIngressServer) return "hub-management";
     return "public";
   }
-  const linkPolicy = (): RequestPolicyView => requestPolicyView(config, LINK_INGRESS_HOSTNAME, { allowedKeyIds: optionalListeners.linkAdmissionKeyIds() });
   let backgroundLifecycle: ReturnType<typeof acquireServerBackgroundLifecycle> | null = null;
   let unregisterQuotaAutoRefresh: (() => void) | null = null;
-  let remoteWorkspaceStopping = false;
-  let remoteWorkspaceShutdown: (() => Promise<void>) | undefined;
   let desktopCompatibilityStartup: ReturnType<typeof scheduleDesktopCompatibilityStartup> | undefined;
   let desktopCompatibilityShutdown: (() => Promise<void>) | undefined;
   const managementApiDeps: ManagementApiDeps = {
     ...deps.managementApi,
     listLowQuotaEvents: limit => backgroundLifecycle?.listLowQuotaEvents(limit) ?? [],
-    remoteWorkspaceStopping: () => remoteWorkspaceStopping,
-    onRemoteWorkspaceShutdown: shutdown => { remoteWorkspaceShutdown = shutdown; }, linkSupervisor: () => optionalListeners.linkSupervisor(), linkListener: () => optionalListeners,
+    claudeIntercept: () => claudeIntercept,
     onDesktopCompatibilityShutdown: shutdown => { desktopCompatibilityShutdown = shutdown; },
-  };
-  let workspaceRuntimeFlight: Promise<typeof import("../remote-control/workspace-runtime")> | undefined;
-  const loadRemoteWorkspaceRuntime = () => {
-    workspaceRuntimeFlight ??= import("../remote-control/workspace-runtime");
-    remoteWorkspaceShutdown = async () => {
-      const runtime = await workspaceRuntimeFlight!;
-      const sessions = deps.managementApi?.remoteWorkspaceSessions ?? runtime.initializedRemoteWorkspaceSessionsForConfig(config);
-      const hub = deps.managementApi?.remoteWorkspaceHub ?? runtime.initializedRemoteWorkspaceHubForConfig(config);
-      try { await sessions?.shutdown(); } finally { hub?.closeAllConnections(); }
-    };
-    return workspaceRuntimeFlight;
   };
   try {
     backgroundLifecycle = acquireServerBackgroundLifecycle(applyPolicy, config);
@@ -642,28 +570,22 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
       drainingResponse,
       ingressForServer,
       loopbackRouteAllowed,
-      managementIngressRouteAllowed,
-      linkRouteAllowed: optionalListeners.linkRouteAllowed, linkPolicy, onAuthenticatedCatalog: optionalListeners.notifyAuthenticatedCatalog,
-      packageTreeChangedResponse,
       serverBusyResponse,
       runAdmittedHttpTurn,
       config,
       inboundBodyLimitBytes,
       listenPort,
       liveCallBindings,
-      loadRemoteWorkspaceRuntime,
       localAttestationSecret,
       loopbackPolicy,
       managementApiDeps,
       managementAuth,
       managementSessionControl,
-      packageTreeIntegrity,
       readinessGate,
       deps,
       port,
       get server() { return server; },
       get boundPort() { return boundPort; },
-      get remoteWorkspaceStopping() { return remoteWorkspaceStopping; },
     });
 
     server = spendLedgerLifecycle.track(Bun.serve<WsData>({ ...serveOptions, port: listenPort, hostname: bindHost }));
@@ -691,25 +613,8 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
         throw new AuxiliaryListenerBindError("unauthenticatedLoopbackListener", loopbackListenerPort, "127.0.0.1", error);
       }
     }
-    if (managementIngressPort !== null) {
-      try {
-        managementIngressServer = spendLedgerLifecycle.track(Bun.serve<WsData>({
-          ...serveOptions,
-          port: managementIngressPort,
-          hostname: "127.0.0.1",
-        }));
-      } catch (error) {
-        // Preserve the management bind failure while synchronously initiating rollback of every
-        // listener already opened in this startup transaction. startServer must not become async.
-        for (const bound of [loopbackServer, server]) {
-          if (!bound) continue;
-          try { void bound.stop(true); } catch { /* report the original bind error */ }
-        }
-        throw new AuxiliaryListenerBindError("hub.managementIngress", managementIngressPort, "127.0.0.1", error);
-      }
-    }
     configureInboundBodyBudget(config.maxConcurrentInboundBodyBytes);
-    optionalListeners.start({ config, publicPort: server.port ?? listenPort, requestedPort: listenPort, startProxy: deps.startClaudeInterceptProxy,
+    claudeIntercept.start({ config, publicPort: server.port ?? listenPort, requestedPort: listenPort, startProxy: deps.startClaudeInterceptProxy,
       maxRequestBodySize: inboundBodyLimitBytes, dispatch: (req, requestServer) => serveOptions.fetch(req, requestServer) });
   } catch (error) {
     unregisterQuotaAutoRefresh?.();
@@ -722,20 +627,11 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
   bindNativeMainStartupLifecycle(server, nativeMainLifecycle);
   const nativeStop = server.stop.bind(server);
   const loopbackListenerRef = loopbackServer;
-  const managementIngressRef = managementIngressServer;
-  let packageRefreshStopped = false;
   Object.defineProperty(server, "stop", {
     configurable: true,
     value: async (closeActiveConnections?: boolean): Promise<void> => {
       backgroundLifecycle?.revokeClientFanout();
-      remoteWorkspaceStopping = true;
       liveCallBindings.clear();
-      // Disarm the package-tree restart timer before teardown can schedule another restart.
-      if (!packageRefreshStopped) {
-        packageRefreshStopped = true;
-        stopPackageRefresh();
-      }
-      packageTreeIntegrity.dispose();
       // The orchestration lives in `runListenerShutdown` so its two competing properties —
       // cleanup completes, failure propagates — are testable without a live socket.
       await runListenerShutdown(
@@ -744,11 +640,7 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
           ...(loopbackListenerRef
             ? [() => loopbackListenerRef.stop(closeActiveConnections)]
             : []),
-          ...(managementIngressRef
-            ? [() => managementIngressRef.stop(closeActiveConnections)]
-            : []),
-          () => optionalListeners.stop(),
-          async () => { await remoteWorkspaceShutdown?.(); },
+          () => claudeIntercept.stop(),
           async () => { await desktopCompatibilityStartup?.shutdown(); await desktopCompatibilityShutdown?.(); },
           async () => {
             try {
@@ -798,12 +690,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     }
   }
 
-  if (managementIngressServer) {
-    const managementPort = managementIngressServer.port ?? managementIngressPort;
-    console.log(`🔒 Hub management ingress active on http://127.0.0.1:${managementPort}`);
-    console.log(`   GUI and /api/*; opted-in Remote Workspace pairing/agent only; data, health, and readiness are disabled.`);
-  }
-
   // Prime pool-account quota in the background so the rotation engine has real
   // usage scores from the first routing decision, even when the dashboard is
   // never opened (the common CLI/WSL case). Fire-and-forget: never blocks the
@@ -831,17 +717,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
   // Opt-in storage policy (default OFF). Never blocks listen; cancellable on shutdown.
   backgroundLifecycle.scheduleStartupRun();
 
-  // Compatibility Lab is optional: wire it only for installs that actually use it -- any
-  // routing profile, or automation enabled on disk. This runs synchronously before
-  // startServer returns, in the same turn as Bun.serve, so a policy route can never be
-  // evaluated before its evidence provider is registered. That ordering is load-bearing:
-  // the subagent-fallback chain routes synchronously and has nowhere to await.
-  activateAdvisor(config);
-  const labConfigDir = getConfigDir();
-  if (labActivationRequired(config, labConfigDir)) {
-    activateLab(config, labConfigDir);
-  }
-
   // Reset-credit auto-redemption (#822) is opt-in; a default install constructs nothing here.
   // Activation is synchronous (timer registration only); network work happens on the timer.
   if (config.resetCreditAutoRedeem?.enabled === true) {
@@ -851,7 +726,6 @@ function startServerWithSpendLedgerOwner(port: number | undefined, deps: StartSe
     });
   }
 
-  startPackageRefresh();
   desktopCompatibilityStartup = scheduleDesktopCompatibilityStartup(config, { boundHostname: bindHost, boundPort: actualPort, loopbackPort: loopbackServer?.port ?? undefined, readiness: deps.readinessGate });
   return server;
 }

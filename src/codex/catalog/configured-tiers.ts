@@ -1,4 +1,4 @@
-import { COMBO_NAMESPACE } from "../../combos";
+
 import type { OcxProviderConfig } from "../../types";
 import { decodeRoutedModelId } from "../../providers/slug-codec";
 import { fastPolicyForModel } from "../../providers/service-tier";
@@ -28,8 +28,7 @@ export function configuredUltraFastSlugs(models: readonly CatalogModel[]): Reado
   const declarations = new Map<string, boolean>();
   for (const model of models) {
     const slug = catalogModelSlug(model);
-    const supported = model.provider !== COMBO_NAMESPACE && model.nativeAlias !== true
-      && model.supportsServiceTier === true && model.supportsUltraFastTier === true;
+    const supported = model.supportsServiceTier === true && model.supportsUltraFastTier === true;
     // A conflicting duplicate cannot lend its capability to the surviving row.
     declarations.set(slug, supported && declarations.get(slug) !== false);
   }
@@ -87,7 +86,7 @@ export function retainedFlexPolicyBySlug(
       name === namespace || provider.alias === namespace);
     if (!owner) continue;
     const [name, provider] = owner;
-    if (provider.disabled === true || namespace === COMBO_NAMESPACE || name === COMBO_NAMESPACE) {
+    if (provider.disabled === true) {
       result.set(slug, false);
       continue;
     }
@@ -95,8 +94,7 @@ export function retainedFlexPolicyBySlug(
     if (observed?.length) {
       // The current gather re-applies captured policy hints; conflicting rows fail closed.
       result.set(slug, observed.every(model =>
-        model.provider !== COMBO_NAMESPACE && model.nativeAlias !== true
-        && model.supportsServiceTier === true && model.supportsFlexTier === true));
+        model.supportsServiceTier === true && model.supportsFlexTier === true));
       continue;
     }
     const requested = slug.slice(slash + 1);

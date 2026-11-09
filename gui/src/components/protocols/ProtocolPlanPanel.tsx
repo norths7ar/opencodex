@@ -15,7 +15,7 @@ import type { ExternalModelRow, GatewayInboundProtocol } from "../../api-access-
 import { useT, type TKey } from "../../i18n/shared";
 import { Select } from "../../ui";
 import { fetchProtocolPlan } from "../../protocol-api";
-import { openCompatibilityPair, openProviderSettings, protocolPairUpstream } from "../../protocol-deep-links";
+import { openProviderSettings } from "../../protocol-deep-links";
 import { FeatureDispositionList } from "./FeatureDispositionList";
 
 const INBOUNDS: readonly Protocol[] = ["responses", "chat", "messages"];
@@ -42,7 +42,6 @@ const FIDELITY_KEYS: Record<Fidelity, TKey> = {
 
 const ROUTE_KIND_KEYS: Record<ProtocolPlanV1["routeKind"], TKey> = {
   direct: "api.plan.routeKind.direct",
-  combo: "api.plan.routeKind.combo",
   policy: "api.plan.routeKind.policy",
   unknown: "api.plan.routeKind.unknown",
 };
@@ -139,13 +138,7 @@ export function PlanResult({ plan }: { plan: ProtocolPlanV1 }) {
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => openProviderSettings(candidate.provider)}>
                   {t("protocolLinks.providerSettings")}
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => openCompatibilityPair({ inbound: plan.inbound, upstream: protocolPairUpstream(candidate.upstream) })}
-                >
-                  {t("protocolLinks.labEvidence")}
-                </button>
+                
               </div>
             </li>
           ))}

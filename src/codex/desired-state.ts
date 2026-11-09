@@ -72,80 +72,24 @@ export function codexIntegrationEnabled(config: Pick<OcxConfig, "clientIntegrati
 }
 
 /** Whether a Codex sync is permitted for this admitted config snapshot. */
-type LocalClientSyncConfig = Pick<
-  OcxConfig,
-  "clientIntegrations" | "runtimeRole" | "unauthenticatedLoopbackListener"
->;
+type LocalClientSyncConfig = Pick<OcxConfig, "clientIntegrations">;
 
-export function localClientSyncAllowed(config: LocalClientSyncConfig): boolean {
-  // A sibling instance never writes the live owner's client routing (`sibling-start.ts`).
-  if (siblingOfLivePort() !== null) return false;
-  return config.runtimeRole !== "hub"
-    || config.unauthenticatedLoopbackListener?.enabled === true;
+export function localClientSyncAllowed(): boolean {
+  return siblingOfLivePort() === null;
 }
 
-/**
- * The one sentence every hub-gated skip says (#4236).
- *
- * The gate is a reasonable decision; reporting it as "Codex integration is OFF" was not. An
- * operator whose `clientIntegrations` says nothing — or says `true` — was told their own switch
- * was off, and `ocx restore back` went further and blamed a competing writer that did not
- * exist. Name the gate and name the key that opens it.
- */
-export const HUB_GATED_SKIP_MESSAGE =
-  "This machine is a hub; it does not rewrite its own Codex/Grok/Claude configs unless "
-  + "unauthenticatedLoopbackListener is enabled.";
+export type LocalClientSkipReason = "desired_disabled" | "sibling";
 
-/**
- * Why a local-client write was skipped. The gate outranks the toggle: it is the surprising one.
- * `sibling` outranks both: this process is a second instance beside a live owner.
- */
-export type LocalClientSkipReason = "desired_disabled" | "hub-gated" | "sibling";
-
-/**
- * "hub-gated" is claimed only when the toggle is ON and the gate is what stopped the write.
- * With the toggle OFF the gate is moot: telling that operator to enable the loopback listener
- * would send them to a key that cannot make the sync happen — the mirror image of the defect
- * this reason exists to fix.
- */
-export function localClientSkipReason(
-  config: LocalClientSyncConfig,
-  client: DurableIntentClientId = "codex",
-): LocalClientSkipReason {
-  if (siblingOfLivePort() !== null) return "sibling";
-  return integrationEnabled(config, client) && !localClientSyncAllowed(config)
-    ? "hub-gated"
-    : "desired_disabled";
+export function localClientSkipReason(): LocalClientSkipReason {
+  return localClientSyncAllowed() ? "desired_disabled" : "sibling";
 }
 
-/**
- * Pick the skip message for a snapshot: today's toggle text, or the hub-gate sentence.
- *
- * `hubSuffix` states what the hub-gated path still did (a catalog refresh, say) so the
- * composed line stays as informative as the toggle one it replaces.
- */
-export function localClientSkipMessage(
-  config: LocalClientSyncConfig,
-  integrationOffMessage: string,
-  hubSuffix?: string,
-  client: DurableIntentClientId = "codex",
-): string {
-  const reason = localClientSkipReason(config, client);
-  if (reason === "sibling") return siblingSkipMessage();
-  if (reason !== "hub-gated") return integrationOffMessage;
-  return hubSuffix ? `${HUB_GATED_SKIP_MESSAGE} ${hubSuffix}` : HUB_GATED_SKIP_MESSAGE;
+export function localClientSkipMessage(integrationOffMessage: string): string {
+  return localClientSyncAllowed() ? integrationOffMessage : siblingSkipMessage();
 }
 
 export function shouldSyncCodexOnStart(config: LocalClientSyncConfig): boolean {
-  // A hub is a server for OTHER machines: it must not rewrite its own host's
-  // Codex/Claude/Grok client configs on startup (interview decision Q6, and the
-  // first clisu-oracle dogfood boot proved the failure mode — the hub marked
-  // /readyz failed because it tried to run the full local client sync).
-  // A hub can be a local client only through its explicitly enabled loopback
-  // listener. The public hub bind remains outside this gate and still requires
-  // admission; an explicit client OFF continues to win. A sibling instance is closed by the
-  // same gate: the live owner keeps the routing it maintains.
-  return localClientSyncAllowed(config) && codexIntegrationEnabled(config);
+  return localClientSyncAllowed() && codexIntegrationEnabled(config);
 }
 
 /**
@@ -279,7 +223,7 @@ export async function syncCodexOnStartIfEnabled(
     : await sync(port).catch(() => undefined);
   // #7423: "published" means this proxy now owns what Codex reads: the sync succeeded and
   // wrote config and catalog (or the catalog, when an external provider owns config.toml).
-  // A skipped sync (sibling, hub gate, desired OFF) published nothing of its own.
+  // A skipped sync (sibling, desired OFF) published nothing of its own.
   const status = (outcome as { status?: unknown } | null | undefined)?.status;
   return {
     ran: true,
@@ -307,5 +251,5 @@ async function defaultStartupSync(port: number): Promise<CodexStartupSyncOutcome
  * attempt the sync at all.
  */
 export function shouldSyncGrokOnStart(config: LocalClientSyncConfig): boolean {
-  return localClientSyncAllowed(config) && grokIntegrationEnabled(config);
+  return localClientSyncAllowed() && grokIntegrationEnabled(config);
 }

@@ -407,22 +407,18 @@ export async function listManagementModelRows(
       .filter(model => model.quotaInactiveReason !== undefined)
       .map(model => [catalogModelSlug(model), model.quotaInactiveReason!] as const),
   );
-  const comboNamespaced = new Set(
-    publicModels.filter(model => model.provider === "combo").map(catalogModelSlug),
-  );
   const visibleCustomModels = customModels
-    .filter(model => !comboNamespaced.has(model.namespaced))
     .map(model => {
       const quotaInactiveReason = quotaInactiveByNamespaced.get(model.namespaced);
       return quotaInactiveReason ? { ...model, quotaInactiveReason } : model;
     });
   // Custom metadata wins when a physical live/static row resolves to the same Codex-facing
-  // slug, while a combo keeps the same precedence it has in routing and /v1/models.
+  // slug.
   const customNamespaced = new Set(visibleCustomModels.map(c => c.namespaced));
   // One catalog read for the whole roster. Every `catalogModelEfforts` call parses the catalog
   // file and scans it once per requested slug, so resolving these per row (and twice per row, as
   // the guard and the value) re-read the same file thousands of times on a large roster.
-  const routedSlugs = publicModels.filter(m => m.provider !== "combo").map(m => routedSlug(m.provider, m.id));
+  const routedSlugs = publicModels.map(m => routedSlug(m.provider, m.id));
   const catalogLadders = catalogModelEfforts([...new Set(routedSlugs)]);
   // The gathered roster, keyed once by Codex-facing slug. A custom row looks itself up here —
   // the gather materializes custom rows with the provider/native inheritance the catalog
@@ -455,28 +451,23 @@ export async function listManagementModelRows(
   const dedupedRouted = publicModels.map((m): ManagementModelRow | null => {
     // Codex-facing slug (one "/", slug-codec); disabledModels compares tolerate both forms.
     const namespaced = catalogModelSlug(m);
-    if (m.provider !== "combo" && customNamespaced.has(namespaced)) return null;
+    if (customNamespaced.has(namespaced)) return null;
     const contextCap = providerContextCap(config, m.provider);
-    const nativeAlias = m.provider === "combo" && m.nativeAlias === true;
     const displayName = effectiveManagementDisplayName(config, m);
-    const routed = m.provider !== "combo";
     // Resolved once each: the spread below used to evaluate the same helpers again for the guard.
-    const reasoningEfforts = routed
-      ? m.supportsReasoningEffort === false || m.supportsReasoning === false ? []
-        : effectiveModelReasoningEfforts(config, m.provider, m.id, m.reasoningEfforts, catalogLadders)
-      : undefined;
-    const defaultReasoningEffort = routed
-      && m.supportsReasoningEffort !== false && m.supportsReasoning !== false
+    const reasoningEfforts = m.supportsReasoningEffort === false || m.supportsReasoning === false ? []
+        : effectiveModelReasoningEfforts(config, m.provider, m.id, m.reasoningEfforts, catalogLadders);
+    const defaultReasoningEffort = m.supportsReasoningEffort !== false && m.supportsReasoning !== false
       ? effectiveModelDefaultReasoningEffort(config, m.provider, m.id, m.defaultReasoningEffort, reasoningEfforts)
       : undefined;
-    const inputModalitiesDeclared = routed ? declaredModelInputModalities(config, m.provider, m.id) : undefined;
-    const contextWindowDeclared = routed ? config.providers[m.provider]?.modelContextWindows?.[m.id] : undefined;
+    const inputModalitiesDeclared = declaredModelInputModalities(config, m.provider, m.id);
+    const contextWindowDeclared = config.providers[m.provider]?.modelContextWindows?.[m.id];
     return {
       ...m,
       ...displayName,
       namespaced,
       disabled: antigravityFamilyDisabled(config, m, models) || [...disabled].some(stored => (
-        (!nativeAlias && stored === namespaced) || slugEquals(stored, m.provider, m.id)
+        stored === namespaced || slugEquals(stored, m.provider, m.id)
       )),
       ...(contextCap !== undefined ? { contextCap, contextCapped: m.contextCapped === true } : {}),
       // A routed row inherits nothing about reasoning or modalities from the row spread above:
@@ -484,7 +475,7 @@ export async function listManagementModelRows(
       // here, where the config and the registry are both in hand.
       ...(reasoningEfforts !== undefined ? { reasoningEfforts } : {}),
       ...(defaultReasoningEffort !== undefined ? { defaultReasoningEffort } : {}),
-      ...(routed ? { reasoningOverridden: reasoningOverrideFor(config, m.provider, m.id, catalogLadders) } : {}),
+      reasoningOverridden: reasoningOverrideFor(config, m.provider, m.id, catalogLadders),
       ...(inputModalitiesDeclared !== undefined ? { inputModalitiesDeclared } : {}),
       ...(contextWindowDeclared !== undefined ? { contextWindowDeclared } : {}),
       // The authoritative export default is the GATHERED row's own declared default — never
@@ -676,7 +667,7 @@ export async function loadExportModels(
   const exported = projected.filter((_, index) => !rows[index]!.disabled && (rows[index]!.native || visibleRouted.has(rows[index]!)));
   // Retain the FINAL projection, not an input to it. A preview that rebuilt from raw provider
   // caches would miss static and forward providers, which never populate one, and would skip the
-  // retention, metadata, combo and filtering this function applies afterwards.
+  // retention, metadata and filtering this function applies afterwards.
   // A deep clone, not a frozen view of the caller's array. Freezing the array alone left the model
   // objects shared, so a caller mutating one in place would have silently rewritten the roster a
   // later preview plans against, and the fingerprint would have moved with it.

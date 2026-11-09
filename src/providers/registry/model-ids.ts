@@ -59,7 +59,6 @@ export const REGISTRY_FIELD_MODEL_ID_ROLES = {
   staticHeaders: NONE,
   modelSuffixBracketStrip: NONE,
   featured: NONE,
-  sponsor: NONE,
   dashboardPreset: NONE,
   deprecated: NONE,
   note: NONE,

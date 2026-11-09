@@ -59,15 +59,6 @@ import { resolveQoderProfile } from "../../adapters/qoder/profiles";
 import { fetchDevinUsableModels } from "../../adapters/devin/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
 import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  quotaInactiveReason,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
-import {
   ProviderOutboundPolicyError,
   providerOutboundGet,
   providerOutboundPost,
@@ -89,9 +80,8 @@ import upstreamModelsSnapshot from "../data/upstream-models.json";
 import { createAdmissionGate, ResourceAdmissionError, type AdmissionMetrics } from "../../lib/admission";
 import { CODEX_CUSTOM_MODEL_CATALOG_KIND, JAWCODE_CATALOG_AUGMENT_PROVIDERS, catalogModelSlug, shouldExposeRoutedModel } from "./parsing";
 import type { CatalogModel } from "./parsing";
-import { disabledNativeSlugs, hasComboTargets, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
-import { deriveComboCatalogModel, normalizedOpenAiApiSignature, openAiApiCollisionWarnings, replaceLastComboCatalogOmissions, warnUncataloguedComboOnce } from "./aggregation";
-import type { ComboCatalogOmission } from "./aggregation";
+import { disabledNativeSlugs, hasNativeOpenAiCapabilityMetadata, NATIVE_GPT56_MAX_INPUT_TOKENS, nativeContextLimits, nativeOpenAiCapabilityDisplayName, nativeDefaultReasoningEffort, nativeInputModalities, nativeOpenAiAutoCompactTokenLimit, nativeOpenAiContextWindow, nativeOpenAiMaxInputTokens, nativeOpenAiMaxOutputTokens, nativeOpenAiSlugs, nativeParallelToolCalls, nativeReasoningEfforts } from "./metadata";
+import { normalizedOpenAiApiSignature, openAiApiCollisionWarnings } from "./aggregation";
 import type { CatalogGatherProviderAuthEvidence } from "./filesystem-evidence";
 import type {
   CatalogAdmissionSnapshot,
@@ -223,10 +213,8 @@ export function mergeConfiguredModelsIntoLiveCatalog(opts: {
   provider: OcxProviderConfig;
   models: readonly CatalogModel[];
   configured: readonly CatalogModel[];
-  retainConfiguredModelIds?: ReadonlySet<string>;
   contextCap?: number;
   seedVertexDefault?: boolean;
-  retainComboTargets?: boolean;
   metadataModelIdCaseFold?: boolean;
   metadataConfigDir?: string;
   includeVisionSidecar?: boolean;
@@ -235,10 +223,8 @@ export function mergeConfiguredModelsIntoLiveCatalog(opts: {
     name,
     provider: prov,
     configured,
-    retainConfiguredModelIds,
     contextCap,
     seedVertexDefault,
-    retainComboTargets = true,
     metadataModelIdCaseFold,
     metadataConfigDir,
     includeVisionSidecar,
@@ -258,7 +244,6 @@ export function mergeConfiguredModelsIntoLiveCatalog(opts: {
     if (
       seedVertexDefault === true
       || shouldRetainConfiguredProviderModel(name, candidate.id, prov)
-      || (retainComboTargets && retainConfiguredModelIds?.has(candidate.id) === true)
     ) {
       out.push(candidate);
       present.add(candidate.id);
@@ -301,12 +286,8 @@ export function filterCatalogVisibleModels(
     if (initialModelSelectionPending(config.providers[m.provider])) return false;
     if (config.providers[m.provider]?.disabled === true) return false;
     if (antigravityFamilyDisabled(config, m, models)) return false;
-    const nativeAlias = m.provider === COMBO_NAMESPACE && m.nativeAlias === true;
     // disabledModels may be stored raw (canonical) or encoded (legacy UI writes).
     for (const stored of disabled) {
-      // Combo management stores the public alias, while canonical `combo/<id>` references
-      // remain valid for backward compatibility through slugEquals below.
-      if (m.alias !== undefined && stored === catalogModelSlug(m) && !nativeAlias) return false;
       if (slugEquals(stored, m.provider, m.id)) return false;
     }
     const allow = allowByProvider.get(m.provider);

@@ -24,9 +24,6 @@ import { getRoutingProfile, policyModelId, type NormalizedRoutingProfile } from 
 import { healthScore, latencyScoreFromEvidence } from "./health";
 import { quotaScore } from "./quota";
 import { costScore } from "./cost";
-import { evaluateCompatibilityForCandidate } from "./compatibility/policy";
-import { COMPATIBILITY_WEIGHT, type CandidateCompatibilityEvidence } from "./compatibility/types";
-import type { RouteCompatibilityEvidence } from "./trace";
 
 /** Unknown health under "penalize": a low-but-not-zero deterministic floor. */
 export const HEALTH_UNKNOWN_PENALTY_SCORE = 0.3;
@@ -60,7 +57,6 @@ export interface PolicyCandidateEvidence {
   health?: RouteHealthEvidence;
   quota?: RouteQuotaEvidence;
   cost?: RouteCostEvidence;
-  compatibility?: CandidateCompatibilityEvidence;
 }
 
 export interface PolicyEvaluationCandidate {
@@ -74,7 +70,6 @@ export interface PolicyEvaluationCandidate {
   health?: RouteHealthEvidence;
   quota?: RouteQuotaEvidence;
   cost?: RouteCostEvidence;
-  compatibility?: RouteCompatibilityEvidence;
   score?: RouteScoreEvidence;
 }
 
@@ -348,18 +343,6 @@ export function evaluatePolicyProfile(
       }
     }
 
-    const compatibilityEval = evaluateCompatibilityForCandidate(
-      profile.compatibility,
-      evidence.compatibility,
-      now,
-    );
-    if (compatibilityEval.exclusions.length > 0) {
-      exclusions.push(...compatibilityEval.exclusions);
-      eligible = false;
-    }
-    const compatibilityValue = compatibilityEval.penaltyScore;
-    const compatibilityTrace = compatibilityEval.trace;
-
     const health = evidence.health;
     let healthValue = health ? healthScore(health, now) : null;
     if (health?.cooldownUntilMs !== undefined && health.cooldownUntilMs > now) {
@@ -430,13 +413,6 @@ export function evaluatePolicyProfile(
       total += latencyWeight * latencyValue;
       components.latency = latencyValue;
     }
-    if (compatibilityValue !== null) {
-      // Compatibility is a penalty-only dimension. A penalized candidate loses
-      // a bounded fraction of its existing score; satisfied/allowed evidence
-      // does not receive a synthetic bonus or alter configured priority.
-      total = Math.max(0, total - COMPATIBILITY_WEIGHT * (1 - compatibilityValue));
-      components.compatibility = compatibilityValue;
-    }
     const score: RouteScoreEvidence = { total, components };
     const evaluated: PolicyEvaluationCandidate = {
       provider: evidence.provider,
@@ -449,7 +425,6 @@ export function evaluatePolicyProfile(
       ...(evidence.health ? { health: evidence.health } : {}),
       ...(evidence.quota ? { quota: evidence.quota } : {}),
       ...(evidence.cost ? { cost: evidence.cost } : {}),
-      ...(compatibilityTrace ? { compatibility: compatibilityTrace } : {}),
       ...(costForCandidate ? { cost: costForCandidate } : {}),
       score,
     };
@@ -477,7 +452,6 @@ export function evaluatePolicyProfile(
       ...(candidate.health ? { health: candidate.health } : {}),
       ...(candidate.quota ? { quota: candidate.quota } : {}),
       ...(candidate.cost ? { cost: candidate.cost } : {}),
-      ...(candidate.compatibility ? { compatibility: candidate.compatibility } : {}),
     })),
     selected: selectedIndex === null
       ? { provider: candidates[0]?.provider ?? "", model: candidates[0]?.model ?? "", reason: "no-eligible-candidate" }

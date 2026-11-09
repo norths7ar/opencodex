@@ -6,7 +6,7 @@ import {
   rankAccountsByHeadroom,
   rankAccountsByResetFirst,
 } from "../../src/oauth/account-quota-rank";
-import { cachedProviderQuotaIsExhausted } from "../../src/combos/resolve";
+import { cachedProviderQuotaIsExhausted } from "../../src/providers/quota-exhaustion";
 import { getCachedProviderAccountQuota, setCachedProviderAccountQuotaForTests } from "../../src/providers/quota";
 import { sweepExpiredProviderAccountQuotaRows } from "../../src/providers/quota/account-cache";
 import { ACCOUNT_QUOTA_TTL_MS } from "../../src/providers/quota-wire";

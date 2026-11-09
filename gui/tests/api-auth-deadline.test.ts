@@ -11,7 +11,7 @@ import {
   setResolutionWatchdogForTests,
   SESSION_UNAVAILABLE_EVENT,
 } from "../src/api";
-import { standaloneApiTargets, targetsFromMachineStatus, type MachineStatusV1 } from "../src/api-targets";
+import { standaloneApiTargets } from "../src/api-targets";
 
 const globals = ["document", "window", "navigator", "sessionStorage", "fetch"] as const;
 let previousGlobals: Record<(typeof globals)[number], unknown>;
@@ -105,43 +105,6 @@ const MINTED = () => {
   return response;
 };
 
-test("a shared-target bootstrap watchdog does not block or clear the machine target", async () => {
-  for (const [name, content] of [
-    ["opencodex-session-token", "ocx_session_machine"],
-    ["opencodex-session-csrf", "machine-csrf"],
-    ["opencodex-session-origin", "http://localhost"],
-    ["opencodex-session-server-origin", "http://localhost"],
-  ]) {
-    const meta = document.createElement("meta");
-    meta.setAttribute("name", name);
-    meta.setAttribute("content", content);
-    document.head.append(meta);
-  }
-  const direct: MachineStatusV1 = {
-    mode: "client", connected: true, machineBase: "http://localhost",
-    sharedBase: "https://hub.example.test", sharedServerOrigin: "https://hub.example.test",
-    managementTransport: "direct", apiKeyId: "client-key-a", protocolVersion: 1,
-    connectedAt: "2026-08-28T00:00:00.000Z", hubReachability: "unknown",
-  };
-  configureApiTargets(targetsFromMachineStatus("", direct));
-  setRebootstrapTimeoutForTests(30);
-  const mockFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = new URL(input instanceof Request ? input.url : String(input), "http://localhost/");
-    if (url.origin === "https://hub.example.test" && url.pathname === "/opencodex-session") {
-      return hangUntilAborted(init?.signal);
-    }
-    if (url.origin === "https://hub.example.test") return new Response("unauthorized", { status: 401 });
-    const token = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined)).get("x-opencodex-api-key");
-    return new Response("{}", { status: token === "ocx_session_machine" ? 200 : 401 });
-  }) as typeof fetch;
-  await installMockAuthFetch(mockFetch);
-
-  const shared = fetch("https://hub.example.test/api/config");
-  const machine = await fetch("/api/machine/status");
-  expect(machine.status).toBe(200);
-  expect((await shared).status).toBe(401);
-  expect(promptCalls).toBe(0);
-});
 test("hung bootstrap fails the wave within the deadline and a later wave re-bootstraps to success", async () => {
   setRebootstrapTimeoutForTests(50);
   let bootstrapCalls = 0;
@@ -258,17 +221,6 @@ test("an exposed standalone bind still gets the prompt", async () => {
 });
 
 /* And a hub on a loopback bind mints its own session, so it must not be asked. */
-test("a loopback hub is not asked for a token", async () => {
-  declareRuntimeRole("hub");
-  declareManagementAuthRequired(false);
-  setRebootstrapTimeoutForTests(40);
-  const mockFetch = (async () => new Response("unauthorized", { status: 401 })) as typeof fetch;
-  await installMockAuthFetch(mockFetch);
-
-  expect((await fetch("/api/config")).status).toBe(401);
-  expect(promptCalls).toBe(0);
-});
-
 test("caller abort during a pending resolution unwinds only that caller", async () => {
   setRebootstrapTimeoutForTests(5_000);
   let releaseBootstrap: (() => void) | null = null;

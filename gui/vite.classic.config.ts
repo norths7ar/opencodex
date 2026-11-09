@@ -13,7 +13,7 @@ import react from '@vitejs/plugin-react'
  * classic UI keeps talking to the current proxy through the same code. The overlay plugin below
  * makes that work: an import resolves to the classic copy when one exists, otherwise to src/.
  */
-const GUI = fileURLToPath(new URL('.', import.meta.url))
+const GUI = fileURLToPath(new URL('../gui/', import.meta.url))
 const SRC = join(GUI, 'src')
 const CLASSIC_SRC = join(GUI, 'classic', 'src')
 

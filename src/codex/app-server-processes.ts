@@ -8,7 +8,7 @@
  * `hermes-codex-bridge-mcp`.
  */
 import { execFile, execFileSync, type ExecFileException } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { statSync } from "node:fs";
 import { isProcessAlive, waitForExit } from "../lib/process-control";
 import {
   resolveTrustedWindowsPowerShellExe,
@@ -32,7 +32,7 @@ export function attachStaleAppServerHint<T extends {
 }
 /**
  * Rust-style target-triple body on official platform-baked Codex binaries
- * (e.g. `x86_64-unknown-linux-musl`, `aarch64-apple-darwin`,
+ * (e.g. `x86_64-unknown-linux-musl`,
  * `x86_64-pc-windows-msvc`). Requires arch-vendor-os with an optional env
  * segment — not a broad `codex-*` wildcard.
  */
@@ -358,113 +358,6 @@ export function isCodexSessionCommandLine(commandLine: string, executable?: stri
   return isCodexExecutableToken(tokens[0]!);
 }
 
-function parseUnixProcStatusUid(status: string): number | undefined {
-  const match = /^Uid:\s+(\d+)/m.exec(status);
-  if (!match) return undefined;
-  const uid = Number(match[1]);
-  return Number.isSafeInteger(uid) ? uid : undefined;
-}
-
-function listUnixProcSnapshots(uid: number | undefined, requireComplete = true): ProcessSnapshot[] {
-  // procfs missing on a Linux-shaped platform is an enumeration failure, not
-  // "no processes" — the staleness collector must not read it as not_running.
-  if (!existsSync("/proc")) throw new Error("procfs_unavailable");
-  const out: ProcessSnapshot[] = [];
-  for (const ent of readdirSync("/proc")) {
-    if (!/^\d+$/.test(ent)) continue;
-    const pid = Number(ent);
-    if (!Number.isSafeInteger(pid) || pid <= 1) continue;
-    try {
-      const status = readFileSync(`/proc/${pid}/status`, "utf8");
-      const processUid = parseUnixProcStatusUid(status);
-      if (uid !== undefined && processUid !== undefined && processUid !== uid) continue;
-      const argv = readFileSync(`/proc/${pid}/cmdline`)
-        .toString("utf8")
-        .split("\0")
-        .filter(Boolean);
-      const commandLine = argv.join(" ").trim();
-      if (!commandLine) continue;
-      out.push({ pid, commandLine, executable: argv[0], uid: processUid });
-    } catch (error) {
-      // Complete observations may ignore only disappearance. Restart target
-      // enumeration can skip an unreadable PID while retaining verified ones.
-      if (requireComplete && (error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error;
-    }
-  }
-  return out;
-}
-
-function listDarwinSnapshots(uid: number | undefined): ProcessSnapshot[] {
-  const commandOutput = uid !== undefined
-    ? execFileSync("/bin/ps", ["-u", String(uid), "-o", "pid=,command="], {
-      encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    })
-    : execFileSync("/bin/ps", ["-axo", "pid=,uid=,command="], {
-      encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    });
-  const executableOutput = uid !== undefined
-    ? execFileSync("/bin/ps", ["-u", String(uid), "-o", "pid=,comm="], {
-      encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    })
-    : execFileSync("/bin/ps", ["-axo", "pid=,comm="], {
-      encoding: "utf-8", stdio: ["ignore", "pipe", "ignore"], timeout: 5_000,
-    });
-  return parseDarwinSnapshotOutputs(commandOutput, executableOutput, uid);
-}
-
-/**
- * Request-path twin of {@link listDarwinSnapshots}: the two `ps` children run off the
- * event loop, so a stalled process-table read cannot park the proxy. Failure still
- * propagates as a rejected read, matching the synchronous contract.
- */
-async function listDarwinSnapshotsAsync(uid: number | undefined): Promise<ProcessSnapshot[]> {
-  const [commandOutput, executableOutput] = await Promise.all([
-    uid !== undefined
-      ? execFileTextAsync("/bin/ps", ["-u", String(uid), "-o", "pid=,command="], 5_000)
-      : execFileTextAsync("/bin/ps", ["-axo", "pid=,uid=,command="], 5_000),
-    uid !== undefined
-      ? execFileTextAsync("/bin/ps", ["-u", String(uid), "-o", "pid=,comm="], 5_000)
-      : execFileTextAsync("/bin/ps", ["-axo", "pid=,comm="], 5_000),
-  ]);
-  return parseDarwinSnapshotOutputs(commandOutput, executableOutput, uid);
-}
-
-function parseDarwinSnapshotOutputs(commandOutput: string, executableOutput: string, uid: number | undefined): ProcessSnapshot[] {
-  const out: ProcessSnapshot[] = [];
-  const executableByPid = new Map<number, string>();
-  for (const raw of executableOutput.split(/\r?\n/)) {
-    const match = /^\s*(\d+)\s+(.+)$/.exec(raw);
-    if (!match) continue;
-    const pid = Number(match[1]);
-    const executable = match[2]?.trim() ?? "";
-    if (Number.isSafeInteger(pid) && pid > 0 && executable) executableByPid.set(pid, executable);
-  }
-  for (const raw of commandOutput.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line) continue;
-    if (uid !== undefined) {
-      const match = /^(\d+)\s+(.*)$/.exec(line);
-      if (!match) continue;
-      const pid = Number(match[1]);
-      const commandLine = match[2]?.trim() ?? "";
-      if (!Number.isSafeInteger(pid) || pid <= 0 || !commandLine) continue;
-      out.push({ pid, commandLine, executable: executableByPid.get(pid), uid });
-      continue;
-    }
-    const match = /^(\d+)\s+(\d+)\s+(.*)$/.exec(line);
-    if (!match) continue;
-    const pid = Number(match[1]);
-    const processUid = Number(match[2]);
-    const commandLine = match[3]?.trim() ?? "";
-    if (!Number.isSafeInteger(pid) || pid <= 0 || !commandLine) continue;
-    out.push({
-      pid, commandLine, executable: executableByPid.get(pid),
-      uid: Number.isSafeInteger(processUid) ? processUid : undefined,
-    });
-  }
-  return out;
-}
-
 /**
  * Windows snapshots scoped to the invoking user via Win32_Process GetOwner.
  * PowerShell is the sole path: WMIC lacks reliable owner data and is disabled on
@@ -544,7 +437,7 @@ function windowsSnapshotPowerShellCommand(): string {
 }
 
 export function listWindowsSnapshots(runPowerShell?: (psCommand: string) => string): ProcessSnapshot[] {
-  // Top-level exec failure propagates (see listDarwinSnapshots note). The
+  // Top-level exec failure propagates. The
   // executable resolves from the trusted System32 directory (never PATH), and
   // windowsHide keeps the enumeration console-less on desktop sessions (#1278).
   const psCommand = windowsSnapshotPowerShellCommand();
@@ -569,15 +462,13 @@ async function listWindowsSnapshotsAsync(): Promise<ProcessSnapshot[]> {
 
 function defaultListSnapshots(platform: NodeJS.Platform, getuid: () => number | undefined, requireComplete = true): ProcessSnapshot[] {
   if (platform === "win32") return listWindowsSnapshots();
-  if (platform === "darwin") return listDarwinSnapshots(getuid());
-  return listUnixProcSnapshots(getuid(), requireComplete);
+
+  throw new Error("unsupported_process_enumeration_platform");
 }
 
 /**
- * Request-path twin of {@link defaultListSnapshots}: the child-process enumerations
- * (Windows PowerShell, darwin ps) wait off the event loop. Linux /proc reads are
- * bounded filesystem I/O rather than a subprocess deadline, so they stay synchronous
- * underneath without reintroducing a multi-second park.
+ * Request-path twin of {@link defaultListSnapshots}: Windows PowerShell enumeration
+ * waits off the event loop. Unsupported platform enumeration fails closed.
  */
 async function defaultListSnapshotsAsync(
   platform: NodeJS.Platform,
@@ -585,8 +476,8 @@ async function defaultListSnapshotsAsync(
   requireComplete = true,
 ): Promise<ProcessSnapshot[]> {
   if (platform === "win32") return listWindowsSnapshotsAsync();
-  if (platform === "darwin") return listDarwinSnapshotsAsync(getuid());
-  return listUnixProcSnapshots(getuid(), requireComplete);
+
+  throw new Error("unsupported_process_enumeration_platform");
 }
 
 export interface ListProcessSnapshotsOptions {
@@ -767,42 +658,6 @@ export function formatStaleCodexAppServerWarning(
   );
 }
 
-/** /proc/<pid>/stat starttime (clock ticks since boot) → epoch ms, or null. */
-function readLinuxProcStartMs(pid: number): number | null {
-  try {
-    const stat = readFileSync(`/proc/${pid}/stat`, "utf8");
-    // Field 22 (starttime) follows the comm field, which may contain spaces
-    // inside parentheses — split after the final ")".
-    const close = stat.lastIndexOf(")");
-    if (close < 0) return null;
-    const fields = stat.slice(close + 2).split(/\s+/);
-    const startTicks = Number(fields[19]); // field 22 = index 19 after comm
-    const boot = /^btime\s+(\d+)/m.exec(readFileSync("/proc/stat", "utf8"));
-    if (!Number.isFinite(startTicks) || !boot) return null;
-    const hertz = 100; // USER_HZ on every supported Linux target
-    return (Number(boot[1]) + startTicks / hertz) * 1000;
-  } catch {
-    return null;
-  }
-}
-
-/** `ps` lstart → epoch ms, or null (macOS). */
-function readDarwinProcStartMs(pid: number): number | null {
-  try {
-    const out = execFileSync("/bin/ps", ["-o", "lstart=", "-p", String(pid)], {
-      encoding: "utf-8",
-      stdio: ["ignore", "pipe", "ignore"],
-      timeout: 4_000,
-    }).trim();
-    if (!out) return null;
-    const parsed = Date.parse(out);
-    return Number.isFinite(parsed) ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Win32_Process.CreationDate → epoch ms, or null (Windows). */
 function readWindowsProcStartMs(pid: number): number | null {
   try {
     const out = execFileSync(resolveTrustedWindowsPowerShellExe(), [
@@ -821,8 +676,8 @@ function readWindowsProcStartMs(pid: number): number | null {
 /** Best-effort process start time; null when the platform source is unreadable. */
 export function readProcessStartMs(pid: number, platform: NodeJS.Platform = process.platform): number | null {
   if (platform === "win32") return readWindowsProcStartMs(pid);
-  if (platform === "darwin") return readDarwinProcStartMs(pid);
-  return readLinuxProcStartMs(pid);
+
+  return null;
 }
 
 function windowsProcessStartPowerShellCommand(pids: readonly number[]): string {
@@ -862,7 +717,7 @@ async function readWindowsProcessStartMsBatchAsync(
 
 /**
  * Start times for many pids in ONE platform call where possible, so the
- * staleness check does not serialize per-process ps/PowerShell invocations
+ * staleness check does not serialize per-process PowerShell invocations
  * on the request path (#857). Missing entries come back as null.
  */
 export function readProcessStartMsBatch(
@@ -871,28 +726,7 @@ export function readProcessStartMsBatch(
 ): Map<number, number | null> {
   const out = new Map<number, number | null>();
   if (pids.length === 0) return out;
-  if (platform === "darwin") {
-    try {
-      const stdout = execFileSync("/bin/ps", ["-o", "pid=,lstart=", "-p", pids.join(",")], {
-        encoding: "utf-8",
-        stdio: ["ignore", "pipe", "ignore"],
-        timeout: 3_000,
-      });
-      const byPid = new Map<number, number>();
-      for (const raw of stdout.split(/\r?\n/)) {
-        const match = /^\s*(\d+)\s+(.+)$/.exec(raw);
-        if (!match) continue;
-        const pid = Number(match[1]);
-        const parsed = Date.parse(match[2]!.trim());
-        if (Number.isSafeInteger(pid) && Number.isFinite(parsed)) byPid.set(pid, parsed);
-      }
-      for (const pid of pids) out.set(pid, byPid.get(pid) ?? null);
-      return out;
-    } catch {
-      for (const pid of pids) out.set(pid, null);
-      return out;
-    }
-  }
+
   if (platform === "win32") {
     try {
       const stdout = execFileSync(resolveTrustedWindowsPowerShellExe(), [
@@ -906,7 +740,7 @@ export function readProcessStartMsBatch(
       return out;
     }
   }
-  for (const pid of pids) out.set(pid, readLinuxProcStartMs(pid));
+  for (const pid of pids) out.set(pid, null);
   return out;
 }
 
@@ -953,7 +787,7 @@ function catalogStatusFromProcesses(
   if (catalogMtimeMs === null || withStarts.some(proc => proc.startedAtMs === null)) {
     return { state: "unknown", processes: withStarts, catalogMtimeMs };
   }
-  // `<=` is deliberate: coarse clocks (ps lstart is second-granularity) can
+  // `<=` is deliberate: coarse clocks can
   // report equal values when the catalog actually changed after startup.
   const stale = withStarts.some(proc => proc.startedAtMs! <= catalogMtimeMs);
   return { state: stale ? "stale" : "fresh", processes: withStarts, catalogMtimeMs };
@@ -1093,7 +927,7 @@ function sameRequestCatalogStateIdentity(
  * an in-memory copy that disagrees with what ocx advertises.
  *
  * Cost note: a cold call synchronously runs the platform listing plus ONE
- * batched start-time query (hard bounds: ~5s+3s macOS, ~8s+5s Windows,
+ * batched start-time query (hard bounds: ~8s+5s Windows,
  * microseconds on Linux); the 5s TTL then serves repeats. Typical cold cost
  * is tens of milliseconds; fully-async background refresh is deliberately
  * out of scope for this slice.
@@ -1278,9 +1112,7 @@ export async function collectCodexAppServerCatalogStateForRequest(
  * banner) and keeps running; its result is cached for the next poll.
  *
  * The deadline bounds the Windows path, where the request collector is asynchronous. On
- * other platforms the request collector keeps its existing synchronous read (a /proc walk on
- * Linux, `ps` on macOS, typically tens of milliseconds), which completes before the deadline
- * timer can fire; making those reads asynchronous is outside this change.
+ * Linux the synchronous /proc walk completes before the deadline timer can fire.
  */
 export async function collectCodexAppServerCatalogStateWithin(
   deadlineMs: number,

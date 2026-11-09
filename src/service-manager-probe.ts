@@ -28,13 +28,11 @@ import {
 } from "./lib/windows-elevation";
 import { decodeWindowsTextBytes } from "./lib/windows-text";
 import { WINSW_SERVICE_ID } from "./lib/winsw";
-import { decodePlistString } from "./service/plist-xml";
 import { BUN_RUNTIME_PATH_ENV, BUN_RUNTIME_SOURCE_ENV } from "./lib/bun-runtime";
 import { REAL_BUN_MIN_BYTES } from "./lib/bun-binary-validator.mjs";
 import { WINDOWS_WRAPPER_PROTOCOL_ENV, WINDOWS_WRAPPER_STAY_OUT_EXIT_CODE } from "./service/windows-wrapper-exit";
 import { buildWindowsServiceScript, windowsTaskActionMatches } from "./service/windows-taskxml";
 import { inspectServiceStateEvidence, serviceStatePathsForOpenCodexHome } from "./service/state";
-import { parseSystemdUnitHomes } from "./service/systemd-env";
 
 /** Short: this runs inside admission, and a slow answer is the same as none. */
 export const SERVICE_PROBE_TIMEOUT_MS = 2_000;
@@ -52,7 +50,7 @@ export const SERVICE_PROBE_TIMEOUT_MS = 2_000;
  */
 export const SERVICE_PROBE_LISTING_TIMEOUT_MS = 20_000;
 
-export type ServiceManagerBackend = "launchd" | "systemd" | "scheduler" | "winsw";
+export type ServiceManagerBackend = "scheduler" | "winsw";
 
 export interface ServiceManagerClaim {
   readonly backend: ServiceManagerBackend;
@@ -208,28 +206,6 @@ const LABEL = "com.opencodex.proxy";
 const TASK = "opencodex-proxy";
 
 /**
- * `launchctl print` exits 113 for a service that is not there and 112 when the
- * domain itself cannot be reached — measured against nonexistent targets rather
- * than assumed. Only 113 is an answer; everything else is a failure to ask.
- */
-const LAUNCHCTL_NO_SUCH_SERVICE = 113;
-/**
- * 112 is an answer about the DOMAIN, not the label.
- *
- * Measured on macOS 27.0: querying a domain with no service name at all still
- * returns it, and a domain that does not exist cannot be running one of our
- * jobs. Treating it as "could not ask" would refuse every write on a fresh
- * headless Mac — no GUI domain, and no installation either.
- */
-const LAUNCHCTL_NO_SUCH_DOMAIN = 112;
-/**
- * Observed on a headless Mac (#7697), but unsupported action is not proof that
- * no GUI login exists. Only independent session evidence can qualify GUI 125;
- * a user-domain 125 remains unknown because its services are independent.
- */
-const LAUNCHCTL_DOMAIN_UNSUPPORTED_ACTION = 125;
-
-/**
  * Residue on disk, distinguished from a path that could not be read.
  *
  * `existsSync` answers "no" for a dangling symlink and for a path whose parent
@@ -246,276 +222,6 @@ function artifactPresence(path: string): "present" | "absent" | "unreadable" {
 
 function unknown(reason: string): ServiceManagerInstallation {
   return { kind: "unknown", reason };
-}
-
-/** Decode the entities and character references buildPlist's encoder applies, in one pass,
- *  so a literal `&amp;lt;` written by a double-escaped value stays `&lt;`. */
-const plistStringValue = decodePlistString;
-
-/** Pull `<key>NAME</key><string>VALUE</string>` out of a plist body. */
-function plistEnvValue(body: string, key: string): string | null {
-  const match = body.match(
-    new RegExp(`<key>\\s*${key}\\s*</key>\\s*<string>([^<]*)</string>`),
-  );
-  return match ? plistStringValue(match[1]) : null;
-}
-
-/**
- * Did `systemctl --user` fail because the session bus could not be reached at all?
- *
- * These are the shapes reported on #2114 and #1939. The distinction that matters is
- * "the question never left the machine" versus "systemd answered and said no" — only
- * the former licenses reading the disk instead.
- *
- * **Locale caveat, stated rather than hidden:** systemd localizes these strings, so a
- * non-English host will not match and keeps the old `unknown`. That is the safe
- * direction — it fences rather than admits — but it does mean the fix does not reach
- * every affected user. Forcing `LC_ALL=C` on the probe would remove the caveat and is
- * the obvious follow-up; it is not done here because it changes every systemctl call
- * this module makes, not just this branch.
- */
-function busUnreachable(stderr: string): boolean {
-  const err = stderr.trim();
-  return err.includes("Failed to connect to bus")
-    || err.includes("Failed to connect to user scope bus")
-    || err.includes("Failed to get D-Bus connection")
-    || err.includes("DBUS_SESSION_BUS_ADDRESS")
-    || err.includes("System has not been booted with systemd");
-}
-
-/**
- * Ownership from the unit file alone, for when the bus cannot answer (#2114).
- *
- * A unit file is proof of installation that does not require a running bus, and the homes
- * it names are what ownership is actually decided on. What the disk cannot tell us is
- * whether systemd has the unit LOADED, so this reports `registration: "absent"` — the
- * honest reading of "no running manager has it" — rather than inventing a live state.
- *
- * A foreign home therefore still blocks, which is the whole reason this consults the disk
- * instead of widening the exit code.
- */
-function systemdUserUnitSearchPaths(home: string): string[] {
-  // systemd's user search path is not one directory. Checking only the canonical one and
-  // calling the rest absent is a fail-open: with the bus down a foreign unit in any other
-  // search dir is invisible, and "no answer" would be read as "no owner".
-  const xdgConfig = process.env.XDG_CONFIG_HOME?.trim();
-  const xdgData = process.env.XDG_DATA_HOME?.trim();
-  const dirs = [
-    xdgConfig ? join(xdgConfig, "systemd", "user") : join(home, ".config", "systemd", "user"),
-    join(home, ".config", "systemd", "user"),
-    xdgData ? join(xdgData, "systemd", "user") : join(home, ".local", "share", "systemd", "user"),
-    join(home, ".local", "share", "systemd", "user"),
-  ];
-  return [...new Set(dirs)].map(dir => join(dir, `${TASK}.service`));
-}
-
-function inspectSystemdOffline(home: string): ServiceManagerInstallation {
-  const candidates = systemdUserUnitSearchPaths(home);
-  const found = candidates.filter(path => artifactPresence(path) === "present");
-  if (candidates.some(path => artifactPresence(path) === "unreadable")) {
-    return unknown("the session bus is unreachable and a systemd unit could not be read");
-  }
-  if (found.length === 0) return { kind: "absent" };
-  if (found.length > 1) {
-    return unknown("the session bus is unreachable and more than one systemd unit file claims this proxy");
-  }
-  const definitionPath = found[0]!;
-  let body: string;
-  try {
-    body = readFileSync(definitionPath, "utf-8");
-  } catch (error) {
-    return unknown(`the session bus is unreachable and the systemd unit could not be read: ${String(error)}`);
-  }
-  const parsed = parseSystemdUnitHomes(body);
-  if (parsed.kind === "invalid") return unknown("the systemd unit has unsupported or ambiguous environment assignments");
-  return {
-    kind: "present",
-    claims: [{
-      backend: "systemd",
-      definitionPath,
-      homes: parsed.homes,
-      registration: "absent",
-    }],
-  };
-}
-
-/**
- * TN2083: /dev/console identifies only the foreground user; switched-out GUI
- * sessions survive. XNU's IOService::updateConsoleUsers publishes the complete
- * supplied array on the registry root, with UID separate from OnConsole:
- * https://github.com/apple-oss-distributions/xnu/blob/main/iokit/Kernel/IOService.cpp
- * https://github.com/apple-oss-distributions/xnu/blob/main/iokit/IOKit/IOKitKeysPrivate.h
- * Both commands inherit the runner's 2s bound. Missing or malformed evidence
- * cannot prove absence; do not cache session evidence across admissions.
- */
-function launchdGuiSessionAbsent(run: ProbeRunner, uid: number): boolean {
-  try {
-    const registry = run("/usr/sbin/ioreg", ["-a", "-r", "-d", "1", "-n", "Root"]);
-    if (registry.spawnFailed || registry.timedOut || registry.status !== 0 || !registry.stdout.trim()) return false;
-    const converted = run("/usr/bin/plutil", ["-extract", "0.IOConsoleUsers", "json", "-o", "-", "-"], {
-      input: registry.stdout,
-    });
-    if (converted.spawnFailed || converted.timedOut || converted.status !== 0) return false;
-    const sessions: unknown = JSON.parse(converted.stdout);
-    if (!Array.isArray(sessions)) return false;
-    return sessions.every(session => {
-      if (!session || typeof session !== "object" || Array.isArray(session)) return false;
-      const sessionUid: unknown = session.kCGSSessionUserIDKey;
-      return typeof sessionUid === "number" && Number.isInteger(sessionUid)
-        && sessionUid >= 0 && sessionUid < 0xffff_ffff && sessionUid !== uid;
-    });
-  } catch {
-    return false;
-  }
-}
-
-function inspectLaunchd(deps: Required<Pick<ProbeDeps, "run" | "uid" | "home">>): ServiceManagerInstallation {
-  const definitionPath = join(deps.home, "Library", "LaunchAgents", `${LABEL}.plist`);
-
-  /*
-   * BOTH domains, because they are independent and hold separate service sets.
-   * Measured on macOS 27.0: the shipped agent answers 0 under `gui/<uid>` and
-   * 113 under `user/<uid>`. Asking only one leaves the other free to hold a job
-   * this probe would then call absent.
-   */
-  let registration: "present" | "absent" = "absent";
-  let unreachableDomains = 0;
-  for (const domain of [`gui/${deps.uid}`, `user/${deps.uid}`]) {
-    const printed = deps.run("/bin/launchctl", ["print", `${domain}/${LABEL}`]);
-    if (printed.spawnFailed || printed.timedOut) {
-      return unknown(`launchctl could not be asked: ${printed.timedOut ? "timed out" : printed.stderr.trim()}`);
-    }
-    if (printed.status === 0) { registration = "present"; break; }
-    if (printed.status === LAUNCHCTL_NO_SUCH_SERVICE) continue;
-    if (printed.status === LAUNCHCTL_NO_SUCH_DOMAIN) { unreachableDomains += 1; continue; }
-    /*
-     * Unsupported action alone says nothing about loaded jobs. Qualify GUI
-     * 125 only with independent evidence excluding this UID's GUI sessions;
-     * the separate user-domain query and plist checks remain mandatory.
-     */
-    if (printed.status === LAUNCHCTL_DOMAIN_UNSUPPORTED_ACTION && domain.startsWith("gui/")) {
-      if (!launchdGuiSessionAbsent(deps.run, deps.uid)) return unknown("GUI login session absence could not be established");
-      unreachableDomains += 1;
-      continue;
-    }
-    return unknown(`launchctl print exited ${String(printed.status)}: ${printed.stderr.trim()}`);
-  }
-
-  const definition = artifactPresence(definitionPath);
-  if (definition === "absent") {
-    // No file. A registration without one means launchd holds a definition whose
-    // file is gone — real, and not something to resolve unattended.
-    if (registration === "present") {
-      return unknown("launchd has a job loaded but its plist is missing");
-    }
-    /*
-     * Nothing staged, and every domain either answered service-scoped 113,
-     * did not exist (112), or returned GUI 125 corroborated by independent
-     * evidence of no GUI session for this UID. A user-domain 113 alone cannot
-     * exclude a job in the GUI domain's separate service set.
-     */
-    void unreachableDomains;
-    return { kind: "absent" };
-  }
-
-  let body: string;
-  try {
-    body = readFileSync(definitionPath, "utf-8");
-  } catch (error) {
-    // Present-but-unreadable cannot supply homes, and `present` without homes
-    // would compare equal to nothing and read as agreement.
-    return unknown(`the launchd plist exists but could not be read: ${String(error)}`);
-  }
-
-  return {
-    kind: "present",
-    claims: [{
-      backend: "launchd",
-      definitionPath,
-      homes: {
-        codexHome: plistEnvValue(body, "CODEX_HOME"),
-        opencodexHome: plistEnvValue(body, "OPENCODEX_HOME"),
-      },
-      registration,
-    }],
-  };
-}
-
-export function systemdProperty(out: string, key: string): string | null {
-  for (const line of out.split("\n")) {
-    const match = line.match(new RegExp(`^${key}=(.*)$`));
-    if (match) return match[1].trim();
-  }
-  return null;
-}
-
-function inspectSystemd(deps: Required<Pick<ProbeDeps, "run" | "home">>): ServiceManagerInstallation {
-  const definitionPath = join(deps.home, ".config", "systemd", "user", `${TASK}.service`);
-
-  /*
-   * All four properties in one call. LoadState alone is not enough — it is
-   * orthogonal to ActiveState — and neither says whether the LOADED bytes match
-   * the file. NeedDaemonReload is that signal, and this repository already
-   * documents it as the systemd analogue of launchd's stale plist.
-   */
-  const shown = deps.run("systemctl", [
-    "--user", "show", TASK,
-    "-p", "LoadState", "-p", "ActiveState", "-p", "FragmentPath", "-p", "NeedDaemonReload",
-  ]);
-  if (shown.spawnFailed) return { kind: "absent" };
-  if (shown.timedOut) return unknown("systemctl could not be asked: timed out");
-  if (shown.status !== 0) {
-    // A missing unit still exits ZERO and says not-found; a non-zero status means
-    // the question never reached the bus.
-    //
-    // That is evidence about the BUS, not evidence that a foreign service owns this home
-    // (#2114). Calling it `unknown` fences native-main for the whole process, so a laptop
-    // with no session bus answers every native request with a 503 until `ocx restart`.
-    //
-    // Widening on the exit code alone would fail open, because with the bus down systemctl
-    // cannot see a foreign unit either. So ask the disk, which needs no bus, and fall back
-    // to `unknown` for every other non-zero exit.
-    if (busUnreachable(shown.stderr)) return inspectSystemdOffline(deps.home);
-    return unknown(`systemctl show exited ${String(shown.status)}: ${shown.stderr.trim()}`);
-  }
-
-  const loadState = systemdProperty(shown.stdout, "LoadState");
-  const activeState = systemdProperty(shown.stdout, "ActiveState");
-  const fragmentPath = systemdProperty(shown.stdout, "FragmentPath");
-  const needReload = systemdProperty(shown.stdout, "NeedDaemonReload");
-  if (loadState === null || activeState === null || needReload === null) {
-    return unknown("systemctl show did not report the properties it was asked for");
-  }
-  if (needReload === "yes") {
-    return unknown("systemd has a stale definition loaded; it needs daemon-reload");
-  }
-
-  const registration: "present" | "absent" =
-    loadState === "not-found" && activeState === "inactive" && !fragmentPath ? "absent" : "present";
-
-  if (artifactPresence(definitionPath) === "absent") {
-    return registration === "absent"
-      ? { kind: "absent" }
-      : unknown("systemd knows this unit but its file is missing");
-  }
-
-  let body: string;
-  try {
-    body = readFileSync(definitionPath, "utf-8");
-  } catch (error) {
-    return unknown(`the systemd unit exists but could not be read: ${String(error)}`);
-  }
-  const parsed = parseSystemdUnitHomes(body);
-  if (parsed.kind === "invalid") return unknown("the systemd unit has unsupported or ambiguous environment assignments");
-  return {
-    kind: "present",
-    claims: [{
-      backend: "systemd",
-      definitionPath,
-      homes: parsed.homes,
-      registration,
-    }],
-  };
 }
 
 /**
@@ -1216,8 +922,8 @@ export function inspectServiceManagerInstallation(deps: ProbeDeps = {}): Service
   const run = deps.run ?? defaultProbeRunner;
   const runRaw = deps.runRaw ?? defaultRawProbeRunner;
   const home = deps.home ?? homedir();
-  if (platform === "darwin") return inspectLaunchd({ run, uid: deps.uid ?? process.getuid?.() ?? 0, home });
-  if (platform === "linux") return inspectSystemd({ run, home });
+
+
   if (platform === "win32") {
     return inspectWindows({
       runRaw,

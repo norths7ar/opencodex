@@ -582,32 +582,6 @@ describe("DSH rc.6 serializer", () => {
     expect(JSON.stringify(document)).not.toContain('"minimal"');
     expect(JSON.stringify(document)).not.toContain('"off"');
   });
-
-  test("Direct drops native OpenAI and OpenAI-backed combos, failing closed on unknown combos", () => {
-    const models: ExportModel[] = [
-      { namespaced: "gpt-5.6-luna", provider: "openai", id: "gpt-5.6-luna", native: true },
-      { namespaced: "openai/gpt-routed", provider: "openai", id: "gpt-routed" },
-      { namespaced: "safe/model", provider: "safe", id: "model" },
-      { namespaced: "combo/safe", provider: "combo", id: "safe" },
-      { namespaced: "combo/mixed", provider: "combo", id: "mixed" },
-      { namespaced: "combo/unknown", provider: "combo", id: "unknown" },
-    ];
-    const direct = cfg({
-      providers: {
-        openai: { adapter: "openai-responses", baseUrl: "https://chatgpt.com/backend-api/codex", codexAccountMode: "direct" },
-        safe: { adapter: "openai-chat", baseUrl: "https://safe.example/v1" },
-      },
-      combos: {
-        safe: { targets: [{ provider: "safe", model: "model" }] },
-        mixed: { targets: [{ provider: "safe", model: "model" }, { provider: "openai", model: "gpt-5.6-luna" }] },
-      },
-    });
-    const ids = dshConfig(ctx({ models, config: direct }))["llm-pi-ai"].providers.opencodex!.models.map(model => model.id);
-    expect(ids).toEqual(["combo/safe", "safe/model"]);
-
-    const pool = cfg({ ...direct, providers: { ...direct.providers, openai: { ...direct.providers.openai!, codexAccountMode: "pool" } } });
-    expect(dshConfig(ctx({ models, config: pool }))["llm-pi-ai"].providers.opencodex!.models).toHaveLength(models.length);
-  });
 });
 
 describe("no credential ever reaches the output (accept criterion 3)", () => {

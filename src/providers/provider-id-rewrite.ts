@@ -108,26 +108,6 @@ export function rewriteProviderReferences(config: OcxConfig, from: string, to: s
       changed += 1;
     }
   }
-  for (const combo of Object.values(config.combos ?? {})) {
-    const decisionModel = route(typeof combo.decisionModel === "string" ? combo.decisionModel.trim() : combo.decisionModel);
-    if (decisionModel) combo.decisionModel = decisionModel;
-    for (const target of combo.targets ?? []) {
-      if (target.provider === from) {
-        target.provider = to;
-        changed += 1;
-      }
-    }
-    // A JEV Combo's decision service is validated against configured providers too.
-    if (typeof combo.decisionProvider === "string" && combo.decisionProvider.trim() === from) {
-      combo.decisionProvider = to;
-      changed += 1;
-    }
-  }
-
-  // Routing-profile candidates carry a bare provider id next to a bare model
-  // id (OcxRoutingProfileCandidate), and profile validation requires the
-  // provider to be configured — so an unrewritten candidate is the same
-  // load-failing dangling reference a stale combo target is.
   for (const profile of Object.values(config.routingProfiles ?? {})) {
     for (const candidate of profile.candidates ?? []) {
       if (candidate.provider === from) {

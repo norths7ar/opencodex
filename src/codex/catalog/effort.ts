@@ -22,14 +22,6 @@ import { CODEX_GPT5_IDENTITY_LINE } from "../../adapters/identity";
 import { filterCursorConfiguredModelsByLiveDiscovery } from "../../adapters/cursor/discovery";
 import { fetchCursorUsableModels } from "../../adapters/cursor/live-models";
 import { isCanonicalOpenAiForwardProvider, OPENAI_API_PROVIDER_ID, OPENAI_CODEX_PROVIDER_ID } from "../../providers/openai-tiers";
-import {
-  COMBO_NAMESPACE,
-  comboModelId,
-  getCombo,
-  listComboIds,
-  targetKey,
-} from "../../combos";
-import type { NormalizedComboConfig } from "../../combos/types";
 import { providerDestinationResolvedError } from "../../lib/destination-policy";
 import { redactSecretString, redactUserPath } from "../../lib/redact";
 import upstreamModelsSnapshot from "../data/upstream-models.json";
@@ -147,9 +139,6 @@ export function applyCatalogModelMetadata(entry: RawEntry, model?: CatalogModel)
       ...level, description: level.effort === "none" ? "Thinking off" : "Thinking on",
     }));
   }
-  // This marker survives strict catalog normalization and lets sync distinguish a stale
-  // bare combo alias from a genuine native model row.
-  if (model.provider === COMBO_NAMESPACE) entry.owned_by = model.owned_by ?? COMBO_NAMESPACE;
   // displayName is DISPLAY-ONLY: it relabels the picker row but never touches the routing
   // slug, alias, or provider. deriveEntry already stamped the slug as display_name; a
   // configured displayName overrides just the label. Custom-model inputs reject `/`; combos
@@ -192,8 +181,7 @@ export function applyCatalogModelMetadata(entry: RawEntry, model?: CatalogModel)
     entry.supports_reasoning_summaries = model.supportsReasoningSummaries;
   }
   if (model.supportsServiceTier === true) {
-    const eligibleRoutedFlex = model.supportsFlexTier === true
-      && model.provider !== COMBO_NAMESPACE && model.nativeAlias !== true;
+    const eligibleRoutedFlex = model.supportsFlexTier === true;
     const nativeFast = model.codexForwardNativeCapabilityAlias && Array.isArray(entry.service_tiers)
       ? entry.service_tiers.find(tier => tier?.id === "priority")
       : undefined;
@@ -231,12 +219,6 @@ export function applyCatalogModelMetadata(entry: RawEntry, model?: CatalogModel)
  * live in that table.
  */
 function stampCapabilityProvenance(entry: RawEntry, model: CatalogModel): void {
-  // Virtual combo rows are synthesized from last-resort defaults (a generic 128k
-  // context and a `["text"]` modality), so their values are placeholders rather
-  // than assertions. Stamping them would reintroduce the exact false-evidence
-  // defect this block exists to prevent.
-  if (model.provider === COMBO_NAMESPACE) return;
-
   const meta = generatedModelMetadata(model.provider, model.id);
   const metaContext = typeof meta?.contextWindow === "number" && meta.contextWindow > 0
     // The generated context is capped before it reaches the entry, so provenance

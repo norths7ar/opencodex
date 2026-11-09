@@ -34,8 +34,3 @@ export declare function findPathBun(options: {
   deadlineMs?: number;
   io?: PathBunIo;
 }): { path: string; version: string } | null;
-export declare function findDesktopCli(options?: {
-  platform?: NodeJS.Platform;
-  home?: string;
-  io?: DesktopCliIo;
-}): string | null;

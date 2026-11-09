@@ -61,7 +61,7 @@ export type CodexUpstreamOutcomeMeta = {
   /** When set, clears affinity for this thread immediately on transient failure. */
   threadId?: string | null;
   /**
-   * Suppress Pool rotation and quota/transient affinity mutations for an account-qualified
+   * Suppress quota/transient affinity mutations for an account-qualified
    * request. Credential failures still sweep stale affinities because reauthentication is
    * account-wide.
    */
@@ -83,12 +83,6 @@ export type CodexUpstreamOutcomeMeta = {
    * holds both and never pays two recovery permits for one send.
    */
   transientProbe?: TransientProbeGrant;
-  /**
-   * Already-chosen alternate for same-request 429 retry. When set, promotion
-   * reuses this account instead of calling {@link pickAlternateCodexAccount}
-   * again (which would advance a round-robin ring twice).
-   */
-  promoteAccountId?: string;
   /** Generation captured when this routed account was selected. */
   writerGeneration?: number;
   /**
@@ -123,14 +117,13 @@ export function computeCodexUsageScore(quota: {
   // The short burst window only REFINES a known long-window position; it cannot stand in for
   // one. A snapshot carrying just `shortPercent: 0` would otherwise score a flat 0 and make an
   // account whose weekly/monthly usage is entirely unverified look like the emptiest in the
-  // pool, so `pickLowestUsageAmong` would send every request to it. Unknown has to stay
+  // configured account. Unknown has to stay
   // unknown until a governing window is actually observed.
   //
   // A FULL burst window is the exception (#3029). It is not an optimistic guess about an
   // unobserved window — it is a direct observation that the account cannot serve a request
   // right now, whatever its monthly position turns out to be. Unknown-means-selectable is
-  // correct for uncertainty and wrong for a measured refusal: the account stays selected,
-  // `applyQuotaAutoSwitch` never fires, and the pool wedges on an exhausted credential.
+  // correct for uncertainty and wrong for a measured refusal.
   if (knownLong.length === 0) {
     return isTerminalShortWindow(quota, now)
       ? (allowCredits && hasSpendableCodexCredits(quota, now)) ? CODEX_EXHAUSTED_USAGE_PERCENT - 1 : CODEX_EXHAUSTED_USAGE_PERCENT

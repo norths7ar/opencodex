@@ -1194,10 +1194,6 @@ export function probeCodexSupportsModeHint(): boolean | null {
 }
 
 const CODEX_PLATFORM_PACKAGES = [
-  ["codex-darwin-arm64", "aarch64-apple-darwin", "codex"],
-  ["codex-darwin-x64", "x86_64-apple-darwin", "codex"],
-  ["codex-linux-x64", "x86_64-unknown-linux-musl", "codex"],
-  ["codex-linux-arm64", "aarch64-unknown-linux-musl", "codex"],
   ["codex-win32-x64", "x86_64-pc-windows-msvc", "codex.exe"],
   ["codex-win32-arm64", "aarch64-pc-windows-msvc", "codex.exe"],
 ] as const;

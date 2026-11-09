@@ -1,7 +1,7 @@
 import { copyTable, type Row } from "./copy-table";
 
 /*
- * Copy for the v2 Startup protection, Remote Link and Remote Workspace pages. Columns: en, ko, de, fr, zh, zh-TW, ru, ja, tr, vi, pt.
+ * Copy for the v2 Startup protection page. Columns: en, ko, de, fr, zh, zh-TW, ru, ja, tr, vi, pt.
  * Keys render as `startupV2.<key>`.
  */
 const rows = {
@@ -49,40 +49,6 @@ const rows = {
     "Lệnh để tự chạy",
     "Comandos para você executar",
   ],
-  // ---- Remote Link
-  off: ["Off", "꺼짐", "Aus", "Désactivé", "关闭", "關閉", "Выкл.", "オフ", "Kapalı", "Tắt", "Desligado"],
-  on: ["On", "켜짐", "An", "Activé", "开启", "開啟", "Вкл.", "オン", "Açık", "Bật", "Ligado"],
-  linkIntroTitle: [
-    "Use one computer's setup on your other computers",
-    "한 컴퓨터의 설정을 다른 컴퓨터에서도 쓰기",
-    "Die Einrichtung eines Computers auf weiteren Computern nutzen",
-    "Utiliser la configuration d’un ordinateur sur vos autres ordinateurs",
-    "在其他电脑上使用同一台电脑的设置",
-    "在其他電腦上使用同一台電腦的設定",
-    "Настройки одного компьютера на других ваших компьютерах",
-    "1 台のコンピューターの設定を他のコンピューターでも使う",
-    "Bir bilgisayarın kurulumunu diğer bilgisayarlarınızda kullanın",
-    "Dùng thiết lập của một máy cho các máy khác",
-    "Use a configuração de um computador nos outros",
-  ],
-  linkIntroBody: [
-    "Remote Link connects OpenCodex computers over SSH. The Home shares its providers, and a Child uses them without any setup of its own.",
-    "원격 연결은 SSH로 OpenCodex 컴퓨터끼리 연결합니다. 홈이 프로바이더를 나눠 주고, 자식은 따로 설정하지 않고 그대로 씁니다.",
-    "Remote Link verbindet OpenCodex-Computer über SSH. Der Home teilt seine Anbieter, ein Child nutzt sie ohne eigene Einrichtung.",
-    "Remote Link relie les ordinateurs OpenCodex par SSH. Le Home partage ses fournisseurs, et un Child les utilise sans configuration propre.",
-    "远程连接通过 SSH 连接 OpenCodex 电脑。主机共享其提供方，子机无需自行设置即可直接使用。",
-    "遠端連線透過 SSH 連接 OpenCodex 電腦。主機分享其提供者，子機無需自行設定即可直接使用。",
-    "Remote Link соединяет компьютеры с OpenCodex по SSH. Home делится своими провайдерами, а Child пользуется ими без собственной настройки.",
-    "リモート接続は SSH で OpenCodex のコンピューター同士をつなぎます。ホームがプロバイダーを共有し、子はそのまま使えます。",
-    "Remote Link, OpenCodex bilgisayarlarını SSH üzerinden bağlar. Home sağlayıcılarını paylaşır, Child bunları kendi kurulumu olmadan kullanır.",
-    "Remote Link kết nối các máy OpenCodex qua SSH. Máy Home chia sẻ nhà cung cấp, máy Child dùng lại mà không cần tự thiết lập.",
-    "O Remote Link conecta computadores OpenCodex por SSH. O Home compartilha seus provedores e um Child os usa sem configuração própria.",
-  ],
-  sshTunnel: ["SSH tunnel", "SSH 터널", "SSH-Tunnel", "Tunnel SSH", "SSH 隧道", "SSH 通道", "SSH-туннель", "SSH トンネル", "SSH tüneli", "Đường hầm SSH", "Túnel SSH"],
-  stepHost: ["Choose a host", "호스트 선택", "Host wählen", "Choisir un hôte", "选择主机", "選擇主機", "Выбор хоста", "ホストを選ぶ", "Ana bilgisayar seçin", "Chọn máy chủ", "Escolher o host"],
-  stepVerify: ["Check the host key", "호스트 키 확인", "Hostschlüssel prüfen", "Vérifier la clé d’hôte", "核对主机密钥", "核對主機金鑰", "Проверка ключа хоста", "ホストキーを確認", "Ana bilgisayar anahtarını doğrulayın", "Kiểm tra khóa máy chủ", "Conferir a chave do host"],
-  stepConnect: ["Connect", "연결", "Verbinden", "Connecter", "连接", "連線", "Подключение", "接続", "Bağlan", "Kết nối", "Conectar"],
-  steps: ["Steps", "단계", "Schritte", "Étapes", "步骤", "步驟", "Шаги", "手順", "Adımlar", "Các bước", "Etapas"],
 } satisfies Record<string, Row>;
 
 export const startupV2Copy = copyTable("startupV2", rows);

@@ -36,49 +36,6 @@ test("translation never turns a restricted hosted search declaration into unrest
 
 for (const adapter of ["openai-responses", "openai-chat"] as const) {
   for (const [index, restriction] of [undefined, ...restrictions].entries()) {
-    test(`combo TRANSLATION to ${adapter} omits restricted search ${index} and keeps deferred functions`, async () => {
-      // Failure health is process-local; distinct physical identities keep scenarios independent.
-      const refusedProvider = `refused-${adapter}-${index}`;
-      const captured: { url: string; body: any }[] = [];
-      const fetch = (async (url: RequestInfo | URL, init?: RequestInit) => {
-        captured.push({ url: String(url), body: JSON.parse(String(init?.body)) });
-        if (String(url).includes("api.anthropic.com")) {
-          return Response.json({ type: "error", error: { type: "overloaded_error", message: "fixture refusal" } }, { status: 503 });
-        }
-        return adapter === "openai-responses"
-          ? Response.json({ id: "resp_fixture", object: "response", status: "completed",
-            output: [{ type: "message", role: "assistant", content: [{ type: "output_text", text: "ok" }] }],
-            usage: { input_tokens: 1, output_tokens: 1 } })
-          : new Response(`data: ${JSON.stringify({ id: "chat_fixture", object: "chat.completion.chunk",
-            choices: [{ index: 0, delta: { content: "ok" }, finish_reason: "stop" }] })}\n\ndata: [DONE]\n\n`,
-            { headers: { "content-type": "text/event-stream" } });
-      }) as typeof globalThis.fetch;
-      const config: OcxConfig = { port: 0, defaultProvider: "target",
-        claudeCode: { nativePassthrough: false, ...(restriction === undefined ? { compatibility: "enforce" as const } : {}) },
-        providers: { [refusedProvider]: { adapter: "anthropic", authMode: "key", baseUrl: "https://api.anthropic.com",
-          apiKey: "synthetic-fixture", models: ["claude-test"], fetch }, target: {
-        adapter, authMode: "key", baseUrl: "https://fixture.invalid/v1", apiKey: "synthetic-fixture", models: ["test-model"], fetch,
-      } }, combos: { pick: { strategy: "failover", targets: [
-        { provider: refusedProvider, model: "claude-test" }, { provider: "target", model: "test-model" },
-      ] } },
-      // Enable a real sidecar plan: the pre-fix Chat path otherwise drops search for lack of auth.
-      webSearchSidecar: { enabled: true, backend: "exa", exaApiKey: "synthetic-fixture" } };
-      const response = await handleClaudeMessages(new Request("http://localhost/v1/messages", {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify(request(restriction === undefined ? [deferred] : [{ ...search, ...restriction }, deferred])),
-      }), config, { model: "", provider: "" });
-      await response.text();
-      expect(response.status).toBe(200);
-      expect(captured).toHaveLength(2);
-      expect(captured[0]!.url).toContain("api.anthropic.com");
-      if (restriction) expect(captured[0]!.body.tools).toContainEqual(expect.objectContaining({ ...search, ...restriction }));
-      expect(captured[1]!.url).toEndWith(adapter === "openai-responses" ? "/responses" : "/chat/completions");
-      const tools = captured[1]!.body.tools.map((tool: any) => tool.function ?? tool);
-      expect(tools.map((tool: any) => tool.name)).toEqual(["lookup"]);
-      expect(tools[0]).toMatchObject({ description: deferred.description, parameters: deferred.input_schema });
-      expect(JSON.stringify(captured[1]!.body)).not.toContain("web_search");
-      expect(tools[0].defer_loading).toBeUndefined();
-    });
   }
 }
 

@@ -92,27 +92,6 @@ export function intersectAdmissionModelScopes(a: AdmissionModelScope | undefined
   return a && b ? { providers: [], models: [], allOf: [a, b] } : a ?? b;
 }
 
-/** Consent comes from stored operator config, never request headers. Use the full listener config. */
-export function admissionMayUseMeteredComboTargets(
-  config: Pick<OcxConfig, "apiKeys" | "hostname">,
-  admission: DataPlaneAdmission | undefined,
-  combo?: { allowMeteredTargets?: boolean },
-): boolean {
-  const caller = admission?.callerPolicy;
-  if (caller && (!caller.allowMeteredComboTargets || caller.meteredRequiresComboOptIn && combo?.allowMeteredTargets !== true)) return false;
-  if (admission?.kind === "configured") {
-    const entry = (config.apiKeys ?? []).find(key => key.id === admission.keyId);
-    return entry?.allowMeteredComboTargets === true;
-  }
-  // A loopback-admitted internal hop's captured policy already holds this branch's decision for
-  // its listener, or the consent of the validated key it presented (#7894); it was checked above.
-  if (admission?.kind === "loopback" && caller) return true;
-  // Linked ingress always carries keyed admission, even when the primary bind is loopback.
-  // A secondary loopback listener on a public proxy does not qualify either.
-  return (!admission || admission.kind === "loopback")
-    && !isApiAuthRequired(config) && combo?.allowMeteredTargets === true;
-}
-
 /**
  * Does this scope admit this resolved destination?
  *

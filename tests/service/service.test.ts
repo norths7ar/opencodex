@@ -1,3 +1,4 @@
+import { assertServiceAuthEnvironment, assertServiceEnvironmentMatchesInstall, bakedServicePathsDiagnostic, confirmServiceServing, buildWindowsLauncherVbs, buildWindowsSchtasksCreateArgs, buildWindowsSchtasksCreateArgsForXml, buildWindowsServiceScript, buildWindowsTaskXml as buildWindowsTaskXmlProduction, buildWindowsTaskXmlDocument, deriveWindowsServiceDiagnostic, deriveWindowsServiceDiagnosticForCurrentUser, installFreshWindowsSchedulerSafely, installServiceSafely, normalizeServiceSubcommand, parseServiceArgs, parseServiceInstallState, planServiceCommand, prepareServiceInstall, probeServiceInstallation, readWindowsSchedulerXmlState, registerFreshWindowsSchedulerTask, removeNativeWindowsServiceForScheduler, repairService, reportServiceServing, resolveServiceListenPort, selectServiceSubcommand, SERVICE_INSTALL_HEALTH_MS, SERVICE_INSTALL_HEALTH_WINDOWS_MS, serviceInstallHealthMs, serviceLogPath, serviceStartableFromTray, serviceStatusReport, serviceRetryCommand, serviceStatusSummary, stableLauncherEntry, windowsListenPort, winswListenPort, windowsTaskRegistrationHealthy as windowsTaskRegistrationHealthyProduction } from "../../src/service";
 import { afterAll, afterEach, describe, expect, spyOn, test } from "bun:test";
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -7,7 +8,6 @@ import { pathToFileURL } from "node:url";
 import * as serviceModule from "../../src/service";
 import { saveConfig } from "../../src/config";
 import { windowsEnvIndirectBatchValue } from "../../src/lib/win-paths";
-import { assertServiceAuthEnvironment, assertServiceEnvironmentMatchesInstall, bakedServicePathsDiagnostic, confirmServiceServing, launchdListenPort, systemdListenPort, buildPlist, buildUnit, buildWindowsLauncherVbs, buildWindowsSchtasksCreateArgs, buildWindowsSchtasksCreateArgsForXml, buildWindowsServiceScript, buildWindowsTaskXml as buildWindowsTaskXmlProduction, buildWindowsTaskXmlDocument, deriveWindowsServiceDiagnostic, deriveWindowsServiceDiagnosticForCurrentUser, expectedLaunchdCommand, installFreshWindowsSchedulerSafely, installServiceSafely, launchctlLoadFailed, launchdJobMatchesPlist, normalizeServiceSubcommand, parseServiceArgs, parseServiceInstallState, planServiceCommand, prepareServiceInstall, probeServiceInstallation, readWindowsSchedulerXmlState, registerFreshWindowsSchedulerTask, removeNativeWindowsServiceForScheduler, repairService, reportServiceServing, resolveServiceListenPort, runLaunchctl, selectServiceSubcommand, SERVICE_INSTALL_HEALTH_MS, SERVICE_INSTALL_HEALTH_WINDOWS_MS, serviceInstallHealthMs, serviceLogPath, serviceStartableFromTray, serviceStatusReport, serviceRetryCommand, serviceStatusSummary, stableLauncherEntry, systemdNeedsDaemonReload, systemdServiceInstallCleanupOps, uninstallSystemd, windowsListenPort, winswListenPort, startLaunchd, windowsTaskRegistrationHealthy as windowsTaskRegistrationHealthyProduction } from "../../src/service";
 import type { ServiceDiagnostic } from "../../src/service";
 import { definitionCarriesCredential, resolvedProxyEnv, writeServiceApiTokenFile, writeServiceDefinitionFile } from "../../src/service";
 import { buildWinswXml } from "../../src/lib/winsw";
@@ -123,14 +123,12 @@ describe("service listen-port bake", () => {
     }
   });
 
-  test("Windows batch and launchd/systemd shell commands bake start --port", () => {
+  test("Windows batch commands bake start --port", () => {
     process.env.OPENCODEX_HOME = TEST_DIR;
     mkdirSync(TEST_DIR, { recursive: true });
     saveConfig({ port: 13337, hostname: "127.0.0.1", defaultProvider: "openai", providers: {} } as OcxConfig);
     const script = buildWindowsServiceScript({ bun: "C:\\OpenCodex\\bun.exe", bunRuntimeSource: "bundled", cli: "C:\\OpenCodex\\cli.ts" });
     expect(script).toContain("start --port 13337");
-    expect(buildPlist()).toContain("start --port 13337");
-    expect(buildUnit()).toContain("start --port 13337");
   });
 });
 
@@ -218,30 +216,7 @@ describe("systemd service unit", () => {
    * version-pinned Bun + CLI pair — the #2898 shape launcher mode exists to avoid — when a
    * repair runs from a context without `ocx` on PATH.
    */
-  test("a repair without ocx on PATH keeps the recorded launcher in the systemd unit too", async () => {
-    const recorded = join(TEST_DIR, "recorded-systemd", "ocx");
-    const launcher = stableLauncherEntry({
-      state: { version: 2, backend: "scheduler", launcherPath: recorded } as never,
-      env: { PATH: "" },
-      isExecutableFile: candidate => candidate === recorded,
-    });
-    expect(launcher).toBe(recorded);
 
-    const unit = buildUnit(resolvedProxyEnv(), { launcher });
-    expectTextToContainPath(unit, recorded);
-    // Launcher mode means the unit must NOT pin the package-local Bun + CLI pair.
-    expect(unit).not.toContain("OCX_BUN_RUNTIME_PATH");
-
-    // And the installer feeds exactly this resolver into exactly that builder, so the
-    // preference above is the one Linux gets.
-    const service = await readText("src/service/systemd.ts");
-    const installSystemd = service.slice(
-      service.indexOf("function installSystemd()"),
-      service.indexOf("function startSystemd()"),
-    );
-    expect(installSystemd).toContain("const launcher = stableLauncherEntry();");
-    expect(installSystemd).toContain("buildUnit(resolvedProxyEnv(), { launcher })");
-  });
 
   test("bare service installs only when absent and otherwise selects no-admin repair", async () => {
     expect(normalizeServiceSubcommand()).toBe("install");
@@ -355,59 +330,13 @@ describe("systemd service unit", () => {
     expect(nativeUnknown.detail).toContain("WinSW status");
   });
 
-  test("redirects service output through the ExecStart shell for legacy systemd", () => {
-    const unit = buildUnit();
 
-    expect(unit).toMatch(/ExecStart=.* start --port \d+ >> '[^'\n]*service\.log' 2>&1/);
-    expect(unit).not.toContain("StandardOutput=");
-    expect(unit).not.toContain("StandardError=");
-  });
 
-  test("bakes outbound proxy env into the unit so the service is not cut off from upstream (#2107)", () => {
-    // systemd does not inherit the installing shell's environment, and ExecStart runs
-    // /bin/sh -lc — which is dash on Ubuntu/WSL and reads .profile, not .bashrc. A user
-    // whose proxy lives in the shell therefore gets a service that dials upstream direct,
-    // the socket is reset, and the request surfaces as 502 Provider unreachable.
-    //
-    // The shell is passed in rather than assigned onto `process.env`. Mutating the real
-    // environment here leaked `HTTP_PROXY` out of this file: Bun runs a `bun test a b`
-    // invocation in ONE process, and the Lab sandbox calls `rejectProxyEnvironment()` on
-    // the live `process.env`, so every Lab file that loaded afterwards died with
-    // `harness_failure`. That was 73 failures on the unsharded macOS lane and zero when
-    // the Lab suites ran alone.
-    const proxyEnv = resolvedProxyEnv({
-      HTTP_PROXY: "http://127.0.0.1:7890",
-      HTTPS_PROXY: "http://127.0.0.1:7890",
-      NO_PROXY: "localhost,127.0.0.1",
-    });
 
-    const unit = buildUnit(proxyEnv);
-    expect(unit).toContain('Environment="HTTP_PROXY=http://127.0.0.1:7890"');
-    expect(unit).toContain('Environment="HTTPS_PROXY=http://127.0.0.1:7890"');
-    expect(unit).toContain("NO_PROXY=");
-    // An unset key must not produce an empty assignment.
-    expect(unit).not.toContain('Environment="ALL_PROXY="');
 
-    const plist = buildPlist(proxyEnv);
-    expect(plist).toContain("<key>HTTP_PROXY</key><string>http://127.0.0.1:7890</string>");
-    expect(plist).not.toContain("<key>ALL_PROXY</key>");
-  });
 
-  test("omits proxy env entirely when the installing shell has none (#2107)", () => {
-    const unit = buildUnit(resolvedProxyEnv({}));
-    for (const key of ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]) {
-      expect(unit).not.toContain(`${key}=`);
-    }
-  });
 
-  test("lower-case shell spellings are baked under the canonical name (#2107)", () => {
-    // curl-style tooling sets the lower-case pair; only the upper-case name is emitted so a
-    // definition never carries two spellings of one setting.
-    const unit = buildUnit(resolvedProxyEnv({ http_proxy: "http://127.0.0.1:7890" }));
 
-    expect(unit).toContain('Environment="HTTP_PROXY=http://127.0.0.1:7890"');
-    expect(unit).not.toContain("http_proxy=");
-  });
 
   test("Claude first-party's own intercept URL is never baked; a plain loopback proxy is", () => {
     // A shell started by Claude Code inherits HTTPS_PROXY from ~/.claude/settings.json.
@@ -438,41 +367,7 @@ describe("systemd service unit", () => {
   });
 
 
-  test("service start checks for the systemd user unit before shelling out", async () => {
-    const service = await readText("src/service/systemd.ts");
-    const installSystemd = service.slice(service.indexOf("function installSystemd()"), service.indexOf("function startSystemd()"));
-    const startSystemd = service.slice(service.indexOf("function startSystemd()"), service.indexOf("function stopSystemd()"));
 
-    const unitCheckAt = startSystemd.indexOf("existsSync(unitPath())");
-    const startAt = startSystemd.indexOf("systemctl --user start");
-    expect(unitCheckAt).toBeGreaterThan(-1);
-    expect(startAt).toBeGreaterThan(-1);
-    expect(unitCheckAt).toBeLessThan(startAt);
-    expect(startSystemd).toContain("ocx service install");
-    expect(startSystemd).toContain("process.exit(1)");
-
-    // The write goes through writeServiceDefinitionFile so the unit lands 0600: it can carry a
-    // proxy credential (#2107). What this test pins is the ORDER — write, then reload.
-    const writeAt = installSystemd.indexOf("writeServiceDefinitionFile(unitPath(), buildUnit(");
-    const reloadAt = installSystemd.indexOf("systemctl --user daemon-reload");
-    const enableAt = installSystemd.indexOf("systemctl --user enable");
-    const restartAt = installSystemd.indexOf("systemctl --user restart");
-    expect(writeAt).toBeGreaterThan(-1);
-    expect(writeAt).toBeLessThan(reloadAt);
-    expect(reloadAt).toBeLessThan(enableAt);
-    expect(enableAt).toBeLessThan(restartAt);
-    expect(installSystemd).not.toContain("ocx service install");
-    expect(installSystemd).not.toContain("process.exit(1)");
-
-    // #2898: the unit and the recorded install state must agree about WHAT is launched, so
-    // the launcher is resolved once and handed to both. Resolving twice would let the
-    // staleness check validate a path the unit does not run.
-    const resolveAt = installSystemd.indexOf("stableLauncherEntry()");
-    expect(resolveAt).toBeGreaterThan(-1);
-    expect(resolveAt).toBeLessThan(writeAt);
-    expect(installSystemd).toContain("writeServiceInstallState(\"scheduler\", launcher)");
-    expect(installSystemd.match(/stableLauncherEntry\(\)/g)).toHaveLength(1);
-  });
 });
 
 describe("service install auth preflight", () => {
@@ -667,29 +562,7 @@ describe("service install auth preflight", () => {
     expect(() => assertServiceAuthEnvironment()).not.toThrow();
   });
 
-  test("hub-mode launchd and systemd installs reuse the protected data-token file", () => {
-    if (existsSync(TEST_DIR)) removeTreeWithRetry(TEST_DIR);
-    mkdirSync(TEST_DIR, { recursive: true });
-    process.env.OPENCODEX_HOME = TEST_DIR;
-    process.env.OPENCODEX_API_AUTH_TOKEN = "phase5-data-secret";
-    saveConfig({
-      port: 10100,
-      hostname: "0.0.0.0",
-      runtimeRole: "hub",
-      hub: {
-        managementPublicOrigin: "https://hub.example.test",
-        managementIngress: { enabled: true, port: 10101 },
-      },
-      providers: { openai: { adapter: "openai-chat", baseUrl: "https://api.example.test/v1" } },
-      defaultProvider: "openai",
-    } as OcxConfig);
 
-    expect(() => assertServiceAuthEnvironment()).not.toThrow();
-    for (const definition of [buildUnit(), buildPlist()]) {
-      expectTextToContainPath(definition, serviceApiTokenFilePath());
-      expect(definition).not.toContain("phase5-data-secret");
-    }
-  });
 
   test("rejects restore operations from a different CODEX_HOME than service install", () => {
     if (existsSync(TEST_DIR)) removeTreeWithRetry(TEST_DIR);
@@ -1323,101 +1196,9 @@ describe("Windows service task", () => {
   });
 });
 
-describe("launchd service plist", () => {
-  test("restarts after unsuccessful exits and stays down after a deliberate stand-down", () => {
-    expect(buildPlist()).toContain("<key>KeepAlive</key><dict><key>SuccessfulExit</key><false/></dict>");
-  });
+describe("durable service definitions", () => {
 
-  test("every durable launcher stamps the Bun provenance paired with the binary it baked (#848)", () => {
-    const inheritedOverride = process.env.OPENCODEX_BUN_PATH;
-    const inheritedSource = process.env.OCX_BUN_RUNTIME_SOURCE;
-    const inheritedPath = process.env.OCX_BUN_RUNTIME_PATH;
-    const overrideBun = join(TEST_DIR, "provenance-override-bun.exe");
-    mkdirSync(TEST_DIR, { recursive: true });
-    writeFileSync(overrideBun, "x".repeat(2 * 1024 * 1024));
-    try {
-      // OPENCODEX_BUN_PATH is consumed by the Node launcher before Bun can load a
-      // project dotenv. Once Bun is running, an unpaired value is untrusted and
-      // must never be persisted into a durable launcher.
-      delete process.env.OCX_BUN_RUNTIME_SOURCE;
-      delete process.env.OCX_BUN_RUNTIME_PATH;
-      process.env.OPENCODEX_BUN_PATH = overrideBun;
-      const plist = buildPlist();
-      expect(plist).not.toContain("<key>OCX_BUN_RUNTIME_SOURCE</key><string>override</string>");
-      expect(plist).not.toContain(overrideBun);
 
-      const unit = buildUnit();
-      expect(unit).not.toContain('Environment="OCX_BUN_RUNTIME_SOURCE=override"');
-      expect(unit).not.toContain(overrideBun);
-
-      const script = buildWindowsServiceScript();
-      expect(script).not.toContain('set "OCX_BUN_RUNTIME_SOURCE=override"');
-      expect(script).not.toContain(overrideBun);
-
-      // A source/path pair stamped by the Node launcher is accepted only when it
-      // names the Bun executable that is actually running this process.
-      process.env.OCX_BUN_RUNTIME_SOURCE = "override";
-      process.env.OCX_BUN_RUNTIME_PATH = process.execPath;
-      const trustedPlist = buildPlist();
-      expect(trustedPlist).toContain("<key>OCX_BUN_RUNTIME_SOURCE</key><string>override</string>");
-      expectTextToContainPath(trustedPlist, process.execPath);
-      // The systemd unit stamps the pair only when it BAKES that pair. A stable-launcher
-      // install runs `ocx` and lets it resolve the current package's Bun, so stamping a
-      // path there would pin the runtime to the directory a version upgrade deletes
-      // (#2898) — the opposite of what #848 asks for. Assert both modes explicitly.
-      expect(buildUnit(resolvedProxyEnv(), { launcher: null })).toContain('Environment="OCX_BUN_RUNTIME_SOURCE=override"');
-      const launched = buildUnit(resolvedProxyEnv(), { launcher: "/opt/shims/ocx" });
-      expect(launched).not.toContain("OCX_BUN_RUNTIME_SOURCE");
-      expect(launched).not.toContain("OCX_BUN_RUNTIME_PATH");
-      expectTextToContainPath(launched, process.execPath);
-      expect(launched).toContain("OPENCODEX_BUN_PATH=");
-      expect(buildWindowsServiceScript()).toContain('set "OCX_BUN_RUNTIME_SOURCE=override"');
-    } finally {
-      if (inheritedOverride === undefined) delete process.env.OPENCODEX_BUN_PATH;
-      else process.env.OPENCODEX_BUN_PATH = inheritedOverride;
-      if (inheritedSource === undefined) delete process.env.OCX_BUN_RUNTIME_SOURCE;
-      else process.env.OCX_BUN_RUNTIME_SOURCE = inheritedSource;
-      if (inheritedPath === undefined) delete process.env.OCX_BUN_RUNTIME_PATH;
-      else process.env.OCX_BUN_RUNTIME_PATH = inheritedPath;
-    }
-  });
-
-  test("preserves custom Codex and OpenCodex homes", () => {
-    const oldCodexHome = process.env.CODEX_HOME;
-    const oldCodexSqliteHome = process.env.CODEX_SQLITE_HOME;
-    const oldOpenCodexHome = process.env.OPENCODEX_HOME;
-    const oldApiAuthToken = process.env.OPENCODEX_API_AUTH_TOKEN;
-    const root = mkdtempSync(join(tmpdir(), "ocx-plist-&'-"));
-    const codexHome = join(root, "codex-home");
-    const openCodexHome = join(root, "opencodex-home");
-    const xml = (value: string) => value.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;")
-      .replaceAll("\t", "&#9;").replaceAll("\n", "&#10;").replaceAll("\r", "&#13;");
-    try {
-      process.env.CODEX_HOME = codexHome;
-      process.env.CODEX_SQLITE_HOME = "/tmp/codex-sqlite-home";
-      process.env.OPENCODEX_HOME = openCodexHome;
-      process.env.OPENCODEX_API_AUTH_TOKEN = "local-secret";
-      const plist = buildPlist();
-      expect(plist).toContain(`<key>CODEX_HOME</key><string>${xml(codexHome)}</string>`);
-      expect(plist).toContain("<key>CODEX_SQLITE_HOME</key><string>/tmp/codex-sqlite-home</string>");
-      expect(plist).toContain(`<key>OPENCODEX_HOME</key><string>${xml(openCodexHome)}</string>`);
-      const quotedTokenPath = "'" + serviceApiTokenFilePath().split("'").join("'\\''") + "'";
-      expect(plist).toContain(xml(quotedTokenPath));
-      expect(plist).not.toContain("local-secret");
-      expect(plist).not.toContain("<key>OPENCODEX_API_AUTH_TOKEN</key>");
-    } finally {
-      if (oldCodexHome === undefined) delete process.env.CODEX_HOME;
-      else process.env.CODEX_HOME = oldCodexHome;
-      if (oldCodexSqliteHome === undefined) delete process.env.CODEX_SQLITE_HOME;
-      else process.env.CODEX_SQLITE_HOME = oldCodexSqliteHome;
-      if (oldOpenCodexHome === undefined) delete process.env.OPENCODEX_HOME;
-      else process.env.OPENCODEX_HOME = oldOpenCodexHome;
-      if (oldApiAuthToken === undefined) delete process.env.OPENCODEX_API_AUTH_TOKEN;
-      else process.env.OPENCODEX_API_AUTH_TOKEN = oldApiAuthToken;
-      removeTreeWithRetry(root);
-    }
-  });
 
   // A POSIX unit must carry the literal POSIX path no matter which host writes it. The two
   // cases above are where this actually bites: on a Windows host `resolve("/tmp/x")` anchors
@@ -1425,168 +1206,20 @@ describe("launchd service plist", () => {
   // CODEX_HOME beside it kept `/tmp/codex-home`. The same file disagreed with itself about two
   // variables holding the same kind of value. This states the rule directly so the intent
   // survives; on a POSIX host `resolve()` is identity here, so only Windows can catch it.
-  test("carries an absolute POSIX sqlite home into POSIX units without host anchoring", () => {
-    const inherited = process.env.CODEX_SQLITE_HOME;
-    try {
-      process.env.CODEX_SQLITE_HOME = "/var/lib/opencodex/codex-sqlite";
 
-      expect(buildPlist()).toContain(
-        "<key>CODEX_SQLITE_HOME</key><string>/var/lib/opencodex/codex-sqlite</string>",
-      );
-      expect(buildUnit()).toContain(
-        'Environment="CODEX_SQLITE_HOME=/var/lib/opencodex/codex-sqlite"',
-      );
-    } finally {
-      if (inherited === undefined) delete process.env.CODEX_SQLITE_HOME;
-      else process.env.CODEX_SQLITE_HOME = inherited;
-    }
-  });
 
   // #2898. A version manager installs OpenCodex under a versioned directory and deletes the
   // old one on upgrade; the baked Bun and CLI both live there. The shim does not move, so the
   // unit has to name the shim and nothing from inside the version directory.
-  test("a stable launcher install names the launcher and bakes no versioned path", () => {
-    const launcher = "/home/u/.local/share/mise/shims/ocx";
-    const unit = buildUnit(resolvedProxyEnv({}), {
-      launcher,
-      runtime: { path: "/opt/opencodex/versioned/bun", source: "bundled", overrideEnv: "OPENCODEX_BUN_PATH" },
-    });
 
-    expect(unit).toContain(launcher);
-    expect(unit).toContain("start --port");
-    // The versioned pair must be absent from BOTH the command and the environment: either one
-    // pins the service to a directory the next upgrade removes.
-    expect(unit).not.toContain("OCX_BUN_RUNTIME_PATH");
-    expect(unit).not.toContain("OCX_BUN_RUNTIME_SOURCE");
-    expect(unit).not.toContain("OPENCODEX_BUN_PATH");
-    expect(unit).not.toContain("/opt/opencodex/versioned/bun");
-    expect(unit).not.toContain("cli/index.ts");
-    // The token still comes from the file at start, never from the unit (#2107).
-    expectTextToContainPath(unit, serviceApiTokenFilePath());
-    expect(unit).toContain("OPENCODEX_API_AUTH_TOKEN");
-
-    // Without a launcher the unit keeps the previous shape, so source checkouts are unaffected.
-    const direct = buildUnit(resolvedProxyEnv({}), { launcher: null });
-    expectTextToContainPath(direct, join("cli", "index.ts"));
-    expect(direct).toContain("OCX_BUN_RUNTIME_PATH");
-  });
-
-
-  test("launchd stays bound to the package runtime instead of a mutable PATH launcher", async () => {
-    // A supplied launcher must not reach the credential-bearing ProgramArguments
-    // command. Assert on the extracted command rather than the whole plist: the
-    // same Bun path also legitimately appears under OCX_BUN_RUNTIME_PATH, so a
-    // plist-wide substring check cannot tell command from environment.
-    const launcher = "/home/u/.local/share/mise/shims/ocx";
-    const plist = buildPlist(resolvedProxyEnv({}), {
-      launcher,
-      runtime: { path: "/opt/opencodex/versioned/bun", source: "bundled", overrideEnv: "OPENCODEX_BUN_PATH" },
-    });
-
-    const command = /<key>ProgramArguments<\/key>\s*<array>\s*<string>\/bin\/sh<\/string>\s*<string>-lc<\/string>\s*<string>([^<]*)<\/string>/.exec(plist)?.[1];
-    expect(command).toBeDefined();
-    expectTextToContainPath(command!, "/opt/opencodex/versioned/bun");
-    expectTextToContainPath(command!, join("cli", "index.ts"));
-    expect(command!).not.toContain(launcher);
-    expect(command!).not.toContain("mise/shims");
-
-    expectTextToContainPath(plist, "/opt/opencodex/versioned/bun");
-    expectTextToContainPath(plist, join("cli", "index.ts"));
-    expect(plist).toContain("OCX_BUN_RUNTIME_PATH");
-    expect(plist).toContain("OCX_BUN_RUNTIME_SOURCE");
-    expect(plist).not.toContain(launcher);
-
-    const service = await readText("src/service/launchd.ts");
-    const installLaunchd = service.slice(
-      service.indexOf("export function installLaunchd("),
-      service.indexOf("export function restartLaunchdJob"),
-    );
-    expect(installLaunchd).not.toContain("stableLauncherEntry");
-    expect(installLaunchd).toContain("buildPlist(resolvedProxyEnv(), { homes })");
-    expect(installLaunchd).toContain('writeServiceInstallState("scheduler")');
-  });
 
   // The scenario itself, executed rather than asserted: retarget the shim the way an upgrade
   // does, delete the old version, and check the generated command still reaches live code.
-  test("the generated launcher command follows a retargeted shim after the old version is gone", () => {
-    const root = mkdtempSync(join(tmpdir(), "ocx-shim-"));
-    const shimDir = join(root, "shims");
-    const v1 = join(root, "installs", "2.35.0 package's");
-    const v2 = join(root, "installs", "2.36.0 package's");
-    mkdirSync(shimDir, { recursive: true });
-    mkdirSync(v1, { recursive: true });
-    mkdirSync(v2, { recursive: true });
-    const v1Entry = join(v1, "ocx");
-    const v2Entry = join(v2, "ocx");
-    writeFileSync(v1Entry, 'console.log("V1", Bun.argv.slice(2).join(" "));\n');
-    writeFileSync(v2Entry, 'console.log("V2", Bun.argv.slice(2).join(" "));\n');
 
-    const shim = join(shimDir, "ocx");
-    const retargetShim = (target: string): void => {
-      writeFileSync(shim, `await import(${JSON.stringify(pathToFileURL(target).href)});\n`);
-    };
-    const runShim = (): string => execFileSync(
-      process.execPath,
-      [shim, "start", "--port", "1"],
-      { encoding: "utf8" },
-    );
-    retargetShim(v1Entry);
-
-    // stableLauncherEntry finds the shim lexically from PATH — not its versioned target.
-    const found = buildUnit(resolvedProxyEnv({}), { launcher: shim });
-    expectTextToContainPath(found, shim);
-    expectTextNotToContainPath(found, v1);
-
-    // Reproduce Windows' host-path serialization on every platform. systemdQuote() must
-    // escape each backslash in the unit, so raw path substring assertions are invalid.
-    const windowsShim = win32.join("C:\\Users\\runneradmin", "mise", "shims", "ocx");
-    const windowsUnit = buildUnit(resolvedProxyEnv({}), { launcher: windowsShim });
-    expectTextToContainPath(windowsUnit, windowsShim);
-
-    // Exercise the retarget through Bun on every host. Directly executing the old
-    // extensionless #!/bin/sh fixture was itself a POSIX-only assumption.
-    expect(runShim()).toContain("V1");
-
-    // The upgrade: shim retargeted, old version removed.
-    retargetShim(v2Entry);
-    removeTreeWithRetry(v1);
-    expect(existsSync(v1Entry)).toBe(false);
-    expect(runShim()).toContain("V2");
-
-    removeTreeWithRetry(root);
-  });
 
   // The relative case is why the resolve() is there at all: a service unit has no meaningful
   // working directory, so a relative home must still be made absolute.
-  test("still absolutizes a relative sqlite home", () => {
-    const inherited = process.env.CODEX_SQLITE_HOME;
-    try {
-      process.env.CODEX_SQLITE_HOME = "relative-sqlite-home";
-      const plist = buildPlist();
 
-      // Assert the emitted value is actually absolute. Rejecting only the raw string would
-      // stay green for any other non-absolute transform, which is the whole thing this test
-      // exists to catch. The two artifact formats differ, so each is extracted on its own
-      // terms: launchd is XML, systemd is a quoted Environment= line.
-      const plistValue = /<key>CODEX_SQLITE_HOME<\/key>\s*<string>([^<]*)<\/string>/.exec(plist)?.[1];
-      expect(plistValue).toBeDefined();
-      expect(
-        isAbsolute(plistValue!) || posix.isAbsolute(plistValue!) || win32.isAbsolute(plistValue!),
-      ).toBe(true);
-      expect(plistValue!.endsWith("relative-sqlite-home")).toBe(true);
-
-      const unit = buildUnit();
-      const unitValue = /Environment="CODEX_SQLITE_HOME=([^"]*)"/.exec(unit)?.[1];
-      expect(unitValue).toBeDefined();
-      expect(
-        isAbsolute(unitValue!) || posix.isAbsolute(unitValue!) || win32.isAbsolute(unitValue!),
-      ).toBe(true);
-      expect(unitValue!.endsWith("relative-sqlite-home")).toBe(true);
-    } finally {
-      if (inherited === undefined) delete process.env.CODEX_SQLITE_HOME;
-      else process.env.CODEX_SQLITE_HOME = inherited;
-    }
-  });
 });
 
 describe("service lifecycle cleanup ordering", () => {
@@ -2289,94 +1922,13 @@ describe("service lifecycle cleanup ordering", () => {
     ]);
   });
 
-  test("legacy systemd reports an absent unit without stopping cleanup or blocking install", async () => {
-    const commands: string[] = [];
-    const manager = systemdServiceInstallCleanupOps({
-      run: command => {
-        commands.push(command);
-        return "LoadState=not-found\n";
-      },
-    });
 
-    expect(manager.status()).toBeNull();
-    expect(commands).toEqual(["systemctl --user show -p LoadState opencodex-proxy"]);
-    expect(commands[0]).not.toContain("--value");
 
-    commands.length = 0;
-    let installed = false;
-    await installServiceSafely("scheduler", () => { installed = true; }, {
-      platform: "linux",
-      managerOps: () => manager,
-      stopTrackedProxy: async () => {},
-    });
 
-    expect(installed).toBe(true);
-    expect(commands).toEqual(["systemctl --user show -p LoadState opencodex-proxy"]);
-  });
 
-  test("legacy systemd still stops a loaded unit before installation", async () => {
-    const commands: string[] = [];
-    const manager = systemdServiceInstallCleanupOps({
-      run: command => {
-        commands.push(command);
-        return command.includes(" show ") ? "LoadState=loaded\n" : "";
-      },
-    });
-    let installed = false;
 
-    await installServiceSafely("scheduler", () => { installed = true; }, {
-      platform: "linux",
-      managerOps: () => manager,
-      stopTrackedProxy: async () => {},
-    });
 
-    expect(installed).toBe(true);
-    expect(commands).toEqual([
-      "systemctl --user show -p LoadState opencodex-proxy",
-      "systemctl --user stop opencodex-proxy",
-    ]);
-  });
 
-  test("legacy systemd status fails closed when LoadState is missing or empty", async () => {
-    for (const output of ["ActiveState=inactive\n", "LoadState=\n"]) {
-      const commands: string[] = [];
-      let installed = false;
-      const manager = systemdServiceInstallCleanupOps({
-        run: command => {
-          commands.push(command);
-          return output;
-        },
-      });
-
-      await expect(installServiceSafely("scheduler", () => { installed = true; }, {
-        platform: "linux",
-        managerOps: () => manager,
-        stopTrackedProxy: async () => {},
-      })).rejects.toThrow("systemd service status could not be verified");
-      expect(installed).toBe(false);
-      expect(commands).toEqual(["systemctl --user show -p LoadState opencodex-proxy"]);
-    }
-  });
-
-  test("legacy systemd uninstall stops and disables separately even when stop fails", () => {
-    const commands: string[] = [];
-
-    uninstallSystemd({
-      run: command => {
-        commands.push(command);
-        if (command.includes(" stop ")) throw new Error("not running");
-        return "";
-      },
-      unitExists: () => false,
-    });
-
-    expect(commands).toEqual([
-      "systemctl --user stop opencodex-proxy",
-      "systemctl --user disable opencodex-proxy",
-      "systemctl --user daemon-reload",
-    ]);
-    expect(commands.join(" ")).not.toContain("--now");
-  });
 
   test("service install fails closed before install on manager or standalone cleanup errors", async () => {
     for (const failure of ["status", "stop", "standalone"] as const) {
@@ -2769,7 +2321,6 @@ describe("service diagnostics", () => {
       // launchd never bakes a launcher anymore, so a recorded launcherPath on darwin can
       // only have come from an install that ran a mutable PATH shim with the service token
       // and proxy environment — stale whether or not the file it names still exists.
-      expect(bakedServicePathsDiagnostic("darwin")).toContain("STALE mutable launchd launcher");
       expect(bakedServicePathsDiagnostic("linux")).toBeNull();
 
       // A launcher that is itself gone is genuinely stale, and names the launcher.
@@ -2783,7 +2334,6 @@ describe("service diagnostics", () => {
         launcherPath: missingLauncher,
         backend: "scheduler",
       }), "utf8");
-      expect(bakedServicePathsDiagnostic("darwin")).toContain("STALE mutable launchd launcher");
       const diagnostic = bakedServicePathsDiagnostic("linux");
       expect(diagnostic).toContain("STALE baked paths");
       expect(diagnostic).toContain(missingLauncher);
@@ -3404,212 +2954,6 @@ describe("service repair", () => {
 });
 
 /**
- * `launchctl load` reports failure on stderr and exits 0 for an already-bootstrapped
- * job, so `sh()` (execSync — throws only on a non-zero exit) treated a load that did
- * nothing as success. launchd then kept running the PREVIOUS plist while a freshly
- * written one sat unused, which is the 2026-08-02 report: `ocx service` prints a
- * checkmark, `launchctl list` shows the job, and the port answers nothing.
- *
- * Measured on macOS 27.0:
- *   $ launchctl load -w ~/Library/LaunchAgents/com.opencodex.proxy.plist
- *   Load failed: 5: Input/output error
- *   $ echo $?
- *   0
- */
-describe("launchctl load verification", () => {
-  describe("launchctlLoadFailed", () => {
-    test("detects the legacy load failure that exits 0", () => {
-      expect(launchctlLoadFailed(
-        "Load failed: 5: Input/output error\nTry running `launchctl bootstrap` as root for richer errors.",
-      )).toBe(true);
-    });
-
-    test("detects a bootstrap failure", () => {
-      expect(launchctlLoadFailed("Bootstrap failed: 37: Operation already in progress")).toBe(true);
-    });
-
-    test("stays false for clean output", () => {
-      expect(launchctlLoadFailed("")).toBe(false);
-    });
-  });
-
-  describe("runLaunchctl", () => {
-    test("reports ok with trimmed stdout on a clean run", () => {
-      const out = runLaunchctl(["print", "gui/501/x"], {
-        run: (() => ({ status: 0, stdout: "  ok  ", stderr: "" })) as never,
-      });
-      // `status` is carried through now: a boolean cannot tell "no such service"
-      // (113) from "no such domain" (112), and only the first is an answer.
-      expect(out).toEqual({ ok: true, stdout: "ok", stderr: "", status: 0 });
-    });
-
-    /**
-     * The regression guard. `execFileSync` discards stderr when the child exits 0,
-     * so a runner built on it returns stderr:"" here and the whole fix silently
-     * no-ops on a real machine while its unit tests stay green.
-     */
-    test("surfaces stderr even when the child exits 0", () => {
-      const out = runLaunchctl(["load", "-w", "/x.plist"], {
-        run: (() => ({
-          status: 0,
-          stdout: "",
-          stderr: "Load failed: 5: Input/output error\nTry running `launchctl bootstrap` as root...",
-        })) as never,
-      });
-      expect(out.ok).toBe(true);
-      expect(launchctlLoadFailed(out.stderr)).toBe(true);
-    });
-
-    test("reports not-ok on a real non-zero exit (bootstrap)", () => {
-      const out = runLaunchctl(["bootstrap", "gui/501", "/x.plist"], {
-        run: (() => ({ status: 5, stdout: "", stderr: "Bootstrap failed: 5: Input/output error" })) as never,
-      });
-      expect(out.ok).toBe(false);
-      expect(launchctlLoadFailed(out.stderr)).toBe(true);
-    });
-
-    test("treats a spawn failure as not-ok rather than success", () => {
-      const out = runLaunchctl(["load", "-w", "/x.plist"], {
-        run: (() => ({ error: new Error("spawn /bin/launchctl ENOENT"), status: null, stdout: null, stderr: null })) as never,
-      });
-      expect(out.ok).toBe(false);
-      expect(out.stderr).toContain("ENOENT");
-    });
-  });
-
-  describe("launchdJobMatchesPlist", () => {
-    // Shape captured from a real `launchctl print gui/$(id -u)/com.opencodex.proxy`
-    // run on macOS 27.0: the arguments block is tab-indented one level, entries two.
-    const cmd = "exec '/pkg/bun' '/pkg/src/cli/index.ts' start --port 10100";
-    const printed = (command: string) => [
-      "\targuments = {",
-      "\t\t/bin/sh",
-      "\t\t-lc",
-      `\t\tif [ -f '/h/.opencodex/service-api-token' ]; then OPENCODEX_API_AUTH_TOKEN="$(cat '/h/.opencodex/service-api-token')"; export OPENCODEX_API_AUTH_TOKEN; fi; ${command}`,
-      "\t}",
-    ].join("\n");
-
-    test("reports matching when print shows the current arguments", () => {
-      expect(launchdJobMatchesPlist(cmd, {
-        run: () => ({ ok: true, stdout: printed(cmd), stderr: "" }),
-      })).toEqual({ loaded: true, matchesPlist: true });
-    });
-
-    test("reports loaded-but-stale when print shows different arguments", () => {
-      const old = "exec '/old/pkg/bun' '/old/pkg/src/cli/index.ts' start --port 10100";
-      expect(launchdJobMatchesPlist(cmd, {
-        run: () => ({ ok: true, stdout: printed(old), stderr: "" }),
-      })).toEqual({ loaded: true, matchesPlist: false });
-    });
-
-    test("reports not loaded when print fails", () => {
-      expect(launchdJobMatchesPlist(cmd, {
-        run: () => ({ ok: false, stdout: "", stderr: "Could not find service" }),
-      })).toEqual({ loaded: false, matchesPlist: false });
-    });
-  });
-
-
-  // #3464. start and status compare the live job against the command the plist SHOULD carry.
-  // A launcher install carries the launcher line, so the comparison must follow the recorded
-  // install state or every healthy launcher-backed service reads as "an OLDER plist".
-  describe("expectedLaunchdCommand follows the recorded launcher", () => {
-    const entry = { bun: "/opt/opencodex/versioned/bun", cli: "/opt/opencodex/versioned/src/cli/index.ts" };
-    const base = { version: 2 as const, codexHome: "/h/.codex", opencodexHome: "/h/.opencodex", backend: "scheduler" as const };
-
-    test("a recorded launcher yields the launcher exec line at the installed port", () => {
-      const command = expectedLaunchdCommand(14001, {
-        state: { ...base, bunPath: entry.bun, cliPath: entry.cli, launcherPath: "/home/u/.local/share/mise/shims/ocx" },
-        entry,
-      });
-      expect(command).toContain("exec '/home/u/.local/share/mise/shims/ocx' start --port 14001");
-      expect(command).not.toContain(entry.cli);
-    });
-
-    test("v1 / legacy state without a launcher yields the Bun + CLI pair", () => {
-      const command = expectedLaunchdCommand(14001, {
-        state: { version: 1, codexHome: "/h/.codex", opencodexHome: "/h/.opencodex", bunPath: entry.bun, cliPath: entry.cli },
-        entry,
-      });
-      expect(command).toContain(`exec '${entry.bun}' '${entry.cli}' start --port 14001`);
-    });
-
-    test("missing state falls back to the Bun + CLI pair and never re-walks PATH", () => {
-      const command = expectedLaunchdCommand(14001, { state: null, entry });
-      expect(command).toContain(`exec '${entry.bun}' '${entry.cli}' start --port 14001`);
-      expect(command).not.toContain("shims/ocx");
-    });
-  });
-
-  describe("startLaunchd", () => {
-    // A runLaunchctl RESULT, not a spawnSync result.
-    const failedLoad = () => ({ ok: true, stdout: "", stderr: "Load failed: 5: Input/output error" });
-    const cleanLoad = () => ({ ok: true, stdout: "", stderr: "" });
-    const readPlist = () => "<plist/>";
-
-    test("returns without consulting launchd when the load is clean", () => {
-      expect(() => startLaunchd({
-        launchctl: cleanLoad,
-        readPlist: () => { throw new Error("must not read a plist on a clean load"); },
-        matches: () => { throw new Error("must not be consulted on a clean load"); },
-      })).not.toThrow();
-    });
-
-    /**
-     * launchctl emits `Load failed` for EVERY already-bootstrapped job, including a
-     * correct one, so `ocx service start` on a healthy service hits it every time.
-     * An unconditional throw would break the most common benign invocation.
-     */
-    test("treats an already-loaded matching job as a no-op", () => {
-      const log = spyOn(console, "log").mockImplementation(() => {});
-      try {
-        expect(() => startLaunchd({
-          launchctl: failedLoad, readPlist,
-          matches: () => ({ loaded: true, matchesPlist: true }),
-        })).not.toThrow();
-      } finally {
-        log.mockRestore();
-      }
-    });
-
-    // not.toThrow() alone would still pass if the guard regressed; assert the branch.
-    test("says so when the job was already loaded from the current plist", () => {
-      const lines: string[] = [];
-      const log = spyOn(console, "log").mockImplementation(m => { lines.push(String(m)); });
-      try {
-        startLaunchd({ launchctl: failedLoad, readPlist, matches: () => ({ loaded: true, matchesPlist: true }) });
-      } finally {
-        log.mockRestore();
-      }
-      expect(lines.join("\n")).toContain("already loaded");
-    });
-
-    test("throws with the bootout hint when the loaded job is stale", () => {
-      expect(() => startLaunchd({
-        launchctl: failedLoad, readPlist,
-        matches: () => ({ loaded: true, matchesPlist: false }),
-      })).toThrow(/bootout/);
-    });
-
-    test("throws with the repair hint when no job is loaded", () => {
-      // The plist exists (this is an installed service) — reloading it is `repair`,
-      // not a re-registration.
-      expect(() => startLaunchd({
-        launchctl: failedLoad, readPlist,
-        matches: () => ({ loaded: false, matchesPlist: false }),
-      })).toThrow(/service repair/);
-    });
-  });
-
-  /**
-   * `installLaunchd` coverage lives in `tests/service/launchd-repair.test.ts`. It moved
-   * out of this file when the repair protocol grew a no-op pre-check, a plist backup and
-   * a rollback: those cases need an injected plist path (os.homedir() ignores HOME, so
-   * the suite sandbox does not move `~/Library/LaunchAgents`) and a full fixture per case.
-   */
-});
-
-/**
  * Registration is not service. `launchctl load` succeeding (or `systemctl enable`,
  * or `schtasks /run`) proves the manager accepted the job, not that the proxy bound
  * a port — so `install`/`start` printed a green checkmark for a service that never
@@ -3632,50 +2976,13 @@ describe("auth preflight retry command (260804 #970 follow-up)", () => {
 });
 
 describe("service serving confirmation", () => {
-  describe("launchdListenPort", () => {
-    test("reads the port baked into the plist, not the current config", () => {
-      expect(launchdListenPort({
-        readPlist: () => "<string>exec '/b' '/c' start --port 18222</string>",
-      })).toBe(18222);
-    });
-
-    // The command's own Bun/CLI paths precede the argument; a path containing the
-    // literal must not shadow it.
-    test("prefers the argument tail over a path that looks like one", () => {
-      expect(launchdListenPort({
-        readPlist: () => "<string>exec '/opt/start --port 9999/bun' '/c' start --port 18222</string>",
-      })).toBe(18222);
-    });
-
-    test("returns null when there is no port to read", () => {
-      expect(launchdListenPort({ readPlist: () => "<string>no port here</string>" })).toBeNull();
-    });
-
-    test("rejects out-of-range ports rather than probing them", () => {
-      expect(launchdListenPort({ readPlist: () => "<string>start --port 0</string>" })).toBeNull();
-      expect(launchdListenPort({ readPlist: () => "<string>start --port 70000</string>" })).toBeNull();
-    });
-
-    // Linux/Windows hit this on every call: plistPath() has nothing to read.
-    test("returns null when the plist cannot be read", () => {
-      expect(launchdListenPort({ readPlist: () => { throw new Error("ENOENT"); } })).toBeNull();
-    });
-  });
 
   describe("systemdListenPort", () => {
-    test("reads the port out of the unit's ExecStart line", () => {
-      expect(systemdListenPort({
-        readUnit: () => 'ExecStart="/bin/sh" -lc "exec \'/b\' \'/c\' start --port 18222"\n',
-      })).toBe(18222);
-    });
 
-    test("returns null when the unit cannot be read", () => {
-      expect(systemdListenPort({ readUnit: () => { throw new Error("ENOENT"); } })).toBeNull();
-    });
 
-    test("rejects out-of-range ports", () => {
-      expect(systemdListenPort({ readUnit: () => "ExecStart=... start --port 0\n" })).toBeNull();
-    });
+
+
+
   });
 
   describe("confirmServiceServing", () => {
@@ -3848,8 +3155,8 @@ describe("service serving confirmation", () => {
       startable: true,
       stale: false,
       conflict: false,
-      backend: "launchd",
-      summary: "installed and loaded (launchd)",
+      backend: "systemd",
+      summary: "installed and loaded (systemd)",
     });
 
     test("reports the serving port when a proxy answers", async () => {
@@ -3864,24 +3171,11 @@ describe("service serving confirmation", () => {
       const out = await serviceStatusReport({
         diagnose: installedDiag,
         serving: async () => ({ ok: false, port: 10100 }),
-        matchesPlist: () => ({ loaded: true, matchesPlist: true }),
       });
       expect(out).toContain("no proxy is answering on port 10100");
       // Registered but not serving: repair refreshes it without demanding elevation.
       expect(out).toContain("ocx service repair");
       expect(out).toContain("ocx start");
-    });
-
-    // The injected seam must win on every platform: the default is darwin-gated,
-    // the dep is not, so this case has to run on Linux and Windows CI too.
-    test("adds the bootout hint when launchd runs an older plist", async () => {
-      const out = await serviceStatusReport({
-        diagnose: installedDiag,
-        serving: async () => ({ ok: false, port: 10100 }),
-        matchesPlist: () => ({ loaded: true, matchesPlist: false }),
-      });
-      expect(out).toContain("OLDER plist");
-      expect(out).toContain("bootout");
     });
 
     test("reports not-installed without probing", async () => {
@@ -3901,48 +3195,22 @@ describe("service serving confirmation", () => {
    * start` would run the PREVIOUS ExecStart.
    */
   describe("systemdNeedsDaemonReload", () => {
-    test("detects a unit changed on disk", () => {
-      expect(systemdNeedsDaemonReload({ show: () => "NeedDaemonReload=yes" })).toBe(true);
-    });
 
-    test("is false when systemd is already in sync", () => {
-      expect(systemdNeedsDaemonReload({ show: () => "NeedDaemonReload=no" })).toBe(false);
-    });
+
+
 
     // No user bus, or not installed: never block a start we cannot judge.
-    test("is false when the query fails", () => {
-      expect(systemdNeedsDaemonReload({ show: () => { throw new Error("no bus"); } })).toBe(false);
-    });
+
   });
 
-  test("systemdListenPort reads the port out of a real generated unit", () => {
-    expect(systemdListenPort({ readUnit: () => buildUnit() })).toBe(resolveServiceListenPort());
-  });
+
 
   /**
    * The defect is an ORDERING property of startSystemd, and this host is macOS so the
    * systemd path cannot be executed. Pin the order in source instead — the same
    * instrument this file already uses for the adjacent install-ordering invariant.
    */
-  test("service start reloads and restarts systemd for a changed unit", async () => {
-    const service = await readText("src/service/systemd.ts");
-    const startSystemd = service.slice(
-      service.indexOf("function startSystemd()"),
-      service.indexOf("function stopSystemd()"),
-    );
 
-    const needsReloadAt = startSystemd.indexOf("systemdNeedsDaemonReload()");
-    const reloadAt = startSystemd.indexOf("systemctl --user daemon-reload");
-    const restartAt = startSystemd.indexOf("systemctl --user restart");
-    const startAt = startSystemd.indexOf("systemctl --user start");
-
-    expect(needsReloadAt).toBeGreaterThan(-1);
-    expect(needsReloadAt).toBeLessThan(reloadAt);
-    expect(reloadAt).toBeLessThan(restartAt);
-    // A changed unit must be RESTARTED, not started: `start` is a no-op on an active
-    // unit and would leave the stale process running the old ExecStart.
-    expect(restartAt).toBeLessThan(startAt);
-  });
 
   /**
    * Windows bakes the port into two different artifacts depending on backend: the
@@ -4030,11 +3298,10 @@ describe("service definitions are not world-readable", () => {
     // `mode` applies only on creation, so a reinstall would otherwise leave 0644 standing.
     const dir = mkdtempSync(join(tmpdir(), "ocx-service-mode-"));
     try {
-      const path = join(dir, "plist");
       writeFileSync(path, "stale", { encoding: "utf8", mode: 0o644 });
       expect(modeOf(path)).toBe("644");
 
-      writeServiceDefinitionFile(path, buildPlist(resolvedProxyEnv({})), "utf8");
+      writeServiceDefinitionFile(path, buildUnit(resolvedProxyEnv({})), "utf8");
 
       expect(modeOf(path)).toBe("600");
     } finally {
@@ -4060,31 +3327,11 @@ describe("service definitions are not world-readable", () => {
 // both fail closed. On Windows the POSIX mode bits are advisory, so a soft ACL failure can
 // leave a proxy password readable by other local principals.
 describe("credential-bearing definitions harden the Windows ACL strictly", () => {
-  test("a proxy URL with userinfo is treated as a secret publication", () => {
-    // `pw@chatgpt.com` is the repo's existing URL-userinfo fixture: the privacy scanner
-    // reads "pw@host" as an email otherwise, and this exact pair is already allowlisted for
-    // tests/ (scripts/privacy-scan.ts:102). The shape under test is the userinfo authority,
-    // not the particular credential.
-    const unit = buildUnit(resolvedProxyEnv({ HTTPS_PROXY: "https://user:pw@chatgpt.com:8080" }));
 
-    expect(definitionCarriesCredential(unit)).toBe(true);
-  });
 
-  test("a bare proxy URL is not a secret, so an icacls stall must not fail the install", () => {
-    // Before #2107 these files had no hardening at all; refusing an install over a stall
-    // would regress a user who has nothing to protect.
-    const unit = buildUnit(resolvedProxyEnv({ HTTP_PROXY: "http://127.0.0.1:7890", NO_PROXY: "localhost" }));
 
-    expect(definitionCarriesCredential(unit)).toBe(false);
-  });
 
-  test("lower-case spellings and the plist form are covered too", () => {
-    const plist = buildPlist(resolvedProxyEnv({ all_proxy: "socks5://u:p@127.0.0.1:1080" }));
 
-    expect(definitionCarriesCredential(plist)).toBe(true);
-  });
 
-  test("a definition with no proxy env at all carries no credential", () => {
-    expect(definitionCarriesCredential(buildUnit(resolvedProxyEnv({})))).toBe(false);
-  });
+
 });

@@ -31,7 +31,7 @@ describe("operator ultrafast survives the build and merge boundary", () => {
     buildCatalogEntriesFromObservedState({
       template: { slug: "gpt-5.5", service_tiers: [{ id: "priority", name: "Fast" }] },
       gptSlugs: [], goModels: [{ provider, id, supportsServiceTier }], wsEnabled: false,
-      multiAgentMode: "default", multiAgentV2Enabled: false, exactComboSlugs: new Set(),
+      multiAgentMode: "default", multiAgentV2Enabled: false,
       accountSelectors: [], suppressedBareNativeSlugs: new Set(), disabledNativeAccountSlugs: new Set(),
     });
   const merge = (catalogModels: RawEntry[], routedEntries = build(), extra: Partial<ObservedCatalogMergeInput> = {}) =>
@@ -39,8 +39,7 @@ describe("operator ultrafast survives the build and merge boundary", () => {
       catalogModels, routedEntries, baselineCatalogModels: [], baseline: new Map(), featured: [],
       wsEnabled: false, template: null, disabledModels: new Set(), selectedModelsByProvider: new Map(),
       gatheredProviderNames: new Set(["gateway"]), degradedProviderNames: new Set(),
-      legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false,
-      exactComboSlugs: new Set(), hasPhysicalComboProvider: false, includeNativeOpenAi: false,
+      legacyCustomModelSlugs: new Set(), multiAgentMode: "default", multiAgentV2Enabled: false, includeNativeOpenAi: false,
       accountBoundEntries: [], ultraFastTier: true,
       policy: { nativeBackfillSlugs: [], unsupportedNativeEntries: "drop", warningPolicy: "suppress" },
       ...extra,

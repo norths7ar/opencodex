@@ -88,10 +88,6 @@ import { KIRO_MODEL_CONTEXT_WINDOWS, normalizeKiroModelId } from "../providers/k
 import { kiroObservedContextWindow } from "../providers/kiro-model-catalog";
 import { DEVIN_MODEL_CONTEXT_WINDOWS } from "../adapters/devin/live-models";
 import { modelRecordValue } from "../reasoning-effort";
-import {
-  normalizePersistedJevDecision,
-  type PersistedJevDecisionV1,
-} from "../usage/jev-stats";
 import { generationWindowFields, recordGenerationEvent } from "./request-log-generation-window";
 import type { RequestMetricsRecorder } from "./request-metrics";
 import type {
@@ -184,8 +180,6 @@ export interface RequestLogContext extends UpstreamErrorDiagnostics {
   requestedAlias?: string;
   /** Original bare helper model when the opt-in shadow-call route rewrote this request. */
   shadowCallRewrittenFrom?: string;
-  /** Internal structural combo identity; omitted from RequestLogEntry/JSONL. */
-  comboId?: string;
   requestedEffort?: string;
   effectiveEffort?: string;
   reasoningWireField?: string;
@@ -278,8 +272,6 @@ export interface RequestLogContext extends UpstreamErrorDiagnostics {
   routeDecision?: RouteDecisionTraceV1;
   /** Full eligible provider/model membership from a policy route; never logged. */
   policyEligibility?: ReadonlySet<string>;
-  /** Privacy-bounded JEV selection metadata; downstream usage is recorded on attempts[]. */
-  jevDecision?: PersistedJevDecisionV1;
   /** Opt-in shadow evidence, normalized again at the logging boundary. */
   claudeCompatibility?: PersistedClaudeCompatibilityLog;
 }
@@ -399,8 +391,6 @@ export interface RequestLogEntry extends UpstreamErrorDiagnostics {
   terminalSource?: "upstream" | "synthetic";
   /** Bounded route-decision trace (RI-01); never contains secrets. */
   routeDecision?: RouteDecisionTraceV1;
-  /** Privacy-bounded JEV selection metadata; downstream usage is recorded on attempts[]. */
-  jevDecision?: PersistedJevDecisionV1;
   /** Closed Claude protocol codes; no request or header values. */
   claudeCompatibility?: PersistedClaudeCompatibilityLog;
   /**
@@ -480,7 +470,6 @@ export function requestLogEntryFromPersistedUsage(entry: PersistedUsageEntry): R
   const terminalStatus = asTerminalStatus(entry.terminalStatus);
   const closeReason = asCloseReason(entry.closeReason);
   const routeDecision = normalizeRouteDecisionTraceForLog(entry.routeDecision);
-  const jevDecision = normalizePersistedJevDecision(entry.jevDecision);
   const claudeCompatibility = normalizeClaudeCompatibilityUsageLog(entry.claudeCompatibility);
   const spend = normalizeRequestSpend(entry.spend);
   const protocolTrace = parseProtocolTraceV1(entry.protocolTrace);
@@ -542,7 +531,6 @@ export function requestLogEntryFromPersistedUsage(entry: PersistedUsageEntry): R
     ...(isKnownTransportPhase(entry.transportPhase) ? { transportPhase: entry.transportPhase } : {}),
     ...(isKnownTerminalSource(entry.terminalSource) ? { terminalSource: entry.terminalSource } : {}),
     ...(routeDecision ? { routeDecision } : {}),
-    ...(jevDecision ? { jevDecision } : {}),
     ...(claudeCompatibility ? { claudeCompatibility } : {}),
     ...(entry.conversationStateScrub === "account-change"
       ? { conversationStateScrub: "account-change" }
@@ -648,13 +636,11 @@ export function addRequestLog(entry: RequestLogEntry) {
   const shadowCallRewrittenFrom = sanitizeLogMetadataString(entry.shadowCallRewrittenFrom);
   const identity = modelIdentityLogFields(entry), servedModel = identity.servedModel;
   const claudeCompatibility = normalizeClaudeCompatibilityUsageLog(entry.claudeCompatibility);
-  const jevDecision = normalizePersistedJevDecision(entry.jevDecision);
   const attempts = normalizedAttempts(entry.attempts);
   const attemptsDropped = Array.isArray(entry.attempts) && attempts.length < entry.attempts.length;
   const retained: RequestLogEntry = shadowCallRewrittenFrom === entry.shadowCallRewrittenFrom
     && servedModel === entry.servedModel && identity.resolvedModel === entry.resolvedModel
     && entry.claudeCompatibility === undefined
-    && entry.jevDecision === undefined
     && !attemptsDropped
     ? entry
     : { ...entry, ...(entry.attemptNormalizationDropped === true || attemptsDropped ? { attemptNormalizationDropped: true } : {}),
@@ -663,8 +649,6 @@ export function addRequestLog(entry: RequestLogEntry) {
   if (retained !== entry) { if (!servedModel) delete retained.servedModel; if (!identity.resolvedModel) delete retained.resolvedModel; }
   if (claudeCompatibility) retained.claudeCompatibility = claudeCompatibility;
   else if (retained !== entry) delete retained.claudeCompatibility;
-  if (jevDecision) retained.jevDecision = jevDecision;
-  else if (retained !== entry) delete retained.jevDecision;
   entry = retained;
   retainRequestLogEntry(entry);
   for (const observer of requestLogObserversForTests) {
@@ -747,7 +731,6 @@ export function addRequestLog(entry: RequestLogEntry) {
       // usage.jsonl, which is the surface the derived failure projection reads.
       ...normalizeRequestFailureAttribution(entry),
       ...(entry.routeDecision ? { routeDecision: entry.routeDecision } : {}),
-      ...(entry.jevDecision ? { jevDecision: entry.jevDecision } : {}),
       ...(entry.claudeCompatibility ? { claudeCompatibility: entry.claudeCompatibility } : {}),
       ...(entry.protocolTrace ? { protocolTrace: entry.protocolTrace } : {}),
       ...(entry.conversationStateScrub === "account-change"
@@ -1507,11 +1490,10 @@ function writeFinalRequestLog(
     // it was written.
     ...(attempt.deliverySummary ? { deliverySummary: { ...attempt.deliverySummary } } : {}),
   }));
-  const isCombo = logCtx.comboId !== undefined && (attempts?.length ?? 0) > 0;
   // A key or account rotation splits the attempt and clears `logCtx.usage`, so a multi-attempt
   // request totals from its attempts, combo or not. One attempt keeps the request-level usage
   // (and its input estimate); a locally answered row sent nothing and keeps its own.
-  const aggregate = isCombo || ((attempts?.length ?? 0) > 1 && logCtx.localTerminalReason === undefined)
+  const aggregate = (attempts?.length ?? 0) > 1 && logCtx.localTerminalReason === undefined
     ? aggregateAttemptUsage(attempts ?? [])
     : null;
   const loggedUsage = aggregate?.usage ?? existing.usage;
@@ -1559,7 +1541,6 @@ function writeFinalRequestLog(
   // the in-memory /api/logs row matches what usage.jsonl already stores.
   const shadowCallRewrittenFrom = sanitizeLogMetadataString(logCtx.shadowCallRewrittenFrom);
   const claudeCompatibility = normalizeClaudeCompatibilityUsageLog(logCtx.claudeCompatibility);
-  const jevDecision = normalizePersistedJevDecision(logCtx.jevDecision);
   // Keyed by the live attempt objects, not the detached copies above.
   const protocolTrace = protocolTraceForRequest(logCtx, logCtx.attempts);
   // Projected before any writer (an injected one too): the row keeps only proxy-owned error facts.
@@ -1567,8 +1548,8 @@ function writeFinalRequestLog(
     requestId,
     ...(isLogicalRequestId(logicalRequestId) ? { logicalRequestId } : {}),
     timestamp: start,
-    model: isCombo ? logCtx.requestedModel! : logCtx.model,
-    provider: isCombo ? "combo" : logCtx.provider,
+    model: logCtx.model,
+    provider: logCtx.provider,
     client: normalizeRecordedClient(logCtx.client) ?? "unknown",
     ...(logCtx.surface ? { surface: logCtx.surface } : {}),
     ...(logCtx.apiKeyId ? { apiKeyId: logCtx.apiKeyId } : {}),
@@ -1626,7 +1607,6 @@ function writeFinalRequestLog(
     ...(logCtx.transportPhase ? { transportPhase: logCtx.transportPhase } : {}),
     ...(logCtx.terminalSource ? { terminalSource: logCtx.terminalSource } : {}),
     ...(logCtx.routeDecision ? { routeDecision: logCtx.routeDecision } : {}),
-    ...(jevDecision ? { jevDecision } : {}),
     ...(claudeCompatibility ? { claudeCompatibility } : {}),
     ...(protocolTrace ? { protocolTrace } : {}),
     ...attribution,

@@ -14,8 +14,6 @@ import { parseRequest } from "../../src/responses/parser";
 import { routeModel } from "../../src/router";
 import { applyFinalRouteRequestNormalization } from "../../src/server/responses/core-normalize";
 import { handleNativeMessages } from "../../src/server/messages-native";
-import { executeComboResponses } from "../../src/server/responses/core-combo";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { createTranslatorBudget } from "../../src/lib/translator-budget";
 import { saveConfig } from "../../src/config";
 import { flushConfigDirHardeningForTests } from "../../src/config/paths";
@@ -282,48 +280,4 @@ test("restart keeps configured canonical history self-bound without persisted me
   ledger.reconfigure(policy());
   expect(ledger.snapshot("pool", "Q")?.settled ?? 0).toBe(0);
   expect(disk.lines.some(line => JSON.parse(line).poolContinuity !== undefined)).toBe(false);
-});
-
-test("combo A to B preserves exact current permit exclusion", async () => {
-  const config: OcxConfig = { port: 0, defaultProvider: "A", providers: {
-    A: { adapter: "openai-chat", apiKey: "fixture-a", baseUrl: "https://a.example.test/v1" },
-    B: { adapter: "openai-chat", apiKey: "fixture-b", baseUrl: "https://b.example.test/v1" },
-  }, combos: { spend: { strategy: "failover", targets: [{ provider: "A", model: "m" }, { provider: "B", model: "m" }] } } };
-  const disk = journal();
-  const ledger = createSpendReservationLedger({ journal: disk, salt,
-    policy: { ...policy({ [pool("A")]: "A", [pool("B")]: "B" }, 10), canonicalProviderIds: ["A", "B"] } });
-  const ctx = log("stale");
-  const tracker = createRequestSpendTracker(ctx, undefined, ledger);
-  const budget = createRequestExecutionBudget(undefined, "combo-contract-c", tracker);
-  const translatorBudget = createTranslatorBudget();
-  clearComboSelectionState(); clearComboTargetCooldowns();
-  const visited: string[] = [];
-  try {
-    const body = { model: "combo/spend", input: [], max_output_tokens: 10 };
-    const result = await executeComboResponses(new Request("http://localhost/v1/responses", {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
-    }), body, "spend", config, ctx, { sendBudget: budget, translatorBudget }, {
-      handleResponses: async (_req, _config, child, options) => {
-        const provider = ctx.spendPoolId!;
-        visited.push(provider);
-        const proof = claimDispatchSpendProof(options!.sendBudget!, options!.comboDispatchPermit);
-        expect(proof).toBeDefined();
-        expect(workflowSpendCeilingReached(undefined, ledger, provider, proof)).toBeUndefined();
-        expect(ledger.snapshot("pool", provider)?.reserved).toBe(10);
-        if (provider === "B") expect(workflowSpendCeilingReached(undefined, ledger, "A", proof)?.scope).toBe("pool");
-        const report = createPhysicalSendReporter(options!.sendBudget!, () => ({ poolId: provider }), options!.comboDispatchPermit);
-        expect(report.beforeSend?.()).toBe(true);
-        report(1); report.close?.();
-        return provider === "A" ? Response.json({ error: { message: "fixture outage" } }, { status: 503 })
-          : Response.json({ id: "fixture", output: [] });
-      },
-      handleComboResponses: async () => { throw new Error("unexpected nested combo"); },
-    });
-    expect(result.status).toBe(200);
-    expect(visited).toEqual(["A", "B"]);
-    tracker.settle({ inputTokens: 10, outputTokens: 0 });
-    expect(ledger.snapshot("pool", "A")).toMatchObject({ unresolved: 10, reserved: 0 });
-    expect(ledger.snapshot("pool", "B")).toMatchObject({ settled: 10, reserved: 0 });
-    expect(disk.lines.some(line => JSON.parse(line).poolContinuity !== undefined)).toBe(false);
-  } finally { translatorBudget.dispose(); clearComboSelectionState(); clearComboTargetCooldowns(); }
 });

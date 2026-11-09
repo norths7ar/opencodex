@@ -57,11 +57,10 @@ import type { OcxClaudeCodeConfig, OcxClaudeDesktopProfile, OcxConfig, OcxCustom
 import type { DesktopProfileModel } from "../../claude/desktop-profile";
 import { drainAndShutdown } from "../lifecycle";
 import { filterRequestLogs, getRequestLogEntries, type RequestLogEntry } from "../request-log";
-import { estimateComboCost, estimateRequestCost, serviceTierContext, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
+import { estimateAttemptsCost, estimateRequestCost, serviceTierContext, normalizeCostTokens, tokensPerSecond } from "../../usage/cost";
 import type { PersistedUsageAttempt } from "../../usage/log";
 import { usageModelPriceOptions } from "../../usage/model-identity";
 import { isAllowedRequestOrigin, jsonResponse, providerManagementConfigError, publicProviderBaseUrl, safeConfigDTO } from "../auth-cors";
-import { applySystemEnvToggle } from "../system-env";
 
 
 export function isPlainRecord(v: unknown): v is Record<string, unknown> {
@@ -205,7 +204,7 @@ export function unavailableCostReason(entry: MetricSource): MetricUnavailableRea
 export function costResult(entry: MetricSource): CostResult {
   const tier = serviceTierContext(entry);
   const estimate = entry.attempts?.length
-    ? estimateComboCost(entry.attempts.map(attempt => ({ ...attempt, ...usageModelPriceOptions(entry, attempt) })), undefined, tier)
+    ? estimateAttemptsCost(entry.attempts.map(attempt => ({ ...attempt, ...usageModelPriceOptions(entry, attempt) })), undefined, tier)
     : estimateRequestCost({ provider: entry.provider, model: entry.model, usage: entry.usage, usageStatus: entry.usageStatus, serviceTier: tier, ...usageModelPriceOptions(entry, entry) });
   if (!estimate) return { kind: "unavailable", reason: unavailableCostReason(entry) };
   const estimateReasons = [

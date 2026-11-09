@@ -1,4 +1,4 @@
-import { comboFailureEvidence } from "../../src/lib/client-error-body";
+import { upstreamFailureEvidence } from "../../src/lib/client-error-body";
 import { expect, test } from "bun:test";
 import { saveConfig } from "../../src/config";
 import { handleClaudeMessages } from "../../src/server/claude-messages";
@@ -37,7 +37,7 @@ for (const native of [false, true]) for (const folded of [false, true]) for (con
       const response = await handleClaudeMessages(new Request("http://localhost/v1/messages", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ model: "fixture/wire-model", stream: false, max_tokens: 16, messages: [{ role: "user", content: "fixture" }] }) }), config, ctx);
       const text = await response.text();
       if (!folded) {
-        const evidence = comboFailureEvidence(response);
+        const evidence = upstreamFailureEvidence(response);
         expect(evidence).toBeDefined();
         expect(Object.keys(JSON.parse(evidence!)).sort()).toEqual(["error", "type"]);
         if (native) expect(Object.hasOwn(JSON.parse(evidence!).error, "code")).toBe(false);

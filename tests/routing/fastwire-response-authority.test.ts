@@ -7,7 +7,7 @@ import { parseProviderEditorConfigDTO, providerEditorConfigDTO } from "../../src
 import { addFinalRequestLog, type RequestLogContext, type RequestLogEntry } from "../../src/server/request-log";
 import { handleResponses } from "../../src/server/responses/core";
 import type { OcxConfig, OcxProviderConfig } from "../../src/types";
-import { estimateComboCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
+import { estimateAttemptsCost, serviceTierContextFromOutcome } from "../../src/usage/cost";
 import { normalizeUsageEntryForTest } from "../../src/usage/log";
 import { acquireOwnedSpendHome } from "../helpers/owned-spend-home";
 
@@ -196,7 +196,7 @@ describe("non-authoritative tier cost provenance", () => {
     }, { kind: "set", value: "priority" }, "service-tier", "priority")!;
     tracker.observeResponseServiceTier(responseTier);
     expect(serviceTierContextFromOutcome(tracker.outcome)).toEqual({ requestedServiceTier: "priority" });
-    const estimate = estimateComboCost([{
+    const estimate = estimateAttemptsCost([{
       ordinal: 1, provider: "openai", model: "gpt-5.6-sol", usageStatus: "reported",
       usage: { inputTokens: 200_000, outputTokens: 20_000 }, tierOutcome: tracker.outcome,
     }], [{

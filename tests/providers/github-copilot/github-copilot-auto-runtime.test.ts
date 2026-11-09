@@ -20,8 +20,6 @@ import { createRequestSpendTracker } from "../../../src/server/responses/request
 import { createInferenceSendBudget } from "../../../src/server/inference/context";
 import { spendTestJournal, spendTestPolicy, testSpendSalt } from "../../helpers/shipped-spend-ledger";
 import { isNonReplayableResponse } from "../../../src/lib/upstream-retry";
-import { clearComboSelectionState } from "../../../src/combos/resolve";
-import { clearComboTargetCooldowns, isComboTargetInCooldown } from "../../../src/combos/failover";
 import { clearFallbackEventsForTests, recentFallbackEvents } from "../../../src/routing/fallback-policy";
 import { closeRequestHistoryIndex } from "../../../src/routing/history/indexer";
 import { clearResponseStateForTests, flushResponseState } from "../../../src/responses/state";
@@ -37,8 +35,6 @@ beforeEach(() => {
   process.env.OPENCODEX_HOME = home;
   clearCopilotAutoModelsForTests();
   clearGenericFailoverHealth();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   clearResponseStateForTests();
   release = acquireOwnedSpendHome();
 });
@@ -56,8 +52,6 @@ afterEach(async () => {
     closeRequestHistoryIndex();
     clearResponseStateForTests();
     clearGenericFailoverHealth();
-    clearComboSelectionState();
-    clearComboTargetCooldowns();
     if (previousHome === undefined) delete process.env.OPENCODEX_HOME;
     else process.env.OPENCODEX_HOME = previousHome;
   }
@@ -208,59 +202,6 @@ describe("Copilot Auto through the Responses pipeline", () => {
     expect(log.model).toBe("gpt-5.4");
     expect(log.activeAttempt?.model).not.toBe("gpt-4o");
   });
-  test.each([["combo", false, false], ["policy", false, false], ["combo", true, false], ["policy", true, false],
-    ["combo", true, true], ["policy", true, true]] as const)(
-    "mandatory tool choice negotiates a %s child and hops its local refusal (mid-dispatch=%s translated=%s)", async (mode, midDispatch, translated) => {
-    const { a, b } = await accounts();
-    if (midDispatch) await setActiveAccount("github-copilot", translated ? a : b);
-    const f = fixture(midDispatch ? { chatOnly: translated,
-      advanceAfterIntent: async () => { await setActiveAccount("github-copilot", translated ? b : a); } } : {});
-    if (translated) f.config.providers["github-copilot"]!.autoToolChoiceOnlyModels = ["gpt-5.4"];
-    const choice = translated ? { type: "function", name: "lookup" } : { type: "mcp", server_label: "remote", name: "shell" };
-    const mcp = { type: "mcp", server_label: "remote", server_url: "https://mcp.example.test", require_approval: "never" };
-    const tools = translated ? [{ type: "function", name: "lookup", parameters: { type: "object", properties: {} } }] : [mcp];
-    const fallbackBodies: any[] = [];
-    const output = translated ? [{ id: "call_fixture", type: "function_call", status: "completed", call_id: "lookup_fixture", name: "lookup", arguments: "{}" }]
-      : [{ id: "mcp_fixture", type: "mcp_call", status: "completed", server_label: "remote", name: "shell", arguments: "{}", output: "done" }];
-    f.config.providers.fallback = { adapter: "openai-responses", authMode: "key", apiKey: "fixture",
-      baseUrl: "https://fallback.example.test/v1", fetch: async (_url, init) => {
-        fallbackBodies.push(JSON.parse(String(init?.body)));
-        return Response.json({ id: "resp_fallback", object: "response", status: "completed", model: "fallback-model", output });
-      } };
-    f.config.combos = { mandatoryAuto: { strategy: "failover", targets: [
-      { provider: "github-copilot", model: "auto" }, { provider: "fallback", model: "fallback-model" },
-    ] } };
-    f.config.routingProfiles = { mandatoryAuto: { candidates: [
-      { provider: "github-copilot", model: "auto" }, { provider: "fallback", model: "fallback-model" },
-    ] } };
-    const log: RequestLogContext = {};
-    const spendTargets: Array<{ poolId?: string; identityId?: string }> = [];
-    const budget = mode === "policy" ? createRequestExecutionBudget(undefined, undefined, {
-      startRequest: target => { spendTargets.push({ ...target }); }, charge: () => true, refund: () => {},
-    }) : undefined;
-    const response = await handleResponses(request("hello", false, {
-      model: `${mode}/mandatoryAuto`, tool_choice: choice, tools,
-    }), f.config, log, { sendBudget: budget });
-    const body = await response.json();
-    expect(response.status).toBe(200); expect(body.output).toEqual(output);
-    expect(f.sent.some(call => call.path === "/models/session/intent")).toBe(true);
-    if (midDispatch) expect(f.sent.filter(call => call.path === "/models/session/intent").map(call => call.host))
-      .toEqual(translated ? ["a.githubcopilot.com", "b.githubcopilot.com"] : ["b.githubcopilot.com", "a.githubcopilot.com"]);
-    expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(0);
-    expect(fallbackBodies).toHaveLength(1); expect(fallbackBodies[0].tool_choice).toEqual(choice);
-    expect(fallbackBodies[0].tools).toEqual(tools); expect(log.provider).toBe(mode === "combo" ? "combo" : "fallback");
-    // The generic key route keeps its existing pre-key-commit identity, never Copilot's candidate.
-    if (mode === "policy") expect(spendTargets.at(-1)).toEqual({ poolId: "fallback", identityId: undefined });
-    if (mode === "combo") {
-      expect(isComboTargetInCooldown("mandatoryAuto", { provider: "github-copilot", model: "auto" })).toBe(false);
-      clearComboSelectionState(); // Reset selection history, retaining any real target cooldown.
-      const compatible = await handleResponses(request("hello", true, { model: "combo/mandatoryAuto" }), f.config, {});
-      expect(compatible.status).toBe(200);
-      await compatible.text();
-      expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(1);
-      expect(fallbackBodies).toHaveLength(1);
-    }
-  });
   test("policy fallback treats a post-send renegotiation refusal as a taken hop", async () => {
     // The Copilot child sends once, takes a 401, refreshes its OAuth credential, and only THEN
     // learns the renewed negotiation settled on a Chat wire that cannot preserve tool_choice.
@@ -309,71 +250,6 @@ describe("Copilot Auto through the Responses pipeline", () => {
       tool_choice: "required", tools: [{ type: "computer_use" }],
     }), f.config, {});
     expect(response.status, await response.text()).toBe(400);
-    expect(f.sent.filter(call => call.path === "/models/session/intent")).toHaveLength(1);
-    expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(0);
-  });
-  test("a denied combo send reservation retains the local refusal instead of claiming target exhaustion", async () => {
-    await accounts();
-    let reservations = 0;
-    const budget = createRequestExecutionBudget(undefined, undefined, {
-      charge: () => ++reservations === 1, refund: () => {},
-    });
-    const f = fixture();
-    let fallbackCalls = 0;
-    f.config.providers.fallback = { adapter: "openai-responses", authMode: "key", apiKey: "fixture",
-      baseUrl: "https://fallback.example.test/v1", fetch: async () => { fallbackCalls++; return Response.json({ status: "completed", output: [] }); } };
-    f.config.combos = { mandatoryAuto: { strategy: "failover", targets: [
-      { provider: "github-copilot", model: "auto" }, { provider: "fallback", model: "fallback-model" },
-    ] } };
-    const response = await handleResponses(request("hello", false, {
-      model: "combo/mandatoryAuto", tool_choice: { type: "mcp", server_label: "remote", name: "shell" },
-      tools: [{ type: "mcp", server_label: "remote", server_url: "https://mcp.example.test" }],
-    }), f.config, {}, { sendBudget: budget });
-    expect(response.status).toBe(409);
-    expect(await response.text()).not.toContain("cannot preserve mandatory tool_choice");
-    expect(fallbackCalls).toBe(0);
-    expect(reservations).toBe(2);
-    expect(budget.used).toBe(0);
-    expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(0);
-  });
-  test.each(["combo", "policy"] as const)("%s exhaustion identifies mandatory tool incompatibility without inference", async mode => {
-    await accounts();
-    const f = fixture();
-    const targets = [{ provider: "github-copilot", model: "auto" }];
-    f.config.combos = { mandatoryAuto: { strategy: "failover", targets } };
-    f.config.routingProfiles = { mandatoryAuto: { candidates: targets } };
-    const response = await handleResponses(request("hello", false, {
-      model: `${mode}/mandatoryAuto`, tool_choice: { type: "mcp", server_label: "remote", name: "shell" },
-      tools: [{ type: "mcp", server_label: "remote", server_url: "https://mcp.example.test" }],
-    }), f.config, {});
-    const body = await response.json();
-    expect(response.status).toBe(mode === "combo" ? 503 : 400);
-    expect(body.error.message).toContain("mandatory tool_choice");
-    expect(f.sent.filter(call => call.path === "/models/session/intent")).toHaveLength(1);
-    expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(0);
-    expect(isComboTargetInCooldown("mandatoryAuto", targets[0]!)).toBe(false);
-  });
-  test.each([["combo", false], ["combo", true], ["policy", false], ["policy", true]] as const)(
-    "%s mixed exhaustion does not claim all targets refused tools (upstream-first=%s)", async (mode, upstreamFirst) => {
-    await accounts();
-    const f = fixture();
-    let fallbackCalls = 0;
-    f.config.providers.fallback = { adapter: "openai-responses", authMode: "key", apiKey: "fixture",
-      baseUrl: "https://fallback.example.test/v1", transientRetryOn5xx: { attempts: 1 }, fetch: async () => {
-        fallbackCalls++;
-        return Response.json({ error: { type: "upstream_error", message: "synthetic failure" } }, { status: 500 });
-      } };
-    const targets = [{ provider: "github-copilot", model: "auto" }, { provider: "fallback", model: "fallback-model" }];
-    if (upstreamFirst) targets.reverse();
-    f.config.combos = { mandatoryAuto: { strategy: "failover", targets } };
-    f.config.routingProfiles = { mandatoryAuto: { candidates: targets } };
-    const response = await handleResponses(request("hello", false, {
-      model: `${mode}/mandatoryAuto`, tool_choice: { type: "mcp", server_label: "remote", name: "shell" },
-      tools: [{ type: "mcp", server_label: "remote", server_url: "https://mcp.example.test" }],
-    }), f.config, {});
-    expect(response.status).toBe(mode === "combo" && upstreamFirst ? 409 : 500);
-    expect(await response.text()).not.toContain("cannot preserve mandatory tool_choice");
-    expect(fallbackCalls).toBe(1);
     expect(f.sent.filter(call => call.path === "/models/session/intent")).toHaveLength(1);
     expect(f.sent.filter(call => ["/chat/completions", "/responses"].includes(call.path))).toHaveLength(0);
   });
@@ -1077,40 +953,6 @@ describe("Copilot Auto through the Responses pipeline", () => {
     expect(text).not.toContain("gpt-5.4");
     expect(sent.filter(call => ["/chat/completions", "/responses"].includes(call.path)).map(call => call.body.model))
       .toEqual(["gpt-4o"]);
-  });
-  test("a local Auto scope refusal cannot hop to an otherwise allowed combo target", async () => {
-    await accounts();
-    const { config } = fixture();
-    let fallbackSends = 0;
-    config.providers.fallback = {
-      adapter: "openai-chat", authMode: "key", apiKey: "synthetic-fallback-key",
-      baseUrl: "https://fallback.invalid/v1", models: ["allowed"],
-      fetch: (async () => {
-        fallbackSends++;
-        return Response.json({
-          id: "fallback-fixture", model: "allowed",
-          choices: [{ message: { role: "assistant", content: "unexpected fallback" }, finish_reason: "stop" }],
-        });
-      }) as typeof fetch,
-    };
-    config.combos = {
-      scopedAuto: {
-        strategy: "failover",
-        targets: [{ provider: "github-copilot", model: "auto" }, { provider: "fallback", model: "allowed" }],
-      },
-    };
-    const admission = scopedAdmission(config, ["github-copilot/auto", "fallback/allowed"]);
-    const req = new Request("http://localhost/v1/responses", {
-      method: "POST", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ model: "combo/scopedAuto", stream: false, input: "hello" }),
-    });
-    const response = await handleResponses(req, config, { model: "", provider: "" }, { admission });
-    expect(response.status).toBe(403);
-    expect(isNonReplayableResponse(response)).toBe(true);
-    // The combo boundary keeps the stable scope envelope instead of rewrapping it as upstream_error.
-    const { error } = await response.json() as { error: { type: string; model: string } };
-    expect(error.type).toBe("model_not_allowed_for_key");
-    expect(fallbackSends).toBe(0);
   });
   test("terminal continuation emits the scope refusal without a replacement inference", async () => {
     const { b } = await accounts();

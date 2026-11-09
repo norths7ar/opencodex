@@ -13,7 +13,6 @@ import {
 export type GuiSessionIssuance =
   | "loopback"
   | "remembered-admin"
-  | "tailscale-identity"
   | "pairing";
 
 export interface GuiSessionRecord {
@@ -41,9 +40,7 @@ export interface GuiPairingGrantRecord {
 }
 
 export interface PairingAttemptContext {
-  ingress: "public" | "hub-management";
   peerAddress: string | null;
-  tailscaleUser: string | null;
   browserOrigin: string;
 }
 
@@ -58,7 +55,6 @@ export interface GuiSessionState {
 }
 
 export interface GuiSessionRequestContext {
-  trustedTailscaleIngress: boolean;
   now?: number;
 }
 
@@ -93,26 +89,6 @@ function equalSecret(actual: string, expected: string): boolean {
   const left = encoder.encode(actual);
   const right = encoder.encode(expected);
   return left.length === right.length && timingSafeEqual(left, right);
-}
-
-function canonicalHttpOrigin(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
-    if (parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) return null;
-    return parsed.origin;
-  } catch {
-    return null;
-  }
-}
-
-export function isRemoteGuiBrowserOriginAllowed(browserOrigin: string, config: OcxConfig): boolean {
-  const canonical = canonicalGuiBrowserOrigin(browserOrigin);
-  if (!canonical || canonical !== browserOrigin) return false;
-  const publicOrigin = canonicalHttpOrigin(config.hub?.managementPublicOrigin);
-  if (publicOrigin === canonical) return true;
-  return (config.corsAllowOrigins ?? []).some(value => canonicalGuiBrowserOrigin(value) === canonical);
 }
 
 function pruneExpired(state: GuiSessionState, now: number): void {
@@ -166,17 +142,11 @@ export function mintSession(
   };
 }
 
-function tailscaleLoginAllowed(req: Request, config: OcxConfig): boolean {
-  const login = req.headers.get("Tailscale-User-Login");
-  if (!login) return false;
-  return (config.remoteGui?.allowedTailscaleUsers ?? []).some(user => user === login);
-}
-
 export function issueGuiSession(
   req: Request,
   config: OcxConfig,
   state: GuiSessionState,
-  context: GuiSessionRequestContext = { trustedTailscaleIngress: false },
+  context: GuiSessionRequestContext = {},
 ): GuiSessionBootstrap | null {
   if (req.method !== "GET") return null;
   const host = parseHttpHost(req.headers.get("Host"));
@@ -189,17 +159,7 @@ export function issueGuiSession(
     return origin ? mintSession(origin, origin, "loopback", state, now) : null;
   }
 
-  if (
-    config.runtimeRole !== "hub"
-    || !context.trustedTailscaleIngress
-    || !tailscaleLoginAllowed(req, config)
-    || !isAllowedManagementOrigin(req, config)
-  ) return null;
-  const serverOrigin = managementRequestOrigin(req, config);
-  if (!serverOrigin || new URL(serverOrigin).protocol !== "https:") return null;
-  const browserOrigin = canonicalGuiBrowserOrigin(req.headers.get("Origin") ?? serverOrigin);
-  if (!browserOrigin || !isRemoteGuiBrowserOriginAllowed(browserOrigin, config)) return null;
-  return mintSession(serverOrigin, browserOrigin, "tailscale-identity", state, now);
+  return null;
 }
 
 function pairingGrantDigest(grant: string): string {
@@ -207,11 +167,7 @@ function pairingGrantDigest(grant: string): string {
 }
 
 function pairingSourceKey(context: PairingAttemptContext): string {
-  const identity = context.ingress === "hub-management" && context.tailscaleUser
-    ? `tailscale:${context.tailscaleUser}`
-    : context.peerAddress
-      ? `peer:${context.peerAddress}`
-      : "anonymous";
+  const identity = context.peerAddress ? "peer:" + context.peerAddress : "anonymous";
   return createHash("sha256").update(identity).digest("base64url");
 }
 
@@ -267,17 +223,10 @@ export function createGuiPairingGrant(
   now = Date.now(),
 ): { grant: string; browserOrigin: string; serverOrigin: string; expiresAt: number } {
   const canonicalBrowserOrigin = canonicalGuiBrowserOrigin(browserOrigin);
-  const localOrigin = standaloneGuiPairingOrigin(config);
-  const localPairing = localOrigin !== null && canonicalBrowserOrigin === localOrigin;
-  const serverOrigin = config.runtimeRole === "hub"
-    ? canonicalHttpOrigin(config.hub?.managementPublicOrigin) : localOrigin;
-  if (
-    !canonicalBrowserOrigin
-    || canonicalBrowserOrigin !== browserOrigin
-    || !serverOrigin
-    || (config.runtimeRole === "hub"
-      ? !isRemoteGuiBrowserOriginAllowed(canonicalBrowserOrigin, config) : !localPairing)
-  ) throw new TypeError("remote GUI origin is not allowed");
+  const serverOrigin = standaloneGuiPairingOrigin(config);
+  if (!serverOrigin || canonicalBrowserOrigin !== browserOrigin || browserOrigin !== serverOrigin) {
+    throw new TypeError("GUI pairing requires the configured loopback origin");
+  }
   pruneExpired(state, now);
   consumeGrantRateSlot(state, now);
   if (state.pairingGrants.size >= GUI_PAIRING_GRANT_LIMIT) throw new GuiPairingGrantRateLimitError();
@@ -289,7 +238,7 @@ export function createGuiPairingGrant(
   } while (state.pairingGrants.has(digest));
   const expiresAt = now + GUI_PAIRING_GRANT_TTL_MS;
   state.pairingGrants.set(digest, { browserOrigin: canonicalBrowserOrigin, serverOrigin, expiresAt,
-    ...(localPairing ? { localPairing: true as const } : {}) });
+    localPairing: true });
   return { grant, browserOrigin: canonicalBrowserOrigin, serverOrigin, expiresAt };
 }
 
@@ -330,47 +279,24 @@ export function consumeGuiPairingGrant(
   attemptContext?: PairingAttemptContext,
 ): GuiSessionBootstrap | PairingAttemptRefusal | null {
   const localOrigin = standaloneGuiPairingOrigin(config);
-  if (req.method !== "POST" || hasAlternateCredential(req) || (config.runtimeRole !== "hub" && !localOrigin)) return null;
-  // Scheme check FIRST, before the grant is parsed or looked up.
-  //
-  // A grant is single-use, so consuming one and then refusing to mint would burn the
-  // operator's code on a request that was never going to succeed — an unauthenticated
-  // caller could strip TLS termination and spend every code the operator prints. Refusing
-  // here leaves the grant intact for a later request over a scheme that can carry it.
-  //
-  // There is no opt-in for plaintext. An earlier revision allowed non-loopback HTTP when
-  // `remoteGui.allowInsecureHttp` was true; a reusable grant on plaintext HTTP is readable
-  // by anything on the path and the session it mints is reusable, so the flag recorded a
-  // risk the operator could not bound rather than controlling one.
+  if (req.method !== "POST" || hasAlternateCredential(req) || !localOrigin) return null;
   const destination = managementRequestOrigin(req, config);
-  if (!destination || !isPairingTransportPermitted(destination)) return null;
   const grant = strictPairingGrantBody(body);
   const browserOrigin = canonicalGuiBrowserOrigin(req.headers.get("Origin"));
   if (!grant || !browserOrigin) return null;
-  // Unlike the hub path, standalone redemption never accepts a proxy-origin claim:
-  // both origins must be the configured loopback origin and the kernel peer must be local.
-  if (localOrigin && (destination !== localOrigin || browserOrigin !== localOrigin
-    || attemptContext?.ingress !== "public"
-    || !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(attemptContext.peerAddress ?? ""))) return null;
-  const context = attemptContext ?? {
-    ingress: "public",
-    peerAddress: null,
-    tailscaleUser: null,
-    browserOrigin,
-  };
+  // Both origins must match the configured loopback address, and the kernel peer must be local.
+  if (destination !== localOrigin || browserOrigin !== localOrigin || !attemptContext
+    || !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(attemptContext.peerAddress ?? "")) return null;
+  const context = attemptContext;
   // Source throttling is only a cost bound for invalid guesses. Look up the grant
   // first so callers sharing a proxy address cannot lock out a valid redemption.
   const found = findPairingGrant(grant, state);
   if (!found) {
-    // Cross-origin browser requests must not create limiter state as a side effect.
-    if (localOrigin ? browserOrigin !== localOrigin : !isRemoteGuiBrowserOriginAllowed(browserOrigin, config)) return null;
     const source = recordSourceFailure(state, context, now);
     return attemptContext && !source.allowed ? source : null;
   }
   const [digest, record] = found;
-  // A live role/config change must not turn a hub grant into local operator consent, or vice versa.
-  if (record.localPairing ? !localOrigin || record.serverOrigin !== localOrigin
-    : config.runtimeRole !== "hub") return null;
+  if (record.serverOrigin !== localOrigin) return null;
   if (record.expiresAt <= now) {
     state.pairingGrants.delete(digest);
     return null;
@@ -384,31 +310,8 @@ export function consumeGuiPairingGrant(
     }
     return attemptContext && !source.allowed ? source : null;
   }
-  const serverOrigin = managementRequestOrigin(req, config);
-  if (serverOrigin !== record.serverOrigin) return null;
-  // Re-checked against the grant's own recorded origin rather than only the request's:
-  // the two are compared just above, but this keeps the transport rule true of the value
-  // the session is actually minted from.
-  if (!isPairingTransportPermitted(record.serverOrigin)) return null;
   state.pairingGrants.delete(digest);
-  return mintSession(record.serverOrigin, record.browserOrigin, "pairing", state, now, record.localPairing === true);
-}
-
-/**
- * A pairing grant may cross loopback or authenticated HTTPS, and nothing else.
- *
- * Loopback plaintext is admissible because the bytes never leave the machine. Non-loopback
- * plaintext is not, and no configuration re-opens it.
- */
-function isPairingTransportPermitted(origin: string): boolean {
-  let url: URL;
-  try {
-    url = new URL(origin);
-  } catch {
-    return false;
-  }
-  if (url.protocol === "https:") return true;
-  return url.protocol === "http:" && isLoopbackHostname(url.hostname);
+  return mintSession(record.serverOrigin, record.browserOrigin, "pairing", state, now, true);
 }
 
 function requestCredential(req: Request): string | null {

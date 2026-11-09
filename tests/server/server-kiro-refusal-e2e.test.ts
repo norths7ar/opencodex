@@ -10,7 +10,6 @@ import { createRequestExecutionBudget } from "../../src/lib/request-execution-bu
 import { ADAPTER_REGISTRY } from "../../src/adapters/registry";
 import { encodeMessage } from "../../src/lib/eventstream-decoder";
 import { KIRO_COMPLETION_TOOL_NAME } from "../../src/adapters/kiro-constants";
-import { clearComboSelectionState, clearComboTargetCooldowns } from "../../src/combos";
 import { clearGenericFailoverHealth } from "../../src/oauth/generic-account-failover";
 import { clearAccountQuotaCache } from "../../src/providers/quota";
 import { kiroAccountEvidence, noteKiroMonthlyRefusal } from "../../src/providers/kiro-usage";
@@ -33,15 +32,11 @@ beforeEach(() => {
   process.env.KIRO_REGION = "us-east-1";
   clearAccountQuotaCache();
   clearGenericFailoverHealth();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
 });
 afterEach(() => {
   globalThis.fetch = realFetch;
   clearAccountQuotaCache();
   clearGenericFailoverHealth();
-  clearComboSelectionState();
-  clearComboTargetCooldowns();
   if (oldHome === undefined) delete process.env.OPENCODEX_HOME;
   else process.env.OPENCODEX_HOME = oldHome;
   if (oldRegion === undefined) delete process.env.KIRO_REGION;
@@ -272,93 +267,6 @@ describe("Kiro refusal recovery through Responses", () => {
   const fallbackOk = () => Response.json({ id: "chatcmpl-1", object: "chat.completion", model: "model-fallback",
     choices: [{ index: 0, finish_reason: "stop", message: { role: "assistant", content: "served by fallback" } }],
     usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } });
-
-  test("combo hops to the next target once every Kiro account has refused as improperly formed", async () => {
-    await seed(); saveConfig(comboConfig("kiro"));
-    let kiroSends = 0; let fallbackSends = 0;
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (KIRO_URL(url)) { kiroSends++; return new Response(IMPROPER, { status: 400 }); }
-      if (url.startsWith("https://fallback.example/")) { fallbackSends++; return fallbackOk(); }
-      return realFetch(input, init);
-    }) as typeof fetch;
-    const server = startServer(0);
-    try {
-      const response = await comboPost(server);
-      const text = await response.text();
-      expect(response.status).toBe(200);
-      expect(text).toContain("served by fallback");
-      expect(kiroSends).toBe(2);
-      expect(fallbackSends).toBe(1);
-    } finally { await server.stop(true); }
-  });
-
-  test("combo never forwards a non-Kiro target's identical 400 to the next target", async () => {
-    await seed(); saveConfig(comboConfig("other"));
-    let otherSends = 0; let fallbackSends = 0;
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (url.startsWith("https://other.example/")) {
-        otherSends++;
-        return Response.json({ error: { message: "ValidationException: Improperly formed request",
-          type: "invalid_request_error" } }, { status: 400 });
-      }
-      if (url.startsWith("https://fallback.example/")) { fallbackSends++; return fallbackOk(); }
-      return realFetch(input, init);
-    }) as typeof fetch;
-    const server = startServer(0);
-    try {
-      const response = await comboPost(server);
-      await response.text();
-      expect(response.status).toBe(400);
-      expect(otherSends).toBe(1);
-      expect(fallbackSends).toBe(0);
-    } finally { await server.stop(true); }
-  });
-
-  test("combo stops on a Kiro 400 that is a malformed payload, not an account refusal", async () => {
-    await seed(); saveConfig(comboConfig("kiro"));
-    let fallbackSends = 0;
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (KIRO_URL(url)) return new Response(JSON.stringify({ message: "Improperly formed request" }), { status: 400 });
-      if (url.startsWith("https://fallback.example/")) { fallbackSends++; return fallbackOk(); }
-      return realFetch(input, init);
-    }) as typeof fetch;
-    const server = startServer(0);
-    try {
-      const response = await comboPost(server);
-      await response.text();
-      expect(response.status).toBe(400);
-      expect(fallbackSends).toBe(0);
-    } finally { await server.stop(true); }
-  });
-
-  test("combo never hops a Kiro-configured target whose model is routed through another adapter", async () => {
-    await seed();
-    const routed = comboConfig("kiro");
-    routed.providers.kiro = { ...routed.providers.kiro!, modelAdapters: { "claude-sonnet-4.5": "openai-chat" } };
-    saveConfig(routed);
-    let routedSends = 0; let fallbackSends = 0;
-    globalThis.fetch = (async (input, init) => {
-      const url = input instanceof Request ? input.url : String(input);
-      if (url.startsWith("https://runtime.us-east-1.kiro.dev/") && !KIRO_URL(url)) {
-        routedSends++;
-        return new Response(IMPROPER, { status: 400, headers: { "content-type": "application/json" } });
-      }
-      if (url.startsWith("https://fallback.example/")) { fallbackSends++; return fallbackOk(); }
-      return realFetch(input, init);
-    }) as typeof fetch;
-    const server = startServer(0);
-    try {
-      const response = await comboPost(server);
-      await response.text();
-      // Same-provider account moves may still run; only the cross-target hop is fenced here.
-      expect(routedSends).toBeGreaterThan(0);
-      expect(response.status).toBe(400);
-      expect(fallbackSends).toBe(0);
-    } finally { await server.stop(true); }
-  });
 
 
   test("Kiro web-search sidecar completion clears B's older verdict after rotated refusal", async () => {

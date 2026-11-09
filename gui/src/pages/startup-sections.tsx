@@ -1,9 +1,8 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { CommandLineIcon, ComputerSettingsIcon, LaptopIcon, ServerStack01Icon } from "@hugeicons/core-free-icons";
+import { CommandLineIcon, ServerStack01Icon } from "@hugeicons/core-free-icons";
 import { useI18n, type TKey } from "../i18n/shared";
-import { confirmAction } from "../action-dialogs";
-import { desktopBadgeKey, desktopManagesStartup, desktopSupervisionFailed, startupPresentation, startupRiskDetailKey } from "../startup-health-ui";
+import { startupPresentation, startupRiskDetailKey } from "../startup-health-ui";
 import { IconAlert, IconCheck, IconChevron, IconInfo, IconTerminal } from "../icons";
 import { Button } from "@/components/ui-v2/button";
 import { cn } from "@/lib/utils";
@@ -13,7 +12,6 @@ import { useHelp } from "../components/v2-startup/use-help";
 import type {
   StartupHealthData,
   StartupInstallAction,
-  TrayStatusData,
 } from "./startup-shared";
 import {
   PROTECTION_KEYS,
@@ -68,11 +66,11 @@ export function StartupHeroSection({
           {t(unverified ? "startup.unverified" : failed ? "startup.status.atRisk" : STATUS_KEYS[data.status])}
         </StateBadge>
         <div className="flex items-start gap-1.5">
-          <h3 className="m-0 text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">{t(unverified ? desktopManagesStartup(data) ? "startup.loginUnverifiedTitle" : "startup.unverified" : failed ? "startup.error" : SUMMARY_KEYS[data.status])}</h3>
+          <h3 className="m-0 text-[20px] leading-7 font-semibold tracking-[-0.02em] text-fg">{t(unverified ? "startup.unverified" : failed ? "startup.error" : SUMMARY_KEYS[data.status])}</h3>
           <span className="mt-0.5"><HelpButton open={help.open} controls={help.id} name={t("startup.title")} onToggle={help.toggle} /></span>
         </div>
         <p className="m-0 max-w-[72ch] text-[14px] leading-[21px] text-fg-muted">
-          {unverified ? t(desktopManagesStartup(data) ? "startup.loginUnverifiedAction" : "startup.subtitle") : data.status === "at-risk" && data.routingKind === "opencodex-local" && desktopManagesStartup(data) && !desktopSupervisionFailed(data) ? t("startup.loginUnverifiedAction") : failed ? t("startup.staleData") : data.status === "at-risk" ? t(startupRiskDetailKey(data)) : t("startup.safeDetail")}
+          {unverified ? t("startup.subtitle") : failed ? t("startup.staleData") : data.status === "at-risk" ? t(startupRiskDetailKey(data)) : t("startup.safeDetail")}
         </p>
         <p className="startup-status-line m-0 mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] leading-5">
           {facts.map(([label, value], index) => (
@@ -97,7 +95,6 @@ export function StartupOptionsSection({
   installBusy,
   installResult,
   onInstall,
-  tray,
 }: {
   data: StartupHealthData;
   failed: boolean;
@@ -105,8 +102,6 @@ export function StartupOptionsSection({
   installBusy: StartupInstallAction | null;
   installResult: InstallResult;
   onInstall: (action: StartupInstallAction, opts?: { repair?: boolean }) => void;
-  /** The Windows tray card, rendered in the same grid; null off Windows. */
-  tray?: ReactNode;
 }) {
   const { t } = useI18n();
   // Repair only rewrites stale assets — conflict/disabled need uninstall/reinstall, not repair.
@@ -115,10 +110,6 @@ export function StartupOptionsSection({
   const shimAwaitingActivation = data.shimInstalled && !data.shimHealthy && data.shimActivationPending === true;
   const shimNeedsRepair = data.shimInstalled && !data.shimHealthy && !shimAwaitingActivation;
   const shimActionsDisabled = installBusy !== null || failed || loading;
-  // Desktop owns startup, so a second supervisor stays off. The shim is safe under Desktop: its
-  // `ocx ensure` waits for or starts the Desktop app instead of a competing CLI proxy (#6971).
-  const desktopManages = desktopManagesStartup(data);
-  const serviceActionsDisabled = shimActionsDisabled || desktopManages;
 
   const serviceBadge: { tone: Tone; label: string } = data.serviceViable
     ? { tone: "ok", label: t("startup.viable") }
@@ -136,8 +127,6 @@ export function StartupOptionsSection({
           : shimAwaitingActivation ? "startup.shimActivationPending" : "startup.stale"
         : "startup.notInstalled"),
     };
-  const desktopOk = Boolean(data.desktop && !failed && data.desktop.viable);
-  const cards = (data.desktop ? 1 : 0) + 2 + (tray ? 1 : 0);
 
   const installButton = (action: StartupInstallAction, label: string, repair: boolean, disabled: boolean) => (
     <Button variant="primary" size="sm" aria-label={`${label} - ${t(repair ? "startup.repair" : "startup.install")}`} disabled={disabled}
@@ -155,19 +144,12 @@ export function StartupOptionsSection({
         </div>
         <span className="font-mono text-[12px] text-fg-subtle" title={t("startup.details")}>{data.platform}</span>
       </div>
-      <div className={cn("grid gap-3 sm:grid-cols-2", cards === 3 && "lg:grid-cols-3")}>
-        {data.desktop && (
-          <OptionCard option="desktop" icon={hugeIcon(LaptopIcon)} title={t("startup.protection.desktop")}
-            badge={{ tone: desktopOk ? "ok" : startupPresentation(data, failed) === "unverified" ? "neutral" : "warn", label: t(startupPresentation(data, failed) === "unverified" ? "startup.loginUnverifiedTitle" : desktopBadgeKey(data.desktop, failed)) }}>
-            {desktopOk ? <p className="m-0">{t("startup.desktopHint")}</p>
-              : !failed && data.desktop.running ? <p className="m-0">{t("startup.desktopRunning")}</p> : null}
-          </OptionCard>
-        )}
+      <div className="grid gap-3 sm:grid-cols-2">
         <OptionCard option="service" icon={hugeIcon(ServerStack01Icon)} title={t("startup.service")}
-          tag={data.serviceSupported && !desktopManages ? t("startupV2.recommended") : undefined}
+          tag={data.serviceSupported ? t("startupV2.recommended") : undefined}
           badge={serviceBadge}
-          actions={(data.serviceSupported && !data.serviceInstalled) ? installButton("install-service", t("startup.service"), false, serviceActionsDisabled)
-            : serviceNeedsRepair ? installButton("install-service", t("startup.service"), true, serviceActionsDisabled) : undefined}>
+          actions={(data.serviceSupported && !data.serviceInstalled) ? installButton("install-service", t("startup.service"), false, shimActionsDisabled)
+            : serviceNeedsRepair ? installButton("install-service", t("startup.service"), true, shimActionsDisabled) : undefined}>
           <p className="m-0">{t("startup.serviceHint")}</p>
         </OptionCard>
         <OptionCard option="shim" icon={hugeIcon(CommandLineIcon)} title={t("startupV2.shimPlain")} term={t("startup.shim")}
@@ -176,7 +158,6 @@ export function StartupOptionsSection({
             : shimNeedsRepair ? installButton("install-shim", t("startup.shim"), true, shimActionsDisabled) : undefined}>
           <p className="m-0">{t(shimAwaitingActivation ? "startup.shimActivationHint" : "startup.shimHint")}</p>
         </OptionCard>
-        {tray}
       </div>
       {installResult && (
         <Banner tone={installResult.kind === "success" ? "ok" : "warn"} className="startup-action-result">
@@ -191,60 +172,6 @@ export function StartupOptionsSection({
   );
 }
 
-export function StartupTrayCard({
-  tray,
-  trayLoading,
-  trayError,
-  trayBusy,
-  onTrayAction,
-}: {
-  tray: TrayStatusData | null;
-  trayLoading: boolean;
-  trayError: boolean;
-  trayBusy: boolean;
-  onTrayAction: (action: "install" | "start" | "stop" | "uninstall") => void;
-}) {
-  const { t } = useI18n();
-
-  /**
-   * Uninstalling removes the tray helper, so it asks first. Written as a named async
-   * function rather than a promise chain inside the handler: a floating `.then` in a JSX
-   * handler has no rejection path, which is what `no-floating-then-in-jsx-handler` catches.
-   */
-  const requestTrayUninstall = async () => {
-    if (await confirmAction({ message: t("startup.tray.uninstall"), tone: "danger" })) {
-      onTrayAction("uninstall");
-    }
-  };
-
-  const known = !trayLoading && !trayError && tray !== null;
-  const badge: { tone: Tone; label: string } = !known
-    ? { tone: trayLoading ? "neutral" : "warn", label: t(trayLoading ? "startup.tray.loading" : "startup.tray.unavailable") }
-    : tray.running && !tray.stale
-      ? { tone: "ok", label: t("startup.tray.running") }
-      : { tone: tray.stale ? "warn" : "neutral", label: t(tray.stale ? "startup.tray.stale" : tray.installed ? "startup.tray.stopped" : "startup.tray.notInstalled") };
-
-  const actions = known ? (
-    <>
-      {!tray.installed && !tray.stale && <Button variant="primary" size="sm" disabled={trayBusy} onClick={() => onTrayAction("install")}>{t("startup.tray.install")}</Button>}
-      {tray.installed && !tray.stale && !tray.running && <Button variant="primary" size="sm" disabled={trayBusy} onClick={() => onTrayAction("start")}>{t("startup.tray.start")}</Button>}
-      {tray.running && !tray.stale && <Button variant="outline" size="sm" disabled={trayBusy} onClick={() => onTrayAction("stop")}>{t("startup.tray.stop")}</Button>}
-      {(tray.installed || tray.stale) && (
-        <Button variant="ghost" size="sm" className="hover:bg-danger-soft hover:text-danger" disabled={trayBusy} onClick={() => { void requestTrayUninstall(); }}>{t("startup.tray.uninstall")}</Button>
-      )}
-    </>
-  ) : undefined;
-
-  return (
-    <OptionCard option="tray" icon={hugeIcon(ComputerSettingsIcon)} title={t("startup.tray.title")} term={t("startup.tray.login")}
-      tag={t("startupV2.optional")} badge={badge} actions={actions}>
-      <p className="m-0">{t("startup.tray.hint")}</p>
-      <p className="m-0 text-[12px] leading-[18px] text-fg-subtle">{t("startup.tray.notProtection")}</p>
-      {(trayError || tray?.stale) && <Banner tone="warn" role="alert">{t("startup.tray.error")}</Banner>}
-    </OptionCard>
-  );
-}
-
 export function StartupRecoverySection({
   data,
   copied,
@@ -255,7 +182,6 @@ export function StartupRecoverySection({
   onCopy: (command: string) => void;
 }) {
   const { t } = useI18n();
-  const desktopManages = desktopManagesStartup(data);
 
   // An already-registered service is refreshed in place. `install` re-registers, which
   // needs elevation on Windows and can switch a WinSW backend to Task Scheduler, so
@@ -266,7 +192,7 @@ export function StartupRecoverySection({
     : data.commands.installService;
 
   const commands: Array<[TKey, string]> = [
-    ...(data.serviceSupported && !desktopManages ? [["startup.command.service", serviceCommand] as [TKey, string]] : []),
+    ...(data.serviceSupported ? [["startup.command.service", serviceCommand] as [TKey, string]] : []),
     ["startup.command.shim", data.commands.installShim],
     ["startup.command.native", data.commands.restoreNative],
   ];
@@ -282,18 +208,18 @@ export function StartupRecoverySection({
           <IconTile className="size-8 rounded-[8px] [&_svg]:size-4"><IconTerminal /></IconTile>
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="text-[15px] leading-6 font-semibold tracking-[-0.01em] text-fg">{t("startup.recovery")}</span>
-            <span className="text-[13px] leading-5 text-fg-muted">{t(desktopManages ? "startup.protection.desktop" : "startupV2.recoveryMeta")}</span>
+            <span className="text-[13px] leading-5 text-fg-muted">{t("startupV2.recoveryMeta")}</span>
           </span>
           <span aria-hidden="true" className="text-fg-subtle transition-transform duration-200 group-open:rotate-90 [&_svg]:size-4"><IconChevron /></span>
         </summary>
         <div className="flex flex-col gap-3 px-3 pt-1 pb-3">
-          {!desktopManages && <p className="m-0 text-[13px] leading-5 text-fg-muted">{t("startup.recoveryHint")}</p>}
+          <p className="m-0 text-[13px] leading-5 text-fg-muted">{t("startup.recoveryHint")}</p>
           <div className="flex flex-col divide-y divide-line rounded-[8px] bg-bg ring-1 ring-line">
             {commands.map(([label, command]) => (
               <CommandRow key={label} label={t(label)} command={command} copied={copied === command} onCopy={() => onCopy(command)} />
             ))}
           </div>
-          {data.status === "at-risk" && data.recommendedCommand && !desktopManages && (
+          {data.status === "at-risk" && data.recommendedCommand && (
             <Banner tone="warn" role="alert">{t("startup.recommended", { cmd: data.recommendedCommand })}</Banner>
           )}
         </div>

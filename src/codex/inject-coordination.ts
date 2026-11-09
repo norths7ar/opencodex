@@ -11,7 +11,6 @@ import { publishCodexArtifact } from "./inject/config-write-section";
 import { withConfigWriteLockHeld, type LockHandle } from "./config-write-lock";
 import { atomicWriteFile } from "../config";
 import type { CodexWriteLockResult, CodexWriteLockSkipReason } from "./codex-write-lock";
-import { HUB_GATED_SKIP_MESSAGE } from "./desired-state";
 import { siblingSkipMessage } from "./sibling-start";
 import { inspectCodexCoordinatorPath } from "./coordinator-doctor";
 import { JOURNAL_PATH } from "./journal";
@@ -473,11 +472,7 @@ export function codexInjectLockOutcome(
       success: true,
       status: "skipped",
       skippedReason: result.reason,
-      // Four distinct facts, four sentences. The hub gate in particular must not borrow the
-      // toggle's wording — that is the phantom "integration is OFF" report from #4236.
-      message: result.reason === "hub-gated"
-        ? `${HUB_GATED_SKIP_MESSAGE} No Codex config, catalog, cache, or history was changed.`
-        : result.reason === "sibling"
+      message: result.reason === "sibling"
         ? `${siblingSkipMessage()} No Codex config, catalog, cache, or history was changed.`
         : result.reason === "desired_disabled"
           ? "Codex integration is OFF; no Codex config, catalog, cache, or history was changed."

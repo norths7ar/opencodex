@@ -159,11 +159,6 @@ if (kind.startsWith("native-pacing")) {
   const { AdmissionModelDeniedError, admissionModelDeniedResponse } = await import("../../src/server/admission-model-scope");
   const { clientFacingModelLabel } = await import("../../src/lib/error-destination");
   produced = admissionModelDeniedResponse(new AdmissionModelDeniedError(clientFacingModelLabel(KEY), { providerName: "fixture", modelId: "model" }));
-} else if (kind === "combo-count") {
-  const { comboUnavailable } = await import("../../src/server/responses/core-errors");
-  produced = comboUnavailable(KEY, Date.now(), "provider disabled: 3" as never); absent = "3";
-} else if (kind === "combo") {
-  const { comboUnavailable } = await import("../../src/server/responses/core-errors"); produced = comboUnavailable(KEY);
 } else if (kind === "config") {
   const { UnsupportedOAuthProviderError } = await import("../../src/oauth/oauth-errors");
   const error = new UnsupportedOAuthProviderError(KEY);

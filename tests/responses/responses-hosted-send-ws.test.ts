@@ -22,7 +22,7 @@ class HostedSocket {
   }
   close() {}
 }
-for (const kind of ["search", "image", "video"] as const) test(`${kind} successful hosted WebSocket frame retains one durable booking`, async () => hostedSendFixture(kind, "failover", async f => {
+for (const kind of ["search", "image", "video"] as const) test(`${kind} successful hosted WebSocket frame retains one durable booking`, async () => hostedSendFixture(kind, async f => {
   const realWebSocket = globalThis.WebSocket;
   globalThis.WebSocket = HostedSocket as unknown as typeof WebSocket;
   HostedSocket.frames = 0;

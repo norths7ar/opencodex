@@ -2,7 +2,7 @@ import { expect, test, spyOn } from "bun:test";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { repoPath, repoRoot } from "../helpers/repo-root";
-import { OPENAI_ERROR_TYPES, OPENAI_ERROR_CODES, ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES, comboFailureEvidence, markProxyError, isProxyError } from "../../src/lib/client-error-body";
+import { OPENAI_ERROR_TYPES, OPENAI_ERROR_CODES, ANTHROPIC_ERROR_TYPES, ANTHROPIC_ERROR_CODES, upstreamFailureEvidence, markProxyError, isProxyError } from "../../src/lib/client-error-body";
 import { ownedAnthropicErrorPayload, ownedAnthropicErrorResponse, messagesUnknownEndpointMessage } from "../../src/lib/messages-error-body";
 import { collectAnthropicMessage, responsesSseToAnthropicSse } from "../../src/claude/outbound";
 import { collectAnthropicMessageResponse, encodeAnthropicMessageSse } from "../../src/protocols/encoders/messages";
@@ -366,5 +366,5 @@ test("owned response retains the baseline envelope for internal evidence", async
   const text = await response.text();
   expect(text.length).toBeGreaterThan(0); expect(text).not.toContain(sentinel);
   expect(response.status).toBe(413); expect(response.headers.get("content-type")).toBe("application/json");
-  expect(comboFailureEvidence(response)).toBe(JSON.stringify(legacy));
+  expect(upstreamFailureEvidence(response)).toBe(JSON.stringify(legacy));
 });

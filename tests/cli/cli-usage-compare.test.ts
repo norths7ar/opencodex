@@ -269,7 +269,7 @@ describe("ocx usage compare", () => {
         customWindow: true,
         since: Number(url.searchParams.get("since")),
         until: Number(url.searchParams.get("until")),
-        filter: { apiKeyId: "Key-A", provider: null, model: null, matched: true, comboOverlap: false },
+        filter: { apiKeyId: "Key-A", provider: null, model: null, matched: true, attemptOverlap: false },
         summary: { requests: 3, totalTokens: 9, inputTokens: 1, outputTokens: 1, cachedInputTokens: 0, estimatedCostUsd: 0.1 },
       });
     };
@@ -392,105 +392,3 @@ test("usage comparison uses the bounded direct transport with its 60 second dead
     await server.stop(true);
   }
 });
-
-
-test.each(["stable-local", "stable-hub", "connect", "disconnect", "account", "credential", "admin", "transport", "runtime"])(
-  "usage comparison keeps one owner across both windows (%s)", scenario => {
-    const home = mkdtempSync(join(tmpdir(), "ocx-compare-owner-"));
-    try {
-      const child = spawnSync(process.execPath, ["--eval", `
-        import { spyOn } from "bun:test";
-        import { writeFileSync } from "node:fs";
-        import { join } from "node:path";
-        import * as state from "./src/client/state";
-        import { serviceApiTokenFingerprint } from "./src/lib/service-secrets";
-        import { handleObserveCommand } from "./src/cli/observe";
-        import { createLocalAttestationProof, LOCAL_ATTESTATION_PROOF_HEADER } from "./src/lib/local-management-attestation";
-        import { LOCAL_MANAGEMENT_NONCE_HEADER } from "./src/lib/local-management-capability";
-        import { managementPrincipal, requireManagementAuth } from "./src/server/management-auth";
-        const scenario = ${JSON.stringify(scenario)};
-        const home = process.env.OPENCODEX_HOME;
-        const token = "compare-fixture-key-a", nextToken = "compare-fixture-key-b";
-        const client = { serverUrl: "https://hub.example.test", managementUrl: "https://manage.example.test",
-          managementTransport: "direct", selectedClients: ["claude"], tokenEnv: "OPENCODEX_API_AUTH_TOKEN",
-          apiKeyId: "account-a", tokenFingerprint: serviceApiTokenFingerprint(token), protocolVersion: 1,
-          connectedAt: "2026-09-01T00:00:00.000Z" };
-        const connected = !["stable-local", "connect", "admin", "runtime"].includes(scenario);
-        const write = (isClient) => writeFileSync(join(home, "config.json"), JSON.stringify({
-          port: 9, providers: {}, defaultProvider: "openai", runtimeRole: isClient ? "client" : "standalone",
-          ...(isClient ? { client } : {}),
-        }));
-        write(connected);
-        const runtime = { pid: 101, port: 7777, hostname: "127.0.0.1", attestationSecret: "A".repeat(43) };
-        writeFileSync(join(home, "runtime-port.json"), JSON.stringify(runtime));
-        writeFileSync(join(home, "service-api-token"), token);
-        process.env.OPENCODEX_ADMIN_AUTH_TOKEN = "compare-fixture-admin-a";
-        const change = () => {
-          if (scenario === "account") client.apiKeyId = "account-b";
-          if (scenario === "credential") {
-            writeFileSync(join(home, "service-api-token"), nextToken);
-            client.tokenFingerprint = serviceApiTokenFingerprint(nextToken);
-          }
-          if (scenario === "transport") client.transport = "hub";
-          if (scenario === "admin") process.env.OPENCODEX_ADMIN_AUTH_TOKEN = "compare-fixture-admin-b";
-          write(scenario === "admin" ? false : scenario !== "disconnect");
-        };
-        // On the old implementation these are the first read's before/after observations,
-        // followed by the second read's capture. Change only after that first owner was verified.
-        const read = state.readClientConnectionState;
-        let observations = 0;
-        spyOn(state, "readClientConnectionState").mockImplementation(() => {
-          if (++observations === 3 && connected && !scenario.startsWith("stable")) change();
-          return read();
-        });
-        const output = [], errors = [], requests = [];
-        console.log = (...args) => output.push(args.join(" "));
-        console.error = (...args) => errors.push(args.join(" "));
-        let discoveries = 0;
-        const code = await handleObserveCommand(["usage", "compare", "--json"], {
-          baseUrl: "http://local.test", findLiveProxy: async () => ({
-            ...runtime, pid: ++discoveries === 1 || scenario !== "runtime" ? 101 : 202, source: "runtime", role: "standalone",
-          }), now: () => ${NOW},
-          fetchImpl: async (input, init) => {
-            const url = new URL(String(input));
-            requests.push({ origin: url.origin, path: url.pathname,
-              originalCredential: new Headers(init?.headers).get("x-opencodex-api-key") === (connected ? token : "compare-fixture-admin-a") });
-            const req = new Request(input, init);
-            const auth = { available: true, token: "compare-fixture-admin-a", source: "environment", sessions: new Map(), pairingGrants: new Map() };
-            if (!connected && (requireManagementAuth(req, auth, undefined, runtime) !== null
-              || managementPrincipal(req, auth, undefined, runtime) !== "local-read-capability")) throw new Error("capability admission failed");
-            if (requests.length === 1 && ["connect", "admin"].includes(scenario)) change();
-            return Response.json({ schemaVersion: 1, source: "hub", scope: "client", range: "30d", surface: "all",
-              generatedAt: 1, customWindow: true, since: Number(url.searchParams.get("since")), until: Number(url.searchParams.get("until")),
-              summary: { requests: 1, totalTokens: 3, inputTokens: 2, outputTokens: 1, cachedInputTokens: 0, unpricedRequests: 1, unmeteredRequests: 0 },
-              providers: [], models: [], days: [], filter: { provider: null, model: null, matched: true, comboOverlap: false } },
-              { headers: !connected ? { [LOCAL_ATTESTATION_PROOF_HEADER]: createLocalAttestationProof(
-                runtime.attestationSecret, req.headers.get(LOCAL_MANAGEMENT_NONCE_HEADER), runtime.pid, runtime.port) } : {} });
-          },
-        });
-        process.stdout.write(JSON.stringify({ code, output, errors, requests, discoveries }));
-      `], { cwd: repoRoot(), env: { ...process.env, OPENCODEX_HOME: home }, encoding: "utf8", timeout: SPAWN_BUDGET_MS - 5000 });
-      expect(child.status, child.stderr).toBe(0);
-      const result = JSON.parse(child.stdout);
-      if (scenario.startsWith("stable")) {
-        expect(result.code).toBe(0);
-        expect(result.requests).toHaveLength(2);
-        expect(result.requests.every((request: { originalCredential: boolean }) => request.originalCredential === (scenario === "stable-hub"))).toBe(true);
-        expect(result.requests.map((request: { path: string }) => request.path)).toEqual(Array(2).fill(scenario === "stable-hub" ? "/v1/usage" : "/api/usage"));
-        expect(JSON.parse(result.output.join("\n")).delta.requests).toBe(0);
-      } else {
-        expect(result.code).toBe(1);
-        expect(result.output).toEqual([]);
-        expect(result.errors.join("\n")).toContain(scenario === "runtime" ? "Usage runtime changed during comparison" : "Usage owner changed during comparison");
-        expect(result.requests).toHaveLength(1);
-        if (scenario === "runtime") {
-          expect(result.discoveries).toBe(2);
-          expect(result.requests[0].originalCredential).toBe(false);
-        }
-      }
-      expect(child.stdout).not.toContain("compare-fixture");
-    } finally {
-      removeTreeWithRetry(home);
-    }
-  }, SPAWN_BUDGET_MS,
-);

@@ -25,15 +25,6 @@ const USAGE = `Usage:
   ocx system sync [--json]
   ocx system codex-app-server [--json]
   ocx system codex-restart --yes [--json]
-  ocx system codex-cli-update check [--json]
-  ocx system codex-cli-update attest [--json]
-  ocx system codex-cli-update attest --candidate <absolute-path> --npm-prefix <absolute-path> --npm-cli <absolute-path> --node <absolute-path> [--json]
-  ocx system codex-cli-update plan [--channel latest] [--json]
-  ocx system codex-cli-update apply --plan-id <32-hex> --yes [--request-id <key>] [--json]
-  ocx system codex-cli-update status <job-id> [--json]
-  ocx system update check [--channel <latest|preview>] [--json]
-  ocx system update run [--channel <latest|preview>] [--restart <on|off>] --yes [--json]
-  ocx system update status <job-id> [--json]
 
 --client-compaction favors native replay portability for future compactions while
 keeping OpenCodeX routing active; the configured provider may process summaries
@@ -210,40 +201,6 @@ async function startup(argv: string[], deps: RuntimeApiDeps): Promise<void> {
   printData(result, wantsJson, [String((result as Record<string, unknown>).message ?? `${action} complete.`)]);
 }
 
-async function update(argv: string[], deps: RuntimeApiDeps): Promise<void> {
-  const args = [...argv];
-  const action = (args.shift() ?? "check").toLowerCase();
-  const wantsJson = takeFlag(args, "--json");
-  if (action === "status") {
-    const jobId = args.shift();
-    if (!jobId) throw new CliUsageError("update job id is required", USAGE);
-    rejectArgs(args, USAGE);
-    printData(await runtimeRequest(`/api/update/status?jobId=${encodeURIComponent(jobId)}`, {}, deps), wantsJson);
-    return;
-  }
-  const channel = takeOption(args, "--channel") ?? "latest";
-  if (channel !== "latest" && channel !== "preview") throw new CliUsageError("--channel must be latest or preview", USAGE);
-  if (action === "check") {
-    rejectArgs(args, USAGE);
-    printData(await runtimeRequest(`/api/update/check?tag=${channel}`, {}, deps), wantsJson);
-    return;
-  }
-  if (action !== "run") throw new CliUsageError(`unknown update action ${action}`, USAGE);
-  const restart = takeBooleanOption(args, "--restart") ?? true;
-  const yes = takeFlag(args, "--yes");
-  if (!yes) throw new CliUsageError("update run requires --yes", USAGE);
-  rejectArgs(args, USAGE);
-  const result = await runtimeRequest("/api/update/run", { method: "POST", body: JSON.stringify({ tag: channel, restart }) }, deps);
-  const job = recordValue(recordValue(result)?.job);
-  const jobId = typeof job?.id === "string" && /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(job.id) ? job.id : undefined;
-  const jobStatus = ["running", "restarting", "succeeded", "failed"].find(state => state === job?.status);
-  const lines = jobId ? [
-    `Update job ${jobId}: ${jobStatus ?? "status unconfirmed"} (${channel}).`,
-    `Check progress: ocx system update status ${jobId}`,
-  ] : ["Update request returned no usable job ID. Check: ocx system update check."];
-  printData(result, wantsJson, lines);
-}
-
 export async function handleSystemCommand(argv: string[], deps: RuntimeApiDeps = {}): Promise<number> {
   const [sub = "status", ...rest] = argv;
   if (sub === "health") return health(rest, deps);
@@ -252,10 +209,6 @@ export async function handleSystemCommand(argv: string[], deps: RuntimeApiDeps =
     if (rest.some(arg => SYSTEM_PARITY_OPTIONS.some(flag => arg === flag || arg.startsWith(`${flag}=`)))) {
       return handleSystemSettingsParity(rest, deps);
     }
-  }
-  if (sub === "codex-cli-update") {
-    const { handleCodexCliUpdateCommand } = await import("./codex-cli-update");
-    return await handleCodexCliUpdateCommand(rest);
   }
   return runCliAction(async () => {
     if (sub === "status") await status(rest, deps);
@@ -285,8 +238,7 @@ export async function handleSystemCommand(argv: string[], deps: RuntimeApiDeps =
       rejectArgs(args, USAGE);
       const result = await runtimeRequest("/api/system/codex-restart", { method: "POST" }, deps);
       printData(result, wantsJson, codexRestartLines(result));
-    } else if (sub === "update") await update(rest, deps);
-    else throw new CliUsageError(`unknown system command ${sub}`, USAGE);
+    } else throw new CliUsageError(`unknown system command ${sub}`, USAGE);
   });
 }
 

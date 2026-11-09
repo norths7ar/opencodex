@@ -3,7 +3,6 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  DESKTOP_PRODUCT_NAME,
   findGuiDist,
   rootFallbackPayload,
   serveGuiFile,
@@ -151,23 +150,10 @@ interface PackagedLayout {
   guiDist: string[];
 }
 
-const linuxLib = (...prefix: string[]) => [...prefix, "lib", DESKTOP_PRODUCT_NAME, "gui", "dist"];
+const bundledGui = (...prefix: string[]) => [...prefix, "bin", "gui", "dist"];
 
 /** Every layout a packaged `ocx` runs from; Tauri's resource_dir rules decide the dashboard path. */
 const PACKAGED_LAYOUTS: [string, PackagedLayout][] = [
-  ["Linux .deb (/usr/bin -> /usr/lib/OpenCodex)", { platform: "linux", executable: ["usr", "bin"], guiDist: linuxLib("usr") }],
-  ["Linux AppImage mount ($APPDIR/usr/bin -> $APPDIR/usr/lib/OpenCodex)", {
-    platform: "linux",
-    executable: [".mount_OpenCo1a2b3c", "usr", "bin"],
-    guiDist: linuxLib(".mount_OpenCo1a2b3c", "usr"),
-  }],
-  ["Linux /usr/local prefix", { platform: "linux", executable: ["usr", "local", "bin"], guiDist: linuxLib("usr", "local") }],
-  ["Linux custom /opt prefix", { platform: "linux", executable: ["opt", "opencodex", "bin"], guiDist: linuxLib("opt", "opencodex") }],
-  ["macOS app bundle (Contents/MacOS -> Contents/Resources)", {
-    platform: "darwin",
-    executable: ["OpenCodex.app", "Contents", "MacOS"],
-    guiDist: ["OpenCodex.app", "Contents", "Resources", "gui", "dist"],
-  }],
   ["Windows install (resources beside ocx.exe)", { platform: "win32", executable: ["OpenCodex"], guiDist: ["OpenCodex", "gui", "dist"] }],
 ];
 
@@ -182,25 +168,13 @@ test.each(PACKAGED_LAYOUTS)("a standalone ocx finds the packaged dashboard: %s",
   expect(findGuiDist(lookupIn(root, executableDir, layout.platform))).toBe(bundled);
 });
 
-test("a Windows install consults neither the Linux nor the macOS bundle directory", () => {
-  delete process.env.OPENCODEX_GUI_DIST;
-  const root = temporaryRoot("ocx-gui-static-windows-");
-  const executableDir = join(root, "OpenCodex");
-  mkdirSync(executableDir, { recursive: true });
-  const linuxBundle = writeGuiDist(root, ...linuxLib());
-  writeGuiDist(root, "Resources", "gui", "dist");
-  expect(findGuiDist(lookupIn(root, executableDir, "win32"))).toBeNull();
-  // The same tree is a Linux package to a Linux binary, so the fixture itself is reachable.
-  expect(findGuiDist(lookupIn(root, executableDir, "linux"))).toBe(linuxBundle);
-});
-
 test("gui/dist beside the binary still wins over a desktop bundle layout", () => {
   delete process.env.OPENCODEX_GUI_DIST;
   const root = temporaryRoot("ocx-gui-static-beside-");
   const executableDir = join(root, "usr", "bin");
   const beside = writeGuiDist(executableDir, "gui", "dist");
-  writeGuiDist(root, ...linuxLib("usr"));
-  expect(findGuiDist(lookupIn(root, executableDir, "linux"))).toBe(beside);
+  writeGuiDist(root, ...bundledGui("usr"));
+  expect(findGuiDist(lookupIn(root, executableDir, "win32"))).toBe(beside);
 });
 
 test("OPENCODEX_GUI_DIST overrides every packaged layout", () => {
@@ -218,9 +192,9 @@ test("OPENCODEX_GUI_DIST overrides every packaged layout", () => {
 test("a source checkout serves its own gui/dist and never consults a bundle layout", () => {
   delete process.env.OPENCODEX_GUI_DIST;
   const root = temporaryRoot("ocx-gui-static-source-");
-  writeGuiDist(root, ...linuxLib("usr"));
+  writeGuiDist(root, ...bundledGui("usr"));
   const checkout = writeGuiDist(root, "checkout", "gui", "dist");
-  expect(findGuiDist(lookupIn(root, null, "linux"))).toBe(checkout);
+  expect(findGuiDist(lookupIn(root, null, "win32"))).toBe(checkout);
 });
 
 test("a packaged layout comes before the source-checkout fallback", () => {
@@ -228,9 +202,9 @@ test("a packaged layout comes before the source-checkout fallback", () => {
   const root = temporaryRoot("ocx-gui-static-order-");
   const executableDir = join(root, "usr", "bin");
   mkdirSync(executableDir, { recursive: true });
-  const bundled = writeGuiDist(root, ...linuxLib("usr"));
+  const bundled = writeGuiDist(root, ...bundledGui("usr"));
   writeGuiDist(root, "checkout", "gui", "dist");
-  expect(findGuiDist(lookupIn(root, executableDir, "linux"))).toBe(bundled);
+  expect(findGuiDist(lookupIn(root, executableDir, "win32"))).toBe(bundled);
 });
 
 test("absent resources leave GET / to the JSON fallback", () => {
@@ -241,8 +215,8 @@ test("absent resources leave GET / to the JSON fallback", () => {
     mkdirSync(executableDir, { recursive: true });
     expect([name, findGuiDist(lookupIn(root, executableDir, layout.platform))]).toEqual([name, null]);
   }
-  expect(findGuiDist(lookupIn(root, null, "linux"))).toBeNull();
-  expect(serveGuiFile("/", findGuiDist(lookupIn(root, join(root, "usr", "bin"), "linux")))).toBeNull();
+  expect(findGuiDist(lookupIn(root, null, "win32"))).toBeNull();
+  expect(serveGuiFile("/", findGuiDist(lookupIn(root, join(root, "usr", "bin"), "win32")))).toBeNull();
   expect(rootFallbackPayload().dashboard.available).toBe(false);
 });
 
@@ -251,7 +225,7 @@ test("a discovered bundle serves index.html with the session bootstrap", async (
   const root = temporaryRoot("ocx-gui-static-session-");
   const executableDir = join(root, "usr", "bin");
   mkdirSync(executableDir, { recursive: true });
-  writeGuiDist(root, ...linuxLib("usr"));
+  writeGuiDist(root, ...bundledGui("usr"));
   const session: GuiSessionBootstrap = {
     token: "fixture-token",
     csrfToken: "fixture-csrf",
@@ -260,7 +234,7 @@ test("a discovered bundle serves index.html with the session bootstrap", async (
     expiresAt: Date.now() + 60_000,
     issuance: "loopback",
   };
-  const guiDist = findGuiDist(lookupIn(root, executableDir, "linux"));
+  const guiDist = findGuiDist(lookupIn(root, executableDir, "win32"));
   for (const pathname of ["/", "/models"]) {
     const response = serveGuiFile(pathname, guiDist, session);
     expect(response).not.toBeNull();
@@ -276,14 +250,14 @@ test("discovery only reads: it creates no files and leaves the environment alone
   for (const [, layout] of PACKAGED_LAYOUTS) {
     mkdirSync(join(root, ...layout.executable), { recursive: true });
   }
-  writeGuiDist(root, ...linuxLib("usr"));
+  writeGuiDist(root, ...bundledGui("usr"));
   const listing = () => readdirSync(root, { recursive: true }).map(String).sort();
   const treeBefore = listing();
   const environmentBefore = { ...process.env };
   for (const [, layout] of PACKAGED_LAYOUTS) {
     findGuiDist(lookupIn(root, join(root, ...layout.executable), layout.platform));
   }
-  findGuiDist(lookupIn(root, null, "linux"));
+  findGuiDist(lookupIn(root, null, "win32"));
   expect(listing()).toEqual(treeBefore);
   expect({ ...process.env }).toEqual(environmentBefore);
 });
@@ -292,21 +266,7 @@ test("each platform consults only its own desktop bundle layout", () => {
   const executableDir = join("opt", "ocx", "bin");
   const beside = join(executableDir, "gui", "dist");
   expect(standaloneGuiDistCandidates(executableDir, "win32")).toEqual([beside]);
-  expect(standaloneGuiDistCandidates(executableDir, "darwin"))
-    .toEqual([beside, join(executableDir, "..", "Resources", "gui", "dist")]);
-  expect(standaloneGuiDistCandidates(executableDir, "linux"))
-    .toEqual([beside, join(executableDir, "..", "lib", DESKTOP_PRODUCT_NAME, "gui", "dist")]);
-});
 
-test("the Linux bundle directory and the resource path follow the desktop Tauri config", () => {
-  // Tauri names the Linux resource directory after productName and copies gui/dist under the
-  // mapped name; a rename on either side would silently send the dashboard lookup elsewhere.
-  const config = JSON.parse(readFileSync(repoPath("desktop", "src-tauri", "tauri.conf.json"), "utf8")) as {
-    productName?: string;
-    bundle?: { resources?: Record<string, string> };
-  };
-  expect(config.productName).toBe(DESKTOP_PRODUCT_NAME);
-  expect(Object.values(config.bundle?.resources ?? {})).toContain("gui/dist");
 });
 
 test("a directory with its own index.html is served as a separate app with the session bootstrap", async () => {

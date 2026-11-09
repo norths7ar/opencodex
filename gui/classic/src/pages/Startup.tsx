@@ -10,13 +10,10 @@ import {
   StartupDetailsSection,
   StartupHeroSection,
   StartupRecoverySection,
-  StartupTraySection,
 } from "./startup-sections";
 import {
-  isTrayStatusData,
   type StartupHealthData,
   type StartupInstallAction,
-  type TrayStatusData,
 } from "./startup-shared";
 
 type CodexRuntimeSettings = {
@@ -29,10 +26,9 @@ type StartupPageCache = {
   data: StartupHealthData;
   warning: string | null;
   fix: string | null;
-  tray: TrayStatusData | null;
 };
 
-const STARTUP_PAGE_CACHE_PREFIX = "ocx.startup.page.v1:";
+const STARTUP_PAGE_CACHE_PREFIX = "ocx.startup.page.v2:";
 
 function shellChain(commands: string[], platform: string | undefined): string {
   // Windows PowerShell 5.x rejects bash `&&`; `;` works in PowerShell and cmd.
@@ -70,17 +66,13 @@ function deriveCodexRuntimeNotice(
   return { warning: null, fix: null };
 }
 
-export default function Startup({ apiBase, machineApiBase = apiBase, connected = false }: { apiBase: string; machineApiBase?: string; connected?: boolean }) {
+export default function Startup({ apiBase }: { apiBase: string }) {
   const { t } = useI18n();
   const cacheKey = `${STARTUP_PAGE_CACHE_PREFIX}${apiBase}`;
   const cached = useMemo(() => readSessionListCache<StartupPageCache>(cacheKey), [cacheKey]);
   const startupResourceKey = `startup-page:${apiBase}`;
 
   const [copied, setCopied] = useState<string | null>(null);
-  const [tray, setTray] = useState<TrayStatusData | null>(() => cached?.tray ?? null);
-  const [trayLoading, setTrayLoading] = useState(() => !cached?.data);
-  const [trayBusy, setTrayBusy] = useState(false);
-  const [trayError, setTrayError] = useState(false);
   const [installBusy, setInstallBusy] = useState<StartupInstallAction | null>(null);
   const [installResult, setInstallResult] = useState<{ kind: "success" | "error"; action: StartupInstallAction; repair?: boolean; detail?: string; forLocalRouting?: boolean } | null>(null);
   const [codexRuntimeWarning, setCodexRuntimeWarning] = useState<string | null>(() => cached?.warning ?? null);
@@ -89,34 +81,6 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
   const [runtimeNoticePending, setRuntimeNoticePending] = useState(() => !cached?.data);
   const paintedRef = useRef(Boolean(cached?.data));
   const secondaryGenerationRef = useRef(0);
-  const [machineShim, setMachineShim] = useState<{ installed?: boolean; healthy?: boolean } | null>(null);
-  const [machineBusy, setMachineBusy] = useState(false);
-
-  useEffect(() => {
-    if (!connected) return;
-    const controller = new AbortController();
-    void fetch(`${machineApiBase}/api/machine/shim`, { signal: controller.signal })
-      .then(response => response.ok ? response.json() : null)
-      .then(value => { if (!controller.signal.aborted) setMachineShim(value); })
-      .catch(() => { if (!controller.signal.aborted) setMachineShim(null); });
-    return () => controller.abort();
-  }, [connected, machineApiBase]);
-
-  const runMachineShim = async (action: "install" | "repair" | "uninstall") => {
-    setMachineBusy(true);
-    try {
-      const response = await fetch(`${machineApiBase}/api/machine/shim`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      });
-      if (response.ok) {
-        const value = await response.json() as { shim?: { installed?: boolean; healthy?: boolean } };
-        setMachineShim(value.shim ?? null);
-      }
-    } finally { setMachineBusy(false); }
-  };
-
   useEffect(() => () => {
     secondaryGenerationRef.current += 1;
   }, [apiBase]);
@@ -124,9 +88,8 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
   const fetchStartup = useCallback(async (signal: AbortSignal): Promise<StartupHealthData> => {
     const secondaryGeneration = ++secondaryGenerationRef.current;
     const keepSecondary = paintedRef.current;
-    // Keep prior notice/tray visible on revalidation; only reserve empty slots on first paint.
+    // Keep prior notice visible on revalidation; only reserve empty slots on first paint.
     if (!keepSecondary) {
-      setTrayLoading(true);
       setRuntimeNoticePending(true);
     }
     try {
@@ -171,33 +134,11 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
         data: next,
         warning: prevCache?.warning ?? null,
         fix: prevCache?.fix ?? null,
-        tray: prevCache?.tray ?? null,
       } satisfies StartupPageCache);
 
-      const trayPromise = next.platform === "win32"
-        ? fetch(`${apiBase}/api/windows-tray`, { signal })
-          .then(async (trayRes) => {
-            if (!trayRes.ok) throw new Error("tray status failed");
-            const trayNext = await trayRes.json() as unknown;
-            if (!isTrayStatusData(trayNext)) throw new Error("invalid tray status");
-            return { tray: trayNext, error: false as const };
-          })
-          .catch(() => ({ tray: null, error: true as const }))
-        : Promise.resolve({ tray: null, error: false as const });
-
-      // Health drives the main page, so publish it before the lower-priority settings/tray
-      // requests finish. Their result updates the existing reserved slots independently.
-      void Promise.all([settingsPromise, trayPromise]).then(([settings, trayResult]) => {
+      // Health drives the main page, so publish it before the lower-priority settings request finishes.
+      void settingsPromise.then(settings => {
         if (signal.aborted || secondaryGeneration !== secondaryGenerationRef.current) return;
-        const nextTray = next.platform === "win32" ? trayResult.tray : null;
-        if (next.platform === "win32") {
-          setTray(nextTray);
-          setTrayError(trayResult.error);
-        } else {
-          setTray(null);
-          setTrayError(false);
-        }
-        setTrayLoading(false);
         setRuntimeNoticePending(false);
 
         if (settings) {
@@ -208,7 +149,6 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
             data: next,
             warning: notice.warning,
             fix: notice.fix,
-            tray: nextTray,
           } satisfies StartupPageCache);
           return;
         }
@@ -219,20 +159,16 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
           data: next,
           warning: prev?.warning ?? null,
           fix: prev?.fix ?? null,
-          tray: nextTray,
         } satisfies StartupPageCache);
       });
       return next;
     } catch (error) {
       if (signal.aborted) throw error;
       if (!keepSecondary) {
-        setTray(null);
-        setTrayError(true);
         setCodexRuntimeWarning(null);
         setCodexRuntimeFix(null);
       }
       setRuntimeNoticePending(false);
-      setTrayLoading(false);
       throw error;
     }
   }, [apiBase, cacheKey, t]);
@@ -265,28 +201,6 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
       window.setTimeout(() => setCopied(current => current === command ? null : current), 1600);
     } catch {
       setCopied(null);
-    }
-  };
-
-  const runTrayAction = async (action: "install" | "start" | "stop" | "uninstall") => {
-    setTrayBusy(true);
-    setTrayError(false);
-    try {
-      const res = await fetch(`${apiBase}/api/windows-tray`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      });
-      if (!res.ok) throw new Error("tray action failed");
-      const body = await res.json() as { status: TrayStatusData };
-      if (!isTrayStatusData(body.status)) throw new Error("invalid tray action status");
-      setTray(body.status);
-      setTrayError(false);
-    } catch {
-      setTray(null);
-      setTrayError(true);
-    } finally {
-      setTrayBusy(false);
     }
   };
 
@@ -327,17 +241,6 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
           </button>
         </div>
       </div>
-
-      {connected && (
-        <section className="notice startup-page-notice" aria-label={t("connection.machine.title")}>
-          <strong>{t("connection.machine.title")}</strong>
-          <span>{machineShim?.healthy ? t("connection.machine.shimHealthy") : t("connection.machine.shimNeedsAttention")}</span>
-          <div className="startup-page-head-actions">
-            <button type="button" className="btn btn-ghost btn-sm" disabled={machineBusy} onClick={() => void runMachineShim("repair")}>{t("connection.machine.repairShim")}</button>
-            {machineShim?.installed && <button type="button" className="btn btn-ghost btn-sm" disabled={machineBusy} onClick={() => void runMachineShim("uninstall")}>{t("connection.machine.removeShim")}</button>}
-          </div>
-        </section>
-      )}
 
       {loadState.showSkeleton && !data ? (
         <DataSurfaceSkeleton label={t("startup.loading")} rows={5} />
@@ -383,15 +286,6 @@ export default function Startup({ apiBase, machineApiBase = apiBase, connected =
             installResult={installResult}
             onInstall={(action, opts) => { void runInstallAction(action, opts); }}
           />
-          {data.platform === "win32" && (
-            <StartupTraySection
-              tray={tray}
-              trayLoading={trayLoading}
-              trayError={trayError}
-              trayBusy={trayBusy}
-              onTrayAction={(action) => { void runTrayAction(action); }}
-            />
-          )}
           <StartupRecoverySection data={data} copied={copied} onCopy={(command) => { void copyCommand(command); }} />
         </>
       ) : null}

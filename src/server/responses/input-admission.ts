@@ -276,48 +276,6 @@ export function resolveOutputCeiling(
 }
 
 /**
- * Combo-only admission. A fallback must be able to satisfy the caller's declared output
- * allowance inside its OWN context window. Otherwise it returns 200, emits a few hundred
- * tokens, and terminates on `finish_reason: length` — which the Anthropic surface renders as
- * "response exceeded the output token maximum" even though the real cause was the total
- * window. By then the next target cannot be tried, because output has already committed.
- *
- * Two budgets are checked separately so the reserve is counted exactly once. `ceiling` is an
- * input-only budget once `modelMaxInputTokens` tightens it below the window, so the output
- * reserve belongs against `window`, not against `ceiling`.
- *
- * Direct and single-target requests keep the deliberately loose 2.5x pathological-input gate.
- * This stricter rule applies only to synthetic combo children, where skipping one known-small
- * target is safe and the ladder continues before any upstream bytes are sent. Unknown context
- * stays fail-open, and a caller that declared no output allowance is unaffected.
- */
-export function checkComboTargetInputAdmission(
-  parsed: OcxParsedRequest,
-  provider: OcxProviderConfig,
-  providerName: string,
-  modelId: string,
-  nativeContextCap?: NativeContextLimitsInput,
-): InputAdmissionResult {
-  const { window, ceiling } = resolveContextLimits(provider, providerName, modelId, nativeContextCap);
-  const requestedOutput = positive(parsed.options.maxOutputTokens);
-  if (window === null || ceiling === null || requestedOutput === null) {
-    return checkInputAdmission(parsed, provider, providerName, modelId, nativeContextCap);
-  }
-  const targetOutput = resolveOutputCeiling(provider, providerName, modelId);
-  const requiredOutputHeadroom = targetOutput === null
-    ? requestedOutput
-    : Math.min(requestedOutput, targetOutput);
-  const estimatedTokens = estimateInputTokens(parsed, modelId, provider);
-  return {
-    admitted: estimatedTokens <= ceiling && estimatedTokens + requiredOutputHeadroom <= window,
-    estimatedTokens,
-    ceiling,
-    requiredOutputHeadroom,
-    ...(window !== ceiling ? { contextWindow: window } : {}),
-  };
-}
-
-/**
  * Fail-open when no ceiling is known; refuse only past `ceiling * ADMISSION_TOLERANCE`.
  *
  * The caller is responsible for skipping compaction turns — see the call site in core.ts.

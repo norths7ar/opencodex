@@ -388,11 +388,8 @@ export const SERIAL_FULL_SUITE_FILES = [
   // Three Linux runs in a row timed out mid-file inside a 12-file batch while
   // every case passed alone (37730984813, 37732846946, 37735238354, all test
   // 1/4 batch 4): the same multi-file process-state class as the entries below.
-  "ci-workflows/ci-gui-typecheck-gate.test.ts",
-  "ci-workflows/release-helper.test.ts",
   // The full macOS isolate pool stalled in the structure gate's synchronous Git
   // child after earlier files; fresh-process execution retains the same assertions.
-  "ci-workflows/structure-ssot.test.ts",
   // Synchronous injection subprocesses can wedge the long-lived macOS isolate
   // parent while reaping a history Worker; contain them in a fresh bounded lane.
   "codex-integration/codex-inject-write-lock.test.ts",
@@ -432,7 +429,6 @@ type SerialLaneBasename = (typeof SERIAL_FULL_SUITE_FILES)[number] extends infer
 const SERIAL_LANE_TIMEOUT_MS: Partial<Record<SerialLaneBasename, number>> = {
   // This file intentionally exercises 33 complete release-script subprocess trees.
   // It is ~90s on an idle machine and measured at ~170s under unrelated host load.
-  "release-helper.test.ts": 5 * 60 * 1000,
 };
 
 export interface BunTestLane {

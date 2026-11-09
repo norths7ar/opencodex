@@ -84,17 +84,6 @@ export async function cmdProviderCcSwitchImport(args: string[], deps: CcSwitchIm
   }
 
   const mode = restore ? "restore" : apply ? "apply" : "preview";
-  if (mode !== "preview") {
-    const refusal = (await import("./link-child")).linkChildProviderChangeRefusal("ocx provider import-cc-switch");
-    if (refusal) {
-      if (wantsJson) console.log(JSON.stringify({ error: "link_child_refused", message: refusal }));
-      else console.error(refusal);
-      return 1;
-    }
-  } else {
-    await (await import("./link-child")).printLinkChildLocalNotice("The CC-Switch provider import preview");
-  }
-
   try {
     const run = deps.runImport ?? (await import("../providers/cc-switch-import")).runCcSwitchProviderImport;
     let printedBeforeWrite = false;

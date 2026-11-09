@@ -173,9 +173,8 @@ export function poolPreOutputRefusalHold(
   authCtx: CodexAuthContext,
   provider: OcxProviderConfig,
   connectMs: number,
-  comboAttempt: boolean | undefined,
 ): CodexWsPreOutputRefusalHold | undefined {
-  return !comboAttempt && usesCodexForwardPoolAuth(authCtx, provider) ? codexWsPreOutputRefusalHold(connectMs) : undefined;
+  return usesCodexForwardPoolAuth(authCtx, provider) ? codexWsPreOutputRefusalHold(connectMs) : undefined;
 }
 
 /**
@@ -491,7 +490,6 @@ export interface CodexPoolAccountRetryArgs {
     visionDescribeTerminal?: boolean;
     abortSignal?: AbortSignal;
     onCodexAuthContextResolved?: (ctx: CodexAuthContext) => void;
-    deferCodexResetDerivedCooldown?: boolean;
     /** Private Claude bridge pool identity; alternate selection completes it like the first pick. */
     claudeBridgePoolSession?: string;
     // Narrowed subset of HandleResponsesOptions: the retry rebuilds the adapter, so it
@@ -864,7 +862,7 @@ export async function retryCodexPoolOnAlternateAccount(
   }
   const deferFirstOutcome = shouldDeferCodexResetDerivedCooldown(
     firstResponse,
-    options.deferCodexResetDerivedCooldown,
+    false,
   );
   const recordFirstOutcome = (): void => {
     if (wasPermanentAccountRefusal(firstResponse)) {
@@ -880,8 +878,6 @@ export async function retryCodexPoolOnAlternateAccount(
       probeQuotaScope: codexProbeQuotaScope(firstAuthCtx),
       transientProbe: codexTransientProbeGrant(firstAuthCtx),
       writerGeneration: firstAuthCtx.writerGeneration,
-      // Retry already advanced the RR ring via excludeAccountId — reuse for promotion.
-      ...(retryAuthCtx.accountId ? { promoteAccountId: retryAuthCtx.accountId } : {}),
     });
     noteCodexWsPreOutputRefusalOutcome(firstResponse);
   };

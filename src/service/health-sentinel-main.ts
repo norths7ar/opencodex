@@ -5,21 +5,13 @@
  * proxy exits for any reason the operating system closes that pipe and this process sees EOF and
  * leaves. It asks `/healthz` on the cadence in health-sentinel-policy.ts and, when the policy says
  * the proxy has stopped answering, records the recovery and terminates the proxy. The supervisor
- * that started the proxy — the Task Scheduler batch loop, launchd, systemd, WinSW — restarts it as
+ * that started the proxy — the Task Scheduler batch loop or WinSW — restarts it as
  * it would after any crash. Nothing is replayed.
  *
  * The kill is bound to the proxy, not to a number:
  * - Windows reuses ids quickly, so the sentinel opens a handle on its parent at startup, accepts it
  *   only if that process was created before the sentinel, and terminates through the handle
  *   (health-sentinel-windows.ts). While the handle is open the id cannot be reused.
- * - Linux holds a pidfd after rechecking the live parent relationship, and signals that fd.
- *   Only unsupported kernels/architectures retain the live-ppid fallback used by macOS.
- * - macOS checks the live parent id immediately before SIGKILL; PID reuse between those two
- *   syscalls remains a documented residual (structure/ops/service-health-recovery.md).
- *
- * SIGKILL rather than SIGTERM: a proxy whose event loop is stuck cannot run its own SIGTERM
- * handler, and systemd counts a SIGTERM death as a clean exit that `Restart=on-failure` does not
- * restart.
  *
  * The final checks and the `intent` write run under the service ownership mutation lease, so the
  * decision cannot interleave with a service install, repair, takeover or startup ownership
@@ -413,15 +405,7 @@ export async function runHealthSentinelProcess(env: NodeJS.ProcessEnv = process.
     if (opened.ok) windowsHandle = opened.handle;
     else windowsBindFailure = opened.reason;
   }
-  let linuxHandle: import("./health-sentinel-linux").ParentPidfd | null = null;
-  let linuxBindFailure: string | null = null;
-  if (process.platform === "linux") {
-    const { openParentPidfd } = await import("./health-sentinel-linux");
-    const opened = openParentPidfd(targetPid, () => !gone && process.ppid === targetPid);
-    if (opened.kind === "bound") linuxHandle = opened.handle;
-    else if (opened.kind === "refused") linuxBindFailure = opened.reason;
-    else appendBoundedLog(logPath, `pidfd unavailable: ${opened.reason}; using live parent PID check`);
-  }
+
   const lag = startLagMonitor();
   try {
     await runHealthSentinel({
@@ -435,14 +419,12 @@ export async function runHealthSentinelProcess(env: NodeJS.ProcessEnv = process.
       },
       readRuntime: () => readSentinelRuntime(runtimePath),
       targetExited,
-      closeTarget: () => { linuxHandle?.close(); windowsHandle?.close(); },
+      closeTarget: () => { windowsHandle?.close(); },
       isTargetGone: () => gone || (windowsHandle?.exited() ?? false),
       bindTarget: () => {
-        // POSIX: Bun reads the parent id live, and it stops naming the proxy once the proxy exits.
         // Windows: it is the creating parent's id, so the handle below carries the identity.
         if (process.ppid !== targetPid) return { ok: false, reason: "the sentinel is not the watched process's child" };
-        if (linuxBindFailure) return { ok: false, reason: linuxBindFailure };
-        if (process.platform !== "win32") return { ok: true };
+        if (process.platform !== "win32") return { ok: false, reason: "unsupported platform" };
         return windowsHandle ? { ok: true } : { ok: false, reason: windowsBindFailure ?? "the parent process cannot be opened" };
       },
       terminateTarget: () => {
@@ -450,14 +432,7 @@ export async function runHealthSentinelProcess(env: NodeJS.ProcessEnv = process.
           if (!windowsHandle) return "failed";
           return windowsHandle.terminate(1) ? "terminated" : "failed";
         }
-        if (gone || process.ppid !== targetPid) return "not_target";
-        if (linuxHandle) return linuxHandle.terminate();
-        try {
-          process.kill(targetPid, "SIGKILL");
-          return "terminated";
-        } catch {
-          return "failed";
-        }
+        return "failed";
       },
       withOwnershipLease: run => {
         let lease: { release(): void };
@@ -473,7 +448,7 @@ export async function runHealthSentinelProcess(env: NodeJS.ProcessEnv = process.
         return entries === null ? null : countedRecoveryTimes(entries);
       },
       writeHistory: entry => writeRecoveryEntry(historyPath, entry),
-      log: line => appendBoundedLog(logPath, linuxHandle && line.startsWith("watching pid ") ? `${line} (pidfd)` : line),
+      log: line => appendBoundedLog(logPath, line),
       timing: parseTimingOverride(env[HEALTH_SENTINEL_ENV.timing]),
     });
   } finally {
