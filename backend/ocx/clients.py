@@ -12,14 +12,16 @@ from pathlib import Path
 
 import tomlkit
 from tomlkit.exceptions import TOMLKitError
-from tomlkit.items import Comment, InlineTable, Table
+from tomlkit.items import Comment, Table
 from tomlkit.toml_document import TOMLDocument
 
 from .runtime import instance_lock
 
 _PROVIDER = "opencodex-lite"
+_COMPACTION_PROVIDER = "opencodex"
 _LOCK_FILE = ".opencodex-lite.lock"
-_ROOT_KEYS = ("model", "model_provider")
+_ROOT_KEYS = ("model", "model_provider", "model_catalog_json")
+_NATIVE_ROOT_KEYS = (*_ROOT_KEYS, "openai_base_url")
 _MAX_CONFIG = 1 << 20
 _MAX_JOURNAL = 6 * _MAX_CONFIG + 2048
 
@@ -144,10 +146,18 @@ def _write_journal(path: Path, original: str | None, revisions: list[dict]) -> N
     _atomic_write(path, json.dumps(record, ensure_ascii=False), "Codex recovery journal")
 
 
-def _owned(values: dict) -> str:
+def _owned(
+    values: dict, *, legacy: bool = False, native: bool = False, compaction: bool = False
+) -> str:
+    if native:
+        keys = _NATIVE_ROOT_KEYS if not legacy else ("model", "model_provider", "openai_base_url")
+        fields = [values.get(key) for key in keys]
+        if compaction:
+            fields.append(values.get("model_providers", {}).get(_COMPACTION_PROVIDER))
+        return _digest(_canonical(fields))
     provider_map = values.get("model_providers")
     provider = provider_map.get(_PROVIDER) if isinstance(provider_map, dict) else None
-    fields = [values.get(key) for key in _ROOT_KEYS] + [provider]
+    fields = [values.get(key) for key in (_ROOT_KEYS[:2] if legacy else _ROOT_KEYS)] + [provider]
     return _digest(_canonical(fields))
 
 
@@ -179,12 +189,26 @@ class _Inspection:
             return {**result, "state": "conflict", "reason": self.conflict}
         if self.revision is None:
             return {**result, "state": "notConfigured"}
+        if self.revision.get("inactive"):
+            return {
+                **result,
+                "state": "notConfigured",
+                "retainedProviderTable": True,
+                "warning": "Native defaults restored. The opencodex provider definition remains so existing opencodex conversations can open; those conversations still need the gateway to send requests.",
+            }
         values = self.document.unwrap()
         return {
             **result,
             "state": "configured",
-            "baseUrl": values["model_providers"][_PROVIDER]["base_url"],
+            "baseUrl": values["openai_base_url"]
+            if self.revision.get("nativeRouting")
+            else values["model_providers"][_PROVIDER]["base_url"],
             "model": values["model"],
+            "clientCompaction": self.revision.get("clientCompaction", False),
+            "profileOverride": values.get("profile")
+            if isinstance(values.get("profiles", {}).get(values.get("profile")), dict)
+            and values["profiles"][values["profile"]].get("model_provider")
+            else None,
         }
 
 
@@ -196,15 +220,40 @@ def _inspect(path: Path, journal_path: Path) -> _Inspection:
     values = document.unwrap()
     provider_map = values.get("model_providers", {})
     if not isinstance(provider_map, dict) or any(
-        key in values and not isinstance(values[key], str) for key in _ROOT_KEYS
+        key in values and not isinstance(values[key], str) for key in _NATIVE_ROOT_KEYS
     ):
         result.conflict = "Codex model or provider settings are not in a supported format."
     elif journal is not None:
-        current = _owned(values)
         result.revision = next(
-            (rev for rev in reversed(journal["revisions"]) if current == rev["owned"]), None
+            (
+                rev
+                for rev in reversed(journal["revisions"])
+                if rev["owned"]
+                == _owned(
+                    values,
+                    legacy=not rev.get("catalogOwned", False),
+                    native=rev.get("nativeRouting", False),
+                    compaction=rev.get("compactionTableOwned", rev.get("clientCompaction", False)),
+                )
+            ),
+            None,
         )
-        if result.revision is None and current != _owned(_parse(journal["original"]).unwrap()):
+        baseline = _parse(journal["original"]).unwrap()
+        if result.revision is None and not any(
+            _owned(
+                values,
+                legacy=not rev.get("catalogOwned", False),
+                native=rev.get("nativeRouting", False),
+                compaction=rev.get("compactionTableOwned", rev.get("clientCompaction", False)),
+            )
+            == _owned(
+                baseline,
+                legacy=not rev.get("catalogOwned", False),
+                native=rev.get("nativeRouting", False),
+                compaction=rev.get("compactionTableOwned", rev.get("clientCompaction", False)),
+            )
+            for rev in journal["revisions"]
+        ):
             result.conflict = "Codex routing settings changed after Lite configured them."
     elif _PROVIDER in provider_map or values.get("model_provider") == _PROVIDER:
         result.conflict = "The Lite provider already exists without a matching recovery journal."
@@ -214,6 +263,8 @@ def _inspect(path: Path, journal_path: Path) -> _Inspection:
         # An authless Desktop placeholder has no URL; a real foreign provider owns its routing.
         if active != "openai" and (not isinstance(table, dict) or table.get("base_url")):
             result.conflict = "An external provider already controls Codex routing."
+        elif values.get("openai_base_url"):
+            result.conflict = "A user-owned openai_base_url already controls Codex routing."
     return result
 
 
@@ -244,39 +295,164 @@ def preview(home: Path, gateway_url: str, model: str | None, state_directory: Pa
     return {**status(home, state_directory), "baseUrl": gateway_url, "model": model or ""}
 
 
+def _reference_owned(document):
+    return _canonical(
+        [document.get(key) for key in ("model_provider", "model_catalog_json", "openai_base_url")]
+        + [document.get("model_providers", {}).get(_COMPACTION_PROVIDER)]
+    )
+
+
+def reference_config(
+    home,
+    directory,
+    gateway_url=None,
+    catalog_path=None,
+    *,
+    client_compaction=False,
+    restore=False,
+    validate=False,
+):
+    """Journal the original fallback/reference artifact without touching named user profiles."""
+    path = home / "opencodex.config.toml"
+    journal_path = _journal_path(home, directory).with_name("codex-reference.json")
+    source = _read(path, _MAX_CONFIG, "Codex reference config")
+    raw = _read(journal_path, _MAX_JOURNAL, "Codex reference journal")
+    record = json.loads(raw) if raw else None
+    document = _parse(source)
+    if (
+        record
+        and source != record.get("original")
+        and _reference_owned(document) not in record.get("owned", [])
+    ):
+        raise ClientConfigError(
+            "Codex reference routing was edited; its recovery journal was preserved."
+        )
+    original = record["original"] if record else source
+    if restore:
+        if record is None:
+            return
+        if source in record.get("applied", []):
+            candidate = original
+        else:
+            baseline = _parse(original)
+            for key in ("model_provider", "model_catalog_json", "openai_base_url"):
+                if key in baseline:
+                    document[key] = baseline[key]
+                else:
+                    document.pop(key, None)
+            providers = document.get("model_providers", {})
+            baseline_provider = baseline.get("model_providers", {}).get(_COMPACTION_PROVIDER)
+            if baseline_provider is not None:
+                if "model_providers" not in document:
+                    document["model_providers"] = tomlkit.table()
+                    providers = document["model_providers"]
+                providers[_COMPACTION_PROVIDER] = baseline_provider
+            elif _COMPACTION_PROVIDER in providers:
+                del providers[_COMPACTION_PROVIDER]
+            if not providers and "model_providers" not in baseline:
+                document.pop("model_providers", None)
+            candidate = _render(document.as_string(), source)
+        if candidate is None:
+            path.unlink(missing_ok=True)
+        else:
+            _atomic_write(path, candidate, "Codex reference config")
+        journal_path.unlink()
+        return
+    if source is None:
+        document.add(
+            tomlkit.comment(
+                "OpenCodex routing reference: merge these settings into config.toml if automatic injection is unavailable."
+            )
+        )
+    for key in ("model_provider", "model_catalog_json", "openai_base_url"):
+        document.pop(key, None)
+    document["model_catalog_json"] = str(catalog_path)
+    if client_compaction:
+        document["model_provider"] = _COMPACTION_PROVIDER
+        if "model_providers" not in document:
+            document["model_providers"] = tomlkit.table()
+        document["model_providers"][_COMPACTION_PROVIDER] = {
+            "name": "OpenCodex Proxy",
+            "base_url": gateway_url,
+            "wire_api": "responses",
+            "requires_openai_auth": True,
+        }
+    else:
+        document["openai_base_url"] = gateway_url
+        providers = document.get("model_providers", {})
+        if _COMPACTION_PROVIDER in providers:
+            del providers[_COMPACTION_PROVIDER]
+        if not providers:
+            document.pop("model_providers", None)
+    candidate = _render(document.as_string(), source)
+    if validate or candidate == source:
+        return str(path)
+    _unchanged(path, source)
+    next_record = {
+        "original": original,
+        "applied": [source, candidate],
+        "owned": [_reference_owned(_parse(source)), _reference_owned(document)],
+    }
+    _atomic_write(journal_path, json.dumps(next_record), "Codex reference journal")
+    _atomic_write(path, candidate, "Codex reference config")
+    return str(path)
+
+
 def _update_document(
-    current: _Inspection, gateway_url: str, model: str, gateway_key: str
+    current: _Inspection,
+    gateway_url: str,
+    model: str,
+    catalog_path: Path | None = None,
+    client_compaction: bool = False,
 ) -> tuple[str, TOMLDocument]:
     document = current.document
     expected = document.unwrap()
-    fields = {
-        "name": "OpenCodex Lite",
-        "base_url": gateway_url,
-        "wire_api": "responses",
-        "requires_openai_auth": False,
-        # This is only the generated loopback gateway key, never an upstream credential.
-        "experimental_bearer_token": gateway_key,
-    }
-    expected.update(model=model, model_provider=_PROVIDER)
-    expected.setdefault("model_providers", {})[_PROVIDER] = fields
+    # Original OpenCodex Design B: retain Codex's built-in provider identity so
+    # existing openai threads keep their routing/history without relabeling.
+    if current.revision and not current.revision.get("nativeRouting"):
+        original = _parse(current.journal["original"]).unwrap()
+        if original.get("openai_base_url"):
+            raise ClientConfigError(
+                "A user-owned openai_base_url must be resolved before migrating legacy routing."
+            )
+        providers = document.get("model_providers", {})
+        if _PROVIDER in providers:
+            del providers[_PROVIDER]
+            del expected["model_providers"][_PROVIDER]
+            if not providers and "model_providers" not in original:
+                del document["model_providers"]
+                del expected["model_providers"]
+    expected.update(model=model, openai_base_url=gateway_url)
+    expected.pop("model_provider", None)
     document["model"] = model
-    document["model_provider"] = _PROVIDER
-    providers = document.get("model_providers", {})
-    if isinstance(providers, InlineTable) or _PROVIDER in providers:
-        if _PROVIDER not in providers:
-            providers[_PROVIDER] = tomlkit.inline_table()
-        for key, value in fields.items():
-            providers[_PROVIDER][key] = value
-        rendered = document.as_string()
-    else:
-        # A sibling header also works if the existing providers were declared with dotted
-        # keys, where extending their TOMLKit parent can move root keys into the new table.
-        table = tomlkit.table()
-        table.update(fields)
-        rendered = document.as_string()
-        if rendered and not rendered.endswith("\n"):
-            rendered += "\n"
-        rendered += f"\n[model_providers.{_PROVIDER}]\n{table.as_string()}"
+    document.pop("model_provider", None)
+    document["openai_base_url"] = gateway_url
+    previous_table = (current.revision or {}).get(
+        "compactionTableOwned", (current.revision or {}).get("clientCompaction", False)
+    )
+    if client_compaction or previous_table:
+        providers = document.get("model_providers", {})
+        if _COMPACTION_PROVIDER in providers and not previous_table:
+            raise ClientConfigError(
+                "The opencodex provider table is user-owned; client-side compaction was not applied."
+            )
+        if "model_providers" not in document:
+            document["model_providers"] = tomlkit.table()
+        provider = {
+            "name": "OpenCodex Proxy",
+            "base_url": gateway_url,
+            "wire_api": "responses",
+            "requires_openai_auth": True,
+        }
+        document["model_providers"][_COMPACTION_PROVIDER] = provider
+        expected.setdefault("model_providers", {})[_COMPACTION_PROVIDER] = provider
+        if client_compaction:
+            document["model_provider"] = _COMPACTION_PROVIDER
+            expected["model_provider"] = _COMPACTION_PROVIDER
+    if catalog_path is not None:
+        expected["model_catalog_json"] = str(catalog_path)
+        document["model_catalog_json"] = str(catalog_path)
+    rendered = document.as_string()
     candidate = _render(rendered, current.source)
     return candidate, _verified(candidate, expected)
 
@@ -286,12 +462,34 @@ def _unchanged(path: Path, before: str | None) -> None:
         raise ClientConfigError("Codex config.toml changed during this operation; retry.")
 
 
+def validate_configuration(
+    home: Path,
+    gateway_url: str,
+    model: str,
+    state_directory: Path,
+    *,
+    catalog_path: Path | None = None,
+    client_compaction: bool = False,
+) -> None:
+    """Preflight the same transformation before publishing the model catalog."""
+    _target(gateway_url, model)
+    home = codex_home(home)
+    current = _inspect(home / "config.toml", _journal_path(home, state_directory))
+    if current.conflict:
+        raise ClientConfigError(current.conflict)
+    _update_document(current, gateway_url, model, catalog_path, client_compaction)
+
+
 def configure(
-    home: Path, gateway_url: str, model: str, gateway_key: str, state_directory: Path
+    home: Path,
+    gateway_url: str,
+    model: str,
+    state_directory: Path,
+    *,
+    catalog_path: Path | None = None,
+    client_compaction: bool = False,
 ) -> dict:
     _target(gateway_url, model)
-    if not re.fullmatch(r"[A-Za-z0-9._~+/-]+=*", gateway_key):
-        raise ClientConfigError("The local gateway credential is invalid.")
     home = codex_home(home)
     path = home / "config.toml"
     journal_path = _journal_path(home, state_directory)
@@ -299,7 +497,9 @@ def configure(
         current = _inspect(path, journal_path)
         if current.conflict:
             raise ClientConfigError(current.conflict)
-        candidate, current.document = _update_document(current, gateway_url, model, gateway_key)
+        candidate, current.document = _update_document(
+            current, gateway_url, model, catalog_path, client_compaction
+        )
         if len(candidate.encode()) > _MAX_CONFIG:
             raise ClientConfigError(
                 "The configured Codex file would be too large to restore safely."
@@ -313,7 +513,19 @@ def configure(
             revision = {
                 "pristine": pristine,
                 "config": _digest(candidate),
-                "owned": _owned(current.document.unwrap()),
+                "owned": _owned(
+                    current.document.unwrap(),
+                    legacy=catalog_path is None and not (previous or {}).get("catalogOwned", False),
+                    native=True,
+                    compaction=client_compaction
+                    or (previous or {}).get("compactionTableOwned", False),
+                ),
+                "nativeRouting": True,
+                "clientCompaction": client_compaction,
+                "compactionTableOwned": client_compaction
+                or (previous or {}).get("compactionTableOwned", False),
+                "catalogOwned": catalog_path is not None
+                or (previous or {}).get("catalogOwned", False),
             }
             # Record both sides of an update before writing config. An interrupted write can
             # still prove ownership of whichever version reached config.toml.
@@ -346,29 +558,43 @@ def _restore_document(current: _Inspection, original: TOMLDocument) -> str:
     document = current.document
     expected = document.unwrap()
     baseline_values = original.unwrap()
-    providers = document["model_providers"]
-    provider = providers[_PROVIDER]
-    if isinstance(provider, Table):
-        _keep_table_comments(document, provider)
-    for key in _ROOT_KEYS:
-        trivia = document.item(key).trivia
+    native = current.revision.get("nativeRouting", False)
+    root_keys = _NATIVE_ROOT_KEYS if native else _ROOT_KEYS
+    if not current.revision.get("catalogOwned"):
+        root_keys = tuple(key for key in root_keys if key != "model_catalog_json")
+    for key in root_keys:
+        trivia = document.item(key).trivia if key in document else None
         if key in original:
             expected[key] = baseline_values[key]
             baseline = original.item(key)
-            baseline.trivia.comment = trivia.comment
-            baseline.trivia.comment_ws = trivia.comment_ws
+            if trivia is not None:
+                baseline.trivia.comment = trivia.comment
+                baseline.trivia.comment_ws = trivia.comment_ws
             document[key] = baseline
-        else:
+        elif key in document:
             del expected[key]
             _keep_comment(document, trivia.comment)
             del document[key]
-    del providers[_PROVIDER]
-    del expected["model_providers"][_PROVIDER]
-    if not providers and "model_providers" not in original:
-        if isinstance(providers, Table):
-            _keep_table_comments(document, providers)
-        del document["model_providers"]
-        del expected["model_providers"]
+    if not native:
+        providers = document["model_providers"]
+        provider = providers[_PROVIDER]
+        if isinstance(provider, Table):
+            _keep_table_comments(document, provider)
+        del providers[_PROVIDER]
+        del expected["model_providers"][_PROVIDER]
+        if not providers and "model_providers" not in original:
+            if isinstance(providers, Table):
+                _keep_table_comments(document, providers)
+            del document["model_providers"]
+            del expected["model_providers"]
+    if current.revision.get(
+        "compactionTableOwned", current.revision.get("clientCompaction", False)
+    ):
+        del document["model_providers"][_COMPACTION_PROVIDER]
+        del expected["model_providers"][_COMPACTION_PROVIDER]
+        if not document["model_providers"] and "model_providers" not in original:
+            del document["model_providers"]
+            del expected["model_providers"]
     candidate = _render(document.as_string(), current.source)
     _verified(candidate, expected)
     return candidate
@@ -386,6 +612,19 @@ def restore(home: Path, state_directory: Path) -> dict:
             raise ClientConfigError(current.conflict)
         if current.journal is None:
             return current.metadata()
+        if current.revision and current.revision.get("inactive"):
+            return current.metadata()
+        retain_table = bool(
+            current.revision
+            and current.revision.get(
+                "compactionTableOwned", current.revision.get("clientCompaction", False)
+            )
+        )
+        retained_definition = (
+            current.document.unwrap().get("model_providers", {}).get(_COMPACTION_PROVIDER)
+            if retain_table
+            else None
+        )
         if current.revision is not None:
             original = current.journal["original"]
             baseline = _parse(original)
@@ -397,12 +636,38 @@ def restore(home: Path, state_directory: Path) -> dict:
                 candidate = _restore_document(current, baseline)
                 if original is None and not candidate.strip():
                     candidate = None
+            if retain_table:
+                restored = _parse(candidate)
+                if "model_providers" not in restored:
+                    restored["model_providers"] = tomlkit.table()
+                restored["model_providers"][_COMPACTION_PROVIDER] = retained_definition
+                candidate = _render(restored.as_string(), original or current.source)
             _unchanged(path, current.source)
+            if retain_table:
+                inactive = {
+                    **current.revision,
+                    "inactive": True,
+                    "clientCompaction": False,
+                    "pristine": False,
+                    "config": _digest(candidate),
+                    "owned": _owned(
+                        _parse(candidate).unwrap(),
+                        native=True,
+                        compaction=True,
+                        legacy=not current.revision.get("catalogOwned", False),
+                    ),
+                }
+                _write_journal(journal_path, original, [current.revision, inactive])
+                _unchanged(path, current.source)
             if candidate is None:
                 path.unlink()
             else:
                 _atomic_write(path, candidate, "Codex config.toml")
             current.source = candidate
+            if retain_table:
+                _write_journal(journal_path, original, [inactive])
+                current.revision = inactive
+                return current.metadata()
         journal_path.unlink()
         return {
             "configPath": str(path),

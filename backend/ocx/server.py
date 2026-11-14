@@ -12,42 +12,63 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from pydantic import ValidationError
 
 from . import __version__
-from .config import ConfigStore
-from .gateway import Gateway
+from .agent_api import agent_router
+from .auxiliary_api import auxiliary_router
+from .client_api import client_router
+from .debug_api import debug_router
+from .dsh_api import dsh_router
+from .fallback_api import fallback_router
+from .legacy_import_api import legacy_import_router
 from .management import management_router
 from .runtime import WEB_ROOT, instance_lock, write_state
+from .services import AppServices
+from .settings_api import settings_router
+from .startup_api import startup_router
+from .storage_api import storage_router
+from .subagent_api import subagent_router
+from .usage_api import usage_router
+from .workflow_api import workflow_router
 
 
 def create_app(directory: Path, state: dict, stop):
-    store = ConfigStore(directory)
-    gateway = Gateway(store)
-    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=gateway.lifespan)
+    services = AppServices(directory, state["port"])
+    store, gateway = services.store, services.gateway
+    app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None, lifespan=services.lifespan)
+    csrf_token = secrets.token_urlsafe(32)
     started = time.monotonic()
 
     @app.exception_handler(RequestValidationError)
+    @app.exception_handler(ValidationError)
     async def invalid_request(request: Request, exc: RequestValidationError):
         # Pydantic's default error response includes the raw submitted credential in `input`.
         return JSONResponse(
             {
+                "error": "Invalid configuration.",
                 "detail": [
                     {"loc": e["loc"], "msg": e["msg"], "type": e["type"]} for e in exc.errors()
-                ]
+                ],
             },
             422,
         )
 
     @app.exception_handler(ValueError)
     async def bad_configuration(request: Request, exc: ValueError):
-        return JSONResponse({"detail": str(exc)}, 400)
+        return JSONResponse({"error": str(exc), "detail": str(exc)}, 400)
 
     @app.exception_handler(RuntimeError)
     async def runtime_error(request: Request, exc: RuntimeError):
-        return JSONResponse({"detail": str(exc)}, 409)
+        return JSONResponse({"error": str(exc), "detail": str(exc)}, 409)
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request: Request, exc):
+        payload = exc.detail if isinstance(exc.detail, dict) else {"error": exc.detail}
+        return JSONResponse(payload, exc.status_code)
 
     def report():
         return {
@@ -79,13 +100,23 @@ def create_app(directory: Path, state: dict, stop):
         if referer and urlsplit(referer).netloc != host:
             return JSONResponse({"error": "Cross-origin access is not allowed."}, 403)
         if request.url.path.startswith("/api/"):
-            supplied = request.headers.get("authorization", "")
-            if not secrets.compare_digest(supplied, f"Bearer {state['token']}"):
+            gui_key = request.headers.get("x-opencodex-api-key", "")
+            bearer = request.headers.get("authorization", "")
+            if not (
+                secrets.compare_digest(gui_key, state["token"])
+                or secrets.compare_digest(bearer, f"Bearer {state['token']}")
+            ):
                 return JSONResponse({"error": "A local console session is required."}, 401)
-        if request.url.path.startswith("/v1/"):
-            supplied = request.headers.get("authorization", "")
-            if not secrets.compare_digest(supplied, f"Bearer {store.gateway_key}"):
-                return JSONResponse({"error": {"message": "A gateway API key is required."}}, 401)
+            if (
+                gui_key
+                and request.method not in {"GET", "HEAD"}
+                and not secrets.compare_digest(
+                    request.headers.get("x-opencodex-csrf-token", ""), csrf_token
+                )
+            ):
+                return JSONResponse({"error": "A current console CSRF token is required."}, 403)
+        # Like the original loopback listener, local clients need no gateway credential.
+        # The browser management plane above still requires its own console session.
         response = await call_next(request)
         response.headers.setdefault("Cache-Control", "no-store")
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -97,9 +128,24 @@ def create_app(directory: Path, state: dict, stop):
     async def health():
         return report()
 
+    @app.get("/api/system/health")
+    async def system_health():
+        data = report()
+        return {
+            **data,
+            "uptime": data["uptimeSeconds"],
+            "spendLedger": services.spend_diagnostics(),
+        }
+
     @app.get("/opencodex-session")
-    async def session():
-        return {"token": state["token"]}
+    async def session(request: Request):
+        origin = f"http://{request.headers['host']}"
+        return {
+            "token": state["token"],
+            "csrfToken": csrf_token,
+            "browserOrigin": origin,
+            "serverOrigin": origin,
+        }
 
     @app.get("/api/status")
     async def runtime_status():
@@ -111,15 +157,59 @@ def create_app(directory: Path, state: dict, stop):
 
     @app.post("/api/stop")
     async def stop_instance():
+        services.stopping.set()
         asyncio.get_running_loop().call_later(0.1, stop)
         return {"status": "stopping"}
 
-    app.include_router(management_router(store, gateway, directory, state["port"]))
+    app.include_router(
+        management_router(
+            store,
+            gateway,
+            directory,
+            state["port"],
+            inventory=services.inventory,
+            quota=services.quota,
+            kimi_quota=services.kimi_quota,
+            catalog_refresh=services.refresh_catalog,
+            stopping=services.stopping,
+        )
+    )
+    app.include_router(legacy_import_router(store, services.imported_providers))
+    app.include_router(subagent_router(services.subagents))
+    app.include_router(auxiliary_router(services.auxiliary, services.integration))
+    app.include_router(workflow_router(store, gateway.workflow_budget))
+    app.include_router(agent_router(store))
+    app.include_router(settings_router(store, services.integration))
+    app.include_router(fallback_router(gateway.fallback))
+    app.include_router(debug_router(services.diagnostics))
+    app.include_router(
+        startup_router(directory, state["port"], client_status=services.integration.status)
+    )
+    app.include_router(dsh_router(directory, state["port"], services.inventory.rows))
+    app.include_router(usage_router(gateway.usage_store, store, services.inventory.official))
+    app.include_router(storage_router(directory, gateway.usage_store))
+    app.include_router(client_router(services.integration))
     app.include_router(gateway.router())
+
+    @app.get("/v1/responses")
+    async def responses_transport(request: Request):
+        # Original Design B: the built-in openai provider tries WS first. 426
+        # selects its immediate HTTP fallback while WebSockets are disabled.
+        if request.headers.get("upgrade", "").lower() == "websocket":
+            return JSONResponse(
+                {
+                    "error": {
+                        "code": "upgrade_required",
+                        "message": "Responses WebSocket transport is disabled; use HTTP",
+                    }
+                },
+                426,
+            )
+        return JSONResponse({"error": "Use POST for Responses requests."}, 405)
 
     @app.api_route("/api/{route:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])
     async def not_migrated(route: str):
-        return JSONResponse({"error": "This API has not been migrated to Python yet."}, 501)
+        return JSONResponse({"error": "This feature has not been migrated yet."}, 501)
 
     @app.get("/{route:path}")
     async def console(route: str):
@@ -128,6 +218,8 @@ def create_app(directory: Path, state: dict, stop):
         file = (WEB_ROOT / (route or "index.html")).resolve()
         if not file.is_relative_to(WEB_ROOT.resolve()):
             return JSONResponse({"error": "Not found"}, 404)
+        if file.is_dir():
+            file = file / "index.html"
         if file.is_file():
             cache = (
                 "public, max-age=31536000, immutable"
@@ -158,7 +250,7 @@ def serve(directory: Path, port: int) -> None:
             "state": "starting",
             "pid": os.getpid(),
             "port": port,
-            "token": secrets.token_urlsafe(32),
+            "token": "ocx_session_" + secrets.token_urlsafe(32),
             "startedAt": datetime.now(UTC).isoformat(),
         }
         write_state(directory, state)
@@ -176,6 +268,7 @@ def serve(directory: Path, port: int) -> None:
                         access_log=False,
                         timeout_graceful_shutdown=10,
                         proxy_headers=False,
+                        ws="none",
                     )
                 )
                 state["state"] = "running"

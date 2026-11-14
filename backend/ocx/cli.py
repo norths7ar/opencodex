@@ -1,4 +1,4 @@
-"""Project-owned lifecycle commands; no OS service or browser process supervision."""
+"""Project-owned lifecycle commands and per-user Windows automatic startup."""
 
 import argparse
 import json
@@ -95,7 +95,14 @@ def stop(directory: Path) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="ocx", description="OpenCodex Lite local Python runtime")
-    parser.add_argument("command", choices=["start", "stop", "restart", "status", "serve"])
+    parser.add_argument(
+        "command", choices=["start", "stop", "restart", "status", "serve", "startup", "service-run"]
+    )
+    parser.add_argument(
+        "startup_action",
+        nargs="?",
+        choices=["status", "install", "repair", "enable", "disable", "remove"],
+    )
     parser.add_argument("--port", type=int, help=f"Listening port (first start: {DEFAULT_PORT})")
     parser.add_argument(
         "--state-dir", help="Independent runtime directory; defaults to LOCALAPPDATA/OpenCodexLite"
@@ -108,6 +115,38 @@ def main() -> None:
         parser.error("--port must be between 1 and 65535")
     directory = state_directory(args.state_dir)
     try:
+        if args.command == "service-run":
+            from .startup import supervise
+
+            supervise(directory, args.port or DEFAULT_PORT)
+            return
+        if args.command == "startup":
+            from .startup import Startup
+
+            startup = Startup(
+                directory, args.port or read_state(directory).get("port", DEFAULT_PORT)
+            )
+            result = (
+                startup.health()
+                if args.startup_action in {None, "status"}
+                else startup.action(args.startup_action)
+            )
+            if args.json:
+                print(json.dumps(result, ensure_ascii=False))
+            else:
+                health = result.get("health", result)
+                print(f"OpenCodex Lite automatic startup: {health['status']}")
+                print(f"Task: {health['taskName']}")
+                print(
+                    f"Gateway: {health['runtimeState']}; user login startup enabled: {health['autostartEnabled']}"
+                )
+                if health.get("error"):
+                    print(health["error"])
+            if result.get("health", result).get("diagnosticStale"):
+                raise SystemExit(1)
+            return
+        if args.startup_action is not None:
+            parser.error("The extra action is only supported by ocx startup.")
         if args.command == "serve":
             from .server import serve
 
@@ -120,6 +159,13 @@ def main() -> None:
                 if args.command == "restart":
                     stop(directory)
                 result = stop(directory) if args.command == "stop" else start(directory, args.port)
+            if args.command in {"start", "restart"}:
+                from .startup import Startup
+
+                try:
+                    Startup(directory, result["port"]).resume_supervision()
+                except (RuntimeError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
+                    result["startupWarning"] = str(exc)
         if args.json:
             print(json.dumps(result, ensure_ascii=False))
         else:
@@ -129,6 +175,8 @@ def main() -> None:
             print(f"Log: {result['logPath']}")
             if result.get("error"):
                 print(result["error"])
+            if result.get("startupWarning"):
+                print(f"Automatic startup: {result['startupWarning']}")
         if result["state"] in {"failed", "unresponsive"}:
             raise SystemExit(1)
     except (RuntimeError, OSError, ValueError) as exc:

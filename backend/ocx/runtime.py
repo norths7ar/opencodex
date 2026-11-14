@@ -4,6 +4,7 @@ import ctypes
 import json
 import msvcrt
 import os
+import time
 from contextlib import contextmanager
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -54,7 +55,15 @@ def read_state(directory: Path) -> dict:
 def write_state(directory: Path, state: dict) -> None:
     temporary = directory / "runtime.json.tmp"
     temporary.write_text(json.dumps(state, indent=2), encoding="utf-8")
-    temporary.replace(directory / "runtime.json")
+    for attempt in range(10):
+        try:
+            temporary.replace(directory / "runtime.json")
+            return
+        except PermissionError:
+            # Windows can briefly hold the destination open during CLI status polling.
+            if attempt == 9:
+                raise
+            time.sleep(0.05)
 
 
 def process_alive(pid: int) -> bool:
