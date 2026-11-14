@@ -17,6 +17,8 @@ import FileIntegrationPage, {
   type FileIntegrationClientId,
 } from "./integrations/FileIntegrationPage";
 import { FILE_CLIENTS, TABS, type IntegrationTab } from "./integrations/integration-tabs";
+import { useRuntimeCapabilities } from "../runtime-capabilities";
+import CodexConnection from "./integrations/CodexConnection";
 
 function readIntegrationTab(hash = window.location.hash): IntegrationTab {
   // Read the destination, not a legacy spelling the route hook is about to replace.
@@ -25,7 +27,7 @@ function readIntegrationTab(hash = window.location.hash): IntegrationTab {
   // sub-tab is Claude's own business.
   if (raw === "claude/desktop") return "claudeDesktop";
   if (raw === "claude" || raw.startsWith("claude/")) return "claude";
-  const match = TABS.find(tab => tab.hash === raw);
+  const match = TABS.find((tab) => tab.hash === raw);
   return match?.id ?? "overview";
 }
 
@@ -51,7 +53,12 @@ function tabMark(tab: IntegrationTab): string | null {
 
 export default function Integrations({ apiBase }: { apiBase: string }) {
   const t = useT();
+  const capabilities = useRuntimeCapabilities();
+  const available = (id: IntegrationTab) =>
+    !capabilities || id === "overview" || capabilities.clients.includes(id);
+  const tabs = TABS.filter((definition) => available(definition.id));
   const [tab, setTab] = useState<IntegrationTab>(readIntegrationTab);
+  const visibleTab = available(tab) ? tab : "overview";
   /*
    * Panels mount lazily and then STAY mounted, hidden, so a half-typed key or
    * an unsaved Grok selection survives a tab hop. Each mounted panel is gated
@@ -71,7 +78,7 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
    */
   const activateTab = (next: IntegrationTab) => {
     setTab(next);
-    setMounted(current => (current.has(next) ? current : new Set([...current, next])));
+    setMounted((current) => (current.has(next) ? current : new Set([...current, next])));
   };
 
   useEffect(() => {
@@ -85,7 +92,7 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
   }, []);
 
   const selectTab = (next: IntegrationTab, moveFocus: boolean) => {
-    const definition = TABS.find(candidate => candidate.id === next);
+    const definition = TABS.find((candidate) => candidate.id === next);
     if (!definition) return;
     navigateHash(definition.hash);
     activateTab(next);
@@ -97,15 +104,15 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
   };
 
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const index = TABS.findIndex(candidate => candidate.id === tab);
+    const index = tabs.findIndex((candidate) => candidate.id === visibleTab);
     let nextIndex: number | null = null;
-    if (event.key === "ArrowLeft") nextIndex = (index - 1 + TABS.length) % TABS.length;
-    else if (event.key === "ArrowRight") nextIndex = (index + 1) % TABS.length;
+    if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+    else if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
     else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = TABS.length - 1;
+    else if (event.key === "End") nextIndex = tabs.length - 1;
     if (nextIndex === null) return;
     event.preventDefault();
-    selectTab(TABS[nextIndex].id, true);
+    selectTab(tabs[nextIndex].id, true);
   };
 
   return (
@@ -114,38 +121,44 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
         <h2>{t("nav.connect")}</h2>
       </div>
       <p className="page-sub">{t("connectV2.subtitle")}</p>
-      <div className="page-tabs connect-tabs" role="tablist" aria-label={t("integrations.tabsLabel")}>
-        {TABS.map(definition => (
+      <div
+        className="page-tabs connect-tabs"
+        role="tablist"
+        aria-label={t("integrations.tabsLabel")}
+      >
+        {tabs.map((definition) => (
           <Fragment key={definition.id}>
-          <button
-            ref={node => {
-              if (node) tabRefs.current!.set(definition.id, node);
-              else tabRefs.current!.delete(definition.id);
-            }}
-            type="button"
-            role="tab"
-            id={tabDomId(definition.id)}
-            aria-selected={tab === definition.id}
-            aria-controls={panelDomId(definition.id)}
-            tabIndex={tab === definition.id ? 0 : -1}
-            className={`page-tab${tab === definition.id ? " page-tab--active" : ""}`}
-            onClick={() => selectTab(definition.id, true)}
-            onKeyDown={handleTabKeyDown}
-          >
-            {definition.id !== "overview" && definition.id !== "keys" && (
-              <ClientMark src={tabMark(definition.id)} label={t(definition.labelKey)} size={14} />
+            <button
+              ref={(node) => {
+                if (node) tabRefs.current!.set(definition.id, node);
+                else tabRefs.current!.delete(definition.id);
+              }}
+              type="button"
+              role="tab"
+              id={tabDomId(definition.id)}
+              aria-selected={visibleTab === definition.id}
+              aria-controls={panelDomId(definition.id)}
+              tabIndex={visibleTab === definition.id ? 0 : -1}
+              className={`page-tab${visibleTab === definition.id ? " page-tab--active" : ""}`}
+              onClick={() => selectTab(definition.id, true)}
+              onKeyDown={handleTabKeyDown}
+            >
+              {definition.id !== "overview" && definition.id !== "keys" && (
+                <ClientMark src={tabMark(definition.id)} label={t(definition.labelKey)} size={14} />
+              )}
+              {t(definition.labelKey)}
+            </button>
+            {/* The two page-level tabs come first; a hairline sets them apart from the apps. */}
+            {definition.id === "keys" && (
+              <span className="connect-tabs-divider" role="presentation" />
             )}
-            {t(definition.labelKey)}
-          </button>
-          {/* The two page-level tabs come first; a hairline sets them apart from the apps. */}
-          {definition.id === "keys" && <span className="connect-tabs-divider" role="presentation" />}
           </Fragment>
         ))}
       </div>
 
-      {TABS.map(definition => {
-        if (!mounted.has(definition.id)) return null;
-        const active = tab === definition.id;
+      {tabs.map((definition) => {
+        if (!mounted.has(definition.id) && definition.id !== visibleTab) return null;
+        const active = visibleTab === definition.id;
         return (
           <div
             key={definition.id}
@@ -158,19 +171,25 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
               <IntegrationsOverview apiBase={apiBase} active={active} />
             )}
             {definition.id === "keys" && <ApiKeys apiBase={apiBase} active={active} />}
-            {definition.id === "codex" && (
-              <section className="integration-native-page" aria-labelledby="codex-integration-title">
-                <h3 id="codex-integration-title">{t("integrations.codex.title")}</h3>
-                <p>{t("integrations.codex.body")}</p>
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => navigateHash("startup")}
+            {definition.id === "codex" &&
+              (capabilities ? (
+                <CodexConnection apiBase={apiBase} active={active} />
+              ) : (
+                <section
+                  className="integration-native-page"
+                  aria-labelledby="codex-integration-title"
                 >
-                  {t("integrations.codex.openService")}
-                </button>
-              </section>
-            )}
+                  <h3 id="codex-integration-title">{t("integrations.codex.title")}</h3>
+                  <p>{t("integrations.codex.body")}</p>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    onClick={() => navigateHash("startup")}
+                  >
+                    {t("integrations.codex.openService")}
+                  </button>
+                </section>
+              ))}
             {definition.id === "grok" && <Grok apiBase={apiBase} active={active} />}
             {definition.id === "claude" && <Claude apiBase={apiBase} active={active} embedded />}
             {definition.id === "claudeDesktop" && (
@@ -179,15 +198,21 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
                 <ClaudeDesktop key={apiBase} apiBase={apiBase} active={active} />
               </div>
             )}
-            {definition.id === "cursor" && <CursorIntegrationPage apiBase={apiBase} active={active} />}
-            {FILE_CLIENTS.has(definition.id as FileIntegrationClientId) && (
-              definition.id === "aside" ? <AsideProfilesPage apiBase={apiBase} active={active} />
-              : definition.id === "hermes" ? <HermesProfilesPage apiBase={apiBase} active={active} /> : <FileIntegrationPage
-                apiBase={apiBase}
-                client={definition.id as FileIntegrationClientId}
-                active={active}
-              />
+            {definition.id === "cursor" && (
+              <CursorIntegrationPage apiBase={apiBase} active={active} />
             )}
+            {FILE_CLIENTS.has(definition.id as FileIntegrationClientId) &&
+              (definition.id === "aside" ? (
+                <AsideProfilesPage apiBase={apiBase} active={active} />
+              ) : definition.id === "hermes" ? (
+                <HermesProfilesPage apiBase={apiBase} active={active} />
+              ) : (
+                <FileIntegrationPage
+                  apiBase={apiBase}
+                  client={definition.id as FileIntegrationClientId}
+                  active={active}
+                />
+              ))}
             {/* Shown only when LazyCodex is detected, so a Pi-based omo install sees nothing new here. */}
             {definition.id === "omo" && <LazyCodexRoleModels apiBase={apiBase} active={active} />}
           </div>

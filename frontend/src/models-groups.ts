@@ -1,12 +1,19 @@
 /** Pure grouping for the Models page, including configured providers with zero model rows. */
-export type ProviderDiscoverySummary =
+export type ProviderDiscoverySummary = (
   | { status: "ok" }
   | { status: "failed"; reason: "http"; httpStatus: number }
   | {
       status: "failed";
       reason: "blocked" | "invalid_response" | "network" | "provider";
       httpStatus?: never;
-    };
+    }
+) & {
+  checkedAt?: string;
+  lastSuccessAt?: string;
+  error?: string;
+  staleDefaultModel?: string;
+  staleAliases?: Record<string, string>;
+};
 
 export type ProviderEntitlementSummary =
   | { status: "unavailable" }
@@ -66,7 +73,7 @@ export function buildProviderModelGroups<Row extends { provider: string; native?
     else grouped.set(row.provider, [row]);
   }
 
-  const providerByName = new Map(providers.map(provider => [provider.name, provider]));
+  const providerByName = new Map(providers.map((provider) => [provider.name, provider]));
   for (const provider of providers) {
     if (provider.disabled === true) {
       grouped.delete(provider.name);
@@ -82,9 +89,10 @@ export function buildProviderModelGroups<Row extends { provider: string; native?
       return {
         provider,
         rows: providerRows,
-        native: providerRows.length > 0 && providerRows.every(row => row.native === true),
-        nativeProviderGroup: providerRows.some(row => row.native === true)
-          || (provider === "openai" && configured?.authMode === "forward"),
+        native: providerRows.length > 0 && providerRows.every((row) => row.native === true),
+        nativeProviderGroup:
+          providerRows.some((row) => row.native === true) ||
+          (provider === "openai" && configured?.authMode === "forward"),
         liveModels: configured?.liveModels !== false,
         configuredModels: configured?.models ?? [],
         contextWindow: configured?.contextWindow,

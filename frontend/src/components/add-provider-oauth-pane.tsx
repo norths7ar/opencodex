@@ -3,6 +3,7 @@ import { useT } from "../i18n/shared";
 import { LoginHint } from "./login-url-block";
 import type { BrowserLaunch } from "../oauth-browser-launch";
 import { OpenBrowserPrefToggle } from "./open-browser-pref-toggle";
+import { OAuthFlowSelect } from "./oauth-flow-select";
 import type { CatalogPreset } from "./provider-catalog/provider-presets";
 
 export function AddProviderOAuthPane({
@@ -53,25 +54,49 @@ export function AddProviderOAuthPane({
       <div className="muted text-control">{preset.note ?? t("modal.oauthDefaultNote")}</div>
       {oauthSupported.includes(preset.oauthProvider ?? "") ? (
         <>
-          <button type="button" className="btn btn-primary" onClick={() => onRequestLogin(preset.oauthProvider!)} disabled={oauthBusy}
-            style={{ width: "100%", padding: "12px 16px" }}>
-            <IconLock />{oauthBusy ? t("modal.waitingBrowser") : t("modal.logInWith", { label: preset.label })}
+          <OAuthFlowSelect provider={preset.oauthProvider ?? ""} disabled={oauthBusy} />
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => onRequestLogin(preset.oauthProvider!)}
+            disabled={oauthBusy}
+            style={{ width: "100%", padding: "12px 16px" }}
+          >
+            <IconLock />
+            {oauthBusy ? t("modal.waitingBrowser") : t("modal.logInWith", { label: preset.label })}
           </button>
           {!oauthBusy && <OpenBrowserPrefToggle />}
         </>
       ) : (
-        <div className="text-control" style={{ color: "var(--amber)", background: "var(--amber-soft)", border: "1px solid var(--amber)", borderRadius: "var(--radius-sm)", padding: "10px 12px" }}>
+        <div
+          className="text-control"
+          style={{
+            color: "var(--amber)",
+            background: "var(--amber-soft)",
+            border: "1px solid var(--amber)",
+            borderRadius: "var(--radius-sm)",
+            padding: "10px 12px",
+          }}
+        >
           {t("modal.oauthComingSoon", { label: preset.label })}
         </div>
       )}
       {oauthMsg && (
-        <div className="text-label" style={{ color: oauthMsgTone === "warn" ? "var(--amber)" : "var(--accent-hover)" }}>
+        <div
+          className="text-label"
+          style={{ color: oauthMsgTone === "warn" ? "var(--amber)" : "var(--accent-hover)" }}
+        >
           {oauthMsg}
         </div>
       )}
       {oauthBusy && (
         <LoginHint
-          hint={{ url: oauthUrl, deviceCode: oauthDeviceCode, instructions: oauthInstructions, browserLaunch: oauthBrowserLaunch }}
+          hint={{
+            url: oauthUrl,
+            deviceCode: oauthDeviceCode,
+            instructions: oauthInstructions,
+            browserLaunch: oauthBrowserLaunch,
+          }}
           paste={{
             value: manualCode,
             busy: manualCodeBusy,
@@ -79,7 +104,9 @@ export function AddProviderOAuthPane({
             message: manualCodeMsg,
             ok: manualCodeOk,
             onChange: onManualCodeChange,
-            onSubmit: () => { if (preset.oauthProvider) onSubmitManualCode(preset.oauthProvider); },
+            onSubmit: () => {
+              if (preset.oauthProvider) onSubmitManualCode(preset.oauthProvider);
+            },
           }}
         />
       )}
@@ -89,11 +116,17 @@ export function AddProviderOAuthPane({
         </button>
         <div style={{ flex: 1 }} />
         {oauthBusy && preset.oauthProvider && (
-          <button type="button" className="btn btn-ghost" onClick={() => onCancelLogin(preset.oauthProvider!)}>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => onCancelLogin(preset.oauthProvider!)}
+          >
             {t("common.cancel")}
           </button>
         )}
-        <button type="button" className="btn btn-ghost" onClick={onBack}>{t("modal.back")}</button>
+        <button type="button" className="btn btn-ghost" onClick={onBack}>
+          {t("modal.back")}
+        </button>
       </div>
     </div>
   );

@@ -2,62 +2,37 @@ import { useEffect, useId, useRef, useState } from "react";
 import { confirmAction } from "../action-dialogs";
 import { createBoundedFetch, type BoundedFetch } from "../bounded-fetch";
 import { readJsonOrThrow } from "../fetch-json";
-import { useT, type TKey } from "../i18n/shared";
+import { liteTranslator } from "../i18n/lite-copy";
+import { useI18n, type TKey } from "../i18n/shared";
 import { Notice, Select } from "../ui";
-import { CUSTOM_OPTION, REASONING_EFFORT_LEVELS, type ModelRow } from "../pages/models-shared";
+import {
+  CUSTOM_OPTION,
+  REASONING_EFFORT_LEVELS,
+  modelDisplayNameValidationKey,
+  type ModelRow,
+} from "../pages/models-shared";
+import {
+  buildDraftCost,
+  isRecord,
+  loadDraft,
+  RATE_FIELDS,
+  sameModelCost,
+  type InvalidField,
+} from "./model-price-cost";
+import ModelPriceFields from "./ModelPriceFields";
+import { MetadataSource, ModelCostSummary, ModelReasoningSummary } from "./model-metadata";
 
-/**
- * The per-model overrides on ONE routed row, in the shape the row already reports them.
- *
- * Three axes, and no fourth. Display name is absent on purpose: the row has its own editor for
- * it, with its own provenance display, and a second control writing the same key is two
- * statements that can drift apart. This dialog owns what nothing else edits — the context
- * window, the modality declaration, and the reasoning ladder — so "restore" means "clear the
- * capability overrides", which is a promise it can keep.
- *
- * Every field is optional and clearing one is a distinct intent from writing a value: an empty
- * window sends `null`, which hands the fact back to the registry, the catalog and the provider
- * default instead of pinning today's answer as an override that outlives its source.
- */
-
-/** The modalities the API accepts. `video` is absent: the wire carries text and image parts. */
 const MODALITIES = ["text", "image", "audio"] as const;
-
 const CONTEXT_PRESETS = ["100000", "128000", "200000", "256000", "352000", "500000", "1000000"];
-
 const REQUEST_TIMEOUT_MS = 60_000;
-
 type Phase = "ready" | "saving" | "restoring" | "unknown" | "saved-stale";
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-/** What the row reported when the dialog opened: the form's start, and the save diff's baseline. */
-interface SettingsBaseline {
-  contextWindow: string;
-  modalities: string[];
-  reasoning: boolean;
-  ladder: string[];
-  defaultEffort: string;
-}
-
-function baselineOf(row: ModelRow): SettingsBaseline {
-  const reasoning = row.reasoningOverridden === true;
-  return {
-    contextWindow: row.contextWindowDeclared !== undefined ? String(row.contextWindowDeclared) : "",
-    // The DECLARATION, never the row's own `inputModalities`. That one is the catalog value:
-    // pre-filling from it made an undeclared model look declared, and because an untouched field
-    // is not submitted, every save came back as "nothing changed" and the row never moved.
-    modalities: Array.isArray(row.inputModalitiesDeclared) ? [...row.inputModalitiesDeclared] : [],
-    reasoning,
-    // The ladder only counts as the operator's when the config really overrides it: OpenCodex
-    // writes the registry ladder into the config itself, so key presence would tick this box on
-    // every model that merely inherits its levels.
-    ladder: reasoning && Array.isArray(row.reasoningEfforts) ? [...row.reasoningEfforts] : [],
-    defaultEffort: reasoning ? (row.defaultReasoningEffort ?? "") : "",
-  };
-}
+type Axis =
+  | "displayName"
+  | "contextWindow"
+  | "inputModalities"
+  | "reasoningEfforts"
+  | "defaultReasoningEffort"
+  | "cost";
 
 function sortedKey(values: readonly string[]): string {
   return values.toSorted().join(",");
@@ -74,50 +49,184 @@ function parseContextWindow(raw: string): number | null | undefined {
 interface ModelSettingsDialogProps {
   row: ModelRow;
   apiBase: string;
-  /** Reload the catalog. Resolves false when the reload failed, so the dialog can say so. */
   onRefresh: (signal: AbortSignal) => Promise<boolean>;
   onFeedback: (ok: boolean, message: string) => void;
   onClose: () => void;
 }
 
-export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedback, onClose }: ModelSettingsDialogProps) {
-  const t = useT();
+export default function ModelSettingsDialog({
+  row,
+  apiBase,
+  onRefresh,
+  onFeedback,
+  onClose,
+}: ModelSettingsDialogProps) {
+  const { t, locale } = useI18n();
+  const lite = liteTranslator(locale);
   const id = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const reloadRef = useRef<HTMLButtonElement>(null);
   const requestRef = useRef<BoundedFetch | null>(null);
-  // State rather than a ref: the form's start values are read during render to seed the fields,
-  // and a ref read in render is exactly what the React Compiler lint refuses.
-  const [baseline] = useState<SettingsBaseline>(() => baselineOf(row));
+  const priceFieldRefs = useRef<Partial<Record<InvalidField, HTMLInputElement>>>({});
+  const [baseline] = useState(() => ({
+    name: row.displayName ?? row.namespaced,
+    contextWindow:
+      (row.metadataOverrides?.contextWindow ?? row.contextWindow) === undefined
+        ? ""
+        : String(row.metadataOverrides?.contextWindow ?? row.contextWindow),
+    modalities: row.inputModalities ?? [],
+    ladder: row.reasoningEfforts ?? [],
+    defaultEffort: row.defaultReasoningEffort ?? "",
+    price: loadDraft(row.costOverride),
+  }));
   const [phase, setPhase] = useState<Phase>("ready");
-  const [contextDraft, setContextDraft] = useState(() => baseline.contextWindow);
-  const [customContext, setCustomContext] = useState(() => (
-    baseline.contextWindow !== "" && !CONTEXT_PRESETS.includes(baseline.contextWindow)
-  ));
-  const [modalities, setModalities] = useState<string[]>(() => [...baseline.modalities]);
-  const [reasoning, setReasoning] = useState(() => baseline.reasoning);
-  const [ladder, setLadder] = useState<string[]>(() => [...baseline.ladder]);
-  const [defaultEffort, setDefaultEffort] = useState(() => baseline.defaultEffort);
+  const [modelId, setModelId] = useState(row.id);
+  const [name, setName] = useState(baseline.name);
+  const [contextDraft, setContextDraft] = useState(baseline.contextWindow);
+  const [customContext, setCustomContext] = useState(
+    baseline.contextWindow !== "" && !CONTEXT_PRESETS.includes(baseline.contextWindow),
+  );
+  const [modalities, setModalities] = useState(baseline.modalities);
+  const [reasoning, setReasoning] = useState(row.reasoningEfforts !== undefined);
+  const [ladder, setLadder] = useState(baseline.ladder);
+  const [defaultEffort, setDefaultEffort] = useState(baseline.defaultEffort);
+  const [priceRates, setPriceRates] = useState(baseline.price.rates);
+  const [priceMode, setPriceMode] = useState(baseline.price.mode);
+  const [customPrice, setCustomPrice] = useState(baseline.price.custom);
+  const [priceOverride, setPriceOverride] = useState(
+    !row.subscription && row.costOverride !== undefined,
+  );
+  const [invalidPrice, setInvalidPrice] = useState<InvalidField | null>(null);
+  const [priceEdited, setPriceEdited] = useState(false);
+  const [resetAxes, setResetAxes] = useState<Axis[]>([]);
   const [errorKey, setErrorKey] = useState<TKey | null>(null);
+  const [idError, setIdError] = useState(false);
   const busy = phase === "saving" || phase === "restoring";
   const terminal = phase === "unknown" || phase === "saved-stale";
+  const locked = busy || terminal;
+  const inherited = row.inheritedMetadata;
+  const overrides = row.metadataOverrides;
+  const hasOverride = (axis: Axis) =>
+    overrides?.[axis] !== undefined ||
+    (axis === "displayName"
+      ? row.displayNameOverride !== undefined
+      : axis === "contextWindow"
+        ? row.contextWindowDeclared !== undefined
+        : axis === "inputModalities"
+          ? row.inputModalitiesDeclared !== undefined
+          : axis === "cost"
+            ? row.costOverride !== undefined
+            : false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
     const opener = document.activeElement as HTMLElement | null;
     if (dialog && !dialog.open) dialog.showModal();
-    return () => { if (dialog?.open) dialog.close(); if (opener?.isConnected && typeof opener.focus === "function") opener.focus(); };
+    return () => {
+      requestRef.current?.controller.abort();
+      requestRef.current?.clear();
+      requestRef.current = null;
+      if (dialog?.open) dialog.close();
+      if (opener?.isConnected) opener.focus();
+    };
   }, []);
 
   useEffect(() => {
     if (terminal) reloadRef.current?.focus();
   }, [terminal]);
 
+  const editAxis = (axis: Axis) => {
+    setResetAxes((current) => current.filter((field) => field !== axis));
+    setErrorKey(null);
+  };
+
+  const resetAxis = (axis: Axis) => {
+    setResetAxes((current) => [...new Set([...current, axis])]);
+    setErrorKey(null);
+    switch (axis) {
+      case "displayName":
+        setName(inherited?.displayName ?? row.namespaced);
+        break;
+      case "contextWindow": {
+        const raw = inherited?.contextWindow;
+        const next =
+          row.contextCap === undefined
+            ? raw === undefined
+              ? ""
+              : String(raw)
+            : String(raw === undefined ? row.contextCap : Math.min(raw, row.contextCap));
+        setContextDraft(next);
+        setCustomContext(next !== "" && !CONTEXT_PRESETS.includes(next));
+        break;
+      }
+      case "inputModalities":
+        setModalities(inherited?.inputModalities ?? []);
+        break;
+      case "reasoningEfforts":
+        setReasoning(inherited?.reasoningEfforts !== undefined);
+        setLadder(inherited?.reasoningEfforts ?? []);
+        if (defaultEffort && !inherited?.reasoningEfforts?.includes(defaultEffort)) {
+          setDefaultEffort(inherited?.defaultReasoningEffort ?? "");
+          setResetAxes((current) => [...new Set<Axis>([...current, "defaultReasoningEffort"])]);
+        }
+        break;
+      case "defaultReasoningEffort":
+        setDefaultEffort(inherited?.defaultReasoningEffort ?? "");
+        break;
+      case "cost":
+        setPriceOverride(false);
+        setInvalidPrice(null);
+        break;
+    }
+  };
+
+  const resetControl = (axis: Axis, label = t("models.settingsRestore")) => (
+    <div className="row models-field-row">
+      <MetadataSource
+        linked
+        value={row.metadataSources?.[axis === "cost" ? "effectiveCost" : axis]}
+        reset={resetAxes.includes(axis)}
+      />
+      {hasOverride(axis) && !resetAxes.includes(axis) && (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => resetAxis(axis)}
+          disabled={locked}
+        >
+          {label}
+        </button>
+      )}
+    </div>
+  );
+
+  const togglePriceOverride = (next: boolean) => {
+    setPriceOverride(next);
+    if (!next) {
+      resetAxis("cost");
+      return;
+    }
+    editAxis("cost");
+    const automatic =
+      inherited?.effectiveCost ?? (row.costOverride ? undefined : row.effectiveCost);
+    const nextDraft = row.costOverride
+      ? baseline.price
+      : {
+          ...loadDraft(undefined),
+          rates: Object.fromEntries(
+            RATE_FIELDS.map((field) => [field, automatic?.[field]?.toString() ?? ""]),
+          ) as typeof priceRates,
+        };
+    setPriceRates(nextDraft.rates);
+    setPriceMode(nextDraft.mode);
+    setCustomPrice(nextDraft.custom);
+  };
   const reload = async () => {
+    if (requestRef.current) return;
     const bounded = createBoundedFetch(REQUEST_TIMEOUT_MS);
     requestRef.current = bounded;
     try {
-      if (!await onRefresh(bounded.signal)) return;
+      if (!(await onRefresh(bounded.signal))) return;
       bounded.signal.throwIfAborted();
       if (requestRef.current !== bounded) return;
       onFeedback(true, t("models.settingsReloaded", { model: row.namespaced }));
@@ -131,6 +240,7 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
   };
 
   const toggleReasoning = (next: boolean) => {
+    editAxis("reasoningEfforts");
     setReasoning(next);
     if (!next) return;
     // First enable seeds from what the model advertises rather than the full shared ladder: a
@@ -141,9 +251,13 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
   };
 
   const toggleLevel = (level: string, on: boolean) => {
-    setLadder(prev => (on ? [...prev, level] : prev.filter(value => value !== level)));
+    editAxis("reasoningEfforts");
+    setLadder((prev) => (on ? [...prev, level] : prev.filter((value) => value !== level)));
     // The default has to stay inside the ladder, so dropping its level drops it too.
-    if (!on && defaultEffort === level) setDefaultEffort("");
+    if (!on && defaultEffort === level) {
+      editAxis("defaultReasoningEffort");
+      setDefaultEffort("");
+    }
   };
 
   const requestClose = () => {
@@ -151,6 +265,7 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
   };
 
   const send = async (patch: Record<string, unknown>, restoring: boolean) => {
+    if (requestRef.current) return;
     const bounded = createBoundedFetch(REQUEST_TIMEOUT_MS);
     requestRef.current = bounded;
     setPhase(restoring ? "restoring" : "saving");
@@ -174,16 +289,32 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
       bounded.signal.throwIfAborted();
       // Validate the receipt against the request: a 200 for another row would otherwise be
       // reported as this row's save, and the reload would appear to disagree with the toast.
-      if (!isRecord(result) || result.ok !== true || result.provider !== row.provider || result.modelId !== row.id
-        || typeof result.changed !== "boolean" || typeof result.hasOverrides !== "boolean"
-        || typeof result.saved !== "boolean" || result.saved !== result.changed || !isRecord(result.catalogRefresh)
-        || !["committed", "skipped", "failed"].includes(String(result.catalogRefresh.status))) {
+      if (
+        !isRecord(result) ||
+        result.ok !== true ||
+        result.provider !== row.provider ||
+        result.modelId !== row.id ||
+        typeof result.changed !== "boolean" ||
+        typeof result.hasOverrides !== "boolean" ||
+        typeof result.saved !== "boolean" ||
+        result.saved !== result.changed ||
+        !isRecord(result.catalogRefresh) ||
+        !["committed", "skipped", "failed"].includes(String(result.catalogRefresh.status))
+      ) {
         throw new Error("invalid model-settings receipt");
       }
       if (requestRef.current !== bounded) return;
       confirmed = true;
       if (!result.changed) {
-        onFeedback(true, t(restoring && !result.hasOverrides ? "models.settingsNothingToRestore" : "models.settingsNoChange", { model: row.namespaced }));
+        onFeedback(
+          true,
+          t(
+            restoring && !result.hasOverrides
+              ? "models.settingsNothingToRestore"
+              : "models.settingsNoChange",
+            { model: row.namespaced },
+          ),
+        );
         onClose();
         return;
       }
@@ -191,8 +322,9 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
       // saved config directly. A skip the operator cannot act on (no managed catalog) is normal;
       // only a failed or retryable refresh is worth a warning, and only after the list reloads.
       const refresh = result.catalogRefresh;
-      const codexStale = refresh.status === "failed" || (refresh.status === "skipped" && refresh.retryable === true);
-      if (!await onRefresh(bounded.signal)) throw new Error("catalog refresh failed");
+      const codexStale =
+        refresh.status === "failed" || (refresh.status === "skipped" && refresh.retryable === true);
+      if (!(await onRefresh(bounded.signal))) throw new Error("catalog refresh failed");
       bounded.signal.throwIfAborted();
       if (requestRef.current !== bounded) return;
       if (codexStale) {
@@ -220,51 +352,112 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
 
   const submit = () => {
     if (phase !== "ready") return;
+    const patch: Record<string, unknown> = Object.fromEntries(
+      resetAxes.map((axis) => [axis, null]),
+    );
+    const nextId = modelId.trim();
+    if (row.custom && !nextId) {
+      setIdError(true);
+      return;
+    }
+    if (row.custom && nextId !== row.id) patch.newModelId = nextId;
+    if (!resetAxes.includes("displayName") && name !== baseline.name) {
+      if (row.custom && !name.trim()) {
+        patch.displayName = null;
+      } else {
+        const validation = modelDisplayNameValidationKey(name);
+        if (validation) {
+          setErrorKey(validation);
+          return;
+        }
+        patch.displayName = name.trim();
+      }
+    }
     const parsedWindow = parseContextWindow(contextDraft);
-    if (parsedWindow === undefined) { setErrorKey("models.contextInvalid"); return; }
-    const base = baseline;
-    const patch: Record<string, unknown> = {};
-    if (contextDraft.trim() !== base.contextWindow) patch.contextWindow = parsedWindow;
-    if (sortedKey(modalities) !== sortedKey(base.modalities)) {
-      patch.inputModalities = modalities.length > 0 ? [...modalities] : null;
+    if (parsedWindow === undefined) {
+      setErrorKey("models.contextInvalid");
+      return;
     }
-    const ladderKey = reasoning ? sortedKey(ladder) : "";
-    if (reasoning !== base.reasoning || ladderKey !== sortedKey(base.ladder)) {
-      patch.reasoningEfforts = reasoning ? [...ladder] : null;
+    if (
+      !resetAxes.includes("contextWindow") &&
+      parsedWindow !== parseContextWindow(baseline.contextWindow)
+    ) {
+      patch.contextWindow = parsedWindow;
     }
-    const nextDefault = reasoning && ladder.includes(defaultEffort) ? defaultEffort : "";
-    if (nextDefault !== base.defaultEffort) patch.defaultReasoningEffort = nextDefault || null;
-    // Only what the operator actually touched is submitted. Writing an untouched field would
-    // convert a fact the row merely inherits into a stored override, which is the failure this
-    // whole surface exists to avoid.
-    if (Object.keys(patch).length === 0) { onClose(); return; }
+    if (
+      !resetAxes.includes("inputModalities") &&
+      sortedKey(modalities) !== sortedKey(baseline.modalities)
+    ) {
+      patch.inputModalities = modalities.length > 0 ? modalities : null;
+    }
+    if (
+      !resetAxes.includes("reasoningEfforts") &&
+      (reasoning !== (row.reasoningEfforts !== undefined) ||
+        sortedKey(ladder) !== sortedKey(baseline.ladder))
+    ) {
+      patch.reasoningEfforts = reasoning ? ladder : null;
+    }
+    if (!resetAxes.includes("defaultReasoningEffort") && defaultEffort !== baseline.defaultEffort) {
+      patch.defaultReasoningEffort = defaultEffort || null;
+    }
+    if (priceOverride && (priceEdited || !row.costOverride)) {
+      const badField = (
+        Object.entries(priceFieldRefs.current) as [InvalidField, HTMLInputElement][]
+      ).find(([, input]) => input.validity.badInput)?.[0];
+      const outcome = buildDraftCost(priceRates, priceMode, customPrice, badField);
+      if ("field" in outcome) {
+        setInvalidPrice(outcome.field);
+        setErrorKey(
+          outcome.field === "threshold" || outcome.field.startsWith("custom")
+            ? "pricing.override.customInvalid"
+            : "pricing.override.invalid",
+        );
+        priceFieldRefs.current[outcome.field]?.focus();
+        return;
+      }
+      if (!row.costOverride || !sameModelCost(row.costOverride, outcome.cost))
+        patch.cost = outcome.cost;
+    } else if (!row.costOverride) {
+      delete patch.cost;
+    }
+    // Effective values are read from the same row as hover. Only intentional changes are stored.
+    if (Object.keys(patch).length === 0) {
+      onClose();
+      return;
+    }
     void send(patch, false);
   };
 
   const restore = async () => {
     if (phase !== "ready") return;
     const confirmed = await confirmAction({
-      message: t("models.settingsRestoreConfirm", { model: row.namespaced }),
-      confirmLabel: t("models.settingsRestore"),
+      message: lite("modelRestoreAllConfirm", { model: row.namespaced }),
+      confirmLabel: lite("modelRestoreAll"),
       tone: "danger",
     });
     if (!confirmed) return;
-    // Every axis at once, and it writes immediately rather than resetting the form: a form-level
-    // reset would still need a save, and that save would re-pin the values it had just restored.
-    void send({ contextWindow: null, inputModalities: null, reasoningEfforts: null, defaultReasoningEffort: null }, true);
+    void send(
+      {
+        displayName: null,
+        cost: null,
+        contextWindow: null,
+        inputModalities: null,
+        reasoningEfforts: null,
+        defaultReasoningEffort: null,
+      },
+      true,
+    );
   };
-
-  const inheritedModalities = Array.isArray(row.inputModalities) ? row.inputModalities.join(", ") : "";
-  const inheritedModalityList = Array.isArray(row.inputModalities)
-    ? row.inputModalities.filter((value): value is string => (MODALITIES as readonly string[]).includes(value))
-    : [];
 
   return (
     <dialog
       ref={dialogRef}
       className="modal-overlay"
       aria-labelledby={id + "-title"}
-      onCancel={event => { event.preventDefault(); requestClose(); }}
+      onCancel={(event) => {
+        event.preventDefault();
+        requestClose();
+      }}
     >
       <button
         type="button"
@@ -274,36 +467,127 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
         disabled={busy}
         onClick={requestClose}
       />
-      {/*
-        `model-display-name-dialog` is reused rather than a new modifier: it is the shared narrow
-        dialog shell (460px, stacked actions on a small viewport), and gui/src/styles.css is at its
-        file-size cap, so a second class with the same rules could not be added.
-      */}
       <form
-        className="modal-card model-display-name-dialog"
+        className="modal-card model-display-name-dialog model-price-dialog"
         role="document"
         noValidate
         aria-busy={busy}
-        onClick={event => event.stopPropagation()}
-        onSubmit={event => { event.preventDefault(); submit(); }}
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
       >
         <div className="modal-head">
           <h3 id={id + "-title"}>{t("models.settingsTitle", { model: row.namespaced })}</h3>
-          <button type="button" className="btn btn-ghost btn-sm" disabled={busy} onClick={requestClose}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy}
+            onClick={requestClose}
+          >
             {t("common.close")}
           </button>
         </div>
 
         {errorKey && <Notice tone={phase === "saved-stale" ? "warn" : "err"}>{t(errorKey)}</Notice>}
 
-        <div className="models-field-stack">
+        <div className="models-field-stack model-price-body">
           <div className="text-label models-field">
             {t("models.customFieldModelId")}
-            <code className="mono text-control">{row.namespaced}</code>
+            {row.custom ? (
+              <input
+                className="input"
+                aria-label={t("models.customFieldModelId")}
+                value={modelId}
+                disabled={locked}
+                aria-invalid={idError || undefined}
+                onChange={(event) => {
+                  setModelId(event.target.value);
+                  setIdError(false);
+                }}
+              />
+            ) : (
+              <code className="mono text-control">{row.namespaced}</code>
+            )}
+            {idError && <Notice tone="err">{lite("modelIdRequired")}</Notice>}
           </div>
 
-          <label className="text-label models-field">
+          <div className="models-field">
+            <label className="field-label" htmlFor={id + "-name"}>
+              {t("models.displayNameField")}
+            </label>
+            <input
+              className="input"
+              id={id + "-name"}
+              value={name}
+              maxLength={129}
+              disabled={locked}
+              onChange={(event) => {
+                editAxis("displayName");
+                setName(event.target.value);
+              }}
+            />
+            {resetControl("displayName", t("models.displayNameReset"))}
+          </div>
+
+          <section className="models-field" aria-labelledby={id + "-pricing"}>
+            <h4 id={id + "-pricing"} className="field-label">
+              {lite("modelPricing")}
+            </h4>
+            <ModelCostSummary
+              cost={resetAxes.includes("cost") ? inherited?.effectiveCost : row.effectiveCost}
+              schedule={row.pricingSchedule}
+              subscription={row.subscription}
+              linked
+            />
+            {row.subscription &&
+              row.costOverride &&
+              resetControl("cost", t("pricing.override.reset"))}
+            {!row.subscription && (
+              <>
+                {resetControl("cost", t("pricing.override.reset"))}
+                <label className="row models-modality-option">
+                  <input
+                    type="checkbox"
+                    checked={priceOverride}
+                    disabled={locked}
+                    onChange={(event) => togglePriceOverride(event.target.checked)}
+                  />
+                  <span className="text-control">{lite("modelOverridePricing")}</span>
+                </label>
+                {priceOverride && (
+                  <ModelPriceFields
+                    draft={priceRates}
+                    setDraft={setPriceRates}
+                    pricingMode={priceMode}
+                    setPricingMode={setPriceMode}
+                    customDraft={customPrice}
+                    setCustomDraft={setCustomPrice}
+                    locked={locked}
+                    invalidField={invalidPrice}
+                    customFieldRefs={priceFieldRefs}
+                    onEdit={() => {
+                      editAxis("cost");
+                      setInvalidPrice(null);
+                      setPriceEdited(true);
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </section>
+
+          <div className="text-label models-field">
             {t("models.customFieldContext")}
+            {row.contextCap !== undefined && (
+              <span className="muted text-caption">
+                {lite("modelContextEffective", {
+                  value: row.contextWindow?.toLocaleString() ?? lite("modelUnknown"),
+                  cap: row.contextCap.toLocaleString(),
+                })}
+              </span>
+            )}
             <div className="row models-field-row">
               <Select
                 value={customContext ? CUSTOM_OPTION : contextDraft}
@@ -318,12 +602,16 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
                   { value: "1000000", label: "1M" },
                   { value: CUSTOM_OPTION, label: t("models.custom") },
                 ]}
-                onChange={value => {
-                  if (value === CUSTOM_OPTION) { setCustomContext(true); return; }
+                onChange={(value) => {
+                  if (value === CUSTOM_OPTION) {
+                    setCustomContext(true);
+                    return;
+                  }
                   setCustomContext(false);
+                  editAxis("contextWindow");
                   setContextDraft(value);
                 }}
-                disabled={busy}
+                disabled={locked}
                 label={t("models.customFieldContext")}
                 // A portaled menu lands under the modal's top layer, where the backdrop takes its clicks.
                 portal={false}
@@ -334,110 +622,143 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
                   style={{ width: 120 }}
                   inputMode="numeric"
                   value={contextDraft}
-                  onChange={event => setContextDraft(event.target.value)}
-                  disabled={busy}
+                  onChange={(event) => {
+                    editAxis("contextWindow");
+                    setContextDraft(event.target.value);
+                  }}
+                  disabled={locked}
                   placeholder={t("models.customPlaceholder")}
                   aria-label={t("models.customFieldContext")}
                 />
               )}
             </div>
-            {row.contextWindowDeclared === undefined && (
-              <span className="muted text-caption">{t("models.settingsContextInherit", {
-                value: row.contextWindow ? String(row.contextWindow) : t("models.settingsContextUnknown"),
-              })}</span>
-            )}
-          </label>
+            {resetControl("contextWindow")}
+          </div>
 
           <div className="text-label models-field">
             {t("models.customFieldModalities")}
             <div className="row models-field-row">
-              {MODALITIES.map(modality => (
+              {[...new Set([...MODALITIES, ...modalities])].map((modality) => (
                 <label key={modality} className="row models-modality-option">
                   <input
                     type="checkbox"
                     checked={modalities.includes(modality)}
-                    onChange={event => {
+                    onChange={(event) => {
                       const checked = event.target.checked;
-                      setModalities(prev => {
-                        if (!checked) return prev.filter(value => value !== modality);
-                        // An empty set means "follow the upstream declaration". The first tick
-                        // starts from what the row already follows, so adding image to a text
-                        // model does not silently declare it image-only.
-                        const start = prev.length > 0 ? prev : inheritedModalityList;
-                        return [...new Set([...start, modality])];
-                      });
+                      editAxis("inputModalities");
+                      setModalities((prev) =>
+                        checked ? [...prev, modality] : prev.filter((value) => value !== modality),
+                      );
                     }}
-                    disabled={busy}
+                    disabled={locked || !(MODALITIES as readonly string[]).includes(modality)}
                   />
                   <span className="text-control">{modality}</span>
                 </label>
               ))}
             </div>
             {modalities.length === 0 && (
-              // No box ticked is a real state — undeclared — not an empty model. Say what is
-              // being followed instead, or the blank row reads as "this model accepts nothing".
-              <span className="muted text-caption">
-                {t("models.settingsModalitiesInherit", {
-                  modalities: inheritedModalities || t("models.settingsModalitiesUnknown"),
-                })}
-              </span>
+              <span className="muted text-caption">{lite("modelUnknown")}</span>
             )}
+            {resetControl("inputModalities")}
+          </div>
+          <div className="models-field">
+            <span className="text-label">{lite("modelOutputModalities")}</span>
+            <span className="text-control">
+              {row.outputModalities?.join(", ") || lite("modelUnknown")}
+            </span>
+            <MetadataSource linked value={row.metadataSources?.outputModalities} />
+          </div>
+          <div className="models-field">
+            <span className="text-label">{lite("modelInputLimit")}</span>
+            <span className="text-control">
+              {row.maxInputTokens?.toLocaleString() ?? lite("modelUnknown")}
+            </span>
+            <MetadataSource linked value={row.metadataSources?.maxInputTokens} />
+          </div>
+          <div className="models-field">
+            <span className="text-label">{lite("modelOutputLimit")}</span>
+            <span className="text-control">
+              {row.maxOutputTokens?.toLocaleString() ?? lite("modelUnknown")}
+            </span>
+            <MetadataSource linked value={row.metadataSources?.maxOutputTokens} />
           </div>
 
           <div className="text-label models-field">
             {t("models.customFieldReasoning")}
+            <span className="text-control">
+              <ModelReasoningSummary row={row} />
+            </span>
             <div className="row models-field-row">
               <label className="row models-modality-option">
                 <input
                   type="checkbox"
                   checked={reasoning}
-                  onChange={event => toggleReasoning(event.target.checked)}
-                  disabled={busy}
+                  onChange={(event) => toggleReasoning(event.target.checked)}
+                  disabled={locked}
                 />
-                <span className="text-control">{t("models.customFieldReasoningOverride")}</span>
+                <span className="text-control">{lite("modelReasoningLevels")}</span>
               </label>
             </div>
             {reasoning && (
               <div className="row models-field-row" style={{ flexWrap: "wrap" }}>
-                {REASONING_EFFORT_LEVELS.map(level => (
+                {REASONING_EFFORT_LEVELS.map((level) => (
                   <label key={level} className="row models-modality-option">
                     <input
                       type="checkbox"
                       checked={ladder.includes(level)}
-                      onChange={event => toggleLevel(level, event.target.checked)}
-                      disabled={busy}
+                      onChange={(event) => toggleLevel(level, event.target.checked)}
+                      disabled={locked}
                     />
-                    <span className="text-control">{t(("models.reasoningEffort." + level) as TKey)}</span>
+                    <span className="text-control">
+                      {t(("models.reasoningEffort." + level) as TKey)}
+                    </span>
                   </label>
                 ))}
               </div>
             )}
+            {resetControl("reasoningEfforts")}
           </div>
 
-          {reasoning && (
-            <label className="text-label models-field">
+          {(reasoning || defaultEffort || hasOverride("defaultReasoningEffort")) && (
+            <div className="text-label models-field">
               {t("models.settingsDefaultEffort")}
               <div className="row models-field-row">
                 <Select
                   value={defaultEffort}
                   options={[
                     { value: "", label: "—" },
-                    ...ladder.map(level => ({ value: level, label: t(("models.reasoningEffort." + level) as TKey) })),
+                    ...[...new Set([...ladder, ...(defaultEffort ? [defaultEffort] : [])])].map(
+                      (level) => ({
+                        value: level,
+                        label: t(("models.reasoningEffort." + level) as TKey),
+                      }),
+                    ),
                   ]}
-                  onChange={setDefaultEffort}
-                  disabled={busy}
+                  onChange={(value) => {
+                    editAxis("defaultReasoningEffort");
+                    setDefaultEffort(value);
+                  }}
+                  disabled={locked}
                   label={t("models.settingsDefaultEffort")}
                   portal={false}
                 />
               </div>
-            </label>
+              {resetControl("defaultReasoningEffort")}
+            </div>
           )}
         </div>
 
         <div className="modal-actions">
-          {terminal && <button ref={reloadRef} type="button" className="btn btn-ghost" onClick={() => void reload()}>
-            {t("models.settingsReload")}
-          </button>}
+          {terminal && (
+            <button
+              ref={reloadRef}
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => void reload()}
+            >
+              {t("models.settingsReload")}
+            </button>
+          )}
           <button
             type="button"
             className="btn btn-ghost"
@@ -445,7 +766,7 @@ export default function ModelSettingsDialog({ row, apiBase, onRefresh, onFeedbac
             disabled={busy || terminal}
             onClick={() => void restore()}
           >
-            {t("models.settingsRestore")}
+            {lite("modelRestoreAll")}
           </button>
           <button type="button" className="btn btn-ghost" onClick={requestClose} disabled={busy}>
             {t("common.cancel")}

@@ -1,3 +1,4 @@
+import MigrationNotice from "../MigrationNotice";
 /**
  * ProviderCatalog — the browse surface of the add-provider modal: Accounts /
  * Free / Local / Paid tabs over a single searchable scroll list, and account
@@ -6,6 +7,8 @@
  */
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useT } from "../../i18n/shared";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
+import { OAuthFlowSelect } from "../oauth-flow-select";
 import {
   bucketPresets,
   noteNeedsReveal,
@@ -98,6 +101,7 @@ export default function ProviderCatalog({
   onManage?: (provider: string) => void;
 }) {
   const t = useT();
+  const capabilities = useRuntimeCapabilities();
   const [tier, setTier] = useState<CatalogTier>(initialTier);
   const rowsId = useId();
   const groupId = (candidate: CatalogTier) => `${rowsId}-${candidate}`;
@@ -113,7 +117,17 @@ export default function ProviderCatalog({
     if (rowsRef.current) rowsRef.current.scrollTop = 0;
   }, [tier, searching]);
 
-  const catalog = useMemo(() => presets.filter(p => p.id !== "custom"), [presets]);
+  const catalog = useMemo(
+    () =>
+      presets.filter(
+        (p) =>
+          p.id !== "custom" &&
+          (!capabilities ||
+            p.auth !== "oauth" ||
+            capabilities.oauthProviders?.includes(p.oauthProvider ?? "")),
+      ),
+    [presets, capabilities],
+  );
 
   /** Usage-ranked order only after usage arrives; until then keep stable label order
    * so a slow /api/usage (~5s cold) cannot flash a catalog resort. */
@@ -125,7 +139,10 @@ export default function ProviderCatalog({
         const rb = usageRank[b.id] ?? 0;
         if (rb !== ra) return rb - ra;
       }
-      return a.label.localeCompare(b.label, undefined, { sensitivity: "base" }) || a.id.localeCompare(b.id);
+      return (
+        a.label.localeCompare(b.label, undefined, { sensitivity: "base" }) ||
+        a.id.localeCompare(b.id)
+      );
     });
   }, [catalog, usageRank]);
 
@@ -145,15 +162,15 @@ export default function ProviderCatalog({
   );
 
   const presetGroups = useMemo(() => {
-    const presetTabs = TIER_TABS.filter(candidate => candidate !== "accounts");
+    const presetTabs = TIER_TABS.filter((candidate) => candidate !== "accounts");
     if (!searching) {
       return tier === "accounts" ? [] : [{ tier, rows: tierList }];
     }
-    return presetTabs.map(candidate => ({
+    return presetTabs.map((candidate) => ({
       tier: candidate,
       rows: sortCatalogMatches(
         dropPresetsCoveredByAccounts(
-          buckets[candidate].filter(p => matchesCatalogQuery(p, query)),
+          buckets[candidate].filter((p) => matchesCatalogQuery(p, query)),
           accountMatches,
         ),
         query,
@@ -162,12 +179,14 @@ export default function ProviderCatalog({
   }, [searching, tier, tierList, buckets, query, accountMatches]);
 
   const counts = useMemo(() => {
-    const byTier = Object.fromEntries(presetGroups.map(group => [group.tier, group.rows.length])) as Record<CatalogTier, number>;
+    const byTier = Object.fromEntries(
+      presetGroups.map((group) => [group.tier, group.rows.length]),
+    ) as Record<CatalogTier, number>;
     return { ...byTier, accounts: accountMatches.length } as Record<CatalogTier, number>;
   }, [presetGroups, accountMatches]);
 
   const totalMatches = TIER_TABS.reduce((sum, candidate) => sum + (counts[candidate] ?? 0), 0);
-  const matchedTiers = TIER_TABS.filter(candidate => (counts[candidate] ?? 0) > 0);
+  const matchedTiers = TIER_TABS.filter((candidate) => (counts[candidate] ?? 0) > 0);
 
   /**
    * What is actually on screen right now. In browse mode that is one tab, and it is NOT
@@ -177,7 +196,9 @@ export default function ProviderCatalog({
    */
   const visibleCount = searching
     ? totalMatches
-    : tier === "accounts" ? accountMatches.length : (presetGroups[0]?.rows.length ?? 0);
+    : tier === "accounts"
+      ? accountMatches.length
+      : (presetGroups[0]?.rows.length ?? 0);
 
   /**
    * A chip scrolls its group into view; it does not change `tier`. Focus moves to the
@@ -226,20 +247,33 @@ export default function ProviderCatalog({
     // A subscription CLI row is keyless because the CLI owns the account, not because it is
     // free: it gets its own badge, and neither the Free nor the API-key badge.
     const subscriptionCli = isSubscriptionCliProvider(p);
-    const auth = subscriptionCli ? <span className="badge badge-amber">{t("modal.badge.subscriptionCli")}</span>
-      : p.codexAccountMode === "direct" ? <span className="badge badge-green">{t("modal.badge.direct")}</span>
-      : p.codexAccountMode === "pool" ? <span className="badge badge-accent">{t("modal.badge.pool")}</span>
-      : p.auth === "oauth" ? <span className="badge badge-accent">{t("modal.badge.oauth")}</span>
-      : p.auth === "forward" ? <span className="badge badge-green">{t("modal.badge.codexLogin")}</span>
-      : p.auth === "local" ? <span className="badge badge-amber">{t("modal.badge.local")}</span>
-      : p.keyOptional ? null // keyless free: the Free badge alone says it all
-      : <span className="badge badge-muted">{t("modal.badge.apiKey")}</span>;
+    const auth = subscriptionCli ? (
+      <span className="badge badge-amber">{t("modal.badge.subscriptionCli")}</span>
+    ) : p.codexAccountMode === "direct" ? (
+      <span className="badge badge-green">{t("modal.badge.direct")}</span>
+    ) : p.codexAccountMode === "pool" ? (
+      <span className="badge badge-accent">{t("modal.badge.pool")}</span>
+    ) : p.auth === "oauth" ? (
+      <span className="badge badge-accent">{t("modal.badge.oauth")}</span>
+    ) : p.auth === "forward" ? (
+      <span className="badge badge-green">{t("modal.badge.codexLogin")}</span>
+    ) : p.auth === "local" ? (
+      <span className="badge badge-amber">{t("modal.badge.local")}</span>
+    ) : p.keyOptional ? null : ( // keyless free: the Free badge alone says it all
+      <span className="badge badge-muted">{t("modal.badge.apiKey")}</span>
+    );
     // Free pricing is orthogonal to auth: NVIDIA (freeTier + key required) shows BOTH
     // the Free badge and the API-key badge — free pricing never hides a key requirement.
-    const free = (p.freeTier || p.keyOptional) && p.auth === "key" && !subscriptionCli
-      ? <span className="badge badge-green">{t("modal.badge.free")}</span>
-      : null;
-    return <>{free}{auth}</>;
+    const free =
+      (p.freeTier || p.keyOptional) && p.auth === "key" && !subscriptionCli ? (
+        <span className="badge badge-green">{t("modal.badge.free")}</span>
+      ) : null;
+    return (
+      <>
+        {free}
+        {auth}
+      </>
+    );
   };
 
   return (
@@ -250,7 +284,7 @@ export default function ProviderCatalog({
         className="input provider-catalog-search"
         type="search"
         value={query}
-        onChange={e => onQueryChange(e.target.value)}
+        onChange={(e) => onQueryChange(e.target.value)}
         onKeyDown={onSearchKeyDown}
         placeholder={t("modal.search")}
         aria-label={t("modal.search")}
@@ -262,8 +296,9 @@ export default function ProviderCatalog({
         // chips with counts, and a chip with no matches is disabled rather than hidden so
         // the strip does not reflow under the pointer on every keystroke.
         <div className="provider-catalog-tabs provider-catalog-tabs--chips">
-          {TIER_TABS.map(candidate => (
-            <button type="button"
+          {TIER_TABS.map((candidate) => (
+            <button
+              type="button"
               key={candidate}
               className="provider-catalog-tab provider-catalog-chip"
               disabled={(counts[candidate] ?? 0) === 0}
@@ -278,8 +313,9 @@ export default function ProviderCatalog({
         </div>
       ) : (
         <div className="provider-catalog-tabs" role="tablist">
-          {TIER_TABS.map(candidate => (
-            <button type="button"
+          {TIER_TABS.map((candidate) => (
+            <button
+              type="button"
               key={candidate}
               role="tab"
               aria-selected={tier === candidate}
@@ -296,81 +332,99 @@ export default function ProviderCatalog({
       {!searching && tier === "accounts" && (
         <div className="provider-catalog-accounts-hint muted text-label">
           {t("modal.accountsHint")}
+          <OAuthFlowSelect provider="openai" disabled={Boolean(busyProvider)} />
         </div>
       )}
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {searching
-          ? (totalMatches === 0
+          ? totalMatches === 0
             ? t("modal.noMatch")
             : t("modal.searchResults", {
-              count: totalMatches,
-              tiers: matchedTiers.map(candidate => t(TIER_TAB_LABEL[candidate])).join(", "),
-            }))
+                count: totalMatches,
+                tiers: matchedTiers.map((candidate) => t(TIER_TAB_LABEL[candidate])).join(", "),
+              })
           : ""}
       </div>
 
       <div className="provider-catalog-rows" id={rowsId} ref={rowsRef}>
-        {presetsLoading && visibleCount === 0 && (
-          <div className="muted text-control provider-catalog-empty">{t("modal.catalogLoading")}</div>
-        )}
-        {(searching || tier === "accounts") && accountMatches.length > 0 && (
-          <Fragment key="accounts">
-            {searching && groupHeading("accounts", accountMatches.length)}
-            {accountMatches.map(row => (
-              <CatalogAccountRow
-                key={row.id}
-                row={row}
-                status={accountStatus[row.id]}
-                busyProvider={busyProvider}
-                loginHint={loginHint}
-                {...(paste ? { paste } : {})}
-                {...(onLogin ? { onLogin } : {})}
-                {...(onCancelLogin ? { onCancelLogin } : {})}
-                {...(onLogout ? { onLogout } : {})}
-                {...(onManage ? { onManage } : {})}
-              />
-            ))}
-          </Fragment>
-        )}
-        {presetGroups.map(group => group.rows.length === 0 ? null : (
-          <Fragment key={group.tier}>
-          {searching && groupHeading(group.tier, group.rows.length)}
-          {group.rows.map(p => (
-          // The reveal control is a SIBLING of the row button, never a child of it: the row
-          // is already a <button>, and a button inside a button is invalid HTML that the
-          // parser may hoist out of the row -- at which point `stopPropagation` never runs.
-          <div key={p.id} className="provider-catalog-row-wrap">
-            <button type="button" className="list-row" onClick={() => onSelectPreset(p)}>
-              {/*
+        {capabilities?.oauth === false && tier === "accounts" && !searching ? (
+          <MigrationNotice />
+        ) : (
+          <>
+            {presetsLoading && visibleCount === 0 && (
+              <div className="muted text-control provider-catalog-empty">
+                {t("modal.catalogLoading")}
+              </div>
+            )}
+            {(searching || tier === "accounts") && accountMatches.length > 0 && (
+              <Fragment key="accounts">
+                {searching && groupHeading("accounts", accountMatches.length)}
+                {accountMatches.map((row) => (
+                  <CatalogAccountRow
+                    key={row.id}
+                    row={row}
+                    status={accountStatus[row.id]}
+                    busyProvider={busyProvider}
+                    loginHint={loginHint}
+                    {...(paste ? { paste } : {})}
+                    {...(onLogin ? { onLogin } : {})}
+                    {...(onCancelLogin ? { onCancelLogin } : {})}
+                    {...(onLogout ? { onLogout } : {})}
+                    {...(onManage ? { onManage } : {})}
+                  />
+                ))}
+              </Fragment>
+            )}
+            {presetGroups.map((group) =>
+              group.rows.length === 0 ? null : (
+                <Fragment key={group.tier}>
+                  {searching && groupHeading(group.tier, group.rows.length)}
+                  {group.rows.map((p) => (
+                    // The reveal control is a SIBLING of the row button, never a child of it: the row
+                    // is already a <button>, and a button inside a button is invalid HTML that the
+                    // parser may hoist out of the row -- at which point `stopPropagation` never runs.
+                    <div key={p.id} className="provider-catalog-row-wrap">
+                      <button type="button" className="list-row" onClick={() => onSelectPreset(p)}>
+                        {/*
                 The one list a user reads to CHOOSE a provider, and until now the only
                 provider surface with no marks at all. `CatalogPreset.id` is the
                 registry id, so this reuses `providerIconSrc` and, with it, the
                 mask/plate decision the rail already owns -- a mark cannot be legible
                 in the workspace and invisible here.
               */}
-              <ProviderIcon name={p.id} adapter={p.adapter} cls="provider-icon provider-icon-sm" />
-              <div>
-                <div className="title">{p.label}</div>
-                <div className="sub"><code className="chip">{p.adapter}</code>{p.note ? ` · ${p.note}` : ""}</div>
-              </div>
-              <div className="provider-catalog-badges">{badges(p)}</div>
-            </button>
-            {onShowNote && noteNeedsReveal(p.note) && (
-              <button
-                type="button"
-                className="link-btn provider-catalog-note-more"
-                onClick={() => onShowNote(p)}
-              >
-                {t("modal.noteMore")}
-              </button>
+                        <ProviderIcon
+                          name={p.id}
+                          adapter={p.adapter}
+                          cls="provider-icon provider-icon-sm"
+                        />
+                        <div>
+                          <div className="title">{p.label}</div>
+                          <div className="sub">
+                            <code className="chip">{p.adapter}</code>
+                            {p.note ? ` · ${p.note}` : ""}
+                          </div>
+                        </div>
+                        <div className="provider-catalog-badges">{badges(p)}</div>
+                      </button>
+                      {onShowNote && noteNeedsReveal(p.note) && (
+                        <button
+                          type="button"
+                          className="link-btn provider-catalog-note-more"
+                          onClick={() => onShowNote(p)}
+                        >
+                          {t("modal.noteMore")}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </Fragment>
+              ),
             )}
-          </div>
-        ))}
-          </Fragment>
-        ))}
-        {!presetsLoading && visibleCount === 0 && (
-          <div className="muted text-control provider-catalog-empty">{t("modal.noMatch")}</div>
+            {!presetsLoading && visibleCount === 0 && (
+              <div className="muted text-control provider-catalog-empty">{t("modal.noMatch")}</div>
+            )}
+          </>
         )}
       </div>
 
@@ -379,7 +433,9 @@ export default function ProviderCatalog({
         {/* Browse copy. "Not listed?" is the escape hatch at the end of a list you read,
             not a search result, so it stays out of the way while a query is live. */}
         {!searching && tier !== "accounts" && (
-          <button type="button" className="link-btn" onClick={onSelectCustom}>{t("modal.notListed")}</button>
+          <button type="button" className="link-btn" onClick={onSelectCustom}>
+            {t("modal.notListed")}
+          </button>
         )}
       </div>
     </div>

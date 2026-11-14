@@ -99,11 +99,18 @@ function isAbortError(error: unknown, signal: AbortSignal): boolean {
   return error instanceof Error && error.name === "AbortError";
 }
 
-export async function fetchStartupHealth(apiBase: string, signal: AbortSignal): Promise<StartupHealthProbe> {
+export async function fetchStartupHealth(
+  apiBase: string,
+  signal: AbortSignal,
+): Promise<StartupHealthProbe> {
   try {
     const response = await fetch(`${apiBase}/api/startup-health`, { signal });
     if (!response.ok) throw new Error("startup health unavailable");
-    const data = await response.json() as { status?: unknown; diagnosticStale?: unknown; routingKind?: unknown };
+    const data = (await response.json()) as {
+      status?: unknown;
+      diagnosticStale?: unknown;
+      routingKind?: unknown;
+    };
     const mapped = mapStartupHealthProbe(data);
     if (!mapped) throw new Error("invalid startup health response");
     // Carry `stale` through so the caller can re-ask in seconds instead of waiting for
@@ -131,14 +138,20 @@ export async function fetchProjectConfigDiagnostics(
   }
 }
 
-export async function fetchDashboardModels(apiBase: string, signal: AbortSignal): Promise<ModelInfo[]> {
+export async function fetchDashboardModels(
+  apiBase: string,
+  signal: AbortSignal,
+): Promise<ModelInfo[]> {
   const response = await fetch(`${apiBase}/api/models`, { signal });
   // Throw on non-OK / empty so client-resource retains the prior snapshot instead of
   // treating an HTTP error as a successful empty list.
   return requireJson<ModelInfo[]>(response);
 }
 
-export async function fetchDashboardUsage(apiBase: string, signal: AbortSignal): Promise<UsageSummary30d> {
+export async function fetchDashboardUsage(
+  apiBase: string,
+  signal: AbortSignal,
+): Promise<UsageSummary30d> {
   const response = await fetch(`${apiBase}/api/usage?range=30d`, { signal });
   // Usage can be expensive on an older server. Keeping it in its own resource means
   // it cannot delay health/provider/settings commits, and a failed refresh retains
@@ -151,6 +164,7 @@ export async function fetchDashboardSidecars(
   apiBase: string,
   signal: AbortSignal,
   epochs: DashboardEpochRefs,
+  visionOnly = false,
 ): Promise<DashboardSidecarPoll> {
   // Only bump shadow epochs — settings has its own poll and must not be invalidated here.
   const { request: shadowRequestEpoch, mutation: shadowMutationEpoch } = beginPollEpoch(
@@ -160,43 +174,49 @@ export async function fetchDashboardSidecars(
 
   const [scRes, shRes] = await Promise.all([
     fetch(`${apiBase}/api/sidecar-settings`, { signal }),
-    fetch(`${apiBase}/api/shadow-call-settings`, { signal }),
+    visionOnly ? Promise.resolve(null) : fetch(`${apiBase}/api/shadow-call-settings`, { signal }),
   ]);
 
   const sidecar = await requireJson<SidecarData>(scRes);
   let shadowCall: ShadowCallData | null | undefined = undefined;
   try {
-    if (shRes.ok) {
-      const nextShadow = await shRes.json() as ShadowCallData;
-      if (settingsPollMayCommit(
+    if (shRes?.ok) {
+      const nextShadow = (await shRes.json()) as ShadowCallData;
+      if (
+        settingsPollMayCommit(
+          { request: shadowRequestEpoch, mutation: shadowMutationEpoch },
+          {
+            request: epochs.shadowCallRequestEpochRef.current,
+            mutation: epochs.shadowCallMutationEpochRef.current,
+            mutationInFlight: epochs.shadowCallMutationInFlightRef.current,
+          },
+        )
+      ) {
+        shadowCall = nextShadow;
+      }
+    } else if (
+      settingsPollMayCommit(
         { request: shadowRequestEpoch, mutation: shadowMutationEpoch },
         {
           request: epochs.shadowCallRequestEpochRef.current,
           mutation: epochs.shadowCallMutationEpochRef.current,
           mutationInFlight: epochs.shadowCallMutationInFlightRef.current,
         },
-      )) {
-        shadowCall = nextShadow;
-      }
-    } else if (settingsPollMayCommit(
-      { request: shadowRequestEpoch, mutation: shadowMutationEpoch },
-      {
-        request: epochs.shadowCallRequestEpochRef.current,
-        mutation: epochs.shadowCallMutationEpochRef.current,
-        mutationInFlight: epochs.shadowCallMutationInFlightRef.current,
-      },
-    )) {
+      )
+    ) {
       shadowCall = null;
     }
   } catch {
-    if (settingsPollMayCommit(
-      { request: shadowRequestEpoch, mutation: shadowMutationEpoch },
-      {
-        request: epochs.shadowCallRequestEpochRef.current,
-        mutation: epochs.shadowCallMutationEpochRef.current,
-        mutationInFlight: epochs.shadowCallMutationInFlightRef.current,
-      },
-    )) {
+    if (
+      settingsPollMayCommit(
+        { request: shadowRequestEpoch, mutation: shadowMutationEpoch },
+        {
+          request: epochs.shadowCallRequestEpochRef.current,
+          mutation: epochs.shadowCallMutationEpochRef.current,
+          mutationInFlight: epochs.shadowCallMutationInFlightRef.current,
+        },
+      )
+    ) {
       shadowCall = null;
     }
   }
@@ -219,14 +239,16 @@ export async function fetchDashboardSettings(
   const nextSettings = await requireJson<SettingsData>(sRes);
   let settings: SettingsData | undefined = undefined;
   let startupHealthSeed: SettingsData["startupHealth"] | null | undefined = undefined;
-  if (settingsPollMayCommit(
-    { request: settingsRequestEpoch, mutation: settingsMutationEpoch },
-    {
-      request: epochs.settingsRequestEpochRef.current,
-      mutation: epochs.settingsMutationEpochRef.current,
-      mutationInFlight: epochs.settingsMutationInFlightRef.current,
-    },
-  )) {
+  if (
+    settingsPollMayCommit(
+      { request: settingsRequestEpoch, mutation: settingsMutationEpoch },
+      {
+        request: epochs.settingsRequestEpochRef.current,
+        mutation: epochs.settingsMutationEpochRef.current,
+        mutationInFlight: epochs.settingsMutationInFlightRef.current,
+      },
+    )
+  ) {
     settings = nextSettings;
     startupHealthSeed = nextSettings.startupHealth;
   }
@@ -242,7 +264,10 @@ export async function fetchDashboardMaMode(
   try {
     const v2Res = await fetch(`${apiBase}/api/v2`, { signal });
     if (!v2Res.ok) return { maMode: "default" };
-    const v2Data = await v2Res.json() as { multiAgentMode?: unknown; multiAgentSurfaceAdvisory?: unknown };
+    const v2Data = (await v2Res.json()) as {
+      multiAgentMode?: unknown;
+      multiAgentSurfaceAdvisory?: unknown;
+    };
     const advisory = readSubagentSurfaceAdvisory(v2Data.multiAgentSurfaceAdvisory);
     if (v2Data.multiAgentMode === "v1" || v2Data.multiAgentMode === "v2") {
       return { maMode: v2Data.multiAgentMode, advisory };
@@ -258,39 +283,64 @@ export async function fetchDashboardOverview(
   apiBase: string,
   signal: AbortSignal,
 ): Promise<DashboardOverviewPoll> {
-  const failed = (failure: DashboardOverviewPoll["failure"]): DashboardOverviewPoll => ({ health: null, providers: [], error: true, failure });
+  const failed = (failure: DashboardOverviewPoll["failure"]): DashboardOverviewPoll => ({
+    health: null,
+    providers: [],
+    error: true,
+    failure,
+  });
   const controller = new AbortController();
   const requestSignal = AbortSignal.any([signal, controller.signal]);
   let accessFailure: "auth" | "denied" | undefined;
   let notifyAccess!: () => void;
-  const accessChanged = new Promise<"access">(resolve => { notifyAccess = () => resolve("access"); });
+  const accessChanged = new Promise<"access">((resolve) => {
+    notifyAccess = () => resolve("access");
+  });
   const observe = (response: Response) => {
     if (response.status === 401 || response.status === 403) {
-      if (response.status === 403 || accessFailure === undefined) accessFailure = response.status === 403 ? "denied" : "auth";
+      if (response.status === 403 || accessFailure === undefined)
+        accessFailure = response.status === 403 ? "denied" : "auth";
       notifyAccess();
     }
     return response;
   };
   try {
-    const requests = ["/api/system/health", "/api/providers"].map(path =>
-      Promise.resolve().then(() => fetch(`${apiBase}${path}`, { signal: requestSignal })).then(observe));
+    const requests = ["/api/system/health", "/api/providers"].map((path) =>
+      Promise.resolve()
+        .then(() => fetch(`${apiBase}${path}`, { signal: requestSignal }))
+        .then(observe),
+    );
     // Access failure must not be lost behind a rejected or stalled peer request.
     const result = await Promise.race([Promise.allSettled(requests), accessChanged]);
     signal.throwIfAborted();
     if (result === "access") return failed(accessFailure ?? "auth");
     const [hResult, pResult] = result;
-    if (hResult.status === "rejected" || pResult.status === "rejected") return failed("unavailable");
+    if (hResult.status === "rejected" || pResult.status === "rejected")
+      return failed("unavailable");
     const hRes = hResult.value;
     const pRes = pResult.value;
     if (!hRes.ok || !pRes.ok) return failed("request");
     try {
       const health = await requireJson<HealthData>(hRes);
       const providers = await requireJson<ProviderInfo[]>(pRes);
-      if (!health || typeof health.status !== "string" || typeof health.version !== "string"
-        || !Number.isFinite(health.uptime) || health.uptime < 0
-        || !Array.isArray(providers) || providers.some(row => !row || typeof row.name !== "string"
-          || typeof row.adapter !== "string" || typeof row.baseUrl !== "string" || typeof row.hasApiKey !== "boolean"
-          || (row.defaultModel !== undefined && typeof row.defaultModel !== "string"))) return failed("invalid");
+      if (
+        !health ||
+        typeof health.status !== "string" ||
+        typeof health.version !== "string" ||
+        !Number.isFinite(health.uptime) ||
+        health.uptime < 0 ||
+        !Array.isArray(providers) ||
+        providers.some(
+          (row) =>
+            !row ||
+            typeof row.name !== "string" ||
+            typeof row.adapter !== "string" ||
+            typeof row.baseUrl !== "string" ||
+            typeof row.hasApiKey !== "boolean" ||
+            (row.defaultModel !== undefined && typeof row.defaultModel !== "string"),
+        )
+      )
+        return failed("invalid");
       return { health, providers, error: false };
     } catch (error) {
       if (isAbortError(error, signal)) throw error;
@@ -313,7 +363,7 @@ export async function fetchDashboardMultiAgent(
   let injection: InjectionPoll | undefined;
   try {
     if (imRes?.ok) {
-      const imData = await imRes.json() as InjectionSelectionResponse & {
+      const imData = (await imRes.json()) as InjectionSelectionResponse & {
         efforts?: string[];
         available?: InjectionPoll["injectionAvailable"];
       };
@@ -323,18 +373,25 @@ export async function fetchDashboardMultiAgent(
         injectionAvailable: imData.available ?? [],
       };
     }
-  } catch { /* old server / malformed — keep prior UI state */ }
+  } catch {
+    /* old server / malformed — keep prior UI state */
+  }
 
   let effortCaps: EffortCapPoll | undefined;
   try {
     if (ecRes?.ok) {
-      const ecData = await ecRes.json() as { effortCap?: string | null; subagentEffortCap?: string | null };
+      const ecData = (await ecRes.json()) as {
+        effortCap?: string | null;
+        subagentEffortCap?: string | null;
+      };
       effortCaps = {
         effortCap: ecData.effortCap ?? "",
         subagentEffortCap: ecData.subagentEffortCap ?? "",
       };
     }
-  } catch { /* old server */ }
+  } catch {
+    /* old server */
+  }
 
   return { injection, effortCaps };
 }

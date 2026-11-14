@@ -1,17 +1,31 @@
 /**
- * The sidebar's rows, with a menu search beside the Everyday heading, keyboard shortcuts
- * for the rows people open most, and a Fine-tuning tier that stays folded until asked.
+ * The sidebar's rows, with menu search beside Use, keyboard shortcuts
+ * for frequent pages, and a Manage tier that stays folded until asked.
  *
  * Rows come from nav-groups.ts, one tier at a time; this file only decides how they are
  * shown. Search covers every page a row owns (Logs inside Usage & Logs, Startup inside
  * Home, Claude inside Route), so a page two clicks deep is one search away.
  */
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from "react";
 import type { Page } from "../app-routing";
 import type { TFn } from "../i18n/shared";
 import { IconChevron, IconSearch, IconX } from "../icons";
 import { NAV_GROUPS, NAV_TIERS, type NavGroup, type NavGroupId, type NavTier } from "../nav-groups";
-import { isEditableTarget, numberModifierHeld, searchShortcutLabel, shortcutLabel, shortcutStyle } from "../lib/nav-shortcuts";
+import {
+  isEditableTarget,
+  numberModifierHeld,
+  searchShortcutLabel,
+  shortcutLabel,
+  shortcutStyle,
+} from "../lib/nav-shortcuts";
 
 const ADVANCED_OPEN_KEY = "ocx-nav-advanced-open";
 /** The tier that folds. Everything in it stays reachable through search and the active row. */
@@ -34,7 +48,14 @@ interface SearchEntry {
   haystack: string;
 }
 
-export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate, onReveal, t }: {
+export function SidebarNav({
+  activeGroupId,
+  pageLabel,
+  pageAvailable,
+  onNavigate,
+  onReveal,
+  t,
+}: {
   activeGroupId: NavGroupId | null;
   pageLabel: (page: Page) => string;
   /** Search offers only pages that can load now (Remote Workspace needs a hub). */
@@ -44,6 +65,22 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
   onReveal: () => void;
   t: TFn;
 }) {
+  const visibleGroups = useMemo(
+    () =>
+      NAV_GROUPS.flatMap((group) => {
+        const pages = group.pages.filter(pageAvailable);
+        return pages.length
+          ? [
+              {
+                ...group,
+                pages: pages as [Page, ...Page[]],
+                embedded: group.embedded?.filter(pageAvailable),
+              },
+            ]
+          : [];
+      }),
+    [pageAvailable],
+  );
   const style = shortcutStyle();
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -64,25 +101,44 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     }
   }, [advancedOpen]);
 
-  const entries = useMemo<SearchEntry[]>(() => NAV_GROUPS.flatMap(group => {
-    const groupLabel = t(group.tkey);
-    return [...group.pages, ...(group.embedded ?? [])].map((page, index) => {
-      const label = index === 0 ? groupLabel : pageLabel(page);
-      const context = index === 0 || label === groupLabel ? null : groupLabel;
-      return { group, page, label, context, haystack: `${label} ${groupLabel}`.toLowerCase() };
-    }).filter(entry => pageAvailable(entry.page));
-  }), [pageAvailable, pageLabel, t]);
+  const entries = useMemo<SearchEntry[]>(
+    () =>
+      visibleGroups.flatMap((group) => {
+        const groupLabel = t(group.tkey);
+        return [...group.pages, ...(group.embedded ?? [])]
+          .map((page, index) => {
+            const label = index === 0 ? groupLabel : pageLabel(page);
+            const context = index === 0 || label === groupLabel ? null : groupLabel;
+            return {
+              group,
+              page,
+              label,
+              context,
+              haystack: `${label} ${groupLabel}`.toLowerCase(),
+            };
+          })
+          .filter((entry) => pageAvailable(entry.page));
+      }),
+    [visibleGroups, pageAvailable, pageLabel, t],
+  );
 
   const trimmed = query.trim().toLowerCase();
-  const results = useMemo(() => (trimmed ? entries.filter(entry => entry.haystack.includes(trimmed)) : []), [entries, trimmed]);
+  const results = useMemo(
+    () => (trimmed ? entries.filter((entry) => entry.haystack.includes(trimmed)) : []),
+    [entries, trimmed],
+  );
 
-  const openSearch = useCallback((fromButton = false) => {
-    if (searching) return;
-    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    openedFromButton.current = fromButton || returnFocusRef.current === searchButtonRef.current;
-    onReveal();
-    setSearching(true);
-  }, [onReveal, searching]);
+  const openSearch = useCallback(
+    (fromButton = false) => {
+      if (searching) return;
+      returnFocusRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      openedFromButton.current = fromButton || returnFocusRef.current === searchButtonRef.current;
+      onReveal();
+      setSearching(true);
+    },
+    [onReveal, searching],
+  );
 
   useEffect(() => {
     if (!searching) return;
@@ -91,7 +147,10 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     const timer = setTimeout(() => {
       if (!searchDialogRef.current?.contains(document.activeElement)) inputRef.current?.focus();
     }, 200);
-    return () => { cancelAnimationFrame(frame); clearTimeout(timer); };
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(timer);
+    };
   }, [searching]);
 
   useEffect(() => {
@@ -114,7 +173,7 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     document.addEventListener("focusin", containFocus);
     return () => {
       document.removeEventListener("focusin", containFocus);
-      changed.forEach(element => element.removeAttribute("inert"));
+      changed.forEach((element) => element.removeAttribute("inert"));
     };
   }, [searching, trimmed]);
 
@@ -122,11 +181,12 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     setQuery("");
     setHighlight(0);
     setSearching(false);
-    if (restoreFocus) requestAnimationFrame(() => {
-      const target = openedFromButton.current ? searchButtonRef.current : returnFocusRef.current;
-      if (target?.isConnected) target.focus();
-      else searchButtonRef.current?.focus();
-    });
+    if (restoreFocus)
+      requestAnimationFrame(() => {
+        const target = openedFromButton.current ? searchButtonRef.current : returnFocusRef.current;
+        if (target?.isConnected) target.focus();
+        else searchButtonRef.current?.focus();
+      });
   }, []);
 
   useEffect(() => {
@@ -134,7 +194,14 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     // The drawer's Escape listener is on window; capture also covers its slide-in
     // interval before the search input can receive focus.
     const onEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape" || event.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (
+        event.key !== "Escape" ||
+        event.isComposing ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey
+      )
+        return;
       event.preventDefault();
       event.stopImmediatePropagation();
       closeSearch(true);
@@ -143,18 +210,37 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     return () => window.removeEventListener("keydown", onEscape, true);
   }, [closeSearch, searching]);
 
-  const go = useCallback((page: Page) => {
-    closeSearch(false);
-    onNavigate(page);
-  }, [closeSearch, onNavigate]);
+  const go = useCallback(
+    (page: Page) => {
+      closeSearch(false);
+      onNavigate(page);
+    },
+    [closeSearch, onNavigate],
+  );
 
-  const daily = useMemo(() => NAV_GROUPS.filter(group => group.tier === "daily"), []);
+  const daily = useMemo(
+    () => visibleGroups.filter((group) => group.tier === "daily"),
+    [visibleGroups],
+  );
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (searching || event.defaultPrevented || event.isComposing) return;
-      const commandK = (style.endsWith("mac") ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey) && !event.altKey && !event.shiftKey && (event.key === "k" || event.key === "K");
-      if (commandK || (event.key === "/" && !event.metaKey && !event.ctrlKey && !event.altKey && !isEditableTarget(event.target))) {
+      const commandK =
+        (style.endsWith("mac")
+          ? event.metaKey && !event.ctrlKey
+          : event.ctrlKey && !event.metaKey) &&
+        !event.altKey &&
+        !event.shiftKey &&
+        (event.key === "k" || event.key === "K");
+      if (
+        commandK ||
+        (event.key === "/" &&
+          !event.metaKey &&
+          !event.ctrlKey &&
+          !event.altKey &&
+          !isEditableTarget(event.target))
+      ) {
         event.preventDefault();
         openSearch();
         return;
@@ -181,19 +267,31 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     } else if (event.key === "Tab") {
       event.preventDefault();
       const close = searchDialogRef.current?.querySelector<HTMLButtonElement>(".nav-search-close");
-      if (event.shiftKey ? document.activeElement === inputRef.current : document.activeElement !== close) close?.focus();
+      if (
+        event.shiftKey
+          ? document.activeElement === inputRef.current
+          : document.activeElement !== close
+      )
+        close?.focus();
       else inputRef.current?.focus();
     }
   };
 
   const onSearchKey = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (event.nativeEvent.isComposing || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+    if (
+      event.nativeEvent.isComposing ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.altKey ||
+      event.shiftKey
+    )
+      return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setHighlight(index => (results.length ? (index + 1) % results.length : 0));
+      setHighlight((index) => (results.length ? (index + 1) % results.length : 0));
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setHighlight(index => (results.length ? (index - 1 + results.length) % results.length : 0));
+      setHighlight((index) => (results.length ? (index - 1 + results.length) % results.length : 0));
     } else if (event.key === "Enter") {
       const entry = results[Math.min(highlight, results.length - 1)];
       if (entry) {
@@ -212,15 +310,24 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
     const label = t(tkey);
     return (
       <div key={id} className="nav-entry">
-        <button type="button" className={`nav-item${active ? " active" : ""}`}
+        <button
+          type="button"
+          className={`nav-item${active ? " active" : ""}`}
           data-page={group.pages[0]}
           data-group={id}
           title={shortcut ? `${label} (${shortcut})` : undefined}
-          aria-keyshortcuts={shortcut ? shortcut.replace("⌘", "Meta+").replace("⌥", "Alt+") : undefined}
+          aria-keyshortcuts={
+            shortcut ? shortcut.replace("⌘", "Meta+").replace("⌥", "Alt+") : undefined
+          }
           onClick={() => onNavigate(group.pages[0])}
-          aria-current={active ? "page" : undefined}>
+          aria-current={active ? "page" : undefined}
+        >
           <Icon /> <span className="nav-item-label">{label}</span>
-          {shortcut && <kbd className="nav-kbd" aria-hidden="true">{shortcut}</kbd>}
+          {shortcut && (
+            <kbd className="nav-kbd" aria-hidden="true">
+              {shortcut}
+            </kbd>
+          )}
         </button>
       </div>
     );
@@ -229,38 +336,83 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
   return (
     <>
       {NAV_TIERS.map(({ tier, tkey: tierKey }) => {
-        const groups = NAV_GROUPS.filter(group => group.tier === tier);
+        const groups = visibleGroups.filter((group) => group.tier === tier);
+        if (!groups.length) return null;
         if (tier === "daily") {
           return (
             <div key={tier} className="nav-tier" data-tier={tier}>
               {searching ? (
-                <div ref={searchDialogRef} role="dialog" aria-modal="true" aria-label={searchLabel} onKeyDown={onDialogKey}>
+                <div
+                  ref={searchDialogRef}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label={searchLabel}
+                  onKeyDown={onDialogKey}
+                >
                   <div className="nav-search">
                     <IconSearch aria-hidden="true" />
-                    <input ref={inputRef} type="search" className="nav-search-input" value={query}
+                    <input
+                      ref={inputRef}
+                      type="search"
+                      className="nav-search-input"
+                      value={query}
                       placeholder={t("shellV2.navSearchPlaceholder")}
-                      aria-label={searchLabel} role="combobox" aria-expanded="true" aria-autocomplete="list"
+                      aria-label={searchLabel}
+                      role="combobox"
+                      aria-expanded="true"
+                      aria-autocomplete="list"
                       aria-controls={listId}
-                      aria-activedescendant={results.length ? `${listId}-${Math.min(highlight, results.length - 1)}` : undefined}
-                      onChange={event => { setQuery(event.target.value); setHighlight(0); }}
-                      onKeyDown={onSearchKey} />
-                    <button type="button" className="nav-search-close" onClick={() => closeSearch(true)} aria-label={t("common.close")} title={t("common.close")}>
+                      aria-activedescendant={
+                        results.length
+                          ? `${listId}-${Math.min(highlight, results.length - 1)}`
+                          : undefined
+                      }
+                      onChange={(event) => {
+                        setQuery(event.target.value);
+                        setHighlight(0);
+                      }}
+                      onKeyDown={onSearchKey}
+                    />
+                    <button
+                      type="button"
+                      className="nav-search-close"
+                      onClick={() => closeSearch(true)}
+                      aria-label={t("common.close")}
+                      title={t("common.close")}
+                    >
                       <IconX />
                     </button>
                   </div>
-                  {trimmed && results.length === 0 && <div className="nav-search-empty" role="status">{t("shellV2.navSearchEmpty")}</div>}
-                  <div id={listId} className="nav-search-results" role="listbox" aria-label={searchLabel}>
+                  {trimmed && results.length === 0 && (
+                    <div className="nav-search-empty" role="status">
+                      {t("shellV2.navSearchEmpty")}
+                    </div>
+                  )}
+                  <div
+                    id={listId}
+                    className="nav-search-results"
+                    role="listbox"
+                    aria-label={searchLabel}
+                  >
                     {results.map((entry, index) => {
                       const { Icon } = entry.group;
                       return (
-                        <button key={entry.page} id={`${listId}-${index}`} type="button" role="option" tabIndex={-1}
+                        <button
+                          key={entry.page}
+                          id={`${listId}-${index}`}
+                          type="button"
+                          role="option"
+                          tabIndex={-1}
                           aria-selected={index === Math.min(highlight, results.length - 1)}
                           className={`nav-item nav-search-result${index === Math.min(highlight, results.length - 1) ? " is-highlighted" : ""}`}
                           onMouseEnter={() => setHighlight(index)}
-                          onMouseDown={event => event.preventDefault()}
-                          onClick={() => go(entry.page)}>
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => go(entry.page)}
+                        >
                           <Icon /> <span className="nav-item-label">{entry.label}</span>
-                          {entry.context && <span className="nav-search-context">{entry.context}</span>}
+                          {entry.context && (
+                            <span className="nav-search-context">{entry.context}</span>
+                          )}
                         </button>
                       );
                     })}
@@ -268,16 +420,29 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
                 </div>
               ) : (
                 <div className="nav-tier-head">
-                  <div className="nav-tier-label" aria-hidden="true">{t(tierKey)}</div>
-                  <button ref={searchButtonRef} type="button" className="nav-search-open" onClick={() => openSearch(true)}
-                    aria-label={`${searchLabel} (${searchHint})`} title={`${searchLabel} (${searchHint})`}
-                    aria-keyshortcuts={searchHint === "⌘K" ? "Meta+K" : "Control+K"}>
+                  <div className="nav-tier-label" aria-hidden="true">
+                    {t(tierKey)}
+                  </div>
+                  <button
+                    ref={searchButtonRef}
+                    type="button"
+                    className="nav-search-open"
+                    onClick={() => openSearch(true)}
+                    aria-label={`${searchLabel} (${searchHint})`}
+                    title={`${searchLabel} (${searchHint})`}
+                    aria-keyshortcuts={searchHint === "⌘K" ? "Meta+K" : "Control+K"}
+                  >
                     <IconSearch aria-hidden="true" />
-                    <kbd className="nav-kbd nav-kbd--search" aria-hidden="true">{searchHint}</kbd>
+                    <kbd className="nav-kbd nav-kbd--search" aria-hidden="true">
+                      {searchHint}
+                    </kbd>
                   </button>
                 </div>
               )}
-              {!trimmed && groups.map((group, index) => row(group, index < 9 ? shortcutLabel(style, String(index + 1)) : null))}
+              {!trimmed &&
+                groups.map((group, index) =>
+                  row(group, index < 9 ? shortcutLabel(style, String(index + 1)) : null),
+                )}
             </div>
           );
         }
@@ -285,21 +450,33 @@ export function SidebarNav({ activeGroupId, pageLabel, pageAvailable, onNavigate
         if (tier !== FOLDING_TIER) {
           return (
             <div key={tier} className="nav-tier" data-tier={tier}>
-              <div className="nav-tier-label" aria-hidden="true">{t(tierKey)}</div>
-              {groups.map(group => row(group, null))}
+              <div className="nav-tier-label" aria-hidden="true">
+                {t(tierKey)}
+              </div>
+              {groups.map((group) => row(group, null))}
             </div>
           );
         }
         // Folded, the tier still shows the row you are on, so the sidebar never hides where you are.
-        const visible = advancedOpen ? groups : groups.filter(group => group.id === activeGroupId);
+        const visible = advancedOpen
+          ? groups
+          : groups.filter((group) => group.id === activeGroupId);
         return (
-          <div key={tier} className={`nav-tier nav-tier--folding${advancedOpen ? " is-open" : ""}`} data-tier={tier}>
-            <button type="button" className="nav-tier-toggle" aria-expanded={advancedOpen}
-              onClick={() => setAdvancedOpen(open => !open)}>
+          <div
+            key={tier}
+            className={`nav-tier nav-tier--folding${advancedOpen ? " is-open" : ""}`}
+            data-tier={tier}
+          >
+            <button
+              type="button"
+              className="nav-tier-toggle"
+              aria-expanded={advancedOpen}
+              onClick={() => setAdvancedOpen((open) => !open)}
+            >
               <span className="nav-tier-label">{t(tierKey)}</span>
               <IconChevron aria-hidden="true" className="nav-tier-chevron" />
             </button>
-            {visible.map(group => row(group, null))}
+            {visible.map((group) => row(group, null))}
           </div>
         );
       })}

@@ -10,14 +10,29 @@ type Dash = ReturnType<typeof useDashboardData>;
  * Proxy details overview: the state strip, then the expert settings as titled sections with a
  * sticky index beside them (a scrolling strip above them on narrow screens).
  */
-export function DashboardOverviewSection({ readOnly = false, ...d }: Dash & { readOnly?: boolean }) {
-  const items = PROXY_SECTION_IDS.map(([id, key]) => ({ id, label: d.t(key) }));
+export function DashboardOverviewSection({
+  readOnly = false,
+  ...d
+}: Dash & { readOnly?: boolean }) {
+  const items = d.liteRuntime
+    ? [
+        { id: "proxy-subagents", label: d.t("proxyV2.secSubagents") },
+        { id: "proxy-codex", label: d.t("proxyV2.secCodex") },
+        { id: "proxy-compaction", label: d.t("proxyV2.secCompaction") },
+        { id: "proxy-sidecars", label: d.t("proxyV2.secSidecars") },
+        { id: "proxy-budget", label: d.t("workflowBudget.title") },
+        { id: "simple-fallback", label: d.t("proxyV2.secFallback") },
+      ]
+    : PROXY_SECTION_IDS.map(([id, key]) => ({ id, label: d.t(key) }));
   return (
     <div className="dash-overview-stack">
       <DashboardOverviewHead {...d} />
       <div className="pv2-overview-grid grid min-w-0 gap-5 lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-8">
-        <SectionIndex items={items} label={d.t("proxyV2.indexLabel")}
-          className="lg:sticky lg:top-4 lg:self-start" />
+        <SectionIndex
+          items={items}
+          label={d.t("proxyV2.indexLabel")}
+          className="lg:sticky lg:top-4 lg:self-start"
+        />
         <div className="flex min-w-0 flex-col gap-5">
           <DashboardOverviewPanels {...d} readOnly={readOnly} />
         </div>

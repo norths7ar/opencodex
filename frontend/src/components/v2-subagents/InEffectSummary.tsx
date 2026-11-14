@@ -17,16 +17,25 @@ interface Props {
   firstEffort: string;
   /** Committed Claude Code pin: null = off, undefined = still loading. */
   pin: string | null | undefined;
+  showPin?: boolean;
   onJump: (target: "featured" | "delegation" | "pin") => void;
 }
 
-export function InEffectSummary({ chosen, max, firstModel, firstEffort, pin, onJump }: Props) {
+export function InEffectSummary({
+  chosen,
+  max,
+  firstModel,
+  firstEffort,
+  pin,
+  showPin = true,
+  onJump,
+}: Props) {
   const t = useT();
   const top = chosen[0];
   return (
     <section aria-label={t("subagentsV2.nowTitle")} className="flex flex-col gap-2">
       <h3 className="m-0 text-[12px] font-medium text-fg-subtle">{t("subagentsV2.nowTitle")}</h3>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className={cn("grid gap-3", showPin ? "md:grid-cols-3" : "md:grid-cols-2")}>
         <Tile
           label={t("subagentsV2.nowOrder")}
           value={top ? modelLabel(top) : t("subagentsV2.nowOrderNone")}
@@ -40,25 +49,38 @@ export function InEffectSummary({ chosen, max, firstModel, firstEffort, pin, onJ
           value={firstModel || t("dash.injectionNone")}
           mono={!!firstModel}
           muted={!firstModel}
-          caption={!firstModel ? t("subagentsV2.firstNoneCaption")
-            : `${t("dash.injectionEffortLabel")} · ${firstEffort || t("dash.injectionEffortNone")}`}
+          caption={
+            !firstModel
+              ? t("subagentsV2.firstNoneCaption")
+              : `${t("dash.injectionEffortLabel")} · ${firstEffort || t("dash.injectionEffortNone")}`
+          }
           onClick={() => onJump("delegation")}
         />
-        <Tile
-          label={t("subagentsV2.nowPin")}
-          value={pin === undefined ? "—" : pin ?? t("subagentsV2.off")}
-          mono={!!pin}
-          muted={!pin}
-          on={!!pin}
-          caption={pin ? t("subagentsV2.pinOnCaption") : t("subagentsV2.pinOffCaption")}
-          onClick={() => onJump("pin")}
-        />
+        {showPin && (
+          <Tile
+            label={t("subagentsV2.nowPin")}
+            value={pin === undefined ? "—" : (pin ?? t("subagentsV2.off"))}
+            mono={!!pin}
+            muted={!pin}
+            on={!!pin}
+            caption={pin ? t("subagentsV2.pinOnCaption") : t("subagentsV2.pinOffCaption")}
+            onClick={() => onJump("pin")}
+          />
+        )}
       </div>
     </section>
   );
 }
 
-function Tile({ label, value, caption, mono, muted, on, onClick }: {
+function Tile({
+  label,
+  value,
+  caption,
+  mono,
+  muted,
+  on,
+  onClick,
+}: {
   label: string;
   value: ReactNode;
   caption: string;
@@ -80,7 +102,10 @@ function Tile({ label, value, caption, mono, muted, on, onClick }: {
     >
       <span className="flex items-center gap-2 text-[12px] font-medium text-fg-subtle">
         {on !== undefined && (
-          <span className={cn("size-1.5 shrink-0 rounded-full", on ? "bg-success" : "bg-fg-subtle")} aria-hidden="true" />
+          <span
+            className={cn("size-1.5 shrink-0 rounded-full", on ? "bg-success" : "bg-fg-subtle")}
+            aria-hidden="true"
+          />
         )}
         <span className="min-w-0 flex-1 truncate">{label}</span>
         <span className="inline-flex items-center gap-0.5 text-fg-subtle opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
@@ -88,11 +113,15 @@ function Tile({ label, value, caption, mono, muted, on, onClick }: {
           <IconChevron className="size-3" aria-hidden="true" />
         </span>
       </span>
-      <span className={cn(
-        "truncate text-[16px] leading-6 font-semibold tracking-[-0.01em]",
-        mono && "font-mono text-[15px]",
-        muted ? "text-fg-muted" : "text-fg",
-      )}>{value}</span>
+      <span
+        className={cn(
+          "truncate text-[16px] leading-6 font-semibold tracking-[-0.01em]",
+          mono && "font-mono text-[15px]",
+          muted ? "text-fg-muted" : "text-fg",
+        )}
+      >
+        {value}
+      </span>
       <span className="truncate text-[12px] text-fg-muted">{caption}</span>
     </button>
   );

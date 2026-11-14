@@ -1,4 +1,5 @@
 export interface DebugSettings {
+  supportedFlags?: Array<"debug" | "usage" | "injection" | "claude">;
   enabled: boolean;
   usage: boolean;
   injection: boolean;
@@ -45,9 +46,22 @@ export function formatClaudeInboundTime(at: number): string {
 }
 
 export function isStreamEnabled(debug: DebugSettings | null, stream: LogStream): boolean {
-  return stream === "provider" ? !!debug?.enabled : stream === "usage" ? !!debug?.usage : !!debug?.injection;
+  return stream === "provider"
+    ? !!debug?.enabled
+    : stream === "usage"
+      ? !!debug?.usage
+      : !!debug?.injection;
 }
 
-export function isDebugFlagEnabled(debug: DebugSettings, flag: keyof DebugSettings["env"]): boolean {
-  return flag === "debug" ? debug.enabled : flag === "usage" ? debug.usage : flag === "injection" ? debug.injection : debug.claude;
+export function isDebugFlagEnabled(
+  debug: DebugSettings,
+  flag: keyof DebugSettings["env"],
+): boolean {
+  return flag === "debug"
+    ? debug.enabled
+    : flag === "usage"
+      ? debug.usage
+      : flag === "injection"
+        ? debug.injection
+        : debug.claude;
 }

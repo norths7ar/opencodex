@@ -3,19 +3,11 @@
   "scope": "full",
   "blocking": "warning",
   "ignore": {
-    "files": [
-      "dist/**",
-      "classic/**",
-      "node_modules/**"
-    ],
+    "files": ["dist/**", "dist-runtime/**", "node_modules/**"],
     "overrides": [
       {
-        "files": [
-          "src/pages/Models.tsx"
-        ],
-        "rules": [
-          "react-hooks/exhaustive-deps"
-        ]
+        "files": ["src/pages/Models.tsx"],
+        "rules": ["react-hooks/exhaustive-deps"]
       }
     ]
   },

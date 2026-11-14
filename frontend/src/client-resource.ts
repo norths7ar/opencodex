@@ -132,7 +132,11 @@ const pollBuckets = new Map<number, PollBucket>();
 /** True when any polling subscriber opted out of hidden pausing (e.g. restart watch). */
 function anyOptOut<T>(store: Store<T>): boolean {
   for (const [listener, ms] of store.pollByListener) {
-    if (typeof ms === "number" && ms > 0 && store.pauseWhenHiddenByListener.get(listener) === false) {
+    if (
+      typeof ms === "number" &&
+      ms > 0 &&
+      store.pauseWhenHiddenByListener.get(listener) === false
+    ) {
       return true;
     }
   }
@@ -154,7 +158,11 @@ function runBucketTick(bucket: PollBucket) {
     const entry = pickPollEntry(store);
     if (!entry) continue;
     // Skip ticks while a request is in flight so slow polls can finish.
-    void runFetch(store, entry.fetcher, { replaceInflight: false, owner: entry.owner, deadlineMs: entry.deadlineMs });
+    void runFetch(store, entry.fetcher, {
+      replaceInflight: false,
+      owner: entry.owner,
+      deadlineMs: entry.deadlineMs,
+    });
   }
 }
 
@@ -211,28 +219,34 @@ function documentIsHidden(): boolean {
  * a background tab has no one reading the paint, but a restart-reconnect poll still has
  * to notice the server coming back. When nothing opted out, the tick is skipped entirely.
  */
-function pickPollEntry<T>(
-  store: Store<T>,
-): { owner: () => void; fetcher: (signal: AbortSignal) => Promise<T>; deadlineMs: number | undefined } | null {
+function pickPollEntry<T>(store: Store<T>): {
+  owner: () => void;
+  fetcher: (signal: AbortSignal) => Promise<T>;
+  deadlineMs: number | undefined;
+} | null {
   if (!documentIsHidden()) return pickFetcherEntry(store);
   for (const [listener, ms] of store.pollByListener) {
     if (typeof ms !== "number" || ms <= 0) continue;
     if (store.pauseWhenHiddenByListener.get(listener) === false) {
       const fetcher = store.fetcherByListener.get(listener);
-      if (fetcher) return { owner: listener, fetcher, deadlineMs: store.deadlineByListener.get(listener) };
+      if (fetcher)
+        return { owner: listener, fetcher, deadlineMs: store.deadlineByListener.get(listener) };
     }
   }
   return null;
 }
 
 /** Prefer a polling subscriber's fetcher; otherwise any remaining subscriber. */
-function pickFetcherEntry<T>(
-  store: Store<T>,
-): { owner: () => void; fetcher: (signal: AbortSignal) => Promise<T>; deadlineMs: number | undefined } | null {
+function pickFetcherEntry<T>(store: Store<T>): {
+  owner: () => void;
+  fetcher: (signal: AbortSignal) => Promise<T>;
+  deadlineMs: number | undefined;
+} | null {
   for (const [listener, ms] of store.pollByListener) {
     if (typeof ms === "number" && ms > 0) {
       const fetcher = store.fetcherByListener.get(listener);
-      if (fetcher) return { owner: listener, fetcher, deadlineMs: store.deadlineByListener.get(listener) };
+      if (fetcher)
+        return { owner: listener, fetcher, deadlineMs: store.deadlineByListener.get(listener) };
     }
   }
   for (const [listener, fetcher] of store.fetcherByListener) {
@@ -295,7 +309,11 @@ function ensureVisibilityListener<T>(_store: Store<T>) {
       for (const store of bucket.stores) {
         const entry = pickFetcherEntry(store);
         if (!entry) continue;
-        void runFetch(store, entry.fetcher, { replaceInflight: false, owner: entry.owner, deadlineMs: entry.deadlineMs });
+        void runFetch(store, entry.fetcher, {
+          replaceInflight: false,
+          owner: entry.owner,
+          deadlineMs: entry.deadlineMs,
+        });
       }
     }
   };
@@ -313,7 +331,12 @@ function removeVisibilityListener<T>(_store: Store<T>) {
 async function runFetch<T>(
   store: Store<T>,
   fetcher: (signal: AbortSignal) => Promise<T>,
-  options?: { replaceInflight?: boolean; owner?: (() => void) | null; forceLoading?: boolean; deadlineMs?: number },
+  options?: {
+    replaceInflight?: boolean;
+    owner?: (() => void) | null;
+    forceLoading?: boolean;
+    deadlineMs?: number;
+  },
 ) {
   const replaceInflight = options?.replaceInflight !== false;
   if (store.inflight && !replaceInflight) return;
@@ -353,12 +376,16 @@ async function runFetch<T>(
     const data = await Promise.race([
       fetcher(controller.signal),
       new Promise<never>((resolve, reject) => {
-        controller.signal.addEventListener("abort", () => {
-          if (timedOut) reject(new Error(`resource request timed out after ${deadlineMs}ms`));
-          // An owner abort frees the race frame immediately; the success guard below
-          // early-returns on signal.aborted, so this never settles data.
-          else resolve(null as never);
-        }, { once: true });
+        controller.signal.addEventListener(
+          "abort",
+          () => {
+            if (timedOut) reject(new Error(`resource request timed out after ${deadlineMs}ms`));
+            // An owner abort frees the race frame immediately; the success guard below
+            // early-returns on signal.aborted, so this never settles data.
+            else resolve(null as never);
+          },
+          { once: true },
+        );
       }),
     ]);
     if (gen !== store.generation || controller.signal.aborted) return;
@@ -460,10 +487,16 @@ function subscribeResource<T>(
   if (store.subscriberCount === 1) {
     // A surviving store (in-page enabled-gate churn) revalidates quietly once its data
     // ages past the window; cached data stays on screen while it runs.
-    const stale = typeof staleAfterMs === "number"
-      && store.lastSettledAt !== undefined
-      && Date.now() - store.lastSettledAt > staleAfterMs;
-    if (store.snapshot.data === undefined || store.seedNeedsRevalidate || invalidatedKeys.has(key) || stale) {
+    const stale =
+      typeof staleAfterMs === "number" &&
+      store.lastSettledAt !== undefined &&
+      Date.now() - store.lastSettledAt > staleAfterMs;
+    if (
+      store.snapshot.data === undefined ||
+      store.seedNeedsRevalidate ||
+      invalidatedKeys.has(key) ||
+      stale
+    ) {
       void runFetch(store, fetcher, { replaceInflight: true, owner: onStoreChange, deadlineMs });
     }
   }
@@ -486,7 +519,11 @@ function subscribeResource<T>(
     if (abortedOwned) {
       const entry = pickFetcherEntry(store);
       if (entry) {
-        void runFetch(store, entry.fetcher, { replaceInflight: true, owner: entry.owner, deadlineMs: entry.deadlineMs });
+        void runFetch(store, entry.fetcher, {
+          replaceInflight: true,
+          owner: entry.owner,
+          deadlineMs: entry.deadlineMs,
+        });
       }
     }
     recomputePoll(store);
@@ -529,13 +566,23 @@ export interface ClientResourceOptions<T = unknown> {
 }
 
 /** Seed an empty, unsubscribed store. No-ops when data already exists or someone is listening. */
-function seedClientResourceIfEmpty<T>(key: string, data: T, cachedAt?: number | null, staleAfterMs?: number): void {
+function seedClientResourceIfEmpty<T>(
+  key: string,
+  data: T,
+  cachedAt?: number | null,
+  staleAfterMs?: number,
+): void {
   const store = getStore<T>(key);
   if (store.subscriberCount !== 0 || store.snapshot.data !== undefined) return;
   setClientResourceData(key, data);
   // A seed fresher than the staleness window skips the mount revalidation entirely:
   // that is the whole request saved on a tab revisit. Unknown age counts as stale.
-  if (!invalidatedKeys.has(key) && typeof staleAfterMs === "number" && typeof cachedAt === "number" && Date.now() - cachedAt < staleAfterMs) {
+  if (
+    !invalidatedKeys.has(key) &&
+    typeof staleAfterMs === "number" &&
+    typeof cachedAt === "number" &&
+    Date.now() - cachedAt < staleAfterMs
+  ) {
     store.seedNeedsRevalidate = false;
     store.lastSettledAt = cachedAt;
   }
@@ -563,10 +610,7 @@ export function useClientResource<T>(
     fetcherRef.current = fetcher;
   });
 
-  const stableFetcher = useCallback(
-    (signal: AbortSignal) => fetcherRef.current(signal),
-    [],
-  );
+  const stableFetcher = useCallback((signal: AbortSignal) => fetcherRef.current(signal), []);
 
   const listenerRef = useRef<(() => void) | null>(null);
 
@@ -574,7 +618,13 @@ export function useClientResource<T>(
     (onStoreChange: () => void) => {
       if (!enabled) return () => {};
       listenerRef.current = onStoreChange;
-      return subscribeResource(key, onStoreChange, { fetcher: stableFetcher, pollMs, pauseWhenHidden, deadlineMs, staleAfterMs });
+      return subscribeResource(key, onStoreChange, {
+        fetcher: stableFetcher,
+        pollMs,
+        pauseWhenHidden,
+        deadlineMs,
+        staleAfterMs,
+      });
     },
     [key, stableFetcher, pollMs, enabled, pauseWhenHidden, deadlineMs, staleAfterMs],
   );
@@ -586,18 +636,23 @@ export function useClientResource<T>(
 
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
-  const refresh = useCallback((opts?: { forceLoading?: boolean }) => {
-    if (!enabled) return;
-    const store = getStore<T>(key);
-    void runFetch(store, stableFetcher, {
-      replaceInflight: true,
-      owner: listenerRef.current,
-      forceLoading: opts?.forceLoading,
-      // The refreshing listener's own deadline — not a frozen option — so a shared
-      // key keeps each owner's contract.
-      deadlineMs: listenerRef.current ? store.deadlineByListener.get(listenerRef.current) : deadlineMs,
-    });
-  }, [key, stableFetcher, enabled, deadlineMs]);
+  const refresh = useCallback(
+    (opts?: { forceLoading?: boolean }) => {
+      if (!enabled) return;
+      const store = getStore<T>(key);
+      void runFetch(store, stableFetcher, {
+        replaceInflight: true,
+        owner: listenerRef.current,
+        forceLoading: opts?.forceLoading,
+        // The refreshing listener's own deadline — not a frozen option — so a shared
+        // key keeps each owner's contract.
+        deadlineMs: listenerRef.current
+          ? store.deadlineByListener.get(listenerRef.current)
+          : deadlineMs,
+      });
+    },
+    [key, stableFetcher, enabled, deadlineMs],
+  );
 
   return { ...snapshot, refresh };
 }
@@ -651,7 +706,11 @@ export function invalidateClientResource(key: string): void {
   if (!store) return;
   const entry = pickFetcherEntry(store);
   if (entry) {
-    void runFetch(store, entry.fetcher, { replaceInflight: true, owner: entry.owner, deadlineMs: entry.deadlineMs });
+    void runFetch(store, entry.fetcher, {
+      replaceInflight: true,
+      owner: entry.owner,
+      deadlineMs: entry.deadlineMs,
+    });
   }
 }
 

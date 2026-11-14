@@ -7,17 +7,26 @@ export interface StartupRiskDetail {
 }
 
 /** Presentation is distinct from conservative restart-protection credit. */
-export function startupPresentation(data: {
-  status: "native" | "protected" | "at-risk";
-  routingKind?: unknown;
-  diagnosticStale?: unknown;
-}, failed = false): "native" | "protected" | "at-risk" | "unverified" | "error" {
-  if (!failed && data.diagnosticStale !== true && (data.status === "native" || data.status === "protected")) return data.status;
+export function startupPresentation(
+  data: {
+    status: "native" | "protected" | "at-risk";
+    routingKind?: unknown;
+    diagnosticStale?: unknown;
+  },
+  failed = false,
+): "native" | "protected" | "at-risk" | "unverified" | "error" {
+  if (
+    !failed &&
+    data.diagnosticStale !== true &&
+    (data.status === "native" || data.status === "protected")
+  )
+    return data.status;
   if (data.diagnosticStale === true && data.routingKind === "opencodex-local") return "unverified";
   return failed ? "error" : data.status;
 }
 
 export function startupChecklistDone(data: {
+  rebootSafe?: boolean;
   status?: "native" | "protected" | "at-risk";
   routingKind?: unknown;
   diagnosticStale?: unknown;
@@ -25,8 +34,14 @@ export function startupChecklistDone(data: {
   serviceInstalled?: boolean;
   shimInstalled?: boolean;
 }): boolean | undefined {
-  if (data.status && startupPresentation({ ...data, status: data.status }) === "unverified") return undefined;
-  return (data.protection !== undefined && data.protection !== "none") || Boolean(data.serviceInstalled || data.shimInstalled);
+  if (data.diagnosticStale === true) return undefined;
+  if (typeof data.rebootSafe === "boolean") return data.rebootSafe;
+  if (data.status && startupPresentation({ ...data, status: data.status }) === "unverified")
+    return undefined;
+  return (
+    (data.protection !== undefined && data.protection !== "none") ||
+    Boolean(data.serviceInstalled || data.shimInstalled)
+  );
 }
 
 export function startupRiskDetailKey(health: StartupRiskDetail): TKey {
@@ -44,9 +59,11 @@ export function settingsPollMayCommit(
   started: SettingsPollEpoch,
   current: SettingsPollEpoch & { mutationInFlight: boolean },
 ): boolean {
-  return !current.mutationInFlight
-    && started.request === current.request
-    && started.mutation === current.mutation;
+  return (
+    !current.mutationInFlight &&
+    started.request === current.request &&
+    started.mutation === current.mutation
+  );
 }
 
 /** Snapshot + bump one request epoch before issuing a poll fetch. */
@@ -135,12 +152,20 @@ export function probeNeedsFastRetry(probe: StartupHealthProbe | undefined | null
  */
 export function seedStartupHealthFromSettings(
   previous: StartupHealthStatus | null,
-  seeded: { status: "native" | "protected" | "at-risk"; diagnosticStale: boolean; routingKind?: unknown } | null | undefined,
+  seeded:
+    | {
+        status: "native" | "protected" | "at-risk";
+        diagnosticStale: boolean;
+        routingKind?: unknown;
+      }
+    | null
+    | undefined,
   authoritative = previous !== null && previous !== "error",
 ): StartupHealthStatus | null {
   if (!seeded) return previous;
   if (authoritative) return previous;
-  if (seeded.diagnosticStale) return seeded.routingKind === "opencodex-local" ? "unverified" : previous;
+  if (seeded.diagnosticStale)
+    return seeded.routingKind === "opencodex-local" ? "unverified" : previous;
   return startupPresentation(seeded);
 }
 

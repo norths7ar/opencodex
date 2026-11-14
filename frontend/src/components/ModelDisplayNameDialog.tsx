@@ -1,9 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { useT, type TKey } from "../i18n/shared";
-import {
-  modelDisplayNameValidationKey,
-  type ModelRow,
-} from "../pages/models-shared";
+import { modelDisplayNameValidationKey, type ModelRow } from "../pages/models-shared";
 
 interface ModelDisplayNameDialogProps {
   model: ModelRow;
@@ -18,7 +15,7 @@ interface ModelDisplayNameDialogProps {
   onClose: () => void;
 }
 
-const SOURCE_LABEL_KEYS: Record<NonNullable<ModelRow["displayNameSource"]>, TKey> = {
+const SOURCE_LABEL_KEYS: Partial<Record<NonNullable<ModelRow["displayNameSource"]>, TKey>> = {
   operator: "models.displayNameSourceOperator",
   provider: "models.displayNameSourceProvider",
   fallback: "models.displayNameSourceFallback",
@@ -52,7 +49,9 @@ export default function ModelDisplayNameDialog({
     const dialog = dialogRef.current;
     if (dialog && !dialog.open) dialog.showModal();
     inputRef.current?.focus();
-    return () => { if (dialog?.open) dialog.close(); };
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
 
   useEffect(() => {
@@ -75,7 +74,7 @@ export default function ModelDisplayNameDialog({
   const validationError = validationKey ? t(validationKey) : null;
   const visibleError = validationError ?? requestError;
   const sourceKey = model.displayNameSource
-    ? SOURCE_LABEL_KEYS[model.displayNameSource]
+    ? (SOURCE_LABEL_KEYS[model.displayNameSource] ?? "models.displayNameSourceFallback")
     : "models.displayNameSourceFallback";
 
   const requestClose = () => {
@@ -87,7 +86,7 @@ export default function ModelDisplayNameDialog({
       ref={dialogRef}
       className="modal-overlay"
       aria-labelledby={titleId}
-      onCancel={event => {
+      onCancel={(event) => {
         event.preventDefault();
         requestClose();
       }}
@@ -103,11 +102,14 @@ export default function ModelDisplayNameDialog({
       <form
         className="modal-card model-display-name-dialog"
         role="document"
-        onClick={event => event.stopPropagation()}
-        onSubmit={event => {
+        onClick={(event) => event.stopPropagation()}
+        onSubmit={(event) => {
           event.preventDefault();
           if (saving) return;
-          if (onRetry) { onRetry(); return; }
+          if (onRetry) {
+            onRetry();
+            return;
+          }
           if (mutationOutcomeUnknown) return;
           const nextValidationKey = modelDisplayNameValidationKey(draft);
           setValidationKey(nextValidationKey);
@@ -116,7 +118,12 @@ export default function ModelDisplayNameDialog({
       >
         <div className="modal-head">
           <h3 id={titleId}>{t("models.displayNameTitle")}</h3>
-          <button type="button" className="btn btn-ghost btn-sm" disabled={saving} onClick={requestClose}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={saving}
+            onClick={requestClose}
+          >
             {t("common.close")}
           </button>
         </div>
@@ -128,8 +135,14 @@ export default function ModelDisplayNameDialog({
 
         <div className="model-display-name-current">
           <span className="muted text-label">{t("models.displayNameCurrent")}</span>
-          <strong>{currentNamePending ? t("models.displayNameCurrentUnavailable") : model.displayName ?? model.namespaced}</strong>
-          {!currentNamePending && <span className="models-chip muted text-caption">{t(sourceKey)}</span>}
+          <strong>
+            {currentNamePending
+              ? t("models.displayNameCurrentUnavailable")
+              : (model.displayName ?? model.namespaced)}
+          </strong>
+          {!currentNamePending && (
+            <span className="models-chip muted text-caption">{t(sourceKey)}</span>
+          )}
         </div>
 
         <label className="field-label" htmlFor={`${titleId}-input`}>
@@ -145,7 +158,7 @@ export default function ModelDisplayNameDialog({
           aria-describedby={`${helpId}${visibleError ? ` ${errorId}` : ""}`}
           aria-invalid={validationError ? true : undefined}
           disabled={saving || mutationOutcomeUnknown}
-          onChange={event => {
+          onChange={(event) => {
             if (saving || mutationOutcomeUnknown) return;
             onEdit?.();
             setDraft(event.target.value);
@@ -166,14 +179,21 @@ export default function ModelDisplayNameDialog({
             type="button"
             className="btn btn-ghost btn-sm"
             disabled={saving || mutationOutcomeUnknown || !model.displayNameOverride}
-            onClick={() => { if (!saving && !mutationOutcomeUnknown) onReset(); }}
+            onClick={() => {
+              if (!saving && !mutationOutcomeUnknown) onReset();
+            }}
           >
             {t("models.displayNameReset")}
           </button>
           <button type="button" className="btn btn-sm" disabled={saving} onClick={requestClose}>
             {t("common.cancel")}
           </button>
-          <button ref={submitRef} type="submit" className="btn btn-primary btn-sm" disabled={saving || (mutationOutcomeUnknown && !onRetry)}>
+          <button
+            ref={submitRef}
+            type="submit"
+            className="btn btn-primary btn-sm"
+            disabled={saving || (mutationOutcomeUnknown && !onRetry)}
+          >
             {saving ? t("common.saving") : onRetry ? t("common.retry") : t("common.save")}
           </button>
         </div>

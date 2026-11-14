@@ -98,22 +98,38 @@ export type AccountLoadState = "idle" | "loading" | "ready" | "error";
 
 export interface ProviderAuthHandlers {
   onLogin: (provider: string, addAccount?: boolean) => void | Promise<void>;
-  onNativeLoginSettled?: (provider: string, outcome: "added" | "ended" | "failed") => void | Promise<void>;
+  onNativeLoginSettled?: (
+    provider: string,
+    outcome: "added" | "ended" | "failed",
+  ) => void | Promise<void>;
   onCancelLogin?: (provider: string) => void;
   onLogout: (provider: string) => void | Promise<void>;
   onReauth: (provider: string, accountId?: string) => void | Promise<void>;
   onSwitchAccount: (provider: string, account: OAuthAccountRow) => void | Promise<void>;
-  onPauseAccount: (provider: string, account: OAuthAccountRow, paused: boolean) => void | Promise<void>;
+  onPauseAccount: (
+    provider: string,
+    account: OAuthAccountRow,
+    paused: boolean,
+  ) => void | Promise<void>;
   pendingAffinityResets?: Readonly<Record<string, { accountId: string }>>;
   onRetryAffinityReset?: (provider: string) => void | Promise<void>;
-  onAccountThreshold?: (provider: string, account: OAuthAccountRow, threshold: number | null) => Promise<boolean>;
+  onAccountThreshold?: (
+    provider: string,
+    account: OAuthAccountRow,
+    threshold: number | null,
+  ) => Promise<boolean>;
   onAccountPoolThreshold?: (provider: string, threshold: number) => void | Promise<boolean>;
   onRemoveAccount: (provider: string, account: OAuthAccountRow) => void | Promise<void>;
   onRetryAccounts?: (provider: string) => void | Promise<void>;
   onAddApiKey: (provider: string, key: string) => Promise<boolean>;
   onSwitchApiKey: (provider: string, entry: ApiKeyRow) => void | Promise<void>;
   onRemoveApiKey: (provider: string, entry: ApiKeyRow) => void | Promise<void>;
-  onEditAlias: (provider: string, type: "oauth" | "api-key", id: string, current?: string) => void | Promise<void>;
+  onEditAlias: (
+    provider: string,
+    type: "oauth" | "api-key",
+    id: string,
+    current?: string,
+  ) => void | Promise<void>;
   /**
    * Force a fresh quota read for this provider, resolving with whether it succeeded.
    *
@@ -137,6 +153,7 @@ export type ProviderUpdatePatch = {
   allowPrivateNetwork?: boolean;
   preserveResponsesReasoningContent?: boolean;
   liveModels?: boolean;
+  modelDiscoveryClientVersion?: string;
   upstreamHttpVersion?: "auto" | "http1.1" | "h1" | "http2" | "h2" | null;
   requestPacing?: WorkspaceItem["requestPacing"] | null;
   /** Dedicated field: the API PATCHes it alone for the canonical `openai` provider. */

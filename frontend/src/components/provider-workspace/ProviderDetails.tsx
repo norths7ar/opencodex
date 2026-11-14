@@ -4,6 +4,7 @@
  */
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useT } from "../../i18n/shared";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
 import type { WorkspaceItem } from "../../provider-workspace/catalog";
 import { formatProviderDisplayName } from "../../provider-icons";
 import { isAccountProvider, isFreeProvider } from "../../provider-workspace/catalog";
@@ -17,12 +18,24 @@ import { useProviderProbeState } from "./use-provider-probe-state";
 import type { ModelRow } from "../../pages/models-shared";
 import ProviderModels from "./ProviderModels";
 import ProviderUsage from "./ProviderUsage";
+import ProviderCurrentQuota from "./ProviderCurrentQuota";
 import ProviderAuthPanel from "./ProviderAuthPanel";
 import type { CodexAccountPoolController } from "../../hooks/useCodexAccountPool";
 import ProviderSettings from "./ProviderSettings";
 import { UnsavedLeaveDialog } from "./ProviderDialogs";
 import type { ProviderQuotaReportView } from "../../provider-workspace/report";
-import type { AccountLoadState, ProviderModelUsageRow, ProviderUsageTotals, OAuthAccountRow, ApiKeyRow, LoginHint, ProviderAuthHandlers, ProviderUpdatePatch, ProviderUpdateResult } from "./types";
+import type {
+  AccountLoadState,
+  AccountQuotaReading,
+  ProviderModelUsageRow,
+  ProviderUsageTotals,
+  OAuthAccountRow,
+  ApiKeyRow,
+  LoginHint,
+  ProviderAuthHandlers,
+  ProviderUpdatePatch,
+  ProviderUpdateResult,
+} from "./types";
 
 type Tab = "overview" | "models" | "usage" | "accounts" | "settings";
 
@@ -31,6 +44,7 @@ export default function ProviderDetails({
   usageTotals,
   modelUsage,
   quotaReport,
+  quotaReading,
   availableModels,
   hasLiveModels,
   selectedModels,
@@ -71,6 +85,7 @@ export default function ProviderDetails({
   usageTotals?: ProviderUsageTotals;
   modelUsage?: ProviderModelUsageRow[];
   quotaReport?: ProviderQuotaReportView;
+  quotaReading?: AccountQuotaReading;
   availableModels: string[];
   /** Server-reported live-catalog provenance; see filterModels(). */
   hasLiveModels: boolean;
@@ -114,6 +129,8 @@ export default function ProviderDetails({
   onRefreshQuota?: () => Promise<boolean>;
 }) {
   const t = useT();
+  const capabilities = useRuntimeCapabilities();
+  const usageEnabled = capabilities === null || capabilities.usage === true;
   const [tab, setTab] = useState<Tab>("overview");
   const [settingsDirty, setSettingsDirty] = useState(false);
   const [pendingLeave, setPendingLeave] = useState<Tab | "deselect" | null>(null);
@@ -131,16 +148,20 @@ export default function ProviderDetails({
   const free = useMemo(() => isFreeProvider(item), [item]);
   const local = useMemo(() => isLocalProvider(item), [item]);
   const authSurface = useMemo(() => providerAuthSurface(item), [item]);
-  const currentQuotaReading = authSurface === "oauth-accounts"
-    ? accounts?.find(account => account.active)
-    : authSurface === "api-keys" ? keys?.find(entry => entry.active) : undefined;
+  const currentQuotaReading =
+    quotaReading ??
+    (authSurface === "oauth-accounts"
+      ? accounts?.find((account) => account.active)
+      : authSurface === "api-keys"
+        ? keys?.find((entry) => entry.active)
+        : undefined);
   // Global counter from Providers — only honor it for the reveal target.
   const scopedAccountsFocusToken = accountsFocusProvider === item.name ? accountsFocusToken : 0;
   const usesCodexPool = isAccountProvider(item.name, item);
   const connectionIdentity = JSON.stringify([
     usesCodexPool ? (codexController?.activeId ?? "") : "",
     usesCodexPool
-      ? (codexController?.accounts ?? []).map(account => [
+      ? (codexController?.accounts ?? []).map((account) => [
           account.id,
           account.isMain === true,
           account.paused === true,
@@ -148,42 +169,47 @@ export default function ProviderDetails({
           account.hasCredential === true,
         ])
       : [],
-    accounts?.find(account => account.active)?.id ?? "",
-    (accounts ?? []).map(account => [
+    accounts?.find((account) => account.active)?.id ?? "",
+    (accounts ?? []).map((account) => [
       account.id,
       account.active,
       account.paused === true,
       account.needsReauth === true,
       account.expiresAt ?? null,
     ]),
-    keys?.find(entry => entry.active)?.id ?? "",
-    (keys ?? []).map(entry => [
-      entry.id,
-      entry.active,
-      entry.disabled === true,
-    ]),
+    keys?.find((entry) => entry.active)?.id ?? "",
+    (keys ?? []).map((entry) => [entry.id, entry.active, entry.disabled === true]),
     oauth?.loggedIn === undefined ? "" : String(oauth.loggedIn),
     oauth?.needsReauth === undefined ? "" : String(oauth.needsReauth),
     oauthEmail ?? "",
   ]);
-  const probeController = useProviderProbeState(item, apiBase, connectionIdentity, availableModels, mutationRevision);
+  const probeController = useProviderProbeState(
+    item,
+    apiBase,
+    connectionIdentity,
+    availableModels,
+    mutationRevision,
+  );
   if (tab !== "overview" && probeController.completionProbe?.status === "testing") {
     probeController.clearIfTesting();
   }
   const handleUpdateProvider = useMemo(
-    () => onUpdateProvider
-      ? async (name: string, patch: ProviderUpdatePatch): Promise<ProviderUpdateResult> => {
-          const result = await onUpdateProvider(name, patch);
-          const affectsConnection = Object.keys(patch).some(key => key !== "note" && key !== "setDefault");
-          if (result.ok && affectsConnection) setMutationRevision(revision => revision + 1);
-          return result;
-        }
-      : undefined,
+    () =>
+      onUpdateProvider
+        ? async (name: string, patch: ProviderUpdatePatch): Promise<ProviderUpdateResult> => {
+            const result = await onUpdateProvider(name, patch);
+            const affectsConnection = Object.keys(patch).some(
+              (key) => key !== "note" && key !== "setDefault",
+            );
+            if (result.ok && affectsConnection) setMutationRevision((revision) => revision + 1);
+            return result;
+          }
+        : undefined,
     [onUpdateProvider],
   );
   const wrappedAuthHandlers = useMemo<ProviderAuthHandlers | undefined>(() => {
     if (!authHandlers) return undefined;
-    const bump = () => setMutationRevision(revision => revision + 1);
+    const bump = () => setMutationRevision((revision) => revision + 1);
     // Void-returning handlers (such as removeApiKey or login launchers) resolve normally when
     // confirmation is cancelled or a dialog opens; confirmed roster changes already flow through
     // accounts/keys/oauth in connectionIdentity above. Only explicit boolean/outcome receipts
@@ -205,28 +231,44 @@ export default function ProviderDetails({
         : {}),
     };
   }, [authHandlers]);
-  const tabs = useMemo<{ id: Tab; label: string }[]>(() => [
-    { id: "overview", label: t("pws.tab.overview") },
-    { id: "models", label: t("pws.tab.models") },
-    { id: "usage", label: t("pws.tab.usage") },
-    ...(authSurface ? [{ id: "accounts" as const, label: authSurface === "api-keys" ? t("pws.apiKeys") : t("pws.tab.accounts") }] : []),
-    { id: "settings", label: t("pws.tab.settings") },
-  ], [authSurface, t]);
+  const tabs = useMemo<{ id: Tab; label: string }[]>(
+    () => [
+      { id: "overview", label: t("pws.tab.overview") },
+      { id: "models", label: t("pws.tab.models") },
+      ...(usageEnabled ? [{ id: "usage" as const, label: t("pws.tab.usage") }] : []),
+      ...(authSurface
+        ? [
+            {
+              id: "accounts" as const,
+              label: authSurface === "api-keys" ? t("pws.apiKeys") : t("pws.tab.accounts"),
+            },
+          ]
+        : []),
+      { id: "settings", label: t("pws.tab.settings") },
+    ],
+    [authSurface, usageEnabled, t],
+  );
 
-  const switchTab = useCallback((next: Tab) => {
-    if (settingsDirty && tab === "settings" && next !== "settings") {
-      setPendingLeave(next);
-      return;
-    }
-    setTab(next);
-  }, [tab, settingsDirty]);
+  const switchTab = useCallback(
+    (next: Tab) => {
+      if (settingsDirty && tab === "settings" && next !== "settings") {
+        setPendingLeave(next);
+        return;
+      }
+      setTab(next);
+    },
+    [tab, settingsDirty],
+  );
 
   // Adjust related state when accountsFocusToken changes during render (not in an
   // effect) so the Accounts tab is selected without a one-frame stale paint.
   // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   // Hold a non-zero token until authSurface exists so mount-time focus from
   // revealProviderAccounts is not marked seen before Accounts can open.
-  if (scopedAccountsFocusToken !== seenAccountsFocusToken && !(scopedAccountsFocusToken && !authSurface)) {
+  if (
+    scopedAccountsFocusToken !== seenAccountsFocusToken &&
+    !(scopedAccountsFocusToken && !authSurface)
+  ) {
     setSeenAccountsFocusToken(scopedAccountsFocusToken);
     if (scopedAccountsFocusToken && authSurface) {
       if (settingsDirty && tab === "settings") {
@@ -253,19 +295,22 @@ export default function ProviderDetails({
     onDeselect();
   }, [settingsDirty, tab, onDeselect]);
 
-  const onTabKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let next: number;
-    if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
-    else if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
-    else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = tabs.length - 1;
-    else return;
-    event.preventDefault();
-    switchTab(tabs[next]!.id);
-    event.currentTarget.parentElement
-      ?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]
-      ?.focus();
-  }, [switchTab, tabs]);
+  const onTabKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+      let next: number;
+      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      switchTab(tabs[next]!.id);
+      event.currentTarget.parentElement
+        ?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+        [next]?.focus();
+    },
+    [switchTab, tabs],
+  );
 
   const activeTabId = `pws-tab-${tab}`;
   const activePanelId = `pws-panel-${tab}`;
@@ -280,18 +325,31 @@ export default function ProviderDetails({
         </button>
       </div>
       <div className="pws-detail-head-main">
-        <ProviderIcon name={item.name} adapter={item.adapter} baseUrl={item.baseUrl} cls="pws-detail-icon" />
+        <ProviderIcon
+          name={item.name}
+          adapter={item.adapter}
+          baseUrl={item.baseUrl}
+          cls="pws-detail-icon"
+        />
         <div className="pws-detail-title-wrap">
           <h2 className="pws-detail-title">
             {displayName}
             {displayName !== item.name && <code className="pws-detail-id">{item.name}</code>}
-            {local && <span className="pwi-rail-badge pwi-rail-badge--local">{t("modal.badge.local")}</span>}
-            {!local && free && <span className="pwi-rail-badge pwi-rail-badge--free">{t("modal.badge.free")}</span>}
+            {local && (
+              <span className="pwi-rail-badge pwi-rail-badge--local">{t("modal.badge.local")}</span>
+            )}
+            {!local && free && (
+              <span className="pwi-rail-badge pwi-rail-badge--free">{t("modal.badge.free")}</span>
+            )}
           </h2>
         </div>
         <div className="pws-detail-actions">
           {!isDefault && !isDisabled && onSetDefault && (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSetDefault(item.name)}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => onSetDefault(item.name)}
+            >
               {t("prov.setDefault")}
             </button>
           )}
@@ -331,7 +389,7 @@ export default function ProviderDetails({
             tabIndex={tab === candidate.id ? 0 : -1}
             className={`pws-detail-tab${tab === candidate.id ? " pws-detail-tab--active" : ""}`}
             onClick={() => switchTab(candidate.id)}
-            onKeyDown={event => onTabKeyDown(event, index)}
+            onKeyDown={(event) => onTabKeyDown(event, index)}
           >
             {candidate.label}
           </button>
@@ -368,17 +426,22 @@ export default function ProviderDetails({
             oauthEmail={oauthEmail}
             oauth={oauth}
             onEditSettings={() => switchTab("settings")}
-            onViewUsage={() => switchTab("usage")}
+            onViewUsage={usageEnabled ? () => switchTab("usage") : undefined}
             onUpdateProvider={handleUpdateProvider}
             reauthBusy={busyProvider === item.name}
-            onCancelLogin={authHandlers?.onCancelLogin ? () => void authHandlers.onCancelLogin?.(item.name) : undefined}
+            onCancelLogin={
+              authHandlers?.onCancelLogin
+                ? () => void authHandlers.onCancelLogin?.(item.name)
+                : undefined
+            }
             onReauthenticate={
               item.activeNeedsReauth
                 ? () => {
                     if (item.authMode === "oauth") {
                       const rows = accounts ?? [];
-                      const active = rows.find(a => a.active && a.needsReauth)
-                        ?? rows.find(a => a.needsReauth);
+                      const active =
+                        rows.find((a) => a.active && a.needsReauth) ??
+                        rows.find((a) => a.needsReauth);
                       void authHandlers?.onReauth(item.name, active?.id);
                       return;
                     }
@@ -404,14 +467,14 @@ export default function ProviderDetails({
             modelsLoading={modelsLoading}
             modelsLoadFailed={modelsLoadFailed}
             needsReauth={
-              (accounts ?? []).some(account => account.active && account.needsReauth)
-              || oauth?.needsReauth === true
+              (accounts ?? []).some((account) => account.active && account.needsReauth) ||
+              oauth?.needsReauth === true
             }
             onRetryModels={onRetryModels}
             onOpenAccounts={authSurface ? () => switchTab("accounts") : undefined}
           />
         )}
-        {tab === "usage" && (
+        {tab === "usage" && usageEnabled && (
           <ProviderUsage
             item={item}
             usageTotals={usageTotals}
@@ -423,22 +486,32 @@ export default function ProviderDetails({
           />
         )}
         {tab === "accounts" && (
-          <ProviderAuthPanel
-            item={item}
-            apiBase={apiBase}
-            oauth={oauth}
-            accounts={accounts}
-            keys={keys}
-            accountLoadState={accountLoadState}
-            switchingAccountId={switchingAccountId}
-            pausingAccountId={pausingAccountId}
-            busy={busyProvider === item.name}
-            loginHint={loginHint}
-            authHandlers={wrappedAuthHandlers}
-            onUpdateProvider={handleUpdateProvider}
-            onCodexActiveNeedsReauthChange={onCodexActiveNeedsReauthChange}
-            codexController={codexController}
-          />
+          <>
+            <ProviderAuthPanel
+              item={item}
+              apiBase={apiBase}
+              oauth={oauth}
+              accounts={accounts}
+              keys={keys}
+              accountLoadState={accountLoadState}
+              switchingAccountId={switchingAccountId}
+              pausingAccountId={pausingAccountId}
+              busy={busyProvider === item.name}
+              loginHint={loginHint}
+              authHandlers={wrappedAuthHandlers}
+              onUpdateProvider={handleUpdateProvider}
+              onCodexActiveNeedsReauthChange={onCodexActiveNeedsReauthChange}
+              codexController={codexController}
+            />
+            {capabilities?.quota && authSurface === "oauth-accounts" && oauth?.loggedIn && (
+              <ProviderCurrentQuota
+                key={connectionIdentity}
+                report={quotaReport}
+                reading={currentQuotaReading}
+                onRefreshQuota={onRefreshQuota}
+              />
+            )}
+          </>
         )}
         {tab === "settings" && (
           <ProviderSettings
@@ -455,7 +528,9 @@ export default function ProviderDetails({
       {pendingLeave && (
         <UnsavedLeaveDialog
           saving={leaveSaving}
-          onCancel={() => { if (!leaveSaving) setPendingLeave(null); }}
+          onCancel={() => {
+            if (!leaveSaving) setPendingLeave(null);
+          }}
           onDiscard={() => {
             if (leaveSaving) return;
             const next = pendingLeave;
@@ -469,7 +544,7 @@ export default function ProviderDetails({
               if (leaveSaving) return;
               setLeaveSaving(true);
               try {
-                const ok = await settingsSaveRef.current?.() ?? false;
+                const ok = (await settingsSaveRef.current?.()) ?? false;
                 if (!ok) return;
                 const next = pendingLeave;
                 setPendingLeave(null);

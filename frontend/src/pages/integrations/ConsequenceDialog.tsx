@@ -12,19 +12,34 @@ export interface ConsequenceCopy {
   sideEffectKey?: TKey;
   confirmKey: TKey;
   vars?: Record<string, string>;
+  text?: Partial<Record<"changes" | "breakage" | "undo" | "sideEffect", string>>;
 }
 
-function CopySlot({ copyKey, vars }: { copyKey: TKey; vars?: Record<string, string> }) {
+function CopySlot({
+  copyKey,
+  vars,
+  text: suppliedText,
+}: {
+  copyKey: TKey;
+  vars?: Record<string, string>;
+  text?: string;
+}) {
   const t = useT();
-  const text = t(copyKey, vars);
+  const text = suppliedText ?? t(copyKey, vars);
   const path = vars?.path;
   if (!path || !text.includes(path)) return <p>{text}</p>;
   const [before, ...after] = text.split(path);
-  return <p>{before}<code>{path}</code>{after.join(path)}</p>;
+  return (
+    <p>
+      {before}
+      <code>{path}</code>
+      {after.join(path)}
+    </p>
+  );
 }
 
 function planHasRollback(plan: IntegrationMutationPlan): boolean {
-  return plan.changes.some(change => change.kind === "snapshot" || change.kind === "journal");
+  return plan.changes.some((change) => change.kind === "snapshot" || change.kind === "journal");
 }
 
 export default function ConsequenceDialog({
@@ -63,15 +78,16 @@ export default function ConsequenceDialog({
   } | null>(null);
   const titleId = "integration-consequence-dialog-title";
   const planRequired = plan !== null || planLoading || planFailure !== null || plans !== undefined;
-  const activePlan = staleOverride?.sourceFingerprint === (plan?.fingerprint ?? null)
-    ? staleOverride.plan
-    : plan;
+  const activePlan =
+    staleOverride?.sourceFingerprint === (plan?.fingerprint ?? null) ? staleOverride.plan : plan;
   const stale = staleOverride?.sourceFingerprint === (plan?.fingerprint ?? null);
-  const noActionableBulkTarget = plans !== undefined
-    && !hasUnboundAction
-    && !plans.some(item => item.plan.canApply);
-  const showUndo = !planRequired
-    || (activePlan ? planHasRollback(activePlan) : plans?.some(item => planHasRollback(item.plan)) === true);
+  const noActionableBulkTarget =
+    plans !== undefined && !hasUnboundAction && !plans.some((item) => item.plan.canApply);
+  const showUndo =
+    !planRequired ||
+    (activePlan
+      ? planHasRollback(activePlan)
+      : plans?.some((item) => planHasRollback(item.plan)) === true);
   const dismiss = useCallback(() => {
     if (!pending) onClose();
   }, [onClose, pending]);
@@ -79,7 +95,7 @@ export default function ConsequenceDialog({
   useEffect(() => {
     const dialog = dialogRef.current;
     const active = document.activeElement;
-    triggerRef.current = active?.tagName === "BUTTON" ? active as HTMLElement : null;
+    triggerRef.current = active?.tagName === "BUTTON" ? (active as HTMLElement) : null;
     if (dialog && !dialog.open) dialog.showModal();
     // showModal() focuses the first focusable descendant, which is the invisible full-screen
     // backdrop button; Space or Enter there would dismiss the dialog unseen. Start on Close.
@@ -90,10 +106,13 @@ export default function ConsequenceDialog({
     };
   }, []);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    dismiss();
-  }, [dismiss]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      dismiss();
+    },
+    [dismiss],
+  );
 
   // Named for what it does rather than shadowing the banned global: a local `confirm`
   // reads exactly like the platform dialog this dashboard no longer uses, and the source
@@ -116,12 +135,27 @@ export default function ConsequenceDialog({
   }, [activePlan, onConfirm, pending, plan?.fingerprint, t]);
 
   const slots: ReactNode[] = [
-    <CopySlot key="changes" copyKey={copy.changesKey} vars={copy.vars} />,
-    <CopySlot key="breakage" copyKey={copy.breakageKey} vars={copy.vars} />,
+    <CopySlot key="changes" copyKey={copy.changesKey} vars={copy.vars} text={copy.text?.changes} />,
+    <CopySlot
+      key="breakage"
+      copyKey={copy.breakageKey}
+      vars={copy.vars}
+      text={copy.text?.breakage}
+    />,
   ];
-  if (showUndo) slots.push(<CopySlot key="undo" copyKey={copy.undoKey} vars={copy.vars} />);
+  if (showUndo)
+    slots.push(
+      <CopySlot key="undo" copyKey={copy.undoKey} vars={copy.vars} text={copy.text?.undo} />,
+    );
   if (copy.sideEffectKey) {
-    slots.push(<CopySlot key="side-effect" copyKey={copy.sideEffectKey} vars={copy.vars} />);
+    slots.push(
+      <CopySlot
+        key="side-effect"
+        copyKey={copy.sideEffectKey}
+        vars={copy.vars}
+        text={copy.text?.sideEffect}
+      />,
+    );
   }
 
   return (
@@ -142,7 +176,13 @@ export default function ConsequenceDialog({
       <div className="modal-card integration-consequence-dialog" role="document">
         <div className="modal-head">
           <h3 id={titleId}>{t(copy.titleKey, copy.vars)}</h3>
-          <button ref={closeRef} type="button" className="btn btn-ghost btn-sm" onClick={dismiss} disabled={pending}>
+          <button
+            ref={closeRef}
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={dismiss}
+            disabled={pending}
+          >
             {t("common.close")}
           </button>
         </div>
@@ -153,10 +193,26 @@ export default function ConsequenceDialog({
           {(stale || planStale) && <Notice tone="err">{t("integrations.preview.stale")}</Notice>}
           {planFailure && <Notice tone="err">{planFailure}</Notice>}
         </div>
-        <IntegrationPlanDetails plan={activePlan} plans={plans} missingStorePath={missingStorePath} />
+        <IntegrationPlanDetails
+          plan={activePlan}
+          plans={plans}
+          missingStorePath={missingStorePath}
+        />
         {failure && <Notice tone="err">{failure}</Notice>}
         <div className="modal-actions">
-          <button type="button" className="btn btn-primary" onClick={() => void applyConsequence()} disabled={pending || planLoading || Boolean(planFailure) || (planRequired && !activePlan && plans === undefined) || noActionableBulkTarget || activePlan?.canApply === false}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => void applyConsequence()}
+            disabled={
+              pending ||
+              planLoading ||
+              Boolean(planFailure) ||
+              (planRequired && !activePlan && plans === undefined) ||
+              noActionableBulkTarget ||
+              activePlan?.canApply === false
+            }
+          >
             {t(copy.confirmKey)}
           </button>
         </div>

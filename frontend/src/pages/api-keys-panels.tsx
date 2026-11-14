@@ -64,12 +64,25 @@ export function ApiKeysManagePanel({
           <h3 className="panel-title">{t("api.newKeyTitle")}</h3>
           <p className="muted small">{t("api.newKeyNote")}</p>
           <div className="api-form-row">
-            <code className="api-code" style={{ flex: 1, wordBreak: "break-all" }}>{newKey}</code>
+            <code className="api-code" style={{ flex: 1, wordBreak: "break-all" }}>
+              {newKey}
+            </code>
             <button type="button" className="btn btn-sm btn-ghost" onClick={onCopyKey}>
-              {copied ? <><IconCheck /> {t("api.copied")}</> : t("api.copy")}
+              {copied ? (
+                <>
+                  <IconCheck /> {t("api.copied")}
+                </>
+              ) : (
+                t("api.copy")
+              )}
             </button>
           </div>
-          <button type="button" className="btn btn-sm btn-ghost" style={{ alignSelf: "flex-start" }} onClick={onDismissNewKey}>
+          <button
+            type="button"
+            className="btn btn-sm btn-ghost"
+            style={{ alignSelf: "flex-start" }}
+            onClick={onDismissNewKey}
+          >
             {t("api.dismiss")}
           </button>
         </div>
@@ -85,7 +98,7 @@ export function ApiKeysManagePanel({
             aria-label={t("api.keyNamePlaceholder")}
             value={newName}
             maxLength={API_KEY_NAME_MAX_LENGTH}
-            onChange={e => onNewNameChange(e.target.value)}
+            onChange={(e) => onNewNameChange(e.target.value)}
             className="input"
           />
           <button type="button" className="btn btn-primary" onClick={onCreate} disabled={creating}>
@@ -100,27 +113,57 @@ export function ApiKeysManagePanel({
             {keysLoading ? t("api.activeKeysLoading") : t("api.activeKeys", { count: keys.length })}
           </h3>
           {keysLoading ? (
-            <div className="api-active-keys-skeleton" role="status" aria-label={t("common.loading")} />
+            <div
+              className="api-active-keys-skeleton"
+              role="status"
+              aria-label={t("common.loading")}
+            />
           ) : keys.length > 0 ? (
             <div className="tbl-wrap">
               <table className="tbl">
                 <thead>
-                  <tr><th>{t("api.colName")}</th><th>{t("api.colKey")}</th><th>{t("api.colCreated")}</th><th></th></tr>
+                  <tr>
+                    <th>{t("api.colName")}</th>
+                    <th>{t("api.colKey")}</th>
+                    <th>{t("api.colCreated")}</th>
+                    <th></th>
+                  </tr>
                 </thead>
                 <tbody>
-                  {keys.map(k => (
+                  {keys.map((k) => (
                     <tr key={k.id}>
                       <td>{k.name}</td>
-                      <td><code>{k.prefix}</code></td>
+                      <td>
+                        <code>{k.prefix}</code>
+                      </td>
                       <td>{formatCreatedDate(k.createdAt, localeTag)}</td>
                       <td>
                         {confirmDelete === k.id ? (
                           <span className="api-actions">
-                            <button type="button" className="btn btn-sm btn-danger" onClick={() => onDelete(k.id)}>{t("api.confirm")}</button>
-                            <button type="button" className="btn btn-sm btn-ghost" onClick={onCancelDelete}>{t("common.cancel")}</button>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-danger"
+                              onClick={() => onDelete(k.id)}
+                            >
+                              {t("api.confirm")}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-ghost"
+                              onClick={onCancelDelete}
+                            >
+                              {t("common.cancel")}
+                            </button>
                           </span>
                         ) : (
-                          <button type="button" className="btn btn-sm btn-ghost" aria-label={t("api.deleteAria")} onClick={() => onConfirmDelete(k.id)}><IconX /></button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-ghost"
+                            aria-label={t("api.deleteAria")}
+                            onClick={() => onConfirmDelete(k.id)}
+                          >
+                            <IconX />
+                          </button>
                         )}
                       </td>
                     </tr>
@@ -188,14 +231,16 @@ export function ApiKeysModelsPanel({
     <div className="panel api-panel api-models-panel">
       <div className="api-panel-head">
         <h3 className="panel-title">{t("api.modelsTitle")}</h3>
-        <span className="muted mono text-label">{t("api.modelsCount", { count: filteredModels.length })}</span>
+        <span className="muted mono text-label">
+          {t("api.modelsCount", { count: filteredModels.length })}
+        </span>
       </div>
       <p className="muted small">{t("api.modelsSubtitle")}</p>
       <input
         type="search"
         className="input"
         value={modelQuery}
-        onChange={event => onModelQueryChange(event.target.value)}
+        onChange={(event) => onModelQueryChange(event.target.value)}
         placeholder={t("api.modelsSearch")}
         aria-label={t("api.modelsSearch")}
       />
@@ -206,22 +251,23 @@ export function ApiKeysModelsPanel({
         <div className="api-models-error">
           {/* The page-level notice this replaced was announced. Moving the
               message next to its retry must not also make it silent. */}
-          <p className="muted small" role="alert">{t("api.modelsLoadFailed")}</p>
+          <p className="muted small" role="alert">
+            {t("api.modelsLoadFailed")}
+          </p>
           <button type="button" className="btn btn-ghost btn-sm" onClick={onRetryModels}>
             {t("common.retry")}
           </button>
         </div>
       )}
       {modelsRefreshing && !modelsLoading && (
-        <p className="muted small" aria-live="polite">{t("api.modelsLoading")}</p>
+        <p className="muted small" aria-live="polite">
+          {t("api.modelsLoading")}
+        </p>
       )}
       {modelsLoading ? (
         <DataSurfaceSkeleton label={t("api.modelsLoading")} rows={3} />
-      ) : !hasModelData ? (
-        // Failed cold: the error above is the whole story. Adding "no models"
-        // here would assert an empty catalog we never managed to read.
-        null
-      ) : filteredModels.length === 0 ? (
+      ) : !hasModelData ? null : filteredModels // here would assert an empty catalog we never managed to read. // Failed cold: the error above is the whole story. Adding "no models"
+        .length === 0 ? (
         <p className="muted small api-models-empty">
           {modelCount === 0
             ? t("api.modelsEmpty")
@@ -238,7 +284,7 @@ export function ApiKeysModelsPanel({
               </tr>
             </thead>
             <tbody>
-              {filteredModels.map(model => {
+              {filteredModels.map((model) => {
                 const modelId = externalModelId(model);
                 const protocols = gatewayInboundProtocols(claudeCodeEnabled);
                 return (
@@ -246,7 +292,9 @@ export function ApiKeysModelsPanel({
                     <td>
                       <div className="api-model-cell">
                         <code>{modelId}</code>
-                        {model.displayName !== model.id && <span className="muted small">{model.displayName}</span>}
+                        {model.displayName !== model.id && (
+                          <span className="muted small">{model.displayName}</span>
+                        )}
                       </div>
                     </td>
                     <td>{sourceLabel(model)}</td>
@@ -256,12 +304,18 @@ export function ApiKeysModelsPanel({
                           repeated them and cost the width that pushed these
                           buttons out of the visible table entirely. */}
                       <div className="api-model-actions">
-                        <button type="button" className="btn btn-sm btn-ghost" onClick={() => { onCopyModelId(modelId); }}>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-ghost"
+                          onClick={() => {
+                            onCopyModelId(modelId);
+                          }}
+                        >
                           {copiedModelId === modelId ? t("api.modelCopied") : t("api.copyModelId")}
                         </button>
                         {/* One chip per protocol. A single button posting a chat
                             body proved nothing about the Responses chip beside it. */}
-                        {protocols.map(protocol => {
+                        {protocols.map((protocol) => {
                           const result = modelTests[modelId]?.[protocol];
                           const state = result?.state ?? "idle";
                           return (
@@ -271,7 +325,9 @@ export function ApiKeysModelsPanel({
                                 className="btn btn-sm btn-ghost"
                                 disabled={state === "testing" || !canTestModels}
                                 title={canTestModels ? undefined : t("api.auth.testNeedsFreshKey")}
-                                onClick={() => { onTestModel(model, protocol); }}
+                                onClick={() => {
+                                  onTestModel(model, protocol);
+                                }}
                               >
                                 {t("api.auth.testProtocol", { protocol: protocolLabel(protocol) })}
                               </button>
@@ -286,7 +342,7 @@ export function ApiKeysModelsPanel({
                                     ? t("api.testingModel")
                                     : state === "ok"
                                       ? t("api.testSucceeded")
-                                      : result?.detail ?? t("api.testFailed")}
+                                      : (result?.detail ?? t("api.testFailed"))}
                                 </span>
                               )}
                             </span>

@@ -11,9 +11,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { baseUrlForChoice, matchChoiceId, resolvedBaseUrlForChoice } from "../../base-url-choice";
 import { readJsonIfOk } from "../../fetch-json";
+import { useRuntimeCapabilities, useMigrationLabel } from "../../runtime-capabilities";
 import { createBoundedFetch } from "../../bounded-fetch";
 import { startVisibilityPoll } from "../../visibility-poll";
-import { useT } from "../../i18n/shared";
+import { useT, useI18n } from "../../i18n/shared";
+import { liteTranslator } from "../../i18n/lite-copy";
 import { IconLock } from "../../icons";
 import { Select } from "../../ui";
 import { isCatalogProviderId } from "../../provider-icons";
@@ -26,19 +28,41 @@ import { ProviderProtocolPanel } from "./ProviderProtocolPanel";
 import { ProviderKeyPacing, type KeyPacingDraft, type KeyPacingStatus } from "./ProviderKeyPacing";
 import type { WorkspaceItem, ProviderUpdatePatch, ProviderUpdateResult } from "./types";
 
-const ADAPTERS = ["openai-responses", "openai-chat", "anthropic", "google", "azure-openai", "cursor"] as const;
+const ADAPTERS = [
+  "openai-responses",
+  "openai-chat",
+  "anthropic",
+  "google",
+  "azure-openai",
+  "cursor",
+] as const;
 const EMPTY_MODELS: string[] = [];
 
 type ChoicesStatus = "idle" | "loading" | "ready" | "error";
-type PacingRule = { requestsPerMinute?: number; minIntervalMs?: number; maxConcurrentRequests?: number };
-type PacingStatus = { enabled: boolean; queued: number; nextSlotInMs: number; lastStartedAt?: number; lastModelId?: string; keys?: KeyPacingStatus[] };
+type PacingRule = {
+  requestsPerMinute?: number;
+  minIntervalMs?: number;
+  maxConcurrentRequests?: number;
+};
+type PacingStatus = {
+  enabled: boolean;
+  queued: number;
+  nextSlotInMs: number;
+  lastStartedAt?: number;
+  lastModelId?: string;
+  keys?: KeyPacingStatus[];
+};
 type CursorHttpVersion = "http2" | "http1.1";
 
-function effectiveCursorHttpVersion(value: WorkspaceItem["upstreamHttpVersion"]): CursorHttpVersion {
+function effectiveCursorHttpVersion(
+  value: WorkspaceItem["upstreamHttpVersion"],
+): CursorHttpVersion {
   return value === "http1.1" || value === "h1" ? "http1.1" : "http2";
 }
 
-function numberDraft(value: number | undefined): string { return value === undefined ? "" : String(value); }
+function numberDraft(value: number | undefined): string {
+  return value === undefined ? "" : String(value);
+}
 function positiveRpm(value: string): number | undefined {
   if (!value.trim()) return undefined;
   const parsed = Number(value);
@@ -52,20 +76,34 @@ function positiveInteger(value: string): number | undefined {
 function pacingSignature(value: WorkspaceItem["requestPacing"] | undefined): string {
   const models = Object.entries(value?.models ?? {})
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([model, rule]) => [model, rule.requestsPerMinute ?? null, rule.minIntervalMs ?? null, rule.maxConcurrentRequests ?? null]);
+    .map(([model, rule]) => [
+      model,
+      rule.requestsPerMinute ?? null,
+      rule.minIntervalMs ?? null,
+      rule.maxConcurrentRequests ?? null,
+    ]);
   return JSON.stringify([
     value?.enabled === true,
     value?.requestsPerMinute ?? null,
     value?.minIntervalMs ?? null,
     value?.maxConcurrentRequests ?? null,
     value?.keySelection ?? "active",
-    [value?.keys?.requestsPerMinute ?? null, value?.keys?.minIntervalMs ?? null, value?.keys?.maxConcurrentRequests ?? null],
+    [
+      value?.keys?.requestsPerMinute ?? null,
+      value?.keys?.minIntervalMs ?? null,
+      value?.keys?.maxConcurrentRequests ?? null,
+    ],
     models,
   ]);
 }
 
 export default function ProviderSettings({
-  item, availableModels = EMPTY_MODELS, apiBase, onUpdateProvider, onDirtyChange, onRegisterSave,
+  item,
+  availableModels = EMPTY_MODELS,
+  apiBase,
+  onUpdateProvider,
+  onDirtyChange,
+  onRegisterSave,
 }: {
   item: WorkspaceItem;
   availableModels?: string[];
@@ -77,8 +115,14 @@ export default function ProviderSettings({
   onRegisterSave?: (save: (() => Promise<boolean>) | null) => void;
 }) {
   const t = useT();
+  const { locale } = useI18n();
+  const lite = liteTranslator(locale);
+  const capabilities = useRuntimeCapabilities();
+  const migrationLabel = useMigrationLabel();
   const initialAuth = String(item.authMode ?? (item.keyOptional ? "local" : "key"));
-  const liveModelDiscoverySupported = providerSupportsLiveModelDiscovery(item.name, item);
+  const liveModelDiscoverySupported = capabilities
+    ? true
+    : providerSupportsLiveModelDiscovery(item.name, item);
   const savedLiveModels = liveModelDiscoverySupported ? item.liveModels !== false : false;
   const savedCursorHttpVersion = effectiveCursorHttpVersion(item.upstreamHttpVersion);
   const [adapter, setAdapter] = useState(item.adapter);
@@ -88,21 +132,38 @@ export default function ProviderSettings({
   const [apiKeyTransport, setApiKeyTransport] = useState(item.apiKeyTransport ?? "x-api-key");
   const [note, setNote] = useState(item.note ?? "");
   const [allowPrivateNetwork, setAllowPrivateNetwork] = useState(item.allowPrivateNetwork ?? false);
-  const [preserveReasoningReplay, setPreserveReasoningReplay] = useState(item.preserveResponsesReasoningContent === true);
+  const [preserveReasoningReplay, setPreserveReasoningReplay] = useState(
+    item.preserveResponsesReasoningContent === true,
+  );
   const [liveModels, setLiveModels] = useState(savedLiveModels);
-  const [cursorHttpVersion, setCursorHttpVersion] = useState<CursorHttpVersion>(savedCursorHttpVersion);
+  const [discoveryVersion, setDiscoveryVersion] = useState(item.modelDiscoveryClientVersion ?? "");
+  const [cursorHttpVersion, setCursorHttpVersion] =
+    useState<CursorHttpVersion>(savedCursorHttpVersion);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [baseUrlChoices, setBaseUrlChoices] = useState<CatalogPreset["baseUrlChoices"]>();
   // "" is the same-origin dashboard and must load like any other server base.
-  const [choicesStatus, setChoicesStatus] = useState<ChoicesStatus>(apiBase !== undefined ? "loading" : "idle");
+  const [choicesStatus, setChoicesStatus] = useState<ChoicesStatus>(
+    apiBase !== undefined ? "loading" : "idle",
+  );
   const [endpointChoice, setEndpointChoice] = useState(() => "custom");
   const [pacingEnabled, setPacingEnabled] = useState(item.requestPacing?.enabled === true);
-  const [keyPacing, setKeyPacing] = useState<KeyPacingDraft>({ keySelection: item.requestPacing?.keySelection, keys: item.requestPacing?.keys });
-  const [pacingRpm, setPacingRpm] = useState(() => numberDraft(item.requestPacing?.requestsPerMinute));
-  const [pacingDelay, setPacingDelay] = useState(() => numberDraft(item.requestPacing?.minIntervalMs));
-  const [pacingConcurrency, setPacingConcurrency] = useState(() => numberDraft(item.requestPacing?.maxConcurrentRequests));
-  const [pacingModels, setPacingModels] = useState<Record<string, PacingRule>>(() => ({ ...(item.requestPacing?.models ?? {}) }));
+  const [keyPacing, setKeyPacing] = useState<KeyPacingDraft>({
+    keySelection: item.requestPacing?.keySelection,
+    keys: item.requestPacing?.keys,
+  });
+  const [pacingRpm, setPacingRpm] = useState(() =>
+    numberDraft(item.requestPacing?.requestsPerMinute),
+  );
+  const [pacingDelay, setPacingDelay] = useState(() =>
+    numberDraft(item.requestPacing?.minIntervalMs),
+  );
+  const [pacingConcurrency, setPacingConcurrency] = useState(() =>
+    numberDraft(item.requestPacing?.maxConcurrentRequests),
+  );
+  const [pacingModels, setPacingModels] = useState<Record<string, PacingRule>>(() => ({
+    ...(item.requestPacing?.models ?? {}),
+  }));
   const [pacingModelId, setPacingModelId] = useState("");
   const [pacingModelRpm, setPacingModelRpm] = useState("");
   const [pacingModelDelay, setPacingModelDelay] = useState("");
@@ -120,22 +181,39 @@ export default function ProviderSettings({
     setAllowPrivateNetwork(item.allowPrivateNetwork ?? false);
     setPreserveReasoningReplay(item.preserveResponsesReasoningContent === true);
     setLiveModels(savedLiveModels);
+    setDiscoveryVersion(item.modelDiscoveryClientVersion ?? "");
     setCursorHttpVersion(savedCursorHttpVersion);
     setPacingEnabled(item.requestPacing?.enabled === true);
-    setKeyPacing({ keySelection: item.requestPacing?.keySelection, keys: item.requestPacing?.keys });
+    setKeyPacing({
+      keySelection: item.requestPacing?.keySelection,
+      keys: item.requestPacing?.keys,
+    });
     setPacingRpm(numberDraft(item.requestPacing?.requestsPerMinute));
     setPacingDelay(numberDraft(item.requestPacing?.minIntervalMs));
     setPacingConcurrency(numberDraft(item.requestPacing?.maxConcurrentRequests));
     setPacingModels({ ...(item.requestPacing?.models ?? {}) });
     setMsg(null);
     queueMicrotask(() => setEndpointChoice(matchChoiceId(baseUrlChoices, item.baseUrl)));
-  }, [item.adapter, item.baseUrl, item.defaultModel, item.authMode, item.apiKeyTransport, item.keyOptional, item.note, item.allowPrivateNetwork, item.preserveResponsesReasoningContent, savedLiveModels, savedCursorHttpVersion, item.requestPacing, baseUrlChoices]);
+  }, [
+    item.adapter,
+    item.baseUrl,
+    item.defaultModel,
+    item.authMode,
+    item.apiKeyTransport,
+    item.keyOptional,
+    item.note,
+    item.allowPrivateNetwork,
+    item.preserveResponsesReasoningContent,
+    item.modelDiscoveryClientVersion,
+    savedLiveModels,
+    savedCursorHttpVersion,
+    item.requestPacing,
+    baseUrlChoices,
+  ]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   // Account mode syncs on its own: a mode PATCH refresh must not reset an in-progress
   // draft, so it is deliberately kept out of the form-reset effect above.
-  /* eslint-disable react-hooks/set-state-in-effect -- intentional split from the form reset */
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (apiBase === undefined) return;
@@ -143,7 +221,7 @@ export default function ProviderSettings({
     const providerId = item.name;
     const savedBaseUrl = item.baseUrl;
     fetch(`${apiBase}/api/provider-presets`)
-      .then(r => readJsonIfOk<{ providers?: CatalogPreset[] }>(r))
+      .then((r) => readJsonIfOk<{ providers?: CatalogPreset[] }>(r))
       .then((d) => {
         if (cancelled) return;
         if (!d) {
@@ -151,7 +229,7 @@ export default function ProviderSettings({
           setChoicesStatus("error");
           return;
         }
-        const preset = (d.providers ?? []).find(p => p.id === providerId);
+        const preset = (d.providers ?? []).find((p) => p.id === providerId);
         const choices = preset?.baseUrlChoices;
         setBaseUrlChoices(choices);
         setChoicesStatus("ready");
@@ -162,14 +240,15 @@ export default function ProviderSettings({
         setBaseUrlChoices(undefined);
         setChoicesStatus("error");
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // Remount via key={item.name}; capture savedBaseUrl once per mount/fetch.
-    // oxlint-disable-next-line react/react-compiler -- existing exhaustive-deps exception is intentional
     // eslint-disable-next-line react-hooks/exhaustive-deps -- item.baseUrl sync is handled by the form-reset effect
   }, [apiBase, item.name]);
 
   useEffect(() => {
-    if (apiBase === undefined) return;
+    if (apiBase === undefined || capabilities) return;
     let active = true;
     let inFlight = false;
     const load = () => {
@@ -177,42 +256,72 @@ export default function ProviderSettings({
       if (inFlight) return;
       inFlight = true;
       const bounded = createBoundedFetch(10_000);
-      fetch(`${apiBase}/api/provider-request-pacing?name=${encodeURIComponent(item.name)}`, { signal: bounded.signal })
-        .then(r => readJsonIfOk<PacingStatus>(r))
-        .then(status => { if (active && status) setPacingStatus(status); })
+      fetch(`${apiBase}/api/provider-request-pacing?name=${encodeURIComponent(item.name)}`, {
+        signal: bounded.signal,
+      })
+        .then((r) => readJsonIfOk<PacingStatus>(r))
+        .then((status) => {
+          if (active && status) setPacingStatus(status);
+        })
         .catch(() => undefined)
-        .finally(() => { bounded.clear(); inFlight = false; });
+        .finally(() => {
+          bounded.clear();
+          inFlight = false;
+        });
     };
     load();
     const stop = startVisibilityPoll(load, 2_000);
-    return () => { active = false; stop(); };
-  }, [apiBase, item.name]);
+    return () => {
+      active = false;
+      stop();
+    };
+  }, [apiBase, capabilities, item.name]);
 
-  const pacingDraft = useMemo(() => ({
-    enabled: pacingEnabled,
-    ...keyPacing,
-    ...(positiveRpm(pacingRpm) !== undefined ? { requestsPerMinute: positiveRpm(pacingRpm) } : {}),
-    ...(positiveInteger(pacingDelay) !== undefined ? { minIntervalMs: positiveInteger(pacingDelay) } : {}),
-    ...(positiveInteger(pacingConcurrency) !== undefined ? { maxConcurrentRequests: positiveInteger(pacingConcurrency) } : {}),
-    ...(Object.keys(pacingModels).length > 0 ? { models: pacingModels } : {}),
-  }), [keyPacing, pacingConcurrency, pacingDelay, pacingEnabled, pacingModels, pacingRpm]);
+  const pacingDraft = useMemo(
+    () => ({
+      enabled: pacingEnabled,
+      ...keyPacing,
+      ...(positiveRpm(pacingRpm) !== undefined
+        ? { requestsPerMinute: positiveRpm(pacingRpm) }
+        : {}),
+      ...(positiveInteger(pacingDelay) !== undefined
+        ? { minIntervalMs: positiveInteger(pacingDelay) }
+        : {}),
+      ...(positiveInteger(pacingConcurrency) !== undefined
+        ? { maxConcurrentRequests: positiveInteger(pacingConcurrency) }
+        : {}),
+      ...(Object.keys(pacingModels).length > 0 ? { models: pacingModels } : {}),
+    }),
+    [keyPacing, pacingConcurrency, pacingDelay, pacingEnabled, pacingModels, pacingRpm],
+  );
 
-  const supportsReasoningReplay = !isCatalogProviderId(item.name)
-    && canConfigureResponsesReasoningReplay({ adapter, baseUrl, authMode });
-  const reasoningReplayDirty = supportsReasoningReplay && preserveReasoningReplay !== (item.preserveResponsesReasoningContent === true);
-  const dirty = reasoningReplayDirty || adapter.trim() !== item.adapter
-    || baseUrl.trim() !== item.baseUrl
-    || defaultModel.trim() !== (item.defaultModel ?? "")
-    || authMode !== String(item.authMode ?? (item.keyOptional ? "local" : "key"))
-    || (adapter.trim() === "anthropic" && authMode === "key" && apiKeyTransport !== (item.apiKeyTransport ?? "x-api-key"))
-    || note.trim() !== (item.note ?? "")
-    || allowPrivateNetwork !== (item.allowPrivateNetwork ?? false)
-    || liveModels !== savedLiveModels
-    || (adapter.trim() === "cursor" && cursorHttpVersion !== savedCursorHttpVersion);
+  const supportsReasoningReplay =
+    !isCatalogProviderId(item.name) &&
+    canConfigureResponsesReasoningReplay({ adapter, baseUrl, authMode });
+  const reasoningReplayDirty =
+    supportsReasoningReplay &&
+    preserveReasoningReplay !== (item.preserveResponsesReasoningContent === true);
+  const dirty =
+    reasoningReplayDirty ||
+    adapter.trim() !== item.adapter ||
+    baseUrl.trim() !== item.baseUrl ||
+    defaultModel.trim() !== (item.defaultModel ?? "") ||
+    authMode !== String(item.authMode ?? (item.keyOptional ? "local" : "key")) ||
+    (adapter.trim() === "anthropic" &&
+      authMode === "key" &&
+      apiKeyTransport !== (item.apiKeyTransport ?? "x-api-key")) ||
+    note.trim() !== (item.note ?? "") ||
+    allowPrivateNetwork !== (item.allowPrivateNetwork ?? false) ||
+    liveModels !== savedLiveModels ||
+    discoveryVersion.trim() !== (item.modelDiscoveryClientVersion ?? "") ||
+    (adapter.trim() === "cursor" && cursorHttpVersion !== savedCursorHttpVersion);
   const pacingDirty = pacingSignature(pacingDraft) !== pacingSignature(item.requestPacing);
   const formDirty = dirty || pacingDirty;
 
-  useEffect(() => { onDirtyChange?.(formDirty); return () => onDirtyChange?.(false); }, [formDirty, onDirtyChange]);
+  useEffect(() => {
+    onDirtyChange?.(formDirty);
+    return () => onDirtyChange?.(false);
+  }, [formDirty, onDirtyChange]);
 
   const modelOptions = useMemo(() => {
     const set = new Set(availableModels);
@@ -222,39 +331,62 @@ export default function ProviderSettings({
   }, [availableModels, defaultModel, item.defaultModel]);
 
   const adapterOptions = useMemo(() => {
-    const list = [...ADAPTERS] as string[];
+    const list = [...(capabilities?.adapters ?? ADAPTERS)] as string[];
     if (adapter && !list.includes(adapter)) list.unshift(adapter);
     return list;
-  }, [adapter]);
+  }, [adapter, capabilities]);
 
   const isPreset = isCatalogProviderId(item.name);
-  const hasEndpointPicker = choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
+  const hasEndpointPicker =
+    choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
   const supportsApiKeyTransport = adapter.trim() === "anthropic" && authMode === "key";
   // Lock plain baseUrl for presets while loading or when there is no picker.
   // On fetch error, keep it editable so allowBaseUrlOverride providers are not trapped.
   const plainBaseUrlLocked = isPreset && choicesStatus !== "error";
 
   const save = async (): Promise<boolean> => {
-    if (!onUpdateProvider) { setMsg({ ok: false, text: t("pws.updatesUnavailable") }); return false; }
+    if (!onUpdateProvider) {
+      setMsg({ ok: false, text: t("pws.updatesUnavailable") });
+      return false;
+    }
     const nextBaseUrl = hasEndpointPicker
       ? resolvedBaseUrlForChoice(baseUrlChoices, endpointChoice, baseUrl)
       : baseUrl.trim();
-    if (!adapter.trim() || !nextBaseUrl) { setMsg({ ok: false, text: t("pws.adapterBaseRequired") }); return false; }
+    if (!adapter.trim() || !nextBaseUrl) {
+      setMsg({ ok: false, text: t("pws.adapterBaseRequired") });
+      return false;
+    }
     setSaving(true);
     setMsg(null);
     try {
       if (pacingConcurrency.trim() !== "" && positiveInteger(pacingConcurrency) === undefined) {
-        setMsg({ ok: false, text: t("pws.pacingCapInvalid") }); return false;
+        setMsg({ ok: false, text: t("pws.pacingCapInvalid") });
+        return false;
       }
-      if (Object.entries(keyPacing.keys ?? {}).some(([field, value]) =>
-        !Number.isFinite(value) || value <= 0
-        || (field !== "requestsPerMinute" && !Number.isSafeInteger(value))
-        || (field === "requestsPerMinute" && (value < 1 / 60 || value > 60_000))
-        || (field === "minIntervalMs" && value > 3_600_000))) {
-        setMsg({ ok: false, text: t("pws.keyLimitInvalid") }); return false;
+      if (
+        Object.entries(keyPacing.keys ?? {}).some(
+          ([field, value]) =>
+            !Number.isFinite(value) ||
+            value <= 0 ||
+            (field !== "requestsPerMinute" && !Number.isSafeInteger(value)) ||
+            (field === "requestsPerMinute" && (value < 1 / 60 || value > 60_000)) ||
+            (field === "minIntervalMs" && value > 3_600_000),
+        )
+      ) {
+        setMsg({ ok: false, text: t("pws.keyLimitInvalid") });
+        return false;
       }
-      if (pacingEnabled && !pacingDraft.requestsPerMinute && !pacingDraft.minIntervalMs && !pacingDraft.maxConcurrentRequests && !pacingDraft.models && !pacingDraft.keys && pacingDraft.keySelection !== "round-robin") {
-        setMsg({ ok: false, text: t("pws.pacingRuleRequired") }); return false;
+      if (
+        pacingEnabled &&
+        !pacingDraft.requestsPerMinute &&
+        !pacingDraft.minIntervalMs &&
+        !pacingDraft.maxConcurrentRequests &&
+        !pacingDraft.models &&
+        !pacingDraft.keys &&
+        pacingDraft.keySelection !== "round-robin"
+      ) {
+        setMsg({ ok: false, text: t("pws.pacingRuleRequired") });
+        return false;
       }
       const pacingOnly = pacingDirty && !dirty;
       const patch: ProviderUpdatePatch = pacingOnly
@@ -269,9 +401,16 @@ export default function ProviderSettings({
             ...(pacingDirty ? { requestPacing: pacingDraft } : {}),
           };
       if (!pacingOnly) {
+        if (
+          capabilities?.oauthProviders?.includes(item.name) &&
+          discoveryVersion.trim() !== (item.modelDiscoveryClientVersion ?? "")
+        ) {
+          patch.modelDiscoveryClientVersion = discoveryVersion.trim();
+        }
         // Keep omitted legacy values omitted unless the user actually changes this toggle.
         // Otherwise an unrelated settings save manufactures `liveModels: true` provenance.
-        if (liveModelDiscoverySupported && liveModels !== (item.liveModels !== false)) patch.liveModels = liveModels;
+        if (liveModelDiscoverySupported && liveModels !== (item.liveModels !== false))
+          patch.liveModels = liveModels;
         if (reasoningReplayDirty) patch.preserveResponsesReasoningContent = preserveReasoningReplay;
         if (adapter.trim() === "cursor" && cursorHttpVersion !== savedCursorHttpVersion) {
           patch.upstreamHttpVersion = cursorHttpVersion === "http1.1" ? "http1.1" : null;
@@ -280,7 +419,11 @@ export default function ProviderSettings({
         else if (item.apiKeyTransport !== undefined) patch.apiKeyTransport = "";
       }
       const res = await onUpdateProvider(item.name, patch);
-      setMsg(res.ok ? { ok: true, text: t("pws.settingsSaved") } : { ok: false, text: res.error || t("prov.saveFailed") });
+      setMsg(
+        res.ok
+          ? { ok: true, text: t("pws.settingsSaved") }
+          : { ok: false, text: res.error || t("prov.saveFailed") },
+      );
       return res.ok;
     } finally {
       setSaving(false);
@@ -298,14 +441,24 @@ export default function ProviderSettings({
   }, [onRegisterSave]);
 
   const discard = () => {
-    setAdapter(item.adapter); setBaseUrl(item.baseUrl);
-    setDefaultModel(item.defaultModel ?? ""); setAuthMode(initialAuth);
+    setAdapter(item.adapter);
+    setBaseUrl(item.baseUrl);
+    setDefaultModel(item.defaultModel ?? "");
+    setAuthMode(initialAuth);
     setApiKeyTransport(item.apiKeyTransport ?? "x-api-key");
-    setNote(item.note ?? ""); setAllowPrivateNetwork(item.allowPrivateNetwork ?? false); setLiveModels(savedLiveModels);
+    setNote(item.note ?? "");
+    setAllowPrivateNetwork(item.allowPrivateNetwork ?? false);
+    setLiveModels(savedLiveModels);
     setPreserveReasoningReplay(item.preserveResponsesReasoningContent === true);
-    setCursorHttpVersion(savedCursorHttpVersion); setMsg(null);
-    setPacingEnabled(item.requestPacing?.enabled === true); setPacingRpm(numberDraft(item.requestPacing?.requestsPerMinute));
-    setKeyPacing({ keySelection: item.requestPacing?.keySelection, keys: item.requestPacing?.keys });
+    setCursorHttpVersion(savedCursorHttpVersion);
+    setMsg(null);
+    setDiscoveryVersion(item.modelDiscoveryClientVersion ?? "");
+    setPacingEnabled(item.requestPacing?.enabled === true);
+    setPacingRpm(numberDraft(item.requestPacing?.requestsPerMinute));
+    setKeyPacing({
+      keySelection: item.requestPacing?.keySelection,
+      keys: item.requestPacing?.keys,
+    });
     setPacingDelay(numberDraft(item.requestPacing?.minIntervalMs));
     setPacingConcurrency(numberDraft(item.requestPacing?.maxConcurrentRequests));
     setPacingModels({ ...(item.requestPacing?.models ?? {}) });
@@ -314,10 +467,14 @@ export default function ProviderSettings({
 
   const endpointLabel = (id: string, fallback: string) => {
     switch (id) {
-      case "token-plan": return t("modal.endpoint.tokenPlan");
-      case "payg": return t("modal.endpoint.payAsYouGo");
-      case "custom": return t("modal.endpoint.custom");
-      default: return fallback;
+      case "token-plan":
+        return t("modal.endpoint.tokenPlan");
+      case "payg":
+        return t("modal.endpoint.payAsYouGo");
+      case "custom":
+        return t("modal.endpoint.custom");
+      default:
+        return fallback;
     }
   };
 
@@ -331,7 +488,7 @@ export default function ProviderSettings({
       return;
     }
     if (!modelId || (rpm === undefined && delay === undefined && cap === undefined)) return;
-    setPacingModels(current => ({
+    setPacingModels((current) => ({
       ...current,
       [modelId]: {
         ...(rpm !== undefined ? { requestsPerMinute: rpm } : {}),
@@ -339,20 +496,32 @@ export default function ProviderSettings({
         ...(cap !== undefined ? { maxConcurrentRequests: cap } : {}),
       },
     }));
-    setPacingModelId(""); setPacingModelRpm(""); setPacingModelDelay(""); setPacingModelConcurrency("");
+    setPacingModelId("");
+    setPacingModelRpm("");
+    setPacingModelDelay("");
+    setPacingModelConcurrency("");
   };
 
   return (
     <div className="pwi-settings-form">
       <label className="pwi-settings-field">
-        <span className="pwi-settings-label"><IconLock style={{ width: 12, height: 12 }} /> {t("pws.providerId")}</span>
+        <span className="pwi-settings-label">
+          <IconLock style={{ width: 12, height: 12 }} /> {t("pws.providerId")}
+        </span>
         <input className="input" value={item.name} readOnly disabled />
       </label>
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("modal.adapter")}</span>
-        {isPreset ? <input className="input" value={adapter} readOnly disabled /> : (
-          <Select fullWidth label={t("modal.adapter")} value={adapter} onChange={setAdapter}
-            options={adapterOptions.map(a => ({ value: a, label: a }))} />
+        {isPreset ? (
+          <input className="input" value={adapter} readOnly disabled />
+        ) : (
+          <Select
+            fullWidth
+            label={t("modal.adapter")}
+            value={adapter}
+            onChange={setAdapter}
+            options={adapterOptions.map((a) => ({ value: a, label: a }))}
+          />
         )}
       </label>
       <ProviderProtocolPanel
@@ -370,24 +539,38 @@ export default function ProviderSettings({
               fullWidth
               label={t("modal.endpoint")}
               value={endpointChoice}
-              onChange={id => {
+              onChange={(id) => {
                 setEndpointChoice(id);
                 setBaseUrl(baseUrlForChoice(baseUrlChoices, id, baseUrl));
               }}
-              options={baseUrlChoices!.map(c => ({ value: c.id, label: endpointLabel(c.id, c.label) }))}
+              options={baseUrlChoices!.map((c) => ({
+                value: c.id,
+                label: endpointLabel(c.id, c.label),
+              }))}
             />
           </label>
           {endpointChoice === "custom" && (
             <label className="pwi-settings-field">
               <span className="pwi-settings-label">{t("modal.baseUrl")}</span>
-              <input className="input" value={baseUrl} onChange={e => setBaseUrl(e.target.value)} placeholder={t("modal.baseUrlPlaceholder")} />
+              <input
+                className="input"
+                value={baseUrl}
+                onChange={(e) => setBaseUrl(e.target.value)}
+                placeholder={t("modal.baseUrlPlaceholder")}
+              />
             </label>
           )}
         </>
       ) : (
         <label className="pwi-settings-field">
           <span className="pwi-settings-label">{t("modal.baseUrl")}</span>
-          <input className="input" value={baseUrl} onChange={e => setBaseUrl(e.target.value)} readOnly={plainBaseUrlLocked} disabled={plainBaseUrlLocked} />
+          <input
+            className="input"
+            value={baseUrl}
+            onChange={(e) => setBaseUrl(e.target.value)}
+            readOnly={plainBaseUrlLocked}
+            disabled={plainBaseUrlLocked}
+          />
         </label>
       )}
       {adapter.trim() === "cursor" && (
@@ -397,7 +580,7 @@ export default function ProviderSettings({
             fullWidth
             label={t("pws.cursorTransport")}
             value={cursorHttpVersion}
-            onChange={value => setCursorHttpVersion(value as CursorHttpVersion)}
+            onChange={(value) => setCursorHttpVersion(value as CursorHttpVersion)}
             options={[
               { value: "http2", label: t("pws.cursorTransportHttp2") },
               { value: "http1.1", label: t("pws.cursorTransportHttp1") },
@@ -409,97 +592,320 @@ export default function ProviderSettings({
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("pws.cell.defaultModel")}</span>
         {modelOptions.length > 0 ? (
-          <Select fullWidth label={t("pws.cell.defaultModel")} value={defaultModel} onChange={setDefaultModel}
-            options={[{ value: "", label: t("pws.defaultModelNone") }, ...modelOptions.map(m => ({ value: m, label: m }))]} />
+          <Select
+            fullWidth
+            label={t("pws.cell.defaultModel")}
+            value={defaultModel}
+            onChange={setDefaultModel}
+            options={[
+              { value: "", label: t("pws.defaultModelNone") },
+              ...modelOptions.map((m) => ({ value: m, label: m })),
+            ]}
+          />
         ) : (
-          <input className="input" value={defaultModel} onChange={e => setDefaultModel(e.target.value)} placeholder={t("pws.optionalPlaceholder")} />
+          <input
+            className="input"
+            value={defaultModel}
+            onChange={(e) => setDefaultModel(e.target.value)}
+            placeholder={t("pws.optionalPlaceholder")}
+          />
         )}
       </label>
+      {capabilities?.oauthProviders?.includes(item.name) && item.authMode === "oauth" && (
+        <label className="pwi-settings-field">
+          <span className="pwi-settings-label">{lite("discoveryVersion")}</span>
+          <input
+            className="input"
+            value={discoveryVersion}
+            onChange={(event) => setDiscoveryVersion(event.target.value)}
+            placeholder={t("pws.optionalPlaceholder")}
+          />
+          <span className="pwi-settings-hint">{lite("discoveryVersionHint")}</span>
+        </label>
+      )}
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("pws.authMode")}</span>
-        {isPreset ? <input className="input" value={authModeLabel(item, t)} readOnly disabled /> : (
-          <Select fullWidth label={t("pws.authMode")} value={authMode} onChange={setAuthMode} options={[
-            { value: "key", label: t("modal.badge.apiKey") },
-            { value: "forward", label: t("pws.auth.chatgptPassthrough") },
-            { value: "oauth", label: t("modal.badge.oauth") },
-            { value: "local", label: t("modal.badge.local") },
-          ]} />
+        {isPreset ? (
+          <input className="input" value={authModeLabel(item, t)} readOnly disabled />
+        ) : (
+          <Select
+            fullWidth
+            label={t("pws.authMode")}
+            value={authMode}
+            onChange={setAuthMode}
+            options={[
+              { value: "key", label: t("modal.badge.apiKey") },
+              { value: "forward", label: t("pws.auth.chatgptPassthrough") },
+              { value: "oauth", label: t("modal.badge.oauth") },
+              { value: "local", label: t("modal.badge.local") },
+            ].filter(
+              (option) =>
+                !capabilities ||
+                option.value === "key" ||
+                option.value === "local" ||
+                (option.value === "oauth" && capabilities.oauthProviders?.includes(item.name)),
+            )}
+          />
         )}
       </label>
 
       {supportsApiKeyTransport && (
         <label className="pwi-settings-field">
           <span className="pwi-settings-label">{t("modal.apiKeyTransport")}</span>
-          <Select fullWidth label={t("modal.apiKeyTransport")} value={apiKeyTransport}
-            onChange={value => setApiKeyTransport(value as "x-api-key" | "bearer")} options={[
+          <Select
+            fullWidth
+            label={t("modal.apiKeyTransport")}
+            value={apiKeyTransport}
+            onChange={(value) => setApiKeyTransport(value as "x-api-key" | "bearer")}
+            options={[
               { value: "x-api-key", label: t("modal.apiKeyTransportNative") },
               { value: "bearer", label: t("modal.apiKeyTransportBearer") },
-            ]} />
+            ]}
+          />
         </label>
       )}
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("pws.note")}</span>
-        <textarea className="input pwi-settings-textarea" value={note} onChange={e => setNote(e.target.value)} rows={2} />
+        <textarea
+          className="input pwi-settings-textarea"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={2}
+        />
       </label>
-      <label className="pwi-settings-field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <input type="checkbox" checked={allowPrivateNetwork} onChange={e => setAllowPrivateNetwork(e.target.checked)} />
+      <label
+        className="pwi-settings-field"
+        style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+      >
+        <input
+          type="checkbox"
+          checked={allowPrivateNetwork}
+          onChange={(e) => setAllowPrivateNetwork(e.target.checked)}
+        />
         <span className="pwi-settings-label">{t("pws.allowPrivateNetwork")}</span>
       </label>
-      {supportsReasoningReplay && <ResponsesReasoningReplayControl checked={preserveReasoningReplay} onChange={setPreserveReasoningReplay} />}
-      <label className="pwi-settings-field" style={{ flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
+      {supportsReasoningReplay && (
+        <ResponsesReasoningReplayControl
+          checked={preserveReasoningReplay}
+          onChange={setPreserveReasoningReplay}
+        />
+      )}
+      <label
+        className="pwi-settings-field"
+        style={{ flexDirection: "row", alignItems: "flex-start", gap: 8 }}
+      >
         <input
           type="checkbox"
           checked={liveModels}
           disabled={!liveModelDiscoverySupported}
-          onChange={e => setLiveModels(e.target.checked)}
+          onChange={(e) => setLiveModels(e.target.checked)}
         />
         <span>
           <span className="pwi-settings-label">{t("pws.liveModels")}</span>
-          <span className="muted text-label" style={{ display: "block", marginTop: 2 }}>{t("pws.liveModelsDesc")}</span>
+          <span className="muted text-label" style={{ display: "block", marginTop: 2 }}>
+            {t("pws.liveModelsDesc")}
+          </span>
         </span>
       </label>
-      <section className="pwi-pacing-card" aria-labelledby="pwi-pacing-title">
-        <div className="pwi-pacing-head">
-          <div><h3 id="pwi-pacing-title">{t("pws.pacingTitle")}</h3><p>{t("pws.pacingDesc")}</p></div>
-          <label className="pwi-pacing-toggle"><input type="checkbox" checked={pacingEnabled} onChange={e => setPacingEnabled(e.target.checked)} /> {t("pws.pacingEnabled")}</label>
-        </div>
-        <div className="pwi-pacing-grid">
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingRpm")}</span><input className="input" type="number" min="0.016667" step="any" value={pacingRpm} onChange={e => setPacingRpm(e.target.value)} placeholder="38" /></label>
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingDelay")}</span><input className="input" type="number" min="1" step="1" value={pacingDelay} onChange={e => setPacingDelay(e.target.value)} placeholder="1600" /></label>
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingConcurrency")}</span><input className="input" type="number" min="1" step="1" value={pacingConcurrency} onChange={e => setPacingConcurrency(e.target.value)} placeholder="8" /></label>
-        </div>
-        <p className="pwi-settings-hint">{t("pws.pacingSlowerWins")}</p>
-        <div className="pwi-pacing-status" aria-live="polite">
-          <span><strong>{pacingStatus?.queued ?? 0}</strong> {t("pws.pacingQueued")}</span>
-          <span><strong>{pacingStatus?.nextSlotInMs ?? 0} ms</strong> {t("pws.pacingNextSlot")}</span>
-          <span><strong>{pacingStatus?.lastModelId ?? t("pws.pacingNone")}</strong> {t("pws.pacingLastModel")}</span>
-        </div>
-        {authMode !== "oauth" && authMode !== "forward" && <ProviderKeyPacing value={keyPacing} onChange={setKeyPacing} status={pacingStatus?.keys} />}
-        <h4>{t("pws.pacingModelOverrides")}</h4>
-        <div className="pwi-pacing-grid pwi-pacing-grid--model">
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingModel")}</span><input className="input" list={`pacing-models-${item.name}`} value={pacingModelId} onChange={e => setPacingModelId(e.target.value)} /><datalist id={`pacing-models-${item.name}`}>{availableModels.map(model => <option key={model} value={model} />)}</datalist></label>
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingRpm")}</span><input className="input" type="number" min="0.016667" step="any" value={pacingModelRpm} onChange={e => setPacingModelRpm(e.target.value)} /></label>
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingDelay")}</span><input className="input" type="number" min="1" step="1" value={pacingModelDelay} onChange={e => setPacingModelDelay(e.target.value)} /></label>
-          <label className="pwi-settings-field"><span className="pwi-settings-label">{t("pws.pacingConcurrency")}</span><input className="input" type="number" min="1" step="1" value={pacingModelConcurrency} onChange={e => setPacingModelConcurrency(e.target.value)} /></label>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={addPacingModel}>{t("pws.pacingAdd")}</button>
-        </div>
-        {Object.entries(pacingModels).length > 0 && <div className="pwi-pacing-overrides">{Object.entries(pacingModels).map(([model, rule]) => <div key={model} className="pwi-pacing-row"><code>{model}</code><span>{[
-          rule.requestsPerMinute !== undefined ? `${rule.requestsPerMinute} ${t("pws.pacingRpmUnit")}` : undefined,
-          rule.minIntervalMs !== undefined ? `${rule.minIntervalMs} ms` : undefined,
-          rule.maxConcurrentRequests !== undefined ? `${rule.maxConcurrentRequests} ${t("pws.pacingCapUnit")}` : undefined,
-        ].filter(part => part !== undefined).join(" · ")}</span><button type="button" className="btn btn-ghost btn-sm" onClick={() => setPacingModels(current => Object.fromEntries(Object.entries(current).filter(([id]) => id !== model)))} aria-label={t("pws.pacingRemoveModel", { model })}>{t("pws.pacingRemove")}</button></div>)}</div>}
-      </section>
+      {capabilities ? (
+        <p className="pwi-settings-hint">
+          {t("pws.pacingTitle")} · {migrationLabel}
+        </p>
+      ) : (
+        <section className="pwi-pacing-card" aria-labelledby="pwi-pacing-title">
+          <div className="pwi-pacing-head">
+            <div>
+              <h3 id="pwi-pacing-title">{t("pws.pacingTitle")}</h3>
+              <p>{t("pws.pacingDesc")}</p>
+            </div>
+            <label className="pwi-pacing-toggle">
+              <input
+                type="checkbox"
+                checked={pacingEnabled}
+                onChange={(e) => setPacingEnabled(e.target.checked)}
+              />{" "}
+              {t("pws.pacingEnabled")}
+            </label>
+          </div>
+          <div className="pwi-pacing-grid">
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingRpm")}</span>
+              <input
+                className="input"
+                type="number"
+                min="0.016667"
+                step="any"
+                value={pacingRpm}
+                onChange={(e) => setPacingRpm(e.target.value)}
+                placeholder="38"
+              />
+            </label>
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingDelay")}</span>
+              <input
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                value={pacingDelay}
+                onChange={(e) => setPacingDelay(e.target.value)}
+                placeholder="1600"
+              />
+            </label>
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingConcurrency")}</span>
+              <input
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                value={pacingConcurrency}
+                onChange={(e) => setPacingConcurrency(e.target.value)}
+                placeholder="8"
+              />
+            </label>
+          </div>
+          <p className="pwi-settings-hint">{t("pws.pacingSlowerWins")}</p>
+          <div className="pwi-pacing-status" aria-live="polite">
+            <span>
+              <strong>{pacingStatus?.queued ?? 0}</strong> {t("pws.pacingQueued")}
+            </span>
+            <span>
+              <strong>{pacingStatus?.nextSlotInMs ?? 0} ms</strong> {t("pws.pacingNextSlot")}
+            </span>
+            <span>
+              <strong>{pacingStatus?.lastModelId ?? t("pws.pacingNone")}</strong>{" "}
+              {t("pws.pacingLastModel")}
+            </span>
+          </div>
+          {authMode !== "oauth" && authMode !== "forward" && (
+            <ProviderKeyPacing
+              value={keyPacing}
+              onChange={setKeyPacing}
+              status={pacingStatus?.keys}
+            />
+          )}
+          <h4>{t("pws.pacingModelOverrides")}</h4>
+          <div className="pwi-pacing-grid pwi-pacing-grid--model">
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingModel")}</span>
+              <input
+                className="input"
+                list={`pacing-models-${item.name}`}
+                value={pacingModelId}
+                onChange={(e) => setPacingModelId(e.target.value)}
+              />
+              <datalist id={`pacing-models-${item.name}`}>
+                {availableModels.map((model) => (
+                  <option key={model} value={model} />
+                ))}
+              </datalist>
+            </label>
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingRpm")}</span>
+              <input
+                className="input"
+                type="number"
+                min="0.016667"
+                step="any"
+                value={pacingModelRpm}
+                onChange={(e) => setPacingModelRpm(e.target.value)}
+              />
+            </label>
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingDelay")}</span>
+              <input
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                value={pacingModelDelay}
+                onChange={(e) => setPacingModelDelay(e.target.value)}
+              />
+            </label>
+            <label className="pwi-settings-field">
+              <span className="pwi-settings-label">{t("pws.pacingConcurrency")}</span>
+              <input
+                className="input"
+                type="number"
+                min="1"
+                step="1"
+                value={pacingModelConcurrency}
+                onChange={(e) => setPacingModelConcurrency(e.target.value)}
+              />
+            </label>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={addPacingModel}>
+              {t("pws.pacingAdd")}
+            </button>
+          </div>
+          {Object.entries(pacingModels).length > 0 && (
+            <div className="pwi-pacing-overrides">
+              {Object.entries(pacingModels).map(([model, rule]) => (
+                <div key={model} className="pwi-pacing-row">
+                  <code>{model}</code>
+                  <span>
+                    {[
+                      rule.requestsPerMinute !== undefined
+                        ? `${rule.requestsPerMinute} ${t("pws.pacingRpmUnit")}`
+                        : undefined,
+                      rule.minIntervalMs !== undefined ? `${rule.minIntervalMs} ms` : undefined,
+                      rule.maxConcurrentRequests !== undefined
+                        ? `${rule.maxConcurrentRequests} ${t("pws.pacingCapUnit")}`
+                        : undefined,
+                    ]
+                      .filter((part) => part !== undefined)
+                      .join(" · ")}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() =>
+                      setPacingModels((current) =>
+                        Object.fromEntries(Object.entries(current).filter(([id]) => id !== model)),
+                      )
+                    }
+                    aria-label={t("pws.pacingRemoveModel", { model })}
+                  >
+                    {t("pws.pacingRemove")}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
       {formDirty && (
         <div className="pwi-settings-sticky-bar">
           <span className="muted">{t("pws.settingsUnsavedBar")}</span>
           <div className="pwi-settings-sticky-bar-actions">
-            <button type="button" className="btn btn-ghost btn-sm" onClick={discard} disabled={saving}>{t("pws.discardSettings")}</button>
-            <button type="button" className="btn btn-primary btn-sm" onClick={() => void save()} disabled={saving}>{saving ? t("pws.saving") : t("pws.saveSettings")}</button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={discard}
+              disabled={saving}
+            >
+              {t("pws.discardSettings")}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => void save()}
+              disabled={saving}
+            >
+              {saving ? t("pws.saving") : t("pws.saveSettings")}
+            </button>
           </div>
         </div>
       )}
       {msg && (
-        <div role={msg.ok ? "status" : "alert"} className={msg.ok ? "pwi-settings-msg pwi-settings-msg--ok" : "pwi-settings-msg pwi-settings-msg--err"}>
+        <div
+          role={msg.ok ? "status" : "alert"}
+          className={
+            msg.ok
+              ? "pwi-settings-msg pwi-settings-msg--ok"
+              : "pwi-settings-msg pwi-settings-msg--err"
+          }
+        >
           {msg.text}
         </div>
       )}

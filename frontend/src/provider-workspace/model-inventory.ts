@@ -1,10 +1,16 @@
 import type { ModelRow } from "../pages/models-shared";
 import type { ProviderDiscoverySummary } from "../models-groups";
-import type { ProviderModelCounts, ProviderAvailableModels, ProviderSelectedModels, ProviderLiveModelCounts } from "./usage";
+import type {
+  ProviderModelCounts,
+  ProviderAvailableModels,
+  ProviderSelectedModels,
+  ProviderLiveModelCounts,
+} from "./usage";
 import { parseSelectedModels } from "../model-visibility";
 
 function record(value: unknown): Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Invalid model response");
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("Invalid model response");
   return value as Record<string, unknown>;
 }
 
@@ -25,28 +31,48 @@ export function parseModelInventory(value: unknown): ModelRow[] {
     const namespaced = identity(row.namespaced);
     if (typeof row.disabled !== "boolean") throw new Error("Invalid model visibility");
     for (const flag of ["native", "custom", "initialSelectionPending", "contextCapped"]) {
-      if (row[flag] !== undefined && typeof row[flag] !== "boolean") throw new Error("Invalid model flag");
+      if (row[flag] !== undefined && typeof row[flag] !== "boolean")
+        throw new Error("Invalid model flag");
     }
     if (row.custom === true) identity(row.customId);
-    if (row.customId !== undefined && (row.custom !== true || typeof row.customId !== "string")) throw new Error("Invalid custom ownership");
+    if (row.customId !== undefined && (row.custom !== true || typeof row.customId !== "string"))
+      throw new Error("Invalid custom ownership");
     if (row.custom === true && row.native === true) throw new Error("Conflicting model ownership");
-    if (row.displayName !== undefined && typeof row.displayName !== "string") throw new Error("Invalid model label");
+    if (row.displayName !== undefined && typeof row.displayName !== "string")
+      throw new Error("Invalid model label");
     for (const field of ["inputModalities", "reasoningEfforts"]) {
-      if (row[field] !== undefined && (!Array.isArray(row[field]) || row[field].some(v => typeof v !== "string"))) throw new Error("Invalid model metadata");
+      if (
+        row[field] !== undefined &&
+        (!Array.isArray(row[field]) || row[field].some((v) => typeof v !== "string"))
+      )
+        throw new Error("Invalid model metadata");
     }
     for (const field of ["contextWindow", "contextCap"]) {
-      if (row[field] !== undefined && (typeof row[field] !== "number" || !Number.isFinite(row[field]))) throw new Error("Invalid model context");
+      if (
+        row[field] !== undefined &&
+        (typeof row[field] !== "number" || !Number.isFinite(row[field]))
+      )
+        throw new Error("Invalid model context");
     }
     // Identity/used metadata have been validated at this HTTP boundary. Keep additive DTO fields.
     const parsed = { ...row, provider, id, namespaced, disabled: row.disabled } as ModelRow;
     const group = groups.get(provider) ?? new Map<string, ModelRow>();
     const previous = group.get(namespaced);
-    if (previous && (previous.id !== id || previous.disabled !== parsed.disabled
-      || !!previous.native !== !!parsed.native || !!previous.custom !== !!parsed.custom
-      || previous.customId !== parsed.customId || !!previous.initialSelectionPending !== !!parsed.initialSelectionPending)) {
+    if (
+      previous &&
+      (previous.id !== id ||
+        previous.disabled !== parsed.disabled ||
+        !!previous.native !== !!parsed.native ||
+        !!previous.custom !== !!parsed.custom ||
+        previous.customId !== parsed.customId ||
+        !!previous.initialSelectionPending !== !!parsed.initialSelectionPending)
+    ) {
       throw new Error("Conflicting model selector");
     }
-    if (!previous) { group.set(namespaced, parsed); rows.push(parsed); }
+    if (!previous) {
+      group.set(namespaced, parsed);
+      rows.push(parsed);
+    }
     groups.set(provider, group);
   }
   return rows;
@@ -64,28 +90,49 @@ export function countModelInventory(rows: readonly ModelRow[]): ProviderModelCou
 
 /** Full selected-models response: available is not a visible-row projection. */
 export function parseModelSelection(value: unknown): {
-  available: ProviderAvailableModels; selected: ProviderSelectedModels; liveModelCounts: ProviderLiveModelCounts;
+  available: ProviderAvailableModels;
+  selected: ProviderSelectedModels;
+  liveModelCounts: ProviderLiveModelCounts;
 } {
   const data = record(value);
-  const selected: ProviderSelectedModels = Object.assign(Object.create(null), parseSelectedModels(data));
-  for (const [provider, ids] of Object.entries(selected)) { identity(provider); ids.forEach(identity); }
-  const available = Object.fromEntries(Object.entries(record(data.available)).map(([provider, ids]) => {
+  const selected: ProviderSelectedModels = Object.assign(
+    Object.create(null),
+    parseSelectedModels(data),
+  );
+  for (const [provider, ids] of Object.entries(selected)) {
     identity(provider);
-    if (!Array.isArray(ids)) throw new Error("Invalid available models");
-    return [provider, ids.map(identity)];
-  }));
+    ids.forEach(identity);
+  }
+  const available = Object.fromEntries(
+    Object.entries(record(data.available)).map(([provider, ids]) => {
+      identity(provider);
+      if (!Array.isArray(ids)) throw new Error("Invalid available models");
+      return [provider, ids.map(identity)];
+    }),
+  );
   // Older servers omit provenance. Missing means unknown, not an invalid action snapshot.
   // A present malformed field is still rejected; DTO/custom ownership remain independent gates.
   const liveCounts = Object.hasOwn(data, "liveModelCounts") ? record(data.liveModelCounts) : {};
-  const liveModelCounts = Object.fromEntries(Object.entries(liveCounts).map(([provider, count]) => {
-    identity(provider);
-    if (typeof count !== "number" || !Number.isInteger(count) || count < 0) throw new Error("Invalid discovery count");
-    return [provider, count];
-  }));
-  return { available: Object.assign(Object.create(null), available), selected, liveModelCounts: Object.assign(Object.create(null), liveModelCounts) };
+  const liveModelCounts = Object.fromEntries(
+    Object.entries(liveCounts).map(([provider, count]) => {
+      identity(provider);
+      if (typeof count !== "number" || !Number.isInteger(count) || count < 0)
+        throw new Error("Invalid discovery count");
+      return [provider, count];
+    }),
+  );
+  return {
+    available: Object.assign(Object.create(null), available),
+    selected,
+    liveModelCounts: Object.assign(Object.create(null), liveModelCounts),
+  };
 }
 
-export interface CustomModelRecord { id: string; provider: string; modelId: string }
+export interface CustomModelRecord {
+  id: string;
+  provider: string;
+  modelId: string;
+}
 
 function parseCustomRecord(value: unknown): CustomModelRecord {
   const row = record(value);
@@ -106,9 +153,14 @@ export function parseCustomModelInventory(value: unknown): CustomModelRecord[] {
   return [...ids.values()];
 }
 
-export function parseCustomModelCreated(value: unknown, provider: string, modelId: string): CustomModelRecord {
+export function parseCustomModelCreated(
+  value: unknown,
+  provider: string,
+  modelId: string,
+): CustomModelRecord {
   const row = parseCustomRecord(value);
-  if (row.provider !== provider || row.modelId !== modelId) throw new Error("Unexpected created model");
+  if (row.provider !== provider || row.modelId !== modelId)
+    throw new Error("Unexpected created model");
   return row;
 }
 
@@ -118,33 +170,56 @@ export function catalogRefreshPending(value: unknown): boolean {
   const status = (value as Record<string, unknown>).catalogRefresh;
   if (!status || typeof status !== "object" || Array.isArray(status)) return true;
   const disposition = status as Record<string, unknown>;
-  return disposition.status !== "committed" || typeof disposition.changed !== "boolean" || typeof disposition.degraded !== "boolean";
+  return (
+    disposition.status !== "committed" ||
+    typeof disposition.changed !== "boolean" ||
+    typeof disposition.degraded !== "boolean"
+  );
 }
 
 function parseDiscoverySummary(value: unknown): ProviderDiscoverySummary | undefined {
   if (value === undefined) return undefined;
   const obj = record(value);
-  if (obj.status === "ok") return { status: "ok" };
+  const details = {
+    ...(typeof obj.checkedAt === "string" ? { checkedAt: obj.checkedAt } : {}),
+    ...(typeof obj.lastSuccessAt === "string" ? { lastSuccessAt: obj.lastSuccessAt } : {}),
+    ...(typeof obj.error === "string" ? { error: obj.error } : {}),
+    ...(typeof obj.staleDefaultModel === "string"
+      ? { staleDefaultModel: obj.staleDefaultModel }
+      : {}),
+    ...(obj.staleAliases && typeof obj.staleAliases === "object" && !Array.isArray(obj.staleAliases)
+      ? {
+          staleAliases: Object.fromEntries(
+            Object.entries(obj.staleAliases).filter(
+              (entry): entry is [string, string] => typeof entry[1] === "string",
+            ),
+          ),
+        }
+      : {}),
+  };
+  if (obj.status === "ok") return { status: "ok", ...details };
   if (obj.status !== "failed") throw new Error("Invalid provider discovery status");
   if (obj.reason === "http") {
     if (typeof obj.httpStatus !== "number" || !Number.isInteger(obj.httpStatus)) {
       throw new Error("Invalid provider discovery HTTP status");
     }
-    return { status: "failed", reason: "http", httpStatus: obj.httpStatus };
+    return { status: "failed", reason: "http", httpStatus: obj.httpStatus, ...details };
   }
   if (
-    obj.reason === "blocked"
-    || obj.reason === "invalid_response"
-    || obj.reason === "network"
-    || obj.reason === "provider"
+    obj.reason === "blocked" ||
+    obj.reason === "invalid_response" ||
+    obj.reason === "network" ||
+    obj.reason === "provider"
   ) {
-    return { status: "failed", reason: obj.reason };
+    return { status: "failed", reason: obj.reason, ...details };
   }
   throw new Error("Invalid provider discovery reason");
 }
 
 /** Parse `/api/providers` rows into a revision-bound provider -> discovery map. */
-export function parseProviderDiscoveryMap(value: unknown): Record<string, ProviderDiscoverySummary> {
+export function parseProviderDiscoveryMap(
+  value: unknown,
+): Record<string, ProviderDiscoverySummary> {
   if (!Array.isArray(value)) throw new Error("Invalid providers discovery response");
   const out: Record<string, ProviderDiscoverySummary> = Object.create(null);
   for (const raw of value) {

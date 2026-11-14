@@ -36,6 +36,8 @@ export interface WorkspaceProvider {
   adapter: string;
   baseUrl: string;
   hasApiKey?: boolean;
+  /** Live gateway login state, when provided by the host. */
+  oauthLoggedIn?: boolean;
   hasHeaders?: boolean;
   defaultModel?: string;
   apiKeyTransport?: "x-api-key" | "bearer";
@@ -43,6 +45,7 @@ export interface WorkspaceProvider {
   models?: string[];
   /** Whether the proxy fetches the provider's live model catalog (default true). */
   liveModels?: boolean;
+  modelDiscoveryClientVersion?: string;
   /** Optional upstream HTTP version pin. Cursor defaults to HTTP/2 when omitted. */
   upstreamHttpVersion?: "auto" | "http1.1" | "h1" | "http2" | "h2";
   authMode?: "key" | "forward" | "oauth" | "local" | string;
@@ -58,7 +61,10 @@ export interface WorkspaceProvider {
     requestsPerMinute?: number;
     minIntervalMs?: number;
     maxConcurrentRequests?: number;
-    models?: Record<string, { requestsPerMinute?: number; minIntervalMs?: number; maxConcurrentRequests?: number }>;
+    models?: Record<
+      string,
+      { requestsPerMinute?: number; minIntervalMs?: number; maxConcurrentRequests?: number }
+    >;
     keySelection?: "active" | "round-robin";
     keys?: { requestsPerMinute?: number; minIntervalMs?: number; maxConcurrentRequests?: number };
   };
@@ -123,13 +129,21 @@ function providerEndpoint(host: string, ...path: string[]): string {
   return `${CANONICAL_PROVIDER_PROTOCOL}//${host}/${path.join("/")}`;
 }
 
-const STATIC_MODEL_CATALOG_TRANSPORTS: Readonly<Record<string, { adapter: string; baseUrl: string }>> = {
+const STATIC_MODEL_CATALOG_TRANSPORTS: Readonly<
+  Record<string, { adapter: string; baseUrl: string }>
+> = {
   "cline-pass": { adapter: "openai-chat", baseUrl: providerEndpoint("api.cline.bot", "api", "v1") },
-  "mimo-free": { adapter: "mimo-free", baseUrl: providerEndpoint("api.xiaomimimo.com", "api", "free-ai", "openai", "chat") },
+  "mimo-free": {
+    adapter: "mimo-free",
+    baseUrl: providerEndpoint("api.xiaomimimo.com", "api", "free-ai", "openai", "chat"),
+  },
 };
 
 /** Keep the Providers toggle aligned with the backend's canonical static-catalog boundary. */
-export function providerSupportsLiveModelDiscovery(name: string, provider: WorkspaceProvider): boolean {
+export function providerSupportsLiveModelDiscovery(
+  name: string,
+  provider: WorkspaceProvider,
+): boolean {
   const canonical = STATIC_MODEL_CATALOG_TRANSPORTS[name];
   if (!canonical || provider.adapter !== canonical.adapter) return true;
   return normalizedBaseUrl(provider.baseUrl) !== normalizedBaseUrl(canonical.baseUrl);
@@ -146,16 +160,19 @@ export function hasLoopbackBaseUrl(baseUrl: string): boolean {
 }
 
 function isConfigurationReady(p: WorkspaceProvider): boolean {
+  if (p.authMode === "oauth" && p.oauthLoggedIn !== undefined) return p.oauthLoggedIn;
   // A subscription CLI row is ready by adapter alone: `keyOptional` is enriched from the
   // registry only for the canonical `claude-cli` name, and a renamed or hand-authored row using
   // that adapter still never reads a key.
-  return p.keyOptional === true ||
+  return (
+    p.keyOptional === true ||
     isSubscriptionCliProvider(p) ||
     p.authMode === "oauth" ||
     p.authMode === "forward" ||
     p.authMode === "local" ||
     hasLoopbackBaseUrl(p.baseUrl) ||
-    p.hasApiKey === true;
+    p.hasApiKey === true
+  );
 }
 
 /**
@@ -164,9 +181,11 @@ function isConfigurationReady(p: WorkspaceProvider): boolean {
  * strict casing, no fallback.
  */
 function isCanonicalForwardShape(p: WorkspaceProvider): boolean {
-  return p.adapter === "openai-responses"
-    && p.authMode === "forward"
-    && normalizedBaseUrl(p.baseUrl) === CODEX_FORWARD_BASE_URL;
+  return (
+    p.adapter === "openai-responses" &&
+    p.authMode === "forward" &&
+    normalizedBaseUrl(p.baseUrl) === CODEX_FORWARD_BASE_URL
+  );
 }
 
 /**
@@ -186,15 +205,17 @@ export function isAccountProvider(name: string, p: WorkspaceProvider): boolean {
  */
 export function isFreeProvider(p: WorkspaceProvider): boolean {
   if (isSubscriptionCliProvider(p)) return false;
-  return p.freeTier === true
-    || p.keyOptional === true
-    || p.authMode === "local"
-    || hasLoopbackBaseUrl(p.baseUrl);
+  return (
+    p.freeTier === true ||
+    p.keyOptional === true ||
+    p.authMode === "local" ||
+    hasLoopbackBaseUrl(p.baseUrl)
+  );
 }
 
 /** Three-way tier: accounts wins over free; everything else is paid. */
 export function providerTier(name: string, p: WorkspaceProvider): ProviderTier {
-  if (isAccountProvider(name, p)) return "accounts";
+  if (isAccountProvider(name, p) || p.authMode === "oauth") return "accounts";
   if (isFreeProvider(p)) return "free";
   return "paid";
 }
@@ -202,7 +223,10 @@ export function providerTier(name: string, p: WorkspaceProvider): ProviderTier {
 /** Rail / list sort modes for the providers workspace. */
 export type ProviderSortMode = "az" | "za" | "free-paid" | "paid-free" | "accounts-first";
 
-export function sortWorkspaceItems(items: WorkspaceItem[], mode: ProviderSortMode): WorkspaceItem[] {
+export function sortWorkspaceItems(
+  items: WorkspaceItem[],
+  mode: ProviderSortMode,
+): WorkspaceItem[] {
   const copy = [...items];
   const byName = (a: WorkspaceItem, b: WorkspaceItem) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
@@ -282,7 +306,7 @@ export function applyActiveAccountReauth(
   if (demote.size === 0) return sections;
 
   const tag = (items: WorkspaceItem[]): WorkspaceItem[] =>
-    items.map(item => (demote.has(item.name) ? { ...item, activeNeedsReauth: true } : item));
+    items.map((item) => (demote.has(item.name) ? { ...item, activeNeedsReauth: true } : item));
 
   return {
     ready: tag(sections.ready),

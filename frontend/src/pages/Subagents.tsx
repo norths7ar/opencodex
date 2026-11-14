@@ -3,23 +3,39 @@ import WorkflowBudgetPanel from "../components/WorkflowBudgetPanel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { readJsonOrThrow } from "../fetch-json";
 import { Notice } from "../ui";
-import { useT } from "../i18n/shared";
-import SubagentsWorkspace, { FEATURED_MAX } from "../components/subagents-workspace/SubagentsWorkspace";
+import { useI18n } from "../i18n/shared";
+import SubagentsWorkspace, {
+  FEATURED_MAX,
+} from "../components/subagents-workspace/SubagentsWorkspace";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { useDataSurface } from "../data-surface";
 import { DataSurfaceSkeleton } from "../components/data-surface";
 import SubagentSurfaceWarningModal from "../components/SubagentSurfaceWarningModal";
 import { SUBAGENT_SURFACE_GUIDE_URL } from "../subagent-surface";
-import { useSubagentDelegation, type UltraModePatch, type UltraModeState } from "./use-subagent-delegation";
+import {
+  useSubagentDelegation,
+  type UltraModePatch,
+  type UltraModeState,
+} from "./use-subagent-delegation";
 import { InEffectSummary } from "../components/v2-subagents/InEffectSummary";
 import { formatNamespacedModelId } from "../provider-icons";
 import { sectionAnchorId } from "../section-anchors";
+import { useRuntimeCapabilities } from "../runtime-capabilities";
 
-type CachedSubagents = { available: string[]; chosen: string[]; fallback?: string[]; pollMs?: number; fallbackAvailable?: string[] };
+type CachedSubagents = {
+  available: string[];
+  chosen: string[];
+  fallback?: string[];
+  pollMs?: number;
+  fallbackAvailable?: string[];
+};
 
 const UNLOADED_ULTRA_MODE: UltraModeState = {
-  enabled: false, hintText: null, recommendation: null,
-  multiAgentV2Enabled: false, multiAgentMode: "default",
+  enabled: false,
+  hintText: null,
+  recommendation: null,
+  multiAgentV2Enabled: false,
+  multiAgentMode: "default",
 };
 
 function seedSubagents(cacheKey: string): CachedSubagents | null {
@@ -28,24 +44,36 @@ function seedSubagents(cacheKey: string): CachedSubagents | null {
 
 /** Scrolls the page to one of its sections, for the section index. */
 function jump(target: "featured" | "delegation" | "pin") {
-  document.getElementById(sectionAnchorId("subagents", target))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  document
+    .getElementById(sectionAnchorId("subagents", target))
+    ?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 export default function Subagents({ apiBase }: { apiBase: string }) {
-  const t = useT();
+  const { t, locale } = useI18n();
+  const capabilities = useRuntimeCapabilities();
+  const claudeAvailable = !capabilities || capabilities.clients.includes("claude");
   const cacheKey = `ocx.subagents.v1:${apiBase}`;
   const cached = seedSubagents(cacheKey);
   const [chosen, setChosen] = useState<string[]>(() => cached?.chosen ?? []);
   const [fallback, setFallback] = useState<string[]>(() => cached?.fallback ?? []);
   const [fallbackPollMs, setFallbackPollMs] = useState(() => cached?.pollMs ?? 60000);
   const [fallbackBusy, setFallbackBusy] = useState(false);
-  const [fallbackLoaded, setFallbackLoaded] = useState(() => Array.isArray(cached?.fallback) && Number.isInteger(cached?.pollMs));
-  const [fallbackAvailable, setFallbackAvailable] = useState<string[] | undefined>(() => cached?.fallbackAvailable);
+  const [fallbackLoaded, setFallbackLoaded] = useState(
+    () => Array.isArray(cached?.fallback) && Number.isInteger(cached?.pollMs),
+  );
+  const [fallbackAvailable, setFallbackAvailable] = useState<string[] | undefined>(
+    () => cached?.fallbackAvailable,
+  );
   const [fallbackError, setFallbackError] = useState("");
   const [fallbackLoading, setFallbackLoading] = useState(true);
   const fallbackLoadController = useRef<AbortController | null>(null);
-  const fallbackSnapshot = useRef<Pick<CachedSubagents, "fallback" | "pollMs" | "fallbackAvailable">>({
-    fallback: cached?.fallback, pollMs: cached?.pollMs, fallbackAvailable: cached?.fallbackAvailable,
+  const fallbackSnapshot = useRef<
+    Pick<CachedSubagents, "fallback" | "pollMs" | "fallbackAvailable">
+  >({
+    fallback: cached?.fallback,
+    pollMs: cached?.pollMs,
+    fallbackAvailable: cached?.fallbackAvailable,
   });
   const fallbackRevision = useRef(0);
   const rosterRevision = useRef(0);
@@ -66,7 +94,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const delegation = useSubagentDelegation(apiBase);
   /** The Claude Code pin as the pin panel last read or wrote it, for the summary tiles. */
   const [pin, setPin] = useState<string | null | undefined>(undefined);
-  const [ultraState, setUltraState] = useState<{ apiBase: string; mode: UltraModeState } | null>(null);
+  const [ultraState, setUltraState] = useState<{ apiBase: string; mode: UltraModeState } | null>(
+    null,
+  );
   const ultraModeCurrent = ultraState?.apiBase === apiBase;
   const ultraMode = ultraModeCurrent ? ultraState.mode : UNLOADED_ULTRA_MODE;
   const [ultraSaving, setUltraSaving] = useState(false);
@@ -76,8 +106,12 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
    * for. Switching endpoints with the dialog open must not apply one proxy's answer to another,
    * and tagging beats clearing it from an effect, which would be a cascading render.
    */
-  const [pendingSurface, setPendingSurface] = useState<{ mode: "default" | "v2"; apiBase: string } | null>(null);
+  const [pendingSurface, setPendingSurface] = useState<{
+    mode: "default" | "v2";
+    apiBase: string;
+  } | null>(null);
   const [ultraLoadFailed, setUltraLoadFailed] = useState(false);
+  const [pendingClientApply, setPendingClientApply] = useState(false);
   const ultraLoadGeneration = useRef(0);
   const currentUltraApiBase = useRef(apiBase);
   useEffect(() => {
@@ -88,42 +122,56 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   // Shared loader for /api/v2 state (multi-agent v2 flag + mode hint). Initial-load
   // failures surface sub.ultraModeLoadFail; refresh failures are rethrown so
   // saveUltraMode can report them against the save action.
-  const loadUltraMode = useCallback(async (signal?: AbortSignal) => {
-    if (currentUltraApiBase.current !== apiBase) return false;
-    const generation = ++ultraLoadGeneration.current;
-    const res = await fetch(`${apiBase}/api/v2`, { signal });
-    const data = await readJsonOrThrow<{
-      enabled?: boolean;
-      multiAgentMode?: "v1" | "default" | "v2";
-      multiAgentModeHintText?: string | null;
-      keepNativeChatGptOnV1?: boolean;
-      multiAgentModeHintRecommendation?: { text?: unknown; revision?: unknown };
-    }>(res, t("sub.ultraModeLoadFail"));
-    if (!data) return false;
-    if (signal?.aborted || generation !== ultraLoadGeneration.current || currentUltraApiBase.current !== apiBase) return false;
-    setUltraLoadFailed(false);
-    const rawRecommendation = data.multiAgentModeHintRecommendation;
-    const recommendation = rawRecommendation
-      && typeof rawRecommendation.text === "string"
-      && rawRecommendation.text.trim().length > 0
-      && typeof rawRecommendation.revision === "string"
-      && rawRecommendation.revision.trim().length > 0
-      ? { text: rawRecommendation.text, revision: rawRecommendation.revision }
-      : null;
-    setUltraState({ apiBase, mode: {
-      enabled: data.enabled ?? false,
-      loaded: true,
-      keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
-      hintText: data.multiAgentModeHintText ?? null,
-      recommendation,
-      // Ultra mode replaces Codex's effort-derived policy for every model. The
-      // `default` surface still preserves upstream V1 pins (for example luna),
-      // so only an explicitly forced V2 catalog is an effective surface here.
-      multiAgentV2Enabled: data.enabled === true && data.multiAgentMode === "v2",
-      multiAgentMode: data.multiAgentMode ?? "default",
-    } });
-    return true;
-  }, [apiBase, t]);
+  const loadUltraMode = useCallback(
+    async (signal?: AbortSignal) => {
+      if (currentUltraApiBase.current !== apiBase) return false;
+      const generation = ++ultraLoadGeneration.current;
+      const res = await fetch(`${apiBase}/api/v2`, { signal });
+      const data = await readJsonOrThrow<{
+        enabled?: boolean;
+        multiAgentMode?: "v1" | "default" | "v2";
+        multiAgentModeHintText?: string | null;
+        keepNativeChatGptOnV1?: boolean;
+        pendingClientApply?: boolean;
+        multiAgentModeHintRecommendation?: { text?: unknown; revision?: unknown };
+      }>(res, t("sub.ultraModeLoadFail"));
+      if (!data) return false;
+      if (
+        signal?.aborted ||
+        generation !== ultraLoadGeneration.current ||
+        currentUltraApiBase.current !== apiBase
+      )
+        return false;
+      setUltraLoadFailed(false);
+      setPendingClientApply(data.pendingClientApply === true);
+      const rawRecommendation = data.multiAgentModeHintRecommendation;
+      const recommendation =
+        rawRecommendation &&
+        typeof rawRecommendation.text === "string" &&
+        rawRecommendation.text.trim().length > 0 &&
+        typeof rawRecommendation.revision === "string" &&
+        rawRecommendation.revision.trim().length > 0
+          ? { text: rawRecommendation.text, revision: rawRecommendation.revision }
+          : null;
+      setUltraState({
+        apiBase,
+        mode: {
+          enabled: data.enabled ?? false,
+          loaded: true,
+          keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
+          hintText: data.multiAgentModeHintText ?? null,
+          recommendation,
+          // Ultra mode replaces Codex's effort-derived policy for every model. The
+          // `default` surface still preserves upstream V1 pins (for example luna),
+          // so only an explicitly forced V2 catalog is an effective surface here.
+          multiAgentV2Enabled: data.enabled === true && data.multiAgentMode === "v2",
+          multiAgentMode: data.multiAgentMode ?? "default",
+        },
+      });
+      return true;
+    },
+    [apiBase, t],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -136,7 +184,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         setStatus(t("sub.ultraModeLoadFail"));
       }
     });
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, [loadUltraMode, t]);
 
   const saveUltraMode = async (patch: UltraModePatch) => {
@@ -151,7 +201,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         body: JSON.stringify(patch),
       });
       await readJsonOrThrow(res, t("sub.ultraModeSaveFail"));
-      if (currentUltraApiBase.current !== requestApiBase || !await loadUltraMode()) return;
+      if (currentUltraApiBase.current !== requestApiBase || !(await loadUltraMode())) return;
       setOk(true);
       setStatus(t("sub.ultraModeSaved"));
     } catch (error) {
@@ -165,11 +215,11 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
 
   const retryUltraMode = useCallback(async () => {
     try {
-      if (!await loadUltraMode()) return;
+      if (!(await loadUltraMode())) return;
       // A successful retry replaces the failed initial load; do not leave the
       // page-level load error visible after the controls have recovered.
       setOk(false);
-      setStatus(current => current === t("sub.ultraModeLoadFail") ? "" : current);
+      setStatus((current) => (current === t("sub.ultraModeLoadFail") ? "" : current));
     } catch {
       setOk(false);
       setUltraLoadFailed(true);
@@ -185,14 +235,35 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     const readRevision = fallbackRevision.current;
     try {
       const res = await fetch(`${apiBase}/api/subagent-model-fallback`, { signal });
-      const data = await readJsonOrThrow<{ models?: unknown; pollMs?: unknown; available?: unknown }>(res);
-      if (!data || !Array.isArray(data.models) || !data.models.every(model => typeof model === "string" && model.trim())
-        || typeof data.pollMs !== "number" || !Number.isInteger(data.pollMs) || data.pollMs < 5000 || data.pollMs > 600000
-        || !Array.isArray(data.available) || !data.available.every(model => typeof model === "string" && model.trim())) {
+      const data = await readJsonOrThrow<{
+        models?: unknown;
+        pollMs?: unknown;
+        available?: unknown;
+      }>(res);
+      if (
+        !data ||
+        !Array.isArray(data.models) ||
+        !data.models.every((model) => typeof model === "string" && model.trim()) ||
+        typeof data.pollMs !== "number" ||
+        !Number.isInteger(data.pollMs) ||
+        data.pollMs < 5000 ||
+        data.pollMs > 600000 ||
+        !Array.isArray(data.available) ||
+        !data.available.every((model) => typeof model === "string" && model.trim())
+      ) {
         throw new Error(t("sub.loadFail"));
       }
-      if (signal.aborted || readRevision !== fallbackRevision.current || fallbackSaveInFlight.current) return;
-      const next = { fallback: data.models, pollMs: data.pollMs, fallbackAvailable: data.available };
+      if (
+        signal.aborted ||
+        readRevision !== fallbackRevision.current ||
+        fallbackSaveInFlight.current
+      )
+        return;
+      const next = {
+        fallback: data.models,
+        pollMs: data.pollMs,
+        fallbackAvailable: data.available,
+      };
       fallbackSnapshot.current = next;
       setFallback(next.fallback);
       setFallbackPollMs(next.pollMs);
@@ -205,48 +276,67 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         writeSessionListCache(cacheKey, committed.current);
       }
     } catch (error) {
-      if (signal.aborted || readRevision !== fallbackRevision.current || fallbackSaveInFlight.current) return;
+      if (
+        signal.aborted ||
+        readRevision !== fallbackRevision.current ||
+        fallbackSaveInFlight.current
+      )
+        return;
       setFallbackLoaded(false);
-      setFallbackError(error instanceof Error && !(error instanceof SyntaxError) ? error.message : t("sub.loadFail"));
+      setFallbackError(
+        error instanceof Error && !(error instanceof SyntaxError)
+          ? error.message
+          : t("sub.loadFail"),
+      );
     } finally {
       if (!signal.aborted) setFallbackLoading(false);
     }
   }, [apiBase, cacheKey, t]);
 
   useEffect(() => {
-    void (async () => { await loadFallback(); })();
-    return () => { fallbackLoadController.current?.abort(); };
+    void (async () => {
+      await loadFallback();
+    })();
+    return () => {
+      fallbackLoadController.current?.abort();
+    };
   }, [loadFallback]);
 
-  const loadSubagents = useCallback(async (signal?: AbortSignal): Promise<CachedSubagents> => {
-    // Auxiliary fallback discovery must neither reject nor delay the roster resource.
-    const rosterReadRevision = rosterRevision.current;
-    const rosterRes = await fetch(`${apiBase}/api/subagent-models`, { signal });
-    const response = await readJsonOrThrow<{ available?: string[]; chosen?: string[] }>(rosterRes, t("sub.loadFail"));
-    if (!response) throw new Error(t("sub.loadFail"));
-    const available = response.available ?? [];
-    const availableSet = new Set(available);
-    const rosterCurrent = rosterReadRevision === rosterRevision.current && !saveInFlight.current;
-    const next = {
-      ...fallbackSnapshot.current,
-      available,
-      chosen: rosterCurrent ? (response.chosen ?? []).filter(model => availableSet.has(model)) : committed.current?.chosen ?? [],
-    };
-    if (signal?.aborted) throw signal.reason;
-    committed.current = next;
-    if (rosterCurrent) setRoster(next.chosen);
-    writeSessionListCache(cacheKey, next);
-    return next;
-  }, [apiBase, cacheKey, setRoster, t]);
+  const loadSubagents = useCallback(
+    async (signal?: AbortSignal): Promise<CachedSubagents> => {
+      // Auxiliary fallback discovery must neither reject nor delay the roster resource.
+      const rosterReadRevision = rosterRevision.current;
+      const rosterRes = await fetch(`${apiBase}/api/subagent-models`, { signal });
+      const response = await readJsonOrThrow<{ available?: string[]; chosen?: string[] }>(
+        rosterRes,
+        t("sub.loadFail"),
+      );
+      if (!response) throw new Error(t("sub.loadFail"));
+      const available = response.available ?? [];
+      const availableSet = new Set(available);
+      const rosterCurrent = rosterReadRevision === rosterRevision.current && !saveInFlight.current;
+      const next = {
+        ...fallbackSnapshot.current,
+        available,
+        chosen: rosterCurrent
+          ? (response.chosen ?? []).filter((model) => availableSet.has(model))
+          : (committed.current?.chosen ?? []),
+      };
+      if (signal?.aborted) throw signal.reason;
+      committed.current = next;
+      if (rosterCurrent) setRoster(next.chosen);
+      writeSessionListCache(cacheKey, next);
+      return next;
+    },
+    [apiBase, cacheKey, setRoster, t],
+  );
 
   // The shared resource owns mount loading and retries; the session seed keeps this workspace
   // usable while the first live response is in flight.
-  const resource = useDataSurface<CachedSubagents>(
-    cacheKey,
-    [apiBase],
-    loadSubagents,
-    { isEmpty: () => false, initialData: cached ?? undefined },
-  );
+  const resource = useDataSurface<CachedSubagents>(cacheKey, [apiBase], loadSubagents, {
+    isEmpty: () => false,
+    initialData: cached ?? undefined,
+  });
   const { state } = resource;
   const load = resource.refresh;
   const snapshot = state.data ?? cached;
@@ -286,7 +376,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     if (failure) {
       setRoster(committed.current?.chosen ?? []);
       setOk(false);
-      setStatus(failure instanceof Error && failure.message ? failure.message : t("sub.networkError"));
+      setStatus(
+        failure instanceof Error && failure.message ? failure.message : t("sub.networkError"),
+      );
       return;
     }
     setRoster(applied);
@@ -302,7 +394,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const toggle = (m: string) => {
     const prev = latestChosen.current;
     if (!prev.includes(m) && prev.length >= FEATURED_MAX) return;
-    editRoster(prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]);
+    editRoster(prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
   };
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
@@ -313,7 +405,14 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   };
 
   const saveFallback = async () => {
-    if (!fallbackLoaded || fallbackSaveInFlight.current || !Number.isInteger(fallbackPollMs) || fallbackPollMs < 5000 || fallbackPollMs > 600000) return;
+    if (
+      !fallbackLoaded ||
+      fallbackSaveInFlight.current ||
+      !Number.isInteger(fallbackPollMs) ||
+      fallbackPollMs < 5000 ||
+      fallbackPollMs > 600000
+    )
+      return;
     fallbackSaveInFlight.current = true;
     fallbackRevision.current += 1;
     const requestApiBase = apiBase;
@@ -325,14 +424,26 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ models: fallback, pollMs: fallbackPollMs }),
       });
-      const d = await readJsonOrThrow<{ models?: string[]; pollMs?: number }>(r, t("sub.fallbackSaveFailed"));
+      const d = await readJsonOrThrow<{ models?: string[]; pollMs?: number }>(
+        r,
+        t("sub.fallbackSaveFailed"),
+      );
       if (currentUltraApiBase.current !== requestApiBase) return;
-      if (!d || !Array.isArray(d.models) || typeof d.pollMs !== "number") throw new Error(t("sub.fallbackSaveFailed"));
+      if (!d || !Array.isArray(d.models) || typeof d.pollMs !== "number")
+        throw new Error(t("sub.fallbackSaveFailed"));
       fallbackRevision.current += 1;
       setFallback(d.models);
       setFallbackPollMs(d.pollMs);
-      fallbackSnapshot.current = { ...fallbackSnapshot.current, fallback: d.models, pollMs: d.pollMs };
-      const next = { available, chosen: committed.current?.chosen ?? [], ...fallbackSnapshot.current };
+      fallbackSnapshot.current = {
+        ...fallbackSnapshot.current,
+        fallback: d.models,
+        pollMs: d.pollMs,
+      };
+      const next = {
+        available,
+        chosen: committed.current?.chosen ?? [],
+        ...fallbackSnapshot.current,
+      };
       committed.current = next;
       writeSessionListCache(cacheKey, next);
       setOk(true);
@@ -356,20 +467,31 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     return (
       <>
         <Notice tone="err">{reason}</Notice>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>{t("common.retry")}</button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>
+          {t("common.retry")}
+        </button>
       </>
     );
   }
 
-  const firstOption = delegation.available.find(option => option.namespaced === delegation.model);
-  const firstModel = !delegation.model ? ""
-    : firstOption ? formatNamespacedModelId(`${firstOption.provider}/${firstOption.model}`, t) : delegation.model;
+  const firstOption = delegation.available.find((option) => option.namespaced === delegation.model);
+  const firstModel = !delegation.model
+    ? ""
+    : firstOption
+      ? formatNamespacedModelId(`${firstOption.provider}/${firstOption.model}`, t)
+      : delegation.model;
 
   return (
     <>
       <div className="page-head flex-col items-start gap-1.5">
         <h2>{t("nav.subagents")}</h2>
-        <p className="m-0 text-[14px] text-fg-muted">{t("subagentsV2.lede")}</p>
+        <p className="m-0 text-[14px] text-fg-muted">
+          {claudeAvailable
+            ? t("subagentsV2.lede")
+            : locale === "zh" || locale === "zh-TW"
+              ? "管理 Codex 子代理的模型选择、委派方式和工作流预算。"
+              : "Manage Codex subagent model selection, delegation and workflow budgets."}
+        </p>
       </div>
       <div className="mt-5 mb-6">
         <InEffectSummary
@@ -378,16 +500,34 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           firstModel={firstModel}
           firstEffort={delegation.effort}
           pin={pin}
+          showPin={claudeAvailable}
           onJump={jump}
         />
       </div>
       {status && <Notice tone={ok ? "ok" : "err"}>{status}</Notice>}
+      {pendingClientApply && (
+        <Notice tone="warn">
+          {locale === "zh" || locale === "zh-TW"
+            ? "设置已保存；请在 Route 中启用 Codex 接入，应用模型目录与客户端设置。"
+            : "Settings are saved. Enable Codex in Route to apply the model catalog and client settings."}
+        </Notice>
+      )}
       {state.showError && <Notice tone="err">{t("sub.loadFail")}</Notice>}
       {fallbackError && (
         <Notice tone="err">
           {t("sub.fallbackLabel")}: {t("sub.loadFail")}
           {fallbackError !== t("sub.loadFail") && <> {fallbackError}</>}
-          <button type="button" className="btn btn-ghost btn-sm" disabled={fallbackLoading} onClick={() => { setFallbackLoading(true); void loadFallback(); }}>{t("common.retry")}</button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={fallbackLoading}
+            onClick={() => {
+              setFallbackLoading(true);
+              void loadFallback();
+            }}
+          >
+            {t("common.retry")}
+          </button>
         </Notice>
       )}
       <SubagentsWorkspace
@@ -399,14 +539,31 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         fallback={fallback}
         fallbackPollMs={fallbackPollMs}
         fallbackBusy={fallbackBusy || !fallbackLoaded}
-        onFallbackChange={models => { fallbackRevision.current += 1; setFallback(models); }}
-        onFallbackPollMsChange={pollMs => { fallbackRevision.current += 1; setFallbackPollMs(pollMs); }}
-        onFallbackSave={() => { void saveFallback(); }}
-        settingsExtra={<>
-          <SubagentForceControl key={apiBase} apiBase={apiBase} roster={chosen}
-            id={sectionAnchorId("subagents", "pin")} onForceChange={setPin} />
-          <WorkflowBudgetPanel apiBase={apiBase} id={sectionAnchorId("subagents", "budget")} />
-        </>}
+        onFallbackChange={(models) => {
+          fallbackRevision.current += 1;
+          setFallback(models);
+        }}
+        onFallbackPollMsChange={(pollMs) => {
+          fallbackRevision.current += 1;
+          setFallbackPollMs(pollMs);
+        }}
+        onFallbackSave={() => {
+          void saveFallback();
+        }}
+        settingsExtra={
+          <>
+            {claudeAvailable && (
+              <SubagentForceControl
+                key={apiBase}
+                apiBase={apiBase}
+                roster={chosen}
+                id={sectionAnchorId("subagents", "pin")}
+                onForceChange={setPin}
+              />
+            )}
+            <WorkflowBudgetPanel apiBase={apiBase} id={sectionAnchorId("subagents", "budget")} />
+          </>
+        }
         delegation={{
           apiBase,
           model: delegation.model,
@@ -416,12 +573,14 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           guidanceEnabled: delegation.guidanceEnabled,
           syncCodexDefaults: delegation.syncCodexDefaults,
           saving: delegation.saving,
-          onSave: patch => { void delegation.save(patch); },
+          onSave: (patch) => {
+            void delegation.save(patch);
+          },
           ultraMode,
           ultraSaving: ultraSaving || !ultraModeCurrent,
           // This page carries the same v1/base/v2 switch as Models and the Dashboard, so it
           // needs the same gate: base and v2 wait for an answer, everything else writes.
-          onUltraModeSave: patch => {
+          onUltraModeSave: (patch) => {
             if (patch.multiAgentMode === "default" || patch.multiAgentMode === "v2") {
               setPendingSurface({ mode: patch.multiAgentMode, apiBase });
               return;
@@ -429,7 +588,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
             void saveUltraMode(patch);
           },
           ultraLoadFailed,
-          onUltraModeRetry: () => { void retryUltraMode(); },
+          onUltraModeRetry: () => {
+            void retryUltraMode();
+          },
         }}
       />
       {pendingSurface && pendingSurface.apiBase === apiBase && (
@@ -442,11 +603,18 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
             const next = pendingSurface.mode;
             setPendingSurface(null);
             // Answer the advisory too: this operator has just read the same warning.
-            void saveUltraMode({ multiAgentMode: next, multiAgentSurfaceAdvisoryAcknowledged: true });
+            void saveUltraMode({
+              multiAgentMode: next,
+              multiAgentSurfaceAdvisoryAcknowledged: true,
+            });
           }}
           onChooseV1={() => {
             setPendingSurface(null);
-            if (ultraMode.multiAgentMode !== "v1") void saveUltraMode({ multiAgentMode: "v1", multiAgentSurfaceAdvisoryAcknowledged: true });
+            if (ultraMode.multiAgentMode !== "v1")
+              void saveUltraMode({
+                multiAgentMode: "v1",
+                multiAgentSurfaceAdvisoryAcknowledged: true,
+              });
           }}
           onDismiss={() => setPendingSurface(null)}
         />

@@ -3,6 +3,7 @@ import type { TFn } from "../i18n/shared";
 import { readJsonIfOk, readJsonOrThrow } from "../fetch-json";
 import { writeSessionListCache } from "../session-list-cache";
 import type { OAuthStatus, ProvidersConfig } from "./providers-shared";
+import { useRuntimeCapabilities } from "../runtime-capabilities";
 export type ProvidersConfigRefreshResult = "applied" | "failed" | "superseded";
 
 export function useProvidersFetch({
@@ -26,8 +27,14 @@ export function useProvidersFetch({
   /** Session seed key for instant Providers shell paint (no secrets — hasApiKey flags only). */
   configCacheKey?: string;
 }) {
+  const capabilities = useRuntimeCapabilities();
   const configRequest = useRef(0);
-  useEffect(() => () => { configRequest.current += 1; }, [apiBase]);
+  useEffect(
+    () => () => {
+      configRequest.current += 1;
+    },
+    [apiBase],
+  );
   const fetchConfig = useCallback(async (): Promise<ProvidersConfigRefreshResult> => {
     const request = ++configRequest.current;
     try {
@@ -46,29 +53,41 @@ export function useProvidersFetch({
   }, [apiBase, configCacheKey, notify, setConfig, t]);
 
   const fetchOauth = useCallback(async () => {
+    if (capabilities?.oauth === false) return;
     try {
       // Codex openai status is owned by useCodexAccountPool — do not duplicate /accounts.
       const provRes = await fetch(`${apiBase}/api/oauth/providers`);
       const provData = await readJsonOrThrow<{ providers?: string[] }>(provRes);
       const provs: string[] = provData?.providers ?? [];
       setOauthProviders(provs);
-      const oauthEntries = await Promise.all(provs.map(async p => {
-        const sRes = await fetch(`${apiBase}/api/oauth/status?provider=${encodeURIComponent(p)}`).catch(() => null);
-        const s = sRes ? (await readJsonIfOk<OAuthStatus>(sRes) ?? { loggedIn: false }) : { loggedIn: false };
-        return [p, s] as const;
-      }));
+      const oauthEntries = await Promise.all(
+        provs.map(async (p) => {
+          const sRes = await fetch(
+            `${apiBase}/api/oauth/status?provider=${encodeURIComponent(p)}`,
+          ).catch(() => null);
+          const s = sRes
+            ? ((await readJsonIfOk<OAuthStatus>(sRes)) ?? { loggedIn: false })
+            : { loggedIn: false };
+          return [p, s] as const;
+        }),
+      );
       setOauthStatus(Object.fromEntries(oauthEntries));
-    } catch { /* ignore */ }
-  }, [apiBase, setOauthProviders, setOauthStatus]);
+    } catch {
+      /* ignore */
+    }
+  }, [apiBase, capabilities?.oauth, setOauthProviders, setOauthStatus]);
 
   /*
    * The workspace shell owns the single quota read; this only invalidates it. Keeping the
    * name means all twelve existing mutation call sites keep working unchanged, and a
    * mutation can no longer race the shell's own fetch for the same data.
    */
-  const fetchProviderQuotas = useCallback(async (refresh = false) => {
-    invalidateProviderQuotas(refresh);
-  }, [invalidateProviderQuotas]);
+  const fetchProviderQuotas = useCallback(
+    async (refresh = false) => {
+      invalidateProviderQuotas(refresh);
+    },
+    [invalidateProviderQuotas],
+  );
 
   return { fetchConfig, fetchOauth, fetchProviderQuotas };
 }

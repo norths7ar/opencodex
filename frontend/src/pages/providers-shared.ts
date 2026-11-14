@@ -1,27 +1,31 @@
 export interface ProvidersConfig {
   port: number;
   defaultProvider: string;
-  providers: Record<string, {
-    adapter: string;
-    baseUrl: string;
-    hasApiKey?: boolean;
-    hasHeaders?: boolean;
-    defaultModel?: string;
-    models?: string[];
-    liveModels?: boolean;
-    upstreamHttpVersion?: "auto" | "http1.1" | "h1" | "http2" | "h2";
-    reasoningWireFormat?: "gateway-object";
-    preserveResponsesReasoningContent?: boolean;
-    authMode?: string;
-    anthropicOAuthInstance?: "anthropic2";
-    keyOptional?: boolean;
-    disabled?: boolean;
-    initialModelSelection?: { status: "pending" | "ready" | "all-off"; modelCount?: number };
-    discovery?: import("../models-groups").ProviderDiscoverySummary;
-    note?: string;
-    codexAccountMode?: "direct" | "pool";
-    xaiResponsesOptInState?: boolean | "mixed";
-  }>;
+  providers: Record<
+    string,
+    {
+      adapter: string;
+      baseUrl: string;
+      hasApiKey?: boolean;
+      hasHeaders?: boolean;
+      defaultModel?: string;
+      models?: string[];
+      liveModels?: boolean;
+      modelDiscoveryClientVersion?: string;
+      upstreamHttpVersion?: "auto" | "http1.1" | "h1" | "http2" | "h2";
+      reasoningWireFormat?: "gateway-object";
+      preserveResponsesReasoningContent?: boolean;
+      authMode?: string;
+      anthropicOAuthInstance?: "anthropic2";
+      keyOptional?: boolean;
+      disabled?: boolean;
+      initialModelSelection?: { status: "pending" | "ready" | "all-off"; modelCount?: number };
+      discovery?: import("../models-groups").ProviderDiscoverySummary;
+      note?: string;
+      codexAccountMode?: "direct" | "pool";
+      xaiResponsesOptInState?: boolean | "mixed";
+    }
+  >;
 }
 
 export interface OAuthStatus {
@@ -29,6 +33,7 @@ export interface OAuthStatus {
   email?: string;
   error?: string;
   done?: boolean;
+  pending?: boolean;
   hint?: import("../components/login-url-block").LoginHintData;
   needsReauth?: boolean;
   activeAccountId?: string | null;

@@ -27,7 +27,12 @@ import {
 export interface MainAccountHardLockStatus {
   thresholds?: { short: number; long: number };
   window?: "short" | "long";
-  externalUsage?: { window: "short" | "long"; fromPercent: number; toPercent: number; observedAt: number };
+  externalUsage?: {
+    window: "short" | "long";
+    fromPercent: number;
+    toPercent: number;
+    observedAt: number;
+  };
   enabled: boolean;
   state: "off" | "unknown" | "ready" | "blocked";
   /** Server timestamp in milliseconds; not a client-side unlock instruction. */
@@ -43,9 +48,12 @@ export const DEFAULT_MAIN_HARD_LOCK_THRESHOLDS = { short: 90, long: 98 } as cons
  * so translated strings never render "undefined" or a non-number.
  */
 export function hardLockThresholds(value: unknown): { short: number; long: number } {
-  const pair = value && typeof value === "object" ? value as { short?: unknown; long?: unknown } : undefined;
-  const percent = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 100;
-  if (pair && percent(pair.short) && percent(pair.long)) return { short: pair.short, long: pair.long };
+  const pair =
+    value && typeof value === "object" ? (value as { short?: unknown; long?: unknown }) : undefined;
+  const percent = (n: unknown): n is number =>
+    typeof n === "number" && Number.isFinite(n) && n >= 0 && n <= 100;
+  if (pair && percent(pair.short) && percent(pair.long))
+    return { short: pair.short, long: pair.long };
   return { ...DEFAULT_MAIN_HARD_LOCK_THRESHOLDS };
 }
 
@@ -93,7 +101,11 @@ export interface CodexAccountEntry {
   needsReauth?: boolean;
   selectionExcludedReason?: "plan_excluded";
   selectionExcludedPlan?: string;
-  health?: { status: "healthy" | "cooldown" | "reauth_required" | "warning"; reason?: string; until?: string };
+  health?: {
+    status: "healthy" | "cooldown" | "reauth_required" | "warning";
+    reason?: string;
+    until?: string;
+  };
   healthLabel?: string;
   healthSummary?: string;
   healthAction?: string;
@@ -107,8 +119,7 @@ export interface CodexAccountEntry {
 export type CodexAccountLoadState = "loading" | "ready" | "error";
 
 export type CodexAccountActionResult<T extends object = Record<never, never>> =
-  | ({ ok: true } & T)
-  | { ok: false; reason: "busy" | "request" | "reload" | "pin_changed" };
+  ({ ok: true } & T) | { ok: false; reason: "busy" | "request" | "reload" | "pin_changed" };
 
 /**
  * The auto-switch threshold arrives on the same /active response as the account list.
@@ -156,12 +167,18 @@ export interface CodexAccountPoolController {
   activePinnedId: string | null;
 
   load(refreshQuota?: boolean, options?: { validatePending?: boolean }): Promise<boolean>;
-  switchAccount(id: string | null, options?: { expectedPinnedAccountId: string }): Promise<CodexAccountActionResult<{ activeId: string | null }>>;
+  switchAccount(
+    id: string | null,
+    options?: { expectedPinnedAccountId: string },
+  ): Promise<CodexAccountActionResult<{ activeId: string | null }>>;
   setAccountPaused(id: string, paused: boolean): Promise<CodexAccountActionResult>;
   /** `null` resets the account to the default order. Accepts the `__main__` sentinel. */
   setAccountPriority(id: string, priority: number | null): Promise<CodexAccountActionResult>;
   /** `null` restores global inheritance. Accepts the `__main__` sentinel. */
-  setAccountAutoSwitchThreshold(id: string, threshold: number | null): Promise<CodexAccountActionResult>;
+  setAccountAutoSwitchThreshold(
+    id: string,
+    threshold: number | null,
+  ): Promise<CodexAccountActionResult>;
   /** Accepts the `__main__` sentinel. */
   setAccountCreditsAfterLimit(id: string, enabled: boolean): Promise<CodexAccountActionResult>;
   /** The global switch: true allows every account, false clears them all. */
@@ -193,7 +210,10 @@ interface CodexAccountUsageSummary {
 }
 
 /** In-memory last-good snapshot (not sessionStorage — accounts carry emails/ids). */
-const lastGoodByBase = new Map<string, { accounts: CodexAccountEntry[]; activeId: string | null }>();
+const lastGoodByBase = new Map<
+  string,
+  { accounts: CodexAccountEntry[]; activeId: string | null }
+>();
 
 function normalizeAccountAutoSwitchThreshold(value: unknown): number | null {
   return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100
@@ -214,7 +234,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
     { enabled },
   );
   const [activeId, setActiveId] = useState<string | null>(() => seed?.activeId ?? null);
-  const [loadState, setLoadState] = useState<CodexAccountLoadState>(() => (seed != null ? "ready" : "loading"));
+  const [loadState, setLoadState] = useState<CodexAccountLoadState>(() =>
+    seed != null ? "ready" : "loading",
+  );
   // Deliberately beside `loadState` rather than inside it. `loadState` answers what the surface
   // can draw, and a warm refresh failure keeps the rows drawable — folding the failure in would
   // mean either flashing the cold skeleton over good data or, as before, saying nothing at all.
@@ -226,7 +248,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
   const [pauseUpdatingId, setPauseUpdatingId] = useState<string | null>(null);
   const [priorityUpdatingId, setPriorityUpdatingId] = useState<string | null>(null);
   const [autoSwitchUpdatingId, setAutoSwitchUpdatingId] = useState<string | null>(null);
-  const [creditsAfterLimitUpdatingId, setCreditsAfterLimitUpdatingId] = useState<string | null>(null);
+  const [creditsAfterLimitUpdatingId, setCreditsAfterLimitUpdatingId] = useState<string | null>(
+    null,
+  );
   const [pausingExhausted, setPausingExhausted] = useState(false);
   const [activePinnedId, setActivePinnedId] = useState<string | null>(null);
   // A counter, not a boolean: the initial load, the 30s poll, quota-fill retries and explicit
@@ -248,7 +272,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
   const loadGenerationRef = useRef(0);
   // Set by switchAccount so a background load already in flight cannot roll the active
   // id back to a value the server had not yet committed when that request was issued.
-  const pendingActiveIdRef = useRef<{ id: string | null; staleReadsRemaining: number } | null>(null);
+  const pendingActiveIdRef = useRef<{ id: string | null; staleReadsRemaining: number } | null>(
+    null,
+  );
   const observersRef = useRef<Set<CodexAccountLoadObserver> | null>(null);
   if (observersRef.current === null) observersRef.current = new Set();
   // Last /active payload an actual read returned. Surfaces that mount after a
@@ -273,7 +299,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
     // editing and saving disposition from that. Synthesising one on subscribe can overwrite
     // an in-flight draft or arm a spurious post-save refresh. Late surfaces seed themselves
     // from readLastThreshold()/readLastActive(), which apply only while uninitialized.
-    return () => { observersRef.current!.delete(observer); };
+    return () => {
+      observersRef.current!.delete(observer);
+    };
   }, []);
 
   /** Last threshold an actual read returned, or undefined when none has succeeded yet. */
@@ -285,140 +313,151 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
   /** Full last /active payload, or undefined when none has succeeded yet. */
   const readLastActive = useCallback(() => lastActiveRef.current?.value, []);
 
-  const load = useCallback(async (refreshQuota = false, options: { validatePending?: boolean } = {}): Promise<boolean> => {
-    const generation = ++loadGenerationRef.current;
-    const validatePending = options.validatePending === true;
-    // Validation can include token recovery, WHAM and two 30s model attempts.
-    // Budget per known row (conservatively ignoring server parallelism), plus
-    // native-main lookup time. Ordinary reads retain their short polling deadline.
-    const knownAccounts = lastGoodByBase.get(apiBase)?.accounts.length ?? 0;
-    const bounded = createBoundedFetch(validatePending ? 30_000 + 120_000 * Math.max(1, knownAccounts) : 20_000);
-    // A periodic read must not supersede this longer-running explicit operation.
-    const validationLease = validatePending ? {} as PauseToken : null;
-    if (validationLease) {
-      pauseTokensRef.current!.add(validationLease);
-      setPauseCount(pauseTokensRef.current!.size);
-    }
-    setInflightCount(count => count + 1);
-    // The try opens immediately after the increment so even a synchronous throw in the
-    // observer snapshot below cannot leave the counter stuck above zero.
-    try {
-      // Snapshot subscribers so an unsubscribe mid-flight cannot desync begin/accept pairs.
-      const observers = [...observersRef.current!];
-      const revisions = new Map<CodexAccountLoadObserver, number>();
-      for (const observer of observers) revisions.set(observer, observer.beginActiveRead());
-      // Soft refresh when boxes are already on screen — avoid full-page loading flash.
-      if (!refreshQuota && !hasLoadedRef.current) setLoadState("loading");
-
-      let nextAccounts: CodexAccountEntry[] | null = null;
-      let nextActiveId: string | null | undefined;
-
-      const accountsTask = (async (): Promise<boolean> => {
-        try {
-          const response = await fetch(`${apiBase}/api/codex-auth/accounts${validatePending ? "/refresh" : refreshQuota ? "?refresh=1" : ""}`, {
-            method: validatePending ? "POST" : "GET",
-            signal: bounded.signal,
-          });
-          if (!response.ok) throw new Error("account load failed");
-          const payload = await response.json();
-          if (loadGenerationRef.current === generation) {
-            // Selection order is required downstream (badge, select). Normalizing here keeps
-            // a payload without it from rendering a NaN order on every card.
-            nextAccounts = ((payload.accounts ?? []) as CodexAccountEntry[]).map(account => {
-              const logLabel = account.isMain ? "main" : account.logLabel;
-              const available = quotaAutoRefreshAvailability(account.quota);
-              return {
-                ...account,
-                ...(logLabel ? { logLabel } : {}),
-                priority: normalizeAccountPriority(account.priority),
-                autoSwitchThresholdOverride: normalizeAccountAutoSwitchThreshold(
-                  account.autoSwitchThresholdOverride,
-                ),
-                quotaAutoRefresh: account.quotaAutoRefresh ?? {
-                  ...available,
-                  fiveHourEnabled: false,
-                  weeklyEnabled: false,
-                },
-              };
-            });
-            setAccounts(nextAccounts);
-            hasAccountsRef.current = nextAccounts.length > 0;
-            hasLoadedRef.current = true;
-            // Progressive: paint account/quota boxes as soon as /accounts returns.
-            setLoadState("ready");
-            // Cleared here rather than at the settle below, because the rows it qualifies are
-            // painted here. Waiting for /active to finish would leave the just-replaced rows
-            // labelled as pre-refresh ones for as long as that read's budget allows.
-            setRefreshFailed(false);
-          }
-          return true;
-        } catch {
-          return false;
-        }
-      })();
-
-      const activeTask = (async (): Promise<boolean> => {
-        try {
-          const response = await fetch(`${apiBase}/api/codex-auth/active`, { signal: bounded.signal });
-          if (!response.ok) throw new Error("active account load failed");
-          const active = await response.json();
-          if (loadGenerationRef.current === generation) {
-            const serverActiveId = active.activeCodexAccountId ?? null;
-            const pending = pendingActiveIdRef.current;
-            if (pending && pending.staleReadsRemaining > 0 && serverActiveId !== pending.id) {
-              // Allow one eventually-consistent response to preserve the accepted value,
-              // but ensure a repeated mismatch can reconcile legitimate routing changes.
-              pending.staleReadsRemaining -= 1;
-            } else {
-              pendingActiveIdRef.current = null;
-              nextActiveId = serverActiveId;
-              setActiveId(serverActiveId);
-            }
-            lastActiveRef.current = { value: active };
-            setActivePinnedId(typeof active.pinnedAccountId === "string" ? active.pinnedAccountId : null);
-            for (const observer of observers) {
-              observer.acceptActiveRead(active, revisions.get(observer)!);
-            }
-          }
-          return true;
-        } catch {
-          if (loadGenerationRef.current === generation) {
-            for (const observer of observers) observer.rejectActiveRead();
-          }
-          return false;
-        }
-      })();
-
-      const [accountsOk, activeOk] = await Promise.all([accountsTask, activeTask]);
-      // A newer load already superseded this one; leave its state in place.
-      if (loadGenerationRef.current !== generation) return false;
-      if (accountsOk) {
-        setLoadState("ready");
-        hasLoadedRef.current = true;
-        const prior = lastGoodByBase.get(apiBase);
-        lastGoodByBase.set(apiBase, {
-          accounts: nextAccounts ?? prior?.accounts ?? [],
-          activeId: nextActiveId !== undefined ? nextActiveId : (prior?.activeId ?? null),
-        });
-        return activeOk;
-      }
-      // A cold failure has nothing to show, so it replaces the surface. A warm one keeps its rows
-      // — flashing the skeleton on a soft poll miss is its own defect — and says so instead of
-      // continuing to present them as current.
-      if (!hasLoadedRef.current) setLoadState("error");
-      setRefreshFailed(true);
-      return false;
-    } finally {
-      bounded.clear();
+  const load = useCallback(
+    async (refreshQuota = false, options: { validatePending?: boolean } = {}): Promise<boolean> => {
+      const generation = ++loadGenerationRef.current;
+      const validatePending = options.validatePending === true;
+      // Validation can include token recovery, WHAM and two 30s model attempts.
+      // Budget per known row (conservatively ignoring server parallelism), plus
+      // native-main lookup time. Ordinary reads retain their short polling deadline.
+      const knownAccounts = lastGoodByBase.get(apiBase)?.accounts.length ?? 0;
+      const bounded = createBoundedFetch(
+        validatePending ? 30_000 + 120_000 * Math.max(1, knownAccounts) : 20_000,
+      );
+      // A periodic read must not supersede this longer-running explicit operation.
+      const validationLease = validatePending ? ({} as PauseToken) : null;
       if (validationLease) {
-        pauseTokensRef.current!.delete(validationLease);
+        pauseTokensRef.current!.add(validationLease);
         setPauseCount(pauseTokensRef.current!.size);
       }
-      setInflightCount(count => Math.max(0, count - 1));
-      setFirstAttemptSettled(true);
-    }
-  // oxlint-disable-next-line react/react-compiler -- preserve existing callback dependency semantics during Oxlint migration
-  }, [apiBase]);
+      setInflightCount((count) => count + 1);
+      // The try opens immediately after the increment so even a synchronous throw in the
+      // observer snapshot below cannot leave the counter stuck above zero.
+      try {
+        // Snapshot subscribers so an unsubscribe mid-flight cannot desync begin/accept pairs.
+        const observers = [...observersRef.current!];
+        const revisions = new Map<CodexAccountLoadObserver, number>();
+        for (const observer of observers) revisions.set(observer, observer.beginActiveRead());
+        // Soft refresh when boxes are already on screen — avoid full-page loading flash.
+        if (!refreshQuota && !hasLoadedRef.current) setLoadState("loading");
+
+        let nextAccounts: CodexAccountEntry[] | null = null;
+        let nextActiveId: string | null | undefined;
+
+        const accountsTask = (async (): Promise<boolean> => {
+          try {
+            const response = await fetch(
+              `${apiBase}/api/codex-auth/accounts${validatePending ? "/refresh" : refreshQuota ? "?refresh=1" : ""}`,
+              {
+                method: validatePending ? "POST" : "GET",
+                signal: bounded.signal,
+              },
+            );
+            if (!response.ok) throw new Error("account load failed");
+            const payload = await response.json();
+            if (loadGenerationRef.current === generation) {
+              // Selection order is required downstream (badge, select). Normalizing here keeps
+              // a payload without it from rendering a NaN order on every card.
+              nextAccounts = ((payload.accounts ?? []) as CodexAccountEntry[]).map((account) => {
+                const logLabel = account.isMain ? "main" : account.logLabel;
+                const available = quotaAutoRefreshAvailability(account.quota);
+                return {
+                  ...account,
+                  ...(logLabel ? { logLabel } : {}),
+                  priority: normalizeAccountPriority(account.priority),
+                  autoSwitchThresholdOverride: normalizeAccountAutoSwitchThreshold(
+                    account.autoSwitchThresholdOverride,
+                  ),
+                  quotaAutoRefresh: account.quotaAutoRefresh ?? {
+                    ...available,
+                    fiveHourEnabled: false,
+                    weeklyEnabled: false,
+                  },
+                };
+              });
+              setAccounts(nextAccounts);
+              hasAccountsRef.current = nextAccounts.length > 0;
+              hasLoadedRef.current = true;
+              // Progressive: paint account/quota boxes as soon as /accounts returns.
+              setLoadState("ready");
+              // Cleared here rather than at the settle below, because the rows it qualifies are
+              // painted here. Waiting for /active to finish would leave the just-replaced rows
+              // labelled as pre-refresh ones for as long as that read's budget allows.
+              setRefreshFailed(false);
+            }
+            return true;
+          } catch {
+            return false;
+          }
+        })();
+
+        const activeTask = (async (): Promise<boolean> => {
+          try {
+            const response = await fetch(`${apiBase}/api/codex-auth/active`, {
+              signal: bounded.signal,
+            });
+            if (!response.ok) throw new Error("active account load failed");
+            const active = await response.json();
+            if (loadGenerationRef.current === generation) {
+              const serverActiveId = active.activeCodexAccountId ?? null;
+              const pending = pendingActiveIdRef.current;
+              if (pending && pending.staleReadsRemaining > 0 && serverActiveId !== pending.id) {
+                // Allow one eventually-consistent response to preserve the accepted value,
+                // but ensure a repeated mismatch can reconcile legitimate routing changes.
+                pending.staleReadsRemaining -= 1;
+              } else {
+                pendingActiveIdRef.current = null;
+                nextActiveId = serverActiveId;
+                setActiveId(serverActiveId);
+              }
+              lastActiveRef.current = { value: active };
+              setActivePinnedId(
+                typeof active.pinnedAccountId === "string" ? active.pinnedAccountId : null,
+              );
+              for (const observer of observers) {
+                observer.acceptActiveRead(active, revisions.get(observer)!);
+              }
+            }
+            return true;
+          } catch {
+            if (loadGenerationRef.current === generation) {
+              for (const observer of observers) observer.rejectActiveRead();
+            }
+            return false;
+          }
+        })();
+
+        const [accountsOk, activeOk] = await Promise.all([accountsTask, activeTask]);
+        // A newer load already superseded this one; leave its state in place.
+        if (loadGenerationRef.current !== generation) return false;
+        if (accountsOk) {
+          setLoadState("ready");
+          hasLoadedRef.current = true;
+          const prior = lastGoodByBase.get(apiBase);
+          lastGoodByBase.set(apiBase, {
+            accounts: nextAccounts ?? prior?.accounts ?? [],
+            activeId: nextActiveId !== undefined ? nextActiveId : (prior?.activeId ?? null),
+          });
+          return activeOk;
+        }
+        // A cold failure has nothing to show, so it replaces the surface. A warm one keeps its rows
+        // — flashing the skeleton on a soft poll miss is its own defect — and says so instead of
+        // continuing to present them as current.
+        if (!hasLoadedRef.current) setLoadState("error");
+        setRefreshFailed(true);
+        return false;
+      } finally {
+        bounded.clear();
+        if (validationLease) {
+          pauseTokensRef.current!.delete(validationLease);
+          setPauseCount(pauseTokensRef.current!.size);
+        }
+        setInflightCount((count) => Math.max(0, count - 1));
+        setFirstAttemptSettled(true);
+      }
+    },
+    [apiBase],
+  );
 
   // Initial load plus background refresh. Owned here so mounting or unmounting a surface
   // never changes the request count.
@@ -440,7 +479,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
     // the uncancellable microtask fires two identical loads, doubling /accounts and /active.
     if (initialLoadKeyRef.current === apiBase) return;
     initialLoadKeyRef.current = apiBase;
-    void Promise.resolve().then(() => { void load(); });
+    void Promise.resolve().then(() => {
+      void load();
+    });
   }, [apiBase, enabled, load]);
 
   // Soft /accounts returns before background WHAM finishes. Re-poll cheaply until
@@ -449,9 +490,11 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
   const needsQuotaFill = accounts.some((account) => account.hasCredential && !account.quota);
   useEffect(() => {
     if (!enabled || !needsQuotaFill || pauseCount > 0) return;
-    const timers = [350, 900, 2000].map((delayMs) => (
-      window.setTimeout(() => { if (pauseTokensRef.current!.size === 0) void load(false); }, delayMs)
-    ));
+    const timers = [350, 900, 2000].map((delayMs) =>
+      window.setTimeout(() => {
+        if (pauseTokensRef.current!.size === 0) void load(false);
+      }, delayMs),
+    );
     return () => {
       for (const timer of timers) window.clearTimeout(timer);
     };
@@ -461,7 +504,9 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
   // (no timer, no traffic) while the tab is hidden.
   useEffect(() => {
     if (!enabled || pauseCount > 0) return;
-    return startVisibilityPoll(() => { if (pauseTokensRef.current!.size === 0) void load(); }, REFRESH_INTERVAL_MS);
+    return startVisibilityPoll(() => {
+      if (pauseTokensRef.current!.size === 0) void load();
+    }, REFRESH_INTERVAL_MS);
   }, [enabled, load, pauseCount]);
 
   const pauseRefresh = useCallback((): PauseToken => {
@@ -476,237 +521,276 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
     setPauseCount(pauseTokensRef.current!.size);
   }, []);
 
-  const switchAccount = useCallback(async (id: string | null, options?: { expectedPinnedAccountId: string }) => {
-    // Cross-gated with the order write, not just with itself: both PUTs move the pin,
-    // and in opposite directions, so letting them overlap lets the client settle on
-    // the inverse of the server's final pin until a reload happens to correct it.
-    if (switchingRef.current || priorityMutationRef.current) return { ok: false, reason: "busy" } as const;
-    switchingRef.current = id ?? "__main__";
-    setSwitchingId(id ?? "__main__");
-    let failure: "request" | "pin_changed" = "request";
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/active`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountId: id, ...(options ? { expectedPinnedAccountId: options.expectedPinnedAccountId } : {}) }),
-      });
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({})) as { code?: unknown };
-        if (error.code === "account_pin_changed") failure = "pin_changed";
-        throw new Error("account switch failed");
-      }
-      const result = await response.json().catch(() => ({})) as { activeCodexAccountId?: string | null };
-      const selectedId = result.activeCodexAccountId ?? id;
-      pendingActiveIdRef.current = {
-        id: selectedId ?? null,
-        staleReadsRemaining: 1,
-      };
-      setActiveId(selectedId ?? null);
-      // A manual selection pins its target until the account drains or routing moves off
-      // it. The badge follows the id, not /active's `pinned` boolean, so a same-tier
-      // sibling's turn does not make the operator's choice look released. A null request
-      // is the unpin path — the server cleared the pin, so nothing is marked.
-      setActivePinnedId(selectedId ?? null);
-      // Reconcile in the background: the switch is already accepted upstream, so a slow
-      // reload must not hold the caller's confirmation dialog open.
-      void load();
-      return { ok: true, activeId: selectedId ?? null } as const;
-    } catch {
-      if (id === null) {
-        // A lost reply or unconfirmed publication can already have changed the saved pin.
-        // Observe /active before feedback; do not let an older optimistic pick mask it.
-        pendingActiveIdRef.current = null;
-        await load();
-      }
-      return { ok: false, reason: failure } as const;
-    } finally {
-      switchingRef.current = null;
-      setSwitchingId(null);
-    }
-  }, [apiBase, load]);
-
-  const saveAlias = useCallback(async (id: string, alias: string) => {
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/accounts/alias`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, alias: alias.trim() }),
-      });
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      await load();
-      return { ok: true } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    }
-  }, [apiBase, load]);
-
-  const setAccountPaused = useCallback(async (id: string, paused: boolean) => {
-    if (pauseMutationRef.current) return { ok: false, reason: "busy" } as const;
-    pauseMutationRef.current = { accountId: id };
-    setPauseUpdatingId(id);
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/accounts/pause`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, paused }),
-      });
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      const raw = await response.json().catch(() => ({}));
-      const result = (raw && typeof raw === "object" ? raw : {}) as { activeCodexAccountId?: string | null };
-      setAccounts(current => current.map(account => (
-        account.id === id || (id === "__main__" && account.isMain)
-          ? { ...account, paused }
-          : account
-      )));
-      if (Object.prototype.hasOwnProperty.call(result, "activeCodexAccountId")) {
-        const nextActiveId = result.activeCodexAccountId ?? null;
+  const switchAccount = useCallback(
+    async (id: string | null, options?: { expectedPinnedAccountId: string }) => {
+      // Cross-gated with the order write, not just with itself: both PUTs move the pin,
+      // and in opposite directions, so letting them overlap lets the client settle on
+      // the inverse of the server's final pin until a reload happens to correct it.
+      if (switchingRef.current || priorityMutationRef.current)
+        return { ok: false, reason: "busy" } as const;
+      switchingRef.current = id ?? "__main__";
+      setSwitchingId(id ?? "__main__");
+      let failure: "request" | "pin_changed" = "request";
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/active`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            accountId: id,
+            ...(options ? { expectedPinnedAccountId: options.expectedPinnedAccountId } : {}),
+          }),
+        });
+        if (!response.ok) {
+          const error = (await response.json().catch(() => ({}))) as { code?: unknown };
+          if (error.code === "account_pin_changed") failure = "pin_changed";
+          throw new Error("account switch failed");
+        }
+        const result = (await response.json().catch(() => ({}))) as {
+          activeCodexAccountId?: string | null;
+        };
+        const selectedId = result.activeCodexAccountId ?? id;
         pendingActiveIdRef.current = {
-          id: nextActiveId,
+          id: selectedId ?? null,
           staleReadsRemaining: 1,
         };
-        setActiveId(nextActiveId);
+        setActiveId(selectedId ?? null);
+        // A manual selection pins its target until the account drains or routing moves off
+        // it. The badge follows the id, not /active's `pinned` boolean, so a same-tier
+        // sibling's turn does not make the operator's choice look released. A null request
+        // is the unpin path — the server cleared the pin, so nothing is marked.
+        setActivePinnedId(selectedId ?? null);
+        // Reconcile in the background: the switch is already accepted upstream, so a slow
+        // reload must not hold the caller's confirmation dialog open.
+        void load();
+        return { ok: true, activeId: selectedId ?? null } as const;
+      } catch {
+        if (id === null) {
+          // A lost reply or unconfirmed publication can already have changed the saved pin.
+          // Observe /active before feedback; do not let an older optimistic pick mask it.
+          pendingActiveIdRef.current = null;
+          await load();
+        }
+        return { ok: false, reason: failure } as const;
+      } finally {
+        switchingRef.current = null;
+        setSwitchingId(null);
       }
-      // Deliberately NOT cross-gated against the switch and order writes, even though
-      // pausing the pinned account also releases the pin. This edge is conditional on
-      // the pin still naming `id`, which makes it order-robust: whichever response
-      // lands last, the client agrees with the server.
-      if (paused) setActivePinnedId(current => current === id ? null : current);
-      void load();
-      return { ok: true } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    } finally {
-      pauseMutationRef.current = null;
-      setPauseUpdatingId(null);
-    }
-  }, [apiBase, load]);
+    },
+    [apiBase, load],
+  );
 
-  const setAccountPriority = useCallback(async (id: string, priority: number | null) => {
-    // The other half of the cross-gate in switchAccount: an order write clears the
-    // pin that a switch sets, so the two cannot be in flight together.
-    if (priorityMutationRef.current || switchingRef.current) return { ok: false, reason: "busy" } as const;
-    priorityMutationRef.current = { accountId: id };
-    setPriorityUpdatingId(id);
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/accounts/priority`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, priority }),
-      });
-      // A rejected write leaves the row alone, so the card snaps back to the last
-      // confirmed order instead of showing a value the server never accepted.
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      const raw = await response.json().catch(() => ({}));
-      const result = (raw && typeof raw === "object" ? raw : {}) as { priority?: unknown };
-      const stored = normalizeAccountPriority(result.priority ?? priority);
-      setAccounts(current => current.map(account => (
-        account.id === id || (id === "__main__" && account.isMain)
-          ? { ...account, priority: stored }
-          : account
-      )));
-      // Every accepted order write releases the manual pin, even when the numeric
-      // value was unchanged. Do not depend on the follow-up read to hide the badge.
-      setActivePinnedId(null);
-      // A pending marker left over from an earlier switch has to go. It exists to
-      // hold the accepted account until a matching `/active` read arrives, and any
-      // read that disagrees is treated as stale — which never clears the marker.
-      // This write is newer than the switch: it releases the pin the switch set, so
-      // the account the switch named is no longer the one routing has to agree with.
-      // The switch's own in-flight reload cannot win the race either —
-      // `loadGenerationRef` discards a response from any generation but the latest.
-      pendingActiveIdRef.current = null;
-      void load();
-      return { ok: true } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    } finally {
-      priorityMutationRef.current = null;
-      setPriorityUpdatingId(null);
-    }
-  }, [apiBase, load]);
+  const saveAlias = useCallback(
+    async (id: string, alias: string) => {
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/accounts/alias`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, alias: alias.trim() }),
+        });
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        await load();
+        return { ok: true } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      }
+    },
+    [apiBase, load],
+  );
 
-  const setAccountAutoSwitchThreshold = useCallback(async (
-    id: string,
-    threshold: number | null,
-  ) => {
-    if (autoSwitchMutationRef.current) return { ok: false, reason: "busy" } as const;
-    autoSwitchMutationRef.current = { accountId: id };
-    setAutoSwitchUpdatingId(id);
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/auto-switch`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, threshold }),
-      });
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      const raw = await response.json().catch(() => ({}));
-      const result = (raw && typeof raw === "object" ? raw : {}) as {
-        autoSwitchThresholdOverride?: unknown;
-      };
-      const stored = Object.prototype.hasOwnProperty.call(result, "autoSwitchThresholdOverride")
-        ? normalizeAccountAutoSwitchThreshold(result.autoSwitchThresholdOverride)
-        : threshold;
-      setAccounts(current => current.map(account => (
-        account.id === id || (id === "__main__" && account.isMain)
-          ? { ...account, autoSwitchThresholdOverride: stored }
-          : account
-      )));
-      void load();
-      return { ok: true } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    } finally {
-      autoSwitchMutationRef.current = null;
-      setAutoSwitchUpdatingId(null);
-    }
-  }, [apiBase, load]);
+  const setAccountPaused = useCallback(
+    async (id: string, paused: boolean) => {
+      if (pauseMutationRef.current) return { ok: false, reason: "busy" } as const;
+      pauseMutationRef.current = { accountId: id };
+      setPauseUpdatingId(id);
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/accounts/pause`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, paused }),
+        });
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        const raw = await response.json().catch(() => ({}));
+        const result = (raw && typeof raw === "object" ? raw : {}) as {
+          activeCodexAccountId?: string | null;
+        };
+        setAccounts((current) =>
+          current.map((account) =>
+            account.id === id || (id === "__main__" && account.isMain)
+              ? { ...account, paused }
+              : account,
+          ),
+        );
+        if (Object.prototype.hasOwnProperty.call(result, "activeCodexAccountId")) {
+          const nextActiveId = result.activeCodexAccountId ?? null;
+          pendingActiveIdRef.current = {
+            id: nextActiveId,
+            staleReadsRemaining: 1,
+          };
+          setActiveId(nextActiveId);
+        }
+        // Deliberately NOT cross-gated against the switch and order writes, even though
+        // pausing the pinned account also releases the pin. This edge is conditional on
+        // the pin still naming `id`, which makes it order-robust: whichever response
+        // lands last, the client agrees with the server.
+        if (paused) setActivePinnedId((current) => (current === id ? null : current));
+        void load();
+        return { ok: true } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      } finally {
+        pauseMutationRef.current = null;
+        setPauseUpdatingId(null);
+      }
+    },
+    [apiBase, load],
+  );
+
+  const setAccountPriority = useCallback(
+    async (id: string, priority: number | null) => {
+      // The other half of the cross-gate in switchAccount: an order write clears the
+      // pin that a switch sets, so the two cannot be in flight together.
+      if (priorityMutationRef.current || switchingRef.current)
+        return { ok: false, reason: "busy" } as const;
+      priorityMutationRef.current = { accountId: id };
+      setPriorityUpdatingId(id);
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/accounts/priority`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, priority }),
+        });
+        // A rejected write leaves the row alone, so the card snaps back to the last
+        // confirmed order instead of showing a value the server never accepted.
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        const raw = await response.json().catch(() => ({}));
+        const result = (raw && typeof raw === "object" ? raw : {}) as { priority?: unknown };
+        const stored = normalizeAccountPriority(result.priority ?? priority);
+        setAccounts((current) =>
+          current.map((account) =>
+            account.id === id || (id === "__main__" && account.isMain)
+              ? { ...account, priority: stored }
+              : account,
+          ),
+        );
+        // Every accepted order write releases the manual pin, even when the numeric
+        // value was unchanged. Do not depend on the follow-up read to hide the badge.
+        setActivePinnedId(null);
+        // A pending marker left over from an earlier switch has to go. It exists to
+        // hold the accepted account until a matching `/active` read arrives, and any
+        // read that disagrees is treated as stale — which never clears the marker.
+        // This write is newer than the switch: it releases the pin the switch set, so
+        // the account the switch named is no longer the one routing has to agree with.
+        // The switch's own in-flight reload cannot win the race either —
+        // `loadGenerationRef` discards a response from any generation but the latest.
+        pendingActiveIdRef.current = null;
+        void load();
+        return { ok: true } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      } finally {
+        priorityMutationRef.current = null;
+        setPriorityUpdatingId(null);
+      }
+    },
+    [apiBase, load],
+  );
+
+  const setAccountAutoSwitchThreshold = useCallback(
+    async (id: string, threshold: number | null) => {
+      if (autoSwitchMutationRef.current) return { ok: false, reason: "busy" } as const;
+      autoSwitchMutationRef.current = { accountId: id };
+      setAutoSwitchUpdatingId(id);
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/auto-switch`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, threshold }),
+        });
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        const raw = await response.json().catch(() => ({}));
+        const result = (raw && typeof raw === "object" ? raw : {}) as {
+          autoSwitchThresholdOverride?: unknown;
+        };
+        const stored = Object.prototype.hasOwnProperty.call(result, "autoSwitchThresholdOverride")
+          ? normalizeAccountAutoSwitchThreshold(result.autoSwitchThresholdOverride)
+          : threshold;
+        setAccounts((current) =>
+          current.map((account) =>
+            account.id === id || (id === "__main__" && account.isMain)
+              ? { ...account, autoSwitchThresholdOverride: stored }
+              : account,
+          ),
+        );
+        void load();
+        return { ok: true } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      } finally {
+        autoSwitchMutationRef.current = null;
+        setAutoSwitchUpdatingId(null);
+      }
+    },
+    [apiBase, load],
+  );
 
   // One writer for the per-account and the global switch: they edit the same list, so a second
   // write while one is in flight is refused rather than raced.
-  const writeCreditsAfterLimit = useCallback(async (
-    updatingId: string,
-    body: { id: string; creditsAfterLimit: boolean } | { all: boolean },
-    apply: (account: CodexAccountEntry) => CodexAccountEntry,
-  ) => {
-    if (creditsAfterLimitMutationRef.current) return { ok: false, reason: "busy" } as const;
-    creditsAfterLimitMutationRef.current = true;
-    setCreditsAfterLimitUpdatingId(updatingId);
-    try {
-      const response = await fetch(`${apiBase}/api/codex-auth/accounts/credits`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      setAccounts(current => current.map(apply));
-      void load();
-      return { ok: true } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    } finally {
-      creditsAfterLimitMutationRef.current = false;
-      setCreditsAfterLimitUpdatingId(null);
-    }
-  }, [apiBase, load]);
+  const writeCreditsAfterLimit = useCallback(
+    async (
+      updatingId: string,
+      body: { id: string; creditsAfterLimit: boolean } | { all: boolean },
+      apply: (account: CodexAccountEntry) => CodexAccountEntry,
+    ) => {
+      if (creditsAfterLimitMutationRef.current) return { ok: false, reason: "busy" } as const;
+      creditsAfterLimitMutationRef.current = true;
+      setCreditsAfterLimitUpdatingId(updatingId);
+      try {
+        const response = await fetch(`${apiBase}/api/codex-auth/accounts/credits`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        setAccounts((current) => current.map(apply));
+        void load();
+        return { ok: true } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      } finally {
+        creditsAfterLimitMutationRef.current = false;
+        setCreditsAfterLimitUpdatingId(null);
+      }
+    },
+    [apiBase, load],
+  );
 
-  const setAccountCreditsAfterLimit = useCallback((id: string, enabled: boolean) => writeCreditsAfterLimit(
-    id,
-    { id, creditsAfterLimit: enabled },
-    account => (account.id === id || (id === "__main__" && account.isMain) ? { ...account, creditsAfterLimit: enabled } : account),
-  ), [writeCreditsAfterLimit]);
+  const setAccountCreditsAfterLimit = useCallback(
+    (id: string, enabled: boolean) =>
+      writeCreditsAfterLimit(id, { id, creditsAfterLimit: enabled }, (account) =>
+        account.id === id || (id === "__main__" && account.isMain)
+          ? { ...account, creditsAfterLimit: enabled }
+          : account,
+      ),
+    [writeCreditsAfterLimit],
+  );
 
-  const setAllCreditsAfterLimit = useCallback((enabled: boolean) => writeCreditsAfterLimit(
-    "*",
-    { all: enabled },
-    account => ({ ...account, creditsAfterLimit: enabled }),
-  ), [writeCreditsAfterLimit]);
+  const setAllCreditsAfterLimit = useCallback(
+    (enabled: boolean) =>
+      writeCreditsAfterLimit("*", { all: enabled }, (account) => ({
+        ...account,
+        creditsAfterLimit: enabled,
+      })),
+    [writeCreditsAfterLimit],
+  );
 
   const pauseExhaustedAccounts = useCallback(async () => {
     if (pauseMutationRef.current) return { ok: false, reason: "busy" } as const;
     pauseMutationRef.current = "bulk";
     setPausingExhausted(true);
     try {
-      const response = await fetch(`${apiBase}/api/codex-auth/accounts/pause-exhausted`, { method: "PUT" });
+      const response = await fetch(`${apiBase}/api/codex-auth/accounts/pause-exhausted`, {
+        method: "PUT",
+      });
       if (!response.ok) return { ok: false, reason: "request" } as const;
       const raw = await response.json().catch(() => ({}));
       const result = (raw && typeof raw === "object" ? raw : {}) as {
@@ -715,11 +799,13 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
         activeCodexAccountId?: string | null;
       };
       const pausedIds = new Set(result.pausedAccountIds ?? []);
-      setAccounts(current => current.map(account => (
-        pausedIds.has(account.id) || (pausedIds.has("__main__") && account.isMain)
-          ? { ...account, paused: true }
-          : account
-      )));
+      setAccounts((current) =>
+        current.map((account) =>
+          pausedIds.has(account.id) || (pausedIds.has("__main__") && account.isMain)
+            ? { ...account, paused: true }
+            : account,
+        ),
+      );
       if (Object.prototype.hasOwnProperty.call(result, "activeCodexAccountId")) {
         const nextActiveId = result.activeCodexAccountId ?? null;
         pendingActiveIdRef.current = {
@@ -730,7 +816,7 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
       }
       // Conditional for the same reason as the single-account pause above: clearing
       // outright would race the switch and order writes.
-      setActivePinnedId(current => current !== null && pausedIds.has(current) ? null : current);
+      setActivePinnedId((current) => (current !== null && pausedIds.has(current) ? null : current));
       void load();
       return { ok: true, pausedCount: result.pausedCount ?? pausedIds.size } as const;
     } catch {
@@ -741,40 +827,40 @@ export function useCodexAccountPool(apiBase: string, enabled = true): CodexAccou
     }
   }, [apiBase, load]);
 
-  const removeAccount = useCallback(async (id: string) => {
-    try {
-      const response = await fetch(
-        `${apiBase}/api/codex-auth/accounts?id=${encodeURIComponent(id)}`,
-        { method: "DELETE" },
-      );
-      if (!response.ok) return { ok: false, reason: "request" } as const;
-      const completion = codexAccountMutationCompletion(
-        await response.json().catch(() => ({})),
-      );
-      await load();
-      return { ok: true, ...completion } as const;
-    } catch {
-      return { ok: false, reason: "request" } as const;
-    }
-  }, [apiBase, load]);
+  const removeAccount = useCallback(
+    async (id: string) => {
+      try {
+        const response = await fetch(
+          `${apiBase}/api/codex-auth/accounts?id=${encodeURIComponent(id)}`,
+          { method: "DELETE" },
+        );
+        if (!response.ok) return { ok: false, reason: "request" } as const;
+        const completion = codexAccountMutationCompletion(await response.json().catch(() => ({})));
+        await load();
+        return { ok: true, ...completion } as const;
+      } catch {
+        return { ok: false, reason: "request" } as const;
+      }
+    },
+    [apiBase, load],
+  );
 
   const syncAfterAccountAdded = useCallback(async () => {
     const ok = await load();
     return ok ? ({ ok: true } as const) : ({ ok: false, reason: "reload" } as const);
   }, [load]);
 
-  const activePoolAccount = activeId && activeId !== "__main__"
-    ? accounts.find(a => a.id === activeId)
-    : null;
-  const mainAccount = accounts.find(a => a.isMain);
+  const activePoolAccount =
+    activeId && activeId !== "__main__" ? accounts.find((a) => a.id === activeId) : null;
+  const mainAccount = accounts.find((a) => a.isMain);
   // Include health-only reauth so Providers overview attention matches row CTAs.
   const activeAccount = activePoolAccount ?? mainAccount;
   const activeNeedsReauth = !activeAccount?.paused && accountNeedsReauth(activeAccount);
   const accountsWithUsage = useMemo(() => {
     const usageByLabel = new Map(
-      (usage30d.data?.accounts ?? []).map(row => [row.accountLogLabel, row] as const),
+      (usage30d.data?.accounts ?? []).map((row) => [row.accountLogLabel, row] as const),
     );
-    return accounts.map(account => {
+    return accounts.map((account) => {
       const logLabel = account.isMain ? "main" : account.logLabel;
       const accountUsage = logLabel ? usageByLabel.get(logLabel) : undefined;
       return accountUsage ? { ...account, usage30d: accountUsage } : account;

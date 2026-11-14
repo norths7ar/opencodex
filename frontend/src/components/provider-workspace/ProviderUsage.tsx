@@ -4,13 +4,26 @@
  */
 import { Fragment, useMemo, useState } from "react";
 import { useT, useI18n } from "../../i18n/shared";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
 import type { WorkspaceItem } from "../../provider-workspace/catalog";
-import { formatRequestCount, formatTokenCount, formatCostUsd } from "../../provider-workspace/usage";
+import {
+  formatRequestCount,
+  formatTokenCount,
+  formatCostUsd,
+} from "../../provider-workspace/usage";
 import type { ProviderQuotaReportView } from "../../provider-workspace/report";
 import type { AccountQuotaReading, ProviderUsageTotals, ProviderModelUsageRow } from "./types";
 import ProviderCurrentQuota from "./ProviderCurrentQuota";
 
-export default function ProviderUsage({ item, usageTotals, quotaReport, currentQuotaReading, quotaIdentity, modelUsage, onRefreshQuota }: {
+export default function ProviderUsage({
+  item,
+  usageTotals,
+  quotaReport,
+  currentQuotaReading,
+  quotaIdentity,
+  modelUsage,
+  onRefreshQuota,
+}: {
   item: WorkspaceItem;
   usageTotals?: ProviderUsageTotals;
   quotaReport?: ProviderQuotaReportView;
@@ -22,6 +35,8 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
 }) {
   const t = useT();
   const { locale } = useI18n();
+  const capabilities = useRuntimeCapabilities();
+  const quotaEnabled = capabilities === null || capabilities.quota === true;
   const hasUsage = usageTotals?.requests !== undefined;
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
 
@@ -49,17 +64,27 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
         <h3 className="pws-section-title">{t("pws.usageLast30d")}</h3>
         {hasUsage ? (
           <>
-            <div className="pws-usage-metrics pws-usage-metrics-3" role="group" aria-label={t("pws.usageLast30d")}>
+            <div
+              className="pws-usage-metrics pws-usage-metrics-3"
+              role="group"
+              aria-label={t("pws.usageLast30d")}
+            >
               <div className="pws-usage-metric">
-                <span className="pws-usage-metric-value mono">{formatCostUsd(providerCost, locale)}</span>
+                <span className="pws-usage-metric-value mono">
+                  {formatCostUsd(providerCost, locale)}
+                </span>
                 <span className="muted pws-usage-metric-label">{t("pws.estimatedCost")}</span>
               </div>
               <div className="pws-usage-metric">
-                <span className="pws-usage-metric-value">{formatRequestCount(usageTotals?.requests, locale)}</span>
+                <span className="pws-usage-metric-value">
+                  {formatRequestCount(usageTotals?.requests, locale)}
+                </span>
                 <span className="muted pws-usage-metric-label">{t("pws.metricRequests")}</span>
               </div>
               <div className="pws-usage-metric">
-                <span className="pws-usage-metric-value">{formatTokenCount(usageTotals?.totalTokens, locale)}</span>
+                <span className="pws-usage-metric-value">
+                  {formatTokenCount(usageTotals?.totalTokens, locale)}
+                </span>
                 <span className="muted pws-usage-metric-label">{t("pws.metricTokens")}</span>
               </div>
             </div>
@@ -85,7 +110,7 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
                 </tr>
               </thead>
               <tbody>
-                {sortedModels.map(row => {
+                {sortedModels.map((row) => {
                   const key = row.model;
                   const isExpanded = expandedModel === key;
                   return (
@@ -101,7 +126,9 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
                             {row.model}
                           </button>
                           {row.hasUnresolvedRequestedModel && (
-                            <div className="muted pws-model-attribution">{t("pws.unresolvedRequestedModel")}</div>
+                            <div className="muted pws-model-attribution">
+                              {t("pws.unresolvedRequestedModel")}
+                            </div>
                           )}
                         </td>
                         <td className="num mono">{formatCostUsd(row.estimatedCostUsd, locale)}</td>
@@ -109,7 +136,10 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
                         <td className="num">{row.requests}</td>
                         <td>
                           <div className="pws-share-bar">
-                            <div className="pws-share-bar-fill" style={{ width: `${Math.round(row.shareRatio * 100)}%` }} />
+                            <div
+                              className="pws-share-bar-fill"
+                              style={{ width: `${Math.round(row.shareRatio * 100)}%` }}
+                            />
                           </div>
                         </td>
                       </tr>
@@ -119,11 +149,17 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
                             <div className="pws-model-detail-grid">
                               <div>
                                 <span className="muted">{t("pws.tokenInput")}</span>
-                                <span className="mono"> {formatTokenCount(row.inputTokens, locale)}</span>
+                                <span className="mono">
+                                  {" "}
+                                  {formatTokenCount(row.inputTokens, locale)}
+                                </span>
                               </div>
                               <div>
                                 <span className="muted">{t("pws.tokenOutput")}</span>
-                                <span className="mono"> {formatTokenCount(row.outputTokens, locale)}</span>
+                                <span className="mono">
+                                  {" "}
+                                  {formatTokenCount(row.outputTokens, locale)}
+                                </span>
                               </div>
                             </div>
                           </td>
@@ -138,7 +174,14 @@ export default function ProviderUsage({ item, usageTotals, quotaReport, currentQ
         </div>
       )}
 
-      <ProviderCurrentQuota key={`${item.name}:${quotaIdentity ?? ""}`} report={quotaReport} reading={currentQuotaReading} onRefreshQuota={onRefreshQuota} />
+      {quotaEnabled && (
+        <ProviderCurrentQuota
+          key={`${item.name}:${quotaIdentity ?? ""}`}
+          report={quotaReport}
+          reading={currentQuotaReading}
+          onRefreshQuota={onRefreshQuota}
+        />
+      )}
     </div>
   );
 }

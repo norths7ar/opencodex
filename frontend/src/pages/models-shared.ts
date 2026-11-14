@@ -1,4 +1,5 @@
 import type { TFn, TKey } from "../i18n/shared";
+import type { ModelCost, RateField } from "../components/model-price-cost";
 import type { ProviderDiscoverySummary } from "../models-groups";
 import { modelVisible, type ProviderModelMap } from "../model-visibility";
 import { formatNamespacedModelId } from "../provider-icons";
@@ -26,7 +27,34 @@ export function discoveryFailureLabel(
   }
 }
 
-export interface ModelRow {
+export interface ModelEditableMetadata {
+  displayName?: string;
+  contextWindow?: number;
+  inputModalities?: string[];
+  reasoningEfforts?: string[];
+  defaultReasoningEffort?: string;
+  effectiveCost?: ModelEffectiveCost;
+}
+
+export type ModelEffectiveCost = Partial<Record<RateField, number>> &
+  Pick<ModelCost, "promptLengthPricing">;
+
+export type ModelMetadataSource = {
+  source: string;
+  updatedAt?: string;
+  sourceRef?: string;
+  stale?: boolean;
+};
+
+export type ModelPricingSchedule = {
+  bands: { offPeak: ModelEffectiveCost; peak: ModelEffectiveCost };
+  sourceRef: string;
+  verifiedAt: string;
+  condition?: string;
+  stale?: boolean;
+};
+
+export interface ModelRow extends ModelEditableMetadata {
   provider: string;
   id: string;
   namespaced: string;
@@ -35,9 +63,8 @@ export interface ModelRow {
   native?: boolean;
   custom?: boolean;
   customId?: string;
-  displayName?: string;
   displayNameOverride?: string;
-  displayNameSource?: "operator" | "provider" | "fallback";
+  displayNameSource?: "operator" | "provider" | "upstream" | "official" | "preset" | "fallback";
   manualPricing?: boolean;
   /**
    * Listed but currently unable to serve, because every usable target is quota-exhausted
@@ -51,25 +78,21 @@ export interface ModelRow {
    * the field. Absent is never treated as free.
    */
   pricingStatus?: "free" | "paid";
-  inputModalities?: string[];
-  contextWindow?: number;
+  outputModalities?: string[];
+  maxInputTokens?: number;
+  maxOutputTokens?: number;
+  supportsReasoning?: boolean;
+  metadataSources?: Record<string, ModelMetadataSource>;
+  inheritedMetadata?: ModelEditableMetadata;
+  metadataOverrides?: Partial<ModelEditableMetadata> & { cost?: ModelCost };
+  costOverride?: ModelCost;
+  pricingSchedule?: ModelPricingSchedule;
+  subscription?: boolean;
   /** Exact stored context override; absent when the row inherits its effective window. */
   contextWindowDeclared?: number;
   contextCap?: number;
   contextCapped?: boolean;
-  /**
-   * Stored custom-row override, or — on a routed row — the ladder that actually applies to it,
-   * resolved from the config and the registry. A routed row carries it because the per-model
-   * editor needs the answer rather than the absence of one.
-   */
-  reasoningEfforts?: string[];
-  /** The level a request inherits when it names none; absent when nothing pins one. */
-  defaultReasoningEffort?: string;
-  /**
-   * The stored modality declaration, which is NOT the row's own `inputModalities`: that one is
-   * the catalog value. An editor has to pre-fill from this one, or it shows what the provider
-   * published while writing something else, and every save reads back as "nothing changed".
-   */
+  /** Stored declaration; inputModalities above is the effective value. */
   inputModalitiesDeclared?: string[];
   /** True when the config really changes this model's reasoning, decided by value, not by key. */
   reasoningOverridden?: boolean;
@@ -87,7 +110,7 @@ export type PricedRow = { pricingStatus?: "free" | "paid" };
  * provider does not say", so the control is hidden instead.
  */
 export function modelPricingKnown(rows: readonly PricedRow[]): boolean {
-  return rows.some(row => row.pricingStatus !== undefined);
+  return rows.some((row) => row.pricingStatus !== undefined);
 }
 
 /**
@@ -98,8 +121,11 @@ export function modelPricingKnown(rows: readonly PricedRow[]): boolean {
  * an older build has no field either. Both consumers call this BEFORE their own search, sort,
  * and page slice, or free models stay stranded behind Show more on a long provider list.
  */
-export function filterFreeModelRows<T extends PricedRow>(rows: readonly T[], freeOnly: boolean): T[] {
-  return freeOnly ? rows.filter(row => row.pricingStatus === "free") : [...rows];
+export function filterFreeModelRows<T extends PricedRow>(
+  rows: readonly T[],
+  freeOnly: boolean,
+): T[] {
+  return freeOnly ? rows.filter((row) => row.pricingStatus === "free") : [...rows];
 }
 
 /**
@@ -117,12 +143,14 @@ export function freeOnlyInForce(freeOnly: boolean, rows: readonly PricedRow[]): 
 }
 
 function containsDisplayNameControlCharacter(value: string): boolean {
-  return [...value].some(character => {
+  return [...value].some((character) => {
     const codePoint = character.codePointAt(0)!;
-    return codePoint <= 0x1f
-      || (codePoint >= 0x7f && codePoint <= 0x9f)
-      || codePoint === 0x2028
-      || codePoint === 0x2029;
+    return (
+      codePoint <= 0x1f ||
+      (codePoint >= 0x7f && codePoint <= 0x9f) ||
+      codePoint === 0x2028 ||
+      codePoint === 0x2029
+    );
   });
 }
 
@@ -143,7 +171,15 @@ export function modelDisplayNameValidationKey(value: string): TKey | null {
  * real `reasoning_effort` value — codex-rs converts it to `max` before any provider
  * request, and the catalog writer appends it to every non-empty ladder anyway.
  */
-export const REASONING_EFFORT_LEVELS = ["none", "minimal", "low", "medium", "high", "xhigh", "max"] as const;
+export const REASONING_EFFORT_LEVELS = [
+  "none",
+  "minimal",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+] as const;
 
 export interface ProviderContextCapsResponse {
   cap?: number;
@@ -206,7 +242,11 @@ export const CAP_OPTION_SET = new Set(CAP_OPTIONS);
  */
 export const NATIVE_GPT56_DEFAULT_WINDOW = 272_000;
 export const NATIVE_GPT56_OPT_IN_WINDOW = 922_000;
-export const NATIVE_CAP_OPTIONS = [NATIVE_GPT56_DEFAULT_WINDOW, 372_000, NATIVE_GPT56_OPT_IN_WINDOW];
+export const NATIVE_CAP_OPTIONS = [
+  NATIVE_GPT56_DEFAULT_WINDOW,
+  372_000,
+  NATIVE_GPT56_OPT_IN_WINDOW,
+];
 export const NATIVE_CAP_OPTION_SET = new Set(NATIVE_CAP_OPTIONS);
 export const CUSTOM_OPTION = "custom";
 export const THREAD_OPTIONS = [4, 8, 16, 32, 64, 128, 256, 500, 1000];
@@ -242,7 +282,7 @@ export function fmtK(n: number): string {
   if (n % 1000 !== 0) return n.toLocaleString();
   // Past a million "1050k" stops reading as a size. Trailing zeros are dropped so
   // 1,000,000 renders as "1M" rather than "1.00M".
-  // eslint-disable-next-line local-i18n/no-hardcoded-ui-strings -- unit suffix, not prose
+
   if (n >= 1_000_000) return Number((n / 1_000_000).toFixed(2)) + "M";
   return `${n / 1000}k`;
 }
@@ -266,7 +306,10 @@ export function activeModelOptions(
     const blocked = disabled.has(m.id) || disabled.has(m.namespaced);
     if (modelVisible(selected, m.provider, m.id, m.native === true, blocked)) {
       // Friendly label (display-name provider prefix) while the raw route stays the value.
-      options.push({ value: m.namespaced, label: t ? formatNamespacedModelId(m.namespaced, t) : m.namespaced });
+      options.push({
+        value: m.namespaced,
+        label: t ? formatNamespacedModelId(m.namespaced, t) : m.namespaced,
+      });
     }
   }
   return options;
@@ -285,10 +328,15 @@ export function routedModelOptions(
   models: readonly ModelRow[],
   saved?: string,
 ): { value: string; label: string }[] {
-  const native = new Set(models.filter(model => model.native === true).map(model => model.namespaced));
-  const options = visible.filter(option => !native.has(option.value));
-  if (saved && !options.some(option => option.value === saved)) {
-    options.push({ value: saved, label: visible.find(option => option.value === saved)?.label ?? saved });
+  const native = new Set(
+    models.filter((model) => model.native === true).map((model) => model.namespaced),
+  );
+  const options = visible.filter((option) => !native.has(option.value));
+  if (saved && !options.some((option) => option.value === saved)) {
+    options.push({
+      value: saved,
+      label: visible.find((option) => option.value === saved)?.label ?? saved,
+    });
   }
   return options;
 }
@@ -308,7 +356,10 @@ export function readCollapsedProviders(storage: StorageLike = localStorage): Set
   }
 }
 
-export function writeCollapsedProviders(collapsed: Set<string>, storage: StorageLike = localStorage): void {
+export function writeCollapsedProviders(
+  collapsed: Set<string>,
+  storage: StorageLike = localStorage,
+): void {
   try {
     storage.setItem(COLLAPSED_KEY_V2, JSON.stringify([...collapsed]));
   } catch {

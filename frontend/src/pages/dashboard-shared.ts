@@ -12,14 +12,12 @@ import type { AnthropicInstanceId, AnthropicPoolOptions } from "./claude-manual-
 
 export type DashboardSection = "overview" | "providers" | "models";
 
-
 export function readDashboardSectionFromHash(): DashboardSection {
   const raw = window.location.hash.replace(/^#\/?/, "");
   if (raw === "dashboard/providers") return "providers";
   if (raw === "dashboard/models") return "models";
   return "overview";
 }
-
 
 /** Overview is the bare `#dashboard`; the other sections carry a suffix. */
 export function dashboardHashForSection(section: DashboardSection): string {
@@ -33,14 +31,38 @@ export async function requireJson<T>(res: Response, fallbackMessage?: string): P
   return data;
 }
 
-export interface HealthData { status: string; version: string; uptime: number }
-export interface ProviderInfo { name: string; adapter: string; baseUrl: string; defaultModel?: string; hasApiKey: boolean }
-export interface ModelInfo { id: string; provider: string; namespaced: string; owned_by?: string; reasoningEfforts?: string[] }
+export interface HealthData {
+  status: string;
+  version: string;
+  uptime: number;
+}
+export interface ProviderInfo {
+  name: string;
+  adapter: string;
+  baseUrl: string;
+  defaultModel?: string;
+  hasApiKey: boolean;
+}
+export interface ModelInfo {
+  id: string;
+  provider: string;
+  namespaced: string;
+  owned_by?: string;
+  reasoningEfforts?: string[];
+}
 export interface SettingsData {
   codexAutoStart: boolean;
   codexDesktopAuthless?: boolean;
   codexClientCompaction?: boolean;
   catalogRefreshPending?: boolean;
+  catalogRefresh?: SyncResult;
+  clientApplyWarning?: string;
+  clientApplication?: {
+    enabled: boolean;
+    appliedClientCompaction: boolean;
+    warning?: string;
+    message?: string;
+  };
   /** Whether a login may open a browser on the machine running the proxy. */
   oauthOpenBrowser?: boolean;
   port: number;
@@ -77,7 +99,12 @@ export interface SidecarSetting {
   maxDescriptionsPerTurn?: number;
   timeoutMs?: number;
 }
-export interface VisionModelOption { value: string; label: string; backend: VisionBackend; baseline?: boolean }
+export interface VisionModelOption {
+  value: string;
+  label: string;
+  backend: VisionBackend;
+  baseline?: boolean;
+}
 export interface WebSearchModelOption {
   value: string;
   label: string;
@@ -115,7 +142,13 @@ export interface SidecarCodexApply {
   detail?: string;
 }
 export interface SidecarPatch {
-  webSearch?: { backend?: SidecarBackend | null; anthropicInstance?: AnthropicInstanceId | null; model?: string; streamRoutedModelOutput?: boolean; enabled?: boolean };
+  webSearch?: {
+    backend?: SidecarBackend | null;
+    anthropicInstance?: AnthropicInstanceId | null;
+    model?: string;
+    streamRoutedModelOutput?: boolean;
+    enabled?: boolean;
+  };
   vision?: {
     backend?: VisionBackend | null;
     anthropicInstance?: AnthropicInstanceId | null;
@@ -133,10 +166,12 @@ export interface ShadowCallData {
   /** Runtime-owned source inventory; older runtimes omit it. */
   sourceModelOptions?: ShadowCallSourceOption[];
 }
-export type UsageSummary30d = import("../usage-summary-resource").UsageReadMetadata & { summary: { requests: number; totalTokens: number; coverageRatio: number } };
+export type UsageSummary30d = import("../usage-summary-resource").UsageReadMetadata & {
+  summary: { requests: number; totalTokens: number; coverageRatio: number };
+};
 export interface SyncResult {
   ok: boolean;
-  status?: "applied" | "skipped" | "catalog-only" | "refused";
+  status?: "applied" | "skipped" | "pending" | "catalog-only" | "refused";
   added: number;
   catalogPath: string | null;
   catalogExists: boolean;
@@ -177,12 +212,16 @@ export function mergeSidecarSetting(
   if (update?.backend === null) delete merged.backend;
   else if (update?.backend !== undefined) merged.backend = update.backend;
   if (update?.anthropicInstance === null) delete merged.anthropicInstance;
-  else if (update?.anthropicInstance !== undefined) merged.anthropicInstance = update.anthropicInstance;
-  if (update?.backend !== undefined && update.backend !== "anthropic") delete merged.anthropicInstance;
+  else if (update?.anthropicInstance !== undefined)
+    merged.anthropicInstance = update.anthropicInstance;
+  if (update?.backend !== undefined && update.backend !== "anthropic")
+    delete merged.anthropicInstance;
   if (update?.reasoning !== undefined) merged.reasoning = update.reasoning;
-  if (update?.streamRoutedModelOutput !== undefined) merged.streamRoutedModelOutput = update.streamRoutedModelOutput;
+  if (update?.streamRoutedModelOutput !== undefined)
+    merged.streamRoutedModelOutput = update.streamRoutedModelOutput;
   if (update?.enabled !== undefined) merged.enabled = update.enabled;
-  if (update?.maxDescriptionsPerTurn !== undefined) merged.maxDescriptionsPerTurn = update.maxDescriptionsPerTurn;
+  if (update?.maxDescriptionsPerTurn !== undefined)
+    merged.maxDescriptionsPerTurn = update.maxDescriptionsPerTurn;
   if (update?.timeoutMs !== undefined) merged.timeoutMs = update.timeoutMs;
   return merged;
 }
@@ -228,7 +267,9 @@ export function nextSidecarCodexApply(
   previous: SidecarCodexApply | undefined,
   report: SidecarCodexApply | undefined,
 ): SidecarCodexApply | undefined {
-  return report?.reason === "not_requested" && sidecarCodexWritePending(previous) ? previous : report;
+  return report?.reason === "not_requested" && sidecarCodexWritePending(previous)
+    ? previous
+    : report;
 }
 
 export function visionMaxDescriptionsPatch(maxDescriptionsPerTurn: number): SidecarPatch {
@@ -259,22 +300,26 @@ export function parsePositiveInteger(raw: string): number | undefined {
 
 export function parseVisionTimeoutMs(raw: string): number | undefined {
   const value = parsePositiveInteger(raw);
-  if (value === undefined || value < VISION_TIMEOUT_MS_MIN || value > VISION_TIMEOUT_MS_MAX) return undefined;
+  if (value === undefined || value < VISION_TIMEOUT_MS_MIN || value > VISION_TIMEOUT_MS_MAX)
+    return undefined;
   return value;
 }
 
 export const VISION_REASONING_LEVELS: VisionReasoning[] = ["low", "medium", "high", "xhigh", "max"];
 
 export function visionReasoningLadder(models: ModelInfo[], modelId: string): VisionReasoning[] {
-  const model = models.find(m => m.id === modelId);
+  const model = models.find((m) => m.id === modelId);
   const ladder = model?.reasoningEfforts;
   if (!ladder || ladder.length === 0) return [...VISION_REASONING_LEVELS];
-  const supported = VISION_REASONING_LEVELS.filter(effort => ladder.includes(effort));
+  const supported = VISION_REASONING_LEVELS.filter((effort) => ladder.includes(effort));
   return supported.length > 0 ? supported : [...VISION_REASONING_LEVELS];
 }
 
 /** Do not keep an unsupported persisted rung in the picker; runtime will not honor it. */
-export function visionReasoningOptionsFor(ladder: VisionReasoning[], persisted: VisionReasoning): VisionReasoning[] {
+export function visionReasoningOptionsFor(
+  ladder: VisionReasoning[],
+  persisted: VisionReasoning,
+): VisionReasoning[] {
   const effective = clampVisionReasoningToLadder(ladder, persisted);
   return ladder.includes(effective) ? ladder : [effective, ...ladder];
 }
@@ -323,7 +368,7 @@ export function webSearchModelOptionsForPicker(
 ): WebSearchPickerOption[] {
   if (serverOptions === undefined) {
     const legacy: WebSearchPickerOption[] = sidecarModelOptions(models);
-    if (current && !legacy.some(option => option.value === current)) {
+    if (current && !legacy.some((option) => option.value === current)) {
       legacy.unshift({
         value: current,
         label: current,
@@ -333,13 +378,13 @@ export function webSearchModelOptionsForPicker(
     }
     return legacy;
   }
-  const out: WebSearchPickerOption[] = serverOptions.map(option => ({
+  const out: WebSearchPickerOption[] = serverOptions.map((option) => ({
     value: option.value,
     label: option.label,
     backend: option.backend,
     model: option.model,
   }));
-  if (current && !out.some(option => option.value === current)) {
+  if (current && !out.some((option) => option.value === current)) {
     out.unshift({
       value: current,
       label: current,
@@ -372,54 +417,78 @@ export function visionModelOptions(
   currentBackend?: VisionBackend,
 ): Array<{ value: string; label: string; backend?: VisionBackend }> {
   const options = serverOptions
-    ? serverOptions.map(option => ({ value: option.value, label: option.label, backend: option.backend }))
+    ? serverOptions.map((option) => ({
+        value: option.value,
+        label: option.label,
+        backend: option.backend,
+      }))
     : sidecarModelOptions(models);
-  if (current && !options.some(option => option.value === current)) {
-    options.unshift({ value: current, label: current, ...(currentBackend ? { backend: currentBackend } : {}) });
+  if (current && !options.some((option) => option.value === current)) {
+    options.unshift({
+      value: current,
+      label: current,
+      ...(currentBackend ? { backend: currentBackend } : {}),
+    });
   }
   return options;
 }
 
 /** Options for shadow-call replacement models use the proxy's canonical routing id. */
-export function shadowCallModelOptions(models: ModelInfo[], current: string | undefined, sourceModels?: string[]) {
+export function shadowCallModelOptions(
+  models: ModelInfo[],
+  current: string | undefined,
+  sourceModels?: string[],
+) {
   const sourcePrefixes = shadowSourceModelList(sourceModels);
-  const sourceIdentities = sourcePrefixes.flatMap(prefix => {
-    const source = models.find(model => model.namespaced.startsWith(prefix))
-      ?? models.find(model => model.id.startsWith(prefix));
+  const sourceIdentities = sourcePrefixes.flatMap((prefix) => {
+    const source =
+      models.find((model) => model.namespaced.startsWith(prefix)) ??
+      models.find((model) => model.id.startsWith(prefix));
     return source ? [{ provider: source.provider, modelId: prefix }] : [];
   });
-  const intersecting = models.filter(model => sourceIdentities.some(source =>
-    model.provider === source.provider && model.id.startsWith(source.modelId)));
+  const intersecting = models.filter((model) =>
+    sourceIdentities.some(
+      (source) => model.provider === source.provider && model.id.startsWith(source.modelId),
+    ),
+  );
   const invalidSelectors = new Set([
-    ...sourcePrefixes.flatMap(prefix => [prefix, `openai/${prefix}`]),
-    ...intersecting.flatMap(model => [model.namespaced, `${model.provider}/${model.id}`]),
+    ...sourcePrefixes.flatMap((prefix) => [prefix, `openai/${prefix}`]),
+    ...intersecting.flatMap((model) => [model.namespaced, `${model.provider}/${model.id}`]),
   ]);
   const out = [
     { value: "", label: "—" },
     ...models
-      .filter(model => !invalidSelectors.has(model.namespaced))
-      .map(model => ({ value: model.namespaced, label: model.namespaced })),
+      .filter((model) => !invalidSelectors.has(model.namespaced))
+      .map((model) => ({ value: model.namespaced, label: model.namespaced })),
   ];
-  if (current && !invalidSelectors.has(current) && !out.some(option => option.value === current)) {
+  if (
+    current &&
+    !invalidSelectors.has(current) &&
+    !out.some((option) => option.value === current)
+  ) {
     out.push({ value: current, label: current });
   }
   return out;
 }
 
 export function sidecarBackendForModel(models: ModelInfo[], modelId: string): SidecarBackend {
-  const provider = models.find(model => model.id === modelId)?.provider;
+  const provider = models.find((model) => model.id === modelId)?.provider;
   return provider === "anthropic" || provider === "anthropic2" ? "anthropic" : "openai";
 }
 
 /** Backend transitions must remove an old explicit pool in the same PATCH. */
 export function sidecarPatchForSave(current: SidecarData, patch: SidecarPatch): SidecarPatch {
-  function clearPool<T extends { backend?: string | null; anthropicInstance?: AnthropicInstanceId | null }>(
-    setting: SidecarSetting, update: T,
-  ): T {
-    return update.backend !== undefined && update.backend !== "anthropic" && setting.anthropicInstance !== undefined
-      ? { ...update, anthropicInstance: null } : update;
+  function clearPool<
+    T extends { backend?: string | null; anthropicInstance?: AnthropicInstanceId | null },
+  >(setting: SidecarSetting, update: T): T {
+    return update.backend !== undefined &&
+      update.backend !== "anthropic" &&
+      setting.anthropicInstance !== undefined
+      ? { ...update, anthropicInstance: null }
+      : update;
   }
-  return { ...patch,
+  return {
+    ...patch,
     ...(patch.webSearch ? { webSearch: clearPool(current.webSearch, patch.webSearch) } : {}),
     ...(patch.vision ? { vision: clearPool(current.vision, patch.vision) } : {}),
   };
@@ -431,7 +500,7 @@ export function webSearchSidecarSelectionForModel(
   options: WebSearchPickerOption[],
   modelId: string,
 ): { backend: SidecarBackend; model: string } {
-  const option = options.find(entry => entry.value === modelId);
+  const option = options.find((entry) => entry.value === modelId);
   return {
     backend: option?.backend ?? sidecarBackendForModel(models, modelId),
     model: option?.model ?? modelId,
@@ -450,7 +519,7 @@ export function visionSidecarBackendForModel(
   options: Array<{ value: string; backend?: VisionBackend }>,
   modelId: string,
 ): VisionBackend {
-  const fromServer = options.find(option => option.value === modelId)?.backend;
+  const fromServer = options.find((option) => option.value === modelId)?.backend;
   if (fromServer) return fromServer;
   if (modelId.includes("/")) return "routed";
   return sidecarBackendForModel(models, modelId);
@@ -458,8 +527,20 @@ export function visionSidecarBackendForModel(
 
 let lastInputWasKeyboard = false;
 if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
-  window.addEventListener("keydown", () => { lastInputWasKeyboard = true; }, { capture: true, passive: true });
-  window.addEventListener("pointerdown", () => { lastInputWasKeyboard = false; }, { capture: true, passive: true });
+  window.addEventListener(
+    "keydown",
+    () => {
+      lastInputWasKeyboard = true;
+    },
+    { capture: true, passive: true },
+  );
+  window.addEventListener(
+    "pointerdown",
+    () => {
+      lastInputWasKeyboard = false;
+    },
+    { capture: true, passive: true },
+  );
 }
 
 function focusTriggerQuietly(trigger: HTMLButtonElement | null) {
@@ -491,11 +572,14 @@ export function useModalDialog(open: boolean, triggerRef: RefObject<HTMLButtonEl
     focusTriggerQuietly(triggerRef.current);
   }, [open, triggerRef]);
 
-  useEffect(() => () => {
-    const dialog = dialogRef.current;
-    if (dialog?.open) dialog.close();
-    focusTriggerQuietly(triggerRef.current);
-  }, [triggerRef]);
+  useEffect(
+    () => () => {
+      const dialog = dialogRef.current;
+      if (dialog?.open) dialog.close();
+      focusTriggerQuietly(triggerRef.current);
+    },
+    [triggerRef],
+  );
 
   return dialogRef;
 }

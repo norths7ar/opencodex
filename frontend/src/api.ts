@@ -1,25 +1,39 @@
 import { promptForAdminToken, type AdminTokenVerifier } from "./admin-token-dialog";
 import { createBoundedFetch, withFetchDeadline } from "./bounded-fetch";
-import { adminTokenPromptAllowed, standaloneApiTargets, type ApiPlane, type ApiTarget, type ApiTargets } from "./api-targets";
+import {
+  adminTokenPromptAllowed,
+  standaloneApiTargets,
+  type ApiPlane,
+  type ApiTarget,
+  type ApiTargets,
+} from "./api-targets";
 
 /** Non-secret generation fencing every Usage report and inventory. */
 export const USAGE_SESSION_CHANGED = "opencodex:usage-session-changed";
 type UsageSessionSnapshot = { generation: number; blocked: boolean };
 let usageSession: UsageSessionSnapshot = { generation: 0, blocked: false };
-export function usageSessionSnapshot(): UsageSessionSnapshot { return usageSession; }
+export function usageSessionSnapshot(): UsageSessionSnapshot {
+  return usageSession;
+}
 export function purgeLegacyUsageCache(): void {
   try {
     for (let i = sessionStorage.length - 1; i >= 0; i--) {
       const key = sessionStorage.key(i);
       if (key?.startsWith("ocx.usage.v2:")) sessionStorage.removeItem(key);
     }
-  } catch { /* Storage may be unavailable. */ }
+  } catch {
+    /* Storage may be unavailable. */
+  }
 }
 function changeUsageSession(blocked: boolean): void {
   usageSession = { generation: usageSession.generation + 1, blocked };
   purgeLegacyUsageCache();
   if (typeof window !== "undefined") {
-    try { window.dispatchEvent(new window.Event(USAGE_SESSION_CHANGED)); } catch { /* Non-browser event environments. */ }
+    try {
+      window.dispatchEvent(new window.Event(USAGE_SESSION_CHANGED));
+    } catch {
+      /* Non-browser event environments. */
+    }
   }
 }
 /** An old request cannot revoke a newer session. */
@@ -40,8 +54,15 @@ function sourceInventoryMutation(path: string | null, method: string): boolean {
 
 export function sourceInventoryEventMatches(event: Event, apiBase: string): boolean {
   const detail = (event as CustomEvent<{ apiBase?: string }>).detail;
-  try { return typeof detail?.apiBase === "string" && new URL(detail.apiBase || "/", window.location.href).href.replace(/\/+$/, "") === new URL(apiBase || "/", window.location.href).href.replace(/\/+$/, ""); }
-  catch { return false; }
+  try {
+    return (
+      typeof detail?.apiBase === "string" &&
+      new URL(detail.apiBase || "/", window.location.href).href.replace(/\/+$/, "") ===
+        new URL(apiBase || "/", window.location.href).href.replace(/\/+$/, "")
+    );
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -80,13 +101,26 @@ interface TargetRuntime {
   promptCancelled: boolean;
 }
 
-interface SessionRevision { state: TargetRuntime; generation: object }
-interface SessionSnapshot extends SessionRevision { token: string | null }
-interface RecoveryAttempt extends SessionRevision { plane: ApiPlane; active: boolean }
+interface SessionRevision {
+  state: TargetRuntime;
+  generation: object;
+}
+interface SessionSnapshot extends SessionRevision {
+  token: string | null;
+}
+interface RecoveryAttempt extends SessionRevision {
+  plane: ApiPlane;
+  active: boolean;
+}
 
-type AdminTokenPrompt = (verifyToken: AdminTokenVerifier, rememberAllowed?: boolean) => Promise<string | null>;
-const defaultAdminTokenPrompt: AdminTokenPrompt = (verify, allowed) => promptForAdminToken(verify, undefined, allowed);
-type RebootstrapResult = { kind: "minted"; token: string } | { kind: "unavailable" } | { kind: "failed" };
+type AdminTokenPrompt = (
+  verifyToken: AdminTokenVerifier,
+  rememberAllowed?: boolean,
+) => Promise<string | null>;
+const defaultAdminTokenPrompt: AdminTokenPrompt = (verify, allowed) =>
+  promptForAdminToken(verify, undefined, allowed);
+type RebootstrapResult =
+  { kind: "minted"; token: string } | { kind: "unavailable" } | { kind: "failed" };
 
 let installed = false;
 let rawFetch: typeof fetch | null = null;
@@ -99,21 +133,26 @@ const sessionHandoffOwners = new WeakMap<ApiSessionState, object>();
 
 function reportSessionEvent(plane: ApiPlane, event: string): void {
   if (typeof window === "undefined") return;
-  if (plane === "shared" && event === SESSION_UNAVAILABLE_EVENT && !usageSession.blocked) changeUsageSession(true);
+  if (plane === "shared" && event === SESSION_UNAVAILABLE_EVENT && !usageSession.blocked)
+    changeUsageSession(true);
   // Take the constructor off the same window we dispatch on: a test harness (and a
   // sandboxed embed) can supply a document without installing CustomEvent globally.
-  const Ctor = (window as unknown as { CustomEvent?: typeof CustomEvent }).CustomEvent
-    ?? (typeof CustomEvent === "function" ? CustomEvent : null);
+  const Ctor =
+    (window as unknown as { CustomEvent?: typeof CustomEvent }).CustomEvent ??
+    (typeof CustomEvent === "function" ? CustomEvent : null);
   if (!Ctor) return;
   try {
     window.dispatchEvent(new Ctor(event, { detail: { plane } }));
-  } catch { /* a shell that cannot receive the notice must not break the fetch path */ }
+  } catch {
+    /* a shell that cannot receive the notice must not break the fetch path */
+  }
 }
 
 function advanceSessionGeneration(state: TargetRuntime, notifyUsage = true): void {
   state.generation = {};
   state.resolutionInFlight = null;
-  if (notifyUsage && state.target.id === "shared") changeUsageSession(!!state.logoutBarrier || !state.session.token);
+  if (notifyUsage && state.target.id === "shared")
+    changeUsageSession(!!state.logoutBarrier || !state.session.token);
 }
 
 function sessionSnapshot(state: TargetRuntime): SessionSnapshot {
@@ -121,14 +160,22 @@ function sessionSnapshot(state: TargetRuntime): SessionSnapshot {
 }
 
 function isCurrentRevision(plane: ApiPlane, revision: SessionRevision): boolean {
-  return runtimes.get(plane) === revision.state && revision.state.generation === revision.generation;
+  return (
+    runtimes.get(plane) === revision.state && revision.state.generation === revision.generation
+  );
 }
 
 function isCurrentRecovery(recovery: RecoveryAttempt): boolean {
-  return recovery.active && !recovery.state.logoutBarrier && isCurrentRevision(recovery.plane, recovery);
+  return (
+    recovery.active && !recovery.state.logoutBarrier && isCurrentRevision(recovery.plane, recovery)
+  );
 }
 
-function updateSession(state: TargetRuntime, session: ApiSessionState, recovery?: RecoveryAttempt): void {
+function updateSession(
+  state: TargetRuntime,
+  session: ApiSessionState,
+  recovery?: RecoveryAttempt,
+): void {
   if (recovery && !isCurrentRecovery(recovery)) return;
   const changed = state.session.token !== session.token;
   advanceSessionGeneration(state, false);
@@ -144,7 +191,11 @@ function blankSession(): ApiSessionState {
 }
 
 /** Automatic invalidation retains rollback authority; login, logout and target changes do not. */
-function invalidateSession(state: TargetRuntime, recovery?: RecoveryAttempt, handoffOwner?: object): void {
+function invalidateSession(
+  state: TargetRuntime,
+  recovery?: RecoveryAttempt,
+  handoffOwner?: object,
+): void {
   const cleared = blankSession();
   const owner = handoffOwner ?? sessionHandoffOwners.get(state.session);
   if (owner) sessionHandoffOwners.set(cleared, owner);
@@ -164,7 +215,8 @@ export function configureApiTargets(targets: ApiTargets): void {
   configuredTargets = targets;
   for (const plane of ["machine", "shared"] as const) {
     const current = runtimes.get(plane);
-    if (current && !sameTarget(current.target, targets[plane])) updateSession(current, blankSession());
+    if (current && !sameTarget(current.target, targets[plane]))
+      updateSession(current, blankSession());
     if (current && sameTarget(current.target, targets[plane])) {
       if (current.target.bootstrapPath !== targets[plane].bootstrapPath) {
         advanceSessionGeneration(current);
@@ -172,9 +224,15 @@ export function configureApiTargets(targets: ApiTargets): void {
         sessionHandoffOwners.delete(current.session);
       }
       current.target = targets[plane];
-    } else runtimes.set(plane, {
-      target: targets[plane], session: blankSession(), generation: {}, logoutBarrier: null, resolutionInFlight: null, promptCancelled: false,
-    });
+    } else
+      runtimes.set(plane, {
+        target: targets[plane],
+        session: blankSession(),
+        generation: {},
+        logoutBarrier: null,
+        resolutionInFlight: null,
+        promptCancelled: false,
+      });
   }
 }
 
@@ -185,7 +243,8 @@ function runtime(plane: ApiPlane): TargetRuntime {
 
 function clearSessionIfCurrent(plane: ApiPlane, expected: string | null): void {
   const state = runtime(plane);
-  if (!state.logoutBarrier && expected !== null && state.session.token === expected) invalidateSession(state);
+  if (!state.logoutBarrier && expected !== null && state.session.token === expected)
+    invalidateSession(state);
 }
 
 function storeSession(
@@ -199,8 +258,12 @@ function storeSession(
 ): boolean {
   if (recovery && !isCurrentRecovery(recovery)) return false;
   const state = runtime(plane);
-  if (!token?.startsWith("ocx_session_") || !csrfToken
-    || browserOrigin !== window.location.origin || serverOrigin !== state.target.serverOrigin) {
+  if (
+    !token?.startsWith("ocx_session_") ||
+    !csrfToken ||
+    browserOrigin !== window.location.origin ||
+    serverOrigin !== state.target.serverOrigin
+  ) {
     invalidateSession(state, recovery, handoffOwner);
     return false;
   }
@@ -231,15 +294,23 @@ export async function logoutApiSession(plane: ApiPlane): Promise<boolean> {
   barrier.pending++;
   const bounded = createBoundedFetch(SESSION_REBOOTSTRAP_TIMEOUT_MS);
   try {
-    const response = await fetchApiSessionValidation(plane, `${state.target.baseUrl}/api/session/logout`, {
-      method: "POST",
-      signal: bounded.signal,
-    });
+    const response = await fetchApiSessionValidation(
+      plane,
+      `${state.target.baseUrl}/api/session/logout`,
+      {
+        method: "POST",
+        signal: bounded.signal,
+      },
+    );
     if (!response.ok) return false;
     barrier.completed = true;
     if (runtimes.get(plane) === state && state.logoutBarrier === barrier) {
       if (canRememberDashboardDevice(plane)) {
-        try { window.localStorage.removeItem(DEVICE_PROOF_KEY); } catch { /* storage may be disabled */ }
+        try {
+          window.localStorage.removeItem(DEVICE_PROOF_KEY);
+        } catch {
+          /* storage may be disabled */
+        }
         reportSessionEvent(plane, DEVICE_PROOF_CHANGED_EVENT);
       }
       updateSession(state, blankSession());
@@ -293,7 +364,12 @@ export function installApiSessionFromHtml(plane: ApiPlane, html: string): boolea
   return installSessionFromHtml(plane, html);
 }
 
-function installSessionFromHtml(plane: ApiPlane, html: string, recovery?: RecoveryAttempt, handoffOwner?: object): boolean {
+function installSessionFromHtml(
+  plane: ApiPlane,
+  html: string,
+  recovery?: RecoveryAttempt,
+  handoffOwner?: object,
+): boolean {
   return storeSession(
     plane,
     metaContentFromHtml(html, "opencodex-session-token"),
@@ -324,46 +400,75 @@ export function beginApiSessionHandoff(plane: ApiPlane) {
       if (!previous || !isCurrentRevision(plane, revision)) return false;
       const accepted = installSessionFromHtml(plane, html, undefined, owner);
       // Event listeners may synchronously install a newer session or start logout.
-      return accepted && runtimes.get(plane) === state && sessionHandoffOwners.get(state.session) === owner;
+      return (
+        accepted &&
+        runtimes.get(plane) === state &&
+        sessionHandoffOwners.get(state.session) === owner
+      );
     },
     commit: release,
     rollback(): void {
       // Background 401 recovery may have cleared the candidate without replacing its owner.
       const current = runtime(plane);
-      if (previous && sameTarget(current.target, state.target) && sessionHandoffOwners.get(current.session) === owner) updateSession(current, previous);
+      if (
+        previous &&
+        sameTarget(current.target, state.target) &&
+        sessionHandoffOwners.get(current.session) === owner
+      )
+        updateSession(current, previous);
       release();
     },
   };
 }
 
 /** Inspect this session's response without the normal 401 renewal or admin-token fallback. */
-export function fetchApiSessionValidation(plane: ApiPlane, input: RequestInfo | URL, init: RequestInit): Promise<Response> {
+export function fetchApiSessionValidation(
+  plane: ApiPlane,
+  input: RequestInfo | URL,
+  init: RequestInit,
+): Promise<Response> {
   const [authenticatedInput, authenticatedInit] = withAuth(plane, input, init);
   return (rawFetch ?? window.fetch.bind(window))(authenticatedInput, authenticatedInit);
 }
 
 function clearLegacySessionToken(): void {
-  try { sessionStorage.removeItem(LEGACY_TOKEN_KEY); } catch { /* storage may be disabled */ }
+  try {
+    sessionStorage.removeItem(LEGACY_TOKEN_KEY);
+  } catch {
+    /* storage may be disabled */
+  }
   try {
     const storage = window.localStorage;
     for (let i = storage.length - 1; i >= 0; i--) {
       const key = storage.key(i);
-      if (key === "opencodex.remembered-admin-token" || key?.startsWith("opencodex.remembered-admin-token:")) storage.removeItem(key);
+      if (
+        key === "opencodex.remembered-admin-token" ||
+        key?.startsWith("opencodex.remembered-admin-token:")
+      )
+        storage.removeItem(key);
     }
-  } catch { /* do not read or migrate old bearer tokens */ }
+  } catch {
+    /* do not read or migrate old bearer tokens */
+  }
 }
 
 export function canRememberDashboardDevice(plane: ApiPlane): boolean {
   const target = runtime(plane).target;
-  return target.serverOrigin === window.location.origin
-    && (window.location.protocol === "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname));
+  return (
+    target.serverOrigin === window.location.origin &&
+    (window.location.protocol === "https:" ||
+      ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname))
+  );
 }
 
 /** Enrollment, not capability: the Forget control exists only once a proof is stored. */
 export function hasRememberedDashboardDevice(plane: ApiPlane): boolean {
   if (!canRememberDashboardDevice(plane)) return false;
-  try { return DEVICE_PROOF_PATTERN.test(window.localStorage.getItem(DEVICE_PROOF_KEY) ?? ""); }
-  catch { return false; }
+  try {
+    return DEVICE_PROOF_PATTERN.test(window.localStorage.getItem(DEVICE_PROOF_KEY) ?? "");
+  } catch {
+    return false;
+  }
 }
 
 function targetAbsoluteBase(target: ApiTarget): URL {
@@ -387,26 +492,39 @@ function classify(input: RequestInfo | URL): { plane: ApiPlane; bootstrap: boole
   let url: URL;
   try {
     url = new URL(input instanceof Request ? input.url : String(input), window.location.href);
-  } catch { return null; }
+  } catch {
+    return null;
+  }
   const targets = ensureTargets();
-  if (url.href === new URL(targets.shared.bootstrapPath, window.location.href).href) return { plane: "shared", bootstrap: true };
+  if (url.href === new URL(targets.shared.bootstrapPath, window.location.href).href)
+    return { plane: "shared", bootstrap: true };
   const machinePath = relativeTargetPath(targets.machine, url);
-  if (machinePath?.startsWith("/api/codex/desktop-compatibility/")) return { plane: "machine", bootstrap: false };
+  if (machinePath?.startsWith("/api/codex/desktop-compatibility/"))
+    return { plane: "machine", bootstrap: false };
   const sharedPath = relativeTargetPath(targets.shared, url);
   if (sharedPath?.startsWith("/api/")) return { plane: "shared", bootstrap: false };
-  if (url.href === new URL(targets.machine.bootstrapPath, window.location.href).href) return { plane: "machine", bootstrap: true };
+  if (url.href === new URL(targets.machine.bootstrapPath, window.location.href).href)
+    return { plane: "machine", bootstrap: true };
   return null;
 }
 
-function sessionHeaders(plane: ApiPlane, input: RequestInfo | URL, init?: RequestInit, overrideToken?: string | null): Headers {
+function sessionHeaders(
+  plane: ApiPlane,
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  overrideToken?: string | null,
+): Headers {
   const state = runtime(plane);
-  const headers = new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined));
+  const headers = new Headers(
+    init?.headers ?? (input instanceof Request ? input.headers : undefined),
+  );
   const token = overrideToken === undefined ? state.session.token : overrideToken;
   const method = (init?.method ?? (input instanceof Request ? input.method : "GET")).toUpperCase();
   if (token) headers.set("X-OpenCodex-API-Key", token);
   if (token?.startsWith("ocx_session_") && state.session.browserOrigin && state.session.csrfToken) {
     headers.set("X-OpenCodex-GUI-Origin", state.session.browserOrigin);
-    if (method !== "GET" && method !== "HEAD") headers.set("X-OpenCodex-CSRF-Token", state.session.csrfToken);
+    if (method !== "GET" && method !== "HEAD")
+      headers.set("X-OpenCodex-CSRF-Token", state.session.csrfToken);
   }
   return headers;
 }
@@ -418,63 +536,128 @@ function withAuth(
   overrideToken?: string | null,
 ): [RequestInfo | URL, RequestInit | undefined] {
   const headers = sessionHeaders(plane, input, init, overrideToken);
-  if (input instanceof Request) return [new Request(input, { headers }), init ? { ...init, headers } : undefined];
+  if (input instanceof Request)
+    return [new Request(input, { headers }), init ? { ...init, headers } : undefined];
   return [input, { ...init, headers }];
 }
 
-async function reBootstrapSessionToken(recovery: RecoveryAttempt, caller?: AbortSignal, deadlineMs = rebootstrapTimeoutMs): Promise<RebootstrapResult> {
+async function reBootstrapSessionToken(
+  recovery: RecoveryAttempt,
+  caller?: AbortSignal,
+  deadlineMs = rebootstrapTimeoutMs,
+): Promise<RebootstrapResult> {
   if (!rawFetch || !isCurrentRecovery(recovery)) return { kind: "failed" };
   const { plane, state } = recovery;
   const send = rawFetch;
   try {
-    return await withFetchDeadline<RebootstrapResult>(deadlineMs, caller, async signal => {
+    return await withFetchDeadline<RebootstrapResult>(deadlineMs, caller, async (signal) => {
       const headers = new Headers();
-      if (canRememberDashboardDevice(plane) && new URL(state.target.bootstrapPath, window.location.href).origin === window.location.origin) {
+      if (
+        canRememberDashboardDevice(plane) &&
+        new URL(state.target.bootstrapPath, window.location.href).origin === window.location.origin
+      ) {
         try {
           const proof = window.localStorage.getItem(DEVICE_PROOF_KEY);
-          if (proof && DEVICE_PROOF_PATTERN.test(proof)) headers.set("X-OpenCodex-Device-Proof", proof);
-        } catch { /* ordinary session bootstrap still works without browser storage */ }
+          if (proof && DEVICE_PROOF_PATTERN.test(proof))
+            headers.set("X-OpenCodex-Device-Proof", proof);
+        } catch {
+          /* ordinary session bootstrap still works without browser storage */
+        }
       }
-      const [input, init] = withAuth(plane, state.target.bootstrapPath, { cache: "no-store", redirect: "error", signal, headers }, null);
+      const [input, init] = withAuth(
+        plane,
+        state.target.bootstrapPath,
+        { cache: "no-store", redirect: "error", signal, headers },
+        null,
+      );
       const response = await send(input, init);
       if (signal.aborted || !isCurrentRecovery(recovery)) return { kind: "failed" };
-      if (!response.ok) return response.status >= 400 && response.status < 500 ? { kind: "unavailable" } : { kind: "failed" };
-      const html = await response.text();
-      if (signal.aborted || !isCurrentRecovery(recovery)) return { kind: "failed" };
-      if (!installSessionFromHtml(plane, html, recovery)) return { kind: "unavailable" };
+      if (!response.ok)
+        return response.status >= 400 && response.status < 500
+          ? { kind: "unavailable" }
+          : { kind: "failed" };
+      let installed: boolean;
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const body = await response.json();
+        if (signal.aborted || !isCurrentRecovery(recovery)) return { kind: "failed" };
+        installed = storeSession(
+          plane,
+          body.token,
+          body.csrfToken,
+          body.browserOrigin,
+          body.serverOrigin,
+          recovery,
+        );
+      } else {
+        const html = await response.text();
+        if (signal.aborted || !isCurrentRecovery(recovery)) return { kind: "failed" };
+        installed = installSessionFromHtml(plane, html, recovery);
+      }
+      if (!installed) return { kind: "unavailable" };
       return { kind: "minted", token: state.session.token! };
     });
-  } catch { return { kind: "failed" }; }
+  } catch {
+    return { kind: "failed" };
+  }
 }
 
 /** Discovery is automatic recovery, never an explicit login that can override logout. */
 export async function bootstrapApiSession(plane: ApiPlane, signal?: AbortSignal): Promise<boolean> {
   const state = runtime(plane);
   const recovery: RecoveryAttempt = { plane, state, generation: state.generation, active: true };
-  try { return (await reBootstrapSessionToken(recovery, signal, 5_000)).kind === "minted"; }
-  finally { recovery.active = false; }
+  try {
+    return (await reBootstrapSessionToken(recovery, signal, 5_000)).kind === "minted";
+  } finally {
+    recovery.active = false;
+  }
 }
 
-async function verifyAdminToken(recovery: RecoveryAttempt, token: string, remember = false): ReturnType<AdminTokenVerifier> {
+async function verifyAdminToken(
+  recovery: RecoveryAttempt,
+  token: string,
+  remember = false,
+): ReturnType<AdminTokenVerifier> {
   if (!rawFetch) return "unavailable";
   const { plane, state } = recovery;
   if (remember && !canRememberDashboardDevice(plane)) return "unavailable";
   try {
-    return await withFetchDeadline(rebootstrapTimeoutMs, undefined, async signal => {
+    return await withFetchDeadline(rebootstrapTimeoutMs, undefined, async (signal) => {
       const path = remember ? "/api/session/remember" : ADMIN_TOKEN_VALIDATION_PATH;
-      const [input, init] = withAuth(plane, state.target.baseUrl + path,
-        { method: remember ? "POST" : "GET", cache: "no-store", signal, credentials: remember ? "same-origin" : "omit", redirect: "error" }, token);
+      const [input, init] = withAuth(
+        plane,
+        state.target.baseUrl + path,
+        {
+          method: remember ? "POST" : "GET",
+          cache: "no-store",
+          signal,
+          credentials: remember ? "same-origin" : "omit",
+          redirect: "error",
+        },
+        token,
+      );
       const response = await rawFetch!(input, init);
       if (signal.aborted || !isCurrentRecovery(recovery)) return "unavailable";
       if (response.status === 401) return "rejected";
       if (!response.ok) return "unavailable";
       if (remember) {
         const body = await response.json();
-        if (signal.aborted || !isCurrentRecovery(recovery) || !storeSession(plane, body?.session?.token,
-          body?.session?.csrfToken, body?.session?.browserOrigin, body?.session?.serverOrigin, recovery)) return "unavailable";
+        if (
+          signal.aborted ||
+          !isCurrentRecovery(recovery) ||
+          !storeSession(
+            plane,
+            body?.session?.token,
+            body?.session?.csrfToken,
+            body?.session?.browserOrigin,
+            body?.session?.serverOrigin,
+            recovery,
+          )
+        )
+          return "unavailable";
         try {
           const proof = body?.device?.proof;
-          if (typeof proof !== "string" || !DEVICE_PROOF_PATTERN.test(proof)) throw new Error("Invalid device proof");
+          if (typeof proof !== "string" || !DEVICE_PROOF_PATTERN.test(proof))
+            throw new Error("Invalid device proof");
           window.localStorage.setItem(DEVICE_PROOF_KEY, proof);
           reportSessionEvent(plane, DEVICE_PROOF_CHANGED_EVENT);
         } catch {
@@ -484,10 +667,16 @@ async function verifyAdminToken(recovery: RecoveryAttempt, token: string, rememb
       }
       return "accepted";
     });
-  } catch { return "unavailable"; }
+  } catch {
+    return "unavailable";
+  }
 }
 
-async function resolveTokenAfter401(plane: ApiPlane, failedToken: string | null, callerSignal?: AbortSignal): Promise<SessionSnapshot | null> {
+async function resolveTokenAfter401(
+  plane: ApiPlane,
+  failedToken: string | null,
+  callerSignal?: AbortSignal,
+): Promise<SessionSnapshot | null> {
   const state = runtime(plane);
   if (callerSignal?.aborted || state.logoutBarrier) return null;
   if (state.promptCancelled) return sessionSnapshot(state);
@@ -499,10 +688,12 @@ async function resolveTokenAfter401(plane: ApiPlane, failedToken: string | null,
       let watchdog: ReturnType<typeof setTimeout> | undefined;
       const renewed = await Promise.race([
         reBootstrapSessionToken(recovery),
-        new Promise<RebootstrapResult>(resolve => { watchdog = setTimeout(() => {
-          recovery.active = false;
-          resolve({ kind: "failed" });
-        }, resolutionWatchdogMs); }),
+        new Promise<RebootstrapResult>((resolve) => {
+          watchdog = setTimeout(() => {
+            recovery.active = false;
+            resolve({ kind: "failed" });
+          }, resolutionWatchdogMs);
+        }),
       ]).finally(() => clearTimeout(watchdog));
       if (!isCurrentRevision(plane, recovery)) return null;
       // Expiry stops late writes, but a still-current timeout must notify the shell.
@@ -524,7 +715,16 @@ async function resolveTokenAfter401(plane: ApiPlane, failedToken: string | null,
       if (!isCurrentRecovery(recovery)) return null;
       if (prompted) {
         if (state.session.token?.startsWith("ocx_session_")) return sessionSnapshot(state);
-        updateSession(state, { token: prompted, csrfToken: null, browserOrigin: null, serverOrigin: state.target.serverOrigin }, recovery);
+        updateSession(
+          state,
+          {
+            token: prompted,
+            csrfToken: null,
+            browserOrigin: null,
+            serverOrigin: state.target.serverOrigin,
+          },
+          recovery,
+        );
         return isCurrentRecovery(recovery) ? sessionSnapshot(state) : null;
       }
       state.promptCancelled = true;
@@ -538,7 +738,7 @@ async function resolveTokenAfter401(plane: ApiPlane, failedToken: string | null,
   }
   if (!callerSignal) return state.resolutionInFlight;
   let onAbort: (() => void) | undefined;
-  const aborted = new Promise<null>(resolve => {
+  const aborted = new Promise<null>((resolve) => {
     onAbort = () => resolve(null);
     callerSignal.addEventListener("abort", onAbort, { once: true });
   });
@@ -562,33 +762,58 @@ export function installApiAuthFetch(): void {
     const generation = state.generation;
     const usageGeneration = usageSession.generation;
     const token = state.session.token;
-    const method = (init?.method ?? (input instanceof Request ? input.method : "GET")).toUpperCase();
+    const method = (
+      init?.method ?? (input instanceof Request ? input.method : "GET")
+    ).toUpperCase();
     let mutation = false;
     let usageRequest = false;
     try {
-      const url = new URL(input instanceof Request ? input.url : String(input), window.location.href);
+      const url = new URL(
+        input instanceof Request ? input.url : String(input),
+        window.location.href,
+      );
       const path = relativeTargetPath(state.target, url);
       mutation = classified.plane === "shared" && sourceInventoryMutation(path, method);
       usageRequest = path === "/api/usage" || path === "/api/usage/source-facets";
-    } catch { /* A malformed URL cannot name an inventory mutation. */ }
+    } catch {
+      /* A malformed URL cannot name an inventory mutation. */
+    }
     const mutationBase = state.target.baseUrl;
     const finish = (result: Response) => {
       if (mutation && result.ok) {
-        try { window.dispatchEvent(new window.CustomEvent(USAGE_SOURCE_INVENTORY_CHANGED, { detail: { apiBase: mutationBase } })); }
-        catch { /* A notification failure must not turn a successful mutation into an error. */ }
+        try {
+          window.dispatchEvent(
+            new window.CustomEvent(USAGE_SOURCE_INVENTORY_CHANGED, {
+              detail: { apiBase: mutationBase },
+            }),
+          );
+        } catch {
+          /* A notification failure must not turn a successful mutation into an error. */
+        }
       }
       return result;
     };
     // Pairing exchanges must not carry the old shared-plane credential. The relay's
     // separate machine-session headers are still attached by sessionHeaders().
     const pairingExchange = classified.bootstrap && method === "POST";
-    const [firstInput, firstInit] = withAuth(classified.plane, input, init, pairingExchange ? null : undefined);
+    const [firstInput, firstInit] = withAuth(
+      classified.plane,
+      input,
+      init,
+      pairingExchange ? null : undefined,
+    );
     const callerSignal = init?.signal ?? (input instanceof Request ? input.signal : undefined);
     const response = await originalFetch(firstInput, firstInit);
-    if (callerSignal?.aborted && (response.status === 401 || response.status === 403)) return response;
+    if (callerSignal?.aborted && (response.status === 401 || response.status === 403))
+      return response;
     const recoverUsage = usageRequest && !callerSignal?.aborted;
-    if (!classified.bootstrap && classified.plane === "shared" && state.generation === generation
-      && response.status === 401) denyUsageSession(usageGeneration);
+    if (
+      !classified.bootstrap &&
+      classified.plane === "shared" &&
+      state.generation === generation &&
+      response.status === 401
+    )
+      denyUsageSession(usageGeneration);
     if (classified.bootstrap || response.status !== 401) return finish(response);
     if (runtimes.get(classified.plane) !== state || state.logoutBarrier) return response;
     const refreshed = state.session.token;
@@ -606,14 +831,18 @@ export function installApiAuthFetch(): void {
     // Usage invalidation unsubscribes its loader and aborts its signal. Once an actual 401
     // arrived, let the existing single-flight recovery finish independently; a request
     // already cancelled before the 401 must not start recovery.
-    const recoverySignal = recoverUsage ? undefined : callerSignal ?? undefined;
+    const recoverySignal = recoverUsage ? undefined : (callerSignal ?? undefined);
     const recoveryRevision = sessionSnapshot(state);
     let next: SessionSnapshot | null;
     try {
       next = await resolveTokenAfter401(classified.plane, token, recoverySignal);
     } catch (error) {
       if (!recoverUsage) throw error;
-      if (isCurrentRevision(classified.plane, recoveryRevision) && !state.logoutBarrier && !state.session.token) {
+      if (
+        isCurrentRevision(classified.plane, recoveryRevision) &&
+        !state.logoutBarrier &&
+        !state.session.token
+      ) {
         reportSessionEvent(classified.plane, SESSION_UNAVAILABLE_EVENT);
       }
       return response;
@@ -622,7 +851,8 @@ export function installApiAuthFetch(): void {
     if (!next.token) {
       // Usage recovery is deliberately detached after an observed 401: its loader was
       // aborted by session invalidation, but the still-current recovery owns this notice.
-      if ((recoverUsage || !callerSignal?.aborted) && !hasApiSession(classified.plane)) reportSessionEvent(classified.plane, SESSION_UNAVAILABLE_EVENT);
+      if ((recoverUsage || !callerSignal?.aborted) && !hasApiSession(classified.plane))
+        reportSessionEvent(classified.plane, SESSION_UNAVAILABLE_EVENT);
       return response;
     }
     if (callerSignal?.aborted) return response;
@@ -630,7 +860,8 @@ export function installApiAuthFetch(): void {
     const retry = await originalFetch(retryInput, retryInit);
     if (retry.status === 401 && isCurrentRevision(classified.plane, next)) {
       clearSessionIfCurrent(classified.plane, next.token);
-      if (!callerSignal?.aborted && !hasApiSession(classified.plane)) reportSessionEvent(classified.plane, SESSION_UNAVAILABLE_EVENT);
+      if (!callerSignal?.aborted && !hasApiSession(classified.plane))
+        reportSessionEvent(classified.plane, SESSION_UNAVAILABLE_EVENT);
     }
     return finish(retry);
   };
@@ -639,14 +870,23 @@ export function installApiAuthFetch(): void {
 /** Audio is data-plane traffic; never attach dashboard credentials. */
 export function fetchAudioUpload(endpoint: string, init: RequestInit): Promise<Response> {
   const url = new URL(endpoint);
-  if (!["http:", "https:"].includes(url.protocol) || url.pathname !== "/v1/audio/transcriptions"
-    || url.username || url.password || url.search || url.hash || init.method !== "POST") {
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.pathname !== "/v1/audio/transcriptions" ||
+    url.username ||
+    url.password ||
+    url.search ||
+    url.hash ||
+    init.method !== "POST"
+  ) {
     return Promise.reject(new Error("Invalid audio upload destination"));
   }
   return (rawFetch ?? fetch)(url.href, { ...init, credentials: "omit", redirect: "error" });
 }
 
-export function resetApiAuthFetchForTests(adminTokenPrompt: AdminTokenPrompt = defaultAdminTokenPrompt): void {
+export function resetApiAuthFetchForTests(
+  adminTokenPrompt: AdminTokenPrompt = defaultAdminTokenPrompt,
+): void {
   changeUsageSession(false);
   installed = false;
   rawFetch = null;
@@ -657,5 +897,9 @@ export function resetApiAuthFetchForTests(adminTokenPrompt: AdminTokenPrompt = d
   resolutionWatchdogMs = RESOLUTION_WATCHDOG_MS;
 }
 
-export function setRebootstrapTimeoutForTests(ms: number): void { rebootstrapTimeoutMs = ms; }
-export function setResolutionWatchdogForTests(ms: number): void { resolutionWatchdogMs = ms; }
+export function setRebootstrapTimeoutForTests(ms: number): void {
+  rebootstrapTimeoutMs = ms;
+}
+export function setResolutionWatchdogForTests(ms: number): void {
+  resolutionWatchdogMs = ms;
+}
