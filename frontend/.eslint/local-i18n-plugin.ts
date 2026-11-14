@@ -34,8 +34,7 @@ type LocalRuleModule = {
 const LITERAL_PATTERN =
   /[A-Za-zÀ-ÖØ-öø-ÿ\u0100-\u024F\u1E00-\u1EFF\u0400-\u04FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/u;
 
-const HTML_CHARACTER_REFERENCE_PATTERN =
-  /&(?:#\d+|#x[0-9A-Fa-f]+|[A-Za-z][A-Za-z0-9]+);/g;
+const HTML_CHARACTER_REFERENCE_PATTERN = /&(?:#\d+|#x[0-9A-Fa-f]+|[A-Za-z][A-Za-z0-9]+);/g;
 
 const UI_ATTRS = new Set([
   "title",

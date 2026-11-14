@@ -31,9 +31,7 @@ const BRAND_LITERALS = new Set([
   "API",
 ]);
 
-const BRAND_LITERALS_LOWER = new Set(
-  [...BRAND_LITERALS].map((name) => name.toLowerCase()),
-);
+const BRAND_LITERALS_LOWER = new Set([...BRAND_LITERALS].map((name) => name.toLowerCase()));
 
 /** Single-token technical units / abbreviations shown next to numbers. */
 const TECHNICAL_UNITS = new Set([
@@ -72,9 +70,7 @@ export function isTechnicalLiteral(value: string): boolean {
   if (/^[?&][a-zA-Z_][\w-]*=$/.test(trimmed)) return true;
 
   // CSS / style functions
-  if (
-    /^(var\(--|calc\(|repeat\(|hsl\(|url\(|linear-gradient\()/i.test(trimmed)
-  ) {
+  if (/^(var\(--|calc\(|repeat\(|hsl\(|url\(|linear-gradient\()/i.test(trimmed)) {
     return true;
   }
 
@@ -157,10 +153,7 @@ export function isBrandOrModelLiteral(value: unknown): boolean {
   if (typeof value !== "string") return false;
   const trimmed = value.trim();
   if (!trimmed) return false;
-  if (
-    BRAND_LITERALS.has(trimmed) ||
-    BRAND_LITERALS_LOWER.has(trimmed.toLowerCase())
-  ) {
+  if (BRAND_LITERALS.has(trimmed) || BRAND_LITERALS_LOWER.has(trimmed.toLowerCase())) {
     return true;
   }
   if (isModelIdentifier(trimmed)) return true;

@@ -46,4 +46,3 @@ export function formatHardcodedSnippet(value: string, maxLen = 56): string {
   if (oneLine.length <= maxLen) return oneLine;
   return `${oneLine.slice(0, maxLen - 1)}…`;
 }
-

@@ -8,7 +8,4 @@ export const I18N_UI_FILES = [
 ];
 
 /** Data/helpers that expose user-facing labels via object fields. */
-export const I18N_DATA_FILES = [
-  "src/provider-workspace-data.ts",
-];
-
+export const I18N_DATA_FILES = ["src/provider-workspace-data.ts"];

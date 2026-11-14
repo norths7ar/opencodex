@@ -7,18 +7,21 @@
   "scripts": {
     "dev": "vite",
     "dev:runtime": "node node_modules/vite/bin/vite.js --config vite.runtime.config.ts",
-    "build:runtime": "node node_modules/vite/bin/vite.js build --config vite.runtime.config.ts",
-    "build": "tsc -b && vite build && vite build -c vite.classic.config.ts",
+    "build:runtime": "tsc -b && node node_modules/vite/bin/vite.js build --config vite.runtime.config.ts",
+    "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
-    "lint": "oxlint .",
+    "lint": "eslint .",
     "test": "bun ../scripts/test-with-pinned-bun.ts --isolate tests",
-    "lint:i18n": "oxlint src/pages src/components src/App.tsx src/main.tsx src/ui.tsx src/provider-workspace-data.ts",
+    "lint:i18n": "eslint src/pages src/components src/App.tsx src/main.tsx src/ui.tsx src/provider-workspace-data.ts",
     "doctor": "npx --yes react-doctor@0.9.11 --verbose --scope changed --base origin/main --no-telemetry",
     "doctor:full": "npx --yes react-doctor@0.9.11 --verbose --scope full --no-telemetry",
     "preview": "vite preview",
     "test:sidebar-version": "bun tests/sidebar-version-browser.ts",
     "test:quota-hover": "bun tests/quota-summary-hover-browser.ts",
-    "test:shared-scroll": "bun tests/shared-scroll-browser.ts"
+    "test:shared-scroll": "bun tests/shared-scroll-browser.ts",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write src .eslint *.ts *.json *.mjs *.html .prettierrc.json",
+    "format:check": "prettier --check src .eslint *.ts *.json *.mjs *.html .prettierrc.json"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
@@ -35,17 +38,24 @@
     "wanted-sans": "^1.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/estree-jsx": "1.0.5",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.14.0",
     "happy-dom": "21.0.4",
-    "oxlint": "1.78.0",
+    "prettier": "3.10.0",
     "react-refresh": "^0.18.0",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
+    "typescript-eslint": "8.72.2",
     "vite": "^8.2.4"
   },
   "overrides": {
