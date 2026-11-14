@@ -35,7 +35,12 @@ import { cn } from "@/lib/utils";
 import { CountPill, Frame, FrameBody, HelpTip } from "../v2-subagents/frame";
 import { iconButton, stepIndicator } from "../v2-subagents/frame-classes";
 import SubagentDelegationSection from "./SubagentDelegationSection";
-import type { DelegationPatch, DelegationModelOption, UltraModePatch, UltraModeState } from "../../pages/use-subagent-delegation";
+import type {
+  DelegationPatch,
+  DelegationModelOption,
+  UltraModePatch,
+  UltraModeState,
+} from "../../pages/use-subagent-delegation";
 
 export interface SubagentsWorkspaceProps {
   available: string[];
@@ -77,7 +82,12 @@ export default function SubagentsWorkspace({
   chosen,
   onToggle,
   onMove,
-  fallback, fallbackPollMs, fallbackBusy, onFallbackChange, onFallbackPollMsChange, onFallbackSave,
+  fallback,
+  fallbackPollMs,
+  fallbackBusy,
+  onFallbackChange,
+  onFallbackPollMsChange,
+  onFallbackSave,
   delegation,
   settingsExtra,
 }: SubagentsWorkspaceProps) {
@@ -90,14 +100,17 @@ export default function SubagentsWorkspace({
 
   const availableFiltered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return available.filter(m => !q || m.toLowerCase().includes(q));
+    return available.filter((m) => !q || m.toLowerCase().includes(q));
   }, [available, query]);
 
-  const tabs = useMemo(() => [
-    { id: "featured", label: t("sub.featured"), meta: `${chosen.length}/${FEATURED_MAX}` },
-    { id: "models", label: t("sub.models"), meta: String(availableFiltered.length) },
-    { id: "settings", label: t("sub.settings") },
-  ], [t, chosen.length, availableFiltered.length]);
+  const tabs = useMemo(
+    () => [
+      { id: "featured", label: t("sub.featured"), meta: `${chosen.length}/${FEATURED_MAX}` },
+      { id: "models", label: t("sub.models"), meta: String(availableFiltered.length) },
+      { id: "settings", label: t("sub.settings") },
+    ],
+    [t, chosen.length, availableFiltered.length],
+  );
 
   return (
     <div className="subagents-workspace-shell">
@@ -108,19 +121,34 @@ export default function SubagentsWorkspace({
           className="subagents-workspace-section"
           headClassName="swi-featured-head"
           title={<span className="swi-featured-title">{t("sub.featured")}</span>}
-          meta={<>
-            <CountPill><span className="swi-featured-count">{chosen.length}/{FEATURED_MAX}</span></CountPill>
-            {/* One-time teaching ("this order is the picker order") rides on a focusable
+          meta={
+            <>
+              <CountPill>
+                <span className="swi-featured-count">
+                  {chosen.length}/{FEATURED_MAX}
+                </span>
+              </CountPill>
+              {/* One-time teaching ("this order is the picker order") rides on a focusable
                 "?" beside the counter instead of a paragraph above the list. */}
-            <HelpTip label={t("sub.orderHintAria")}><Trans k="sub.orderHint" cmd="spawn_agent" /></HelpTip>
-          </>}
+              <HelpTip label={t("sub.orderHintAria")}>
+                <Trans k="sub.orderHint" cmd="spawn_agent" />
+              </HelpTip>
+            </>
+          }
           lede={t("subagentsV2.featuredLede")}
         >
           <FrameBody as="ol">
             {chosen.map((m, i) => (
-              <li key={m} className="swi-featured-row flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3 transition-colors hover:bg-surface/60">
-                <span className={cn(stepIndicator, "bg-surface text-fg ring-line-strong")}>{i + 1}</span>
-                <span className="swi-featured-name min-w-0 flex-1 truncate font-mono text-[13px] text-fg">{modelLabel(m)}</span>
+              <li
+                key={m}
+                className="swi-featured-row flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3 transition-colors hover:bg-surface/60"
+              >
+                <span className={cn(stepIndicator, "bg-surface text-fg ring-line-strong")}>
+                  {i + 1}
+                </span>
+                <span className="swi-featured-name min-w-0 flex-1 truncate font-mono text-[13px] text-fg">
+                  {modelLabel(m)}
+                </span>
                 <span className="swi-featured-actions flex shrink-0 items-center gap-0.5">
                   <button
                     type="button"
@@ -152,10 +180,23 @@ export default function SubagentsWorkspace({
               </li>
             ))}
             {Array.from({ length: freeSlots }, (_, k) => (
-              <li key={`free-${k}`} className="flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3 text-[13px] text-fg-subtle">
-                <span className={cn(stepIndicator, "border border-dashed border-line-strong text-fg-subtle ring-0")} aria-hidden="true">{chosen.length + k + 1}</span>
+              <li
+                key={`free-${k}`}
+                className="flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3 text-[13px] text-fg-subtle"
+              >
+                <span
+                  className={cn(
+                    stepIndicator,
+                    "border border-dashed border-line-strong text-fg-subtle ring-0",
+                  )}
+                  aria-hidden="true"
+                >
+                  {chosen.length + k + 1}
+                </span>
                 <span className="min-w-0 flex-1 truncate">
-                  {chosen.length === 0 && k === 0 ? t("sub.noneSelected") : t("subagentsV2.emptySlot")}
+                  {chosen.length === 0 && k === 0
+                    ? t("sub.noneSelected")
+                    : t("subagentsV2.emptySlot")}
                 </span>
               </li>
             ))}
@@ -167,15 +208,22 @@ export default function SubagentsWorkspace({
           className="subagents-workspace-section"
           title={t("sub.workspace.allModels")}
           meta={<CountPill>{availableFiltered.length}</CountPill>}
-          lede={full ? t("sub.workspace.featuredFull") : t("subagentsV2.modelsLede", { max: FEATURED_MAX })}
+          lede={
+            full
+              ? t("sub.workspace.featuredFull")
+              : t("subagentsV2.modelsLede", { max: FEATURED_MAX })
+          }
           actions={
             <label className="relative flex w-full items-center sm:w-72">
-              <IconSearch className="pointer-events-none absolute left-2.5 size-4 text-fg-subtle" aria-hidden="true" />
+              <IconSearch
+                className="pointer-events-none absolute left-2.5 size-4 text-fg-subtle"
+                aria-hidden="true"
+              />
               <input
                 className="input w-full pl-8"
                 type="search"
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("sub.search")}
                 aria-label={t("sub.search")}
               />
@@ -184,17 +232,27 @@ export default function SubagentsWorkspace({
         >
           <FrameBody as="ul" className="max-h-[min(30rem,60vh)] overflow-y-auto">
             {availableFiltered.length === 0 ? (
-              <li className="px-4 py-6 text-center text-[13px] text-fg-muted">{t("sub.noModels")}</li>
+              <li className="px-4 py-6 text-center text-[13px] text-fg-muted">
+                {t("sub.noModels")}
+              </li>
             ) : (
-              availableFiltered.map(m => {
+              availableFiltered.map((m) => {
                 const isFeatured = chosenSet.has(m);
                 const priority = isFeatured ? chosen.indexOf(m) + 1 : null;
                 // A featured row can always be removed; only adding is blocked when full.
                 const blocked = !isFeatured && full;
                 return (
-                  <li key={m} className="flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3.5">
+                  <li
+                    key={m}
+                    className="flex min-h-11 min-w-0 items-center gap-3 py-1.5 pr-2 pl-3.5"
+                  >
                     <IconBot className="size-4 shrink-0 text-fg-subtle" aria-hidden="true" />
-                    <span className={cn("min-w-0 flex-1 truncate font-mono text-[13px]", isFeatured ? "text-fg" : "text-fg-muted")}>
+                    <span
+                      className={cn(
+                        "min-w-0 flex-1 truncate font-mono text-[13px]",
+                        isFeatured ? "text-fg" : "text-fg-muted",
+                      )}
+                    >
                       {modelLabel(m)}
                     </span>
                     {priority !== null && (
@@ -212,17 +270,29 @@ export default function SubagentsWorkspace({
                           ? "bg-accent text-on-accent hover:opacity-85"
                           : "text-fg-muted ring-1 ring-inset ring-line-strong hover:bg-surface-2 hover:text-fg",
                       )}
-                      onClick={() => { if (!blocked) onToggle(m); }}
+                      onClick={() => {
+                        if (!blocked) onToggle(m);
+                      }}
                       disabled={blocked}
                       aria-pressed={isFeatured}
-                      aria-label={isFeatured
-                        ? t("sub.workspace.removeFromFeatured", { m })
-                        : t("sub.workspace.addToFeatured", { m })}
-                      title={isFeatured
-                        ? t("sub.workspace.removeFromFeatured", { m })
-                        : full ? t("sub.workspace.featuredFull") : t("sub.workspace.addToFeatured", { m })}
+                      aria-label={
+                        isFeatured
+                          ? t("sub.workspace.removeFromFeatured", { m })
+                          : t("sub.workspace.addToFeatured", { m })
+                      }
+                      title={
+                        isFeatured
+                          ? t("sub.workspace.removeFromFeatured", { m })
+                          : full
+                            ? t("sub.workspace.featuredFull")
+                            : t("sub.workspace.addToFeatured", { m })
+                      }
                     >
-                      {isFeatured ? <IconCheck aria-hidden="true" /> : <IconPlus aria-hidden="true" />}
+                      {isFeatured ? (
+                        <IconCheck aria-hidden="true" />
+                      ) : (
+                        <IconPlus aria-hidden="true" />
+                      )}
                       {isFeatured ? t("subagentsV2.added") : t("subagentsV2.add")}
                     </button>
                   </li>

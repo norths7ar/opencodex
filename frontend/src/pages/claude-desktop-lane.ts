@@ -32,10 +32,17 @@ export interface LaneView<T extends LaneModel> {
   noMatch: boolean;
 }
 
-export function laneView<T extends LaneModel>(models: T[], search: string, limit: number): LaneView<T> {
+export function laneView<T extends LaneModel>(
+  models: T[],
+  search: string,
+  limit: number,
+): LaneView<T> {
   const query = search.trim().toLowerCase();
   const matched = query
-    ? models.filter(model => model.label.toLowerCase().includes(query) || model.route.toLowerCase().includes(query))
+    ? models.filter(
+        (model) =>
+          model.label.toLowerCase().includes(query) || model.route.toLowerCase().includes(query),
+      )
     : models;
   // Stable partition: available first, server order preserved inside each half.
   const ordered = matched.toSorted((a, b) => Number(!a.available) - Number(!b.available));

@@ -8,7 +8,7 @@ import { LazyMotion, m, useReducedMotion } from "motion/react";
  * use instead of shipping with every page; until they arrive the plate simply jumps.
  */
 
-const loadLayoutFeatures = () => import("./segment-thumb-features").then(mod => mod.default);
+const loadLayoutFeatures = () => import("./segment-thumb-features").then((mod) => mod.default);
 const SPRING = { type: "spring", stiffness: 420, damping: 36 } as const;
 const INSTANT = { duration: 0 } as const;
 

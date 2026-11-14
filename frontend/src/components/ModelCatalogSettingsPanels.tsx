@@ -9,8 +9,10 @@ type Props = ComponentProps<typeof ModelPickerOrderEditor> & {
 
 /** Keep conditional picker ordering and always-visible Fast rows as sibling panels. */
 export default function ModelCatalogSettingsPanels({ showOrderEditor, onSaved, ...picker }: Props) {
-  return <>
-    {showOrderEditor && <ModelPickerOrderEditor key={picker.apiBase} {...picker} />}
-    <FastRowsSetting apiBase={picker.apiBase} onSaved={onSaved} />
-  </>;
+  return (
+    <>
+      {showOrderEditor && <ModelPickerOrderEditor key={picker.apiBase} {...picker} />}
+      <FastRowsSetting apiBase={picker.apiBase} onSaved={onSaved} />
+    </>
+  );
 }

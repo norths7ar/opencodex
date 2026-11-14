@@ -14,22 +14,39 @@ export interface ProviderModelsNoticeProps {
   onRetry?: () => void;
 }
 
-const FOCUS_FALLBACK_REGIONS = [".pws-detail-panel", ".pws-detail", ".pws-main", ".page-head"] as const;
-const FOCUSABLE_SELECTOR = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const FOCUS_FALLBACK_REGIONS = [
+  ".pws-detail-panel",
+  ".pws-detail",
+  ".pws-main",
+  ".page-head",
+] as const;
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 function isUsableFocusTarget(element: Element | null): element is HTMLElement {
-  if (!element || !element.isConnected || typeof (element as HTMLElement).focus !== "function") return false;
+  if (!element || !element.isConnected || typeof (element as HTMLElement).focus !== "function")
+    return false;
   if (element === document.body || element === document.documentElement) return false;
   if ((element as HTMLButtonElement).disabled === true) return false;
-  for (let cur: Element | null = element; cur && cur !== document.documentElement; cur = cur.parentElement) {
+  for (
+    let cur: Element | null = element;
+    cur && cur !== document.documentElement;
+    cur = cur.parentElement
+  ) {
     const htmlCur = cur as HTMLElement;
-    if (htmlCur.hidden || cur.hasAttribute("inert") || cur.getAttribute("aria-hidden") === "true") return false;
-    if (htmlCur.style?.display === "none" || htmlCur.style?.visibility === "hidden" || htmlCur.style?.visibility === "collapse") {
+    if (htmlCur.hidden || cur.hasAttribute("inert") || cur.getAttribute("aria-hidden") === "true")
+      return false;
+    if (
+      htmlCur.style?.display === "none" ||
+      htmlCur.style?.visibility === "hidden" ||
+      htmlCur.style?.visibility === "collapse"
+    ) {
       return false;
     }
     if (typeof window !== "undefined" && typeof window.getComputedStyle === "function") {
       const cs = window.getComputedStyle(cur);
-      if (cs.display === "none" || cs.visibility === "hidden" || cs.visibility === "collapse") return false;
+      if (cs.display === "none" || cs.visibility === "hidden" || cs.visibility === "collapse")
+        return false;
     }
   }
   return true;
@@ -59,40 +76,94 @@ export default function ProviderModelsNotice(props: ProviderModelsNoticeProps) {
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     primary.current?.focus();
-    return () => { restoreOrFallbackFocus(previous); };
+    return () => {
+      restoreOrFallbackFocus(previous);
+    };
   }, []);
   const pending = props.selection?.status === "pending";
   const unavailable = props.failed || !props.providerKnown;
-  const message = props.loading ? t("prov.modelsNoticeChecking")
-    : unavailable ? t("prov.modelsNoticeFailed")
-      : pending ? t("prov.modelsNoticePending")
-        : props.initialRegistration && props.selection?.status === "all-off" ? t("prov.modelsNoticeOff")
+  const message = props.loading
+    ? t("prov.modelsNoticeChecking")
+    : unavailable
+      ? t("prov.modelsNoticeFailed")
+      : pending
+        ? t("prov.modelsNoticePending")
+        : props.initialRegistration && props.selection?.status === "all-off"
+          ? t("prov.modelsNoticeOff")
           : t("prov.modelsNoticeReady");
 
   return (
-    <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby={titleId}
-      onKeyDown={event => {
-        if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); props.onClose(); }
+    <div
+      className="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          props.onClose();
+        }
         if (event.key !== "Tab") return;
-        const buttons = dialog.current?.querySelectorAll<HTMLButtonElement>("button:not([disabled])");
-        const first = buttons?.[0], last = buttons?.[buttons.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-      }}>
+        const buttons =
+          dialog.current?.querySelectorAll<HTMLButtonElement>("button:not([disabled])");
+        const first = buttons?.[0],
+          last = buttons?.[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }}
+    >
       <div className="modal-card" ref={dialog}>
-        <div className="modal-head"><h2 id={titleId} style={{ fontSize: "var(--text-subtitle)", margin: 0 }}>{t("prov.modelsNoticeTitle")}</h2></div>
-        <p><strong style={{ overflowWrap: "anywhere" }}>{props.provider}</strong></p>
-        <p role="status" aria-live="polite">{message}</p>
+        <div className="modal-head">
+          <h2 id={titleId} style={{ fontSize: "var(--text-subtitle)", margin: 0 }}>
+            {t("prov.modelsNoticeTitle")}
+          </h2>
+        </div>
+        <p>
+          <strong style={{ overflowWrap: "anywhere" }}>{props.provider}</strong>
+        </p>
+        <p role="status" aria-live="polite">
+          {message}
+        </p>
         {props.initialRegistration && props.selection?.modelCount !== undefined && (
-          <p className="muted">{t("prov.modelsNoticeCount", { count: props.selection.modelCount })}</p>
+          <p className="muted">
+            {t("prov.modelsNoticeCount", { count: props.selection.modelCount })}
+          </p>
         )}
-        {props.catalogRefreshPending && <p className="muted" role="status">{t("codexAuth.catalogRefreshPending")}</p>}
+        {props.catalogRefreshPending && (
+          <p className="muted" role="status">
+            {t("codexAuth.catalogRefreshPending")}
+          </p>
+        )}
         {!props.loading && (pending || unavailable) && props.onRetry && (
-          <button type="button" className="btn btn-ghost" onClick={() => { props.onRetry?.(); primary.current?.focus(); }}>{t("common.retry")}</button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => {
+              props.onRetry?.();
+              primary.current?.focus();
+            }}
+          >
+            {t("common.retry")}
+          </button>
         )}
         <div className="modal-actions">
-          <button type="button" className="btn btn-ghost" onClick={props.onClose}>{t("common.close")}</button>
-          <button type="button" className="btn btn-primary" ref={primary} onClick={props.onOpenModels}>{t("prov.modelsNoticeOpen")}</button>
+          <button type="button" className="btn btn-ghost" onClick={props.onClose}>
+            {t("common.close")}
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            ref={primary}
+            onClick={props.onOpenModels}
+          >
+            {t("prov.modelsNoticeOpen")}
+          </button>
         </div>
       </div>
     </div>

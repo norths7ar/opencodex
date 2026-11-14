@@ -15,7 +15,7 @@ import type { TKey } from "./en";
  * Turkish i18n catalog. Must match the `TKey` set (compile-checked).
  */
 export const tr: Record<TKey, string> = {
-    "pws.firstResponse.title": "İlk yanıt durumu",
+  "pws.firstResponse.title": "İlk yanıt durumu",
   "pws.firstResponse.stepProvider": "Sağlayıcı",
   "pws.firstResponse.stepModels": "Modeller",
   "pws.firstResponse.stepClients": "İstemci yönlendirmesi",
@@ -23,40 +23,56 @@ export const tr: Record<TKey, string> = {
   "pws.firstResponse.providerSaved": "Sağlayıcı yapılandırması kaydedildi",
   "pws.firstResponse.providerNeedsSetup": "Kaydedildi — kimlik bilgileri gerekli",
   "pws.firstResponse.providerNeedsLogin": "Kaydedildi — hesap girişi gerekli",
-  "pws.firstResponse.providerNeedsAttention": "Kaydedildi — etkin hesabın yeniden doğrulanması gerekiyor",
+  "pws.firstResponse.providerNeedsAttention":
+    "Kaydedildi — etkin hesabın yeniden doğrulanması gerekiyor",
   "pws.firstResponse.providerDisabled": "Sağlayıcı devre dışı",
   "pws.firstResponse.modelsLoading": "Model listesi kontrol ediliyor…",
   "pws.firstResponse.modelsFailed": "Model listesi yüklenemedi",
-  "pws.firstResponse.modelsPending": "İlk model listesi hâlâ beklemede — keşif tamamlanana kadar modeller gizli kalır",
+  "pws.firstResponse.modelsPending":
+    "İlk model listesi hâlâ beklemede — keşif tamamlanana kadar modeller gizli kalır",
   "pws.firstResponse.modelsReady": "Yönlendirme için {count} model etkin",
-  "pws.firstResponse.modelsReadyDiscoveryFailed": "Korunan {count} model etkin — canlı keşif başarısız oldu",
+  "pws.firstResponse.modelsReadyDiscoveryFailed":
+    "Korunan {count} model etkin — canlı keşif başarısız oldu",
   "pws.firstResponse.modelsAllOff": "Tüm modeller kapalı — Modeller sayfasından etkinleştirin",
   "pws.firstResponse.modelsConfigured": "{count} model yapılandırıldı",
   "pws.firstResponse.modelsEmpty": "Henüz keşfedilen veya yapılandırılan model yok",
   "pws.firstResponse.openProviderModels": "Modelleri seç",
-  "pws.firstResponse.clientStep": "Connect'te bir istemci uygulayın ve {provider}/<model> seçin; değişiklikler yeni oturumlarda geçerli olur",
+  "pws.firstResponse.clientStep":
+    "Connect'te bir istemci uygulayın ve {provider}/<model> seçin; değişiklikler yeni oturumlarda geçerli olur",
   "pws.firstResponse.openConnect": "Connect'i aç",
-  "pws.firstResponse.probeUntested": "Henüz doğrulanmadı — aşağıdan model tamamlama testini çalıştırın",
+  "pws.firstResponse.probeUntested":
+    "Henüz doğrulanmadı — aşağıdan model tamamlama testini çalıştırın",
   "pws.firstResponse.probeOk": "{model} modelinden tamamlama yanıtı doğrulandı",
   "pws.firstResponse.probeFailed": "{model} için son tamamlama testi başarısız oldu",
   "pws.firstResponse.stepDisconnect": "Bağlantıyı kesme ve geri yükleme",
-  "pws.firstResponse.disconnectNote": "Connect'te Claude Code'u kapatmak yalnızca yeni Claude oturumları için proxy bloğunu kaldırır; Codex'i devre dışı bırakmak ise proxy yönlendirmesini durdurur ve yerel Codex kataloğu ile iş parçacığı geçmişini geri yükler; hâlihazırda çalışan oturumlar yeniden başlatılana kadar mevcut ortamlarını korur. {provider} sağlayıcısını devre dışı bırakmak veya kaldırmak Connect'teki istemci ayarlarını geri yüklemez.",
-  "pws.firstResponse.probeReverify": "Başarısız testten sonra bağlantı ayarları değişti — düzeltmeyi doğrulamak için {model} testini yeniden çalıştırın",
-  "pws.completion.recovery.auth": "Bu sağlayıcı için API anahtarını veya hesap kimlik bilgilerini kontrol edin ya da güncelleyin, ardından {model} için testi yeniden çalıştırın.",
-  "pws.completion.recovery.rateLimit": "Sağlayıcı bu isteğe hız sınırı uyguladı (HTTP 429). Sınır penceresinin sıfırlanmasını bekleyin veya başka bir hesaba ya da API anahtarına geçin, ardından {model} için testi yeniden çalıştırın.",
-  "pws.completion.recovery.connection": "İstek zaman aşımına uğradı veya uç noktaya ulaşılamadı. Temel URL'yi ve ağ ayarlarını kontrol edin, ardından {model} için testi yeniden çalıştırın.",
-  "pws.completion.recovery.model": "Sağlayıcı bu model isteğini reddetti. Modeller sekmesinde model kimliğini kontrol edin veya başka bir model seçin, ardından testi yeniden çalıştırın.",
-  "pws.completion.recovery.upstream": "Yukarı akış sağlayıcısı bir hata veya eksik akış döndürdü. {model} için testi yeniden deneyin veya sağlayıcı ayarlarını kontrol edin.",
-  "pws.completion.recovery.aborted": "Test tamamlanmadan iptal edildi. Hazır olduğunuzda {model} için testi yeniden çalıştırın.",
-  "pws.completion.recovery.credentialChanged": "Test başlatılırken sağlayıcı ayarları veya kimlik bilgileri değişti. {model} için testi yeniden çalıştırın.",
-  "pws.completion.recovery.request": "Test isteği başlatılamadı. Çalışan testin bitmesini bekleyin veya {model} için yeniden deneyin.",
+  "pws.firstResponse.disconnectNote":
+    "Connect'te Claude Code'u kapatmak yalnızca yeni Claude oturumları için proxy bloğunu kaldırır; Codex'i devre dışı bırakmak ise proxy yönlendirmesini durdurur ve yerel Codex kataloğu ile iş parçacığı geçmişini geri yükler; hâlihazırda çalışan oturumlar yeniden başlatılana kadar mevcut ortamlarını korur. {provider} sağlayıcısını devre dışı bırakmak veya kaldırmak Connect'teki istemci ayarlarını geri yüklemez.",
+  "pws.firstResponse.probeReverify":
+    "Başarısız testten sonra bağlantı ayarları değişti — düzeltmeyi doğrulamak için {model} testini yeniden çalıştırın",
+  "pws.completion.recovery.auth":
+    "Bu sağlayıcı için API anahtarını veya hesap kimlik bilgilerini kontrol edin ya da güncelleyin, ardından {model} için testi yeniden çalıştırın.",
+  "pws.completion.recovery.rateLimit":
+    "Sağlayıcı bu isteğe hız sınırı uyguladı (HTTP 429). Sınır penceresinin sıfırlanmasını bekleyin veya başka bir hesaba ya da API anahtarına geçin, ardından {model} için testi yeniden çalıştırın.",
+  "pws.completion.recovery.connection":
+    "İstek zaman aşımına uğradı veya uç noktaya ulaşılamadı. Temel URL'yi ve ağ ayarlarını kontrol edin, ardından {model} için testi yeniden çalıştırın.",
+  "pws.completion.recovery.model":
+    "Sağlayıcı bu model isteğini reddetti. Modeller sekmesinde model kimliğini kontrol edin veya başka bir model seçin, ardından testi yeniden çalıştırın.",
+  "pws.completion.recovery.upstream":
+    "Yukarı akış sağlayıcısı bir hata veya eksik akış döndürdü. {model} için testi yeniden deneyin veya sağlayıcı ayarlarını kontrol edin.",
+  "pws.completion.recovery.aborted":
+    "Test tamamlanmadan iptal edildi. Hazır olduğunuzda {model} için testi yeniden çalıştırın.",
+  "pws.completion.recovery.credentialChanged":
+    "Test başlatılırken sağlayıcı ayarları veya kimlik bilgileri değişti. {model} için testi yeniden çalıştırın.",
+  "pws.completion.recovery.request":
+    "Test isteği başlatılamadı. Çalışan testin bitmesini bekleyin veya {model} için yeniden deneyin.",
   "pws.completion.recovery.fixAuth": "Kimlik bilgilerini güncelle",
   "pws.completion.recovery.fixSettings": "Ayarları kontrol et",
-"pws.completion.title": "Model yanıt testi",
+  "pws.completion.title": "Model yanıt testi",
   "pws.completion.model": "Test edilecek model",
   "pws.completion.choose": "Bir model seçin",
   "pws.completion.run": "Modeli test et",
-  "pws.completion.confirm": "{provider} üzerinde {model} test edilsin mi? En fazla 32 çıktı tokenı içeren gerçek bir istek gönderilir. Kota tüketir ve ücrete neden olabilir.",
+  "pws.completion.confirm":
+    "{provider} üzerinde {model} test edilsin mi? En fazla 32 çıktı tokenı içeren gerçek bir istek gönderilir. Kota tüketir ve ücrete neden olabilir.",
   "pws.completion.failed": "Model testi başarısız",
   "pws.completion.ok": "Model testi başarılı",
   "pws.completion.notApplicable": "Test uygulanamaz",
@@ -64,7 +80,8 @@ export const tr: Record<TKey, string> = {
   "pws.completion.total": "Toplam gecikme",
   "pws.completion.reported": "Üst sunucu {model} için {upstream} bildirdi",
   "pws.completion.unreported": "Üst sunucu {model} için model bildirmedi",
-  "pws.completion.identity": "Model meta verilerini üst sağlayıcı bildirir; bu bilgiler gerçek modelin kimliğini doğrulamaz.",
+  "pws.completion.identity":
+    "Model meta verilerini üst sağlayıcı bildirir; bu bilgiler gerçek modelin kimliğini doğrulamaz.",
   "pws.completion.match": "Eşleşiyor",
   "pws.completion.mismatch": "Eşleşmiyor",
   "pws.completion.unknown": "Bilinmiyor",
@@ -78,9 +95,11 @@ export const tr: Record<TKey, string> = {
   "pws.completion.tls_profile": "Özel bir TLS profili yapılandırılmış.",
   "pws.completion.upstream_http_version": "Üst sunucu HTTP sürümü yapılandırılmış.",
   "pws.completion.request_pacing": "İstek aralığı sınırlaması etkin.",
-  "pws.completion.custom_executor_egress": "Sağlayıcı vekiliyle kullanılan özel fetch yürütücüsü korunamaz.",
+  "pws.completion.custom_executor_egress":
+    "Sağlayıcı vekiliyle kullanılan özel fetch yürütücüsü korunamaz.",
   "pws.completion.runAll": "Tüm modelleri test et",
-  "pws.completion.allConfirm": "{provider} üzerindeki {count} modelin tümü test edilsin mi? Her biri 32 token çıktı sınırına sahip en fazla {count} gerçek istek tek tek gönderilir. Bazı modeller gönderimden önce atlanabilir. Kota tüketir ve maliyet oluşturabilir.",
+  "pws.completion.allConfirm":
+    "{provider} üzerindeki {count} modelin tümü test edilsin mi? Her biri 32 token çıktı sınırına sahip en fazla {count} gerçek istek tek tek gönderilir. Bazı modeller gönderimden önce atlanabilir. Kota tüketir ve maliyet oluşturabilir.",
   "pws.completion.stop": "Durdur",
   "pws.completion.progress": "{total} içinden {done} test ediliyor…",
   "pws.completion.stopped": "{total} modelden {done} tanesinden sonra durduruldu",
@@ -89,39 +108,51 @@ export const tr: Record<TKey, string> = {
   "pws.completion.failedShort": "Başarısız",
   "pws.completion.notTested": "Test edilmedi",
   "pws.completion.disableFailed": "Başarısız {count} modeli devre dışı bırak",
-  "pws.completion.disableConfirm": "{provider} üzerinde testi geçemeyen {count} model devre dışı bırakılsın mı? Modeller sayfasında yeniden etkinleştirilene kadar katalogda ve model seçicide görünmezler, ancak tam kimlikleriyle doğrudan çağrılabilirler.",
-  "pws.completion.disabledDone": "{count} model devre dışı bırakıldı. Modeller sayfasında yeniden etkinleştirebilirsiniz.",
+  "pws.completion.disableConfirm":
+    "{provider} üzerinde testi geçemeyen {count} model devre dışı bırakılsın mı? Modeller sayfasında yeniden etkinleştirilene kadar katalogda ve model seçicide görünmezler, ancak tam kimlikleriyle doğrudan çağrılabilirler.",
+  "pws.completion.disabledDone":
+    "{count} model devre dışı bırakıldı. Modeller sayfasında yeniden etkinleştirebilirsiniz.",
   "pws.completion.disableError": "Başarısız modeller devre dışı bırakılamadı",
 
   "reasoningRetention.advanced": "Gelişmiş ayarlar",
   "reasoningRetention.title": "Akıl yürütmeyi saklama",
   "reasoningRetention.enable": "Akıl yürütmeyi saklamayı etkinleştir",
-  "reasoningRetention.description": "Varsayılan olarak kapalıdır. Okunabilir özet döndüren yönlendirilmiş v1/v2 sıkıştırma için etkinleştirildiğinde, bağlam penceresi yüzdesi ile token sınırının küçüğü içinde kalan akıl yürütme, özetle birlikte geçmiş bağlam olarak geri getirilir. Sınır aşılırsa yerel olarak arşivlenir ve dosya yolu notuyla değiştirilir. Etkinleştirildiğindeki varsayılanlar: %20 ve 100.000 token. Sağlayıcının özel akıl yürütmesinin şifresi çözülmez; opak sıkıştırma çıktısı değişmeden kalır.",
-  "reasoningRetention.storageHint": "Etkinleştirmek, akıl yürütmenin yerel geçmişte ve arşivlerde düz metin olarak saklanmasına yol açabilir. Tamamlanan arşivlerin toplam boyut sınırı veya son kullanma süresi yoktur; gereksiz arşivleri elle silin.",
+  "reasoningRetention.description":
+    "Varsayılan olarak kapalıdır. Okunabilir özet döndüren yönlendirilmiş v1/v2 sıkıştırma için etkinleştirildiğinde, bağlam penceresi yüzdesi ile token sınırının küçüğü içinde kalan akıl yürütme, özetle birlikte geçmiş bağlam olarak geri getirilir. Sınır aşılırsa yerel olarak arşivlenir ve dosya yolu notuyla değiştirilir. Etkinleştirildiğindeki varsayılanlar: %20 ve 100.000 token. Sağlayıcının özel akıl yürütmesinin şifresi çözülmez; opak sıkıştırma çıktısı değişmeden kalır.",
+  "reasoningRetention.storageHint":
+    "Etkinleştirmek, akıl yürütmenin yerel geçmişte ve arşivlerde düz metin olarak saklanmasına yol açabilir. Tamamlanan arşivlerin toplam boyut sınırı veya son kullanma süresi yoktur; gereksiz arşivleri elle silin.",
   "reasoningRetention.percent": "Bağlam penceresi (%)",
   "reasoningRetention.tokens": "Token sınırı",
   "reasoningRetention.reset": "Sıfırla ve kapat",
-  "reasoningRetention.invalid": "0’dan büyük, 100’ü aşmayan bir yüzde ve pozitif tam sayı token sınırı girin.",
+  "reasoningRetention.invalid":
+    "0’dan büyük, 100’ü aşmayan bir yüzde ve pozitif tam sayı token sınırı girin.",
   "reasoningRetention.loadFailed": "Ayarlar yüklenemedi.",
   "reasoningRetention.saveFailed": "Ayarlar kaydedilemedi.",
   "reasoningRetention.saved": "Ayarlar kaydedildi.",
   "nativeReasoningRetention.title": "OpenAI yerel akıl yürütmesini koruma",
-  "nativeReasoningRetention.description": "Yalnızca resmi ChatGPT arka ucuna yapılan yerel isteklerde, Combo ve hesap havuzlarındaki gerçek hedef değişiklikleri dahil uygulanır. Önceki şifreli akıl yürütme yeniden gönderilebilir; yeniden kullanım arka uca bağlıdır. İki seçenek de varsayılan olarak kapalıdır.",
+  "nativeReasoningRetention.description":
+    "Yalnızca resmi ChatGPT arka ucuna yapılan yerel isteklerde, Combo ve hesap havuzlarındaki gerçek hedef değişiklikleri dahil uygulanır. Önceki şifreli akıl yürütme yeniden gönderilebilir; yeniden kullanım arka uca bağlıdır. İki seçenek de varsayılan olarak kapalıdır.",
   "nativeReasoningRetention.modelSwitch": "Model değiştirirken şifreli akıl yürütmeyi koru",
-  "nativeReasoningRetention.accountSwitch": "Hesap değiştirirken şifreli akıl yürütmeyi koru (deneysel)",
-  "nativeReasoningRetention.accountHint": "Şifreli içeriği korumak, başka hesaplara eski yanıt kimliklerine veya dosyalara erişim vermez. Başarılı bir istek, akıl yürütmenin yeniden kullanıldığını kanıtlamaz. Yerel bağlam sıkıştırma işlemi değişmez.",
+  "nativeReasoningRetention.accountSwitch":
+    "Hesap değiştirirken şifreli akıl yürütmeyi koru (deneysel)",
+  "nativeReasoningRetention.accountHint":
+    "Şifreli içeriği korumak, başka hesaplara eski yanıt kimliklerine veya dosyalara erişim vermez. Başarılı bir istek, akıl yürütmenin yeniden kullanıldığını kanıtlamaz. Yerel bağlam sıkıştırma işlemi değişmez.",
   "nativeReasoningRetention.reset": "Varsayılanları geri yükle",
   "nativeReasoningRetention.loadFailed": "Yerel akıl yürütme ayarları yüklenemedi.",
   "nativeReasoningRetention.saveFailed": "Yerel akıl yürütme ayarları kaydedilemedi.",
   "nativeReasoningRetention.saved": "Yerel akıl yürütme ayarları kaydedildi.",
   "workflowBudget.title": "Alt ajanlar için iş akışı sınırları",
-  "workflowBudget.description": "Görev başına, yani bir konuşma ve başlattığı alt ajanlar için üst sınırlar; {minutes} dakikalık kayan bir pencerede sayılır. Bir sınırı aşan istek, herhangi bir sağlayıcıyla iletişime geçilmeden önce yerel olarak 429 ile reddedilir. Değişiklikler bir sonraki istekten itibaren geçerlidir; önceden sayılan kullanım korunur.",
+  "workflowBudget.description":
+    "Görev başına, yani bir konuşma ve başlattığı alt ajanlar için üst sınırlar; {minutes} dakikalık kayan bir pencerede sayılır. Bir sınırı aşan istek, herhangi bir sağlayıcıyla iletişime geçilmeden önce yerel olarak 429 ile reddedilir. Değişiklikler bir sonraki istekten itibaren geçerlidir; önceden sayılan kullanım korunur.",
   "workflowBudget.maxConcurrentChildren": "Paralel turlar",
-  "workflowBudget.maxConcurrentChildrenHint": "Bir görevin aynı anda çalıştırabileceği tur sayısı. Bir yer her zaman kendi konuşmanız için ayrılır, bu yüzden alt ajanlar bir eksik alır.",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "Bir görevin aynı anda çalıştırabileceği tur sayısı. Bir yer her zaman kendi konuşmanız için ayrılır, bu yüzden alt ajanlar bir eksik alır.",
   "workflowBudget.maxPhysicalSends": "Pencere başına model isteği",
-  "workflowBudget.maxPhysicalSendsHint": "Bir görevin pencere içinde gönderebileceği sağlayıcı istekleri, yeniden denemeler dahil.",
+  "workflowBudget.maxPhysicalSendsHint":
+    "Bir görevin pencere içinde gönderebileceği sağlayıcı istekleri, yeniden denemeler dahil.",
   "workflowBudget.maxDistinctChildren": "Pencere başına farklı alt ajan",
-  "workflowBudget.maxDistinctChildrenHint": "Bir görevin pencere içinde başlatabileceği farklı alt ajan iş parçacığı sayısı.",
+  "workflowBudget.maxDistinctChildrenHint":
+    "Bir görevin pencere içinde başlatabileceği farklı alt ajan iş parçacığı sayısı.",
   "workflowBudget.range": "Varsayılan {default}, izin verilen {min}–{max}.",
   "workflowBudget.invalid": "{min} ile {max} arasında bir tam sayı girin.",
   "workflowBudget.increase": "{label} artır",
@@ -141,12 +172,14 @@ export const tr: Record<TKey, string> = {
   ...startupV2Copy("tr"),
   ...proxyV2Copy("tr"),
   "claude.tierDefaults.unset": "Belirtilmedi (mevcut Claude ayarını koru)",
-  "claude.tierDefaults.recovery": "Uygulama durdu ve otomatik geri yükleme başarısız oldu. Yeniden denemeden önce aşağıdaki yedeği kontrol edin.",
+  "claude.tierDefaults.recovery":
+    "Uygulama durdu ve otomatik geri yükleme başarısız oldu. Yeniden denemeden önce aşağıdaki yedeği kontrol edin.",
   "claude.tierDefaults.title": "CLI varsayılan modelleri",
   "claude.tierDefaults.preview": "Claude ayarlarını önizle",
   "claude.tierDefaults.apply": "Claude ayarlarına uygula",
   "claude.tierDefaults.applied": "Claude ayarları kaydedilen varsayılanlarla eşleşiyor.",
-  "claude.tierDefaults.failed": "Varsayılanlar uygulanamadı. Yeniden önizleyin ve Claude ayarlarını kontrol edin.",
+  "claude.tierDefaults.failed":
+    "Varsayılanlar uygulanamadı. Yeniden önizleyin ve Claude ayarlarını kontrol edin.",
   "sidecar.pool": "Hesap havuzu",
   "sidecar.poolCurrent": "Geçerli isteğin havuzu",
   "sidecar.poolA": "Anthropic",
@@ -156,15 +189,18 @@ export const tr: Record<TKey, string> = {
   "nav.claude": "Claude",
   "claude.pageSub": "Claude Code için OpenCodex yönlendirmesi ve ayarları.",
 
-  "pws.anthropicAccountThresholdHint": "Claude havuzunun varsayılan eşiğini geçersiz kılar. 0, yalnızca bu hesap için kullanıma dayalı geçişi kapatır; duraklatma ve hız sınırı kurtarması geçerliliğini korur.",
+  "pws.anthropicAccountThresholdHint":
+    "Claude havuzunun varsayılan eşiğini geçersiz kılar. 0, yalnızca bu hesap için kullanıma dayalı geçişi kapatır; duraklatma ve hız sınırı kurtarması geçerliliğini korur.",
   "kiroLogin.title": "Kiro oturumu aç",
   "kiroLogin.chooseMethod": "Oturum açma yöntemi seç",
   "kiroLogin.cli": "Kiro CLI ile içe aktar",
   "kiroLogin.iam": "AWS IAM Identity Center",
-  "kiroLogin.iamDescription": "Kuruluşunuzun AWS erişim portalını ve IAM Identity Center bölgesini kullanın.",
+  "kiroLogin.iamDescription":
+    "Kuruluşunuzun AWS erişim portalını ve IAM Identity Center bölgesini kullanın.",
   "kiroLogin.startUrl": "AWS erişim portalı URL’si",
   "kiroLogin.region": "IAM Identity Center bölgesi",
-  "kiroLogin.invalidIam": "/start ile biten bir HTTPS AWS erişim portalı URL’si ve geçerli bir AWS bölgesi girin.",
+  "kiroLogin.invalidIam":
+    "/start ile biten bir HTTPS AWS erişim portalı URL’si ve geçerli bir AWS bölgesi girin.",
   "kiroLogin.back": "Geri",
   "kiroLogin.continue": "AWS ile devam et",
   "kiroLogin.selectProfile": "Bir Kiro profili seçin",
@@ -175,7 +211,8 @@ export const tr: Record<TKey, string> = {
   "kiroLogin.builderId": "Builder ID ile oturum aç",
   "kiroLogin.google": "Google ile oturum aç",
   "kiroLogin.github": "GitHub ile oturum aç",
-  "kiroLogin.addDescription": "Cihazla bir Kiro hesabı ekleyin veya Kiro CLI oturumunu içe aktarın.",
+  "kiroLogin.addDescription":
+    "Cihazla bir Kiro hesabı ekleyin veya Kiro CLI oturumunu içe aktarın.",
   "kiroLogin.loginDescription": "Cihazla oturum açın veya Kiro CLI oturumunuzu içe aktarın.",
   "kiroLogin.starting": "Cihaz oturumu başlatılıyor…",
   "kiroLogin.pending": "Bu kodu doğrulama sayfasına girin ve burada bekleyin.",
@@ -189,7 +226,8 @@ export const tr: Record<TKey, string> = {
   "kiroLogin.copied": "Kod kopyalandı",
   "kiroLogin.copyUnavailable": "Kopyalama kullanılamıyor",
   "kiroLogin.openVerification": "Doğrulama sayfasını aç",
-  "kiroLogin.unexpectedHost": "Beklenmeyen doğrulama sunucusu. Kopyalamadan önce adresi kontrol edin.",
+  "kiroLogin.unexpectedHost":
+    "Beklenmeyen doğrulama sunucusu. Kopyalamadan önce adresi kontrol edin.",
   "kiroLogin.duplicate": "Bu Kiro profili hesap listesinde zaten var.",
   "kiroLogin.manualReview": "Bu hesap için elle inceleme gerekebilir.",
   "kiroSelection.suspended": "Otomatik seçilmiyor: askıya alındı",
@@ -197,8 +235,10 @@ export const tr: Record<TKey, string> = {
   "kiroSelection.cooldown": "Otomatik seçilmiyor: bekleme süresi",
   "kiroSelection.generic": "Otomatik seçilmiyor",
 
-  "usage.incomplete": "Bazı kullanım kayıtları dahil edilemedi. Sayılar, tarihler ve sıralamalar yalnızca okunabilir kayıtlara dayanır.",
-  "models.pickerOrder.usageIncomplete": "Kullanım geçmişi eksik olduğundan en çok kullanılan sıralaması kaydedilemiyor. Başka bir sıralama seçin veya önce geçmişi onarın.",
+  "usage.incomplete":
+    "Bazı kullanım kayıtları dahil edilemedi. Sayılar, tarihler ve sıralamalar yalnızca okunabilir kayıtlara dayanır.",
+  "models.pickerOrder.usageIncomplete":
+    "Kullanım geçmişi eksik olduğundan en çok kullanılan sıralaması kaydedilemiyor. Başka bir sıralama seçin veya önce geçmişi onarın.",
   "api.attribution.noRecordedUse": "Okunabilir kayıtlarda kullanım yok",
   "audio.dictation": "Dikte",
   "audio.liveVoice": "Canlı Ses",
@@ -237,24 +277,29 @@ export const tr: Record<TKey, string> = {
   "models.pickerOrder.custom": "Özel sıra",
   "models.pickerOrder.apply": "Sırayı uygula",
   "models.pickerOrder.applying": "Uygulanıyor…",
-  "models.pickerOrder.saved": "Model sırası kaydedildi. Eski kataloğu gösteren istemcileri yeniden açın.",
+  "models.pickerOrder.saved":
+    "Model sırası kaydedildi. Eski kataloğu gösteren istemcileri yeniden açın.",
   "models.pickerOrder.pending": "Sıra kaydedildi; katalog yenilemesi bekleniyor.",
   "models.pickerOrder.usageFailed": "Model kullanımı yüklenemedi.",
   "models.pickerOrder.loadFailed": "Seçici ayarları yüklenemedi.",
   "models.pickerOrder.retry": "Yeniden dene",
-  "models.pickerOrder.hint": "Codex ve Claude keşfi için yönlendirilen model sırasını kaydeder. Öne çıkan/yerel öncelik aralıkları korunur. Kullanım bir anlık görüntüdür; yerel araçta sunulan seçenekler değişebilir.",
+  "models.pickerOrder.hint":
+    "Codex ve Claude keşfi için yönlendirilen model sırasını kaydeder. Öne çıkan/yerel öncelik aralıkları korunur. Kullanım bir anlık görüntüdür; yerel araçta sunulan seçenekler değişebilir.",
   "models.fastRows.title": "Hızlı model satırlarını göster",
-  "models.fastRows.desc": "Harici istemci model seçicilerine uygun „Model Fast“ seçicilerini ekler. Bu, temel modeldeki akıl yürütme çabası seçeneklerini değiştirmez. Kaydetme işlemi mümkün olduğunda bağlı entegrasyonları yeniler; aksi durumda entegrasyonu veya istemci kataloğunu yenileyin.",
+  "models.fastRows.desc":
+    "Harici istemci model seçicilerine uygun „Model Fast“ seçicilerini ekler. Bu, temel modeldeki akıl yürütme çabası seçeneklerini değiştirmez. Kaydetme işlemi mümkün olduğunda bağlı entegrasyonları yeniler; aksi durumda entegrasyonu veya istemci kataloğunu yenileyin.",
   "models.fastRows.refreshHint": "Kaydedildi. Katalog yenilemesi bekleniyor.",
   "models.fastRows.enabled": "Hızlı model satırları etkinleştirildi.",
   "models.fastRows.disabled": "Hızlı model satırları devre dışı bırakıldı.",
   "models.fastRows.loadFailed": "Hızlı satır ayarı yüklenemedi.",
   "models.fastRows.updateFailed": "Hızlı satır ayarı güncellenemedi.",
-  "codexAuth.quotaAutoRefreshAllHint": "Mevcut tüm hesapların desteklenen 5 saatlik ve haftalık pencerelerini birlikte açıp kapatır. Havuz modunda her sıfırlamadan sonra az miktarda kota kullanan bir istek gönderilir.",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "Mevcut tüm hesapların desteklenen 5 saatlik ve haftalık pencerelerini birlikte açıp kapatır. Havuz modunda her sıfırlamadan sonra az miktarda kota kullanan bir istek gönderilir.",
   "codexAuth.quotaAutoRefreshMixed": "Bazı pencereler etkin.",
   "codexAuth.quotaAutoRefreshEmpty": "Desteklenen kota penceresi yok. Hesap kotalarını yenileyin.",
   "codexAuth.quotaAutoRefreshLoadFailed": "Etkinleştirme ayarları yüklenemedi. Yeniden deneyin.",
-  "codexAuth.quotaAutoRefreshPartial": "Bazı ayarlar kaydedilemedi. Aynı değişikliği tamamlamak için yeniden deneyin.",
+  "codexAuth.quotaAutoRefreshPartial":
+    "Bazı ayarlar kaydedilemedi. Aynı değişikliği tamamlamak için yeniden deneyin.",
   // sidebar / nav / common
   "nav.dashboard": "Gösterge Paneli",
   "uptime.day": " gün",
@@ -270,39 +315,47 @@ export const tr: Record<TKey, string> = {
   "nav.usage": "Kullanım",
   "common.github": "GitHub",
   "onboarding.star.title": "OpenCodex’i beğendiniz mi?",
-  "onboarding.star.body": "OpenCodex ücretsiz ve açık kaynaktır. GitHub’daki bir yıldız, diğer geliştiricilerin onu bulmasına yardımcı olur ve projenin sürmesini sağlar.",
+  "onboarding.star.body":
+    "OpenCodex ücretsiz ve açık kaynaktır. GitHub’daki bir yıldız, diğer geliştiricilerin onu bulmasına yardımcı olur ve projenin sürmesini sağlar.",
   "onboarding.star.cta": "GitHub’da yıldız ver",
-  "onboarding.star.ghHint": "Oturum açmış GitHub CLI (gh) ile depoya yıldız verir. Siz tıklayana kadar hiçbir şey yapılmaz.",
+  "onboarding.star.ghHint":
+    "Oturum açmış GitHub CLI (gh) ile depoya yıldız verir. Siz tıklayana kadar hiçbir şey yapılmaz.",
   "onboarding.star.browserHint": "Depoyu tarayıcınızda github.com üzerinde açar.",
   "onboarding.star.openPage": "Bunun yerine GitHub sayfasını aç",
   "onboarding.star.later": "Daha sonra",
-  "onboarding.star.failed": "GitHub CLI (gh) ile yıldız verilemedi. Bunun yerine GitHub sayfasından yıldız verebilirsiniz.",
+  "onboarding.star.failed":
+    "GitHub CLI (gh) ile yıldız verilemedi. Bunun yerine GitHub sayfasından yıldız verebilirsiniz.",
   "onboarding.star.starring": "Yıldız veriliyor…",
   "onboarding.star.thanks": "Yıldız için teşekkürler!",
-  "onboarding.star.thanksBody": "Gerçekten çok yardımcı oluyor. Kenar çubuğundaki GitHub bağlantısı sizi her zaman depoya götürür.",
+  "onboarding.star.thanksBody":
+    "Gerçekten çok yardımcı oluyor. Kenar çubuğundaki GitHub bağlantısı sizi her zaman depoya götürür.",
   "onboarding.star.done": "Tamam",
   "common.save": "Kaydet",
   "common.saving": "Kaydediliyor…",
   "common.cancel": "İptal",
-"common.discard": "Vazgeç",
+  "common.discard": "Vazgeç",
   "common.delete": "Sil",
   "common.close": "Kapat",
   "common.ok": "Tamam",
   "common.remove": "Kaldır",
   "common.loading": "Yükleniyor…",
   "common.retry": "Tekrar Dene",
-  "prov.affinityResetPending": "Hesap değişikliği kaydedildi, ancak konuşma yönlendirmesi güncellenemedi. Tamamlamak için yeniden deneyin.",
+  "prov.affinityResetPending":
+    "Hesap değişikliği kaydedildi, ancak konuşma yönlendirmesi güncellenemedi. Tamamlamak için yeniden deneyin.",
   "prov.affinityResetComplete": "Konuşma yönlendirmesi güncellendi.",
-  "prov.affinityResetRetryUnavailable": "Bu hesap için şu anda yeniden denenemiyor. Hesap listesini yenileyin ve gerekirse hesabı devam ettirin veya yeniden oturum açın.",
+  "prov.affinityResetRetryUnavailable":
+    "Bu hesap için şu anda yeniden denenemiyor. Hesap listesini yenileyin ve gerekirse hesabı devam ettirin veya yeniden oturum açın.",
   "common.undo": "Geri al",
   "auth.adminTokenTitle": "OpenCodex yönetici jetonu (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "Hesap",
   "auth.adminTokenFieldLabel": "Yönetici jetonu",
   "auth.adminTokenRejected": "Bu yönetici jetonu reddedildi. Kontrol edip tekrar deneyin.",
   "auth.adminTokenUnavailable": "Yönetici jetonu doğrulanamadı. Tekrar deneyin.",
-  "auth.adminTokenHelp": "Bu, sağlayıcı API anahtarı değil, OpenCodex yönetim API’sinin yönetici jetonudur. Proxy ilk açılışta bunu ~/.opencodex/admin-api-token (veya $OPENCODEX_HOME/admin-api-token) dosyasına yazar; OPENCODEX_ADMIN_AUTH_TOKEN bu değeri geçersiz kılar.",
+  "auth.adminTokenHelp":
+    "Bu, sağlayıcı API anahtarı değil, OpenCodex yönetim API’sinin yönetici jetonudur. Proxy ilk açılışta bunu ~/.opencodex/admin-api-token (veya $OPENCODEX_HOME/admin-api-token) dosyasına yazar; OPENCODEX_ADMIN_AUTH_TOKEN bu değeri geçersiz kılar.",
   "auth.rememberDevice": "Bu cihazı hatırla",
-  "auth.rememberDeviceHint": "Yönetici belirteci yerine iptal edilebilir HttpOnly oturumunu 30 gün tutar. API ile aynı origin'de doğrudan bir HTTPS paneli (veya yerel loopback) gerekir.",
+  "auth.rememberDeviceHint":
+    "Yönetici belirteci yerine iptal edilebilir HttpOnly oturumunu 30 gün tutar. API ile aynı origin'de doğrudan bir HTTPS paneli (veya yerel loopback) gerekir.",
   "connection.forgetDevice": "Bu cihazı unut",
   "connection.forgetDeviceFailed": "Bu cihaz unutulamadı. Oturum korundu.",
   "auth.adminTokenDocsLink": "Nasıl bulunur",
@@ -327,15 +380,18 @@ export const tr: Record<TKey, string> = {
   "provider.name.volcengineCodingPlan": "Volcengine Ark Coding Plan",
   "provider.name.volcengineAgentPlan": "Volcengine Ark Agent Plan",
   "errorBoundary.title": "Sayfa yüklenemedi",
-  "errorBoundary.message": "Bu bölümde bir işleme hatası oluştu. Yeniden denemek için sayfayı yenileyin.",
+  "errorBoundary.message":
+    "Bu bölümde bir işleme hatası oluştu. Yeniden denemek için sayfayı yenileyin.",
   "errorBoundary.details": "Hata",
   "errorBoundary.reload": "Yeniden Yükle",
 
   // routing intelligence
   "routing.title": "Yönlendirme Zekası (beta)",
-  "routing.subtitle": "Politika profilleri, simülasyon değerlendirmesi ve kaynak destekli yönlendirme analitiği.",
+  "routing.subtitle":
+    "Politika profilleri, simülasyon değerlendirmesi ve kaynak destekli yönlendirme analitiği.",
   "routing.loadFailed": "Yönlendirme verileri yüklenemedi",
-  "routing.empty": "Yapılandırılmış yönlendirme profili yok. config.json dosyasına `routingProfiles` ekleyin.",
+  "routing.empty":
+    "Yapılandırılmış yönlendirme profili yok. config.json dosyasına `routingProfiles` ekleyin.",
   "routing.revision": "revizyon",
   "routing.detail": "Profil",
   "routing.createProfile": "Profil oluştur",
@@ -394,22 +450,28 @@ export const tr: Record<TKey, string> = {
 
   // startup health
   "startup.title": "Başlatma güvenliği",
-  "startup.subtitle": "Yerel proxy yönlendirmesi bir yeniden bağlanma döngüsüne girmeden önce Codex'in yeniden başlatmanın ardından opencodex'e erişebildiğini doğrulayın.",
+  "startup.subtitle":
+    "Yerel proxy yönlendirmesi bir yeniden bağlanma döngüsüne girmeden önce Codex'in yeniden başlatmanın ardından opencodex'e erişebildiğini doğrulayın.",
   "startup.refresh": "Yenile",
   "startup.backToDashboard": "Gösterge Paneline Dön",
   "startup.loading": "Başlatma koruması kontrol ediliyor…",
   "startup.error": "Başlatma koruması okunamadı.",
-  "startup.staleData": "Son başlatma kontrolü başarısız oldu. Aşağıdaki değerler güncel değildir ve koruma kanıtı olarak kabul edilmemelidir.",
+  "startup.staleData":
+    "Son başlatma kontrolü başarısız oldu. Aşağıdaki değerler güncel değildir ve koruma kanıtı olarak kabul edilmemelidir.",
   "startup.status.native": "Yerel yönlendirme",
   "startup.status.protected": "Yeniden başlatma korumalı",
   "startup.status.atRisk": "Eylem gerekiyor",
   "startup.summary.native": "Codex yerel proxy'ye bağımlı değildir",
   "startup.summary.protected": "opencodex yeniden başlatmanın ardından kullanılabilir olacaktır",
   "startup.summary.atRisk": "Codex yeniden başlatmanın ardından model erişimini kaybedebilir",
-  "startup.riskDetail": "Codex yerel proxy'ye sabitlenmiş, ancak kalıcı bir servis veya sağlıklı başlatıcı shim bunu tekrar başlatmayacak.",
-  "startup.riskDetailCustomLocal": "Codex özel bir yerel ağ geçidine işaret ediyor. opencodex bu ağ geçidinin yeniden başlatma yaşam döngüsünü yönetemez veya doğrulayamaz.",
-  "startup.riskDetailWindowsShim": "Başlatıcı shim desteklenen CLI betiklerini korur, ancak Codex Desktop ve doğrudan codex.exe başlatmaları Windows'ta bunu atlayabilir.",
-  "startup.safeDetail": "Mevcut yönlendirme ve başlatma mekanizması tutarlıdır. Yeniden başlatmanın ardından manuel `ocx start` komutuna gerek yoktur.",
+  "startup.riskDetail":
+    "Codex yerel proxy'ye sabitlenmiş, ancak kalıcı bir servis veya sağlıklı başlatıcı shim bunu tekrar başlatmayacak.",
+  "startup.riskDetailCustomLocal":
+    "Codex özel bir yerel ağ geçidine işaret ediyor. opencodex bu ağ geçidinin yeniden başlatma yaşam döngüsünü yönetemez veya doğrulayamaz.",
+  "startup.riskDetailWindowsShim":
+    "Başlatıcı shim desteklenen CLI betiklerini korur, ancak Codex Desktop ve doğrudan codex.exe başlatmaları Windows'ta bunu atlayabilir.",
+  "startup.safeDetail":
+    "Mevcut yönlendirme ve başlatma mekanizması tutarlıdır. Yeniden başlatmanın ardından manuel `ocx start` komutuna gerek yoktur.",
   "startup.routing": "Codex yönlendirmesi",
   "startup.routing.proxy": "Yerel proxy",
   "startup.routing.native": "Yerel OpenAI",
@@ -430,7 +492,8 @@ export const tr: Record<TKey, string> = {
   "startup.notInstalled": "Yüklü değil",
   "startup.unsupported": "Desteklenmiyor",
   "startup.shim": "Codex başlatıcı shim",
-  "startup.shimHint": "Desteklenen bir Codex betik başlatıcısı başladığında `ocx ensure` çalıştırır.",
+  "startup.shimHint":
+    "Desteklenen bir Codex betik başlatıcısı başladığında `ocx ensure` çalıştırır.",
   "startup.healthy": "Sağlıklı",
   "startup.cliOnly": "Yalnızca CLI",
   "startup.stale": "Eski",
@@ -440,7 +503,8 @@ export const tr: Record<TKey, string> = {
   "startup.conflict": "Servis çakışması",
   "startup.installedDisabled": "Yüklü ama devre dışı",
   "startup.shimActivationPending": "Yüklü · etkinleştirme doğrulanmadı",
-  "startup.shimActivationHint": "Kabuk başlangıç dosyanızda diğer PATH ayarlarından sonra . ~/.opencodex/codex-shell-env.sh satırını ekleyin ve yeni bir terminal açın. Pano, kabuğunuzun PATH değerini her zaman göremez.",
+  "startup.shimActivationHint":
+    "Kabuk başlangıç dosyanızda diğer PATH ayarlarından sonra . ~/.opencodex/codex-shell-env.sh satırını ekleyin ve yeni bir terminal açın. Pano, kabuğunuzun PATH değerini her zaman göremez.",
   "startup.install": "Yükle",
   "startup.installing": "Yükleniyor…",
   "startup.repair": "Onar",
@@ -451,7 +515,8 @@ export const tr: Record<TKey, string> = {
   "startup.shimRepaired": "Codex başlatıcı shim başarıyla onarıldı.",
   "startup.installFailed": "Yükleme başarısız oldu:",
   "startup.recovery": "Onarım seçenekleri",
-  "startup.recoveryHint": "Yukarıdaki tek tıkla yükleyicileri kullanın veya manuel onarım için komutu kopyalayın. Codex Desktop ve Windows yürütülebilir dosyaları için arka plan servisi önerilir.",
+  "startup.recoveryHint":
+    "Yukarıdaki tek tıkla yükleyicileri kullanın veya manuel onarım için komutu kopyalayın. Codex Desktop ve Windows yürütülebilir dosyaları için arka plan servisi önerilir.",
   "startup.command.service": "Önerilen: kalıcı arka plan servisi",
   "startup.command.shim": "Alternatif: CLI başlatıcı shim",
   "startup.command.native": "Güvenli mod: yerel Codex yönlendirmesini geri yükle",
@@ -459,12 +524,16 @@ export const tr: Record<TKey, string> = {
   "startup.copied": "Kopyalandı",
   "startup.recommended": "Önerilen onarım: {cmd}",
   "startup.navRisk": "Başlatma koruması dikkat gerektiriyor",
-  "startup.codexRuntime.clampHidden": "OpenCodex, Codex {version} kullandığı için bazı akıl yürütme çabası seçenekleri gizlendi.",
-  "startup.codexRuntime.clampHiddenWithEfforts": "OpenCodex, Codex {version} kullandığı için bazı akıl yürütme çabası seçenekleri gizlendi (kaldırılanlar: {efforts}).",
-  "startup.codexRuntime.olderBinary": "OpenCodex eski bir Codex ikili dosyası ({version}) kullanıyor. Daha yeni bir kurulum mevcut.",
+  "startup.codexRuntime.clampHidden":
+    "OpenCodex, Codex {version} kullandığı için bazı akıl yürütme çabası seçenekleri gizlendi.",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "OpenCodex, Codex {version} kullandığı için bazı akıl yürütme çabası seçenekleri gizlendi (kaldırılanlar: {efforts}).",
+  "startup.codexRuntime.olderBinary":
+    "OpenCodex eski bir Codex ikili dosyası ({version}) kullanıyor. Daha yeni bir kurulum mevcut.",
 
   // dashboard
-  "dash.subtitle": "Yerel opencodex proxy'sinin, sağlayıcılarının ve Codex'e yönlendirilen modellerin canlı durumu.",
+  "dash.subtitle":
+    "Yerel opencodex proxy'sinin, sağlayıcılarının ve Codex'e yönlendirilen modellerin canlı durumu.",
   "dash.workspace.overview": "Genel Bakış",
   "dash.workspace.sections": "Bölümler",
   "dash.status": "Durum",
@@ -476,7 +545,8 @@ export const tr: Record<TKey, string> = {
   "dash.tokens30d": "Jetonlar (30 gün)",
   "dash.coverage": "%{pct} kapsam",
   "dash.mem.title": "Bellek izlenebilirliği",
-  "dash.mem.hint": "Salt okunur çalışma zamanı tanılamaları. Gözlemlenen bellek max(RSS, harici, ArrayBuffers) değeridir.",
+  "dash.mem.hint":
+    "Salt okunur çalışma zamanı tanılamaları. Gözlemlenen bellek max(RSS, harici, ArrayBuffers) değeridir.",
   "dash.mem.rss": "Yerleşik küme (RSS)",
   "dash.mem.jsHeap": "Kullanımdaki JS yığını",
   "dash.mem.jsHeapArena": "arena {total}",
@@ -503,10 +573,12 @@ export const tr: Record<TKey, string> = {
   "dash.mem.unavailable": "Bellek tanılaması kullanılamıyor (eski proxy).",
   "dash.mem.inFlight": "İşlemdeki istekler",
   "dash.mem.restart": "Boşalt & yeniden başlat",
-  "dash.mem.restartConfirm": "{count} işlemdeki isteğin tamamlanmasını bekleyin, ardından yeniden başlatın ({seconds} saniyeye kadar).",
+  "dash.mem.restartConfirm":
+    "{count} işlemdeki isteğin tamamlanmasını bekleyin, ardından yeniden başlatın ({seconds} saniyeye kadar).",
   "dash.mem.draining": "{count} istek boşaltılıyor… tamamlandığında yeniden başlatılacak",
   "dash.mem.reconnecting": "Proxy yeniden başlatılıyor… yeniden bağlanması bekleniyor",
-  "dash.mem.restartFailed": "Boşaltma ve yeniden başlatma başarısız oldu. Proxy'nin çalıştığını kontrol edin.",
+  "dash.mem.restartFailed":
+    "Boşaltma ve yeniden başlatma başarısız oldu. Proxy'nin çalıştığını kontrol edin.",
   "dash.mem.restartNoSupervisor": "Yeniden başlatma koruması algılanmadı.",
   "dash.activeProviders": "Aktif sağlayıcılar",
   "dash.noProviders": "Yapılandırılmış sağlayıcı yok. {cmd} komutunu çalıştırın.",
@@ -523,41 +595,56 @@ export const tr: Record<TKey, string> = {
   "dash.stopConfirm": "Proxy durdurulsun ve yerel Codex geri yüklensin mi?",
   "dash.stopFailed": "Proxy durdurulamadı (HTTP {status}).",
   "dash.stopStillRunning": "Proxy hâlâ yanıt veriyor, yani durmadı.",
-  "dash.stopUnknown": "Durdurma doğrulanamadı. Yeniden denemeden önce proxy’nin çalışıp çalışmadığını kontrol edin.",
+  "dash.stopUnknown":
+    "Durdurma doğrulanamadı. Yeniden denemeden önce proxy’nin çalışıp çalışmadığını kontrol edin.",
   "dash.maSwitchFailed": "Mod değiştirme başarısız oldu (HTTP {status}).",
   "dash.maNetworkError": "Ağ hatası — proxy çalışıyor mu?",
   "dash.stopping": "Durduruluyor…",
   "dash.actions": "Proxy",
   "dash.codexRestart": "Codex model listesini yenile",
   "dash.codexRestarting": "Durduruluyor…",
-  "dash.codexRestartConfirm": "Model listesini yeniden okumaları için Codex app-server'ları durdurulsun mu? Süren bir Codex işlemi kesilir ve Codex kendiliğinden yeniden başlamaz — sonrasında yeniden açın.",
-  "dash.codexRestartDone": "{count} Codex app-server durduruldu. Güncel model listesi için Codex'i yeniden açın.",
-  "dash.codexRestartNothing": "Çalışan Codex app-server yok. Sonraki açılışta güncel model listesi okunur.",
+  "dash.codexRestartConfirm":
+    "Model listesini yeniden okumaları için Codex app-server'ları durdurulsun mu? Süren bir Codex işlemi kesilir ve Codex kendiliğinden yeniden başlamaz — sonrasında yeniden açın.",
+  "dash.codexRestartDone":
+    "{count} Codex app-server durduruldu. Güncel model listesi için Codex'i yeniden açın.",
+  "dash.codexRestartNothing":
+    "Çalışan Codex app-server yok. Sonraki açılışta güncel model listesi okunur.",
   "dash.codexRestartUnknown": "Süreçler listelenemedi, bu yüzden hiçbir şey durdurulmadı.",
-  "dash.codexRestartPartial": "{count} app-server kapanmadı. Model listesi eski kalırsa bunları elle durdurun.",
+  "dash.codexRestartPartial":
+    "{count} app-server kapanmadı. Model listesi eski kalırsa bunları elle durdurun.",
   "dash.codexRestartFailed": "Codex model listesi yenilenemedi (HTTP {status}).",
   "dash.codexRestartUnreachable": "Proxy'ye ulaşılamadı.",
   "dash.codexRestartMalformed": "Proxy beklenmeyen bir yanıt döndürdü.",
-  "dash.codexRestartTimeout": "Proxy zamanında yanıt vermedi. App-server'ları durdurmaya devam ediyor olabilir.",
-  "models.staleBanner": "Codex, bu katalogdan daha eski bir model listesi gösteriyor. Yeniden okumak için Codex'i yeniden başlatın.",
+  "dash.codexRestartTimeout":
+    "Proxy zamanında yanıt vermedi. App-server'ları durdurmaya devam ediyor olabilir.",
+  "models.staleBanner":
+    "Codex, bu katalogdan daha eski bir model listesi gösteriyor. Yeniden okumak için Codex'i yeniden başlatın.",
   "dash.codexAutoStart": "opencodex'i Codex ile başlat",
-  "dash.codexAutoStartHint": "Yüklü bir shim'in ocx ensure çalıştırmasına izin verir. Arka plan servisi veya yeniden başlatma koruması kurmaz; sistem durumu için Başlatma Güvenliği'ne bakın.",
+  "dash.codexAutoStartHint":
+    "Yüklü bir shim'in ocx ensure çalıştırmasına izin verir. Arka plan servisi veya yeniden başlatma koruması kurmaz; sistem durumu için Başlatma Güvenliği'ne bakın.",
   "dash.searchModel": "Arama yan araç modeli",
-  "dash.searchModelHint": "OpenAI dışı yönlendirilen modellerde web_search için kullanılan model. ChatGPT girişi gerektirir.",
+  "dash.searchModelHint":
+    "OpenAI dışı yönlendirilen modellerde web_search için kullanılan model. ChatGPT girişi gerektirir.",
   "dash.searchReasoning": "Arama akıl yürütme çabası",
   "dash.visionModel": "Görsel yan araç modeli",
-  "dash.visionModelHint": "Salt metin yönlendirilen modeller için görselleri tanımlamakta kullanılan model. ChatGPT girişi gerektirir.",
+  "dash.visionModelHint":
+    "Salt metin yönlendirilen modeller için görselleri tanımlamakta kullanılan model. ChatGPT girişi gerektirir.",
   "dash.webSearchSidecar": "Web arama yan aracı (sidecar)",
-  "dash.webSearchSidecarHint": "Yönlendirilen modellerde web araması için kullanılan arka ucu ve modeli seçin.",
+  "dash.webSearchSidecarHint":
+    "Yönlendirilen modellerde web araması için kullanılan arka ucu ve modeli seçin.",
   "dash.webSearchOff": "Kapalı",
-  "dash.webSearchCodexSync": "Kaydedildi. Codex yapılandırması henüz yeniden yazılmadı — “Modelleri senkronize et”i çalıştırın.",
+  "dash.webSearchCodexSync":
+    "Kaydedildi. Codex yapılandırması henüz yeniden yazılmadı — “Modelleri senkronize et”i çalıştırın.",
   "dash.webSearchStream": "Yanıtları canlı akıt",
-  "dash.webSearchStreamHint": "Model bir araç çağrısına karar verene kadar baştaki metni ve akıl yürütmeyi canlı akıtır; kalanı arama yakalama için arabelleğe alınır. Aramadan önce yazılan metin kısmen tekrarlanabilir.",
+  "dash.webSearchStreamHint":
+    "Model bir araç çağrısına karar verene kadar baştaki metni ve akıl yürütmeyi canlı akıtır; kalanı arama yakalama için arabelleğe alınır. Aramadan önce yazılan metin kısmen tekrarlanabilir.",
   "dash.visionSidecar": "Görsel yan aracı (sidecar)",
-  "dash.visionSidecarHint": "Salt metin modeller için görselleri tanımlamakta kullanılan arka ucu ve modeli seçin.",
+  "dash.visionSidecarHint":
+    "Salt metin modeller için görselleri tanımlamakta kullanılan arka ucu ve modeli seçin.",
   "dash.visionOff": "Kapalı",
   "compactionRouting.title": "Özetleme yönlendirmesi",
-  "compactionRouting.description": "Codex özetleme istekleri için bir model ve bunun hangi tetikleyicileri kapsadığını seçin. Sonraki mesajlar konuşma ayarlarını korur.",
+  "compactionRouting.description":
+    "Codex özetleme istekleri için bir model ve bunun hangi tetikleyicileri kapsadığını seçin. Sonraki mesajlar konuşma ayarlarını korur.",
   "compactionRouting.model": "Özetleme modeli",
   "compactionRouting.effort": "Akıl yürütme düzeyi",
   "compactionRouting.triggers": "Şunlara uygulanır",
@@ -571,32 +658,45 @@ export const tr: Record<TKey, string> = {
   "compactionRouting.sourcesModels": "Tekil modeller",
   "compactionRouting.sourcesSaved": "Geçerli katalogda olmayan kayıtlı seçiciler",
   "compactionRouting.sourcesNone": "En az bir kaynak seçin veya tüm konuşma modellerine dönün.",
-  "compactionRouting.sourcesHint": "Geçersiz kılmayı yalnızca özetleme isteğinin kaynak modeli seçilen modelle veya provider/* ile eşleştiğinde uygular. Eşleşmeyen istekler kendi modelini kullanır.",
-  "compactionRouting.sourcesGridTitle": "Kaynak modeli aşağıdakilerle eşleşen özetleme isteklerini yeniden yönlendir:",
+  "compactionRouting.sourcesHint":
+    "Geçersiz kılmayı yalnızca özetleme isteğinin kaynak modeli seçilen modelle veya provider/* ile eşleştiğinde uygular. Eşleşmeyen istekler kendi modelini kullanır.",
+  "compactionRouting.sourcesGridTitle":
+    "Kaynak modeli aşağıdakilerle eşleşen özetleme isteklerini yeniden yönlendir:",
   "compactionRouting.currentModel": "Konuşma modelini kullan",
   "compactionRouting.currentEffort": "İsteğin düzeyini koru",
-  "compactionRouting.effortHint": "Akıl yürütme, özetleme uç noktası destekliyorsa uygulanır. Model tüm konuşmayı kabul edebilmelidir.",
-  "compactionRouting.dataNotice": "Kapsama giren bir özetleme isteği, konuşma başka bir sağlayıcıda yürütülse bile konuşmanın tamamını özetlenmek üzere seçilen modelin sağlayıcısına gönderir.",
-  "compactionRouting.autoNotice": "Otomatik özetleme kendiliğinden çalışır; bu nedenle uzun bir konuşma siz istemeden o sağlayıcıya gidebilir.",
-  "compactionRouting.providerWarning": "Bu ayarla kapsama giren her özetleme isteği, konuşmanın tüm içeriğini özetlenmek üzere {provider} sağlayıcısına gönderir.",
-  "compactionRouting.providerWarningScoped": "Bu ayarla yalnızca kaynak modeli {sources} ile eşleşen özetleme istekleri konuşmanın tüm içeriğini {provider} hedefine gönderir; eşleşmeyen istekler kendi modelini kullanır.",
+  "compactionRouting.effortHint":
+    "Akıl yürütme, özetleme uç noktası destekliyorsa uygulanır. Model tüm konuşmayı kabul edebilmelidir.",
+  "compactionRouting.dataNotice":
+    "Kapsama giren bir özetleme isteği, konuşma başka bir sağlayıcıda yürütülse bile konuşmanın tamamını özetlenmek üzere seçilen modelin sağlayıcısına gönderir.",
+  "compactionRouting.autoNotice":
+    "Otomatik özetleme kendiliğinden çalışır; bu nedenle uzun bir konuşma siz istemeden o sağlayıcıya gidebilir.",
+  "compactionRouting.providerWarning":
+    "Bu ayarla kapsama giren her özetleme isteği, konuşmanın tüm içeriğini özetlenmek üzere {provider} sağlayıcısına gönderir.",
+  "compactionRouting.providerWarningScoped":
+    "Bu ayarla yalnızca kaynak modeli {sources} ile eşleşen özetleme istekleri konuşmanın tüm içeriğini {provider} hedefine gönderir; eşleşmeyen istekler kendi modelini kullanır.",
   "compactionRouting.loadFailed": "Özetleme ayarları yüklenemedi.",
   "compactionRouting.saved": "Özetleme ayarları kaydedildi.",
   "compactionRouting.saveFailed": "Kaydedilemedi. Değişiklikleriniz korunuyor; tekrar deneyin.",
   "memoryModels.title": "Bellek yönlendirmesi",
-  "memoryModels.description": "Codex, oturum bittikten sonra belleği arka planda yazar. Her aşama için model seçin veya mevcut yönlendirmeyi koruyun.",
+  "memoryModels.description":
+    "Codex, oturum bittikten sonra belleği arka planda yazar. Her aşama için model seçin veya mevcut yönlendirmeyi koruyun.",
   "memoryModels.infoLabel": "Extract ve Consolidation nedir?",
-  "memoryModels.info": "Codex, biten oturumları iki adımda belleğe dönüştürür. Extract biten bir oturumu okuyup ne olduğunu not eder: oturum başına bir not, yani çok sayıda küçük çağrı. Consolidation bu notları alıp Codex'in sonraki oturumların başında okuduğu bellek dosyalarına yazar. Seyrek çalışır ama dosyaları düzenler. Her adım kendi modelini ister, bu yüzden burada ayrı görünürler.",
+  "memoryModels.info":
+    "Codex, biten oturumları iki adımda belleğe dönüştürür. Extract biten bir oturumu okuyup ne olduğunu not eder: oturum başına bir not, yani çok sayıda küçük çağrı. Consolidation bu notları alıp Codex'in sonraki oturumların başında okuduğu bellek dosyalarına yazar. Seyrek çalışır ama dosyaları düzenler. Her adım kendi modelini ister, bu yüzden burada ayrı görünürler.",
   "memoryModels.extract": "Çıkarım",
-  "memoryModels.extractHint": "Her biten oturumu bir ham belleğe özetler. Oturum başına bir kez çalışır.",
+  "memoryModels.extractHint":
+    "Her biten oturumu bir ham belleğe özetler. Oturum başına bir kez çalışır.",
   "memoryModels.consolidation": "Birleştirme",
-  "memoryModels.consolidationHint": "Ham bellekleri Codex'in sonra okuduğu bellek dosyalarında birleştirir. Seyrek çalışır ve dosyaları düzenler.",
+  "memoryModels.consolidationHint":
+    "Ham bellekleri Codex'in sonra okuduğu bellek dosyalarında birleştirir. Seyrek çalışır ve dosyaları düzenler.",
   "memoryModels.model": "Model",
   "memoryModels.effort": "Akıl yürütme çabası",
   "memoryModels.off": "Kapalı",
   "memoryModels.defaultEffort": "Codex varsayılanı",
-  "memoryModels.dataNotice": "Seçilen model kendi aşamasının girdisini alır: Extract için biten oturum, Consolidation için ham bellekler.",
-  "memoryModels.accountNotice": "Burada yalnızca bir aşama yönlendirildi; diğeri mevcut yolunu korur. Shadow Call Intercept o aşamanın bellek çağrılarını da kendi ayarlı modeline gönderebilir.",
+  "memoryModels.dataNotice":
+    "Seçilen model kendi aşamasının girdisini alır: Extract için biten oturum, Consolidation için ham bellekler.",
+  "memoryModels.accountNotice":
+    "Burada yalnızca bir aşama yönlendirildi; diğeri mevcut yolunu korur. Shadow Call Intercept o aşamanın bellek çağrılarını da kendi ayarlı modeline gönderebilir.",
   "memoryModels.loadFailed": "Bellek ayarları yüklenemedi.",
   "memoryModels.saved": "Bellek ayarları kaydedildi.",
   "memoryModels.saveFailed": "Kaydedilemedi. Değişiklikleriniz duruyor; tekrar deneyin.",
@@ -609,21 +709,31 @@ export const tr: Record<TKey, string> = {
   "shadowCall.sourceMemory": "Bellek",
   "shadowCall.sourceLegacy": "Eski",
   "shadowCall.sourceCustom": "Özel",
-  "shadowCall.sourceHint": "Yalnızca etkin kaynaklar yakalanır. En az biri açık kalmalıdır; tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın. Bellek yönlendirmesi yapılandırıldığında birleştirme için yine önceliklidir.",
-  "shadowCall.sourceCovered": "Özel {prefix} öneki tarafından kapsanıyor. Bu kaynağı ayrı ayrı değiştirmek için config.json içinde öneki kaldırın veya daraltın.",
-  "shadowCall.sourceLastRequired": "En az bir kaynak açık kalmalıdır. Tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın.",
-  "dash.shadowCallInterceptHint": "Codex App'in başlık, commit mesajı ve beceri orkestrasyonu için yaptığı arka plan yardımcı çağrılarını yakalar. Aşağıdan kaynak modelleri seçin. Bellek birleştirme normalde Terra ile çalışır ve yapılandırıldığında Bellek yönlendirmesini izler.",
-  "dash.shadowCallWarning": "⚠ Etkinleştirildiğinde, seçilen her kaynağa ({models}) yapılan istekler seçilen modelle değiştirilir. Terra isteğe bağlıdır; birleştirme için yapılandırılmış Bellek yönlendirmesi yine önceliklidir.",
+  "shadowCall.sourceHint":
+    "Yalnızca etkin kaynaklar yakalanır. En az biri açık kalmalıdır; tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın. Bellek yönlendirmesi yapılandırıldığında birleştirme için yine önceliklidir.",
+  "shadowCall.sourceCovered":
+    "Özel {prefix} öneki tarafından kapsanıyor. Bu kaynağı ayrı ayrı değiştirmek için config.json içinde öneki kaldırın veya daraltın.",
+  "shadowCall.sourceLastRequired":
+    "En az bir kaynak açık kalmalıdır. Tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın.",
+  "dash.shadowCallInterceptHint":
+    "Codex App'in başlık, commit mesajı ve beceri orkestrasyonu için yaptığı arka plan yardımcı çağrılarını yakalar. Aşağıdan kaynak modelleri seçin. Bellek birleştirme normalde Terra ile çalışır ve yapılandırıldığında Bellek yönlendirmesini izler.",
+  "dash.shadowCallWarning":
+    "⚠ Etkinleştirildiğinde, seçilen her kaynağa ({models}) yapılan istekler seçilen modelle değiştirilir. Terra isteğe bağlıdır; birleştirme için yapılandırılmış Bellek yönlendirmesi yine önceliklidir.",
   "dash.shadowCallOriginal": "Orijinal",
   "dash.shadowCallModel": "Yedek model",
-  "dash.shadowCallTooltip": "Codex App arka planda başlık, commit mesajı ve beceri orkestrasyonu için yardımcı çağrılar yapar. Yardımcı model istemci sürümleri arasında değiştiği için opencodex birden çok kaynağı yakalayabilir. Aşağıdan yönlendirmek istediğiniz her kaynağı seçin. Terra bellek birleştirme modelidir ve varsayılan olarak kapalıdır çünkü Codex onu normal işler için de seçer; Bellek yönlendirmesinde bir birleştirme modeli yapılandırıldığında o rota önceliklidir. En az bir kaynak açık kalmalıdır; tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın.",
+  "dash.shadowCallTooltip":
+    "Codex App arka planda başlık, commit mesajı ve beceri orkestrasyonu için yardımcı çağrılar yapar. Yardımcı model istemci sürümleri arasında değiştiği için opencodex birden çok kaynağı yakalayabilir. Aşağıdan yönlendirmek istediğiniz her kaynağı seçin. Terra bellek birleştirme modelidir ve varsayılan olarak kapalıdır çünkü Codex onu normal işler için de seçer; Bellek yönlendirmesinde bir birleştirme modeli yapılandırıldığında o rota önceliklidir. En az bir kaynak açık kalmalıdır; tüm shadow çağrılarının yakalanmasını durdurmak için ana anahtarı kullanın.",
   "models.shadowCallIntercept": "Gölge Çağrı Yakalama",
-  "models.shadowCallInterceptHint": "Codex App'in başlık, commit mesajı ve beceri orkestrasyonu için yaptığı arka plan yardımcı çağrılarını yakalar. Aşağıdan kaynak modelleri seçin. Bellek birleştirme normalde Terra ile çalışır ve yapılandırıldığında Bellek yönlendirmesini izler.",
+  "models.shadowCallInterceptHint":
+    "Codex App'in başlık, commit mesajı ve beceri orkestrasyonu için yaptığı arka plan yardımcı çağrılarını yakalar. Aşağıdan kaynak modelleri seçin. Bellek birleştirme normalde Terra ile çalışır ve yapılandırıldığında Bellek yönlendirmesini izler.",
   "models.shadowCallSaveFailed": "Gölge çağrı ayarları kaydedilemedi.",
-  "models.shadowCallTargetInvalid": "Yedek model etkin bir kaynakla çakışıyor. Başka bir yedek model seçin.",
-  "models.shadowCallSourceInvalid": "Bu kaynak seçimi geçersiz. Boşluk veya sağlayıcı öneki içermeyen en az bir kaynak seçin.",
+  "models.shadowCallTargetInvalid":
+    "Yedek model etkin bir kaynakla çakışıyor. Başka bir yedek model seçin.",
+  "models.shadowCallSourceInvalid":
+    "Bu kaynak seçimi geçersiz. Boşluk veya sağlayıcı öneki içermeyen en az bir kaynak seçin.",
   "models.autoReviewOverride": "Otomatik inceleme geçersiz kılma",
-  "models.autoReviewOverrideHint": "Codex’in otomatik incelemesi (onay gözden geçiren) için kullanılacak modeli seçer. Katalog eşitlemesinde tüm satırlara uygulanır; sağlayıcıya özel autoReviewModel kendi satırlarında yine önceliklidir.",
+  "models.autoReviewOverrideHint":
+    "Codex’in otomatik incelemesi (onay gözden geçiren) için kullanılacak modeli seçer. Katalog eşitlemesinde tüm satırlara uygulanır; sağlayıcıya özel autoReviewModel kendi satırlarında yine önceliklidir.",
   "models.autoReviewPending": "Beklemede",
   "dash.sidecarBackend": "Arka uç",
   "dash.sidecarModel": "Model",
@@ -636,24 +746,29 @@ export const tr: Record<TKey, string> = {
   "dash.injectionHint": "Codex'in alt ajan işlerini devredeceği modeli seçin.",
   "dash.injectionManage": "Ayarları aç",
   "dash.syncCodexSubagentDefaults": "Ayrıca Codex varsayılanı olarak kaydet",
-  "dash.syncCodexSubagentDefaultsHint": "Açık olduğunda, yukarıdaki seçim Codex'in kendi yapılandırmasına yazılır.",
+  "dash.syncCodexSubagentDefaultsHint":
+    "Açık olduğunda, yukarıdaki seçim Codex'in kendi yapılandırmasına yazılır.",
   "dash.multiAgentGuidance": "Codex'e işi nasıl böleceğini söyle",
-  "dash.multiAgentGuidanceHint": "Codex'e işleri alt ajanlara nasıl devredeceğini söyleyen kısa bir not gönderir.",
+  "dash.multiAgentGuidanceHint":
+    "Codex'e işleri alt ajanlara nasıl devredeceğini söyleyen kısa bir not gönderir.",
   "dash.injectionNone": "Yok",
   "dash.injectionEffortLabel": "Akıl yürütme çabası",
   "dash.injectionEffortNone": "Model varsayılanı",
   "dash.effortCapLabel": "V2 ultra çaba limiti",
   "dash.subagentEffortCapLabel": "V2 alt ajan çaba limiti",
-  "dash.effortCapHelp": "V2 ultra modu turları için akıl yürütme çabasını sınırlar. Ayarlandığında, gelen maksimum çaba istekleri (ultra modundan) seçilen seviye ile sınırlandırılır. Alt ajan limiti yalnızca türetilen çocuk ajanları etkiler. Limitler çabayı yalnızca düşürür, asla yükseltmez. Bir model sınırlandırılan seviyeyi desteklemiyorsa, desteklenen en yakın alt seviyeye iner.",
+  "dash.effortCapHelp":
+    "V2 ultra modu turları için akıl yürütme çabasını sınırlar. Ayarlandığında, gelen maksimum çaba istekleri (ultra modundan) seçilen seviye ile sınırlandırılır. Alt ajan limiti yalnızca türetilen çocuk ajanları etkiler. Limitler çabayı yalnızca düşürür, asla yükseltmez. Bir model sınırlandırılan seviyeyi desteklemiyorsa, desteklenen en yakın alt seviyeye iner.",
   "dash.effortCapNone": "Limit yok",
   "dash.maintenance": "Bakım",
-  "dash.maintenanceHint": "Codex'in model kataloğunu yenileyin veya daha yeni bir opencodex sürümü yükleyin.",
+  "dash.maintenanceHint":
+    "Codex'in model kataloğunu yenileyin veya daha yeni bir opencodex sürümü yükleyin.",
   "dash.syncModels": "Modelleri senkronize et",
   "dash.syncModelsHint": "Bağladığınız sağlayıcılardan Codex'in model kataloğunu yeniden yazın.",
   "dash.syncRun": "Şimdi senkronize et",
   "dash.syncing": "Senkronize ediliyor…",
   "dash.syncOk": "Senkronizasyon tamamlandı. {count} model eklendi.",
-  "dash.syncStaleHint": "Codex hâlâ eski bir liste gösteriyorsa uygulama sunucusunu yeniden başlatın ({cmd}).",
+  "dash.syncStaleHint":
+    "Codex hâlâ eski bir liste gösteriyorsa uygulama sunucusunu yeniden başlatın ({cmd}).",
   "dash.syncFailed": "Senkronizasyon başarısız oldu: {error}",
   "dash.projectConfigTitle": "Proje Codex konfigürasyonu OpenCodex'i atlıyor",
   "dash.projectConfigHint": "Bu depoya özel ayarlar OpenCodex proxy'sini geçersiz kılar.",
@@ -676,14 +791,16 @@ export const tr: Record<TKey, string> = {
   "prov.didntOpen": "Açılmadı mı? Buraya tıklayın",
   "prov.copyLink": "Bağlantıyı kopyala",
   "prov.dontOpenBrowser": "Proxy makinesinde tarayıcı açma",
-  "prov.dontOpenBrowserHint": "Farklı bir tarayıcı profili için ya da pano proxy'nin makinesinde değilken kullanışlıdır.",
+  "prov.dontOpenBrowserHint":
+    "Farklı bir tarayıcı profili için ya da pano proxy'nin makinesinde değilken kullanışlıdır.",
   "prov.linkCopied": "Kopyalandı",
   "prov.linkCopyUnavailable": "Pano kullanılamıyor",
   "prov.deviceCode": "Cihaz kodu",
   "prov.copyCode": "Kodu kopyala",
   "prov.copyCodeAndOpen": "Kodu kopyala ve aç",
   "prov.openSignInPage": "Oturum açma sayfasını aç",
-  "prov.browserLaunchFailed": "Tarayıcı otomatik olarak açılmadı. Aşağıdaki oturum açma sayfasını açın veya bağlantıyı kopyalayın.",
+  "prov.browserLaunchFailed":
+    "Tarayıcı otomatik olarak açılmadı. Aşağıdaki oturum açma sayfasını açın veya bağlantıyı kopyalayın.",
   "prov.codeCopied": "Kod kopyalandı",
   "prov.editAlias": "Takma adı düzenle",
   "prov.aliasPrompt": "Görüntülenen ad (temizlemek için boş bırakın)",
@@ -692,7 +809,8 @@ export const tr: Record<TKey, string> = {
   "prov.aliasInvalid": "En fazla 80 karakter kullanın, kontrol karakteri içermemelidir.",
   "prov.accountId": "ID",
   "prov.pasteRedirect": "Yönlendirme URL'sini veya kodu yapıştırın",
-  "prov.pasteRedirectHint": "Tarayıcı localhost hatası gösterirse adres çubuğundaki URL'yi kopyalayıp buraya yapıştırın.",
+  "prov.pasteRedirectHint":
+    "Tarayıcı localhost hatası gösterirse adres çubuğundaki URL'yi kopyalayıp buraya yapıştırın.",
   "prov.pasteSubmit": "Gönder",
   "prov.pasteSubmitting": "Gönderiliyor…",
   "prov.pasteOk": "Kod gönderildi — giriş tamamlanıyor…",
@@ -709,52 +827,69 @@ export const tr: Record<TKey, string> = {
   "prov.loginRequestFail": "{provider} giriş isteği başarısız oldu",
   "prov.loginCancelled": "{provider} girişi iptal edildi",
   "prov.loginTimeout": "{provider} girişi zaman aşımına uğradı.",
-  "prov.loginSameAccount": "Hâlâ aynı {provider} hesabı — tarayıcıda hesap değiştirin, ardından tekrar Hesap Ekle'yi deneyin.",
-  "prov.loginOk": "{provider} hesabına giriş yapıldı. Modellerini listelemek için {cmd} çalıştırın (veya canlı olarak uygulanır).",
-  "prov.added": "\"{name}\" eklendi. Modellerini listelemek için {cmd} çalıştırın (veya canlı olarak uygulanır).",
+  "prov.loginSameAccount":
+    "Hâlâ aynı {provider} hesabı — tarayıcıda hesap değiştirin, ardından tekrar Hesap Ekle'yi deneyin.",
+  "prov.loginOk":
+    "{provider} hesabına giriş yapıldı. Modellerini listelemek için {cmd} çalıştırın (veya canlı olarak uygulanır).",
+  "prov.added":
+    '"{name}" eklendi. Modellerini listelemek için {cmd} çalıştırın (veya canlı olarak uygulanır).',
   "prov.modelsNoticeTitle": "Model ayarları",
-  "prov.modelsNoticeChecking": "Model listesi kontrol ediliyor. Model anahtarları sağlayıcıyı devre dışı bırakmaz.",
-  "prov.modelsNoticePending": "İlk model listesi henüz doğrulanmadı. Keşif tamamlanana kadar modeller gizli kalır.",
-  "prov.modelsNoticeOff": "İlk kayıtta tüm model anahtarları OFF olarak ayarlandı. Models sayfasında ihtiyacınız olan modelleri açın.",
-  "prov.modelsNoticeReady": "Models sayfasında hangi modellerin görüneceğini seçin. Bu anahtarlar sağlayıcının kendisini kapatmaz.",
-  "prov.modelsNoticeFailed": "Sağlayıcı kaydedildi ancak model listesi yenilenemedi. Tekrar deneyin.",
+  "prov.modelsNoticeChecking":
+    "Model listesi kontrol ediliyor. Model anahtarları sağlayıcıyı devre dışı bırakmaz.",
+  "prov.modelsNoticePending":
+    "İlk model listesi henüz doğrulanmadı. Keşif tamamlanana kadar modeller gizli kalır.",
+  "prov.modelsNoticeOff":
+    "İlk kayıtta tüm model anahtarları OFF olarak ayarlandı. Models sayfasında ihtiyacınız olan modelleri açın.",
+  "prov.modelsNoticeReady":
+    "Models sayfasında hangi modellerin görüneceğini seçin. Bu anahtarlar sağlayıcının kendisini kapatmaz.",
+  "prov.modelsNoticeFailed":
+    "Sağlayıcı kaydedildi ancak model listesi yenilenemedi. Tekrar deneyin.",
   "prov.modelsNoticeCount": "{count} model",
   "prov.modelsNoticeOpen": "Models sayfasını aç",
   "models.initialSelectionPending": "İlk model keşfi bekleniyor",
   "oauthTos.highTitle": "{provider}: abonelik OAuth riski",
   "oauthTos.elevatedTitle": "{provider}: gayri resmi OAuth köprüsü",
-  "oauthTos.anthropicBody": "Bu işlem, bir Claude aboneliğini üçüncü taraf proxy olan OpenCodex üzerinden bağlar. Anthropic bu bağlantıyı veya otomatik hesap havuzunu onaylamamıştır; erişim, Anthropic'in güncel koşullarına ve bunları nasıl uyguladığına bağlıdır.",
-  "oauthTos.highBody": "OpenCodex, {provider} bağlantısını üçüncü taraf bir OAuth yolu üzerinden kurar. Desteklenmeyen kullanım, erişim kısıtlamalarına veya hesabın askıya alınmasına yol açabilir.",
-  "oauthTos.elevatedBody": "OpenCodex, {provider} bağlantısını resmi olmayan bir OAuth yolu üzerinden kurar. Mümkün olduğunda resmi istemciyi kullanın; sıra dışı veya otomatik trafik kötüye kullanım olarak değerlendirilebilir ve erişim kısıtlanabilir veya askıya alınabilir.",
+  "oauthTos.anthropicBody":
+    "Bu işlem, bir Claude aboneliğini üçüncü taraf proxy olan OpenCodex üzerinden bağlar. Anthropic bu bağlantıyı veya otomatik hesap havuzunu onaylamamıştır; erişim, Anthropic'in güncel koşullarına ve bunları nasıl uyguladığına bağlıdır.",
+  "oauthTos.highBody":
+    "OpenCodex, {provider} bağlantısını üçüncü taraf bir OAuth yolu üzerinden kurar. Desteklenmeyen kullanım, erişim kısıtlamalarına veya hesabın askıya alınmasına yol açabilir.",
+  "oauthTos.elevatedBody":
+    "OpenCodex, {provider} bağlantısını resmi olmayan bir OAuth yolu üzerinden kurar. Mümkün olduğunda resmi istemciyi kullanın; sıra dışı veya otomatik trafik kötüye kullanım olarak değerlendirilebilir ve erişim kısıtlanabilir veya askıya alınabilir.",
   "oauthTos.saferPath": "Daha güvenli seçenek: OpenCodex'te bir API anahtarı yapılandırın.",
   "oauthTos.acknowledge": "Riski anlıyorum ve OAuth ile devam etmek istiyorum.",
   "oauthTos.continue": "OAuth ile devam et",
   "oauthTos.anthropicTitle": "Claude abonelik bağlantısı",
-  "oauthTos.anthropicConditions": "Size ait olan veya kullanma yetkiniz bulunan bir hesap kullanın. Gerçek Claude Code istemcisini bir kişinin gözetimindeki oturumda kullanmak, abonelik jetonlarını başka istemciler üzerinden göndermekle aynı şey değildir. OpenCodex bu diğer istemcileri de desteklediği için bu bağlantı her kullanımın izinli olduğunu garanti etmez. Desteklenen Agent SDK entegrasyonları ayrıdır.",
-  "oauthTos.anthropicSaferPath": "Başka istemciler veya gözetimsiz otomasyon için bunun yerine bir Anthropic API anahtarı yapılandırın.",
-  "oauthTos.anthropicAcknowledge": "Bunun üçüncü taraf bir abonelik bağlantısı olduğunu anlıyorum ve geçerli koşulları kontrol edeceğim.",
+  "oauthTos.anthropicConditions":
+    "Size ait olan veya kullanma yetkiniz bulunan bir hesap kullanın. Gerçek Claude Code istemcisini bir kişinin gözetimindeki oturumda kullanmak, abonelik jetonlarını başka istemciler üzerinden göndermekle aynı şey değildir. OpenCodex bu diğer istemcileri de desteklediği için bu bağlantı her kullanımın izinli olduğunu garanti etmez. Desteklenen Agent SDK entegrasyonları ayrıdır.",
+  "oauthTos.anthropicSaferPath":
+    "Başka istemciler veya gözetimsiz otomasyon için bunun yerine bir Anthropic API anahtarı yapılandırın.",
+  "oauthTos.anthropicAcknowledge":
+    "Bunun üçüncü taraf bir abonelik bağlantısı olduğunu anlıyorum ve geçerli koşulları kontrol edeceğim.",
   "oauthTos.anthropicContinue": "Claude aboneliğiyle devam et",
   "subagentSurface.selectionTitle": "Alt ajan yüzeyi {mode} olarak değiştirilsin mi?",
-  "subagentSurface.selectionBody": "{mode} üzerinde, v2 yüzeyini kullanan ChatGPT modelleri (base üzerinde Sol ve Terra, v2 üzerinde tüm modeller) görevlerini Grok veya Claude gibi yönlendirilmiş bir modele ChatGPT arka ucu için şifrelenmiş olarak devreder ve yönlendirilmiş model bunu okuyamaz. Yukarı akışta düzeltilene kadar bu devir unreadable_encrypted_agent_task hatasıyla başarısız olur. v1 sağlayıcılar arası devri güvenilir biçimde yapar.",
+  "subagentSurface.selectionBody":
+    "{mode} üzerinde, v2 yüzeyini kullanan ChatGPT modelleri (base üzerinde Sol ve Terra, v2 üzerinde tüm modeller) görevlerini Grok veya Claude gibi yönlendirilmiş bir modele ChatGPT arka ucu için şifrelenmiş olarak devreder ve yönlendirilmiş model bunu okuyamaz. Yukarı akışta düzeltilene kadar bu devir unreadable_encrypted_agent_task hatasıyla başarısız olur. v1 sağlayıcılar arası devri güvenilir biçimde yapar.",
   "subagentSurface.advisoryTitle": "v1 artık varsayılan alt ajan yüzeyi",
-  "subagentSurface.advisoryBody": "Bu kurulum {mode} ile çalışıyor; v2 yüzeyindeki bir ChatGPT modeli, yönlendirilmiş bir modele okuyamayacağı şifreli bir görev aktardığı için sağlayıcılar arası devri bozuyor. Yukarı akışta düzeltilene kadar v1 önerilir. Seçim yapılana kadar mevcut ayarınız değişmez.",
+  "subagentSurface.advisoryBody":
+    "Bu kurulum {mode} ile çalışıyor; v2 yüzeyindeki bir ChatGPT modeli, yönlendirilmiş bir modele okuyamayacağı şifreli bir görev aktardığı için sağlayıcılar arası devri bozuyor. Yukarı akışta düzeltilene kadar v1 önerilir. Seçim yapılana kadar mevcut ayarınız değişmez.",
   "subagentSurface.continue": "Devam",
   "subagentSurface.switchToV1": "v1'e geç",
   "subagentSurface.learnMore": "Neden başarısız oluyor",
   "prov.logoutOk": "{provider} çıkışı yapıldı.",
   "prov.logoutFail": "{provider} çıkışı yapılamadı.",
-  "prov.removed": "\"{name}\" kaldırıldı.",
-  "prov.removedDefault": "\"{name}\" kaldırıldı. Varsayılan sağlayıcı artık \"{defaultProvider}\".",
-  "prov.removedShadowTarget": "\"{name}\" kaldırıldı. Gölge Çağrı Yakalama hâlâ \"{model}\" hedefini kullanıyor; başka bir hedef seçene kadar yardımcı çağrılar başarısız olur.",
-  "prov.removeFail": "\"{name}\" kaldırılamadı.",
+  "prov.removed": '"{name}" kaldırıldı.',
+  "prov.removedDefault": '"{name}" kaldırıldı. Varsayılan sağlayıcı artık "{defaultProvider}".',
+  "prov.removedShadowTarget":
+    '"{name}" kaldırıldı. Gölge Çağrı Yakalama hâlâ "{model}" hedefini kullanıyor; başka bir hedef seçene kadar yardımcı çağrılar başarısız olur.',
+  "prov.removeFail": '"{name}" kaldırılamadı.',
   "prov.removeLastProvider": "Başka etkin sağlayıcı yokken bu sağlayıcıyı kaldıramazsınız.",
   "prov.setDefault": "Varsayılan olarak ayarla",
-  "prov.setDefaultSuccess": "\"{name}\" artık varsayılan sağlayıcı.",
-  "prov.setDefaultFail": "\"{name}\" varsayılan yapılamadı.",
+  "prov.setDefaultSuccess": '"{name}" artık varsayılan sağlayıcı.',
+  "prov.setDefaultFail": '"{name}" varsayılan yapılamadı.',
   "prov.defaultDisabled": "Varsayılan yapmadan önce bu sağlayıcıyı etkinleştirin.",
   "prov.updateFail": "Sağlayıcı güncellenemedi.",
   "prov.networkError": "Ağ hatası. Proxy'nin çalıştığını kontrol edin.",
-  "prov.removeConfirm": "\"{name}\" sağlayıcısı kaldırılsın mı?",
+  "prov.removeConfirm": '"{name}" sağlayıcısı kaldırılsın mı?',
   "prov.hasApiKey": "API anahtarı yapılandırıldı",
   "prov.hasHeaders": "özel başlıklar yapılandırıldı",
   "prov.accounts": "Hesaplar ({n})",
@@ -788,11 +923,12 @@ export const tr: Record<TKey, string> = {
   "prov.defaultBadge": "Varsayılan",
   "prov.enable": "Etkinleştir",
   "prov.disable": "Devre Dışı Bırak",
-  "prov.enabled": "\"{name}\" etkinleştirildi.",
-  "prov.disabled": "\"{name}\" devre dışı bırakıldı.",
-  "prov.disabledShadowTarget": "\"{name}\" devre dışı bırakıldı. Gölge Çağrı Yakalama hâlâ \"{model}\" hedefini kullanıyor; başka bir hedef seçene veya \"{name}\" sağlayıcısını yeniden etkinleştirene kadar yardımcı çağrılar başarısız olur.",
-  "prov.enableFail": "\"{name}\" etkinleştirilemedi.",
-  "prov.disableFail": "\"{name}\" devre dışı bırakılamadı.",
+  "prov.enabled": '"{name}" etkinleştirildi.',
+  "prov.disabled": '"{name}" devre dışı bırakıldı.',
+  "prov.disabledShadowTarget":
+    '"{name}" devre dışı bırakıldı. Gölge Çağrı Yakalama hâlâ "{model}" hedefini kullanıyor; başka bir hedef seçene veya "{name}" sağlayıcısını yeniden etkinleştirene kadar yardımcı çağrılar başarısız olur.',
+  "prov.enableFail": '"{name}" etkinleştirilemedi.',
+  "prov.disableFail": '"{name}" devre dışı bırakılamadı.',
   "prov.enableAria": "{name} sağlayıcısını etkinleştir",
   "prov.disableAria": "{name} sağlayıcısını devre dışı bırak",
   "prov.defaultCannotDisable": "Varsayılan sağlayıcı devre dışı bırakılamaz",
@@ -813,17 +949,22 @@ export const tr: Record<TKey, string> = {
   "models.tab.routing": "Yönlendirme (beta)",
   "models.tabsLabel": "Model yüzeyleri",
   "models.subtitle.routing": "Politika profilleri ve simülasyon değerlendirmesi.",
-  "models.subtitle": "Codex'in göreceği modelleri açıp kapatın — yerel GPT passthrough ve yönlendirilen sağlayıcılar, sağlayıcıya göre gruplanır (daraltmak için başlığa tıklayın). Gizlenen modeller katalogda ve model seçicide görünmez, ancak tam kimlikleriyle doğrudan çağrılabilir.",
+  "models.subtitle":
+    "Codex'in göreceği modelleri açıp kapatın — yerel GPT passthrough ve yönlendirilen sağlayıcılar, sağlayıcıya göre gruplanır (daraltmak için başlığa tıklayın). Gizlenen modeller katalogda ve model seçicide görünmez, ancak tam kimlikleriyle doğrudan çağrılabilir.",
   "models.delivery.title": "Değişiklikler Codex'e nasıl ulaşır",
   "models.delivery.chip.saved": "Buraya kaydedildi",
   "models.delivery.chip.loaded": "Codex yeniden başlatınca yükler",
   "models.delivery.saved.title": "Bu proxy'ye kaydedildi",
-  "models.delivery.saved.body": "Bu sayfada kaydetmek, bu OpenCodex proxy'sinin Codex'e ilettiği model kataloğunu yeniden yazar. Codex model seçicisinde görünen liste budur. Kaydetme sonrası onay, bu adımın tamamlandığı anlamına gelir.",
+  "models.delivery.saved.body":
+    "Bu sayfada kaydetmek, bu OpenCodex proxy'sinin Codex'e ilettiği model kataloğunu yeniden yazar. Codex model seçicisinde görünen liste budur. Kaydetme sonrası onay, bu adımın tamamlandığı anlamına gelir.",
   "models.delivery.loaded.title": "Codex tarafından yüklendi",
-  "models.delivery.loaded.body": "Codex kataloğu başlarken okur, bu yüzden zaten açık olan bir Codex penceresi eski model listesini tutar. OpenCodex, çalışan bir Codex'in hangi listeyi kullandığını göremez. Codex'in değişikliğinizden önce başladığını anlayabildiğinde sekmelerin üstünde bir yeniden başlatma uyarısı görünür.",
-  "models.delivery.hint": "Açtığınız bir model Codex'te görünmüyorsa, bu sayfanın sağ üstündeki Codex model listesini yenile düğmesine basın, ardından Codex'i yeniden açın.",
+  "models.delivery.loaded.body":
+    "Codex kataloğu başlarken okur, bu yüzden zaten açık olan bir Codex penceresi eski model listesini tutar. OpenCodex, çalışan bir Codex'in hangi listeyi kullandığını göremez. Codex'in değişikliğinizden önce başladığını anlayabildiğinde sekmelerin üstünde bir yeniden başlatma uyarısı görünür.",
+  "models.delivery.hint":
+    "Açtığınız bir model Codex'te görünmüyorsa, bu sayfanın sağ üstündeki Codex model listesini yenile düğmesine basın, ardından Codex'i yeniden açın.",
   "models.nativeGroupLabel": "Yerel OpenAI",
-  "models.nativeHint": "Doğrudan geçiş modelleri Sağlayıcılar bölümünde seçilen Havuz veya Doğrudan seçeneğini kullanır. Buradan model eklemek, yeni bir düz passthrough kimliği değil, yönlendirilmiş bir `openai/<model>` seçici kaydeder.",
+  "models.nativeHint":
+    "Doğrudan geçiş modelleri Sağlayıcılar bölümünde seçilen Havuz veya Doğrudan seçeneğini kullanır. Buradan model eklemek, yeni bir düz passthrough kimliği değil, yönlendirilmiş bir `openai/<model>` seçici kaydeder.",
   "models.active": "{active}/{total} görünür",
   "models.workspace.providers": "Sağlayıcılar",
   "models.workspace.allProviders": "Tüm sağlayıcılar",
@@ -834,7 +975,8 @@ export const tr: Record<TKey, string> = {
   "models.presetMode_preset": "Ön ayar",
   "models.presetMode_all": "Tümü",
   "models.presetMode_custom": "Özel",
-  "models.presetSummary": "{total} modelden {count} tanesi gösteriliyor — çekirdek ön ayar v{version}",
+  "models.presetSummary":
+    "{total} modelden {count} tanesi gösteriliyor — çekirdek ön ayar v{version}",
   "models.presetUpdateAvailable": "Ön ayar v{version} mevcut",
   "models.presetAppliedToast": "{provider}: ön ayar uygulandı — {count} model seçildi",
   "models.presetClearedToast": "{provider}: tüm modeller gösteriliyor",
@@ -855,11 +997,15 @@ export const tr: Record<TKey, string> = {
   "models.v2ModeDesc_default": "Yukarı akış varsayılanları",
   "models.v2ModeDesc_v2": "Tüm modeller → v2 yüzeyi",
   "models.keepNativeOnV1": "ChatGPT v1'de kalsın",
-  "models.keepNativeOnV1Hint": "ChatGPT yerel ebeveynleri v2 çocuk görevlerini şifreler; Grok ve Claude okuyamaz. Sol/Terra yönlendirilmiş modelleri spawn edecekse açık bırakın. Yönlendirilmiş ebeveynler v2'de kalır.",
-  "models.v2Help": "v1 alt ajanları birincil modelle sınırlandırır; taban standart ajan sınırlarını devralır; v2 tam çoklu ajan orkestrasyonunu etkinleştirir.\n\nv2'de ChatGPT v1'de kalsın, Sol/Terra'yı v1'de bırakır; böylece Grok veya Claude spawn edebilirler. ChatGPT v2 çocuk görevlerini şifreler; yönlendirilmiş modeller okuyamaz. Yönlendirilmiş ebeveynler v2'de kalır.\n\nDeğişiklikler yeni oturumlara uygulanır.",
+  "models.keepNativeOnV1Hint":
+    "ChatGPT yerel ebeveynleri v2 çocuk görevlerini şifreler; Grok ve Claude okuyamaz. Sol/Terra yönlendirilmiş modelleri spawn edecekse açık bırakın. Yönlendirilmiş ebeveynler v2'de kalır.",
+  "models.v2Help":
+    "v1 alt ajanları birincil modelle sınırlandırır; taban standart ajan sınırlarını devralır; v2 tam çoklu ajan orkestrasyonunu etkinleştirir.\n\nv2'de ChatGPT v1'de kalsın, Sol/Terra'yı v1'de bırakır; böylece Grok veya Claude spawn edebilirler. ChatGPT v2 çocuk görevlerini şifreler; yönlendirilmiş modeller okuyamaz. Yönlendirilmiş ebeveynler v2'de kalır.\n\nDeğişiklikler yeni oturumlara uygulanır.",
   "dash.multiAgent": "Alt Ajan",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads ayarlanmış — config.toml dosyasından kaldırın",
-  "models.v2Applied": "Çoklu ajan modu güncellendi. Yeni oturumlar bu modu kullanacaktır; model seçiciyi yenilemek için Codex uygulamasını yeniden başlatın.",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads ayarlanmış — config.toml dosyasından kaldırın",
+  "models.v2Applied":
+    "Çoklu ajan modu güncellendi. Yeni oturumlar bu modu kullanacaktır; model seçiciyi yenilemek için Codex uygulamasını yeniden başlatın.",
   "models.v2ThreadsLabel": "Alt ajan limiti",
   "models.v2ThreadsDefault": "varsayılan",
   "models.v2ThreadsApplied": "Alt ajan limiti güncellendi",
@@ -871,7 +1017,8 @@ export const tr: Record<TKey, string> = {
   "models.contextDefault": "Sağlayıcı varsayılanı",
   "models.contextModel": "Model",
   "models.contextModelOverride": "Model geçersiz kılma",
-  "models.contextHint": "Pencereyi biliyorsanız gerçek Codex penceresini buraya yazın. Üst akış değer yoksa bu kullanılır; daha büyük bildirilen pencere düşürülür, daha küçük olan korunur. Boş bırakırsanız sağlayıcının «Varsayılan pencere / sınır» değeri kullanılır; o sınır kapalıysa 128k olur.",
+  "models.contextHint":
+    "Pencereyi biliyorsanız gerçek Codex penceresini buraya yazın. Üst akış değer yoksa bu kullanılır; daha büyük bildirilen pencere düşürülür, daha küçük olan korunur. Boş bırakırsanız sağlayıcının «Varsayılan pencere / sınır» değeri kullanılır; o sınır kapalıysa 128k olur.",
   "models.contextAutomatic": "Otomatik keşif",
   "models.contextSaved": "Bağlam pencereleri güncellendi.",
   "models.contextUnchanged": "Kaydedilecek bağlam penceresi değişikliği yok.",
@@ -879,10 +1026,12 @@ export const tr: Record<TKey, string> = {
   "models.contextInvalid": "Bağlam pencereleri pozitif tam sayılar olmalıdır",
   "models.contextCappedValue": "{value} sınırı",
   "models.setAll": "Tümünü ayarla",
-  "models.setAllHint": "Her yönlendirilen sağlayıcıda {value} varsayılan pencereyi açar. Röle context_window / context_length vermezse bu değer gerçek Codex penceresi olur. Tek bir modeli elle yazmak için aynı satırdaki «Özel pencereler»i kullanın.",
+  "models.setAllHint":
+    "Her yönlendirilen sağlayıcıda {value} varsayılan pencereyi açar. Röle context_window / context_length vermezse bu değer gerçek Codex penceresi olur. Tek bir modeli elle yazmak için aynı satırdaki «Özel pencereler»i kullanın.",
   "models.collapseAll": "Tümünü daralt",
   "models.expandAll": "Tümünü genişlet",
-  "models.orderHint": "Varsayılan sıra öne çıkan seçimleri ve katalog önceliğini izler; eşit öncelikli yönlendirilmiş satırlar sağlayıcı ve modele göre sıralanır. Kaydedilmiş sıra görünümü değiştirebilir; görünürlük anahtarları satırları filtreler. İstemci yeniden getirene kadar eski kataloğu tutabilir.",
+  "models.orderHint":
+    "Varsayılan sıra öne çıkan seçimleri ve katalog önceliğini izler; eşit öncelikli yönlendirilmiş satırlar sağlayıcı ve modele göre sıralanır. Kaydedilmiş sıra görünümü değiştirebilir; görünürlük anahtarları satırları filtreler. İstemci yeniden getirene kadar eski kataloğu tutabilir.",
   "models.settingsPanel.title": "Model ayarları",
   "models.settingsPanel.off": "kapalı",
   "models.settingsPanel.attention": "İlgilenilmesi gerekiyor",
@@ -896,19 +1045,27 @@ export const tr: Record<TKey, string> = {
   "models.settingsContextInherit": "Geçersiz kılınmadı — şu anda {value}",
   "models.settingsContextUnknown": "bilinmiyor",
   "models.settingsReload": "Yeniden yükle",
-  "models.settingsReloaded": "Model listesi yenilendi. Kayıtlı değerleri görmek için {model} satırını yeniden açın.",
+  "models.settingsReloaded":
+    "Model listesi yenilendi. Kayıtlı değerleri görmek için {model} satırını yeniden açın.",
   "models.settingsNoChange": "{model} için ayarlar değişmedi",
   "models.settingsSaved": "{model} için model ayarları kaydedildi",
-  "models.settingsSaveFailed": "Ayarların kaydedilip kaydedilmediğini doğrulayamadık. Yeniden denemeden önce model listesini yenileyin.",
-  "models.settingsRefreshFailed": "Kaydedildi. Model listesi yenilenmediği için satır eski değerleri gösterebilir. Kontrol etmek için yenileyin.",
-  "models.settingsSavedCodexStale": "{model} kaydedildi ancak Codex model kataloğu yenilenmedi. Değişikliğin Codex'e geçmesi için panodaki \"Şimdi senkronize et\" düğmesine tıklayın.",
-  "models.settingsRejected": "Sunucu bu ayarları reddetti, bu yüzden hiçbir şey kaydedilmedi. Değerleri kontrol edip yeniden deneyin.",
+  "models.settingsSaveFailed":
+    "Ayarların kaydedilip kaydedilmediğini doğrulayamadık. Yeniden denemeden önce model listesini yenileyin.",
+  "models.settingsRefreshFailed":
+    "Kaydedildi. Model listesi yenilenmediği için satır eski değerleri gösterebilir. Kontrol etmek için yenileyin.",
+  "models.settingsSavedCodexStale":
+    '{model} kaydedildi ancak Codex model kataloğu yenilenmedi. Değişikliğin Codex\'e geçmesi için panodaki "Şimdi senkronize et" düğmesine tıklayın.',
+  "models.settingsRejected":
+    "Sunucu bu ayarları reddetti, bu yüzden hiçbir şey kaydedilmedi. Değerleri kontrol edip yeniden deneyin.",
   "models.settingsDefaultEffort": "Varsayılan düzey",
-  "models.settingsModalitiesInherit": "Geçersiz kılınmadı — şu anda üst kaynak bildirimine uyuluyor: {modalities}",
+  "models.settingsModalitiesInherit":
+    "Geçersiz kılınmadı — şu anda üst kaynak bildirimine uyuluyor: {modalities}",
   "models.settingsModalitiesUnknown": "bildirilmemiş",
   "models.settingsRestore": "Sıfırla",
-  "models.settingsRestoreHint": "Bu modeldeki tüm geçersiz kılmaları kaldır ve hesaplanan değerlere dön.",
-  "models.settingsRestoreConfirm": "{model} hesaplanan değerlere sıfırlansın mı? Bağlam penceresi, modalite ve akıl yürütme geçersiz kılmaları silinir.",
+  "models.settingsRestoreHint":
+    "Bu modeldeki tüm geçersiz kılmaları kaldır ve hesaplanan değerlere dön.",
+  "models.settingsRestoreConfirm":
+    "{model} hesaplanan değerlere sıfırlansın mı? Bağlam penceresi, modalite ve akıl yürütme geçersiz kılmaları silinir.",
   "models.settingsRestored": "{model} hesaplanan değerlere sıfırlandı",
   "models.settingsNothingToRestore": "{model} için geçersiz kılma yok — zaten hesaplanan değerler",
   "models.customAdded": "Özel model eklendi",
@@ -922,19 +1079,27 @@ export const tr: Record<TKey, string> = {
   "models.customDelete": "Sil",
   "pws.manageModelVisibility": "Modeller bölümünde görünürlüğü yönet",
   "pws.modelOwnershipLoading": "Model tanımları kontrol ediliyor…",
-  "pws.modelOwnershipFailed": "Model tanımları yüklenemedi. Değişiklik yapmadan önce yeniden deneyin.",
-  "pws.modelSelectionPending": "Değişiklik yapmadan önce Modeller bölümünde model seçimini tamamlayın.",
+  "pws.modelOwnershipFailed":
+    "Model tanımları yüklenemedi. Değişiklik yapmadan önce yeniden deneyin.",
+  "pws.modelSelectionPending":
+    "Değişiklik yapmadan önce Modeller bölümünde model seçimini tamamlayın.",
   "pws.modelSaved": "Özel model tanımı kaydedildi.",
-  "pws.modelSavedHidden": "Tanım kaydedildi. Bu model gizli; görünürlüğünü Modeller bölümünde yönetin.",
-  "pws.modelSavedRefreshPending": "Tanım kaydedildi ancak model kataloğu yenilenemedi. Yenilemeyi tekrar deneyin; modeli yeniden eklemeyin.",
-  "pws.modelMutationUnconfirmed": "Değişiklik doğrulanamadı. Yeniden denemeden önce modelleri yenileyin.",
-  "pws.modelRemovedRefreshPending": "Değişiklik kaydedildi ancak model kataloğu yenilenemedi. Yenilemeyi tekrar deneyin.",
+  "pws.modelSavedHidden":
+    "Tanım kaydedildi. Bu model gizli; görünürlüğünü Modeller bölümünde yönetin.",
+  "pws.modelSavedRefreshPending":
+    "Tanım kaydedildi ancak model kataloğu yenilenemedi. Yenilemeyi tekrar deneyin; modeli yeniden eklemeyin.",
+  "pws.modelMutationUnconfirmed":
+    "Değişiklik doğrulanamadı. Yeniden denemeden önce modelleri yenileyin.",
+  "pws.modelRemovedRefreshPending":
+    "Değişiklik kaydedildi ancak model kataloğu yenilenemedi. Yenilemeyi tekrar deneyin.",
   "pws.modelHidden": "Model gizlendi. Modeller bölümünden yeniden görünür yapabilirsiniz.",
   "pws.modelDefinitionDeleted": "Özel tanım silindi. Alttaki model görünmeye devam edebilir.",
   "pws.modelKnown": "Bu model zaten biliniyor. Görünürlüğünü Modeller bölümünde yönetin.",
-  "models.customDeleteConfirm": "{name} için özel tanım silinsin mi? Alttaki yerel veya keşfedilmiş model yeniden görünebilir.",
+  "models.customDeleteConfirm":
+    "{name} için özel tanım silinsin mi? Alttaki yerel veya keşfedilmiş model yeniden görünebilir.",
   "models.hide": "Gizle",
-  "models.hideConfirm": "{name} model kataloğundan gizlensin mi? Tanımı silinmez ve doğrudan yönlendirme ilkesi değişmez.",
+  "models.hideConfirm":
+    "{name} model kataloğundan gizlensin mi? Tanımı silinmez ve doğrudan yönlendirme ilkesi değişmez.",
   "models.customBadge": "Özel",
   "models.customSummary": "{count} özel",
   "models.customFieldModelId": "Model ID",
@@ -959,8 +1124,10 @@ export const tr: Record<TKey, string> = {
   "models.tipStatus": "Durum",
   "models.tipActive": "Aktif",
   "models.tipDisabled": "Devre Dışı",
-  "models.applied": "Kaydedildi. Codex, model listesini yeniden yükledikten sonra değişikliği gösterir.",
-  "models.integrationRefreshWarning": "Model seçimi kaydedildi. Bazı istemcilerin model katalogları yenilenemedi. Yeni bir oturum başlatmadan önce Entegrasyonlar bölümünü kontrol edin.",
+  "models.applied":
+    "Kaydedildi. Codex, model listesini yeniden yükledikten sonra değişikliği gösterir.",
+  "models.integrationRefreshWarning":
+    "Model seçimi kaydedildi. Bazı istemcilerin model katalogları yenilenemedi. Yeni bir oturum başlatmadan önce Entegrasyonlar bölümünü kontrol edin.",
   "models.saveFailed": "Kaydetme başarısız",
   "models.networkError": "Ağ hatası — proxy çalışıyor mu?",
   "models.loadFail": "Modeller yüklenemedi — proxy çalışıyor mu?",
@@ -977,13 +1144,16 @@ export const tr: Record<TKey, string> = {
   "models.discoveryFailedGeneric": "Model keşfi başarısız oldu.",
   "models.openProviderSettings": "Sağlayıcı ayarlarını aç",
   "models.inactiveNoCredit": "Kredi yok",
-  "models.inactiveNoCreditHint": "Bu girdinin arkasındaki tüm sağlayıcıların kredisi şu anda bitmiş durumda, bu yüzden istek başarısız olur. Girdi listede kalır ve kredi sıfırlandığında veya yüklendiğinde yeniden kullanılabilir.",
-  "models.discoveryFailedDependency": "Bu sağlayıcı için model keşfi açık. Başarısız olmaya devam ettiği sürece, elle eklenen veya statik modelleri kullanmak için sağlayıcı ayarlarından „{control}“ seçeneğini kapatın.",
+  "models.inactiveNoCreditHint":
+    "Bu girdinin arkasındaki tüm sağlayıcıların kredisi şu anda bitmiş durumda, bu yüzden istek başarısız olur. Girdi listede kalır ve kredi sıfırlandığında veya yüklendiğinde yeniden kullanılabilir.",
+  "models.discoveryFailedDependency":
+    "Bu sağlayıcı için model keşfi açık. Başarısız olmaya devam ettiği sürece, elle eklenen veya statik modelleri kullanmak için sağlayıcı ayarlarından „{control}“ seçeneğini kapatın.",
   "models.loading": "Yükleniyor…",
   "models.search": "Modellerde ara…",
   "models.showMore": "{n} tane daha göster",
   "models.freeOnly": "Yalnızca ücretsiz",
-  "models.noFreeMatch": "Burada ücretsiz model yok. Diğerlerini görmek için „Yalnızca ücretsiz“ seçeneğini kapatın.",
+  "models.noFreeMatch":
+    "Burada ücretsiz model yok. Diğerlerini görmek için „Yalnızca ücretsiz“ seçeneğini kapatın.",
   "models.allowlistLabel": "Sadece seçilenler",
   "models.allowlistHint": "Sadece işaretli modeller kataloğa gönderilir.",
   "models.selectedCount": "{n} seçildi",
@@ -992,19 +1162,28 @@ export const tr: Record<TKey, string> = {
   "sub.forceTitle": "Tüm alt ajanları aynı modeli kullanmaya zorla",
   "sub.forceModel": "Claude Code alt ajan modeli",
   "sub.forceChoose": "Erişime açılmış bir model seçin",
-  "sub.forceHelp": "Eklenti ajanlarına ve yerleşik ajanlara (Explore/Plan dahil) uygulanır; çağrı başına seçilen modelleri geçersiz kılar. Fork’lar ve model: inherit kullanan beceriler, ana sohbetin modelini kullanmaya devam eder. Ana model ve Haiku/small-fast yardımcı modelleri etkilenmez.",
-  "sub.forceScope": "Varsayılan olarak kapalıdır. Bir sonraki yönlendirmeli ocx claude başlatmasından itibaren geçerlidir; doğrudan claude çalıştırıldığında uygulanmaz. Kabukta dışa aktarılan ortam değişkenleri önceliklidir; settings.json içindeki env bunları geçersiz kılabilir. Durum denetimi yalnızca sunucudaki CLI ve kullanıcı ayarlarını kapsar; başka bir kabuğu veya proje ayarlarını kapsamaz.",
-  "sub.forceInvalid": "Yapılandırılan hedef kullanılamıyor. Başlatma sırasında modelin geçersiz kılınması atlanacak; erişime açılmış bir model seçin veya bu özelliği kapatın.",
-  "sub.forceOld": "Claude Code sürümü 2.1.257’den eski: FORCE yok sayılır; yalnızca zorunlu tutulmayan varsayılan alt ajan modeli uygulanır.",
-  "sub.forceUnknown": "Claude Code sürümü bilinmiyor. Bir modeli zorunlu tutmak için 2.1.257 veya daha yeni bir sürüm gerekir.",
-  "sub.forceOverride": "settings.json tarafından geçersiz kılındı: env alanında bir alt ajan modeli veya FORCE ayarı var. OpenCodex bu dosyayı değiştirmez.",
-  "sub.forceSettingsUnknown": "settings.json incelenemedi. Ayarların bu seçeneği geçersiz kılıp kılmadığı bilinmiyor.",
+  "sub.forceHelp":
+    "Eklenti ajanlarına ve yerleşik ajanlara (Explore/Plan dahil) uygulanır; çağrı başına seçilen modelleri geçersiz kılar. Fork’lar ve model: inherit kullanan beceriler, ana sohbetin modelini kullanmaya devam eder. Ana model ve Haiku/small-fast yardımcı modelleri etkilenmez.",
+  "sub.forceScope":
+    "Varsayılan olarak kapalıdır. Bir sonraki yönlendirmeli ocx claude başlatmasından itibaren geçerlidir; doğrudan claude çalıştırıldığında uygulanmaz. Kabukta dışa aktarılan ortam değişkenleri önceliklidir; settings.json içindeki env bunları geçersiz kılabilir. Durum denetimi yalnızca sunucudaki CLI ve kullanıcı ayarlarını kapsar; başka bir kabuğu veya proje ayarlarını kapsamaz.",
+  "sub.forceInvalid":
+    "Yapılandırılan hedef kullanılamıyor. Başlatma sırasında modelin geçersiz kılınması atlanacak; erişime açılmış bir model seçin veya bu özelliği kapatın.",
+  "sub.forceOld":
+    "Claude Code sürümü 2.1.257’den eski: FORCE yok sayılır; yalnızca zorunlu tutulmayan varsayılan alt ajan modeli uygulanır.",
+  "sub.forceUnknown":
+    "Claude Code sürümü bilinmiyor. Bir modeli zorunlu tutmak için 2.1.257 veya daha yeni bir sürüm gerekir.",
+  "sub.forceOverride":
+    "settings.json tarafından geçersiz kılındı: env alanında bir alt ajan modeli veya FORCE ayarı var. OpenCodex bu dosyayı değiştirmez.",
+  "sub.forceSettingsUnknown":
+    "settings.json incelenemedi. Ayarların bu seçeneği geçersiz kılıp kılmadığı bilinmiyor.",
   "sub.forceSaved": "Kaydedildi. Bir sonraki yönlendirmeli ocx claude başlatmasında geçerli olur.",
-  "sub.subtitle": "Codex'in {cmd} komutu, geçersiz kılma olarak yalnızca ilk 5 modeli (önceliğe göre) sunar. Buradan 5 taneye kadar seçin (yerel gpt veya yönlendirilen) ve opencodex bunların katalog önceliğini tam olarak bunların liderlik edeceği şekilde ayarlar. Diğer herhangi bir model tam adıyla çağrılabilir kalır; bu yalnızca neyin gösterileceğini kontrol eder.",
+  "sub.subtitle":
+    "Codex'in {cmd} komutu, geçersiz kılma olarak yalnızca ilk 5 modeli (önceliğe göre) sunar. Buradan 5 taneye kadar seçin (yerel gpt veya yönlendirilen) ve opencodex bunların katalog önceliğini tam olarak bunların liderlik edeceği şekilde ayarlar. Diğer herhangi bir model tam adıyla çağrılabilir kalır; bu yalnızca neyin gösterileceğini kontrol eder.",
   "sub.featured": "Öne Çıkarılanlar",
   "sub.advanced": "Gelişmiş",
   "sub.orderHintAria": "Bu sıra nasıl kullanılır",
-  "sub.orderHint": "Burada gösterilen sıralama, Codex model seçicisinin üst kısmındaki 1-5 pozisyonlarını ve {cmd} için varsayılan model adaylarını belirler. Seçicide 5’ten az öne çıkarılmış model görünüyorsa kalan yuvalarda katalog önceliğine göre modeller sunulur; model seçicisindeki özel bir sıralama katalog önceliğini değiştirmediği sürece görünür 5 öne çıkarılmış model listeyi doldurur.",
+  "sub.orderHint":
+    "Burada gösterilen sıralama, Codex model seçicisinin üst kısmındaki 1-5 pozisyonlarını ve {cmd} için varsayılan model adaylarını belirler. Seçicide 5’ten az öne çıkarılmış model görünüyorsa kalan yuvalarda katalog önceliğine göre modeller sunulur; model seçicisindeki özel bir sıralama katalog önceliğini değiştirmediği sürece görünür 5 öne çıkarılmış model listeyi doldurur.",
   "sub.noneSelected": "Hiçbiri seçilmedi — aşağıdaki listeden seçin.",
   "sub.models": "Modeller",
   "sub.search": "Modellerde ara…",
@@ -1014,14 +1193,16 @@ export const tr: Record<TKey, string> = {
   "sub.delegation.modelHint": "Codex'in iş devrederken ilk ulaştığı model.",
   "sub.suggest.button": "Öner",
   "sub.suggest.label": "Devredilen iş",
-  "sub.suggest.placeholder": "Codex genelde neyi devreder? örn. depo genelinde salt okunur aramalar veya birden çok modülü kapsayan yeniden düzenlemeler",
+  "sub.suggest.placeholder":
+    "Codex genelde neyi devreder? örn. depo genelinde salt okunur aramalar veya birden çok modülü kapsayan yeniden düzenlemeler",
   "sub.suggest.submit": "Boyutlandır",
   "sub.suggest.running": "Boyutlandırılıyor…",
   "sub.suggest.failed": "Devredilen iş boyutlandırılamadı.",
   "sub.suggest.title": "Önerilen model",
   "sub.suggest.accept": "Bunu kullan",
   "sub.noModels": "Model yok — önce bir sağlayıcı ekleyin.",
-  "sub.saved": "{n} model kaydedildi. Bunları spawn_agent geçersiz kılmaları olarak görmek için yeni bir Codex oturumu başlatın (veya {cmd} çalıştırın).",
+  "sub.saved":
+    "{n} model kaydedildi. Bunları spawn_agent geçersiz kılmaları olarak görmek için yeni bir Codex oturumu başlatın (veya {cmd} çalıştırın).",
   "sub.saveFailed": "Kaydetme başarısız",
   "sub.networkError": "Ağ hatası — proxy çalışıyor mu?",
   "sub.loadFail": "Modeller yüklenemedi",
@@ -1040,15 +1221,18 @@ export const tr: Record<TKey, string> = {
   "sub.workspace.selectModelDesc": "Detayları görmek için listeden bir model seçin.",
   "sub.workspace.selector": "Genel seçici",
   "sub.ultraMode": "Her zaman proaktif delegasyon",
-  "sub.ultraModeHint": "Tüm modeller ve reasoning effort için Proactive çoklu ajan delegasyon politikasını etkinleştirir (reasoning effort değerini değiştirmez). config.toml dosyasına features.multi_agent_v2.multi_agent_mode_hint_text yazar.",
-  "sub.ultraModeV2Required": "v2 çoklu ajan yüzeyi gerekir — önce multi_agent_v2'yi etkinleştirin ve alt ajan modu denetiminde v2'yi seçin.",
+  "sub.ultraModeHint":
+    "Tüm modeller ve reasoning effort için Proactive çoklu ajan delegasyon politikasını etkinleştirir (reasoning effort değerini değiştirmez). config.toml dosyasına features.multi_agent_v2.multi_agent_mode_hint_text yazar.",
+  "sub.ultraModeV2Required":
+    "v2 çoklu ajan yüzeyi gerekir — önce multi_agent_v2'yi etkinleştirin ve alt ajan modu denetiminde v2'yi seçin.",
   "sub.ultraModeText": "Proaktif delegasyon metni",
   "sub.ultraModePreset": "Ön ayarı geri yükle",
   "sub.ultraModeLoadFail": "Proaktif delegasyon ayarları yüklenemedi — proxy çalışıyor mu?",
   "sub.ultraModeSaveFail": "Proaktif delegasyon ayarları kaydedilemedi",
   "sub.ultraModeSaved": "Proaktif delegasyon kaydedildi. Yeni Codex oturumlarına uygulanır.",
   "sub.fallbackLabel": "Alt ajan yedek zinciri",
-  "sub.fallbackHint": "Alt ajan modeli kullanılamadığında veya başarısız olduğunda sırayla denenecek modeller.",
+  "sub.fallbackHint":
+    "Alt ajan modeli kullanılamadığında veya başarısız olduğunda sırayla denenecek modeller.",
   "sub.fallbackAdd": "Yedek model ekle…",
   "sub.fallbackPoll": "Kullanılabilirlik kontrol aralığı",
   "sub.fallbackSaved": "Alt ajan yedek ayarları kaydedildi.",
@@ -1056,8 +1240,10 @@ export const tr: Record<TKey, string> = {
   "sub.fallbackUnavailable": "Şu anda listelenmiyor; zincirde korunur.",
   "sub.fallbackPollInvalid": "5000–600000 ms arasında bir tam sayı girin.",
   "sub.v2Compatibility.title": "Yerel üst ajanın V2 uyumluluğu",
-  "sub.v2Compatibility.risk": "Yerel ChatGPT üst ajanı V2 ile bu yönlendirilmiş modele görev verirse görev şifrelenmiş olabilir ve yürütülmeden başarısız olabilir. Yönlendirilmiş üst ajanların okunabilir görevleri etkilenmez.",
-  "sub.v2Compatibility.recoveryUnknown": "Bu sunucu kurtarmanın etkinliğini veya uygunluğunu bildirmez. V1/düz metin kullanın ya da deneysel V2 kurtarmayı yalnızca uygunsa açın. Kurtarma kota, gecikme, arka uç bağımlılığı ve aslına uygunluk kaybı getirebilir; üst sistem protokolünü düzeltmez.",
+  "sub.v2Compatibility.risk":
+    "Yerel ChatGPT üst ajanı V2 ile bu yönlendirilmiş modele görev verirse görev şifrelenmiş olabilir ve yürütülmeden başarısız olabilir. Yönlendirilmiş üst ajanların okunabilir görevleri etkilenmez.",
+  "sub.v2Compatibility.recoveryUnknown":
+    "Bu sunucu kurtarmanın etkinliğini veya uygunluğunu bildirmez. V1/düz metin kullanın ya da deneysel V2 kurtarmayı yalnızca uygunsa açın. Kurtarma kota, gecikme, arka uç bağımlılığı ve aslına uygunluk kaybı getirebilir; üst sistem protokolünü düzeltmez.",
   "sub.v2Compatibility.details": "Uyumluluk ayrıntıları",
 
   // logs
@@ -1098,7 +1284,7 @@ export const tr: Record<TKey, string> = {
   "logs.badge.interceptedHelperTitle": "Yakalanan yardimci istegi",
   "logs.filter.conversation.label": "Sohbet",
   "logs.filter.conversation.placeholder": "Sohbet ID'sini yapıştırın",
- "logs.filter.conversation.clear": "Temizle",
+  "logs.filter.conversation.clear": "Temizle",
   "logs.filter.model.label": "Model",
   "logs.filter.model.placeholder": "Modele veya sağlayıcıya göre filtrele",
   "logs.filter.conversation.apply": "Günlükleri filtrele",
@@ -1175,12 +1361,17 @@ export const tr: Record<TKey, string> = {
   "logs.detail.decodeGeneration": "Üretim sırasındaki çıktı hızı (tahmini)",
   "logs.detail.decodeLegacy": "İlk görünür çıktıdan sonraki çıktı hızı (tahmini)",
   "logs.detail.decodeUnknown": "Çıktı hızı (tahmini; zaman ölçüm yöntemi bilinmiyor)",
-  "logs.detail.decodeBasisHint.generation": "Akıl yürütme dahil, proxy’nin gözlemlediği ilk çıktıdan son çıktı parçasına kadar geçen süre kullanılarak tahmin edilir.",
-  "logs.detail.decodeBasisHint.legacy": "İlk görünür çıktıdan isteğin sonuna kadar geçen süre kullanılarak tahmin edilir; akıl yürütme dahil bildirilen tüm çıktı tokenları sayılır.",
-  "logs.detail.decodeBasisHint.unknown": "Sunucu bu tahmin için hangi zaman ölçüm yönteminin kullanıldığını bildirmedi.",
+  "logs.detail.decodeBasisHint.generation":
+    "Akıl yürütme dahil, proxy’nin gözlemlediği ilk çıktıdan son çıktı parçasına kadar geçen süre kullanılarak tahmin edilir.",
+  "logs.detail.decodeBasisHint.legacy":
+    "İlk görünür çıktıdan isteğin sonuna kadar geçen süre kullanılarak tahmin edilir; akıl yürütme dahil bildirilen tüm çıktı tokenları sayılır.",
+  "logs.detail.decodeBasisHint.unknown":
+    "Sunucu bu tahmin için hangi zaman ölçüm yönteminin kullanıldığını bildirmedi.",
   "logs.detail.endToEndTokPerSec": "Uçtan uca çıktı jeton/sn",
-  "logs.detail.reason.ttft_missing": "Bu istek için ilk token süresi kaydedilmediğinden ölçülecek bir çözme aralığı yok.",
-  "logs.detail.reason.decode_window_too_short": "Ölçülen çıktı aralığı bir saniyenin altındaydı; çözme hızını tahmin etmek için fazla kısa.",
+  "logs.detail.reason.ttft_missing":
+    "Bu istek için ilk token süresi kaydedilmediğinden ölçülecek bir çözme aralığı yok.",
+  "logs.detail.reason.decode_window_too_short":
+    "Ölçülen çıktı aralığı bir saniyenin altındaydı; çözme hızını tahmin etmek için fazla kısa.",
   "logs.detail.costTotal": "Liste fiyatı eşdeğeri",
   "logs.detail.totalTokens": "Toplam jeton",
   "logs.detail.matchedKey": "Eşleşen anahtar",
@@ -1212,7 +1403,8 @@ export const tr: Record<TKey, string> = {
   "logs.detail.attempt.recovery.oauthAccount402": "Hesap kotası tükendi (402)",
   "logs.detail.attempt.recovery.opaqueBlobRejection": "Eski şifreli durum bırakıldı",
   "logs.detail.attempt.recovery.reasoningEffortDowngrade": "Akıl yürütme düzeyi düşürüldü",
-  "logs.detail.attempt.recovery.anthropicFastDowngrade": "Hızlı mod reddedildi, standart hızda yeniden denendi",
+  "logs.detail.attempt.recovery.anthropicFastDowngrade":
+    "Hızlı mod reddedildi, standart hızda yeniden denendi",
   "logs.detail.outcome.label": "Sonuç",
   "logs.detail.outcome.completed": "Tamamlandı",
   "logs.detail.outcome.failed": "Başarısız",
@@ -1263,8 +1455,10 @@ export const tr: Record<TKey, string> = {
   "logs.detail.estimate.usage_estimated": "Sağlayıcı kullanımı tahminidir.",
   "logs.detail.estimate.cache_detail_missing": "Önbellek detayları eksik.",
   "logs.detail.estimate.expected_price_overlay": "Doğrulanmış liste fiyatı kullanıldı.",
-  "logs.detail.estimate.provider_cost_overlay": "Kullanıcı tarafından yapılandırılan bir sağlayıcı fiyat katmanı kullanıldı.",
-  "logs.detail.estimate.priority_lower_bound": "Doğrulanan Priority fiyatı kullanılamıyor; gösterilen tahmin bilinen bir alt sınırdır.",
+  "logs.detail.estimate.provider_cost_overlay":
+    "Kullanıcı tarafından yapılandırılan bir sağlayıcı fiyat katmanı kullanıldı.",
+  "logs.detail.estimate.priority_lower_bound":
+    "Doğrulanan Priority fiyatı kullanılamıyor; gösterilen tahmin bilinen bir alt sınırdır.",
   "logs.col.error": "Hata",
   "logs.col.upstreamReason": "Yukarı akış nedeni",
   "logs.col.failureDetail": "Hata ayrıntısı",
@@ -1282,7 +1476,8 @@ export const tr: Record<TKey, string> = {
   "logs.failureDetail.providerError": "Sağlayıcı bir hata döndürdü",
   "logs.failureDetail.providerErrorTyped": "Sağlayıcı bir hata döndürdü ({type})",
   "logs.failureDetail.headerTimeout": "Yanıt başlıkları beklenirken zaman aşımı oluştu",
-  "logs.failureDetail.headerTimeoutAfter": "{value} ms sonra yanıt başlıkları beklenirken zaman aşımı oluştu",
+  "logs.failureDetail.headerTimeoutAfter":
+    "{value} ms sonra yanıt başlıkları beklenirken zaman aşımı oluştu",
   "logs.failureDetail.connectTimeout": "Sağlayıcıya bağlantı {value} ms sonra zaman aşımına uğradı",
   "logs.failureDetail.connectFailed": "Sağlayıcıya bağlanılamadı",
   "logs.failureDetail.clientClosed": "İstemci isteği kapattı",
@@ -1367,7 +1562,8 @@ export const tr: Record<TKey, string> = {
   "usage.range.all": "Tümü",
   "usage.range.available": "Mevcut geçmiş",
   "usage.historyTruncated": "Toplamlar yalnızca mevcut geçmişi kapsar.",
-  "usage.historyTruncatedWindow": "Yüklenen satırların istek başlangıç zamanları {start} ile {end} arasındadır. Dosyanın önceki kayıtları okuma sınırı nedeniyle atlandı, bu yüzden seçilen aralık eksik olabilir.",
+  "usage.historyTruncatedWindow":
+    "Yüklenen satırların istek başlangıç zamanları {start} ile {end} arasındadır. Dosyanın önceki kayıtları okuma sınırı nedeniyle atlandı, bu yüzden seçilen aralık eksik olabilir.",
   "usage.range.30d": "30 gün",
   "usage.range.7d": "7 gün",
   "usage.card.requests": "İstekler",
@@ -1400,10 +1596,14 @@ export const tr: Record<TKey, string> = {
   "usage.col.cacheHits": "Önbellek isabetleri",
   "usage.col.cacheWrites": "Önbellek yazma",
   "usage.col.cacheHitRate": "İsabet oranı",
-  "usage.throughput.title": "Uçtan uca çıktı verimi: {samples} ölçülen deneme için çıktı jetonları toplamı ÷ geçen süre toplamı. Kod çözme öncesi bekleme süresini içerir, bu yüzden kararlı kod çözme hızının altındadır; ölçülen jetonu ve süresi olmayan istekler hariç tutulur.",
-  "usage.throughput.unmeasured": "Bu satırdaki hiçbir istek hem çıktı jetonlarını hem de süreyi bildirmedi; ortalanacak verim yok.",
-  "usage.cacheHitRate.partial": "Toplam {total} girdi jetonunun {measured} kadarı üzerinden ortalama hesaplandı; kalan isteklerde önbellek ayrıntısı bildirilmedi.",
-  "usage.cacheHitRate.unmeasured": "Bu satırdaki hiçbir istek önbellek ayrıntısı bildirmediği için hesaplanabilecek bir ortalama isabet oranı yok.",
+  "usage.throughput.title":
+    "Uçtan uca çıktı verimi: {samples} ölçülen deneme için çıktı jetonları toplamı ÷ geçen süre toplamı. Kod çözme öncesi bekleme süresini içerir, bu yüzden kararlı kod çözme hızının altındadır; ölçülen jetonu ve süresi olmayan istekler hariç tutulur.",
+  "usage.throughput.unmeasured":
+    "Bu satırdaki hiçbir istek hem çıktı jetonlarını hem de süreyi bildirmedi; ortalanacak verim yok.",
+  "usage.cacheHitRate.partial":
+    "Toplam {total} girdi jetonunun {measured} kadarı üzerinden ortalama hesaplandı; kalan isteklerde önbellek ayrıntısı bildirilmedi.",
+  "usage.cacheHitRate.unmeasured":
+    "Bu satırdaki hiçbir istek önbellek ayrıntısı bildirmediği için hesaplanabilecek bir ortalama isabet oranı yok.",
   "usage.unavailable": "—",
   "usage.col.tokens": "Jetonlar",
   "usage.col.apiListPrice": "API liste fiyatı",
@@ -1415,7 +1615,8 @@ export const tr: Record<TKey, string> = {
   "usage.dayFri": "Cum",
   "usage.heatmap.tooltipTokens": "{tokens} jeton",
   "usage.chart.dayDetail": "{date}: {requests} istek, {tokens} jeton",
-  "usage.heatmap.keyboardLabel": "Gün gün ilerlemek için Yukarı ve Aşağı, hafta hafta ilerlemek için Sol ve Sağ tuşlarını kullanın.",
+  "usage.heatmap.keyboardLabel":
+    "Gün gün ilerlemek için Yukarı ve Aşağı, hafta hafta ilerlemek için Sol ve Sağ tuşlarını kullanın.",
   "usage.heatmap.tooltipRequests": "{requests} istek",
 
   "nav.storage": "Depolama",
@@ -1462,7 +1663,8 @@ export const tr: Record<TKey, string> = {
   "storage.cleanup.preset": "{percent}",
   "storage.cleanup.preview": "Önizleme",
   "storage.cleanup.confirmTitle": "Arşiv temizliğini onayla",
-  "storage.cleanup.confirmBody": "Toplam ~{size} tutan {count} arşivlenmiş oturum dosyası silinsin mi (%{percent} eşiği)?",
+  "storage.cleanup.confirmBody":
+    "Toplam ~{size} tutan {count} arşivlenmiş oturum dosyası silinsin mi (%{percent} eşiği)?",
   "storage.cleanup.moreFiles": "…ve {n} tane daha",
   "storage.cleanup.permanent": "Kalıcı olarak sil (karantinayı atla)",
   "storage.cleanup.permanentWarn": "Kalıcı silme geri alınamaz.",
@@ -1477,11 +1679,14 @@ export const tr: Record<TKey, string> = {
   "storage.cleanup.cleanupFailed": "Temizleme başarısız oldu.",
   "storage.cleanup.err.codex_busy": "Codex state.sqlite dosyasını kullanıyor.",
   "storage.cleanup.err.stale_preview": "Önizlemeden sonra arşivlenmiş dosyalar değişti.",
-  "storage.cleanup.err.restore_pending_overlap": "Seçilen arşivler tamamlanmamış bir geri yükleme ile çakışıyor.",
-  "storage.cleanup.err.referenced_history": "Seçilen arşivler hâlâ geçmiş tarafından referans gösteriliyor.",
+  "storage.cleanup.err.restore_pending_overlap":
+    "Seçilen arşivler tamamlanmamış bir geri yükleme ile çakışıyor.",
+  "storage.cleanup.err.referenced_history":
+    "Seçilen arşivler hâlâ geçmiş tarafından referans gösteriliyor.",
   "storage.cleanup.err.invalid_digest": "Önizleme özeti eksik veya geçersiz.",
   "storage.cleanup.err.invalid_mode": "Temizleme modu karantina veya kalıcı olmalıdır.",
-  "storage.cleanup.err.fs_failed": "Dosya sistemi temizliği başarısız oldu. Bazı dosyalar başarısızlıktan önce taşınmış olabilir; CODEX_HOME/.trash veya hedef dizini inceleyin.",
+  "storage.cleanup.err.fs_failed":
+    "Dosya sistemi temizliği başarısız oldu. Bazı dosyalar başarısızlıktan önce taşınmış olabilir; CODEX_HOME/.trash veya hedef dizini inceleyin.",
   "storage.cleanup.err.fs_failed_trash": "{trashDir} için çöp kutusu işlemi başarısız oldu.",
   "storage.cleanup.err.db_reconcile_failed": "Codex durum veritabanı güncellenemedi.",
   "storage.cleanup.err.cleanup_failed": "Temizleme başarısız oldu.",
@@ -1559,7 +1764,8 @@ export const tr: Record<TKey, string> = {
   "storage.policy.skippedEmpty": "Hedefle eşleşen aday yok.",
   "storage.policy.doneQuarantine": "Politika {count} dosyayı karantinaya aldı ({size}).",
   "storage.policy.donePermanent": "Politika {count} dosyayı kalıcı olarak sildi ({size}).",
-  "storage.policy.metadataSaveWarning": "Politika çalışması tamamlandı ancak zamanlama meta verileri kaydedilemedi.",
+  "storage.policy.metadataSaveWarning":
+    "Politika çalışması tamamlandı ancak zamanlama meta verileri kaydedilemedi.",
 
   // add-provider modal
   "modal.addNamed": "Ekle: {label}",
@@ -1599,7 +1805,8 @@ export const tr: Record<TKey, string> = {
   "modal.invalidPreset": "Bu yerleşik sağlayıcı ayarı eksik.",
   "modal.freeTierTitle": "Ücretsiz katman",
   "modal.subscriptionCliTitle": "Abonelik CLI'si, API anahtarı değil",
-  "modal.subscriptionCliWarning": "Bu sağlayıcı API anahtarı kullanmaz. Bu makinede oturum açılmış resmi Claude Code CLI'sini ({cmd}) çalıştırır ve ücreti o Claude abonelik hesabına yansıtır. OpenCodex bunun için anahtar saklamaz ve buraya girilen bir anahtar asla kullanılmaz. API anahtarıyla faturalandırma için bunun yerine {apiProvider} ekleyin.",
+  "modal.subscriptionCliWarning":
+    "Bu sağlayıcı API anahtarı kullanmaz. Bu makinede oturum açılmış resmi Claude Code CLI'sini ({cmd}) çalıştırır ve ücreti o Claude abonelik hesabına yansıtır. OpenCodex bunun için anahtar saklamaz ve buraya girilen bir anahtar asla kullanılmaz. API anahtarıyla faturalandırma için bunun yerine {apiProvider} ekleyin.",
   "modal.freeTierDefault": "API anahtarı gerekmez. Doğrudan çalışır.",
   "modal.tab.accounts": "Hesaplar",
   "modal.tab.free": "Ücretsiz",
@@ -1618,12 +1825,13 @@ export const tr: Record<TKey, string> = {
   "modal.accountCodexPool": "ChatGPT hesap havuzu",
   "modal.accountLoggedIn": "Giriş yapıldı",
   "modal.accountLoggedOut": "Giriş yapılmadı",
- "quota.fiveHourLimit": "5 saatlik limit",
+  "quota.fiveHourLimit": "5 saatlik limit",
   "quota.ageMinutes": "{n} dk",
   "quota.ageHours": "{n} sa",
   "quota.ageDays": "{n} g",
   "quota.observedAgo": "{age} önce alındı",
-  "quota.observedHint": "Meta kullanımı yalnızca akış yanıtı sırasında bildirir; bu canlı bir ölçüm değil, en son alınan değerdir.",
+  "quota.observedHint":
+    "Meta kullanımı yalnızca akış yanıtı sırasında bildirir; bu canlı bir ölçüm değil, en son alınan değerdir.",
   "quota.weeklyLimit": "Haftalık limit",
   "quota.monthlyLimit": "30 günlük limit",
   "quota.cursorFirstParty": "Birinci taraf modeller",
@@ -1775,16 +1983,19 @@ export const tr: Record<TKey, string> = {
   "pws.accountsLoadFailed": "Hesaplar yüklenemedi.",
   "pws.retryAccounts": "Tekrar Dene",
   "pws.noAccounts": "Henüz bağlı hesap yok.",
-  "pws.cockpitImportDescription": "Bu cihazdan bir Cockpit Tools Antigravity JSON dışa aktarımını içe aktarın. Dosya içeriği gösterilmez.",
+  "pws.cockpitImportDescription":
+    "Bu cihazdan bir Cockpit Tools Antigravity JSON dışa aktarımını içe aktarın. Dosya içeriği gösterilmez.",
   "pws.cockpitImportFileLabel": "Cockpit Tools Antigravity JSON dışa aktarımı",
   "pws.cockpitImportChooseFile": "JSON dosyası seç",
   "pws.cockpitImporting": "İçe aktarılıyor…",
   "pws.cockpitImportInvalid": "Seçilen dosya geçerli bir JSON dışa aktarımı değil veya çok büyük.",
   "pws.cockpitImportFailed": "Hesap içe aktarımı tamamlanamadı.",
-  "pws.cockpitImportComplete": "İçe aktarma tamamlandı: {imported} içe aktarıldı, {updated} güncellendi, {failed} başarısız, {unsupported} desteklenmiyor.",
+  "pws.cockpitImportComplete":
+    "İçe aktarma tamamlandı: {imported} içe aktarıldı, {updated} güncellendi, {failed} başarısız, {unsupported} desteklenmiyor.",
   "pws.accountSwitching": "Değiştiriliyor…",
   "pws.accountCurrent": "Mevcut hesap",
-  "pws.accountPausedHint": "Devam ettirilene kadar otomatik seçim, yeniden deneme, bekleme süresinden kurtarma, manuel seçim ve proaktif belirteç yenilemesinden hariç tutulur.",
+  "pws.accountPausedHint":
+    "Devam ettirilene kadar otomatik seçim, yeniden deneme, bekleme süresinden kurtarma, manuel seçim ve proaktif belirteç yenilemesinden hariç tutulur.",
   "pws.defaultModelNone": "Yok (sağlayıcı varsayılanını kullan)",
   "pws.discardSettings": "Vazgeç",
   "pws.jsonEditorDesc": "Ham sağlayıcı JSON konfigürasyonunu düzenleyin.",
@@ -1795,17 +2006,20 @@ export const tr: Record<TKey, string> = {
   "pws.notLoggedInTitle": "Giriş yapılmadı",
   "pws.note": "Not",
   "pws.responsesReasoningReplay": "Düz metin akıl yürütmeyi yeniden gönder",
-  "pws.responsesReasoningReplayHint": "Varsayılan olarak kapalıdır. Önceki düz metin akıl yürütmeyi bu uç noktaya gönderir ve token kullanımını artırabilir. Yalnızca uç nokta bu tekrarı destekliyorsa etkinleştirin.",
+  "pws.responsesReasoningReplayHint":
+    "Varsayılan olarak kapalıdır. Önceki düz metin akıl yürütmeyi bu uç noktaya gönderir ve token kullanımını artırabilir. Yalnızca uç nokta bu tekrarı destekliyorsa etkinleştirin.",
   "pws.allowPrivateNetwork": "Yerel/özel ağa izin ver",
   "pws.liveModels": "Sağlayıcıdan canlı model keşfet",
   "pws.liveModelsDesc": "Sağlayıcının canlı model kataloğunu çekin.",
   "pws.xaiChatOptIn": "Grok 4.5 ve 4.6 için Chat Completions kullan",
-  "pws.xaiChatOptInDesc": "Kapalıyken OAuth Responses isteklerinin varsayılanı olan Responses kullanılır. Diğer Grok modelleri ve hizmet katmanı davranışı değişmez.",
+  "pws.xaiChatOptInDesc":
+    "Kapalıyken OAuth Responses isteklerinin varsayılanı olan Responses kullanılır. Diğer Grok modelleri ve hizmet katmanı davranışı değişmez.",
   "pws.xaiChatOptInMixed": "Yalnızca bir model Chat kullanıyor.",
   "pws.cursorTransport": "Cursor aktarımı",
   "pws.cursorTransportHttp2": "HTTP/2 (varsayılan)",
   "pws.cursorTransportHttp1": "HTTP/1.1 (proxy uyumluluğu)",
-  "pws.cursorTransportDesc": "Proxy'niz Cursor'ın HTTP/2 akışını güvenilir biçimde taşıyamıyorsa HTTP/1.1 kullanın.",
+  "pws.cursorTransportDesc":
+    "Proxy'niz Cursor'ın HTTP/2 akışını güvenilir biçimde taşıyamıyorsa HTTP/1.1 kullanın.",
   "pws.optionalPlaceholder": "İsteğe bağlı",
   "pws.providerId": "Sağlayıcı ID",
   "pws.reauth": "Yeniden doğrulama gerekiyor",
@@ -1820,7 +2034,8 @@ export const tr: Record<TKey, string> = {
   "pws.healthLabel.refreshFailed": "Yenileme başarısız oldu",
   "pws.healthLabel.metadataMismatch": "Meta veri uyuşmazlığı",
   "pws.healthLabel.validationPending": "Doğrulama bekleniyor",
-  "pws.healthSummary.validationPending": "{provider} {account}: kota tükenmişken kaydedildi. Kota yenilendikten sonra küçük bir doğrulama isteği göndermek için kotaları yenileyin. Başarılı olana kadar yönlendirme kapalı kalır.",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}: kota tükenmişken kaydedildi. Kota yenilendikten sonra küçük bir doğrulama isteği göndermek için kotaları yenileyin. Başarılı olana kadar yönlendirme kapalı kalır.",
   "pws.healthLabel.credentialConflict": "Kimlik bilgisi çakışması",
   "pws.healthSummary.rateLimited": "{provider} {account}: {until} tarihine kadar oran kısıtlandı.",
   "pws.healthSummary.quotaLimited": "{provider} {account}: {until} tarihine kadar kota kısıtlandı.",
@@ -1829,30 +2044,35 @@ export const tr: Record<TKey, string> = {
   "pws.healthSummary.metadataMismatch": "{provider} {account}: meta veri uyuşmazlığı.",
   "pws.healthSummary.staleCredentials": "{provider} {account}: eksik kimlik bilgileri.",
   "pws.removeConfirm": "Kaldır",
-  "pws.removeConfirmBody": "\"{name}\" sağlayıcısı kaldırılsın mı?",
-  "pws.removeDefaultConfirmBody": "Varsayılan sağlayıcı \"{name}\" kaldırılsın mı? \"{defaultProvider}\" varsayılan sağlayıcı olacaktır. Bu işlem geri alınamaz.",
+  "pws.removeConfirmBody": '"{name}" sağlayıcısı kaldırılsın mı?',
+  "pws.removeDefaultConfirmBody":
+    'Varsayılan sağlayıcı "{name}" kaldırılsın mı? "{defaultProvider}" varsayılan sağlayıcı olacaktır. Bu işlem geri alınamaz.',
   "pws.removeConfirmTitle": "Sağlayıcıyı kaldır",
   "pws.saveSettings": "Kaydet",
   "pws.keySelection": "API anahtarı seçimi",
   "pws.keyActive": "Etkin anahtar (mevcut davranış)",
-  "pws.keyLimitInvalid": "Anahtar sınırları pozitif ve desteklenen aralıkta olmalıdır; aralık ve eşzamanlılık tam sayı olmalıdır.",
+  "pws.keyLimitInvalid":
+    "Anahtar sınırları pozitif ve desteklenen aralıkta olmalıdır; aralık ve eşzamanlılık tam sayı olmalıdır.",
   "pws.keyRoundRobin": "Sıralı dağıtım",
   "pws.keyLimits": "Anahtar başına sınırlar",
-  "pws.keySharedQuota": "Sağlayıcı sınırları tüm anahtarlara uygulanır. Aynı projedeki anahtarlar kota paylaşabilir; RPM, token veya günlük bütçeyi sınırlamaz.",
+  "pws.keySharedQuota":
+    "Sağlayıcı sınırları tüm anahtarlara uygulanır. Aynı projedeki anahtarlar kota paylaşabilir; RPM, token veya günlük bütçeyi sınırlamaz.",
   "pws.keyHandle": "Anahtar ID",
   "pws.keyStarts": "Başlatılan",
   "pws.keyInFlight": "Çalışan",
   "pws.keyWait": "Bekleme",
   "pws.keyCooldown": "Soğuma",
   "pws.pacingTitle": "İstek aralığı",
-  "pws.pacingDesc": "Bu sağlayıcıya giden istek başlangıçlarını eşit aralıklarla geciktirir. Akış yanıtları çakışabilir.",
+  "pws.pacingDesc":
+    "Bu sağlayıcıya giden istek başlangıçlarını eşit aralıklarla geciktirir. Akış yanıtları çakışabilir.",
   "pws.pacingEnabled": "Etkin",
   "pws.pacingRpm": "Dakikadaki istek",
   "pws.pacingConcurrency": "Eşzamanlı istek üst sınırı",
   "pws.pacingRpmUnit": "RPM",
   "pws.pacingCapUnit": "×",
   "pws.pacingDelay": "En kısa aralık (ms)",
-  "pws.pacingSlowerWins": "Daha yavaş sağlayıcı sınırı geçerlidir. Model kuralları yalnızca ek gecikme getirir veya eşzamanlı istek üst sınırını düşürür.",
+  "pws.pacingSlowerWins":
+    "Daha yavaş sağlayıcı sınırı geçerlidir. Model kuralları yalnızca ek gecikme getirir veya eşzamanlı istek üst sınırını düşürür.",
   "pws.pacingQueued": "kuyrukta",
   "pws.pacingNextSlot": "sonraki aralığa",
   "pws.pacingLastModel": "son model",
@@ -1863,14 +2083,17 @@ export const tr: Record<TKey, string> = {
   "pws.pacingRemove": "Kaldır",
   "pws.pacingRemoveModel": "{model} için istek aralığı kuralını kaldır",
   "pws.pacingRuleRequired": "Önce bir sağlayıcı sınırı veya model kuralı belirleyin.",
-  "pws.pacingCapInvalid": "Maksimum eşzamanlı istek sayısı 1 veya daha büyük bir tam sayı olmalıdır.",
+  "pws.pacingCapInvalid":
+    "Maksimum eşzamanlı istek sayısı 1 veya daha büyük bir tam sayı olmalıdır.",
   "pws.saving": "Kaydediliyor…",
   "pws.settingsSaved": "Ayarlar kaydedildi.",
   "pws.accountModeSaved": "Hesap modu kaydedildi.",
   "pws.accountModeFailed": "Hesap modu değiştirilemedi.",
-  "pws.accountModeConfirm": "OpenAI hesap modu değiştirilsin mi? Aktif oturumlar hedef hesap havuzuna yönlendirilecek ve kota yeni mod altında birikecektir.",
+  "pws.accountModeConfirm":
+    "OpenAI hesap modu değiştirilsin mi? Aktif oturumlar hedef hesap havuzuna yönlendirilecek ve kota yeni mod altında birikecektir.",
   "pws.settingsUnsavedBar": "Kaydedilmemiş değişiklikleriniz var.",
-  "pws.unsavedLeaveBody": "Kaydedilmemiş değişiklikleriniz var. Ayrılmadan önce kaydetmek ister misiniz?",
+  "pws.unsavedLeaveBody":
+    "Kaydedilmemiş değişiklikleriniz var. Ayrılmadan önce kaydetmek ister misiniz?",
   "pws.unsavedLeaveTitle": "Kaydedilmemiş değişiklikler",
   "pws.attentionRequired": "Dikkat gerekiyor",
   "pws.attentionAria": "{name}: {reason}",
@@ -1885,7 +2108,8 @@ export const tr: Record<TKey, string> = {
   "pws.capacity.nextRecovery": "Sonraki kapasite yenilenmesi",
   "pws.capacity.recoveryShare": "+%{percent} havuz kapasitesi",
   "pws.capacity.incomplete": "Kısmi pencere kapsamı ({excluded} hariç tutuldu)",
-  "pws.capacity.uncalibratedPlan": "Kalibre edilmemiş plandaki {count} hesap temel koltuk ağırlığıyla sayılır; bu tahmin ihtiyatlı olabilir",
+  "pws.capacity.uncalibratedPlan":
+    "Kalibre edilmemiş plandaki {count} hesap temel koltuk ağırlığıyla sayılır; bu tahmin ihtiyatlı olabilir",
   "pws.capacity.partial": "Kısmi ({count} hesap kota metriği bildiriyor)",
   "pws.capacity.windowPartial": "Kısmi",
   "pws.capacity.windowPartialA11y": "{window}: eksik hesap kapsamı",
@@ -1922,7 +2146,8 @@ export const tr: Record<TKey, string> = {
   "modal.noMatch": "Eşleşme yok.",
   "modal.oauthDefaultNote": "Hesabınızla giriş yapın — API anahtarı gerekmez.",
   "modal.oauthComingSoon": "{label} için OAuth girişi gelecektir. Şimdilik API anahtarı kullanın.",
-  "modal.oauthComingSoonShort": "Bu sağlayıcı için OAuth girişi gelecektir — şimdilik API anahtarı kullanın.",
+  "modal.oauthComingSoonShort":
+    "Bu sağlayıcı için OAuth girişi gelecektir — şimdilik API anahtarı kullanın.",
   "modal.useApiKeyInstead": "Bunun yerine API anahtarı kullanın",
   "modal.setupGuide": "Kurulum rehberi",
   "modal.setupStep1Prefix": "Adresine gidin:",
@@ -1931,11 +2156,12 @@ export const tr: Record<TKey, string> = {
   "modal.setupStep2": "Aşağıdaki API anahtarı alanına yapıştırın",
   "modal.setupStep3": "Sağlayıcı ekle'ye tıklayın — modeller otomatik keşfedilir",
   "modal.namePlaceholder": "örn. openrouter",
-  "modal.duplicateWarn": "\"{name}\" sağlayıcısı mevcut ve üzerine yazılacak.",
+  "modal.duplicateWarn": '"{name}" sağlayıcısı mevcut ve üzerine yazılacak.',
   "modal.forwardHintPrefix": "Anahtar gerekmez — proxy kimlik bilgilerinizi iletir",
   "modal.forwardCredentials": "codex girişi",
   "modal.forwardHintSuffix": "kimlik bilgilerini bu sağlayıcıya iletir.",
-  "modal.localHint": "Yerel mod, Cursor'ın statik kamuya açık kataloğunu kaydeder. Canlı taşıma, dosya ve kabuk (shell) araçları denetlenene kadar kapalı kalır.",
+  "modal.localHint":
+    "Yerel mod, Cursor'ın statik kamuya açık kataloğunu kaydeder. Canlı taşıma, dosya ve kabuk (shell) araçları denetlenene kadar kapalı kalır.",
   "modal.getApiKey": "{label} API anahtarınızı alın",
   "modal.apiKey": "API anahtarı",
   "modal.apiKeyTransport": "API anahtar başlığı",
@@ -1945,10 +2171,11 @@ export const tr: Record<TKey, string> = {
   "modal.defaultModelPlaceholder": "örn. gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
   "modal.baseUrlPlaceholderError": "Taban URL çözümlenmemiş bir {placeholder} içeriyor.",
-  "modal.baseUrlPlaceholderHint": "Eklemeden önce {placeholder} değerini gerçek Hesap ID'nizle değiştirin.",
+  "modal.baseUrlPlaceholderHint":
+    "Eklemeden önce {placeholder} değerini gerçek Hesap ID'nizle değiştirin.",
   "modal.adding": "Ekleniyor…",
   "modal.useOauthLogin": "← OAuth girişini kullan",
-"nav.codexAuth": "Codex Kimlik Doğrulama",
+  "nav.codexAuth": "Codex Kimlik Doğrulama",
   "nav.codexSet": "Codex",
   "nav.connect": "Rota",
   "nav.usageLogs": "Kullanım ve Günlükler",
@@ -1956,36 +2183,46 @@ export const tr: Record<TKey, string> = {
   "codexSet.tab.multiauth": "Çoklu kimlik doğrulama",
   "codexSet.tab.prompt": "İstem",
   "codexSet.prompt.title": "İstem katmanları",
-  "codexSet.prompt.timing": "Yeni başlatılan oturumlara uygulanır. Çalışan oturumlar mevcut istem ayarlarını korur.",
+  "codexSet.prompt.timing":
+    "Yeni başlatılan oturumlara uygulanır. Çalışan oturumlar mevcut istem ayarlarını korur.",
   "codexSet.prompt.staleRevision": "Yapılandırma başka bir yerde değişti. Liste yeniden yüklendi.",
-"codexSet.prompt.writeFailed": "Değişiklik kaydedilemedi.",
-"codexSet.prompt.loadFailed": "İstem katmanları yüklenemedi.",
+  "codexSet.prompt.writeFailed": "Değişiklik kaydedilemedi.",
+  "codexSet.prompt.loadFailed": "İstem katmanları yüklenemedi.",
   "codexSet.prompt.repair": "Onar",
   "codexSet.prompt.repairFailed": "Onarım tamamlanamadı.",
   "codexSet.prompt.remeasure": "Yeniden ölç",
-  "codexSet.drift.journalPresent": "Önceki yazma işlemi tamamlanmadı. Kurtarma bir sonraki yazma sırasında otomatik olarak çalışır.",
-  "codexSet.drift.projectionStale": "Kaydedilen katmanlar ile config.toml içindeki değer uyuşmuyor. Onarım, değeri katmanlarınıza göre yeniden yazar.",
-  "codexSet.drift.storeMissing": "Katman dosyası yok ancak config.toml içinde talimatlar duruyor. Onarım önce yedek alır ve metni tek bir katman olarak saklar.",
-  "codexSet.drift.ownedMalformed": "config.toml içinde oluşturulan satır elle değiştirilmiş, bu yüzden yeniden yazmak artık güvenli değil.",
-  "codexSet.custom.adoptUnsupported": "{path} dosyasının {line}. satırındaki değer tek satırlık bir dizge olmadığından içe aktarılamaz. Burada yönetmek için elle taşıyın.",
-  "codexSet.prompt.unreadable": "Codex yapılandırma dosyası var ancak okunamadı, bu yüzden değişiklikler reddedildi.",
+  "codexSet.drift.journalPresent":
+    "Önceki yazma işlemi tamamlanmadı. Kurtarma bir sonraki yazma sırasında otomatik olarak çalışır.",
+  "codexSet.drift.projectionStale":
+    "Kaydedilen katmanlar ile config.toml içindeki değer uyuşmuyor. Onarım, değeri katmanlarınıza göre yeniden yazar.",
+  "codexSet.drift.storeMissing":
+    "Katman dosyası yok ancak config.toml içinde talimatlar duruyor. Onarım önce yedek alır ve metni tek bir katman olarak saklar.",
+  "codexSet.drift.ownedMalformed":
+    "config.toml içinde oluşturulan satır elle değiştirilmiş, bu yüzden yeniden yazmak artık güvenli değil.",
+  "codexSet.custom.adoptUnsupported":
+    "{path} dosyasının {line}. satırındaki değer tek satırlık bir dizge olmadığından içe aktarılamaz. Burada yönetmek için elle taşıyın.",
+  "codexSet.prompt.unreadable":
+    "Codex yapılandırma dosyası var ancak okunamadı, bu yüzden değişiklikler reddedildi.",
   "codexSet.layer.permissions": "İzinler",
   "codexSet.layer.collaboration": "İş birliği modu",
   "codexSet.layer.environment": "Ortam bağlamı",
   "codexSet.layer.apps": "Uygulamalar",
-"codexSet.layer.skills": "Beceriler",
-"codexSet.prompt.extensionsUnknown": "Uzantılar kendi katmanlarını ekleyebilir. Codex bunları göstermediği için burada listelenemez.",
+  "codexSet.layer.skills": "Beceriler",
+  "codexSet.prompt.extensionsUnknown":
+    "Uzantılar kendi katmanlarını ekleyebilir. Codex bunları göstermediği için burada listelenemez.",
   "codexSet.group.transition": "Geçiş bildirimleri",
-  "codexSet.group.transitionDesc": "Durumu anlatmak yerine bir değişikliği bildirirler; bu yüzden yalnızca oturum gerçek zamanlıya geçtiğinde veya model değiştiğinde görünürler. Numaralar birleştirme sırasını korur, bu yüzden yukarıdaki listede atlamalar olur.",
+  "codexSet.group.transitionDesc":
+    "Durumu anlatmak yerine bir değişikliği bildirirler; bu yüzden yalnızca oturum gerçek zamanlıya geçtiğinde veya model değiştiğinde görünürler. Numaralar birleştirme sırasını korur, bu yüzden yukarıdaki listede atlamalar olur.",
   "codexSet.custom.slotNote": "Özel katmanlar bu sırayla birleştirilip tek bir bölüm olur.",
-"codexSet.row.alwaysOn": "Her zaman açık",
+  "codexSet.row.alwaysOn": "Her zaman açık",
   "codexSet.row.onChange": "Değişimde gönderilir",
-"codexSet.row.featureGated": "[features] altında yapılandırılır",
+  "codexSet.row.featureGated": "[features] altında yapılandırılır",
   "codexSet.row.openFeatures": "Ayarları aç",
   "codexSet.row.resetDefault": "{value} değerine sıfırla",
   "codexSet.dialog.setValue": "{value} (varsayılan {fallback})",
-"codexSet.dialog.copyKey": "Anahtarı kopyala",
-"codexSet.dialog.unknownLayer": "Bu derlemede bu katman için açıklama yok. Panelden daha yeni bir Codex çalışma zamanından geliyor.",
+  "codexSet.dialog.copyKey": "Anahtarı kopyala",
+  "codexSet.dialog.unknownLayer":
+    "Bu derlemede bu katman için açıklama yok. Panelden daha yeni bir Codex çalışma zamanından geliyor.",
   "codexSet.custom.heading": "Özel katmanlar",
   "codexSet.custom.add": "+ Katman ekle",
   "codexSet.custom.newTitle": "Yeni katman",
@@ -1998,17 +2235,19 @@ export const tr: Record<TKey, string> = {
   "codexSet.custom.titleTooLong": "Başlık {count} karakter; sınır {max}.",
   "codexSet.custom.titleMultiline": "Başlık tek satır olmalıdır.",
   "codexSet.custom.bodyTooLarge": "Bu katman {bytes} bayt; sınır {max}.",
-  "codexSet.custom.composedTooLarge": "Etkin katmanların toplamı {bytes} bayt olacak ve sınırı aşacak.",
+  "codexSet.custom.composedTooLarge":
+    "Etkin katmanların toplamı {bytes} bayt olacak ve sınırı aşacak.",
   "codexSet.custom.invalidCharacter": "{position} konumundaki denetim karakteri kaydedilemez.",
   "codexSet.custom.discardPrompt": "Değişiklikler silinsin mi?",
-  "codexSet.custom.discardOthersAndSave": "Diğer katmanlardaki kaydedilmemiş değişiklikler silinip bu katman kaydedilsin mi?",
+  "codexSet.custom.discardOthersAndSave":
+    "Diğer katmanlardaki kaydedilmemiş değişiklikler silinip bu katman kaydedilsin mi?",
   "codexSet.custom.keepEditing": "Düzenlemeye devam et",
   "codexSet.custom.delete": "{title} katmanını sil",
   "codexSet.custom.deleteConfirm": "Bu katman silinsin mi? Kısa bir süre geri alabilirsiniz.",
   "codexSet.custom.layerGone": "Bu katman başka bir yerde silindiği için düzenleyici kapatıldı.",
   "codexSet.custom.deleteConfirmNamed": "“{title}” silinsin mi? Kısa bir süre geri alabilirsiniz.",
   "codexSet.custom.deletedNamed": "“{title}” silindi.",
-"codexSet.custom.moveUp": "{title} katmanını yukarı taşı",
+  "codexSet.custom.moveUp": "{title} katmanını yukarı taşı",
   "codexSet.custom.prevLayer": "Önceki katman",
   "codexSet.custom.nextLayer": "Sonraki katman",
   "codexSet.custom.navPosition": "{position} / {total}",
@@ -2016,54 +2255,75 @@ export const tr: Record<TKey, string> = {
   "codexSet.custom.limitReached": "En fazla {max} özel katman saklayabilirsiniz.",
   "codexSet.custom.composedSize": "Birleşik: {bytes}/{max} bayt",
   "codexSet.custom.composedPreview": "Birleştirilmiş developer_instructions göster",
-  "codexSet.custom.notOwned": "developer_instructions opencodex dışında yazıldığı için buradan düzenlenemez. Katman olarak yönetmek için içe aktarın.",
+  "codexSet.custom.notOwned":
+    "developer_instructions opencodex dışında yazıldığı için buradan düzenlenemez. Katman olarak yönetmek için içe aktarın.",
   "codexSet.custom.adopt": "Mevcut talimatları içe aktar",
   "codexSet.custom.adoptConfirm": "Katman olarak içe aktar",
   "codexSet.custom.adoptRefused": "Mevcut değer içe aktarılamadı.",
-  "codexSet.custom.baseReplaced": "model_instructions_file {path} olarak ayarlandığından, opencodex dışındaki bir öğe temel istemi değiştirmiş.",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file {path} olarak ayarlandığından, opencodex dışındaki bir öğe temel istemi değiştirmiş.",
   "codexSet.custom.baseReplacedOpen": "Yönet",
   "codexSet.lint.identity": "Bu, Codex tarafından belirlenenden farklı bir kimlik iddia ediyor.",
-  "codexSet.lint.foreignTool": "Araçlar kayıt defterinden gelir; burada bir aracın adını belirtmek onu oluşturmaz.",
-  "codexSet.lint.placeholder": "Talimatlar bir şablon motorundan geçmez, bu nedenle bu metin olduğu gibi gönderilir.",
-  "codexSet.lint.applyPatch": "apply_patch talimatlar tarafından değil, araç kayıt defteri tarafından tanımlanır.",
-  "codexSet.lint.approvalVocab": "Codex kendi onay terimlerini ekler; bu metin onlarla çelişebilir.",
+  "codexSet.lint.foreignTool":
+    "Araçlar kayıt defterinden gelir; burada bir aracın adını belirtmek onu oluşturmaz.",
+  "codexSet.lint.placeholder":
+    "Talimatlar bir şablon motorundan geçmez, bu nedenle bu metin olduğu gibi gönderilir.",
+  "codexSet.lint.applyPatch":
+    "apply_patch talimatlar tarafından değil, araç kayıt defteri tarafından tanımlanır.",
+  "codexSet.lint.approvalVocab":
+    "Codex kendi onay terimlerini ekler; bu metin onlarla çelişebilir.",
   "codexSet.lint.environment": "Ortam bilgileri daha sonra oluşturulur ve bu metinle çelişebilir.",
-"codexSet.lint.size": "Bu katman 8 KB sınırını aşıyor. Yine de kaydedilir, ancak her istekte belirteç harcar.",
-  "codexSet.lint.secret": "Kimlik bilgisi ya da API anahtarı gibi görünüyor - config.toml içine düz metin olarak kaydedilir.",
-  "codexSet.lint.ignoreInstructions": "Codex'e kendi yönergelerini yok saymasını söylemek yerleşik kuralları devre dışı bırakabilir.",
+  "codexSet.lint.size":
+    "Bu katman 8 KB sınırını aşıyor. Yine de kaydedilir, ancak her istekte belirteç harcar.",
+  "codexSet.lint.secret":
+    "Kimlik bilgisi ya da API anahtarı gibi görünüyor - config.toml içine düz metin olarak kaydedilir.",
+  "codexSet.lint.ignoreInstructions":
+    "Codex'e kendi yönergelerini yok saymasını söylemek yerleşik kuralları devre dışı bırakabilir.",
   "codexSet.preset.blank": "Boş katman",
   "codexSet.preset.concise.name": "Kısa çıktı",
   "codexSet.preset.concise.description": "Kısa yanıtlar, giriş yok, en az biçimlendirme.",
-  "codexSet.preset.concise.provenance": "Claude Code'un kısa yanıt talimatlarından uyarlandı. İfade bize aittir, kopya değildir.",
+  "codexSet.preset.concise.provenance":
+    "Claude Code'un kısa yanıt talimatlarından uyarlandı. İfade bize aittir, kopya değildir.",
   "codexSet.preset.planFirst.name": "Düzenlemeden önce planla",
   "codexSet.preset.planFirst.description": "Önce planı belirt, ardından değişikliği yap.",
-  "codexSet.preset.planFirst.provenance": "Claude Code'un planlama yaklaşımından uyarlandı. İfade bize aittir, kopya değildir.",
+  "codexSet.preset.planFirst.provenance":
+    "Claude Code'un planlama yaklaşımından uyarlandı. İfade bize aittir, kopya değildir.",
   "codexSet.preset.explainWhy.name": "Gerekçeyi açıkla",
   "codexSet.preset.explainWhy.description": "Yalnızca ne olduğunu değil, nedenini de belirt.",
-  "codexSet.preset.explainWhy.provenance": "Grok Build'in onaylama tarzından uyarlandı. İfade bize aittir, kopya değildir.",
+  "codexSet.preset.explainWhy.provenance":
+    "Grok Build'in onaylama tarzından uyarlandı. İfade bize aittir, kopya değildir.",
   "codexSet.preset.testFirst.name": "Önce test",
   "codexSet.preset.testFirst.description": "Düzeltmeden önce başarısız olan testi yaz.",
-  "codexSet.preset.testFirst.provenance": "Yaygın ajan uygulamalarından uyarlandı. İfade bize aittir, kopya değildir.",
+  "codexSet.preset.testFirst.provenance":
+    "Yaygın ajan uygulamalarından uyarlandı. İfade bize aittir, kopya değildir.",
   "codexSet.preset.korean.name": "Korece yanıtlar",
   "codexSet.preset.korean.description": "İstek hangi dilde olursa olsun Korece yanıt ver.",
-  "codexSet.preset.korean.provenance": "Sık istenen bir ihtiyaçtan yola çıkarak opencodex için yazıldı. İfade bize aittir, kopya değildir.",
+  "codexSet.preset.korean.provenance":
+    "Sık istenen bir ihtiyaçtan yola çıkarak opencodex için yazıldı. İfade bize aittir, kopya değildir.",
   "codexSet.dialog.class": "Tür",
   "codexSet.dialog.key": "Yapılandırma anahtarı",
   "codexSet.dialog.fileValue": "Bu dosyadaki değer",
   "codexSet.dialog.absentDefault": "ayarlanmamış (varsayılan: {value})",
-"codexSet.dialog.noRenderedText": "Codex yerleşik bir katmanın birleştirilmiş metnini göstermez. Bu nedenle bu iletişim kutusu içeriği göstermek yerine katmanı açıklar ve anahtarını belirtir.",
+  "codexSet.dialog.noRenderedText":
+    "Codex yerleşik bir katmanın birleştirilmiş metnini göstermez. Bu nedenle bu iletişim kutusu içeriği göstermek yerine katmanı açıklar ve anahtarını belirtir.",
   "codexSet.dialog.probeNotFound": "Ölçüm yapılamadı: codex yürütülebilir dosyası bulunamadı.",
-  "codexSet.dialog.probeUnsupported": "Ölçüm yapılamadı: bu Codex sürümü ölçüm komutunu desteklemiyor.",
+  "codexSet.dialog.probeUnsupported":
+    "Ölçüm yapılamadı: bu Codex sürümü ölçüm komutunu desteklemiyor.",
   "codexSet.dialog.probeInvalid": "Ölçüm yapılamadı: Codex çıktısı ayrıştırılamadı.",
   "codexSet.dialog.probeFailed": "Ölçüm yapılamadı: Codex ölçümü tamamlanmadı.",
   "codexSet.dialog.probeBusy": "Başka bir ölçüm hâlâ sürüyor. Birazdan yeniden deneyin.",
   "codexSet.dialog.sourceText": "Modele gönderilen metin",
   "codexSet.dialog.sourceBytes": "{bytes} bayt",
-"codexSet.dialog.notRendered": "Okuduğumuz turda bu katman hiçbir şey göndermedi. Bölümler yalnızca değiştiklerinde yeniden gönderilir, bu yüzden tek bir örnekte görünmeyebilir.",
-  "codexSet.dialog.emptySource": "{path} konumundaki dosya var ancak boş, bu yüzden bu katman hiçbir şey göndermiyor.",
-  "codexSet.dialog.notExposed": "Temel istem, Codex'in yazdırabildiği mesaj listesinin dışından geçtiği için burada gösterilemez. model_instructions_file ile değiştirilebilir.",
-  "codexSet.dialog.unmapped": "Bu katmanın istem çıktısında henüz doğrulanmış bir eşlemesi yok, bu nedenle metni burada henüz gösterilemiyor.",
-  "codexSet.dialog.textUnavailable": "Bu makinede Codex istemi okunamadı, bu yüzden metin kullanılamıyor.",
+  "codexSet.dialog.notRendered":
+    "Okuduğumuz turda bu katman hiçbir şey göndermedi. Bölümler yalnızca değiştiklerinde yeniden gönderilir, bu yüzden tek bir örnekte görünmeyebilir.",
+  "codexSet.dialog.emptySource":
+    "{path} konumundaki dosya var ancak boş, bu yüzden bu katman hiçbir şey göndermiyor.",
+  "codexSet.dialog.notExposed":
+    "Temel istem, Codex'in yazdırabildiği mesaj listesinin dışından geçtiği için burada gösterilemez. model_instructions_file ile değiştirilebilir.",
+  "codexSet.dialog.unmapped":
+    "Bu katmanın istem çıktısında henüz doğrulanmış bir eşlemesi yok, bu nedenle metni burada henüz gösterilemiyor.",
+  "codexSet.dialog.textUnavailable":
+    "Bu makinede Codex istemi okunamadı, bu yüzden metin kullanılamıyor.",
   "codexSet.class.base": "Temel talimatlar",
   "codexSet.class.config-toggle": "Buradan değiştirilebilir",
   "codexSet.class.feature-gated": "Özellik bayraklı",
@@ -2080,43 +2340,56 @@ export const tr: Record<TKey, string> = {
   "codexSet.layer.tools": "Araçlar",
   "codexSet.layer.multi-agent-mode": "Çoklu ajan modu",
   "codexSet.layer.git-attribution": "Commit atıfları",
-  "codexSet.about.base-instructions": "Codex'in kendi talimatlarıdır. İstekle birlikte gönderilir ve kapatılamaz.",
+  "codexSet.about.base-instructions":
+    "Codex'in kendi talimatlarıdır. İstekle birlikte gönderilir ve kapatılamaz.",
   "codexSet.about.model-switch": "Oturum sırasında model değiştiğinde eklenir.",
   "codexSet.about.personality": "Bir özellik bayrağının yönettiği ton ve anlatım yönlendirmesi.",
-  "codexSet.about.context-window-guidance": "Bir özellik bayrağının yönettiği kalan bağlam bütçesi önerileri.",
+  "codexSet.about.context-window-guidance":
+    "Bir özellik bayrağının yönettiği kalan bağlam bütçesi önerileri.",
   "codexSet.about.realtime": "Gerçek zamanlı oturumlarda eklenir.",
-  "codexSet.about.agents-md": "Projenizin AGENTS.md dosyalarıdır. Bu sayfa katmanı gösterir, proje belgelerinizi değiştirmez.",
+  "codexSet.about.agents-md":
+    "Projenizin AGENTS.md dosyalarıdır. Bu sayfa katmanı gösterir, proje belgelerinizi değiştirmez.",
   "codexSet.about.permissions": "Geçerli korumalı alan ve onay ayarlarını açıklar.",
   "codexSet.about.collaboration": "Etkin iş birliği modunu açıklar.",
   "codexSet.about.environment": "Çalışma dizini, platform ve diğer ortam bilgileri.",
-  "codexSet.about.environments-instructions": "Bir özellik bayrağının yönettiği ertelenmiş yürütme ortamı talimatları.",
+  "codexSet.about.environments-instructions":
+    "Bir özellik bayrağının yönettiği ertelenmiş yürütme ortamı talimatları.",
   "codexSet.about.apps": "Bağlı uygulamaların nasıl kullanılacağını açıklar.",
-  "codexSet.about.plugins": "Bir eklenti seçildiğinde veya herhangi bir eklenti bir yetenek bildirdiğinde eklenir.",
+  "codexSet.about.plugins":
+    "Bir eklenti seçildiğinde veya herhangi bir eklenti bir yetenek bildirdiğinde eklenir.",
   "codexSet.about.tools": "Bir özellik bayrağının yönettiği ertelenmiş araç açıklamaları.",
   "codexSet.about.skills": "Kullanılabilir becerilerin listesi.",
   "codexSet.about.multi-agent-mode": "Bir özellik bayrağının yönettiği alt ajan talimatları.",
-  "codexSet.about.git-attribution": "Modelin yazdığı commit’lere Co-authored-by: Codex trailer’ını, açtığı pull request’lere de Generated with Codex. satırını eklemesini söyler. Codex bunu hesabınızdan okur; ne burada ne de [features] altında değiştirilebilir. Hesabınız kapattığında Codex hiçbir şey göndermek yerine tersi yönde talimat gönderir.",
+  "codexSet.about.git-attribution":
+    "Modelin yazdığı commit’lere Co-authored-by: Codex trailer’ını, açtığı pull request’lere de Generated with Codex. satırını eklemesini söyler. Codex bunu hesabınızdan okur; ne burada ne de [features] altında değiştirilebilir. Hesabınız kapattığında Codex hiçbir şey göndermek yerine tersi yönde talimat gönderir.",
   "codexSet.condition.model-switch": "Yalnızca oturum sırasında model değiştikten sonra eklenir.",
   "codexSet.condition.realtime": "Yalnızca gerçek zamanlı oturumlarda eklenir.",
   "codexSet.condition.agents-md": "Çalışma dizini için bir proje belgesi bulunduğunda eklenir.",
-  "codexSet.condition.plugins": "Bir eklenti seçildiğinde veya herhangi bir eklenti bir yetenek bildirdiğinde eklenir.",
+  "codexSet.condition.plugins":
+    "Bir eklenti seçildiğinde veya herhangi bir eklenti bir yetenek bildirdiğinde eklenir.",
   "codexSet.condition.git-attribution": "Hesabınızın atıf politikası belirler.",
   "codexSet.base.title": "Temel istem",
   "codexSet.base.prev": "Önceki seçenek",
   "codexSet.base.next": "Sonraki seçenek",
   "codexSet.base.position": "{position} / {total}",
-  "codexSet.base.swipeHint": "Yana kaydırın, yön tuşlarını ya da ok düğmelerini kullanarak seçenekler arasında geçin. Yeni başlatılan oturumlarda geçerlidir.",
+  "codexSet.base.swipeHint":
+    "Yana kaydırın, yön tuşlarını ya da ok düğmelerini kullanarak seçenekler arasında geçin. Yeni başlatılan oturumlarda geçerlidir.",
   "codexSet.base.defaultTitle": "Codex’in kendi temel istemi",
-  "codexSet.base.defaultBody": "Varsayılan burada saklanmaz, dolayısıyla düzenlenecek veya silinecek bir şey yoktur: seçmek yapılandırmadan model_instructions_file satırını kaldırır ve Codex kendi istemini kullanır.",
+  "codexSet.base.defaultBody":
+    "Varsayılan burada saklanmaz, dolayısıyla düzenlenecek veya silinecek bir şey yoktur: seçmek yapılandırmadan model_instructions_file satırını kaldırır ve Codex kendi istemini kullanır.",
   "codexSet.base.variantTitle": "Ad",
   "codexSet.base.variantBody": "İstem",
-  "codexSet.base.replacesWarning": "Bu, Codex’in temel istemine eklemek yerine onun YERİNE geçer. Buraya kısa yazarsanız modelin talimatları da o kadar kısa olur.",
+  "codexSet.base.replacesWarning":
+    "Bu, Codex’in temel istemine eklemek yerine onun YERİNE geçer. Buraya kısa yazarsanız modelin talimatları da o kadar kısa olur.",
   "codexSet.base.use": "Bunu kullan",
   "codexSet.base.inUse": "Kullanımda",
-  "codexSet.base.externalBlocked": "model_instructions_file zaten {path} yolunu gösteriyor ve bunu opencodex yazmadı. Buradan seçim yapmadan önce kendiniz temizleyin ya da dosyayı varyant olarak içe aktarın.",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file zaten {path} yolunu gösteriyor ve bunu opencodex yazmadı. Buradan seçim yapmadan önce kendiniz temizleyin ya da dosyayı varyant olarak içe aktarın.",
   "codexSet.base.import": "Varyant olarak içe aktar",
-  "codexSet.base.importPreview": "{path} konumundaki dosya yönetilen bir varyanta dönüştürülür ve aşağıda gösterildiği gibi kurulur — başlık bir `#` başlık satırı olur ve gövde normalleştirilir (CRLF → LF, sekme → 4 boşluk).",
-  "codexSet.base.importFormat": "Olduğu gibi saklanır: toplam {serializedBytes} bayt (gövde {bodyBytes} bayt). Codex, başlık satırı dahil tüm dosyayı okur.",
+  "codexSet.base.importPreview":
+    "{path} konumundaki dosya yönetilen bir varyanta dönüştürülür ve aşağıda gösterildiği gibi kurulur — başlık bir `#` başlık satırı olur ve gövde normalleştirilir (CRLF → LF, sekme → 4 boşluk).",
+  "codexSet.base.importFormat":
+    "Olduğu gibi saklanır: toplam {serializedBytes} bayt (gövde {bodyBytes} bayt). Codex, başlık satırı dahil tüm dosyayı okur.",
   "codexSet.base.importTitle": "Varyant başlığı",
   "codexSet.base.importTitlePending": "Bu başlık için önizleme yenileniyor…",
   "codexSet.base.importConfirm": "İçe aktar ve yönet",
@@ -2140,7 +2413,8 @@ export const tr: Record<TKey, string> = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "Kayıtlı ana dizindeki kataloğu yüklemek için Gentle Shell’i yeniden başlatın. Bağlı/ortak dizinler için Pi entegrasyonunu kullanın.",
+  "integrations.semantics.gentleShell":
+    "Kayıtlı ana dizindeki kataloğu yüklemek için Gentle Shell’i yeniden başlatın. Bağlı/ortak dizinler için Pi entegrasyonunu kullanın.",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -2155,32 +2429,40 @@ export const tr: Record<TKey, string> = {
   "integrations.tab.raycast": "Raycast",
   "integrations.tab.omo": "omo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "~/.qoder-cn/settings.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
+  "integrations.semantics.qoderCn":
+    "~/.qoder-cn/settings.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "~/.workbuddy/models.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
+  "integrations.semantics.workbuddy":
+    "~/.workbuddy/models.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "~/.workbuddy-ai/models.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
+  "integrations.semantics.workbuddyAi":
+    "~/.workbuddy-ai/models.json içindeki OpenCodex modellerini yönetir. Yerel bağlantı gerekir. Diğer ayarlar korunur; Geri Al anlık görüntüyü geri yükler.",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
-  "integrations.semantics.qoder": "~/.qoder/settings.json içindeki OpenCodex sağlayıcılarını ve özel modelleri yönetir. Loopback erişimi gerektirir. Diğer ayarlar korunur; Geri al, anlık görüntüyü geri yükler.",
-  "integrations.semantics.t3code": "~/.t3/userdata/settings.json dosyasına bir opencodex Claude sağlayıcı örneği ekler (T3CODE_HOME konumunu değiştirir). Yönlendirilen modeller T3 Code model seçicisinde görünür; Codex iş parçacıkları proxy’yi yalnızca Codex entegrasyonu etkinse ve T3 Code aynı CODEX_HOME değerini kullanıyorsa kullanır. Loopback erişimi gerektirir. Diğer ayarlar korunur; Geri al, anlık görüntüyü geri yükler.",
+  "integrations.semantics.qoder":
+    "~/.qoder/settings.json içindeki OpenCodex sağlayıcılarını ve özel modelleri yönetir. Loopback erişimi gerektirir. Diğer ayarlar korunur; Geri al, anlık görüntüyü geri yükler.",
+  "integrations.semantics.t3code":
+    "~/.t3/userdata/settings.json dosyasına bir opencodex Claude sağlayıcı örneği ekler (T3CODE_HOME konumunu değiştirir). Yönlendirilen modeller T3 Code model seçicisinde görünür; Codex iş parçacıkları proxy’yi yalnızca Codex entegrasyonu etkinse ve T3 Code aynı CODEX_HOME değerini kullanıyorsa kullanır. Loopback erişimi gerektirir. Diğer ayarlar korunur; Geri al, anlık görüntüyü geri yükler.",
   "integrations.tab.cline": "Cline CLI",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.droid": "Factory Droid",
   "integrations.droidReasoning.title": "Varsayılan akıl yürütme düzeyi",
-  "integrations.droidReasoning.description": "Varsayılan yalnızca istek akıl yürütme düzeyi belirtmediğinde kullanılır. Kaydedilmiş varsayılanları kaldırmak için Factory Droid'u devre dışı bırakın.",
+  "integrations.droidReasoning.description":
+    "Varsayılan yalnızca istek akıl yürütme düzeyi belirtmediğinde kullanılır. Kaydedilmiş varsayılanları kaldırmak için Factory Droid'u devre dışı bırakın.",
   "integrations.droidReasoning.noDefault": "Varsayılan yok",
   "integrations.droidReasoning.noEfforts": "Kullanılabilir akıl yürütme düzeyi seçeneği yok",
   "integrations.droidReasoning.noModels": "Dışa aktarılmış model yok.",
   "integrations.droidReasoning.modelDefault": "{model} için varsayılan akıl yürütme düzeyi",
-  "integrations.droidReasoning.unsupportedTitle": "Kaydedilmiş bazı varsayılanlar artık desteklenmiyor. Bunları temizleyin, ardından uygulamak için değişiklikleri kaydedip inceleyin.",
+  "integrations.droidReasoning.unsupportedTitle":
+    "Kaydedilmiş bazı varsayılanlar artık desteklenmiyor. Bunları temizleyin, ardından uygulamak için değişiklikleri kaydedip inceleyin.",
   "integrations.droidReasoning.unsupportedEffort": "Desteklenmeyen düzey: {effort}",
   "integrations.droidReasoning.clear": "Varsayılanı temizle",
   "integrations.droidReasoning.saveReview": "Değişiklikleri kaydet / incele",
   "integrations.aside.profilesTitle": "Aside profilleri",
-  "integrations.aside.profilesHint": "Seçili modellerin hangi profillere aktarılacağını seçin. Aside’ın etkin profili değişmez.",
+  "integrations.aside.profilesHint":
+    "Seçili modellerin hangi profillere aktarılacağını seçin. Aside’ın etkin profili değişmez.",
   "integrations.aside.all": "Tüm profilleri eşitle",
   "integrations.aside.syncNow": "Şimdi eşitle",
   "integrations.aside.applied": "{total} profilden {count} tanesine uygulandı",
@@ -2190,15 +2472,19 @@ export const tr: Record<TKey, string> = {
   "integrations.aside.details": "{name} profilini yönet",
   "integrations.aside.back": "Tüm Aside profilleri",
   "integrations.aside.empty": "Bağlamak için Aside’ı açıp bir profil oluşturun.",
-  "integrations.aside.partial": "Bazı profillerle ilgilenmeniz gerekiyor. Eşitleme tercihleriniz kaydedildi; her profilin durumunu kontrol edin.",
+  "integrations.aside.partial":
+    "Bazı profillerle ilgilenmeniz gerekiyor. Eşitleme tercihleriniz kaydedildi; her profilin durumunu kontrol edin.",
   "integrations.aside.pending": "Eşitleme tercihi kaydedildi; dosya güncellemesi bekleniyor.",
   "integrations.aside.retry": "{name} için yeniden dene",
-  "integrations.aside.loadError": "Aside profilleri yüklenemedi. Durumlarını kontrol etmek için yeniden deneyin.",
+  "integrations.aside.loadError":
+    "Aside profilleri yüklenemedi. Durumlarını kontrol etmek için yeniden deneyin.",
   "integrations.hermes.profilesTitle": "Hermes profilleri",
-  "integrations.hermes.profilesHint": "Her Hermes profilinin kendi config.yaml dosyası vardır. Bağlamak için bir profil seçin; diğerleri değişmez.",
+  "integrations.hermes.profilesHint":
+    "Her Hermes profilinin kendi config.yaml dosyası vardır. Bağlamak için bir profil seçin; diğerleri değişmez.",
   "integrations.hermes.defaultProfile": "Varsayılan profil",
   "integrations.hermes.select": "{name} profilini yönet",
-  "integrations.hermes.loadError": "Hermes profilleri yüklenemedi. Durumlarını kontrol etmek için yeniden deneyin.",
+  "integrations.hermes.loadError":
+    "Hermes profilleri yüklenemedi. Durumlarını kontrol etmek için yeniden deneyin.",
   "integrations.hermes.profileTitle": "Hermes profili: {name}",
   "integrations.codex.title": "Codex CLI",
   "integrations.codex.body": "Codex bağlantısı proxy servisine aittir.",
@@ -2217,7 +2503,8 @@ export const tr: Record<TKey, string> = {
   "integrations.detail.desktopNotServed": "Profil mevcut ancak Desktop başkasını kullanıyor",
   "integrations.detail.desktopAbsent": "Uygulanan profil yok",
   "integrations.detail.desktopDesiredOff": "Claude Desktop entegrasyonu kapalı",
-  "integrations.detail.desktopDesiredOffCleanupPending": "Claude Desktop hâlâ ağ geçidini kullanıyor; temizlik bekleniyor",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "Claude Desktop hâlâ ağ geçidini kullanıyor; temizlik bekleniyor",
   "integrations.detail.desktopDesiredOnNotApplied": "Entegrasyon açık ancak Desktop kullanmıyor",
   "integrations.detail.desktopSelectedElsewhere": "Desktop başka bir profil kullanıyor",
   "integrations.detail.desktopProfileDrift": "Seçilen Desktop profili değişti",
@@ -2226,31 +2513,51 @@ export const tr: Record<TKey, string> = {
   "integrations.detail.grokModels": "{count} model bağlandı",
   "integrations.detail.grokAbsent": "Konfigürasyonda opencodex bloğu yok",
   "integrations.dialog.codex.title": "Codex entegrasyonu devre dışı bırakılsın mı?",
-  "integrations.dialog.codex.changes": "opencodex {path} içindeki yönlendirmesini kaldıracak, oluşturduğu profili silecek, yerel model kataloğunu geri yükleyecek ve sürdürülebilir iş parçacıklarını yerel Codex için yeniden etiketleyecek.",
-  "integrations.dialog.codex.breakage": "Plain codex doğrudan OpenAI'ye bağlanacak ve diğer sağlayıcılardan yönlendirilen modeller Codex'ten kaybolacak. Proxy ve /v1/responses diğer istemciler için çalışmaya devam edecek.",
-  "integrations.dialog.codex.undo": "Yeniden açmak, o sırada kullanılabilen modellerden yönlendirilmiş kataloğu yeniden oluşturur ve Codex'i tekrar enjekte eder. Sürdürülebilir geçmiş uygun yönde kullanılabilir olur, ancak dosyaları bayt bayt geri yüklenmez.",
-  "integrations.dialog.codex.sideEffect": "opencodex yapılandırmayı enjekte ettikten sonra yönlendirilmiş bir kök model seçtiyseniz, devre dışı bırakmak bu seçimi kaldırır ve yeniden açmak onu yeniden oluşturamaz; modeli tekrar seçin. Harici bir model_provider Codex'in sahibiyse opencodex yalnızca eski günlüğünü kaldırır, yapılandırmayı, kataloğu ve geçmişi değiştirmez.",
+  "integrations.dialog.codex.changes":
+    "opencodex {path} içindeki yönlendirmesini kaldıracak, oluşturduğu profili silecek, yerel model kataloğunu geri yükleyecek ve sürdürülebilir iş parçacıklarını yerel Codex için yeniden etiketleyecek.",
+  "integrations.dialog.codex.breakage":
+    "Plain codex doğrudan OpenAI'ye bağlanacak ve diğer sağlayıcılardan yönlendirilen modeller Codex'ten kaybolacak. Proxy ve /v1/responses diğer istemciler için çalışmaya devam edecek.",
+  "integrations.dialog.codex.undo":
+    "Yeniden açmak, o sırada kullanılabilen modellerden yönlendirilmiş kataloğu yeniden oluşturur ve Codex'i tekrar enjekte eder. Sürdürülebilir geçmiş uygun yönde kullanılabilir olur, ancak dosyaları bayt bayt geri yüklenmez.",
+  "integrations.dialog.codex.sideEffect":
+    "opencodex yapılandırmayı enjekte ettikten sonra yönlendirilmiş bir kök model seçtiyseniz, devre dışı bırakmak bu seçimi kaldırır ve yeniden açmak onu yeniden oluşturamaz; modeli tekrar seçin. Harici bir model_provider Codex'in sahibiyse opencodex yalnızca eski günlüğünü kaldırır, yapılandırmayı, kataloğu ve geçmişi değiştirmez.",
   "integrations.dialog.codex.confirm": "Devre Dışı Bırak",
   "integrations.dialog.grok.title": "Grok Build entegrasyonu devre dışı bırakılsın mı?",
-  "integrations.dialog.grok.changes": "Yalnızca {path} dosyasında opencodex tarafından işaretlenen blok kaldırılacaktır. Blok dışında yazılan içerik değişmeden kalır.",
-  "integrations.dialog.grok.breakage": "Devre dışı bırakmak, opencodex model takma adlarını Grok Build'den kaldırır. xAI hesabınızla kullanılan modeller kullanılabilir kalır.",
-  "integrations.dialog.grok.undo": "opencodex bir geri döngü (loopback) adresinde çalışıyorsa, bunu tekrar açmak şu anda mevcut olan modellerden yeni bir blok yazar.",
+  "integrations.dialog.grok.changes":
+    "Yalnızca {path} dosyasında opencodex tarafından işaretlenen blok kaldırılacaktır. Blok dışında yazılan içerik değişmeden kalır.",
+  "integrations.dialog.grok.breakage":
+    "Devre dışı bırakmak, opencodex model takma adlarını Grok Build'den kaldırır. xAI hesabınızla kullanılan modeller kullanılabilir kalır.",
+  "integrations.dialog.grok.undo":
+    "opencodex bir geri döngü (loopback) adresinde çalışıyorsa, bunu tekrar açmak şu anda mevcut olan modellerden yeni bir blok yazar.",
   "integrations.dialog.grok.confirm": "Devre Dışı Bırak",
   "integrations.dialog.desktop.title": "Claude Desktop entegrasyonu devre dışı bırakılsın mı?",
-  "integrations.dialog.desktop.changes": "Eğer {path} opencodex tarafından yönetilen bir ağ geçidi profili içeriyorsa, Desktop önce kimlik bilgisiz yeni bir standart profil seçer, ardından eski profili ve yedeği kaldırır.",
-  "integrations.dialog.desktop.breakage": "Claude Desktop, opencodex üzerinden yönlendirilen modeller yerine standart Claude'a geri dönecektir.",
-  "integrations.dialog.desktop.undo": "Bunu tekrar açmak, kaydedilmiş model atamalarınızdan opencodex profilini yeniden oluşturur.",
-  "integrations.dialog.desktop.restart": "Claude Desktop bu yapılandırmayı yalnızca açılışta okur. Değişikliğin yürürlüğe girmesi için uygulamayı tamamen kapatıp yeniden açın.",
+  "integrations.dialog.desktop.changes":
+    "Eğer {path} opencodex tarafından yönetilen bir ağ geçidi profili içeriyorsa, Desktop önce kimlik bilgisiz yeni bir standart profil seçer, ardından eski profili ve yedeği kaldırır.",
+  "integrations.dialog.desktop.breakage":
+    "Claude Desktop, opencodex üzerinden yönlendirilen modeller yerine standart Claude'a geri dönecektir.",
+  "integrations.dialog.desktop.undo":
+    "Bunu tekrar açmak, kaydedilmiş model atamalarınızdan opencodex profilini yeniden oluşturur.",
+  "integrations.dialog.desktop.restart":
+    "Claude Desktop bu yapılandırmayı yalnızca açılışta okur. Değişikliğin yürürlüğe girmesi için uygulamayı tamamen kapatıp yeniden açın.",
   "integrations.dialog.desktop.confirm": "Devre Dışı Bırak",
-  "integrations.native.msg.nonLoopbackRemoved": "Grok Build yalnızca opencodex bir geri döngü (loopback) adresinde çalışırken otomatik olarak kaydolabilir. Loopback'i işaret eden önceki blok kaldırıldı.",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "Grok Build yalnızca opencodex bir geri döngü (loopback) adresinde çalışırken otomatik olarak kaydolabilir. Kaldırılacak önceki bir blok yoktu.",
-  "integrations.native.msg.nonLoopbackSuperseded": "Grok Build yalnızca opencodex bir geri döngü adresi üzerinde çalışırken otomatik kaydedilebilir. Bu sırada başka bir işlem yeni bir blok yazdı, bu nedenle şu an dosyadaki blok bu istek tarafından oluşturulmadı.",
-  "integrations.native.error.orphanedMarker": "{path} bir opencodex başlangıç işaretine sahip ancak bitiş işareti yok. opencodex bloğunun nerede bittiğini belirleyemediği için dosya değiştirilmeden bırakıldı.",
-  "integrations.native.error.homeMismatch": "Yüklü servis dizini mevcut ev dizini ile uyuşmuyor, bu nedenle dosya değiştirilmeden bırakıldı.",
-  "integrations.native.error.notInstalled": "Grok Build yüklü değil, bu nedenle değiştirilecek bir şey yok.",
-  "integrations.native.error.configBusy": "Yapılandırma başka bir yerde kaydediliyor ve değiştirilemedi. Kısa süre sonra tekrar deneyin.",
-  "integrations.native.error.desktopUnsafeMetadata": "{path} konumundaki Claude Desktop meta verileri güvenle okunamadı, bu nedenle kütüphanesi değiştirilmedi.",
-  "integrations.native.error.desktopCleanupIncomplete": "Claude Desktop standart moda yönlendirildi, ancak eski opencodex kimlik bilgisi dosyaları şu konumda kalmaya devam ediyor: {paths}.",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "Grok Build yalnızca opencodex bir geri döngü (loopback) adresinde çalışırken otomatik olarak kaydolabilir. Loopback'i işaret eden önceki blok kaldırıldı.",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "Grok Build yalnızca opencodex bir geri döngü (loopback) adresinde çalışırken otomatik olarak kaydolabilir. Kaldırılacak önceki bir blok yoktu.",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "Grok Build yalnızca opencodex bir geri döngü adresi üzerinde çalışırken otomatik kaydedilebilir. Bu sırada başka bir işlem yeni bir blok yazdı, bu nedenle şu an dosyadaki blok bu istek tarafından oluşturulmadı.",
+  "integrations.native.error.orphanedMarker":
+    "{path} bir opencodex başlangıç işaretine sahip ancak bitiş işareti yok. opencodex bloğunun nerede bittiğini belirleyemediği için dosya değiştirilmeden bırakıldı.",
+  "integrations.native.error.homeMismatch":
+    "Yüklü servis dizini mevcut ev dizini ile uyuşmuyor, bu nedenle dosya değiştirilmeden bırakıldı.",
+  "integrations.native.error.notInstalled":
+    "Grok Build yüklü değil, bu nedenle değiştirilecek bir şey yok.",
+  "integrations.native.error.configBusy":
+    "Yapılandırma başka bir yerde kaydediliyor ve değiştirilemedi. Kısa süre sonra tekrar deneyin.",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "{path} konumundaki Claude Desktop meta verileri güvenle okunamadı, bu nedenle kütüphanesi değiştirilmedi.",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "Claude Desktop standart moda yönlendirildi, ancak eski opencodex kimlik bilgisi dosyaları şu konumda kalmaya devam ediyor: {paths}.",
   "integrations.native.msg.desktopDisabled": "Claude Desktop entegrasyonu devre dışı bırakıldı.",
   "integrations.native.msg.desktopEnabled": "Claude Desktop entegrasyonu etkinleştirildi.",
   "integrations.state.absent": "Uygulanmadı",
@@ -2284,17 +2591,22 @@ export const tr: Record<TKey, string> = {
   "integrations.rollback.failed": "Geri alma geçmişi yüklenemedi.",
   "integrations.rollback.delete": "Sil",
   "integrations.rollback.deleteAria": "{at} tarihli geri alma kaydını sil",
-  "integrations.rollback.deleteNewest": "Bu istemcinin en son kaydı, hâlâ geri alabilmeniz için saklanır.",
+  "integrations.rollback.deleteNewest":
+    "Bu istemcinin en son kaydı, hâlâ geri alabilmeniz için saklanır.",
   "integrations.rollback.deleteGone": "Bu kayıt zaten silinmiş. Liste yenilenecek.",
   "integrations.dialog.deleteEntry.title": "Bu geri alma kaydı silinsin mi?",
-  "integrations.dialog.deleteEntry.changes": "Bu kayıt geri alma listesinden kaybolur ve {path} için hâlâ tutulan yedek diskten silinir.",
-  "integrations.dialog.deleteEntry.breakage": "Dosyayı artık bu noktaya geri döndüremezsiniz. Daha yeni kayıtlar ve dosyanın kendisi etkilenmez.",
-  "integrations.dialog.deleteEntry.undo": "Bu işlem geri alınamaz. Her istemcinin en son kaydı saklanır ve silinemez.",
+  "integrations.dialog.deleteEntry.changes":
+    "Bu kayıt geri alma listesinden kaybolur ve {path} için hâlâ tutulan yedek diskten silinir.",
+  "integrations.dialog.deleteEntry.breakage":
+    "Dosyayı artık bu noktaya geri döndüremezsiniz. Daha yeni kayıtlar ve dosyanın kendisi etkilenmez.",
+  "integrations.dialog.deleteEntry.undo":
+    "Bu işlem geri alınamaz. Her istemcinin en son kaydı saklanır ve silinemez.",
   "integrations.dialog.deleteEntry.confirm": "Kaydı sil",
   "integrations.restore.title": "Bu anlık görüntü geri yüklensin mi?",
   "integrations.restore.body": "Mevcut dosya önce yedeklenir.",
   "integrations.restore.driftTitle": "Daha yeni düzenlemeler algılandı",
-  "integrations.restore.driftBody": "Bu anlık görüntüden sonra yapılan değişiklikler yedeklenecektir.",
+  "integrations.restore.driftBody":
+    "Bu anlık görüntüden sonra yapılan değişiklikler yedeklenecektir.",
   "integrations.restore.confirm": "Geri Yükle",
   "integrations.restore.confirmDrift": "Yedekle ve geri yükle",
   "integrations.restore.pending": "Geri yükleniyor…",
@@ -2305,13 +2617,17 @@ export const tr: Record<TKey, string> = {
   "integrations.error.conflict": "Konfigürasyon yazıldıktan sonra değişti.",
   "integrations.error.unsafe": "Konfigürasyon güvenle değiştirilemiyor.",
   "integrations.error.generic": "Entegrasyon değişikliği başarısız oldu.",
-  "integrations.error.nonLoopback": "{client} istemcisi geri döngü (loopback) dışında bir adreste. Yerel entegrasyonlar yalnızca loopback (127.0.0.1 veya ::1) üzerinden düzenlenebilir. Bir API anahtarı ayarlayın veya yerel erişim kullanın.",
+  "integrations.error.nonLoopback":
+    "{client} istemcisi geri döngü (loopback) dışında bir adreste. Yerel entegrasyonlar yalnızca loopback (127.0.0.1 veya ::1) üzerinden düzenlenebilir. Bir API anahtarı ayarlayın veya yerel erişim kullanın.",
   "integrations.status.installed": "Yüklü",
   "integrations.status.notInstalled": "Yüklü değil",
   "integrations.status.appliedAt": "Uygulandı",
-  "integrations.status.supersededStore": "Bu istemci sağlayıcılarını artık {path} dosyasından okuyor; opencodex bu dosyayı yazmadığı için buradan etkinleştirmek istemcinin yüklediklerini değiştirmez.",
-  "integrations.status.missingStore": "Bu istemci sağlayıcılarını {path} dosyasında tutuyor, ancak bu dosya yok. İstemci eski ayar dosyasını bir sonraki açılışta taşıyıp içe aktarır; bu nedenle opencodex eski ayar dosyasına yazmaz. {path} dosyasını {document} içeriğiyle oluşturun, ardından \"Uygula\"ya yeniden basın.",
-  "integrations.status.candidateConflict": "Başka bir Kilo yapılandırma dosyası olan {path} da provider.opencodex tanımlıyor. Uygulamadan önce bu dosyadan provider.opencodex değerini kaldırın.",
+  "integrations.status.supersededStore":
+    "Bu istemci sağlayıcılarını artık {path} dosyasından okuyor; opencodex bu dosyayı yazmadığı için buradan etkinleştirmek istemcinin yüklediklerini değiştirmez.",
+  "integrations.status.missingStore":
+    'Bu istemci sağlayıcılarını {path} dosyasında tutuyor, ancak bu dosya yok. İstemci eski ayar dosyasını bir sonraki açılışta taşıyıp içe aktarır; bu nedenle opencodex eski ayar dosyasına yazmaz. {path} dosyasını {document} içeriğiyle oluşturun, ardından "Uygula"ya yeniden basın.',
+  "integrations.status.candidateConflict":
+    "Başka bir Kilo yapılandırma dosyası olan {path} da provider.opencodex tanımlıyor. Uygulamadan önce bu dosyadan provider.opencodex değerini kaldırın.",
   "integrations.status.backup": "Yedek",
   "integrations.status.lastRestore": "Son geri yükleme",
   "integrations.status.unknown": "Bilinmiyor",
@@ -2321,7 +2637,8 @@ export const tr: Record<TKey, string> = {
   "integrations.bulk.success": "Uygulanan istemci entegrasyonları devre dışı bırakıldı.",
   "integrations.retention.degraded": "Yedek temizliği geride kaldı.",
   "integrations.error.residual": "{path} konumunda {message}",
-  "integrations.error.residualNoSnapshot": "{message} Otomatik kurtarma tamamlanamadı. Yeniden denemeden önce istemci yapılandırmasını kontrol edin.",
+  "integrations.error.residualNoSnapshot":
+    "{message} Otomatik kurtarma tamamlanamadı. Yeniden denemeden önce istemci yapılandırmasını kontrol edin.",
   "integrations.error.recover": "{path} kurtarılırken {message}",
   "integrations.kind.apply": "Uygulandı",
   "integrations.kind.disable": "Devre Dışı Bırakıldı",
@@ -2329,24 +2646,34 @@ export const tr: Record<TKey, string> = {
   "integrations.kind.restore": "Geri Yüklendi",
   "integrations.kind.overwrite": "Üzerine yazıldı",
   "integrations.dialog.overwrite.title": "Bu yapılandırmadaki blok değiştirilsin mi?",
-  "integrations.dialog.overwrite.changesUnowned": "{path} içinde opencodex'in ihtiyaç duyduğu yeri, bizim yazmadığımız bir blok tutuyor. Uygulamak onu opencodex'in yazacağı blokla değiştirir.",
-  "integrations.dialog.overwrite.changesForeign": "{path} içindeki opencodex bloğuna yaptığınız değişiklik atılacak ve opencodex'in yazacağı blokla değiştirilecek.",
-  "integrations.dialog.overwrite.breakage": "Diğer bloğun yaptığı ayarlar artık geçerli olmaz. Dosyanın kalanına dokunulmaz.",
-  "integrations.dialog.overwrite.undo": "Önce bir anlık görüntü kaydedilir; bu işlem aşağıdaki geri alma listesinde görünür ve geri alınabilir.",
+  "integrations.dialog.overwrite.changesUnowned":
+    "{path} içinde opencodex'in ihtiyaç duyduğu yeri, bizim yazmadığımız bir blok tutuyor. Uygulamak onu opencodex'in yazacağı blokla değiştirir.",
+  "integrations.dialog.overwrite.changesForeign":
+    "{path} içindeki opencodex bloğuna yaptığınız değişiklik atılacak ve opencodex'in yazacağı blokla değiştirilecek.",
+  "integrations.dialog.overwrite.breakage":
+    "Diğer bloğun yaptığı ayarlar artık geçerli olmaz. Dosyanın kalanına dokunulmaz.",
+  "integrations.dialog.overwrite.undo":
+    "Önce bir anlık görüntü kaydedilir; bu işlem aşağıdaki geri alma listesinde görünür ve geri alınabilir.",
   "integrations.dialog.overwrite.confirm": "Değiştir",
   "integrations.action.overwrite": "Değiştir",
   "integrations.preview.loading": "Kesin değişiklik planı yükleniyor…",
   "integrations.preview.failed": "Değişiklik planı yüklenemedi. Hiçbir şey değiştirilmedi.",
-  "integrations.preview.stale": "Onay sırasında entegrasyon değişti. Güncellenen planı inceleyip yeniden onaylayın.",
+  "integrations.preview.stale":
+    "Onay sırasında entegrasyon değişti. Güncellenen planı inceleyip yeniden onaylayın.",
   "integrations.dialog.apply.title": "Bu entegrasyon uygulansın mı?",
-  "integrations.dialog.apply.changes": "opencodex, yönettiği sağlayıcı ayarlarını istemci yapılandırmasına ekleyecek.",
-  "integrations.dialog.apply.breakage": "İstemci, bu opencodex örneğinin sunduğu modelleri kullanacak.",
-  "integrations.dialog.apply.undo": "Önce yedek kaydedilir; değişiklik geri alma merkezinden geri alınabilir.",
+  "integrations.dialog.apply.changes":
+    "opencodex, yönettiği sağlayıcı ayarlarını istemci yapılandırmasına ekleyecek.",
+  "integrations.dialog.apply.breakage":
+    "İstemci, bu opencodex örneğinin sunduğu modelleri kullanacak.",
+  "integrations.dialog.apply.undo":
+    "Önce yedek kaydedilir; değişiklik geri alma merkezinden geri alınabilir.",
   "integrations.dialog.apply.confirm": "Uygula",
   "integrations.dialog.disable.title": "Bu entegrasyon devre dışı bırakılsın mı?",
   "integrations.dialog.disable.changes": "Yalnızca opencodex’e ait ayarlar kaldırılacak.",
-  "integrations.dialog.disable.breakage": "İstemci, bu opencodex örneği üzerinden yönlendirilen modelleri kullanmayı bırakacak.",
-  "integrations.dialog.disable.undo": "Önce yedek kaydedilir; değişiklik geri alma merkezinden geri alınabilir.",
+  "integrations.dialog.disable.breakage":
+    "İstemci, bu opencodex örneği üzerinden yönlendirilen modelleri kullanmayı bırakacak.",
+  "integrations.dialog.disable.undo":
+    "Önce yedek kaydedilir; değişiklik geri alma merkezinden geri alınabilir.",
   "integrations.dialog.disable.confirm": "Devre dışı bırak",
   "integrations.plan.heading": "Sunucu değişiklik planı",
   "integrations.plan.operation": "İşlem: {operation}",
@@ -2362,23 +2689,37 @@ export const tr: Record<TKey, string> = {
   "integrations.plan.change.journal": "Geri alma kaydı oluştur",
   "integrations.plan.foreign.none": "Dış düzenleme algılanmadı.",
   "integrations.plan.foreign.unowned": "opencodex’e ait olmayan bir ayar bloğu değiştirilecek.",
-  "integrations.plan.foreign.foreignEdit": "opencodex yönetimli blok içindeki düzenlemeler değiştirilecek.",
+  "integrations.plan.foreign.foreignEdit":
+    "opencodex yönetimli blok içindeki düzenlemeler değiştirilecek.",
   "integrations.plan.foreign.drift": "Dosya bu geri alma noktasından sonra değişti.",
-  "integrations.plan.noop.applied": "Yönetilen istemci belgesinde değişiklik gerekmiyor; entegrasyon ayarları zaten mevcut.",
-  "integrations.plan.noop.disabled": "Yönetilen istemci belgesinde değişiklik gerekmiyor; entegrasyon ayarları zaten yok.",
-  "integrations.plan.noop.profilePreference": "Onayladığınızda profil eşitleme tercihi yine de kaydedilir.",
+  "integrations.plan.noop.applied":
+    "Yönetilen istemci belgesinde değişiklik gerekmiyor; entegrasyon ayarları zaten mevcut.",
+  "integrations.plan.noop.disabled":
+    "Yönetilen istemci belgesinde değişiklik gerekmiyor; entegrasyon ayarları zaten yok.",
+  "integrations.plan.noop.profilePreference":
+    "Onayladığınızda profil eşitleme tercihi yine de kaydedilir.",
   "integrations.plan.refused": "Sunucu bu planı güvenle uygulayamıyor.",
-  "integrations.plan.refusal.notInstalled": "İstemci yüklü değil. İstemciyi yükleyin, sayfayı yenileyin ve değişikliği yeniden önizleyin.",
-  "integrations.plan.refusal.conflict": "Yönetilen ayarlar mevcut dosyayla çakışıyor. Dosyayı inceleyin veya varsa Değiştir işlemini kullanın.",
-  "integrations.plan.refusal.unsafe": "İstemci yapılandırması güvenle değiştirilemiyor. Yeniden denemeden önce dosyayı onarın veya değiştirin.",
-  "integrations.plan.refusal.nonLoopback": "Bu istemci bir geri döngü proxy adresi gerektiriyor. localhost, tünel veya yerel yönlendirme kullanın.",
-  "integrations.plan.refusal.supersededStore": "Bu istemci sağlayıcılarını opencodex'in yazmadığı bir dosyadan okuyor; bu işlem istemcinin yüklediklerini değiştirmez.",
-  "integrations.plan.refusal.missingStore": "Bu istemcinin sağlayıcılarını tuttuğu dosya yok. İstemci eski ayar dosyasını bir sonraki açılışta taşır; bu nedenle opencodex eski ayar dosyasına yazmaz. Dosyayı {document} içeriğiyle oluşturun, ardından \"Uygula\"ya yeniden basın.",
-  "integrations.plan.refusal.driftRequiresConfirm": "Dosya bu geri alma noktasından sonra değişti. Geri yüklemeden önce değişikliği dikkate alan planı inceleyin.",
-  "integrations.plan.refusal.snapshotExpired": "Bu geri alma noktasının yedeği sona erdiği için artık geri yüklenemez.",
-  "integrations.plan.refusal.writeFailed": "Sunucu güvenli bir yazma işlemi hazırlayamadı. Yeniden denemeden önce entegrasyon durumunu yenileyin.",
+  "integrations.plan.refusal.notInstalled":
+    "İstemci yüklü değil. İstemciyi yükleyin, sayfayı yenileyin ve değişikliği yeniden önizleyin.",
+  "integrations.plan.refusal.conflict":
+    "Yönetilen ayarlar mevcut dosyayla çakışıyor. Dosyayı inceleyin veya varsa Değiştir işlemini kullanın.",
+  "integrations.plan.refusal.unsafe":
+    "İstemci yapılandırması güvenle değiştirilemiyor. Yeniden denemeden önce dosyayı onarın veya değiştirin.",
+  "integrations.plan.refusal.nonLoopback":
+    "Bu istemci bir geri döngü proxy adresi gerektiriyor. localhost, tünel veya yerel yönlendirme kullanın.",
+  "integrations.plan.refusal.supersededStore":
+    "Bu istemci sağlayıcılarını opencodex'in yazmadığı bir dosyadan okuyor; bu işlem istemcinin yüklediklerini değiştirmez.",
+  "integrations.plan.refusal.missingStore":
+    'Bu istemcinin sağlayıcılarını tuttuğu dosya yok. İstemci eski ayar dosyasını bir sonraki açılışta taşır; bu nedenle opencodex eski ayar dosyasına yazmaz. Dosyayı {document} içeriğiyle oluşturun, ardından "Uygula"ya yeniden basın.',
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "Dosya bu geri alma noktasından sonra değişti. Geri yüklemeden önce değişikliği dikkate alan planı inceleyin.",
+  "integrations.plan.refusal.snapshotExpired":
+    "Bu geri alma noktasının yedeği sona erdiği için artık geri yüklenemez.",
+  "integrations.plan.refusal.writeFailed":
+    "Sunucu güvenli bir yazma işlemi hazırlayamadı. Yeniden denemeden önce entegrasyon durumunu yenileyin.",
   "integrations.mutation.pending": "Onaylanan değişiklik uygulanıyor…",
-  "integrations.bulk.breakage": "Her istemci, bu opencodex örneği üzerinden yönlendirilen modelleri kullanmayı bırakacak.",
+  "integrations.bulk.breakage":
+    "Her istemci, bu opencodex örneği üzerinden yönlendirilen modelleri kullanmayı bırakacak.",
   "integrations.bulk.undo": "Her istemci kendi yedeğini ve geri alma kaydını tutar.",
   "integrations.bulk.confirm": "Tümünü devre dışı bırak",
   "integrations.semantics.opencode": "Doğrudan disk başlatmaları.",
@@ -2387,16 +2728,25 @@ export const tr: Record<TKey, string> = {
   "integrations.semantics.openclaw": "Anında uygulanır.",
   "integrations.semantics.kimi": "Uygulamak için yeniden başlatın.",
   "integrations.semantics.gajae": "Yeni oturuma uygulanır.",
-  "integrations.semantics.dsh": "OpenCodex yalnızca $DSH_HOME/profiles/desktop/cordis.patch.yml içindeki llm-pi-ai satırının opencodex sağlayıcısını yönetir; bu, DSH 0.1.7+ sürümünün okuduğu Desktop profilidir (profil yokken $DSH_HOME/settings.yaml). DSH bu sağlayıcıyı çalışırken yeniden yükler; varsayılan modeliniz ve deepseek-official değişmez. Şimdilik yalnızca geri döngü desteklenir; gerçek kimlik bilgisi yazılmaz.",
-  "integrations.semantics.mcode": "Yalnızca custom_provider.opencodex bölümünü yönetir. Varsayılan model ve MiniMax oturumu değişmez.",
-  "integrations.semantics.zcode": "Yalnızca ~/.zcode/v2/config.json içindeki provider.opencodex bölümünü yönetir. Z.ai oturumu ve diğer sağlayıcılar değişmez. Değişikliklerden sonra ZCode'u yeniden başlatın.",
-  "integrations.semantics.commandcode": "Yalnızca ~/.commandcode/providers.json içindeki OpenCodex sağlayıcı girdisini yönetir. Diğer sağlayıcılarınız ve ayarlarınız değişmez.",
-  "integrations.semantics.prime": "Yalnızca Prime Agent'ın models.json dosyasındaki providers.opencodex bölümünü yönetir — PRIME_AGENT_CODING_AGENT_DIR ayarlı değilse ~/.prime/agent. Diğer sağlayıcılar ve model geçersiz kılmaları değişmez. Yeni oturumlarda geçerli olur.",
-  "integrations.semantics.aside": "Yalnızca bu profilin ~/.aside/u/<id>/models.json dosyasındaki providers.opencodex bölümünü yönetir. Diğer sağlayıcılarınız değişmez. Uyguladıktan sonra Aside’ı tamamen kapatıp yeniden açın.",
-  "integrations.semantics.raycast": "Raycast'in providers.yaml dosyasına bir OpenCodex sağlayıcı girdisi ekler; böylece yönlendirilen her model Raycast AI model seçicisinde görünür. Raycast Pro gerekir.",
-  "integrations.semantics.omo": "Yalnızca omo'nun models.json dosyasındaki providers.opencodex girdisini yönetir — OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR veya PI_CODING_AGENT_DIR yönlendirmediği sürece ~/.omo/agent. Diğer sağlayıcılarınız değişmeden kalır. Yeni oturumlardan itibaren geçerlidir.",
+  "integrations.semantics.dsh":
+    "OpenCodex yalnızca $DSH_HOME/profiles/desktop/cordis.patch.yml içindeki llm-pi-ai satırının opencodex sağlayıcısını yönetir; bu, DSH 0.1.7+ sürümünün okuduğu Desktop profilidir (profil yokken $DSH_HOME/settings.yaml). DSH bu sağlayıcıyı çalışırken yeniden yükler; varsayılan modeliniz ve deepseek-official değişmez. Şimdilik yalnızca geri döngü desteklenir; gerçek kimlik bilgisi yazılmaz.",
+  "integrations.semantics.mcode":
+    "Yalnızca custom_provider.opencodex bölümünü yönetir. Varsayılan model ve MiniMax oturumu değişmez.",
+  "integrations.semantics.zcode":
+    "Yalnızca ~/.zcode/v2/config.json içindeki provider.opencodex bölümünü yönetir. Z.ai oturumu ve diğer sağlayıcılar değişmez. Değişikliklerden sonra ZCode'u yeniden başlatın.",
+  "integrations.semantics.commandcode":
+    "Yalnızca ~/.commandcode/providers.json içindeki OpenCodex sağlayıcı girdisini yönetir. Diğer sağlayıcılarınız ve ayarlarınız değişmez.",
+  "integrations.semantics.prime":
+    "Yalnızca Prime Agent'ın models.json dosyasındaki providers.opencodex bölümünü yönetir — PRIME_AGENT_CODING_AGENT_DIR ayarlı değilse ~/.prime/agent. Diğer sağlayıcılar ve model geçersiz kılmaları değişmez. Yeni oturumlarda geçerli olur.",
+  "integrations.semantics.aside":
+    "Yalnızca bu profilin ~/.aside/u/<id>/models.json dosyasındaki providers.opencodex bölümünü yönetir. Diğer sağlayıcılarınız değişmez. Uyguladıktan sonra Aside’ı tamamen kapatıp yeniden açın.",
+  "integrations.semantics.raycast":
+    "Raycast'in providers.yaml dosyasına bir OpenCodex sağlayıcı girdisi ekler; böylece yönlendirilen her model Raycast AI model seçicisinde görünür. Raycast Pro gerekir.",
+  "integrations.semantics.omo":
+    "Yalnızca omo'nun models.json dosyasındaki providers.opencodex girdisini yönetir — OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR veya PI_CODING_AGENT_DIR yönlendirmediği sürece ~/.omo/agent. Diğer sağlayıcılarınız değişmeden kalır. Yeni oturumlardan itibaren geçerlidir.",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex) rol modelleri",
-  "integrations.lazycodexRoles.hint": "Her rolün modelini ve akıl yürütme çabasını seçin. Kaydetmek rolün $CODEX_HOME/agents altındaki dosyasını ve güvenle yeniden yazılabiliyorsa LazyCodex'in omo.jsonc dosyasını günceller; \"Çabayı devral\" çabayı Codex'e bırakır.",
+  "integrations.lazycodexRoles.hint":
+    "Her rolün modelini ve akıl yürütme çabasını seçin. Kaydetmek rolün $CODEX_HOME/agents altındaki dosyasını ve güvenle yeniden yazılabiliyorsa LazyCodex'in omo.jsonc dosyasını günceller; \"Çabayı devral\" çabayı Codex'e bırakır.",
   "integrations.lazycodexRoles.role": "Rol",
   "integrations.lazycodexRoles.current": "Şu an",
   "integrations.lazycodexRoles.model": "Yeni model",
@@ -2410,21 +2760,31 @@ export const tr: Record<TKey, string> = {
   "integrations.lazycodexRoles.loadFailed": "Codex ajan rolleri yüklenemedi.",
   "integrations.lazycodexRoles.saveFailed": "{role} için model kaydedilemedi.",
   "integrations.lazycodexRoles.saved": "{role} artık {model} ile çalışıyor.",
-  "integrations.lazycodexRoles.omoAbsent": "{role} artık {model} ile çalışıyor. omo.jsonc bulunamadığı için yalnızca rol dosyası değişti.",
-  "integrations.lazycodexRoles.omoComments": "{role} artık {model} ile çalışıyor. omo.jsonc kaydetmenin sileceği yorumlar içerdiği için değiştirilmedi; oradaki [codex].agents.{role} değerini kendiniz ayarlayın.",
-  "integrations.lazycodexRoles.omoInvalid": "{role} artık {model} ile çalışıyor. omo.jsonc, LazyCodex'in okuduğu biçimde geçerli bir JSON olmadığı için değiştirilmedi.",
-  "integrations.lazycodexRoles.omoFailed": "{role} artık {model} ile çalışıyor, ancak omo.jsonc yazılamadı.",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} artık {model} ile çalışıyor. omo.jsonc bulunamadığı için yalnızca rol dosyası değişti.",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} artık {model} ile çalışıyor. omo.jsonc kaydetmenin sileceği yorumlar içerdiği için değiştirilmedi; oradaki [codex].agents.{role} değerini kendiniz ayarlayın.",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} artık {model} ile çalışıyor. omo.jsonc, LazyCodex'in okuduğu biçimde geçerli bir JSON olmadığı için değiştirilmedi.",
+  "integrations.lazycodexRoles.omoFailed":
+    "{role} artık {model} ile çalışıyor, ancak omo.jsonc yazılamadı.",
   "integrations.lazycodexRoles.retryMirror": "omo.jsonc'yi yeniden dene",
   "integrations.lazycodexRoles.history.title": "Değişiklik geçmişi",
-  "integrations.lazycodexRoles.history.hint": "Bu bölümdeki en yeni 50 kaydetme ve otomatik atama, bütün işlemler halinde burada listelenir. Geri yükleme önceki modeli ve çabayı sıradan bir kaydetme gibi geri yazar ve o da listelenir. Önceden sabitlenmiş modeli olmayan bir rol mevcut modelini korur; yalnızca çabası geri döner.",
-  "integrations.lazycodexRoles.history.unavailable": "Değişiklik geçmişi okunamadı, bu yüzden Geri yükleme kullanılamıyor. Rol düzenleme çalışmaya devam ediyor.",
+  "integrations.lazycodexRoles.history.hint":
+    "Bu bölümdeki en yeni 50 kaydetme ve otomatik atama, bütün işlemler halinde burada listelenir. Geri yükleme önceki modeli ve çabayı sıradan bir kaydetme gibi geri yazar ve o da listelenir. Önceden sabitlenmiş modeli olmayan bir rol mevcut modelini korur; yalnızca çabası geri döner.",
+  "integrations.lazycodexRoles.history.unavailable":
+    "Değişiklik geçmişi okunamadı, bu yüzden Geri yükleme kullanılamıyor. Rol düzenleme çalışmaya devam ediyor.",
   "integrations.lazycodexRoles.history.restore": "Geri yükle",
-  "integrations.lazycodexRoles.history.restored": "{count} rol {time} öncesindeki durumuna geri yüklendi.",
-  "integrations.lazycodexRoles.history.partial": "Geri yükleme {role} rolünde durdu: {total} rolden {count} tanesi geri döndü, diğerleri mevcut değerlerini koruyor. Yukarıdaki hatayı düzeltip yeniden geri yükleyin.",
-  "integrations.lazycodexRoles.omoCommentsState": "omo.jsonc yorumlar içeriyor, bu yüzden burada kaydetmek yalnızca rol dosyalarını günceller. omo.jsonc içindeki [codex].agents değerini kendiniz ayarlayın.",
+  "integrations.lazycodexRoles.history.restored":
+    "{count} rol {time} öncesindeki durumuna geri yüklendi.",
+  "integrations.lazycodexRoles.history.partial":
+    "Geri yükleme {role} rolünde durdu: {total} rolden {count} tanesi geri döndü, diğerleri mevcut değerlerini koruyor. Yukarıdaki hatayı düzeltip yeniden geri yükleyin.",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "omo.jsonc yorumlar içeriyor, bu yüzden burada kaydetmek yalnızca rol dosyalarını günceller. omo.jsonc içindeki [codex].agents değerini kendiniz ayarlayın.",
   "integrations.lazycodexRoles.auto.button": "Otomatik ata",
   "integrations.lazycodexRoles.auto.running": "Roller değerlendiriliyor…",
-  "integrations.lazycodexRoles.auto.hint": "Her rol için yeterli olan en ucuz modeli ve çabayı önerir. Uygulayana kadar hiçbir şey değişmez.",
+  "integrations.lazycodexRoles.auto.hint":
+    "Her rol için yeterli olan en ucuz modeli ve çabayı önerir. Uygulayana kadar hiçbir şey değişmez.",
   "integrations.lazycodexRoles.auto.failed": "Codex ajan rolleri değerlendirilemedi.",
   "integrations.lazycodexRoles.auto.title": "Önerilen modeller",
   "integrations.lazycodexRoles.auto.sizedWith": "{model} ile değerlendirildi",
@@ -2448,12 +2808,18 @@ export const tr: Record<TKey, string> = {
   "integrations.lazycodexRoles.auto.apply": "Uygula",
   "integrations.lazycodexRoles.auto.moveUp": "Yükselt, eğer: {text}",
   "integrations.lazycodexRoles.auto.moveDown": "Düşür, eğer: {text}",
-  "integrations.semantics.cline": "Cline CLI providers.json ve models.json dosyalarındaki OpenCodex girdilerini yönetir. Değişiklik veya eşitleme öncesinde Cline’ı kapatın, ardından yeniden başlatın. Geri al iki özgün dosyayı da geri yükler. Varsayılan sağlayıcınız değişmez; Cline içinde OpenCodex’i seçin.",
-  "integrations.semantics.kilo": "Yalnızca Kilo’nun genel yapılandırmasındaki provider.opencodex öğesini yönetir — ~/.config/kilo altındaki ilk bulunan kilo.jsonc, kilo.json, opencode.jsonc, opencode.json veya config.json (XDG_CONFIG_HOME bu dizini taşır; hiçbiri yoksa kilo.jsonc oluşturulur). Diğer anahtarlar değişmez. Uygula dosyanın tamamını yeniden yazar; yorumlar ve sondaki virgüller korunmaz. Kilo’da opencodex/<model> seçin.",
-  "integrations.semantics.droid": "Factory Droid settings.json dosyasına OpenCodex özel modellerini ekler. Devre dışı bırakma yalnızca yönetilen girdileri kaldırır; Geri al kaydedilen dosyayı geri yükler.",
-  "integrations.raycast.proRequired": "Custom Providers bir Raycast Pro özelliğidir. Dosya yazılır, ancak bir Pro aboneliği etkin olana kadar Raycast bunu yok sayar.",
-  "integrations.raycast.planUnknown": "Raycast Pro’nun etkin olup olmadığı belirlenemedi; Custom Providers için Raycast Pro gerekir.",
-  "integrations.raycast.revealConfig": "Raycast → Ayarlar → AI bölümünü açıp sağlayıcı klasörünün oluşması için „Reveal Providers Config“ seçeneğine bir kez tıklayın.",
+  "integrations.semantics.cline":
+    "Cline CLI providers.json ve models.json dosyalarındaki OpenCodex girdilerini yönetir. Değişiklik veya eşitleme öncesinde Cline’ı kapatın, ardından yeniden başlatın. Geri al iki özgün dosyayı da geri yükler. Varsayılan sağlayıcınız değişmez; Cline içinde OpenCodex’i seçin.",
+  "integrations.semantics.kilo":
+    "Yalnızca Kilo’nun genel yapılandırmasındaki provider.opencodex öğesini yönetir — ~/.config/kilo altındaki ilk bulunan kilo.jsonc, kilo.json, opencode.jsonc, opencode.json veya config.json (XDG_CONFIG_HOME bu dizini taşır; hiçbiri yoksa kilo.jsonc oluşturulur). Diğer anahtarlar değişmez. Uygula dosyanın tamamını yeniden yazar; yorumlar ve sondaki virgüller korunmaz. Kilo’da opencodex/<model> seçin.",
+  "integrations.semantics.droid":
+    "Factory Droid settings.json dosyasına OpenCodex özel modellerini ekler. Devre dışı bırakma yalnızca yönetilen girdileri kaldırır; Geri al kaydedilen dosyayı geri yükler.",
+  "integrations.raycast.proRequired":
+    "Custom Providers bir Raycast Pro özelliğidir. Dosya yazılır, ancak bir Pro aboneliği etkin olana kadar Raycast bunu yok sayar.",
+  "integrations.raycast.planUnknown":
+    "Raycast Pro’nun etkin olup olmadığı belirlenemedi; Custom Providers için Raycast Pro gerekir.",
+  "integrations.raycast.revealConfig":
+    "Raycast → Ayarlar → AI bölümünü açıp sağlayıcı klasörünün oluşması için „Reveal Providers Config“ seçeneğine bir kez tıklayın.",
   "integrations.semantics.omp": "Kataloğu yüklemek için OMP'yi yeniden başlatın.",
   "codexAuth.mainAccount": "Ana Hesap",
   "codexAuth.logLabel": "Günlük etiketi",
@@ -2468,16 +2834,22 @@ export const tr: Record<TKey, string> = {
   "codexAuth.accountModeDirect": "Doğrudan mod",
   "codexAuth.accountModeDirectDesc": "İstekler yalnızca ana girişi kullanır.",
   "codexAuth.accountPickerTitle": "Model seçiciden belirli bir Codex hesabını hedefleyin",
-  "codexAuth.accountPickerOffDesc": "Etkinleştirildiğinde, sıradan GPT seçici satırlarının yerini her hesap seçicisi için bir giriş alır, böylece çıkış yapmadan bir konuşma için tam hesabı seçebilirsiniz. Kapatılması hiçbir hesabı kaldırmaz.",
-  "codexAuth.accountPickerOnDesc": "Her seçici, kayıtlı bir hesap için genel bir etikettir. Bunu seçmek, konuşmayı eşlenen hesaba kilitler: asla dönmez veya yedek hesaba geçmez ve aktif Havuz hesabını değiştirmez.",
-  "codexAuth.accountPickerCompatibility": "Yerleşik Codex Uygulama girişinin kendi seçicisi vardır; oluşturulan haritalar normalde bunu main olarak adlandırır ve gerektiğinde main-2 gibi çakışmasız bir son ek kullanır. Eklenen hesaplar kararlı ve gizlilik açısından güvenli etiketler alırken, özel seçici etiketleri değişmeden kalır. Mevcut konuşmalar ve kaydedilmiş model seçimleri yönlendirilmeye devam eder. Bunu kapatmak oluşturulan girişleri gizler ancak seçicileri ve tam rotaları korur. Yalın GPT model kimlikleri Havuz veya Doğrudan davranışlarını sürdürür.",
+  "codexAuth.accountPickerOffDesc":
+    "Etkinleştirildiğinde, sıradan GPT seçici satırlarının yerini her hesap seçicisi için bir giriş alır, böylece çıkış yapmadan bir konuşma için tam hesabı seçebilirsiniz. Kapatılması hiçbir hesabı kaldırmaz.",
+  "codexAuth.accountPickerOnDesc":
+    "Her seçici, kayıtlı bir hesap için genel bir etikettir. Bunu seçmek, konuşmayı eşlenen hesaba kilitler: asla dönmez veya yedek hesaba geçmez ve aktif Havuz hesabını değiştirmez.",
+  "codexAuth.accountPickerCompatibility":
+    "Yerleşik Codex Uygulama girişinin kendi seçicisi vardır; oluşturulan haritalar normalde bunu main olarak adlandırır ve gerektiğinde main-2 gibi çakışmasız bir son ek kullanır. Eklenen hesaplar kararlı ve gizlilik açısından güvenli etiketler alırken, özel seçici etiketleri değişmeden kalır. Mevcut konuşmalar ve kaydedilmiş model seçimleri yönlendirilmeye devam eder. Bunu kapatmak oluşturulan girişleri gizler ancak seçicileri ve tam rotaları korur. Yalın GPT model kimlikleri Havuz veya Doğrudan davranışlarını sürdürür.",
   "codexAuth.accountPickerUpdated": "Hesap hedefleme güncellendi.",
-  "codexAuth.accountPickerUpdateFailed": "Hesap hedefleme güncellenemedi. Son doğrulanan ayar gösteriliyor.",
+  "codexAuth.accountPickerUpdateFailed":
+    "Hesap hedefleme güncellenemedi. Son doğrulanan ayar gösteriliyor.",
   "codexAuth.accountPickerLoadFailed": "Hesap hedefleme ayarı yüklenemedi.",
-  "codexAuth.accountPickerRefreshFailed": "Bu ayar yenilenemedi. Son doğrulanan değer hâlâ gösteriliyor.",
+  "codexAuth.accountPickerRefreshFailed":
+    "Bu ayar yenilenemedi. Son doğrulanan değer hâlâ gösteriliyor.",
   "codexAuth.advancedSettings": "Gelişmiş ayarlar",
   "codexAuth.advancedSettingsAria": "Gelişmiş Codex Auth ayarlarını göster veya gizle",
-  "codexAuth.catalogRefreshPending": "Değişiklik kaydedildi ancak Codex model kataloğunun yenilenmesi bekleniyor. Yeniden denemek için ocx sync çalıştırın.",
+  "codexAuth.catalogRefreshPending":
+    "Değişiklik kaydedildi ancak Codex model kataloğunun yenilenmesi bekleniyor. Yeniden denemek için ocx sync çalıştırın.",
   "codexAuth.openaiMissing": "Yerleşik OpenAI sağlayıcısı yapılandırılmamış.",
   "codexAuth.openaiDisabled": "Yerleşik OpenAI sağlayıcısı devre dışı.",
   "codexAuth.openaiUnavailableDesc": "OpenAI hesaplarınız kullanılabilir.",
@@ -2494,35 +2866,47 @@ export const tr: Record<TKey, string> = {
   "codexAuth.creditsOverage": "Aşım sınırına ulaşıldı",
   "codexAuth.creditsApprox": "Tahmini mesajlar: yerel {local} · bulut {cloud}",
   "codexAuth.creditsToggle": "Codex kredileri",
-  "codexAuth.creditsToggleHint": "Hesap kartlarında kalan Codex kredilerini gösterir. Varsayılan olarak gizlidir.",
+  "codexAuth.creditsToggleHint":
+    "Hesap kartlarında kalan Codex kredilerini gösterir. Varsayılan olarak gizlidir.",
   "codexAuth.creditsShown": "Codex kredileri gösteriliyor",
   "codexAuth.creditsHidden": "Codex kredileri gizlendi",
   "codexAuth.creditsToggleFailed": "Codex kredileri ayarı değiştirilemedi",
   "codexAuth.refreshQuota": "Kotaları yenile",
   "codexAuth.ultraFastTitle": "Ultra Fast hizmet katmanı",
   "codexAuth.mainHardLockTitle": "Ana hesabı engelle (5sa {short}%, uzun {long}%)",
-  "codexAuth.mainHardLockDesc": "5 saatlik pencerede {short}%, haftalık pencerede {long}% kullanımda engeller (aylık hesaplarda aylık). Engelleyen tüm pencereler eşik altına inince açılır. Koruma varsayılan olarak açıktır.",
-  "codexAuth.mainHardLockConfirmTitle": "Ana hesap koruması açılsın mı (5sa {short}%, uzun {long}%)?",
-  "codexAuth.mainHardLockConfirmBody": "Engel sürerken ana hesabın Luna Reserve erişimi de kullanılamaz. Normal kotanın tükenmemesi Reserve’in etkinleşmesini önleyebilir. Ek hesaplar ve diğer sağlayıcılar kullanılmaya devam eder. Çalışan istekler, eşleştirilemeyen anahtarlık kimlik bilgileri ve bu proxy dışındaki trafik korunmaz.",
+  "codexAuth.mainHardLockDesc":
+    "5 saatlik pencerede {short}%, haftalık pencerede {long}% kullanımda engeller (aylık hesaplarda aylık). Engelleyen tüm pencereler eşik altına inince açılır. Koruma varsayılan olarak açıktır.",
+  "codexAuth.mainHardLockConfirmTitle":
+    "Ana hesap koruması açılsın mı (5sa {short}%, uzun {long}%)?",
+  "codexAuth.mainHardLockConfirmBody":
+    "Engel sürerken ana hesabın Luna Reserve erişimi de kullanılamaz. Normal kotanın tükenmemesi Reserve’in etkinleşmesini önleyebilir. Ek hesaplar ve diğer sağlayıcılar kullanılmaya devam eder. Çalışan istekler, eşleştirilemeyen anahtarlık kimlik bilgileri ve bu proxy dışındaki trafik korunmaz.",
   "codexAuth.mainHardLockConfirm": "Korumayı aç",
   "codexAuth.mainHardLockEnabled": "Koruma açık (5sa {short}%, uzun {long}%).",
   "codexAuth.mainHardLockDisabled": "Ana hesap koruması kapalı. Diğer hesap sınırları geçerlidir.",
-  "codexAuth.mainHardLockLoadFailed": "Ayar yüklenemedi. Güncel durumu kontrol etmek için yeniden deneyin.",
-  "codexAuth.mainHardLockSaveFailed": "Kayıt doğrulanamadı. Yeniden denemeden önce ayarı tekrar yükleyin.",
-  "codexAuth.mainHardLockRefreshFailed": "Ayar kaydedildi ancak hesap durumu yenilenemedi. Yeniden deneyin.",
+  "codexAuth.mainHardLockLoadFailed":
+    "Ayar yüklenemedi. Güncel durumu kontrol etmek için yeniden deneyin.",
+  "codexAuth.mainHardLockSaveFailed":
+    "Kayıt doğrulanamadı. Yeniden denemeden önce ayarı tekrar yükleyin.",
+  "codexAuth.mainHardLockRefreshFailed":
+    "Ayar kaydedildi ancak hesap durumu yenilenemedi. Yeniden deneyin.",
   "codexAuth.mainHardLockBlocked": "Ana hesap korumasıyla engellendi (5sa {short}%, uzun {long}%)",
   "codexAuth.mainHardLockUnknown": "Koruma açık · kullanım bilinmiyor",
   "codexAuth.mainHardLockMonitoring": "Koruma açık · izleniyor",
-  "codexAuth.mainExternalUsageWarning": "opencodex dışında kullanım olabilir. Engel, kotanın tükenmesini önlemeyebilir.",
+  "codexAuth.mainExternalUsageWarning":
+    "opencodex dışında kullanım olabilir. Engel, kotanın tükenmesini önlemeyebilir.",
   "codexAuth.mainHardLockManage": "Koruma ayarını göster",
   "codexAuth.mainHardLockFallbackTitle": "Engel sırasında yedek model",
-  "codexAuth.mainHardLockFallbackDesc": "Engel etkinken hiçbir Codex hesabı isteği karşılayamıyorsa, yerel Codex modeli istekleri başarısız olmak yerine bu modele yönlendirilir. Her zamanki gibi reddetmek için boş bırakın; engel kendiliğinden kalkar.",
+  "codexAuth.mainHardLockFallbackDesc":
+    "Engel etkinken hiçbir Codex hesabı isteği karşılayamıyorsa, yerel Codex modeli istekleri başarısız olmak yerine bu modele yönlendirilir. Her zamanki gibi reddetmek için boş bırakın; engel kendiliğinden kalkar.",
   "codexAuth.mainHardLockFallbackModel": "Yedek model",
   "codexAuth.mainHardLockFallbackEffort": "Düşünme çabası",
   "codexAuth.mainHardLockFallbackDefaultEffort": "İsteğin çabasını koru",
-  "codexAuth.mainHardLockFallbackActive": "Şu anda engelleniyor — yerel Codex istekleri {model} modeline yönlendirilir.",
-  "codexAuth.mainHardLockFallbackSaveFailed": "Yedek kaydı onaylanamadı. Ayarı yeniden yükleyip tekrar deneyin.",
-  "codexAuth.ultraFastDesc": "Codex model seçicisinde GPT-6 Astra ve GPT-6.1 Sol için Ultrafast hız seçeneğini ekler ve yönlendirilen modellerde kendi yapılandırdığınız ultrafast hizmet katmanının katalog yeniden oluşturulurken silinmesini önler. Ultrafast uygun bir ChatGPT planı gerektirir; yalnızca planınız içeriyorsa açın.",
+  "codexAuth.mainHardLockFallbackActive":
+    "Şu anda engelleniyor — yerel Codex istekleri {model} modeline yönlendirilir.",
+  "codexAuth.mainHardLockFallbackSaveFailed":
+    "Yedek kaydı onaylanamadı. Ayarı yeniden yükleyip tekrar deneyin.",
+  "codexAuth.ultraFastDesc":
+    "Codex model seçicisinde GPT-6 Astra ve GPT-6.1 Sol için Ultrafast hız seçeneğini ekler ve yönlendirilen modellerde kendi yapılandırdığınız ultrafast hizmet katmanının katalog yeniden oluşturulurken silinmesini önler. Ultrafast uygun bir ChatGPT planı gerektirir; yalnızca planınız içeriyorsa açın.",
   "codexAuth.ultraFastLoadFailed": "Ultra Fast ayarı okunamadı.",
   "codexAuth.ultraFastEnabled": "Ultra Fast katmanı etkinleştirildi",
   "codexAuth.ultraFastDisabled": "Ultra Fast katmanı devre dışı bırakıldı",
@@ -2540,7 +2924,8 @@ export const tr: Record<TKey, string> = {
   "codexAuth.resume": "Devam Ettir",
   "codexAuth.paused": "DURAKLATILDI",
   "codexAuth.planExcluded": "Otomatik seçilmez",
-  "codexAuth.planExcludedHint": "{plan} planı otomatik seçimden hariç tutulur. Açık hesap yönlendirmeleri kullanılabilir.",
+  "codexAuth.planExcludedHint":
+    "{plan} planı otomatik seçimden hariç tutulur. Açık hesap yönlendirmeleri kullanılabilir.",
   "codexAuth.pauseSucceeded": "{email} duraklatıldı",
   "codexAuth.resumeSucceeded": "{email} tekrar havuza alındı",
   "codexAuth.pauseFailed": "{email} duraklatılamadı.",
@@ -2551,34 +2936,45 @@ export const tr: Record<TKey, string> = {
   "accountPause.reason.subscriptionInactive": "Abonelik etkin değil",
   "accountPause.reason.subscriptionExpired": "Abonelik süresi doldu",
   "accountPause.reason.planDowngraded": "Plan düşürüldü",
-  "prov.keyResumedSwitchFailed": "Anahtarın duraklatılması kaldırıldı ancak etkinleştirme başarısız oldu. Anahtar otomatik olarak seçilebilir. Yeniden seçmeyi deneyin.",
+  "prov.keyResumedSwitchFailed":
+    "Anahtarın duraklatılması kaldırıldı ancak etkinleştirme başarısız oldu. Anahtar otomatik olarak seçilebilir. Yeniden seçmeyi deneyin.",
   "codexAuth.pausedHint": "Devam ettirilene kadar otomatik seçimden hariç tutulur.",
   "codexAuth.creditsAfterLimit": "Limitten sonra kredi kullan",
-  "codexAuth.creditsAfterLimitHint": "Varsayılan olarak kapalı: kullanım penceresi %100’e ulaşan hesap sıfırlanana kadar otomatik seçim dışında kalır ve ChatGPT kredileri harcanmaz. Bir hesabın kredileriyle çalışmaya devam etmesi için bu ayarı açın. Yeni hesaplar kapalı başlar.",
+  "codexAuth.creditsAfterLimitHint":
+    "Varsayılan olarak kapalı: kullanım penceresi %100’e ulaşan hesap sıfırlanana kadar otomatik seçim dışında kalır ve ChatGPT kredileri harcanmaz. Bir hesabın kredileriyle çalışmaya devam etmesi için bu ayarı açın. Yeni hesaplar kapalı başlar.",
   "codexAuth.creditsAfterLimitAria": "{email} için kullanım limitinden sonra kredi kullan",
-  "codexAuth.creditsAfterLimitMainHint": "Ana hesabın katı kilidi (varsayılan olarak açık) onu yine önce durdurur. Ana hesabın kredi harcaması için kilidi kapatın.",
+  "codexAuth.creditsAfterLimitMainHint":
+    "Ana hesabın katı kilidi (varsayılan olarak açık) onu yine önce durdurur. Ana hesabın kredi harcaması için kilidi kapatın.",
   "codexAuth.creditSpend": "Kredi kullan",
   "codexAuth.creditSpendAria": "Kullanım limitinden sonra ChatGPT kredisi kullan",
   "codexAuth.creditsOn": "Kredi kullanır",
   "codexAuth.creditsOnSucceeded": "{email} kullanım limitinden sonra kredi kullanabilir.",
-  "codexAuth.creditsOffSucceeded": "{email} kullanım limitinde otomatik seçim dışında kalacak, kredileri korunacak.",
-  "codexAuth.creditsUpdateFailed": "{email} için kredi ayarı güncellenemedi. Hiçbir şey değiştirilmedi.",
-  "codexAuth.creditsAllOnSucceeded": "Tüm hesaplar artık kullanım limitinden sonra kredi kullanabilir.",
-  "codexAuth.creditsAllOffSucceeded": "Hiçbir hesap kredi harcamayacak. Hesaplar %100’de otomatik seçim dışında kalır.",
+  "codexAuth.creditsOffSucceeded":
+    "{email} kullanım limitinde otomatik seçim dışında kalacak, kredileri korunacak.",
+  "codexAuth.creditsUpdateFailed":
+    "{email} için kredi ayarı güncellenemedi. Hiçbir şey değiştirilmedi.",
+  "codexAuth.creditsAllOnSucceeded":
+    "Tüm hesaplar artık kullanım limitinden sonra kredi kullanabilir.",
+  "codexAuth.creditsAllOffSucceeded":
+    "Hiçbir hesap kredi harcamayacak. Hesaplar %100’de otomatik seçim dışında kalır.",
   "codexAuth.creditsAllUpdateFailed": "Kredi ayarı güncellenemedi. Hiçbir şey değiştirilmedi.",
   "codexAuth.pinned": "SABİTLENDİ",
   "codexAuth.pinnedHint": "Bu hesabı elle seçtiniz.",
   "codexAuth.unpinHint": "Sabitlemeyi kaldırıp otomatik seçime dönmek için yeniden seçin.",
   "codexAuth.unpinTitle": "Sabitleme kaldırılsın mı?",
-  "codexAuth.unpinDesc": "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya hesaba bağlanmamış istekler seçim sırası ve eşik kurallarına göre otomatik olarak hesap seçer.",
+  "codexAuth.unpinDesc":
+    "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya hesaba bağlanmamış istekler seçim sırası ve eşik kurallarına göre otomatik olarak hesap seçer.",
   "codexAuth.unpinAction": "Sabitlemeyi kaldır",
   "codexAuth.unpinned": "Sabitleme kaldırıldı — otomatik seçime dönüldü",
-  "codexAuth.unpinFailed": "Sabitlemenin kaldırıldığı doğrulanamadı. Yeniden denemeden önce hesapları yenileyin ve mevcut seçimi kontrol edin.",
-  "codexAuth.unpinChanged": "Bu onay açıkken sabitlenen hesap değişti. Sabitlemeyi kaldırmadan önce hesapları yenileyin ve mevcut seçimi kontrol edin.",
+  "codexAuth.unpinFailed":
+    "Sabitlemenin kaldırıldığı doğrulanamadı. Yeniden denemeden önce hesapları yenileyin ve mevcut seçimi kontrol edin.",
+  "codexAuth.unpinChanged":
+    "Bu onay açıkken sabitlenen hesap değişti. Sabitlemeyi kaldırmadan önce hesapları yenileyin ve mevcut seçimi kontrol edin.",
   "codexAuth.fiveHour": "5saat",
   "codexAuth.weekly": "Hafta",
   "codexAuth.quotaAutoRefresh": "Otomatik pencere etkinleştirme",
-  "codexAuth.quotaAutoRefreshHint": "Bu kota penceresi sıfırlandığında depolanmayan tek bir en küçük Codex ısınma isteği gönderir.",
+  "codexAuth.quotaAutoRefreshHint":
+    "Bu kota penceresi sıfırlandığında depolanmayan tek bir en küçük Codex ısınma isteği gönderir.",
   "codexAuth.quotaAutoRefreshUpdated": "Otomatik pencere etkinleştirme güncellendi.",
   "codexAuth.quotaAutoRefreshFailed": "Otomatik pencere etkinleştirme güncellenemedi.",
   "codexAuth.monthly": "30gün",
@@ -2592,18 +2988,23 @@ export const tr: Record<TKey, string> = {
   "codexAuth.prepareForPool": "Havuz İçin Hazırla",
   "codexAuth.poolPreparedToast": "{email} Havuz modu için hazırlandı",
   "codexAuth.switchTitle": "Aktif hesap değiştirilsin mi?",
-  "codexAuth.switchDesc": "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya bağımsız istekler seçilen hesabın sıra kademesini kullanır ve aynı seçim sırasındaki hesaplar sırayla görev almaya devam eder.",
+  "codexAuth.switchDesc":
+    "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya bağımsız istekler seçilen hesabın sıra kademesini kullanır ve aynı seçim sırasındaki hesaplar sırayla görev almaya devam eder.",
   "codexAuth.cacheWarning": "Hesap değiştirildiğinde önbellek sıfırlanır.",
-  "codexAuth.switchExceedsThresholdWarning": "Bu hesap geçiş eşiğine (%{threshold}) ulaştı veya aştı. Kalan kota yetersizse sabitlenen seçim serbest bırakılır.",
+  "codexAuth.switchExceedsThresholdWarning":
+    "Bu hesap geçiş eşiğine (%{threshold}) ulaştı veya aştı. Kalan kota yetersizse sabitlenen seçim serbest bırakılır.",
   "codexAuth.setAsNext": "Sonraki istekte bu hesabı kullan",
   "codexAuth.cancel": "İptal",
   "codexAuth.switchBack": "Ana hesaba geri dönülsün mü?",
-  "codexAuth.switchBackDesc": "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya bağımsız istekler Uygulama giriş hesabınızın sıra kademesini kullanır ve aynı seçim sırasındaki hesaplar sırayla görev almaya devam eder.",
+  "codexAuth.switchBackDesc":
+    "Anında yürürlüğe girer. Mevcut hesaba bağlı iş parçacıkları ve işlenmekte olan istekler yakalanan hesaplarını korur; yeni veya bağımsız istekler Uygulama giriş hesabınızın sıra kademesini kullanır ve aynı seçim sırasındaki hesaplar sırayla görev almaya devam eder.",
   "codexAuth.autoSwitch": "Kullanıma dayalı proaktif geçiş",
-  "codexAuth.autoSwitchQuotaDesc": "Kota: %{threshold} veya üzeri kullanımda sonraki bağımsız istek daha az kullanılan uygun bir hesaba geçebilir. Bağlı görevler varsayılan önbellek bağlılığını korur ve hesap hizmet veremez hale gelince yalnızca gerçek kota payı olan bir hesaba geçer.",
+  "codexAuth.autoSwitchQuotaDesc":
+    "Kota: %{threshold} veya üzeri kullanımda sonraki bağımsız istek daha az kullanılan uygun bir hesaba geçebilir. Bağlı görevler varsayılan önbellek bağlılığını korur ve hesap hizmet veremez hale gelince yalnızca gerçek kota payı olan bir hesaba geçer.",
   "codexAuth.autoSwitchQuotaOffDesc": "Kullanıma dayalı proaktif geçiş kapalı.",
   "codexAuth.autoSwitchRoundRobinDesc": "Round-robin bu eşiği kullanmaz.",
-  "codexAuth.autoSwitchFillFirstDesc": "Kullanım %{threshold} eşiğini aşana kadar hesabı doldurun, ardından sonraki kullanılabilir hesaba geçin.",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "Kullanım %{threshold} eşiğini aşana kadar hesabı doldurun, ardından sonraki kullanılabilir hesaba geçin.",
   "codexAuth.autoSwitchFillFirstOffDesc": "İlk doldurma modunda kullanım boşaltma noktası yok.",
   "codexAuth.failureRecoveryNote": "Hata kurtarma ayrıdır.",
   "codexAuth.autoSwitchThreshold": "Kullanım eşiği",
@@ -2617,32 +3018,47 @@ export const tr: Record<TKey, string> = {
   "codexAuth.requestUserInput": "Varsayılan modda kullanıcı girdisi iste",
   "codexAuth.requestUserInputDesc": "Codex'in soru sormasına izin verir.",
   "codexAuth.requestUserInputUpdated": "Özellik güncellendi.",
-  "codexAuth.requestUserInputUpdatedRestart": "Özellik güncellendi. Codex uygulamasını yeniden başlatın.",
+  "codexAuth.requestUserInputUpdatedRestart":
+    "Özellik güncellendi. Codex uygulamasını yeniden başlatın.",
   "codexAuth.requestUserInputUpdateFailed": "Özellik güncellenemedi.",
   "codexAuth.requestUserInputLoadFailed": "Özellik okunamadı.",
 
   "anthropicPool.title": "Claude hesap havuzu (deneysel)",
-  "anthropicPool.enabledDesc": "Oturumlar aynı hesapta kalır; yeni oturumlar {window} değerine göre %{threshold} altında kullanıma sahip hesapları tercih eder.",
-  "anthropicPool.enabledNoProactiveDesc": "Kullanım eşikleri, sorunsuz çalışan bir oturumu veya sorunsuz aktif hesabı değiştirmez. Aktif hesap kullanılamadığında ve ret sonrası kurtarmada, kullanımı en düşük hesap ({window}) seçilir.",
-  "anthropicPool.enabledFillFirstDesc": "Oturumlar aynı hesapta kalır. Yeni oturumlar, aktif hesap %{threshold} değerine ({window}) ulaşana, bekleme süresine girene veya yeniden giriş gerektirene kadar o hesapta kalır, ardından sıradaki hesaba geçer. Ret sonrası kurtarma da sıradaki hesabı kullanır.",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "Oturumlar aynı hesapta kalır. Yeni oturumlar, aktif hesap bekleme süresine girene veya yeniden giriş gerektirene kadar o hesapta kalır, ardından sıradaki hesaba geçer. Ret sonrası kurtarma da sıradaki hesabı kullanır.",
-  "anthropicPool.enabledRoundRobinDesc": "Oturumlar aynı hesapta kalır. Yeni oturumlar ve ret sonrası kurtarma uygun hesaplar arasında sırayla döner; kullanım, eşik ve kota penceresi kullanılmaz.",
-  "anthropicPool.disabledDesc": "Öngörülü hesap seçimi kapalı. OpenCodex seçili hesabı kullanır; giriş yapılmış başka uygun bir hesap varsa hız sınırı yanıtından (429) veya hesap reddi olarak sınıflandırılan bir yanıttan sonra yine hesap değiştirebilir.",
-  "anthropicPool.experimentalWarning": "Yalnızca size ait olan veya kullanma yetkiniz bulunan abonelikleri kullanın. Otomatik hesap havuzu Anthropic tarafından onaylanmamıştır ve deneysel olmaya devam eder. Gerçek Claude Code istemcisini bir kişinin gözetimindeki oturumda kullanın ve Anthropic'in güncel koşullarını kontrol edin. Hesaplar bir kuruluş kotasını paylaşabilir; bu durumda hesap eklemek kapasite eklemeyebilir.",
+  "anthropicPool.enabledDesc":
+    "Oturumlar aynı hesapta kalır; yeni oturumlar {window} değerine göre %{threshold} altında kullanıma sahip hesapları tercih eder.",
+  "anthropicPool.enabledNoProactiveDesc":
+    "Kullanım eşikleri, sorunsuz çalışan bir oturumu veya sorunsuz aktif hesabı değiştirmez. Aktif hesap kullanılamadığında ve ret sonrası kurtarmada, kullanımı en düşük hesap ({window}) seçilir.",
+  "anthropicPool.enabledFillFirstDesc":
+    "Oturumlar aynı hesapta kalır. Yeni oturumlar, aktif hesap %{threshold} değerine ({window}) ulaşana, bekleme süresine girene veya yeniden giriş gerektirene kadar o hesapta kalır, ardından sıradaki hesaba geçer. Ret sonrası kurtarma da sıradaki hesabı kullanır.",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "Oturumlar aynı hesapta kalır. Yeni oturumlar, aktif hesap bekleme süresine girene veya yeniden giriş gerektirene kadar o hesapta kalır, ardından sıradaki hesaba geçer. Ret sonrası kurtarma da sıradaki hesabı kullanır.",
+  "anthropicPool.enabledRoundRobinDesc":
+    "Oturumlar aynı hesapta kalır. Yeni oturumlar ve ret sonrası kurtarma uygun hesaplar arasında sırayla döner; kullanım, eşik ve kota penceresi kullanılmaz.",
+  "anthropicPool.disabledDesc":
+    "Öngörülü hesap seçimi kapalı. OpenCodex seçili hesabı kullanır; giriş yapılmış başka uygun bir hesap varsa hız sınırı yanıtından (429) veya hesap reddi olarak sınıflandırılan bir yanıttan sonra yine hesap değiştirebilir.",
+  "anthropicPool.experimentalWarning":
+    "Yalnızca size ait olan veya kullanma yetkiniz bulunan abonelikleri kullanın. Otomatik hesap havuzu Anthropic tarafından onaylanmamıştır ve deneysel olmaya devam eder. Gerçek Claude Code istemcisini bir kişinin gözetimindeki oturumda kullanın ve Anthropic'in güncel koşullarını kontrol edin. Hesaplar bir kuruluş kotasını paylaşabilir; bu durumda hesap eklemek kapasite eklemeyebilir.",
   "anthropicPool.detailsSummary": "Hesap seçimi nasıl çalışır",
-  "anthropicPool.detailsEnabling": "Havuz açıkken her oturum, hesabı sorunsuz çalıştığı sürece o hesapta kalır; yeni oturumların ve ret sonrasının hesabını seçili strateji belirler.",
-  "anthropicPool.detailsFailover": "Kapatmak yük devretmeyi kapatmaz: 429 veya hesap reddi olarak sınıflandırılan bir yanıttan sonra istek yine giriş yapılmış başka bir hesaba geçebilir. Bir hesabı bunun dışında tutmak için duraklatın.",
-  "anthropicPool.detailsActivity": "OpenCodex hesapları sıcak tutmak için (keep-warm) istek göndermez. Varsayılan olarak Claude jetonlarını arka planda yenilemez ve kullanımı arka planda sorgulamaz; kullanım yalnızca pano, menü çubuğu uygulaması veya bir ocx komutu istediğinde okunur.",
+  "anthropicPool.detailsEnabling":
+    "Havuz açıkken her oturum, hesabı sorunsuz çalıştığı sürece o hesapta kalır; yeni oturumların ve ret sonrasının hesabını seçili strateji belirler.",
+  "anthropicPool.detailsFailover":
+    "Kapatmak yük devretmeyi kapatmaz: 429 veya hesap reddi olarak sınıflandırılan bir yanıttan sonra istek yine giriş yapılmış başka bir hesaba geçebilir. Bir hesabı bunun dışında tutmak için duraklatın.",
+  "anthropicPool.detailsActivity":
+    "OpenCodex hesapları sıcak tutmak için (keep-warm) istek göndermez. Varsayılan olarak Claude jetonlarını arka planda yenilemez ve kullanımı arka planda sorgulamaz; kullanım yalnızca pano, menü çubuğu uygulaması veya bir ocx komutu istediğinde okunur.",
   "anthropicPool.nativeMessagesLabel": `Claude yerel isteklerini koru`,
   "anthropicPool.nativeMessagesHelp": `Havuz açıkken, seçilen rota destekliyorsa Claude Code geçmişini ve önbellek işaretlerini yerel Messages yolunda tutar. Diğer rotalar istekleri çevirmeye devam edebilir. Hesap değişikliği önbelleği yeniden başlatabilir; önbellek isabeti garanti edilmez ve hesaplar arasında önbellek paylaşılmaz. Açıkça kapatılmış dağıtım seçenekleri kapalı kalır.`,
-  "anthropicPool.saveWarning": "Ayarlar kaydedildi ancak yapılandırmanın kayıt sonrası işlemleri başarısız oldu. Mevcut durumu doğrulamak için ayarları yeniden yükleyin.",
-  "anthropicPool.saveStateUnknown": "Kaydedilen ayarlar doğrulanamadı. Başka bir değişiklik yapmadan önce ayarları yeniden yükleyin.",
+  "anthropicPool.saveWarning":
+    "Ayarlar kaydedildi ancak yapılandırmanın kayıt sonrası işlemleri başarısız oldu. Mevcut durumu doğrulamak için ayarları yeniden yükleyin.",
+  "anthropicPool.saveStateUnknown":
+    "Kaydedilen ayarlar doğrulanamadı. Başka bir değişiklik yapmadan önce ayarları yeniden yükleyin.",
   "anthropicPool.reloadSettings": "Ayarları yeniden yükle",
   "anthropicPool.detailsGuide": "Hesap havuzu kılavuzu",
-  "anthropicPool.needTwoAccounts": "Havuzu etkinleştirmeden önce en az iki Claude OAuth hesabı ekleyin.",
+  "anthropicPool.needTwoAccounts":
+    "Havuzu etkinleştirmeden önce en az iki Claude OAuth hesabı ekleyin.",
   "anthropicPool.threshold": "Yeni oturum kullanım eşiği",
   "anthropicPool.thresholdAria": "Yeni oturum kullanım eşiği, yüzde",
-  "anthropicPool.thresholdHelp": "Bu, hesap seçimi için bir tercihtir; kesin bir kullanım veya faturalandırma sınırı değildir. 0, bu eşiğe bağlı öngörülü geçişi kapatır. Varsayılan: %80.",
+  "anthropicPool.thresholdHelp":
+    "Bu, hesap seçimi için bir tercihtir; kesin bir kullanım veya faturalandırma sınırı değildir. 0, bu eşiğe bağlı öngörülü geçişi kapatır. Varsayılan: %80.",
   "anthropicPool.thresholdInvalid": "0 ile 100 arasında bir tam sayı girin",
   "anthropicPool.loadFailed": "Claude havuz ayarları yüklenemedi.",
   "anthropicPool.saveFailed": "Claude havuz ayarları kaydedilemedi.",
@@ -2652,12 +3068,15 @@ export const tr: Record<TKey, string> = {
   "accountPool.strategy": "Rotasyon stratejisi",
   "accountPool.strategyDesc": "OpenCodex'in yeni bir göreve nasıl hesap atayacağı.",
   "accountPool.strategyResetFirst": "En yakın sıfırlama önce",
-  "accountPool.strategyHintResetFirst": "Eşiğin altındaki hesaplar arasından sonraki 5 saatlik veya haftalık sıfırlaması en yakın olanı seçer. Bağlı görevler yapılandırılmış bağlılık politikasını izler. Bağımsız model kotaları kullanıma göre sıralanır.",
+  "accountPool.strategyHintResetFirst":
+    "Eşiğin altındaki hesaplar arasından sonraki 5 saatlik veya haftalık sıfırlaması en yakın olanı seçer. Bağlı görevler yapılandırılmış bağlılık politikasını izler. Bağımsız model kotaları kullanıma göre sıralanır.",
   "accountPool.strategyQuota": "Kota",
   "accountPool.strategyRoundRobin": "Round-robin",
   "accountPool.strategyFillFirst": "İlk doldurma",
-  "accountPool.strategyHintQuota": "Kota, kullanım eşiğinde hesabı yalnızca `pool.cacheAffinity` kapalıyken değiştirir (varsayılan açıktır). Bağlı görevler hesabın hizmet veremez hale gelmesine kadar kalır, sonra yalnızca gerçek kota payı olan bir hesaba geçer.",
-  "accountPool.strategyHintRoundRobin": "Round-robin yalnızca canlı bir hesap bağı olmayan yeni/bağımsız görevleri döndürür; mevcut görevler bağlı kalabilir ve kullanım eşiği normal rotasyonu değiştirmez.",
+  "accountPool.strategyHintQuota":
+    "Kota, kullanım eşiğinde hesabı yalnızca `pool.cacheAffinity` kapalıyken değiştirir (varsayılan açıktır). Bağlı görevler hesabın hizmet veremez hale gelmesine kadar kalır, sonra yalnızca gerçek kota payı olan bir hesaba geçer.",
+  "accountPool.strategyHintRoundRobin":
+    "Round-robin yalnızca canlı bir hesap bağı olmayan yeni/bağımsız görevleri döndürür; mevcut görevler bağlı kalabilir ve kullanım eşiği normal rotasyonu değiştirmez.",
   "accountPool.strategyHintFillFirst": "İlk doldurma eşiği boşaltma noktası olarak kullanır.",
   "accountPool.unboundDefinition": "Bağlı olmayan yeni görev.",
   "accountPool.stickyLimit": "Döndürmeden önceki sabit atamalar",
@@ -2670,17 +3089,21 @@ export const tr: Record<TKey, string> = {
   "accountPool.strategyUpdateFailed": "Strateji kaydedilemedi.",
   "accountPool.switchAtThreshold": "%{threshold} düzeyinde geçiş",
   "accountPool.drainAtThreshold": "%{threshold} düzeyinde boşaltma",
-  "accountPool.resetBelowThreshold": "Kullanımı %{threshold} altında olan hesaplar arasında en yakın sıfırlama",
+  "accountPool.resetBelowThreshold":
+    "Kullanımı %{threshold} altında olan hesaplar arasında en yakın sıfırlama",
   "accountPool.thresholdNotUsed": "eşik kullanılmıyor",
   "accountPool.proactiveSwitchingOff": "proaktif geçiş kapalı",
 
   "accountPool.quotaWindow": "Kota penceresi",
-  "accountPool.quotaWindowDesc": "Kotaya dayalı yeni oturum seçimi, İlk doldurma eşik kontrolleri ve uygun 429 yedekleri için hangi önbelleğe alınmış kullanım çubuğunun kullanılacağını belirler.",
+  "accountPool.quotaWindowDesc":
+    "Kotaya dayalı yeni oturum seçimi, İlk doldurma eşik kontrolleri ve uygun 429 yedekleri için hangi önbelleğe alınmış kullanım çubuğunun kullanılacağını belirler.",
   "accountPool.quotaWindowFiveHour": "5 saatlik çubuk",
   "accountPool.quotaWindowWeekly": "Haftalık çubuk",
   "accountPool.quotaWindowMaxUtilization": "Daha yüksek çubuk",
-  "accountPool.quotaWindowHint": "Haftalık çubuk, başka uygun hesap kaldığı sürece 5 saatlik çubuğu tükenmiş hesapları atlar; hiçbiri kalmazsa bu hesaplara geri döner. Eşitlikte 5 saatlik kullanımı daha düşük olan seçilir; hesap başına haftalık çubuklar ancak Sağlayıcılar sayfası sorguladıktan sonra bilinir.",
-  "accountPool.quotaWindowInert": "Kullanım çubuğunu yalnızca Kota ya da eşiği 0'ın üzerinde olan İlk doldurma puanlar; bu yüzden geçerli rotasyon stratejisi için bu ayar hiçbir şeyi değiştirmez.",
+  "accountPool.quotaWindowHint":
+    "Haftalık çubuk, başka uygun hesap kaldığı sürece 5 saatlik çubuğu tükenmiş hesapları atlar; hiçbiri kalmazsa bu hesaplara geri döner. Eşitlikte 5 saatlik kullanımı daha düşük olan seçilir; hesap başına haftalık çubuklar ancak Sağlayıcılar sayfası sorguladıktan sonra bilinir.",
+  "accountPool.quotaWindowInert":
+    "Kullanım çubuğunu yalnızca Kota ya da eşiği 0'ın üzerinde olan İlk doldurma puanlar; bu yüzden geçerli rotasyon stratejisi için bu ayar hiçbir şeyi değiştirmez.",
 
   "accountPool.priority": "Seçim sırası",
   "accountPool.priorityAria": "Bu hesap için seçim sırası",
@@ -2697,13 +3120,16 @@ export const tr: Record<TKey, string> = {
   "accountPool.autoSwitchThreshold": "Özel hesap eşiği",
   "accountPool.autoSwitchThresholdAria": "{email} için kullanım eşiği",
   "accountPool.autoSwitchOverrideAria": "{email} için genel kullanım eşiğini geçersiz kıl",
-  "accountPool.autoSwitchHint": "Bu hesap için genel eşiği geçersiz kılar. 0, bu hesaptan kullanıma dayalı proaktif geçişi devre dışı bırakır.",
+  "accountPool.autoSwitchHint":
+    "Bu hesap için genel eşiği geçersiz kılar. 0, bu hesaptan kullanıma dayalı proaktif geçişi devre dışı bırakır.",
   "accountPool.autoSwitchUpdated": "{email} için kullanım eşiği güncellendi",
-  "accountPool.autoSwitchUpdateFailed": "{email} için kullanım eşiği kaydedilemedi. Son onaylanan değer gösteriliyor.",
+  "accountPool.autoSwitchUpdateFailed":
+    "{email} için kullanım eşiği kaydedilemedi. Son onaylanan değer gösteriliyor.",
 
   "codexAuth.switched": "Sonraki istek için {email} seçildi",
   "codexAuth.loadFailed": "Codex hesap ayarları yüklenemedi.",
-  "codexAuth.accountsRefreshFailed": "Son hesap yenilemesi başarısız oldu. Aşağıda son doğrulanan hesaplar gösteriliyor.",
+  "codexAuth.accountsRefreshFailed":
+    "Son hesap yenilemesi başarısız oldu. Aşağıda son doğrulanan hesaplar gösteriliyor.",
   "codexAuth.switchFailed": "Hesap değiştirilemedi.",
   "codexAuth.removeConfirm": "{id} kaldırılsın mı?",
   "codexAuth.removeFailed": "Hesap kaldırılamadı.",
@@ -2736,7 +3162,8 @@ export const tr: Record<TKey, string> = {
   "codexAuth.needsReauth": "Tekrar Giriş Yap",
   "codexAuth.reauthenticate": "Yeniden Doğrula",
   "codexAuth.tokenExpired": "Jeton süresi doldu — hesabı yeniden doğrulayın",
-  "codexAuth.mainTokenExpired": "Belirteç süresi doldu — aşağıdan cihaz koduyla veya Codex App girişiyle yeniden giriş yapın",
+  "codexAuth.mainTokenExpired":
+    "Belirteç süresi doldu — aşağıdan cihaz koduyla veya Codex App girişiyle yeniden giriş yapın",
   "codexAuth.mainReauthSucceeded": "Giriş yapıldı",
   "codexAuth.mainReauthFailed": "Yeniden giriş başarısız",
   "codexAuth.mainReauthCancel": "İptal",
@@ -2754,7 +3181,8 @@ export const tr: Record<TKey, string> = {
   "codexAuth.creditsExpireNote": "Kredilerin süresi 30 gün içinde dolmaktadır.",
   "codexAuth.useOneCredit": "1 Kredi Kullan",
   "codexAuth.confirmResetTitle": "Sıfırlama Kredisi Kullanılsın mı?",
-  "codexAuth.confirmResetDesc": "Bu işlem oran limitlerinizi anında sıfırlayacaktır. {count} krediniz kaldı.",
+  "codexAuth.confirmResetDesc":
+    "Bu işlem oran limitlerinizi anında sıfırlayacaktır. {count} krediniz kaldı.",
   "codexAuth.irreversible": "Bu işlem geri alınamaz.",
   "codexAuth.useCredit": "Kredi Kullan",
   "codexAuth.redeeming": "Sıfırlanıyor...",
@@ -2790,35 +3218,44 @@ export const tr: Record<TKey, string> = {
   "grokCoupon.useOne": "1 Kupon Kullan",
   "grokCoupon.fifoNote": "Süresi en yakın dolacak kupon ilk önce kullanılır.",
   "grokCoupon.confirmTitle": "Sıfırlama Kuponu Kullanılsın mı?",
-  "grokCoupon.confirmDesc": "Bu işlem bu hesabın Grok kullanım penceresini şimdi sıfırlar. {count} kuponunuz var.",
+  "grokCoupon.confirmDesc":
+    "Bu işlem bu hesabın Grok kullanım penceresini şimdi sıfırlar. {count} kuponunuz var.",
   "grokCoupon.confirmWhich": "{date} tarihinde süresi dolacak kupon kullanılacak.",
   "grokCoupon.irreversible": "Bu işlem geri alınamaz.",
   "grokCoupon.redeem": "Kupon Kullan",
   "grokCoupon.redeeming": "Kullanılıyor…",
   "grokCoupon.redeemSuccess": "Kupon kullanıldı. {count} kupon kaldı.",
   "grokCoupon.redeemReplayed": "Bu kullanım daha önce tamamlanmış. Yeniden bir şey tüketilmedi.",
-  "grokCoupon.redeemFailed": "Kullanım başarısız oldu. Tekrar denemeden önce kupon listesini kontrol edin.",
+  "grokCoupon.redeemFailed":
+    "Kullanım başarısız oldu. Tekrar denemeden önce kupon listesini kontrol edin.",
   "grokCoupon.authFailed": "Kuponlarını kullanmak için bu xAI hesabına tekrar giriş yapın.",
   "grokCoupon.noAccount": "Bu kullanım için uygun bir xAI hesabı yok.",
   "grokCoupon.noneAvailable": "Kullanılabilir sıfırlama kuponu yok.",
-  "grokCoupon.identityMismatch": "Bu kullanım başka bir hesaba ait. Bu iletişim kutusunu kapatıp yeniden başlayın.",
+  "grokCoupon.identityMismatch":
+    "Bu kullanım başka bir hesaba ait. Bu iletişim kutusunu kapatıp yeniden başlayın.",
   "grokCoupon.networkError": "Proxy'ye ulaşılamadı.",
   "grokCoupon.capacity": "Kullanım günlüğü şu anda dolu. Biraz sonra tekrar deneyin.",
-  "grokCoupon.noOperationId": "Bu tarayıcı bir kullanım kimliği üretemiyor, bu yüzden kupon kullanma burada devre dışı.",
-  "grokCoupon.unknownOutcome": "Kullanım sonucu bilinmiyor. Kullanılabilir kuponları görmek için hesabı yeniden okuyun; bu, ilk denemeyi doğrulamaz.",
+  "grokCoupon.noOperationId":
+    "Bu tarayıcı bir kullanım kimliği üretemiyor, bu yüzden kupon kullanma burada devre dışı.",
+  "grokCoupon.unknownOutcome":
+    "Kullanım sonucu bilinmiyor. Kullanılabilir kuponları görmek için hesabı yeniden okuyun; bu, ilk denemeyi doğrulamaz.",
   "grokCoupon.checkResult": "Hesabı yeniden oku",
   "grokCoupon.checking": "Yeniden okunuyor…",
-  "grokCoupon.consumedElsewhere": "Kupon artık listede yok. İlk kullanım hâlâ doğrulanmadı; başka kullanım isteği gönderilmeyecek.",
-  "grokCoupon.unresolved": "Kupon hâlâ listede. İlk kullanım daha sonra tamamlanabilir; başka kullanım isteği gönderilmeyecek.",
+  "grokCoupon.consumedElsewhere":
+    "Kupon artık listede yok. İlk kullanım hâlâ doğrulanmadı; başka kullanım isteği gönderilmeyecek.",
+  "grokCoupon.unresolved":
+    "Kupon hâlâ listede. İlk kullanım daha sonra tamamlanabilir; başka kullanım isteği gönderilmeyecek.",
   "anthropicGrant.badgeAria": "{count} Claude kullanım sıfırlaması",
   "anthropicGrant.badgeErrorAria": "Claude kullanım sıfırlamaları okunamadı",
   "anthropicGrant.title": "Claude Kullanım Sıfırlamaları",
   "anthropicGrant.available": "Bu hesapta {count} kullanım sıfırlaması var.",
-  "anthropicGrant.desc": "Bir sıfırlama, bu hesabın 5 saatlik ve haftalık Claude limitlerini hemen yeniler. Haftalık sıfırlama günü değişmez.",
+  "anthropicGrant.desc":
+    "Bir sıfırlama, bu hesabın 5 saatlik ve haftalık Claude limitlerini hemen yeniler. Haftalık sıfırlama günü değişmez.",
   "anthropicGrant.none": "Bu hesapta kullanım sıfırlaması yok.",
   "anthropicGrant.ineligible": "Bu hesap şu anda kullanım sıfırlamalarından yararlanamıyor.",
   "anthropicGrant.loadFailed": "Bu hesabın kullanım sıfırlamaları okunamadı.",
-  "anthropicGrant.loadFailedAuth": "Sıfırlamaları okumak için bu Anthropic hesabına tekrar giriş yapın.",
+  "anthropicGrant.loadFailedAuth":
+    "Sıfırlamaları okumak için bu Anthropic hesabına tekrar giriş yapın.",
   "anthropicGrant.retry": "Tekrar Dene",
   "anthropicGrant.resetsLeft": "{total} sıfırlamadan {left} kaldı",
   "anthropicGrant.validFrom": "Geçerlilik başlangıcı {date}",
@@ -2831,37 +3268,53 @@ export const tr: Record<TKey, string> = {
   "anthropicGrant.requiresLimit": "Bu hesap bir limite ulaştığında kullanılabilir",
   "anthropicGrant.useOne": "1 Sıfırlama Kullan",
   "anthropicGrant.confirmTitle": "Kullanım Limitleri Şimdi Sıfırlansın mı?",
-  "anthropicGrant.confirmDesc": "Bu işlem, bu hesabın Claude kullanım limitlerini şimdi yeniler ve bir sıfırlama kullanır.",
+  "anthropicGrant.confirmDesc":
+    "Bu işlem, bu hesabın Claude kullanım limitlerini şimdi yeniler ve bir sıfırlama kullanır.",
   "anthropicGrant.confirmWhich": "Kullanılacak: {label}",
   "anthropicGrant.irreversible": "Bu işlem geri alınamaz.",
   "anthropicGrant.redeem": "Limitleri Sıfırla",
   "anthropicGrant.redeeming": "Sıfırlanıyor…",
   "anthropicGrant.resultReset": "Limitler sıfırlandı. {count} sıfırlama kaldı.",
   "anthropicGrant.resultAlreadyUsed": "Bu sıfırlama zaten kullanıldı.",
-  "anthropicGrant.resultNotLimited": "Bu hesap bir limite ulaşmadığı için hiçbir sıfırlama kullanılmadı.",
-  "anthropicGrant.resultCooldown": "Bu hesabın sıfırlamaları bekleme süresinde. Hiçbir sıfırlama kullanılmadı.",
+  "anthropicGrant.resultNotLimited":
+    "Bu hesap bir limite ulaşmadığı için hiçbir sıfırlama kullanılmadı.",
+  "anthropicGrant.resultCooldown":
+    "Bu hesabın sıfırlamaları bekleme süresinde. Hiçbir sıfırlama kullanılmadı.",
   "anthropicGrant.resultIneligible": "Bu hesap artık uygun değil. Hiçbir sıfırlama kullanılmadı.",
-  "anthropicGrant.resultUnavailable": "Sıfırlamalar şu anda kullanılamıyor. Hiçbir sıfırlama kullanılmadı.",
-  "anthropicGrant.resultRateLimited": "Çok fazla istek gönderildi. Hiçbir sıfırlama kullanılmadı; bir dakika sonra tekrar deneyin.",
-  "anthropicGrant.resultAuthError": "Bu Anthropic hesabına tekrar giriş yapın. Hiçbir sıfırlama kullanılmadı.",
-  "anthropicGrant.replayed": "Bu sıfırlama daha önce sonuçlandı. Yeniden bir sıfırlama kullanılmadı.",
+  "anthropicGrant.resultUnavailable":
+    "Sıfırlamalar şu anda kullanılamıyor. Hiçbir sıfırlama kullanılmadı.",
+  "anthropicGrant.resultRateLimited":
+    "Çok fazla istek gönderildi. Hiçbir sıfırlama kullanılmadı; bir dakika sonra tekrar deneyin.",
+  "anthropicGrant.resultAuthError":
+    "Bu Anthropic hesabına tekrar giriş yapın. Hiçbir sıfırlama kullanılmadı.",
+  "anthropicGrant.replayed":
+    "Bu sıfırlama daha önce sonuçlandı. Yeniden bir sıfırlama kullanılmadı.",
   "anthropicGrant.notUsableNow": "Bu sıfırlama şu anda kullanılamaz. Hesabı yeniden okuyun.",
   "anthropicGrant.inFlight": "Bu sıfırlama hâlâ işleniyor. Biraz bekleyip hesabı yeniden okuyun.",
-  "anthropicGrant.unresolvedPrior": "Bu sıfırlamayla ilgili önceki girişim henüz doğrulanmadı. Yeni bir işlem başlatmak yerine o girişimi yeniden deneyin.",
-  "anthropicGrant.expired": "Önceki girişim zamanında doğrulanamadı. Bir sıfırlama kullanmadan önce hesabı yeniden okuyun.",
-  "anthropicGrant.identityMismatch": "Bu sıfırlama başka bir hesaba ait. Bu iletişim kutusunu kapatıp yeniden başlayın.",
-  "anthropicGrant.sessionRequired": "Sıfırlamaları kullanmak için kontrol panelini kendi oturum açma sayfasından açın.",
-  "anthropicGrant.journalBusy": "Sıfırlama günlüğü meşgul veya kullanılamıyor. Hiçbir sıfırlama kullanılmadı; biraz sonra tekrar deneyin.",
-  "anthropicGrant.failed": "Sıfırlama isteği başarısız oldu. Tekrar denemeden önce hesabı kontrol edin.",
-  "anthropicGrant.noOperationId": "Bu tarayıcı bir istek kimliği üretemiyor, bu yüzden sıfırlamalar burada devre dışı.",
-  "anthropicGrant.unknownOutcome": "Sıfırlama zamanında yanıt vermediği için sonucu bilinmiyor. Yeniden denemek aynı istek kimliğini gönderir; bu yüzden ikinci bir sıfırlama başlatamaz.",
+  "anthropicGrant.unresolvedPrior":
+    "Bu sıfırlamayla ilgili önceki girişim henüz doğrulanmadı. Yeni bir işlem başlatmak yerine o girişimi yeniden deneyin.",
+  "anthropicGrant.expired":
+    "Önceki girişim zamanında doğrulanamadı. Bir sıfırlama kullanmadan önce hesabı yeniden okuyun.",
+  "anthropicGrant.identityMismatch":
+    "Bu sıfırlama başka bir hesaba ait. Bu iletişim kutusunu kapatıp yeniden başlayın.",
+  "anthropicGrant.sessionRequired":
+    "Sıfırlamaları kullanmak için kontrol panelini kendi oturum açma sayfasından açın.",
+  "anthropicGrant.journalBusy":
+    "Sıfırlama günlüğü meşgul veya kullanılamıyor. Hiçbir sıfırlama kullanılmadı; biraz sonra tekrar deneyin.",
+  "anthropicGrant.failed":
+    "Sıfırlama isteği başarısız oldu. Tekrar denemeden önce hesabı kontrol edin.",
+  "anthropicGrant.noOperationId":
+    "Bu tarayıcı bir istek kimliği üretemiyor, bu yüzden sıfırlamalar burada devre dışı.",
+  "anthropicGrant.unknownOutcome":
+    "Sıfırlama zamanında yanıt vermediği için sonucu bilinmiyor. Yeniden denemek aynı istek kimliğini gönderir; bu yüzden ikinci bir sıfırlama başlatamaz.",
   "anthropicGrant.retrySame": "Aynı İsteği Yeniden Dene",
   "anthropicGrant.checkResult": "Hesabı yeniden oku",
   "anthropicGrant.checking": "Yeniden okunuyor…",
 
   // api access page
   "api.title": "API Erişimi",
-  "api.subtitle": "Harici uygulamalardan opencodex proxy'sine erişmek için üretilen API anahtarlarını kullanın. Anahtarlar {authHeader} başlığı üzerinden kimlik doğrulaması yapar; her bir uç noktanın neleri kabul ettiğini görmek için aşağıdaki tabloya bakın.",
+  "api.subtitle":
+    "Harici uygulamalardan opencodex proxy'sine erişmek için üretilen API anahtarlarını kullanın. Anahtarlar {authHeader} başlığı üzerinden kimlik doğrulaması yapar; her bir uç noktanın neleri kabul ettiğini görmek için aşağıdaki tabloya bakın.",
   "api.baseUrl": "Taban URL",
   "api.responsesEndpoint": "Responses API",
   "api.chatCompletionsEndpoint": "Chat Completions API",
@@ -2874,18 +3327,22 @@ export const tr: Record<TKey, string> = {
   "api.surface.source.inherited": "Claude ayarlarından devralındı",
   "api.surface.source.invalid": "Geçersiz değer — kapalı",
   "api.surface.messagesToggle": "Messages API'yi sun",
-  "api.surface.messagesCloseNote": "Messages kapatıldığında Claude entegrasyonu da kapanır; böylece eski bir opencodex sürümü de uç noktayı kapalı tutar.",
+  "api.surface.messagesCloseNote":
+    "Messages kapatıldığında Claude entegrasyonu da kapanır; böylece eski bir opencodex sürümü de uç noktayı kapalı tutar.",
   "api.surface.openClaude": "Claude ayarları",
   "api.surface.toggleFailed": "Messages ayarı kaydedilemedi.",
-  "api.surface.toggleUnavailable": "Bu proxy sürümü Messages API'yi burada değiştiremez. Bunun yerine Claude sayfasını kullanın.",
+  "api.surface.toggleUnavailable":
+    "Bu proxy sürümü Messages API'yi burada değiştiremez. Bunun yerine Claude sayfasını kullanın.",
   "api.surface.closedNote": "Bu uç noktaya gelen istekler 403 ile reddedilir.",
   "api.endpointNote": "OpenAI uyumlu istemcilerle taban URL'yi kullanın.",
   "api.endpointsTitle": "Uç noktalar",
   "api.authTitle": "Kimlik Doğrulama",
-  "api.authLoopback": "Geri döngü erişimi yola bağlıdır; bağımsız ses istemcileri OpenCodex veri anahtarı gerektirir. Uzak bağlantılar veri anahtarı veya OPENCODEX_API_AUTH_TOKEN gerektirir.",
+  "api.authLoopback":
+    "Geri döngü erişimi yola bağlıdır; bağımsız ses istemcileri OpenCodex veri anahtarı gerektirir. Uzak bağlantılar veri anahtarı veya OPENCODEX_API_AUTH_TOKEN gerektirir.",
   "api.authBaseUrlNote": "İstemcileri taban URL ile yapılandırın.",
   "api.newKeyTitle": "Yeni anahtar oluşturuldu",
-  "api.newKeyNote": "Bu anahtarı şimdi kopyalayın. Daha sonra anahtar listesinde üzerine tıklayarak yeniden gösterebilirsiniz.",
+  "api.newKeyNote":
+    "Bu anahtarı şimdi kopyalayın. Daha sonra anahtar listesinde üzerine tıklayarak yeniden gösterebilirsiniz.",
   "api.copy": "Kopyala",
   "api.copied": "Kopyalandı",
   "api.dismiss": "Kapat",
@@ -2904,8 +3361,10 @@ export const tr: Record<TKey, string> = {
   "api.section.examples": "Örnekler",
   "api.section.plan": "Yol önizlemesi",
   "api.plan.title": "İstek yolu önizlemesi",
-  "api.plan.description": "Bu model için bir isteğin proxy içinde izleyeceği yolu gösterir. Önizleme sağlayıcıya hiçbir şey göndermez ve ücretsizdir.",
-  "api.plan.modeNote": "“Yerel” bir isteğin nasıl iletildiğini anlatır. Bir doğrulama sonucu değildir.",
+  "api.plan.description":
+    "Bu model için bir isteğin proxy içinde izleyeceği yolu gösterir. Önizleme sağlayıcıya hiçbir şey göndermez ve ücretsizdir.",
+  "api.plan.modeNote":
+    "“Yerel” bir isteğin nasıl iletildiğini anlatır. Bir doğrulama sonucu değildir.",
   "api.plan.unavailable": "Bu proxy sürümü yol önizlemesi sunmuyor.",
   "api.plan.noModels": "Henüz önizlenecek model yok.",
   "api.plan.model": "Model",
@@ -2948,7 +3407,8 @@ export const tr: Record<TKey, string> = {
   "api.workspace.keyDetails": "Anahtar detayları",
   "api.workspace.keyPrefix": "Anahtar ön eki",
   "api.workspace.deleteKey": "Anahtarı sil",
-  "api.workspace.deleteConfirm": "Bu API anahtarı silinsin mi? Bunu kullanan istemciler erişimi anında kaybedecektir. Bu işlem geri alınamaz.",
+  "api.workspace.deleteConfirm":
+    "Bu API anahtarı silinsin mi? Bunu kullanan istemciler erişimi anında kaybedecektir. Bu işlem geri alınamaz.",
   "api.workspace.usageExamples": "Kullanım örnekleri",
   "api.copyUrlHint": "URL kopyalamak için tıklayın",
   "api.urlCopied": "URL kopyalandı",
@@ -2963,7 +3423,8 @@ export const tr: Record<TKey, string> = {
   "api.key.hideHint": "Tam anahtarı gizlemek için tıklayın",
   "api.key.revealFailed": "Tam anahtar yüklenemedi.",
   "api.key.revealDenied": "Kayıtlı bir anahtarı görüntülemek için önce bu tarayıcıyı eşleştirin.",
-  "api.key.mutationHidden": "Anahtar oluşturuldu veya anahtar rotasyonu başlatıldı, ancak oturum ya da görünüm değiştiği için tek seferlik değer gizlendi.",
+  "api.key.mutationHidden":
+    "Anahtar oluşturuldu veya anahtar rotasyonu başlatıldı, ancak oturum ya da görünüm değiştiği için tek seferlik değer gizlendi.",
   "api.key.copyFailedShort": "Kopyalanamadı. Anahtarı seçip elle kopyalayın.",
   "api.key.deleteRowAria": "{name} sil",
   "api.key.deleteShort": "Sil",
@@ -3022,24 +3483,30 @@ export const tr: Record<TKey, string> = {
   "api.clientConfig.clientCline": "Cline CLI",
   "api.clientConfig.clientKilo": "Kilo",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "Bu, bir Cline ayar dosyası değil, iki dosyalık bir pakettir. settings içeriğini providers.json, catalog içeriğini aynı klasördeki models.json ile birleştirin. Yazmadan önce yedek almak için entegrasyon anahtarını kullanın.",
-  "api.clientConfig.clineDownloaded": "{filename} indirildi. Henüz değişiklik yapılmadı; settings ve catalog ayrı Cline dosyalarına aittir.",
+  "api.clientConfig.clineBundle":
+    "Bu, bir Cline ayar dosyası değil, iki dosyalık bir pakettir. settings içeriğini providers.json, catalog içeriğini aynı klasördeki models.json ile birleştirin. Yazmadan önce yedek almak için entegrasyon anahtarını kullanın.",
+  "api.clientConfig.clineDownloaded":
+    "{filename} indirildi. Henüz değişiklik yapılmadı; settings ve catalog ayrı Cline dosyalarına aittir.",
   "api.clientConfig.copy": "JSON Kopyala",
   "api.clientConfig.download": "İndir",
   "api.clientConfig.loading": "İstemci konfigürasyonu oluşturuluyor…",
   "api.clientConfig.jsonLabel": "{client} konfigürasyon JSON",
   "api.clientConfig.destination": "Hedef dosya",
   "api.clientConfig.envHint": "Başlatmadan önce anahtarı ayarlayın",
-  "api.clientConfig.mergeWarning": "Bunu hedef dosyaya birleştirin. Dosyanın üzerine yazıp değiştirmek, diğer sağlayıcılarınızı ve MCP ayarlarınızı silecektir.",
+  "api.clientConfig.mergeWarning":
+    "Bunu hedef dosyaya birleştirin. Dosyanın üzerine yazıp değiştirmek, diğer sağlayıcılarınızı ve MCP ayarlarınızı silecektir.",
   "api.clientConfig.modelCount": "{count} model dışa aktarıldı",
-  "api.clientConfig.missingLimits": "{total} modelden {count} tanesi bağlam sınırı olmadan gönderildi.",
+  "api.clientConfig.missingLimits":
+    "{total} modelden {count} tanesi bağlam sınırı olmadan gönderildi.",
   "api.clientConfig.noKeyYet": "{env} arkasında henüz anahtar yok.",
   "api.clientConfig.loadFailed": "Model listesi okunamadı.",
   "api.clientConfig.copiedAnnounce": "İstemci konfigürasyonu JSON panoya kopyalandı.",
   "api.clientConfig.copyFailed": "Kopyalanamadı.",
-  "api.clientConfig.downloadedAnnounce": "{filename} indirildi. Henüz hiçbir şey değişmedi — kendiniz {destination} konumuna birleştirin.",
+  "api.clientConfig.downloadedAnnounce":
+    "{filename} indirildi. Henüz hiçbir şey değişmedi — kendiniz {destination} konumuna birleştirin.",
   "api.clientConfig.whereDisclosure": "Bu dosya nereye gidiyor",
-  "api.clientConfig.whereBody": "Yukarıdaki hedef genel (global) yoldur. Çalışma dizinindeki projeye özel bir konfigürasyon dosyası buna öncelik eder ve istemci anahtarı bu dosyadan değil, konfigürasyonda belirtilen çevre değişkeninden okur.",
+  "api.clientConfig.whereBody":
+    "Yukarıdaki hedef genel (global) yoldur. Çalışma dizinindeki projeye özel bir konfigürasyon dosyası buna öncelik eder ve istemci anahtarı bu dosyadan değil, konfigürasyonda belirtilen çevre değişkeninden okur.",
   "api.clientConfig.clientOmp": "OMP",
   "api.keysLoadFailed": "API anahtarları yüklenemedi.",
   "api.createFailed": "API anahtarı oluşturulamadı.",
@@ -3059,7 +3526,8 @@ export const tr: Record<TKey, string> = {
   "api.rotation.title": "Anahtar döndürme",
   "api.rotation.pending": "Döndürme bekliyor. Onaylamadan önce istemciyi güncelleyip doğrulayın.",
   "api.rotation.expires": "Geçiş süresi sonu:",
-  "api.key.copyFailed": "Otomatik kopyalanamadı. Kapatmadan önce anahtarı manuel olarak seçip kopyalayın — tekrar gösterilmeyecektir.",
+  "api.key.copyFailed":
+    "Otomatik kopyalanamadı. Kapatmadan önce anahtarı manuel olarak seçip kopyalayın — tekrar gösterilmeyecektir.",
   "api.attribution.title": "Atfedilen kullanım",
   "api.attribution.requests7d": "Son 7 gün istekleri",
   "api.attribution.totalRequests": "Toplam atfedilen istekler",
@@ -3074,7 +3542,8 @@ export const tr: Record<TKey, string> = {
   "api.attribution.railAmbiguous": "mükerrer ID",
 
   // Claude Code inbound
-  "claude.subtitle": "ocx claude trafiğini OpenCodex üzerinden yönlendirerek Claude Code içinde GPT, Gemini ve diğer modellerin kullanılmasını sağlar. Kapatıldığında yakalama (first-party dahil) ve Claude Desktop model listesi de devre dışı kalır. Bağlantı genel bakışındaki Claude anahtarıyla aynı ayardır.",
+  "claude.subtitle":
+    "ocx claude trafiğini OpenCodex üzerinden yönlendirerek Claude Code içinde GPT, Gemini ve diğer modellerin kullanılmasını sağlar. Kapatıldığında yakalama (first-party dahil) ve Claude Desktop model listesi de devre dışı kalır. Bağlantı genel bakışındaki Claude anahtarıyla aynı ayardır.",
   "claude.pageTitle": "Claude Code",
   "claude.workspace.settings": "Genel",
   "claude.enabledLabel": "Claude bağlantısı",
@@ -3090,7 +3559,8 @@ export const tr: Record<TKey, string> = {
   "claude.authModeAuto": "Otomatik (Claude doğrulamasını algıla)",
   "claude.effectiveMode.label": "Sonraki başlatmada geçerli",
   "claude.effectiveMode.manual": "Manuel: {mode}",
-  "claude.effectiveMode.autoPresent": "Otomatik: abonelik — {source} üzerinden Claude kimliği bulundu",
+  "claude.effectiveMode.autoPresent":
+    "Otomatik: abonelik — {source} üzerinden Claude kimliği bulundu",
   "claude.effectiveMode.autoAbsent": "Otomatik: proxy modu — Claude kimliği bulunamadı",
   "claude.effectiveMode.autoUnknown": "Otomatik: abonelik — doğrulanamadı",
   "claude.effectiveMode.admissionKey": "Bu proxy'nin API anahtarı hâlâ gönderiliyor.",
@@ -3105,32 +3575,43 @@ export const tr: Record<TKey, string> = {
   "claude.fastOn": "AÇIK",
   "claude.fastOff": "KAPALI",
   "claude.autoContext": "Otomatik büyük bağlam kullan",
-  "claude.autoContextDesc": "1M işaretinin ne kadar ileri gideceğini kontrol eder. AÇIK: penceresi sıkıştırma eşiğini barındırabilen her model 1M aralığı kazanır. KAPALI: yalnızca gerçek 1M modelleri alır.",
-  "claude.autoContextInert": "Pasif durumdadır çünkü konfigürasyon dosyasında eski bir bağlam boyutu değeri (maxContextTokens) var. Yeniden etkinleştirmek için oradan kaldırın.",
+  "claude.autoContextDesc":
+    "1M işaretinin ne kadar ileri gideceğini kontrol eder. AÇIK: penceresi sıkıştırma eşiğini barındırabilen her model 1M aralığı kazanır. KAPALI: yalnızca gerçek 1M modelleri alır.",
+  "claude.autoContextInert":
+    "Pasif durumdadır çünkü konfigürasyon dosyasında eski bir bağlam boyutu değeri (maxContextTokens) var. Yeniden etkinleştirmek için oradan kaldırın.",
   "claude.contextAccounting": "Bağlam hesaplama",
-  "claude.contextAccountingDesc": "1M: Uzun pencereli modeller, opencodex'in varsayılanı seçtiği her yerde varsayılan olarak 1M olur. 200k: opencodex modelleri artık otomatik olarak 1M işaretlemez; kendi seçtiğiniz 1M satırı ve ayarladığınız bağlam geçersiz kılması geçerli kalır.",
+  "claude.contextAccountingDesc":
+    "1M: Uzun pencereli modeller, opencodex'in varsayılanı seçtiği her yerde varsayılan olarak 1M olur. 200k: opencodex modelleri artık otomatik olarak 1M işaretlemez; kendi seçtiğiniz 1M satırı ve ayarladığınız bağlam geçersiz kılması geçerli kalır.",
   "claude.contextAccounting1m": "1M (varsayılan)",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "Otomatik özetleme noktası",
   "claude.autoCompactDefault": "{value} (varsayılan)",
-  "claude.autoCompactWindowDesc": "Sohbet bu noktaya ulaştığında eski mesajlar özetlenir. Her modelin kendi sınırını asla aşmaz, bu nedenle 200k modeller etkilenmez.",
-  "claude.autoCompactWindowWarn": "Bunu değiştirmek GPT modellerini bozabilir — bir modelin gerçek sınırından daha yüksek ayarlanırsa, sohbetler özet devreye girmeden önce hata verecektir.",
+  "claude.autoCompactWindowDesc":
+    "Sohbet bu noktaya ulaştığında eski mesajlar özetlenir. Her modelin kendi sınırını asla aşmaz, bu nedenle 200k modeller etkilenmez.",
+  "claude.autoCompactWindowWarn":
+    "Bunu değiştirmek GPT modellerini bozabilir — bir modelin gerçek sınırından daha yüksek ayarlanırsa, sohbetler özet devreye girmeden önce hata verecektir.",
   "claude.injectAgents": "Alt ajanları otomatik kaydet",
-  "claude.injectAgentsDesc": "Alt Ajanlar sekmesinde seçilen modelleri (ve mevcut varsayılan modeli) çağrılabilir Claude Code ajanları (ocx-*) olarak kaydeder. Sonraki oturumdan itibaren uygulanır.",
+  "claude.injectAgentsDesc":
+    "Alt Ajanlar sekmesinde seçilen modelleri (ve mevcut varsayılan modeli) çağrılabilir Claude Code ajanları (ocx-*) olarak kaydeder. Sonraki oturumdan itibaren uygulanır.",
   "claude.webSearchSidecar": "Web arama yan araç geçersiz kılması",
-  "claude.webSearchSidecarHint": "Claude Code istekleri için ana web arama sidecar'ını geçersiz kılın.",
+  "claude.webSearchSidecarHint":
+    "Claude Code istekleri için ana web arama sidecar'ını geçersiz kılın.",
   "claude.visionSidecar": "Görsel yan araç geçersiz kılması",
   "claude.visionSidecarHint": "Claude Code istekleri için ana görsel sidecar'ını geçersiz kılın.",
   "claude.useMainSetting": "Ana ayarı kullan",
   "claude.sidecarModelPlaceholder": "Ana ayar modeli",
   "claude.quickstart": "Başlarken",
-  "claude.quickstartHint": "{cmd} Claude Code'u proxy üzerinden açar. claude.ai girişiniz aktif kalır.",
+  "claude.quickstartHint":
+    "{cmd} Claude Code'u proxy üzerinden açar. claude.ai girişiniz aktif kalır.",
   "claude.manualEnv": "Manuel kurulum (gelişmiş)",
   "claude.smallFastModel": "Arka plan yardımcı modeli",
-  "claude.smallFastModelHint": "Claude Code'un sohbet özetleri ve konu tespiti gibi arka plan işleri için kullandığı model. haiku alt ajan takma adı da bunu kullanır. Boş = Claude varsayılanı (Haiku).",
-  "claude.smallFastModelAccurateHint": "Claude Code'un sohbet özetleri ve konu tespiti gibi arka plan işleri için kullandığı model. haiku alt ajan takma adı da bunu kullanır.",
+  "claude.smallFastModelHint":
+    "Claude Code'un sohbet özetleri ve konu tespiti gibi arka plan işleri için kullandığı model. haiku alt ajan takma adı da bunu kullanır. Boş = Claude varsayılanı (Haiku).",
+  "claude.smallFastModelAccurateHint":
+    "Claude Code'un sohbet özetleri ve konu tespiti gibi arka plan işleri için kullandığı model. haiku alt ajan takma adı da bunu kullanır.",
   "claude.smallFastModelUnsetOption": "Bırakın Claude Code seçsin (yerel model)",
-  "claude.smallFastModelNativeWarning": "Ayarlanmadığında, OpenCodex yardımcı model geçersiz kılmalarını boş bırakır. Claude Code kendi yerel Sonnet modelini kullanabilir ve bu durum yerel sağlayıcınızdan ücret alınmasına yol açabilir.",
+  "claude.smallFastModelNativeWarning":
+    "Ayarlanmadığında, OpenCodex yardımcı model geçersiz kılmalarını boş bırakır. Claude Code kendi yerel Sonnet modelini kullanabilir ve bu durum yerel sağlayıcınızdan ücret alınmasına yol açabilir.",
   "claude.slotUnset": "Claude varsayılanını kullan",
   "claude.modelMap": "Model yakalama",
   "claude.modelMapHint": "Belirli bir model isteklerini yakalar ve seçtiğiniz modele yönlendirir.",
@@ -3150,7 +3631,8 @@ export const tr: Record<TKey, string> = {
   "claude.none": "Yok",
   "claude.tabsLabel": "Claude istemcisi",
   "claudeDesktop.title": "Claude Desktop",
-  "claudeDesktop.subtitle": "Claude model ailelerini {port} proxy portundaki bir modele yönlendirin.",
+  "claudeDesktop.subtitle":
+    "Claude model ailelerini {port} proxy portundaki bir modele yönlendirin.",
   "claudeDesktop.importJson": "JSON İçe Aktar",
   "claudeDesktop.exportJson": "JSON Dışa Aktar",
   "claudeDesktop.loading": "Claude Desktop profili yükleniyor…",
@@ -3218,15 +3700,18 @@ export const tr: Record<TKey, string> = {
   "claudeDesktop.defaultBadge": "Varsayılan",
   "claudeDesktop.roles.title": "Modeller",
   "claudeDesktop.roles.default": "Varsayılan model",
-  "claudeDesktop.roles.defaultDesc": "Claude Desktop listesinin başında yer alır ve Opus düzeyi olarak gönderilir.",
+  "claudeDesktop.roles.defaultDesc":
+    "Claude Desktop listesinin başında yer alır ve Opus düzeyi olarak gönderilir.",
   "claudeDesktop.roles.quick": "Hızlı görev modeli",
   "claudeDesktop.roles.quickDesc": "Claude Desktop’ın Haiku düzeyindeki isteklerini yanıtlar.",
   "claudeDesktop.roles.unset": "Ayarlanmadı",
   "claudeDesktop.roles.pick": "Bir model seçin",
   "claudeDesktop.roles.unavailableOption": "{route} (kullanılamıyor)",
-  "claudeDesktop.roles.gatewayScope": "Bu seçimler, Claude Desktop’ın model listesini yazan ağ geçidi modunda geçerlidir.",
+  "claudeDesktop.roles.gatewayScope":
+    "Bu seçimler, Claude Desktop’ın model listesini yazan ağ geçidi modunda geçerlidir.",
   "claudeDesktop.roles.listTitle": "Desktop model listesi",
-  "claudeDesktop.roles.listHint": "Claude Desktop'un listeleyeceği modelleri seçin. Yalnızca Claude Desktop değişir: diğer istemciler ve sağlayıcı ayarları modellerini korur.",
+  "claudeDesktop.roles.listHint":
+    "Claude Desktop'un listeleyeceği modelleri seçin. Yalnızca Claude Desktop değişir: diğer istemciler ve sağlayıcı ayarları modellerini korur.",
   "claudeDesktop.status.pendingApply": "Kaydedildi — Desktop'u güncellemek için uygulayın",
   "claudeDesktop.visibility.search": "Model ara",
   "claudeDesktop.visibility.provider": "Sağlayıcı",
@@ -3247,11 +3732,14 @@ export const tr: Record<TKey, string> = {
   "claudeDesktop.visibility.previewTitle": "Sonraki uygulama",
   "claudeDesktop.visibility.previewAdds": "Ekler: {models}",
   "claudeDesktop.visibility.previewRemoves": "Kaldırır: {models}",
-  "claudeDesktop.visibility.previewSame": "Profil aynı model kimliklerini içeriyor. Desktop'ı yeniden başlatmadan önce profil değişikliklerini uygulayın.",
-  "claudeDesktop.visibility.replaceNote": "Uygulamak, OpenCodex'in Claude Desktop profilindeki model listesini (elle düzenlenmiş liste dahil) değiştirir. Gelişmiş altındaki katman eşlemesi isteğe bağlıdır. Yalnızca keşif modu bu seçimi kullanmaz.",
+  "claudeDesktop.visibility.previewSame":
+    "Profil aynı model kimliklerini içeriyor. Desktop'ı yeniden başlatmadan önce profil değişikliklerini uygulayın.",
+  "claudeDesktop.visibility.replaceNote":
+    "Uygulamak, OpenCodex'in Claude Desktop profilindeki model listesini (elle düzenlenmiş liste dahil) değiştirir. Gelişmiş altındaki katman eşlemesi isteğe bağlıdır. Yalnızca keşif modu bu seçimi kullanmaz.",
   "claudeDesktop.roles.quickBadge": "Hızlı görevler",
   "claudeDesktop.advanced.title": "Gelişmiş: Claude düzeyi ataması",
-  "claudeDesktop.advanced.desc": "Claude Desktop’ın her modeli hangi Claude düzeyi (Opus, Fable, Sonnet, Haiku) olarak değerlendireceğini seçin.",
+  "claudeDesktop.advanced.desc":
+    "Claude Desktop’ın her modeli hangi Claude düzeyi (Opus, Fable, Sonnet, Haiku) olarak değerlendireceğini seçin.",
   "claudeDesktop.advanced.empty": "boş",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "Kullanılamıyor",
@@ -3269,53 +3757,79 @@ export const tr: Record<TKey, string> = {
   "claudeDesktop.status.disabled": "Claude Desktop entegrasyonu kapalı.",
   "claudeDesktop.enableApply": "Etkinleştir ve uygula",
   "claudeDesktop.switchModeApply": "Modu değiştir ve uygula",
-  "claudeDesktop.status.appliedFirstParty": "First-party: Desktop Code sekmesi yerel vekil üzerinden",
+  "claudeDesktop.status.appliedFirstParty":
+    "First-party: Desktop Code sekmesi yerel vekil üzerinden",
   "claudeDesktop.mode.legend": "Bağlantı modu",
   "claudeDesktop.mode.firstParty": "First-party",
   "claudeDesktop.mode.gateway": "Ağ geçidi (üçüncü taraf)",
   "claudeDesktop.mode.defaultBadge": "varsayılan",
   "claudeDesktop.mode.current": "geçerli",
-  "claudeDesktop.mode.firstPartyHint": "Desktop claude.ai oturumunu korur. Desktop first-party açıksa Code sekmesi OpenCodex'i kullanır; bağımsız CLI'nin ayrı bir anahtarı vardır. İkisi de aynı ayar ortamını okur.",
+  "claudeDesktop.mode.firstPartyHint":
+    "Desktop claude.ai oturumunu korur. Desktop first-party açıksa Code sekmesi OpenCodex'i kullanır; bağımsız CLI'nin ayrı bir anahtarı vardır. İkisi de aynı ayar ortamını okur.",
   "claude.intercept.start": "Yakalamayı başlat",
   "claude.intercept.starting": "Yakalama başlatılıyor…",
   "claude.intercept.reason.disabled": "Önce Claude yönlendirmesini ve yakalamayı etkinleştirin.",
-  "claude.intercept.reason.client_role": "Bu süreç bir hub istemcisidir. Yerel sunucuda yakalamayı etkinleştirin.",
-  "claude.intercept.reason.ephemeral_port": "Genel bağlantı noktası geçiciyse claudeCode.intercept.port değerini ayarlayın.",
-  "claude.intercept.reason.port_in_use": "{port} bağlantı noktası kullanımda. Boşaltın veya claudeCode.intercept.port değerini değiştirin.",
-  "claude.intercept.reason.port_mismatch": "Bu çalıştırma {bound} bağlantı noktasını kullanıyor; yapılandırılan değer {configured}. Mevcut noktayı kullanın veya yapılandırmayı geri yükleyin.",
-  "claude.intercept.reason.failed": "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
+  "claude.intercept.reason.client_role":
+    "Bu süreç bir hub istemcisidir. Yerel sunucuda yakalamayı etkinleştirin.",
+  "claude.intercept.reason.ephemeral_port":
+    "Genel bağlantı noktası geçiciyse claudeCode.intercept.port değerini ayarlayın.",
+  "claude.intercept.reason.port_in_use":
+    "{port} bağlantı noktası kullanımda. Boşaltın veya claudeCode.intercept.port değerini değiştirin.",
+  "claude.intercept.reason.port_mismatch":
+    "Bu çalıştırma {bound} bağlantı noktasını kullanıyor; yapılandırılan değer {configured}. Mevcut noktayı kullanın veya yapılandırmayı geri yükleyin.",
+  "claude.intercept.reason.failed":
+    "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
   "claude.intercept.reason.stopped": "Yakalama durdu. OpenCodex hizmetini başlatın.",
   "claude.firstParty.label": "Claude Code CLI first-party",
-  "claude.firstParty.desc": "Bağımsız claude CLI, Claude oturumunu korurken trafiğini yerel yakalama proxy'sinden geçirir.",
+  "claude.firstParty.desc":
+    "Bağımsız claude CLI, Claude oturumunu korurken trafiğini yerel yakalama proxy'sinden geçirir.",
   "claude.firstParty.aria": "Claude Code CLI first-party modunu değiştir",
-  "claude.firstParty.risk": "Hesap riski: first-party, Claude abonelik trafiğini yerel bir yakalama vekilinden geçirir. Anthropic bunu koşul ihlali sayıp hesabı askıya alabilir.",
-  "claude.firstParty.shared": "Paylaşılan vekil ayarları uygulandıysa diğer Claude istemcisi de yerel vekilden geçer ancak istekleri değiştirilmeden iletilir; TLS yerelde sonlanır. Terminalde doğrudan bağlantı için kabukta NO_PROXY='*' ayarlayın.",
-  "claude.firstParty.deadProxy": "Claude ayarları çalışmayan bir vekile işaret ediyor. OpenCodex çalışana veya Desktop/CLI first-party kapatılana kadar doğrudan claude bağlanamaz.",
-  "claude.firstParty.notApplied": "CLI first-party açık ancak vekil ayarları uygulanmamış. Doğrudan claude kullanmadan önce Claude ayarlarını kontrol edin.",
-  "claude.firstParty.brokenProxy": "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
-  "claude.firstParty.residual": "Desktop ve CLI first-party kapalı olsa da Claude ayarları hâlâ OpenCodex vekiline işaret ediyor. Kalan vekil ayarını kaldırın veya `ocx ensure` çalıştırın.",
-  "claude.firstParty.routingOff": "opencodex, geçerli yapılandırmada Claude kesmesini sunmuyor (Claude yönlendirmesi veya kesme kapalı ya da bu makine başka bir opencodex merkezinin istemcisi). Bu nedenle ayarlar, istekleri karşılamayacak bir vekile işaret ediyor. Bu makinede yeniden etkinleştirin veya ayarları kaldırmak için first-party modunu kapatın.",
+  "claude.firstParty.risk":
+    "Hesap riski: first-party, Claude abonelik trafiğini yerel bir yakalama vekilinden geçirir. Anthropic bunu koşul ihlali sayıp hesabı askıya alabilir.",
+  "claude.firstParty.shared":
+    "Paylaşılan vekil ayarları uygulandıysa diğer Claude istemcisi de yerel vekilden geçer ancak istekleri değiştirilmeden iletilir; TLS yerelde sonlanır. Terminalde doğrudan bağlantı için kabukta NO_PROXY='*' ayarlayın.",
+  "claude.firstParty.deadProxy":
+    "Claude ayarları çalışmayan bir vekile işaret ediyor. OpenCodex çalışana veya Desktop/CLI first-party kapatılana kadar doğrudan claude bağlanamaz.",
+  "claude.firstParty.notApplied":
+    "CLI first-party açık ancak vekil ayarları uygulanmamış. Doğrudan claude kullanmadan önce Claude ayarlarını kontrol edin.",
+  "claude.firstParty.brokenProxy":
+    "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
+  "claude.firstParty.residual":
+    "Desktop ve CLI first-party kapalı olsa da Claude ayarları hâlâ OpenCodex vekiline işaret ediyor. Kalan vekil ayarını kaldırın veya `ocx ensure` çalıştırın.",
+  "claude.firstParty.routingOff":
+    "opencodex, geçerli yapılandırmada Claude kesmesini sunmuyor (Claude yönlendirmesi veya kesme kapalı ya da bu makine başka bir opencodex merkezinin istemcisi). Bu nedenle ayarlar, istekleri karşılamayacak bir vekile işaret ediyor. Bu makinede yeniden etkinleştirin veya ayarları kaldırmak için first-party modunu kapatın.",
   "claude.firstParty.disabled": "Önce Claude yönlendirmesini ve yakalamayı etkinleştirin.",
-  "claude.firstParty.foreign": "~/.claude/settings.json opencodex vekiline işaret ediyor ancak opencodex tarafından yönetilmeyen bir sertifikaya güveniyor; istekler başarısız olur. HTTPS_PROXY / NODE_EXTRA_CA_CERTS değerlerini elle düzeltin.",
-  "claude.firstParty.local": "~/.claude/settings.json, Claude Code trafiğini 127.0.0.1 üzerindeki yerel bir vekile gönderiyor; opencodex bu vekilin kendisine ait olduğunu doğrulayamıyor. Artık kullanmıyorsanız HTTPS_PROXY değerini bu dosyadan kaldırın.",
-  "claude.firstParty.unknown": "opencodex, ~/.claude/settings.json dosyasının hâlâ kendi vekiline işaret edip etmediğini belirleyemedi.",
+  "claude.firstParty.foreign":
+    "~/.claude/settings.json opencodex vekiline işaret ediyor ancak opencodex tarafından yönetilmeyen bir sertifikaya güveniyor; istekler başarısız olur. HTTPS_PROXY / NODE_EXTRA_CA_CERTS değerlerini elle düzeltin.",
+  "claude.firstParty.local":
+    "~/.claude/settings.json, Claude Code trafiğini 127.0.0.1 üzerindeki yerel bir vekile gönderiyor; opencodex bu vekilin kendisine ait olduğunu doğrulayamıyor. Artık kullanmıyorsanız HTTPS_PROXY değerini bu dosyadan kaldırın.",
+  "claude.firstParty.unknown":
+    "opencodex, ~/.claude/settings.json dosyasının hâlâ kendi vekiline işaret edip etmediğini belirleyemedi.",
   "claude.firstParty.refusal.interceptDisabled": "Yakalama vekili kapalı.",
-  "claude.firstParty.refusal.interceptUnavailable": "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
+  "claude.firstParty.refusal.interceptUnavailable":
+    "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin.",
   "claude.firstParty.refusal.foreignEnv": "Claude vekil ayarları başka bir programa ait.",
   "claude.firstParty.refusal.caUnavailable": "Yerel sertifika yetkilisi kullanılamıyor.",
   "claude.firstParty.refusal.unreadable": "Claude ayarları okunamadı.",
   "claude.firstParty.refusal.writeFailed": "Claude ayarları yazılamadı.",
-  "claudeDesktop.mode.firstPartyRisk": "Hesap riski: First-party modu, Claude abonelik trafiğinizi yerel bir trafik yakalama proxy'si üzerinden geçirir. Anthropic bunu kullanım koşullarının ihlali sayıp hesabı askıya alabilir. Ağ geçidi varsayılan moddur.",
-  "claudeDesktop.mode.gatewayHint": "Uygulamanın tamamı OpenCodex'i ağ geçidi olarak kullanır. Sohbet yerelde çalışır; claude.ai özellikleri kullanılamaz.",
-  "claudeDesktop.mode.switchNote": "Geçiş diğer modun yapılandırmasını kaldırır. Ardından Desktop'ı tamamen kapatıp yeniden açın.",
+  "claudeDesktop.mode.firstPartyRisk":
+    "Hesap riski: First-party modu, Claude abonelik trafiğinizi yerel bir trafik yakalama proxy'si üzerinden geçirir. Anthropic bunu kullanım koşullarının ihlali sayıp hesabı askıya alabilir. Ağ geçidi varsayılan moddur.",
+  "claudeDesktop.mode.gatewayHint":
+    "Uygulamanın tamamı OpenCodex'i ağ geçidi olarak kullanır. Sohbet yerelde çalışır; claude.ai özellikleri kullanılamaz.",
+  "claudeDesktop.mode.switchNote":
+    "Geçiş diğer modun yapılandırmasını kaldırır. Ardından Desktop'ı tamamen kapatıp yeniden açın.",
   "claudeDesktop.firstParty.proxyRunning": "Yerel proxy 127.0.0.1:{port}",
-  "claudeDesktop.firstParty.proxyStopped": "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin. ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "Yakalama proxy'si yapılandırmada kapalı (claudeCode.intercept.enabled)",
+  "claudeDesktop.firstParty.proxyStopped":
+    "Yakalama başlatılamadı. Yerel proxy yapılandırmasını kontrol edip tekrar deneyin. ({port})",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "Yakalama proxy'si yapılandırmada kapalı (claudeCode.intercept.enabled)",
   "claudeDesktop.picker.title": "Claude Desktop seçici",
-  "claudeDesktop.picker.hint": "OpenCodex modellerini özel yerel proxy üzerinden Desktop Code sekmesi seçicisinde gösterin.",
+  "claudeDesktop.picker.hint":
+    "OpenCodex modellerini özel yerel proxy üzerinden Desktop Code sekmesi seçicisinde gösterin.",
   "claudeDesktop.picker.toggle": "Claude Desktop seçiciyi etkinleştir",
   "claudeDesktop.picker.state.active": "Seçici etkin",
-  "claudeDesktop.picker.state.restart": "Seçici profilini uygulamak için Claude Desktop’tan tamamen çıkıp yeniden açın.",
+  "claudeDesktop.picker.state.restart":
+    "Seçici profilini uygulamak için Claude Desktop’tan tamamen çıkıp yeniden açın.",
   "claudeDesktop.picker.state.trustPending": "Sertifika güven adımı bekleniyor",
   "claudeDesktop.picker.state.trustDeclined": "Sertifika güveni reddedildi",
   "claudeDesktop.picker.state.proxyUnavailable": "Seçici proxy’si çalışmıyor",
@@ -3323,10 +3837,13 @@ export const tr: Record<TKey, string> = {
   "claudeDesktop.picker.state.notFirstParty": "Seçici yalnızca first-party modunda kullanılabilir",
   "claudeDesktop.picker.state.profileFailed": "Seçici profili uygulanamadı",
   "claudeDesktop.picker.models": "Seçicide {count} model kullanılabilir",
-  "claudeDesktop.picker.offlineNote": "Seçici açıkken Claude Desktop ağa OpenCodex üzerinden erişir. OpenCodex durursa Desktop yeniden başlatılana veya seçici kapatılana kadar çevrimdışı kalır.",
+  "claudeDesktop.picker.offlineNote":
+    "Seçici açıkken Claude Desktop ağa OpenCodex üzerinden erişir. OpenCodex durursa Desktop yeniden başlatılana veya seçici kapatılana kadar çevrimdışı kalır.",
   "claudeDesktop.firstParty.bindings.title": "Code sekmesi model bağlantıları",
-  "claudeDesktop.firstParty.bindings.hint": "Claude Desktop, Code sekmesi seçicisinde Anthropic'in adlarını korur. Bir seçici modelini OpenCodex modeline bağladığınızda o seçici girdisine gelen istekler bağlı model tarafından sunulur. Bu bağlantıları yalnızca yerel proxy üzerinden geçen Claude Code trafiği (Desktop Code sekmesi ve claude CLI'si) kullanır; ocx claude etkilenmez. Bağlantılar sonraki istekte geçerli olur — tamamen kapatıp yeniden açmak gerekmez.",
-  "claudeDesktop.firstParty.bindings.empty": "Henüz bağlantı yok — seçici modelleri varsayılan rotayı izler.",
+  "claudeDesktop.firstParty.bindings.hint":
+    "Claude Desktop, Code sekmesi seçicisinde Anthropic'in adlarını korur. Bir seçici modelini OpenCodex modeline bağladığınızda o seçici girdisine gelen istekler bağlı model tarafından sunulur. Bu bağlantıları yalnızca yerel proxy üzerinden geçen Claude Code trafiği (Desktop Code sekmesi ve claude CLI'si) kullanır; ocx claude etkilenmez. Bağlantılar sonraki istekte geçerli olur — tamamen kapatıp yeniden açmak gerekmez.",
+  "claudeDesktop.firstParty.bindings.empty":
+    "Henüz bağlantı yok — seçici modelleri varsayılan rotayı izler.",
   "claudeDesktop.firstParty.bindings.pickerLabel": "Seçici model kimliği",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
   "claudeDesktop.firstParty.bindings.routeLabel": "OpenCodex modeli",
@@ -3345,13 +3862,25 @@ export const tr: Record<TKey, string> = {
   "dash.visionTimeoutInvalid": "{min} ile {max} milisaniye arasında bir tam sayı girin.",
   "dash.visionAdvancedPopover": "Gelişmiş görsel ayarları",
   "dash.codexDesktopAuthless": "Codex’i oturum açmadan başlat",
-  "dash.codexDesktopAuthlessHint": "Varsayılan olarak kapalıdır. Uygun yerel bağlantılarda ayrı Desktop oturum açma adımını atlar. Sağlayıcı kimlik bilgileri yine gereklidir. Değişiklikten sonra Codex’i yeniden başlatın. Hesaba bağlı Desktop özellikleri kullanılamayabilir.",
+  "dash.codexDesktopAuthlessHint":
+    "Varsayılan olarak kapalıdır. Uygun yerel bağlantılarda ayrı Desktop oturum açma adımını atlar. Sağlayıcı kimlik bilgileri yine gereklidir. Değişiklikten sonra Codex’i yeniden başlatın. Hesaba bağlı Desktop özellikleri kullanılamayabilir.",
   "dash.codexClientCompaction": "İstemci tarafı sıkıştırmayı kullan",
-  "dash.codexClientCompactionHint": "Varsayılan olarak kapalıdır ve yalnızca kimliği doğrulanmış geri döngü yönlendirmesinde geçerlidir. Gelecekteki sıkıştırmalar, OpenCodeX ve V2 sağlayıcı yönlendirmesi etkin kalırken taşınabilir düz metin özetleri kaydeder; yapılandırılmış sağlayıcı bunları işleyip kotasını tüketebilir. Mevcut ocx1 geçmişi yine ayrıca kurtarılmalıdır. Değişiklikten sonra Codex’i yeniden başlatın.",
-  "dash.codexRemoteHistoryHint": "Sağlayıcı tablosuyla yönlendirme, mevcut openai etiketli konuşmaları bazı mobil uzak listelerde gizleyebilir. Geçmiş silinmez. Uzak istemci tüm sağlayıcıları listelemelidir; bu anahtar istemcinin filtresini düzeltmez.",
-  "models.newPolicyGlobal": "Yeni modeller devre dışı başlasın", "models.newPolicyProvider": "Yeni model ilkesi",
-  "models.fastProvider": "Fast modu", "models.fastProviderHint": "Kullanım kredilerini 2 kat fiyatla harcar", "models.fastEnabled": "Fast modu açık", "models.fastDisabled": "Fast modu kapalı", "models.fastSaveFailed": "Fast modu kaydedilemedi",
-  "models.newPolicy_inherit": "Devral", "models.newPolicy_off": "Kapalı", "models.newPolicy_on": "Açık", "models.newBadge": "YENİ", "models.newCount": "{count} yeni, kapalı",
+  "dash.codexClientCompactionHint":
+    "Varsayılan olarak kapalıdır ve yalnızca kimliği doğrulanmış geri döngü yönlendirmesinde geçerlidir. Gelecekteki sıkıştırmalar, OpenCodeX ve V2 sağlayıcı yönlendirmesi etkin kalırken taşınabilir düz metin özetleri kaydeder; yapılandırılmış sağlayıcı bunları işleyip kotasını tüketebilir. Mevcut ocx1 geçmişi yine ayrıca kurtarılmalıdır. Değişiklikten sonra Codex’i yeniden başlatın.",
+  "dash.codexRemoteHistoryHint":
+    "Sağlayıcı tablosuyla yönlendirme, mevcut openai etiketli konuşmaları bazı mobil uzak listelerde gizleyebilir. Geçmiş silinmez. Uzak istemci tüm sağlayıcıları listelemelidir; bu anahtar istemcinin filtresini düzeltmez.",
+  "models.newPolicyGlobal": "Yeni modeller devre dışı başlasın",
+  "models.newPolicyProvider": "Yeni model ilkesi",
+  "models.fastProvider": "Fast modu",
+  "models.fastProviderHint": "Kullanım kredilerini 2 kat fiyatla harcar",
+  "models.fastEnabled": "Fast modu açık",
+  "models.fastDisabled": "Fast modu kapalı",
+  "models.fastSaveFailed": "Fast modu kaydedilemedi",
+  "models.newPolicy_inherit": "Devral",
+  "models.newPolicy_off": "Kapalı",
+  "models.newPolicy_on": "Açık",
+  "models.newBadge": "YENİ",
+  "models.newCount": "{count} yeni, kapalı",
   "models.aliases": "Takma adlar",
   "models.aliasesTable": "Takma ad tablosu",
   "models.aliasPrompt": "Sağlayıcı takma adı (temizlemek için boş bırakın)",
@@ -3365,21 +3894,28 @@ export const tr: Record<TKey, string> = {
   "models.aliasAuto": "otomatik",
   "models.aliasUser": "kullanıcı",
   "models.aliasStale": "eski",
-  "connection.pairing.notApiKey": "Buraya tek kullanımlık eşleştirme kodunu yapıştırın. Veri API anahtarları ve yönetici belirteçleri bu alana girilmez.",
-  "connection.pairing.networkError": "OpenCodex’e erişilemedi. Çalıştığından emin olup tekrar deneyin.",
+  "connection.pairing.notApiKey":
+    "Buraya tek kullanımlık eşleştirme kodunu yapıştırın. Veri API anahtarları ve yönetici belirteçleri bu alana girilmez.",
+  "connection.pairing.networkError":
+    "OpenCodex’e erişilemedi. Çalıştığından emin olup tekrar deneyin.",
   "connection.pairing.requestError": "OpenCodex eşleştirmeyi tamamlayamadı. Tekrar deneyin.",
-  "connection.pairing.responseError": "OpenCodex geçersiz bir eşleştirme yanıtı döndürdü. Tekrar deneyin.",
+  "connection.pairing.responseError":
+    "OpenCodex geçersiz bir eşleştirme yanıtı döndürdü. Tekrar deneyin.",
   "dash.authRequired": "Bu panoyu görüntülemek için tarayıcı kimlik doğrulaması gerekiyor.",
-  "dash.permissionDenied": "Bu tarayıcının panoyu okuma izni yok. Erişim ayarlarını sunucu yöneticisiyle kontrol edin.",
+  "dash.permissionDenied":
+    "Bu tarayıcının panoyu okuma izni yok. Erişim ayarlarını sunucu yöneticisiyle kontrol edin.",
   "dash.dataUnavailable": "Pano verileri yüklenemedi. Bağlantıyı kontrol edip yeniden deneyin.",
   "dash.staleData": "Son alınan veriler gösteriliyor; güncel olmayabilir.",
   "connection.pairing.code": "Tek kullanımlık eşleştirme kodu",
   "connection.pairing.retryValidation": "Doğrulamayı yeniden dene",
-  "connection.pairing.validationPending": "Kod kullanıldı ancak oturum doğrulaması tamamlanamadı. Bu sayfayı açık tutup Doğrulamayı yeniden dene seçeneğini kullanın; yeni kod gerekmez.",
+  "connection.pairing.validationPending":
+    "Kod kullanıldı ancak oturum doğrulaması tamamlanamadı. Bu sayfayı açık tutup Doğrulamayı yeniden dene seçeneğini kullanın; yeni kod gerekmez.",
   "connection.pairing.submit": "Bağlan",
   "connection.pairing.submitting": "Bağlanıyor…",
-  "connection.pairing.error": "Eşleştirme kodu reddedildi. Bu tarayıcı adresi için yeni kod almak üzere komutu tekrar çalıştırın.",
-  "connection.pairing.originDenied": "Panoyu yapılandırılmış geri döngü adresinde açıp yeni bir kod isteyin.",
+  "connection.pairing.error":
+    "Eşleştirme kodu reddedildi. Bu tarayıcı adresi için yeni kod almak üzere komutu tekrar çalıştırın.",
+  "connection.pairing.originDenied":
+    "Panoyu yapılandırılmış geri döngü adresinde açıp yeni bir kod isteyin.",
   "connection.sessionLogout": "Uzak oturumdan çık",
   "connection.sessionLoggingOut": "Uzak oturumdan çıkılıyor…",
   "connection.sessionLogoutFailed": "Uzak oturumdan çıkılamadı. Mevcut oturum korundu.",
@@ -3389,7 +3925,8 @@ export const tr: Record<TKey, string> = {
   "integrations.detail.cursorNeverSeen": "Private Inference yüklü; henüz istek alınmadı",
   "integrations.detail.cursorAbsent": "Cursor Private Inference bulunamadı",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "Cursor Private Inference, aracısını yerel olarak çalıştırır ve geri döngü üzerinden opencodex ile iletişim kurar. Normal Cursor bunu yapamaz: arka ucu özel uç noktayı çağırır ve herkese açık bir HTTPS URL'sine ihtiyaç duyar. Bu sayfa Cursor'a hiçbir zaman yazmaz; aşağıdaki değerleri Cursor'a kendiniz yapıştırın.",
+  "integrations.cursor.intro":
+    "Cursor Private Inference, aracısını yerel olarak çalıştırır ve geri döngü üzerinden opencodex ile iletişim kurar. Normal Cursor bunu yapamaz: arka ucu özel uç noktayı çağırır ve herkese açık bir HTTPS URL'sine ihtiyaç duyar. Bu sayfa Cursor'a hiçbir zaman yazmaz; aşağıdaki değerleri Cursor'a kendiniz yapıştırın.",
   "integrations.cursor.loading": "Cursor durumu okunuyor…",
   "integrations.cursor.unavailable": "Cursor durumu proxy'den okunamadı.",
   "integrations.cursor.detection": "Yüklü derlemeler",
@@ -3397,36 +3934,48 @@ export const tr: Record<TKey, string> = {
   "integrations.cursor.regular": "Cursor (normal)",
   "integrations.cursor.detected": "Algılandı",
   "integrations.cursor.notFound": "Bulunamadı",
-  "integrations.cursor.regularOnly": "Yalnızca normal Cursor bulundu. Özel uç noktaları Cursor sunucuları üzerinden yönlendirdiği için geri döngü proxy'sine herkese açık bir tünel olmadan erişilemez. Private Inference derlemesi için kılavuza bakın.",
-  "integrations.cursor.nothingFound": "Olağan konumlarda Cursor kurulumu bulunamadı. Başka bir yere yüklenmişse aşağıdaki değerler yine de geçerlidir.",
+  "integrations.cursor.regularOnly":
+    "Yalnızca normal Cursor bulundu. Özel uç noktaları Cursor sunucuları üzerinden yönlendirdiği için geri döngü proxy'sine herkese açık bir tünel olmadan erişilemez. Private Inference derlemesi için kılavuza bakın.",
+  "integrations.cursor.nothingFound":
+    "Olağan konumlarda Cursor kurulumu bulunamadı. Başka bir yere yüklenmişse aşağıdaki değerler yine de geçerlidir.",
   "integrations.cursor.gateway": "Ağ geçidi değerleri",
-  "integrations.cursor.gatewayHint": "Cursor Private Inference'da Settings > Models > Gateway bölümünü açın, bu iki değeri yapıştırın ve ardından Refresh model list düğmesine basın.",
+  "integrations.cursor.gatewayHint":
+    "Cursor Private Inference'da Settings > Models > Gateway bölümünü açın, bu iki değeri yapıştırın ve ardından Refresh model list düğmesine basın.",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "API Key",
-  "integrations.cursor.apiKeyCredential": "opencodex API anahtarlarınızdan biri (bu bağlantı için kimlik bilgisi gerekir)",
+  "integrations.cursor.apiKeyCredential":
+    "opencodex API anahtarlarınızdan biri (bu bağlantı için kimlik bilgisi gerekir)",
   "integrations.cursor.copy": "Kopyala",
   "integrations.cursor.copied": "Kopyalandı",
   "integrations.cursor.connection": "Bağlantı",
   "integrations.cursor.seen": "Cursor'dan gelen son istek: {time} ({ua})",
-  "integrations.cursor.neverSeen": "Proxy başlatıldığından beri Cursor'dan istek alınmadı. Ağ geçidini kaydettikten sonra Cursor'da Refresh model list düğmesine basın.",
+  "integrations.cursor.neverSeen":
+    "Proxy başlatıldığından beri Cursor'dan istek alınmadı. Ağ geçidini kaydettikten sonra Cursor'da Refresh model list düğmesine basın.",
   "integrations.cursor.models": "Cursor'da gösterilecekler",
-  "integrations.cursor.modelsHint": "Cursor, akıl yürütme kademesini kendi model tablosundan seçtiği için opencodex bunu yalnızca tahmin edebilir. Bağlam sütunu varsayılan pencereyi ve isteğe bağlı pencereyi (Cursor'ın Max Mode'u) listeler.",
-  "integrations.cursor.ladderFromBundle": "Akıl yürütme kademeleri yüklü Cursor Private Inference {version} paketinden okundu. Bunlara Cursor karar verir; opencodex yalnızca tablosunu gösterir.",
-  "integrations.cursor.ladderFromStatic": "Akıl yürütme kademeleri Cursor 3.18.25'in statik bir kopyasıdır (okunabilir bir Private Inference paketi bulunamadı). Bağlam sütunu varsayılan ve isteğe bağlı pencereyi gösterir.",
+  "integrations.cursor.modelsHint":
+    "Cursor, akıl yürütme kademesini kendi model tablosundan seçtiği için opencodex bunu yalnızca tahmin edebilir. Bağlam sütunu varsayılan pencereyi ve isteğe bağlı pencereyi (Cursor'ın Max Mode'u) listeler.",
+  "integrations.cursor.ladderFromBundle":
+    "Akıl yürütme kademeleri yüklü Cursor Private Inference {version} paketinden okundu. Bunlara Cursor karar verir; opencodex yalnızca tablosunu gösterir.",
+  "integrations.cursor.ladderFromStatic":
+    "Akıl yürütme kademeleri Cursor 3.18.25'in statik bir kopyasıdır (okunabilir bir Private Inference paketi bulunamadı). Bağlam sütunu varsayılan ve isteğe bağlı pencereyi gösterir.",
   "integrations.cursor.unknownVersion": "bilinmeyen sürüm",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "tek pencere",
-  "integrations.cursor.noControlTitle": "Bu kimlik Cursor'ın yerleşik çaba tablosunda yok, bu yüzden Cursor akıl yürütme denetimi göstermez.",
+  "integrations.cursor.noControlTitle":
+    "Bu kimlik Cursor'ın yerleşik çaba tablosunda yok, bu yüzden Cursor akıl yürütme denetimi göstermez.",
   "integrations.cursor.effortRowsOne": "1 çaba satırı yayımlandı",
   "integrations.cursor.effortRowsMany": "{n} çaba satırı yayımlandı",
   "integrations.cursor.effortRowsOff": "çaba satırı yok",
-  "integrations.cursor.tableLessHint": "— ile işaretli satırlar Cursor'da akıl yürütme denetimi almaz. Her çaba için bir seçici girdisi (id--effort) yayımlamak üzere cursorEffortRows'u açın veya sabit bir varsayılan için sağlayıcıda modelDefaultReasoningEfforts ayarlayın.",
+  "integrations.cursor.tableLessHint":
+    "— ile işaretli satırlar Cursor'da akıl yürütme denetimi almaz. Her çaba için bir seçici girdisi (id--effort) yayımlamak üzere cursorEffortRows'u açın veya sabit bir varsayılan için sağlayıcıda modelDefaultReasoningEfforts ayarlayın.",
   "integrations.cursor.colModel": "Model",
   "integrations.cursor.colReasoning": "Akıl yürütme",
   "integrations.cursor.colContext": "Bağlam",
   "integrations.cursor.guide": "Cursor Private Inference kılavuzunu aç",
-  "models.displayNameSavedRefreshFailed": "Değişiklik kaydedildi ancak model listesi yenilenemedi. Yenilemek için tekrar deneyin.",
-  "models.displayNameOutcomeUnknown": "İstek tamamlanmadı. Değişiklik kaydedilmiş olabilir. Başka bir değişiklik yapmadan önce geçerli adı kontrol etmek için tekrar deneyin.",
+  "models.displayNameSavedRefreshFailed":
+    "Değişiklik kaydedildi ancak model listesi yenilenemedi. Yenilemek için tekrar deneyin.",
+  "models.displayNameOutcomeUnknown":
+    "İstek tamamlanmadı. Değişiklik kaydedilmiş olabilir. Başka bir değişiklik yapmadan önce geçerli adı kontrol etmek için tekrar deneyin.",
   "models.displayNameCurrentUnavailable": "Geçerli ad yenilemeye kadar kullanılamıyor",
   "models.displayNameReloaded": "Model listesi yenilendi",
   "models.displayNameAction": "Ad",
@@ -3454,8 +4003,10 @@ export const tr: Record<TKey, string> = {
   "pricing.override.title": "Model fiyatı",
   "pricing.override.modelId": "Model kimliği",
   "pricing.override.promptTitle": "Uzun istem fiyatlandırması",
-  "pricing.override.promptHelp": "İsteğin girdi ve önbellek okuma ve yazma token'ları aralığı belirler; isteğin tamamı o aralığın fiyatıyla hesaplanır. Çıktı token'ları sayılmaz. Fiyatlar standart hız içindir.",
-  "pricing.override.help": "1 milyon token başına USD. Giriş ve çıkış ücretlerini girin; boş önbellek ücretleri 0 sayılır. 0 ücretlere izin verilir.",
+  "pricing.override.promptHelp":
+    "İsteğin girdi ve önbellek okuma ve yazma token'ları aralığı belirler; isteğin tamamı o aralığın fiyatıyla hesaplanır. Çıktı token'ları sayılmaz. Fiyatlar standart hız içindir.",
+  "pricing.override.help":
+    "1 milyon token başına USD. Giriş ve çıkış ücretlerini girin; boş önbellek ücretleri 0 sayılır. 0 ücretlere izin verilir.",
   "pricing.override.input": "Giriş",
   "pricing.override.output": "Çıkış",
   "pricing.override.cacheRead": "Önbellek okuma",
@@ -3464,23 +4015,33 @@ export const tr: Record<TKey, string> = {
   "pricing.override.modeFlat": "Sabit ücret",
   "pricing.override.modeCustom": "Özel eşik",
 
-  "pricing.override.modeAutomaticHelp": "Yukarıdaki temel ücretlerle katalogdaki istem uzunluğu kurallarını kullanır. Fast ve Priority ayarlamaları uygulanmaya devam eder.",
-  "pricing.override.modeFlatHelp": "İstem uzunluğundan bağımsız olarak yukarıdaki temel ücretleri kullanır ve katalogdaki istem uzunluğu kurallarını devre dışı bırakır. Fast ve Priority ayarlamaları uygulanmaya devam eder.",
+  "pricing.override.modeAutomaticHelp":
+    "Yukarıdaki temel ücretlerle katalogdaki istem uzunluğu kurallarını kullanır. Fast ve Priority ayarlamaları uygulanmaya devam eder.",
+  "pricing.override.modeFlatHelp":
+    "İstem uzunluğundan bağımsız olarak yukarıdaki temel ücretleri kullanır ve katalogdaki istem uzunluğu kurallarını devre dışı bırakır. Fast ve Priority ayarlamaları uygulanmaya devam eder.",
   "pricing.override.threshold": "İstem eşiği (token)",
   "pricing.override.bandTitle": "Uzun istem aralığındaki fiyatlar",
-  "pricing.override.bandHelp": "Bunlar standart hız fiyatlarıdır. Katalogdaki Fast ve Priority kuralları geçerliliğini korur. Maliyetler tahminidir.",
+  "pricing.override.bandHelp":
+    "Bunlar standart hız fiyatlarıdır. Katalogdaki Fast ve Priority kuralları geçerliliğini korur. Maliyetler tahminidir.",
   "pricing.override.comparison": "Eşik karşılaştırması",
   "pricing.override.comparisonGt": "Büyüktür (>)",
   "pricing.override.comparisonGte": "Büyük veya eşittir (≥)",
-  "pricing.override.modeCustomHelp": "1 milyon token başına dört mutlak ücret girin. İstem uzunluğu önbelleğe alınmış girdiyi içerir ve çıktıyı içermez. Bu ücretler, tüm istek için katalogdaki istem uzunluğu kuralının yerini alır. Fast ve Priority ayarlamaları uygulanmaya devam eder. Maliyetler tahminidir.",
-  "pricing.override.customInvalid": "Pozitif ve güvenli bir tam sayı token eşiği ile 0–1.000.000 arasında dört sonlu ücret girin. Ücretler 0 olabilir.",
+  "pricing.override.modeCustomHelp":
+    "1 milyon token başına dört mutlak ücret girin. İstem uzunluğu önbelleğe alınmış girdiyi içerir ve çıktıyı içermez. Bu ücretler, tüm istek için katalogdaki istem uzunluğu kuralının yerini alır. Fast ve Priority ayarlamaları uygulanmaya devam eder. Maliyetler tahminidir.",
+  "pricing.override.customInvalid":
+    "Pozitif ve güvenli bir tam sayı token eşiği ile 0–1.000.000 arasında dört sonlu ücret girin. Ücretler 0 olabilir.",
   "pricing.override.loading": "Kayıtlı fiyat yükleniyor…",
   "pricing.override.loadFailed": "Kayıtlı fiyat yüklenemedi. Yeniden yükleyin.",
-  "pricing.override.outcomeUnknown": "İsteğin sonucu doğrulanamadı. Fiyat değişmiş olabilir. Yeniden düzenlemeden önce kayıtlı fiyatı yükleyin.",
-  "pricing.override.recoveryFailed": "Kayıtlı fiyat alınamadı. Düzenleme kilitli kalır; yeniden yükleyin.",
-  "pricing.override.recovered": "Güncel kayıtlı fiyat yüklendi. Önceki istek veya başka bir istemci fiyatı hâlâ değiştirebilir.",
-  "pricing.override.refreshFailed": "Fiyat kaydedildi ancak model listesi yenilenemedi. Listeyi yeniden yenileyin.",
-  "pricing.override.invalid": "Giriş ve çıkış ücretlerini girin. Her ücret 0 ile 1.000.000 arasında sonlu bir sayı olmalıdır.",
+  "pricing.override.outcomeUnknown":
+    "İsteğin sonucu doğrulanamadı. Fiyat değişmiş olabilir. Yeniden düzenlemeden önce kayıtlı fiyatı yükleyin.",
+  "pricing.override.recoveryFailed":
+    "Kayıtlı fiyat alınamadı. Düzenleme kilitli kalır; yeniden yükleyin.",
+  "pricing.override.recovered":
+    "Güncel kayıtlı fiyat yüklendi. Önceki istek veya başka bir istemci fiyatı hâlâ değiştirebilir.",
+  "pricing.override.refreshFailed":
+    "Fiyat kaydedildi ancak model listesi yenilenemedi. Listeyi yeniden yenileyin.",
+  "pricing.override.invalid":
+    "Giriş ve çıkış ücretlerini girin. Her ücret 0 ile 1.000.000 arasında sonlu bir sayı olmalıdır.",
   "pricing.override.reset": "Otomatik fiyata dön",
   "pricing.override.save": "Kaydet",
   "pricing.override.saving": "Kaydediliyor…",
@@ -3498,12 +4059,18 @@ export const tr: Record<TKey, string> = {
   "usage.range.invalid": "1970-01-01 UTC veya sonrasına ait geçerli yerel tarih ve saat girin.",
   "usage.range.reversed": "Bitiş, başlangıçla aynı veya daha sonra olmalıdır.",
   "usage.range.applied": "Seçilen aralık: {start} – {end} (iki sınır da dahil).",
-  "models.pickerOrder.editorHint": "Yönlendirilen modelleri sıralayıp taslağı kaydedin. Öne çıkan satırlar sabittir; yerel modeller gösterilmez.",
-  "models.pickerOrder.nativeLocked": "Kayıtlı sıra yerel modeller içeriyor. Özel sırayı düzenlemeden önce yönlendirme ön ayarını veya Varsayılan seçeneğini uygulayın.",
-  "models.pickerOrder.unknownChosen": "Öne çıkan modeller bilinmiyor. Düzenlemeden önce yeniden yükleyin.",
-  "models.pickerOrder.changed": "Seçici ayarları değişti. Taslağınız korunuyor; yeniden yüklemek taslağı siler ve güncel ayarları kullanır.",
-  "models.pickerOrder.savedReload": "Sıra kaydedildi. Yeniden düzenlemeden önce güncel ayarları yükleyin.",
-  "models.pickerOrder.requestFailed": "İstek başarısız. Taslağınız korunuyor; tekrar deneyin veya yeniden yükleyin.",
+  "models.pickerOrder.editorHint":
+    "Yönlendirilen modelleri sıralayıp taslağı kaydedin. Öne çıkan satırlar sabittir; yerel modeller gösterilmez.",
+  "models.pickerOrder.nativeLocked":
+    "Kayıtlı sıra yerel modeller içeriyor. Özel sırayı düzenlemeden önce yönlendirme ön ayarını veya Varsayılan seçeneğini uygulayın.",
+  "models.pickerOrder.unknownChosen":
+    "Öne çıkan modeller bilinmiyor. Düzenlemeden önce yeniden yükleyin.",
+  "models.pickerOrder.changed":
+    "Seçici ayarları değişti. Taslağınız korunuyor; yeniden yüklemek taslağı siler ve güncel ayarları kullanır.",
+  "models.pickerOrder.savedReload":
+    "Sıra kaydedildi. Yeniden düzenlemeden önce güncel ayarları yükleyin.",
+  "models.pickerOrder.requestFailed":
+    "İstek başarısız. Taslağınız korunuyor; tekrar deneyin veya yeniden yükleyin.",
   "models.pickerOrder.empty": "Kullanılabilir yönlendirilen model yok.",
   "models.pickerOrder.dragModel": "{model} modelini sürükle",
   "models.pickerOrder.featured": "Öne çıkan",
@@ -3512,7 +4079,8 @@ export const tr: Record<TKey, string> = {
   "models.pickerOrder.position": "{model}: {total} içinde {position}. sıra",
   "models.pickerOrder.saveDraft": "Taslağı kaydet",
   "models.pickerOrder.reloadDraft": "Yeniden yükle ve taslağı sil",
-  "models.pickerOrder.catalogRequired": "Model kimlikleri eksik veya belirsiz. Özel sırayı düzenlemeden önce kataloğu yenilemek için Modeller sayfasını yeniden yükleyin.",
+  "models.pickerOrder.catalogRequired":
+    "Model kimlikleri eksik veya belirsiz. Özel sırayı düzenlemeden önce kataloğu yenilemek için Modeller sayfasını yeniden yükleyin.",
   "quotaSummary.aria": "Sağlayıcı kota özeti",
   "quotaSummary.updated": "{time} güncellendi",
   "quotaSummary.dataAt": "{time} verisi",
@@ -3525,7 +4093,8 @@ export const tr: Record<TKey, string> = {
   "quotaSummary.scrollNext": "Sağlayıcıları sağa kaydır",
   "quotaSummary.openAccounts": "Hesap yönetimini aç",
   "pws.protocol.title": "Yukarı akış protokolü",
-  "pws.protocol.note": "opencodex'in bu sağlayıcıyla konuştuğu API biçimi. Hiçbir istemci API'sini açıp kapatmaz; bunlar API sayfasından yönetilir.",
+  "pws.protocol.note":
+    "opencodex'in bu sağlayıcıyla konuştuğu API biçimi. Hiçbir istemci API'sini açıp kapatmaz; bunlar API sayfasından yönetilir.",
   "pws.protocol.adapterLabel": "Bu sağlayıcının aldığı yukarı akış protokolü",
   "pws.protocol.source": "Belirleyen",
   "pws.protocol.source.hardPin": "opencodex bu model için sabitledi",
@@ -3545,17 +4114,22 @@ export const tr: Record<TKey, string> = {
   "compatProtocol.anyProtocol": "herhangi",
   "compatProtocol.pair": "{inbound} → {upstream}",
   "compatProtocol.loading": "Her öznenin protokol çifti okunuyor…",
-  "compatProtocol.unverified": "{pair} için henüz Lab kanıtı yok. Bu çift başarısız değil, doğrulanmamış.",
-  "compatProtocol.unresolved": "{count} öznenin protokol çifti okunamadı; bu filtrenin dışında bırakıldılar.",
-  "compatProtocol.axisNote": "Bunlar yalnızca Lab kararlarıdır. Bir isteğin nasıl iletildiği (yerel ya da çevrilmiş) API sayfasındaki istek yolu önizlemesinde gösterilir.",
+  "compatProtocol.unverified":
+    "{pair} için henüz Lab kanıtı yok. Bu çift başarısız değil, doğrulanmamış.",
+  "compatProtocol.unresolved":
+    "{count} öznenin protokol çifti okunamadı; bu filtrenin dışında bırakıldılar.",
+  "compatProtocol.axisNote":
+    "Bunlar yalnızca Lab kararlarıdır. Bir isteğin nasıl iletildiği (yerel ya da çevrilmiş) API sayfasındaki istek yolu önizlemesinde gösterilir.",
   "protocolLinks.providerSettings": "Sağlayıcı ayarları",
   "fallback.title": "Yedek",
-  "fallback.desc": "Bir model veya sağlayıcı başarısız olduğunda OpenCodex isteği bir kombodaki, yönlendirme profilindeki veya alt ajan zincirindeki sonraki hedefe gönderebilir. Bunun yerine açık bir hata almak için bir türü kapatın.",
+  "fallback.desc":
+    "Bir model veya sağlayıcı başarısız olduğunda OpenCodex isteği bir kombodaki, yönlendirme profilindeki veya alt ajan zincirindeki sonraki hedefe gönderebilir. Bunun yerine açık bir hata almak için bir türü kapatın.",
   "fallback.model": "Model yedeği",
   "fallback.modelHint": "Aynı sağlayıcının başka bir modeli",
   "fallback.provider": "Sağlayıcı yedeği",
   "fallback.providerHint": "Başka bir sağlayıcı",
-  "fallback.rotationNote": "Bir sağlayıcının hesapları veya anahtarları arasında geçiş yedek sayılmaz ve açık kalır.",
+  "fallback.rotationNote":
+    "Bir sağlayıcının hesapları veya anahtarları arasında geçiş yedek sayılmaz ve açık kalır.",
   "fallback.overrides": "Geçersiz kılmalar",
   "fallback.scope.provider": "Sağlayıcı {name}",
   "fallback.scope.route": "Rota {name}",

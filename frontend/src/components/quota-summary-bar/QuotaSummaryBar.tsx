@@ -10,14 +10,38 @@
  * (`#providers?provider=<name>&tab=accounts`); hovering or keyboard-focusing it shows the
  * per-window detail, and on touch the first tap shows the detail and the second one navigates.
  */
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type MouseEvent, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+} from "react";
 import { useDataSurface } from "../../data-surface";
-import { formatMuseResetCountdown, museObservationResetAt, withMuseLimitObservation, withoutExpiredMuseObservation } from "../../muse-limit-observation";
+import {
+  formatMuseResetCountdown,
+  museObservationResetAt,
+  withMuseLimitObservation,
+  withoutExpiredMuseObservation,
+} from "../../muse-limit-observation";
 import { useI18n, type Locale, type TFn } from "../../i18n/shared";
 import { formatProviderDisplayName } from "../../provider-icons";
-import { freshQuotaReportsFromResponse, type ProviderQuotaReportView } from "../../provider-workspace/report";
+import {
+  freshQuotaReportsFromResponse,
+  type ProviderQuotaReportView,
+} from "../../provider-workspace/report";
 import { openProviderAccounts, providerAccountsHash } from "../../protocol-deep-links";
-import { buildQuotaSummary, formatQuotaPercent, type QuotaSummaryRow, type QuotaSummarySeverity, type QuotaSummaryWindow } from "../../quota-summary";
+import {
+  buildQuotaSummary,
+  formatQuotaPercent,
+  type QuotaSummaryRow,
+  type QuotaSummarySeverity,
+  type QuotaSummaryWindow,
+} from "../../quota-summary";
 import { formatResetFuture } from "../QuotaBars";
 import { publishStickyTop } from "./sticky-top";
 import "./quota-summary-bar.css";
@@ -36,14 +60,18 @@ const PAGE_FRACTION = 0.8;
 
 function formatClock(ms: number, locale: Locale): string {
   try {
-    return new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", hour12: false }).format(ms);
+    return new Intl.DateTimeFormat(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(ms);
   } catch {
     return new Date(ms).toTimeString().slice(0, 5);
   }
 }
 
 function windowLabel(window: QuotaSummaryWindow, t: TFn): string {
-  return window.labelKey ? t(window.labelKey) : window.label ?? window.id;
+  return window.labelKey ? t(window.labelKey) : (window.label ?? window.id);
 }
 
 function severityText(severity: QuotaSummarySeverity, t: TFn): string {
@@ -68,7 +96,11 @@ function isKeyboardFocus(element: Element): boolean {
  * re-place it so it stays attached to its chip. The mobile stylesheet keeps its own horizontal
  * inset and only reads the vertical coordinate.
  */
-function usePopoverPlacement(open: boolean, anchorRef: RefObject<HTMLElement | null>, popoverRef: RefObject<HTMLElement | null>) {
+function usePopoverPlacement(
+  open: boolean,
+  anchorRef: RefObject<HTMLElement | null>,
+  popoverRef: RefObject<HTMLElement | null>,
+) {
   useLayoutEffect(() => {
     if (!open) return;
     const place = () => {
@@ -85,11 +117,20 @@ function usePopoverPlacement(open: boolean, anchorRef: RefObject<HTMLElement | n
       popover.style.setProperty("--qs-pop-top", String(Math.round(rect.bottom + POPOVER_GAP)));
       popover.style.setProperty("--qs-pop-left", String(Math.round(left)));
       // Share the measured gap with the hover bridge, including fractional-pixel rounding.
-      popover.style.setProperty("--qs-pop-gap", String(Math.round(rect.bottom + POPOVER_GAP) - rect.bottom));
+      popover.style.setProperty(
+        "--qs-pop-gap",
+        String(Math.round(rect.bottom + POPOVER_GAP) - rect.bottom),
+      );
       // Cover the visible chip as well as the popover, including mobile's CSS horizontal inset.
       const placed = popover.getBoundingClientRect();
-      popover.style.setProperty("--qs-bridge-left", String(Math.min(0, Math.max(0, rect.left) - placed.left)));
-      popover.style.setProperty("--qs-bridge-right", String(Math.min(0, placed.right - Math.min(viewportWidth, rect.right))));
+      popover.style.setProperty(
+        "--qs-bridge-left",
+        String(Math.min(0, Math.max(0, rect.left) - placed.left)),
+      );
+      popover.style.setProperty(
+        "--qs-bridge-right",
+        String(Math.min(0, placed.right - Math.min(viewportWidth, rect.right))),
+      );
     };
     place();
     window.addEventListener("scroll", place, { capture: true, passive: true });
@@ -165,7 +206,8 @@ function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; lo
   };
   const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
     // Modified and middle clicks keep the browser's own link behavior (new tab/window).
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+      return;
     event.preventDefault();
     // Read once and forget, so a later keyboard Enter is never mistaken for a tap.
     const viaTouch = pointerTypeRef.current === "touch";
@@ -189,12 +231,12 @@ function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; lo
       className={`quota-summary-item quota-summary-item--${row.severity}`}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-      onFocus={event => {
+      onFocus={(event) => {
         if (!isKeyboardFocus(event.target)) return;
         setSuppressed(false);
         setFocused(true);
       }}
-      onBlur={event => {
+      onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
       }}
     >
@@ -205,34 +247,55 @@ function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; lo
         aria-expanded={open}
         aria-controls={open ? popoverId : undefined}
         aria-describedby={open ? `${popoverId}-table` : undefined}
-        onPointerDown={event => { pointerTypeRef.current = event.pointerType; }}
+        onPointerDown={(event) => {
+          pointerTypeRef.current = event.pointerType;
+        }}
         onClick={onClick}
       >
         <span className="quota-summary-name">{row.label}</span>
         <span className="quota-summary-pct">{formatQuotaPercent(headline.percent)}</span>
         {row.provider === "meta-muse" && headline.resetAt !== undefined && (
-          <span className="quota-summary-name" title={formatResetFuture(headline.resetAt, t, locale)}>
+          <span
+            className="quota-summary-name"
+            title={formatResetFuture(headline.resetAt, t, locale)}
+          >
             {formatMuseResetCountdown(headline.resetAt, clock)}
           </span>
         )}
-        {warning && <span className="quota-summary-flag" aria-hidden="true">!</span>}
+        {warning && (
+          <span className="quota-summary-flag" aria-hidden="true">
+            !
+          </span>
+        )}
         {warning && <span className="sr-only">{warning}</span>}
         <span className="sr-only">{t("quotaSummary.openAccounts")}</span>
       </a>
       {open && (
-        <div ref={popoverRef} id={popoverId} className="quota-summary-popover" role="group" aria-label={row.label}>
+        <div
+          ref={popoverRef}
+          id={popoverId}
+          className="quota-summary-popover"
+          role="group"
+          aria-label={row.label}
+        >
           <div className="quota-summary-popover-head">
             <strong>{row.label}</strong>
-            {warning && <span className={`quota-summary-badge quota-summary-badge--${row.severity}`}>{warning}</span>}
+            {warning && (
+              <span className={`quota-summary-badge quota-summary-badge--${row.severity}`}>
+                {warning}
+              </span>
+            )}
           </div>
           <table id={`${popoverId}-table`} className="quota-summary-table">
             <tbody>
-              {row.windows.map(window => (
+              {row.windows.map((window) => (
                 <tr key={window.id} className={`quota-summary-row--${window.severity}`}>
                   <th scope="row">{windowLabel(window, t)}</th>
                   <td className="quota-summary-row-pct">{formatQuotaPercent(window.percent)}</td>
                   <td className="quota-summary-row-reset">
-                    {window.resetAt !== undefined ? formatResetFuture(window.resetAt, t, locale) : "-"}
+                    {window.resetAt !== undefined
+                      ? formatResetFuture(window.resetAt, t, locale)
+                      : "-"}
                   </td>
                 </tr>
               ))}
@@ -240,12 +303,18 @@ function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; lo
           </table>
           <div className="quota-summary-popover-foot">
             {row.updatedAt !== undefined && (
-              <span>{t(row.observed ? "quotaSummary.observedAt" : "quotaSummary.dataAt", { time: formatClock(row.updatedAt, locale) })}</span>
+              <span>
+                {t(row.observed ? "quotaSummary.observedAt" : "quotaSummary.dataAt", {
+                  time: formatClock(row.updatedAt, locale),
+                })}
+              </span>
             )}
             <a
               href={`#${providerAccountsHash(row.provider)}`}
               className="quota-summary-popover-link"
-              onPointerDown={event => { pointerTypeRef.current = event.pointerType; }}
+              onPointerDown={(event) => {
+                pointerTypeRef.current = event.pointerType;
+              }}
               onClick={onClick}
             >
               {t("quotaSummary.openAccounts")}
@@ -269,7 +338,15 @@ const NO_OVERFLOW: ScrollEdges = { overflow: false, atStart: true, atEnd: true }
  * The provider chips on one scrolling row with « / » paging. Exported for tests; the bar
  * supplies the rows it derived from `/api/provider-quotas`.
  */
-export function QuotaSummaryChips({ rows, t, locale }: { rows: QuotaSummaryRow[]; t: TFn; locale: Locale }) {
+export function QuotaSummaryChips({
+  rows,
+  t,
+  locale,
+}: {
+  rows: QuotaSummaryRow[];
+  t: TFn;
+  locale: Locale;
+}) {
   const listRef = useRef<HTMLUListElement>(null);
   const [edges, setEdges] = useState<ScrollEdges>(NO_OVERFLOW);
 
@@ -277,25 +354,34 @@ export function QuotaSummaryChips({ rows, t, locale }: { rows: QuotaSummaryRow[]
     const list = listRef.current;
     if (!list) return;
     const max = list.scrollWidth - list.clientWidth;
-    const next: ScrollEdges = max > 1
-      ? { overflow: true, atStart: list.scrollLeft <= 1, atEnd: list.scrollLeft >= max - 1 }
-      : NO_OVERFLOW;
-    setEdges(previous => (
-      previous.overflow === next.overflow && previous.atStart === next.atStart && previous.atEnd === next.atEnd
+    const next: ScrollEdges =
+      max > 1
+        ? { overflow: true, atStart: list.scrollLeft <= 1, atEnd: list.scrollLeft >= max - 1 }
+        : NO_OVERFLOW;
+    setEdges((previous) =>
+      previous.overflow === next.overflow &&
+      previous.atStart === next.atStart &&
+      previous.atEnd === next.atEnd
         ? previous
-        : next
-    ));
+        : next,
+    );
   }, []);
 
   // Chips can widen without the list box changing size (a new provider, a longer percent, a late
   // web font), so the observer watches every chip as well as the list, and the row signature
   // re-measures on the next frame for chips that arrive with the new rows.
-  const rowsKey = rows.map(row => `${row.provider}:${row.label}:${formatQuotaPercent(row.headline.percent)}:${row.severity}`).join("|");
+  const rowsKey = rows
+    .map(
+      (row) =>
+        `${row.provider}:${row.label}:${formatQuotaPercent(row.headline.percent)}:${row.severity}`,
+    )
+    .join("|");
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
     const frame = requestAnimationFrame(measure);
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => measure());
+    const observer =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => measure());
     observer?.observe(list);
     for (const chip of Array.from(list.children)) observer?.observe(chip);
     return () => {
@@ -313,14 +399,21 @@ export function QuotaSummaryChips({ rows, t, locale }: { rows: QuotaSummaryRow[]
       measure();
       return;
     }
-    const reduceMotion = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    list.scrollBy({ left: direction * Math.max(list.clientWidth * PAGE_FRACTION, 80), behavior: reduceMotion ? "auto" : "smooth" });
+    const reduceMotion =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    list.scrollBy({
+      left: direction * Math.max(list.clientWidth * PAGE_FRACTION, 80),
+      behavior: reduceMotion ? "auto" : "smooth",
+    });
   };
 
   // aria-disabled, not disabled: a focused button that becomes disabled drops focus to <body>,
   // so paging to the end with the keyboard would restart Tab order at the top of the page.
   return (
-    <div className={`quota-summary-scroller${edges.overflow ? " quota-summary-scroller--overflow" : ""}`}>
+    <div
+      className={`quota-summary-scroller${edges.overflow ? " quota-summary-scroller--overflow" : ""}`}
+    >
       {edges.overflow && (
         <button
           type="button"
@@ -334,7 +427,9 @@ export function QuotaSummaryChips({ rows, t, locale }: { rows: QuotaSummaryRow[]
         </button>
       )}
       <ul ref={listRef} className="quota-summary-list" onScroll={measure}>
-        {rows.map(row => <QuotaSummaryItem key={row.provider} row={row} t={t} locale={locale} />)}
+        {rows.map((row) => (
+          <QuotaSummaryItem key={row.provider} row={row} t={t} locale={locale} />
+        ))}
       </ul>
       {edges.overflow && (
         <button
@@ -354,18 +449,29 @@ export function QuotaSummaryChips({ rows, t, locale }: { rows: QuotaSummaryRow[]
 
 export default function QuotaSummaryBar({ apiBase }: { apiBase: string }) {
   const { t, locale } = useI18n();
-  const load = useCallback(async (signal: AbortSignal): Promise<QuotaSummaryData> => {
-    const response = await fetch(`${apiBase}/api/provider-quotas`, { signal });
-    if (!response.ok) throw new Error("quota summary load failed");
-    const body = await response.json() as { reports?: unknown } | null;
-    const reports = await withMuseLimitObservation(freshQuotaReportsFromResponse(body?.reports), apiBase, signal);
-    return { fetchedAt: Date.now(), reports };
-  }, [apiBase]);
+  const load = useCallback(
+    async (signal: AbortSignal): Promise<QuotaSummaryData> => {
+      const response = await fetch(`${apiBase}/api/provider-quotas`, { signal });
+      if (!response.ok) throw new Error("quota summary load failed");
+      const body = (await response.json()) as { reports?: unknown } | null;
+      const reports = await withMuseLimitObservation(
+        freshQuotaReportsFromResponse(body?.reports),
+        apiBase,
+        signal,
+      );
+      return { fetchedAt: Date.now(), reports };
+    },
+    [apiBase],
+  );
   const resource = useDataSurface<QuotaSummaryData>(
     `ocx.quota-summary.provider-quotas.v1:${apiBase}`,
     [apiBase],
     load,
-    { isEmpty: data => Object.keys(data.reports).length === 0, pollMs: POLL_MS, pauseWhenHidden: true },
+    {
+      isEmpty: (data) => Object.keys(data.reports).length === 0,
+      pollMs: POLL_MS,
+      pauseWhenHidden: true,
+    },
   );
 
   const data = resource.data;
@@ -374,17 +480,24 @@ export default function QuotaSummaryBar({ apiBase }: { apiBase: string }) {
   const observedResetAt = data ? museObservationResetAt(data.reports) : undefined;
   useEffect(() => {
     if (observedResetAt === undefined || clock >= observedResetAt) return;
-    const timer = window.setTimeout(() => setClock(Date.now()), Math.max(0, observedResetAt - Date.now()));
+    const timer = window.setTimeout(
+      () => setClock(Date.now()),
+      Math.max(0, observedResetAt - Date.now()),
+    );
     return () => window.clearTimeout(timer);
   }, [observedResetAt, clock]);
   if (!data) return null;
   const reports = withoutExpiredMuseObservation(data.reports, clock);
-  const rows = buildQuotaSummary(reports, provider => formatProviderDisplayName(provider, t));
+  const rows = buildQuotaSummary(reports, (provider) => formatProviderDisplayName(provider, t));
   if (rows.length === 0) return null;
   const stale = !resource.lastAttemptOk;
 
   return (
-    <section className="quota-summary-bar" aria-label={t("quotaSummary.aria")} ref={publishStickyTop}>
+    <section
+      className="quota-summary-bar"
+      aria-label={t("quotaSummary.aria")}
+      ref={publishStickyTop}
+    >
       <QuotaSummaryChips rows={rows} t={t} locale={locale} />
       <span
         className={`quota-summary-updated${stale ? " quota-summary-updated--stale" : ""}`}

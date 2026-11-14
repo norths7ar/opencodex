@@ -36,23 +36,26 @@ export function useCopyFeedback<Scope = void>(): {
     [feedback],
   );
 
-  const copy = useCallback((text: string, scope: Scope) => {
-    // Writes settle out of order: a permission prompt can delay the first
-    // attempt past a second one. Without a generation the older completion
-    // overwrites the newer click's result — and its timer expires the wrong
-    // feedback. Same guard shape the OAuth polling paths already use.
-    const generation = ++generationRef.current;
-    void copyTextToClipboard(text).then((ok) => {
-      if (generationRef.current !== generation) return;
-      clearTimer();
-      setFeedback({ scope, outcome: ok ? "copied" : "unavailable" });
-      timerRef.current = setTimeout(() => {
-        timerRef.current = null;
+  const copy = useCallback(
+    (text: string, scope: Scope) => {
+      // Writes settle out of order: a permission prompt can delay the first
+      // attempt past a second one. Without a generation the older completion
+      // overwrites the newer click's result — and its timer expires the wrong
+      // feedback. Same guard shape the OAuth polling paths already use.
+      const generation = ++generationRef.current;
+      void copyTextToClipboard(text).then((ok) => {
         if (generationRef.current !== generation) return;
-        setFeedback(null);
-      }, FEEDBACK_MS);
-    });
-  }, [clearTimer]);
+        clearTimer();
+        setFeedback({ scope, outcome: ok ? "copied" : "unavailable" });
+        timerRef.current = setTimeout(() => {
+          timerRef.current = null;
+          if (generationRef.current !== generation) return;
+          setFeedback(null);
+        }, FEEDBACK_MS);
+      });
+    },
+    [clearTimer],
+  );
 
   return { outcomeFor, copy };
 }

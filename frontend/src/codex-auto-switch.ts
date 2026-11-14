@@ -7,10 +7,7 @@ const AUTO_SWITCH_PUT_TIMEOUT_MS = 10_000;
 export type AutoSwitchFetch = (input: string, init: RequestInit) => Promise<Response>;
 
 export function normalizeAutoSwitchThreshold(value: unknown): number {
-  return typeof value === "number"
-    && Number.isInteger(value)
-    && value >= 0
-    && value <= 100
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 100
     ? value
     : DEFAULT_AUTO_SWITCH_THRESHOLD;
 }
@@ -68,8 +65,8 @@ export function planAutoSwitchToggleWrite(
     const threshold = nextAutoSwitchThreshold(current, lastEnabled);
     return { threshold, lastEnabled: threshold };
   }
-  const restoreThreshold = parseEnabledAutoSwitchThreshold(draft)
-    ?? nextAutoSwitchThreshold(0, lastEnabled);
+  const restoreThreshold =
+    parseEnabledAutoSwitchThreshold(draft) ?? nextAutoSwitchThreshold(0, lastEnabled);
   return { threshold: 0, lastEnabled: restoreThreshold };
 }
 

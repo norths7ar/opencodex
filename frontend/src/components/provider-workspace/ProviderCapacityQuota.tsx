@@ -18,17 +18,28 @@ import { WorkBuddyCredits } from "./WorkBuddyCredits";
 
 function bcp47(locale: Locale): string {
   switch (locale) {
-    case "en": return "en-GB";
-    case "de": return "de-DE";
-    case "fr": return "fr-FR";
-    case "ko": return "ko-KR";
-    case "zh": return "zh-CN";
-    case "zh-TW": return "zh-TW";
-    case "ru": return "ru-RU";
-    case "ja": return "ja-JP";
-    case "tr": return "tr-TR";
-    case "vi": return "vi-VN";
-    case "pt": return "pt-BR";
+    case "en":
+      return "en-GB";
+    case "de":
+      return "de-DE";
+    case "fr":
+      return "fr-FR";
+    case "ko":
+      return "ko-KR";
+    case "zh":
+      return "zh-CN";
+    case "zh-TW":
+      return "zh-TW";
+    case "ru":
+      return "ru-RU";
+    case "ja":
+      return "ja-JP";
+    case "tr":
+      return "tr-TR";
+    case "vi":
+      return "vi-VN";
+    case "pt":
+      return "pt-BR";
     default: {
       const _exhaustive: never = locale;
       return _exhaustive;
@@ -44,7 +55,13 @@ function asDate(value: number): Date | null {
   return Number.isFinite(date.getTime()) ? date : null;
 }
 
-export function ProviderCapacityQuota({ report, pending }: { report: ProviderQuotaReportView; pending: boolean }) {
+export function ProviderCapacityQuota({
+  report,
+  pending,
+}: {
+  report: ProviderQuotaReportView;
+  pending: boolean;
+}) {
   const t = useT();
   const { locale } = useI18n();
   const aggregation = capacityAggregationFromReport(report);
@@ -63,34 +80,58 @@ export function ProviderCapacityQuota({ report, pending }: { report: ProviderQuo
       if (window.incomplete) incompleteCustomWindowLabels.add(window.label);
     }
   }
-  const recoveryRows: Array<{ key: number; label: string; window: CapacityWindowView }> = showsAggregate && aggregation ? [
-    ...(aggregation.fiveHour ? [{ key: 0, label: t("codexAuth.fiveHour"), window: aggregation.fiveHour }] : []),
-    ...(aggregation.weekly ? [{ key: 1, label: t("codexAuth.weekly"), window: aggregation.weekly }] : []),
-    ...(aggregation.monthly ? [{ key: 2, label: t("codexAuth.monthly"), window: aggregation.monthly }] : []),
-    ...(aggregation.customWindows ?? []).map((window, index) => ({ key: index + 3, label: window.label, window })),
-  ] : [];
-  const formatPercent = (value: number) => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
+  const recoveryRows: Array<{ key: number; label: string; window: CapacityWindowView }> =
+    showsAggregate && aggregation
+      ? [
+          ...(aggregation.fiveHour
+            ? [{ key: 0, label: t("codexAuth.fiveHour"), window: aggregation.fiveHour }]
+            : []),
+          ...(aggregation.weekly
+            ? [{ key: 1, label: t("codexAuth.weekly"), window: aggregation.weekly }]
+            : []),
+          ...(aggregation.monthly
+            ? [{ key: 2, label: t("codexAuth.monthly"), window: aggregation.monthly }]
+            : []),
+          ...(aggregation.customWindows ?? []).map((window, index) => ({
+            key: index + 3,
+            label: window.label,
+            window,
+          })),
+        ]
+      : [];
+  const formatPercent = (value: number) =>
+    new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
   const formatRecoveryAt = (value: number) => {
     const date = asDate(value);
-    return date === null ? null : new Intl.DateTimeFormat(locale, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(date);
+    return date === null
+      ? null
+      : new Intl.DateTimeFormat(locale, {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(date);
   };
   const localeTag = bcp47(locale);
-  const formatCredits = (value: number) => new Intl.NumberFormat(localeTag, {
-    style: "currency",
-    currency: "USD",
-  }).format(value);
+  const formatCredits = (value: number) =>
+    new Intl.NumberFormat(localeTag, {
+      style: "currency",
+      currency: "USD",
+    }).format(value);
   const formatPeriodEnd = (value: number) => {
     const date = asDate(value);
-    return date === null ? null : new Intl.DateTimeFormat(localeTag, { dateStyle: "medium" }).format(date);
+    return date === null
+      ? null
+      : new Intl.DateTimeFormat(localeTag, { dateStyle: "medium" }).format(date);
   };
   const periodEnd = credits?.expiresAt === undefined ? null : formatPeriodEnd(credits.expiresAt);
 
   return (
     <>
-      {primaryQuota?.workbuddyCredits && <WorkBuddyCredits credits={primaryQuota.workbuddyCredits} updatedAt={primaryQuota.updatedAt} />}
+      {primaryQuota?.workbuddyCredits && (
+        <WorkBuddyCredits
+          credits={primaryQuota.workbuddyCredits}
+          updatedAt={primaryQuota.updatedAt}
+        />
+      )}
       {showsAggregate && <div className="pws-capacity-label">{t("pws.capacity.estimate")}</div>}
       {(primaryQuota || pending) && (
         <QuotaBars
@@ -118,12 +159,21 @@ export function ProviderCapacityQuota({ report, pending }: { report: ProviderQuo
             </div>
           )}
           {recoveryRows.flatMap(({ key, label, window }) => {
-            const recoveryAt = window.nextRecoveryAt === undefined ? null : formatRecoveryAt(window.nextRecoveryAt);
+            const recoveryAt =
+              window.nextRecoveryAt === undefined ? null : formatRecoveryAt(window.nextRecoveryAt);
             return recoveryAt !== null && window.nextRecoveryPercent !== undefined
-              ? [<div className="pws-capacity-recovery" key={key}>
-                  <span>{t("pws.capacity.nextRecovery")} · {label} · {recoveryAt}</span>
-                  <strong>{t("pws.capacity.recoveryShare", { percent: formatPercent(window.nextRecoveryPercent) })}</strong>
-                </div>]
+              ? [
+                  <div className="pws-capacity-recovery" key={key}>
+                    <span>
+                      {t("pws.capacity.nextRecovery")} · {label} · {recoveryAt}
+                    </span>
+                    <strong>
+                      {t("pws.capacity.recoveryShare", {
+                        percent: formatPercent(window.nextRecoveryPercent),
+                      })}
+                    </strong>
+                  </div>,
+                ]
               : [];
           })}
           {showsAggregate && aggregation && aggregation.currentAccount?.quota && (
@@ -132,7 +182,12 @@ export function ProviderCapacityQuota({ report, pending }: { report: ProviderQuo
                 {t("pws.capacity.currentAccount")}
                 {aggregation.currentAccount.plan ? ` · ${aggregation.currentAccount.plan}` : ""}
               </span>
-              <QuotaBars quota={aggregation.currentAccount.quota} threshold={80} t={t} layout="stacked" />
+              <QuotaBars
+                quota={aggregation.currentAccount.quota}
+                threshold={80}
+                t={t}
+                layout="stacked"
+              />
             </div>
           )}
           {aggregation && aggregation.incomplete && aggregation.excludedAccounts > 0 && (

@@ -24,20 +24,33 @@ let activeLocale: Locale | null = null;
 export function detectInitial(): Locale {
   try {
     const stored = localStorage.getItem(LANG_KEY);
-    if (stored === "en" || stored === "de" || stored === "fr" || stored === "ko" || stored === "zh" || stored === "zh-TW" || stored === "ru" || stored === "ja" || stored === "tr" || stored === "vi" || stored === "pt") return stored;
-  } catch { /* ignore */ }
-  const nav = typeof navigator !== "undefined" && navigator?.language ? navigator.language.toLowerCase() : "en";
+    if (
+      stored === "en" ||
+      stored === "de" ||
+      stored === "fr" ||
+      stored === "ko" ||
+      stored === "zh" ||
+      stored === "zh-TW" ||
+      stored === "ru" ||
+      stored === "ja" ||
+      stored === "tr" ||
+      stored === "vi" ||
+      stored === "pt"
+    )
+      return stored;
+  } catch {
+    /* ignore */
+  }
+  const nav =
+    typeof navigator !== "undefined" && navigator?.language
+      ? navigator.language.toLowerCase()
+      : "en";
   if (nav.startsWith("de")) return "de";
   if (nav.startsWith("fr")) return "fr";
   if (nav.startsWith("ko")) return "ko";
   if (nav.startsWith("zh")) {
     // zh-TW / zh-HK / zh-MO / zh-Hant → Traditional; everything else → Simplified.
-    if (
-      nav.includes("tw") ||
-      nav.includes("hk") ||
-      nav.includes("mo") ||
-      nav.includes("hant")
-    ) {
+    if (nav.includes("tw") || nav.includes("hk") || nav.includes("mo") || nav.includes("hant")) {
       return "zh-TW";
     }
     return "zh";
@@ -62,7 +75,11 @@ export function setActiveLocale(locale: Locale): void {
 export type Vars = Record<string, string | number>;
 export type TFn = (key: TKey, vars?: Vars) => string;
 
-export interface I18nContextValue { locale: Locale; setLocale: (l: Locale) => void; t: TFn }
+export interface I18nContextValue {
+  locale: Locale;
+  setLocale: (l: Locale) => void;
+  t: TFn;
+}
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 

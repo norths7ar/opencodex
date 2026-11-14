@@ -22,7 +22,10 @@ interface ThemeSwitchProps {
  */
 export function ThemeSwitch({ theme, onChange }: ThemeSwitchProps) {
   const t = useT();
-  const index = Math.max(0, MODES.findIndex(entry => entry.mode === theme));
+  const index = Math.max(
+    0,
+    MODES.findIndex((entry) => entry.mode === theme),
+  );
   const current = MODES[index]!;
   const next = MODES[(index + 1) % MODES.length]!;
   const label = t("shellV2.themeCycle", { mode: t(current.tkey), next: t(next.tkey) });

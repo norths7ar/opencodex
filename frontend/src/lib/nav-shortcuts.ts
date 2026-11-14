@@ -4,22 +4,29 @@
  */
 
 export function isEditableTarget(target: EventTarget | null): boolean {
-  return target instanceof HTMLElement
-    && (target.isContentEditable || target.closest("input, textarea, select, [contenteditable]") !== null);
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable ||
+      target.closest("input, textarea, select, [contenteditable]") !== null)
+  );
 }
 
 export type ShortcutStyle = "browser-mac" | "browser";
 
 /** Browsers reserve Cmd/Ctrl+digit; dashboard navigation uses Option/Alt. */
-export function shortcutStyle(userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent): ShortcutStyle {
+export function shortcutStyle(
+  userAgent = typeof navigator === "undefined" ? "" : navigator.userAgent,
+): ShortcutStyle {
   const mac = /Mac OS X|Macintosh/i.test(userAgent);
   return mac ? "browser-mac" : "browser";
 }
 
 export function shortcutLabel(style: ShortcutStyle, key: string): string {
   switch (style) {
-    case "browser-mac": return `⌥${key}`;
-    default: return `Alt+${key}`;
+    case "browser-mac":
+      return `⌥${key}`;
+    default:
+      return `Alt+${key}`;
   }
 }
 
@@ -31,4 +38,3 @@ export function searchShortcutLabel(style: ShortcutStyle): string {
 export function numberModifierHeld(event: KeyboardEvent): boolean {
   return event.altKey && !event.metaKey && !event.ctrlKey && !event.shiftKey;
 }
-

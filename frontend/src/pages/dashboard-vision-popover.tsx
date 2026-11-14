@@ -1,10 +1,33 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { TFn } from "../i18n/shared";
 import { computeSelectMenuStyle } from "../select-position";
 import { VISION_TIMEOUT_MS_MAX, VISION_TIMEOUT_MS_MIN } from "./dashboard-shared";
 
 /** The Vision sidecar's advanced numbers (descriptions per turn, timeout) as a floating popover. */
-export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, maxInvalid, timeoutValue, timeoutInvalid, disabled, setMaxDraft, setMaxInvalid, setTimeoutDraft, setTimeoutInvalid, commitMaxDescriptions, commitTimeout }: {
+export function VisionAdvancedPopover({
+  t,
+  open,
+  triggerRef,
+  onClose,
+  maxValue,
+  maxInvalid,
+  timeoutValue,
+  timeoutInvalid,
+  disabled,
+  setMaxDraft,
+  setMaxInvalid,
+  setTimeoutDraft,
+  setTimeoutInvalid,
+  commitMaxDescriptions,
+  commitTimeout,
+}: {
   t: TFn;
   open: boolean;
   triggerRef: React.RefObject<HTMLButtonElement | null>;
@@ -28,14 +51,13 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
   const reposition = useCallback(() => {
     if (!triggerRef.current) return;
 
-    setStyle(computeSelectMenuStyle(
-      triggerRef.current.getBoundingClientRect(),
-      {
+    setStyle(
+      computeSelectMenuStyle(triggerRef.current.getBoundingClientRect(), {
         align: "right",
         placement: "below",
         menuHeight: panelRef.current?.offsetHeight ?? 180,
-      },
-    ));
+      }),
+    );
   }, [triggerRef]);
 
   useLayoutEffect(() => {
@@ -87,12 +109,20 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
   if (!open) return null;
 
   return (
-    <div ref={panelRef} id="dash-vision-advanced-popover" className="dash-vision-advanced-popover" role="dialog" aria-modal="false"
+    <div
+      ref={panelRef}
+      id="dash-vision-advanced-popover"
+      className="dash-vision-advanced-popover"
+      role="dialog"
+      aria-modal="false"
       aria-label={t("dash.visionAdvancedPopover") as string}
-      style={{ ...style, zIndex: 60 }}>
+      style={{ ...style, zIndex: 60 }}
+    >
       <div className="dash-vision-advanced-popover-title">{t("dash.visionAdvancedPopover")}</div>
       <label className="dash-vision-number">
-        <span className="muted setting-hint" id="dash-vision-max-label">{t("dash.visionMaxDescriptions")}</span>
+        <span className="muted setting-hint" id="dash-vision-max-label">
+          {t("dash.visionMaxDescriptions")}
+        </span>
         <span className="codex-auto-switch-input-wrap">
           <input
             ref={firstInputRef}
@@ -105,13 +135,15 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
             disabled={disabled}
             aria-invalid={maxInvalid || undefined}
             aria-label={t("dash.visionMaxDescriptions")}
-            aria-describedby={maxInvalid ? "dash-vision-max-error dash-vision-max-label" : "dash-vision-max-label"}
-            onChange={event => {
+            aria-describedby={
+              maxInvalid ? "dash-vision-max-error dash-vision-max-label" : "dash-vision-max-label"
+            }
+            onChange={(event) => {
               setMaxInvalid(false);
               setMaxDraft(event.target.value);
             }}
-            onBlur={event => commitMaxDescriptions(event.currentTarget.value)}
-            onKeyDown={event => {
+            onBlur={(event) => commitMaxDescriptions(event.currentTarget.value)}
+            onKeyDown={(event) => {
               if (event.nativeEvent.isComposing || disabled) return;
               if (event.key === "Enter") {
                 event.preventDefault();
@@ -131,7 +163,9 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
         )}
       </label>
       <label className="dash-vision-number">
-        <span className="muted setting-hint" id="dash-vision-timeout-label">{t("dash.visionTimeout")}</span>
+        <span className="muted setting-hint" id="dash-vision-timeout-label">
+          {t("dash.visionTimeout")}
+        </span>
         <span className="codex-auto-switch-input-wrap">
           <input
             className="input mono codex-auto-switch-input"
@@ -144,13 +178,17 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
             disabled={disabled}
             aria-invalid={timeoutInvalid || undefined}
             aria-label={t("dash.visionTimeout")}
-            aria-describedby={timeoutInvalid ? "dash-vision-timeout-error dash-vision-timeout-label" : "dash-vision-timeout-label"}
-            onChange={event => {
+            aria-describedby={
+              timeoutInvalid
+                ? "dash-vision-timeout-error dash-vision-timeout-label"
+                : "dash-vision-timeout-label"
+            }
+            onChange={(event) => {
               setTimeoutInvalid(false);
               setTimeoutDraft(event.target.value);
             }}
-            onBlur={event => commitTimeout(event.currentTarget.value)}
-            onKeyDown={event => {
+            onBlur={(event) => commitTimeout(event.currentTarget.value)}
+            onKeyDown={(event) => {
               if (event.nativeEvent.isComposing || disabled) return;
               if (event.key === "Enter") {
                 event.preventDefault();
@@ -162,11 +200,16 @@ export function VisionAdvancedPopover({ t, open, triggerRef, onClose, maxValue, 
               }
             }}
           />
-          <span className="codex-auto-switch-unit" aria-hidden="true">ms</span>
+          <span className="codex-auto-switch-unit" aria-hidden="true">
+            ms
+          </span>
         </span>
         {timeoutInvalid && (
           <span id="dash-vision-timeout-error" className="muted setting-hint" role="alert">
-            {t("dash.visionTimeoutInvalid", { min: VISION_TIMEOUT_MS_MIN, max: VISION_TIMEOUT_MS_MAX })}
+            {t("dash.visionTimeoutInvalid", {
+              min: VISION_TIMEOUT_MS_MIN,
+              max: VISION_TIMEOUT_MS_MAX,
+            })}
           </span>
         )}
       </label>

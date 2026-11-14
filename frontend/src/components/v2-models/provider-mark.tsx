@@ -21,8 +21,10 @@ export function ProviderMark({ name, className }: { name: string; className?: st
       )}
     >
       {src && paint === "mask" ? (
-        <span className="block size-3.5 bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-          style={{ maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` }} />
+        <span
+          className="block size-3.5 bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          style={{ maskImage: `url(${src})`, WebkitMaskImage: `url(${src})` }}
+        />
       ) : src ? (
         <img src={src} alt="" className="block size-3.5 object-contain" />
       ) : (

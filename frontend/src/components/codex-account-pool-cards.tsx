@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { formatAccountPauseTooltip } from "../account-pause-display";
-import { useI18n,useT } from "../i18n/shared";
-import { IconPause,IconPlay,IconX } from "../icons";
+import { useI18n, useT } from "../i18n/shared";
+import { IconPause, IconPlay, IconX } from "../icons";
 import { displayAccountId } from "../lib/privacy";
 import {
-doctorCopyButtonLabel,
-formatOAuthHealthLabel,
-formatOAuthHealthSummary,
-oauthHealthBadgeClass,
-oauthHealthIsCooldown,
-oauthHealthShowsDoctor,
-oauthHealthShowsReauth,
+  doctorCopyButtonLabel,
+  formatOAuthHealthLabel,
+  formatOAuthHealthSummary,
+  oauthHealthBadgeClass,
+  oauthHealthIsCooldown,
+  oauthHealthShowsDoctor,
+  oauthHealthShowsReauth,
 } from "../oauth-health-display";
-import { AccountCreditsToggle,CreditsOnBadge } from "./CodexCreditSpend";
+import { AccountCreditsToggle, CreditsOnBadge } from "./CodexCreditSpend";
 import CodexCreditsRow from "./CodexCreditsRow";
 import QuotaBars from "./QuotaBars";
-import { CodexPauseToggleLabel,CodexTicketBadge } from "./codex-account-pool-helpers";
+import { CodexPauseToggleLabel, CodexTicketBadge } from "./codex-account-pool-helpers";
 import type { CodexAccountEntry } from "./codex-account-pool-types";
 import { useCopyFeedback } from "./use-copy-feedback";
-import { AccountMore,AccountRow,AccountSetting } from "./v2-accounts/account-row";
+import { AccountMore, AccountRow, AccountSetting } from "./v2-accounts/account-row";
 import { InlineBanner } from "./v2-accounts/surface";
 
 export function CodexAccountPoolCards({
@@ -66,7 +66,7 @@ export function CodexAccountPoolCards({
 
   return (
     <>
-      {pool.map(a => {
+      {pool.map((a) => {
         const showCredits = creditsVisible === true && a.credits !== undefined;
         const healthStatus = a.health?.status;
         const planExcluded = a.selectionExcludedReason === "plan_excluded";
@@ -86,54 +86,81 @@ export function CodexAccountPoolCards({
             dot={showReauth ? "warn" : a.paused ? "idle" : next ? "active" : "ok"}
             name={label}
             sub={a.alias ? a.email : undefined}
-            chips={<>
-              {next && !planExcluded && !showReauth && !inCooldown && !validationPending && (
-                <span className="badge badge-primary">
-                  {t("prov.accountActive")}
-                </span>
-              )}
-              {a.plan && <span className="badge badge-plan">{a.plan}</span>}
-              {planExcluded && (
-                <span className="badge badge-muted" title={t("codexAuth.planExcludedHint", { plan: a.selectionExcludedPlan ?? a.plan ?? "" })}>
-                  {t("codexAuth.planExcluded")}
-                </span>
-              )}
-              {a.paused && (
-                <span className="badge badge-muted" title={a.pauseDetails ? formatAccountPauseTooltip(t, locale, a.pauseDetails) : t("codexAuth.pausedHint")}>
-                  {t("codexAuth.paused")}
-                </span>
-              )}
+            chips={
+              <>
+                {next && !planExcluded && !showReauth && !inCooldown && !validationPending && (
+                  <span className="badge badge-primary">{t("prov.accountActive")}</span>
+                )}
+                {a.plan && <span className="badge badge-plan">{a.plan}</span>}
+                {planExcluded && (
+                  <span
+                    className="badge badge-muted"
+                    title={t("codexAuth.planExcludedHint", {
+                      plan: a.selectionExcludedPlan ?? a.plan ?? "",
+                    })}
+                  >
+                    {t("codexAuth.planExcluded")}
+                  </span>
+                )}
+                {a.paused && (
+                  <span
+                    className="badge badge-muted"
+                    title={
+                      a.pauseDetails
+                        ? formatAccountPauseTooltip(t, locale, a.pauseDetails)
+                        : t("codexAuth.pausedHint")
+                    }
+                  >
+                    {t("codexAuth.paused")}
+                  </span>
+                )}
 
-              <CreditsOnBadge enabled={a.creditsAfterLimit} />
+                <CreditsOnBadge enabled={a.creditsAfterLimit} />
 
-              <CodexTicketBadge t={t} account={a} onClick={() => onOpenReset(a)} />
-              {healthLabel && (
-                <span className={oauthHealthBadgeClass(healthStatus)}>{healthLabel}</span>
-              )}
-              {showReauth && !healthLabel && <span className="badge badge-amber">{t("codexAuth.needsReauth")}</span>}
-            </>}
-            actions={<>
-
-              {showReauth && (
-                <button type="button" className="btn btn-primary btn-sm" onClick={() => onReauth(a.id)}>
-                  {t("codexAuth.reauthenticate")}
+                <CodexTicketBadge t={t} account={a} onClick={() => onOpenReset(a)} />
+                {healthLabel && (
+                  <span className={oauthHealthBadgeClass(healthStatus)}>{healthLabel}</span>
+                )}
+                {showReauth && !healthLabel && (
+                  <span className="badge badge-amber">{t("codexAuth.needsReauth")}</span>
+                )}
+              </>
+            }
+            actions={
+              <>
+                {showReauth && (
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => onReauth(a.id)}
+                  >
+                    {t("codexAuth.reauthenticate")}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="acc-icon-btn codex-auth-action-btn"
+                  onClick={() => onTogglePause(a)}
+                  disabled={pauseBusy}
+                  aria-busy={pauseUpdatingId === a.id || undefined}
+                  title={a.paused ? t("codexAuth.pausedHint") : t("codexAuth.pause")}
+                  aria-label={
+                    a.paused
+                      ? `${t("codexAuth.resume")}. ${t("codexAuth.pausedHint")}`
+                      : t("codexAuth.pause")
+                  }
+                >
+                  {a.paused ? <IconPlay width={15} /> : <IconPause width={15} />}
+                  <span className="sr-only">
+                    <CodexPauseToggleLabel
+                      t={t}
+                      paused={a.paused}
+                      saving={pauseUpdatingId === a.id}
+                    />
+                  </span>
                 </button>
-              )}
-              <button
-                type="button"
-                className="acc-icon-btn codex-auth-action-btn"
-                onClick={() => onTogglePause(a)}
-                disabled={pauseBusy}
-                aria-busy={pauseUpdatingId === a.id || undefined}
-                title={a.paused ? t("codexAuth.pausedHint") : t("codexAuth.pause")}
-                aria-label={a.paused ? `${t("codexAuth.resume")}. ${t("codexAuth.pausedHint")}` : t("codexAuth.pause")}
-              >
-                {a.paused ? <IconPlay width={15} /> : <IconPause width={15} />}
-                <span className="sr-only">
-                  <CodexPauseToggleLabel t={t} paused={a.paused} saving={pauseUpdatingId === a.id} />
-                </span>
-              </button>
-            </>}
+              </>
+            }
             more={
               /*
                 Rarely used settings fold into a labelled disclosure (aria-expanded from the
@@ -144,10 +171,15 @@ export function CodexAccountPoolCards({
                 label={`${t("codexAuth.moreActions")} — ${a.email}`}
                 title={t("codexAuth.moreActions")}
                 open={moreOpen.has(a.id)}
-                onToggle={open => setMoreOpen(prev => { const nextSet = new Set(prev); if (open) nextSet.add(a.id); else nextSet.delete(a.id); return nextSet; })}
+                onToggle={(open) =>
+                  setMoreOpen((prev) => {
+                    const nextSet = new Set(prev);
+                    if (open) nextSet.add(a.id);
+                    else nextSet.delete(a.id);
+                    return nextSet;
+                  })
+                }
               >
-
-
                 {onToggleCreditsAfterLimit && (
                   <AccountSetting>
                     <AccountCreditsToggle
@@ -155,15 +187,31 @@ export function CodexAccountPoolCards({
                       enabled={a.creditsAfterLimit}
                       saving={creditsAfterLimitUpdatingId === a.id}
                       disabled={creditsAfterLimitUpdatingId !== null}
-                      onChange={enabled => onToggleCreditsAfterLimit(a, enabled)}
+                      onChange={(enabled) => onToggleCreditsAfterLimit(a, enabled)}
                     />
                   </AccountSetting>
                 )}
-                <AccountSetting label={<span className="mono">{t("prov.accountId")}: {displayAccountId(a.id)}</span>}>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => idCopy.copy(a.id, a.id)}>
-                    {idCopy.outcomeFor(a.id) === "copied" ? t("startup.copied") : t("codexAuth.copyId")}
+                <AccountSetting
+                  label={
+                    <span className="mono">
+                      {t("prov.accountId")}: {displayAccountId(a.id)}
+                    </span>
+                  }
+                >
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => idCopy.copy(a.id, a.id)}
+                  >
+                    {idCopy.outcomeFor(a.id) === "copied"
+                      ? t("startup.copied")
+                      : t("codexAuth.copyId")}
                   </button>
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => void onEditAlias(a)}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => void onEditAlias(a)}
+                  >
                     {t("prov.editAlias")}
                   </button>
                   <button
@@ -171,7 +219,10 @@ export function CodexAccountPoolCards({
                     className="btn btn-ghost btn-sm acc-danger-btn"
                     aria-label={`${t("common.remove")} — ${a.email}`}
                     title={`${t("common.remove")} — ${a.email}`}
-                    onClick={e => { e.stopPropagation(); void onRemove(a.id); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void onRemove(a.id);
+                    }}
                   >
                     <IconX width={14} /> {t("common.remove")}
                   </button>
@@ -185,16 +236,28 @@ export function CodexAccountPoolCards({
                   <div className="card-sub faint">
                     <span>{healthSummary}</span>
                     {showDoctor && (
-                      <button type="button" className="link-btn codex-auth-action-btn" onClick={() => onCopyDoctor(a.id)}>
-                        <span aria-live="polite">{doctorCopyButtonLabel(t, doctorCopyOutcomeFor?.(a.id))}</span>
+                      <button
+                        type="button"
+                        className="link-btn codex-auth-action-btn"
+                        onClick={() => onCopyDoctor(a.id)}
+                      >
+                        <span aria-live="polite">
+                          {doctorCopyButtonLabel(t, doctorCopyOutcomeFor?.(a.id))}
+                        </span>
                       </button>
                     )}
                   </div>
                 )}
                 {!healthSummary && showDoctor && (
                   <div className="card-sub faint">
-                    <button type="button" className="link-btn codex-auth-action-btn" onClick={() => onCopyDoctor(a.id)}>
-                      <span aria-live="polite">{doctorCopyButtonLabel(t, doctorCopyOutcomeFor?.(a.id))}</span>
+                    <button
+                      type="button"
+                      className="link-btn codex-auth-action-btn"
+                      onClick={() => onCopyDoctor(a.id)}
+                    >
+                      <span aria-live="polite">
+                        {doctorCopyButtonLabel(t, doctorCopyOutcomeFor?.(a.id))}
+                      </span>
                     </button>
                   </div>
                 )}
@@ -204,12 +267,17 @@ export function CodexAccountPoolCards({
             )}
             {!showReauth && !inCooldown && (
               <div className="acc-row__meters">
-                <QuotaBars threshold={0}
+                <QuotaBars
+                  threshold={0}
                   quota={a.quota}
                   plan={a.plan}
                   t={t}
                   pending={a.quota == null && (loading || !showCredits)}
-                  afterWeekly={showCredits && !loading ? <CodexCreditsRow credits={a.credits} t={t} locale={locale} /> : undefined}
+                  afterWeekly={
+                    showCredits && !loading ? (
+                      <CodexCreditsRow credits={a.credits} t={t} locale={locale} />
+                    ) : undefined
+                  }
                 />
               </div>
             )}
@@ -220,18 +288,18 @@ export function CodexAccountPoolCards({
   );
 }
 
-export function CodexAccountPoolReauthBanner({
-  onReauth,
-}: {
-  onReauth: () => void;
-}) {
+export function CodexAccountPoolReauthBanner({ onReauth }: { onReauth: () => void }) {
   const t = useT();
   return (
-    <InlineBanner tone="warn" className="acc-row-banner" action={
-      <button type="button" className="btn btn-primary btn-sm" onClick={onReauth}>
-        {t("codexAuth.reauthenticate")}
-      </button>
-    }>
+    <InlineBanner
+      tone="warn"
+      className="acc-row-banner"
+      action={
+        <button type="button" className="btn btn-primary btn-sm" onClick={onReauth}>
+          {t("codexAuth.reauthenticate")}
+        </button>
+      }
+    >
       {t("codexAuth.tokenExpired")}
     </InlineBanner>
   );

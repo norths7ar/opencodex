@@ -17,7 +17,13 @@ export const LOGS_OPTIONAL_COLUMNS: ReadonlyArray<{ key: LogsOptionalColumn; lab
 ];
 
 const STORAGE_KEY = "ocx.logs.columns.v1";
-const ALL_VISIBLE: Record<LogsOptionalColumn, boolean> = { effort: true, tokens: true, rate: true, cost: true, duration: true };
+const ALL_VISIBLE: Record<LogsOptionalColumn, boolean> = {
+  effort: true,
+  tokens: true,
+  rate: true,
+  cost: true,
+  duration: true,
+};
 
 function readColumns(): Record<LogsOptionalColumn, boolean> {
   try {
@@ -40,14 +46,17 @@ export function useLogsColumns() {
   const [columns, setColumns] = useState(readColumns);
   // Each toggle is its own click, so `columns` is current here; the store write stays out of
   // the state updater, which React may replay.
-  const toggle = useCallback((key: LogsOptionalColumn) => {
-    const next = { ...columns, [key]: !columns[key] };
-    setColumns(next);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      // Private mode or a blocked store: the toggle still applies for this visit.
-    }
-  }, [columns]);
+  const toggle = useCallback(
+    (key: LogsOptionalColumn) => {
+      const next = { ...columns, [key]: !columns[key] };
+      setColumns(next);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Private mode or a blocked store: the toggle still applies for this visit.
+      }
+    },
+    [columns],
+  );
   return { columns, toggle };
 }

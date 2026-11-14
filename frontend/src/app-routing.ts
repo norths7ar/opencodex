@@ -36,9 +36,9 @@ export const VALID_PAGES = new Set<Page>([
 ]);
 
 export function readPageFromHash(hash?: string): Page {
-  const raw = splitHashQuery(normalizeHashPath(
-    hash ?? (typeof window !== "undefined" ? window.location.hash : ""),
-  )).path;
+  const raw = splitHashQuery(
+    normalizeHashPath(hash ?? (typeof window !== "undefined" ? window.location.hash : "")),
+  ).path;
   // Sub-views use a "/" suffix (e.g. #logs/debug); the first segment is the page id.
   const pageId = raw.split("/")[0] as Page;
   // Legacy: Debug used to be a standalone page; it now lives as a tab on Logs.
@@ -52,8 +52,7 @@ export function readPageFromHash(hash?: string): Page {
   // Legacy integration pages now live below one Integrations route. Returning
   // the destination page here keeps the initial hook state aligned until the
   // resolver replaces the hash with the exact nested destination.
-  if (pageId === ("api" as Page)
-    || pageId === ("grok" as Page)) return "integrations";
+  if (pageId === ("api" as Page) || pageId === ("grok" as Page)) return "integrations";
   if (raw === "integrations/claude" || raw === "integrations/claude/desktop") return "claude";
   // Claude accounts live on Providers now; the old Account sub-tab bookmark opens them there.
   if (raw === "claude/account") return "providers";
@@ -83,7 +82,6 @@ export const DASHBOARD_TAB_HASHES = ["dashboard/providers", "dashboard/models"] 
 
 /** Models keeps the catalog and explicit routing configuration. */
 export const MODELS_TAB_HASHES = ["models/routing"] as const;
-
 
 /**
  * Integrations uses a wrapping outer tab strip. Claude Desktop is a nested
@@ -130,18 +128,16 @@ export const QUERY_HASH_PATHS: readonly string[] = ["providers"];
 export const CLAUDE_ACCOUNT_REDIRECT = "providers?provider=anthropic&tab=accounts";
 
 export function hashBelongsToPage(rawHash: string, page: Page): boolean {
-  return rawHash === page
-    || (page === "claude" && ["claude/code", "claude/desktop"].includes(rawHash))
-    || (page === "logs" && rawHash === "logs/debug")
-    || (page === "usage" && rawHash === "usage/companion")
-    || (page === "codex-set" && (rawHash === "codex-set/prompt" || rawHash === "codex-set/desktop"))
-    || (page === "models" && (
-      (MODELS_TAB_HASHES as readonly string[]).includes(rawHash)
-    ))
-    || (page === "dashboard"
-      && (DASHBOARD_TAB_HASHES as readonly string[]).includes(rawHash))
-    || (page === "integrations"
-      && (INTEGRATION_TAB_HASHES as readonly string[]).includes(rawHash));
+  return (
+    rawHash === page ||
+    (page === "claude" && ["claude/code", "claude/desktop"].includes(rawHash)) ||
+    (page === "logs" && rawHash === "logs/debug") ||
+    (page === "usage" && rawHash === "usage/companion") ||
+    (page === "codex-set" && (rawHash === "codex-set/prompt" || rawHash === "codex-set/desktop")) ||
+    (page === "models" && (MODELS_TAB_HASHES as readonly string[]).includes(rawHash)) ||
+    (page === "dashboard" && (DASHBOARD_TAB_HASHES as readonly string[]).includes(rawHash)) ||
+    (page === "integrations" && (INTEGRATION_TAB_HASHES as readonly string[]).includes(rawHash))
+  );
 }
 
 /** Result of resolving an incoming hash. */
@@ -183,9 +179,11 @@ export function resolveAppHashChange(rawHash: string): AppHashChangeAction {
   /* Legacy top-level integration pages. */
   if (rawHash === "api") return { page: "integrations", replaceTo: "integrations/keys" };
   if (rawHash === "integrations/claude") return { page: "claude", replaceTo: "claude/code" };
-  if (rawHash === "integrations/claude/desktop") return { page: "claude", replaceTo: "claude/desktop" };
+  if (rawHash === "integrations/claude/desktop")
+    return { page: "claude", replaceTo: "claude/desktop" };
   // The Claude page lost its Account sub-tab; Anthropic's Accounts tab on Providers replaces it.
-  if (rawHash === "claude/account") return { page: "providers", replaceTo: CLAUDE_ACCOUNT_REDIRECT };
+  if (rawHash === "claude/account")
+    return { page: "providers", replaceTo: CLAUDE_ACCOUNT_REDIRECT };
   // The read-only Settings sub-tab folded into Code, which already holds its controls.
   if (rawHash === "claude/settings") return { page: "claude", replaceTo: "claude/code" };
   if (rawHash === "grok") return { page: "integrations", replaceTo: "integrations/grok" };

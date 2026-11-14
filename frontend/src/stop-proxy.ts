@@ -85,7 +85,7 @@ export async function requestProxyStop(
   const {
     fetchFn = fetch,
     timeoutMs = DEFAULT_STOP_TIMEOUT_MS,
-    formatFailure = status => `Failed to stop proxy (HTTP ${status}).`,
+    formatFailure = (status) => `Failed to stop proxy (HTTP ${status}).`,
     formatStillRunning = () => "The proxy is still answering, so it did not stop.",
     formatUnknown = () => "The proxy did not confirm the stop. Check whether it is still running.",
     livenessTimeoutMs = DEFAULT_LIVENESS_TIMEOUT_MS,
@@ -106,7 +106,7 @@ export async function requestProxyStop(
   let payload: ProxyStopPayload | null = null;
   let bodyRead = true;
   try {
-    payload = await response.json() as ProxyStopPayload;
+    payload = (await response.json()) as ProxyStopPayload;
   } catch {
     // The status line arrived and the body did not. On a refusal that is already enough to
     // report; on an apparent success it is not, because `success: false` rides in the body

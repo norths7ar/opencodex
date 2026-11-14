@@ -7,10 +7,7 @@ import { DashboardDialogs } from "./dashboard-dialogs";
 import { DashboardModelsSection } from "./dashboard-models-section";
 import { DashboardOverviewSection } from "./dashboard-overview-section";
 import { DashboardProvidersSection } from "./dashboard-providers-section";
-import {
-  dashboardHashForSection,
-  type DashboardSection,
-} from "./dashboard-shared";
+import { dashboardHashForSection, type DashboardSection } from "./dashboard-shared";
 import { useDashboardData } from "./use-dashboard-data";
 
 function selectDashboardTab(next: DashboardSection) {
@@ -18,25 +15,55 @@ function selectDashboardTab(next: DashboardSection) {
   navigateHash(dashboardHashForSection(next));
 }
 
-export default function Dashboard({ apiBase, readOnly = false, authenticationPending = false, refreshEpoch = 0 }: {
-  apiBase: string; readOnly?: boolean; authenticationPending?: boolean; refreshEpoch?: number;
+export default function Dashboard({
+  apiBase,
+  readOnly = false,
+  authenticationPending = false,
+  refreshEpoch = 0,
+}: {
+  apiBase: string;
+  readOnly?: boolean;
+  authenticationPending?: boolean;
+  refreshEpoch?: number;
 }) {
   const d = useDashboardData(apiBase, refreshEpoch);
   const {
-    t, error, selectedSection,
-    providers, models, modelsLoading, modelQuery, setModelQuery,
-    filteredGroups, expandedProviders, setExpandedProviders,
+    t,
+    error,
+    selectedSection,
+    providers,
+    models,
+    modelsLoading,
+    modelQuery,
+    setModelQuery,
+    filteredGroups,
+    expandedProviders,
+    setExpandedProviders,
   } = d;
 
   if (authenticationPending) return null;
   const accessFailure = d.connectionFailure === "auth" || d.connectionFailure === "denied";
   if (error && (accessFailure || !d.health)) {
     return (
-      <EmptyState style={{ marginTop: 40 }} icon={<IconAlert />}
-        title={<span style={{ color: "var(--red)" }}>{t(d.connectionFailure === "denied"
-          ? "dash.permissionDenied" : d.connectionFailure === "auth" ? "dash.authRequired" : "dash.dataUnavailable")}</span>}>
+      <EmptyState
+        style={{ marginTop: 40 }}
+        icon={<IconAlert />}
+        title={
+          <span style={{ color: "var(--red)" }}>
+            {t(
+              d.connectionFailure === "denied"
+                ? "dash.permissionDenied"
+                : d.connectionFailure === "auth"
+                  ? "dash.authRequired"
+                  : "dash.dataUnavailable",
+            )}
+          </span>
+        }
+      >
         {d.connectionFailure === "unavailable" && <Trans k="dash.runStart" cmd="ocx start" />}
-        <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>{t("common.retry")}</button>
+        <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
+          {t("common.retry")}
+        </button>
       </EmptyState>
     );
   }
@@ -62,10 +89,10 @@ export default function Dashboard({ apiBase, readOnly = false, authenticationPen
     { id: "providers", label: t("dash.activeProviders"), body: providersSection },
     { id: "models", label: t("dash.availableModels"), body: modelsSection },
   ];
-  const selected = sections.find(s => s.id === selectedSection) ?? sections[0];
+  const selected = sections.find((s) => s.id === selectedSection) ?? sections[0];
   const selectTab = selectDashboardTab;
   const onTabKeyDown = (e: React.KeyboardEvent) => {
-    const index = sections.findIndex(s => s.id === selectedSection);
+    const index = sections.findIndex((s) => s.id === selectedSection);
     let next = -1;
     if (e.key === "ArrowRight") next = (index + 1) % sections.length;
     else if (e.key === "ArrowLeft") next = (index - 1 + sections.length) % sections.length;
@@ -80,16 +107,24 @@ export default function Dashboard({ apiBase, readOnly = false, authenticationPen
 
   return (
     <div className="dashboard-workspace-shell">
-      {error && <Notice tone="warn">{t("dash.staleData")} <button className="btn btn-ghost" type="button"
-        onClick={() => d.refreshDashboard()}>{t("common.retry")}</button></Notice>}
+      {error && (
+        <Notice tone="warn">
+          {t("dash.staleData")}{" "}
+          <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
+            {t("common.retry")}
+          </button>
+        </Notice>
+      )}
       <header className="mb-5 flex flex-col gap-1.5">
-        <h2 className="m-0 text-title font-semibold tracking-[-0.025em] text-fg">{t("shellV2.pageProxyDetails")}</h2>
+        <h2 className="m-0 text-title font-semibold tracking-[-0.025em] text-fg">
+          {t("shellV2.pageProxyDetails")}
+        </h2>
         <p className="m-0 max-w-[68ch] text-[14px] leading-[1.55] text-fg-muted">
           {selectedSection === "overview" ? t("proxyV2.pageLede") : t("dash.subtitle")}
         </p>
       </header>
       <div className="page-tabs" role="tablist" aria-label={t("dash.workspace.sections")}>
-        {sections.map(s => (
+        {sections.map((s) => (
           <button
             key={s.id}
             type="button"

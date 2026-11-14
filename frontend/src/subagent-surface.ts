@@ -29,7 +29,8 @@ export function readSubagentSurfaceAdvisory(value: unknown): SubagentSurfaceAdvi
     mode,
     recommended: "v1",
     version: typeof raw.version === "number" ? raw.version : 0,
-    docsUrl: typeof raw.docsUrl === "string" && raw.docsUrl ? raw.docsUrl : SUBAGENT_SURFACE_GUIDE_URL,
+    docsUrl:
+      typeof raw.docsUrl === "string" && raw.docsUrl ? raw.docsUrl : SUBAGENT_SURFACE_GUIDE_URL,
   };
 }
 

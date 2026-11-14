@@ -16,7 +16,9 @@ export default function DroidReasoningDefaultsPanel({
   onReview: () => void;
 }) {
   const t = useT();
-  const effortsByModel = new Map(reasoning.models.map(model => [model.model, new Set(model.efforts)]));
+  const effortsByModel = new Map(
+    reasoning.models.map((model) => [model.model, new Set(model.efforts)]),
+  );
   const unsupported = Object.entries(defaults).filter(([modelId, effort]) => {
     return !effortsByModel.get(modelId)?.has(effort);
   });
@@ -42,16 +44,22 @@ export default function DroidReasoningDefaultsPanel({
 
       {reasoning.models.length > 0 ? (
         <ul className="droid-reasoning-list">
-          {reasoning.models.map(model => {
+          {reasoning.models.map((model) => {
             const selected = defaults[model.model] ?? "";
             const declared = model.efforts.includes(selected);
             const options = [
               { value: "", label: t("integrations.droidReasoning.noDefault") },
-              ...(!declared && selected ? [{
-                value: selected,
-                label: t("integrations.droidReasoning.unsupportedEffort", { effort: selected }),
-              }] : []),
-              ...model.efforts.map(effort => ({ value: effort, label: effort })),
+              ...(!declared && selected
+                ? [
+                    {
+                      value: selected,
+                      label: t("integrations.droidReasoning.unsupportedEffort", {
+                        effort: selected,
+                      }),
+                    },
+                  ]
+                : []),
+              ...model.efforts.map((effort) => ({ value: effort, label: effort })),
             ];
             return (
               <li className="droid-reasoning-row" key={model.model}>
@@ -63,12 +71,14 @@ export default function DroidReasoningDefaultsPanel({
                   <Select
                     value={selected}
                     options={options}
-                    onChange={effort => setDefault(model.model, effort)}
+                    onChange={(effort) => setDefault(model.model, effort)}
                     disabled={disabled}
                     label={t("integrations.droidReasoning.modelDefault", { model: model.label })}
                   />
                 ) : (
-                  <span className="muted text-caption">{t("integrations.droidReasoning.noEfforts")}</span>
+                  <span className="muted text-caption">
+                    {t("integrations.droidReasoning.noEfforts")}
+                  </span>
                 )}
               </li>
             );
@@ -84,9 +94,14 @@ export default function DroidReasoningDefaultsPanel({
           <ul>
             {unsupported.map(([model, effort]) => (
               <li key={model}>
-                <code>{model}</code>
-                {" "}{t("integrations.droidReasoning.unsupportedEffort", { effort })}
-                <button type="button" className="btn btn-ghost btn-sm" disabled={disabled} onClick={() => setDefault(model, "")}>
+                <code>{model}</code>{" "}
+                {t("integrations.droidReasoning.unsupportedEffort", { effort })}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={disabled}
+                  onClick={() => setDefault(model, "")}
+                >
                   {t("integrations.droidReasoning.clear")}
                 </button>
               </li>

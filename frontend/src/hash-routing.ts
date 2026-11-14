@@ -11,7 +11,9 @@ export function normalizeHashPath(hash: string): string {
  */
 export function splitHashQuery(raw: string): { path: string; query: string } {
   const index = raw.indexOf("?");
-  return index < 0 ? { path: raw, query: "" } : { path: raw.slice(0, index), query: raw.slice(index + 1) };
+  return index < 0
+    ? { path: raw, query: "" }
+    : { path: raw.slice(0, index), query: raw.slice(index + 1) };
 }
 
 /**

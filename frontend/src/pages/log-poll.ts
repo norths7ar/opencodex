@@ -13,20 +13,27 @@ export function parseLogPollResponse<T>(body: unknown): ParsedLogPollResponse<T>
   if (!body || typeof body !== "object") throw new Error("Invalid log response");
   const value = body as Record<string, unknown>;
   const hasCursor = Object.hasOwn(value, "cursor") || Object.hasOwn(value, "reset");
-  if ((value.logs !== undefined && !Array.isArray(value.logs))
-    || (hasCursor && (!Array.isArray(value.logs)
-      || typeof value.cursor !== "string" || value.cursor.length === 0 || value.cursor.length > 512
-      || !/^[A-Za-z0-9_-]+$/.test(value.cursor) || typeof value.reset !== "boolean"))) {
+  if (
+    (value.logs !== undefined && !Array.isArray(value.logs)) ||
+    (hasCursor &&
+      (!Array.isArray(value.logs) ||
+        typeof value.cursor !== "string" ||
+        value.cursor.length === 0 ||
+        value.cursor.length > 512 ||
+        !/^[A-Za-z0-9_-]+$/.test(value.cursor) ||
+        typeof value.reset !== "boolean"))
+  ) {
     throw new Error("Invalid log response");
   }
   return {
     rows: (value.logs ?? []) as T[],
-    cursor: hasCursor ? value.cursor as string : null,
+    cursor: hasCursor ? (value.cursor as string) : null,
     reset: value.reset === true,
     generatedAt: value.generatedAt,
     ...(typeof value.timeZone === "string" ? { timeZone: value.timeZone } : {}),
     ...(typeof value.total === "number" && Number.isFinite(value.total) && value.total >= 0
-      ? { total: value.total } : {}),
+      ? { total: value.total }
+      : {}),
   };
 }
 

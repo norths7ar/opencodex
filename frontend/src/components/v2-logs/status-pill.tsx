@@ -13,7 +13,13 @@ const TONE: Record<RequestOutcomeClass, string> = {
  * outcome class, not the number alone, so an incomplete 200 never reads as a clean success; the
  * number and the outcome in the title carry the meaning, never the colour by itself.
  */
-export function StatusPill({ status, outcome, label, announce = true, className }: {
+export function StatusPill({
+  status,
+  outcome,
+  label,
+  announce = true,
+  className,
+}: {
   status: number;
   outcome: RequestOutcomeClass;
   /** The outcome in words, announced and shown on hover. */

@@ -184,9 +184,9 @@ export function useDataSurface<T>(
     ...resourceOptions,
     ...(sessionCacheKey
       ? {
-        initialData: resourceOptions.initialData ?? cachedEntry?.data,
-        initialDataCachedAt: resourceOptions.initialDataCachedAt ?? cachedEntry?.cachedAt ?? null,
-      }
+          initialData: resourceOptions.initialData ?? cachedEntry?.data,
+          initialDataCachedAt: resourceOptions.initialDataCachedAt ?? cachedEntry?.cachedAt ?? null,
+        }
       : {}),
   });
   return {

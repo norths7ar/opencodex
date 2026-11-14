@@ -8,7 +8,15 @@ import "./app-titlebar.css";
  * `brand` is the wordmark the strip shows before the toggle, so the collapse control sits
  * beside the name it hides. It is hidden while collapsed (only the toggle floats then).
  */
-export function SidebarTopStrip({ collapsed, onToggle, brand }: { collapsed: boolean; onToggle: () => void; brand?: ReactNode }) {
+export function SidebarTopStrip({
+  collapsed,
+  onToggle,
+  brand,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+  brand?: ReactNode;
+}) {
   const t = useT();
   const label = collapsed ? t("nav.expandSidebar") : t("nav.collapseSidebar");
   return (
@@ -28,4 +36,3 @@ export function SidebarTopStrip({ collapsed, onToggle, brand }: { collapsed: boo
     </div>
   );
 }
-

@@ -15,7 +15,17 @@
  */
 import type { Page } from "./app-routing";
 import type { TKey } from "./i18n/shared";
-import { IconActivity, IconBot, IconBoxes, IconCodex, IconGrid, IconList, IconPlug, IconRoute, IconServer } from "./icons";
+import {
+  IconActivity,
+  IconBot,
+  IconBoxes,
+  IconCodex,
+  IconGrid,
+  IconList,
+  IconPlug,
+  IconRoute,
+  IconServer,
+} from "./icons";
 
 export type NavGroupId =
   | "home"
@@ -52,28 +62,67 @@ export interface NavGroup {
 export const NAV_GROUPS: readonly NavGroup[] = [
   // Startup lives inside Home again: how the proxy starts is part of its at-a-glance health,
   // and Home's switcher reaches it in one click.
-  { id: "home", tier: "daily", tkey: "shellV2.navHome", Icon: IconGrid, pages: ["home", "startup"] },
+  {
+    id: "home",
+    tier: "daily",
+    tkey: "shellV2.navHome",
+    Icon: IconGrid,
+    pages: ["home", "startup"],
+  },
   // Route: where each client's traffic goes (integrations, the setup checklist, Claude as a tab).
   // It sits above Models because choosing the route comes before choosing the model.
-  { id: "connect", tier: "daily", tkey: "nav.connect", Icon: IconRoute, pages: ["integrations", "setup"], embedded: ["claude"] },
+  {
+    id: "connect",
+    tier: "daily",
+    tkey: "nav.connect",
+    Icon: IconRoute,
+    pages: ["integrations", "setup"],
+    embedded: ["claude"],
+  },
   // Providers: every non-Codex upstream and its quota, on its own row right under Route,
   // since adding a provider is the step that gives a route somewhere to go.
   { id: "providers", tier: "daily", tkey: "nav.providers", Icon: IconPlug, pages: ["providers"] },
   { id: "models", tier: "daily", tkey: "nav.models", Icon: IconBoxes, pages: ["models"] },
   // Codex's account pool: which account is serving and how much it has left.
-  { id: "accounts", tier: "daily", tkey: "shellV2.navAccounts", Icon: IconCodex, pages: ["codex-set"] },
+  {
+    id: "accounts",
+    tier: "daily",
+    tkey: "shellV2.navAccounts",
+    Icon: IconCodex,
+    pages: ["codex-set"],
+  },
   // Which model a helper agent runs on is changed as often as the main model.
   { id: "subagents", tier: "daily", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents"] },
-  { id: "usage-logs", tier: "daily", tkey: "nav.usageLogs", Icon: IconActivity, pages: ["usage", "logs", "storage"] },
+  {
+    id: "usage-logs",
+    tier: "daily",
+    tkey: "nav.usageLogs",
+    Icon: IconActivity,
+    pages: ["usage", "logs", "storage"],
+  },
   // Fine-tuning keeps its surfaces visible too; the All settings hub is the searchable index
   // of every one of them, including the ones that live inside other pages.
-  { id: "proxy", tier: "advanced", tkey: "shellV2.pageProxyDetails", Icon: IconServer, pages: ["dashboard"] },
-  { id: "advanced", tier: "advanced", tkey: "shellV2.pageAllSettings", Icon: IconList, pages: ["advanced"] },
+  {
+    id: "proxy",
+    tier: "advanced",
+    tkey: "shellV2.pageProxyDetails",
+    Icon: IconServer,
+    pages: ["dashboard"],
+  },
+  {
+    id: "advanced",
+    tier: "advanced",
+    tkey: "shellV2.pageAllSettings",
+    Icon: IconList,
+    pages: ["advanced"],
+  },
 ];
 
 /** The row that owns a page, or null for a page outside the sidebar. */
 export function groupForPage(page: Page): NavGroup | null {
-  return NAV_GROUPS.find(group => group.pages.includes(page) || group.embedded?.includes(page)) ?? null;
+  return (
+    NAV_GROUPS.find((group) => group.pages.includes(page) || group.embedded?.includes(page)) ?? null
+  );
 }
 
 export function visibleGroupPages(group: NavGroup): Page[] {

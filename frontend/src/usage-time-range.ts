@@ -12,15 +12,23 @@ function localMinute(value: string): number | null {
   const date = new Date(`${value}:00`);
   const timestamp = date.getTime();
   // Reject calendar overflow and nonexistent local times (including DST gaps).
-  if (!Number.isSafeInteger(timestamp) || timestamp < 0
-    || date.getFullYear() !== year || date.getMonth() !== month - 1
-    || date.getDate() !== day || date.getHours() !== hour || date.getMinutes() !== minute) return null;
+  if (
+    !Number.isSafeInteger(timestamp) ||
+    timestamp < 0 ||
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day ||
+    date.getHours() !== hour ||
+    date.getMinutes() !== minute
+  )
+    return null;
   return timestamp;
 }
 
-export function parseUsageTimeRange(start: string, end: string):
-  | { ok: true; window: UsageTimeWindow }
-  | { ok: false; error: UsageRangeError } {
+export function parseUsageTimeRange(
+  start: string,
+  end: string,
+): { ok: true; window: UsageTimeWindow } | { ok: false; error: UsageRangeError } {
   if (!start || !end) return { ok: false, error: "required" };
   const since = localMinute(start);
   const endMinute = localMinute(end);

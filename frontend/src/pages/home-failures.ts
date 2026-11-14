@@ -1,4 +1,7 @@
-import { classifyRequestOutcome, type RequestOutcomeFacts } from "../../../backend/src/usage/request-outcome";
+import {
+  classifyRequestOutcome,
+  type RequestOutcomeFacts,
+} from "../../../backend/src/usage/request-outcome";
 
 /** The slice of a log row Home reads: when it ran, and the facts its outcome is classified from. */
 export interface HomeLogRow extends RequestOutcomeFacts {
@@ -11,5 +14,5 @@ export interface HomeLogRow extends RequestOutcomeFacts {
  * there, not an error, and a 200 that settled on a failed terminal is a failure.
  */
 export function recentFailures<R extends HomeLogRow>(rows: readonly R[], since: number): R[] {
-  return rows.filter(row => row.timestamp >= since && classifyRequestOutcome(row) === "failed");
+  return rows.filter((row) => row.timestamp >= since && classifyRequestOutcome(row) === "failed");
 }

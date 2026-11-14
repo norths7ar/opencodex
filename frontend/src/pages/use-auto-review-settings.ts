@@ -16,13 +16,27 @@ export function useAutoReviewSettings(
   t: TFn,
   publishFeedback: (ok: boolean, message: string) => void,
 ): AutoReviewSettingsController {
-  const [state, setState] = useState<{ apiBase: string; data: AutoReviewData | null; saving: boolean }>({
-    apiBase, data: null, saving: false,
+  const [state, setState] = useState<{
+    apiBase: string;
+    data: AutoReviewData | null;
+    saving: boolean;
+  }>({
+    apiBase,
+    data: null,
+    saving: false,
   });
   const data = state.apiBase === apiBase ? state.data : null;
   const saving = state.apiBase === apiBase && state.saving;
-  const requests = useRef<{ read: BoundedFetch | null; write: BoundedFetch | null; generation: number; apiBase: string }>({
-    read: null, write: null, generation: 0, apiBase,
+  const requests = useRef<{
+    read: BoundedFetch | null;
+    write: BoundedFetch | null;
+    generation: number;
+    apiBase: string;
+  }>({
+    read: null,
+    write: null,
+    generation: 0,
+    apiBase,
   });
 
   useLayoutEffect(() => {
@@ -40,71 +54,100 @@ export function useAutoReviewSettings(
     };
   }, [apiBase]);
 
-  const load = useCallback(async ({ reconcile = false }: { reconcile?: boolean } = {}) => {
-    const scope = requests.current;
-    if (scope.write && !reconcile) return null;
-    scope.read?.controller.abort();
-    scope.read?.clear();
-    const bounded = createBoundedFetch(15_000);
-    const generation = scope.generation;
-    scope.read = bounded;
-    try {
-      const response = await fetch(`${apiBase}/api/auto-review-settings`, { signal: bounded.signal });
-      const next = await readJsonIfOk<AutoReviewData>(response);
-      if (!next || typeof next.enabled !== "boolean" || typeof next.model !== "string") return null;
-      if (!bounded.signal.aborted && scope.apiBase === apiBase && scope.generation === generation && scope.read === bounded
-        && (!scope.write || reconcile)) {
-        setState({ apiBase, data: next, saving: scope.write !== null });
-        return next;
+  const load = useCallback(
+    async ({ reconcile = false }: { reconcile?: boolean } = {}) => {
+      const scope = requests.current;
+      if (scope.write && !reconcile) return null;
+      scope.read?.controller.abort();
+      scope.read?.clear();
+      const bounded = createBoundedFetch(15_000);
+      const generation = scope.generation;
+      scope.read = bounded;
+      try {
+        const response = await fetch(`${apiBase}/api/auto-review-settings`, {
+          signal: bounded.signal,
+        });
+        const next = await readJsonIfOk<AutoReviewData>(response);
+        if (!next || typeof next.enabled !== "boolean" || typeof next.model !== "string")
+          return null;
+        if (
+          !bounded.signal.aborted &&
+          scope.apiBase === apiBase &&
+          scope.generation === generation &&
+          scope.read === bounded &&
+          (!scope.write || reconcile)
+        ) {
+          setState({ apiBase, data: next, saving: scope.write !== null });
+          return next;
+        }
+        return null;
+      } catch {
+        /* old server / network: keep the row disabled */ return null;
+      } finally {
+        bounded.clear();
+        if (scope.read === bounded) scope.read = null;
       }
-      return null;
-    } catch { /* old server / network: keep the row disabled */ return null; }
-    finally {
-      bounded.clear();
-      if (scope.read === bounded) scope.read = null;
-    }
-  }, [apiBase]);
+    },
+    [apiBase],
+  );
 
-  const save = useCallback(async (patch: Partial<AutoReviewData>) => {
-    const scope = requests.current;
-    if (!data || saving || scope.apiBase !== apiBase || scope.write) return;
-    const confirmed = data;
-    const bounded = createBoundedFetch(15_000);
-    scope.write = bounded;
-    const generation = ++scope.generation;
-    scope.read?.controller.abort();
-    scope.read?.clear();
-    scope.read = null;
-    setState({ apiBase, data: { ...confirmed, ...patch }, saving: true });
-    try {
-      const response = await fetch(`${apiBase}/api/auto-review-settings`, {
-        method: "PUT", headers: { "Content-Type": "application/json" }, signal: bounded.signal,
-        body: JSON.stringify(patch),
-      });
-      const next = await readJsonOrThrow<AutoReviewData & { ok?: unknown; catalogRefresh?: { status?: string } }>(response, t("models.saveFailed"));
-      if (!next || next.ok !== true || typeof next.enabled !== "boolean" || typeof next.model !== "string") {
-        throw new Error(t("models.saveFailed"));
-      }
-      if (scope.apiBase !== apiBase || scope.generation !== generation) return;
-      setState({ apiBase, data: { enabled: next.enabled, model: next.model }, saving: true });
-      if (!next.catalogRefresh || next.catalogRefresh.status !== "committed") {
-        publishFeedback(false, t("codexAuth.catalogRefreshPending"));
-      }
-    } catch (error) {
-      if (scope.apiBase === apiBase && scope.generation === generation) {
-        const refreshed = await load({ reconcile: true });
+  const save = useCallback(
+    async (patch: Partial<AutoReviewData>) => {
+      const scope = requests.current;
+      if (!data || saving || scope.apiBase !== apiBase || scope.write) return;
+      const confirmed = data;
+      const bounded = createBoundedFetch(15_000);
+      scope.write = bounded;
+      const generation = ++scope.generation;
+      scope.read?.controller.abort();
+      scope.read?.clear();
+      scope.read = null;
+      setState({ apiBase, data: { ...confirmed, ...patch }, saving: true });
+      try {
+        const response = await fetch(`${apiBase}/api/auto-review-settings`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          signal: bounded.signal,
+          body: JSON.stringify(patch),
+        });
+        const next = await readJsonOrThrow<
+          AutoReviewData & { ok?: unknown; catalogRefresh?: { status?: string } }
+        >(response, t("models.saveFailed"));
+        if (
+          !next ||
+          next.ok !== true ||
+          typeof next.enabled !== "boolean" ||
+          typeof next.model !== "string"
+        ) {
+          throw new Error(t("models.saveFailed"));
+        }
         if (scope.apiBase !== apiBase || scope.generation !== generation) return;
-        setState({ apiBase, data: refreshed ?? confirmed, saving: true });
-        publishFeedback(false, error instanceof Error && error.message ? error.message : t("models.saveFailed"));
+        setState({ apiBase, data: { enabled: next.enabled, model: next.model }, saving: true });
+        if (!next.catalogRefresh || next.catalogRefresh.status !== "committed") {
+          publishFeedback(false, t("codexAuth.catalogRefreshPending"));
+        }
+      } catch (error) {
+        if (scope.apiBase === apiBase && scope.generation === generation) {
+          const refreshed = await load({ reconcile: true });
+          if (scope.apiBase !== apiBase || scope.generation !== generation) return;
+          setState({ apiBase, data: refreshed ?? confirmed, saving: true });
+          publishFeedback(
+            false,
+            error instanceof Error && error.message ? error.message : t("models.saveFailed"),
+          );
+        }
+      } finally {
+        bounded.clear();
+        if (scope.write === bounded) scope.write = null;
+        if (scope.apiBase === apiBase && scope.generation === generation) {
+          setState((current) =>
+            current.apiBase === apiBase ? { ...current, saving: false } : current,
+          );
+        }
       }
-    } finally {
-      bounded.clear();
-      if (scope.write === bounded) scope.write = null;
-      if (scope.apiBase === apiBase && scope.generation === generation) {
-        setState(current => current.apiBase === apiBase ? { ...current, saving: false } : current);
-      }
-    }
-  }, [apiBase, data, saving, t, publishFeedback, load]);
+    },
+    [apiBase, data, saving, t, publishFeedback, load],
+  );
 
   return { data, saving, load, save };
 }

@@ -3,7 +3,12 @@ import { readJsonOrThrow } from "../../fetch-json";
 import { useT } from "../../i18n/shared";
 import { Notice } from "../../ui";
 import type { SavedRole } from "./LazyCodexRoleHistory";
-import { EFFORT_LABEL, TIER_LABEL, type SizingEffortIntent, type SizingTier } from "./sizing-labels";
+import {
+  EFFORT_LABEL,
+  TIER_LABEL,
+  type SizingEffortIntent,
+  type SizingTier,
+} from "./sizing-labels";
 
 export interface RoleProposal {
   role: string;
@@ -37,7 +42,12 @@ export default function LazyCodexRoleAutoAssign({
 }: {
   apiBase: string;
   busy: boolean;
-  apply: (role: string, model: string, effort: string | undefined, batch?: string) => Promise<SavedRole | null>;
+  apply: (
+    role: string,
+    model: string,
+    effort: string | undefined,
+    batch?: string,
+  ) => Promise<SavedRole | null>;
 }) {
   const t = useT();
   const [running, setRunning] = useState(false);
@@ -57,23 +67,36 @@ export default function LazyCodexRoleAutoAssign({
         headers: { "Content-Type": "application/json" },
         body: "{}",
       });
-      const payload = await readJsonOrThrow<Proposals>(response, t("integrations.lazycodexRoles.auto.failed"));
+      const payload = await readJsonOrThrow<Proposals>(
+        response,
+        t("integrations.lazycodexRoles.auto.failed"),
+      );
       setResult(payload ?? null);
       setApplied({});
     } catch (caught) {
       setResult(null);
-      setError(caught instanceof Error && caught.message ? caught.message : t("integrations.lazycodexRoles.auto.failed"));
+      setError(
+        caught instanceof Error && caught.message
+          ? caught.message
+          : t("integrations.lazycodexRoles.auto.failed"),
+      );
     } finally {
       setRunning(false);
     }
   };
 
-  const applicable = (result?.proposals ?? []).filter(p =>
-    p.status === "proposed" && p.proposedModel && !applied[p.role] && !alreadySet(p));
+  const applicable = (result?.proposals ?? []).filter(
+    (p) => p.status === "proposed" && p.proposedModel && !applied[p.role] && !alreadySet(p),
+  );
 
   const applyOne = async (proposal: RoleProposal, batch?: string): Promise<SavedRole | null> => {
-    const saved = await apply(proposal.role, proposal.proposedModel!, proposal.proposedEffort ?? undefined, batch);
-    if (saved) setApplied(current => ({ ...current, [proposal.role]: true }));
+    const saved = await apply(
+      proposal.role,
+      proposal.proposedModel!,
+      proposal.proposedEffort ?? undefined,
+      batch,
+    );
+    if (saved) setApplied((current) => ({ ...current, [proposal.role]: true }));
     return saved;
   };
 
@@ -92,7 +115,12 @@ export default function LazyCodexRoleAutoAssign({
         batch ??= saved.batch;
         count += 1;
       }
-      setSummary(t("integrations.lazycodexRoles.auto.appliedCount", { count: String(count), total: String(total) }));
+      setSummary(
+        t("integrations.lazycodexRoles.auto.appliedCount", {
+          count: String(count),
+          total: String(total),
+        }),
+      );
     } finally {
       setApplying(false);
     }
@@ -105,29 +133,58 @@ export default function LazyCodexRoleAutoAssign({
       <div className="lazycodex-auto-assign-bar">
         <p className="page-sub">{t("integrations.lazycodexRoles.auto.hint")}</p>
         <button type="button" className="btn btn-sm" disabled={locked} onClick={() => void run()}>
-          {running ? t("integrations.lazycodexRoles.auto.running") : t("integrations.lazycodexRoles.auto.button")}
+          {running
+            ? t("integrations.lazycodexRoles.auto.running")
+            : t("integrations.lazycodexRoles.auto.button")}
         </button>
       </div>
       {error && <Notice tone="err">{error}</Notice>}
       {result && (
-        <section className="lazycodex-auto-assign-panel" aria-labelledby="lazycodex-auto-assign-title">
+        <section
+          className="lazycodex-auto-assign-panel"
+          aria-labelledby="lazycodex-auto-assign-title"
+        >
           <div className="lazycodex-auto-assign-bar">
             <h5 id="lazycodex-auto-assign-title">{t("integrations.lazycodexRoles.auto.title")}</h5>
-            <span className="integration-meta">{t("integrations.lazycodexRoles.auto.sizedWith", { model: result.sizingModel })}</span>
+            <span className="integration-meta">
+              {t("integrations.lazycodexRoles.auto.sizedWith", { model: result.sizingModel })}
+            </span>
             <div className="lazycodex-auto-assign-actions">
-              <button type="button" className="btn btn-primary btn-sm" disabled={locked || applicable.length === 0} onClick={() => void applyAll()}>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={locked || applicable.length === 0}
+                onClick={() => void applyAll()}
+              >
                 {t("integrations.lazycodexRoles.auto.applyAll")}
               </button>
-              <button type="button" className="btn btn-ghost btn-sm" disabled={applying} onClick={() => { setResult(null); setSummary(null); }}>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                disabled={applying}
+                onClick={() => {
+                  setResult(null);
+                  setSummary(null);
+                }}
+              >
                 {t("integrations.lazycodexRoles.auto.discard")}
               </button>
             </div>
           </div>
-          {result.sizingError && <Notice tone="warn">{t("integrations.lazycodexRoles.auto.sizingFailed", { error: result.sizingError })}</Notice>}
+          {result.sizingError && (
+            <Notice tone="warn">
+              {t("integrations.lazycodexRoles.auto.sizingFailed", { error: result.sizingError })}
+            </Notice>
+          )}
           {summary && <Notice tone="ok">{summary}</Notice>}
           <ul className="lazycodex-auto-assign-list">
-            {result.proposals.map(proposal => (
-              <li key={proposal.role} aria-label={t("integrations.lazycodexRoles.auto.proposalFor", { role: proposal.role })}>
+            {result.proposals.map((proposal) => (
+              <li
+                key={proposal.role}
+                aria-label={t("integrations.lazycodexRoles.auto.proposalFor", {
+                  role: proposal.role,
+                })}
+              >
                 <div className="lazycodex-auto-assign-head">
                   <code>{proposal.role}</code>
                   {proposal.tier && proposal.effortIntent && (
@@ -140,30 +197,65 @@ export default function LazyCodexRoleAutoAssign({
                   )}
                 </div>
                 {proposal.status === "unsized" ? (
-                  <p className="integration-meta">{t("integrations.lazycodexRoles.auto.unsized", { reason: proposal.reason ?? "" })}</p>
+                  <p className="integration-meta">
+                    {t("integrations.lazycodexRoles.auto.unsized", {
+                      reason: proposal.reason ?? "",
+                    })}
+                  </p>
                 ) : (
                   <>
                     <div className="lazycodex-auto-assign-change">
-                      <span>{proposal.model ? <code>{proposal.model}</code> : t("integrations.lazycodexRoles.none")}</span>
+                      <span>
+                        {proposal.model ? (
+                          <code>{proposal.model}</code>
+                        ) : (
+                          t("integrations.lazycodexRoles.none")
+                        )}
+                      </span>
                       <span aria-hidden="true">→</span>
-                      {proposal.proposedModel
-                        ? <code>{proposal.proposedModel}{proposal.proposedEffort ? ` · ${proposal.proposedEffort}` : ""}</code>
-                        : <span className="integration-meta">{t("integrations.lazycodexRoles.auto.unassigned", { reason: proposal.reason ?? "" })}</span>}
-                      {proposal.status === "proposed" && (applied[proposal.role] || alreadySet(proposal)
-                        ? (
+                      {proposal.proposedModel ? (
+                        <code>
+                          {proposal.proposedModel}
+                          {proposal.proposedEffort ? ` · ${proposal.proposedEffort}` : ""}
+                        </code>
+                      ) : (
+                        <span className="integration-meta">
+                          {t("integrations.lazycodexRoles.auto.unassigned", {
+                            reason: proposal.reason ?? "",
+                          })}
+                        </span>
+                      )}
+                      {proposal.status === "proposed" &&
+                        (applied[proposal.role] || alreadySet(proposal) ? (
                           <span className="lazycodex-auto-assign-done">
-                            {applied[proposal.role] ? t("integrations.lazycodexRoles.auto.applied") : t("integrations.lazycodexRoles.auto.alreadySet")}
+                            {applied[proposal.role]
+                              ? t("integrations.lazycodexRoles.auto.applied")
+                              : t("integrations.lazycodexRoles.auto.alreadySet")}
                           </span>
-                        )
-                        : (
-                          <button type="button" className="btn btn-sm" disabled={locked} onClick={() => void applyOne(proposal)}>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            disabled={locked}
+                            onClick={() => void applyOne(proposal)}
+                          >
                             {t("integrations.lazycodexRoles.auto.apply")}
                           </button>
                         ))}
                     </div>
                     {proposal.rationale && <p>{proposal.rationale}</p>}
-                    {proposal.moveUpIf && <p className="integration-meta">{t("integrations.lazycodexRoles.auto.moveUp", { text: proposal.moveUpIf })}</p>}
-                    {proposal.moveDownIf && <p className="integration-meta">{t("integrations.lazycodexRoles.auto.moveDown", { text: proposal.moveDownIf })}</p>}
+                    {proposal.moveUpIf && (
+                      <p className="integration-meta">
+                        {t("integrations.lazycodexRoles.auto.moveUp", { text: proposal.moveUpIf })}
+                      </p>
+                    )}
+                    {proposal.moveDownIf && (
+                      <p className="integration-meta">
+                        {t("integrations.lazycodexRoles.auto.moveDown", {
+                          text: proposal.moveDownIf,
+                        })}
+                      </p>
+                    )}
                   </>
                 )}
               </li>

@@ -1,9 +1,11 @@
 import type { TFn } from "../i18n/shared";
 
-type EstimatedCostResult = {
-  kind: "value";
-  estimate: { cost: { total: number }; priorityLowerBound?: boolean };
-} | { kind: "unavailable" };
+type EstimatedCostResult =
+  | {
+      kind: "value";
+      estimate: { cost: { total: number }; priorityLowerBound?: boolean };
+    }
+  | { kind: "unavailable" };
 
 /**
  * Cost cells render a fixed `$0.1401` in every locale. The column header is the untranslated

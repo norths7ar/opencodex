@@ -46,15 +46,20 @@ export function useProviderSettingsDeepLink(
     tab: readProviderDeepLinkTab(),
     seq: 0,
   }));
-  const [applied, setApplied] = useState<{ seq: number; provider: string; tab: ProviderDeepLinkTab } | null>(null);
+  const [applied, setApplied] = useState<{
+    seq: number;
+    provider: string;
+    tab: ProviderDeepLinkTab;
+  } | null>(null);
   const previousSelectedRef = useRef<string | null>(selected);
 
   useEffect(() => {
-    const sync = () => setRequest(current => ({
-      name: readProviderSettingsTarget(),
-      tab: readProviderDeepLinkTab(),
-      seq: current.seq + 1,
-    }));
+    const sync = () =>
+      setRequest((current) => ({
+        name: readProviderSettingsTarget(),
+        tab: readProviderDeepLinkTab(),
+        seq: current.seq + 1,
+      }));
     window.addEventListener("hashchange", sync);
     window.addEventListener("popstate", sync);
     return () => {
@@ -66,7 +71,11 @@ export function useProviderSettingsDeepLink(
   // A name that is not configured (yet) waits here until the provider list contains it.
   if (request.name && applied?.seq !== request.seq && providerNames?.includes(request.name)) {
     const openAccounts = request.tab === "accounts" ? onAccounts : undefined;
-    setApplied({ seq: request.seq, provider: request.name, tab: openAccounts ? "accounts" : "settings" });
+    setApplied({
+      seq: request.seq,
+      provider: request.name,
+      tab: openAccounts ? "accounts" : "settings",
+    });
     if (openAccounts) openAccounts(request.name);
     else select(request.name);
   }
@@ -82,5 +91,7 @@ export function useProviderSettingsDeepLink(
     if (movedAway) replaceHash(PROVIDERS_HASH);
   }, [applied, request, selected]);
 
-  return applied?.tab === "settings" ? { token: applied.seq + 1, provider: applied.provider } : { token: 0, provider: null };
+  return applied?.tab === "settings"
+    ? { token: applied.seq + 1, provider: applied.provider }
+    : { token: 0, provider: null };
 }

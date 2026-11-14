@@ -41,9 +41,8 @@ export default function IntegrationStateBadge({
   const t = useT();
   // A caller that already resolved the visual state passes it through; the
   // file-client pages still hand over the raw server state plus `installed`.
-  const visual: VisualIntegrationState = state === "unknown" || state === "not-installed"
-    ? state
-    : installed ? state : "not-installed";
+  const visual: VisualIntegrationState =
+    state === "unknown" || state === "not-installed" ? state : installed ? state : "not-installed";
   return (
     <span id={id} className={CLASSES[visual]} data-integration-state={visual}>
       {t(LABEL_KEYS[visual])}

@@ -10,7 +10,10 @@ import { useAddCodexAccountOAuth } from "./use-add-codex-account-oauth";
 import type { CodexAccountMutationCompletion } from "../codex-account-mutation";
 
 export default function AddCodexAccountModal({
-  apiBase, onClose, onAdded, reauthAccountId,
+  apiBase,
+  onClose,
+  onAdded,
+  reauthAccountId,
 }: {
   apiBase: string;
   onClose: () => void;
@@ -18,12 +21,23 @@ export default function AddCodexAccountModal({
   reauthAccountId?: string;
 }) {
   const t = useT();
-  const [ui, dispatch] = useReducer(addCodexAccountUiReducer, reauthAccountId, initialAddCodexAccountUiState);
+  const [ui, dispatch] = useReducer(
+    addCodexAccountUiReducer,
+    reauthAccountId,
+    initialAddCodexAccountUiState,
+  );
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   const oauth = useAddCodexAccountOAuth({ apiBase, reauthAccountId, ui, dispatch, t });
-  const { manualCodeBusy, manualCodeWaiting, bindCallbacks, closeModal, startOAuth, submitManualCode } = oauth;
+  const {
+    manualCodeBusy,
+    manualCodeWaiting,
+    bindCallbacks,
+    closeModal,
+    startOAuth,
+    submitManualCode,
+  } = oauth;
 
   useEffect(() => {
     bindCallbacks(onAdded, onClose);
@@ -42,10 +56,13 @@ export default function AddCodexAccountModal({
     };
   }, []);
 
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
-    e.preventDefault();
-    closeModal();
-  }, [closeModal]);
+  const handleCancel = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      closeModal();
+    },
+    [closeModal],
+  );
 
   const dialogLabel = reauthAccountId ? t("codexAuth.reauthenticate") : t("codexAuth.addTitle");
 
@@ -61,9 +78,13 @@ export default function AddCodexAccountModal({
           <AddCodexAccountPickStep
             id={ui.id}
             error={ui.error}
-            onIdChange={value => dispatch({ type: "set-id", id: value })}
-            onStartOAuth={() => { void startOAuth(ui.id); }}
-            onStartDeviceOAuth={() => { void startOAuth(ui.id, { device: true }); }}
+            onIdChange={(value) => dispatch({ type: "set-id", id: value })}
+            onStartOAuth={() => {
+              void startOAuth(ui.id);
+            }}
+            onStartDeviceOAuth={() => {
+              void startOAuth(ui.id, { device: true });
+            }}
             onClose={closeModal}
           />
         )}
@@ -81,9 +102,13 @@ export default function AddCodexAccountModal({
             statusTone={ui.statusTone}
             flowId={ui.flowId}
             error={ui.error}
-            onSwitchToDevice={() => { void startOAuth(ui.id, { device: true }); }}
-            onManualCodeChange={value => dispatch({ type: "set-manual-code", manualCode: value })}
-            onSubmitManualCode={() => { void submitManualCode(); }}
+            onSwitchToDevice={() => {
+              void startOAuth(ui.id, { device: true });
+            }}
+            onManualCodeChange={(value) => dispatch({ type: "set-manual-code", manualCode: value })}
+            onSubmitManualCode={() => {
+              void submitManualCode();
+            }}
             onClose={closeModal}
           />
         )}

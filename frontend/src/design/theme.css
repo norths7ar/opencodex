@@ -109,8 +109,12 @@
   --ocx-glow: inset 0 1px 0 0 rgb(255 255 255 / 0.18), 0 1px 2px rgb(0 0 0 / 0.2);
   --ocx-glow-hover: inset 0 1px 0 0 rgb(255 255 255 / 0.3), 0 1px 3px rgb(0 0 0 / 0.24);
 }
-:root[data-theme="light"] { color-scheme: light; }
-:root[data-theme="dark"] { color-scheme: dark; }
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
 
 /* ---- Tailwind theme mapping: bg-surface, text-fg-muted, rounded-control … */
 @theme inline {
@@ -185,5 +189,7 @@
     letter-spacing: inherit;
     line-height: inherit;
   }
-  :where(.ui-v2 svg) { display: block; }
+  :where(.ui-v2 svg) {
+    display: block;
+  }
 }

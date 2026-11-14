@@ -1,5 +1,11 @@
-import { anthropicInstanceRowShapeMatches, isAnthropicInstanceId } from "../../../backend/src/providers/anthropic-instance-id";
-import type { AccountLoginRow, AccountLoginStatus } from "../components/provider-catalog/ProviderCatalog";
+import {
+  anthropicInstanceRowShapeMatches,
+  isAnthropicInstanceId,
+} from "../../../backend/src/providers/anthropic-instance-id";
+import type {
+  AccountLoginRow,
+  AccountLoginStatus,
+} from "../components/provider-catalog/ProviderCatalog";
 import type { TFn } from "../i18n/shared";
 import { formatProviderDisplayName } from "../provider-icons";
 import { codexAccountProviderNames } from "../provider-payload";
@@ -12,16 +18,15 @@ export function buildAddModalAccountRows(
   t: TFn,
 ): AccountLoginRow[] {
   return [
-    ...codexAccountProviderNames(config.providers)
-      .map(name => ({
-        id: name,
-        label: formatProviderDisplayName(name, t),
-        kind: "codex" as const,
-        href: "#codex-set",
-      })),
+    ...codexAccountProviderNames(config.providers).map((name) => ({
+      id: name,
+      label: formatProviderDisplayName(name, t),
+      kind: "codex" as const,
+      href: "#codex-set",
+    })),
     ...oauthProviders
       .toSorted((a, b) => a.localeCompare(b))
-      .map(id => ({ id, label: oauthLabel(id), kind: "oauth" as const })),
+      .map((id) => ({ id, label: oauthLabel(id), kind: "oauth" as const })),
   ];
 }
 
@@ -37,7 +42,11 @@ export function buildAccountLoginStatus(
     }
   }
   for (const [name, status] of Object.entries(accountLoginStatus)) {
-    if (!isAnthropicInstanceId(name) || !anthropicInstanceRowShapeMatches(name, config.providers[name])) continue;
+    if (
+      !isAnthropicInstanceId(name) ||
+      !anthropicInstanceRowShapeMatches(name, config.providers[name])
+    )
+      continue;
     const publicStatus = { ...status };
     delete publicStatus.email;
     accountLoginStatus[name] = publicStatus;

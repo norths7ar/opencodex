@@ -39,29 +39,53 @@ export interface DesktopPickerStatus {
 function isDesktopPickerStatus(value: unknown): value is DesktopPickerStatus {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
-  return typeof v.desired === "boolean"
-    && typeof v.supported === "boolean"
-    && ["trusted", "untrusted", "unsupported", "unknown"].includes(v.trust as string)
-    && ["absent", "applied", "not_selected", "unsafe"].includes(v.profile as string)
-    && typeof v.listenerReady === "boolean"
-    && typeof v.effective === "boolean"
-    && ["active", "restart_required", "unsupported_platform", "not_first_party", "integration_off", "disabled", "proxy_unavailable", "mode_not_committed", "trust_pending", "trust_declined", "profile_failed"].includes(v.reason as string)
-    && typeof v.models === "number" && Number.isFinite(v.models) && v.models >= 0
-    && (v.snapshotAt === null || typeof v.snapshotAt === "number")
-    && (v.lastBootstrapAt === null || typeof v.lastBootstrapAt === "number")
-    && (v.hint === undefined || typeof v.hint === "string")
-    && (v.residual === undefined || (Array.isArray(v.residual) && v.residual.every(item => typeof item === "string")));
+  return (
+    typeof v.desired === "boolean" &&
+    typeof v.supported === "boolean" &&
+    ["trusted", "untrusted", "unsupported", "unknown"].includes(v.trust as string) &&
+    ["absent", "applied", "not_selected", "unsafe"].includes(v.profile as string) &&
+    typeof v.listenerReady === "boolean" &&
+    typeof v.effective === "boolean" &&
+    [
+      "active",
+      "restart_required",
+      "unsupported_platform",
+      "not_first_party",
+      "integration_off",
+      "disabled",
+      "proxy_unavailable",
+      "mode_not_committed",
+      "trust_pending",
+      "trust_declined",
+      "profile_failed",
+    ].includes(v.reason as string) &&
+    typeof v.models === "number" &&
+    Number.isFinite(v.models) &&
+    v.models >= 0 &&
+    (v.snapshotAt === null || typeof v.snapshotAt === "number") &&
+    (v.lastBootstrapAt === null || typeof v.lastBootstrapAt === "number") &&
+    (v.hint === undefined || typeof v.hint === "string") &&
+    (v.residual === undefined ||
+      (Array.isArray(v.residual) && v.residual.every((item) => typeof item === "string")))
+  );
 }
 
 function stateKey(reason: DesktopPickerReason): TKey {
   switch (reason) {
-    case "active": return "claudeDesktop.picker.state.active";
-    case "restart_required": return "claudeDesktop.picker.state.restart";
-    case "trust_pending": return "claudeDesktop.picker.state.trustPending";
-    case "trust_declined": return "claudeDesktop.picker.state.trustDeclined";
-    case "proxy_unavailable": return "claudeDesktop.picker.state.proxyUnavailable";
-    case "unsupported_platform": return "claudeDesktop.picker.state.unsupported";
-    case "profile_failed": return "claudeDesktop.picker.state.profileFailed";
+    case "active":
+      return "claudeDesktop.picker.state.active";
+    case "restart_required":
+      return "claudeDesktop.picker.state.restart";
+    case "trust_pending":
+      return "claudeDesktop.picker.state.trustPending";
+    case "trust_declined":
+      return "claudeDesktop.picker.state.trustDeclined";
+    case "proxy_unavailable":
+      return "claudeDesktop.picker.state.proxyUnavailable";
+    case "unsupported_platform":
+      return "claudeDesktop.picker.state.unsupported";
+    case "profile_failed":
+      return "claudeDesktop.picker.state.profileFailed";
     case "not_first_party":
     case "integration_off":
     case "disabled":
@@ -99,7 +123,8 @@ export default function ClaudeDesktopPicker({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !current.desired, persist: true }),
       });
-      let payload: { ok?: boolean; reason?: string; port?: number; picker?: DesktopPickerStatus } | undefined;
+      let payload:
+        { ok?: boolean; reason?: string; port?: number; picker?: DesktopPickerStatus } | undefined;
       if (response.ok) {
         payload = await readJsonOrThrow<{ ok?: boolean; picker?: DesktopPickerStatus }>(
           response,
@@ -109,13 +134,24 @@ export default function ClaudeDesktopPicker({
         // A refused enable is a useful status response (not a transport failure); 503
         // carries the controller's reason so the card can explain the missing proxy.
         try {
-          payload = await response.json() as { ok?: boolean; reason?: string; port?: number; picker?: DesktopPickerStatus };
+          payload = (await response.json()) as {
+            ok?: boolean;
+            reason?: string;
+            port?: number;
+            picker?: DesktopPickerStatus;
+          };
         } catch {
           throw new Error(t("claudeDesktop.updateFailed"));
         }
-        if (!payload.picker) throw new Error(t(interceptReasonKey(payload.reason), { port: payload.port ?? "" }));
+        if (!payload.picker)
+          throw new Error(t(interceptReasonKey(payload.reason), { port: payload.port ?? "" }));
       }
-      if (!payload || payload.ok !== true && !payload.picker || !payload.picker || !isDesktopPickerStatus(payload.picker)) {
+      if (
+        !payload ||
+        (payload.ok !== true && !payload.picker) ||
+        !payload.picker ||
+        !isDesktopPickerStatus(payload.picker)
+      ) {
         throw new Error(t("claudeDesktop.updateFailed"));
       }
       setLocalPicker(payload.picker);
@@ -129,11 +165,30 @@ export default function ClaudeDesktopPicker({
 
   return (
     <section className="claude-picker" aria-labelledby="claude-picker-title">
-      {!current.listenerReady && pickerReason && <span role="status">{t(interceptReasonKey(pickerReason === "port_in_use" && !pickerFailurePort ? "failed" : pickerReason), { port: pickerFailurePort ?? "" })}</span>}
-      {!current.listenerReady && !pickerReason && <ClaudeInterceptStart apiBase={apiBase} onStarted={() => { setLocalPicker(null); onUpdated?.(current); }} />}
+      {!current.listenerReady && pickerReason && (
+        <span role="status">
+          {t(
+            interceptReasonKey(
+              pickerReason === "port_in_use" && !pickerFailurePort ? "failed" : pickerReason,
+            ),
+            { port: pickerFailurePort ?? "" },
+          )}
+        </span>
+      )}
+      {!current.listenerReady && !pickerReason && (
+        <ClaudeInterceptStart
+          apiBase={apiBase}
+          onStarted={() => {
+            setLocalPicker(null);
+            onUpdated?.(current);
+          }}
+        />
+      )}
       <div className="claude-picker-header">
         <div className="claude-picker-copy">
-          <h3 id="claude-picker-title" className="claude-picker-title">{t("claudeDesktop.picker.title")}</h3>
+          <h3 id="claude-picker-title" className="claude-picker-title">
+            {t("claudeDesktop.picker.title")}
+          </h3>
           <p className="claude-picker-hint">{t("claudeDesktop.picker.hint")}</p>
         </div>
         <button
@@ -159,7 +214,9 @@ export default function ClaudeDesktopPicker({
       <p className="claude-picker-models">
         {t("claudeDesktop.picker.models", { count: current.models })}
       </p>
-      <p className="claude-picker-offline-note" role="note">{t("claudeDesktop.picker.offlineNote")}</p>
+      <p className="claude-picker-offline-note" role="note">
+        {t("claudeDesktop.picker.offlineNote")}
+      </p>
     </section>
   );
 }

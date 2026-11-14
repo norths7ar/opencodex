@@ -13,9 +13,6 @@ import { pt } from "./pt";
 /** React-free locale catalog registry for formatters and other shared helpers. */
 export type Locale = "en" | "de" | "fr" | "ko" | "zh" | "zh-TW" | "ru" | "ja" | "tr" | "vi" | "pt";
 
-
-
-
 export const DICTS: Record<Locale, Record<TKey, string>> = {
   en: en,
   de: de,

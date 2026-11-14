@@ -81,7 +81,9 @@ export default function CustomLayerDialog({
    * mutating a ref while rendering is exactly what React Compiler rejects.
    */
   const liveRef = useRef({ title, body });
-  useEffect(() => { liveRef.current = { title, body }; }, [title, body]);
+  useEffect(() => {
+    liveRef.current = { title, body };
+  }, [title, body]);
 
   useEffect(() => {
     if (lastIdRef.current === editingId) return;
@@ -96,13 +98,17 @@ export default function CustomLayerDialog({
   }, [editingId, layer]);
 
   useEffect(() => {
-    setParkedDirty([...draftsRef.current].some(([id, draft]) => {
-      if (id === editingId) return false;
-      const saved = others.find(candidate => candidate.id === id);
-      return saved === undefined || draft.title !== saved.title || draft.body !== saved.body;
-    }));
+    setParkedDirty(
+      [...draftsRef.current].some(([id, draft]) => {
+        if (id === editingId) return false;
+        const saved = others.find((candidate) => candidate.id === id);
+        return saved === undefined || draft.title !== saved.title || draft.body !== saved.body;
+      }),
+    );
   }, [editingId, others]);
-  const [discardAction, setDiscardAction] = useState<{ kind: "close" } | { kind: "save"; targetId: string | null } | null>(null);
+  const [discardAction, setDiscardAction] = useState<
+    { kind: "close" } | { kind: "save"; targetId: string | null } | null
+  >(null);
   const titleId = "codex-set-custom-dialog";
 
   // Compare against what the editor OPENED with, seed included. Comparing against
@@ -125,14 +131,20 @@ export default function CustomLayerDialog({
   }, []);
 
   const requestClose = useCallback(() => {
-    if (dirty || parkedDirty) { setDiscardAction({ kind: "close" }); return; }
+    if (dirty || parkedDirty) {
+      setDiscardAction({ kind: "close" });
+      return;
+    }
     onClose();
   }, [dirty, parkedDirty, onClose]);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    requestClose();
-  }, [requestClose]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      requestClose();
+    },
+    [requestClose],
+  );
 
   const draft: Draft = { id: layer?.id ?? null, title, body, enabled: layer?.enabled ?? true };
   const problem = validateDraft(draft, others);
@@ -148,24 +160,50 @@ export default function CustomLayerDialog({
   };
   const requestSave = () => {
     if (busy || problem !== null) return;
-    if (parkedDirty) { setDiscardAction({ kind: "save", targetId: editingId }); return; }
+    if (parkedDirty) {
+      setDiscardAction({ kind: "save", targetId: editingId });
+      return;
+    }
     saveCurrent(editingId);
   };
 
-  const problemMessage = !problem ? null
-    : problem.kind === "title-empty" ? t("codexSet.custom.titleRequired")
-    : problem.kind === "title-too-long" ? t("codexSet.custom.titleTooLong", { count: problem.length, max: MAX_TITLE_CHARS })
-    : problem.kind === "title-multiline" ? t("codexSet.custom.titleMultiline")
-    : problem.kind === "body-too-large" ? t("codexSet.custom.bodyTooLarge", { bytes: problem.bytes, max: MAX_BODY_BYTES })
-    : problem.kind === "composed-too-large" ? t("codexSet.custom.composedTooLarge", { bytes: problem.bytes })
-    : t("codexSet.custom.invalidCharacter", { position: problem.position });
+  const problemMessage = !problem
+    ? null
+    : problem.kind === "title-empty"
+      ? t("codexSet.custom.titleRequired")
+      : problem.kind === "title-too-long"
+        ? t("codexSet.custom.titleTooLong", { count: problem.length, max: MAX_TITLE_CHARS })
+        : problem.kind === "title-multiline"
+          ? t("codexSet.custom.titleMultiline")
+          : problem.kind === "body-too-large"
+            ? t("codexSet.custom.bodyTooLarge", { bytes: problem.bytes, max: MAX_BODY_BYTES })
+            : problem.kind === "composed-too-large"
+              ? t("codexSet.custom.composedTooLarge", { bytes: problem.bytes })
+              : t("codexSet.custom.invalidCharacter", { position: problem.position });
 
   return (
-    <dialog ref={dialogRef} className="modal-overlay" aria-labelledby={titleId} onCancel={handleCancel}>
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={requestClose} />
-      <div className="modal-card codex-set-custom-dialog" onClick={event => event.stopPropagation()} role="document">
+    <dialog
+      ref={dialogRef}
+      className="modal-overlay"
+      aria-labelledby={titleId}
+      onCancel={handleCancel}
+    >
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={requestClose}
+      />
+      <div
+        className="modal-card codex-set-custom-dialog"
+        onClick={(event) => event.stopPropagation()}
+        role="document"
+      >
         <div className="modal-head">
-          <h3 id={titleId}>{layer ? t("codexSet.custom.editTitle") : t("codexSet.custom.newTitle")}</h3>
+          <h3 id={titleId}>
+            {layer ? t("codexSet.custom.editTitle") : t("codexSet.custom.newTitle")}
+          </h3>
           {navigation && (
             // Arrows alone lose the user: every reference implementation pairs
             // movement with an explicit position. "3 / 7" is what makes prev/next
@@ -181,7 +219,10 @@ export default function CustomLayerDialog({
                 &larr;
               </button>
               <span className="codex-set-custom-dialog__nav-pos">
-                {t("codexSet.custom.navPosition", { position: navigation.position, total: navigation.total })}
+                {t("codexSet.custom.navPosition", {
+                  position: navigation.position,
+                  total: navigation.total,
+                })}
               </span>
               <button
                 type="button"
@@ -203,24 +244,35 @@ export default function CustomLayerDialog({
             type="text"
             value={title}
             maxLength={MAX_TITLE_CHARS + 20}
-            onChange={e => setTitle(e.target.value)}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </label>
 
         <label className="field">
           <span className="muted text-label">{t("codexSet.custom.bodyLabel")}</span>
-          <textarea className="input" rows={10} value={body} onChange={e => setBody(e.target.value)} />
+          <textarea
+            className="input"
+            rows={10}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
         </label>
 
-        <p className="muted small">{t("codexSet.custom.bodySize", { bytes: bodyBytes, max: MAX_BODY_BYTES })}</p>
+        <p className="muted small">
+          {t("codexSet.custom.bodySize", { bytes: bodyBytes, max: MAX_BODY_BYTES })}
+        </p>
 
         {normalizationApplied && (
           // Quiet note, not an error: the text is accepted, just stored canonically.
-          <p className="muted small codex-set-custom-dialog__normalized">{t("codexSet.custom.normalized")}</p>
+          <p className="muted small codex-set-custom-dialog__normalized">
+            {t("codexSet.custom.normalized")}
+          </p>
         )}
 
         {problemMessage && (
-          <div className="notice notice-err" role="alert">{problemMessage}</div>
+          <div className="notice notice-err" role="alert">
+            {problemMessage}
+          </div>
         )}
 
         {findings.length > 0 && (
@@ -228,10 +280,16 @@ export default function CustomLayerDialog({
           // linter only makes it a decision rather than an accident.
           <ul className="codex-set-custom-dialog__lint">
             {findings.map((finding, index) => (
-              <li key={finding.rule + ":" + index} data-lint-rule={finding.rule} data-lint-level={finding.level}>
+              <li
+                key={finding.rule + ":" + index}
+                data-lint-rule={finding.rule}
+                data-lint-level={finding.level}
+              >
                 {t(finding.messageKey)}
                 {finding.span && (
-                  <code className="codex-set-custom-dialog__span">{normalized.slice(finding.span[0], finding.span[1])}</code>
+                  <code className="codex-set-custom-dialog__span">
+                    {normalized.slice(finding.span[0], finding.span[1])}
+                  </code>
                 )}
               </li>
             ))}
@@ -248,7 +306,11 @@ export default function CustomLayerDialog({
             aria-labelledby={titleId + "-discard"}
           >
             <span id={titleId + "-discard"} className="muted small">
-              {t(discardAction.kind === "save" ? "codexSet.custom.discardOthersAndSave" : "codexSet.custom.discardPrompt")}
+              {t(
+                discardAction.kind === "save"
+                  ? "codexSet.custom.discardOthersAndSave"
+                  : "codexSet.custom.discardPrompt",
+              )}
             </span>
             <button type="button" className="btn btn-sm" onClick={() => setDiscardAction(null)}>
               {t("codexSet.custom.keepEditing")}
@@ -256,8 +318,13 @@ export default function CustomLayerDialog({
             <button
               type="button"
               className="btn btn-danger btn-sm"
-              disabled={discardAction.kind === "save" && (problem !== null || busy || discardAction.targetId !== editingId)}
-              onClick={() => discardAction.kind === "save" ? saveCurrent(discardAction.targetId) : onClose()}
+              disabled={
+                discardAction.kind === "save" &&
+                (problem !== null || busy || discardAction.targetId !== editingId)
+              }
+              onClick={() =>
+                discardAction.kind === "save" ? saveCurrent(discardAction.targetId) : onClose()
+              }
             >
               {t(discardAction.kind === "save" ? "common.save" : "common.discard")}
             </button>
@@ -272,7 +339,9 @@ export default function CustomLayerDialog({
             >
               {t("common.save")}
             </button>
-            <button type="button" className="btn btn-sm" onClick={requestClose}>{t("common.cancel")}</button>
+            <button type="button" className="btn btn-sm" onClick={requestClose}>
+              {t("common.cancel")}
+            </button>
           </div>
         )}
       </div>

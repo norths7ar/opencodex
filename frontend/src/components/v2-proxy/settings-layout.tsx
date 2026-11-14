@@ -14,7 +14,13 @@ import { cn } from "@/lib/utils";
  * `ui-v2`: its reset would outrank the bridge that paints those controls.
  */
 
-export function SettingsSection({ id, title, lede, children, className }: {
+export function SettingsSection({
+  id,
+  title,
+  lede,
+  children,
+  className,
+}: {
   id: string;
   title: ReactNode;
   lede?: ReactNode;
@@ -23,10 +29,21 @@ export function SettingsSection({ id, title, lede, children, className }: {
 }) {
   const headingId = useId();
   return (
-    <section id={id} aria-labelledby={headingId} className={cn("pv2-section min-w-0 scroll-mt-6 rounded-card bg-surface p-1", className)}>
+    <section
+      id={id}
+      aria-labelledby={headingId}
+      className={cn("pv2-section min-w-0 scroll-mt-6 rounded-card bg-surface p-1", className)}
+    >
       <header className="flex flex-col gap-0.5 px-4 pt-3 pb-3">
-        <h3 id={headingId} className="m-0 text-[15px] leading-5 font-semibold tracking-[-0.01em] text-fg">{title}</h3>
-        {lede && <p className="m-0 max-w-[70ch] text-[13px] leading-[18px] text-fg-muted">{lede}</p>}
+        <h3
+          id={headingId}
+          className="m-0 text-[15px] leading-5 font-semibold tracking-[-0.01em] text-fg"
+        >
+          {title}
+        </h3>
+        {lede && (
+          <p className="m-0 max-w-[70ch] text-[13px] leading-[18px] text-fg-muted">{lede}</p>
+        )}
       </header>
       <div className="pv2-section-body flex min-w-0 flex-col divide-y divide-line rounded-[12px] bg-raised ring-1 ring-line">
         {children}
@@ -36,7 +53,14 @@ export function SettingsSection({ id, title, lede, children, className }: {
 }
 
 /** The bare "?" beside a label: no plate at rest, a soft one on hover. */
-export function HelpButton({ label, expanded, controls, onClick, buttonRef, popup }: {
+export function HelpButton({
+  label,
+  expanded,
+  controls,
+  onClick,
+  buttonRef,
+  popup,
+}: {
   label: string;
   expanded: boolean;
   controls: string;
@@ -91,41 +115,83 @@ export interface SettingsRowProps {
   busy?: boolean;
 }
 
-export function SettingsRow({ label, labelFor, labelId, hint, details, help, badge, control, children, stacked, inline, className, busy }: SettingsRowProps) {
+export function SettingsRow({
+  label,
+  labelFor,
+  labelId,
+  hint,
+  details,
+  help,
+  badge,
+  control,
+  children,
+  stacked,
+  inline,
+  className,
+  busy,
+}: SettingsRowProps) {
   const t = useT();
   const detailsId = useId();
   const [open, setOpen] = useState(false);
   const labelText = typeof label === "string" ? label : undefined;
   const labelClass = "m-0 text-[14px] leading-5 font-medium text-fg";
   return (
-    <div className={cn("pv2-row flex min-w-0 flex-col gap-3 px-4 py-3.5", className)} aria-busy={busy || undefined}>
-      <div className={cn("flex min-w-0 flex-col gap-3", !stacked && "sm:flex-row sm:items-center sm:justify-between sm:gap-6",
-        inline && "flex-row items-center justify-between gap-4")}>
+    <div
+      className={cn("pv2-row flex min-w-0 flex-col gap-3 px-4 py-3.5", className)}
+      aria-busy={busy || undefined}
+    >
+      <div
+        className={cn(
+          "flex min-w-0 flex-col gap-3",
+          !stacked && "sm:flex-row sm:items-center sm:justify-between sm:gap-6",
+          inline && "flex-row items-center justify-between gap-4",
+        )}
+      >
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className="flex min-h-[22px] flex-wrap items-center gap-x-1.5 gap-y-1">
-            {labelFor
-              ? <label htmlFor={labelFor} id={labelId} className={labelClass}>{label}</label>
-              : <span id={labelId} className={labelClass}>{label}</span>}
+            {labelFor ? (
+              <label htmlFor={labelFor} id={labelId} className={labelClass}>
+                {label}
+              </label>
+            ) : (
+              <span id={labelId} className={labelClass}>
+                {label}
+              </span>
+            )}
             {details && (
               <HelpButton
-                label={labelText ? t("proxyV2.detailsFor", { name: labelText }) : t("proxyV2.details")}
+                label={
+                  labelText ? t("proxyV2.detailsFor", { name: labelText }) : t("proxyV2.details")
+                }
                 expanded={open}
                 controls={detailsId}
-                onClick={() => setOpen(value => !value)}
+                onClick={() => setOpen((value) => !value)}
               />
             )}
             {help}
             {badge}
           </div>
-          {hint && <p className="m-0 max-w-[62ch] text-[13px] leading-[18px] text-fg-muted">{hint}</p>}
+          {hint && (
+            <p className="m-0 max-w-[62ch] text-[13px] leading-[18px] text-fg-muted">{hint}</p>
+          )}
           {details && (
-            <div id={detailsId} hidden={!open} className="pv2-details mt-1.5 max-w-[68ch] text-[13px] leading-[19px] text-fg-muted">
+            <div
+              id={detailsId}
+              hidden={!open}
+              className="pv2-details mt-1.5 max-w-[68ch] text-[13px] leading-[19px] text-fg-muted"
+            >
               {details}
             </div>
           )}
         </div>
         {control && (
-          <div className={cn("pv2-row-control flex min-w-0 flex-wrap items-center gap-2", !stacked && "sm:shrink-0 sm:justify-end", inline && "shrink-0")}>
+          <div
+            className={cn(
+              "pv2-row-control flex min-w-0 flex-wrap items-center gap-2",
+              !stacked && "sm:shrink-0 sm:justify-end",
+              inline && "shrink-0",
+            )}
+          >
             {control}
           </div>
         )}

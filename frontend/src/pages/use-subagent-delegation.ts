@@ -81,32 +81,50 @@ export function useSubagentDelegation(apiBase: string) {
         const data = await requireJson<DelegationResponse>(res);
         if (cancelled) return;
         apply(data);
-      } catch { /* keep defaults; the panel still renders and can be retried by saving */ }
-      finally { if (!cancelled) setLoaded(true); }
+      } catch {
+        /* keep defaults; the panel still renders and can be retried by saving */
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [apiBase, apply]);
 
-  const save = useCallback(async (patch: DelegationPatch) => {
-    if (saving) return;
-    setSaving(true);
-    try {
-      const res = await fetch(`${apiBase}/api/injection-model`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      if (!res.ok) throw new Error("injection save failed");
-      // Re-read rather than trusting the patch: the server clamps effort to what the chosen
-      // model actually supports, so the echo can differ from what was sent.
-      const getRes = await fetch(`${apiBase}/api/injection-model`);
-      apply(await requireJson<DelegationResponse>(getRes));
-    } catch { /* keep the last committed UI state */ }
-    finally { setSaving(false); }
-  }, [apiBase, apply, saving]);
+  const save = useCallback(
+    async (patch: DelegationPatch) => {
+      if (saving) return;
+      setSaving(true);
+      try {
+        const res = await fetch(`${apiBase}/api/injection-model`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(patch),
+        });
+        if (!res.ok) throw new Error("injection save failed");
+        // Re-read rather than trusting the patch: the server clamps effort to what the chosen
+        // model actually supports, so the echo can differ from what was sent.
+        const getRes = await fetch(`${apiBase}/api/injection-model`);
+        apply(await requireJson<DelegationResponse>(getRes));
+      } catch {
+        /* keep the last committed UI state */
+      } finally {
+        setSaving(false);
+      }
+    },
+    [apiBase, apply, saving],
+  );
 
   return {
-    loaded, saving, model, effort, efforts, available,
-    guidanceEnabled, syncCodexDefaults, save,
+    loaded,
+    saving,
+    model,
+    effort,
+    efforts,
+    available,
+    guidanceEnabled,
+    syncCodexDefaults,
+    save,
   };
 }

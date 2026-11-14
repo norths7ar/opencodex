@@ -7,7 +7,10 @@ import { requireJson, useModalDialog, type ModelInfo } from "../pages/dashboard-
 import { formatNamespacedModelId } from "../provider-icons";
 
 type Phase = "extract" | "consolidation";
-interface PhaseSetting { model?: string; reasoningEffort?: string }
+interface PhaseSetting {
+  model?: string;
+  reasoningEffort?: string;
+}
 type Settings = { extract?: PhaseSetting; consolidation?: PhaseSetting };
 
 const EFFORTS = ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"];
@@ -19,7 +22,8 @@ const EFFORTS = ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ul
 function readSettings(payload: { memoryModels?: unknown }): Settings {
   const value = payload.memoryModels;
   if (value == null) return {};
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("invalid settings");
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("invalid settings");
   const out: Settings = {};
   for (const phase of ["extract", "consolidation"] as const) {
     const raw = (value as Record<string, unknown>)[phase];
@@ -28,7 +32,8 @@ function readSettings(payload: { memoryModels?: unknown }): Settings {
     const model = "model" in raw && typeof raw.model === "string" ? raw.model.trim() : "";
     if (!model) throw new Error("invalid model");
     const effort = "reasoningEffort" in raw ? raw.reasoningEffort : undefined;
-    if (effort !== undefined && (typeof effort !== "string" || !EFFORTS.includes(effort))) throw new Error("invalid effort");
+    if (effort !== undefined && (typeof effort !== "string" || !EFFORTS.includes(effort)))
+      throw new Error("invalid effort");
     out[phase] = { model, ...(effort ? { reasoningEffort: effort } : {}) };
   }
   return out;
@@ -89,7 +94,9 @@ function MemoryModelsControls({ apiBase, models }: { apiBase: string; models: Mo
 
   useEffect(() => {
     active.current = true;
-    const timer = window.setTimeout(() => { void load(); }, 0);
+    const timer = window.setTimeout(() => {
+      void load();
+    }, 0);
     return () => {
       window.clearTimeout(timer);
       active.current = false;
@@ -113,9 +120,10 @@ function MemoryModelsControls({ apiBase, models }: { apiBase: string; models: Mo
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           // Null clears the whole block; a phase left at "Off" is simply absent.
-          memoryModels: extract || consolidation
-            ? { ...(extract ? { extract } : {}), ...(consolidation ? { consolidation } : {}) }
-            : null,
+          memoryModels:
+            extract || consolidation
+              ? { ...(extract ? { extract } : {}), ...(consolidation ? { consolidation } : {}) }
+              : null,
         }),
         signal: request.signal,
       });
@@ -133,49 +141,96 @@ function MemoryModelsControls({ apiBase, models }: { apiBase: string; models: Mo
     }
   };
 
-  const options = [{ value: "", label: t("memoryModels.off") },
-    ...[...new Set([...models.map(item => item.namespaced),
-      ...[extractModel, consolidationModel].filter(Boolean)])]
-      .map(value => ({ value, label: formatNamespacedModelId(value, t) }))];
-  const effortOptions = [{ value: "", label: t("memoryModels.defaultEffort") },
-    ...EFFORTS.map(value => ({ value, label: t(`models.reasoningEffort.${value}` as TKey) }))];
+  const options = [
+    { value: "", label: t("memoryModels.off") },
+    ...[
+      ...new Set([
+        ...models.map((item) => item.namespaced),
+        ...[extractModel, consolidationModel].filter(Boolean),
+      ]),
+    ].map((value) => ({ value, label: formatNamespacedModelId(value, t) })),
+  ];
+  const effortOptions = [
+    { value: "", label: t("memoryModels.defaultEffort") },
+    ...EFFORTS.map((value) => ({ value, label: t(`models.reasoningEffort.${value}` as TKey) })),
+  ];
   const disabled = busy || saved === undefined || loadError;
-  const dirty = extractModel !== (saved?.extract?.model ?? "")
-    || extractEffort !== (saved?.extract?.reasoningEffort ?? "")
-    || consolidationModel !== (saved?.consolidation?.model ?? "")
-    || consolidationEffort !== (saved?.consolidation?.reasoningEffort ?? "");
+  const dirty =
+    extractModel !== (saved?.extract?.model ?? "") ||
+    extractEffort !== (saved?.extract?.reasoningEffort ?? "") ||
+    consolidationModel !== (saved?.consolidation?.model ?? "") ||
+    consolidationEffort !== (saved?.consolidation?.reasoningEffort ?? "");
   // The account notice is about the phase that stays on Codex's own model, so it is both
   // true and useful only while exactly one of the two phases is routed.
   const partiallyRouted = Boolean(extractModel) !== Boolean(consolidationModel);
   const info = t("memoryModels.info");
 
-  const row = (phase: Phase, model: string, effort: string, setModel: (value: string) => void, setEffort: (value: string) => void) => (
+  const row = (
+    phase: Phase,
+    model: string,
+    effort: string,
+    setModel: (value: string) => void,
+    setEffort: (value: string) => void,
+  ) => (
     <div className="spread memory-models-row" style={{ flexWrap: "wrap", gap: 8, marginTop: 12 }}>
       <div style={{ flex: "1 1 18rem", minWidth: 0 }}>
         <div className="font-semibold">{t(`memoryModels.${phase}` as TKey)}</div>
         <div className="muted setting-hint">{t(`memoryModels.${phase}Hint` as TKey)}</div>
       </div>
       <div className="memory-models-controls">
-        <Select id={`memory-models-${phase}`} value={model} options={options} disabled={disabled}
+        <Select
+          id={`memory-models-${phase}`}
+          value={model}
+          options={options}
+          disabled={disabled}
           label={t("memoryModels.model")}
-          onChange={value => { setModel(value); if (!value) setEffort(""); setFeedback(null); }} />
-        <Select id={`memory-models-${phase}-effort`} value={effort} options={effortOptions}
-          disabled={disabled || !model} align="right" label={t("memoryModels.effort")}
-          onChange={value => { setEffort(value); setFeedback(null); }} />
+          onChange={(value) => {
+            setModel(value);
+            if (!value) setEffort("");
+            setFeedback(null);
+          }}
+        />
+        <Select
+          id={`memory-models-${phase}-effort`}
+          value={effort}
+          options={effortOptions}
+          disabled={disabled || !model}
+          align="right"
+          label={t("memoryModels.effort")}
+          onChange={(value) => {
+            setEffort(value);
+            setFeedback(null);
+          }}
+        />
       </div>
     </div>
   );
 
   return (
-    <section className="panel" aria-labelledby="memory-models-title" aria-busy={busy || (saved === undefined && !loadError)}>
-      <div className="font-semibold" id="memory-models-title" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <section
+      className="panel"
+      aria-labelledby="memory-models-title"
+      aria-busy={busy || (saved === undefined && !loadError)}
+    >
+      <div
+        className="font-semibold"
+        id="memory-models-title"
+        style={{ display: "flex", alignItems: "center", gap: 6 }}
+      >
         {t("memoryModels.title")}
         <button
           ref={infoTriggerRef}
           type="button"
           className="btn btn-ghost btn-sm"
-          style={{ width: 22, height: 22, minWidth: 22, padding: 0, borderRadius: "var(--radius-pill)", color: "var(--muted)" }}
-          onClick={() => setInfoOpen(open => !open)}
+          style={{
+            width: 22,
+            height: 22,
+            minWidth: 22,
+            padding: 0,
+            borderRadius: "var(--radius-pill)",
+            color: "var(--muted)",
+          }}
+          onClick={() => setInfoOpen((open) => !open)}
           aria-label={t("memoryModels.infoLabel")}
           aria-expanded={infoOpen}
           aria-haspopup="dialog"
@@ -186,38 +241,105 @@ function MemoryModelsControls({ apiBase, models }: { apiBase: string; models: Mo
       </div>
       <div className="muted setting-hint">{t("memoryModels.description")}</div>
       {row("extract", extractModel, extractEffort, setExtractModel, setExtractEffort)}
-      {row("consolidation", consolidationModel, consolidationEffort, setConsolidationModel, setConsolidationEffort)}
-      <div className="spread" style={{ alignItems: "center", flexWrap: "wrap", gap: 8, marginTop: 12 }}>
-        <div className="muted setting-hint" style={{ flex: "1 1 18rem", minWidth: 0 }}>{t("memoryModels.dataNotice")}</div>
-        <button type="button" className="btn btn-primary btn-sm" disabled={disabled || !dirty} onClick={() => { void save(); }}>
+      {row(
+        "consolidation",
+        consolidationModel,
+        consolidationEffort,
+        setConsolidationModel,
+        setConsolidationEffort,
+      )}
+      <div
+        className="spread"
+        style={{ alignItems: "center", flexWrap: "wrap", gap: 8, marginTop: 12 }}
+      >
+        <div className="muted setting-hint" style={{ flex: "1 1 18rem", minWidth: 0 }}>
+          {t("memoryModels.dataNotice")}
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          disabled={disabled || !dirty}
+          onClick={() => {
+            void save();
+          }}
+        >
           {busy ? t("common.saving") : t("common.save")}
         </button>
       </div>
-      {partiallyRouted && <div className="notice-warn" role="note" style={{ marginTop: 12 }}>
-        <IconAlert width={14} /> {t("memoryModels.accountNotice")}
-      </div>}
-      {loadError && <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>{t("memoryModels.loadFailed")} <button type="button" className="btn btn-ghost btn-sm" onClick={() => { void load(); }}>{t("common.retry")}</button></div>}
-      {feedback === "failed" && <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>{t("memoryModels.saveFailed")}</div>}
-      {feedback === "saved" && <div className="muted setting-hint" role="status">{t("memoryModels.saved")}</div>}
+      {partiallyRouted && (
+        <div className="notice-warn" role="note" style={{ marginTop: 12 }}>
+          <IconAlert width={14} /> {t("memoryModels.accountNotice")}
+        </div>
+      )}
+      {loadError && (
+        <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>
+          {t("memoryModels.loadFailed")}{" "}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              void load();
+            }}
+          >
+            {t("common.retry")}
+          </button>
+        </div>
+      )}
+      {feedback === "failed" && (
+        <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>
+          {t("memoryModels.saveFailed")}
+        </div>
+      )}
+      {feedback === "saved" && (
+        <div className="muted setting-hint" role="status">
+          {t("memoryModels.saved")}
+        </div>
+      )}
       <dialog
         ref={infoDialogRef}
         id="memory-models-help-dialog"
         className="modal-overlay"
-        style={{ display: infoOpen ? "flex" : "none", border: "none", margin: 0, maxWidth: "none", maxHeight: "none", width: "100%", height: "100%" }}
+        style={{
+          display: infoOpen ? "flex" : "none",
+          border: "none",
+          margin: 0,
+          maxWidth: "none",
+          maxHeight: "none",
+          width: "100%",
+          height: "100%",
+        }}
         aria-labelledby="memory-models-help-title"
-        onCancel={event => { event.preventDefault(); setInfoOpen(false); }}
+        onCancel={(event) => {
+          event.preventDefault();
+          setInfoOpen(false);
+        }}
       >
-        <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={() => setInfoOpen(false)} />
-        <div className="modal-card" onClick={e => e.stopPropagation()}>
+        <button
+          type="button"
+          className="modal-backdrop-dismiss"
+          aria-label={t("common.close")}
+          tabIndex={-1}
+          onClick={() => setInfoOpen(false)}
+        />
+        <div className="modal-card" onClick={(e) => e.stopPropagation()}>
           <div className="modal-head">
             <h3 id="memory-models-help-title">{t("memoryModels.title")}</h3>
-            <button type="button" className="btn btn-ghost btn-icon" onClick={() => setInfoOpen(false)} aria-label={t("common.close")}><IconX /></button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-icon"
+              onClick={() => setInfoOpen(false)}
+              aria-label={t("common.close")}
+            >
+              <IconX />
+            </button>
           </div>
           <div className="modal-desc leading-relaxed" style={{ whiteSpace: "pre-line" }}>
             {info}
           </div>
           <div className="modal-actions">
-            <button type="button" className="btn btn-primary" onClick={() => setInfoOpen(false)}>{t("common.ok")}</button>
+            <button type="button" className="btn btn-primary" onClick={() => setInfoOpen(false)}>
+              {t("common.ok")}
+            </button>
           </div>
         </div>
       </dialog>

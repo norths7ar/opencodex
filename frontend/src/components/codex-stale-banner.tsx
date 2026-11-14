@@ -14,7 +14,11 @@ import type { Ref } from "react";
  * button, the page-head button, and the sidebar button all clear the banner the
  * same way.
  */
-export function CodexStaleBanner({ state, controller, actionRef }: {
+export function CodexStaleBanner({
+  state,
+  controller,
+  actionRef,
+}: {
   state: AppServerStateOutcome["state"];
   controller: CodexRestartController;
   actionRef?: Ref<HTMLButtonElement>;
@@ -30,11 +34,12 @@ export function CodexStaleBanner({ state, controller, actionRef }: {
         type="button"
         className="btn btn-sm"
         disabled={controller.restarting}
-        onClick={() => { void controller.restart(); }}
+        onClick={() => {
+          void controller.restart();
+        }}
       >
         {controller.restarting ? t("dash.codexRestarting") : t("dash.codexRestart")}
       </button>
     </div>
   );
 }
-

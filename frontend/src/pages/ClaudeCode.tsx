@@ -15,10 +15,22 @@ import {
   ClaudeCodeQuickstartSection,
   ClaudeCodeSettingsCard,
 } from "./claude-code-sections";
-import { AUTO_COMPACT_WINDOW_DEFAULT, formatCompactWindow, newClientId, normalizeContextAccounting, type ClaudeCodeState, type MapRow } from "./claude-code-types";
+import {
+  AUTO_COMPACT_WINDOW_DEFAULT,
+  formatCompactWindow,
+  newClientId,
+  normalizeContextAccounting,
+  type ClaudeCodeState,
+  type MapRow,
+} from "./claude-code-types";
 import { SmallFastModelSetting } from "./claude-code-settings";
 import { ClaudeCodeTierDefaults } from "./claude-code-tier-defaults";
-import { interceptReasonKey, normalizeSharedProxy, selectFirstPartyNotice, type FirstPartyNotice } from "./claude-code-first-party";
+import {
+  interceptReasonKey,
+  normalizeSharedProxy,
+  selectFirstPartyNotice,
+  type FirstPartyNotice,
+} from "./claude-code-first-party";
 import {
   acknowledgeSave,
   applyServerRead,
@@ -41,13 +53,16 @@ function normalizeFirstPartyState(state: ClaudeCodeState): ClaudeCodeState {
     cliFirstPartyApplied: state.cliFirstPartyApplied === true,
     desktopFirstParty: state.desktopFirstParty === true,
     interceptRunning: state.interceptRunning === true,
-    interceptEligible: state.interceptEligible === undefined ? true : state.interceptEligible === true,
+    interceptEligible:
+      state.interceptEligible === undefined ? true : state.interceptEligible === true,
     sharedProxy: normalizeSharedProxy(state.sharedProxy),
     // Shared by the session cache and the GET read, so a state cached by an older proxy (no
     // field) and an older server both read as the default.
     contextAccounting: normalizeContextAccounting(state.contextAccounting),
     // The GET has no separate field: the env on this read was built under the accounting it reports.
-    servedContextAccounting: normalizeContextAccounting(state.servedContextAccounting ?? state.contextAccounting),
+    servedContextAccounting: normalizeContextAccounting(
+      state.servedContextAccounting ?? state.contextAccounting,
+    ),
   };
 }
 
@@ -60,7 +75,9 @@ function normalizeFirstPartyState(state: ClaudeCodeState): ClaudeCodeState {
  */
 const writeEpochs = new Map<string, number>();
 const writeEpoch = (key: string) => writeEpochs.get(key) ?? 0;
-const bumpWriteEpoch = (key: string) => { writeEpochs.set(key, writeEpoch(key) + 1); };
+const bumpWriteEpoch = (key: string) => {
+  writeEpochs.set(key, writeEpoch(key) + 1);
+};
 
 /*
  * Confirmed writes, per session-cache key. A switch or a Save can be confirmed after the page
@@ -69,7 +86,9 @@ const bumpWriteEpoch = (key: string) => { writeEpochs.set(key, writeEpoch(key) +
  * event, since it already applied the write with its own rules.
  */
 type LiveFields = Partial<Pick<ClaudeCodeState, "enabled" | "cliFirstParty">>;
-type Confirmation = { kind: "live"; fields: LiveFields } | { kind: "saved"; copy: { state: ClaudeCodeState; rows: MapRow[] } };
+type Confirmation =
+  | { kind: "live"; fields: LiveFields }
+  | { kind: "saved"; copy: { state: ClaudeCodeState; rows: MapRow[] } };
 const liveSource = Symbol("claude-code-live");
 const confirmationListeners = new Map<string, Set<(event: Confirmation, source: symbol) => void>>();
 function publishConfirmation(key: string, event: Confirmation, source: symbol) {
@@ -93,7 +112,15 @@ const firstPartyNoticeKeys: Record<Exclude<FirstPartyNotice, null>, TKey> = {
  * One titled block of the single-page layout. The page used to show one of these at a time
  * behind an inner section rail; inside Connect that made a second sidebar next to the app's.
  */
-function CcwSection({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
+function CcwSection({
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count?: number;
+  children: ReactNode;
+}) {
   const headingId = useId();
   return (
     <section className="ccw-section" aria-labelledby={headingId}>
@@ -106,13 +133,22 @@ function CcwSection({ title, count, children }: { title: string; count?: number;
   );
 }
 
-export default function ClaudeCode({ apiBase, active = true }: { apiBase: string; active?: boolean }) {
+export default function ClaudeCode({
+  apiBase,
+  active = true,
+}: {
+  apiBase: string;
+  active?: boolean;
+}) {
   const t = useT();
   const { locale } = useI18n();
-  const localeTag = LOCALES.find(l => l.code === locale)?.htmlLang ?? "en";
+  const localeTag = LOCALES.find((l) => l.code === locale)?.htmlLang ?? "en";
   const cacheKey = `ocx.claude-code.v1:${apiBase}`;
   const resourceKey = `claude-code:${apiBase}`;
-  const cachedEntry = useMemo(() => readSessionListCacheEntry<CachedClaudeCode>(cacheKey), [cacheKey]);
+  const cachedEntry = useMemo(
+    () => readSessionListCacheEntry<CachedClaudeCode>(cacheKey),
+    [cacheKey],
+  );
   const cached = useMemo(() => {
     if (!cachedEntry?.data) return null;
     return {
@@ -126,8 +162,8 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
    * server-owned fields of a dirty one (applyServerRead): the 1P toggle and the post-Save
    * refresh both re-read, and neither may throw away an edit the user has not saved.
    */
-  const [edit, setEdit] = useState<ClaudeCodeEditState | null>(
-    () => cached ? { draft: cached, baseline: cached, adoptNextRead: false } : null,
+  const [edit, setEdit] = useState<ClaudeCodeEditState | null>(() =>
+    cached ? { draft: cached, baseline: cached, adoptNextRead: false } : null,
   );
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -147,47 +183,49 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   const [firstPartyPending, setFirstPartyPending] = useState(false);
   const firstPartyInFlight = useRef(false);
 
-  const fetchCode = useCallback(async (signal: AbortSignal): Promise<CachedClaudeCode> => {
-    const epoch = writeEpoch(cacheKey);
-    const res = await fetch(`${apiBase}/api/claude-code`, { signal });
-    const r = await readJsonOrThrow<ClaudeCodeState & { modelMap?: Record<string, string> }>(
-      res,
-      t("claude.loadFail"),
-    );
-    if (!r) throw new Error(t("claude.loadFail"));
-    const nextState = normalizeFirstPartyState({
-      ...r,
-      // No coercion: an absent config key is AUTO, and coercing it to subscription is
-      // what silently converted an untouched auto config on every save.
-      authMode: r.authMode === "proxy" || r.authMode === "subscription" ? r.authMode : "auto",
-      fastMode: r.fastMode ?? null,
-      maxContextTokens: r.maxContextTokens ?? null,
-      autoContext: r.autoContext !== false,
-      autoCompactWindow: r.autoCompactWindow ?? null,
-      injectAgents: r.injectAgents !== false,
-      effectiveModelEnv: r.effectiveModelEnv ?? {},
-    });
-    const nextRows = Object.entries(r.modelMap ?? {}).map(([from, to]) => ({ id: newClientId(), from, to: String(to) }));
-    const next = { state: nextState, rows: nextRows };
-    if (signal.aborted) throw new Error("Claude Code request aborted");
-    // Superseded by a write: hand it to the resource marked, so no mount folds it into a draft.
-    if (epoch !== writeEpoch(cacheKey)) return { ...next, superseded: true };
-    writeSessionListCacheEntry(cacheKey, next);
-    return next;
-  }, [apiBase, cacheKey, t]);
-
-  const codeResource = useDataSurface<CachedClaudeCode>(
-    resourceKey,
-    [apiBase],
-    fetchCode,
-    {
-      isEmpty: () => false,
-      enabled: active,
-      initialData: cached ?? undefined,
-      initialDataCachedAt: cachedEntry?.cachedAt ?? null,
-      staleAfterMs: 60_000,
+  const fetchCode = useCallback(
+    async (signal: AbortSignal): Promise<CachedClaudeCode> => {
+      const epoch = writeEpoch(cacheKey);
+      const res = await fetch(`${apiBase}/api/claude-code`, { signal });
+      const r = await readJsonOrThrow<ClaudeCodeState & { modelMap?: Record<string, string> }>(
+        res,
+        t("claude.loadFail"),
+      );
+      if (!r) throw new Error(t("claude.loadFail"));
+      const nextState = normalizeFirstPartyState({
+        ...r,
+        // No coercion: an absent config key is AUTO, and coercing it to subscription is
+        // what silently converted an untouched auto config on every save.
+        authMode: r.authMode === "proxy" || r.authMode === "subscription" ? r.authMode : "auto",
+        fastMode: r.fastMode ?? null,
+        maxContextTokens: r.maxContextTokens ?? null,
+        autoContext: r.autoContext !== false,
+        autoCompactWindow: r.autoCompactWindow ?? null,
+        injectAgents: r.injectAgents !== false,
+        effectiveModelEnv: r.effectiveModelEnv ?? {},
+      });
+      const nextRows = Object.entries(r.modelMap ?? {}).map(([from, to]) => ({
+        id: newClientId(),
+        from,
+        to: String(to),
+      }));
+      const next = { state: nextState, rows: nextRows };
+      if (signal.aborted) throw new Error("Claude Code request aborted");
+      // Superseded by a write: hand it to the resource marked, so no mount folds it into a draft.
+      if (epoch !== writeEpoch(cacheKey)) return { ...next, superseded: true };
+      writeSessionListCacheEntry(cacheKey, next);
+      return next;
     },
+    [apiBase, cacheKey, t],
   );
+
+  const codeResource = useDataSurface<CachedClaudeCode>(resourceKey, [apiBase], fetchCode, {
+    isEmpty: () => false,
+    enabled: active,
+    initialData: cached ?? undefined,
+    initialDataCachedAt: cachedEntry?.cachedAt ?? null,
+    staleAfterMs: 60_000,
+  });
   const loadState = codeResource.state;
   /*
    * Every mount folds each new server read into its own draft here, during render, instead of
@@ -198,7 +236,8 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   if (loadState.data !== seenRead) {
     setSeenRead(loadState.data);
     const read = loadState.data;
-    if (read && !read.superseded) setEdit(current => applyServerRead(current, { state: read.state, rows: read.rows }));
+    if (read && !read.superseded)
+      setEdit((current) => applyServerRead(current, { state: read.state, rows: read.rows }));
   }
   const data = loadState.data ?? cached;
   const state = edit?.draft.state ?? data?.state ?? null;
@@ -206,10 +245,24 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   const dirty = edit !== null && isClaudeCodeDraftDirty(edit.draft, edit.baseline);
 
   const setState = (nextState: ClaudeCodeState) => {
-    setEdit(current => current && { ...current, draft: { ...current.draft, state: nextState }, adoptNextRead: false });
+    setEdit(
+      (current) =>
+        current && {
+          ...current,
+          draft: { ...current.draft, state: nextState },
+          adoptNextRead: false,
+        },
+    );
   };
   const setRows = (nextRows: MapRow[]) => {
-    setEdit(current => current && { ...current, draft: { ...current.draft, rows: nextRows }, adoptNextRead: false });
+    setEdit(
+      (current) =>
+        current && {
+          ...current,
+          draft: { ...current.draft, rows: nextRows },
+          adoptNextRead: false,
+        },
+    );
   };
   /**
    * Fields committed by their own control land in draft AND baseline, since they are not
@@ -218,7 +271,8 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
    */
   const applyLive = (fields: LiveFields) => {
     const stored = readSessionListCacheEntry<CachedClaudeCode>(cacheKey)?.data;
-    if (stored) writeSessionListCacheEntry(cacheKey, { ...stored, state: { ...stored.state, ...fields } });
+    if (stored)
+      writeSessionListCacheEntry(cacheKey, { ...stored, state: { ...stored.state, ...fields } });
     // Live fields are not edits, so every page (this one included) takes them as-is.
     publishConfirmation(cacheKey, { kind: "live", fields }, liveSource);
   };
@@ -227,21 +281,26 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
     const listener = (event: Confirmation, source: symbol) => {
       if (event.kind === "live") {
         const { fields } = event;
-        setEdit(current => current && {
-          ...current,
-          draft: { ...current.draft, state: { ...current.draft.state, ...fields } },
-          baseline: { ...current.baseline, state: { ...current.baseline.state, ...fields } },
-        });
+        setEdit(
+          (current) =>
+            current && {
+              ...current,
+              draft: { ...current.draft, state: { ...current.draft.state, ...fields } },
+              baseline: { ...current.baseline, state: { ...current.baseline.state, ...fields } },
+            },
+        );
       } else if (source !== pageSource) {
         // Another page's Save: fold it like a server read, so unsaved edits here survive.
         const { copy } = event;
-        setEdit(current => applyServerRead(current, copy));
+        setEdit((current) => applyServerRead(current, copy));
       }
     };
     const listeners = confirmationListeners.get(cacheKey) ?? new Set();
     listeners.add(listener);
     confirmationListeners.set(cacheKey, listeners);
-    return () => { listeners.delete(listener); };
+    return () => {
+      listeners.delete(listener);
+    };
   }, [cacheKey, pageSource]);
 
   const modelOptions = useMemo(
@@ -255,17 +314,38 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   // explicit one are visibly the same number.
   const autoCompactOptions = useMemo(() => {
     const ladder = [
-      100_000, 200_000, 250_000, 300_000, 350_000, 400_000, 500_000, 600_000, 750_000,
-      AUTO_COMPACT_WINDOW_DEFAULT, 900_000, 1_000_000,
+      100_000,
+      200_000,
+      250_000,
+      300_000,
+      350_000,
+      400_000,
+      500_000,
+      600_000,
+      750_000,
+      AUTO_COMPACT_WINDOW_DEFAULT,
+      900_000,
+      1_000_000,
     ].sort((a, b) => a - b);
     // Compact SI-style units (1M / 350k) — technical number format, not prose.
     const current = state?.autoCompactWindow ?? null;
-    const values = current !== null && !ladder.includes(current) ? [...ladder, current].sort((a, b) => a - b) : ladder;
+    const values =
+      current !== null && !ladder.includes(current)
+        ? [...ladder, current].sort((a, b) => a - b)
+        : ladder;
     return [
       // The label carries the number instead of hardcoding it in nine locale files, which
       // is how "350k (default)" survived a default change.
-      { value: "", label: t("claude.autoCompactDefault", { value: formatCompactWindow(AUTO_COMPACT_WINDOW_DEFAULT, localeTag) }) },
-      ...values.map(value => ({ value: String(value), label: formatCompactWindow(value, localeTag) })),
+      {
+        value: "",
+        label: t("claude.autoCompactDefault", {
+          value: formatCompactWindow(AUTO_COMPACT_WINDOW_DEFAULT, localeTag),
+        }),
+      },
+      ...values.map((value) => ({
+        value: String(value),
+        label: formatCompactWindow(value, localeTag),
+      })),
     ];
   }, [state?.autoCompactWindow, t, localeTag]);
 
@@ -277,14 +357,20 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   const toggleConnection = async () => {
     if (!state) return;
     setStatus("");
-    await changeConnection(!state.enabled, enabled => {
-      bumpWriteEpoch(cacheKey);
-      applyLive({ enabled });
-      codeResource.refresh();
-    }, error => {
-      setOk(false);
-      setStatus(error instanceof Error && error.message ? error.message : t("claude.networkError"));
-    });
+    await changeConnection(
+      !state.enabled,
+      (enabled) => {
+        bumpWriteEpoch(cacheKey);
+        applyLive({ enabled });
+        codeResource.refresh();
+      },
+      (error) => {
+        setOk(false);
+        setStatus(
+          error instanceof Error && error.message ? error.message : t("claude.networkError"),
+        );
+      },
+    );
   };
 
   const toggleFirstParty = async () => {
@@ -300,7 +386,12 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
         body: JSON.stringify({ cliFirstParty: requested }),
       });
       if (!response.ok) {
-        const payload = await response.json().catch(() => null) as { code?: string; port?: number; bound?: number; configured?: number } | null;
+        const payload = (await response.json().catch(() => null)) as {
+          code?: string;
+          port?: number;
+          bound?: number;
+          configured?: number;
+        } | null;
         const refusalKeys = {
           intercept_disabled: "claude.firstParty.refusal.interceptDisabled",
           intercept_unavailable: "claude.firstParty.refusal.interceptUnavailable",
@@ -309,11 +400,28 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
           unreadable: "claude.firstParty.refusal.unreadable",
           write_failed: "claude.firstParty.refusal.writeFailed",
         } as const;
-        const key = payload?.code && payload.code in refusalKeys
-          ? refusalKeys[payload.code as keyof typeof refusalKeys]
-          : "claude.saveFailed";
-        throw new Error(payload?.code && ["disabled", "client_role", "ephemeral_port", "port_in_use", "port_mismatch", "stopped", "failed"].includes(payload.code)
-          ? t(interceptReasonKey(payload.code), { port: payload.port ?? "", bound: payload.bound ?? "", configured: payload.configured ?? "" }) : t(key));
+        const key =
+          payload?.code && payload.code in refusalKeys
+            ? refusalKeys[payload.code as keyof typeof refusalKeys]
+            : "claude.saveFailed";
+        throw new Error(
+          payload?.code &&
+            [
+              "disabled",
+              "client_role",
+              "ephemeral_port",
+              "port_in_use",
+              "port_mismatch",
+              "stopped",
+              "failed",
+            ].includes(payload.code)
+            ? t(interceptReasonKey(payload.code), {
+                port: payload.port ?? "",
+                bound: payload.bound ?? "",
+                configured: payload.configured ?? "",
+              })
+            : t(key),
+        );
       }
       await readJsonOrThrow(response, t("claude.saveFailed"));
       bumpWriteEpoch(cacheKey);
@@ -336,7 +444,7 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
     setStatus("");
     setSaveError("");
     setSaving(true);
-    setEdit(current => current && { ...current, savePending: true });
+    setEdit((current) => current && { ...current, savePending: true });
     // Reads already in flight predate this Save; none of them may reach the draft or cache.
     bumpWriteEpoch(cacheKey);
     try {
@@ -360,15 +468,17 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
       writeSessionListCacheEntry(cacheKey, copy);
       publishConfirmation(cacheKey, { kind: "saved", copy }, pageSource);
       // The submitted draft is what the server now holds; edits made meanwhile stay dirty.
-      setEdit(current => acknowledgeSave(current, submitted));
+      setEdit((current) => acknowledgeSave(current, submitted));
       setOk(true);
       setSaveError("");
       setStatus(t("claude.saved"));
       codeResource.refresh();
     } catch (error) {
-      setEdit(current => current && { ...current, savePending: false });
+      setEdit((current) => current && { ...current, savePending: false });
       setOk(false);
-      setSaveError(error instanceof Error && error.message ? error.message : t("claude.networkError"));
+      setSaveError(
+        error instanceof Error && error.message ? error.message : t("claude.networkError"),
+      );
     } finally {
       setSaving(false);
     }
@@ -377,11 +487,17 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   const revert = () => {
     setStatus("");
     setSaveError("");
-    setEdit(current => current && {
-      draft: { state: revertEditable(current.draft.state, current.baseline.state), rows: current.baseline.rows },
-      baseline: current.baseline,
-      adoptNextRead: false,
-    });
+    setEdit(
+      (current) =>
+        current && {
+          draft: {
+            state: revertEditable(current.draft.state, current.baseline.state),
+            rows: current.baseline.rows,
+          },
+          baseline: current.baseline,
+          adoptNextRead: false,
+        },
+    );
   };
 
   // A hidden Code tab remains mounted for draft preservation, but must not advertise a
@@ -391,11 +507,18 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
     return <DataSurfaceSkeleton label={t("claude.loading")} rows={3} />;
   }
   if (loadState.kind === "failed-cold") {
-    const reason = loadState.error instanceof Error ? loadState.error.message : t("claude.loadFail");
+    const reason =
+      loadState.error instanceof Error ? loadState.error.message : t("claude.loadFail");
     return (
       <div className="claudecode-workspace-shell">
         <Notice tone="err">{reason}</Notice>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => codeResource.refresh()}>{t("common.retry")}</button>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => codeResource.refresh()}
+        >
+          {t("common.retry")}
+        </button>
       </div>
     );
   }
@@ -410,7 +533,9 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
   const connectionRow = (
     <div className="setting-row claudecode-connection-row">
       <div className="setting-label">
-        <span className="title" id="claudecode-connection-label">{t("claude.enabledLabel")}</span>
+        <span className="title" id="claudecode-connection-label">
+          {t("claude.enabledLabel")}
+        </span>
         <span className="desc">{t("claude.subtitle")}</span>
       </div>
       <Switch
@@ -429,7 +554,9 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
       <div className="card claudecode-connection-card">
         <div className="setting-row">
           <div className="setting-label">
-            <span className="title" id="claudecode-first-party-label">{t("claude.firstParty.label")}</span>
+            <span className="title" id="claudecode-first-party-label">
+              {t("claude.firstParty.label")}
+            </span>
             <span className="desc">{t("claude.firstParty.desc")}</span>
           </div>
           <Switch
@@ -440,10 +567,15 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
           />
         </div>
       </div>
-      {!state.interceptRunning && <ClaudeInterceptStart apiBase={apiBase} reason={state.interceptReason} port={state.interceptFailurePort} onStarted={() => codeResource.refresh()} />}
-      {state.cliFirstParty && (
-        <Notice tone="warn">{t("claude.firstParty.risk")}</Notice>
+      {!state.interceptRunning && (
+        <ClaudeInterceptStart
+          apiBase={apiBase}
+          reason={state.interceptReason}
+          port={state.interceptFailurePort}
+          onStarted={() => codeResource.refresh()}
+        />
       )}
+      {state.cliFirstParty && <Notice tone="warn">{t("claude.firstParty.risk")}</Notice>}
       {(() => {
         const notice = selectFirstPartyNotice(state);
         const key = notice && firstPartyNoticeKeys[notice];
@@ -464,8 +596,13 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
       </CcwSection>
 
       <CcwSection title={t("claude.tierDefaults.title")}>
-        <ClaudeCodeTierDefaults state={state} options={modelOptions} onChange={setState} apiBase={apiBase}
-          dirty={!!edit && isClaudeCodeDraftDirty(edit.draft, edit.baseline)} />
+        <ClaudeCodeTierDefaults
+          state={state}
+          options={modelOptions}
+          onChange={setState}
+          apiBase={apiBase}
+          dirty={!!edit && isClaudeCodeDraftDirty(edit.draft, edit.baseline)}
+        />
       </CcwSection>
 
       <CcwSection title={t("claude.smallFastModel")}>
@@ -473,7 +610,7 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
           value={state.smallFastModel}
           tierHaikuModel={state.tierModels?.haiku}
           options={modelOptions}
-          onChange={smallFastModel => setState({ ...state, smallFastModel })}
+          onChange={(smallFastModel) => setState({ ...state, smallFastModel })}
         />
       </CcwSection>
 
@@ -485,19 +622,37 @@ export default function ClaudeCode({ apiBase, active = true }: { apiBase: string
         <ClaudeCodeAliasesSection aliases={state.aliases} />
       </CcwSection>
 
-      <div className="card claudecode-master-card">
-        {connectionRow}
-      </div>
+      <div className="card claudecode-master-card">{connectionRow}</div>
 
       <div className="ccw-savebar" role="region" aria-label={t("claude.saveBar.label")}>
-        {saveError && <span className="ccw-savebar-error" role="alert">{saveError}</span>}
-        <span className={`ccw-savebar-state${dirty ? " dirty" : ""}`} aria-live="polite" aria-atomic="true">
+        {saveError && (
+          <span className="ccw-savebar-error" role="alert">
+            {saveError}
+          </span>
+        )}
+        <span
+          className={`ccw-savebar-state${dirty ? " dirty" : ""}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {dirty ? t("claude.saveBar.dirty") : t("claude.saveBar.clean")}
         </span>
-        <button type="button" className="btn btn-ghost btn-sm" disabled={!dirty || saving} onClick={revert}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={!dirty || saving}
+          onClick={revert}
+        >
           {t("claude.saveBar.revert")}
         </button>
-        <button type="button" className="btn btn-primary btn-sm" disabled={saving} onClick={() => { void save(); }}>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          disabled={saving}
+          onClick={() => {
+            void save();
+          }}
+        >
           {t("common.save")}
         </button>
       </div>

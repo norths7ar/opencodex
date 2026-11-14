@@ -59,7 +59,10 @@ export type AnthropicSpendOutcome =
 export interface AnthropicResetGrantController {
   entries: Record<string, AnthropicGrantEntry>;
   refresh: (accountId: string) => Promise<void>;
-  spend: (accountId: string, request: { grantId: string; operationId: string }) => Promise<AnthropicSpendOutcome>;
+  spend: (
+    accountId: string,
+    request: { grantId: string; operationId: string },
+  ) => Promise<AnthropicSpendOutcome>;
 }
 
 const READ_TIMEOUT_MS = 20_000;
@@ -67,7 +70,11 @@ const READ_TIMEOUT_MS = 20_000;
 const SPEND_TIMEOUT_MS = 60_000;
 const MAX_READS_IN_FLIGHT = 3;
 const NO_ENTRIES: Record<string, AnthropicGrantEntry> = {};
-const WINDOWS: readonly AnthropicResetWindow[] = ["five_hour", "seven_day", "seven_day_overage_included"];
+const WINDOWS: readonly AnthropicResetWindow[] = [
+  "five_hour",
+  "seven_day",
+  "seven_day_overage_included",
+];
 const UNKNOWN_CODES = new Set(["unknown_outcome", "journal_write_failed", "in_flight"]);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -84,10 +91,20 @@ function parseGrant(value: unknown): AnthropicResetGrant | null {
   const { id, label, resetsTotal, resetsLeft, paused, usableNow, useRequiresLimit } = value;
   const startsAt = nullableString(value.startsAt);
   const endsAt = nullableString(value.endsAt);
-  if (typeof id !== "string" || id === "" || typeof label !== "string"
-    || typeof resetsTotal !== "number" || typeof resetsLeft !== "number"
-    || typeof paused !== "boolean" || typeof usableNow !== "boolean" || typeof useRequiresLimit !== "boolean"
-    || startsAt === undefined || endsAt === undefined || !Array.isArray(value.clears)) return null;
+  if (
+    typeof id !== "string" ||
+    id === "" ||
+    typeof label !== "string" ||
+    typeof resetsTotal !== "number" ||
+    typeof resetsLeft !== "number" ||
+    typeof paused !== "boolean" ||
+    typeof usableNow !== "boolean" ||
+    typeof useRequiresLimit !== "boolean" ||
+    startsAt === undefined ||
+    endsAt === undefined ||
+    !Array.isArray(value.clears)
+  )
+    return null;
   const percentUsed: Partial<Record<AnthropicResetWindow, number>> = {};
   if (isRecord(value.percentUsed)) {
     for (const window of WINDOWS) {
@@ -96,14 +113,24 @@ function parseGrant(value: unknown): AnthropicResetGrant | null {
     }
   }
   return {
-    id, label, resetsTotal, resetsLeft, startsAt, endsAt, paused, usableNow, useRequiresLimit, percentUsed,
-    clears: WINDOWS.filter(window => (value.clears as unknown[]).includes(window)),
+    id,
+    label,
+    resetsTotal,
+    resetsLeft,
+    startsAt,
+    endsAt,
+    paused,
+    usableNow,
+    useRequiresLimit,
+    percentUsed,
+    clears: WINDOWS.filter((window) => (value.clears as unknown[]).includes(window)),
   };
 }
 
 /** One malformed grant rejects the snapshot: the dialog spends from this list. */
 export function parseAnthropicGrantSnapshot(value: unknown): AnthropicResetGrantSnapshot | null {
-  if (!isRecord(value) || typeof value.eligible !== "boolean" || !Array.isArray(value.grants)) return null;
+  if (!isRecord(value) || typeof value.eligible !== "boolean" || !Array.isArray(value.grants))
+    return null;
   const grants: AnthropicResetGrant[] = [];
   for (const raw of value.grants) {
     const grant = parseGrant(raw);
@@ -112,9 +139,17 @@ export function parseAnthropicGrantSnapshot(value: unknown): AnthropicResetGrant
   }
   let pendingOperation: AnthropicPendingOperation | null = null;
   const pending = value.pendingOperation;
-  if (isRecord(pending) && typeof pending.operationId === "string" && typeof pending.grantId === "string"
-    && typeof pending.retryableUntil === "number") {
-    pendingOperation = { operationId: pending.operationId, grantId: pending.grantId, retryableUntil: pending.retryableUntil };
+  if (
+    isRecord(pending) &&
+    typeof pending.operationId === "string" &&
+    typeof pending.grantId === "string" &&
+    typeof pending.retryableUntil === "number"
+  ) {
+    pendingOperation = {
+      operationId: pending.operationId,
+      grantId: pending.grantId,
+      retryableUntil: pending.retryableUntil,
+    };
   }
   return {
     eligible: value.eligible,
@@ -132,20 +167,37 @@ export function unspentResets(snapshot: AnthropicResetGrantSnapshot): number {
 }
 
 /** The grant a spend would use: the first one the server's gate would accept now. */
-export function spendableGrant(snapshot: AnthropicResetGrantSnapshot): AnthropicResetGrant | undefined {
+export function spendableGrant(
+  snapshot: AnthropicResetGrantSnapshot,
+): AnthropicResetGrant | undefined {
   if (!snapshot.eligible || !snapshot.journalAvailable) return undefined;
-  return snapshot.grants.find(grant => !grant.paused && grant.usableNow && grant.resetsLeft > 0
-    && (!grant.useRequiresLimit || snapshot.atLimit));
+  return snapshot.grants.find(
+    (grant) =>
+      !grant.paused &&
+      grant.usableNow &&
+      grant.resetsLeft > 0 &&
+      (!grant.useRequiresLimit || snapshot.atLimit),
+  );
 }
 
 function errorCode(value: unknown): string {
-  if (isRecord(value) && isRecord(value.error) && typeof value.error.code === "string" && value.error.code !== "") {
+  if (
+    isRecord(value) &&
+    isRecord(value.error) &&
+    typeof value.error.code === "string" &&
+    value.error.code !== ""
+  ) {
     return value.error.code;
   }
   return "failed";
 }
 
-export function useAnthropicResetGrants({ apiBase, provider = "anthropic", accountIds, enabled }: {
+export function useAnthropicResetGrants({
+  apiBase,
+  provider = "anthropic",
+  accountIds,
+  enabled,
+}: {
   apiBase: string;
   provider?: AnthropicInstanceId;
   accountIds: string[];
@@ -154,9 +206,10 @@ export function useAnthropicResetGrants({ apiBase, provider = "anthropic", accou
   const namespace = `${apiBase}\0${provider}`;
   // Entries are stored with the pool namespace that produced them. A render for another
   // namespace treats them as absent, so equal account IDs in A and B never share a row.
-  const [store, setStore] = useState<{ namespace: string; entries: Record<string, AnthropicGrantEntry> }>(
-    () => ({ namespace, entries: {} }),
-  );
+  const [store, setStore] = useState<{
+    namespace: string;
+    entries: Record<string, AnthropicGrantEntry>;
+  }>(() => ({ namespace, entries: {} }));
   const epoch = useRef(0);
   const tokens = useRef(new Map<string, number>());
   const gate = useRef<{ active: number; waiting: Array<() => void> }>({ active: 0, waiting: [] });
@@ -170,49 +223,66 @@ export function useAnthropicResetGrants({ apiBase, provider = "anthropic", accou
     const previous = gate.current;
     gate.current = { active: 0, waiting: [] };
     for (const release of previous.waiting.splice(0)) release();
-    return () => { epoch.current += 1; };
+    return () => {
+      epoch.current += 1;
+    };
   }, [namespace]);
 
-  const setEntry = useCallback((accountId: string, entry: AnthropicGrantEntry) => {
-    setStore(current => ({
-      namespace,
-      entries: { ...(current.namespace === namespace ? current.entries : {}), [accountId]: entry },
-    }));
-  }, [namespace]);
+  const setEntry = useCallback(
+    (accountId: string, entry: AnthropicGrantEntry) => {
+      setStore((current) => ({
+        namespace,
+        entries: {
+          ...(current.namespace === namespace ? current.entries : {}),
+          [accountId]: entry,
+        },
+      }));
+    },
+    [namespace],
+  );
 
-  const read = useCallback(async (accountId: string, rosterEpoch: number) => {
-    if (epoch.current !== rosterEpoch) return;
-    const token = (tokens.current.get(accountId) ?? 0) + 1;
-    tokens.current.set(accountId, token);
-    const queue = gate.current;
-    if (queue.active >= MAX_READS_IN_FLIGHT) {
-      await new Promise<void>(resolve => queue.waiting.push(resolve));
-    }
-    queue.active += 1;
-    const current = () => epoch.current === rosterEpoch && tokens.current.get(accountId) === token;
-    const bounded = createBoundedFetch(READ_TIMEOUT_MS);
-    try {
-      if (!current()) return;
-      const response = await fetch(
-        `${apiBase}/api/anthropic/reset-grants?accountId=${encodeURIComponent(accountId)}${provider === "anthropic" ? "" : `&provider=${encodeURIComponent(provider)}`}`,
-        { signal: bounded.signal },
-      );
-      const raw = response.ok ? await response.json().catch(() => null) : null;
-      const ownsResponse = isRecord(raw) && (raw.provider === provider || (provider === "anthropic" && raw.provider === undefined));
-      const snapshot = ownsResponse ? parseAnthropicGrantSnapshot(raw) : null;
-      if (!current()) return;
-      setEntry(accountId, snapshot
-        ? { status: "ready", snapshot }
-        : { status: "error", reason: response.status === 401 ? "auth" : "upstream" });
-    } catch {
-      if (!current()) return;
-      setEntry(accountId, { status: "error", reason: "upstream" });
-    } finally {
-      bounded.clear();
-      queue.active -= 1;
-      queue.waiting.shift()?.();
-    }
-  }, [apiBase, provider, setEntry]);
+  const read = useCallback(
+    async (accountId: string, rosterEpoch: number) => {
+      if (epoch.current !== rosterEpoch) return;
+      const token = (tokens.current.get(accountId) ?? 0) + 1;
+      tokens.current.set(accountId, token);
+      const queue = gate.current;
+      if (queue.active >= MAX_READS_IN_FLIGHT) {
+        await new Promise<void>((resolve) => queue.waiting.push(resolve));
+      }
+      queue.active += 1;
+      const current = () =>
+        epoch.current === rosterEpoch && tokens.current.get(accountId) === token;
+      const bounded = createBoundedFetch(READ_TIMEOUT_MS);
+      try {
+        if (!current()) return;
+        const response = await fetch(
+          `${apiBase}/api/anthropic/reset-grants?accountId=${encodeURIComponent(accountId)}${provider === "anthropic" ? "" : `&provider=${encodeURIComponent(provider)}`}`,
+          { signal: bounded.signal },
+        );
+        const raw = response.ok ? await response.json().catch(() => null) : null;
+        const ownsResponse =
+          isRecord(raw) &&
+          (raw.provider === provider || (provider === "anthropic" && raw.provider === undefined));
+        const snapshot = ownsResponse ? parseAnthropicGrantSnapshot(raw) : null;
+        if (!current()) return;
+        setEntry(
+          accountId,
+          snapshot
+            ? { status: "ready", snapshot }
+            : { status: "error", reason: response.status === 401 ? "auth" : "upstream" },
+        );
+      } catch {
+        if (!current()) return;
+        setEntry(accountId, { status: "error", reason: "upstream" });
+      } finally {
+        bounded.clear();
+        queue.active -= 1;
+        queue.waiting.shift()?.();
+      }
+    },
+    [apiBase, provider, setEntry],
+  );
 
   useEffect(() => {
     if (!enabled || identity === "") return;
@@ -220,48 +290,65 @@ export function useAnthropicResetGrants({ apiBase, provider = "anthropic", accou
     void Promise.resolve().then(() => {
       for (const accountId of identity.split("\u0000")) void read(accountId, rosterEpoch);
     });
-    return () => { epoch.current += 1; };
+    return () => {
+      epoch.current += 1;
+    };
   }, [enabled, identity, read]);
 
-  const refresh = useCallback(async (accountId: string) => {
-    setEntry(accountId, { status: "loading" });
-    await read(accountId, epoch.current);
-  }, [read, setEntry]);
+  const refresh = useCallback(
+    async (accountId: string) => {
+      setEntry(accountId, { status: "loading" });
+      await read(accountId, epoch.current);
+    },
+    [read, setEntry],
+  );
 
-  const spend = useCallback(async (
-    accountId: string,
-    request: { grantId: string; operationId: string },
-  ): Promise<AnthropicSpendOutcome> => {
-    const spendEpoch = epoch.current;
-    const bounded = createBoundedFetch(SPEND_TIMEOUT_MS);
-    try {
-      const response = await fetch(`${apiBase}/api/anthropic/reset-grants/consume`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...(provider === "anthropic" ? {} : { provider }), accountId, grantId: request.grantId, operationId: request.operationId }),
-        signal: bounded.signal,
-      });
-      if (!response.ok) {
-        const code = errorCode(await response.json().catch(() => null));
-        return UNKNOWN_CODES.has(code) ? { kind: "unknown", code } : { kind: "refused", code };
+  const spend = useCallback(
+    async (
+      accountId: string,
+      request: { grantId: string; operationId: string },
+    ): Promise<AnthropicSpendOutcome> => {
+      const spendEpoch = epoch.current;
+      const bounded = createBoundedFetch(SPEND_TIMEOUT_MS);
+      try {
+        const response = await fetch(`${apiBase}/api/anthropic/reset-grants/consume`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...(provider === "anthropic" ? {} : { provider }),
+            accountId,
+            grantId: request.grantId,
+            operationId: request.operationId,
+          }),
+          signal: bounded.signal,
+        });
+        if (!response.ok) {
+          const code = errorCode(await response.json().catch(() => null));
+          return UNKNOWN_CODES.has(code) ? { kind: "unknown", code } : { kind: "refused", code };
+        }
+        const data = (await response.json().catch(() => null)) as unknown;
+        if (
+          !isRecord(data) ||
+          typeof data.code !== "string" ||
+          (data.provider !== provider && !(provider === "anthropic" && data.provider === undefined))
+        )
+          return { kind: "unknown", code: "unknown_outcome" };
+        if (spendEpoch === epoch.current) void read(accountId, spendEpoch);
+        return {
+          kind: "settled",
+          code: data.code,
+          replayed: data.replayed === true,
+          resetsLeft: typeof data.resetsLeft === "number" ? data.resetsLeft : null,
+        };
+      } catch {
+        // Delivery may have happened: the caller keeps the id and may only retry it.
+        return { kind: "unknown", code: "aborted" };
+      } finally {
+        bounded.clear();
       }
-      const data = await response.json().catch(() => null) as unknown;
-      if (!isRecord(data) || typeof data.code !== "string"
-        || (data.provider !== provider && !(provider === "anthropic" && data.provider === undefined))) return { kind: "unknown", code: "unknown_outcome" };
-      if (spendEpoch === epoch.current) void read(accountId, spendEpoch);
-      return {
-        kind: "settled",
-        code: data.code,
-        replayed: data.replayed === true,
-        resetsLeft: typeof data.resetsLeft === "number" ? data.resetsLeft : null,
-      };
-    } catch {
-      // Delivery may have happened: the caller keeps the id and may only retry it.
-      return { kind: "unknown", code: "aborted" };
-    } finally {
-      bounded.clear();
-    }
-  }, [apiBase, provider, read]);
+    },
+    [apiBase, provider, read],
+  );
 
   return { entries: store.namespace === namespace ? store.entries : NO_ENTRIES, refresh, spend };
 }

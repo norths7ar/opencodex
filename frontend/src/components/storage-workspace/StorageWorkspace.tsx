@@ -121,22 +121,33 @@ function rowsDisplay(bucket: StorageBucket, locale: Locale, t: TFn): string {
 
 function mutationErrorLabel(locale: Locale, code: unknown): string {
   switch (code) {
-    case "codex_running": return logGuardOperationLabel(locale, "error.codex_running");
-    case "process_enumeration_failed": return logGuardOperationLabel(locale, "error.process_enumeration_failed");
-    case "busy": return logGuardOperationLabel(locale, "error.busy");
-    case "unsupported_schema": return logGuardOperationLabel(locale, "error.unsupported_schema");
-    case "trigger_collision": return logGuardLabel(locale, "error.trigger_collision");
-    case "unsafe_path": return logGuardOperationLabel(locale, "error.unsafe_path");
-    case "database_error": return logGuardOperationLabel(locale, "error.database_error");
+    case "codex_running":
+      return logGuardOperationLabel(locale, "error.codex_running");
+    case "process_enumeration_failed":
+      return logGuardOperationLabel(locale, "error.process_enumeration_failed");
+    case "busy":
+      return logGuardOperationLabel(locale, "error.busy");
+    case "unsupported_schema":
+      return logGuardOperationLabel(locale, "error.unsupported_schema");
+    case "trigger_collision":
+      return logGuardLabel(locale, "error.trigger_collision");
+    case "unsafe_path":
+      return logGuardOperationLabel(locale, "error.unsafe_path");
+    case "database_error":
+      return logGuardOperationLabel(locale, "error.database_error");
     // Two distinct situations that previously collapsed into the generic
     // message: an unsupported auto-vacuum configuration (nothing can be
     // reclaimed without a full rebuild) versus a failed integrity check
     // (the database itself is suspect). A user cannot act on "something
     // went wrong".
-    case "auto_vacuum_not_incremental": return logGuardOperationLabel(locale, "error.auto_vacuum_not_incremental");
-    case "integrity_check_failed": return logGuardOperationLabel(locale, "error.integrity_check_failed");
-    case "config_write_failed": return logGuardLabel(locale, "error.config_write_failed");
-    default: return logGuardOperationLabel(locale, "error.generic");
+    case "auto_vacuum_not_incremental":
+      return logGuardOperationLabel(locale, "error.auto_vacuum_not_incremental");
+    case "integrity_check_failed":
+      return logGuardOperationLabel(locale, "error.integrity_check_failed");
+    case "config_write_failed":
+      return logGuardLabel(locale, "error.config_write_failed");
+    default:
+      return logGuardOperationLabel(locale, "error.generic");
   }
 }
 
@@ -159,13 +170,15 @@ function CodexLogGuardPanel({
   onAction: (action: CodexLogGuardAction) => void;
 }) {
   const metrics = report.metrics;
-  const inspectOnly = report.capabilities.protection.state === "unsupported"
-    || report.capabilities.reclaim.state === "unsupported";
+  const inspectOnly =
+    report.capabilities.protection.state === "unsupported" ||
+    report.capabilities.reclaim.state === "unsupported";
   const protection = report.protection;
   const mutationDisabled = busy || report.capabilities.protection.state !== "supported";
-  const reclaimAvailable = protection !== undefined
-    && report.capabilities.reclaim.state === "supported"
-    && (metrics?.reclaimableBytes ?? 0) > 0;
+  const reclaimAvailable =
+    protection !== undefined &&
+    report.capabilities.reclaim.state === "supported" &&
+    (metrics?.reclaimableBytes ?? 0) > 0;
   const [confirmCompact, setConfirmCompact] = useState(false);
 
   return (
@@ -176,7 +189,12 @@ function CodexLogGuardPanel({
           <dt>{t("dash.status")}</dt>
           <dd className="stw-kv-mono">
             <code>{logGuardSchemaStateLabel(locale, report.schema.state)}</code>
-            {inspectOnly && report.schema.state === "unsupported" ? <><span aria-hidden="true"> · </span><code>{logGuardLabel(locale, "inspectionOnly")}</code></> : null}
+            {inspectOnly && report.schema.state === "unsupported" ? (
+              <>
+                <span aria-hidden="true"> · </span>
+                <code>{logGuardLabel(locale, "inspectionOnly")}</code>
+              </>
+            ) : null}
           </dd>
         </div>
         <div className="stw-kv-row">
@@ -184,11 +202,15 @@ function CodexLogGuardPanel({
           <dd className="stw-kv-mono">{formatBytes(report.files.databaseBytes, locale)}</dd>
         </div>
         <div className="stw-kv-row">
-          <dt><code>WAL</code></dt>
+          <dt>
+            <code>WAL</code>
+          </dt>
           <dd className="stw-kv-mono">{formatBytes(report.files.walBytes, locale)}</dd>
         </div>
         <div className="stw-kv-row">
-          <dt><code>SHM</code></dt>
+          <dt>
+            <code>SHM</code>
+          </dt>
           <dd className="stw-kv-mono">{formatBytes(report.files.shmBytes, locale)}</dd>
         </div>
         {metrics && (
@@ -198,11 +220,15 @@ function CodexLogGuardPanel({
               <dd className="stw-kv-mono">{metrics.totalRows.toLocaleString(locale)}</dd>
             </div>
             <div className="stw-kv-row">
-              <dt><code>TRACE</code></dt>
+              <dt>
+                <code>TRACE</code>
+              </dt>
               <dd className="stw-kv-mono">{(metrics.traceShare * 100).toFixed(1)}%</dd>
             </div>
             <div className="stw-kv-row">
-              <dt><code>freelist</code></dt>
+              <dt>
+                <code>freelist</code>
+              </dt>
               <dd className="stw-kv-mono">{formatBytes(metrics.reclaimableBytes, locale)}</dd>
             </div>
           </>
@@ -218,15 +244,23 @@ function CodexLogGuardPanel({
           <div className="stw-kv-row" data-testid="log-guard-metrics-skipped">
             <dt>{t("storage.col.rows")}</dt>
             <dd className="muted">
-              {logGuardLabel(locale, "metricsSkippedLarge")
-                .replace("{threshold}", formatBytes(report.metricsSkipped.thresholdBytes, locale))}
+              {logGuardLabel(locale, "metricsSkippedLarge").replace(
+                "{threshold}",
+                formatBytes(report.metricsSkipped.thresholdBytes, locale),
+              )}
             </dd>
           </div>
         )}
         <div className="stw-kv-row">
-          <dt><code>sqlite_home</code></dt>
+          <dt>
+            <code>sqlite_home</code>
+          </dt>
           <dd className="stw-kv-mono">
-            <code>{report.externalSqliteHome ? logGuardLabel(locale, "externalSqliteHome") : "CODEX_HOME"}</code>
+            <code>
+              {report.externalSqliteHome
+                ? logGuardLabel(locale, "externalSqliteHome")
+                : "CODEX_HOME"}
+            </code>
           </dd>
         </div>
       </dl>
@@ -235,10 +269,17 @@ function CodexLogGuardPanel({
         <div className="stw-section" data-testid="log-guard-protection">
           <h4 className="stw-section-title">{logGuardLabel(locale, "protection")}</h4>
           <div className="stw-kv-row">
-            <span className="muted"><code>{logGuardProtectionStateLabel(locale, protection.state)}</code></span>
+            <span className="muted">
+              <code>{logGuardProtectionStateLabel(locale, protection.state)}</code>
+            </span>
             <span className="stw-kv-mono">
               <code>{logGuardProtectionModeLabel(locale, protection.desiredMode)}</code>
-              {protection.observedMode !== protection.desiredMode ? <><span aria-hidden="true"> · </span><code>{logGuardProtectionModeLabel(locale, protection.observedMode)}</code></> : null}
+              {protection.observedMode !== protection.desiredMode ? (
+                <>
+                  <span aria-hidden="true"> · </span>
+                  <code>{logGuardProtectionModeLabel(locale, protection.observedMode)}</code>
+                </>
+              ) : null}
             </span>
           </div>
           <div className="storage-policy-actions">
@@ -282,9 +323,17 @@ function CodexLogGuardPanel({
                 {logGuardLabel(locale, "repair")}
               </button>
             )}
-            {busy && <span className="muted" role="status">{logGuardOperationLabel(locale, "applying")}</span>}
+            {busy && (
+              <span className="muted" role="status">
+                {logGuardOperationLabel(locale, "applying")}
+              </span>
+            )}
           </div>
-          {error && <p className="err" role="alert">{error}</p>}
+          {error && (
+            <p className="err" role="alert">
+              {error}
+            </p>
+          )}
         </div>
       )}
 
@@ -336,22 +385,30 @@ function CodexLogGuardPanel({
         // the best case. The POST's own result is also shown when the follow-up
         // status refresh fails, since the mutation had already succeeded.
         <div className="stw-section">
-          <p className="stw-kv-mono" role="status" data-testid="log-guard-compact-result">{compaction}</p>
+          <p className="stw-kv-mono" role="status" data-testid="log-guard-compact-result">
+            {compaction}
+          </p>
         </div>
       )}
 
       {metrics && metrics.topTargets.length > 0 && (
         <div className="stw-section">
-          <h4 className="stw-section-title"><code>target</code></h4>
-          {metrics.topTargets.slice(0, 5).map(target => (
+          <h4 className="stw-section-title">
+            <code>target</code>
+          </h4>
+          {metrics.topTargets.slice(0, 5).map((target) => (
             <div key={target.target} className="stw-file-row">
-              <span className="stw-file-path" title={target.target}><code>{target.target}</code></span>
+              <span className="stw-file-path" title={target.target}>
+                <code>{target.target}</code>
+              </span>
               <span className="stw-file-size">{target.rows.toLocaleString(locale)}</span>
             </div>
           ))}
         </div>
       )}
-      <p className="stw-hint"><code>immutable=1 · snapshot={report.snapshot}</code></p>
+      <p className="stw-hint">
+        <code>immutable=1 · snapshot={report.snapshot}</code>
+      </p>
     </div>
   );
 }
@@ -403,25 +460,28 @@ export default function StorageWorkspace({
 }: StorageWorkspaceProps) {
   const t = useT();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const [logGuardOverride, setLogGuardOverride] = useState<GenerationScopedLogGuardReport | null>(null);
+  const [logGuardOverride, setLogGuardOverride] = useState<GenerationScopedLogGuardReport | null>(
+    null,
+  );
   const [internalLogGuardBusy, setInternalLogGuardBusy] = useState(false);
   const [logGuardError, setLogGuardError] = useState<GenerationScopedError | null>(null);
-  const [logGuardCompaction, setLogGuardCompaction] = useState<GenerationScopedCompaction | null>(null);
+  const [logGuardCompaction, setLogGuardCompaction] = useState<GenerationScopedCompaction | null>(
+    null,
+  );
 
   const sortedBuckets = useMemo(
     () => report.buckets.toSorted((a, b) => b.bytes - a.bytes),
     [report.buckets],
   );
-  const selected = sortedBuckets.find(b => b.key === selectedKey) ?? null;
-  const displayedLogGuard = logGuardOverride?.generation === report.generatedAt
-    ? logGuardOverride.report
-    : report.codexLogs ?? null;
-  const displayedLogGuardError = logGuardError?.generation === report.generatedAt
-    ? logGuardError.message
-    : null;
-  const displayedCompaction = logGuardCompaction?.generation === report.generatedAt
-    ? logGuardCompaction.summary
-    : null;
+  const selected = sortedBuckets.find((b) => b.key === selectedKey) ?? null;
+  const displayedLogGuard =
+    logGuardOverride?.generation === report.generatedAt
+      ? logGuardOverride.report
+      : (report.codexLogs ?? null);
+  const displayedLogGuardError =
+    logGuardError?.generation === report.generatedAt ? logGuardError.message : null;
+  const displayedCompaction =
+    logGuardCompaction?.generation === report.generatedAt ? logGuardCompaction.summary : null;
   const effectiveLogGuardBusy = logGuardBusy || internalLogGuardBusy;
 
   const largestAcross = useMemo(() => {
@@ -433,7 +493,7 @@ export default function StorageWorkspace({
   }, [report.buckets]);
 
   const bucketByKey = useMemo(
-    () => new Map(report.buckets.map(b => [b.key, b])),
+    () => new Map(report.buckets.map((b) => [b.key, b])),
     [report.buckets],
   );
 
@@ -455,14 +515,16 @@ export default function StorageWorkspace({
         const suffix = action.action === "protect" ? "protect" : action.action;
         const init: RequestInit = {
           method: "POST",
-          ...(action.action === "protect" ? {
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ mode: action.mode }),
-          } : {}),
+          ...(action.action === "protect"
+            ? {
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ mode: action.mode }),
+              }
+            : {}),
         };
         const response = await fetch(`${apiBase}/api/storage/codex-logs/${suffix}`, init);
         if (!response.ok) {
-          const errorPayload = await response.json().catch(() => ({})) as Record<string, unknown>;
+          const errorPayload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
           setLogGuardError({ generation, message: mutationErrorLabel(locale, errorPayload.error) });
           return;
         }
@@ -472,7 +534,7 @@ export default function StorageWorkspace({
           // compaction whose refresh then failed showed the user nothing at all,
           // hiding pagesReclaimed/complete/stopReason and inviting them to
           // repeat a mutation that already worked.
-          const posted = await response.json().catch(() => null) as {
+          const posted = (await response.json().catch(() => null)) as {
             report?: {
               pagesReclaimed?: number;
               logicalBytesReclaimed?: number;
@@ -497,9 +559,10 @@ export default function StorageWorkspace({
             // in. Reporting only bytes left a partial run indistinguishable from
             // any other partial run.
             const pages = postedReport.pagesReclaimed ?? 0;
-            const reason = !postedReport.complete && postedReport.stopReason
-              ? ` (${postedReport.stopReason})`
-              : "";
+            const reason =
+              !postedReport.complete && postedReport.stopReason
+                ? ` (${postedReport.stopReason})`
+                : "";
             setLogGuardCompaction({
               generation,
               summary: [
@@ -514,13 +577,15 @@ export default function StorageWorkspace({
           try {
             const refreshed = await fetch(`${apiBase}/api/storage/codex-logs`);
             if (refreshed.ok) {
-              const payload = await refreshed.json() as CodexLogGuardReport;
+              const payload = (await refreshed.json()) as CodexLogGuardReport;
               setLogGuardOverride({ generation, report: payload });
             }
-          } catch { /* keep the existing report after successful compaction */ }
+          } catch {
+            /* keep the existing report after successful compaction */
+          }
           return;
         }
-        const payload = await response.json() as CodexLogGuardReport;
+        const payload = (await response.json()) as CodexLogGuardReport;
         setLogGuardOverride({ generation, report: payload });
       } catch {
         setLogGuardError({ generation, message: logGuardOperationLabel(locale, "error.generic") });
@@ -541,17 +606,19 @@ export default function StorageWorkspace({
           {sortedBuckets.length === 0 ? (
             <span className="storage-workspace-rail-empty">{t("storage.empty")}</span>
           ) : (
-            sortedBuckets.map(bucket => (
+            sortedBuckets.map((bucket) => (
               <button
                 key={bucket.key}
                 type="button"
                 className={`storage-workspace-rail-row${selectedKey === bucket.key ? " storage-workspace-rail-row--selected" : ""}`}
-                onClick={() => setSelectedKey(prev => (prev === bucket.key ? null : bucket.key))}
+                onClick={() => setSelectedKey((prev) => (prev === bucket.key ? null : bucket.key))}
                 aria-current={selectedKey === bucket.key ? "true" : undefined}
               >
                 <span className="storage-workspace-rail-primary">
                   <span className="storage-workspace-rail-name">{bucketLabel(bucket, t)}</span>
-                  <span className="storage-workspace-rail-size">{formatBytes(bucket.bytes, locale)}</span>
+                  <span className="storage-workspace-rail-size">
+                    {formatBytes(bucket.bytes, locale)}
+                  </span>
                 </span>
                 <span className="storage-workspace-rail-meta">
                   {bucket.fileCount.toLocaleString(locale)} {t("storage.col.files").toLowerCase()}
@@ -562,11 +629,18 @@ export default function StorageWorkspace({
         </div>
       </aside>
 
-      <section className="storage-workspace-main" aria-label={selected ? bucketLabel(selected, t) : t("storage.section.largest")}>
+      <section
+        className="storage-workspace-main"
+        aria-label={selected ? bucketLabel(selected, t) : t("storage.section.largest")}
+      >
         {selected ? (
           <div className="stw-detail">
             <div className="stw-detail-toolbar">
-              <button type="button" className="stw-detail-back" onClick={() => setSelectedKey(null)}>
+              <button
+                type="button"
+                className="stw-detail-back"
+                onClick={() => setSelectedKey(null)}
+              >
                 <IconChevron className="stw-detail-back-chevron" aria-hidden="true" />
                 {t("modal.back")}
               </button>
@@ -599,9 +673,11 @@ export default function StorageWorkspace({
               {(selected.largest?.length ?? 0) > 0 && (
                 <div className="stw-section">
                   <h3 className="stw-section-title">{t("storage.section.largest")}</h3>
-                  {selected.largest!.map(entry => (
+                  {selected.largest!.map((entry) => (
                     <div key={entry.path} className="stw-file-row">
-                      <span className="stw-file-path" title={entry.path}>{entry.path}</span>
+                      <span className="stw-file-path" title={entry.path}>
+                        {entry.path}
+                      </span>
                       <span className="stw-file-size">{formatBytes(entry.bytes, locale)}</span>
                     </div>
                   ))}
@@ -618,11 +694,15 @@ export default function StorageWorkspace({
               </div>
               <div className="stw-summary-card">
                 <div className="stw-summary-label">{t("storage.card.files")}</div>
-                <div className="stw-summary-value">{report.total.fileCount.toLocaleString(locale)}</div>
+                <div className="stw-summary-value">
+                  {report.total.fileCount.toLocaleString(locale)}
+                </div>
               </div>
               <div className="stw-summary-card">
                 <div className="stw-summary-label">{t("storage.card.home")}</div>
-                <div className="stw-summary-value mono stw-home-path" title={report.codexHome}>{report.codexHome}</div>
+                <div className="stw-summary-value mono stw-home-path" title={report.codexHome}>
+                  {report.codexHome}
+                </div>
               </div>
             </div>
 
@@ -643,11 +723,13 @@ export default function StorageWorkspace({
             {largestAcross.length > 0 ? (
               <div className="stw-section">
                 <h3 className="stw-section-title">{t("storage.section.largest")}</h3>
-                {largestAcross.map(entry => {
+                {largestAcross.map((entry) => {
                   const owner = bucketByKey.get(entry.bucketKey);
                   return (
                     <div key={`${entry.bucketKey}:${entry.path}`} className="stw-file-row">
-                      <span className="stw-file-path" title={entry.path}>{entry.path}</span>
+                      <span className="stw-file-path" title={entry.path}>
+                        {entry.path}
+                      </span>
                       {owner && <span className="stw-file-bucket">{bucketLabel(owner, t)}</span>}
                       <span className="stw-file-size">{formatBytes(entry.bytes, locale)}</span>
                     </div>
@@ -656,7 +738,10 @@ export default function StorageWorkspace({
               </div>
             ) : (
               <p className="stw-hint">
-                <IconHardDrive style={{ width: 14, height: 14, verticalAlign: "text-bottom", marginRight: 6 }} aria-hidden="true" />
+                <IconHardDrive
+                  style={{ width: 14, height: 14, verticalAlign: "text-bottom", marginRight: 6 }}
+                  aria-hidden="true"
+                />
                 {t("storage.workspace.selectBucket")}
               </p>
             )}

@@ -30,11 +30,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
     if (!this.state.error) return this.props.children;
 
     return (
-      <section
-        className="card"
-        role="alert"
-        style={{ maxWidth: 720, padding: "var(--space-6)" }}
-      >
+      <section className="card" role="alert" style={{ maxWidth: 720, padding: "var(--space-6)" }}>
         <h2 style={{ margin: "0 0 var(--space-2)", fontSize: "var(--text-title)" }}>
           {this.props.pageName}: {this.props.title}
         </h2>

@@ -32,7 +32,7 @@ export default function FastRowsSetting({
     try {
       const response = await fetch(`${apiBase}/api/settings`, { signal: bounded.signal });
       if (!response.ok) throw new Error("load");
-      const payload = await response.json() as { fastRows?: unknown };
+      const payload = (await response.json()) as { fastRows?: unknown };
       if (savingRef.current || generation !== loadGenerationRef.current) return;
       if (typeof payload.fastRows !== "boolean") throw new Error("shape");
       enabledRef.current = payload.fastRows;
@@ -49,8 +49,12 @@ export default function FastRowsSetting({
   }, [apiBase]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void load(); }, 0);
-    const stop = startVisibilityPoll(() => { void load(); }, 30_000);
+    const timeout = window.setTimeout(() => {
+      void load();
+    }, 0);
+    const stop = startVisibilityPoll(() => {
+      void load();
+    }, 30_000);
     return () => {
       window.clearTimeout(timeout);
       stop();
@@ -75,11 +79,12 @@ export default function FastRowsSetting({
         body: JSON.stringify({ fastRows: requested }),
         signal: bounded.signal,
       });
-      const payload = (await readJsonOrThrow<{
-        ok?: unknown;
-        fastRows?: unknown;
-        catalogRefreshPending?: unknown;
-      }>(response)) ?? {};
+      const payload =
+        (await readJsonOrThrow<{
+          ok?: unknown;
+          fastRows?: unknown;
+          catalogRefreshPending?: unknown;
+        }>(response)) ?? {};
       if (payload.ok !== true || typeof payload.fastRows !== "boolean") {
         throw new Error("unconfirmed");
       }
@@ -87,24 +92,31 @@ export default function FastRowsSetting({
       setEnabled(payload.fastRows);
       setHydrated(true);
       setLoadError(false);
-      setFeedback(payload.catalogRefreshPending === true
-        ? { tone: "warn", message: t("models.fastRows.refreshHint") }
-        : { tone: "ok", message: t(payload.fastRows ? "models.fastRows.enabled" : "models.fastRows.disabled") });
+      setFeedback(
+        payload.catalogRefreshPending === true
+          ? { tone: "warn", message: t("models.fastRows.refreshHint") }
+          : {
+              tone: "ok",
+              message: t(payload.fastRows ? "models.fastRows.enabled" : "models.fastRows.disabled"),
+            },
+      );
       onSaved?.();
     } catch {
       const reconciliation = createBoundedFetch(15_000);
       try {
         const response = await fetch(`${apiBase}/api/settings`, { signal: reconciliation.signal });
         if (!response.ok) throw new Error("reconcile");
-        const payload = await response.json() as { fastRows?: unknown };
+        const payload = (await response.json()) as { fastRows?: unknown };
         if (typeof payload.fastRows !== "boolean") throw new Error("shape");
         enabledRef.current = payload.fastRows;
         setEnabled(payload.fastRows);
         setHydrated(true);
         setLoadError(false);
-        setFeedback(payload.fastRows === requested
-          ? { tone: "warn", message: t("models.fastRows.refreshHint") }
-          : { tone: "err", message: t("models.fastRows.updateFailed") });
+        setFeedback(
+          payload.fastRows === requested
+            ? { tone: "warn", message: t("models.fastRows.refreshHint") }
+            : { tone: "err", message: t("models.fastRows.updateFailed") },
+        );
       } catch {
         enabledRef.current = previous;
         setEnabled(previous);
@@ -147,7 +159,9 @@ export default function FastRowsSetting({
           <button
             type="button"
             className="btn btn-ghost btn-sm"
-            onClick={() => { void load(); }}
+            onClick={() => {
+              void load();
+            }}
             disabled={saving}
           >
             {t("common.retry")}
@@ -157,7 +171,9 @@ export default function FastRowsSetting({
           <button
             type="button"
             className={`toggle ${enabled ? "on" : ""}`}
-            onClick={() => { void toggle(); }}
+            onClick={() => {
+              void toggle();
+            }}
             disabled={saving}
             aria-pressed={enabled}
             aria-label={t("models.fastRows.title")}

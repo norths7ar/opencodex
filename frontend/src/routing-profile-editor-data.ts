@@ -20,10 +20,7 @@ function newDraftCandidateKey(): string {
 }
 
 /** Create a draft candidate with a fresh stable key. */
-export function newDraftCandidate(
-  provider: string,
-  model: string,
-): RoutingProfileDraftCandidate {
+export function newDraftCandidate(provider: string, model: string): RoutingProfileDraftCandidate {
   return { provider, model, key: newDraftCandidateKey() };
 }
 
@@ -57,7 +54,6 @@ export type RoutingProfileDto = {
   };
   unknownEvidence: Record<"capability" | "health" | "quota" | "cost", UnknownEvidenceMode>;
 };
-
 
 export type RoutingProfileDraft = {
   id: string;
@@ -117,10 +113,7 @@ function numberInput(value: number | undefined): string {
   return value === undefined ? "" : String(value);
 }
 
-export function newRoutingProfileDraft(
-  provider = "",
-  model = "",
-): RoutingProfileDraft {
+export function newRoutingProfileDraft(provider = "", model = ""): RoutingProfileDraft {
   return {
     id: "",
     alias: "",
@@ -147,7 +140,10 @@ export function routingProfileDraftFromDto(profile: RoutingProfileDto): RoutingP
   return {
     id: profile.id,
     alias: profile.alias ?? "",
-    candidates: profile.candidates.map(candidate => ({ ...candidate, key: newDraftCandidateKey() })),
+    candidates: profile.candidates.map((candidate) => ({
+      ...candidate,
+      key: newDraftCandidateKey(),
+    })),
     require: {
       minContextWindow: numberInput(profile.require.minContextWindow),
       minQuotaHeadroom: numberInput(profile.require.minQuotaHeadroom),
@@ -214,7 +210,7 @@ export function routingProfilePutBody(
     encryptedCodexTasks: draftBoolean(draft.require.encryptedCodexTasks),
   });
   const maxEstimatedCostUsd = optionalNumber(draft.limits.maxEstimatedCostUsd);
-  const onUnknownCost = draft.limits.onUnknownCost === "exclude" ? "exclude" as const : undefined;
+  const onUnknownCost = draft.limits.onUnknownCost === "exclude" ? ("exclude" as const) : undefined;
   const limits = compactRecord({
     maxEstimatedCostUsd,
     onUnknownCost,
@@ -226,7 +222,7 @@ export function routingProfilePutBody(
     ...(mode === "update" && expectedRevision ? { expectedRevision } : {}),
     profile: {
       ...(draft.alias.trim() ? { alias: draft.alias.trim() } : {}),
-      candidates: draft.candidates.map(candidate => ({
+      candidates: draft.candidates.map((candidate) => ({
         provider: candidate.provider.trim(),
         model: candidate.model.trim(),
       })),
@@ -255,13 +251,14 @@ export function routingProfileResponseError(data: unknown): string | undefined {
 }
 
 export function routingProfileResponseSucceeded(data: unknown): boolean {
-  return !!data && typeof data === "object" && !Array.isArray(data)
-    && (data as { success?: unknown }).success === true;
+  return (
+    !!data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    (data as { success?: unknown }).success === true
+  );
 }
 
-export function modelOptionsForProvider(
-  models: ModelOption[],
-  provider: string,
-): ModelOption[] {
-  return models.filter(model => model.provider === provider);
+export function modelOptionsForProvider(models: ModelOption[], provider: string): ModelOption[] {
+  return models.filter((model) => model.provider === provider);
 }

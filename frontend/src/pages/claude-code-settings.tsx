@@ -22,7 +22,7 @@ export function SettingToggle({
         disabled={disabled}
         aria-label={label}
         aria-describedby={describedBy}
-        onChange={event => onChange(event.target.checked)}
+        onChange={(event) => onChange(event.target.checked)}
       />
       <span className="slider" aria-hidden="true" />
     </label>

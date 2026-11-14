@@ -11,7 +11,11 @@ const tabs: readonly CodexSetTab[] = ["multiauth", "prompt", "desktop"];
 
 export function readCodexSetTabFromHash(): CodexSetTab {
   const hash = window.location.hash.replace(/^#\/?/, "");
-  return hash === "codex-set/desktop" ? "desktop" : hash === "codex-set/prompt" ? "prompt" : "multiauth";
+  return hash === "codex-set/desktop"
+    ? "desktop"
+    : hash === "codex-set/prompt"
+      ? "prompt"
+      : "multiauth";
 }
 
 export function selectCodexSetTab(next: CodexSetTab): void {
@@ -22,7 +26,13 @@ export function codexSetTabKeyDown(e: KeyboardEvent): void {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
   e.preventDefault();
   const current = tabs.indexOf(readCodexSetTabFromHash());
-  const index = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : (current + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
-  const next = tabs[index]!; selectCodexSetTab(next);
+  const index =
+    e.key === "Home"
+      ? 0
+      : e.key === "End"
+        ? tabs.length - 1
+        : (current + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  const next = tabs[index]!;
+  selectCodexSetTab(next);
   document.getElementById(`codex-set-tab-${next}`)?.focus();
 }

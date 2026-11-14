@@ -14,7 +14,13 @@ import { codexSetTabKeyDown, readCodexSetTabFromHash, selectCodexSetTab } from "
  * user is editing prompts. Prompt lazy-mounts on first visit and stays mounted
  * afterwards, so hopping between tabs does not refetch either side.
  */
-export default function CodexSet({ apiBase }: { apiBase: string; machineApiBase?: string; connected?: boolean }) {
+export default function CodexSet({
+  apiBase,
+}: {
+  apiBase: string;
+  machineApiBase?: string;
+  connected?: boolean;
+}) {
   const t = useT();
   const [tab, setTab] = useState(readCodexSetTabFromHash);
   const [promptMounted, setPromptMounted] = useState(() => readCodexSetTabFromHash() === "prompt");
@@ -22,8 +28,12 @@ export default function CodexSet({ apiBase }: { apiBase: string; machineApiBase?
   // direct visit to #codex-set/prompt still started its /api/config fetch and 30s
   // account poll behind a hidden panel - exactly the cost this shell was shaped to
   // avoid. Both panels now mount on first selection and stay mounted after.
-  const [multiauthMounted, setMultiauthMounted] = useState(() => readCodexSetTabFromHash() === "multiauth");
-  const [desktopMounted, setDesktopMounted] = useState(() => readCodexSetTabFromHash() === "desktop");
+  const [multiauthMounted, setMultiauthMounted] = useState(
+    () => readCodexSetTabFromHash() === "multiauth",
+  );
+  const [desktopMounted, setDesktopMounted] = useState(
+    () => readCodexSetTabFromHash() === "desktop",
+  );
 
   useEffect(() => {
     const onHash = () => setTab(readCodexSetTabFromHash());
@@ -71,10 +81,19 @@ export default function CodexSet({ apiBase }: { apiBase: string; machineApiBase?
         >
           {t("codexSet.tab.prompt")}
         </button>
-        <button type="button" role="tab" id="codex-set-tab-desktop" aria-selected={tab === "desktop"}
-          aria-controls="codex-set-panel-desktop" tabIndex={tab === "desktop" ? 0 : -1}
+        <button
+          type="button"
+          role="tab"
+          id="codex-set-tab-desktop"
+          aria-selected={tab === "desktop"}
+          aria-controls="codex-set-panel-desktop"
+          tabIndex={tab === "desktop" ? 0 : -1}
           className={`page-tab${tab === "desktop" ? " page-tab--active" : ""}`}
-          onClick={() => selectCodexSetTab("desktop")} onKeyDown={codexSetTabKeyDown}>{t("desktopCompat.title")}</button>
+          onClick={() => selectCodexSetTab("desktop")}
+          onKeyDown={codexSetTabKeyDown}
+        >
+          {t("desktopCompat.title")}
+        </button>
       </div>
 
       {showPrompt && (
@@ -98,9 +117,16 @@ export default function CodexSet({ apiBase }: { apiBase: string; machineApiBase?
           <CodexSetMultiauth apiBase={apiBase} />
         </div>
       )}
-      {showDesktop && <div role="tabpanel" id="codex-set-panel-desktop" aria-labelledby="codex-set-tab-desktop" hidden={tab !== "desktop"}>
-        <CodexDesktopCompatibility apiBase={apiBase} active={tab === "desktop"} />
-      </div>}
+      {showDesktop && (
+        <div
+          role="tabpanel"
+          id="codex-set-panel-desktop"
+          aria-labelledby="codex-set-tab-desktop"
+          hidden={tab !== "desktop"}
+        >
+          <CodexDesktopCompatibility apiBase={apiBase} active={tab === "desktop"} />
+        </div>
+      )}
     </>
   );
 }

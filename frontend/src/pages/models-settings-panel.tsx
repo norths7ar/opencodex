@@ -16,9 +16,20 @@ import { useState, type ReactNode } from "react";
 import { IconInfo } from "../icons";
 import { Tooltip } from "../ui";
 import type { StorageLike } from "./collapse-store";
-import { readSettingsOpen, writeSettingsOpen, type SettingsSummaryItem } from "./models-settings-summary";
+import {
+  readSettingsOpen,
+  writeSettingsOpen,
+  type SettingsSummaryItem,
+} from "./models-settings-summary";
 
-export function ModelsSettingsPanel({ title, attentionLabel, summary, warn, children, storage }: {
+export function ModelsSettingsPanel({
+  title,
+  attentionLabel,
+  summary,
+  warn,
+  children,
+  storage,
+}: {
   title: string;
   attentionLabel: string;
   summary: SettingsSummaryItem[];
@@ -34,7 +45,7 @@ export function ModelsSettingsPanel({ title, attentionLabel, summary, warn, chil
     <details
       className="models-settings"
       open={shown}
-      onToggle={event => {
+      onToggle={(event) => {
         // React writes `open` before the browser fires toggle, so an event that already
         // matches the rendered state is our own render, not a user action.
         const next = event.currentTarget.open;
@@ -46,9 +57,16 @@ export function ModelsSettingsPanel({ title, attentionLabel, summary, warn, chil
     >
       <summary className="models-settings-summary">
         <span className="models-settings-title">{title}</span>
-        {warn && <span className="models-settings-warn" role="img" aria-label={attentionLabel} title={attentionLabel} />}
+        {warn && (
+          <span
+            className="models-settings-warn"
+            role="img"
+            aria-label={attentionLabel}
+            title={attentionLabel}
+          />
+        )}
         <span className="models-settings-state">
-          {summary.map(item => (
+          {summary.map((item) => (
             <span key={item.id} className="models-settings-kv" data-item={item.id}>
               <span className="models-settings-k">{item.label}</span>
               {item.value && <span className="models-settings-v">{item.value}</span>}
@@ -88,7 +106,14 @@ export function InfoHint({ text }: { text: string }) {
  * edge. Six rows share this shape, so the wrapper lives here rather than being repeated
  * in Models.tsx where each copy drifts independently.
  */
-export function SettingsRow({ label, hint, busy, muted = true, caption, children }: {
+export function SettingsRow({
+  label,
+  hint,
+  busy,
+  muted = true,
+  caption,
+  children,
+}: {
   label: ReactNode;
   hint?: ReactNode;
   busy?: boolean;
@@ -96,7 +121,13 @@ export function SettingsRow({ label, hint, busy, muted = true, caption, children
   caption?: boolean;
   children: ReactNode;
 }) {
-  const labelClass = ["models-row-label", muted ? "muted" : "", caption ? "text-caption" : "text-control"].filter(Boolean).join(" ");
+  const labelClass = [
+    "models-row-label",
+    muted ? "muted" : "",
+    caption ? "text-caption" : "text-control",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
     <div className="models-control-row" aria-busy={busy || undefined}>
       <span className={labelClass}>

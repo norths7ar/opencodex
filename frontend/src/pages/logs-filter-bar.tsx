@@ -6,7 +6,13 @@ import { PROTOCOL_MODE_KEYS } from "../components/protocols/protocol-labels";
 import { chip, fieldControl, fieldLabel, quietButton } from "../components/v2-logs/classes";
 import { cn } from "@/lib/utils";
 import { Select } from "../ui";
-import { LOG_PROTOCOL_MODE_FILTERS, type LogFilterState, type LogProtocolModeFilter, type LogStatusFilter, type LogTimeWindow } from "./logs-filter";
+import {
+  LOG_PROTOCOL_MODE_FILTERS,
+  type LogFilterState,
+  type LogProtocolModeFilter,
+  type LogStatusFilter,
+  type LogTimeWindow,
+} from "./logs-filter";
 
 interface LogsFilterBarProps {
   filters: LogFilterState;
@@ -48,7 +54,15 @@ function speedBounds(value: string): Pick<LogFilterState, "minTokPerSec" | "maxT
  * state and remain reachable by label.
  */
 export function LogsFilterBar({
-  filters, options, hasActiveFilters, filteredCount, totalCount, t, onFilterChange, onResetFilters, trailing,
+  filters,
+  options,
+  hasActiveFilters,
+  filteredCount,
+  totalCount,
+  t,
+  onFilterChange,
+  onResetFilters,
+  trailing,
 }: LogsFilterBarProps) {
   const panelId = useId();
   const [open, setOpen] = useState(false);
@@ -63,25 +77,63 @@ export function LogsFilterBar({
 
   // Everything the folded panel holds, as chips that each clear one filter.
   const chips: Array<{ key: string; label: string; clear: () => void }> = [];
-  if (filters.interceptedOnly) chips.push({ key: "intercepted", label: t("logs.filter.interceptedHelpersOnly"), clear: () => set({ interceptedOnly: false }) });
-  if (filters.provider) chips.push({ key: "provider", label: `${t("logs.filter.provider.label")}: ${formatProviderDisplayName(filters.provider, t)}`, clear: () => set({ provider: "" }) });
-  if (filters.model) chips.push({ key: "model", label: `${t("logs.filter.model.label")}: ${filters.model}`, clear: () => set({ model: "" }) });
-  if (filters.timeWindow !== "all") chips.push({ key: "time", label: `${t("logs.filter.time.label")}: ${t(`logs.filter.time.${filters.timeWindow}`)}`, clear: () => set({ timeWindow: "all" }) });
-  if (currentSpeed !== "all") chips.push({ key: "speed", label: `${t("logs.filter.speed.label")}: ${t(`logs.filter.speed.${currentSpeed}`)}`, clear: () => set(speedBounds("all")) });
-  if (filters.status !== "all") chips.push({ key: "status", label: `${t("logs.filter.status.label")}: ${t(`logs.filter.status.${filters.status}`)}`, clear: () => set({ status: "all" }) });
-  if (protocolMode !== "all") chips.push({ key: "protocol", label: `${t("logs.filter.protocol.label")}: ${t(protocolModeFilterKey(protocolMode))}`, clear: () => set({ protocolMode: "all" }) });
+  if (filters.interceptedOnly)
+    chips.push({
+      key: "intercepted",
+      label: t("logs.filter.interceptedHelpersOnly"),
+      clear: () => set({ interceptedOnly: false }),
+    });
+  if (filters.provider)
+    chips.push({
+      key: "provider",
+      label: `${t("logs.filter.provider.label")}: ${formatProviderDisplayName(filters.provider, t)}`,
+      clear: () => set({ provider: "" }),
+    });
+  if (filters.model)
+    chips.push({
+      key: "model",
+      label: `${t("logs.filter.model.label")}: ${filters.model}`,
+      clear: () => set({ model: "" }),
+    });
+  if (filters.timeWindow !== "all")
+    chips.push({
+      key: "time",
+      label: `${t("logs.filter.time.label")}: ${t(`logs.filter.time.${filters.timeWindow}`)}`,
+      clear: () => set({ timeWindow: "all" }),
+    });
+  if (currentSpeed !== "all")
+    chips.push({
+      key: "speed",
+      label: `${t("logs.filter.speed.label")}: ${t(`logs.filter.speed.${currentSpeed}`)}`,
+      clear: () => set(speedBounds("all")),
+    });
+  if (filters.status !== "all")
+    chips.push({
+      key: "status",
+      label: `${t("logs.filter.status.label")}: ${t(`logs.filter.status.${filters.status}`)}`,
+      clear: () => set({ status: "all" }),
+    });
+  if (protocolMode !== "all")
+    chips.push({
+      key: "protocol",
+      label: `${t("logs.filter.protocol.label")}: ${t(protocolModeFilterKey(protocolMode))}`,
+      clear: () => set({ protocolMode: "all" }),
+    });
 
   return (
     <div className="logs-filter-container flex min-w-0 flex-col gap-2">
       <div className="flex min-w-0 flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1 basis-56 sm:max-w-72">
-          <IconSearch aria-hidden className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-fg-subtle" />
+          <IconSearch
+            aria-hidden
+            className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-fg-subtle"
+          />
           <input
             ref={searchRef}
             type="search"
             className={cn(fieldControl, "mono pl-8")}
             value={filters.conversationId}
-            onChange={event => set({ conversationId: event.target.value })}
+            onChange={(event) => set({ conversationId: event.target.value })}
             placeholder={t("logs.filter.conversation.placeholder")}
             aria-label={t("logs.filter.conversation.label")}
           />
@@ -91,7 +143,7 @@ export function LogsFilterBar({
           type="button"
           aria-expanded={open}
           aria-controls={panelId}
-          onClick={() => setOpen(value => !value)}
+          onClick={() => setOpen((value) => !value)}
           className={quietButton}
         >
           <IconFilter aria-hidden />
@@ -116,61 +168,94 @@ export function LogsFilterBar({
       >
         <label className={fieldLabel}>
           {t("logs.filter.provider.label")}
-          <Select {...FILTER_SELECT} value={filters.provider} label={t("logs.filter.provider.label")} onChange={provider => set({ provider })}
+          <Select
+            {...FILTER_SELECT}
+            value={filters.provider}
+            label={t("logs.filter.provider.label")}
+            onChange={(provider) => set({ provider })}
             options={[
               { value: "", label: t("logs.filter.provider.all") },
-              ...options.providers.map(provider => ({ value: provider, label: formatProviderDisplayName(provider, t) })),
-            ]} />
+              ...options.providers.map((provider) => ({
+                value: provider,
+                label: formatProviderDisplayName(provider, t),
+              })),
+            ]}
+          />
         </label>
 
         <label className={fieldLabel}>
           {t("logs.filter.model.label")}
-          <Select {...FILTER_SELECT} value={filters.model} label={t("logs.filter.model.label")} onChange={model => set({ model })}
+          <Select
+            {...FILTER_SELECT}
+            value={filters.model}
+            label={t("logs.filter.model.label")}
+            onChange={(model) => set({ model })}
             options={[
               { value: "", label: t("logs.filter.model.all") },
-              ...options.models.map(model => ({ value: model, label: model })),
-            ]} />
+              ...options.models.map((model) => ({ value: model, label: model })),
+            ]}
+          />
         </label>
 
         <label className={fieldLabel}>
           {t("logs.filter.time.label")}
-          <Select {...FILTER_SELECT} value={filters.timeWindow} label={t("logs.filter.time.label")}
-            onChange={timeWindow => set({ timeWindow: timeWindow as LogTimeWindow })}
+          <Select
+            {...FILTER_SELECT}
+            value={filters.timeWindow}
+            label={t("logs.filter.time.label")}
+            onChange={(timeWindow) => set({ timeWindow: timeWindow as LogTimeWindow })}
             options={[
               { value: "all", label: t("logs.filter.time.all") },
               { value: "15m", label: t("logs.filter.time.15m") },
               { value: "1h", label: t("logs.filter.time.1h") },
               { value: "24h", label: t("logs.filter.time.24h") },
-            ]} />
+            ]}
+          />
         </label>
 
         <label className={fieldLabel}>
           {t("logs.filter.speed.label")}
-          <Select {...FILTER_SELECT} value={currentSpeed} label={t("logs.filter.speed.label")} onChange={speed => set(speedBounds(speed))}
+          <Select
+            {...FILTER_SELECT}
+            value={currentSpeed}
+            label={t("logs.filter.speed.label")}
+            onChange={(speed) => set(speedBounds(speed))}
             options={[
               { value: "all", label: t("logs.filter.speed.all") },
               { value: "slow", label: t("logs.filter.speed.slow") },
               { value: "medium", label: t("logs.filter.speed.medium") },
               { value: "fast", label: t("logs.filter.speed.fast") },
-            ]} />
+            ]}
+          />
         </label>
 
         <label className={fieldLabel}>
           {t("logs.filter.status.label")}
-          <Select {...FILTER_SELECT} value={filters.status} label={t("logs.filter.status.label")}
-            onChange={status => set({ status: status as LogStatusFilter })}
+          <Select
+            {...FILTER_SELECT}
+            value={filters.status}
+            label={t("logs.filter.status.label")}
+            onChange={(status) => set({ status: status as LogStatusFilter })}
             options={[
               { value: "all", label: t("logs.filter.status.all") },
               { value: "success", label: t("logs.filter.status.success") },
               { value: "errors", label: t("logs.filter.status.errors") },
-            ]} />
+            ]}
+          />
         </label>
 
         <label className={fieldLabel}>
           {t("logs.filter.protocol.label")}
-          <Select {...FILTER_SELECT} value={protocolMode} label={t("logs.filter.protocol.label")}
-            onChange={mode => set({ protocolMode: mode as LogProtocolModeFilter })}
-            options={LOG_PROTOCOL_MODE_FILTERS.map(mode => ({ value: mode, label: t(protocolModeFilterKey(mode)) }))} />
+          <Select
+            {...FILTER_SELECT}
+            value={protocolMode}
+            label={t("logs.filter.protocol.label")}
+            onChange={(mode) => set({ protocolMode: mode as LogProtocolModeFilter })}
+            options={LOG_PROTOCOL_MODE_FILTERS.map((mode) => ({
+              value: mode,
+              label: t(protocolModeFilterKey(mode)),
+            }))}
+          />
         </label>
 
         <label className="col-span-full inline-flex w-fit cursor-pointer items-center gap-2 text-[13px] text-fg-muted hover:text-fg">
@@ -178,7 +263,7 @@ export function LogsFilterBar({
             type="checkbox"
             className="size-4 cursor-pointer accent-[var(--ocx-accent)]"
             checked={filters.interceptedOnly}
-            onChange={event => set({ interceptedOnly: event.target.checked })}
+            onChange={(event) => set({ interceptedOnly: event.target.checked })}
           />
           {t("logs.filter.interceptedHelpersOnly")}
         </label>
@@ -186,7 +271,7 @@ export function LogsFilterBar({
 
       {hasActiveFilters && (
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-          {chips.map(item => (
+          {chips.map((item) => (
             <button
               key={item.key}
               type="button"
@@ -199,7 +284,9 @@ export function LogsFilterBar({
             </button>
           ))}
           <div className="logs-filter-status ml-auto inline-flex flex-wrap items-center gap-1">
-            <span className="text-[13px] text-fg-muted tabular-nums">{t("logs.filter.showingCount", { count: filteredCount, total: totalCount })}</span>
+            <span className="text-[13px] text-fg-muted tabular-nums">
+              {t("logs.filter.showingCount", { count: filteredCount, total: totalCount })}
+            </span>
             <button type="button" className={quietButton} onClick={resetFilters}>
               <IconX aria-hidden /> {t("logs.filter.reset")}
             </button>

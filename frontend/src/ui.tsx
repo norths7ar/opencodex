@@ -1,5 +1,15 @@
 /* Shared UI primitives built on the design-system classes in styles.css. */
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 import { IconCheck, IconAlert } from "./icons";
 import { IconChevron } from "./icons";
@@ -26,20 +36,39 @@ import { cn } from "./lib/utils";
  * `aria-describedby` is absent, so every untouched bare `Switch` would have been
  * announced twice with a description that repeats its own name.
  */
-export function Switch({ on, mixed, onClick, disabled, label, showLabel = false, title }: { on: boolean; mixed?: boolean; onClick: () => void; disabled?: boolean; label?: string; showLabel?: boolean; title?: string }) {
+export function Switch({
+  on,
+  mixed,
+  onClick,
+  disabled,
+  label,
+  showLabel = false,
+  title,
+}: {
+  on: boolean;
+  mixed?: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+  label?: string;
+  showLabel?: boolean;
+  title?: string;
+}) {
   const labeled = showLabel && !!label;
   // ARIA switches are binary. Controls that can represent a mixed bulk selection
   // retain toggle-button semantics for all three states.
   const triState = mixed !== undefined;
   return (
-    <button type="button"
+    <button
+      type="button"
       className={`switch${on ? " on" : ""}${mixed ? " mixed" : ""}${labeled ? " switch-labeled" : ""}`}
-      onClick={onClick} disabled={disabled}
+      onClick={onClick}
+      disabled={disabled}
       role={triState ? undefined : "switch"}
       aria-checked={triState ? undefined : on}
       aria-pressed={triState ? (mixed ? "mixed" : on) : undefined}
       aria-label={labeled ? undefined : (label ?? (on ? "enabled" : "disabled"))}
-      title={title}>
+      title={title}
+    >
       <span className="knob" />
       {labeled ? <span className="switch-labeled-text text-label muted">{label}</span> : null}
     </button>
@@ -87,7 +116,12 @@ export function ToastNotice({
         {tone === "ok" ? <IconCheck /> : <IconAlert />}
         <span className="toast-notice-copy">{children}</span>
         {onDismiss && (
-          <button type="button" className="toast-notice-dismiss" onClick={onDismiss} aria-label={dismissLabel}>
+          <button
+            type="button"
+            className="toast-notice-dismiss"
+            onClick={onDismiss}
+            aria-label={dismissLabel}
+          >
             ×
           </button>
         )}
@@ -108,7 +142,9 @@ export interface SelectOption {
 
 function optionText(option: SelectOption): string {
   if (option.textValue !== undefined) return option.textValue;
-  return typeof option.label === "string" || typeof option.label === "number" ? String(option.label) : option.value;
+  return typeof option.label === "string" || typeof option.label === "number"
+    ? String(option.label)
+    : option.value;
 }
 
 /**
@@ -122,8 +158,27 @@ function optionText(option: SelectOption): string {
  * validation and submission through a visually hidden proxy input.
  */
 export function Select({
-  value, options, onChange, disabled, id, label, labelledBy, describedBy, invalid, title, style, align, placement,
-  dropdownStyle, portal: portalProp, className, triggerClassName, fullWidth, size, name, required,
+  value,
+  options,
+  onChange,
+  disabled,
+  id,
+  label,
+  labelledBy,
+  describedBy,
+  invalid,
+  title,
+  style,
+  align,
+  placement,
+  dropdownStyle,
+  portal: portalProp,
+  className,
+  triggerClassName,
+  fullWidth,
+  size,
+  name,
+  required,
 }: {
   value: string;
   options: SelectOption[];
@@ -167,13 +222,20 @@ export function Select({
   const menuRef = useRef<HTMLDivElement>(null);
   const typeahead = useRef({ text: "", at: 0 });
   const optionId = useCallback((index: number) => `${listboxId}-${index}`, [listboxId]);
-  const current = options.find(o => o.value === value);
-  const selectedIndex = options.length === 0 ? 0 : Math.max(0, options.findIndex(o => o.value === value));
+  const current = options.find((o) => o.value === value);
+  const selectedIndex =
+    options.length === 0
+      ? 0
+      : Math.max(
+          0,
+          options.findIndex((o) => o.value === value),
+        );
   // While open, keyboard/hover highlight wins; while closed, follow the selected value.
   // Clamp so aria-activedescendant never points at a missing option after shrink/reorder.
-  const activeIndex = !open || options.length === 0
-    ? selectedIndex
-    : Math.min(highlightIndex ?? selectedIndex, options.length - 1);
+  const activeIndex =
+    !open || options.length === 0
+      ? selectedIndex
+      : Math.min(highlightIndex ?? selectedIndex, options.length - 1);
 
   /** The nearest choosable option from `from` (inclusive) walking by `step`; `fallback` when none. */
   const enabledFrom = (from: number, step: 1 | -1, fallback = from): number => {
@@ -189,13 +251,16 @@ export function Select({
     if (restoreFocus) triggerRef.current?.focus();
   }, []);
 
-  const openAt = useCallback((index: number) => {
-    if (disabled || options.length === 0) return;
-    const clamped = Math.max(0, Math.min(options.length - 1, index));
-    setInDialog(Boolean(triggerRef.current?.closest("dialog")));
-    setHighlightIndex(clamped);
-    setOpen(true);
-  }, [disabled, options.length]);
+  const openAt = useCallback(
+    (index: number) => {
+      if (disabled || options.length === 0) return;
+      const clamped = Math.max(0, Math.min(options.length - 1, index));
+      setInDialog(Boolean(triggerRef.current?.closest("dialog")));
+      setHighlightIndex(clamped);
+      setOpen(true);
+    },
+    [disabled, options.length],
+  );
 
   /** Native-select type-ahead: typed letters jump to the next option whose text starts with them. */
   const typeAhead = (key: string): boolean => {
@@ -205,7 +270,7 @@ export function Select({
     buffer.at = now;
     // A repeated single letter ("ccc") cycles through the matches for that letter; a longer
     // prefix ("cob") refines the search from the current row.
-    const cycling = [...buffer.text].every(char => char === buffer.text[0]);
+    const cycling = [...buffer.text].every((char) => char === buffer.text[0]);
     const needle = (cycling ? buffer.text[0]! : buffer.text).toLocaleLowerCase();
     const start = cycling ? activeIndex + 1 : activeIndex;
     for (let step = 0; step < options.length; step++) {
@@ -219,16 +284,21 @@ export function Select({
     return false;
   };
 
-  const reposition = useCallback((menuHeight?: number) => {
-    if (!portal) return;
-    const trigger = triggerRef.current;
-    if (!trigger) return;
-    setMenuStyle(computeSelectMenuStyle(trigger.getBoundingClientRect(), {
-      align,
-      placement,
-      menuHeight,
-    }));
-  }, [align, placement, portal]);
+  const reposition = useCallback(
+    (menuHeight?: number) => {
+      if (!portal) return;
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      setMenuStyle(
+        computeSelectMenuStyle(trigger.getBoundingClientRect(), {
+          align,
+          placement,
+          menuHeight,
+        }),
+      );
+    },
+    [align, placement, portal],
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -262,8 +332,13 @@ export function Select({
       placement,
       menuHeight: nextHeight,
     });
-    setMenuStyle(prev => {
-      if (prev?.top === nextStyle.top && prev?.bottom === nextStyle.bottom && prev?.maxHeight === nextStyle.maxHeight) return prev;
+    setMenuStyle((prev) => {
+      if (
+        prev?.top === nextStyle.top &&
+        prev?.bottom === nextStyle.bottom &&
+        prev?.maxHeight === nextStyle.maxHeight
+      )
+        return prev;
       return nextStyle;
     });
   }, [align, open, options.length, placement, portal]);
@@ -290,7 +365,11 @@ export function Select({
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
-        openAt(open ? enabledFrom(Math.min(options.length - 1, activeIndex + 1), 1, activeIndex) : selectedIndex);
+        openAt(
+          open
+            ? enabledFrom(Math.min(options.length - 1, activeIndex + 1), 1, activeIndex)
+            : selectedIndex,
+        );
         break;
       case "ArrowUp":
         event.preventDefault();
@@ -325,7 +404,13 @@ export function Select({
         }
         break;
       default:
-        if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey && event.key !== " ") {
+        if (
+          event.key.length === 1 &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey &&
+          event.key !== " "
+        ) {
           if (typeAhead(event.key)) event.preventDefault();
         }
         break;
@@ -339,38 +424,43 @@ export function Select({
   // disabled must not leave the rendered option buttons able to call `onChange`
   // and silently drop the second update, so the dropdown is not rendered (and the
   // option buttons are disabled) whenever `disabled` is true.
-  const dropdown = open && !disabled ? (
-    <div
-      ref={menuRef}
-      id={listboxId}
-      className={`select-dropdown${portal ? " select-dropdown-portal" : ""}${!portal && align === "right" ? " select-dropdown-right" : ""}${!portal && placement === "right" ? " select-dropdown-beside" : ""}`}
-      role="listbox"
-      aria-label={label}
-      style={portal ? { ...menuStyle, zIndex: 60, ...dropdownStyle } : dropdownStyle}
-    >
-      {options.map((o, index) => (
-        <button
-          key={o.value}
-          id={optionId(index)}
-          type="button"
-          role="option"
-          tabIndex={-1}
-          disabled={disabled || o.disabled}
-          aria-disabled={o.disabled || undefined}
-          aria-selected={o.value === value}
-          data-value={o.value}
-          className={cn(
-            "select-option",
-            o.value === value && "active",
-            index === activeIndex && "select-option-active",
-            o.disabled && "cursor-default opacity-45",
-          )}
-          onMouseEnter={() => { if (!o.disabled) setHighlightIndex(index); }}
-          onClick={() => selectIndex(index)}
-        >{o.label}</button>
-      ))}
-    </div>
-  ) : null;
+  const dropdown =
+    open && !disabled ? (
+      <div
+        ref={menuRef}
+        id={listboxId}
+        className={`select-dropdown${portal ? " select-dropdown-portal" : ""}${!portal && align === "right" ? " select-dropdown-right" : ""}${!portal && placement === "right" ? " select-dropdown-beside" : ""}`}
+        role="listbox"
+        aria-label={label}
+        style={portal ? { ...menuStyle, zIndex: 60, ...dropdownStyle } : dropdownStyle}
+      >
+        {options.map((o, index) => (
+          <button
+            key={o.value}
+            id={optionId(index)}
+            type="button"
+            role="option"
+            tabIndex={-1}
+            disabled={disabled || o.disabled}
+            aria-disabled={o.disabled || undefined}
+            aria-selected={o.value === value}
+            data-value={o.value}
+            className={cn(
+              "select-option",
+              o.value === value && "active",
+              index === activeIndex && "select-option-active",
+              o.disabled && "cursor-default opacity-45",
+            )}
+            onMouseEnter={() => {
+              if (!o.disabled) setHighlightIndex(index);
+            }}
+            onClick={() => selectIndex(index)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    ) : null;
 
   return (
     <div
@@ -408,8 +498,19 @@ export function Select({
         aria-activedescendant={activeDescendant}
         aria-label={label}
       >
-        <span className={fullWidth ? "min-w-0 truncate" : undefined}>{current?.label ?? value}</span>
-        <IconChevron style={{ flexShrink: 0, width: 12, height: 12, color: "var(--muted)", transform: open ? "rotate(90deg)" : "none", transition: "transform .12s" }} />
+        <span className={fullWidth ? "min-w-0 truncate" : undefined}>
+          {current?.label ?? value}
+        </span>
+        <IconChevron
+          style={{
+            flexShrink: 0,
+            width: 12,
+            height: 12,
+            color: "var(--muted)",
+            transform: open ? "rotate(90deg)" : "none",
+            transition: "transform .12s",
+          }}
+        />
       </button>
       {(required || name !== undefined) && (
         // Keeps native constraint validation (`required` blocks submit) and form submission
@@ -425,18 +526,47 @@ export function Select({
           value={value}
           onChange={() => {}}
           onFocus={() => triggerRef.current?.focus()}
-          style={{ position: "absolute", left: 0, bottom: 0, width: "100%", height: 1, opacity: 0, pointerEvents: "none", border: 0, padding: 0, margin: 0 }}
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            width: "100%",
+            height: 1,
+            opacity: 0,
+            pointerEvents: "none",
+            border: 0,
+            padding: 0,
+            margin: 0,
+          }}
         />
       )}
-      {portal ? (dropdown && createPortal(dropdown, document.body)) : dropdown}
+      {portal ? dropdown && createPortal(dropdown, document.body) : dropdown}
     </div>
   );
 }
 
 /** A positioned Select surface for grouped, searchable choices with their own semantics. */
-function SelectPopup({ open, onOpenChange, trigger, label, children, initialFocusRef, width = 354, maxHeight = 520, className, onKeyDown }: {
-  open: boolean; onOpenChange: (open: boolean) => void; trigger: ReactNode; label: string; children: ReactNode;
-  initialFocusRef?: React.RefObject<HTMLElement | null>; width?: number; maxHeight?: number; className?: string;
+function SelectPopup({
+  open,
+  onOpenChange,
+  trigger,
+  label,
+  children,
+  initialFocusRef,
+  width = 354,
+  maxHeight = 520,
+  className,
+  onKeyDown,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  trigger: ReactNode;
+  label: string;
+  children: ReactNode;
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
+  width?: number;
+  maxHeight?: number;
+  className?: string;
   onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -448,45 +578,110 @@ function SelectPopup({ open, onOpenChange, trigger, label, children, initialFocu
     if (!open) return;
     const update = () => {
       if (!triggerRef.current) return;
-      setPosition(computeSelectMenuStyle(triggerRef.current.getBoundingClientRect(), { menuWidth: width, menuHeight: maxHeight, maxMenuHeight: maxHeight }));
+      setPosition(
+        computeSelectMenuStyle(triggerRef.current.getBoundingClientRect(), {
+          menuWidth: width,
+          menuHeight: maxHeight,
+          maxMenuHeight: maxHeight,
+        }),
+      );
     };
     update();
     initialFocusRef?.current?.focus();
     window.addEventListener("resize", update);
     window.addEventListener("scroll", update, true);
-    return () => { window.removeEventListener("resize", update); window.removeEventListener("scroll", update, true); };
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
   }, [open, width, maxHeight, initialFocusRef]);
   useEffect(() => {
     if (!open) return;
     const outside = (event: Event) => {
       const target = event.target as Node;
-      if (!triggerRef.current?.contains(target) && !popupRef.current?.contains(target)) onOpenChange(false);
+      if (!triggerRef.current?.contains(target) && !popupRef.current?.contains(target))
+        onOpenChange(false);
     };
     document.addEventListener("mousedown", outside);
     document.addEventListener("focusin", outside);
-    return () => { document.removeEventListener("mousedown", outside); document.removeEventListener("focusin", outside); };
+    return () => {
+      document.removeEventListener("mousedown", outside);
+      document.removeEventListener("focusin", outside);
+    };
   }, [open, onOpenChange]);
-  const popup = open ? <div ref={popupRef} id={id} role="dialog" aria-label={label}
-    className={cn("select-dropdown select-dropdown-portal", className)}
-    style={inDialog ? { position: "absolute", top: "calc(100% + 4px)", left: 0, width: `min(${width}px, calc(100vw - 16px))`, maxHeight } : { ...position, width: `min(${width}px, calc(100vw - 16px))`, zIndex: "var(--z-popover)" }}
-    onKeyDown={event => {
-      if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); onOpenChange(false); triggerRef.current?.focus(); return; }
-      onKeyDown?.(event);
-    }}>
-    {children}
-  </div> : null;
-  return <div className="custom-select" style={{ position: "relative", display: "inline-block" }}>
-    <button ref={triggerRef} type="button" className="select-trigger" aria-haspopup="dialog" aria-expanded={open}
-      aria-controls={open ? id : undefined} onClick={() => { setInDialog(Boolean(triggerRef.current?.closest("dialog"))); onOpenChange(!open); }}>
-      {trigger}<IconChevron style={{ flexShrink: 0, width: 12, height: 12, color: "var(--muted)" }} />
-    </button>
-    {inDialog ? popup : popup && createPortal(popup, document.body)}
-  </div>;
+  const popup = open ? (
+    <div
+      ref={popupRef}
+      id={id}
+      role="dialog"
+      aria-label={label}
+      className={cn("select-dropdown select-dropdown-portal", className)}
+      style={
+        inDialog
+          ? {
+              position: "absolute",
+              top: "calc(100% + 4px)",
+              left: 0,
+              width: `min(${width}px, calc(100vw - 16px))`,
+              maxHeight,
+            }
+          : {
+              ...position,
+              width: `min(${width}px, calc(100vw - 16px))`,
+              zIndex: "var(--z-popover)",
+            }
+      }
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          onOpenChange(false);
+          triggerRef.current?.focus();
+          return;
+        }
+        onKeyDown?.(event);
+      }}
+    >
+      {children}
+    </div>
+  ) : null;
+  return (
+    <div className="custom-select" style={{ position: "relative", display: "inline-block" }}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="select-trigger"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-controls={open ? id : undefined}
+        onClick={() => {
+          setInDialog(Boolean(triggerRef.current?.closest("dialog")));
+          onOpenChange(!open);
+        }}
+      >
+        {trigger}
+        <IconChevron style={{ flexShrink: 0, width: 12, height: 12, color: "var(--muted)" }} />
+      </button>
+      {inDialog ? popup : popup && createPortal(popup, document.body)}
+    </div>
+  );
 }
 
 Select.Popup = SelectPopup;
 
-export function EmptyState({ icon, title, children, className, style }: { icon?: ReactNode; title: ReactNode; children?: ReactNode; className?: string; style?: CSSProperties }) {
+export function EmptyState({
+  icon,
+  title,
+  children,
+  className,
+  style,
+}: {
+  icon?: ReactNode;
+  title: ReactNode;
+  children?: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
     <div className={className ? `empty ${className}` : "empty"} style={style}>
       {icon}
@@ -497,7 +692,12 @@ export function EmptyState({ icon, title, children, className, style }: { icon?:
 }
 
 /* Hover/focus tooltip — styled replacement for the native `title` attribute. */
-export function Tooltip({ content, children, side = "top", maxWidth = 280 }: {
+export function Tooltip({
+  content,
+  children,
+  side = "top",
+  maxWidth = 280,
+}: {
   content: ReactNode;
   children: ReactNode;
   side?: "top" | "bottom" | "left" | "right";
@@ -512,10 +712,18 @@ export function Tooltip({ content, children, side = "top", maxWidth = 280 }: {
     timer.current = window.setTimeout(() => setOpen(true), 150);
   };
   const hide = () => {
-    if (timer.current !== null) { window.clearTimeout(timer.current); timer.current = null; }
+    if (timer.current !== null) {
+      window.clearTimeout(timer.current);
+      timer.current = null;
+    }
     setOpen(false);
   };
-  useEffect(() => () => { if (timer.current !== null) window.clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current !== null) window.clearTimeout(timer.current);
+    },
+    [],
+  );
 
   return (
     <button
@@ -525,15 +733,29 @@ export function Tooltip({ content, children, side = "top", maxWidth = 280 }: {
       onMouseLeave={hide}
       onFocus={show}
       onBlur={hide}
-      onKeyDown={event => {
+      onKeyDown={(event) => {
         if (event.key === "Escape") hide();
       }}
       aria-describedby={open ? tipId : undefined}
-      style={{ display: "inline", border: 0, background: "transparent", padding: 0, margin: 0, color: "inherit", font: "inherit", cursor: "inherit" }}
+      style={{
+        display: "inline",
+        border: 0,
+        background: "transparent",
+        padding: 0,
+        margin: 0,
+        color: "inherit",
+        font: "inherit",
+        cursor: "inherit",
+      }}
     >
       {children}
       {open && (
-        <span id={tipId} className={`ocx-tooltip-bubble ocx-tooltip-bubble--${side}`} role="tooltip" style={{ maxWidth }}>
+        <span
+          id={tipId}
+          className={`ocx-tooltip-bubble ocx-tooltip-bubble--${side}`}
+          role="tooltip"
+          style={{ maxWidth }}
+        >
           {content}
         </span>
       )}

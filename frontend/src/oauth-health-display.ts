@@ -52,7 +52,8 @@ export function oauthHealthShowsReauth(status: OAuthHealthStatus | undefined): b
  * Health-only `reauth_required` must still demote Providers overview attention state.
  */
 export function accountNeedsReauth(
-  account: { needsReauth?: boolean; health?: { status?: OAuthHealthStatus } | null } | null | undefined,
+  account:
+    { needsReauth?: boolean; health?: { status?: OAuthHealthStatus } | null } | null | undefined,
 ): boolean {
   return Boolean(account?.needsReauth) || oauthHealthShowsReauth(account?.health?.status);
 }
@@ -105,11 +106,14 @@ export function formatOAuthHealthSummary(
   health: OAuthHealthView | undefined,
 ): string | null {
   if (!health || health.status === "healthy") return null;
-  const account = accountId === "__main__" ? t("codexAuth.mainAccount") : displayAccountId(accountId);
+  const account =
+    accountId === "__main__" ? t("codexAuth.mainAccount") : displayAccountId(accountId);
   if (health.status === "cooldown") {
     const until = health.until ? new Date(health.until).toLocaleString() : "";
     return t(
-      health.reason === "rate_limit" ? "pws.healthSummary.rateLimited" : "pws.healthSummary.quotaLimited",
+      health.reason === "rate_limit"
+        ? "pws.healthSummary.rateLimited"
+        : "pws.healthSummary.quotaLimited",
       { provider, account, until },
     );
   }

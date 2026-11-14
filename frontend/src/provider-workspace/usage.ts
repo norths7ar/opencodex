@@ -86,7 +86,8 @@ export function buildProviderUsageTotals(
   providers: readonly (ProviderUsageTotals & { provider: string })[],
 ): Record<string, ProviderUsageTotals> {
   const totals: Record<string, ProviderUsageTotals> = Object.create(null);
-  for (const row of providers) totals[row.provider] = { requests: row.requests, totalTokens: row.totalTokens };
+  for (const row of providers)
+    totals[row.provider] = { requests: row.requests, totalTokens: row.totalTokens };
   return totals;
 }
 
@@ -101,7 +102,8 @@ export function buildProviderModelUsage(
     const { provider, ...model } = row;
     (result[provider] ??= []).push({
       ...model,
-      shareRatio: providerTokens > 0 ? Math.min(1, Math.max(0, row.totalTokens / providerTokens)) : 0,
+      shareRatio:
+        providerTokens > 0 ? Math.min(1, Math.max(0, row.totalTokens / providerTokens)) : 0,
     });
   }
   return result;
@@ -116,8 +118,10 @@ export function buildMostUsedProviders(
   usageTotals: Record<string, ProviderUsageTotals>,
 ): MostUsedProvider[] {
   return Object.entries(usageTotals)
-    .filter((entry): entry is [string, ProviderUsageTotals & { requests: number }] =>
-      typeof entry[1].requests === "number" && entry[1].requests > 0)
+    .filter(
+      (entry): entry is [string, ProviderUsageTotals & { requests: number }] =>
+        typeof entry[1].requests === "number" && entry[1].requests > 0,
+    )
     .map(([name, totals]) => ({ name, ...totals, requests: totals.requests }))
     .sort((a, b) => b.requests - a.requests || a.name.localeCompare(b.name));
 }
@@ -134,9 +138,9 @@ export type RelativeTimeLabels = {
 const EN_RELATIVE: RelativeTimeLabels = {
   justNow: "Just now",
   notChecked: "Not checked",
-  minutesAgo: n => `${n}m ago`,
-  hoursAgo: n => `${n}h ago`,
-  daysAgo: n => `${n}d ago`,
+  minutesAgo: (n) => `${n}m ago`,
+  hoursAgo: (n) => `${n}h ago`,
+  daysAgo: (n) => `${n}d ago`,
 };
 
 export function formatRelativeTime(
@@ -144,7 +148,8 @@ export function formatRelativeTime(
   labelsOrNow?: RelativeTimeLabels | number,
   nowArg?: number,
 ): string {
-  const labels = typeof labelsOrNow === "object" && labelsOrNow !== null ? labelsOrNow : EN_RELATIVE;
+  const labels =
+    typeof labelsOrNow === "object" && labelsOrNow !== null ? labelsOrNow : EN_RELATIVE;
   const now = typeof labelsOrNow === "number" ? labelsOrNow : (nowArg ?? Date.now());
   if (updatedAt === undefined || !Number.isFinite(updatedAt)) return labels.notChecked;
   const elapsedMs = Math.max(0, now - updatedAt);
@@ -158,14 +163,17 @@ export function formatRelativeTime(
 
 /** Build RelativeTimeLabels from the app translator. */
 export function relativeTimeLabelsFromT(
-  t: (key: "time.justNow" | "time.notChecked" | "time.minutesAgo" | "time.hoursAgo" | "time.daysAgo", vars?: Record<string, string | number>) => string,
+  t: (
+    key: "time.justNow" | "time.notChecked" | "time.minutesAgo" | "time.hoursAgo" | "time.daysAgo",
+    vars?: Record<string, string | number>,
+  ) => string,
 ): RelativeTimeLabels {
   return {
     justNow: t("time.justNow"),
     notChecked: t("time.notChecked"),
-    minutesAgo: n => t("time.minutesAgo", { n }),
-    hoursAgo: n => t("time.hoursAgo", { n }),
-    daysAgo: n => t("time.daysAgo", { n }),
+    minutesAgo: (n) => t("time.minutesAgo", { n }),
+    hoursAgo: (n) => t("time.hoursAgo", { n }),
+    daysAgo: (n) => t("time.daysAgo", { n }),
   };
 }
 
@@ -242,7 +250,8 @@ export function formatTokenCount(n: number | undefined, locale = "en"): string {
 
 /** Format a USD cost estimate for display. Returns "—" when unavailable. */
 export function formatCostUsd(value: number | null | undefined, locale = "en"): string {
-  if (value === null || value === undefined || !Number.isFinite(value) || value < 0) return "\u2014";
+  if (value === null || value === undefined || !Number.isFinite(value) || value < 0)
+    return "\u2014";
   return `~$${new Intl.NumberFormat(locale, {
     minimumFractionDigits: 4,
     maximumFractionDigits: 4,

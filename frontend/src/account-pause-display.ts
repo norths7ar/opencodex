@@ -11,10 +11,15 @@ const REASON_KEYS = {
 
 /** Display fixed reason labels and timestamps in the selected dashboard language. */
 export function formatAccountPauseTooltip(
-  t: TFn, locale: Locale, details: { reason: string; pausedAt: number },
+  t: TFn,
+  locale: Locale,
+  details: { reason: string; pausedAt: number },
 ): string {
   const reason = Object.hasOwn(REASON_KEYS, details.reason)
-    ? t(REASON_KEYS[details.reason as AccountPauseReason]) : t("codexAuth.paused");
+    ? t(REASON_KEYS[details.reason as AccountPauseReason])
+    : t("codexAuth.paused");
   const date = new Date(details.pausedAt);
-  return Number.isNaN(date.getTime()) ? reason : t("accountPause.tooltip", { reason, date: date.toLocaleString(locale) });
+  return Number.isNaN(date.getTime())
+    ? reason
+    : t("accountPause.tooltip", { reason, date: date.toLocaleString(locale) });
 }

@@ -11,8 +11,6 @@
  * been selected in some other task, which is a guess wearing an observation's
  * clothes.
  */
-export function speedLabel(log: {
-  requestedSpeedLabel?: string;
-}): string | undefined {
+export function speedLabel(log: { requestedSpeedLabel?: string }): string | undefined {
   return log.requestedSpeedLabel || undefined;
 }

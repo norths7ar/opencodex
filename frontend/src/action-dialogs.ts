@@ -64,7 +64,10 @@ export interface RequestTextValueOptions {
 
 /** Renders a multi-paragraph consent message as separate paragraphs. */
 function paragraphsOf(message: string): string[] {
-  const paragraphs = message.split(/\n{2,}/).map(part => part.trim()).filter(part => part.length > 0);
+  const paragraphs = message
+    .split(/\n{2,}/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
   return paragraphs.length > 0 ? paragraphs : [message];
 }
 
@@ -190,7 +193,12 @@ function openModal<T>(
 }
 
 /** Appends the message paragraphs and returns the element that names the dialog. */
-function appendMessage(form: HTMLFormElement, bodyId: string, message: string, tag = "div"): HTMLElement {
+function appendMessage(
+  form: HTMLFormElement,
+  bodyId: string,
+  message: string,
+  tag = "div",
+): HTMLElement {
   const body = document.createElement(tag);
   body.id = bodyId;
   for (const paragraph of paragraphsOf(message)) {
@@ -216,8 +224,17 @@ export function confirmAction(options: ConfirmActionOptions): Promise<boolean> {
 
   return new Promise<boolean>((resolve) => {
     // Already withdrawn: answer without ever drawing the question.
-    if (options.signal?.aborted) { resolve(false); return; }
-    const { form, bodyId, finish } = openModal<boolean>(locale, false, resolve, options.signal, options.restoreFocusFallback);
+    if (options.signal?.aborted) {
+      resolve(false);
+      return;
+    }
+    const { form, bodyId, finish } = openModal<boolean>(
+      locale,
+      false,
+      resolve,
+      options.signal,
+      options.restoreFocusFallback,
+    );
     appendMessage(form, bodyId, options.message);
 
     const actions = document.createElement("div");
@@ -257,8 +274,16 @@ export function requestTextValue(options: RequestTextValueOptions): Promise<stri
   const messages = DICTS[locale];
 
   return new Promise<string | null>((resolve) => {
-    if (options.signal?.aborted) { resolve(null); return; }
-    const { form, bodyId, finish } = openModal<string | null>(locale, null, resolve, options.signal);
+    if (options.signal?.aborted) {
+      resolve(null);
+      return;
+    }
+    const { form, bodyId, finish } = openModal<string | null>(
+      locale,
+      null,
+      resolve,
+      options.signal,
+    );
     const input = document.createElement("input");
     const inputId = `${bodyId}-input`;
     // A real <label for> rather than aria-describedby: the message IS the field's name, and

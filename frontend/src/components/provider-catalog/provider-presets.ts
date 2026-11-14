@@ -6,7 +6,11 @@
  * predicates), search filtering, and deterministic sorting. No React, no fetch.
  */
 
-import { providerTier, type ProviderTier, type WorkspaceProvider } from "../../provider-workspace/catalog";
+import {
+  providerTier,
+  type ProviderTier,
+  type WorkspaceProvider,
+} from "../../provider-workspace/catalog";
 import { isLocalProvider } from "../../provider-workspace/kind";
 import type { ProviderPayload } from "../../provider-payload";
 
@@ -36,7 +40,6 @@ export interface CatalogPreset {
   codexAccountMode?: "direct" | "pool";
   provider?: ProviderPayload;
 }
-
 
 /**
  * Adapt a preset row to the WorkspaceProvider shape the tier predicates expect
@@ -76,7 +79,12 @@ export function isLocalCatalogPreset(preset: CatalogPreset): boolean {
 
 /** Tab buckets for the catalog: accounts / free / local / paid, preserving input order per bucket. */
 export function bucketPresets(presets: CatalogPreset[]): Record<CatalogTier, CatalogPreset[]> {
-  const buckets: Record<CatalogTier, CatalogPreset[]> = { accounts: [], free: [], local: [], paid: [] };
+  const buckets: Record<CatalogTier, CatalogPreset[]> = {
+    accounts: [],
+    free: [],
+    local: [],
+    paid: [],
+  };
   for (const preset of presets) {
     // Local is peeled off AFTER `presetTier` has spoken, which is what lets `presetTier`
     // keep returning `"free"` for Ollama and leaves the workspace Free count untouched.
@@ -87,9 +95,8 @@ export function bucketPresets(presets: CatalogPreset[]): Record<CatalogTier, Cat
     // widened, this ordering is what stops a local-looking account row from being pulled
     // out of the tab where a user logs in.
     const tier = presetTier(preset);
-    const bucket: CatalogTier = tier === "accounts" ? "accounts"
-      : isLocalCatalogPreset(preset) ? "local"
-      : tier;
+    const bucket: CatalogTier =
+      tier === "accounts" ? "accounts" : isLocalCatalogPreset(preset) ? "local" : tier;
     buckets[bucket].push(preset);
   }
   return buckets;
@@ -99,7 +106,7 @@ export function bucketPresets(presets: CatalogPreset[]): Record<CatalogTier, Cat
 export function filterPresets(presets: CatalogPreset[], query: string): CatalogPreset[] {
   const q = query.trim().toLowerCase();
   if (!q) return presets;
-  return presets.filter(p => p.label.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
+  return presets.filter((p) => p.label.toLowerCase().includes(q) || p.id.toLowerCase().includes(q));
 }
 
 /** Every nonempty note has a full-text route: rendered clipping depends on width,
@@ -113,7 +120,16 @@ export function noteNeedsReveal(note: string | undefined): boolean {
  * `isLocalCatalogPreset` rather than a substring match, so `localhost` finds the Local
  * group instead of matching every base URL that happens to contain the word.
  */
-const LOCAL_QUERY_ALIASES = new Set(["local", "localhost", "ollama", "vllm", "lmstudio", "lm studio", "self-hosted", "selfhosted"]);
+const LOCAL_QUERY_ALIASES = new Set([
+  "local",
+  "localhost",
+  "ollama",
+  "vllm",
+  "lmstudio",
+  "lm studio",
+  "self-hosted",
+  "selfhosted",
+]);
 
 /**
  * Unified-search match for one preset.
@@ -152,7 +168,7 @@ export function sortCatalogMatches(presets: CatalogPreset[], query: string): Cat
   return presets
     .map((preset, index) => ({ preset, index }))
     .sort((a, b) => rank(a.preset) - rank(b.preset) || a.index - b.index)
-    .map(entry => entry.preset);
+    .map((entry) => entry.preset);
 }
 
 /**
@@ -170,10 +186,12 @@ export function filterAccountRows<T extends { id: string; label: string }>(
 ): T[] {
   const q = query.trim().toLowerCase();
   if (!q) return [...rows];
-  return rows.filter(row =>
-    row.id === pinnedId
-    || row.label.toLowerCase().includes(q)
-    || row.id.toLowerCase().includes(q));
+  return rows.filter(
+    (row) =>
+      row.id === pinnedId ||
+      row.label.toLowerCase().includes(q) ||
+      row.id.toLowerCase().includes(q),
+  );
 }
 
 /**
@@ -186,7 +204,6 @@ export function dropPresetsCoveredByAccounts(
   accountRows: readonly { id: string }[],
 ): CatalogPreset[] {
   if (accountRows.length === 0) return presets;
-  const covered = new Set(accountRows.map(row => row.id));
-  return presets.filter(preset => !covered.has(preset.id));
+  const covered = new Set(accountRows.map((row) => row.id));
+  return presets.filter((preset) => !covered.has(preset.id));
 }
-

@@ -20,6 +20,6 @@ export function providerKind(item: WorkspaceProvider & { name?: string }): Provi
   if (mode === "oauth" || mode === "forward") return "login";
   if (isLocalProvider(item)) return "local";
   const haystack = `${item.name ?? ""} ${item.adapter} ${item.baseUrl}`.toLowerCase();
-  if (SELF_HOSTED_HINTS.some(hint => haystack.includes(hint))) return "selfHosted";
+  if (SELF_HOSTED_HINTS.some((hint) => haystack.includes(hint))) return "selfHosted";
   return "cloud";
 }

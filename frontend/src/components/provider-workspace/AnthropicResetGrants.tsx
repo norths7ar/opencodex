@@ -30,8 +30,14 @@ function newOperationId(): string | undefined {
     const bytes = api.getRandomValues(new Uint8Array(16));
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = [...bytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
-    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-");
+    const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    return [
+      hex.slice(0, 8),
+      hex.slice(8, 12),
+      hex.slice(12, 16),
+      hex.slice(16, 20),
+      hex.slice(20),
+    ].join("-");
   }
   return undefined;
 }
@@ -60,7 +66,11 @@ const REFUSED_KEYS: Record<string, TKey> = {
 };
 
 /** Ticket badge on an Anthropic account row. Muted at zero, amber when a reset is spendable. */
-export function AnthropicGrantBadge({ entry, onClick, t }: {
+export function AnthropicGrantBadge({
+  entry,
+  onClick,
+  t,
+}: {
   entry: AnthropicGrantEntry | undefined;
   onClick: () => void;
   t: TFn;
@@ -74,15 +84,19 @@ export function AnthropicGrantBadge({ entry, onClick, t }: {
   }
   const count = entry.status === "ready" ? unspentResets(entry.snapshot) : null;
   const spendable = entry.status === "ready" && spendableGrant(entry.snapshot) !== undefined;
-  const label = count === null
-    ? t("anthropicGrant.badgeErrorAria")
-    : t("anthropicGrant.badgeAria", { count: String(count) });
+  const label =
+    count === null
+      ? t("anthropicGrant.badgeErrorAria")
+      : t("anthropicGrant.badgeAria", { count: String(count) });
   return (
     <button
       type="button"
       className={`badge ${spendable ? "badge-amber" : "badge-muted"} badge-clickable`}
       data-anthropic-grant-badge={count === null ? "error" : String(count)}
-      onClick={event => { event.stopPropagation(); onClick(); }}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}
       aria-label={label}
       title={label}
     >
@@ -98,7 +112,13 @@ const WINDOW_KEYS = {
   seven_day_overage_included: "anthropicGrant.windowOverage",
 } as const satisfies Record<string, TKey>;
 
-function GrantItem({ grant, snapshot, isNext, locale, t }: {
+function GrantItem({
+  grant,
+  snapshot,
+  isNext,
+  locale,
+  t,
+}: {
   grant: AnthropicResetGrant;
   snapshot: AnthropicResetGrantSnapshot;
   isNext: boolean;
@@ -106,9 +126,12 @@ function GrantItem({ grant, snapshot, isNext, locale, t }: {
   t: TFn;
 }) {
   const days = grant.endsAt ? daysUntil(grant.endsAt) : null;
-  const note = grant.paused ? t("anthropicGrant.paused")
-    : !grant.usableNow ? t("anthropicGrant.notUsable")
-      : grant.useRequiresLimit && !snapshot.atLimit ? t("anthropicGrant.requiresLimit")
+  const note = grant.paused
+    ? t("anthropicGrant.paused")
+    : !grant.usableNow
+      ? t("anthropicGrant.notUsable")
+      : grant.useRequiresLimit && !snapshot.atLimit
+        ? t("anthropicGrant.requiresLimit")
         : null;
   return (
     <div className={`credit-item${isNext ? " credit-next" : ""}`} data-anthropic-grant={grant.id}>
@@ -116,20 +139,30 @@ function GrantItem({ grant, snapshot, isNext, locale, t }: {
         <IconTicket width={13} />
         <span className="credit-item-label">{grant.label || grant.id}</span>
         <span className="badge badge-muted text-micro anthropic-grant-count">
-          {t("anthropicGrant.resetsLeft", { left: String(grant.resetsLeft), total: String(grant.resetsTotal) })}
+          {t("anthropicGrant.resetsLeft", {
+            left: String(grant.resetsLeft),
+            total: String(grant.resetsTotal),
+          })}
         </span>
       </div>
       <div className="credit-item-dates">
-        {grant.startsAt && <span>{t("anthropicGrant.validFrom", { date: formatCreditDate(grant.startsAt, locale) })}</span>}
+        {grant.startsAt && (
+          <span>
+            {t("anthropicGrant.validFrom", { date: formatCreditDate(grant.startsAt, locale) })}
+          </span>
+        )}
         {grant.endsAt && days !== null && (
           <span className={days <= 7 ? "credit-urgent" : ""}>
-            {t("anthropicGrant.expires", { date: formatCreditDateTime(grant.endsAt, locale), days: String(days) })}
+            {t("anthropicGrant.expires", {
+              date: formatCreditDateTime(grant.endsAt, locale),
+              days: String(days),
+            })}
           </span>
         )}
       </div>
       {grant.clears.length > 0 && (
         <div className="anthropic-grant-windows">
-          {grant.clears.map(window => (
+          {grant.clears.map((window) => (
             <span key={window} className="anthropic-grant-window">
               {t(WINDOW_KEYS[window], { percent: String(grant.percentUsed[window] ?? 0) })}
             </span>
@@ -148,7 +181,8 @@ function outcomeOf(result: AnthropicSpendOutcome): Outcome {
   if (result.kind === "settled") {
     // A replay reports the stored code like a fresh answer would, so a replayed
     // refusal never reads as a success.
-    if (result.replayed && result.code === "reset") return { tone: "ok", key: "anthropicGrant.replayed" };
+    if (result.replayed && result.code === "reset")
+      return { tone: "ok", key: "anthropicGrant.replayed" };
     return {
       tone: result.code === "reset" ? "ok" : "warn",
       key: SETTLED_KEYS[result.code] ?? "anthropicGrant.failed",
@@ -165,7 +199,13 @@ function outcomeOf(result: AnthropicSpendOutcome): Outcome {
  */
 const RELEASES_HELD = new Set(["unknown_outcome_expired", "operation_identity_mismatch"]);
 
-export function AnthropicResetGrantModal({ accountId, accountLabel, entry, controller, onClose }: {
+export function AnthropicResetGrantModal({
+  accountId,
+  accountLabel,
+  entry,
+  controller,
+  onClose,
+}: {
   accountId: string;
   accountLabel: string;
   entry: AnthropicGrantEntry | undefined;
@@ -191,18 +231,21 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
     if (confirming) primaryRef.current?.focus();
   }, [confirming]);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    onClose();
-  }, [onClose]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      onClose();
+    },
+    [onClose],
+  );
 
   const snapshot = entry?.status === "ready" ? entry.snapshot : null;
   const pending = snapshot?.pendingOperation;
   // An attempt the server still holds (for example after a reload) is resumed,
   // never replaced by a new id. The server only reports attempts still inside
   // their retry window, so no clock check is needed here.
-  const unresolved: Held | null = held
-    ?? (pending ? { grantId: pending.grantId, operationId: pending.operationId } : null);
+  const unresolved: Held | null =
+    held ?? (pending ? { grantId: pending.grantId, operationId: pending.operationId } : null);
   const next = snapshot ? spendableGrant(snapshot) : undefined;
 
   const startConfirm = () => {
@@ -223,7 +266,10 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
     const result = await controller.spend(accountId, request);
     setBusy(false);
     setConfirming(null);
-    if (result.kind === "unknown" || (result.kind === "refused" && retryingHeld && !RELEASES_HELD.has(result.code))) {
+    if (
+      result.kind === "unknown" ||
+      (result.kind === "refused" && retryingHeld && !RELEASES_HELD.has(result.code))
+    ) {
       setHeld(request);
       setOutcome(result.kind === "refused" ? outcomeOf(result) : null);
       return;
@@ -250,28 +296,62 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
     </p>
   );
 
-  const confirmGrant = confirming && snapshot ? snapshot.grants.find(grant => grant.id === confirming.grantId) : undefined;
+  const confirmGrant =
+    confirming && snapshot
+      ? snapshot.grants.find((grant) => grant.id === confirming.grantId)
+      : undefined;
   const total = snapshot ? unspentResets(snapshot) : 0;
 
   return (
-    <dialog ref={dialogRef} className="modal-overlay" aria-labelledby="anthropic-grant-title" onCancel={handleCancel}>
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onClose} />
-      <div className="modal-card" onClick={event => event.stopPropagation()} role="document">
+    <dialog
+      ref={dialogRef}
+      className="modal-overlay"
+      aria-labelledby="anthropic-grant-title"
+      onCancel={handleCancel}
+    >
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onClose}
+      />
+      <div className="modal-card" onClick={(event) => event.stopPropagation()} role="document">
         {unresolved ? (
           <>
             <div style={{ textAlign: "center", padding: "12px 0" }}>
-              <div className="confirm-icon"><IconAlert width={22} /></div>
+              <div className="confirm-icon">
+                <IconAlert width={22} />
+              </div>
               <h3 id="anthropic-grant-title">{t("anthropicGrant.title")}</h3>
-              <p className="pws-status-warn" role="alert">{t("anthropicGrant.unknownOutcome")}</p>
+              <p className="pws-status-warn" role="alert">
+                {t("anthropicGrant.unknownOutcome")}
+              </p>
               {outcome && message(outcome)}
             </div>
             <div className="modal-actions">
-              <button type="button" className="btn btn-ghost" onClick={onClose}>{t("common.close")}</button>
-              <button type="button" className="btn btn-ghost" onClick={() => { void recheck(); }} disabled={checking || busy}>
+              <button type="button" className="btn btn-ghost" onClick={onClose}>
+                {t("common.close")}
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => {
+                  void recheck();
+                }}
+                disabled={checking || busy}
+              >
                 {checking ? t("anthropicGrant.checking") : t("anthropicGrant.checkResult")}
               </button>
-              <button type="button" className="btn btn-primary" data-anthropic-grant-retry
-                onClick={() => { void post(unresolved); }} disabled={busy || checking}>
+              <button
+                type="button"
+                className="btn btn-primary"
+                data-anthropic-grant-retry
+                onClick={() => {
+                  void post(unresolved);
+                }}
+                disabled={busy || checking}
+              >
                 {busy ? t("anthropicGrant.redeeming") : t("anthropicGrant.retrySame")}
               </button>
             </div>
@@ -279,27 +359,48 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
         ) : confirming ? (
           <>
             <div style={{ textAlign: "center", padding: "12px 0" }}>
-              <div className="confirm-icon"><IconAlert width={22} /></div>
+              <div className="confirm-icon">
+                <IconAlert width={22} />
+              </div>
               <h3 id="anthropic-grant-title">{t("anthropicGrant.confirmTitle")}</h3>
               <p className="modal-desc">{t("anthropicGrant.confirmDesc")}</p>
               {confirmGrant && (
-                <p className="faint text-label">{t("anthropicGrant.confirmWhich", { label: confirmGrant.label || confirmGrant.id })}</p>
+                <p className="faint text-label">
+                  {t("anthropicGrant.confirmWhich", {
+                    label: confirmGrant.label || confirmGrant.id,
+                  })}
+                </p>
               )}
               <p className="faint text-label">{t("anthropicGrant.irreversible")}</p>
             </div>
             <div className="modal-actions">
-              <button type="button" className="btn btn-ghost" onClick={() => setConfirming(null)} disabled={busy}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setConfirming(null)}
+                disabled={busy}
+              >
                 {t("common.cancel")}
               </button>
-              <button ref={primaryRef} type="button" className="btn btn-primary" data-anthropic-grant-confirm
-                onClick={() => { void post(confirming); }} disabled={busy}>
+              <button
+                ref={primaryRef}
+                type="button"
+                className="btn btn-primary"
+                data-anthropic-grant-confirm
+                onClick={() => {
+                  void post(confirming);
+                }}
+                disabled={busy}
+              >
                 {busy ? t("anthropicGrant.redeeming") : t("anthropicGrant.redeem")}
               </button>
             </div>
           </>
         ) : (
           <>
-            <h3 id="anthropic-grant-title"><IconTicket width={16} /> {t("anthropicGrant.title")}</h3>
+            <h3 id="anthropic-grant-title">
+              <IconTicket width={16} /> {t("anthropicGrant.title")}
+            </h3>
             <div className="card-sub">{accountLabel}</div>
             <div style={{ margin: "16px 0" }}>
               {entry === undefined || entry.status === "loading" ? (
@@ -307,10 +408,20 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
               ) : entry.status === "error" ? (
                 <>
                   <p className="faint" role="alert">
-                    {t(entry.reason === "auth" ? "anthropicGrant.loadFailedAuth" : "anthropicGrant.loadFailed")}
+                    {t(
+                      entry.reason === "auth"
+                        ? "anthropicGrant.loadFailedAuth"
+                        : "anthropicGrant.loadFailed",
+                    )}
                   </p>
-                  <button type="button" className="btn btn-ghost" style={{ marginTop: 12 }}
-                    onClick={() => { void controller.refresh(accountId); }}>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    style={{ marginTop: 12 }}
+                    onClick={() => {
+                      void controller.refresh(accountId);
+                    }}
+                  >
                     {t("anthropicGrant.retry")}
                   </button>
                 </>
@@ -318,18 +429,37 @@ export function AnthropicResetGrantModal({ accountId, accountLabel, entry, contr
                 <p className="faint">{t("anthropicGrant.ineligible")}</p>
               ) : entry.snapshot.grants.length > 0 ? (
                 <>
-                  <p style={{ marginBottom: 12 }}>{t("anthropicGrant.available", { count: String(total) })}</p>
+                  <p style={{ marginBottom: 12 }}>
+                    {t("anthropicGrant.available", { count: String(total) })}
+                  </p>
                   <div className="credit-list">
-                    {entry.snapshot.grants.map(grant => (
-                      <GrantItem key={grant.id} grant={grant} snapshot={entry.snapshot}
-                        isNext={grant.id === next?.id} locale={locale} t={t} />
+                    {entry.snapshot.grants.map((grant) => (
+                      <GrantItem
+                        key={grant.id}
+                        grant={grant}
+                        snapshot={entry.snapshot}
+                        isNext={grant.id === next?.id}
+                        locale={locale}
+                        t={t}
+                      />
                     ))}
                   </div>
-                  <button type="button" className="btn btn-primary" data-anthropic-grant-use
-                    style={{ marginTop: 12, width: "100%" }} onClick={startConfirm} disabled={!next || busy}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    data-anthropic-grant-use
+                    style={{ marginTop: 12, width: "100%" }}
+                    onClick={startConfirm}
+                    disabled={!next || busy}
+                  >
                     {t("anthropicGrant.useOne")}
                   </button>
-                  <p className="card-sub text-caption" style={{ marginTop: 8, textAlign: "center" }}>{t("anthropicGrant.desc")}</p>
+                  <p
+                    className="card-sub text-caption"
+                    style={{ marginTop: 8, textAlign: "center" }}
+                  >
+                    {t("anthropicGrant.desc")}
+                  </p>
                 </>
               ) : (
                 <>

@@ -61,7 +61,8 @@ export default function PromptLayerRow({
    */
   onSelectBase?: (useDefault: boolean) => void;
   /** Which base prompt is live, so the switch can show the truth. */
-  baseSelection?: { kind: "default" } | { kind: "variant"; id: string } | { kind: "external"; path: string };
+  baseSelection?:
+    { kind: "default" } | { kind: "variant"; id: string } | { kind: "external"; path: string };
   onOpen: (id: string) => void;
 }) {
   const t = useT();
@@ -79,7 +80,11 @@ export default function PromptLayerRow({
   const baseUsesDefault = baseSelection?.kind === "default";
 
   return (
-    <li className="codex-set-prompt__row" data-layer-id={descriptor.id} data-layer-class={descriptor.class}>
+    <li
+      className="codex-set-prompt__row"
+      data-layer-id={descriptor.id}
+      data-layer-class={descriptor.class}
+    >
       {/*
         The CANONICAL assembly index, gaps included. Renumbering per visual group
         would invent an order the runtime does not have: these positions come from
@@ -105,7 +110,10 @@ export default function PromptLayerRow({
         identical while the user decides which to keep.
       */}
       {bytes !== null && bytes > 0 && (
-        <span className="codex-set-prompt__bytes" title={t("codexSet.dialog.sourceBytes", { bytes })}>
+        <span
+          className="codex-set-prompt__bytes"
+          title={t("codexSet.dialog.sourceBytes", { bytes })}
+        >
           {bytes >= 1024 ? Math.round(bytes / 1024) + " KB" : bytes + " B"}
         </span>
       )}
@@ -121,7 +129,9 @@ export default function PromptLayerRow({
           aria-checked={baseUsesDefault}
           aria-label={label}
           disabled={busy || writesRefused || baseSelection?.kind === "external"}
-          onClick={() => { onSelectBase(!baseUsesDefault); }}
+          onClick={() => {
+            onSelectBase(!baseUsesDefault);
+          }}
         >
           <span className="toggle-knob" />
         </button>
@@ -137,7 +147,9 @@ export default function PromptLayerRow({
             aria-checked={checked}
             aria-label={label}
             disabled={busy || writesRefused}
-            onClick={() => { onToggle(descriptor.id, !checked); }}
+            onClick={() => {
+              onToggle(descriptor.id, !checked);
+            }}
           >
             <span className="toggle-knob" />
           </button>
@@ -151,7 +163,9 @@ export default function PromptLayerRow({
               type="button"
               className="link-btn codex-set-prompt__reset"
               disabled={busy || writesRefused}
-              onClick={() => { onReset(descriptor.id); }}
+              onClick={() => {
+                onReset(descriptor.id);
+              }}
             >
               {t("codexSet.row.resetDefault", { value: String(toggle.default) })}
             </button>

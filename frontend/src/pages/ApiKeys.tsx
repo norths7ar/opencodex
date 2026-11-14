@@ -93,14 +93,23 @@ function seedEndpointsFromApiBase(apiBase: string): ApiEndpointInfo {
 /** Session-cache entries get the same scrutiny as a network payload. */
 function validCachedKeys(cached: CachedKeysShape | null): CachedKeysShape | null {
   if (!cached || !isApiAuthMatrix(cached.authMatrix)) return null;
-  if (!Array.isArray(cached.keys) || cached.keys.some(key => !key || !isApiKeyUsage(key.usage) || !validPendingRotation(key.pendingRotation))) return null;
+  if (
+    !Array.isArray(cached.keys) ||
+    cached.keys.some(
+      (key) => !key || !isApiKeyUsage(key.usage) || !validPendingRotation(key.pendingRotation),
+    )
+  )
+    return null;
   if (cached.surfaces !== undefined && !parseApiSurfaces(cached.surfaces)) {
     // Drop an unusable surface record rather than the whole entry: the page falls back to
     // the flat endpoint list until the network answer arrives.
     const { surfaces: _surfaces, ...rest } = cached;
     cached = rest;
   }
-  if (cached.endpoints?.audio !== undefined && !isAudioApiInfo(cached.endpoints.audio, cached.endpoints.baseUrl)) {
+  if (
+    cached.endpoints?.audio !== undefined &&
+    !isAudioApiInfo(cached.endpoints.audio, cached.endpoints.baseUrl)
+  ) {
     const { audio: _audio, ...endpoints } = cached.endpoints;
     return { ...cached, endpoints };
   }
@@ -111,9 +120,14 @@ function validPendingRotation(value: ApiKeyEntry["pendingRotation"] | unknown): 
   if (value === undefined) return true;
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const pending = value as Record<string, unknown>;
-  return typeof pending.id === "string" && !!pending.id
-    && typeof pending.createdAt === "string" && !Number.isNaN(Date.parse(pending.createdAt))
-    && typeof pending.expiresAt === "string" && !Number.isNaN(Date.parse(pending.expiresAt));
+  return (
+    typeof pending.id === "string" &&
+    !!pending.id &&
+    typeof pending.createdAt === "string" &&
+    !Number.isNaN(Date.parse(pending.createdAt)) &&
+    typeof pending.expiresAt === "string" &&
+    !Number.isNaN(Date.parse(pending.expiresAt))
+  );
 }
 
 /**
@@ -124,7 +138,7 @@ function validPendingRotation(value: ApiKeyEntry["pendingRotation"] | unknown): 
  */
 export default function ApiKeys({ apiBase, active = true }: { apiBase: string; active?: boolean }) {
   const { t, locale } = useI18n();
-  const localeTag = LOCALES.find(l => l.code === locale)?.htmlLang;
+  const localeTag = LOCALES.find((l) => l.code === locale)?.htmlLang;
   // v2: a v1 session entry has no auth matrix, and defaulting that to [] would
   // turn stale client state into an apparently authoritative empty auth table.
   const keysCacheKey = `ocx.apikeys.list.v2:${apiBase}`;
@@ -139,7 +153,9 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
   const cachedKeys = validCachedKeys(cachedKeysEntry?.data ?? null);
   const cachedModels = cachedModelsEntry?.data ?? null;
   const currentApiBase = useRef(apiBase);
-  useLayoutEffect(() => { currentApiBase.current = apiBase; }, [apiBase]);
+  useLayoutEffect(() => {
+    currentApiBase.current = apiBase;
+  }, [apiBase]);
   const [hiddenMutationBase, setHiddenMutationBase] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [modelQuery, setModelQuery] = useState("");
@@ -156,85 +172,94 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
   }, []);
   const disclosure = useKeyDisclosure(apiBase, active, clearDisclosure);
 
-  const fetchKeys = useCallback(async (signal: AbortSignal): Promise<CachedKeysShape> => {
-    const res = await fetch(`${apiBase}/api/keys`, { signal });
-    const data = await readJsonIfOk<KeysResponse>(res);
-    // The auth matrix is server truth; without it the page would have to describe
-    // the rules from memory, which is the defect this replaces.
-    if (!data || !isApiAuthMatrix(data.authMatrix)) throw new Error(t("api.keysLoadFailed"));
-    const rows = data.keys ?? [];
-    if (rows.some(key => !isApiKeyUsage(key.usage) || !validPendingRotation(key.pendingRotation))) throw new Error(t("api.keysLoadFailed"));
-    const validatedKeys = rows as ApiKeyEntry[];
-    const derived = deriveApiEndpoints(data.endpoint ?? "");
-    // An older server sends no surfaces; the endpoints panel then keeps its flat list.
-    const surfaces = parseApiSurfaces(data.surfaces);
-    const next: CachedKeysShape = {
-      // Validate rather than coerce. A missing or malformed `usage` used to
-      // become zeroes, which says "used zero times" about data we could not
-      // read — and every reader downstream would believe it.
-      keys: validatedKeys,
-      endpoints: {
-        baseUrl: data.baseUrl ?? derived.baseUrl,
-        responses: data.responsesEndpoint ?? data.endpoint ?? DEFAULT_ENDPOINTS.responses,
-        chatCompletions: data.chatCompletionsEndpoint ?? derived.chatCompletions,
-        messages: data.messagesEndpoint ?? derived.messages,
-        models: data.modelsEndpoint ?? derived.models,
-        ...(isAudioApiInfo(data.audio, data.baseUrl ?? derived.baseUrl) ? { audio: data.audio } : {}),
-      },
-      claudeCodeEnabled: data.claudeCodeEnabled !== false,
-      ...(surfaces ? { surfaces } : {}),
-      ...(data.attributionSince ? { attributionSince: data.attributionSince } : {}),
-      ...(data.historyTruncated === true ? { historyTruncated: true } : {}),
-      ...readUsageMetadata(data),
-      authMatrix: data.authMatrix,
-    };
-    // Prefixes only — never the secret key material.
-    if (!signal.aborted) writeSessionListCacheEntry(keysCacheKey, next);
-    return next;
-  }, [apiBase, keysCacheKey, t]);
+  const fetchKeys = useCallback(
+    async (signal: AbortSignal): Promise<CachedKeysShape> => {
+      const res = await fetch(`${apiBase}/api/keys`, { signal });
+      const data = await readJsonIfOk<KeysResponse>(res);
+      // The auth matrix is server truth; without it the page would have to describe
+      // the rules from memory, which is the defect this replaces.
+      if (!data || !isApiAuthMatrix(data.authMatrix)) throw new Error(t("api.keysLoadFailed"));
+      const rows = data.keys ?? [];
+      if (
+        rows.some((key) => !isApiKeyUsage(key.usage) || !validPendingRotation(key.pendingRotation))
+      )
+        throw new Error(t("api.keysLoadFailed"));
+      const validatedKeys = rows as ApiKeyEntry[];
+      const derived = deriveApiEndpoints(data.endpoint ?? "");
+      // An older server sends no surfaces; the endpoints panel then keeps its flat list.
+      const surfaces = parseApiSurfaces(data.surfaces);
+      const next: CachedKeysShape = {
+        // Validate rather than coerce. A missing or malformed `usage` used to
+        // become zeroes, which says "used zero times" about data we could not
+        // read — and every reader downstream would believe it.
+        keys: validatedKeys,
+        endpoints: {
+          baseUrl: data.baseUrl ?? derived.baseUrl,
+          responses: data.responsesEndpoint ?? data.endpoint ?? DEFAULT_ENDPOINTS.responses,
+          chatCompletions: data.chatCompletionsEndpoint ?? derived.chatCompletions,
+          messages: data.messagesEndpoint ?? derived.messages,
+          models: data.modelsEndpoint ?? derived.models,
+          ...(isAudioApiInfo(data.audio, data.baseUrl ?? derived.baseUrl)
+            ? { audio: data.audio }
+            : {}),
+        },
+        claudeCodeEnabled: data.claudeCodeEnabled !== false,
+        ...(surfaces ? { surfaces } : {}),
+        ...(data.attributionSince ? { attributionSince: data.attributionSince } : {}),
+        ...(data.historyTruncated === true ? { historyTruncated: true } : {}),
+        ...readUsageMetadata(data),
+        authMatrix: data.authMatrix,
+      };
+      // Prefixes only — never the secret key material.
+      if (!signal.aborted) writeSessionListCacheEntry(keysCacheKey, next);
+      return next;
+    },
+    [apiBase, keysCacheKey, t],
+  );
 
-  const fetchModels = useCallback(async (signal: AbortSignal): Promise<ExternalModelRow[]> => {
-    const res = await fetch(`${apiBase}/v1/models`, { signal });
-    if (!res.ok) throw new Error(t("api.modelsLoadFailed"));
-    const data = await res.json() as unknown;
-    const rawRows = Array.isArray(data)
-      ? data
-      : (typeof data === "object" && data !== null && Array.isArray((data as { data?: unknown }).data)
-        ? (data as { data: unknown[] }).data
-        : null);
-    if (!rawRows) throw new Error(t("api.modelsLoadFailed"));
-    const rows = rawRows
-      .filter((row): row is { id: string; owned_by?: string; is_combo?: boolean } => (
-        typeof row === "object"
-        && row !== null
-        && typeof (row as { id?: unknown }).id === "string"
-      ))
-      .map(row => classifyExternalModel(row))
-      .sort((a, b) => externalModelId(a).localeCompare(externalModelId(b)));
-    writeSessionListCacheEntry(modelsCacheKey, rows);
-    return rows;
-  }, [apiBase, modelsCacheKey, t]);
+  const fetchModels = useCallback(
+    async (signal: AbortSignal): Promise<ExternalModelRow[]> => {
+      const res = await fetch(`${apiBase}/v1/models`, { signal });
+      if (!res.ok) throw new Error(t("api.modelsLoadFailed"));
+      const data = (await res.json()) as unknown;
+      const rawRows = Array.isArray(data)
+        ? data
+        : typeof data === "object" &&
+            data !== null &&
+            Array.isArray((data as { data?: unknown }).data)
+          ? (data as { data: unknown[] }).data
+          : null;
+      if (!rawRows) throw new Error(t("api.modelsLoadFailed"));
+      const rows = rawRows
+        .filter(
+          (row): row is { id: string; owned_by?: string; is_combo?: boolean } =>
+            typeof row === "object" &&
+            row !== null &&
+            typeof (row as { id?: unknown }).id === "string",
+        )
+        .map((row) => classifyExternalModel(row))
+        .sort((a, b) => externalModelId(a).localeCompare(externalModelId(b)));
+      writeSessionListCacheEntry(modelsCacheKey, rows);
+      return rows;
+    },
+    [apiBase, modelsCacheKey, t],
+  );
 
   // Keys and models intentionally remain independent resources: a slow catalog must never
   // block endpoint/key management, and each cache key retains its own session seed.
-  const keysResource = useDataSurface<CachedKeysShape>(
-    keysResourceKey,
-    [apiBase],
-    fetchKeys,
-    {
-      isEmpty: data => data.keys.length === 0,
-      initialData: cachedKeys ?? undefined,
-      initialDataCachedAt: cachedKeysEntry?.cachedAt ?? null,
-      staleAfterMs: 60_000,
-      enabled: active,
-    },
-  );
+  const keysResource = useDataSurface<CachedKeysShape>(keysResourceKey, [apiBase], fetchKeys, {
+    isEmpty: (data) => data.keys.length === 0,
+    initialData: cachedKeys ?? undefined,
+    initialDataCachedAt: cachedKeysEntry?.cachedAt ?? null,
+    staleAfterMs: 60_000,
+    enabled: active,
+  });
   const modelsResource = useDataSurface<ExternalModelRow[]>(
     modelsResourceKey,
     [apiBase],
     fetchModels,
     {
-      isEmpty: models => models.length === 0,
+      isEmpty: (models) => models.length === 0,
       initialData: cachedModels ?? undefined,
       initialDataCachedAt: cachedModelsEntry?.cachedAt ?? null,
       staleAfterMs: 60_000,
@@ -261,11 +286,13 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
   const filteredModels = useMemo(() => {
     const query = modelQuery.trim().toLowerCase();
     if (!query) return models;
-    return models.filter(model => {
+    return models.filter((model) => {
       const id = externalModelId(model).toLowerCase();
-      return id.includes(query)
-        || model.displayName.toLowerCase().includes(query)
-        || model.provider.toLowerCase().includes(query);
+      return (
+        id.includes(query) ||
+        model.displayName.toLowerCase().includes(query) ||
+        model.provider.toLowerCase().includes(query)
+      );
     });
   }, [modelQuery, models]);
 
@@ -350,7 +377,7 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
       });
       if (res.status === 401 || res.status === 403) return { ok: false, kind: "denied" };
       if (!res.ok) return { ok: false, kind: "failed" };
-      const body = await res.json() as { key?: unknown };
+      const body = (await res.json()) as { key?: unknown };
       return typeof body.key === "string" && body.key
         ? { ok: true, key: body.key }
         : { ok: false, kind: "failed" };
@@ -394,7 +421,9 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
       await navigator.clipboard.writeText(newKey);
       if (!disclosure.current(generation)) return;
       setCopied(true);
-      window.setTimeout(() => { if (disclosure.current(generation)) setCopied(false); }, 2000);
+      window.setTimeout(() => {
+        if (disclosure.current(generation)) setCopied(false);
+      }, 2000);
     } catch {
       if (!disclosure.current(generation)) return;
       // The one-time key is the only string in the product with no second
@@ -408,7 +437,10 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
     try {
       await navigator.clipboard.writeText(modelId);
       setCopiedModelId(modelId);
-      window.setTimeout(() => setCopiedModelId(current => (current === modelId ? null : current)), 2000);
+      window.setTimeout(
+        () => setCopiedModelId((current) => (current === modelId ? null : current)),
+        2000,
+      );
     } catch {
       /* clipboard unavailable */
     }
@@ -428,18 +460,42 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
 
   /** Each protocol speaks its own wire; a chat body sent to Responses proves
    *  nothing about Responses. */
-  const modelTestRequest = (protocol: GatewayInboundProtocol, modelId: string): { url: string; body: unknown } => {
+  const modelTestRequest = (
+    protocol: GatewayInboundProtocol,
+    modelId: string,
+  ): { url: string; body: unknown } => {
     if (protocol === "responses") {
-      return { url: endpoints.responses, body: { model: modelId, input: "ping", max_output_tokens: 1, stream: false } };
+      return {
+        url: endpoints.responses,
+        body: { model: modelId, input: "ping", max_output_tokens: 1, stream: false },
+      };
     }
     if (protocol === "messages") {
-      return { url: endpoints.messages, body: { model: modelId, max_tokens: 1, messages: [{ role: "user", content: "ping" }] } };
+      return {
+        url: endpoints.messages,
+        body: { model: modelId, max_tokens: 1, messages: [{ role: "user", content: "ping" }] },
+      };
     }
-    return { url: endpoints.chatCompletions, body: { model: modelId, messages: [{ role: "user", content: "ping" }], max_tokens: 1, stream: false } };
+    return {
+      url: endpoints.chatCompletions,
+      body: {
+        model: modelId,
+        messages: [{ role: "user", content: "ping" }],
+        max_tokens: 1,
+        stream: false,
+      },
+    };
   };
 
-  const setModelTest = (modelId: string, protocol: GatewayInboundProtocol, result: ModelTestResult) =>
-    setModelTests(current => ({ ...current, [modelId]: { ...current[modelId], [protocol]: result } }));
+  const setModelTest = (
+    modelId: string,
+    protocol: GatewayInboundProtocol,
+    result: ModelTestResult,
+  ) =>
+    setModelTests((current) => ({
+      ...current,
+      [modelId]: { ...current[modelId], [protocol]: result },
+    }));
 
   const testModel = async (model: ExternalModelRow, protocol: GatewayInboundProtocol) => {
     // Without a key the request would ride the loopback bypass and pass whether
@@ -461,7 +517,10 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
       });
       if (!res.ok) {
         const detail = await res.text();
-        setModelTest(modelId, protocol, { state: "error", detail: detail.slice(0, 160) || String(res.status) });
+        setModelTest(modelId, protocol, {
+          state: "error",
+          detail: detail.slice(0, 160) || String(res.status),
+        });
         return;
       }
       setModelTest(modelId, protocol, { state: "ok" });
@@ -503,60 +562,80 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
         <DataSurfaceSkeleton label={t("api.activeKeysLoading")} rows={4} />
       ) : keysState.kind === "failed-cold" && !keysData ? (
         <>
-          <Notice tone="err">{keysState.error instanceof Error ? keysState.error.message : t("api.keysLoadFailed")}</Notice>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => refreshKeys()}>{t("common.retry")}</button>
+          <Notice tone="err">
+            {keysState.error instanceof Error ? keysState.error.message : t("api.keysLoadFailed")}
+          </Notice>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => refreshKeys()}>
+            {t("common.retry")}
+          </button>
         </>
       ) : (
         <>
           <ApiKeysWorkspace
-        key={apiBase}
-        active={active}
-        onPairingStart={() => disclosure.invalidate()}
-        keys={keys}
-        apiBase={apiBase}
-        attributionSince={attributionSince}
-        historyTruncated={historyTruncated}
-        usageMetadata={readUsageMetadata(keysData)}
-        authMatrix={authMatrix}
-        keysLoading={false}
-        keysLoadFailed={keysState.showError}
-        endpoints={endpoints}
-        claudeCodeEnabled={claudeCodeEnabled}
-        surfaces={surfaces}
-        onSurfacesChanged={() => { refreshKeys(); }}
-        localeTag={localeTag}
-        newName={newName}
-        creating={creating}
-        newKey={newKey}
-        copied={copied}
-        filteredModels={filteredModels}
-        planModels={models}
-        modelsLoading={modelsState.showSkeleton && !modelsState.data && !cachedModels}
-        // Only announce progress on a retry after failure — quiet warm revisits stay silent.
-        modelsRefreshing={modelsState.refreshing && modelsState.showError && (modelsState.data !== undefined || cachedModels !== null)}
-        modelsLoadFailed={modelsState.showError}
-        modelCount={models.length}
-        // `readSessionListCache` answers `null`, not `undefined`, when it has
-        // nothing — comparing against `undefined` made a failed cold load look
-        // like a successfully-read empty catalog.
-        hasModelData={modelsState.data !== undefined || cachedModels !== null}
-        modelQuery={modelQuery}
-        copiedModelId={copiedModelId}
-        modelTests={modelTests}
-        onNewNameChange={setNewName}
-        onCreate={() => { void handleCreate(); }}
-        onDismissNewKey={() => setNewKey(null)}
-        onCopyKey={() => { void copyKey(); }}
-        onDelete={handleDelete}
-        onRevealKey={handleReveal}
-        onRename={handleRename}
-        onModelQueryChange={setModelQuery}
-        onCopyModelId={(modelId) => { void copyModelId(modelId); }}
-        onTestModel={(model, protocol) => { void testModel(model, protocol); }}
-        onRetryModels={() => { refreshModels({ forceLoading: true }); }}
-        canTestModels={newKey !== null}
-        sourceLabel={sourceLabel}
-        protocolLabel={protocolLabel}
+            key={apiBase}
+            active={active}
+            onPairingStart={() => disclosure.invalidate()}
+            keys={keys}
+            apiBase={apiBase}
+            attributionSince={attributionSince}
+            historyTruncated={historyTruncated}
+            usageMetadata={readUsageMetadata(keysData)}
+            authMatrix={authMatrix}
+            keysLoading={false}
+            keysLoadFailed={keysState.showError}
+            endpoints={endpoints}
+            claudeCodeEnabled={claudeCodeEnabled}
+            surfaces={surfaces}
+            onSurfacesChanged={() => {
+              refreshKeys();
+            }}
+            localeTag={localeTag}
+            newName={newName}
+            creating={creating}
+            newKey={newKey}
+            copied={copied}
+            filteredModels={filteredModels}
+            planModels={models}
+            modelsLoading={modelsState.showSkeleton && !modelsState.data && !cachedModels}
+            // Only announce progress on a retry after failure — quiet warm revisits stay silent.
+            modelsRefreshing={
+              modelsState.refreshing &&
+              modelsState.showError &&
+              (modelsState.data !== undefined || cachedModels !== null)
+            }
+            modelsLoadFailed={modelsState.showError}
+            modelCount={models.length}
+            // `readSessionListCache` answers `null`, not `undefined`, when it has
+            // nothing — comparing against `undefined` made a failed cold load look
+            // like a successfully-read empty catalog.
+            hasModelData={modelsState.data !== undefined || cachedModels !== null}
+            modelQuery={modelQuery}
+            copiedModelId={copiedModelId}
+            modelTests={modelTests}
+            onNewNameChange={setNewName}
+            onCreate={() => {
+              void handleCreate();
+            }}
+            onDismissNewKey={() => setNewKey(null)}
+            onCopyKey={() => {
+              void copyKey();
+            }}
+            onDelete={handleDelete}
+            onRevealKey={handleReveal}
+            onRename={handleRename}
+            onModelQueryChange={setModelQuery}
+            onCopyModelId={(modelId) => {
+              void copyModelId(modelId);
+            }}
+            onTestModel={(model, protocol) => {
+              void testModel(model, protocol);
+            }}
+            onRetryModels={() => {
+              refreshModels({ forceLoading: true });
+            }}
+            canTestModels={newKey !== null}
+            sourceLabel={sourceLabel}
+            protocolLabel={protocolLabel}
           />
         </>
       )}

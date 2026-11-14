@@ -44,7 +44,9 @@ export function AddCodexAccountWaitingStep({
 
   return (
     <>
-      <h3 style={{ marginBottom: 4 }}>{reauthAccountId ? t("codexAuth.reauthenticate") : t("codexAuth.oauthLogin")}</h3>
+      <h3 style={{ marginBottom: 4 }}>
+        {reauthAccountId ? t("codexAuth.reauthenticate") : t("codexAuth.oauthLogin")}
+      </h3>
       <p className="modal-desc">{t("codexAuth.oauthWaiting")}</p>
       <LoginHint
         hint={{ url: authUrl, deviceCode, instructions, browserLaunch }}
@@ -72,7 +74,11 @@ export function AddCodexAccountWaitingStep({
           {statusNotice}
         </div>
       )}
-      {error && <div className="notice notice-err" style={{ marginTop: 12 }}>{error}</div>}
+      {error && (
+        <div className="notice notice-err" style={{ marginTop: 12 }}>
+          {error}
+        </div>
+      )}
       {onSwitchToDevice && !deviceCode && (
         // Reauth skips the pick step and starts the browser flow on its own, so
         // this is the only place a headless operator can reach the device grant

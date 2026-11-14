@@ -1,6 +1,11 @@
 import { parseProtocolTraceV1 } from "../../../../backend/src/protocols/dto";
 import type { TFn } from "../../i18n/shared";
-import { FEATURE_DISPOSITION_KEYS, PROTOCOL_MODE_KEYS, protocolHopLabel, protocolPathLabel } from "./protocol-labels";
+import {
+  FEATURE_DISPOSITION_KEYS,
+  PROTOCOL_MODE_KEYS,
+  protocolHopLabel,
+  protocolPathLabel,
+} from "./protocol-labels";
 
 /**
  * The protocol section of the Logs detail dialog: what this request actually did, attempt by
@@ -13,7 +18,9 @@ export function ProtocolTracePanel({ trace, t }: { trace: unknown; t: TFn }) {
   const parsed = parseProtocolTraceV1(trace);
   return (
     <section className="log-detail-section" aria-labelledby="log-detail-protocol">
-      <h4 id="log-detail-protocol" className="log-detail-section-title">{t("logs.detail.protocol.section")}</h4>
+      <h4 id="log-detail-protocol" className="log-detail-section-title">
+        {t("logs.detail.protocol.section")}
+      </h4>
       {parsed ? (
         <>
           <div className="log-detail-grid" data-protocol-mode={parsed.mode}>
@@ -41,9 +48,10 @@ export function ProtocolTracePanel({ trace, t }: { trace: unknown; t: TFn }) {
               <>
                 <span className="muted">{t("logs.detail.protocol.features")}</span>
                 <span>
-                  {parsed.featureEffects.map(effect => (
+                  {parsed.featureEffects.map((effect) => (
                     <span key={effect.feature} style={{ display: "block" }}>
-                      <code>{effect.feature}</code>: {t(FEATURE_DISPOSITION_KEYS[effect.disposition])}
+                      <code>{effect.feature}</code>:{" "}
+                      {t(FEATURE_DISPOSITION_KEYS[effect.disposition])}
                     </span>
                   ))}
                 </span>
@@ -53,17 +61,17 @@ export function ProtocolTracePanel({ trace, t }: { trace: unknown; t: TFn }) {
               <>
                 <span className="muted">{t("logs.detail.protocol.attempts")}</span>
                 <span>
-                  {parsed.attempts.map(attempt => (
+                  {parsed.attempts.map((attempt) => (
                     <span key={attempt.ordinal} style={{ display: "block" }}>
                       {t("logs.detail.protocol.attempt", { ordinal: attempt.ordinal })}:{" "}
-                      {protocolPathLabel(attempt.requestPath, t)} · {t(PROTOCOL_MODE_KEYS[attempt.mode])}
+                      {protocolPathLabel(attempt.requestPath, t)} ·{" "}
+                      {t(PROTOCOL_MODE_KEYS[attempt.mode])}
                     </span>
                   ))}
                 </span>
               </>
             )}
           </div>
-          
         </>
       ) : (
         <p className="log-detail-notes-line muted">{t("logs.detail.protocol.none")}</p>

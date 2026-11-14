@@ -3,7 +3,12 @@
  * ProviderCatalog so CatalogAccountRow can import them without a cycle back through
  * the component that renders it.
  */
-export type AccountLoginStatus = { loggedIn: boolean; email?: string; error?: string; needsReauth?: boolean };
+export type AccountLoginStatus = {
+  loggedIn: boolean;
+  email?: string;
+  error?: string;
+  needsReauth?: boolean;
+};
 
 export type AccountLoginRow = {
   id: string;

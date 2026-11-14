@@ -9,12 +9,7 @@
 import type { KeyboardEvent } from "react";
 import { useRef } from "react";
 import { useT, type TKey } from "../i18n/shared";
-import {
-  MODELS_TABS,
-  modelsPanelDomId,
-  modelsTabDomId,
-  type ModelsTab,
-} from "./models-tab";
+import { MODELS_TABS, modelsPanelDomId, modelsTabDomId, type ModelsTab } from "./models-tab";
 
 const TAB_LABEL: Record<ModelsTab, TKey> = {
   catalog: "models.tab.catalog",
@@ -50,7 +45,8 @@ export function ModelsTabStrip({
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     const index = MODELS_TABS.indexOf(tab);
     let nextIndex: number | null = null;
-    if (event.key === "ArrowLeft") nextIndex = (index - 1 + MODELS_TABS.length) % MODELS_TABS.length;
+    if (event.key === "ArrowLeft")
+      nextIndex = (index - 1 + MODELS_TABS.length) % MODELS_TABS.length;
     else if (event.key === "ArrowRight") nextIndex = (index + 1) % MODELS_TABS.length;
     else if (event.key === "Home") nextIndex = 0;
     else if (event.key === "End") nextIndex = MODELS_TABS.length - 1;
@@ -61,13 +57,13 @@ export function ModelsTabStrip({
 
   return (
     <div className="page-tabs models-page-tabs" role="tablist" aria-label={t("models.tabsLabel")}>
-      {MODELS_TABS.map(candidate => {
+      {MODELS_TABS.map((candidate) => {
         const active = candidate === tab;
         const count = meta?.[candidate];
         return (
           <button
             key={candidate}
-            ref={node => {
+            ref={(node) => {
               if (node) refs.current!.set(candidate, node);
               else refs.current!.delete(candidate);
             }}

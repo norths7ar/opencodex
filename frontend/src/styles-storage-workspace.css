@@ -90,7 +90,9 @@
   color: inherit;
   font: inherit;
   overflow: hidden;
-  transition: background var(--motion-fast), box-shadow var(--motion-fast);
+  transition:
+    background var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 
 .storage-workspace-rail-row:hover {
@@ -309,7 +311,10 @@
   cursor: pointer;
   padding: 6px 12px 6px 8px;
   margin: 0;
-  transition: background var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
+  transition:
+    background var(--motion-fast),
+    border-color var(--motion-fast),
+    color var(--motion-fast);
 }
 
 .stw-detail-back:hover {

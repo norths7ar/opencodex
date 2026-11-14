@@ -43,9 +43,10 @@ export type { FileIntegrationClientId };
 function overwriteCopy(reason: string | undefined, path: string): ConsequenceCopy {
   return {
     titleKey: "integrations.dialog.overwrite.title",
-    changesKey: reason === "foreign-edit"
-      ? "integrations.dialog.overwrite.changesForeign"
-      : "integrations.dialog.overwrite.changesUnowned",
+    changesKey:
+      reason === "foreign-edit"
+        ? "integrations.dialog.overwrite.changesForeign"
+        : "integrations.dialog.overwrite.changesUnowned",
     breakageKey: "integrations.dialog.overwrite.breakage",
     undoKey: "integrations.dialog.overwrite.undo",
     confirmKey: "integrations.dialog.overwrite.confirm",
@@ -91,7 +92,7 @@ const SEMANTICS_KEY: Record<FileIntegrationClientId, TKey> = {
   droid: "integrations.semantics.droid",
   qoder: "integrations.semantics.qoder",
   "qoder-cn": "integrations.semantics.qoderCn",
-  "workbuddy": "integrations.semantics.workbuddy",
+  workbuddy: "integrations.semantics.workbuddy",
   "workbuddy-ai": "integrations.semantics.workbuddyAi",
   t3code: "integrations.semantics.t3code",
 };
@@ -118,7 +119,7 @@ const TAB_LABEL_KEY: Record<FileIntegrationClientId, TKey> = {
   droid: "integrations.tab.droid",
   qoder: "integrations.tab.qoder",
   "qoder-cn": "integrations.tab.qoderCn",
-  "workbuddy": "integrations.tab.workbuddy",
+  workbuddy: "integrations.tab.workbuddy",
   "workbuddy-ai": "integrations.tab.workbuddyAi",
   t3code: "integrations.tab.t3code",
 };
@@ -136,7 +137,12 @@ type FileIntegrationPageProps = {
 };
 
 export default function FileIntegrationPage(props: FileIntegrationPageProps) {
-  return <FileIntegrationControls key={JSON.stringify([props.apiBase, props.client, props.profileId, props.hermesProfile])} {...props} />;
+  return (
+    <FileIntegrationControls
+      key={JSON.stringify([props.apiBase, props.client, props.profileId, props.hermesProfile])}
+      {...props}
+    />
+  );
 }
 
 function FileIntegrationControls({
@@ -149,8 +155,12 @@ function FileIntegrationControls({
   onRefresh,
 }: FileIntegrationPageProps) {
   const t = useT();
-  const scopeKey = profileId !== undefined ? `${client}:${profileId}`
-    : hermesProfile !== undefined ? `${client}/${hermesProfile}` : client;
+  const scopeKey =
+    profileId !== undefined
+      ? `${client}:${profileId}`
+      : hermesProfile !== undefined
+        ? `${client}/${hermesProfile}`
+        : client;
   const [pending, setPending] = useState(false);
   const [droidReasoningDraft, setDroidReasoningDraft] = useState<{
     scopeKey: string;
@@ -170,17 +180,22 @@ function FileIntegrationControls({
   const previewAbortRef = useRef<AbortController | null>(null);
   const previewGenerationRef = useRef(0);
 
-  useEffect(() => () => {
-    previewGenerationRef.current += 1;
-    previewAbortRef.current?.abort();
-  }, []);
+  useEffect(
+    () => () => {
+      previewGenerationRef.current += 1;
+      previewAbortRef.current?.abort();
+    },
+    [],
+  );
 
   const fetchState = useCallback(
-    (signal: AbortSignal) => loadIntegrationState(apiBase, client, signal, profileId, hermesProfile),
+    (signal: AbortSignal) =>
+      loadIntegrationState(apiBase, client, signal, profileId, hermesProfile),
     [apiBase, client, profileId, hermesProfile],
   );
   const fetchHistory = useCallback(
-    async (signal: AbortSignal) => (await loadIntegrationJournal(apiBase, client, signal, profileId, hermesProfile)).operations,
+    async (signal: AbortSignal) =>
+      (await loadIntegrationJournal(apiBase, client, signal, profileId, hermesProfile)).operations,
     [apiBase, client, profileId, hermesProfile],
   );
 
@@ -199,16 +214,20 @@ function FileIntegrationControls({
     [apiBase, client, profileId, hermesProfile],
     fetchHistory,
     {
-      isEmpty: rows => rows.length === 0,
+      isEmpty: (rows) => rows.length === 0,
       enabled: active,
       sessionCacheKey: `ocx.integrations.client-journal.v1:${apiBase}:${scopeKey}`,
     },
   );
 
   const candidate = stateResource.state.data ?? null;
-  const status = candidate && (profileId === undefined
-    || (candidate.profileId === profileId && typeof candidate.enabled === "boolean"))
-    && candidate.hermesProfile === hermesProfile ? candidate : null;
+  const status =
+    candidate &&
+    (profileId === undefined ||
+      (candidate.profileId === profileId && typeof candidate.enabled === "boolean")) &&
+    candidate.hermesProfile === hermesProfile
+      ? candidate
+      : null;
   const history = historyResource.state.data ?? [];
 
   const refresh = () => {
@@ -225,9 +244,9 @@ function FileIntegrationControls({
   const requestMutation = async (
     operation: Exclude<IntegrationPlanOperation, "restore">,
     reasoningDefaults = client === "droid" && operation !== "disable"
-      ? (droidReasoningDraft?.scopeKey === scopeKey
+      ? droidReasoningDraft?.scopeKey === scopeKey
         ? droidReasoningDraft.values
-        : undefined)
+        : undefined
       : undefined,
   ) => {
     if (!status || pending || plannedMutation) return;
@@ -239,10 +258,24 @@ function FileIntegrationControls({
     previewAbortRef.current = controller;
     setPlannedMutation({ operation, plan: null, loading: true, failure: null });
     try {
-      const plan = await previewIntegrationMutation(apiBase, client, operation, controller.signal, profileId, defaultsSnapshot, hermesProfile);
+      const plan = await previewIntegrationMutation(
+        apiBase,
+        client,
+        operation,
+        controller.signal,
+        profileId,
+        defaultsSnapshot,
+        hermesProfile,
+      );
       if (controller.signal.aborted || generation !== previewGenerationRef.current) return;
       previewAbortRef.current = null;
-      setPlannedMutation({ operation, plan, loading: false, failure: null, droidReasoningDefaults: defaultsSnapshot });
+      setPlannedMutation({
+        operation,
+        plan,
+        loading: false,
+        failure: null,
+        droidReasoningDefaults: defaultsSnapshot,
+      });
     } catch (error) {
       if (controller.signal.aborted || generation !== previewGenerationRef.current) return;
       previewAbortRef.current = null;
@@ -251,7 +284,12 @@ function FileIntegrationControls({
         refresh();
         return;
       }
-      setPlannedMutation({ operation, plan: null, loading: false, failure: t("integrations.preview.failed") });
+      setPlannedMutation({
+        operation,
+        plan: null,
+        loading: false,
+        failure: t("integrations.preview.failed"),
+      });
     }
   };
 
@@ -312,13 +350,21 @@ function FileIntegrationControls({
   if (!status) {
     return (
       <section className="integration-client-page">
-        {stateResource.state.showError
-          ? (
-            <Notice tone="err">{t("integrations.error.load")}
-              <button type="button" className="btn btn-ghost btn-sm" onClick={refresh} disabled={stateResource.state.refreshing}>{t("common.retry")}</button>
-            </Notice>
-          )
-          : <p className="page-sub">{t("common.loading")}</p>}
+        {stateResource.state.showError ? (
+          <Notice tone="err">
+            {t("integrations.error.load")}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={refresh}
+              disabled={stateResource.state.refreshing}
+            >
+              {t("common.retry")}
+            </button>
+          </Notice>
+        ) : (
+          <p className="page-sub">{t("common.loading")}</p>
+        )}
       </section>
     );
   }
@@ -326,11 +372,14 @@ function FileIntegrationControls({
   const removableKiloIssue = canDisableKiloWithCandidateIssue(status);
   const applied = status.state === "current" || status.state === "stale" || removableKiloIssue;
   const enabled = profileId !== undefined ? status.enabled === true : applied;
-  const profileUnavailable = profileId !== undefined && (stateResource.state.showError || stateResource.state.refreshing);
+  const profileUnavailable =
+    profileId !== undefined && (stateResource.state.showError || stateResource.state.refreshing);
   // A profile may stop future sync even when its file cannot be changed; the
   // writer still refuses unsafe deletion and reports the actual state separately.
-  const locked = (!status.installed || ((status.state === "conflict" || status.state === "unsafe") && !removableKiloIssue))
-    && !(profileId !== undefined && enabled);
+  const locked =
+    (!status.installed ||
+      ((status.state === "conflict" || status.state === "unsafe") && !removableKiloIssue)) &&
+    !(profileId !== undefined && enabled);
 
   return (
     <section className="integration-client-page">
@@ -351,8 +400,16 @@ function FileIntegrationControls({
       </div>
 
       {profileId !== undefined && stateResource.state.showError && (
-        <Notice tone="err">{t("integrations.aside.loadError")}
-          <button type="button" className="btn btn-ghost btn-sm" onClick={refresh} disabled={pending || stateResource.state.refreshing}>{t("common.retry")}</button>
+        <Notice tone="err">
+          {t("integrations.aside.loadError")}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={refresh}
+            disabled={pending || stateResource.state.refreshing}
+          >
+            {t("common.retry")}
+          </button>
         </Notice>
       )}
       {/*
@@ -374,11 +431,13 @@ function FileIntegrationControls({
       {client === "droid" && status.droidReasoning && (
         <DroidReasoningDefaultsPanel
           reasoning={status.droidReasoning}
-          defaults={droidReasoningDraft?.scopeKey === scopeKey
-            ? droidReasoningDraft.values
-            : status.droidReasoning.defaults}
+          defaults={
+            droidReasoningDraft?.scopeKey === scopeKey
+              ? droidReasoningDraft.values
+              : status.droidReasoning.defaults
+          }
           disabled={pending || plannedMutation !== null}
-          onChange={values => setDroidReasoningDraft({ scopeKey, values })}
+          onChange={(values) => setDroidReasoningDraft({ scopeKey, values })}
           onReview={() => void requestMutation("apply")}
         />
       )}
@@ -390,22 +449,27 @@ function FileIntegrationControls({
         and this is the way past an overwriteable conflict, behind a dialog
         that names the file and says what is lost.
       */}
-      {status.installed && status.state === "conflict" && status.reason !== "candidate-conflict" && (
-        <button
-          type="button"
-          className="btn btn-danger"
-          onClick={() => void requestMutation("overwrite")}
-          disabled={pending}
-        >
-          {t("integrations.action.overwrite")}
-        </button>
-      )}
+      {status.installed &&
+        status.state === "conflict" &&
+        status.reason !== "candidate-conflict" && (
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => void requestMutation("overwrite")}
+            disabled={pending}
+          >
+            {t("integrations.action.overwrite")}
+          </button>
+        )}
 
       <p className="page-sub">{t(SEMANTICS_KEY[client])}</p>
       <p className="integration-path">{status.configPath}</p>
-      {status.reason === "candidate-conflict" && status.conflictPaths?.map(path => (
-        <Notice key={path} tone="err">{t("integrations.status.candidateConflict", { path })}</Notice>
-      ))}
+      {status.reason === "candidate-conflict" &&
+        status.conflictPaths?.map((path) => (
+          <Notice key={path} tone="err">
+            {t("integrations.status.candidateConflict", { path })}
+          </Notice>
+        ))}
       {/* Only the raycast envelope carries this; the guard is the field, not the id. */}
       {status.raycast && <RaycastPlanNotice install={status.raycast} />}
       {/*
@@ -416,7 +480,10 @@ function FileIntegrationControls({
       {status.supersededBy && (
         <Notice tone="err">
           {status.supersededReason === "missing-store" && status.missingStoreDocument !== undefined
-            ? t("integrations.status.missingStore", { path: status.supersededBy, document: status.missingStoreDocument })
+            ? t("integrations.status.missingStore", {
+                path: status.supersededBy,
+                document: status.missingStoreDocument,
+              })
             : t("integrations.status.supersededStore", { path: status.supersededBy })}
         </Notice>
       )}
@@ -442,7 +509,11 @@ function FileIntegrationControls({
       ) : historyResource.state.kind === "failed-cold" ? (
         <Notice tone="err">
           {t("integrations.rollback.failed")}{" "}
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => void historyResource.refresh()}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => void historyResource.refresh()}
+          >
             {t("common.retry")}
           </button>
         </Notice>
@@ -459,7 +530,10 @@ function FileIntegrationControls({
           profileId={profileId}
           hermesProfile={hermesProfile}
           onClose={() => setRestoring(null)}
-          onRestored={() => { if (client === "droid") resetDroidDraft(); else refresh(); }}
+          onRestored={() => {
+            if (client === "droid") resetDroidDraft();
+            else refresh();
+          }}
           onReconcile={refresh}
         />
       )}
@@ -497,15 +571,23 @@ function FileIntegrationControls({
       )}
       {plannedMutation && (
         <ConsequenceDialog
-          copy={plannedMutation.operation === "overwrite"
-            ? overwriteCopy(status.reason, status.configPath)
-            : plannedMutation.operation === "disable" ? DISABLE_COPY : APPLY_COPY}
+          copy={
+            plannedMutation.operation === "overwrite"
+              ? overwriteCopy(status.reason, status.configPath)
+              : plannedMutation.operation === "disable"
+                ? DISABLE_COPY
+                : APPLY_COPY
+          }
           plan={plannedMutation.plan}
           planLoading={plannedMutation.loading}
           planFailure={plannedMutation.failure}
-          missingStorePath={status.supersededReason === "missing-store" ? status.supersededBy : undefined}
+          missingStorePath={
+            status.supersededReason === "missing-store" ? status.supersededBy : undefined
+          }
           onClose={closePlannedMutation}
-          onConfirm={async plan => { if (plan) await mutate(plan); }}
+          onConfirm={async (plan) => {
+            if (plan) await mutate(plan);
+          }}
         />
       )}
     </section>

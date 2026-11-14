@@ -5,7 +5,10 @@ const ADMIN_TOKEN_USERNAME = "OpenCodex";
 const ADMIN_TOKEN_DOCS_URL = "https://opencodex.me/guides/web-dashboard/#finding-the-admin-token";
 
 export type AdminTokenValidation = "accepted" | "rejected" | "unavailable";
-export type AdminTokenVerifier = (token: string, rememberDevice?: boolean) => Promise<AdminTokenValidation>;
+export type AdminTokenVerifier = (
+  token: string,
+  rememberDevice?: boolean,
+) => Promise<AdminTokenValidation>;
 
 /**
  * Ask for the management credential with a real sign-in form so browsers and
@@ -21,9 +24,8 @@ export function promptForAdminToken(
   const titleText = messages["auth.adminTokenTitle"];
 
   return new Promise((resolve) => {
-    const previouslyFocused = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null;
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     let settled = false;
 
     const dialog = document.createElement("dialog");
@@ -158,29 +160,33 @@ export function promptForAdminToken(
       remember.disabled = true;
       setValidationError(null);
 
-      void verifyToken(token, rememberAllowed && remember.checked).then((result) => {
-        if (settled) return;
-        if (result === "accepted") {
-          finish(token);
-          return;
-        }
-        password.value = "";
-        password.disabled = false;
-        submit.disabled = false;
-        remember.disabled = !rememberAllowed;
-        setValidationError(result === "rejected"
-          ? messages["auth.adminTokenRejected"]
-          : messages["auth.adminTokenUnavailable"]);
-        password.focus();
-      }).catch(() => {
-        if (settled) return;
-        password.value = "";
-        password.disabled = false;
-        submit.disabled = false;
-        remember.disabled = !rememberAllowed;
-        setValidationError(messages["auth.adminTokenUnavailable"]);
-        password.focus();
-      });
+      void verifyToken(token, rememberAllowed && remember.checked)
+        .then((result) => {
+          if (settled) return;
+          if (result === "accepted") {
+            finish(token);
+            return;
+          }
+          password.value = "";
+          password.disabled = false;
+          submit.disabled = false;
+          remember.disabled = !rememberAllowed;
+          setValidationError(
+            result === "rejected"
+              ? messages["auth.adminTokenRejected"]
+              : messages["auth.adminTokenUnavailable"],
+          );
+          password.focus();
+        })
+        .catch(() => {
+          if (settled) return;
+          password.value = "";
+          password.disabled = false;
+          submit.disabled = false;
+          remember.disabled = !rememberAllowed;
+          setValidationError(messages["auth.adminTokenUnavailable"]);
+          password.focus();
+        });
     });
     cancel.addEventListener("click", () => finish(null));
     dialog.addEventListener("cancel", (event) => {

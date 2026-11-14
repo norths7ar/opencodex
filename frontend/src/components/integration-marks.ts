@@ -14,7 +14,11 @@
  * on one surface and leave it unmasked on another, which is exactly the
  * inconsistency a second id-keyed set would invite.
  */
-import { CLIENT_MARKS, MONOCHROME_CLIENT_MARKS, type ExportClientId } from "./apikeys-workspace/client-config-clients";
+import {
+  CLIENT_MARKS,
+  MONOCHROME_CLIENT_MARKS,
+  type ExportClientId,
+} from "./apikeys-workspace/client-config-clients";
 import type { OverviewClientId } from "../pages/integrations/overview-clients";
 
 /**
@@ -73,11 +77,11 @@ export const INTEGRATION_MARKS: Record<OverviewClientId, string | null> = {
 };
 
 /**
-* Assets whose artwork is one neutral ink, so the ink has to come from the theme.
-*
+ * Assets whose artwork is one neutral ink, so the ink has to come from the theme.
+ *
  * The export-client half is derived from `MONOCHROME_CLIENT_MARKS` rather than
  * restated, because two hand-maintained lists of the same fact drift.
-*
+ *
  * `openai.svg` looks like it belongs here and does not: it is a single fill, but
  * that fill is #10A37F -- OpenAI's brand green. Masking repaints a trademark in
  * the theme's text color, the same reason `dsh` stays an image despite being
@@ -106,7 +110,9 @@ export const INTEGRATION_MARKS: Record<OverviewClientId, string | null> = {
 const MASKED_NATIVE_MARKS: readonly string[] = [NATIVE_MARKS.grok];
 
 export const MASKED_MARKS: ReadonlySet<string> = new Set([
-  ...[...MONOCHROME_CLIENT_MARKS].map(clientId => CLIENT_MARKS[clientId]).filter((src): src is string => src !== undefined),
+  ...[...MONOCHROME_CLIENT_MARKS]
+    .map((clientId) => CLIENT_MARKS[clientId])
+    .filter((src): src is string => src !== undefined),
   ...MASKED_NATIVE_MARKS,
 ]);
 

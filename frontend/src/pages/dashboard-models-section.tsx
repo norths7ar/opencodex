@@ -41,12 +41,14 @@ export function DashboardModelsSection({
               className="input pws-search-input"
               placeholder={t("models.search")}
               value={modelQuery}
-              onChange={e => setModelQuery(e.target.value)}
+              onChange={(e) => setModelQuery(e.target.value)}
               aria-label={t("models.search")}
             />
           </div>
           {filteredGroups.length === 0 ? (
-            <p className="muted text-control" style={{ margin: "4px 0" }}>{t("dash.modelsNoResults")}</p>
+            <p className="muted text-control" style={{ margin: "4px 0" }}>
+              {t("dash.modelsNoResults")}
+            </p>
           ) : (
             <div className="dash-model-acc">
               {filteredGroups.map(([provider, rows]) => {
@@ -57,17 +59,37 @@ export function DashboardModelsSection({
                     <button
                       type="button"
                       className="dash-model-head"
-                      onClick={() => setExpandedProviders(prev => { const next = new Set(prev); if (next.has(provider)) next.delete(provider); else next.add(provider); return next; })}
+                      onClick={() =>
+                        setExpandedProviders((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(provider)) next.delete(provider);
+                          else next.add(provider);
+                          return next;
+                        })
+                      }
                       aria-expanded={open}
                     >
-                      <IconChevron width={12} height={12} style={{ transform: open ? "rotate(90deg)" : "none", transition: "transform .12s", color: "var(--muted)" }} aria-hidden="true" />
-                      <span className="font-semibold">{formatProviderDisplayName(provider, t)}</span>
+                      <IconChevron
+                        width={12}
+                        height={12}
+                        style={{
+                          transform: open ? "rotate(90deg)" : "none",
+                          transition: "transform .12s",
+                          color: "var(--muted)",
+                        }}
+                        aria-hidden="true"
+                      />
+                      <span className="font-semibold">
+                        {formatProviderDisplayName(provider, t)}
+                      </span>
                       <span className="count">{rows.length}</span>
                     </button>
                     {open && (
                       <div className="dash-model-chips">
-                        {rows.map(m => (
-                          <code key={`${m.provider}/${m.id}`} className="dash-model-chip">{m.id}</code>
+                        {rows.map((m) => (
+                          <code key={`${m.provider}/${m.id}`} className="dash-model-chip">
+                            {m.id}
+                          </code>
                         ))}
                       </div>
                     )}

@@ -115,7 +115,7 @@ export function useCodexRestart(
       confirmLabel: t("dash.codexRestart"),
       tone: "danger",
       signal: consent.signal,
-      restoreFocusFallback: previous => restoreFocusFallback.current?.(previous) ?? null,
+      restoreFocusFallback: (previous) => restoreFocusFallback.current?.(previous) ?? null,
     });
     if (pendingConsent.current === consent) pendingConsent.current = null;
     /*
@@ -126,7 +126,7 @@ export function useCodexRestart(
     if (!consented || !mounted.current || currentApiBase.current !== apiBase) return null;
     setRestarting(true);
     const outcome = await requestCodexRestart(apiBase, {
-      formatFailure: status => t("dash.codexRestartFailed", { status: String(status) }),
+      formatFailure: (status) => t("dash.codexRestartFailed", { status: String(status) }),
       formatUnreachable: () => t("dash.codexRestartUnreachable"),
       formatTimeout: () => t("dash.codexRestartTimeout"),
       formatMalformed: () => t("dash.codexRestartMalformed"),
@@ -147,7 +147,10 @@ export function useCodexRestart(
       report.current(t("dash.codexRestartUnknown"), "warn");
     } else {
       // Degraded, not failed: something is still running, so it must not read as success.
-      report.current(t("dash.codexRestartPartial", { count: String(result.surviving.length) }), "warn");
+      report.current(
+        t("dash.codexRestartPartial", { count: String(result.surviving.length) }),
+        "warn",
+      );
     }
 
     // Only while mounted: a settled callback typically starts a refresh fetch,

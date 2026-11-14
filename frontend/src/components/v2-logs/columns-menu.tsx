@@ -15,7 +15,13 @@ export interface ColumnOption<K extends string> {
  * menuitemcheckbox rows. Arrows / Home / End move between rows, Escape or a click outside
  * closes it and returns focus to the trigger.
  */
-export function ColumnsMenu<K extends string>({ options, visible, onToggle, label, menuLabel }: {
+export function ColumnsMenu<K extends string>({
+  options,
+  visible,
+  onToggle,
+  label,
+  menuLabel,
+}: {
   options: ReadonlyArray<ColumnOption<K>>;
   visible: Readonly<Record<K, boolean>>;
   onToggle: (key: K) => void;
@@ -57,12 +63,23 @@ export function ColumnsMenu<K extends string>({ options, visible, onToggle, labe
   };
 
   const onMenuKey = (event: KeyboardEvent<HTMLDivElement>) => {
-    const current = itemRefs.current.findIndex(item => item === event.currentTarget.ownerDocument.activeElement);
+    const current = itemRefs.current.findIndex(
+      (item) => item === event.currentTarget.ownerDocument.activeElement,
+    );
     if (event.key === "Tab") setOpen(false);
-    else if (event.key === "ArrowDown") { event.preventDefault(); focusItem(current + 1); }
-    else if (event.key === "ArrowUp") { event.preventDefault(); focusItem(current < 0 ? options.length - 1 : current - 1); }
-    else if (event.key === "Home") { event.preventDefault(); focusItem(0); }
-    else if (event.key === "End") { event.preventDefault(); focusItem(options.length - 1); }
+    else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      focusItem(current + 1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      focusItem(current < 0 ? options.length - 1 : current - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusItem(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusItem(options.length - 1);
+    }
   };
 
   return (
@@ -74,12 +91,23 @@ export function ColumnsMenu<K extends string>({ options, visible, onToggle, labe
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         title={menuLabel}
-        onClick={() => setOpen(value => !value)}
+        onClick={() => setOpen((value) => !value)}
         className={quietButton}
       >
-        <HugeiconsIcon icon={LayoutThreeColumnIcon} size={16} strokeWidth={1.8} aria-hidden="true" />
+        <HugeiconsIcon
+          icon={LayoutThreeColumnIcon}
+          size={16}
+          strokeWidth={1.8}
+          aria-hidden="true"
+        />
         <span className="max-sm:sr-only">{label}</span>
-        <IconChevron aria-hidden className={cn("size-3.5 text-fg-subtle transition-transform", open ? "-rotate-90" : "rotate-90")} />
+        <IconChevron
+          aria-hidden
+          className={cn(
+            "size-3.5 text-fg-subtle transition-transform",
+            open ? "-rotate-90" : "rotate-90",
+          )}
+        />
       </button>
       {open && (
         <div
@@ -93,7 +121,9 @@ export function ColumnsMenu<K extends string>({ options, visible, onToggle, labe
           {options.map((option, index) => (
             <button
               key={option.key}
-              ref={node => { itemRefs.current[index] = node; }}
+              ref={(node) => {
+                itemRefs.current[index] = node;
+              }}
               type="button"
               role="menuitemcheckbox"
               aria-checked={visible[option.key]}

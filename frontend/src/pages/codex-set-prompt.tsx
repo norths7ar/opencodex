@@ -10,7 +10,10 @@ import type { TKey } from "../i18n/en";
 import CustomLayerRow from "../components/codex-set/CustomLayerRow";
 import CustomLayerDialog from "../components/codex-set/CustomLayerDialog";
 import PresetPicker from "../components/codex-set/PresetPicker";
-import BaseVariantDialog, { type BaseSelectionDto, type BaseVariantDto } from "../components/codex-set/BaseVariantDialog";
+import BaseVariantDialog, {
+  type BaseSelectionDto,
+  type BaseVariantDto,
+} from "../components/codex-set/BaseVariantDialog";
 import {
   composeBodies,
   MAX_COMPOSED_BYTES,
@@ -34,11 +37,7 @@ import {
  * fight the editor for no gain.
  */
 export type LayerClass =
-  | "base"
-  | "config-toggle"
-  | "feature-gated"
-  | "runtime-conditional"
-  | "extension-unknown";
+  "base" | "config-toggle" | "feature-gated" | "runtime-conditional" | "extension-unknown";
 
 export interface LayerDescriptorDto {
   /**
@@ -76,7 +75,10 @@ export interface CustomLayerDto {
  */
 export interface PromptProbeDto {
   ok: boolean;
-  layers?: Record<string, { text: string | null; reason: string; bytes: number; sourcePath?: string }>;
+  layers?: Record<
+    string,
+    { text: string | null; reason: string; bytes: number; sourcePath?: string }
+  >;
   failure?: { kind: string; command?: string; detail?: string };
   detail?: string;
 }
@@ -136,13 +138,20 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
   // null = closed, "new" = the + flow, otherwise the id being edited.
   const [editing, setEditing] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
-  const [adoptPreview, setAdoptPreview] = useState<{ rawLine: string | null; decodedBody: string | null } | null>(null);
+  const [adoptPreview, setAdoptPreview] = useState<{
+    rawLine: string | null;
+    decodedBody: string | null;
+  } | null>(null);
   /**
    * A refused adopt has to say WHERE. "The existing value could not be imported"
    * leaves the user with no way to act; the file path and line number are what let
    * them move the text by hand.
    */
-  const [adoptRefusal, setAdoptRefusal] = useState<{ path?: string; line?: number | null; rawLine?: string | null } | null>(null);
+  const [adoptRefusal, setAdoptRefusal] = useState<{
+    path?: string;
+    line?: number | null;
+    rawLine?: string | null;
+  } | null>(null);
   const [repairBusy, setRepairBusy] = useState(false);
   /**
    * A preset chosen from the picker seeds the ordinary editor. It is a starting
@@ -185,27 +194,37 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
    * door. Ten seconds is long enough to notice the notice, short enough that
    * restoring it cannot surprise someone mid-edit.
    */
-  const [deletedLayer, setDeletedLayer] = useState<{ layer: CustomLayerDto; index: number } | null>(null);
+  const [deletedLayer, setDeletedLayer] = useState<{ layer: CustomLayerDto; index: number } | null>(
+    null,
+  );
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    },
+    [],
+  );
 
   /**
    * Drop the measured text after any write. It describes the configuration that
    * just changed, so keeping it would show a layer's old body and old byte count
    * beside a switch that now reads off. Nulling it re-triggers the fetch.
    */
-  const invalidateLayerText = useCallback(() => { setLayerText(null); }, []);
+  const invalidateLayerText = useCallback(() => {
+    setLayerText(null);
+  }, []);
 
-  const load = useCallback(async (signal: AbortSignal): Promise<PromptSnapshotDto> => {
-    const res = await fetch(apiBase + "/api/codex-prompt", { signal });
-    if (!res.ok) throw new Error(String(res.status));
-    return await res.json() as PromptSnapshotDto;
-  }, [apiBase]);
+  const load = useCallback(
+    async (signal: AbortSignal): Promise<PromptSnapshotDto> => {
+      const res = await fetch(apiBase + "/api/codex-prompt", { signal });
+      if (!res.ok) throw new Error(String(res.status));
+      return (await res.json()) as PromptSnapshotDto;
+    },
+    [apiBase],
+  );
 
   const resource = useDataSurface<PromptSnapshotDto>(resourceKey, [apiBase], load, {
-    isEmpty: snapshot => snapshot.inventory.length === 0,
+    isEmpty: (snapshot) => snapshot.inventory.length === 0,
   });
   const snapshot = resource.data;
   const state = resource.state;
@@ -225,7 +244,12 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id, enabled, revision: snapshot.revision }),
       });
-      const body = await res.json() as { ok?: boolean; code?: string; message?: string; snapshot?: PromptSnapshotDto };
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
+        snapshot?: PromptSnapshotDto;
+      };
       if (!res.ok || !body.ok || !body.snapshot) {
         // A stale revision means another tab or a hand edit moved the file. Re-read
         // rather than retrying blindly: a retry would overwrite whatever moved it.
@@ -269,7 +293,12 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ ...payload, revision: snapshot.revision }),
       });
-      const body = await res.json() as { ok?: boolean; code?: string; message?: string; snapshot?: PromptSnapshotDto };
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
+        snapshot?: PromptSnapshotDto;
+      };
       if (!res.ok || !body.ok || !body.snapshot) {
         if (body.code === "stale_revision") {
           resource.refresh();
@@ -324,22 +353,31 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
       const res = await fetch(apiBase + "/api/codex-prompt/base/import", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(confirm
-          ? {
-            confirm: true,
-            revision: snapshot.revision,
-            ...(title !== undefined ? { title } : {}),
-            previewSha256: baseImportPreview?.previewSha256,
-          }
-          : { confirm: false, ...(title !== undefined ? { title } : {}) }),
+        body: JSON.stringify(
+          confirm
+            ? {
+                confirm: true,
+                revision: snapshot.revision,
+                ...(title !== undefined ? { title } : {}),
+                previewSha256: baseImportPreview?.previewSha256,
+              }
+            : { confirm: false, ...(title !== undefined ? { title } : {}) },
+        ),
       });
-      const body = await res.json() as {
-        ok?: boolean; code?: string; message?: string;
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
         snapshot?: PromptSnapshotDto;
         preview?: {
-          rawPath: string | null; resolvedPath: string | null;
-          serialized: string; serializedBytes: number; bodyBytes: number;
-          suggestedTitle: string | null; effectiveTitle: string | null; previewSha256: string;
+          rawPath: string | null;
+          resolvedPath: string | null;
+          serialized: string;
+          serializedBytes: number;
+          bodyBytes: number;
+          suggestedTitle: string | null;
+          effectiveTitle: string | null;
+          previewSha256: string;
         };
       };
       // Only read-only previews expire with their view. A confirm must settle
@@ -358,9 +396,11 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         // A refusal lands beside the affordance, not in the page-level error
         // notice: the user is deciding about THIS file, so the reason belongs
         // where the file is described.
-        setBaseImportRefusal(body.code === "import_body_changed"
-          ? t("codexSet.base.importChanged")
-          : (body.message ?? t("codexSet.base.importFailed")));
+        setBaseImportRefusal(
+          body.code === "import_body_changed"
+            ? t("codexSet.base.importChanged")
+            : (body.message ?? t("codexSet.base.importFailed")),
+        );
         if (confirm) setBaseImportPreview(null);
         return;
       }
@@ -385,7 +425,7 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
     } finally {
       if (confirm) baseImportConfirmPending.current = false;
       if (confirm || seq === baseImportSeq.current) {
-        setBusyId(current => current === "base-import" ? null : current);
+        setBusyId((current) => (current === "base-import" ? null : current));
       }
     }
   };
@@ -414,7 +454,7 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
     setBaseImportRefusal(null);
     // Only release the import's own busy marker — an unrelated write must keep its guard.
     if (!baseImportConfirmPending.current) {
-      setBusyId(current => current === "base-import" ? null : current);
+      setBusyId((current) => (current === "base-import" ? null : current));
     }
     resource.refresh();
   };
@@ -440,7 +480,12 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ layers, revision: snapshot.revision }),
       });
-      const body = await res.json() as { ok?: boolean; code?: string; message?: string; snapshot?: PromptSnapshotDto };
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
+        snapshot?: PromptSnapshotDto;
+      };
       if (!res.ok || !body.ok || !body.snapshot) {
         if (body.code === "stale_revision") {
           resource.refresh();
@@ -469,11 +514,17 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
   const saveDraft = async (draft: Draft) => {
     if (!snapshot) return;
     const existing = snapshot.custom;
-    const next = draft.id === null
-      ? [...existing, { id: newLayerId(existing), title: draft.title, body: draft.body, enabled: true }]
-      // Editing keeps the id: it is stable across edits, which is what lets the
-      // store and the projection stay in agreement.
-      : existing.map(l => (l.id === draft.id ? { ...l, title: draft.title, body: draft.body } : l));
+    const next =
+      draft.id === null
+        ? [
+            ...existing,
+            { id: newLayerId(existing), title: draft.title, body: draft.body, enabled: true },
+          ]
+        : // Editing keeps the id: it is stable across edits, which is what lets the
+          // store and the projection stay in agreement.
+          existing.map((l) =>
+            l.id === draft.id ? { ...l, title: draft.title, body: draft.body } : l,
+          );
     // Close only after the write lands. Closing first threw away the text the user
     // just typed whenever the write was refused - a stale revision, a transient
     // failure - and the re-read that follows can restore the file but not a draft
@@ -490,21 +541,29 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
       const res = await fetch(apiBase + "/api/codex-prompt/adopt", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(confirm ? { confirm: true, revision: snapshot.revision } : { confirm: false }),
+        body: JSON.stringify(
+          confirm ? { confirm: true, revision: snapshot.revision } : { confirm: false },
+        ),
       });
-      const body = await res.json() as {
-        ok?: boolean; code?: string; message?: string;
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
         snapshot?: PromptSnapshotDto;
         preview?: { rawLine: string | null; decodedBody: string | null };
-        path?: string; line?: number | null; rawLine?: string | null;
+        path?: string;
+        line?: number | null;
+        rawLine?: string | null;
       };
       if (!res.ok || !body.ok) {
         setError(body.message ?? t("codexSet.custom.adoptRefused"));
         setAdoptPreview(null);
         // Only an unsupported FORM has a place to point at; other refusals do not.
-        setAdoptRefusal(body.code === "adopt_unsupported_form"
-          ? { path: body.path, line: body.line, rawLine: body.rawLine }
-          : null);
+        setAdoptRefusal(
+          body.code === "adopt_unsupported_form"
+            ? { path: body.path, line: body.line, rawLine: body.rawLine }
+            : null,
+        );
         return;
       }
       if (body.snapshot) {
@@ -538,9 +597,16 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
       const res = await fetch(apiBase + "/api/codex-prompt/repair", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(confirm ? { confirm: true, revision: snapshot.revision } : { confirm: false }),
+        body: JSON.stringify(
+          confirm ? { confirm: true, revision: snapshot.revision } : { confirm: false },
+        ),
       });
-      const body = await res.json() as { ok?: boolean; code?: string; message?: string; snapshot?: PromptSnapshotDto };
+      const body = (await res.json()) as {
+        ok?: boolean;
+        code?: string;
+        message?: string;
+        snapshot?: PromptSnapshotDto;
+      };
       if (!res.ok || !body.ok) {
         if (body.code === "stale_revision") {
           resource.refresh();
@@ -569,7 +635,7 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
   // claimed they are assembled first. The stable fallback keeps two such layers in
   // inventory order relative to each other rather than swapping unpredictably.
   const rows = [...(snapshot?.inventory ?? [])]
-    .filter(d => d.class !== "extension-unknown")
+    .filter((d) => d.class !== "extension-unknown")
     .sort((a, b) => (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER));
 
   /**
@@ -585,9 +651,9 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
    * diff-rendered, so an unchanged layer of either kind sends nothing.
    */
   const TRANSITION_ONLY = new Set(["realtime", "model-switch"]);
-  const stateRows = rows.filter(d => !TRANSITION_ONLY.has(d.id));
-  const transitionRows = rows.filter(d => TRANSITION_ONLY.has(d.id));
-  const openDescriptor = rows.find(d => d.id === openLayerId) ?? null;
+  const stateRows = rows.filter((d) => !TRANSITION_ONLY.has(d.id));
+  const transitionRows = rows.filter((d) => TRANSITION_ONLY.has(d.id));
+  const openDescriptor = rows.find((d) => d.id === openLayerId) ?? null;
 
   /**
    * The layer under the open editor, and where it sits.
@@ -597,9 +663,10 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
    * carrying the deleted layer's text, so Save would have recreated a layer the
    * user had just removed. Index -1 is the signal that this happened.
    */
-  const editingIndex = editing === null || editing === "new"
-    ? -1
-    : (snapshot?.custom.findIndex(l => l.id === editing) ?? -1);
+  const editingIndex =
+    editing === null || editing === "new"
+      ? -1
+      : (snapshot?.custom.findIndex((l) => l.id === editing) ?? -1);
   const editingLayer = editingIndex >= 0 ? snapshot!.custom[editingIndex]! : null;
 
   /**
@@ -613,7 +680,8 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
    * effect body cascades an extra render - which is what lint rejects - and
    * every input here is already known while rendering.
    */
-  const layerGone = editing !== null && editing !== "new" && snapshot !== undefined && editingIndex < 0;
+  const layerGone =
+    editing !== null && editing !== "new" && snapshot !== undefined && editingIndex < 0;
 
   useEffect(() => {
     // Fetch on panel mount, not on first dialog open: size is what a user needs to
@@ -638,7 +706,7 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
           if (!cancelled) setLayerText({ ok: false, failure: { kind: "request-failed" } });
           return;
         }
-        const body = await res.json() as PromptProbeDto;
+        const body = (await res.json()) as PromptProbeDto;
         if (!cancelled) setLayerText(body);
       } catch {
         // A failed probe is a missing body, not a broken page. An abort lands here too, and the
@@ -646,7 +714,10 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         if (!cancelled) setLayerText({ ok: false, failure: { kind: "request-failed" } });
       }
     })();
-    return () => { cancelled = true; controller.abort(); };
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [layerText, apiBase]);
 
   return (
@@ -678,17 +749,15 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         the error notice so a screen reader is not told the same thing twice.
       */}
       {state.refreshing && (
-        <DataSurfaceStatus live={!state.showError}>
-          {t("common.loading")}
-        </DataSurfaceStatus>
+        <DataSurfaceStatus live={!state.showError}>{t("common.loading")}</DataSurfaceStatus>
       )}
 
-      {state.showSkeleton && (
-        <DataSurfaceSkeleton label={t("common.loading")} rows={5} />
-      )}
+      {state.showSkeleton && <DataSurfaceSkeleton label={t("common.loading")} rows={5} />}
 
       {snapshot && !snapshot.readable && (
-        <div className="notice notice-err" role="alert">{t("codexSet.prompt.unreadable")}</div>
+        <div className="notice notice-err" role="alert">
+          {t("codexSet.prompt.unreadable")}
+        </div>
       )}
       {/*
         A failed read must be visible. Without this the cold failure rendered as a
@@ -696,7 +765,9 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         settled - the two states the loading contract exists to keep apart.
       */}
       {state.showError && (
-        <div className="notice notice-err" role="alert">{t("codexSet.prompt.loadFailed")}</div>
+        <div className="notice notice-err" role="alert">
+          {t("codexSet.prompt.loadFailed")}
+        </div>
       )}
       {(error || layerGone) && (
         <div className="notice notice-err" role="alert">
@@ -716,7 +787,9 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
             type="button"
             className="btn btn-sm"
             disabled={repairBusy}
-            onClick={() => { void repair(true); }}
+            onClick={() => {
+              void repair(true);
+            }}
           >
             {t("codexSet.prompt.repair")}
           </button>
@@ -724,28 +797,42 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
       )}
 
       <ul className="codex-set-prompt__rows">
-        {stateRows.map(descriptor => (
+        {stateRows.map((descriptor) => (
           <PromptLayerRow
             key={descriptor.id}
             descriptor={descriptor}
-            toggle={snapshot?.toggles.find(s => s.id === descriptor.id)}
+            toggle={snapshot?.toggles.find((s) => s.id === descriptor.id)}
             bytes={layerText?.layers?.[descriptor.id]?.bytes ?? null}
             busy={busyId === descriptor.id}
             writesRefused={snapshot?.readable === false}
-            onToggle={(id, enabled) => { void onToggle(id, enabled); }}
-            onReset={id => { void onToggle(id, null); }}
-            onSelectBase={descriptor.class === "base" && snapshot ? (useDefault => {
-              // Turning it OFF has to pick something concrete. With no variant yet the
-              // switch cannot act, so it opens the picker instead of writing a key that
-              // would name a file the user has not written.
-              if (useDefault) {
-                void writeBase("/api/codex-prompt/base/select", { kind: "default" });
-                return;
-              }
-              const first = snapshot.baseVariants[0];
-              if (!first) { setOpenLayerId(descriptor.id); return; }
-              void writeBase("/api/codex-prompt/base/select", { kind: "variant", id: first.id });
-            }) : undefined}
+            onToggle={(id, enabled) => {
+              void onToggle(id, enabled);
+            }}
+            onReset={(id) => {
+              void onToggle(id, null);
+            }}
+            onSelectBase={
+              descriptor.class === "base" && snapshot
+                ? (useDefault) => {
+                    // Turning it OFF has to pick something concrete. With no variant yet the
+                    // switch cannot act, so it opens the picker instead of writing a key that
+                    // would name a file the user has not written.
+                    if (useDefault) {
+                      void writeBase("/api/codex-prompt/base/select", { kind: "default" });
+                      return;
+                    }
+                    const first = snapshot.baseVariants[0];
+                    if (!first) {
+                      setOpenLayerId(descriptor.id);
+                      return;
+                    }
+                    void writeBase("/api/codex-prompt/base/select", {
+                      kind: "variant",
+                      id: first.id,
+                    });
+                  }
+                : undefined
+            }
             baseSelection={snapshot?.baseSelection}
             onOpen={setOpenLayerId}
           />
@@ -764,17 +851,21 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
           </div>
           <p className="muted small">{t("codexSet.group.transitionDesc")}</p>
           <ul className="codex-set-prompt__rows">
-            {transitionRows.map(descriptor => (
+            {transitionRows.map((descriptor) => (
               <PromptLayerRow
                 key={descriptor.id}
                 descriptor={descriptor}
-                toggle={snapshot?.toggles.find(s => s.id === descriptor.id)}
+                toggle={snapshot?.toggles.find((s) => s.id === descriptor.id)}
                 bytes={layerText?.layers?.[descriptor.id]?.bytes ?? null}
                 transitionOnly
                 busy={busyId === descriptor.id}
                 writesRefused={snapshot?.readable === false}
-                onToggle={(id, enabled) => { void onToggle(id, enabled); }}
-                onReset={id => { void onToggle(id, null); }}
+                onToggle={(id, enabled) => {
+                  void onToggle(id, enabled);
+                }}
+                onReset={(id) => {
+                  void onToggle(id, null);
+                }}
                 onOpen={setOpenLayerId}
               />
             ))}
@@ -788,13 +879,15 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
         is the honest shape: rows would claim knowledge we do not have.
       */}
       {snapshot && !snapshot.extensionLayersEnumerable && (
-        <p className="muted small codex-set-prompt__extensions">{t("codexSet.prompt.extensionsUnknown")}</p>
+        <p className="muted small codex-set-prompt__extensions">
+          {t("codexSet.prompt.extensionsUnknown")}
+        </p>
       )}
 
-      {openDescriptor && (
+      {openDescriptor &&
         // The base row opens the VARIANT picker, not the read-only dialog: it is the
         // one layer with something to choose between.
-        openDescriptor.class === "base" && snapshot ? (
+        (openDescriptor.class === "base" && snapshot ? (
           <BaseVariantDialog
             variants={snapshot.baseVariants}
             selection={snapshot.baseSelection}
@@ -802,27 +895,36 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
             busy={busyId !== null || !snapshot.readable}
             importPreview={baseImportPreview}
             importRefusal={baseImportRefusal}
-            onSelect={sel => { void writeBase("/api/codex-prompt/base/select", sel); }}
-            onSave={input => writeBase("/api/codex-prompt/base", input)}
-            onDelete={id => { void writeBase("/api/codex-prompt/base", { id, delete: true }); }}
-            onImport={(confirm, title) => { void importBase(confirm, title); }}
+            onSelect={(sel) => {
+              void writeBase("/api/codex-prompt/base/select", sel);
+            }}
+            onSave={(input) => writeBase("/api/codex-prompt/base", input)}
+            onDelete={(id) => {
+              void writeBase("/api/codex-prompt/base", { id, delete: true });
+            }}
+            onImport={(confirm, title) => {
+              void importBase(confirm, title);
+            }}
             onImportTitle={importTitleChange}
             onClose={closeBaseDialog}
           />
         ) : (
-        <PromptLayerDialog
-          descriptor={openDescriptor}
-          toggle={snapshot?.toggles.find(s => s.id === openDescriptor.id)}
-          text={layerText?.layers?.[openDescriptor.id]}
-          probe={layerText}
-          busy={busyId !== null}
-          onToggle={(id, enabled) => { void onToggle(id, enabled); }}
-          onReset={id => { void onToggle(id, null); }}
-          onClose={() => setOpenLayerId(null)}
-          onRemeasure={invalidateLayerText}
-        />
-        )
-      )}
+          <PromptLayerDialog
+            descriptor={openDescriptor}
+            toggle={snapshot?.toggles.find((s) => s.id === openDescriptor.id)}
+            text={layerText?.layers?.[openDescriptor.id]}
+            probe={layerText}
+            busy={busyId !== null}
+            onToggle={(id, enabled) => {
+              void onToggle(id, enabled);
+            }}
+            onReset={(id) => {
+              void onToggle(id, null);
+            }}
+            onClose={() => setOpenLayerId(null)}
+            onRemeasure={invalidateLayerText}
+          />
+        ))}
 
       {/*
         Custom layers compose into developer_instructions, NEVER into
@@ -839,9 +941,17 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
                 // Same refusal as the built-in switches. Offering an editor over a
                 // file we cannot read only trades a disabled control for a server
                 // rejection after the user has typed.
-                disabled={snapshot.custom.length >= MAX_LAYERS || busyId !== null || !snapshot.readable}
-                onBlank={() => { setPresetSeed(null); setEditing("new"); }}
-                onPreset={(body, title) => { setPresetSeed({ body, title }); setEditing("new"); }}
+                disabled={
+                  snapshot.custom.length >= MAX_LAYERS || busyId !== null || !snapshot.readable
+                }
+                onBlank={() => {
+                  setPresetSeed(null);
+                  setEditing("new");
+                }}
+                onPreset={(body, title) => {
+                  setPresetSeed({ body, title });
+                  setEditing("new");
+                }}
               />
             ) : null}
           </div>
@@ -855,38 +965,59 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
             the user to go delete their own instructions by hand, the panel offers
             to import them - previewed first, written only on confirmation.
           */}
-          {snapshot.developerInstructionsState === "external" && snapshot.modelInstructionsFile === null && (
-            <div className="codex-set-custom__adopt">
-              <p className="muted small">{t("codexSet.custom.notOwned")}</p>
-              {adoptRefusal && (
-                // Path and line, so the user can go find the text and move it by hand.
-                // "Could not be imported" alone leaves them with nothing to act on.
-                <p className="muted small codex-set-custom__adopt-refusal">
-                  {t("codexSet.custom.adoptUnsupported", {
-                    path: adoptRefusal.path ?? "",
-                    line: adoptRefusal.line ?? 0,
-                  })}
-                </p>
-              )}
-              {adoptPreview ? (
-                <>
-                  <pre className="api-code codex-set-custom__adopt-preview">{adoptPreview.decodedBody}</pre>
-                  <div className="modal-actions">
-                    <button type="button" className="btn btn-primary btn-sm" disabled={busyId !== null} onClick={() => { void adopt(true); }}>
-                      {t("codexSet.custom.adoptConfirm")}
-                    </button>
-                    <button type="button" className="btn btn-sm" onClick={() => setAdoptPreview(null)}>
-                      {t("common.cancel")}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <button type="button" className="btn btn-sm" disabled={busyId !== null} onClick={() => { void adopt(false); }}>
-                  {t("codexSet.custom.adopt")}
-                </button>
-              )}
-            </div>
-          )}
+          {snapshot.developerInstructionsState === "external" &&
+            snapshot.modelInstructionsFile === null && (
+              <div className="codex-set-custom__adopt">
+                <p className="muted small">{t("codexSet.custom.notOwned")}</p>
+                {adoptRefusal && (
+                  // Path and line, so the user can go find the text and move it by hand.
+                  // "Could not be imported" alone leaves them with nothing to act on.
+                  <p className="muted small codex-set-custom__adopt-refusal">
+                    {t("codexSet.custom.adoptUnsupported", {
+                      path: adoptRefusal.path ?? "",
+                      line: adoptRefusal.line ?? 0,
+                    })}
+                  </p>
+                )}
+                {adoptPreview ? (
+                  <>
+                    <pre className="api-code codex-set-custom__adopt-preview">
+                      {adoptPreview.decodedBody}
+                    </pre>
+                    <div className="modal-actions">
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        disabled={busyId !== null}
+                        onClick={() => {
+                          void adopt(true);
+                        }}
+                      >
+                        {t("codexSet.custom.adoptConfirm")}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        onClick={() => setAdoptPreview(null)}
+                      >
+                        {t("common.cancel")}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    disabled={busyId !== null}
+                    onClick={() => {
+                      void adopt(false);
+                    }}
+                  >
+                    {t("codexSet.custom.adopt")}
+                  </button>
+                )}
+              </div>
+            )}
 
           {/*
             "Replaced outside opencodex" is only true for the EXTERNAL selection:
@@ -895,8 +1026,7 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
           */}
           {snapshot.baseSelection.kind === "external" && (
             <p className="muted small codex-set-custom__replaced">
-              {t("codexSet.custom.baseReplaced", { path: snapshot.baseSelection.path })}
-              {" "}
+              {t("codexSet.custom.baseReplaced", { path: snapshot.baseSelection.path })}{" "}
               {/* The affordance lives in the base prompt's own dialog; pointing
                   there beats duplicating the whole preview-confirm flow here. */}
               <button
@@ -918,11 +1048,16 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
                 total={snapshot.custom.length}
                 busy={busyId !== null || !snapshot.readable}
                 onToggle={(id, enabled) => {
-                  void writeCustom(snapshot.custom.map(l => (l.id === id ? { ...l, enabled } : l)), id);
+                  void writeCustom(
+                    snapshot.custom.map((l) => (l.id === id ? { ...l, enabled } : l)),
+                    id,
+                  );
                 }}
                 onEdit={setEditing}
                 onDelete={setConfirmingDelete}
-                onMove={(id, delta) => { void writeCustom(moveLayer(snapshot.custom, id, delta), id); }}
+                onMove={(id, delta) => {
+                  void writeCustom(moveLayer(snapshot.custom, id, delta), id);
+                }}
               />
             ))}
           </ul>
@@ -933,23 +1068,33 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
             its 128 KB cap - belongs on it. Over the cap the next write would be
             refused, so it renders as an error, not a stat.
           */}
-          {snapshot.custom.length > 0 && (() => {
-            const composed = composeBodies(snapshot.custom);
-            const composedBytes = utf8Length(composed);
-            return (
-              <>
-                <p className={composedBytes > MAX_COMPOSED_BYTES ? "notice notice-err" : "muted small"}>
-                  {t("codexSet.custom.composedSize", { bytes: composedBytes, max: MAX_COMPOSED_BYTES })}
-                </p>
-                {composed.length > 0 && (
-                  <details className="codex-set-custom__preview">
-                    <summary className="muted small">{t("codexSet.custom.composedPreview")}</summary>
-                    <pre className="api-code codex-set-custom__preview-body">{composed}</pre>
-                  </details>
-                )}
-              </>
-            );
-          })()}
+          {snapshot.custom.length > 0 &&
+            (() => {
+              const composed = composeBodies(snapshot.custom);
+              const composedBytes = utf8Length(composed);
+              return (
+                <>
+                  <p
+                    className={
+                      composedBytes > MAX_COMPOSED_BYTES ? "notice notice-err" : "muted small"
+                    }
+                  >
+                    {t("codexSet.custom.composedSize", {
+                      bytes: composedBytes,
+                      max: MAX_COMPOSED_BYTES,
+                    })}
+                  </p>
+                  {composed.length > 0 && (
+                    <details className="codex-set-custom__preview">
+                      <summary className="muted small">
+                        {t("codexSet.custom.composedPreview")}
+                      </summary>
+                      <pre className="api-code codex-set-custom__preview-body">{composed}</pre>
+                    </details>
+                  )}
+                </>
+              );
+            })()}
 
           {deletedLayer && (
             // Short-lived undo for a delete that has no trash. The layer is
@@ -973,7 +1118,10 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
                   void (async () => {
                     const done = await writeCustom(next, layer.id);
                     if (!done) {
-                      undoTimerRef.current = setTimeout(() => setDeletedLayer(null), undoWindowMs());
+                      undoTimerRef.current = setTimeout(
+                        () => setDeletedLayer(null),
+                        undoWindowMs(),
+                      );
                       return;
                     }
                     setDeletedLayer(null);
@@ -999,19 +1147,24 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
                 Name the row. A generic "delete this layer?" sitting under a list of
                 long titles leaves the user guessing which one is pending.
               */}
-              <span id="codex-set-delete-confirm">{t("codexSet.custom.deleteConfirmNamed", {
-                title: snapshot.custom.find(l => l.id === confirmingDelete)?.title ?? "",
-              })}</span>
+              <span id="codex-set-delete-confirm">
+                {t("codexSet.custom.deleteConfirmNamed", {
+                  title: snapshot.custom.find((l) => l.id === confirmingDelete)?.title ?? "",
+                })}
+              </span>
               <button
                 type="button"
                 className="btn btn-danger btn-sm"
                 onClick={() => {
                   const id = confirmingDelete;
-                  const index = snapshot.custom.findIndex(l => l.id === id);
+                  const index = snapshot.custom.findIndex((l) => l.id === id);
                   const removed = index >= 0 ? snapshot.custom[index]! : null;
                   setConfirmingDelete(null);
                   void (async () => {
-                    const done = await writeCustom(snapshot.custom.filter(l => l.id !== id), id);
+                    const done = await writeCustom(
+                      snapshot.custom.filter((l) => l.id !== id),
+                      id,
+                    );
                     // The undo offer only stands once the delete actually landed:
                     // restoring a row that was never removed would just be a write.
                     if (!done || !removed) return;
@@ -1023,7 +1176,11 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
               >
                 {t("common.delete")}
               </button>
-              <button type="button" className="btn btn-sm" onClick={() => setConfirmingDelete(null)}>
+              <button
+                type="button"
+                className="btn btn-sm"
+                onClick={() => setConfirmingDelete(null)}
+              >
                 {t("common.cancel")}
               </button>
             </div>
@@ -1040,16 +1197,26 @@ export default function CodexSetPrompt({ apiBase }: { apiBase: string }) {
           // Navigation only exists while the edited layer is still in the list.
           // Deriving the position from a findIndex that can return -1 produced
           // "0 / 3" for a layer another tab had just deleted.
-          navigation={editingIndex >= 0 && snapshot.custom.length > 1 ? {
-            position: editingIndex + 1,
-            total: snapshot.custom.length,
-            onPrev: () => { if (editingIndex > 0) setEditing(snapshot.custom[editingIndex - 1]!.id); },
-            onNext: () => {
-              if (editingIndex < snapshot.custom.length - 1) setEditing(snapshot.custom[editingIndex + 1]!.id);
-            },
-          } : undefined}
+          navigation={
+            editingIndex >= 0 && snapshot.custom.length > 1
+              ? {
+                  position: editingIndex + 1,
+                  total: snapshot.custom.length,
+                  onPrev: () => {
+                    if (editingIndex > 0) setEditing(snapshot.custom[editingIndex - 1]!.id);
+                  },
+                  onNext: () => {
+                    if (editingIndex < snapshot.custom.length - 1)
+                      setEditing(snapshot.custom[editingIndex + 1]!.id);
+                  },
+                }
+              : undefined
+          }
           onSave={saveDraft}
-          onClose={() => { setEditing(null); setPresetSeed(null); }}
+          onClose={() => {
+            setEditing(null);
+            setPresetSeed(null);
+          }}
         />
       )}
     </div>

@@ -42,9 +42,12 @@ function CopyOnClickTip({
   const copiedTimer = useRef<number | null>(null);
   const showTip = hover || copied;
 
-  useEffect(() => () => {
-    if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
 
   useLayoutEffect(() => {
     // No reset on close: the portal and aria-describedby are already gated on showTip,
@@ -83,19 +86,20 @@ function CopyOnClickTip({
     }
   };
 
-  const tip = showTip && coords
-    ? createPortal(
-      <span
-        id={tipId}
-        className="ocx-tooltip-bubble api-copy-tip-fixed"
-        role="tooltip"
-        style={{ top: coords.top, left: coords.left }}
-      >
-        {copied ? t(copiedKey) : t(hintKey)}
-      </span>,
-      document.body,
-    )
-    : null;
+  const tip =
+    showTip && coords
+      ? createPortal(
+          <span
+            id={tipId}
+            className="ocx-tooltip-bubble api-copy-tip-fixed"
+            role="tooltip"
+            style={{ top: coords.top, left: coords.left }}
+          >
+            {copied ? t(copiedKey) : t(hintKey)}
+          </span>,
+          document.body,
+        )
+      : null;
 
   const shared = {
     ref: anchorRef as never,
@@ -104,13 +108,20 @@ function CopyOnClickTip({
     onMouseLeave: closeTip,
     onFocus: openTip,
     onBlur: closeTip,
-    onClick: (event: { currentTarget: EventTarget & Element; target: EventTarget | null; clientX: number; clientY: number }) => {
+    onClick: (event: {
+      currentTarget: EventTarget & Element;
+      target: EventTarget | null;
+      clientX: number;
+      clientY: number;
+    }) => {
       if (typeof window !== "undefined" && window.getSelection()?.toString()) return;
       const target = event.target;
       if (target instanceof HTMLElement && target !== event.currentTarget) {
         const rect = target.getBoundingClientRect();
-        if (target.scrollHeight > target.clientHeight + 1 && event.clientX >= rect.right - 16) return;
-        if (target.scrollWidth > target.clientWidth + 1 && event.clientY >= rect.bottom - 16) return;
+        if (target.scrollHeight > target.clientHeight + 1 && event.clientX >= rect.right - 16)
+          return;
+        if (target.scrollWidth > target.clientWidth + 1 && event.clientY >= rect.bottom - 16)
+          return;
       }
       void copyText();
     },

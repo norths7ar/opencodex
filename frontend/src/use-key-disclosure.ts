@@ -13,10 +13,13 @@ export function useKeyDisclosure(
 ) {
   const generation = useRef(0);
   const mounted = useRef(false);
-  const invalidate = useCallback((reason: DisclosureResetReason = "pairing") => {
-    generation.current++;
-    clear(reason);
-  }, [clear]);
+  const invalidate = useCallback(
+    (reason: DisclosureResetReason = "pairing") => {
+      generation.current++;
+      clear(reason);
+    },
+    [clear],
+  );
   const expire = useCallback(() => {
     mounted.current = false;
     generation.current++;
@@ -30,9 +33,12 @@ export function useKeyDisclosure(
 
   useEffect(() => {
     const unavailable = (event: Event) => {
-      if ((event as CustomEvent<{ plane?: string }>).detail?.plane === "shared") invalidate("session");
+      if ((event as CustomEvent<{ plane?: string }>).detail?.plane === "shared")
+        invalidate("session");
     };
-    const hidden = () => { if (hostDocumentHidden()) invalidate("lifecycle"); };
+    const hidden = () => {
+      if (hostDocumentHidden()) invalidate("lifecycle");
+    };
     window.addEventListener(SESSION_UNAVAILABLE_EVENT, unavailable);
     window.addEventListener(SESSION_CHANGED_EVENT, unavailable);
     const stopVisibility = onHostVisibilityChange(hidden);
@@ -43,7 +49,10 @@ export function useKeyDisclosure(
     };
   }, [invalidate]);
 
-  const current = useCallback((expected: number) =>
-    mounted.current && active && !hostDocumentHidden() && generation.current === expected, [active]);
+  const current = useCallback(
+    (expected: number) =>
+      mounted.current && active && !hostDocumentHidden() && generation.current === expected,
+    [active],
+  );
   return { generation, invalidate, current };
 }

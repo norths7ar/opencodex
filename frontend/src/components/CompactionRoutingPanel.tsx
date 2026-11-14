@@ -6,7 +6,12 @@ import { createBoundedFetch } from "../bounded-fetch";
 import { requireJson, type ModelInfo } from "../pages/dashboard-shared";
 import { formatNamespacedModelId } from "../provider-icons";
 
-type Setting = { model: string; reasoningEffort?: string; triggers?: string[]; sourceModels?: string[] } | null;
+type Setting = {
+  model: string;
+  reasoningEffort?: string;
+  triggers?: string[];
+  sourceModels?: string[];
+} | null;
 const EFFORTS = ["none", "minimal", "low", "medium", "high", "xhigh", "max", "ultra"];
 const TRIGGERS = ["manual", "auto"];
 const SOURCE_RENDER_CAP = 300;
@@ -16,9 +21,9 @@ const SOURCE_RENDER_CAP = 300;
  */
 const TRIGGER_CHOICES = ["manual", "manual+auto", "auto"] as const;
 const TRIGGER_LABELS: Record<string, TKey> = {
-  "manual": "compactionRouting.triggersManual",
+  manual: "compactionRouting.triggersManual",
   "manual+auto": "compactionRouting.triggersBoth",
-  "auto": "compactionRouting.triggersAuto",
+  auto: "compactionRouting.triggersAuto",
 };
 /**
  * "all" is sent as an omitted `sourceModels`, so the default save keeps the exact payload the
@@ -27,14 +32,14 @@ const TRIGGER_LABELS: Record<string, TKey> = {
  */
 const SCOPE_CHOICES = ["all", "selected"] as const;
 const SCOPE_LABELS: Record<string, TKey> = {
-  "all": "compactionRouting.sourcesAll",
-  "selected": "compactionRouting.sourcesSelected",
+  all: "compactionRouting.sourcesAll",
+  selected: "compactionRouting.sourcesSelected",
 };
 
 function triggersToChoice(value: string[] | undefined): string {
   if (!value) return "manual";
   const auto = value.includes("auto");
-  return value.includes("manual") ? (auto ? "manual+auto" : "manual") : (auto ? "auto" : "manual");
+  return value.includes("manual") ? (auto ? "manual+auto" : "manual") : auto ? "auto" : "manual";
 }
 
 function choiceToTriggers(choice: string): string[] | undefined {
@@ -46,18 +51,35 @@ function choiceToTriggers(choice: string): string[] | undefined {
 function readSetting(payload: { compactionRouting?: unknown }): Setting {
   const value = payload.compactionRouting;
   if (value == null) return null;
-  if (!value || typeof value !== "object" || !("model" in value) || typeof value.model !== "string" || !value.model.trim()) {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("model" in value) ||
+    typeof value.model !== "string" ||
+    !value.model.trim()
+  ) {
     throw new Error("invalid settings");
   }
   const effort = "reasoningEffort" in value ? value.reasoningEffort : undefined;
-  if (effort !== undefined && (typeof effort !== "string" || !EFFORTS.includes(effort))) throw new Error("invalid effort");
+  if (effort !== undefined && (typeof effort !== "string" || !EFFORTS.includes(effort)))
+    throw new Error("invalid effort");
   const triggers = "triggers" in value ? value.triggers : undefined;
   const sourceModels = "sourceModels" in value ? value.sourceModels : undefined;
-  if (sourceModels !== undefined && (!Array.isArray(sourceModels) || !sourceModels.length
-    || !sourceModels.every(entry => typeof entry === "string" && entry.trim()))) throw new Error("invalid sourceModels");
-  if (triggers !== undefined && (!Array.isArray(triggers) || triggers.length === 0
-    || !triggers.every(entry => typeof entry === "string" && TRIGGERS.includes(entry))
-    || new Set(triggers).size !== triggers.length)) throw new Error("invalid triggers");
+  if (
+    sourceModels !== undefined &&
+    (!Array.isArray(sourceModels) ||
+      !sourceModels.length ||
+      !sourceModels.every((entry) => typeof entry === "string" && entry.trim()))
+  )
+    throw new Error("invalid sourceModels");
+  if (
+    triggers !== undefined &&
+    (!Array.isArray(triggers) ||
+      triggers.length === 0 ||
+      !triggers.every((entry) => typeof entry === "string" && TRIGGERS.includes(entry)) ||
+      new Set(triggers).size !== triggers.length)
+  )
+    throw new Error("invalid triggers");
   return {
     model: value.model,
     ...(effort ? { reasoningEffort: effort as string } : {}),
@@ -81,11 +103,23 @@ function endpointLabel(name: string, hosts: ReadonlyMap<string, string>): string
   return host ? `${name} (${host})` : name;
 }
 
-export default function CompactionRoutingPanel(props: { apiBase: string; models: ModelInfo[]; providers?: Array<{ name: string; baseUrl: string }> }) {
+export default function CompactionRoutingPanel(props: {
+  apiBase: string;
+  models: ModelInfo[];
+  providers?: Array<{ name: string; baseUrl: string }>;
+}) {
   return <CompactionRoutingControls key={props.apiBase} {...props} />;
 }
 
-function CompactionRoutingControls({ apiBase, models, providers: providerList = [] }: { apiBase: string; models: ModelInfo[]; providers?: Array<{ name: string; baseUrl: string }> }) {
+function CompactionRoutingControls({
+  apiBase,
+  models,
+  providers: providerList = [],
+}: {
+  apiBase: string;
+  models: ModelInfo[];
+  providers?: Array<{ name: string; baseUrl: string }>;
+}) {
   const t = useT();
   const [saved, setSaved] = useState<Setting | undefined>(undefined);
   const [model, setModel] = useState("");
@@ -110,9 +144,11 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
   }, []);
 
   const toggleSource = (selector: string) => {
-    setSources(current => current.includes(selector)
-      ? current.filter(entry => entry !== selector)
-      : [...current, selector]);
+    setSources((current) =>
+      current.includes(selector)
+        ? current.filter((entry) => entry !== selector)
+        : [...current, selector],
+    );
     setFeedback(null);
   };
 
@@ -135,7 +171,9 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
 
   useEffect(() => {
     active.current = true;
-    const timer = window.setTimeout(() => { void load(); }, 0);
+    const timer = window.setTimeout(() => {
+      void load();
+    }, 0);
     return () => {
       window.clearTimeout(timer);
       active.current = false;
@@ -158,11 +196,11 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
         body: JSON.stringify({
           compactionRouting: model
             ? {
-              model,
-              ...(effort ? { reasoningEffort: effort } : {}),
-              ...(choiceToTriggers(triggers) ? { triggers: choiceToTriggers(triggers) } : {}),
-              ...(scope === "selected" && sources.length > 0 ? { sourceModels: sources } : {}),
-            }
+                model,
+                ...(effort ? { reasoningEffort: effort } : {}),
+                ...(choiceToTriggers(triggers) ? { triggers: choiceToTriggers(triggers) } : {}),
+                ...(scope === "selected" && sources.length > 0 ? { sourceModels: sources } : {}),
+              }
             : null,
         }),
         signal: request.signal,
@@ -181,57 +219,84 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
     }
   };
 
-  const options = [{ value: "", label: t("compactionRouting.currentModel") },
-    ...[...new Set([...models.map(item => item.namespaced), ...(model ? [model] : [])])]
-      .map(value => ({ value, label: formatNamespacedModelId(value, t) }))];
+  const options = [
+    { value: "", label: t("compactionRouting.currentModel") },
+    ...[...new Set([...models.map((item) => item.namespaced), ...(model ? [model] : [])])].map(
+      (value) => ({ value, label: formatNamespacedModelId(value, t) }),
+    ),
+  ];
   // Configured providers count even without a catalog row: they can still serve
   // provider-qualified ids, so their wildcard must be selectable here.
-  const providerWildcards = [...new Set([
-    ...providerList.map(provider => provider.name),
-    ...models.flatMap(item => item.provider ? [item.provider] : []),
-  ])].map(provider => `${provider}/*`);
-  const knownSelectors = new Set([...providerWildcards, ...models.map(item => item.namespaced)]);
+  const providerWildcards = [
+    ...new Set([
+      ...providerList.map((provider) => provider.name),
+      ...models.flatMap((item) => (item.provider ? [item.provider] : [])),
+    ]),
+  ].map((provider) => `${provider}/*`);
+  const knownSelectors = new Set([...providerWildcards, ...models.map((item) => item.namespaced)]);
   // Saved selectors the catalog no longer lists stay visible, so saving never drops them by
   // omission and the operator removes them deliberately.
-  const savedOnlySelectors = (saved?.sourceModels ?? []).filter(selector => !knownSelectors.has(selector));
+  const savedOnlySelectors = (saved?.sourceModels ?? []).filter(
+    (selector) => !knownSelectors.has(selector),
+  );
   const disabled = busy || saved === undefined || loadError;
   const savedScope = saved?.sourceModels ? "selected" : "all";
   const savedSources = new Set(saved?.sourceModels);
-  const dirty = model !== (saved?.model ?? "")
-    || effort !== (saved?.reasoningEffort ?? "")
-    || triggers !== triggersToChoice(saved?.triggers)
-    || scope !== savedScope
-    || (scope === "selected"
-      && (sources.length !== (saved?.sourceModels?.length ?? 0)
-        || sources.some(selector => !savedSources.has(selector))));
+  const dirty =
+    model !== (saved?.model ?? "") ||
+    effort !== (saved?.reasoningEffort ?? "") ||
+    triggers !== triggersToChoice(saved?.triggers) ||
+    scope !== savedScope ||
+    (scope === "selected" &&
+      (sources.length !== (saved?.sourceModels?.length ?? 0) ||
+        sources.some((selector) => !savedSources.has(selector))));
   const scopeEmpty = scope === "selected" && sources.length === 0;
   const selectedSources = new Set(sources);
-  const filteredSources = [...new Set(models.map(item => item.namespaced))]
-    .filter(selector => selector.toLowerCase().includes(sourceQuery.trim().toLowerCase()));
+  const filteredSources = [...new Set(models.map((item) => item.namespaced))].filter((selector) =>
+    selector.toLowerCase().includes(sourceQuery.trim().toLowerCase()),
+  );
   const sourceRow = (selector: string) => (
     <label key={selector}>
-      <input type="checkbox" checked={selectedSources.has(selector)} disabled={disabled}
-        onChange={() => { toggleSource(selector); }} />
+      <input
+        type="checkbox"
+        checked={selectedSources.has(selector)}
+        disabled={disabled}
+        onChange={() => {
+          toggleSource(selector);
+        }}
+      />
       <span>{selector}</span>
     </label>
   );
   const namespace = model.slice(0, Math.max(model.indexOf("/"), 0));
-  const endpointHosts = new Map(providerList.map(entry => [entry.name, hostOf(entry.baseUrl)] as const).filter(([, host]) => host));
+  const endpointHosts = new Map(
+    providerList
+      .map((entry) => [entry.name, hostOf(entry.baseUrl)] as const)
+      .filter(([, host]) => host),
+  );
   const provider = endpointLabel(namespace || model, endpointHosts);
   const routesAutomatic = triggers !== "manual";
   const scopedSources = sources.join(", ");
   // A scoped override only covers the checked sources, so the disclosure names them instead of
   // claiming every request; an empty selection covers nothing and shows no destination claim.
-  const warningText = !model || scopeEmpty ? null
-    : (scope === "selected"
+  const warningText =
+    !model || scopeEmpty
+      ? null
+      : scope === "selected"
         ? t("compactionRouting.providerWarningScoped", { provider, sources: scopedSources })
-        : t("compactionRouting.providerWarning", { provider }));
+        : t("compactionRouting.providerWarning", { provider });
 
   return (
-    <section className="panel" aria-labelledby="compaction-routing-title" aria-busy={busy || (saved === undefined && !loadError)}>
+    <section
+      className="panel"
+      aria-labelledby="compaction-routing-title"
+      aria-busy={busy || (saved === undefined && !loadError)}
+    >
       <div className="spread" style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 20rem", minWidth: 0 }}>
-          <div className="font-semibold" id="compaction-routing-title">{t("compactionRouting.title")}</div>
+          <div className="font-semibold" id="compaction-routing-title">
+            {t("compactionRouting.title")}
+          </div>
           <div className="muted setting-hint">{t("compactionRouting.description")}</div>
           {/* The policy text stays one click away so the controls are not buried under it. */}
           <details className="pv2-more">
@@ -241,68 +306,185 @@ function CompactionRoutingControls({ apiBase, models, providers: providerList = 
             <div className="muted setting-hint">{t("compactionRouting.sourcesHint")}</div>
           </details>
         </div>
-        <div className="dash-delegation-controls compaction-routing-controls" style={{ flex: "0 1 auto" }}>
+        <div
+          className="dash-delegation-controls compaction-routing-controls"
+          style={{ flex: "0 1 auto" }}
+        >
           <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-model">{t("compactionRouting.model")}</label>
-            <Select id="compaction-routing-model" value={model} options={options} disabled={disabled}
+            <label className="field-label" htmlFor="compaction-routing-model">
+              {t("compactionRouting.model")}
+            </label>
+            <Select
+              id="compaction-routing-model"
+              value={model}
+              options={options}
+              disabled={disabled}
               label={t("compactionRouting.model")}
-              onChange={value => { setModel(value); if (!value) { setEffort(""); setTriggers("manual"); setScope("all"); setSources([]); } setFeedback(null); }} />
+              onChange={(value) => {
+                setModel(value);
+                if (!value) {
+                  setEffort("");
+                  setTriggers("manual");
+                  setScope("all");
+                  setSources([]);
+                }
+                setFeedback(null);
+              }}
+            />
           </div>
           <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-triggers">{t("compactionRouting.triggers")}</label>
-            <Select id="compaction-routing-triggers" value={triggers} disabled={disabled || !model} align="right"
+            <label className="field-label" htmlFor="compaction-routing-triggers">
+              {t("compactionRouting.triggers")}
+            </label>
+            <Select
+              id="compaction-routing-triggers"
+              value={triggers}
+              disabled={disabled || !model}
+              align="right"
               label={t("compactionRouting.triggers")}
-              options={TRIGGER_CHOICES.map(value => ({ value, label: t(TRIGGER_LABELS[value]!) }))}
-              onChange={value => { setTriggers(value); setFeedback(null); }} />
+              options={TRIGGER_CHOICES.map((value) => ({
+                value,
+                label: t(TRIGGER_LABELS[value]!),
+              }))}
+              onChange={(value) => {
+                setTriggers(value);
+                setFeedback(null);
+              }}
+            />
           </div>
           <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-sources">{t("compactionRouting.sources")}</label>
-            <Select id="compaction-routing-sources" value={scope} disabled={disabled || !model} align="right"
+            <label className="field-label" htmlFor="compaction-routing-sources">
+              {t("compactionRouting.sources")}
+            </label>
+            <Select
+              id="compaction-routing-sources"
+              value={scope}
+              disabled={disabled || !model}
+              align="right"
               label={t("compactionRouting.sources")}
-              options={SCOPE_CHOICES.map(value => ({ value, label: t(SCOPE_LABELS[value]!) }))}
-              onChange={value => { setScope(value); setFeedback(null); }} />
+              options={SCOPE_CHOICES.map((value) => ({ value, label: t(SCOPE_LABELS[value]!) }))}
+              onChange={(value) => {
+                setScope(value);
+                setFeedback(null);
+              }}
+            />
           </div>
           <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-effort">{t("compactionRouting.effort")}</label>
-            <Select id="compaction-routing-effort" value={effort} disabled={disabled || !model} align="right"
+            <label className="field-label" htmlFor="compaction-routing-effort">
+              {t("compactionRouting.effort")}
+            </label>
+            <Select
+              id="compaction-routing-effort"
+              value={effort}
+              disabled={disabled || !model}
+              align="right"
               label={t("compactionRouting.effort")}
-              options={[{ value: "", label: t("compactionRouting.currentEffort") }, ...EFFORTS.map(value => ({ value, label: t(`models.reasoningEffort.${value}` as TKey) }))]}
-              onChange={value => { setEffort(value); setFeedback(null); }} />
+              options={[
+                { value: "", label: t("compactionRouting.currentEffort") },
+                ...EFFORTS.map((value) => ({
+                  value,
+                  label: t(`models.reasoningEffort.${value}` as TKey),
+                })),
+              ]}
+              onChange={(value) => {
+                setEffort(value);
+                setFeedback(null);
+              }}
+            />
           </div>
-          <button type="button" className="btn btn-primary btn-sm" disabled={disabled || !dirty || scopeEmpty} onClick={() => { void save(); }}>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            disabled={disabled || !dirty || scopeEmpty}
+            onClick={() => {
+              void save();
+            }}
+          >
             {busy ? t("common.saving") : t("common.save")}
           </button>
         </div>
       </div>
-      {model && scope === "selected" && <div className="compaction-sources-block">
-        <div className="field-label compaction-sources-title">{t("compactionRouting.sourcesGridTitle")}</div>
-        <div className="source-scope-groups">
-          {providerWildcards.length > 0 && <fieldset className="source-scope-group">
-            <legend className="field-label">{t("compactionRouting.sourcesProviders")}</legend>
-            {providerWildcards.map(sourceRow)}
-          </fieldset>}
-          {models.length > 0 && <fieldset className="source-scope-group">
-            <legend className="field-label">{t("compactionRouting.sourcesModels")}</legend>
-            <input type="search" className="input" value={sourceQuery} disabled={disabled}
-              aria-label={t("pws.modelSearchPlaceholder")} placeholder={t("pws.modelSearchPlaceholder")}
-              onChange={event => setSourceQuery(event.target.value)} />
-            {filteredSources.slice(0, SOURCE_RENDER_CAP).map(sourceRow)}
-            {filteredSources.length > SOURCE_RENDER_CAP && <p className="muted text-label">
-              {t("pws.modelsTruncated", { shown: SOURCE_RENDER_CAP, total: filteredSources.length })}
-            </p>}
-          </fieldset>}
-          {savedOnlySelectors.length > 0 && <fieldset className="source-scope-group">
-            <legend className="field-label">{t("compactionRouting.sourcesSaved")}</legend>
-            {savedOnlySelectors.map(sourceRow)}
-          </fieldset>}
-          {scopeEmpty && <div className="muted setting-hint">{t("compactionRouting.sourcesNone")}</div>}
+      {model && scope === "selected" && (
+        <div className="compaction-sources-block">
+          <div className="field-label compaction-sources-title">
+            {t("compactionRouting.sourcesGridTitle")}
+          </div>
+          <div className="source-scope-groups">
+            {providerWildcards.length > 0 && (
+              <fieldset className="source-scope-group">
+                <legend className="field-label">{t("compactionRouting.sourcesProviders")}</legend>
+                {providerWildcards.map(sourceRow)}
+              </fieldset>
+            )}
+            {models.length > 0 && (
+              <fieldset className="source-scope-group">
+                <legend className="field-label">{t("compactionRouting.sourcesModels")}</legend>
+                <input
+                  type="search"
+                  className="input"
+                  value={sourceQuery}
+                  disabled={disabled}
+                  aria-label={t("pws.modelSearchPlaceholder")}
+                  placeholder={t("pws.modelSearchPlaceholder")}
+                  onChange={(event) => setSourceQuery(event.target.value)}
+                />
+                {filteredSources.slice(0, SOURCE_RENDER_CAP).map(sourceRow)}
+                {filteredSources.length > SOURCE_RENDER_CAP && (
+                  <p className="muted text-label">
+                    {t("pws.modelsTruncated", {
+                      shown: SOURCE_RENDER_CAP,
+                      total: filteredSources.length,
+                    })}
+                  </p>
+                )}
+              </fieldset>
+            )}
+            {savedOnlySelectors.length > 0 && (
+              <fieldset className="source-scope-group">
+                <legend className="field-label">{t("compactionRouting.sourcesSaved")}</legend>
+                {savedOnlySelectors.map(sourceRow)}
+              </fieldset>
+            )}
+            {scopeEmpty && (
+              <div className="muted setting-hint">{t("compactionRouting.sourcesNone")}</div>
+            )}
+          </div>
         </div>
-      </div>}
-      {warningText && <div className="notice-warn" role="note" style={{ marginTop: 12 }}><IconAlert width={14} /> {warningText}</div>}
-      {model && routesAutomatic && <div className="notice-warn" role="note" style={{ marginTop: 12 }}><IconAlert width={14} /> {t("compactionRouting.autoNotice")}</div>}
-      {loadError && <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>{t("compactionRouting.loadFailed")} <button type="button" className="btn btn-ghost btn-sm" onClick={() => { void load(); }}>{t("common.retry")}</button></div>}
-      {feedback === "failed" && <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>{t("compactionRouting.saveFailed")}</div>}
-      {feedback === "saved" && <div className="muted setting-hint" role="status">{t("compactionRouting.saved")}</div>}
+      )}
+      {warningText && (
+        <div className="notice-warn" role="note" style={{ marginTop: 12 }}>
+          <IconAlert width={14} /> {warningText}
+        </div>
+      )}
+      {model && routesAutomatic && (
+        <div className="notice-warn" role="note" style={{ marginTop: 12 }}>
+          <IconAlert width={14} /> {t("compactionRouting.autoNotice")}
+        </div>
+      )}
+      {loadError && (
+        <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>
+          {t("compactionRouting.loadFailed")}{" "}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              void load();
+            }}
+          >
+            {t("common.retry")}
+          </button>
+        </div>
+      )}
+      {feedback === "failed" && (
+        <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>
+          {t("compactionRouting.saveFailed")}
+        </div>
+      )}
+      {feedback === "saved" && (
+        <div className="muted setting-hint" role="status">
+          {t("compactionRouting.saved")}
+        </div>
+      )}
     </section>
   );
 }

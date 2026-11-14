@@ -37,8 +37,18 @@ export type ProtocolPlanResult =
 const CACHE_LIMIT = 32;
 const planCache = new Map<string, ProtocolPlanV1>();
 
-export function protocolPlanCacheKey(apiBase: string, query: ProtocolPlanQuery, policyRevision: string): string {
-  return JSON.stringify([apiBase, query.model, query.inbound, [...new Set(query.features)].sort(), policyRevision]);
+export function protocolPlanCacheKey(
+  apiBase: string,
+  query: ProtocolPlanQuery,
+  policyRevision: string,
+): string {
+  return JSON.stringify([
+    apiBase,
+    query.model,
+    query.inbound,
+    [...new Set(query.features)].sort(),
+    policyRevision,
+  ]);
 }
 
 function remember(key: string, plan: ProtocolPlanV1): void {
@@ -62,7 +72,8 @@ function isRec(value: unknown): value is Rec {
 }
 
 export function parseProtocolInfo(value: unknown): ProtocolInfo | null {
-  if (!isRec(value) || value.schemaVersion !== 1 || typeof value.policyRevision !== "string") return null;
+  if (!isRec(value) || value.schemaVersion !== 1 || typeof value.policyRevision !== "string")
+    return null;
   if (!Array.isArray(value.features) || !value.features.every(isProtocolFeature)) return null;
   if (!isRec(value.surfaces)) return null;
   const surfaces = {} as Record<Protocol, { enabled: boolean }>;
@@ -75,7 +86,10 @@ export function parseProtocolInfo(value: unknown): ProtocolInfo | null {
 }
 
 /** `null` when the server has no protocol routes; throws on any other failure. */
-export async function fetchProtocolInfo(apiBase: string, signal?: AbortSignal): Promise<ProtocolInfo | null> {
+export async function fetchProtocolInfo(
+  apiBase: string,
+  signal?: AbortSignal,
+): Promise<ProtocolInfo | null> {
   const res = await fetch(`${apiBase}/api/protocols`, { signal });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -102,7 +116,11 @@ export async function fetchProtocolPlan(
     const res = await fetch(`${apiBase}/api/protocols/plan`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ model: query.model, inbound: query.inbound, features: [...query.features] }),
+      body: JSON.stringify({
+        model: query.model,
+        inbound: query.inbound,
+        features: [...query.features],
+      }),
       signal,
     });
     if (res.status === 404) return { kind: "unavailable" };
@@ -146,7 +164,10 @@ export async function patchProtocolSettings(
     if (res.status === 404 || res.status === 405) return { kind: "unavailable" };
     const payload: unknown = await res.json().catch(() => null);
     if (!res.ok) {
-      const code = isRec(payload) && isRec(payload.error) && typeof payload.error.code === "string" ? payload.error.code : undefined;
+      const code =
+        isRec(payload) && isRec(payload.error) && typeof payload.error.code === "string"
+          ? payload.error.code
+          : undefined;
       return code ? { kind: "error", code } : { kind: "error" };
     }
     const info = parseProtocolInfo(payload);
@@ -175,12 +196,16 @@ export async function fetchProtocolProviderSummary(
   signal?: AbortSignal,
 ): Promise<ProtocolProviderSummaryResult> {
   try {
-    const res = await fetch(`${apiBase}/api/protocols?${new URLSearchParams({ provider }).toString()}`, { signal });
+    const res = await fetch(
+      `${apiBase}/api/protocols?${new URLSearchParams({ provider }).toString()}`,
+      { signal },
+    );
     if (res.status === 404) return { kind: "unavailable" };
     if (!res.ok) return { kind: "error" };
     const payload: unknown = await res.json();
     if (!isRec(payload) || payload.provider === undefined) return { kind: "unavailable" };
-    if (!isProtocolProviderSummaryV1(payload.provider) || payload.provider.name !== provider) return { kind: "error" };
+    if (!isProtocolProviderSummaryV1(payload.provider) || payload.provider.name !== provider)
+      return { kind: "error" };
     return { kind: "summary", summary: payload.provider };
   } catch (error) {
     if (error instanceof DOMException && error.name === "AbortError") throw error;

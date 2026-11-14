@@ -26,7 +26,15 @@ const stepButton = cn(
  * value can be nudged without typing. The parent owns parsing and clamping.
  */
 export function StepperInput({
-  decrementLabel, incrementLabel, onDecrement, onIncrement, stepDisabled, unit, className, inputClassName, ...input
+  decrementLabel,
+  incrementLabel,
+  onDecrement,
+  onIncrement,
+  stepDisabled,
+  unit,
+  className,
+  inputClassName,
+  ...input
 }: StepperInputProps) {
   return (
     <span
@@ -43,7 +51,7 @@ export function StepperInput({
         className={cn(stepButton, "border-r border-line")}
         disabled={stepDisabled}
         aria-label={decrementLabel}
-        onMouseDown={event => event.preventDefault()}
+        onMouseDown={(event) => event.preventDefault()}
         onClick={onDecrement}
       >
         <IconMinus aria-hidden="true" />
@@ -58,14 +66,16 @@ export function StepperInput({
             inputClassName,
           )}
         />
-        {unit && <span className="pr-2 font-mono text-[12px] text-fg-subtle select-none">{unit}</span>}
+        {unit && (
+          <span className="pr-2 font-mono text-[12px] text-fg-subtle select-none">{unit}</span>
+        )}
       </span>
       <button
         type="button"
         className={cn(stepButton, "border-l border-line")}
         disabled={stepDisabled}
         aria-label={incrementLabel}
-        onMouseDown={event => event.preventDefault()}
+        onMouseDown={(event) => event.preventDefault()}
         onClick={onIncrement}
       >
         <IconPlus aria-hidden="true" />

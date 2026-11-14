@@ -1,10 +1,18 @@
 import AddProviderModal from "../components/AddProviderModal";
-import ProviderModelsNotice, { type ProviderModelsNoticeProps } from "../components/ProviderModelsNotice";
+import ProviderModelsNotice, {
+  type ProviderModelsNoticeProps,
+} from "../components/ProviderModelsNotice";
 import AddCodexAccountModal from "../components/AddCodexAccountModal";
 import OAuthTosWarningModal from "../components/OAuthTosWarningModal";
-import { RemoveConfirmDialog, UnsavedLeaveDialog } from "../components/provider-workspace/ProviderDialogs";
+import {
+  RemoveConfirmDialog,
+  UnsavedLeaveDialog,
+} from "../components/provider-workspace/ProviderDialogs";
 import type { AddProviderIntent } from "../components/provider-workspace/ProviderWorkspaceShell";
-import type { AccountLoginRow, AccountLoginStatus } from "../components/provider-catalog/ProviderCatalog";
+import type {
+  AccountLoginRow,
+  AccountLoginStatus,
+} from "../components/provider-catalog/ProviderCatalog";
 import type { CatalogLoginHint } from "../components/provider-catalog/login-hint-visibility";
 import type { ProvidersConfig } from "./providers-shared";
 import { oauthLabel } from "./providers-shared";

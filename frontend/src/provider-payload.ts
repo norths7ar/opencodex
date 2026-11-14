@@ -39,21 +39,22 @@ export function codexAccountProviderNames(
   const configuredForward = Object.entries(providers)
     .filter(([, provider]) => provider.authMode === "forward")
     .map(([name]) => name)
-    .filter(name => name !== "openai")
+    .filter((name) => name !== "openai")
     .sort((a, b) => a.localeCompare(b));
   return ["openai", ...configuredForward];
 }
 
 export function openAiAccountProviderState(
-  provider: { adapter?: string; authMode?: string; baseUrl?: string; disabled?: boolean } | undefined,
+  provider:
+    { adapter?: string; authMode?: string; baseUrl?: string; disabled?: boolean } | undefined,
 ): "absent" | "disabled" | "ready" | "invalid" {
   if (!provider) return "absent";
   // Disabled and enabled rows share one canonical gate: adapter + authMode + baseUrl.
   if (
-    provider.adapter !== "openai-responses"
-    || provider.authMode !== "forward"
-    || typeof provider.baseUrl !== "string"
-    || normalizedBaseUrl(provider.baseUrl) !== CODEX_FORWARD_BASE_URL
+    provider.adapter !== "openai-responses" ||
+    provider.authMode !== "forward" ||
+    typeof provider.baseUrl !== "string" ||
+    normalizedBaseUrl(provider.baseUrl) !== CODEX_FORWARD_BASE_URL
   ) {
     return "invalid";
   }
@@ -66,7 +67,9 @@ export function isReservedCodexForwardPreset(preset: ProviderPostPreset): boolea
   return preset.id === "openai";
 }
 
-export function codexPresetDescriptionKey(preset: ProviderPostPreset): CodexPresetDescriptionKey | null {
+export function codexPresetDescriptionKey(
+  preset: ProviderPostPreset,
+): CodexPresetDescriptionKey | null {
   if (preset.id !== "openai") return null;
   return preset.codexAccountMode === "direct" ? "prov.openaiDirectDesc" : "prov.openaiPoolDesc";
 }
@@ -99,7 +102,11 @@ export function buildProviderPayload(form: ProviderPayloadForm): ProviderPayload
   if (form.authMode === "key" && form.apiKey.trim()) {
     provider.apiKey = form.apiKey.trim();
   }
-  if (form.adapter.trim() === "anthropic" && form.authMode === "key" && form.apiKeyTransport === "bearer") {
+  if (
+    form.adapter.trim() === "anthropic" &&
+    form.authMode === "key" &&
+    form.apiKeyTransport === "bearer"
+  ) {
     provider.apiKeyTransport = "bearer";
   }
   if (form.defaultModel.trim()) {
@@ -108,7 +115,10 @@ export function buildProviderPayload(form: ProviderPayloadForm): ProviderPayload
   if (form.allowPrivateNetwork) {
     provider.allowPrivateNetwork = true;
   }
-  if (canConfigureResponsesReasoningReplay(form) && form.preserveResponsesReasoningContent === true) {
+  if (
+    canConfigureResponsesReasoningReplay(form) &&
+    form.preserveResponsesReasoningContent === true
+  ) {
     provider.preserveResponsesReasoningContent = true;
   }
 
@@ -125,9 +135,10 @@ export function buildProviderPostBody(
   return { name: form.name.trim(), provider: buildProviderPayload(form) };
 }
 
-function buildReservedProviderPostBody(
-  preset: ProviderPostPreset,
-): { name: string; provider: ProviderPayload } {
+function buildReservedProviderPostBody(preset: ProviderPostPreset): {
+  name: string;
+  provider: ProviderPayload;
+} {
   if (!preset.provider) throw new Error(`Missing canonical provider seed for ${preset.id}`);
   return {
     name: preset.id,
@@ -168,8 +179,8 @@ export async function ensureOpenAiProvider(
 
   const presetsResponse = await fetchImpl(`${apiBase}/api/provider-presets`);
   if (!presetsResponse.ok) throw new OpenAiEnableError("codexAuth.openaiPresetLoadFailed");
-  const data = await presetsResponse.json() as { providers?: ProviderPostPreset[] };
-  const preset = data.providers?.find(provider => provider.id === "openai");
+  const data = (await presetsResponse.json()) as { providers?: ProviderPostPreset[] };
+  const preset = data.providers?.find((provider) => provider.id === "openai");
   if (!preset?.provider) throw new OpenAiEnableError("codexAuth.openaiPresetUnavailable");
 
   const response = await fetchImpl(`${apiBase}/api/providers`, {

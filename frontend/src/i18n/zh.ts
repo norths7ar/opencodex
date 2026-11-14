@@ -14,7 +14,7 @@ import type { TKey } from "./en";
  * Chinese i18n catalog; must match the `TKey` set (compile-checked).
  */
 export const zh: Record<TKey, string> = {
-    "pws.firstResponse.title": "首次响应进度",
+  "pws.firstResponse.title": "首次响应进度",
   "pws.firstResponse.stepProvider": "提供商",
   "pws.firstResponse.stepModels": "模型",
   "pws.firstResponse.stepClients": "客户端路由",
@@ -39,23 +39,33 @@ export const zh: Record<TKey, string> = {
   "pws.firstResponse.probeOk": "已验证来自 {model} 的补全响应",
   "pws.firstResponse.probeFailed": "{model} 的上次补全测试失败",
   "pws.firstResponse.stepDisconnect": "断开与恢复",
-  "pws.firstResponse.disconnectNote": "在 Connect 中，关闭 Claude Code 仅会移除新 Claude 会话的代理配置块，而禁用 Codex 会停止代理路由并恢复原生 Codex 目录与会话历史；已运行的会话在重启前仍保持当前环境。禁用或移除 {provider} 不会恢复 Connect 中的客户端设置。",
-  "pws.firstResponse.probeReverify": "连接设置自上次失败测试后已更改 — 请对 {model} 重新运行测试以验证修复",
-  "pws.completion.recovery.auth": "请检查或更新此提供商的 API 密钥或账号凭据，然后对 {model} 重新运行测试。",
-  "pws.completion.recovery.rateLimit": "提供商对此请求触发了速率限制（HTTP 429）。请等待限制窗口重置或切换到其他账号或 API 密钥，然后对 {model} 重新运行测试。",
-  "pws.completion.recovery.connection": "请求超时或无法访问端点。请检查基础 URL 和网络设置，然后对 {model} 重新运行测试。",
-  "pws.completion.recovery.model": "提供商拒绝了此模型请求。请在“模型”标签页检查模型 ID 或选择其他模型，然后重新运行测试。",
-  "pws.completion.recovery.upstream": "上游提供商返回了错误或未完成的流。请对 {model} 重试测试或检查提供商设置。",
+  "pws.firstResponse.disconnectNote":
+    "在 Connect 中，关闭 Claude Code 仅会移除新 Claude 会话的代理配置块，而禁用 Codex 会停止代理路由并恢复原生 Codex 目录与会话历史；已运行的会话在重启前仍保持当前环境。禁用或移除 {provider} 不会恢复 Connect 中的客户端设置。",
+  "pws.firstResponse.probeReverify":
+    "连接设置自上次失败测试后已更改 — 请对 {model} 重新运行测试以验证修复",
+  "pws.completion.recovery.auth":
+    "请检查或更新此提供商的 API 密钥或账号凭据，然后对 {model} 重新运行测试。",
+  "pws.completion.recovery.rateLimit":
+    "提供商对此请求触发了速率限制（HTTP 429）。请等待限制窗口重置或切换到其他账号或 API 密钥，然后对 {model} 重新运行测试。",
+  "pws.completion.recovery.connection":
+    "请求超时或无法访问端点。请检查基础 URL 和网络设置，然后对 {model} 重新运行测试。",
+  "pws.completion.recovery.model":
+    "提供商拒绝了此模型请求。请在“模型”标签页检查模型 ID 或选择其他模型，然后重新运行测试。",
+  "pws.completion.recovery.upstream":
+    "上游提供商返回了错误或未完成的流。请对 {model} 重试测试或检查提供商设置。",
   "pws.completion.recovery.aborted": "测试在完成前已取消。准备好后请对 {model} 重新运行测试。",
-  "pws.completion.recovery.credentialChanged": "提供商设置或凭据在测试启动时发生了更改。请对 {model} 重新运行测试。",
-  "pws.completion.recovery.request": "无法启动测试请求。请等待正在运行的测试完成，或对 {model} 重试测试。",
+  "pws.completion.recovery.credentialChanged":
+    "提供商设置或凭据在测试启动时发生了更改。请对 {model} 重新运行测试。",
+  "pws.completion.recovery.request":
+    "无法启动测试请求。请等待正在运行的测试完成，或对 {model} 重试测试。",
   "pws.completion.recovery.fixAuth": "更新凭据",
   "pws.completion.recovery.fixSettings": "检查设置",
-"pws.completion.title": "模型响应测试",
+  "pws.completion.title": "模型响应测试",
   "pws.completion.model": "要测试的模型",
   "pws.completion.choose": "选择模型",
   "pws.completion.run": "测试模型",
-  "pws.completion.confirm": "要在 {provider} 上测试 {model} 吗？这会发送一次真实请求，输出上限为 32 个 token。测试会消耗配额，并可能产生费用。",
+  "pws.completion.confirm":
+    "要在 {provider} 上测试 {model} 吗？这会发送一次真实请求，输出上限为 32 个 token。测试会消耗配额，并可能产生费用。",
   "pws.completion.failed": "模型测试失败",
   "pws.completion.ok": "模型测试成功",
   "pws.completion.notApplicable": "不适用此测试",
@@ -79,7 +89,8 @@ export const zh: Record<TKey, string> = {
   "pws.completion.request_pacing": "已启用请求速率控制。",
   "pws.completion.custom_executor_egress": "无法保留同时使用提供商代理的自定义 fetch 执行器。",
   "pws.completion.runAll": "测试所有模型",
-  "pws.completion.allConfirm": "测试 {provider} 上全部 {count} 个模型？这会逐个发送最多 {count} 个真实请求，每个请求的输出上限为 32 个 token。部分模型可能在发送请求前被跳过。这会消耗配额并可能产生费用。",
+  "pws.completion.allConfirm":
+    "测试 {provider} 上全部 {count} 个模型？这会逐个发送最多 {count} 个真实请求，每个请求的输出上限为 32 个 token。部分模型可能在发送请求前被跳过。这会消耗配额并可能产生费用。",
   "pws.completion.stop": "停止",
   "pws.completion.progress": "正在测试 {done}/{total}…",
   "pws.completion.stopped": "已在 {done}/{total} 个模型后停止",
@@ -88,15 +99,18 @@ export const zh: Record<TKey, string> = {
   "pws.completion.failedShort": "失败",
   "pws.completion.notTested": "未测试",
   "pws.completion.disableFailed": "停用 {count} 个失败的模型",
-  "pws.completion.disableConfirm": "停用 {provider} 上未通过测试的 {count} 个模型？在模型页面重新启用之前，它们不会出现在目录和模型选择器中，但仍可按精确 id 直接调用。",
+  "pws.completion.disableConfirm":
+    "停用 {provider} 上未通过测试的 {count} 个模型？在模型页面重新启用之前，它们不会出现在目录和模型选择器中，但仍可按精确 id 直接调用。",
   "pws.completion.disabledDone": "已停用 {count} 个模型。可在模型页面重新启用。",
   "pws.completion.disableError": "无法停用失败的模型",
 
   "reasoningRetention.advanced": "高级设置",
   "reasoningRetention.title": "推理保留",
   "reasoningRetention.enable": "启用推理保留",
-  "reasoningRetention.description": "默认关闭。对于返回可读摘要的路由 v1/v2 压缩，启用后，在上下文窗口比例与 token 上限两者较小值以内的推理会随摘要作为历史上下文带回。超过上限时，推理会在本地归档并由路径说明替代。启用时的默认值：20% 和 100,000 token。不会解密提供商的私有推理；不透明的压缩输出保持原样。",
-  "reasoningRetention.storageHint": "启用后，明文推理可能会保留在本地历史记录和归档中。已完成的归档没有总大小限制或到期时间；请手动删除不需要的归档。",
+  "reasoningRetention.description":
+    "默认关闭。对于返回可读摘要的路由 v1/v2 压缩，启用后，在上下文窗口比例与 token 上限两者较小值以内的推理会随摘要作为历史上下文带回。超过上限时，推理会在本地归档并由路径说明替代。启用时的默认值：20% 和 100,000 token。不会解密提供商的私有推理；不透明的压缩输出保持原样。",
+  "reasoningRetention.storageHint":
+    "启用后，明文推理可能会保留在本地历史记录和归档中。已完成的归档没有总大小限制或到期时间；请手动删除不需要的归档。",
   "reasoningRetention.percent": "上下文窗口比例（%）",
   "reasoningRetention.tokens": "Token 上限",
   "reasoningRetention.reset": "重置并关闭",
@@ -105,18 +119,22 @@ export const zh: Record<TKey, string> = {
   "reasoningRetention.saveFailed": "无法保存推理保留设置。",
   "reasoningRetention.saved": "推理保留设置已保存。",
   "nativeReasoningRetention.title": "OpenAI 原生推理保留",
-  "nativeReasoningRetention.description": "仅适用于官方 ChatGPT 后端的原生请求，包括 Combo 和账号池中的实际目标切换。允许透传旧推理密文；能否复用由后端决定。两个选项默认关闭。",
+  "nativeReasoningRetention.description":
+    "仅适用于官方 ChatGPT 后端的原生请求，包括 Combo 和账号池中的实际目标切换。允许透传旧推理密文；能否复用由后端决定。两个选项默认关闭。",
   "nativeReasoningRetention.modelSwitch": "切换模型时保留推理密文",
   "nativeReasoningRetention.accountSwitch": "切换账号时保留推理密文（实验性）",
-  "nativeReasoningRetention.accountHint": "保留密文不会让其他账号获得旧响应 ID 或文件的访问权限。请求成功也不能证明推理已被复用。 原生压缩的处理方式保持不变。",
+  "nativeReasoningRetention.accountHint":
+    "保留密文不会让其他账号获得旧响应 ID 或文件的访问权限。请求成功也不能证明推理已被复用。 原生压缩的处理方式保持不变。",
   "nativeReasoningRetention.reset": "恢复默认",
   "nativeReasoningRetention.loadFailed": "无法加载原生推理设置。",
   "nativeReasoningRetention.saveFailed": "无法保存原生推理设置。",
   "nativeReasoningRetention.saved": "原生推理设置已保存。",
   "workflowBudget.title": "子代理工作流限制",
-  "workflowBudget.description": "按任务（即一个对话及其启动的子代理）设置的上限，在滚动的 {minutes} 分钟窗口内计数。超过上限的请求会在联系任何提供商之前于本地以 429 拒绝。更改从下一个请求开始生效；已计入的用量会保留。",
+  "workflowBudget.description":
+    "按任务（即一个对话及其启动的子代理）设置的上限，在滚动的 {minutes} 分钟窗口内计数。超过上限的请求会在联系任何提供商之前于本地以 429 拒绝。更改从下一个请求开始生效；已计入的用量会保留。",
   "workflowBudget.maxConcurrentChildren": "并行轮次",
-  "workflowBudget.maxConcurrentChildrenHint": "一个任务可同时运行的轮次数。始终为你自己的对话保留一个名额，因此子代理少一个。",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "一个任务可同时运行的轮次数。始终为你自己的对话保留一个名额，因此子代理少一个。",
   "workflowBudget.maxPhysicalSends": "每个窗口的模型请求数",
   "workflowBudget.maxPhysicalSendsHint": "一个任务在窗口内可向提供商发送的请求数（含重试）。",
   "workflowBudget.maxDistinctChildren": "每个窗口的不同子代理数",
@@ -155,7 +173,8 @@ export const zh: Record<TKey, string> = {
   "nav.claude": "Claude",
   "claude.pageSub": "管理 Claude Code 的 OpenCodex 路由和设置。",
 
-  "pws.anthropicAccountThresholdHint": "覆盖 Claude 池默认阈值。0 仅禁用此账户的按用量切换；暂停和速率限制恢复仍然生效。",
+  "pws.anthropicAccountThresholdHint":
+    "覆盖 Claude 池默认阈值。0 仅禁用此账户的按用量切换；暂停和速率限制恢复仍然生效。",
   "kiroLogin.title": "登录 Kiro",
   "kiroLogin.chooseMethod": "选择登录方式",
   "kiroLogin.cli": "从 Kiro CLI 导入",
@@ -197,7 +216,8 @@ export const zh: Record<TKey, string> = {
   "kiroSelection.generic": "不会自动选择",
 
   "usage.incomplete": "部分用量记录无法计入。次数、日期和排名仅反映可读取的记录。",
-  "models.pickerOrder.usageIncomplete": "用量历史不完整，无法保存最常用排序。请选择其他排序或先修复历史记录。",
+  "models.pickerOrder.usageIncomplete":
+    "用量历史不完整，无法保存最常用排序。请选择其他排序或先修复历史记录。",
   "api.attribution.noRecordedUse": "可读取的记录中没有使用记录",
   "audio.dictation": "听写",
   "audio.liveVoice": "实时语音",
@@ -241,15 +261,18 @@ export const zh: Record<TKey, string> = {
   "models.pickerOrder.usageFailed": "无法加载模型使用量。",
   "models.pickerOrder.loadFailed": "无法加载模型选择设置。",
   "models.pickerOrder.retry": "重试",
-  "models.pickerOrder.hint": "保存 Codex 和 Claude 发现列表中的路由模型顺序。保留精选与原生模型的优先级区间；使用量排序是快照，原生工具显示的候选可能变化。",
+  "models.pickerOrder.hint":
+    "保存 Codex 和 Claude 发现列表中的路由模型顺序。保留精选与原生模型的优先级区间；使用量排序是快照，原生工具显示的候选可能变化。",
   "models.fastRows.title": "显示快速模型项目",
-  "models.fastRows.desc": "在外部客户端模型选择器中添加符合条件的“Model Fast”选项。这不会改变基础模型上的推理力度选项。保存时会尽可能刷新已连接的集成；若未生效，请刷新集成或客户端目录。",
+  "models.fastRows.desc":
+    "在外部客户端模型选择器中添加符合条件的“Model Fast”选项。这不会改变基础模型上的推理力度选项。保存时会尽可能刷新已连接的集成；若未生效，请刷新集成或客户端目录。",
   "models.fastRows.refreshHint": "已保存。目录刷新正在处理中。",
   "models.fastRows.enabled": "已启用快速模型项目。",
   "models.fastRows.disabled": "已禁用快速模型项目。",
   "models.fastRows.loadFailed": "无法加载快速模型项目设置。",
   "models.fastRows.updateFailed": "更新快速模型项目设置失败。",
-  "codexAuth.quotaAutoRefreshAllHint": "统一开关当前所有账户各自支持的 5 小时和每周额度窗口。在账户池模式下，重置后会发送消耗少量额度的请求。",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "统一开关当前所有账户各自支持的 5 小时和每周额度窗口。在账户池模式下，重置后会发送消耗少量额度的请求。",
   "codexAuth.quotaAutoRefreshMixed": "部分窗口已启用。",
   "codexAuth.quotaAutoRefreshEmpty": "没有支持的额度窗口。请刷新账户额度。",
   "codexAuth.quotaAutoRefreshLoadFailed": "无法加载自动激活设置。请重试。",
@@ -329,7 +352,8 @@ export const zh: Record<TKey, string> = {
   "nav.usage": "用量",
   "common.github": "GitHub",
   "onboarding.star.title": "喜欢 OpenCodex 吗？",
-  "onboarding.star.body": "OpenCodex 免费且开源。在 GitHub 上点一颗星，能帮助更多开发者发现它，也让项目持续下去。",
+  "onboarding.star.body":
+    "OpenCodex 免费且开源。在 GitHub 上点一颗星，能帮助更多开发者发现它，也让项目持续下去。",
   "onboarding.star.cta": "在 GitHub 上加星",
   "onboarding.star.ghHint": "使用已登录的 GitHub CLI（gh）为仓库加星。点击之前不会进行任何操作。",
   "onboarding.star.browserHint": "在浏览器中打开 github.com 上的仓库。",
@@ -343,23 +367,26 @@ export const zh: Record<TKey, string> = {
   "common.save": "保存",
   "common.saving": "保存中…",
   "common.cancel": "取消",
-"common.discard": "丢弃",
+  "common.discard": "丢弃",
   "common.delete": "删除",
   "common.remove": "移除",
   "common.loading": "加载中…",
   "common.retry": "重试",
   "prov.affinityResetPending": "账户更改已保存，但对话路由更新尚未完成。请重试以完成更新。",
   "prov.affinityResetComplete": "对话路由更新已完成。",
-  "prov.affinityResetRetryUnavailable": "此账户目前无法重试。请刷新账户列表，并在需要时恢复账户或重新登录。",
+  "prov.affinityResetRetryUnavailable":
+    "此账户目前无法重试。请刷新账户列表，并在需要时恢复账户或重新登录。",
   "common.undo": "撤销",
   "auth.adminTokenTitle": "OpenCodex 管理员令牌 (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "账户",
   "auth.adminTokenFieldLabel": "管理员令牌",
   "auth.adminTokenRejected": "管理员令牌被拒绝。请检查后重试。",
   "auth.adminTokenUnavailable": "无法验证管理员令牌。请重试。",
-  "auth.adminTokenHelp": "这是 OpenCodex 管理 API 的管理员令牌，不是服务商 API 密钥。代理首次启动时会写入 ~/.opencodex/admin-api-token（或 $OPENCODEX_HOME/admin-api-token），设置 OPENCODEX_ADMIN_AUTH_TOKEN 可覆盖该值。",
+  "auth.adminTokenHelp":
+    "这是 OpenCodex 管理 API 的管理员令牌，不是服务商 API 密钥。代理首次启动时会写入 ~/.opencodex/admin-api-token（或 $OPENCODEX_HOME/admin-api-token），设置 OPENCODEX_ADMIN_AUTH_TOKEN 可覆盖该值。",
   "auth.rememberDevice": "记住此设备",
-  "auth.rememberDeviceHint": "保留可撤销的 HttpOnly 会话30天，不保存管理员令牌。需要直接访问与 API 同源的 HTTPS 仪表板（或本地回环）。",
+  "auth.rememberDeviceHint":
+    "保留可撤销的 HttpOnly 会话30天，不保存管理员令牌。需要直接访问与 API 同源的 HTTPS 仪表板（或本地回环）。",
   "connection.forgetDevice": "忘记此设备",
   "connection.forgetDeviceFailed": "无法忘记此设备。会话已保留。",
   "auth.adminTokenDocsLink": "如何查找",
@@ -400,8 +427,10 @@ export const zh: Record<TKey, string> = {
   "startup.summary.protected": "重启后 opencodex 会自动可用",
   "startup.summary.atRisk": "重启后 Codex 可能无法访问模型",
   "startup.riskDetail": "Codex 已指向本地代理，但没有持久服务或正常的 launcher shim 将其重新启动。",
-  "startup.riskDetailCustomLocal": "Codex 指向自定义本地网关。opencodex 无法管理或验证该网关的重启生命周期。",
-  "startup.riskDetailWindowsShim": "Launcher shim 仅保护受支持的 CLI 脚本；Windows 上的 Codex Desktop 和直接 codex.exe 启动可以绕过它。",
+  "startup.riskDetailCustomLocal":
+    "Codex 指向自定义本地网关。opencodex 无法管理或验证该网关的重启生命周期。",
+  "startup.riskDetailWindowsShim":
+    "Launcher shim 仅保护受支持的 CLI 脚本；Windows 上的 Codex Desktop 和直接 codex.exe 启动可以绕过它。",
   "startup.safeDetail": "当前路由与启动机制一致。重启后无需手动运行 ocx start。",
   "startup.routing": "Codex 路由",
   "startup.routing.proxy": "本地代理",
@@ -433,7 +462,8 @@ export const zh: Record<TKey, string> = {
   "startup.conflict": "服务冲突",
   "startup.installedDisabled": "已安装但禁用",
   "startup.shimActivationPending": "已安装 · 未确认激活",
-  "startup.shimActivationHint": "请在 shell 启动文件中其他 PATH 设置之后添加 . ~/.opencodex/codex-shell-env.sh，然后打开新终端。仪表盘不一定能看到你的 shell PATH。",
+  "startup.shimActivationHint":
+    "请在 shell 启动文件中其他 PATH 设置之后添加 . ~/.opencodex/codex-shell-env.sh，然后打开新终端。仪表盘不一定能看到你的 shell PATH。",
   "startup.install": "安装",
   "startup.installing": "正在安装…",
   "startup.repair": "修复",
@@ -444,7 +474,8 @@ export const zh: Record<TKey, string> = {
   "startup.shimRepaired": "Codex 启动器 shim 修复成功。",
   "startup.installFailed": "安装失败：",
   "startup.recovery": "修复选项",
-  "startup.recoveryHint": "使用上方的一键安装，或复制命令进行手动修复。Codex Desktop 和 Windows 可执行文件建议使用后台服务。",
+  "startup.recoveryHint":
+    "使用上方的一键安装，或复制命令进行手动修复。Codex Desktop 和 Windows 可执行文件建议使用后台服务。",
   "startup.command.service": "推荐：持久后台服务",
   "startup.command.shim": "备选：CLI launcher shim",
   "startup.command.native": "安全恢复：还原 Codex 原生路由",
@@ -452,9 +483,12 @@ export const zh: Record<TKey, string> = {
   "startup.copied": "已复制",
   "startup.recommended": "推荐修复：{cmd}",
   "startup.navRisk": "启动保护需要处理",
-  "startup.codexRuntime.clampHidden": "部分推理强度选项已隐藏，因为 OpenCodex 正在使用 Codex {version}。",
-  "startup.codexRuntime.clampHiddenWithEfforts": "部分推理强度选项已隐藏，因为 OpenCodex 正在使用 Codex {version}（已移除：{efforts}）。",
-  "startup.codexRuntime.olderBinary": "OpenCodex 正在使用较旧的 Codex 二进制文件（{version}）。检测到可用的较新安装。",
+  "startup.codexRuntime.clampHidden":
+    "部分推理强度选项已隐藏，因为 OpenCodex 正在使用 Codex {version}。",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "部分推理强度选项已隐藏，因为 OpenCodex 正在使用 Codex {version}（已移除：{efforts}）。",
+  "startup.codexRuntime.olderBinary":
+    "OpenCodex 正在使用较旧的 Codex 二进制文件（{version}）。检测到可用的较新安装。",
 
   // dashboard
   "dash.subtitle": "本地 opencodex 代理、其提供方以及路由到 Codex 的模型的实时状态。",
@@ -469,7 +503,8 @@ export const zh: Record<TKey, string> = {
   "dash.tokens30d": "Token (30 天)",
   "dash.coverage": "覆盖率 {pct}",
   "dash.mem.title": "内存可观测性",
-  "dash.mem.hint": "只读运行时诊断。观测内存为 max(RSS, external, ArrayBuffers)，避免 Windows working set trimming 隐藏已提交的保留内存。",
+  "dash.mem.hint":
+    "只读运行时诊断。观测内存为 max(RSS, external, ArrayBuffers)，避免 Windows working set trimming 隐藏已提交的保留内存。",
   "dash.mem.rss": "常驻内存 (RSS)",
   "dash.mem.jsHeap": "JS 堆已用",
   "dash.mem.jsHeapArena": "堆区 {total}",
@@ -484,7 +519,8 @@ export const zh: Record<TKey, string> = {
   "dash.mem.growth": "每小时观测变化",
   "dash.mem.perHour": "/小时",
   "dash.mem.store": "延续存储",
-  "dash.mem.storeHint": "代理 previous_response_id 缓存。堆上升时总字节数增加，说明是对话保留而非运行时分配器。",
+  "dash.mem.storeHint":
+    "代理 previous_response_id 缓存。堆上升时总字节数增加，说明是对话保留而非运行时分配器。",
   "dash.mem.storeEntries": "条目",
   "dash.mem.storeTotal": "总计",
   "dash.mem.storeLargest": "最大",
@@ -496,7 +532,8 @@ export const zh: Record<TKey, string> = {
   "dash.mem.unavailable": "内存诊断不可用（旧版代理）。",
   "dash.mem.inFlight": "进行中的请求",
   "dash.mem.restart": "排空并重启",
-  "dash.mem.restartConfirm": "等待 {count} 个进行中的请求结束后再重启（最多 {seconds} 秒；超时将中断剩余请求）。",
+  "dash.mem.restartConfirm":
+    "等待 {count} 个进行中的请求结束后再重启（最多 {seconds} 秒；超时将中断剩余请求）。",
   "dash.mem.draining": "正在等待 {count} 个请求完成… 完成后重启",
   "dash.mem.reconnecting": "代理正在重启… 等待重新连接",
   "dash.mem.restartFailed": "排空并重启失败。请确认代理正在运行。",
@@ -523,8 +560,10 @@ export const zh: Record<TKey, string> = {
   "dash.actions": "代理",
   "dash.codexRestart": "重新加载 Codex 模型列表",
   "dash.codexRestarting": "正在停止…",
-  "dash.codexRestartConfirm": "停止 Codex app-server 以便重新读取模型列表？进行中的 Codex 任务会被中断，且 Codex 不会自动重启，请稍后自行重新打开。",
-  "dash.codexRestartDone": "已停止 {count} 个 Codex app-server。重新打开 Codex 即可加载最新模型列表。",
+  "dash.codexRestartConfirm":
+    "停止 Codex app-server 以便重新读取模型列表？进行中的 Codex 任务会被中断，且 Codex 不会自动重启，请稍后自行重新打开。",
+  "dash.codexRestartDone":
+    "已停止 {count} 个 Codex app-server。重新打开 Codex 即可加载最新模型列表。",
   "dash.codexRestartNothing": "没有正在运行的 Codex app-server。下次启动会读取最新模型列表。",
   "dash.codexRestartUnknown": "无法枚举进程，因此没有停止任何进程。",
   "dash.codexRestartPartial": "有 {count} 个 app-server 未退出。若模型列表仍然过旧，请手动停止。",
@@ -534,7 +573,8 @@ export const zh: Record<TKey, string> = {
   "dash.codexRestartTimeout": "代理未在超时前响应，可能仍在停止 app-server。",
   "models.staleBanner": "Codex 显示的模型列表比当前目录旧。重启 Codex 即可重新读取。",
   "dash.codexAutoStart": "随 Codex 启动 opencodex",
-  "dash.codexAutoStartHint": "允许已安装的 launcher shim 运行 ocx ensure。此设置不会安装重启保护；请在启动安全中检查实际状态。",
+  "dash.codexAutoStartHint":
+    "允许已安装的 launcher shim 运行 ocx ensure。此设置不会安装重启保护；请在启动安全中检查实际状态。",
   "dash.searchModel": "搜索附属模型",
   "dash.searchModelHint": "用于非 OpenAI 路由模型的 web_search 的模型。需要 ChatGPT 登录。",
   "dash.searchReasoning": "搜索推理强度",
@@ -545,12 +585,14 @@ export const zh: Record<TKey, string> = {
   "dash.webSearchOff": "关闭",
   "dash.webSearchCodexSync": "已保存。Codex 的配置尚未重写 — 请运行“同步模型”。",
   "dash.webSearchStream": "实时流式输出回答",
-  "dash.webSearchStreamHint": "实时流式输出开头的文本和推理，直到模型决定调用工具；其余部分为拦截搜索而保持缓冲。搜索前的文本可能会部分重复。",
+  "dash.webSearchStreamHint":
+    "实时流式输出开头的文本和推理，直到模型决定调用工具；其余部分为拦截搜索而保持缓冲。搜索前的文本可能会部分重复。",
   "dash.visionSidecar": "视觉附属服务",
   "dash.visionSidecarHint": "选择纯文本路由模型描述图像时使用的后端和模型。",
   "dash.visionOff": "关闭",
   "compactionRouting.title": "压缩路由",
-  "compactionRouting.description": "选择 Codex 压缩请求使用的模型，以及它覆盖哪些触发方式。后续消息保留对话设置。",
+  "compactionRouting.description":
+    "选择 Codex 压缩请求使用的模型，以及它覆盖哪些触发方式。后续消息保留对话设置。",
   "compactionRouting.model": "压缩模型",
   "compactionRouting.effort": "推理强度",
   "compactionRouting.triggers": "适用于",
@@ -564,32 +606,42 @@ export const zh: Record<TKey, string> = {
   "compactionRouting.sourcesModels": "单个模型",
   "compactionRouting.sourcesSaved": "已保存但不在当前目录中的选择器",
   "compactionRouting.sourcesNone": "至少选择一个来源，或改回所有对话模型。",
-  "compactionRouting.sourcesHint": "仅当压缩请求的来源模型匹配所选模型或 provider/* 时才使用覆盖；其他请求仍使用自身模型压缩。",
+  "compactionRouting.sourcesHint":
+    "仅当压缩请求的来源模型匹配所选模型或 provider/* 时才使用覆盖；其他请求仍使用自身模型压缩。",
   "compactionRouting.sourcesGridTitle": "改路由来源模型匹配以下选择器的压缩请求：",
   "compactionRouting.currentModel": "使用对话模型",
   "compactionRouting.currentEffort": "保留请求的推理强度",
   "compactionRouting.effortHint": "推理设置仅在压缩端点支持时生效。模型必须能容纳完整对话。",
-  "compactionRouting.dataNotice": "被覆盖的压缩请求会将整个对话发送给所选模型的提供商进行摘要，即使对话正在其他提供商上运行。",
-  "compactionRouting.autoNotice": "自动压缩会自行触发，因此长对话可能在你没有主动要求的情况下被发送给该提供商。",
-  "compactionRouting.providerWarning": "启用此设置后，每个被覆盖的压缩请求都会将完整对话内容发送给 {provider} 进行摘要。",
-  "compactionRouting.providerWarningScoped": "启用此设置后，仅当压缩请求的来源模型匹配 {sources} 时，完整对话内容才会发送给 {provider} 进行摘要；其他请求仍使用自身模型压缩。",
+  "compactionRouting.dataNotice":
+    "被覆盖的压缩请求会将整个对话发送给所选模型的提供商进行摘要，即使对话正在其他提供商上运行。",
+  "compactionRouting.autoNotice":
+    "自动压缩会自行触发，因此长对话可能在你没有主动要求的情况下被发送给该提供商。",
+  "compactionRouting.providerWarning":
+    "启用此设置后，每个被覆盖的压缩请求都会将完整对话内容发送给 {provider} 进行摘要。",
+  "compactionRouting.providerWarningScoped":
+    "启用此设置后，仅当压缩请求的来源模型匹配 {sources} 时，完整对话内容才会发送给 {provider} 进行摘要；其他请求仍使用自身模型压缩。",
   "compactionRouting.loadFailed": "无法加载压缩设置。",
   "compactionRouting.saved": "压缩设置已保存。",
   "compactionRouting.saveFailed": "保存失败。更改仍然保留，请重试。",
   "memoryModels.title": "记忆路由",
-  "memoryModels.description": "会话结束后，Codex 会在后台写入记忆。为每个阶段选择模型，或保留现有路由。",
+  "memoryModels.description":
+    "会话结束后，Codex 会在后台写入记忆。为每个阶段选择模型，或保留现有路由。",
   "memoryModels.infoLabel": "Extract 和 Consolidation 是什么？",
-  "memoryModels.info": "Codex 分两步把结束的会话变成记忆。Extract 读取一个已结束的会话并记下其中的内容：每个会话一张笔记，因此有很多小请求。Consolidation 把这些笔记写进 Codex 在后续会话开始时读取的记忆文件。很少运行，但会修改文件。两步各自请求自己的模型，所以这里分开展示。",
+  "memoryModels.info":
+    "Codex 分两步把结束的会话变成记忆。Extract 读取一个已结束的会话并记下其中的内容：每个会话一张笔记，因此有很多小请求。Consolidation 把这些笔记写进 Codex 在后续会话开始时读取的记忆文件。很少运行，但会修改文件。两步各自请求自己的模型，所以这里分开展示。",
   "memoryModels.extract": "提取",
   "memoryModels.extractHint": "把每个结束的会话汇总成一条原始记忆。每个会话运行一次。",
   "memoryModels.consolidation": "整合",
-  "memoryModels.consolidationHint": "把原始记忆合并进 Codex 之后读取的记忆文件。很少运行，并会修改文件。",
+  "memoryModels.consolidationHint":
+    "把原始记忆合并进 Codex 之后读取的记忆文件。很少运行，并会修改文件。",
   "memoryModels.model": "模型",
   "memoryModels.effort": "推理强度",
   "memoryModels.off": "关闭",
   "memoryModels.defaultEffort": "Codex 默认",
-  "memoryModels.dataNotice": "所选模型会收到该阶段的输入：Extract 是已结束的会话，Consolidation 是原始记忆。",
-  "memoryModels.accountNotice": "这里只路由了一个阶段；另一个阶段保留其现有路由。Shadow Call Intercept 也可能把该阶段的记忆调用发往其配置的模型。",
+  "memoryModels.dataNotice":
+    "所选模型会收到该阶段的输入：Extract 是已结束的会话，Consolidation 是原始记忆。",
+  "memoryModels.accountNotice":
+    "这里只路由了一个阶段；另一个阶段保留其现有路由。Shadow Call Intercept 也可能把该阶段的记忆调用发往其配置的模型。",
   "memoryModels.loadFailed": "无法加载记忆设置。",
   "memoryModels.saved": "记忆设置已保存。",
   "memoryModels.saveFailed": "保存失败。你的改动仍在，请重试。",
@@ -602,21 +654,28 @@ export const zh: Record<TKey, string> = {
   "shadowCall.sourceMemory": "记忆",
   "shadowCall.sourceLegacy": "旧版",
   "shadowCall.sourceCustom": "自定义",
-  "shadowCall.sourceHint": "只有已启用的来源会被拦截。至少保留一个来源；使用主开关关闭所有影子调用的拦截。配置了记忆路由时，记忆整合仍优先。",
-  "shadowCall.sourceCovered": "已被自定义前缀 {prefix} 覆盖。请在 config.json 中删除或缩小该前缀，以便单独切换此来源。",
+  "shadowCall.sourceHint":
+    "只有已启用的来源会被拦截。至少保留一个来源；使用主开关关闭所有影子调用的拦截。配置了记忆路由时，记忆整合仍优先。",
+  "shadowCall.sourceCovered":
+    "已被自定义前缀 {prefix} 覆盖。请在 config.json 中删除或缩小该前缀，以便单独切换此来源。",
   "shadowCall.sourceLastRequired": "至少保留一个来源。使用主开关关闭所有影子调用的拦截。",
-  "dash.shadowCallInterceptHint": "拦截 Codex 应用的后台辅助调用（标题生成、提交消息、技能编排）。在下方选择来源模型。记忆整合通常由 Terra 运行，配置后遵循记忆路由。",
-  "dash.shadowCallWarning": "⚠ 启用后，发往每个所选来源（{models}）的请求都会替换为所选模型。Terra 需要手动启用；记忆整合仍优先使用已配置的记忆路由。",
+  "dash.shadowCallInterceptHint":
+    "拦截 Codex 应用的后台辅助调用（标题生成、提交消息、技能编排）。在下方选择来源模型。记忆整合通常由 Terra 运行，配置后遵循记忆路由。",
+  "dash.shadowCallWarning":
+    "⚠ 启用后，发往每个所选来源（{models}）的请求都会替换为所选模型。Terra 需要手动启用；记忆整合仍优先使用已配置的记忆路由。",
   "dash.shadowCallOriginal": "原始",
   "dash.shadowCallModel": "替代模型",
-  "dash.shadowCallTooltip": "Codex 应用会在后台调用辅助模型来生成线程标题、提交消息以及进行技能编排。该模型随客户端版本变化，因此 opencodex 可以拦截多个来源。请在下方选择要重定向的每个来源。Terra 是记忆整合模型，默认关闭，因为 Codex 也会在普通工作中选择它；如果在记忆路由中配置了整合模型，该路由优先。至少保留一个来源；使用主开关关闭所有影子调用的拦截。",
+  "dash.shadowCallTooltip":
+    "Codex 应用会在后台调用辅助模型来生成线程标题、提交消息以及进行技能编排。该模型随客户端版本变化，因此 opencodex 可以拦截多个来源。请在下方选择要重定向的每个来源。Terra 是记忆整合模型，默认关闭，因为 Codex 也会在普通工作中选择它；如果在记忆路由中配置了整合模型，该路由优先。至少保留一个来源；使用主开关关闭所有影子调用的拦截。",
   "models.shadowCallIntercept": "影子调用拦截",
-  "models.shadowCallInterceptHint": "拦截 Codex 应用的后台辅助调用（标题生成、提交消息、技能编排）。在下方选择来源模型。记忆整合通常由 Terra 运行，配置后遵循记忆路由。",
+  "models.shadowCallInterceptHint":
+    "拦截 Codex 应用的后台辅助调用（标题生成、提交消息、技能编排）。在下方选择来源模型。记忆整合通常由 Terra 运行，配置后遵循记忆路由。",
   "models.shadowCallSaveFailed": "无法保存影子调用设置。",
   "models.shadowCallTargetInvalid": "替代模型与已启用的来源重叠。请选择其他替代模型。",
   "models.shadowCallSourceInvalid": "此来源选择无效。请至少选择一个不含空白或提供方前缀的来源。",
   "models.autoReviewOverride": "自动审查覆盖",
-  "models.autoReviewOverrideHint": "指定 Codex 自动审查（审批审查模型）使用的模型。同步目录时应用于所有行；提供方级的 autoReviewModel 在这些行上仍然优先。",
+  "models.autoReviewOverrideHint":
+    "指定 Codex 自动审查（审批审查模型）使用的模型。同步目录时应用于所有行；提供方级的 autoReviewModel 在这些行上仍然优先。",
   "models.autoReviewPending": "待定",
   "dash.sidecarBackend": "后端",
   "dash.sidecarModel": "模型",
@@ -626,19 +685,23 @@ export const zh: Record<TKey, string> = {
   "dash.sidecarSaved": "附属设置已保存。将在下一个请求时生效。",
   "dash.sidecarSaveFailed": "保存附属设置失败。",
   "dash.injectionLabel": "子代理委托",
-  "dash.injectionHint": "选择 Codex 把子任务交给谁来做的模型。这个选择用在哪里，由下面两个开关决定。",
+  "dash.injectionHint":
+    "选择 Codex 把子任务交给谁来做的模型。这个选择用在哪里，由下面两个开关决定。",
   "dash.syncCodexSubagentDefaults": "同时保存为 Codex 默认值",
-  "dash.syncCodexSubagentDefaultsHint": "打开后，上面选的模型会写进 Codex 自己的配置，新任务一开始也用它。关闭则只在这里记住。下次同步或重启后生效，你手写的 [agents] 设置不会被改动。",
+  "dash.syncCodexSubagentDefaultsHint":
+    "打开后，上面选的模型会写进 Codex 自己的配置，新任务一开始也用它。关闭则只在这里记住。下次同步或重启后生效，你手写的 [agents] 设置不会被改动。",
   "dash.multiAgentGuidance": "告诉 Codex 怎么分工",
-  "dash.multiAgentGuidanceHint": "给 Codex 附上一张短便条，说明怎么把活分给子代理。v2 会告诉它可用的模型和优先模型；v1 只在推理强度为 max 或 ultra 时才起作用。关闭则不附任何便条。",
+  "dash.multiAgentGuidanceHint":
+    "给 Codex 附上一张短便条，说明怎么把活分给子代理。v2 会告诉它可用的模型和优先模型；v1 只在推理强度为 max 或 ultra 时才起作用。关闭则不附任何便条。",
   "dash.injectionNone": "无",
   "dash.injectionEffortLabel": "推理强度",
   "dash.injectionEffortNone": "模型默认",
   "dash.effortCapLabel": "V2 ultra 推理强度限制",
   "dash.subagentEffortCapLabel": "V2 子代理推理强度限制",
-  "dash.effortCapHelp": "限制 V2 ultra 模式轮次的推理强度。设置后，来自 ultra 模式的 max 请求将被限制到所选级别。子代理限制仅适用于衍生的子代理。只会降低强度，不会提高。如果模型不支持所选级别，将自动降至最近的支持级别。",
+  "dash.effortCapHelp":
+    "限制 V2 ultra 模式轮次的推理强度。设置后，来自 ultra 模式的 max 请求将被限制到所选级别。子代理限制仅适用于衍生的子代理。只会降低强度，不会提高。如果模型不支持所选级别，将自动降至最近的支持级别。",
   "dash.effortCapNone": "无上限",
-    "dash.maintenance": "维护",
+  "dash.maintenance": "维护",
   "dash.maintenanceHint": "刷新 Codex 模型目录，或安装新的 opencodex 版本。",
   "dash.syncModels": "同步模型",
   "dash.syncing": "同步中…",
@@ -646,14 +709,15 @@ export const zh: Record<TKey, string> = {
   "dash.syncStaleHint": "如果 Codex 仍显示旧列表，请重启长期运行的 app-server（{cmd}）。",
   "dash.syncFailed": "同步失败：{error}",
   "dash.projectConfigTitle": "项目 Codex 配置绕过了 OpenCodex",
-  "dash.projectConfigHint": "这些仓库级设置会覆盖 OpenCodex 代理（例如直接走 OpenCode Go）。请移除它们，以便该项目使用 ~/.codex/config.toml 的代理路由。",
+  "dash.projectConfigHint":
+    "这些仓库级设置会覆盖 OpenCodex 代理（例如直接走 OpenCode Go）。请移除它们，以便该项目使用 ~/.codex/config.toml 的代理路由。",
   "dash.checkUpdate": "检查更新",
   "dash.updateReconnecting": "正在等待重启后的代理…",
   "dash.updateVersionTransition": "{currentVersion} -> {latestVersion}.",
 
-
   // providers
-  "prov.subtitle": "配置 opencodex 路由到 Codex 的上游提供方。使用账户登录、添加提供方，或编辑原始配置。",
+  "prov.subtitle":
+    "配置 opencodex 路由到 Codex 的上游提供方。使用账户登录、添加提供方，或编辑原始配置。",
   "prov.add": "添加提供方",
   "prov.editJson": "编辑 JSON",
   "prov.accountLogin": "账户登录",
@@ -683,7 +747,8 @@ export const zh: Record<TKey, string> = {
   "prov.aliasInvalid": "请使用最多 80 个字符，且不含控制字符。",
   "prov.accountId": "ID",
   "prov.pasteRedirect": "粘贴重定向 URL 或授权码",
-  "prov.pasteRedirectHint": "如果浏览器显示 localhost 错误，请复制地址栏中的完整 URL 并粘贴到此处（或粘贴授权码）。",
+  "prov.pasteRedirectHint":
+    "如果浏览器显示 localhost 错误，请复制地址栏中的完整 URL 并粘贴到此处（或粘贴授权码）。",
   "prov.pasteSubmit": "提交",
   "prov.pasteSubmitting": "提交中…",
   "prov.pasteOk": "已提交代码 — 正在完成登录…",
@@ -704,38 +769,46 @@ export const zh: Record<TKey, string> = {
   "prov.loginSameAccount": "仍是同一个 {provider} 账户 — 请在浏览器中切换账户后再次尝试添加账户。",
   "oauthTos.highTitle": "{provider}：订阅 OAuth 风险",
   "oauthTos.elevatedTitle": "{provider}：非官方 OAuth 桥接",
-  "oauthTos.anthropicBody": "此操作通过第三方代理 OpenCodex 连接 Claude 订阅。Anthropic 未认可此连接方式或自动账户池；能否使用取决于其现行条款及执行方式。",
-  "oauthTos.highBody": "OpenCodex 通过第三方 OAuth 路径连接 {provider}。如果该用法不受支持，访问可能会被限制或暂停。",
-  "oauthTos.elevatedBody": "OpenCodex 通过非官方 OAuth 路径连接 {provider}。请尽量使用官方客户端；异常或自动化流量可能被视为滥用，访问可能会被限制或暂停。",
+  "oauthTos.anthropicBody":
+    "此操作通过第三方代理 OpenCodex 连接 Claude 订阅。Anthropic 未认可此连接方式或自动账户池；能否使用取决于其现行条款及执行方式。",
+  "oauthTos.highBody":
+    "OpenCodex 通过第三方 OAuth 路径连接 {provider}。如果该用法不受支持，访问可能会被限制或暂停。",
+  "oauthTos.elevatedBody":
+    "OpenCodex 通过非官方 OAuth 路径连接 {provider}。请尽量使用官方客户端；异常或自动化流量可能被视为滥用，访问可能会被限制或暂停。",
   "oauthTos.saferPath": "更安全的做法：改为在 OpenCodex 中配置 API 密钥。",
   "oauthTos.acknowledge": "我了解风险，仍要继续使用 OAuth。",
   "oauthTos.continue": "继续使用 OAuth",
   "oauthTos.anthropicTitle": "Claude 订阅连接",
-  "oauthTos.anthropicConditions": "请使用你本人拥有或获授权使用的账户。在有人值守的会话中使用官方 Claude Code 客户端，与通过其他客户端发送订阅令牌是两回事。OpenCodex 也支持这些其他客户端，因此此连接不能保证每种用法都被允许。受支持的 Agent SDK 集成是另一回事。",
-  "oauthTos.anthropicSaferPath": "如需用于其他客户端或无人值守的自动化，请改为配置 Anthropic API 密钥。",
+  "oauthTos.anthropicConditions":
+    "请使用你本人拥有或获授权使用的账户。在有人值守的会话中使用官方 Claude Code 客户端，与通过其他客户端发送订阅令牌是两回事。OpenCodex 也支持这些其他客户端，因此此连接不能保证每种用法都被允许。受支持的 Agent SDK 集成是另一回事。",
+  "oauthTos.anthropicSaferPath":
+    "如需用于其他客户端或无人值守的自动化，请改为配置 Anthropic API 密钥。",
   "oauthTos.anthropicAcknowledge": "我了解这是经由第三方的订阅连接，并会查阅适用条款。",
   "oauthTos.anthropicContinue": "使用 Claude 订阅继续",
   "subagentSurface.selectionTitle": "将子代理界面切换到 {mode}？",
-  "subagentSurface.selectionBody": "在 {mode} 下，使用 v2 界面的 ChatGPT 模型（base 上是 Sol 和 Terra，v2 上是所有模型）会把任务以 ChatGPT 后端的加密形式交给 Grok、Claude 等路由模型，路由模型无法读取。在上游修复之前，这种委托会以 unreadable_encrypted_agent_task 失败。v1 可以可靠地跨提供方委托。",
+  "subagentSurface.selectionBody":
+    "在 {mode} 下，使用 v2 界面的 ChatGPT 模型（base 上是 Sol 和 Terra，v2 上是所有模型）会把任务以 ChatGPT 后端的加密形式交给 Grok、Claude 等路由模型，路由模型无法读取。在上游修复之前，这种委托会以 unreadable_encrypted_agent_task 失败。v1 可以可靠地跨提供方委托。",
   "subagentSurface.advisoryTitle": "v1 现在是默认子代理界面",
-  "subagentSurface.advisoryBody": "此安装当前使用 {mode}，v2 界面上的 ChatGPT 模型会把无法读取的加密任务交给路由模型，跨提供方委托因此失败。在上游修复之前建议使用 v1。在你做出选择之前，当前设置保持不变。",
+  "subagentSurface.advisoryBody":
+    "此安装当前使用 {mode}，v2 界面上的 ChatGPT 模型会把无法读取的加密任务交给路由模型，跨提供方委托因此失败。在上游修复之前建议使用 v1。在你做出选择之前，当前设置保持不变。",
   "subagentSurface.continue": "继续",
   "subagentSurface.switchToV1": "切换到 v1",
   "subagentSurface.learnMore": "为什么失败",
   "prov.logoutOk": "已退出 {provider}。",
   "prov.logoutFail": "无法退出 {provider}。账户状态保持不变。",
-  "prov.removed": "已移除 \"{name}\"。",
-  "prov.removedDefault": "已移除 \"{name}\"。默认提供方现为 \"{defaultProvider}\"。",
-  "prov.removedShadowTarget": "已移除 \"{name}\"。影子调用拦截仍指向 \"{model}\"，在选择其他目标之前，辅助调用会失败。",
-  "prov.removeFail": "移除 \"{name}\" 失败。",
+  "prov.removed": '已移除 "{name}"。',
+  "prov.removedDefault": '已移除 "{name}"。默认提供方现为 "{defaultProvider}"。',
+  "prov.removedShadowTarget":
+    '已移除 "{name}"。影子调用拦截仍指向 "{model}"，在选择其他目标之前，辅助调用会失败。',
+  "prov.removeFail": '移除 "{name}" 失败。',
   "prov.removeLastProvider": "如果没有其他已启用的提供方可以成为默认，则无法移除此提供方。",
   "prov.setDefault": "设为默认",
-  "prov.setDefaultSuccess": "\"{name}\" 已设为默认提供方。",
-  "prov.setDefaultFail": "无法将 \"{name}\" 设为默认提供方。",
+  "prov.setDefaultSuccess": '"{name}" 已设为默认提供方。',
+  "prov.setDefaultFail": '无法将 "{name}" 设为默认提供方。',
   "prov.defaultDisabled": "请先启用此提供方，再将其设为默认。",
   "prov.updateFail": "无法更新此提供方。",
   "prov.networkError": "网络错误。请确认代理正在运行后重试。",
-  "prov.added": "已添加 \"{name}\"。现已生效 — 运行 {cmd}（或重启）以在 Codex 选择器中列出其模型。",
+  "prov.added": '已添加 "{name}"。现已生效 — 运行 {cmd}（或重启）以在 Codex 选择器中列出其模型。',
   "prov.modelsNoticeTitle": "模型设置提示",
   "prov.modelsNoticeChecking": "正在检查模型列表。关闭模型开关不会停用提供者。",
   "prov.modelsNoticePending": "尚未确认初始模型列表。在发现完成之前，模型暂不公开。",
@@ -745,7 +818,7 @@ export const zh: Record<TKey, string> = {
   "prov.modelsNoticeCount": "{count} 个模型",
   "prov.modelsNoticeOpen": "打开模型页面",
   "models.initialSelectionPending": "等待初始模型发现",
-  "prov.removeConfirm": "移除提供方 \"{name}\"？其模型将从 Codex 选择器中消失。",
+  "prov.removeConfirm": '移除提供方 "{name}"？其模型将从 Codex 选择器中消失。',
   "prov.hasApiKey": "已配置 API 密钥",
   "prov.hasHeaders": "已配置自定义请求头",
   "prov.accounts": "账户（{n}）",
@@ -779,18 +852,20 @@ export const zh: Record<TKey, string> = {
   "prov.defaultBadge": "默认",
   "prov.enable": "启用",
   "prov.disable": "禁用",
-  "prov.enabled": "已启用 \"{name}\"。其模型可再次出现在 Codex 中。",
-  "prov.disabled": "已禁用 \"{name}\"。设置会保留，但模型会被隐藏。",
-  "prov.disabledShadowTarget": "已禁用 \"{name}\"。影子调用拦截仍指向 \"{model}\"，在选择其他目标或重新启用 \"{name}\" 之前，辅助调用会失败。",
-  "prov.enableFail": "启用 \"{name}\" 失败。",
-  "prov.disableFail": "禁用 \"{name}\" 失败。",
+  "prov.enabled": '已启用 "{name}"。其模型可再次出现在 Codex 中。',
+  "prov.disabled": '已禁用 "{name}"。设置会保留，但模型会被隐藏。',
+  "prov.disabledShadowTarget":
+    '已禁用 "{name}"。影子调用拦截仍指向 "{model}"，在选择其他目标或重新启用 "{name}" 之前，辅助调用会失败。',
+  "prov.enableFail": '启用 "{name}" 失败。',
+  "prov.disableFail": '禁用 "{name}" 失败。',
   "prov.enableAria": "启用提供方 {name}",
   "prov.disableAria": "禁用提供方 {name}",
   "prov.defaultCannotDisable": "默认提供方不能被禁用",
   "prov.openaiAccountMode": "Codex 账户模式",
   "prov.openaiModePool": "账户池",
   "prov.openaiModeDirect": "直连",
-  "prov.openaiPoolDesc": "默认模式。根据会话关联、额度、冷却时间和故障转移，在主登录与已添加账户之间轮换。",
+  "prov.openaiPoolDesc":
+    "默认模式。根据会话关联、额度、冷却时间和故障转移，在主登录与已添加账户之间轮换。",
   "prov.openaiDirectDesc": "仅使用当前主 Codex 登录。不会读取或轮换已存储的账户池账号。",
   "prov.openaiModeSaved": "OpenAI 账户模式已更改为 {mode}。",
   "prov.openaiModeSaveFailed": "无法更改 OpenAI 账户模式。",
@@ -804,17 +879,22 @@ export const zh: Record<TKey, string> = {
   "models.tab.routing": "路由 (beta)",
   "models.tabsLabel": "模型界面",
   "models.subtitle.routing": "策略配置、dry-run 评估，以及有据可查的路由分析。",
-  "models.subtitle": "开关 Codex 可见的模型 — 原生 GPT passthrough 与已路由模型按提供方分组（点击标题可折叠）。隐藏的模型不会出现在目录和模型选择器中，但仍可按精确 id 直接调用。",
+  "models.subtitle":
+    "开关 Codex 可见的模型 — 原生 GPT passthrough 与已路由模型按提供方分组（点击标题可折叠）。隐藏的模型不会出现在目录和模型选择器中，但仍可按精确 id 直接调用。",
   "models.delivery.title": "更改如何到达 Codex",
   "models.delivery.chip.saved": "已保存在此",
   "models.delivery.chip.loaded": "Codex 重启后才会加载",
   "models.delivery.saved.title": "已保存到此代理",
-  "models.delivery.saved.body": "在此页面保存会改写本 OpenCodex 代理交给 Codex 的模型目录，也就是 Codex 模型选择器里显示的那份列表。保存后的确认表示这一步已经完成。",
+  "models.delivery.saved.body":
+    "在此页面保存会改写本 OpenCodex 代理交给 Codex 的模型目录，也就是 Codex 模型选择器里显示的那份列表。保存后的确认表示这一步已经完成。",
   "models.delivery.loaded.title": "已由 Codex 加载",
-  "models.delivery.loaded.body": "Codex 在启动时读取目录，所以已经打开的 Codex 窗口会继续使用旧的模型列表。OpenCodex 无法查看正在运行的 Codex 内部，也就无法确认它用的是哪一份列表。如果能判断 Codex 是在你的更改之前启动的，标签页上方会出现重启提示。",
-  "models.delivery.hint": "如果刚打开的模型没有出现在 Codex 里，请点击本页右上角的「重新加载 Codex 模型列表」，然后重新打开 Codex。",
+  "models.delivery.loaded.body":
+    "Codex 在启动时读取目录，所以已经打开的 Codex 窗口会继续使用旧的模型列表。OpenCodex 无法查看正在运行的 Codex 内部，也就无法确认它用的是哪一份列表。如果能判断 Codex 是在你的更改之前启动的，标签页上方会出现重启提示。",
+  "models.delivery.hint":
+    "如果刚打开的模型没有出现在 Codex 里，请点击本页右上角的「重新加载 Codex 模型列表」，然后重新打开 Codex。",
   "models.nativeGroupLabel": "OpenAI 原生",
-  "models.nativeHint": "Passthrough 模型使用在提供方页面选择的账户池或直连选项。关闭后会从 Codex 选择器中隐藏（目录条目保留，重新开启即可完整恢复）。 在此添加模型将注册为路由的 `openai/<model>` 选择器，而不是新的裸 passthrough id。",
+  "models.nativeHint":
+    "Passthrough 模型使用在提供方页面选择的账户池或直连选项。关闭后会从 Codex 选择器中隐藏（目录条目保留，重新开启即可完整恢复）。 在此添加模型将注册为路由的 `openai/<model>` 选择器，而不是新的裸 passthrough id。",
   "models.active": "{active}/{total} 可见",
   "models.workspace.providers": "提供方",
   "models.workspace.allProviders": "所有提供方",
@@ -845,11 +925,14 @@ export const zh: Record<TKey, string> = {
   "models.v2ModeDesc_default": "上游默认值 (sol/terra=v2, luna=v1)",
   "models.v2ModeDesc_v2": "所有模型 → v2 界面",
   "models.keepNativeOnV1": "ChatGPT 保持 v1",
-  "models.keepNativeOnV1Hint": "仅当 ChatGPT 原生父代理仍留在 v2 时，才会加密 v2 子任务，Grok/Claude 无法读取。开启此选项可让 Sol/Terra 留在 v1，从而避免该加密。路由父代理仍使用 v2。",
-  "models.v2Help": "控制所有模型的多代理界面。\n\nv1: 经典单线程代理。所有模型使用 v1 协作界面。\nbase: 上游默认值 — sol/terra 使用 v2，luna 使用 v1，其余跟随 codex 功能标志。\nv2: 多线程代理（spawn_agent）。所有模型使用 v2 协作界面。\n\n在 v2 下，「ChatGPT 保持 v1」会让 Sol/Terra 留在 v1，以便继续派发 Grok 或 Claude。ChatGPT 会加密 v2 子任务，路由模型无法读取；路由父代理仍留在 v2。\n\n更改在新会话中生效。",
+  "models.keepNativeOnV1Hint":
+    "仅当 ChatGPT 原生父代理仍留在 v2 时，才会加密 v2 子任务，Grok/Claude 无法读取。开启此选项可让 Sol/Terra 留在 v1，从而避免该加密。路由父代理仍使用 v2。",
+  "models.v2Help":
+    "控制所有模型的多代理界面。\n\nv1: 经典单线程代理。所有模型使用 v1 协作界面。\nbase: 上游默认值 — sol/terra 使用 v2，luna 使用 v1，其余跟随 codex 功能标志。\nv2: 多线程代理（spawn_agent）。所有模型使用 v2 协作界面。\n\n在 v2 下，「ChatGPT 保持 v1」会让 Sol/Terra 留在 v1，以便继续派发 Grok 或 Claude。ChatGPT 会加密 v2 子任务，路由模型无法读取；路由父代理仍留在 v2。\n\n更改在新会话中生效。",
   "models.v2DocsLink": "v1 / v2 是什么？",
   "dash.multiAgent": "子代理",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads 仍存在 — codex 将拒绝启动，请从 config.toml 移除",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads 仍存在 — codex 将拒绝启动，请从 config.toml 移除",
   "models.v2Applied": "子代理模式已更新 — 新会话生效（重启 Codex 应用以刷新选择器）",
   "models.v2ThreadsLabel": "子代理上限",
   "models.v2ThreadsDefault": "默认",
@@ -862,7 +945,8 @@ export const zh: Record<TKey, string> = {
   "models.contextDefault": "提供方默认值",
   "models.contextModel": "模型",
   "models.contextModelOverride": "模型覆盖值",
-  "models.contextHint": "已经知道窗口时，在这里手写 Codex 实际窗口。上游没报窗口就用这个值；上游报了更大窗口才压低。留空则使用提供方的「默认窗口 / 上限」；那个开关没开时才回退 128k。",
+  "models.contextHint":
+    "已经知道窗口时，在这里手写 Codex 实际窗口。上游没报窗口就用这个值；上游报了更大窗口才压低。留空则使用提供方的「默认窗口 / 上限」；那个开关没开时才回退 128k。",
   "models.contextAutomatic": "自动发现",
   "models.contextSaved": "上下文窗口已更新 — 将在下一个 Codex 回合生效。",
   "models.contextUnchanged": "没有需要保存的上下文窗口更改。",
@@ -870,10 +954,12 @@ export const zh: Record<TKey, string> = {
   "models.contextInvalid": "上下文窗口必须为正整数",
   "models.contextCappedValue": "{value} 限制",
   "models.setAll": "全部设置",
-  "models.setAllHint": "给所有已路由提供方打开 {value} 默认窗口。中转站没报 context_window / context_length 时，这个值就是 Codex 实际窗口。要给单个模型手写，用同一行上的「自定义窗口」。原生提供方不受影响。",
+  "models.setAllHint":
+    "给所有已路由提供方打开 {value} 默认窗口。中转站没报 context_window / context_length 时，这个值就是 Codex 实际窗口。要给单个模型手写，用同一行上的「自定义窗口」。原生提供方不受影响。",
   "models.collapseAll": "全部折叠",
   "models.expandAll": "全部展开",
-  "models.orderHint": "默认顺序遵循精选项和目录优先级；同优先级的路由行按提供商、模型排序。保存的选择顺序可改变显示顺序，可见性开关用于筛选显示的行。客户端在再次获取前可能继续使用旧目录。",
+  "models.orderHint":
+    "默认顺序遵循精选项和目录优先级；同优先级的路由行按提供商、模型排序。保存的选择顺序可改变显示顺序，可见性开关用于筛选显示的行。客户端在再次获取前可能继续使用旧目录。",
   "models.settingsPanel.title": "模型设置",
   "models.settingsPanel.off": "关",
   "models.settingsPanel.attention": "需要注意",
@@ -891,15 +977,18 @@ export const zh: Record<TKey, string> = {
   "models.settingsNoChange": "{model} 的设置未更改",
   "models.settingsSaved": "已保存 {model} 的模型设置",
   "models.settingsSaveFailed": "无法确认设置是否已保存。重试前请重新加载模型列表。",
-  "models.settingsRefreshFailed": "已保存。模型列表未重新加载，因此该行可能显示旧值。请重新加载确认。",
-  "models.settingsSavedCodexStale": "已保存 {model}，但 Codex 模型目录未刷新。请在仪表板点击「立即同步」让 Codex 应用此更改。",
+  "models.settingsRefreshFailed":
+    "已保存。模型列表未重新加载，因此该行可能显示旧值。请重新加载确认。",
+  "models.settingsSavedCodexStale":
+    "已保存 {model}，但 Codex 模型目录未刷新。请在仪表板点击「立即同步」让 Codex 应用此更改。",
   "models.settingsRejected": "服务器拒绝了这些设置，因此没有保存任何内容。请检查数值后重试。",
   "models.settingsDefaultEffort": "默认档位",
   "models.settingsModalitiesInherit": "未覆盖 — 当前按上游声明：{modalities}",
   "models.settingsModalitiesUnknown": "未声明",
   "models.settingsRestore": "恢复",
   "models.settingsRestoreHint": "清除这个模型上的全部覆盖，回到程序计算值。",
-  "models.settingsRestoreConfirm": "把 {model} 恢复为程序计算值？这会清除它的上下文窗口、输入模态与推理覆盖。",
+  "models.settingsRestoreConfirm":
+    "把 {model} 恢复为程序计算值？这会清除它的上下文窗口、输入模态与推理覆盖。",
   "models.settingsRestored": "{model} 已恢复为程序计算值",
   "models.settingsNothingToRestore": "{model} 没有覆盖，已经是程序计算值",
   "models.customAdded": "已添加自定义模型",
@@ -923,7 +1012,8 @@ export const zh: Record<TKey, string> = {
   "pws.modelHidden": "模型已隐藏。可在模型中恢复显示。",
   "pws.modelDefinitionDeleted": "自定义定义已删除。原有模型可能仍会显示。",
   "pws.modelKnown": "此模型已存在。请在模型中管理其可见性。",
-  "models.customDeleteConfirm": "要删除 {name} 的自定义定义吗？原有的原生模型或已发现模型可能会重新显示。",
+  "models.customDeleteConfirm":
+    "要删除 {name} 的自定义定义吗？原有的原生模型或已发现模型可能会重新显示。",
   "models.hide": "隐藏",
   "models.hideConfirm": "要从模型目录中隐藏 {name} 吗？这不会删除其定义，也不会改变直接路由策略。",
   "models.customBadge": "自定义",
@@ -951,7 +1041,8 @@ export const zh: Record<TKey, string> = {
   "models.tipActive": "已启用",
   "models.tipDisabled": "已禁用",
   "models.applied": "已保存。Codex 在重新加载模型列表后会显示这项更改。",
-  "models.integrationRefreshWarning": "模型选择已保存。部分客户端的模型目录未能刷新。开始新会话前，请检查“集成”页面。",
+  "models.integrationRefreshWarning":
+    "模型选择已保存。部分客户端的模型目录未能刷新。开始新会话前，请检查“集成”页面。",
   "models.saveFailed": "保存失败",
   "models.networkError": "网络错误 — 代理在运行吗？",
   "models.loadFail": "加载模型失败 — 代理在运行吗？",
@@ -968,8 +1059,10 @@ export const zh: Record<TKey, string> = {
   "models.discoveryFailedGeneric": "模型发现失败。",
   "models.openProviderSettings": "打开提供方设置",
   "models.inactiveNoCredit": "无额度",
-  "models.inactiveNoCreditHint": "该条目背后的提供方当前都没有额度，请求会失败。条目仍会列出，额度重置或充值后即可继续使用。",
-  "models.discoveryFailedDependency": "该提供方已开启模型发现。若持续失败，可在提供方设置中关闭“{control}”，改用手动添加的模型或静态模型。",
+  "models.inactiveNoCreditHint":
+    "该条目背后的提供方当前都没有额度，请求会失败。条目仍会列出，额度重置或充值后即可继续使用。",
+  "models.discoveryFailedDependency":
+    "该提供方已开启模型发现。若持续失败，可在提供方设置中关闭“{control}”，改用手动添加的模型或静态模型。",
   "models.loading": "加载中…",
   "models.search": "搜索模型…",
   "models.showMore": "再显示 {n} 个",
@@ -983,24 +1076,30 @@ export const zh: Record<TKey, string> = {
   "sub.forceTitle": "强制所有子代理使用同一模型",
   "sub.forceModel": "Claude Code 子代理模型",
   "sub.forceChoose": "选择已公开的模型",
-  "sub.forceHelp": "适用于插件和内置代理（包括 Explore/Plan），并覆盖每次调用指定的模型。分支和设置了 model: inherit 的技能仍使用主对话模型。主模型和 Haiku/small-fast 辅助模型不受影响。",
-  "sub.forceScope": "默认关闭。从下次通过路由启动 ocx claude 时生效，不适用于直接运行 claude。Shell 导出的环境变量优先；settings.json 的 env 可覆盖这些变量。状态仅检查服务器上的 CLI 和用户设置，不涵盖其他 Shell 或项目设置。",
+  "sub.forceHelp":
+    "适用于插件和内置代理（包括 Explore/Plan），并覆盖每次调用指定的模型。分支和设置了 model: inherit 的技能仍使用主对话模型。主模型和 Haiku/small-fast 辅助模型不受影响。",
+  "sub.forceScope":
+    "默认关闭。从下次通过路由启动 ocx claude 时生效，不适用于直接运行 claude。Shell 导出的环境变量优先；settings.json 的 env 可覆盖这些变量。状态仅检查服务器上的 CLI 和用户设置，不涵盖其他 Shell 或项目设置。",
   "sub.forceInvalid": "配置的目标不可用，启动时将跳过模型覆盖。请选择已公开的模型或关闭此功能。",
   "sub.forceOld": "Claude Code 版本低于 2.1.257：FORCE 会被忽略，仅应用非强制的子代理默认模型。",
   "sub.forceUnknown": "无法确定 Claude Code 版本。强制功能需要 2.1.257 或更新版本。",
-  "sub.forceOverride": "已被 settings.json 覆盖：其 env 中包含子代理模型或 FORCE 设置。OpenCodex 不会修改该文件。",
+  "sub.forceOverride":
+    "已被 settings.json 覆盖：其 env 中包含子代理模型或 FORCE 设置。OpenCodex 不会修改该文件。",
   "sub.forceSettingsUnknown": "无法检查 settings.json，无法确定设置是否覆盖了此选项。",
   "sub.forceSaved": "已保存。从下次通过路由启动 ocx claude 时生效。",
-  "sub.subtitle": "Codex 的 {cmd} 仅将优先级最高的前 5 个模型作为覆盖项公开。在此最多选择 5 个 — 原生 gpt 或已路由模型 — opencodex 会设置它们的目录优先级，使其正好排在前面。其他模型仍可按确切名称调用；此设置仅控制显示项。",
+  "sub.subtitle":
+    "Codex 的 {cmd} 仅将优先级最高的前 5 个模型作为覆盖项公开。在此最多选择 5 个 — 原生 gpt 或已路由模型 — opencodex 会设置它们的目录优先级，使其正好排在前面。其他模型仍可按确切名称调用；此设置仅控制显示项。",
   "sub.featured": "精选",
   "sub.advanced": "高级",
   "sub.orderHintAria": "此顺序的用途",
-  "sub.orderHint": "此处所选并显示的顺序决定 Codex 模型选择器顶部第 1–5 位，以及 {cmd} 的默认模型候选。若模型选择器中可见的精选模型少于 5 个，剩余栏位会按目录优先级显示模型；5 个可见的精选模型即可填满名单，除非自定义模型选择器顺序改变了目录优先级。",
+  "sub.orderHint":
+    "此处所选并显示的顺序决定 Codex 模型选择器顶部第 1–5 位，以及 {cmd} 的默认模型候选。若模型选择器中可见的精选模型少于 5 个，剩余栏位会按目录优先级显示模型；5 个可见的精选模型即可填满名单，除非自定义模型选择器顺序改变了目录优先级。",
   "sub.noneSelected": "未选择 — 请从下方列表选择。",
   "sub.models": "模型",
   "sub.search": "搜索模型（原生 gpt + 已路由）…",
   "sub.noModels": "没有模型 — 请先登录提供方或添加一个。",
-  "sub.saved": "已保存 {n} 个模型。启动新的 Codex 会话（或运行 {cmd}）以将它们作为 spawn_agent 覆盖项查看。",
+  "sub.saved":
+    "已保存 {n} 个模型。启动新的 Codex 会话（或运行 {cmd}）以将它们作为 spawn_agent 覆盖项查看。",
   "sub.saveFailed": "保存失败",
   "sub.networkError": "网络错误 — 代理在运行吗？",
   "sub.loadFail": "加载模型失败 — 代理在运行吗？",
@@ -1016,11 +1115,14 @@ export const zh: Record<TKey, string> = {
   "sub.workspace.priority": "优先级",
   "sub.workspace.removeFromFeatured": "将 {m} 从精选中移除",
   "sub.workspace.selectModel": "选择模型",
-  "sub.workspace.selectModelDesc": "从列表中选择一个模型以查看详情，并将其设为 spawn_agent 的精选模型。",
+  "sub.workspace.selectModelDesc":
+    "从列表中选择一个模型以查看详情，并将其设为 spawn_agent 的精选模型。",
   "sub.workspace.selector": "公开选择器",
   "sub.ultraMode": "始终主动委派",
-  "sub.ultraModeHint": "为所有模型和推理力度启用主动多代理委派策略（不改变推理力度本身）。将 features.multi_agent_v2.multi_agent_mode_hint_text 写入 config.toml。",
-  "sub.ultraModeV2Required": "需要 v2 多代理表面 — 请先启用 multi_agent_v2，并在子代理模式控件中选择 v2。",
+  "sub.ultraModeHint":
+    "为所有模型和推理力度启用主动多代理委派策略（不改变推理力度本身）。将 features.multi_agent_v2.multi_agent_mode_hint_text 写入 config.toml。",
+  "sub.ultraModeV2Required":
+    "需要 v2 多代理表面 — 请先启用 multi_agent_v2，并在子代理模式控件中选择 v2。",
   "sub.ultraModeText": "主动委派文本",
   "sub.ultraModePreset": "恢复预设",
   "sub.ultraModeLoadFail": "无法加载主动委派设置 — 代理是否在运行？",
@@ -1065,7 +1167,7 @@ export const zh: Record<TKey, string> = {
   "logs.badge.interceptedHelperTitle": "已拦截的辅助请求",
   "logs.filter.conversation.label": "会话",
   "logs.filter.conversation.placeholder": "粘贴会话 ID",
- "logs.filter.conversation.clear": "清除",
+  "logs.filter.conversation.clear": "清除",
   "logs.filter.model.label": "模型",
   "logs.filter.model.placeholder": "按模型或供应商筛选",
   "logs.filter.conversation.apply": "筛选日志",
@@ -1142,8 +1244,10 @@ export const zh: Record<TKey, string> = {
   "logs.detail.decodeGeneration": "生成期间的输出速率（估算）",
   "logs.detail.decodeLegacy": "首次可见输出后的输出速率（估算）",
   "logs.detail.decodeUnknown": "输出速率（估算；计时方式未知）",
-  "logs.detail.decodeBasisHint.generation": "按代理观测到首次输出（包括推理）至最后一个输出增量之间的时间估算。",
-  "logs.detail.decodeBasisHint.legacy": "按首次可见输出至请求结束之间的时间估算，同时计入所有已报告的输出 token，包括推理 token。",
+  "logs.detail.decodeBasisHint.generation":
+    "按代理观测到首次输出（包括推理）至最后一个输出增量之间的时间估算。",
+  "logs.detail.decodeBasisHint.legacy":
+    "按首次可见输出至请求结束之间的时间估算，同时计入所有已报告的输出 token，包括推理 token。",
   "logs.detail.decodeBasisHint.unknown": "服务器未报告此估算使用的计时方式。",
   "logs.detail.endToEndTokPerSec": "端到端输出 tok/s",
   "logs.detail.reason.ttft_missing": "该请求没有记录首个 token 的时间，因此没有可测量的解码区间。",
@@ -1231,7 +1335,8 @@ export const zh: Record<TKey, string> = {
   "logs.detail.estimate.cache_detail_missing": "缺少缓存明细；输入费用按上限估算。",
   "logs.detail.estimate.expected_price_overlay": "使用了已验证的 Expected 标价。",
   "logs.detail.estimate.provider_cost_overlay": "使用了用户配置的提供方价格覆盖。",
-  "logs.detail.estimate.priority_lower_bound": "暂无已确认的 Priority 价格；当前显示的估算是已知下界。",
+  "logs.detail.estimate.priority_lower_bound":
+    "暂无已确认的 Priority 价格；当前显示的估算是已知下界。",
   "logs.col.error": "错误",
   "logs.col.upstreamReason": "上游原因",
   "logs.col.failureDetail": "失败详情",
@@ -1290,20 +1395,23 @@ export const zh: Record<TKey, string> = {
   "logs.tokens.contextTotal": "活动上下文",
   "logs.tokens.noCacheNote": "该提供商不报告缓存 token 数",
   "logs.tokens.noCacheCursor": "Cursor 未报告缓存明细",
-  "logs.tokens.noCacheCursorNote": "Cursor 不提供缓存读写 token 数；这表示未知，并不代表已确认缓存未命中",
+  "logs.tokens.noCacheCursorNote":
+    "Cursor 不提供缓存读写 token 数；这表示未知，并不代表已确认缓存未命中",
   "logs.tokens.estimatedNote": "估算值（提供商不报告精确用量）",
   "logs.details": "查看详情",
   "logs.detailTitle": "请求详情",
   "logs.detailRaw": "原始日志",
 
   "debug.title": "调试",
-  "debug.subtitle": "可选的 provider transport 与 usage 提取诊断。请求错误和 502 在“日志”标签页显示。",
+  "debug.subtitle":
+    "可选的 provider transport 与 usage 提取诊断。请求错误和 502 在“日志”标签页显示。",
   "debug.debug": "提供方调试",
   "debug.usage": "用量提取",
   "debug.injection": "注入日志",
   "debug.claude": "Claude 入站",
   "debug.claudeInbound.title": "Claude 入站请求",
-  "debug.claudeInbound.sub": "显示 Claude Code/Desktop 实际发送的内容（thinking、effort、metadata）— 不保存提示词原文。",
+  "debug.claudeInbound.sub":
+    "显示 Claude Code/Desktop 实际发送的内容（thinking、effort、metadata）— 不保存提示词原文。",
   "debug.claudeInbound.empty": "尚未捕获任何请求。开启后从 Claude 发送一条消息试试。",
   "debug.claudeInbound.time": "时间",
   "debug.claudeInbound.endpoint": "端点",
@@ -1318,11 +1426,15 @@ export const zh: Record<TKey, string> = {
   "debug.loading": "正在加载调试设置…",
   "debug.loadFailed": "无法加载调试设置。",
   "debug.emptyTitle": "调试日志已关闭",
-  "debug.empty": "请在上方卡片中开启 Provider debug 或 Usage extraction。通过代理发送请求后，诊断行会显示在这里。",
+  "debug.empty":
+    "请在上方卡片中开启 Provider debug 或 Usage extraction。通过代理发送请求后，诊断行会显示在这里。",
   "debug.noLinesTitle": "等待诊断行",
-  "debug.noLines.provider": "提供商调试已开启，但仅记录传输异常（丢弃或格式错误的帧，以及 Cursor dial/retry 事件）。通过 Anthropic 等提供商的正常请求可能不会产生任何行。",
-  "debug.noLines.usage": "用量提取已开启但尚未捕获任何内容。请通过 Codex 发送请求，随后会显示在此处。",
-  "debug.noLines.injection": "注入日志已开启但尚未捕获任何内容。它记录协作和子代理回合中的多代理指导注入与 effort-cap 决策。",
+  "debug.noLines.provider":
+    "提供商调试已开启，但仅记录传输异常（丢弃或格式错误的帧，以及 Cursor dial/retry 事件）。通过 Anthropic 等提供商的正常请求可能不会产生任何行。",
+  "debug.noLines.usage":
+    "用量提取已开启但尚未捕获任何内容。请通过 Codex 发送请求，随后会显示在此处。",
+  "debug.noLines.injection":
+    "注入日志已开启但尚未捕获任何内容。它记录协作和子代理回合中的多代理指导注入与 effort-cap 决策。",
 
   // usage page
   "usage.title": "用量",
@@ -1333,7 +1445,8 @@ export const zh: Record<TKey, string> = {
   "usage.range.all": "全部",
   "usage.range.available": "可用历史",
   "usage.historyTruncated": "由于未加载较早的使用记录，合计仅涵盖可用历史。",
-  "usage.historyTruncatedWindow": "已加载记录的请求开始时间介于 {start} 到 {end} 之间。受读取上限限制，文件较前的条目已被省略，所选时间范围可能不完整。",
+  "usage.historyTruncatedWindow":
+    "已加载记录的请求开始时间介于 {start} 到 {end} 之间。受读取上限限制，文件较前的条目已被省略，所选时间范围可能不完整。",
   "usage.range.30d": "30 天",
   "usage.range.7d": "7 天",
   "usage.card.requests": "请求数",
@@ -1355,7 +1468,8 @@ export const zh: Record<TKey, string> = {
   "usage.coverage.measured": "已计量",
   "usage.coverage.reported": "提供方上报",
   "usage.coverage.estimated": "估算",
-  "usage.coverage.note": "已计量包含提供方上报和估算的 Token 数。未上报 / 不支持请求仅做计数，不会被算作 0 Token。",
+  "usage.coverage.note":
+    "已计量包含提供方上报和估算的 Token 数。未上报 / 不支持请求仅做计数，不会被算作 0 Token。",
   "usage.search.models": "搜索模型…",
   "usage.col.requests": "请求数",
   "usage.col.measured": "已计量",
@@ -1366,9 +1480,11 @@ export const zh: Record<TKey, string> = {
   "usage.col.cacheHits": "缓存命中",
   "usage.col.cacheWrites": "缓存写入",
   "usage.col.cacheHitRate": "命中率",
-  "usage.throughput.title": "端到端输出吞吐：输出 token 总和 ÷ 墙钟时长总和，样本为 {samples} 个同时上报了 token 与时长的尝试。包含解码前的等待时间，因此低于稳态解码速度；未上报 token 或时长的请求不计入。",
+  "usage.throughput.title":
+    "端到端输出吞吐：输出 token 总和 ÷ 墙钟时长总和，样本为 {samples} 个同时上报了 token 与时长的尝试。包含解码前的等待时间，因此低于稳态解码速度；未上报 token 或时长的请求不计入。",
   "usage.throughput.unmeasured": "该行没有请求同时上报输出 token 与时长，无法计算吞吐。",
-  "usage.cacheHitRate.partial": "全部 {total} 个输入 Token 中，有 {measured} 个提供了缓存明细，命中率取这些数据的平均值；其余请求未报告缓存明细。",
+  "usage.cacheHitRate.partial":
+    "全部 {total} 个输入 Token 中，有 {measured} 个提供了缓存明细，命中率取这些数据的平均值；其余请求未报告缓存明细。",
   "usage.cacheHitRate.unmeasured": "此行没有任何请求报告缓存明细，因此无法计算平均命中率。",
   "usage.unavailable": "—",
   "usage.col.tokens": "Token 数",
@@ -1401,7 +1517,7 @@ export const zh: Record<TKey, string> = {
   "modal.loggingIn": "登录中…",
   "modal.loginTimeout": "登录超时 — 请重试。",
   "nav.api": "API",
-"nav.codexAuth": "Codex 认证",
+  "nav.codexAuth": "Codex 认证",
   "nav.codexSet": "Codex",
   "nav.connect": "路由",
   "nav.usageLogs": "用量与日志",
@@ -1411,34 +1527,39 @@ export const zh: Record<TKey, string> = {
   "codexSet.prompt.title": "提示词层",
   "codexSet.prompt.timing": "对新启动的会话生效。正在运行的会话保持当前的提示词设置。",
   "codexSet.prompt.staleRevision": "配置已在别处更改，列表已重新加载。",
-"codexSet.prompt.writeFailed": "无法保存更改。",
-"codexSet.prompt.loadFailed": "无法加载提示词层。",
+  "codexSet.prompt.writeFailed": "无法保存更改。",
+  "codexSet.prompt.loadFailed": "无法加载提示词层。",
   "codexSet.prompt.repair": "修复",
   "codexSet.prompt.repairFailed": "无法完成修复。",
   "codexSet.prompt.remeasure": "重新测量",
   "codexSet.drift.journalPresent": "上一次写入未完成。下次写入时会自动恢复。",
-  "codexSet.drift.projectionStale": "已保存的层与 config.toml 中的值不一致。修复会按你的层重新写入该值。",
-  "codexSet.drift.storeMissing": "层文件已丢失，但 config.toml 中仍有指令。修复会先创建备份，并将该文本保留为一个层。",
+  "codexSet.drift.projectionStale":
+    "已保存的层与 config.toml 中的值不一致。修复会按你的层重新写入该值。",
+  "codexSet.drift.storeMissing":
+    "层文件已丢失，但 config.toml 中仍有指令。修复会先创建备份，并将该文本保留为一个层。",
   "codexSet.drift.ownedMalformed": "config.toml 中生成的那一行被手动改动过，因此重写不再安全。",
-  "codexSet.custom.adoptUnsupported": "{path} 第 {line} 行的值不是单行字符串，无法导入。若要在此管理，请手动移动它。",
+  "codexSet.custom.adoptUnsupported":
+    "{path} 第 {line} 行的值不是单行字符串，无法导入。若要在此管理，请手动移动它。",
   "codexSet.prompt.unreadable": "Codex 配置文件存在但无法读取，因此拒绝了更改。",
   "codexSet.layer.permissions": "权限",
   "codexSet.layer.collaboration": "协作模式",
   "codexSet.layer.environment": "环境上下文",
   "codexSet.layer.apps": "应用",
-"codexSet.layer.skills": "技能",
-"codexSet.prompt.extensionsUnknown": "扩展可添加自己的层。Codex 不会公开这些层，因此无法在此列出。",
+  "codexSet.layer.skills": "技能",
+  "codexSet.prompt.extensionsUnknown":
+    "扩展可添加自己的层。Codex 不会公开这些层，因此无法在此列出。",
   "codexSet.group.transition": "变更通知",
-  "codexSet.group.transitionDesc": "它们通报变化而非描述状态，因此仅在会话切换到实时模式或更换模型时出现。编号保持组装顺序，因此上面的列表会跳号。",
+  "codexSet.group.transitionDesc":
+    "它们通报变化而非描述状态，因此仅在会话切换到实时模式或更换模型时出现。编号保持组装顺序，因此上面的列表会跳号。",
   "codexSet.custom.slotNote": "自定义层会按此顺序合并为一个部分。",
-"codexSet.row.alwaysOn": "始终启用",
+  "codexSet.row.alwaysOn": "始终启用",
   "codexSet.row.onChange": "变更时发送",
-"codexSet.row.featureGated": "在 [features] 下配置",
+  "codexSet.row.featureGated": "在 [features] 下配置",
   "codexSet.row.openFeatures": "打开设置",
   "codexSet.row.resetDefault": "重置为 {value}",
   "codexSet.dialog.setValue": "{value}（默认 {fallback}）",
-"codexSet.dialog.copyKey": "复制配置键",
-"codexSet.dialog.unknownLayer": "此版本没有该层的说明。它来自比仪表板更新的 Codex 运行时。",
+  "codexSet.dialog.copyKey": "复制配置键",
+  "codexSet.dialog.unknownLayer": "此版本没有该层的说明。它来自比仪表板更新的 Codex 运行时。",
   "codexSet.custom.heading": "自定义层",
   "codexSet.custom.add": "+ 添加层",
   "codexSet.custom.newTitle": "新建层",
@@ -1461,7 +1582,7 @@ export const zh: Record<TKey, string> = {
   "codexSet.custom.layerGone": "该层已在别处被删除，因此编辑器已关闭。",
   "codexSet.custom.deleteConfirmNamed": "删除“{title}”？可在短时间内撤销。",
   "codexSet.custom.deletedNamed": "已删除“{title}”。",
-"codexSet.custom.moveUp": "上移 {title}",
+  "codexSet.custom.moveUp": "上移 {title}",
   "codexSet.custom.prevLayer": "上一层",
   "codexSet.custom.nextLayer": "下一层",
   "codexSet.custom.navPosition": "{position} / {total}",
@@ -1469,11 +1590,13 @@ export const zh: Record<TKey, string> = {
   "codexSet.custom.limitReached": "最多可保留 {max} 个自定义层。",
   "codexSet.custom.composedSize": "合成大小: {bytes}/{max} 字节",
   "codexSet.custom.composedPreview": "查看合成的 developer_instructions",
-  "codexSet.custom.notOwned": "developer_instructions 是在 opencodex 外部写入的，因此无法在此编辑。请将其导入，以便作为层进行管理。",
+  "codexSet.custom.notOwned":
+    "developer_instructions 是在 opencodex 外部写入的，因此无法在此编辑。请将其导入，以便作为层进行管理。",
   "codexSet.custom.adopt": "导入现有指令",
   "codexSet.custom.adoptConfirm": "导入为层",
   "codexSet.custom.adoptRefused": "无法导入现有值。",
-  "codexSet.custom.baseReplaced": "model_instructions_file 已设置为 {path}，因此 opencodex 外部的内容已替换基础提示词。",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file 已设置为 {path}，因此 opencodex 外部的内容已替换基础提示词。",
   "codexSet.custom.baseReplacedOpen": "管理它",
   "codexSet.lint.identity": "此内容声明了与 Codex 所设定身份不同的身份。",
   "codexSet.lint.foreignTool": "工具由注册表提供；在此指定名称并不会创建工具。",
@@ -1481,30 +1604,35 @@ export const zh: Record<TKey, string> = {
   "codexSet.lint.applyPatch": "apply_patch 由工具注册表定义，而不是由指令定义。",
   "codexSet.lint.approvalVocab": "Codex 会注入自己的审批术语；此内容可能与其冲突。",
   "codexSet.lint.environment": "环境信息稍后生成，可能与此内容冲突。",
-"codexSet.lint.size": "此层超过 8 KB。仍可保存，但每次请求都会消耗令牌。",
+  "codexSet.lint.size": "此层超过 8 KB。仍可保存，但每次请求都会消耗令牌。",
   "codexSet.lint.secret": "看起来像凭据或 API 密钥——将以明文存储在 config.toml 中。",
   "codexSet.lint.ignoreInstructions": "让 Codex 忽略其自身指令可能会使其内置指导失效。",
   "codexSet.preset.blank": "空白层",
   "codexSet.preset.concise.name": "简洁输出",
   "codexSet.preset.concise.description": "简短作答，不加开场白，尽量减少格式。",
-  "codexSet.preset.concise.provenance": "改编自 Claude Code 的简洁性指令。文案由我们原创，并非复制。",
+  "codexSet.preset.concise.provenance":
+    "改编自 Claude Code 的简洁性指令。文案由我们原创，并非复制。",
   "codexSet.preset.planFirst.name": "编辑前先规划",
   "codexSet.preset.planFirst.description": "先说明计划，再进行更改。",
-  "codexSet.preset.planFirst.provenance": "改编自 Claude Code 的规划思路。文案由我们原创，并非复制。",
+  "codexSet.preset.planFirst.provenance":
+    "改编自 Claude Code 的规划思路。文案由我们原创，并非复制。",
   "codexSet.preset.explainWhy.name": "解释理由",
   "codexSet.preset.explainWhy.description": "不仅说明做什么，也说明为什么。",
-  "codexSet.preset.explainWhy.provenance": "改编自 Grok Build 的确认风格。文案由我们原创，并非复制。",
+  "codexSet.preset.explainWhy.provenance":
+    "改编自 Grok Build 的确认风格。文案由我们原创，并非复制。",
   "codexSet.preset.testFirst.name": "测试优先",
   "codexSet.preset.testFirst.description": "修复前先编写会失败的测试。",
   "codexSet.preset.testFirst.provenance": "改编自常见的代理实践。文案由我们原创，并非复制。",
   "codexSet.preset.korean.name": "韩语回复",
   "codexSet.preset.korean.description": "无论请求使用哪种语言，都用韩语回答。",
-  "codexSet.preset.korean.provenance": "根据常见的用户需求为 opencodex 编写。文案由我们原创，并非复制。",
+  "codexSet.preset.korean.provenance":
+    "根据常见的用户需求为 opencodex 编写。文案由我们原创，并非复制。",
   "codexSet.dialog.class": "类型",
   "codexSet.dialog.key": "配置键",
   "codexSet.dialog.fileValue": "此文件中的值",
   "codexSet.dialog.absentDefault": "未设置（默认为 {value}）",
-"codexSet.dialog.noRenderedText": "Codex 不会公开内置层组装后的文本，因此此对话框仅说明该层并列出其配置键，不显示具体内容。",
+  "codexSet.dialog.noRenderedText":
+    "Codex 不会公开内置层组装后的文本，因此此对话框仅说明该层并列出其配置键，不显示具体内容。",
   "codexSet.dialog.probeNotFound": "无法测量：未找到 codex 可执行文件。",
   "codexSet.dialog.probeUnsupported": "无法测量：此 Codex 版本不支持测量命令。",
   "codexSet.dialog.probeInvalid": "无法测量：无法解析 Codex 输出。",
@@ -1512,9 +1640,11 @@ export const zh: Record<TKey, string> = {
   "codexSet.dialog.probeBusy": "另一个测量仍在进行。请稍后重试。",
   "codexSet.dialog.sourceText": "发送给模型的原文",
   "codexSet.dialog.sourceBytes": "{bytes} 字节",
-"codexSet.dialog.notRendered": "在我们读取的那一轮中，此层没有发送任何内容。各部分仅在内容变化时才会重新发送，因此单次采样可能看不到它。",
+  "codexSet.dialog.notRendered":
+    "在我们读取的那一轮中，此层没有发送任何内容。各部分仅在内容变化时才会重新发送，因此单次采样可能看不到它。",
   "codexSet.dialog.emptySource": "{path} 文件存在但为空，因此此层不会发送任何内容。",
-  "codexSet.dialog.notExposed": "基础提示词不在 Codex 可打印的消息列表中传递，因此无法在此显示。可以通过 model_instructions_file 替换它。",
+  "codexSet.dialog.notExposed":
+    "基础提示词不在 Codex 可打印的消息列表中传递，因此无法在此显示。可以通过 model_instructions_file 替换它。",
   "codexSet.dialog.unmapped": "此层在提示词输出中尚无已确认的映射，因此暂时无法在此显示其文本。",
   "codexSet.dialog.textUnavailable": "本机无法读取 Codex 提示词，因此无法显示原文。",
   "codexSet.class.base": "基础指令",
@@ -1548,7 +1678,8 @@ export const zh: Record<TKey, string> = {
   "codexSet.about.tools": "延迟加载的工具说明，由功能开关控制。",
   "codexSet.about.skills": "可用技能列表。",
   "codexSet.about.multi-agent-mode": "子代理指令，由功能开关控制。",
-  "codexSet.about.git-attribution": "让模型在它写的提交里加上 Co-authored-by: Codex 尾注，并在它开的拉取请求里加上 Generated with Codex. 这一行。Codex 从你的账号读取此项，所以这里和 [features] 都改不了。账号关闭时，Codex 会发送相反的指令，而不是什么都不发。",
+  "codexSet.about.git-attribution":
+    "让模型在它写的提交里加上 Co-authored-by: Codex 尾注，并在它开的拉取请求里加上 Generated with Codex. 这一行。Codex 从你的账号读取此项，所以这里和 [features] 都改不了。账号关闭时，Codex 会发送相反的指令，而不是什么都不发。",
   "codexSet.condition.model-switch": "仅在会话中途切换模型后注入。",
   "codexSet.condition.realtime": "仅在实时会话中注入。",
   "codexSet.condition.agents-md": "找到适用于当前工作目录的项目文档时注入。",
@@ -1560,16 +1691,21 @@ export const zh: Record<TKey, string> = {
   "codexSet.base.position": "{position} / {total}",
   "codexSet.base.swipeHint": "左右滑动、按方向键，或点箭头按钮切换选项。对新开始的会话生效。",
   "codexSet.base.defaultTitle": "Codex 自带的基础提示词",
-  "codexSet.base.defaultBody": "默认项并不存在这里，所以没有可编辑或删除的内容：选它只是从配置里移除 model_instructions_file，让 Codex 用自带的提示词。",
+  "codexSet.base.defaultBody":
+    "默认项并不存在这里，所以没有可编辑或删除的内容：选它只是从配置里移除 model_instructions_file，让 Codex 用自带的提示词。",
   "codexSet.base.variantTitle": "名称",
   "codexSet.base.variantBody": "提示词",
-  "codexSet.base.replacesWarning": "这会整体替换 Codex 自带的基础提示词，而不是在其后追加。这里写得短，模型收到的指令就只有这么短。",
+  "codexSet.base.replacesWarning":
+    "这会整体替换 Codex 自带的基础提示词，而不是在其后追加。这里写得短，模型收到的指令就只有这么短。",
   "codexSet.base.use": "用这一个",
   "codexSet.base.inUse": "正在使用",
-  "codexSet.base.externalBlocked": "model_instructions_file 已指向 {path}，且不是 opencodex 写的。请先自行清除，再在此处选择——或将该文件导入为变体。",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file 已指向 {path}，且不是 opencodex 写的。请先自行清除，再在此处选择——或将该文件导入为变体。",
   "codexSet.base.import": "导入为变体",
-  "codexSet.base.importPreview": "{path} 中的文件会被转换为受管变体，并按下方所示原样安装 —— 标题成为 `#` 标题行，正文会被规范化（CRLF → LF，制表符 → 4 个空格）。",
-  "codexSet.base.importFormat": "按原样存储：共 {serializedBytes} 字节（正文 {bodyBytes} 字节）。Codex 会读取包含标题行在内的整个文件。",
+  "codexSet.base.importPreview":
+    "{path} 中的文件会被转换为受管变体，并按下方所示原样安装 —— 标题成为 `#` 标题行，正文会被规范化（CRLF → LF，制表符 → 4 个空格）。",
+  "codexSet.base.importFormat":
+    "按原样存储：共 {serializedBytes} 字节（正文 {bodyBytes} 字节）。Codex 会读取包含标题行在内的整个文件。",
   "codexSet.base.importTitle": "变体标题",
   "codexSet.base.importTitlePending": "正在按此标题刷新预览…",
   "codexSet.base.importConfirm": "导入并管理",
@@ -1592,7 +1728,8 @@ export const zh: Record<TKey, string> = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "重启 Gentle Shell 以加载已保存目录中的模型目录。链接或共享目录请使用 Pi 集成。",
+  "integrations.semantics.gentleShell":
+    "重启 Gentle Shell 以加载已保存目录中的模型目录。链接或共享目录请使用 Pi 集成。",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -1607,32 +1744,40 @@ export const zh: Record<TKey, string> = {
   "integrations.tab.raycast": "Raycast",
   "integrations.tab.omo": "omo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "在 ~/.qoder-cn/settings.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
+  "integrations.semantics.qoderCn":
+    "在 ~/.qoder-cn/settings.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "在 ~/.workbuddy/models.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
+  "integrations.semantics.workbuddy":
+    "在 ~/.workbuddy/models.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "在 ~/.workbuddy-ai/models.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
+  "integrations.semantics.workbuddyAi":
+    "在 ~/.workbuddy-ai/models.json 中管理 OpenCodex 模型。需要本机回环连接。保留其他设置；撤销可恢复快照。",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
-  "integrations.semantics.qoder": "管理 ~/.qoder/settings.json 中的 OpenCodex 提供商和自定义模型。需要回环访问。保留其他设置；撤销会恢复快照。",
-  "integrations.semantics.t3code": "在 ~/.t3/userdata/settings.json 中添加 opencodex Claude 提供商实例（T3CODE_HOME 可更改位置）。路由模型会出现在 T3 Code 的模型选择器中；只有启用 Codex 集成且 T3 Code 使用相同的 CODEX_HOME 时，Codex 线程才会通过代理。需要回环访问。保留其他设置；撤销会恢复快照。",
+  "integrations.semantics.qoder":
+    "管理 ~/.qoder/settings.json 中的 OpenCodex 提供商和自定义模型。需要回环访问。保留其他设置；撤销会恢复快照。",
+  "integrations.semantics.t3code":
+    "在 ~/.t3/userdata/settings.json 中添加 opencodex Claude 提供商实例（T3CODE_HOME 可更改位置）。路由模型会出现在 T3 Code 的模型选择器中；只有启用 Codex 集成且 T3 Code 使用相同的 CODEX_HOME 时，Codex 线程才会通过代理。需要回环访问。保留其他设置；撤销会恢复快照。",
   "integrations.tab.cline": "Cline CLI",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.droid": "Factory Droid",
   "integrations.droidReasoning.title": "默认推理强度",
-  "integrations.droidReasoning.description": "仅当请求未指定推理强度时才使用默认值。停用 Factory Droid 会删除这些已保存的默认值。",
+  "integrations.droidReasoning.description":
+    "仅当请求未指定推理强度时才使用默认值。停用 Factory Droid 会删除这些已保存的默认值。",
   "integrations.droidReasoning.noDefault": "无默认值",
   "integrations.droidReasoning.noEfforts": "没有可用的推理强度选项",
   "integrations.droidReasoning.noModels": "没有可导出的模型。",
   "integrations.droidReasoning.modelDefault": "{model} 的默认推理强度",
-  "integrations.droidReasoning.unsupportedTitle": "部分已保存的默认值已不再受支持。清除后，请保存 / 检查更改以应用。",
+  "integrations.droidReasoning.unsupportedTitle":
+    "部分已保存的默认值已不再受支持。清除后，请保存 / 检查更改以应用。",
   "integrations.droidReasoning.unsupportedEffort": "不支持的强度：{effort}",
   "integrations.droidReasoning.clear": "清除默认值",
   "integrations.droidReasoning.saveReview": "保存 / 检查更改",
   "integrations.aside.profilesTitle": "Aside 配置文件",
-  "integrations.aside.profilesHint": "选择要接收所选模型的配置文件。Aside 当前使用的配置文件不会改变。",
+  "integrations.aside.profilesHint":
+    "选择要接收所选模型的配置文件。Aside 当前使用的配置文件不会改变。",
   "integrations.aside.all": "同步所有配置文件",
   "integrations.aside.syncNow": "立即同步",
   "integrations.aside.applied": "已应用 {count}/{total} 个配置文件",
@@ -1647,13 +1792,15 @@ export const zh: Record<TKey, string> = {
   "integrations.aside.retry": "重试 {name}",
   "integrations.aside.loadError": "无法加载 Aside 配置文件。请重试以查看状态。",
   "integrations.hermes.profilesTitle": "Hermes 配置文件",
-  "integrations.hermes.profilesHint": "每个 Hermes 配置文件都有自己的 config.yaml。选择要连接的配置文件；其他配置文件保持不变。",
+  "integrations.hermes.profilesHint":
+    "每个 Hermes 配置文件都有自己的 config.yaml。选择要连接的配置文件；其他配置文件保持不变。",
   "integrations.hermes.defaultProfile": "默认配置文件",
   "integrations.hermes.select": "管理 {name}",
   "integrations.hermes.loadError": "无法加载 Hermes 配置文件。请重试以查看状态。",
   "integrations.hermes.profileTitle": "Hermes 配置文件：{name}",
   "integrations.codex.title": "Codex CLI",
-  "integrations.codex.body": "Codex 连接由代理服务管理。启动 opencodex 时应用该连接；停止服务时恢复原生路由。",
+  "integrations.codex.body":
+    "Codex 连接由代理服务管理。启动 opencodex 时应用该连接；停止服务时恢复原生路由。",
   "integrations.codex.openService": "打开服务控制",
   "integrations.state.notInstalled": "未安装",
   "integrations.state.unknown": "检查中",
@@ -1669,40 +1816,58 @@ export const zh: Record<TKey, string> = {
   "integrations.detail.desktopNotServed": "配置存在，但 Desktop 使用的是另一个",
   "integrations.detail.desktopAbsent": "未应用任何配置",
   "integrations.detail.desktopDesiredOff": "Claude Desktop 集成已关闭",
-  "integrations.detail.desktopDesiredOffCleanupPending": "Claude Desktop 仍在使用网关，清理尚未完成",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "Claude Desktop 仍在使用网关，清理尚未完成",
   "integrations.detail.desktopDesiredOnNotApplied": "集成已开启，但 Desktop 未使用网关配置",
   "integrations.detail.desktopSelectedElsewhere": "Desktop 正在使用其他配置",
   "integrations.detail.desktopProfileDrift": "选中的 Desktop 配置已更改",
   "integrations.detail.desktopObservedUnsafe": "无法安全更改选中的 Desktop 配置",
   "integrations.detail.desktopNotInstalled": "未安装 Claude Desktop 配置库",
   "integrations.dialog.desktop.title": "要关闭 Claude Desktop 集成吗？",
-  "integrations.dialog.desktop.changes": "如果 {path} 包含由 opencodex 管理的网关配置，Desktop 会先选择新的无凭据标准配置，再移除旧配置及其备份。",
-  "integrations.dialog.desktop.breakage": "Claude Desktop 将不再使用经由 opencodex 路由的模型，而会恢复为标准 Claude。",
+  "integrations.dialog.desktop.changes":
+    "如果 {path} 包含由 opencodex 管理的网关配置，Desktop 会先选择新的无凭据标准配置，再移除旧配置及其备份。",
+  "integrations.dialog.desktop.breakage":
+    "Claude Desktop 将不再使用经由 opencodex 路由的模型，而会恢复为标准 Claude。",
   "integrations.dialog.desktop.undo": "重新开启后，会根据已保存的模型分配重新生成 opencodex 配置。",
-  "integrations.dialog.desktop.restart": "Claude Desktop 仅在启动时读取此配置。请完全退出并重新打开 Desktop 以使更改生效。",
+  "integrations.dialog.desktop.restart":
+    "Claude Desktop 仅在启动时读取此配置。请完全退出并重新打开 Desktop 以使更改生效。",
   "integrations.dialog.desktop.confirm": "停用",
-  "integrations.native.error.desktopUnsafeMetadata": "无法安全读取 {path} 中的 Claude Desktop 元数据，因此未更改其配置库。",
-  "integrations.native.error.desktopCleanupIncomplete": "Claude Desktop 已指向标准模式，但仍残留旧的 opencodex 凭据文件：{paths}。",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "无法安全读取 {path} 中的 Claude Desktop 元数据，因此未更改其配置库。",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "Claude Desktop 已指向标准模式，但仍残留旧的 opencodex 凭据文件：{paths}。",
   "integrations.native.msg.desktopDisabled": "Claude Desktop 集成已关闭。",
   "integrations.native.msg.desktopEnabled": "Claude Desktop 集成已开启。",
   "integrations.detail.grokModels": "已接入 {count} 个模型",
   "integrations.detail.grokAbsent": "配置中没有 opencodex 区块",
   "integrations.dialog.codex.title": "要停用 Codex 集成吗？",
-  "integrations.dialog.codex.changes": "opencodex 将从 {path} 中移除路由，删除其生成的配置，恢复原生模型目录，并将可恢复的线程重新标记为原生 Codex。",
-  "integrations.dialog.codex.breakage": "普通 codex 将直接连接 OpenAI，其他提供商路由的模型将从 Codex 中消失。代理和 /v1/responses 仍会继续为其他客户端运行。",
-  "integrations.dialog.codex.undo": "再次启用后，将根据当时可用的模型重建路由目录并重新注入 Codex。可恢复历史会按对应方向变得可用，但其文件不会逐字节恢复。",
-  "integrations.dialog.codex.sideEffect": "如果你在 opencodex 注入配置后选择了路由根模型，停用会移除该模型选择，再次启用也无法重建它；请重新选择模型。如果外部 model_provider 拥有 Codex，opencodex 只会删除其过时日志，配置、目录和历史记录保持不变。",
+  "integrations.dialog.codex.changes":
+    "opencodex 将从 {path} 中移除路由，删除其生成的配置，恢复原生模型目录，并将可恢复的线程重新标记为原生 Codex。",
+  "integrations.dialog.codex.breakage":
+    "普通 codex 将直接连接 OpenAI，其他提供商路由的模型将从 Codex 中消失。代理和 /v1/responses 仍会继续为其他客户端运行。",
+  "integrations.dialog.codex.undo":
+    "再次启用后，将根据当时可用的模型重建路由目录并重新注入 Codex。可恢复历史会按对应方向变得可用，但其文件不会逐字节恢复。",
+  "integrations.dialog.codex.sideEffect":
+    "如果你在 opencodex 注入配置后选择了路由根模型，停用会移除该模型选择，再次启用也无法重建它；请重新选择模型。如果外部 model_provider 拥有 Codex，opencodex 只会删除其过时日志，配置、目录和历史记录保持不变。",
   "integrations.dialog.codex.confirm": "停用",
   "integrations.dialog.grok.title": "要停用 Grok Build 集成吗？",
-  "integrations.dialog.grok.changes": "只会从 {path} 中删除由 opencodex 标记的区块。区块之外手动写入的内容将保持不变。",
-  "integrations.dialog.grok.breakage": "停用后，Grok Build 中的 opencodex 模型别名将消失。通过 xAI 账号使用的模型不受影响。",
-  "integrations.dialog.grok.undo": "如果 opencodex 正在 loopback 地址上运行，再次启用时会根据当前可用的模型列表重新写入区块。",
+  "integrations.dialog.grok.changes":
+    "只会从 {path} 中删除由 opencodex 标记的区块。区块之外手动写入的内容将保持不变。",
+  "integrations.dialog.grok.breakage":
+    "停用后，Grok Build 中的 opencodex 模型别名将消失。通过 xAI 账号使用的模型不受影响。",
+  "integrations.dialog.grok.undo":
+    "如果 opencodex 正在 loopback 地址上运行，再次启用时会根据当前可用的模型列表重新写入区块。",
   "integrations.dialog.grok.confirm": "停用",
-  "integrations.native.msg.nonLoopbackRemoved": "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。已删除之前指向 loopback 地址的区块。",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。没有需要删除的旧区块。",
-  "integrations.native.msg.nonLoopbackSuperseded": "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。在此期间，其他进程向配置写入了新区块，因此文件中的当前区块并非由本次请求创建。",
-  "integrations.native.error.orphanedMarker": "{path} 中有 opencodex 开始标记，但没有结束标记。由于无法确定该区块的结束位置，因此未修改文件。",
-  "integrations.native.error.homeMismatch": "已安装服务的主目录与当前主目录不一致，因此未修改文件。",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。已删除之前指向 loopback 地址的区块。",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。没有需要删除的旧区块。",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "只有当 opencodex 在 loopback 地址上运行时，才能自动注册 Grok Build。在此期间，其他进程向配置写入了新区块，因此文件中的当前区块并非由本次请求创建。",
+  "integrations.native.error.orphanedMarker":
+    "{path} 中有 opencodex 开始标记，但没有结束标记。由于无法确定该区块的结束位置，因此未修改文件。",
+  "integrations.native.error.homeMismatch":
+    "已安装服务的主目录与当前主目录不一致，因此未修改文件。",
   "integrations.native.error.notInstalled": "尚未安装 Grok Build，因此没有可更改的内容。",
   "integrations.native.error.configBusy": "其他进程正在保存配置，无法进行更改。请稍后重试。",
   "integrations.state.absent": "未应用",
@@ -1715,7 +1880,8 @@ export const zh: Record<TKey, string> = {
   "integrations.summary.stale": "需要更新",
   "integrations.summary.lastChange": "上次更改",
   "integrations.summary.disableAll": "全部禁用…",
-  "integrations.onboarding": "应用时会先保存备份，再写入一个 opencodex 提供方配置块。禁用时只移除该配置块，并可从保留的快照恢复。",
+  "integrations.onboarding":
+    "应用时会先保存备份，再写入一个 opencodex 提供方配置块。禁用时只移除该配置块，并可从保留的快照恢复。",
   "integrations.empty.title": "未检测到已安装的客户端",
   "integrations.empty.body": "安装受支持的客户端，然后返回此处应用 opencodex。",
   "integrations.action.apply": "应用",
@@ -1739,9 +1905,12 @@ export const zh: Record<TKey, string> = {
   "integrations.rollback.deleteNewest": "该客户端最近的一条记录会保留，以便你仍能撤销。",
   "integrations.rollback.deleteGone": "该记录已被删除。列表将会刷新。",
   "integrations.dialog.deleteEntry.title": "要删除这条回滚记录吗？",
-  "integrations.dialog.deleteEntry.changes": "该记录将从回滚列表中消失，并且它为 {path} 保留的备份也会从磁盘删除。",
-  "integrations.dialog.deleteEntry.breakage": "你将无法再把文件恢复到这个时间点。更新的记录和文件本身不受影响。",
-  "integrations.dialog.deleteEntry.undo": "此操作无法撤销。每个客户端最近的一条记录会保留且不能删除。",
+  "integrations.dialog.deleteEntry.changes":
+    "该记录将从回滚列表中消失，并且它为 {path} 保留的备份也会从磁盘删除。",
+  "integrations.dialog.deleteEntry.breakage":
+    "你将无法再把文件恢复到这个时间点。更新的记录和文件本身不受影响。",
+  "integrations.dialog.deleteEntry.undo":
+    "此操作无法撤销。每个客户端最近的一条记录会保留且不能删除。",
   "integrations.dialog.deleteEntry.confirm": "删除记录",
   "integrations.restore.title": "恢复此快照？",
   "integrations.restore.body": "系统会先备份当前文件，再用所选快照替换它。",
@@ -1757,18 +1926,23 @@ export const zh: Record<TKey, string> = {
   "integrations.error.conflict": "opencodex 写入后配置又发生了更改。未移除任何内容。",
   "integrations.error.unsafe": "无法安全地更改配置。",
   "integrations.error.generic": "集成更改失败。已保留之前的状态。",
-  "integrations.error.nonLoopback": "{client} 只能连接 localhost 上的代理：其配置没有位置放置远程绑定所需的准入标头，手动编写同样无效。请改用隧道或本地转发器提供 loopback 访问。",
+  "integrations.error.nonLoopback":
+    "{client} 只能连接 localhost 上的代理：其配置没有位置放置远程绑定所需的准入标头，手动编写同样无效。请改用隧道或本地转发器提供 loopback 访问。",
   "integrations.status.installed": "已安装",
   "integrations.status.notInstalled": "未安装",
   "integrations.status.appliedAt": "已应用",
-  "integrations.status.supersededStore": "此客户端现在从 {path} 读取提供方，而 opencodex 不写入该文件，因此在这里启用不会改变它加载的内容。",
-  "integrations.status.missingStore": "此客户端把提供方保存在 {path}，但该文件不存在。客户端下次启动时会把旧的设置文件移走并导入，所以 opencodex 不会改为写入那个设置文件。请创建 {path}，内容为 {document}，然后再点一次“应用”。",
-  "integrations.status.candidateConflict": "另一个 Kilo 配置文件 {path} 也定义了 provider.opencodex。应用之前，请从该文件中移除 provider.opencodex。",
+  "integrations.status.supersededStore":
+    "此客户端现在从 {path} 读取提供方，而 opencodex 不写入该文件，因此在这里启用不会改变它加载的内容。",
+  "integrations.status.missingStore":
+    "此客户端把提供方保存在 {path}，但该文件不存在。客户端下次启动时会把旧的设置文件移走并导入，所以 opencodex 不会改为写入那个设置文件。请创建 {path}，内容为 {document}，然后再点一次“应用”。",
+  "integrations.status.candidateConflict":
+    "另一个 Kilo 配置文件 {path} 也定义了 provider.opencodex。应用之前，请从该文件中移除 provider.opencodex。",
   "integrations.status.backup": "备份",
   "integrations.status.lastRestore": "上次恢复",
   "integrations.status.unknown": "未知",
   "integrations.bulk.title": "禁用已应用的客户端集成？",
-  "integrations.bulk.body": "只会移除归 opencodex 所有的配置块。每个客户端都会先保留一份写入前快照。",
+  "integrations.bulk.body":
+    "只会移除归 opencodex 所有的配置块。每个客户端都会先保留一份写入前快照。",
   "integrations.bulk.partial": "部分客户端无法禁用：{clients}",
   "integrations.bulk.success": "已禁用已应用的客户端集成。",
   "integrations.retention.degraded": "备份清理进度滞后；磁盘上可能仍有较旧的备份。",
@@ -1781,10 +1955,14 @@ export const zh: Record<TKey, string> = {
   "integrations.kind.restore": "已恢复",
   "integrations.kind.overwrite": "已覆盖",
   "integrations.dialog.overwrite.title": "替换该配置文件中的代码块？",
-  "integrations.dialog.overwrite.changesUnowned": "{path} 中 opencodex 需要写入的位置被一个并非我们写入的代码块占用。应用会将其替换为 opencodex 写入的代码块。",
-  "integrations.dialog.overwrite.changesForeign": "{path} 中 opencodex 代码块内你所做的修改会被丢弃，并替换为 opencodex 写入的代码块。",
-  "integrations.dialog.overwrite.breakage": "该代码块原本配置的内容将不再生效。文件其他位置保持不变。",
-  "integrations.dialog.overwrite.undo": "会先保存快照，因此这次操作会出现在下方的回滚列表中，可以撤销。",
+  "integrations.dialog.overwrite.changesUnowned":
+    "{path} 中 opencodex 需要写入的位置被一个并非我们写入的代码块占用。应用会将其替换为 opencodex 写入的代码块。",
+  "integrations.dialog.overwrite.changesForeign":
+    "{path} 中 opencodex 代码块内你所做的修改会被丢弃，并替换为 opencodex 写入的代码块。",
+  "integrations.dialog.overwrite.breakage":
+    "该代码块原本配置的内容将不再生效。文件其他位置保持不变。",
+  "integrations.dialog.overwrite.undo":
+    "会先保存快照，因此这次操作会出现在下方的回滚列表中，可以撤销。",
   "integrations.dialog.overwrite.confirm": "替换",
   "integrations.action.overwrite": "替换",
   "integrations.preview.loading": "正在加载准确的更改计划…",
@@ -1820,13 +1998,19 @@ export const zh: Record<TKey, string> = {
   "integrations.plan.noop.disabled": "无需更改托管的客户端文档；集成设置已不存在。",
   "integrations.plan.noop.profilePreference": "确认后仍会保存配置文件同步偏好。",
   "integrations.plan.refused": "服务器无法安全地应用此计划。",
-  "integrations.plan.refusal.notInstalled": "客户端尚未安装。请先安装，刷新此页面，然后重新预览更改。",
-  "integrations.plan.refusal.conflict": "托管设置与当前文件冲突。请检查文件，或在可用时使用“替换”。",
+  "integrations.plan.refusal.notInstalled":
+    "客户端尚未安装。请先安装，刷新此页面，然后重新预览更改。",
+  "integrations.plan.refusal.conflict":
+    "托管设置与当前文件冲突。请检查文件，或在可用时使用“替换”。",
   "integrations.plan.refusal.unsafe": "无法安全地更改客户端配置。请修复或替换文件后重试。",
-  "integrations.plan.refusal.nonLoopback": "此客户端需要环回代理地址。请使用 localhost、隧道或本地转发后重试。",
-  "integrations.plan.refusal.supersededStore": "此客户端从 opencodex 不写入的文件读取提供方，因此该操作不会改变它加载的内容。",
-  "integrations.plan.refusal.missingStore": "此客户端保存提供方的文件不存在。客户端下次启动时会把旧的设置文件移走，所以 opencodex 不会改为写入那个设置文件。请创建该文件，内容为 {document}，然后再点一次“应用”。",
-  "integrations.plan.refusal.driftRequiresConfirm": "文件在此回滚点后发生了变化。请先查看包含变化的计划再恢复。",
+  "integrations.plan.refusal.nonLoopback":
+    "此客户端需要环回代理地址。请使用 localhost、隧道或本地转发后重试。",
+  "integrations.plan.refusal.supersededStore":
+    "此客户端从 opencodex 不写入的文件读取提供方，因此该操作不会改变它加载的内容。",
+  "integrations.plan.refusal.missingStore":
+    "此客户端保存提供方的文件不存在。客户端下次启动时会把旧的设置文件移走，所以 opencodex 不会改为写入那个设置文件。请创建该文件，内容为 {document}，然后再点一次“应用”。",
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "文件在此回滚点后发生了变化。请先查看包含变化的计划再恢复。",
   "integrations.plan.refusal.snapshotExpired": "此回滚点的备份已过期，无法再恢复。",
   "integrations.plan.refusal.writeFailed": "服务器无法准备安全写入。请刷新集成状态后重试。",
   "integrations.mutation.pending": "正在应用已确认的更改…",
@@ -1840,16 +2024,25 @@ export const zh: Record<TKey, string> = {
   "integrations.semantics.openclaw": "立即应用到正在运行的网关。",
   "integrations.semantics.kimi": "重启或运行 /reload 以应用（v2 会监视该文件）。",
   "integrations.semantics.gajae": "在新会话中或打开 /model 时生效。",
-  "integrations.semantics.dsh": "OpenCodex 只管理 $DSH_HOME/profiles/desktop/cordis.patch.yml（DSH 0.1.7 起读取的 Desktop profile；该 profile 不存在时为 $DSH_HOME/settings.yaml）中 llm-pi-ai 这一行的 opencodex provider。DSH 会热重载该 provider；你的默认模型和 deepseek-official 保持不变。目前仅支持环回地址，且不会写入真实凭据。",
-  "integrations.semantics.mcode": "仅管理 custom_provider.opencodex，不会更改默认模型或 MiniMax 登录状态。",
-  "integrations.semantics.zcode": "仅管理 ~/.zcode/v2/config.json 中的 provider.opencodex，不会更改 Z.ai 登录状态或其他提供商。更改后请重启 ZCode。",
-  "integrations.semantics.commandcode": "仅管理 ~/.commandcode/providers.json 中的 OpenCodex 提供商条目。其他提供商和设置保持不变。",
-  "integrations.semantics.prime": "仅管理 Prime Agent 的 models.json 中的 providers.opencodex；默认位于 ~/.prime/agent，若设置 PRIME_AGENT_CODING_AGENT_DIR 则以其为准。不会更改其他提供商或模型覆盖设置。对新会话生效。",
-  "integrations.semantics.aside": "仅管理此配置文件的 ~/.aside/u/<id>/models.json 中的 providers.opencodex。其他提供商保持不变。应用后请完全退出并重新打开 Aside。",
-  "integrations.semantics.raycast": "在 Raycast 的 providers.yaml 中添加一个 OpenCodex 提供商条目，让所有已路由的模型出现在 Raycast AI 模型选择器中。需要 Raycast Pro。",
-  "integrations.semantics.omo": "仅管理 omo 的 models.json 中的 providers.opencodex，路径为 ~/.omo/agent，若设置了 OMO_CODING_AGENT_DIR、SENPI_CODING_AGENT_DIR 或 PI_CODING_AGENT_DIR 则以其为准。你的其他提供商保持不变。对新会话生效。",
+  "integrations.semantics.dsh":
+    "OpenCodex 只管理 $DSH_HOME/profiles/desktop/cordis.patch.yml（DSH 0.1.7 起读取的 Desktop profile；该 profile 不存在时为 $DSH_HOME/settings.yaml）中 llm-pi-ai 这一行的 opencodex provider。DSH 会热重载该 provider；你的默认模型和 deepseek-official 保持不变。目前仅支持环回地址，且不会写入真实凭据。",
+  "integrations.semantics.mcode":
+    "仅管理 custom_provider.opencodex，不会更改默认模型或 MiniMax 登录状态。",
+  "integrations.semantics.zcode":
+    "仅管理 ~/.zcode/v2/config.json 中的 provider.opencodex，不会更改 Z.ai 登录状态或其他提供商。更改后请重启 ZCode。",
+  "integrations.semantics.commandcode":
+    "仅管理 ~/.commandcode/providers.json 中的 OpenCodex 提供商条目。其他提供商和设置保持不变。",
+  "integrations.semantics.prime":
+    "仅管理 Prime Agent 的 models.json 中的 providers.opencodex；默认位于 ~/.prime/agent，若设置 PRIME_AGENT_CODING_AGENT_DIR 则以其为准。不会更改其他提供商或模型覆盖设置。对新会话生效。",
+  "integrations.semantics.aside":
+    "仅管理此配置文件的 ~/.aside/u/<id>/models.json 中的 providers.opencodex。其他提供商保持不变。应用后请完全退出并重新打开 Aside。",
+  "integrations.semantics.raycast":
+    "在 Raycast 的 providers.yaml 中添加一个 OpenCodex 提供商条目，让所有已路由的模型出现在 Raycast AI 模型选择器中。需要 Raycast Pro。",
+  "integrations.semantics.omo":
+    "仅管理 omo 的 models.json 中的 providers.opencodex，路径为 ~/.omo/agent，若设置了 OMO_CODING_AGENT_DIR、SENPI_CODING_AGENT_DIR 或 PI_CODING_AGENT_DIR 则以其为准。你的其他提供商保持不变。对新会话生效。",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex) 角色模型",
-  "integrations.lazycodexRoles.hint": "为每个角色选择模型和推理强度。保存会更新 $CODEX_HOME/agents 中的角色文件，并在可以安全改写时一并更新 LazyCodex 的 omo.jsonc；选“继承推理强度”则由 Codex 决定推理强度。",
+  "integrations.lazycodexRoles.hint":
+    "为每个角色选择模型和推理强度。保存会更新 $CODEX_HOME/agents 中的角色文件，并在可以安全改写时一并更新 LazyCodex 的 omo.jsonc；选“继承推理强度”则由 Codex 决定推理强度。",
   "integrations.lazycodexRoles.role": "角色",
   "integrations.lazycodexRoles.current": "当前",
   "integrations.lazycodexRoles.model": "新模型",
@@ -1863,21 +2056,29 @@ export const zh: Record<TKey, string> = {
   "integrations.lazycodexRoles.loadFailed": "无法加载 Codex 智能体角色。",
   "integrations.lazycodexRoles.saveFailed": "无法保存 {role} 的模型。",
   "integrations.lazycodexRoles.saved": "{role} 现在使用 {model}。",
-  "integrations.lazycodexRoles.omoAbsent": "{role} 现在使用 {model}。未找到 omo.jsonc，因此只修改了角色文件。",
-  "integrations.lazycodexRoles.omoComments": "{role} 现在使用 {model} 运行。omo.jsonc 中有保存后会丢失的注释，因此未修改；请自行设置其中的 [codex].agents.{role}。",
-  "integrations.lazycodexRoles.omoInvalid": "{role} 现在使用 {model} 运行。omo.jsonc 不是 LazyCodex 可读取格式的有效 JSON，因此未修改。",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} 现在使用 {model}。未找到 omo.jsonc，因此只修改了角色文件。",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} 现在使用 {model} 运行。omo.jsonc 中有保存后会丢失的注释，因此未修改；请自行设置其中的 [codex].agents.{role}。",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} 现在使用 {model} 运行。omo.jsonc 不是 LazyCodex 可读取格式的有效 JSON，因此未修改。",
   "integrations.lazycodexRoles.omoFailed": "{role} 现在使用 {model} 运行，但无法写入 omo.jsonc。",
   "integrations.lazycodexRoles.retryMirror": "重试 omo.jsonc",
   "integrations.lazycodexRoles.history.title": "变更记录",
-  "integrations.lazycodexRoles.history.hint": "本节中最近 50 次保存和自动分配会以整次操作记录在这里。恢复会像普通保存一样写回之前的模型和推理强度，这次操作本身也会被记录。原先没有固定模型的角色保留当前模型，只恢复推理强度。",
-  "integrations.lazycodexRoles.history.unavailable": "无法读取变更记录，因此无法恢复。角色编辑仍可正常使用。",
+  "integrations.lazycodexRoles.history.hint":
+    "本节中最近 50 次保存和自动分配会以整次操作记录在这里。恢复会像普通保存一样写回之前的模型和推理强度，这次操作本身也会被记录。原先没有固定模型的角色保留当前模型，只恢复推理强度。",
+  "integrations.lazycodexRoles.history.unavailable":
+    "无法读取变更记录，因此无法恢复。角色编辑仍可正常使用。",
   "integrations.lazycodexRoles.history.restore": "恢复",
   "integrations.lazycodexRoles.history.restored": "已将 {count} 个角色恢复到 {time} 之前的状态。",
-  "integrations.lazycodexRoles.history.partial": "在 {role} 处停止恢复：{total} 个角色中已恢复 {count} 个，其余保留当前的值。请先修复上方的错误，再重试恢复。",
-  "integrations.lazycodexRoles.omoCommentsState": "omo.jsonc 中有注释，因此在这里保存只会更新角色文件。请自行设置 omo.jsonc 中的 [codex].agents。",
+  "integrations.lazycodexRoles.history.partial":
+    "在 {role} 处停止恢复：{total} 个角色中已恢复 {count} 个，其余保留当前的值。请先修复上方的错误，再重试恢复。",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "omo.jsonc 中有注释，因此在这里保存只会更新角色文件。请自行设置 omo.jsonc 中的 [codex].agents。",
   "integrations.lazycodexRoles.auto.button": "自动分配",
   "integrations.lazycodexRoles.auto.running": "正在评估角色…",
-  "integrations.lazycodexRoles.auto.hint": "为每个角色推荐够用且最便宜的模型和推理强度。应用之前不会更改任何内容。",
+  "integrations.lazycodexRoles.auto.hint":
+    "为每个角色推荐够用且最便宜的模型和推理强度。应用之前不会更改任何内容。",
   "integrations.lazycodexRoles.auto.failed": "无法评估 Codex 代理角色。",
   "integrations.lazycodexRoles.auto.title": "建议的模型",
   "integrations.lazycodexRoles.auto.sizedWith": "使用 {model} 评估",
@@ -1901,12 +2102,18 @@ export const zh: Record<TKey, string> = {
   "integrations.lazycodexRoles.auto.apply": "应用",
   "integrations.lazycodexRoles.auto.moveUp": "提高的条件：{text}",
   "integrations.lazycodexRoles.auto.moveDown": "降低的条件：{text}",
-  "integrations.semantics.cline": "管理 Cline CLI 的 providers.json 和 models.json 中的 OpenCodex 项目。修改或同步前请退出 Cline，完成后重新启动。撤销会恢复两个文件的原始内容。默认提供商保持不变，请在 Cline 中选择 OpenCodex。",
-  "integrations.semantics.kilo": "仅管理 Kilo 全局配置——~/.config/kilo 下最先存在的 kilo.jsonc、kilo.json、opencode.jsonc、opencode.json 或 config.json（XDG_CONFIG_HOME 会移动该目录；若都不存在则创建 kilo.jsonc）——中的 provider.opencodex。其他键保持不变。应用会重写整个文件，因此不会保留注释和尾随逗号。请在 Kilo 中选择 opencodex/<模型>。",
-  "integrations.semantics.droid": "将 OpenCodex 自定义模型添加到 Factory Droid 的 settings.json。停用仅移除托管条目；撤销会恢复已保存的文件。",
-  "integrations.raycast.proRequired": "Custom Providers 是 Raycast Pro 功能。文件会被写入，但在 Pro 订阅生效之前 Raycast 会忽略它。",
-  "integrations.raycast.planUnknown": "无法确定 Raycast Pro 是否已激活；Custom Providers 需要 Raycast Pro。",
-  "integrations.raycast.revealConfig": "打开 Raycast → 设置 → AI，点击一次“Reveal Providers Config”，以便创建 providers 文件夹。",
+  "integrations.semantics.cline":
+    "管理 Cline CLI 的 providers.json 和 models.json 中的 OpenCodex 项目。修改或同步前请退出 Cline，完成后重新启动。撤销会恢复两个文件的原始内容。默认提供商保持不变，请在 Cline 中选择 OpenCodex。",
+  "integrations.semantics.kilo":
+    "仅管理 Kilo 全局配置——~/.config/kilo 下最先存在的 kilo.jsonc、kilo.json、opencode.jsonc、opencode.json 或 config.json（XDG_CONFIG_HOME 会移动该目录；若都不存在则创建 kilo.jsonc）——中的 provider.opencodex。其他键保持不变。应用会重写整个文件，因此不会保留注释和尾随逗号。请在 Kilo 中选择 opencodex/<模型>。",
+  "integrations.semantics.droid":
+    "将 OpenCodex 自定义模型添加到 Factory Droid 的 settings.json。停用仅移除托管条目；撤销会恢复已保存的文件。",
+  "integrations.raycast.proRequired":
+    "Custom Providers 是 Raycast Pro 功能。文件会被写入，但在 Pro 订阅生效之前 Raycast 会忽略它。",
+  "integrations.raycast.planUnknown":
+    "无法确定 Raycast Pro 是否已激活；Custom Providers 需要 Raycast Pro。",
+  "integrations.raycast.revealConfig":
+    "打开 Raycast → 设置 → AI，点击一次“Reveal Providers Config”，以便创建 providers 文件夹。",
   "codexAuth.mainAccount": "主账号",
   "codexAuth.logLabel": "日志标签",
   "codexAuth.codexApp": "Codex App",
@@ -1942,9 +2149,11 @@ export const zh: Record<TKey, string> = {
   "codexAuth.refreshQuota": "刷新额度",
   "codexAuth.ultraFastTitle": "Ultra Fast 服务层级",
   "codexAuth.mainHardLockTitle": "阻止主账户 (5h {short}%，长期 {long}%)",
-  "codexAuth.mainHardLockDesc": "5h 窗口达到 {short}% 或周窗口达到 {long}% 时阻止。仅月度账户使用月窗口。所有阻止窗口低于各自阈值后自动解除，保护保持开启。默认开启。",
+  "codexAuth.mainHardLockDesc":
+    "5h 窗口达到 {short}% 或周窗口达到 {long}% 时阻止。仅月度账户使用月窗口。所有阻止窗口低于各自阈值后自动解除，保护保持开启。默认开启。",
   "codexAuth.mainHardLockConfirmTitle": "启用主账户保护 (5h {short}%，长期 {long}%)？",
-  "codexAuth.mainHardLockConfirmBody": "阻止期间，主账户也无法使用 Luna Reserve。普通额度未耗尽时，Reserve 可能不会激活。附加账户和其他提供商仍可使用。正在进行的请求、无法匹配的钥匙串凭据以及此代理之外的流量不受此保护。",
+  "codexAuth.mainHardLockConfirmBody":
+    "阻止期间，主账户也无法使用 Luna Reserve。普通额度未耗尽时，Reserve 可能不会激活。附加账户和其他提供商仍可使用。正在进行的请求、无法匹配的钥匙串凭据以及此代理之外的流量不受此保护。",
   "codexAuth.mainHardLockConfirm": "开启保护",
   "codexAuth.mainHardLockEnabled": "保护已开启 (5h {short}%，长期 {long}%)。",
   "codexAuth.mainHardLockDisabled": "主账户保护已关闭。其他账户限制仍然适用。",
@@ -1957,13 +2166,15 @@ export const zh: Record<TKey, string> = {
   "codexAuth.mainExternalUsageWarning": "可能存在 opencodex 之外的使用。阻止可能无法避免额度耗尽。",
   "codexAuth.mainHardLockManage": "查看保护设置",
   "codexAuth.mainHardLockFallbackTitle": "阻止时回退模型",
-  "codexAuth.mainHardLockFallbackDesc": "阻止期间，当没有 Codex 账户能服务请求时，原生 Codex 模型的请求会改路由到该模型而不是失败。留空则照常拒绝；阻止会自动解除。",
+  "codexAuth.mainHardLockFallbackDesc":
+    "阻止期间，当没有 Codex 账户能服务请求时，原生 Codex 模型的请求会改路由到该模型而不是失败。留空则照常拒绝；阻止会自动解除。",
   "codexAuth.mainHardLockFallbackModel": "回退模型",
   "codexAuth.mainHardLockFallbackEffort": "思考强度",
   "codexAuth.mainHardLockFallbackDefaultEffort": "保留请求原强度",
   "codexAuth.mainHardLockFallbackActive": "正在阻止——原生 Codex 请求已路由到 {model}。",
   "codexAuth.mainHardLockFallbackSaveFailed": "无法确认回退设置已保存。请重新加载设置后再试。",
-  "codexAuth.ultraFastDesc": "在 Codex 模型选择器中为 GPT-6 Astra 和 GPT-6.1 Sol 添加 Ultrafast 速度选项，并让你在路由模型上自行配置的 ultrafast 服务层级在重新生成目录时不被删除。Ultrafast 需要符合条件的 ChatGPT 套餐，仅在你的套餐包含它时开启。",
+  "codexAuth.ultraFastDesc":
+    "在 Codex 模型选择器中为 GPT-6 Astra 和 GPT-6.1 Sol 添加 Ultrafast 速度选项，并让你在路由模型上自行配置的 ultrafast 服务层级在重新生成目录时不被删除。Ultrafast 需要符合条件的 ChatGPT 套餐，仅在你的套餐包含它时开启。",
   "codexAuth.ultraFastLoadFailed": "无法读取 Ultra Fast 设置。",
   "codexAuth.ultraFastEnabled": "已启用 Ultra Fast 层级",
   "codexAuth.ultraFastDisabled": "已禁用 Ultra Fast 层级",
@@ -1995,9 +2206,11 @@ export const zh: Record<TKey, string> = {
   "prov.keyResumedSwitchFailed": "密钥已恢复，但激活失败。该密钥可被自动选择，请尝试重新选择。",
   "codexAuth.pausedHint": "恢复前不会参与自动切换、重试、冷却恢复或手动选择。",
   "codexAuth.creditsAfterLimit": "达到上限后使用额度",
-  "codexAuth.creditsAfterLimitHint": "默认关闭：用量窗口达到 100% 的账户会被切换出去，直到重置，不消耗其 ChatGPT 额度。打开某个账户后，它在达到上限后仍会使用额度继续工作。新账户默认关闭。",
+  "codexAuth.creditsAfterLimitHint":
+    "默认关闭：用量窗口达到 100% 的账户会被切换出去，直到重置，不消耗其 ChatGPT 额度。打开某个账户后，它在达到上限后仍会使用额度继续工作。新账户默认关闭。",
   "codexAuth.creditsAfterLimitAria": "{email} 达到上限后使用额度",
-  "codexAuth.creditsAfterLimitMainHint": "主账户的硬锁（默认开启）仍会先拦下它。若要让主账户使用额度，请关闭硬锁。",
+  "codexAuth.creditsAfterLimitMainHint":
+    "主账户的硬锁（默认开启）仍会先拦下它。若要让主账户使用额度，请关闭硬锁。",
   "codexAuth.creditSpend": "使用额度",
   "codexAuth.creditSpendAria": "达到用量上限后使用 ChatGPT 额度",
   "codexAuth.creditsOn": "使用额度",
@@ -2008,14 +2221,17 @@ export const zh: Record<TKey, string> = {
   "codexAuth.creditsAllOffSucceeded": "不会有账户消耗额度。账户在 100% 时切换。",
   "codexAuth.creditsAllUpdateFailed": "无法更新额度设置。未做任何更改。",
   "codexAuth.pinned": "已固定",
-  "codexAuth.pinnedHint": "这是你手动选择的账号，因此更高的选择顺序不会越过它。该固定会一直生效，直到此账号用尽、你改选其他账号，或你修改任一选择顺序。",
+  "codexAuth.pinnedHint":
+    "这是你手动选择的账号，因此更高的选择顺序不会越过它。该固定会一直生效，直到此账号用尽、你改选其他账号，或你修改任一选择顺序。",
   "codexAuth.unpinHint": "再次选择即可解除固定并恢复自动选择。",
   "codexAuth.unpinTitle": "解除固定？",
-  "codexAuth.unpinDesc": "立即生效。已绑定账号的现有线程和进行中的请求保留原账号；新的或未绑定的请求会按选择顺序与阈值规则自动挑选账号。",
+  "codexAuth.unpinDesc":
+    "立即生效。已绑定账号的现有线程和进行中的请求保留原账号；新的或未绑定的请求会按选择顺序与阈值规则自动挑选账号。",
   "codexAuth.unpinAction": "解除固定",
   "codexAuth.unpinned": "已解除固定——恢复自动选择",
   "codexAuth.unpinFailed": "无法确认账户固定是否已解除。请刷新账户并检查当前选择后再重试。",
-  "codexAuth.unpinChanged": "此确认窗口打开期间，固定账户已更改。解除固定前请刷新账户并检查当前选择。",
+  "codexAuth.unpinChanged":
+    "此确认窗口打开期间，固定账户已更改。解除固定前请刷新账户并检查当前选择。",
   "codexAuth.fiveHour": "5 小时",
   "codexAuth.weekly": "每周",
   "codexAuth.quotaAutoRefresh": "自动激活额度窗口",
@@ -2029,24 +2245,33 @@ export const zh: Record<TKey, string> = {
   "codexAuth.nextSession": "已选择",
   "codexAuth.poolPrepared": "已为账户池准备",
   "codexAuth.preparePoolTitle": "为账户池模式准备此账号？",
-  "codexAuth.preparePoolDesc": "直连请求仍使用主登录。启用账户池模式后，此账号会成为预先选择的池账号。",
+  "codexAuth.preparePoolDesc":
+    "直连请求仍使用主登录。启用账户池模式后，此账号会成为预先选择的池账号。",
   "codexAuth.prepareForPool": "为账户池准备",
   "codexAuth.poolPreparedToast": "已为账户池模式准备 {email}",
   "codexAuth.switchTitle": "切换活跃账号？",
-  "codexAuth.switchDesc": "立即生效。已在进行中的请求保留原账号，其余都会切换到此账号；不过选择顺序相同的账号仍会轮换使用。",
+  "codexAuth.switchDesc":
+    "立即生效。已在进行中的请求保留原账号，其余都会切换到此账号；不过选择顺序相同的账号仍会轮换使用。",
   "codexAuth.cacheWarning": "切换账号会重置提示缓存。新会话从空缓存开始。",
-  "codexAuth.switchExceedsThresholdWarning": "该账号用量已达到或超过切换阈值（{threshold}%）。若无可用配额空间，固定选择将被立即释放。",
+  "codexAuth.switchExceedsThresholdWarning":
+    "该账号用量已达到或超过切换阈值（{threshold}%）。若无可用配额空间，固定选择将被立即释放。",
   "codexAuth.setAsNext": "接下来使用此账号",
   "codexAuth.cancel": "取消",
   "codexAuth.switchBack": "切换回主账号？",
-  "codexAuth.switchBackDesc": "立即生效。已在进行中的请求保留原账号，其余都会切换到应用登录账号；不过选择顺序相同的账号仍会轮换使用。",
+  "codexAuth.switchBackDesc":
+    "立即生效。已在进行中的请求保留原账号，其余都会切换到应用登录账号；不过选择顺序相同的账号仍会轮换使用。",
   "codexAuth.autoSwitch": "基于用量的主动切换",
-  "codexAuth.autoSwitchQuotaDesc": "配额：使用率达到或超过 {threshold}% 时，未绑定的下一次请求可能转到用量更低的合格账号。已绑定任务默认保持亲和性，仅在账号无法继续服务时离开，并且只改绑到确有额度余量的账号；Go/Free 仅使用 30 天窗口。",
-  "codexAuth.autoSwitchQuotaOffDesc": "基于用量的主动切换已关闭。新建/未绑定任务分配和故障恢复仍然生效。",
+  "codexAuth.autoSwitchQuotaDesc":
+    "配额：使用率达到或超过 {threshold}% 时，未绑定的下一次请求可能转到用量更低的合格账号。已绑定任务默认保持亲和性，仅在账号无法继续服务时离开，并且只改绑到确有额度余量的账号；Go/Free 仅使用 30 天窗口。",
+  "codexAuth.autoSwitchQuotaOffDesc":
+    "基于用量的主动切换已关闭。新建/未绑定任务分配和故障恢复仍然生效。",
   "codexAuth.autoSwitchRoundRobinDesc": "轮询分配不使用此阈值，并会继续轮换新建/未绑定任务。",
-  "codexAuth.autoSwitchFillFirstDesc": "填满优先：{threshold}% 是新建/未绑定任务的耗尽点；健康的已绑定任务继续使用原账号。",
-  "codexAuth.autoSwitchFillFirstOffDesc": "填满优先没有新建/未绑定任务的用量耗尽点；冷却、重新认证和故障恢复仍可能改变路由。",
-  "codexAuth.failureRecoveryNote": "故障恢复是独立机制：输出前的 429/402 拒绝、冷却、重新认证、排除或已配置的瞬时故障转移可能选择另一个合格账号。",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "填满优先：{threshold}% 是新建/未绑定任务的耗尽点；健康的已绑定任务继续使用原账号。",
+  "codexAuth.autoSwitchFillFirstOffDesc":
+    "填满优先没有新建/未绑定任务的用量耗尽点；冷却、重新认证和故障恢复仍可能改变路由。",
+  "codexAuth.failureRecoveryNote":
+    "故障恢复是独立机制：输出前的 429/402 拒绝、冷却、重新认证、排除或已配置的瞬时故障转移可能选择另一个合格账号。",
   "codexAuth.autoSwitchThreshold": "用量阈值",
   "codexAuth.autoSwitchThresholdAria": "用量阈值（百分比）",
   "codexAuth.autoSwitchThresholdInc": "提高用量阈值",
@@ -2057,34 +2282,49 @@ export const zh: Record<TKey, string> = {
   "codexAuth.autoSwitchUpdated": "基于用量的主动切换设置已更新",
   "codexAuth.autoSwitchUpdateFailed": "无法确认基于用量的切换更新。当前显示最后一次确认的值。",
   "codexAuth.requestUserInput": "在 Default 模式下请求输入",
-  "codexAuth.requestUserInputDesc": "允许 Codex 在 Default 模式会话中暂停，并通过 request_user_input 工具向你提问。",
+  "codexAuth.requestUserInputDesc":
+    "允许 Codex 在 Default 模式会话中暂停，并通过 request_user_input 工具向你提问。",
   "codexAuth.requestUserInputUpdated": "功能标志已更新 - 适用于新会话。",
   "codexAuth.requestUserInputUpdatedRestart": "功能标志已更新 - 适用于新会话。请重启 Codex 应用。",
   "codexAuth.requestUserInputUpdateFailed": "无法更新功能标志。未做任何更改。",
   "codexAuth.requestUserInputLoadFailed": "无法从 config.toml 读取功能标志。",
   "codexAuth.accountPickerTitle": "在模型选择器中指定 Codex 账号",
-  "codexAuth.accountPickerOffDesc": "启用后，普通 GPT 选择器条目会替换为每个账号选择器对应的条目，让你无需退出登录即可为对话明确选择账号。关闭此功能不会删除任何账号。",
-  "codexAuth.accountPickerOnDesc": "每个选择器都是一个已存储账号的公开标签。选择后，该对话会锁定到对应账号，不会参与 Pool 轮换或故障转移，也不会更改当前的 Pool 账号。",
-  "codexAuth.accountPickerCompatibility": "内置 Codex App 登录有自己的选择器；生成的映射通常使用 main，发生冲突时会使用 main-2 这类安全后缀。新增账号会获得稳定且保护隐私的标签，自定义选择器名称保持不变。现有对话和已保存的模型选择会继续路由。关闭后只隐藏生成的条目，选择器和精确路由仍会保留。普通 GPT 模型 ID 继续保持原有的 Pool 或 Direct 行为。",
+  "codexAuth.accountPickerOffDesc":
+    "启用后，普通 GPT 选择器条目会替换为每个账号选择器对应的条目，让你无需退出登录即可为对话明确选择账号。关闭此功能不会删除任何账号。",
+  "codexAuth.accountPickerOnDesc":
+    "每个选择器都是一个已存储账号的公开标签。选择后，该对话会锁定到对应账号，不会参与 Pool 轮换或故障转移，也不会更改当前的 Pool 账号。",
+  "codexAuth.accountPickerCompatibility":
+    "内置 Codex App 登录有自己的选择器；生成的映射通常使用 main，发生冲突时会使用 main-2 这类安全后缀。新增账号会获得稳定且保护隐私的标签，自定义选择器名称保持不变。现有对话和已保存的模型选择会继续路由。关闭后只隐藏生成的条目，选择器和精确路由仍会保留。普通 GPT 模型 ID 继续保持原有的 Pool 或 Direct 行为。",
   "codexAuth.accountPickerUpdated": "账号指定设置已更新。",
   "codexAuth.accountPickerUpdateFailed": "无法更新账号指定设置。当前显示的是最后一次确认的设置。",
   "codexAuth.accountPickerLoadFailed": "无法加载账号指定设置。",
   "codexAuth.accountPickerRefreshFailed": "无法刷新此设置。当前仍显示最后一次确认的值。",
   "codexAuth.advancedSettings": "高级设置",
   "codexAuth.advancedSettingsAria": "显示或隐藏高级 Codex 认证设置",
-  "codexAuth.catalogRefreshPending": "更改已保存，但 Codex 模型目录仍待刷新。请运行 ocx sync 重试。",
+  "codexAuth.catalogRefreshPending":
+    "更改已保存，但 Codex 模型目录仍待刷新。请运行 ocx sync 重试。",
   "anthropicPool.title": "Claude 账户池（实验性）",
-  "anthropicPool.enabledDesc": "会话固定在同一账户；新会话优先使用{window}低于 {threshold}% 的账户。",
-  "anthropicPool.enabledNoProactiveDesc": "用量阈值不会移动正常运行的会话，也不会更换正常的活跃账户。活跃账户不可用时以及拒绝后恢复时，会选择用量（{window}）最低的账户。",
-  "anthropicPool.enabledFillFirstDesc": "会话固定在同一账户。新会话会一直使用活跃账户，直到其达到 {threshold}%（{window}）、进入冷却或需要重新登录，然后按顺序切换到下一个账户。拒绝后的恢复也按顺序使用下一个账户。",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "会话固定在同一账户。新会话会一直使用活跃账户，直到其进入冷却或需要重新登录，然后按顺序切换到下一个账户。拒绝后的恢复也按顺序使用下一个账户。",
-  "anthropicPool.enabledRoundRobinDesc": "会话固定在同一账户。新会话和拒绝后的恢复会在符合条件的账户之间轮流使用；不参考用量、阈值和配额窗口。",
-  "anthropicPool.disabledDesc": "主动账户选择已关闭。OpenCodex 使用所选账户；如果还登录了其他符合条件的账户，在收到限流响应（429）或被识别为账户拒绝的响应后，仍可能切换账户。",
-  "anthropicPool.experimentalWarning": "请只使用你本人拥有或获授权使用的订阅。自动账户池未获 Anthropic 认可，目前仍是实验性功能。请在有人值守的会话中使用官方 Claude Code 客户端，并查阅 Anthropic 的现行条款。多个账户可能共享同一组织配额，因此添加账户不一定能增加容量。",
+  "anthropicPool.enabledDesc":
+    "会话固定在同一账户；新会话优先使用{window}低于 {threshold}% 的账户。",
+  "anthropicPool.enabledNoProactiveDesc":
+    "用量阈值不会移动正常运行的会话，也不会更换正常的活跃账户。活跃账户不可用时以及拒绝后恢复时，会选择用量（{window}）最低的账户。",
+  "anthropicPool.enabledFillFirstDesc":
+    "会话固定在同一账户。新会话会一直使用活跃账户，直到其达到 {threshold}%（{window}）、进入冷却或需要重新登录，然后按顺序切换到下一个账户。拒绝后的恢复也按顺序使用下一个账户。",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "会话固定在同一账户。新会话会一直使用活跃账户，直到其进入冷却或需要重新登录，然后按顺序切换到下一个账户。拒绝后的恢复也按顺序使用下一个账户。",
+  "anthropicPool.enabledRoundRobinDesc":
+    "会话固定在同一账户。新会话和拒绝后的恢复会在符合条件的账户之间轮流使用；不参考用量、阈值和配额窗口。",
+  "anthropicPool.disabledDesc":
+    "主动账户选择已关闭。OpenCodex 使用所选账户；如果还登录了其他符合条件的账户，在收到限流响应（429）或被识别为账户拒绝的响应后，仍可能切换账户。",
+  "anthropicPool.experimentalWarning":
+    "请只使用你本人拥有或获授权使用的订阅。自动账户池未获 Anthropic 认可，目前仍是实验性功能。请在有人值守的会话中使用官方 Claude Code 客户端，并查阅 Anthropic 的现行条款。多个账户可能共享同一组织配额，因此添加账户不一定能增加容量。",
   "anthropicPool.detailsSummary": "账户选择方式",
-  "anthropicPool.detailsEnabling": "开启账户池后，会话在其账户正常时会一直使用该账户；新会话和拒绝后使用哪个账户由所选策略决定。",
-  "anthropicPool.detailsFailover": "关闭账户池不会关闭故障转移：收到 429 或被识别为账户拒绝的响应后，请求仍可能转到另一个已登录账户。若要排除某个账户，请将其暂停。",
-  "anthropicPool.detailsActivity": "OpenCodex 不发送保活（keep-warm）请求。默认情况下，它不会在后台刷新 Claude 令牌或查询用量；只有仪表盘、菜单栏应用或 ocx 命令请求时才会读取用量。",
+  "anthropicPool.detailsEnabling":
+    "开启账户池后，会话在其账户正常时会一直使用该账户；新会话和拒绝后使用哪个账户由所选策略决定。",
+  "anthropicPool.detailsFailover":
+    "关闭账户池不会关闭故障转移：收到 429 或被识别为账户拒绝的响应后，请求仍可能转到另一个已登录账户。若要排除某个账户，请将其暂停。",
+  "anthropicPool.detailsActivity":
+    "OpenCodex 不发送保活（keep-warm）请求。默认情况下，它不会在后台刷新 Claude 令牌或查询用量；只有仪表盘、菜单栏应用或 ocx 命令请求时才会读取用量。",
   "anthropicPool.nativeMessagesLabel": `保留 Claude 原生请求`,
   "anthropicPool.nativeMessagesHelp": `启用账号池后，如果所选路由支持，Claude Code 历史记录和缓存标记会保留在原生 Messages 路径上。其他路由仍可能转换请求。切换账号可能需要重新建立缓存；不保证命中缓存，账号之间也不共享缓存。 明确禁用的推出设置仍然适用。`,
   "anthropicPool.saveWarning": "设置已保存，但配置的保存后处理失败。请重新加载设置以确认当前状态。",
@@ -2094,7 +2334,8 @@ export const zh: Record<TKey, string> = {
   "anthropicPool.needTwoAccounts": "启用账户池前请至少添加两个 Claude OAuth 账户。",
   "anthropicPool.threshold": "新会话用量阈值",
   "anthropicPool.thresholdAria": "新会话用量阈值（百分比）",
-  "anthropicPool.thresholdHelp": "这是选择账户时的偏好，而非用量或计费的硬性上限。设为 0 会关闭基于此阈值的主动切换。默认：80%。",
+  "anthropicPool.thresholdHelp":
+    "这是选择账户时的偏好，而非用量或计费的硬性上限。设为 0 会关闭基于此阈值的主动切换。默认：80%。",
   "anthropicPool.thresholdInvalid": "请输入 0 到 100 之间的整数",
   "anthropicPool.loadFailed": "无法加载 Claude 账户池设置。",
   "anthropicPool.saveFailed": "无法保存 Claude 账户池设置。",
@@ -2104,19 +2345,24 @@ export const zh: Record<TKey, string> = {
   "accountPool.strategy": "轮换策略",
   "accountPool.strategyDesc": "OpenCodex 如何为新建/未绑定任务分配账号。",
   "accountPool.strategyResetFirst": "额度即将刷新优先",
-  "accountPool.strategyHintResetFirst": "在低于用量阈值的账号中，优先选择下次5小时或周额度重置最早的账号。已绑定任务遵循配置的亲和策略。独立模型额度按用量排序。",
+  "accountPool.strategyHintResetFirst":
+    "在低于用量阈值的账号中，优先选择下次5小时或周额度重置最早的账号。已绑定任务遵循配置的亲和策略。独立模型额度按用量排序。",
   "accountPool.strategyQuota": "配额",
   "accountPool.strategyRoundRobin": "轮询",
   "accountPool.strategyFillFirst": "填满优先",
-  "accountPool.strategyHintQuota": "配额策略仅在 `pool.cacheAffinity` 关闭时才会在超过用量阈值后重新绑定现有任务（默认开启）。默认下任务会保留到账号无法继续服务，并且只改绑到确有额度余量的账号。",
+  "accountPool.strategyHintQuota":
+    "配额策略仅在 `pool.cacheAffinity` 关闭时才会在超过用量阈值后重新绑定现有任务（默认开启）。默认下任务会保留到账号无法继续服务，并且只改绑到确有额度余量的账号。",
   "accountPool.strategyHintRoundRobin": "轮询只轮换没有有效绑定的任务；用量阈值不会改变正常轮换。",
-  "accountPool.strategyHintFillFirst": "填满优先把阈值用作未绑定任务的耗尽点；健康的已绑定任务保持亲和性。",
-  "accountPool.unboundDefinition": "新建/未绑定任务是当前没有账号绑定的请求；已有的可见任务在代理或亲和性重置后也可能变为未绑定。",
+  "accountPool.strategyHintFillFirst":
+    "填满优先把阈值用作未绑定任务的耗尽点；健康的已绑定任务保持亲和性。",
+  "accountPool.unboundDefinition":
+    "新建/未绑定任务是当前没有账号绑定的请求；已有的可见任务在代理或亲和性重置后也可能变为未绑定。",
   "accountPool.stickyLimit": "轮换前的新建/未绑定任务分配数",
   "accountPool.stickyLimitAria": "轮换前的新建/未绑定任务分配数",
   "accountPool.stickyLimitInc": "提高粘性上限",
   "accountPool.stickyLimitDec": "降低粘性上限",
-  "accountPool.stickyLimitHelp": "在推进到下一个账号之前，为所选账号分配这么多次新建/未绑定任务；计数在任务绑定时增加，而不是在上游成功后增加。",
+  "accountPool.stickyLimitHelp":
+    "在推进到下一个账号之前，为所选账号分配这么多次新建/未绑定任务；计数在任务绑定时增加，而不是在上游成功后增加。",
   "accountPool.stickyLimitInvalid": "请输入 1 到 100 之间的整数",
   "accountPool.strategyLoadFailed": "无法加载轮换策略。",
   "accountPool.strategyUpdateFailed": "无法保存轮换策略。",
@@ -2127,16 +2373,20 @@ export const zh: Record<TKey, string> = {
   "accountPool.proactiveSwitchingOff": "主动切换已关闭",
 
   "accountPool.quotaWindow": "配额统计窗口",
-  "accountPool.quotaWindowDesc": "指定按配额选择新会话、填满优先阈值判断以及可用 429 替代账户所使用的缓存用量。",
+  "accountPool.quotaWindowDesc":
+    "指定按配额选择新会话、填满优先阈值判断以及可用 429 替代账户所使用的缓存用量。",
   "accountPool.quotaWindowFiveHour": "5 小时用量",
   "accountPool.quotaWindowWeekly": "每周用量",
   "accountPool.quotaWindowMaxUtilization": "较高的用量",
-  "accountPool.quotaWindowHint": "每周用量会在仍有其他可用账户时跳过 5 小时用量已耗尽的账户；若没有其他账户，则回退使用这些账户。每周用量相同时优先选择 5 小时用量更低者；各账户的每周用量要等提供商页面轮询后才能获知。",
-  "accountPool.quotaWindowInert": "只有配额策略，或阈值大于 0 的填满优先策略，才会按用量打分；在当前轮换策略下这项设置不起作用。",
+  "accountPool.quotaWindowHint":
+    "每周用量会在仍有其他可用账户时跳过 5 小时用量已耗尽的账户；若没有其他账户，则回退使用这些账户。每周用量相同时优先选择 5 小时用量更低者；各账户的每周用量要等提供商页面轮询后才能获知。",
+  "accountPool.quotaWindowInert":
+    "只有配额策略，或阈值大于 0 的填满优先策略，才会按用量打分；在当前轮换策略下这项设置不起作用。",
 
   "accountPool.priority": "选择顺序",
   "accountPool.priorityAria": "此账号的选择顺序",
-  "accountPool.priorityHint": "数字越大越先使用。只有当排在前面的账号全部用尽或不可用时，账号池才会转向更小的数字。",
+  "accountPool.priorityHint":
+    "数字越大越先使用。只有当排在前面的账号全部用尽或不可用时，账号池才会转向更小的数字。",
   "accountPool.priorityFirst": "最先",
   "accountPool.priorityEarlier": "较先",
   "accountPool.priorityNormal": "默认",
@@ -2149,7 +2399,8 @@ export const zh: Record<TKey, string> = {
   "accountPool.autoSwitchThreshold": "自定义账号阈值",
   "accountPool.autoSwitchThresholdAria": "{email} 的使用量阈值",
   "accountPool.autoSwitchOverrideAria": "覆盖 {email} 的全局使用量阈值",
-  "accountPool.autoSwitchHint": "覆盖此账号的全局阈值。设为 0 会停用从此账号发起的基于使用量的主动切换。",
+  "accountPool.autoSwitchHint":
+    "覆盖此账号的全局阈值。设为 0 会停用从此账号发起的基于使用量的主动切换。",
   "accountPool.autoSwitchUpdated": "已更新 {email} 的使用量阈值",
   "accountPool.autoSwitchUpdateFailed": "无法保存 {email} 的使用量阈值。当前显示最后确认的值。",
   "codexAuth.switched": "下一次请求将使用 {email}",
@@ -2254,7 +2505,8 @@ export const zh: Record<TKey, string> = {
   "grokCoupon.networkError": "无法连接到代理。",
   "grokCoupon.capacity": "兑换日志目前已满。请稍后再试。",
   "grokCoupon.noOperationId": "此浏览器无法生成兑换 ID，因此无法在此兑换。",
-  "grokCoupon.unknownOutcome": "兑换结果未知。重新读取账号可查看优惠券列表，但无法确认原始尝试的结果。",
+  "grokCoupon.unknownOutcome":
+    "兑换结果未知。重新读取账号可查看优惠券列表，但无法确认原始尝试的结果。",
   "grokCoupon.checkResult": "重新读取账号",
   "grokCoupon.checking": "正在重新读取…",
   "grokCoupon.consumedElsewhere": "优惠券已不在列表中。原始兑换结果仍未确认，不会再发送兑换请求。",
@@ -2263,7 +2515,8 @@ export const zh: Record<TKey, string> = {
   "anthropicGrant.badgeErrorAria": "无法读取 Claude 用量重置次数",
   "anthropicGrant.title": "Claude 用量重置",
   "anthropicGrant.available": "此账号有 {count} 次用量重置机会。",
-  "anthropicGrant.desc": "使用一次重置机会可立即恢复此账号的 Claude 5 小时和每周用量额度。每周额度的重置日期不变。",
+  "anthropicGrant.desc":
+    "使用一次重置机会可立即恢复此账号的 Claude 5 小时和每周用量额度。每周额度的重置日期不变。",
   "anthropicGrant.none": "此账号没有用量重置机会。",
   "anthropicGrant.ineligible": "此账号目前不符合用量重置条件。",
   "anthropicGrant.loadFailed": "无法读取此账号的用量重置机会。",
@@ -2296,22 +2549,26 @@ export const zh: Record<TKey, string> = {
   "anthropicGrant.replayed": "此次重置此前已完成，未再次使用重置机会。",
   "anthropicGrant.notUsableNow": "此次重置目前不可用。请重新读取账号。",
   "anthropicGrant.inFlight": "此次重置仍在处理中。请稍等片刻，再重新读取账号。",
-  "anthropicGrant.unresolvedPrior": "此重置机会的较早一次尝试尚未确认。请重试该次请求，不要发起新请求。",
+  "anthropicGrant.unresolvedPrior":
+    "此重置机会的较早一次尝试尚未确认。请重试该次请求，不要发起新请求。",
   "anthropicGrant.expired": "较早一次尝试未能及时确认。使用重置机会前请重新读取账号。",
   "anthropicGrant.identityMismatch": "该重置机会属于其他账号。请关闭此对话框后重新开始。",
   "anthropicGrant.sessionRequired": "请从仪表板自身的登录入口打开仪表板，才能使用重置机会。",
   "anthropicGrant.journalBusy": "重置日志正忙或不可用。未使用重置机会；请稍后重试。",
   "anthropicGrant.failed": "重置请求失败。请先核对账号状态再重试。",
   "anthropicGrant.noOperationId": "此浏览器无法生成请求 ID，因此无法在此使用重置机会。",
-  "anthropicGrant.unknownOutcome": "重置请求未及时返回结果，因此结果未知。重试会发送相同的请求 ID，不会发起第二次重置。",
+  "anthropicGrant.unknownOutcome":
+    "重置请求未及时返回结果，因此结果未知。重试会发送相同的请求 ID，不会发起第二次重置。",
   "anthropicGrant.retrySame": "重试同一请求",
   "anthropicGrant.checkResult": "重新读取账号",
   "anthropicGrant.checking": "正在重新读取…",
 
   // api access page
   "api.title": "API 访问",
-  "api.subtitle": "用生成的 API 密钥从外部应用访问 opencodex 代理。认证使用 {authHeader} 请求头；各端点接受哪些请求头见下表。",
-  "api.endpointNote": "请将基础 URL 用于 OpenAI 兼容客户端。Responses 与 Chat Completions 在 /v1 下提供。",
+  "api.subtitle":
+    "用生成的 API 密钥从外部应用访问 opencodex 代理。认证使用 {authHeader} 请求头；各端点接受哪些请求头见下表。",
+  "api.endpointNote":
+    "请将基础 URL 用于 OpenAI 兼容客户端。Responses 与 Chat Completions 在 /v1 下提供。",
   "api.baseUrl": "基础 URL",
   "api.responsesEndpoint": "Responses API",
   "api.chatCompletionsEndpoint": "Chat Completions API",
@@ -2324,7 +2581,8 @@ export const zh: Record<TKey, string> = {
   "api.surface.source.inherited": "继承自 Claude 设置",
   "api.surface.source.invalid": "无效值 — 已关闭",
   "api.surface.messagesToggle": "提供 Messages API",
-  "api.surface.messagesCloseNote": "关闭 Messages 也会关闭 Claude 集成，这样旧版 opencodex 也会保持该端点关闭。",
+  "api.surface.messagesCloseNote":
+    "关闭 Messages 也会关闭 Claude 集成，这样旧版 opencodex 也会保持该端点关闭。",
   "api.surface.openClaude": "Claude 设置",
   "api.surface.toggleFailed": "无法保存 Messages 设置。",
   "api.surface.toggleUnavailable": "此代理版本无法在这里更改 Messages API，请改用 Claude 页面。",
@@ -2332,7 +2590,8 @@ export const zh: Record<TKey, string> = {
   "api.endpointsTitle": "网关端点",
   "api.authBaseUrlNote": "客户端应使用基础 URL，然后选择下面的协议端点。",
   "api.authTitle": "身份验证",
-  "api.authLoopback": "回环访问的认证要求因路径而异；独立音频客户端需要 OpenCodex 数据密钥。远程连接需要数据密钥或 OPENCODEX_API_AUTH_TOKEN。",
+  "api.authLoopback":
+    "回环访问的认证要求因路径而异；独立音频客户端需要 OpenCodex 数据密钥。远程连接需要数据密钥或 OPENCODEX_API_AUTH_TOKEN。",
   "api.modelsTitle": "外部模型目录",
   "api.modelsCount": "{count} 个可调用",
   "api.modelsSearch": "搜索模型",
@@ -2378,7 +2637,8 @@ export const zh: Record<TKey, string> = {
   "api.section.examples": "示例",
   "api.section.plan": "路径预览",
   "api.plan.title": "请求路径预览",
-  "api.plan.description": "显示对此模型的请求在代理中会经过的路径。预览不会向上游发送任何内容，也不产生费用。",
+  "api.plan.description":
+    "显示对此模型的请求在代理中会经过的路径。预览不会向上游发送任何内容，也不产生费用。",
   "api.plan.modeNote": "“原生”描述请求的传递方式，并不是验证结果。",
   "api.plan.unavailable": "此代理版本不支持路径预览。",
   "api.plan.noModels": "暂无可预览的模型。",
@@ -2472,24 +2732,31 @@ export const zh: Record<TKey, string> = {
   "api.clientConfig.clientCline": "Cline CLI",
   "api.clientConfig.clientKilo": "Kilo",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "这是两个文件的数据包，不是 Cline 设置文件。将 settings 合并到 providers.json，将 catalog 合并到同目录的 models.json。使用集成开关可在写入前备份。",
-  "api.clientConfig.clineDownloaded": "已下载 {filename}，设置尚未更改。settings 和 catalog 应分别保存到两个 Cline 文件。",
+  "api.clientConfig.clineBundle":
+    "这是两个文件的数据包，不是 Cline 设置文件。将 settings 合并到 providers.json，将 catalog 合并到同目录的 models.json。使用集成开关可在写入前备份。",
+  "api.clientConfig.clineDownloaded":
+    "已下载 {filename}，设置尚未更改。settings 和 catalog 应分别保存到两个 Cline 文件。",
   "api.clientConfig.copy": "复制配置",
   "api.clientConfig.download": "下载",
   "api.clientConfig.loading": "正在生成客户端配置…",
   "api.clientConfig.jsonLabel": "{client} 配置",
   "api.clientConfig.destination": "目标文件",
   "api.clientConfig.envHint": "启动前设置密钥",
-  "api.clientConfig.mergeWarning": "请合并到目标文件中。直接替换会丢失你已有的其他提供商和 MCP 配置。",
+  "api.clientConfig.mergeWarning":
+    "请合并到目标文件中。直接替换会丢失你已有的其他提供商和 MCP 配置。",
   "api.clientConfig.modelCount": "已导出 {count} 个模型",
-  "api.clientConfig.missingLimits": "{total} 个模型中有 {count} 个没有上下文上限，客户端将使用自己的默认值。",
-  "api.clientConfig.noKeyYet": "{env} 目前还没有对应的密钥。离开回环地址使用前，请先在上方生成密钥。",
+  "api.clientConfig.missingLimits":
+    "{total} 个模型中有 {count} 个没有上下文上限，客户端将使用自己的默认值。",
+  "api.clientConfig.noKeyYet":
+    "{env} 目前还没有对应的密钥。离开回环地址使用前，请先在上方生成密钥。",
   "api.clientConfig.loadFailed": "无法读取模型列表，因此没有生成客户端配置。",
   "api.clientConfig.copiedAnnounce": "客户端配置已复制到剪贴板。",
   "api.clientConfig.copyFailed": "无法复制客户端配置。",
-  "api.clientConfig.downloadedAnnounce": "已下载 {filename}。目前还没有任何改动，请自行将其合并到 {destination}。",
+  "api.clientConfig.downloadedAnnounce":
+    "已下载 {filename}。目前还没有任何改动，请自行将其合并到 {destination}。",
   "api.clientConfig.whereDisclosure": "该文件应放在哪里",
-  "api.clientConfig.whereBody": "上面的路径是全局配置位置。工作目录中的项目级配置文件优先级更高；密钥由配置中指定的环境变量读取，不会写入该文件。",
+  "api.clientConfig.whereBody":
+    "上面的路径是全局配置位置。工作目录中的项目级配置文件优先级更高；密钥由配置中指定的环境变量读取，不会写入该文件。",
   "api.keysLoadFailed": "无法加载 API 密钥。",
   "api.createFailed": "无法创建 API 密钥。",
   "api.deleteFailed": "无法删除 API 密钥。",
@@ -2498,7 +2765,8 @@ export const zh: Record<TKey, string> = {
   "api.auth.accepted": "可用",
   "api.auth.rejected": "不接受",
   "api.auth.testProtocol": "测试 {protocol}",
-  "api.auth.testNeedsFreshKey": "要运行带认证的测试，请先生成密钥，并让一次性显示的值保留在屏幕上。",
+  "api.auth.testNeedsFreshKey":
+    "要运行带认证的测试，请先生成密钥，并让一次性显示的值保留在屏幕上。",
   "api.key.name": "密钥名称",
   "api.key.rename": "重命名",
   "api.key.saveName": "保存名称",
@@ -2519,10 +2787,12 @@ export const zh: Record<TKey, string> = {
   "api.attribution.neverUsed": "统计开始后未使用",
   "api.attribution.unavailable": "暂无用量",
   "api.attribution.unavailableDetail": "尚未归属任何用量。统计开始之前的请求无法追溯归属。",
-  "api.attribution.ambiguous": "两个密钥共用同一个 ID，无法判断用量属于哪一个。请在配置文件中为每个密钥设置唯一 ID。",
+  "api.attribution.ambiguous":
+    "两个密钥共用同一个 ID，无法判断用量属于哪一个。请在配置文件中为每个密钥设置唯一 ID。",
   "api.attribution.railAmbiguous": "ID 重复",
   // Claude Code inbound
-  "claude.subtitle": "将 ocx claude 通过 OpenCodex 路由，让 Claude Code 可以使用 GPT、Gemini 等其他模型。关闭后，拦截（包括第一方模式）和 Claude Desktop 的模型列表也会一并停用。此设置与连接概览中的 Claude 开关相同。",
+  "claude.subtitle":
+    "将 ocx claude 通过 OpenCodex 路由，让 Claude Code 可以使用 GPT、Gemini 等其他模型。关闭后，拦截（包括第一方模式）和 Claude Desktop 的模型列表也会一并停用。此设置与连接概览中的 Claude 开关相同。",
   "claude.enabledLabel": "Claude 连接",
   "claude.saveBar.label": "保存 Claude Code 设置",
   "claude.saveBar.dirty": "有未保存的更改",
@@ -2546,23 +2816,30 @@ export const zh: Record<TKey, string> = {
   "claude.authSource.exported-env": "环境变量",
   "claude.authSource.unknown": "检测到的凭据",
   "claude.fastMode": "Fast Mode (OpenAI)",
-  "claude.fastModeDesc": "控制 OpenAI 模型的推理速度。ON = 优先级（更快）。OFF = 默认速度。Auto = 透传客户端设置。",
+  "claude.fastModeDesc":
+    "控制 OpenAI 模型的推理速度。ON = 优先级（更快）。OFF = 默认速度。Auto = 透传客户端设置。",
   "claude.fastAuto": "Auto",
   "claude.fastOn": "ON",
   "claude.fastOff": "OFF",
   "claude.autoContext": "自动利用大上下文",
-  "claude.autoContextDesc": "决定 1M 标记的范围。开：窗口能容纳压缩阈值的模型都有大上下文条目；关：仅真正的 1M 模型有。",
-  "claude.autoContextInert": "配置文件中存在旧式上下文大小值（maxContextTokens），此功能暂不生效。删除该值即可恢复。",
+  "claude.autoContextDesc":
+    "决定 1M 标记的范围。开：窗口能容纳压缩阈值的模型都有大上下文条目；关：仅真正的 1M 模型有。",
+  "claude.autoContextInert":
+    "配置文件中存在旧式上下文大小值（maxContextTokens），此功能暂不生效。删除该值即可恢复。",
   "claude.contextAccounting": "上下文计算方式",
-  "claude.contextAccountingDesc": "1M：长上下文模型在 opencodex 选择默认值的所有地方默认按 1M 提供。200k：opencodex 不再自动标记 1M；你自己选择的 1M 条目和你设置的上下文覆盖仍然生效。",
+  "claude.contextAccountingDesc":
+    "1M：长上下文模型在 opencodex 选择默认值的所有地方默认按 1M 提供。200k：opencodex 不再自动标记 1M；你自己选择的 1M 条目和你设置的上下文覆盖仍然生效。",
   "claude.contextAccounting1m": "1M（默认）",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "自动摘要触发点",
   "claude.autoCompactDefault": "{value}（默认）",
-  "claude.autoCompactWindowDesc": "对话达到该点时自动摘要旧内容。不会超过各模型自身上限，因此 200k 模型不受影响。",
-  "claude.autoCompactWindowWarn": "修改该值可能导致 GPT 模型异常——若超过模型真实上限，会在摘要触发前报错。",
+  "claude.autoCompactWindowDesc":
+    "对话达到该点时自动摘要旧内容。不会超过各模型自身上限，因此 200k 模型不受影响。",
+  "claude.autoCompactWindowWarn":
+    "修改该值可能导致 GPT 模型异常——若超过模型真实上限，会在摘要触发前报错。",
   "claude.injectAgents": "自动注册子代理",
-  "claude.injectAgentsDesc": "将“子代理”页选中的模型（以及当前默认模型）注册为 Claude Code 可派遣的代理（ocx-*）。从下一个会话开始生效。",
+  "claude.injectAgentsDesc":
+    "将“子代理”页选中的模型（以及当前默认模型）注册为 Claude Code 可派遣的代理（ocx-*）。从下一个会话开始生效。",
   "claude.webSearchSidecar": "网页搜索附属服务覆盖",
   "claude.webSearchSidecarHint": "仅对 Claude Code 请求覆盖主网页搜索附属服务设置。",
   "claude.visionSidecar": "视觉附属服务覆盖",
@@ -2573,10 +2850,13 @@ export const zh: Record<TKey, string> = {
   "claude.quickstartHint": "{cmd} 通过代理打开 Claude Code。你的 claude.ai 登录保持不变。",
   "claude.manualEnv": "手动配置（高级）",
   "claude.smallFastModel": "后台辅助模型",
-  "claude.smallFastModelHint": "Claude Code 用于对话摘要、主题识别等后台工作的模型。子代理的 haiku 别名也使用它。留空 = Claude 默认（Haiku）。",
-  "claude.smallFastModelAccurateHint": "Claude Code 用于聊天摘要、主题识别等后台工作的模型。子代理的 haiku 别名也使用此模型。",
+  "claude.smallFastModelHint":
+    "Claude Code 用于对话摘要、主题识别等后台工作的模型。子代理的 haiku 别名也使用它。留空 = Claude 默认（Haiku）。",
+  "claude.smallFastModelAccurateHint":
+    "Claude Code 用于聊天摘要、主题识别等后台工作的模型。子代理的 haiku 别名也使用此模型。",
   "claude.smallFastModelUnsetOption": "让 Claude Code 选择（原生模型）",
-  "claude.smallFastModelNativeWarning": "留空时，OpenCodex 不会设置辅助模型覆盖项。Claude Code 可能使用其原生 Sonnet 模型，并可能产生原生提供方费用。",
+  "claude.smallFastModelNativeWarning":
+    "留空时，OpenCodex 不会设置辅助模型覆盖项。Claude Code 可能使用其原生 Sonnet 模型，并可能产生原生提供方费用。",
   "claude.slotUnset": "使用 Claude 默认值",
   "claude.modelMap": "模型拦截",
   "claude.modelMapHint": "拦截对特定模型的请求并重定向到你指定的模型。默认为空——添加规则后才生效。",
@@ -2645,7 +2925,8 @@ export const zh: Record<TKey, string> = {
   "storage.bucket.deletion_manifests": "删除清单",
   "storage.bucket.other": "其他",
   "storage.cleanup.title": "归档清理",
-  "storage.cleanup.help": "按百分比移除最旧的归档会话。不会触碰活动会话。默认隔离——文件移至 CODEX_HOME/.trash。",
+  "storage.cleanup.help":
+    "按百分比移除最旧的归档会话。不会触碰活动会话。默认隔离——文件移至 CODEX_HOME/.trash。",
   "storage.cleanup.slider": "最旧归档百分比",
   "storage.cleanup.percent": "{percent}%",
   "storage.cleanup.preset": "{percent}",
@@ -2666,12 +2947,15 @@ export const zh: Record<TKey, string> = {
   "storage.cleanup.cleanupFailed": "清理失败。",
   "storage.cleanup.err.codex_busy": "Codex 正在使用 state.sqlite — 请退出 Codex 后重试。",
   "storage.cleanup.err.stale_preview": "预览后归档文件已变化 — 请重新预览。",
-  "storage.cleanup.err.restore_pending_overlap": "所选归档与未完成的隔离区恢复重叠 — 请先完成或重试恢复。",
+  "storage.cleanup.err.restore_pending_overlap":
+    "所选归档与未完成的隔离区恢复重叠 — 请先完成或重试恢复。",
   "storage.cleanup.err.referenced_history": "所选归档仍被 fork 或分页历史引用。",
   "storage.cleanup.err.invalid_digest": "预览摘要缺失或无效。",
   "storage.cleanup.err.invalid_mode": "模式必须是 quarantine 或 permanent。",
-  "storage.cleanup.err.fs_failed": "文件系统清理失败。部分更改可能已生效 — 请检查 CODEX_HOME/.trash 及显示的恢复路径。",
-  "storage.cleanup.err.fs_failed_trash": "文件系统清理失败。部分更改可能已生效 — 请在 {trashDir} 和 manifest.json 中查找可恢复文件。",
+  "storage.cleanup.err.fs_failed":
+    "文件系统清理失败。部分更改可能已生效 — 请检查 CODEX_HOME/.trash 及显示的恢复路径。",
+  "storage.cleanup.err.fs_failed_trash":
+    "文件系统清理失败。部分更改可能已生效 — 请在 {trashDir} 和 manifest.json 中查找可恢复文件。",
   "storage.cleanup.err.db_reconcile_failed": "无法更新 Codex 状态数据库。",
   "storage.cleanup.err.cleanup_failed": "清理失败。",
 
@@ -2698,7 +2982,8 @@ export const zh: Record<TKey, string> = {
   "storage.trash.err.invalid_trash": "隔离条目 ID 缺失或无效。",
   "storage.trash.err.missing_trash": "未找到隔离条目。",
   "storage.trash.err.dest_exists": "恢复目标已存在 — 请删除或重命名归档文件后重试。",
-  "storage.trash.err.fs_failed": "文件系统恢复失败。部分文件可能已恢复 — 请检查 archived_sessions 与 .trash。",
+  "storage.trash.err.fs_failed":
+    "文件系统恢复失败。部分文件可能已恢复 — 请检查 archived_sessions 与 .trash。",
   "storage.trash.err.storage_mutation_busy": "另一项存储清理或恢复正在进行 — 请稍后再试。",
   "storage.trash.err.db_reconcile_failed": "无法恢复 Codex 状态数据库行。",
   "storage.trash.err.restore_failed": "恢复失败。",
@@ -2764,7 +3049,8 @@ export const zh: Record<TKey, string> = {
   "modal.invalidPreset": "此内置提供方预设不完整。请重启代理后重试。",
   "modal.freeTierTitle": "免费层级",
   "modal.subscriptionCliTitle": "订阅 CLI，而非 API 密钥",
-  "modal.subscriptionCliWarning": "此提供商不使用 API 密钥。它调用本机已登录的官方 Claude Code CLI（{cmd}），并向该 Claude 订阅账户计费。OpenCodex 不为其存储任何密钥，在此输入的密钥也永远不会被使用。如需按 API 密钥计费，请改为添加 {apiProvider}。",
+  "modal.subscriptionCliWarning":
+    "此提供商不使用 API 密钥。它调用本机已登录的官方 Claude Code CLI（{cmd}），并向该 Claude 订阅账户计费。OpenCodex 不为其存储任何密钥，在此输入的密钥也永远不会被使用。如需按 API 密钥计费，请改为添加 {apiProvider}。",
   "modal.freeTierDefault": "无需 API 密钥，开箱即用。",
   "modal.tab.accounts": "账户",
   "modal.tab.free": "免费",
@@ -2772,7 +3058,8 @@ export const zh: Record<TKey, string> = {
   "modal.tab.paid": "付费",
   "modal.noteMore": "查看完整说明",
   "modal.searchResults": "在 {tiers} 中找到 {count} 个",
-  "modal.accountsHint": "在此登录 ChatGPT/Codex、OAuth 与 API 密钥账户。OpenAI 为内置提供商 — 请登录，无需再次添加。",
+  "modal.accountsHint":
+    "在此登录 ChatGPT/Codex、OAuth 与 API 密钥账户。OpenAI 为内置提供商 — 请登录，无需再次添加。",
   "modal.accountsCodexAuthLink": "Codex 认证",
   "modal.notListed": "没有你要的提供商？添加自定义",
   "modal.catalogLoading": "正在加载目录…",
@@ -2783,7 +3070,7 @@ export const zh: Record<TKey, string> = {
   "modal.accountCodexPool": "ChatGPT 账户池",
   "modal.accountLoggedIn": "已登录",
   "modal.accountLoggedOut": "未登录",
- "quota.fiveHourLimit": "5 小时限额",
+  "quota.fiveHourLimit": "5 小时限额",
   "quota.ageMinutes": "{n} 分钟",
   "quota.ageHours": "{n} 小时",
   "quota.ageDays": "{n} 天",
@@ -2928,7 +3215,7 @@ export const zh: Record<TKey, string> = {
   "pws.modelsTruncated": "显示 {total} 个模型中的前 {shown} 个。使用筛选以缩小列表。",
   "pws.retry": "重试",
   "pws.noModels": "未发现此提供商的模型。",
- "pws.noModelMatch": "没有匹配筛选的模型。",
+  "pws.noModelMatch": "没有匹配筛选的模型。",
   "pws.adapterBaseRequired": "适配器和基本 URL 为必填项。",
   "pws.addAccount": "添加账户",
   "pws.addKey": "添加 API 密钥",
@@ -2940,13 +3227,15 @@ export const zh: Record<TKey, string> = {
   "pws.accountsLoadFailed": "无法加载账户。",
   "pws.retryAccounts": "重试",
   "pws.noAccounts": "尚未连接任何账户。",
-  "pws.cockpitImportDescription": "从此设备导入 Cockpit Tools Antigravity JSON 导出文件。不会显示文件内容。",
+  "pws.cockpitImportDescription":
+    "从此设备导入 Cockpit Tools Antigravity JSON 导出文件。不会显示文件内容。",
   "pws.cockpitImportFileLabel": "Cockpit Tools Antigravity JSON 导出文件",
   "pws.cockpitImportChooseFile": "选择 JSON 文件",
   "pws.cockpitImporting": "正在导入…",
   "pws.cockpitImportInvalid": "所选文件不是有效的 JSON 导出文件或文件过大。",
   "pws.cockpitImportFailed": "无法完成账户导入。",
-  "pws.cockpitImportComplete": "导入完成：已导入 {imported}，已更新 {updated}，失败 {failed}，不支持 {unsupported}。",
+  "pws.cockpitImportComplete":
+    "导入完成：已导入 {imported}，已更新 {updated}，失败 {failed}，不支持 {unsupported}。",
   "pws.accountSwitching": "切换中…",
   "pws.accountCurrent": "当前账户",
   "pws.accountPausedHint": "恢复前不会参与自动切换、重试、冷却恢复、手动选择或主动令牌刷新。",
@@ -2960,12 +3249,14 @@ export const zh: Record<TKey, string> = {
   "pws.notLoggedInTitle": "未登录",
   "pws.note": "备注",
   "pws.responsesReasoningReplay": "重放明文推理",
-  "pws.responsesReasoningReplayHint": "默认关闭。将此前的明文推理发送到此端点，可能增加令牌用量。仅在端点支持推理重放时启用。",
+  "pws.responsesReasoningReplayHint":
+    "默认关闭。将此前的明文推理发送到此端点，可能增加令牌用量。仅在端点支持推理重放时启用。",
   "pws.allowPrivateNetwork": "允许本地/私有网络",
   "pws.liveModels": "从提供方发现模型",
   "pws.liveModelsDesc": "获取提供方的实时模型目录。关闭后仅使用已配置的静态模型。",
   "pws.xaiChatOptIn": "为 Grok 4.5 和 4.6 使用 Chat Completions",
-  "pws.xaiChatOptInDesc": "关闭时使用 Responses，即 OAuth Responses 请求的默认协议。其他 Grok 模型和服务层级行为不变。",
+  "pws.xaiChatOptInDesc":
+    "关闭时使用 Responses，即 OAuth Responses 请求的默认协议。其他 Grok 模型和服务层级行为不变。",
   "pws.xaiChatOptInMixed": "只有一个模型使用 Chat。",
   "pws.cursorTransport": "Cursor 传输协议",
   "pws.cursorTransportHttp2": "HTTP/2（默认）",
@@ -2985,17 +3276,21 @@ export const zh: Record<TKey, string> = {
   "pws.healthLabel.refreshFailed": "刷新失败",
   "pws.healthLabel.metadataMismatch": "元数据不匹配",
   "pws.healthLabel.validationPending": "等待验证",
-  "pws.healthSummary.validationPending": "{provider} {account}：已在额度耗尽时注册。额度恢复后，刷新额度将发送一个小型验证请求。验证成功前不会用于路由。",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}：已在额度耗尽时注册。额度恢复后，刷新额度将发送一个小型验证请求。验证成功前不会用于路由。",
   "pws.healthLabel.credentialConflict": "凭证冲突",
-  "pws.healthSummary.rateLimited": "{provider} {account}：限速至 {until}。在此之前将暂停该账户的路由。",
-  "pws.healthSummary.quotaLimited": "{provider} {account}：配额限制至 {until}。在此之前将暂停该账户的路由。",
+  "pws.healthSummary.rateLimited":
+    "{provider} {account}：限速至 {until}。在此之前将暂停该账户的路由。",
+  "pws.healthSummary.quotaLimited":
+    "{provider} {account}：配额限制至 {until}。在此之前将暂停该账户的路由。",
   "pws.healthSummary.reauthRequired": "{provider} {account}：需要重新认证。",
   "pws.healthSummary.credentialConflict": "{provider} {account}：凭证冲突。",
   "pws.healthSummary.metadataMismatch": "{provider} {account}：元数据不匹配。",
   "pws.healthSummary.staleCredentials": "{provider} {account}：凭证不完整。",
   "pws.removeConfirm": "移除",
   "pws.removeConfirmBody": "移除提供商「{name}」？此操作无法撤销。",
-  "pws.removeDefaultConfirmBody": "移除默认提供方「{name}」？「{defaultProvider}」将成为默认提供方。此操作无法撤销。",
+  "pws.removeDefaultConfirmBody":
+    "移除默认提供方「{name}」？「{defaultProvider}」将成为默认提供方。此操作无法撤销。",
   "pws.removeConfirmTitle": "移除提供商",
   "pws.saveSettings": "保存",
   "pws.keySelection": "API 密钥选择",
@@ -3003,7 +3298,8 @@ export const zh: Record<TKey, string> = {
   "pws.keyLimitInvalid": "每个密钥的限制必须为支持范围内的正数；间隔和并发数必须为整数。",
   "pws.keyRoundRobin": "轮询",
   "pws.keyLimits": "每个密钥的限制",
-  "pws.keySharedQuota": "提供商限制仍对所有密钥合并生效。同一项目的密钥可能共享配额；RPM 不限制令牌或每日预算。",
+  "pws.keySharedQuota":
+    "提供商限制仍对所有密钥合并生效。同一项目的密钥可能共享配额；RPM 不限制令牌或每日预算。",
   "pws.keyHandle": "密钥 ID",
   "pws.keyStarts": "已开始",
   "pws.keyInFlight": "处理中",
@@ -3033,7 +3329,8 @@ export const zh: Record<TKey, string> = {
   "pws.settingsSaved": "设置已保存。",
   "pws.accountModeSaved": "账户模式已保存。",
   "pws.accountModeFailed": "无法切换账户模式。",
-  "pws.accountModeConfirm": "切换 OpenAI 账户模式？正在进行的对话将重新分配到另一种模式的账户集合，配额用量将按新模式计入。",
+  "pws.accountModeConfirm":
+    "切换 OpenAI 账户模式？正在进行的对话将重新分配到另一种模式的账户集合，配额用量将按新模式计入。",
   "pws.settingsUnsavedBar": "有未保存的更改。",
   "pws.unsavedLeaveBody": "有未保存的更改。离开前保存吗？",
   "pws.unsavedLeaveTitle": "未保存的更改",
@@ -3050,7 +3347,8 @@ export const zh: Record<TKey, string> = {
   "pws.capacity.nextRecovery": "下一次容量恢复",
   "pws.capacity.recoveryShare": "+{percent}% 账户池容量",
   "pws.capacity.incomplete": "覆盖不完整：已排除 {excluded} 个账户",
-  "pws.capacity.uncalibratedPlan": "{count} 个账户使用未校准套餐，按基准席位权重计入，因此该估算可能偏保守",
+  "pws.capacity.uncalibratedPlan":
+    "{count} 个账户使用未校准套餐，按基准席位权重计入，因此该估算可能偏保守",
   "pws.capacity.partial": "部分窗口覆盖不完整：{count} 个账户未报告所有显示的限额窗口",
   "pws.capacity.windowPartial": "部分",
   "pws.capacity.windowPartialA11y": "{window}：账户覆盖不完整",
@@ -3096,11 +3394,12 @@ export const zh: Record<TKey, string> = {
   "modal.setupStep2": "粘贴到下方的 API 密钥字段",
   "modal.setupStep3": "点击添加提供方 — 模型会自动发现",
   "modal.namePlaceholder": "例如 openrouter",
-  "modal.duplicateWarn": "提供方 \"{name}\" 已存在，将被覆盖。",
+  "modal.duplicateWarn": '提供方 "{name}" 已存在，将被覆盖。',
   "modal.forwardHintPrefix": "无需密钥 — 代理会转发你的",
   "modal.forwardCredentials": "codex login",
   "modal.forwardHintSuffix": "凭据到此提供方。",
-  "modal.localHint": "不会存储 API 密钥。这会为 Codex 添加 Cursor 的公开模型目录，但在审计完成前，实时 Cursor 传输与原生文件/Shell 执行仍保持禁用。",
+  "modal.localHint":
+    "不会存储 API 密钥。这会为 Codex 添加 Cursor 的公开模型目录，但在审计完成前，实时 Cursor 传输与原生文件/Shell 执行仍保持禁用。",
   "modal.getApiKey": "获取 {label} API 密钥",
   "modal.apiKey": "API 密钥",
   "modal.apiKeyTransport": "API 密钥请求头",
@@ -3108,9 +3407,10 @@ export const zh: Record<TKey, string> = {
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
   "modal.apiKeyPlaceholder": "sk-…（或 $ENV_VAR）",
   "modal.defaultModelPlaceholder": "例如 gpt-5.5",
- "modal.baseUrlPlaceholder": "https://...",
+  "modal.baseUrlPlaceholder": "https://...",
   "modal.baseUrlPlaceholderError": "Base URL 包含未解析的 {placeholder}，请替换为实际值。",
-  "modal.baseUrlPlaceholderHint": "请在添加前将 Base URL 中的 {placeholder} 替换为你的实际 Account ID。",
+  "modal.baseUrlPlaceholderHint":
+    "请在添加前将 Base URL 中的 {placeholder} 替换为你的实际 Account ID。",
   "modal.adding": "正在添加…",
   "modal.useOauthLogin": "← 使用 OAuth 登录",
   "codexAuth.addIdPlaceholder": "codex-work, codex-alt, team…",
@@ -3129,7 +3429,8 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.applyFailed": "配置已保存，但无法应用。",
   "claudeDesktop.updateFailed": "Claude Desktop 更新失败。",
   "claudeDesktop.savedApplied": "配置已保存并应用到 Claude Desktop。",
-  "claudeDesktop.appliedMarkerUnsaved": "已应用到 Claude Desktop，但应用标记未能保存。在再次应用之前，下方的已保存／已应用状态可能显示不准确。",
+  "claudeDesktop.appliedMarkerUnsaved":
+    "已应用到 Claude Desktop，但应用标记未能保存。在再次应用之前，下方的已保存／已应用状态可能显示不准确。",
   "claudeDesktop.savedAppliedAnnounce": "Claude Desktop 配置已保存并应用。",
   "claudeDesktop.saved": "配置已保存。",
   "claudeDesktop.savedAnnounce": "Claude Desktop 配置已保存。",
@@ -3193,9 +3494,11 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.roles.unset": "未设置",
   "claudeDesktop.roles.pick": "选择模型",
   "claudeDesktop.roles.unavailableOption": "{route}（不可用）",
-  "claudeDesktop.roles.gatewayScope": "这些选择适用于网关模式，该模式会写入 Claude Desktop 的模型列表。",
+  "claudeDesktop.roles.gatewayScope":
+    "这些选择适用于网关模式，该模式会写入 Claude Desktop 的模型列表。",
   "claudeDesktop.roles.listTitle": "Desktop 模型列表",
-  "claudeDesktop.roles.listHint": "选择 Claude Desktop 列出的模型。只影响 Claude Desktop：其他客户端和提供商设置的模型保持不变。",
+  "claudeDesktop.roles.listHint":
+    "选择 Claude Desktop 列出的模型。只影响 Claude Desktop：其他客户端和提供商设置的模型保持不变。",
   "claudeDesktop.status.pendingApply": "已保存 — 应用后更新 Desktop",
   "claudeDesktop.visibility.search": "搜索模型",
   "claudeDesktop.visibility.provider": "提供商",
@@ -3216,11 +3519,14 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.visibility.previewTitle": "下次应用",
   "claudeDesktop.visibility.previewAdds": "新增：{models}",
   "claudeDesktop.visibility.previewRemoves": "移除：{models}",
-  "claudeDesktop.visibility.previewSame": "配置中包含相同的模型 ID。请先应用配置更改，再重启 Desktop。",
-  "claudeDesktop.visibility.replaceNote": "应用会替换 OpenCodex 的 Claude Desktop 配置中的模型列表，包括手动编辑过的列表。高级中的层级映射仍为可选。仅发现模式不使用此选择。",
+  "claudeDesktop.visibility.previewSame":
+    "配置中包含相同的模型 ID。请先应用配置更改，再重启 Desktop。",
+  "claudeDesktop.visibility.replaceNote":
+    "应用会替换 OpenCodex 的 Claude Desktop 配置中的模型列表，包括手动编辑过的列表。高级中的层级映射仍为可选。仅发现模式不使用此选择。",
   "claudeDesktop.roles.quickBadge": "快速任务",
   "claudeDesktop.advanced.title": "高级：Claude 等级分配",
-  "claudeDesktop.advanced.desc": "选择 Claude Desktop 将各模型视为哪个 Claude 等级（Opus、Fable、Sonnet、Haiku）。",
+  "claudeDesktop.advanced.desc":
+    "选择 Claude Desktop 将各模型视为哪个 Claude 等级（Opus、Fable、Sonnet、Haiku）。",
   "claudeDesktop.advanced.empty": "空",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "不可用",
@@ -3235,7 +3541,8 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.status.stale": "Desktop 配置尚未更新 — 需重新应用",
   "claudeDesktop.status.notApplied": "未应用",
   "claudeDesktop.status.notActiveProfile": "Desktop 正在使用其他配置 — 请重新应用",
-  "claudeDesktop.status.disabled": "Claude Desktop 集成已关闭。开启后请完全退出并重新打开 Desktop。",
+  "claudeDesktop.status.disabled":
+    "Claude Desktop 集成已关闭。开启后请完全退出并重新打开 Desktop。",
   "claudeDesktop.enableApply": "开启并应用",
   "claudeDesktop.switchModeApply": "切换模式并应用",
   "claudeDesktop.status.appliedFirstParty": "第一方：Desktop Code 标签页经由本地代理",
@@ -3244,29 +3551,41 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.mode.gateway": "网关（第三方）",
   "claudeDesktop.mode.defaultBadge": "默认",
   "claudeDesktop.mode.current": "当前",
-  "claudeDesktop.mode.firstPartyHint": "Desktop 保持登录 claude.ai。开启 Desktop 第一方模式时，Code 标签页使用 OpenCodex；独立 CLI 有自己的开关。两者读取同一份设置环境变量。",
+  "claudeDesktop.mode.firstPartyHint":
+    "Desktop 保持登录 claude.ai。开启 Desktop 第一方模式时，Code 标签页使用 OpenCodex；独立 CLI 有自己的开关。两者读取同一份设置环境变量。",
   "claude.intercept.start": "启动拦截",
   "claude.intercept.starting": "正在启动拦截…",
   "claude.intercept.reason.disabled": "请先启用Claude路由和拦截。",
   "claude.intercept.reason.client_role": "此进程是中心客户端。请在本地服务器启用拦截。",
-  "claude.intercept.reason.ephemeral_port": "公共端口为临时端口时，请设置claudeCode.intercept.port。",
-  "claude.intercept.reason.port_in_use": "端口{port}已被占用。请释放端口或修改claudeCode.intercept.port。",
-  "claude.intercept.reason.port_mismatch": "本次运行使用端口{bound}，与配置端口{configured}不同。请使用当前端口或恢复配置。",
+  "claude.intercept.reason.ephemeral_port":
+    "公共端口为临时端口时，请设置claudeCode.intercept.port。",
+  "claude.intercept.reason.port_in_use":
+    "端口{port}已被占用。请释放端口或修改claudeCode.intercept.port。",
+  "claude.intercept.reason.port_mismatch":
+    "本次运行使用端口{bound}，与配置端口{configured}不同。请使用当前端口或恢复配置。",
   "claude.intercept.reason.failed": "无法启动拦截。请检查本地代理配置后重试。",
   "claude.intercept.reason.stopped": "拦截已停止。请启动OpenCodex服务。",
   "claude.firstParty.label": "Claude Code CLI 第一方",
   "claude.firstParty.desc": "独立的 claude CLI 保留其 Claude 登录，同时流量经过本地拦截代理。",
   "claude.firstParty.aria": "切换 Claude Code CLI 第一方模式",
-  "claude.firstParty.risk": "账户风险：第一方模式让 Claude 订阅流量经过本地拦截代理。Anthropic 可能将其视为违反条款并暂停账户。",
-  "claude.firstParty.shared": "如果共享代理设置已应用，另一个 Claude 客户端也会经由本地代理原样转发；TLS 在本地终止。若要在终端直连，请在 shell 中设置 NO_PROXY='*'。",
-  "claude.firstParty.deadProxy": "Claude 设置指向未运行的代理。运行 OpenCodex 或关闭 Desktop/CLI 第一方模式之前，直接运行 claude 无法连接。",
-  "claude.firstParty.notApplied": "CLI 第一方模式已开启，但代理设置尚未生效。运行普通 claude 前请检查 Claude 设置。",
+  "claude.firstParty.risk":
+    "账户风险：第一方模式让 Claude 订阅流量经过本地拦截代理。Anthropic 可能将其视为违反条款并暂停账户。",
+  "claude.firstParty.shared":
+    "如果共享代理设置已应用，另一个 Claude 客户端也会经由本地代理原样转发；TLS 在本地终止。若要在终端直连，请在 shell 中设置 NO_PROXY='*'。",
+  "claude.firstParty.deadProxy":
+    "Claude 设置指向未运行的代理。运行 OpenCodex 或关闭 Desktop/CLI 第一方模式之前，直接运行 claude 无法连接。",
+  "claude.firstParty.notApplied":
+    "CLI 第一方模式已开启，但代理设置尚未生效。运行普通 claude 前请检查 Claude 设置。",
   "claude.firstParty.brokenProxy": "无法启动拦截。请检查本地代理配置后重试。",
-  "claude.firstParty.residual": "Desktop 和 CLI 第一方模式均已关闭，但 Claude 设置仍指向 OpenCodex 代理。请删除残留代理设置或运行 `ocx ensure`。",
-  "claude.firstParty.routingOff": "opencodex 当前未提供 Claude 拦截服务（Claude 路由或拦截功能已关闭，或此设备是另一台 opencodex 中枢的客户端），因此这些设置指向的代理无法处理请求。请在此设备上重新启用该服务，或关闭第一方模式以移除这些设置。",
+  "claude.firstParty.residual":
+    "Desktop 和 CLI 第一方模式均已关闭，但 Claude 设置仍指向 OpenCodex 代理。请删除残留代理设置或运行 `ocx ensure`。",
+  "claude.firstParty.routingOff":
+    "opencodex 当前未提供 Claude 拦截服务（Claude 路由或拦截功能已关闭，或此设备是另一台 opencodex 中枢的客户端），因此这些设置指向的代理无法处理请求。请在此设备上重新启用该服务，或关闭第一方模式以移除这些设置。",
   "claude.firstParty.disabled": "请先启用Claude路由和拦截。",
-  "claude.firstParty.foreign": "~/.claude/settings.json 指向 opencodex 代理，却信任 opencodex 未管理的证书，因此请求会失败。请手动修正其中的 HTTPS_PROXY / NODE_EXTRA_CA_CERTS。",
-  "claude.firstParty.local": "~/.claude/settings.json 让 Claude Code 使用 127.0.0.1 上的本地代理，但 opencodex 无法确认该代理是否由自己管理。如果不再使用，请删除其中的 HTTPS_PROXY。",
+  "claude.firstParty.foreign":
+    "~/.claude/settings.json 指向 opencodex 代理，却信任 opencodex 未管理的证书，因此请求会失败。请手动修正其中的 HTTPS_PROXY / NODE_EXTRA_CA_CERTS。",
+  "claude.firstParty.local":
+    "~/.claude/settings.json 让 Claude Code 使用 127.0.0.1 上的本地代理，但 opencodex 无法确认该代理是否由自己管理。如果不再使用，请删除其中的 HTTPS_PROXY。",
   "claude.firstParty.unknown": "opencodex 无法确认 ~/.claude/settings.json 是否仍指向它的代理。",
   "claude.firstParty.refusal.interceptDisabled": "拦截代理已关闭。",
   "claude.firstParty.refusal.interceptUnavailable": "无法启动拦截。请检查本地代理配置后重试。",
@@ -3274,17 +3593,22 @@ export const zh: Record<TKey, string> = {
   "claude.firstParty.refusal.caUnavailable": "本地证书颁发机构不可用。",
   "claude.firstParty.refusal.unreadable": "无法读取 Claude 设置。",
   "claude.firstParty.refusal.writeFailed": "无法写入 Claude 设置。",
-  "claudeDesktop.mode.firstPartyRisk": "账户风险：第一方模式会让您的 Claude 订阅流量经过本地拦截代理。Anthropic 可能将此视为违反服务条款并暂停账户。网关是默认模式。",
-  "claudeDesktop.mode.gatewayHint": "整个应用改用 OpenCodex 作为网关。聊天在本地运行；claude.ai 功能不可用。",
+  "claudeDesktop.mode.firstPartyRisk":
+    "账户风险：第一方模式会让您的 Claude 订阅流量经过本地拦截代理。Anthropic 可能将此视为违反服务条款并暂停账户。网关是默认模式。",
+  "claudeDesktop.mode.gatewayHint":
+    "整个应用改用 OpenCodex 作为网关。聊天在本地运行；claude.ai 功能不可用。",
   "claudeDesktop.mode.switchNote": "切换会移除另一模式的配置。应用后请完全退出并重新打开 Desktop。",
   "claudeDesktop.firstParty.proxyRunning": "本地代理 127.0.0.1:{port}",
   "claudeDesktop.firstParty.proxyStopped": "无法启动拦截。请检查本地代理配置后重试。 ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "配置中已禁用拦截代理（claudeCode.intercept.enabled）",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "配置中已禁用拦截代理（claudeCode.intercept.enabled）",
   "claudeDesktop.picker.title": "Claude Desktop 模型选择器",
-  "claudeDesktop.picker.hint": "通过专用本地代理，将 OpenCodex 模型显示在 Desktop 的 Code 标签选择器中。",
+  "claudeDesktop.picker.hint":
+    "通过专用本地代理，将 OpenCodex 模型显示在 Desktop 的 Code 标签选择器中。",
   "claudeDesktop.picker.toggle": "启用 Claude Desktop 选择器",
   "claudeDesktop.picker.state.active": "选择器已启用",
-  "claudeDesktop.picker.state.restart": "请完全退出并重新打开 Claude Desktop，以完成选择器配置的应用。",
+  "claudeDesktop.picker.state.restart":
+    "请完全退出并重新打开 Claude Desktop，以完成选择器配置的应用。",
   "claudeDesktop.picker.state.trustPending": "正在等待证书信任步骤",
   "claudeDesktop.picker.state.trustDeclined": "证书信任已被拒绝",
   "claudeDesktop.picker.state.proxyUnavailable": "选择器代理未运行",
@@ -3292,9 +3616,11 @@ export const zh: Record<TKey, string> = {
   "claudeDesktop.picker.state.notFirstParty": "选择器仅在第一方模式下可用",
   "claudeDesktop.picker.state.profileFailed": "无法应用选择器配置",
   "claudeDesktop.picker.models": "选择器中有 {count} 个可用模型",
-  "claudeDesktop.picker.offlineNote": "启用选择器模式后，Claude Desktop 会通过 OpenCodex 访问网络。如果 OpenCodex 停止，Desktop 将保持离线，直到重启或关闭选择器模式。",
+  "claudeDesktop.picker.offlineNote":
+    "启用选择器模式后，Claude Desktop 会通过 OpenCodex 访问网络。如果 OpenCodex 停止，Desktop 将保持离线，直到重启或关闭选择器模式。",
   "claudeDesktop.firstParty.bindings.title": "Code 标签页模型绑定",
-  "claudeDesktop.firstParty.bindings.hint": "Claude Desktop 在 Code 标签页选择器中保留 Anthropic 的名称。将选择器模型绑定到 OpenCodex 模型后，该选择器条目的请求将由绑定的模型处理。只有经由本地代理的 Claude Code 流量（Desktop Code 标签页和 claude CLI）使用这些绑定；ocx claude 不受影响。绑定在下一个请求时生效，无需完全退出并重新打开。",
+  "claudeDesktop.firstParty.bindings.hint":
+    "Claude Desktop 在 Code 标签页选择器中保留 Anthropic 的名称。将选择器模型绑定到 OpenCodex 模型后，该选择器条目的请求将由绑定的模型处理。只有经由本地代理的 Claude Code 流量（Desktop Code 标签页和 claude CLI）使用这些绑定；ocx claude 不受影响。绑定在下一个请求时生效，无需完全退出并重新打开。",
   "claudeDesktop.firstParty.bindings.empty": "暂无绑定 — 选择器模型将使用默认路由。",
   "claudeDesktop.firstParty.bindings.pickerLabel": "选择器模型 ID",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
@@ -3312,7 +3638,8 @@ export const zh: Record<TKey, string> = {
   "sub.settings": "设置",
   "sub.sections": "子代理分区",
   "sub.delegation.model": "优先调用的模型",
-  "sub.delegation.modelHint": "Codex 分派工作时最先调用的模型。上面的推荐是可调用的名单，这里选的是其中第一顺位。",
+  "sub.delegation.modelHint":
+    "Codex 分派工作时最先调用的模型。上面的推荐是可调用的名单，这里选的是其中第一顺位。",
   "sub.suggest.button": "建议",
   "sub.suggest.label": "委派的工作",
   "sub.suggest.placeholder": "Codex 通常交出什么工作？例如：整个仓库的只读搜索，或跨多个模块的重构",
@@ -3330,8 +3657,10 @@ export const zh: Record<TKey, string> = {
   "sub.fallbackUnavailable": "当前未列出，仍保留在回退链中。",
   "sub.fallbackPollInvalid": "请输入 5000 到 600000 ms 之间的整数。",
   "sub.v2Compatibility.title": "原生父代理的 V2 兼容性",
-  "sub.v2Compatibility.risk": "原生 ChatGPT 父代理通过 V2 委派给此路由模型时，任务可能被加密并在执行前失败。路由父代理发送的可读任务不受影响。",
-  "sub.v2Compatibility.recoveryUnknown": "此服务器未提供恢复功能的启用或适用状态。请使用 V1/明文兼容委派，或仅在符合条件时启用实验性 V2 恢复。恢复会增加配额消耗、延迟、后端依赖及保真度损失风险，并不修复上游协议。",
+  "sub.v2Compatibility.risk":
+    "原生 ChatGPT 父代理通过 V2 委派给此路由模型时，任务可能被加密并在执行前失败。路由父代理发送的可读任务不受影响。",
+  "sub.v2Compatibility.recoveryUnknown":
+    "此服务器未提供恢复功能的启用或适用状态。请使用 V1/明文兼容委派，或仅在符合条件时启用实验性 V2 恢复。恢复会增加配额消耗、延迟、后端依赖及保真度损失风险，并不修复上游协议。",
   "sub.v2Compatibility.details": "兼容性详情",
   "dash.syncModelsHint": "按已连接的提供商重写 Codex 的模型目录。",
   "dash.syncRun": "立即同步",
@@ -3342,13 +3671,25 @@ export const zh: Record<TKey, string> = {
   "dash.visionTimeoutInvalid": "请输入 {min} 到 {max} 毫秒之间的整数。",
   "dash.visionAdvancedPopover": "高级视觉设置",
   "dash.codexDesktopAuthless": "无需登录即可打开 Codex",
-  "dash.codexDesktopAuthlessHint": "默认关闭。为符合条件的本地连接跳过单独的 Desktop 登录。仍需上游提供商凭据。更改后请重启 Codex。依赖账户的 Desktop 功能可能不可用。",
+  "dash.codexDesktopAuthlessHint":
+    "默认关闭。为符合条件的本地连接跳过单独的 Desktop 登录。仍需上游提供商凭据。更改后请重启 Codex。依赖账户的 Desktop 功能可能不可用。",
   "dash.codexClientCompaction": "使用客户端压缩",
-  "dash.codexClientCompactionHint": "默认关闭，仅适用于已认证的 loopback 路由。未来压缩会保存可移植的明文摘要，同时保留 OpenCodeX 与 V2 提供方路由；已配置的提供方可能处理摘要并消耗其额度。已有 ocx1 历史仍需单独恢复。更改后请重启 Codex。",
-  "dash.codexRemoteHistoryHint": "提供商表路由可能使已有的 openai 标签会话在部分移动端远程列表中隐藏。历史记录并未删除。远程客户端必须列出所有提供商；此开关不会修复客户端的列表过滤器。",
-  "models.newPolicyGlobal": "新模型默认停用", "models.newPolicyProvider": "新模型策略",
-  "models.fastProvider": "Fast 模式", "models.fastProviderHint": "按 2 倍价格消耗用量额度", "models.fastEnabled": "已开启 Fast 模式", "models.fastDisabled": "已关闭 Fast 模式", "models.fastSaveFailed": "无法保存 Fast 模式",
-  "models.newPolicy_inherit": "继承", "models.newPolicy_off": "关闭", "models.newPolicy_on": "开启", "models.newBadge": "新增", "models.newCount": "{count} 个新增，已关闭",
+  "dash.codexClientCompactionHint":
+    "默认关闭，仅适用于已认证的 loopback 路由。未来压缩会保存可移植的明文摘要，同时保留 OpenCodeX 与 V2 提供方路由；已配置的提供方可能处理摘要并消耗其额度。已有 ocx1 历史仍需单独恢复。更改后请重启 Codex。",
+  "dash.codexRemoteHistoryHint":
+    "提供商表路由可能使已有的 openai 标签会话在部分移动端远程列表中隐藏。历史记录并未删除。远程客户端必须列出所有提供商；此开关不会修复客户端的列表过滤器。",
+  "models.newPolicyGlobal": "新模型默认停用",
+  "models.newPolicyProvider": "新模型策略",
+  "models.fastProvider": "Fast 模式",
+  "models.fastProviderHint": "按 2 倍价格消耗用量额度",
+  "models.fastEnabled": "已开启 Fast 模式",
+  "models.fastDisabled": "已关闭 Fast 模式",
+  "models.fastSaveFailed": "无法保存 Fast 模式",
+  "models.newPolicy_inherit": "继承",
+  "models.newPolicy_off": "关闭",
+  "models.newPolicy_on": "开启",
+  "models.newBadge": "新增",
+  "models.newCount": "{count} 个新增，已关闭",
   "models.aliases": "别名",
   "models.aliasesTable": "别名表",
   "models.aliasPrompt": "服务商别名（留空即清除）",
@@ -3372,7 +3713,8 @@ export const zh: Record<TKey, string> = {
   "dash.staleData": "正在显示最后收到的数据，可能已过时。",
   "connection.pairing.code": "一次性配对码",
   "connection.pairing.retryValidation": "重试验证",
-  "connection.pairing.validationPending": "代码已兑换，但会话验证未能完成。请保持此页面打开并点击“重试验证”，无需新的代码。",
+  "connection.pairing.validationPending":
+    "代码已兑换，但会话验证未能完成。请保持此页面打开并点击“重试验证”，无需新的代码。",
   "connection.pairing.submit": "连接",
   "connection.pairing.submitting": "正在连接…",
   "connection.pairing.error": "配对码已被拒绝。请重新运行命令，为此浏览器地址获取新配对码。",
@@ -3386,7 +3728,8 @@ export const zh: Record<TKey, string> = {
   "integrations.detail.cursorNeverSeen": "已安装 Private Inference；尚未收到请求",
   "integrations.detail.cursorAbsent": "未找到 Cursor Private Inference",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "Cursor Private Inference 会在本地运行其智能体，并通过环回地址与 opencodex 通信。普通版 Cursor 无法如此工作：其后端会调用自定义端点，因此需要一个公开的 HTTPS URL。本页面不会向 Cursor 写入任何内容；请自行将以下值粘贴到 Cursor 中。",
+  "integrations.cursor.intro":
+    "Cursor Private Inference 会在本地运行其智能体，并通过环回地址与 opencodex 通信。普通版 Cursor 无法如此工作：其后端会调用自定义端点，因此需要一个公开的 HTTPS URL。本页面不会向 Cursor 写入任何内容；请自行将以下值粘贴到 Cursor 中。",
   "integrations.cursor.loading": "正在读取 Cursor 状态…",
   "integrations.cursor.unavailable": "无法从代理读取 Cursor 状态。",
   "integrations.cursor.detection": "已安装版本",
@@ -3394,10 +3737,13 @@ export const zh: Record<TKey, string> = {
   "integrations.cursor.regular": "Cursor（普通版）",
   "integrations.cursor.detected": "已检测到",
   "integrations.cursor.notFound": "未找到",
-  "integrations.cursor.regularOnly": "仅找到普通版 Cursor。它会通过 Cursor 的服务器路由自定义端点，因此如果没有公网隧道，便无法访问环回代理。有关 Private Inference 版本的信息，请参阅指南。",
-  "integrations.cursor.nothingFound": "在常用位置未找到 Cursor 安装。如果安装在其他位置，以下值仍然适用。",
+  "integrations.cursor.regularOnly":
+    "仅找到普通版 Cursor。它会通过 Cursor 的服务器路由自定义端点，因此如果没有公网隧道，便无法访问环回代理。有关 Private Inference 版本的信息，请参阅指南。",
+  "integrations.cursor.nothingFound":
+    "在常用位置未找到 Cursor 安装。如果安装在其他位置，以下值仍然适用。",
   "integrations.cursor.gateway": "网关参数",
-  "integrations.cursor.gatewayHint": "在 Cursor Private Inference 中打开 Settings > Models > Gateway，粘贴以下两个值，然后点击 Refresh model list。",
+  "integrations.cursor.gatewayHint":
+    "在 Cursor Private Inference 中打开 Settings > Models > Gateway，粘贴以下两个值，然后点击 Refresh model list。",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "API Key",
   "integrations.cursor.apiKeyCredential": "你的任一 opencodex API 密钥（此绑定需要凭据）",
@@ -3405,25 +3751,32 @@ export const zh: Record<TKey, string> = {
   "integrations.cursor.copied": "已复制",
   "integrations.cursor.connection": "连接",
   "integrations.cursor.seen": "Cursor 最近一次请求：{time}（{ua}）",
-  "integrations.cursor.neverSeen": "代理启动后尚未收到 Cursor 的请求。保存网关设置后，请在 Cursor 中点击 Refresh model list。",
+  "integrations.cursor.neverSeen":
+    "代理启动后尚未收到 Cursor 的请求。保存网关设置后，请在 Cursor 中点击 Refresh model list。",
   "integrations.cursor.models": "Cursor 将显示的内容",
-  "integrations.cursor.modelsHint": "Cursor 会从自身的模型表中选择推理层级，因此 opencodex 只能进行预测。“上下文”列会列出默认窗口和可选窗口（Cursor 的 Max Mode）。",
-  "integrations.cursor.ladderFromBundle": "推理档位读取自已安装的 Cursor Private Inference {version} 包。档位由 Cursor 决定，opencodex 只是展示它的表。",
-  "integrations.cursor.ladderFromStatic": "推理档位是 Cursor 3.18.25 的静态镜像（未找到可读取的 Private Inference 包）。上下文列显示默认窗口和可选窗口。",
+  "integrations.cursor.modelsHint":
+    "Cursor 会从自身的模型表中选择推理层级，因此 opencodex 只能进行预测。“上下文”列会列出默认窗口和可选窗口（Cursor 的 Max Mode）。",
+  "integrations.cursor.ladderFromBundle":
+    "推理档位读取自已安装的 Cursor Private Inference {version} 包。档位由 Cursor 决定，opencodex 只是展示它的表。",
+  "integrations.cursor.ladderFromStatic":
+    "推理档位是 Cursor 3.18.25 的静态镜像（未找到可读取的 Private Inference 包）。上下文列显示默认窗口和可选窗口。",
   "integrations.cursor.unknownVersion": "未知版本",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "单一窗口",
-  "integrations.cursor.noControlTitle": "此 id 不在 Cursor 内置的 effort 表中，因此 Cursor 不显示推理控件。",
+  "integrations.cursor.noControlTitle":
+    "此 id 不在 Cursor 内置的 effort 表中，因此 Cursor 不显示推理控件。",
   "integrations.cursor.effortRowsOne": "已发布 1 个 effort 行",
   "integrations.cursor.effortRowsMany": "已发布 {n} 个 effort 行",
   "integrations.cursor.effortRowsOff": "无 effort 行",
-  "integrations.cursor.tableLessHint": "标为 — 的行在 Cursor 中没有推理控件。开启 cursorEffortRows 可为每个 effort 发布一个选择器条目（id--effort），或在提供商上设置 modelDefaultReasoningEfforts 作为固定默认值。",
+  "integrations.cursor.tableLessHint":
+    "标为 — 的行在 Cursor 中没有推理控件。开启 cursorEffortRows 可为每个 effort 发布一个选择器条目（id--effort），或在提供商上设置 modelDefaultReasoningEfforts 作为固定默认值。",
   "integrations.cursor.colModel": "模型",
   "integrations.cursor.colReasoning": "推理",
   "integrations.cursor.colContext": "上下文",
   "integrations.cursor.guide": "打开 Cursor Private Inference 指南",
   "models.displayNameSavedRefreshFailed": "更改已保存，但无法刷新模型列表。请重试以刷新。",
-  "models.displayNameOutcomeUnknown": "请求未完成。更改可能已保存。再次更改之前，请重试以检查当前名称。",
+  "models.displayNameOutcomeUnknown":
+    "请求未完成。更改可能已保存。再次更改之前，请重试以检查当前名称。",
   "models.displayNameCurrentUnavailable": "刷新之前无法获取当前名称",
   "models.displayNameReloaded": "模型列表已刷新",
   "models.displayNameAction": "名称",
@@ -3451,8 +3804,10 @@ export const zh: Record<TKey, string> = {
   "pricing.override.title": "模型价格",
   "pricing.override.modelId": "模型 ID",
   "pricing.override.promptTitle": "长提示词计价",
-  "pricing.override.promptHelp": "请求中的输入和缓存读写 token 决定所属区间，整个请求都按该区间计价。输出 token 不计入。费率适用于标准速度。",
-  "pricing.override.help": "单位为每百万 token 的美元价格。请输入输入和输出费率；空白缓存费率按 0 计算。允许费率为 0。",
+  "pricing.override.promptHelp":
+    "请求中的输入和缓存读写 token 决定所属区间，整个请求都按该区间计价。输出 token 不计入。费率适用于标准速度。",
+  "pricing.override.help":
+    "单位为每百万 token 的美元价格。请输入输入和输出费率；空白缓存费率按 0 计算。允许费率为 0。",
   "pricing.override.input": "输入",
   "pricing.override.output": "输出",
   "pricing.override.cacheRead": "缓存读取",
@@ -3461,23 +3816,30 @@ export const zh: Record<TKey, string> = {
   "pricing.override.modeFlat": "固定费率",
   "pricing.override.modeCustom": "自定义阈值",
 
-  "pricing.override.modeAutomaticHelp": "使用上方基本费率，并应用目录中的提示长度规则。Fast 和 Priority 调整仍会应用。",
-  "pricing.override.modeFlatHelp": "无论提示长度如何都使用上方基本费率，并替代目录中的提示长度规则。Fast 和 Priority 调整仍会应用。",
+  "pricing.override.modeAutomaticHelp":
+    "使用上方基本费率，并应用目录中的提示长度规则。Fast 和 Priority 调整仍会应用。",
+  "pricing.override.modeFlatHelp":
+    "无论提示长度如何都使用上方基本费率，并替代目录中的提示长度规则。Fast 和 Priority 调整仍会应用。",
   "pricing.override.threshold": "提示阈值（令牌）",
   "pricing.override.bandTitle": "长提示词区间费率",
-  "pricing.override.bandHelp": "这些是标准速度费率。目录中的 Fast 和 Priority 规则仍会应用。费用为估算值。",
+  "pricing.override.bandHelp":
+    "这些是标准速度费率。目录中的 Fast 和 Priority 规则仍会应用。费用为估算值。",
   "pricing.override.comparison": "阈值比较",
   "pricing.override.comparisonGt": "大于 (>)",
   "pricing.override.comparisonGte": "大于或等于 (≥)",
-  "pricing.override.modeCustomHelp": "请输入每百万令牌的四项绝对费率。提示长度包含缓存输入，不包含输出。这些费率会针对整个请求替代目录中的提示长度规则。Fast 和 Priority 调整仍会应用。费用为估算值。",
-  "pricing.override.customInvalid": "请输入一个正的安全整数令牌阈值，以及四项介于 0 到 1,000,000 的有限费率。费率可以为 0。",
+  "pricing.override.modeCustomHelp":
+    "请输入每百万令牌的四项绝对费率。提示长度包含缓存输入，不包含输出。这些费率会针对整个请求替代目录中的提示长度规则。Fast 和 Priority 调整仍会应用。费用为估算值。",
+  "pricing.override.customInvalid":
+    "请输入一个正的安全整数令牌阈值，以及四项介于 0 到 1,000,000 的有限费率。费率可以为 0。",
   "pricing.override.loading": "正在加载已保存的价格…",
   "pricing.override.loadFailed": "无法加载已保存的价格，请重新加载。",
-  "pricing.override.outcomeUnknown": "无法确认请求结果，价格可能已更改。再次编辑前请重新加载已保存的价格。",
+  "pricing.override.outcomeUnknown":
+    "无法确认请求结果，价格可能已更改。再次编辑前请重新加载已保存的价格。",
   "pricing.override.recoveryFailed": "无法获取已保存的价格，编辑仍被锁定。请重新加载。",
   "pricing.override.recovered": "已加载当前保存的价格。之前的请求或其他客户端仍可能更改该价格。",
   "pricing.override.refreshFailed": "价格已保存，但无法刷新模型列表。请重试刷新列表。",
-  "pricing.override.invalid": "请输入输入和输出费率。每项费率必须是 0 到 1,000,000 之间的有限数字。",
+  "pricing.override.invalid":
+    "请输入输入和输出费率。每项费率必须是 0 到 1,000,000 之间的有限数字。",
   "pricing.override.reset": "恢复自动价格",
   "pricing.override.save": "保存",
   "pricing.override.saving": "正在保存…",
@@ -3496,9 +3858,11 @@ export const zh: Record<TKey, string> = {
   "usage.range.reversed": "结束时间必须等于或晚于开始时间。",
   "usage.range.applied": "所选范围：{start} – {end}（包含两端）。",
   "models.pickerOrder.editorHint": "调整路由模型顺序后保存草稿。精选行固定，原生模型不在此显示。",
-  "models.pickerOrder.nativeLocked": "已保存的顺序包含原生模型。请先应用路由预设或默认顺序，再编辑自定义顺序。",
+  "models.pickerOrder.nativeLocked":
+    "已保存的顺序包含原生模型。请先应用路由预设或默认顺序，再编辑自定义顺序。",
   "models.pickerOrder.unknownChosen": "精选模型信息未知。请重新加载后再编辑。",
-  "models.pickerOrder.changed": "模型选择设置已更改。草稿已保留；重新加载将丢弃草稿并使用当前设置。",
+  "models.pickerOrder.changed":
+    "模型选择设置已更改。草稿已保留；重新加载将丢弃草稿并使用当前设置。",
   "models.pickerOrder.savedReload": "顺序已保存。再次编辑前请重新加载当前设置。",
   "models.pickerOrder.requestFailed": "请求失败。草稿已保留；请重试或重新加载。",
   "models.pickerOrder.empty": "没有可用的路由模型。",
@@ -3509,7 +3873,8 @@ export const zh: Record<TKey, string> = {
   "models.pickerOrder.position": "{model}：第 {position} 位，共 {total} 个",
   "models.pickerOrder.saveDraft": "保存草稿",
   "models.pickerOrder.reloadDraft": "丢弃草稿并重新加载",
-  "models.pickerOrder.catalogRequired": "模型标识信息缺失或不明确。请重新加载模型页面以刷新目录，再编辑自定义顺序。",
+  "models.pickerOrder.catalogRequired":
+    "模型标识信息缺失或不明确。请重新加载模型页面以刷新目录，再编辑自定义顺序。",
   "quotaSummary.aria": "提供商配额概览",
   "quotaSummary.updated": "{time} 更新",
   "quotaSummary.dataAt": "{time} 的数据",
@@ -3522,7 +3887,8 @@ export const zh: Record<TKey, string> = {
   "quotaSummary.scrollNext": "向右滚动提供商",
   "quotaSummary.openAccounts": "打开账号管理",
   "pws.protocol.title": "上游协议",
-  "pws.protocol.note": "opencodex 与此提供商通信时使用的 API 格式。它不会开启或关闭任何客户端 API；这些在 API 页面设置。",
+  "pws.protocol.note":
+    "opencodex 与此提供商通信时使用的 API 格式。它不会开启或关闭任何客户端 API；这些在 API 页面设置。",
   "pws.protocol.adapterLabel": "此提供商接收的上游协议",
   "pws.protocol.source": "决定来源",
   "pws.protocol.source.hardPin": "opencodex 为此模型固定",
@@ -3544,10 +3910,12 @@ export const zh: Record<TKey, string> = {
   "compatProtocol.loading": "正在读取每个主体的协议组合…",
   "compatProtocol.unverified": "{pair} 尚无 Lab 证据。此组合是未验证，而非失败。",
   "compatProtocol.unresolved": "无法读取 {count} 个主体的协议组合，已从此筛选中排除。",
-  "compatProtocol.axisNote": "这里只有 Lab 判定。请求如何传递（原生或转译）请见 API 页面的请求路径预览。",
+  "compatProtocol.axisNote":
+    "这里只有 Lab 判定。请求如何传递（原生或转译）请见 API 页面的请求路径预览。",
   "protocolLinks.providerSettings": "提供商设置",
   "fallback.title": "回退",
-  "fallback.desc": "当模型或服务商失败时，OpenCodex 可以把请求发送到组合、路由配置或子代理链中的下一个目标。关闭某一类后，会改为返回明确的错误。",
+  "fallback.desc":
+    "当模型或服务商失败时，OpenCodex 可以把请求发送到组合、路由配置或子代理链中的下一个目标。关闭某一类后，会改为返回明确的错误。",
   "fallback.model": "模型回退",
   "fallback.modelHint": "同一服务商的其他模型",
   "fallback.provider": "服务商回退",

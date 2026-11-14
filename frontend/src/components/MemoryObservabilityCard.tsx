@@ -55,7 +55,13 @@ interface SystemMemory {
   /** Absent on older proxies predating the drain-and-restart action (#563). */
   activeTurnCount?: number;
   isDraining?: boolean;
-  watchdog: { warnThresholdBytes: number; lastWarnAt: number | null; observedBytes?: number; observedMetric?: MemoryMetric; samples: MemorySample[] } | null;
+  watchdog: {
+    warnThresholdBytes: number;
+    lastWarnAt: number | null;
+    observedBytes?: number;
+    observedMetric?: MemoryMetric;
+    samples: MemorySample[];
+  } | null;
 }
 
 type RestartPhase = "idle" | "draining" | "reconnecting" | "error";
@@ -105,7 +111,9 @@ function formatAge(ms: number, locale: Locale): string {
   return formatUptime(ms / 1000, locale);
 }
 
-function observedMemory(sample: Pick<MemorySample, "rss" | "external" | "arrayBuffers" | "observedBytes">): number {
+function observedMemory(
+  sample: Pick<MemorySample, "rss" | "external" | "arrayBuffers" | "observedBytes">,
+): number {
   if (typeof sample.observedBytes === "number") return sample.observedBytes;
   return Math.max(sample.rss, sample.external ?? 0, sample.arrayBuffers ?? 0);
 }
@@ -118,7 +126,7 @@ function observedMetric(data: SystemMemory): MemoryMetric {
     { metric: "external", bytes: data.external ?? 0 },
     { metric: "arrayBuffers", bytes: data.arrayBuffers ?? 0 },
   ];
-  return values.reduce((best, next) => next.bytes > best.bytes ? next : best, values[0]).metric;
+  return values.reduce((best, next) => (next.bytes > best.bytes ? next : best), values[0]).metric;
 }
 
 /** Derive observed-memory drift per hour from the bounded watchdog ring (never mutates it). */
@@ -132,7 +140,17 @@ function observedGrowthPerHour(samples: MemorySample[]): number | null {
 }
 
 /** One labelled monospace metric cell inside a stat-row. */
-function Stat({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "warn" | "danger" }) {
+function Stat({
+  label,
+  value,
+  sub,
+  tone,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  tone?: "warn" | "danger";
+}) {
   return (
     <div className="stat">
       <div className="label">{label}</div>
@@ -188,7 +206,11 @@ function MemoryPressure({
       <div className="mem-pressure-track" role="presentation">
         <span
           className="mem-pressure-fill"
-          style={{ ["--mem-scale" as string]: String(ratio === null ? 0 : Math.min(1, Math.max(0.01, ratio))) }}
+          style={{
+            ["--mem-scale" as string]: String(
+              ratio === null ? 0 : Math.min(1, Math.max(0.01, ratio)),
+            ),
+          }}
         />
       </div>
       <div className="mem-pressure-foot">
@@ -218,13 +240,15 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
       try {
         const res = await fetch(`${apiBase}/api/startup-health`);
         if (!res.ok || cancelled) return;
-        const json = await res.json() as { protection?: string };
+        const json = (await res.json()) as { protection?: string };
         if (!cancelled) setNoSupervisor(json.protection === "none");
       } catch {
         /* older proxies / offline — leave warning off */
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [apiBase]);
 
   useEffect(() => {
@@ -242,7 +266,7 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
       try {
         const res = await fetch(`${apiBase}/api/system/memory`, { signal: bounded.signal });
         if (!res.ok) throw new Error("memory unavailable");
-        const json = await res.json() as SystemMemory;
+        const json = (await res.json()) as SystemMemory;
         if (cancelled) return;
         setData(json);
         setUnavailable(false);
@@ -250,11 +274,11 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
         if (json.isDraining && restartPhase === "idle") setRestartPhase("draining");
         // Fast recycle can finish between polls with no observed outage — detect pid change.
         if (
-          (restartPhase === "draining" || restartPhase === "reconnecting")
-          && restartFromPid != null
-          && typeof json.pid === "number"
-          && json.pid !== restartFromPid
-          && !json.isDraining
+          (restartPhase === "draining" || restartPhase === "reconnecting") &&
+          restartFromPid != null &&
+          typeof json.pid === "number" &&
+          json.pid !== restartFromPid &&
+          !json.isDraining
         ) {
           setRestartPhase("idle");
           setRestartFromPid(null);
@@ -315,7 +339,7 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
           let replaced = restartFromPid == null;
           if (restartFromPid != null) {
             try {
-              const health = await res.json() as { pid?: number };
+              const health = (await res.json()) as { pid?: number };
               replaced = typeof health.pid === "number" && health.pid !== restartFromPid;
             } catch {
               replaced = true;
@@ -358,9 +382,7 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
 
   const confirmRestart = async () => {
     const count = data?.activeTurnCount ?? 0;
-    const lines = [
-      t("dash.mem.restartConfirm", { count, seconds: DRAIN_TIMEOUT_S }),
-    ];
+    const lines = [t("dash.mem.restartConfirm", { count, seconds: DRAIN_TIMEOUT_S })];
     if (noSupervisor) lines.push(t("dash.mem.restartNoSupervisor"));
     // Blank lines still separate the paragraphs; the dialog renders each as its own <p>.
     if (!(await confirmAction({ message: lines.join("\n\n"), tone: "danger" }))) return;
@@ -385,13 +407,17 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
           <IconActivity width={16} height={16} aria-hidden="true" />
           {t("dash.mem.title")}
         </div>
-        <div className="muted text-control" style={{ marginTop: 8 }}>{t("dash.mem.unavailable")}</div>
+        <div className="muted text-control" style={{ marginTop: 8 }}>
+          {t("dash.mem.unavailable")}
+        </div>
       </div>
     );
   }
 
   const growth = data?.watchdog ? observedGrowthPerHour(data.watchdog.samples) : null;
-  const observedBytes = data ? data.observedBytes ?? data.watchdog?.observedBytes ?? observedMemory(data) : null;
+  const observedBytes = data
+    ? (data.observedBytes ?? data.watchdog?.observedBytes ?? observedMemory(data))
+    : null;
   const observedBy = data ? observedMetric(data) : null;
   // Drift only matters relative to the headroom it eats. Flag it when the current
   // climb would reach the warn threshold within an hour (danger) or a shift (warn);
@@ -425,14 +451,18 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
             <span className="mem-inflight">
               <span className="mem-inflight-label">{t("dash.mem.inFlight")}</span>
               <span className="mem-inflight-value mono">
-                {typeof activeTurns === "number" ? plainNumberFormat(locale).format(activeTurns) : "—"}
+                {typeof activeTurns === "number"
+                  ? plainNumberFormat(locale).format(activeTurns)
+                  : "—"}
               </span>
             </span>
             <button
               type="button"
               className="btn btn-ghost btn-sm"
               disabled={busy}
-              onClick={() => { void confirmRestart(); }}
+              onClick={() => {
+                void confirmRestart();
+              }}
             >
               {t("dash.mem.restart")}
             </button>
@@ -456,47 +486,101 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
         <Stat
           label={t("dash.mem.jsHeap")}
           value={data ? formatBytes(data.heapUsed, locale) : "—"}
-          sub={data ? t("dash.mem.jsHeapArena", { total: formatBytes(data.heapTotal, locale) }) : undefined}
+          sub={
+            data
+              ? t("dash.mem.jsHeapArena", { total: formatBytes(data.heapTotal, locale) })
+              : undefined
+          }
         />
-        <Stat label={t("dash.mem.jscHeap")} value={data?.jscHeap ? formatBytes(data.jscHeap.heapSize, locale) : "—"} />
+        <Stat
+          label={t("dash.mem.jscHeap")}
+          value={data?.jscHeap ? formatBytes(data.jscHeap.heapSize, locale) : "—"}
+        />
         <Stat
           label={t("dash.mem.growth")}
-          value={growth === null ? "—" : `${growth >= 0 ? "+" : "−"}${formatBytes(Math.abs(growth), locale)}${t("dash.mem.perHour")}`}
+          value={
+            growth === null
+              ? "—"
+              : `${growth >= 0 ? "+" : "−"}${formatBytes(Math.abs(growth), locale)}${t("dash.mem.perHour")}`
+          }
           tone={growthTone}
         />
       </div>
 
       {/* Secondary diagnostics collapsed by default: only the headline stats stay visible. */}
       <details style={{ marginTop: 10 }}>
-        <summary className="muted text-label" style={{ cursor: "pointer", padding: "2px 2px" }}>{t("dash.mem.details")}</summary>
-        <div className="muted text-control" style={{ margin: "8px 0 0" }}>{t("dash.mem.hint")}</div>
-
-        <div className="muted text-label" style={{ margin: "14px 0 6px" }}>{t("dash.mem.runtime")}</div>
-        <div className="stat-row">
-          <Stat label={t("dash.mem.observed")} value={observedBytes === null ? "—" : `${formatBytes(observedBytes, locale)} (${observedBy})`} />
-          <Stat label={t("dash.mem.external")} value={data?.external === undefined ? "—" : formatBytes(data.external, locale)} />
-          <Stat label={t("dash.mem.arrayBuffers")} value={data?.arrayBuffers === undefined ? "—" : formatBytes(data.arrayBuffers, locale)} />
+        <summary className="muted text-label" style={{ cursor: "pointer", padding: "2px 2px" }}>
+          {t("dash.mem.details")}
+        </summary>
+        <div className="muted text-control" style={{ margin: "8px 0 0" }}>
+          {t("dash.mem.hint")}
         </div>
 
-        <div className="muted text-label" style={{ margin: "14px 0 6px" }}>{t("dash.mem.store")}</div>
-        <div className="muted text-control" style={{ marginBottom: 10 }}>{t("dash.mem.storeHint")}</div>
+        <div className="muted text-label" style={{ margin: "14px 0 6px" }}>
+          {t("dash.mem.runtime")}
+        </div>
         <div className="stat-row">
-          <Stat label={t("dash.mem.storeEntries")} value={responseState ? plainNumberFormat(locale).format(responseState.count) : "—"} />
-          <Stat label={t("dash.mem.storeTotal")} value={responseState ? formatBytes(responseState.totalBytes, locale) : "—"} />
-          <Stat label={t("dash.mem.storeLargest")} value={responseState ? formatBytes(responseState.largestBytes, locale) : "—"} />
+          <Stat
+            label={t("dash.mem.observed")}
+            value={
+              observedBytes === null ? "—" : `${formatBytes(observedBytes, locale)} (${observedBy})`
+            }
+          />
+          <Stat
+            label={t("dash.mem.external")}
+            value={data?.external === undefined ? "—" : formatBytes(data.external, locale)}
+          />
+          <Stat
+            label={t("dash.mem.arrayBuffers")}
+            value={data?.arrayBuffers === undefined ? "—" : formatBytes(data.arrayBuffers, locale)}
+          />
+        </div>
+
+        <div className="muted text-label" style={{ margin: "14px 0 6px" }}>
+          {t("dash.mem.store")}
+        </div>
+        <div className="muted text-control" style={{ marginBottom: 10 }}>
+          {t("dash.mem.storeHint")}
+        </div>
+        <div className="stat-row">
+          <Stat
+            label={t("dash.mem.storeEntries")}
+            value={responseState ? plainNumberFormat(locale).format(responseState.count) : "—"}
+          />
+          <Stat
+            label={t("dash.mem.storeTotal")}
+            value={responseState ? formatBytes(responseState.totalBytes, locale) : "—"}
+          />
+          <Stat
+            label={t("dash.mem.storeLargest")}
+            value={responseState ? formatBytes(responseState.largestBytes, locale) : "—"}
+          />
           <Stat
             label={t("dash.mem.storeOldest")}
             // count distinguishes an empty store ("—") from a legit same-tick zero age ("0s").
-            value={responseState ? (responseState.count === 0 ? "—" : formatAge(responseState.oldestAgeMs, locale)) : "—"}
+            value={
+              responseState
+                ? responseState.count === 0
+                  ? "—"
+                  : formatAge(responseState.oldestAgeMs, locale)
+                : "—"
+            }
           />
         </div>
 
         {data?.watchdog && (
           <div className="stat-row" style={{ marginTop: 16 }}>
-            <Stat label={t("dash.mem.threshold")} value={formatBytes(data.watchdog.warnThresholdBytes, locale)} />
+            <Stat
+              label={t("dash.mem.threshold")}
+              value={formatBytes(data.watchdog.warnThresholdBytes, locale)}
+            />
             <Stat
               label={t("dash.mem.lastWarn")}
-              value={data.watchdog.lastWarnAt ? new Date(data.watchdog.lastWarnAt).toLocaleString(locale) : t("dash.mem.never")}
+              value={
+                data.watchdog.lastWarnAt
+                  ? new Date(data.watchdog.lastWarnAt).toLocaleString(locale)
+                  : t("dash.mem.never")
+              }
             />
           </div>
         )}
@@ -515,7 +599,9 @@ export default function MemoryObservabilityCard({ apiBase }: { apiBase: string }
             <span className="muted text-control">{t("dash.mem.reconnecting")}</span>
           )}
           {restartPhase === "error" && restartError && (
-            <span className="text-control" style={{ color: "var(--danger, #c44)" }}>{restartError}</span>
+            <span className="text-control" style={{ color: "var(--danger, #c44)" }}>
+              {restartError}
+            </span>
           )}
           {noSupervisor && restartPhase === "idle" && (
             <span className="muted text-control">{t("dash.mem.restartNoSupervisor")}</span>

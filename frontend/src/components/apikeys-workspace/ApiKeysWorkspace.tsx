@@ -145,20 +145,27 @@ export default function ApiKeysWorkspace({
    *  and can end up attached to whichever key the user selects next. */
   const [renameFailed, setRenameFailed] = useState(false);
   const [deleteFailed, setDeleteFailed] = useState(false);
-  const selected = selectedId ? (keys.find(k => k.id === selectedId) ?? null) : null;
+  const selected = selectedId ? (keys.find((k) => k.id === selectedId) ?? null) : null;
   const mutationPending = deleting || renamePending;
 
   /** The strip's items. Counts sit in `meta` so the strip reports scale, not just names. */
-  const sectionTabs = useMemo(() => [
-    { id: "keys", label: t("api.section.keys"), meta: keysLoading ? undefined : String(keys.length) },
-    { id: "connect", label: t("api.section.connect") },
-    { id: "endpoints", label: t("api.section.endpoints") },
-    { id: "plan", label: t("api.section.plan") },
-    { id: "dictation", label: t("audio.dictation") },
-    { id: "live-voice", label: t("audio.liveVoice") },
-    { id: "models", label: t("api.section.models"), meta: String(modelCount) },
-    { id: "examples", label: t("api.section.examples") },
-  ], [t, keys.length, keysLoading, modelCount]);
+  const sectionTabs = useMemo(
+    () => [
+      {
+        id: "keys",
+        label: t("api.section.keys"),
+        meta: keysLoading ? undefined : String(keys.length),
+      },
+      { id: "connect", label: t("api.section.connect") },
+      { id: "endpoints", label: t("api.section.endpoints") },
+      { id: "plan", label: t("api.section.plan") },
+      { id: "dictation", label: t("audio.dictation") },
+      { id: "live-voice", label: t("audio.liveVoice") },
+      { id: "models", label: t("api.section.models"), meta: String(modelCount) },
+      { id: "examples", label: t("api.section.examples") },
+    ],
+    [t, keys.length, keysLoading, modelCount],
+  );
 
   const clearDeleteConfirm = () => {
     setConfirmDelete(false);
@@ -237,13 +244,25 @@ export default function ApiKeysWorkspace({
           one, the pattern Usage / Logs / Subagents already use. A rail plus a
           content pane was a second vertical band competing for the same width,
           and at 1280px it cost the content column 252px it could not spare. */}
-      {!selected && <SectionTabs scope="api" items={sectionTabs} ariaLabel={t("api.workspace.sections")} mobileReadingLine={108} />}
+      {!selected && (
+        <SectionTabs
+          scope="api"
+          items={sectionTabs}
+          ariaLabel={t("api.workspace.sections")}
+          mobileReadingLine={108}
+        />
+      )}
       <div className="apikeys-workspace-root">
         <section className="apikeys-workspace-main" aria-label={t("api.workspace.details")}>
           {selected ? (
             <div className="awi-detail">
               <div className="awi-detail-toolbar">
-                <button type="button" className="awi-back" onClick={showOverview} disabled={mutationPending}>
+                <button
+                  type="button"
+                  className="awi-back"
+                  onClick={showOverview}
+                  disabled={mutationPending}
+                >
                   <IconChevron className="awi-back-chevron" aria-hidden="true" />
                   {t("modal.back")}
                 </button>
@@ -258,12 +277,19 @@ export default function ApiKeysWorkspace({
                           key="confirm-delete"
                           type="button"
                           className="btn btn-danger btn-sm awi-confirm-delete"
-                          onClick={() => { void handleConfirmDelete(); }}
+                          onClick={() => {
+                            void handleConfirmDelete();
+                          }}
                           disabled={!confirmArmed || deleting}
                         >
                           <IconTrash /> {deleting ? t("api.key.deleting") : t("api.confirm")}
                         </button>
-                        <button type="button" className="btn btn-ghost btn-sm" onClick={clearDeleteConfirm} disabled={deleting}>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={clearDeleteConfirm}
+                          disabled={deleting}
+                        >
                           {t("common.cancel")}
                         </button>
                       </>
@@ -295,11 +321,15 @@ export default function ApiKeysWorkspace({
                   <p className="muted awi-delete-hint">{t("api.workspace.deleteConfirm")}</p>
                 )}
                 {deleteFailed && (
-                  <p className="awi-delete-error" role="alert">{t("api.deleteFailed")}</p>
+                  <p className="awi-delete-error" role="alert">
+                    {t("api.deleteFailed")}
+                  </p>
                 )}
                 {renaming && (
                   <div className="awi-rename">
-                    <label className="awi-rename-label" htmlFor="awi-key-name">{t("api.key.name")}</label>
+                    <label className="awi-rename-label" htmlFor="awi-key-name">
+                      {t("api.key.name")}
+                    </label>
                     <input
                       id="awi-key-name"
                       className="input"
@@ -307,17 +337,22 @@ export default function ApiKeysWorkspace({
                       value={renameDraft}
                       maxLength={API_KEY_NAME_MAX_LENGTH}
                       disabled={renamePending}
-                      onChange={event => setRenameDraft(event.target.value)}
-                      onKeyDown={event => {
+                      onChange={(event) => setRenameDraft(event.target.value)}
+                      onKeyDown={(event) => {
                         // Enter still saves, without relying on implicit form
                         // submission (which browsers and test DOMs disagree on).
-                        if (event.key === "Enter") { event.preventDefault(); void submitRename(); }
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          void submitRename();
+                        }
                       }}
                     />
                     <button
                       type="button"
                       className="btn btn-sm"
-                      onClick={() => { void submitRename(); }}
+                      onClick={() => {
+                        void submitRename();
+                      }}
                       disabled={renamePending}
                     >
                       {renamePending ? t("api.key.renaming") : t("api.key.saveName")}
@@ -331,7 +366,9 @@ export default function ApiKeysWorkspace({
                       {t("common.cancel")}
                     </button>
                     {renameFailed && (
-                      <p className="awi-rename-error" role="alert">{t("api.key.renameFailed")}</p>
+                      <p className="awi-rename-error" role="alert">
+                        {t("api.key.renameFailed")}
+                      </p>
                     )}
                   </div>
                 )}
@@ -340,7 +377,9 @@ export default function ApiKeysWorkspace({
                   <dl className="awi-kv">
                     <div className="awi-kv-row">
                       <dt>{t("api.workspace.keyPrefix")}</dt>
-                      <dd><code>{selected.prefix}</code></dd>
+                      <dd>
+                        <code>{selected.prefix}</code>
+                      </dd>
                     </div>
                     <div className="awi-kv-row">
                       <dt>{t("api.colCreated")}</dt>
@@ -348,11 +387,16 @@ export default function ApiKeysWorkspace({
                     </div>
                   </dl>
                 </div>
-                {selected.pendingRotation && <div className="awi-section" aria-live="polite">
-                  <h3 className="awi-section-title">{t("api.rotation.title")}</h3>
-                  <p className="muted">{t("api.rotation.pending")}</p>
-                  <p className="muted">{t("api.rotation.expires")} {formatCreatedDate(selected.pendingRotation.expiresAt, localeTag)}</p>
-                </div>}
+                {selected.pendingRotation && (
+                  <div className="awi-section" aria-live="polite">
+                    <h3 className="awi-section-title">{t("api.rotation.title")}</h3>
+                    <p className="muted">{t("api.rotation.pending")}</p>
+                    <p className="muted">
+                      {t("api.rotation.expires")}{" "}
+                      {formatCreatedDate(selected.pendingRotation.expiresAt, localeTag)}
+                    </p>
+                  </div>
+                )}
                 <div className="awi-section">
                   <h3 className="awi-section-title">{t("api.attribution.title")}</h3>
                   <UsageIncompleteNotice data={usageMetadata} />
@@ -370,17 +414,31 @@ export default function ApiKeysWorkspace({
                         <dd>{selected.usage.requests7d.toLocaleString(localeTag)}</dd>
                       </div>
                       <div className="awi-kv-row">
-                        <dt>{historyTruncated || usageMetadata?.usageIncomplete ? t("api.attribution.totalRequestsAvailable") : t("api.attribution.totalRequests")}</dt>
+                        <dt>
+                          {historyTruncated || usageMetadata?.usageIncomplete
+                            ? t("api.attribution.totalRequestsAvailable")
+                            : t("api.attribution.totalRequests")}
+                        </dt>
                         <dd>{selected.usage.totalRequests.toLocaleString(localeTag)}</dd>
                       </div>
                       <div className="awi-kv-row">
                         <dt>{t("api.attribution.lastUsed")}</dt>
-                        <dd>{selected.usage.lastUsedAt
-                          ? formatCreatedDate(selected.usage.lastUsedAt, localeTag)
-                          : t(usageMetadata?.usageIncomplete ? "api.attribution.noRecordedUse" : "api.attribution.neverUsed")}</dd>
+                        <dd>
+                          {selected.usage.lastUsedAt
+                            ? formatCreatedDate(selected.usage.lastUsedAt, localeTag)
+                            : t(
+                                usageMetadata?.usageIncomplete
+                                  ? "api.attribution.noRecordedUse"
+                                  : "api.attribution.neverUsed",
+                              )}
+                        </dd>
                       </div>
                       <div className="awi-kv-row">
-                        <dt>{historyTruncated || usageMetadata?.usageIncomplete ? t("api.attribution.sinceAvailable") : t("api.attribution.since")}</dt>
+                        <dt>
+                          {historyTruncated || usageMetadata?.usageIncomplete
+                            ? t("api.attribution.sinceAvailable")
+                            : t("api.attribution.since")}
+                        </dt>
                         <dd>{formatCreatedDate(attributionSince, localeTag)}</dd>
                       </div>
                     </dl>
@@ -432,7 +490,7 @@ export default function ApiKeysWorkspace({
                     busy={mutationPending}
                     onDelete={onDelete}
                     onReveal={onRevealKey}
-                    onSelect={id => {
+                    onSelect={(id) => {
                       setSelectedId(id);
                       clearDeleteConfirm();
                       setRenaming(false);
@@ -444,7 +502,11 @@ export default function ApiKeysWorkspace({
                 {/* Transport before reference: "where do I point a client" is the
                     question a reader has before "what headers does it accept". */}
                 <div id={sectionAnchorId("api", "connect")} className="awi-section-anchor">
-                  <ClientConfigPanel apiBase={apiBase} baseUrl={endpoints.baseUrl} hasKeys={keys.length > 0} />
+                  <ClientConfigPanel
+                    apiBase={apiBase}
+                    baseUrl={endpoints.baseUrl}
+                    hasKeys={keys.length > 0}
+                  />
                 </div>
                 <div id={sectionAnchorId("api", "endpoints")} className="awi-section-anchor">
                   <ApiKeysEndpointsPanel
@@ -459,34 +521,49 @@ export default function ApiKeysWorkspace({
                 {/* Reference, then prediction: which path a request would take through the
                     endpoints above. Asked of the server on demand; it sends nothing upstream. */}
                 <div id={sectionAnchorId("api", "plan")} className="awi-section-anchor">
-                  <ProtocolPlanPanel key={apiBase} apiBase={apiBase} models={planModels ?? filteredModels} protocolLabel={protocolLabel} />
+                  <ProtocolPlanPanel
+                    key={apiBase}
+                    apiBase={apiBase}
+                    models={planModels ?? filteredModels}
+                    protocolLabel={protocolLabel}
+                  />
                 </div>
                 <div id={sectionAnchorId("api", "dictation")} className="awi-section-anchor">
-                  {active && <DictationPanel key={`${apiBase}:${JSON.stringify(endpoints.audio)}`} audio={endpoints.audio} />}
+                  {active && (
+                    <DictationPanel
+                      key={`${apiBase}:${JSON.stringify(endpoints.audio)}`}
+                      audio={endpoints.audio}
+                    />
+                  )}
                 </div>
                 <div id={sectionAnchorId("api", "live-voice")} className="awi-section-anchor">
-                  {active && <LiveVoicePanel key={`${apiBase}:${JSON.stringify(endpoints.audio)}`} audio={endpoints.audio} />}
+                  {active && (
+                    <LiveVoicePanel
+                      key={`${apiBase}:${JSON.stringify(endpoints.audio)}`}
+                      audio={endpoints.audio}
+                    />
+                  )}
                 </div>
                 <div id={sectionAnchorId("api", "models")} className="awi-section-anchor">
-                <ApiKeysModelsPanel
-                  filteredModels={filteredModels}
-                  modelsLoading={modelsLoading}
-                  modelsRefreshing={modelsRefreshing}
-                  modelsLoadFailed={modelsLoadFailed}
-                  modelCount={modelCount}
-                  hasModelData={hasModelData}
-                  modelQuery={modelQuery}
-                  copiedModelId={copiedModelId}
-                  modelTests={modelTests}
-                  claudeCodeEnabled={claudeCodeEnabled}
-                  onModelQueryChange={onModelQueryChange}
-                  onCopyModelId={onCopyModelId}
-                  onTestModel={onTestModel}
-                  onRetryModels={onRetryModels}
-                  canTestModels={canTestModels}
-                  sourceLabel={sourceLabel}
-                  protocolLabel={protocolLabel}
-                />
+                  <ApiKeysModelsPanel
+                    filteredModels={filteredModels}
+                    modelsLoading={modelsLoading}
+                    modelsRefreshing={modelsRefreshing}
+                    modelsLoadFailed={modelsLoadFailed}
+                    modelCount={modelCount}
+                    hasModelData={hasModelData}
+                    modelQuery={modelQuery}
+                    copiedModelId={copiedModelId}
+                    modelTests={modelTests}
+                    claudeCodeEnabled={claudeCodeEnabled}
+                    onModelQueryChange={onModelQueryChange}
+                    onCopyModelId={onCopyModelId}
+                    onTestModel={onTestModel}
+                    onRetryModels={onRetryModels}
+                    canTestModels={canTestModels}
+                    sourceLabel={sourceLabel}
+                    protocolLabel={protocolLabel}
+                  />
                 </div>
                 <div id={sectionAnchorId("api", "examples")} className="awi-section-anchor">
                   <ApiKeysUsagePanel endpoints={endpoints} claudeCodeEnabled={claudeCodeEnabled} />

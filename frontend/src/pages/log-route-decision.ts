@@ -4,7 +4,12 @@ export interface LogRouteDecision {
   routeKind?: string;
   profile?: { id?: string; revision?: string };
   selected?: { provider?: string; model?: string; reason?: string };
-  candidates?: Array<{ provider?: string; model?: string; eligible?: boolean; exclusions?: Array<{ code?: string }> }>;
+  candidates?: Array<{
+    provider?: string;
+    model?: string;
+    eligible?: boolean;
+    exclusions?: Array<{ code?: string }>;
+  }>;
 }
 
 export interface LogEntryBase {

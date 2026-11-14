@@ -34,7 +34,7 @@ export default function DefaultModeRequestUserInputSetting({ apiBase }: { apiBas
     try {
       const res = await fetch(`${apiBase}${FEATURE_ENDPOINT}`, { signal: bounded.signal });
       if (!res.ok) throw new Error("load");
-      const payload = await res.json() as { enabled?: unknown };
+      const payload = (await res.json()) as { enabled?: unknown };
       if (savingRef.current || generation !== loadGenerationRef.current) return;
       enabledRef.current = payload.enabled === true;
       setEnabled(enabledRef.current);
@@ -48,8 +48,12 @@ export default function DefaultModeRequestUserInputSetting({ apiBase }: { apiBas
   }, [apiBase]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void load(); }, 0);
-    const stop = startVisibilityPoll(() => { void load(); }, 30_000);
+    const timeout = window.setTimeout(() => {
+      void load();
+    }, 0);
+    const stop = startVisibilityPoll(() => {
+      void load();
+    }, 30_000);
     return () => {
       window.clearTimeout(timeout);
       stop();
@@ -72,21 +76,27 @@ export default function DefaultModeRequestUserInputSetting({ apiBase }: { apiBas
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ enabled: next }),
       });
-      const payload = (await readJsonOrThrow<{ ok?: boolean; enabled?: unknown; changed?: unknown }>(res)) ?? {};
+      const payload =
+        (await readJsonOrThrow<{ ok?: boolean; enabled?: unknown; changed?: unknown }>(res)) ?? {};
       if (payload.ok !== true) throw new Error(String(res.status));
       enabledRef.current = payload.enabled === true;
       setEnabled(enabledRef.current);
       setHydrated(true);
       setFeedback({
         tone: "ok",
-        message: t(payload.changed === true ? "codexAuth.requestUserInputUpdatedRestart" : "codexAuth.requestUserInputUpdated"),
+        message: t(
+          payload.changed === true
+            ? "codexAuth.requestUserInputUpdatedRestart"
+            : "codexAuth.requestUserInputUpdated",
+        ),
       });
     } catch (error) {
       enabledRef.current = previous;
       setEnabled(previous);
-      const reason = error instanceof Error && error.message && !/^HTTP \d{3}$/.test(error.message)
-        ? error.message
-        : t("codexAuth.requestUserInputUpdateFailed");
+      const reason =
+        error instanceof Error && error.message && !/^HTTP \d{3}$/.test(error.message)
+          ? error.message
+          : t("codexAuth.requestUserInputUpdateFailed");
       setFeedback({ tone: "err", message: reason });
     } finally {
       savingRef.current = false;
@@ -105,7 +115,9 @@ export default function DefaultModeRequestUserInputSetting({ apiBase }: { apiBas
       <div className="codex-request-user-input-copy">
         <strong>{t("codexAuth.requestUserInput")}</strong>
         <div className="card-sub" role={loadError ? "alert" : undefined}>
-          {loadError ? t("codexAuth.requestUserInputLoadFailed") : t("codexAuth.requestUserInputDesc")}
+          {loadError
+            ? t("codexAuth.requestUserInputLoadFailed")
+            : t("codexAuth.requestUserInputDesc")}
         </div>
         <code className="mono codex-request-user-input-config">
           {`[features]\ndefault_mode_request_user_input = true`}
@@ -113,14 +125,22 @@ export default function DefaultModeRequestUserInputSetting({ apiBase }: { apiBas
       </div>
       <div className="codex-request-user-input-controls">
         {loadError && (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => { void load(); }}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              void load();
+            }}
+          >
             {t("common.retry")}
           </button>
         )}
         <button
           type="button"
           className={`toggle ${enabled ? "on" : ""}`}
-          onClick={() => { void toggle(); }}
+          onClick={() => {
+            void toggle();
+          }}
           disabled={controlsDisabled}
           aria-pressed={enabled}
           aria-label={t("codexAuth.requestUserInput")}

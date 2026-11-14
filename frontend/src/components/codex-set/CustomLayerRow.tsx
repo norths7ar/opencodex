@@ -36,7 +36,7 @@ export default function CustomLayerRow({
       // Alt+Arrow reorders from anywhere in the row, per the W3C rearrangeable
       // listbox pattern. The up/down buttons stay: a shortcut nobody discovers is
       // not an affordance, and a button is what makes the capability visible.
-      onKeyDown={event => {
+      onKeyDown={(event) => {
         if (!event.altKey || busy) return;
         if (event.key === "ArrowUp" && index > 0) {
           event.preventDefault();
@@ -52,8 +52,14 @@ export default function CustomLayerRow({
         layers concatenate into ONE developer_instructions section, so sharing a
         sequence with the built-ins would draw a stack that does not exist.
       */}
-      <span className="codex-set-prompt__pos" aria-hidden="true">{index + 1}</span>
-      <button type="button" className="link-btn codex-set-prompt__name" onClick={() => onEdit(layer.id)}>
+      <span className="codex-set-prompt__pos" aria-hidden="true">
+        {index + 1}
+      </span>
+      <button
+        type="button"
+        className="link-btn codex-set-prompt__name"
+        onClick={() => onEdit(layer.id)}
+      >
         {layer.title}
       </button>
 

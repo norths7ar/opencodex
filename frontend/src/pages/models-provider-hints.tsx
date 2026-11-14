@@ -16,10 +16,18 @@ export function EmptyProviderHint({
   const t = useT();
   const failed = liveModels && discovery?.status === "failed" ? discovery : undefined;
   return (
-    <div className="row muted text-label leading-body" role="status" style={{ alignItems: "flex-start", gap: 8, padding: "6px 0" }}>
+    <div
+      className="row muted text-label leading-body"
+      role="status"
+      style={{ alignItems: "flex-start", gap: 8, padding: "6px 0" }}
+    >
       <IconInfo width={15} height={15} aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }} />
       <span>
-        {failed && showFailureBadge && <><span className="badge badge-amber">{t("models.discoveryFailedBadge")}</span>{" "}</>}
+        {failed && showFailureBadge && (
+          <>
+            <span className="badge badge-amber">{t("models.discoveryFailedBadge")}</span>{" "}
+          </>
+        )}
         {failed
           ? `${discoveryFailureLabel(t, failed)} `
           : `${t(liveModels ? "models.emptyDiscovery" : "models.emptyDiscoveryDisabled")} `}
@@ -48,7 +56,11 @@ export function EmptyProviderHint({
 export function DiscoveryDependencyHint() {
   const t = useT();
   return (
-    <div className="row muted text-label leading-body" role="status" style={{ alignItems: "flex-start", gap: 8, padding: "6px 0" }}>
+    <div
+      className="row muted text-label leading-body"
+      role="status"
+      style={{ alignItems: "flex-start", gap: 8, padding: "6px 0" }}
+    >
       <IconInfo width={15} height={15} aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }} />
       <span>
         {`${t("models.discoveryFailedDependency", { control: t("pws.liveModels") })} `}

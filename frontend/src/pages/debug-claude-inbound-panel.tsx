@@ -9,7 +9,9 @@ export function DebugClaudeInboundPanel({ entries }: { entries: ClaudeInboundEnt
   return (
     <section className={card} aria-labelledby="debug-claude-inbound-title">
       <div className="flex flex-col gap-1">
-        <h3 id="debug-claude-inbound-title" className={cardTitle}>{t("debug.claudeInbound.title")}</h3>
+        <h3 id="debug-claude-inbound-title" className={cardTitle}>
+          {t("debug.claudeInbound.title")}
+        </h3>
         <p className={cardHint}>{t("debug.claudeInbound.sub")}</p>
       </div>
       {entries.length === 0 ? (
@@ -30,7 +32,7 @@ export function DebugClaudeInboundPanel({ entries }: { entries: ClaudeInboundEnt
               </tr>
             </thead>
             <tbody>
-              {entries.map(entry => (
+              {entries.map((entry) => (
                 <tr key={entry.id}>
                   <td className="muted mono">{formatClaudeInboundTime(entry.at)}</td>
                   <td className="mono">{entry.endpoint}</td>
@@ -42,14 +44,22 @@ export function DebugClaudeInboundPanel({ entries }: { entries: ClaudeInboundEnt
                   </td>
                   <td className="mono">
                     {entry.thinkingType ?? "-"}
-                    {entry.thinkingBudgetTokens !== undefined && <span className="muted"> ({entry.thinkingBudgetTokens})</span>}
+                    {entry.thinkingBudgetTokens !== undefined && (
+                      <span className="muted"> ({entry.thinkingBudgetTokens})</span>
+                    )}
                   </td>
                   <td className="mono">{entry.outputConfigEffort ?? "-"}</td>
-                  <td className="mono max-w-40 truncate" title={entry.anthropicBeta}>{entry.anthropicBeta ?? "-"}</td>
-                  <td className="mono" title={entry.metadataKeys?.join(", ")}>
-                    {entry.hasMetadataUserId ? `user_id ${entry.userIdTag ?? ""}` : t("debug.claudeInbound.none")}
+                  <td className="mono max-w-40 truncate" title={entry.anthropicBeta}>
+                    {entry.anthropicBeta ?? "-"}
                   </td>
-                  <td className="mono">{entry.hasSystem ? entry.systemTag ?? "yes" : t("debug.claudeInbound.none")}</td>
+                  <td className="mono" title={entry.metadataKeys?.join(", ")}>
+                    {entry.hasMetadataUserId
+                      ? `user_id ${entry.userIdTag ?? ""}`
+                      : t("debug.claudeInbound.none")}
+                  </td>
+                  <td className="mono">
+                    {entry.hasSystem ? (entry.systemTag ?? "yes") : t("debug.claudeInbound.none")}
+                  </td>
                 </tr>
               ))}
             </tbody>

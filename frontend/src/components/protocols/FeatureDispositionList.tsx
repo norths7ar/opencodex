@@ -4,7 +4,10 @@
  * The disposition is always spelled out as text; colour only repeats it. These are declared
  * claims about the translators, not Lab evidence, so nothing here reads as "verified".
  */
-import type { FeatureDisposition, ProtocolFeature } from "../../../../backend/src/protocols/features";
+import type {
+  FeatureDisposition,
+  ProtocolFeature,
+} from "../../../../backend/src/protocols/features";
 import type { ProtocolFeatureEffectV1 } from "../../../../backend/src/protocols/dto";
 import { useT, type TKey } from "../../i18n/shared";
 
@@ -35,13 +38,15 @@ export function FeatureDispositionList({
   }
   return (
     <ul className="protocol-feature-list">
-      {effects.map(effect => (
+      {effects.map((effect) => (
         <li key={effect.feature}>
           <code>{effect.feature}</code>
-          <span className={`badge ${DISPOSITION_TONES[effect.disposition]}`}>{t(DISPOSITION_KEYS[effect.disposition])}</span>
+          <span className={`badge ${DISPOSITION_TONES[effect.disposition]}`}>
+            {t(DISPOSITION_KEYS[effect.disposition])}
+          </span>
         </li>
       ))}
-      {unknownFeatures.map(feature => (
+      {unknownFeatures.map((feature) => (
         <li key={feature}>
           <code>{feature}</code>
           <span className="badge badge-muted">{t("api.plan.disposition.unknown")}</span>

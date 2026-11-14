@@ -7,7 +7,7 @@ export function useStartupChecklist(apiBase: string) {
   const key = `home-startup:${apiBase}`;
   const load = async (signal: AbortSignal): Promise<StartupBody | null> => {
     const response = await fetch(`${apiBase}/api/startup-health`, { signal });
-    return response.ok ? (await response.json()) as StartupBody : null;
+    return response.ok ? ((await response.json()) as StartupBody) : null;
   };
   const resource = useKeyedClientResource(key, [apiBase], load);
   // A second subscription delegates scheduling and in-flight deduplication to the

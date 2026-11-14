@@ -19,7 +19,7 @@ export function useHelpDisclosure(label: string) {
       aria-expanded={open}
       aria-controls={panelId}
       aria-label={t("subagentsV2.moreAbout", { label })}
-      onClick={() => setOpen(value => !value)}
+      onClick={() => setOpen((value) => !value)}
     >
       <QuestionIcon aria-hidden="true" />
     </button>
@@ -28,7 +28,10 @@ export function useHelpDisclosure(label: string) {
     <div
       id={panelId}
       hidden={!open}
-      className={cn("rounded-[8px] bg-surface-2/60 px-3 py-2.5 text-[13px] leading-5 text-fg-muted [&_p]:m-0 [&_p+p]:mt-2", className)}
+      className={cn(
+        "rounded-[8px] bg-surface-2/60 px-3 py-2.5 text-[13px] leading-5 text-fg-muted [&_p]:m-0 [&_p+p]:mt-2",
+        className,
+      )}
     >
       {children}
     </div>

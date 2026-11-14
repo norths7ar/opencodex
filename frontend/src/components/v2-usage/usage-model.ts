@@ -142,7 +142,11 @@ export function formatPct(ratio: number): string {
   return `${Math.round(ratio * 100)}%`;
 }
 
-export function formatOptionalTokens(value: number | undefined, locale: Locale, unavailable: string): string {
+export function formatOptionalTokens(
+  value: number | undefined,
+  locale: Locale,
+  unavailable: string,
+): string {
   return typeof value === "number" && Number.isFinite(value) && value >= 0
     ? formatTokens(value, locale)
     : unavailable;
@@ -177,7 +181,10 @@ export function hasThroughput(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
-export function throughputTitle(row: { throughputTokensPerSec?: number; throughputSamples?: number }, t: TFn): string {
+export function throughputTitle(
+  row: { throughputTokensPerSec?: number; throughputSamples?: number },
+  t: TFn,
+): string {
   return hasThroughput(row.throughputTokensPerSec)
     ? t("usage.throughput.title", { samples: row.throughputSamples ?? 0 })
     : t("usage.throughput.unmeasured");
@@ -193,7 +200,7 @@ function isoDate(day: Date): string {
  * chart needs a stable axis either way.
  */
 export function lastDays(days: UsageDay[], count: number): UsageDay[] {
-  const byDate = new Map(days.map(d => [d.date, d]));
+  const byDate = new Map(days.map((d) => [d.date, d]));
   const out: UsageDay[] = [];
   const cursor = new Date();
   cursor.setHours(0, 0, 0, 0);
@@ -216,10 +223,16 @@ export function lastDays(days: UsageDay[], count: number): UsageDay[] {
 }
 
 export function formatCalendarDate(date: string, locale: Locale): string {
-  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(`${date}T12:00:00`));
+  return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+    new Date(`${date}T12:00:00`),
+  );
 }
 
-export function dayDetail(day: Pick<UsageDay, "date" | "requests" | "totalTokens">, locale: Locale, t: TFn): string {
+export function dayDetail(
+  day: Pick<UsageDay, "date" | "requests" | "totalTokens">,
+  locale: Locale,
+  t: TFn,
+): string {
   return t("usage.chart.dayDetail", {
     date: formatCalendarDate(day.date, locale),
     requests: day.requests,
@@ -233,11 +246,17 @@ export function chartTipPosition(rect: DOMRect): CSSProperties {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
   const maxWidth = Math.min(240, Math.max(0, viewportWidth - gutter * 2));
-  const left = Math.max(gutter, Math.min(rect.left + rect.width / 2 - maxWidth / 2, viewportWidth - gutter - maxWidth));
+  const left = Math.max(
+    gutter,
+    Math.min(rect.left + rect.width / 2 - maxWidth / 2, viewportWidth - gutter - maxWidth),
+  );
   const above = rect.top - gutter > viewportHeight - rect.bottom - gutter;
   const vertical = above
     ? (() => {
-        const bottom = Math.max(gutter, Math.min(viewportHeight - gutter, viewportHeight - rect.top + gutter));
+        const bottom = Math.max(
+          gutter,
+          Math.min(viewportHeight - gutter, viewportHeight - rect.top + gutter),
+        );
         return { bottom, maxHeight: Math.max(0, viewportHeight - bottom - gutter) };
       })()
     : (() => {
@@ -258,7 +277,7 @@ export function niceCeiling(max: number): number {
 }
 
 function quantileBuckets(values: number[]): number[] {
-  const positive = values.filter(v => v > 0).sort((a, b) => a - b);
+  const positive = values.filter((v) => v > 0).sort((a, b) => a - b);
   if (positive.length === 0) return [0, 0, 0, 0];
   const q = (p: number) => positive[Math.min(positive.length - 1, Math.floor(p * positive.length))];
   return [q(0.25), q(0.5), q(0.75), q(0.95)];
@@ -288,7 +307,7 @@ export interface Heatmap {
 }
 
 export function buildHeatmap(days: UsageDay[], customWindow = false): Heatmap {
-  const buckets = quantileBuckets(days.map(d => d.totalTokens));
+  const buckets = quantileBuckets(days.map((d) => d.totalTokens));
   if (customWindow) {
     const weeks: HeatmapCell[][] = [];
     const months: { month: number; col: number }[] = [];
@@ -297,7 +316,8 @@ export function buildHeatmap(days: UsageDay[], customWindow = false): Heatmap {
     let previousMonth = -1;
     let lastMonthCol = -4;
     const pad = (length: number) => {
-      while (week.length < length) week.push({ date: "", requests: 0, totalTokens: 0, level: 0, dayOfWeek: week.length });
+      while (week.length < length)
+        week.push({ date: "", requests: 0, totalTokens: 0, level: 0, dayOfWeek: week.length });
     };
     // The server already supplied the bounded civil dates. Local midnight stepping
     // can retain a shifted hour across DST and omit the final day of the report.
@@ -307,7 +327,10 @@ export function buildHeatmap(days: UsageDay[], customWindow = false): Heatmap {
       const weekday = calendar.getUTCDay();
       const nextWeekStart = calendar.getTime() - weekday * 86_400_000;
       if (weekStart !== nextWeekStart) {
-        if (week.length > 0) { pad(7); weeks.push(week); }
+        if (week.length > 0) {
+          pad(7);
+          weeks.push(week);
+        }
         week = [];
         weekStart = nextWeekStart;
       }
@@ -318,13 +341,21 @@ export function buildHeatmap(days: UsageDay[], customWindow = false): Heatmap {
         lastMonthCol = weeks.length;
       }
       pad(weekday);
-      week.push({ date: day.date, requests: day.requests, totalTokens: day.totalTokens,
-        level: bucketLevel(day.totalTokens, buckets), dayOfWeek: weekday });
+      week.push({
+        date: day.date,
+        requests: day.requests,
+        totalTokens: day.totalTokens,
+        level: bucketLevel(day.totalTokens, buckets),
+        dayOfWeek: weekday,
+      });
     }
-    if (week.length > 0) { pad(7); weeks.push(week); }
+    if (week.length > 0) {
+      pad(7);
+      weeks.push(week);
+    }
     return { weeks, months, buckets };
   }
-  const dayMap = new Map(days.map(d => [d.date, d]));
+  const dayMap = new Map(days.map((d) => [d.date, d]));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);

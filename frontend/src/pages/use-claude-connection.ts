@@ -5,7 +5,11 @@ import { toggleNativeIntegration } from "./integrations/native-api";
 export function useClaudeConnection(apiBase: string) {
   const [pending, setPending] = useState(false);
   const inFlight = useRef(false);
-  const change = async (enabled: boolean, onSuccess: (enabled: boolean) => void, onError: (error: unknown) => void) => {
+  const change = async (
+    enabled: boolean,
+    onSuccess: (enabled: boolean) => void,
+    onError: (error: unknown) => void,
+  ) => {
     if (inFlight.current) return;
     inFlight.current = true;
     setPending(true);

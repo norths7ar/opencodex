@@ -42,7 +42,7 @@ export default function DelegationSuggest({
   const [result, setResult] = useState<Suggestion | null>(null);
 
   const label = (slug: string) => {
-    const option = available.find(o => o.namespaced === slug);
+    const option = available.find((o) => o.namespaced === slug);
     return option ? formatNamespacedModelId(`${option.provider}/${option.model}`, t) : slug;
   };
 
@@ -55,23 +55,30 @@ export default function DelegationSuggest({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ work: work.trim() }),
       });
-      setResult(await readJsonOrThrow<Suggestion>(response, t("sub.suggest.failed")) ?? null);
+      setResult((await readJsonOrThrow<Suggestion>(response, t("sub.suggest.failed"))) ?? null);
     } catch (caught) {
       setResult(null);
-      setError(caught instanceof Error && caught.message ? caught.message : t("sub.suggest.failed"));
+      setError(
+        caught instanceof Error && caught.message ? caught.message : t("sub.suggest.failed"),
+      );
     } finally {
       setRunning(false);
     }
   };
 
   const p = result?.proposal;
-  const alreadySet = !!p?.proposedModel && p.proposedModel === model && (p.proposedEffort ?? "") === effort;
+  const alreadySet =
+    !!p?.proposedModel && p.proposedModel === model && (p.proposedEffort ?? "") === effort;
   const announcement = running ? t("sub.suggest.running") : result ? t("sub.suggest.title") : "";
 
   return (
     <div className="swi-suggest">
-      <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
-      <label className="swi-suggest-label" htmlFor="swi-suggest-work">{t("sub.suggest.label")}</label>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
+      <label className="swi-suggest-label" htmlFor="swi-suggest-work">
+        {t("sub.suggest.label")}
+      </label>
       <div className="swi-suggest-input">
         <textarea
           id="swi-suggest-work"
@@ -80,10 +87,15 @@ export default function DelegationSuggest({
           maxLength={ROLE_INSTRUCTIONS_EXCERPT_CHARS}
           value={work}
           placeholder={t("sub.suggest.placeholder")}
-          onChange={e => setWork(e.target.value)}
+          onChange={(e) => setWork(e.target.value)}
           disabled={running}
         />
-        <button type="button" className="btn btn-sm" disabled={running || saving || work.trim() === ""} onClick={() => void run()}>
+        <button
+          type="button"
+          className="btn btn-sm"
+          disabled={running || saving || work.trim() === ""}
+          onClick={() => void run()}
+        >
           {running ? t("sub.suggest.running") : t("sub.suggest.submit")}
         </button>
       </div>
@@ -93,42 +105,83 @@ export default function DelegationSuggest({
           <div className="swi-suggest-head">
             {p.tier && p.effortIntent && (
               <span className="font-semibold">
-                {t("integrations.lazycodexRoles.auto.tierEffort", { tier: t(TIER_LABEL[p.tier]), effort: t(EFFORT_LABEL[p.effortIntent]) })}
+                {t("integrations.lazycodexRoles.auto.tierEffort", {
+                  tier: t(TIER_LABEL[p.tier]),
+                  effort: t(EFFORT_LABEL[p.effortIntent]),
+                })}
               </span>
             )}
-            <span className="muted setting-hint">{t("integrations.lazycodexRoles.auto.sizedWith", { model: result.sizingModel })}</span>
+            <span className="muted setting-hint">
+              {t("integrations.lazycodexRoles.auto.sizedWith", { model: result.sizingModel })}
+            </span>
           </div>
-          {result.sizingError && <Notice tone="warn">{t("integrations.lazycodexRoles.auto.sizingFailed", { error: result.sizingError })}</Notice>}
+          {result.sizingError && (
+            <Notice tone="warn">
+              {t("integrations.lazycodexRoles.auto.sizingFailed", { error: result.sizingError })}
+            </Notice>
+          )}
           {p.status === "unsized" ? (
-            <p className="muted setting-hint">{t("integrations.lazycodexRoles.auto.unsized", { reason: p.reason ?? "" })}</p>
+            <p className="muted setting-hint">
+              {t("integrations.lazycodexRoles.auto.unsized", { reason: p.reason ?? "" })}
+            </p>
           ) : (
             <>
               <div className="swi-suggest-change">
-                <span>{p.model ? label(p.model) : t("dash.injectionNone")}{p.effort ? ` · ${p.effort}` : ""}</span>
+                <span>
+                  {p.model ? label(p.model) : t("dash.injectionNone")}
+                  {p.effort ? ` · ${p.effort}` : ""}
+                </span>
                 <span aria-hidden="true">→</span>
-                {p.proposedModel
-                  ? <strong>{label(p.proposedModel)}{p.proposedEffort ? ` · ${p.proposedEffort}` : ""}</strong>
-                  : <span className="muted">{t("integrations.lazycodexRoles.auto.unassigned", { reason: p.reason ?? "" })}</span>}
+                {p.proposedModel ? (
+                  <strong>
+                    {label(p.proposedModel)}
+                    {p.proposedEffort ? ` · ${p.proposedEffort}` : ""}
+                  </strong>
+                ) : (
+                  <span className="muted">
+                    {t("integrations.lazycodexRoles.auto.unassigned", { reason: p.reason ?? "" })}
+                  </span>
+                )}
               </div>
               {p.rationale && <p>{p.rationale}</p>}
-              {p.moveUpIf && <p className="muted setting-hint">{t("integrations.lazycodexRoles.auto.moveUp", { text: p.moveUpIf })}</p>}
-              {p.moveDownIf && <p className="muted setting-hint">{t("integrations.lazycodexRoles.auto.moveDown", { text: p.moveDownIf })}</p>}
+              {p.moveUpIf && (
+                <p className="muted setting-hint">
+                  {t("integrations.lazycodexRoles.auto.moveUp", { text: p.moveUpIf })}
+                </p>
+              )}
+              {p.moveDownIf && (
+                <p className="muted setting-hint">
+                  {t("integrations.lazycodexRoles.auto.moveDown", { text: p.moveDownIf })}
+                </p>
+              )}
             </>
           )}
           <div className="swi-suggest-actions">
-            {alreadySet
-              ? <span className="swi-suggest-done">{t("integrations.lazycodexRoles.auto.alreadySet")}</span>
-              : p.status === "proposed" && p.proposedModel && (
+            {alreadySet ? (
+              <span className="swi-suggest-done">
+                {t("integrations.lazycodexRoles.auto.alreadySet")}
+              </span>
+            ) : (
+              p.status === "proposed" &&
+              p.proposedModel && (
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
                   disabled={saving}
-                  onClick={() => onAccept({ model: p.proposedModel!, effort: p.proposedEffort ?? null })}
+                  onClick={() =>
+                    onAccept({ model: p.proposedModel!, effort: p.proposedEffort ?? null })
+                  }
                 >
                   {t("sub.suggest.accept")}
                 </button>
-              )}
-            <button type="button" className="btn btn-ghost btn-sm" disabled={saving} onClick={() => setResult(null)}>
+              )
+            )}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={saving}
+              onClick={() => setResult(null)}
+            >
               {t("integrations.lazycodexRoles.auto.discard")}
             </button>
           </div>

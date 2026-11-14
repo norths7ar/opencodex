@@ -12,7 +12,8 @@ export function logsSurfaceKeyDown(
   const index = SURFACES.indexOf(current);
   let nextIndex = -1;
   if (e.key === "ArrowRight" || e.key === "ArrowDown") nextIndex = (index + 1) % SURFACES.length;
-  else if (e.key === "ArrowLeft" || e.key === "ArrowUp") nextIndex = (index - 1 + SURFACES.length) % SURFACES.length;
+  else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+    nextIndex = (index - 1 + SURFACES.length) % SURFACES.length;
   else if (e.key === "Home") nextIndex = 0;
   else if (e.key === "End") nextIndex = SURFACES.length - 1;
   if (nextIndex < 0) return;

@@ -60,7 +60,9 @@ export function ClaudeCodeSettingsCard({
               { value: "subscription", label: t("claude.authModeSubscription") },
               { value: "proxy", label: t("claude.authModeProxy") },
             ]}
-            onChange={v => onStateChange({ ...state, authMode: v as ClaudeCodeState["authMode"] })}
+            onChange={(v) =>
+              onStateChange({ ...state, authMode: v as ClaudeCodeState["authMode"] })
+            }
             label={t("claude.authMode")}
             style={{ minWidth: 220 }}
             align="right"
@@ -70,15 +72,23 @@ export function ClaudeCodeSettingsCard({
       </div>
 
       {state.authModeOrigin && (
-        <div className={`claude-effective-auth${state.authModeOrigin === "auto-unknown" ? " warn" : ""}`} role="status">
+        <div
+          className={`claude-effective-auth${state.authModeOrigin === "auto-unknown" ? " warn" : ""}`}
+          role="status"
+        >
           <span className="claude-effective-auth-label">{t("claude.effectiveMode.label")}</span>
           <span>
             {state.authModeOrigin === "manual"
               ? t("claude.effectiveMode.manual", {
-                mode: state.markerMode === "proxy" ? t("claude.authModeProxy") : t("claude.authModeSubscription"),
-              })
+                  mode:
+                    state.markerMode === "proxy"
+                      ? t("claude.authModeProxy")
+                      : t("claude.authModeSubscription"),
+                })
               : state.authModeOrigin === "auto-present"
-                ? t("claude.effectiveMode.autoPresent", { source: authSourceLabel(state.authFoundBy, t) })
+                ? t("claude.effectiveMode.autoPresent", {
+                    source: authSourceLabel(state.authFoundBy, t),
+                  })
                 : state.authModeOrigin === "auto-absent"
                   ? t("claude.effectiveMode.autoAbsent")
                   : t("claude.effectiveMode.autoUnknown")}
@@ -100,7 +110,9 @@ export function ClaudeCodeSettingsCard({
               { value: "on", label: t("claude.fastOn") },
               { value: "off", label: t("claude.fastOff") },
             ]}
-            onChange={v => onStateChange({ ...state, fastMode: v === "auto" ? null : v === "on" })}
+            onChange={(v) =>
+              onStateChange({ ...state, fastMode: v === "auto" ? null : v === "on" })
+            }
             label={t("claude.fastMode")}
             style={{ minWidth: 140 }}
             align="right"
@@ -121,7 +133,9 @@ export function ClaudeCodeSettingsCard({
               { value: "1m", label: t("claude.contextAccounting1m") },
               { value: "200k", label: t("claude.contextAccounting200k") },
             ]}
-            onChange={v => onStateChange({ ...state, contextAccounting: v === "200k" ? "200k" : "1m" })}
+            onChange={(v) =>
+              onStateChange({ ...state, contextAccounting: v === "200k" ? "200k" : "1m" })
+            }
             label={t("claude.contextAccounting")}
             style={{ minWidth: 140 }}
             align="right"
@@ -135,9 +149,17 @@ export function ClaudeCodeSettingsCard({
           <div className="setting-label">
             <span className="title">{t("claude.autoContext")}</span>
             <span className="desc">{t("claude.autoContextDesc")}</span>
-            {state.maxContextTokens !== null && <span className="desc" style={{ color: "var(--muted)" }}>{t("claude.autoContextInert")}</span>}
+            {state.maxContextTokens !== null && (
+              <span className="desc" style={{ color: "var(--muted)" }}>
+                {t("claude.autoContextInert")}
+              </span>
+            )}
           </div>
-          <SettingToggle label={t("claude.autoContext")} checked={state.autoContext} onChange={autoContext => onStateChange({ ...state, autoContext })} />
+          <SettingToggle
+            label={t("claude.autoContext")}
+            checked={state.autoContext}
+            onChange={(autoContext) => onStateChange({ ...state, autoContext })}
+          />
         </div>
       )}
 
@@ -146,13 +168,19 @@ export function ClaudeCodeSettingsCard({
           <div className="setting-label">
             <span className="title">{t("claude.autoCompactWindow")}</span>
             <span className="desc">{t("claude.autoCompactWindowDesc")}</span>
-            {state.autoCompactWindow !== null && <span className="desc" style={{ color: "var(--red)" }}>{t("claude.autoCompactWindowWarn")}</span>}
+            {state.autoCompactWindow !== null && (
+              <span className="desc" style={{ color: "var(--red)" }}>
+                {t("claude.autoCompactWindowWarn")}
+              </span>
+            )}
           </div>
           <div className="setting-controls">
             <Select
               value={state.autoCompactWindow === null ? "" : String(state.autoCompactWindow)}
               options={autoCompactOptions}
-              onChange={v => onStateChange({ ...state, autoCompactWindow: v === "" ? null : Number(v) })}
+              onChange={(v) =>
+                onStateChange({ ...state, autoCompactWindow: v === "" ? null : Number(v) })
+              }
               label={t("claude.autoCompactWindow")}
               style={{ minWidth: 130 }}
               align="right"
@@ -167,13 +195,19 @@ export function ClaudeCodeSettingsCard({
           <span className="title">{t("claude.injectAgents")}</span>
           <span className="desc">{t("claude.injectAgentsDesc")}</span>
         </div>
-        <SettingToggle label={t("claude.injectAgents")} checked={state.injectAgents} onChange={injectAgents => onStateChange({ ...state, injectAgents })} />
+        <SettingToggle
+          label={t("claude.injectAgents")}
+          checked={state.injectAgents}
+          onChange={(injectAgents) => onStateChange({ ...state, injectAgents })}
+        />
       </div>
 
-      {(["webSearchSidecar", "visionSidecar"] as const).map(key => {
+      {(["webSearchSidecar", "visionSidecar"] as const).map((key) => {
         const override = state[key];
-        const titleKey = key === "webSearchSidecar" ? "claude.webSearchSidecar" : "claude.visionSidecar";
-        const hintKey = key === "webSearchSidecar" ? "claude.webSearchSidecarHint" : "claude.visionSidecarHint";
+        const titleKey =
+          key === "webSearchSidecar" ? "claude.webSearchSidecar" : "claude.visionSidecar";
+        const hintKey =
+          key === "webSearchSidecar" ? "claude.webSearchSidecarHint" : "claude.visionSidecarHint";
         const listId = `claude-sidecar-models-${key}`;
         const backend = override?.backend ?? state.sidecarPools?.[key]?.backend;
         return (
@@ -191,7 +225,7 @@ export function ClaudeCodeSettingsCard({
                   { value: "openai", label: t("dash.backendOpenAI") },
                   { value: "anthropic", label: t("dash.backendAnthropic") },
                 ]}
-                onChange={value => {
+                onChange={(value) => {
                   // Auto may exist as an empty in-memory draft so the model input
                   // stays enabled; empty Auto serializes to null on save.
                   onStateChange({
@@ -205,7 +239,7 @@ export function ClaudeCodeSettingsCard({
               <input
                 className="input mono"
                 value={override?.model ?? ""}
-                onChange={e => {
+                onChange={(e) => {
                   onStateChange({
                     ...state,
                     [key]: applySidecarModelChange(override, e.target.value),
@@ -219,26 +253,32 @@ export function ClaudeCodeSettingsCard({
               />
               {override && (
                 <datalist id={listId}>
-                  {availableModels.map(m => (
+                  {availableModels.map((m) => (
                     <option key={m} value={m} />
                   ))}
                 </datalist>
               )}
               {backend === "anthropic" && (
-                <Select value={override?.anthropicInstance ?? ""} label={t("sidecar.pool")}
+                <Select
+                  value={override?.anthropicInstance ?? ""}
+                  label={t("sidecar.pool")}
                   options={[
                     { value: "", label: t("sidecar.poolCurrent") },
                     { value: "anthropic", label: t("sidecar.poolA") },
                     { value: "anthropic2", label: t("sidecar.poolB") },
                   ]}
-                  onChange={value => onStateChange({ ...state, [key]: applySidecarPoolChange(override, value) })}
-                  portal />
+                  onChange={(value) =>
+                    onStateChange({ ...state, [key]: applySidecarPoolChange(override, value) })
+                  }
+                  portal
+                />
               )}
-              {backend === "anthropic" && override?.anthropicInstance
-                && state.sidecarPools?.[key]?.parent
-                && override.anthropicInstance !== state.sidecarPools[key].parent && (
-                <span className="muted setting-hint">{t("sidecar.poolMixed")}</span>
-              )}
+              {backend === "anthropic" &&
+                override?.anthropicInstance &&
+                state.sidecarPools?.[key]?.parent &&
+                override.anthropicInstance !== state.sidecarPools[key].parent && (
+                  <span className="muted setting-hint">{t("sidecar.poolMixed")}</span>
+                )}
             </div>
           </div>
         );
@@ -252,7 +292,9 @@ export function ClaudeCodeQuickstartSection({ manualEnv }: { manualEnv: string }
   // The section title lives in ClaudeCode's CcwSection heading.
   return (
     <>
-      <p className="muted text-label claude-quickstart-hint"><Trans k="claude.quickstartHint" cmd="ocx claude" /></p>
+      <p className="muted text-label claude-quickstart-hint">
+        <Trans k="claude.quickstartHint" cmd="ocx claude" />
+      </p>
       <CodeBlock code="ocx claude" />
       <details className="claude-quickstart-manual">
         <summary className="muted text-label">{t("claude.manualEnv")}</summary>
@@ -273,36 +315,55 @@ export function ClaudeCodeModelMapSection({
   // Title + count live in ClaudeCode's CcwSection heading.
   return (
     <>
-      <p className="muted text-label" style={{ margin: "0 0 8px" }}>{t("claude.modelMapHint")}</p>
-      {rows.length > 0 && <div className="stack" style={{ gap: 8 }}>
-        {rows.map((row, i) => (
-          <div key={row.id} className="row" style={{ gap: 8 }}>
-            <input
-              className="input mono"
-              value={row.from}
-              placeholder={t("claude.mapFrom")}
-              aria-label={t("claude.mapFrom")}
-              onChange={e => onRowsChange(rows.map((r, j) => j === i ? { ...r, from: e.target.value } : r))}
-              style={{ flex: 1 }}
-            />
-            <span className="muted" aria-hidden>→</span>
-            <input
-              className="input mono"
-              value={row.to}
-              placeholder={t("claude.mapTo")}
-              aria-label={t("claude.mapTo")}
-              onChange={e => onRowsChange(rows.map((r, j) => j === i ? { ...r, to: e.target.value } : r))}
-              style={{ flex: 1 }}
-            />
-            <button type="button" className="btn btn-ghost btn-icon btn-sm" onClick={() => onRowsChange(rows.filter((_, j) => j !== i))}
-              aria-label={t("claude.removeMapping")} style={{ color: "var(--red)" }}>
-              <IconX />
-            </button>
-          </div>
-        ))}
-      </div>}
+      <p className="muted text-label" style={{ margin: "0 0 8px" }}>
+        {t("claude.modelMapHint")}
+      </p>
+      {rows.length > 0 && (
+        <div className="stack" style={{ gap: 8 }}>
+          {rows.map((row, i) => (
+            <div key={row.id} className="row" style={{ gap: 8 }}>
+              <input
+                className="input mono"
+                value={row.from}
+                placeholder={t("claude.mapFrom")}
+                aria-label={t("claude.mapFrom")}
+                onChange={(e) =>
+                  onRowsChange(rows.map((r, j) => (j === i ? { ...r, from: e.target.value } : r)))
+                }
+                style={{ flex: 1 }}
+              />
+              <span className="muted" aria-hidden>
+                →
+              </span>
+              <input
+                className="input mono"
+                value={row.to}
+                placeholder={t("claude.mapTo")}
+                aria-label={t("claude.mapTo")}
+                onChange={(e) =>
+                  onRowsChange(rows.map((r, j) => (j === i ? { ...r, to: e.target.value } : r)))
+                }
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className="btn btn-ghost btn-icon btn-sm"
+                onClick={() => onRowsChange(rows.filter((_, j) => j !== i))}
+                aria-label={t("claude.removeMapping")}
+                style={{ color: "var(--red)" }}
+              >
+                <IconX />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <div style={{ marginTop: rows.length > 0 ? 8 : 0 }}>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => onRowsChange([...rows, { id: newClientId(), from: "", to: "" }])}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => onRowsChange([...rows, { id: newClientId(), from: "", to: "" }])}
+        >
           <IconPlus /> {t("claude.addMapping")}
         </button>
       </div>
@@ -344,7 +405,7 @@ export function ClaudeCodeAliasesSection({ aliases }: { aliases: AliasRow[] }) {
                 <span className="claude-aliases-group-count">{aliasRows.length}</span>
               </div>
               <div className="claude-aliases-chips">
-                {aliasRows.map(a => (
+                {aliasRows.map((a) => (
                   <span key={a.id} className="claude-aliases-chip">
                     <code className="claude-aliases-chip-id">{a.id}</code>
                     {a.display_name ? (

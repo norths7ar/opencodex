@@ -16,7 +16,7 @@ import type { TKey } from "./en";
  * Technical terms and model identifiers intentionally remain English.
  */
 export const vi: Record<TKey, string> = {
-    "pws.firstResponse.title": "Tiến trình phản hồi đầu tiên",
+  "pws.firstResponse.title": "Tiến trình phản hồi đầu tiên",
   "pws.firstResponse.stepProvider": "Nhà cung cấp",
   "pws.firstResponse.stepModels": "Mô hình",
   "pws.firstResponse.stepClients": "Định tuyến client",
@@ -28,36 +28,51 @@ export const vi: Record<TKey, string> = {
   "pws.firstResponse.providerDisabled": "Nhà cung cấp đã bị tắt",
   "pws.firstResponse.modelsLoading": "Đang kiểm tra danh sách mô hình…",
   "pws.firstResponse.modelsFailed": "Không thể tải danh sách mô hình",
-  "pws.firstResponse.modelsPending": "Danh sách mô hình ban đầu vẫn đang chờ — các mô hình sẽ ẩn cho đến khi khám phá xong",
+  "pws.firstResponse.modelsPending":
+    "Danh sách mô hình ban đầu vẫn đang chờ — các mô hình sẽ ẩn cho đến khi khám phá xong",
   "pws.firstResponse.modelsReady": "Đã bật {count} mô hình để định tuyến",
-  "pws.firstResponse.modelsReadyDiscoveryFailed": "Đã bật {count} mô hình giữ lại — khám phá trực tiếp thất bại",
+  "pws.firstResponse.modelsReadyDiscoveryFailed":
+    "Đã bật {count} mô hình giữ lại — khám phá trực tiếp thất bại",
   "pws.firstResponse.modelsAllOff": "Tất cả mô hình đang tắt — hãy bật trong trang Mô hình",
   "pws.firstResponse.modelsConfigured": "Đã cấu hình {count} mô hình",
   "pws.firstResponse.modelsEmpty": "Chưa khám phá hoặc cấu hình mô hình nào",
   "pws.firstResponse.openProviderModels": "Chọn mô hình",
-  "pws.firstResponse.clientStep": "Áp dụng client trong Connect và chọn {provider}/<model>; áp dụng cho các phiên mới",
+  "pws.firstResponse.clientStep":
+    "Áp dụng client trong Connect và chọn {provider}/<model>; áp dụng cho các phiên mới",
   "pws.firstResponse.openConnect": "Mở Connect",
-  "pws.firstResponse.probeUntested": "Chưa xác minh — hãy chạy kiểm tra hoàn thành mô hình bên dưới",
+  "pws.firstResponse.probeUntested":
+    "Chưa xác minh — hãy chạy kiểm tra hoàn thành mô hình bên dưới",
   "pws.firstResponse.probeOk": "Đã xác minh phản hồi hoàn thành từ {model}",
   "pws.firstResponse.probeFailed": "Kiểm tra hoàn thành gần nhất cho {model} đã thất bại",
   "pws.firstResponse.stepDisconnect": "Ngắt kết nối & khôi phục",
-  "pws.firstResponse.disconnectNote": "Trong Connect, tắt Claude Code chỉ xóa khối proxy cho các phiên Claude mới, trong khi tắt Codex sẽ dừng định tuyến qua proxy và khôi phục danh mục cũng như lịch sử luồng Codex gốc; các phiên đang chạy vẫn giữ môi trường hiện tại cho đến khi khởi động lại. Tắt hoặc xóa {provider} không khôi phục cài đặt client trong Connect.",
-  "pws.firstResponse.probeReverify": "Cài đặt kết nối đã thay đổi kể từ lần kiểm tra thất bại — hãy chạy lại kiểm tra cho {model} để xác minh bản sửa lỗi",
-  "pws.completion.recovery.auth": "Kiểm tra hoặc cập nhật khóa API hoặc thông tin xác thực tài khoản cho nhà cung cấp này, sau đó chạy lại kiểm tra cho {model}.",
-  "pws.completion.recovery.rateLimit": "Nhà cung cấp đã giới hạn tốc độ yêu cầu này (HTTP 429). Hãy đợi cửa sổ giới hạn đặt lại hoặc chuyển sang tài khoản hay khóa API khác, sau đó chạy lại kiểm tra cho {model}.",
-  "pws.completion.recovery.connection": "Yêu cầu đã hết thời gian chờ hoặc không thể kết nối tới điểm cuối. Hãy kiểm tra URL cơ sở và cài đặt mạng, sau đó chạy lại kiểm tra cho {model}.",
-  "pws.completion.recovery.model": "Nhà cung cấp đã từ chối yêu cầu mô hình này. Hãy kiểm tra ID mô hình trên tab Mô hình hoặc chọn mô hình khác, sau đó chạy lại kiểm tra.",
-  "pws.completion.recovery.upstream": "Nhà cung cấp upstream đã trả về lỗi hoặc luồng chưa hoàn chỉnh. Hãy thử lại kiểm tra cho {model} hoặc kiểm tra cài đặt nhà cung cấp.",
-  "pws.completion.recovery.aborted": "Kiểm tra đã bị hủy trước khi hoàn tất. Hãy chạy lại kiểm tra cho {model} khi sẵn sàng.",
-  "pws.completion.recovery.credentialChanged": "Cài đặt hoặc thông tin xác thực của nhà cung cấp đã thay đổi khi bắt đầu kiểm tra. Hãy chạy lại kiểm tra cho {model}.",
-  "pws.completion.recovery.request": "Không thể bắt đầu yêu cầu kiểm tra. Hãy đợi kiểm tra đang chạy hoàn tất hoặc thử lại cho {model}.",
+  "pws.firstResponse.disconnectNote":
+    "Trong Connect, tắt Claude Code chỉ xóa khối proxy cho các phiên Claude mới, trong khi tắt Codex sẽ dừng định tuyến qua proxy và khôi phục danh mục cũng như lịch sử luồng Codex gốc; các phiên đang chạy vẫn giữ môi trường hiện tại cho đến khi khởi động lại. Tắt hoặc xóa {provider} không khôi phục cài đặt client trong Connect.",
+  "pws.firstResponse.probeReverify":
+    "Cài đặt kết nối đã thay đổi kể từ lần kiểm tra thất bại — hãy chạy lại kiểm tra cho {model} để xác minh bản sửa lỗi",
+  "pws.completion.recovery.auth":
+    "Kiểm tra hoặc cập nhật khóa API hoặc thông tin xác thực tài khoản cho nhà cung cấp này, sau đó chạy lại kiểm tra cho {model}.",
+  "pws.completion.recovery.rateLimit":
+    "Nhà cung cấp đã giới hạn tốc độ yêu cầu này (HTTP 429). Hãy đợi cửa sổ giới hạn đặt lại hoặc chuyển sang tài khoản hay khóa API khác, sau đó chạy lại kiểm tra cho {model}.",
+  "pws.completion.recovery.connection":
+    "Yêu cầu đã hết thời gian chờ hoặc không thể kết nối tới điểm cuối. Hãy kiểm tra URL cơ sở và cài đặt mạng, sau đó chạy lại kiểm tra cho {model}.",
+  "pws.completion.recovery.model":
+    "Nhà cung cấp đã từ chối yêu cầu mô hình này. Hãy kiểm tra ID mô hình trên tab Mô hình hoặc chọn mô hình khác, sau đó chạy lại kiểm tra.",
+  "pws.completion.recovery.upstream":
+    "Nhà cung cấp upstream đã trả về lỗi hoặc luồng chưa hoàn chỉnh. Hãy thử lại kiểm tra cho {model} hoặc kiểm tra cài đặt nhà cung cấp.",
+  "pws.completion.recovery.aborted":
+    "Kiểm tra đã bị hủy trước khi hoàn tất. Hãy chạy lại kiểm tra cho {model} khi sẵn sàng.",
+  "pws.completion.recovery.credentialChanged":
+    "Cài đặt hoặc thông tin xác thực của nhà cung cấp đã thay đổi khi bắt đầu kiểm tra. Hãy chạy lại kiểm tra cho {model}.",
+  "pws.completion.recovery.request":
+    "Không thể bắt đầu yêu cầu kiểm tra. Hãy đợi kiểm tra đang chạy hoàn tất hoặc thử lại cho {model}.",
   "pws.completion.recovery.fixAuth": "Cập nhật thông tin xác thực",
   "pws.completion.recovery.fixSettings": "Kiểm tra cài đặt",
-"pws.completion.title": "Kiểm tra phản hồi mô hình",
+  "pws.completion.title": "Kiểm tra phản hồi mô hình",
   "pws.completion.model": "Mô hình cần kiểm tra",
   "pws.completion.choose": "Chọn mô hình",
   "pws.completion.run": "Kiểm tra mô hình",
-  "pws.completion.confirm": "Kiểm tra {model} trên {provider}? Thao tác này gửi yêu cầu thật với giới hạn đầu ra 32 token, tiêu tốn hạn mức và có thể phát sinh chi phí.",
+  "pws.completion.confirm":
+    "Kiểm tra {model} trên {provider}? Thao tác này gửi yêu cầu thật với giới hạn đầu ra 32 token, tiêu tốn hạn mức và có thể phát sinh chi phí.",
   "pws.completion.failed": "Kiểm tra mô hình thất bại",
   "pws.completion.ok": "Kiểm tra mô hình thành công",
   "pws.completion.notApplicable": "Không áp dụng kiểm tra",
@@ -65,7 +80,8 @@ export const vi: Record<TKey, string> = {
   "pws.completion.total": "Tổng độ trễ",
   "pws.completion.reported": "Máy chủ nguồn báo cáo {upstream} cho {model}",
   "pws.completion.unreported": "Máy chủ nguồn không báo cáo mô hình cho {model}",
-  "pws.completion.identity": "Siêu dữ liệu mô hình do nhà cung cấp nguồn báo cáo và không xác minh danh tính mô hình thực tế.",
+  "pws.completion.identity":
+    "Siêu dữ liệu mô hình do nhà cung cấp nguồn báo cáo và không xác minh danh tính mô hình thực tế.",
   "pws.completion.match": "Khớp",
   "pws.completion.mismatch": "Không khớp",
   "pws.completion.unknown": "Không xác định",
@@ -79,9 +95,11 @@ export const vi: Record<TKey, string> = {
   "pws.completion.tls_profile": "Đã cấu hình hồ sơ TLS tùy chỉnh.",
   "pws.completion.upstream_http_version": "Đã cấu hình phiên bản HTTP của máy chủ nguồn.",
   "pws.completion.request_pacing": "Đã bật điều tiết yêu cầu.",
-  "pws.completion.custom_executor_egress": "Không thể giữ bộ thực thi fetch tùy chỉnh kết hợp proxy của nhà cung cấp.",
+  "pws.completion.custom_executor_egress":
+    "Không thể giữ bộ thực thi fetch tùy chỉnh kết hợp proxy của nhà cung cấp.",
   "pws.completion.runAll": "Kiểm tra tất cả mô hình",
-  "pws.completion.allConfirm": "Kiểm tra cả {count} mô hình trên {provider}? Thao tác này gửi lần lượt tối đa {count} yêu cầu thật, mỗi yêu cầu giới hạn đầu ra 32 token. Một số mô hình có thể được bỏ qua trước khi gửi. Việc này tiêu tốn hạn mức và có thể phát sinh chi phí.",
+  "pws.completion.allConfirm":
+    "Kiểm tra cả {count} mô hình trên {provider}? Thao tác này gửi lần lượt tối đa {count} yêu cầu thật, mỗi yêu cầu giới hạn đầu ra 32 token. Một số mô hình có thể được bỏ qua trước khi gửi. Việc này tiêu tốn hạn mức và có thể phát sinh chi phí.",
   "pws.completion.stop": "Dừng",
   "pws.completion.progress": "Đang kiểm tra {done}/{total}…",
   "pws.completion.stopped": "Đã dừng sau {done}/{total} mô hình",
@@ -90,39 +108,49 @@ export const vi: Record<TKey, string> = {
   "pws.completion.failedShort": "Lỗi",
   "pws.completion.notTested": "Chưa kiểm tra",
   "pws.completion.disableFailed": "Tắt {count} mô hình lỗi",
-  "pws.completion.disableConfirm": "Tắt {count} mô hình không qua kiểm tra trên {provider}? Cho đến khi bạn bật lại trong trang Mô hình, chúng sẽ không xuất hiện trong catalog và bộ chọn model nhưng vẫn có thể được gọi trực tiếp bằng id chính xác.",
+  "pws.completion.disableConfirm":
+    "Tắt {count} mô hình không qua kiểm tra trên {provider}? Cho đến khi bạn bật lại trong trang Mô hình, chúng sẽ không xuất hiện trong catalog và bộ chọn model nhưng vẫn có thể được gọi trực tiếp bằng id chính xác.",
   "pws.completion.disabledDone": "Đã tắt {count} mô hình. Bật lại trong trang Mô hình.",
   "pws.completion.disableError": "Không thể tắt các mô hình lỗi",
 
   "reasoningRetention.advanced": "Cài đặt nâng cao",
   "reasoningRetention.title": "Lưu giữ suy luận",
   "reasoningRetention.enable": "Bật lưu giữ suy luận",
-  "reasoningRetention.description": "Mặc định tắt. Khi được bật cho quá trình nén v1/v2 qua định tuyến có bản tóm tắt đọc được, suy luận trong ngưỡng nhỏ hơn giữa tỷ lệ cửa sổ ngữ cảnh và giới hạn token sẽ được trả lại dưới dạng ngữ cảnh lịch sử cùng bản tóm tắt. Vượt ngưỡng, suy luận được lưu trữ cục bộ và thay bằng ghi chú đường dẫn. Giá trị mặc định khi bật: 20% và 100.000 token. Không giải mã suy luận riêng tư của nhà cung cấp; đầu ra nén không đọc được giữ nguyên.",
-  "reasoningRetention.storageHint": "Việc bật có thể lưu suy luận ở dạng văn bản thuần trong lịch sử cục bộ và các bản lưu trữ. Các bản lưu trữ đã hoàn tất không có giới hạn tổng dung lượng hay thời hạn hết hạn; hãy xóa thủ công những bản không cần thiết.",
+  "reasoningRetention.description":
+    "Mặc định tắt. Khi được bật cho quá trình nén v1/v2 qua định tuyến có bản tóm tắt đọc được, suy luận trong ngưỡng nhỏ hơn giữa tỷ lệ cửa sổ ngữ cảnh và giới hạn token sẽ được trả lại dưới dạng ngữ cảnh lịch sử cùng bản tóm tắt. Vượt ngưỡng, suy luận được lưu trữ cục bộ và thay bằng ghi chú đường dẫn. Giá trị mặc định khi bật: 20% và 100.000 token. Không giải mã suy luận riêng tư của nhà cung cấp; đầu ra nén không đọc được giữ nguyên.",
+  "reasoningRetention.storageHint":
+    "Việc bật có thể lưu suy luận ở dạng văn bản thuần trong lịch sử cục bộ và các bản lưu trữ. Các bản lưu trữ đã hoàn tất không có giới hạn tổng dung lượng hay thời hạn hết hạn; hãy xóa thủ công những bản không cần thiết.",
   "reasoningRetention.percent": "Cửa sổ ngữ cảnh (%)",
   "reasoningRetention.tokens": "Giới hạn token",
   "reasoningRetention.reset": "Đặt lại và tắt",
-  "reasoningRetention.invalid": "Nhập tỷ lệ lớn hơn 0 và không quá 100, cùng số token nguyên dương.",
+  "reasoningRetention.invalid":
+    "Nhập tỷ lệ lớn hơn 0 và không quá 100, cùng số token nguyên dương.",
   "reasoningRetention.loadFailed": "Không thể tải cài đặt.",
   "reasoningRetention.saveFailed": "Không thể lưu cài đặt.",
   "reasoningRetention.saved": "Đã lưu cài đặt.",
   "nativeReasoningRetention.title": "Giữ lại suy luận gốc OpenAI",
-  "nativeReasoningRetention.description": "Chỉ áp dụng cho yêu cầu gốc đến backend ChatGPT chính thức, bao gồm đổi đích thực tế trong Combo và nhóm tài khoản. Cho phép gửi lại suy luận đã mã hóa trước đó; việc tái sử dụng phụ thuộc vào backend. Cả hai tùy chọn mặc định đều tắt.",
+  "nativeReasoningRetention.description":
+    "Chỉ áp dụng cho yêu cầu gốc đến backend ChatGPT chính thức, bao gồm đổi đích thực tế trong Combo và nhóm tài khoản. Cho phép gửi lại suy luận đã mã hóa trước đó; việc tái sử dụng phụ thuộc vào backend. Cả hai tùy chọn mặc định đều tắt.",
   "nativeReasoningRetention.modelSwitch": "Giữ suy luận đã mã hóa khi đổi mô hình",
   "nativeReasoningRetention.accountSwitch": "Giữ suy luận đã mã hóa khi đổi tài khoản (thử nghiệm)",
-  "nativeReasoningRetention.accountHint": "Giữ bản mã không cho tài khoản khác quyền truy cập ID phản hồi hoặc tệp cũ. Yêu cầu thành công không chứng minh suy luận đã được tái sử dụng. Cách xử lý nén ngữ cảnh gốc không thay đổi.",
+  "nativeReasoningRetention.accountHint":
+    "Giữ bản mã không cho tài khoản khác quyền truy cập ID phản hồi hoặc tệp cũ. Yêu cầu thành công không chứng minh suy luận đã được tái sử dụng. Cách xử lý nén ngữ cảnh gốc không thay đổi.",
   "nativeReasoningRetention.reset": "Khôi phục mặc định",
   "nativeReasoningRetention.loadFailed": "Không thể tải cài đặt suy luận gốc.",
   "nativeReasoningRetention.saveFailed": "Không thể lưu cài đặt suy luận gốc.",
   "nativeReasoningRetention.saved": "Đã lưu cài đặt suy luận gốc.",
   "workflowBudget.title": "Giới hạn quy trình cho tác tử phụ",
-  "workflowBudget.description": "Mức trần cho mỗi tác vụ, tức là một cuộc trò chuyện cùng các tác tử phụ nó khởi chạy, được đếm trong cửa sổ trượt {minutes} phút. Yêu cầu vượt mức trần bị từ chối cục bộ với mã 429 trước khi liên hệ bất kỳ nhà cung cấp nào. Thay đổi áp dụng từ yêu cầu tiếp theo; mức sử dụng đã đếm được giữ nguyên.",
+  "workflowBudget.description":
+    "Mức trần cho mỗi tác vụ, tức là một cuộc trò chuyện cùng các tác tử phụ nó khởi chạy, được đếm trong cửa sổ trượt {minutes} phút. Yêu cầu vượt mức trần bị từ chối cục bộ với mã 429 trước khi liên hệ bất kỳ nhà cung cấp nào. Thay đổi áp dụng từ yêu cầu tiếp theo; mức sử dụng đã đếm được giữ nguyên.",
   "workflowBudget.maxConcurrentChildren": "Lượt chạy song song",
-  "workflowBudget.maxConcurrentChildrenHint": "Số lượt một tác vụ có thể chạy cùng lúc. Luôn giữ lại một chỗ cho cuộc trò chuyện của bạn, nên tác tử phụ được ít hơn một.",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "Số lượt một tác vụ có thể chạy cùng lúc. Luôn giữ lại một chỗ cho cuộc trò chuyện của bạn, nên tác tử phụ được ít hơn một.",
   "workflowBudget.maxPhysicalSends": "Yêu cầu tới mô hình mỗi cửa sổ",
-  "workflowBudget.maxPhysicalSendsHint": "Số yêu cầu tới nhà cung cấp, kể cả thử lại, mà một tác vụ có thể gửi trong cửa sổ.",
+  "workflowBudget.maxPhysicalSendsHint":
+    "Số yêu cầu tới nhà cung cấp, kể cả thử lại, mà một tác vụ có thể gửi trong cửa sổ.",
   "workflowBudget.maxDistinctChildren": "Tác tử phụ khác nhau mỗi cửa sổ",
-  "workflowBudget.maxDistinctChildrenHint": "Số luồng tác tử phụ khác nhau mà một tác vụ có thể khởi chạy trong cửa sổ.",
+  "workflowBudget.maxDistinctChildrenHint":
+    "Số luồng tác tử phụ khác nhau mà một tác vụ có thể khởi chạy trong cửa sổ.",
   "workflowBudget.range": "Mặc định {default}, cho phép {min}–{max}.",
   "workflowBudget.invalid": "Nhập một số nguyên từ {min} đến {max}.",
   "workflowBudget.increase": "Tăng {label}",
@@ -142,12 +170,14 @@ export const vi: Record<TKey, string> = {
   ...startupV2Copy("vi"),
   ...proxyV2Copy("vi"),
   "claude.tierDefaults.unset": "Chưa đặt (giữ cài đặt Claude hiện có)",
-  "claude.tierDefaults.recovery": "Đã dừng áp dụng và khôi phục tự động thất bại. Kiểm tra bản sao lưu bên dưới trước khi thử lại.",
+  "claude.tierDefaults.recovery":
+    "Đã dừng áp dụng và khôi phục tự động thất bại. Kiểm tra bản sao lưu bên dưới trước khi thử lại.",
   "claude.tierDefaults.title": "Mô hình mặc định CLI",
   "claude.tierDefaults.preview": "Xem trước cài đặt Claude",
   "claude.tierDefaults.apply": "Áp dụng vào cài đặt Claude",
   "claude.tierDefaults.applied": "Cài đặt Claude khớp với mặc định đã lưu.",
-  "claude.tierDefaults.failed": "Không thể áp dụng mặc định. Xem trước lại và kiểm tra cài đặt Claude.",
+  "claude.tierDefaults.failed":
+    "Không thể áp dụng mặc định. Xem trước lại và kiểm tra cài đặt Claude.",
   "sidecar.pool": "Nhóm tài khoản",
   "sidecar.poolCurrent": "Nhóm của yêu cầu hiện tại",
   "sidecar.poolA": "Anthropic",
@@ -157,7 +187,8 @@ export const vi: Record<TKey, string> = {
   "nav.claude": "Claude",
   "claude.pageSub": "Định tuyến và cài đặt OpenCodex cho Claude Code.",
 
-  "pws.anthropicAccountThresholdHint": "Ghi đè ngưỡng mặc định của nhóm Claude. 0 chỉ tắt chuyển đổi dựa trên mức sử dụng của tài khoản này; tạm dừng và khôi phục khi bị giới hạn vẫn áp dụng.",
+  "pws.anthropicAccountThresholdHint":
+    "Ghi đè ngưỡng mặc định của nhóm Claude. 0 chỉ tắt chuyển đổi dựa trên mức sử dụng của tài khoản này; tạm dừng và khôi phục khi bị giới hạn vẫn áp dụng.",
   "kiroLogin.title": "Đăng nhập Kiro",
   "kiroLogin.chooseMethod": "Chọn cách đăng nhập",
   "kiroLogin.cli": "Nhập từ Kiro CLI",
@@ -165,7 +196,8 @@ export const vi: Record<TKey, string> = {
   "kiroLogin.iamDescription": "Dùng cổng truy cập AWS và vùng IAM Identity Center của tổ chức bạn.",
   "kiroLogin.startUrl": "URL cổng truy cập AWS",
   "kiroLogin.region": "Vùng IAM Identity Center",
-  "kiroLogin.invalidIam": "Nhập URL HTTPS của cổng AWS kết thúc bằng /start và một vùng AWS hợp lệ.",
+  "kiroLogin.invalidIam":
+    "Nhập URL HTTPS của cổng AWS kết thúc bằng /start và một vùng AWS hợp lệ.",
   "kiroLogin.back": "Quay lại",
   "kiroLogin.continue": "Tiếp tục đến AWS",
   "kiroLogin.selectProfile": "Chọn hồ sơ Kiro",
@@ -190,7 +222,8 @@ export const vi: Record<TKey, string> = {
   "kiroLogin.copied": "Đã sao chép mã",
   "kiroLogin.copyUnavailable": "Không thể sao chép",
   "kiroLogin.openVerification": "Mở trang xác minh",
-  "kiroLogin.unexpectedHost": "Máy chủ xác minh không mong đợi. Hãy kiểm tra địa chỉ trước khi sao chép.",
+  "kiroLogin.unexpectedHost":
+    "Máy chủ xác minh không mong đợi. Hãy kiểm tra địa chỉ trước khi sao chép.",
   "kiroLogin.duplicate": "Hồ sơ Kiro này đã có trong danh sách tài khoản.",
   "kiroLogin.manualReview": "Tài khoản này có thể cần được xem xét thủ công.",
   "kiroSelection.suspended": "Không tự chọn: bị tạm ngưng",
@@ -201,11 +234,15 @@ export const vi: Record<TKey, string> = {
   "accountPool.autoSwitchThreshold": "Ngưỡng riêng cho tài khoản",
   "accountPool.autoSwitchThresholdAria": "Ngưỡng sử dụng cho {email}",
   "accountPool.autoSwitchOverrideAria": "Ghi đè ngưỡng sử dụng chung cho {email}",
-  "accountPool.autoSwitchHint": "Ghi đè ngưỡng chung cho tài khoản này. 0 chỉ tắt chuyển đổi chủ động dựa trên mức sử dụng từ tài khoản này.",
+  "accountPool.autoSwitchHint":
+    "Ghi đè ngưỡng chung cho tài khoản này. 0 chỉ tắt chuyển đổi chủ động dựa trên mức sử dụng từ tài khoản này.",
   "accountPool.autoSwitchUpdated": "Đã cập nhật ngưỡng sử dụng cho {email}",
-  "accountPool.autoSwitchUpdateFailed": "Không thể lưu ngưỡng sử dụng cho {email}. Giá trị được xác nhận gần nhất đang được hiển thị.",
-  "usage.incomplete": "Không thể đưa một số bản ghi sử dụng vào. Số lượng, ngày tháng và thứ hạng chỉ phản ánh các bản ghi có thể đọc được.",
-  "models.pickerOrder.usageIncomplete": "Không thể lưu thứ tự dùng nhiều nhất vì lịch sử sử dụng không đầy đủ. Hãy chọn thứ tự khác hoặc sửa lịch sử trước.",
+  "accountPool.autoSwitchUpdateFailed":
+    "Không thể lưu ngưỡng sử dụng cho {email}. Giá trị được xác nhận gần nhất đang được hiển thị.",
+  "usage.incomplete":
+    "Không thể đưa một số bản ghi sử dụng vào. Số lượng, ngày tháng và thứ hạng chỉ phản ánh các bản ghi có thể đọc được.",
+  "models.pickerOrder.usageIncomplete":
+    "Không thể lưu thứ tự dùng nhiều nhất vì lịch sử sử dụng không đầy đủ. Hãy chọn thứ tự khác hoặc sửa lịch sử trước.",
   "api.attribution.noRecordedUse": "Không có lượt sử dụng trong các bản ghi có thể đọc được",
   "audio.dictation": "Đọc chính tả",
   "audio.liveVoice": "Giọng nói trực tiếp",
@@ -229,13 +266,15 @@ export const vi: Record<TKey, string> = {
   "audio.state.disconnected": "Đã ngắt kết nối",
   "audio.state.failed": "Kết nối thất bại",
   "audio.error.auth": "Khóa bị từ chối. Hãy kiểm tra khóa dữ liệu OpenCodex.",
-  "audio.error.unavailable": "Dịch vụ upstream không khả dụng. Hãy kiểm tra tài khoản nhà cung cấp.",
+  "audio.error.unavailable":
+    "Dịch vụ upstream không khả dụng. Hãy kiểm tra tài khoản nhà cung cấp.",
   "audio.error.rateLimit": "Đã đạt giới hạn tốc độ. Hãy thử lại sau.",
   "audio.error.invalid": "Yêu cầu bị từ chối. Hãy kiểm tra tệp và nhà cung cấp.",
   "audio.error.size": "Hãy chọn tệp âm thanh không rỗng có dung lượng tối đa 25 MB.",
   "audio.error.network": "Kết nối thất bại. Hãy kiểm tra địa chỉ proxy.",
   "audio.error.timeout": "Yêu cầu đã hết thời gian chờ. Hãy thử lại.",
-  "audio.error.protocol": "Phản hồi âm thanh không mong đợi. Hãy kiểm tra tính tương thích của nhà cung cấp.",
+  "audio.error.protocol":
+    "Phản hồi âm thanh không mong đợi. Hãy kiểm tra tính tương thích của nhà cung cấp.",
   "models.pickerOrder.label": "Thứ tự chọn",
   "models.pickerOrder.default": "Mặc định",
   "models.pickerOrder.alphabetical": "A–Z theo model",
@@ -249,12 +288,17 @@ export const vi: Record<TKey, string> = {
   "models.pickerOrder.usageFailed": "Không thể tải mức sử dụng model.",
   "models.pickerOrder.loadFailed": "Không thể tải cài đặt bộ chọn.",
   "models.pickerOrder.retry": "Thử lại",
-  "models.pickerOrder.hint": "Lưu thứ tự được định tuyến cho việc khám phá của Codex và Claude. Các dải native/được giới thiệu giữ nguyên vị trí; 'Bản chụp dùng nhiều nhất' là một bản chụp (snapshot). Các lựa chọn native được quảng cáo có thể thay đổi.",
-  "codexAuth.quotaAutoRefreshAllHint": "Điều khiển các khung thời gian 5 giờ và hàng tuần được hỗ trợ cho tất cả các tài khoản hiện tại cùng lúc. Ở chế độ Pool, một yêu cầu nhỏ sẽ được gửi đi sau mỗi lần đặt lại và có tiêu tốn hạn ngạch.",
+  "models.pickerOrder.hint":
+    "Lưu thứ tự được định tuyến cho việc khám phá của Codex và Claude. Các dải native/được giới thiệu giữ nguyên vị trí; 'Bản chụp dùng nhiều nhất' là một bản chụp (snapshot). Các lựa chọn native được quảng cáo có thể thay đổi.",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "Điều khiển các khung thời gian 5 giờ và hàng tuần được hỗ trợ cho tất cả các tài khoản hiện tại cùng lúc. Ở chế độ Pool, một yêu cầu nhỏ sẽ được gửi đi sau mỗi lần đặt lại và có tiêu tốn hạn ngạch.",
   "codexAuth.quotaAutoRefreshMixed": "Một số khung thời gian đã được bật.",
-  "codexAuth.quotaAutoRefreshEmpty": "Không có khung thời gian hạn ngạch nào được hỗ trợ. Hãy làm mới hạn ngạch tài khoản để kiểm tra lại.",
-  "codexAuth.quotaAutoRefreshLoadFailed": "Không thể tải các cài đặt kích hoạt. Hãy thử lại để kiểm tra trạng thái của chúng.",
-  "codexAuth.quotaAutoRefreshPartial": "Không thể lưu một số cài đặt. Hãy thử lại để hoàn tất cùng một thay đổi.",
+  "codexAuth.quotaAutoRefreshEmpty":
+    "Không có khung thời gian hạn ngạch nào được hỗ trợ. Hãy làm mới hạn ngạch tài khoản để kiểm tra lại.",
+  "codexAuth.quotaAutoRefreshLoadFailed":
+    "Không thể tải các cài đặt kích hoạt. Hãy thử lại để kiểm tra trạng thái của chúng.",
+  "codexAuth.quotaAutoRefreshPartial":
+    "Không thể lưu một số cài đặt. Hãy thử lại để hoàn tất cùng một thay đổi.",
   "nav.dashboard": "Bảng điều khiển",
   "uptime.day": "ng",
   "uptime.hour": "g",
@@ -269,16 +313,20 @@ export const vi: Record<TKey, string> = {
   "nav.usage": "Mức sử dụng",
   "common.github": "GitHub",
   "onboarding.star.title": "Bạn thích OpenCodex chứ?",
-  "onboarding.star.body": "OpenCodex miễn phí và mã nguồn mở. Một ngôi sao trên GitHub giúp các nhà phát triển khác tìm thấy dự án và giúp dự án tiếp tục phát triển.",
+  "onboarding.star.body":
+    "OpenCodex miễn phí và mã nguồn mở. Một ngôi sao trên GitHub giúp các nhà phát triển khác tìm thấy dự án và giúp dự án tiếp tục phát triển.",
   "onboarding.star.cta": "Gắn sao trên GitHub",
-  "onboarding.star.ghHint": "Gắn sao cho kho mã bằng GitHub CLI (gh) đã đăng nhập của bạn. Không có gì xảy ra cho đến khi bạn bấm.",
+  "onboarding.star.ghHint":
+    "Gắn sao cho kho mã bằng GitHub CLI (gh) đã đăng nhập của bạn. Không có gì xảy ra cho đến khi bạn bấm.",
   "onboarding.star.browserHint": "Mở kho mã trên github.com trong trình duyệt.",
   "onboarding.star.openPage": "Mở trang GitHub thay vào đó",
   "onboarding.star.later": "Để sau",
-  "onboarding.star.failed": "Không thể gắn sao bằng GitHub CLI (gh). Bạn có thể gắn sao trên trang GitHub.",
+  "onboarding.star.failed":
+    "Không thể gắn sao bằng GitHub CLI (gh). Bạn có thể gắn sao trên trang GitHub.",
   "onboarding.star.starring": "Đang gắn sao…",
   "onboarding.star.thanks": "Cảm ơn bạn đã gắn sao!",
-  "onboarding.star.thanksBody": "Điều này thật sự rất có ích. Liên kết GitHub ở thanh bên luôn đưa bạn về kho mã.",
+  "onboarding.star.thanksBody":
+    "Điều này thật sự rất có ích. Liên kết GitHub ở thanh bên luôn đưa bạn về kho mã.",
   "onboarding.star.done": "Xong",
   "common.save": "Lưu",
   "common.saving": "Đang lưu…",
@@ -289,18 +337,22 @@ export const vi: Record<TKey, string> = {
   "common.remove": "Xóa",
   "common.loading": "Đang tải…",
   "common.retry": "Thử lại",
-  "prov.affinityResetPending": "Thay đổi tài khoản đã được lưu nhưng chưa cập nhật xong định tuyến cuộc trò chuyện. Hãy thử lại để hoàn tất.",
+  "prov.affinityResetPending":
+    "Thay đổi tài khoản đã được lưu nhưng chưa cập nhật xong định tuyến cuộc trò chuyện. Hãy thử lại để hoàn tất.",
   "prov.affinityResetComplete": "Đã cập nhật định tuyến cuộc trò chuyện.",
-  "prov.affinityResetRetryUnavailable": "Hiện không thể thử lại với tài khoản này. Hãy làm mới danh sách tài khoản và, nếu cần, tiếp tục sử dụng tài khoản hoặc đăng nhập lại.",
+  "prov.affinityResetRetryUnavailable":
+    "Hiện không thể thử lại với tài khoản này. Hãy làm mới danh sách tài khoản và, nếu cần, tiếp tục sử dụng tài khoản hoặc đăng nhập lại.",
   "common.undo": "Hoàn tác",
   "auth.adminTokenTitle": "Token quản trị OpenCodex (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "Tài khoản",
   "auth.adminTokenFieldLabel": "Token quản trị",
   "auth.adminTokenRejected": "Token quản trị đó đã bị từ chối. Hãy kiểm tra lại và thử lại.",
   "auth.adminTokenUnavailable": "Không thể xác minh token quản trị. Hãy thử lại.",
-  "auth.adminTokenHelp": "Đây là token quản trị quản lý OpenCodex, không phải là API key của provider. Proxy ghi nó vào ~/.opencodex/admin-api-token (hoặc $OPENCODEX_HOME/admin-api-token) trong lần khởi động đầu tiên và OPENCODEX_ADMIN_AUTH_TOKEN sẽ ghi đè nó.",
+  "auth.adminTokenHelp":
+    "Đây là token quản trị quản lý OpenCodex, không phải là API key của provider. Proxy ghi nó vào ~/.opencodex/admin-api-token (hoặc $OPENCODEX_HOME/admin-api-token) trong lần khởi động đầu tiên và OPENCODEX_ADMIN_AUTH_TOKEN sẽ ghi đè nó.",
   "auth.rememberDevice": "Ghi nhớ thiết bị này",
-  "auth.rememberDeviceHint": "Giữ phiên HttpOnly có thể thu hồi trong 30 ngày, không lưu mã quản trị. Yêu cầu bảng điều khiển HTTPS trực tiếp cùng nguồn gốc với API (hoặc loopback cục bộ).",
+  "auth.rememberDeviceHint":
+    "Giữ phiên HttpOnly có thể thu hồi trong 30 ngày, không lưu mã quản trị. Yêu cầu bảng điều khiển HTTPS trực tiếp cùng nguồn gốc với API (hoặc loopback cục bộ).",
   "connection.forgetDevice": "Quên thiết bị này",
   "connection.forgetDeviceFailed": "Không thể quên thiết bị này. Phiên vẫn được giữ.",
   "auth.adminTokenDocsLink": "Cách tìm nó",
@@ -329,9 +381,11 @@ export const vi: Record<TKey, string> = {
   "errorBoundary.details": "Lỗi",
   "errorBoundary.reload": "Tải lại",
   "routing.title": "Định tuyến thông minh (beta)",
-  "routing.subtitle": "Hồ sơ chính sách, đánh giá chạy thử (dry-run) và phân tích định tuyến dựa trên nguồn.",
+  "routing.subtitle":
+    "Hồ sơ chính sách, đánh giá chạy thử (dry-run) và phân tích định tuyến dựa trên nguồn.",
   "routing.loadFailed": "Không thể tải dữ liệu định tuyến",
-  "routing.empty": "Không có hồ sơ định tuyến nào được định cấu hình. Hãy thêm `routingProfiles` vào config.json.",
+  "routing.empty":
+    "Không có hồ sơ định tuyến nào được định cấu hình. Hãy thêm `routingProfiles` vào config.json.",
   "routing.revision": "rev",
   "routing.detail": "Hồ sơ",
   "routing.createProfile": "Tạo hồ sơ",
@@ -388,22 +442,28 @@ export const vi: Record<TKey, string> = {
   "routing.analyticsRequests": "Yêu cầu",
   "routing.analyticsEmpty": "Chưa có phân tích nào — hãy gửi vài yêu cầu trước.",
   "startup.title": "An toàn khởi động",
-  "startup.subtitle": "Xác minh rằng Codex có thể kết nối với opencodex sau khi khởi động lại, trước khi proxy định tuyến cục bộ trở thành một vòng lặp kết nối lại.",
+  "startup.subtitle":
+    "Xác minh rằng Codex có thể kết nối với opencodex sau khi khởi động lại, trước khi proxy định tuyến cục bộ trở thành một vòng lặp kết nối lại.",
   "startup.refresh": "Làm mới",
   "startup.backToDashboard": "Quay lại Bảng điều khiển",
   "startup.loading": "Đang kiểm tra bảo vệ khởi động…",
   "startup.error": "Không thể đọc bảo vệ khởi động.",
-  "startup.staleData": "Lần kiểm tra khởi động gần nhất thất bại. Các giá trị bên dưới đã cũ và không được coi là bằng chứng bảo vệ.",
+  "startup.staleData":
+    "Lần kiểm tra khởi động gần nhất thất bại. Các giá trị bên dưới đã cũ và không được coi là bằng chứng bảo vệ.",
   "startup.status.native": "Định tuyến native",
   "startup.status.protected": "Bảo vệ khi khởi động lại",
   "startup.status.atRisk": "Cần hành động",
   "startup.summary.native": "Codex không phụ thuộc vào proxy cục bộ",
   "startup.summary.protected": "opencodex sẽ khả dụng sau khi khởi động lại",
   "startup.summary.atRisk": "Codex có thể mất kết nối model sau khi khởi động lại",
-  "startup.riskDetail": "Codex được ghim vào proxy cục bộ, nhưng không có service nền hoặc launcher shim khoẻ mạnh nào sẽ khởi động lại nó.",
-  "startup.riskDetailCustomLocal": "Codex trỏ đến một cổng cục bộ (custom local gateway) tùy chỉnh. opencodex không thể quản lý hoặc xác minh vòng đời khởi động lại của cổng đó.",
-  "startup.riskDetailWindowsShim": "Launcher shim bảo vệ các tập lệnh CLI được hỗ trợ, nhưng Codex Desktop và các lần khởi chạy codex.exe trực tiếp có thể bỏ qua nó trên Windows.",
-  "startup.safeDetail": "Cơ chế định tuyến và khởi động hiện tại đã nhất quán. Sẽ không cần phải khởi động ocx thủ công sau khi khởi động lại.",
+  "startup.riskDetail":
+    "Codex được ghim vào proxy cục bộ, nhưng không có service nền hoặc launcher shim khoẻ mạnh nào sẽ khởi động lại nó.",
+  "startup.riskDetailCustomLocal":
+    "Codex trỏ đến một cổng cục bộ (custom local gateway) tùy chỉnh. opencodex không thể quản lý hoặc xác minh vòng đời khởi động lại của cổng đó.",
+  "startup.riskDetailWindowsShim":
+    "Launcher shim bảo vệ các tập lệnh CLI được hỗ trợ, nhưng Codex Desktop và các lần khởi chạy codex.exe trực tiếp có thể bỏ qua nó trên Windows.",
+  "startup.safeDetail":
+    "Cơ chế định tuyến và khởi động hiện tại đã nhất quán. Sẽ không cần phải khởi động ocx thủ công sau khi khởi động lại.",
   "startup.routing": "Định tuyến Codex",
   "startup.routing.proxy": "Proxy cục bộ",
   "startup.routing.native": "OpenAI gốc",
@@ -434,7 +494,8 @@ export const vi: Record<TKey, string> = {
   "startup.conflict": "Xung đột service",
   "startup.installedDisabled": "Đã cài đặt nhưng bị vô hiệu hoá",
   "startup.shimActivationPending": "Đã cài đặt · chưa xác nhận kích hoạt",
-  "startup.shimActivationHint": "Thêm . ~/.opencodex/codex-shell-env.sh sau các thiết lập PATH khác trong tệp khởi động shell, rồi mở terminal mới. Bảng điều khiển không phải lúc nào cũng thấy PATH của shell.",
+  "startup.shimActivationHint":
+    "Thêm . ~/.opencodex/codex-shell-env.sh sau các thiết lập PATH khác trong tệp khởi động shell, rồi mở terminal mới. Bảng điều khiển không phải lúc nào cũng thấy PATH của shell.",
   "startup.install": "Cài đặt",
   "startup.installing": "Đang cài đặt…",
   "startup.repair": "Sửa chữa",
@@ -445,7 +506,8 @@ export const vi: Record<TKey, string> = {
   "startup.shimRepaired": "Codex launcher shim đã được sửa chữa thành công.",
   "startup.installFailed": "Cài đặt thất bại:",
   "startup.recovery": "Các tuỳ chọn sửa chữa",
-  "startup.recoveryHint": "Sử dụng các trình cài đặt một click ở trên, hoặc sao chép lệnh để sửa chữa thủ công. Service nền được khuyến nghị dùng cho Codex Desktop và các tệp thực thi Windows.",
+  "startup.recoveryHint":
+    "Sử dụng các trình cài đặt một click ở trên, hoặc sao chép lệnh để sửa chữa thủ công. Service nền được khuyến nghị dùng cho Codex Desktop và các tệp thực thi Windows.",
   "startup.command.service": "Khuyên dùng: service nền bền bỉ",
   "startup.command.shim": "Tuỳ chọn thay thế: launcher shim cho CLI",
   "startup.command.native": "An toàn dự phòng (Fail-safe): khôi phục định tuyến native cho Codex",
@@ -453,10 +515,14 @@ export const vi: Record<TKey, string> = {
   "startup.copied": "Đã sao chép",
   "startup.recommended": "Sửa chữa được đề xuất: {cmd}",
   "startup.navRisk": "Bảo vệ khởi động cần sự chú ý",
-  "startup.codexRuntime.clampHidden": "Một số tùy chọn effort suy luận đã bị ẩn do OpenCodex đang sử dụng Codex {version}.",
-  "startup.codexRuntime.clampHiddenWithEfforts": "Một số tùy chọn effort suy luận đã bị ẩn do OpenCodex đang sử dụng Codex {version} (đã gỡ: {efforts}).",
-  "startup.codexRuntime.olderBinary": "OpenCodex đang sử dụng một tệp nhị phân Codex cũ hơn ({version}). Có một bản cài đặt mới hơn khả dụng.",
-  "dash.subtitle": "Trạng thái trực tiếp của opencodex proxy cục bộ, các providers của nó và các models được định tuyến vào Codex.",
+  "startup.codexRuntime.clampHidden":
+    "Một số tùy chọn effort suy luận đã bị ẩn do OpenCodex đang sử dụng Codex {version}.",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "Một số tùy chọn effort suy luận đã bị ẩn do OpenCodex đang sử dụng Codex {version} (đã gỡ: {efforts}).",
+  "startup.codexRuntime.olderBinary":
+    "OpenCodex đang sử dụng một tệp nhị phân Codex cũ hơn ({version}). Có một bản cài đặt mới hơn khả dụng.",
+  "dash.subtitle":
+    "Trạng thái trực tiếp của opencodex proxy cục bộ, các providers của nó và các models được định tuyến vào Codex.",
   "dash.workspace.overview": "Tổng quan",
   "dash.workspace.sections": "Các phần",
   "dash.status": "Trạng thái",
@@ -468,7 +534,8 @@ export const vi: Record<TKey, string> = {
   "dash.tokens30d": "Tokens (30 ngày)",
   "dash.coverage": "{pct} độ phủ",
   "dash.mem.title": "Khả năng quan sát bộ nhớ",
-  "dash.mem.hint": "Chẩn đoán runtime chỉ đọc. Bộ nhớ được quan sát là max(RSS, external, ArrayBuffers) nên việc Windows xén bộ nhớ làm việc không che giấu mức giữ bộ nhớ đã cấp phát.",
+  "dash.mem.hint":
+    "Chẩn đoán runtime chỉ đọc. Bộ nhớ được quan sát là max(RSS, external, ArrayBuffers) nên việc Windows xén bộ nhớ làm việc không che giấu mức giữ bộ nhớ đã cấp phát.",
   "dash.mem.rss": "Tập hợp thường trú (RSS)",
   "dash.mem.jsHeap": "JS heap đang dùng",
   "dash.mem.jsHeapArena": "vùng {total}",
@@ -483,7 +550,8 @@ export const vi: Record<TKey, string> = {
   "dash.mem.growth": "Sự sai lệch (drift) / giờ đã quan sát",
   "dash.mem.perHour": "/g",
   "dash.mem.store": "Lưu trữ phần tiếp nối (Continuation store)",
-  "dash.mem.storeHint": "Bộ đệm previous_response_id của proxy. Tổng byte tăng dần dưới một heap đang tăng chỉ ra rằng nguyên nhân là do giữ lại các cuộc hội thoại thay vì từ trình cấp phát thời gian chạy.",
+  "dash.mem.storeHint":
+    "Bộ đệm previous_response_id của proxy. Tổng byte tăng dần dưới một heap đang tăng chỉ ra rằng nguyên nhân là do giữ lại các cuộc hội thoại thay vì từ trình cấp phát thời gian chạy.",
   "dash.mem.storeEntries": "Mục nhập",
   "dash.mem.storeTotal": "Tổng cộng",
   "dash.mem.storeLargest": "Lớn nhất",
@@ -495,11 +563,14 @@ export const vi: Record<TKey, string> = {
   "dash.mem.unavailable": "Chẩn đoán bộ nhớ không khả dụng (proxy phiên bản cũ hơn).",
   "dash.mem.inFlight": "Các yêu cầu đang xử lý (In-flight requests)",
   "dash.mem.restart": "Xả & khởi động lại",
-  "dash.mem.restartConfirm": "Chờ {count} yêu cầu đang xử lý, sau đó khởi động lại (tối đa {seconds} giây; các yêu cầu còn lại sẽ bị ngắt khi hết thời gian).",
+  "dash.mem.restartConfirm":
+    "Chờ {count} yêu cầu đang xử lý, sau đó khởi động lại (tối đa {seconds} giây; các yêu cầu còn lại sẽ bị ngắt khi hết thời gian).",
   "dash.mem.draining": "Đang xả {count} yêu cầu… sẽ khởi động lại khi hoàn tất",
   "dash.mem.reconnecting": "Proxy đang khởi động lại… đang đợi kết nối lại",
-  "dash.mem.restartFailed": "Xả & khởi động lại thất bại. Vui lòng kiểm tra xem proxy có đang chạy không.",
-  "dash.mem.restartNoSupervisor": "Không phát hiện thấy bảo vệ khởi động lại. Proxy có thể vẫn ngừng hoạt động sau khi khởi động lại trừ khi bạn khởi động lại nó.",
+  "dash.mem.restartFailed":
+    "Xả & khởi động lại thất bại. Vui lòng kiểm tra xem proxy có đang chạy không.",
+  "dash.mem.restartNoSupervisor":
+    "Không phát hiện thấy bảo vệ khởi động lại. Proxy có thể vẫn ngừng hoạt động sau khi khởi động lại trừ khi bạn khởi động lại nó.",
   "dash.activeProviders": "Các provider đang hoạt động",
   "dash.noProviders": "Chưa có provider nào được cấu hình. Hãy chạy {cmd}.",
   "dash.col.name": "Tên",
@@ -515,38 +586,52 @@ export const vi: Record<TKey, string> = {
   "dash.stopConfirm": "Dừng proxy và khôi phục native Codex?",
   "dash.stopFailed": "Không thể dừng proxy (HTTP {status}).",
   "dash.stopStillRunning": "Proxy vẫn đang phản hồi nên chưa dừng.",
-  "dash.stopUnknown": "Chưa xác nhận được việc dừng. Hãy kiểm tra proxy còn chạy không trước khi thử lại.",
+  "dash.stopUnknown":
+    "Chưa xác nhận được việc dừng. Hãy kiểm tra proxy còn chạy không trước khi thử lại.",
   "dash.maSwitchFailed": "Chuyển đổi chế độ thất bại (HTTP {status}).",
   "dash.maNetworkError": "Lỗi mạng — có phải proxy đang chạy không?",
   "dash.stopping": "Đang dừng…",
   "dash.actions": "Proxy",
   "dash.codexRestart": "Tải lại các models của Codex",
   "dash.codexRestarting": "Đang dừng…",
-  "dash.codexRestartConfirm": "Dừng app-servers của Codex để chúng tải lại danh sách model? Bất kỳ lượt chạy Codex nào đang tiến hành sẽ bị gián đoạn và Codex không tự khởi chạy lại — bạn cần mở lại nó sau đó.",
-  "dash.codexRestartDone": "Đã dừng {count} app-server(s) của Codex. Hãy mở lại Codex để tải danh sách model hiện tại.",
-  "dash.codexRestartNothing": "Không có app-server Codex nào đang chạy. Lần khởi chạy tiếp theo sẽ đọc danh sách model hiện tại.",
+  "dash.codexRestartConfirm":
+    "Dừng app-servers của Codex để chúng tải lại danh sách model? Bất kỳ lượt chạy Codex nào đang tiến hành sẽ bị gián đoạn và Codex không tự khởi chạy lại — bạn cần mở lại nó sau đó.",
+  "dash.codexRestartDone":
+    "Đã dừng {count} app-server(s) của Codex. Hãy mở lại Codex để tải danh sách model hiện tại.",
+  "dash.codexRestartNothing":
+    "Không có app-server Codex nào đang chạy. Lần khởi chạy tiếp theo sẽ đọc danh sách model hiện tại.",
   "dash.codexRestartUnknown": "Không thể liệt kê các tiến trình, do đó không có gì bị dừng.",
-  "dash.codexRestartPartial": "{count} app-server(s) đã không thoát. Hãy dừng chúng thủ công nếu danh sách model vẫn còn cũ.",
+  "dash.codexRestartPartial":
+    "{count} app-server(s) đã không thoát. Hãy dừng chúng thủ công nếu danh sách model vẫn còn cũ.",
   "dash.codexRestartFailed": "Không thể tải lại các models của Codex (HTTP {status}).",
   "dash.codexRestartUnreachable": "Không thể kết nối với proxy.",
   "dash.codexRestartMalformed": "Proxy trả về phản hồi không mong đợi.",
-  "dash.codexRestartTimeout": "Proxy không phản hồi đúng thời gian. Nó có thể vẫn đang dừng các app-servers.",
-  "models.staleBanner": "Codex đang hiển thị danh sách model cũ hơn so với catalog này. Hãy khởi động lại Codex để tải lại.",
+  "dash.codexRestartTimeout":
+    "Proxy không phản hồi đúng thời gian. Nó có thể vẫn đang dừng các app-servers.",
+  "models.staleBanner":
+    "Codex đang hiển thị danh sách model cũ hơn so với catalog này. Hãy khởi động lại Codex để tải lại.",
   "dash.codexAutoStart": "Khởi động opencodex cùng với Codex",
-  "dash.codexAutoStartHint": "Cho phép launcher shim đã cài đặt chạy ocx ensure. Cài đặt này không cài đặt bảo vệ khởi động lại; vui lòng kiểm tra tính năng an toàn khởi động để biết trạng thái hiệu lực.",
+  "dash.codexAutoStartHint":
+    "Cho phép launcher shim đã cài đặt chạy ocx ensure. Cài đặt này không cài đặt bảo vệ khởi động lại; vui lòng kiểm tra tính năng an toàn khởi động để biết trạng thái hiệu lực.",
   "dash.searchModel": "Sidecar model tìm kiếm",
-  "dash.searchModelHint": "Model được sử dụng cho tính năng web_search trên các models định tuyến không thuộc OpenAI. Yêu cầu đăng nhập ChatGPT.",
+  "dash.searchModelHint":
+    "Model được sử dụng cho tính năng web_search trên các models định tuyến không thuộc OpenAI. Yêu cầu đăng nhập ChatGPT.",
   "dash.searchReasoning": "Mức độ lý luận tìm kiếm (reasoning effort)",
   "dash.visionModel": "Sidecar model hình ảnh (vision)",
-  "dash.visionModelHint": "Model được sử dụng để mô tả hình ảnh cho các model định tuyến chỉ hỗ trợ văn bản. Yêu cầu đăng nhập ChatGPT.",
+  "dash.visionModelHint":
+    "Model được sử dụng để mô tả hình ảnh cho các model định tuyến chỉ hỗ trợ văn bản. Yêu cầu đăng nhập ChatGPT.",
   "dash.webSearchSidecar": "Web search sidecar",
-  "dash.webSearchSidecarHint": "Chọn backend và model được sử dụng cho tìm kiếm web trên các models định tuyến.",
+  "dash.webSearchSidecarHint":
+    "Chọn backend và model được sử dụng cho tìm kiếm web trên các models định tuyến.",
   "dash.webSearchOff": "Tắt",
-  "dash.webSearchCodexSync": "Đã lưu. Cấu hình Codex chưa được ghi lại — hãy chạy “Đồng bộ models”.",
+  "dash.webSearchCodexSync":
+    "Đã lưu. Cấu hình Codex chưa được ghi lại — hãy chạy “Đồng bộ models”.",
   "dash.webSearchStream": "Phát trực tuyến (Stream) các câu trả lời trực tiếp",
-  "dash.webSearchStreamHint": "Phát trực tuyến các văn bản dẫn dắt và quá trình lý luận của model cho đến khi nó quyết định gọi một công cụ; phần còn lại của lượt chạy sẽ được lưu đệm (buffered) để can thiệp tìm kiếm. Văn bản được viết trước một tìm kiếm có thể lặp lại một phần.",
+  "dash.webSearchStreamHint":
+    "Phát trực tuyến các văn bản dẫn dắt và quá trình lý luận của model cho đến khi nó quyết định gọi một công cụ; phần còn lại của lượt chạy sẽ được lưu đệm (buffered) để can thiệp tìm kiếm. Văn bản được viết trước một tìm kiếm có thể lặp lại một phần.",
   "dash.visionSidecar": "Vision sidecar",
-  "dash.visionSidecarHint": "Chọn backend và model được sử dụng để mô tả hình ảnh cho các model định tuyến chỉ hỗ trợ văn bản.",
+  "dash.visionSidecarHint":
+    "Chọn backend và model được sử dụng để mô tả hình ảnh cho các model định tuyến chỉ hỗ trợ văn bản.",
   "dash.visionOff": "Tắt",
   "dash.visionAdvanced": "Cài đặt nâng cao",
   "dash.visionMaxDescriptions": "Số lượng mô tả tối đa mỗi lượt",
@@ -555,7 +640,8 @@ export const vi: Record<TKey, string> = {
   "dash.visionTimeoutInvalid": "Vui lòng nhập một số nguyên từ {min} đến {max} milliseconds.",
   "dash.visionAdvancedPopover": "Cài đặt vision nâng cao",
   "compactionRouting.title": "Định tuyến nén",
-  "compactionRouting.description": "Chọn model cho các yêu cầu nén của Codex và những trường hợp nó áp dụng. Các tin nhắn sau vẫn giữ thiết lập của cuộc trò chuyện.",
+  "compactionRouting.description":
+    "Chọn model cho các yêu cầu nén của Codex và những trường hợp nó áp dụng. Các tin nhắn sau vẫn giữ thiết lập của cuộc trò chuyện.",
   "compactionRouting.model": "Model nén",
   "compactionRouting.effort": "Mức suy luận",
   "compactionRouting.triggers": "Áp dụng cho",
@@ -569,32 +655,44 @@ export const vi: Record<TKey, string> = {
   "compactionRouting.sourcesModels": "Từng model",
   "compactionRouting.sourcesSaved": "Bộ chọn đã lưu không có trong danh mục hiện tại",
   "compactionRouting.sourcesNone": "Chọn ít nhất một nguồn, hoặc quay lại tất cả model hội thoại.",
-  "compactionRouting.sourcesHint": "Chỉ áp dụng ghi đè khi model nguồn của yêu cầu nén khớp với model đã chọn hoặc provider/*. Các yêu cầu không khớp vẫn dùng model của chính mình.",
+  "compactionRouting.sourcesHint":
+    "Chỉ áp dụng ghi đè khi model nguồn của yêu cầu nén khớp với model đã chọn hoặc provider/*. Các yêu cầu không khớp vẫn dùng model của chính mình.",
   "compactionRouting.sourcesGridTitle": "Định tuyến lại yêu cầu nén có model nguồn khớp với:",
   "compactionRouting.currentModel": "Dùng model của cuộc trò chuyện",
   "compactionRouting.currentEffort": "Giữ mức suy luận của yêu cầu",
-  "compactionRouting.effortHint": "Mức suy luận được áp dụng nếu điểm cuối nén hỗ trợ. Model phải tiếp nhận được toàn bộ cuộc trò chuyện.",
-  "compactionRouting.dataNotice": "Yêu cầu nén thuộc phạm vi áp dụng sẽ gửi toàn bộ cuộc trò chuyện đến nhà cung cấp của model đã chọn để tóm tắt, ngay cả khi cuộc trò chuyện đang chạy ở nhà cung cấp khác.",
-  "compactionRouting.autoNotice": "Nén tự động tự chạy, nên một cuộc trò chuyện dài có thể được gửi đến nhà cung cấp đó mà bạn không yêu cầu.",
-  "compactionRouting.providerWarning": "Với thiết lập này, mỗi yêu cầu nén thuộc phạm vi áp dụng sẽ gửi toàn bộ nội dung cuộc trò chuyện đến {provider} để tóm tắt.",
-  "compactionRouting.providerWarningScoped": "Với thiết lập này, chỉ các yêu cầu nén có model nguồn khớp với {sources} mới gửi toàn bộ nội dung cuộc trò chuyện đến {provider} để tóm tắt; yêu cầu không khớp vẫn dùng model nguồn.",
+  "compactionRouting.effortHint":
+    "Mức suy luận được áp dụng nếu điểm cuối nén hỗ trợ. Model phải tiếp nhận được toàn bộ cuộc trò chuyện.",
+  "compactionRouting.dataNotice":
+    "Yêu cầu nén thuộc phạm vi áp dụng sẽ gửi toàn bộ cuộc trò chuyện đến nhà cung cấp của model đã chọn để tóm tắt, ngay cả khi cuộc trò chuyện đang chạy ở nhà cung cấp khác.",
+  "compactionRouting.autoNotice":
+    "Nén tự động tự chạy, nên một cuộc trò chuyện dài có thể được gửi đến nhà cung cấp đó mà bạn không yêu cầu.",
+  "compactionRouting.providerWarning":
+    "Với thiết lập này, mỗi yêu cầu nén thuộc phạm vi áp dụng sẽ gửi toàn bộ nội dung cuộc trò chuyện đến {provider} để tóm tắt.",
+  "compactionRouting.providerWarningScoped":
+    "Với thiết lập này, chỉ các yêu cầu nén có model nguồn khớp với {sources} mới gửi toàn bộ nội dung cuộc trò chuyện đến {provider} để tóm tắt; yêu cầu không khớp vẫn dùng model nguồn.",
   "compactionRouting.loadFailed": "Không thể tải cài đặt nén.",
   "compactionRouting.saved": "Đã lưu cài đặt nén.",
   "compactionRouting.saveFailed": "Không thể lưu. Thay đổi của bạn vẫn còn; hãy thử lại.",
   "memoryModels.title": "Định tuyến bộ nhớ",
-  "memoryModels.description": "Codex ghi bộ nhớ ở chế độ nền sau khi phiên kết thúc. Chọn mô hình cho từng giai đoạn hoặc giữ tuyến hiện tại.",
+  "memoryModels.description":
+    "Codex ghi bộ nhớ ở chế độ nền sau khi phiên kết thúc. Chọn mô hình cho từng giai đoạn hoặc giữ tuyến hiện tại.",
   "memoryModels.infoLabel": "Extract và Consolidation là gì?",
-  "memoryModels.info": "Codex biến các phiên đã kết thúc thành bộ nhớ qua hai bước. Extract đọc một phiên đã kết thúc và ghi lại những gì đã diễn ra: một ghi chú cho mỗi phiên, nên có nhiều lời gọi nhỏ. Consolidation lấy các ghi chú đó và ghi vào các tệp bộ nhớ mà Codex đọc khi bắt đầu các phiên sau. Hiếm khi chạy nhưng có sửa tệp. Mỗi bước tự yêu cầu mô hình riêng, nên ở đây chúng được tách riêng.",
+  "memoryModels.info":
+    "Codex biến các phiên đã kết thúc thành bộ nhớ qua hai bước. Extract đọc một phiên đã kết thúc và ghi lại những gì đã diễn ra: một ghi chú cho mỗi phiên, nên có nhiều lời gọi nhỏ. Consolidation lấy các ghi chú đó và ghi vào các tệp bộ nhớ mà Codex đọc khi bắt đầu các phiên sau. Hiếm khi chạy nhưng có sửa tệp. Mỗi bước tự yêu cầu mô hình riêng, nên ở đây chúng được tách riêng.",
   "memoryModels.extract": "Trích xuất",
-  "memoryModels.extractHint": "Tóm tắt mỗi phiên đã kết thúc thành một bộ nhớ thô. Chạy một lần mỗi phiên.",
+  "memoryModels.extractHint":
+    "Tóm tắt mỗi phiên đã kết thúc thành một bộ nhớ thô. Chạy một lần mỗi phiên.",
   "memoryModels.consolidation": "Hợp nhất",
-  "memoryModels.consolidationHint": "Hợp nhất các bộ nhớ thô vào tệp bộ nhớ mà Codex đọc sau này. Hiếm khi chạy và có sửa tệp.",
+  "memoryModels.consolidationHint":
+    "Hợp nhất các bộ nhớ thô vào tệp bộ nhớ mà Codex đọc sau này. Hiếm khi chạy và có sửa tệp.",
   "memoryModels.model": "Mô hình",
   "memoryModels.effort": "Mức suy luận",
   "memoryModels.off": "Tắt",
   "memoryModels.defaultEffort": "Mặc định của Codex",
-  "memoryModels.dataNotice": "Mô hình được chọn nhận đầu vào của giai đoạn đó: phiên đã kết thúc với Extract, bộ nhớ thô với Consolidation.",
-  "memoryModels.accountNotice": "Ở đây chỉ có một giai đoạn được định tuyến; giai đoạn còn lại giữ nguyên tuyến hiện có. Shadow Call Intercept cũng có thể gửi các lệnh gọi bộ nhớ của giai đoạn đó tới mô hình đã đặt.",
+  "memoryModels.dataNotice":
+    "Mô hình được chọn nhận đầu vào của giai đoạn đó: phiên đã kết thúc với Extract, bộ nhớ thô với Consolidation.",
+  "memoryModels.accountNotice":
+    "Ở đây chỉ có một giai đoạn được định tuyến; giai đoạn còn lại giữ nguyên tuyến hiện có. Shadow Call Intercept cũng có thể gửi các lệnh gọi bộ nhớ của giai đoạn đó tới mô hình đã đặt.",
   "memoryModels.loadFailed": "Không tải được cài đặt bộ nhớ.",
   "memoryModels.saved": "Đã lưu cài đặt bộ nhớ.",
   "memoryModels.saveFailed": "Không lưu được. Thay đổi của bạn vẫn còn; hãy thử lại.",
@@ -607,21 +705,31 @@ export const vi: Record<TKey, string> = {
   "shadowCall.sourceMemory": "Bộ nhớ",
   "shadowCall.sourceLegacy": "Cũ",
   "shadowCall.sourceCustom": "Tùy chỉnh",
-  "shadowCall.sourceHint": "Chỉ các nguồn được bật mới được đánh chặn. Phải giữ ít nhất một nguồn; dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow. Định tuyến bộ nhớ vẫn được ưu tiên cho hợp nhất khi đã cấu hình.",
-  "shadowCall.sourceCovered": "Được bao phủ bởi tiền tố tùy chỉnh {prefix}. Hãy xóa hoặc thu hẹp tiền tố đó trong config.json để bật/tắt riêng nguồn này.",
-  "shadowCall.sourceLastRequired": "Phải giữ ít nhất một nguồn. Dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow.",
-  "dash.shadowCallInterceptHint": "Đánh chặn các lệnh gọi helper nền của ứng dụng Codex để tạo tiêu đề, commit message và điều phối kĩ năng. Chọn model nguồn bên dưới. Hợp nhất bộ nhớ thường chạy trên Terra và tuân theo Định tuyến bộ nhớ khi đã cấu hình.",
-  "dash.shadowCallWarning": "⚠ Khi được bật, yêu cầu cho mọi nguồn đã chọn ({models}) sẽ được thay thế bằng model đã chọn. Terra là tùy chọn; Định tuyến bộ nhớ vẫn được ưu tiên cho hợp nhất.",
+  "shadowCall.sourceHint":
+    "Chỉ các nguồn được bật mới được đánh chặn. Phải giữ ít nhất một nguồn; dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow. Định tuyến bộ nhớ vẫn được ưu tiên cho hợp nhất khi đã cấu hình.",
+  "shadowCall.sourceCovered":
+    "Được bao phủ bởi tiền tố tùy chỉnh {prefix}. Hãy xóa hoặc thu hẹp tiền tố đó trong config.json để bật/tắt riêng nguồn này.",
+  "shadowCall.sourceLastRequired":
+    "Phải giữ ít nhất một nguồn. Dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow.",
+  "dash.shadowCallInterceptHint":
+    "Đánh chặn các lệnh gọi helper nền của ứng dụng Codex để tạo tiêu đề, commit message và điều phối kĩ năng. Chọn model nguồn bên dưới. Hợp nhất bộ nhớ thường chạy trên Terra và tuân theo Định tuyến bộ nhớ khi đã cấu hình.",
+  "dash.shadowCallWarning":
+    "⚠ Khi được bật, yêu cầu cho mọi nguồn đã chọn ({models}) sẽ được thay thế bằng model đã chọn. Terra là tùy chọn; Định tuyến bộ nhớ vẫn được ưu tiên cho hợp nhất.",
   "dash.shadowCallOriginal": "Gốc",
   "dash.shadowCallModel": "Model thay thế",
-  "dash.shadowCallTooltip": "Ứng dụng Codex thực hiện các lệnh gọi helper ngầm để tạo tiêu đề chuỗi, tạo commit message và điều phối các kĩ năng. Helper model thay đổi giữa các phiên bản client, nên opencodex có thể đánh chặn nhiều nguồn. Chọn từng nguồn bạn muốn chuyển hướng bên dưới. Terra là model hợp nhất bộ nhớ và mặc định tắt vì Codex cũng chọn nó cho công việc thường; khi đã cấu hình model hợp nhất trong Định tuyến bộ nhớ, tuyến đó được ưu tiên. Phải giữ ít nhất một nguồn; dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow.",
+  "dash.shadowCallTooltip":
+    "Ứng dụng Codex thực hiện các lệnh gọi helper ngầm để tạo tiêu đề chuỗi, tạo commit message và điều phối các kĩ năng. Helper model thay đổi giữa các phiên bản client, nên opencodex có thể đánh chặn nhiều nguồn. Chọn từng nguồn bạn muốn chuyển hướng bên dưới. Terra là model hợp nhất bộ nhớ và mặc định tắt vì Codex cũng chọn nó cho công việc thường; khi đã cấu hình model hợp nhất trong Định tuyến bộ nhớ, tuyến đó được ưu tiên. Phải giữ ít nhất một nguồn; dùng công tắc chính để tắt việc đánh chặn mọi lệnh gọi shadow.",
   "models.shadowCallIntercept": "Shadow Call Intercept",
-  "models.shadowCallInterceptHint": "Đánh chặn các lệnh gọi helper nền của ứng dụng Codex để tạo tiêu đề, commit message và điều phối kĩ năng. Chọn model nguồn bên dưới. Hợp nhất bộ nhớ thường chạy trên Terra và tuân theo Định tuyến bộ nhớ khi đã cấu hình.",
+  "models.shadowCallInterceptHint":
+    "Đánh chặn các lệnh gọi helper nền của ứng dụng Codex để tạo tiêu đề, commit message và điều phối kĩ năng. Chọn model nguồn bên dưới. Hợp nhất bộ nhớ thường chạy trên Terra và tuân theo Định tuyến bộ nhớ khi đã cấu hình.",
   "models.shadowCallSaveFailed": "Không thể lưu cài đặt lệnh gọi shadow.",
-  "models.shadowCallTargetInvalid": "Model thay thế trùng với một nguồn đang bật. Hãy chọn model thay thế khác.",
-  "models.shadowCallSourceInvalid": "Lựa chọn nguồn này không hợp lệ. Hãy chọn ít nhất một nguồn không có khoảng trắng hoặc tiền tố nhà cung cấp.",
+  "models.shadowCallTargetInvalid":
+    "Model thay thế trùng với một nguồn đang bật. Hãy chọn model thay thế khác.",
+  "models.shadowCallSourceInvalid":
+    "Lựa chọn nguồn này không hợp lệ. Hãy chọn ít nhất một nguồn không có khoảng trắng hoặc tiền tố nhà cung cấp.",
   "models.autoReviewOverride": "Ghi đè duyệt tự động",
-  "models.autoReviewOverrideHint": "Chọn model Codex dùng cho việc duyệt tự động (mô hình đánh giá phê duyệt). Áp dụng cho mọi hàng trong catalog khi đồng bộ; autoReviewModel ở cấp nhà cung cấp vẫn được ưu tiên trên các hàng đó.",
+  "models.autoReviewOverrideHint":
+    "Chọn model Codex dùng cho việc duyệt tự động (mô hình đánh giá phê duyệt). Áp dụng cho mọi hàng trong catalog khi đồng bộ; autoReviewModel ở cấp nhà cung cấp vẫn được ưu tiên trên các hàng đó.",
   "models.autoReviewPending": "Đang chờ",
   "dash.sidecarBackend": "Backend",
   "dash.sidecarModel": "Model",
@@ -631,34 +739,42 @@ export const vi: Record<TKey, string> = {
   "dash.sidecarSaved": "Cài đặt sidecar đã được lưu. Sẽ được áp dụng trong yêu cầu tiếp theo.",
   "dash.sidecarSaveFailed": "Lưu cài đặt sidecar thất bại.",
   "dash.injectionLabel": "Ủy quyền sub-agent",
-  "dash.injectionHint": "Chọn model mà Codex sẽ dùng để giao công việc cho các sub-agents. Hai tuỳ chọn bên dưới sẽ quyết định nơi sử dụng lựa chọn này.",
+  "dash.injectionHint":
+    "Chọn model mà Codex sẽ dùng để giao công việc cho các sub-agents. Hai tuỳ chọn bên dưới sẽ quyết định nơi sử dụng lựa chọn này.",
   "dash.injectionManage": "Mở cài đặt",
   "dash.syncCodexSubagentDefaults": "Đồng thời lưu dưới dạng cài đặt mặc định của Codex",
-  "dash.syncCodexSubagentDefaultsHint": "Khi Bật, lựa chọn ở trên sẽ được ghi vào cấu hình riêng của Codex, để các tác vụ mới cũng bắt đầu với model đó. Khi Tắt, nó chỉ được ghi nhớ ở đây. Cài đặt này có hiệu lực ở lần đồng bộ hóa hoặc lần khởi động lại tiếp theo, và các cài đặt [agents] do bạn tự viết sẽ được giữ nguyên.",
+  "dash.syncCodexSubagentDefaultsHint":
+    "Khi Bật, lựa chọn ở trên sẽ được ghi vào cấu hình riêng của Codex, để các tác vụ mới cũng bắt đầu với model đó. Khi Tắt, nó chỉ được ghi nhớ ở đây. Cài đặt này có hiệu lực ở lần đồng bộ hóa hoặc lần khởi động lại tiếp theo, và các cài đặt [agents] do bạn tự viết sẽ được giữ nguyên.",
   "dash.multiAgentGuidance": "Hướng dẫn Codex cách phân chia công việc",
-  "dash.multiAgentGuidanceHint": "Gửi một ghi chú ngắn cho Codex để cho biết cách thức giao việc cho các sub-agents. Đối với v2, nó chỉ định các models có thể sử dụng và model nào nên được ưu tiên; đối với v1, nó chỉ áp dụng ở mức độ lý luận max hoặc ultra. Khi Tắt, sẽ không có ghi chú nào được thêm vào.",
+  "dash.multiAgentGuidanceHint":
+    "Gửi một ghi chú ngắn cho Codex để cho biết cách thức giao việc cho các sub-agents. Đối với v2, nó chỉ định các models có thể sử dụng và model nào nên được ưu tiên; đối với v1, nó chỉ áp dụng ở mức độ lý luận max hoặc ultra. Khi Tắt, sẽ không có ghi chú nào được thêm vào.",
   "dash.injectionNone": "Không có",
   "dash.injectionEffortLabel": "Effort lý luận",
   "dash.injectionEffortNone": "Mặc định của Model",
   "dash.effortCapLabel": "Giới hạn effort V2 ultra",
   "dash.subagentEffortCapLabel": "Giới hạn effort V2 sub-agent",
-  "dash.effortCapHelp": "Giới hạn effort suy luận cho các lượt chạy ở chế độ V2 ultra. Khi được thiết lập, các yêu cầu có effort tối đa (từ chế độ ultra) sẽ bị giới hạn ở mức đã chọn. Giới hạn sub-agent chỉ áp dụng cho các agent con được tạo ra. Các giới hạn này chỉ có tác dụng giảm effort, không bao giờ tăng nó. Nếu một model không hỗ trợ mức giới hạn đó, nó sẽ tự động giảm xuống mức được hỗ trợ gần nhất.",
+  "dash.effortCapHelp":
+    "Giới hạn effort suy luận cho các lượt chạy ở chế độ V2 ultra. Khi được thiết lập, các yêu cầu có effort tối đa (từ chế độ ultra) sẽ bị giới hạn ở mức đã chọn. Giới hạn sub-agent chỉ áp dụng cho các agent con được tạo ra. Các giới hạn này chỉ có tác dụng giảm effort, không bao giờ tăng nó. Nếu một model không hỗ trợ mức giới hạn đó, nó sẽ tự động giảm xuống mức được hỗ trợ gần nhất.",
   "dash.effortCapNone": "Không giới hạn",
   "dash.maintenance": "Bảo trì",
-  "dash.maintenanceHint": "Làm mới danh sách models của Codex hoặc cài đặt bản phát hành opencodex mới hơn.",
+  "dash.maintenanceHint":
+    "Làm mới danh sách models của Codex hoặc cài đặt bản phát hành opencodex mới hơn.",
   "dash.syncModels": "Đồng bộ models",
   "dash.syncModelsHint": "Ghi lại catalog model của Codex từ các providers bạn đã kết nối.",
   "dash.syncRun": "Đồng bộ ngay",
   "dash.syncing": "Đang đồng bộ…",
   "dash.syncOk": "Đồng bộ hoàn tất. Đã thêm {count} model(s).",
-  "dash.syncStaleHint": "Nếu Codex vẫn hiển thị danh sách cũ, hãy khởi động lại app-server chạy nền của nó ({cmd}).",
+  "dash.syncStaleHint":
+    "Nếu Codex vẫn hiển thị danh sách cũ, hãy khởi động lại app-server chạy nền của nó ({cmd}).",
   "dash.syncFailed": "Đồng bộ thất bại: {error}",
   "dash.projectConfigTitle": "Cấu hình Codex dự án đang bỏ qua OpenCodex",
-  "dash.projectConfigHint": "Các cài đặt nội bộ trong repository này ghi đè proxy OpenCodex (ví dụ: định tuyến trực tiếp đến OpenCode Go). Hãy xóa chúng để định tuyến trong ~/.codex/config.toml được áp dụng cho dự án đó.",
+  "dash.projectConfigHint":
+    "Các cài đặt nội bộ trong repository này ghi đè proxy OpenCodex (ví dụ: định tuyến trực tiếp đến OpenCode Go). Hãy xóa chúng để định tuyến trong ~/.codex/config.toml được áp dụng cho dự án đó.",
   "dash.checkUpdate": "Kiểm tra bản cập nhật",
   "dash.updateReconnecting": "Đang chờ proxy khởi động lại…",
   "dash.updateVersionTransition": "{currentVersion} -> {latestVersion}.",
-  "prov.subtitle": "Cấu hình các upstream providers mà opencodex sẽ định tuyến vào Codex. Đăng nhập bằng một tài khoản, thêm một provider, hoặc chỉnh sửa file config trực tiếp.",
+  "prov.subtitle":
+    "Cấu hình các upstream providers mà opencodex sẽ định tuyến vào Codex. Đăng nhập bằng một tài khoản, thêm một provider, hoặc chỉnh sửa file config trực tiếp.",
   "prov.add": "Thêm Provider",
   "prov.editJson": "Chỉnh sửa JSON",
   "prov.accountLogin": "Đăng nhập tài khoản",
@@ -672,14 +788,16 @@ export const vi: Record<TKey, string> = {
   "prov.didntOpen": "Không mở được? Nhấp vào đây",
   "prov.copyLink": "Sao chép liên kết",
   "prov.dontOpenBrowser": "Không mở trình duyệt trên máy chạy proxy",
-  "prov.dontOpenBrowserHint": "Hữu ích đối với profile trình duyệt khác, hoặc khi bảng điều khiển (dashboard) không nằm trên máy cài proxy.",
+  "prov.dontOpenBrowserHint":
+    "Hữu ích đối với profile trình duyệt khác, hoặc khi bảng điều khiển (dashboard) không nằm trên máy cài proxy.",
   "prov.linkCopied": "Đã sao chép",
   "prov.linkCopyUnavailable": "Clipboard không khả dụng",
   "prov.deviceCode": "Mã thiết bị",
   "prov.copyCode": "Sao chép mã",
   "prov.copyCodeAndOpen": "Sao chép mã và mở",
   "prov.openSignInPage": "Mở trang đăng nhập",
-  "prov.browserLaunchFailed": "Trình duyệt không tự mở. Hãy mở trang đăng nhập bên dưới hoặc sao chép liên kết.",
+  "prov.browserLaunchFailed":
+    "Trình duyệt không tự mở. Hãy mở trang đăng nhập bên dưới hoặc sao chép liên kết.",
   "prov.codeCopied": "Đã sao chép mã",
   "prov.editAlias": "Chỉnh sửa bí danh",
   "prov.aliasPrompt": "Tên hiển thị (để trống để xoá)",
@@ -688,7 +806,8 @@ export const vi: Record<TKey, string> = {
   "prov.aliasInvalid": "Dùng tối đa 80 ký tự, không chứa ký tự điều khiển.",
   "prov.accountId": "ID",
   "prov.pasteRedirect": "Dán URL chuyển hướng hoặc mã",
-  "prov.pasteRedirectHint": "Nếu trình duyệt hiển thị lỗi localhost, hãy sao chép URL đầy đủ từ thanh địa chỉ và dán nó vào đây (hoặc dán authorization code).",
+  "prov.pasteRedirectHint":
+    "Nếu trình duyệt hiển thị lỗi localhost, hãy sao chép URL đầy đủ từ thanh địa chỉ và dán nó vào đây (hoặc dán authorization code).",
   "prov.pasteSubmit": "Gửi",
   "prov.pasteSubmitting": "Đang gửi…",
   "prov.pasteOk": "Mã đã được gửi — đang hoàn tất đăng nhập…",
@@ -704,53 +823,74 @@ export const vi: Record<TKey, string> = {
   "prov.loginError": "Lỗi đăng nhập {provider}: {error}",
   "prov.loginRequestFail": "Yêu cầu đăng nhập {provider} thất bại",
   "prov.loginCancelled": "Đã huỷ đăng nhập {provider}",
-  "prov.loginTimeout": "Đăng nhập {provider} bị quá thời gian (timed out) — trình duyệt đã đóng hoặc quá trình đăng nhập không hoàn tất. Hãy thử lại.",
-  "prov.loginOk": "Đã đăng nhập vào {provider}. Hãy chạy {cmd} (hoặc tự động áp dụng) để liệt kê các models của nó.",
-  "prov.loginSameAccount": "Vẫn là tài khoản {provider} đó — hãy chuyển đổi các tài khoản trong trình duyệt, sau đó thử Thêm tài khoản lại.",
+  "prov.loginTimeout":
+    "Đăng nhập {provider} bị quá thời gian (timed out) — trình duyệt đã đóng hoặc quá trình đăng nhập không hoàn tất. Hãy thử lại.",
+  "prov.loginOk":
+    "Đã đăng nhập vào {provider}. Hãy chạy {cmd} (hoặc tự động áp dụng) để liệt kê các models của nó.",
+  "prov.loginSameAccount":
+    "Vẫn là tài khoản {provider} đó — hãy chuyển đổi các tài khoản trong trình duyệt, sau đó thử Thêm tài khoản lại.",
   "oauthTos.highTitle": "{provider}: rủi ro đăng ký (subscription) OAuth",
   "oauthTos.elevatedTitle": "{provider}: cầu nối OAuth không chính thức",
-  "oauthTos.anthropicBody": "Thao tác này kết nối gói đăng ký Claude qua OpenCodex, một proxy bên thứ ba. Anthropic chưa chấp thuận kết nối này hay việc gom nhóm tài khoản tự động; quyền truy cập phụ thuộc vào điều khoản hiện hành và cách Anthropic thực thi.",
-  "oauthTos.highBody": "OpenCodex kết nối với {provider} thông qua một đường dẫn OAuth của bên thứ ba. Việc sử dụng không được hỗ trợ có thể dẫn đến giới hạn hoặc bị đình chỉ truy cập.",
-  "oauthTos.elevatedBody": "OpenCodex kết nối {provider} qua đường dẫn OAuth không chính thức. Hãy sử dụng client chính thức khi có thể; lưu lượng truy cập tự động hoặc bất thường có thể bị coi là lạm dụng và có thể bị giới hạn hoặc đình chỉ truy cập.",
+  "oauthTos.anthropicBody":
+    "Thao tác này kết nối gói đăng ký Claude qua OpenCodex, một proxy bên thứ ba. Anthropic chưa chấp thuận kết nối này hay việc gom nhóm tài khoản tự động; quyền truy cập phụ thuộc vào điều khoản hiện hành và cách Anthropic thực thi.",
+  "oauthTos.highBody":
+    "OpenCodex kết nối với {provider} thông qua một đường dẫn OAuth của bên thứ ba. Việc sử dụng không được hỗ trợ có thể dẫn đến giới hạn hoặc bị đình chỉ truy cập.",
+  "oauthTos.elevatedBody":
+    "OpenCodex kết nối {provider} qua đường dẫn OAuth không chính thức. Hãy sử dụng client chính thức khi có thể; lưu lượng truy cập tự động hoặc bất thường có thể bị coi là lạm dụng và có thể bị giới hạn hoặc đình chỉ truy cập.",
   "oauthTos.saferPath": "Giải pháp an toàn hơn: cấu hình một API key trong OpenCodex thay thế.",
   "oauthTos.acknowledge": "Tôi hiểu rõ rủi ro và vẫn muốn tiếp tục với OAuth.",
   "oauthTos.continue": "Tiếp tục với OAuth",
   "oauthTos.anthropicTitle": "Kết nối gói đăng ký Claude",
-  "oauthTos.anthropicConditions": "Hãy dùng tài khoản bạn sở hữu hoặc được phép sử dụng. Dùng ứng dụng Claude Code chính hãng trong phiên có người giám sát khác với việc gửi token đăng ký qua các ứng dụng khác. OpenCodex cũng hỗ trợ các ứng dụng khác đó, nên kết nối này không bảo đảm mọi cách sử dụng đều được phép. Các tích hợp Agent SDK được hỗ trợ là một phần riêng.",
-  "oauthTos.anthropicSaferPath": "Với ứng dụng khác hoặc tự động hóa không có người giám sát, hãy cấu hình khóa API Anthropic.",
-  "oauthTos.anthropicAcknowledge": "Tôi hiểu đây là kết nối gói đăng ký qua bên thứ ba và sẽ kiểm tra các điều khoản áp dụng.",
+  "oauthTos.anthropicConditions":
+    "Hãy dùng tài khoản bạn sở hữu hoặc được phép sử dụng. Dùng ứng dụng Claude Code chính hãng trong phiên có người giám sát khác với việc gửi token đăng ký qua các ứng dụng khác. OpenCodex cũng hỗ trợ các ứng dụng khác đó, nên kết nối này không bảo đảm mọi cách sử dụng đều được phép. Các tích hợp Agent SDK được hỗ trợ là một phần riêng.",
+  "oauthTos.anthropicSaferPath":
+    "Với ứng dụng khác hoặc tự động hóa không có người giám sát, hãy cấu hình khóa API Anthropic.",
+  "oauthTos.anthropicAcknowledge":
+    "Tôi hiểu đây là kết nối gói đăng ký qua bên thứ ba và sẽ kiểm tra các điều khoản áp dụng.",
   "oauthTos.anthropicContinue": "Tiếp tục với gói đăng ký Claude",
   "subagentSurface.selectionTitle": "Chuyển bề mặt sub-agent sang {mode}?",
-  "subagentSurface.selectionBody": "Ở chế độ {mode}, các model ChatGPT dùng bề mặt v2 — Sol và Terra trên base, mọi model trên v2 — chuyển tác vụ được mã hóa cho backend ChatGPT sang một model được định tuyến như Grok hoặc Claude, nên model được định tuyến không thể đọc tác vụ. Việc ủy quyền đó thất bại với unreadable_encrypted_agent_task cho đến khi upstream sửa lỗi. v1 ủy quyền giữa các nhà cung cấp một cách ổn định.",
+  "subagentSurface.selectionBody":
+    "Ở chế độ {mode}, các model ChatGPT dùng bề mặt v2 — Sol và Terra trên base, mọi model trên v2 — chuyển tác vụ được mã hóa cho backend ChatGPT sang một model được định tuyến như Grok hoặc Claude, nên model được định tuyến không thể đọc tác vụ. Việc ủy quyền đó thất bại với unreadable_encrypted_agent_task cho đến khi upstream sửa lỗi. v1 ủy quyền giữa các nhà cung cấp một cách ổn định.",
   "subagentSurface.advisoryTitle": "v1 hiện là bề mặt sub-agent mặc định",
-  "subagentSurface.advisoryBody": "Bản cài đặt này đang chạy {mode}, nơi model ChatGPT trên bề mặt v2 chuyển một tác vụ được mã hóa cho model được định tuyến nên model đó không thể đọc, khiến việc ủy quyền giữa các nhà cung cấp thất bại. Chúng tôi khuyên dùng v1 cho đến khi upstream sửa lỗi. Cài đặt hiện tại của bạn không thay đổi cho đến khi bạn chọn.",
+  "subagentSurface.advisoryBody":
+    "Bản cài đặt này đang chạy {mode}, nơi model ChatGPT trên bề mặt v2 chuyển một tác vụ được mã hóa cho model được định tuyến nên model đó không thể đọc, khiến việc ủy quyền giữa các nhà cung cấp thất bại. Chúng tôi khuyên dùng v1 cho đến khi upstream sửa lỗi. Cài đặt hiện tại của bạn không thay đổi cho đến khi bạn chọn.",
   "subagentSurface.continue": "Tiếp tục",
   "subagentSurface.switchToV1": "Chuyển sang v1",
   "subagentSurface.learnMore": "Vì sao việc này thất bại",
   "prov.logoutOk": "Đã đăng xuất khỏi {provider}.",
-  "prov.logoutFail": "Không thể đăng xuất khỏi {provider}. Trạng thái tài khoản của bạn vẫn không thay đổi.",
-  "prov.removed": "Đã xóa \"{name}\".",
-  "prov.removedDefault": "Đã xoá \"{name}\". Provider mặc định hiện tại là \"{defaultProvider}\".",
-  "prov.removedShadowTarget": "Đã xóa \"{name}\". Shadow Call Intercept vẫn trỏ tới \"{model}\", nên các lệnh gọi phụ sẽ thất bại cho đến khi bạn chọn mục tiêu khác.",
-  "prov.removeFail": "Xóa \"{name}\" thất bại.",
-  "prov.removeLastProvider": "Bạn không thể xóa provider này khi không có provider nào khác đang bật để có thể trở thành mặc định.",
+  "prov.logoutFail":
+    "Không thể đăng xuất khỏi {provider}. Trạng thái tài khoản của bạn vẫn không thay đổi.",
+  "prov.removed": 'Đã xóa "{name}".',
+  "prov.removedDefault": 'Đã xoá "{name}". Provider mặc định hiện tại là "{defaultProvider}".',
+  "prov.removedShadowTarget":
+    'Đã xóa "{name}". Shadow Call Intercept vẫn trỏ tới "{model}", nên các lệnh gọi phụ sẽ thất bại cho đến khi bạn chọn mục tiêu khác.',
+  "prov.removeFail": 'Xóa "{name}" thất bại.',
+  "prov.removeLastProvider":
+    "Bạn không thể xóa provider này khi không có provider nào khác đang bật để có thể trở thành mặc định.",
   "prov.setDefault": "Đặt làm mặc định",
-  "prov.setDefaultSuccess": "\"{name}\" hiện là provider mặc định.",
-  "prov.setDefaultFail": "Không thể đặt \"{name}\" làm provider mặc định.",
+  "prov.setDefaultSuccess": '"{name}" hiện là provider mặc định.',
+  "prov.setDefaultFail": 'Không thể đặt "{name}" làm provider mặc định.',
   "prov.defaultDisabled": "Hãy bật provider này trước khi đặt nó làm mặc định.",
   "prov.updateFail": "Không thể cập nhật provider này.",
   "prov.networkError": "Lỗi mạng. Kiểm tra xem proxy có đang chạy không và thử lại.",
-  "prov.added": "Đã thêm \"{name}\". Đang trực tiếp ngay bây giờ — hãy chạy {cmd} (hoặc khởi động lại) để hiển thị các models của nó trong bộ chọn của Codex.",
+  "prov.added":
+    'Đã thêm "{name}". Đang trực tiếp ngay bây giờ — hãy chạy {cmd} (hoặc khởi động lại) để hiển thị các models của nó trong bộ chọn của Codex.',
   "prov.modelsNoticeTitle": "Chọn models",
-  "prov.modelsNoticeChecking": "Đang kiểm tra danh sách model. Việc chuyển đổi models không vô hiệu hoá provider.",
-  "prov.modelsNoticePending": "Danh sách model ban đầu chưa được xác nhận. Các models sẽ bị ẩn cho đến khi quá trình khám phá kết thúc.",
-  "prov.modelsNoticeOff": "Tất cả các chuyển đổi model đều bị TẮT lúc đăng ký. Bật các models mà bạn muốn ở trang Models.",
-  "prov.modelsNoticeReady": "Chọn những models sẽ xuất hiện trên trang Models. Việc chuyển đổi models không vô hiệu hoá provider.",
-  "prov.modelsNoticeFailed": "Provider đã được lưu, nhưng không thể làm mới danh sách model. Vui lòng thử lại.",
+  "prov.modelsNoticeChecking":
+    "Đang kiểm tra danh sách model. Việc chuyển đổi models không vô hiệu hoá provider.",
+  "prov.modelsNoticePending":
+    "Danh sách model ban đầu chưa được xác nhận. Các models sẽ bị ẩn cho đến khi quá trình khám phá kết thúc.",
+  "prov.modelsNoticeOff":
+    "Tất cả các chuyển đổi model đều bị TẮT lúc đăng ký. Bật các models mà bạn muốn ở trang Models.",
+  "prov.modelsNoticeReady":
+    "Chọn những models sẽ xuất hiện trên trang Models. Việc chuyển đổi models không vô hiệu hoá provider.",
+  "prov.modelsNoticeFailed":
+    "Provider đã được lưu, nhưng không thể làm mới danh sách model. Vui lòng thử lại.",
   "prov.modelsNoticeCount": "{count} models",
   "prov.modelsNoticeOpen": "Mở Models",
   "models.initialSelectionPending": "Đang chờ khám phá ban đầu",
-  "prov.removeConfirm": "Xóa provider \"{name}\"? Models của provider này sẽ biến mất khỏi bộ chọn của Codex.",
+  "prov.removeConfirm":
+    'Xóa provider "{name}"? Models của provider này sẽ biến mất khỏi bộ chọn của Codex.',
   "prov.hasApiKey": "đã định cấu hình api key",
   "prov.hasHeaders": "đã định cấu hình tiêu đề tùy chỉnh (custom headers)",
   "prov.accounts": "Tài khoản ({n})",
@@ -768,7 +908,8 @@ export const vi: Record<TKey, string> = {
   "prov.accountRemoved": "Đã xóa {email}.",
   "prov.accountRemoveFail": "Không thể xóa {email}. Tài khoản không bị thay đổi.",
   "prov.accountRemoveAria": "Xóa {email}",
-  "prov.accountRemoveConfirm": "Xóa tài khoản {email}? Thông tin đăng nhập của nó sẽ bị xóa khỏi proxy này.",
+  "prov.accountRemoveConfirm":
+    "Xóa tài khoản {email}? Thông tin đăng nhập của nó sẽ bị xóa khỏi proxy này.",
   "prov.keyAdd": "Thêm API key",
   "prov.keyAdded": "Đã thêm API key vào {name}.",
   "prov.keyAddFail": "Thêm API key thất bại",
@@ -784,40 +925,50 @@ export const vi: Record<TKey, string> = {
   "prov.defaultBadge": "Mặc định",
   "prov.enable": "Bật",
   "prov.disable": "Tắt",
-  "prov.enabled": "Đã Bật \"{name}\". Models của provider này có thể xuất hiện lại trong Codex.",
-  "prov.disabled": "Đã Tắt \"{name}\". Các cài đặt vẫn được giữ lại nhưng models của nó sẽ bị ẩn.",
-  "prov.disabledShadowTarget": "Đã tắt \"{name}\". Shadow Call Intercept vẫn trỏ tới \"{model}\", nên các lệnh gọi phụ sẽ thất bại cho đến khi bạn chọn mục tiêu khác hoặc bật lại \"{name}\".",
-  "prov.enableFail": "Bật \"{name}\" thất bại.",
-  "prov.disableFail": "Tắt \"{name}\" thất bại.",
+  "prov.enabled": 'Đã Bật "{name}". Models của provider này có thể xuất hiện lại trong Codex.',
+  "prov.disabled": 'Đã Tắt "{name}". Các cài đặt vẫn được giữ lại nhưng models của nó sẽ bị ẩn.',
+  "prov.disabledShadowTarget":
+    'Đã tắt "{name}". Shadow Call Intercept vẫn trỏ tới "{model}", nên các lệnh gọi phụ sẽ thất bại cho đến khi bạn chọn mục tiêu khác hoặc bật lại "{name}".',
+  "prov.enableFail": 'Bật "{name}" thất bại.',
+  "prov.disableFail": 'Tắt "{name}" thất bại.',
   "prov.enableAria": "Bật provider {name}",
   "prov.disableAria": "Tắt provider {name}",
   "prov.defaultCannotDisable": "Không thể tắt provider mặc định",
   "prov.openaiAccountMode": "Chế độ tài khoản Codex",
   "prov.openaiModePool": "Nhóm (Pool)",
   "prov.openaiModeDirect": "Trực tiếp",
-  "prov.openaiPoolDesc": "Mặc định. Xoay vòng tài khoản đăng nhập chính và các tài khoản đã thêm dựa trên mức độ yêu thích (affinity), hạn ngạch, thời gian chờ (cooldown) và khả năng chuyển đổi dự phòng (failover).",
-  "prov.openaiDirectDesc": "Chỉ sử dụng tài khoản đăng nhập Codex hiện tại/chính. Các tài khoản nhóm đã lưu không được đọc hoặc luân phiên.",
+  "prov.openaiPoolDesc":
+    "Mặc định. Xoay vòng tài khoản đăng nhập chính và các tài khoản đã thêm dựa trên mức độ yêu thích (affinity), hạn ngạch, thời gian chờ (cooldown) và khả năng chuyển đổi dự phòng (failover).",
+  "prov.openaiDirectDesc":
+    "Chỉ sử dụng tài khoản đăng nhập Codex hiện tại/chính. Các tài khoản nhóm đã lưu không được đọc hoặc luân phiên.",
   "prov.openaiModeSaved": "Chế độ tài khoản OpenAI đã chuyển thành {mode}.",
   "prov.openaiModeSaveFailed": "Không thể thay đổi chế độ tài khoản OpenAI.",
-  "prov.openaiApiDesc": "Sử dụng API key OpenAI và không bao giờ sử dụng chứng chỉ thông tin tài khoản Codex.",
+  "prov.openaiApiDesc":
+    "Sử dụng API key OpenAI và không bao giờ sử dụng chứng chỉ thông tin tài khoản Codex.",
   "prov.manageCodexAccounts": "Quản lý các tài khoản Codex",
   "prov.openaiApiMissing": "Yêu cầu có API key",
   "prov.openaiApiSetup": "Thiết lập API key",
   "models.tab.catalog": "Models",
   "models.tab.routing": "Định tuyến (beta)",
   "models.tabsLabel": "Các bề mặt Model",
-  "models.subtitle.routing": "Hồ sơ chính sách, đánh giá chạy thử (dry-run) và phân tích định tuyến dựa trên nguồn.",
-  "models.subtitle": "Bật hoặc tắt các model mà Codex nhìn thấy — gồm GPT native truyền thẳng và các provider được định tuyến, nhóm theo provider (bấm vào tiêu đề để thu gọn). Model bị ẩn sẽ không xuất hiện trong catalog và bộ chọn model nhưng vẫn có thể được gọi trực tiếp bằng id chính xác.",
+  "models.subtitle.routing":
+    "Hồ sơ chính sách, đánh giá chạy thử (dry-run) và phân tích định tuyến dựa trên nguồn.",
+  "models.subtitle":
+    "Bật hoặc tắt các model mà Codex nhìn thấy — gồm GPT native truyền thẳng và các provider được định tuyến, nhóm theo provider (bấm vào tiêu đề để thu gọn). Model bị ẩn sẽ không xuất hiện trong catalog và bộ chọn model nhưng vẫn có thể được gọi trực tiếp bằng id chính xác.",
   "models.delivery.title": "Thay đổi đến Codex như thế nào",
   "models.delivery.chip.saved": "Đã lưu tại đây",
   "models.delivery.chip.loaded": "Codex tải khi khởi động lại",
   "models.delivery.saved.title": "Đã lưu vào proxy này",
-  "models.delivery.saved.body": "Lưu trên trang này ghi lại catalog model mà proxy OpenCodex này chuyển cho Codex, chính là danh sách mà bộ chọn model của Codex hiển thị. Xác nhận sau khi lưu nghĩa là bước này đã xong.",
+  "models.delivery.saved.body":
+    "Lưu trên trang này ghi lại catalog model mà proxy OpenCodex này chuyển cho Codex, chính là danh sách mà bộ chọn model của Codex hiển thị. Xác nhận sau khi lưu nghĩa là bước này đã xong.",
   "models.delivery.loaded.title": "Codex đã tải",
-  "models.delivery.loaded.body": "Codex đọc catalog khi khởi động, nên cửa sổ Codex đã mở sẵn vẫn giữ danh sách model cũ. OpenCodex không thể nhìn vào một Codex đang chạy để biết nó đang dùng danh sách nào. Khi OpenCodex nhận ra Codex đã khởi động trước thay đổi của bạn, một thông báo khởi động lại sẽ hiện phía trên các tab.",
-  "models.delivery.hint": "Nếu một model bạn vừa bật không xuất hiện trong Codex, hãy nhấn Tải lại các models của Codex ở góc trên bên phải trang này, rồi mở lại Codex.",
+  "models.delivery.loaded.body":
+    "Codex đọc catalog khi khởi động, nên cửa sổ Codex đã mở sẵn vẫn giữ danh sách model cũ. OpenCodex không thể nhìn vào một Codex đang chạy để biết nó đang dùng danh sách nào. Khi OpenCodex nhận ra Codex đã khởi động trước thay đổi của bạn, một thông báo khởi động lại sẽ hiện phía trên các tab.",
+  "models.delivery.hint":
+    "Nếu một model bạn vừa bật không xuất hiện trong Codex, hãy nhấn Tải lại các models của Codex ở góc trên bên phải trang này, rồi mở lại Codex.",
   "models.nativeGroupLabel": "OpenAI native",
-  "models.nativeHint": "Các models truyền thẳng (passthrough) sử dụng tùy chọn tài khoản Nhóm (Pool) hoặc Trực tiếp (Direct) được chọn trên màn hình Providers. Khi Tắt một tính năng, nó sẽ bị ẩn khỏi bộ chọn Codex (mục nhập catalog vẫn được giữ lại, vì vậy khi Bật lại thì mọi thứ vẫn được khôi phục chính xác). Thêm một model tại đây sẽ đăng ký định tuyến selector `openai/<model>`, chứ không phải là một id truyền thẳng mới.",
+  "models.nativeHint":
+    "Các models truyền thẳng (passthrough) sử dụng tùy chọn tài khoản Nhóm (Pool) hoặc Trực tiếp (Direct) được chọn trên màn hình Providers. Khi Tắt một tính năng, nó sẽ bị ẩn khỏi bộ chọn Codex (mục nhập catalog vẫn được giữ lại, vì vậy khi Bật lại thì mọi thứ vẫn được khôi phục chính xác). Thêm một model tại đây sẽ đăng ký định tuyến selector `openai/<model>`, chứ không phải là một id truyền thẳng mới.",
   "models.active": "{active}/{total} đang hiển thị",
   "models.workspace.providers": "Nhà cung cấp",
   "models.workspace.allProviders": "Tất cả các providers",
@@ -832,10 +983,12 @@ export const vi: Record<TKey, string> = {
   "models.presetUpdateAvailable": "Preset v{version} hiện có sẵn",
   "models.presetAppliedToast": "{provider}: đã áp dụng preset — có {count} models được chọn",
   "models.presetClearedToast": "{provider}: đang hiển thị tất cả các models",
-  "models.presetEmpty": "{provider}: preset không khớp với bất kỳ models nào — lựa chọn không thay đổi",
+  "models.presetEmpty":
+    "{provider}: preset không khớp với bất kỳ models nào — lựa chọn không thay đổi",
   "models.presetConfirmReplace": "Thay thế các lựa chọn của bạn bằng preset {count}-model?",
   "models.cap350k": "Giới hạn 350k",
-  "models.capApplied": "Giới hạn ngữ cảnh (Context cap) đã được áp dụng — sẽ có hiệu lực ở lượt chạy Codex tiếp theo.",
+  "models.capApplied":
+    "Giới hạn ngữ cảnh (Context cap) đã được áp dụng — sẽ có hiệu lực ở lượt chạy Codex tiếp theo.",
   "models.capSaveFailed": "Không thể lưu giới hạn ngữ cảnh",
   "models.contextCapped": "Giới hạn 350k",
   "models.contextCapLabel": "Cửa sổ/Giới hạn (Window / cap) mặc định",
@@ -849,16 +1002,23 @@ export const vi: Record<TKey, string> = {
   "models.v2ModeDesc_default": "Mặc định của upstream (sol/terra=v2, luna=v1)",
   "models.v2ModeDesc_v2": "Tất cả model → giao diện v2",
   "models.keepNativeOnV1": "Giữ ChatGPT ở v1",
-  "models.keepNativeOnV1Hint": "ChatGPT chỉ mã hoá các task con v2 khi model cha ChatGPT-native giữ ở v2, khiến Grok và Claude không thể đọc được chúng. Bật tuỳ chọn này để giữ Sol/Terra ở v1 và tránh việc mã hoá đó. Các model cha được định tuyến (routed parents) vẫn ở v2.",
-  "models.v2Help": "Điều khiển giao diện đa agent (multi-agent surface) cho tất cả model.\n\nv1: Agent luồng đơn cổ điển. Mọi model đều sử dụng giao diện cộng tác v1.\nbase: Mặc định của upstream — sol/terra dùng v2, luna dùng v1, các model khác tuân theo cờ tính năng (feature flag) của codex.\nv2: Agent đa luồng với spawn_agent. Mọi model đều sử dụng giao diện cộng tác v2.\n\nỞ v2, tuỳ chọn Giữ ChatGPT ở v1 sẽ giữ Sol/Terra ở giao diện v1 để chúng vẫn có thể gọi Grok hoặc Claude. ChatGPT mã hoá các task con v2; các model được định tuyến không thể đọc được chúng. Các model cha được định tuyến vẫn giữ ở v2.\n\nCác thay đổi sẽ áp dụng cho các phiên (sessions) mới.",
+  "models.keepNativeOnV1Hint":
+    "ChatGPT chỉ mã hoá các task con v2 khi model cha ChatGPT-native giữ ở v2, khiến Grok và Claude không thể đọc được chúng. Bật tuỳ chọn này để giữ Sol/Terra ở v1 và tránh việc mã hoá đó. Các model cha được định tuyến (routed parents) vẫn ở v2.",
+  "models.v2Help":
+    "Điều khiển giao diện đa agent (multi-agent surface) cho tất cả model.\n\nv1: Agent luồng đơn cổ điển. Mọi model đều sử dụng giao diện cộng tác v1.\nbase: Mặc định của upstream — sol/terra dùng v2, luna dùng v1, các model khác tuân theo cờ tính năng (feature flag) của codex.\nv2: Agent đa luồng với spawn_agent. Mọi model đều sử dụng giao diện cộng tác v2.\n\nỞ v2, tuỳ chọn Giữ ChatGPT ở v1 sẽ giữ Sol/Terra ở giao diện v1 để chúng vẫn có thể gọi Grok hoặc Claude. ChatGPT mã hoá các task con v2; các model được định tuyến không thể đọc được chúng. Các model cha được định tuyến vẫn giữ ở v2.\n\nCác thay đổi sẽ áp dụng cho các phiên (sessions) mới.",
   "dash.multiAgent": "Agent con (Sub-agent)",
   "dash.codexDesktopAuthless": "Mở Codex không cần đăng nhập",
-  "dash.codexDesktopAuthlessHint": "Mặc định tắt. Bỏ qua bước đăng nhập Desktop riêng cho các kết nối cục bộ hợp lệ. Vẫn cần thông tin xác thực upstream. Khởi động lại Codex sau khi thay đổi cài đặt này. Các tính năng Desktop yêu cầu tài khoản có thể không khả dụng.",
+  "dash.codexDesktopAuthlessHint":
+    "Mặc định tắt. Bỏ qua bước đăng nhập Desktop riêng cho các kết nối cục bộ hợp lệ. Vẫn cần thông tin xác thực upstream. Khởi động lại Codex sau khi thay đổi cài đặt này. Các tính năng Desktop yêu cầu tài khoản có thể không khả dụng.",
   "dash.codexClientCompaction": "Sử dụng tính năng thu gọn phía client (client-side compaction)",
-  "dash.codexClientCompactionHint": "Mặc định tắt; chỉ dành cho authenticated loopback. Các compactions trong tương lai sẽ lưu trữ các bản tóm tắt văn bản thuần trong khi OpenCodeX và V2 provider routing vẫn hoạt động; provider được cấu hình có thể xử lý chúng và tiêu tốn quota. Lịch sử được giữ nguyên, và các luồng (threads) hiện tại tiếp tục định tuyến qua proxy thông qua ghi đè openai_base_url mà OpenCodeX quản lý; nếu bạn tự thiết lập dòng đó, nó sẽ được giữ lại và các luồng đó sẽ tuân theo đích đến của bạn thay thế. Lịch sử ocx1 hiện tại vẫn có thể khôi phục được; chỉ khôi phục một luồng riêng biệt trước khi phát lại (replay) trong Codex native. Khởi động lại Codex sau khi thay đổi cài đặt này.",
-  "dash.codexRemoteHistoryHint": "Định tuyến bằng bảng nhà cung cấp có thể ẩn các luồng mang nhãn openai hiện có khỏi một số danh sách từ xa trên điện thoại. Lịch sử không bị xóa. Client từ xa phải liệt kê mọi nhà cung cấp; công tắc này không sửa bộ lọc của client.",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads đã được thiết lập — codex sẽ từ chối khởi động; hãy xoá nó khỏi config.toml",
-  "models.v2Applied": "Chế độ agent con đã được cập nhật — áp dụng cho các phiên mới (khởi động lại ứng dụng Codex để làm mới picker)",
+  "dash.codexClientCompactionHint":
+    "Mặc định tắt; chỉ dành cho authenticated loopback. Các compactions trong tương lai sẽ lưu trữ các bản tóm tắt văn bản thuần trong khi OpenCodeX và V2 provider routing vẫn hoạt động; provider được cấu hình có thể xử lý chúng và tiêu tốn quota. Lịch sử được giữ nguyên, và các luồng (threads) hiện tại tiếp tục định tuyến qua proxy thông qua ghi đè openai_base_url mà OpenCodeX quản lý; nếu bạn tự thiết lập dòng đó, nó sẽ được giữ lại và các luồng đó sẽ tuân theo đích đến của bạn thay thế. Lịch sử ocx1 hiện tại vẫn có thể khôi phục được; chỉ khôi phục một luồng riêng biệt trước khi phát lại (replay) trong Codex native. Khởi động lại Codex sau khi thay đổi cài đặt này.",
+  "dash.codexRemoteHistoryHint":
+    "Định tuyến bằng bảng nhà cung cấp có thể ẩn các luồng mang nhãn openai hiện có khỏi một số danh sách từ xa trên điện thoại. Lịch sử không bị xóa. Client từ xa phải liệt kê mọi nhà cung cấp; công tắc này không sửa bộ lọc của client.",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads đã được thiết lập — codex sẽ từ chối khởi động; hãy xoá nó khỏi config.toml",
+  "models.v2Applied":
+    "Chế độ agent con đã được cập nhật — áp dụng cho các phiên mới (khởi động lại ứng dụng Codex để làm mới picker)",
   "models.v2ThreadsLabel": "Giới hạn sub-agent",
   "models.v2ThreadsDefault": "mặc định",
   "models.v2ThreadsApplied": "Giới hạn sub-agent đã được cập nhật — áp dụng cho các phiên mới",
@@ -870,18 +1030,22 @@ export const vi: Record<TKey, string> = {
   "models.contextDefault": "Mặc định của provider",
   "models.contextModel": "Model",
   "models.contextModelOverride": "Ghi đè model",
-  "models.contextHint": "Ghi cửa sổ (window) Codex thực tế vào đây khi bạn đã biết nó. Việc này điền vào một cửa sổ upstream bị thiếu và chỉ làm giảm bớt nếu cửa sổ được báo cáo lớn hơn. Để trống để sử dụng cửa sổ/giới hạn Mặc định của provider, hoặc 128k nếu giới hạn đó đã bị tắt.",
+  "models.contextHint":
+    "Ghi cửa sổ (window) Codex thực tế vào đây khi bạn đã biết nó. Việc này điền vào một cửa sổ upstream bị thiếu và chỉ làm giảm bớt nếu cửa sổ được báo cáo lớn hơn. Để trống để sử dụng cửa sổ/giới hạn Mặc định của provider, hoặc 128k nếu giới hạn đó đã bị tắt.",
   "models.contextAutomatic": "Khám phá tự động (Automatic discovery)",
-  "models.contextSaved": "Cửa sổ ngữ cảnh (Context windows) đã được cập nhật — có hiệu lực ở lượt Codex tiếp theo.",
+  "models.contextSaved":
+    "Cửa sổ ngữ cảnh (Context windows) đã được cập nhật — có hiệu lực ở lượt Codex tiếp theo.",
   "models.contextUnchanged": "Không có thay đổi nào về cửa sổ ngữ cảnh để lưu.",
   "models.contextSaveFailed": "Lỗi lưu cửa sổ ngữ cảnh",
   "models.contextInvalid": "Cửa sổ ngữ cảnh phải là số nguyên dương",
   "models.contextCappedValue": "giới hạn {value}",
   "models.setAll": "Thiết lập tất cả",
-  "models.setAllHint": "Bật cửa sổ mặc định {value} cho mọi provider được định tuyến. Các relay bỏ qua context_window / context_length sẽ nhận giá trị này làm cửa sổ Codex thực tế. Sử dụng Cửa sổ tuỳ chỉnh trên một hàng provider để thiết lập một model bằng tay. Các native provider không bị ảnh hưởng.",
+  "models.setAllHint":
+    "Bật cửa sổ mặc định {value} cho mọi provider được định tuyến. Các relay bỏ qua context_window / context_length sẽ nhận giá trị này làm cửa sổ Codex thực tế. Sử dụng Cửa sổ tuỳ chỉnh trên một hàng provider để thiết lập một model bằng tay. Các native provider không bị ảnh hưởng.",
   "models.collapseAll": "Thu gọn tất cả",
   "models.expandAll": "Mở rộng tất cả",
-  "models.orderHint": "Thứ tự mặc định tuân theo các lựa chọn nổi bật và độ ưu tiên của catalog; các hàng định tuyến cùng hạng được sắp theo provider/model. Thứ tự picker đã lưu có thể thay đổi cách hiển thị; công tắc hiển thị lọc các hàng xuất hiện. Client có thể giữ catalog cũ cho đến lần tải tiếp theo.",
+  "models.orderHint":
+    "Thứ tự mặc định tuân theo các lựa chọn nổi bật và độ ưu tiên của catalog; các hàng định tuyến cùng hạng được sắp theo provider/model. Thứ tự picker đã lưu có thể thay đổi cách hiển thị; công tắc hiển thị lọc các hàng xuất hiện. Client có thể giữ catalog cũ cho đến lần tải tiếp theo.",
   "models.settingsPanel.title": "Cài đặt mô hình",
   "models.settingsPanel.off": "tắt",
   "models.settingsPanel.attention": "Cần chú ý",
@@ -895,19 +1059,27 @@ export const vi: Record<TKey, string> = {
   "models.settingsContextInherit": "Không ghi đè — hiện là {value}",
   "models.settingsContextUnknown": "không rõ",
   "models.settingsReload": "Tải lại",
-  "models.settingsReloaded": "Đã tải lại danh sách model. Mở lại {model} để xem các giá trị đã lưu.",
+  "models.settingsReloaded":
+    "Đã tải lại danh sách model. Mở lại {model} để xem các giá trị đã lưu.",
   "models.settingsNoChange": "Không có cài đặt nào thay đổi cho {model}",
   "models.settingsSaved": "Đã lưu cài đặt model cho {model}",
-  "models.settingsSaveFailed": "Không thể xác nhận cài đặt đã được lưu hay chưa. Hãy tải lại danh sách model trước khi thử lại.",
-  "models.settingsRefreshFailed": "Đã lưu. Danh sách model chưa tải lại nên dòng có thể hiển thị giá trị cũ. Hãy tải lại để kiểm tra.",
-  "models.settingsSavedCodexStale": "Đã lưu {model}, nhưng danh mục model của Codex chưa được làm mới. Hãy bấm \"Đồng bộ ngay\" trên bảng điều khiển để Codex nhận thay đổi.",
-  "models.settingsRejected": "Máy chủ đã từ chối các thiết lập này nên chưa có gì được lưu. Hãy kiểm tra giá trị rồi thử lại.",
+  "models.settingsSaveFailed":
+    "Không thể xác nhận cài đặt đã được lưu hay chưa. Hãy tải lại danh sách model trước khi thử lại.",
+  "models.settingsRefreshFailed":
+    "Đã lưu. Danh sách model chưa tải lại nên dòng có thể hiển thị giá trị cũ. Hãy tải lại để kiểm tra.",
+  "models.settingsSavedCodexStale":
+    'Đã lưu {model}, nhưng danh mục model của Codex chưa được làm mới. Hãy bấm "Đồng bộ ngay" trên bảng điều khiển để Codex nhận thay đổi.',
+  "models.settingsRejected":
+    "Máy chủ đã từ chối các thiết lập này nên chưa có gì được lưu. Hãy kiểm tra giá trị rồi thử lại.",
   "models.settingsDefaultEffort": "Mức mặc định",
-  "models.settingsModalitiesInherit": "Chưa ghi đè — hiện theo khai báo từ nhà cung cấp: {modalities}",
+  "models.settingsModalitiesInherit":
+    "Chưa ghi đè — hiện theo khai báo từ nhà cung cấp: {modalities}",
   "models.settingsModalitiesUnknown": "chưa khai báo",
   "models.settingsRestore": "Khôi phục",
-  "models.settingsRestoreHint": "Xoá mọi ghi đè trên model này và quay về giá trị do chương trình tính.",
-  "models.settingsRestoreConfirm": "Khôi phục {model} về giá trị do chương trình tính? Thao tác này xoá ghi đè về cửa sổ ngữ cảnh, modality và suy luận.",
+  "models.settingsRestoreHint":
+    "Xoá mọi ghi đè trên model này và quay về giá trị do chương trình tính.",
+  "models.settingsRestoreConfirm":
+    "Khôi phục {model} về giá trị do chương trình tính? Thao tác này xoá ghi đè về cửa sổ ngữ cảnh, modality và suy luận.",
   "models.settingsRestored": "Đã khôi phục {model} về giá trị do chương trình tính",
   "models.settingsNothingToRestore": "{model} không có ghi đè — đã là giá trị do chương trình tính",
   "pws.manageModelVisibility": "Quản lý hiển thị trong Models",
@@ -915,12 +1087,17 @@ export const vi: Record<TKey, string> = {
   "pws.modelOwnershipFailed": "Không thể tải định nghĩa model. Hãy thử lại trước khi thay đổi.",
   "pws.modelSelectionPending": "Hoàn tất việc chọn model trong Models trước khi thay đổi.",
   "pws.modelSaved": "Định nghĩa model tuỳ chỉnh đã được lưu.",
-  "pws.modelSavedHidden": "Đã lưu định nghĩa. Model này đang bị ẩn; hãy quản lý hiển thị trong Models.",
-  "pws.modelSavedRefreshPending": "Đã lưu định nghĩa, nhưng không thể làm mới danh mục model (model catalog). Hãy thử làm mới lại; đừng thêm lại model đó.",
-  "pws.modelMutationUnconfirmed": "Không thể xác nhận thay đổi. Hãy làm mới danh sách model trước khi thử lại.",
-  "pws.modelRemovedRefreshPending": "Thay đổi đã được lưu, nhưng không thể làm mới danh mục model. Hãy thử làm mới lại.",
+  "pws.modelSavedHidden":
+    "Đã lưu định nghĩa. Model này đang bị ẩn; hãy quản lý hiển thị trong Models.",
+  "pws.modelSavedRefreshPending":
+    "Đã lưu định nghĩa, nhưng không thể làm mới danh mục model (model catalog). Hãy thử làm mới lại; đừng thêm lại model đó.",
+  "pws.modelMutationUnconfirmed":
+    "Không thể xác nhận thay đổi. Hãy làm mới danh sách model trước khi thử lại.",
+  "pws.modelRemovedRefreshPending":
+    "Thay đổi đã được lưu, nhưng không thể làm mới danh mục model. Hãy thử làm mới lại.",
   "pws.modelHidden": "Model đã ẩn. Khôi phục hiển thị trong Models.",
-  "pws.modelDefinitionDeleted": "Định nghĩa tuỳ chỉnh đã bị xoá. Một model cơ sở (underlying model) vẫn có thể xuất hiện.",
+  "pws.modelDefinitionDeleted":
+    "Định nghĩa tuỳ chỉnh đã bị xoá. Một model cơ sở (underlying model) vẫn có thể xuất hiện.",
   "pws.modelKnown": "Model này đã được nhận diện. Quản lý hiển thị của nó trong Models.",
   "models.customAdded": "Đã thêm model tuỳ chỉnh",
   "models.customUpdated": "Đã cập nhật model tuỳ chỉnh",
@@ -931,9 +1108,11 @@ export const vi: Record<TKey, string> = {
   "models.customEditBtn": "Cập nhật",
   "models.customEdit": "Chỉnh sửa",
   "models.customDelete": "Xóa",
-  "models.customDeleteConfirm": "Xoá định nghĩa tuỳ chỉnh cho {name}? Một model gốc hoặc được khám phá tự động có thể xuất hiện trở lại.",
+  "models.customDeleteConfirm":
+    "Xoá định nghĩa tuỳ chỉnh cho {name}? Một model gốc hoặc được khám phá tự động có thể xuất hiện trở lại.",
   "models.hide": "Ẩn",
-  "models.hideConfirm": "Ẩn {name} khỏi danh mục model? Điều này không xoá định nghĩa của nó hay thay đổi chính sách định tuyến trực tiếp.",
+  "models.hideConfirm":
+    "Ẩn {name} khỏi danh mục model? Điều này không xoá định nghĩa của nó hay thay đổi chính sách định tuyến trực tiếp.",
   "models.customBadge": "Tùy chỉnh",
   "models.customSummary": "{count} tuỳ chỉnh",
   "models.customFieldModelId": "Model ID (endpoint slug)",
@@ -959,14 +1138,17 @@ export const vi: Record<TKey, string> = {
   "models.tipActive": "Đang hoạt động",
   "models.tipDisabled": "Đã tắt",
   "models.applied": "Đã lưu. Codex hiển thị thay đổi sau khi tải lại danh sách model.",
-  "models.integrationRefreshWarning": "Đã lưu lựa chọn model. Một số danh mục client không thể được làm mới. Hãy kiểm tra Integrations trước khi bắt đầu phiên mới.",
+  "models.integrationRefreshWarning":
+    "Đã lưu lựa chọn model. Một số danh mục client không thể được làm mới. Hãy kiểm tra Integrations trước khi bắt đầu phiên mới.",
   "models.saveFailed": "Lưu thất bại",
   "models.networkError": "Lỗi mạng — proxy có đang chạy không?",
   "models.loadFail": "Lỗi tải danh sách model — proxy có đang chạy không?",
   "models.noRouted": "Không có model được định tuyến",
   "models.noRoutedHint": "Vui lòng đăng nhập vào một provider hoặc thêm một model trước.",
-  "models.emptyDiscovery": "Không tìm thấy model nào. Hãy kiểm tra endpoint của provider hoặc thêm model tĩnh/tuỳ chỉnh.",
-  "models.emptyDiscoveryDisabled": "Tính năng khám phá model trực tiếp đang tắt và không có model tĩnh nào được cấu hình.",
+  "models.emptyDiscovery":
+    "Không tìm thấy model nào. Hãy kiểm tra endpoint của provider hoặc thêm model tĩnh/tuỳ chỉnh.",
+  "models.emptyDiscoveryDisabled":
+    "Tính năng khám phá model trực tiếp đang tắt và không có model tĩnh nào được cấu hình.",
   "models.discoveryFailedBadge": "Khám phá thất bại",
   "models.discoveryFailedHttp": "Khám phá model thất bại (HTTP {status}).",
   "models.discoveryFailedBlocked": "Khám phá model bị chặn bởi chính sách đích.",
@@ -976,49 +1158,64 @@ export const vi: Record<TKey, string> = {
   "models.discoveryFailedGeneric": "Khám phá model thất bại.",
   "models.openProviderSettings": "Mở cài đặt provider",
   "models.inactiveNoCredit": "Hết credit",
-  "models.inactiveNoCreditHint": "Mọi provider phía sau mục này hiện đều đã hết credit, do đó yêu cầu sẽ thất bại. Nó vẫn hiển thị trong danh sách và có thể sử dụng lại khi credit được đặt lại hoặc nạp thêm.",
-  "models.discoveryFailedDependency": "Tính năng khám phá model đang bật cho provider này. Trong khi tính năng này liên tục thất bại, hãy tắt “{control}” trong cài đặt provider để sử dụng các model được thêm thủ công hoặc model tĩnh để thay thế.",
+  "models.inactiveNoCreditHint":
+    "Mọi provider phía sau mục này hiện đều đã hết credit, do đó yêu cầu sẽ thất bại. Nó vẫn hiển thị trong danh sách và có thể sử dụng lại khi credit được đặt lại hoặc nạp thêm.",
+  "models.discoveryFailedDependency":
+    "Tính năng khám phá model đang bật cho provider này. Trong khi tính năng này liên tục thất bại, hãy tắt “{control}” trong cài đặt provider để sử dụng các model được thêm thủ công hoặc model tĩnh để thay thế.",
   "models.loading": "Đang tải…",
   "models.search": "Tìm kiếm model…",
   "models.showMore": "Hiển thị thêm {n}",
   "models.freeOnly": "Chỉ miễn phí",
   "models.noFreeMatch": "Không có model miễn phí ở đây. Tắt Chỉ miễn phí để xem phần còn lại.",
   "models.allowlistLabel": "Chỉ các mục đã chọn",
-  "models.allowlistHint": "Chỉ các model được chọn mới gửi đến danh mục (để trống = tất cả). Hữu ích cho các provider cung cấp hàng nghìn model.",
+  "models.allowlistHint":
+    "Chỉ các model được chọn mới gửi đến danh mục (để trống = tất cả). Hữu ích cho các provider cung cấp hàng nghìn model.",
   "models.selectedCount": "Đã chọn {n}",
   "sub.forceTitle": "Buộc tất cả tác nhân con dùng cùng một mô hình",
   "sub.forceModel": "Mô hình tác nhân con của Claude Code",
   "sub.forceChoose": "Chọn một mô hình đã được công khai",
-  "sub.forceHelp": "Áp dụng cho tác nhân của plugin và tác nhân tích hợp (bao gồm Explore/Plan), ghi đè mô hình được chỉ định cho từng lần gọi. Các nhánh fork và kỹ năng có model: inherit vẫn dùng mô hình của cuộc trò chuyện chính. Mô hình chính và các mô hình phụ trợ Haiku/small-fast không bị ảnh hưởng.",
-  "sub.forceScope": "Mặc định tắt. Áp dụng từ lần khởi chạy ocx claude có định tuyến tiếp theo, không áp dụng khi chạy trực tiếp claude. Các biến môi trường được export trong shell có ưu tiên cao hơn; env trong settings.json có thể ghi đè chúng. Trạng thái chỉ kiểm tra CLI và cài đặt người dùng trên máy chủ, không kiểm tra shell khác hay cài đặt dự án.",
-  "sub.forceInvalid": "Mô hình đích đã cấu hình không khả dụng. Việc ghi đè mô hình khi khởi chạy sẽ bị bỏ qua; hãy chọn một mô hình đã được công khai hoặc tắt tính năng này.",
-  "sub.forceOld": "Phiên bản Claude Code cũ hơn 2.1.257: FORCE bị bỏ qua; chỉ áp dụng mô hình mặc định không bắt buộc của tác nhân con.",
-  "sub.forceUnknown": "Không xác định được phiên bản Claude Code. Tính năng buộc dùng mô hình yêu cầu phiên bản 2.1.257 trở lên.",
-  "sub.forceOverride": "Bị settings.json ghi đè: env trong tệp này chứa mô hình tác nhân con hoặc cài đặt FORCE. OpenCodex không sửa đổi tệp này.",
-  "sub.forceSettingsUnknown": "Không thể kiểm tra settings.json. Chưa xác định được liệu cài đặt trong tệp có ghi đè tùy chọn này hay không.",
+  "sub.forceHelp":
+    "Áp dụng cho tác nhân của plugin và tác nhân tích hợp (bao gồm Explore/Plan), ghi đè mô hình được chỉ định cho từng lần gọi. Các nhánh fork và kỹ năng có model: inherit vẫn dùng mô hình của cuộc trò chuyện chính. Mô hình chính và các mô hình phụ trợ Haiku/small-fast không bị ảnh hưởng.",
+  "sub.forceScope":
+    "Mặc định tắt. Áp dụng từ lần khởi chạy ocx claude có định tuyến tiếp theo, không áp dụng khi chạy trực tiếp claude. Các biến môi trường được export trong shell có ưu tiên cao hơn; env trong settings.json có thể ghi đè chúng. Trạng thái chỉ kiểm tra CLI và cài đặt người dùng trên máy chủ, không kiểm tra shell khác hay cài đặt dự án.",
+  "sub.forceInvalid":
+    "Mô hình đích đã cấu hình không khả dụng. Việc ghi đè mô hình khi khởi chạy sẽ bị bỏ qua; hãy chọn một mô hình đã được công khai hoặc tắt tính năng này.",
+  "sub.forceOld":
+    "Phiên bản Claude Code cũ hơn 2.1.257: FORCE bị bỏ qua; chỉ áp dụng mô hình mặc định không bắt buộc của tác nhân con.",
+  "sub.forceUnknown":
+    "Không xác định được phiên bản Claude Code. Tính năng buộc dùng mô hình yêu cầu phiên bản 2.1.257 trở lên.",
+  "sub.forceOverride":
+    "Bị settings.json ghi đè: env trong tệp này chứa mô hình tác nhân con hoặc cài đặt FORCE. OpenCodex không sửa đổi tệp này.",
+  "sub.forceSettingsUnknown":
+    "Không thể kiểm tra settings.json. Chưa xác định được liệu cài đặt trong tệp có ghi đè tùy chọn này hay không.",
   "sub.forceSaved": "Đã lưu. Có hiệu lực ở lần khởi chạy ocx claude có định tuyến tiếp theo.",
-  "sub.subtitle": "{cmd} của Codex chỉ quảng bá 5 model đầu tiên (theo mức độ ưu tiên) làm ghi đè (overrides). Chọn tối đa 5 model ở đây — native gpt hoặc routed — và opencodex sẽ đặt mức độ ưu tiên trong catalog của chúng để những model này dẫn đầu. Bất kỳ model nào khác vẫn có thể được gọi bằng đúng tên của nó; cài đặt này chỉ kiểm soát những gì được hiển thị.",
+  "sub.subtitle":
+    "{cmd} của Codex chỉ quảng bá 5 model đầu tiên (theo mức độ ưu tiên) làm ghi đè (overrides). Chọn tối đa 5 model ở đây — native gpt hoặc routed — và opencodex sẽ đặt mức độ ưu tiên trong catalog của chúng để những model này dẫn đầu. Bất kỳ model nào khác vẫn có thể được gọi bằng đúng tên của nó; cài đặt này chỉ kiểm soát những gì được hiển thị.",
   "sub.featured": "Nổi bật (Featured)",
   "sub.advanced": "Nâng cao (Advanced)",
   "sub.orderHintAria": "Cách thứ tự này được sử dụng",
-  "sub.orderHint": "Thứ tự hiển thị ở đây thiết lập các vị trí 1–5 ở đầu bộ chọn mô hình của Codex và các mô hình ứng viên mặc định cho {cmd}. Khi có ít hơn 5 mô hình nổi bật hiển thị trong bộ chọn, các vị trí còn lại sẽ hiển thị mô hình theo mức ưu tiên của danh mục; 5 mô hình nổi bật đang hiển thị sẽ lấp đầy danh sách, trừ khi thứ tự tùy chỉnh trong bộ chọn mô hình làm thay đổi mức ưu tiên của danh mục.",
+  "sub.orderHint":
+    "Thứ tự hiển thị ở đây thiết lập các vị trí 1–5 ở đầu bộ chọn mô hình của Codex và các mô hình ứng viên mặc định cho {cmd}. Khi có ít hơn 5 mô hình nổi bật hiển thị trong bộ chọn, các vị trí còn lại sẽ hiển thị mô hình theo mức ưu tiên của danh mục; 5 mô hình nổi bật đang hiển thị sẽ lấp đầy danh sách, trừ khi thứ tự tùy chỉnh trong bộ chọn mô hình làm thay đổi mức ưu tiên của danh mục.",
   "sub.noneSelected": "Chưa chọn — hãy chọn từ danh sách bên dưới.",
   "sub.models": "Models",
   "sub.search": "Tìm kiếm model (native gpt + routed)…",
   "sub.settings": "Cài đặt",
   "sub.sections": "Các phần agent con (Subagent sections)",
   "sub.delegation.model": "Model sẽ gọi đầu tiên",
-  "sub.delegation.modelHint": "Model mà Codex gọi đầu tiên khi bàn giao (hands off) công việc. Nổi bật bên trên là danh sách model nó có thể gọi; đây là model nó gọi đầu tiên.",
+  "sub.delegation.modelHint":
+    "Model mà Codex gọi đầu tiên khi bàn giao (hands off) công việc. Nổi bật bên trên là danh sách model nó có thể gọi; đây là model nó gọi đầu tiên.",
   "sub.suggest.button": "Gợi ý",
   "sub.suggest.label": "Công việc được giao",
-  "sub.suggest.placeholder": "Codex thường giao việc gì? ví dụ: tìm kiếm chỉ đọc trên toàn repo, hoặc refactor trải qua nhiều module",
+  "sub.suggest.placeholder":
+    "Codex thường giao việc gì? ví dụ: tìm kiếm chỉ đọc trên toàn repo, hoặc refactor trải qua nhiều module",
   "sub.suggest.submit": "Đánh giá",
   "sub.suggest.running": "Đang đánh giá…",
   "sub.suggest.failed": "Không thể đánh giá công việc được giao.",
   "sub.suggest.title": "Model được gợi ý",
   "sub.suggest.accept": "Dùng model này",
   "sub.noModels": "Không có model — vui lòng đăng nhập vào provider hoặc thêm model trước.",
-  "sub.saved": "Đã lưu {n} model. Hãy bắt đầu phiên Codex mới (hoặc chạy {cmd}) để thấy chúng dưới dạng ghi đè spawn_agent.",
+  "sub.saved":
+    "Đã lưu {n} model. Hãy bắt đầu phiên Codex mới (hoặc chạy {cmd}) để thấy chúng dưới dạng ghi đè spawn_agent.",
   "sub.saveFailed": "Lưu thất bại",
   "sub.networkError": "Lỗi mạng — proxy có đang chạy không?",
   "sub.loadFail": "Lỗi tải model — proxy có đang chạy không?",
@@ -1033,8 +1230,10 @@ export const vi: Record<TKey, string> = {
   "sub.workspace.notFeatured": "Không nổi bật",
   "sub.workspace.priority": "Ưu tiên",
   "sub.ultraMode": "Luôn uỷ quyền chủ động",
-  "sub.ultraModeHint": "Bật chính sách uỷ quyền đa agent chủ động (Proactive multi-agent delegation) cho mọi model và nỗ lực suy luận (không làm thay đổi bản thân nỗ lực suy luận). Ghi thiết lập vào features.multi_agent_v2.multi_agent_mode_hint_text trong config.toml.",
-  "sub.ultraModeV2Required": "Yêu cầu giao diện đa agent v2 (v2 multi-agent surface) — bật multi_agent_v2 và chọn v2 trong trình điều khiển Chế độ agent con (Sub-agent mode) trước.",
+  "sub.ultraModeHint":
+    "Bật chính sách uỷ quyền đa agent chủ động (Proactive multi-agent delegation) cho mọi model và nỗ lực suy luận (không làm thay đổi bản thân nỗ lực suy luận). Ghi thiết lập vào features.multi_agent_v2.multi_agent_mode_hint_text trong config.toml.",
+  "sub.ultraModeV2Required":
+    "Yêu cầu giao diện đa agent v2 (v2 multi-agent surface) — bật multi_agent_v2 và chọn v2 trong trình điều khiển Chế độ agent con (Sub-agent mode) trước.",
   "sub.ultraModeText": "Văn bản uỷ quyền chủ động",
   "sub.ultraModePreset": "Khôi phục preset",
   "sub.ultraModeLoadFail": "Lỗi tải cài đặt uỷ quyền chủ động — proxy có đang chạy không?",
@@ -1042,10 +1241,12 @@ export const vi: Record<TKey, string> = {
   "sub.ultraModeSaved": "Đã lưu uỷ quyền chủ động. Áp dụng cho các phiên Codex mới.",
   "sub.workspace.removeFromFeatured": "Xoá {m} khỏi phần Nổi bật",
   "sub.workspace.selectModel": "Chọn một model",
-  "sub.workspace.selectModelDesc": "Chọn một model từ danh sách để xem chi tiết và đưa nó vào danh sách nổi bật cho spawn_agent.",
+  "sub.workspace.selectModelDesc":
+    "Chọn một model từ danh sách để xem chi tiết và đưa nó vào danh sách nổi bật cho spawn_agent.",
   "sub.workspace.selector": "Bộ chọn công khai (Public selector)",
   "sub.fallbackLabel": "Chuỗi dự phòng của agent con",
-  "sub.fallbackHint": "Các model có thứ tự được thử nghiệm khi model agent con không khả dụng hoặc bị lỗi.",
+  "sub.fallbackHint":
+    "Các model có thứ tự được thử nghiệm khi model agent con không khả dụng hoặc bị lỗi.",
   "sub.fallbackAdd": "Thêm model dự phòng…",
   "sub.fallbackPoll": "Khoảng thời gian kiểm tra khả dụng (Availability check interval)",
   "sub.fallbackSaved": "Đã lưu cài đặt dự phòng của agent con.",
@@ -1053,13 +1254,16 @@ export const vi: Record<TKey, string> = {
   "sub.fallbackUnavailable": "Hiện không được quảng bá; vẫn được giữ trong chuỗi dự phòng.",
   "sub.fallbackPollInvalid": "Vui lòng nhập một số nguyên từ 5000 đến 600000 ms.",
   "sub.v2Compatibility.title": "Khả năng tương thích V2 của Native-parent",
-  "sub.v2Compatibility.risk": "Nếu model cha ChatGPT-native uỷ quyền cho model định tuyến (routed model) này bằng V2, task của nó có thể bị mã hoá và thất bại trước khi thực thi. Các task có thể đọc được từ model cha định tuyến không bị ảnh hưởng.",
-  "sub.v2Compatibility.recoveryUnknown": "Trạng thái bật phục hồi/đủ điều kiện không được tiết lộ bởi máy chủ này. Hãy dùng V1/uỷ quyền tương thích văn bản thuần (plaintext-compatible delegation), hoặc chỉ bật khôi phục V2 thử nghiệm (experimental V2 recovery) nếu đủ điều kiện. Khôi phục sẽ tăng thêm tiêu tốn quota, độ trễ, phụ thuộc backend và có khả năng làm giảm độ chính xác; nó không sửa được giao thức upstream.",
+  "sub.v2Compatibility.risk":
+    "Nếu model cha ChatGPT-native uỷ quyền cho model định tuyến (routed model) này bằng V2, task của nó có thể bị mã hoá và thất bại trước khi thực thi. Các task có thể đọc được từ model cha định tuyến không bị ảnh hưởng.",
+  "sub.v2Compatibility.recoveryUnknown":
+    "Trạng thái bật phục hồi/đủ điều kiện không được tiết lộ bởi máy chủ này. Hãy dùng V1/uỷ quyền tương thích văn bản thuần (plaintext-compatible delegation), hoặc chỉ bật khôi phục V2 thử nghiệm (experimental V2 recovery) nếu đủ điều kiện. Khôi phục sẽ tăng thêm tiêu tốn quota, độ trễ, phụ thuộc backend và có khả năng làm giảm độ chính xác; nó không sửa được giao thức upstream.",
   "sub.v2Compatibility.details": "Chi tiết tương thích",
   "logs.title": "Nhật ký yêu cầu",
   "logs.tabLogs": "Nhật ký",
   "logs.tabDebug": "Gỡ lỗi",
-  "logs.subtitle": "Các request gần đây được định tuyến qua local opencodex proxy, mới nhất ở trên cùng.",
+  "logs.subtitle":
+    "Các request gần đây được định tuyến qua local opencodex proxy, mới nhất ở trên cùng.",
   "logs.autoRefresh": "Tự động làm mới",
   "logs.noRequests": "Chưa có request nào.",
   "logs.loadError": "Không thể tải logs request.",
@@ -1098,7 +1302,8 @@ export const vi: Record<TKey, string> = {
   "logs.filter.conversation.apply": "Lọc logs",
   "logs.conversation.totals": "{requests} yêu cầu · {tokens} token · {cost}",
   "logs.conversation.scope": "Tổng số liệu chỉ áp dụng cho bộ đệm Logs đang được tải.",
-  "logs.conversation.excluded": "(đã loại trừ {unpriced} không có giá, {unmetered} không đo lường khỏi khoản ước tính ~$)",
+  "logs.conversation.excluded":
+    "(đã loại trừ {unpriced} không có giá, {unmetered} không đo lường khỏi khoản ước tính ~$)",
   "logs.cost.approximate": "{amount}",
   "logs.cost.lowerBound": "≥{amount}",
   "logs.cost.unavailable": "—",
@@ -1115,9 +1320,11 @@ export const vi: Record<TKey, string> = {
   "logs.col.tokPerSec": "tok/s",
   "logs.col.estimatedCost": "~$",
   "logs.metric.tokPerSecTitle": "Số output token mỗi giây trên toàn bộ thời lượng request",
-  "logs.metric.estimatedCostTitle": "Mức tương đương giá niêm yết của API, không phải là mức phí thực tế; không khả dụng với giá không khớp",
+  "logs.metric.estimatedCostTitle":
+    "Mức tương đương giá niêm yết của API, không phải là mức phí thực tế; không khả dụng với giá không khớp",
   "usage.cost.total": "Tương đương giá niêm yết API (phạm vi này)",
-  "usage.cost.disclaimer": "Đây không phải biên lai thanh toán. Mức sử dụng thuê bao hoặc credit của provider có thể được áp dụng thay thế.",
+  "usage.cost.disclaimer":
+    "Đây không phải biên lai thanh toán. Mức sử dụng thuê bao hoặc credit của provider có thể được áp dụng thay thế.",
   "usage.cost.unpricedNote": "Đã loại trừ {count} requests (không có giá hoặc mức sử dụng)",
   "usage.cost.excluded": "({count} yêu cầu bị loại trừ)",
   "usage.cost.excludedOne": "({count} yêu cầu bị loại trừ)",
@@ -1127,7 +1334,8 @@ export const vi: Record<TKey, string> = {
   "logs.detail.route.profile": "Profile",
   "logs.detail.route.selected": "Đã chọn",
   "logs.detail.route.candidates": "Ứng viên (Candidates)",
-  "logs.detail.route.unknown": "Không có dấu vết định tuyến (route trace) nào được ghi lại cho request này (pre-trace row).",
+  "logs.detail.route.unknown":
+    "Không có dấu vết định tuyến (route trace) nào được ghi lại cho request này (pre-trace row).",
   "logs.filter.protocol.label": "Đường giao thức",
   "logs.filter.protocol.all": "Tất cả đường",
   "logs.filter.protocol.none": "Không có dữ liệu đường",
@@ -1169,12 +1377,17 @@ export const vi: Record<TKey, string> = {
   "logs.detail.decodeGeneration": "Tốc độ đầu ra trong khi tạo (ước tính)",
   "logs.detail.decodeLegacy": "Tốc độ đầu ra sau lần hiển thị đầu tiên (ước tính)",
   "logs.detail.decodeUnknown": "Tốc độ đầu ra (ước tính; chưa rõ cách đo thời gian)",
-  "logs.detail.decodeBasisHint.generation": "Ước tính theo thời gian từ đầu ra đầu tiên mà proxy quan sát được, bao gồm suy luận, đến phần đầu ra bổ sung cuối cùng.",
-  "logs.detail.decodeBasisHint.legacy": "Ước tính theo thời gian từ đầu ra hiển thị đầu tiên đến khi yêu cầu kết thúc, đồng thời đếm tất cả token đầu ra được báo cáo, bao gồm suy luận.",
-  "logs.detail.decodeBasisHint.unknown": "Máy chủ không báo cáo cách đo thời gian được dùng cho ước tính này.",
+  "logs.detail.decodeBasisHint.generation":
+    "Ước tính theo thời gian từ đầu ra đầu tiên mà proxy quan sát được, bao gồm suy luận, đến phần đầu ra bổ sung cuối cùng.",
+  "logs.detail.decodeBasisHint.legacy":
+    "Ước tính theo thời gian từ đầu ra hiển thị đầu tiên đến khi yêu cầu kết thúc, đồng thời đếm tất cả token đầu ra được báo cáo, bao gồm suy luận.",
+  "logs.detail.decodeBasisHint.unknown":
+    "Máy chủ không báo cáo cách đo thời gian được dùng cho ước tính này.",
   "logs.detail.endToEndTokPerSec": "Đầu ra toàn yêu cầu (tok/s)",
-  "logs.detail.reason.ttft_missing": "Không ghi nhận thời gian đến token đầu tiên (time-to-first-token) cho request này, nên không có cửa sổ decode nào để đo lường.",
-  "logs.detail.reason.decode_window_too_short": "Cửa sổ đầu ra đo được nhỏ hơn một giây, quá ngắn để ước tính tốc độ decode.",
+  "logs.detail.reason.ttft_missing":
+    "Không ghi nhận thời gian đến token đầu tiên (time-to-first-token) cho request này, nên không có cửa sổ decode nào để đo lường.",
+  "logs.detail.reason.decode_window_too_short":
+    "Cửa sổ đầu ra đo được nhỏ hơn một giây, quá ngắn để ước tính tốc độ decode.",
   "logs.detail.costTotal": "Tương đương giá niêm yết",
   "logs.detail.totalTokens": "Tổng số tokens",
   "logs.detail.matchedKey": "Khoá giá trùng khớp (Matched price key)",
@@ -1190,15 +1403,18 @@ export const vi: Record<TKey, string> = {
   "logs.detail.attempt.target": "Nhà cung cấp / model",
   "logs.detail.attempt.reason": "Kết quả / lý do",
   "logs.detail.attempt.completed": "Đã hoàn thành",
-  "logs.detail.attempt.e2eNote": "Chỉ số tok/s tổng thể (top-level) là tính từ đầu đến cuối (end-to-end); mỗi lần thử (attempt) sử dụng thời lượng riêng của nó.",
+  "logs.detail.attempt.e2eNote":
+    "Chỉ số tok/s tổng thể (top-level) là tính từ đầu đến cuối (end-to-end); mỗi lần thử (attempt) sử dụng thời lượng riêng của nó.",
   "logs.detail.attempt.recovery.transient5xx": "Lỗi tạm thời 5xx (Transient 5xx)",
   "logs.detail.attempt.recovery.connectionReset": "Kết nối bị đặt lại (Connection reset)",
   "logs.detail.attempt.recovery.oauth401": "Xác thực lại OAuth (OAuth re-authentication)",
   "logs.detail.attempt.recovery.key429": "Khoá bị giới hạn tỷ lệ (Key rate-limited 429)",
   "logs.detail.attempt.recovery.rateLimit429": "Bị giới hạn tỷ lệ (Rate-limited 429)",
-  "logs.detail.attempt.recovery.anthropicOauth429": "Xác thực Anthropic OAuth bị giới hạn tỷ lệ (429)",
+  "logs.detail.attempt.recovery.anthropicOauth429":
+    "Xác thực Anthropic OAuth bị giới hạn tỷ lệ (429)",
   "logs.detail.attempt.recovery.image413": "Kích thước hình ảnh quá lớn (413)",
-  "logs.detail.attempt.recovery.emptyCompletion": "Thử lại do hoàn thành rỗng (Empty completion retry)",
+  "logs.detail.attempt.recovery.emptyCompletion":
+    "Thử lại do hoàn thành rỗng (Empty completion retry)",
   "logs.detail.attempt.recovery.consoleGoUpload": "Thử lại tải lên Console",
   "logs.detail.attempt.recovery.key401": "Xác thực lại khóa API",
   "logs.detail.attempt.recovery.oauthAccount403": "Cần xác minh tài khoản (403)",
@@ -1206,7 +1422,8 @@ export const vi: Record<TKey, string> = {
   "logs.detail.attempt.recovery.oauthAccount402": "Tài khoản đã hết hạn mức (402)",
   "logs.detail.attempt.recovery.opaqueBlobRejection": "Đã bỏ trạng thái mã hóa cũ",
   "logs.detail.attempt.recovery.reasoningEffortDowngrade": "Đã giảm mức suy luận",
-  "logs.detail.attempt.recovery.anthropicFastDowngrade": "Chế độ nhanh bị từ chối, thử lại ở tốc độ chuẩn",
+  "logs.detail.attempt.recovery.anthropicFastDowngrade":
+    "Chế độ nhanh bị từ chối, thử lại ở tốc độ chuẩn",
   "logs.detail.outcome.label": "Kết quả",
   "logs.detail.outcome.completed": "Hoàn tất",
   "logs.detail.outcome.failed": "Thất bại",
@@ -1251,14 +1468,19 @@ export const vi: Record<TKey, string> = {
   "logs.detail.reason.output_missing": "Không có số lượng output token dương nào được báo cáo.",
   "logs.detail.reason.invalid_duration": "Thời lượng request không hợp lệ.",
   "logs.detail.reason.price_unmatched": "Không tìm thấy giá khớp.",
-  "logs.detail.reason.invalid_cache_breakdown": "Chi tiết cache token không khớp với tổng số input token.",
+  "logs.detail.reason.invalid_cache_breakdown":
+    "Chi tiết cache token không khớp với tổng số input token.",
   "logs.detail.reason.invalid_usage": "Mức sử dụng chứa giá trị token không hợp lệ.",
-  "logs.detail.reason.combo_attempt_unavailable": "Ít nhất một lượt thử kết hợp (combo attempt) không thể định giá.",
+  "logs.detail.reason.combo_attempt_unavailable":
+    "Ít nhất một lượt thử kết hợp (combo attempt) không thể định giá.",
   "logs.detail.estimate.usage_estimated": "Mức sử dụng của provider được ước tính.",
-  "logs.detail.estimate.cache_detail_missing": "Chi tiết cache không khả dụng; đầu vào là ước tính giới hạn trên.",
-  "logs.detail.estimate.expected_price_overlay": "Một giá niêm yết kỳ vọng (expected list price) đã xác minh được sử dụng.",
+  "logs.detail.estimate.cache_detail_missing":
+    "Chi tiết cache không khả dụng; đầu vào là ước tính giới hạn trên.",
+  "logs.detail.estimate.expected_price_overlay":
+    "Một giá niêm yết kỳ vọng (expected list price) đã xác minh được sử dụng.",
   "logs.detail.estimate.provider_cost_overlay": "Sử dụng giá tuỳ chỉnh do provider cấu hình.",
-  "logs.detail.estimate.priority_lower_bound": "Giá Ưu tiên (Priority price) đã xác nhận không khả dụng; ước tính hiển thị là giới hạn dưới đã biết.",
+  "logs.detail.estimate.priority_lower_bound":
+    "Giá Ưu tiên (Priority price) đã xác nhận không khả dụng; ước tính hiển thị là giới hạn dưới đã biết.",
   "logs.col.error": "Lỗi",
   "logs.col.upstreamReason": "Lý do upstream",
   "logs.col.failureDetail": "Chi tiết lỗi",
@@ -1317,20 +1539,24 @@ export const vi: Record<TKey, string> = {
   "logs.tokens.contextTotal": "tổng ngữ cảnh hoạt động",
   "logs.tokens.noCacheNote": "provider này không báo cáo số lượng cache tokens",
   "logs.tokens.noCacheCursor": "Chi tiết bộ nhớ cache của Cursor không được báo cáo",
-  "logs.tokens.noCacheCursorNote": "Cursor không tiết lộ số lượng cache read/write token; thông tin này chưa được biết (unknown), không phải là xác nhận cache miss",
+  "logs.tokens.noCacheCursorNote":
+    "Cursor không tiết lộ số lượng cache read/write token; thông tin này chưa được biết (unknown), không phải là xác nhận cache miss",
   "logs.tokens.estimatedNote": "ước tính (provider không báo cáo mức sử dụng chính xác)",
   "logs.details": "Chi tiết",
   "logs.detailTitle": "Chi tiết request",
   "logs.detailRaw": "Mục log thô",
   "debug.title": "Gỡ lỗi",
-  "debug.subtitle": "Chuẩn đoán (Diagnostics) về trích xuất mức sử dụng và luồng truyền (transport) của provider tuỳ chọn. Các request lỗi và 502 vẫn ở tab Logs.",
+  "debug.subtitle":
+    "Chuẩn đoán (Diagnostics) về trích xuất mức sử dụng và luồng truyền (transport) của provider tuỳ chọn. Các request lỗi và 502 vẫn ở tab Logs.",
   "debug.debug": "Debug của provider",
   "debug.usage": "Trích xuất mức sử dụng",
   "debug.injection": "Log can thiệp (Injection log)",
   "debug.claude": "Claude đầu vào (Claude inbound)",
   "debug.claudeInbound.title": "Các request đầu vào từ Claude",
-  "debug.claudeInbound.sub": "Những gì Claude Code/Desktop thực sự gửi (thinking, effort, metadata) — không có nội dung text của prompt nào được lưu.",
-  "debug.claudeInbound.empty": "Chưa thu được request nào. Hãy gửi một tin nhắn từ Claude trong khi tính năng này được bật.",
+  "debug.claudeInbound.sub":
+    "Những gì Claude Code/Desktop thực sự gửi (thinking, effort, metadata) — không có nội dung text của prompt nào được lưu.",
+  "debug.claudeInbound.empty":
+    "Chưa thu được request nào. Hãy gửi một tin nhắn từ Claude trong khi tính năng này được bật.",
   "debug.claudeInbound.time": "Thời gian",
   "debug.claudeInbound.endpoint": "Endpoint",
   "debug.claudeInbound.model": "Model",
@@ -1344,20 +1570,28 @@ export const vi: Record<TKey, string> = {
   "debug.loading": "Đang tải cài đặt debug…",
   "debug.loadFailed": "Không thể tải cài đặt debug.",
   "debug.emptyTitle": "Ghi log debug đang tắt",
-  "debug.empty": "Bật Provider debug hoặc Trích xuất mức sử dụng (Usage extraction) trong thẻ bên trên. Các dòng log sẽ xuất hiện ở đây sau khi bạn gửi một request qua proxy.",
+  "debug.empty":
+    "Bật Provider debug hoặc Trích xuất mức sử dụng (Usage extraction) trong thẻ bên trên. Các dòng log sẽ xuất hiện ở đây sau khi bạn gửi một request qua proxy.",
   "debug.noLinesTitle": "Đang chờ dòng (Waiting for lines)",
-  "debug.noLines.provider": "Tính năng Provider debug đang bật, nhưng nó chỉ ghi lại những bất thường trong quá trình truyền dữ liệu (dropped or malformed frames, và các sự kiện quay số/thử lại của Cursor). Một request không lỗi qua provider như Anthropic có thể không tạo ra dòng nào.",
-  "debug.noLines.usage": "Trích xuất mức sử dụng đang bật nhưng chưa thu thập được dữ liệu. Gửi một chat/request thông qua Codex và log sẽ hiện ra ở đây.",
-  "debug.noLines.injection": "Log can thiệp (Injection log) đang bật nhưng chưa thu thập được dữ liệu. Tính năng này ghi lại các can thiệp về hướng dẫn đa agent (multi-agent guidance injection) và quyết định nỗ lực trong các lượt cộng tác (collab) hoặc qua agent con.",
+  "debug.noLines.provider":
+    "Tính năng Provider debug đang bật, nhưng nó chỉ ghi lại những bất thường trong quá trình truyền dữ liệu (dropped or malformed frames, và các sự kiện quay số/thử lại của Cursor). Một request không lỗi qua provider như Anthropic có thể không tạo ra dòng nào.",
+  "debug.noLines.usage":
+    "Trích xuất mức sử dụng đang bật nhưng chưa thu thập được dữ liệu. Gửi một chat/request thông qua Codex và log sẽ hiện ra ở đây.",
+  "debug.noLines.injection":
+    "Log can thiệp (Injection log) đang bật nhưng chưa thu thập được dữ liệu. Tính năng này ghi lại các can thiệp về hướng dẫn đa agent (multi-agent guidance injection) và quyết định nỗ lực trong các lượt cộng tác (collab) hoặc qua agent con.",
   "usage.title": "Mức sử dụng",
-  "usage.subtitle": "Quản lý token cục bộ (local token accounting) từ proxy của bạn. Mức sử dụng bị thiếu sẽ không bao giờ hiển thị bằng 0 (zero).",
+  "usage.subtitle":
+    "Quản lý token cục bộ (local token accounting) từ proxy của bạn. Mức sử dụng bị thiếu sẽ không bao giờ hiển thị bằng 0 (zero).",
   "usage.loading": "Đang tải dữ liệu sử dụng…",
-  "usage.empty": "Chưa có mức sử dụng nào được ghi lại. Gửi một request qua proxy để thấy hoạt động ở đây.",
+  "usage.empty":
+    "Chưa có mức sử dụng nào được ghi lại. Gửi một request qua proxy để thấy hoạt động ở đây.",
   "usage.loadError": "Không thể tải dữ liệu sử dụng.",
   "usage.range.all": "Tất cả",
   "usage.range.available": "Lịch sử khả dụng",
-  "usage.historyTruncated": "Số tổng chỉ bao gồm lịch sử có sẵn vì các dữ liệu sử dụng cũ hơn không được tải.",
-  "usage.historyTruncatedWindow": "Các hàng được tải có thời gian bắt đầu (request start times) từ {start} đến {end}. Các mục file cũ hơn đã bị bỏ qua bởi giới hạn đọc (read limit), do đó bất kỳ phạm vi đã chọn nào cũng có thể không đầy đủ.",
+  "usage.historyTruncated":
+    "Số tổng chỉ bao gồm lịch sử có sẵn vì các dữ liệu sử dụng cũ hơn không được tải.",
+  "usage.historyTruncatedWindow":
+    "Các hàng được tải có thời gian bắt đầu (request start times) từ {start} đến {end}. Các mục file cũ hơn đã bị bỏ qua bởi giới hạn đọc (read limit), do đó bất kỳ phạm vi đã chọn nào cũng có thể không đầy đủ.",
   "usage.range.30d": "30 ngày",
   "usage.range.7d": "7 ngày",
   "usage.card.requests": "Yêu cầu",
@@ -1365,7 +1599,8 @@ export const vi: Record<TKey, string> = {
   "usage.card.reported": "Đã báo cáo (Reported)",
   "usage.card.totalTokens": "Tổng số tokens",
   "usage.card.cachedTokens": "Đọc cache (Cache reads)",
-  "usage.card.cachedTokensHint": "Prompt tokens được phục vụ từ cache của provider (cache reads). Cache writes sẽ hiển thị bên dưới nếu có.",
+  "usage.card.cachedTokensHint":
+    "Prompt tokens được phục vụ từ cache của provider (cache reads). Cache writes sẽ hiển thị bên dưới nếu có.",
   "usage.card.cacheWriteTokens": "ghi cache (cache writes)",
   "usage.card.coverage": "Độ phủ (Coverage)",
   "usage.card.activeDays": "Số ngày hoạt động",
@@ -1379,7 +1614,8 @@ export const vi: Record<TKey, string> = {
   "usage.coverage.measured": "Đã đo",
   "usage.coverage.reported": "Provider báo cáo",
   "usage.coverage.estimated": "Ước tính",
-  "usage.coverage.note": "Các mục đo lường (Measured) bao gồm số lượng token ước tính và được báo cáo bởi provider. Các requests không có báo cáo hoặc không được hỗ trợ vẫn được theo dõi nhưng không bao giờ bị biến thành 0 token.",
+  "usage.coverage.note":
+    "Các mục đo lường (Measured) bao gồm số lượng token ước tính và được báo cáo bởi provider. Các requests không có báo cáo hoặc không được hỗ trợ vẫn được theo dõi nhưng không bao giờ bị biến thành 0 token.",
   "usage.search.models": "Tìm kiếm models…",
   "usage.col.requests": "Yêu cầu",
   "usage.col.measured": "Đã đo",
@@ -1390,10 +1626,14 @@ export const vi: Record<TKey, string> = {
   "usage.col.cacheHits": "Lượt truy cập cache",
   "usage.col.cacheWrites": "Lần ghi cache",
   "usage.col.cacheHitRate": "Tỷ lệ truy cập cache",
-  "usage.throughput.title": "Thông lượng đầu ra end-to-end: tổng token đầu ra chia cho tổng thời gian đồng hồ qua {samples} lần thử được đo. Bao gồm thời gian chờ trước khi giải mã nên thấp hơn tốc độ giải mã ổn định; các yêu cầu không đo được token và thời lượng bị loại.",
-  "usage.throughput.unmeasured": "Không có yêu cầu nào trong dòng này báo cả token đầu ra lẫn thời lượng, nên không có thông lượng để trung bình.",
-  "usage.cacheHitRate.partial": "Giá trị trung bình được tính dựa trên {measured} trong tổng số {total} token đầu vào; các yêu cầu còn lại không cung cấp thông tin chi tiết về cache.",
-  "usage.cacheHitRate.unmeasured": "Không có yêu cầu nào trong hàng này cung cấp thông tin chi tiết về cache, nên không thể tính tỷ lệ truy cập cache trung bình.",
+  "usage.throughput.title":
+    "Thông lượng đầu ra end-to-end: tổng token đầu ra chia cho tổng thời gian đồng hồ qua {samples} lần thử được đo. Bao gồm thời gian chờ trước khi giải mã nên thấp hơn tốc độ giải mã ổn định; các yêu cầu không đo được token và thời lượng bị loại.",
+  "usage.throughput.unmeasured":
+    "Không có yêu cầu nào trong dòng này báo cả token đầu ra lẫn thời lượng, nên không có thông lượng để trung bình.",
+  "usage.cacheHitRate.partial":
+    "Giá trị trung bình được tính dựa trên {measured} trong tổng số {total} token đầu vào; các yêu cầu còn lại không cung cấp thông tin chi tiết về cache.",
+  "usage.cacheHitRate.unmeasured":
+    "Không có yêu cầu nào trong hàng này cung cấp thông tin chi tiết về cache, nên không thể tính tỷ lệ truy cập cache trung bình.",
   "usage.unavailable": "—",
   "usage.col.tokens": "Tokens",
   "usage.col.apiListPrice": "Giá niêm yết API",
@@ -1405,14 +1645,17 @@ export const vi: Record<TKey, string> = {
   "usage.dayFri": "T6",
   "usage.heatmap.tooltipTokens": "{tokens} token",
   "usage.chart.dayDetail": "{date}: {requests} yêu cầu, {tokens} token",
-  "usage.heatmap.keyboardLabel": "Dùng phím Lên và Xuống để di chuyển theo ngày; Trái và Phải để di chuyển theo tuần.",
+  "usage.heatmap.keyboardLabel":
+    "Dùng phím Lên và Xuống để di chuyển theo ngày; Trái và Phải để di chuyển theo tuần.",
   "usage.heatmap.tooltipRequests": "{requests} yêu cầu",
   "nav.storage": "Lưu trữ",
   "storage.title": "Lưu trữ",
-  "storage.subtitle": "Xem những gì đang chiếm dụng dung lượng trong CODEX_HOME. Việc dọn dẹp sẽ không bao giờ đụng đến các phiên (sessions) đang hoạt động.",
+  "storage.subtitle":
+    "Xem những gì đang chiếm dụng dung lượng trong CODEX_HOME. Việc dọn dẹp sẽ không bao giờ đụng đến các phiên (sessions) đang hoạt động.",
   "storage.loading": "Đang quét lưu trữ…",
   "storage.empty": "CODEX_HOME trống hoặc bị thiếu — không có gì để báo cáo.",
-  "storage.error": "Quét lưu trữ thất bại. Vui lòng kiểm tra CODEX_HOME có trỏ đến một thư mục hợp lệ không.",
+  "storage.error":
+    "Quét lưu trữ thất bại. Vui lòng kiểm tra CODEX_HOME có trỏ đến một thư mục hợp lệ không.",
   "storage.refresh": "Quét lại (Rescan)",
   "storage.rescanned": "Quét hoàn tất.",
   "storage.card.total": "Tổng kích thước",
@@ -1445,17 +1688,20 @@ export const vi: Record<TKey, string> = {
   "storage.bucket.deletion_manifests": "Manifests xoá",
   "storage.bucket.other": "Khác",
   "storage.cleanup.title": "Dọn dẹp lưu trữ (Archived cleanup)",
-  "storage.cleanup.help": "Xoá các phiên đã lưu trữ cũ nhất theo tỷ lệ phần trăm. Các phiên hoạt động không bao giờ bị đụng tới. Cách ly là mặc định — các tệp sẽ chuyển vào CODEX_HOME/.trash.",
+  "storage.cleanup.help":
+    "Xoá các phiên đã lưu trữ cũ nhất theo tỷ lệ phần trăm. Các phiên hoạt động không bao giờ bị đụng tới. Cách ly là mặc định — các tệp sẽ chuyển vào CODEX_HOME/.trash.",
   "storage.cleanup.slider": "Phần trăm cũ nhất của lưu trữ",
   "storage.cleanup.percent": "{percent}%",
   "storage.cleanup.preset": "{percent}",
   "storage.cleanup.preview": "Xem trước",
   "storage.cleanup.confirmTitle": "Xác nhận dọn dẹp lưu trữ",
-  "storage.cleanup.confirmBody": "Thao tác này sẽ xử lý {count} tệp lưu trữ (~{size}), chiếm {percent}% cũ nhất.",
+  "storage.cleanup.confirmBody":
+    "Thao tác này sẽ xử lý {count} tệp lưu trữ (~{size}), chiếm {percent}% cũ nhất.",
   "storage.cleanup.moreFiles": "…và {n} tệp khác",
   "storage.cleanup.permanent": "Xoá vĩnh viễn (bỏ qua cách ly)",
   "storage.cleanup.permanentWarn": "Thao tác xoá vĩnh viễn không thể hoàn tác.",
-  "storage.cleanup.quarantineNote": "Các tệp sẽ được di chuyển vào .trash thuộc CODEX_HOME. Bạn có thể khôi phục chúng từ tab Cách ly.",
+  "storage.cleanup.quarantineNote":
+    "Các tệp sẽ được di chuyển vào .trash thuộc CODEX_HOME. Bạn có thể khôi phục chúng từ tab Cách ly.",
   "storage.cleanup.cancel": "Hủy",
   "storage.cleanup.confirmQuarantine": "Cách ly",
   "storage.cleanup.confirmPermanent": "Xoá vĩnh viễn",
@@ -1464,18 +1710,27 @@ export const vi: Record<TKey, string> = {
   "storage.cleanup.skippedReferenced": "Đã bỏ qua {count} tệp đang được tham chiếu.",
   "storage.cleanup.previewFailed": "Xem trước thất bại.",
   "storage.cleanup.cleanupFailed": "Dọn dẹp thất bại.",
-  "storage.cleanup.err.codex_busy": "Codex đang sử dụng state.sqlite — hãy thử lại sau khi thoát Codex.",
-  "storage.cleanup.err.stale_preview": "Các tệp lưu trữ đã thay đổi kể từ khi xem trước — hãy chạy lại tính năng Xem trước (Preview).",
-  "storage.cleanup.err.restore_pending_overlap": "Các lưu trữ đã chọn bị trùng với tiến trình khôi phục rác chưa hoàn tất — hãy kết thúc hoặc thử khôi phục lại trước.",
-  "storage.cleanup.err.referenced_history": "Các lưu trữ đã chọn vẫn đang được tham chiếu bởi lịch sử phân nhánh (forked) hoặc phân trang (paginated).",
-  "storage.cleanup.err.invalid_digest": "Mã xác nhận xem trước (Preview digest) bị thiếu hoặc không hợp lệ.",
-  "storage.cleanup.err.invalid_mode": "Chế độ dọn dẹp phải là cách ly (quarantine) hoặc xoá vĩnh viễn (permanent).",
-  "storage.cleanup.err.fs_failed": "Dọn dẹp hệ thống tệp thất bại. Một số thay đổi có thể đã được áp dụng — kiểm tra CODEX_HOME/.trash và bất kỳ đường dẫn khôi phục nào được hiển thị.",
-  "storage.cleanup.err.fs_failed_trash": "Dọn dẹp hệ thống tệp thất bại. Một số thay đổi có thể đã được áp dụng — kiểm tra {trashDir} và manifest.json để xem tệp có thể khôi phục.",
+  "storage.cleanup.err.codex_busy":
+    "Codex đang sử dụng state.sqlite — hãy thử lại sau khi thoát Codex.",
+  "storage.cleanup.err.stale_preview":
+    "Các tệp lưu trữ đã thay đổi kể từ khi xem trước — hãy chạy lại tính năng Xem trước (Preview).",
+  "storage.cleanup.err.restore_pending_overlap":
+    "Các lưu trữ đã chọn bị trùng với tiến trình khôi phục rác chưa hoàn tất — hãy kết thúc hoặc thử khôi phục lại trước.",
+  "storage.cleanup.err.referenced_history":
+    "Các lưu trữ đã chọn vẫn đang được tham chiếu bởi lịch sử phân nhánh (forked) hoặc phân trang (paginated).",
+  "storage.cleanup.err.invalid_digest":
+    "Mã xác nhận xem trước (Preview digest) bị thiếu hoặc không hợp lệ.",
+  "storage.cleanup.err.invalid_mode":
+    "Chế độ dọn dẹp phải là cách ly (quarantine) hoặc xoá vĩnh viễn (permanent).",
+  "storage.cleanup.err.fs_failed":
+    "Dọn dẹp hệ thống tệp thất bại. Một số thay đổi có thể đã được áp dụng — kiểm tra CODEX_HOME/.trash và bất kỳ đường dẫn khôi phục nào được hiển thị.",
+  "storage.cleanup.err.fs_failed_trash":
+    "Dọn dẹp hệ thống tệp thất bại. Một số thay đổi có thể đã được áp dụng — kiểm tra {trashDir} và manifest.json để xem tệp có thể khôi phục.",
   "storage.cleanup.err.db_reconcile_failed": "Không thể cập nhật cơ sở dữ liệu state của Codex.",
   "storage.cleanup.err.cleanup_failed": "Dọn dẹp thất bại.",
   "storage.trash.title": "Cách ly (Quarantine)",
-  "storage.trash.help": "Các phiên đã lưu trữ (Archived sessions) được di chuyển vào CODEX_HOME/.trash. Quá trình Khôi phục sẽ đặt các tệp JSONL và dữ liệu hàng (thread rows) trở lại.",
+  "storage.trash.help":
+    "Các phiên đã lưu trữ (Archived sessions) được di chuyển vào CODEX_HOME/.trash. Quá trình Khôi phục sẽ đặt các tệp JSONL và dữ liệu hàng (thread rows) trở lại.",
   "storage.trash.empty": "Không có mục cách ly nào.",
   "storage.trash.loading": "Đang tải vùng cách ly…",
   "storage.trash.col.when": "Thời gian cách ly",
@@ -1485,7 +1740,8 @@ export const vi: Record<TKey, string> = {
   "storage.trash.col.id": "Mục (Entry)",
   "storage.trash.restore": "Khôi phục",
   "storage.trash.confirmTitle": "Khôi phục mục cách ly?",
-  "storage.trash.confirmBody": "Khôi phục {count} tệp (~{size}) từ {id} về lại các phiên đã lưu trữ (archived sessions).",
+  "storage.trash.confirmBody":
+    "Khôi phục {count} tệp (~{size}) từ {id} về lại các phiên đã lưu trữ (archived sessions).",
   "storage.trash.cancel": "Hủy",
   "storage.trash.confirmRestore": "Khôi phục",
   "storage.trash.done": "Đã khôi phục {count} tệp ({size}).",
@@ -1493,27 +1749,37 @@ export const vi: Record<TKey, string> = {
   "storage.trash.listFailed": "Không thể lấy danh sách các mục cách ly.",
   "storage.trash.mode.quarantine": "cách ly",
   "storage.trash.mode.permanent": "xoá vĩnh viễn (chưa hoàn thành)",
-  "storage.trash.err.codex_busy": "Codex đang sử dụng state.sqlite — hãy thử lại sau khi thoát Codex.",
+  "storage.trash.err.codex_busy":
+    "Codex đang sử dụng state.sqlite — hãy thử lại sau khi thoát Codex.",
   "storage.trash.err.invalid_trash": "Id của mục trong thùng rác bị thiếu hoặc không hợp lệ.",
   "storage.trash.err.missing_trash": "Không tìm thấy mục thùng rác.",
-  "storage.trash.err.dest_exists": "Đích khôi phục đã tồn tại — hãy xoá hoặc đổi tên tệp lưu trữ và thử lại.",
-  "storage.trash.err.fs_failed": "Khôi phục hệ thống tệp thất bại. Một số tệp có thể đã được khôi phục — hãy kiểm tra archived_sessions và .trash.",
-  "storage.trash.err.db_reconcile_failed": "Không thể khôi phục hàng (rows) của cơ sở dữ liệu Codex state.",
-  "storage.trash.err.storage_mutation_busy": "Có một quá trình dọn dẹp hoặc khôi phục lưu trữ khác đang chạy — vui lòng thử lại sau.",
+  "storage.trash.err.dest_exists":
+    "Đích khôi phục đã tồn tại — hãy xoá hoặc đổi tên tệp lưu trữ và thử lại.",
+  "storage.trash.err.fs_failed":
+    "Khôi phục hệ thống tệp thất bại. Một số tệp có thể đã được khôi phục — hãy kiểm tra archived_sessions và .trash.",
+  "storage.trash.err.db_reconcile_failed":
+    "Không thể khôi phục hàng (rows) của cơ sở dữ liệu Codex state.",
+  "storage.trash.err.storage_mutation_busy":
+    "Có một quá trình dọn dẹp hoặc khôi phục lưu trữ khác đang chạy — vui lòng thử lại sau.",
   "storage.trash.err.restore_failed": "Khôi phục thất bại.",
-  "storage.trash.err.restore_worker_timeout": "Quá trình khôi phục diễn ra quá lâu (hơn 10 phút) và đã bị dừng lại.",
-  "storage.trash.err.restore_worker_aborted": "Quá trình khôi phục đã bị huỷ trong lúc tắt máy (shutdown).",
+  "storage.trash.err.restore_worker_timeout":
+    "Quá trình khôi phục diễn ra quá lâu (hơn 10 phút) và đã bị dừng lại.",
+  "storage.trash.err.restore_worker_aborted":
+    "Quá trình khôi phục đã bị huỷ trong lúc tắt máy (shutdown).",
   "storage.trash.err.restore_worker_failed": "Worker khôi phục bị treo hoặc bị lỗi ngoài dự kiến.",
   "storage.policy.title": "Chính sách dọn dẹp tự động",
-  "storage.policy.help": "Làm sạch hàng loạt (batch cleanup) tuỳ chọn khi số phiên lưu trữ vượt quá ngưỡng nhất định. Mặc định là tắt — không bao giờ tự động bật.",
+  "storage.policy.help":
+    "Làm sạch hàng loạt (batch cleanup) tuỳ chọn khi số phiên lưu trữ vượt quá ngưỡng nhất định. Mặc định là tắt — không bao giờ tự động bật.",
   "storage.policy.loading": "Đang tải chính sách…",
   "storage.policy.loadFailed": "Không thể tải chính sách dọn dẹp.",
   "storage.policy.saveFailed": "Không thể lưu chính sách dọn dẹp.",
   "storage.policy.runFailed": "Lỗi khi chạy chính sách (Policy run failed).",
-  "storage.policy.alreadyRunning": "Một lượt chạy chính sách dọn dẹp (cleanup policy run) đang được thực thi.",
+  "storage.policy.alreadyRunning":
+    "Một lượt chạy chính sách dọn dẹp (cleanup policy run) đang được thực thi.",
   "storage.policy.invalid": "Giá trị của chính sách không hợp lệ.",
   "storage.policy.enabled": "Bật dọn dẹp tự động",
-  "storage.policy.enabledHint": "Mặc định đang tắt. Khi bật, nó chỉ chạy theo lịch mà bạn đã chọn (hoặc khi bấm Chạy ngay bây giờ).",
+  "storage.policy.enabledHint":
+    "Mặc định đang tắt. Khi bật, nó chỉ chạy theo lịch mà bạn đã chọn (hoặc khi bấm Chạy ngay bây giờ).",
   "storage.policy.threshold": "Khi kích thước lưu trữ vượt quá (GiB)",
   "storage.policy.trigger": "Kích hoạt (Trigger)",
   "storage.policy.target": "Mục tiêu dọn dẹp",
@@ -1533,7 +1799,8 @@ export const vi: Record<TKey, string> = {
   "storage.policy.mode": "Chế độ xoá (Deletion mode)",
   "storage.policy.mode.quarantine": "Cách ly (mặc định)",
   "storage.policy.mode.permanent": "Xoá vĩnh viễn",
-  "storage.policy.permanentWarn": "Chế độ xoá vĩnh viễn không thể hoàn tác. Khuyến khích sử dụng chế độ cách ly trừ khi bạn chắc chắn.",
+  "storage.policy.permanentWarn":
+    "Chế độ xoá vĩnh viễn không thể hoàn tác. Khuyến khích sử dụng chế độ cách ly trừ khi bạn chắc chắn.",
   "storage.policy.lastRun": "Chạy lần cuối (Last run)",
   "storage.policy.lastRunDetail": "Đã xoá {count} · đã giải phóng {size}",
   "storage.policy.nextRun": "Chạy lần tiếp",
@@ -1547,7 +1814,8 @@ export const vi: Record<TKey, string> = {
   "storage.policy.skippedEmpty": "Không có ứng viên lưu trữ nào phù hợp với mục tiêu.",
   "storage.policy.doneQuarantine": "Chính sách đã cách ly {count} tệp ({size}).",
   "storage.policy.donePermanent": "Chính sách đã xoá vĩnh viễn {count} tệp ({size}).",
-  "storage.policy.metadataSaveWarning": "Phiên chạy chính sách đã kết thúc, nhưng metadata lập lịch của nó không thể lưu được.",
+  "storage.policy.metadataSaveWarning":
+    "Phiên chạy chính sách đã kết thúc, nhưng metadata lập lịch của nó không thể lưu được.",
   "modal.addNamed": "Thêm: {label}",
   "modal.add": "Thêm provider",
   "modal.search": "Tìm Provider…",
@@ -1562,7 +1830,8 @@ export const vi: Record<TKey, string> = {
   "modal.endpoint.custom": "Tùy chỉnh",
   "modal.defaultModel": "Model mặc định (tuỳ chọn)",
   "modal.allowPrivateNetwork": "Cho phép mạng nội bộ/cá nhân",
-  "modal.allowPrivateNetworkHint": "Chỉ bật cho các provider tự host có chủ đích. Các endpoint metadata vẫn bị chặn.",
+  "modal.allowPrivateNetworkHint":
+    "Chỉ bật cho các provider tự host có chủ đích. Các endpoint metadata vẫn bị chặn.",
   "modal.nameRequired": "Bắt buộc phải có tên provider",
   "modal.baseUrlRequired": "Bắt buộc phải có Base URL",
   "modal.networkError": "Lỗi mạng — proxy có đang chạy không?",
@@ -1582,10 +1851,12 @@ export const vi: Record<TKey, string> = {
   "modal.badge.pool": "Pool",
   "modal.badge.free": "Miễn phí",
   "modal.badge.subscriptionCli": "CLI gói đăng ký",
-  "modal.invalidPreset": "Preset của provider tích hợp này bị thiếu. Hãy khởi động lại proxy và thử lại.",
+  "modal.invalidPreset":
+    "Preset của provider tích hợp này bị thiếu. Hãy khởi động lại proxy và thử lại.",
   "modal.freeTierTitle": "Gói miễn phí",
   "modal.subscriptionCliTitle": "CLI theo gói đăng ký, không phải API key",
-  "modal.subscriptionCliWarning": "Nhà cung cấp này không dùng API key. Nó chạy Claude Code CLI chính thức đã đăng nhập trên máy này ({cmd}) và tính phí vào tài khoản gói đăng ký Claude đó. OpenCodex không lưu key nào cho nó, và key nhập ở đây sẽ không bao giờ được dùng. Để tính phí theo API key, hãy thêm {apiProvider} thay thế.",
+  "modal.subscriptionCliWarning":
+    "Nhà cung cấp này không dùng API key. Nó chạy Claude Code CLI chính thức đã đăng nhập trên máy này ({cmd}) và tính phí vào tài khoản gói đăng ký Claude đó. OpenCodex không lưu key nào cho nó, và key nhập ở đây sẽ không bao giờ được dùng. Để tính phí theo API key, hãy thêm {apiProvider} thay thế.",
   "modal.freeTierDefault": "Không cần API key. Có thể sử dụng ngay.",
   "modal.tab.accounts": "Tài khoản",
   "modal.tab.free": "Miễn phí",
@@ -1593,7 +1864,8 @@ export const vi: Record<TKey, string> = {
   "modal.tab.paid": "Trả phí",
   "modal.noteMore": "Hiển thị mô tả đầy đủ",
   "modal.searchResults": "{count} kết quả trong {tiers}",
-  "modal.accountsHint": "Đăng nhập vào tài khoản ChatGPT/Codex, các provider OAuth, và tài khoản API key tại đây. OpenAI đã được tích hợp sẵn — vui lòng đăng nhập thay vì thêm mới.",
+  "modal.accountsHint":
+    "Đăng nhập vào tài khoản ChatGPT/Codex, các provider OAuth, và tài khoản API key tại đây. OpenAI đã được tích hợp sẵn — vui lòng đăng nhập thay vì thêm mới.",
   "modal.accountsCodexAuthLink": "Xác thực Codex",
   "modal.notListed": "Không tìm thấy provider? Thêm provider tuỳ chỉnh",
   "modal.catalogLoading": "Đang tải danh mục…",
@@ -1608,7 +1880,8 @@ export const vi: Record<TKey, string> = {
   "quota.ageHours": "{n} giờ",
   "quota.ageDays": "{n} ngày",
   "quota.observedAgo": "Ghi nhận {age} trước",
-  "quota.observedHint": "Meta chỉ báo cáo mức sử dụng trong quá trình phản hồi stream, vì vậy đây là giá trị cuối cùng ghi nhận được, không phải số liệu thời gian thực.",
+  "quota.observedHint":
+    "Meta chỉ báo cáo mức sử dụng trong quá trình phản hồi stream, vì vậy đây là giá trị cuối cùng ghi nhận được, không phải số liệu thời gian thực.",
   "quota.weeklyLimit": "Giới hạn hàng tuần",
   "quota.monthlyLimit": "Giới hạn 30 ngày",
   "quota.cursorFirstParty": "Các model first-party",
@@ -1674,7 +1947,8 @@ export const vi: Record<TKey, string> = {
   "pws.noMatchFilters": "Không có provider nào khớp với các bộ lọc.",
   "pws.noProvidersConfigured": "Chưa có provider nào được cấu hình.",
   "pws.workspaceMainAria": "Chi tiết provider",
-  "pws.detailComingSoon": "Chế độ xem chi tiết sắp ra mắt — sử dụng chế độ xem cổ điển để quản lý provider này.",
+  "pws.detailComingSoon":
+    "Chế độ xem chi tiết sắp ra mắt — sử dụng chế độ xem cổ điển để quản lý provider này.",
   "pws.selectPrompt": "Chọn một provider từ danh sách.",
   "pws.connectFirst": "Kết nối provider đầu tiên của bạn",
   "pws.empty.browseFree": "Duyệt các provider miễn phí",
@@ -1692,7 +1966,8 @@ export const vi: Record<TKey, string> = {
   "pws.status.connected": "Đã kết nối",
   "pws.attentionTitle": "Cần chú ý",
   "pws.attention.reauth": "Tài khoản đang hoạt động cần xác thực lại",
-  "pws.attention.reauthForward": "Tài khoản Codex đang hoạt động cần xác thực lại — hãy mở mục Accounts để khắc phục",
+  "pws.attention.reauthForward":
+    "Tài khoản Codex đang hoạt động cần xác thực lại — hãy mở mục Accounts để khắc phục",
   "pws.attention.missingCredentials": "Thiếu thông tin xác thực",
   "pws.cell.auth": "Xác thực",
   "pws.cell.note": "Ghi chú",
@@ -1725,8 +2000,10 @@ export const vi: Record<TKey, string> = {
   "pws.usageUnavailable": "Chưa có mức sử dụng nào được ghi nhận.",
   "pws.rateLimits": "Giới hạn tốc độ",
   "pws.quotaUnavailable": "Không có dữ liệu hạn mức cho provider này.",
-  "pws.accountQuotaUnavailable": "Dữ liệu giới hạn tốc độ tạm thời không khả dụng; đang hiển thị các giá trị cuối cùng được biết đến (nếu có).",
-  "pws.quotaFailure.account_unavailable": "Không có thông tin tài khoản cho lần kiểm tra hạn ngạch này.",
+  "pws.accountQuotaUnavailable":
+    "Dữ liệu giới hạn tốc độ tạm thời không khả dụng; đang hiển thị các giá trị cuối cùng được biết đến (nếu có).",
+  "pws.quotaFailure.account_unavailable":
+    "Không có thông tin tài khoản cho lần kiểm tra hạn ngạch này.",
   "pws.quotaFailure.access_denied": "Nhà cung cấp đã từ chối quyền truy cập dữ liệu hạn ngạch.",
   "pws.quotaFailure.rate_limited": "Nhà cung cấp đã giới hạn tốc độ kiểm tra hạn ngạch.",
   "pws.quotaFailure.upstream_error": "Nhà cung cấp không thể hoàn tất kiểm tra hạn ngạch.",
@@ -1743,9 +2020,12 @@ export const vi: Record<TKey, string> = {
   "pws.modelSearchPlaceholder": "Lọc các model…",
   "pws.modelsLoading": "Đang tải các model…",
   "pws.modelsLoadFailed": "Không thể tải các model.",
-  "pws.modelsNeedsReauth": "Tài khoản cần đăng nhập lại trước khi tính năng khám phá model trực tiếp có thể hoạt động. Tạm thời hiển thị các model đã cấu hình.",
-  "pws.modelsConfiguredFallback": "Đang hiển thị các model đã cấu hình (tính năng khám phá trực tiếp không khả dụng).",
-  "pws.modelsTruncated": "Đang hiển thị {shown} model đầu tiên trong tổng số {total} model. Hãy sử dụng bộ lọc để thu hẹp danh sách.",
+  "pws.modelsNeedsReauth":
+    "Tài khoản cần đăng nhập lại trước khi tính năng khám phá model trực tiếp có thể hoạt động. Tạm thời hiển thị các model đã cấu hình.",
+  "pws.modelsConfiguredFallback":
+    "Đang hiển thị các model đã cấu hình (tính năng khám phá trực tiếp không khả dụng).",
+  "pws.modelsTruncated":
+    "Đang hiển thị {shown} model đầu tiên trong tổng số {total} model. Hãy sử dụng bộ lọc để thu hẹp danh sách.",
   "pws.retry": "Thử lại",
   "pws.noModels": "Không phát hiện model nào cho provider này.",
   "pws.adapterBaseRequired": "Bắt buộc phải có Adapter và Base URL.",
@@ -1759,19 +2039,24 @@ export const vi: Record<TKey, string> = {
   "pws.accountsLoadFailed": "Không thể tải các tài khoản.",
   "pws.retryAccounts": "Thử lại",
   "pws.noAccounts": "Chưa có tài khoản nào được kết nối.",
-  "pws.cockpitImportDescription": "Nhập tệp xuất Cockpit Tools Antigravity dạng JSON từ thiết bị này. Nội dung tệp sẽ không được hiển thị.",
+  "pws.cockpitImportDescription":
+    "Nhập tệp xuất Cockpit Tools Antigravity dạng JSON từ thiết bị này. Nội dung tệp sẽ không được hiển thị.",
   "pws.cockpitImportFileLabel": "Tệp xuất JSON từ Cockpit Tools Antigravity",
   "pws.cockpitImportChooseFile": "Chọn tệp JSON",
   "pws.cockpitImporting": "Đang nhập…",
-  "pws.cockpitImportInvalid": "Tệp đã chọn không phải là tệp xuất JSON hợp lệ hoặc có kích thước quá lớn.",
+  "pws.cockpitImportInvalid":
+    "Tệp đã chọn không phải là tệp xuất JSON hợp lệ hoặc có kích thước quá lớn.",
   "pws.cockpitImportFailed": "Không thể hoàn thành việc nhập tài khoản.",
-  "pws.cockpitImportComplete": "Đã nhập xong: {imported} được nhập, {updated} được cập nhật, {failed} thất bại, {unsupported} không được hỗ trợ.",
+  "pws.cockpitImportComplete":
+    "Đã nhập xong: {imported} được nhập, {updated} được cập nhật, {failed} thất bại, {unsupported} không được hỗ trợ.",
   "pws.accountSwitching": "Đang chuyển…",
   "pws.accountCurrent": "Tài khoản hiện tại",
-  "pws.accountPausedHint": "Được loại trừ khỏi chọn tài khoản tự động, thử lại, hồi phục sau thời gian chờ, lựa chọn thủ công và làm mới token chủ động cho đến khi tiếp tục.",
+  "pws.accountPausedHint":
+    "Được loại trừ khỏi chọn tài khoản tự động, thử lại, hồi phục sau thời gian chờ, lựa chọn thủ công và làm mới token chủ động cho đến khi tiếp tục.",
   "pws.defaultModelNone": "Không có (sử dụng mặc định của provider)",
   "pws.discardSettings": "Huỷ bỏ",
-  "pws.jsonEditorDesc": "Chỉnh sửa config dạng JSON thô của provider. Các thay đổi sẽ được lưu ngay lập tức.",
+  "pws.jsonEditorDesc":
+    "Chỉnh sửa config dạng JSON thô của provider. Các thay đổi sẽ được lưu ngay lập tức.",
   "pws.jsonEditorTitle": "Trình chỉnh sửa JSON — {name}",
   "pws.jsonRestore": "Khôi phục",
   "pws.jsonSave": "Lưu",
@@ -1779,17 +2064,21 @@ export const vi: Record<TKey, string> = {
   "pws.notLoggedInTitle": "Chưa đăng nhập",
   "pws.note": "Ghi chú",
   "pws.responsesReasoningReplay": "Gửi lại suy luận văn bản thuần",
-  "pws.responsesReasoningReplayHint": "Mặc định tắt. Gửi suy luận văn bản thuần trước đó đến điểm cuối này và có thể tăng mức dùng token. Chỉ bật khi điểm cuối hỗ trợ gửi lại suy luận.",
+  "pws.responsesReasoningReplayHint":
+    "Mặc định tắt. Gửi suy luận văn bản thuần trước đó đến điểm cuối này và có thể tăng mức dùng token. Chỉ bật khi điểm cuối hỗ trợ gửi lại suy luận.",
   "pws.allowPrivateNetwork": "Cho phép mạng nội bộ/cá nhân",
   "pws.liveModels": "Khám phá các model từ provider",
-  "pws.liveModelsDesc": "Lấy danh mục model trực tiếp từ provider. Hãy tắt tuỳ chọn này nếu chỉ muốn sử dụng các model đã cấu hình/tĩnh.",
+  "pws.liveModelsDesc":
+    "Lấy danh mục model trực tiếp từ provider. Hãy tắt tuỳ chọn này nếu chỉ muốn sử dụng các model đã cấu hình/tĩnh.",
   "pws.xaiChatOptIn": "Sử dụng Chat Completions cho Grok 4.5 và 4.6",
-  "pws.xaiChatOptInDesc": "Tắt để chọn Responses. Các yêu cầu OAuth Responses sử dụng tuỳ chọn này theo mặc định. Các model Grok khác và hành vi của gói không bị ảnh hưởng.",
+  "pws.xaiChatOptInDesc":
+    "Tắt để chọn Responses. Các yêu cầu OAuth Responses sử dụng tuỳ chọn này theo mặc định. Các model Grok khác và hành vi của gói không bị ảnh hưởng.",
   "pws.xaiChatOptInMixed": "Chỉ có một model sử dụng Chat.",
   "pws.cursorTransport": "Cursor transport",
   "pws.cursorTransportHttp2": "HTTP/2 (mặc định)",
   "pws.cursorTransportHttp1": "HTTP/1.1 (tương thích với proxy)",
-  "pws.cursorTransportDesc": "Sử dụng HTTP/1.1 khi proxy của bạn không thể truyền stream HTTP/2 của Cursor một cách đáng tin cậy.",
+  "pws.cursorTransportDesc":
+    "Sử dụng HTTP/1.1 khi proxy của bạn không thể truyền stream HTTP/2 của Cursor một cách đáng tin cậy.",
   "pws.optionalPlaceholder": "Tuỳ chọn",
   "pws.providerId": "ID provider",
   "pws.reauth": "Cần xác thực lại",
@@ -1797,46 +2086,55 @@ export const vi: Record<TKey, string> = {
   "pws.copyDoctor": "Sao chép ocx doctor",
   "pws.doctorCopied": "Đã sao chép",
   "pws.doctorCopyUnavailable": "Clipboard không khả dụng",
-  "pws.healthCooldownHint": "Đợi cho đến khi thời gian chờ kết thúc. Không thăm dò tài khoản này ngay bây giờ.",
+  "pws.healthCooldownHint":
+    "Đợi cho đến khi thời gian chờ kết thúc. Không thăm dò tài khoản này ngay bây giờ.",
   "pws.healthLabel.rateLimited": "Bị giới hạn tốc độ",
   "pws.healthLabel.quotaLimited": "Bị giới hạn hạn mức",
   "pws.healthLabel.reauthRequired": "Yêu cầu xác thực lại",
   "pws.healthLabel.refreshFailed": "Làm mới thất bại",
   "pws.healthLabel.metadataMismatch": "Metadata không khớp",
   "pws.healthLabel.validationPending": "Đang chờ xác thực",
-  "pws.healthSummary.validationPending": "{provider} {account}: được đăng ký trong khi bị giới hạn hạn mức. Sau khi hạn mức phục hồi, hãy làm mới hạn mức để chạy một yêu cầu xác thực nhỏ. Định tuyến sẽ bị vô hiệu hoá cho đến khi thành công.",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}: được đăng ký trong khi bị giới hạn hạn mức. Sau khi hạn mức phục hồi, hãy làm mới hạn mức để chạy một yêu cầu xác thực nhỏ. Định tuyến sẽ bị vô hiệu hoá cho đến khi thành công.",
   "pws.healthLabel.credentialConflict": "Xung đột thông tin xác thực",
-  "pws.healthSummary.rateLimited": "{provider} {account}: bị giới hạn tốc độ cho đến {until}. Quá trình định tuyến cho tài khoản này sẽ bị tạm dừng cho đến lúc đó.",
-  "pws.healthSummary.quotaLimited": "{provider} {account}: bị giới hạn hạn mức cho đến {until}. Quá trình định tuyến cho tài khoản này sẽ bị tạm dừng cho đến lúc đó.",
+  "pws.healthSummary.rateLimited":
+    "{provider} {account}: bị giới hạn tốc độ cho đến {until}. Quá trình định tuyến cho tài khoản này sẽ bị tạm dừng cho đến lúc đó.",
+  "pws.healthSummary.quotaLimited":
+    "{provider} {account}: bị giới hạn hạn mức cho đến {until}. Quá trình định tuyến cho tài khoản này sẽ bị tạm dừng cho đến lúc đó.",
   "pws.healthSummary.reauthRequired": "{provider} {account}: yêu cầu xác thực lại.",
   "pws.healthSummary.credentialConflict": "{provider} {account}: có xung đột thông tin xác thực.",
   "pws.healthSummary.metadataMismatch": "{provider} {account}: metadata không khớp.",
   "pws.healthSummary.staleCredentials": "{provider} {account}: thông tin xác thực không đầy đủ.",
   "pws.removeConfirm": "Xóa",
-  "pws.removeConfirmBody": "Xoá provider \\\"{name}\\\"? Hành động này không thể hoàn tác.",
-  "pws.removeDefaultConfirmBody": "Xoá provider mặc định \\\"{name}\\\"? \\\"{defaultProvider}\\\" sẽ trở thành provider mặc định. Hành động này không thể hoàn tác.",
+  "pws.removeConfirmBody": 'Xoá provider \\"{name}\\"? Hành động này không thể hoàn tác.',
+  "pws.removeDefaultConfirmBody":
+    'Xoá provider mặc định \\"{name}\\"? \\"{defaultProvider}\\" sẽ trở thành provider mặc định. Hành động này không thể hoàn tác.',
   "pws.removeConfirmTitle": "Xóa Provider",
   "pws.saveSettings": "Lưu",
   "pws.keySelection": "Chọn khóa API",
   "pws.keyActive": "Khóa đang hoạt động (hành vi hiện tại)",
-  "pws.keyLimitInvalid": "Giới hạn mỗi khóa phải dương và trong phạm vi hỗ trợ; khoảng thời gian và số yêu cầu đồng thời phải là số nguyên.",
+  "pws.keyLimitInvalid":
+    "Giới hạn mỗi khóa phải dương và trong phạm vi hỗ trợ; khoảng thời gian và số yêu cầu đồng thời phải là số nguyên.",
   "pws.keyRoundRobin": "Luân phiên",
   "pws.keyLimits": "Giới hạn mỗi khóa",
-  "pws.keySharedQuota": "Giới hạn nhà cung cấp vẫn áp dụng cho mọi khóa. Khóa cùng dự án có thể dùng chung hạn mức; RPM không giới hạn token hay ngân sách ngày.",
+  "pws.keySharedQuota":
+    "Giới hạn nhà cung cấp vẫn áp dụng cho mọi khóa. Khóa cùng dự án có thể dùng chung hạn mức; RPM không giới hạn token hay ngân sách ngày.",
   "pws.keyHandle": "ID khóa",
   "pws.keyStarts": "Đã bắt đầu",
   "pws.keyInFlight": "Đang chạy",
   "pws.keyWait": "Chờ",
   "pws.keyCooldown": "Tạm nghỉ",
   "pws.pacingTitle": "Pacing của yêu cầu",
-  "pws.pacingDesc": "Đồng đều trì hoãn thời điểm bắt đầu yêu cầu ra ngoài cho provider này. Các phản hồi stream có thể chồng chéo.",
+  "pws.pacingDesc":
+    "Đồng đều trì hoãn thời điểm bắt đầu yêu cầu ra ngoài cho provider này. Các phản hồi stream có thể chồng chéo.",
   "pws.pacingEnabled": "Đã bật",
   "pws.pacingRpm": "Yêu cầu mỗi phút",
   "pws.pacingConcurrency": "Số yêu cầu đồng thời tối đa",
   "pws.pacingRpmUnit": "RPM",
   "pws.pacingCapUnit": "×",
   "pws.pacingDelay": "Khoảng thời gian tối thiểu (ms)",
-  "pws.pacingSlowerWins": "Giới hạn provider chậm hơn sẽ được ưu tiên. Ghi đè model chỉ có thể làm tăng thêm độ trễ hoặc giảm giới hạn yêu cầu đồng thời.",
+  "pws.pacingSlowerWins":
+    "Giới hạn provider chậm hơn sẽ được ưu tiên. Ghi đè model chỉ có thể làm tăng thêm độ trễ hoặc giảm giới hạn yêu cầu đồng thời.",
   "pws.pacingQueued": "đã xếp hàng",
   "pws.pacingNextSlot": "cho đến slot tiếp theo",
   "pws.pacingLastModel": "model cuối cùng",
@@ -1846,13 +2144,15 @@ export const vi: Record<TKey, string> = {
   "pws.pacingAdd": "Thêm ghi đè",
   "pws.pacingRemove": "Xóa",
   "pws.pacingRemoveModel": "Xoá ghi đè pacing yêu cầu cho {model}",
-  "pws.pacingRuleRequired": "Chỉ bật pacing yêu cầu sau khi đã thiết lập giới hạn provider hoặc một ghi đè model.",
+  "pws.pacingRuleRequired":
+    "Chỉ bật pacing yêu cầu sau khi đã thiết lập giới hạn provider hoặc một ghi đè model.",
   "pws.pacingCapInvalid": "Số yêu cầu đồng thời tối đa phải là số nguyên lớn hơn hoặc bằng 1.",
   "pws.saving": "Đang lưu…",
   "pws.settingsSaved": "Đã lưu cài đặt.",
   "pws.accountModeSaved": "Đã lưu chế độ tài khoản.",
   "pws.accountModeFailed": "Không thể chuyển chế độ tài khoản.",
-  "pws.accountModeConfirm": "Chuyển chế độ tài khoản OpenAI? Các cuộc hội thoại đang chạy sẽ được gán lại cho bộ tài khoản của chế độ khác, và mức sử dụng hạn mức sẽ được theo dõi trên chế độ mới.",
+  "pws.accountModeConfirm":
+    "Chuyển chế độ tài khoản OpenAI? Các cuộc hội thoại đang chạy sẽ được gán lại cho bộ tài khoản của chế độ khác, và mức sử dụng hạn mức sẽ được theo dõi trên chế độ mới.",
   "pws.settingsUnsavedBar": "Bạn có các thay đổi chưa lưu.",
   "pws.unsavedLeaveBody": "Bạn có các thay đổi chưa lưu. Lưu chúng lại trước khi rời đi?",
   "pws.unsavedLeaveTitle": "Thay đổi chưa lưu",
@@ -1869,8 +2169,10 @@ export const vi: Record<TKey, string> = {
   "pws.capacity.nextRecovery": "Lần phục hồi năng lực tiếp theo",
   "pws.capacity.recoveryShare": "+{percent}% năng lực của pool",
   "pws.capacity.incomplete": "Độ phủ không đầy đủ: Đã loại trừ {excluded} tài khoản",
-  "pws.capacity.uncalibratedPlan": "{count} tài khoản thuộc gói chưa được hiệu chuẩn sẽ được tính ở mức trọng số ghế tiêu chuẩn, do đó ước tính này có thể là bảo thủ",
-  "pws.capacity.partial": "Độ phủ window bán phần: {count} tài khoản không báo cáo mọi limit window được hiển thị",
+  "pws.capacity.uncalibratedPlan":
+    "{count} tài khoản thuộc gói chưa được hiệu chuẩn sẽ được tính ở mức trọng số ghế tiêu chuẩn, do đó ước tính này có thể là bảo thủ",
+  "pws.capacity.partial":
+    "Độ phủ window bán phần: {count} tài khoản không báo cáo mọi limit window được hiển thị",
   "pws.capacity.windowPartial": "Bán phần",
   "pws.capacity.windowPartialA11y": "{window}: độ phủ tài khoản không đầy đủ",
   "pws.dashboard.recentlyUsed": "SỬ DỤNG GẦN ĐÂY",
@@ -1905,8 +2207,10 @@ export const vi: Record<TKey, string> = {
   "time.daysAgo": "{n} ngày trước",
   "modal.noMatch": "Không khớp.",
   "modal.oauthDefaultNote": "Đăng nhập bằng tài khoản của bạn — không cần API key.",
-  "modal.oauthComingSoon": "Đăng nhập OAuth cho {label} sẽ có trong bản cập nhật tới. Tạm thời hãy sử dụng API key.",
-  "modal.oauthComingSoonShort": "Đăng nhập OAuth cho provider này sẽ có trong bản cập nhật tới — tạm thời hãy sử dụng API key.",
+  "modal.oauthComingSoon":
+    "Đăng nhập OAuth cho {label} sẽ có trong bản cập nhật tới. Tạm thời hãy sử dụng API key.",
+  "modal.oauthComingSoonShort":
+    "Đăng nhập OAuth cho provider này sẽ có trong bản cập nhật tới — tạm thời hãy sử dụng API key.",
   "modal.useApiKeyInstead": "Thay vào đó hãy sử dụng API key",
   "modal.setupGuide": "Hướng dẫn thiết lập",
   "modal.setupStep1Prefix": "Truy cập",
@@ -1915,11 +2219,12 @@ export const vi: Record<TKey, string> = {
   "modal.setupStep2": "Dán vào trường API key bên dưới",
   "modal.setupStep3": "Nhấp vào Thêm provider — các model sẽ được tự động khám phá",
   "modal.namePlaceholder": "vd: openrouter",
-  "modal.duplicateWarn": "Provider \\\"{name}\\\" đã tồn tại và sẽ bị ghi đè.",
+  "modal.duplicateWarn": 'Provider \\"{name}\\" đã tồn tại và sẽ bị ghi đè.',
   "modal.forwardHintPrefix": "Không cần key — proxy sẽ chuyển tiếp",
   "modal.forwardCredentials": "đăng nhập codex",
   "modal.forwardHintSuffix": "thông tin xác thực của bạn đến provider này.",
-  "modal.localHint": "Không lưu trữ API key. Thao tác này sẽ thêm danh mục model công khai tĩnh của Cursor cho Codex, nhưng transport trực tiếp của Cursor và tính năng thực thi file/shell native vẫn bị vô hiệu hoá cho đến khi được kiểm toán.",
+  "modal.localHint":
+    "Không lưu trữ API key. Thao tác này sẽ thêm danh mục model công khai tĩnh của Cursor cho Codex, nhưng transport trực tiếp của Cursor và tính năng thực thi file/shell native vẫn bị vô hiệu hoá cho đến khi được kiểm toán.",
   "modal.getApiKey": "Lấy API key {label} của bạn",
   "modal.apiKey": "API key",
   "modal.apiKeyTransport": "API key header",
@@ -1927,8 +2232,10 @@ export const vi: Record<TKey, string> = {
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
   "modal.apiKeyPlaceholder": "sk-… (hoặc $ENV_VAR)",
   "modal.defaultModelPlaceholder": "vd: gpt-5.5",
-  "modal.baseUrlPlaceholderError": "Base URL có chứa {placeholder} chưa được giải quyết. Thay thế bằng giá trị thực tế của bạn.",
-  "modal.baseUrlPlaceholderHint": "Hãy thay thế {placeholder} trong Base URL bằng Account ID thực tế của bạn trước khi thêm.",
+  "modal.baseUrlPlaceholderError":
+    "Base URL có chứa {placeholder} chưa được giải quyết. Thay thế bằng giá trị thực tế của bạn.",
+  "modal.baseUrlPlaceholderHint":
+    "Hãy thay thế {placeholder} trong Base URL bằng Account ID thực tế của bạn trước khi thêm.",
   "modal.adding": "Đang thêm…",
   "modal.useOauthLogin": "← Sử dụng đăng nhập OAuth",
   "nav.codexSet": "Codex",
@@ -1938,23 +2245,31 @@ export const vi: Record<TKey, string> = {
   "codexSet.tab.multiauth": "Đa xác thực",
   "codexSet.tab.prompt": "Prompt",
   "codexSet.prompt.title": "Prompt layer",
-  "codexSet.prompt.timing": "Áp dụng cho các phiên mới bắt đầu. Các phiên đang chạy sẽ giữ nguyên cài đặt prompt hiện tại của chúng.",
+  "codexSet.prompt.timing":
+    "Áp dụng cho các phiên mới bắt đầu. Các phiên đang chạy sẽ giữ nguyên cài đặt prompt hiện tại của chúng.",
   "codexSet.prompt.staleRevision": "Cấu hình đã thay đổi ở nơi khác. Danh sách đã được tải lại.",
   "codexSet.prompt.repair": "Sửa chữa",
   "codexSet.prompt.repairFailed": "Không thể hoàn thành việc sửa chữa.",
   "codexSet.prompt.remeasure": "Đo lại",
-  "codexSet.drift.journalPresent": "Một tác vụ ghi trước đó chưa hoàn thành. Quá trình phục hồi sẽ tự động chạy ở lần ghi tiếp theo.",
-  "codexSet.drift.projectionStale": "Các layer đã lưu và giá trị trong config.toml không khớp nhau. Sửa chữa sẽ ghi lại giá trị từ các layer của bạn.",
-  "codexSet.drift.storeMissing": "Tệp layer đã biến mất trong khi các chỉ thị vẫn còn trong config.toml. Sửa chữa sẽ giữ phần văn bản này như một layer và sẽ ghi một bản sao lưu trước.",
-  "codexSet.drift.ownedMalformed": "Dòng mã được sinh ra trong config.toml đã bị định dạng lại thủ công, nên không còn an toàn để ghi đè.",
-  "codexSet.custom.adoptUnsupported": "Giá trị tại {path} dòng {line} không phải là chuỗi một dòng, do đó không thể nhập. Di chuyển bằng tay để quản lý tại đây.",
-  "codexSet.prompt.unreadable": "Tệp config Codex tồn tại nhưng không thể đọc được, vì vậy các thay đổi sẽ bị từ chối.",
+  "codexSet.drift.journalPresent":
+    "Một tác vụ ghi trước đó chưa hoàn thành. Quá trình phục hồi sẽ tự động chạy ở lần ghi tiếp theo.",
+  "codexSet.drift.projectionStale":
+    "Các layer đã lưu và giá trị trong config.toml không khớp nhau. Sửa chữa sẽ ghi lại giá trị từ các layer của bạn.",
+  "codexSet.drift.storeMissing":
+    "Tệp layer đã biến mất trong khi các chỉ thị vẫn còn trong config.toml. Sửa chữa sẽ giữ phần văn bản này như một layer và sẽ ghi một bản sao lưu trước.",
+  "codexSet.drift.ownedMalformed":
+    "Dòng mã được sinh ra trong config.toml đã bị định dạng lại thủ công, nên không còn an toàn để ghi đè.",
+  "codexSet.custom.adoptUnsupported":
+    "Giá trị tại {path} dòng {line} không phải là chuỗi một dòng, do đó không thể nhập. Di chuyển bằng tay để quản lý tại đây.",
+  "codexSet.prompt.unreadable":
+    "Tệp config Codex tồn tại nhưng không thể đọc được, vì vậy các thay đổi sẽ bị từ chối.",
   "codexSet.layer.permissions": "Quyền truy cập",
   "codexSet.layer.collaboration": "Chế độ cộng tác",
   "codexSet.layer.environment": "Bối cảnh môi trường",
   "codexSet.layer.apps": "Ứng dụng",
   "codexSet.group.transition": "Thông báo chuyển tiếp",
-  "codexSet.group.transitionDesc": "Các thông báo này thông báo về một sự thay đổi thay vì mô tả trạng thái, vì vậy chúng chỉ xuất hiện khi phiên chuyển sang trạng thái realtime hoặc chuyển model. Số thứ tự giữ theo thứ tự lắp ghép nên danh sách trên bị nhảy số.",
+  "codexSet.group.transitionDesc":
+    "Các thông báo này thông báo về một sự thay đổi thay vì mô tả trạng thái, vì vậy chúng chỉ xuất hiện khi phiên chuyển sang trạng thái realtime hoặc chuyển model. Số thứ tự giữ theo thứ tự lắp ghép nên danh sách trên bị nhảy số.",
   "codexSet.custom.slotNote": "Các layer tuỳ chỉnh được nối thành một phần theo thứ tự này.",
   "codexSet.row.onChange": "Kích hoạt khi thay đổi",
   "codexSet.row.openFeatures": "Mở cài đặt",
@@ -1972,8 +2287,10 @@ export const vi: Record<TKey, string> = {
   "codexSet.custom.titleTooLong": "Tiêu đề dài {count} ký tự; giới hạn là {max}.",
   "codexSet.custom.titleMultiline": "Tiêu đề phải trên một dòng duy nhất.",
   "codexSet.custom.bodyTooLarge": "Layer này có dung lượng {bytes} byte; giới hạn là {max}.",
-  "codexSet.custom.composedTooLarge": "Gộp chung, các layer được kích hoạt sẽ chiếm {bytes} byte, vượt quá giới hạn.",
-  "codexSet.custom.invalidCharacter": "Một ký tự điều khiển tại vị trí {position} không thể được lưu.",
+  "codexSet.custom.composedTooLarge":
+    "Gộp chung, các layer được kích hoạt sẽ chiếm {bytes} byte, vượt quá giới hạn.",
+  "codexSet.custom.invalidCharacter":
+    "Một ký tự điều khiển tại vị trí {position} không thể được lưu.",
   "codexSet.custom.discardPrompt": "Huỷ bỏ các thay đổi của bạn?",
   "codexSet.custom.discardOthersAndSave": "Huỷ các thay đổi chưa lưu ở lớp khác và lưu lớp này?",
   "codexSet.custom.keepEditing": "Tiếp tục chỉnh sửa",
@@ -1988,44 +2305,65 @@ export const vi: Record<TKey, string> = {
   "codexSet.custom.limitReached": "Bạn có thể giữ lại tối đa {max} layer tuỳ chỉnh.",
   "codexSet.custom.composedSize": "Đã ghép: {bytes}/{max} byte",
   "codexSet.custom.composedPreview": "Xem developer_instructions đã ghép",
-  "codexSet.custom.notOwned": "developer_instructions được viết bên ngoài opencodex, vì vậy không thể chỉnh sửa nó từ đây. Hãy nhập nội dung đó để quản lý nó như một layer.",
+  "codexSet.custom.notOwned":
+    "developer_instructions được viết bên ngoài opencodex, vì vậy không thể chỉnh sửa nó từ đây. Hãy nhập nội dung đó để quản lý nó như một layer.",
   "codexSet.custom.adopt": "Nhập các chỉ thị hiện có",
   "codexSet.custom.adoptConfirm": "Nhập dưới dạng layer",
   "codexSet.custom.adoptRefused": "Giá trị hiện có không thể được nhập.",
-  "codexSet.custom.baseReplaced": "model_instructions_file được đặt là {path}, có nghĩa là một yếu tố bên ngoài opencodex đã thay thế base prompt.",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file được đặt là {path}, có nghĩa là một yếu tố bên ngoài opencodex đã thay thế base prompt.",
   "codexSet.custom.baseReplacedOpen": "Quản lý",
-  "codexSet.lint.identity": "Cấu hình này tự nhận một danh tính khác với danh tính do Codex thiết lập.",
-  "codexSet.lint.foreignTool": "Các công cụ đến từ registry; việc chỉ đặt tên chúng ở đây không tự tạo ra công cụ.",
-  "codexSet.lint.placeholder": "Không có template engine nào xử lý các chỉ thị, do đó phần này sẽ được truyền đi đúng nguyên văn.",
-  "codexSet.lint.applyPatch": "apply_patch được định nghĩa bởi tool registry, không phải bởi các chỉ thị.",
-  "codexSet.lint.approvalVocab": "Codex tự chèn thêm từ vựng phê duyệt riêng; điều này có thể mâu thuẫn với nó.",
-  "codexSet.lint.environment": "Các sự kiện thực tế của môi trường được sinh ra sau đó và có thể gây mâu thuẫn với cấu hình này.",
+  "codexSet.lint.identity":
+    "Cấu hình này tự nhận một danh tính khác với danh tính do Codex thiết lập.",
+  "codexSet.lint.foreignTool":
+    "Các công cụ đến từ registry; việc chỉ đặt tên chúng ở đây không tự tạo ra công cụ.",
+  "codexSet.lint.placeholder":
+    "Không có template engine nào xử lý các chỉ thị, do đó phần này sẽ được truyền đi đúng nguyên văn.",
+  "codexSet.lint.applyPatch":
+    "apply_patch được định nghĩa bởi tool registry, không phải bởi các chỉ thị.",
+  "codexSet.lint.approvalVocab":
+    "Codex tự chèn thêm từ vựng phê duyệt riêng; điều này có thể mâu thuẫn với nó.",
+  "codexSet.lint.environment":
+    "Các sự kiện thực tế của môi trường được sinh ra sau đó và có thể gây mâu thuẫn với cấu hình này.",
   "codexSet.preset.blank": "Layer trống",
   "codexSet.preset.concise.name": "Phản hồi súc tích",
-  "codexSet.preset.concise.description": "Câu trả lời ngắn gọn, không có phần mở đầu, giảm thiểu định dạng.",
-  "codexSet.preset.concise.provenance": "Được điều chỉnh từ chỉ thị hướng đến sự ngắn gọn của Claude Code. Chúng tôi tự diễn đạt lại, không phải sao chép.",
+  "codexSet.preset.concise.description":
+    "Câu trả lời ngắn gọn, không có phần mở đầu, giảm thiểu định dạng.",
+  "codexSet.preset.concise.provenance":
+    "Được điều chỉnh từ chỉ thị hướng đến sự ngắn gọn của Claude Code. Chúng tôi tự diễn đạt lại, không phải sao chép.",
   "codexSet.preset.planFirst.name": "Lập kế hoạch trước khi chỉnh sửa",
-  "codexSet.preset.planFirst.description": "Trình bày kế hoạch trước, sau đó mới thực hiện thay đổi.",
-  "codexSet.preset.planFirst.provenance": "Được điều chỉnh từ phong thái lập kế hoạch của Claude Code. Chúng tôi tự diễn đạt lại, không phải sao chép.",
+  "codexSet.preset.planFirst.description":
+    "Trình bày kế hoạch trước, sau đó mới thực hiện thay đổi.",
+  "codexSet.preset.planFirst.provenance":
+    "Được điều chỉnh từ phong thái lập kế hoạch của Claude Code. Chúng tôi tự diễn đạt lại, không phải sao chép.",
   "codexSet.preset.explainWhy.name": "Giải thích lý do",
-  "codexSet.preset.explainWhy.description": "Cho biết tại sao lại thực hiện điều đó, thay vì chỉ mô tả những gì bạn đã làm.",
-  "codexSet.preset.explainWhy.provenance": "Được điều chỉnh từ phong cách xác nhận của Grok Build. Chúng tôi tự diễn đạt lại, không phải sao chép.",
+  "codexSet.preset.explainWhy.description":
+    "Cho biết tại sao lại thực hiện điều đó, thay vì chỉ mô tả những gì bạn đã làm.",
+  "codexSet.preset.explainWhy.provenance":
+    "Được điều chỉnh từ phong cách xác nhận của Grok Build. Chúng tôi tự diễn đạt lại, không phải sao chép.",
   "codexSet.preset.testFirst.name": "Viết test trước tiên",
   "codexSet.preset.testFirst.description": "Viết fail test trước khi tiến hành sửa lỗi.",
-  "codexSet.preset.testFirst.provenance": "Được điều chỉnh từ quy trình thực hành thông thường của agent. Chúng tôi tự diễn đạt lại, không phải sao chép.",
+  "codexSet.preset.testFirst.provenance":
+    "Được điều chỉnh từ quy trình thực hành thông thường của agent. Chúng tôi tự diễn đạt lại, không phải sao chép.",
   "codexSet.preset.korean.name": "Phản hồi bằng tiếng Hàn",
-  "codexSet.preset.korean.description": "Luôn trả lời bằng tiếng Hàn cho dù yêu cầu sử dụng bất kỳ ngôn ngữ nào.",
-  "codexSet.preset.korean.provenance": "Được viết riêng cho opencodex dựa trên một tính năng chủ lực do người dùng yêu cầu. Chúng tôi tự diễn đạt lại, không phải sao chép.",
+  "codexSet.preset.korean.description":
+    "Luôn trả lời bằng tiếng Hàn cho dù yêu cầu sử dụng bất kỳ ngôn ngữ nào.",
+  "codexSet.preset.korean.provenance":
+    "Được viết riêng cho opencodex dựa trên một tính năng chủ lực do người dùng yêu cầu. Chúng tôi tự diễn đạt lại, không phải sao chép.",
   "codexSet.dialog.class": "Loại",
   "codexSet.dialog.key": "Khoá cấu hình",
   "codexSet.dialog.fileValue": "Giá trị trong tệp này",
   "codexSet.dialog.absentDefault": "chưa thiết lập (mặc định là {value})",
   "codexSet.dialog.sourceText": "Văn bản được gửi tới model",
   "codexSet.dialog.sourceBytes": "{bytes} byte",
-  "codexSet.dialog.emptySource": "Tệp tại {path} tồn tại nhưng không có dữ liệu, vì vậy layer này không gửi đi nội dung nào cả.",
-  "codexSet.dialog.notExposed": "Base prompt di chuyển bên ngoài danh sách tin nhắn mà Codex có thể in ra, vì vậy không thể hiển thị ở đây. Tuy nhiên có thể thay thế nó thông qua model_instructions_file.",
-  "codexSet.dialog.unmapped": "Lớp này chưa có ánh xạ được xác nhận trong đầu ra prompt, vì vậy chưa thể hiển thị văn bản của nó ở đây.",
-  "codexSet.dialog.textUnavailable": "Không thể đọc prompt Codex trên máy này, do đó văn bản không khả dụng.",
+  "codexSet.dialog.emptySource":
+    "Tệp tại {path} tồn tại nhưng không có dữ liệu, vì vậy layer này không gửi đi nội dung nào cả.",
+  "codexSet.dialog.notExposed":
+    "Base prompt di chuyển bên ngoài danh sách tin nhắn mà Codex có thể in ra, vì vậy không thể hiển thị ở đây. Tuy nhiên có thể thay thế nó thông qua model_instructions_file.",
+  "codexSet.dialog.unmapped":
+    "Lớp này chưa có ánh xạ được xác nhận trong đầu ra prompt, vì vậy chưa thể hiển thị văn bản của nó ở đây.",
+  "codexSet.dialog.textUnavailable":
+    "Không thể đọc prompt Codex trên máy này, do đó văn bản không khả dụng.",
   "codexSet.class.base": "Base instructions",
   "codexSet.class.config-toggle": "Có thể chuyển đổi tại đây",
   "codexSet.class.feature-gated": "Tính năng bị giới hạn",
@@ -2042,48 +2380,68 @@ export const vi: Record<TKey, string> = {
   "codexSet.layer.tools": "Công cụ",
   "codexSet.layer.multi-agent-mode": "Chế độ multi-agent",
   "codexSet.layer.git-attribution": "Attribution commit",
-  "codexSet.about.base-instructions": "Base instructions của riêng Codex. Chúng đi kèm với chính yêu cầu và không thể bị tắt.",
-  "codexSet.about.model-switch": "Được thêm vào khi phiên trò chuyện thay đổi model giữa cuộc hội thoại.",
-  "codexSet.about.personality": "Hướng dẫn về giọng điệu và phong cách, được điều khiển bởi một feature flag.",
-  "codexSet.about.context-window-guidance": "Lời khuyên về ngân sách context còn lại, được điều khiển bởi một feature flag.",
+  "codexSet.about.base-instructions":
+    "Base instructions của riêng Codex. Chúng đi kèm với chính yêu cầu và không thể bị tắt.",
+  "codexSet.about.model-switch":
+    "Được thêm vào khi phiên trò chuyện thay đổi model giữa cuộc hội thoại.",
+  "codexSet.about.personality":
+    "Hướng dẫn về giọng điệu và phong cách, được điều khiển bởi một feature flag.",
+  "codexSet.about.context-window-guidance":
+    "Lời khuyên về ngân sách context còn lại, được điều khiển bởi một feature flag.",
   "codexSet.about.realtime": "Được thêm vào cho các phiên realtime.",
-  "codexSet.about.agents-md": "Tệp AGENTS.md cho dự án của bạn. Trang này chỉ báo cáo layer; nó không bao giờ chỉnh sửa tài liệu dự án của bạn.",
+  "codexSet.about.agents-md":
+    "Tệp AGENTS.md cho dự án của bạn. Trang này chỉ báo cáo layer; nó không bao giờ chỉnh sửa tài liệu dự án của bạn.",
   "codexSet.about.permissions": "Giải thích về sandbox và các cài đặt phê duyệt đang có hiệu lực.",
   "codexSet.about.collaboration": "Giải thích chế độ cộng tác đang hoạt động.",
-  "codexSet.about.environment": "Thư mục làm việc, nền tảng, và các sự kiện môi trường thực tế khác.",
-  "codexSet.about.environments-instructions": "Hướng dẫn cho môi trường thực thi trì hoãn, được điều khiển bởi một feature flag.",
+  "codexSet.about.environment":
+    "Thư mục làm việc, nền tảng, và các sự kiện môi trường thực tế khác.",
+  "codexSet.about.environments-instructions":
+    "Hướng dẫn cho môi trường thực thi trì hoãn, được điều khiển bởi một feature flag.",
   "codexSet.about.apps": "Cách sử dụng các ứng dụng đã kết nối.",
-  "codexSet.about.plugins": "Được thêm vào khi một plugin được chọn hoặc khi bất kỳ plugin nào quảng cáo về năng lực của mình.",
+  "codexSet.about.plugins":
+    "Được thêm vào khi một plugin được chọn hoặc khi bất kỳ plugin nào quảng cáo về năng lực của mình.",
   "codexSet.about.tools": "Mô tả công cụ trì hoãn, được điều khiển bởi một feature flag.",
   "codexSet.about.skills": "Danh sách các kỹ năng (skills) khả dụng.",
   "codexSet.about.multi-agent-mode": "Chỉ thị cho subagent, được điều khiển bởi một feature flag.",
-  "codexSet.about.git-attribution": "Yêu cầu model thêm trailer Co-authored-by: Codex vào các commit mà nó viết, và dòng Generated with Codex. vào các pull request mà nó mở. Codex phân giải điều này từ tài khoản của bạn, vì vậy không có cài đặt nào cho nó ở đây hay dưới phần [features]. Khi tài khoản của bạn tắt tính năng này, Codex sẽ gửi hướng dẫn ngược lại thay vì không gửi gì.",
-  "codexSet.condition.model-switch": "Chỉ được phát ra sau khi có sự thay đổi model giữa phiên làm việc.",
+  "codexSet.about.git-attribution":
+    "Yêu cầu model thêm trailer Co-authored-by: Codex vào các commit mà nó viết, và dòng Generated with Codex. vào các pull request mà nó mở. Codex phân giải điều này từ tài khoản của bạn, vì vậy không có cài đặt nào cho nó ở đây hay dưới phần [features]. Khi tài khoản của bạn tắt tính năng này, Codex sẽ gửi hướng dẫn ngược lại thay vì không gửi gì.",
+  "codexSet.condition.model-switch":
+    "Chỉ được phát ra sau khi có sự thay đổi model giữa phiên làm việc.",
   "codexSet.condition.realtime": "Chỉ được phát ra trong phiên realtime.",
-  "codexSet.condition.agents-md": "Được phát ra khi tìm thấy một tài liệu dự án cho thư mục làm việc.",
-  "codexSet.condition.plugins": "Được phát ra khi một plugin được chọn hoặc khi có bất kỳ plugin nào quảng cáo về năng lực của mình.",
-  "codexSet.condition.git-attribution": "Được cấu hình bởi chính sách attribution của tài khoản của bạn.",
+  "codexSet.condition.agents-md":
+    "Được phát ra khi tìm thấy một tài liệu dự án cho thư mục làm việc.",
+  "codexSet.condition.plugins":
+    "Được phát ra khi một plugin được chọn hoặc khi có bất kỳ plugin nào quảng cáo về năng lực của mình.",
+  "codexSet.condition.git-attribution":
+    "Được cấu hình bởi chính sách attribution của tài khoản của bạn.",
   "codexSet.base.title": "Base prompt",
   "codexSet.base.prev": "Tuỳ chọn trước đó",
   "codexSet.base.next": "Tuỳ chọn tiếp theo",
   "codexSet.base.position": "{position} / {total}",
-  "codexSet.base.swipeHint": "Vuốt sang một bên, sử dụng các phím mũi tên hoặc nhấn vào các mũi tên để di chuyển qua lại giữa các tuỳ chọn. Chỉ áp dụng cho các phiên mới bắt đầu.",
+  "codexSet.base.swipeHint":
+    "Vuốt sang một bên, sử dụng các phím mũi tên hoặc nhấn vào các mũi tên để di chuyển qua lại giữa các tuỳ chọn. Chỉ áp dụng cho các phiên mới bắt đầu.",
   "codexSet.base.defaultTitle": "Base prompt của riêng Codex",
-  "codexSet.base.defaultBody": "Mặc định không được lưu ở đây, vì vậy không có gì để chỉnh sửa hoặc xoá: việc chọn nó đơn giản là sẽ xoá model_instructions_file khỏi cấu hình của bạn, và Codex sử dụng prompt đi kèm với nó.",
+  "codexSet.base.defaultBody":
+    "Mặc định không được lưu ở đây, vì vậy không có gì để chỉnh sửa hoặc xoá: việc chọn nó đơn giản là sẽ xoá model_instructions_file khỏi cấu hình của bạn, và Codex sử dụng prompt đi kèm với nó.",
   "codexSet.base.variantTitle": "Tên",
   "codexSet.base.variantBody": "Prompt",
-  "codexSet.base.replacesWarning": "Điều này SẼ THAY THẾ base prompt của chính Codex chứ không bổ sung thêm. Một prompt ngắn ở đây đồng nghĩa với một model có những chỉ thị ngắn.",
+  "codexSet.base.replacesWarning":
+    "Điều này SẼ THAY THẾ base prompt của chính Codex chứ không bổ sung thêm. Một prompt ngắn ở đây đồng nghĩa với một model có những chỉ thị ngắn.",
   "codexSet.base.use": "Sử dụng cái này",
   "codexSet.base.inUse": "Đang sử dụng",
-  "codexSet.base.externalBlocked": "model_instructions_file đã được trỏ tới {path}, tệp mà opencodex không hề viết. Hãy tự xoá tệp đó đi trước khi chọn một tuỳ chọn tại đây — hoặc nhập nó thành một biến thể.",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file đã được trỏ tới {path}, tệp mà opencodex không hề viết. Hãy tự xoá tệp đó đi trước khi chọn một tuỳ chọn tại đây — hoặc nhập nó thành một biến thể.",
   "codexSet.base.import": "Nhập thành biến thể",
-  "codexSet.base.importPreview": "Tệp tại {path} được chuyển thành một biến thể được quản lý và cài đặt đúng như hiển thị bên dưới — tiêu đề trở thành dòng heading `#` và nội dung được chuẩn hóa (CRLF → LF, tab → 4 dấu cách).",
-  "codexSet.base.importFormat": "Được lưu nguyên văn: tổng {serializedBytes} byte (phần thân {bodyBytes} byte). Codex đọc toàn bộ tệp, kể cả dòng tiêu đề.",
+  "codexSet.base.importPreview":
+    "Tệp tại {path} được chuyển thành một biến thể được quản lý và cài đặt đúng như hiển thị bên dưới — tiêu đề trở thành dòng heading `#` và nội dung được chuẩn hóa (CRLF → LF, tab → 4 dấu cách).",
+  "codexSet.base.importFormat":
+    "Được lưu nguyên văn: tổng {serializedBytes} byte (phần thân {bodyBytes} byte). Codex đọc toàn bộ tệp, kể cả dòng tiêu đề.",
   "codexSet.base.importTitle": "Tiêu đề biến thể",
   "codexSet.base.importTitlePending": "Đang làm mới bản xem trước cho tiêu đề này…",
   "codexSet.base.importConfirm": "Nhập và quản lý",
   "codexSet.base.importFailed": "Không thể nhập tệp.",
-  "codexSet.base.importChanged": "Tệp hoặc tiêu đề đã thay đổi kể từ lúc xem trước. Hãy xem trước lại.",
+  "codexSet.base.importChanged":
+    "Tệp hoặc tiêu đề đã thay đổi kể từ lúc xem trước. Hãy xem trước lại.",
   "nav.api": "API",
   "nav.openMenu": "Mở menu",
   "nav.closeMenu": "Đóng menu",
@@ -2092,7 +2450,8 @@ export const vi: Record<TKey, string> = {
   "nav.expandSidebar": "Mở rộng thanh bên",
   "pws.refreshAllQuotas": "Làm mới tất cả hạn mức",
   "pws.quotaRefreshDone": "Đã kiểm tra hạn mức xong",
-  "integrations.subtitle": "Kết nối các client với opencodex, quản lý thông tin xác thực, và khôi phục cấu hình client.",
+  "integrations.subtitle":
+    "Kết nối các client với opencodex, quản lý thông tin xác thực, và khôi phục cấu hình client.",
   "integrations.tabsLabel": "Các bề mặt tích hợp",
   "integrations.tab.overview": "Tổng quan",
   "integrations.tab.keys": "API Keys",
@@ -2103,7 +2462,8 @@ export const vi: Record<TKey, string> = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "Khởi động lại Gentle Shell để tải danh mục trong thư mục đã lưu. Với thư mục liên kết/dùng chung, hãy dùng tích hợp Pi.",
+  "integrations.semantics.gentleShell":
+    "Khởi động lại Gentle Shell để tải danh mục trong thư mục đã lưu. Với thư mục liên kết/dùng chung, hãy dùng tích hợp Pi.",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -2118,32 +2478,40 @@ export const vi: Record<TKey, string> = {
   "integrations.tab.raycast": "Raycast",
   "integrations.tab.omo": "omo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "Quản lý mô hình OpenCodex trong ~/.qoder-cn/settings.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
+  "integrations.semantics.qoderCn":
+    "Quản lý mô hình OpenCodex trong ~/.qoder-cn/settings.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "Quản lý mô hình OpenCodex trong ~/.workbuddy/models.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
+  "integrations.semantics.workbuddy":
+    "Quản lý mô hình OpenCodex trong ~/.workbuddy/models.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "Quản lý mô hình OpenCodex trong ~/.workbuddy-ai/models.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
+  "integrations.semantics.workbuddyAi":
+    "Quản lý mô hình OpenCodex trong ~/.workbuddy-ai/models.json. Cần kết nối loopback. Giữ nguyên cài đặt khác; Hoàn tác khôi phục bản sao lưu.",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
-  "integrations.semantics.qoder": "Quản lý nhà cung cấp OpenCodex và mô hình tùy chỉnh trong ~/.qoder/settings.json. Yêu cầu truy cập loopback. Giữ nguyên các cài đặt khác; Hoàn tác khôi phục bản chụp.",
-  "integrations.semantics.t3code": "Thêm một phiên bản nhà cung cấp Claude của opencodex vào ~/.t3/userdata/settings.json (T3CODE_HOME thay đổi vị trí). Các mô hình được định tuyến xuất hiện trong bộ chọn mô hình của T3 Code; luồng Codex chỉ dùng proxy khi tích hợp Codex được bật và T3 Code dùng cùng CODEX_HOME. Yêu cầu truy cập loopback. Giữ nguyên các cài đặt khác; Hoàn tác khôi phục bản chụp.",
+  "integrations.semantics.qoder":
+    "Quản lý nhà cung cấp OpenCodex và mô hình tùy chỉnh trong ~/.qoder/settings.json. Yêu cầu truy cập loopback. Giữ nguyên các cài đặt khác; Hoàn tác khôi phục bản chụp.",
+  "integrations.semantics.t3code":
+    "Thêm một phiên bản nhà cung cấp Claude của opencodex vào ~/.t3/userdata/settings.json (T3CODE_HOME thay đổi vị trí). Các mô hình được định tuyến xuất hiện trong bộ chọn mô hình của T3 Code; luồng Codex chỉ dùng proxy khi tích hợp Codex được bật và T3 Code dùng cùng CODEX_HOME. Yêu cầu truy cập loopback. Giữ nguyên các cài đặt khác; Hoàn tác khôi phục bản chụp.",
   "integrations.tab.cline": "Cline CLI",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.droid": "Factory Droid",
   "integrations.droidReasoning.title": "Mức suy luận mặc định",
-  "integrations.droidReasoning.description": "Chỉ dùng mức mặc định khi yêu cầu không chỉ định mức suy luận. Tắt Factory Droid để xóa các mức mặc định đã lưu.",
+  "integrations.droidReasoning.description":
+    "Chỉ dùng mức mặc định khi yêu cầu không chỉ định mức suy luận. Tắt Factory Droid để xóa các mức mặc định đã lưu.",
   "integrations.droidReasoning.noDefault": "Không có mặc định",
   "integrations.droidReasoning.noEfforts": "Không có tùy chọn mức độ suy luận khả dụng",
   "integrations.droidReasoning.noModels": "Không có mô hình nào được xuất.",
   "integrations.droidReasoning.modelDefault": "Mức suy luận mặc định cho {model}",
-  "integrations.droidReasoning.unsupportedTitle": "Một số mức mặc định đã lưu không còn được hỗ trợ. Hãy xóa chúng, sau đó lưu / xem lại thay đổi để áp dụng.",
+  "integrations.droidReasoning.unsupportedTitle":
+    "Một số mức mặc định đã lưu không còn được hỗ trợ. Hãy xóa chúng, sau đó lưu / xem lại thay đổi để áp dụng.",
   "integrations.droidReasoning.unsupportedEffort": "Mức không được hỗ trợ: {effort}",
   "integrations.droidReasoning.clear": "Xóa mặc định",
   "integrations.droidReasoning.saveReview": "Lưu / xem lại thay đổi",
   "integrations.aside.profilesTitle": "Cấu hình Aside",
-  "integrations.aside.profilesHint": "Chọn profile nào sẽ nhận các model được chọn. Profile đang hoạt động của Aside sẽ được giữ nguyên.",
+  "integrations.aside.profilesHint":
+    "Chọn profile nào sẽ nhận các model được chọn. Profile đang hoạt động của Aside sẽ được giữ nguyên.",
   "integrations.aside.all": "Đồng bộ tất cả profile",
   "integrations.aside.syncNow": "Đồng bộ ngay",
   "integrations.aside.applied": "{count}/{total} profile đã được áp dụng",
@@ -2153,18 +2521,23 @@ export const vi: Record<TKey, string> = {
   "integrations.aside.details": "Quản lý {name}",
   "integrations.aside.back": "Tất cả profile Aside",
   "integrations.aside.empty": "Mở Aside và tạo một profile để kết nối nó.",
-  "integrations.aside.partial": "Một số profile cần chú ý. Các lựa chọn đồng bộ của bạn đã được lưu; hãy kiểm tra trạng thái của từng profile.",
+  "integrations.aside.partial":
+    "Một số profile cần chú ý. Các lựa chọn đồng bộ của bạn đã được lưu; hãy kiểm tra trạng thái của từng profile.",
   "integrations.aside.pending": "Lựa chọn đồng bộ đã được lưu; đang chờ cập nhật file.",
   "integrations.aside.retry": "Thử lại {name}",
-  "integrations.aside.loadError": "Không thể tải các profile Aside. Thử lại để kiểm tra trạng thái của chúng.",
+  "integrations.aside.loadError":
+    "Không thể tải các profile Aside. Thử lại để kiểm tra trạng thái của chúng.",
   "integrations.hermes.profilesTitle": "Profile Hermes",
-  "integrations.hermes.profilesHint": "Mỗi profile Hermes có config.yaml riêng. Chọn một profile để kết nối; các profile khác giữ nguyên.",
+  "integrations.hermes.profilesHint":
+    "Mỗi profile Hermes có config.yaml riêng. Chọn một profile để kết nối; các profile khác giữ nguyên.",
   "integrations.hermes.defaultProfile": "Profile mặc định",
   "integrations.hermes.select": "Quản lý {name}",
-  "integrations.hermes.loadError": "Không thể tải các profile Hermes. Thử lại để kiểm tra trạng thái của chúng.",
+  "integrations.hermes.loadError":
+    "Không thể tải các profile Hermes. Thử lại để kiểm tra trạng thái của chúng.",
   "integrations.hermes.profileTitle": "Profile Hermes: {name}",
   "integrations.codex.title": "Codex CLI",
-  "integrations.codex.body": "Việc kết nối Codex do proxy service quản lý. Khởi động opencodex sẽ áp dụng nó; dừng service sẽ khôi phục lại định tuyến nguyên bản.",
+  "integrations.codex.body":
+    "Việc kết nối Codex do proxy service quản lý. Khởi động opencodex sẽ áp dụng nó; dừng service sẽ khôi phục lại định tuyến nguyên bản.",
   "integrations.codex.openService": "Mở cài đặt service",
   "integrations.state.notInstalled": "Chưa cài đặt",
   "integrations.state.unknown": "Đang kiểm tra…",
@@ -2177,14 +2550,18 @@ export const vi: Record<TKey, string> = {
   "integrations.detail.claudeOff": "Kết nối đang tắt",
   "integrations.detail.desktopCurrent": "Desktop đang chạy profile này",
   "integrations.detail.desktopStale": "File profile đã bị thay đổi sau khi được áp dụng",
-  "integrations.detail.desktopNotServed": "Profile có tồn tại, nhưng Desktop đang sử dụng một profile khác",
+  "integrations.detail.desktopNotServed":
+    "Profile có tồn tại, nhưng Desktop đang sử dụng một profile khác",
   "integrations.detail.desktopAbsent": "Chưa có profile nào được áp dụng",
   "integrations.detail.desktopDesiredOff": "Tích hợp Claude Desktop đang tắt",
-  "integrations.detail.desktopDesiredOffCleanupPending": "Claude Desktop vẫn đang sử dụng gateway; đang chờ dọn dẹp",
-  "integrations.detail.desktopDesiredOnNotApplied": "Tích hợp đang bật, nhưng Desktop không sử dụng profile gateway",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "Claude Desktop vẫn đang sử dụng gateway; đang chờ dọn dẹp",
+  "integrations.detail.desktopDesiredOnNotApplied":
+    "Tích hợp đang bật, nhưng Desktop không sử dụng profile gateway",
   "integrations.detail.desktopSelectedElsewhere": "Desktop đang sử dụng một profile khác",
   "integrations.detail.desktopProfileDrift": "Profile Desktop được chọn đã bị thay đổi",
-  "integrations.detail.desktopObservedUnsafe": "Không thể thay đổi profile Desktop được chọn một cách an toàn",
+  "integrations.detail.desktopObservedUnsafe":
+    "Không thể thay đổi profile Desktop được chọn một cách an toàn",
   "integrations.detail.desktopNotInstalled": "Thư viện cấu hình Claude Desktop chưa được cài đặt",
   "integrations.detail.grokModels": "{count} model đã được kết nối",
   "integrations.detail.grokAbsent": "Không có block opencodex nào trong config",
@@ -2192,7 +2569,8 @@ export const vi: Record<TKey, string> = {
   "integrations.detail.cursorNeverSeen": "Đã cài đặt Private Inference; chưa thấy request nào",
   "integrations.detail.cursorAbsent": "Không tìm thấy Cursor Private Inference",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "Cursor Private Inference chạy agent của nó cục bộ và giao tiếp với opencodex trên loopback. Cursor bản thường không thể làm điều này: backend của nó gọi endpoint tùy chỉnh và cần một URL HTTPS công khai. Trang này không bao giờ ghi dữ liệu vào Cursor; bạn hãy tự dán các giá trị bên dưới vào Cursor.",
+  "integrations.cursor.intro":
+    "Cursor Private Inference chạy agent của nó cục bộ và giao tiếp với opencodex trên loopback. Cursor bản thường không thể làm điều này: backend của nó gọi endpoint tùy chỉnh và cần một URL HTTPS công khai. Trang này không bao giờ ghi dữ liệu vào Cursor; bạn hãy tự dán các giá trị bên dưới vào Cursor.",
   "integrations.cursor.loading": "Đang đọc trạng thái Cursor…",
   "integrations.cursor.unavailable": "Không thể đọc trạng thái Cursor từ proxy.",
   "integrations.cursor.detection": "Các bản cài đặt được phát hiện",
@@ -2200,60 +2578,90 @@ export const vi: Record<TKey, string> = {
   "integrations.cursor.regular": "Cursor (bản thường)",
   "integrations.cursor.detected": "Đã phát hiện",
   "integrations.cursor.notFound": "Không tìm thấy",
-  "integrations.cursor.regularOnly": "Chỉ tìm thấy Cursor bản thường. Nó định tuyến các custom endpoint qua server của Cursor, vì vậy proxy loopback không thể tiếp cận nếu không có public tunnel. Hãy xem hướng dẫn về bản Private Inference.",
-  "integrations.cursor.nothingFound": "Không tìm thấy bản cài đặt Cursor nào ở các vị trí thông thường. Nếu nó được cài đặt ở nơi khác, các giá trị bên dưới vẫn được áp dụng.",
+  "integrations.cursor.regularOnly":
+    "Chỉ tìm thấy Cursor bản thường. Nó định tuyến các custom endpoint qua server của Cursor, vì vậy proxy loopback không thể tiếp cận nếu không có public tunnel. Hãy xem hướng dẫn về bản Private Inference.",
+  "integrations.cursor.nothingFound":
+    "Không tìm thấy bản cài đặt Cursor nào ở các vị trí thông thường. Nếu nó được cài đặt ở nơi khác, các giá trị bên dưới vẫn được áp dụng.",
   "integrations.cursor.gateway": "Giá trị Gateway",
-  "integrations.cursor.gatewayHint": "Trong Cursor Private Inference, mở Settings > Models > Gateway, dán hai giá trị này, sau đó nhấn Refresh model list.",
+  "integrations.cursor.gatewayHint":
+    "Trong Cursor Private Inference, mở Settings > Models > Gateway, dán hai giá trị này, sau đó nhấn Refresh model list.",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "API Key",
-  "integrations.cursor.apiKeyCredential": "Một trong các API key opencodex của bạn (liên kết này yêu cầu credential)",
+  "integrations.cursor.apiKeyCredential":
+    "Một trong các API key opencodex của bạn (liên kết này yêu cầu credential)",
   "integrations.cursor.copy": "Sao chép",
   "integrations.cursor.copied": "Đã sao chép",
   "integrations.cursor.connection": "Kết nối",
   "integrations.cursor.seen": "Request cuối cùng từ Cursor: {time} ({ua})",
-  "integrations.cursor.neverSeen": "Chưa có request nào từ Cursor kể từ khi khởi động proxy. Sau khi lưu gateway, hãy nhấn Refresh model list trong Cursor.",
+  "integrations.cursor.neverSeen":
+    "Chưa có request nào từ Cursor kể từ khi khởi động proxy. Sau khi lưu gateway, hãy nhấn Refresh model list trong Cursor.",
   "integrations.cursor.models": "Những gì Cursor sẽ hiển thị",
-  "integrations.cursor.modelsHint": "Cursor lấy danh sách Reasoning từ bảng model của riêng nó, vì vậy opencodex chỉ có thể dự đoán. Context liệt kê mặc định và cửa sổ opt-in (Max Mode của Cursor).",
-  "integrations.cursor.ladderFromBundle": "Danh sách Reasoning đọc từ gói Cursor Private Inference {version} đã cài đặt. Cursor quyết định chúng; opencodex chỉ báo cáo bảng của nó.",
-  "integrations.cursor.ladderFromStatic": "Danh sách Reasoning là một bản sao tĩnh của Cursor 3.18.25 (không tìm thấy gói Private Inference nào có thể đọc được). Context liệt kê mặc định và cửa sổ opt-in.",
+  "integrations.cursor.modelsHint":
+    "Cursor lấy danh sách Reasoning từ bảng model của riêng nó, vì vậy opencodex chỉ có thể dự đoán. Context liệt kê mặc định và cửa sổ opt-in (Max Mode của Cursor).",
+  "integrations.cursor.ladderFromBundle":
+    "Danh sách Reasoning đọc từ gói Cursor Private Inference {version} đã cài đặt. Cursor quyết định chúng; opencodex chỉ báo cáo bảng của nó.",
+  "integrations.cursor.ladderFromStatic":
+    "Danh sách Reasoning là một bản sao tĩnh của Cursor 3.18.25 (không tìm thấy gói Private Inference nào có thể đọc được). Context liệt kê mặc định và cửa sổ opt-in.",
   "integrations.cursor.unknownVersion": "không rõ phiên bản",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "cửa sổ đơn",
-  "integrations.cursor.noControlTitle": "ID này không có trong bảng effort tích hợp của Cursor, nên Cursor sẽ không hiển thị nút điều khiển Reasoning.",
+  "integrations.cursor.noControlTitle":
+    "ID này không có trong bảng effort tích hợp của Cursor, nên Cursor sẽ không hiển thị nút điều khiển Reasoning.",
   "integrations.cursor.effortRowsOne": "1 dòng effort được công bố",
   "integrations.cursor.effortRowsMany": "{n} dòng effort được công bố",
   "integrations.cursor.effortRowsOff": "không có dòng effort",
-  "integrations.cursor.tableLessHint": "Các dòng được đánh dấu — sẽ không có nút điều khiển Reasoning trong Cursor. Bật cursorEffortRows để xuất ra một mục lựa chọn cho mỗi effort (id--effort), hoặc đặt modelDefaultReasoningEfforts trên provider để dùng mặc định cố định.",
+  "integrations.cursor.tableLessHint":
+    "Các dòng được đánh dấu — sẽ không có nút điều khiển Reasoning trong Cursor. Bật cursorEffortRows để xuất ra một mục lựa chọn cho mỗi effort (id--effort), hoặc đặt modelDefaultReasoningEfforts trên provider để dùng mặc định cố định.",
   "integrations.cursor.colModel": "Mô hình",
   "integrations.cursor.colReasoning": "Suy luận",
   "integrations.cursor.colContext": "Ngữ cảnh",
   "integrations.cursor.guide": "Mở hướng dẫn Cursor Private Inference",
   "integrations.dialog.codex.title": "Vô hiệu hóa tích hợp Codex?",
-  "integrations.dialog.codex.changes": "opencodex sẽ gỡ bỏ routing của nó khỏi {path}, gỡ bỏ profile nó tạo ra, khôi phục lại model catalog mặc định, và đổi thẻ các luồng có thể tiếp tục về native Codex.",
-  "integrations.dialog.codex.breakage": "Codex thuần sẽ kết nối trực tiếp đến OpenAI, và các model được định tuyến từ provider khác sẽ biến mất khỏi Codex. Proxy và /v1/responses vẫn tiếp tục chạy cho các client khác.",
-  "integrations.dialog.codex.undo": "Bật lại tính năng này sẽ xây dựng lại catalog được định tuyến từ các model hiện có và chèn Codex vào một lần nữa. Lịch sử cũ có thể dùng lại được cho hướng tương ứng, nhưng các file không được khôi phục chính xác từng byte.",
-  "integrations.dialog.codex.sideEffect": "Nếu bạn chọn một routed root model sau khi opencodex chèn cấu hình, việc vô hiệu hóa sẽ gỡ bỏ lựa chọn model đó và bật lại tích hợp sẽ không thể phục hồi nó; bạn hãy chọn lại model. Nếu một model_provider ngoài quản lý Codex, opencodex chỉ gỡ bỏ journal cũ của nó và giữ nguyên cấu hình, catalog và lịch sử.",
+  "integrations.dialog.codex.changes":
+    "opencodex sẽ gỡ bỏ routing của nó khỏi {path}, gỡ bỏ profile nó tạo ra, khôi phục lại model catalog mặc định, và đổi thẻ các luồng có thể tiếp tục về native Codex.",
+  "integrations.dialog.codex.breakage":
+    "Codex thuần sẽ kết nối trực tiếp đến OpenAI, và các model được định tuyến từ provider khác sẽ biến mất khỏi Codex. Proxy và /v1/responses vẫn tiếp tục chạy cho các client khác.",
+  "integrations.dialog.codex.undo":
+    "Bật lại tính năng này sẽ xây dựng lại catalog được định tuyến từ các model hiện có và chèn Codex vào một lần nữa. Lịch sử cũ có thể dùng lại được cho hướng tương ứng, nhưng các file không được khôi phục chính xác từng byte.",
+  "integrations.dialog.codex.sideEffect":
+    "Nếu bạn chọn một routed root model sau khi opencodex chèn cấu hình, việc vô hiệu hóa sẽ gỡ bỏ lựa chọn model đó và bật lại tích hợp sẽ không thể phục hồi nó; bạn hãy chọn lại model. Nếu một model_provider ngoài quản lý Codex, opencodex chỉ gỡ bỏ journal cũ của nó và giữ nguyên cấu hình, catalog và lịch sử.",
   "integrations.dialog.codex.confirm": "Vô hiệu hóa",
   "integrations.dialog.grok.title": "Vô hiệu hóa tích hợp Grok Build?",
-  "integrations.dialog.grok.changes": "Chỉ block được đánh dấu bởi opencodex sẽ bị gỡ bỏ khỏi {path}. Nội dung được ghi bên ngoài block sẽ giữ nguyên.",
-  "integrations.dialog.grok.breakage": "Việc vô hiệu hóa sẽ gỡ bỏ các bí danh model opencodex khỏi Grok Build. Các model được dùng với tài khoản xAI của bạn vẫn hoạt động.",
-  "integrations.dialog.grok.undo": "Nếu opencodex đang chạy trên địa chỉ loopback, việc bật lại tính năng này sẽ ghi một block mới từ các model hiện có.",
+  "integrations.dialog.grok.changes":
+    "Chỉ block được đánh dấu bởi opencodex sẽ bị gỡ bỏ khỏi {path}. Nội dung được ghi bên ngoài block sẽ giữ nguyên.",
+  "integrations.dialog.grok.breakage":
+    "Việc vô hiệu hóa sẽ gỡ bỏ các bí danh model opencodex khỏi Grok Build. Các model được dùng với tài khoản xAI của bạn vẫn hoạt động.",
+  "integrations.dialog.grok.undo":
+    "Nếu opencodex đang chạy trên địa chỉ loopback, việc bật lại tính năng này sẽ ghi một block mới từ các model hiện có.",
   "integrations.dialog.grok.confirm": "Vô hiệu hóa",
   "integrations.dialog.desktop.title": "Vô hiệu hóa tích hợp Claude Desktop?",
-  "integrations.dialog.desktop.changes": "Nếu {path} chứa một profile gateway do opencodex quản lý, Desktop sẽ chuyển về một profile tiêu chuẩn không cần credential, sau đó xóa profile cũ và bản sao lưu.",
-  "integrations.dialog.desktop.breakage": "Claude Desktop sẽ trở lại dùng Claude tiêu chuẩn thay vì các model định tuyến qua opencodex.",
-  "integrations.dialog.desktop.undo": "Bật lại tính năng này sẽ tạo lại profile opencodex từ các thiết lập model đã lưu của bạn.",
-  "integrations.dialog.desktop.restart": "Claude Desktop chỉ đọc cấu hình này khi khởi động. Hãy thoát hoàn toàn và mở lại để thay đổi có hiệu lực.",
+  "integrations.dialog.desktop.changes":
+    "Nếu {path} chứa một profile gateway do opencodex quản lý, Desktop sẽ chuyển về một profile tiêu chuẩn không cần credential, sau đó xóa profile cũ và bản sao lưu.",
+  "integrations.dialog.desktop.breakage":
+    "Claude Desktop sẽ trở lại dùng Claude tiêu chuẩn thay vì các model định tuyến qua opencodex.",
+  "integrations.dialog.desktop.undo":
+    "Bật lại tính năng này sẽ tạo lại profile opencodex từ các thiết lập model đã lưu của bạn.",
+  "integrations.dialog.desktop.restart":
+    "Claude Desktop chỉ đọc cấu hình này khi khởi động. Hãy thoát hoàn toàn và mở lại để thay đổi có hiệu lực.",
   "integrations.dialog.desktop.confirm": "Vô hiệu hóa",
-  "integrations.native.msg.nonLoopbackRemoved": "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Block trước đó trỏ tới loopback đã bị xóa.",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Không có block trước đó nào để xóa.",
-  "integrations.native.msg.nonLoopbackSuperseded": "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Một tiến trình khác đã ghi một block mới trong khi chờ, do đó block hiện tại trong file không phải do request này tạo ra.",
-  "integrations.native.error.orphanedMarker": "{path} có một điểm bắt đầu của opencodex nhưng không có điểm kết thúc. File không được thay đổi vì opencodex không thể xác định điểm cuối của block.",
-  "integrations.native.error.homeMismatch": "Thư mục cài đặt service không khớp với thư mục hiện tại, vì vậy file không được thay đổi.",
-  "integrations.native.error.notInstalled": "Grok Build chưa được cài đặt, nên không có gì để thay đổi.",
-  "integrations.native.error.configBusy": "Cấu hình đang được lưu ở nơi khác và không thể thay đổi. Hãy thử lại sau ít phút.",
-  "integrations.native.error.desktopUnsafeMetadata": "Metadata của Claude Desktop tại {path} không thể được đọc một cách an toàn, vì vậy thư viện của nó không được thay đổi.",
-  "integrations.native.error.desktopCleanupIncomplete": "Claude Desktop đang trỏ tới chế độ tiêu chuẩn, nhưng các file credential opencodex cũ vẫn còn tại: {paths}.",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Block trước đó trỏ tới loopback đã bị xóa.",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Không có block trước đó nào để xóa.",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "Grok Build chỉ có thể tự động đăng ký khi opencodex đang chạy trên một địa chỉ loopback. Một tiến trình khác đã ghi một block mới trong khi chờ, do đó block hiện tại trong file không phải do request này tạo ra.",
+  "integrations.native.error.orphanedMarker":
+    "{path} có một điểm bắt đầu của opencodex nhưng không có điểm kết thúc. File không được thay đổi vì opencodex không thể xác định điểm cuối của block.",
+  "integrations.native.error.homeMismatch":
+    "Thư mục cài đặt service không khớp với thư mục hiện tại, vì vậy file không được thay đổi.",
+  "integrations.native.error.notInstalled":
+    "Grok Build chưa được cài đặt, nên không có gì để thay đổi.",
+  "integrations.native.error.configBusy":
+    "Cấu hình đang được lưu ở nơi khác và không thể thay đổi. Hãy thử lại sau ít phút.",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "Metadata của Claude Desktop tại {path} không thể được đọc một cách an toàn, vì vậy thư viện của nó không được thay đổi.",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "Claude Desktop đang trỏ tới chế độ tiêu chuẩn, nhưng các file credential opencodex cũ vẫn còn tại: {paths}.",
   "integrations.native.msg.desktopDisabled": "Tích hợp Claude Desktop đã bị vô hiệu hóa.",
   "integrations.native.msg.desktopEnabled": "Tích hợp Claude Desktop đã được kích hoạt.",
   "integrations.state.absent": "Chưa được áp dụng",
@@ -2266,9 +2674,11 @@ export const vi: Record<TKey, string> = {
   "integrations.summary.stale": "Cần cập nhật",
   "integrations.summary.lastChange": "Thay đổi cuối cùng",
   "integrations.summary.disableAll": "Vô hiệu hóa tất cả…",
-  "integrations.onboarding": "Việc áp dụng sẽ ghi một provider block opencodex sau khi lưu một bản sao lưu. Việc vô hiệu hóa chỉ xóa block đó, và bản sao lưu đã giữ lại có thể được dùng để khôi phục.",
+  "integrations.onboarding":
+    "Việc áp dụng sẽ ghi một provider block opencodex sau khi lưu một bản sao lưu. Việc vô hiệu hóa chỉ xóa block đó, và bản sao lưu đã giữ lại có thể được dùng để khôi phục.",
   "integrations.empty.title": "Không tìm thấy client nào đã được cài đặt",
-  "integrations.empty.body": "Hãy cài đặt một client được hỗ trợ, sau đó quay lại đây để áp dụng opencodex.",
+  "integrations.empty.body":
+    "Hãy cài đặt một client được hỗ trợ, sau đó quay lại đây để áp dụng opencodex.",
   "integrations.action.apply": "Áp dụng",
   "integrations.action.disable": "Vô hiệu hóa",
   "integrations.action.refresh": "Cập nhật",
@@ -2287,44 +2697,62 @@ export const vi: Record<TKey, string> = {
   "integrations.rollback.failed": "Không thể tải lịch sử hoàn tác.",
   "integrations.rollback.delete": "Xóa",
   "integrations.rollback.deleteAria": "Xóa mục hoàn tác từ {at}",
-  "integrations.rollback.deleteNewest": "Mục gần đây nhất của client này được giữ lại để bạn vẫn có thể hoàn tác nó.",
+  "integrations.rollback.deleteNewest":
+    "Mục gần đây nhất của client này được giữ lại để bạn vẫn có thể hoàn tác nó.",
   "integrations.rollback.deleteGone": "Mục này đã bị xóa. Danh sách sẽ tự động làm mới.",
   "integrations.dialog.deleteEntry.title": "Xóa mục hoàn tác này?",
-  "integrations.dialog.deleteEntry.changes": "Mục này sẽ biến mất khỏi danh sách hoàn tác, và bất kỳ bản sao lưu nào nó giữ cho {path} sẽ bị xóa khỏi đĩa.",
-  "integrations.dialog.deleteEntry.breakage": "Bạn sẽ không thể khôi phục file về thời điểm này nữa. Các mục mới hơn và bản thân file sẽ không bị ảnh hưởng.",
-  "integrations.dialog.deleteEntry.undo": "Thao tác này không thể hoàn tác. Mục gần đây nhất của mỗi client luôn được giữ lại và không thể xóa.",
+  "integrations.dialog.deleteEntry.changes":
+    "Mục này sẽ biến mất khỏi danh sách hoàn tác, và bất kỳ bản sao lưu nào nó giữ cho {path} sẽ bị xóa khỏi đĩa.",
+  "integrations.dialog.deleteEntry.breakage":
+    "Bạn sẽ không thể khôi phục file về thời điểm này nữa. Các mục mới hơn và bản thân file sẽ không bị ảnh hưởng.",
+  "integrations.dialog.deleteEntry.undo":
+    "Thao tác này không thể hoàn tác. Mục gần đây nhất của mỗi client luôn được giữ lại và không thể xóa.",
   "integrations.dialog.deleteEntry.confirm": "Xóa mục",
   "integrations.restore.title": "Khôi phục bản sao lưu này?",
-  "integrations.restore.body": "File hiện tại sẽ được sao lưu trước, sau đó bản sao lưu đã chọn sẽ thay thế nó.",
+  "integrations.restore.body":
+    "File hiện tại sẽ được sao lưu trước, sau đó bản sao lưu đã chọn sẽ thay thế nó.",
   "integrations.restore.driftTitle": "Đã phát hiện các thay đổi mới hơn",
-  "integrations.restore.driftBody": "Các thay đổi được thực hiện sau bản sao lưu này sẽ được sao lưu lại, sau đó file sẽ bị thay thế.",
+  "integrations.restore.driftBody":
+    "Các thay đổi được thực hiện sau bản sao lưu này sẽ được sao lưu lại, sau đó file sẽ bị thay thế.",
   "integrations.restore.confirm": "Khôi phục",
   "integrations.restore.confirmDrift": "Sao lưu các thay đổi mới và khôi phục",
   "integrations.restore.pending": "Đang khôi phục…",
-  "integrations.restore.manual": "Khôi phục tự động thất bại: {reason}. Hãy khôi phục thủ công từ {path}.",
+  "integrations.restore.manual":
+    "Khôi phục tự động thất bại: {reason}. Hãy khôi phục thủ công từ {path}.",
   "integrations.error.load": "Không thể tải trạng thái tích hợp.",
   "integrations.error.stale": "Lần làm mới cuối cùng thất bại. Các giá trị bên dưới có thể đã cũ.",
-  "integrations.error.busy": "Một thay đổi khác cho client này vẫn đang chạy. Hãy thử lại sau ít phút.",
-  "integrations.error.conflict": "Cấu hình đã thay đổi sau khi opencodex ghi nó. Không có nội dung nào bị xóa.",
+  "integrations.error.busy":
+    "Một thay đổi khác cho client này vẫn đang chạy. Hãy thử lại sau ít phút.",
+  "integrations.error.conflict":
+    "Cấu hình đã thay đổi sau khi opencodex ghi nó. Không có nội dung nào bị xóa.",
   "integrations.error.unsafe": "Cấu hình không thể thay đổi một cách an toàn.",
-  "integrations.error.generic": "Việc thay đổi tích hợp thất bại. Trạng thái trước đó của bạn vẫn được giữ nguyên.",
-  "integrations.error.nonLoopback": "{client} chỉ có thể kết nối với proxy trên localhost — cấu hình của nó không có chỗ để đặt header admission mà một kết nối từ xa yêu cầu, vì vậy việc viết thủ công cũng không giúp ích. Thay vào đó, hãy cấp quyền truy cập loopback cho nó qua một tunnel hoặc local forwarder.",
+  "integrations.error.generic":
+    "Việc thay đổi tích hợp thất bại. Trạng thái trước đó của bạn vẫn được giữ nguyên.",
+  "integrations.error.nonLoopback":
+    "{client} chỉ có thể kết nối với proxy trên localhost — cấu hình của nó không có chỗ để đặt header admission mà một kết nối từ xa yêu cầu, vì vậy việc viết thủ công cũng không giúp ích. Thay vào đó, hãy cấp quyền truy cập loopback cho nó qua một tunnel hoặc local forwarder.",
   "integrations.status.installed": "Đã cài đặt",
   "integrations.status.notInstalled": "Chưa cài đặt",
   "integrations.status.appliedAt": "Đã áp dụng",
-  "integrations.status.supersededStore": "Máy khách này hiện đọc danh sách nhà cung cấp từ {path}, tệp mà opencodex không ghi, nên bật ở đây sẽ không thay đổi những gì nó tải.",
-  "integrations.status.missingStore": "Máy khách này lưu danh sách nhà cung cấp trong {path}, nhưng tệp này không tồn tại. opencodex sẽ không ghi vào tệp cài đặt cũ của máy khách để thay thế, vì máy khách sẽ di chuyển và nhập tệp đó ở lần khởi động tiếp theo. Hãy tạo {path} với nội dung {document}, rồi nhấn \"Áp dụng\" lần nữa.",
-  "integrations.status.candidateConflict": "Một tệp cấu hình Kilo khác, {path}, cũng định nghĩa provider.opencodex. Hãy xóa provider.opencodex khỏi tệp đó trước khi áp dụng.",
+  "integrations.status.supersededStore":
+    "Máy khách này hiện đọc danh sách nhà cung cấp từ {path}, tệp mà opencodex không ghi, nên bật ở đây sẽ không thay đổi những gì nó tải.",
+  "integrations.status.missingStore":
+    'Máy khách này lưu danh sách nhà cung cấp trong {path}, nhưng tệp này không tồn tại. opencodex sẽ không ghi vào tệp cài đặt cũ của máy khách để thay thế, vì máy khách sẽ di chuyển và nhập tệp đó ở lần khởi động tiếp theo. Hãy tạo {path} với nội dung {document}, rồi nhấn "Áp dụng" lần nữa.',
+  "integrations.status.candidateConflict":
+    "Một tệp cấu hình Kilo khác, {path}, cũng định nghĩa provider.opencodex. Hãy xóa provider.opencodex khỏi tệp đó trước khi áp dụng.",
   "integrations.status.backup": "Sao lưu",
   "integrations.status.lastRestore": "Lần khôi phục cuối",
   "integrations.status.unknown": "Không xác định",
   "integrations.bulk.title": "Vô hiệu hóa các tích hợp client đã áp dụng?",
-  "integrations.bulk.body": "Chỉ block thuộc về opencodex mới bị xóa. Một bản sao lưu trước khi ghi sẽ được giữ lại cho từng client.",
+  "integrations.bulk.body":
+    "Chỉ block thuộc về opencodex mới bị xóa. Một bản sao lưu trước khi ghi sẽ được giữ lại cho từng client.",
   "integrations.bulk.partial": "Một số client không thể vô hiệu hóa: {clients}",
   "integrations.bulk.success": "Các tích hợp client đã áp dụng đã bị vô hiệu hóa.",
-  "integrations.retention.degraded": "Việc dọn dẹp bản sao lưu bị chậm trễ; các bản sao lưu cũ hơn có thể vẫn còn trên đĩa.",
-  "integrations.error.residual": "File có thể đang ở trạng thái trung gian: {message} Hãy khôi phục nó từ {path}.",
-  "integrations.error.residualNoSnapshot": "{message} Quá trình khôi phục tự động chưa hoàn tất. Hãy kiểm tra cấu hình client trước khi thử lại.",
+  "integrations.retention.degraded":
+    "Việc dọn dẹp bản sao lưu bị chậm trễ; các bản sao lưu cũ hơn có thể vẫn còn trên đĩa.",
+  "integrations.error.residual":
+    "File có thể đang ở trạng thái trung gian: {message} Hãy khôi phục nó từ {path}.",
+  "integrations.error.residualNoSnapshot":
+    "{message} Quá trình khôi phục tự động chưa hoàn tất. Hãy kiểm tra cấu hình client trước khi thử lại.",
   "integrations.error.recover": "{message} Một bản sao lưu nằm tại {path}.",
   "integrations.kind.apply": "Đã áp dụng",
   "integrations.kind.disable": "Đã tắt",
@@ -2332,24 +2760,34 @@ export const vi: Record<TKey, string> = {
   "integrations.kind.restore": "Đã khôi phục",
   "integrations.kind.overwrite": "Đã ghi đè",
   "integrations.dialog.overwrite.title": "Thay thế block trong config này?",
-  "integrations.dialog.overwrite.changesUnowned": "Một block không do chúng ta ghi đã chiếm lấy các thiết lập mà opencodex cần trong {path}. Việc áp dụng sẽ thay thế nó bằng block mà opencodex sẽ ghi.",
-  "integrations.dialog.overwrite.changesForeign": "Thay đổi của bạn bên trong block opencodex ở {path} sẽ bị loại bỏ và thay thế bằng block mà opencodex sẽ ghi.",
-  "integrations.dialog.overwrite.breakage": "Bất cứ thứ gì mà block kia cấu hình sẽ ngừng hoạt động. Nội dung ở những chỗ khác trong file được giữ nguyên.",
-  "integrations.dialog.overwrite.undo": "Một bản sao lưu sẽ được lưu trước tiên, do đó thao tác này sẽ xuất hiện trong danh sách hoàn tác bên dưới và có thể được khôi phục.",
+  "integrations.dialog.overwrite.changesUnowned":
+    "Một block không do chúng ta ghi đã chiếm lấy các thiết lập mà opencodex cần trong {path}. Việc áp dụng sẽ thay thế nó bằng block mà opencodex sẽ ghi.",
+  "integrations.dialog.overwrite.changesForeign":
+    "Thay đổi của bạn bên trong block opencodex ở {path} sẽ bị loại bỏ và thay thế bằng block mà opencodex sẽ ghi.",
+  "integrations.dialog.overwrite.breakage":
+    "Bất cứ thứ gì mà block kia cấu hình sẽ ngừng hoạt động. Nội dung ở những chỗ khác trong file được giữ nguyên.",
+  "integrations.dialog.overwrite.undo":
+    "Một bản sao lưu sẽ được lưu trước tiên, do đó thao tác này sẽ xuất hiện trong danh sách hoàn tác bên dưới và có thể được khôi phục.",
   "integrations.dialog.overwrite.confirm": "Thay thế",
   "integrations.action.overwrite": "Thay thế",
   "integrations.preview.loading": "Đang tải kế hoạch thay đổi chính xác…",
   "integrations.preview.failed": "Không thể tải kế hoạch thay đổi. Không có gì bị thay đổi.",
-  "integrations.preview.stale": "Tích hợp đã thay đổi trong lúc xác nhận. Hãy xem kế hoạch mới và xác nhận lại.",
+  "integrations.preview.stale":
+    "Tích hợp đã thay đổi trong lúc xác nhận. Hãy xem kế hoạch mới và xác nhận lại.",
   "integrations.dialog.apply.title": "Áp dụng tích hợp này?",
-  "integrations.dialog.apply.changes": "opencodex sẽ thêm các cài đặt nhà cung cấp do nó quản lý vào cấu hình máy khách.",
-  "integrations.dialog.apply.breakage": "Máy khách sẽ dùng các mô hình hiện được phiên bản opencodex này cung cấp.",
-  "integrations.dialog.apply.undo": "Bản sao lưu được lưu trước và có thể hoàn tác thay đổi trong trung tâm khôi phục.",
+  "integrations.dialog.apply.changes":
+    "opencodex sẽ thêm các cài đặt nhà cung cấp do nó quản lý vào cấu hình máy khách.",
+  "integrations.dialog.apply.breakage":
+    "Máy khách sẽ dùng các mô hình hiện được phiên bản opencodex này cung cấp.",
+  "integrations.dialog.apply.undo":
+    "Bản sao lưu được lưu trước và có thể hoàn tác thay đổi trong trung tâm khôi phục.",
   "integrations.dialog.apply.confirm": "Áp dụng",
   "integrations.dialog.disable.title": "Tắt tích hợp này?",
   "integrations.dialog.disable.changes": "Chỉ các cài đặt thuộc opencodex sẽ bị xóa.",
-  "integrations.dialog.disable.breakage": "Máy khách sẽ ngừng dùng các mô hình được định tuyến qua phiên bản opencodex này.",
-  "integrations.dialog.disable.undo": "Bản sao lưu được lưu trước và có thể hoàn tác thay đổi trong trung tâm khôi phục.",
+  "integrations.dialog.disable.breakage":
+    "Máy khách sẽ ngừng dùng các mô hình được định tuyến qua phiên bản opencodex này.",
+  "integrations.dialog.disable.undo":
+    "Bản sao lưu được lưu trước và có thể hoàn tác thay đổi trong trung tâm khôi phục.",
   "integrations.dialog.disable.confirm": "Tắt",
   "integrations.plan.heading": "Kế hoạch thay đổi từ máy chủ",
   "integrations.plan.operation": "Thao tác: {operation}",
@@ -2365,42 +2803,66 @@ export const vi: Record<TKey, string> = {
   "integrations.plan.change.journal": "Ghi mục khôi phục",
   "integrations.plan.foreign.none": "Không phát hiện chỉnh sửa bên ngoài.",
   "integrations.plan.foreign.unowned": "Một khối cài đặt không thuộc opencodex sẽ bị thay thế.",
-  "integrations.plan.foreign.foreignEdit": "Các chỉnh sửa trong khối do opencodex quản lý sẽ bị thay thế.",
+  "integrations.plan.foreign.foreignEdit":
+    "Các chỉnh sửa trong khối do opencodex quản lý sẽ bị thay thế.",
   "integrations.plan.foreign.drift": "Tệp đã thay đổi kể từ điểm khôi phục này.",
-  "integrations.plan.noop.applied": "Không cần thay đổi tài liệu máy khách được quản lý; cài đặt tích hợp đã có sẵn.",
-  "integrations.plan.noop.disabled": "Không cần thay đổi tài liệu máy khách được quản lý; cài đặt tích hợp đã không còn.",
-  "integrations.plan.noop.profilePreference": "Tùy chọn đồng bộ hồ sơ vẫn sẽ được lưu khi bạn xác nhận.",
+  "integrations.plan.noop.applied":
+    "Không cần thay đổi tài liệu máy khách được quản lý; cài đặt tích hợp đã có sẵn.",
+  "integrations.plan.noop.disabled":
+    "Không cần thay đổi tài liệu máy khách được quản lý; cài đặt tích hợp đã không còn.",
+  "integrations.plan.noop.profilePreference":
+    "Tùy chọn đồng bộ hồ sơ vẫn sẽ được lưu khi bạn xác nhận.",
   "integrations.plan.refused": "Máy chủ không thể áp dụng kế hoạch này một cách an toàn.",
-  "integrations.plan.refusal.notInstalled": "Máy khách chưa được cài đặt. Hãy cài đặt, làm mới trang và xem trước thay đổi lần nữa.",
-  "integrations.plan.refusal.conflict": "Cài đặt được quản lý xung đột với tệp hiện tại. Hãy xem lại tệp hoặc dùng Thay thế khi có thể.",
-  "integrations.plan.refusal.unsafe": "Không thể thay đổi cấu hình máy khách một cách an toàn. Hãy sửa hoặc thay tệp trước khi thử lại.",
-  "integrations.plan.refusal.nonLoopback": "Máy khách này cần địa chỉ proxy loopback. Hãy dùng localhost, đường hầm hoặc chuyển tiếp cục bộ.",
-  "integrations.plan.refusal.supersededStore": "Máy khách này đọc danh sách nhà cung cấp từ một tệp mà opencodex không ghi, nên thao tác này sẽ không thay đổi những gì nó tải.",
-  "integrations.plan.refusal.missingStore": "Tệp mà máy khách này dùng để lưu danh sách nhà cung cấp không tồn tại, và opencodex sẽ không ghi vào tệp cài đặt cũ của máy khách để thay thế, vì máy khách sẽ di chuyển tệp đó ở lần khởi động tiếp theo. Hãy tạo tệp với nội dung {document}, rồi nhấn \"Áp dụng\" lần nữa.",
-  "integrations.plan.refusal.driftRequiresConfirm": "Tệp đã thay đổi sau điểm khôi phục này. Hãy xem kế hoạch có tính đến thay đổi trước khi khôi phục.",
-  "integrations.plan.refusal.snapshotExpired": "Bản sao lưu cho điểm khôi phục này đã hết hạn nên không thể khôi phục nữa.",
-  "integrations.plan.refusal.writeFailed": "Máy chủ không thể chuẩn bị thao tác ghi an toàn. Hãy làm mới trạng thái tích hợp trước khi thử lại.",
+  "integrations.plan.refusal.notInstalled":
+    "Máy khách chưa được cài đặt. Hãy cài đặt, làm mới trang và xem trước thay đổi lần nữa.",
+  "integrations.plan.refusal.conflict":
+    "Cài đặt được quản lý xung đột với tệp hiện tại. Hãy xem lại tệp hoặc dùng Thay thế khi có thể.",
+  "integrations.plan.refusal.unsafe":
+    "Không thể thay đổi cấu hình máy khách một cách an toàn. Hãy sửa hoặc thay tệp trước khi thử lại.",
+  "integrations.plan.refusal.nonLoopback":
+    "Máy khách này cần địa chỉ proxy loopback. Hãy dùng localhost, đường hầm hoặc chuyển tiếp cục bộ.",
+  "integrations.plan.refusal.supersededStore":
+    "Máy khách này đọc danh sách nhà cung cấp từ một tệp mà opencodex không ghi, nên thao tác này sẽ không thay đổi những gì nó tải.",
+  "integrations.plan.refusal.missingStore":
+    'Tệp mà máy khách này dùng để lưu danh sách nhà cung cấp không tồn tại, và opencodex sẽ không ghi vào tệp cài đặt cũ của máy khách để thay thế, vì máy khách sẽ di chuyển tệp đó ở lần khởi động tiếp theo. Hãy tạo tệp với nội dung {document}, rồi nhấn "Áp dụng" lần nữa.',
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "Tệp đã thay đổi sau điểm khôi phục này. Hãy xem kế hoạch có tính đến thay đổi trước khi khôi phục.",
+  "integrations.plan.refusal.snapshotExpired":
+    "Bản sao lưu cho điểm khôi phục này đã hết hạn nên không thể khôi phục nữa.",
+  "integrations.plan.refusal.writeFailed":
+    "Máy chủ không thể chuẩn bị thao tác ghi an toàn. Hãy làm mới trạng thái tích hợp trước khi thử lại.",
   "integrations.mutation.pending": "Đang áp dụng thay đổi đã xác nhận…",
-  "integrations.bulk.breakage": "Mỗi máy khách sẽ ngừng dùng các mô hình được định tuyến qua phiên bản opencodex này.",
+  "integrations.bulk.breakage":
+    "Mỗi máy khách sẽ ngừng dùng các mô hình được định tuyến qua phiên bản opencodex này.",
   "integrations.bulk.undo": "Mỗi máy khách giữ bản sao lưu và mục khôi phục riêng.",
   "integrations.bulk.confirm": "Tắt tất cả",
-  "integrations.semantics.opencode": "Chỉ khởi chạy trực tiếp trên đĩa; việc inject môi trường ocx opencode sẽ được ưu tiên.",
+  "integrations.semantics.opencode":
+    "Chỉ khởi chạy trực tiếp trên đĩa; việc inject môi trường ocx opencode sẽ được ưu tiên.",
   "integrations.semantics.pi": "Áp dụng cho các session mới.",
   "integrations.semantics.omp": "Khởi động lại OMP để tải catalog.",
   "integrations.semantics.hermes": "Áp dụng cho các session mới.",
   "integrations.semantics.openclaw": "Áp dụng ngay cho gateway đang chạy.",
   "integrations.semantics.kimi": "Khởi động lại hoặc chạy /reload để áp dụng (v2 theo dõi file).",
   "integrations.semantics.gajae": "Áp dụng cho session mới hoặc khi mở /model.",
-  "integrations.semantics.dsh": "OpenCodex chỉ quản lý provider opencodex trong dòng llm-pi-ai của $DSH_HOME/profiles/desktop/cordis.patch.yml, profile Desktop mà DSH 0.1.7+ đọc ($DSH_HOME/settings.yaml khi profile đó chưa tồn tại). DSH sẽ hot reload provider này; model mặc định của bạn và deepseek-official không thay đổi. Hiện chỉ hỗ trợ loopback; không ghi credential thật nào.",
-  "integrations.semantics.mcode": "Chỉ quản lý custom_provider.opencodex. Model mặc định của bạn và đăng nhập MiniMax không thay đổi.",
-  "integrations.semantics.zcode": "Chỉ quản lý provider.opencodex trong ~/.zcode/v2/config.json. Đăng nhập Z.ai của bạn và các provider khác không thay đổi. Khởi động lại ZCode sau khi thay đổi.",
-  "integrations.semantics.commandcode": "Chỉ quản lý mục nhà cung cấp OpenCodex trong ~/.commandcode/providers.json. Các provider và cài đặt khác của bạn vẫn không thay đổi.",
-  "integrations.semantics.prime": "Chỉ quản lý providers.opencodex trong models.json của Prime Agent — ~/.prime/agent trừ khi PRIME_AGENT_CODING_AGENT_DIR điều hướng nó. Các provider khác và ngoại lệ model của bạn không thay đổi. Áp dụng cho các session mới.",
-  "integrations.semantics.aside": "Chỉ quản lý providers.opencodex trong ~/.aside/u/<id>/models.json của profile này. Các provider khác của bạn không thay đổi. Hãy thoát hoàn toàn và mở lại Aside sau khi áp dụng.",
-  "integrations.semantics.raycast": "Thêm một provider OpenCodex vào providers.yaml của Raycast để mọi model được định tuyến xuất hiện trong bộ chọn model AI của Raycast. Yêu cầu Raycast Pro.",
-  "integrations.semantics.omo": "Chỉ quản lý providers.opencodex trong models.json của omo — ~/.omo/agent, trừ khi OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR hoặc PI_CODING_AGENT_DIR chuyển hướng. Các nhà cung cấp khác của bạn không thay đổi. Áp dụng cho phiên mới.",
+  "integrations.semantics.dsh":
+    "OpenCodex chỉ quản lý provider opencodex trong dòng llm-pi-ai của $DSH_HOME/profiles/desktop/cordis.patch.yml, profile Desktop mà DSH 0.1.7+ đọc ($DSH_HOME/settings.yaml khi profile đó chưa tồn tại). DSH sẽ hot reload provider này; model mặc định của bạn và deepseek-official không thay đổi. Hiện chỉ hỗ trợ loopback; không ghi credential thật nào.",
+  "integrations.semantics.mcode":
+    "Chỉ quản lý custom_provider.opencodex. Model mặc định của bạn và đăng nhập MiniMax không thay đổi.",
+  "integrations.semantics.zcode":
+    "Chỉ quản lý provider.opencodex trong ~/.zcode/v2/config.json. Đăng nhập Z.ai của bạn và các provider khác không thay đổi. Khởi động lại ZCode sau khi thay đổi.",
+  "integrations.semantics.commandcode":
+    "Chỉ quản lý mục nhà cung cấp OpenCodex trong ~/.commandcode/providers.json. Các provider và cài đặt khác của bạn vẫn không thay đổi.",
+  "integrations.semantics.prime":
+    "Chỉ quản lý providers.opencodex trong models.json của Prime Agent — ~/.prime/agent trừ khi PRIME_AGENT_CODING_AGENT_DIR điều hướng nó. Các provider khác và ngoại lệ model của bạn không thay đổi. Áp dụng cho các session mới.",
+  "integrations.semantics.aside":
+    "Chỉ quản lý providers.opencodex trong ~/.aside/u/<id>/models.json của profile này. Các provider khác của bạn không thay đổi. Hãy thoát hoàn toàn và mở lại Aside sau khi áp dụng.",
+  "integrations.semantics.raycast":
+    "Thêm một provider OpenCodex vào providers.yaml của Raycast để mọi model được định tuyến xuất hiện trong bộ chọn model AI của Raycast. Yêu cầu Raycast Pro.",
+  "integrations.semantics.omo":
+    "Chỉ quản lý providers.opencodex trong models.json của omo — ~/.omo/agent, trừ khi OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR hoặc PI_CODING_AGENT_DIR chuyển hướng. Các nhà cung cấp khác của bạn không thay đổi. Áp dụng cho phiên mới.",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex): model theo vai trò",
-  "integrations.lazycodexRoles.hint": "Chọn model và mức suy luận cho từng vai trò. Lưu sẽ cập nhật tệp của vai trò trong $CODEX_HOME/agents, và cả omo.jsonc của LazyCodex khi tệp đó có thể được ghi lại an toàn; \"Kế thừa mức suy luận\" để Codex quyết định mức này.",
+  "integrations.lazycodexRoles.hint":
+    'Chọn model và mức suy luận cho từng vai trò. Lưu sẽ cập nhật tệp của vai trò trong $CODEX_HOME/agents, và cả omo.jsonc của LazyCodex khi tệp đó có thể được ghi lại an toàn; "Kế thừa mức suy luận" để Codex quyết định mức này.',
   "integrations.lazycodexRoles.role": "Vai trò",
   "integrations.lazycodexRoles.current": "Hiện tại",
   "integrations.lazycodexRoles.model": "Mô hình mới",
@@ -2414,21 +2876,31 @@ export const vi: Record<TKey, string> = {
   "integrations.lazycodexRoles.loadFailed": "Không tải được các vai trò tác tử Codex.",
   "integrations.lazycodexRoles.saveFailed": "Không lưu được mô hình cho {role}.",
   "integrations.lazycodexRoles.saved": "{role} giờ chạy trên {model}.",
-  "integrations.lazycodexRoles.omoAbsent": "{role} giờ chạy trên {model}. Không tìm thấy omo.jsonc nên chỉ tệp vai trò được thay đổi.",
-  "integrations.lazycodexRoles.omoComments": "{role} giờ chạy bằng {model}. omo.jsonc có chú thích sẽ bị xóa khi lưu nên được giữ nguyên; hãy tự đặt [codex].agents.{role} trong đó.",
-  "integrations.lazycodexRoles.omoInvalid": "{role} giờ chạy bằng {model}. omo.jsonc được giữ nguyên vì nó không phải JSON hợp lệ theo dạng LazyCodex đọc.",
-  "integrations.lazycodexRoles.omoFailed": "{role} giờ chạy bằng {model}, nhưng không ghi được omo.jsonc.",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} giờ chạy trên {model}. Không tìm thấy omo.jsonc nên chỉ tệp vai trò được thay đổi.",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} giờ chạy bằng {model}. omo.jsonc có chú thích sẽ bị xóa khi lưu nên được giữ nguyên; hãy tự đặt [codex].agents.{role} trong đó.",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} giờ chạy bằng {model}. omo.jsonc được giữ nguyên vì nó không phải JSON hợp lệ theo dạng LazyCodex đọc.",
+  "integrations.lazycodexRoles.omoFailed":
+    "{role} giờ chạy bằng {model}, nhưng không ghi được omo.jsonc.",
   "integrations.lazycodexRoles.retryMirror": "Thử lại omo.jsonc",
   "integrations.lazycodexRoles.history.title": "Lịch sử thay đổi",
-  "integrations.lazycodexRoles.history.hint": "50 lần lưu và tự động gán gần nhất trong phần này được liệt kê ở đây, theo từng thao tác trọn vẹn. Khôi phục ghi lại mô hình và mức suy luận trước đó như một lần lưu thông thường, nên thao tác đó cũng được liệt kê. Vai trò trước đây không ghim mô hình sẽ giữ mô hình hiện tại; chỉ mức suy luận được khôi phục.",
-  "integrations.lazycodexRoles.history.unavailable": "Không đọc được lịch sử thay đổi nên không thể khôi phục. Bạn vẫn chỉnh sửa vai trò như bình thường.",
+  "integrations.lazycodexRoles.history.hint":
+    "50 lần lưu và tự động gán gần nhất trong phần này được liệt kê ở đây, theo từng thao tác trọn vẹn. Khôi phục ghi lại mô hình và mức suy luận trước đó như một lần lưu thông thường, nên thao tác đó cũng được liệt kê. Vai trò trước đây không ghim mô hình sẽ giữ mô hình hiện tại; chỉ mức suy luận được khôi phục.",
+  "integrations.lazycodexRoles.history.unavailable":
+    "Không đọc được lịch sử thay đổi nên không thể khôi phục. Bạn vẫn chỉnh sửa vai trò như bình thường.",
   "integrations.lazycodexRoles.history.restore": "Khôi phục",
-  "integrations.lazycodexRoles.history.restored": "Đã khôi phục {count} vai trò về trạng thái trước {time}.",
-  "integrations.lazycodexRoles.history.partial": "Khôi phục dừng ở {role}: {count}/{total} vai trò đã được khôi phục, các vai trò còn lại giữ giá trị hiện tại. Hãy sửa lỗi ở trên rồi khôi phục lại.",
-  "integrations.lazycodexRoles.omoCommentsState": "omo.jsonc có chú thích, nên lưu ở đây chỉ cập nhật các tệp vai trò. Hãy tự đặt [codex].agents trong omo.jsonc.",
+  "integrations.lazycodexRoles.history.restored":
+    "Đã khôi phục {count} vai trò về trạng thái trước {time}.",
+  "integrations.lazycodexRoles.history.partial":
+    "Khôi phục dừng ở {role}: {count}/{total} vai trò đã được khôi phục, các vai trò còn lại giữ giá trị hiện tại. Hãy sửa lỗi ở trên rồi khôi phục lại.",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "omo.jsonc có chú thích, nên lưu ở đây chỉ cập nhật các tệp vai trò. Hãy tự đặt [codex].agents trong omo.jsonc.",
   "integrations.lazycodexRoles.auto.button": "Tự động gán",
   "integrations.lazycodexRoles.auto.running": "Đang đánh giá vai trò…",
-  "integrations.lazycodexRoles.auto.hint": "Đề xuất cho mỗi vai trò model rẻ nhất mà vẫn đủ dùng cùng effort lý luận phù hợp. Không có gì thay đổi cho tới khi bạn áp dụng.",
+  "integrations.lazycodexRoles.auto.hint":
+    "Đề xuất cho mỗi vai trò model rẻ nhất mà vẫn đủ dùng cùng effort lý luận phù hợp. Không có gì thay đổi cho tới khi bạn áp dụng.",
   "integrations.lazycodexRoles.auto.failed": "Không thể đánh giá các vai trò tác tử Codex.",
   "integrations.lazycodexRoles.auto.title": "Mô hình đề xuất",
   "integrations.lazycodexRoles.auto.sizedWith": "Đánh giá bằng {model}",
@@ -2452,12 +2924,18 @@ export const vi: Record<TKey, string> = {
   "integrations.lazycodexRoles.auto.apply": "Áp dụng",
   "integrations.lazycodexRoles.auto.moveUp": "Nâng lên nếu: {text}",
   "integrations.lazycodexRoles.auto.moveDown": "Hạ xuống nếu: {text}",
-  "integrations.semantics.cline": "Quản lý OpenCodex trong providers.json và models.json của Cline CLI. Hãy dừng Cline trước khi thay đổi hoặc đồng bộ các tệp này, rồi khởi động lại. Hoàn tác sẽ khôi phục cả hai bản gốc. Nhà cung cấp mặc định của bạn không thay đổi; hãy chọn OpenCodex trong Cline.",
-  "integrations.semantics.kilo": "Chỉ quản lý provider.opencodex trong cấu hình toàn cục của Kilo — tệp tồn tại đầu tiên trong kilo.jsonc, kilo.json, opencode.jsonc, opencode.json hoặc config.json dưới ~/.config/kilo (XDG_CONFIG_HOME chuyển thư mục này; nếu không tệp nào tồn tại, kilo.jsonc sẽ được tạo). Các khóa khác giữ nguyên. Áp dụng ghi lại toàn bộ tệp nên chú thích và dấu phẩy cuối không được giữ. Chọn opencodex/<mô hình> trong Kilo.",
-  "integrations.semantics.droid": "Thêm các mô hình OpenCodex vào settings.json của Factory Droid. Tắt chỉ xóa các mục được quản lý; Hoàn tác khôi phục tệp đã lưu.",
-  "integrations.raycast.proRequired": "Custom Providers là một tính năng của Raycast Pro. File sẽ được ghi, nhưng Raycast sẽ bỏ qua nó cho đến khi đăng ký Pro được kích hoạt.",
-  "integrations.raycast.planUnknown": "Không thể xác định xem Raycast Pro có đang hoạt động hay không; Custom Providers yêu cầu Raycast Pro.",
-  "integrations.raycast.revealConfig": "Mở Raycast → Settings → AI và nhấp vào Reveal Providers Config một lần để thư mục providers được tạo.",
+  "integrations.semantics.cline":
+    "Quản lý OpenCodex trong providers.json và models.json của Cline CLI. Hãy dừng Cline trước khi thay đổi hoặc đồng bộ các tệp này, rồi khởi động lại. Hoàn tác sẽ khôi phục cả hai bản gốc. Nhà cung cấp mặc định của bạn không thay đổi; hãy chọn OpenCodex trong Cline.",
+  "integrations.semantics.kilo":
+    "Chỉ quản lý provider.opencodex trong cấu hình toàn cục của Kilo — tệp tồn tại đầu tiên trong kilo.jsonc, kilo.json, opencode.jsonc, opencode.json hoặc config.json dưới ~/.config/kilo (XDG_CONFIG_HOME chuyển thư mục này; nếu không tệp nào tồn tại, kilo.jsonc sẽ được tạo). Các khóa khác giữ nguyên. Áp dụng ghi lại toàn bộ tệp nên chú thích và dấu phẩy cuối không được giữ. Chọn opencodex/<mô hình> trong Kilo.",
+  "integrations.semantics.droid":
+    "Thêm các mô hình OpenCodex vào settings.json của Factory Droid. Tắt chỉ xóa các mục được quản lý; Hoàn tác khôi phục tệp đã lưu.",
+  "integrations.raycast.proRequired":
+    "Custom Providers là một tính năng của Raycast Pro. File sẽ được ghi, nhưng Raycast sẽ bỏ qua nó cho đến khi đăng ký Pro được kích hoạt.",
+  "integrations.raycast.planUnknown":
+    "Không thể xác định xem Raycast Pro có đang hoạt động hay không; Custom Providers yêu cầu Raycast Pro.",
+  "integrations.raycast.revealConfig":
+    "Mở Raycast → Settings → AI và nhấp vào Reveal Providers Config một lần để thư mục providers được tạo.",
   "codexAuth.mainAccount": "Tài khoản chính",
   "codexAuth.logLabel": "Nhãn log",
   "codexAuth.codexApp": "Codex App",
@@ -2467,12 +2945,15 @@ export const vi: Record<TKey, string> = {
   "codexAuth.accountPool": "Pool tài khoản",
   "codexAuth.accountModeTitle": "Chế độ tài khoản OpenAI",
   "codexAuth.accountModePool": "Chế độ Pool",
-  "codexAuth.accountModePoolDesc": "Tài khoản đăng nhập chính và các tài khoản đủ điều kiện được thêm vào sẽ luân phiên ở đây.",
+  "codexAuth.accountModePoolDesc":
+    "Tài khoản đăng nhập chính và các tài khoản đủ điều kiện được thêm vào sẽ luân phiên ở đây.",
   "codexAuth.accountModeDirect": "Chế độ Direct",
-  "codexAuth.accountModeDirectDesc": "Các request chỉ sử dụng tài khoản đăng nhập chính; các tài khoản được thêm vào vẫn được lưu để dùng cho chế độ Pool.",
+  "codexAuth.accountModeDirectDesc":
+    "Các request chỉ sử dụng tài khoản đăng nhập chính; các tài khoản được thêm vào vẫn được lưu để dùng cho chế độ Pool.",
   "codexAuth.openaiMissing": "Provider OpenAI mặc định chưa được cấu hình.",
   "codexAuth.openaiDisabled": "Provider OpenAI mặc định đang bị vô hiệu hóa.",
-  "codexAuth.openaiUnavailableDesc": "Các tài khoản OpenAI của bạn vẫn khả dụng. Hãy bật provider để định tuyến các request của Codex.",
+  "codexAuth.openaiUnavailableDesc":
+    "Các tài khoản OpenAI của bạn vẫn khả dụng. Hãy bật provider để định tuyến các request của Codex.",
   "codexAuth.enableOpenai": "Bật OpenAI",
   "codexAuth.enablingOpenai": "Đang bật...",
   "codexAuth.enableOpenaiFailed": "Không thể bật provider OpenAI.",
@@ -2493,28 +2974,40 @@ export const vi: Record<TKey, string> = {
   "codexAuth.refreshQuota": "Làm mới quota",
   "codexAuth.ultraFastTitle": "Dịch vụ cấp độ Ultra Fast",
   "codexAuth.mainHardLockTitle": "Chặn tài khoản chính (5h {short}%, dài hạn {long}%)",
-  "codexAuth.mainHardLockDesc": "Chặn khi cửa sổ 5h đạt {short}% hoặc tuần đạt {long}% (tháng với tài khoản chỉ có hạn tháng). Tự mở khi mọi cửa sổ chặn xuống dưới ngưỡng. Bảo vệ bật mặc định.",
-  "codexAuth.mainHardLockConfirmTitle": "Bật bảo vệ tài khoản chính (5h {short}%, dài hạn {long}%)?",
-  "codexAuth.mainHardLockConfirmBody": "Khi bị khóa, tài khoản chính không thể sử dụng Luna Reserve. Giữ lượng dùng dưới mức cạn kiệt có thể ngăn việc kích hoạt Reserve. Các tài khoản được thêm vào và provider khác vẫn khả dụng. Các request đang chạy, credential chưa khớp, và lưu lượng ngoài proxy này không được bảo vệ.",
+  "codexAuth.mainHardLockDesc":
+    "Chặn khi cửa sổ 5h đạt {short}% hoặc tuần đạt {long}% (tháng với tài khoản chỉ có hạn tháng). Tự mở khi mọi cửa sổ chặn xuống dưới ngưỡng. Bảo vệ bật mặc định.",
+  "codexAuth.mainHardLockConfirmTitle":
+    "Bật bảo vệ tài khoản chính (5h {short}%, dài hạn {long}%)?",
+  "codexAuth.mainHardLockConfirmBody":
+    "Khi bị khóa, tài khoản chính không thể sử dụng Luna Reserve. Giữ lượng dùng dưới mức cạn kiệt có thể ngăn việc kích hoạt Reserve. Các tài khoản được thêm vào và provider khác vẫn khả dụng. Các request đang chạy, credential chưa khớp, và lưu lượng ngoài proxy này không được bảo vệ.",
   "codexAuth.mainHardLockConfirm": "Bật bảo vệ",
   "codexAuth.mainHardLockEnabled": "Bảo vệ đang bật (5h {short}%, dài hạn {long}%).",
-  "codexAuth.mainHardLockDisabled": "Bảo vệ tài khoản chính đang tắt. Các giới hạn khác vẫn áp dụng.",
-  "codexAuth.mainHardLockLoadFailed": "Không thể tải cài đặt này. Hãy thử lại để kiểm tra trạng thái hiện tại của nó.",
-  "codexAuth.mainHardLockSaveFailed": "Không thể xác nhận việc lưu. Tải lại cài đặt trước khi thử lại.",
-  "codexAuth.mainHardLockRefreshFailed": "Cài đặt đã được lưu, nhưng không thể làm mới trạng thái tài khoản. Vui lòng thử lại.",
-  "codexAuth.mainHardLockBlocked": "Bị chặn bởi bảo vệ tài khoản chính (5h {short}%, dài hạn {long}%)",
+  "codexAuth.mainHardLockDisabled":
+    "Bảo vệ tài khoản chính đang tắt. Các giới hạn khác vẫn áp dụng.",
+  "codexAuth.mainHardLockLoadFailed":
+    "Không thể tải cài đặt này. Hãy thử lại để kiểm tra trạng thái hiện tại của nó.",
+  "codexAuth.mainHardLockSaveFailed":
+    "Không thể xác nhận việc lưu. Tải lại cài đặt trước khi thử lại.",
+  "codexAuth.mainHardLockRefreshFailed":
+    "Cài đặt đã được lưu, nhưng không thể làm mới trạng thái tài khoản. Vui lòng thử lại.",
+  "codexAuth.mainHardLockBlocked":
+    "Bị chặn bởi bảo vệ tài khoản chính (5h {short}%, dài hạn {long}%)",
   "codexAuth.mainHardLockUnknown": "Bảo vệ đang bật · lượng sử dụng chưa rõ",
   "codexAuth.mainHardLockMonitoring": "Bảo vệ đang bật · đang theo dõi",
-  "codexAuth.mainExternalUsageWarning": "Có thể có sử dụng ngoài opencodex. Việc chặn có thể không ngăn hết hạn mức.",
+  "codexAuth.mainExternalUsageWarning":
+    "Có thể có sử dụng ngoài opencodex. Việc chặn có thể không ngăn hết hạn mức.",
   "codexAuth.mainHardLockManage": "Xem thiết lập bảo vệ",
   "codexAuth.mainHardLockFallbackTitle": "Mô hình dự phòng khi bị chặn",
-  "codexAuth.mainHardLockFallbackDesc": "Khi bị chặn và không tài khoản Codex nào phục vụ được yêu cầu, các yêu cầu tới mô hình Codex gốc được chuyển tới mô hình này thay vì thất bại. Để trống để từ chối như thường lệ; việc chặn tự kết thúc.",
+  "codexAuth.mainHardLockFallbackDesc":
+    "Khi bị chặn và không tài khoản Codex nào phục vụ được yêu cầu, các yêu cầu tới mô hình Codex gốc được chuyển tới mô hình này thay vì thất bại. Để trống để từ chối như thường lệ; việc chặn tự kết thúc.",
   "codexAuth.mainHardLockFallbackModel": "Mô hình dự phòng",
   "codexAuth.mainHardLockFallbackEffort": "Mức suy luận",
   "codexAuth.mainHardLockFallbackDefaultEffort": "Giữ mức của yêu cầu",
   "codexAuth.mainHardLockFallbackActive": "Đang chặn — yêu cầu Codex gốc được chuyển tới {model}.",
-  "codexAuth.mainHardLockFallbackSaveFailed": "Không xác nhận được việc lưu dự phòng. Hãy tải lại cài đặt rồi thử lại.",
-  "codexAuth.ultraFastDesc": "Thêm lựa chọn tốc độ Ultrafast cho GPT-6 Astra và GPT-6.1 Sol trong bộ chọn model của Codex, đồng thời ngăn dịch vụ cấp độ ultrafast mà bạn tự thiết lập trên các model định tuyến bị loại bỏ khi catalog được tạo lại. Ultrafast yêu cầu gói ChatGPT đủ điều kiện; chỉ bật khi gói của bạn bao gồm nó.",
+  "codexAuth.mainHardLockFallbackSaveFailed":
+    "Không xác nhận được việc lưu dự phòng. Hãy tải lại cài đặt rồi thử lại.",
+  "codexAuth.ultraFastDesc":
+    "Thêm lựa chọn tốc độ Ultrafast cho GPT-6 Astra và GPT-6.1 Sol trong bộ chọn model của Codex, đồng thời ngăn dịch vụ cấp độ ultrafast mà bạn tự thiết lập trên các model định tuyến bị loại bỏ khi catalog được tạo lại. Ultrafast yêu cầu gói ChatGPT đủ điều kiện; chỉ bật khi gói của bạn bao gồm nó.",
   "codexAuth.ultraFastLoadFailed": "Không thể đọc thiết lập Ultra Fast.",
   "codexAuth.ultraFastEnabled": "Cấp độ Ultra Fast đã bật",
   "codexAuth.ultraFastDisabled": "Cấp độ Ultra Fast đã tắt",
@@ -2532,7 +3025,8 @@ export const vi: Record<TKey, string> = {
   "codexAuth.resume": "Tiếp tục",
   "codexAuth.paused": "ĐÃ TẠM NGƯNG",
   "codexAuth.planExcluded": "Không được tự động chọn",
-  "codexAuth.planExcludedHint": "Gói {plan} bị loại khỏi lựa chọn tự động. Các tuyến tài khoản chỉ định vẫn khả dụng.",
+  "codexAuth.planExcludedHint":
+    "Gói {plan} bị loại khỏi lựa chọn tự động. Các tuyến tài khoản chỉ định vẫn khả dụng.",
   "codexAuth.pauseSucceeded": "{email} đã bị tạm ngưng",
   "codexAuth.resumeSucceeded": "{email} đã có mặt lại trong pool",
   "codexAuth.pauseFailed": "Không thể ngưng {email}. Không có thay đổi nào.",
@@ -2543,34 +3037,46 @@ export const vi: Record<TKey, string> = {
   "accountPause.reason.subscriptionInactive": "Gói đăng ký không hoạt động",
   "accountPause.reason.subscriptionExpired": "Gói đăng ký đã hết hạn",
   "accountPause.reason.planDowngraded": "Gói đã bị hạ cấp",
-  "prov.keyResumedSwitchFailed": "Khóa đã được tiếp tục nhưng kích hoạt thất bại. Khóa có thể được chọn tự động. Hãy thử chọn lại.",
-  "codexAuth.pausedHint": "Được loại trừ khỏi luân phiên tự động, thử lại, hồi phục sau thời gian chờ, và lựa chọn thủ công cho đến khi tiếp tục.",
+  "prov.keyResumedSwitchFailed":
+    "Khóa đã được tiếp tục nhưng kích hoạt thất bại. Khóa có thể được chọn tự động. Hãy thử chọn lại.",
+  "codexAuth.pausedHint":
+    "Được loại trừ khỏi luân phiên tự động, thử lại, hồi phục sau thời gian chờ, và lựa chọn thủ công cho đến khi tiếp tục.",
   "codexAuth.creditsAfterLimit": "Dùng tín dụng sau giới hạn",
-  "codexAuth.creditsAfterLimitHint": "Mặc định tắt: tài khoản có cửa sổ sử dụng đạt 100% sẽ được thay thế cho đến khi đặt lại, nên tín dụng ChatGPT của nó không bị tiêu. Bật một tài khoản để nó tiếp tục chạy bằng tín dụng. Tài khoản mới bắt đầu ở trạng thái tắt.",
+  "codexAuth.creditsAfterLimitHint":
+    "Mặc định tắt: tài khoản có cửa sổ sử dụng đạt 100% sẽ được thay thế cho đến khi đặt lại, nên tín dụng ChatGPT của nó không bị tiêu. Bật một tài khoản để nó tiếp tục chạy bằng tín dụng. Tài khoản mới bắt đầu ở trạng thái tắt.",
   "codexAuth.creditsAfterLimitAria": "Dùng tín dụng sau giới hạn sử dụng cho {email}",
-  "codexAuth.creditsAfterLimitMainHint": "Khóa cứng của tài khoản chính (mặc định bật) vẫn chặn trước. Tắt khóa để tài khoản chính được dùng tín dụng.",
+  "codexAuth.creditsAfterLimitMainHint":
+    "Khóa cứng của tài khoản chính (mặc định bật) vẫn chặn trước. Tắt khóa để tài khoản chính được dùng tín dụng.",
   "codexAuth.creditSpend": "Dùng tín dụng",
   "codexAuth.creditSpendAria": "Dùng tín dụng ChatGPT sau giới hạn sử dụng",
   "codexAuth.creditsOn": "Dùng tín dụng",
   "codexAuth.creditsOnSucceeded": "{email} có thể dùng tín dụng sau giới hạn sử dụng.",
-  "codexAuth.creditsOffSucceeded": "{email} sẽ được thay thế khi đạt giới hạn, tín dụng được giữ lại.",
-  "codexAuth.creditsUpdateFailed": "Không thể cập nhật cài đặt tín dụng cho {email}. Không có gì thay đổi.",
+  "codexAuth.creditsOffSucceeded":
+    "{email} sẽ được thay thế khi đạt giới hạn, tín dụng được giữ lại.",
+  "codexAuth.creditsUpdateFailed":
+    "Không thể cập nhật cài đặt tín dụng cho {email}. Không có gì thay đổi.",
   "codexAuth.creditsAllOnSucceeded": "Mọi tài khoản giờ có thể dùng tín dụng sau giới hạn sử dụng.",
-  "codexAuth.creditsAllOffSucceeded": "Không tài khoản nào tiêu tín dụng. Tài khoản được thay thế ở 100%.",
+  "codexAuth.creditsAllOffSucceeded":
+    "Không tài khoản nào tiêu tín dụng. Tài khoản được thay thế ở 100%.",
   "codexAuth.creditsAllUpdateFailed": "Không thể cập nhật cài đặt tín dụng. Không có gì thay đổi.",
   "codexAuth.pinned": "ĐÃ GHIM",
-  "codexAuth.pinnedHint": "Bạn đã chọn tài khoản này bằng tay, nên một thứ tự ưu tiên cao hơn sẽ không bỏ qua nó. Việc ghim kéo dài đến khi tài khoản này bị cạn kiệt, bạn chọn một tài khoản khác, hoặc bạn thay đổi bất kỳ thứ tự lựa chọn nào.",
+  "codexAuth.pinnedHint":
+    "Bạn đã chọn tài khoản này bằng tay, nên một thứ tự ưu tiên cao hơn sẽ không bỏ qua nó. Việc ghim kéo dài đến khi tài khoản này bị cạn kiệt, bạn chọn một tài khoản khác, hoặc bạn thay đổi bất kỳ thứ tự lựa chọn nào.",
   "codexAuth.unpinHint": "Chọn lại để bỏ ghim và quay về chế độ chọn tự động.",
   "codexAuth.unpinTitle": "Bỏ ghim?",
-  "codexAuth.unpinDesc": "Có hiệu lực ngay lập tức. Các luồng đã gắn với tài khoản và các request đang thực thi giữ nguyên tài khoản cũ; các request mới hoặc chưa gán sẽ tự động chọn tài khoản theo thứ tự lựa chọn và ngưỡng.",
+  "codexAuth.unpinDesc":
+    "Có hiệu lực ngay lập tức. Các luồng đã gắn với tài khoản và các request đang thực thi giữ nguyên tài khoản cũ; các request mới hoặc chưa gán sẽ tự động chọn tài khoản theo thứ tự lựa chọn và ngưỡng.",
   "codexAuth.unpinAction": "Bỏ ghim",
   "codexAuth.unpinned": "Đã bỏ ghim — quay lại chọn tự động",
-  "codexAuth.unpinFailed": "Không thể xác nhận việc bỏ ghim. Hãy làm mới các tài khoản và kiểm tra lựa chọn hiện tại trước khi thử lại.",
-  "codexAuth.unpinChanged": "Tài khoản được ghim đã thay đổi khi hộp xác nhận này đang mở. Hãy làm mới các tài khoản và kiểm tra lựa chọn hiện tại trước khi bỏ ghim.",
+  "codexAuth.unpinFailed":
+    "Không thể xác nhận việc bỏ ghim. Hãy làm mới các tài khoản và kiểm tra lựa chọn hiện tại trước khi thử lại.",
+  "codexAuth.unpinChanged":
+    "Tài khoản được ghim đã thay đổi khi hộp xác nhận này đang mở. Hãy làm mới các tài khoản và kiểm tra lựa chọn hiện tại trước khi bỏ ghim.",
   "codexAuth.fiveHour": "5h",
   "codexAuth.weekly": "Tuần",
   "codexAuth.quotaAutoRefresh": "Tự động kích hoạt cửa sổ",
-  "codexAuth.quotaAutoRefreshHint": "Gửi một request warm-up Codex tối thiểu, không lưu trữ khi cửa sổ quota này reset.",
+  "codexAuth.quotaAutoRefreshHint":
+    "Gửi một request warm-up Codex tối thiểu, không lưu trữ khi cửa sổ quota này reset.",
   "codexAuth.quotaAutoRefreshUpdated": "Tự động kích hoạt cửa sổ đã được cập nhật.",
   "codexAuth.quotaAutoRefreshFailed": "Không thể cập nhật tự động kích hoạt cửa sổ.",
   "codexAuth.monthly": "30 ngày",
@@ -2580,23 +3086,33 @@ export const vi: Record<TKey, string> = {
   "codexAuth.nextSession": "ĐÃ CHỌN",
   "codexAuth.poolPrepared": "ĐÃ CHUẨN BỊ CHO POOL",
   "codexAuth.preparePoolTitle": "Chuẩn bị tài khoản này cho chế độ Pool?",
-  "codexAuth.preparePoolDesc": "Các request dạng Direct tiếp tục sử dụng đăng nhập chính. Tài khoản này trở thành lựa chọn được chuẩn bị của Pool khi chế độ Pool được bật.",
+  "codexAuth.preparePoolDesc":
+    "Các request dạng Direct tiếp tục sử dụng đăng nhập chính. Tài khoản này trở thành lựa chọn được chuẩn bị của Pool khi chế độ Pool được bật.",
   "codexAuth.prepareForPool": "Chuẩn bị cho Pool",
   "codexAuth.poolPreparedToast": "{email} đã sẵn sàng cho chế độ Pool",
   "codexAuth.switchTitle": "Chuyển tài khoản đang hoạt động?",
-  "codexAuth.switchDesc": "Có hiệu lực ngay lập tức. Các luồng gắn kết với tài khoản đã có và các request đang thực thi sẽ tiếp tục sử dụng tài khoản cũ; các request mới hoặc chưa gán sẽ dùng theo mức ưu tiên của tài khoản mới được chọn, và các tài khoản ở cùng mức độ ưu tiên vẫn sẽ luân phiên.",
-  "codexAuth.cacheWarning": "Prompt cache sẽ reset khi chuyển tài khoản. Session mới bắt đầu với cache rỗng.",
+  "codexAuth.switchDesc":
+    "Có hiệu lực ngay lập tức. Các luồng gắn kết với tài khoản đã có và các request đang thực thi sẽ tiếp tục sử dụng tài khoản cũ; các request mới hoặc chưa gán sẽ dùng theo mức ưu tiên của tài khoản mới được chọn, và các tài khoản ở cùng mức độ ưu tiên vẫn sẽ luân phiên.",
+  "codexAuth.cacheWarning":
+    "Prompt cache sẽ reset khi chuyển tài khoản. Session mới bắt đầu với cache rỗng.",
   "codexAuth.setAsNext": "Dùng tài khoản này tiếp theo",
   "codexAuth.cancel": "Hủy",
   "codexAuth.switchBack": "Chuyển lại sang Main?",
-  "codexAuth.switchBackDesc": "Có hiệu lực ngay lập tức. Các luồng gắn kết với tài khoản đã có và các request đang thực thi sẽ tiếp tục sử dụng tài khoản cũ; các request mới hoặc chưa gán sẽ sử dụng mức ưu tiên của tài khoản đăng nhập App, và các tài khoản ở cùng mức độ ưu tiên vẫn sẽ luân phiên.",
+  "codexAuth.switchBackDesc":
+    "Có hiệu lực ngay lập tức. Các luồng gắn kết với tài khoản đã có và các request đang thực thi sẽ tiếp tục sử dụng tài khoản cũ; các request mới hoặc chưa gán sẽ sử dụng mức ưu tiên của tài khoản đăng nhập App, và các tài khoản ở cùng mức độ ưu tiên vẫn sẽ luân phiên.",
   "codexAuth.autoSwitch": "Luân phiên chủ động theo mức độ sử dụng",
-  "codexAuth.autoSwitchQuotaDesc": "Quota: ở mức {threshold}% hoặc cao hơn, request tiếp theo có thể chuyển sang một tài khoản khác đủ điều kiện có mức dùng thấp hơn, bao gồm cả một task đang liên kết; Go/Free chỉ dùng khung 30 ngày.",
-  "codexAuth.autoSwitchQuotaOffDesc": "Chuyển tài khoản chủ động dựa trên mức sử dụng đang tắt. Các gán ghép cho tác vụ mới/chưa gắn kết và hồi phục sự cố vẫn hoạt động.",
-  "codexAuth.autoSwitchRoundRobinDesc": "Phân bổ luân phiên (Round-robin) không sử dụng ngưỡng này; nó tiếp tục xoay vòng các task mới/chưa gắn kết.",
-  "codexAuth.autoSwitchFillFirstDesc": "Ưu tiên làm đầy trước (Fill-first): {threshold}% là điểm chuyển hướng cho các task mới/chưa gắn kết; các task đang liên kết hợp lệ vẫn giữ nguyên tài khoản của chúng.",
-  "codexAuth.autoSwitchFillFirstOffDesc": "Ưu tiên làm đầy trước (Fill-first) không có điểm chuyển hướng mức sử dụng cho các task mới/chưa gắn kết; việc hồi chiêu, tái xác thực, và hồi phục sự cố vẫn có thể thay đổi định tuyến.",
-  "codexAuth.failureRecoveryNote": "Hồi phục sự cố là một quy trình riêng: một request bị từ chối trước khi có output với 429/402, cooldown, reauthentication, bị loại trừ, hoặc cấu hình chuyển hướng lỗi tạm thời có thể chọn một tài khoản đủ điều kiện khác.",
+  "codexAuth.autoSwitchQuotaDesc":
+    "Quota: ở mức {threshold}% hoặc cao hơn, request tiếp theo có thể chuyển sang một tài khoản khác đủ điều kiện có mức dùng thấp hơn, bao gồm cả một task đang liên kết; Go/Free chỉ dùng khung 30 ngày.",
+  "codexAuth.autoSwitchQuotaOffDesc":
+    "Chuyển tài khoản chủ động dựa trên mức sử dụng đang tắt. Các gán ghép cho tác vụ mới/chưa gắn kết và hồi phục sự cố vẫn hoạt động.",
+  "codexAuth.autoSwitchRoundRobinDesc":
+    "Phân bổ luân phiên (Round-robin) không sử dụng ngưỡng này; nó tiếp tục xoay vòng các task mới/chưa gắn kết.",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "Ưu tiên làm đầy trước (Fill-first): {threshold}% là điểm chuyển hướng cho các task mới/chưa gắn kết; các task đang liên kết hợp lệ vẫn giữ nguyên tài khoản của chúng.",
+  "codexAuth.autoSwitchFillFirstOffDesc":
+    "Ưu tiên làm đầy trước (Fill-first) không có điểm chuyển hướng mức sử dụng cho các task mới/chưa gắn kết; việc hồi chiêu, tái xác thực, và hồi phục sự cố vẫn có thể thay đổi định tuyến.",
+  "codexAuth.failureRecoveryNote":
+    "Hồi phục sự cố là một quy trình riêng: một request bị từ chối trước khi có output với 429/402, cooldown, reauthentication, bị loại trừ, hoặc cấu hình chuyển hướng lỗi tạm thời có thể chọn một tài khoản đủ điều kiện khác.",
   "codexAuth.autoSwitchThreshold": "Ngưỡng sử dụng",
   "codexAuth.autoSwitchThresholdAria": "Ngưỡng sử dụng, phần trăm",
   "codexAuth.autoSwitchThresholdInc": "Tăng ngưỡng sử dụng",
@@ -2604,46 +3120,69 @@ export const vi: Record<TKey, string> = {
   "codexAuth.autoSwitchLoadFailed": "Không thể tải cài đặt chuyển đổi theo mức sử dụng.",
   "codexAuth.autoSwitchThresholdInvalid": "Nhập một số nguyên từ 1 đến 100",
   "codexAuth.autoSwitchUpdated": "Cập nhật chuyển đổi chủ động theo mức độ sử dụng thành công",
-  "codexAuth.autoSwitchUpdateFailed": "Không thể xác nhận bản cập nhật chuyển đổi theo mức sử dụng. Đang hiển thị giá trị được xác nhận gần nhất.",
+  "codexAuth.autoSwitchUpdateFailed":
+    "Không thể xác nhận bản cập nhật chuyển đổi theo mức sử dụng. Đang hiển thị giá trị được xác nhận gần nhất.",
   "codexAuth.requestUserInput": "Yêu cầu người dùng nhập ở chế độ Default",
-  "codexAuth.requestUserInputDesc": "Cho phép Codex tạm ngưng một session Default-mode và đặt câu hỏi cho bạn bằng tool request_user_input.",
+  "codexAuth.requestUserInputDesc":
+    "Cho phép Codex tạm ngưng một session Default-mode và đặt câu hỏi cho bạn bằng tool request_user_input.",
   "codexAuth.requestUserInputUpdated": "Tính năng đã được cập nhật - áp dụng cho các session mới.",
-  "codexAuth.requestUserInputUpdatedRestart": "Tính năng đã được cập nhật - áp dụng cho các session mới. Khởi động lại Codex app để áp dụng.",
+  "codexAuth.requestUserInputUpdatedRestart":
+    "Tính năng đã được cập nhật - áp dụng cho các session mới. Khởi động lại Codex app để áp dụng.",
   "codexAuth.requestUserInputUpdateFailed": "Không thể cập nhật tính năng. Không có thay đổi nào.",
   "codexAuth.requestUserInputLoadFailed": "Không thể đọc tính năng từ config.toml.",
   "codexAuth.accountPickerTitle": "Chỉ định một tài khoản Codex cụ thể từ bộ chọn model",
-  "codexAuth.accountPickerOffDesc": "Khi được bật, các mục chọn model GPT thông thường được thay thế bằng một lựa chọn cho mỗi tài khoản, vì vậy bạn có thể chọn chính xác một tài khoản cho cuộc hội thoại mà không cần đăng xuất. Việc tắt đi không xóa bất kỳ tài khoản nào.",
-  "codexAuth.accountPickerOnDesc": "Mỗi bộ chọn là một nhãn công khai cho một tài khoản đã lưu. Chọn nó sẽ khóa cuộc hội thoại đó với tài khoản được gán: nó không bao giờ luân phiên hoặc fallback, và nó không thay đổi tài khoản Pool đang hoạt động.",
-  "codexAuth.accountPickerCompatibility": "Tài khoản đăng nhập Codex App tích hợp sẵn có bộ chọn riêng; các liên kết tự tạo thường gọi nó là main và sử dụng hậu tố chống trùng lặp như main-2 khi cần. Các tài khoản được thêm nhận các nhãn an toàn riêng tư, còn các nhãn bộ chọn tùy chỉnh không bị thay đổi. Các cuộc hội thoại hiện có và model đã lưu tiếp tục được định tuyến. Việc tắt tùy chọn này ẩn đi các mục được tạo nhưng vẫn giữ các bộ chọn và các định tuyến chính xác. Các model ID GPT thuần giữ nguyên hành vi Pool hoặc Direct của chúng.",
+  "codexAuth.accountPickerOffDesc":
+    "Khi được bật, các mục chọn model GPT thông thường được thay thế bằng một lựa chọn cho mỗi tài khoản, vì vậy bạn có thể chọn chính xác một tài khoản cho cuộc hội thoại mà không cần đăng xuất. Việc tắt đi không xóa bất kỳ tài khoản nào.",
+  "codexAuth.accountPickerOnDesc":
+    "Mỗi bộ chọn là một nhãn công khai cho một tài khoản đã lưu. Chọn nó sẽ khóa cuộc hội thoại đó với tài khoản được gán: nó không bao giờ luân phiên hoặc fallback, và nó không thay đổi tài khoản Pool đang hoạt động.",
+  "codexAuth.accountPickerCompatibility":
+    "Tài khoản đăng nhập Codex App tích hợp sẵn có bộ chọn riêng; các liên kết tự tạo thường gọi nó là main và sử dụng hậu tố chống trùng lặp như main-2 khi cần. Các tài khoản được thêm nhận các nhãn an toàn riêng tư, còn các nhãn bộ chọn tùy chỉnh không bị thay đổi. Các cuộc hội thoại hiện có và model đã lưu tiếp tục được định tuyến. Việc tắt tùy chọn này ẩn đi các mục được tạo nhưng vẫn giữ các bộ chọn và các định tuyến chính xác. Các model ID GPT thuần giữ nguyên hành vi Pool hoặc Direct của chúng.",
   "codexAuth.accountPickerUpdated": "Việc nhắm mục tiêu tài khoản đã được cập nhật.",
-  "codexAuth.accountPickerUpdateFailed": "Không thể cập nhật việc nhắm mục tiêu tài khoản. Cài đặt được xác nhận gần nhất đang được hiển thị.",
+  "codexAuth.accountPickerUpdateFailed":
+    "Không thể cập nhật việc nhắm mục tiêu tài khoản. Cài đặt được xác nhận gần nhất đang được hiển thị.",
   "codexAuth.accountPickerLoadFailed": "Không thể tải cài đặt nhắm mục tiêu tài khoản.",
-  "codexAuth.accountPickerRefreshFailed": "Không thể làm mới cài đặt này. Giá trị được xác nhận gần nhất vẫn đang được hiển thị.",
+  "codexAuth.accountPickerRefreshFailed":
+    "Không thể làm mới cài đặt này. Giá trị được xác nhận gần nhất vẫn đang được hiển thị.",
   "codexAuth.advancedSettings": "Cài đặt nâng cao",
   "codexAuth.advancedSettingsAria": "Hiển thị hoặc ẩn cài đặt xác thực Codex nâng cao",
-  "codexAuth.catalogRefreshPending": "Thay đổi đã được lưu, nhưng việc làm mới model catalog của Codex vẫn đang chờ xử lý. Hãy chạy ocx sync để thử lại.",
+  "codexAuth.catalogRefreshPending":
+    "Thay đổi đã được lưu, nhưng việc làm mới model catalog của Codex vẫn đang chờ xử lý. Hãy chạy ocx sync để thử lại.",
   "anthropicPool.title": "Claude account pool (thử nghiệm)",
-  "anthropicPool.enabledDesc": "Sticky sessions, và các session mới ưu tiên mức sử dụng dưới {threshold}% ({window}).",
-  "anthropicPool.enabledNoProactiveDesc": "Ngưỡng sử dụng không chuyển một phiên đang hoạt động bình thường và không thay tài khoản đang hoạt động bình thường. Khi tài khoản đang dùng không khả dụng, và khi khôi phục sau khi bị từ chối, tài khoản có mức sử dụng thấp nhất ({window}) sẽ được chọn.",
-  "anthropicPool.enabledFillFirstDesc": "Sticky sessions. Phiên mới ở lại tài khoản đang dùng cho đến khi nó đạt {threshold}% ({window}), vào thời gian chờ hoặc cần đăng nhập lại, rồi chuyển sang tài khoản kế tiếp theo thứ tự. Việc khôi phục sau khi bị từ chối cũng dùng tài khoản kế tiếp theo thứ tự.",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "Sticky sessions. Phiên mới ở lại tài khoản đang dùng cho đến khi nó vào thời gian chờ hoặc cần đăng nhập lại, rồi chuyển sang tài khoản kế tiếp theo thứ tự. Việc khôi phục sau khi bị từ chối cũng dùng tài khoản kế tiếp theo thứ tự.",
-  "anthropicPool.enabledRoundRobinDesc": "Sticky sessions. Phiên mới và việc khôi phục sau khi bị từ chối lần lượt dùng các tài khoản đủ điều kiện; mức sử dụng, ngưỡng và cửa sổ hạn mức không được dùng.",
-  "anthropicPool.disabledDesc": "Chọn tài khoản chủ động đang tắt. OpenCodex dùng tài khoản đã chọn và vẫn có thể chuyển sau phản hồi giới hạn tốc độ (429) hoặc một lần tài khoản bị từ chối đã được phân loại, nếu có tài khoản đủ điều kiện khác đang đăng nhập.",
-  "anthropicPool.experimentalWarning": "Chỉ dùng các gói đăng ký bạn sở hữu hoặc được phép sử dụng. Gom nhóm tài khoản tự động chưa được Anthropic chấp thuận và vẫn đang thử nghiệm. Hãy dùng ứng dụng Claude Code chính hãng trong phiên có người giám sát, và kiểm tra điều khoản hiện hành của Anthropic. Các tài khoản có thể dùng chung hạn mức của một tổ chức, nên thêm tài khoản có thể không tăng dung lượng.",
+  "anthropicPool.enabledDesc":
+    "Sticky sessions, và các session mới ưu tiên mức sử dụng dưới {threshold}% ({window}).",
+  "anthropicPool.enabledNoProactiveDesc":
+    "Ngưỡng sử dụng không chuyển một phiên đang hoạt động bình thường và không thay tài khoản đang hoạt động bình thường. Khi tài khoản đang dùng không khả dụng, và khi khôi phục sau khi bị từ chối, tài khoản có mức sử dụng thấp nhất ({window}) sẽ được chọn.",
+  "anthropicPool.enabledFillFirstDesc":
+    "Sticky sessions. Phiên mới ở lại tài khoản đang dùng cho đến khi nó đạt {threshold}% ({window}), vào thời gian chờ hoặc cần đăng nhập lại, rồi chuyển sang tài khoản kế tiếp theo thứ tự. Việc khôi phục sau khi bị từ chối cũng dùng tài khoản kế tiếp theo thứ tự.",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "Sticky sessions. Phiên mới ở lại tài khoản đang dùng cho đến khi nó vào thời gian chờ hoặc cần đăng nhập lại, rồi chuyển sang tài khoản kế tiếp theo thứ tự. Việc khôi phục sau khi bị từ chối cũng dùng tài khoản kế tiếp theo thứ tự.",
+  "anthropicPool.enabledRoundRobinDesc":
+    "Sticky sessions. Phiên mới và việc khôi phục sau khi bị từ chối lần lượt dùng các tài khoản đủ điều kiện; mức sử dụng, ngưỡng và cửa sổ hạn mức không được dùng.",
+  "anthropicPool.disabledDesc":
+    "Chọn tài khoản chủ động đang tắt. OpenCodex dùng tài khoản đã chọn và vẫn có thể chuyển sau phản hồi giới hạn tốc độ (429) hoặc một lần tài khoản bị từ chối đã được phân loại, nếu có tài khoản đủ điều kiện khác đang đăng nhập.",
+  "anthropicPool.experimentalWarning":
+    "Chỉ dùng các gói đăng ký bạn sở hữu hoặc được phép sử dụng. Gom nhóm tài khoản tự động chưa được Anthropic chấp thuận và vẫn đang thử nghiệm. Hãy dùng ứng dụng Claude Code chính hãng trong phiên có người giám sát, và kiểm tra điều khoản hiện hành của Anthropic. Các tài khoản có thể dùng chung hạn mức của một tổ chức, nên thêm tài khoản có thể không tăng dung lượng.",
   "anthropicPool.detailsSummary": "Cách chọn tài khoản",
-  "anthropicPool.detailsEnabling": "Khi bật nhóm, mỗi phiên ở lại tài khoản của nó khi tài khoản còn hoạt động bình thường; chiến lược đã chọn sẽ quyết định tài khoản cho phiên mới và sau khi bị từ chối.",
-  "anthropicPool.detailsFailover": "Tắt nhóm không tắt chuyển đổi dự phòng: sau lỗi 429 hoặc một lần tài khoản bị từ chối đã được phân loại, yêu cầu vẫn có thể chuyển sang tài khoản khác đang đăng nhập. Hãy tạm dừng một tài khoản để loại nó ra.",
-  "anthropicPool.detailsActivity": "OpenCodex không gửi yêu cầu giữ ấm (keep-warm). Theo mặc định, nó không làm mới token Claude hay kiểm tra mức sử dụng ở chế độ nền; mức sử dụng chỉ được đọc khi bảng điều khiển, ứng dụng thanh menu hoặc một lệnh ocx yêu cầu.",
+  "anthropicPool.detailsEnabling":
+    "Khi bật nhóm, mỗi phiên ở lại tài khoản của nó khi tài khoản còn hoạt động bình thường; chiến lược đã chọn sẽ quyết định tài khoản cho phiên mới và sau khi bị từ chối.",
+  "anthropicPool.detailsFailover":
+    "Tắt nhóm không tắt chuyển đổi dự phòng: sau lỗi 429 hoặc một lần tài khoản bị từ chối đã được phân loại, yêu cầu vẫn có thể chuyển sang tài khoản khác đang đăng nhập. Hãy tạm dừng một tài khoản để loại nó ra.",
+  "anthropicPool.detailsActivity":
+    "OpenCodex không gửi yêu cầu giữ ấm (keep-warm). Theo mặc định, nó không làm mới token Claude hay kiểm tra mức sử dụng ở chế độ nền; mức sử dụng chỉ được đọc khi bảng điều khiển, ứng dụng thanh menu hoặc một lệnh ocx yêu cầu.",
   "anthropicPool.nativeMessagesLabel": `Giữ nguyên yêu cầu Claude gốc`,
   "anthropicPool.nativeMessagesHelp": `Khi bật pool, lịch sử Claude Code cùng dấu mốc bộ nhớ đệm sẽ được giữ trên luồng Messages gốc nếu tuyến đã chọn hỗ trợ. Các tuyến khác vẫn có thể chuyển đổi yêu cầu. Đổi tài khoản có thể khiến bộ nhớ đệm phải khởi tạo lại; không đảm bảo có cache hit và các tài khoản không dùng chung bộ nhớ đệm. Các tùy chọn triển khai đã tắt rõ ràng vẫn có hiệu lực.`,
-  "anthropicPool.saveWarning": "Đã lưu cài đặt nhưng xử lý cấu hình sau khi lưu thất bại. Tải lại cài đặt để xác nhận trạng thái hiện tại.",
-  "anthropicPool.saveStateUnknown": "Không thể xác nhận cài đặt đã lưu. Hãy tải lại cài đặt trước khi thay đổi tiếp.",
+  "anthropicPool.saveWarning":
+    "Đã lưu cài đặt nhưng xử lý cấu hình sau khi lưu thất bại. Tải lại cài đặt để xác nhận trạng thái hiện tại.",
+  "anthropicPool.saveStateUnknown":
+    "Không thể xác nhận cài đặt đã lưu. Hãy tải lại cài đặt trước khi thay đổi tiếp.",
   "anthropicPool.reloadSettings": "Tải lại cài đặt",
   "anthropicPool.detailsGuide": "Hướng dẫn nhóm tài khoản",
-  "anthropicPool.needTwoAccounts": "Thêm ít nhất hai tài khoản Claude OAuth trước khi kích hoạt pool.",
+  "anthropicPool.needTwoAccounts":
+    "Thêm ít nhất hai tài khoản Claude OAuth trước khi kích hoạt pool.",
   "anthropicPool.threshold": "Ngưỡng sử dụng cho session mới",
   "anthropicPool.thresholdAria": "Ngưỡng sử dụng cho session mới, phần trăm",
-  "anthropicPool.thresholdHelp": "Đây là mức ưu tiên khi chọn tài khoản, không phải giới hạn cứng về mức sử dụng hay thanh toán. 0 sẽ tắt việc chuyển chủ động theo ngưỡng này. Mặc định: 80%.",
+  "anthropicPool.thresholdHelp":
+    "Đây là mức ưu tiên khi chọn tài khoản, không phải giới hạn cứng về mức sử dụng hay thanh toán. 0 sẽ tắt việc chuyển chủ động theo ngưỡng này. Mặc định: 80%.",
   "anthropicPool.thresholdInvalid": "Nhập một số nguyên từ 0 đến 100",
   "anthropicPool.loadFailed": "Không thể tải cài đặt Claude pool.",
   "anthropicPool.saveFailed": "Không thể lưu cài đặt Claude pool.",
@@ -2652,7 +3191,8 @@ export const vi: Record<TKey, string> = {
   "accountPool.strategy": "Chiến lược xoay vòng",
   "accountPool.strategyDesc": "Cách OpenCodex chỉ định tài khoản cho một task mới/chưa gắn kết.",
   "accountPool.strategyResetFirst": "Ưu tiên lần đặt lại sớm nhất",
-  "accountPool.strategyHintResetFirst": "Ưu tiên lần đặt lại 5 giờ hoặc hàng tuần gần nhất trong tương lai giữa các tài khoản dưới ngưỡng sử dụng. Tác vụ đã liên kết tuân theo chính sách affinity đã cấu hình. Hạn ngạch model độc lập dùng thứ tự hạn ngạch.",
+  "accountPool.strategyHintResetFirst":
+    "Ưu tiên lần đặt lại 5 giờ hoặc hàng tuần gần nhất trong tương lai giữa các tài khoản dưới ngưỡng sử dụng. Tác vụ đã liên kết tuân theo chính sách affinity đã cấu hình. Hạn ngạch model độc lập dùng thứ tự hạn ngạch.",
   "accountPool.strategyQuota": "Quota",
   "accountPool.strategyRoundRobin": "Luân phiên",
   "accountPool.strategyFillFirst": "Làm đầy trước",
@@ -2661,28 +3201,37 @@ export const vi: Record<TKey, string> = {
   "accountPool.resetBelowThreshold": "lần đặt lại gần nhất dưới {threshold}%",
   "accountPool.thresholdNotUsed": "không dùng ngưỡng",
   "accountPool.proactiveSwitchingOff": "tắt chuyển đổi chủ động",
-  "accountPool.strategyHintQuota": "Quota cũng có thể liên kết lại một task đang chạy ở request tiếp theo của nó sau khi vượt qua ngưỡng sử dụng.",
-  "accountPool.strategyHintRoundRobin": "Luân phiên (Round-robin) chỉ chuyển đổi các task không có liên kết hiện tại; ngưỡng sử dụng không làm thay đổi việc luân phiên bình thường.",
-  "accountPool.strategyHintFillFirst": "Làm đầy trước (Fill-first) sử dụng ngưỡng như là một điểm xả cho các task chưa gắn kết; các task đang liên kết hợp lệ vẫn giữ ái lực.",
-  "accountPool.unboundDefinition": "Task mới/chưa gắn kết (new/unbound) nghĩa là một request không có liên kết tài khoản nào hiện tại; một task có thể nhìn thấy có thể trở nên chưa gắn kết sau khi proxy hoặc ái lực bị đặt lại.",
+  "accountPool.strategyHintQuota":
+    "Quota cũng có thể liên kết lại một task đang chạy ở request tiếp theo của nó sau khi vượt qua ngưỡng sử dụng.",
+  "accountPool.strategyHintRoundRobin":
+    "Luân phiên (Round-robin) chỉ chuyển đổi các task không có liên kết hiện tại; ngưỡng sử dụng không làm thay đổi việc luân phiên bình thường.",
+  "accountPool.strategyHintFillFirst":
+    "Làm đầy trước (Fill-first) sử dụng ngưỡng như là một điểm xả cho các task chưa gắn kết; các task đang liên kết hợp lệ vẫn giữ ái lực.",
+  "accountPool.unboundDefinition":
+    "Task mới/chưa gắn kết (new/unbound) nghĩa là một request không có liên kết tài khoản nào hiện tại; một task có thể nhìn thấy có thể trở nên chưa gắn kết sau khi proxy hoặc ái lực bị đặt lại.",
   "accountPool.stickyLimit": "Các tác vụ mới/chưa gắn kết sẽ giữ nguyên trước khi quay vòng",
   "accountPool.stickyLimitAria": "Số lần gán tác vụ mới/chưa gắn kết trước khi xoay vòng",
   "accountPool.stickyLimitInc": "Tăng giới hạn dính",
   "accountPool.stickyLimitDec": "Giảm giới hạn dính",
-  "accountPool.stickyLimitHelp": "Giữ tài khoản đã chọn cho số lần gán tác vụ mới/chưa gắn kết này trước khi chuyển sang tài khoản khác; bộ đếm tăng lên khi tác vụ được gắn kết, chứ không phải sau khi upstream thành công.",
+  "accountPool.stickyLimitHelp":
+    "Giữ tài khoản đã chọn cho số lần gán tác vụ mới/chưa gắn kết này trước khi chuyển sang tài khoản khác; bộ đếm tăng lên khi tác vụ được gắn kết, chứ không phải sau khi upstream thành công.",
   "accountPool.stickyLimitInvalid": "Nhập một số nguyên từ 1 đến 100",
   "accountPool.strategyLoadFailed": "Không thể tải chiến lược luân phiên.",
   "accountPool.strategyUpdateFailed": "Không thể lưu chiến lược luân phiên.",
   "accountPool.quotaWindow": "Cửa sổ Quota",
-  "accountPool.quotaWindowDesc": "Thanh trạng thái sử dụng lưu trong cache nào kiểm soát việc chọn session mới dựa trên quota, kiểm tra ngưỡng fill-first, và các bản thay thế 429 đủ điều kiện.",
+  "accountPool.quotaWindowDesc":
+    "Thanh trạng thái sử dụng lưu trong cache nào kiểm soát việc chọn session mới dựa trên quota, kiểm tra ngưỡng fill-first, và các bản thay thế 429 đủ điều kiện.",
   "accountPool.quotaWindowFiveHour": "Khung 5 giờ",
   "accountPool.quotaWindowWeekly": "Khung hàng tuần",
   "accountPool.quotaWindowMaxUtilization": "Khung sử dụng cao hơn",
-  "accountPool.quotaWindowHint": "Hàng tuần sẽ bỏ qua các tài khoản đã hết mức giới hạn 5 giờ nếu còn tài khoản khác hợp lệ, nhưng sẽ quay về chúng nếu không còn ai khác. Nếu hòa hàng tuần, tài khoản có mức 5 giờ thấp hơn sẽ được ưu tiên; mức hàng tuần cho mỗi tài khoản chỉ được biết sau khi trang Providers đã lấy dữ liệu.",
-  "accountPool.quotaWindowInert": "Chỉ chiến lược Quota — hoặc Fill-first khi lớn hơn ngưỡng 0 — mới lấy điểm đánh giá mức sử dụng, nên cài đặt này không có tác dụng đối với chiến lược luân phiên hiện tại.",
+  "accountPool.quotaWindowHint":
+    "Hàng tuần sẽ bỏ qua các tài khoản đã hết mức giới hạn 5 giờ nếu còn tài khoản khác hợp lệ, nhưng sẽ quay về chúng nếu không còn ai khác. Nếu hòa hàng tuần, tài khoản có mức 5 giờ thấp hơn sẽ được ưu tiên; mức hàng tuần cho mỗi tài khoản chỉ được biết sau khi trang Providers đã lấy dữ liệu.",
+  "accountPool.quotaWindowInert":
+    "Chỉ chiến lược Quota — hoặc Fill-first khi lớn hơn ngưỡng 0 — mới lấy điểm đánh giá mức sử dụng, nên cài đặt này không có tác dụng đối với chiến lược luân phiên hiện tại.",
   "accountPool.priority": "Thứ tự chọn",
   "accountPool.priorityAria": "Thứ tự ưu tiên cho tài khoản này",
-  "accountPool.priorityHint": "Số càng cao càng được sử dụng trước. Pool chuyển xuống một số ưu tiên thấp hơn chỉ khi tất cả các tài khoản ở mức trên bị cạn kiệt hoặc không khả dụng.",
+  "accountPool.priorityHint":
+    "Số càng cao càng được sử dụng trước. Pool chuyển xuống một số ưu tiên thấp hơn chỉ khi tất cả các tài khoản ở mức trên bị cạn kiệt hoặc không khả dụng.",
   "accountPool.priorityFirst": "Đầu tiên",
   "accountPool.priorityEarlier": "Sớm hơn",
   "accountPool.priorityNormal": "Thông thường",
@@ -2691,12 +3240,16 @@ export const vi: Record<TKey, string> = {
   "accountPool.priorityOption": "{name} ({value})",
   "accountPool.priorityCustom": "Tùy chỉnh",
   "accountPool.priorityUpdated": "Đã cập nhật thứ tự ưu tiên cho {email}",
-  "accountPool.priorityUpdateFailed": "Không thể lưu thứ tự lựa chọn cho {email}. Giá trị được xác nhận gần nhất đang được hiển thị.",
+  "accountPool.priorityUpdateFailed":
+    "Không thể lưu thứ tự lựa chọn cho {email}. Giá trị được xác nhận gần nhất đang được hiển thị.",
   "codexAuth.switched": "Tài khoản được chọn cho request tiếp theo là {email}",
   "codexAuth.loadFailed": "Không thể tải cài đặt tài khoản Codex.",
-  "codexAuth.accountsRefreshFailed": "Lần làm mới tài khoản gần nhất thất bại. Dưới đây là các tài khoản được xác nhận gần nhất.",
-  "codexAuth.switchExceedsThresholdWarning": "Mức sử dụng của tài khoản này đã đạt hoặc vượt ngưỡng chuyển đổi ({threshold}%). Lựa chọn đã ghim sẽ được giải phóng nếu không còn hạn ngạch khả dụng.",
-  "codexAuth.switchFailed": "Không thể chuyển đổi tài khoản. Tùy chọn trước đó của bạn vẫn được giữ nguyên.",
+  "codexAuth.accountsRefreshFailed":
+    "Lần làm mới tài khoản gần nhất thất bại. Dưới đây là các tài khoản được xác nhận gần nhất.",
+  "codexAuth.switchExceedsThresholdWarning":
+    "Mức sử dụng của tài khoản này đã đạt hoặc vượt ngưỡng chuyển đổi ({threshold}%). Lựa chọn đã ghim sẽ được giải phóng nếu không còn hạn ngạch khả dụng.",
+  "codexAuth.switchFailed":
+    "Không thể chuyển đổi tài khoản. Tùy chọn trước đó của bạn vẫn được giữ nguyên.",
   "codexAuth.removeConfirm": "Gỡ bỏ {id}?",
   "codexAuth.removeFailed": "Không thể gỡ bỏ tài khoản. Không có thay đổi nào.",
   "codexAuth.addTitle": "Thêm tài khoản Codex",
@@ -2704,7 +3257,8 @@ export const vi: Record<TKey, string> = {
   "codexAuth.addIdPlaceholder": "codex-work, codex-alt, team...",
   "codexAuth.resetCreditsAria": "{count} credit reset",
   "codexAuth.addJsonLabel": "Nội dung auth.json",
-  "codexAuth.addHelp": "Sao chép từ ~/.codex/auth.json trên một máy khác, hoặc sử dụng codex-auth export.",
+  "codexAuth.addHelp":
+    "Sao chép từ ~/.codex/auth.json trên một máy khác, hoặc sử dụng codex-auth export.",
   "codexAuth.importBtn": "Nhập (Import)",
   "codexAuth.importInvalidJson": "JSON không hợp lệ",
   "codexAuth.importMissingTokens": "Thiếu access_token hoặc refresh_token trong JSON",
@@ -2714,15 +3268,18 @@ export const vi: Record<TKey, string> = {
   "codexAuth.oauthLogin": "Đăng nhập bằng OAuth",
   "codexAuth.oauthDesc": "Mở trang đăng nhập ChatGPT trong trình duyệt",
   "codexAuth.deviceLogin": "Đăng nhập qua device code",
-  "codexAuth.deviceDesc": "Dành cho máy chủ headless hoặc proxy từ xa: nhập mã ngắn này trên một thiết bị khác",
+  "codexAuth.deviceDesc":
+    "Dành cho máy chủ headless hoặc proxy từ xa: nhập mã ngắn này trên một thiết bị khác",
   "codexAuth.importAuthJson": "Nhập auth.json",
   "codexAuth.importAuthJsonDesc": "Từ một bản Codex khác hoặc thông qua export codex-auth",
   "codexAuth.back": "Quay lại",
-  "codexAuth.oauthAlreadyInProgress": "Đang tiến hành đăng nhập. Vui lòng hoàn tất quá trình này trong trình duyệt của bạn.",
+  "codexAuth.oauthAlreadyInProgress":
+    "Đang tiến hành đăng nhập. Vui lòng hoàn tất quá trình này trong trình duyệt của bạn.",
   "codexAuth.oauthWaiting": "Đang đợi quá trình đăng nhập ChatGPT hoàn tất trên trình duyệt...",
   "codexAuth.oauthSubmittingCode": "Đang gửi mã…",
   "codexAuth.oauthCodeSubmitted": "Đã gửi mã — đang đợi đăng nhập hoàn tất…",
-  "codexAuth.oauthStatusRetrying": "Lỗi mạng hoặc proxy trong khi kiểm tra trạng thái đăng nhập — đang thử lại…",
+  "codexAuth.oauthStatusRetrying":
+    "Lỗi mạng hoặc proxy trong khi kiểm tra trạng thái đăng nhập — đang thử lại…",
   "codexAuth.oauthCancelled": "Quá trình đăng nhập đã bị hủy.",
   "codexAuth.loginFailed": "Đăng nhập thất bại",
   "codexAuth.needsReauth": "Đăng nhập lại",
@@ -2736,16 +3293,20 @@ export const vi: Record<TKey, string> = {
   "codexAuth.mainReauthOpen": "Mở",
   "codexAuth.mainReauthPending": "Đang chờ đăng nhập…",
   "codexAuth.mainReauthDevice": "Đăng nhập lại bằng mã thiết bị",
-  "codexAuth.emailCollision": "Tài khoản này trùng với lần đăng nhập Codex chính của bạn. Vui lòng dùng tài khoản khác.",
+  "codexAuth.emailCollision":
+    "Tài khoản này trùng với lần đăng nhập Codex chính của bạn. Vui lòng dùng tài khoản khác.",
   "codexAuth.resetCreditsTitle": "Đặt lại Credits",
   "codexAuth.resetCreditsAvailable": "Bạn đang có sẵn {count} credit reset.",
-  "codexAuth.resetCreditsDesc": "Mỗi credit reset ngay lập tức các giới hạn sử dụng hàng giờ và hàng tuần hiện tại của bạn.",
+  "codexAuth.resetCreditsDesc":
+    "Mỗi credit reset ngay lập tức các giới hạn sử dụng hàng giờ và hàng tuần hiện tại của bạn.",
   "codexAuth.noResetCredits": "Bạn không có credit reset nào.",
-  "codexAuth.earnCreditsHint": "Credit được thưởng hàng tháng và qua chương trình giới thiệu (referral program).",
+  "codexAuth.earnCreditsHint":
+    "Credit được thưởng hàng tháng và qua chương trình giới thiệu (referral program).",
   "codexAuth.creditsExpireNote": "Credit hết hạn sau 30 ngày kể từ khi kiếm được.",
   "codexAuth.useOneCredit": "Sử dụng 1 Credit",
   "codexAuth.confirmResetTitle": "Sử dụng Reset Credit?",
-  "codexAuth.confirmResetDesc": "Thao tác này sẽ reset ngay lập tức các giới hạn tỉ lệ hiện tại của bạn. Bạn còn lại {count} credit.",
+  "codexAuth.confirmResetDesc":
+    "Thao tác này sẽ reset ngay lập tức các giới hạn tỉ lệ hiện tại của bạn. Bạn còn lại {count} credit.",
   "codexAuth.irreversible": "Hành động này không thể hoàn tác.",
   "codexAuth.useCredit": "Dùng Credit",
   "codexAuth.redeeming": "Đang reset...",
@@ -2779,35 +3340,44 @@ export const vi: Record<TKey, string> = {
   "grokCoupon.useOne": "Dùng 1 phiếu",
   "grokCoupon.fifoNote": "Phiếu gần hết hạn nhất được dùng trước.",
   "grokCoupon.confirmTitle": "Dùng phiếu đặt lại?",
-  "grokCoupon.confirmDesc": "Việc này sẽ đặt lại ngay cửa sổ sử dụng Grok của tài khoản. Bạn có {count} phiếu.",
+  "grokCoupon.confirmDesc":
+    "Việc này sẽ đặt lại ngay cửa sổ sử dụng Grok của tài khoản. Bạn có {count} phiếu.",
   "grokCoupon.confirmWhich": "Phiếu hết hạn vào {date} sẽ được sử dụng.",
   "grokCoupon.irreversible": "Không thể hoàn tác hành động này.",
   "grokCoupon.redeem": "Dùng phiếu",
   "grokCoupon.redeeming": "Đang đổi phiếu…",
   "grokCoupon.redeemSuccess": "Đã đổi phiếu. Còn {count} phiếu.",
-  "grokCoupon.redeemReplayed": "Lần đổi phiếu này đã hoàn tất trước đó. Không có gì bị tiêu thụ thêm.",
+  "grokCoupon.redeemReplayed":
+    "Lần đổi phiếu này đã hoàn tất trước đó. Không có gì bị tiêu thụ thêm.",
   "grokCoupon.redeemFailed": "Đổi phiếu thất bại. Hãy kiểm tra danh sách phiếu trước khi thử lại.",
   "grokCoupon.authFailed": "Hãy đăng nhập lại tài khoản xAI này để dùng phiếu.",
   "grokCoupon.noAccount": "Không có tài khoản xAI nào cho lần đổi phiếu này.",
   "grokCoupon.noneAvailable": "Không có phiếu đặt lại nào để đổi.",
-  "grokCoupon.identityMismatch": "Lần đổi phiếu đó thuộc tài khoản khác. Hãy đóng hộp thoại này và bắt đầu lại.",
+  "grokCoupon.identityMismatch":
+    "Lần đổi phiếu đó thuộc tài khoản khác. Hãy đóng hộp thoại này và bắt đầu lại.",
   "grokCoupon.networkError": "Không thể kết nối tới proxy.",
   "grokCoupon.capacity": "Nhật ký đổi phiếu hiện đã đầy. Hãy thử lại sau giây lát.",
-  "grokCoupon.noOperationId": "Trình duyệt này không thể tạo ID đổi phiếu, nên tính năng đổi phiếu bị tắt tại đây.",
-  "grokCoupon.unknownOutcome": "Chưa rõ kết quả đổi phiếu. Đọc lại tài khoản để xem phiếu còn khả dụng; điều này không xác nhận lần thử ban đầu.",
+  "grokCoupon.noOperationId":
+    "Trình duyệt này không thể tạo ID đổi phiếu, nên tính năng đổi phiếu bị tắt tại đây.",
+  "grokCoupon.unknownOutcome":
+    "Chưa rõ kết quả đổi phiếu. Đọc lại tài khoản để xem phiếu còn khả dụng; điều này không xác nhận lần thử ban đầu.",
   "grokCoupon.checkResult": "Đọc lại tài khoản",
   "grokCoupon.checking": "Đang đọc lại…",
-  "grokCoupon.consumedElsewhere": "Phiếu không còn trong danh sách. Lần đổi ban đầu vẫn chưa được xác nhận; sẽ không gửi thêm yêu cầu đổi.",
-  "grokCoupon.unresolved": "Phiếu vẫn còn trong danh sách. Lần đổi ban đầu có thể hoàn tất sau; sẽ không gửi thêm yêu cầu đổi.",
+  "grokCoupon.consumedElsewhere":
+    "Phiếu không còn trong danh sách. Lần đổi ban đầu vẫn chưa được xác nhận; sẽ không gửi thêm yêu cầu đổi.",
+  "grokCoupon.unresolved":
+    "Phiếu vẫn còn trong danh sách. Lần đổi ban đầu có thể hoàn tất sau; sẽ không gửi thêm yêu cầu đổi.",
   "anthropicGrant.badgeAria": "{count} lần đặt lại mức sử dụng Claude",
   "anthropicGrant.badgeErrorAria": "Không thể đọc các lần đặt lại mức sử dụng Claude",
   "anthropicGrant.title": "Đặt lại mức sử dụng Claude",
   "anthropicGrant.available": "Tài khoản này có {count} lần đặt lại mức sử dụng.",
-  "anthropicGrant.desc": "Một lần đặt lại sẽ khôi phục ngay giới hạn sử dụng Claude trong 5 giờ và hàng tuần của tài khoản này. Ngày đặt lại hàng tuần vẫn giữ nguyên.",
+  "anthropicGrant.desc":
+    "Một lần đặt lại sẽ khôi phục ngay giới hạn sử dụng Claude trong 5 giờ và hàng tuần của tài khoản này. Ngày đặt lại hàng tuần vẫn giữ nguyên.",
   "anthropicGrant.none": "Tài khoản này không có lần đặt lại mức sử dụng nào.",
   "anthropicGrant.ineligible": "Tài khoản này hiện không đủ điều kiện để đặt lại mức sử dụng.",
   "anthropicGrant.loadFailed": "Không thể đọc các lần đặt lại mức sử dụng của tài khoản này.",
-  "anthropicGrant.loadFailedAuth": "Hãy đăng nhập lại tài khoản Anthropic này để đọc các lần đặt lại.",
+  "anthropicGrant.loadFailedAuth":
+    "Hãy đăng nhập lại tài khoản Anthropic này để đọc các lần đặt lại.",
   "anthropicGrant.retry": "Thử lại",
   "anthropicGrant.resetsLeft": "Còn {left} trên {total}",
   "anthropicGrant.validFrom": "Có hiệu lực từ {date}",
@@ -2820,35 +3390,52 @@ export const vi: Record<TKey, string> = {
   "anthropicGrant.requiresLimit": "Có thể sử dụng khi tài khoản này chạm giới hạn",
   "anthropicGrant.useOne": "Dùng 1 lần đặt lại",
   "anthropicGrant.confirmTitle": "Đặt lại giới hạn sử dụng ngay?",
-  "anthropicGrant.confirmDesc": "Việc này sẽ khôi phục ngay giới hạn sử dụng Claude của tài khoản này và dùng một lần đặt lại.",
+  "anthropicGrant.confirmDesc":
+    "Việc này sẽ khôi phục ngay giới hạn sử dụng Claude của tài khoản này và dùng một lần đặt lại.",
   "anthropicGrant.confirmWhich": "Sử dụng: {label}",
   "anthropicGrant.irreversible": "Không thể hoàn tác hành động này.",
   "anthropicGrant.redeem": "Đặt lại giới hạn",
   "anthropicGrant.redeeming": "Đang đặt lại…",
   "anthropicGrant.resultReset": "Đã đặt lại giới hạn. Còn {count} lần đặt lại.",
   "anthropicGrant.resultAlreadyUsed": "Lần đặt lại này đã được sử dụng.",
-  "anthropicGrant.resultNotLimited": "Tài khoản này chưa chạm giới hạn, nên không có lần đặt lại nào được sử dụng.",
-  "anthropicGrant.resultCooldown": "Các lần đặt lại của tài khoản này đang trong thời gian chờ. Không có lần nào được sử dụng.",
-  "anthropicGrant.resultIneligible": "Tài khoản này không còn đủ điều kiện. Không có lần đặt lại nào được sử dụng.",
-  "anthropicGrant.resultUnavailable": "Hiện không thể sử dụng các lần đặt lại. Không có lần nào được sử dụng.",
-  "anthropicGrant.resultRateLimited": "Quá nhiều yêu cầu. Không có lần đặt lại nào được sử dụng; hãy thử lại sau một phút.",
-  "anthropicGrant.resultAuthError": "Hãy đăng nhập lại tài khoản Anthropic này. Không có lần đặt lại nào được sử dụng.",
-  "anthropicGrant.replayed": "Lần đặt lại này đã hoàn tất trước đó. Không có lần nào được sử dụng thêm.",
+  "anthropicGrant.resultNotLimited":
+    "Tài khoản này chưa chạm giới hạn, nên không có lần đặt lại nào được sử dụng.",
+  "anthropicGrant.resultCooldown":
+    "Các lần đặt lại của tài khoản này đang trong thời gian chờ. Không có lần nào được sử dụng.",
+  "anthropicGrant.resultIneligible":
+    "Tài khoản này không còn đủ điều kiện. Không có lần đặt lại nào được sử dụng.",
+  "anthropicGrant.resultUnavailable":
+    "Hiện không thể sử dụng các lần đặt lại. Không có lần nào được sử dụng.",
+  "anthropicGrant.resultRateLimited":
+    "Quá nhiều yêu cầu. Không có lần đặt lại nào được sử dụng; hãy thử lại sau một phút.",
+  "anthropicGrant.resultAuthError":
+    "Hãy đăng nhập lại tài khoản Anthropic này. Không có lần đặt lại nào được sử dụng.",
+  "anthropicGrant.replayed":
+    "Lần đặt lại này đã hoàn tất trước đó. Không có lần nào được sử dụng thêm.",
   "anthropicGrant.notUsableNow": "Hiện không thể sử dụng lần đặt lại này. Hãy đọc lại tài khoản.",
-  "anthropicGrant.inFlight": "Lần đặt lại này vẫn đang được xử lý. Hãy đợi giây lát rồi đọc lại tài khoản.",
-  "anthropicGrant.unresolvedPrior": "Một lần thử trước đó với lần đặt lại này vẫn chưa được xác nhận. Hãy thử lại lần đó thay vì bắt đầu lần mới.",
-  "anthropicGrant.expired": "Không thể xác nhận lần thử trước đó kịp thời. Hãy đọc lại tài khoản trước khi dùng một lần đặt lại.",
-  "anthropicGrant.identityMismatch": "Lần đặt lại đó thuộc tài khoản khác. Hãy đóng hộp thoại này và bắt đầu lại.",
-  "anthropicGrant.sessionRequired": "Hãy mở dashboard từ phiên đăng nhập của chính nó để dùng các lần đặt lại.",
-  "anthropicGrant.journalBusy": "Nhật ký đặt lại đang bận hoặc không khả dụng. Không có lần nào được sử dụng; hãy thử lại sau giây lát.",
+  "anthropicGrant.inFlight":
+    "Lần đặt lại này vẫn đang được xử lý. Hãy đợi giây lát rồi đọc lại tài khoản.",
+  "anthropicGrant.unresolvedPrior":
+    "Một lần thử trước đó với lần đặt lại này vẫn chưa được xác nhận. Hãy thử lại lần đó thay vì bắt đầu lần mới.",
+  "anthropicGrant.expired":
+    "Không thể xác nhận lần thử trước đó kịp thời. Hãy đọc lại tài khoản trước khi dùng một lần đặt lại.",
+  "anthropicGrant.identityMismatch":
+    "Lần đặt lại đó thuộc tài khoản khác. Hãy đóng hộp thoại này và bắt đầu lại.",
+  "anthropicGrant.sessionRequired":
+    "Hãy mở dashboard từ phiên đăng nhập của chính nó để dùng các lần đặt lại.",
+  "anthropicGrant.journalBusy":
+    "Nhật ký đặt lại đang bận hoặc không khả dụng. Không có lần nào được sử dụng; hãy thử lại sau giây lát.",
   "anthropicGrant.failed": "Yêu cầu đặt lại thất bại. Hãy kiểm tra tài khoản trước khi thử lại.",
-  "anthropicGrant.noOperationId": "Trình duyệt này không thể tạo ID yêu cầu, nên tính năng đặt lại bị tắt tại đây.",
-  "anthropicGrant.unknownOutcome": "Yêu cầu đặt lại không phản hồi kịp thời nên chưa rõ kết quả. Thử lại sẽ gửi cùng ID yêu cầu, vì vậy không thể bắt đầu lần đặt lại thứ hai.",
+  "anthropicGrant.noOperationId":
+    "Trình duyệt này không thể tạo ID yêu cầu, nên tính năng đặt lại bị tắt tại đây.",
+  "anthropicGrant.unknownOutcome":
+    "Yêu cầu đặt lại không phản hồi kịp thời nên chưa rõ kết quả. Thử lại sẽ gửi cùng ID yêu cầu, vì vậy không thể bắt đầu lần đặt lại thứ hai.",
   "anthropicGrant.retrySame": "Thử lại cùng yêu cầu",
   "anthropicGrant.checkResult": "Đọc lại tài khoản",
   "anthropicGrant.checking": "Đang đọc lại…",
   "api.title": "Truy cập API",
-  "api.subtitle": "Sử dụng các API key được tạo để truy cập proxy opencodex từ các ứng dụng bên ngoài. API key được xác thực qua header {authHeader}; xem bảng bên dưới để biết mỗi endpoint hỗ trợ những gì.",
+  "api.subtitle":
+    "Sử dụng các API key được tạo để truy cập proxy opencodex từ các ứng dụng bên ngoài. API key được xác thực qua header {authHeader}; xem bảng bên dưới để biết mỗi endpoint hỗ trợ những gì.",
   "api.baseUrl": "Base URL",
   "api.responsesEndpoint": "Responses API",
   "api.chatCompletionsEndpoint": "Chat Completions API",
@@ -2861,18 +3448,24 @@ export const vi: Record<TKey, string> = {
   "api.surface.source.inherited": "Kế thừa từ cài đặt Claude",
   "api.surface.source.invalid": "Giá trị không hợp lệ — đã đóng",
   "api.surface.messagesToggle": "Phục vụ Messages API",
-  "api.surface.messagesCloseNote": "Tắt Messages cũng tắt tích hợp Claude, để phiên bản opencodex cũ hơn cũng giữ endpoint này đóng.",
+  "api.surface.messagesCloseNote":
+    "Tắt Messages cũng tắt tích hợp Claude, để phiên bản opencodex cũ hơn cũng giữ endpoint này đóng.",
   "api.surface.openClaude": "Cài đặt Claude",
   "api.surface.toggleFailed": "Không lưu được thiết lập Messages.",
-  "api.surface.toggleUnavailable": "Phiên bản proxy này không thể đổi Messages API tại đây. Hãy dùng trang Claude.",
+  "api.surface.toggleUnavailable":
+    "Phiên bản proxy này không thể đổi Messages API tại đây. Hãy dùng trang Claude.",
   "api.surface.closedNote": "Yêu cầu tới endpoint này bị từ chối với mã 403.",
-  "api.endpointNote": "Dùng URL cơ sở cho các ứng dụng hỗ trợ OpenAI tương thích. Responses và Chat Completions được đặt ở /v1.",
+  "api.endpointNote":
+    "Dùng URL cơ sở cho các ứng dụng hỗ trợ OpenAI tương thích. Responses và Chat Completions được đặt ở /v1.",
   "api.endpointsTitle": "Endpoints",
   "api.authTitle": "Xác thực (Authentication)",
-  "api.authLoopback": "Kết nối Loopback (127.0.0.1 hoặc ::1) bỏ qua xác thực. Các kết nối từ xa yêu cầu một API key tạo sẵn bằng tiền tố ocx_ hoặc OPENCODEX_API_AUTH_TOKEN.",
-  "api.authBaseUrlNote": "Cấu hình client bằng URL cơ sở, sau đó chọn một endpoint cụ thể theo giao thức ở bên dưới.",
+  "api.authLoopback":
+    "Kết nối Loopback (127.0.0.1 hoặc ::1) bỏ qua xác thực. Các kết nối từ xa yêu cầu một API key tạo sẵn bằng tiền tố ocx_ hoặc OPENCODEX_API_AUTH_TOKEN.",
+  "api.authBaseUrlNote":
+    "Cấu hình client bằng URL cơ sở, sau đó chọn một endpoint cụ thể theo giao thức ở bên dưới.",
   "api.newKeyTitle": "Đã tạo key mới",
-  "api.newKeyNote": "Sao chép key này ngay bây giờ. Sau này bạn có thể nhấp vào nó trong danh sách key để hiện lại.",
+  "api.newKeyNote":
+    "Sao chép key này ngay bây giờ. Sau này bạn có thể nhấp vào nó trong danh sách key để hiện lại.",
   "api.copy": "Sao chép",
   "api.copied": "Đã sao chép",
   "api.dismiss": "Bỏ qua",
@@ -2891,8 +3484,10 @@ export const vi: Record<TKey, string> = {
   "api.section.examples": "Ví dụ",
   "api.section.plan": "Xem trước đường đi",
   "api.plan.title": "Xem trước đường đi của yêu cầu",
-  "api.plan.description": "Hiển thị đường đi mà một yêu cầu tới mô hình này sẽ đi qua proxy. Xem trước không gửi gì lên nhà cung cấp và không tốn phí.",
-  "api.plan.modeNote": "“Gốc” mô tả cách yêu cầu được chuyển đi. Đây không phải là kết quả xác minh.",
+  "api.plan.description":
+    "Hiển thị đường đi mà một yêu cầu tới mô hình này sẽ đi qua proxy. Xem trước không gửi gì lên nhà cung cấp và không tốn phí.",
+  "api.plan.modeNote":
+    "“Gốc” mô tả cách yêu cầu được chuyển đi. Đây không phải là kết quả xác minh.",
   "api.plan.unavailable": "Phiên bản proxy này không hỗ trợ xem trước đường đi.",
   "api.plan.noModels": "Chưa có mô hình nào để xem trước.",
   "api.plan.model": "Mô hình",
@@ -2935,7 +3530,8 @@ export const vi: Record<TKey, string> = {
   "api.workspace.keyDetails": "Chi tiết Key",
   "api.workspace.keyPrefix": "Tiền tố key",
   "api.workspace.deleteKey": "Xóa key",
-  "api.workspace.deleteConfirm": "Bạn có chắc chắn muốn xóa key này? Hành động này không thể hoàn tác.",
+  "api.workspace.deleteConfirm":
+    "Bạn có chắc chắn muốn xóa key này? Hành động này không thể hoàn tác.",
   "api.workspace.usageExamples": "Ví dụ cách dùng",
   "api.copyUrlHint": "Nhấp để chép URL",
   "api.urlCopied": "Đã chép URL",
@@ -2950,7 +3546,8 @@ export const vi: Record<TKey, string> = {
   "api.key.hideHint": "Nhấp để ẩn toàn bộ khóa",
   "api.key.revealFailed": "Không tải được toàn bộ khóa.",
   "api.key.revealDenied": "Hãy ghép nối trình duyệt này trước khi hiển thị khóa đã lưu.",
-  "api.key.mutationHidden": "Khóa đã được tạo hoặc quá trình xoay khóa đã bắt đầu, nhưng giá trị chỉ hiển thị một lần đã bị ẩn vì phiên hoặc màn hình đã thay đổi.",
+  "api.key.mutationHidden":
+    "Khóa đã được tạo hoặc quá trình xoay khóa đã bắt đầu, nhưng giá trị chỉ hiển thị một lần đã bị ẩn vì phiên hoặc màn hình đã thay đổi.",
   "api.key.copyFailedShort": "Không sao chép được. Hãy chọn key và sao chép thủ công.",
   "api.key.deleteRowAria": "Xóa {name}",
   "api.key.deleteShort": "Xóa",
@@ -2961,7 +3558,8 @@ export const vi: Record<TKey, string> = {
   "api.modelsCount": "{count} có thể gọi được",
   "api.modelsLoading": "Đang tải các model…",
   "api.modelsSearch": "Tìm model",
-  "api.modelsSubtitle": "Dùng chính xác các ID model này với /v1/models và giao thức đầu vào bạn đã chọn.",
+  "api.modelsSubtitle":
+    "Dùng chính xác các ID model này với /v1/models và giao thức đầu vào bạn đã chọn.",
   "api.modelsEmpty": "Chưa có model bên ngoài nào khả dụng để gọi.",
   "api.modelsNoMatch": "Không có model nào khớp với “{query}”.",
   "api.modelsLoadFailed": "Không thể tải danh sách model bên ngoài.",
@@ -3010,24 +3608,32 @@ export const vi: Record<TKey, string> = {
   "api.clientConfig.clientCline": "Cline CLI",
   "api.clientConfig.clientKilo": "Kilo",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "Đây là gói gồm hai tệp, không phải tệp cài đặt Cline. Hãy hợp nhất cài đặt vào providers.json và catalog vào models.json cùng cấp. Dùng công tắc tích hợp để ghi kèm bản sao lưu.",
-  "api.clientConfig.clineDownloaded": "Đã tải xuống {filename}. Chưa có gì thay đổi; cài đặt và catalog thuộc hai tệp Cline riêng biệt.",
+  "api.clientConfig.clineBundle":
+    "Đây là gói gồm hai tệp, không phải tệp cài đặt Cline. Hãy hợp nhất cài đặt vào providers.json và catalog vào models.json cùng cấp. Dùng công tắc tích hợp để ghi kèm bản sao lưu.",
+  "api.clientConfig.clineDownloaded":
+    "Đã tải xuống {filename}. Chưa có gì thay đổi; cài đặt và catalog thuộc hai tệp Cline riêng biệt.",
   "api.clientConfig.copy": "Sao chép cấu hình",
   "api.clientConfig.download": "Tải xuống",
   "api.clientConfig.loading": "Đang xây dựng cấu hình client…",
   "api.clientConfig.jsonLabel": "Cấu hình {client}",
   "api.clientConfig.destination": "Tệp đích",
   "api.clientConfig.envHint": "Thiết lập khóa trước khi khởi chạy",
-  "api.clientConfig.mergeWarning": "Gộp nội dung này vào tệp đích. Nếu ghi đè hoàn toàn, bạn sẽ mất các cài đặt MCP và provider khác.",
+  "api.clientConfig.mergeWarning":
+    "Gộp nội dung này vào tệp đích. Nếu ghi đè hoàn toàn, bạn sẽ mất các cài đặt MCP và provider khác.",
   "api.clientConfig.modelCount": "Đã xuất {count} model",
-  "api.clientConfig.missingLimits": "{count} trong số {total} model được phân phối không có giới hạn ngữ cảnh (context limit); client sẽ áp dụng các giá trị mặc định của riêng nó.",
-  "api.clientConfig.noKeyYet": "{env} hiện chưa có khóa. Hãy tạo một khóa ở trên trước khi sử dụng cấu hình này bên ngoài loopback.",
-  "api.clientConfig.loadFailed": "Không thể đọc danh sách model, do đó không có cấu hình client nào được tạo ra.",
+  "api.clientConfig.missingLimits":
+    "{count} trong số {total} model được phân phối không có giới hạn ngữ cảnh (context limit); client sẽ áp dụng các giá trị mặc định của riêng nó.",
+  "api.clientConfig.noKeyYet":
+    "{env} hiện chưa có khóa. Hãy tạo một khóa ở trên trước khi sử dụng cấu hình này bên ngoài loopback.",
+  "api.clientConfig.loadFailed":
+    "Không thể đọc danh sách model, do đó không có cấu hình client nào được tạo ra.",
   "api.clientConfig.copiedAnnounce": "Cấu hình client đã được sao chép vào khay nhớ tạm.",
   "api.clientConfig.copyFailed": "Không thể sao chép cấu hình client.",
-  "api.clientConfig.downloadedAnnounce": "Đã tải xuống {filename}. Chưa có thay đổi nào được áp dụng — hãy tự gộp nó vào {destination}.",
+  "api.clientConfig.downloadedAnnounce":
+    "Đã tải xuống {filename}. Chưa có thay đổi nào được áp dụng — hãy tự gộp nó vào {destination}.",
   "api.clientConfig.whereDisclosure": "Tệp này được lưu ở đâu",
-  "api.clientConfig.whereBody": "Đích đến ở trên là đường dẫn toàn cục (global path). Một tệp cấu hình project-local trong thư mục làm việc sẽ được ưu tiên cao hơn, và client sẽ đọc khóa từ biến môi trường (environment variable) được chỉ định trong cấu hình — chứ không bao giờ đọc từ tệp này.",
+  "api.clientConfig.whereBody":
+    "Đích đến ở trên là đường dẫn toàn cục (global path). Một tệp cấu hình project-local trong thư mục làm việc sẽ được ưu tiên cao hơn, và client sẽ đọc khóa từ biến môi trường (environment variable) được chỉ định trong cấu hình — chứ không bao giờ đọc từ tệp này.",
   "api.keysLoadFailed": "Không thể tải các khóa API.",
   "api.createFailed": "Không thể tạo khóa API.",
   "api.deleteFailed": "Không thể xóa khóa API.",
@@ -3036,7 +3642,8 @@ export const vi: Record<TKey, string> = {
   "api.auth.accepted": "Được chấp nhận",
   "api.auth.rejected": "Không được chấp nhận",
   "api.auth.testProtocol": "Kiểm tra {protocol}",
-  "api.auth.testNeedsFreshKey": "Tạo một khóa và giữ giá trị hiển thị một lần của nó trên màn hình để chạy một bài kiểm tra xác thực (authenticated test).",
+  "api.auth.testNeedsFreshKey":
+    "Tạo một khóa và giữ giá trị hiển thị một lần của nó trên màn hình để chạy một bài kiểm tra xác thực (authenticated test).",
   "api.key.name": "Tên khóa",
   "api.key.rename": "Đổi tên",
   "api.key.saveName": "Lưu tên",
@@ -3044,9 +3651,11 @@ export const vi: Record<TKey, string> = {
   "api.key.renameFailed": "Không thể đổi tên khóa. Bản nháp của bạn đã được giữ lại.",
   "api.key.deleting": "Đang xóa…",
   "api.rotation.title": "Luân chuyển khóa",
-  "api.rotation.pending": "Quá trình luân chuyển đang chờ xử lý. Hãy cập nhật và xác minh client trước khi xác nhận (commit).",
+  "api.rotation.pending":
+    "Quá trình luân chuyển đang chờ xử lý. Hãy cập nhật và xác minh client trước khi xác nhận (commit).",
   "api.rotation.expires": "Thời gian gối đầu (overlap) hết hạn lúc:",
-  "api.key.copyFailed": "Không thể sao chép khóa. Hãy chọn và sao chép thủ công trước khi đóng bảng này.",
+  "api.key.copyFailed":
+    "Không thể sao chép khóa. Hãy chọn và sao chép thủ công trước khi đóng bảng này.",
   "api.attribution.title": "Mức sử dụng được quy kết",
   "api.attribution.requests7d": "Số requests, 7 ngày qua",
   "api.attribution.totalRequests": "Tổng số requests được quy kết",
@@ -3056,10 +3665,13 @@ export const vi: Record<TKey, string> = {
   "api.attribution.since": "Dữ liệu quy kết có sẵn từ",
   "api.attribution.neverUsed": "Chưa được sử dụng kể từ khi bắt đầu quy kết",
   "api.attribution.unavailable": "Không có dữ liệu sử dụng",
-  "api.attribution.unavailableDetail": "Chưa có mức sử dụng nào được quy kết. Các requests được ghi nhận trước khi tính năng quy kết bắt đầu sẽ không thể được gán hồi tố.",
-  "api.attribution.ambiguous": "Có hai khóa dùng chung ID này, do đó không thể quy kết mức sử dụng cho một trong số chúng. Hãy cung cấp cho mỗi khóa một ID duy nhất trong tệp cấu hình.",
+  "api.attribution.unavailableDetail":
+    "Chưa có mức sử dụng nào được quy kết. Các requests được ghi nhận trước khi tính năng quy kết bắt đầu sẽ không thể được gán hồi tố.",
+  "api.attribution.ambiguous":
+    "Có hai khóa dùng chung ID này, do đó không thể quy kết mức sử dụng cho một trong số chúng. Hãy cung cấp cho mỗi khóa một ID duy nhất trong tệp cấu hình.",
   "api.attribution.railAmbiguous": "trùng ID",
-  "claude.subtitle": "Định tuyến ocx claude qua OpenCodex để Claude Code có thể sử dụng GPT, Gemini và các model khác. Khi tắt, tính năng đánh chặn (bao gồm chế độ first-party) và danh sách model của Claude Desktop cũng bị tắt. Đây là cùng một thiết lập với công tắc Claude trong trang tổng quan Kết nối.",
+  "claude.subtitle":
+    "Định tuyến ocx claude qua OpenCodex để Claude Code có thể sử dụng GPT, Gemini và các model khác. Khi tắt, tính năng đánh chặn (bao gồm chế độ first-party) và danh sách model của Claude Desktop cũng bị tắt. Đây là cùng một thiết lập với công tắc Claude trong trang tổng quan Kết nối.",
   "claude.pageTitle": "Claude Code",
   "claude.workspace.settings": "Chung",
   "claude.enabledLabel": "Kết nối Claude",
@@ -3069,13 +3681,15 @@ export const vi: Record<TKey, string> = {
   "claude.saveBar.revert": "Hoàn tác",
   "claude.enabledHint": "Khi tắt, Claude Code không thể sử dụng proxy này.",
   "claude.authMode": "Chế độ xác thực",
-  "claude.authModeHint": "Chế độ Subscription yêu cầu tài khoản Claude, chế độ Proxy hoạt động mà không cần tài khoản Anthropic",
+  "claude.authModeHint":
+    "Chế độ Subscription yêu cầu tài khoản Claude, chế độ Proxy hoạt động mà không cần tài khoản Anthropic",
   "claude.authModeSubscription": "Subscription (Tài khoản Claude)",
   "claude.authModeProxy": "Proxy (Không cần tài khoản)",
   "claude.authModeAuto": "Auto (Tự động phát hiện xác thực Claude)",
   "claude.effectiveMode.label": "Sẽ có hiệu lực ở lần khởi chạy tiếp theo",
   "claude.effectiveMode.manual": "Thủ công: {mode}",
-  "claude.effectiveMode.autoPresent": "Tự động: subscription — tìm thấy xác thực Claude thông qua {source}",
+  "claude.effectiveMode.autoPresent":
+    "Tự động: subscription — tìm thấy xác thực Claude thông qua {source}",
   "claude.effectiveMode.autoAbsent": "Tự động: chế độ proxy — không tìm thấy xác thực Claude",
   "claude.effectiveMode.autoUnknown": "Tự động: subscription — không thể xác minh xác thực",
   "claude.effectiveMode.admissionKey": "Khóa API của proxy này vẫn được gửi đi.",
@@ -3085,40 +3699,53 @@ export const vi: Record<TKey, string> = {
   "claude.authSource.exported-env": "biến môi trường (environment variable)",
   "claude.authSource.unknown": "một credential được phát hiện",
   "claude.fastMode": "Chế độ Fast (OpenAI)",
-  "claude.fastModeDesc": "Kiểm soát service_tier cho các model OpenAI. ON = priority (nhanh hơn). OFF = default. Auto = passthrough (client tự quyết định).",
+  "claude.fastModeDesc":
+    "Kiểm soát service_tier cho các model OpenAI. ON = priority (nhanh hơn). OFF = default. Auto = passthrough (client tự quyết định).",
   "claude.fastAuto": "Tự động",
   "claude.fastOn": "BẬT",
   "claude.fastOff": "TẮT",
   "claude.autoContext": "Tự động sử dụng ngữ cảnh lớn (big context)",
-  "claude.autoContextDesc": "Kiểm soát phạm vi áp dụng nhãn 1M. ON: bất kỳ model nào có cửa sổ (window) đủ lớn để chứa ngưỡng nén (compaction threshold) đều sẽ có hàng big-context. OFF: chỉ những model thực sự đạt 1M mới có.",
-  "claude.autoContextInert": "Bị vô hiệu hóa vì giá trị kích thước ngữ cảnh (maxContextTokens) cũ vẫn tồn tại trong tệp cấu hình. Hãy xóa nó ở đó để kích hoạt lại.",
+  "claude.autoContextDesc":
+    "Kiểm soát phạm vi áp dụng nhãn 1M. ON: bất kỳ model nào có cửa sổ (window) đủ lớn để chứa ngưỡng nén (compaction threshold) đều sẽ có hàng big-context. OFF: chỉ những model thực sự đạt 1M mới có.",
+  "claude.autoContextInert":
+    "Bị vô hiệu hóa vì giá trị kích thước ngữ cảnh (maxContextTokens) cũ vẫn tồn tại trong tệp cấu hình. Hãy xóa nó ở đó để kích hoạt lại.",
   "claude.contextAccounting": "Cách tính ngữ cảnh",
-  "claude.contextAccountingDesc": "1M: các mô hình cửa sổ dài mặc định là 1M ở mọi nơi opencodex chọn giá trị mặc định. 200k: opencodex không còn tự động đánh dấu mô hình là 1M; dòng 1M bạn tự chọn và giá trị ghi đè ngữ cảnh bạn đặt vẫn được áp dụng.",
+  "claude.contextAccountingDesc":
+    "1M: các mô hình cửa sổ dài mặc định là 1M ở mọi nơi opencodex chọn giá trị mặc định. 200k: opencodex không còn tự động đánh dấu mô hình là 1M; dòng 1M bạn tự chọn và giá trị ghi đè ngữ cảnh bạn đặt vẫn được áp dụng.",
   "claude.contextAccounting1m": "1M (mặc định)",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "Điểm tự động tóm tắt",
   "claude.autoCompactDefault": "{value} (mặc định)",
-  "claude.autoCompactWindowDesc": "Các tin nhắn cũ hơn sẽ được tóm tắt khi cuộc trò chuyện đạt đến điểm này. Nó không bao giờ vượt qua giới hạn riêng của từng model, do đó các model 200k sẽ không bị ảnh hưởng.",
-  "claude.autoCompactWindowWarn": "Việc thay đổi điều này có thể làm hỏng các model GPT — nếu đặt cao hơn giới hạn thực của model, các cuộc trò chuyện sẽ gặp lỗi trước khi quá trình tóm tắt bắt đầu.",
+  "claude.autoCompactWindowDesc":
+    "Các tin nhắn cũ hơn sẽ được tóm tắt khi cuộc trò chuyện đạt đến điểm này. Nó không bao giờ vượt qua giới hạn riêng của từng model, do đó các model 200k sẽ không bị ảnh hưởng.",
+  "claude.autoCompactWindowWarn":
+    "Việc thay đổi điều này có thể làm hỏng các model GPT — nếu đặt cao hơn giới hạn thực của model, các cuộc trò chuyện sẽ gặp lỗi trước khi quá trình tóm tắt bắt đầu.",
   "claude.injectAgents": "Tự động đăng ký các subagent",
-  "claude.injectAgentsDesc": "Đăng ký các model được chọn trên thẻ Subagents (cộng với model mặc định hiện tại) làm các agent Claude Code có thể điều phối (ocx-*). Có hiệu lực từ phiên làm việc tiếp theo.",
+  "claude.injectAgentsDesc":
+    "Đăng ký các model được chọn trên thẻ Subagents (cộng với model mặc định hiện tại) làm các agent Claude Code có thể điều phối (ocx-*). Có hiệu lực từ phiên làm việc tiếp theo.",
   "claude.webSearchSidecar": "Ghi đè sidecar tìm kiếm web",
-  "claude.webSearchSidecarHint": "Ghi đè sidecar tìm kiếm web chính đối với các yêu cầu từ Claude Code.",
+  "claude.webSearchSidecarHint":
+    "Ghi đè sidecar tìm kiếm web chính đối với các yêu cầu từ Claude Code.",
   "claude.visionSidecar": "Ghi đè sidecar thị giác (vision sidecar)",
   "claude.visionSidecarHint": "Ghi đè sidecar thị giác chính đối với các yêu cầu từ Claude Code.",
   "claude.useMainSetting": "Sử dụng thiết lập chính",
   "claude.sidecarModelPlaceholder": "Model thiết lập chính",
   "claude.quickstart": "Bắt đầu",
-  "claude.quickstartHint": "{cmd} sẽ mở Claude Code thông qua proxy. Phiên đăng nhập claude.ai của bạn vẫn được giữ nguyên.",
+  "claude.quickstartHint":
+    "{cmd} sẽ mở Claude Code thông qua proxy. Phiên đăng nhập claude.ai của bạn vẫn được giữ nguyên.",
   "claude.manualEnv": "Thiết lập thủ công (nâng cao)",
   "claude.smallFastModel": "Model hỗ trợ nền (Background helper model)",
-  "claude.smallFastModelHint": "Model mà Claude Code sử dụng cho các tác vụ nền như tóm tắt trò chuyện và phát hiện chủ đề. Bí danh (alias) của subagent haiku cũng sử dụng nó. Bỏ trống = Mặc định của Claude (Haiku).",
-  "claude.smallFastModelAccurateHint": "Model mà Claude Code sử dụng cho các tác vụ nền như tóm tắt trò chuyện và phát hiện chủ đề. Bí danh của subagent haiku cũng sử dụng nó.",
+  "claude.smallFastModelHint":
+    "Model mà Claude Code sử dụng cho các tác vụ nền như tóm tắt trò chuyện và phát hiện chủ đề. Bí danh (alias) của subagent haiku cũng sử dụng nó. Bỏ trống = Mặc định của Claude (Haiku).",
+  "claude.smallFastModelAccurateHint":
+    "Model mà Claude Code sử dụng cho các tác vụ nền như tóm tắt trò chuyện và phát hiện chủ đề. Bí danh của subagent haiku cũng sử dụng nó.",
   "claude.smallFastModelUnsetOption": "Để Claude Code tự chọn (native model)",
-  "claude.smallFastModelNativeWarning": "Khi bỏ trống, OpenCodex sẽ không ghi đè model hỗ trợ (helper-model). Claude Code có thể sử dụng model Sonnet gốc của nó, điều này có thể phát sinh chi phí từ provider gốc của bạn.",
+  "claude.smallFastModelNativeWarning":
+    "Khi bỏ trống, OpenCodex sẽ không ghi đè model hỗ trợ (helper-model). Claude Code có thể sử dụng model Sonnet gốc của nó, điều này có thể phát sinh chi phí từ provider gốc của bạn.",
   "claude.slotUnset": "Sử dụng mặc định của Claude",
   "claude.modelMap": "Đánh chặn model (Model interception)",
-  "claude.modelMapHint": "Đánh chặn các yêu cầu đến một model cụ thể và định tuyến lại sang model bạn chọn. Mặc định là trống — sẽ không có gì xảy ra cho đến khi bạn thêm một quy tắc (rule).",
+  "claude.modelMapHint":
+    "Đánh chặn các yêu cầu đến một model cụ thể và định tuyến lại sang model bạn chọn. Mặc định là trống — sẽ không có gì xảy ra cho đến khi bạn thêm một quy tắc (rule).",
   "claude.mapFrom": "Model gốc (ví dụ: claude-sonnet-4-5)",
   "claude.mapTo": "Chuyển đổi thành (ví dụ: gemini/gemini-3-pro)",
   "claude.addMapping": "Thêm quy tắc",
@@ -3135,7 +3762,8 @@ export const vi: Record<TKey, string> = {
   "claude.none": "Không có",
   "claude.tabsLabel": "Client Claude",
   "claudeDesktop.title": "Claude Desktop",
-  "claudeDesktop.subtitle": "Định tuyến từng họ model (model family) Claude thông qua một model khả dụng trên cổng proxy {port}.",
+  "claudeDesktop.subtitle":
+    "Định tuyến từng họ model (model family) Claude thông qua một model khả dụng trên cổng proxy {port}.",
   "claudeDesktop.importJson": "Nhập JSON",
   "claudeDesktop.exportJson": "Xuất JSON",
   "claudeDesktop.loading": "Đang tải hồ sơ Claude Desktop…",
@@ -3145,14 +3773,16 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.applyFailed": "Hồ sơ đã được lưu, nhưng không thể áp dụng.",
   "claudeDesktop.updateFailed": "Cập nhật Claude Desktop thất bại.",
   "claudeDesktop.savedApplied": "Hồ sơ đã được lưu và áp dụng cho Claude Desktop.",
-  "claudeDesktop.appliedMarkerUnsaved": "Đã được áp dụng cho Claude Desktop, nhưng dấu (marker) áp dụng chưa được lưu — trạng thái đã lưu-so với-đã áp dụng bên dưới có thể hiển thị dữ liệu cũ cho đến khi bạn áp dụng lại.",
+  "claudeDesktop.appliedMarkerUnsaved":
+    "Đã được áp dụng cho Claude Desktop, nhưng dấu (marker) áp dụng chưa được lưu — trạng thái đã lưu-so với-đã áp dụng bên dưới có thể hiển thị dữ liệu cũ cho đến khi bạn áp dụng lại.",
   "claudeDesktop.savedAppliedAnnounce": "Hồ sơ Claude Desktop đã được lưu và áp dụng.",
   "claudeDesktop.saved": "Hồ sơ đã được lưu.",
   "claudeDesktop.savedAnnounce": "Hồ sơ Claude Desktop đã được lưu.",
   "claudeDesktop.exported": "Hồ sơ đã được xuất dưới dạng JSON.",
   "claudeDesktop.importExpected": "Cần có một hồ sơ Claude Desktop phiên bản 1.",
   "claudeDesktop.importReady": "Đã nhập JSON. Hãy xem lại bản nháp, sau đó lưu và áp dụng.",
-  "claudeDesktop.importedAnnounce": "Đã nhập JSON hồ sơ. Các thay đổi chưa được lưu đã sẵn sàng để xem xét.",
+  "claudeDesktop.importedAnnounce":
+    "Đã nhập JSON hồ sơ. Các thay đổi chưa được lưu đã sẵn sàng để xem xét.",
   "claudeDesktop.importInvalid": "Tệp đã chọn không phải là một hồ sơ hợp lệ.",
   "claudeDesktop.importFailed": "Nhập thất bại. {error}",
   "claudeDesktop.moved": "{route} đã được chuyển đến {family}.",
@@ -3162,7 +3792,8 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.applying": "Đang áp dụng…",
   "claudeDesktop.saveApply": "Lưu & áp dụng",
   "claudeDesktop.emptyTitle": "Không có model nào khả dụng",
-  "claudeDesktop.emptyHint": "Hãy thêm hoặc bật một provider, sau đó quay lại để chỉ định các định tuyến cho Claude Desktop.",
+  "claudeDesktop.emptyHint":
+    "Hãy thêm hoặc bật một provider, sau đó quay lại để chỉ định các định tuyến cho Claude Desktop.",
   "claudeDesktop.assignmentsLabel": "Các chỉ định họ model Claude",
   "claudeDesktop.family.opus": "Opus",
   "claudeDesktop.family.fable": "Fable",
@@ -3172,7 +3803,8 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.modelCountMany": "{count} model",
   "claudeDesktop.chooseDefault": "Chọn một model mặc định",
   "claudeDesktop.temporaryDefault": "Mặc định tạm thời",
-  "claudeDesktop.laneEmpty": "Thả một model vào đây hoặc sử dụng bộ điều khiển Di chuyển (Move) của nó.",
+  "claudeDesktop.laneEmpty":
+    "Thả một model vào đây hoặc sử dụng bộ điều khiển Di chuyển (Move) của nó.",
   "claudeDesktop.laneNoMatch": "Không có model nào trong họ này khớp với tìm kiếm của bạn.",
   "nav.grok": "Grok",
   "grok.title": "Grok Build",
@@ -3180,7 +3812,8 @@ export const vi: Record<TKey, string> = {
   "grok.loading": "Đang tải trạng thái Grok…",
   "grok.loadFail": "Không thể đọc cấu hình Grok.",
   "grok.notConfiguredTitle": "Grok Build chưa được kết nối",
-  "grok.notConfiguredHint": "Hãy khởi động hoặc khởi động lại proxy với Grok đã được cài đặt và opencodex sẽ ghi một khối được quản lý (managed block) vào:",
+  "grok.notConfiguredHint":
+    "Hãy khởi động hoặc khởi động lại proxy với Grok đã được cài đặt và opencodex sẽ ghi một khối được quản lý (managed block) vào:",
   "grok.endpoint": "Endpoint",
   "grok.colModel": "Model",
   "grok.colAlias": "Bí danh Grok",
@@ -3203,15 +3836,18 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.defaultBadge": "Mặc định",
   "claudeDesktop.roles.title": "Model",
   "claudeDesktop.roles.default": "Model mặc định",
-  "claudeDesktop.roles.defaultDesc": "Đứng đầu danh sách model của Claude Desktop và được gửi dưới dạng cấp Opus.",
+  "claudeDesktop.roles.defaultDesc":
+    "Đứng đầu danh sách model của Claude Desktop và được gửi dưới dạng cấp Opus.",
   "claudeDesktop.roles.quick": "Model cho tác vụ nhanh",
   "claudeDesktop.roles.quickDesc": "Trả lời các yêu cầu cấp Haiku của Claude Desktop.",
   "claudeDesktop.roles.unset": "Chưa đặt",
   "claudeDesktop.roles.pick": "Chọn một model",
   "claudeDesktop.roles.unavailableOption": "{route} (không khả dụng)",
-  "claudeDesktop.roles.gatewayScope": "Các lựa chọn này áp dụng cho chế độ gateway, chế độ ghi danh sách model của Claude Desktop.",
+  "claudeDesktop.roles.gatewayScope":
+    "Các lựa chọn này áp dụng cho chế độ gateway, chế độ ghi danh sách model của Claude Desktop.",
   "claudeDesktop.roles.listTitle": "Danh sách model Desktop",
-  "claudeDesktop.roles.listHint": "Chọn những model Claude Desktop sẽ liệt kê. Chỉ Claude Desktop thay đổi: các client khác và cài đặt provider giữ nguyên model.",
+  "claudeDesktop.roles.listHint":
+    "Chọn những model Claude Desktop sẽ liệt kê. Chỉ Claude Desktop thay đổi: các client khác và cài đặt provider giữ nguyên model.",
   "claudeDesktop.status.pendingApply": "Đã lưu — hãy áp dụng để cập nhật Desktop",
   "claudeDesktop.visibility.search": "Tìm model",
   "claudeDesktop.visibility.provider": "Provider",
@@ -3232,11 +3868,14 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.visibility.previewTitle": "Lần áp dụng tới",
   "claudeDesktop.visibility.previewAdds": "Thêm: {models}",
   "claudeDesktop.visibility.previewRemoves": "Bỏ: {models}",
-  "claudeDesktop.visibility.previewSame": "Hồ sơ chứa cùng các ID model. Áp dụng thay đổi hồ sơ trước khi khởi động lại Desktop.",
-  "claudeDesktop.visibility.replaceNote": "Áp dụng sẽ thay danh sách model trong hồ sơ Claude Desktop của OpenCodex, kể cả danh sách đã sửa tay. Ánh xạ tier trong Nâng cao vẫn là tùy chọn. Chế độ chỉ discovery không dùng lựa chọn này.",
+  "claudeDesktop.visibility.previewSame":
+    "Hồ sơ chứa cùng các ID model. Áp dụng thay đổi hồ sơ trước khi khởi động lại Desktop.",
+  "claudeDesktop.visibility.replaceNote":
+    "Áp dụng sẽ thay danh sách model trong hồ sơ Claude Desktop của OpenCodex, kể cả danh sách đã sửa tay. Ánh xạ tier trong Nâng cao vẫn là tùy chọn. Chế độ chỉ discovery không dùng lựa chọn này.",
   "claudeDesktop.roles.quickBadge": "Tác vụ nhanh",
   "claudeDesktop.advanced.title": "Nâng cao: chỉ định cấp Claude",
-  "claudeDesktop.advanced.desc": "Chọn cấp Claude (Opus, Fable, Sonnet, Haiku) mà Claude Desktop dùng để phân loại từng model.",
+  "claudeDesktop.advanced.desc":
+    "Chọn cấp Claude (Opus, Fable, Sonnet, Haiku) mà Claude Desktop dùng để phân loại từng model.",
   "claudeDesktop.advanced.empty": "trống",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "Không khả dụng",
@@ -3251,7 +3890,8 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.status.stale": "Cấu hình Desktop chưa cập nhật — hãy áp dụng lại",
   "claudeDesktop.status.notApplied": "Chưa được áp dụng",
   "claudeDesktop.status.notActiveProfile": "Desktop đang phục vụ một hồ sơ khác — hãy áp dụng lại",
-  "claudeDesktop.status.disabled": "Tiện ích tích hợp Claude Desktop đang tắt. Hãy thoát hoàn toàn và mở lại Desktop sau khi bật nó.",
+  "claudeDesktop.status.disabled":
+    "Tiện ích tích hợp Claude Desktop đang tắt. Hãy thoát hoàn toàn và mở lại Desktop sau khi bật nó.",
   "claudeDesktop.enableApply": "Bật và áp dụng",
   "claudeDesktop.switchModeApply": "Đổi chế độ & áp dụng",
   "claudeDesktop.status.appliedFirstParty": "First-party: tab Code của Desktop đi qua proxy cục bộ",
@@ -3260,47 +3900,72 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.mode.gateway": "Gateway (bên thứ ba)",
   "claudeDesktop.mode.defaultBadge": "mặc định",
   "claudeDesktop.mode.current": "hiện tại",
-  "claudeDesktop.mode.firstPartyHint": "Desktop vẫn đăng nhập claude.ai. Tab Code dùng OpenCodex khi bật first-party của Desktop; CLI độc lập có công tắc riêng. Cả hai đọc cùng môi trường thiết lập.",
+  "claudeDesktop.mode.firstPartyHint":
+    "Desktop vẫn đăng nhập claude.ai. Tab Code dùng OpenCodex khi bật first-party của Desktop; CLI độc lập có công tắc riêng. Cả hai đọc cùng môi trường thiết lập.",
   "claude.intercept.start": "Bắt đầu chặn",
   "claude.intercept.starting": "Đang bắt đầu chặn…",
   "claude.intercept.reason.disabled": "Hãy bật định tuyến Claude và chặn trước.",
-  "claude.intercept.reason.client_role": "Tiến trình này là máy khách hub. Bật chặn trên máy chủ cục bộ.",
-  "claude.intercept.reason.ephemeral_port": "Đặt claudeCode.intercept.port khi cổng công khai là cổng tạm thời.",
-  "claude.intercept.reason.port_in_use": "Cổng {port} đang được dùng. Giải phóng cổng hoặc đổi claudeCode.intercept.port.",
-  "claude.intercept.reason.port_mismatch": "Lần chạy này dùng cổng {bound}, khác cổng cấu hình {configured}. Dùng cổng hiện tại hoặc khôi phục cấu hình.",
-  "claude.intercept.reason.failed": "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
+  "claude.intercept.reason.client_role":
+    "Tiến trình này là máy khách hub. Bật chặn trên máy chủ cục bộ.",
+  "claude.intercept.reason.ephemeral_port":
+    "Đặt claudeCode.intercept.port khi cổng công khai là cổng tạm thời.",
+  "claude.intercept.reason.port_in_use":
+    "Cổng {port} đang được dùng. Giải phóng cổng hoặc đổi claudeCode.intercept.port.",
+  "claude.intercept.reason.port_mismatch":
+    "Lần chạy này dùng cổng {bound}, khác cổng cấu hình {configured}. Dùng cổng hiện tại hoặc khôi phục cấu hình.",
+  "claude.intercept.reason.failed":
+    "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
   "claude.intercept.reason.stopped": "Chặn đã dừng. Hãy khởi chạy dịch vụ OpenCodex.",
   "claude.firstParty.label": "First-party cho Claude Code CLI",
-  "claude.firstParty.desc": "CLI claude độc lập giữ phiên đăng nhập Claude, còn lưu lượng đi qua proxy chặn cục bộ.",
+  "claude.firstParty.desc":
+    "CLI claude độc lập giữ phiên đăng nhập Claude, còn lưu lượng đi qua proxy chặn cục bộ.",
   "claude.firstParty.aria": "Bật/tắt first-party cho Claude Code CLI",
-  "claude.firstParty.risk": "Rủi ro tài khoản: first-party đưa lưu lượng thuê bao Claude qua proxy chặn bắt cục bộ. Anthropic có thể coi đây là vi phạm điều khoản và đình chỉ tài khoản.",
-  "claude.firstParty.shared": "Khi thiết lập proxy dùng chung đã được áp dụng, ứng dụng Claude còn lại cũng đi qua proxy cục bộ và được chuyển tiếp nguyên trạng; TLS kết thúc tại máy. Để terminal kết nối trực tiếp, đặt NO_PROXY='*' trong shell.",
-  "claude.firstParty.deadProxy": "Thiết lập Claude trỏ đến proxy không chạy. Lệnh claude thông thường không thể kết nối cho đến khi OpenCodex chạy hoặc first-party Desktop/CLI được tắt.",
-  "claude.firstParty.notApplied": "First-party CLI đang bật nhưng thiết lập proxy chưa được áp dụng. Hãy kiểm tra thiết lập Claude trước khi chạy claude thông thường.",
-  "claude.firstParty.brokenProxy": "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
-  "claude.firstParty.residual": "Cả first-party Desktop và CLI đều đã tắt nhưng thiết lập Claude vẫn trỏ tới proxy OpenCodex. Xóa thiết lập proxy còn lại hoặc chạy `ocx ensure`.",
-  "claude.firstParty.routingOff": "Với cấu hình hiện tại, opencodex không phục vụ chức năng chặn Claude (định tuyến Claude hoặc chức năng chặn đã tắt, hoặc máy này là máy khách của một hub opencodex khác), nên các thiết lập này trỏ đến proxy không xử lý yêu cầu. Hãy bật lại trên máy này hoặc tắt first-party để xóa các thiết lập.",
+  "claude.firstParty.risk":
+    "Rủi ro tài khoản: first-party đưa lưu lượng thuê bao Claude qua proxy chặn bắt cục bộ. Anthropic có thể coi đây là vi phạm điều khoản và đình chỉ tài khoản.",
+  "claude.firstParty.shared":
+    "Khi thiết lập proxy dùng chung đã được áp dụng, ứng dụng Claude còn lại cũng đi qua proxy cục bộ và được chuyển tiếp nguyên trạng; TLS kết thúc tại máy. Để terminal kết nối trực tiếp, đặt NO_PROXY='*' trong shell.",
+  "claude.firstParty.deadProxy":
+    "Thiết lập Claude trỏ đến proxy không chạy. Lệnh claude thông thường không thể kết nối cho đến khi OpenCodex chạy hoặc first-party Desktop/CLI được tắt.",
+  "claude.firstParty.notApplied":
+    "First-party CLI đang bật nhưng thiết lập proxy chưa được áp dụng. Hãy kiểm tra thiết lập Claude trước khi chạy claude thông thường.",
+  "claude.firstParty.brokenProxy":
+    "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
+  "claude.firstParty.residual":
+    "Cả first-party Desktop và CLI đều đã tắt nhưng thiết lập Claude vẫn trỏ tới proxy OpenCodex. Xóa thiết lập proxy còn lại hoặc chạy `ocx ensure`.",
+  "claude.firstParty.routingOff":
+    "Với cấu hình hiện tại, opencodex không phục vụ chức năng chặn Claude (định tuyến Claude hoặc chức năng chặn đã tắt, hoặc máy này là máy khách của một hub opencodex khác), nên các thiết lập này trỏ đến proxy không xử lý yêu cầu. Hãy bật lại trên máy này hoặc tắt first-party để xóa các thiết lập.",
   "claude.firstParty.disabled": "Hãy bật định tuyến Claude và chặn trước.",
-  "claude.firstParty.foreign": "~/.claude/settings.json trỏ đến proxy opencodex nhưng tin một chứng chỉ không do opencodex quản lý nên yêu cầu sẽ thất bại. Hãy sửa HTTPS_PROXY / NODE_EXTRA_CA_CERTS thủ công trong tệp đó.",
-  "claude.firstParty.local": "~/.claude/settings.json đưa Claude Code qua proxy cục bộ tại 127.0.0.1 nhưng opencodex không thể xác nhận proxy đó là của mình. Nếu không còn dùng, hãy xóa HTTPS_PROXY trong tệp này.",
-  "claude.firstParty.unknown": "opencodex không xác định được ~/.claude/settings.json còn trỏ đến proxy của mình hay không.",
+  "claude.firstParty.foreign":
+    "~/.claude/settings.json trỏ đến proxy opencodex nhưng tin một chứng chỉ không do opencodex quản lý nên yêu cầu sẽ thất bại. Hãy sửa HTTPS_PROXY / NODE_EXTRA_CA_CERTS thủ công trong tệp đó.",
+  "claude.firstParty.local":
+    "~/.claude/settings.json đưa Claude Code qua proxy cục bộ tại 127.0.0.1 nhưng opencodex không thể xác nhận proxy đó là của mình. Nếu không còn dùng, hãy xóa HTTPS_PROXY trong tệp này.",
+  "claude.firstParty.unknown":
+    "opencodex không xác định được ~/.claude/settings.json còn trỏ đến proxy của mình hay không.",
   "claude.firstParty.refusal.interceptDisabled": "Proxy chặn bắt đã tắt.",
-  "claude.firstParty.refusal.interceptUnavailable": "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
+  "claude.firstParty.refusal.interceptUnavailable":
+    "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại.",
   "claude.firstParty.refusal.foreignEnv": "Một chương trình khác quản lý thiết lập proxy Claude.",
   "claude.firstParty.refusal.caUnavailable": "Không dùng được cơ quan chứng thực cục bộ.",
   "claude.firstParty.refusal.unreadable": "Không đọc được thiết lập Claude.",
   "claude.firstParty.refusal.writeFailed": "Không ghi được thiết lập Claude.",
-  "claudeDesktop.mode.firstPartyRisk": "Rủi ro tài khoản: chế độ First-party chuyển lưu lượng gói thuê bao Claude của bạn qua proxy chặn bắt cục bộ. Anthropic có thể xem đây là hành vi vi phạm điều khoản sử dụng và đình chỉ tài khoản. Gateway là chế độ mặc định.",
-  "claudeDesktop.mode.gatewayHint": "Toàn bộ ứng dụng chuyển sang dùng OpenCodex làm gateway. Chat chạy cục bộ; các tính năng claude.ai không khả dụng.",
-  "claudeDesktop.mode.switchNote": "Chuyển chế độ sẽ xóa cấu hình của chế độ kia. Sau đó hãy thoát hẳn Desktop rồi mở lại.",
+  "claudeDesktop.mode.firstPartyRisk":
+    "Rủi ro tài khoản: chế độ First-party chuyển lưu lượng gói thuê bao Claude của bạn qua proxy chặn bắt cục bộ. Anthropic có thể xem đây là hành vi vi phạm điều khoản sử dụng và đình chỉ tài khoản. Gateway là chế độ mặc định.",
+  "claudeDesktop.mode.gatewayHint":
+    "Toàn bộ ứng dụng chuyển sang dùng OpenCodex làm gateway. Chat chạy cục bộ; các tính năng claude.ai không khả dụng.",
+  "claudeDesktop.mode.switchNote":
+    "Chuyển chế độ sẽ xóa cấu hình của chế độ kia. Sau đó hãy thoát hẳn Desktop rồi mở lại.",
   "claudeDesktop.firstParty.proxyRunning": "Proxy cục bộ tại 127.0.0.1:{port}",
-  "claudeDesktop.firstParty.proxyStopped": "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại. ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "Proxy chặn bắt đã bị tắt trong cấu hình (claudeCode.intercept.enabled)",
+  "claudeDesktop.firstParty.proxyStopped":
+    "Không thể bắt đầu chặn. Kiểm tra cấu hình proxy cục bộ rồi thử lại. ({port})",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "Proxy chặn bắt đã bị tắt trong cấu hình (claudeCode.intercept.enabled)",
   "claudeDesktop.picker.title": "Bộ chọn Claude Desktop",
-  "claudeDesktop.picker.hint": "Hiển thị các model OpenCodex trong bộ chọn ở tab Code của Desktop qua proxy cục bộ chuyên dụng.",
+  "claudeDesktop.picker.hint":
+    "Hiển thị các model OpenCodex trong bộ chọn ở tab Code của Desktop qua proxy cục bộ chuyên dụng.",
   "claudeDesktop.picker.toggle": "Bật bộ chọn Claude Desktop",
   "claudeDesktop.picker.state.active": "Bộ chọn đang hoạt động",
-  "claudeDesktop.picker.state.restart": "Thoát hoàn toàn rồi mở lại Claude Desktop để hoàn tất áp dụng hồ sơ bộ chọn.",
+  "claudeDesktop.picker.state.restart":
+    "Thoát hoàn toàn rồi mở lại Claude Desktop để hoàn tất áp dụng hồ sơ bộ chọn.",
   "claudeDesktop.picker.state.trustPending": "Đang chờ bước tin cậy chứng chỉ",
   "claudeDesktop.picker.state.trustDeclined": "Đã từ chối tin cậy chứng chỉ",
   "claudeDesktop.picker.state.proxyUnavailable": "Proxy bộ chọn chưa chạy",
@@ -3308,10 +3973,13 @@ export const vi: Record<TKey, string> = {
   "claudeDesktop.picker.state.notFirstParty": "Bộ chọn chỉ khả dụng trong chế độ first-party",
   "claudeDesktop.picker.state.profileFailed": "Không thể áp dụng hồ sơ bộ chọn",
   "claudeDesktop.picker.models": "{count} model khả dụng trong bộ chọn",
-  "claudeDesktop.picker.offlineNote": "Khi bật chế độ bộ chọn, Claude Desktop truy cập mạng qua OpenCodex. Nếu OpenCodex dừng, Desktop sẽ ngoại tuyến cho đến khi được khởi động lại hoặc tắt chế độ bộ chọn.",
+  "claudeDesktop.picker.offlineNote":
+    "Khi bật chế độ bộ chọn, Claude Desktop truy cập mạng qua OpenCodex. Nếu OpenCodex dừng, Desktop sẽ ngoại tuyến cho đến khi được khởi động lại hoặc tắt chế độ bộ chọn.",
   "claudeDesktop.firstParty.bindings.title": "Liên kết mô hình cho tab Code",
-  "claudeDesktop.firstParty.bindings.hint": "Claude Desktop giữ nguyên tên của Anthropic trong bộ chọn của tab Code. Liên kết một mô hình trong bộ chọn với mô hình OpenCodex và các yêu cầu tới mục đó sẽ do mô hình được liên kết phục vụ. Chỉ lưu lượng Claude Code đi qua proxy cục bộ (tab Code của Desktop và CLI claude) dùng các liên kết này; ocx claude không bị ảnh hưởng. Liên kết có hiệu lực từ yêu cầu tiếp theo — không cần thoát hẳn rồi mở lại.",
-  "claudeDesktop.firstParty.bindings.empty": "Chưa có liên kết nào — mô hình trong bộ chọn dùng tuyến mặc định.",
+  "claudeDesktop.firstParty.bindings.hint":
+    "Claude Desktop giữ nguyên tên của Anthropic trong bộ chọn của tab Code. Liên kết một mô hình trong bộ chọn với mô hình OpenCodex và các yêu cầu tới mục đó sẽ do mô hình được liên kết phục vụ. Chỉ lưu lượng Claude Code đi qua proxy cục bộ (tab Code của Desktop và CLI claude) dùng các liên kết này; ocx claude không bị ảnh hưởng. Liên kết có hiệu lực từ yêu cầu tiếp theo — không cần thoát hẳn rồi mở lại.",
+  "claudeDesktop.firstParty.bindings.empty":
+    "Chưa có liên kết nào — mô hình trong bộ chọn dùng tuyến mặc định.",
   "claudeDesktop.firstParty.bindings.pickerLabel": "ID mô hình trong bộ chọn",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
   "claudeDesktop.firstParty.bindings.routeLabel": "Mô hình OpenCodex",
@@ -3336,27 +4004,37 @@ export const vi: Record<TKey, string> = {
   "models.aliasAuto": "tự động (auto)",
   "models.aliasUser": "người dùng (user)",
   "models.aliasStale": "cũ (stale)",
-  "connection.pairing.notApiKey": "Dán mã ghép nối dùng một lần vào đây. Khóa API dữ liệu và admin token không thuộc trường này.",
-  "connection.pairing.networkError": "Không thể kết nối OpenCodex. Hãy kiểm tra ứng dụng đang chạy rồi thử lại.",
+  "connection.pairing.notApiKey":
+    "Dán mã ghép nối dùng một lần vào đây. Khóa API dữ liệu và admin token không thuộc trường này.",
+  "connection.pairing.networkError":
+    "Không thể kết nối OpenCodex. Hãy kiểm tra ứng dụng đang chạy rồi thử lại.",
   "connection.pairing.requestError": "OpenCodex không thể hoàn tất ghép nối. Vui lòng thử lại.",
-  "connection.pairing.responseError": "OpenCodex trả về phản hồi ghép nối không hợp lệ. Vui lòng thử lại.",
+  "connection.pairing.responseError":
+    "OpenCodex trả về phản hồi ghép nối không hợp lệ. Vui lòng thử lại.",
   "dash.authRequired": "Cần xác thực trình duyệt để xem bảng điều khiển này.",
-  "dash.permissionDenied": "Trình duyệt này không được phép đọc bảng điều khiển. Hãy kiểm tra cài đặt truy cập với người vận hành máy chủ.",
+  "dash.permissionDenied":
+    "Trình duyệt này không được phép đọc bảng điều khiển. Hãy kiểm tra cài đặt truy cập với người vận hành máy chủ.",
   "dash.dataUnavailable": "Không thể tải dữ liệu bảng điều khiển. Hãy kiểm tra kết nối và thử lại.",
   "dash.staleData": "Đang hiển thị dữ liệu nhận được gần nhất; dữ liệu có thể đã cũ.",
   "connection.pairing.code": "Mã ghép nối một lần",
   "connection.pairing.retryValidation": "Thử xác minh lại",
-  "connection.pairing.validationPending": "Mã đã được đổi nhưng chưa thể hoàn tất xác minh phiên. Giữ trang này mở và chọn Thử xác minh lại; không cần mã mới.",
+  "connection.pairing.validationPending":
+    "Mã đã được đổi nhưng chưa thể hoàn tất xác minh phiên. Giữ trang này mở và chọn Thử xác minh lại; không cần mã mới.",
   "connection.pairing.submit": "Kết nối",
   "connection.pairing.submitting": "Đang kết nối…",
-  "connection.pairing.error": "Mã ghép nối bị từ chối. Chạy lại lệnh để nhận mã mới cho địa chỉ này.",
-  "connection.pairing.originDenied": "Mở bảng điều khiển tại địa chỉ loopback đã cấu hình và yêu cầu mã mới.",
+  "connection.pairing.error":
+    "Mã ghép nối bị từ chối. Chạy lại lệnh để nhận mã mới cho địa chỉ này.",
+  "connection.pairing.originDenied":
+    "Mở bảng điều khiển tại địa chỉ loopback đã cấu hình và yêu cầu mã mới.",
   "connection.sessionLogout": "Đăng xuất phiên từ xa",
   "connection.sessionLoggingOut": "Đang đăng xuất phiên từ xa…",
-  "connection.sessionLogoutFailed": "Không thể đăng xuất phiên từ xa. Phiên hiện tại vẫn được giữ nguyên.",
+  "connection.sessionLogoutFailed":
+    "Không thể đăng xuất phiên từ xa. Phiên hiện tại vẫn được giữ nguyên.",
   "usage.source.local": "Nguồn: usage.jsonl cục bộ",
-  "models.displayNameSavedRefreshFailed": "Thay đổi đã được lưu, nhưng không thể làm mới danh sách model. Hãy thử lại để làm mới nó.",
-  "models.displayNameOutcomeUnknown": "Yêu cầu chưa hoàn tất. Thay đổi có thể đã được lưu. Hãy thử lại để kiểm tra tên hiện tại trước khi thực hiện thay đổi khác.",
+  "models.displayNameSavedRefreshFailed":
+    "Thay đổi đã được lưu, nhưng không thể làm mới danh sách model. Hãy thử lại để làm mới nó.",
+  "models.displayNameOutcomeUnknown":
+    "Yêu cầu chưa hoàn tất. Thay đổi có thể đã được lưu. Hãy thử lại để kiểm tra tên hiện tại trước khi thực hiện thay đổi khác.",
   "models.displayNameCurrentUnavailable": "Tên hiện tại không khả dụng cho đến khi làm mới",
   "models.displayNameReloaded": "Đã làm mới danh sách model",
   "models.displayNameAction": "Tên",
@@ -3377,15 +4055,18 @@ export const vi: Record<TKey, string> = {
   "models.displayNameRequired": "Hãy nhập tên thân thiện, hoặc sử dụng Đặt lại tên.",
   "models.displayNameTooLong": "Tên thân thiện phải có độ dài từ 128 ký tự trở xuống.",
   "models.displayNameNoSlash": "Tên thân thiện không được chứa ký tự /.",
-  "models.displayNameNoControl": "Tên thân thiện không được chứa các ký tự điều khiển (control characters).",
+  "models.displayNameNoControl":
+    "Tên thân thiện không được chứa các ký tự điều khiển (control characters).",
   "pricing.override.action": "Giá",
   "pricing.override.actionLabel": "Chỉnh sửa giá cho {model}",
   "pricing.override.badge": "Giá thủ công",
   "pricing.override.title": "Giá model",
   "pricing.override.modelId": "Model ID",
   "pricing.override.promptTitle": "Giá prompt dài",
-  "pricing.override.promptHelp": "Token đầu vào và token đọc, ghi cache của yêu cầu quyết định mức giá; toàn bộ yêu cầu được tính theo mức đó. Token đầu ra không được tính. Giá áp dụng cho tốc độ tiêu chuẩn.",
-  "pricing.override.help": "USD cho mỗi 1M token. Nhập mức giá đầu vào (input) và đầu ra (output); mức giá cache nếu để trống sẽ tính là 0. Có thể đặt mức giá bằng 0.",
+  "pricing.override.promptHelp":
+    "Token đầu vào và token đọc, ghi cache của yêu cầu quyết định mức giá; toàn bộ yêu cầu được tính theo mức đó. Token đầu ra không được tính. Giá áp dụng cho tốc độ tiêu chuẩn.",
+  "pricing.override.help":
+    "USD cho mỗi 1M token. Nhập mức giá đầu vào (input) và đầu ra (output); mức giá cache nếu để trống sẽ tính là 0. Có thể đặt mức giá bằng 0.",
   "pricing.override.input": "Đầu vào (Input)",
   "pricing.override.output": "Đầu ra (Output)",
   "pricing.override.cacheRead": "Đọc bộ nhớ đệm (Cache read)",
@@ -3394,23 +4075,33 @@ export const vi: Record<TKey, string> = {
   "pricing.override.modeFlat": "Giá cố định",
   "pricing.override.modeCustom": "Ngưỡng tùy chỉnh",
 
-  "pricing.override.modeAutomaticHelp": "Dùng quy tắc độ dài prompt trong danh mục cùng các mức giá cơ bản ở trên. Điều chỉnh Fast và Priority vẫn được áp dụng.",
-  "pricing.override.modeFlatHelp": "Dùng các mức giá cơ bản ở trên cho mọi độ dài prompt, thay thế quy tắc độ dài prompt trong danh mục. Điều chỉnh Fast và Priority vẫn được áp dụng.",
+  "pricing.override.modeAutomaticHelp":
+    "Dùng quy tắc độ dài prompt trong danh mục cùng các mức giá cơ bản ở trên. Điều chỉnh Fast và Priority vẫn được áp dụng.",
+  "pricing.override.modeFlatHelp":
+    "Dùng các mức giá cơ bản ở trên cho mọi độ dài prompt, thay thế quy tắc độ dài prompt trong danh mục. Điều chỉnh Fast và Priority vẫn được áp dụng.",
   "pricing.override.threshold": "Ngưỡng prompt (token)",
   "pricing.override.bandTitle": "Giá trong mức prompt dài",
-  "pricing.override.bandHelp": "Đây là giá ở tốc độ tiêu chuẩn. Quy tắc Fast và Priority trong danh mục vẫn áp dụng. Chi phí chỉ là ước tính.",
+  "pricing.override.bandHelp":
+    "Đây là giá ở tốc độ tiêu chuẩn. Quy tắc Fast và Priority trong danh mục vẫn áp dụng. Chi phí chỉ là ước tính.",
   "pricing.override.comparison": "So sánh ngưỡng",
   "pricing.override.comparisonGt": "Lớn hơn (>)",
   "pricing.override.comparisonGte": "Lớn hơn hoặc bằng (≥)",
-  "pricing.override.modeCustomHelp": "Nhập bốn mức giá tuyệt đối cho mỗi 1 triệu token. Độ dài prompt bao gồm đầu vào đã lưu trong bộ nhớ đệm và không bao gồm đầu ra. Các mức giá này thay thế quy tắc độ dài prompt trong danh mục cho toàn bộ yêu cầu. Điều chỉnh Fast và Priority vẫn được áp dụng. Chi phí chỉ là ước tính.",
-  "pricing.override.customInvalid": "Nhập ngưỡng token là số nguyên an toàn dương và bốn mức giá hữu hạn từ 0 đến 1.000.000. Mức giá có thể là 0.",
+  "pricing.override.modeCustomHelp":
+    "Nhập bốn mức giá tuyệt đối cho mỗi 1 triệu token. Độ dài prompt bao gồm đầu vào đã lưu trong bộ nhớ đệm và không bao gồm đầu ra. Các mức giá này thay thế quy tắc độ dài prompt trong danh mục cho toàn bộ yêu cầu. Điều chỉnh Fast và Priority vẫn được áp dụng. Chi phí chỉ là ước tính.",
+  "pricing.override.customInvalid":
+    "Nhập ngưỡng token là số nguyên an toàn dương và bốn mức giá hữu hạn từ 0 đến 1.000.000. Mức giá có thể là 0.",
   "pricing.override.loading": "Đang tải giá đã lưu…",
   "pricing.override.loadFailed": "Không thể tải giá đã lưu. Hãy tải lại để thử lại.",
-  "pricing.override.outcomeUnknown": "Yêu cầu không hoàn tất một cách đáng tin cậy. Giá có thể đã thay đổi. Hãy tải lại giá đã lưu trước khi chỉnh sửa tiếp.",
-  "pricing.override.recoveryFailed": "Không thể khôi phục giá đã lưu. Chức năng chỉnh sửa vẫn bị khóa; hãy tải lại để thử lại.",
-  "pricing.override.recovered": "Đã tải giá được lưu mới nhất. Yêu cầu trước đó hoặc một client khác vẫn có thể thay đổi nó.",
-  "pricing.override.refreshFailed": "Giá đã được lưu, nhưng không thể làm mới danh sách model. Hãy thử làm mới lại danh sách.",
-  "pricing.override.invalid": "Hãy nhập mức giá đầu vào và đầu ra. Mỗi mức giá phải là một số hữu hạn từ 0 đến 1,000,000.",
+  "pricing.override.outcomeUnknown":
+    "Yêu cầu không hoàn tất một cách đáng tin cậy. Giá có thể đã thay đổi. Hãy tải lại giá đã lưu trước khi chỉnh sửa tiếp.",
+  "pricing.override.recoveryFailed":
+    "Không thể khôi phục giá đã lưu. Chức năng chỉnh sửa vẫn bị khóa; hãy tải lại để thử lại.",
+  "pricing.override.recovered":
+    "Đã tải giá được lưu mới nhất. Yêu cầu trước đó hoặc một client khác vẫn có thể thay đổi nó.",
+  "pricing.override.refreshFailed":
+    "Giá đã được lưu, nhưng không thể làm mới danh sách model. Hãy thử làm mới lại danh sách.",
+  "pricing.override.invalid":
+    "Hãy nhập mức giá đầu vào và đầu ra. Mỗi mức giá phải là một số hữu hạn từ 0 đến 1,000,000.",
   "pricing.override.reset": "Đặt lại thành tự động",
   "pricing.override.save": "Lưu",
   "pricing.override.saving": "Đang lưu…",
@@ -3428,12 +4119,18 @@ export const vi: Record<TKey, string> = {
   "usage.range.invalid": "Hãy nhập ngày và giờ địa phương hợp lệ, từ ngày 1970-01-01 UTC trở đi.",
   "usage.range.reversed": "Thời điểm kết thúc phải bằng hoặc sau thời điểm bắt đầu.",
   "usage.range.applied": "Khoảng thời gian đã chọn: {start} – {end} (bao gồm cả hai).",
-  "models.pickerOrder.editorHint": "Sắp xếp lại các model được định tuyến, sau đó lưu bản nháp của bạn. Các hàng nổi bật (featured) được cố định; các model gốc (native) không được hiển thị.",
-  "models.pickerOrder.nativeLocked": "Thứ tự đã lưu này bao gồm các model gốc. Hãy áp dụng một cài đặt sẵn (preset) định tuyến hoặc Mặc định (Default) trước khi chỉnh sửa Tùy chỉnh (Custom).",
-  "models.pickerOrder.unknownChosen": "Các lựa chọn nổi bật không xác định. Hãy tải lại trước khi chỉnh sửa.",
-  "models.pickerOrder.changed": "Cài đặt bộ chọn (picker) đã thay đổi. Bản nháp của bạn vẫn được giữ lại; hãy tải lại để loại bỏ nó và sử dụng cài đặt hiện tại.",
-  "models.pickerOrder.savedReload": "Đã lưu thứ tự. Hãy tải lại cài đặt hiện tại trước khi chỉnh sửa lại.",
-  "models.pickerOrder.requestFailed": "Yêu cầu thất bại. Bản nháp của bạn vẫn được giữ lại; hãy thử lại hoặc tải lại.",
+  "models.pickerOrder.editorHint":
+    "Sắp xếp lại các model được định tuyến, sau đó lưu bản nháp của bạn. Các hàng nổi bật (featured) được cố định; các model gốc (native) không được hiển thị.",
+  "models.pickerOrder.nativeLocked":
+    "Thứ tự đã lưu này bao gồm các model gốc. Hãy áp dụng một cài đặt sẵn (preset) định tuyến hoặc Mặc định (Default) trước khi chỉnh sửa Tùy chỉnh (Custom).",
+  "models.pickerOrder.unknownChosen":
+    "Các lựa chọn nổi bật không xác định. Hãy tải lại trước khi chỉnh sửa.",
+  "models.pickerOrder.changed":
+    "Cài đặt bộ chọn (picker) đã thay đổi. Bản nháp của bạn vẫn được giữ lại; hãy tải lại để loại bỏ nó và sử dụng cài đặt hiện tại.",
+  "models.pickerOrder.savedReload":
+    "Đã lưu thứ tự. Hãy tải lại cài đặt hiện tại trước khi chỉnh sửa lại.",
+  "models.pickerOrder.requestFailed":
+    "Yêu cầu thất bại. Bản nháp của bạn vẫn được giữ lại; hãy thử lại hoặc tải lại.",
   "models.pickerOrder.empty": "Không có model được định tuyến nào khả dụng.",
   "models.pickerOrder.dragModel": "Kéo {model}",
   "models.pickerOrder.featured": "Nổi bật (Featured)",
@@ -3442,10 +4139,15 @@ export const vi: Record<TKey, string> = {
   "models.pickerOrder.position": "{model}: vị trí {position} trong số {total}",
   "models.pickerOrder.saveDraft": "Lưu bản nháp",
   "models.pickerOrder.reloadDraft": "Tải lại và bỏ bản nháp",
-  "models.pickerOrder.catalogRequired": "Danh tính của các model bị thiếu hoặc không rõ ràng. Hãy tải lại trang Models để làm mới danh mục của nó trước khi chỉnh sửa Tùy chỉnh (Custom).",
+  "models.pickerOrder.catalogRequired":
+    "Danh tính của các model bị thiếu hoặc không rõ ràng. Hãy tải lại trang Models để làm mới danh mục của nó trước khi chỉnh sửa Tùy chỉnh (Custom).",
   "models.newPolicyGlobal": "Model mới mặc định bị tắt",
   "models.newPolicyProvider": "Chính sách model mới",
-  "models.fastProvider": "Chế độ Fast", "models.fastProviderHint": "Dùng tín dụng sử dụng với giá gấp 2", "models.fastEnabled": "Đã bật chế độ Fast", "models.fastDisabled": "Đã tắt chế độ Fast", "models.fastSaveFailed": "Không thể lưu chế độ Fast",
+  "models.fastProvider": "Chế độ Fast",
+  "models.fastProviderHint": "Dùng tín dụng sử dụng với giá gấp 2",
+  "models.fastEnabled": "Đã bật chế độ Fast",
+  "models.fastDisabled": "Đã tắt chế độ Fast",
+  "models.fastSaveFailed": "Không thể lưu chế độ Fast",
   "models.newPolicy_inherit": "Kế thừa",
   "models.newPolicy_off": "Tắt",
   "models.newPolicy_on": "Bật",
@@ -3454,19 +4156,26 @@ export const vi: Record<TKey, string> = {
   "codexSet.custom.deleteConfirm": "Xoá lớp này? Bạn có thể hoàn tác trong vài giây.",
   "codexSet.custom.moveUp": "Di chuyển {title} lên",
   "codexSet.dialog.copyKey": "Sao chép khóa",
-  "codexSet.dialog.noRenderedText": "Codex không cung cấp nội dung đã ghép của một lớp tích hợp sẵn, nên hộp thoại này mô tả lớp và nêu tên khóa thay vì hiển thị nội dung của nó.",
+  "codexSet.dialog.noRenderedText":
+    "Codex không cung cấp nội dung đã ghép của một lớp tích hợp sẵn, nên hộp thoại này mô tả lớp và nêu tên khóa thay vì hiển thị nội dung của nó.",
   "codexSet.dialog.probeNotFound": "Không đo được: không tìm thấy tệp thực thi codex.",
   "codexSet.dialog.probeUnsupported": "Không đo được: phiên bản Codex này không hỗ trợ lệnh đo.",
   "codexSet.dialog.probeInvalid": "Không đo được: không phân tích được đầu ra của Codex.",
   "codexSet.dialog.probeFailed": "Không đo được: lệnh đo của Codex không hoàn tất.",
   "codexSet.dialog.probeBusy": "Một phép đo khác vẫn đang chạy. Hãy thử lại sau giây lát.",
-  "codexSet.dialog.notRendered": "Lớp này không gửi gì trong lượt đã đọc. Các phần chỉ được gửi lại khi thay đổi, nên một lớp không đổi sẽ vắng mặt trong một mẫu đơn lẻ.",
-  "codexSet.dialog.unknownLayer": "Bản dựng này không có mô tả cho lớp đó. Nó đến từ một runtime Codex mới hơn bảng điều khiển.",
+  "codexSet.dialog.notRendered":
+    "Lớp này không gửi gì trong lượt đã đọc. Các phần chỉ được gửi lại khi thay đổi, nên một lớp không đổi sẽ vắng mặt trong một mẫu đơn lẻ.",
+  "codexSet.dialog.unknownLayer":
+    "Bản dựng này không có mô tả cho lớp đó. Nó đến từ một runtime Codex mới hơn bảng điều khiển.",
   "codexSet.layer.skills": "Skills",
-  "codexSet.lint.size": "Lớp này vượt quá 8 KB. Vẫn lưu được, nhưng sẽ tốn token trong mọi yêu cầu.",
-  "codexSet.lint.secret": "Trông giống thông tin đăng nhập hoặc khoá API - sẽ được lưu dạng văn bản thuần trong config.toml.",
-  "codexSet.lint.ignoreInstructions": "Bảo Codex bỏ qua hướng dẫn của chính nó có thể vô hiệu các chỉ dẫn tích hợp.",
-  "codexSet.prompt.extensionsUnknown": "Tiện ích mở rộng có thể thêm lớp riêng. Codex không cung cấp chúng, nên không thể liệt kê ở đây.",
+  "codexSet.lint.size":
+    "Lớp này vượt quá 8 KB. Vẫn lưu được, nhưng sẽ tốn token trong mọi yêu cầu.",
+  "codexSet.lint.secret":
+    "Trông giống thông tin đăng nhập hoặc khoá API - sẽ được lưu dạng văn bản thuần trong config.toml.",
+  "codexSet.lint.ignoreInstructions":
+    "Bảo Codex bỏ qua hướng dẫn của chính nó có thể vô hiệu các chỉ dẫn tích hợp.",
+  "codexSet.prompt.extensionsUnknown":
+    "Tiện ích mở rộng có thể thêm lớp riêng. Codex không cung cấp chúng, nên không thể liệt kê ở đây.",
   "codexSet.prompt.loadFailed": "Không thể tải các lớp prompt.",
   "codexSet.prompt.writeFailed": "Không thể lưu thay đổi.",
   "codexSet.row.alwaysOn": "Luôn bật",
@@ -3478,7 +4187,8 @@ export const vi: Record<TKey, string> = {
   "pws.noModelMatch": "Không có model nào khớp bộ lọc.",
   "quota.fiveHourLimit": "Giới hạn 5 giờ",
   "models.fastRows.title": "Hiển thị hàng model Fast",
-  "models.fastRows.desc": "Thêm các bộ chọn “Model Fast” đủ điều kiện vào trình chọn model của client bên ngoài. Việc này không thay đổi tùy chọn reasoning-effort của model gốc. Khi lưu, các tích hợp đang kết nối sẽ được làm mới nếu có thể; nếu không, hãy làm mới tích hợp hoặc catalog của client.",
+  "models.fastRows.desc":
+    "Thêm các bộ chọn “Model Fast” đủ điều kiện vào trình chọn model của client bên ngoài. Việc này không thay đổi tùy chọn reasoning-effort của model gốc. Khi lưu, các tích hợp đang kết nối sẽ được làm mới nếu có thể; nếu không, hãy làm mới tích hợp hoặc catalog của client.",
   "models.fastRows.refreshHint": "Đã lưu. Đang chờ làm mới catalog.",
   "models.fastRows.enabled": "Đã bật hàng model Fast.",
   "models.fastRows.disabled": "Đã tắt hàng model Fast.",
@@ -3496,7 +4206,8 @@ export const vi: Record<TKey, string> = {
   "quotaSummary.scrollNext": "Cuộn nhà cung cấp sang phải",
   "quotaSummary.openAccounts": "Mở quản lý tài khoản",
   "pws.protocol.title": "Giao thức upstream",
-  "pws.protocol.note": "Định dạng API mà opencodex dùng để gọi nhà cung cấp này. Nó không bật hay tắt API phía client nào; các API đó nằm ở trang API.",
+  "pws.protocol.note":
+    "Định dạng API mà opencodex dùng để gọi nhà cung cấp này. Nó không bật hay tắt API phía client nào; các API đó nằm ở trang API.",
   "pws.protocol.adapterLabel": "Giao thức upstream mà nhà cung cấp này nhận",
   "pws.protocol.source": "Do ai quyết định",
   "pws.protocol.source.hardPin": "opencodex cố định cho mô hình này",
@@ -3516,17 +4227,22 @@ export const vi: Record<TKey, string> = {
   "compatProtocol.anyProtocol": "bất kỳ",
   "compatProtocol.pair": "{inbound} → {upstream}",
   "compatProtocol.loading": "Đang đọc cặp giao thức của từng đối tượng…",
-  "compatProtocol.unverified": "Chưa có bằng chứng Lab cho {pair}. Cặp này chưa được xác minh, không phải thất bại.",
-  "compatProtocol.unresolved": "Không đọc được cặp giao thức của {count} đối tượng; chúng bị loại khỏi bộ lọc này.",
-  "compatProtocol.axisNote": "Đây chỉ là kết luận của Lab. Cách một request được chuyển đi (native hay được dịch) hiển thị trong phần xem trước đường đi request trên trang API.",
+  "compatProtocol.unverified":
+    "Chưa có bằng chứng Lab cho {pair}. Cặp này chưa được xác minh, không phải thất bại.",
+  "compatProtocol.unresolved":
+    "Không đọc được cặp giao thức của {count} đối tượng; chúng bị loại khỏi bộ lọc này.",
+  "compatProtocol.axisNote":
+    "Đây chỉ là kết luận của Lab. Cách một request được chuyển đi (native hay được dịch) hiển thị trong phần xem trước đường đi request trên trang API.",
   "protocolLinks.providerSettings": "Cài đặt nhà cung cấp",
   "fallback.title": "Dự phòng",
-  "fallback.desc": "Khi một model hoặc nhà cung cấp lỗi, OpenCodex có thể gửi yêu cầu đến mục tiêu tiếp theo trong combo, hồ sơ định tuyến hoặc chuỗi subagent. Tắt một loại để nhận lỗi rõ ràng thay vào đó.",
+  "fallback.desc":
+    "Khi một model hoặc nhà cung cấp lỗi, OpenCodex có thể gửi yêu cầu đến mục tiêu tiếp theo trong combo, hồ sơ định tuyến hoặc chuỗi subagent. Tắt một loại để nhận lỗi rõ ràng thay vào đó.",
   "fallback.model": "Dự phòng model",
   "fallback.modelHint": "Model khác của cùng nhà cung cấp",
   "fallback.provider": "Dự phòng nhà cung cấp",
   "fallback.providerHint": "Nhà cung cấp khác",
-  "fallback.rotationNote": "Chuyển giữa các tài khoản hoặc khóa của cùng một nhà cung cấp không phải là dự phòng và luôn bật.",
+  "fallback.rotationNote":
+    "Chuyển giữa các tài khoản hoặc khóa của cùng một nhà cung cấp không phải là dự phòng và luôn bật.",
   "fallback.overrides": "Ghi đè",
   "fallback.scope.provider": "Nhà cung cấp {name}",
   "fallback.scope.route": "Tuyến {name}",

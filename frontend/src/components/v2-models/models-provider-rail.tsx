@@ -15,7 +15,12 @@ export interface RailItem {
  * selected row takes the raised plate the app sidebar uses; a thin meter under the name
  * shows at a glance how much of each provider is switched on.
  */
-export function ModelsProviderRail({ items, all, selected, onSelect }: {
+export function ModelsProviderRail({
+  items,
+  all,
+  selected,
+  onSelect,
+}: {
   items: RailItem[];
   all: { active: number; total: number };
   selected: string | null;
@@ -30,19 +35,37 @@ export function ModelsProviderRail({ items, all, selected, onSelect }: {
         <span className="models-workspace-rail-count">{items.length}</span>
       </div>
       <div className="models-workspace-rail-list">
-        <RailRow label={t("models.workspace.allProviders")} meta={t("models.active", all)} ratio={all.total ? all.active / all.total : 0}
-          current={selected === null} onClick={() => onSelect(null)} />
-        {items.map(item => (
-          <RailRow key={item.provider} provider={item.provider} label={formatProviderDisplayName(item.provider, t)}
-            meta={t("models.active", { active: item.active, total: item.total })} ratio={item.total ? item.active / item.total : 0}
-            current={selected === item.provider} onClick={() => onSelect(item.provider)} />
+        <RailRow
+          label={t("models.workspace.allProviders")}
+          meta={t("models.active", all)}
+          ratio={all.total ? all.active / all.total : 0}
+          current={selected === null}
+          onClick={() => onSelect(null)}
+        />
+        {items.map((item) => (
+          <RailRow
+            key={item.provider}
+            provider={item.provider}
+            label={formatProviderDisplayName(item.provider, t)}
+            meta={t("models.active", { active: item.active, total: item.total })}
+            ratio={item.total ? item.active / item.total : 0}
+            current={selected === item.provider}
+            onClick={() => onSelect(item.provider)}
+          />
         ))}
       </div>
     </aside>
   );
 }
 
-function RailRow({ provider, label, meta, ratio, current, onClick }: {
+function RailRow({
+  provider,
+  label,
+  meta,
+  ratio,
+  current,
+  onClick,
+}: {
   provider?: string;
   label: string;
   meta: string;
@@ -57,7 +80,11 @@ function RailRow({ provider, label, meta, ratio, current, onClick }: {
       onClick={onClick}
       aria-current={current ? "true" : undefined}
     >
-      {provider ? <ProviderMark name={provider} /> : <span aria-hidden="true" className="models-rail-all-mark" />}
+      {provider ? (
+        <ProviderMark name={provider} />
+      ) : (
+        <span aria-hidden="true" className="models-rail-all-mark" />
+      )}
       <span className="models-workspace-rail-name">{label}</span>
       <span className="models-workspace-rail-meta">{meta}</span>
       <span aria-hidden="true" className="models-rail-meter">

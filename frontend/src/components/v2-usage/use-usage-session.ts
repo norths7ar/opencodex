@@ -7,6 +7,8 @@ function subscribe(listener: () => void) {
 }
 
 export function useUsageSession() {
-  useEffect(() => { purgeLegacyUsageCache(); }, []);
+  useEffect(() => {
+    purgeLegacyUsageCache();
+  }, []);
   return useSyncExternalStore(subscribe, usageSessionSnapshot, usageSessionSnapshot);
 }

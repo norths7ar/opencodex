@@ -27,21 +27,21 @@ const QUOTA_WINDOW_SET = new Set<string>(ACCOUNT_POOL_QUOTA_WINDOWS);
 
 export function normalizeAccountPoolStrategy(value: unknown): AccountPoolStrategy {
   return typeof value === "string" && STRATEGY_SET.has(value)
-    ? value as AccountPoolStrategy
+    ? (value as AccountPoolStrategy)
     : DEFAULT_ACCOUNT_POOL_STRATEGY;
 }
 
 export function normalizeAccountPoolQuotaWindow(value: unknown): AccountPoolQuotaWindow {
   return typeof value === "string" && QUOTA_WINDOW_SET.has(value)
-    ? value as AccountPoolQuotaWindow
+    ? (value as AccountPoolQuotaWindow)
     : DEFAULT_ACCOUNT_POOL_QUOTA_WINDOW;
 }
 
 export function normalizeAccountPoolStickyLimit(value: unknown): number {
-  return typeof value === "number"
-    && Number.isInteger(value)
-    && value >= MIN_ACCOUNT_POOL_STICKY_LIMIT
-    && value <= MAX_ACCOUNT_POOL_STICKY_LIMIT
+  return typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= MIN_ACCOUNT_POOL_STICKY_LIMIT &&
+    value <= MAX_ACCOUNT_POOL_STICKY_LIMIT
     ? value
     : DEFAULT_ACCOUNT_POOL_STICKY_LIMIT;
 }

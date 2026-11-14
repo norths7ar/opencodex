@@ -1,5 +1,9 @@
 import { readJsonIfOk } from "../../fetch-json";
-import { parseAsideProfileStatus, parseAsideProfileOutcomes, type AsideProfileOutcome } from "./aside-profile-contract";
+import {
+  parseAsideProfileStatus,
+  parseAsideProfileOutcomes,
+  type AsideProfileOutcome,
+} from "./aside-profile-contract";
 
 export const FILE_INTEGRATION_CLIENTS = [
   "qoder",
@@ -68,7 +72,8 @@ export interface RaycastInstall {
  * Why a client's provider store is not written. `missing-store` is the one with a
  * remedy the operator performs: create the store with `missingStoreDocument`.
  */
-export type IntegrationSupersededReason = "owned-config-file" | "unestablished-schema" | "missing-store";
+export type IntegrationSupersededReason =
+  "owned-config-file" | "unestablished-schema" | "missing-store";
 
 export interface IntegrationStatus {
   clientId: FileIntegrationClientId;
@@ -118,10 +123,14 @@ export interface DroidReasoningStatus {
 
 /** A candidate issue can block adding Kilo while removal still targets its recorded file. */
 export function canDisableKiloWithCandidateIssue(status: IntegrationStatus): boolean {
-  return status.clientId === "kilo" && !!status.lastOpId
-    && (status.reason === "candidate-conflict"
-      || (status.state === "unsafe" && !!status.candidateFailurePath
-        && status.candidateFailurePath !== status.configPath));
+  return (
+    status.clientId === "kilo" &&
+    !!status.lastOpId &&
+    (status.reason === "candidate-conflict" ||
+      (status.state === "unsafe" &&
+        !!status.candidateFailurePath &&
+        status.candidateFailurePath !== status.configPath))
+  );
 }
 
 export interface IntegrationStateListEnvelope {
@@ -159,13 +168,16 @@ export interface IntegrationMutationResult {
   profileId?: number;
 }
 
-export type IntegrationToggleResult = IntegrationMutationResult & { results?: AsideProfileOutcome[] };
+export type IntegrationToggleResult = IntegrationMutationResult & {
+  results?: AsideProfileOutcome[];
+};
 export type IntegrationRestoreResult = IntegrationMutationResult;
 /** Kept as the shared name consumed by the page surfaces. */
 export type IntegrationMutationEnvelope = IntegrationMutationResult;
 
 export type IntegrationPlanOperation = "apply" | "overwrite" | "disable" | "restore";
-export type IntegrationPlanChangeKind = "add" | "replace" | "remove" | "snapshot" | "ownership" | "journal";
+export type IntegrationPlanChangeKind =
+  "add" | "replace" | "remove" | "snapshot" | "ownership" | "journal";
 export type IntegrationPlanForeignEdit = "none" | "unowned" | "foreign-edit" | "drift";
 
 export interface IntegrationPlanChange {
@@ -275,11 +287,46 @@ const INTEGRATION_STATES: ReadonlySet<string> = new Set<IntegrationState>([
   "conflict",
   "unsafe",
 ]);
-const PLAN_OPERATIONS: readonly IntegrationPlanOperation[] = ["apply", "overwrite", "disable", "restore"];
-const PLAN_CHANGE_KINDS: readonly IntegrationPlanChangeKind[] = ["add", "replace", "remove", "snapshot", "ownership", "journal"];
-const PLAN_FOREIGN_EDITS: readonly IntegrationPlanForeignEdit[] = ["none", "unowned", "foreign-edit", "drift"];
-const PLAN_KEYS = new Set(["version", "clientId", "operation", "state", "foreignEdit", "changes", "fingerprint", "canApply", "willChange", "refusalReason", "supersededReason", "missingStoreDocument", "profileId"]);
-const SUPERSEDED_REASONS: ReadonlySet<string> = new Set<IntegrationSupersededReason>(["owned-config-file", "unestablished-schema", "missing-store"]);
+const PLAN_OPERATIONS: readonly IntegrationPlanOperation[] = [
+  "apply",
+  "overwrite",
+  "disable",
+  "restore",
+];
+const PLAN_CHANGE_KINDS: readonly IntegrationPlanChangeKind[] = [
+  "add",
+  "replace",
+  "remove",
+  "snapshot",
+  "ownership",
+  "journal",
+];
+const PLAN_FOREIGN_EDITS: readonly IntegrationPlanForeignEdit[] = [
+  "none",
+  "unowned",
+  "foreign-edit",
+  "drift",
+];
+const PLAN_KEYS = new Set([
+  "version",
+  "clientId",
+  "operation",
+  "state",
+  "foreignEdit",
+  "changes",
+  "fingerprint",
+  "canApply",
+  "willChange",
+  "refusalReason",
+  "supersededReason",
+  "missingStoreDocument",
+  "profileId",
+]);
+const SUPERSEDED_REASONS: ReadonlySet<string> = new Set<IntegrationSupersededReason>([
+  "owned-config-file",
+  "unestablished-schema",
+  "missing-store",
+]);
 /** Shown verbatim (and echoed by the CLI): one short printable-ASCII line, as a store's empty form is. */
 const MISSING_STORE_DOCUMENT = /^[\x20-\x7e]{1,64}$/;
 const PLAN_CHANGE_KEYS = new Set(["kind", "path"]);
@@ -312,7 +359,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function hasOnlyKeys(value: Record<string, unknown>, allowed: ReadonlySet<string>): boolean {
-  return Object.keys(value).every(key => allowed.has(key));
+  return Object.keys(value).every((key) => allowed.has(key));
 }
 
 function isSafePlanPath(path: string): boolean {
@@ -324,30 +371,41 @@ function invalidPreviewResponse(): IntegrationApiError {
 }
 
 export function parseIntegrationMutationPlan(value: unknown): IntegrationMutationPlan {
-  if (!isRecord(value) || !hasOnlyKeys(value, PLAN_KEYS)
-    || value.version !== 1
-    || !FILE_INTEGRATION_CLIENTS.includes(value.clientId as FileIntegrationClientId)
-    || !PLAN_OPERATIONS.includes(value.operation as IntegrationPlanOperation)
-    || !INTEGRATION_STATES.has(String(value.state))
-    || !PLAN_FOREIGN_EDITS.includes(value.foreignEdit as IntegrationPlanForeignEdit)
+  if (
+    !isRecord(value) ||
+    !hasOnlyKeys(value, PLAN_KEYS) ||
+    value.version !== 1 ||
+    !FILE_INTEGRATION_CLIENTS.includes(value.clientId as FileIntegrationClientId) ||
+    !PLAN_OPERATIONS.includes(value.operation as IntegrationPlanOperation) ||
+    !INTEGRATION_STATES.has(String(value.state)) ||
+    !PLAN_FOREIGN_EDITS.includes(value.foreignEdit as IntegrationPlanForeignEdit) ||
     /*
      * The version is matched as a version, not as `p1`. The server calls this
      * token opaque and bumps its prefix whenever the inputs it binds change; a
      * literal here made that bump a silent client-side rejection of every
      * preview, which is a worse failure than the drift it was meant to catch.
      */
-    || typeof value.fingerprint !== "string" || !/^p[0-9]+:(?:[0-9a-f]{32}|unbound)$/.test(value.fingerprint)
-    || typeof value.canApply !== "boolean" || typeof value.willChange !== "boolean"
-    || !Array.isArray(value.changes) || value.changes.length > PLAN_CHANGE_LIMIT
-    || (value.profileId !== undefined && (typeof value.profileId !== "number" || !Number.isSafeInteger(value.profileId) || value.profileId < 0))
-    || (value.profileId !== undefined && value.clientId !== "aside")
-    || (value.refusalReason !== undefined && !REFUSAL_REASONS.has(String(value.refusalReason)))
-    || (value.supersededReason !== undefined
-      && (value.refusalReason !== "superseded_store" || typeof value.supersededReason !== "string"
-        || !SUPERSEDED_REASONS.has(value.supersededReason)))
-    || (value.missingStoreDocument !== undefined
-      && (value.supersededReason !== "missing-store" || typeof value.missingStoreDocument !== "string"
-        || !MISSING_STORE_DOCUMENT.test(value.missingStoreDocument)))) {
+    typeof value.fingerprint !== "string" ||
+    !/^p[0-9]+:(?:[0-9a-f]{32}|unbound)$/.test(value.fingerprint) ||
+    typeof value.canApply !== "boolean" ||
+    typeof value.willChange !== "boolean" ||
+    !Array.isArray(value.changes) ||
+    value.changes.length > PLAN_CHANGE_LIMIT ||
+    (value.profileId !== undefined &&
+      (typeof value.profileId !== "number" ||
+        !Number.isSafeInteger(value.profileId) ||
+        value.profileId < 0)) ||
+    (value.profileId !== undefined && value.clientId !== "aside") ||
+    (value.refusalReason !== undefined && !REFUSAL_REASONS.has(String(value.refusalReason))) ||
+    (value.supersededReason !== undefined &&
+      (value.refusalReason !== "superseded_store" ||
+        typeof value.supersededReason !== "string" ||
+        !SUPERSEDED_REASONS.has(value.supersededReason))) ||
+    (value.missingStoreDocument !== undefined &&
+      (value.supersededReason !== "missing-store" ||
+        typeof value.missingStoreDocument !== "string" ||
+        !MISSING_STORE_DOCUMENT.test(value.missingStoreDocument)))
+  ) {
     throw invalidPreviewResponse();
   }
   const changes: IntegrationPlanChange[] = [];
@@ -355,11 +413,17 @@ export function parseIntegrationMutationPlan(value: unknown): IntegrationMutatio
   let previousPath = "";
   const seenByKind = new Map<IntegrationPlanChangeKind, Set<string>>();
   for (const item of value.changes) {
-    if (!isRecord(item) || !hasOnlyKeys(item, PLAN_CHANGE_KEYS)
-      || !PLAN_CHANGE_KINDS.includes(item.kind as IntegrationPlanChangeKind)
-      || typeof item.path !== "string" || !isSafePlanPath(item.path)) throw invalidPreviewResponse();
+    if (
+      !isRecord(item) ||
+      !hasOnlyKeys(item, PLAN_CHANGE_KEYS) ||
+      !PLAN_CHANGE_KINDS.includes(item.kind as IntegrationPlanChangeKind) ||
+      typeof item.path !== "string" ||
+      !isSafePlanPath(item.path)
+    )
+      throw invalidPreviewResponse();
     const order = PLAN_CHANGE_KINDS.indexOf(item.kind as IntegrationPlanChangeKind);
-    if (order < previousOrder || (order === previousOrder && item.path <= previousPath)) throw invalidPreviewResponse();
+    if (order < previousOrder || (order === previousOrder && item.path <= previousPath))
+      throw invalidPreviewResponse();
     const kind = item.kind as IntegrationPlanChangeKind;
     const paths = seenByKind.get(kind) ?? new Set<string>();
     if (paths.has(item.path)) throw invalidPreviewResponse();
@@ -369,10 +433,13 @@ export function parseIntegrationMutationPlan(value: unknown): IntegrationMutatio
     previousPath = item.path;
     changes.push({ kind, path: item.path });
   }
-  if ((value.willChange && (!value.canApply || changes.length === 0))
-    || (!value.willChange && changes.length !== 0)
-    || ((value.fingerprint as string).endsWith(":unbound") && value.canApply)
-    || (value.canApply === (value.refusalReason !== undefined))) throw invalidPreviewResponse();
+  if (
+    (value.willChange && (!value.canApply || changes.length === 0)) ||
+    (!value.willChange && changes.length !== 0) ||
+    ((value.fingerprint as string).endsWith(":unbound") && value.canApply) ||
+    value.canApply === (value.refusalReason !== undefined)
+  )
+    throw invalidPreviewResponse();
   return {
     version: 1,
     clientId: value.clientId as FileIntegrationClientId,
@@ -383,9 +450,15 @@ export function parseIntegrationMutationPlan(value: unknown): IntegrationMutatio
     fingerprint: value.fingerprint,
     canApply: value.canApply,
     willChange: value.willChange,
-    ...(value.refusalReason === undefined ? {} : { refusalReason: value.refusalReason as IntegrationRefusalReason }),
-    ...(value.supersededReason === undefined ? {} : { supersededReason: value.supersededReason as IntegrationSupersededReason }),
-    ...(value.missingStoreDocument === undefined ? {} : { missingStoreDocument: value.missingStoreDocument as string }),
+    ...(value.refusalReason === undefined
+      ? {}
+      : { refusalReason: value.refusalReason as IntegrationRefusalReason }),
+    ...(value.supersededReason === undefined
+      ? {}
+      : { supersededReason: value.supersededReason as IntegrationSupersededReason }),
+    ...(value.missingStoreDocument === undefined
+      ? {}
+      : { missingStoreDocument: value.missingStoreDocument as string }),
     ...(value.profileId === undefined ? {} : { profileId: Number(value.profileId) }),
   };
 }
@@ -393,11 +466,13 @@ export function parseIntegrationMutationPlan(value: unknown): IntegrationMutatio
 /** Writer refusals are identified by their canonical reason, never by state. */
 export function isIntegrationRefusalEnvelope(body: unknown): body is IntegrationRefusalEnvelope {
   if (!isRecord(body) || !REFUSAL_REASONS.has(String(body.reason))) return false;
-  return typeof body.error === "string"
-    && REFUSAL_CODES.has(String(body.code))
-    && FILE_INTEGRATION_CLIENTS.includes(body.clientId as FileIntegrationClientId)
-    && INTEGRATION_STATES.has(String(body.state))
-    && typeof body.message === "string";
+  return (
+    typeof body.error === "string" &&
+    REFUSAL_CODES.has(String(body.code)) &&
+    FILE_INTEGRATION_CLIENTS.includes(body.clientId as FileIntegrationClientId) &&
+    INTEGRATION_STATES.has(String(body.state)) &&
+    typeof body.message === "string"
+  );
 }
 
 export class IntegrationApiError extends Error {
@@ -416,21 +491,24 @@ export class IntegrationApiError extends Error {
     this.status = status;
     this.body = body;
     this.refusal = refusal;
-    this.stalePlan = body.code === "integration_preview_stale" && "plan" in body && body.plan ? body.plan : null;
+    this.stalePlan =
+      body.code === "integration_preview_stale" && "plan" in body && body.plan ? body.plan : null;
   }
 }
 
 /** A concurrent tab already completed the requested journal deletion. */
 export function isMissingJournalEntry(error: unknown): boolean {
-  return error instanceof IntegrationApiError
-    && error.status === 404
-    && error.body.code === "integration_operation_not_found";
+  return (
+    error instanceof IntegrationApiError &&
+    error.status === 404 &&
+    error.body.code === "integration_operation_not_found"
+  );
 }
 
 async function readErrorBody(response: Response): Promise<IntegrationErrorEnvelope> {
   let body: unknown;
   try {
-    body = await response.json() as unknown;
+    body = (await response.json()) as unknown;
   } catch {
     return {};
   }
@@ -455,7 +533,9 @@ async function readResponse<T>(response: Response): Promise<T> {
 export { readResponse as readIntegrationResponse };
 
 export function isIntegrationPreviewUnavailable(error: unknown): boolean {
-  return error instanceof IntegrationApiError && error.body.code === "integration_preview_unavailable";
+  return (
+    error instanceof IntegrationApiError && error.body.code === "integration_preview_unavailable"
+  );
 }
 
 export function bindingFor(plan: IntegrationMutationPlan): IntegrationPlanBinding {
@@ -463,7 +543,8 @@ export function bindingFor(plan: IntegrationMutationPlan): IntegrationPlanBindin
 }
 
 function profilePath(profileId: number): string {
-  if (!Number.isSafeInteger(profileId) || profileId < 0) throw new IntegrationApiError(400, { code: "invalid_aside_profile" });
+  if (!Number.isSafeInteger(profileId) || profileId < 0)
+    throw new IntegrationApiError(400, { code: "invalid_aside_profile" });
   return `/api/client-integrations/aside/profiles/${profileId}`;
 }
 
@@ -472,7 +553,9 @@ function clientPath(client: FileIntegrationClientId, profileId?: number): string
     if (client !== "aside") throw new IntegrationApiError(400, { code: "invalid_aside_profile" });
     return profilePath(profileId);
   }
-  return client === "aside" ? "/api/client-integrations/aside/profiles" : `/api/client-integrations/${encodeURIComponent(client)}`;
+  return client === "aside"
+    ? "/api/client-integrations/aside/profiles"
+    : `/api/client-integrations/${encodeURIComponent(client)}`;
 }
 
 /**
@@ -507,12 +590,20 @@ export async function loadIntegrationState(
   hermesProfile?: string,
 ) {
   const result = await readResponse<IntegrationStatus>(
-    await fetch(`${apiBase}${withQuery(clientPath(client, profileId), hermesScope(hermesProfile, false))}`, { signal }),
+    await fetch(
+      `${apiBase}${withQuery(clientPath(client, profileId), hermesScope(hermesProfile, false))}`,
+      { signal },
+    ),
   );
-  if (hermesProfile !== undefined && (client !== "hermes" || result.hermesProfile !== hermesProfile)) throw invalidHermesResponse();
+  if (
+    hermesProfile !== undefined &&
+    (client !== "hermes" || result.hermesProfile !== hermesProfile)
+  )
+    throw invalidHermesResponse();
   if (profileId !== undefined) {
     const parsed = parseAsideProfileStatus(result);
-    if (!parsed || parsed.profileId !== profileId) throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
+    if (!parsed || parsed.profileId !== profileId)
+      throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
     return parsed;
   }
   return result;
@@ -525,15 +616,26 @@ export async function loadIntegrationJournal(
   profileId?: number,
   hermesProfile?: string,
 ) {
-  if (profileId !== undefined && client !== "aside") throw new IntegrationApiError(400, { code: "invalid_aside_profile" });
-  if (hermesProfile !== undefined && client !== "hermes") throw new IntegrationApiError(400, { code: "invalid_hermes_profile" });
-  const path = client === "aside" ? `${clientPath(client, profileId)}/journal`
-    : withQuery(`/api/client-integrations/journal${client ? `?client=${encodeURIComponent(client)}` : ""}`, hermesScope(hermesProfile, false));
+  if (profileId !== undefined && client !== "aside")
+    throw new IntegrationApiError(400, { code: "invalid_aside_profile" });
+  if (hermesProfile !== undefined && client !== "hermes")
+    throw new IntegrationApiError(400, { code: "invalid_hermes_profile" });
+  const path =
+    client === "aside"
+      ? `${clientPath(client, profileId)}/journal`
+      : withQuery(
+          `/api/client-integrations/journal${client ? `?client=${encodeURIComponent(client)}` : ""}`,
+          hermesScope(hermesProfile, false),
+        );
   const result = await readResponse<IntegrationJournalEnvelope>(
     await fetch(`${apiBase}${path}`, { signal }),
   );
-  if (profileId !== undefined && (!Array.isArray(result.operations)
-    || result.operations.some(row => row.clientId !== "aside" || row.profileId !== profileId))) throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
+  if (
+    profileId !== undefined &&
+    (!Array.isArray(result.operations) ||
+      result.operations.some((row) => row.clientId !== "aside" || row.profileId !== profileId))
+  )
+    throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
   return result;
 }
 
@@ -546,18 +648,29 @@ export async function previewIntegrationMutation(
   droidReasoningDefaults?: Record<string, string>,
   hermesProfile?: string,
 ) {
-  const path = profileId === undefined
-    ? withQuery("/api/client-integrations/preview", hermesScope(hermesProfile, true))
-    : `${profilePath(profileId)}/preview`;
+  const path =
+    profileId === undefined
+      ? withQuery("/api/client-integrations/preview", hermesScope(hermesProfile, true))
+      : `${profilePath(profileId)}/preview`;
   const requestBody = {
     ...(profileId === undefined ? { clientId: client } : {}),
     operation,
-    ...(client === "droid" && droidReasoningDefaults !== undefined ? { droidReasoningDefaults } : {}),
+    ...(client === "droid" && droidReasoningDefaults !== undefined
+      ? { droidReasoningDefaults }
+      : {}),
   };
-  const plan = parseIntegrationMutationPlan(await readResponse<unknown>(await fetch(`${apiBase}${path}`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody), signal,
-  })));
-  if (plan.clientId !== client || plan.operation !== operation || plan.profileId !== profileId) throw invalidPreviewResponse();
+  const plan = parseIntegrationMutationPlan(
+    await readResponse<unknown>(
+      await fetch(`${apiBase}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+        signal,
+      }),
+    ),
+  );
+  if (plan.clientId !== client || plan.operation !== operation || plan.profileId !== profileId)
+    throw invalidPreviewResponse();
   return plan;
 }
 
@@ -569,68 +682,126 @@ export async function previewIntegrationRestore(
   profileId?: number,
   hermesProfile?: string,
 ) {
-  const path = profileId === undefined
-    ? withQuery("/api/client-integrations/restore/preview", hermesScope(hermesProfile, true))
-    : `${profilePath(profileId)}/preview`;
-  const body = profileId === undefined ? { opId, confirmDrift } : { operation: "restore", opId, confirmDrift };
-  const plan = parseIntegrationMutationPlan(await readResponse<unknown>(await fetch(`${apiBase}${path}`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal,
-  })));
+  const path =
+    profileId === undefined
+      ? withQuery("/api/client-integrations/restore/preview", hermesScope(hermesProfile, true))
+      : `${profilePath(profileId)}/preview`;
+  const body =
+    profileId === undefined ? { opId, confirmDrift } : { operation: "restore", opId, confirmDrift };
+  const plan = parseIntegrationMutationPlan(
+    await readResponse<unknown>(
+      await fetch(`${apiBase}${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal,
+      }),
+    ),
+  );
   if (plan.operation !== "restore" || plan.profileId !== profileId) throw invalidPreviewResponse();
   return plan;
 }
 
-export async function toggleIntegration(apiBase: string, client: FileIntegrationClientId, options: ToggleIntegrationOptions) {
-  const { enabled, signal, overwriteConflict, profileId, binding, droidReasoningDefaults, hermesProfile } = options;
-  if (hermesProfile !== undefined && client !== "hermes") throw new IntegrationApiError(400, { code: "invalid_hermes_profile" });
-  const expectedOperation: IntegrationPlanOperation = enabled ? (overwriteConflict ? "overwrite" : "apply") : "disable";
+export async function toggleIntegration(
+  apiBase: string,
+  client: FileIntegrationClientId,
+  options: ToggleIntegrationOptions,
+) {
+  const {
+    enabled,
+    signal,
+    overwriteConflict,
+    profileId,
+    binding,
+    droidReasoningDefaults,
+    hermesProfile,
+  } = options;
+  if (hermesProfile !== undefined && client !== "hermes")
+    throw new IntegrationApiError(400, { code: "invalid_hermes_profile" });
+  const expectedOperation: IntegrationPlanOperation = enabled
+    ? overwriteConflict
+      ? "overwrite"
+      : "apply"
+    : "disable";
   let result: IntegrationToggleResult | { ok: false; message?: string; results?: unknown };
   try {
-    result = await readResponse<IntegrationToggleResult | { ok: false; message?: string; results?: unknown }>(await fetch(`${apiBase}${withQuery(clientPath(client, profileId), hermesScope(hermesProfile, false))}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ enabled, ...(overwriteConflict === true ? { overwriteConflict: true } : {}), ...binding,
-        ...(client === "droid" && droidReasoningDefaults !== undefined ? { droidReasoningDefaults } : {}) }),
-      signal,
-    }));
+    result = await readResponse<
+      IntegrationToggleResult | { ok: false; message?: string; results?: unknown }
+    >(
+      await fetch(
+        `${apiBase}${withQuery(clientPath(client, profileId), hermesScope(hermesProfile, false))}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            enabled,
+            ...(overwriteConflict === true ? { overwriteConflict: true } : {}),
+            ...binding,
+            ...(client === "droid" && droidReasoningDefaults !== undefined
+              ? { droidReasoningDefaults }
+              : {}),
+          }),
+          signal,
+        },
+      ),
+    );
   } catch (error) {
-    if (error instanceof IntegrationApiError && error.stalePlan
-      && (error.stalePlan.clientId !== client || error.stalePlan.operation !== expectedOperation
-        || error.stalePlan.profileId !== profileId)) throw invalidPreviewResponse();
+    if (
+      error instanceof IntegrationApiError &&
+      error.stalePlan &&
+      (error.stalePlan.clientId !== client ||
+        error.stalePlan.operation !== expectedOperation ||
+        error.stalePlan.profileId !== profileId)
+    )
+      throw invalidPreviewResponse();
     throw error;
   }
-  const outcomes = result.results === undefined ? undefined : parseAsideProfileOutcomes(result.results);
-  if (client === "aside" && result.results !== undefined && (!outcomes
-    || result.ok !== outcomes.every(row => row.ok))) {
+  const outcomes =
+    result.results === undefined ? undefined : parseAsideProfileOutcomes(result.results);
+  if (
+    client === "aside" &&
+    result.results !== undefined &&
+    (!outcomes || result.ok !== outcomes.every((row) => row.ok))
+  ) {
     throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
   }
-  if (result.ok !== true) throw new IntegrationApiError(207, {
-    code: client === "aside" ? "aside_profile_partial" : "integration_mutation_failed", message: result.message,
-    results: outcomes ?? undefined,
-  });
-  if (profileId !== undefined && result.profileId !== profileId) throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
+  if (result.ok !== true)
+    throw new IntegrationApiError(207, {
+      code: client === "aside" ? "aside_profile_partial" : "integration_mutation_failed",
+      message: result.message,
+      results: outcomes ?? undefined,
+    });
+  if (profileId !== undefined && result.profileId !== profileId)
+    throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
   return { ...result, ...(outcomes ? { results: outcomes } : {}) };
 }
 
-export async function restoreIntegration(
-  apiBase: string,
-  options: RestoreIntegrationOptions,
-) {
+export async function restoreIntegration(apiBase: string, options: RestoreIntegrationOptions) {
   const { opId, confirmDrift = false, signal, profileId, binding, hermesProfile } = options;
   let result: IntegrationRestoreResult;
   try {
-    result = await readResponse<IntegrationRestoreResult>(await fetch(`${apiBase}${profileId === undefined ? withQuery("/api/client-integrations/restore", hermesScope(hermesProfile, true)) : `${profilePath(profileId)}/restore`}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ opId, confirmDrift, ...binding }),
-      signal,
-    }));
+    result = await readResponse<IntegrationRestoreResult>(
+      await fetch(
+        `${apiBase}${profileId === undefined ? withQuery("/api/client-integrations/restore", hermesScope(hermesProfile, true)) : `${profilePath(profileId)}/restore`}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ opId, confirmDrift, ...binding }),
+          signal,
+        },
+      ),
+    );
   } catch (error) {
-    if (error instanceof IntegrationApiError && error.stalePlan
-      && (error.stalePlan.operation !== "restore" || error.stalePlan.profileId !== profileId)) throw invalidPreviewResponse();
+    if (
+      error instanceof IntegrationApiError &&
+      error.stalePlan &&
+      (error.stalePlan.operation !== "restore" || error.stalePlan.profileId !== profileId)
+    )
+      throw invalidPreviewResponse();
     throw error;
   }
-  if (profileId !== undefined && result.profileId !== profileId) throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
+  if (profileId !== undefined && result.profileId !== profileId)
+    throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
   return result;
 }
 
@@ -655,12 +826,16 @@ export async function deleteJournalEntry(
     snapshotRemoved: boolean;
     profileId?: number;
   }>(
-    await fetch(`${apiBase}${withQuery(profileId === undefined ? "/api/client-integrations/journal" : `${profilePath(profileId)}/journal`, hermesScope(hermesProfile, true))}${hermesProfile === undefined ? "?" : "&"}opId=${encodeURIComponent(opId)}`, {
-      method: "DELETE",
-      signal,
-    }),
+    await fetch(
+      `${apiBase}${withQuery(profileId === undefined ? "/api/client-integrations/journal" : `${profilePath(profileId)}/journal`, hermesScope(hermesProfile, true))}${hermesProfile === undefined ? "?" : "&"}opId=${encodeURIComponent(opId)}`,
+      {
+        method: "DELETE",
+        signal,
+      },
+    ),
   );
-  if (profileId !== undefined && result.profileId !== profileId) throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
+  if (profileId !== undefined && result.profileId !== profileId)
+    throw new IntegrationApiError(502, { code: "invalid_aside_profile_response" });
   return result;
 }
 
@@ -682,7 +857,7 @@ async function readOptional<T>(request: Promise<Response>): Promise<T | null> {
   try {
     const response = await request;
     if (!response.ok) return null;
-    return await readJsonIfOk<T>(response) ?? null;
+    return (await readJsonIfOk<T>(response)) ?? null;
   } catch {
     return null;
   }
@@ -701,7 +876,8 @@ export async function loadCodexRoutingStatus(apiBase: string, signal?: AbortSign
   return {
     routingInjected: body.routingInjected === true,
     status: typeof body.status === "string" ? body.status : undefined,
-    recommendedCommand: typeof body.recommendedCommand === "string" ? body.recommendedCommand : null,
+    recommendedCommand:
+      typeof body.recommendedCommand === "string" ? body.recommendedCommand : null,
   };
 }
 
@@ -751,7 +927,13 @@ export async function loadClaudeDesktopStatus(apiBase: string, signal?: AbortSig
     installed?: unknown;
     observedKind?: unknown;
   }>(fetch(`${apiBase}/api/claude-desktop/status`, { signal }));
-  if (!body || typeof body.desiredEnabled !== "boolean" || typeof body.installed !== "boolean" || typeof body.observedKind !== "string") return null;
+  if (
+    !body ||
+    typeof body.desiredEnabled !== "boolean" ||
+    typeof body.installed !== "boolean" ||
+    typeof body.observedKind !== "string"
+  )
+    return null;
   return {
     desiredEnabled: body.desiredEnabled,
     installed: body.installed,

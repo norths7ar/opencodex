@@ -42,13 +42,16 @@ export default function SubagentSurfaceWarningModal({
     if (dialog && !dialog.open) dialog.showModal();
   }, []);
 
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
-    e.preventDefault();
-    // The dashboard keeps this mounted until its write settles, so Escape or the backdrop
-    // could otherwise close the dialog over a request that then lands anyway.
-    if (busy) return;
-    onDismiss();
-  }, [busy, onDismiss]);
+  const handleCancel = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      // The dashboard keeps this mounted until its write settles, so Escape or the backdrop
+      // could otherwise close the dialog over a request that then lands anyway.
+      if (busy) return;
+      onDismiss();
+    },
+    [busy, onDismiss],
+  );
 
   const label = subagentSurfaceLabel(mode);
   const advisory = reason === "advisory";
@@ -62,17 +65,37 @@ export default function SubagentSurfaceWarningModal({
       data-subagent-surface-reason={reason}
       onCancel={handleCancel}
     >
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} disabled={busy} onClick={() => { if (!busy) onDismiss(); }} />
-      <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 480 }}>
-        <h3 id={titleId}>{t(advisory ? "subagentSurface.advisoryTitle" : "subagentSurface.selectionTitle", { mode: label })}</h3>
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        disabled={busy}
+        onClick={() => {
+          if (!busy) onDismiss();
+        }}
+      />
+      <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 480 }}>
+        <h3 id={titleId}>
+          {t(advisory ? "subagentSurface.advisoryTitle" : "subagentSurface.selectionTitle", {
+            mode: label,
+          })}
+        </h3>
         <div
           id={bodyId}
           className="notice-warn"
           style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "flex-start" }}
         >
-          <IconAlert width={16} height={16} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
+          <IconAlert
+            width={16}
+            height={16}
+            style={{ flexShrink: 0, marginTop: 2 }}
+            aria-hidden="true"
+          />
           <p className="modal-desc" style={{ margin: 0 }}>
-            {t(advisory ? "subagentSurface.advisoryBody" : "subagentSurface.selectionBody", { mode: label })}
+            {t(advisory ? "subagentSurface.advisoryBody" : "subagentSurface.selectionBody", {
+              mode: label,
+            })}
           </p>
         </div>
         <p className="text-label" style={{ marginTop: 12 }}>

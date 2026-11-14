@@ -47,7 +47,9 @@
   that. `--fill` marks the panel that owns a full-height workspace; the height chain
   that feeds it lives with the combos rules in styles.css.
 */
-.models-tab-panel { min-width: 0; }
+.models-tab-panel {
+  min-width: 0;
+}
 
 .models-workspace-root {
   display: grid;
@@ -268,17 +270,39 @@
   border-color: color-mix(in srgb, var(--green) 35%, var(--border));
 }
 
-.shadow-source-toggle .switch { flex: 0 0 auto; }
-.shadow-source-id { font-size: 11.5px; white-space: nowrap; }
-.shadow-source-role { white-space: nowrap; }
-.shadow-source-reason { white-space: normal; line-height: 1.2; }
-.shadow-source-hint { display: block; line-height: 1.4; }
-.models-shadow-sources { grid-column: 1 / -1; margin: 0 0 var(--space-3); }
-.dash-shadow-sources { margin-top: var(--space-2); }
+.shadow-source-toggle .switch {
+  flex: 0 0 auto;
+}
+.shadow-source-id {
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.shadow-source-role {
+  white-space: nowrap;
+}
+.shadow-source-reason {
+  white-space: normal;
+  line-height: 1.2;
+}
+.shadow-source-hint {
+  display: block;
+  line-height: 1.4;
+}
+.models-shadow-sources {
+  grid-column: 1 / -1;
+  margin: 0 0 var(--space-3);
+}
+.dash-shadow-sources {
+  margin-top: var(--space-2);
+}
 
 @media (max-width: 560px) {
-  .shadow-source-toggle-list { gap: var(--space-1); }
-  .shadow-source-toggle { padding-right: 4px; }
+  .shadow-source-toggle-list {
+    gap: var(--space-1);
+  }
+  .shadow-source-toggle {
+    padding-right: 4px;
+  }
 }
 
 .models-v2-detail-row {
@@ -697,33 +721,122 @@
     justify-content: flex-start;
   }
 }
-.models-integration-warning { overflow-wrap: anywhere; }
+.models-integration-warning {
+  overflow-wrap: anywhere;
+}
 
-.picker-order-editor { margin-block: 12px; }
-.picker-order-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.picker-order-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-block: 4px; }
-.picker-order-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.picker-order-actions { display: inline-flex; flex-shrink: 0; gap: 2px; }
-.picker-order-row .cwi-target-grip:disabled { cursor: default; opacity: 0.5; }
+.picker-order-editor {
+  margin-block: 12px;
+}
+.picker-order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.picker-order-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block: 4px;
+}
+.picker-order-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.picker-order-actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+}
+.picker-order-row .cwi-target-grip:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
 
 /*
   Catalog delivery process, folded to one line under the Models subtitle.
   Summary marker follows .startup-recovery-details; focus uses the global :focus-visible rule.
 */
-.models-delivery { margin: -14px 0 18px; max-width: var(--prose-measure); font-size: var(--text-control); color: var(--muted); }
-.models-delivery > summary { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 4px 0; cursor: pointer; list-style: none; }
-.models-delivery > summary::-webkit-details-marker { display: none; }
-.models-delivery > summary::before { content: ""; flex: 0 0 auto; width: 0; height: 0; border-left: 5px solid var(--muted); border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform var(--motion-fast); }
-.models-delivery[open] > summary::before { transform: rotate(90deg); }
-.models-delivery-title { flex: 0 0 auto; color: var(--text); font-weight: var(--weight-semibold); }
-.models-delivery-flow { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.models-delivery-steps { margin: 8px 0 0; padding: 0 0 0 26px; display: flex; flex-direction: column; gap: 10px; line-height: var(--leading-body); }
-.models-delivery-steps > li { padding-left: 2px; }
-.models-delivery-steps > li::marker { color: var(--muted); font-weight: var(--weight-semibold); }
-.models-delivery-steps strong { display: block; color: var(--text); font-weight: var(--weight-semibold); }
-.models-delivery-steps p { margin: 2px 0 0; }
-.models-delivery-hint { margin: 10px 0 0 13px; padding: 8px 12px; border-left: 2px solid var(--border); line-height: var(--leading-body); }
-:lang(ko) .models-delivery { word-break: keep-all; overflow-wrap: anywhere; }
+.models-delivery {
+  margin: -14px 0 18px;
+  max-width: var(--prose-measure);
+  font-size: var(--text-control);
+  color: var(--muted);
+}
+.models-delivery > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.models-delivery > summary::-webkit-details-marker {
+  display: none;
+}
+.models-delivery > summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--muted);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform var(--motion-fast);
+}
+.models-delivery[open] > summary::before {
+  transform: rotate(90deg);
+}
+.models-delivery-title {
+  flex: 0 0 auto;
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+}
+.models-delivery-flow {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.models-delivery-steps {
+  margin: 8px 0 0;
+  padding: 0 0 0 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  line-height: var(--leading-body);
+}
+.models-delivery-steps > li {
+  padding-left: 2px;
+}
+.models-delivery-steps > li::marker {
+  color: var(--muted);
+  font-weight: var(--weight-semibold);
+}
+.models-delivery-steps strong {
+  display: block;
+  color: var(--text);
+  font-weight: var(--weight-semibold);
+}
+.models-delivery-steps p {
+  margin: 2px 0 0;
+}
+.models-delivery-hint {
+  margin: 10px 0 0 13px;
+  padding: 8px 12px;
+  border-left: 2px solid var(--border);
+  line-height: var(--leading-body);
+}
+:lang(ko) .models-delivery {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
 /*
   Model settings panel: every global catalog control, folded into one card above the
@@ -747,7 +860,9 @@
   list-style: none;
   font-size: var(--text-control);
 }
-.models-settings > summary::-webkit-details-marker { display: none; }
+.models-settings > summary::-webkit-details-marker {
+  display: none;
+}
 .models-settings > summary::before {
   content: "";
   flex: 0 0 auto;
@@ -758,8 +873,12 @@
   border-bottom: 4px solid transparent;
   transition: transform var(--motion-fast);
 }
-.models-settings[open] > summary::before { transform: rotate(90deg); }
-.models-settings[open] > summary { border-bottom: 1px solid var(--border); }
+.models-settings[open] > summary::before {
+  transform: rotate(90deg);
+}
+.models-settings[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
 .models-settings-title {
   flex: 0 0 auto;
   color: var(--text);
@@ -797,11 +916,19 @@
   padding: var(--space-4);
   min-width: 0;
 }
-.models-settings-body > .models-control-top-row { margin-bottom: var(--space-3); }
-.models-settings-body .models-cap-row { margin-bottom: var(--space-3); }
+.models-settings-body > .models-control-top-row {
+  margin-bottom: var(--space-3);
+}
+.models-settings-body .models-cap-row {
+  margin-bottom: var(--space-3);
+}
 /* The two cap rows put their controls on the same right edge as the rows above. */
-.models-settings-body .models-cap-row > .muted:first-child { margin-right: auto; }
-.models-settings-body > .models-aliases-card { margin: var(--space-2) 0 0; }
+.models-settings-body .models-cap-row > .muted:first-child {
+  margin-right: auto;
+}
+.models-settings-body > .models-aliases-card {
+  margin: var(--space-2) 0 0;
+}
 
 .models-info-hint {
   display: inline-flex;
@@ -812,5 +939,10 @@
 }
 
 /* List toolbar: collapse/expand, the order hint, and the custom-model count on one row. */
-.models-collapse-controls { align-items: center; flex-wrap: wrap; }
-.models-collapse-controls > .models-custom-summary { margin: 0 0 0 auto; }
+.models-collapse-controls {
+  align-items: center;
+  flex-wrap: wrap;
+}
+.models-collapse-controls > .models-custom-summary {
+  margin: 0 0 0 auto;
+}

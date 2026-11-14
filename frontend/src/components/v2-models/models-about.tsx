@@ -43,14 +43,19 @@ export function ModelsAbout({ text, children }: { text: string; children?: React
         aria-controls={panelId}
         aria-label={t("modelsV2.about")}
         title={t("modelsV2.about")}
-        onClick={() => setOpen(value => !value)}
+        onClick={() => setOpen((value) => !value)}
         className={cn(
           "grid size-8 cursor-pointer place-items-center rounded-[10px] text-fg-muted transition-colors duration-200",
           "hover:bg-surface hover:text-fg aria-expanded:bg-surface aria-expanded:text-fg",
           "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight",
         )}
       >
-        <span aria-hidden="true" className="grid size-[18px] place-items-center rounded-full text-[11px] leading-none font-semibold ring-[1.5px] ring-current">?</span>
+        <span
+          aria-hidden="true"
+          className="grid size-[18px] place-items-center rounded-full text-[11px] leading-none font-semibold ring-[1.5px] ring-current"
+        >
+          ?
+        </span>
       </button>
       <div
         id={panelId}

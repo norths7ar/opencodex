@@ -11,7 +11,10 @@
  */
 import { useEffect, useState } from "react";
 import { upstreamWireForAdapter } from "../../../../backend/src/protocols/contract";
-import type { ProtocolAdapterSource, ProtocolProviderSummaryV1 } from "../../../../backend/src/protocols/dto";
+import type {
+  ProtocolAdapterSource,
+  ProtocolProviderSummaryV1,
+} from "../../../../backend/src/protocols/dto";
 import { useT, type TKey } from "../../i18n/shared";
 import { fetchProtocolProviderSummary } from "../../protocol-api";
 import { protocolHopLabel } from "../protocols/protocol-labels";
@@ -62,13 +65,17 @@ export function ProviderProtocolPanel({
     if (apiBase === undefined) return;
     const controller = new AbortController();
     fetchProtocolProviderSummary(apiBase, providerName, controller.signal)
-      .then(result => {
+      .then((result) => {
         if (controller.signal.aborted) return;
-        setState(result.kind === "summary"
-          ? { key: requestKey, kind: "summary", summary: result.summary }
-          : { key: requestKey, kind: result.kind === "unavailable" ? "hidden" : "error" });
+        setState(
+          result.kind === "summary"
+            ? { key: requestKey, kind: "summary", summary: result.summary }
+            : { key: requestKey, kind: result.kind === "unavailable" ? "hidden" : "error" },
+        );
       })
-      .catch(() => { /* aborted by a newer request or by unmount */ });
+      .catch(() => {
+        /* aborted by a newer request or by unmount */
+      });
     return () => controller.abort();
   }, [apiBase, providerName, requestKey]);
 
@@ -81,27 +88,37 @@ export function ProviderProtocolPanel({
       <h3 id="ppp-title">{t("pws.protocol.title")}</h3>
       <p className="pwi-settings-hint">{t("pws.protocol.note")}</p>
       {current.kind === "error" ? (
-        <p className="muted small" role="status">{t("pws.protocol.loadFailed")}</p>
+        <p className="muted small" role="status">
+          {t("pws.protocol.loadFailed")}
+        </p>
       ) : (
         <>
           <dl className="ppp-kv">
             <div>
               <dt>{t("pws.protocol.adapterLabel")}</dt>
-              <dd><WireText adapter={current.summary.adapter} /></dd>
+              <dd>
+                <WireText adapter={current.summary.adapter} />
+              </dd>
             </div>
             <div>
               <dt>{t("pws.protocol.source")}</dt>
-              <dd data-adapter-source={current.summary.adapterSource}>{t(SOURCE_KEYS[current.summary.adapterSource])}</dd>
+              <dd data-adapter-source={current.summary.adapterSource}>
+                {t(SOURCE_KEYS[current.summary.adapterSource])}
+              </dd>
             </div>
             {current.summary.authMode && (
               <div>
                 <dt>{t("pws.authMode")}</dt>
-                <dd><code>{current.summary.authMode}</code></dd>
+                <dd>
+                  <code>{current.summary.authMode}</code>
+                </dd>
               </div>
             )}
           </dl>
           {pendingAdapter && (
-            <p className="ppp-pending" role="status">{t("pws.protocol.pending", { adapter: pendingAdapter })}</p>
+            <p className="ppp-pending" role="status">
+              {t("pws.protocol.pending", { adapter: pendingAdapter })}
+            </p>
           )}
           <h4>{t("pws.protocol.overrides")}</h4>
           {current.summary.modelOverrides.length === 0 ? (
@@ -116,10 +133,14 @@ export function ProviderProtocolPanel({
                 </tr>
               </thead>
               <tbody>
-                {current.summary.modelOverrides.map(row => (
+                {current.summary.modelOverrides.map((row) => (
                   <tr key={row.model}>
-                    <td><code>{row.model}</code></td>
-                    <td><WireText adapter={row.adapter} /></td>
+                    <td>
+                      <code>{row.model}</code>
+                    </td>
+                    <td>
+                      <WireText adapter={row.adapter} />
+                    </td>
                     <td data-adapter-source={row.source}>{t(SOURCE_KEYS[row.source])}</td>
                   </tr>
                 ))}
@@ -127,7 +148,11 @@ export function ProviderProtocolPanel({
             </table>
           )}
           {current.summary.modelOverridesTruncated && (
-            <p className="muted small">{t("pws.protocol.overridesTruncated", { count: current.summary.modelOverrides.length })}</p>
+            <p className="muted small">
+              {t("pws.protocol.overridesTruncated", {
+                count: current.summary.modelOverrides.length,
+              })}
+            </p>
           )}
         </>
       )}

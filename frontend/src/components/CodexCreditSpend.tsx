@@ -10,7 +10,11 @@ import "../styles/codex-credits.css";
  * display; each account's own switch lives in that card's "more" disclosure. The global switch is
  * derived from the accounts: off when none may spend, mixed when some may, on when all may.
  */
-export function CodexCreditSpendSwitch({ summary, busy, onToggleAll }: {
+export function CodexCreditSpendSwitch({
+  summary,
+  busy,
+  onToggleAll,
+}: {
   summary: CreditSpendSummary;
   busy: boolean;
   /** The requested global state: true allows every account, false clears them all. */
@@ -35,13 +39,22 @@ export function CodexCreditSpendSwitch({ summary, busy, onToggleAll }: {
       >
         <span className="toggle-knob" />
       </button>
-      <span id={hintId} className="sr-only">{t("codexAuth.creditsAfterLimitHint")}</span>
+      <span id={hintId} className="sr-only">
+        {t("codexAuth.creditsAfterLimitHint")}
+      </span>
     </span>
   );
 }
 
 /** One account's switch, rendered inside its card's "more" disclosure. */
-export function AccountCreditsToggle({ accountLabel, enabled, saving, disabled, hint, onChange }: {
+export function AccountCreditsToggle({
+  accountLabel,
+  enabled,
+  saving,
+  disabled,
+  hint,
+  onChange,
+}: {
   accountLabel: string;
   /** Absent on rows from an older server; the default is off. */
   enabled: boolean | undefined;
@@ -69,7 +82,9 @@ export function AccountCreditsToggle({ accountLabel, enabled, saving, disabled, 
       >
         <span className="toggle-knob" />
       </button>
-      <span id={hintId} className="sr-only">{description}</span>
+      <span id={hintId} className="sr-only">
+        {description}
+      </span>
     </div>
   );
 }

@@ -73,9 +73,12 @@ function describeNativeRefusal(
   }
   if (refusal.reason === "not_installed") return t("integrations.native.error.notInstalled");
   if (refusal.reason === "config_busy") return t("integrations.native.error.configBusy");
-  if (refusal.reason === "metadata_unreadable") return t("integrations.native.error.desktopUnsafeMetadata", { path: configPath ?? "" });
+  if (refusal.reason === "metadata_unreadable")
+    return t("integrations.native.error.desktopUnsafeMetadata", { path: configPath ?? "" });
   if (refusal.reason === "cleanup_incomplete") {
-    return t("integrations.native.error.desktopCleanupIncomplete", { paths: (refusal.residualPaths ?? []).join(", ") });
+    return t("integrations.native.error.desktopCleanupIncomplete", {
+      paths: (refusal.residualPaths ?? []).join(", "),
+    });
   }
   return refusal.message || t("integrations.error.generic");
 }
@@ -91,11 +94,17 @@ export function describeRefusal(
 
   const refusal = refusalOf(error);
   if (!refusal) {
-    if (error instanceof IntegrationApiError && "results" in error.body && error.body.results?.length) {
-      const failures = error.body.results.filter(row => !row.ok).map(row => {
-        const detail = describeAsideProfileOutcome(t, row);
-        return `${t("integrations.aside.profile", { id: String(row.profileId) })}: ${detail}`;
-      });
+    if (
+      error instanceof IntegrationApiError &&
+      "results" in error.body &&
+      error.body.results?.length
+    ) {
+      const failures = error.body.results
+        .filter((row) => !row.ok)
+        .map((row) => {
+          const detail = describeAsideProfileOutcome(t, row);
+          return `${t("integrations.aside.profile", { id: String(row.profileId) })}: ${detail}`;
+        });
       return [t("integrations.aside.partial"), ...failures].join("\n");
     }
     const code = error instanceof IntegrationApiError ? String(error.body.code ?? "") : "";
@@ -103,29 +112,41 @@ export function describeRefusal(
     if (known) return t(known);
     return error instanceof Error && error.message
       ? error.message
-      : fallback ?? t("integrations.error.generic");
+      : (fallback ?? t("integrations.error.generic"));
   }
   return describeIntegrationRefusalParts(t, refusal);
 }
 
 export function describeAsideProfileOutcome(t: Translate, row: AsideProfileOutcome): string {
-  return describeIntegrationRefusalParts(t, { clientId: "aside", message: row.message ?? row.reason,
-    reason: row.refusalReason ?? row.reason, snapshotPath: row.snapshotPath, residual: row.residual });
+  return describeIntegrationRefusalParts(t, {
+    clientId: "aside",
+    message: row.message ?? row.reason,
+    reason: row.refusalReason ?? row.reason,
+    snapshotPath: row.snapshotPath,
+    residual: row.residual,
+  });
 }
 
-export function describeIntegrationRefusalParts(t: Translate, refusal: {
-  reason?: string; message?: string; clientId: string; snapshotPath?: string; residual?: boolean;
-}): string {
+export function describeIntegrationRefusalParts(
+  t: Translate,
+  refusal: {
+    reason?: string;
+    message?: string;
+    clientId: string;
+    snapshotPath?: string;
+    residual?: boolean;
+  },
+): string {
   const message = LOCALIZED_REASONS.has(refusal.reason ?? "")
     ? t(reasonKey(refusal.reason), { client: refusal.clientId })
     : refusal.message || t(reasonKey(refusal.reason));
   if (refusal.snapshotPath) {
     // A dead end the user cannot finish by hand is worse than no rollback at
     // all, so the path rides along whenever the server sent one.
-    return t(
-      refusal.residual ? "integrations.error.residual" : "integrations.error.recover",
-      { message, path: refusal.snapshotPath },
-    );
+    return t(refusal.residual ? "integrations.error.residual" : "integrations.error.recover", {
+      message,
+      path: refusal.snapshotPath,
+    });
   }
   if (refusal.residual) return t("integrations.error.residualNoSnapshot", { message });
   return refusal.reason === "conflict" || refusal.reason === "unsafe"

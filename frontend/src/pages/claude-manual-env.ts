@@ -18,7 +18,12 @@ export interface AnthropicPoolOptions {
   available: AnthropicInstanceId[];
   code?: "anthropic_helper_unavailable";
 }
-export interface SidecarOverride { enabled?: boolean; backend?: VisionOverrideBackend; model?: string; anthropicInstance?: AnthropicInstanceId | null }
+export interface SidecarOverride {
+  enabled?: boolean;
+  backend?: VisionOverrideBackend;
+  model?: string;
+  anthropicInstance?: AnthropicInstanceId | null;
+}
 
 export interface ClaudeManualEnvState {
   /**
@@ -68,14 +73,23 @@ function stripOneMillionMarker(value: string): string {
   return value.replace(ONE_M_MARKER, "");
 }
 
-function configuredSlot(state: ClaudeManualEnvState, name: (typeof MODEL_ENV_NAMES)[number]): string {
+function configuredSlot(
+  state: ClaudeManualEnvState,
+  name: (typeof MODEL_ENV_NAMES)[number],
+): string {
   const haiku = state.tierModels?.haiku?.trim() || state.smallFastModel?.trim() || "";
-  const raw = name === "ANTHROPIC_MODEL" ? state.model
-    : name === "ANTHROPIC_DEFAULT_OPUS_MODEL" ? state.tierModels?.opus
-    : name === "ANTHROPIC_DEFAULT_SONNET_MODEL" ? state.tierModels?.sonnet
-    : name === "ANTHROPIC_DEFAULT_HAIKU_MODEL" ? haiku
-    : name === "ANTHROPIC_DEFAULT_FABLE_MODEL" ? state.tierModels?.fable
-    : "";
+  const raw =
+    name === "ANTHROPIC_MODEL"
+      ? state.model
+      : name === "ANTHROPIC_DEFAULT_OPUS_MODEL"
+        ? state.tierModels?.opus
+        : name === "ANTHROPIC_DEFAULT_SONNET_MODEL"
+          ? state.tierModels?.sonnet
+          : name === "ANTHROPIC_DEFAULT_HAIKU_MODEL"
+            ? haiku
+            : name === "ANTHROPIC_DEFAULT_FABLE_MODEL"
+              ? state.tierModels?.fable
+              : "";
   return (raw ?? "").trim();
 }
 
@@ -90,7 +104,10 @@ export function manualModelEnv(state: ClaudeManualEnvState): Record<string, stri
   const accounting = state.contextAccounting ?? "1m";
   const served = state.servedContextAccounting ?? accounting;
   if (accounting !== "200k" || served === "200k") return state.effectiveModelEnv;
-  const slotsKnown = state.model !== undefined || state.smallFastModel !== undefined || state.tierModels !== undefined;
+  const slotsKnown =
+    state.model !== undefined ||
+    state.smallFastModel !== undefined ||
+    state.tierModels !== undefined;
   const out: Record<string, string> = {};
   for (const name of MODEL_ENV_NAMES) {
     const server = state.effectiveModelEnv[name];
@@ -116,11 +133,15 @@ export function buildManualEnv(state: ClaudeManualEnvState): string {
   const served = state.servedContextAccounting ?? accounting;
   // Compact window and model ids come from one accounting snapshot. A 1M draft whose
   // env was built under 200k waits for the next read rather than adding the window alone.
-  const autoCompactActive = accounting !== "200k" && served !== "200k" && state.autoContext && state.maxContextTokens === null;
+  const autoCompactActive =
+    accounting !== "200k" &&
+    served !== "200k" &&
+    state.autoContext &&
+    state.maxContextTokens === null;
   const modelEnv = manualModelEnv(state);
-  const modelEnvExports = MODEL_ENV_NAMES
-    .filter(name => modelEnv[name])
-    .map(name => `export ${name}=${modelEnv[name]}`);
+  const modelEnvExports = MODEL_ENV_NAMES.filter((name) => modelEnv[name]).map(
+    (name) => `export ${name}=${modelEnv[name]}`,
+  );
 
   return [
     `export ANTHROPIC_BASE_URL=${baseUrl}`,
@@ -132,11 +153,17 @@ export function buildManualEnv(state: ClaudeManualEnvState): string {
     // proxy mode, where the same block supplies a host-managed token. The
     // conditional form still preserves an explicit user opt-out (=0).
     ...(marker === "proxy"
-      ? ['[ -z "${CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST+x}" ] && export CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1']
+      ? [
+          '[ -z "${CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST+x}" ] && export CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1',
+        ]
       : []),
     // The copy a user pastes has to match what the runtime injects, or the manual path
     // compacts somewhere else entirely.
-    ...(autoCompactActive ? [`export CLAUDE_CODE_AUTO_COMPACT_WINDOW=${state.autoCompactWindow ?? AUTO_COMPACT_WINDOW_DEFAULT}`] : []),
+    ...(autoCompactActive
+      ? [
+          `export CLAUDE_CODE_AUTO_COMPACT_WINDOW=${state.autoCompactWindow ?? AUTO_COMPACT_WINDOW_DEFAULT}`,
+        ]
+      : []),
     ...modelEnvExports,
     "claude",
   ].join("\n");

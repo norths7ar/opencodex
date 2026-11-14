@@ -35,10 +35,13 @@ export default function OAuthTosWarningModal({
   }, []);
 
   // Native <dialog> fires "cancel" on Escape — forward it to our handler.
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
-    e.preventDefault();
-    onCancel();
-  }, [onCancel]);
+  const handleCancel = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      onCancel();
+    },
+    [onCancel],
+  );
 
   // Unmarked provider: render nothing (callers must gate with oauthTosRisk).
   if (!level) return null;
@@ -60,19 +63,26 @@ export default function OAuthTosWarningModal({
       className="modal-overlay"
       onCancel={handleCancel}
     >
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onCancel} />
-      <div
-        className="modal-card"
-        onClick={e => e.stopPropagation()}
-        style={{ maxWidth: 460 }}
-      >
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onCancel}
+      />
+      <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
         <h3 id={titleId}>{t(copy.title, { provider: providerLabel })}</h3>
         <div
           id={bodyId}
           className="notice-warn"
           style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "flex-start" }}
         >
-          <IconAlert width={16} height={16} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
+          <IconAlert
+            width={16}
+            height={16}
+            style={{ flexShrink: 0, marginTop: 2 }}
+            aria-hidden="true"
+          />
           <p className="modal-desc" style={{ margin: 0 }}>
             {t(copy.body, { provider: providerLabel })}
           </p>
@@ -87,11 +97,14 @@ export default function OAuthTosWarningModal({
             {t(copy.saferPath)}
           </p>
         )}
-        <label className="oauth-tos-ack" style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 14 }}>
+        <label
+          className="oauth-tos-ack"
+          style={{ display: "flex", gap: 8, alignItems: "flex-start", marginTop: 14 }}
+        >
           <input
             type="checkbox"
             checked={acknowledged}
-            onChange={e => setAcknowledged(e.target.checked)}
+            onChange={(e) => setAcknowledged(e.target.checked)}
             style={{ marginTop: 3 }}
             aria-required="true"
           />

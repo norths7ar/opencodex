@@ -29,7 +29,10 @@ export interface CursorIntegrationStatus {
 }
 
 /** A failed read is null, never "not installed": the overview paints null as unknown. */
-export async function loadCursorIntegrationStatus(apiBase: string, signal?: AbortSignal): Promise<CursorIntegrationStatus | null> {
+export async function loadCursorIntegrationStatus(
+  apiBase: string,
+  signal?: AbortSignal,
+): Promise<CursorIntegrationStatus | null> {
   try {
     const response = await fetch(`${apiBase}/api/native-integrations/cursor`, { signal });
     if (!response.ok) return null;

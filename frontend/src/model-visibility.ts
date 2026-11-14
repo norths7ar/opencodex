@@ -1,22 +1,34 @@
 export type ProviderModelMap = Record<string, string[]>;
 
-export interface ModelVisibilityTarget { id: string; native?: boolean; }
+export interface ModelVisibilityTarget {
+  id: string;
+  native?: boolean;
+}
 
 export type ModelVisibilityScope = "models" | "provider";
 
 export interface ClientCatalogRefreshFailure {
-  client: string; profileId?: number; reason?: string; refusalReason?: string;
-  snapshotPath?: string; residual?: boolean;
+  client: string;
+  profileId?: number;
+  reason?: string;
+  refusalReason?: string;
+  snapshotPath?: string;
+  residual?: boolean;
 }
 
 /** Selection persistence and client-file refresh have separate success outcomes. */
-export function clientCatalogRefreshFailures(body: unknown): ClientCatalogRefreshFailure[] | undefined {
+export function clientCatalogRefreshFailures(
+  body: unknown,
+): ClientCatalogRefreshFailure[] | undefined {
   // Missing outcomes (old servers or preset-empty fallback) do not prove recovery.
   if (!isRecord(body) || !Array.isArray(body.clientIntegrations)) return undefined;
-  return body.clientIntegrations.filter((row): row is Record<string, unknown> => isRecord(row) && row.ok === false)
-    .map(row => ({
+  return body.clientIntegrations
+    .filter((row): row is Record<string, unknown> => isRecord(row) && row.ok === false)
+    .map((row) => ({
       client: typeof row.client === "string" ? row.client : "",
-      ...(Number.isSafeInteger(row.profileId) && (row.profileId as number) >= 0 ? { profileId: row.profileId as number } : {}),
+      ...(Number.isSafeInteger(row.profileId) && (row.profileId as number) >= 0
+        ? { profileId: row.profileId as number }
+        : {}),
       ...(typeof row.reason === "string" ? { reason: row.reason } : {}),
       ...(typeof row.refusalReason === "string" ? { refusalReason: row.refusalReason } : {}),
       ...(typeof row.snapshotPath === "string" ? { snapshotPath: row.snapshotPath } : {}),
@@ -29,7 +41,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function uniqueStrings(value: unknown): string[] {
-  if (!Array.isArray(value) || value.some(item => typeof item !== "string")) {
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
     throw new Error("invalid model list");
   }
   return [...new Set(value)];
@@ -49,7 +61,10 @@ export async function fetchSelectedModels(
   fetchImpl: typeof fetch = fetch,
   signal?: AbortSignal,
 ): Promise<ProviderModelMap> {
-  const response = await fetchImpl(`${apiBase}/api/selected-models`, signal ? { signal } : undefined);
+  const response = await fetchImpl(
+    `${apiBase}/api/selected-models`,
+    signal ? { signal } : undefined,
+  );
   if (!response.ok) throw new Error(`selected models HTTP ${response.status}`);
   return parseSelectedModels(await response.json());
 }

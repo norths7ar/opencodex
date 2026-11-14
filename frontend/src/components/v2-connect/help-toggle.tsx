@@ -21,7 +21,7 @@ export function useHelpToggle(label: string) {
       aria-expanded={open}
       aria-controls={panelId}
       aria-label={t("connectV2.moreAbout", { label })}
-      onClick={() => setOpen(value => !value)}
+      onClick={() => setOpen((value) => !value)}
     >
       <HugeiconsIcon icon={HelpCircleIcon} strokeWidth={1.8} aria-hidden="true" />
     </button>
@@ -30,7 +30,10 @@ export function useHelpToggle(label: string) {
     <div
       id={panelId}
       hidden={!open}
-      className={cn("ui-v2 rounded-[8px] bg-surface px-3.5 py-3 text-[13px] leading-5 text-fg-muted [&_p]:m-0 [&_p+p]:mt-2", className)}
+      className={cn(
+        "ui-v2 rounded-[8px] bg-surface px-3.5 py-3 text-[13px] leading-5 text-fg-muted [&_p]:m-0 [&_p+p]:mt-2",
+        className,
+      )}
     >
       {children}
     </div>

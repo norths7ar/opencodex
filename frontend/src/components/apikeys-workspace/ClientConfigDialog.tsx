@@ -44,23 +44,45 @@ export default function ClientConfigDialog({
     if (dialog && !dialog.open) dialog.showModal();
     // Closing on unmount matters: a parent re-render that drops this node while
     // the dialog is open would otherwise leave the top layer occupied.
-    return () => { if (dialog?.open) dialog.close(); };
+    return () => {
+      if (dialog?.open) dialog.close();
+    };
   }, []);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    // Escape reaches us as `cancel`. Prevent the default close so React owns the
-    // unmount and the caller can restore focus to the trigger.
-    event.preventDefault();
-    onClose();
-  }, [onClose]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      // Escape reaches us as `cancel`. Prevent the default close so React owns the
+      // unmount and the caller can restore focus to the trigger.
+      event.preventDefault();
+      onClose();
+    },
+    [onClose],
+  );
 
   return (
-    <dialog ref={dialogRef} className="modal-overlay" aria-labelledby={titleId} onCancel={handleCancel}>
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onClose} />
-      <div className="modal-card awi-clientconfig-dialog" onClick={event => event.stopPropagation()} role="document">
+    <dialog
+      ref={dialogRef}
+      className="modal-overlay"
+      aria-labelledby={titleId}
+      onCancel={handleCancel}
+    >
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onClose}
+      />
+      <div
+        className="modal-card awi-clientconfig-dialog"
+        onClick={(event) => event.stopPropagation()}
+        role="document"
+      >
         <div className="modal-head">
           <h3 id={titleId}>{t(CLIENT_LABEL_KEYS[client])}</h3>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>{t("common.close")}</button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
+            {t("common.close")}
+          </button>
         </div>
 
         <pre
@@ -68,14 +90,19 @@ export default function ClientConfigDialog({
           tabIndex={0}
           role="group"
           aria-label={t("api.clientConfig.jsonLabel", { client: t(CLIENT_LABEL_KEYS[client]) })}
-        >{json}</pre>
+        >
+          {json}
+        </pre>
 
         <p className="muted small awi-clientconfig-count">
           {t("api.clientConfig.modelCount", { count: envelope.modelCount })}
         </p>
         {envelope.modelsWithoutLimits > 0 && (
           <p className="muted small awi-clientconfig-degraded">
-            {t("api.clientConfig.missingLimits", { count: envelope.modelsWithoutLimits, total: envelope.modelCount })}
+            {t("api.clientConfig.missingLimits", {
+              count: envelope.modelsWithoutLimits,
+              total: envelope.modelCount,
+            })}
           </p>
         )}
         {!hasKeys && client !== "cline" && envelope.apiKeyEnv !== "" && (
@@ -91,16 +118,28 @@ export default function ClientConfigDialog({
           <CopyableExample text={envelope.destination} />
         </div>
         <div className="awi-clientconfig-line">
-          {client !== "cline" && envelope.apiKeyEnv !== "" && <span className="muted text-label">{t("api.clientConfig.envHint")}</span>}
+          {client !== "cline" && envelope.apiKeyEnv !== "" && (
+            <span className="muted text-label">{t("api.clientConfig.envHint")}</span>
+          )}
           <CopyableExample text={envelope.exportHint} />
         </div>
-        <p className="muted small awi-clientconfig-merge">{t(client === "cline" ? "api.clientConfig.clineBundle" : "api.clientConfig.mergeWarning")}</p>
+        <p className="muted small awi-clientconfig-merge">
+          {t(client === "cline" ? "api.clientConfig.clineBundle" : "api.clientConfig.mergeWarning")}
+        </p>
         {/* The old <details> is gone — this is the one place the answer lives now,
             so it is a labelled paragraph rather than a fold. */}
-        {(client === "cline" || envelope.apiKeyEnv !== "") && <>
-          <p className="muted text-label awi-clientconfig-where-title">{t("api.clientConfig.whereDisclosure")}</p>
-          <p className="muted small">{t(client === "cline" ? "integrations.semantics.cline" : "api.clientConfig.whereBody")}</p>
-        </>}
+        {(client === "cline" || envelope.apiKeyEnv !== "") && (
+          <>
+            <p className="muted text-label awi-clientconfig-where-title">
+              {t("api.clientConfig.whereDisclosure")}
+            </p>
+            <p className="muted small">
+              {t(
+                client === "cline" ? "integrations.semantics.cline" : "api.clientConfig.whereBody",
+              )}
+            </p>
+          </>
+        )}
 
         <div className="modal-actions">
           <button type="button" className="btn btn-primary btn-sm" onClick={onCopy}>

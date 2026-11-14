@@ -1,4 +1,3 @@
-
 import { navigateHash, normalizeHashPath, splitHashQuery } from "./hash-routing";
 import { canonicalHashPath } from "./app-routing";
 export const PROVIDERS_HASH = "providers";
@@ -46,7 +45,10 @@ export function openProviderSettings(provider: string): void {
  * arriving) leaves the hash unchanged, and an unchanged hash fires no `hashchange`, so announce
  * it by hand: the deep-link hook then re-applies the link and the Accounts tab opens again.
  */
-export function openProviderAccounts(provider: string, win: Window & typeof globalThis = window): void {
+export function openProviderAccounts(
+  provider: string,
+  win: Window & typeof globalThis = window,
+): void {
   const target = providerAccountsHash(provider);
   if (normalizeHashPath(win.location.hash) === target) {
     win.dispatchEvent(new win.Event("hashchange"));

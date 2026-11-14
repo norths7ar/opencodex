@@ -6,7 +6,9 @@ import { shadowCallSaveErrorKey, type ShadowCallData } from "./models-shared";
 
 /** Load and persist the Models workspace's shadow-call settings. */
 export function useShadowCallSettings({
-  apiBase, publishFeedback, t,
+  apiBase,
+  publishFeedback,
+  t,
 }: {
   apiBase: string;
   publishFeedback: (ok: boolean, message: string) => void;
@@ -21,8 +23,11 @@ export function useShadowCallSettings({
       const r = await fetch(`${apiBase}/api/shadow-call-settings`, { signal: bounded.signal });
       const data = await readJsonIfOk<ShadowCallData>(r);
       if (data) setShadowCall(data);
-    } catch { /* old server / network: keep the section disabled */ }
-    finally { bounded.clear(); }
+    } catch {
+      /* old server / network: keep the section disabled */
+    } finally {
+      bounded.clear();
+    }
   }, [apiBase]);
 
   const saveShadowCall = async (patch: Partial<ShadowCallData>) => {
@@ -38,11 +43,11 @@ export function useShadowCallSettings({
       });
       if (!res.ok) {
         setShadowCall(previous);
-        const body = await res.json().catch(() => null) as { code?: unknown } | null;
+        const body = (await res.json().catch(() => null)) as { code?: unknown } | null;
         publishFeedback(false, t(shadowCallSaveErrorKey(body?.code)));
         return;
       }
-      const data = await res.json().catch(() => null) as ShadowCallData | null;
+      const data = (await res.json().catch(() => null)) as ShadowCallData | null;
       if (data && typeof data.enabled === "boolean") setShadowCall(data);
     } catch {
       setShadowCall(previous);

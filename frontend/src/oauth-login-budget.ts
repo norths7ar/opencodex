@@ -12,7 +12,11 @@
 export const DEVICE_LOGIN_POLL_BUDGET_MS = 31 * 60_000;
 
 /** Poll attempts for a login, stretched to the device budget once the flow shows a device code. */
-export function loginPollAttempts(isDeviceFlow: boolean, intervalMs: number, browserAttempts: number): number {
+export function loginPollAttempts(
+  isDeviceFlow: boolean,
+  intervalMs: number,
+  browserAttempts: number,
+): number {
   if (!isDeviceFlow) return browserAttempts;
   return Math.max(browserAttempts, Math.ceil(DEVICE_LOGIN_POLL_BUDGET_MS / intervalMs));
 }

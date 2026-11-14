@@ -65,60 +65,127 @@ export function ProxyControls({
   const status = stopping ? stoppingLabel : restarting ? restartingLabel : statusLabel;
   const busy = stopping || restarting;
   const [preview, setPreview] = useState<LeverPreview>(null);
-  const previewText = busy || preview === null ? null
-    : preview === "hover" ? leverText.hover
-    : preview === "rest" ? leverText.cancel
-    : leverText[preview];
+  const previewText =
+    busy || preview === null
+      ? null
+      : preview === "hover"
+        ? leverText.hover
+        : preview === "rest"
+          ? leverText.cancel
+          : leverText[preview];
 
   return (
-    <div className={cn("ui-v2 relative flex h-8 items-center gap-[9px] overflow-hidden px-2.5", className)} title={detail ? `${status} · ${detail}` : status}>
+    <div
+      className={cn(
+        "ui-v2 relative flex h-8 items-center gap-[9px] overflow-hidden px-2.5",
+        className,
+      )}
+      title={detail ? `${status} · ${detail}` : status}
+    >
       {/* A held reload keeps a band of sky light sweeping across the row; once the reload starts it
           sweeps once more. */}
       {(preview === "restart" || (restarting && !stopping)) && (
         <span className={cn("ocx-sweep", preview === "restart" && "ocx-sweep-loop")} aria-hidden />
       )}
-      <span className={cn("relative flex min-w-0 flex-1 items-center gap-[9px]",
-        stopping ? "ocx-halt" : preview === "stop" && "ocx-tremble ocx-dim")}>
-      {/* The dot sits in the same 16px slot as the globe and GitHub marks below, so every label starts
+      <span
+        className={cn(
+          "relative flex min-w-0 flex-1 items-center gap-[9px]",
+          stopping ? "ocx-halt" : preview === "stop" && "ocx-tremble ocx-dim",
+        )}
+      >
+        {/* The dot sits in the same 16px slot as the globe and GitHub marks below, so every label starts
           on one line. It is the proxy's light: it flickers while a stop is held and goes out when the
           stop starts. */}
-      <span className="grid size-4 shrink-0 place-items-center" aria-hidden>
-        <span className={cn("size-2 rounded-full transition-colors duration-300",
-          stopping ? "bg-danger ocx-lightout" : preview === "stop" ? "bg-danger ocx-flicker"
-          : preview === "restart" ? "bg-highlight" : live ? "bg-success" : "bg-fg-subtle")} />
-      </span>
-      {previewText !== null ? (
-        <span aria-hidden className={cn(
-          "min-w-0 flex-1 truncate text-[13px] leading-5",
-          preview === "stop" ? "font-medium text-danger" : preview === "restart" ? "ocx-shine font-medium" : "text-fg-muted",
-        )}>{previewText}</span>
-      ) : (
-        <span className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[13px] leading-5">
-          <span className="shrink-0 font-medium text-fg">{label}</span>
-          <span className="sr-only">{status}</span>
-          {/* A reload in flight shines sky so it is noticed; everything else stays quiet. */}
-          <span className={cn("min-w-0 truncate text-xs tabular-nums",
-            stopping ? "font-medium text-danger" : restarting ? "ocx-shine font-medium" : "text-fg-subtle")}
-            aria-hidden={!busy && !!detail ? undefined : true}>
-            {/* The stopping word pulls into its own clipped box, so it never slides over the title. */}
-            {stopping ? <span className="ocx-brake">{status}</span> : busy ? status : detail ?? statusLabel}
-          </span>
+        <span className="grid size-4 shrink-0 place-items-center" aria-hidden>
+          <span
+            className={cn(
+              "size-2 rounded-full transition-colors duration-300",
+              stopping
+                ? "bg-danger ocx-lightout"
+                : preview === "stop"
+                  ? "bg-danger ocx-flicker"
+                  : preview === "restart"
+                    ? "bg-highlight"
+                    : live
+                      ? "bg-success"
+                      : "bg-fg-subtle",
+            )}
+          />
         </span>
-      )}
+        {previewText !== null ? (
+          <span
+            aria-hidden
+            className={cn(
+              "min-w-0 flex-1 truncate text-[13px] leading-5",
+              preview === "stop"
+                ? "font-medium text-danger"
+                : preview === "restart"
+                  ? "ocx-shine font-medium"
+                  : "text-fg-muted",
+            )}
+          >
+            {previewText}
+          </span>
+        ) : (
+          <span className="flex min-w-0 flex-1 items-baseline gap-1.5 text-[13px] leading-5">
+            <span className="shrink-0 font-medium text-fg">{label}</span>
+            <span className="sr-only">{status}</span>
+            {/* A reload in flight shines sky so it is noticed; everything else stays quiet. */}
+            <span
+              className={cn(
+                "min-w-0 truncate text-xs tabular-nums",
+                stopping
+                  ? "font-medium text-danger"
+                  : restarting
+                    ? "ocx-shine font-medium"
+                    : "text-fg-subtle",
+              )}
+              aria-hidden={!busy && !!detail ? undefined : true}
+            >
+              {/* The stopping word pulls into its own clipped box, so it never slides over the title. */}
+              {stopping ? (
+                <span className="ocx-brake">{status}</span>
+              ) : busy ? (
+                status
+              ) : (
+                (detail ?? statusLabel)
+              )}
+            </span>
+          </span>
+        )}
       </span>
       {session && (
-        <TrayButton onClick={session.onClick} disabled={session.busy}
-          label={session.busy ? session.busyLabel : session.label} title={session.label}>
+        <TrayButton
+          onClick={session.onClick}
+          disabled={session.busy}
+          label={session.busy ? session.busyLabel : session.label}
+          title={session.label}
+        >
           <IconX />
         </TrayButton>
       )}
-      <ProxyLever restartLabel={restarting ? restartingLabel : restartLabel} stopLabel={stopping ? stoppingLabel : stopLabel}
-        hint={leverHint} restarting={restarting} settled={done} stopping={stopping} onRestart={onRestart} onStop={onStop} onPreview={setPreview} />
+      <ProxyLever
+        restartLabel={restarting ? restartingLabel : restartLabel}
+        stopLabel={stopping ? stoppingLabel : stopLabel}
+        hint={leverHint}
+        restarting={restarting}
+        settled={done}
+        stopping={stopping}
+        onRestart={onRestart}
+        onStop={onStop}
+        onPreview={setPreview}
+      />
     </div>
   );
 }
 
-function TrayButton({ onClick, disabled, label, title, children }: {
+function TrayButton({
+  onClick,
+  disabled,
+  label,
+  title,
+  children,
+}: {
   onClick: () => void;
   disabled: boolean;
   label: string;

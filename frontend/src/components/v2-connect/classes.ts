@@ -15,7 +15,8 @@ export const iconButton = cn(
 );
 
 /** Hairline frame for a list of ruled rows (the React Bits `frame`). */
-export const frame = "flex min-w-0 flex-col overflow-hidden rounded-[12px] bg-raised ring-1 ring-inset ring-line";
+export const frame =
+  "flex min-w-0 flex-col overflow-hidden rounded-[12px] bg-raised ring-1 ring-inset ring-line";
 
 /** Small section heading above a frame or a grid. */
 export const sectionTitle = "m-0 text-[15px] leading-6 font-semibold tracking-[-0.01em] text-fg";

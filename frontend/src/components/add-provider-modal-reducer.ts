@@ -41,7 +41,14 @@ export type AddProviderModalAction =
   | { type: "set-oauth-busy"; busy: boolean }
   | { type: "set-oauth-msg"; msg: string; tone?: "ok" | "warn" }
   | { type: "set-oauth-tone"; tone: "ok" | "warn" }
-  | { type: "set-oauth-url"; url: string; providerId: string; deviceCode?: string; instructions?: string; browserLaunch?: BrowserLaunch }
+  | {
+      type: "set-oauth-url";
+      url: string;
+      providerId: string;
+      deviceCode?: string;
+      instructions?: string;
+      browserLaunch?: BrowserLaunch;
+    }
   | { type: "set-manual-code"; code: string }
   | { type: "set-manual-code-busy"; busy: boolean }
   | { type: "set-manual-code-msg"; msg: string; ok?: boolean }
@@ -63,7 +70,16 @@ export function createInitialAddProviderState(
   return {
     preset: initialCustom ? customPreset : null,
     form: initialCustom
-      ? { name: "", adapter: "openai-chat", baseUrl: "", authMode: "key", apiKey: "", apiKeyTransport: undefined, defaultModel: "", allowPrivateNetwork: false }
+      ? {
+          name: "",
+          adapter: "openai-chat",
+          baseUrl: "",
+          authMode: "key",
+          apiKey: "",
+          apiKeyTransport: undefined,
+          defaultModel: "",
+          allowPrivateNetwork: false,
+        }
       : null,
     saving: false,
     error: "",
@@ -154,7 +170,8 @@ export function addProviderModalReducer(
         // omits it and must not erase it. Clearing the URL ends the login and its outcome.
         oauthBrowserLaunch: !action.url
           ? undefined
-          : action.browserLaunch ?? (state.oauthUrlProvider === action.providerId ? state.oauthBrowserLaunch : undefined),
+          : (action.browserLaunch ??
+            (state.oauthUrlProvider === action.providerId ? state.oauthBrowserLaunch : undefined)),
       };
     case "set-manual-code":
       return { ...state, manualCode: action.code };
@@ -165,7 +182,16 @@ export function addProviderModalReducer(
     case "set-oauth-tos-pending":
       return { ...state, oauthTosPending: action.providerId };
     case "use-oauth-login":
-      return { ...state, form: action.form, error: "", oauthUrl: "", oauthDeviceCode: "", oauthInstructions: "", oauthBrowserLaunch: undefined, oauthUrlProvider: null };
+      return {
+        ...state,
+        form: action.form,
+        error: "",
+        oauthUrl: "",
+        oauthDeviceCode: "",
+        oauthInstructions: "",
+        oauthBrowserLaunch: undefined,
+        oauthUrlProvider: null,
+      };
     case "use-api-key-instead":
       return {
         ...state,

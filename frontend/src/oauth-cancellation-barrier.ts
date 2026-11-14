@@ -14,12 +14,14 @@ export function cancelOAuthLogin(apiBase: string, provider: string): Promise<voi
       body: JSON.stringify({ provider }),
       keepalive: true,
     });
-  })().catch(() => {
-    // Preserve best-effort cleanup: a transport failure must not wedge retries.
-    // Settlement is an ordering barrier, not proof of server cancellation.
-  }).finally(() => {
-    if (cancellations.get(key) === delivery) cancellations.delete(key);
-  });
+  })()
+    .catch(() => {
+      // Preserve best-effort cleanup: a transport failure must not wedge retries.
+      // Settlement is an ordering barrier, not proof of server cancellation.
+    })
+    .finally(() => {
+      if (cancellations.get(key) === delivery) cancellations.delete(key);
+    });
   cancellations.set(key, delivery);
   return delivery;
 }

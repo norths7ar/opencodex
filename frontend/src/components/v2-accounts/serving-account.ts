@@ -12,14 +12,15 @@ export function servingAccount(
   activeId: string | null,
   mode: CodexAccountModeState | null,
 ): CodexAccountEntry | null {
-  const main = accounts.find(account => account.isMain);
-  const mainBlocked = main?.mainAccountHardLock?.enabled === true && main.mainAccountHardLock.state === "blocked";
+  const main = accounts.find((account) => account.isMain);
+  const mainBlocked =
+    main?.mainAccountHardLock?.enabled === true && main.mainAccountHardLock.state === "blocked";
   const mainUsable = main && !main.paused && !mainBlocked;
   // Direct mode resolves to the main login regardless of the Pool pause (pausing only removes
   // an account from pool selection), but the main-account hard lock still rejects it.
   if (mode === "direct") return main && !mainBlocked ? main : null;
   if (activeId && activeId !== "__main__") {
-    const pooled = accounts.find(account => !account.isMain && account.id === activeId);
+    const pooled = accounts.find((account) => !account.isMain && account.id === activeId);
     if (pooled && !pooled.paused) return pooled;
   }
   return mainUsable ? main : null;

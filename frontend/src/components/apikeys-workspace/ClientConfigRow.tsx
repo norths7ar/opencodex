@@ -8,7 +8,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useT } from "../../i18n/shared";
 import ClientMark from "../ClientMark";
-import { CLIENT_LABEL_KEYS, CLIENT_MARKS, type ClientConfigEnvelope, type ExportClientId } from "./client-config-clients";
+import {
+  CLIENT_LABEL_KEYS,
+  CLIENT_MARKS,
+  type ClientConfigEnvelope,
+  type ExportClientId,
+} from "./client-config-clients";
 
 export default function ClientConfigRow({
   client,
@@ -20,7 +25,12 @@ export default function ClientConfigRow({
   client: ExportClientId;
   apiBase: string;
   /** Passed the trigger element so the dialog can restore focus on close. */
-  onOpenDetails: (client: ExportClientId, envelope: ClientConfigEnvelope, json: string, trigger: HTMLButtonElement | null) => void;
+  onOpenDetails: (
+    client: ExportClientId,
+    envelope: ClientConfigEnvelope,
+    json: string,
+    trigger: HTMLButtonElement | null,
+  ) => void;
   onCopy: (client: ExportClientId, json: string) => void;
   onDownload: (client: ExportClientId, envelope: ClientConfigEnvelope, json: string) => void;
 }) {
@@ -38,9 +48,11 @@ export default function ClientConfigRow({
    * derived from that tag rather than reset in the effect body — otherwise a
    * superseded response can land on top of a newer one.
    */
-  const [result, setResult] = useState<
-    { key: string; data: ClientConfigEnvelope | null; failed: boolean } | null
-  >(null);
+  const [result, setResult] = useState<{
+    key: string;
+    data: ClientConfigEnvelope | null;
+    failed: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -50,11 +62,14 @@ export default function ClientConfigRow({
     let cancelled = false;
     void (async () => {
       try {
-        const res = await fetch(`${apiBase}/api/client-config?client=${encodeURIComponent(client)}`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(
+          `${apiBase}/api/client-config?client=${encodeURIComponent(client)}`,
+          {
+            signal: controller.signal,
+          },
+        );
         if (!res.ok) throw new Error(String(res.status));
-        const envelope = await res.json() as ClientConfigEnvelope;
+        const envelope = (await res.json()) as ClientConfigEnvelope;
         if (cancelled) return;
         setResult({ key: requestKey, data: envelope, failed: false });
       } catch {
@@ -82,9 +97,12 @@ export default function ClientConfigRow({
   // would hand a TOML or YAML client bytes its parser cannot read.
   const json = data?.text ?? "";
 
-  const openDetails = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (data) onOpenDetails(client, data, json, event.currentTarget);
-  }, [client, data, json, onOpenDetails]);
+  const openDetails = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (data) onOpenDetails(client, data, json, event.currentTarget);
+    },
+    [client, data, json, onOpenDetails],
+  );
 
   return (
     <li className="awi-clientconfig-row">
@@ -101,17 +119,23 @@ export default function ClientConfigRow({
       <span className="awi-clientconfig-identity">
         <span className="awi-clientconfig-name">{label}</span>
         <span className="muted text-label awi-clientconfig-meta">
-          {loading
-            ? t("api.clientConfig.loading")
-            : failed || !data
-              ? <span role="alert">{t("api.clientConfig.rowError", { client: label })}</span>
-              : t("api.clientConfig.rowMeta", { destination: data.destination, count: data.modelCount })}
+          {loading ? (
+            t("api.clientConfig.loading")
+          ) : failed || !data ? (
+            <span role="alert">{t("api.clientConfig.rowError", { client: label })}</span>
+          ) : (
+            t("api.clientConfig.rowMeta", { destination: data.destination, count: data.modelCount })
+          )}
         </span>
       </span>
 
       <span className="awi-clientconfig-row-actions">
         {failed && !loading ? (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAttempt(n => n + 1)}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setAttempt((n) => n + 1)}
+          >
             {t("common.retry")}
           </button>
         ) : (
@@ -121,7 +145,9 @@ export default function ClientConfigRow({
               className="btn btn-primary btn-sm"
               aria-label={t("api.clientConfig.copyAria", { client: label })}
               disabled={!data}
-              onClick={() => { if (data) onCopy(client, json); }}
+              onClick={() => {
+                if (data) onCopy(client, json);
+              }}
             >
               {t("api.clientConfig.copy")}
             </button>
@@ -130,7 +156,9 @@ export default function ClientConfigRow({
               className="btn btn-sm"
               aria-label={t("api.clientConfig.downloadAria", { client: label })}
               disabled={!data}
-              onClick={() => { if (data) onDownload(client, data, json); }}
+              onClick={() => {
+                if (data) onDownload(client, data, json);
+              }}
             >
               {t("api.clientConfig.download")}
             </button>

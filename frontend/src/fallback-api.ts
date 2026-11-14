@@ -2,7 +2,15 @@
 export type FallbackKind = "model" | "provider";
 export type FallbackSwitches = { model?: boolean; provider?: boolean };
 export type FallbackDeviceRow = { id: string; model: boolean | null; provider: boolean | null };
-export type FallbackEventRow = { at: string; route: string; kind: FallbackKind; from: string; to: string; trigger: string; outcome: "taken" | "refused" };
+export type FallbackEventRow = {
+  at: string;
+  route: string;
+  kind: FallbackKind;
+  from: string;
+  to: string;
+  trigger: string;
+  outcome: "taken" | "refused";
+};
 export type FallbackState = {
   schema: "ocx.fallback/1";
   global: { model: boolean; provider: boolean };
@@ -27,7 +35,9 @@ export function parseFallbackState(value: unknown): FallbackState | null {
     global: { model: raw.global.model !== false, provider: raw.global.provider !== false },
     providers: raw.providers && typeof raw.providers === "object" ? raw.providers : {},
     routes: raw.routes && typeof raw.routes === "object" ? raw.routes : {},
-    devices: raw.devices.filter((row): row is FallbackDeviceRow => !!row && typeof row.id === "string"),
+    devices: raw.devices.filter(
+      (row): row is FallbackDeviceRow => !!row && typeof row.id === "string",
+    ),
     last: raw.last && typeof raw.last === "object" ? raw.last : null,
   };
 }

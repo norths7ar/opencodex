@@ -23,7 +23,9 @@ function DataSurfaceSkeletonBlock({
   return (
     <span
       aria-hidden="true"
-      className={className ? `data-surface-skeleton__block ${className}` : "data-surface-skeleton__block"}
+      className={
+        className ? `data-surface-skeleton__block ${className}` : "data-surface-skeleton__block"
+      }
       style={style}
     />
   );

@@ -7,7 +7,12 @@ export type LogStatusFilter = "all" | "success" | "errors";
 /** Final protocol delivery mode, or `none` for rows without an observed path (PF-02). */
 export type LogProtocolModeFilter = "all" | DeliveryMode | "none";
 export const LOG_PROTOCOL_MODE_FILTERS: readonly LogProtocolModeFilter[] = [
-  "all", "native", "translated", "legacy-bridge", "blocked", "none",
+  "all",
+  "native",
+  "translated",
+  "legacy-bridge",
+  "blocked",
+  "none",
 ];
 
 export interface LogFilterState {
@@ -56,15 +61,17 @@ export interface FilterableLogEntry {
 
 /** Return whether any filter differs from the inert default state. */
 export function hasActiveLogFilters(filters: LogFilterState): boolean {
-  return filters.model.trim() !== ""
-    || filters.provider.trim() !== ""
-    || filters.status !== "all"
-    || filters.timeWindow !== "all"
-    || filters.minTokPerSec !== undefined
-    || filters.maxTokPerSec !== undefined
-    || filters.interceptedOnly
-    || filters.conversationId.trim() !== ""
-    || (filters.protocolMode ?? "all") !== "all";
+  return (
+    filters.model.trim() !== "" ||
+    filters.provider.trim() !== "" ||
+    filters.status !== "all" ||
+    filters.timeWindow !== "all" ||
+    filters.minTokPerSec !== undefined ||
+    filters.maxTokPerSec !== undefined ||
+    filters.interceptedOnly ||
+    filters.conversationId.trim() !== "" ||
+    (filters.protocolMode ?? "all") !== "all"
+  );
 }
 
 /** Safely retain only object-shaped failover attempts from untrusted log data. */
@@ -102,58 +109,89 @@ export function filterLogs<T extends FilterableLogEntry>(
   const since = timeThreshold(filters.timeWindow, now);
   const protocolMode = filters.protocolMode ?? "all";
 
-  return logs.filter(log => {
+  return logs.filter((log) => {
     if (filters.interceptedOnly && typeof log.shadowCallRewrittenFrom !== "string") return false;
     if (protocolMode !== "all") {
       // Validated like the detail panel, so a row the panel reports as "no path data" is the
       // row the `none` filter selects.
       const traceMode = parseProtocolTraceV1(log.protocolTrace)?.mode;
-      if (protocolMode === "none" ? traceMode !== undefined : traceMode !== protocolMode) return false;
+      if (protocolMode === "none" ? traceMode !== undefined : traceMode !== protocolMode)
+        return false;
     }
-    if (conversationQuery && !matchesLogConversationId(
-      log.conversationId,
-      conversationQuery,
-      filters.conversationQueryHash,
-    )) return false;
+    if (
+      conversationQuery &&
+      !matchesLogConversationId(
+        log.conversationId,
+        conversationQuery,
+        filters.conversationQueryHash,
+      )
+    )
+      return false;
 
-    if (filters.status === "success"
-      && (typeof log.status !== "number"
-        || !Number.isInteger(log.status)
-        || log.status < 200
-        || log.status >= 300)) return false;
-    if (filters.status === "errors"
-      && (typeof log.status !== "number"
-        || !Number.isInteger(log.status)
-        || log.status < 400
-        || log.status > 599)) return false;
+    if (
+      filters.status === "success" &&
+      (typeof log.status !== "number" ||
+        !Number.isInteger(log.status) ||
+        log.status < 200 ||
+        log.status >= 300)
+    )
+      return false;
+    if (
+      filters.status === "errors" &&
+      (typeof log.status !== "number" ||
+        !Number.isInteger(log.status) ||
+        log.status < 400 ||
+        log.status > 599)
+    )
+      return false;
 
     const logAttempts = attempts(log);
     // Model options represent complete identities from the current log snapshot. Match
     // selections exactly (case/whitespace-insensitive), while the standalone
     // logMatchesModelQuery helper retains its free-text substring semantics.
-    if (modelQuery && ![
-      normalized(log.model),
-      normalized(log.resolvedModel),
-      normalized(log.servedModel),
-      ...logAttempts.map(attempt => normalized(attempt.model)),
-    ].some(value => value === modelQuery)) return false;
+    if (
+      modelQuery &&
+      ![
+        normalized(log.model),
+        normalized(log.resolvedModel),
+        normalized(log.servedModel),
+        ...logAttempts.map((attempt) => normalized(attempt.model)),
+      ].some((value) => value === modelQuery)
+    )
+      return false;
 
-    if (providerQuery && ![
-      normalized(log.provider),
-      ...logAttempts.map(attempt => normalized(attempt.provider)),
-    ].some(value => value === providerQuery)) return false;
+    if (
+      providerQuery &&
+      ![
+        normalized(log.provider),
+        ...logAttempts.map((attempt) => normalized(attempt.provider)),
+      ].some((value) => value === providerQuery)
+    )
+      return false;
 
-    if (since !== undefined
-      && (typeof log.timestamp !== "number" || !Number.isFinite(log.timestamp) || log.timestamp < since)) return false;
+    if (
+      since !== undefined &&
+      (typeof log.timestamp !== "number" ||
+        !Number.isFinite(log.timestamp) ||
+        log.timestamp < since)
+    )
+      return false;
 
-    const tokPerSecond = log.displayMetrics?.tokPerSecond?.kind === "value"
-      && Number.isFinite(log.displayMetrics.tokPerSecond.value)
-      ? log.displayMetrics.tokPerSecond.value
-      : undefined;
-    if (filters.minTokPerSec !== undefined
-      && (tokPerSecond === undefined || tokPerSecond < filters.minTokPerSec)) return false;
-    if (filters.maxTokPerSec !== undefined
-      && (tokPerSecond === undefined || tokPerSecond >= filters.maxTokPerSec)) return false;
+    const tokPerSecond =
+      log.displayMetrics?.tokPerSecond?.kind === "value" &&
+      Number.isFinite(log.displayMetrics.tokPerSecond.value)
+        ? log.displayMetrics.tokPerSecond.value
+        : undefined;
+    if (
+      filters.minTokPerSec !== undefined &&
+      (tokPerSecond === undefined || tokPerSecond < filters.minTokPerSec)
+    )
+      return false;
+    if (
+      filters.maxTokPerSec !== undefined &&
+      (tokPerSecond === undefined || tokPerSecond >= filters.maxTokPerSec)
+    )
+      return false;
 
     return true;
   });
@@ -177,10 +215,15 @@ export function extractLogFilterOptions(logs: readonly FilterableLogEntry[]): {
   const models = new Map<string, string>();
   const providers = new Map<string, string>();
   for (const log of logs) {
-    for (const value of [log.model, log.resolvedModel, log.servedModel, ...attempts(log).map(attempt => attempt.model)]) {
+    for (const value of [
+      log.model,
+      log.resolvedModel,
+      log.servedModel,
+      ...attempts(log).map((attempt) => attempt.model),
+    ]) {
       addOption(models, value);
     }
-    for (const value of [log.provider, ...attempts(log).map(attempt => attempt.provider)]) {
+    for (const value of [log.provider, ...attempts(log).map((attempt) => attempt.provider)]) {
       addOption(providers, value);
     }
   }

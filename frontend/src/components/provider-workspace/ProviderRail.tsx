@@ -14,7 +14,11 @@ import {
 } from "../../provider-workspace/catalog";
 import { isSubscriptionCliProvider } from "../../provider-workspace/subscription-cli";
 import { isLocalProvider } from "../../provider-workspace/kind";
-import { formatProviderDisplayName, providerIconPaint, providerIconSrc } from "../../provider-icons";
+import {
+  formatProviderDisplayName,
+  providerIconPaint,
+  providerIconSrc,
+} from "../../provider-icons";
 
 export function statusLabel(p: WorkspaceProvider, t: TFn): string {
   const s = binProviderStatus(p);
@@ -30,22 +34,34 @@ export function authModeLabel(item: WorkspaceItem, t: TFn): string {
   // Configured with authMode "key" (the registry's authKind), but no key is ever used.
   if (isSubscriptionCliProvider(item)) return t("modal.badge.subscriptionCli");
   switch (item.authMode) {
-    case "oauth": return t("modal.badge.oauth");
-    case "forward": return t("pws.auth.chatgptPassthrough");
-    case "local": return t("modal.badge.local");
-    case "key": return t("modal.badge.apiKey");
-    default: return item.authMode ?? (item.keyOptional ? t("pws.auth.noKey") : t("modal.badge.apiKey"));
+    case "oauth":
+      return t("modal.badge.oauth");
+    case "forward":
+      return t("pws.auth.chatgptPassthrough");
+    case "local":
+      return t("modal.badge.local");
+    case "key":
+      return t("modal.badge.apiKey");
+    default:
+      return item.authMode ?? (item.keyOptional ? t("pws.auth.noKey") : t("modal.badge.apiKey"));
   }
 }
 
 export function railStatusCls(item: WorkspaceItem): string {
   const s = binProviderStatus(item);
-  if (s === "disabled") return "providers-workspace-rail-status providers-workspace-rail-status--inactive";
-  if (s === "ready") return "providers-workspace-rail-status providers-workspace-rail-status--active";
+  if (s === "disabled")
+    return "providers-workspace-rail-status providers-workspace-rail-status--inactive";
+  if (s === "ready")
+    return "providers-workspace-rail-status providers-workspace-rail-status--active";
   return "providers-workspace-rail-status providers-workspace-rail-status--warning";
 }
 
-export function ProviderIcon({ name, adapter, baseUrl, cls }: {
+export function ProviderIcon({
+  name,
+  adapter,
+  baseUrl,
+  cls,
+}: {
   name: string;
   adapter?: string;
   baseUrl?: string;
@@ -65,9 +81,12 @@ export function ProviderIcon({ name, adapter, baseUrl, cls }: {
    * artwork sits on a constant light plate, the way a favicon already assumes.
    */
   const paint = providerIconPaint(src);
-  const tileClass = paint === "plate" ? `${cls} provider-icon--plate`
-    : paint === "dark-plate" ? `${cls} provider-icon--plate-dark`
-    : cls;
+  const tileClass =
+    paint === "plate"
+      ? `${cls} provider-icon--plate`
+      : paint === "dark-plate"
+        ? `${cls} provider-icon--plate-dark`
+        : cls;
   return (
     <span className={tileClass}>
       {src && paint === "mask" ? (
@@ -107,7 +126,16 @@ function ProviderFallbackMark({ name, label }: { name: string; label: string }) 
   );
 }
 
-export function RailRow({ item, selected, tabbable, modelCount, isDefault, showConfigId, onClick, onFocus }: {
+export function RailRow({
+  item,
+  selected,
+  tabbable,
+  modelCount,
+  isDefault,
+  showConfigId,
+  onClick,
+  onFocus,
+}: {
   item: WorkspaceItem;
   selected: boolean;
   tabbable: boolean;
@@ -125,9 +153,12 @@ export function RailRow({ item, selected, tabbable, modelCount, isDefault, showC
   const displayName = formatProviderDisplayName(item.name, t);
   const nameTitle = showConfigId ? `${displayName} (${item.name})` : displayName;
   const suffix = `${isDefault ? t("pws.rail.suffixDefault") : ""}${local ? t("pws.rail.suffixLocal") : free ? t("pws.rail.suffixFree") : ""}`;
-  const countLabel = modelCount !== undefined && modelCount > 0
-    ? (modelCount === 1 ? t("pws.modelCountOne") : t("pws.modelCount", { count: modelCount }))
-    : "";
+  const countLabel =
+    modelCount !== undefined && modelCount > 0
+      ? modelCount === 1
+        ? t("pws.modelCountOne")
+        : t("pws.modelCount", { count: modelCount })
+      : "";
   const secondaryLabel = [showConfigId ? item.name : "", countLabel].filter(Boolean).join(" · ");
   return (
     <button
@@ -149,12 +180,18 @@ export function RailRow({ item, selected, tabbable, modelCount, isDefault, showC
       />
       <span className="providers-workspace-rail-copy">
         <span className="providers-workspace-rail-primary">
-          <span className="providers-workspace-rail-name-label" title={displayName}>{displayName}</span>
+          <span className="providers-workspace-rail-name-label" title={displayName}>
+            {displayName}
+          </span>
           {/* Only label exceptions (Local / Free). Paid is the unmarked default. */}
           {local ? (
-            <span className="pwi-rail-badge pwi-rail-badge--local" title={t("pws.localTitle")}>{t("modal.badge.local")}</span>
+            <span className="pwi-rail-badge pwi-rail-badge--local" title={t("pws.localTitle")}>
+              {t("modal.badge.local")}
+            </span>
           ) : free ? (
-            <span className="pwi-rail-badge pwi-rail-badge--free" title={t("pws.freeTitle")}>{t("modal.badge.free")}</span>
+            <span className="pwi-rail-badge pwi-rail-badge--free" title={t("pws.freeTitle")}>
+              {t("modal.badge.free")}
+            </span>
           ) : null}
         </span>
         <span className="providers-workspace-rail-secondary" title={secondaryLabel || undefined}>

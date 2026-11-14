@@ -13,12 +13,14 @@ export const panel = "flex min-w-0 flex-col rounded-[12px] bg-surface ring-1 rin
 export const panelBody = "mx-1 mb-1 min-w-0 overflow-hidden rounded-[8px] bg-bg ring-1 ring-line";
 
 /** A settings card: the same frame with its own padding, for switches and short forms. */
-export const card = "flex min-w-0 flex-col gap-4 rounded-[12px] bg-surface p-5 ring-1 ring-inset ring-line";
+export const card =
+  "flex min-w-0 flex-col gap-4 rounded-[12px] bg-surface p-5 ring-1 ring-inset ring-line";
 
 export const cardTitle = "m-0 text-[15px] leading-5 font-semibold tracking-[-0.01em] text-fg";
 export const cardHint = "m-0 text-[13px] leading-5 text-fg-muted";
 
-const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight";
+const focusRing =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight";
 
 /** Secondary action: bare at rest, a soft plate on hover. */
 export const quietButton = cn(
@@ -48,4 +50,5 @@ export const chip = cn(
 export const fieldLabel = "flex min-w-0 flex-col gap-1.5 text-[12px] font-medium text-fg-muted";
 
 /** Compact native select or input; the bridge paints `.input`, these set the v2 size. */
-export const fieldControl = "input select-sm h-[var(--ocx-control-h)] w-full min-w-0 max-w-none px-2.5 text-[13px] text-fg";
+export const fieldControl =
+  "input select-sm h-[var(--ocx-control-h)] w-full min-w-0 max-w-none px-2.5 text-[13px] text-fg";

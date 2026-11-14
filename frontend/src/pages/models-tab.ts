@@ -21,7 +21,6 @@ export function modelsTabHash(tab: ModelsTab): string {
   return tab === "catalog" ? "models" : `models/${tab}`;
 }
 
-
 export function readModelsTab(hash = window.location.hash): ModelsTab {
   // A compatibility prefilter rides in `?query` (protocol-deep-links.ts); the tab is the path.
   const raw = splitHashQuery(normalizeHashPath(hash)).path;

@@ -32,7 +32,7 @@ export default function UltraFastTierSetting({ apiBase }: { apiBase: string }) {
     try {
       const res = await fetch(`${apiBase}/api/settings`, { signal: bounded.signal });
       if (!res.ok) throw new Error("load");
-      const payload = await res.json() as { ultraFastTier?: unknown };
+      const payload = (await res.json()) as { ultraFastTier?: unknown };
       if (savingRef.current || generation !== loadGenerationRef.current) return;
       setEnabled(payload.ultraFastTier === true);
       setHydrated(true);
@@ -45,8 +45,12 @@ export default function UltraFastTierSetting({ apiBase }: { apiBase: string }) {
   }, [apiBase]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void load(); }, 0);
-    const stop = startVisibilityPoll(() => { void load(); }, 30_000);
+    const timeout = window.setTimeout(() => {
+      void load();
+    }, 0);
+    const stop = startVisibilityPoll(() => {
+      void load();
+    }, 30_000);
     return () => {
       window.clearTimeout(timeout);
       stop();
@@ -70,10 +74,14 @@ export default function UltraFastTierSetting({ apiBase }: { apiBase: string }) {
         signal: bounded.signal,
       });
       if (!res.ok) throw new Error("save");
-      const payload = await res.json() as { ultraFastTier?: unknown };
-      const confirmed = typeof payload.ultraFastTier === "boolean" ? payload.ultraFastTier : requested;
+      const payload = (await res.json()) as { ultraFastTier?: unknown };
+      const confirmed =
+        typeof payload.ultraFastTier === "boolean" ? payload.ultraFastTier : requested;
       setEnabled(confirmed);
-      setFeedback({ tone: "ok", message: t(confirmed ? "codexAuth.ultraFastEnabled" : "codexAuth.ultraFastDisabled") });
+      setFeedback({
+        tone: "ok",
+        message: t(confirmed ? "codexAuth.ultraFastEnabled" : "codexAuth.ultraFastDisabled"),
+      });
     } catch {
       setEnabled(!requested);
       setFeedback({ tone: "err", message: t("codexAuth.ultraFastFailed") });
@@ -100,14 +108,22 @@ export default function UltraFastTierSetting({ apiBase }: { apiBase: string }) {
       </div>
       <div className="codex-ultrafast-controls">
         {loadError && (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => { void load(); }}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => {
+              void load();
+            }}
+          >
             {t("common.retry")}
           </button>
         )}
         <button
           type="button"
           className={`toggle ${enabled ? "on" : ""}`}
-          onClick={() => { void toggle(); }}
+          onClick={() => {
+            void toggle();
+          }}
           disabled={controlsDisabled}
           aria-pressed={enabled}
           aria-label={t("codexAuth.ultraFastTitle")}

@@ -5,7 +5,10 @@
 import { useT } from "../../i18n/shared";
 
 export function RemoveConfirmDialog({
-  providerName, defaultProviderName, onConfirm, onCancel,
+  providerName,
+  defaultProviderName,
+  onConfirm,
+  onCancel,
 }: {
   providerName: string;
   /** The automatic replacement when deleting the current default provider. */
@@ -16,14 +19,28 @@ export function RemoveConfirmDialog({
   const t = useT();
   return (
     <div className="dialog-backdrop" onClick={onCancel}>
-      <div className="dialog" role="alertdialog" aria-label={t("pws.removeConfirmTitle")} onClick={e => e.stopPropagation()}>
+      <div
+        className="dialog"
+        role="alertdialog"
+        aria-label={t("pws.removeConfirmTitle")}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3>{t("pws.removeConfirmTitle")}</h3>
-        <p>{defaultProviderName
-          ? t("pws.removeDefaultConfirmBody", { name: providerName, defaultProvider: defaultProviderName })
-          : t("pws.removeConfirmBody", { name: providerName })}</p>
+        <p>
+          {defaultProviderName
+            ? t("pws.removeDefaultConfirmBody", {
+                name: providerName,
+                defaultProvider: defaultProviderName,
+              })
+            : t("pws.removeConfirmBody", { name: providerName })}
+        </p>
         <div className="dialog-actions">
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>{t("common.cancel")}</button>
-          <button type="button" className="btn btn-danger" onClick={onConfirm}>{t("pws.removeConfirm")}</button>
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+            {t("common.cancel")}
+          </button>
+          <button type="button" className="btn btn-danger" onClick={onConfirm}>
+            {t("pws.removeConfirm")}
+          </button>
         </div>
       </div>
     </div>
@@ -31,7 +48,10 @@ export function RemoveConfirmDialog({
 }
 
 export function UnsavedLeaveDialog({
-  onSave, onDiscard, onCancel, saving = false,
+  onSave,
+  onDiscard,
+  onCancel,
+  saving = false,
 }: {
   onSave: () => void;
   onDiscard: () => void;
@@ -41,12 +61,21 @@ export function UnsavedLeaveDialog({
   const t = useT();
   return (
     <div className="dialog-backdrop" onClick={onCancel}>
-      <div className="dialog" role="alertdialog" aria-label={t("pws.unsavedLeaveTitle")} onClick={e => e.stopPropagation()}>
+      <div
+        className="dialog"
+        role="alertdialog"
+        aria-label={t("pws.unsavedLeaveTitle")}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3>{t("pws.unsavedLeaveTitle")}</h3>
         <p>{t("pws.unsavedLeaveBody")}</p>
         <div className="dialog-actions">
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>{t("common.cancel")}</button>
-          <button type="button" className="btn btn-ghost" onClick={onDiscard}>{t("pws.discardSettings")}</button>
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+            {t("common.cancel")}
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={onDiscard}>
+            {t("pws.discardSettings")}
+          </button>
           <button type="button" className="btn btn-primary" onClick={onSave} disabled={saving}>
             {saving ? t("pws.saving") : t("pws.saveSettings")}
           </button>

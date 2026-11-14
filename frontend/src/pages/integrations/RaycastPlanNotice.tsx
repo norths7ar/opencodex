@@ -22,10 +22,14 @@ export default function RaycastPlanNotice({ install }: { install: RaycastInstall
         <Notice tone="warn">{t("integrations.raycast.proRequired")}</Notice>
       )}
       {install.plan === "unknown" && (
-        <p className="page-sub" data-raycast-plan="unknown">{t("integrations.raycast.planUnknown")}</p>
+        <p className="page-sub" data-raycast-plan="unknown">
+          {t("integrations.raycast.planUnknown")}
+        </p>
       )}
       {!install.aiDirPresent && (
-        <p className="page-sub" data-raycast-ai-dir="absent">{t("integrations.raycast.revealConfig")}</p>
+        <p className="page-sub" data-raycast-ai-dir="absent">
+          {t("integrations.raycast.revealConfig")}
+        </p>
       )}
     </>
   );

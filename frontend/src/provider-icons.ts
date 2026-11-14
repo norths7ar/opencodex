@@ -7,7 +7,7 @@ const PROVIDER_ICON_ALIASES: Record<string, string> = {
   "claude-cli": "claude-color.svg",
   "azure-openai": "openai.svg",
   chatgpt: "openai.svg",
- "cloudflare-ai-gateway": "cloudflare-ai-gateway-color.svg",
+  "cloudflare-ai-gateway": "cloudflare-ai-gateway-color.svg",
   "cloudflare-workers-ai": "cloudflare-ai-gateway-color.svg",
   cline: "cline-color.svg",
   "cline-pass": "cline-color.svg",
@@ -131,7 +131,7 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   openai: "OpenAI (Codex login)",
   "openai-apikey": "OpenAI API",
   "azure-openai": "Azure OpenAI",
- "cloudflare-ai-gateway": "Cloudflare AI Gateway",
+  "cloudflare-ai-gateway": "Cloudflare AI Gateway",
   "cloudflare-workers-ai": "Cloudflare Workers AI",
   cline: "Cline",
   "cline-pass": "ClinePass",
@@ -356,7 +356,7 @@ export function formatProviderDisplayName(provider: string, t: TFn): string {
   if (provider === key && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(provider)) {
     return provider
       .split("-")
-      .map(part => (part ? part[0]!.toUpperCase() + part.slice(1) : part))
+      .map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : part))
       .join(" ");
   }
   return provider;

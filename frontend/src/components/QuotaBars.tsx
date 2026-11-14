@@ -66,7 +66,11 @@ function localizeCustomQuotaLabel(rawLabel: string, t: TFn): string {
   }
 }
 
-export function buildQuotaRows(quota: AccountQuota | null, plan: string | null | undefined, t: TFn): QuotaBarRow[] {
+export function buildQuotaRows(
+  quota: AccountQuota | null,
+  plan: string | null | undefined,
+  t: TFn,
+): QuotaBarRow[] {
   const displayQuota = normalizeQuotaForPlan(quota, plan);
   if (!displayQuota) return [];
   // Intrinsic ranks for the standard slots; custom windows rank on their RAW labels.
@@ -124,7 +128,9 @@ export function buildQuotaRows(quota: AccountQuota | null, plan: string | null |
   }
   if (displayQuota.creditsUsd && typeof displayQuota.creditsUsd.percent === "number") {
     const hasSubscriptionCreditsCustom = displayQuota.customWindows?.some(
-      w => w.modelId === undefined && canonicalCustomWindowLabel(w.label) === SUBSCRIPTION_CREDITS_LABEL,
+      (w) =>
+        w.modelId === undefined &&
+        canonicalCustomWindowLabel(w.label) === SUBSCRIPTION_CREDITS_LABEL,
     );
     if (!hasSubscriptionCreditsCustom) {
       const localized = localizeCustomQuotaLabel(SUBSCRIPTION_CREDITS_LABEL, t);
@@ -141,25 +147,29 @@ export function buildQuotaRows(quota: AccountQuota | null, plan: string | null |
     }
   }
   const identities = new Map<string, number>();
-  return ranked.sort((a, b) => a.rank - b.rank).map(({ row }) => {
-    const identity = row.id ?? row.windowKey ?? row.customLabel!;
-    const ordinal = identities.get(identity) ?? 0;
-    identities.set(identity, ordinal + 1);
-    return { ...row, id: JSON.stringify([identity, ordinal]) };
-  });
+  return ranked
+    .sort((a, b) => a.rank - b.rank)
+    .map(({ row }) => {
+      const identity = row.id ?? row.windowKey ?? row.customLabel!;
+      const ordinal = identities.get(identity) ?? 0;
+      identities.set(identity, ordinal + 1);
+      return { ...row, id: JSON.stringify([identity, ordinal]) };
+    });
 }
 
 /** Max utilisation across known windows (for sorting providers by urgency). */
 export function maxQuotaUtilisation(quota: AccountQuota | null): number {
   if (!quota) return -1;
-  const vals = [quota.fiveHourPercent, quota.weeklyPercent, quota.monthlyPercent]
-    .filter((n): n is number => typeof n === "number");
+  const vals = [quota.fiveHourPercent, quota.weeklyPercent, quota.monthlyPercent].filter(
+    (n): n is number => typeof n === "number",
+  );
   for (const w of quota.customWindows ?? []) {
     if (w.modelId !== undefined) continue;
     if (typeof w.percent === "number") vals.push(w.percent);
   }
   const hasSubscriptionCreditsCustom = quota.customWindows?.some(
-    w => w.modelId === undefined && canonicalCustomWindowLabel(w.label) === SUBSCRIPTION_CREDITS_LABEL,
+    (w) =>
+      w.modelId === undefined && canonicalCustomWindowLabel(w.label) === SUBSCRIPTION_CREDITS_LABEL,
   );
   if (!hasSubscriptionCreditsCustom && typeof quota.creditsUsd?.percent === "number") {
     vals.push(quota.creditsUsd.percent);
@@ -234,8 +244,10 @@ export function formatObservedAge(observedAt: number, t: TFn, now = Date.now()):
   const elapsed = now - observedAt;
   if (!Number.isFinite(elapsed) || elapsed < 60_000) return null;
   // Units go through t(): the suffix is copy, and "m"/"h"/"d" do not survive translation.
-  if (elapsed < 60 * 60_000) return t("quota.ageMinutes").replace("{n}", String(Math.floor(elapsed / 60_000)));
-  if (elapsed < 24 * 60 * 60_000) return t("quota.ageHours").replace("{n}", String(Math.floor(elapsed / (60 * 60_000))));
+  if (elapsed < 60 * 60_000)
+    return t("quota.ageMinutes").replace("{n}", String(Math.floor(elapsed / 60_000)));
+  if (elapsed < 24 * 60 * 60_000)
+    return t("quota.ageHours").replace("{n}", String(Math.floor(elapsed / (60 * 60_000))));
   return t("quota.ageDays").replace("{n}", String(Math.floor(elapsed / (24 * 60 * 60_000))));
 }
 
@@ -284,20 +296,34 @@ export default function QuotaBars({
   // Rendered above the bars in both layouts. Null age (under a minute, or no observation)
   // renders nothing rather than "just now", which would be one more thing to read.
   const observedAge = observedAt === undefined ? null : formatObservedAge(observedAt, t);
-  const observedLine = observedAge === null ? null : (
-    <p className="quota-observed muted" title={t("quota.observedHint")}>
-      {t("quota.observedAgo").replace("{age}", observedAge)}
-    </p>
-  );
+  const observedLine =
+    observedAge === null ? null : (
+      <p className="quota-observed muted" title={t("quota.observedHint")}>
+        {t("quota.observedAgo").replace("{age}", observedAge)}
+      </p>
+    );
   if (rows.length === 0) {
-    if (!pending) return layout === "compact" && afterWeekly ? (
-      <div className={`codex-account-quota-slot quota-compact${className ? ` ${className}` : ""}`}>{afterWeekly}</div>
-    ) : null;
+    if (!pending)
+      return layout === "compact" && afterWeekly ? (
+        <div
+          className={`codex-account-quota-slot quota-compact${className ? ` ${className}` : ""}`}
+        >
+          {afterWeekly}
+        </div>
+      ) : null;
     if (layout === "stacked") {
       return (
-        <div className={`quota-stacked quota-stacked--pending${className ? ` ${className}` : ""}`} aria-busy="true" role="status">
+        <div
+          className={`quota-stacked quota-stacked--pending${className ? ` ${className}` : ""}`}
+          aria-busy="true"
+          role="status"
+        >
           {Array.from({ length: 2 }, (_, index) => (
-            <div key={index} className="quota-stacked-row quota-stacked-row--skeleton" aria-hidden="true">
+            <div
+              key={index}
+              className="quota-stacked-row quota-stacked-row--skeleton"
+              aria-hidden="true"
+            >
               <div className="quota-stacked-head">
                 <span className="quota-skel quota-skel--label" style={{ width: 72 }} />
                 <span className="quota-skel quota-skel--time" style={{ width: 64 }} />
@@ -336,16 +362,18 @@ export default function QuotaBars({
     return (
       <div className={`quota-stacked${className ? ` ${className}` : ""}`}>
         {observedLine}
-        {rows.map(row => (
+        {rows.map((row) => (
           <StackedQuotaRow
             key={row.id}
             row={row}
             threshold={threshold}
             t={t}
             locale={locale}
-            incomplete={row.windowKey
-              ? incompleteWindowKeys?.has(row.windowKey) === true
-              : isCustomQuotaWindowIncomplete(row.customLabel, incompleteCustomWindowLabels)}
+            incomplete={
+              row.windowKey
+                ? incompleteWindowKeys?.has(row.windowKey) === true
+                : isCustomQuotaWindowIncomplete(row.customLabel, incompleteCustomWindowLabels)
+            }
           />
         ))}
       </div>
@@ -354,7 +382,7 @@ export default function QuotaBars({
   return (
     <div className={`codex-account-quota-slot quota-compact${className ? ` ${className}` : ""}`}>
       {observedLine}
-      {rows.map(row => (
+      {rows.map((row) => (
         <Fragment key={row.id}>
           <QuotaRow
             credits={row.customLabel === SUBSCRIPTION_CREDITS_LABEL}
@@ -368,12 +396,20 @@ export default function QuotaBars({
           {row.windowKey === "weekly" && afterWeekly}
         </Fragment>
       ))}
-      {!rows.some(row => row.windowKey === "weekly") && afterWeekly}
+      {!rows.some((row) => row.windowKey === "weekly") && afterWeekly}
     </div>
   );
 }
 
-function QuotaRow({ credits, label, percent, resetAt, threshold, t, locale }: {
+function QuotaRow({
+  credits,
+  label,
+  percent,
+  resetAt,
+  threshold,
+  t,
+  locale,
+}: {
   credits?: boolean;
   label: string;
   percent: number;
@@ -386,31 +422,43 @@ function QuotaRow({ credits, label, percent, resetAt, threshold, t, locale }: {
   const warn = isQuotaWarn(percent, threshold);
   const color = quotaBarTone(percent, threshold);
   const reset = formatResetAt(resetAt, t, locale);
-  const resetTitle = reset.day || reset.time
-    ? `${t("codexAuth.resets")} ${reset.day} ${reset.time}`.replace(/\s+/g, " ").trim()
-    : undefined;
+  const resetTitle =
+    reset.day || reset.time
+      ? `${t("codexAuth.resets")} ${reset.day} ${reset.time}`.replace(/\s+/g, " ").trim()
+      : undefined;
   const hasReset = reset.day !== "" || reset.time !== "";
   return (
-    <div className={`quota-row${credits ? " quota-row--credits" : ""}${warn ? " quota-row--warn" : ""}${exhausted ? " quota-row--exhausted" : ""}`}>
-      <span className="quota-label" title={resetTitle}>{label}</span>
+    <div
+      className={`quota-row${credits ? " quota-row--credits" : ""}${warn ? " quota-row--warn" : ""}${exhausted ? " quota-row--exhausted" : ""}`}
+    >
+      <span className="quota-label" title={resetTitle}>
+        {label}
+      </span>
       <span className="quota-reset-label">{hasReset ? t("codexAuth.resets") : ""}</span>
       <span className="quota-reset-day">{reset.day}</span>
       <span className="quota-reset-time">{reset.time}</span>
-      <div className="bar" title={resetTitle}><div className={`bar-fill ${color}`} style={barFillStyle(percent)} /></div>
+      <div className="bar" title={resetTitle}>
+        <div className={`bar-fill ${color}`} style={barFillStyle(percent)} />
+      </div>
       <span
         className={`quota-val${warn ? " quota-val--warn" : ""}`}
         title={exhausted ? t("quota.limitReached") : resetTitle}
         aria-label={resetTitle}
       >
         {warn && <IconAlert width={12} height={12} aria-hidden="true" />}
-        {Math.round(percent)}%
-        {exhausted ? ` · ${t("quota.limitReached")}` : ""}
+        {Math.round(percent)}%{exhausted ? ` · ${t("quota.limitReached")}` : ""}
       </span>
     </div>
   );
 }
 
-function StackedQuotaRow({ row, threshold, t, locale, incomplete }: {
+function StackedQuotaRow({
+  row,
+  threshold,
+  t,
+  locale,
+  incomplete,
+}: {
   row: QuotaBarRow;
   threshold: number;
   t: TFn;
@@ -422,7 +470,9 @@ function StackedQuotaRow({ row, threshold, t, locale, incomplete }: {
   const color = quotaBarTone(row.percent, threshold);
   const resetText = formatResetFuture(row.resetAt, t, locale);
   return (
-    <div className={`quota-stacked-row${warn ? " quota-stacked-row--warn" : ""}${exhausted ? " quota-stacked-row--exhausted" : ""}`}>
+    <div
+      className={`quota-stacked-row${warn ? " quota-stacked-row--warn" : ""}${exhausted ? " quota-stacked-row--exhausted" : ""}`}
+    >
       <div className="quota-stacked-head">
         <span className="quota-stacked-limit-group">
           <span className="quota-stacked-limit">{row.limitLabel}</span>
@@ -466,16 +516,25 @@ function resetDate(resetAt: number | undefined): { date: Date; ms: number } | nu
   return { date, ms };
 }
 
-function formatResetAt(resetAt: number | undefined, t: TFn, locale: Locale): { day: string; time: string } {
+function formatResetAt(
+  resetAt: number | undefined,
+  t: TFn,
+  locale: Locale,
+): { day: string; time: string } {
   const normalized = resetDate(resetAt);
   if (!normalized) return { day: "", time: "" };
   const { date } = normalized;
   const now = new Date();
   const tag = bcp47(locale);
-  const time = new Intl.DateTimeFormat(tag, { hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
-  const isToday = date.getFullYear() === now.getFullYear()
-    && date.getMonth() === now.getMonth()
-    && date.getDate() === now.getDate();
+  const time = new Intl.DateTimeFormat(tag, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
   if (isToday) return { day: t("codexAuth.today"), time };
   const day = new Intl.DateTimeFormat(tag, { day: "numeric", month: "short" }).format(date);
   return { day, time };
@@ -492,9 +551,17 @@ export function formatResetFuture(
   if (!normalized) return "";
   const { date, ms } = normalized;
   const tag = bcp47(locale);
-  const time = new Intl.DateTimeFormat(tag, { hour: "2-digit", minute: "2-digit", hour12: false }).format(date);
+  const time = new Intl.DateTimeFormat(tag, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
   const nowDate = new Date(now);
-  const startOfToday = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime();
+  const startOfToday = new Date(
+    nowDate.getFullYear(),
+    nowDate.getMonth(),
+    nowDate.getDate(),
+  ).getTime();
   const startOfTarget = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
   const dayDiff = Math.round((startOfTarget - startOfToday) / 86_400_000);
 

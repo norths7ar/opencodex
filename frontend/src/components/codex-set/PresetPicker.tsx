@@ -46,7 +46,9 @@ export default function PresetPicker({
     const onDown = (event: Event) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
-    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
     return () => {
@@ -85,20 +87,16 @@ export default function PresetPicker({
         className="btn btn-sm codex-set-custom__add"
         aria-expanded={expanded}
         disabled={disabled}
-        onClick={() => setOpen(value => !value)}
+        onClick={() => setOpen((value) => !value)}
       >
         {t("codexSet.custom.add")}
       </button>
       {expanded && (
         <div className="codex-set-preset__menu">
-          <button
-            type="button"
-            className="codex-set-preset__item"
-            onClick={() => choose(onBlank)}
-          >
+          <button type="button" className="codex-set-preset__item" onClick={() => choose(onBlank)}>
             <span className="codex-set-preset__name">{t("codexSet.preset.blank")}</span>
           </button>
-          {presets.map(preset => (
+          {presets.map((preset) => (
             <button
               key={preset.id}
               type="button"

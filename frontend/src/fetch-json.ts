@@ -14,10 +14,13 @@ async function readJsonBody<T>(res: Response): Promise<T | undefined> {
     if (!text.trim()) return undefined;
     return JSON.parse(text) as T;
   }
-  return await res.json() as T;
+  return (await res.json()) as T;
 }
 
-function errorMessageFromBody(errBody: { error?: unknown; message?: unknown }, fallback: string): string {
+function errorMessageFromBody(
+  errBody: { error?: unknown; message?: unknown },
+  fallback: string,
+): string {
   if (typeof errBody.error === "string" && errBody.error) return errBody.error;
   // Some management routes (e.g. Grok apply orphan repair) put the actionable
   // copy in `message` rather than `error`.
@@ -32,7 +35,7 @@ export async function readJsonOrThrow<T>(
   if (!res.ok) {
     let message = fallbackMessage;
     try {
-      const errBody = await res.json() as { error?: unknown; message?: unknown };
+      const errBody = (await res.json()) as { error?: unknown; message?: unknown };
       message = errorMessageFromBody(errBody, fallbackMessage);
     } catch {
       // non-JSON error bodies keep the fallback message

@@ -59,16 +59,24 @@ export function claudeCodeSaveBody(state: ClaudeCodeState, rows: readonly MapRow
  * blank or half-typed row keeps Revert available instead of vanishing on the next read.
  */
 export function claudeCodeDraftKey(draft: ClaudeCodeEditable): string {
-  return JSON.stringify([claudeCodeSaveBody(draft.state, draft.rows), draft.rows.map(row => [row.from, row.to])]);
+  return JSON.stringify([
+    claudeCodeSaveBody(draft.state, draft.rows),
+    draft.rows.map((row) => [row.from, row.to]),
+  ]);
 }
 
 /** Whether the draft differs from what the server last confirmed. */
-export function isClaudeCodeDraftDirty(draft: ClaudeCodeEditable, baseline: ClaudeCodeEditable): boolean {
+export function isClaudeCodeDraftDirty(
+  draft: ClaudeCodeEditable,
+  baseline: ClaudeCodeEditable,
+): boolean {
   return claudeCodeDraftKey(draft) !== claudeCodeDraftKey(baseline);
 }
 
 function pickEditable(state: ClaudeCodeState): Partial<ClaudeCodeState> {
-  return Object.fromEntries(EDITABLE_KEYS.map(key => [key, state[key]])) as Partial<ClaudeCodeState>;
+  return Object.fromEntries(
+    EDITABLE_KEYS.map((key) => [key, state[key]]),
+  ) as Partial<ClaudeCodeState>;
 }
 
 /** A fresh server read with the user's unsaved editable fields laid back on top. */
@@ -98,8 +106,15 @@ export type ClaudeCodeEditState = {
 };
 
 /** Fold a successful read into the edit state. */
-export function applyServerRead(current: ClaudeCodeEditState | null, next: ClaudeCodeEditable): ClaudeCodeEditState {
-  if (!current || current.adoptNextRead || (!current.savePending && !isClaudeCodeDraftDirty(current.draft, current.baseline))) {
+export function applyServerRead(
+  current: ClaudeCodeEditState | null,
+  next: ClaudeCodeEditable,
+): ClaudeCodeEditState {
+  if (
+    !current ||
+    current.adoptNextRead ||
+    (!current.savePending && !isClaudeCodeDraftDirty(current.draft, current.baseline))
+  ) {
     return { draft: next, baseline: next, adoptNextRead: false, savePending: current?.savePending };
   }
   return {
@@ -114,13 +129,22 @@ export function applyServerRead(current: ClaudeCodeEditState | null, next: Claud
  * What the server holds after a successful Save: the last server copy with the submitted
  * editable fields, and the normalized map (trimmed, no blanks, last duplicate wins).
  */
-export function savedCopy(serverState: ClaudeCodeState, submitted: ClaudeCodeEditable): ClaudeCodeEditable {
+export function savedCopy(
+  serverState: ClaudeCodeState,
+  submitted: ClaudeCodeEditable,
+): ClaudeCodeEditable {
   return {
-    state: { ...serverState, ...pickEditable(submitted.state),
+    state: {
+      ...serverState,
+      ...pickEditable(submitted.state),
       visionSidecar: confirmSidecarOverride(submitted.state.visionSidecar),
       webSearchSidecar: confirmSidecarOverride(submitted.state.webSearchSidecar),
     },
-    rows: Object.entries(normalizedModelMap(submitted.rows)).map(([from, to]) => ({ id: newClientId(), from, to })),
+    rows: Object.entries(normalizedModelMap(submitted.rows)).map(([from, to]) => ({
+      id: newClientId(),
+      from,
+      to,
+    })),
   };
 }
 
@@ -131,7 +155,10 @@ export function savedCopy(serverState: ClaudeCodeState, submitted: ClaudeCodeEdi
  * restores settings the server has already overwritten. The following read still gets the
  * final word through applyServerRead (adoptNextRead when nothing changed since submission).
  */
-export function acknowledgeSave(current: ClaudeCodeEditState | null, submitted: ClaudeCodeEditable): ClaudeCodeEditState | null {
+export function acknowledgeSave(
+  current: ClaudeCodeEditState | null,
+  submitted: ClaudeCodeEditable,
+): ClaudeCodeEditState | null {
   if (!current) return current;
   // The saved copy is the baseline even if the refresh that would show it fails.
   const baseline = savedCopy(current.baseline.state, submitted);
@@ -139,9 +166,18 @@ export function acknowledgeSave(current: ClaudeCodeEditState | null, submitted: 
   const unchanged = claudeCodeDraftKey(current.draft) === claudeCodeDraftKey(submitted);
   if (unchanged) {
     // Untouched since submission: show what was stored.
-    return { draft: { state: { ...current.draft.state,
-      visionSidecar: baseline.state.visionSidecar, webSearchSidecar: baseline.state.webSearchSidecar,
-    }, rows }, baseline, adoptNextRead: true };
+    return {
+      draft: {
+        state: {
+          ...current.draft.state,
+          visionSidecar: baseline.state.visionSidecar,
+          webSearchSidecar: baseline.state.webSearchSidecar,
+        },
+        rows,
+      },
+      baseline,
+      adoptNextRead: true,
+    };
   }
   /*
    * Edited while the PUT was out: keep the edits, dirty. A sidecar is still confirmed —
@@ -153,7 +189,8 @@ export function acknowledgeSave(current: ClaudeCodeEditState | null, submitted: 
     const stored = JSON.stringify(serializeSidecarOverride(submitted.state[key]));
     if (JSON.stringify(serializeSidecarOverride(draft.state[key])) !== stored) continue;
     const confirmed = confirmSidecarOverride(draft.state[key]);
-    if (confirmed !== draft.state[key]) draft = { ...draft, state: { ...draft.state, [key]: confirmed } };
+    if (confirmed !== draft.state[key])
+      draft = { ...draft, state: { ...draft.state, [key]: confirmed } };
   }
   return { draft, baseline, adoptNextRead: false };
 }

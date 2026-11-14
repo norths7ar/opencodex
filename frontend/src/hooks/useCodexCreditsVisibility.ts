@@ -15,7 +15,10 @@ export function useCodexCreditsVisibility(
     onRead: (read: Promise<unknown>, signal: AbortSignal) => void;
   },
 ) {
-  const [state, setState] = useState<{ apiBase: string; visible?: boolean; busy: boolean }>({ apiBase, busy: false });
+  const [state, setState] = useState<{ apiBase: string; visible?: boolean; busy: boolean }>({
+    apiBase,
+    busy: false,
+  });
   const scopeRef = useRef<AbortController | null>(null);
   const mutationRevisionRef = useRef(0);
   const observeSettingsRead = useEffectEvent((read: Promise<unknown>, signal: AbortSignal) => {
@@ -42,15 +45,28 @@ export function useCodexCreditsVisibility(
     const abort = new AbortController();
     const bounded = createBoundedFetch(15_000);
     const startedMutationRevision = mutationRevisionRef.current;
-    const read = fetch(`${apiBase}/api/settings`, { signal: bounded.signal })
-      .then(response => { if (!response.ok) throw new Error("read"); return response.json() as Promise<unknown>; });
+    const read = fetch(`${apiBase}/api/settings`, { signal: bounded.signal }).then((response) => {
+      if (!response.ok) throw new Error("read");
+      return response.json() as Promise<unknown>;
+    });
     observeSettingsRead(read, abort.signal);
-    read.then(payload => {
-      if (abort.signal.aborted || mutationRef.current || mutationRevisionRef.current !== startedMutationRevision) return;
-      if (!payload || typeof payload !== "object" || !("showCodexCredits" in payload)
-        || typeof payload.showCodexCredits !== "boolean") return;
-      setState({ apiBase, visible: payload.showCodexCredits, busy: false });
-    })
+    read
+      .then((payload) => {
+        if (
+          abort.signal.aborted ||
+          mutationRef.current ||
+          mutationRevisionRef.current !== startedMutationRevision
+        )
+          return;
+        if (
+          !payload ||
+          typeof payload !== "object" ||
+          !("showCodexCredits" in payload) ||
+          typeof payload.showCodexCredits !== "boolean"
+        )
+          return;
+        setState({ apiBase, visible: payload.showCodexCredits, busy: false });
+      })
       // A failed read leaves the switch unrendered instead of guessing its state.
       .catch(() => {})
       .finally(() => bounded.clear());
@@ -63,7 +79,8 @@ export function useCodexCreditsVisibility(
 
   const toggle = async () => {
     const scope = scopeRef.current;
-    if (visible === undefined || busy || mutationRef.current || !scope || scope.signal.aborted) return;
+    if (visible === undefined || busy || mutationRef.current || !scope || scope.signal.aborted)
+      return;
     const mutation = new AbortController();
     mutationRef.current = mutation;
     // Bounded like the read: a relay that accepts the PUT and never answers must not leave the
@@ -79,11 +96,13 @@ export function useCodexCreditsVisibility(
       let confirmed: boolean;
       try {
         const response = await fetch(`${apiBase}/api/settings`, {
-          method: "PUT", headers: { "content-type": "application/json" }, signal: write.signal,
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          signal: write.signal,
           body: JSON.stringify({ showCodexCredits: requested }),
         });
         if (!response.ok) throw new Error("save");
-        const payload = await response.json() as { showCodexCredits?: unknown } | null;
+        const payload = (await response.json()) as { showCodexCredits?: unknown } | null;
         if (typeof payload?.showCodexCredits !== "boolean") throw new Error("shape");
         confirmed = payload.showCodexCredits;
       } catch {
@@ -107,7 +126,7 @@ export function useCodexCreditsVisibility(
       mutation.signal.removeEventListener("abort", abortWrite);
       if (current()) {
         mutationRef.current = null;
-        setState(previous => ({ ...previous, busy: false }));
+        setState((previous) => ({ ...previous, busy: false }));
       }
     }
   };

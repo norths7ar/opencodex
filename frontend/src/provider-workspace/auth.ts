@@ -42,6 +42,6 @@ export function oauthAccountDisplayLabel<T extends OAuthAccountIdentity>(
   if (alias) return alias;
   const label = account.maskedLabel?.trim();
   if (label) return label;
-  const index = accounts.findIndex(candidate => candidate.id === account.id);
+  const index = accounts.findIndex((candidate) => candidate.id === account.id);
   return t("pws.accountOrdinal", { count: String(index >= 0 ? index + 1 : 1) });
 }

@@ -5,11 +5,18 @@ export interface UsageReadMetadata {
 }
 
 export function readUsageMetadata(value: unknown): UsageReadMetadata {
-  if (!value || typeof value !== "object" || !("usageIncomplete" in value) || value.usageIncomplete !== true) return {};
+  if (
+    !value ||
+    typeof value !== "object" ||
+    !("usageIncomplete" in value) ||
+    value.usageIncomplete !== true
+  )
+    return {};
   return {
     usageIncomplete: true,
     ...("usageIncompleteReason" in value && value.usageIncompleteReason === "oversized_rows"
-      ? { usageIncompleteReason: "oversized_rows" as const } : {}),
+      ? { usageIncompleteReason: "oversized_rows" as const }
+      : {}),
   };
 }
 
@@ -26,7 +33,10 @@ export class UsageReadFailedError extends Error {
 }
 
 /** Admit usage data only after recognizing both current HTTP errors and legacy HTTP-200 failures. */
-export async function readUsageResponseJson<T>(response: Response, fallbackMessage?: string): Promise<T> {
+export async function readUsageResponseJson<T>(
+  response: Response,
+  fallbackMessage?: string,
+): Promise<T> {
   let value: unknown;
   try {
     value = await response.json();
@@ -34,11 +44,15 @@ export async function readUsageResponseJson<T>(response: Response, fallbackMessa
     throw new Error(fallbackMessage ?? `${response.status} ${response.statusText}`.trim());
   }
   if (isUsageReadFailure(value)) throw new UsageReadFailedError();
-  if (!response.ok) throw new Error(fallbackMessage ?? `${response.status} ${response.statusText}`.trim());
+  if (!response.ok)
+    throw new Error(fallbackMessage ?? `${response.status} ${response.statusText}`.trim());
   return value as T;
 }
 
-export function usageSummary30dResourceKey(apiBase: string, surface: "all" | "codex" = "all"): string {
+export function usageSummary30dResourceKey(
+  apiBase: string,
+  surface: "all" | "codex" = "all",
+): string {
   return surface === "codex"
     ? ["usage-summary-30d", apiBase, "codex"].join(":")
     : ["usage-summary-30d", apiBase, "all"].join(":");

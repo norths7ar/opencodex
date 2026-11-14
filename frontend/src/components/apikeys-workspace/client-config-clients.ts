@@ -8,13 +8,38 @@
  * with EXPORT_CLIENT_IDS by hand; adding a client server-side renders no row
  * until this tuple changes.
  */
-export const CLIENTS = ["qoder", "qoder-cn", "workbuddy", "workbuddy-ai", "opencode", "pi", "omp", "hermes", "openclaw", "kimi", "gajae", "dsh", "mcode", "zcode", "commandcode", "prime", "aside", "raycast", "omo", "cline", "kilo", "droid", "gentle-shell", "t3code"] as const;
+export const CLIENTS = [
+  "qoder",
+  "qoder-cn",
+  "workbuddy",
+  "workbuddy-ai",
+  "opencode",
+  "pi",
+  "omp",
+  "hermes",
+  "openclaw",
+  "kimi",
+  "gajae",
+  "dsh",
+  "mcode",
+  "zcode",
+  "commandcode",
+  "prime",
+  "aside",
+  "raycast",
+  "omo",
+  "cline",
+  "kilo",
+  "droid",
+  "gentle-shell",
+  "t3code",
+] as const;
 export type ExportClientId = (typeof CLIENTS)[number];
 
 export const CLIENT_LABEL_KEYS = {
   qoder: "api.clientConfig.clientQoder",
   "qoder-cn": "integrations.tab.qoderCn",
-  "workbuddy": "integrations.tab.workbuddy",
+  workbuddy: "integrations.tab.workbuddy",
   "workbuddy-ai": "integrations.tab.workbuddyAi",
   opencode: "api.clientConfig.clientOpencode",
   pi: "api.clientConfig.clientPi",

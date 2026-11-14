@@ -48,7 +48,17 @@ const zoneOf = (pos: number): Zone => (pos >= STOP ? "stop" : pos >= RESTART ? "
  * harmless one; End (or a full drag) is the stop. While dragging, the handle takes the colour of
  * the action it will fire on release.
  */
-export function ProxyLever({ restartLabel, stopLabel, hint, restarting, settled = false, stopping, onRestart, onStop, onPreview }: ProxyLeverProps) {
+export function ProxyLever({
+  restartLabel,
+  stopLabel,
+  hint,
+  restarting,
+  settled = false,
+  stopping,
+  onRestart,
+  onStop,
+  onPreview,
+}: ProxyLeverProps) {
   const [pulled, setPulled] = useState(false);
   const [drag, setDrag] = useState<number | null>(null);
   const start = useRef<{ y: number; from: number; moved: boolean } | null>(null);
@@ -135,9 +145,17 @@ export function ProxyLever({ restartLabel, stopLabel, hint, restarting, settled 
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      onPointerCancel={() => { start.current = null; setDrag(null); preview(null); }}
-      onPointerEnter={() => { if (!start.current) preview("hover"); }}
-      onPointerLeave={() => { if (!start.current) preview(null); }}
+      onPointerCancel={() => {
+        start.current = null;
+        setDrag(null);
+        preview(null);
+      }}
+      onPointerEnter={() => {
+        if (!start.current) preview("hover");
+      }}
+      onPointerLeave={() => {
+        if (!start.current) preview(null);
+      }}
       onFocus={() => preview("hover")}
       onBlur={() => preview(null)}
       className={cn(
@@ -149,21 +167,42 @@ export function ProxyLever({ restartLabel, stopLabel, hint, restarting, settled 
       )}
     >
       {/* The slot, with a notch mark at each of the three stops. It charges sky while a reload runs. */}
-      <span className={cn("pointer-events-none absolute top-[4px] h-5 w-[5px] rounded-full bg-line-strong", restarting && "ocx-charge")} aria-hidden />
-      {[0, 0.5, 1].map(at => (
-        <span key={at} className="pointer-events-none absolute left-[21px] h-px w-[3px] bg-line-strong" style={{ top: 7 + at * TRAVEL }} aria-hidden />
+      <span
+        className={cn(
+          "pointer-events-none absolute top-[4px] h-5 w-[5px] rounded-full bg-line-strong",
+          restarting && "ocx-charge",
+        )}
+        aria-hidden
+      />
+      {[0, 0.5, 1].map((at) => (
+        <span
+          key={at}
+          className="pointer-events-none absolute left-[21px] h-px w-[3px] bg-line-strong"
+          style={{ top: 7 + at * TRAVEL }}
+          aria-hidden
+        />
       ))}
       {/* The handle: a grip bar across the slot. */}
       <span
         aria-hidden
         className={cn(
           "pointer-events-none absolute top-[5px] h-[5px] w-3 rounded-[2px] shadow-sm",
-          zone === "stop" ? "bg-danger" : zone === "restart" ? "bg-highlight" : settled ? "bg-success" : "bg-fg-muted group-hover:bg-fg",
-          ((restarting && drag === null) || (drag !== null && zone === "restart")) && "shadow-[0_0_0_3px_var(--ocx-highlight-soft)]",
+          zone === "stop"
+            ? "bg-danger"
+            : zone === "restart"
+              ? "bg-highlight"
+              : settled
+                ? "bg-success"
+                : "bg-fg-muted group-hover:bg-fg",
+          ((restarting && drag === null) || (drag !== null && zone === "restart")) &&
+            "shadow-[0_0_0_3px_var(--ocx-highlight-soft)]",
         )}
         style={{
           transform: `translateY(${pos * TRAVEL}px)`,
-          transition: drag !== null ? "background-color 150ms" : `transform ${THROW[zone]}, background-color 150ms, box-shadow 200ms`,
+          transition:
+            drag !== null
+              ? "background-color 150ms"
+              : `transform ${THROW[zone]}, background-color 150ms, box-shadow 200ms`,
         }}
       />
     </button>

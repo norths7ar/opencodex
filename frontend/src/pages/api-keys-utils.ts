@@ -27,9 +27,7 @@ export interface ApiKeyEntry {
  * browser or signs in through a trusted identity. `failed` is the transient
  * remainder: timeout, unreachable server, malformed answer.
  */
-export type RevealKeyResult =
-  | { ok: true; key: string }
-  | { ok: false; kind: "denied" | "failed" };
+export type RevealKeyResult = { ok: true; key: string } | { ok: false; kind: "denied" | "failed" };
 
 /**
  * A usage object the GUI can actually render. Coercing a malformed one to zeroes
@@ -41,9 +39,11 @@ export function isApiKeyUsage(value: unknown): value is ApiKeyUsage {
   const usage = value as Record<string, unknown>;
   if (usage.ambiguous === true) return true;
   if (typeof usage.requests7d !== "number" || !Number.isFinite(usage.requests7d)) return false;
-  if (typeof usage.totalRequests !== "number" || !Number.isFinite(usage.totalRequests)) return false;
+  if (typeof usage.totalRequests !== "number" || !Number.isFinite(usage.totalRequests))
+    return false;
   if (usage.lastUsedAt !== undefined) {
-    if (typeof usage.lastUsedAt !== "string" || Number.isNaN(new Date(usage.lastUsedAt).getTime())) return false;
+    if (typeof usage.lastUsedAt !== "string" || Number.isNaN(new Date(usage.lastUsedAt).getTime()))
+      return false;
   }
   return true;
 }
@@ -61,14 +61,20 @@ const DISPOSITIONS = new Set<ApiAuthDisposition>(["required", "accepted", "rejec
 
 /** The GUI must not invent auth rules; an unusable payload is a load failure. */
 export function isApiAuthMatrix(value: unknown): value is ApiAuthMatrixRow[] {
-  return Array.isArray(value) && value.length > 0 && value.every(row => {
-    if (!row || typeof row !== "object") return false;
-    const r = row as Record<string, unknown>;
-    return typeof r.endpoint === "string"
-      && DISPOSITIONS.has(r.bearer as ApiAuthDisposition)
-      && DISPOSITIONS.has(r.dedicated as ApiAuthDisposition)
-      && DISPOSITIONS.has(r.xApiKey as ApiAuthDisposition);
-  });
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((row) => {
+      if (!row || typeof row !== "object") return false;
+      const r = row as Record<string, unknown>;
+      return (
+        typeof r.endpoint === "string" &&
+        DISPOSITIONS.has(r.bearer as ApiAuthDisposition) &&
+        DISPOSITIONS.has(r.dedicated as ApiAuthDisposition) &&
+        DISPOSITIONS.has(r.xApiKey as ApiAuthDisposition)
+      );
+    })
+  );
 }
 
 /** Shared by both key-name inputs; the server rejects anything longer. */
@@ -82,8 +88,17 @@ export interface ApiSurfaceInfo {
 }
 export type ApiSurfacesInfo = Record<GatewayInboundProtocol, ApiSurfaceInfo>;
 
-const SURFACE_SOURCES = new Set<ApiSurfaceSource>(["fixed", "api-surfaces", "claude-code-legacy", "invalid"]);
-const SURFACE_NAMES = ["responses", "chat", "messages"] as const satisfies readonly GatewayInboundProtocol[];
+const SURFACE_SOURCES = new Set<ApiSurfaceSource>([
+  "fixed",
+  "api-surfaces",
+  "claude-code-legacy",
+  "invalid",
+]);
+const SURFACE_NAMES = [
+  "responses",
+  "chat",
+  "messages",
+] as const satisfies readonly GatewayInboundProtocol[];
 
 /**
  * `surfaces` from the keys payload, or `undefined` when an older server sent none or the value
@@ -97,7 +112,8 @@ export function parseApiSurfaces(value: unknown): ApiSurfacesInfo | undefined {
     const surface = record[name];
     if (!surface || typeof surface !== "object" || Array.isArray(surface)) return undefined;
     const { enabled, source } = surface as Record<string, unknown>;
-    if (typeof enabled !== "boolean" || !SURFACE_SOURCES.has(source as ApiSurfaceSource)) return undefined;
+    if (typeof enabled !== "boolean" || !SURFACE_SOURCES.has(source as ApiSurfaceSource))
+      return undefined;
     surfaces[name] = { enabled, source: source as ApiSurfaceSource };
   }
   return surfaces;
@@ -128,11 +144,28 @@ export interface AudioApiInfo {
 export function isAudioApiInfo(value: unknown, baseUrl: string): value is AudioApiInfo {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const audio = value as Record<string, unknown>;
-  const fields = new Set(["transcriptionEndpoint", "dictationStreamEndpoint", "liveEndpoint", "realtimeCallsEndpoint", "transcriptionModel", "liveModel", "transcriptionConfigured", "dictationConfigured", "liveConfigured"]);
-  if (Object.keys(audio).some(field => !fields.has(field))) return false;
+  const fields = new Set([
+    "transcriptionEndpoint",
+    "dictationStreamEndpoint",
+    "liveEndpoint",
+    "realtimeCallsEndpoint",
+    "transcriptionModel",
+    "liveModel",
+    "transcriptionConfigured",
+    "dictationConfigured",
+    "liveConfigured",
+  ]);
+  if (Object.keys(audio).some((field) => !fields.has(field))) return false;
   try {
     const base = new URL(baseUrl);
-    if (!["http:", "https:"].includes(base.protocol) || base.username || base.password || base.search || base.hash) return false;
+    if (
+      !["http:", "https:"].includes(base.protocol) ||
+      base.username ||
+      base.password ||
+      base.search ||
+      base.hash
+    )
+      return false;
     const paths = {
       transcriptionEndpoint: ["/audio/transcriptions", false],
       dictationStreamEndpoint: ["/audio/transcriptions/stream", true],
@@ -143,17 +176,32 @@ export function isAudioApiInfo(value: unknown, baseUrl: string): value is AudioA
       if (typeof audio[field] !== "string") return false;
       const url = new URL(audio[field]);
       const protocol = socket ? (base.protocol === "https:" ? "wss:" : "ws:") : base.protocol;
-      if (url.protocol !== protocol || url.username || url.password || url.search || url.hash) return false;
+      if (url.protocol !== protocol || url.username || url.password || url.search || url.hash)
+        return false;
       url.protocol = base.protocol;
-      if (url.origin !== base.origin || url.pathname !== `${base.pathname.replace(/\/$/, "")}${suffix}`) return false;
+      if (
+        url.origin !== base.origin ||
+        url.pathname !== `${base.pathname.replace(/\/$/, "")}${suffix}`
+      )
+        return false;
     }
-    return audio.transcriptionModel === "gpt-4o-transcribe" && audio.liveModel === "gpt-live-1-codex"
-      && [audio.transcriptionConfigured, audio.dictationConfigured, audio.liveConfigured].every(flag => typeof flag === "boolean");
-  } catch { return false; }
+    return (
+      audio.transcriptionModel === "gpt-4o-transcribe" &&
+      audio.liveModel === "gpt-live-1-codex" &&
+      [audio.transcriptionConfigured, audio.dictationConfigured, audio.liveConfigured].every(
+        (flag) => typeof flag === "boolean",
+      )
+    );
+  } catch {
+    return false;
+  }
 }
 
 export type ModelTestState = "idle" | "testing" | "ok" | "error";
-export interface ModelTestResult { state: ModelTestState; detail?: string }
+export interface ModelTestResult {
+  state: ModelTestState;
+  detail?: string;
+}
 /** Per model, per protocol: a result belongs to the chip that produced it. */
 export type ModelTests = Record<string, Partial<Record<GatewayInboundProtocol, ModelTestResult>>>;
 

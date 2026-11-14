@@ -16,7 +16,7 @@ import type { TKey } from "./en";
  * Technical terms and model identifiers intentionally remain English.
  */
 export const pt: Record<TKey, string> = {
-    "pws.firstResponse.title": "Progresso até a primeira resposta",
+  "pws.firstResponse.title": "Progresso até a primeira resposta",
   "pws.firstResponse.stepProvider": "Provedor",
   "pws.firstResponse.stepModels": "Modelos",
   "pws.firstResponse.stepClients": "Roteamento do cliente",
@@ -28,36 +28,50 @@ export const pt: Record<TKey, string> = {
   "pws.firstResponse.providerDisabled": "O provedor está desativado",
   "pws.firstResponse.modelsLoading": "Verificando lista de modelos…",
   "pws.firstResponse.modelsFailed": "Não foi possível carregar a lista de modelos",
-  "pws.firstResponse.modelsPending": "A lista inicial de modelos ainda está pendente — os modelos ficam ocultos até a descoberta terminar",
+  "pws.firstResponse.modelsPending":
+    "A lista inicial de modelos ainda está pendente — os modelos ficam ocultos até a descoberta terminar",
   "pws.firstResponse.modelsReady": "{count} modelo(s) ativado(s) para roteamento",
-  "pws.firstResponse.modelsReadyDiscoveryFailed": "{count} modelo(s) retido(s) ativado(s) — falha na descoberta ao vivo",
+  "pws.firstResponse.modelsReadyDiscoveryFailed":
+    "{count} modelo(s) retido(s) ativado(s) — falha na descoberta ao vivo",
   "pws.firstResponse.modelsAllOff": "Todos os modelos estão desativados — ative-os em Modelos",
   "pws.firstResponse.modelsConfigured": "{count} modelo(s) configurado(s)",
   "pws.firstResponse.modelsEmpty": "Nenhum modelo descoberto ou configurado ainda",
   "pws.firstResponse.openProviderModels": "Escolher modelos",
-  "pws.firstResponse.clientStep": "Aplique um cliente em Connect e selecione {provider}/<model>; vale para novas sessões",
+  "pws.firstResponse.clientStep":
+    "Aplique um cliente em Connect e selecione {provider}/<model>; vale para novas sessões",
   "pws.firstResponse.openConnect": "Abrir Connect",
   "pws.firstResponse.probeUntested": "Ainda não verificado — execute o teste de conclusão abaixo",
   "pws.firstResponse.probeOk": "Resposta de conclusão verificada de {model}",
   "pws.firstResponse.probeFailed": "O último teste de conclusão falhou para {model}",
   "pws.firstResponse.stepDisconnect": "Desconectar e restaurar",
-  "pws.firstResponse.disconnectNote": "Em Connect, desativar o Claude Code remove apenas o bloco do proxy para novas sessões do Claude, enquanto desativar o Codex interrompe o roteamento pelo proxy e restaura o catálogo nativo e o histórico de conversas do Codex; sessões em execução mantêm o ambiente atual até serem reiniciadas. Desativar ou remover {provider} não restaura as configurações dos clientes em Connect.",
-  "pws.firstResponse.probeReverify": "As configurações de conexão mudaram desde o teste com falha — execute o teste novamente para {model} para verificar a correção",
-  "pws.completion.recovery.auth": "Verifique ou atualize a chave de API ou as credenciais da conta deste provedor e execute novamente o teste para {model}.",
-  "pws.completion.recovery.rateLimit": "O provedor limitou a taxa desta solicitação (HTTP 429). Aguarde a janela de limite reiniciar ou troque de conta ou chave de API e execute novamente o teste para {model}.",
-  "pws.completion.recovery.connection": "A solicitação expirou ou não conseguiu alcançar o endpoint. Verifique a URL base e as configurações de rede e execute novamente o teste para {model}.",
-  "pws.completion.recovery.model": "O provedor rejeitou esta solicitação de modelo. Verifique o ID do modelo na aba Modelos ou escolha outro modelo e execute o teste novamente.",
-  "pws.completion.recovery.upstream": "O provedor upstream retornou um erro ou fluxo incompleto. Tente novamente o teste para {model} ou verifique as configurações do provedor.",
-  "pws.completion.recovery.aborted": "O teste foi cancelado antes da conclusão. Execute o teste novamente para {model} quando estiver pronto.",
-  "pws.completion.recovery.credentialChanged": "As configurações ou credenciais do provedor mudaram enquanto o teste iniciava. Execute o teste novamente para {model}.",
-  "pws.completion.recovery.request": "Não foi possível iniciar a solicitação de teste. Aguarde o término de qualquer teste em execução ou tente novamente para {model}.",
+  "pws.firstResponse.disconnectNote":
+    "Em Connect, desativar o Claude Code remove apenas o bloco do proxy para novas sessões do Claude, enquanto desativar o Codex interrompe o roteamento pelo proxy e restaura o catálogo nativo e o histórico de conversas do Codex; sessões em execução mantêm o ambiente atual até serem reiniciadas. Desativar ou remover {provider} não restaura as configurações dos clientes em Connect.",
+  "pws.firstResponse.probeReverify":
+    "As configurações de conexão mudaram desde o teste com falha — execute o teste novamente para {model} para verificar a correção",
+  "pws.completion.recovery.auth":
+    "Verifique ou atualize a chave de API ou as credenciais da conta deste provedor e execute novamente o teste para {model}.",
+  "pws.completion.recovery.rateLimit":
+    "O provedor limitou a taxa desta solicitação (HTTP 429). Aguarde a janela de limite reiniciar ou troque de conta ou chave de API e execute novamente o teste para {model}.",
+  "pws.completion.recovery.connection":
+    "A solicitação expirou ou não conseguiu alcançar o endpoint. Verifique a URL base e as configurações de rede e execute novamente o teste para {model}.",
+  "pws.completion.recovery.model":
+    "O provedor rejeitou esta solicitação de modelo. Verifique o ID do modelo na aba Modelos ou escolha outro modelo e execute o teste novamente.",
+  "pws.completion.recovery.upstream":
+    "O provedor upstream retornou um erro ou fluxo incompleto. Tente novamente o teste para {model} ou verifique as configurações do provedor.",
+  "pws.completion.recovery.aborted":
+    "O teste foi cancelado antes da conclusão. Execute o teste novamente para {model} quando estiver pronto.",
+  "pws.completion.recovery.credentialChanged":
+    "As configurações ou credenciais do provedor mudaram enquanto o teste iniciava. Execute o teste novamente para {model}.",
+  "pws.completion.recovery.request":
+    "Não foi possível iniciar a solicitação de teste. Aguarde o término de qualquer teste em execução ou tente novamente para {model}.",
   "pws.completion.recovery.fixAuth": "Atualizar credenciais",
   "pws.completion.recovery.fixSettings": "Verificar configurações",
-"pws.completion.title": "Teste de resposta do modelo",
+  "pws.completion.title": "Teste de resposta do modelo",
   "pws.completion.model": "Modelo a testar",
   "pws.completion.choose": "Escolha um modelo",
   "pws.completion.run": "Testar modelo",
-  "pws.completion.confirm": "Testar {model} em {provider}? Isso envia uma solicitação real com limite de 32 tokens de saída. Consome cota e pode gerar custos.",
+  "pws.completion.confirm":
+    "Testar {model} em {provider}? Isso envia uma solicitação real com limite de 32 tokens de saída. Consome cota e pode gerar custos.",
   "pws.completion.failed": "Falha no teste do modelo",
   "pws.completion.ok": "Teste do modelo concluído",
   "pws.completion.notApplicable": "Teste não aplicável",
@@ -65,12 +79,14 @@ export const pt: Record<TKey, string> = {
   "pws.completion.total": "Latência total",
   "pws.completion.reported": "O servidor de origem informou {upstream} para {model}",
   "pws.completion.unreported": "O servidor de origem não informou um modelo para {model}",
-  "pws.completion.identity": "Os metadados do modelo são informados pelo provedor de origem e não verificam a identidade do modelo real.",
+  "pws.completion.identity":
+    "Os metadados do modelo são informados pelo provedor de origem e não verificam a identidade do modelo real.",
   "pws.completion.match": "Correspondência",
   "pws.completion.mismatch": "Divergência",
   "pws.completion.unknown": "Desconhecido",
   "pws.completion.missing_metadata": "A resposta de origem não contém metadados do modelo.",
-  "pws.completion.conflicting_metadata": "A resposta de origem contém metadados do modelo conflitantes.",
+  "pws.completion.conflicting_metadata":
+    "A resposta de origem contém metadados do modelo conflitantes.",
   "pws.completion.disabled": "Este provedor está desativado.",
   "pws.completion.forward_auth": "A autenticação encaminhada não é compatível.",
   "pws.completion.oauth_auth": "A autenticação OAuth não é compatível.",
@@ -79,9 +95,11 @@ export const pt: Record<TKey, string> = {
   "pws.completion.tls_profile": "Um perfil TLS personalizado está configurado.",
   "pws.completion.upstream_http_version": "Uma versão HTTP de origem está configurada.",
   "pws.completion.request_pacing": "O controle de ritmo das solicitações está ativado.",
-  "pws.completion.custom_executor_egress": "Não é possível manter um executor fetch personalizado com proxy do provedor.",
+  "pws.completion.custom_executor_egress":
+    "Não é possível manter um executor fetch personalizado com proxy do provedor.",
   "pws.completion.runAll": "Testar todos os modelos",
-  "pws.completion.allConfirm": "Testar todos os modelos de {provider} ({count} no total)? Isso envia requisições reais, uma de cada vez (no máximo {count}), cada uma com limite de saída de 32 tokens. Alguns modelos podem ser ignorados antes do envio. Consome cota e pode gerar custos.",
+  "pws.completion.allConfirm":
+    "Testar todos os modelos de {provider} ({count} no total)? Isso envia requisições reais, uma de cada vez (no máximo {count}), cada uma com limite de saída de 32 tokens. Alguns modelos podem ser ignorados antes do envio. Consome cota e pode gerar custos.",
   "pws.completion.stop": "Parar",
   "pws.completion.progress": "Testando {done} de {total}…",
   "pws.completion.stopped": "Interrompido: {done} de {total} testados",
@@ -90,39 +108,54 @@ export const pt: Record<TKey, string> = {
   "pws.completion.failedShort": "Falhou",
   "pws.completion.notTested": "Não testado",
   "pws.completion.disableFailed": "Desativar modelos com falha ({count})",
-  "pws.completion.disableConfirm": "Desativar os modelos que falharam no teste em {provider} ({count})? Eles ficam fora do catálogo e do seletor de modelos, mas continuam acessíveis pelo ID exato até serem reativados na página Modelos.",
+  "pws.completion.disableConfirm":
+    "Desativar os modelos que falharam no teste em {provider} ({count})? Eles ficam fora do catálogo e do seletor de modelos, mas continuam acessíveis pelo ID exato até serem reativados na página Modelos.",
   "pws.completion.disabledDone": "Modelos desativados: {count}. Reative-os na página Modelos.",
   "pws.completion.disableError": "Não foi possível desativar os modelos com falha",
 
   "reasoningRetention.advanced": "Configurações avançadas",
   "reasoningRetention.title": "Retenção de raciocínio",
   "reasoningRetention.enable": "Ativar retenção de raciocínio",
-  "reasoningRetention.description": "Desativada por padrão. Quando ativada para compactação v1/v2 roteada com resumo legível, o raciocínio até o menor valor entre a porcentagem da janela de contexto e o limite de tokens retorna como contexto histórico junto com o resumo. Acima do limite, ele é arquivado localmente e substituído por uma indicação do caminho. Padrões quando ativada: 20% e 100.000 tokens. O raciocínio privado do provedor não é descriptografado; a saída opaca de compactação permanece inalterada.",
-  "reasoningRetention.storageHint": "A ativação pode preservar o raciocínio em texto não criptografado no histórico local e nos arquivos. Os arquivos concluídos não têm limite de tamanho total nem prazo de expiração; exclua manualmente os arquivos desnecessários.",
+  "reasoningRetention.description":
+    "Desativada por padrão. Quando ativada para compactação v1/v2 roteada com resumo legível, o raciocínio até o menor valor entre a porcentagem da janela de contexto e o limite de tokens retorna como contexto histórico junto com o resumo. Acima do limite, ele é arquivado localmente e substituído por uma indicação do caminho. Padrões quando ativada: 20% e 100.000 tokens. O raciocínio privado do provedor não é descriptografado; a saída opaca de compactação permanece inalterada.",
+  "reasoningRetention.storageHint":
+    "A ativação pode preservar o raciocínio em texto não criptografado no histórico local e nos arquivos. Os arquivos concluídos não têm limite de tamanho total nem prazo de expiração; exclua manualmente os arquivos desnecessários.",
   "reasoningRetention.percent": "Janela de contexto (%)",
   "reasoningRetention.tokens": "Limite de tokens",
   "reasoningRetention.reset": "Redefinir e desativar",
-  "reasoningRetention.invalid": "Informe uma porcentagem maior que 0 e no máximo 100, e um número inteiro positivo de tokens.",
-  "reasoningRetention.loadFailed": "Não foi possível carregar as configurações de retenção de raciocínio.",
-  "reasoningRetention.saveFailed": "Não foi possível salvar as configurações de retenção de raciocínio.",
+  "reasoningRetention.invalid":
+    "Informe uma porcentagem maior que 0 e no máximo 100, e um número inteiro positivo de tokens.",
+  "reasoningRetention.loadFailed":
+    "Não foi possível carregar as configurações de retenção de raciocínio.",
+  "reasoningRetention.saveFailed":
+    "Não foi possível salvar as configurações de retenção de raciocínio.",
   "reasoningRetention.saved": "Configurações de retenção de raciocínio salvas.",
   "nativeReasoningRetention.title": "Retenção de raciocínio nativo OpenAI",
-  "nativeReasoningRetention.description": "Somente para solicitações nativas ao backend oficial do ChatGPT, incluindo mudanças do destino real em Combos e pools de contas. Permite reenviar o raciocínio criptografado anterior; a reutilização depende do backend. As duas opções ficam desativadas por padrão.",
+  "nativeReasoningRetention.description":
+    "Somente para solicitações nativas ao backend oficial do ChatGPT, incluindo mudanças do destino real em Combos e pools de contas. Permite reenviar o raciocínio criptografado anterior; a reutilização depende do backend. As duas opções ficam desativadas por padrão.",
   "nativeReasoningRetention.modelSwitch": "Manter o raciocínio criptografado ao trocar de modelo",
-  "nativeReasoningRetention.accountSwitch": "Manter o raciocínio criptografado ao trocar de conta (experimental)",
-  "nativeReasoningRetention.accountHint": "Preservar o conteúdo criptografado não dá a outras contas acesso aos IDs de respostas ou arquivos anteriores. Uma solicitação bem-sucedida não comprova a reutilização do raciocínio. O tratamento da compactação nativa permanece inalterado.",
+  "nativeReasoningRetention.accountSwitch":
+    "Manter o raciocínio criptografado ao trocar de conta (experimental)",
+  "nativeReasoningRetention.accountHint":
+    "Preservar o conteúdo criptografado não dá a outras contas acesso aos IDs de respostas ou arquivos anteriores. Uma solicitação bem-sucedida não comprova a reutilização do raciocínio. O tratamento da compactação nativa permanece inalterado.",
   "nativeReasoningRetention.reset": "Restaurar padrões",
-  "nativeReasoningRetention.loadFailed": "Não foi possível carregar as configurações de raciocínio nativo.",
-  "nativeReasoningRetention.saveFailed": "Não foi possível salvar as configurações de raciocínio nativo.",
+  "nativeReasoningRetention.loadFailed":
+    "Não foi possível carregar as configurações de raciocínio nativo.",
+  "nativeReasoningRetention.saveFailed":
+    "Não foi possível salvar as configurações de raciocínio nativo.",
   "nativeReasoningRetention.saved": "Configurações de raciocínio nativo salvas.",
   "workflowBudget.title": "Limites de fluxo de trabalho dos subagentes",
-  "workflowBudget.description": "Tetos por tarefa, ou seja, uma conversa e os subagentes que ela inicia, contados em uma janela deslizante de {minutes} minutos. Uma requisição acima de um teto é recusada localmente com 429 antes de qualquer provedor ser contatado. As alterações valem a partir da próxima requisição; o uso já contado é mantido.",
+  "workflowBudget.description":
+    "Tetos por tarefa, ou seja, uma conversa e os subagentes que ela inicia, contados em uma janela deslizante de {minutes} minutos. Uma requisição acima de um teto é recusada localmente com 429 antes de qualquer provedor ser contatado. As alterações valem a partir da próxima requisição; o uso já contado é mantido.",
   "workflowBudget.maxConcurrentChildren": "Turnos em paralelo",
-  "workflowBudget.maxConcurrentChildrenHint": "Turnos que uma tarefa pode executar ao mesmo tempo. Uma vaga fica sempre reservada para a sua própria conversa, então os subagentes recebem uma a menos.",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "Turnos que uma tarefa pode executar ao mesmo tempo. Uma vaga fica sempre reservada para a sua própria conversa, então os subagentes recebem uma a menos.",
   "workflowBudget.maxPhysicalSends": "Requisições ao modelo por janela",
-  "workflowBudget.maxPhysicalSendsHint": "Requisições ao provedor, incluindo novas tentativas, que uma tarefa pode enviar dentro da janela.",
+  "workflowBudget.maxPhysicalSendsHint":
+    "Requisições ao provedor, incluindo novas tentativas, que uma tarefa pode enviar dentro da janela.",
   "workflowBudget.maxDistinctChildren": "Subagentes diferentes por janela",
-  "workflowBudget.maxDistinctChildrenHint": "Threads de subagentes distintos que uma tarefa pode iniciar dentro da janela.",
+  "workflowBudget.maxDistinctChildrenHint":
+    "Threads de subagentes distintos que uma tarefa pode iniciar dentro da janela.",
   "workflowBudget.range": "Padrão {default}, permitido {min}–{max}.",
   "workflowBudget.invalid": "Informe um número inteiro de {min} a {max}.",
   "workflowBudget.increase": "Aumentar {label}",
@@ -142,17 +175,20 @@ export const pt: Record<TKey, string> = {
   ...startupV2Copy("pt"),
   ...proxyV2Copy("pt"),
   "claude.tierDefaults.unset": "Não definido (manter configuração Claude)",
-  "claude.tierDefaults.recovery": "Aplicação interrompida; restauração automática falhou. Verifique o backup abaixo antes de tentar novamente.",
+  "claude.tierDefaults.recovery":
+    "Aplicação interrompida; restauração automática falhou. Verifique o backup abaixo antes de tentar novamente.",
   "claude.tierDefaults.title": "Modelos padrão da CLI",
   "claude.tierDefaults.preview": "Prévia das configurações Claude",
   "claude.tierDefaults.apply": "Aplicar às configurações Claude",
   "claude.tierDefaults.applied": "As configurações Claude correspondem aos padrões salvos.",
-  "claude.tierDefaults.failed": "Não foi possível aplicar os padrões. Veja a prévia novamente e confira as configurações Claude.",
+  "claude.tierDefaults.failed":
+    "Não foi possível aplicar os padrões. Veja a prévia novamente e confira as configurações Claude.",
   "sidecar.pool": "Pool de contas",
   "sidecar.poolCurrent": "Pool da solicitação atual",
   "sidecar.poolA": "Anthropic",
   "sidecar.poolB": "Anthropic · Pool 2",
-  "sidecar.poolMixed": "Esta seleção explícita pode usar um pool diferente da solicitação principal.",
+  "sidecar.poolMixed":
+    "Esta seleção explícita pode usar um pool diferente da solicitação principal.",
   "provider.name.anthropic2": "Anthropic · Pool 2",
   "compactionRouting.sources": "Origens",
   "compactionRouting.sourcesAll": "Todos os modelos de conversa",
@@ -160,35 +196,46 @@ export const pt: Record<TKey, string> = {
   "compactionRouting.sourcesProviders": "Provedores inteiros",
   "compactionRouting.sourcesModels": "Modelos individuais",
   "compactionRouting.sourcesSaved": "Seletores salvos ausentes no catálogo atual",
-  "compactionRouting.sourcesNone": "Selecione pelo menos uma origem ou volte para todos os modelos de conversa.",
-  "compactionRouting.sourcesHint": "Aplique a substituição somente quando o modelo de origem da requisição de compactação corresponder a um modelo selecionado ou a provedor/*. As demais requisições continuam usando seu próprio modelo.",
-  "compactionRouting.sourcesGridTitle": "Redirecionar requisições de compactação cujo modelo de origem corresponda a:",
-  "compactionRouting.providerWarningScoped": "Com esta configuração, somente requisições de compactação cujo modelo de origem corresponda a {sources} enviam todo o conteúdo da conversa para {provider} resumir; as demais continuam usando seu próprio modelo.",
+  "compactionRouting.sourcesNone":
+    "Selecione pelo menos uma origem ou volte para todos os modelos de conversa.",
+  "compactionRouting.sourcesHint":
+    "Aplique a substituição somente quando o modelo de origem da requisição de compactação corresponder a um modelo selecionado ou a provedor/*. As demais requisições continuam usando seu próprio modelo.",
+  "compactionRouting.sourcesGridTitle":
+    "Redirecionar requisições de compactação cujo modelo de origem corresponda a:",
+  "compactionRouting.providerWarningScoped":
+    "Com esta configuração, somente requisições de compactação cujo modelo de origem corresponda a {sources} enviam todo o conteúdo da conversa para {provider} resumir; as demais continuam usando seu próprio modelo.",
   "usage.col.tokPerSec": "Saída tok/s",
-  "usage.throughput.title": "Taxa de saída de ponta a ponta: soma dos tokens de saída dividida pela soma dos tempos totais de {samples} tentativas medidas. Inclui a espera antes da decodificação, não apenas sua velocidade estável; requisições sem tokens medidos ou sem duração medida são excluídas.",
-  "usage.throughput.unmeasured": "Nenhuma requisição desta linha informou tokens de saída e duração válidos; não há taxa para calcular.",
+  "usage.throughput.title":
+    "Taxa de saída de ponta a ponta: soma dos tokens de saída dividida pela soma dos tempos totais de {samples} tentativas medidas. Inclui a espera antes da decodificação, não apenas sua velocidade estável; requisições sem tokens medidos ou sem duração medida são excluídas.",
+  "usage.throughput.unmeasured":
+    "Nenhuma requisição desta linha informou tokens de saída e duração válidos; não há taxa para calcular.",
   "integrations.droidReasoning.title": "Esforço de raciocínio padrão",
-  "integrations.droidReasoning.description": "O padrão só é usado quando a requisição omite o esforço de raciocínio. Desative o Factory Droid para remover estes padrões salvos.",
+  "integrations.droidReasoning.description":
+    "O padrão só é usado quando a requisição omite o esforço de raciocínio. Desative o Factory Droid para remover estes padrões salvos.",
   "integrations.droidReasoning.noDefault": "Sem padrão",
   "integrations.droidReasoning.noEfforts": "Nenhuma opção de esforço de raciocínio disponível",
   "integrations.droidReasoning.noModels": "Nenhum modelo exportado está disponível.",
   "integrations.droidReasoning.modelDefault": "Esforço de raciocínio padrão para {model}",
-  "integrations.droidReasoning.unsupportedTitle": "Alguns padrões salvos não são mais compatíveis. Limpe-os e salve / revise as alterações para aplicar.",
+  "integrations.droidReasoning.unsupportedTitle":
+    "Alguns padrões salvos não são mais compatíveis. Limpe-os e salve / revise as alterações para aplicar.",
   "integrations.droidReasoning.unsupportedEffort": "Esforço não compatível: {effort}",
   "integrations.droidReasoning.clear": "Limpar padrão",
   "integrations.droidReasoning.saveReview": "Salvar / revisar alterações",
 
   "nav.claude": "Claude",
   "claude.pageSub": "Roteamento e configurações do OpenCodex para o Claude Code.",
-  "pws.anthropicAccountThresholdHint": "Substitui o padrão do pool do Claude. 0 desativa a troca por uso apenas para esta conta; a pausa e a recuperação de limite de taxa continuam valendo.",
+  "pws.anthropicAccountThresholdHint":
+    "Substitui o padrão do pool do Claude. 0 desativa a troca por uso apenas para esta conta; a pausa e a recuperação de limite de taxa continuam valendo.",
   "kiroLogin.title": "Entrar no Kiro",
   "kiroLogin.chooseMethod": "Escolha um método de login",
   "kiroLogin.cli": "Kiro CLI",
   "kiroLogin.iam": "AWS IAM Identity Center",
-  "kiroLogin.iamDescription": "Use o portal de acesso AWS e a região do IAM Identity Center da sua organização.",
+  "kiroLogin.iamDescription":
+    "Use o portal de acesso AWS e a região do IAM Identity Center da sua organização.",
   "kiroLogin.startUrl": "URL do portal de acesso AWS",
   "kiroLogin.region": "Região do IAM Identity Center",
-  "kiroLogin.invalidIam": "Insira uma URL HTTPS do portal AWS terminada em /start e uma região AWS válida.",
+  "kiroLogin.invalidIam":
+    "Insira uma URL HTTPS do portal AWS terminada em /start e uma região AWS válida.",
   "kiroLogin.back": "Voltar",
   "kiroLogin.continue": "Continuar para a AWS",
   "kiroLogin.selectProfile": "Escolher um perfil Kiro",
@@ -199,7 +246,8 @@ export const pt: Record<TKey, string> = {
   "kiroLogin.builderId": "Builder ID",
   "kiroLogin.google": "Google",
   "kiroLogin.github": "GitHub",
-  "kiroLogin.addDescription": "Adicione uma conta Kiro com login por dispositivo ou importe uma sessão do Kiro CLI.",
+  "kiroLogin.addDescription":
+    "Adicione uma conta Kiro com login por dispositivo ou importe uma sessão do Kiro CLI.",
   "kiroLogin.loginDescription": "Entre com um dispositivo ou importe sua sessão do Kiro CLI.",
   "kiroLogin.starting": "Iniciando login por dispositivo…",
   "kiroLogin.pending": "Digite este código na página de verificação e aguarde aqui.",
@@ -213,15 +261,18 @@ export const pt: Record<TKey, string> = {
   "kiroLogin.copied": "Código copiado",
   "kiroLogin.copyUnavailable": "Cópia indisponível",
   "kiroLogin.openVerification": "Abrir página de verificação",
-  "kiroLogin.unexpectedHost": "Host de verificação inesperado. Confira o endereço antes de copiá-lo.",
+  "kiroLogin.unexpectedHost":
+    "Host de verificação inesperado. Confira o endereço antes de copiá-lo.",
   "kiroLogin.duplicate": "Este perfil do Kiro já está na lista de contas.",
   "kiroLogin.manualReview": "Esta conta pode precisar de revisão manual.",
   "kiroSelection.suspended": "Não selecionada automaticamente: suspensa",
   "kiroSelection.quotaExhausted": "Não selecionada automaticamente: cota esgotada",
   "kiroSelection.cooldown": "Não selecionada automaticamente: em espera",
   "kiroSelection.generic": "Não selecionada automaticamente",
-  "usage.incomplete": "Alguns registros de uso não puderam ser incluídos. Contagens, datas e rankings refletem apenas os registros legíveis.",
-  "models.pickerOrder.usageIncomplete": "Não é possível salvar a ordem por mais usados porque o histórico de uso está incompleto. Escolha outra ordem ou repare o histórico primeiro.",
+  "usage.incomplete":
+    "Alguns registros de uso não puderam ser incluídos. Contagens, datas e rankings refletem apenas os registros legíveis.",
+  "models.pickerOrder.usageIncomplete":
+    "Não é possível salvar a ordem por mais usados porque o histórico de uso está incompleto. Escolha outra ordem ou repare o histórico primeiro.",
   "api.attribution.noRecordedUse": "Sem uso nos registros legíveis",
   "audio.dictation": "Ditado",
   "audio.liveVoice": "Voz ao vivo",
@@ -260,24 +311,31 @@ export const pt: Record<TKey, string> = {
   "models.pickerOrder.custom": "Ordem personalizada",
   "models.pickerOrder.apply": "Aplicar ordem",
   "models.pickerOrder.applying": "Aplicando…",
-  "models.pickerOrder.saved": "Ordem do seletor salva. Reabra os clientes que ainda mostram o catálogo antigo.",
+  "models.pickerOrder.saved":
+    "Ordem do seletor salva. Reabra os clientes que ainda mostram o catálogo antigo.",
   "models.pickerOrder.pending": "Ordem salva; a atualização do catálogo está pendente.",
   "models.pickerOrder.usageFailed": "Não foi possível carregar o uso dos modelos.",
   "models.pickerOrder.loadFailed": "Não foi possível carregar as configurações do seletor.",
   "models.pickerOrder.retry": "Tentar novamente",
-  "models.pickerOrder.hint": "Salva a ordem roteada para a descoberta do Codex e do Claude. As faixas em destaque/nativas permanecem no lugar; Mais usados é um instantâneo. As opções nativas anunciadas podem mudar.",
+  "models.pickerOrder.hint":
+    "Salva a ordem roteada para a descoberta do Codex e do Claude. As faixas em destaque/nativas permanecem no lugar; Mais usados é um instantâneo. As opções nativas anunciadas podem mudar.",
   "models.fastRows.title": "Mostrar linhas de modelos Fast",
-  "models.fastRows.desc": "Adiciona seletores “Model Fast” elegíveis aos seletores de modelos de clientes externos. Isso não altera as opções de esforço de raciocínio do modelo base. Ao salvar, as integrações conectadas são atualizadas quando possível; caso contrário, atualize a integração ou o catálogo do cliente.",
+  "models.fastRows.desc":
+    "Adiciona seletores “Model Fast” elegíveis aos seletores de modelos de clientes externos. Isso não altera as opções de esforço de raciocínio do modelo base. Ao salvar, as integrações conectadas são atualizadas quando possível; caso contrário, atualize a integração ou o catálogo do cliente.",
   "models.fastRows.refreshHint": "Salvo. A atualização do catálogo está pendente.",
   "models.fastRows.enabled": "Linhas de modelos Fast ativadas.",
   "models.fastRows.disabled": "Linhas de modelos Fast desativadas.",
   "models.fastRows.loadFailed": "Não foi possível carregar a configuração das linhas Fast.",
   "models.fastRows.updateFailed": "Falha ao atualizar a configuração das linhas Fast.",
-  "codexAuth.quotaAutoRefreshAllHint": "Controla juntas as janelas compatíveis de 5 horas e semanal de todas as contas atuais. No modo Pool, uma pequena requisição é enviada após cada redefinição e consome cota.",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "Controla juntas as janelas compatíveis de 5 horas e semanal de todas as contas atuais. No modo Pool, uma pequena requisição é enviada após cada redefinição e consome cota.",
   "codexAuth.quotaAutoRefreshMixed": "Algumas janelas estão ativadas.",
-  "codexAuth.quotaAutoRefreshEmpty": "Nenhuma janela de cota compatível. Atualize as cotas das contas para verificar novamente.",
-  "codexAuth.quotaAutoRefreshLoadFailed": "Não foi possível carregar as configurações de ativação. Tente novamente para verificar o estado delas.",
-  "codexAuth.quotaAutoRefreshPartial": "Algumas configurações não puderam ser salvas. Tente novamente para concluir a mesma alteração.",
+  "codexAuth.quotaAutoRefreshEmpty":
+    "Nenhuma janela de cota compatível. Atualize as cotas das contas para verificar novamente.",
+  "codexAuth.quotaAutoRefreshLoadFailed":
+    "Não foi possível carregar as configurações de ativação. Tente novamente para verificar o estado delas.",
+  "codexAuth.quotaAutoRefreshPartial":
+    "Algumas configurações não puderam ser salvas. Tente novamente para concluir a mesma alteração.",
   "nav.dashboard": "Painel",
   "uptime.day": "d",
   "uptime.hour": "h",
@@ -292,16 +350,20 @@ export const pt: Record<TKey, string> = {
   "nav.usage": "Uso",
   "common.github": "GitHub",
   "onboarding.star.title": "Gostando do OpenCodex?",
-  "onboarding.star.body": "O OpenCodex é gratuito e de código aberto. Uma estrela no GitHub ajuda outros desenvolvedores a encontrá-lo e mantém o projeto vivo.",
+  "onboarding.star.body":
+    "O OpenCodex é gratuito e de código aberto. Uma estrela no GitHub ajuda outros desenvolvedores a encontrá-lo e mantém o projeto vivo.",
   "onboarding.star.cta": "Dar estrela no GitHub",
-  "onboarding.star.ghHint": "Dá a estrela no repositório com a CLI do GitHub (gh) autenticada. Nada é marcado até você clicar.",
+  "onboarding.star.ghHint":
+    "Dá a estrela no repositório com a CLI do GitHub (gh) autenticada. Nada é marcado até você clicar.",
   "onboarding.star.browserHint": "Abre o repositório em github.com no navegador.",
   "onboarding.star.openPage": "Abrir a página do GitHub",
   "onboarding.star.later": "Talvez depois",
-  "onboarding.star.failed": "Não foi possível dar a estrela pela CLI do GitHub (gh). Você pode dá-la na página do GitHub.",
+  "onboarding.star.failed":
+    "Não foi possível dar a estrela pela CLI do GitHub (gh). Você pode dá-la na página do GitHub.",
   "onboarding.star.starring": "Dando estrela…",
   "onboarding.star.thanks": "Obrigado pela estrela!",
-  "onboarding.star.thanksBody": "Ajuda muito. O link do GitHub na barra lateral leva você de volta ao repositório a qualquer momento.",
+  "onboarding.star.thanksBody":
+    "Ajuda muito. O link do GitHub na barra lateral leva você de volta ao repositório a qualquer momento.",
   "onboarding.star.done": "Concluído",
   "common.save": "Salvar",
   "common.saving": "Salvando…",
@@ -313,20 +375,27 @@ export const pt: Record<TKey, string> = {
   "common.remove": "Remover",
   "common.loading": "Carregando…",
   "common.retry": "Tentar novamente",
-  "prov.affinityResetPending": "A alteração da conta foi salva, mas a atualização do roteamento das conversas não terminou. Tente novamente para concluir.",
+  "prov.affinityResetPending":
+    "A alteração da conta foi salva, mas a atualização do roteamento das conversas não terminou. Tente novamente para concluir.",
   "prov.affinityResetComplete": "O roteamento das conversas foi atualizado.",
-  "prov.affinityResetRetryUnavailable": "Não é possível tentar novamente com esta conta agora. Atualize a lista de contas e, se necessário, retome a conta ou entre novamente.",
+  "prov.affinityResetRetryUnavailable":
+    "Não é possível tentar novamente com esta conta agora. Atualize a lista de contas e, se necessário, retome a conta ou entre novamente.",
   "common.undo": "Desfazer",
   "auth.adminTokenTitle": "Token de administrador do OpenCodex (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "Conta",
   "auth.adminTokenFieldLabel": "Token de administrador",
-  "auth.adminTokenRejected": "Esse token de administrador foi rejeitado. Confira-o e tente novamente.",
-  "auth.adminTokenUnavailable": "Não foi possível verificar o token de administrador. Tente novamente.",
-  "auth.adminTokenHelp": "Este é o token de administrador de gerenciamento do OpenCodex, não uma chave de API de provedor. O proxy o grava em ~/.opencodex/admin-api-token (ou $OPENCODEX_HOME/admin-api-token) na primeira inicialização, e OPENCODEX_ADMIN_AUTH_TOKEN o substitui.",
+  "auth.adminTokenRejected":
+    "Esse token de administrador foi rejeitado. Confira-o e tente novamente.",
+  "auth.adminTokenUnavailable":
+    "Não foi possível verificar o token de administrador. Tente novamente.",
+  "auth.adminTokenHelp":
+    "Este é o token de administrador de gerenciamento do OpenCodex, não uma chave de API de provedor. O proxy o grava em ~/.opencodex/admin-api-token (ou $OPENCODEX_HOME/admin-api-token) na primeira inicialização, e OPENCODEX_ADMIN_AUTH_TOKEN o substitui.",
   "auth.rememberDevice": "Lembrar este dispositivo",
-  "auth.rememberDeviceHint": "Mantém uma sessão HttpOnly revogável por 30 dias, não o token de administrador. Requer um painel HTTPS direto de mesma origem que a API (ou loopback local).",
+  "auth.rememberDeviceHint":
+    "Mantém uma sessão HttpOnly revogável por 30 dias, não o token de administrador. Requer um painel HTTPS direto de mesma origem que a API (ou loopback local).",
   "connection.forgetDevice": "Esquecer este dispositivo",
-  "connection.forgetDeviceFailed": "Não foi possível esquecer este dispositivo. A sessão foi mantida.",
+  "connection.forgetDeviceFailed":
+    "Não foi possível esquecer este dispositivo. A sessão foi mantida.",
   "auth.adminTokenDocsLink": "Como encontrá-lo",
   "app.logoAria": "logotipo do opencodex",
   "app.claudeOn": "Claude ON",
@@ -349,13 +418,16 @@ export const pt: Record<TKey, string> = {
   "provider.name.volcengineCodingPlan": "Volcengine Ark Coding Plan",
   "provider.name.volcengineAgentPlan": "Volcengine Ark Agent Plan",
   "errorBoundary.title": "Falha ao carregar a página",
-  "errorBoundary.message": "Esta seção encontrou um erro de renderização. Recarregue-a para tentar novamente.",
+  "errorBoundary.message":
+    "Esta seção encontrou um erro de renderização. Recarregue-a para tentar novamente.",
   "errorBoundary.details": "Erro",
   "errorBoundary.reload": "Recarregar",
   "routing.title": "Inteligência de roteamento (beta)",
-  "routing.subtitle": "Perfis de política, avaliação em dry-run e análises de roteamento com base em fontes.",
+  "routing.subtitle":
+    "Perfis de política, avaliação em dry-run e análises de roteamento com base em fontes.",
   "routing.loadFailed": "Não foi possível carregar os dados de roteamento",
-  "routing.empty": "Nenhum perfil de roteamento configurado. Adicione `routingProfiles` ao config.json.",
+  "routing.empty":
+    "Nenhum perfil de roteamento configurado. Adicione `routingProfiles` ao config.json.",
   "routing.revision": "rev",
   "routing.detail": "Perfil",
   "routing.createProfile": "Criar perfil",
@@ -412,22 +484,28 @@ export const pt: Record<TKey, string> = {
   "routing.analyticsRequests": "Requisições",
   "routing.analyticsEmpty": "Ainda não há análises — envie algumas requisições primeiro.",
   "startup.title": "Segurança na inicialização",
-  "startup.subtitle": "Verifique se o Codex consegue alcançar o opencodex após uma reinicialização, antes que o roteamento pelo proxy local vire um loop de reconexão.",
+  "startup.subtitle":
+    "Verifique se o Codex consegue alcançar o opencodex após uma reinicialização, antes que o roteamento pelo proxy local vire um loop de reconexão.",
   "startup.refresh": "Atualizar",
   "startup.backToDashboard": "Voltar ao painel",
   "startup.loading": "Verificando a proteção de inicialização…",
   "startup.error": "Não foi possível ler a proteção de inicialização.",
-  "startup.staleData": "A última verificação de inicialização falhou. Os valores abaixo estão desatualizados e não devem ser tratados como prova de proteção.",
+  "startup.staleData":
+    "A última verificação de inicialização falhou. Os valores abaixo estão desatualizados e não devem ser tratados como prova de proteção.",
   "startup.status.native": "Roteamento nativo",
   "startup.status.protected": "Protegido contra reinicialização",
   "startup.status.atRisk": "Ação necessária",
   "startup.summary.native": "O Codex não depende do proxy local",
   "startup.summary.protected": "O opencodex estará disponível após a reinicialização",
   "startup.summary.atRisk": "O Codex pode perder o acesso aos modelos após a reinicialização",
-  "startup.riskDetail": "O Codex está fixado no proxy local, mas nenhum serviço persistente ou shim de inicializador íntegro o iniciará novamente.",
-  "startup.riskDetailCustomLocal": "O Codex aponta para um gateway local personalizado. O opencodex não consegue gerenciar nem verificar o ciclo de reinicialização desse gateway.",
-  "startup.riskDetailWindowsShim": "O shim do inicializador protege os scripts de CLI compatíveis, mas o Codex Desktop e as execuções diretas de codex.exe podem contorná-lo no Windows.",
-  "startup.safeDetail": "O roteamento atual e o mecanismo de inicialização são consistentes. Nenhum ocx start manual deve ser necessário após a reinicialização.",
+  "startup.riskDetail":
+    "O Codex está fixado no proxy local, mas nenhum serviço persistente ou shim de inicializador íntegro o iniciará novamente.",
+  "startup.riskDetailCustomLocal":
+    "O Codex aponta para um gateway local personalizado. O opencodex não consegue gerenciar nem verificar o ciclo de reinicialização desse gateway.",
+  "startup.riskDetailWindowsShim":
+    "O shim do inicializador protege os scripts de CLI compatíveis, mas o Codex Desktop e as execuções diretas de codex.exe podem contorná-lo no Windows.",
+  "startup.safeDetail":
+    "O roteamento atual e o mecanismo de inicialização são consistentes. Nenhum ocx start manual deve ser necessário após a reinicialização.",
   "startup.routing": "Roteamento do Codex",
   "startup.routing.proxy": "Proxy local",
   "startup.routing.native": "OpenAI nativo",
@@ -448,7 +526,8 @@ export const pt: Record<TKey, string> = {
   "startup.notInstalled": "Não instalado",
   "startup.unsupported": "Sem suporte",
   "startup.shim": "Shim do inicializador do Codex",
-  "startup.shimHint": "Executa ocx ensure quando um inicializador de script do Codex compatível é iniciado.",
+  "startup.shimHint":
+    "Executa ocx ensure quando um inicializador de script do Codex compatível é iniciado.",
   "startup.healthy": "Íntegro",
   "startup.cliOnly": "Somente CLI",
   "startup.stale": "Desatualizado",
@@ -458,7 +537,8 @@ export const pt: Record<TKey, string> = {
   "startup.conflict": "Conflito de serviço",
   "startup.installedDisabled": "Instalado, mas desativado",
   "startup.shimActivationPending": "Instalado · ativação não confirmada",
-  "startup.shimActivationHint": "Adicione . ~/.opencodex/codex-shell-env.sh depois das outras configurações de PATH no arquivo de inicialização do seu shell e abra um novo terminal. O painel nem sempre vê o PATH do seu shell.",
+  "startup.shimActivationHint":
+    "Adicione . ~/.opencodex/codex-shell-env.sh depois das outras configurações de PATH no arquivo de inicialização do seu shell e abra um novo terminal. O painel nem sempre vê o PATH do seu shell.",
   "startup.install": "Instalar",
   "startup.installing": "Instalando…",
   "startup.repair": "Reparar",
@@ -469,7 +549,8 @@ export const pt: Record<TKey, string> = {
   "startup.shimRepaired": "Shim do inicializador do Codex reparado com sucesso.",
   "startup.installFailed": "Falha na instalação:",
   "startup.recovery": "Opções de reparo",
-  "startup.recoveryHint": "Use os instaladores de um clique acima ou copie um comando para reparo manual. O serviço em segundo plano é recomendado para o Codex Desktop e para executáveis do Windows.",
+  "startup.recoveryHint":
+    "Use os instaladores de um clique acima ou copie um comando para reparo manual. O serviço em segundo plano é recomendado para o Codex Desktop e para executáveis do Windows.",
   "startup.command.service": "Recomendado: serviço persistente em segundo plano",
   "startup.command.shim": "Alternativa: shim do inicializador da CLI",
   "startup.command.native": "À prova de falhas: restaurar o roteamento nativo do Codex",
@@ -477,10 +558,14 @@ export const pt: Record<TKey, string> = {
   "startup.copied": "Copiado",
   "startup.recommended": "Reparo recomendado: {cmd}",
   "startup.navRisk": "A proteção de inicialização requer atenção",
-  "startup.codexRuntime.clampHidden": "Algumas opções de esforço de raciocínio foram ocultadas porque o OpenCodex usou o Codex {version}.",
-  "startup.codexRuntime.clampHiddenWithEfforts": "Algumas opções de esforço de raciocínio foram ocultadas porque o OpenCodex usou o Codex {version} (removidas: {efforts}).",
-  "startup.codexRuntime.olderBinary": "O OpenCodex está usando um binário do Codex mais antigo ({version}). Há uma instalação mais recente disponível.",
-  "dash.subtitle": "Status ao vivo do proxy local do opencodex, de seus provedores e dos modelos roteados para o Codex.",
+  "startup.codexRuntime.clampHidden":
+    "Algumas opções de esforço de raciocínio foram ocultadas porque o OpenCodex usou o Codex {version}.",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "Algumas opções de esforço de raciocínio foram ocultadas porque o OpenCodex usou o Codex {version} (removidas: {efforts}).",
+  "startup.codexRuntime.olderBinary":
+    "O OpenCodex está usando um binário do Codex mais antigo ({version}). Há uma instalação mais recente disponível.",
+  "dash.subtitle":
+    "Status ao vivo do proxy local do opencodex, de seus provedores e dos modelos roteados para o Codex.",
   "dash.workspace.overview": "Visão geral",
   "dash.workspace.sections": "Seções",
   "dash.status": "Status",
@@ -492,7 +577,8 @@ export const pt: Record<TKey, string> = {
   "dash.tokens30d": "Tokens (30d)",
   "dash.coverage": "{pct} de cobertura",
   "dash.mem.title": "Observabilidade de memória",
-  "dash.mem.hint": "Diagnóstico de runtime somente leitura. A memória observada é max(RSS, external, ArrayBuffers), para que o corte do working set no Windows não esconda retenção já alocada.",
+  "dash.mem.hint":
+    "Diagnóstico de runtime somente leitura. A memória observada é max(RSS, external, ArrayBuffers), para que o corte do working set no Windows não esconda retenção já alocada.",
   "dash.mem.rss": "Conjunto residente (RSS)",
   "dash.mem.jsHeap": "Heap JS em uso",
   "dash.mem.jsHeapArena": "arena {total}",
@@ -507,7 +593,8 @@ export const pt: Record<TKey, string> = {
   "dash.mem.growth": "Deriva observada / hora",
   "dash.mem.perHour": "/h",
   "dash.mem.store": "Armazenamento de continuação",
-  "dash.mem.storeHint": "Cache de previous_response_id do proxy. Um total de bytes crescente com um heap crescente aponta para retenção de conversas, e não para o alocador do runtime.",
+  "dash.mem.storeHint":
+    "Cache de previous_response_id do proxy. Um total de bytes crescente com um heap crescente aponta para retenção de conversas, e não para o alocador do runtime.",
   "dash.mem.storeEntries": "Entradas",
   "dash.mem.storeTotal": "Total",
   "dash.mem.storeLargest": "Maior",
@@ -519,11 +606,13 @@ export const pt: Record<TKey, string> = {
   "dash.mem.unavailable": "Diagnóstico de memória indisponível (proxy mais antigo).",
   "dash.mem.inFlight": "Requisições em andamento",
   "dash.mem.restart": "Esvaziar e reiniciar",
-  "dash.mem.restartConfirm": "Aguarde {count} requisição(ões) em andamento e reinicie (até {seconds}s; as requisições restantes são cortadas ao esgotar o tempo).",
+  "dash.mem.restartConfirm":
+    "Aguarde {count} requisição(ões) em andamento e reinicie (até {seconds}s; as requisições restantes são cortadas ao esgotar o tempo).",
   "dash.mem.draining": "Esvaziando {count} requisição(ões)… reiniciando ao concluir",
   "dash.mem.reconnecting": "Proxy reiniciando… aguardando reconexão",
   "dash.mem.restartFailed": "Falha ao esvaziar e reiniciar. Verifique se o proxy está em execução.",
-  "dash.mem.restartNoSupervisor": "Nenhuma proteção contra reinicialização detectada. O proxy pode permanecer parado após a reinicialização, a menos que você o inicie novamente.",
+  "dash.mem.restartNoSupervisor":
+    "Nenhuma proteção contra reinicialização detectada. O proxy pode permanecer parado após a reinicialização, a menos que você o inicie novamente.",
   "dash.activeProviders": "Provedores ativos",
   "dash.noProviders": "Nenhum provedor configurado. Execute {cmd}.",
   "dash.col.name": "Nome",
@@ -539,38 +628,52 @@ export const pt: Record<TKey, string> = {
   "dash.stopConfirm": "Parar o proxy e restaurar o Codex nativo?",
   "dash.stopFailed": "Falha ao parar o proxy (HTTP {status}).",
   "dash.stopStillRunning": "O proxy ainda está respondendo, então não foi parado.",
-  "dash.stopUnknown": "O proxy não confirmou a parada. Verifique se ele ainda está em execução antes de tentar novamente.",
+  "dash.stopUnknown":
+    "O proxy não confirmou a parada. Verifique se ele ainda está em execução antes de tentar novamente.",
   "dash.maSwitchFailed": "Falha na troca de modo (HTTP {status}).",
   "dash.maNetworkError": "Erro de rede — o proxy está em execução?",
   "dash.stopping": "Parando…",
   "dash.actions": "Proxy",
   "dash.codexRestart": "Recarregar modelos do Codex",
   "dash.codexRestarting": "Parando…",
-  "dash.codexRestartConfirm": "Parar os app-servers do Codex para que recarreguem a lista de modelos? Qualquer turno do Codex em andamento será interrompido, e o Codex não é reiniciado sozinho — reabra-o depois.",
-  "dash.codexRestartDone": "{count} app-server(s) do Codex parado(s). Reabra o Codex para carregar a lista de modelos atual.",
-  "dash.codexRestartNothing": "Nenhum app-server do Codex em execução. A próxima inicialização lerá a lista de modelos atual.",
+  "dash.codexRestartConfirm":
+    "Parar os app-servers do Codex para que recarreguem a lista de modelos? Qualquer turno do Codex em andamento será interrompido, e o Codex não é reiniciado sozinho — reabra-o depois.",
+  "dash.codexRestartDone":
+    "{count} app-server(s) do Codex parado(s). Reabra o Codex para carregar a lista de modelos atual.",
+  "dash.codexRestartNothing":
+    "Nenhum app-server do Codex em execução. A próxima inicialização lerá a lista de modelos atual.",
   "dash.codexRestartUnknown": "Não foi possível listar os processos, então nada foi parado.",
-  "dash.codexRestartPartial": "{count} app-server(s) não encerrou(aram). Pare-os manualmente se a lista de modelos continuar desatualizada.",
+  "dash.codexRestartPartial":
+    "{count} app-server(s) não encerrou(aram). Pare-os manualmente se a lista de modelos continuar desatualizada.",
   "dash.codexRestartFailed": "Falha ao recarregar os modelos do Codex (HTTP {status}).",
   "dash.codexRestartUnreachable": "Não foi possível alcançar o proxy.",
   "dash.codexRestartMalformed": "O proxy retornou uma resposta inesperada.",
-  "dash.codexRestartTimeout": "O proxy não respondeu a tempo. Ele ainda pode estar parando os app-servers.",
-  "models.staleBanner": "O Codex está mostrando uma lista de modelos mais antiga que este catálogo. Reinicie o Codex para recarregá-la.",
+  "dash.codexRestartTimeout":
+    "O proxy não respondeu a tempo. Ele ainda pode estar parando os app-servers.",
+  "models.staleBanner":
+    "O Codex está mostrando uma lista de modelos mais antiga que este catálogo. Reinicie o Codex para recarregá-la.",
   "dash.codexAutoStart": "Iniciar o opencodex com o Codex",
-  "dash.codexAutoStartHint": "Permite que um shim de inicializador instalado execute ocx ensure. Esta configuração não instala proteção contra reinicialização; confira Segurança na inicialização para ver o estado efetivo.",
+  "dash.codexAutoStartHint":
+    "Permite que um shim de inicializador instalado execute ocx ensure. Esta configuração não instala proteção contra reinicialização; confira Segurança na inicialização para ver o estado efetivo.",
   "dash.searchModel": "Modelo do sidecar de busca",
-  "dash.searchModelHint": "Modelo usado para web_search em modelos roteados que não são da OpenAI. Requer login no ChatGPT.",
+  "dash.searchModelHint":
+    "Modelo usado para web_search em modelos roteados que não são da OpenAI. Requer login no ChatGPT.",
   "dash.searchReasoning": "Esforço de raciocínio da busca",
   "dash.visionModel": "Modelo do sidecar de visão",
-  "dash.visionModelHint": "Modelo usado para descrever imagens para modelos roteados somente de texto. Requer login no ChatGPT.",
+  "dash.visionModelHint":
+    "Modelo usado para descrever imagens para modelos roteados somente de texto. Requer login no ChatGPT.",
   "dash.webSearchSidecar": "Sidecar de busca na web",
-  "dash.webSearchSidecarHint": "Escolha o backend e o modelo usados para busca na web em modelos roteados.",
+  "dash.webSearchSidecarHint":
+    "Escolha o backend e o modelo usados para busca na web em modelos roteados.",
   "dash.webSearchOff": "Desligado",
-  "dash.webSearchCodexSync": "Salvo. A configuração do Codex não foi reescrita — execute Sincronizar modelos para aplicá-la.",
+  "dash.webSearchCodexSync":
+    "Salvo. A configuração do Codex não foi reescrita — execute Sincronizar modelos para aplicá-la.",
   "dash.webSearchStream": "Transmitir respostas ao vivo",
-  "dash.webSearchStreamHint": "Transmite ao vivo o texto inicial e o raciocínio do modelo até ele decidir por uma chamada de ferramenta; o restante do turno continua em buffer para a interceptação da busca. O texto escrito antes de uma busca pode se repetir parcialmente.",
+  "dash.webSearchStreamHint":
+    "Transmite ao vivo o texto inicial e o raciocínio do modelo até ele decidir por uma chamada de ferramenta; o restante do turno continua em buffer para a interceptação da busca. O texto escrito antes de uma busca pode se repetir parcialmente.",
   "dash.visionSidecar": "Sidecar de visão",
-  "dash.visionSidecarHint": "Escolha o backend e o modelo usados para descrever imagens para modelos roteados somente de texto.",
+  "dash.visionSidecarHint":
+    "Escolha o backend e o modelo usados para descrever imagens para modelos roteados somente de texto.",
   "dash.visionOff": "Desligado",
   "dash.visionAdvanced": "Configurações avançadas",
   "dash.visionMaxDescriptions": "Máximo de descrições por turno",
@@ -579,7 +682,8 @@ export const pt: Record<TKey, string> = {
   "dash.visionTimeoutInvalid": "Informe um número inteiro de {min} a {max} milissegundos.",
   "dash.visionAdvancedPopover": "Configurações avançadas de visão",
   "compactionRouting.title": "Roteamento de compactação",
-  "compactionRouting.description": "Escolha um modelo para as requisições de compactação do Codex e quais gatilhos ele cobre. As mensagens seguintes mantêm as configurações da conversa.",
+  "compactionRouting.description":
+    "Escolha um modelo para as requisições de compactação do Codex e quais gatilhos ele cobre. As mensagens seguintes mantêm as configurações da conversa.",
   "compactionRouting.model": "Modelo de compactação",
   "compactionRouting.effort": "Esforço de raciocínio",
   "compactionRouting.triggers": "Aplica-se a",
@@ -588,30 +692,42 @@ export const pt: Record<TKey, string> = {
   "compactionRouting.triggersAuto": "Somente automática",
   "compactionRouting.currentModel": "Usar o modelo da conversa",
   "compactionRouting.currentEffort": "Manter o esforço da requisição",
-  "compactionRouting.effortHint": "O raciocínio se aplica onde o endpoint de compactação der suporte. O modelo precisa aceitar a conversa completa.",
-  "compactionRouting.dataNotice": "Uma requisição de compactação coberta envia a conversa inteira ao provedor do modelo selecionado para resumo, mesmo quando a conversa roda em outro provedor.",
-  "compactionRouting.autoNotice": "A compactação automática roda por conta própria, então uma conversa longa pode ser enviada a esse provedor sem que você peça.",
-  "compactionRouting.providerWarning": "Com esta configuração, toda requisição de compactação coberta envia o conteúdo completo da conversa para {provider} para resumo.",
+  "compactionRouting.effortHint":
+    "O raciocínio se aplica onde o endpoint de compactação der suporte. O modelo precisa aceitar a conversa completa.",
+  "compactionRouting.dataNotice":
+    "Uma requisição de compactação coberta envia a conversa inteira ao provedor do modelo selecionado para resumo, mesmo quando a conversa roda em outro provedor.",
+  "compactionRouting.autoNotice":
+    "A compactação automática roda por conta própria, então uma conversa longa pode ser enviada a esse provedor sem que você peça.",
+  "compactionRouting.providerWarning":
+    "Com esta configuração, toda requisição de compactação coberta envia o conteúdo completo da conversa para {provider} para resumo.",
   "compactionRouting.loadFailed": "Não foi possível carregar as configurações de compactação.",
   "compactionRouting.saved": "Configurações de compactação salvas.",
-  "compactionRouting.saveFailed": "Não foi possível salvar. Suas alterações continuam aqui; tente novamente.",
+  "compactionRouting.saveFailed":
+    "Não foi possível salvar. Suas alterações continuam aqui; tente novamente.",
   "memoryModels.title": "Roteamento de memória",
-  "memoryModels.description": "O Codex grava memórias após o término de uma sessão. Escolha um modelo para cada fase ou mantenha a rota existente.",
+  "memoryModels.description":
+    "O Codex grava memórias após o término de uma sessão. Escolha um modelo para cada fase ou mantenha a rota existente.",
   "memoryModels.infoLabel": "O que são Extração e Consolidação?",
-  "memoryModels.info": "O Codex transforma sessões encerradas em memória em duas etapas. A Extração lê uma sessão encerrada e anota o que aconteceu: uma nota por sessão, então faz muitas chamadas pequenas. A Consolidação pega essas notas e as grava nos arquivos de memória que o Codex lê no início das próximas sessões. Roda raramente, mas edita arquivos. Cada etapa pede seu próprio modelo, por isso aparecem separadas aqui.",
+  "memoryModels.info":
+    "O Codex transforma sessões encerradas em memória em duas etapas. A Extração lê uma sessão encerrada e anota o que aconteceu: uma nota por sessão, então faz muitas chamadas pequenas. A Consolidação pega essas notas e as grava nos arquivos de memória que o Codex lê no início das próximas sessões. Roda raramente, mas edita arquivos. Cada etapa pede seu próprio modelo, por isso aparecem separadas aqui.",
   "memoryModels.extract": "Extração",
-  "memoryModels.extractHint": "Resume cada sessão encerrada em uma memória bruta. Roda uma vez por sessão.",
+  "memoryModels.extractHint":
+    "Resume cada sessão encerrada em uma memória bruta. Roda uma vez por sessão.",
   "memoryModels.consolidation": "Consolidação",
-  "memoryModels.consolidationHint": "Mescla as memórias brutas nos arquivos de memória que o Codex lê depois. Roda raramente e edita arquivos.",
+  "memoryModels.consolidationHint":
+    "Mescla as memórias brutas nos arquivos de memória que o Codex lê depois. Roda raramente e edita arquivos.",
   "memoryModels.model": "Modelo",
   "memoryModels.effort": "Esforço de raciocínio",
   "memoryModels.off": "Desativado",
   "memoryModels.defaultEffort": "Padrão do Codex",
-  "memoryModels.dataNotice": "O modelo escolhido recebe a entrada daquela fase: a sessão encerrada na Extração e as memórias brutas na Consolidação.",
-  "memoryModels.accountNotice": "Somente uma fase é roteada aqui; a outra mantém a rota existente. O Shadow Call Intercept também pode enviar as chamadas de memória dessa fase ao modelo configurado nele.",
+  "memoryModels.dataNotice":
+    "O modelo escolhido recebe a entrada daquela fase: a sessão encerrada na Extração e as memórias brutas na Consolidação.",
+  "memoryModels.accountNotice":
+    "Somente uma fase é roteada aqui; a outra mantém a rota existente. O Shadow Call Intercept também pode enviar as chamadas de memória dessa fase ao modelo configurado nele.",
   "memoryModels.loadFailed": "Não foi possível carregar as configurações de memória.",
   "memoryModels.saved": "Configurações de memória salvas.",
-  "memoryModels.saveFailed": "Não foi possível salvar. Suas alterações continuam aqui; tente novamente.",
+  "memoryModels.saveFailed":
+    "Não foi possível salvar. Suas alterações continuam aqui; tente novamente.",
   "dash.shadowCallIntercept": "Shadow Call Intercept",
   "shadowCall.memoryLabel": "Memória: Terra",
   "shadowCall.sourceCoveredShort": "Coberto por {prefix}",
@@ -621,21 +737,31 @@ export const pt: Record<TKey, string> = {
   "shadowCall.sourceMemory": "Memória",
   "shadowCall.sourceLegacy": "Legado",
   "shadowCall.sourceCustom": "Personalizado",
-  "shadowCall.sourceHint": "Somente as fontes ativadas são interceptadas. Pelo menos uma deve permanecer ativa; use o interruptor principal para desativar a interceptação de todas as chamadas shadow. O roteamento de memória ainda vence na consolidação quando configurado.",
-  "shadowCall.sourceCovered": "Coberto pelo prefixo personalizado {prefix}. Remova-o ou restrinja-o em config.json para alternar esta fonte separadamente.",
-  "shadowCall.sourceLastRequired": "Pelo menos uma fonte deve permanecer ativa. Use o interruptor principal para desativar a interceptação de todas as chamadas shadow.",
-  "dash.shadowCallInterceptHint": "Intercepta as chamadas auxiliares em segundo plano do Codex App para títulos, mensagens de commit e orquestração de skills. Escolha os modelos de origem abaixo. A consolidação de memória normalmente usa Terra e segue o roteamento de memória quando configurado.",
-  "dash.shadowCallWarning": "⚠ Quando ativado, as requisições para cada fonte selecionada ({models}) são substituídas pelo modelo escolhido. Terra é opcional; o roteamento de memória ainda vence na consolidação.",
+  "shadowCall.sourceHint":
+    "Somente as fontes ativadas são interceptadas. Pelo menos uma deve permanecer ativa; use o interruptor principal para desativar a interceptação de todas as chamadas shadow. O roteamento de memória ainda vence na consolidação quando configurado.",
+  "shadowCall.sourceCovered":
+    "Coberto pelo prefixo personalizado {prefix}. Remova-o ou restrinja-o em config.json para alternar esta fonte separadamente.",
+  "shadowCall.sourceLastRequired":
+    "Pelo menos uma fonte deve permanecer ativa. Use o interruptor principal para desativar a interceptação de todas as chamadas shadow.",
+  "dash.shadowCallInterceptHint":
+    "Intercepta as chamadas auxiliares em segundo plano do Codex App para títulos, mensagens de commit e orquestração de skills. Escolha os modelos de origem abaixo. A consolidação de memória normalmente usa Terra e segue o roteamento de memória quando configurado.",
+  "dash.shadowCallWarning":
+    "⚠ Quando ativado, as requisições para cada fonte selecionada ({models}) são substituídas pelo modelo escolhido. Terra é opcional; o roteamento de memória ainda vence na consolidação.",
   "dash.shadowCallOriginal": "Original",
   "dash.shadowCallModel": "Modelo substituto",
-  "dash.shadowCallTooltip": "O Codex App faz chamadas auxiliares em segundo plano para geração de título de thread, geração de mensagem de commit e orquestração de skills. O modelo auxiliar mudou entre versões do cliente, então o opencodex pode interceptar várias fontes. Selecione abaixo cada fonte que deseja redirecionar. Terra é o modelo de consolidação de memória e fica desativado por padrão porque o Codex também o seleciona para trabalho comum; quando um modelo de consolidação está configurado no roteamento de memória, essa rota vence. Pelo menos uma fonte deve permanecer ativa; use o interruptor principal para desativar a interceptação de todas as chamadas shadow.",
+  "dash.shadowCallTooltip":
+    "O Codex App faz chamadas auxiliares em segundo plano para geração de título de thread, geração de mensagem de commit e orquestração de skills. O modelo auxiliar mudou entre versões do cliente, então o opencodex pode interceptar várias fontes. Selecione abaixo cada fonte que deseja redirecionar. Terra é o modelo de consolidação de memória e fica desativado por padrão porque o Codex também o seleciona para trabalho comum; quando um modelo de consolidação está configurado no roteamento de memória, essa rota vence. Pelo menos uma fonte deve permanecer ativa; use o interruptor principal para desativar a interceptação de todas as chamadas shadow.",
   "models.shadowCallIntercept": "Shadow Call Intercept",
-  "models.shadowCallInterceptHint": "Intercepta as chamadas auxiliares em segundo plano do Codex App para títulos, mensagens de commit e orquestração de skills. Escolha os modelos de origem abaixo. A consolidação de memória normalmente usa Terra e segue o roteamento de memória quando configurado.",
+  "models.shadowCallInterceptHint":
+    "Intercepta as chamadas auxiliares em segundo plano do Codex App para títulos, mensagens de commit e orquestração de skills. Escolha os modelos de origem abaixo. A consolidação de memória normalmente usa Terra e segue o roteamento de memória quando configurado.",
   "models.shadowCallSaveFailed": "Não foi possível salvar as configurações de chamadas shadow.",
-  "models.shadowCallTargetInvalid": "O modelo substituto sobrepõe uma fonte ativa. Escolha outro modelo substituto.",
-  "models.shadowCallSourceInvalid": "Esta seleção de fontes é inválida. Escolha pelo menos uma fonte sem espaços ou prefixo de provedor.",
+  "models.shadowCallTargetInvalid":
+    "O modelo substituto sobrepõe uma fonte ativa. Escolha outro modelo substituto.",
+  "models.shadowCallSourceInvalid":
+    "Esta seleção de fontes é inválida. Escolha pelo menos uma fonte sem espaços ou prefixo de provedor.",
   "models.autoReviewOverride": "Substituição da revisão automática",
-  "models.autoReviewOverrideHint": "Define o modelo que o Codex usa na revisão automática (revisor de aprovação). Aplicado a todas as linhas do catálogo na sincronização; um autoReviewModel no provedor continua tendo prioridade nas próprias linhas.",
+  "models.autoReviewOverrideHint":
+    "Define o modelo que o Codex usa na revisão automática (revisor de aprovação). Aplicado a todas as linhas do catálogo na sincronização; um autoReviewModel no provedor continua tendo prioridade nas próprias linhas.",
   "models.autoReviewPending": "Pendente",
   "dash.sidecarBackend": "Backend",
   "dash.sidecarModel": "Modelo",
@@ -645,34 +771,43 @@ export const pt: Record<TKey, string> = {
   "dash.sidecarSaved": "Configurações do sidecar salvas. Aplicadas na próxima requisição.",
   "dash.sidecarSaveFailed": "Falha ao salvar as configurações do sidecar.",
   "dash.injectionLabel": "Delegação a subagentes",
-  "dash.injectionHint": "Escolha o modelo para o qual o Codex deve delegar o trabalho de subagentes. As duas opções abaixo definem onde essa escolha é usada.",
+  "dash.injectionHint":
+    "Escolha o modelo para o qual o Codex deve delegar o trabalho de subagentes. As duas opções abaixo definem onde essa escolha é usada.",
   "dash.injectionManage": "Abrir configurações",
   "dash.syncCodexSubagentDefaults": "Salvar também como padrão do Codex",
-  "dash.syncCodexSubagentDefaultsHint": "Ativado, a escolha acima é gravada na configuração do próprio Codex, e novas tarefas também começam com esse modelo. Desativado, ela fica salva apenas aqui. Entra em vigor na próxima sincronização ou reinicialização, e suas configurações [agents] escritas à mão são preservadas.",
+  "dash.syncCodexSubagentDefaultsHint":
+    "Ativado, a escolha acima é gravada na configuração do próprio Codex, e novas tarefas também começam com esse modelo. Desativado, ela fica salva apenas aqui. Entra em vigor na próxima sincronização ou reinicialização, e suas configurações [agents] escritas à mão são preservadas.",
   "dash.multiAgentGuidance": "Orientar o Codex a dividir o trabalho",
-  "dash.multiAgentGuidanceHint": "Envia uma nota curta dizendo ao Codex como repassar trabalho a subagentes. Na v2, ela cita os modelos que podem ser usados e qual preferir; na v1, só se aplica com esforço de raciocínio max ou ultra. Desativado, nenhuma nota é adicionada.",
+  "dash.multiAgentGuidanceHint":
+    "Envia uma nota curta dizendo ao Codex como repassar trabalho a subagentes. Na v2, ela cita os modelos que podem ser usados e qual preferir; na v1, só se aplica com esforço de raciocínio max ou ultra. Desativado, nenhuma nota é adicionada.",
   "dash.injectionNone": "Nenhum",
   "dash.injectionEffortLabel": "Esforço de raciocínio",
   "dash.injectionEffortNone": "Padrão do modelo",
   "dash.effortCapLabel": "Limite de esforço ultra na V2",
   "dash.subagentEffortCapLabel": "Limite de esforço de subagentes na V2",
-  "dash.effortCapHelp": "Limita o esforço de raciocínio dos turnos em modo ultra da V2. Quando definido, requisições de esforço máximo (do modo ultra) são limitadas ao nível selecionado. O limite de subagentes se aplica apenas aos agentes filhos criados. Os limites só reduzem o esforço, nunca o aumentam. Se um modelo não suportar o nível limitado, ele desce para o nível suportado mais próximo.",
+  "dash.effortCapHelp":
+    "Limita o esforço de raciocínio dos turnos em modo ultra da V2. Quando definido, requisições de esforço máximo (do modo ultra) são limitadas ao nível selecionado. O limite de subagentes se aplica apenas aos agentes filhos criados. Os limites só reduzem o esforço, nunca o aumentam. Se um modelo não suportar o nível limitado, ele desce para o nível suportado mais próximo.",
   "dash.effortCapNone": "Sem limite",
   "dash.maintenance": "Manutenção",
-  "dash.maintenanceHint": "Atualize o catálogo de modelos do Codex ou instale uma versão mais nova do opencodex.",
+  "dash.maintenanceHint":
+    "Atualize o catálogo de modelos do Codex ou instale uma versão mais nova do opencodex.",
   "dash.syncModels": "Sincronizar modelos",
-  "dash.syncModelsHint": "Reescreve o catálogo de modelos do Codex a partir dos provedores conectados.",
+  "dash.syncModelsHint":
+    "Reescreve o catálogo de modelos do Codex a partir dos provedores conectados.",
   "dash.syncRun": "Sincronizar agora",
   "dash.syncing": "Sincronizando…",
   "dash.syncOk": "Sincronização concluída. {count} modelo(s) adicionado(s).",
-  "dash.syncStaleHint": "Se o Codex ainda mostrar uma lista antiga, reinicie o app-server de longa duração dele ({cmd}).",
+  "dash.syncStaleHint":
+    "Se o Codex ainda mostrar uma lista antiga, reinicie o app-server de longa duração dele ({cmd}).",
   "dash.syncFailed": "Falha na sincronização: {error}",
   "dash.projectConfigTitle": "A configuração de Codex do projeto ignora o OpenCodex",
-  "dash.projectConfigHint": "Estas configurações locais do repositório substituem o proxy do OpenCodex (por exemplo, roteando direto para o OpenCode Go). Remova-as para que o roteamento de ~/.codex/config.toml valha nesse projeto.",
+  "dash.projectConfigHint":
+    "Estas configurações locais do repositório substituem o proxy do OpenCodex (por exemplo, roteando direto para o OpenCode Go). Remova-as para que o roteamento de ~/.codex/config.toml valha nesse projeto.",
   "dash.checkUpdate": "Verificar atualização",
   "dash.updateReconnecting": "Aguardando o proxy reiniciado…",
   "dash.updateVersionTransition": "{currentVersion} -> {latestVersion}.",
-  "prov.subtitle": "Configure os provedores upstream para os quais o opencodex roteia o Codex. Faça login com uma conta, adicione um provedor ou edite a configuração bruta.",
+  "prov.subtitle":
+    "Configure os provedores upstream para os quais o opencodex roteia o Codex. Faça login com uma conta, adicione um provedor ou edite a configuração bruta.",
   "prov.add": "Adicionar provedor",
   "prov.editJson": "Editar JSON",
   "prov.accountLogin": "Login de conta",
@@ -686,14 +821,16 @@ export const pt: Record<TKey, string> = {
   "prov.didntOpen": "Não abriu? Clique aqui",
   "prov.copyLink": "Copiar link",
   "prov.dontOpenBrowser": "Não abrir um navegador na máquina do proxy",
-  "prov.dontOpenBrowserHint": "Útil para usar outro perfil de navegador ou quando o painel não está na máquina do proxy.",
+  "prov.dontOpenBrowserHint":
+    "Útil para usar outro perfil de navegador ou quando o painel não está na máquina do proxy.",
   "prov.linkCopied": "Copiado",
   "prov.linkCopyUnavailable": "Área de transferência indisponível",
   "prov.deviceCode": "Código do dispositivo",
   "prov.copyCode": "Copiar código",
   "prov.copyCodeAndOpen": "Copiar código e abrir",
   "prov.openSignInPage": "Abrir página de login",
-  "prov.browserLaunchFailed": "O navegador não abriu automaticamente. Abra a página de login abaixo ou copie o link.",
+  "prov.browserLaunchFailed":
+    "O navegador não abriu automaticamente. Abra a página de login abaixo ou copie o link.",
   "prov.codeCopied": "Código copiado",
   "prov.editAlias": "Editar apelido",
   "prov.aliasPrompt": "Nome de exibição (deixe vazio para limpar)",
@@ -702,7 +839,8 @@ export const pt: Record<TKey, string> = {
   "prov.aliasInvalid": "Use no máximo 80 caracteres, sem caracteres de controle.",
   "prov.accountId": "ID",
   "prov.pasteRedirect": "Cole a URL de redirecionamento ou o código",
-  "prov.pasteRedirectHint": "Se o navegador mostrar um erro de localhost, copie a URL completa da barra de endereços e cole aqui (ou cole o código de autorização).",
+  "prov.pasteRedirectHint":
+    "Se o navegador mostrar um erro de localhost, copie a URL completa da barra de endereços e cole aqui (ou cole o código de autorização).",
   "prov.pasteSubmit": "Enviar",
   "prov.pasteSubmitting": "Enviando…",
   "prov.pasteOk": "Código enviado — concluindo o login…",
@@ -718,53 +856,72 @@ export const pt: Record<TKey, string> = {
   "prov.loginError": "Erro no login de {provider}: {error}",
   "prov.loginRequestFail": "A requisição de login de {provider} falhou",
   "prov.loginCancelled": "Login de {provider} cancelado",
-  "prov.loginTimeout": "O login de {provider} expirou — o navegador foi fechado ou o processo nunca terminou. Tente novamente.",
-  "prov.loginOk": "Login em {provider} concluído. Execute {cmd} (ou ele se aplica ao vivo) para listar seus modelos.",
-  "prov.loginSameAccount": "Ainda é a mesma conta de {provider} — troque de conta no navegador e tente adicionar a conta novamente.",
+  "prov.loginTimeout":
+    "O login de {provider} expirou — o navegador foi fechado ou o processo nunca terminou. Tente novamente.",
+  "prov.loginOk":
+    "Login em {provider} concluído. Execute {cmd} (ou ele se aplica ao vivo) para listar seus modelos.",
+  "prov.loginSameAccount":
+    "Ainda é a mesma conta de {provider} — troque de conta no navegador e tente adicionar a conta novamente.",
   "oauthTos.highTitle": "{provider}: risco do OAuth de assinatura",
   "oauthTos.elevatedTitle": "{provider}: ponte OAuth não oficial",
-  "oauthTos.anthropicBody": "Isto conecta uma assinatura do Claude por meio do proxy de terceiros do OpenCodex. A Anthropic não endossou esta conexão nem o pooling automatizado de contas; o acesso depende dos termos e da fiscalização vigentes.",
-  "oauthTos.highBody": "O OpenCodex conecta {provider} por um caminho OAuth de terceiros. O uso sem suporte pode levar a limites de acesso ou suspensão.",
-  "oauthTos.elevatedBody": "O OpenCodex conecta {provider} por um caminho OAuth não oficial. Use o cliente oficial sempre que possível; tráfego incomum ou automatizado pode ser tratado como abuso, e o acesso pode ser limitado ou suspenso.",
+  "oauthTos.anthropicBody":
+    "Isto conecta uma assinatura do Claude por meio do proxy de terceiros do OpenCodex. A Anthropic não endossou esta conexão nem o pooling automatizado de contas; o acesso depende dos termos e da fiscalização vigentes.",
+  "oauthTos.highBody":
+    "O OpenCodex conecta {provider} por um caminho OAuth de terceiros. O uso sem suporte pode levar a limites de acesso ou suspensão.",
+  "oauthTos.elevatedBody":
+    "O OpenCodex conecta {provider} por um caminho OAuth não oficial. Use o cliente oficial sempre que possível; tráfego incomum ou automatizado pode ser tratado como abuso, e o acesso pode ser limitado ou suspenso.",
   "oauthTos.saferPath": "Opção mais segura: configure uma chave de API no OpenCodex.",
   "oauthTos.acknowledge": "Entendo o risco e quero continuar com OAuth mesmo assim.",
   "oauthTos.continue": "Continuar com OAuth",
   "oauthTos.anthropicTitle": "Conexão de assinatura do Claude",
-  "oauthTos.anthropicConditions": "Use uma conta que você possua ou esteja autorizado a usar. Usar o cliente Claude Code genuíno com uma pessoa supervisionando a sessão é diferente de enviar tokens de assinatura por outros clientes. O OpenCodex também oferece suporte a esses outros clientes, portanto esta conexão não garante que todo uso seja permitido. As integrações com o Agent SDK compatíveis são tratadas à parte.",
-  "oauthTos.anthropicSaferPath": "Para outros clientes ou automação sem supervisão, configure uma chave de API da Anthropic.",
-  "oauthTos.anthropicAcknowledge": "Entendo que esta é uma conexão de assinatura de terceiros e verificarei os termos aplicáveis.",
+  "oauthTos.anthropicConditions":
+    "Use uma conta que você possua ou esteja autorizado a usar. Usar o cliente Claude Code genuíno com uma pessoa supervisionando a sessão é diferente de enviar tokens de assinatura por outros clientes. O OpenCodex também oferece suporte a esses outros clientes, portanto esta conexão não garante que todo uso seja permitido. As integrações com o Agent SDK compatíveis são tratadas à parte.",
+  "oauthTos.anthropicSaferPath":
+    "Para outros clientes ou automação sem supervisão, configure uma chave de API da Anthropic.",
+  "oauthTos.anthropicAcknowledge":
+    "Entendo que esta é uma conexão de assinatura de terceiros e verificarei os termos aplicáveis.",
   "oauthTos.anthropicContinue": "Continuar com a assinatura do Claude",
   "subagentSurface.selectionTitle": "Mudar a superfície de subagentes para {mode}?",
-  "subagentSurface.selectionBody": "Em {mode}, os modelos do ChatGPT que usam a superfície v2 — Sol e Terra na base, todos os modelos na v2 — entregam sua tarefa a um modelo roteado, como Grok ou Claude, criptografada para o backend do ChatGPT, e o modelo roteado não consegue lê-la. Essa delegação falha com unreadable_encrypted_agent_task até que seja corrigido upstream. A v1 delega entre provedores de forma confiável.",
+  "subagentSurface.selectionBody":
+    "Em {mode}, os modelos do ChatGPT que usam a superfície v2 — Sol e Terra na base, todos os modelos na v2 — entregam sua tarefa a um modelo roteado, como Grok ou Claude, criptografada para o backend do ChatGPT, e o modelo roteado não consegue lê-la. Essa delegação falha com unreadable_encrypted_agent_task até que seja corrigido upstream. A v1 delega entre provedores de forma confiável.",
   "subagentSurface.advisoryTitle": "A v1 agora é a superfície de subagentes padrão",
-  "subagentSurface.advisoryBody": "Esta instalação roda {mode}, em que um modelo do ChatGPT na superfície v2 entrega a um modelo roteado uma tarefa criptografada que ele não consegue ler, e a delegação entre provedores falha. Recomendamos a v1 até que isso seja corrigido upstream. Sua configuração atual não muda até você escolher.",
+  "subagentSurface.advisoryBody":
+    "Esta instalação roda {mode}, em que um modelo do ChatGPT na superfície v2 entrega a um modelo roteado uma tarefa criptografada que ele não consegue ler, e a delegação entre provedores falha. Recomendamos a v1 até que isso seja corrigido upstream. Sua configuração atual não muda até você escolher.",
   "subagentSurface.continue": "Continuar",
   "subagentSurface.switchToV1": "Mudar para a v1",
   "subagentSurface.learnMore": "Por que isso falha",
   "prov.logoutOk": "Sessão de {provider} encerrada.",
   "prov.logoutFail": "Não foi possível sair de {provider}. O estado da sua conta não mudou.",
-  "prov.removed": "\"{name}\" removido.",
-  "prov.removedDefault": "\"{name}\" removido. O provedor padrão agora é \"{defaultProvider}\".",
-  "prov.removedShadowTarget": "\"{name}\" removido. O Shadow Call Intercept ainda aponta para \"{model}\", então as chamadas auxiliares vão falhar até você escolher outro destino.",
-  "prov.removeFail": "Falha ao remover \"{name}\".",
-  "prov.removeLastProvider": "Você não pode remover este provedor quando nenhum outro provedor habilitado pode se tornar o padrão.",
+  "prov.removed": '"{name}" removido.',
+  "prov.removedDefault": '"{name}" removido. O provedor padrão agora é "{defaultProvider}".',
+  "prov.removedShadowTarget":
+    '"{name}" removido. O Shadow Call Intercept ainda aponta para "{model}", então as chamadas auxiliares vão falhar até você escolher outro destino.',
+  "prov.removeFail": 'Falha ao remover "{name}".',
+  "prov.removeLastProvider":
+    "Você não pode remover este provedor quando nenhum outro provedor habilitado pode se tornar o padrão.",
   "prov.setDefault": "Definir como padrão",
-  "prov.setDefaultSuccess": "\"{name}\" agora é o provedor padrão.",
-  "prov.setDefaultFail": "Não foi possível definir \"{name}\" como provedor padrão.",
+  "prov.setDefaultSuccess": '"{name}" agora é o provedor padrão.',
+  "prov.setDefaultFail": 'Não foi possível definir "{name}" como provedor padrão.',
   "prov.defaultDisabled": "Habilite este provedor antes de torná-lo o padrão.",
   "prov.updateFail": "Não foi possível atualizar este provedor.",
   "prov.networkError": "Erro de rede. Verifique se o proxy está em execução e tente novamente.",
-  "prov.added": "\"{name}\" adicionado. Já está ativo — execute {cmd} (ou reinicie) para listar seus modelos no seletor do Codex.",
+  "prov.added":
+    '"{name}" adicionado. Já está ativo — execute {cmd} (ou reinicie) para listar seus modelos no seletor do Codex.',
   "prov.modelsNoticeTitle": "Escolha os modelos",
-  "prov.modelsNoticeChecking": "Verificando a lista de modelos. Alternar modelos não desativa o provedor.",
-  "prov.modelsNoticePending": "A lista inicial de modelos ainda não foi confirmada. Os modelos ficam ocultos até a descoberta terminar.",
-  "prov.modelsNoticeOff": "Todas as chaves de modelo foram DESLIGADAS no registro. Ative os modelos desejados na página Modelos.",
-  "prov.modelsNoticeReady": "Escolha quais modelos aparecem na página Modelos. Alternar modelos não desativa o provedor.",
-  "prov.modelsNoticeFailed": "O provedor foi salvo, mas não foi possível atualizar a lista de modelos. Tente novamente.",
+  "prov.modelsNoticeChecking":
+    "Verificando a lista de modelos. Alternar modelos não desativa o provedor.",
+  "prov.modelsNoticePending":
+    "A lista inicial de modelos ainda não foi confirmada. Os modelos ficam ocultos até a descoberta terminar.",
+  "prov.modelsNoticeOff":
+    "Todas as chaves de modelo foram DESLIGADAS no registro. Ative os modelos desejados na página Modelos.",
+  "prov.modelsNoticeReady":
+    "Escolha quais modelos aparecem na página Modelos. Alternar modelos não desativa o provedor.",
+  "prov.modelsNoticeFailed":
+    "O provedor foi salvo, mas não foi possível atualizar a lista de modelos. Tente novamente.",
   "prov.modelsNoticeCount": "{count} modelos",
   "prov.modelsNoticeOpen": "Abrir Modelos",
   "models.initialSelectionPending": "Descoberta inicial pendente",
-  "prov.removeConfirm": "Remover o provedor \"{name}\"? Os modelos dele somem do seletor do Codex.",
+  "prov.removeConfirm": 'Remover o provedor "{name}"? Os modelos dele somem do seletor do Codex.',
   "prov.hasApiKey": "chave de API configurada",
   "prov.hasHeaders": "cabeçalhos personalizados configurados",
   "prov.accounts": "Contas ({n})",
@@ -792,46 +949,58 @@ export const pt: Record<TKey, string> = {
   "prov.keySwitchFail": "Falha ao trocar de chave",
   "prov.keyRemoved": "Chave {key} removida.",
   "prov.keyRemoveAria": "Remover a chave {key}",
-  "prov.keyRemoveConfirm": "Remover a chave de API {key}? Ela é excluída da configuração deste proxy.",
+  "prov.keyRemoveConfirm":
+    "Remover a chave de API {key}? Ela é excluída da configuração deste proxy.",
   "prov.activeBadge": "Ativa",
   "prov.disabledBadge": "Desativado",
   "prov.defaultBadge": "Padrão",
   "prov.enable": "Habilitar",
   "prov.disable": "Desabilitar",
-  "prov.enabled": "\"{name}\" habilitado. Seus modelos podem voltar a aparecer no Codex.",
-  "prov.disabled": "\"{name}\" desabilitado. As configurações são mantidas, mas os modelos ficam ocultos.",
-  "prov.disabledShadowTarget": "\"{name}\" desabilitado. O Shadow Call Intercept ainda aponta para \"{model}\", então as chamadas auxiliares vão falhar até você escolher outro destino ou reabilitar \"{name}\".",
-  "prov.enableFail": "Falha ao habilitar \"{name}\".",
-  "prov.disableFail": "Falha ao desabilitar \"{name}\".",
+  "prov.enabled": '"{name}" habilitado. Seus modelos podem voltar a aparecer no Codex.',
+  "prov.disabled":
+    '"{name}" desabilitado. As configurações são mantidas, mas os modelos ficam ocultos.',
+  "prov.disabledShadowTarget":
+    '"{name}" desabilitado. O Shadow Call Intercept ainda aponta para "{model}", então as chamadas auxiliares vão falhar até você escolher outro destino ou reabilitar "{name}".',
+  "prov.enableFail": 'Falha ao habilitar "{name}".',
+  "prov.disableFail": 'Falha ao desabilitar "{name}".',
   "prov.enableAria": "Habilitar o provedor {name}",
   "prov.disableAria": "Desabilitar o provedor {name}",
   "prov.defaultCannotDisable": "O provedor padrão não pode ser desabilitado",
   "prov.openaiAccountMode": "Modo de conta do Codex",
   "prov.openaiModePool": "Pool",
   "prov.openaiModeDirect": "Direto",
-  "prov.openaiPoolDesc": "Padrão. Alterna entre o login principal e as contas adicionadas usando afinidade, cota, cooldown e failover.",
-  "prov.openaiDirectDesc": "Usa somente o login atual/principal do Codex. As contas armazenadas no pool não são lidas nem alternadas.",
+  "prov.openaiPoolDesc":
+    "Padrão. Alterna entre o login principal e as contas adicionadas usando afinidade, cota, cooldown e failover.",
+  "prov.openaiDirectDesc":
+    "Usa somente o login atual/principal do Codex. As contas armazenadas no pool não são lidas nem alternadas.",
   "prov.openaiModeSaved": "Modo de conta da OpenAI alterado para {mode}.",
   "prov.openaiModeSaveFailed": "Não foi possível alterar o modo de conta da OpenAI.",
-  "prov.openaiApiDesc": "Usa uma chave de API da OpenAI e nunca usa as credenciais da conta do Codex.",
+  "prov.openaiApiDesc":
+    "Usa uma chave de API da OpenAI e nunca usa as credenciais da conta do Codex.",
   "prov.manageCodexAccounts": "Gerenciar contas do Codex",
   "prov.openaiApiMissing": "Chave de API obrigatória",
   "prov.openaiApiSetup": "Configurar chave de API",
   "models.tab.catalog": "Modelos",
   "models.tab.routing": "Roteamento (beta)",
   "models.tabsLabel": "Superfícies de modelos",
-  "models.subtitle.routing": "Perfis de política, avaliação em modo de simulação (dry-run) e análises de roteamento com base em fontes.",
-  "models.subtitle": "Alterne quais modelos o Codex enxerga — passthrough nativo do GPT e provedores roteados, agrupados por provedor (clique em um cabeçalho para recolher). Modelos ocultos ficam fora do catálogo e do seletor de modelos, mas continuam acessíveis diretamente pelo id exato.",
+  "models.subtitle.routing":
+    "Perfis de política, avaliação em modo de simulação (dry-run) e análises de roteamento com base em fontes.",
+  "models.subtitle":
+    "Alterne quais modelos o Codex enxerga — passthrough nativo do GPT e provedores roteados, agrupados por provedor (clique em um cabeçalho para recolher). Modelos ocultos ficam fora do catálogo e do seletor de modelos, mas continuam acessíveis diretamente pelo id exato.",
   "models.delivery.title": "Como as alterações chegam ao Codex",
   "models.delivery.chip.saved": "Salvo aqui",
   "models.delivery.chip.loaded": "O Codex carrega ao reiniciar",
   "models.delivery.saved.title": "Salvo neste proxy",
-  "models.delivery.saved.body": "Salvar nesta página reescreve o catálogo de modelos que este proxy OpenCodex entrega ao Codex, que é a lista exibida no seletor de modelos do Codex. A confirmação após salvar significa que esta etapa foi concluída.",
+  "models.delivery.saved.body":
+    "Salvar nesta página reescreve o catálogo de modelos que este proxy OpenCodex entrega ao Codex, que é a lista exibida no seletor de modelos do Codex. A confirmação após salvar significa que esta etapa foi concluída.",
   "models.delivery.loaded.title": "Carregado pelo Codex",
-  "models.delivery.loaded.body": "O Codex lê o catálogo ao iniciar, então uma janela do Codex que já estava aberta mantém a lista de modelos antiga. O OpenCodex não consegue ver dentro de um Codex em execução para saber qual lista ele usa. Quando consegue perceber que o Codex iniciou antes da sua alteração, um aviso de reinicialização aparece acima das abas.",
-  "models.delivery.hint": "Se um modelo que você ativou não aparecer no Codex, clique em Recarregar modelos do Codex no canto superior direito desta página e reabra o Codex.",
+  "models.delivery.loaded.body":
+    "O Codex lê o catálogo ao iniciar, então uma janela do Codex que já estava aberta mantém a lista de modelos antiga. O OpenCodex não consegue ver dentro de um Codex em execução para saber qual lista ele usa. Quando consegue perceber que o Codex iniciou antes da sua alteração, um aviso de reinicialização aparece acima das abas.",
+  "models.delivery.hint":
+    "Se um modelo que você ativou não aparecer no Codex, clique em Recarregar modelos do Codex no canto superior direito desta página e reabra o Codex.",
   "models.nativeGroupLabel": "OpenAI nativo",
-  "models.nativeHint": "Os modelos em passthrough usam a opção de conta Pool ou Direto selecionada em Provedores. Desativar um deles o oculta do seletor do Codex (a entrada do catálogo é mantida, então reativar restaura exatamente como estava). Adicionar um modelo aqui registra um seletor roteado `openai/<model>`, não um novo id de passthrough simples.",
+  "models.nativeHint":
+    "Os modelos em passthrough usam a opção de conta Pool ou Direto selecionada em Provedores. Desativar um deles o oculta do seletor do Codex (a entrada do catálogo é mantida, então reativar restaura exatamente como estava). Adicionar um modelo aqui registra um seletor roteado `openai/<model>`, não um novo id de passthrough simples.",
   "models.active": "{active}/{total} visíveis",
   "models.workspace.providers": "Provedores",
   "models.workspace.allProviders": "Todos os provedores",
@@ -846,7 +1015,8 @@ export const pt: Record<TKey, string> = {
   "models.presetUpdateAvailable": "Preset v{version} disponível",
   "models.presetAppliedToast": "{provider}: preset aplicado — {count} modelos selecionados",
   "models.presetClearedToast": "{provider}: exibindo todos os modelos",
-  "models.presetEmpty": "{provider}: o preset não correspondeu a nenhum modelo — seleção inalterada",
+  "models.presetEmpty":
+    "{provider}: o preset não correspondeu a nenhum modelo — seleção inalterada",
   "models.presetConfirmReplace": "Substituir sua seleção pelo preset de {count} modelos?",
   "models.cap350k": "Limite de 350k",
   "models.capApplied": "Limite de contexto aplicado — vale a partir do próximo turno do Codex.",
@@ -863,16 +1033,23 @@ export const pt: Record<TKey, string> = {
   "models.v2ModeDesc_default": "Padrões do upstream (sol/terra=v2, luna=v1)",
   "models.v2ModeDesc_v2": "Todos os modelos → superfície v2",
   "models.keepNativeOnV1": "Manter o ChatGPT na v1",
-  "models.keepNativeOnV1Hint": "O ChatGPT só criptografa as tarefas filhas da v2 quando um pai nativo do ChatGPT permanece na v2, então Grok e Claude não conseguem lê-las. Ative para manter Sol/Terra na v1 e evitar essa criptografia. Pais roteados continuam na v2.",
-  "models.v2Help": "Controla a superfície multiagente para todos os modelos.\n\nv1: agente clássico de thread única. Todos os modelos usam a superfície collab da v1.\nbase: padrões do upstream — sol/terra usam a v2, luna usa a v1, os demais seguem a feature flag do codex.\nv2: agente multithread com spawn_agent. Todos os modelos usam a superfície collab da v2.\n\nNa v2, Manter o ChatGPT na v1 deixa Sol/Terra na superfície v1 para que ainda possam acionar Grok ou Claude. O ChatGPT criptografa as tarefas filhas da v2; modelos roteados não conseguem lê-las. Pais roteados permanecem na v2.\n\nAs alterações valem para novas sessões.",
+  "models.keepNativeOnV1Hint":
+    "O ChatGPT só criptografa as tarefas filhas da v2 quando um pai nativo do ChatGPT permanece na v2, então Grok e Claude não conseguem lê-las. Ative para manter Sol/Terra na v1 e evitar essa criptografia. Pais roteados continuam na v2.",
+  "models.v2Help":
+    "Controla a superfície multiagente para todos os modelos.\n\nv1: agente clássico de thread única. Todos os modelos usam a superfície collab da v1.\nbase: padrões do upstream — sol/terra usam a v2, luna usa a v1, os demais seguem a feature flag do codex.\nv2: agente multithread com spawn_agent. Todos os modelos usam a superfície collab da v2.\n\nNa v2, Manter o ChatGPT na v1 deixa Sol/Terra na superfície v1 para que ainda possam acionar Grok ou Claude. O ChatGPT criptografa as tarefas filhas da v2; modelos roteados não conseguem lê-las. Pais roteados permanecem na v2.\n\nAs alterações valem para novas sessões.",
   "dash.multiAgent": "Subagente",
   "dash.codexDesktopAuthless": "Abrir o Codex sem fazer login",
-  "dash.codexDesktopAuthlessHint": "Desativado por padrão. Dispensa o login separado do Desktop em conexões locais elegíveis. As credenciais upstream continuam sendo necessárias. Reinicie o Codex após alterar esta configuração. Recursos do Desktop que dependem de conta podem ficar indisponíveis.",
+  "dash.codexDesktopAuthlessHint":
+    "Desativado por padrão. Dispensa o login separado do Desktop em conexões locais elegíveis. As credenciais upstream continuam sendo necessárias. Reinicie o Codex após alterar esta configuração. Recursos do Desktop que dependem de conta podem ficar indisponíveis.",
   "dash.codexClientCompaction": "Usar compactação no cliente",
-  "dash.codexClientCompactionHint": "Desativado por padrão; somente loopback autenticado. As próximas compactações armazenam resumos portáveis em texto simples enquanto o roteamento de provedores do OpenCodeX e da V2 permanece ativo; o provedor configurado pode processá-los e consumir cota. O histórico não é alterado, e as threads existentes continuam roteando pelo proxy por meio do override openai_base_url gerenciado pelo OpenCodeX; se você definir essa linha manualmente, ela é mantida, e essas threads seguem o seu destino. O histórico ocx1 existente continua recuperável; recupere uma thread separadamente apenas antes de reproduzi-la no Codex nativo. Reinicie o Codex após alterar esta configuração.",
-  "dash.codexRemoteHistoryHint": "O roteamento por tabela de provedores pode ocultar threads existentes marcadas como openai em algumas listas remotas do celular. O histórico não é excluído. O cliente remoto precisa listar todos os provedores; esta opção não corrige o filtro desse cliente.",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads está definido — o codex se recusará a iniciar; remova-o do config.toml",
-  "models.v2Applied": "Modo de subagente atualizado — vale para novas sessões (reinicie o app do Codex para atualizar o seletor)",
+  "dash.codexClientCompactionHint":
+    "Desativado por padrão; somente loopback autenticado. As próximas compactações armazenam resumos portáveis em texto simples enquanto o roteamento de provedores do OpenCodeX e da V2 permanece ativo; o provedor configurado pode processá-los e consumir cota. O histórico não é alterado, e as threads existentes continuam roteando pelo proxy por meio do override openai_base_url gerenciado pelo OpenCodeX; se você definir essa linha manualmente, ela é mantida, e essas threads seguem o seu destino. O histórico ocx1 existente continua recuperável; recupere uma thread separadamente apenas antes de reproduzi-la no Codex nativo. Reinicie o Codex após alterar esta configuração.",
+  "dash.codexRemoteHistoryHint":
+    "O roteamento por tabela de provedores pode ocultar threads existentes marcadas como openai em algumas listas remotas do celular. O histórico não é excluído. O cliente remoto precisa listar todos os provedores; esta opção não corrige o filtro desse cliente.",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads está definido — o codex se recusará a iniciar; remova-o do config.toml",
+  "models.v2Applied":
+    "Modo de subagente atualizado — vale para novas sessões (reinicie o app do Codex para atualizar o seletor)",
   "models.v2ThreadsLabel": "Limite de subagentes",
   "models.v2ThreadsDefault": "padrão",
   "models.v2ThreadsApplied": "Limite de subagentes atualizado — vale para novas sessões",
@@ -884,18 +1061,22 @@ export const pt: Record<TKey, string> = {
   "models.contextDefault": "Padrão do provedor",
   "models.contextModel": "Modelo",
   "models.contextModelOverride": "Substituição do modelo",
-  "models.contextHint": "Informe aqui a janela real do Codex quando já a conhecer. Isso preenche uma janela upstream ausente e só reduz uma janela maior informada. Deixe em branco para usar a Janela padrão / limite do provedor, ou 128k se esse limite estiver desativado.",
+  "models.contextHint":
+    "Informe aqui a janela real do Codex quando já a conhecer. Isso preenche uma janela upstream ausente e só reduz uma janela maior informada. Deixe em branco para usar a Janela padrão / limite do provedor, ou 128k se esse limite estiver desativado.",
   "models.contextAutomatic": "Descoberta automática",
-  "models.contextSaved": "Janelas de contexto atualizadas — valem a partir do próximo turno do Codex.",
+  "models.contextSaved":
+    "Janelas de contexto atualizadas — valem a partir do próximo turno do Codex.",
   "models.contextUnchanged": "Nenhuma alteração de janela de contexto para salvar.",
   "models.contextSaveFailed": "Falha ao salvar as janelas de contexto",
   "models.contextInvalid": "As janelas de contexto devem ser números inteiros positivos",
   "models.contextCappedValue": "limite de {value}",
   "models.setAll": "Definir para todos",
-  "models.setAllHint": "Ativa a janela padrão de {value} para todos os provedores roteados. Relays que omitem context_window / context_length recebem este valor como a janela real do Codex. Use Janelas personalizadas na linha de um provedor para ajustar um modelo manualmente. Provedores nativos não são afetados.",
+  "models.setAllHint":
+    "Ativa a janela padrão de {value} para todos os provedores roteados. Relays que omitem context_window / context_length recebem este valor como a janela real do Codex. Use Janelas personalizadas na linha de um provedor para ajustar um modelo manualmente. Provedores nativos não são afetados.",
   "models.collapseAll": "Recolher tudo",
   "models.expandAll": "Expandir tudo",
-  "models.orderHint": "A ordem padrão segue as seleções em destaque e a prioridade do catálogo, com ordenação por provedor/modelo para linhas roteadas empatadas. Uma ordem salva do seletor pode sobrepor a ordem de exibição; as chaves de visibilidade filtram quais linhas aparecem. Um cliente pode manter um catálogo antigo até buscá-lo novamente.",
+  "models.orderHint":
+    "A ordem padrão segue as seleções em destaque e a prioridade do catálogo, com ordenação por provedor/modelo para linhas roteadas empatadas. Uma ordem salva do seletor pode sobrepor a ordem de exibição; as chaves de visibilidade filtram quais linhas aparecem. Um cliente pode manter um catálogo antigo até buscá-lo novamente.",
   "models.settingsPanel.title": "Configurações do modelo",
   "models.settingsPanel.off": "desativado",
   "models.settingsPanel.attention": "Requer atenção",
@@ -909,32 +1090,47 @@ export const pt: Record<TKey, string> = {
   "models.settingsContextInherit": "Sem substituição — atualmente {value}",
   "models.settingsContextUnknown": "desconhecido",
   "models.settingsReload": "Recarregar",
-  "models.settingsReloaded": "Lista de modelos recarregada. Reabra {model} para ver os valores armazenados.",
+  "models.settingsReloaded":
+    "Lista de modelos recarregada. Reabra {model} para ver os valores armazenados.",
   "models.settingsNoChange": "Nenhuma configuração alterada para {model}",
   "models.settingsSaved": "Configurações do modelo salvas para {model}",
-  "models.settingsSaveFailed": "Não foi possível confirmar se as configurações foram salvas. Recarregue a lista de modelos antes de tentar novamente.",
-  "models.settingsRefreshFailed": "Salvo. A lista de modelos não foi recarregada, então a linha pode mostrar valores antigos. Recarregue para conferir.",
-  "models.settingsSavedCodexStale": "{model} salvo, mas o catálogo de modelos do Codex não foi atualizado. Clique em Sincronizar agora no Painel para o Codex receber a alteração.",
-  "models.settingsRejected": "O servidor rejeitou estas configurações, então nada foi salvo. Confira os valores e tente novamente.",
+  "models.settingsSaveFailed":
+    "Não foi possível confirmar se as configurações foram salvas. Recarregue a lista de modelos antes de tentar novamente.",
+  "models.settingsRefreshFailed":
+    "Salvo. A lista de modelos não foi recarregada, então a linha pode mostrar valores antigos. Recarregue para conferir.",
+  "models.settingsSavedCodexStale":
+    "{model} salvo, mas o catálogo de modelos do Codex não foi atualizado. Clique em Sincronizar agora no Painel para o Codex receber a alteração.",
+  "models.settingsRejected":
+    "O servidor rejeitou estas configurações, então nada foi salvo. Confira os valores e tente novamente.",
   "models.settingsDefaultEffort": "Nível padrão",
-  "models.settingsModalitiesInherit": "Sem substituição — seguindo atualmente a declaração do upstream: {modalities}",
+  "models.settingsModalitiesInherit":
+    "Sem substituição — seguindo atualmente a declaração do upstream: {modalities}",
   "models.settingsModalitiesUnknown": "não declarado",
   "models.settingsRestore": "Restaurar",
-  "models.settingsRestoreHint": "Limpa todas as substituições deste modelo e volta aos valores calculados.",
-  "models.settingsRestoreConfirm": "Restaurar {model} para os valores calculados? Isso limpa as substituições de janela de contexto, modalidade e raciocínio.",
+  "models.settingsRestoreHint":
+    "Limpa todas as substituições deste modelo e volta aos valores calculados.",
+  "models.settingsRestoreConfirm":
+    "Restaurar {model} para os valores calculados? Isso limpa as substituições de janela de contexto, modalidade e raciocínio.",
   "models.settingsRestored": "{model} restaurado para os valores calculados",
-  "models.settingsNothingToRestore": "{model} não tem substituições; já está nos valores calculados",
+  "models.settingsNothingToRestore":
+    "{model} não tem substituições; já está nos valores calculados",
   "pws.manageModelVisibility": "Gerenciar visibilidade em Modelos",
   "pws.modelOwnershipLoading": "Verificando as definições de modelos…",
-  "pws.modelOwnershipFailed": "Não foi possível carregar as definições de modelos. Tente novamente antes de fazer alterações.",
+  "pws.modelOwnershipFailed":
+    "Não foi possível carregar as definições de modelos. Tente novamente antes de fazer alterações.",
   "pws.modelSelectionPending": "Conclua a seleção de modelos em Modelos antes de fazer alterações.",
   "pws.modelSaved": "Definição de modelo personalizado salva.",
-  "pws.modelSavedHidden": "Definição salva. Este modelo está oculto; gerencie a visibilidade em Modelos.",
-  "pws.modelSavedRefreshPending": "Definição salva, mas não foi possível atualizar o catálogo de modelos. Tente a atualização novamente; não o adicione de novo.",
-  "pws.modelMutationUnconfirmed": "Não foi possível confirmar a alteração. Atualize os modelos antes de tentar novamente.",
-  "pws.modelRemovedRefreshPending": "A alteração foi salva, mas não foi possível atualizar o catálogo de modelos. Tente a atualização novamente.",
+  "pws.modelSavedHidden":
+    "Definição salva. Este modelo está oculto; gerencie a visibilidade em Modelos.",
+  "pws.modelSavedRefreshPending":
+    "Definição salva, mas não foi possível atualizar o catálogo de modelos. Tente a atualização novamente; não o adicione de novo.",
+  "pws.modelMutationUnconfirmed":
+    "Não foi possível confirmar a alteração. Atualize os modelos antes de tentar novamente.",
+  "pws.modelRemovedRefreshPending":
+    "A alteração foi salva, mas não foi possível atualizar o catálogo de modelos. Tente a atualização novamente.",
   "pws.modelHidden": "Modelo oculto. Restaure a visibilidade em Modelos.",
-  "pws.modelDefinitionDeleted": "Definição personalizada excluída. Um modelo subjacente ainda pode aparecer.",
+  "pws.modelDefinitionDeleted":
+    "Definição personalizada excluída. Um modelo subjacente ainda pode aparecer.",
   "pws.modelKnown": "Este modelo já é conhecido. Gerencie a visibilidade dele em Modelos.",
   "models.customAdded": "Modelo personalizado adicionado",
   "models.customUpdated": "Modelo personalizado atualizado",
@@ -945,9 +1141,11 @@ export const pt: Record<TKey, string> = {
   "models.customEditBtn": "Atualizar",
   "models.customEdit": "Editar",
   "models.customDelete": "Excluir",
-  "models.customDeleteConfirm": "Excluir a definição personalizada de {name}? Um modelo nativo ou descoberto subjacente pode voltar a aparecer.",
+  "models.customDeleteConfirm":
+    "Excluir a definição personalizada de {name}? Um modelo nativo ou descoberto subjacente pode voltar a aparecer.",
   "models.hide": "Ocultar",
-  "models.hideConfirm": "Ocultar {name} do catálogo de modelos? Isso não remove a definição nem altera a política de roteamento direto.",
+  "models.hideConfirm":
+    "Ocultar {name} do catálogo de modelos? Isso não remove a definição nem altera a política de roteamento direto.",
   "models.customBadge": "Personalizado",
   "models.customSummary": "{count} personalizado(s)",
   "models.customFieldModelId": "ID do modelo (slug do endpoint)",
@@ -973,66 +1171,87 @@ export const pt: Record<TKey, string> = {
   "models.tipActive": "Ativo",
   "models.tipDisabled": "Desativado",
   "models.applied": "Salvo. O Codex mostra a alteração depois de recarregar a lista de modelos.",
-  "models.integrationRefreshWarning": "Seleção de modelos salva. Alguns catálogos de clientes não puderam ser atualizados. Verifique Integrações antes de iniciar uma nova sessão.",
+  "models.integrationRefreshWarning":
+    "Seleção de modelos salva. Alguns catálogos de clientes não puderam ser atualizados. Verifique Integrações antes de iniciar uma nova sessão.",
   "models.saveFailed": "Falha ao salvar",
   "models.networkError": "Erro de rede — o proxy está em execução?",
   "models.loadFail": "Falha ao carregar os modelos — o proxy está em execução?",
   "models.noRouted": "Nenhum modelo roteado",
   "models.noRoutedHint": "Faça login em um provedor ou adicione um primeiro.",
-  "models.emptyDiscovery": "Nenhum modelo foi descoberto. Verifique o endpoint do provedor ou adicione um modelo estático/personalizado.",
-  "models.emptyDiscoveryDisabled": "A descoberta de modelos em tempo real está desativada e nenhum modelo estático está configurado.",
+  "models.emptyDiscovery":
+    "Nenhum modelo foi descoberto. Verifique o endpoint do provedor ou adicione um modelo estático/personalizado.",
+  "models.emptyDiscoveryDisabled":
+    "A descoberta de modelos em tempo real está desativada e nenhum modelo estático está configurado.",
   "models.discoveryFailedBadge": "Falha na descoberta",
   "models.discoveryFailedHttp": "A descoberta de modelos falhou (HTTP {status}).",
-  "models.discoveryFailedBlocked": "A descoberta de modelos foi bloqueada pela política do destino.",
-  "models.discoveryFailedInvalidResponse": "A descoberta de modelos retornou uma resposta inválida.",
+  "models.discoveryFailedBlocked":
+    "A descoberta de modelos foi bloqueada pela política do destino.",
+  "models.discoveryFailedInvalidResponse":
+    "A descoberta de modelos retornou uma resposta inválida.",
   "models.discoveryFailedNetwork": "A descoberta de modelos falhou por erro de rede.",
   "models.discoveryFailedProvider": "O provedor informou um erro na descoberta de modelos.",
   "models.discoveryFailedGeneric": "A descoberta de modelos falhou.",
   "models.openProviderSettings": "Abrir configurações do provedor",
   "models.inactiveNoCredit": "Sem crédito",
-  "models.inactiveNoCreditHint": "Todos os provedores por trás desta entrada estão sem crédito no momento, então uma requisição falharia. Ela continua listada e volta a ser utilizável quando o crédito for renovado ou recarregado.",
-  "models.discoveryFailedDependency": "A descoberta de modelos está ativada para este provedor. Enquanto continuar falhando, desative “{control}” nas configurações do provedor para usar modelos adicionados manualmente ou estáticos.",
+  "models.inactiveNoCreditHint":
+    "Todos os provedores por trás desta entrada estão sem crédito no momento, então uma requisição falharia. Ela continua listada e volta a ser utilizável quando o crédito for renovado ou recarregado.",
+  "models.discoveryFailedDependency":
+    "A descoberta de modelos está ativada para este provedor. Enquanto continuar falhando, desative “{control}” nas configurações do provedor para usar modelos adicionados manualmente ou estáticos.",
   "models.loading": "Carregando…",
   "models.search": "Buscar modelos…",
   "models.showMore": "Mostrar mais {n}",
   "models.freeOnly": "Somente gratuitos",
-  "models.noFreeMatch": "Nenhum modelo gratuito aqui. Desative “Somente gratuitos” para ver os demais.",
+  "models.noFreeMatch":
+    "Nenhum modelo gratuito aqui. Desative “Somente gratuitos” para ver os demais.",
   "models.allowlistLabel": "Somente selecionados",
-  "models.allowlistHint": "Somente os modelos marcados vão para o catálogo (vazio = todos). Útil para provedores que expõem milhares de modelos.",
+  "models.allowlistHint":
+    "Somente os modelos marcados vão para o catálogo (vazio = todos). Útil para provedores que expõem milhares de modelos.",
   "models.selectedCount": "{n} selecionados",
   "sub.forceTitle": "Forçar todos os subagentes a usar o mesmo modelo",
   "sub.forceModel": "Modelo dos subagentes do Claude Code",
   "sub.forceChoose": "Selecione um modelo exposto",
-  "sub.forceHelp": "Aplica-se aos agentes de plugins e aos agentes integrados (incluindo Explore/Plan), substituindo os modelos definidos por chamada. Forks e skills com model: inherit mantêm o modelo da conversa principal. O modelo principal e os modelos auxiliares Haiku/small-fast não são afetados.",
-  "sub.forceScope": "Desativado por padrão. Aplica-se a partir da próxima execução com roteamento via ocx claude, não à execução direta de claude. As variáveis exportadas no shell têm prioridade; env em settings.json pode sobrescrevê-las. O status verifica apenas a CLI e as configurações do usuário no servidor, não as de outro shell nem as do projeto.",
-  "sub.forceInvalid": "O destino configurado não está disponível. A substituição do modelo na inicialização será ignorada; selecione um modelo exposto ou desative esta opção.",
-  "sub.forceOld": "A versão do Claude Code é anterior à 2.1.257: FORCE é ignorado; aplica-se apenas o modelo padrão dos subagentes, sem imposição.",
-  "sub.forceUnknown": "A versão do Claude Code é desconhecida. Forçar um modelo requer a versão 2.1.257 ou posterior.",
-  "sub.forceOverride": "Sobrescrito por settings.json: seu env contém um modelo de subagente ou uma configuração FORCE. O OpenCodex não modifica esse arquivo.",
-  "sub.forceSettingsUnknown": "Não foi possível inspecionar settings.json. Não se sabe se suas configurações sobrescrevem esta opção.",
+  "sub.forceHelp":
+    "Aplica-se aos agentes de plugins e aos agentes integrados (incluindo Explore/Plan), substituindo os modelos definidos por chamada. Forks e skills com model: inherit mantêm o modelo da conversa principal. O modelo principal e os modelos auxiliares Haiku/small-fast não são afetados.",
+  "sub.forceScope":
+    "Desativado por padrão. Aplica-se a partir da próxima execução com roteamento via ocx claude, não à execução direta de claude. As variáveis exportadas no shell têm prioridade; env em settings.json pode sobrescrevê-las. O status verifica apenas a CLI e as configurações do usuário no servidor, não as de outro shell nem as do projeto.",
+  "sub.forceInvalid":
+    "O destino configurado não está disponível. A substituição do modelo na inicialização será ignorada; selecione um modelo exposto ou desative esta opção.",
+  "sub.forceOld":
+    "A versão do Claude Code é anterior à 2.1.257: FORCE é ignorado; aplica-se apenas o modelo padrão dos subagentes, sem imposição.",
+  "sub.forceUnknown":
+    "A versão do Claude Code é desconhecida. Forçar um modelo requer a versão 2.1.257 ou posterior.",
+  "sub.forceOverride":
+    "Sobrescrito por settings.json: seu env contém um modelo de subagente ou uma configuração FORCE. O OpenCodex não modifica esse arquivo.",
+  "sub.forceSettingsUnknown":
+    "Não foi possível inspecionar settings.json. Não se sabe se suas configurações sobrescrevem esta opção.",
   "sub.forceSaved": "Salvo. Entra em vigor na próxima execução com roteamento via ocx claude.",
-  "sub.subtitle": "O {cmd} do Codex anuncia apenas os 5 primeiros modelos (por prioridade) como substituições. Escolha até 5 aqui — gpt nativo ou roteado — e o opencodex define a prioridade deles no catálogo para que exatamente esses fiquem à frente. Qualquer outro modelo continua acessível pelo nome exato; isto controla apenas o que é exibido.",
+  "sub.subtitle":
+    "O {cmd} do Codex anuncia apenas os 5 primeiros modelos (por prioridade) como substituições. Escolha até 5 aqui — gpt nativo ou roteado — e o opencodex define a prioridade deles no catálogo para que exatamente esses fiquem à frente. Qualquer outro modelo continua acessível pelo nome exato; isto controla apenas o que é exibido.",
   "sub.featured": "Em destaque",
   "sub.advanced": "Avançado",
   "sub.orderHintAria": "Como esta ordem é usada",
-  "sub.orderHint": "A ordem exibida aqui define as posições 1 a 5 no topo do seletor de modelos do Codex e os modelos padrão candidatos para {cmd}. Quando menos de 5 modelos destacados estão visíveis no seletor, os slots restantes são oferecidos por prioridade do catálogo; 5 modelos destacados visíveis preenchem a lista, a menos que uma ordem personalizada do seletor de modelos altere a prioridade do catálogo.",
+  "sub.orderHint":
+    "A ordem exibida aqui define as posições 1 a 5 no topo do seletor de modelos do Codex e os modelos padrão candidatos para {cmd}. Quando menos de 5 modelos destacados estão visíveis no seletor, os slots restantes são oferecidos por prioridade do catálogo; 5 modelos destacados visíveis preenchem a lista, a menos que uma ordem personalizada do seletor de modelos altere a prioridade do catálogo.",
   "sub.noneSelected": "Nenhum selecionado — escolha na lista abaixo.",
   "sub.models": "Modelos",
   "sub.search": "Buscar modelos (gpt nativo + roteados)…",
   "sub.settings": "Configurações",
   "sub.sections": "Seções de subagentes",
   "sub.delegation.model": "Modelo a chamar primeiro",
-  "sub.delegation.modelHint": "O modelo que o Codex aciona primeiro ao delegar trabalho. “Em destaque” acima é a lista que ele pode chamar; este é o que ele chama primeiro.",
+  "sub.delegation.modelHint":
+    "O modelo que o Codex aciona primeiro ao delegar trabalho. “Em destaque” acima é a lista que ele pode chamar; este é o que ele chama primeiro.",
   "sub.suggest.button": "Sugerir",
   "sub.suggest.label": "Trabalho delegado",
-  "sub.suggest.placeholder": "O que o Codex costuma delegar? Ex.: buscas somente leitura em todo o repositório ou refatorações em vários módulos",
+  "sub.suggest.placeholder":
+    "O que o Codex costuma delegar? Ex.: buscas somente leitura em todo o repositório ou refatorações em vários módulos",
   "sub.suggest.submit": "Dimensionar",
   "sub.suggest.running": "Dimensionando…",
   "sub.suggest.failed": "Não foi possível dimensionar o trabalho delegado.",
   "sub.suggest.title": "Modelo sugerido",
   "sub.suggest.accept": "Usar este",
   "sub.noModels": "Nenhum modelo — faça login em um provedor ou adicione um primeiro.",
-  "sub.saved": "{n} modelos salvos. Inicie uma nova sessão do Codex (ou execute {cmd}) para vê-los como substituições de spawn_agent.",
+  "sub.saved":
+    "{n} modelos salvos. Inicie uma nova sessão do Codex (ou execute {cmd}) para vê-los como substituições de spawn_agent.",
   "sub.saveFailed": "Falha ao salvar",
   "sub.networkError": "Erro de rede — o proxy está em execução?",
   "sub.loadFail": "Falha ao carregar os modelos — o proxy está em execução?",
@@ -1047,19 +1266,24 @@ export const pt: Record<TKey, string> = {
   "sub.workspace.notFeatured": "Fora dos destaques",
   "sub.workspace.priority": "Prioridade",
   "sub.ultraMode": "Delegação sempre proativa",
-  "sub.ultraModeHint": "Ativa a política de delegação multiagente proativa para todos os modelos e esforços de raciocínio (não altera o esforço de raciocínio em si). Grava features.multi_agent_v2.multi_agent_mode_hint_text no config.toml.",
-  "sub.ultraModeV2Required": "Requer a superfície multiagente v2 — ative multi_agent_v2 e selecione v2 no controle de modo de subagente primeiro.",
+  "sub.ultraModeHint":
+    "Ativa a política de delegação multiagente proativa para todos os modelos e esforços de raciocínio (não altera o esforço de raciocínio em si). Grava features.multi_agent_v2.multi_agent_mode_hint_text no config.toml.",
+  "sub.ultraModeV2Required":
+    "Requer a superfície multiagente v2 — ative multi_agent_v2 e selecione v2 no controle de modo de subagente primeiro.",
   "sub.ultraModeText": "Texto da delegação proativa",
   "sub.ultraModePreset": "Restaurar predefinição",
-  "sub.ultraModeLoadFail": "Falha ao carregar as configurações de delegação proativa — o proxy está em execução?",
+  "sub.ultraModeLoadFail":
+    "Falha ao carregar as configurações de delegação proativa — o proxy está em execução?",
   "sub.ultraModeSaveFail": "Falha ao salvar as configurações de delegação proativa",
   "sub.ultraModeSaved": "Delegação proativa salva. Vale para novas sessões do Codex.",
   "sub.workspace.removeFromFeatured": "Remover {m} dos destaques",
   "sub.workspace.selectModel": "Selecione um modelo",
-  "sub.workspace.selectModelDesc": "Escolha um modelo na lista para ver os detalhes e colocá-lo em destaque para o spawn_agent.",
+  "sub.workspace.selectModelDesc":
+    "Escolha um modelo na lista para ver os detalhes e colocá-lo em destaque para o spawn_agent.",
   "sub.workspace.selector": "Seletor público",
   "sub.fallbackLabel": "Cadeia de fallback de subagente",
-  "sub.fallbackHint": "Modelos tentados, em ordem, quando o modelo do subagente estiver indisponível ou falhar.",
+  "sub.fallbackHint":
+    "Modelos tentados, em ordem, quando o modelo do subagente estiver indisponível ou falhar.",
   "sub.fallbackAdd": "Adicionar modelo de fallback…",
   "sub.fallbackPoll": "Intervalo de verificação de disponibilidade",
   "sub.fallbackSaved": "Configurações de fallback de subagente salvas.",
@@ -1067,13 +1291,16 @@ export const pt: Record<TKey, string> = {
   "sub.fallbackUnavailable": "Não anunciado no momento; mantido na cadeia.",
   "sub.fallbackPollInvalid": "Informe um número inteiro de 5000 a 600000 ms.",
   "sub.v2Compatibility.title": "Compatibilidade V2 com pai nativo",
-  "sub.v2Compatibility.risk": "Se um pai nativo do ChatGPT delegar a este modelo roteado usando V2, a tarefa pode ser criptografada e falhar antes da execução. Tarefas legíveis vindas de pais roteados não são afetadas.",
-  "sub.v2Compatibility.recoveryUnknown": "O estado de recuperação ativada/elegibilidade não é exposto por este servidor. Use delegação V1/compatível com texto simples, ou ative a recuperação V2 experimental somente se elegível. A recuperação adiciona consumo de cota, latência, dependência do backend e possível perda de fidelidade; ela não corrige o protocolo upstream.",
+  "sub.v2Compatibility.risk":
+    "Se um pai nativo do ChatGPT delegar a este modelo roteado usando V2, a tarefa pode ser criptografada e falhar antes da execução. Tarefas legíveis vindas de pais roteados não são afetadas.",
+  "sub.v2Compatibility.recoveryUnknown":
+    "O estado de recuperação ativada/elegibilidade não é exposto por este servidor. Use delegação V1/compatível com texto simples, ou ative a recuperação V2 experimental somente se elegível. A recuperação adiciona consumo de cota, latência, dependência do backend e possível perda de fidelidade; ela não corrige o protocolo upstream.",
   "sub.v2Compatibility.details": "Detalhes de compatibilidade",
   "logs.title": "Logs de requisições",
   "logs.tabLogs": "Logs",
   "logs.tabDebug": "Debug",
-  "logs.subtitle": "Requisições recentes roteadas pelo proxy local do opencodex, das mais novas para as mais antigas.",
+  "logs.subtitle":
+    "Requisições recentes roteadas pelo proxy local do opencodex, das mais novas para as mais antigas.",
   "logs.autoRefresh": "Atualização automática",
   "logs.noRequests": "Nenhuma requisição ainda.",
   "logs.loadError": "Não foi possível carregar os logs de requisições.",
@@ -1130,9 +1357,11 @@ export const pt: Record<TKey, string> = {
   "logs.col.tokPerSec": "tok/s",
   "logs.col.estimatedCost": "~$",
   "logs.metric.tokPerSecTitle": "Tokens de saída por segundo durante toda a duração da requisição",
-  "logs.metric.estimatedCostTitle": "Equivalente ao preço de tabela da API, não uma cobrança real; preços sem correspondência ficam indisponíveis",
+  "logs.metric.estimatedCostTitle":
+    "Equivalente ao preço de tabela da API, não uma cobrança real; preços sem correspondência ficam indisponíveis",
   "usage.cost.total": "Equivalente ao preço de tabela da API (este período)",
-  "usage.cost.disclaimer": "Não é um comprovante de cobrança. Pode valer o uso da assinatura ou créditos do provedor.",
+  "usage.cost.disclaimer":
+    "Não é um comprovante de cobrança. Pode valer o uso da assinatura ou créditos do provedor.",
   "usage.cost.unpricedNote": "{count} requisições excluídas (sem preço ou uso)",
   "usage.cost.excluded": "({count} requisições excluídas)",
   "usage.cost.excludedOne": "({count} requisição excluída)",
@@ -1142,7 +1371,8 @@ export const pt: Record<TKey, string> = {
   "logs.detail.route.profile": "Perfil",
   "logs.detail.route.selected": "Selecionado",
   "logs.detail.route.candidates": "Candidatos",
-  "logs.detail.route.unknown": "Nenhum rastreio de rota registrado para esta requisição (linha anterior ao rastreio).",
+  "logs.detail.route.unknown":
+    "Nenhum rastreio de rota registrado para esta requisição (linha anterior ao rastreio).",
   "logs.filter.protocol.label": "Caminho do protocolo",
   "logs.filter.protocol.all": "Todos os caminhos",
   "logs.filter.protocol.none": "Sem dados de caminho",
@@ -1184,12 +1414,17 @@ export const pt: Record<TKey, string> = {
   "logs.detail.decodeGeneration": "Taxa de saída durante a geração (est.)",
   "logs.detail.decodeLegacy": "Taxa de saída após a primeira saída visível (est.)",
   "logs.detail.decodeUnknown": "Taxa de saída (est.; método de medição de tempo desconhecido)",
-  "logs.detail.decodeBasisHint.generation": "Estimada usando o tempo entre a primeira saída observada pelo proxy, incluindo raciocínio, e o último delta de saída.",
-  "logs.detail.decodeBasisHint.legacy": "Estimada usando o tempo entre a primeira saída visível e o fim da requisição, contando todos os tokens de saída informados, incluindo raciocínio.",
-  "logs.detail.decodeBasisHint.unknown": "O servidor não informou qual método de medição de tempo foi usado nesta estimativa.",
+  "logs.detail.decodeBasisHint.generation":
+    "Estimada usando o tempo entre a primeira saída observada pelo proxy, incluindo raciocínio, e o último delta de saída.",
+  "logs.detail.decodeBasisHint.legacy":
+    "Estimada usando o tempo entre a primeira saída visível e o fim da requisição, contando todos os tokens de saída informados, incluindo raciocínio.",
+  "logs.detail.decodeBasisHint.unknown":
+    "O servidor não informou qual método de medição de tempo foi usado nesta estimativa.",
   "logs.detail.endToEndTokPerSec": "Saída de ponta a ponta (tok/s)",
-  "logs.detail.reason.ttft_missing": "Nenhum tempo até o primeiro token foi registrado para esta requisição, portanto não há janela de decodificação para medir.",
-  "logs.detail.reason.decode_window_too_short": "A janela de saída medida foi inferior a um segundo, curta demais para estimar a taxa de decodificação.",
+  "logs.detail.reason.ttft_missing":
+    "Nenhum tempo até o primeiro token foi registrado para esta requisição, portanto não há janela de decodificação para medir.",
+  "logs.detail.reason.decode_window_too_short":
+    "A janela de saída medida foi inferior a um segundo, curta demais para estimar a taxa de decodificação.",
   "logs.detail.costTotal": "Equivalente ao preço de tabela",
   "logs.detail.totalTokens": "Total de tokens",
   "logs.detail.matchedKey": "Chave de preço correspondente",
@@ -1205,7 +1440,8 @@ export const pt: Record<TKey, string> = {
   "logs.detail.attempt.target": "Provedor / modelo",
   "logs.detail.attempt.reason": "Resultado / motivo",
   "logs.detail.attempt.completed": "Concluída",
-  "logs.detail.attempt.e2eNote": "O tok/s de nível superior é ponta a ponta; cada tentativa usa sua própria duração.",
+  "logs.detail.attempt.e2eNote":
+    "O tok/s de nível superior é ponta a ponta; cada tentativa usa sua própria duração.",
   "logs.detail.attempt.recovery.transient5xx": "5xx transitório",
   "logs.detail.attempt.recovery.connectionReset": "Conexão reiniciada",
   "logs.detail.attempt.recovery.oauth401": "Reautenticação OAuth",
@@ -1221,7 +1457,8 @@ export const pt: Record<TKey, string> = {
   "logs.detail.attempt.recovery.oauthAccount402": "Cota da conta esgotada (402)",
   "logs.detail.attempt.recovery.opaqueBlobRejection": "Estado criptografado obsoleto descartado",
   "logs.detail.attempt.recovery.reasoningEffortDowngrade": "Esforço de raciocínio reduzido",
-  "logs.detail.attempt.recovery.anthropicFastDowngrade": "Modo rápido recusado, repetido em velocidade padrão",
+  "logs.detail.attempt.recovery.anthropicFastDowngrade":
+    "Modo rápido recusado, repetido em velocidade padrão",
   "logs.detail.outcome.label": "Resultado",
   "logs.detail.outcome.completed": "Concluída",
   "logs.detail.outcome.failed": "Falhou",
@@ -1263,17 +1500,24 @@ export const pt: Record<TKey, string> = {
   "logs.detail.resend.refusedFutile": "Não reenviada: a mesma requisição falharia de novo",
   "logs.detail.reason.usage_missing": "O uso não foi informado.",
   "logs.detail.reason.usage_unsupported": "Este provedor não informa o uso.",
-  "logs.detail.reason.output_missing": "Nenhuma contagem positiva de tokens de saída foi informada.",
+  "logs.detail.reason.output_missing":
+    "Nenhuma contagem positiva de tokens de saída foi informada.",
   "logs.detail.reason.invalid_duration": "A duração da requisição não é válida.",
   "logs.detail.reason.price_unmatched": "Nenhum preço correspondente foi encontrado.",
-  "logs.detail.reason.invalid_cache_breakdown": "Os detalhes de tokens de cache conflitam com o total de tokens de entrada.",
+  "logs.detail.reason.invalid_cache_breakdown":
+    "Os detalhes de tokens de cache conflitam com o total de tokens de entrada.",
   "logs.detail.reason.invalid_usage": "O uso contém um valor de token inválido.",
-  "logs.detail.reason.combo_attempt_unavailable": "Pelo menos uma tentativa do combo não pôde ser precificada.",
+  "logs.detail.reason.combo_attempt_unavailable":
+    "Pelo menos uma tentativa do combo não pôde ser precificada.",
   "logs.detail.estimate.usage_estimated": "O uso do provedor é estimado.",
-  "logs.detail.estimate.cache_detail_missing": "Os detalhes de cache estavam indisponíveis; a entrada é uma estimativa de limite superior.",
-  "logs.detail.estimate.expected_price_overlay": "Foi usado um preço de tabela esperado verificado.",
-  "logs.detail.estimate.provider_cost_overlay": "Foi usada uma sobreposição de preço configurada no provedor.",
-  "logs.detail.estimate.priority_lower_bound": "O preço Priority confirmado está indisponível; a estimativa exibida é um limite inferior conhecido.",
+  "logs.detail.estimate.cache_detail_missing":
+    "Os detalhes de cache estavam indisponíveis; a entrada é uma estimativa de limite superior.",
+  "logs.detail.estimate.expected_price_overlay":
+    "Foi usado um preço de tabela esperado verificado.",
+  "logs.detail.estimate.provider_cost_overlay":
+    "Foi usada uma sobreposição de preço configurada no provedor.",
+  "logs.detail.estimate.priority_lower_bound":
+    "O preço Priority confirmado está indisponível; a estimativa exibida é um limite inferior conhecido.",
   "logs.col.error": "Erro",
   "logs.col.upstreamReason": "Motivo do upstream",
   "logs.col.failureDetail": "Detalhe da falha",
@@ -1291,7 +1535,8 @@ export const pt: Record<TKey, string> = {
   "logs.failureDetail.providerError": "O provedor retornou um erro",
   "logs.failureDetail.providerErrorTyped": "O provedor retornou um erro ({type})",
   "logs.failureDetail.headerTimeout": "Tempo esgotado aguardando os cabeçalhos da resposta",
-  "logs.failureDetail.headerTimeoutAfter": "Tempo esgotado aguardando os cabeçalhos da resposta após {value} ms",
+  "logs.failureDetail.headerTimeoutAfter":
+    "Tempo esgotado aguardando os cabeçalhos da resposta após {value} ms",
   "logs.failureDetail.connectTimeout": "A conexão com o provedor expirou após {value} ms",
   "logs.failureDetail.connectFailed": "Não foi possível conectar ao provedor",
   "logs.failureDetail.clientClosed": "O cliente fechou a solicitação",
@@ -1301,7 +1546,8 @@ export const pt: Record<TKey, string> = {
   "logs.failureDetail.streamEndedEarly": "O fluxo de resposta terminou antes do evento final",
   "logs.failureDetail.streamFailed": "O fluxo de resposta falhou",
   "logs.failureDetail.outputLimit": "A saída atingiu o limite de tokens solicitado",
-  "logs.failureDetail.stallTimeout": "O provedor não enviou dados dentro do tempo limite de inatividade",
+  "logs.failureDetail.stallTimeout":
+    "O provedor não enviou dados dentro do tempo limite de inatividade",
   "logs.failureDetail.adapterEof": "O fluxo do provedor terminou sem um evento final",
   "logs.failureDetail.generationTimeout": "O modelo roteado não respondeu em {value} ms",
   "logs.failureDetail.turnInactivity": "O turno ficou inativo por {value} ms",
@@ -1332,20 +1578,24 @@ export const pt: Record<TKey, string> = {
   "logs.tokens.contextTotal": "contexto ativo",
   "logs.tokens.noCacheNote": "este provedor não informa tokens de cache",
   "logs.tokens.noCacheCursor": "Detalhe de cache do Cursor não informado",
-  "logs.tokens.noCacheCursorNote": "O Cursor não expõe as contagens de tokens de leitura/gravação de cache; isso é desconhecido, não um cache miss confirmado",
+  "logs.tokens.noCacheCursorNote":
+    "O Cursor não expõe as contagens de tokens de leitura/gravação de cache; isso é desconhecido, não um cache miss confirmado",
   "logs.tokens.estimatedNote": "estimado (o provedor não informa o uso exato)",
   "logs.details": "Detalhes",
   "logs.detailTitle": "Detalhes da requisição",
   "logs.detailRaw": "Entrada de log bruta",
   "debug.title": "Debug",
-  "debug.subtitle": "Diagnósticos opcionais de transporte do provedor e de extração de uso. Erros de requisição e 502 permanecem na aba Logs.",
+  "debug.subtitle":
+    "Diagnósticos opcionais de transporte do provedor e de extração de uso. Erros de requisição e 502 permanecem na aba Logs.",
   "debug.debug": "Debug do provedor",
   "debug.usage": "Extração de uso",
   "debug.injection": "Log de injeção",
   "debug.claude": "Entrada do Claude",
   "debug.claudeInbound.title": "Requisições de entrada do Claude",
-  "debug.claudeInbound.sub": "O que o Claude Code/Desktop realmente envia (thinking, esforço, metadados) — nenhum texto de prompt é armazenado.",
-  "debug.claudeInbound.empty": "Nenhuma requisição capturada ainda. Envie uma mensagem pelo Claude enquanto isto estiver ativado.",
+  "debug.claudeInbound.sub":
+    "O que o Claude Code/Desktop realmente envia (thinking, esforço, metadados) — nenhum texto de prompt é armazenado.",
+  "debug.claudeInbound.empty":
+    "Nenhuma requisição capturada ainda. Envie uma mensagem pelo Claude enquanto isto estiver ativado.",
   "debug.claudeInbound.time": "Hora",
   "debug.claudeInbound.endpoint": "Endpoint",
   "debug.claudeInbound.model": "Modelo",
@@ -1359,20 +1609,28 @@ export const pt: Record<TKey, string> = {
   "debug.loading": "Carregando configurações de debug…",
   "debug.loadFailed": "Não foi possível carregar as configurações de debug.",
   "debug.emptyTitle": "O log de debug está desativado",
-  "debug.empty": "Ative Debug do provedor ou Extração de uso no cartão acima. As linhas aparecem aqui depois que você enviar uma requisição pelo proxy.",
+  "debug.empty":
+    "Ative Debug do provedor ou Extração de uso no cartão acima. As linhas aparecem aqui depois que você enviar uma requisição pelo proxy.",
   "debug.noLinesTitle": "Aguardando linhas",
-  "debug.noLines.provider": "O debug do provedor está ativado, mas registra apenas anomalias de transporte (frames descartados ou malformados e eventos de conexão/nova tentativa do Cursor). Uma requisição normal por um provedor como a Anthropic pode não gerar nenhuma linha.",
-  "debug.noLines.usage": "A extração de uso está ativada, mas nada foi capturado ainda. Envie um chat/requisição pelo Codex e ele aparecerá aqui.",
-  "debug.noLines.injection": "O log de injeção está ativado, mas nada foi capturado ainda. Ele registra a injeção de orientação multiagente e as decisões de limite de esforço em turnos de colaboração e de subagentes.",
+  "debug.noLines.provider":
+    "O debug do provedor está ativado, mas registra apenas anomalias de transporte (frames descartados ou malformados e eventos de conexão/nova tentativa do Cursor). Uma requisição normal por um provedor como a Anthropic pode não gerar nenhuma linha.",
+  "debug.noLines.usage":
+    "A extração de uso está ativada, mas nada foi capturado ainda. Envie um chat/requisição pelo Codex e ele aparecerá aqui.",
+  "debug.noLines.injection":
+    "O log de injeção está ativado, mas nada foi capturado ainda. Ele registra a injeção de orientação multiagente e as decisões de limite de esforço em turnos de colaboração e de subagentes.",
   "usage.title": "Uso",
-  "usage.subtitle": "Contabilização local de tokens do seu proxy. O uso ausente nunca é exibido como zero.",
+  "usage.subtitle":
+    "Contabilização local de tokens do seu proxy. O uso ausente nunca é exibido como zero.",
   "usage.loading": "Carregando dados de uso…",
-  "usage.empty": "Nenhum uso registrado ainda. Envie uma requisição pelo proxy para ver a atividade aqui.",
+  "usage.empty":
+    "Nenhum uso registrado ainda. Envie uma requisição pelo proxy para ver a atividade aqui.",
   "usage.loadError": "Não foi possível carregar os dados de uso.",
   "usage.range.all": "Tudo",
   "usage.range.available": "Histórico disponível",
-  "usage.historyTruncated": "Os totais cobrem apenas o histórico disponível porque o uso mais antigo não foi carregado.",
-  "usage.historyTruncatedWindow": "As linhas carregadas têm horários de início de requisição entre {start} e {end}. Entradas anteriores do arquivo foram omitidas pelo limite de leitura, então qualquer período selecionado pode estar incompleto.",
+  "usage.historyTruncated":
+    "Os totais cobrem apenas o histórico disponível porque o uso mais antigo não foi carregado.",
+  "usage.historyTruncatedWindow":
+    "As linhas carregadas têm horários de início de requisição entre {start} e {end}. Entradas anteriores do arquivo foram omitidas pelo limite de leitura, então qualquer período selecionado pode estar incompleto.",
   "usage.range.30d": "30d",
   "usage.range.7d": "7d",
   "usage.card.requests": "Requisições",
@@ -1380,7 +1638,8 @@ export const pt: Record<TKey, string> = {
   "usage.card.reported": "Informadas",
   "usage.card.totalTokens": "Total de tokens",
   "usage.card.cachedTokens": "Leituras de cache",
-  "usage.card.cachedTokensHint": "Tokens do prompt atendidos pelo cache do provedor (leituras). As gravações de cache aparecem abaixo quando houver.",
+  "usage.card.cachedTokensHint":
+    "Tokens do prompt atendidos pelo cache do provedor (leituras). As gravações de cache aparecem abaixo quando houver.",
   "usage.card.cacheWriteTokens": "gravações de cache",
   "usage.card.coverage": "Cobertura",
   "usage.card.activeDays": "Dias ativos",
@@ -1394,7 +1653,8 @@ export const pt: Record<TKey, string> = {
   "usage.coverage.measured": "Medido",
   "usage.coverage.reported": "Informado pelo provedor",
   "usage.coverage.estimated": "Estimado",
-  "usage.coverage.note": "As entradas medidas incluem contagens de tokens informadas pelo provedor e estimadas. Requisições sem informação ou sem suporte são registradas, mas nunca contabilizadas como zero token.",
+  "usage.coverage.note":
+    "As entradas medidas incluem contagens de tokens informadas pelo provedor e estimadas. Requisições sem informação ou sem suporte são registradas, mas nunca contabilizadas como zero token.",
   "usage.search.models": "Buscar modelos…",
   "usage.col.requests": "Requisições",
   "usage.col.measured": "Medido",
@@ -1404,8 +1664,10 @@ export const pt: Record<TKey, string> = {
   "usage.col.cacheHits": "Acertos de cache",
   "usage.col.cacheWrites": "Gravações em cache",
   "usage.col.cacheHitRate": "Taxa de acerto",
-  "usage.cacheHitRate.partial": "Média sobre {measured} de {total} tokens de entrada; as demais requisições não informaram detalhes de cache.",
-  "usage.cacheHitRate.unmeasured": "Nenhuma requisição desta linha informou detalhes de cache, então não há taxa de acerto para calcular a média.",
+  "usage.cacheHitRate.partial":
+    "Média sobre {measured} de {total} tokens de entrada; as demais requisições não informaram detalhes de cache.",
+  "usage.cacheHitRate.unmeasured":
+    "Nenhuma requisição desta linha informou detalhes de cache, então não há taxa de acerto para calcular a média.",
   "usage.unavailable": "—",
   "usage.col.tokens": "Tokens",
   "usage.col.apiListPrice": "Preço de tabela da API",
@@ -1417,14 +1679,17 @@ export const pt: Record<TKey, string> = {
   "usage.dayFri": "Sex",
   "usage.heatmap.tooltipTokens": "{tokens} tokens",
   "usage.chart.dayDetail": "{date}: {requests} requisições, {tokens} tokens",
-  "usage.heatmap.keyboardLabel": "Use Cima e Baixo para mover por dia; Esquerda e Direita para mover por semana.",
+  "usage.heatmap.keyboardLabel":
+    "Use Cima e Baixo para mover por dia; Esquerda e Direita para mover por semana.",
   "usage.heatmap.tooltipRequests": "{requests} requisições",
   "nav.storage": "Armazenamento",
   "storage.title": "Armazenamento",
-  "storage.subtitle": "Veja o que está ocupando o CODEX_HOME. A limpeza nunca afeta sessões ativas.",
+  "storage.subtitle":
+    "Veja o que está ocupando o CODEX_HOME. A limpeza nunca afeta sessões ativas.",
   "storage.loading": "Analisando o armazenamento…",
   "storage.empty": "CODEX_HOME está vazio ou ausente — nada a relatar.",
-  "storage.error": "Falha na análise do armazenamento. Verifique se CODEX_HOME aponta para um diretório válido.",
+  "storage.error":
+    "Falha na análise do armazenamento. Verifique se CODEX_HOME aponta para um diretório válido.",
   "storage.refresh": "Reanalisar",
   "storage.rescanned": "Análise concluída.",
   "storage.card.total": "Tamanho total",
@@ -1457,17 +1722,20 @@ export const pt: Record<TKey, string> = {
   "storage.bucket.deletion_manifests": "Manifestos de exclusão",
   "storage.bucket.other": "Outros",
   "storage.cleanup.title": "Limpeza de arquivados",
-  "storage.cleanup.help": "Remove as sessões arquivadas mais antigas por porcentagem. Sessões ativas nunca são afetadas. A quarentena é o padrão — os arquivos são movidos para CODEX_HOME/.trash.",
+  "storage.cleanup.help":
+    "Remove as sessões arquivadas mais antigas por porcentagem. Sessões ativas nunca são afetadas. A quarentena é o padrão — os arquivos são movidos para CODEX_HOME/.trash.",
   "storage.cleanup.slider": "Porcentagem dos arquivados mais antigos",
   "storage.cleanup.percent": "{percent}%",
   "storage.cleanup.preset": "{percent}",
   "storage.cleanup.preview": "Pré-visualizar",
   "storage.cleanup.confirmTitle": "Confirmar limpeza de arquivados",
-  "storage.cleanup.confirmBody": "Isto processará {count} arquivo(s) arquivado(s) (~{size}), os {percent}% mais antigos.",
+  "storage.cleanup.confirmBody":
+    "Isto processará {count} arquivo(s) arquivado(s) (~{size}), os {percent}% mais antigos.",
   "storage.cleanup.moreFiles": "…e mais {n}",
   "storage.cleanup.permanent": "Excluir permanentemente (ignorar quarentena)",
   "storage.cleanup.permanentWarn": "A exclusão permanente não pode ser desfeita.",
-  "storage.cleanup.quarantineNote": "Os arquivos são movidos para .trash em CODEX_HOME. Você pode restaurá-los na aba Quarentena.",
+  "storage.cleanup.quarantineNote":
+    "Os arquivos são movidos para .trash em CODEX_HOME. Você pode restaurá-los na aba Quarentena.",
   "storage.cleanup.cancel": "Cancelar",
   "storage.cleanup.confirmQuarantine": "Colocar em quarentena",
   "storage.cleanup.confirmPermanent": "Excluir permanentemente",
@@ -1476,18 +1744,26 @@ export const pt: Record<TKey, string> = {
   "storage.cleanup.skippedReferenced": "{count} arquivo(s) referenciado(s) ignorado(s).",
   "storage.cleanup.previewFailed": "Falha na pré-visualização.",
   "storage.cleanup.cleanupFailed": "Falha na limpeza.",
-  "storage.cleanup.err.codex_busy": "O Codex está usando o state.sqlite — tente novamente após encerrar o Codex.",
-  "storage.cleanup.err.stale_preview": "Os arquivos arquivados mudaram desde a pré-visualização — execute a pré-visualização novamente.",
-  "storage.cleanup.err.restore_pending_overlap": "Os arquivos selecionados se sobrepõem a uma restauração incompleta da lixeira — conclua ou tente novamente a restauração primeiro.",
-  "storage.cleanup.err.referenced_history": "Os arquivos selecionados ainda são referenciados por históricos bifurcados ou paginados.",
+  "storage.cleanup.err.codex_busy":
+    "O Codex está usando o state.sqlite — tente novamente após encerrar o Codex.",
+  "storage.cleanup.err.stale_preview":
+    "Os arquivos arquivados mudaram desde a pré-visualização — execute a pré-visualização novamente.",
+  "storage.cleanup.err.restore_pending_overlap":
+    "Os arquivos selecionados se sobrepõem a uma restauração incompleta da lixeira — conclua ou tente novamente a restauração primeiro.",
+  "storage.cleanup.err.referenced_history":
+    "Os arquivos selecionados ainda são referenciados por históricos bifurcados ou paginados.",
   "storage.cleanup.err.invalid_digest": "O digest da pré-visualização está ausente ou é inválido.",
   "storage.cleanup.err.invalid_mode": "O modo de limpeza deve ser quarentena ou permanente.",
-  "storage.cleanup.err.fs_failed": "Falha na limpeza do sistema de arquivos. Algumas alterações podem já ter sido aplicadas — verifique CODEX_HOME/.trash e qualquer caminho de recuperação exibido.",
-  "storage.cleanup.err.fs_failed_trash": "Falha na limpeza do sistema de arquivos. Algumas alterações podem já ter sido aplicadas — verifique {trashDir} e manifest.json para arquivos recuperáveis.",
-  "storage.cleanup.err.db_reconcile_failed": "Não foi possível atualizar o banco de estado do Codex.",
+  "storage.cleanup.err.fs_failed":
+    "Falha na limpeza do sistema de arquivos. Algumas alterações podem já ter sido aplicadas — verifique CODEX_HOME/.trash e qualquer caminho de recuperação exibido.",
+  "storage.cleanup.err.fs_failed_trash":
+    "Falha na limpeza do sistema de arquivos. Algumas alterações podem já ter sido aplicadas — verifique {trashDir} e manifest.json para arquivos recuperáveis.",
+  "storage.cleanup.err.db_reconcile_failed":
+    "Não foi possível atualizar o banco de estado do Codex.",
   "storage.cleanup.err.cleanup_failed": "Falha na limpeza.",
   "storage.trash.title": "Quarentena",
-  "storage.trash.help": "Sessões arquivadas movidas para CODEX_HOME/.trash. A restauração devolve os arquivos JSONL e as linhas de thread.",
+  "storage.trash.help":
+    "Sessões arquivadas movidas para CODEX_HOME/.trash. A restauração devolve os arquivos JSONL e as linhas de thread.",
   "storage.trash.empty": "Nenhuma entrada em quarentena.",
   "storage.trash.loading": "Carregando quarentena…",
   "storage.trash.col.when": "Em quarentena desde",
@@ -1497,7 +1773,8 @@ export const pt: Record<TKey, string> = {
   "storage.trash.col.id": "Entrada",
   "storage.trash.restore": "Restaurar",
   "storage.trash.confirmTitle": "Restaurar entrada da quarentena?",
-  "storage.trash.confirmBody": "Restaurar {count} arquivo(s) (~{size}) de {id} para as sessões arquivadas.",
+  "storage.trash.confirmBody":
+    "Restaurar {count} arquivo(s) (~{size}) de {id} para as sessões arquivadas.",
   "storage.trash.cancel": "Cancelar",
   "storage.trash.confirmRestore": "Restaurar",
   "storage.trash.done": "{count} arquivo(s) restaurado(s) ({size}).",
@@ -1505,19 +1782,27 @@ export const pt: Record<TKey, string> = {
   "storage.trash.listFailed": "Não foi possível listar as entradas da quarentena.",
   "storage.trash.mode.quarantine": "quarentena",
   "storage.trash.mode.permanent": "permanente (incompleto)",
-  "storage.trash.err.codex_busy": "O Codex está usando o state.sqlite — tente novamente após encerrar o Codex.",
+  "storage.trash.err.codex_busy":
+    "O Codex está usando o state.sqlite — tente novamente após encerrar o Codex.",
   "storage.trash.err.invalid_trash": "O ID da entrada da lixeira está ausente ou é inválido.",
   "storage.trash.err.missing_trash": "A entrada da lixeira não foi encontrada.",
-  "storage.trash.err.dest_exists": "O destino da restauração já existe — remova ou renomeie o arquivo arquivado e tente novamente.",
-  "storage.trash.err.fs_failed": "Falha na restauração do sistema de arquivos. Alguns arquivos podem já ter sido restaurados — verifique archived_sessions e .trash.",
-  "storage.trash.err.db_reconcile_failed": "Não foi possível restaurar as linhas do banco de estado do Codex.",
-  "storage.trash.err.storage_mutation_busy": "Outra limpeza ou restauração de armazenamento está em andamento — tente novamente em instantes.",
+  "storage.trash.err.dest_exists":
+    "O destino da restauração já existe — remova ou renomeie o arquivo arquivado e tente novamente.",
+  "storage.trash.err.fs_failed":
+    "Falha na restauração do sistema de arquivos. Alguns arquivos podem já ter sido restaurados — verifique archived_sessions e .trash.",
+  "storage.trash.err.db_reconcile_failed":
+    "Não foi possível restaurar as linhas do banco de estado do Codex.",
+  "storage.trash.err.storage_mutation_busy":
+    "Outra limpeza ou restauração de armazenamento está em andamento — tente novamente em instantes.",
   "storage.trash.err.restore_failed": "Falha na restauração.",
-  "storage.trash.err.restore_worker_timeout": "A restauração demorou demais (mais de 10 minutos) e foi interrompida.",
+  "storage.trash.err.restore_worker_timeout":
+    "A restauração demorou demais (mais de 10 minutos) e foi interrompida.",
   "storage.trash.err.restore_worker_aborted": "A restauração foi cancelada durante o encerramento.",
-  "storage.trash.err.restore_worker_failed": "O worker de restauração travou ou falhou inesperadamente.",
+  "storage.trash.err.restore_worker_failed":
+    "O worker de restauração travou ou falhou inesperadamente.",
   "storage.policy.title": "Política de limpeza automática",
-  "storage.policy.help": "Limpeza em lote opcional quando as sessões arquivadas excedem um limite. Desativada por padrão — nunca é ativada automaticamente.",
+  "storage.policy.help":
+    "Limpeza em lote opcional quando as sessões arquivadas excedem um limite. Desativada por padrão — nunca é ativada automaticamente.",
   "storage.policy.loading": "Carregando política…",
   "storage.policy.loadFailed": "Não foi possível carregar a política de limpeza.",
   "storage.policy.saveFailed": "Não foi possível salvar a política de limpeza.",
@@ -1525,7 +1810,8 @@ export const pt: Record<TKey, string> = {
   "storage.policy.alreadyRunning": "Já há uma execução da política de limpeza em andamento.",
   "storage.policy.invalid": "Valores de política inválidos.",
   "storage.policy.enabled": "Ativar limpeza automática",
-  "storage.policy.enabledHint": "O padrão é desativada. Quando ativada, executa apenas no agendamento escolhido (ou em Executar agora).",
+  "storage.policy.enabledHint":
+    "O padrão é desativada. Quando ativada, executa apenas no agendamento escolhido (ou em Executar agora).",
   "storage.policy.threshold": "Quando o tamanho dos arquivados exceder (GiB)",
   "storage.policy.trigger": "Gatilho",
   "storage.policy.target": "Alvo da limpeza",
@@ -1545,7 +1831,8 @@ export const pt: Record<TKey, string> = {
   "storage.policy.mode": "Modo de exclusão",
   "storage.policy.mode.quarantine": "Quarentena (padrão)",
   "storage.policy.mode.permanent": "Exclusão permanente",
-  "storage.policy.permanentWarn": "O modo permanente não pode ser desfeito. Prefira a quarentena, a menos que tenha certeza.",
+  "storage.policy.permanentWarn":
+    "O modo permanente não pode ser desfeito. Prefira a quarentena, a menos que tenha certeza.",
   "storage.policy.lastRun": "Última execução",
   "storage.policy.lastRunDetail": "Removidos {count} · liberados {size}",
   "storage.policy.nextRun": "Próxima execução",
@@ -1559,7 +1846,8 @@ export const pt: Record<TKey, string> = {
   "storage.policy.skippedEmpty": "Nenhum candidato arquivado correspondeu ao alvo.",
   "storage.policy.doneQuarantine": "A política colocou {count} arquivo(s) em quarentena ({size}).",
   "storage.policy.donePermanent": "A política excluiu permanentemente {count} arquivo(s) ({size}).",
-  "storage.policy.metadataSaveWarning": "A execução da política terminou, mas seus metadados de agendamento não puderam ser salvos.",
+  "storage.policy.metadataSaveWarning":
+    "A execução da política terminou, mas seus metadados de agendamento não puderam ser salvos.",
   "modal.addNamed": "Adicionar: {label}",
   "modal.add": "Adicionar provedor",
   "modal.search": "Buscar provedores…",
@@ -1574,7 +1862,8 @@ export const pt: Record<TKey, string> = {
   "modal.endpoint.custom": "Personalizado",
   "modal.defaultModel": "Modelo padrão (opcional)",
   "modal.allowPrivateNetwork": "Permitir rede local/privada",
-  "modal.allowPrivateNetworkHint": "Ative apenas para provedores hospedados por você de propósito. Os endpoints de metadados continuam bloqueados.",
+  "modal.allowPrivateNetworkHint":
+    "Ative apenas para provedores hospedados por você de propósito. Os endpoints de metadados continuam bloqueados.",
   "modal.nameRequired": "O nome do provedor é obrigatório",
   "modal.baseUrlRequired": "A URL base é obrigatória",
   "modal.networkError": "Erro de rede — o proxy está em execução?",
@@ -1594,10 +1883,12 @@ export const pt: Record<TKey, string> = {
   "modal.badge.pool": "Pool",
   "modal.badge.free": "Grátis",
   "modal.badge.subscriptionCli": "CLI por assinatura",
-  "modal.invalidPreset": "Este preset de provedor integrado está incompleto. Reinicie o proxy e tente novamente.",
+  "modal.invalidPreset":
+    "Este preset de provedor integrado está incompleto. Reinicie o proxy e tente novamente.",
   "modal.freeTierTitle": "Plano gratuito",
   "modal.subscriptionCliTitle": "CLI por assinatura, não chave de API",
-  "modal.subscriptionCliWarning": "Este provedor não usa chave de API. Ele aciona a CLI oficial do Claude Code autenticada nesta máquina ({cmd}) e cobra da conta de assinatura do Claude. O OpenCodex não armazena nenhuma chave para ele, e uma chave informada aqui nunca é usada. Para cobrança por chave de API, adicione {apiProvider}.",
+  "modal.subscriptionCliWarning":
+    "Este provedor não usa chave de API. Ele aciona a CLI oficial do Claude Code autenticada nesta máquina ({cmd}) e cobra da conta de assinatura do Claude. O OpenCodex não armazena nenhuma chave para ele, e uma chave informada aqui nunca é usada. Para cobrança por chave de API, adicione {apiProvider}.",
   "modal.freeTierDefault": "Não requer chave de API. Funciona de imediato.",
   "modal.tab.accounts": "Contas",
   "modal.tab.free": "Grátis",
@@ -1605,7 +1896,8 @@ export const pt: Record<TKey, string> = {
   "modal.tab.paid": "Pago",
   "modal.noteMore": "Mostrar descrição completa",
   "modal.searchResults": "{count} resultados em {tiers}",
-  "modal.accountsHint": "Entre aqui no ChatGPT/Codex, em provedores OAuth e em contas com chave de API. A OpenAI já está integrada — faça login em vez de adicioná-la novamente.",
+  "modal.accountsHint":
+    "Entre aqui no ChatGPT/Codex, em provedores OAuth e em contas com chave de API. A OpenAI já está integrada — faça login em vez de adicioná-la novamente.",
   "modal.accountsCodexAuthLink": "Autenticação do Codex",
   "modal.notListed": "Provedor não listado? Adicione um personalizado",
   "modal.catalogLoading": "Carregando catálogo…",
@@ -1621,7 +1913,8 @@ export const pt: Record<TKey, string> = {
   "quota.ageHours": "{n}h",
   "quota.ageDays": "{n}d",
   "quota.observedAgo": "Observado há {age}",
-  "quota.observedHint": "A Meta informa o uso apenas durante uma resposta em streaming, então este é o último valor visto, não uma leitura em tempo real.",
+  "quota.observedHint":
+    "A Meta informa o uso apenas durante uma resposta em streaming, então este é o último valor visto, não uma leitura em tempo real.",
   "quota.weeklyLimit": "Limite semanal",
   "quota.monthlyLimit": "Limite de 30 dias",
   "quota.cursorFirstParty": "Modelos próprios",
@@ -1687,7 +1980,8 @@ export const pt: Record<TKey, string> = {
   "pws.noMatchFilters": "Nenhum provedor corresponde aos filtros.",
   "pws.noProvidersConfigured": "Nenhum provedor configurado.",
   "pws.workspaceMainAria": "Detalhes do provedor",
-  "pws.detailComingSoon": "Visão detalhada em breve — use a visão clássica para gerenciar este provedor.",
+  "pws.detailComingSoon":
+    "Visão detalhada em breve — use a visão clássica para gerenciar este provedor.",
   "pws.selectPrompt": "Selecione um provedor na lista.",
   "pws.connectFirst": "Conecte seu primeiro provedor",
   "pws.empty.browseFree": "Explorar provedores gratuitos",
@@ -1705,7 +1999,8 @@ export const pt: Record<TKey, string> = {
   "pws.status.connected": "Conectado",
   "pws.attentionTitle": "Requer atenção",
   "pws.attention.reauth": "A conta ativa precisa ser autenticada novamente",
-  "pws.attention.reauthForward": "A conta ativa do Codex precisa ser autenticada novamente — abra Contas para corrigir",
+  "pws.attention.reauthForward":
+    "A conta ativa do Codex precisa ser autenticada novamente — abra Contas para corrigir",
   "pws.attention.missingCredentials": "Credenciais ausentes",
   "pws.cell.auth": "Autenticação",
   "pws.cell.note": "Observação",
@@ -1738,8 +2033,10 @@ export const pt: Record<TKey, string> = {
   "pws.usageUnavailable": "Nenhum uso registrado ainda.",
   "pws.rateLimits": "Limites de taxa",
   "pws.quotaUnavailable": "Sem dados de cota para este provedor.",
-  "pws.accountQuotaUnavailable": "Dados de limite de taxa temporariamente indisponíveis; exibindo os últimos valores conhecidos, quando houver.",
-  "pws.quotaFailure.account_unavailable": "Os detalhes da conta estão indisponíveis para esta verificação de cota.",
+  "pws.accountQuotaUnavailable":
+    "Dados de limite de taxa temporariamente indisponíveis; exibindo os últimos valores conhecidos, quando houver.",
+  "pws.quotaFailure.account_unavailable":
+    "Os detalhes da conta estão indisponíveis para esta verificação de cota.",
   "pws.quotaFailure.access_denied": "O provedor negou acesso aos dados de cota.",
   "pws.quotaFailure.rate_limited": "O provedor limitou a taxa da verificação de cota.",
   "pws.quotaFailure.upstream_error": "O provedor não conseguiu concluir a verificação de cota.",
@@ -1756,9 +2053,12 @@ export const pt: Record<TKey, string> = {
   "pws.modelSearchPlaceholder": "Filtrar modelos…",
   "pws.modelsLoading": "Carregando modelos…",
   "pws.modelsLoadFailed": "Não foi possível carregar os modelos.",
-  "pws.modelsNeedsReauth": "A conta precisa fazer login novamente para a descoberta de modelos ao vivo funcionar. Exibindo os modelos configurados por enquanto.",
-  "pws.modelsConfiguredFallback": "Exibindo os modelos configurados (descoberta ao vivo indisponível).",
-  "pws.modelsTruncated": "Exibindo os primeiros {shown} de {total} modelos. Use o filtro para refinar a lista.",
+  "pws.modelsNeedsReauth":
+    "A conta precisa fazer login novamente para a descoberta de modelos ao vivo funcionar. Exibindo os modelos configurados por enquanto.",
+  "pws.modelsConfiguredFallback":
+    "Exibindo os modelos configurados (descoberta ao vivo indisponível).",
+  "pws.modelsTruncated":
+    "Exibindo os primeiros {shown} de {total} modelos. Use o filtro para refinar a lista.",
   "pws.retry": "Tentar novamente",
   "pws.noModels": "Nenhum modelo descoberto para este provedor.",
   "pws.noModelMatch": "Nenhum modelo corresponde ao filtro.",
@@ -1773,19 +2073,24 @@ export const pt: Record<TKey, string> = {
   "pws.accountsLoadFailed": "Não foi possível carregar as contas.",
   "pws.retryAccounts": "Tentar novamente",
   "pws.noAccounts": "Nenhuma conta conectada ainda.",
-  "pws.cockpitImportDescription": "Importe uma exportação JSON do Antigravity do Cockpit Tools a partir deste dispositivo. O conteúdo do arquivo não é exibido.",
+  "pws.cockpitImportDescription":
+    "Importe uma exportação JSON do Antigravity do Cockpit Tools a partir deste dispositivo. O conteúdo do arquivo não é exibido.",
   "pws.cockpitImportFileLabel": "Exportação JSON do Antigravity do Cockpit Tools",
   "pws.cockpitImportChooseFile": "Escolher arquivo JSON",
   "pws.cockpitImporting": "Importando…",
-  "pws.cockpitImportInvalid": "O arquivo selecionado não é uma exportação JSON válida ou é grande demais.",
+  "pws.cockpitImportInvalid":
+    "O arquivo selecionado não é uma exportação JSON válida ou é grande demais.",
   "pws.cockpitImportFailed": "Não foi possível concluir a importação das contas.",
-  "pws.cockpitImportComplete": "Importação concluída: {imported} importadas, {updated} atualizadas, {failed} com falha, {unsupported} sem suporte.",
+  "pws.cockpitImportComplete":
+    "Importação concluída: {imported} importadas, {updated} atualizadas, {failed} com falha, {unsupported} sem suporte.",
   "pws.accountSwitching": "Alternando…",
   "pws.accountCurrent": "Conta atual",
-  "pws.accountPausedHint": "Excluída da seleção automática, das novas tentativas, da recuperação de cooldown, da seleção manual e da renovação proativa de token até ser retomada.",
+  "pws.accountPausedHint":
+    "Excluída da seleção automática, das novas tentativas, da recuperação de cooldown, da seleção manual e da renovação proativa de token até ser retomada.",
   "pws.defaultModelNone": "Nenhum (usar o padrão do provedor)",
   "pws.discardSettings": "Descartar",
-  "pws.jsonEditorDesc": "Edite a configuração JSON bruta do provedor. As alterações são salvas imediatamente.",
+  "pws.jsonEditorDesc":
+    "Edite a configuração JSON bruta do provedor. As alterações são salvas imediatamente.",
   "pws.jsonEditorTitle": "Editor JSON — {name}",
   "pws.jsonRestore": "Restaurar",
   "pws.jsonSave": "Salvar",
@@ -1793,17 +2098,21 @@ export const pt: Record<TKey, string> = {
   "pws.notLoggedInTitle": "Não conectado",
   "pws.note": "Observação",
   "pws.responsesReasoningReplay": "Reenviar raciocínio em texto simples",
-  "pws.responsesReasoningReplayHint": "Desativado por padrão. Envia o raciocínio anterior em texto simples a este endpoint e pode aumentar o uso de tokens. Ative apenas se o endpoint aceitar esse reenvio.",
+  "pws.responsesReasoningReplayHint":
+    "Desativado por padrão. Envia o raciocínio anterior em texto simples a este endpoint e pode aumentar o uso de tokens. Ative apenas se o endpoint aceitar esse reenvio.",
   "pws.allowPrivateNetwork": "Permitir rede local/privada",
   "pws.liveModels": "Descobrir modelos a partir do provedor",
-  "pws.liveModelsDesc": "Busca o catálogo de modelos ao vivo do provedor. Desative para usar apenas os modelos configurados/estáticos.",
+  "pws.liveModelsDesc":
+    "Busca o catálogo de modelos ao vivo do provedor. Desative para usar apenas os modelos configurados/estáticos.",
   "pws.xaiChatOptIn": "Usar Chat Completions para Grok 4.5 e 4.6",
-  "pws.xaiChatOptInDesc": "Desativado seleciona Responses. Requisições OAuth Responses o usam por padrão. Os demais modelos Grok e o comportamento por plano permanecem inalterados.",
+  "pws.xaiChatOptInDesc":
+    "Desativado seleciona Responses. Requisições OAuth Responses o usam por padrão. Os demais modelos Grok e o comportamento por plano permanecem inalterados.",
   "pws.xaiChatOptInMixed": "Apenas um modelo usa Chat.",
   "pws.cursorTransport": "Transporte do Cursor",
   "pws.cursorTransportHttp2": "HTTP/2 (padrão)",
   "pws.cursorTransportHttp1": "HTTP/1.1 (compatibilidade com proxy)",
-  "pws.cursorTransportDesc": "Use HTTP/1.1 quando seu proxy não conseguir transportar de forma confiável o stream HTTP/2 do Cursor.",
+  "pws.cursorTransportDesc":
+    "Use HTTP/1.1 quando seu proxy não conseguir transportar de forma confiável o stream HTTP/2 do Cursor.",
   "pws.optionalPlaceholder": "Opcional",
   "pws.providerId": "ID do provedor",
   "pws.reauth": "Requer nova autenticação",
@@ -1818,39 +2127,47 @@ export const pt: Record<TKey, string> = {
   "pws.healthLabel.refreshFailed": "Falha na renovação",
   "pws.healthLabel.metadataMismatch": "Metadados divergentes",
   "pws.healthLabel.validationPending": "Validação pendente",
-  "pws.healthSummary.validationPending": "{provider} {account}: registrada com a cota esgotada. Após a cota se recuperar, atualize as cotas para executar uma pequena requisição de validação. O roteamento permanece desativado até que ela tenha êxito.",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}: registrada com a cota esgotada. Após a cota se recuperar, atualize as cotas para executar uma pequena requisição de validação. O roteamento permanece desativado até que ela tenha êxito.",
   "pws.healthLabel.credentialConflict": "Conflito de credenciais",
-  "pws.healthSummary.rateLimited": "{provider} {account}: limite de requisições atingido até {until}. O roteamento desta conta fica pausado até lá.",
-  "pws.healthSummary.quotaLimited": "{provider} {account}: cota esgotada até {until}. O roteamento desta conta fica pausado até lá.",
+  "pws.healthSummary.rateLimited":
+    "{provider} {account}: limite de requisições atingido até {until}. O roteamento desta conta fica pausado até lá.",
+  "pws.healthSummary.quotaLimited":
+    "{provider} {account}: cota esgotada até {until}. O roteamento desta conta fica pausado até lá.",
   "pws.healthSummary.reauthRequired": "{provider} {account}: reautenticação necessária.",
   "pws.healthSummary.credentialConflict": "{provider} {account}: conflito de credenciais.",
   "pws.healthSummary.metadataMismatch": "{provider} {account}: metadados divergentes.",
   "pws.healthSummary.staleCredentials": "{provider} {account}: credenciais incompletas.",
   "pws.removeConfirm": "Remover",
-  "pws.removeConfirmBody": "Remover o provedor \"{name}\"? Esta ação não pode ser desfeita.",
-  "pws.removeDefaultConfirmBody": "Remover o provedor padrão \"{name}\"? \"{defaultProvider}\" passará a ser o provedor padrão. Esta ação não pode ser desfeita.",
+  "pws.removeConfirmBody": 'Remover o provedor "{name}"? Esta ação não pode ser desfeita.',
+  "pws.removeDefaultConfirmBody":
+    'Remover o provedor padrão "{name}"? "{defaultProvider}" passará a ser o provedor padrão. Esta ação não pode ser desfeita.',
   "pws.removeConfirmTitle": "Remover provedor",
   "pws.saveSettings": "Salvar",
   "pws.keySelection": "Seleção de chave API",
   "pws.keyActive": "Priorizar a chave ativa (comportamento atual)",
-  "pws.keyLimitInvalid": "Os limites por chave devem ser positivos e estar no intervalo permitido; intervalo e simultaneidade devem ser números inteiros.",
+  "pws.keyLimitInvalid":
+    "Os limites por chave devem ser positivos e estar no intervalo permitido; intervalo e simultaneidade devem ser números inteiros.",
   "pws.keyRoundRobin": "Round-robin",
   "pws.keyLimits": "Limites por chave",
-  "pws.keySharedQuota": "Os limites do provedor continuam valendo para todas as chaves. Chaves do mesmo projeto podem compartilhar cotas; RPM não limita tokens nem o orçamento diário.",
+  "pws.keySharedQuota":
+    "Os limites do provedor continuam valendo para todas as chaves. Chaves do mesmo projeto podem compartilhar cotas; RPM não limita tokens nem o orçamento diário.",
   "pws.keyHandle": "ID da chave",
   "pws.keyStarts": "Iniciadas",
   "pws.keyInFlight": "Em andamento",
   "pws.keyWait": "Espera",
   "pws.keyCooldown": "Intervalo de recuperação",
   "pws.pacingTitle": "Ritmo de requisições",
-  "pws.pacingDesc": "Distribui uniformemente o início das requisições de saída deste provedor. Respostas em streaming podem se sobrepor.",
+  "pws.pacingDesc":
+    "Distribui uniformemente o início das requisições de saída deste provedor. Respostas em streaming podem se sobrepor.",
   "pws.pacingEnabled": "Ativado",
   "pws.pacingRpm": "Requisições por minuto",
   "pws.pacingConcurrency": "Máximo de requisições simultâneas",
   "pws.pacingRpmUnit": "RPM",
   "pws.pacingCapUnit": "×",
   "pws.pacingDelay": "Intervalo mínimo (ms)",
-  "pws.pacingSlowerWins": "Prevalece o limite mais lento do provedor. As substituições por modelo só podem acrescentar mais atraso ou reduzir o limite de simultaneidade.",
+  "pws.pacingSlowerWins":
+    "Prevalece o limite mais lento do provedor. As substituições por modelo só podem acrescentar mais atraso ou reduzir o limite de simultaneidade.",
   "pws.pacingQueued": "na fila",
   "pws.pacingNextSlot": "até o próximo slot",
   "pws.pacingLastModel": "último modelo",
@@ -1860,13 +2177,16 @@ export const pt: Record<TKey, string> = {
   "pws.pacingAdd": "Adicionar substituição",
   "pws.pacingRemove": "Remover",
   "pws.pacingRemoveModel": "Remover a substituição de ritmo de requisições de {model}",
-  "pws.pacingRuleRequired": "Ative o ritmo de requisições somente após definir um limite do provedor ou uma substituição por modelo.",
-  "pws.pacingCapInvalid": "O máximo de requisições simultâneas deve ser um número inteiro igual ou maior que 1.",
+  "pws.pacingRuleRequired":
+    "Ative o ritmo de requisições somente após definir um limite do provedor ou uma substituição por modelo.",
+  "pws.pacingCapInvalid":
+    "O máximo de requisições simultâneas deve ser um número inteiro igual ou maior que 1.",
   "pws.saving": "Salvando…",
   "pws.settingsSaved": "Configurações salvas.",
   "pws.accountModeSaved": "Modo de conta salvo.",
   "pws.accountModeFailed": "Não foi possível alternar o modo de conta.",
-  "pws.accountModeConfirm": "Alternar o modo de conta da OpenAI? As conversas em andamento serão reatribuídas ao conjunto de contas do outro modo, e o uso de cota passará a ser contabilizado no novo modo.",
+  "pws.accountModeConfirm":
+    "Alternar o modo de conta da OpenAI? As conversas em andamento serão reatribuídas ao conjunto de contas do outro modo, e o uso de cota passará a ser contabilizado no novo modo.",
   "pws.settingsUnsavedBar": "Você tem alterações não salvas.",
   "pws.unsavedLeaveBody": "Você tem alterações não salvas. Salvar antes de sair?",
   "pws.unsavedLeaveTitle": "Alterações não salvas",
@@ -1883,8 +2203,10 @@ export const pt: Record<TKey, string> = {
   "pws.capacity.nextRecovery": "Próxima recuperação de capacidade",
   "pws.capacity.recoveryShare": "+{percent}% de capacidade do pool",
   "pws.capacity.incomplete": "Cobertura incompleta: {excluded} conta(s) excluída(s)",
-  "pws.capacity.uncalibratedPlan": "{count} conta(s) em um plano não calibrado são contadas com o peso de assento de referência, portanto esta estimativa pode ser conservadora",
-  "pws.capacity.partial": "Cobertura parcial de janelas: {count} conta(s) não informam todas as janelas de limite exibidas",
+  "pws.capacity.uncalibratedPlan":
+    "{count} conta(s) em um plano não calibrado são contadas com o peso de assento de referência, portanto esta estimativa pode ser conservadora",
+  "pws.capacity.partial":
+    "Cobertura parcial de janelas: {count} conta(s) não informam todas as janelas de limite exibidas",
   "pws.capacity.windowPartial": "Parcial",
   "pws.capacity.windowPartialA11y": "{window}: cobertura de contas incompleta",
   "pws.dashboard.recentlyUsed": "USADOS RECENTEMENTE",
@@ -1899,7 +2221,8 @@ export const pt: Record<TKey, string> = {
   "pws.testing": "Testando…",
   "pws.connectionOk": "Conexão OK",
   "pws.connectionFailed": "Falha na conexão",
-  "pws.connectionNotApplicable": "Não se aplica — este provedor usa um catálogo de modelos estático.",
+  "pws.connectionNotApplicable":
+    "Não se aplica — este provedor usa um catálogo de modelos estático.",
   "pws.editSettings": "Editar configurações",
   "pws.viewUsage": "Ver uso detalhado",
   "pws.allSystemsOk": "Tudo funcionando normalmente",
@@ -1919,8 +2242,10 @@ export const pt: Record<TKey, string> = {
   "time.daysAgo": "há {n} d",
   "modal.noMatch": "Nenhuma correspondência.",
   "modal.oauthDefaultNote": "Entre com sua conta — sem necessidade de chave de API.",
-  "modal.oauthComingSoon": "O login OAuth para {label} chega na próxima atualização. Por enquanto, use uma chave de API.",
-  "modal.oauthComingSoonShort": "O login OAuth para este provedor chega na próxima atualização — por enquanto, use uma chave de API.",
+  "modal.oauthComingSoon":
+    "O login OAuth para {label} chega na próxima atualização. Por enquanto, use uma chave de API.",
+  "modal.oauthComingSoonShort":
+    "O login OAuth para este provedor chega na próxima atualização — por enquanto, use uma chave de API.",
   "modal.useApiKeyInstead": "Usar uma chave de API",
   "modal.setupGuide": "Guia de configuração",
   "modal.setupStep1Prefix": "Acesse o",
@@ -1929,11 +2254,12 @@ export const pt: Record<TKey, string> = {
   "modal.setupStep2": "Cole-a no campo de chave de API abaixo",
   "modal.setupStep3": "Clique em Adicionar provedor — os modelos são descobertos automaticamente",
   "modal.namePlaceholder": "ex.: openrouter",
-  "modal.duplicateWarn": "O provedor \"{name}\" já existe e será sobrescrito.",
+  "modal.duplicateWarn": 'O provedor "{name}" já existe e será sobrescrito.',
   "modal.forwardHintPrefix": "Não é necessária chave — o proxy encaminha suas credenciais de",
   "modal.forwardCredentials": "codex login",
   "modal.forwardHintSuffix": "para este provedor.",
-  "modal.localHint": "Nenhuma chave de API é armazenada. Isto adiciona o catálogo estático público de modelos do Cursor para o Codex, mas o transporte ao vivo do Cursor e a execução nativa de arquivos/shell permanecem desativados até serem auditados.",
+  "modal.localHint":
+    "Nenhuma chave de API é armazenada. Isto adiciona o catálogo estático público de modelos do Cursor para o Codex, mas o transporte ao vivo do Cursor e a execução nativa de arquivos/shell permanecem desativados até serem auditados.",
   "modal.getApiKey": "Obtenha sua chave de API de {label}",
   "modal.apiKey": "Chave de API",
   "modal.apiKeyTransport": "Cabeçalho da chave de API",
@@ -1942,8 +2268,10 @@ export const pt: Record<TKey, string> = {
   "modal.apiKeyPlaceholder": "sk-… (ou $ENV_VAR)",
   "modal.defaultModelPlaceholder": "ex.: gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
-  "modal.baseUrlPlaceholderError": "A URL base contém um {placeholder} não resolvido. Substitua-o pelo valor real.",
-  "modal.baseUrlPlaceholderHint": "Substitua o {placeholder} na URL base pelo ID real da sua conta antes de adicionar.",
+  "modal.baseUrlPlaceholderError":
+    "A URL base contém um {placeholder} não resolvido. Substitua-o pelo valor real.",
+  "modal.baseUrlPlaceholderHint":
+    "Substitua o {placeholder} na URL base pelo ID real da sua conta antes de adicionar.",
   "modal.adding": "Adicionando…",
   "modal.useOauthLogin": "← Usar login OAuth",
   "nav.codexAuth": "Autenticação do Codex",
@@ -1954,28 +2282,39 @@ export const pt: Record<TKey, string> = {
   "codexSet.tab.multiauth": "Multiautenticação",
   "codexSet.tab.prompt": "Prompt",
   "codexSet.prompt.title": "Camadas de prompt",
-  "codexSet.prompt.timing": "Aplica-se a sessões recém-iniciadas. As sessões em andamento mantêm suas configurações de prompt atuais.",
-  "codexSet.prompt.staleRevision": "A configuração foi alterada em outro lugar. A lista foi recarregada.",
+  "codexSet.prompt.timing":
+    "Aplica-se a sessões recém-iniciadas. As sessões em andamento mantêm suas configurações de prompt atuais.",
+  "codexSet.prompt.staleRevision":
+    "A configuração foi alterada em outro lugar. A lista foi recarregada.",
   "codexSet.prompt.writeFailed": "Não foi possível salvar a alteração.",
   "codexSet.prompt.loadFailed": "Não foi possível carregar as camadas de prompt.",
   "codexSet.prompt.repair": "Reparar",
   "codexSet.prompt.repairFailed": "Não foi possível concluir o reparo.",
   "codexSet.prompt.remeasure": "Medir novamente",
-  "codexSet.drift.journalPresent": "Uma gravação anterior não foi concluída. A recuperação é executada automaticamente na próxima gravação.",
-  "codexSet.drift.projectionStale": "As camadas salvas e o valor em config.toml divergem. O reparo reescreve o valor a partir das suas camadas.",
-  "codexSet.drift.storeMissing": "O arquivo de camadas sumiu, mas as instruções permanecem em config.toml. O reparo mantém o texto como uma única camada e grava um backup antes.",
-  "codexSet.drift.ownedMalformed": "A linha gerada em config.toml foi remodelada manualmente e, por isso, não é mais seguro reescrevê-la.",
-  "codexSet.custom.adoptUnsupported": "O valor em {path}, linha {line}, não é uma string de linha única e não pode ser importado. Mova-o manualmente para gerenciá-lo aqui.",
-  "codexSet.prompt.unreadable": "O arquivo de configuração do Codex existe, mas não pôde ser lido; por isso as alterações são recusadas.",
+  "codexSet.drift.journalPresent":
+    "Uma gravação anterior não foi concluída. A recuperação é executada automaticamente na próxima gravação.",
+  "codexSet.drift.projectionStale":
+    "As camadas salvas e o valor em config.toml divergem. O reparo reescreve o valor a partir das suas camadas.",
+  "codexSet.drift.storeMissing":
+    "O arquivo de camadas sumiu, mas as instruções permanecem em config.toml. O reparo mantém o texto como uma única camada e grava um backup antes.",
+  "codexSet.drift.ownedMalformed":
+    "A linha gerada em config.toml foi remodelada manualmente e, por isso, não é mais seguro reescrevê-la.",
+  "codexSet.custom.adoptUnsupported":
+    "O valor em {path}, linha {line}, não é uma string de linha única e não pode ser importado. Mova-o manualmente para gerenciá-lo aqui.",
+  "codexSet.prompt.unreadable":
+    "O arquivo de configuração do Codex existe, mas não pôde ser lido; por isso as alterações são recusadas.",
   "codexSet.layer.permissions": "Permissões",
   "codexSet.layer.collaboration": "Modo de colaboração",
   "codexSet.layer.environment": "Contexto do ambiente",
   "codexSet.layer.apps": "Apps",
   "codexSet.layer.skills": "Skills",
-  "codexSet.prompt.extensionsUnknown": "As extensões podem adicionar suas próprias camadas. O Codex não as expõe, portanto não é possível listá-las aqui.",
+  "codexSet.prompt.extensionsUnknown":
+    "As extensões podem adicionar suas próprias camadas. O Codex não as expõe, portanto não é possível listá-las aqui.",
   "codexSet.group.transition": "Avisos de transição",
-  "codexSet.group.transitionDesc": "Estes anunciam uma mudança em vez de descrever um estado, por isso aparecem apenas quando a sessão entra em tempo real ou troca de modelo. Os números seguem a ordem de montagem, por isso a lista acima salta.",
-  "codexSet.custom.slotNote": "As camadas personalizadas são unidas em uma única seção, nesta ordem.",
+  "codexSet.group.transitionDesc":
+    "Estes anunciam uma mudança em vez de descrever um estado, por isso aparecem apenas quando a sessão entra em tempo real ou troca de modelo. Os números seguem a ordem de montagem, por isso a lista acima salta.",
+  "codexSet.custom.slotNote":
+    "As camadas personalizadas são unidas em uma única seção, nesta ordem.",
   "codexSet.row.alwaysOn": "Sempre ativa",
   "codexSet.row.onChange": "Disparada em mudanças",
   "codexSet.row.featureGated": "Configurada em [features]",
@@ -1983,7 +2322,8 @@ export const pt: Record<TKey, string> = {
   "codexSet.row.resetDefault": "Redefinir para {value}",
   "codexSet.dialog.setValue": "{value} (padrão {fallback})",
   "codexSet.dialog.copyKey": "Copiar chave",
-  "codexSet.dialog.unknownLayer": "Esta versão não tem descrição para esta camada. Ela vem de um runtime do Codex mais recente que o dashboard.",
+  "codexSet.dialog.unknownLayer":
+    "Esta versão não tem descrição para esta camada. Ela vem de um runtime do Codex mais recente que o dashboard.",
   "codexSet.custom.heading": "Camadas personalizadas",
   "codexSet.custom.add": "+ Adicionar camada",
   "codexSet.custom.newTitle": "Nova camada",
@@ -1991,20 +2331,26 @@ export const pt: Record<TKey, string> = {
   "codexSet.custom.titleLabel": "Título",
   "codexSet.custom.bodyLabel": "Instruções",
   "codexSet.custom.bodySize": "{bytes} de {max} bytes",
-  "codexSet.custom.normalized": "Tabulações viraram quatro espaços e as quebras de linha viraram LF.",
+  "codexSet.custom.normalized":
+    "Tabulações viraram quatro espaços e as quebras de linha viraram LF.",
   "codexSet.custom.titleRequired": "Informe um título.",
   "codexSet.custom.titleTooLong": "O título tem {count} caracteres; o limite é {max}.",
   "codexSet.custom.titleMultiline": "O título deve ter uma única linha.",
   "codexSet.custom.bodyTooLarge": "Esta camada tem {bytes} bytes; o limite é {max}.",
-  "codexSet.custom.composedTooLarge": "Somadas, as camadas ativadas teriam {bytes} bytes, acima do limite.",
-  "codexSet.custom.invalidCharacter": "Um caractere de controle na posição {position} não pode ser salvo.",
+  "codexSet.custom.composedTooLarge":
+    "Somadas, as camadas ativadas teriam {bytes} bytes, acima do limite.",
+  "codexSet.custom.invalidCharacter":
+    "Um caractere de controle na posição {position} não pode ser salvo.",
   "codexSet.custom.discardPrompt": "Descartar suas alterações?",
-  "codexSet.custom.discardOthersAndSave": "Descartar as edições não salvas das outras camadas e salvar esta camada?",
+  "codexSet.custom.discardOthersAndSave":
+    "Descartar as edições não salvas das outras camadas e salvar esta camada?",
   "codexSet.custom.keepEditing": "Continuar editando",
   "codexSet.custom.delete": "Excluir {title}",
   "codexSet.custom.deleteConfirm": "Excluir esta camada? Você pode desfazer por alguns segundos.",
-  "codexSet.custom.layerGone": "Essa camada foi removida em outro lugar, então o editor foi fechado.",
-  "codexSet.custom.deleteConfirmNamed": "Excluir “{title}”? Você pode desfazer por alguns segundos.",
+  "codexSet.custom.layerGone":
+    "Essa camada foi removida em outro lugar, então o editor foi fechado.",
+  "codexSet.custom.deleteConfirmNamed":
+    "Excluir “{title}”? Você pode desfazer por alguns segundos.",
   "codexSet.custom.deletedNamed": "“{title}” excluída.",
   "codexSet.custom.moveUp": "Mover {title} para cima",
   "codexSet.custom.prevLayer": "Camada anterior",
@@ -2014,54 +2360,76 @@ export const pt: Record<TKey, string> = {
   "codexSet.custom.limitReached": "Você pode manter até {max} camadas personalizadas.",
   "codexSet.custom.composedSize": "Combinado: {bytes} de {max} bytes",
   "codexSet.custom.composedPreview": "Mostrar developer_instructions combinadas",
-  "codexSet.custom.notOwned": "developer_instructions foi gravado fora do opencodex e, por isso, não é editado aqui. Importe-o para gerenciá-lo como uma camada.",
+  "codexSet.custom.notOwned":
+    "developer_instructions foi gravado fora do opencodex e, por isso, não é editado aqui. Importe-o para gerenciá-lo como uma camada.",
   "codexSet.custom.adopt": "Importar instruções existentes",
   "codexSet.custom.adoptConfirm": "Importar como camada",
   "codexSet.custom.adoptRefused": "Não foi possível importar o valor existente.",
-  "codexSet.custom.baseReplaced": "model_instructions_file está definido como {path}, ou seja, algo fora do opencodex substituiu o prompt base.",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file está definido como {path}, ou seja, algo fora do opencodex substituiu o prompt base.",
   "codexSet.custom.baseReplacedOpen": "Gerenciar",
   "codexSet.lint.identity": "Isto declara uma identidade diferente da que o Codex estabelece.",
   "codexSet.lint.foreignTool": "As ferramentas vêm do registro; nomeá-las aqui não as cria.",
-  "codexSet.lint.placeholder": "Nenhum mecanismo de template é executado sobre as instruções, então isto é enviado literalmente.",
-  "codexSet.lint.applyPatch": "apply_patch é definido pelo registro de ferramentas, não pelas instruções.",
-  "codexSet.lint.approvalVocab": "O Codex injeta seu próprio vocabulário de aprovação; isto pode contradizê-lo.",
+  "codexSet.lint.placeholder":
+    "Nenhum mecanismo de template é executado sobre as instruções, então isto é enviado literalmente.",
+  "codexSet.lint.applyPatch":
+    "apply_patch é definido pelo registro de ferramentas, não pelas instruções.",
+  "codexSet.lint.approvalVocab":
+    "O Codex injeta seu próprio vocabulário de aprovação; isto pode contradizê-lo.",
   "codexSet.lint.environment": "Os fatos do ambiente são gerados depois e podem contradizer isto.",
-  "codexSet.lint.size": "Esta camada tem mais de 8 KB. Ela ainda é salva, mas consome tokens a cada requisição.",
-  "codexSet.lint.secret": "Parece uma credencial ou chave de API - seria salva em texto claro no config.toml.",
-  "codexSet.lint.ignoreInstructions": "Mandar o Codex ignorar as próprias instruções pode anular as diretrizes internas.",
+  "codexSet.lint.size":
+    "Esta camada tem mais de 8 KB. Ela ainda é salva, mas consome tokens a cada requisição.",
+  "codexSet.lint.secret":
+    "Parece uma credencial ou chave de API - seria salva em texto claro no config.toml.",
+  "codexSet.lint.ignoreInstructions":
+    "Mandar o Codex ignorar as próprias instruções pode anular as diretrizes internas.",
   "codexSet.preset.blank": "Camada em branco",
   "codexSet.preset.concise.name": "Saída concisa",
   "codexSet.preset.concise.description": "Respostas curtas, sem preâmbulo, com formatação mínima.",
-  "codexSet.preset.concise.provenance": "Adaptado das diretrizes de concisão do Claude Code. Redação nossa, não uma cópia.",
+  "codexSet.preset.concise.provenance":
+    "Adaptado das diretrizes de concisão do Claude Code. Redação nossa, não uma cópia.",
   "codexSet.preset.planFirst.name": "Planejar antes de editar",
   "codexSet.preset.planFirst.description": "Apresente o plano e depois faça a alteração.",
-  "codexSet.preset.planFirst.provenance": "Adaptado da postura de planejamento do Claude Code. Redação nossa, não uma cópia.",
+  "codexSet.preset.planFirst.provenance":
+    "Adaptado da postura de planejamento do Claude Code. Redação nossa, não uma cópia.",
   "codexSet.preset.explainWhy.name": "Explicar o raciocínio",
   "codexSet.preset.explainWhy.description": "Diga o porquê, não apenas o quê.",
-  "codexSet.preset.explainWhy.provenance": "Adaptado do estilo de confirmação do Grok Build. Redação nossa, não uma cópia.",
+  "codexSet.preset.explainWhy.provenance":
+    "Adaptado do estilo de confirmação do Grok Build. Redação nossa, não uma cópia.",
   "codexSet.preset.testFirst.name": "Testar primeiro",
   "codexSet.preset.testFirst.description": "Escreva o teste que falha antes da correção.",
-  "codexSet.preset.testFirst.provenance": "Adaptado de práticas comuns de agentes. Redação nossa, não uma cópia.",
+  "codexSet.preset.testFirst.provenance":
+    "Adaptado de práticas comuns de agentes. Redação nossa, não uma cópia.",
   "codexSet.preset.korean.name": "Respostas em coreano",
-  "codexSet.preset.korean.description": "Responda em coreano, qualquer que seja o idioma da requisição.",
-  "codexSet.preset.korean.provenance": "Escrito para o opencodex a partir de um pedido recorrente de usuários. Redação nossa, não uma cópia.",
+  "codexSet.preset.korean.description":
+    "Responda em coreano, qualquer que seja o idioma da requisição.",
+  "codexSet.preset.korean.provenance":
+    "Escrito para o opencodex a partir de um pedido recorrente de usuários. Redação nossa, não uma cópia.",
   "codexSet.dialog.class": "Tipo",
   "codexSet.dialog.key": "Chave de configuração",
   "codexSet.dialog.fileValue": "Valor neste arquivo",
   "codexSet.dialog.absentDefault": "não definido (padrão {value})",
-  "codexSet.dialog.noRenderedText": "O Codex não expõe o texto montado de uma camada nativa; por isso este diálogo descreve a camada e indica sua chave, em vez de mostrar seu conteúdo.",
+  "codexSet.dialog.noRenderedText":
+    "O Codex não expõe o texto montado de uma camada nativa; por isso este diálogo descreve a camada e indica sua chave, em vez de mostrar seu conteúdo.",
   "codexSet.dialog.probeNotFound": "Não foi possível medir: o executável codex não foi encontrado.",
-  "codexSet.dialog.probeUnsupported": "Não foi possível medir: esta versão do Codex não suporta o comando de medição.",
-  "codexSet.dialog.probeInvalid": "Não foi possível medir: a saída do Codex não pôde ser analisada.",
+  "codexSet.dialog.probeUnsupported":
+    "Não foi possível medir: esta versão do Codex não suporta o comando de medição.",
+  "codexSet.dialog.probeInvalid":
+    "Não foi possível medir: a saída do Codex não pôde ser analisada.",
   "codexSet.dialog.probeFailed": "Não foi possível medir: a sonda do Codex não terminou.",
   "codexSet.dialog.probeBusy": "Outra medição ainda está em andamento. Tente de novo em instantes.",
   "codexSet.dialog.sourceText": "Texto enviado ao modelo",
   "codexSet.dialog.sourceBytes": "{bytes} bytes",
-  "codexSet.dialog.notRendered": "Esta camada não enviou nada no turno que lemos. As seções só são reenviadas quando mudam, então uma camada inalterada fica ausente de uma única amostra.",
-  "codexSet.dialog.emptySource": "O arquivo em {path} existe, mas está vazio, então esta camada não envia nada.",
-  "codexSet.dialog.notExposed": "O prompt base trafega fora da lista de mensagens que o Codex consegue imprimir, então não pode ser exibido aqui. É possível substituí-lo por meio de model_instructions_file.",
-  "codexSet.dialog.unmapped": "Esta camada não tem mapeamento confirmado na saída do prompt, então seu texto ainda não pode ser exibido aqui.",
-  "codexSet.dialog.textUnavailable": "Não foi possível ler o prompt do Codex nesta máquina, então o texto está indisponível.",
+  "codexSet.dialog.notRendered":
+    "Esta camada não enviou nada no turno que lemos. As seções só são reenviadas quando mudam, então uma camada inalterada fica ausente de uma única amostra.",
+  "codexSet.dialog.emptySource":
+    "O arquivo em {path} existe, mas está vazio, então esta camada não envia nada.",
+  "codexSet.dialog.notExposed":
+    "O prompt base trafega fora da lista de mensagens que o Codex consegue imprimir, então não pode ser exibido aqui. É possível substituí-lo por meio de model_instructions_file.",
+  "codexSet.dialog.unmapped":
+    "Esta camada não tem mapeamento confirmado na saída do prompt, então seu texto ainda não pode ser exibido aqui.",
+  "codexSet.dialog.textUnavailable":
+    "Não foi possível ler o prompt do Codex nesta máquina, então o texto está indisponível.",
   "codexSet.class.base": "Instruções base",
   "codexSet.class.config-toggle": "Alternável aqui",
   "codexSet.class.feature-gated": "Controlada por recurso",
@@ -2078,48 +2446,63 @@ export const pt: Record<TKey, string> = {
   "codexSet.layer.tools": "Ferramentas",
   "codexSet.layer.multi-agent-mode": "Modo multiagente",
   "codexSet.layer.git-attribution": "Atribuição de commits",
-  "codexSet.about.base-instructions": "As instruções do próprio Codex. Elas viajam com a própria requisição e não podem ser desativadas.",
+  "codexSet.about.base-instructions":
+    "As instruções do próprio Codex. Elas viajam com a própria requisição e não podem ser desativadas.",
   "codexSet.about.model-switch": "Adicionada quando a sessão troca de modelo no meio da conversa.",
   "codexSet.about.personality": "Orientação de tom e voz, controlada por uma feature flag.",
-  "codexSet.about.context-window-guidance": "Orientação sobre o orçamento de contexto restante, controlada por uma feature flag.",
+  "codexSet.about.context-window-guidance":
+    "Orientação sobre o orçamento de contexto restante, controlada por uma feature flag.",
   "codexSet.about.realtime": "Adicionada em sessões em tempo real.",
-  "codexSet.about.agents-md": "Os arquivos AGENTS.md do seu projeto. Esta página apenas informa a camada; nunca edita a documentação do seu projeto.",
+  "codexSet.about.agents-md":
+    "Os arquivos AGENTS.md do seu projeto. Esta página apenas informa a camada; nunca edita a documentação do seu projeto.",
   "codexSet.about.permissions": "Explica as configurações de sandbox e de aprovação em vigor.",
   "codexSet.about.collaboration": "Explica o modo de colaboração ativo.",
   "codexSet.about.environment": "Diretório de trabalho, plataforma e outros fatos do ambiente.",
-  "codexSet.about.environments-instructions": "Orientação para ambientes de execução adiada, controlada por uma feature flag.",
+  "codexSet.about.environments-instructions":
+    "Orientação para ambientes de execução adiada, controlada por uma feature flag.",
   "codexSet.about.apps": "Como usar os apps conectados.",
-  "codexSet.about.plugins": "Adicionada quando um plugin é selecionado ou quando qualquer plugin anuncia uma capacidade.",
+  "codexSet.about.plugins":
+    "Adicionada quando um plugin é selecionado ou quando qualquer plugin anuncia uma capacidade.",
   "codexSet.about.tools": "Descrições de ferramentas adiadas, controladas por uma feature flag.",
   "codexSet.about.skills": "A lista de skills disponíveis.",
   "codexSet.about.multi-agent-mode": "Instruções de subagentes, controladas por uma feature flag.",
-  "codexSet.about.git-attribution": "Instrui o modelo a adicionar um trailer Co-authored-by: Codex aos commits que ele escreve e uma linha Generated with Codex. aos pull requests que ele abre. O Codex resolve isso a partir da sua conta, portanto não há configuração para isso aqui nem em [features]. Quando sua conta o desativa, o Codex envia a instrução oposta em vez de não enviar nada.",
+  "codexSet.about.git-attribution":
+    "Instrui o modelo a adicionar um trailer Co-authored-by: Codex aos commits que ele escreve e uma linha Generated with Codex. aos pull requests que ele abre. O Codex resolve isso a partir da sua conta, portanto não há configuração para isso aqui nem em [features]. Quando sua conta o desativa, o Codex envia a instrução oposta em vez de não enviar nada.",
   "codexSet.condition.model-switch": "Emitida apenas após uma troca de modelo no meio da sessão.",
   "codexSet.condition.realtime": "Emitida apenas em uma sessão em tempo real.",
-  "codexSet.condition.agents-md": "Emitida quando um documento de projeto é encontrado para o diretório de trabalho.",
-  "codexSet.condition.plugins": "Emitida quando um plugin é selecionado ou quando qualquer plugin anuncia uma capacidade.",
+  "codexSet.condition.agents-md":
+    "Emitida quando um documento de projeto é encontrado para o diretório de trabalho.",
+  "codexSet.condition.plugins":
+    "Emitida quando um plugin é selecionado ou quando qualquer plugin anuncia uma capacidade.",
   "codexSet.condition.git-attribution": "Definida pela política de atribuição da sua conta.",
   "codexSet.base.title": "Prompt base",
   "codexSet.base.prev": "Opção anterior",
   "codexSet.base.next": "Próxima opção",
   "codexSet.base.position": "{position} / {total}",
-  "codexSet.base.swipeHint": "Deslize para o lado, use as teclas de seta ou pressione as setas para alternar entre as opções. Aplica-se a sessões recém-iniciadas.",
+  "codexSet.base.swipeHint":
+    "Deslize para o lado, use as teclas de seta ou pressione as setas para alternar entre as opções. Aplica-se a sessões recém-iniciadas.",
   "codexSet.base.defaultTitle": "Prompt base do próprio Codex",
-  "codexSet.base.defaultBody": "O padrão não é armazenado aqui, então não há nada para editar ou excluir: escolhê-lo simplesmente remove model_instructions_file da sua configuração, e o Codex usa o prompt que já acompanha o produto.",
+  "codexSet.base.defaultBody":
+    "O padrão não é armazenado aqui, então não há nada para editar ou excluir: escolhê-lo simplesmente remove model_instructions_file da sua configuração, e o Codex usa o prompt que já acompanha o produto.",
   "codexSet.base.variantTitle": "Nome",
   "codexSet.base.variantBody": "Prompt",
-  "codexSet.base.replacesWarning": "Isto SUBSTITUI o prompt base do Codex em vez de acrescentar a ele. Um prompt curto aqui significa um modelo com instruções curtas.",
+  "codexSet.base.replacesWarning":
+    "Isto SUBSTITUI o prompt base do Codex em vez de acrescentar a ele. Um prompt curto aqui significa um modelo com instruções curtas.",
   "codexSet.base.use": "Usar este",
   "codexSet.base.inUse": "Em uso",
-  "codexSet.base.externalBlocked": "model_instructions_file já aponta para {path}, que não foi gravado pelo opencodex. Limpe-o você mesmo antes de escolher uma opção aqui — ou importe-o como uma variante.",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file já aponta para {path}, que não foi gravado pelo opencodex. Limpe-o você mesmo antes de escolher uma opção aqui — ou importe-o como uma variante.",
   "codexSet.base.import": "Importar como variante",
-  "codexSet.base.importPreview": "O arquivo em {path} é convertido em uma variante gerenciada e instalado exatamente como mostrado abaixo — o título vira uma linha de título `#` e o corpo é normalizado (CRLF → LF, tabulações → 4 espaços).",
-  "codexSet.base.importFormat": "Armazenado literalmente: {serializedBytes} bytes no total (corpo {bodyBytes} bytes). O Codex lê o arquivo inteiro, incluindo o título.",
+  "codexSet.base.importPreview":
+    "O arquivo em {path} é convertido em uma variante gerenciada e instalado exatamente como mostrado abaixo — o título vira uma linha de título `#` e o corpo é normalizado (CRLF → LF, tabulações → 4 espaços).",
+  "codexSet.base.importFormat":
+    "Armazenado literalmente: {serializedBytes} bytes no total (corpo {bodyBytes} bytes). O Codex lê o arquivo inteiro, incluindo o título.",
   "codexSet.base.importTitle": "Título da variante",
   "codexSet.base.importTitlePending": "Atualizando a pré-visualização para este título…",
   "codexSet.base.importConfirm": "Importar e gerenciar",
   "codexSet.base.importFailed": "Não foi possível importar o arquivo.",
-  "codexSet.base.importChanged": "O arquivo ou o título mudou desde a pré-visualização. Visualize novamente.",
+  "codexSet.base.importChanged":
+    "O arquivo ou o título mudou desde a pré-visualização. Visualize novamente.",
   "nav.api": "API",
   "nav.openMenu": "Abrir menu",
   "nav.closeMenu": "Fechar menu",
@@ -2128,7 +2511,8 @@ export const pt: Record<TKey, string> = {
   "nav.expandSidebar": "Expandir barra lateral",
   "pws.refreshAllQuotas": "Atualizar todas as cotas",
   "pws.quotaRefreshDone": "Verificação de cotas concluída",
-  "integrations.subtitle": "Conecte clientes ao opencodex, gerencie credenciais e restaure a configuração dos clientes.",
+  "integrations.subtitle":
+    "Conecte clientes ao opencodex, gerencie credenciais e restaure a configuração dos clientes.",
   "integrations.tabsLabel": "Superfícies de integração",
   "integrations.tab.overview": "Visão geral",
   "integrations.tab.keys": "Chaves de API",
@@ -2139,7 +2523,8 @@ export const pt: Record<TKey, string> = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "Reinicie o Gentle Shell para carregar o catálogo no diretório salvo. Para diretórios vinculados ou compartilhados, use a integração Pi.",
+  "integrations.semantics.gentleShell":
+    "Reinicie o Gentle Shell para carregar o catálogo no diretório salvo. Para diretórios vinculados ou compartilhados, use a integração Pi.",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -2156,16 +2541,20 @@ export const pt: Record<TKey, string> = {
   "integrations.tab.commandcode": "Command Code",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "Gerencia modelos OpenCodex em ~/.qoder-cn/settings.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
+  "integrations.semantics.qoderCn":
+    "Gerencia modelos OpenCodex em ~/.qoder-cn/settings.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "Gerencia modelos OpenCodex em ~/.workbuddy/models.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
+  "integrations.semantics.workbuddy":
+    "Gerencia modelos OpenCodex em ~/.workbuddy/models.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "Gerencia modelos OpenCodex em ~/.workbuddy-ai/models.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
+  "integrations.semantics.workbuddyAi":
+    "Gerencia modelos OpenCodex em ~/.workbuddy-ai/models.json. Requer acesso local. Outras configurações são preservadas; Desfazer restaura o snapshot.",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "integrations.tab.droid": "Factory Droid",
   "integrations.aside.profilesTitle": "Perfis do Aside",
-  "integrations.aside.profilesHint": "Escolha quais perfis recebem os modelos selecionados. O perfil ativo do Aside permanece inalterado.",
+  "integrations.aside.profilesHint":
+    "Escolha quais perfis recebem os modelos selecionados. O perfil ativo do Aside permanece inalterado.",
   "integrations.aside.all": "Sincronizar todos os perfis",
   "integrations.aside.syncNow": "Sincronizar agora",
   "integrations.aside.applied": "{count} de {total} perfis aplicados",
@@ -2175,18 +2564,23 @@ export const pt: Record<TKey, string> = {
   "integrations.aside.details": "Gerenciar {name}",
   "integrations.aside.back": "Todos os perfis do Aside",
   "integrations.aside.empty": "Abra o Aside e crie um perfil para conectá-lo.",
-  "integrations.aside.partial": "Alguns perfis requerem atenção. Suas escolhas de sincronização foram salvas; verifique o estado de cada perfil.",
+  "integrations.aside.partial":
+    "Alguns perfis requerem atenção. Suas escolhas de sincronização foram salvas; verifique o estado de cada perfil.",
   "integrations.aside.pending": "Escolha de sincronização salva; atualização do arquivo pendente.",
   "integrations.aside.retry": "Tentar {name} novamente",
-  "integrations.aside.loadError": "Não foi possível carregar os perfis do Aside. Tente novamente para verificar o estado deles.",
+  "integrations.aside.loadError":
+    "Não foi possível carregar os perfis do Aside. Tente novamente para verificar o estado deles.",
   "integrations.hermes.profilesTitle": "Perfis do Hermes",
-  "integrations.hermes.profilesHint": "Cada perfil do Hermes tem seu próprio config.yaml. Escolha um perfil para conectá-lo; os outros permanecem inalterados.",
+  "integrations.hermes.profilesHint":
+    "Cada perfil do Hermes tem seu próprio config.yaml. Escolha um perfil para conectá-lo; os outros permanecem inalterados.",
   "integrations.hermes.defaultProfile": "Perfil padrão",
   "integrations.hermes.select": "Gerenciar {name}",
-  "integrations.hermes.loadError": "Não foi possível carregar os perfis do Hermes. Tente novamente para verificar o estado deles.",
+  "integrations.hermes.loadError":
+    "Não foi possível carregar os perfis do Hermes. Tente novamente para verificar o estado deles.",
   "integrations.hermes.profileTitle": "Perfil do Hermes: {name}",
   "integrations.codex.title": "Codex CLI",
-  "integrations.codex.body": "A integração do Codex pertence ao serviço do proxy. Iniciar o opencodex a aplica; parar o serviço restaura o roteamento nativo.",
+  "integrations.codex.body":
+    "A integração do Codex pertence ao serviço do proxy. Iniciar o opencodex a aplica; parar o serviço restaura o roteamento nativo.",
   "integrations.codex.openService": "Abrir controles do serviço",
   "integrations.state.notInstalled": "Não instalado",
   "integrations.state.unknown": "Verificando…",
@@ -2202,19 +2596,25 @@ export const pt: Record<TKey, string> = {
   "integrations.detail.desktopNotServed": "O perfil existe, mas o Desktop serve outro",
   "integrations.detail.desktopAbsent": "Nenhum perfil aplicado",
   "integrations.detail.desktopDesiredOff": "A integração com o Claude Desktop está desativada",
-  "integrations.detail.desktopDesiredOffCleanupPending": "O Claude Desktop ainda está usando o gateway; limpeza pendente",
-  "integrations.detail.desktopDesiredOnNotApplied": "A integração está ativada, mas o Desktop não está usando o perfil do gateway",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "O Claude Desktop ainda está usando o gateway; limpeza pendente",
+  "integrations.detail.desktopDesiredOnNotApplied":
+    "A integração está ativada, mas o Desktop não está usando o perfil do gateway",
   "integrations.detail.desktopSelectedElsewhere": "O Desktop está usando outro perfil",
   "integrations.detail.desktopProfileDrift": "O perfil selecionado do Desktop foi alterado",
-  "integrations.detail.desktopObservedUnsafe": "O perfil selecionado do Desktop não pode ser alterado com segurança",
-  "integrations.detail.desktopNotInstalled": "A biblioteca de configuração do Claude Desktop não está instalada",
+  "integrations.detail.desktopObservedUnsafe":
+    "O perfil selecionado do Desktop não pode ser alterado com segurança",
+  "integrations.detail.desktopNotInstalled":
+    "A biblioteca de configuração do Claude Desktop não está instalada",
   "integrations.detail.grokModels": "{count} modelo(s) conectado(s)",
   "integrations.detail.grokAbsent": "Nenhum bloco do opencodex na configuração",
   "integrations.detail.cursorSeen": "O Cursor chamou este proxy recentemente",
-  "integrations.detail.cursorNeverSeen": "Private Inference instalado; nenhuma requisição vista ainda",
+  "integrations.detail.cursorNeverSeen":
+    "Private Inference instalado; nenhuma requisição vista ainda",
   "integrations.detail.cursorAbsent": "Cursor Private Inference não encontrado",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "O Cursor Private Inference executa seu agente localmente e se comunica com o opencodex em loopback. O Cursor comum não consegue: o backend dele chama o endpoint personalizado e exige uma URL HTTPS pública. Esta página nunca grava no Cursor; cole os valores abaixo no Cursor você mesmo.",
+  "integrations.cursor.intro":
+    "O Cursor Private Inference executa seu agente localmente e se comunica com o opencodex em loopback. O Cursor comum não consegue: o backend dele chama o endpoint personalizado e exige uma URL HTTPS pública. Esta página nunca grava no Cursor; cole os valores abaixo no Cursor você mesmo.",
   "integrations.cursor.loading": "Lendo o status do Cursor…",
   "integrations.cursor.unavailable": "Não foi possível ler o status do Cursor a partir do proxy.",
   "integrations.cursor.detection": "Versões instaladas",
@@ -2222,60 +2622,90 @@ export const pt: Record<TKey, string> = {
   "integrations.cursor.regular": "Cursor (padrão)",
   "integrations.cursor.detected": "Detectado",
   "integrations.cursor.notFound": "Não encontrado",
-  "integrations.cursor.regularOnly": "Apenas o Cursor regular foi encontrado. Ele roteia endpoints personalizados pelos servidores do Cursor, então um proxy em loopback fica inacessível sem um túnel público. Consulte o guia da versão Private Inference.",
-  "integrations.cursor.nothingFound": "Nenhuma instalação do Cursor foi encontrada nos locais habituais. Se estiver instalado em outro lugar, os valores abaixo continuam valendo.",
+  "integrations.cursor.regularOnly":
+    "Apenas o Cursor regular foi encontrado. Ele roteia endpoints personalizados pelos servidores do Cursor, então um proxy em loopback fica inacessível sem um túnel público. Consulte o guia da versão Private Inference.",
+  "integrations.cursor.nothingFound":
+    "Nenhuma instalação do Cursor foi encontrada nos locais habituais. Se estiver instalado em outro lugar, os valores abaixo continuam valendo.",
   "integrations.cursor.gateway": "Valores do gateway",
-  "integrations.cursor.gatewayHint": "No Cursor Private Inference, abra Settings > Models > Gateway, cole estes dois valores e clique em Refresh model list.",
+  "integrations.cursor.gatewayHint":
+    "No Cursor Private Inference, abra Settings > Models > Gateway, cole estes dois valores e clique em Refresh model list.",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "Chave de API",
-  "integrations.cursor.apiKeyCredential": "Uma das suas chaves de API do opencodex (este bind exige uma credencial)",
+  "integrations.cursor.apiKeyCredential":
+    "Uma das suas chaves de API do opencodex (este bind exige uma credencial)",
   "integrations.cursor.copy": "Copiar",
   "integrations.cursor.copied": "Copiado",
   "integrations.cursor.connection": "Conexão",
   "integrations.cursor.seen": "Última requisição do Cursor: {time} ({ua})",
-  "integrations.cursor.neverSeen": "Nenhuma requisição do Cursor desde que o proxy iniciou. Depois de salvar o gateway, clique em Refresh model list no Cursor.",
+  "integrations.cursor.neverSeen":
+    "Nenhuma requisição do Cursor desde que o proxy iniciou. Depois de salvar o gateway, clique em Refresh model list no Cursor.",
   "integrations.cursor.models": "O que o Cursor vai mostrar",
-  "integrations.cursor.modelsHint": "O Cursor escolhe a escala de Reasoning a partir da própria tabela de modelos, então o opencodex só consegue prevê-la. Context lista a janela padrão e a opcional (Max Mode do Cursor).",
-  "integrations.cursor.ladderFromBundle": "Escalas de Reasoning lidas do bundle instalado do Cursor Private Inference {version}. Quem decide é o Cursor; o opencodex apenas informa a tabela dele.",
-  "integrations.cursor.ladderFromStatic": "As escalas de Reasoning são um espelho estático do Cursor 3.18.25 (nenhum bundle legível do Private Inference foi encontrado). Context lista a janela padrão e a opcional.",
+  "integrations.cursor.modelsHint":
+    "O Cursor escolhe a escala de Reasoning a partir da própria tabela de modelos, então o opencodex só consegue prevê-la. Context lista a janela padrão e a opcional (Max Mode do Cursor).",
+  "integrations.cursor.ladderFromBundle":
+    "Escalas de Reasoning lidas do bundle instalado do Cursor Private Inference {version}. Quem decide é o Cursor; o opencodex apenas informa a tabela dele.",
+  "integrations.cursor.ladderFromStatic":
+    "As escalas de Reasoning são um espelho estático do Cursor 3.18.25 (nenhum bundle legível do Private Inference foi encontrado). Context lista a janela padrão e a opcional.",
   "integrations.cursor.unknownVersion": "versão desconhecida",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "janela única",
-  "integrations.cursor.noControlTitle": "Este id não está na tabela de esforço embutida do Cursor, então o Cursor não mostra controle de Reasoning.",
+  "integrations.cursor.noControlTitle":
+    "Este id não está na tabela de esforço embutida do Cursor, então o Cursor não mostra controle de Reasoning.",
   "integrations.cursor.effortRowsOne": "1 linha de esforço publicada",
   "integrations.cursor.effortRowsMany": "{n} linhas de esforço publicadas",
   "integrations.cursor.effortRowsOff": "sem linhas de esforço",
-  "integrations.cursor.tableLessHint": "Linhas marcadas com — ficam sem controle de Reasoning no Cursor. Ative cursorEffortRows para publicar uma entrada no seletor por esforço (id--effort) ou defina modelDefaultReasoningEfforts no provedor para um padrão fixo.",
+  "integrations.cursor.tableLessHint":
+    "Linhas marcadas com — ficam sem controle de Reasoning no Cursor. Ative cursorEffortRows para publicar uma entrada no seletor por esforço (id--effort) ou defina modelDefaultReasoningEfforts no provedor para um padrão fixo.",
   "integrations.cursor.colModel": "Modelo",
   "integrations.cursor.colReasoning": "Raciocínio",
   "integrations.cursor.colContext": "Contexto",
   "integrations.cursor.guide": "Abrir o guia do Cursor Private Inference",
   "integrations.dialog.codex.title": "Desativar a integração com o Codex?",
-  "integrations.dialog.codex.changes": "O opencodex vai remover seu roteamento de {path}, remover o perfil gerado, restaurar o catálogo de modelos nativo e reetiquetar as threads retomáveis para o Codex nativo.",
-  "integrations.dialog.codex.breakage": "O codex puro vai se conectar direto à OpenAI, e os modelos roteados de outros provedores vão desaparecer do Codex. O proxy e o /v1/responses continuam rodando para outros clientes.",
-  "integrations.dialog.codex.undo": "Ativar de novo reconstrói o catálogo roteado com os modelos disponíveis na hora e injeta o Codex novamente. O histórico de retomada é adaptado à direção correspondente, mas seus arquivos não são restaurados byte a byte.",
-  "integrations.dialog.codex.sideEffect": "Se você selecionou um modelo raiz roteado depois que o opencodex injetou a configuração, desativar remove essa seleção e reativar a integração não consegue reconstruí-la; selecione o modelo de novo. Se um model_provider externo controla o Codex, o opencodex remove apenas seu journal obsoleto e deixa a configuração, o catálogo e o histórico inalterados.",
+  "integrations.dialog.codex.changes":
+    "O opencodex vai remover seu roteamento de {path}, remover o perfil gerado, restaurar o catálogo de modelos nativo e reetiquetar as threads retomáveis para o Codex nativo.",
+  "integrations.dialog.codex.breakage":
+    "O codex puro vai se conectar direto à OpenAI, e os modelos roteados de outros provedores vão desaparecer do Codex. O proxy e o /v1/responses continuam rodando para outros clientes.",
+  "integrations.dialog.codex.undo":
+    "Ativar de novo reconstrói o catálogo roteado com os modelos disponíveis na hora e injeta o Codex novamente. O histórico de retomada é adaptado à direção correspondente, mas seus arquivos não são restaurados byte a byte.",
+  "integrations.dialog.codex.sideEffect":
+    "Se você selecionou um modelo raiz roteado depois que o opencodex injetou a configuração, desativar remove essa seleção e reativar a integração não consegue reconstruí-la; selecione o modelo de novo. Se um model_provider externo controla o Codex, o opencodex remove apenas seu journal obsoleto e deixa a configuração, o catálogo e o histórico inalterados.",
   "integrations.dialog.codex.confirm": "Desativar",
   "integrations.dialog.grok.title": "Desativar a integração com o Grok Build?",
-  "integrations.dialog.grok.changes": "Apenas o bloco marcado pelo opencodex será removido de {path}. O conteúdo escrito fora do bloco permanece inalterado.",
-  "integrations.dialog.grok.breakage": "Desativar remove os aliases de modelo do opencodex no Grok Build. Os modelos usados com sua conta xAI continuam disponíveis.",
-  "integrations.dialog.grok.undo": "Se o opencodex estiver rodando em um endereço loopback, reativar grava um novo bloco com os modelos disponíveis no momento.",
+  "integrations.dialog.grok.changes":
+    "Apenas o bloco marcado pelo opencodex será removido de {path}. O conteúdo escrito fora do bloco permanece inalterado.",
+  "integrations.dialog.grok.breakage":
+    "Desativar remove os aliases de modelo do opencodex no Grok Build. Os modelos usados com sua conta xAI continuam disponíveis.",
+  "integrations.dialog.grok.undo":
+    "Se o opencodex estiver rodando em um endereço loopback, reativar grava um novo bloco com os modelos disponíveis no momento.",
   "integrations.dialog.grok.confirm": "Desativar",
   "integrations.dialog.desktop.title": "Desativar a integração com o Claude Desktop?",
-  "integrations.dialog.desktop.changes": "Se {path} contiver um perfil de gateway gerenciado pelo opencodex, o Desktop primeiro selecionará um novo perfil padrão sem credenciais e depois removerá o perfil antigo e o backup.",
-  "integrations.dialog.desktop.breakage": "O Claude Desktop voltará ao Claude padrão, em vez dos modelos roteados pelo opencodex.",
-  "integrations.dialog.desktop.undo": "Reativar regenera o perfil do opencodex a partir das suas atribuições de modelo salvas.",
-  "integrations.dialog.desktop.restart": "O Claude Desktop lê esta configuração apenas na inicialização. Feche-o completamente e reabra para que a mudança tenha efeito.",
+  "integrations.dialog.desktop.changes":
+    "Se {path} contiver um perfil de gateway gerenciado pelo opencodex, o Desktop primeiro selecionará um novo perfil padrão sem credenciais e depois removerá o perfil antigo e o backup.",
+  "integrations.dialog.desktop.breakage":
+    "O Claude Desktop voltará ao Claude padrão, em vez dos modelos roteados pelo opencodex.",
+  "integrations.dialog.desktop.undo":
+    "Reativar regenera o perfil do opencodex a partir das suas atribuições de modelo salvas.",
+  "integrations.dialog.desktop.restart":
+    "O Claude Desktop lê esta configuração apenas na inicialização. Feche-o completamente e reabra para que a mudança tenha efeito.",
   "integrations.dialog.desktop.confirm": "Desativar",
-  "integrations.native.msg.nonLoopbackRemoved": "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. O bloco anterior que apontava para loopback foi removido.",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. Não havia bloco anterior para remover.",
-  "integrations.native.msg.nonLoopbackSuperseded": "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. Outro processo gravou um novo bloco nesse meio-tempo, então o bloco atual no arquivo não foi criado por esta requisição.",
-  "integrations.native.error.orphanedMarker": "{path} tem um marcador de início do opencodex, mas nenhum marcador de fim. O arquivo foi mantido inalterado porque o opencodex não consegue determinar onde seu bloco termina.",
-  "integrations.native.error.homeMismatch": "O home do serviço instalado não corresponde ao home atual, então o arquivo foi mantido inalterado.",
-  "integrations.native.error.notInstalled": "O Grok Build não está instalado, então não há nada a alterar.",
-  "integrations.native.error.configBusy": "A configuração está sendo salva em outro lugar e não pôde ser alterada. Tente novamente em instantes.",
-  "integrations.native.error.desktopUnsafeMetadata": "Os metadados do Claude Desktop em {path} não puderam ser lidos com segurança, então sua biblioteca não foi alterada.",
-  "integrations.native.error.desktopCleanupIncomplete": "O Claude Desktop está apontado para o modo padrão, mas ainda restam arquivos de credencial antigos do opencodex em: {paths}.",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. O bloco anterior que apontava para loopback foi removido.",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. Não havia bloco anterior para remover.",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "O Grok Build só pode ser registrado automaticamente enquanto o opencodex roda em um endereço loopback. Outro processo gravou um novo bloco nesse meio-tempo, então o bloco atual no arquivo não foi criado por esta requisição.",
+  "integrations.native.error.orphanedMarker":
+    "{path} tem um marcador de início do opencodex, mas nenhum marcador de fim. O arquivo foi mantido inalterado porque o opencodex não consegue determinar onde seu bloco termina.",
+  "integrations.native.error.homeMismatch":
+    "O home do serviço instalado não corresponde ao home atual, então o arquivo foi mantido inalterado.",
+  "integrations.native.error.notInstalled":
+    "O Grok Build não está instalado, então não há nada a alterar.",
+  "integrations.native.error.configBusy":
+    "A configuração está sendo salva em outro lugar e não pôde ser alterada. Tente novamente em instantes.",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "Os metadados do Claude Desktop em {path} não puderam ser lidos com segurança, então sua biblioteca não foi alterada.",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "O Claude Desktop está apontado para o modo padrão, mas ainda restam arquivos de credencial antigos do opencodex em: {paths}.",
   "integrations.native.msg.desktopDisabled": "Integração com o Claude Desktop desativada.",
   "integrations.native.msg.desktopEnabled": "Integração com o Claude Desktop ativada.",
   "integrations.state.absent": "Não aplicado",
@@ -2288,7 +2718,8 @@ export const pt: Record<TKey, string> = {
   "integrations.summary.stale": "Atualização necessária",
   "integrations.summary.lastChange": "Última alteração",
   "integrations.summary.disableAll": "Desativar todos…",
-  "integrations.onboarding": "Aplicar grava um bloco de provedor do opencodex depois de salvar um backup. Desativar remove apenas esse bloco, e um snapshot retido pode ser restaurado.",
+  "integrations.onboarding":
+    "Aplicar grava um bloco de provedor do opencodex depois de salvar um backup. Desativar remove apenas esse bloco, e um snapshot retido pode ser restaurado.",
   "integrations.empty.title": "Nenhum cliente instalado foi detectado",
   "integrations.empty.body": "Instale um cliente compatível e volte aqui para aplicar o opencodex.",
   "integrations.action.apply": "Aplicar",
@@ -2302,51 +2733,71 @@ export const pt: Record<TKey, string> = {
   "integrations.action.snapshotExpired": "Backup expirado",
   "integrations.rollback.title": "Central de rollback",
   "integrations.rollback.empty": "Ainda não há histórico de aplicações",
-  "integrations.rollback.emptyBody": "Toda gravação bem-sucedida mantém antes um snapshot do estado anterior.",
+  "integrations.rollback.emptyBody":
+    "Toda gravação bem-sucedida mantém antes um snapshot do estado anterior.",
   "integrations.catalog.title": "Clientes",
   "integrations.rollback.older": "Operações anteriores",
   "integrations.rollback.showMore": "Mostrar mais {n}",
   "integrations.rollback.failed": "Não foi possível carregar o histórico de rollback.",
   "integrations.rollback.delete": "Excluir",
   "integrations.rollback.deleteAria": "Excluir a entrada de rollback de {at}",
-  "integrations.rollback.deleteNewest": "A entrada mais recente deste cliente é mantida para que você ainda possa desfazer.",
+  "integrations.rollback.deleteNewest":
+    "A entrada mais recente deste cliente é mantida para que você ainda possa desfazer.",
   "integrations.rollback.deleteGone": "Esta entrada já foi excluída. A lista será atualizada.",
   "integrations.dialog.deleteEntry.title": "Excluir esta entrada de rollback?",
-  "integrations.dialog.deleteEntry.changes": "Esta entrada some da lista de rollback, e qualquer backup que ela ainda guarde de {path} é apagado do disco.",
-  "integrations.dialog.deleteEntry.breakage": "Você não poderá mais restaurar o arquivo para este ponto. As entradas mais novas e o próprio arquivo não são afetados.",
-  "integrations.dialog.deleteEntry.undo": "Isso não pode ser desfeito. A entrada mais recente de cada cliente é mantida e não pode ser excluída.",
+  "integrations.dialog.deleteEntry.changes":
+    "Esta entrada some da lista de rollback, e qualquer backup que ela ainda guarde de {path} é apagado do disco.",
+  "integrations.dialog.deleteEntry.breakage":
+    "Você não poderá mais restaurar o arquivo para este ponto. As entradas mais novas e o próprio arquivo não são afetados.",
+  "integrations.dialog.deleteEntry.undo":
+    "Isso não pode ser desfeito. A entrada mais recente de cada cliente é mantida e não pode ser excluída.",
   "integrations.dialog.deleteEntry.confirm": "Excluir entrada",
   "integrations.restore.title": "Restaurar este snapshot?",
-  "integrations.restore.body": "O arquivo atual recebe um backup primeiro, e então o snapshot selecionado o substitui.",
+  "integrations.restore.body":
+    "O arquivo atual recebe um backup primeiro, e então o snapshot selecionado o substitui.",
   "integrations.restore.driftTitle": "Foram detectadas edições mais novas",
-  "integrations.restore.driftBody": "As alterações feitas depois deste snapshot receberão backup, e então o arquivo será substituído.",
+  "integrations.restore.driftBody":
+    "As alterações feitas depois deste snapshot receberão backup, e então o arquivo será substituído.",
   "integrations.restore.confirm": "Restaurar",
   "integrations.restore.confirmDrift": "Fazer backup das edições novas e restaurar",
   "integrations.restore.pending": "Restaurando…",
-  "integrations.restore.manual": "A restauração automática falhou: {reason}. Restaure manualmente a partir de {path}.",
+  "integrations.restore.manual":
+    "A restauração automática falhou: {reason}. Restaure manualmente a partir de {path}.",
   "integrations.error.load": "Não foi possível carregar o estado das integrações.",
-  "integrations.error.stale": "A última atualização falhou. Os valores abaixo podem estar desatualizados.",
-  "integrations.error.busy": "Outra alteração para este cliente ainda está em andamento. Tente novamente em instantes.",
-  "integrations.error.conflict": "A configuração mudou depois que o opencodex a gravou. Nada foi removido.",
+  "integrations.error.stale":
+    "A última atualização falhou. Os valores abaixo podem estar desatualizados.",
+  "integrations.error.busy":
+    "Outra alteração para este cliente ainda está em andamento. Tente novamente em instantes.",
+  "integrations.error.conflict":
+    "A configuração mudou depois que o opencodex a gravou. Nada foi removido.",
   "integrations.error.unsafe": "A configuração não pode ser alterada com segurança.",
-  "integrations.error.generic": "A alteração da integração falhou. Seu estado anterior foi mantido.",
-  "integrations.error.nonLoopback": "{client} só consegue alcançar um proxy em localhost: a configuração dele não tem onde colocar o cabeçalho de admissão que um bind remoto exige, então gravá-lo manualmente também não ajudaria. Dê a ele acesso loopback, por meio de um túnel ou de um encaminhador local.",
+  "integrations.error.generic":
+    "A alteração da integração falhou. Seu estado anterior foi mantido.",
+  "integrations.error.nonLoopback":
+    "{client} só consegue alcançar um proxy em localhost: a configuração dele não tem onde colocar o cabeçalho de admissão que um bind remoto exige, então gravá-lo manualmente também não ajudaria. Dê a ele acesso loopback, por meio de um túnel ou de um encaminhador local.",
   "integrations.status.installed": "Instalado",
   "integrations.status.notInstalled": "Não instalado",
   "integrations.status.appliedAt": "Aplicado",
-  "integrations.status.supersededStore": "Este cliente agora lê seus provedores de {path}, que o opencodex não grava, então ativá-lo aqui não mudaria nada do que ele carrega.",
-  "integrations.status.missingStore": "Este cliente guarda seus provedores em {path}, e esse arquivo não existe. O opencodex não grava no antigo arquivo de configurações do cliente no lugar dele, porque o cliente move esse arquivo e o importa na próxima inicialização. Crie {path} com o conteúdo {document} e clique em \"Aplicar\" de novo.",
-  "integrations.status.candidateConflict": "Outro arquivo de configuração do Kilo, {path}, também define provider.opencodex. Remova provider.opencodex desse arquivo antes de aplicar.",
+  "integrations.status.supersededStore":
+    "Este cliente agora lê seus provedores de {path}, que o opencodex não grava, então ativá-lo aqui não mudaria nada do que ele carrega.",
+  "integrations.status.missingStore":
+    'Este cliente guarda seus provedores em {path}, e esse arquivo não existe. O opencodex não grava no antigo arquivo de configurações do cliente no lugar dele, porque o cliente move esse arquivo e o importa na próxima inicialização. Crie {path} com o conteúdo {document} e clique em "Aplicar" de novo.',
+  "integrations.status.candidateConflict":
+    "Outro arquivo de configuração do Kilo, {path}, também define provider.opencodex. Remova provider.opencodex desse arquivo antes de aplicar.",
   "integrations.status.backup": "Backup",
   "integrations.status.lastRestore": "Última restauração",
   "integrations.status.unknown": "Desconhecido",
   "integrations.bulk.title": "Desativar as integrações de clientes aplicadas?",
-  "integrations.bulk.body": "Apenas o bloco pertencente ao opencodex é removido. Um snapshot anterior à gravação é mantido para cada cliente.",
+  "integrations.bulk.body":
+    "Apenas o bloco pertencente ao opencodex é removido. Um snapshot anterior à gravação é mantido para cada cliente.",
   "integrations.bulk.partial": "Alguns clientes não puderam ser desativados: {clients}",
   "integrations.bulk.success": "As integrações de clientes aplicadas foram desativadas.",
-  "integrations.retention.degraded": "A limpeza de backups está atrasada; backups mais antigos ainda podem estar no disco.",
-  "integrations.error.residual": "O arquivo pode estar em um estado intermediário: {message} Restaure-o a partir de {path}.",
-  "integrations.error.residualNoSnapshot": "{message} A recuperação automática não foi concluída. Verifique a configuração do cliente antes de tentar de novo.",
+  "integrations.retention.degraded":
+    "A limpeza de backups está atrasada; backups mais antigos ainda podem estar no disco.",
+  "integrations.error.residual":
+    "O arquivo pode estar em um estado intermediário: {message} Restaure-o a partir de {path}.",
+  "integrations.error.residualNoSnapshot":
+    "{message} A recuperação automática não foi concluída. Verifique a configuração do cliente antes de tentar de novo.",
   "integrations.error.recover": "{message} Há um backup em {path}.",
   "integrations.kind.apply": "Aplicado",
   "integrations.kind.disable": "Desativado",
@@ -2354,24 +2805,36 @@ export const pt: Record<TKey, string> = {
   "integrations.kind.restore": "Restaurado",
   "integrations.kind.overwrite": "Sobrescrito",
   "integrations.dialog.overwrite.title": "Substituir o bloco nesta configuração?",
-  "integrations.dialog.overwrite.changesUnowned": "Um bloco que não foi escrito por nós ocupa as configurações de que o opencodex precisa em {path}. Aplicar o substitui pelo bloco que o opencodex gravaria.",
-  "integrations.dialog.overwrite.changesForeign": "Sua edição dentro do bloco do opencodex em {path} será descartada e substituída pelo bloco que o opencodex gravaria.",
-  "integrations.dialog.overwrite.breakage": "Tudo o que o outro bloco configurava deixa de valer. O restante do arquivo não é tocado.",
-  "integrations.dialog.overwrite.undo": "Um snapshot é salvo antes, então isto aparece na lista de rollback abaixo e pode ser desfeito.",
+  "integrations.dialog.overwrite.changesUnowned":
+    "Um bloco que não foi escrito por nós ocupa as configurações de que o opencodex precisa em {path}. Aplicar o substitui pelo bloco que o opencodex gravaria.",
+  "integrations.dialog.overwrite.changesForeign":
+    "Sua edição dentro do bloco do opencodex em {path} será descartada e substituída pelo bloco que o opencodex gravaria.",
+  "integrations.dialog.overwrite.breakage":
+    "Tudo o que o outro bloco configurava deixa de valer. O restante do arquivo não é tocado.",
+  "integrations.dialog.overwrite.undo":
+    "Um snapshot é salvo antes, então isto aparece na lista de rollback abaixo e pode ser desfeito.",
   "integrations.dialog.overwrite.confirm": "Substituir",
   "integrations.action.overwrite": "Substituir",
   "integrations.preview.loading": "Carregando o plano exato de alterações…",
-  "integrations.preview.failed": "Não foi possível carregar o plano de alterações. Nada foi alterado.",
-  "integrations.preview.stale": "A integração mudou enquanto você confirmava. Revise o plano atualizado e confirme novamente.",
+  "integrations.preview.failed":
+    "Não foi possível carregar o plano de alterações. Nada foi alterado.",
+  "integrations.preview.stale":
+    "A integração mudou enquanto você confirmava. Revise o plano atualizado e confirme novamente.",
   "integrations.dialog.apply.title": "Aplicar esta integração?",
-  "integrations.dialog.apply.changes": "O opencodex vai adicionar suas configurações de provedor gerenciadas à configuração do cliente.",
-  "integrations.dialog.apply.breakage": "O cliente passará a usar os modelos expostos atualmente por esta instância do opencodex.",
-  "integrations.dialog.apply.undo": "Um backup é salvo antes, e a alteração pode ser desfeita pela central de rollback.",
+  "integrations.dialog.apply.changes":
+    "O opencodex vai adicionar suas configurações de provedor gerenciadas à configuração do cliente.",
+  "integrations.dialog.apply.breakage":
+    "O cliente passará a usar os modelos expostos atualmente por esta instância do opencodex.",
+  "integrations.dialog.apply.undo":
+    "Um backup é salvo antes, e a alteração pode ser desfeita pela central de rollback.",
   "integrations.dialog.apply.confirm": "Aplicar",
   "integrations.dialog.disable.title": "Desativar esta integração?",
-  "integrations.dialog.disable.changes": "Apenas as configurações pertencentes ao opencodex serão removidas.",
-  "integrations.dialog.disable.breakage": "O cliente deixará de usar os modelos roteados por esta instância do opencodex.",
-  "integrations.dialog.disable.undo": "Um backup é salvo antes, e a alteração pode ser desfeita pela central de rollback.",
+  "integrations.dialog.disable.changes":
+    "Apenas as configurações pertencentes ao opencodex serão removidas.",
+  "integrations.dialog.disable.breakage":
+    "O cliente deixará de usar os modelos roteados por esta instância do opencodex.",
+  "integrations.dialog.disable.undo":
+    "Um backup é salvo antes, e a alteração pode ser desfeita pela central de rollback.",
   "integrations.dialog.disable.confirm": "Desativar",
   "integrations.plan.heading": "Plano de alterações do servidor",
   "integrations.plan.operation": "Operação: {operation}",
@@ -2386,42 +2849,67 @@ export const pt: Record<TKey, string> = {
   "integrations.plan.change.ownership": "Atualizar o registro de propriedade",
   "integrations.plan.change.journal": "Registrar entrada de rollback",
   "integrations.plan.foreign.none": "Nenhuma edição externa foi detectada.",
-  "integrations.plan.foreign.unowned": "Um bloco de configurações que não pertence ao opencodex será substituído.",
-  "integrations.plan.foreign.foreignEdit": "As edições dentro do bloco gerenciado pelo opencodex serão substituídas.",
+  "integrations.plan.foreign.unowned":
+    "Um bloco de configurações que não pertence ao opencodex será substituído.",
+  "integrations.plan.foreign.foreignEdit":
+    "As edições dentro do bloco gerenciado pelo opencodex serão substituídas.",
   "integrations.plan.foreign.drift": "O arquivo mudou desde este ponto de rollback.",
-  "integrations.plan.noop.applied": "Nenhuma alteração é necessária no documento do cliente gerenciado; as configurações da integração já estão presentes.",
-  "integrations.plan.noop.disabled": "Nenhuma alteração é necessária no documento do cliente gerenciado; as configurações da integração já estão ausentes.",
-  "integrations.plan.noop.profilePreference": "A preferência de sincronização do perfil ainda será salva quando você confirmar.",
+  "integrations.plan.noop.applied":
+    "Nenhuma alteração é necessária no documento do cliente gerenciado; as configurações da integração já estão presentes.",
+  "integrations.plan.noop.disabled":
+    "Nenhuma alteração é necessária no documento do cliente gerenciado; as configurações da integração já estão ausentes.",
+  "integrations.plan.noop.profilePreference":
+    "A preferência de sincronização do perfil ainda será salva quando você confirmar.",
   "integrations.plan.refused": "O servidor não consegue aplicar este plano com segurança.",
-  "integrations.plan.refusal.notInstalled": "O cliente não está instalado. Instale-o, atualize esta página e visualize a alteração novamente.",
-  "integrations.plan.refusal.conflict": "As configurações gerenciadas entram em conflito com o arquivo atual. Revise o arquivo ou use Substituir quando essa ação estiver disponível.",
-  "integrations.plan.refusal.unsafe": "A configuração do cliente não pode ser alterada com segurança. Repare ou substitua o arquivo antes de tentar de novo.",
-  "integrations.plan.refusal.nonLoopback": "Este cliente exige um endereço de proxy loopback. Use acesso por localhost, um túnel ou um encaminhador local antes de tentar de novo.",
-  "integrations.plan.refusal.supersededStore": "Este cliente agora lê seus provedores de um arquivo que o opencodex não grava, então esta operação não mudaria nada do que ele carrega.",
-  "integrations.plan.refusal.missingStore": "O arquivo em que este cliente guarda seus provedores não existe, e o opencodex não grava no antigo arquivo de configurações do cliente no lugar dele, porque o cliente move esse arquivo na próxima inicialização. Crie o arquivo com o conteúdo {document} e clique em \"Aplicar\" de novo.",
-  "integrations.plan.refusal.driftRequiresConfirm": "O arquivo mudou depois deste ponto de rollback. Revise o plano com as diferenças antes de restaurar.",
-  "integrations.plan.refusal.snapshotExpired": "O backup deste ponto de rollback expirou, então ele não pode mais ser restaurado.",
-  "integrations.plan.refusal.writeFailed": "O servidor não conseguiu preparar uma gravação segura. Atualize o estado da integração antes de tentar de novo.",
+  "integrations.plan.refusal.notInstalled":
+    "O cliente não está instalado. Instale-o, atualize esta página e visualize a alteração novamente.",
+  "integrations.plan.refusal.conflict":
+    "As configurações gerenciadas entram em conflito com o arquivo atual. Revise o arquivo ou use Substituir quando essa ação estiver disponível.",
+  "integrations.plan.refusal.unsafe":
+    "A configuração do cliente não pode ser alterada com segurança. Repare ou substitua o arquivo antes de tentar de novo.",
+  "integrations.plan.refusal.nonLoopback":
+    "Este cliente exige um endereço de proxy loopback. Use acesso por localhost, um túnel ou um encaminhador local antes de tentar de novo.",
+  "integrations.plan.refusal.supersededStore":
+    "Este cliente agora lê seus provedores de um arquivo que o opencodex não grava, então esta operação não mudaria nada do que ele carrega.",
+  "integrations.plan.refusal.missingStore":
+    'O arquivo em que este cliente guarda seus provedores não existe, e o opencodex não grava no antigo arquivo de configurações do cliente no lugar dele, porque o cliente move esse arquivo na próxima inicialização. Crie o arquivo com o conteúdo {document} e clique em "Aplicar" de novo.',
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "O arquivo mudou depois deste ponto de rollback. Revise o plano com as diferenças antes de restaurar.",
+  "integrations.plan.refusal.snapshotExpired":
+    "O backup deste ponto de rollback expirou, então ele não pode mais ser restaurado.",
+  "integrations.plan.refusal.writeFailed":
+    "O servidor não conseguiu preparar uma gravação segura. Atualize o estado da integração antes de tentar de novo.",
   "integrations.mutation.pending": "Aplicando a alteração confirmada…",
-  "integrations.bulk.breakage": "Cada cliente deixará de usar os modelos roteados por esta instância do opencodex.",
+  "integrations.bulk.breakage":
+    "Cada cliente deixará de usar os modelos roteados por esta instância do opencodex.",
   "integrations.bulk.undo": "Cada cliente mantém seu próprio backup e sua entrada de rollback.",
   "integrations.bulk.confirm": "Desativar todos",
-  "integrations.semantics.opencode": "Apenas inicializações diretas do disco; a injeção de ambiente do ocx opencode tem precedência.",
+  "integrations.semantics.opencode":
+    "Apenas inicializações diretas do disco; a injeção de ambiente do ocx opencode tem precedência.",
   "integrations.semantics.pi": "Vale para novas sessões.",
   "integrations.semantics.omp": "Reinicie o OMP para carregar o catálogo.",
   "integrations.semantics.hermes": "Vale para novas sessões.",
   "integrations.semantics.openclaw": "Vale imediatamente para um gateway em execução.",
-  "integrations.semantics.kimi": "Reinicie ou execute /reload para aplicar (a v2 observa o arquivo).",
+  "integrations.semantics.kimi":
+    "Reinicie ou execute /reload para aplicar (a v2 observa o arquivo).",
   "integrations.semantics.gajae": "Vale para uma nova sessão ou ao abrir /model.",
-  "integrations.semantics.dsh": "O OpenCodex gerencia apenas o provedor opencodex da linha llm-pi-ai em $DSH_HOME/profiles/desktop/cordis.patch.yml, o perfil Desktop que o DSH 0.1.7+ lê ($DSH_HOME/settings.yaml enquanto esse perfil não existir). O DSH recarrega esse provedor a quente; seu modelo padrão e o deepseek-official permanecem inalterados. Atualmente somente loopback; nenhuma credencial real é gravada.",
-  "integrations.semantics.mcode": "Gerencia apenas custom_provider.opencodex. Seu modelo padrão e o login do MiniMax permanecem inalterados.",
-  "integrations.semantics.zcode": "Gerencia apenas provider.opencodex em ~/.zcode/v2/config.json. Seu login do Z.ai e os outros provedores permanecem inalterados. Reinicie o ZCode após as alterações.",
-  "integrations.semantics.prime": "Gerencia apenas providers.opencodex no models.json do Prime Agent — ~/.prime/agent, a menos que PRIME_AGENT_CODING_AGENT_DIR o redirecione. Seus outros provedores e substituições de modelo permanecem inalterados. Vale para novas sessões.",
-  "integrations.semantics.aside": "Gerencia apenas providers.opencodex no ~/.aside/u/<id>/models.json deste perfil. Seus outros provedores permanecem inalterados. Feche completamente e reabra o Aside após aplicar.",
-  "integrations.semantics.raycast": "Adiciona uma entrada de provedor OpenCodex ao providers.yaml do Raycast, para que todos os modelos roteados apareçam no seletor de modelos do Raycast AI. Requer Raycast Pro.",
-  "integrations.semantics.omo": "Gerencia apenas providers.opencodex no models.json do omo — ~/.omo/agent, a menos que OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR ou PI_CODING_AGENT_DIR o redirecione. Seus outros provedores permanecem inalterados. Vale para novas sessões.",
+  "integrations.semantics.dsh":
+    "O OpenCodex gerencia apenas o provedor opencodex da linha llm-pi-ai em $DSH_HOME/profiles/desktop/cordis.patch.yml, o perfil Desktop que o DSH 0.1.7+ lê ($DSH_HOME/settings.yaml enquanto esse perfil não existir). O DSH recarrega esse provedor a quente; seu modelo padrão e o deepseek-official permanecem inalterados. Atualmente somente loopback; nenhuma credencial real é gravada.",
+  "integrations.semantics.mcode":
+    "Gerencia apenas custom_provider.opencodex. Seu modelo padrão e o login do MiniMax permanecem inalterados.",
+  "integrations.semantics.zcode":
+    "Gerencia apenas provider.opencodex em ~/.zcode/v2/config.json. Seu login do Z.ai e os outros provedores permanecem inalterados. Reinicie o ZCode após as alterações.",
+  "integrations.semantics.prime":
+    "Gerencia apenas providers.opencodex no models.json do Prime Agent — ~/.prime/agent, a menos que PRIME_AGENT_CODING_AGENT_DIR o redirecione. Seus outros provedores e substituições de modelo permanecem inalterados. Vale para novas sessões.",
+  "integrations.semantics.aside":
+    "Gerencia apenas providers.opencodex no ~/.aside/u/<id>/models.json deste perfil. Seus outros provedores permanecem inalterados. Feche completamente e reabra o Aside após aplicar.",
+  "integrations.semantics.raycast":
+    "Adiciona uma entrada de provedor OpenCodex ao providers.yaml do Raycast, para que todos os modelos roteados apareçam no seletor de modelos do Raycast AI. Requer Raycast Pro.",
+  "integrations.semantics.omo":
+    "Gerencia apenas providers.opencodex no models.json do omo — ~/.omo/agent, a menos que OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR ou PI_CODING_AGENT_DIR o redirecione. Seus outros provedores permanecem inalterados. Vale para novas sessões.",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex): modelos por papel",
-  "integrations.lazycodexRoles.hint": "Escolha o modelo e o esforço de raciocínio de cada papel. Salvar atualiza o arquivo dele em $CODEX_HOME/agents e, quando puder ser reescrito com segurança, o omo.jsonc do LazyCodex; \"Herdar esforço\" deixa o esforço para o Codex.",
+  "integrations.lazycodexRoles.hint":
+    'Escolha o modelo e o esforço de raciocínio de cada papel. Salvar atualiza o arquivo dele em $CODEX_HOME/agents e, quando puder ser reescrito com segurança, o omo.jsonc do LazyCodex; "Herdar esforço" deixa o esforço para o Codex.',
   "integrations.lazycodexRoles.role": "Função",
   "integrations.lazycodexRoles.current": "Atual",
   "integrations.lazycodexRoles.model": "Novo modelo",
@@ -2432,25 +2920,37 @@ export const pt: Record<TKey, string> = {
   "integrations.lazycodexRoles.none": "Nenhum modelo fixado",
   "integrations.lazycodexRoles.choose": "Escolha um modelo",
   "integrations.lazycodexRoles.empty": "Nenhuma função de agente do Codex foi encontrada.",
-  "integrations.lazycodexRoles.loadFailed": "Não foi possível carregar as funções de agente do Codex.",
+  "integrations.lazycodexRoles.loadFailed":
+    "Não foi possível carregar as funções de agente do Codex.",
   "integrations.lazycodexRoles.saveFailed": "Não foi possível salvar o modelo de {role}.",
   "integrations.lazycodexRoles.saved": "{role} agora usa {model}.",
-  "integrations.lazycodexRoles.omoAbsent": "{role} agora usa {model}. O omo.jsonc não foi encontrado, então só o arquivo da função foi alterado.",
-  "integrations.lazycodexRoles.omoComments": "{role} agora usa {model}. O omo.jsonc tem comentários que salvar removeria, então ficou como estava; defina [codex].agents.{role} nele você mesmo.",
-  "integrations.lazycodexRoles.omoInvalid": "{role} agora usa {model}. O omo.jsonc ficou como estava porque não é um JSON válido no formato que o LazyCodex lê.",
-  "integrations.lazycodexRoles.omoFailed": "{role} agora usa {model}, mas não foi possível gravar o omo.jsonc.",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} agora usa {model}. O omo.jsonc não foi encontrado, então só o arquivo da função foi alterado.",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} agora usa {model}. O omo.jsonc tem comentários que salvar removeria, então ficou como estava; defina [codex].agents.{role} nele você mesmo.",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} agora usa {model}. O omo.jsonc ficou como estava porque não é um JSON válido no formato que o LazyCodex lê.",
+  "integrations.lazycodexRoles.omoFailed":
+    "{role} agora usa {model}, mas não foi possível gravar o omo.jsonc.",
   "integrations.lazycodexRoles.retryMirror": "Tentar omo.jsonc novamente",
   "integrations.lazycodexRoles.history.title": "Histórico de alterações",
-  "integrations.lazycodexRoles.history.hint": "As 50 gravações e atribuições automáticas mais recentes desta seção aparecem aqui, agrupadas por ação inteira. Restaurar grava de volta o modelo e o esforço anteriores como uma gravação comum, que também aparece aqui. Um papel que não tinha modelo fixado mantém o atual; só o esforço volta.",
-  "integrations.lazycodexRoles.history.unavailable": "Não foi possível ler o histórico de alterações, por isso Restaurar não está disponível. A edição de papéis continua funcionando.",
+  "integrations.lazycodexRoles.history.hint":
+    "As 50 gravações e atribuições automáticas mais recentes desta seção aparecem aqui, agrupadas por ação inteira. Restaurar grava de volta o modelo e o esforço anteriores como uma gravação comum, que também aparece aqui. Um papel que não tinha modelo fixado mantém o atual; só o esforço volta.",
+  "integrations.lazycodexRoles.history.unavailable":
+    "Não foi possível ler o histórico de alterações, por isso Restaurar não está disponível. A edição de papéis continua funcionando.",
   "integrations.lazycodexRoles.history.restore": "Restaurar",
-  "integrations.lazycodexRoles.history.restored": "{count} papel(is) restaurado(s) ao estado anterior a {time}.",
-  "integrations.lazycodexRoles.history.partial": "A restauração parou em {role}: {count} de {total} papel(is) voltaram, e os demais mantêm os valores atuais. Corrija o erro acima e restaure novamente.",
-  "integrations.lazycodexRoles.omoCommentsState": "O omo.jsonc tem comentários, então salvar aqui atualiza só os arquivos de papel. Defina [codex].agents no omo.jsonc você mesmo.",
+  "integrations.lazycodexRoles.history.restored":
+    "{count} papel(is) restaurado(s) ao estado anterior a {time}.",
+  "integrations.lazycodexRoles.history.partial":
+    "A restauração parou em {role}: {count} de {total} papel(is) voltaram, e os demais mantêm os valores atuais. Corrija o erro acima e restaure novamente.",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "O omo.jsonc tem comentários, então salvar aqui atualiza só os arquivos de papel. Defina [codex].agents no omo.jsonc você mesmo.",
   "integrations.lazycodexRoles.auto.button": "Atribuir automaticamente",
   "integrations.lazycodexRoles.auto.running": "Dimensionando funções…",
-  "integrations.lazycodexRoles.auto.hint": "Sugere para cada papel o modelo suficiente mais barato e o esforço adequado. Nada muda até você aplicar.",
-  "integrations.lazycodexRoles.auto.failed": "Não foi possível dimensionar as funções de agente do Codex.",
+  "integrations.lazycodexRoles.auto.hint":
+    "Sugere para cada papel o modelo suficiente mais barato e o esforço adequado. Nada muda até você aplicar.",
+  "integrations.lazycodexRoles.auto.failed":
+    "Não foi possível dimensionar as funções de agente do Codex.",
   "integrations.lazycodexRoles.auto.title": "Modelos propostos",
   "integrations.lazycodexRoles.auto.sizedWith": "Dimensionado com {model}",
   "integrations.lazycodexRoles.auto.applyAll": "Aplicar todos",
@@ -2473,15 +2973,24 @@ export const pt: Record<TKey, string> = {
   "integrations.lazycodexRoles.auto.apply": "Aplicar",
   "integrations.lazycodexRoles.auto.moveUp": "Suba de nível se: {text}",
   "integrations.lazycodexRoles.auto.moveDown": "Desça de nível se: {text}",
-  "integrations.semantics.cline": "Gerencia o OpenCodex no providers.json e no models.json do Cline CLI. Pare o Cline antes de alterar ou sincronizar esses arquivos e reinicie depois. Desfazer restaura os dois originais. Seu provedor padrão permanece inalterado; selecione o OpenCodex no Cline.",
-  "integrations.semantics.qoder": "Gerencia os provedores e modelos personalizados do OpenCodex em ~/.qoder/settings.json. Requer acesso por loopback. As demais configurações são preservadas; Desfazer restaura o snapshot.",
-  "integrations.semantics.t3code": "Adiciona uma instância de provedor Claude do opencodex a ~/.t3/userdata/settings.json (T3CODE_HOME a realoca). Os modelos roteados aparecem no seletor de modelos do T3 Code; os threads do Codex só usam o proxy quando a integração do Codex está ativada e o T3 Code usa o mesmo CODEX_HOME. Requer acesso por loopback. As demais configurações são preservadas; Desfazer restaura o snapshot.",
-  "integrations.semantics.commandcode": "Gerencia apenas a entrada do provedor OpenCodex em ~/.commandcode/providers.json. Seus outros provedores e configurações permanecem inalterados.",
-  "integrations.semantics.kilo": "Gerencia apenas provider.opencodex na configuração global do Kilo — o primeiro arquivo existente entre kilo.jsonc, kilo.json, opencode.jsonc, opencode.json ou config.json em ~/.config/kilo (XDG_CONFIG_HOME realoca esse diretório; kilo.jsonc é criado quando nenhum existe). As demais chaves permanecem inalteradas. Aplicar reescreve o arquivo inteiro, então comentários e vírgulas finais não são preservados. Selecione opencodex/<model> no Kilo.",
-  "integrations.semantics.droid": "Adiciona modelos personalizados do OpenCodex ao settings.json do Factory Droid. Desativar remove apenas as linhas gerenciadas; desfazer restaura o arquivo salvo.",
-  "integrations.raycast.proRequired": "Custom Providers é um recurso do Raycast Pro. O arquivo será gravado, mas o Raycast o ignora até que uma assinatura Pro esteja ativa.",
-  "integrations.raycast.planUnknown": "Não foi possível determinar se o Raycast Pro está ativo; Custom Providers requer o Raycast Pro.",
-  "integrations.raycast.revealConfig": "Abra Raycast → Settings → AI e clique uma vez em Reveal Providers Config para que a pasta de provedores exista.",
+  "integrations.semantics.cline":
+    "Gerencia o OpenCodex no providers.json e no models.json do Cline CLI. Pare o Cline antes de alterar ou sincronizar esses arquivos e reinicie depois. Desfazer restaura os dois originais. Seu provedor padrão permanece inalterado; selecione o OpenCodex no Cline.",
+  "integrations.semantics.qoder":
+    "Gerencia os provedores e modelos personalizados do OpenCodex em ~/.qoder/settings.json. Requer acesso por loopback. As demais configurações são preservadas; Desfazer restaura o snapshot.",
+  "integrations.semantics.t3code":
+    "Adiciona uma instância de provedor Claude do opencodex a ~/.t3/userdata/settings.json (T3CODE_HOME a realoca). Os modelos roteados aparecem no seletor de modelos do T3 Code; os threads do Codex só usam o proxy quando a integração do Codex está ativada e o T3 Code usa o mesmo CODEX_HOME. Requer acesso por loopback. As demais configurações são preservadas; Desfazer restaura o snapshot.",
+  "integrations.semantics.commandcode":
+    "Gerencia apenas a entrada do provedor OpenCodex em ~/.commandcode/providers.json. Seus outros provedores e configurações permanecem inalterados.",
+  "integrations.semantics.kilo":
+    "Gerencia apenas provider.opencodex na configuração global do Kilo — o primeiro arquivo existente entre kilo.jsonc, kilo.json, opencode.jsonc, opencode.json ou config.json em ~/.config/kilo (XDG_CONFIG_HOME realoca esse diretório; kilo.jsonc é criado quando nenhum existe). As demais chaves permanecem inalteradas. Aplicar reescreve o arquivo inteiro, então comentários e vírgulas finais não são preservados. Selecione opencodex/<model> no Kilo.",
+  "integrations.semantics.droid":
+    "Adiciona modelos personalizados do OpenCodex ao settings.json do Factory Droid. Desativar remove apenas as linhas gerenciadas; desfazer restaura o arquivo salvo.",
+  "integrations.raycast.proRequired":
+    "Custom Providers é um recurso do Raycast Pro. O arquivo será gravado, mas o Raycast o ignora até que uma assinatura Pro esteja ativa.",
+  "integrations.raycast.planUnknown":
+    "Não foi possível determinar se o Raycast Pro está ativo; Custom Providers requer o Raycast Pro.",
+  "integrations.raycast.revealConfig":
+    "Abra Raycast → Settings → AI e clique uma vez em Reveal Providers Config para que a pasta de provedores exista.",
   "codexAuth.mainAccount": "Conta principal",
   "codexAuth.logLabel": "Rótulo no log",
   "codexAuth.codexApp": "App Codex",
@@ -2491,12 +3000,15 @@ export const pt: Record<TKey, string> = {
   "codexAuth.accountPool": "Pool de contas",
   "codexAuth.accountModeTitle": "Modo de conta OpenAI",
   "codexAuth.accountModePool": "Modo Pool",
-  "codexAuth.accountModePoolDesc": "O login principal e as contas adicionadas elegíveis se alternam aqui.",
+  "codexAuth.accountModePoolDesc":
+    "O login principal e as contas adicionadas elegíveis se alternam aqui.",
   "codexAuth.accountModeDirect": "Modo direto",
-  "codexAuth.accountModeDirectDesc": "As requisições usam apenas o login principal; as contas adicionadas continuam armazenadas para o modo Pool.",
+  "codexAuth.accountModeDirectDesc":
+    "As requisições usam apenas o login principal; as contas adicionadas continuam armazenadas para o modo Pool.",
   "codexAuth.openaiMissing": "O provedor OpenAI integrado não está configurado.",
   "codexAuth.openaiDisabled": "O provedor OpenAI integrado está desativado.",
-  "codexAuth.openaiUnavailableDesc": "Suas contas OpenAI continuam disponíveis. Ative o provedor para rotear as requisições do Codex.",
+  "codexAuth.openaiUnavailableDesc":
+    "Suas contas OpenAI continuam disponíveis. Ative o provedor para rotear as requisições do Codex.",
   "codexAuth.enableOpenai": "Ativar OpenAI",
   "codexAuth.enablingOpenai": "Ativando...",
   "codexAuth.enableOpenaiFailed": "Falha ao ativar o provedor OpenAI.",
@@ -2510,35 +3022,49 @@ export const pt: Record<TKey, string> = {
   "codexAuth.creditsOverage": "Limite de excedente atingido",
   "codexAuth.creditsApprox": "Mensagens aprox.: local {local} · nuvem {cloud}",
   "codexAuth.creditsToggle": "Créditos do Codex",
-  "codexAuth.creditsToggleHint": "Mostra os créditos restantes do Codex nos cartões das contas. Oculto por padrão.",
+  "codexAuth.creditsToggleHint":
+    "Mostra os créditos restantes do Codex nos cartões das contas. Oculto por padrão.",
   "codexAuth.creditsShown": "Créditos do Codex visíveis",
   "codexAuth.creditsHidden": "Créditos do Codex ocultos",
   "codexAuth.creditsToggleFailed": "Não foi possível alterar a configuração de créditos do Codex",
   "codexAuth.refreshQuota": "Atualizar cotas",
   "codexAuth.ultraFastTitle": "Nível de serviço Ultra Fast",
   "codexAuth.mainHardLockTitle": "Bloquear conta principal (5h {short}%, longa {long}%)",
-  "codexAuth.mainHardLockDesc": "Bloqueia em {short}% na janela de 5h ou em {long}% na janela semanal (mensal, para contas apenas mensais). Desbloqueia quando todas as janelas bloqueantes ficam abaixo do limite; a proteção continua ativa. Ativada por padrão.",
-  "codexAuth.mainHardLockConfirmTitle": "Ativar a proteção da conta principal (5h {short}%, longa {long}%)?",
-  "codexAuth.mainHardLockConfirmBody": "Enquanto estiver bloqueada, a conta principal não pode usar a Luna Reserve. Manter o uso normal abaixo do esgotamento pode impedir a ativação da Reserve. As contas adicionadas e os outros provedores continuam disponíveis. Requisições em andamento, credenciais de keyring sem correspondência e tráfego fora deste proxy não são protegidos.",
+  "codexAuth.mainHardLockDesc":
+    "Bloqueia em {short}% na janela de 5h ou em {long}% na janela semanal (mensal, para contas apenas mensais). Desbloqueia quando todas as janelas bloqueantes ficam abaixo do limite; a proteção continua ativa. Ativada por padrão.",
+  "codexAuth.mainHardLockConfirmTitle":
+    "Ativar a proteção da conta principal (5h {short}%, longa {long}%)?",
+  "codexAuth.mainHardLockConfirmBody":
+    "Enquanto estiver bloqueada, a conta principal não pode usar a Luna Reserve. Manter o uso normal abaixo do esgotamento pode impedir a ativação da Reserve. As contas adicionadas e os outros provedores continuam disponíveis. Requisições em andamento, credenciais de keyring sem correspondência e tráfego fora deste proxy não são protegidos.",
   "codexAuth.mainHardLockConfirm": "Ativar proteção",
   "codexAuth.mainHardLockEnabled": "A proteção está ativada (5h {short}%, longa {long}%).",
-  "codexAuth.mainHardLockDisabled": "A proteção da conta principal está desativada. Os limites das outras contas continuam valendo.",
-  "codexAuth.mainHardLockLoadFailed": "Não foi possível carregar esta configuração. Tente de novo para verificar o estado atual.",
-  "codexAuth.mainHardLockSaveFailed": "Não foi possível confirmar o salvamento. Recarregue a configuração antes de tentar de novo.",
-  "codexAuth.mainHardLockRefreshFailed": "Configuração salva, mas não foi possível atualizar o status das contas. Tente novamente.",
-  "codexAuth.mainHardLockBlocked": "Bloqueada pela proteção da conta principal (5h {short}%, longa {long}%)",
+  "codexAuth.mainHardLockDisabled":
+    "A proteção da conta principal está desativada. Os limites das outras contas continuam valendo.",
+  "codexAuth.mainHardLockLoadFailed":
+    "Não foi possível carregar esta configuração. Tente de novo para verificar o estado atual.",
+  "codexAuth.mainHardLockSaveFailed":
+    "Não foi possível confirmar o salvamento. Recarregue a configuração antes de tentar de novo.",
+  "codexAuth.mainHardLockRefreshFailed":
+    "Configuração salva, mas não foi possível atualizar o status das contas. Tente novamente.",
+  "codexAuth.mainHardLockBlocked":
+    "Bloqueada pela proteção da conta principal (5h {short}%, longa {long}%)",
   "codexAuth.mainHardLockUnknown": "Proteção ativa · uso desconhecido",
   "codexAuth.mainHardLockMonitoring": "Proteção ativa · monitorando",
-  "codexAuth.mainExternalUsageWarning": "Possível uso fora do opencodex. O bloqueio pode não impedir o esgotamento.",
+  "codexAuth.mainExternalUsageWarning":
+    "Possível uso fora do opencodex. O bloqueio pode não impedir o esgotamento.",
   "codexAuth.mainHardLockManage": "Ver configuração de proteção",
   "codexAuth.mainHardLockFallbackTitle": "Fallback durante o bloqueio",
-  "codexAuth.mainHardLockFallbackDesc": "Durante o bloqueio, quando nenhuma conta Codex pode atender a uma solicitação, as solicitações a modelos Codex nativos são roteadas para este modelo em vez de falhar. Deixe vazio para recusar como de costume; o bloqueio termina sozinho.",
+  "codexAuth.mainHardLockFallbackDesc":
+    "Durante o bloqueio, quando nenhuma conta Codex pode atender a uma solicitação, as solicitações a modelos Codex nativos são roteadas para este modelo em vez de falhar. Deixe vazio para recusar como de costume; o bloqueio termina sozinho.",
   "codexAuth.mainHardLockFallbackModel": "Modelo de fallback",
   "codexAuth.mainHardLockFallbackEffort": "Esforço de raciocínio",
   "codexAuth.mainHardLockFallbackDefaultEffort": "Manter esforço da solicitação",
-  "codexAuth.mainHardLockFallbackActive": "Bloqueando agora — solicitações Codex nativas são roteadas para {model}.",
-  "codexAuth.mainHardLockFallbackSaveFailed": "Não foi possível confirmar o salvamento do fallback. Recarregue a configuração antes de tentar de novo.",
-  "codexAuth.ultraFastDesc": "Adiciona a opção de velocidade Ultrafast ao GPT-6 Astra e ao GPT-6.1 Sol no seletor de modelos do Codex e impede que um nível de serviço ultrafast configurado por você em modelos roteados seja removido quando o catálogo é regenerado. O Ultrafast exige um plano do ChatGPT elegível; ative apenas se o seu plano o incluir.",
+  "codexAuth.mainHardLockFallbackActive":
+    "Bloqueando agora — solicitações Codex nativas são roteadas para {model}.",
+  "codexAuth.mainHardLockFallbackSaveFailed":
+    "Não foi possível confirmar o salvamento do fallback. Recarregue a configuração antes de tentar de novo.",
+  "codexAuth.ultraFastDesc":
+    "Adiciona a opção de velocidade Ultrafast ao GPT-6 Astra e ao GPT-6.1 Sol no seletor de modelos do Codex e impede que um nível de serviço ultrafast configurado por você em modelos roteados seja removido quando o catálogo é regenerado. O Ultrafast exige um plano do ChatGPT elegível; ative apenas se o seu plano o incluir.",
   "codexAuth.ultraFastLoadFailed": "Não foi possível ler a configuração do Ultra Fast.",
   "codexAuth.ultraFastEnabled": "Nível Ultra Fast ativado",
   "codexAuth.ultraFastDisabled": "Nível Ultra Fast desativado",
@@ -2556,7 +3082,8 @@ export const pt: Record<TKey, string> = {
   "codexAuth.resume": "Retomar",
   "codexAuth.paused": "PAUSADA",
   "codexAuth.planExcluded": "Não selecionada automaticamente",
-  "codexAuth.planExcludedHint": "O plano {plan} está excluído da seleção automática. As rotas explícitas por conta continuam disponíveis.",
+  "codexAuth.planExcludedHint":
+    "O plano {plan} está excluído da seleção automática. As rotas explícitas por conta continuam disponíveis.",
   "codexAuth.pauseSucceeded": "{email} está pausada",
   "codexAuth.resumeSucceeded": "{email} voltou a ficar disponível para o pool",
   "codexAuth.pauseFailed": "Não foi possível pausar {email}. Nada foi alterado.",
@@ -2567,34 +3094,49 @@ export const pt: Record<TKey, string> = {
   "accountPause.reason.subscriptionInactive": "Assinatura inativa",
   "accountPause.reason.subscriptionExpired": "Assinatura expirada",
   "accountPause.reason.planDowngraded": "Plano rebaixado",
-  "prov.keyResumedSwitchFailed": "A chave foi retomada, mas a ativação falhou. A chave está disponível para seleção automática. Tente selecioná-la novamente.",
-  "codexAuth.pausedHint": "Excluída da troca automática, das novas tentativas, da recuperação de cooldown e da seleção manual até ser retomada.",
+  "prov.keyResumedSwitchFailed":
+    "A chave foi retomada, mas a ativação falhou. A chave está disponível para seleção automática. Tente selecioná-la novamente.",
+  "codexAuth.pausedHint":
+    "Excluída da troca automática, das novas tentativas, da recuperação de cooldown e da seleção manual até ser retomada.",
   "codexAuth.creditsAfterLimit": "Usar créditos após o limite",
-  "codexAuth.creditsAfterLimitHint": "Desativado por padrão: uma conta cuja janela de uso chega a 100% é retirada de uso até a janela reiniciar, para que seus créditos do ChatGPT não sejam gastos. Ative em uma conta para que ela continue trabalhando com seus créditos. Contas novas começam desativadas.",
+  "codexAuth.creditsAfterLimitHint":
+    "Desativado por padrão: uma conta cuja janela de uso chega a 100% é retirada de uso até a janela reiniciar, para que seus créditos do ChatGPT não sejam gastos. Ative em uma conta para que ela continue trabalhando com seus créditos. Contas novas começam desativadas.",
   "codexAuth.creditsAfterLimitAria": "Usar créditos após o limite de uso para {email}",
-  "codexAuth.creditsAfterLimitMainHint": "O bloqueio rígido da conta principal (ativado por padrão) ainda a interrompe primeiro. Desative o bloqueio para que a conta principal gaste créditos.",
+  "codexAuth.creditsAfterLimitMainHint":
+    "O bloqueio rígido da conta principal (ativado por padrão) ainda a interrompe primeiro. Desative o bloqueio para que a conta principal gaste créditos.",
   "codexAuth.creditSpend": "Usar créditos",
   "codexAuth.creditSpendAria": "Usar créditos do ChatGPT após o limite de uso",
   "codexAuth.creditsOn": "Usa créditos",
   "codexAuth.creditsOnSucceeded": "{email} pode usar créditos após o limite de uso.",
-  "codexAuth.creditsOffSucceeded": "{email} será retirada de uso ao atingir o limite, e seus créditos serão preservados.",
-  "codexAuth.creditsUpdateFailed": "Não foi possível atualizar a configuração de créditos de {email}. Nada foi alterado.",
-  "codexAuth.creditsAllOnSucceeded": "Agora todas as contas podem usar créditos após o limite de uso.",
-  "codexAuth.creditsAllOffSucceeded": "Nenhuma conta gastará créditos. As contas são retiradas de uso ao chegar a 100%.",
-  "codexAuth.creditsAllUpdateFailed": "Não foi possível atualizar a configuração de créditos. Nada foi alterado.",
+  "codexAuth.creditsOffSucceeded":
+    "{email} será retirada de uso ao atingir o limite, e seus créditos serão preservados.",
+  "codexAuth.creditsUpdateFailed":
+    "Não foi possível atualizar a configuração de créditos de {email}. Nada foi alterado.",
+  "codexAuth.creditsAllOnSucceeded":
+    "Agora todas as contas podem usar créditos após o limite de uso.",
+  "codexAuth.creditsAllOffSucceeded":
+    "Nenhuma conta gastará créditos. As contas são retiradas de uso ao chegar a 100%.",
+  "codexAuth.creditsAllUpdateFailed":
+    "Não foi possível atualizar a configuração de créditos. Nada foi alterado.",
   "codexAuth.pinned": "FIXADA",
-  "codexAuth.pinnedHint": "Você selecionou esta conta manualmente, então uma ordem de seleção mais alta não passará por cima dela. A fixação dura até esta conta ser esgotada, você selecionar outra ou alterar qualquer ordem de seleção.",
-  "codexAuth.unpinHint": "Selecione-a novamente para remover a fixação e voltar à seleção automática.",
+  "codexAuth.pinnedHint":
+    "Você selecionou esta conta manualmente, então uma ordem de seleção mais alta não passará por cima dela. A fixação dura até esta conta ser esgotada, você selecionar outra ou alterar qualquer ordem de seleção.",
+  "codexAuth.unpinHint":
+    "Selecione-a novamente para remover a fixação e voltar à seleção automática.",
   "codexAuth.unpinTitle": "Remover a fixação?",
-  "codexAuth.unpinDesc": "Vale imediatamente. As threads com afinidade de conta e as requisições em andamento mantêm a conta capturada; as requisições novas ou sem vínculo escolhem automaticamente uma conta pela ordem de seleção e pelos limites.",
+  "codexAuth.unpinDesc":
+    "Vale imediatamente. As threads com afinidade de conta e as requisições em andamento mantêm a conta capturada; as requisições novas ou sem vínculo escolhem automaticamente uma conta pela ordem de seleção e pelos limites.",
   "codexAuth.unpinAction": "Remover fixação",
   "codexAuth.unpinned": "Fixação removida — a seleção automática voltou",
-  "codexAuth.unpinFailed": "Não foi possível confirmar a liberação da fixação. Atualize as contas e verifique a seleção atual antes de tentar novamente.",
-  "codexAuth.unpinChanged": "A conta fixada mudou enquanto esta confirmação estava aberta. Atualize as contas e confira a seleção atual antes de liberar uma fixação.",
+  "codexAuth.unpinFailed":
+    "Não foi possível confirmar a liberação da fixação. Atualize as contas e verifique a seleção atual antes de tentar novamente.",
+  "codexAuth.unpinChanged":
+    "A conta fixada mudou enquanto esta confirmação estava aberta. Atualize as contas e confira a seleção atual antes de liberar uma fixação.",
   "codexAuth.fiveHour": "5h",
   "codexAuth.weekly": "Semana",
   "codexAuth.quotaAutoRefresh": "Ativação automática da janela",
-  "codexAuth.quotaAutoRefreshHint": "Envia uma requisição mínima de aquecimento do Codex, sem armazenamento, quando esta janela de cota é reiniciada.",
+  "codexAuth.quotaAutoRefreshHint":
+    "Envia uma requisição mínima de aquecimento do Codex, sem armazenamento, quando esta janela de cota é reiniciada.",
   "codexAuth.quotaAutoRefreshUpdated": "Ativação automática da janela atualizada.",
   "codexAuth.quotaAutoRefreshFailed": "Não foi possível atualizar a ativação automática da janela.",
   "codexAuth.monthly": "30d",
@@ -2604,24 +3146,35 @@ export const pt: Record<TKey, string> = {
   "codexAuth.nextSession": "SELECIONADA",
   "codexAuth.poolPrepared": "PREPARADA PARA O POOL",
   "codexAuth.preparePoolTitle": "Preparar esta conta para o modo Pool?",
-  "codexAuth.preparePoolDesc": "As requisições diretas continuam usando o login principal. Esta conta passa a ser a seleção preparada do Pool quando o modo Pool for ativado.",
+  "codexAuth.preparePoolDesc":
+    "As requisições diretas continuam usando o login principal. Esta conta passa a ser a seleção preparada do Pool quando o modo Pool for ativado.",
   "codexAuth.prepareForPool": "Preparar para o Pool",
   "codexAuth.poolPreparedToast": "{email} está preparada para o modo Pool",
   "codexAuth.switchTitle": "Trocar a conta ativa?",
-  "codexAuth.switchDesc": "Vale imediatamente. As threads com afinidade de conta e as requisições já em andamento mantêm a conta capturada; as requisições novas ou sem vínculo usam a faixa de ordem da conta selecionada, e as contas com a mesma ordem de seleção continuam se revezando.",
-  "codexAuth.cacheWarning": "O cache de prompt é reiniciado ao trocar de conta. A nova sessão começa com o cache vazio.",
-  "codexAuth.switchExceedsThresholdWarning": "O uso desta conta atinge ou excede o limite de troca ({threshold}%). A seleção fixada será liberada se não houver folga de cota.",
+  "codexAuth.switchDesc":
+    "Vale imediatamente. As threads com afinidade de conta e as requisições já em andamento mantêm a conta capturada; as requisições novas ou sem vínculo usam a faixa de ordem da conta selecionada, e as contas com a mesma ordem de seleção continuam se revezando.",
+  "codexAuth.cacheWarning":
+    "O cache de prompt é reiniciado ao trocar de conta. A nova sessão começa com o cache vazio.",
+  "codexAuth.switchExceedsThresholdWarning":
+    "O uso desta conta atinge ou excede o limite de troca ({threshold}%). A seleção fixada será liberada se não houver folga de cota.",
   "codexAuth.setAsNext": "Usar esta conta em seguida",
   "codexAuth.cancel": "Cancelar",
   "codexAuth.switchBack": "Voltar para a conta principal?",
-  "codexAuth.switchBackDesc": "Vale imediatamente. As threads com afinidade de conta e as requisições já em andamento mantêm a conta capturada; as requisições novas ou sem vínculo usam a faixa de ordem da conta do login do app, e as contas com a mesma ordem de seleção continuam se revezando.",
+  "codexAuth.switchBackDesc":
+    "Vale imediatamente. As threads com afinidade de conta e as requisições já em andamento mantêm a conta capturada; as requisições novas ou sem vínculo usam a faixa de ordem da conta do login do app, e as contas com a mesma ordem de seleção continuam se revezando.",
   "codexAuth.autoSwitch": "Troca proativa por uso",
-  "codexAuth.autoSwitchQuotaDesc": "Cota: com {threshold}% de uso ou mais, a próxima requisição sem vínculo pode ir para uma conta elegível de menor uso. As tarefas vinculadas mantêm a afinidade por padrão e só mudam quando a conta não consegue atender, e apenas para uma conta com folga real de cota; Go/Free usam somente 30d.",
-  "codexAuth.autoSwitchQuotaOffDesc": "A troca proativa por uso está desativada. A atribuição de tarefas novas/sem vínculo e a recuperação de falhas continuam valendo.",
-  "codexAuth.autoSwitchRoundRobinDesc": "A atribuição round-robin não usa este limite; continua alternando as tarefas novas/sem vínculo.",
-  "codexAuth.autoSwitchFillFirstDesc": "Fill-first: {threshold}% é o ponto de esgotamento para tarefas novas/sem vínculo; as tarefas vinculadas saudáveis mantêm a conta.",
-  "codexAuth.autoSwitchFillFirstOffDesc": "O fill-first não tem ponto de esgotamento por uso para tarefas novas/sem vínculo; cooldown, reautenticação e recuperação de falhas ainda podem mudar o roteamento.",
-  "codexAuth.failureRecoveryNote": "A recuperação de falhas é separada: uma requisição rejeitada antes de qualquer saída com 429/402, cooldown, reautenticação, exclusão ou failover transitório configurado pode selecionar outra conta elegível.",
+  "codexAuth.autoSwitchQuotaDesc":
+    "Cota: com {threshold}% de uso ou mais, a próxima requisição sem vínculo pode ir para uma conta elegível de menor uso. As tarefas vinculadas mantêm a afinidade por padrão e só mudam quando a conta não consegue atender, e apenas para uma conta com folga real de cota; Go/Free usam somente 30d.",
+  "codexAuth.autoSwitchQuotaOffDesc":
+    "A troca proativa por uso está desativada. A atribuição de tarefas novas/sem vínculo e a recuperação de falhas continuam valendo.",
+  "codexAuth.autoSwitchRoundRobinDesc":
+    "A atribuição round-robin não usa este limite; continua alternando as tarefas novas/sem vínculo.",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "Fill-first: {threshold}% é o ponto de esgotamento para tarefas novas/sem vínculo; as tarefas vinculadas saudáveis mantêm a conta.",
+  "codexAuth.autoSwitchFillFirstOffDesc":
+    "O fill-first não tem ponto de esgotamento por uso para tarefas novas/sem vínculo; cooldown, reautenticação e recuperação de falhas ainda podem mudar o roteamento.",
+  "codexAuth.failureRecoveryNote":
+    "A recuperação de falhas é separada: uma requisição rejeitada antes de qualquer saída com 429/402, cooldown, reautenticação, exclusão ou failover transitório configurado pode selecionar outra conta elegível.",
   "codexAuth.autoSwitchThreshold": "Limite de uso",
   "codexAuth.autoSwitchThresholdAria": "Limite de uso, em porcentagem",
   "codexAuth.autoSwitchThresholdInc": "Aumentar o limite de uso",
@@ -2629,46 +3182,72 @@ export const pt: Record<TKey, string> = {
   "codexAuth.autoSwitchLoadFailed": "Não foi possível carregar a configuração de troca por uso.",
   "codexAuth.autoSwitchThresholdInvalid": "Digite um número inteiro de 1 a 100",
   "codexAuth.autoSwitchUpdated": "Troca proativa por uso atualizada",
-  "codexAuth.autoSwitchUpdateFailed": "Não foi possível confirmar a atualização da troca por uso. O último valor confirmado é exibido.",
+  "codexAuth.autoSwitchUpdateFailed":
+    "Não foi possível confirmar a atualização da troca por uso. O último valor confirmado é exibido.",
   "codexAuth.requestUserInput": "Pedir entrada no modo Default",
-  "codexAuth.requestUserInputDesc": "Permite que o Codex pause uma sessão no modo Default e faça perguntas a você com a ferramenta request_user_input.",
+  "codexAuth.requestUserInputDesc":
+    "Permite que o Codex pause uma sessão no modo Default e faça perguntas a você com a ferramenta request_user_input.",
   "codexAuth.requestUserInputUpdated": "Feature flag atualizada - vale para novas sessões.",
-  "codexAuth.requestUserInputUpdatedRestart": "Feature flag atualizada - vale para novas sessões. Reinicie o app Codex para aplicá-la.",
-  "codexAuth.requestUserInputUpdateFailed": "Não foi possível atualizar a feature flag. Nada foi alterado.",
+  "codexAuth.requestUserInputUpdatedRestart":
+    "Feature flag atualizada - vale para novas sessões. Reinicie o app Codex para aplicá-la.",
+  "codexAuth.requestUserInputUpdateFailed":
+    "Não foi possível atualizar a feature flag. Nada foi alterado.",
   "codexAuth.requestUserInputLoadFailed": "Não foi possível ler a feature flag do config.toml.",
-  "codexAuth.accountPickerTitle": "Direcionar uma conta específica do Codex pelo seletor de modelos",
-  "codexAuth.accountPickerOffDesc": "Quando ativado, as linhas comuns de GPT no seletor são substituídas por uma entrada por seletor de conta, para que você escolha a conta exata de uma conversa sem precisar sair da sessão. Desativar não remove nenhuma conta.",
-  "codexAuth.accountPickerOnDesc": "Cada seletor é um rótulo público de uma conta armazenada. Escolhê-lo trava a conversa na conta mapeada: ela nunca alterna nem recorre a outra, e não muda a conta ativa do Pool.",
-  "codexAuth.accountPickerCompatibility": "O login integrado do app Codex tem seu próprio seletor; os mapas gerados normalmente o chamam de main e usam um sufixo à prova de colisão, como main-2, quando necessário. As contas adicionadas recebem rótulos estáveis que preservam a privacidade, enquanto os rótulos personalizados de seletor permanecem inalterados. As conversas existentes e as seleções de modelo salvas continuam roteando. Desativar oculta as entradas geradas, mas preserva os seletores e as rotas exatas. Os IDs simples de modelos GPT mantêm o comportamento de Pool ou Direct.",
+  "codexAuth.accountPickerTitle":
+    "Direcionar uma conta específica do Codex pelo seletor de modelos",
+  "codexAuth.accountPickerOffDesc":
+    "Quando ativado, as linhas comuns de GPT no seletor são substituídas por uma entrada por seletor de conta, para que você escolha a conta exata de uma conversa sem precisar sair da sessão. Desativar não remove nenhuma conta.",
+  "codexAuth.accountPickerOnDesc":
+    "Cada seletor é um rótulo público de uma conta armazenada. Escolhê-lo trava a conversa na conta mapeada: ela nunca alterna nem recorre a outra, e não muda a conta ativa do Pool.",
+  "codexAuth.accountPickerCompatibility":
+    "O login integrado do app Codex tem seu próprio seletor; os mapas gerados normalmente o chamam de main e usam um sufixo à prova de colisão, como main-2, quando necessário. As contas adicionadas recebem rótulos estáveis que preservam a privacidade, enquanto os rótulos personalizados de seletor permanecem inalterados. As conversas existentes e as seleções de modelo salvas continuam roteando. Desativar oculta as entradas geradas, mas preserva os seletores e as rotas exatas. Os IDs simples de modelos GPT mantêm o comportamento de Pool ou Direct.",
   "codexAuth.accountPickerUpdated": "Direcionamento de conta atualizado.",
-  "codexAuth.accountPickerUpdateFailed": "Não foi possível atualizar o direcionamento de conta. A última configuração confirmada é exibida.",
-  "codexAuth.accountPickerLoadFailed": "Não foi possível carregar a configuração de direcionamento de conta.",
-  "codexAuth.accountPickerRefreshFailed": "Não foi possível atualizar esta configuração. O último valor confirmado continua sendo exibido.",
+  "codexAuth.accountPickerUpdateFailed":
+    "Não foi possível atualizar o direcionamento de conta. A última configuração confirmada é exibida.",
+  "codexAuth.accountPickerLoadFailed":
+    "Não foi possível carregar a configuração de direcionamento de conta.",
+  "codexAuth.accountPickerRefreshFailed":
+    "Não foi possível atualizar esta configuração. O último valor confirmado continua sendo exibido.",
   "codexAuth.advancedSettings": "Configurações avançadas",
   "codexAuth.advancedSettingsAria": "Mostrar ou ocultar as configurações avançadas do Codex Auth",
-  "codexAuth.catalogRefreshPending": "A alteração foi salva, mas a atualização do catálogo de modelos do Codex está pendente. Execute ocx sync para tentar de novo.",
+  "codexAuth.catalogRefreshPending":
+    "A alteração foi salva, mas a atualização do catálogo de modelos do Codex está pendente. Execute ocx sync para tentar de novo.",
   "anthropicPool.title": "Pool de contas Claude (experimental)",
-  "anthropicPool.enabledDesc": "Sessões fixas, e as novas sessões preferem contas com uso abaixo de {threshold}% ({window}).",
-  "anthropicPool.enabledNoProactiveDesc": "Os limites de uso não movem uma sessão saudável existente nem uma conta ativa saudável. Quando a conta ativa fica indisponível, e durante a recuperação de recusa, é escolhida a conta com menor uso ({window}).",
-  "anthropicPool.enabledFillFirstDesc": "Sessões fixas. As novas sessões permanecem na conta ativa até ela atingir {threshold}% ({window}), entrar em cooldown ou precisar de novo login; depois passam para a próxima conta, em ordem. A recuperação de recusa também usa a próxima conta, em ordem.",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "Sessões fixas. As novas sessões permanecem na conta ativa até ela entrar em cooldown ou precisar de novo login; depois passam para a próxima conta, em ordem. A recuperação de recusa também usa a próxima conta, em ordem.",
-  "anthropicPool.enabledRoundRobinDesc": "Sessões fixas. As novas sessões e a recuperação de recusa se revezam entre as contas elegíveis; uso, limite e janela de cota não são considerados.",
-  "anthropicPool.disabledDesc": "A seleção proativa de contas está desativada. O OpenCodex usa a conta selecionada e ainda pode trocar após uma resposta de limite de taxa (429) ou uma recusa de conta classificada, quando houver outra conta elegível conectada.",
-  "anthropicPool.experimentalWarning": "Use apenas assinaturas que você possua ou esteja autorizado a usar. O pooling automatizado de contas não é endossado pela Anthropic e continua experimental. Use o cliente Claude Code genuíno com uma pessoa supervisionando a sessão e verifique os termos vigentes da Anthropic. As contas podem compartilhar a cota de uma organização, então adicionar uma conta pode não aumentar a capacidade.",
+  "anthropicPool.enabledDesc":
+    "Sessões fixas, e as novas sessões preferem contas com uso abaixo de {threshold}% ({window}).",
+  "anthropicPool.enabledNoProactiveDesc":
+    "Os limites de uso não movem uma sessão saudável existente nem uma conta ativa saudável. Quando a conta ativa fica indisponível, e durante a recuperação de recusa, é escolhida a conta com menor uso ({window}).",
+  "anthropicPool.enabledFillFirstDesc":
+    "Sessões fixas. As novas sessões permanecem na conta ativa até ela atingir {threshold}% ({window}), entrar em cooldown ou precisar de novo login; depois passam para a próxima conta, em ordem. A recuperação de recusa também usa a próxima conta, em ordem.",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "Sessões fixas. As novas sessões permanecem na conta ativa até ela entrar em cooldown ou precisar de novo login; depois passam para a próxima conta, em ordem. A recuperação de recusa também usa a próxima conta, em ordem.",
+  "anthropicPool.enabledRoundRobinDesc":
+    "Sessões fixas. As novas sessões e a recuperação de recusa se revezam entre as contas elegíveis; uso, limite e janela de cota não são considerados.",
+  "anthropicPool.disabledDesc":
+    "A seleção proativa de contas está desativada. O OpenCodex usa a conta selecionada e ainda pode trocar após uma resposta de limite de taxa (429) ou uma recusa de conta classificada, quando houver outra conta elegível conectada.",
+  "anthropicPool.experimentalWarning":
+    "Use apenas assinaturas que você possua ou esteja autorizado a usar. O pooling automatizado de contas não é endossado pela Anthropic e continua experimental. Use o cliente Claude Code genuíno com uma pessoa supervisionando a sessão e verifique os termos vigentes da Anthropic. As contas podem compartilhar a cota de uma organização, então adicionar uma conta pode não aumentar a capacidade.",
   "anthropicPool.detailsSummary": "Como funciona a seleção de contas",
-  "anthropicPool.detailsEnabling": "Ativar o pool mantém cada sessão em sua conta enquanto ela estiver saudável e permite que a estratégia selecionada escolha as contas das novas sessões e após uma recusa.",
-  "anthropicPool.detailsFailover": "Desativá-lo não desativa o failover: após um 429 ou uma recusa de conta classificada, uma requisição ainda pode passar para outra conta conectada. Pause uma conta para mantê-la fora do failover.",
-  "anthropicPool.detailsActivity": "O OpenCodex não envia requisições keep-warm. Por padrão, não renova tokens do Claude nem consulta o uso em segundo plano; o uso só é lido quando o painel, o app da barra de menus ou um comando ocx o solicita.",
+  "anthropicPool.detailsEnabling":
+    "Ativar o pool mantém cada sessão em sua conta enquanto ela estiver saudável e permite que a estratégia selecionada escolha as contas das novas sessões e após uma recusa.",
+  "anthropicPool.detailsFailover":
+    "Desativá-lo não desativa o failover: após um 429 ou uma recusa de conta classificada, uma requisição ainda pode passar para outra conta conectada. Pause uma conta para mantê-la fora do failover.",
+  "anthropicPool.detailsActivity":
+    "O OpenCodex não envia requisições keep-warm. Por padrão, não renova tokens do Claude nem consulta o uso em segundo plano; o uso só é lido quando o painel, o app da barra de menus ou um comando ocx o solicita.",
   "anthropicPool.nativeMessagesLabel": `Preservar solicitações nativas do Claude`,
   "anthropicPool.nativeMessagesHelp": `Com o pool ativado, mantém o histórico do Claude Code e os marcadores de cache no caminho nativo de Messages quando a rota selecionada oferece suporte. Outras rotas ainda podem traduzir solicitações. A troca de conta pode iniciar um cache frio; acertos de cache não são garantidos e as contas não compartilham cache. As desativações explícitas de rollout continuam valendo.`,
-  "anthropicPool.saveWarning": "As configurações foram salvas, mas o processamento posterior da configuração falhou. Recarregue as configurações para confirmar o estado atual.",
-  "anthropicPool.saveStateUnknown": "Não foi possível confirmar as configurações salvas. Recarregue-as antes de fazer outra alteração.",
+  "anthropicPool.saveWarning":
+    "As configurações foram salvas, mas o processamento posterior da configuração falhou. Recarregue as configurações para confirmar o estado atual.",
+  "anthropicPool.saveStateUnknown":
+    "Não foi possível confirmar as configurações salvas. Recarregue-as antes de fazer outra alteração.",
   "anthropicPool.reloadSettings": "Recarregar configurações",
   "anthropicPool.detailsGuide": "Guia do pool de contas",
-  "anthropicPool.needTwoAccounts": "Adicione pelo menos duas contas Claude OAuth antes de ativar o pool.",
+  "anthropicPool.needTwoAccounts":
+    "Adicione pelo menos duas contas Claude OAuth antes de ativar o pool.",
   "anthropicPool.threshold": "Limite de uso para novas sessões",
   "anthropicPool.thresholdAria": "Limite de uso para novas sessões, em porcentagem",
-  "anthropicPool.thresholdHelp": "É uma preferência para a seleção de contas, não um limite rígido de uso ou de cobrança. 0 desativa a troca proativa por este limite. Padrão: 80%.",
+  "anthropicPool.thresholdHelp":
+    "É uma preferência para a seleção de contas, não um limite rígido de uso ou de cobrança. 0 desativa a troca proativa por este limite. Padrão: 80%.",
   "anthropicPool.thresholdInvalid": "Digite um número inteiro de 0 a 100",
   "anthropicPool.loadFailed": "Não foi possível carregar as configurações do pool Claude.",
   "anthropicPool.saveFailed": "Não foi possível salvar as configurações do pool Claude.",
@@ -2677,19 +3256,25 @@ export const pt: Record<TKey, string> = {
   "accountPool.strategy": "Estratégia de rotação",
   "accountPool.strategyDesc": "Como o OpenCodex atribui uma conta a uma tarefa nova/sem vínculo.",
   "accountPool.strategyResetFirst": "Reinício mais próximo primeiro",
-  "accountPool.strategyHintResetFirst": "Prefere o reinício de 5 horas ou semanal futuro mais próximo entre as contas abaixo do limite de uso. As tarefas vinculadas seguem a política de afinidade configurada. Cotas independentes por modelo usam a ordenação por cota.",
+  "accountPool.strategyHintResetFirst":
+    "Prefere o reinício de 5 horas ou semanal futuro mais próximo entre as contas abaixo do limite de uso. As tarefas vinculadas seguem a política de afinidade configurada. Cotas independentes por modelo usam a ordenação por cota.",
   "accountPool.strategyQuota": "Cota",
   "accountPool.strategyRoundRobin": "Round-robin",
   "accountPool.strategyFillFirst": "Fill-first",
-  "accountPool.strategyHintQuota": "A cota revincula uma tarefa existente no limite de uso apenas quando `pool.cacheAffinity` está desativado (por padrão, ele vem ativado). Caso contrário, as tarefas vinculadas permanecem até a conta não conseguir atender, e então só vão para uma conta com folga real de cota.",
-  "accountPool.strategyHintRoundRobin": "O round-robin alterna apenas as tarefas sem vínculo ativo; o limite de uso não altera a rotação normal.",
-  "accountPool.strategyHintFillFirst": "O fill-first usa o limite como ponto de esgotamento para tarefas sem vínculo; as tarefas vinculadas saudáveis mantêm a afinidade.",
-  "accountPool.unboundDefinition": "Tarefa nova/sem vínculo é uma requisição sem vínculo atual com uma conta; uma tarefa visível existente pode ficar sem vínculo após um reset do proxy ou da afinidade.",
+  "accountPool.strategyHintQuota":
+    "A cota revincula uma tarefa existente no limite de uso apenas quando `pool.cacheAffinity` está desativado (por padrão, ele vem ativado). Caso contrário, as tarefas vinculadas permanecem até a conta não conseguir atender, e então só vão para uma conta com folga real de cota.",
+  "accountPool.strategyHintRoundRobin":
+    "O round-robin alterna apenas as tarefas sem vínculo ativo; o limite de uso não altera a rotação normal.",
+  "accountPool.strategyHintFillFirst":
+    "O fill-first usa o limite como ponto de esgotamento para tarefas sem vínculo; as tarefas vinculadas saudáveis mantêm a afinidade.",
+  "accountPool.unboundDefinition":
+    "Tarefa nova/sem vínculo é uma requisição sem vínculo atual com uma conta; uma tarefa visível existente pode ficar sem vínculo após um reset do proxy ou da afinidade.",
   "accountPool.stickyLimit": "Atribuições novas/sem vínculo antes de alternar",
   "accountPool.stickyLimitAria": "Atribuições novas/sem vínculo antes de alternar",
   "accountPool.stickyLimitInc": "Aumentar o limite de fixação",
   "accountPool.stickyLimitDec": "Diminuir o limite de fixação",
-  "accountPool.stickyLimitHelp": "Mantém a conta selecionada por esta quantidade de atribuições de tarefas novas/sem vínculo antes de avançar; o contador aumenta quando a tarefa é vinculada, não após o sucesso no upstream.",
+  "accountPool.stickyLimitHelp":
+    "Mantém a conta selecionada por esta quantidade de atribuições de tarefas novas/sem vínculo antes de avançar; o contador aumenta quando a tarefa é vinculada, não após o sucesso no upstream.",
   "accountPool.stickyLimitInvalid": "Digite um número inteiro de 1 a 100",
   "accountPool.strategyLoadFailed": "Não foi possível carregar a estratégia de rotação.",
   "accountPool.strategyUpdateFailed": "Não foi possível salvar a estratégia de rotação.",
@@ -2699,15 +3284,19 @@ export const pt: Record<TKey, string> = {
   "accountPool.thresholdNotUsed": "limite não utilizado",
   "accountPool.proactiveSwitchingOff": "troca proativa desativada",
   "accountPool.quotaWindow": "Janela de cota",
-  "accountPool.quotaWindowDesc": "Qual barra de uso em cache controla a seleção de novas sessões baseada em cota, as verificações de limite do fill-first e as substituições elegíveis por 429.",
+  "accountPool.quotaWindowDesc":
+    "Qual barra de uso em cache controla a seleção de novas sessões baseada em cota, as verificações de limite do fill-first e as substituições elegíveis por 429.",
   "accountPool.quotaWindowFiveHour": "Barra de 5 horas",
   "accountPool.quotaWindowWeekly": "Barra semanal",
   "accountPool.quotaWindowMaxUtilization": "Barra mais alta",
-  "accountPool.quotaWindowHint": "A semanal ignora as contas cuja barra de 5 horas está esgotada enquanto houver outra conta elegível, mas recorre a elas quando não houver. Empates na semanal preferem o menor uso de 5 horas; as barras semanais por conta só são conhecidas depois que a página Provedores as consultar.",
-  "accountPool.quotaWindowInert": "Só a cota — ou o fill-first com limite acima de 0 — pontua uma barra de uso, então esta configuração não muda nada na estratégia de rotação atual.",
+  "accountPool.quotaWindowHint":
+    "A semanal ignora as contas cuja barra de 5 horas está esgotada enquanto houver outra conta elegível, mas recorre a elas quando não houver. Empates na semanal preferem o menor uso de 5 horas; as barras semanais por conta só são conhecidas depois que a página Provedores as consultar.",
+  "accountPool.quotaWindowInert":
+    "Só a cota — ou o fill-first com limite acima de 0 — pontua uma barra de uso, então esta configuração não muda nada na estratégia de rotação atual.",
   "accountPool.priority": "Ordem de seleção",
   "accountPool.priorityAria": "Ordem de seleção desta conta",
-  "accountPool.priorityHint": "Números maiores são usados primeiro. O pool passa para um número menor apenas quando todas as contas acima dele estiverem esgotadas ou indisponíveis.",
+  "accountPool.priorityHint":
+    "Números maiores são usados primeiro. O pool passa para um número menor apenas quando todas as contas acima dele estiverem esgotadas ou indisponíveis.",
   "accountPool.priorityFirst": "Primeira",
   "accountPool.priorityEarlier": "Antes",
   "accountPool.priorityNormal": "Normal",
@@ -2716,16 +3305,20 @@ export const pt: Record<TKey, string> = {
   "accountPool.priorityOption": "{name} ({value})",
   "accountPool.priorityCustom": "Personalizada",
   "accountPool.priorityUpdated": "Ordem de seleção atualizada para {email}",
-  "accountPool.priorityUpdateFailed": "Não foi possível salvar a ordem de seleção de {email}. O último valor confirmado é exibido.",
+  "accountPool.priorityUpdateFailed":
+    "Não foi possível salvar a ordem de seleção de {email}. O último valor confirmado é exibido.",
   "accountPool.autoSwitchThreshold": "Limite personalizado da conta",
   "accountPool.autoSwitchThresholdAria": "Limite de uso de {email}",
   "accountPool.autoSwitchOverrideAria": "Substituir o limite de uso global de {email}",
-  "accountPool.autoSwitchHint": "Substitui o limite global desta conta. 0 desativa a troca proativa por uso a partir desta conta.",
+  "accountPool.autoSwitchHint":
+    "Substitui o limite global desta conta. 0 desativa a troca proativa por uso a partir desta conta.",
   "accountPool.autoSwitchUpdated": "Limite de uso atualizado para {email}",
-  "accountPool.autoSwitchUpdateFailed": "Não foi possível salvar o limite de uso de {email}. O último valor confirmado é exibido.",
+  "accountPool.autoSwitchUpdateFailed":
+    "Não foi possível salvar o limite de uso de {email}. O último valor confirmado é exibido.",
   "codexAuth.switched": "{email} está selecionada para a próxima requisição",
   "codexAuth.loadFailed": "Não foi possível carregar as configurações da conta Codex.",
-  "codexAuth.accountsRefreshFailed": "A última atualização das contas falhou. As contas abaixo são as últimas confirmadas.",
+  "codexAuth.accountsRefreshFailed":
+    "A última atualização das contas falhou. As contas abaixo são as últimas confirmadas.",
   "codexAuth.switchFailed": "Não foi possível trocar de conta. Sua seleção anterior foi mantida.",
   "codexAuth.removeConfirm": "Remover {id}?",
   "codexAuth.removeFailed": "Não foi possível remover a conta. Nada foi alterado.",
@@ -2744,7 +3337,8 @@ export const pt: Record<TKey, string> = {
   "codexAuth.oauthLogin": "Login OAuth",
   "codexAuth.oauthDesc": "Abre o login do ChatGPT no navegador",
   "codexAuth.deviceLogin": "Login por código de dispositivo",
-  "codexAuth.deviceDesc": "Para proxy headless ou remoto: digite um código curto em outro dispositivo",
+  "codexAuth.deviceDesc":
+    "Para proxy headless ou remoto: digite um código curto em outro dispositivo",
   "codexAuth.importAuthJson": "Importar auth.json",
   "codexAuth.importAuthJsonDesc": "De outra instalação do Codex ou de um codex-auth export",
   "codexAuth.back": "Voltar",
@@ -2752,13 +3346,15 @@ export const pt: Record<TKey, string> = {
   "codexAuth.oauthWaiting": "Aguardando a conclusão do login do ChatGPT no navegador...",
   "codexAuth.oauthSubmittingCode": "Enviando código…",
   "codexAuth.oauthCodeSubmitted": "Código enviado — aguardando a conclusão do login…",
-  "codexAuth.oauthStatusRetrying": "Erro de rede ou de proxy ao verificar o status do login — tentando novamente…",
+  "codexAuth.oauthStatusRetrying":
+    "Erro de rede ou de proxy ao verificar o status do login — tentando novamente…",
   "codexAuth.oauthCancelled": "O login foi cancelado.",
   "codexAuth.loginFailed": "Falha no login",
   "codexAuth.needsReauth": "Refazer login",
   "codexAuth.reauthenticate": "Reautenticar",
   "codexAuth.tokenExpired": "Token expirado — reautentique esta conta",
-  "codexAuth.mainTokenExpired": "Token expirado — refaça o login com um código de dispositivo abaixo ou pelo login do Codex App",
+  "codexAuth.mainTokenExpired":
+    "Token expirado — refaça o login com um código de dispositivo abaixo ou pelo login do Codex App",
   "codexAuth.mainReauthSucceeded": "Login realizado",
   "codexAuth.mainReauthFailed": "Falha ao refazer o login",
   "codexAuth.mainReauthCancel": "Cancelar",
@@ -2766,23 +3362,27 @@ export const pt: Record<TKey, string> = {
   "codexAuth.mainReauthOpen": "Abrir",
   "codexAuth.mainReauthPending": "Aguardando o login…",
   "codexAuth.mainReauthDevice": "Refazer login com código de dispositivo",
-  "codexAuth.emailCollision": "Esta conta corresponde ao seu login principal do Codex. Use outra conta.",
+  "codexAuth.emailCollision":
+    "Esta conta corresponde ao seu login principal do Codex. Use outra conta.",
   "codexAuth.resetCreditsTitle": "Créditos de reset",
   "codexAuth.resetCreditsAvailable": "Você tem {count} crédito(s) de reset disponível(is).",
-  "codexAuth.resetCreditsDesc": "Cada crédito zera imediatamente seus limites de uso por hora e por semana.",
+  "codexAuth.resetCreditsDesc":
+    "Cada crédito zera imediatamente seus limites de uso por hora e por semana.",
   "codexAuth.noResetCredits": "Você não tem créditos de reset.",
   "codexAuth.earnCreditsHint": "Os créditos são ganhos mensalmente e pelo programa de indicação.",
   "codexAuth.creditsExpireNote": "Os créditos expiram 30 dias após serem ganhos.",
   "codexAuth.useOneCredit": "Usar 1 crédito",
   "codexAuth.confirmResetTitle": "Usar crédito de reset?",
-  "codexAuth.confirmResetDesc": "Isso zerará imediatamente seus limites de taxa atuais. Restam {count} crédito(s).",
+  "codexAuth.confirmResetDesc":
+    "Isso zerará imediatamente seus limites de taxa atuais. Restam {count} crédito(s).",
   "codexAuth.irreversible": "Esta ação não pode ser desfeita.",
   "codexAuth.useCredit": "Usar crédito",
   "codexAuth.redeeming": "Zerando...",
   "codexAuth.resetSuccess": "Limites de taxa zerados! Restam {remaining} crédito(s).",
   "codexAuth.resetSuccessGeneric": "Limites de taxa zerados!",
   "codexAuth.resetAlreadyRedeemed": "Este crédito já foi resgatado. Créditos inalterados.",
-  "codexAuth.resetNothingToReset": "Nenhuma janela de limite de taxa precisa ser zerada no momento.",
+  "codexAuth.resetNothingToReset":
+    "Nenhuma janela de limite de taxa precisa ser zerada no momento.",
   "codexAuth.resetNoCredit": "Nenhum crédito de reset disponível.",
   "codexAuth.resetError": "Falha ao resgatar o crédito de reset. Tente novamente.",
   "codexAuth.fifoNote": "O crédito mais antigo é usado primeiro.",
@@ -2809,31 +3409,40 @@ export const pt: Record<TKey, string> = {
   "grokCoupon.useOne": "Usar 1 cupom",
   "grokCoupon.fifoNote": "O cupom mais próximo do vencimento é usado primeiro.",
   "grokCoupon.confirmTitle": "Usar cupom de reset?",
-  "grokCoupon.confirmDesc": "Isso zera agora a janela de uso do Grok desta conta. Você tem {count} cupom(ns).",
+  "grokCoupon.confirmDesc":
+    "Isso zera agora a janela de uso do Grok desta conta. Você tem {count} cupom(ns).",
   "grokCoupon.confirmWhich": "O cupom que expira em {date} será usado.",
   "grokCoupon.irreversible": "Esta ação não pode ser desfeita.",
   "grokCoupon.redeem": "Usar cupom",
   "grokCoupon.redeeming": "Resgatando…",
   "grokCoupon.redeemSuccess": "Cupom resgatado. Restam {count} cupom(ns).",
   "grokCoupon.redeemReplayed": "Este resgate já foi concluído antes. Nada foi consumido novamente.",
-  "grokCoupon.redeemFailed": "Falha no resgate. Confira a lista de cupons antes de tentar novamente.",
+  "grokCoupon.redeemFailed":
+    "Falha no resgate. Confira a lista de cupons antes de tentar novamente.",
   "grokCoupon.authFailed": "Faça login novamente nesta conta xAI para usar os cupons.",
   "grokCoupon.noAccount": "Nenhuma conta xAI está disponível para este resgate.",
   "grokCoupon.noneAvailable": "Não há cupons de reset disponíveis para resgatar.",
-  "grokCoupon.identityMismatch": "Esse resgate pertence a outra conta. Feche este diálogo e comece de novo.",
+  "grokCoupon.identityMismatch":
+    "Esse resgate pertence a outra conta. Feche este diálogo e comece de novo.",
   "grokCoupon.networkError": "Não foi possível alcançar o proxy.",
-  "grokCoupon.capacity": "O registro de resgates está cheio no momento. Tente novamente em instantes.",
-  "grokCoupon.noOperationId": "Este navegador não consegue gerar um ID de resgate, então o resgate está desativado aqui.",
-  "grokCoupon.unknownOutcome": "O resultado do resgate é desconhecido. Releia a conta para consultar os cupons disponíveis; isso não confirma a tentativa original.",
+  "grokCoupon.capacity":
+    "O registro de resgates está cheio no momento. Tente novamente em instantes.",
+  "grokCoupon.noOperationId":
+    "Este navegador não consegue gerar um ID de resgate, então o resgate está desativado aqui.",
+  "grokCoupon.unknownOutcome":
+    "O resultado do resgate é desconhecido. Releia a conta para consultar os cupons disponíveis; isso não confirma a tentativa original.",
   "grokCoupon.checkResult": "Reler conta",
   "grokCoupon.checking": "Relendo…",
-  "grokCoupon.consumedElsewhere": "O cupom não está mais na lista. O resgate original continua sem confirmação; nenhum novo resgate será enviado.",
-  "grokCoupon.unresolved": "O cupom ainda está na lista. O resgate original ainda pode ser concluído; nenhum novo resgate será enviado.",
+  "grokCoupon.consumedElsewhere":
+    "O cupom não está mais na lista. O resgate original continua sem confirmação; nenhum novo resgate será enviado.",
+  "grokCoupon.unresolved":
+    "O cupom ainda está na lista. O resgate original ainda pode ser concluído; nenhum novo resgate será enviado.",
   "anthropicGrant.badgeAria": "{count} reset(s) de uso do Claude",
   "anthropicGrant.badgeErrorAria": "Não foi possível ler os resets de uso do Claude",
   "anthropicGrant.title": "Resets de uso do Claude",
   "anthropicGrant.available": "Esta conta tem {count} reset(s) de uso.",
-  "anthropicGrant.desc": "Um reset recompõe imediatamente os limites de 5 horas e semanais do Claude desta conta. O dia do reset semanal permanece o mesmo.",
+  "anthropicGrant.desc":
+    "Um reset recompõe imediatamente os limites de 5 horas e semanais do Claude desta conta. O dia do reset semanal permanece o mesmo.",
   "anthropicGrant.none": "Esta conta não tem resets de uso.",
   "anthropicGrant.ineligible": "Esta conta não é elegível para resets de uso no momento.",
   "anthropicGrant.loadFailed": "Não foi possível ler os resets de uso desta conta.",
@@ -2850,7 +3459,8 @@ export const pt: Record<TKey, string> = {
   "anthropicGrant.requiresLimit": "Utilizável quando esta conta atingir um limite",
   "anthropicGrant.useOne": "Usar 1 reset",
   "anthropicGrant.confirmTitle": "Zerar os limites de uso agora?",
-  "anthropicGrant.confirmDesc": "Isso recompõe agora os limites de uso do Claude desta conta e consome um reset.",
+  "anthropicGrant.confirmDesc":
+    "Isso recompõe agora os limites de uso do Claude desta conta e consome um reset.",
   "anthropicGrant.confirmWhich": "Usa: {label}",
   "anthropicGrant.irreversible": "Esta ação não pode ser desfeita.",
   "anthropicGrant.redeem": "Zerar limites",
@@ -2858,27 +3468,38 @@ export const pt: Record<TKey, string> = {
   "anthropicGrant.resultReset": "Limites zerados. Restam {count} reset(s).",
   "anthropicGrant.resultAlreadyUsed": "Este reset já foi usado.",
   "anthropicGrant.resultNotLimited": "Esta conta não está em um limite, então nada foi usado.",
-  "anthropicGrant.resultCooldown": "Os resets estão em período de espera para esta conta. Nada foi usado.",
+  "anthropicGrant.resultCooldown":
+    "Os resets estão em período de espera para esta conta. Nada foi usado.",
   "anthropicGrant.resultIneligible": "Esta conta não é mais elegível. Nada foi usado.",
   "anthropicGrant.resultUnavailable": "Os resets estão indisponíveis no momento. Nada foi usado.",
-  "anthropicGrant.resultRateLimited": "Requisições demais. Nada foi usado; tente novamente em um minuto.",
+  "anthropicGrant.resultRateLimited":
+    "Requisições demais. Nada foi usado; tente novamente em um minuto.",
   "anthropicGrant.resultAuthError": "Faça login novamente nesta conta Anthropic. Nada foi usado.",
   "anthropicGrant.replayed": "Este reset já foi concluído antes. Nada foi usado novamente.",
   "anthropicGrant.notUsableNow": "Este reset não pode ser usado no momento. Releia a conta.",
-  "anthropicGrant.inFlight": "Este reset ainda está sendo processado. Aguarde um instante e releia a conta.",
-  "anthropicGrant.unresolvedPrior": "Uma tentativa anterior deste reset ainda não foi confirmada. Repita essa tentativa em vez de iniciar uma nova.",
-  "anthropicGrant.expired": "A tentativa anterior não pôde ser confirmada a tempo. Releia a conta antes de usar um reset.",
-  "anthropicGrant.identityMismatch": "Esse reset pertence a outra conta. Feche este diálogo e comece de novo.",
+  "anthropicGrant.inFlight":
+    "Este reset ainda está sendo processado. Aguarde um instante e releia a conta.",
+  "anthropicGrant.unresolvedPrior":
+    "Uma tentativa anterior deste reset ainda não foi confirmada. Repita essa tentativa em vez de iniciar uma nova.",
+  "anthropicGrant.expired":
+    "A tentativa anterior não pôde ser confirmada a tempo. Releia a conta antes de usar um reset.",
+  "anthropicGrant.identityMismatch":
+    "Esse reset pertence a outra conta. Feche este diálogo e comece de novo.",
   "anthropicGrant.sessionRequired": "Abra o painel pelo login próprio dele para usar os resets.",
-  "anthropicGrant.journalBusy": "O registro de resets está ocupado ou indisponível. Nada foi usado; tente novamente em instantes.",
-  "anthropicGrant.failed": "A requisição de reset falhou. Verifique a conta antes de tentar novamente.",
-  "anthropicGrant.noOperationId": "Este navegador não consegue gerar um ID de requisição, então os resets estão desativados aqui.",
-  "anthropicGrant.unknownOutcome": "O reset não respondeu a tempo, então seu resultado é desconhecido. Tentar de novo envia o mesmo ID de requisição, portanto não pode iniciar um segundo reset.",
+  "anthropicGrant.journalBusy":
+    "O registro de resets está ocupado ou indisponível. Nada foi usado; tente novamente em instantes.",
+  "anthropicGrant.failed":
+    "A requisição de reset falhou. Verifique a conta antes de tentar novamente.",
+  "anthropicGrant.noOperationId":
+    "Este navegador não consegue gerar um ID de requisição, então os resets estão desativados aqui.",
+  "anthropicGrant.unknownOutcome":
+    "O reset não respondeu a tempo, então seu resultado é desconhecido. Tentar de novo envia o mesmo ID de requisição, portanto não pode iniciar um segundo reset.",
   "anthropicGrant.retrySame": "Repetir a mesma requisição",
   "anthropicGrant.checkResult": "Reler conta",
   "anthropicGrant.checking": "Relendo…",
   "api.title": "Acesso à API",
-  "api.subtitle": "Use chaves de API geradas para acessar o proxy opencodex a partir de apps externos. As chaves se autenticam pelo cabeçalho {authHeader}; veja na tabela abaixo o que cada endpoint aceita.",
+  "api.subtitle":
+    "Use chaves de API geradas para acessar o proxy opencodex a partir de apps externos. As chaves se autenticam pelo cabeçalho {authHeader}; veja na tabela abaixo o que cada endpoint aceita.",
   "api.baseUrl": "URL base",
   "api.responsesEndpoint": "API Responses",
   "api.chatCompletionsEndpoint": "API Chat Completions",
@@ -2891,18 +3512,24 @@ export const pt: Record<TKey, string> = {
   "api.surface.source.inherited": "Herdado das configurações do Claude",
   "api.surface.source.invalid": "Valor inválido — fechado",
   "api.surface.messagesToggle": "Disponibilizar a API Messages",
-  "api.surface.messagesCloseNote": "Desativar o Messages também desativa a integração com o Claude, para que uma versão mais antiga do opencodex mantenha o endpoint fechado também.",
+  "api.surface.messagesCloseNote":
+    "Desativar o Messages também desativa a integração com o Claude, para que uma versão mais antiga do opencodex mantenha o endpoint fechado também.",
   "api.surface.openClaude": "Configurações do Claude",
   "api.surface.toggleFailed": "Não foi possível salvar a configuração do Messages.",
-  "api.surface.toggleUnavailable": "Esta versão do proxy não permite alterar a API Messages aqui. Use a página do Claude.",
+  "api.surface.toggleUnavailable":
+    "Esta versão do proxy não permite alterar a API Messages aqui. Use a página do Claude.",
   "api.surface.closedNote": "As requisições a este endpoint são recusadas com 403.",
-  "api.endpointNote": "Use a URL base com clientes compatíveis com OpenAI. Responses e Chat Completions são expostos em /v1.",
+  "api.endpointNote":
+    "Use a URL base com clientes compatíveis com OpenAI. Responses e Chat Completions são expostos em /v1.",
   "api.endpointsTitle": "Endpoints",
   "api.authTitle": "Autenticação",
-  "api.authLoopback": "O acesso por loopback depende da rota; clientes de áudio independentes exigem uma chave de dados do OpenCodex. Binds remotos exigem uma chave de dados ou OPENCODEX_API_AUTH_TOKEN.",
-  "api.authBaseUrlNote": "Configure os clientes com a URL base e depois escolha o endpoint específico do protocolo abaixo.",
+  "api.authLoopback":
+    "O acesso por loopback depende da rota; clientes de áudio independentes exigem uma chave de dados do OpenCodex. Binds remotos exigem uma chave de dados ou OPENCODEX_API_AUTH_TOKEN.",
+  "api.authBaseUrlNote":
+    "Configure os clientes com a URL base e depois escolha o endpoint específico do protocolo abaixo.",
   "api.newKeyTitle": "Nova chave criada",
-  "api.newKeyNote": "Copie esta chave agora. Depois, você pode exibi-la novamente clicando nela na lista de chaves.",
+  "api.newKeyNote":
+    "Copie esta chave agora. Depois, você pode exibi-la novamente clicando nela na lista de chaves.",
   "api.copy": "Copiar",
   "api.copied": "Copiado",
   "api.dismiss": "Dispensar",
@@ -2921,8 +3548,10 @@ export const pt: Record<TKey, string> = {
   "api.section.examples": "Exemplos",
   "api.section.plan": "Prévia do caminho",
   "api.plan.title": "Prévia do caminho da requisição",
-  "api.plan.description": "Mostra o caminho que uma requisição para este modelo percorreria pelo proxy. A prévia não envia nada ao upstream e não tem custo.",
-  "api.plan.modeNote": "Nativo descreve como a requisição é entregue. Não é um resultado de verificação.",
+  "api.plan.description":
+    "Mostra o caminho que uma requisição para este modelo percorreria pelo proxy. A prévia não envia nada ao upstream e não tem custo.",
+  "api.plan.modeNote":
+    "Nativo descreve como a requisição é entregue. Não é um resultado de verificação.",
   "api.plan.unavailable": "Esta versão do proxy não oferece prévias de caminho.",
   "api.plan.noModels": "Ainda não há modelos para pré-visualizar.",
   "api.plan.model": "Modelo",
@@ -2965,7 +3594,8 @@ export const pt: Record<TKey, string> = {
   "api.workspace.keyDetails": "Detalhes da chave",
   "api.workspace.keyPrefix": "Prefixo da chave",
   "api.workspace.deleteKey": "Excluir chave",
-  "api.workspace.deleteConfirm": "Tem certeza de que deseja excluir esta chave? Isso não pode ser desfeito.",
+  "api.workspace.deleteConfirm":
+    "Tem certeza de que deseja excluir esta chave? Isso não pode ser desfeito.",
   "api.workspace.usageExamples": "Exemplos de uso",
   "api.copyUrlHint": "Clique para copiar a URL",
   "api.urlCopied": "URL copiada",
@@ -2980,7 +3610,8 @@ export const pt: Record<TKey, string> = {
   "api.key.hideHint": "Clique para ocultar a chave completa",
   "api.key.revealFailed": "Não foi possível carregar a chave completa.",
   "api.key.revealDenied": "Para exibir uma chave armazenada, primeiro pareie este navegador.",
-  "api.key.mutationHidden": "A chave foi criada ou sua rotação foi iniciada, mas o valor de exibição única foi ocultado porque a sessão ou a tela mudou.",
+  "api.key.mutationHidden":
+    "A chave foi criada ou sua rotação foi iniciada, mas o valor de exibição única foi ocultado porque a sessão ou a tela mudou.",
   "api.key.copyFailedShort": "Não foi possível copiar. Selecione a chave e copie-a manualmente.",
   "api.key.deleteRowAria": "Excluir {name}",
   "api.key.deleteShort": "Excluir",
@@ -2991,7 +3622,8 @@ export const pt: Record<TKey, string> = {
   "api.modelsCount": "{count} chamável(is)",
   "api.modelsLoading": "Carregando modelos…",
   "api.modelsSearch": "Buscar modelos",
-  "api.modelsSubtitle": "Use exatamente estes IDs de modelo com /v1/models e o protocolo de entrada escolhido.",
+  "api.modelsSubtitle":
+    "Use exatamente estes IDs de modelo com /v1/models e o protocolo de entrada escolhido.",
   "api.modelsEmpty": "Ainda não há modelos chamáveis externamente.",
   "api.modelsNoMatch": "Nenhum modelo corresponde a “{query}”.",
   "api.modelsLoadFailed": "Não foi possível carregar o catálogo de modelos externos.",
@@ -3021,7 +3653,8 @@ export const pt: Record<TKey, string> = {
   "api.clientConfig.downloadAria": "Baixar a configuração de {client}",
   "api.clientConfig.rowMeta": "{destination} · {count} modelo(s)",
   "api.clientConfig.rowError": "Não foi possível gerar a configuração de {client}.",
-  "api.clientConfig.copiedAnnounceClient": "Configuração de {client} copiada para a área de transferência.",
+  "api.clientConfig.copiedAnnounceClient":
+    "Configuração de {client} copiada para a área de transferência.",
   "api.clientConfig.clientOpencode": "OpenCode",
   "api.clientConfig.clientPi": "Pi",
   "api.clientConfig.clientOmp": "OMP",
@@ -3042,24 +3675,33 @@ export const pt: Record<TKey, string> = {
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "Este é um pacote de dois arquivos, não um arquivo de configurações do Cline. Mescle settings em providers.json e catalog no models.json vizinho. Use o interruptor de integração para uma gravação com backup.",
-  "api.clientConfig.clineDownloaded": "{filename} baixado. Nada foi alterado ainda; settings e catalog pertencem a dois arquivos separados do Cline.",
+  "api.clientConfig.clineBundle":
+    "Este é um pacote de dois arquivos, não um arquivo de configurações do Cline. Mescle settings em providers.json e catalog no models.json vizinho. Use o interruptor de integração para uma gravação com backup.",
+  "api.clientConfig.clineDownloaded":
+    "{filename} baixado. Nada foi alterado ainda; settings e catalog pertencem a dois arquivos separados do Cline.",
   "api.clientConfig.copy": "Copiar configuração",
   "api.clientConfig.download": "Baixar",
   "api.clientConfig.loading": "Gerando configuração do cliente…",
   "api.clientConfig.jsonLabel": "Configuração de {client}",
   "api.clientConfig.destination": "Arquivo de destino",
   "api.clientConfig.envHint": "Defina a chave antes de iniciar",
-  "api.clientConfig.mergeWarning": "Mescle isto no arquivo de destino. Substituí-lo apagaria seus outros provedores e configurações de MCP.",
+  "api.clientConfig.mergeWarning":
+    "Mescle isto no arquivo de destino. Substituí-lo apagaria seus outros provedores e configurações de MCP.",
   "api.clientConfig.modelCount": "{count} modelo(s) exportado(s)",
-  "api.clientConfig.missingLimits": "{count} de {total} modelo(s) saem sem limite de contexto; o cliente aplica seus próprios padrões.",
-  "api.clientConfig.noKeyYet": "{env} ainda não tem nenhuma chave por trás. Gere uma chave acima antes de usar esta configuração fora do loopback.",
-  "api.clientConfig.loadFailed": "Não foi possível ler a lista de modelos, então nenhuma configuração de cliente foi gerada.",
-  "api.clientConfig.copiedAnnounce": "Configuração do cliente copiada para a área de transferência.",
+  "api.clientConfig.missingLimits":
+    "{count} de {total} modelo(s) saem sem limite de contexto; o cliente aplica seus próprios padrões.",
+  "api.clientConfig.noKeyYet":
+    "{env} ainda não tem nenhuma chave por trás. Gere uma chave acima antes de usar esta configuração fora do loopback.",
+  "api.clientConfig.loadFailed":
+    "Não foi possível ler a lista de modelos, então nenhuma configuração de cliente foi gerada.",
+  "api.clientConfig.copiedAnnounce":
+    "Configuração do cliente copiada para a área de transferência.",
   "api.clientConfig.copyFailed": "Não foi possível copiar a configuração do cliente.",
-  "api.clientConfig.downloadedAnnounce": "{filename} baixado. Nada foi alterado ainda — mescle-o você mesmo em {destination}.",
+  "api.clientConfig.downloadedAnnounce":
+    "{filename} baixado. Nada foi alterado ainda — mescle-o você mesmo em {destination}.",
   "api.clientConfig.whereDisclosure": "Onde este arquivo vai",
-  "api.clientConfig.whereBody": "O destino acima é o caminho global. Um arquivo de configuração local do projeto, no diretório de trabalho, tem precedência sobre ele, e o cliente lê a chave da variável de ambiente indicada na configuração — nunca deste arquivo.",
+  "api.clientConfig.whereBody":
+    "O destino acima é o caminho global. Um arquivo de configuração local do projeto, no diretório de trabalho, tem precedência sobre ele, e o cliente lê a chave da variável de ambiente indicada na configuração — nunca deste arquivo.",
   "api.keysLoadFailed": "Não foi possível carregar as chaves de API.",
   "api.createFailed": "Não foi possível criar a chave de API.",
   "api.deleteFailed": "Não foi possível excluir a chave de API.",
@@ -3068,7 +3710,8 @@ export const pt: Record<TKey, string> = {
   "api.auth.accepted": "Aceita",
   "api.auth.rejected": "Não aceita",
   "api.auth.testProtocol": "Testar {protocol}",
-  "api.auth.testNeedsFreshKey": "Gere uma chave e mantenha seu valor único na tela para executar um teste autenticado.",
+  "api.auth.testNeedsFreshKey":
+    "Gere uma chave e mantenha seu valor único na tela para executar um teste autenticado.",
   "api.key.name": "Nome da chave",
   "api.key.rename": "Renomear",
   "api.key.saveName": "Salvar nome",
@@ -3076,9 +3719,11 @@ export const pt: Record<TKey, string> = {
   "api.key.renameFailed": "Não foi possível renomear a chave. Seu rascunho foi mantido.",
   "api.key.deleting": "Excluindo…",
   "api.rotation.title": "Rotação de chave",
-  "api.rotation.pending": "A rotação está pendente. Atualize e verifique o cliente antes de confirmar.",
+  "api.rotation.pending":
+    "A rotação está pendente. Atualize e verifique o cliente antes de confirmar.",
   "api.rotation.expires": "A sobreposição expira em:",
-  "api.key.copyFailed": "Não foi possível copiar a chave. Selecione-a e copie manualmente antes de fechar este painel.",
+  "api.key.copyFailed":
+    "Não foi possível copiar a chave. Selecione-a e copie manualmente antes de fechar este painel.",
   "api.attribution.title": "Uso atribuído",
   "api.attribution.requests7d": "Requisições, últimos 7 dias",
   "api.attribution.totalRequests": "Total de requisições atribuídas",
@@ -3088,10 +3733,13 @@ export const pt: Record<TKey, string> = {
   "api.attribution.since": "Atribuição disponível desde",
   "api.attribution.neverUsed": "Não usada desde o início da atribuição",
   "api.attribution.unavailable": "Uso indisponível",
-  "api.attribution.unavailableDetail": "Nenhum uso foi atribuído ainda. As requisições registradas antes do início da atribuição não podem ser atribuídas retroativamente.",
-  "api.attribution.ambiguous": "Duas chaves compartilham este ID, então o uso não pode ser atribuído a nenhuma delas. Dê a cada chave um ID exclusivo no arquivo de configuração.",
+  "api.attribution.unavailableDetail":
+    "Nenhum uso foi atribuído ainda. As requisições registradas antes do início da atribuição não podem ser atribuídas retroativamente.",
+  "api.attribution.ambiguous":
+    "Duas chaves compartilham este ID, então o uso não pode ser atribuído a nenhuma delas. Dê a cada chave um ID exclusivo no arquivo de configuração.",
   "api.attribution.railAmbiguous": "ID duplicado",
-  "claude.subtitle": "Encaminha ocx claude pelo OpenCodex para que o Claude Code possa usar GPT, Gemini e outros modelos. Ao desativar, a interceptação (incluindo o modo first-party) e a lista de modelos do Claude Desktop também são desativadas. É a mesma configuração do interruptor Claude na visão geral de Conexão.",
+  "claude.subtitle":
+    "Encaminha ocx claude pelo OpenCodex para que o Claude Code possa usar GPT, Gemini e outros modelos. Ao desativar, a interceptação (incluindo o modo first-party) e a lista de modelos do Claude Desktop também são desativadas. É a mesma configuração do interruptor Claude na visão geral de Conexão.",
   "claude.pageTitle": "Claude Code",
   "claude.workspace.settings": "Geral",
   "claude.enabledLabel": "Conexão com o Claude",
@@ -3107,9 +3755,12 @@ export const pt: Record<TKey, string> = {
   "claude.authModeAuto": "Automático (detectar autenticação do Claude)",
   "claude.effectiveMode.label": "Vale a partir da próxima inicialização",
   "claude.effectiveMode.manual": "Manual: {mode}",
-  "claude.effectiveMode.autoPresent": "Automático: assinatura — autenticação do Claude encontrada via {source}",
-  "claude.effectiveMode.autoAbsent": "Automático: modo proxy — nenhuma autenticação do Claude encontrada",
-  "claude.effectiveMode.autoUnknown": "Automático: assinatura — não foi possível verificar a autenticação",
+  "claude.effectiveMode.autoPresent":
+    "Automático: assinatura — autenticação do Claude encontrada via {source}",
+  "claude.effectiveMode.autoAbsent":
+    "Automático: modo proxy — nenhuma autenticação do Claude encontrada",
+  "claude.effectiveMode.autoUnknown":
+    "Automático: assinatura — não foi possível verificar a autenticação",
   "claude.effectiveMode.admissionKey": "A chave de API deste proxy continua sendo enviada.",
   "claude.authSource.claude-json-oauth": "conta Claude",
   "claude.authSource.claude-credentials-file": "arquivo de credenciais",
@@ -3117,40 +3768,54 @@ export const pt: Record<TKey, string> = {
   "claude.authSource.exported-env": "variável de ambiente",
   "claude.authSource.unknown": "uma credencial detectada",
   "claude.fastMode": "Modo rápido (OpenAI)",
-  "claude.fastModeDesc": "Controla o service_tier dos modelos OpenAI. ON = priority (mais rápido). OFF = default. Auto = repasse (o cliente decide).",
+  "claude.fastModeDesc":
+    "Controla o service_tier dos modelos OpenAI. ON = priority (mais rápido). OFF = default. Auto = repasse (o cliente decide).",
   "claude.fastAuto": "Auto",
   "claude.fastOn": "ON",
   "claude.fastOff": "OFF",
   "claude.autoContext": "Usar contexto grande automaticamente",
-  "claude.autoContextDesc": "Controla até onde vai a marcação de 1M. ON: qualquer modelo cuja janela comporte o limite de compactação ganha uma linha de contexto grande. OFF: só os modelos de 1M de verdade ganham uma.",
-  "claude.autoContextInert": "Inativo porque existe um valor legado de tamanho de contexto (maxContextTokens) no arquivo de configuração. Remova-o de lá para reativar.",
+  "claude.autoContextDesc":
+    "Controla até onde vai a marcação de 1M. ON: qualquer modelo cuja janela comporte o limite de compactação ganha uma linha de contexto grande. OFF: só os modelos de 1M de verdade ganham uma.",
+  "claude.autoContextInert":
+    "Inativo porque existe um valor legado de tamanho de contexto (maxContextTokens) no arquivo de configuração. Remova-o de lá para reativar.",
   "claude.contextAccounting": "Contagem de contexto",
-  "claude.contextAccountingDesc": "1M: modelos de janela longa ficam com 1M por padrão onde o opencodex escolhe o padrão. 200k: o opencodex deixa de marcar modelos como 1M automaticamente; uma linha 1M escolhida por você e uma substituição de contexto definida por você continuam valendo.",
+  "claude.contextAccountingDesc":
+    "1M: modelos de janela longa ficam com 1M por padrão onde o opencodex escolhe o padrão. 200k: o opencodex deixa de marcar modelos como 1M automaticamente; uma linha 1M escolhida por você e uma substituição de contexto definida por você continuam valendo.",
   "claude.contextAccounting1m": "1M (padrão)",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "Ponto de resumo automático",
   "claude.autoCompactDefault": "{value} (padrão)",
-  "claude.autoCompactWindowDesc": "As mensagens mais antigas são resumidas quando a conversa chega a este ponto. Ele nunca excede o limite de cada modelo, então modelos de 200k não são afetados.",
-  "claude.autoCompactWindowWarn": "Alterar isto pode quebrar modelos GPT — se for definido acima do limite real do modelo, as conversas darão erro antes de o resumo entrar em ação.",
+  "claude.autoCompactWindowDesc":
+    "As mensagens mais antigas são resumidas quando a conversa chega a este ponto. Ele nunca excede o limite de cada modelo, então modelos de 200k não são afetados.",
+  "claude.autoCompactWindowWarn":
+    "Alterar isto pode quebrar modelos GPT — se for definido acima do limite real do modelo, as conversas darão erro antes de o resumo entrar em ação.",
   "claude.injectAgents": "Registrar subagentes automaticamente",
-  "claude.injectAgentsDesc": "Registra os modelos escolhidos na aba Subagentes (mais o modelo padrão atual) como agentes despacháveis do Claude Code (ocx-*). Vale a partir da próxima sessão.",
+  "claude.injectAgentsDesc":
+    "Registra os modelos escolhidos na aba Subagentes (mais o modelo padrão atual) como agentes despacháveis do Claude Code (ocx-*). Vale a partir da próxima sessão.",
   "claude.webSearchSidecar": "Substituição do sidecar de busca na web",
-  "claude.webSearchSidecarHint": "Substitui o sidecar principal de busca na web nas requisições do Claude Code.",
+  "claude.webSearchSidecarHint":
+    "Substitui o sidecar principal de busca na web nas requisições do Claude Code.",
   "claude.visionSidecar": "Substituição do sidecar de visão",
-  "claude.visionSidecarHint": "Substitui o sidecar principal de visão nas requisições do Claude Code.",
+  "claude.visionSidecarHint":
+    "Substitui o sidecar principal de visão nas requisições do Claude Code.",
   "claude.useMainSetting": "Usar configuração principal",
   "claude.sidecarModelPlaceholder": "Modelo da configuração principal",
   "claude.quickstart": "Primeiros passos",
-  "claude.quickstartHint": "{cmd} abre o Claude Code por meio do proxy. Seu login no claude.ai continua ativo.",
+  "claude.quickstartHint":
+    "{cmd} abre o Claude Code por meio do proxy. Seu login no claude.ai continua ativo.",
   "claude.manualEnv": "Configuração manual (avançado)",
   "claude.smallFastModel": "Modelo auxiliar em segundo plano",
-  "claude.smallFastModelHint": "O modelo que o Claude Code usa em tarefas de segundo plano, como resumos de conversa e detecção de tópico. O alias de subagente haiku também o utiliza. Vazio = padrão do Claude (Haiku).",
-  "claude.smallFastModelAccurateHint": "O modelo que o Claude Code usa em tarefas de segundo plano, como resumos de conversa e detecção de tópico. O alias de subagente haiku também o utiliza.",
+  "claude.smallFastModelHint":
+    "O modelo que o Claude Code usa em tarefas de segundo plano, como resumos de conversa e detecção de tópico. O alias de subagente haiku também o utiliza. Vazio = padrão do Claude (Haiku).",
+  "claude.smallFastModelAccurateHint":
+    "O modelo que o Claude Code usa em tarefas de segundo plano, como resumos de conversa e detecção de tópico. O alias de subagente haiku também o utiliza.",
   "claude.smallFastModelUnsetOption": "Deixar o Claude Code escolher (modelo nativo)",
-  "claude.smallFastModelNativeWarning": "Quando não definido, o OpenCodex deixa sem definir as substituições do modelo auxiliar. O Claude Code pode usar seu modelo Sonnet nativo, o que pode gerar cobranças do seu provedor nativo.",
+  "claude.smallFastModelNativeWarning":
+    "Quando não definido, o OpenCodex deixa sem definir as substituições do modelo auxiliar. O Claude Code pode usar seu modelo Sonnet nativo, o que pode gerar cobranças do seu provedor nativo.",
   "claude.slotUnset": "Usar padrão do Claude",
   "claude.modelMap": "Interceptação de modelo",
-  "claude.modelMapHint": "Intercepta requisições de um modelo específico e as redireciona para o modelo que você escolher. Vazio por padrão: nada acontece até você adicionar uma regra.",
+  "claude.modelMapHint":
+    "Intercepta requisições de um modelo específico e as redireciona para o modelo que você escolher. Vazio por padrão: nada acontece até você adicionar uma regra.",
   "claude.mapFrom": "Modelo original (ex.: claude-sonnet-4-5)",
   "claude.mapTo": "Trocar por (ex.: gemini/gemini-3-pro)",
   "claude.addMapping": "Adicionar regra",
@@ -3167,7 +3832,8 @@ export const pt: Record<TKey, string> = {
   "claude.none": "Nenhum",
   "claude.tabsLabel": "Cliente Claude",
   "claudeDesktop.title": "Claude Desktop",
-  "claudeDesktop.subtitle": "Roteia cada família de modelos do Claude por um modelo disponível na porta {port} do proxy.",
+  "claudeDesktop.subtitle":
+    "Roteia cada família de modelos do Claude por um modelo disponível na porta {port} do proxy.",
   "claudeDesktop.importJson": "Importar JSON",
   "claudeDesktop.exportJson": "Exportar JSON",
   "claudeDesktop.loading": "Carregando perfil do Claude Desktop…",
@@ -3177,14 +3843,16 @@ export const pt: Record<TKey, string> = {
   "claudeDesktop.applyFailed": "O perfil foi salvo, mas não pôde ser aplicado.",
   "claudeDesktop.updateFailed": "Falha na atualização do Claude Desktop.",
   "claudeDesktop.savedApplied": "Perfil salvo e aplicado ao Claude Desktop.",
-  "claudeDesktop.appliedMarkerUnsaved": "Aplicado ao Claude Desktop, mas o marcador de aplicação não foi salvo — o estado salvo versus aplicado abaixo pode aparecer desatualizado até você aplicar novamente.",
+  "claudeDesktop.appliedMarkerUnsaved":
+    "Aplicado ao Claude Desktop, mas o marcador de aplicação não foi salvo — o estado salvo versus aplicado abaixo pode aparecer desatualizado até você aplicar novamente.",
   "claudeDesktop.savedAppliedAnnounce": "Perfil do Claude Desktop salvo e aplicado.",
   "claudeDesktop.saved": "Perfil salvo.",
   "claudeDesktop.savedAnnounce": "Perfil do Claude Desktop salvo.",
   "claudeDesktop.exported": "Perfil exportado como JSON.",
   "claudeDesktop.importExpected": "Era esperado um perfil do Claude Desktop versão 1.",
   "claudeDesktop.importReady": "JSON importado. Revise o rascunho e depois salve e aplique.",
-  "claudeDesktop.importedAnnounce": "JSON do perfil importado. As alterações não salvas estão prontas para revisão.",
+  "claudeDesktop.importedAnnounce":
+    "JSON do perfil importado. As alterações não salvas estão prontas para revisão.",
   "claudeDesktop.importInvalid": "O arquivo selecionado não é um perfil válido.",
   "claudeDesktop.importFailed": "Falha na importação. {error}",
   "claudeDesktop.moved": "{route} movido para {family}.",
@@ -3194,7 +3862,8 @@ export const pt: Record<TKey, string> = {
   "claudeDesktop.applying": "Aplicando…",
   "claudeDesktop.saveApply": "Salvar e aplicar",
   "claudeDesktop.emptyTitle": "Nenhum modelo disponível",
-  "claudeDesktop.emptyHint": "Adicione ou habilite um provedor e volte para atribuir rotas ao Claude Desktop.",
+  "claudeDesktop.emptyHint":
+    "Adicione ou habilite um provedor e volte para atribuir rotas ao Claude Desktop.",
   "claudeDesktop.assignmentsLabel": "Atribuições das famílias de modelos do Claude",
   "claudeDesktop.family.opus": "Opus",
   "claudeDesktop.family.fable": "Fable",
@@ -3212,7 +3881,8 @@ export const pt: Record<TKey, string> = {
   "grok.loading": "Carregando status do Grok…",
   "grok.loadFail": "Não foi possível ler a configuração do Grok.",
   "grok.notConfiguredTitle": "O Grok Build não está configurado",
-  "grok.notConfiguredHint": "Inicie ou reinicie o proxy com o Grok instalado e o opencodex grava um bloco gerenciado em:",
+  "grok.notConfiguredHint":
+    "Inicie ou reinicie o proxy com o Grok instalado e o opencodex grava um bloco gerenciado em:",
   "grok.endpoint": "Endpoint",
   "grok.colModel": "Modelo",
   "grok.colAlias": "Alias do Grok",
@@ -3235,15 +3905,18 @@ export const pt: Record<TKey, string> = {
   "claudeDesktop.defaultBadge": "Padrão",
   "claudeDesktop.roles.title": "Modelos",
   "claudeDesktop.roles.default": "Modelo padrão",
-  "claudeDesktop.roles.defaultDesc": "Aparece primeiro no Claude Desktop e é enviado como modelo do nível Opus.",
+  "claudeDesktop.roles.defaultDesc":
+    "Aparece primeiro no Claude Desktop e é enviado como modelo do nível Opus.",
   "claudeDesktop.roles.quick": "Modelo para tarefas rápidas",
   "claudeDesktop.roles.quickDesc": "Responde às solicitações do nível Haiku do Claude Desktop.",
   "claudeDesktop.roles.unset": "Não definido",
   "claudeDesktop.roles.pick": "Escolha um modelo",
   "claudeDesktop.roles.unavailableOption": "{route} (indisponível)",
-  "claudeDesktop.roles.gatewayScope": "Essas escolhas se aplicam ao modo gateway, que grava a lista de modelos do Claude Desktop.",
+  "claudeDesktop.roles.gatewayScope":
+    "Essas escolhas se aplicam ao modo gateway, que grava a lista de modelos do Claude Desktop.",
   "claudeDesktop.roles.listTitle": "Lista de modelos Desktop",
-  "claudeDesktop.roles.listHint": "Escolha quais modelos o Claude Desktop lista. Só o Claude Desktop muda: outros clientes e as configurações dos provedores mantêm seus modelos.",
+  "claudeDesktop.roles.listHint":
+    "Escolha quais modelos o Claude Desktop lista. Só o Claude Desktop muda: outros clientes e as configurações dos provedores mantêm seus modelos.",
   "claudeDesktop.status.pendingApply": "Salvo — aplique para atualizar o Desktop",
   "claudeDesktop.visibility.search": "Buscar modelos",
   "claudeDesktop.visibility.provider": "Provedor",
@@ -3264,11 +3937,14 @@ export const pt: Record<TKey, string> = {
   "claudeDesktop.visibility.previewTitle": "Próxima aplicação",
   "claudeDesktop.visibility.previewAdds": "Adiciona: {models}",
   "claudeDesktop.visibility.previewRemoves": "Remove: {models}",
-  "claudeDesktop.visibility.previewSame": "O perfil contém os mesmos IDs de modelos. Aplique as alterações do perfil antes de reiniciar o Desktop.",
-  "claudeDesktop.visibility.replaceNote": "Aplicar substitui a lista de modelos do perfil Claude Desktop do OpenCodex, inclusive uma lista editada à mão. O mapeamento de níveis em Avançado continua opcional. O modo somente descoberta não usa esta seleção.",
+  "claudeDesktop.visibility.previewSame":
+    "O perfil contém os mesmos IDs de modelos. Aplique as alterações do perfil antes de reiniciar o Desktop.",
+  "claudeDesktop.visibility.replaceNote":
+    "Aplicar substitui a lista de modelos do perfil Claude Desktop do OpenCodex, inclusive uma lista editada à mão. O mapeamento de níveis em Avançado continua opcional. O modo somente descoberta não usa esta seleção.",
   "claudeDesktop.roles.quickBadge": "Tarefas rápidas",
   "claudeDesktop.advanced.title": "Avançado: atribuição de níveis Claude",
-  "claudeDesktop.advanced.desc": "Escolha em qual nível Claude (Opus, Fable, Sonnet, Haiku) o Claude Desktop classifica cada modelo.",
+  "claudeDesktop.advanced.desc":
+    "Escolha em qual nível Claude (Opus, Fable, Sonnet, Haiku) o Claude Desktop classifica cada modelo.",
   "claudeDesktop.advanced.empty": "vazio",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "Indisponível",
@@ -3283,67 +3959,101 @@ export const pt: Record<TKey, string> = {
   "claudeDesktop.status.stale": "A configuração do Desktop está desatualizada — aplique novamente",
   "claudeDesktop.status.notApplied": "Não aplicado",
   "claudeDesktop.status.notActiveProfile": "O Desktop está usando outro perfil — aplique novamente",
-  "claudeDesktop.status.disabled": "A integração com o Claude Desktop está desativada. Feche completamente e reabra o Desktop após ativá-la.",
+  "claudeDesktop.status.disabled":
+    "A integração com o Claude Desktop está desativada. Feche completamente e reabra o Desktop após ativá-la.",
   "claudeDesktop.enableApply": "Ativar e aplicar",
   "claudeDesktop.switchModeApply": "Trocar de modo e aplicar",
-  "claudeDesktop.status.appliedFirstParty": "Primeira parte: a aba Code do Desktop roteada pelo proxy local",
+  "claudeDesktop.status.appliedFirstParty":
+    "Primeira parte: a aba Code do Desktop roteada pelo proxy local",
   "claudeDesktop.mode.legend": "Modo de conexão",
   "claudeDesktop.mode.firstParty": "Primeira parte",
   "claudeDesktop.mode.gateway": "Gateway (terceiros)",
   "claudeDesktop.mode.defaultBadge": "padrão",
   "claudeDesktop.mode.current": "atual",
-  "claudeDesktop.mode.firstPartyHint": "O Desktop continua conectado ao claude.ai. A aba Code usa o OpenCodex quando a primeira parte do Desktop está ativada; a CLI independente tem seu próprio interruptor. Ambos leem o mesmo env das configurações.",
+  "claudeDesktop.mode.firstPartyHint":
+    "O Desktop continua conectado ao claude.ai. A aba Code usa o OpenCodex quando a primeira parte do Desktop está ativada; a CLI independente tem seu próprio interruptor. Ambos leem o mesmo env das configurações.",
   "claude.intercept.start": "Iniciar interceptação",
   "claude.intercept.starting": "Iniciando interceptação…",
   "claude.intercept.reason.disabled": "Ative primeiro o roteamento e a interceptação do Claude.",
-  "claude.intercept.reason.client_role": "Este processo é um cliente do hub. Ative a interceptação em um servidor local.",
-  "claude.intercept.reason.ephemeral_port": "Defina claudeCode.intercept.port quando a porta pública for efêmera.",
-  "claude.intercept.reason.port_in_use": "A porta {port} está em uso. Libere-a ou altere claudeCode.intercept.port.",
-  "claude.intercept.reason.port_mismatch": "Esta execução usa a porta {bound}; a porta configurada {configured} é diferente. Use a porta vinculada ou restaure o valor configurado.",
-  "claude.intercept.reason.failed": "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
-  "claude.intercept.reason.stopped": "O ciclo de vida da interceptação foi encerrado. Inicie um serviço OpenCodex em execução.",
+  "claude.intercept.reason.client_role":
+    "Este processo é um cliente do hub. Ative a interceptação em um servidor local.",
+  "claude.intercept.reason.ephemeral_port":
+    "Defina claudeCode.intercept.port quando a porta pública for efêmera.",
+  "claude.intercept.reason.port_in_use":
+    "A porta {port} está em uso. Libere-a ou altere claudeCode.intercept.port.",
+  "claude.intercept.reason.port_mismatch":
+    "Esta execução usa a porta {bound}; a porta configurada {configured} é diferente. Use a porta vinculada ou restaure o valor configurado.",
+  "claude.intercept.reason.failed":
+    "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
+  "claude.intercept.reason.stopped":
+    "O ciclo de vida da interceptação foi encerrado. Inicie um serviço OpenCodex em execução.",
   "claude.firstParty.label": "Primeira parte da CLI do Claude Code",
-  "claude.firstParty.desc": "Permite que a CLI claude independente mantenha o login do Claude enquanto seu tráfego passa pelo proxy de interceptação local.",
+  "claude.firstParty.desc":
+    "Permite que a CLI claude independente mantenha o login do Claude enquanto seu tráfego passa pelo proxy de interceptação local.",
   "claude.firstParty.aria": "Alternar primeira parte da CLI do Claude Code",
-  "claude.firstParty.risk": "Risco para a conta: a primeira parte encaminha o tráfego da assinatura do Claude por um proxy local de interceptação. A Anthropic pode tratar isso como violação dos termos e suspender a conta.",
-  "claude.firstParty.shared": "Quando o env compartilhado do proxy é aplicado, o outro cliente do Claude também passa pelo proxy local como um relay inalterado; o TLS é encerrado localmente. Defina NO_PROXY='*' no shell para uso totalmente nativo no terminal.",
-  "claude.firstParty.deadProxy": "O env das configurações do Claude aponta para um proxy que não está em execução. Inicie o opencodex ou desative a primeira parte do Desktop/CLI para remover as configurações antes de usar o claude puro.",
-  "claude.firstParty.notApplied": "A primeira parte da CLI está ativada, mas suas configurações de proxy não foram aplicadas. Verifique o env das configurações do Claude antes de usar o claude puro.",
-  "claude.firstParty.brokenProxy": "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
-  "claude.firstParty.residual": "As configurações do Claude ainda apontam para um proxy do OpenCodex, embora nem a primeira parte do Desktop nem a da CLI esteja ativada. Remova a configuração de proxy restante ou execute `ocx ensure`.",
-  "claude.firstParty.routingOff": "O opencodex não está atendendo à interceptação do Claude na configuração atual (o roteamento do Claude ou a interceptação está desativado, ou esta máquina é cliente de outro hub opencodex), então estas configurações apontam para um proxy que não vai atendê-las. Reative-o nesta máquina ou desative a primeira parte para remover as configurações.",
+  "claude.firstParty.risk":
+    "Risco para a conta: a primeira parte encaminha o tráfego da assinatura do Claude por um proxy local de interceptação. A Anthropic pode tratar isso como violação dos termos e suspender a conta.",
+  "claude.firstParty.shared":
+    "Quando o env compartilhado do proxy é aplicado, o outro cliente do Claude também passa pelo proxy local como um relay inalterado; o TLS é encerrado localmente. Defina NO_PROXY='*' no shell para uso totalmente nativo no terminal.",
+  "claude.firstParty.deadProxy":
+    "O env das configurações do Claude aponta para um proxy que não está em execução. Inicie o opencodex ou desative a primeira parte do Desktop/CLI para remover as configurações antes de usar o claude puro.",
+  "claude.firstParty.notApplied":
+    "A primeira parte da CLI está ativada, mas suas configurações de proxy não foram aplicadas. Verifique o env das configurações do Claude antes de usar o claude puro.",
+  "claude.firstParty.brokenProxy":
+    "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
+  "claude.firstParty.residual":
+    "As configurações do Claude ainda apontam para um proxy do OpenCodex, embora nem a primeira parte do Desktop nem a da CLI esteja ativada. Remova a configuração de proxy restante ou execute `ocx ensure`.",
+  "claude.firstParty.routingOff":
+    "O opencodex não está atendendo à interceptação do Claude na configuração atual (o roteamento do Claude ou a interceptação está desativado, ou esta máquina é cliente de outro hub opencodex), então estas configurações apontam para um proxy que não vai atendê-las. Reative-o nesta máquina ou desative a primeira parte para remover as configurações.",
   "claude.firstParty.disabled": "Ative primeiro o roteamento e a interceptação do Claude.",
-  "claude.firstParty.foreign": "O ~/.claude/settings.json aponta para o proxy do opencodex, mas confia em um certificado que o opencodex não gerencia, então as requisições falham. Corrija HTTPS_PROXY / NODE_EXTRA_CA_CERTS manualmente ali.",
-  "claude.firstParty.local": "O ~/.claude/settings.json envia o Claude Code por um proxy local em 127.0.0.1 que o opencodex não consegue confirmar como seu. Se você não o usa mais, remova HTTPS_PROXY dali.",
-  "claude.firstParty.unknown": "O opencodex não conseguiu determinar se o ~/.claude/settings.json ainda aponta para o seu proxy.",
+  "claude.firstParty.foreign":
+    "O ~/.claude/settings.json aponta para o proxy do opencodex, mas confia em um certificado que o opencodex não gerencia, então as requisições falham. Corrija HTTPS_PROXY / NODE_EXTRA_CA_CERTS manualmente ali.",
+  "claude.firstParty.local":
+    "O ~/.claude/settings.json envia o Claude Code por um proxy local em 127.0.0.1 que o opencodex não consegue confirmar como seu. Se você não o usa mais, remova HTTPS_PROXY dali.",
+  "claude.firstParty.unknown":
+    "O opencodex não conseguiu determinar se o ~/.claude/settings.json ainda aponta para o seu proxy.",
   "claude.firstParty.refusal.interceptDisabled": "O proxy de interceptação está desativado.",
-  "claude.firstParty.refusal.interceptUnavailable": "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
-  "claude.firstParty.refusal.foreignEnv": "Outro programa é dono das configurações de proxy do Claude.",
+  "claude.firstParty.refusal.interceptUnavailable":
+    "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local.",
+  "claude.firstParty.refusal.foreignEnv":
+    "Outro programa é dono das configurações de proxy do Claude.",
   "claude.firstParty.refusal.caUnavailable": "A autoridade certificadora local está indisponível.",
   "claude.firstParty.refusal.unreadable": "Não foi possível ler as configurações do Claude.",
   "claude.firstParty.refusal.writeFailed": "Não foi possível gravar as configurações do Claude.",
-  "claudeDesktop.mode.firstPartyRisk": "Risco para a conta: a primeira parte envia o tráfego da sua assinatura do Claude por um proxy local de interceptação. A Anthropic pode tratar isso como violação dos termos e suspender a conta. O Gateway é o padrão.",
-  "claudeDesktop.mode.gatewayHint": "O aplicativo inteiro passa a usar o OpenCodex como gateway. O chat roda localmente; os recursos do claude.ai ficam indisponíveis.",
-  "claudeDesktop.mode.switchNote": "A troca substitui a configuração do outro modo. Depois, feche completamente e reabra o Desktop.",
+  "claudeDesktop.mode.firstPartyRisk":
+    "Risco para a conta: a primeira parte envia o tráfego da sua assinatura do Claude por um proxy local de interceptação. A Anthropic pode tratar isso como violação dos termos e suspender a conta. O Gateway é o padrão.",
+  "claudeDesktop.mode.gatewayHint":
+    "O aplicativo inteiro passa a usar o OpenCodex como gateway. O chat roda localmente; os recursos do claude.ai ficam indisponíveis.",
+  "claudeDesktop.mode.switchNote":
+    "A troca substitui a configuração do outro modo. Depois, feche completamente e reabra o Desktop.",
   "claudeDesktop.firstParty.proxyRunning": "Proxy local em 127.0.0.1:{port}",
-  "claudeDesktop.firstParty.proxyStopped": "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local. ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "O proxy de interceptação está desativado na configuração (claudeCode.intercept.enabled)",
+  "claudeDesktop.firstParty.proxyStopped":
+    "Não foi possível iniciar a interceptação. Tente novamente após verificar a configuração do proxy local. ({port})",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "O proxy de interceptação está desativado na configuração (claudeCode.intercept.enabled)",
   "claudeDesktop.picker.title": "Seletor do Claude Desktop",
-  "claudeDesktop.picker.hint": "Mostra os modelos do OpenCodex no seletor da aba Code do Desktop por meio do proxy local dedicado.",
+  "claudeDesktop.picker.hint":
+    "Mostra os modelos do OpenCodex no seletor da aba Code do Desktop por meio do proxy local dedicado.",
   "claudeDesktop.picker.toggle": "Ativar o seletor do Claude Desktop",
   "claudeDesktop.picker.state.active": "O seletor está ativo",
-  "claudeDesktop.picker.state.restart": "Feche completamente e reabra o Claude Desktop para concluir a aplicação do perfil do seletor.",
+  "claudeDesktop.picker.state.restart":
+    "Feche completamente e reabra o Claude Desktop para concluir a aplicação do perfil do seletor.",
   "claudeDesktop.picker.state.trustPending": "Aguardando a etapa de confiança do certificado",
   "claudeDesktop.picker.state.trustDeclined": "A confiança no certificado foi recusada",
   "claudeDesktop.picker.state.proxyUnavailable": "O proxy do seletor não está em execução",
-  "claudeDesktop.picker.state.unsupported": "O modo seletor não é compatível com este sistema operacional",
-  "claudeDesktop.picker.state.notFirstParty": "O seletor só está disponível no modo de primeira parte",
+  "claudeDesktop.picker.state.unsupported":
+    "O modo seletor não é compatível com este sistema operacional",
+  "claudeDesktop.picker.state.notFirstParty":
+    "O seletor só está disponível no modo de primeira parte",
   "claudeDesktop.picker.state.profileFailed": "Não foi possível aplicar o perfil do seletor",
   "claudeDesktop.picker.models": "{count} modelos disponíveis no seletor",
-  "claudeDesktop.picker.offlineNote": "Com o modo seletor ativado, o Claude Desktop acessa a rede por meio do OpenCodex. Se o OpenCodex parar, o Desktop fica offline até ele reiniciar ou o modo seletor ser desativado.",
+  "claudeDesktop.picker.offlineNote":
+    "Com o modo seletor ativado, o Claude Desktop acessa a rede por meio do OpenCodex. Se o OpenCodex parar, o Desktop fica offline até ele reiniciar ou o modo seletor ser desativado.",
   "claudeDesktop.firstParty.bindings.title": "Vínculos de modelo da aba Code",
-  "claudeDesktop.firstParty.bindings.hint": "O Claude Desktop mantém os nomes da Anthropic no seletor da aba Code. Vincule um modelo do seletor a um modelo do OpenCodex e as requisições dessa entrada do seletor serão atendidas pelo modelo vinculado. Somente o tráfego do Claude Code pelo proxy local (a aba Code do Desktop e a CLI claude) usa estes vínculos; o ocx claude não é afetado. Os vínculos valem a partir da próxima requisição — não é preciso fechar e reabrir completamente.",
-  "claudeDesktop.firstParty.bindings.empty": "Ainda não há vínculos — os modelos do seletor seguem a rota padrão.",
+  "claudeDesktop.firstParty.bindings.hint":
+    "O Claude Desktop mantém os nomes da Anthropic no seletor da aba Code. Vincule um modelo do seletor a um modelo do OpenCodex e as requisições dessa entrada do seletor serão atendidas pelo modelo vinculado. Somente o tráfego do Claude Code pelo proxy local (a aba Code do Desktop e a CLI claude) usa estes vínculos; o ocx claude não é afetado. Os vínculos valem a partir da próxima requisição — não é preciso fechar e reabrir completamente.",
+  "claudeDesktop.firstParty.bindings.empty":
+    "Ainda não há vínculos — os modelos do seletor seguem a rota padrão.",
   "claudeDesktop.firstParty.bindings.pickerLabel": "Id do modelo no seletor",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
   "claudeDesktop.firstParty.bindings.routeLabel": "Modelo do OpenCodex",
@@ -3380,27 +4090,38 @@ export const pt: Record<TKey, string> = {
   "models.aliasAuto": "auto",
   "models.aliasUser": "usuário",
   "models.aliasStale": "obsoleto",
-  "connection.pairing.notApiKey": "Cole aqui um código de pareamento de uso único. Chaves de API de dados e tokens de administrador não devem ser colocados neste campo.",
-  "connection.pairing.networkError": "Não foi possível acessar o OpenCodex. Verifique se ele está em execução e tente novamente.",
+  "connection.pairing.notApiKey":
+    "Cole aqui um código de pareamento de uso único. Chaves de API de dados e tokens de administrador não devem ser colocados neste campo.",
+  "connection.pairing.networkError":
+    "Não foi possível acessar o OpenCodex. Verifique se ele está em execução e tente novamente.",
   "connection.pairing.requestError": "O OpenCodex não concluiu o pareamento. Tente novamente.",
-  "connection.pairing.responseError": "O OpenCodex retornou uma resposta de pareamento inválida. Tente novamente.",
+  "connection.pairing.responseError":
+    "O OpenCodex retornou uma resposta de pareamento inválida. Tente novamente.",
   "dash.authRequired": "É necessária autenticação do navegador para ver este dashboard.",
-  "dash.permissionDenied": "Este navegador não tem permissão para ler o dashboard. Verifique as configurações de acesso com o operador do servidor.",
-  "dash.dataUnavailable": "Não foi possível carregar os dados do dashboard. Verifique a conexão e tente novamente.",
+  "dash.permissionDenied":
+    "Este navegador não tem permissão para ler o dashboard. Verifique as configurações de acesso com o operador do servidor.",
+  "dash.dataUnavailable":
+    "Não foi possível carregar os dados do dashboard. Verifique a conexão e tente novamente.",
   "dash.staleData": "Exibindo os últimos dados recebidos; podem estar desatualizados.",
   "connection.pairing.code": "Código de pareamento de uso único",
   "connection.pairing.retryValidation": "Tentar validar novamente",
-  "connection.pairing.validationPending": "O código foi trocado, mas a validação da sessão não pôde ser concluída. Mantenha esta página aberta e escolha Tentar validar novamente; não é necessário um novo código.",
+  "connection.pairing.validationPending":
+    "O código foi trocado, mas a validação da sessão não pôde ser concluída. Mantenha esta página aberta e escolha Tentar validar novamente; não é necessário um novo código.",
   "connection.pairing.submit": "Conectar",
   "connection.pairing.submitting": "Conectando…",
-  "connection.pairing.error": "O código de pareamento foi recusado. Execute o comando novamente para obter um novo código para este endereço.",
-  "connection.pairing.originDenied": "Abra o painel no endereço de loopback configurado e solicite um novo código.",
+  "connection.pairing.error":
+    "O código de pareamento foi recusado. Execute o comando novamente para obter um novo código para este endereço.",
+  "connection.pairing.originDenied":
+    "Abra o painel no endereço de loopback configurado e solicite um novo código.",
   "connection.sessionLogout": "Encerrar sessão remota",
   "connection.sessionLoggingOut": "Encerrando sessão remota…",
-  "connection.sessionLogoutFailed": "Não foi possível encerrar a sessão remota. A sessão atual foi mantida.",
+  "connection.sessionLogoutFailed":
+    "Não foi possível encerrar a sessão remota. A sessão atual foi mantida.",
   "usage.source.local": "Fonte: usage.jsonl local",
-  "models.displayNameSavedRefreshFailed": "A alteração foi salva, mas não foi possível atualizar a lista de modelos. Tente novamente para atualizá-la.",
-  "models.displayNameOutcomeUnknown": "A requisição não foi concluída. A alteração pode ter sido salva. Tente novamente para verificar o nome atual antes de fazer outra alteração.",
+  "models.displayNameSavedRefreshFailed":
+    "A alteração foi salva, mas não foi possível atualizar a lista de modelos. Tente novamente para atualizá-la.",
+  "models.displayNameOutcomeUnknown":
+    "A requisição não foi concluída. A alteração pode ter sido salva. Tente novamente para verificar o nome atual antes de fazer outra alteração.",
   "models.displayNameCurrentUnavailable": "Nome atual indisponível até a atualização",
   "models.displayNameReloaded": "Lista de modelos atualizada",
   "models.displayNameAction": "Nome",
@@ -3428,8 +4149,10 @@ export const pt: Record<TKey, string> = {
   "pricing.override.title": "Preço do modelo",
   "pricing.override.modelId": "ID do modelo",
   "pricing.override.promptTitle": "Preço de prompts longos",
-  "pricing.override.promptHelp": "Os tokens de entrada e de leitura e gravação do cache determinam a faixa; a requisição inteira é cobrada pelas taxas dessa faixa. Tokens de saída nunca contam. As taxas são de velocidade padrão.",
-  "pricing.override.help": "USD por 1M de tokens. Informe as taxas de entrada e saída; taxas de cache em branco usam 0. Taxas iguais a 0 são permitidas.",
+  "pricing.override.promptHelp":
+    "Os tokens de entrada e de leitura e gravação do cache determinam a faixa; a requisição inteira é cobrada pelas taxas dessa faixa. Tokens de saída nunca contam. As taxas são de velocidade padrão.",
+  "pricing.override.help":
+    "USD por 1M de tokens. Informe as taxas de entrada e saída; taxas de cache em branco usam 0. Taxas iguais a 0 são permitidas.",
   "pricing.override.input": "Entrada",
   "pricing.override.output": "Saída",
   "pricing.override.cacheRead": "Leitura de cache",
@@ -3438,23 +4161,34 @@ export const pt: Record<TKey, string> = {
   "pricing.override.modeFlat": "Preço fixo",
   "pricing.override.modeCustom": "Limite personalizado",
 
-  "pricing.override.modeAutomaticHelp": "Usa as regras do catálogo por tamanho do prompt com os preços básicos acima. Os ajustes Fast e Priority continuam valendo.",
-  "pricing.override.modeFlatHelp": "Usa os preços básicos acima para qualquer tamanho de prompt, substituindo as regras do catálogo. Os ajustes Fast e Priority continuam valendo.",
+  "pricing.override.modeAutomaticHelp":
+    "Usa as regras do catálogo por tamanho do prompt com os preços básicos acima. Os ajustes Fast e Priority continuam valendo.",
+  "pricing.override.modeFlatHelp":
+    "Usa os preços básicos acima para qualquer tamanho de prompt, substituindo as regras do catálogo. Os ajustes Fast e Priority continuam valendo.",
   "pricing.override.threshold": "Limite do prompt (tokens)",
   "pricing.override.bandTitle": "Taxas da faixa de prompts longos",
-  "pricing.override.bandHelp": "Estas são taxas de velocidade padrão. As regras Fast e Priority do catálogo continuam valendo. Os custos são estimativas.",
+  "pricing.override.bandHelp":
+    "Estas são taxas de velocidade padrão. As regras Fast e Priority do catálogo continuam valendo. Os custos são estimativas.",
   "pricing.override.comparison": "Comparação do limite",
   "pricing.override.comparisonGt": "Maior que (>)",
   "pricing.override.comparisonGte": "Maior ou igual a (≥)",
-  "pricing.override.modeCustomHelp": "Insira quatro preços absolutos por 1 milhão de tokens. O tamanho do prompt inclui a entrada em cache e exclui a saída. Esses preços substituem a regra do catálogo por tamanho de prompt para toda a solicitação. Os ajustes Fast e Priority continuam valendo. Os custos são estimativas.",
-  "pricing.override.customInvalid": "Insira um limite positivo de tokens que seja um inteiro seguro e quatro preços finitos de 0 a 1.000.000. Os preços podem ser 0.",
+  "pricing.override.modeCustomHelp":
+    "Insira quatro preços absolutos por 1 milhão de tokens. O tamanho do prompt inclui a entrada em cache e exclui a saída. Esses preços substituem a regra do catálogo por tamanho de prompt para toda a solicitação. Os ajustes Fast e Priority continuam valendo. Os custos são estimativas.",
+  "pricing.override.customInvalid":
+    "Insira um limite positivo de tokens que seja um inteiro seguro e quatro preços finitos de 0 a 1.000.000. Os preços podem ser 0.",
   "pricing.override.loading": "Carregando preço salvo…",
-  "pricing.override.loadFailed": "Não foi possível carregar o preço salvo. Recarregue para tentar de novo.",
-  "pricing.override.outcomeUnknown": "A requisição não terminou de forma confiável. O preço pode ter mudado. Recarregue o preço salvo antes de editar novamente.",
-  "pricing.override.recoveryFailed": "Não foi possível recuperar o preço salvo. A edição continua bloqueada; recarregue para tentar de novo.",
-  "pricing.override.recovered": "Último preço salvo carregado. A requisição anterior ou outro cliente ainda pode alterá-lo.",
-  "pricing.override.refreshFailed": "O preço foi salvo, mas não foi possível atualizar a lista de modelos. Tente atualizar a lista novamente.",
-  "pricing.override.invalid": "Informe as taxas de entrada e saída. Cada taxa deve ser um número finito de 0 a 1.000.000.",
+  "pricing.override.loadFailed":
+    "Não foi possível carregar o preço salvo. Recarregue para tentar de novo.",
+  "pricing.override.outcomeUnknown":
+    "A requisição não terminou de forma confiável. O preço pode ter mudado. Recarregue o preço salvo antes de editar novamente.",
+  "pricing.override.recoveryFailed":
+    "Não foi possível recuperar o preço salvo. A edição continua bloqueada; recarregue para tentar de novo.",
+  "pricing.override.recovered":
+    "Último preço salvo carregado. A requisição anterior ou outro cliente ainda pode alterá-lo.",
+  "pricing.override.refreshFailed":
+    "O preço foi salvo, mas não foi possível atualizar a lista de modelos. Tente atualizar a lista novamente.",
+  "pricing.override.invalid":
+    "Informe as taxas de entrada e saída. Cada taxa deve ser um número finito de 0 a 1.000.000.",
   "pricing.override.reset": "Voltar ao automático",
   "pricing.override.save": "Salvar",
   "pricing.override.saving": "Salvando…",
@@ -3472,12 +4206,18 @@ export const pt: Record<TKey, string> = {
   "usage.range.invalid": "Informe datas e horas locais válidas, a partir de 01/01/1970 UTC.",
   "usage.range.reversed": "O fim deve ser igual ou posterior ao início.",
   "usage.range.applied": "Intervalo selecionado: {start} – {end} (ambos inclusivos).",
-  "models.pickerOrder.editorHint": "Reordene os modelos roteados e salve seu rascunho. As linhas em destaque são fixas; modelos nativos não são exibidos.",
-  "models.pickerOrder.nativeLocked": "Esta ordem salva inclui modelos nativos. Aplique um preset roteado ou Padrão antes de editar o Personalizado.",
-  "models.pickerOrder.unknownChosen": "As escolhas em destaque são desconhecidas. Recarregue antes de editar.",
-  "models.pickerOrder.changed": "As configurações do seletor mudaram. Seu rascunho foi mantido; recarregue para descartá-lo e usar as configurações atuais.",
-  "models.pickerOrder.savedReload": "Ordem salva. Recarregue as configurações atuais antes de editar novamente.",
-  "models.pickerOrder.requestFailed": "A requisição falhou. Seu rascunho foi mantido; tente novamente ou recarregue.",
+  "models.pickerOrder.editorHint":
+    "Reordene os modelos roteados e salve seu rascunho. As linhas em destaque são fixas; modelos nativos não são exibidos.",
+  "models.pickerOrder.nativeLocked":
+    "Esta ordem salva inclui modelos nativos. Aplique um preset roteado ou Padrão antes de editar o Personalizado.",
+  "models.pickerOrder.unknownChosen":
+    "As escolhas em destaque são desconhecidas. Recarregue antes de editar.",
+  "models.pickerOrder.changed":
+    "As configurações do seletor mudaram. Seu rascunho foi mantido; recarregue para descartá-lo e usar as configurações atuais.",
+  "models.pickerOrder.savedReload":
+    "Ordem salva. Recarregue as configurações atuais antes de editar novamente.",
+  "models.pickerOrder.requestFailed":
+    "A requisição falhou. Seu rascunho foi mantido; tente novamente ou recarregue.",
   "models.pickerOrder.empty": "Nenhum modelo roteado disponível.",
   "models.pickerOrder.dragModel": "Arrastar {model}",
   "models.pickerOrder.featured": "Em destaque",
@@ -3486,7 +4226,8 @@ export const pt: Record<TKey, string> = {
   "models.pickerOrder.position": "{model}: posição {position} de {total}",
   "models.pickerOrder.saveDraft": "Salvar rascunho",
   "models.pickerOrder.reloadDraft": "Recarregar e descartar rascunho",
-  "models.pickerOrder.catalogRequired": "As identidades dos modelos estão ausentes ou ambíguas. Recarregue a página Modelos para atualizar o catálogo antes de editar o Personalizado.",
+  "models.pickerOrder.catalogRequired":
+    "As identidades dos modelos estão ausentes ou ambíguas. Recarregue a página Modelos para atualizar o catálogo antes de editar o Personalizado.",
   "quotaSummary.aria": "Resumo de cota dos provedores",
   "quotaSummary.updated": "Atualizado {time}",
   "quotaSummary.dataAt": "Dados de {time}",
@@ -3499,7 +4240,8 @@ export const pt: Record<TKey, string> = {
   "quotaSummary.scrollNext": "Rolar provedores para a direita",
   "quotaSummary.openAccounts": "Abrir gerenciamento de contas",
   "pws.protocol.title": "Wire upstream",
-  "pws.protocol.note": "O formato de API que o opencodex usa para falar com este provedor. Ele não ativa nem desativa nenhuma API de cliente; a página de API controla isso.",
+  "pws.protocol.note":
+    "O formato de API que o opencodex usa para falar com este provedor. Ele não ativa nem desativa nenhuma API de cliente; a página de API controla isso.",
   "pws.protocol.adapterLabel": "Wire upstream que este provedor recebe",
   "pws.protocol.source": "Definido por",
   "pws.protocol.source.hardPin": "Fixado pelo opencodex para este modelo",
@@ -3519,17 +4261,22 @@ export const pt: Record<TKey, string> = {
   "compatProtocol.anyProtocol": "qualquer",
   "compatProtocol.pair": "{inbound} → {upstream}",
   "compatProtocol.loading": "Lendo o par de protocolos de cada subject…",
-  "compatProtocol.unverified": "Ainda não há evidência do Lab para {pair}. O par não foi verificado, não que tenha falhado.",
-  "compatProtocol.unresolved": "Não foi possível ler o par de protocolos de {count} subjects; eles ficam fora deste filtro.",
-  "compatProtocol.axisNote": "Estes são apenas veredictos do Lab. A forma como uma requisição é entregue (nativa ou traduzida) é mostrada na prévia do caminho da requisição, na página de API.",
+  "compatProtocol.unverified":
+    "Ainda não há evidência do Lab para {pair}. O par não foi verificado, não que tenha falhado.",
+  "compatProtocol.unresolved":
+    "Não foi possível ler o par de protocolos de {count} subjects; eles ficam fora deste filtro.",
+  "compatProtocol.axisNote":
+    "Estes são apenas veredictos do Lab. A forma como uma requisição é entregue (nativa ou traduzida) é mostrada na prévia do caminho da requisição, na página de API.",
   "protocolLinks.providerSettings": "Configurações do provedor",
   "fallback.title": "Fallback",
-  "fallback.desc": "Quando um modelo ou provedor falha, o OpenCodex pode enviar a requisição para o próximo alvo de um combo, perfil de roteamento ou cadeia de subagentes. Desative um tipo para receber um erro claro em vez disso.",
+  "fallback.desc":
+    "Quando um modelo ou provedor falha, o OpenCodex pode enviar a requisição para o próximo alvo de um combo, perfil de roteamento ou cadeia de subagentes. Desative um tipo para receber um erro claro em vez disso.",
   "fallback.model": "Fallback de modelo",
   "fallback.modelHint": "Outro modelo do mesmo provedor",
   "fallback.provider": "Fallback de provedor",
   "fallback.providerHint": "Outro provedor",
-  "fallback.rotationNote": "Alternar entre contas ou chaves de um mesmo provedor não é fallback e continua ativo.",
+  "fallback.rotationNote":
+    "Alternar entre contas ou chaves de um mesmo provedor não é fallback e continua ativo.",
   "fallback.overrides": "Substituições",
   "fallback.scope.provider": "Provedor {name}",
   "fallback.scope.route": "Rota {name}",

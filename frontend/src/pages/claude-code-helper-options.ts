@@ -13,6 +13,6 @@ export function backgroundHelperOptions(
   available: readonly string[] | undefined,
   unsetLabel: string,
 ): { value: string; label: ReactNode }[] {
-  const options = (available ?? []).map(m => ({ value: m, label: modelLabel(m) }));
+  const options = (available ?? []).map((m) => ({ value: m, label: modelLabel(m) }));
   return [{ value: "", label: unsetLabel }, ...options];
 }

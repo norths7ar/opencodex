@@ -29,8 +29,8 @@ export interface AccountQuota {
 
 export function quotaAutoRefreshAvailability(quota: AccountQuota | null) {
   return {
-    fiveHourAvailable: quota?.shortWindowSeconds === 5 * 60 * 60
-      && typeof quota.shortResetAt === "number",
+    fiveHourAvailable:
+      quota?.shortWindowSeconds === 5 * 60 * 60 && typeof quota.shortResetAt === "number",
     weeklyAvailable: typeof quota?.weeklyResetAt === "number",
   };
 }
@@ -40,20 +40,30 @@ export function isThirtyDayOnlyPlan(plan: string | null | undefined): boolean {
   return normalized === "go" || normalized === "free";
 }
 
-export function normalizeQuotaForPlan(quota: AccountQuota | null, plan: string | null | undefined): AccountQuota | null {
+export function normalizeQuotaForPlan(
+  quota: AccountQuota | null,
+  plan: string | null | undefined,
+): AccountQuota | null {
   if (!quota) return null;
-  const normalized = quota.shortPercent === undefined && quota.shortResetAt === undefined
-    ? quota
-    : {
-        ...quota,
-        fiveHourPercent: quota.fiveHourPercent ?? quota.shortPercent,
-        fiveHourResetAt: quota.fiveHourResetAt ?? quota.shortResetAt,
-      };
+  const normalized =
+    quota.shortPercent === undefined && quota.shortResetAt === undefined
+      ? quota
+      : {
+          ...quota,
+          fiveHourPercent: quota.fiveHourPercent ?? quota.shortPercent,
+          fiveHourResetAt: quota.fiveHourResetAt ?? quota.shortResetAt,
+        };
   if (!isThirtyDayOnlyPlan(plan)) return normalized;
   return {
-    ...(normalized.monthlyPercent !== undefined ? { monthlyPercent: normalized.monthlyPercent } : {}),
-    ...(normalized.monthlyResetAt !== undefined ? { monthlyResetAt: normalized.monthlyResetAt } : {}),
-    ...(normalized.workbuddyCredits !== undefined ? { workbuddyCredits: normalized.workbuddyCredits } : {}),
+    ...(normalized.monthlyPercent !== undefined
+      ? { monthlyPercent: normalized.monthlyPercent }
+      : {}),
+    ...(normalized.monthlyResetAt !== undefined
+      ? { monthlyResetAt: normalized.monthlyResetAt }
+      : {}),
+    ...(normalized.workbuddyCredits !== undefined
+      ? { workbuddyCredits: normalized.workbuddyCredits }
+      : {}),
     ...(normalized.creditsUsd !== undefined ? { creditsUsd: normalized.creditsUsd } : {}),
     ...(normalized.resetCredits !== undefined ? { resetCredits: normalized.resetCredits } : {}),
     updatedAt: normalized.updatedAt,
@@ -76,10 +86,13 @@ export function computeCodexUsageScore(
   now: number = Date.now(),
 ): number | null {
   if (!quota) return null;
-  const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
+  const finite = (value: unknown): value is number =>
+    typeof value === "number" && Number.isFinite(value);
   const shortPercent = finite(quota.fiveHourPercent)
     ? quota.fiveHourPercent
-    : (finite(quota.shortPercent) ? quota.shortPercent : undefined);
+    : finite(quota.shortPercent)
+      ? quota.shortPercent
+      : undefined;
   const longWindows = isThirtyDayOnlyPlan(plan)
     ? [quota.monthlyPercent]
     : [quota.weeklyPercent, quota.monthlyPercent];
@@ -94,17 +107,22 @@ export function computeCodexUsageScore(
     //
     // The alias collapse happens here because it is a wire concern of this DTO: the account
     // API spells the same burst window `fiveHour*` and the stored snapshot spells it `short*`.
-    return isTerminalShortWindow({
-      ...(finite(shortPercent) ? { shortPercent } : {}),
-      ...(finite(quota.fiveHourResetAt ?? quota.shortResetAt)
-        ? { shortResetAt: quota.fiveHourResetAt ?? quota.shortResetAt }
-        : {}),
-      ...(finite(quota.shortObservedAt) ? { shortObservedAt: quota.shortObservedAt } : {}),
-    }, now)
+    return isTerminalShortWindow(
+      {
+        ...(finite(shortPercent) ? { shortPercent } : {}),
+        ...(finite(quota.fiveHourResetAt ?? quota.shortResetAt)
+          ? { shortResetAt: quota.fiveHourResetAt ?? quota.shortResetAt }
+          : {}),
+        ...(finite(quota.shortObservedAt) ? { shortObservedAt: quota.shortObservedAt } : {}),
+      },
+      now,
+    )
       ? 100
       : null;
   }
-  const values = finite(shortPercent) && !hasElapsedShortWindow(quota.fiveHourResetAt ?? quota.shortResetAt, now)
-    ? [...knownLong, shortPercent] : knownLong;
+  const values =
+    finite(shortPercent) && !hasElapsedShortWindow(quota.fiveHourResetAt ?? quota.shortResetAt, now)
+      ? [...knownLong, shortPercent]
+      : knownLong;
   return values.length ? Math.max(...values) : null;
 }

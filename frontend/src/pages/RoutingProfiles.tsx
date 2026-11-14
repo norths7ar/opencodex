@@ -36,8 +36,20 @@ type Analytics = {
   historyTruncated: boolean;
   cooldownTriggeringFailures: number;
   durationMs: { p50?: number; p95?: number; p99?: number; sampleCount: number };
-  firstOutputMs: { p50?: number; p95?: number; p99?: number; sampleCount: number; coverage: number | null };
-  breakdown: Array<{ provider: string; model: string; requests: number; successRate: number | null; p50DurationMs?: number }>;
+  firstOutputMs: {
+    p50?: number;
+    p95?: number;
+    p99?: number;
+    sampleCount: number;
+    coverage: number | null;
+  };
+  breakdown: Array<{
+    provider: string;
+    model: string;
+    requests: number;
+    successRate: number | null;
+    p50DurationMs?: number;
+  }>;
 };
 
 type DryRunResult = {
@@ -68,7 +80,9 @@ const NUMERIC_REQUIREMENT_SPEC = {
   minContextWindow: { min: 1, max: undefined, step: 1 },
   minQuotaHeadroom: { min: 0, max: 1, step: "any" },
 } as const;
-const NUMERIC_REQUIREMENTS = Object.keys(NUMERIC_REQUIREMENT_SPEC) as Array<keyof typeof NUMERIC_REQUIREMENT_SPEC>;
+const NUMERIC_REQUIREMENTS = Object.keys(NUMERIC_REQUIREMENT_SPEC) as Array<
+  keyof typeof NUMERIC_REQUIREMENT_SPEC
+>;
 const OPTIMIZE_KEYS = ["latency", "health", "cost", "quota"] as const;
 const UNKNOWN_EVIDENCE_KEYS = ["capability", "health", "quota", "cost"] as const;
 const UNKNOWN_EVIDENCE_OPTIONS: UnknownEvidenceMode[] = ["allow", "penalize", "exclude"];
@@ -128,9 +142,9 @@ function fmtExclusion(code: string, t: ReturnType<typeof useT>): string {
   }
 }
 
-
 function parseProfiles(raw: unknown): RoutingProfileDto[] {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("invalid-profiles-response");
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    throw new Error("invalid-profiles-response");
   const profiles = (raw as { profiles?: unknown }).profiles;
   if (!Array.isArray(profiles)) throw new Error("invalid-profiles-response");
   const valid = profiles.filter((profile): profile is RoutingProfileDto => {
@@ -138,17 +152,19 @@ function parseProfiles(raw: unknown): RoutingProfileDto[] {
     // Validate the complete DTO shape: routingProfileDraftFromDto dereferences
     // these nested objects, so a management response that omits any of them
     // must be rejected here rather than crash the load path.
-    return typeof profile.id === "string"
-      && typeof profile.model === "string"
-      && typeof profile.revision === "string"
-      && Array.isArray(profile.candidates)
-      && isPlainObject(profile.require)
-      && isPlainObject(profile.optimize)
-      && isPlainObject(profile.limits)
-      && isPlainObject(profile.unknownEvidence);
+    return (
+      typeof profile.id === "string" &&
+      typeof profile.model === "string" &&
+      typeof profile.revision === "string" &&
+      Array.isArray(profile.candidates) &&
+      isPlainObject(profile.require) &&
+      isPlainObject(profile.optimize) &&
+      isPlainObject(profile.limits) &&
+      isPlainObject(profile.unknownEvidence)
+    );
   });
   if (profiles.length > 0 && valid.length === 0) throw new Error("invalid-profiles-response");
-  return valid.map(profile => ({ ...profile, alias: profile.alias ?? null }));
+  return valid.map((profile) => ({ ...profile, alias: profile.alias ?? null }));
 }
 
 function parseModels(raw: unknown): ModelOption[] {
@@ -161,12 +177,12 @@ function parseModels(raw: unknown): ModelOption[] {
   const models: ModelOption[] = [];
   for (const row of rows) {
     if (!row || typeof row !== "object" || Array.isArray(row)) continue;
-    const provider = typeof (row as { provider?: unknown }).provider === "string"
-      ? (row as { provider: string }).provider.trim()
-      : "";
-    const id = typeof (row as { id?: unknown }).id === "string"
-      ? (row as { id: string }).id.trim()
-      : "";
+    const provider =
+      typeof (row as { provider?: unknown }).provider === "string"
+        ? (row as { provider: string }).provider.trim()
+        : "";
+    const id =
+      typeof (row as { id?: unknown }).id === "string" ? (row as { id: string }).id.trim() : "";
     if (!provider || !id || provider === "combo" || provider === "policy") continue;
     if ((row as { disabled?: unknown }).disabled === true) continue;
     const key = JSON.stringify([provider, id]);
@@ -184,7 +200,7 @@ function selectedAfterLoad(
 ): RoutingProfileDto | null {
   const requestedId = preferredId ?? currentId;
   if (requestedId) {
-    const match = profiles.find(profile => profile.id === requestedId);
+    const match = profiles.find((profile) => profile.id === requestedId);
     if (match) return match;
   }
   return profiles[0] ?? null;
@@ -270,83 +286,99 @@ export default function RoutingProfiles({
     setRunning(false);
   }, []);
 
-  const selectProfile = useCallback((profile: RoutingProfileDto | null) => {
-    selectedRef.current = profile;
-    setSelected(profile);
-    setDraft(profile ? routingProfileDraftFromDto(profile) : null);
-    setStatus(null);
-    clearDryRun();
-  }, [clearDryRun]);
+  const selectProfile = useCallback(
+    (profile: RoutingProfileDto | null) => {
+      selectedRef.current = profile;
+      setSelected(profile);
+      setDraft(profile ? routingProfileDraftFromDto(profile) : null);
+      setStatus(null);
+      clearDryRun();
+    },
+    [clearDryRun],
+  );
 
-  const load = useCallback(async (preferredId?: string) => {
-    if (!loadEnabledRef.current) return;
-    /*
-     * `load` owns the controller, not the effect that happens to call it.
-     *
-     * There are four entry points — the mount effect, Retry, post-save, and
-     * post-delete — so an effect-local controller would cancel only the first and let
-     * a Retry or a mutation reload keep running after the tab hides. Generation
-     * invalidation stops the state write but not the network work.
-     */
-    loadAbortRef.current?.abort();
-    const controller = new AbortController();
-    loadAbortRef.current = controller;
-    const { signal } = controller;
-    const generation = ++loadGenerationRef.current;
-    setLoaded(false);
-    setLoadError("");
-    try {
-      const [profilesRes, analyticsRes, configRes, modelsRes] = await Promise.all([
-        fetch(`${apiBase}/api/routing-profiles`, { signal }),
-        fetch(`${apiBase}/api/routing-analytics`, { signal }),
-        fetch(`${apiBase}/api/config`, { signal }),
-        fetch(`${apiBase}/api/models`, { signal }),
-      ]);
-      if (!profilesRes.ok) throw new Error(`load-${profilesRes.status}`);
-      const [profilesJson, analyticsJson, configJson, modelsJson] = await Promise.all([
-        profilesRes.json() as Promise<unknown>,
-        analyticsRes.ok ? analyticsRes.json() as Promise<Analytics> : Promise.resolve(null),
-        configRes.ok ? configRes.json() as Promise<ConfigDto> : Promise.resolve({} as ConfigDto),
-        modelsRes.ok ? modelsRes.json() as Promise<unknown> : Promise.resolve([]),
-      ]);
-      if (generation !== loadGenerationRef.current) return;
+  const load = useCallback(
+    async (preferredId?: string) => {
+      if (!loadEnabledRef.current) return;
+      /*
+       * `load` owns the controller, not the effect that happens to call it.
+       *
+       * There are four entry points — the mount effect, Retry, post-save, and
+       * post-delete — so an effect-local controller would cancel only the first and let
+       * a Retry or a mutation reload keep running after the tab hides. Generation
+       * invalidation stops the state write but not the network work.
+       */
+      loadAbortRef.current?.abort();
+      const controller = new AbortController();
+      loadAbortRef.current = controller;
+      const { signal } = controller;
+      const generation = ++loadGenerationRef.current;
+      setLoaded(false);
+      setLoadError("");
+      try {
+        const [profilesRes, analyticsRes, configRes, modelsRes] = await Promise.all([
+          fetch(`${apiBase}/api/routing-profiles`, { signal }),
+          fetch(`${apiBase}/api/routing-analytics`, { signal }),
+          fetch(`${apiBase}/api/config`, { signal }),
+          fetch(`${apiBase}/api/models`, { signal }),
+        ]);
+        if (!profilesRes.ok) throw new Error(`load-${profilesRes.status}`);
+        const [profilesJson, analyticsJson, configJson, modelsJson] = await Promise.all([
+          profilesRes.json() as Promise<unknown>,
+          analyticsRes.ok ? (analyticsRes.json() as Promise<Analytics>) : Promise.resolve(null),
+          configRes.ok
+            ? (configRes.json() as Promise<ConfigDto>)
+            : Promise.resolve({} as ConfigDto),
+          modelsRes.ok ? (modelsRes.json() as Promise<unknown>) : Promise.resolve([]),
+        ]);
+        if (generation !== loadGenerationRef.current) return;
 
-      const nextProfiles = parseProfiles(profilesJson);
-      const current = selectedRef.current;
-      const refreshed = selectedAfterLoad(nextProfiles, current?.id ?? null, preferredId);
-      const configuredProviders = configJson.providers ?? {};
-      const nextProviderNames = Object.entries(configuredProviders)
-        .filter(([, provider]) => provider.disabled !== true)
-        .map(([name]) => name)
-        .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
-      const nextDefaults = Object.fromEntries(
-        Object.entries(configuredProviders)
-          .filter(([, provider]) => provider.disabled !== true && typeof provider.defaultModel === "string")
-          .map(([name, provider]) => [name, provider.defaultModel!.trim()]),
-      );
+        const nextProfiles = parseProfiles(profilesJson);
+        const current = selectedRef.current;
+        const refreshed = selectedAfterLoad(nextProfiles, current?.id ?? null, preferredId);
+        const configuredProviders = configJson.providers ?? {};
+        const nextProviderNames = Object.entries(configuredProviders)
+          .filter(([, provider]) => provider.disabled !== true)
+          .map(([name]) => name)
+          .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+        const nextDefaults = Object.fromEntries(
+          Object.entries(configuredProviders)
+            .filter(
+              ([, provider]) =>
+                provider.disabled !== true && typeof provider.defaultModel === "string",
+            )
+            .map(([name, provider]) => [name, provider.defaultModel!.trim()]),
+        );
 
-      selectedRef.current = refreshed;
-      setProfiles(nextProfiles);
-      setLoaded(true);
-      setSelected(refreshed);
-      setDraft(refreshed ? routingProfileDraftFromDto(refreshed) : null);
-      setAnalytics(analyticsJson);
-      setProviderNames(nextProviderNames);
-      setProviderDefaults(nextDefaults);
-      setModels(parseModels(modelsJson));
-      if (!current || !refreshed || current.id !== refreshed.id || current.revision !== refreshed.revision) {
-        clearDryRun();
+        selectedRef.current = refreshed;
+        setProfiles(nextProfiles);
+        setLoaded(true);
+        setSelected(refreshed);
+        setDraft(refreshed ? routingProfileDraftFromDto(refreshed) : null);
+        setAnalytics(analyticsJson);
+        setProviderNames(nextProviderNames);
+        setProviderDefaults(nextDefaults);
+        setModels(parseModels(modelsJson));
+        if (
+          !current ||
+          !refreshed ||
+          current.id !== refreshed.id ||
+          current.revision !== refreshed.revision
+        ) {
+          clearDryRun();
+        }
+      } catch (error) {
+        if (generation !== loadGenerationRef.current) return;
+        // An aborted supersede or deactivate is not a failure worth showing.
+        if (signal.aborted) return;
+        setLoadError(error instanceof Error ? error.message : String(error));
+      } finally {
+        // Clear only if this request still owns the ref; a newer load may have replaced it.
+        if (loadAbortRef.current === controller) loadAbortRef.current = null;
       }
-    } catch (error) {
-      if (generation !== loadGenerationRef.current) return;
-      // An aborted supersede or deactivate is not a failure worth showing.
-      if (signal.aborted) return;
-      setLoadError(error instanceof Error ? error.message : String(error));
-    } finally {
-      // Clear only if this request still owns the ref; a newer load may have replaced it.
-      if (loadAbortRef.current === controller) loadAbortRef.current = null;
-    }
-  }, [apiBase, clearDryRun]);
+    },
+    [apiBase, clearDryRun],
+  );
 
   useEffect(() => {
     if (!active) {
@@ -373,9 +405,8 @@ export default function RoutingProfiles({
   }, [onCountChange, profiles.length]);
 
   const firstProvider = providerNames[0] ?? "";
-  const firstModel = providerDefaults[firstProvider]
-    ?? modelOptionsForProvider(models, firstProvider)[0]?.id
-    ?? "";
+  const firstModel =
+    providerDefaults[firstProvider] ?? modelOptionsForProvider(models, firstProvider)[0]?.id ?? "";
 
   const startCreate = () => {
     selectedRef.current = null;
@@ -407,7 +438,7 @@ export default function RoutingProfiles({
       });
       const data = await readJsonIfOk<unknown>(response);
       if (!response.ok) {
-        const errorBody = await response.json().catch(() => null) as unknown;
+        const errorBody = (await response.json().catch(() => null)) as unknown;
         notify(routingProfileResponseError(errorBody) ?? t("routing.loadFailed"), false);
         return;
       }
@@ -426,7 +457,14 @@ export default function RoutingProfiles({
 
   const removeProfile = async () => {
     if (!selected || saving) return;
-    if (!(await confirmAction({ message: t("routing.removeConfirm", { id: selected.id }), confirmLabel: t("common.remove"), tone: "danger" }))) return;
+    if (
+      !(await confirmAction({
+        message: t("routing.removeConfirm", { id: selected.id }),
+        confirmLabel: t("common.remove"),
+        tone: "danger",
+      }))
+    )
+      return;
     setSaving(true);
     setStatus(null);
     try {
@@ -436,7 +474,7 @@ export default function RoutingProfiles({
       );
       const data = await readJsonIfOk<unknown>(response);
       if (!response.ok) {
-        const errorBody = await response.json().catch(() => null) as unknown;
+        const errorBody = (await response.json().catch(() => null)) as unknown;
         notify(routingProfileResponseError(errorBody) ?? t("routing.loadFailed"), false);
         return;
       }
@@ -454,12 +492,8 @@ export default function RoutingProfiles({
     }
   };
 
-  const updateCandidate = (
-    index: number,
-    field: "provider" | "model",
-    value: string,
-  ) => {
-    setDraft(current => {
+  const updateCandidate = (index: number, field: "provider" | "model", value: string) => {
+    setDraft((current) => {
       if (!current) return current;
       const candidates = current.candidates.map((candidate, candidateIndex) => {
         if (candidateIndex !== index) return candidate;
@@ -467,9 +501,7 @@ export default function RoutingProfiles({
           return {
             ...candidate,
             provider: value,
-            model: providerDefaults[value]
-              ?? modelOptionsForProvider(models, value)[0]?.id
-              ?? "",
+            model: providerDefaults[value] ?? modelOptionsForProvider(models, value)[0]?.id ?? "",
           };
         }
         return { ...candidate, model: value };
@@ -479,20 +511,25 @@ export default function RoutingProfiles({
   };
 
   const addCandidate = () => {
-    setDraft(current => current ? {
-      ...current,
-      candidates: [
-        ...current.candidates,
-        newDraftCandidate(firstProvider, firstModel),
-      ],
-    } : current);
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            candidates: [...current.candidates, newDraftCandidate(firstProvider, firstModel)],
+          }
+        : current,
+    );
   };
 
   const removeCandidate = (index: number) => {
-    setDraft(current => current ? {
-      ...current,
-      candidates: current.candidates.filter((_, candidateIndex) => candidateIndex !== index),
-    } : current);
+    setDraft((current) =>
+      current
+        ? {
+            ...current,
+            candidates: current.candidates.filter((_, candidateIndex) => candidateIndex !== index),
+          }
+        : current,
+    );
   };
 
   const runDryRun = async () => {
@@ -520,12 +557,15 @@ export default function RoutingProfiles({
       });
       if (generation !== dryRunGenerationRef.current) return;
       if (!response.ok) {
-        const body = await response.json().catch(() => null) as unknown;
+        const body = (await response.json().catch(() => null)) as unknown;
         if (generation !== dryRunGenerationRef.current) return;
-        setDryRunError(routingProfileResponseError(body) ?? t("routing.dryRunError", { status: response.status }));
+        setDryRunError(
+          routingProfileResponseError(body) ??
+            t("routing.dryRunError", { status: response.status }),
+        );
         return;
       }
-      const result = await response.json() as DryRunResult;
+      const result = (await response.json()) as DryRunResult;
       if (generation !== dryRunGenerationRef.current) return;
       setDryRunResult(result);
     } catch (error) {
@@ -538,10 +578,12 @@ export default function RoutingProfiles({
     }
   };
 
-  const selectedModelOptions = draft?.candidates.map(
-    candidate => modelOptionsForProvider(models, candidate.provider),
-  ) ?? [];
-  const unknownEvidenceOptions = UNKNOWN_EVIDENCE_OPTIONS.map(mode => ({ value: mode, label: t(`routing.unknownEvidence.${mode}` as const) }));
+  const selectedModelOptions =
+    draft?.candidates.map((candidate) => modelOptionsForProvider(models, candidate.provider)) ?? [];
+  const unknownEvidenceOptions = UNKNOWN_EVIDENCE_OPTIONS.map((mode) => ({
+    value: mode,
+    label: t(`routing.unknownEvidence.${mode}` as const),
+  }));
 
   return (
     <div className="page" data-page="routing">
@@ -552,20 +594,31 @@ export default function RoutingProfiles({
         every static gate. The actions stay; a heading cannot carry buttons, so they sit
         in a plain toolbar row.
       */}
-      <div className="row" style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 12 }}>
+      <div
+        className="row"
+        style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginBottom: 12 }}
+      >
         <button type="button" className="btn btn-primary btn-sm" onClick={startCreate}>
           <span aria-hidden="true">+</span> {t("routing.createProfile")}
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => void load()}>{t("common.retry")}</button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => void load()}>
+          {t("common.retry")}
+        </button>
       </div>
 
-      {loadError ? <Notice tone="err">{t("routing.loadFailed")}: {loadError}</Notice> : null}
+      {loadError ? (
+        <Notice tone="err">
+          {t("routing.loadFailed")}: {loadError}
+        </Notice>
+      ) : null}
       {status ? <Notice tone={status.ok ? "ok" : "err"}>{status.message}</Notice> : null}
-      {loaded && !loadError && profiles.length === 0 && !draft ? <p className="muted">{t("routing.empty")}</p> : null}
+      {loaded && !loadError && profiles.length === 0 && !draft ? (
+        <p className="muted">{t("routing.empty")}</p>
+      ) : null}
 
       {profiles.length > 0 ? (
         <div className="panel" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {profiles.map(profile => (
+          {profiles.map((profile) => (
             <button
               key={profile.id}
               type="button"
@@ -577,7 +630,9 @@ export default function RoutingProfiles({
               <div className="card-badges">
                 <strong>{profile.id}</strong>
                 <span className="badge badge-muted">{profile.model}</span>
-                <span className="badge badge-muted">{t("routing.revision")}: {profile.revision}</span>
+                <span className="badge badge-muted">
+                  {t("routing.revision")}: {profile.revision}
+                </span>
               </div>
             </button>
           ))}
@@ -588,14 +643,20 @@ export default function RoutingProfiles({
         <form
           className="panel"
           style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 16 }}
-          onSubmit={event => {
+          onSubmit={(event) => {
             event.preventDefault();
             void saveProfile();
           }}
         >
           <div className="page-head">
-            <h3>{t("routing.detail")}: {selected?.model ?? <code>policy/…</code>}</h3>
-            {selected ? <span className="badge badge-muted">{t("routing.revision")}: {selected.revision}</span> : null}
+            <h3>
+              {t("routing.detail")}: {selected?.model ?? <code>policy/…</code>}
+            </h3>
+            {selected ? (
+              <span className="badge badge-muted">
+                {t("routing.revision")}: {selected.revision}
+              </span>
+            ) : null}
           </div>
 
           <div className="model-grid">
@@ -606,7 +667,11 @@ export default function RoutingProfiles({
                 required
                 disabled={selected !== null}
                 value={draft.id}
-                onChange={event => setDraft(current => current ? { ...current, id: event.target.value } : current)}
+                onChange={(event) =>
+                  setDraft((current) =>
+                    current ? { ...current, id: event.target.value } : current,
+                  )
+                }
               />
             </label>
             <label className="field-label">
@@ -614,7 +679,11 @@ export default function RoutingProfiles({
               <input
                 className="input"
                 value={draft.alias}
-                onChange={event => setDraft(current => current ? { ...current, alias: event.target.value } : current)}
+                onChange={(event) =>
+                  setDraft((current) =>
+                    current ? { ...current, alias: event.target.value } : current,
+                  )
+                }
               />
             </label>
           </div>
@@ -623,7 +692,9 @@ export default function RoutingProfiles({
             <legend className="field-label">{t("routing.candidates")}</legend>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {draft.candidates.map((candidate, index) => {
-                const candidateProviders = [...new Set([candidate.provider, ...providerNames])].filter(Boolean);
+                const candidateProviders = [
+                  ...new Set([candidate.provider, ...providerNames]),
+                ].filter(Boolean);
                 const listId = `routing-model-options-${index}`;
                 return (
                   <div key={candidate.key} className="model-card">
@@ -634,10 +705,13 @@ export default function RoutingProfiles({
                           fullWidth
                           required
                           value={candidate.provider}
-                          onChange={provider => updateCandidate(index, "provider", provider)}
+                          onChange={(provider) => updateCandidate(index, "provider", provider)}
                           options={[
                             { value: "", label: t("routing.none"), disabled: true },
-                            ...candidateProviders.map(provider => ({ value: provider, label: provider })),
+                            ...candidateProviders.map((provider) => ({
+                              value: provider,
+                              label: provider,
+                            })),
                           ]}
                         />
                       </label>
@@ -648,10 +722,12 @@ export default function RoutingProfiles({
                           required
                           list={listId}
                           value={candidate.model}
-                          onChange={event => updateCandidate(index, "model", event.target.value)}
+                          onChange={(event) => updateCandidate(index, "model", event.target.value)}
                         />
                         <datalist id={listId}>
-                          {selectedModelOptions[index]?.map(model => <option key={model.id} value={model.id} />)}
+                          {selectedModelOptions[index]?.map((model) => (
+                            <option key={model.id} value={model.id} />
+                          ))}
                         </datalist>
                       </label>
                     </div>
@@ -660,7 +736,10 @@ export default function RoutingProfiles({
                       className="btn btn-ghost btn-sm"
                       disabled={draft.candidates.length === 1}
                       onClick={() => removeCandidate(index)}
-                      aria-label={t("routing.removeCandidate", { provider: candidate.provider, model: candidate.model })}
+                      aria-label={t("routing.removeCandidate", {
+                        provider: candidate.provider,
+                        model: candidate.model,
+                      })}
                     >
                       {t("common.remove")}
                     </button>
@@ -676,7 +755,7 @@ export default function RoutingProfiles({
           <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
             <legend className="field-label">{t("routing.require")}</legend>
             <div className="model-grid">
-              {NUMERIC_REQUIREMENTS.map(key => (
+              {NUMERIC_REQUIREMENTS.map((key) => (
                 <label key={key} className="field-label">
                   <code>{key}</code>
                   <input
@@ -686,39 +765,57 @@ export default function RoutingProfiles({
                     max={NUMERIC_REQUIREMENT_SPEC[key].max}
                     step={NUMERIC_REQUIREMENT_SPEC[key].step}
                     value={draft.require[key]}
-                    onChange={event => setDraft(current => current ? {
-                      ...current,
-                      require: { ...current.require, [key]: event.target.value },
-                    } : current)}
+                    onChange={(event) =>
+                      setDraft((current) =>
+                        current
+                          ? {
+                              ...current,
+                              require: { ...current.require, [key]: event.target.value },
+                            }
+                          : current,
+                      )
+                    }
                   />
                 </label>
               ))}
-              {STRING_REQUIREMENTS.map(key => (
+              {STRING_REQUIREMENTS.map((key) => (
                 <label key={key} className="field-label">
                   <code>{key}</code>
                   <input
                     className="input"
                     value={draft.require[key]}
-                    onChange={event => setDraft(current => current ? {
-                      ...current,
-                      require: { ...current.require, [key]: event.target.value },
-                    } : current)}
+                    onChange={(event) =>
+                      setDraft((current) =>
+                        current
+                          ? {
+                              ...current,
+                              require: { ...current.require, [key]: event.target.value },
+                            }
+                          : current,
+                      )
+                    }
                   />
                 </label>
               ))}
-              {BOOLEAN_REQUIREMENTS.map(key => (
+              {BOOLEAN_REQUIREMENTS.map((key) => (
                 <label key={key} className="field-label">
                   <code>{key}</code>
                   <Select
                     fullWidth
                     value={draft.require[key]}
-                    onChange={value => setDraft(current => current ? {
-                      ...current,
-                      require: {
-                        ...current.require,
-                        [key]: value as OptionalBoolean,
-                      },
-                    } : current)}
+                    onChange={(value) =>
+                      setDraft((current) =>
+                        current
+                          ? {
+                              ...current,
+                              require: {
+                                ...current.require,
+                                [key]: value as OptionalBoolean,
+                              },
+                            }
+                          : current,
+                      )
+                    }
                     options={[
                       { value: "", label: t("routing.none") },
                       { value: "true", label: t("routing.yes") },
@@ -733,7 +830,7 @@ export default function RoutingProfiles({
           <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
             <legend className="field-label">{t("routing.optimize")}</legend>
             <div className="model-grid">
-              {OPTIMIZE_KEYS.map(key => (
+              {OPTIMIZE_KEYS.map((key) => (
                 <label key={key} className="field-label">
                   <code>{key}</code>
                   <input
@@ -743,10 +840,16 @@ export default function RoutingProfiles({
                     step="any"
                     required
                     value={draft.optimize[key]}
-                    onChange={event => setDraft(current => current ? {
-                      ...current,
-                      optimize: { ...current.optimize, [key]: event.target.value },
-                    } : current)}
+                    onChange={(event) =>
+                      setDraft((current) =>
+                        current
+                          ? {
+                              ...current,
+                              optimize: { ...current.optimize, [key]: event.target.value },
+                            }
+                          : current,
+                      )
+                    }
                   />
                 </label>
               ))}
@@ -763,10 +866,16 @@ export default function RoutingProfiles({
                 min={0}
                 step="any"
                 value={draft.limits.maxEstimatedCostUsd}
-                onChange={event => setDraft(current => current ? {
-                  ...current,
-                  limits: { ...current.limits, maxEstimatedCostUsd: event.target.value },
-                } : current)}
+                onChange={(event) =>
+                  setDraft((current) =>
+                    current
+                      ? {
+                          ...current,
+                          limits: { ...current.limits, maxEstimatedCostUsd: event.target.value },
+                        }
+                      : current,
+                  )
+                }
               />
             </label>
             <label className="field-label">
@@ -774,14 +883,23 @@ export default function RoutingProfiles({
               <Select
                 fullWidth
                 value={draft.limits.onUnknownCost}
-                onChange={value => setDraft(current => current ? {
-                  ...current,
-                  limits: {
-                    ...current.limits,
-                    onUnknownCost: value as UnknownCostCapMode,
-                  },
-                } : current)}
-                options={UNKNOWN_COST_CAP_OPTIONS.map(mode => ({ value: mode, label: t(`routing.unknownEvidence.${mode}` as const) }))}
+                onChange={(value) =>
+                  setDraft((current) =>
+                    current
+                      ? {
+                          ...current,
+                          limits: {
+                            ...current.limits,
+                            onUnknownCost: value as UnknownCostCapMode,
+                          },
+                        }
+                      : current,
+                  )
+                }
+                options={UNKNOWN_COST_CAP_OPTIONS.map((mode) => ({
+                  value: mode,
+                  label: t(`routing.unknownEvidence.${mode}` as const),
+                }))}
               />
             </label>
           </fieldset>
@@ -789,27 +907,31 @@ export default function RoutingProfiles({
           <fieldset style={{ border: 0, padding: 0, margin: 0 }}>
             <legend className="field-label">{t("routing.unknownEvidence")}</legend>
             <div className="model-grid">
-              {UNKNOWN_EVIDENCE_KEYS.map(key => (
+              {UNKNOWN_EVIDENCE_KEYS.map((key) => (
                 <label key={key} className="field-label">
                   <code>{key}</code>
                   <Select
                     fullWidth
                     value={draft.unknownEvidence[key]}
-                    onChange={value => setDraft(current => current ? {
-                      ...current,
-                      unknownEvidence: {
-                        ...current.unknownEvidence,
-                        [key]: value as UnknownEvidenceMode,
-                      },
-                    } : current)}
+                    onChange={(value) =>
+                      setDraft((current) =>
+                        current
+                          ? {
+                              ...current,
+                              unknownEvidence: {
+                                ...current.unknownEvidence,
+                                [key]: value as UnknownEvidenceMode,
+                              },
+                            }
+                          : current,
+                      )
+                    }
                     options={unknownEvidenceOptions}
                   />
                 </label>
               ))}
             </div>
           </fieldset>
-
-          
 
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button type="submit" className="btn btn-primary" disabled={saving}>
@@ -819,7 +941,12 @@ export default function RoutingProfiles({
               {t("common.cancel")}
             </button>
             {selected ? (
-              <button type="button" className="btn btn-ghost" disabled={saving} onClick={() => void removeProfile()}>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={saving}
+                onClick={() => void removeProfile()}
+              >
                 {t("common.remove")}
               </button>
             ) : null}
@@ -829,130 +956,165 @@ export default function RoutingProfiles({
 
       {/* A dry-run form is dead weight until an existing profile is selected to evaluate. */}
       {selected && (
-      <div className="panel" style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-        <h3>{t("routing.dryRun")}</h3>
-        <label className="field-label" htmlFor="routing-context">
-          {t("routing.dryRunContext")}
-          <input
-            id="routing-context"
-            className="input"
-            type="number"
-            min={1}
-            value={context}
-            onChange={event => {
-              setContext(event.target.value);
-              clearDryRun();
-            }}
-          />
-        </label>
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={tools}
-            onChange={event => {
-              setTools(event.target.checked);
-              clearDryRun();
-            }}
-          />
-          {t("routing.dryRunTools")}
-        </label>
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={image}
-            onChange={event => {
-              setImage(event.target.checked);
-              clearDryRun();
-            }}
-          />
-          {t("routing.dryRunImage")}
-        </label>
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={structured}
-            onChange={event => {
-              setStructured(event.target.checked);
-              clearDryRun();
-            }}
-          />
-          {t("routing.dryRunStructured")}
-        </label>
-        <button type="button" className="btn btn-primary" disabled={!selected || running} onClick={() => void runDryRun()}>
-          {t("routing.dryRunRun")}
-        </button>
-        {dryRunError ? <Notice tone="err">{dryRunError}</Notice> : null}
-        {dryRunResult ? (
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th>{t("routing.candidate")}</th>
-                <th>{t("routing.eligible")}</th>
-                <th>{t("routing.exclusions")}</th>
-                <th>{t("routing.costCap")}</th>
-                <th>{t("routing.score")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dryRunResult.candidates.map((candidate, index) => (
-                <tr key={`${candidate.provider}/${candidate.model}`}>
-                  <td>
-                    {candidate.provider}/{candidate.model}
-                    {index === dryRunResult.selectedIndex ? ` ✓ (${t("routing.selected")})` : ""}
-                  </td>
-                  <td>{candidate.eligible ? t("routing.yes") : t("routing.no")}</td>
-                  <td>{candidate.exclusions.map(exclusion => fmtExclusion(exclusion.code, t)).join(", ") || t("routing.none")}</td>
-                  <td>{fmtCapOutcome(candidate.cost?.capOutcome, t, unavailable)}</td>
-                  <td>{candidate.score ? candidate.score.total.toFixed(3) : unavailable}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : null}
-      </div>
-
-      )}
-      {profiles.length > 0 && (
-      <div className="panel" style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}>
-        <h3>{t("routing.analytics")}</h3>
-        {analytics ? (
-          <>
-            <div className="card-badges">
-              <span className="badge badge-muted">{t("routing.analyticsTotal")}: {analytics.totalRequests}</span>
-              <span className="badge badge-muted">{t("routing.analyticsSuccessRate")}: {fmtRate(analytics.successRate, unavailable)}</span>
-              <span className="badge badge-muted">{t("routing.analyticsFallbackRate")}: {fmtRate(analytics.fallbackRate, unavailable)}</span>
-              <span className="badge badge-muted">{t("routing.analyticsP50")}: {fmtMs(analytics.durationMs.p50, unavailable)}</span>
-              <span className="badge badge-muted">{t("routing.analyticsP95")}: {fmtMs(analytics.durationMs.p95, unavailable)}</span>
-              <span className="badge badge-muted">{t("routing.analyticsP99")}: {fmtMs(analytics.durationMs.p99, unavailable)}</span>
-              <span className="badge badge-muted">{t("routing.analyticsCooldown")}: {analytics.cooldownTriggeringFailures}</span>
-              <span className="badge badge-muted">{t("routing.analyticsConfidence")}: {analytics.confidence ?? unavailable}</span>
-              {analytics.historyTruncated ? <span className="badge badge-muted">{t("routing.analyticsTruncated")}</span> : null}
-            </div>
+        <div
+          className="panel"
+          style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}
+        >
+          <h3>{t("routing.dryRun")}</h3>
+          <label className="field-label" htmlFor="routing-context">
+            {t("routing.dryRunContext")}
+            <input
+              id="routing-context"
+              className="input"
+              type="number"
+              min={1}
+              value={context}
+              onChange={(event) => {
+                setContext(event.target.value);
+                clearDryRun();
+              }}
+            />
+          </label>
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={tools}
+              onChange={(event) => {
+                setTools(event.target.checked);
+                clearDryRun();
+              }}
+            />
+            {t("routing.dryRunTools")}
+          </label>
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={image}
+              onChange={(event) => {
+                setImage(event.target.checked);
+                clearDryRun();
+              }}
+            />
+            {t("routing.dryRunImage")}
+          </label>
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={structured}
+              onChange={(event) => {
+                setStructured(event.target.checked);
+                clearDryRun();
+              }}
+            />
+            {t("routing.dryRunStructured")}
+          </label>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={!selected || running}
+            onClick={() => void runDryRun()}
+          >
+            {t("routing.dryRunRun")}
+          </button>
+          {dryRunError ? <Notice tone="err">{dryRunError}</Notice> : null}
+          {dryRunResult ? (
             <table className="tbl">
               <thead>
                 <tr>
                   <th>{t("routing.candidate")}</th>
-                  <th>{t("routing.analyticsRequests")}</th>
-                  <th>{t("routing.analyticsSuccessRate")}</th>
-                  <th>{t("routing.analyticsP50")}</th>
+                  <th>{t("routing.eligible")}</th>
+                  <th>{t("routing.exclusions")}</th>
+                  <th>{t("routing.costCap")}</th>
+                  <th>{t("routing.score")}</th>
                 </tr>
               </thead>
               <tbody>
-                {analytics.breakdown.map(row => (
-                  <tr key={`${row.provider}/${row.model}`}>
-                    <td>{row.provider}/{row.model}</td>
-                    <td>{row.requests}</td>
-                    <td>{fmtRate(row.successRate, unavailable)}</td>
-                    <td>{fmtMs(row.p50DurationMs, unavailable)}</td>
+                {dryRunResult.candidates.map((candidate, index) => (
+                  <tr key={`${candidate.provider}/${candidate.model}`}>
+                    <td>
+                      {candidate.provider}/{candidate.model}
+                      {index === dryRunResult.selectedIndex ? ` ✓ (${t("routing.selected")})` : ""}
+                    </td>
+                    <td>{candidate.eligible ? t("routing.yes") : t("routing.no")}</td>
+                    <td>
+                      {candidate.exclusions
+                        .map((exclusion) => fmtExclusion(exclusion.code, t))
+                        .join(", ") || t("routing.none")}
+                    </td>
+                    <td>{fmtCapOutcome(candidate.cost?.capOutcome, t, unavailable)}</td>
+                    <td>{candidate.score ? candidate.score.total.toFixed(3) : unavailable}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </>
-        ) : (
-          <p className="muted">{t("routing.analyticsEmpty")}</p>
-        )}
-      </div>
+          ) : null}
+        </div>
+      )}
+      {profiles.length > 0 && (
+        <div
+          className="panel"
+          style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 10 }}
+        >
+          <h3>{t("routing.analytics")}</h3>
+          {analytics ? (
+            <>
+              <div className="card-badges">
+                <span className="badge badge-muted">
+                  {t("routing.analyticsTotal")}: {analytics.totalRequests}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsSuccessRate")}: {fmtRate(analytics.successRate, unavailable)}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsFallbackRate")}:{" "}
+                  {fmtRate(analytics.fallbackRate, unavailable)}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsP50")}: {fmtMs(analytics.durationMs.p50, unavailable)}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsP95")}: {fmtMs(analytics.durationMs.p95, unavailable)}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsP99")}: {fmtMs(analytics.durationMs.p99, unavailable)}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsCooldown")}: {analytics.cooldownTriggeringFailures}
+                </span>
+                <span className="badge badge-muted">
+                  {t("routing.analyticsConfidence")}: {analytics.confidence ?? unavailable}
+                </span>
+                {analytics.historyTruncated ? (
+                  <span className="badge badge-muted">{t("routing.analyticsTruncated")}</span>
+                ) : null}
+              </div>
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>{t("routing.candidate")}</th>
+                    <th>{t("routing.analyticsRequests")}</th>
+                    <th>{t("routing.analyticsSuccessRate")}</th>
+                    <th>{t("routing.analyticsP50")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {analytics.breakdown.map((row) => (
+                    <tr key={`${row.provider}/${row.model}`}>
+                      <td>
+                        {row.provider}/{row.model}
+                      </td>
+                      <td>{row.requests}</td>
+                      <td>{fmtRate(row.successRate, unavailable)}</td>
+                      <td>{fmtMs(row.p50DurationMs, unavailable)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </>
+          ) : (
+            <p className="muted">{t("routing.analyticsEmpty")}</p>
+          )}
+        </div>
       )}
     </div>
   );

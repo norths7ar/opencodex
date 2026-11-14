@@ -1,8 +1,17 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useT } from "../../i18n/shared";
 import { navigateHash } from "../../hash-routing";
-import type { LayerDescriptorDto, PromptProbeDto, ToggleStateDto } from "../../pages/codex-set-prompt";
-import { CLASS_LABEL_KEYS, LAYER_ABOUT_KEYS, LAYER_CONDITION_KEYS, LAYER_LABEL_KEYS } from "./prompt-layer-copy";
+import type {
+  LayerDescriptorDto,
+  PromptProbeDto,
+  ToggleStateDto,
+} from "../../pages/codex-set-prompt";
+import {
+  CLASS_LABEL_KEYS,
+  LAYER_ABOUT_KEYS,
+  LAYER_CONDITION_KEYS,
+  LAYER_LABEL_KEYS,
+} from "./prompt-layer-copy";
 
 /**
  * Read-only detail for a built-in layer (ask item 8).
@@ -57,12 +66,15 @@ export default function PromptLayerDialog({
     };
   }, []);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    // Escape arrives as `cancel`. Prevent the default close so React owns the
-    // unmount and the caller can restore focus to the row that opened this.
-    event.preventDefault();
-    onClose();
-  }, [onClose]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      // Escape arrives as `cancel`. Prevent the default close so React owns the
+      // unmount and the caller can restore focus to the row that opened this.
+      event.preventDefault();
+      onClose();
+    },
+    [onClose],
+  );
 
   const classKey = CLASS_LABEL_KEYS[descriptor.class];
   // Same fallback the row uses. The wire response is cast, not validated, so a
@@ -73,9 +85,24 @@ export default function PromptLayerDialog({
   const conditionKey = LAYER_CONDITION_KEYS[descriptor.id];
 
   return (
-    <dialog ref={dialogRef} className="modal-overlay" aria-labelledby={titleId} onCancel={handleCancel}>
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onClose} />
-      <div className="modal-card codex-set-layer-dialog" onClick={event => event.stopPropagation()} role="document">
+    <dialog
+      ref={dialogRef}
+      className="modal-overlay"
+      aria-labelledby={titleId}
+      onCancel={handleCancel}
+    >
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onClose}
+      />
+      <div
+        className="modal-card codex-set-layer-dialog"
+        onClick={(event) => event.stopPropagation()}
+        role="document"
+      >
         <div className="modal-head">
           <h3 id={titleId}>{labelKey ? t(labelKey) : descriptor.id}</h3>
           {/*
@@ -91,12 +118,16 @@ export default function PromptLayerDialog({
               aria-checked={toggle.defaultedUserValue}
               aria-label={labelKey ? t(labelKey) : descriptor.id}
               disabled={busy}
-              onClick={() => { onToggle(descriptor.id, !toggle.defaultedUserValue); }}
+              onClick={() => {
+                onToggle(descriptor.id, !toggle.defaultedUserValue);
+              }}
             >
               <span className="toggle-knob" />
             </button>
           )}
-          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>{t("common.close")}</button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>
+            {t("common.close")}
+          </button>
         </div>
 
         <p className="muted small">{aboutKey ? t(aboutKey) : t("codexSet.dialog.unknownLayer")}</p>
@@ -113,7 +144,9 @@ export default function PromptLayerDialog({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => { void navigator.clipboard?.writeText(descriptor.key ?? ""); }}
+              onClick={() => {
+                void navigator.clipboard?.writeText(descriptor.key ?? "");
+              }}
             >
               {t("codexSet.dialog.copyKey")}
             </button>
@@ -126,12 +159,12 @@ export default function PromptLayerDialog({
             <span>
               {toggle.userFileValue === null
                 ? t("codexSet.dialog.absentDefault", { value: String(toggle.default) })
-                // The default travels with an explicit value too: knowing the file says
-                // false is only half the answer without knowing what it would be otherwise.
-                : t("codexSet.dialog.setValue", {
-                  value: String(toggle.userFileValue),
-                  fallback: String(toggle.default),
-                })}
+                : // The default travels with an explicit value too: knowing the file says
+                  // false is only half the answer without knowing what it would be otherwise.
+                  t("codexSet.dialog.setValue", {
+                    value: String(toggle.userFileValue),
+                    fallback: String(toggle.default),
+                  })}
             </span>
             {/*
               A literal `key = true` for a default-true toggle reads identical today
@@ -143,7 +176,9 @@ export default function PromptLayerDialog({
                 type="button"
                 className="link-btn codex-set-prompt__reset"
                 disabled={busy}
-                onClick={() => { onReset(descriptor.id); }}
+                onClick={() => {
+                  onReset(descriptor.id);
+                }}
               >
                 {t("codexSet.row.resetDefault", { value: String(toggle.default) })}
               </button>
@@ -179,7 +214,9 @@ export default function PromptLayerDialog({
           <>
             <div className="codex-set-layer-dialog__line">
               <span className="muted text-label">{t("codexSet.dialog.sourceText")}</span>
-              <span className="muted small">{t("codexSet.dialog.sourceBytes", { bytes: text.bytes })}</span>
+              <span className="muted small">
+                {t("codexSet.dialog.sourceBytes", { bytes: text.bytes })}
+              </span>
             </div>
             <pre className="api-code codex-set-layer-dialog__text">{text.text}</pre>
           </>
@@ -191,10 +228,10 @@ export default function PromptLayerDialog({
           <>
             <p className="muted small codex-set-layer-dialog__no-text">
               {text?.reason === "empty-source"
-                // An existing but empty file is a fourth state. Reporting it as
-                // "sent nothing" would describe the layer as idle when the real
-                // answer is that the file the user wrote is blank.
-                ? t("codexSet.dialog.emptySource", { path: text.sourcePath ?? "" })
+                ? // An existing but empty file is a fourth state. Reporting it as
+                  // "sent nothing" would describe the layer as idle when the real
+                  // answer is that the file the user wrote is blank.
+                  t("codexSet.dialog.emptySource", { path: text.sourcePath ?? "" })
                 : text?.reason === "not-rendered"
                   ? t("codexSet.dialog.notRendered")
                   : text?.reason === "unmapped"
@@ -202,15 +239,16 @@ export default function PromptLayerDialog({
                     : text?.reason === "not-exposed"
                       ? t("codexSet.dialog.notExposed")
                       : probe && probe.ok === false
-                        ? (probe.failure?.kind === "program-not-found"
+                        ? probe.failure?.kind === "program-not-found"
                           ? t("codexSet.dialog.probeNotFound")
                           : probe.failure?.kind === "command-unsupported"
                             ? t("codexSet.dialog.probeUnsupported")
                             : probe.failure?.kind === "output-invalid"
                               ? t("codexSet.dialog.probeInvalid")
-                              : probe.failure?.kind === "execution-failed" || probe.failure?.kind === "request-failed"
+                              : probe.failure?.kind === "execution-failed" ||
+                                  probe.failure?.kind === "request-failed"
                                 ? t("codexSet.dialog.probeFailed")
-                                : t("codexSet.dialog.probeBusy"))
+                                : t("codexSet.dialog.probeBusy")
                         : t("codexSet.dialog.textUnavailable")}
             </p>
             {probe && probe.ok === false && probe.failure === undefined && onRemeasure && (

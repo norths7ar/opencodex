@@ -8,7 +8,17 @@ import { cn } from "@/lib/utils";
  * and an overflow (⋯) for everything else. The row keeps the `.card` hook the behaviour
  * tests find accounts by; the v2 look comes from `acc-row` in design/pages/accounts.css.
  */
-export function AccountRow({ active = false, paused = false, dot, name, sub, chips, actions, more, children }: {
+export function AccountRow({
+  active = false,
+  paused = false,
+  dot,
+  name,
+  sub,
+  chips,
+  actions,
+  more,
+  children,
+}: {
   active?: boolean;
   paused?: boolean;
   dot: "ok" | "warn" | "err" | "idle" | "active";
@@ -22,17 +32,40 @@ export function AccountRow({ active = false, paused = false, dot, name, sub, chi
   children?: ReactNode;
 }) {
   return (
-    <div className={cn("card acc-row", active && "card-active is-active", paused && "is-paused", more ? "has-more" : undefined)}>
+    <div
+      className={cn(
+        "card acc-row",
+        active && "card-active is-active",
+        paused && "is-paused",
+        more ? "has-more" : undefined,
+      )}
+    >
       <div className="acc-row__head flex min-w-0 items-start gap-3">
-        <span className="flex h-5 items-center"><StatusDot tone={dot} /></span>
+        <span className="flex h-5 items-center">
+          <StatusDot tone={dot} />
+        </span>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-            <strong className="acc-row__name min-w-0 truncate text-[14px] leading-5 font-semibold tracking-[-0.005em] text-fg">{name}</strong>
-            {chips && <span className="card-badges acc-chips flex flex-wrap items-center gap-1">{chips}</span>}
+            <strong className="acc-row__name min-w-0 truncate text-[14px] leading-5 font-semibold tracking-[-0.005em] text-fg">
+              {name}
+            </strong>
+            {chips && (
+              <span className="card-badges acc-chips flex flex-wrap items-center gap-1">
+                {chips}
+              </span>
+            )}
           </div>
-          {sub && <div className="acc-row__sub min-w-0 truncate text-[12.5px] leading-[18px] text-fg-muted">{sub}</div>}
+          {sub && (
+            <div className="acc-row__sub min-w-0 truncate text-[12.5px] leading-[18px] text-fg-muted">
+              {sub}
+            </div>
+          )}
         </div>
-        {actions && <div className="acc-row__actions flex shrink-0 flex-wrap items-center justify-end gap-1">{actions}</div>}
+        {actions && (
+          <div className="acc-row__actions flex shrink-0 flex-wrap items-center justify-end gap-1">
+            {actions}
+          </div>
+        )}
       </div>
       {children}
       {more}
@@ -43,7 +76,9 @@ export function AccountRow({ active = false, paused = false, dot, name, sub, chi
 function DotsIcon() {
   return (
     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-      <circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" />
+      <circle cx="5" cy="12" r="1.6" />
+      <circle cx="12" cy="12" r="1.6" />
+      <circle cx="19" cy="12" r="1.6" />
     </svg>
   );
 }
@@ -53,7 +88,14 @@ function DotsIcon() {
  * while closed. The summary is a bare icon button docked to the row's top-right corner; the
  * body opens full width under the row as an inset settings list.
  */
-export function AccountMore({ label, title, open, onToggle, heading, children }: {
+export function AccountMore({
+  label,
+  title,
+  open,
+  onToggle,
+  heading,
+  children,
+}: {
   /** Accessible name of the ⋯ button, naming the account. */
   label: string;
   title: string;
@@ -63,9 +105,18 @@ export function AccountMore({ label, title, open, onToggle, heading, children }:
   children: ReactNode;
 }) {
   return (
-    <details className="codex-account-more acc-more" open={open}
-      onToggle={onToggle ? (e: SyntheticEvent<HTMLDetailsElement>) => onToggle(e.currentTarget.open) : undefined}>
-      <summary className="acc-more__summary" aria-label={label} title={title}><DotsIcon /></summary>
+    <details
+      className="codex-account-more acc-more"
+      open={open}
+      onToggle={
+        onToggle
+          ? (e: SyntheticEvent<HTMLDetailsElement>) => onToggle(e.currentTarget.open)
+          : undefined
+      }
+    >
+      <summary className="acc-more__summary" aria-label={label} title={title}>
+        <DotsIcon />
+      </summary>
       <div className="codex-account-more-body acc-settings">
         {heading && <div className="acc-settings__heading">{heading}</div>}
         {children}
@@ -75,7 +126,15 @@ export function AccountMore({ label, title, open, onToggle, heading, children }:
 }
 
 /** One line of the overflow list: a label on the left, its control on the right. */
-export function AccountSetting({ label, children, className }: { label?: ReactNode; children: ReactNode; className?: string }) {
+export function AccountSetting({
+  label,
+  children,
+  className,
+}: {
+  label?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div className={cn("acc-setting", className)}>
       {label && <span className="acc-setting__label">{label}</span>}

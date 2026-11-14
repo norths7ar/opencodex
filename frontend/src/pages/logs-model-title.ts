@@ -18,7 +18,9 @@ export interface ModelTitleEntry {
 }
 
 /** The upstream answered with a model other than the one sent on the wire. */
-export function isModelRerouted(log: Pick<ModelTitleEntry, "model" | "servedModel" | "wireModel">): boolean {
+export function isModelRerouted(
+  log: Pick<ModelTitleEntry, "model" | "servedModel" | "wireModel">,
+): boolean {
   return log.servedModel !== undefined && log.servedModel !== (log.wireModel ?? log.model);
 }
 
@@ -37,9 +39,10 @@ export function isModelRerouted(log: Pick<ModelTitleEntry, "model" | "servedMode
 function tierConfirmationSuffix(outcome: ModelTitleEntry["tierOutcome"], t: TFn): string {
   const confirmation = outcome?.confirmation;
   if (!confirmation) return "";
-  const reason = confirmation === "downgraded" && outcome?.fastDowngradeReason
-    ? `: ${outcome.fastDowngradeReason}`
-    : "";
+  const reason =
+    confirmation === "downgraded" && outcome?.fastDowngradeReason
+      ? `: ${outcome.fastDowngradeReason}`
+      : "";
   return ` (${t(`logs.modelTooltip.tierOutcome.${confirmation}`)}${reason})`;
 }
 
@@ -50,8 +53,12 @@ export function modelTitle(log: ModelTitleEntry, t: TFn): string {
     log.resolvedModel ? `${t("logs.modelTooltip.resolvedModel")}=${log.resolvedModel}` : undefined,
     log.servedModel ? `${t("logs.modelTooltip.servedModel")}=${log.servedModel}` : undefined,
     log.wireModel ? `${t("logs.modelTooltip.wireModel")}=${log.wireModel}` : undefined,
-    log.requestedServiceTier ? `${t("logs.modelTooltip.requestedTier")}=${log.requestedServiceTier}` : undefined,
-    log.configuredServiceTier ? `${t("logs.modelTooltip.configuredTier")}=${log.configuredServiceTier}` : undefined,
+    log.requestedServiceTier
+      ? `${t("logs.modelTooltip.requestedTier")}=${log.requestedServiceTier}`
+      : undefined,
+    log.configuredServiceTier
+      ? `${t("logs.modelTooltip.configuredTier")}=${log.configuredServiceTier}`
+      : undefined,
     log.responseServiceTier
       ? `${t("logs.modelTooltip.responseTier")}=${log.responseServiceTier}${tierConfirmationSuffix(log.tierOutcome, t)}`
       : undefined,

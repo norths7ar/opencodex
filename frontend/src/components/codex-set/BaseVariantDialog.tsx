@@ -16,9 +16,7 @@ export interface BaseVariantDto {
 }
 
 export type BaseSelectionDto =
-  | { kind: "default" }
-  | { kind: "variant"; id: string }
-  | { kind: "external"; path: string };
+  { kind: "default" } | { kind: "variant"; id: string } | { kind: "external"; path: string };
 
 /** One step of the ring: the default, then each authored variant, then an empty slot. */
 interface Slot {
@@ -106,13 +104,17 @@ export default function BaseVariantDialog({
    */
   const slots: Slot[] = [
     { kind: "default" },
-    ...variants.map(variant => ({ kind: "variant" as const, variant })),
+    ...variants.map((variant) => ({ kind: "variant" as const, variant })),
     ...(variants.length < maxVariants ? [{ kind: "new" as const }] : []),
   ];
 
-  const liveIndex = selection.kind === "variant"
-    ? Math.max(0, slots.findIndex(s => s.variant?.id === selection.id))
-    : 0;
+  const liveIndex =
+    selection.kind === "variant"
+      ? Math.max(
+          0,
+          slots.findIndex((s) => s.variant?.id === selection.id),
+        )
+      : 0;
   const [index, setIndex] = useState(liveIndex);
   const slot = slots[Math.min(index, slots.length - 1)]!;
 
@@ -155,27 +157,46 @@ export default function BaseVariantDialog({
    */
   const prevIdsRef = useRef<ReadonlySet<string>>(new Set());
   const liveRef = useRef({ title, body });
-  useEffect(() => { liveRef.current = { title, body }; }, [title, body]);
+  useEffect(() => {
+    liveRef.current = { title, body };
+  }, [title, body]);
 
   /** Park outgoing work before reconciling the snapshot, in one ordered effect. */
   useEffect(() => {
     const previousIds = prevIdsRef.current;
-    const nextIds = new Set(variants.map(v => v.id));
+    const nextIds = new Set(variants.map((v) => v.id));
     const pendingSave = pendingSaveRef.current;
-    const landed = pendingSave !== null && (pendingSave.id !== null
-      ? variants.some(v => v.id === pendingSave.id && v.title === pendingSave.title && v.body === pendingSave.body)
-      : variants.some(v => !previousIds.has(v.id) && v.title === (pendingSave.title || v.id) && v.body === pendingSave.body));
+    const landed =
+      pendingSave !== null &&
+      (pendingSave.id !== null
+        ? variants.some(
+            (v) =>
+              v.id === pendingSave.id &&
+              v.title === pendingSave.title &&
+              v.body === pendingSave.body,
+          )
+        : variants.some(
+            (v) =>
+              !previousIds.has(v.id) &&
+              v.title === (pendingSave.title || v.id) &&
+              v.body === pendingSave.body,
+          ));
 
     if (lastKeyRef.current !== editingKey && lastKeyRef.current !== null) {
       const outgoing = liveRef.current;
-      const saved = variants.find(v => v.id === lastKeyRef.current) ?? lastSlotRef.current.variant;
-      const unedited = saved === undefined
-        ? outgoing.title === "" && outgoing.body === ""
-        : outgoing.title === saved.title && outgoing.body === saved.body;
+      const saved =
+        variants.find((v) => v.id === lastKeyRef.current) ?? lastSlotRef.current.variant;
+      const unedited =
+        saved === undefined
+          ? outgoing.title === "" && outgoing.body === ""
+          : outgoing.title === saved.title && outgoing.body === saved.body;
       const deleted = lastKeyRef.current !== NEW_SLOT_KEY && !nextIds.has(lastKeyRef.current);
-      const savedOutgoing = landed && pendingSave !== null
-        && lastKeyRef.current === (pendingSave.id ?? NEW_SLOT_KEY)
-        && outgoing.title === pendingSave.title && outgoing.body === pendingSave.body;
+      const savedOutgoing =
+        landed &&
+        pendingSave !== null &&
+        lastKeyRef.current === (pendingSave.id ?? NEW_SLOT_KEY) &&
+        outgoing.title === pendingSave.title &&
+        outgoing.body === pendingSave.body;
       if (unedited || deleted || savedOutgoing) draftsRef.current.delete(lastKeyRef.current);
       else draftsRef.current.set(lastKeyRef.current, outgoing);
     }
@@ -205,7 +226,9 @@ export default function BaseVariantDialog({
    * freezes navigation until answered - otherwise the user could swipe before
    * confirming and the save would land on the wrong variant.
    */
-  const [discardAction, setDiscardAction] = useState<{ kind: "close" } | { kind: "save"; targetKey: string | null } | null>(null);
+  const [discardAction, setDiscardAction] = useState<
+    { kind: "close" } | { kind: "save"; targetKey: string | null } | null
+  >(null);
 
   /**
    * A parked draft that differs from its slot's stored value still counts as
@@ -218,17 +241,20 @@ export default function BaseVariantDialog({
    */
   const [parkedDirty, setParkedDirty] = useState(false);
   useEffect(() => {
-    setParkedDirty([...draftsRef.current].some(([key, draft]) => {
-      if (key === editingKey) return false;
-      if (key === NEW_SLOT_KEY) return draft.title !== "" || draft.body !== "";
-      const saved = variants.find(candidate => candidate.id === key);
-      return saved === undefined || draft.title !== saved.title || draft.body !== saved.body;
-    }));
+    setParkedDirty(
+      [...draftsRef.current].some(([key, draft]) => {
+        if (key === editingKey) return false;
+        if (key === NEW_SLOT_KEY) return draft.title !== "" || draft.body !== "";
+        const saved = variants.find((candidate) => candidate.id === key);
+        return saved === undefined || draft.title !== saved.title || draft.body !== saved.body;
+      }),
+    );
   }, [editingKey, variants, title, body]);
 
-  const dirty = parkedDirty
-    || (editingKey !== null
-      && (title !== (slot.variant?.title ?? "") || body !== (slot.variant?.body ?? "")));
+  const dirty =
+    parkedDirty ||
+    (editingKey !== null &&
+      (title !== (slot.variant?.title ?? "") || body !== (slot.variant?.body ?? "")));
 
   /**
    * The title the user picked for the import, seeded from each preview's
@@ -244,15 +270,18 @@ export default function BaseVariantDialog({
     setImportTitle(previewedTitle ?? "");
   }
 
-  const step = useCallback((delta: number) => {
-    setIndex(current => {
-      const next = current + delta;
-      // Wrap, so a ring of three does not dead-end at either edge.
-      if (next < 0) return slots.length - 1;
-      if (next >= slots.length) return 0;
-      return next;
-    });
-  }, [slots.length]);
+  const step = useCallback(
+    (delta: number) => {
+      setIndex((current) => {
+        const next = current + delta;
+        // Wrap, so a ring of three does not dead-end at either edge.
+        if (next < 0) return slots.length - 1;
+        if (next >= slots.length) return 0;
+        return next;
+      });
+    },
+    [slots.length],
+  );
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -284,12 +313,21 @@ export default function BaseVariantDialog({
     // Only when focus is NOT in a text field, or typing in the body would navigate.
     const tag = (event.target as HTMLElement).tagName;
     if (tag === "TEXTAREA" || tag === "INPUT") return;
-    if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); }
-    if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      step(-1);
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      step(1);
+    }
   };
 
   const requestClose = useCallback(() => {
-    if (dirty) { setDiscardAction({ kind: "close" }); return; }
+    if (dirty) {
+      setDiscardAction({ kind: "close" });
+      return;
+    }
     onClose();
   }, [dirty, onClose]);
 
@@ -298,14 +336,20 @@ export default function BaseVariantDialog({
    * before the dirty check can run, and a half-written variant was gone without
    * a word - the same fix the custom-layer editor needed.
    */
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    requestClose();
-  }, [requestClose]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      requestClose();
+    },
+    [requestClose],
+  );
 
-  const isLive = slot.kind === "default"
-    ? selection.kind === "default"
-    : slot.kind === "variant" && selection.kind === "variant" && selection.id === slot.variant!.id;
+  const isLive =
+    slot.kind === "default"
+      ? selection.kind === "default"
+      : slot.kind === "variant" &&
+        selection.kind === "variant" &&
+        selection.id === slot.variant!.id;
   const external = selection.kind === "external";
 
   /**
@@ -316,7 +360,10 @@ export default function BaseVariantDialog({
   const normalized = normalizeBody(body);
   const bodyBytes = utf8Length(normalized);
   const invalid = findInvalidCharacter(normalized);
-  const problem: { kind: "body-too-large"; bytes: number } | { kind: "invalid-character"; position: number } | null =
+  const problem:
+    | { kind: "body-too-large"; bytes: number }
+    | { kind: "invalid-character"; position: number }
+    | null =
     bodyBytes > MAX_BODY_BYTES
       ? { kind: "body-too-large", bytes: bodyBytes }
       : invalid !== null
@@ -328,9 +375,11 @@ export default function BaseVariantDialog({
   // manual-memoization rules over it.
   const findings = lintPromptLayer(normalized);
 
-  const problemMessage = !problem ? null
-    : problem.kind === "body-too-large" ? t("codexSet.custom.bodyTooLarge", { bytes: problem.bytes, max: MAX_BODY_BYTES })
-    : t("codexSet.custom.invalidCharacter", { position: problem.position });
+  const problemMessage = !problem
+    ? null
+    : problem.kind === "body-too-large"
+      ? t("codexSet.custom.bodyTooLarge", { bytes: problem.bytes, max: MAX_BODY_BYTES })
+      : t("codexSet.custom.invalidCharacter", { position: problem.position });
 
   const saveNow = async (targetKey: string | null) => {
     if (busy || problem !== null || body.trim().length === 0 || targetKey !== editingKey) return;
@@ -351,8 +400,12 @@ export default function BaseVariantDialog({
     // An existing slot keeps its identity, so the slot-change effect cannot
     // replace raw input with the canonical values just saved. Preserve newer
     // edits or a different visible slot if either changed during the request.
-    if (savedKey !== NEW_SLOT_KEY && lastKeyRef.current === targetKey
-      && liveRef.current.title === submitted.title && liveRef.current.body === submitted.body) {
+    if (
+      savedKey !== NEW_SLOT_KEY &&
+      lastKeyRef.current === targetKey &&
+      liveRef.current.title === submitted.title &&
+      liveRef.current.body === submitted.body
+    ) {
       liveRef.current = { title: savedTitle, body: normalized };
       setTitle(savedTitle);
       setBody(normalized);
@@ -369,7 +422,10 @@ export default function BaseVariantDialog({
   };
   const requestSave = () => {
     if (busy || problem !== null) return;
-    if (parkedDirty) { setDiscardAction({ kind: "save", targetKey: editingKey }); return; }
+    if (parkedDirty) {
+      setDiscardAction({ kind: "save", targetKey: editingKey });
+      return;
+    }
     void saveNow(editingKey);
   };
 
@@ -441,12 +497,14 @@ export default function BaseVariantDialog({
           the key at the copy — previewed first, written only on confirm, the
           same shape as the developer_instructions adopt flow.
         */}
-        {external && (
-          importPreview ? (
+        {external &&
+          (importPreview ? (
             <>
               {importRefusal !== null && <p className="muted small">{importRefusal}</p>}
               <p className="muted small">
-                {t("codexSet.base.importPreview", { path: importPreview.resolvedPath ?? importPreview.rawPath ?? "" })}
+                {t("codexSet.base.importPreview", {
+                  path: importPreview.resolvedPath ?? importPreview.rawPath ?? "",
+                })}
               </p>
               {/*
                 The exact serialized file is shown, not just the body: the title
@@ -454,7 +512,9 @@ export default function BaseVariantDialog({
                 normalization is already applied — what is previewed is what is
                 installed.
               */}
-              <pre className="api-code codex-set-custom__adopt-preview">{importPreview.serialized}</pre>
+              <pre className="api-code codex-set-custom__adopt-preview">
+                {importPreview.serialized}
+              </pre>
               <p className="muted small">
                 {t("codexSet.base.importFormat", {
                   bodyBytes: importPreview.bodyBytes,
@@ -469,7 +529,7 @@ export default function BaseVariantDialog({
                   value={importTitle}
                   disabled={busy}
                   maxLength={80}
-                  onChange={event => {
+                  onChange={(event) => {
                     setImportTitle(event.target.value);
                     onImportTitle(event.target.value);
                   }}
@@ -503,9 +563,7 @@ export default function BaseVariantDialog({
             </>
           ) : (
             <>
-              {importRefusal !== null && (
-                <p className="muted small">{importRefusal}</p>
-              )}
+              {importRefusal !== null && <p className="muted small">{importRefusal}</p>}
               <button
                 type="button"
                 className="btn btn-sm"
@@ -515,8 +573,7 @@ export default function BaseVariantDialog({
                 {t("codexSet.base.import")}
               </button>
             </>
-          )
-        )}
+          ))}
 
         {slot.kind === "default" ? (
           <div className="codex-set-base-dialog__default">
@@ -537,7 +594,7 @@ export default function BaseVariantDialog({
                 type="text"
                 value={title}
                 disabled={busy || external}
-                onChange={event => setTitle(event.target.value)}
+                onChange={(event) => setTitle(event.target.value)}
               />
             </label>
             <label className={FIELD}>
@@ -547,26 +604,38 @@ export default function BaseVariantDialog({
                 rows={12}
                 value={body}
                 disabled={busy || external}
-                onChange={event => setBody(event.target.value)}
+                onChange={(event) => setBody(event.target.value)}
               />
             </label>
-            <p className="muted small">{t("codexSet.custom.bodySize", { bytes: bodyBytes, max: MAX_BODY_BYTES })}</p>
+            <p className="muted small">
+              {t("codexSet.custom.bodySize", { bytes: bodyBytes, max: MAX_BODY_BYTES })}
+            </p>
             {normalizationApplied && (
               // Quiet note, not an error: the text is accepted, just stored canonically.
-              <p className="muted small codex-set-custom-dialog__normalized">{t("codexSet.custom.normalized")}</p>
+              <p className="muted small codex-set-custom-dialog__normalized">
+                {t("codexSet.custom.normalized")}
+              </p>
             )}
             {problemMessage && (
-              <div className="notice notice-err" role="alert">{problemMessage}</div>
+              <div className="notice notice-err" role="alert">
+                {problemMessage}
+              </div>
             )}
             {findings.length > 0 && (
               // Warnings, never blockers - a variant that deliberately takes over the
               // base prompt is allowed to restate things it genuinely wants.
               <ul className="codex-set-custom-dialog__lint">
                 {findings.map((finding, i) => (
-                  <li key={finding.rule + ":" + i} data-lint-rule={finding.rule} data-lint-level={finding.level}>
+                  <li
+                    key={finding.rule + ":" + i}
+                    data-lint-rule={finding.rule}
+                    data-lint-level={finding.level}
+                  >
                     {t(finding.messageKey)}
                     {finding.span && (
-                      <code className="codex-set-custom-dialog__span">{normalized.slice(finding.span[0], finding.span[1])}</code>
+                      <code className="codex-set-custom-dialog__span">
+                        {normalized.slice(finding.span[0], finding.span[1])}
+                      </code>
                     )}
                   </li>
                 ))}
@@ -587,7 +656,11 @@ export default function BaseVariantDialog({
             aria-labelledby="codex-set-base-dialog-discard"
           >
             <span id="codex-set-base-dialog-discard" className="muted small">
-              {t(discardAction.kind === "save" ? "codexSet.custom.discardOthersAndSave" : "codexSet.custom.discardPrompt")}
+              {t(
+                discardAction.kind === "save"
+                  ? "codexSet.custom.discardOthersAndSave"
+                  : "codexSet.custom.discardPrompt",
+              )}
             </span>
             <button type="button" className="btn btn-sm" onClick={() => setDiscardAction(null)}>
               {t("codexSet.custom.keepEditing")}
@@ -595,8 +668,16 @@ export default function BaseVariantDialog({
             <button
               type="button"
               className="btn btn-danger btn-sm"
-              disabled={discardAction.kind === "save" && (problem !== null || busy || body.trim().length === 0 || discardAction.targetKey !== editingKey)}
-              onClick={() => discardAction.kind === "save" ? void saveNow(discardAction.targetKey) : onClose()}
+              disabled={
+                discardAction.kind === "save" &&
+                (problem !== null ||
+                  busy ||
+                  body.trim().length === 0 ||
+                  discardAction.targetKey !== editingKey)
+              }
+              onClick={() =>
+                discardAction.kind === "save" ? void saveNow(discardAction.targetKey) : onClose()
+              }
             >
               {t(discardAction.kind === "save" ? "common.save" : "common.discard")}
             </button>
@@ -618,9 +699,13 @@ export default function BaseVariantDialog({
                 type="button"
                 className="btn btn-sm"
                 disabled={busy || external}
-                onClick={() => onSelect(slot.kind === "default"
-                  ? { kind: "default" }
-                  : { kind: "variant", id: slot.variant!.id })}
+                onClick={() =>
+                  onSelect(
+                    slot.kind === "default"
+                      ? { kind: "default" }
+                      : { kind: "variant", id: slot.variant!.id },
+                  )
+                }
               >
                 {t("codexSet.base.use")}
               </button>

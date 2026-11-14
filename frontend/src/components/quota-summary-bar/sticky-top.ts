@@ -7,7 +7,11 @@
  */
 export function publishStickyTop(node: HTMLElement): () => void {
   const root = document.documentElement;
-  const write = () => root.style.setProperty("--ocx-sticky-top-h", String(Math.ceil(node.getBoundingClientRect().height)));
+  const write = () =>
+    root.style.setProperty(
+      "--ocx-sticky-top-h",
+      String(Math.ceil(node.getBoundingClientRect().height)),
+    );
   write();
   const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(write);
   observer?.observe(node);

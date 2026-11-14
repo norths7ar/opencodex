@@ -3,7 +3,9 @@ import { useCallback, useEffect, useState } from "react";
 const COLLAPSED_KEY = "ocx-sidebar-collapsed";
 
 export function readSidebarCollapsed(
-  storage: Pick<Storage, "getItem"> | undefined = typeof localStorage === "undefined" ? undefined : localStorage,
+  storage: Pick<Storage, "getItem"> | undefined = typeof localStorage === "undefined"
+    ? undefined
+    : localStorage,
 ): boolean {
   try {
     return storage?.getItem(COLLAPSED_KEY) === "1";
@@ -23,7 +25,8 @@ function writeSidebarCollapsed(collapsed: boolean): void {
 function isEditableTarget(target: EventTarget | null): boolean {
   return (
     target instanceof HTMLElement &&
-    (target.isContentEditable || target.closest("input, textarea, select, [contenteditable]") !== null)
+    (target.isContentEditable ||
+      target.closest("input, textarea, select, [contenteditable]") !== null)
   );
 }
 
@@ -33,9 +36,10 @@ function isEditableTarget(target: EventTarget | null): boolean {
  * toggles too, the shortcut every sibling app trained into the same hands — but only in
  * the desktop shell, because in a plain browser it would steal the bookmark-bar shortcut.
  */
-export function useSidebarCollapse(
-  { shortcut = false }: { shortcut?: boolean } = {},
-): { collapsed: boolean; toggle: () => void } {
+export function useSidebarCollapse({ shortcut = false }: { shortcut?: boolean } = {}): {
+  collapsed: boolean;
+  toggle: () => void;
+} {
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const toggle = useCallback(() => setCollapsed((current) => !current), []);
   // Updaters may run without a commit, so the write follows the render instead.

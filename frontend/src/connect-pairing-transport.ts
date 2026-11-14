@@ -4,10 +4,18 @@ import { discardResponseBody, withFetchDeadline } from "./bounded-fetch";
 
 const PAIRING_CODE = /^ocx_pair_[A-Za-z0-9_-]{43}$/;
 let pairingDeadlineMs = 10_000;
-export function setPairingDeadlineForTests(ms: number): void { pairingDeadlineMs = ms; }
+export function setPairingDeadlineForTests(ms: number): void {
+  pairingDeadlineMs = ms;
+}
 
 export class PairingError extends Error {
-  readonly kind: "invalid-code" | "refused" | "origin-denied" | "unreachable" | "request-failed" | "invalid-response";
+  readonly kind:
+    | "invalid-code"
+    | "refused"
+    | "origin-denied"
+    | "unreachable"
+    | "request-failed"
+    | "invalid-response";
   constructor(kind: PairingError["kind"]) {
     super(`pairing_${kind}`);
     this.kind = kind;
@@ -35,11 +43,12 @@ export async function submitConnectPairing(
   const send = fetchImpl ?? ((input, init) => window.fetch(input, init));
   // Capture authority before either response headers or body can yield to another login.
   const handoff = beginApiSessionHandoff(target.id);
-  return withFetchDeadline(pairingDeadlineMs, signal, async deadline => {
+  return withFetchDeadline(pairingDeadlineMs, signal, async (deadline) => {
     let response: Response;
     try {
       response = await send(target.bootstrapPath, {
-        method: "POST", signal: deadline,
+        method: "POST",
+        signal: deadline,
         headers: { "Content-Type": "application/json", Accept: "text/html" },
         body: JSON.stringify({ grant: code }),
       });
@@ -54,15 +63,19 @@ export async function submitConnectPairing(
       throw new PairingError("request-failed");
     }
     let html: string;
-    try { html = await response.text(); }
-    catch (error) { if (signal?.aborted) throw error; throw new PairingError("invalid-response"); }
+    try {
+      html = await response.text();
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      throw new PairingError("invalid-response");
+    }
     deadline.throwIfAborted();
     if (!handoff.install(html)) {
       handoff.rollback();
       throw new PairingError("invalid-response");
     }
     return handoff;
-  }).catch(error => {
+  }).catch((error) => {
     handoff.rollback();
     signal?.throwIfAborted();
     if (error instanceof PairingError) throw error;

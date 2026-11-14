@@ -36,7 +36,8 @@ export interface QuotaSummaryRow {
   severity: QuotaSummarySeverity;
 }
 
-const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
+const finite = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
 
 function resetTimestamp(value: unknown): number | null {
   if (!finite(value) || value <= 0) return null;
@@ -46,14 +47,41 @@ function resetTimestamp(value: unknown): number | null {
 
 function quotaWindows(quota: AccountQuota) {
   const windows = [
-    { id: "quota.fiveHourLimit", key: "quota.fiveHourLimit" as const, percent: quota.fiveHourPercent ?? quota.shortPercent, reset: quota.fiveHourResetAt ?? quota.shortResetAt },
-    { id: "quota.weeklyLimit", key: "quota.weeklyLimit" as const, percent: quota.weeklyPercent, reset: quota.weeklyResetAt },
-    { id: "quota.monthlyLimit", key: "quota.monthlyLimit" as const, percent: quota.monthlyPercent, reset: quota.monthlyResetAt },
-    ...(Array.isArray(quota.customWindows) ? quota.customWindows.filter(w => w && typeof w.label === "string").map(w => ({ id: w.label, label: w.label, modelId: w.modelId, percent: w.percent, reset: w.resetAt })) : []),
+    {
+      id: "quota.fiveHourLimit",
+      key: "quota.fiveHourLimit" as const,
+      percent: quota.fiveHourPercent ?? quota.shortPercent,
+      reset: quota.fiveHourResetAt ?? quota.shortResetAt,
+    },
+    {
+      id: "quota.weeklyLimit",
+      key: "quota.weeklyLimit" as const,
+      percent: quota.weeklyPercent,
+      reset: quota.weeklyResetAt,
+    },
+    {
+      id: "quota.monthlyLimit",
+      key: "quota.monthlyLimit" as const,
+      percent: quota.monthlyPercent,
+      reset: quota.monthlyResetAt,
+    },
+    ...(Array.isArray(quota.customWindows)
+      ? quota.customWindows
+          .filter((w) => w && typeof w.label === "string")
+          .map((w) => ({
+            id: w.label,
+            label: w.label,
+            modelId: w.modelId,
+            percent: w.percent,
+            reset: w.resetAt,
+          }))
+      : []),
   ];
-  const kept = windows.filter(w => (finite(w.percent) && w.percent >= 0) || resetTimestamp(w.reset) !== null);
+  const kept = windows.filter(
+    (w) => (finite(w.percent) && w.percent >= 0) || resetTimestamp(w.reset) !== null,
+  );
   const seen = new Map<string, number>();
-  return kept.map(w => {
+  return kept.map((w) => {
     const taken = seen.get(w.id) ?? 0;
     seen.set(w.id, taken + 1);
     return taken === 0 ? w : { ...w, id: `${w.id}#${taken}` };
@@ -77,7 +105,7 @@ const HEADLINE_ORDER: TKey[] = ["quota.weeklyLimit", "quota.monthlyLimit", "quot
 
 /** Build reported quota windows with distinct IDs, including measured prepaid credits. */
 function summaryWindows(quota: AccountQuota): QuotaSummaryWindow[] {
-  const windows: QuotaSummaryWindow[] = quotaWindows(quota).map(window => {
+  const windows: QuotaSummaryWindow[] = quotaWindows(quota).map((window) => {
     const percent = finite(window.percent) ? window.percent : undefined;
     const resetMs = resetTimestamp(window.reset);
     const modelId = "modelId" in window ? window.modelId : undefined;
@@ -104,7 +132,7 @@ function summaryWindows(quota: AccountQuota): QuotaSummaryWindow[] {
   }
   // Credits are appended after provider windows, whose labels can equal any fixed id.
   const used = new Set<string>();
-  return windows.map(window => {
+  return windows.map((window) => {
     let id = window.id;
     let suffix = 1;
     while (used.has(id)) id = `${window.id}#${suffix++}`;
@@ -115,10 +143,13 @@ function summaryWindows(quota: AccountQuota): QuotaSummaryWindow[] {
 
 /** Critical credits displace the preferred regular window only when it is not critical. */
 function pickHeadline(windows: QuotaSummaryWindow[]): QuotaSummaryWindow | undefined {
-  const measured = windows.filter(window => window.modelId === undefined && window.percent !== undefined);
+  const measured = windows.filter(
+    (window) => window.modelId === undefined && window.percent !== undefined,
+  );
   const byLabel = new Map<TKey, QuotaSummaryWindow>();
   for (const window of measured) {
-    if (window.labelKey !== undefined && !byLabel.has(window.labelKey)) byLabel.set(window.labelKey, window);
+    if (window.labelKey !== undefined && !byLabel.has(window.labelKey))
+      byLabel.set(window.labelKey, window);
   }
   let regular: QuotaSummaryWindow | undefined;
   for (const key of HEADLINE_ORDER) {
@@ -128,9 +159,10 @@ function pickHeadline(windows: QuotaSummaryWindow[]): QuotaSummaryWindow | undef
       break;
     }
   }
-  if (!regular) regular = measured.find(window => window.labelKey !== "quotaSummary.credits");
+  if (!regular) regular = measured.find((window) => window.labelKey !== "quotaSummary.credits");
   const credits = byLabel.get("quotaSummary.credits");
-  if (credits && credits.severity === "critical" && regular?.severity !== "critical") return credits;
+  if (credits && credits.severity === "critical" && regular?.severity !== "critical")
+    return credits;
   return regular ?? measured[0];
 }
 

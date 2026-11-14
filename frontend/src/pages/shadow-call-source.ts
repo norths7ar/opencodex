@@ -26,13 +26,13 @@ export interface ShadowCallSourceOption {
 
 export function shadowSourceModelList(sourceModels?: string[]): string[] {
   const raw = Array.isArray(sourceModels)
-    ? sourceModels.filter(v => typeof v === "string" && v.trim() !== "").map(v => v.trim())
+    ? sourceModels.filter((v) => typeof v === "string" && v.trim() !== "").map((v) => v.trim())
     : [];
   if (raw.length === 0) return FALLBACK_SOURCE_MODELS;
   // A routed model id can never match: the runtime hard-excludes slashes before
   // prefix comparison. Keeping one visible would let the next save send a value
   // the API rejects, so the effective list drops it here as well.
-  return raw.filter(id => !id.includes("/"));
+  return raw.filter((id) => !id.includes("/"));
 }
 
 /** Comma-joined source models for inline badges and warning text. */
@@ -43,24 +43,25 @@ export function shadowSourceModelLabel(sourceModels?: string[]): string {
 /** Short badge form: drops the shared `gpt-` prefix to keep the row compact. */
 export function shadowSourceModelBadge(sourceModels?: string[]): string {
   return shadowSourceModelList(sourceModels)
-    .map(id => id.replace(/^gpt-/, ""))
+    .map((id) => id.replace(/^gpt-/, ""))
     .join(", ");
 }
 
 /** True when any configured prefix intercepts this option's model id. */
 export function shadowSourceOptionActive(optionId: string, sourceModels?: string[]): boolean {
-  return shadowSourceModelList(sourceModels).some(prefix => optionId.startsWith(prefix));
+  return shadowSourceModelList(sourceModels).some((prefix) => optionId.startsWith(prefix));
 }
 
 /** The configured prefix that covers this option, if any. */
-export function shadowSourceOptionCoveringPrefix(optionId: string, sourceModels?: string[]): string | undefined {
-  return shadowSourceModelList(sourceModels).find(prefix => optionId.startsWith(prefix));
+export function shadowSourceOptionCoveringPrefix(
+  optionId: string,
+  sourceModels?: string[],
+): string | undefined {
+  return shadowSourceModelList(sourceModels).find((prefix) => optionId.startsWith(prefix));
 }
 
 export type ShadowCallSourceToggleResult =
-  | { sourceModels: string[] }
-  | { blocked: "last" }
-  | { blocked: "covered"; prefix: string };
+  { sourceModels: string[] } | { blocked: "last" } | { blocked: "covered"; prefix: string };
 
 /**
  * Compute the next source list for one toggle.
@@ -75,10 +76,10 @@ export function toggleShadowCallSource(
   sourceModels?: string[],
 ): ShadowCallSourceToggleResult {
   const selected = shadowSourceModelList(sourceModels);
-  const broader = selected.find(prefix => prefix !== option.id && option.id.startsWith(prefix));
+  const broader = selected.find((prefix) => prefix !== option.id && option.id.startsWith(prefix));
   if (broader !== undefined) return { blocked: "covered", prefix: broader };
   if (!selected.includes(option.id)) return { sourceModels: [...selected, option.id] };
-  const next = selected.filter(prefix => prefix !== option.id);
+  const next = selected.filter((prefix) => prefix !== option.id);
   return next.length === 0 ? { blocked: "last" } : { sourceModels: next };
 }
 
@@ -97,8 +98,9 @@ export function shadowBackgroundModelBadge(
   memoryModelIds: readonly string[] = ["gpt-6.1-terra", "gpt-5.6-terra"],
 ): string {
   const selected = shadowSourceModelList(sourceModels);
-  const memoryAlreadyIntercepted = memoryModelIds.some(id => id !== ""
-    && selected.some(prefix => id.startsWith(prefix)));
+  const memoryAlreadyIntercepted = memoryModelIds.some(
+    (id) => id !== "" && selected.some((prefix) => id.startsWith(prefix)),
+  );
   const sourceLabel = shadowSourceModelBadge(sourceModels);
   return memoryAlreadyIntercepted ? sourceLabel : `${sourceLabel} (+ ${memoryLabel})`;
 }

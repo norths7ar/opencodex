@@ -1,7 +1,15 @@
 import type { TFn } from "../i18n/shared";
-import type { RequestFailureCause, RequestFailureStage, ResendPermission, RequestSpendTotals } from "../../../backend/src/usage/telemetry-contract";
+import type {
+  RequestFailureCause,
+  RequestFailureStage,
+  ResendPermission,
+  RequestSpendTotals,
+} from "../../../backend/src/usage/telemetry-contract";
 import type { UpstreamCondition } from "../../../backend/src/lib/upstream-condition";
-import { boundedFailureDetail, type FailureDetailCode } from "../../../backend/src/lib/failure-detail";
+import {
+  boundedFailureDetail,
+  type FailureDetailCode,
+} from "../../../backend/src/lib/failure-detail";
 
 interface LogFailureAttribution {
   failureCause?: RequestFailureCause;
@@ -42,12 +50,12 @@ const FAILURE_STAGE_KEYS = {
   "protocol-prelude": "logs.detail.stage.protocolPrelude",
   "semantic-output": "logs.detail.stage.semanticOutput",
   "side-effect": "logs.detail.stage.sideEffect",
-  "terminal": "logs.detail.stage.terminal",
+  terminal: "logs.detail.stage.terminal",
 } as const satisfies Record<RequestFailureStage, string>;
 
 /** i18n key for each resend verdict; every refusal names which refusal it is. */
 const RESEND_PERMISSION_KEYS = {
-  "permitted": "logs.detail.resend.permitted",
+  permitted: "logs.detail.resend.permitted",
   "permitted-after-repair": "logs.detail.resend.permittedAfterRepair",
   "refused-ambiguous": "logs.detail.resend.refusedAmbiguous",
   "refused-committed": "logs.detail.resend.refusedCommitted",
@@ -65,9 +73,24 @@ export function failureAttributionLabels(
   row: LogFailureAttribution,
   t: TFn,
 ): { cause?: string; stage?: string; resend?: string } {
-  const causeKey = row.failureCause === undefined ? undefined : (Object.hasOwn(FAILURE_CAUSE_KEYS, row.failureCause) ? FAILURE_CAUSE_KEYS[row.failureCause] : undefined);
-  const stageKey = row.failureStage === undefined ? undefined : (Object.hasOwn(FAILURE_STAGE_KEYS, row.failureStage) ? FAILURE_STAGE_KEYS[row.failureStage] : undefined);
-  const resendKey = row.resendPermission === undefined ? undefined : (Object.hasOwn(RESEND_PERMISSION_KEYS, row.resendPermission) ? RESEND_PERMISSION_KEYS[row.resendPermission] : undefined);
+  const causeKey =
+    row.failureCause === undefined
+      ? undefined
+      : Object.hasOwn(FAILURE_CAUSE_KEYS, row.failureCause)
+        ? FAILURE_CAUSE_KEYS[row.failureCause]
+        : undefined;
+  const stageKey =
+    row.failureStage === undefined
+      ? undefined
+      : Object.hasOwn(FAILURE_STAGE_KEYS, row.failureStage)
+        ? FAILURE_STAGE_KEYS[row.failureStage]
+        : undefined;
+  const resendKey =
+    row.resendPermission === undefined
+      ? undefined
+      : Object.hasOwn(RESEND_PERMISSION_KEYS, row.resendPermission)
+        ? RESEND_PERMISSION_KEYS[row.resendPermission]
+        : undefined;
   return {
     ...(row.failureCause ? { cause: causeKey ? t(causeKey) : row.failureCause } : {}),
     ...(row.failureStage ? { stage: stageKey ? t(stageKey) : row.failureStage } : {}),
@@ -75,30 +98,52 @@ export function failureAttributionLabels(
   };
 }
 
-
 const nonnegativeInteger = (value: unknown): value is number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0;
 
 export function failureSummary(
-  row: LogFailureAttribution & { spend?: RequestSpendTotals; attempts?: Array<{ sendCount: number }>; attemptNormalizationDropped?: boolean },
+  row: LogFailureAttribution & {
+    spend?: RequestSpendTotals;
+    attempts?: Array<{ sendCount: number }>;
+    attemptNormalizationDropped?: boolean;
+  },
   fallback: { label: string; description: string } | null,
   t: TFn,
 ): { label?: string; description?: string; sends?: number; unresolved?: number; retries?: number } {
   const cause = row.failureCause;
-  const causeKey = cause && Object.hasOwn(FAILURE_CAUSE_KEYS, cause) ? FAILURE_CAUSE_KEYS[cause] : undefined;
-  const result: { label?: string; description?: string; sends?: number; unresolved?: number; retries?: number } = causeKey
+  const causeKey =
+    cause && Object.hasOwn(FAILURE_CAUSE_KEYS, cause) ? FAILURE_CAUSE_KEYS[cause] : undefined;
+  const result: {
+    label?: string;
+    description?: string;
+    sends?: number;
+    unresolved?: number;
+    retries?: number;
+  } = causeKey
     ? { label: t(causeKey) }
     : { label: fallback?.label, description: fallback?.description };
   const spend = row.spend;
-  if (!spend || !nonnegativeInteger(spend.sends) || !nonnegativeInteger(spend.settled)
-    || !nonnegativeInteger(spend.unresolved) || spend.settled > spend.sends
-    || (spend.reserved !== undefined && !nonnegativeInteger(spend.reserved))) return result;
+  if (
+    !spend ||
+    !nonnegativeInteger(spend.sends) ||
+    !nonnegativeInteger(spend.settled) ||
+    !nonnegativeInteger(spend.unresolved) ||
+    spend.settled > spend.sends ||
+    (spend.reserved !== undefined && !nonnegativeInteger(spend.reserved))
+  )
+    return result;
   result.sends = spend.sends;
   result.unresolved = spend.unresolved;
-  if (spend.unresolved === 0 && spend.settled === spend.sends
-    && (spend.reserved === undefined || spend.reserved <= spend.settled)
-    && row.attemptNormalizationDropped !== true && Array.isArray(row.attempts) && row.attempts.length === 1
-    && nonnegativeInteger(row.attempts[0]?.sendCount) && row.attempts[0].sendCount === spend.sends) {
+  if (
+    spend.unresolved === 0 &&
+    spend.settled === spend.sends &&
+    (spend.reserved === undefined || spend.reserved <= spend.settled) &&
+    row.attemptNormalizationDropped !== true &&
+    Array.isArray(row.attempts) &&
+    row.attempts.length === 1 &&
+    nonnegativeInteger(row.attempts[0]?.sendCount) &&
+    row.attempts[0].sendCount === spend.sends
+  ) {
     result.retries = Math.max(0, spend.sends - 1);
   }
   return result;
@@ -146,7 +191,11 @@ const FAILURE_DETAIL_KEYS = {
 } as const satisfies Record<FailureDetailCode, string>;
 
 const VALUE_REQUIRED: ReadonlySet<FailureDetailCode> = new Set([
-  "connect_timeout", "body_stall", "body_overflow", "generation_timeout", "turn_inactivity",
+  "connect_timeout",
+  "body_stall",
+  "body_overflow",
+  "generation_timeout",
+  "turn_inactivity",
 ]);
 
 /**
@@ -157,15 +206,20 @@ export function failureDetailLabel(value: unknown, t: TFn): string | undefined {
   const detail = boundedFailureDetail(value);
   if (!detail) return undefined;
   if (detail.code === "provider_error") {
-    const label = detail.type ? t("logs.failureDetail.providerErrorTyped", { type: detail.type }) : t(FAILURE_DETAIL_KEYS.provider_error);
-    return detail.validation ? `${label}: ${detail.validation.map(issue => `${issue.field} [${issue.type}]`).join("; ")}` : label;
+    const label = detail.type
+      ? t("logs.failureDetail.providerErrorTyped", { type: detail.type })
+      : t(FAILURE_DETAIL_KEYS.provider_error);
+    return detail.validation
+      ? `${label}: ${detail.validation.map((issue) => `${issue.field} [${issue.type}]`).join("; ")}`
+      : label;
   }
   if (detail.code === "header_timeout" && detail.value !== undefined) {
     return t("logs.failureDetail.headerTimeoutAfter", { value: detail.value });
   }
   if (VALUE_REQUIRED.has(detail.code)) {
-    return detail.value === undefined ? undefined : t(FAILURE_DETAIL_KEYS[detail.code], { value: detail.value });
+    return detail.value === undefined
+      ? undefined
+      : t(FAILURE_DETAIL_KEYS[detail.code], { value: detail.value });
   }
   return t(FAILURE_DETAIL_KEYS[detail.code]);
 }
-

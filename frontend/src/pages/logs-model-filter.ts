@@ -35,11 +35,11 @@ export function logMatchesModelQuery(log: LogModelFields, query: string): boolea
   const needle = query.trim().toLowerCase();
   if (!needle) return true;
   const attemptTargets = Array.isArray(log.attempts)
-    ? log.attempts.flatMap(attempt => (
-      attempt && typeof attempt === "object" ? [attempt.provider, attempt.model] : []
-    ))
+    ? log.attempts.flatMap((attempt) =>
+        attempt && typeof attempt === "object" ? [attempt.provider, attempt.model] : [],
+      )
     : [];
   return [log.model, log.resolvedModel, log.provider, ...attemptTargets].some(
-    value => typeof value === "string" && value.toLowerCase().includes(needle),
+    (value) => typeof value === "string" && value.toLowerCase().includes(needle),
   );
 }

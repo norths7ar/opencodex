@@ -35,7 +35,10 @@ const CREDIT_DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
 
 const dateFormatters = new Map<string, Intl.DateTimeFormat>();
 
-function cachedDateFormatter(locale: string | undefined, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+function cachedDateFormatter(
+  locale: string | undefined,
+  options: Intl.DateTimeFormatOptions,
+): Intl.DateTimeFormat {
   const key = cacheKey(locale, options);
   let fmt = dateFormatters.get(key);
   if (!fmt) {

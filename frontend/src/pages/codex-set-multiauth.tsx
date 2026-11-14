@@ -7,7 +7,11 @@ import MainAccountHardLockSetting from "../components/MainAccountHardLockSetting
 import { useCodexAccountPool } from "../hooks/useCodexAccountPool";
 import { codexAccountModeState, type CodexAccountModeState } from "../codex-multi-state";
 import { navigateHash } from "../hash-routing";
-import { ensureOpenAiProvider, openAiAccountProviderState, OpenAiEnableError } from "../provider-payload";
+import {
+  ensureOpenAiProvider,
+  openAiAccountProviderState,
+  OpenAiEnableError,
+} from "../provider-payload";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { startVisibilityPoll } from "../visibility-poll";
 import { createBoundedFetch } from "../bounded-fetch";
@@ -15,22 +19,43 @@ import { InlineBanner } from "../components/v2-accounts/surface";
 
 export type OpenAiAccountBannerState = CodexAccountModeState | "invalid" | null;
 
-export function OpenAiAccountModeBanner({ state, busy, onEnable }: { state: OpenAiAccountBannerState; busy: boolean; onEnable: () => void }) {
+export function OpenAiAccountModeBanner({
+  state,
+  busy,
+  onEnable,
+}: {
+  state: OpenAiAccountBannerState;
+  busy: boolean;
+  onEnable: () => void;
+}) {
   const t = useT();
   if (state === null || state === "pool" || state === "direct") return null;
-  return <div className="panel openai-account-mode-banner">
-    <p className="card-sub">{t(state === "invalid" ? "codexAuth.openaiMissing" : "codexAuth.openaiUnavailableDesc")}</p>
-    {state === "invalid" ? <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>{t("codexAuth.openProviders")}</button>
-      : <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={onEnable}>{busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}</button>}
-  </div>;
+  return (
+    <div className="panel openai-account-mode-banner">
+      <p className="card-sub">
+        {t(state === "invalid" ? "codexAuth.openaiMissing" : "codexAuth.openaiUnavailableDesc")}
+      </p>
+      {state === "invalid" ? (
+        <button type="button" className="link-btn" onClick={() => navigateHash("providers")}>
+          {t("codexAuth.openProviders")}
+        </button>
+      ) : (
+        <button type="button" className="btn btn-primary btn-sm" disabled={busy} onClick={onEnable}>
+          {busy ? t("codexAuth.enablingOpenai") : t("codexAuth.enableOpenai")}
+        </button>
+      )}
+    </div>
+  );
 }
 
-function openaiProviderFromConfig(config: unknown): {
-  adapter?: string;
-  authMode?: string;
-  baseUrl?: string;
-  disabled?: boolean;
-} | undefined {
+function openaiProviderFromConfig(config: unknown):
+  | {
+      adapter?: string;
+      authMode?: string;
+      baseUrl?: string;
+      disabled?: boolean;
+    }
+  | undefined {
   if (!config || typeof config !== "object") return undefined;
   const providers = (config as { providers?: unknown }).providers;
   if (!providers || typeof providers !== "object" || Array.isArray(providers)) return undefined;
@@ -75,14 +100,19 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
   useLayoutEffect(() => {
     ownerMountedRef.current = true;
     // Retire captured callbacks at commit, before a replacement proxy can be displayed.
-    return () => { ownerMountedRef.current = false; };
+    return () => {
+      ownerMountedRef.current = false;
+    };
   }, []);
-  const onHardLockSaved = useCallback(() => ownerMountedRef.current
-    ? loadAccounts(false)
-    : Promise.resolve(false), [loadAccounts]);
+  const onHardLockSaved = useCallback(
+    () => (ownerMountedRef.current ? loadAccounts(false) : Promise.resolve(false)),
+    [loadAccounts],
+  );
   const configCacheKey = `ocx.codex-auth.config.v1:${apiBase}`;
   const cached = readSessionListCache<CachedMode>(configCacheKey);
-  const [bannerState, setBannerState] = useState<OpenAiAccountBannerState>(() => cached?.bannerState ?? null);
+  const [bannerState, setBannerState] = useState<OpenAiAccountBannerState>(
+    () => cached?.bannerState ?? null,
+  );
   const [accountModeState, setAccountModeState] = useState<CodexAccountModeState | null>(
     () => cached?.accountModeState ?? null,
   );
@@ -99,12 +129,19 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
       if (!res.ok) throw new Error(String(res.status));
       const config = await res.json();
       const providerState = openAiAccountProviderState(openaiProviderFromConfig(config));
-      if (providerState === "absent" || providerState === "disabled" || providerState === "invalid") {
+      if (
+        providerState === "absent" ||
+        providerState === "disabled" ||
+        providerState === "invalid"
+      ) {
         setBannerState(providerState);
         // Non-canonical / missing rows are not a live Codex account mode.
-        const mode = providerState === "disabled" ? "disabled" as const : "absent" as const;
+        const mode = providerState === "disabled" ? ("disabled" as const) : ("absent" as const);
         setAccountModeState(mode);
-        writeSessionListCache(configCacheKey, { bannerState: providerState, accountModeState: mode });
+        writeSessionListCache(configCacheKey, {
+          bannerState: providerState,
+          accountModeState: mode,
+        });
         return;
       }
       const mode = codexAccountModeState(config);
@@ -126,12 +163,18 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
     // cancelled, so without it the banner reads /api/config twice on every mount.
     if (initialModeKeyRef.current !== apiBase) {
       initialModeKeyRef.current = apiBase;
-      void Promise.resolve().then(() => { void loadMode(); });
+      void Promise.resolve().then(() => {
+        void loadMode();
+      });
     }
     // Hidden tabs hold no timer and fire nothing; the visible make-up tick re-reads
     // the mode the moment the user returns.
-    const stop = startVisibilityPoll(() => { void loadMode(); }, 30_000);
-    return () => { stop(); };
+    const stop = startVisibilityPoll(() => {
+      void loadMode();
+    }, 30_000);
+    return () => {
+      stop();
+    };
   }, [apiBase, loadMode]);
 
   const enableOpenAi = async () => {
@@ -153,14 +196,22 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
     }
   };
 
-  const banner = <>
-    <OpenAiAccountModeBanner
-      state={bannerState}
-      busy={enableBusy}
-      onEnable={() => { void enableOpenAi(); }}
-    />
-    {enableError && <InlineBanner tone="err" role="alert">{enableError}</InlineBanner>}
-  </>;
+  const banner = (
+    <>
+      <OpenAiAccountModeBanner
+        state={bannerState}
+        busy={enableBusy}
+        onEnable={() => {
+          void enableOpenAi();
+        }}
+      />
+      {enableError && (
+        <InlineBanner tone="err" role="alert">
+          {enableError}
+        </InlineBanner>
+      )}
+    </>
+  );
 
   return (
     <>
@@ -170,11 +221,13 @@ function CodexSetMultiauthForProxy({ apiBase }: { apiBase: string }) {
         hasMainHardLockSetting
         accountModeState={accountModeState}
         banner={banner}
-        advancedExtras={<>
-          <DefaultModeRequestUserInputSetting apiBase={apiBase} />
-          <UltraFastTierSetting apiBase={apiBase} />
-          <MainAccountHardLockSetting apiBase={apiBase} onSaved={onHardLockSaved} />
-        </>}
+        advancedExtras={
+          <>
+            <DefaultModeRequestUserInputSetting apiBase={apiBase} />
+            <UltraFastTierSetting apiBase={apiBase} />
+            <MainAccountHardLockSetting apiBase={apiBase} onSaved={onHardLockSaved} />
+          </>
+        }
       />
     </>
   );

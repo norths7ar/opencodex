@@ -52,7 +52,9 @@ function toDto(json: unknown, provider: string, fallback?: PoolSettingsWrite): P
   return {
     provider,
     kind: raw.kind === "codex" || raw.kind === "anthropic" ? raw.kind : "generic",
-    supported: Array.isArray(raw.supported) ? raw.supported.filter((f): f is string => typeof f === "string") : [],
+    supported: Array.isArray(raw.supported)
+      ? raw.supported.filter((f): f is string => typeof f === "string")
+      : [],
     enabled: typeof raw.enabled === "boolean" ? raw.enabled : null,
     enabledEffective: raw.enabledEffective === true,
     // Fall back to what was asked for when the response omits a field. A management write may
@@ -61,14 +63,17 @@ function toDto(json: unknown, provider: string, fallback?: PoolSettingsWrite): P
     strategy: normalizeAccountPoolStrategy(raw.strategy ?? fallback?.strategy),
     stickyLimit: normalizeAccountPoolStickyLimit(raw.stickyLimit ?? fallback?.stickyLimit),
     autoSwitchThreshold: typeof threshold === "number" ? threshold : null,
-    quotaWindow: (raw.quotaWindow ?? fallback?.quotaWindow) === undefined || raw.quotaWindow === null
-      ? null
-      : normalizeAccountPoolQuotaWindow(raw.quotaWindow ?? fallback?.quotaWindow),
+    quotaWindow:
+      (raw.quotaWindow ?? fallback?.quotaWindow) === undefined || raw.quotaWindow === null
+        ? null
+        : normalizeAccountPoolQuotaWindow(raw.quotaWindow ?? fallback?.quotaWindow),
     // Provider scope wins over a mismatched kind. Present malformed values fail closed;
     // only an absent field may use the submitted value (including false after a 204).
-    nativeMessages: !isAnthropicInstanceId(provider) ? null
-      : Object.hasOwn(raw, "nativeMessages") ? raw.nativeMessages === true
-        : fallback?.nativeMessages ?? true,
+    nativeMessages: !isAnthropicInstanceId(provider)
+      ? null
+      : Object.hasOwn(raw, "nativeMessages")
+        ? raw.nativeMessages === true
+        : (fallback?.nativeMessages ?? true),
     ...(raw.warning === "config_bookkeeping_failed" ? { warning: raw.warning } : {}),
   };
 }
@@ -82,7 +87,10 @@ function toDto(json: unknown, provider: string, fallback?: PoolSettingsWrite): P
  * is worse than a visible failure, which is why the mapping lives here rather than at each
  * call site where one of three could forget it.
  */
-export function poolSettingsRequestBody(provider: string, fields: PoolSettingsWrite): Record<string, unknown> {
+export function poolSettingsRequestBody(
+  provider: string,
+  fields: PoolSettingsWrite,
+): Record<string, unknown> {
   return {
     provider,
     ...(fields.enabled !== undefined ? { enabled: fields.enabled } : {}),
@@ -90,7 +98,9 @@ export function poolSettingsRequestBody(provider: string, fields: PoolSettingsWr
     ...(fields.stickyLimit !== undefined ? { stickyLimit: fields.stickyLimit } : {}),
     ...(fields.threshold !== undefined ? { autoSwitchThreshold: fields.threshold } : {}),
     ...(fields.quotaWindow !== undefined ? { quotaWindow: fields.quotaWindow } : {}),
-    ...(isAnthropicInstanceId(provider) && fields.nativeMessages !== undefined ? { nativeMessages: fields.nativeMessages } : {}),
+    ...(isAnthropicInstanceId(provider) && fields.nativeMessages !== undefined
+      ? { nativeMessages: fields.nativeMessages }
+      : {}),
   };
 }
 
@@ -101,7 +111,10 @@ export async function getPoolSettings(
   init?: RequestInit,
 ): Promise<PoolSettings | null> {
   try {
-    const response = await fetchImpl(`${apiBase}/api/pool/settings?provider=${encodeURIComponent(provider)}`, init);
+    const response = await fetchImpl(
+      `${apiBase}/api/pool/settings?provider=${encodeURIComponent(provider)}`,
+      init,
+    );
     if (!response.ok) return null;
     // No empty-body tolerance on the READ. `toDto` fills defaults, so `{}` would render as a
     // disabled pool with default values and the panel would treat that as a loaded state --
@@ -140,7 +153,8 @@ export async function putPoolSettings(
     if (!response.ok) {
       if (isAnthropicInstanceId(provider) && response.status === 409) {
         const failure = await response.json().catch(() => null);
-        if (failure?.code === "config_save_state_unknown") throw new PoolSettingsSaveStateUnknownError();
+        if (failure?.code === "config_save_state_unknown")
+          throw new PoolSettingsSaveStateUnknownError();
       }
       return null;
     }
@@ -167,10 +181,15 @@ export async function putCodexPoolStrategy(
   fetchImpl: PoolSettingsFetch = (input, init) => fetch(input, init),
 ): Promise<{ ok: true; strategy: AccountPoolStrategy; stickyLimit: number } | { ok: false }> {
   if (body.strategy === undefined && body.stickyLimit === undefined) return { ok: false };
-  const settings = await putPoolSettings(apiBase, CODEX_POOL_PROVIDER, {
-    strategy: body.strategy,
-    stickyLimit: body.stickyLimit,
-  }, fetchImpl);
+  const settings = await putPoolSettings(
+    apiBase,
+    CODEX_POOL_PROVIDER,
+    {
+      strategy: body.strategy,
+      stickyLimit: body.stickyLimit,
+    },
+    fetchImpl,
+  );
   if (!settings) return { ok: false };
   return { ok: true, strategy: settings.strategy, stickyLimit: settings.stickyLimit };
 }

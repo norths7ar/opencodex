@@ -67,7 +67,7 @@ export default function RestoreDialog({
   const [pending, setPending] = useState(false);
   const [previewFailure, setPreviewFailure] = useState<string | null>(null);
   const [mutationFailure, setMutationFailure] = useState<string | null>(null);
-  const scopedProfileId = row.clientId === "aside" ? profileId ?? row.profileId : undefined;
+  const scopedProfileId = row.clientId === "aside" ? (profileId ?? row.profileId) : undefined;
   const scopedHermesProfile = row.clientId === "hermes" ? hermesProfile : undefined;
   const plan = boundPlan?.plan ?? null;
   const drift = plan?.foreignEdit === "drift";
@@ -93,7 +93,7 @@ export default function RestoreDialog({
     // is not a global in the happy-dom test window, and the overview's own
     // focus-restore uses the same tagName check.
     const active = document.activeElement;
-    restoreFocusRef.current = active?.tagName === "BUTTON" ? active as HTMLElement : null;
+    restoreFocusRef.current = active?.tagName === "BUTTON" ? (active as HTMLElement) : null;
     // The trigger may not survive the asynchronous history refresh. A row whose
     // snapshot is consumed re-renders as an `expired` badge with no button
     // (RollbackHistory.tsx:44-46), so remember the enclosing region too: it
@@ -144,10 +144,24 @@ export default function RestoreDialog({
     setStale(false);
     try {
       let confirmDrift = false;
-      let next = await previewIntegrationRestore(apiBase, row.opId, confirmDrift, controller.signal, scopedProfileId, scopedHermesProfile);
+      let next = await previewIntegrationRestore(
+        apiBase,
+        row.opId,
+        confirmDrift,
+        controller.signal,
+        scopedProfileId,
+        scopedHermesProfile,
+      );
       if (next.refusalReason === "drift_requires_confirm") {
         confirmDrift = true;
-        next = await previewIntegrationRestore(apiBase, row.opId, confirmDrift, controller.signal, scopedProfileId, scopedHermesProfile);
+        next = await previewIntegrationRestore(
+          apiBase,
+          row.opId,
+          confirmDrift,
+          controller.signal,
+          scopedProfileId,
+          scopedHermesProfile,
+        );
       }
       if (controller.signal.aborted || generation !== previewGenerationRef.current) return;
       setBoundPlan({ plan: next, confirmDrift });
@@ -168,7 +182,9 @@ export default function RestoreDialog({
   }, [apiBase, row.opId, scopedProfileId, scopedHermesProfile]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => { void loadPreview(); }, 0);
+    const timeout = window.setTimeout(() => {
+      void loadPreview();
+    }, 0);
     return () => {
       window.clearTimeout(timeout);
       previewGenerationRef.current += 1;
@@ -177,10 +193,13 @@ export default function RestoreDialog({
     };
   }, [loadPreview]);
 
-  const handleCancel = useCallback((event: React.SyntheticEvent) => {
-    event.preventDefault();
-    dismiss();
-  }, [dismiss]);
+  const handleCancel = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+      dismiss();
+    },
+    [dismiss],
+  );
 
   const submit = async () => {
     if (pending || previewPending || !boundPlan || !boundPlan.plan.canApply) return;
@@ -216,7 +235,14 @@ export default function RestoreDialog({
             setPreviewPending(true);
             freshConfirmDrift = true;
             try {
-              fresh = await previewIntegrationRestore(apiBase, row.opId, freshConfirmDrift, controller.signal, scopedProfileId, scopedHermesProfile);
+              fresh = await previewIntegrationRestore(
+                apiBase,
+                row.opId,
+                freshConfirmDrift,
+                controller.signal,
+                scopedProfileId,
+                scopedHermesProfile,
+              );
             } finally {
               if (!controller.signal.aborted && generation === previewGenerationRef.current) {
                 previewAbortRef.current = null;
@@ -282,7 +308,12 @@ export default function RestoreDialog({
           <button type="button" className="btn btn-ghost" onClick={dismiss} disabled={pending}>
             {t("common.cancel")}
           </button>
-          <button type="button" className="btn btn-primary" onClick={() => void submit()} disabled={pending || previewPending || !plan?.canApply || Boolean(previewFailure)}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => void submit()}
+            disabled={pending || previewPending || !plan?.canApply || Boolean(previewFailure)}
+          >
             {pending
               ? t("integrations.restore.pending")
               : drift

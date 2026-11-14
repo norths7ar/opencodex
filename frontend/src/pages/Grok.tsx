@@ -72,57 +72,63 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
   // cascading-render lint; `null` here means "no unsaved edits, follow the server".
   const [draftExcluded, setDraftExcluded] = useState<Set<string> | null>(null);
   // null = no stored preference; groups start collapsed so the list opens on demand.
-  const [collapsed, setCollapsed] = useState<Set<string>>(() => GROUP_COLLAPSE.read() ?? new Set(DEFAULT_COLLAPSED_GROUPS));
+  const [collapsed, setCollapsed] = useState<Set<string>>(
+    () => GROUP_COLLAPSE.read() ?? new Set(DEFAULT_COLLAPSED_GROUPS),
+  );
   const [pending, setPending] = useState<"save" | "apply" | null>(null);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
   const [announcement, setAnnouncement] = useState("");
 
-  const fetchStatus = useCallback(async (signal: AbortSignal): Promise<GrokStatus> => {
-    const response = await fetch(`${apiBase}/api/grok`, { signal });
-    const payload = await readJsonOrThrow<GrokStatus & { error?: string }>(response, t("grok.loadFail"));
-    if (!payload) throw new Error(t("grok.loadFail"));
-    // Tolerate an older proxy that predates the selection routes: the page degrades
-    // to the read-only fence view instead of crashing on a missing field.
-    const next = { ...payload, candidates: payload.candidates ?? [], excluded: payload.excluded ?? [] };
-    writeSessionListCacheEntry(cacheKey, next);
-    return next;
-  }, [apiBase, cacheKey, t]);
+  const fetchStatus = useCallback(
+    async (signal: AbortSignal): Promise<GrokStatus> => {
+      const response = await fetch(`${apiBase}/api/grok`, { signal });
+      const payload = await readJsonOrThrow<GrokStatus & { error?: string }>(
+        response,
+        t("grok.loadFail"),
+      );
+      if (!payload) throw new Error(t("grok.loadFail"));
+      // Tolerate an older proxy that predates the selection routes: the page degrades
+      // to the read-only fence view instead of crashing on a missing field.
+      const next = {
+        ...payload,
+        candidates: payload.candidates ?? [],
+        excluded: payload.excluded ?? [],
+      };
+      writeSessionListCacheEntry(cacheKey, next);
+      return next;
+    },
+    [apiBase, cacheKey, t],
+  );
 
   // Request ownership lives in the shared resource layer, so a route change during the first
   // load cannot drop the request the way the old deferred timer did.
   const resourceKey = `grok-status:${apiBase}`;
-  const resource = useDataSurface<GrokStatus>(
-    resourceKey,
-    [apiBase],
-    fetchStatus,
-    {
-      isEmpty: () => false,
-      initialData: cached ?? undefined,
-      initialDataCachedAt: cachedEntry?.cachedAt ?? null,
-      // A revisit within the window paints from cache with no request at all; past it,
-      // the refetch is quiet (cached rows stay on screen).
-      staleAfterMs: 60_000,
-      enabled: active,
-    },
-  );
+  const resource = useDataSurface<GrokStatus>(resourceKey, [apiBase], fetchStatus, {
+    isEmpty: () => false,
+    initialData: cached ?? undefined,
+    initialDataCachedAt: cachedEntry?.cachedAt ?? null,
+    // A revisit within the window paints from cache with no request at all; past it,
+    // the refetch is quiet (cached rows stay on screen).
+    staleAfterMs: 60_000,
+    enabled: active,
+  });
   const { state } = resource;
   const load = resource.refresh;
   const status = state.data ?? cached;
 
-  const savedExcluded = useMemo(
-    () => new Set(status?.excluded ?? []),
-    [status],
-  );
+  const savedExcluded = useMemo(() => new Set(status?.excluded ?? []), [status]);
   const excluded = draftExcluded ?? savedExcluded;
 
   const dirty = useMemo(
-    () => draftExcluded !== null
-      && (draftExcluded.size !== savedExcluded.size || [...draftExcluded].some(id => !savedExcluded.has(id))),
+    () =>
+      draftExcluded !== null &&
+      (draftExcluded.size !== savedExcluded.size ||
+        [...draftExcluded].some((id) => !savedExcluded.has(id))),
     [draftExcluded, savedExcluded],
   );
 
   const aliasById = useMemo(
-    () => new Map((status?.models ?? []).map(m => [m.id, m.alias])),
+    () => new Map((status?.models ?? []).map((m) => [m.id, m.alias])),
     [status],
   );
 
@@ -139,7 +145,7 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
   };
 
   const toggleModel = (id: string, currentlyExcluded: boolean) => {
-    setDraftExcluded(current => {
+    setDraftExcluded((current) => {
       // First toggle forks the server selection into a draft; later toggles build on the draft.
       const next = new Set(current ?? savedExcluded);
       if (currentlyExcluded) next.delete(id);
@@ -172,10 +178,13 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
         // Apply errors use `{ message, skippedReason }` (not always `error`); preserve that
         // actionable copy for orphan-marker repair and policy skips.
         if (!applied.ok) {
-          const failed = await applied.json().catch(() => ({})) as { message?: string; error?: string };
+          const failed = (await applied.json().catch(() => ({}))) as {
+            message?: string;
+            error?: string;
+          };
           throw new Error(failed.message ?? failed.error ?? t("grok.applyFailed"));
         }
-        const payload = await applied.json().catch(() => ({})) as {
+        const payload = (await applied.json().catch(() => ({}))) as {
           message?: string;
           skippedReason?: string;
         };
@@ -218,8 +227,12 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
     const reason = state.error instanceof Error ? state.error.message : t("grok.loadFail");
     return (
       <section className="grok-page">
-        <div className="alert alert-err" role="alert">{reason}</div>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>{t("common.retry")}</button>
+        <div className="alert alert-err" role="alert">
+          {reason}
+        </div>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>
+          {t("common.retry")}
+        </button>
       </section>
     );
   }
@@ -229,7 +242,9 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
       <h2 className="page-title">{t("grok.title")}</h2>
       <p className="page-sub">{t("grok.subtitle")}</p>
 
-      <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </div>
       {message && <Notice tone={message.tone}>{message.text}</Notice>}
 
       {/* A refresh that fails while cached data is on screen must say so instead of leaving the
@@ -242,11 +257,25 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
             {dirty ? t("grok.unsaved") : t("grok.upToDate")}
           </span>
           <div className="claude-save-actions">
-            <button type="button" className="btn btn-ghost" disabled={!dirty || pending !== null} onClick={() => void save(false)}>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={!dirty || pending !== null}
+              onClick={() => void save(false)}
+            >
               {pending === "save" ? t("grok.saving") : t("common.save")}
             </button>
-            <button type="button" className="btn btn-primary" disabled={!dirty || pending !== null} onClick={() => void save(true)}>
-              {pending === "apply" ? t("grok.applying") : pending === "save" ? t("grok.saving") : t("grok.saveApply")}
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={!dirty || pending !== null}
+              onClick={() => void save(true)}
+            >
+              {pending === "apply"
+                ? t("grok.applying")
+                : pending === "save"
+                  ? t("grok.saving")
+                  : t("grok.saveApply")}
             </button>
           </div>
         </div>
@@ -266,26 +295,48 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
             <span>{t("grok.endpoint")}</span>
             <code>{status.baseUrl ?? "—"}</code>
           </div>
-          <p className="page-sub"><code>{status.configPath}</code></p>
+          <p className="page-sub">
+            <code>{status.configPath}</code>
+          </p>
         </>
       )}
 
       {status && status.candidates.length > 0 && (
         <div className="ocx-group-stack">
           <div className="row" style={{ gap: 6, margin: "2px 0 10px" }}>
-            <button type="button" className="btn btn-ghost btn-sm text-caption" onClick={() => setAllCollapsed(true)} disabled={pending !== null}>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm text-caption"
+              onClick={() => setAllCollapsed(true)}
+              disabled={pending !== null}
+            >
               <IconChevron width={12} height={12} aria-hidden="true" /> {t("models.collapseAll")}
             </button>
-            <button type="button" className="btn btn-ghost btn-sm text-caption" onClick={() => setAllCollapsed(false)} disabled={pending !== null}>
-              <IconChevron width={12} height={12} aria-hidden="true" style={{ transform: "rotate(90deg)" }} /> {t("models.expandAll")}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm text-caption"
+              onClick={() => setAllCollapsed(false)}
+              disabled={pending !== null}
+            >
+              <IconChevron
+                width={12}
+                height={12}
+                aria-hidden="true"
+                style={{ transform: "rotate(90deg)" }}
+              />{" "}
+              {t("models.expandAll")}
             </button>
           </div>
-          {GROUPS.map(group => {
+          {GROUPS.map((group) => {
             const view = grokGroupView(status.candidates, aliasById, excluded, group.id);
             if (view.total === 0) return null;
             const isCollapsed = collapsed.has(group.id);
             return (
-              <section key={group.id} className={`ocx-group${isCollapsed ? " collapsed" : ""}`} aria-labelledby={`grok-group-${group.id}`}>
+              <section
+                key={group.id}
+                className={`ocx-group${isCollapsed ? " collapsed" : ""}`}
+                aria-labelledby={`grok-group-${group.id}`}
+              >
                 <header className={`ocx-group-head${isCollapsed ? "" : " open"}`}>
                   <h3 id={`grok-group-${group.id}`} className="ocx-group-heading">
                     <button
@@ -311,7 +362,7 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
                 </header>
                 {!isCollapsed && (
                   <div id={`grok-group-body-${group.id}`} className="grok-model-list">
-                    {view.rows.map(model => (
+                    {view.rows.map((model) => (
                       <div key={model.id} className="grok-model-row">
                         <Switch
                           on={model.enabled}
@@ -323,7 +374,9 @@ export default function Grok({ apiBase, active = true }: { apiBase: string; acti
                           <strong title={model.id}>{model.id}</strong>
                           <code title={model.alias ?? undefined}>{model.alias ?? "—"}</code>
                         </span>
-                        <span className="claude-model-context">{formatContext(model.contextWindow, t)}</span>
+                        <span className="claude-model-context">
+                          {formatContext(model.contextWindow, t)}
+                        </span>
                       </div>
                     ))}
                   </div>

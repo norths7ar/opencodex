@@ -14,7 +14,12 @@ import { useI18n, type TKey } from "../i18n/shared";
 import { navigateHash } from "../hash-routing";
 import { patchProtocolSettings } from "../protocol-api";
 import type { GatewayInboundProtocol } from "../api-access-models";
-import type { ApiEndpointInfo, ApiSurfaceInfo, ApiSurfaceSource, ApiSurfacesInfo } from "./api-keys-utils";
+import type {
+  ApiEndpointInfo,
+  ApiSurfaceInfo,
+  ApiSurfaceSource,
+  ApiSurfacesInfo,
+} from "./api-keys-utils";
 import { EndpointUrl } from "./api-keys-copy";
 
 const CLAUDE_HASH = "claude/code";
@@ -26,10 +31,18 @@ const SOURCE_KEYS: Record<ApiSurfaceSource, TKey> = {
   invalid: "api.surface.source.invalid",
 };
 
-const CARDS: ReadonlyArray<{ id: GatewayInboundProtocol; titleKey: TKey; url: (endpoints: ApiEndpointInfo) => string }> = [
-  { id: "responses", titleKey: "api.responsesEndpoint", url: endpoints => endpoints.responses },
-  { id: "chat", titleKey: "api.chatCompletionsEndpoint", url: endpoints => endpoints.chatCompletions },
-  { id: "messages", titleKey: "api.messagesEndpoint", url: endpoints => endpoints.messages },
+const CARDS: ReadonlyArray<{
+  id: GatewayInboundProtocol;
+  titleKey: TKey;
+  url: (endpoints: ApiEndpointInfo) => string;
+}> = [
+  { id: "responses", titleKey: "api.responsesEndpoint", url: (endpoints) => endpoints.responses },
+  {
+    id: "chat",
+    titleKey: "api.chatCompletionsEndpoint",
+    url: (endpoints) => endpoints.chatCompletions,
+  },
+  { id: "messages", titleKey: "api.messagesEndpoint", url: (endpoints) => endpoints.messages },
 ];
 
 type ToggleError = "failed" | "unavailable" | null;
@@ -64,7 +77,7 @@ export function ApiSurfaceCards({
 
   return (
     <div className="api-endpoints api-surface-cards">
-      {CARDS.map(card => {
+      {CARDS.map((card) => {
         const surface = surfaces[card.id];
         const stateLabel = surface.enabled ? t("api.surface.on") : t("api.surface.off");
         return (
@@ -79,25 +92,45 @@ export function ApiSurfaceCards({
                 <Switch
                   on={surface.enabled}
                   disabled={pending}
-                  onClick={() => { void toggleMessages(surface); }}
+                  onClick={() => {
+                    void toggleMessages(surface);
+                  }}
                   label={`${t("api.surface.messagesToggle")}: ${stateLabel}`}
                 />
               ) : null}
-              <span className={`badge ${surface.enabled ? "badge-green" : "badge-muted"}`}>{stateLabel}</span>
+              <span className={`badge ${surface.enabled ? "badge-green" : "badge-muted"}`}>
+                {stateLabel}
+              </span>
             </div>
             <EndpointUrl url={card.url(endpoints)} />
-            <span className={`small ${surface.source === "invalid" ? "api-surface-invalid" : "muted"}`}>
+            <span
+              className={`small ${surface.source === "invalid" ? "api-surface-invalid" : "muted"}`}
+            >
               {t(SOURCE_KEYS[surface.source])}
             </span>
             {card.id === "messages" ? (
               <>
-                {!surface.enabled ? <span className="muted small">{t("api.surface.closedNote")}</span> : null}
-                {surface.enabled ? <span className="muted small">{t("api.surface.messagesCloseNote")}</span> : null}
-                <button type="button" className="btn btn-ghost btn-sm api-surface-card-link" onClick={() => navigateHash(CLAUDE_HASH)}>
+                {!surface.enabled ? (
+                  <span className="muted small">{t("api.surface.closedNote")}</span>
+                ) : null}
+                {surface.enabled ? (
+                  <span className="muted small">{t("api.surface.messagesCloseNote")}</span>
+                ) : null}
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm api-surface-card-link"
+                  onClick={() => navigateHash(CLAUDE_HASH)}
+                >
                   {t("api.surface.openClaude")}
                 </button>
                 {error ? (
-                  <Notice tone="err">{t(error === "unavailable" ? "api.surface.toggleUnavailable" : "api.surface.toggleFailed")}</Notice>
+                  <Notice tone="err">
+                    {t(
+                      error === "unavailable"
+                        ? "api.surface.toggleUnavailable"
+                        : "api.surface.toggleFailed",
+                    )}
+                  </Notice>
                 ) : null}
               </>
             ) : null}

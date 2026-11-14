@@ -7,7 +7,11 @@ import type { ConfiguredProviderSummary } from "../models-groups";
  * Off/On switch for a provider's opt-in Fast lane (Anthropic fast mode spends usage credits at 2x
  * price, so it ships off). Drawn only when the server reports `fastOptIn` for the provider.
  */
-export function ProviderFastRow({ summary, apiBase, onSaved }: {
+export function ProviderFastRow({
+  summary,
+  apiBase,
+  onSaved,
+}: {
   summary: ConfiguredProviderSummary | undefined;
   apiBase: string;
   onSaved: (ok: boolean, message: string) => void;
@@ -28,11 +32,14 @@ export function ProviderFastRow({ summary, apiBase, onSaved }: {
     if (busy || next === enabled) return;
     setBusy(true);
     try {
-      const response = await fetch(`${apiBase}/api/providers?name=${encodeURIComponent(summary.name)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fastEnabled: next }),
-      });
+      const response = await fetch(
+        `${apiBase}/api/providers?name=${encodeURIComponent(summary.name)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fastEnabled: next }),
+        },
+      );
       await readJsonOrThrow(response, t("models.fastSaveFailed"));
       setSaved({ value: next, from: serverEnabled });
       onSaved(true, t(next ? "models.fastEnabled" : "models.fastDisabled"));
@@ -45,11 +52,21 @@ export function ProviderFastRow({ summary, apiBase, onSaved }: {
   return (
     <div className="row models-provider-hint">
       <span className="muted text-label">{t("models.fastProvider")}</span>
-      <div className="segmented models-segmented" role="radiogroup" aria-label={t("models.fastProvider")}>
-        {([false, true] as const).map(mode => (
-          <button key={String(mode)} type="button" role="radio" aria-checked={enabled === mode}
+      <div
+        className="segmented models-segmented"
+        role="radiogroup"
+        aria-label={t("models.fastProvider")}
+      >
+        {([false, true] as const).map((mode) => (
+          <button
+            key={String(mode)}
+            type="button"
+            role="radio"
+            aria-checked={enabled === mode}
             className={`btn btn-sm${enabled === mode ? " btn-primary" : " btn-ghost"}`}
-            disabled={busy} onClick={() => void save(mode)}>
+            disabled={busy}
+            onClick={() => void save(mode)}
+          >
             {t(mode ? "models.newPolicy_on" : "models.newPolicy_off")}
           </button>
         ))}

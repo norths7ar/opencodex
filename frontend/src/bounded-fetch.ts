@@ -12,9 +12,9 @@ export type BoundedFetch = {
 export function createBoundedFetch(ms: number): BoundedFetch {
   const controller = new AbortController();
   if (
-    typeof AbortSignal !== "undefined"
-    && typeof AbortSignal.any === "function"
-    && typeof AbortSignal.timeout === "function"
+    typeof AbortSignal !== "undefined" &&
+    typeof AbortSignal.any === "function" &&
+    typeof AbortSignal.timeout === "function"
   ) {
     return {
       controller,
@@ -31,7 +31,11 @@ export function createBoundedFetch(ms: number): BoundedFetch {
 }
 
 /** Bound headers and body work even when a transport ignores abort; late writers must check signal. */
-export async function withFetchDeadline<T>(ms: number, caller: AbortSignal | undefined, work: (signal: AbortSignal) => Promise<T>): Promise<T> {
+export async function withFetchDeadline<T>(
+  ms: number,
+  caller: AbortSignal | undefined,
+  work: (signal: AbortSignal) => Promise<T>,
+): Promise<T> {
   caller?.throwIfAborted();
   const bounded = createBoundedFetch(ms);
   const cancel = () => bounded.controller.abort(caller?.reason);
@@ -61,5 +65,9 @@ export async function withFetchDeadline<T>(ms: number, caller: AbortSignal | und
  * status classification: a rejected, stalled, or throwing cancel is ignored.
  */
 export function discardResponseBody(response: Response): void {
-  try { void response.body?.cancel().catch(() => {}); } catch { /* best effort */ }
+  try {
+    void response.body?.cancel().catch(() => {});
+  } catch {
+    /* best effort */
+  }
 }

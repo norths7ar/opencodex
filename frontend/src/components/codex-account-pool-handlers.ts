@@ -1,10 +1,7 @@
 import type { TFn } from "../i18n/shared";
 import { readJsonIfOk } from "../fetch-json";
 
-function remainingCreditsToast(
-  t: TFn,
-  remaining: number | undefined,
-): string {
+function remainingCreditsToast(t: TFn, remaining: number | undefined): string {
   if (remaining === undefined) return t("codexAuth.resetSuccessGeneric");
   return t("codexAuth.resetSuccess", { remaining: String(remaining) });
 }
@@ -37,9 +34,12 @@ export async function redeemResetCredit(
         toast: remainingCreditsToast(t, remaining),
       };
     }
-    const key = result.code === "nothing_to_reset" ? "codexAuth.resetNothingToReset"
-      : result.code === "no_credit" ? "codexAuth.resetNoCredit"
-      : "codexAuth.resetError";
+    const key =
+      result.code === "nothing_to_reset"
+        ? "codexAuth.resetNothingToReset"
+        : result.code === "no_credit"
+          ? "codexAuth.resetNoCredit"
+          : "codexAuth.resetError";
     return { ok: false, close: true, toast: t(key) };
   } catch {
     return { ok: false, toast: t("codexAuth.resetError") };

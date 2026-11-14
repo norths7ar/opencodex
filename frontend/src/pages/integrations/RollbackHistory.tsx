@@ -69,7 +69,9 @@ export function RollbackRow({
           type="button"
           className="btn btn-ghost btn-sm"
           onClick={() => onDelete(row)}
-          aria-label={t("integrations.rollback.deleteAria", { at: new Date(row.at).toLocaleString() })}
+          aria-label={t("integrations.rollback.deleteAria", {
+            at: new Date(row.at).toLocaleString(),
+          })}
         >
           {t("integrations.rollback.delete")}
         </button>
@@ -105,21 +107,32 @@ export function RollbackHistory({
           for it, so no button appears -- but withholding the prop here would make
           that rule depend on an omission rather than on the data.
         */}
-        <RollbackRow row={newest} showClient={showClient} onRestore={onRestore} onDelete={onDelete} />
+        <RollbackRow
+          row={newest}
+          showClient={showClient}
+          onRestore={onRestore}
+          onDelete={onDelete}
+        />
       </ul>
       {older.length > 0 && (
         <details className="integration-history-older">
           <summary>{t("integrations.rollback.older")}</summary>
           <ul className="integration-history-list">
-            {visible.map(row => (
-              <RollbackRow key={row.opId} row={row} showClient={showClient} onRestore={onRestore} onDelete={onDelete} />
+            {visible.map((row) => (
+              <RollbackRow
+                key={row.opId}
+                row={row}
+                showClient={showClient}
+                onRestore={onRestore}
+                onDelete={onDelete}
+              />
             ))}
           </ul>
           {remaining > 0 && (
             <button
               type="button"
               className="btn btn-ghost btn-sm integration-history-more"
-              onClick={() => setShown(count => count + PAGE)}
+              onClick={() => setShown((count) => count + PAGE)}
             >
               {t("integrations.rollback.showMore", { n: String(Math.min(remaining, PAGE)) })}
             </button>

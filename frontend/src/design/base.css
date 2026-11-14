@@ -10,9 +10,20 @@
 
 :where(
   input:not([type]),
-  input:is([type="text"], [type="number"], [type="search"], [type="email"], [type="url"],
-    [type="password"], [type="tel"], [type="date"], [type="time"], [type="datetime-local"],
-    [type="month"], [type="week"]),
+  input:is(
+    [type="text"],
+    [type="number"],
+    [type="search"],
+    [type="email"],
+    [type="url"],
+    [type="password"],
+    [type="tel"],
+    [type="date"],
+    [type="time"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="week"]
+  ),
   textarea,
   select
 ) {
@@ -26,14 +37,20 @@
   font-size: 13px;
   line-height: 18px;
   box-shadow: 0 1px 2px -1px rgb(0 0 0 / 0.12);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
-:where(input, textarea, select):where(:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"])):focus-visible {
+:where(input, textarea, select):where(
+    :not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"])
+  ):focus-visible {
   outline: none;
   border-color: var(--ocx-highlight);
   box-shadow: 0 0 0 3px var(--ocx-highlight-soft);
 }
-:where(input, textarea)::placeholder { color: var(--ocx-fg-subtle); }
+:where(input, textarea)::placeholder {
+  color: var(--ocx-fg-subtle);
+}
 :where(select) {
   padding-right: 30px;
   appearance: none;
@@ -43,17 +60,30 @@
   background-size: 14px;
   cursor: pointer;
 }
-:where(select) option { background-color: var(--ocx-raised); color: var(--ocx-fg); }
-:where(input, textarea, select):disabled { opacity: 0.5; cursor: not-allowed; }
+:where(select) option {
+  background-color: var(--ocx-raised);
+  color: var(--ocx-fg);
+}
+:where(input, textarea, select):disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* ---- line breaking --------------------------------------------------------
    Korean breaks between words, not inside them ("백 / 그라운드" read as a typo);
    overflow-wrap still lets a long token (a path, a model id) break so nothing
    overflows. Running text wraps evenly instead of leaving one word alone on the
    last line. Both are floors: a component that needs other behaviour sets it. */
-:root:lang(ko) body { word-break: keep-all; overflow-wrap: break-word; }
-:where(p, li, dd, summary, figcaption, label, .muted, .page-sub) { text-wrap: pretty; }
-:where(h1, h2, h3, h4) { text-wrap: balance; }
+:root:lang(ko) body {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+:where(p, li, dd, summary, figcaption, label, .muted, .page-sub) {
+  text-wrap: pretty;
+}
+:where(h1, h2, h3, h4) {
+  text-wrap: balance;
+}
 
 /* ---- native <select> popup: never the OS list -------------------------------
    Native selects are banned in source (form-controls-rule.test.ts; the app's
@@ -61,8 +91,13 @@
    select draws its open list in the v2 menu style instead of the OS popup with
    its blue highlight. Browsers without it keep the closed-state look above. */
 @supports (appearance: base-select) {
-  :where(select), :where(select)::picker(select) { appearance: base-select; }
-  :where(select)::picker-icon { display: none; }
+  :where(select),
+  :where(select)::picker(select) {
+    appearance: base-select;
+  }
+  :where(select)::picker-icon {
+    display: none;
+  }
   :where(select)::picker(select) {
     margin-top: 4px;
     padding: 4px;
@@ -78,7 +113,16 @@
     background: transparent;
     font-size: 13px;
   }
-  :where(select) option::checkmark { display: none; }
-  :where(select) option:hover, :where(select) option:focus-visible { background: var(--ocx-accent-soft); outline: none; }
-  :where(select) option:checked { background: var(--ocx-accent-soft); font-weight: 600; }
+  :where(select) option::checkmark {
+    display: none;
+  }
+  :where(select) option:hover,
+  :where(select) option:focus-visible {
+    background: var(--ocx-accent-soft);
+    outline: none;
+  }
+  :where(select) option:checked {
+    background: var(--ocx-accent-soft);
+    font-weight: 600;
+  }
 }

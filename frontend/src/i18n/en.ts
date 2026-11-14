@@ -16,7 +16,7 @@ import { proxyV2Copy } from "./v2-pages/proxy-copy";
  * `{var}` are plain interpolations.
  */
 export const en = {
-    "pws.firstResponse.title": "First-response progress",
+  "pws.firstResponse.title": "First-response progress",
   "pws.firstResponse.stepProvider": "Provider",
   "pws.firstResponse.stepModels": "Models",
   "pws.firstResponse.stepClients": "Client routing",
@@ -28,36 +28,50 @@ export const en = {
   "pws.firstResponse.providerDisabled": "Provider is disabled",
   "pws.firstResponse.modelsLoading": "Checking model list…",
   "pws.firstResponse.modelsFailed": "Could not load model list",
-  "pws.firstResponse.modelsPending": "Initial model list is still pending — models stay hidden until discovery finishes",
+  "pws.firstResponse.modelsPending":
+    "Initial model list is still pending — models stay hidden until discovery finishes",
   "pws.firstResponse.modelsReady": "{count} model(s) enabled for routing",
-  "pws.firstResponse.modelsReadyDiscoveryFailed": "{count} retained model(s) enabled — live discovery failed",
+  "pws.firstResponse.modelsReadyDiscoveryFailed":
+    "{count} retained model(s) enabled — live discovery failed",
   "pws.firstResponse.modelsAllOff": "All models are turned off — enable models in Models",
   "pws.firstResponse.modelsConfigured": "{count} model(s) configured",
   "pws.firstResponse.modelsEmpty": "No models discovered or configured yet",
   "pws.firstResponse.openProviderModels": "Choose models",
-  "pws.firstResponse.clientStep": "Apply a client in Connect and select {provider}/<model>; changes apply to new sessions",
+  "pws.firstResponse.clientStep":
+    "Apply a client in Connect and select {provider}/<model>; changes apply to new sessions",
   "pws.firstResponse.openConnect": "Open Connect",
   "pws.firstResponse.probeUntested": "Not verified yet — run the model completion test below",
   "pws.firstResponse.probeOk": "Verified completion response from {model}",
   "pws.firstResponse.probeFailed": "Last completion test failed for {model}",
   "pws.firstResponse.stepDisconnect": "Disconnect & restore",
-  "pws.firstResponse.disconnectNote": "In Connect, turning Claude Code off removes only the proxy block for new Claude sessions, while disabling Codex stops proxy routing and restores the native Codex catalog and thread history; already-running sessions keep their current environment until restarted. Disabling or removing {provider} does not restore client settings in Connect.",
-  "pws.firstResponse.probeReverify": "Connection settings changed since the failed test — run the test again for {model} to verify the fix",
-  "pws.completion.recovery.auth": "Check or update the API key or account credentials for this provider, then re-run the test for {model}.",
-  "pws.completion.recovery.rateLimit": "The provider rate-limited this request (HTTP 429). Wait for the rate-limit window to reset or switch to another account or API key, then re-run the test for {model}.",
-  "pws.completion.recovery.connection": "The request timed out or could not reach the endpoint. Check the base URL and network settings, then re-run the test for {model}.",
-  "pws.completion.recovery.model": "The provider rejected this model request. Check the model ID on the Models tab or choose another model, then re-run the test.",
-  "pws.completion.recovery.upstream": "The upstream provider returned an error or incomplete stream. Retry the test for {model} or check provider settings.",
-  "pws.completion.recovery.aborted": "The test was cancelled before completion. Run the test again for {model} when ready.",
-  "pws.completion.recovery.credentialChanged": "Provider settings or credentials changed while the test was starting. Run the test again for {model}.",
-  "pws.completion.recovery.request": "The test request could not be started. Wait for any running test to finish or retry the test for {model}.",
+  "pws.firstResponse.disconnectNote":
+    "In Connect, turning Claude Code off removes only the proxy block for new Claude sessions, while disabling Codex stops proxy routing and restores the native Codex catalog and thread history; already-running sessions keep their current environment until restarted. Disabling or removing {provider} does not restore client settings in Connect.",
+  "pws.firstResponse.probeReverify":
+    "Connection settings changed since the failed test — run the test again for {model} to verify the fix",
+  "pws.completion.recovery.auth":
+    "Check or update the API key or account credentials for this provider, then re-run the test for {model}.",
+  "pws.completion.recovery.rateLimit":
+    "The provider rate-limited this request (HTTP 429). Wait for the rate-limit window to reset or switch to another account or API key, then re-run the test for {model}.",
+  "pws.completion.recovery.connection":
+    "The request timed out or could not reach the endpoint. Check the base URL and network settings, then re-run the test for {model}.",
+  "pws.completion.recovery.model":
+    "The provider rejected this model request. Check the model ID on the Models tab or choose another model, then re-run the test.",
+  "pws.completion.recovery.upstream":
+    "The upstream provider returned an error or incomplete stream. Retry the test for {model} or check provider settings.",
+  "pws.completion.recovery.aborted":
+    "The test was cancelled before completion. Run the test again for {model} when ready.",
+  "pws.completion.recovery.credentialChanged":
+    "Provider settings or credentials changed while the test was starting. Run the test again for {model}.",
+  "pws.completion.recovery.request":
+    "The test request could not be started. Wait for any running test to finish or retry the test for {model}.",
   "pws.completion.recovery.fixAuth": "Update credentials",
   "pws.completion.recovery.fixSettings": "Check settings",
-"pws.completion.title": "Model completion test",
+  "pws.completion.title": "Model completion test",
   "pws.completion.model": "Model to test",
   "pws.completion.choose": "Choose a model",
   "pws.completion.run": "Test model",
-  "pws.completion.confirm": "Test {model} on {provider}? This sends a real completion request with an output cap of 32 tokens. It consumes quota and may incur costs.",
+  "pws.completion.confirm":
+    "Test {model} on {provider}? This sends a real completion request with an output cap of 32 tokens. It consumes quota and may incur costs.",
   "pws.completion.failed": "Model test failed",
   "pws.completion.ok": "Model test succeeded",
   "pws.completion.notApplicable": "Test not applicable",
@@ -65,12 +79,14 @@ export const en = {
   "pws.completion.total": "Total latency",
   "pws.completion.reported": "Upstream reported {upstream} for {model}",
   "pws.completion.unreported": "Upstream did not report a model for {model}",
-  "pws.completion.identity": "Model metadata is reported by the upstream provider and does not verify the actual model's identity.",
+  "pws.completion.identity":
+    "Model metadata is reported by the upstream provider and does not verify the actual model's identity.",
   "pws.completion.match": "Match",
   "pws.completion.mismatch": "Mismatch",
   "pws.completion.unknown": "Unknown",
   "pws.completion.missing_metadata": "The upstream response contains no model metadata.",
-  "pws.completion.conflicting_metadata": "The upstream response reports conflicting model metadata.",
+  "pws.completion.conflicting_metadata":
+    "The upstream response reports conflicting model metadata.",
   "pws.completion.disabled": "This provider is disabled.",
   "pws.completion.forward_auth": "Forwarded authentication is not supported.",
   "pws.completion.oauth_auth": "OAuth authentication is not supported.",
@@ -79,9 +95,11 @@ export const en = {
   "pws.completion.tls_profile": "A custom TLS profile is configured.",
   "pws.completion.upstream_http_version": "An upstream HTTP version is configured.",
   "pws.completion.request_pacing": "Request pacing is enabled.",
-  "pws.completion.custom_executor_egress": "A custom fetch executor with a provider proxy cannot be preserved.",
+  "pws.completion.custom_executor_egress":
+    "A custom fetch executor with a provider proxy cannot be preserved.",
   "pws.completion.runAll": "Test all models",
-  "pws.completion.allConfirm": "Test every model on {provider} ({count} total)? This sends real completion requests one at a time (up to {count}), each with an output cap of 32 tokens. Some models may be skipped before sending. It consumes quota and may incur costs.",
+  "pws.completion.allConfirm":
+    "Test every model on {provider} ({count} total)? This sends real completion requests one at a time (up to {count}), each with an output cap of 32 tokens. Some models may be skipped before sending. It consumes quota and may incur costs.",
   "pws.completion.stop": "Stop",
   "pws.completion.progress": "Testing {done} of {total}…",
   "pws.completion.stopped": "Stopped: {done} of {total} tested",
@@ -90,39 +108,50 @@ export const en = {
   "pws.completion.failedShort": "Failed",
   "pws.completion.notTested": "Not tested",
   "pws.completion.disableFailed": "Disable failed models ({count})",
-  "pws.completion.disableConfirm": "Disable the models that failed the test on {provider} ({count})? They leave the model catalog and picker but stay callable by exact id until you re-enable them on the Models page.",
+  "pws.completion.disableConfirm":
+    "Disable the models that failed the test on {provider} ({count})? They leave the model catalog and picker but stay callable by exact id until you re-enable them on the Models page.",
   "pws.completion.disabledDone": "Models disabled: {count}. Re-enable them on the Models page.",
   "pws.completion.disableError": "Could not disable the failed models",
 
   "reasoningRetention.advanced": "Advanced settings",
   "reasoningRetention.title": "Reasoning retention",
   "reasoningRetention.enable": "Enable reasoning retention",
-  "reasoningRetention.description": "Off by default. When enabled for routed v1/v2 compaction with a readable summary, reasoning within the smaller of the context-window percentage and token cap returns as historical context alongside the summary. Above the limit, it is archived locally and replaced by a path note. Defaults when enabled: 20% and 100,000 tokens. Private provider reasoning is not decrypted; opaque compaction output stays unchanged.",
-  "reasoningRetention.storageHint": "Enabling can preserve plaintext reasoning in local history and archives. Completed archives have no total-size limit or expiry; delete unneeded archives manually.",
+  "reasoningRetention.description":
+    "Off by default. When enabled for routed v1/v2 compaction with a readable summary, reasoning within the smaller of the context-window percentage and token cap returns as historical context alongside the summary. Above the limit, it is archived locally and replaced by a path note. Defaults when enabled: 20% and 100,000 tokens. Private provider reasoning is not decrypted; opaque compaction output stays unchanged.",
+  "reasoningRetention.storageHint":
+    "Enabling can preserve plaintext reasoning in local history and archives. Completed archives have no total-size limit or expiry; delete unneeded archives manually.",
   "reasoningRetention.percent": "Context window (%)",
   "reasoningRetention.tokens": "Token cap",
   "reasoningRetention.reset": "Reset and turn off",
-  "reasoningRetention.invalid": "Enter a percentage greater than 0 and at most 100, and a positive whole token count.",
+  "reasoningRetention.invalid":
+    "Enter a percentage greater than 0 and at most 100, and a positive whole token count.",
   "reasoningRetention.loadFailed": "Could not load reasoning retention settings.",
   "reasoningRetention.saveFailed": "Could not save reasoning retention settings.",
   "reasoningRetention.saved": "Reasoning retention settings saved.",
   "nativeReasoningRetention.title": "Native OpenAI reasoning retention",
-  "nativeReasoningRetention.description": "Only for native requests to the official ChatGPT backend, including actual target changes in Combos and account pools. Allows old encrypted reasoning to be replayed; reuse depends on the backend. Both options are off by default.",
+  "nativeReasoningRetention.description":
+    "Only for native requests to the official ChatGPT backend, including actual target changes in Combos and account pools. Allows old encrypted reasoning to be replayed; reuse depends on the backend. Both options are off by default.",
   "nativeReasoningRetention.modelSwitch": "Keep encrypted reasoning when switching models",
-  "nativeReasoningRetention.accountSwitch": "Keep encrypted reasoning when switching accounts (experimental)",
-  "nativeReasoningRetention.accountHint": "Preserving ciphertext does not share stored response IDs or files across accounts. A successful request does not prove reasoning reuse. Native compaction handling is unchanged.",
+  "nativeReasoningRetention.accountSwitch":
+    "Keep encrypted reasoning when switching accounts (experimental)",
+  "nativeReasoningRetention.accountHint":
+    "Preserving ciphertext does not share stored response IDs or files across accounts. A successful request does not prove reasoning reuse. Native compaction handling is unchanged.",
   "nativeReasoningRetention.reset": "Restore defaults",
   "nativeReasoningRetention.loadFailed": "Could not load native reasoning settings.",
   "nativeReasoningRetention.saveFailed": "Could not save native reasoning settings.",
   "nativeReasoningRetention.saved": "Native reasoning settings saved.",
   "workflowBudget.title": "Workflow limits for subagents",
-  "workflowBudget.description": "Ceilings per task, meaning one conversation and the subagents it starts, counted over a rolling {minutes}-minute window. A request over a ceiling is refused locally with a 429 before any provider is contacted. Changes apply to the next request; usage already counted is kept.",
+  "workflowBudget.description":
+    "Ceilings per task, meaning one conversation and the subagents it starts, counted over a rolling {minutes}-minute window. A request over a ceiling is refused locally with a 429 before any provider is contacted. Changes apply to the next request; usage already counted is kept.",
   "workflowBudget.maxConcurrentChildren": "Parallel turns",
-  "workflowBudget.maxConcurrentChildrenHint": "Turns one task may run at the same time. One slot is always kept for your own conversation, so subagents get one fewer.",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "Turns one task may run at the same time. One slot is always kept for your own conversation, so subagents get one fewer.",
   "workflowBudget.maxPhysicalSends": "Model requests per window",
-  "workflowBudget.maxPhysicalSendsHint": "Upstream requests, retries included, one task may send inside the window.",
+  "workflowBudget.maxPhysicalSendsHint":
+    "Upstream requests, retries included, one task may send inside the window.",
   "workflowBudget.maxDistinctChildren": "Different subagents per window",
-  "workflowBudget.maxDistinctChildrenHint": "Distinct subagent threads one task may start inside the window.",
+  "workflowBudget.maxDistinctChildrenHint":
+    "Distinct subagent threads one task may start inside the window.",
   "workflowBudget.range": "Default {default}, allowed {min}–{max}.",
   "workflowBudget.invalid": "Enter a whole number from {min} to {max}.",
   "workflowBudget.increase": "Increase {label}",
@@ -142,12 +171,14 @@ export const en = {
   ...startupV2Copy("en"),
   ...proxyV2Copy("en"),
   "claude.tierDefaults.unset": "Unset (keep existing Claude setting)",
-  "claude.tierDefaults.recovery": "Apply stopped and automatic restore failed. Check the backup below before retrying.",
+  "claude.tierDefaults.recovery":
+    "Apply stopped and automatic restore failed. Check the backup below before retrying.",
   "claude.tierDefaults.title": "CLI tier defaults",
   "claude.tierDefaults.preview": "Preview Claude settings",
   "claude.tierDefaults.apply": "Apply to Claude settings",
   "claude.tierDefaults.applied": "Claude settings match the saved defaults.",
-  "claude.tierDefaults.failed": "Could not apply defaults. Preview again and check Claude settings.",
+  "claude.tierDefaults.failed":
+    "Could not apply defaults. Preview again and check Claude settings.",
   "sidecar.pool": "Pool",
   "sidecar.poolCurrent": "Current request's pool",
   "sidecar.poolA": "Anthropic",
@@ -157,15 +188,18 @@ export const en = {
   "nav.claude": "Claude",
   "claude.pageSub": "OpenCodex routing and settings for Claude Code.",
 
-  "pws.anthropicAccountThresholdHint": "Overrides the Claude pool default. 0 disables usage-based switching only for this account; pause and rate-limit recovery still apply.",
+  "pws.anthropicAccountThresholdHint":
+    "Overrides the Claude pool default. 0 disables usage-based switching only for this account; pause and rate-limit recovery still apply.",
   "kiroLogin.title": "Sign in to Kiro",
   "kiroLogin.chooseMethod": "Choose a sign-in method",
   "kiroLogin.cli": "Kiro CLI",
   "kiroLogin.iam": "AWS IAM Identity Center",
-  "kiroLogin.iamDescription": "Use your organization’s AWS access portal and IAM Identity Center region.",
+  "kiroLogin.iamDescription":
+    "Use your organization’s AWS access portal and IAM Identity Center region.",
   "kiroLogin.startUrl": "AWS access portal URL",
   "kiroLogin.region": "IAM Identity Center region",
-  "kiroLogin.invalidIam": "Enter an HTTPS AWS access portal URL ending in /start and a valid AWS region.",
+  "kiroLogin.invalidIam":
+    "Enter an HTTPS AWS access portal URL ending in /start and a valid AWS region.",
   "kiroLogin.back": "Back",
   "kiroLogin.continue": "Continue to AWS",
   "kiroLogin.selectProfile": "Choose a Kiro profile",
@@ -176,7 +210,8 @@ export const en = {
   "kiroLogin.builderId": "Builder ID",
   "kiroLogin.google": "Google",
   "kiroLogin.github": "GitHub",
-  "kiroLogin.addDescription": "Add a Kiro account with a device sign-in, or import a Kiro CLI session.",
+  "kiroLogin.addDescription":
+    "Add a Kiro account with a device sign-in, or import a Kiro CLI session.",
   "kiroLogin.loginDescription": "Sign in with a device, or import your Kiro CLI session.",
   "kiroLogin.starting": "Starting device sign-in…",
   "kiroLogin.pending": "Enter this code on the verification page, then wait here.",
@@ -198,8 +233,10 @@ export const en = {
   "kiroSelection.cooldown": "Not auto-selected: cooling down",
   "kiroSelection.generic": "Not auto-selected",
 
-  "usage.incomplete": "Some usage records could not be included. Counts, dates, and rankings reflect readable records only.",
-  "models.pickerOrder.usageIncomplete": "Cannot save most-used order because usage history is incomplete. Choose another order or repair the history first.",
+  "usage.incomplete":
+    "Some usage records could not be included. Counts, dates, and rankings reflect readable records only.",
+  "models.pickerOrder.usageIncomplete":
+    "Cannot save most-used order because usage history is incomplete. Choose another order or repair the history first.",
   "api.attribution.noRecordedUse": "No use in readable records",
   "audio.dictation": "Dictation",
   "audio.liveVoice": "Live Voice",
@@ -243,19 +280,25 @@ export const en = {
   "models.pickerOrder.usageFailed": "Could not load model usage.",
   "models.pickerOrder.loadFailed": "Could not load picker settings.",
   "models.pickerOrder.retry": "Retry",
-  "models.pickerOrder.hint": "Saves routed order for Codex and Claude discovery. Featured/native bands stay in place; Most used is a snapshot. Native advertised choices may change.",
+  "models.pickerOrder.hint":
+    "Saves routed order for Codex and Claude discovery. Featured/native bands stay in place; Most used is a snapshot. Native advertised choices may change.",
   "models.fastRows.title": "Show Fast model rows",
-  "models.fastRows.desc": "Adds eligible “Model Fast” selectors to external client model pickers. This does not change reasoning-effort options on the base model. Saving refreshes connected integrations when possible; otherwise refresh the integration or client catalog.",
+  "models.fastRows.desc":
+    "Adds eligible “Model Fast” selectors to external client model pickers. This does not change reasoning-effort options on the base model. Saving refreshes connected integrations when possible; otherwise refresh the integration or client catalog.",
   "models.fastRows.refreshHint": "Saved. Catalog refresh is pending.",
   "models.fastRows.enabled": "Fast model rows enabled.",
   "models.fastRows.disabled": "Fast model rows disabled.",
   "models.fastRows.loadFailed": "Could not load Fast rows setting.",
   "models.fastRows.updateFailed": "Failed to update Fast rows setting.",
-  "codexAuth.quotaAutoRefreshAllHint": "Controls the supported 5-hour and weekly windows for all current accounts together. In Pool mode, a small request is sent after each reset and uses quota.",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "Controls the supported 5-hour and weekly windows for all current accounts together. In Pool mode, a small request is sent after each reset and uses quota.",
   "codexAuth.quotaAutoRefreshMixed": "Some windows are enabled.",
-  "codexAuth.quotaAutoRefreshEmpty": "No supported quota windows. Refresh account quotas to check again.",
-  "codexAuth.quotaAutoRefreshLoadFailed": "Could not load activation settings. Retry to check their state.",
-  "codexAuth.quotaAutoRefreshPartial": "Some settings could not be saved. Retry to finish the same change.",
+  "codexAuth.quotaAutoRefreshEmpty":
+    "No supported quota windows. Refresh account quotas to check again.",
+  "codexAuth.quotaAutoRefreshLoadFailed":
+    "Could not load activation settings. Retry to check their state.",
+  "codexAuth.quotaAutoRefreshPartial":
+    "Some settings could not be saved. Retry to finish the same change.",
   // sidebar / nav / common
   "nav.dashboard": "Dashboard",
   "uptime.day": "d",
@@ -271,39 +314,47 @@ export const en = {
   "nav.usage": "Usage",
   "common.github": "GitHub",
   "onboarding.star.title": "Enjoying OpenCodex?",
-  "onboarding.star.body": "OpenCodex is free and open source. A star on GitHub helps other developers find it and keeps the project going.",
+  "onboarding.star.body":
+    "OpenCodex is free and open source. A star on GitHub helps other developers find it and keeps the project going.",
   "onboarding.star.cta": "Star on GitHub",
-  "onboarding.star.ghHint": "Stars the repository with your signed-in GitHub CLI (gh). Nothing is starred until you click.",
+  "onboarding.star.ghHint":
+    "Stars the repository with your signed-in GitHub CLI (gh). Nothing is starred until you click.",
   "onboarding.star.browserHint": "Opens the repository on github.com in your browser.",
   "onboarding.star.openPage": "Open the GitHub page instead",
   "onboarding.star.later": "Maybe later",
-  "onboarding.star.failed": "Couldn't star it with the GitHub CLI (gh). You can star it on the GitHub page instead.",
+  "onboarding.star.failed":
+    "Couldn't star it with the GitHub CLI (gh). You can star it on the GitHub page instead.",
   "onboarding.star.starring": "Starring…",
   "onboarding.star.thanks": "Thanks for the star!",
-  "onboarding.star.thanksBody": "It really helps. The GitHub link in the sidebar takes you back to the repository any time.",
+  "onboarding.star.thanksBody":
+    "It really helps. The GitHub link in the sidebar takes you back to the repository any time.",
   "onboarding.star.done": "Done",
   "common.save": "Save",
   "common.saving": "Saving…",
   "common.cancel": "Cancel",
-"common.discard": "Discard",
+  "common.discard": "Discard",
   "common.delete": "Delete",
   "common.close": "Close",
   "common.ok": "OK",
   "common.remove": "Remove",
   "common.loading": "Loading…",
   "common.retry": "Retry",
-  "prov.affinityResetPending": "The account change was saved, but conversation routing could not finish updating. Retry to finish.",
+  "prov.affinityResetPending":
+    "The account change was saved, but conversation routing could not finish updating. Retry to finish.",
   "prov.affinityResetComplete": "Conversation routing has been updated.",
-  "prov.affinityResetRetryUnavailable": "This account is unavailable for retry. Refresh the account list and, if needed, resume the account or sign in again.",
+  "prov.affinityResetRetryUnavailable":
+    "This account is unavailable for retry. Refresh the account list and, if needed, resume the account or sign in again.",
   "common.undo": "Undo",
   "auth.adminTokenTitle": "OpenCodex admin token (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "Account",
   "auth.adminTokenFieldLabel": "Admin token",
   "auth.adminTokenRejected": "That admin token was rejected. Check it and try again.",
   "auth.adminTokenUnavailable": "The admin token could not be verified. Try again.",
-  "auth.adminTokenHelp": "This is the OpenCodex management admin token, not a provider API key. The proxy writes it to ~/.opencodex/admin-api-token (or $OPENCODEX_HOME/admin-api-token) on first start, and OPENCODEX_ADMIN_AUTH_TOKEN overrides it.",
+  "auth.adminTokenHelp":
+    "This is the OpenCodex management admin token, not a provider API key. The proxy writes it to ~/.opencodex/admin-api-token (or $OPENCODEX_HOME/admin-api-token) on first start, and OPENCODEX_ADMIN_AUTH_TOKEN overrides it.",
   "auth.rememberDevice": "Remember this device",
-  "auth.rememberDeviceHint": "Keep a revocable HttpOnly dashboard session for 30 days, not the admin token. Requires a direct HTTPS dashboard that is same-origin with the API (or local loopback).",
+  "auth.rememberDeviceHint":
+    "Keep a revocable HttpOnly dashboard session for 30 days, not the admin token. Requires a direct HTTPS dashboard that is same-origin with the API (or local loopback).",
   "connection.forgetDevice": "Forget this device",
   "connection.forgetDeviceFailed": "Could not forget this device. The session was kept.",
   "auth.adminTokenDocsLink": "How to find it",
@@ -395,22 +446,28 @@ export const en = {
 
   // startup health
   "startup.title": "Startup safety",
-  "startup.subtitle": "Verify that Codex can reach opencodex after a restart, before local proxy routing becomes a reconnect loop.",
+  "startup.subtitle":
+    "Verify that Codex can reach opencodex after a restart, before local proxy routing becomes a reconnect loop.",
   "startup.refresh": "Refresh",
   "startup.backToDashboard": "Back to Dashboard",
   "startup.loading": "Checking startup protection…",
   "startup.error": "Could not read startup protection.",
-  "startup.staleData": "The latest startup check failed. The values below are stale and must not be treated as proof of protection.",
+  "startup.staleData":
+    "The latest startup check failed. The values below are stale and must not be treated as proof of protection.",
   "startup.status.native": "Native routing",
   "startup.status.protected": "Restart protected",
   "startup.status.atRisk": "Action required",
   "startup.summary.native": "Codex does not depend on the local proxy",
   "startup.summary.protected": "opencodex will be available after restart",
   "startup.summary.atRisk": "Codex can lose model access after restart",
-  "startup.riskDetail": "Codex is pinned to the local proxy, but no persistent service or healthy launcher shim will start it again.",
-  "startup.riskDetailCustomLocal": "Codex points to a custom local gateway. opencodex cannot manage or verify that gateway's restart lifecycle.",
-  "startup.riskDetailWindowsShim": "The launcher shim protects supported CLI scripts, but Codex Desktop and direct codex.exe launches can bypass it on Windows.",
-  "startup.safeDetail": "The current routing and startup mechanism are consistent. No manual ocx start should be required after restart.",
+  "startup.riskDetail":
+    "Codex is pinned to the local proxy, but no persistent service or healthy launcher shim will start it again.",
+  "startup.riskDetailCustomLocal":
+    "Codex points to a custom local gateway. opencodex cannot manage or verify that gateway's restart lifecycle.",
+  "startup.riskDetailWindowsShim":
+    "The launcher shim protects supported CLI scripts, but Codex Desktop and direct codex.exe launches can bypass it on Windows.",
+  "startup.safeDetail":
+    "The current routing and startup mechanism are consistent. No manual ocx start should be required after restart.",
   "startup.routing": "Codex routing",
   "startup.routing.proxy": "Local proxy",
   "startup.routing.native": "Native OpenAI",
@@ -441,7 +498,8 @@ export const en = {
   "startup.conflict": "Service conflict",
   "startup.installedDisabled": "Installed but disabled",
   "startup.shimActivationPending": "Installed · activation not confirmed",
-  "startup.shimActivationHint": "Add . ~/.opencodex/codex-shell-env.sh after other PATH setup in your shell startup file, then open a new terminal. The dashboard cannot always see your shell's PATH.",
+  "startup.shimActivationHint":
+    "Add . ~/.opencodex/codex-shell-env.sh after other PATH setup in your shell startup file, then open a new terminal. The dashboard cannot always see your shell's PATH.",
   "startup.install": "Install",
   "startup.installing": "Installing…",
   "startup.repair": "Repair",
@@ -452,7 +510,8 @@ export const en = {
   "startup.shimRepaired": "Codex launcher shim repaired successfully.",
   "startup.installFailed": "Installation failed:",
   "startup.recovery": "Repair options",
-  "startup.recoveryHint": "Use the one-click installers above, or copy a command for manual repair. The background service is recommended for Codex Desktop and Windows executables.",
+  "startup.recoveryHint":
+    "Use the one-click installers above, or copy a command for manual repair. The background service is recommended for Codex Desktop and Windows executables.",
   "startup.command.service": "Recommended: persistent background service",
   "startup.command.shim": "Alternative: CLI launcher shim",
   "startup.command.native": "Fail-safe: restore native Codex routing",
@@ -460,12 +519,16 @@ export const en = {
   "startup.copied": "Copied",
   "startup.recommended": "Recommended repair: {cmd}",
   "startup.navRisk": "Startup protection requires attention",
-  "startup.codexRuntime.clampHidden": "Some reasoning effort options were hidden because OpenCodex used Codex {version}.",
-  "startup.codexRuntime.clampHiddenWithEfforts": "Some reasoning effort options were hidden because OpenCodex used Codex {version} (removed: {efforts}).",
-  "startup.codexRuntime.olderBinary": "OpenCodex is using an older Codex binary ({version}). A newer installation is available.",
+  "startup.codexRuntime.clampHidden":
+    "Some reasoning effort options were hidden because OpenCodex used Codex {version}.",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "Some reasoning effort options were hidden because OpenCodex used Codex {version} (removed: {efforts}).",
+  "startup.codexRuntime.olderBinary":
+    "OpenCodex is using an older Codex binary ({version}). A newer installation is available.",
 
   // dashboard
-  "dash.subtitle": "Live status of the local opencodex proxy, its providers, and the models routed into Codex.",
+  "dash.subtitle":
+    "Live status of the local opencodex proxy, its providers, and the models routed into Codex.",
   "dash.workspace.overview": "Overview",
   "dash.workspace.sections": "Sections",
   "dash.status": "Status",
@@ -478,7 +541,8 @@ export const en = {
   "dash.coverage": "{pct} coverage",
   // memory observability card (read-only /api/system/memory)
   "dash.mem.title": "Memory observability",
-  "dash.mem.hint": "Read-only runtime diagnostics. Observed memory is max(RSS, external, ArrayBuffers) so Windows working-set trimming does not hide committed retention.",
+  "dash.mem.hint":
+    "Read-only runtime diagnostics. Observed memory is max(RSS, external, ArrayBuffers) so Windows working-set trimming does not hide committed retention.",
   "dash.mem.rss": "Resident set (RSS)",
   "dash.mem.jsHeap": "JS heap in use",
   "dash.mem.jsHeapArena": "arena {total}",
@@ -493,7 +557,8 @@ export const en = {
   "dash.mem.growth": "Observed drift / hour",
   "dash.mem.perHour": "/h",
   "dash.mem.store": "Continuation store",
-  "dash.mem.storeHint": "Proxy previous_response_id cache. Rising total bytes under a rising heap points at conversation retention rather than the runtime allocator.",
+  "dash.mem.storeHint":
+    "Proxy previous_response_id cache. Rising total bytes under a rising heap points at conversation retention rather than the runtime allocator.",
   "dash.mem.storeEntries": "Entries",
   "dash.mem.storeTotal": "Total",
   "dash.mem.storeLargest": "Largest",
@@ -505,11 +570,13 @@ export const en = {
   "dash.mem.unavailable": "Memory diagnostics unavailable (older proxy).",
   "dash.mem.inFlight": "In-flight requests",
   "dash.mem.restart": "Drain & restart",
-  "dash.mem.restartConfirm": "Wait for {count} in-flight request(s), then restart (up to {seconds}s; remaining requests are cut on timeout).",
+  "dash.mem.restartConfirm":
+    "Wait for {count} in-flight request(s), then restart (up to {seconds}s; remaining requests are cut on timeout).",
   "dash.mem.draining": "Draining {count} request(s)… restarting when complete",
   "dash.mem.reconnecting": "Proxy restarting… waiting to reconnect",
   "dash.mem.restartFailed": "Drain & restart failed. Check that the proxy is running.",
-  "dash.mem.restartNoSupervisor": "No restart protection detected. The proxy may stay down after restart unless you start it again.",
+  "dash.mem.restartNoSupervisor":
+    "No restart protection detected. The proxy may stay down after restart unless you start it again.",
   "dash.activeProviders": "Active providers",
   "dash.noProviders": "No providers configured. Run {cmd}.",
   "dash.col.name": "Name",
@@ -525,38 +592,51 @@ export const en = {
   "dash.stopConfirm": "Stop the proxy and restore native Codex?",
   "dash.stopFailed": "Failed to stop proxy (HTTP {status}).",
   "dash.stopStillRunning": "The proxy is still answering, so it did not stop.",
-  "dash.stopUnknown": "The proxy did not confirm the stop. Check whether it is still running before trying again.",
+  "dash.stopUnknown":
+    "The proxy did not confirm the stop. Check whether it is still running before trying again.",
   "dash.maSwitchFailed": "Mode switch failed (HTTP {status}).",
   "dash.maNetworkError": "Network error — is the proxy running?",
   "dash.stopping": "Stopping…",
   "dash.actions": "Proxy",
   "dash.codexRestart": "Reload Codex models",
   "dash.codexRestarting": "Stopping…",
-  "dash.codexRestartConfirm": "Stop Codex app-servers so they reload the model list? Any Codex turn in progress is interrupted, and Codex does not relaunch on its own — reopen it afterwards.",
-  "dash.codexRestartDone": "Stopped {count} Codex app-server(s). Reopen Codex to load the current model list.",
-  "dash.codexRestartNothing": "No Codex app-server is running. The next launch reads the current model list.",
+  "dash.codexRestartConfirm":
+    "Stop Codex app-servers so they reload the model list? Any Codex turn in progress is interrupted, and Codex does not relaunch on its own — reopen it afterwards.",
+  "dash.codexRestartDone":
+    "Stopped {count} Codex app-server(s). Reopen Codex to load the current model list.",
+  "dash.codexRestartNothing":
+    "No Codex app-server is running. The next launch reads the current model list.",
   "dash.codexRestartUnknown": "Could not list processes, so nothing was stopped.",
-  "dash.codexRestartPartial": "{count} app-server(s) did not exit. Stop them manually if the model list stays stale.",
+  "dash.codexRestartPartial":
+    "{count} app-server(s) did not exit. Stop them manually if the model list stays stale.",
   "dash.codexRestartFailed": "Failed to reload Codex models (HTTP {status}).",
   "dash.codexRestartUnreachable": "Could not reach the proxy.",
   "dash.codexRestartMalformed": "The proxy returned an unexpected response.",
-  "dash.codexRestartTimeout": "The proxy did not answer in time. It may still be stopping app-servers.",
-  "models.staleBanner": "Codex is showing an older model list than this catalog. Restart Codex to reload it.",
+  "dash.codexRestartTimeout":
+    "The proxy did not answer in time. It may still be stopping app-servers.",
+  "models.staleBanner":
+    "Codex is showing an older model list than this catalog. Restart Codex to reload it.",
   "dash.codexAutoStart": "Start opencodex with Codex",
-  "dash.codexAutoStartHint": "Allows an installed launcher shim to run ocx ensure. This setting does not install restart protection; check Startup safety for the effective state.",
+  "dash.codexAutoStartHint":
+    "Allows an installed launcher shim to run ocx ensure. This setting does not install restart protection; check Startup safety for the effective state.",
   "dash.searchModel": "Search sidecar model",
-  "dash.searchModelHint": "Model used for web_search on non-OpenAI routed models. Requires ChatGPT login.",
+  "dash.searchModelHint":
+    "Model used for web_search on non-OpenAI routed models. Requires ChatGPT login.",
   "dash.searchReasoning": "Search reasoning effort",
   "dash.visionModel": "Vision sidecar model",
-  "dash.visionModelHint": "Model used to describe images for text-only routed models. Requires ChatGPT login.",
+  "dash.visionModelHint":
+    "Model used to describe images for text-only routed models. Requires ChatGPT login.",
   "dash.webSearchSidecar": "Web search sidecar",
   "dash.webSearchSidecarHint": "Choose the backend and model used for web search on routed models.",
   "dash.webSearchOff": "Off",
-  "dash.webSearchCodexSync": "Saved. Codex's config was not rewritten — run Sync models to apply it.",
+  "dash.webSearchCodexSync":
+    "Saved. Codex's config was not rewritten — run Sync models to apply it.",
   "dash.webSearchStream": "Stream answers live",
-  "dash.webSearchStreamHint": "Stream the model’s leading text and reasoning live until it decides on a tool call; the rest of the turn stays buffered for search interception. Text written before a search may partially repeat.",
+  "dash.webSearchStreamHint":
+    "Stream the model’s leading text and reasoning live until it decides on a tool call; the rest of the turn stays buffered for search interception. Text written before a search may partially repeat.",
   "dash.visionSidecar": "Vision sidecar",
-  "dash.visionSidecarHint": "Choose the backend and model used to describe images for text-only routed models.",
+  "dash.visionSidecarHint":
+    "Choose the backend and model used to describe images for text-only routed models.",
   "dash.visionOff": "Off",
   "dash.visionAdvanced": "Advanced settings",
   "dash.visionMaxDescriptions": "Maximum descriptions per turn",
@@ -565,7 +645,8 @@ export const en = {
   "dash.visionTimeoutInvalid": "Enter an integer from {min} to {max} milliseconds.",
   "dash.visionAdvancedPopover": "Advanced vision settings",
   "compactionRouting.title": "Compaction routing",
-  "compactionRouting.description": "Choose a model for Codex compaction requests and which triggers it covers. Later messages keep the conversation settings.",
+  "compactionRouting.description":
+    "Choose a model for Codex compaction requests and which triggers it covers. Later messages keep the conversation settings.",
   "compactionRouting.model": "Compaction model",
   "compactionRouting.effort": "Reasoning effort",
   "compactionRouting.triggers": "Applies to",
@@ -578,33 +659,46 @@ export const en = {
   "compactionRouting.sourcesProviders": "Entire providers",
   "compactionRouting.sourcesModels": "Individual models",
   "compactionRouting.sourcesSaved": "Saved selectors not in the current catalog",
-  "compactionRouting.sourcesNone": "Select at least one source, or switch back to all conversation models.",
-  "compactionRouting.sourcesHint": "Apply the override only when a compaction request's source model matches a selected model or provider/*. Other requests keep using their own model.",
+  "compactionRouting.sourcesNone":
+    "Select at least one source, or switch back to all conversation models.",
+  "compactionRouting.sourcesHint":
+    "Apply the override only when a compaction request's source model matches a selected model or provider/*. Other requests keep using their own model.",
   "compactionRouting.sourcesGridTitle": "Reroute compaction requests whose source model matches:",
   "compactionRouting.currentModel": "Use conversation model",
   "compactionRouting.currentEffort": "Keep request effort",
-  "compactionRouting.effortHint": "Reasoning applies where supported by the compaction endpoint. The model must accept the full conversation.",
-  "compactionRouting.dataNotice": "A covered compaction request sends the entire conversation to the selected model's provider for summarization, even when the conversation runs on another provider.",
-  "compactionRouting.autoNotice": "Automatic compaction runs on its own, so a long conversation can be sent to that provider without you asking for it.",
-  "compactionRouting.providerWarning": "With this setting, every covered compaction request sends the full conversation contents to {provider} for summarization.",
-  "compactionRouting.providerWarningScoped": "With this setting, only compaction requests whose source model matches {sources} send the full conversation contents to {provider} for summarization; other requests keep using their own model.",
+  "compactionRouting.effortHint":
+    "Reasoning applies where supported by the compaction endpoint. The model must accept the full conversation.",
+  "compactionRouting.dataNotice":
+    "A covered compaction request sends the entire conversation to the selected model's provider for summarization, even when the conversation runs on another provider.",
+  "compactionRouting.autoNotice":
+    "Automatic compaction runs on its own, so a long conversation can be sent to that provider without you asking for it.",
+  "compactionRouting.providerWarning":
+    "With this setting, every covered compaction request sends the full conversation contents to {provider} for summarization.",
+  "compactionRouting.providerWarningScoped":
+    "With this setting, only compaction requests whose source model matches {sources} send the full conversation contents to {provider} for summarization; other requests keep using their own model.",
   "compactionRouting.loadFailed": "Could not load compaction settings.",
   "compactionRouting.saved": "Compaction settings saved.",
   "compactionRouting.saveFailed": "Could not save. Your changes are still here; try again.",
   "memoryModels.title": "Memory routing",
-  "memoryModels.description": "Codex writes memories after a session ends. Choose a model for either phase, or keep its existing route.",
+  "memoryModels.description":
+    "Codex writes memories after a session ends. Choose a model for either phase, or keep its existing route.",
   "memoryModels.infoLabel": "What are Extract and Consolidation?",
-  "memoryModels.info": "Codex turns finished sessions into memory in two steps. Extract reads one finished session and jots down what happened: one note per session, so it makes many small calls. Consolidation takes those notes and writes them into the memory files Codex reads at the start of your next sessions. It runs rarely, but it edits files. Each step asks for its own model, which is why they are listed separately here.",
+  "memoryModels.info":
+    "Codex turns finished sessions into memory in two steps. Extract reads one finished session and jots down what happened: one note per session, so it makes many small calls. Consolidation takes those notes and writes them into the memory files Codex reads at the start of your next sessions. It runs rarely, but it edits files. Each step asks for its own model, which is why they are listed separately here.",
   "memoryModels.extract": "Extract",
-  "memoryModels.extractHint": "Summarizes each finished session into a raw memory. Runs once per session.",
+  "memoryModels.extractHint":
+    "Summarizes each finished session into a raw memory. Runs once per session.",
   "memoryModels.consolidation": "Consolidation",
-  "memoryModels.consolidationHint": "Merges the raw memories into the memory files Codex reads later. Runs rarely and edits files.",
+  "memoryModels.consolidationHint":
+    "Merges the raw memories into the memory files Codex reads later. Runs rarely and edits files.",
   "memoryModels.model": "Model",
   "memoryModels.effort": "Reasoning effort",
   "memoryModels.off": "Off",
   "memoryModels.defaultEffort": "Codex default",
-  "memoryModels.dataNotice": "The chosen model receives that phase's input: the finished session for Extract, the raw memories for Consolidation.",
-  "memoryModels.accountNotice": "Only one phase is routed here; the other keeps its existing route. Shadow Call Intercept can also send that phase's memory calls to its configured model.",
+  "memoryModels.dataNotice":
+    "The chosen model receives that phase's input: the finished session for Extract, the raw memories for Consolidation.",
+  "memoryModels.accountNotice":
+    "Only one phase is routed here; the other keeps its existing route. Shadow Call Intercept can also send that phase's memory calls to its configured model.",
   "memoryModels.loadFailed": "Could not load memory settings.",
   "memoryModels.saved": "Memory settings saved.",
   "memoryModels.saveFailed": "Could not save. Your changes are still here; try again.",
@@ -612,26 +706,36 @@ export const en = {
   "shadowCall.memoryLabel": "Memory: Terra",
   "shadowCall.sourceCoveredShort": "Covered by {prefix}",
   "shadowCall.sourceRequired": "Must stay on",
-  "dash.shadowCallInterceptHint": "Intercepts Codex App's background helper calls for titles, commit messages, and skill orchestration. Choose the source models below. Memory consolidation normally runs on Terra and follows Memory-Routing when configured.",
-  "dash.shadowCallWarning": "⚠ When enabled, requests for every selected source ({models}) are replaced with the chosen model. Terra is opt-in; Memory-Routing still wins for consolidation.",
+  "dash.shadowCallInterceptHint":
+    "Intercepts Codex App's background helper calls for titles, commit messages, and skill orchestration. Choose the source models below. Memory consolidation normally runs on Terra and follows Memory-Routing when configured.",
+  "dash.shadowCallWarning":
+    "⚠ When enabled, requests for every selected source ({models}) are replaced with the chosen model. Terra is opt-in; Memory-Routing still wins for consolidation.",
   "dash.shadowCallOriginal": "Original",
   "dash.shadowCallModel": "Replacement model",
-  "dash.shadowCallTooltip": "Codex App makes background helper calls for thread title generation, commit message generation, and skill orchestration. The helper model changed across client versions, so opencodex can intercept several sources. Select each source you want to redirect below. Terra is the memory-consolidation model and stays off by default because Codex also selects it for ordinary work; when a Memory-Routing consolidation model is configured, that route wins. At least one source must stay enabled; use the main switch to turn off shadow-call interception.",
+  "dash.shadowCallTooltip":
+    "Codex App makes background helper calls for thread title generation, commit message generation, and skill orchestration. The helper model changed across client versions, so opencodex can intercept several sources. Select each source you want to redirect below. Terra is the memory-consolidation model and stays off by default because Codex also selects it for ordinary work; when a Memory-Routing consolidation model is configured, that route wins. At least one source must stay enabled; use the main switch to turn off shadow-call interception.",
   "shadowCall.sources": "Intercepted sources",
   "shadowCall.sourceHelper": "Helper",
   "shadowCall.sourceMemory": "Memory",
   "shadowCall.sourceLegacy": "Legacy",
   "shadowCall.sourceCustom": "Custom",
-  "shadowCall.sourceHint": "Only enabled sources are intercepted. At least one must stay on; use the main switch to turn off shadow-call interception. Memory-Routing still wins for consolidation when configured.",
-  "shadowCall.sourceCovered": "Covered by the custom prefix {prefix}. Remove or narrow it in config.json to toggle this source separately.",
-  "shadowCall.sourceLastRequired": "At least one source must stay enabled. Use the main switch to turn off shadow-call interception.",
+  "shadowCall.sourceHint":
+    "Only enabled sources are intercepted. At least one must stay on; use the main switch to turn off shadow-call interception. Memory-Routing still wins for consolidation when configured.",
+  "shadowCall.sourceCovered":
+    "Covered by the custom prefix {prefix}. Remove or narrow it in config.json to toggle this source separately.",
+  "shadowCall.sourceLastRequired":
+    "At least one source must stay enabled. Use the main switch to turn off shadow-call interception.",
   "models.shadowCallIntercept": "Shadow Call Intercept",
-  "models.shadowCallInterceptHint": "Intercepts Codex App's background helper calls for titles, commit messages, and skill orchestration. Choose the source models below. Memory consolidation normally runs on Terra and follows Memory-Routing when configured.",
+  "models.shadowCallInterceptHint":
+    "Intercepts Codex App's background helper calls for titles, commit messages, and skill orchestration. Choose the source models below. Memory consolidation normally runs on Terra and follows Memory-Routing when configured.",
   "models.shadowCallSaveFailed": "Could not save the shadow-call settings.",
-  "models.shadowCallTargetInvalid": "The replacement target overlaps an active source. Choose another replacement model.",
-  "models.shadowCallSourceInvalid": "This source selection is invalid. Choose at least one source without whitespace or a provider prefix.",
+  "models.shadowCallTargetInvalid":
+    "The replacement target overlaps an active source. Choose another replacement model.",
+  "models.shadowCallSourceInvalid":
+    "This source selection is invalid. Choose at least one source without whitespace or a provider prefix.",
   "models.autoReviewOverride": "Auto-review override",
-  "models.autoReviewOverrideHint": "Chooses the model Codex uses for auto-review (the approval reviewer). Applied to every catalog row at sync; a provider-scoped autoReviewModel still takes precedence on its own rows.",
+  "models.autoReviewOverrideHint":
+    "Chooses the model Codex uses for auto-review (the approval reviewer). Applied to every catalog row at sync; a provider-scoped autoReviewModel still takes precedence on its own rows.",
   "models.autoReviewPending": "Pending",
   "dash.sidecarBackend": "Backend",
   "dash.sidecarModel": "Model",
@@ -641,18 +745,22 @@ export const en = {
   "dash.sidecarSaved": "Sidecar settings saved. Applied on the next request.",
   "dash.sidecarSaveFailed": "Failed to save sidecar settings.",
   "dash.injectionLabel": "Sub-agent delegation",
-  "dash.injectionHint": "Pick the model Codex should hand sub-agent work to. The two switches below decide where that pick is used.",
+  "dash.injectionHint":
+    "Pick the model Codex should hand sub-agent work to. The two switches below decide where that pick is used.",
   "dash.injectionManage": "Open settings",
   "dash.syncCodexSubagentDefaults": "Also save as a Codex default",
-  "dash.syncCodexSubagentDefaultsHint": "On, the pick above is written into Codex's own config, so new tasks start with that model too. Off, it is remembered only here. It takes effect on the next sync or restart, and your hand-written [agents] settings are left alone.",
+  "dash.syncCodexSubagentDefaultsHint":
+    "On, the pick above is written into Codex's own config, so new tasks start with that model too. Off, it is remembered only here. It takes effect on the next sync or restart, and your hand-written [agents] settings are left alone.",
   "dash.multiAgentGuidance": "Tell Codex how to split work",
-  "dash.multiAgentGuidanceHint": "Sends a short note telling Codex how to hand work to sub-agents. On v2 it names the models it may use and which to prefer; on v1 it only applies at max or ultra reasoning effort. Off, no note is added.",
+  "dash.multiAgentGuidanceHint":
+    "Sends a short note telling Codex how to hand work to sub-agents. On v2 it names the models it may use and which to prefer; on v1 it only applies at max or ultra reasoning effort. Off, no note is added.",
   "dash.injectionNone": "None",
   "dash.injectionEffortLabel": "Reasoning effort",
   "dash.injectionEffortNone": "Model default",
   "dash.effortCapLabel": "V2 ultra effort limit",
   "dash.subagentEffortCapLabel": "V2 sub-agent effort limit",
-  "dash.effortCapHelp": "Limits the reasoning effort for V2 ultra-mode turns. When set, incoming max-effort requests (from ultra mode) are capped to the selected level. The sub-agent limit applies only to spawned child agents. Caps only lower effort, never raise it. If a model doesn't support the capped level, it snaps down to the nearest supported level.",
+  "dash.effortCapHelp":
+    "Limits the reasoning effort for V2 ultra-mode turns. When set, incoming max-effort requests (from ultra mode) are capped to the selected level. The sub-agent limit applies only to spawned child agents. Caps only lower effort, never raise it. If a model doesn't support the capped level, it snaps down to the nearest supported level.",
   "dash.effortCapNone": "No cap",
   "dash.maintenance": "Maintenance",
   "dash.maintenanceHint": "Refresh Codex's model catalog or install a newer opencodex release.",
@@ -661,17 +769,19 @@ export const en = {
   "dash.syncRun": "Sync now",
   "dash.syncing": "Syncing…",
   "dash.syncOk": "Sync complete. {count} model(s) appended.",
-  "dash.syncStaleHint": "If Codex still shows an older list, restart its long-lived app-server ({cmd}).",
+  "dash.syncStaleHint":
+    "If Codex still shows an older list, restart its long-lived app-server ({cmd}).",
   "dash.syncFailed": "Sync failed: {error}",
   "dash.projectConfigTitle": "Project Codex config bypasses OpenCodex",
-  "dash.projectConfigHint": "These repo-local settings override the OpenCodex proxy (e.g. route to OpenCode Go directly). Remove them so ~/.codex/config.toml routing applies in that project.",
+  "dash.projectConfigHint":
+    "These repo-local settings override the OpenCodex proxy (e.g. route to OpenCode Go directly). Remove them so ~/.codex/config.toml routing applies in that project.",
   "dash.checkUpdate": "Check update",
   "dash.updateReconnecting": "Waiting for the restarted proxy…",
   "dash.updateVersionTransition": "{currentVersion} -> {latestVersion}.",
 
-
   // providers
-  "prov.subtitle": "Configure the upstream providers opencodex routes into Codex. Log in with an account, add a provider, or edit the raw config.",
+  "prov.subtitle":
+    "Configure the upstream providers opencodex routes into Codex. Log in with an account, add a provider, or edit the raw config.",
   "prov.add": "Add Provider",
   "prov.editJson": "Edit JSON",
   "prov.accountLogin": "Account login",
@@ -685,14 +795,16 @@ export const en = {
   "prov.didntOpen": "Didn't open? Click here",
   "prov.copyLink": "Copy link",
   "prov.dontOpenBrowser": "Don't open a browser on the proxy machine",
-  "prov.dontOpenBrowserHint": "Useful for a different browser profile, or when the dashboard is not on the proxy's machine.",
+  "prov.dontOpenBrowserHint":
+    "Useful for a different browser profile, or when the dashboard is not on the proxy's machine.",
   "prov.linkCopied": "Copied",
   "prov.linkCopyUnavailable": "Clipboard unavailable",
   "prov.deviceCode": "Device code",
   "prov.copyCode": "Copy code",
   "prov.copyCodeAndOpen": "Copy code & open",
   "prov.openSignInPage": "Open sign-in page",
-  "prov.browserLaunchFailed": "The browser didn't open automatically. Open the sign-in page below or copy the link.",
+  "prov.browserLaunchFailed":
+    "The browser didn't open automatically. Open the sign-in page below or copy the link.",
   "prov.codeCopied": "Code copied",
   "prov.editAlias": "Edit alias",
   "prov.aliasPrompt": "Display name (leave empty to clear)",
@@ -701,7 +813,8 @@ export const en = {
   "prov.aliasInvalid": "Use at most 80 characters, with no control characters.",
   "prov.accountId": "ID",
   "prov.pasteRedirect": "Paste redirect URL or code",
-  "prov.pasteRedirectHint": "If the browser shows a localhost error, copy the full URL from its address bar and paste it here (or paste the authorization code).",
+  "prov.pasteRedirectHint":
+    "If the browser shows a localhost error, copy the full URL from its address bar and paste it here (or paste the authorization code).",
   "prov.pasteSubmit": "Submit",
   "prov.pasteSubmitting": "Submitting…",
   "prov.pasteOk": "Code submitted — finishing login…",
@@ -719,51 +832,68 @@ export const en = {
   "prov.loginCancelled": "{provider} login cancelled",
   "prov.loginTimeout": "{provider} login timed out — browser closed or never finished. Try again.",
   "prov.loginOk": "Logged in to {provider}. Run {cmd} (or it applies live) to list its models.",
-  "prov.loginSameAccount": "Still the same {provider} account — switch accounts in the browser, then try Add account again.",
+  "prov.loginSameAccount":
+    "Still the same {provider} account — switch accounts in the browser, then try Add account again.",
   "oauthTos.highTitle": "{provider}: subscription OAuth risk",
   "oauthTos.elevatedTitle": "{provider}: unofficial OAuth bridge",
-  "oauthTos.anthropicBody": "This connects a Claude subscription through OpenCodex's third-party proxy. Anthropic has not endorsed this connection or automated account pooling; access depends on its current terms and enforcement.",
-  "oauthTos.highBody": "OpenCodex connects {provider} through a third-party OAuth path. Unsupported use may lead to access limits or suspension.",
-  "oauthTos.elevatedBody": "OpenCodex connects {provider} through an unofficial OAuth path. Use the official client when possible; unusual or automated traffic may be treated as abuse and access may be limited or suspended.",
+  "oauthTos.anthropicBody":
+    "This connects a Claude subscription through OpenCodex's third-party proxy. Anthropic has not endorsed this connection or automated account pooling; access depends on its current terms and enforcement.",
+  "oauthTos.highBody":
+    "OpenCodex connects {provider} through a third-party OAuth path. Unsupported use may lead to access limits or suspension.",
+  "oauthTos.elevatedBody":
+    "OpenCodex connects {provider} through an unofficial OAuth path. Use the official client when possible; unusual or automated traffic may be treated as abuse and access may be limited or suspended.",
   "oauthTos.saferPath": "Safer option: configure an API key in OpenCodex instead.",
   "oauthTos.acknowledge": "I understand the risk and want to continue with OAuth anyway.",
   "oauthTos.continue": "Continue with OAuth",
   "oauthTos.anthropicTitle": "Claude subscription connection",
-  "oauthTos.anthropicConditions": "Use an account you own or are authorized to use. Using the genuine Claude Code client with a person supervising the session is different from sending subscription tokens through other clients. OpenCodex also supports those other clients, so this connection does not guarantee that every use is permitted. Supported Agent SDK integrations are separate.",
-  "oauthTos.anthropicSaferPath": "For other clients or unattended automation, configure an Anthropic API key instead.",
-  "oauthTos.anthropicAcknowledge": "I understand this is a third-party subscription connection and will check the applicable terms.",
+  "oauthTos.anthropicConditions":
+    "Use an account you own or are authorized to use. Using the genuine Claude Code client with a person supervising the session is different from sending subscription tokens through other clients. OpenCodex also supports those other clients, so this connection does not guarantee that every use is permitted. Supported Agent SDK integrations are separate.",
+  "oauthTos.anthropicSaferPath":
+    "For other clients or unattended automation, configure an Anthropic API key instead.",
+  "oauthTos.anthropicAcknowledge":
+    "I understand this is a third-party subscription connection and will check the applicable terms.",
   "oauthTos.anthropicContinue": "Continue with Claude subscription",
   "subagentSurface.selectionTitle": "Switch the sub-agent surface to {mode}?",
-  "subagentSurface.selectionBody": "On {mode}, ChatGPT models that use the v2 surface — Sol and Terra on base, every model on v2 — hand their task to a routed model such as Grok or Claude encrypted for the ChatGPT backend, and the routed model cannot read it. That delegation fails with unreadable_encrypted_agent_task until it is fixed upstream. v1 delegates across providers reliably.",
+  "subagentSurface.selectionBody":
+    "On {mode}, ChatGPT models that use the v2 surface — Sol and Terra on base, every model on v2 — hand their task to a routed model such as Grok or Claude encrypted for the ChatGPT backend, and the routed model cannot read it. That delegation fails with unreadable_encrypted_agent_task until it is fixed upstream. v1 delegates across providers reliably.",
   "subagentSurface.advisoryTitle": "v1 is now the default sub-agent surface",
-  "subagentSurface.advisoryBody": "This install runs {mode}, where a ChatGPT model on the v2 surface hands a routed model an encrypted task it cannot read, so cross-provider delegation fails. We recommend v1 until that is fixed upstream. Your current setting is unchanged until you choose.",
+  "subagentSurface.advisoryBody":
+    "This install runs {mode}, where a ChatGPT model on the v2 surface hands a routed model an encrypted task it cannot read, so cross-provider delegation fails. We recommend v1 until that is fixed upstream. Your current setting is unchanged until you choose.",
   "subagentSurface.continue": "Continue",
   "subagentSurface.switchToV1": "Switch to v1",
   "subagentSurface.learnMore": "Why this fails",
   "prov.logoutOk": "Logged out of {provider}.",
   "prov.logoutFail": "Could not log out of {provider}. Your account state is unchanged.",
-  "prov.removed": "Removed \"{name}\".",
-  "prov.removedDefault": "Removed \"{name}\". Default provider is now \"{defaultProvider}\".",
-  "prov.removedShadowTarget": "Removed \"{name}\". Shadow Call Intercept still targets \"{model}\", so helper calls will fail until you choose another target.",
-  "prov.removeFail": "Failed to remove \"{name}\".",
-  "prov.removeLastProvider": "You can't remove this provider when no other enabled provider can become the default.",
+  "prov.removed": 'Removed "{name}".',
+  "prov.removedDefault": 'Removed "{name}". Default provider is now "{defaultProvider}".',
+  "prov.removedShadowTarget":
+    'Removed "{name}". Shadow Call Intercept still targets "{model}", so helper calls will fail until you choose another target.',
+  "prov.removeFail": 'Failed to remove "{name}".',
+  "prov.removeLastProvider":
+    "You can't remove this provider when no other enabled provider can become the default.",
   "prov.setDefault": "Set as default",
-  "prov.setDefaultSuccess": "\"{name}\" is now the default provider.",
-  "prov.setDefaultFail": "Couldn't set \"{name}\" as the default provider.",
+  "prov.setDefaultSuccess": '"{name}" is now the default provider.',
+  "prov.setDefaultFail": 'Couldn\'t set "{name}" as the default provider.',
   "prov.defaultDisabled": "Enable this provider before making it the default.",
   "prov.updateFail": "Couldn't update this provider.",
   "prov.networkError": "Network error. Check that the proxy is running and try again.",
-  "prov.added": "Added \"{name}\". Live now — run {cmd} (or restart) to list its models in Codex's picker.",
+  "prov.added":
+    'Added "{name}". Live now — run {cmd} (or restart) to list its models in Codex\'s picker.',
   "prov.modelsNoticeTitle": "Choose models",
-  "prov.modelsNoticeChecking": "Checking the model list. Model switches do not disable the provider.",
-  "prov.modelsNoticePending": "The initial model list is not confirmed yet. Models stay hidden until discovery finishes.",
-  "prov.modelsNoticeOff": "All model switches were turned OFF at registration. Enable the models you want on the Models page.",
-  "prov.modelsNoticeReady": "Choose which models appear on the Models page. Model switches do not disable the provider.",
-  "prov.modelsNoticeFailed": "The provider was saved, but the model list could not be refreshed. Try again.",
+  "prov.modelsNoticeChecking":
+    "Checking the model list. Model switches do not disable the provider.",
+  "prov.modelsNoticePending":
+    "The initial model list is not confirmed yet. Models stay hidden until discovery finishes.",
+  "prov.modelsNoticeOff":
+    "All model switches were turned OFF at registration. Enable the models you want on the Models page.",
+  "prov.modelsNoticeReady":
+    "Choose which models appear on the Models page. Model switches do not disable the provider.",
+  "prov.modelsNoticeFailed":
+    "The provider was saved, but the model list could not be refreshed. Try again.",
   "prov.modelsNoticeCount": "{count} models",
   "prov.modelsNoticeOpen": "Open Models",
   "models.initialSelectionPending": "Initial discovery pending",
-  "prov.removeConfirm": "Remove provider \"{name}\"? Its models disappear from Codex's picker.",
+  "prov.removeConfirm": 'Remove provider "{name}"? Its models disappear from Codex\'s picker.',
   "prov.hasApiKey": "api key configured",
   "prov.hasHeaders": "custom headers configured",
   "prov.accounts": "Accounts ({n})",
@@ -797,19 +927,22 @@ export const en = {
   "prov.defaultBadge": "Default",
   "prov.enable": "Enable",
   "prov.disable": "Disable",
-  "prov.enabled": "Enabled \"{name}\". Its models can appear in Codex again.",
-  "prov.disabled": "Disabled \"{name}\". Settings are kept, but its models are hidden.",
-  "prov.disabledShadowTarget": "Disabled \"{name}\". Shadow Call Intercept still targets \"{model}\", so helper calls will fail until you choose another target or re-enable \"{name}\".",
-  "prov.enableFail": "Failed to enable \"{name}\".",
-  "prov.disableFail": "Failed to disable \"{name}\".",
+  "prov.enabled": 'Enabled "{name}". Its models can appear in Codex again.',
+  "prov.disabled": 'Disabled "{name}". Settings are kept, but its models are hidden.',
+  "prov.disabledShadowTarget":
+    'Disabled "{name}". Shadow Call Intercept still targets "{model}", so helper calls will fail until you choose another target or re-enable "{name}".',
+  "prov.enableFail": 'Failed to enable "{name}".',
+  "prov.disableFail": 'Failed to disable "{name}".',
   "prov.enableAria": "Enable provider {name}",
   "prov.disableAria": "Disable provider {name}",
   "prov.defaultCannotDisable": "Default provider can't be disabled",
   "prov.openaiAccountMode": "Codex account mode",
   "prov.openaiModePool": "Pool",
   "prov.openaiModeDirect": "Direct",
-  "prov.openaiPoolDesc": "Default. Rotate the main login and added accounts using affinity, quota, cooldown, and failover.",
-  "prov.openaiDirectDesc": "Use only the current/main Codex login. Stored pool accounts are not read or rotated.",
+  "prov.openaiPoolDesc":
+    "Default. Rotate the main login and added accounts using affinity, quota, cooldown, and failover.",
+  "prov.openaiDirectDesc":
+    "Use only the current/main Codex login. Stored pool accounts are not read or rotated.",
   "prov.openaiModeSaved": "OpenAI account mode changed to {mode}.",
   "prov.openaiModeSaveFailed": "Could not change the OpenAI account mode.",
   "prov.openaiApiDesc": "Uses an OpenAI API key and never uses Codex account credentials.",
@@ -821,18 +954,24 @@ export const en = {
   "models.tab.catalog": "Models",
   "models.tab.routing": "Routing (beta)",
   "models.tabsLabel": "Model surfaces",
-  "models.subtitle.routing": "Policy profiles, dry-run evaluation, and source-backed routing analytics.",
-  "models.subtitle": "Toggle which models Codex sees — native GPT passthrough and routed providers, grouped by provider (click a header to collapse). Hidden models stay off the catalog + model picker but remain directly callable by exact id.",
+  "models.subtitle.routing":
+    "Policy profiles, dry-run evaluation, and source-backed routing analytics.",
+  "models.subtitle":
+    "Toggle which models Codex sees — native GPT passthrough and routed providers, grouped by provider (click a header to collapse). Hidden models stay off the catalog + model picker but remain directly callable by exact id.",
   "models.delivery.title": "How changes reach Codex",
   "models.delivery.chip.saved": "Saved here",
   "models.delivery.chip.loaded": "Codex loads it on restart",
   "models.delivery.saved.title": "Saved to this proxy",
-  "models.delivery.saved.body": "Saving on this page rewrites the model catalog this OpenCodex proxy hands to Codex, which is the list the Codex model picker shows. The confirmation after saving means this step is done.",
+  "models.delivery.saved.body":
+    "Saving on this page rewrites the model catalog this OpenCodex proxy hands to Codex, which is the list the Codex model picker shows. The confirmation after saving means this step is done.",
   "models.delivery.loaded.title": "Loaded by Codex",
-  "models.delivery.loaded.body": "Codex reads the catalog when it starts, so a Codex window that was already open keeps its old model list. OpenCodex cannot look inside a running Codex to see which list it uses. When it can tell that Codex started before your change, a restart notice appears above the tabs.",
-  "models.delivery.hint": "If a model you turned on does not show up in Codex, press Reload Codex models at the top right of this page, then reopen Codex.",
+  "models.delivery.loaded.body":
+    "Codex reads the catalog when it starts, so a Codex window that was already open keeps its old model list. OpenCodex cannot look inside a running Codex to see which list it uses. When it can tell that Codex started before your change, a restart notice appears above the tabs.",
+  "models.delivery.hint":
+    "If a model you turned on does not show up in Codex, press Reload Codex models at the top right of this page, then reopen Codex.",
   "models.nativeGroupLabel": "OpenAI native",
-  "models.nativeHint": "Passthrough models use the Pool or Direct account option selected on Providers. Toggling one off hides it from the Codex picker (the catalog entry is kept, so re-enabling restores it exactly). Adding a model here registers a routed `openai/<model>` selector, not a new bare passthrough id.",
+  "models.nativeHint":
+    "Passthrough models use the Pool or Direct account option selected on Providers. Toggling one off hides it from the Codex picker (the catalog entry is kept, so re-enabling restores it exactly). Adding a model here registers a routed `openai/<model>` selector, not a new bare passthrough id.",
   "models.active": "{active}/{total} visible",
   "models.workspace.providers": "Providers",
   "models.workspace.allProviders": "All providers",
@@ -864,16 +1003,23 @@ export const en = {
   "models.v2ModeDesc_default": "Upstream defaults (sol/terra=v2, luna=v1)",
   "models.v2ModeDesc_v2": "All models → v2 surface",
   "models.keepNativeOnV1": "Keep ChatGPT on v1",
-  "models.keepNativeOnV1Hint": "ChatGPT encrypts v2 child tasks only when a ChatGPT-native parent stays on v2, so Grok and Claude cannot read them. Turn this on to keep Sol/Terra on v1 and avoid that encryption. Routed parents keep v2.",
-  "models.v2Help": "Controls the multi-agent surface for all models.\n\nv1: Classic single-thread agent. Every model uses the v1 collab surface.\nbase: Upstream defaults — sol/terra use v2, luna uses v1, others follow the codex feature flag.\nv2: Multi-thread agent with spawn_agent. Every model uses the v2 collab surface.\n\nOn v2, Keep ChatGPT on v1 leaves Sol/Terra on the v1 surface so they can still spawn Grok or Claude. ChatGPT encrypts v2 child tasks; routed models cannot read them. Routed parents stay on v2.\n\nChanges apply to new sessions.",
+  "models.keepNativeOnV1Hint":
+    "ChatGPT encrypts v2 child tasks only when a ChatGPT-native parent stays on v2, so Grok and Claude cannot read them. Turn this on to keep Sol/Terra on v1 and avoid that encryption. Routed parents keep v2.",
+  "models.v2Help":
+    "Controls the multi-agent surface for all models.\n\nv1: Classic single-thread agent. Every model uses the v1 collab surface.\nbase: Upstream defaults — sol/terra use v2, luna uses v1, others follow the codex feature flag.\nv2: Multi-thread agent with spawn_agent. Every model uses the v2 collab surface.\n\nOn v2, Keep ChatGPT on v1 leaves Sol/Terra on the v1 surface so they can still spawn Grok or Claude. ChatGPT encrypts v2 child tasks; routed models cannot read them. Routed parents stay on v2.\n\nChanges apply to new sessions.",
   "dash.multiAgent": "Sub-agent",
   "dash.codexDesktopAuthless": "Open Codex without signing in",
-  "dash.codexDesktopAuthlessHint": "Off by default. Skip the separate Desktop sign-in for eligible local connections. Upstream credentials are still required. Restart Codex after changing this setting. Account-gated Desktop features may be unavailable.",
+  "dash.codexDesktopAuthlessHint":
+    "Off by default. Skip the separate Desktop sign-in for eligible local connections. Upstream credentials are still required. Restart Codex after changing this setting. Account-gated Desktop features may be unavailable.",
   "dash.codexClientCompaction": "Use client-side compaction",
-  "dash.codexClientCompactionHint": "Off by default; authenticated loopback only. Future compactions store portable plaintext summaries while OpenCodeX and V2 provider routing stay active; the configured provider may process them and consume quota. History is left untouched, and existing threads keep routing through the proxy via the openai_base_url override OpenCodeX manages; if you set that line yourself it is kept, and those threads follow your destination instead. Existing ocx1 history stays recoverable; recover a thread separately only before replaying it in native Codex. Restart Codex after changing this setting.",
-  "dash.codexRemoteHistoryHint": "Provider-table routing can hide existing openai-tagged threads in some mobile remote lists. History is not deleted. The remote client must list all providers; this switch does not repair that client filter.",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads is set — codex will refuse to start; remove it from config.toml",
-  "models.v2Applied": "Sub-agent mode updated — applies to new sessions (restart the Codex app to refresh the picker)",
+  "dash.codexClientCompactionHint":
+    "Off by default; authenticated loopback only. Future compactions store portable plaintext summaries while OpenCodeX and V2 provider routing stay active; the configured provider may process them and consume quota. History is left untouched, and existing threads keep routing through the proxy via the openai_base_url override OpenCodeX manages; if you set that line yourself it is kept, and those threads follow your destination instead. Existing ocx1 history stays recoverable; recover a thread separately only before replaying it in native Codex. Restart Codex after changing this setting.",
+  "dash.codexRemoteHistoryHint":
+    "Provider-table routing can hide existing openai-tagged threads in some mobile remote lists. History is not deleted. The remote client must list all providers; this switch does not repair that client filter.",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads is set — codex will refuse to start; remove it from config.toml",
+  "models.v2Applied":
+    "Sub-agent mode updated — applies to new sessions (restart the Codex app to refresh the picker)",
   "models.v2ThreadsLabel": "Sub-agent limit",
   "models.v2ThreadsDefault": "default",
   "models.v2ThreadsApplied": "Sub-agent limit updated — applies to new sessions",
@@ -885,7 +1031,8 @@ export const en = {
   "models.contextDefault": "Provider default",
   "models.contextModel": "Model",
   "models.contextModelOverride": "Model override",
-  "models.contextHint": "Write the actual Codex window here when you already know it. This fills a missing upstream window and only lowers a larger reported one. Leave blank to use the provider Default window / cap, or 128k if that cap is off.",
+  "models.contextHint":
+    "Write the actual Codex window here when you already know it. This fills a missing upstream window and only lowers a larger reported one. Leave blank to use the provider Default window / cap, or 128k if that cap is off.",
   "models.contextAutomatic": "Automatic discovery",
   "models.contextSaved": "Context windows updated — takes effect on the next Codex turn.",
   "models.contextUnchanged": "No context window changes to save.",
@@ -893,10 +1040,12 @@ export const en = {
   "models.contextInvalid": "Context windows must be positive whole numbers",
   "models.contextCappedValue": "{value} cap",
   "models.setAll": "Set all",
-  "models.setAllHint": "Turn on the {value} default window for every routed provider. Relays that omit context_window / context_length get this as the actual Codex window. Use Custom windows on a provider row to set one model by hand. Native providers are unaffected.",
+  "models.setAllHint":
+    "Turn on the {value} default window for every routed provider. Relays that omit context_window / context_length get this as the actual Codex window. Use Custom windows on a provider row to set one model by hand. Native providers are unaffected.",
   "models.collapseAll": "Collapse all",
   "models.expandAll": "Expand all",
-  "models.orderHint": "Default order follows featured selections and catalog priority, with provider/model ordering for tied routed rows. A saved picker order can override display order; visibility switches filter which rows appear. A client can keep an older catalog until it fetches again.",
+  "models.orderHint":
+    "Default order follows featured selections and catalog priority, with provider/model ordering for tied routed rows. A saved picker order can override display order; visibility switches filter which rows appear. A client can keep an older catalog until it fetches again.",
   "models.settingsPanel.title": "Model settings",
   "models.settingsPanel.off": "off",
   "models.settingsPanel.attention": "Needs attention",
@@ -913,16 +1062,23 @@ export const en = {
   "models.settingsReloaded": "Model list reloaded. Reopen {model} to see the stored values.",
   "models.settingsNoChange": "No settings changed for {model}",
   "models.settingsSaved": "Model settings saved for {model}",
-  "models.settingsSaveFailed": "We could not confirm whether the settings were saved. Reload the model list before trying again.",
-  "models.settingsRefreshFailed": "Saved. The model list did not reload, so the row may show old values. Reload to check.",
-  "models.settingsSavedCodexStale": "Saved {model}, but the Codex model catalog did not refresh. Click Sync now on the Dashboard so Codex picks up the change.",
-  "models.settingsRejected": "The server rejected these settings, so nothing was saved. Check the values and try again.",
+  "models.settingsSaveFailed":
+    "We could not confirm whether the settings were saved. Reload the model list before trying again.",
+  "models.settingsRefreshFailed":
+    "Saved. The model list did not reload, so the row may show old values. Reload to check.",
+  "models.settingsSavedCodexStale":
+    "Saved {model}, but the Codex model catalog did not refresh. Click Sync now on the Dashboard so Codex picks up the change.",
+  "models.settingsRejected":
+    "The server rejected these settings, so nothing was saved. Check the values and try again.",
   "models.settingsDefaultEffort": "Default level",
-  "models.settingsModalitiesInherit": "Not overridden — currently following the upstream declaration: {modalities}",
+  "models.settingsModalitiesInherit":
+    "Not overridden — currently following the upstream declaration: {modalities}",
   "models.settingsModalitiesUnknown": "not declared",
   "models.settingsRestore": "Restore",
-  "models.settingsRestoreHint": "Clear every override on this model and fall back to the computed values.",
-  "models.settingsRestoreConfirm": "Restore {model} to the computed values? This clears its context window, modality and reasoning overrides.",
+  "models.settingsRestoreHint":
+    "Clear every override on this model and fall back to the computed values.",
+  "models.settingsRestoreConfirm":
+    "Restore {model} to the computed values? This clears its context window, modality and reasoning overrides.",
   "models.settingsRestored": "{model} restored to the computed values",
   "models.settingsNothingToRestore": "{model} carries no overrides; already the computed values",
   "pws.manageModelVisibility": "Manage visibility in Models",
@@ -931,9 +1087,12 @@ export const en = {
   "pws.modelSelectionPending": "Finish model selection in Models before making changes.",
   "pws.modelSaved": "Custom model definition saved.",
   "pws.modelSavedHidden": "Definition saved. This model is hidden; manage visibility in Models.",
-  "pws.modelSavedRefreshPending": "Definition saved, but the model catalog could not be refreshed. Retry the refresh; do not add it again.",
-  "pws.modelMutationUnconfirmed": "The change could not be confirmed. Refresh the models before trying again.",
-  "pws.modelRemovedRefreshPending": "The change was saved, but the model catalog could not be refreshed. Retry the refresh.",
+  "pws.modelSavedRefreshPending":
+    "Definition saved, but the model catalog could not be refreshed. Retry the refresh; do not add it again.",
+  "pws.modelMutationUnconfirmed":
+    "The change could not be confirmed. Refresh the models before trying again.",
+  "pws.modelRemovedRefreshPending":
+    "The change was saved, but the model catalog could not be refreshed. Retry the refresh.",
   "pws.modelHidden": "Model hidden. Restore visibility in Models.",
   "pws.modelDefinitionDeleted": "Custom definition deleted. An underlying model may still appear.",
   "pws.modelKnown": "This model is already known. Manage its visibility in Models.",
@@ -946,9 +1105,11 @@ export const en = {
   "models.customEditBtn": "Update",
   "models.customEdit": "Edit",
   "models.customDelete": "Delete",
-  "models.customDeleteConfirm": "Delete the custom definition for {name}? An underlying native or discovered model may appear again.",
+  "models.customDeleteConfirm":
+    "Delete the custom definition for {name}? An underlying native or discovered model may appear again.",
   "models.hide": "Hide",
-  "models.hideConfirm": "Hide {name} from the model catalog? This does not remove its definition or change direct routing policy.",
+  "models.hideConfirm":
+    "Hide {name} from the model catalog? This does not remove its definition or change direct routing policy.",
   "models.customBadge": "Custom",
   "models.customSummary": "{count} custom",
   "models.customFieldModelId": "Model ID (endpoint slug)",
@@ -974,14 +1135,17 @@ export const en = {
   "models.tipActive": "Active",
   "models.tipDisabled": "Disabled",
   "models.applied": "Saved. Codex shows the change after it reloads the model list.",
-  "models.integrationRefreshWarning": "Model selection saved. Some client catalogs could not be refreshed. Check Integrations before starting a new session.",
+  "models.integrationRefreshWarning":
+    "Model selection saved. Some client catalogs could not be refreshed. Check Integrations before starting a new session.",
   "models.saveFailed": "Save failed",
   "models.networkError": "Network error — is the proxy running?",
   "models.loadFail": "Failed to load models — is the proxy running?",
   "models.noRouted": "No routed models",
   "models.noRoutedHint": "Log into a provider or add one first.",
-  "models.emptyDiscovery": "No models were discovered. Check the provider endpoint or add a static/custom model.",
-  "models.emptyDiscoveryDisabled": "Live model discovery is off and no static models are configured.",
+  "models.emptyDiscovery":
+    "No models were discovered. Check the provider endpoint or add a static/custom model.",
+  "models.emptyDiscoveryDisabled":
+    "Live model discovery is off and no static models are configured.",
   "models.discoveryFailedBadge": "Discovery failed",
   "models.discoveryFailedHttp": "Model discovery failed (HTTP {status}).",
   "models.discoveryFailedBlocked": "Model discovery was blocked by the destination policy.",
@@ -991,51 +1155,66 @@ export const en = {
   "models.discoveryFailedGeneric": "Model discovery failed.",
   "models.openProviderSettings": "Open provider settings",
   "models.inactiveNoCredit": "No credit",
-  "models.inactiveNoCreditHint": "Every provider behind this entry is out of credit right now, so a request would fail. It stays listed and becomes usable again when credit resets or is topped up.",
-  "models.discoveryFailedDependency": "Model discovery is on for this provider. While it keeps failing, turn off “{control}” in provider settings to use manually added or static models instead.",
+  "models.inactiveNoCreditHint":
+    "Every provider behind this entry is out of credit right now, so a request would fail. It stays listed and becomes usable again when credit resets or is topped up.",
+  "models.discoveryFailedDependency":
+    "Model discovery is on for this provider. While it keeps failing, turn off “{control}” in provider settings to use manually added or static models instead.",
   "models.loading": "Loading…",
   "models.search": "Search models…",
   "models.showMore": "Show {n} more",
   "models.freeOnly": "Free only",
   "models.noFreeMatch": "No free models here. Turn off Free only to see the rest.",
   "models.allowlistLabel": "Only selected",
-  "models.allowlistHint": "Only checked models ship to the catalog (empty = all). Useful for providers exposing thousands of models.",
+  "models.allowlistHint":
+    "Only checked models ship to the catalog (empty = all). Useful for providers exposing thousands of models.",
   "models.selectedCount": "{n} selected",
 
   // subagents
   "sub.forceTitle": "Force all subagents onto one model",
   "sub.forceModel": "Claude Code subagent model",
   "sub.forceChoose": "Choose an exposed model",
-  "sub.forceHelp": "Applies to plugin and built-in agents (including Explore/Plan), overriding per-call models. Forks and skills with model: inherit keep the main conversation model. The main model and Haiku/small-fast sidecars are unaffected.",
-  "sub.forceScope": "Default off. Applies from the next routed ocx claude launch, not plain claude. Shell exports win; settings.json env can override them. Status checks the server’s CLI and user settings only, not another shell or project settings.",
-  "sub.forceInvalid": "The configured target is unavailable. Launch override will be skipped; select an exposed model or turn this off.",
-  "sub.forceOld": "Claude Code is older than 2.1.257: FORCE is ignored; only the non-forced subagent default applies.",
-  "sub.forceUnknown": "Claude Code version is unknown. Force support requires version 2.1.257 or newer.",
-  "sub.forceOverride": "Overridden by settings.json: its env contains a subagent model or FORCE setting. OpenCodex does not modify it.",
-  "sub.forceSettingsUnknown": "Could not inspect settings.json. Settings override status is unknown.",
+  "sub.forceHelp":
+    "Applies to plugin and built-in agents (including Explore/Plan), overriding per-call models. Forks and skills with model: inherit keep the main conversation model. The main model and Haiku/small-fast sidecars are unaffected.",
+  "sub.forceScope":
+    "Default off. Applies from the next routed ocx claude launch, not plain claude. Shell exports win; settings.json env can override them. Status checks the server’s CLI and user settings only, not another shell or project settings.",
+  "sub.forceInvalid":
+    "The configured target is unavailable. Launch override will be skipped; select an exposed model or turn this off.",
+  "sub.forceOld":
+    "Claude Code is older than 2.1.257: FORCE is ignored; only the non-forced subagent default applies.",
+  "sub.forceUnknown":
+    "Claude Code version is unknown. Force support requires version 2.1.257 or newer.",
+  "sub.forceOverride":
+    "Overridden by settings.json: its env contains a subagent model or FORCE setting. OpenCodex does not modify it.",
+  "sub.forceSettingsUnknown":
+    "Could not inspect settings.json. Settings override status is unknown.",
   "sub.forceSaved": "Saved. Takes effect on the next routed ocx claude launch.",
-  "sub.subtitle": "Codex's {cmd} advertises only the first 5 models (by priority) as overrides. Pick up to 5 here — native gpt or routed — and opencodex sets their catalog priority so exactly these lead. Any other model is still callable by its exact name; this only controls what's shown.",
+  "sub.subtitle":
+    "Codex's {cmd} advertises only the first 5 models (by priority) as overrides. Pick up to 5 here — native gpt or routed — and opencodex sets their catalog priority so exactly these lead. Any other model is still callable by its exact name; this only controls what's shown.",
   "sub.featured": "Featured",
   "sub.advanced": "Advanced",
   "sub.orderHintAria": "How this order is used",
-  "sub.orderHint": "The order shown here sets positions 1–5 at the top of the Codex model picker and the default model candidates for {cmd}. When fewer than 5 featured models are visible in the picker, remaining slots are advertised by catalog priority; 5 visible featured models fill the list unless a custom model picker order changes catalog priority.",
+  "sub.orderHint":
+    "The order shown here sets positions 1–5 at the top of the Codex model picker and the default model candidates for {cmd}. When fewer than 5 featured models are visible in the picker, remaining slots are advertised by catalog priority; 5 visible featured models fill the list unless a custom model picker order changes catalog priority.",
   "sub.noneSelected": "None selected — pick from the list below.",
   "sub.models": "Models",
   "sub.search": "Search models (native gpt + routed)…",
   "sub.settings": "Settings",
   "sub.sections": "Subagent sections",
   "sub.delegation.model": "Model to call first",
-  "sub.delegation.modelHint": "The model Codex reaches for first when it hands off work. Featured above is the list it may call; this is the one it calls first.",
+  "sub.delegation.modelHint":
+    "The model Codex reaches for first when it hands off work. Featured above is the list it may call; this is the one it calls first.",
   "sub.suggest.button": "Suggest",
   "sub.suggest.label": "Delegated work",
-  "sub.suggest.placeholder": "What does Codex usually hand off? e.g. read-only searches across the repo, or multi-module refactors",
+  "sub.suggest.placeholder":
+    "What does Codex usually hand off? e.g. read-only searches across the repo, or multi-module refactors",
   "sub.suggest.submit": "Size it",
   "sub.suggest.running": "Sizing…",
   "sub.suggest.failed": "Could not size the delegated work.",
   "sub.suggest.title": "Suggested model",
   "sub.suggest.accept": "Use this",
   "sub.noModels": "No models — log into a provider or add one first.",
-  "sub.saved": "Saved {n} models. Start a new Codex session (or run {cmd}) to see them as spawn_agent overrides.",
+  "sub.saved":
+    "Saved {n} models. Start a new Codex session (or run {cmd}) to see them as spawn_agent overrides.",
   "sub.saveFailed": "Save failed",
   "sub.networkError": "Network error — is the proxy running?",
   "sub.loadFail": "Failed to load models — is the proxy running?",
@@ -1050,8 +1229,10 @@ export const en = {
   "sub.workspace.notFeatured": "Not featured",
   "sub.workspace.priority": "Priority",
   "sub.ultraMode": "Always proactive delegation",
-  "sub.ultraModeHint": "Enable the Proactive multi-agent delegation policy for every model and reasoning effort (does not change reasoning effort itself). Writes features.multi_agent_v2.multi_agent_mode_hint_text in config.toml.",
-  "sub.ultraModeV2Required": "Requires the v2 multi-agent surface — enable multi_agent_v2 and select v2 in the Sub-agent mode control first.",
+  "sub.ultraModeHint":
+    "Enable the Proactive multi-agent delegation policy for every model and reasoning effort (does not change reasoning effort itself). Writes features.multi_agent_v2.multi_agent_mode_hint_text in config.toml.",
+  "sub.ultraModeV2Required":
+    "Requires the v2 multi-agent surface — enable multi_agent_v2 and select v2 in the Sub-agent mode control first.",
   "sub.ultraModeText": "Proactive delegation text",
   "sub.ultraModePreset": "Restore preset",
   "sub.ultraModeLoadFail": "Failed to load proactive delegation settings — is the proxy running?",
@@ -1059,7 +1240,8 @@ export const en = {
   "sub.ultraModeSaved": "Proactive delegation saved. Applies to new Codex sessions.",
   "sub.workspace.removeFromFeatured": "Remove {m} from featured",
   "sub.workspace.selectModel": "Select a model",
-  "sub.workspace.selectModelDesc": "Pick a model from the list to see details and feature it for spawn_agent.",
+  "sub.workspace.selectModelDesc":
+    "Pick a model from the list to see details and feature it for spawn_agent.",
   "sub.workspace.selector": "Public selector",
   "sub.fallbackLabel": "Sub-agent fallback chain",
   "sub.fallbackHint": "Ordered models tried when a sub-agent model is unavailable or fails.",
@@ -1070,8 +1252,10 @@ export const en = {
   "sub.fallbackUnavailable": "Not currently advertised; kept in the chain.",
   "sub.fallbackPollInvalid": "Enter an integer from 5000 to 600000 ms.",
   "sub.v2Compatibility.title": "Native-parent V2 compatibility",
-  "sub.v2Compatibility.risk": "If a native ChatGPT parent delegates to this routed model using V2, its task may be encrypted and fail before execution. Readable tasks from routed parents are unaffected.",
-  "sub.v2Compatibility.recoveryUnknown": "Recovery enabled/eligibility state is not exposed by this server. Use V1/plaintext-compatible delegation, or enable experimental V2 recovery only if eligible. Recovery adds quota, latency, backend dependence and possible fidelity loss; it does not fix the upstream protocol.",
+  "sub.v2Compatibility.risk":
+    "If a native ChatGPT parent delegates to this routed model using V2, its task may be encrypted and fail before execution. Readable tasks from routed parents are unaffected.",
+  "sub.v2Compatibility.recoveryUnknown":
+    "Recovery enabled/eligibility state is not exposed by this server. Use V1/plaintext-compatible delegation, or enable experimental V2 recovery only if eligible. Recovery adds quota, latency, backend dependence and possible fidelity loss; it does not fix the upstream protocol.",
   "sub.v2Compatibility.details": "Compatibility details",
 
   // logs
@@ -1112,7 +1296,7 @@ export const en = {
   "logs.badge.interceptedHelperTitle": "Intercepted helper request",
   "logs.filter.conversation.label": "Conversation",
   "logs.filter.conversation.placeholder": "Paste conversation id",
- "logs.filter.conversation.clear": "Clear",
+  "logs.filter.conversation.clear": "Clear",
   "logs.filter.model.label": "Model",
   "logs.filter.model.placeholder": "Filter by model or provider",
   "logs.filter.conversation.apply": "Filter logs",
@@ -1135,9 +1319,11 @@ export const en = {
   "logs.col.tokPerSec": "tok/s",
   "logs.col.estimatedCost": "~$",
   "logs.metric.tokPerSecTitle": "Output tokens per second over the full request duration",
-  "logs.metric.estimatedCostTitle": "API list-price equivalent, not an actual charge; unmatched pricing is unavailable",
+  "logs.metric.estimatedCostTitle":
+    "API list-price equivalent, not an actual charge; unmatched pricing is unavailable",
   "usage.cost.total": "API list-price equivalent (this range)",
-  "usage.cost.disclaimer": "Not a billing receipt. Subscription usage or provider credits may apply instead.",
+  "usage.cost.disclaimer":
+    "Not a billing receipt. Subscription usage or provider credits may apply instead.",
   "usage.cost.unpricedNote": "{count} requests excluded (no price or usage)",
   "usage.cost.excluded": "({count} requests excluded)",
   "usage.cost.excludedOne": "({count} request excluded)",
@@ -1189,12 +1375,17 @@ export const en = {
   "logs.detail.decodeGeneration": "Output rate during generation (est.)",
   "logs.detail.decodeLegacy": "Output rate after first visible output (est.)",
   "logs.detail.decodeUnknown": "Output rate (est.; timing method unknown)",
-  "logs.detail.decodeBasisHint.generation": "Estimated using the time from the first output observed by the proxy, including reasoning, to the last output delta.",
-  "logs.detail.decodeBasisHint.legacy": "Estimated using the time from the first visible output to the end of the request, while counting all reported output tokens, including reasoning.",
-  "logs.detail.decodeBasisHint.unknown": "The server did not report which timing method was used for this estimate.",
+  "logs.detail.decodeBasisHint.generation":
+    "Estimated using the time from the first output observed by the proxy, including reasoning, to the last output delta.",
+  "logs.detail.decodeBasisHint.legacy":
+    "Estimated using the time from the first visible output to the end of the request, while counting all reported output tokens, including reasoning.",
+  "logs.detail.decodeBasisHint.unknown":
+    "The server did not report which timing method was used for this estimate.",
   "logs.detail.endToEndTokPerSec": "End-to-end output tok/s",
-  "logs.detail.reason.ttft_missing": "No time-to-first-token was recorded for this request, so there is no decode window to measure.",
-  "logs.detail.reason.decode_window_too_short": "The measured output window was under a second, which is too short to estimate a decode rate from.",
+  "logs.detail.reason.ttft_missing":
+    "No time-to-first-token was recorded for this request, so there is no decode window to measure.",
+  "logs.detail.reason.decode_window_too_short":
+    "The measured output window was under a second, which is too short to estimate a decode rate from.",
   "logs.detail.costTotal": "List-price equivalent",
   "logs.detail.totalTokens": "Total tokens",
   "logs.detail.matchedKey": "Matched price key",
@@ -1210,7 +1401,8 @@ export const en = {
   "logs.detail.attempt.target": "Provider / model",
   "logs.detail.attempt.reason": "Result / reason",
   "logs.detail.attempt.completed": "Completed",
-  "logs.detail.attempt.e2eNote": "Top-level tok/s is end-to-end; each attempt uses its own duration.",
+  "logs.detail.attempt.e2eNote":
+    "Top-level tok/s is end-to-end; each attempt uses its own duration.",
   "logs.detail.attempt.recovery.transient5xx": "Transient 5xx",
   "logs.detail.attempt.recovery.connectionReset": "Connection reset",
   "logs.detail.attempt.recovery.oauth401": "OAuth re-authentication",
@@ -1226,7 +1418,8 @@ export const en = {
   "logs.detail.attempt.recovery.oauthAccount402": "Account quota exhausted (402)",
   "logs.detail.attempt.recovery.opaqueBlobRejection": "Stale encrypted state dropped",
   "logs.detail.attempt.recovery.reasoningEffortDowngrade": "Reasoning effort downgraded",
-  "logs.detail.attempt.recovery.anthropicFastDowngrade": "Fast mode refused, retried at standard speed",
+  "logs.detail.attempt.recovery.anthropicFastDowngrade":
+    "Fast mode refused, retried at standard speed",
   "logs.detail.outcome.label": "Outcome",
   "logs.detail.outcome.completed": "Completed",
   "logs.detail.outcome.failed": "Failed",
@@ -1271,14 +1464,17 @@ export const en = {
   "logs.detail.reason.output_missing": "No positive output token count was reported.",
   "logs.detail.reason.invalid_duration": "The request duration is not valid.",
   "logs.detail.reason.price_unmatched": "No matching price was found.",
-  "logs.detail.reason.invalid_cache_breakdown": "Cache token details conflict with total input tokens.",
+  "logs.detail.reason.invalid_cache_breakdown":
+    "Cache token details conflict with total input tokens.",
   "logs.detail.reason.invalid_usage": "Usage contains an invalid token value.",
   "logs.detail.reason.combo_attempt_unavailable": "At least one combo attempt could not be priced.",
   "logs.detail.estimate.usage_estimated": "Provider usage is estimated.",
-  "logs.detail.estimate.cache_detail_missing": "Cache details were unavailable; input is an upper-bound estimate.",
+  "logs.detail.estimate.cache_detail_missing":
+    "Cache details were unavailable; input is an upper-bound estimate.",
   "logs.detail.estimate.expected_price_overlay": "A verified expected list price was used.",
   "logs.detail.estimate.provider_cost_overlay": "A provider-configured price overlay was used.",
-  "logs.detail.estimate.priority_lower_bound": "The confirmed Priority price is unavailable; the displayed estimate is a known lower bound.",
+  "logs.detail.estimate.priority_lower_bound":
+    "The confirmed Priority price is unavailable; the displayed estimate is a known lower bound.",
   "logs.col.error": "Error",
   "logs.col.upstreamReason": "Upstream reason",
   "logs.col.failureDetail": "Failure detail",
@@ -1296,7 +1492,8 @@ export const en = {
   "logs.failureDetail.providerError": "The provider returned an error",
   "logs.failureDetail.providerErrorTyped": "The provider returned an error ({type})",
   "logs.failureDetail.headerTimeout": "Timed out waiting for response headers",
-  "logs.failureDetail.headerTimeoutAfter": "Timed out waiting for response headers after {value} ms",
+  "logs.failureDetail.headerTimeoutAfter":
+    "Timed out waiting for response headers after {value} ms",
   "logs.failureDetail.connectTimeout": "Connecting to the provider timed out after {value} ms",
   "logs.failureDetail.connectFailed": "Could not connect to the provider",
   "logs.failureDetail.clientClosed": "The client closed the request",
@@ -1337,7 +1534,8 @@ export const en = {
   "logs.tokens.contextTotal": "active context",
   "logs.tokens.noCacheNote": "this provider does not report cache tokens",
   "logs.tokens.noCacheCursor": "Cursor cache detail unreported",
-  "logs.tokens.noCacheCursorNote": "Cursor does not expose cache read/write token counts; this is unknown, not a confirmed cache miss",
+  "logs.tokens.noCacheCursorNote":
+    "Cursor does not expose cache read/write token counts; this is unknown, not a confirmed cache miss",
   "logs.tokens.estimatedNote": "estimated (provider reports no exact usage)",
   "logs.details": "Details",
   "logs.detailTitle": "Request details",
@@ -1345,14 +1543,17 @@ export const en = {
 
   // debug page
   "debug.title": "Debug",
-  "debug.subtitle": "Opt-in provider transport and usage-extraction diagnostics. Request errors and 502s stay on the Logs tab.",
+  "debug.subtitle":
+    "Opt-in provider transport and usage-extraction diagnostics. Request errors and 502s stay on the Logs tab.",
   "debug.debug": "Provider debug",
   "debug.usage": "Usage extraction",
   "debug.injection": "Injection log",
   "debug.claude": "Claude inbound",
   "debug.claudeInbound.title": "Claude inbound requests",
-  "debug.claudeInbound.sub": "What Claude Code/Desktop actually sends (thinking, effort, metadata) — no prompt text is stored.",
-  "debug.claudeInbound.empty": "No requests captured yet. Send a message from Claude while this is on.",
+  "debug.claudeInbound.sub":
+    "What Claude Code/Desktop actually sends (thinking, effort, metadata) — no prompt text is stored.",
+  "debug.claudeInbound.empty":
+    "No requests captured yet. Send a message from Claude while this is on.",
   "debug.claudeInbound.time": "Time",
   "debug.claudeInbound.endpoint": "Endpoint",
   "debug.claudeInbound.model": "Model",
@@ -1366,11 +1567,15 @@ export const en = {
   "debug.loading": "Loading debug settings…",
   "debug.loadFailed": "Could not load debug settings.",
   "debug.emptyTitle": "Debug logging is off",
-  "debug.empty": "Turn on Provider debug or Usage extraction in the card above. Lines appear here after you send a request through the proxy.",
+  "debug.empty":
+    "Turn on Provider debug or Usage extraction in the card above. Lines appear here after you send a request through the proxy.",
   "debug.noLinesTitle": "Waiting for lines",
-  "debug.noLines.provider": "Provider debug is on, but it only records transport anomalies (dropped or malformed frames, and Cursor dial/retry events). A clean request through a provider like Anthropic can produce no lines.",
-  "debug.noLines.usage": "Usage extraction is on but nothing has been captured yet. Send a chat/request through Codex and it appears here.",
-  "debug.noLines.injection": "Injection log is on but nothing has been captured yet. It records multi-agent guidance injection and effort-cap decisions on collab and sub-agent turns.",
+  "debug.noLines.provider":
+    "Provider debug is on, but it only records transport anomalies (dropped or malformed frames, and Cursor dial/retry events). A clean request through a provider like Anthropic can produce no lines.",
+  "debug.noLines.usage":
+    "Usage extraction is on but nothing has been captured yet. Send a chat/request through Codex and it appears here.",
+  "debug.noLines.injection":
+    "Injection log is on but nothing has been captured yet. It records multi-agent guidance injection and effort-cap decisions on collab and sub-agent turns.",
 
   // usage page
   "usage.title": "Usage",
@@ -1380,8 +1585,10 @@ export const en = {
   "usage.loadError": "Could not load usage data.",
   "usage.range.all": "All",
   "usage.range.available": "Available history",
-  "usage.historyTruncated": "Totals cover available history only because older usage was not loaded.",
-  "usage.historyTruncatedWindow": "Loaded rows have request start times ranging from {start} to {end}. Earlier file entries were omitted by the read limit, so any selected range may be incomplete.",
+  "usage.historyTruncated":
+    "Totals cover available history only because older usage was not loaded.",
+  "usage.historyTruncatedWindow":
+    "Loaded rows have request start times ranging from {start} to {end}. Earlier file entries were omitted by the read limit, so any selected range may be incomplete.",
   "usage.range.30d": "30d",
   "usage.range.7d": "7d",
   "usage.card.requests": "Requests",
@@ -1389,7 +1596,8 @@ export const en = {
   "usage.card.reported": "Reported",
   "usage.card.totalTokens": "Total tokens",
   "usage.card.cachedTokens": "Cache reads",
-  "usage.card.cachedTokensHint": "Prompt tokens served from the provider cache (reads). Cache writes are shown below when present.",
+  "usage.card.cachedTokensHint":
+    "Prompt tokens served from the provider cache (reads). Cache writes are shown below when present.",
   "usage.card.cacheWriteTokens": "cache writes",
   "usage.card.coverage": "Coverage",
   "usage.card.activeDays": "Active days",
@@ -1403,7 +1611,8 @@ export const en = {
   "usage.coverage.measured": "Measured",
   "usage.coverage.reported": "Provider reported",
   "usage.coverage.estimated": "Estimated",
-  "usage.coverage.note": "Measured entries include provider-reported and estimated token counts. Unreported and unsupported requests are tracked but never inflated to zero tokens.",
+  "usage.coverage.note":
+    "Measured entries include provider-reported and estimated token counts. Unreported and unsupported requests are tracked but never inflated to zero tokens.",
   "usage.search.models": "Search models…",
   "usage.col.requests": "Requests",
   "usage.col.measured": "Measured",
@@ -1414,10 +1623,14 @@ export const en = {
   "usage.col.cacheHits": "Cache hits",
   "usage.col.cacheWrites": "Cache writes",
   "usage.col.cacheHitRate": "Hit rate",
-  "usage.throughput.title": "End-to-end output throughput: summed output tokens over summed wall-clock duration across {samples} measured attempt(s). It includes pre-decode wait time, so it runs below steady-state decode speed; requests without measured tokens or duration are excluded.",
-  "usage.throughput.unmeasured": "No request for this row reported both output tokens and duration, so there is no throughput to average.",
-  "usage.cacheHitRate.partial": "Averaged over {measured} of {total} input tokens; the remaining requests reported no cache detail.",
-  "usage.cacheHitRate.unmeasured": "No request for this row reported cache detail, so there is no hit rate to average.",
+  "usage.throughput.title":
+    "End-to-end output throughput: summed output tokens over summed wall-clock duration across {samples} measured attempt(s). It includes pre-decode wait time, so it runs below steady-state decode speed; requests without measured tokens or duration are excluded.",
+  "usage.throughput.unmeasured":
+    "No request for this row reported both output tokens and duration, so there is no throughput to average.",
+  "usage.cacheHitRate.partial":
+    "Averaged over {measured} of {total} input tokens; the remaining requests reported no cache detail.",
+  "usage.cacheHitRate.unmeasured":
+    "No request for this row reported cache detail, so there is no hit rate to average.",
   "usage.unavailable": "—",
   "usage.col.tokens": "Tokens",
   "usage.col.apiListPrice": "API list-price",
@@ -1470,17 +1683,20 @@ export const en = {
   "storage.bucket.deletion_manifests": "Deletion manifests",
   "storage.bucket.other": "Other",
   "storage.cleanup.title": "Archived cleanup",
-  "storage.cleanup.help": "Remove the oldest archived sessions by percentage. Active sessions are never touched. Quarantine is the default — files move to CODEX_HOME/.trash.",
+  "storage.cleanup.help":
+    "Remove the oldest archived sessions by percentage. Active sessions are never touched. Quarantine is the default — files move to CODEX_HOME/.trash.",
   "storage.cleanup.slider": "Oldest archived percent",
   "storage.cleanup.percent": "{percent}%",
   "storage.cleanup.preset": "{percent}",
   "storage.cleanup.preview": "Preview",
   "storage.cleanup.confirmTitle": "Confirm archived cleanup",
-  "storage.cleanup.confirmBody": "This will process {count} archived file(s) (~{size}), the oldest {percent}%.",
+  "storage.cleanup.confirmBody":
+    "This will process {count} archived file(s) (~{size}), the oldest {percent}%.",
   "storage.cleanup.moreFiles": "…and {n} more",
   "storage.cleanup.permanent": "Delete permanently (skip quarantine)",
   "storage.cleanup.permanentWarn": "Permanent delete cannot be undone.",
-  "storage.cleanup.quarantineNote": "Files move to .trash under CODEX_HOME. You can restore them from the Quarantine tab.",
+  "storage.cleanup.quarantineNote":
+    "Files move to .trash under CODEX_HOME. You can restore them from the Quarantine tab.",
   "storage.cleanup.cancel": "Cancel",
   "storage.cleanup.confirmQuarantine": "Quarantine",
   "storage.cleanup.confirmPermanent": "Delete permanently",
@@ -1491,17 +1707,22 @@ export const en = {
   "storage.cleanup.cleanupFailed": "Cleanup failed.",
   "storage.cleanup.err.codex_busy": "Codex is using state.sqlite — try again after quitting Codex.",
   "storage.cleanup.err.stale_preview": "Archived files changed since preview — run Preview again.",
-  "storage.cleanup.err.restore_pending_overlap": "Selected archives overlap an incomplete trash restore — finish or retry restore first.",
-  "storage.cleanup.err.referenced_history": "Selected archives are still referenced by forked or paginated history.",
+  "storage.cleanup.err.restore_pending_overlap":
+    "Selected archives overlap an incomplete trash restore — finish or retry restore first.",
+  "storage.cleanup.err.referenced_history":
+    "Selected archives are still referenced by forked or paginated history.",
   "storage.cleanup.err.invalid_digest": "Preview digest is missing or invalid.",
   "storage.cleanup.err.invalid_mode": "Cleanup mode must be quarantine or permanent.",
-  "storage.cleanup.err.fs_failed": "Filesystem cleanup failed. Some changes may already be applied — check CODEX_HOME/.trash and any recovery path shown.",
-  "storage.cleanup.err.fs_failed_trash": "Filesystem cleanup failed. Some changes may already be applied — check {trashDir} and manifest.json for recoverable files.",
+  "storage.cleanup.err.fs_failed":
+    "Filesystem cleanup failed. Some changes may already be applied — check CODEX_HOME/.trash and any recovery path shown.",
+  "storage.cleanup.err.fs_failed_trash":
+    "Filesystem cleanup failed. Some changes may already be applied — check {trashDir} and manifest.json for recoverable files.",
   "storage.cleanup.err.db_reconcile_failed": "Could not update Codex state database.",
   "storage.cleanup.err.cleanup_failed": "Cleanup failed.",
 
   "storage.trash.title": "Quarantine",
-  "storage.trash.help": "Archived sessions moved to CODEX_HOME/.trash. Restore puts JSONL files and thread rows back.",
+  "storage.trash.help":
+    "Archived sessions moved to CODEX_HOME/.trash. Restore puts JSONL files and thread rows back.",
   "storage.trash.empty": "No quarantined entries.",
   "storage.trash.loading": "Loading quarantine…",
   "storage.trash.col.when": "Quarantined",
@@ -1511,7 +1732,8 @@ export const en = {
   "storage.trash.col.id": "Entry",
   "storage.trash.restore": "Restore",
   "storage.trash.confirmTitle": "Restore quarantine entry?",
-  "storage.trash.confirmBody": "Restore {count} file(s) (~{size}) from {id} back to archived sessions.",
+  "storage.trash.confirmBody":
+    "Restore {count} file(s) (~{size}) from {id} back to archived sessions.",
   "storage.trash.cancel": "Cancel",
   "storage.trash.confirmRestore": "Restore",
   "storage.trash.done": "Restored {count} file(s) ({size}).",
@@ -1522,16 +1744,21 @@ export const en = {
   "storage.trash.err.codex_busy": "Codex is using state.sqlite — try again after quitting Codex.",
   "storage.trash.err.invalid_trash": "Trash entry id is missing or invalid.",
   "storage.trash.err.missing_trash": "Trash entry was not found.",
-  "storage.trash.err.dest_exists": "Restore destination already exists — remove or rename the archived file and retry.",
-  "storage.trash.err.fs_failed": "Filesystem restore failed. Some files may already be restored — check archived_sessions and .trash.",
+  "storage.trash.err.dest_exists":
+    "Restore destination already exists — remove or rename the archived file and retry.",
+  "storage.trash.err.fs_failed":
+    "Filesystem restore failed. Some files may already be restored — check archived_sessions and .trash.",
   "storage.trash.err.db_reconcile_failed": "Could not restore Codex state database rows.",
-  "storage.trash.err.storage_mutation_busy": "Another storage cleanup or restore is in progress — try again shortly.",
+  "storage.trash.err.storage_mutation_busy":
+    "Another storage cleanup or restore is in progress — try again shortly.",
   "storage.trash.err.restore_failed": "Restore failed.",
-  "storage.trash.err.restore_worker_timeout": "Restore took too long (over 10 minutes) and was stopped.",
+  "storage.trash.err.restore_worker_timeout":
+    "Restore took too long (over 10 minutes) and was stopped.",
   "storage.trash.err.restore_worker_aborted": "Restore was cancelled during shutdown.",
   "storage.trash.err.restore_worker_failed": "Restore worker crashed or failed unexpectedly.",
   "storage.policy.title": "Auto-cleanup policy",
-  "storage.policy.help": "Optional batch cleanup when archived sessions exceed a threshold. Off by default — never enabled automatically.",
+  "storage.policy.help":
+    "Optional batch cleanup when archived sessions exceed a threshold. Off by default — never enabled automatically.",
   "storage.policy.loading": "Loading policy…",
   "storage.policy.loadFailed": "Could not load cleanup policy.",
   "storage.policy.saveFailed": "Could not save cleanup policy.",
@@ -1539,7 +1766,8 @@ export const en = {
   "storage.policy.alreadyRunning": "A cleanup policy run is already in progress.",
   "storage.policy.invalid": "Invalid policy values.",
   "storage.policy.enabled": "Enable auto-cleanup",
-  "storage.policy.enabledHint": "Default is off. Enabling runs only on the schedule you choose (or Run now).",
+  "storage.policy.enabledHint":
+    "Default is off. Enabling runs only on the schedule you choose (or Run now).",
   "storage.policy.threshold": "When archived size exceeds (GiB)",
   "storage.policy.trigger": "Trigger",
   "storage.policy.target": "Cleanup target",
@@ -1559,7 +1787,8 @@ export const en = {
   "storage.policy.mode": "Deletion mode",
   "storage.policy.mode.quarantine": "Quarantine (default)",
   "storage.policy.mode.permanent": "Permanent delete",
-  "storage.policy.permanentWarn": "Permanent mode cannot be undone. Prefer quarantine unless you are sure.",
+  "storage.policy.permanentWarn":
+    "Permanent mode cannot be undone. Prefer quarantine unless you are sure.",
   "storage.policy.lastRun": "Last run",
   "storage.policy.lastRunDetail": "Removed {count} · freed {size}",
   "storage.policy.nextRun": "Next run",
@@ -1573,7 +1802,8 @@ export const en = {
   "storage.policy.skippedEmpty": "No archived candidates matched the target.",
   "storage.policy.doneQuarantine": "Policy quarantined {count} file(s) ({size}).",
   "storage.policy.donePermanent": "Policy permanently deleted {count} file(s) ({size}).",
-  "storage.policy.metadataSaveWarning": "The policy run finished, but its scheduling metadata could not be saved.",
+  "storage.policy.metadataSaveWarning":
+    "The policy run finished, but its scheduling metadata could not be saved.",
 
   // add-provider modal
   "modal.addNamed": "Add: {label}",
@@ -1590,7 +1820,8 @@ export const en = {
   "modal.endpoint.custom": "Custom",
   "modal.defaultModel": "Default model (optional)",
   "modal.allowPrivateNetwork": "Allow local/private network",
-  "modal.allowPrivateNetworkHint": "Enable only for intentionally self-hosted providers. Metadata endpoints remain blocked.",
+  "modal.allowPrivateNetworkHint":
+    "Enable only for intentionally self-hosted providers. Metadata endpoints remain blocked.",
   "modal.nameRequired": "Provider name is required",
   "modal.baseUrlRequired": "Base URL is required",
   "modal.networkError": "Network error — is the proxy running?",
@@ -1610,10 +1841,12 @@ export const en = {
   "modal.badge.pool": "Pool",
   "modal.badge.free": "Free",
   "modal.badge.subscriptionCli": "Subscription CLI",
-  "modal.invalidPreset": "This built-in provider preset is incomplete. Restart the proxy and try again.",
+  "modal.invalidPreset":
+    "This built-in provider preset is incomplete. Restart the proxy and try again.",
   "modal.freeTierTitle": "Free tier",
   "modal.subscriptionCliTitle": "Subscription CLI, not an API key",
-  "modal.subscriptionCliWarning": "This provider does not use an API key. It drives the official Claude Code CLI signed in on this machine ({cmd}) and bills that Claude subscription account. OpenCodex stores no key for it, and a key entered here is never used. For API-key billing, add {apiProvider} instead.",
+  "modal.subscriptionCliWarning":
+    "This provider does not use an API key. It drives the official Claude Code CLI signed in on this machine ({cmd}) and bills that Claude subscription account. OpenCodex stores no key for it, and a key entered here is never used. For API-key billing, add {apiProvider} instead.",
   "modal.freeTierDefault": "No API key required. Works out of the box.",
   "modal.tab.accounts": "Accounts",
   "modal.tab.free": "Free",
@@ -1621,7 +1854,8 @@ export const en = {
   "modal.tab.paid": "Paid",
   "modal.noteMore": "Show full description",
   "modal.searchResults": "{count} results across {tiers}",
-  "modal.accountsHint": "Sign in to ChatGPT/Codex, OAuth providers, and API-key accounts here. OpenAI is built in — log in rather than adding it again.",
+  "modal.accountsHint":
+    "Sign in to ChatGPT/Codex, OAuth providers, and API-key accounts here. OpenAI is built in — log in rather than adding it again.",
   "modal.accountsCodexAuthLink": "Codex Auth",
   "modal.notListed": "Provider not listed? Add a custom one",
   "modal.catalogLoading": "Loading catalog…",
@@ -1632,12 +1866,13 @@ export const en = {
   "modal.accountCodexPool": "ChatGPT account pool",
   "modal.accountLoggedIn": "Logged in",
   "modal.accountLoggedOut": "Not logged in",
- "quota.fiveHourLimit": "5-hour limit",
+  "quota.fiveHourLimit": "5-hour limit",
   "quota.ageMinutes": "{n}m",
   "quota.ageHours": "{n}h",
   "quota.ageDays": "{n}d",
   "quota.observedAgo": "Observed {age} ago",
-  "quota.observedHint": "Meta reports usage only during a streaming response, so this is the last value seen, not a live reading.",
+  "quota.observedHint":
+    "Meta reports usage only during a streaming response, so this is the last value seen, not a live reading.",
   "quota.weeklyLimit": "Weekly limit",
   "quota.monthlyLimit": "30-day limit",
   "quota.cursorFirstParty": "First-party models",
@@ -1721,7 +1956,8 @@ export const en = {
   "pws.status.connected": "Connected",
   "pws.attentionTitle": "Needs attention",
   "pws.attention.reauth": "Active account needs re-authentication",
-  "pws.attention.reauthForward": "Active Codex account needs re-authentication — open Accounts to fix it",
+  "pws.attention.reauthForward":
+    "Active Codex account needs re-authentication — open Accounts to fix it",
   "pws.attention.missingCredentials": "Missing credentials",
   "pws.cell.auth": "Authentication",
   "pws.cell.note": "Note",
@@ -1754,7 +1990,8 @@ export const en = {
   "pws.usageUnavailable": "No usage recorded yet.",
   "pws.rateLimits": "Rate limits",
   "pws.quotaUnavailable": "No quota data for this provider.",
-  "pws.accountQuotaUnavailable": "Rate-limit data temporarily unavailable; showing last known values when present.",
+  "pws.accountQuotaUnavailable":
+    "Rate-limit data temporarily unavailable; showing last known values when present.",
   "pws.quotaFailure.account_unavailable": "Account details are unavailable for this quota check.",
   "pws.quotaFailure.access_denied": "The provider denied access to quota data.",
   "pws.quotaFailure.rate_limited": "The provider rate-limited the quota check.",
@@ -1772,12 +2009,13 @@ export const en = {
   "pws.modelSearchPlaceholder": "Filter models…",
   "pws.modelsLoading": "Loading models…",
   "pws.modelsLoadFailed": "Could not load models.",
-  "pws.modelsNeedsReauth": "Account needs re-login before live model discovery works. Showing configured models for now.",
+  "pws.modelsNeedsReauth":
+    "Account needs re-login before live model discovery works. Showing configured models for now.",
   "pws.modelsConfiguredFallback": "Showing configured models (live discovery unavailable).",
   "pws.modelsTruncated": "Showing first {shown} of {total} models. Filter to narrow the list.",
   "pws.retry": "Retry",
   "pws.noModels": "No models discovered for this provider.",
- "pws.noModelMatch": "No models match the filter.",
+  "pws.noModelMatch": "No models match the filter.",
   "pws.adapterBaseRequired": "Adapter and base URL are required.",
   "pws.addAccount": "Add account",
   "pws.addKey": "Add API key",
@@ -1789,16 +2027,19 @@ export const en = {
   "pws.accountsLoadFailed": "Accounts could not be loaded.",
   "pws.retryAccounts": "Retry",
   "pws.noAccounts": "No accounts are connected yet.",
-  "pws.cockpitImportDescription": "Import a Cockpit Tools Antigravity JSON export from this device. The file contents are not shown.",
+  "pws.cockpitImportDescription":
+    "Import a Cockpit Tools Antigravity JSON export from this device. The file contents are not shown.",
   "pws.cockpitImportFileLabel": "Cockpit Tools Antigravity JSON export",
   "pws.cockpitImportChooseFile": "Choose JSON file",
   "pws.cockpitImporting": "Importing…",
   "pws.cockpitImportInvalid": "The selected file is not a valid JSON export or is too large.",
   "pws.cockpitImportFailed": "The account import could not be completed.",
-  "pws.cockpitImportComplete": "Import complete: {imported} imported, {updated} updated, {failed} failed, {unsupported} unsupported.",
+  "pws.cockpitImportComplete":
+    "Import complete: {imported} imported, {updated} updated, {failed} failed, {unsupported} unsupported.",
   "pws.accountSwitching": "Switching…",
   "pws.accountCurrent": "Current account",
-  "pws.accountPausedHint": "Excluded from automatic selection, retries, cooldown recovery, manual selection, and proactive token refresh until resumed.",
+  "pws.accountPausedHint":
+    "Excluded from automatic selection, retries, cooldown recovery, manual selection, and proactive token refresh until resumed.",
   "pws.defaultModelNone": "None (use provider default)",
   "pws.discardSettings": "Discard",
   "pws.jsonEditorDesc": "Edit the raw provider JSON config. Changes are saved immediately.",
@@ -1809,17 +2050,21 @@ export const en = {
   "pws.notLoggedInTitle": "Not logged in",
   "pws.note": "Note",
   "pws.responsesReasoningReplay": "Replay plaintext reasoning",
-  "pws.responsesReasoningReplayHint": "Off by default. Sends prior plaintext reasoning to this endpoint and may increase token use. Enable only if the endpoint accepts reasoning replay.",
+  "pws.responsesReasoningReplayHint":
+    "Off by default. Sends prior plaintext reasoning to this endpoint and may increase token use. Enable only if the endpoint accepts reasoning replay.",
   "pws.allowPrivateNetwork": "Allow local/private network",
   "pws.liveModels": "Discover models from provider",
-  "pws.liveModelsDesc": "Fetch the provider's live model catalog. Turn this off to use only configured/static models.",
+  "pws.liveModelsDesc":
+    "Fetch the provider's live model catalog. Turn this off to use only configured/static models.",
   "pws.xaiChatOptIn": "Use Chat Completions for Grok 4.5 and 4.6",
-  "pws.xaiChatOptInDesc": "Off selects Responses. OAuth Responses requests use it by default. Other Grok models and tier behavior are unchanged.",
+  "pws.xaiChatOptInDesc":
+    "Off selects Responses. OAuth Responses requests use it by default. Other Grok models and tier behavior are unchanged.",
   "pws.xaiChatOptInMixed": "Only one model uses Chat.",
   "pws.cursorTransport": "Cursor transport",
   "pws.cursorTransportHttp2": "HTTP/2 (default)",
   "pws.cursorTransportHttp1": "HTTP/1.1 (proxy compatibility)",
-  "pws.cursorTransportDesc": "Use HTTP/1.1 when your proxy cannot reliably carry Cursor's HTTP/2 stream.",
+  "pws.cursorTransportDesc":
+    "Use HTTP/1.1 when your proxy cannot reliably carry Cursor's HTTP/2 stream.",
   "pws.optionalPlaceholder": "Optional",
   "pws.providerId": "Provider ID",
   "pws.reauth": "Needs re-auth",
@@ -1834,39 +2079,47 @@ export const en = {
   "pws.healthLabel.refreshFailed": "Refresh failed",
   "pws.healthLabel.metadataMismatch": "Metadata mismatch",
   "pws.healthLabel.validationPending": "Validation pending",
-  "pws.healthSummary.validationPending": "{provider} {account}: registered while quota-limited. After quota recovers, refresh quotas to run a small validation request. Routing stays disabled until it succeeds.",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}: registered while quota-limited. After quota recovers, refresh quotas to run a small validation request. Routing stays disabled until it succeeds.",
   "pws.healthLabel.credentialConflict": "Credential conflict",
-  "pws.healthSummary.rateLimited": "{provider} {account}: rate limited until {until}. Routing for this account is paused until then.",
-  "pws.healthSummary.quotaLimited": "{provider} {account}: quota limited until {until}. Routing for this account is paused until then.",
+  "pws.healthSummary.rateLimited":
+    "{provider} {account}: rate limited until {until}. Routing for this account is paused until then.",
+  "pws.healthSummary.quotaLimited":
+    "{provider} {account}: quota limited until {until}. Routing for this account is paused until then.",
   "pws.healthSummary.reauthRequired": "{provider} {account}: reauthentication required.",
   "pws.healthSummary.credentialConflict": "{provider} {account}: credential conflict.",
   "pws.healthSummary.metadataMismatch": "{provider} {account}: metadata mismatch.",
   "pws.healthSummary.staleCredentials": "{provider} {account}: incomplete credentials.",
   "pws.removeConfirm": "Remove",
-  "pws.removeConfirmBody": "Remove provider \"{name}\"? This cannot be undone.",
-  "pws.removeDefaultConfirmBody": "Remove default provider \"{name}\"? \"{defaultProvider}\" will become the default provider. This cannot be undone.",
+  "pws.removeConfirmBody": 'Remove provider "{name}"? This cannot be undone.',
+  "pws.removeDefaultConfirmBody":
+    'Remove default provider "{name}"? "{defaultProvider}" will become the default provider. This cannot be undone.',
   "pws.removeConfirmTitle": "Remove provider",
   "pws.saveSettings": "Save",
   "pws.keySelection": "API key selection",
   "pws.keyActive": "Active key (existing behavior)",
-  "pws.keyLimitInvalid": "Per-key limits must be positive and within the supported range; interval and concurrency must be whole numbers.",
+  "pws.keyLimitInvalid":
+    "Per-key limits must be positive and within the supported range; interval and concurrency must be whole numbers.",
   "pws.keyRoundRobin": "Round-robin",
   "pws.keyLimits": "Per-key limits",
-  "pws.keySharedQuota": "Provider limits still apply across all keys. Keys in the same project may share quotas; RPM limits do not enforce token or daily budgets.",
+  "pws.keySharedQuota":
+    "Provider limits still apply across all keys. Keys in the same project may share quotas; RPM limits do not enforce token or daily budgets.",
   "pws.keyHandle": "Key ID",
   "pws.keyStarts": "Started",
   "pws.keyInFlight": "In flight",
   "pws.keyWait": "Wait",
   "pws.keyCooldown": "Cooldown",
   "pws.pacingTitle": "Request pacing",
-  "pws.pacingDesc": "Evenly delay outbound request starts for this provider. Streaming responses may overlap.",
+  "pws.pacingDesc":
+    "Evenly delay outbound request starts for this provider. Streaming responses may overlap.",
   "pws.pacingEnabled": "Enabled",
   "pws.pacingRpm": "Requests per minute",
   "pws.pacingConcurrency": "Max concurrent requests",
   "pws.pacingRpmUnit": "RPM",
   "pws.pacingCapUnit": "×",
   "pws.pacingDelay": "Minimum interval (ms)",
-  "pws.pacingSlowerWins": "The slower provider limit wins. Model overrides can only add more delay or lower the concurrency cap.",
+  "pws.pacingSlowerWins":
+    "The slower provider limit wins. Model overrides can only add more delay or lower the concurrency cap.",
   "pws.pacingQueued": "queued",
   "pws.pacingNextSlot": "until next slot",
   "pws.pacingLastModel": "last model",
@@ -1876,13 +2129,15 @@ export const en = {
   "pws.pacingAdd": "Add override",
   "pws.pacingRemove": "Remove",
   "pws.pacingRemoveModel": "Remove request pacing override for {model}",
-  "pws.pacingRuleRequired": "Enable request pacing only after setting a provider limit or a model override.",
+  "pws.pacingRuleRequired":
+    "Enable request pacing only after setting a provider limit or a model override.",
   "pws.pacingCapInvalid": "Max concurrent requests must be a whole number of 1 or more.",
   "pws.saving": "Saving…",
   "pws.settingsSaved": "Settings saved.",
   "pws.accountModeSaved": "Account mode saved.",
   "pws.accountModeFailed": "Could not switch the account mode.",
-  "pws.accountModeConfirm": "Switch the OpenAI account mode? Running conversations will be reassigned to the other mode's account set, and quota usage will be tracked against the new mode.",
+  "pws.accountModeConfirm":
+    "Switch the OpenAI account mode? Running conversations will be reassigned to the other mode's account set, and quota usage will be tracked against the new mode.",
   "pws.settingsUnsavedBar": "You have unsaved changes.",
   "pws.unsavedLeaveBody": "You have unsaved changes. Save them before leaving?",
   "pws.unsavedLeaveTitle": "Unsaved changes",
@@ -1899,8 +2154,10 @@ export const en = {
   "pws.capacity.nextRecovery": "Next capacity recovery",
   "pws.capacity.recoveryShare": "+{percent}% pool capacity",
   "pws.capacity.incomplete": "Incomplete coverage: {excluded} account(s) excluded",
-  "pws.capacity.uncalibratedPlan": "{count} account(s) on an uncalibrated plan are counted at the baseline seat weight, so this estimate may be conservative",
-  "pws.capacity.partial": "Partial window coverage: {count} account(s) do not report every displayed limit window",
+  "pws.capacity.uncalibratedPlan":
+    "{count} account(s) on an uncalibrated plan are counted at the baseline seat weight, so this estimate may be conservative",
+  "pws.capacity.partial":
+    "Partial window coverage: {count} account(s) do not report every displayed limit window",
   "pws.capacity.windowPartial": "Partial",
   "pws.capacity.windowPartialA11y": "{window}: incomplete account coverage",
   "pws.dashboard.recentlyUsed": "RECENTLY USED",
@@ -1935,8 +2192,10 @@ export const en = {
   "time.daysAgo": "{n}d ago",
   "modal.noMatch": "No match.",
   "modal.oauthDefaultNote": "Log in with your account — no API key needed.",
-  "modal.oauthComingSoon": "OAuth login for {label} arrives in the next update. Use an API key for now.",
-  "modal.oauthComingSoonShort": "OAuth login for this provider arrives in the next update — use an API key for now.",
+  "modal.oauthComingSoon":
+    "OAuth login for {label} arrives in the next update. Use an API key for now.",
+  "modal.oauthComingSoonShort":
+    "OAuth login for this provider arrives in the next update — use an API key for now.",
   "modal.useApiKeyInstead": "Use an API key instead",
   "modal.setupGuide": "Setup guide",
   "modal.setupStep1Prefix": "Go to",
@@ -1945,11 +2204,12 @@ export const en = {
   "modal.setupStep2": "Paste it in the API key field below",
   "modal.setupStep3": "Click Add provider — models are auto-discovered",
   "modal.namePlaceholder": "e.g. openrouter",
-  "modal.duplicateWarn": "Provider \"{name}\" exists and will be overwritten.",
+  "modal.duplicateWarn": 'Provider "{name}" exists and will be overwritten.',
   "modal.forwardHintPrefix": "No key needed — the proxy forwards your",
   "modal.forwardCredentials": "codex login",
   "modal.forwardHintSuffix": "credentials to this provider.",
-  "modal.localHint": "No API key is stored. This adds Cursor's static public model catalog for Codex, but live Cursor transport and native file/shell execution remain disabled until audited.",
+  "modal.localHint":
+    "No API key is stored. This adds Cursor's static public model catalog for Codex, but live Cursor transport and native file/shell execution remain disabled until audited.",
   "modal.getApiKey": "Get your {label} API key",
   "modal.apiKey": "API key",
   "modal.apiKeyTransport": "API key header",
@@ -1957,12 +2217,14 @@ export const en = {
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
   "modal.apiKeyPlaceholder": "sk-… (or $ENV_VAR)",
   "modal.defaultModelPlaceholder": "e.g. gpt-5.5",
- "modal.baseUrlPlaceholder": "https://...",
-  "modal.baseUrlPlaceholderError": "Base URL contains an unresolved {placeholder}. Replace it with your actual value.",
-  "modal.baseUrlPlaceholderHint": "Replace the {placeholder} in the Base URL with your actual Account ID before adding.",
+  "modal.baseUrlPlaceholder": "https://...",
+  "modal.baseUrlPlaceholderError":
+    "Base URL contains an unresolved {placeholder}. Replace it with your actual value.",
+  "modal.baseUrlPlaceholderHint":
+    "Replace the {placeholder} in the Base URL with your actual Account ID before adding.",
   "modal.adding": "Adding…",
   "modal.useOauthLogin": "← Use OAuth login",
-"nav.codexAuth": "Codex Auth",
+  "nav.codexAuth": "Codex Auth",
   "nav.codexSet": "Codex",
   "nav.connect": "Route",
   "nav.usageLogs": "Usage & Logs",
@@ -1970,36 +2232,46 @@ export const en = {
   "codexSet.tab.multiauth": "Multi-auth",
   "codexSet.tab.prompt": "Prompt",
   "codexSet.prompt.title": "Prompt layers",
-  "codexSet.prompt.timing": "Applies to newly started sessions. Running sessions keep their current prompt settings.",
+  "codexSet.prompt.timing":
+    "Applies to newly started sessions. Running sessions keep their current prompt settings.",
   "codexSet.prompt.staleRevision": "The configuration changed elsewhere. The list was reloaded.",
-"codexSet.prompt.writeFailed": "The change could not be saved.",
-"codexSet.prompt.loadFailed": "The prompt layers could not be loaded.",
+  "codexSet.prompt.writeFailed": "The change could not be saved.",
+  "codexSet.prompt.loadFailed": "The prompt layers could not be loaded.",
   "codexSet.prompt.repair": "Repair",
   "codexSet.prompt.repairFailed": "The repair could not be completed.",
   "codexSet.prompt.remeasure": "Re-measure",
-  "codexSet.drift.journalPresent": "A previous write did not finish. Recovery runs automatically on the next write.",
-  "codexSet.drift.projectionStale": "The saved layers and the value in config.toml disagree. Repair rewrites the value from your layers.",
-  "codexSet.drift.storeMissing": "The layer file is gone while instructions remain in config.toml. Repair keeps the text as one layer and writes a backup first.",
-  "codexSet.drift.ownedMalformed": "The generated line in config.toml was reshaped by hand, so it is no longer safe to rewrite.",
-  "codexSet.custom.adoptUnsupported": "The value at {path} line {line} is not a single-line string, so it cannot be imported. Move it by hand to manage it here.",
-  "codexSet.prompt.unreadable": "The Codex configuration file exists but could not be read, so changes are refused.",
+  "codexSet.drift.journalPresent":
+    "A previous write did not finish. Recovery runs automatically on the next write.",
+  "codexSet.drift.projectionStale":
+    "The saved layers and the value in config.toml disagree. Repair rewrites the value from your layers.",
+  "codexSet.drift.storeMissing":
+    "The layer file is gone while instructions remain in config.toml. Repair keeps the text as one layer and writes a backup first.",
+  "codexSet.drift.ownedMalformed":
+    "The generated line in config.toml was reshaped by hand, so it is no longer safe to rewrite.",
+  "codexSet.custom.adoptUnsupported":
+    "The value at {path} line {line} is not a single-line string, so it cannot be imported. Move it by hand to manage it here.",
+  "codexSet.prompt.unreadable":
+    "The Codex configuration file exists but could not be read, so changes are refused.",
   "codexSet.layer.permissions": "Permissions",
   "codexSet.layer.collaboration": "Collaboration mode",
   "codexSet.layer.environment": "Environment context",
   "codexSet.layer.apps": "Apps",
-"codexSet.layer.skills": "Skills",
-"codexSet.prompt.extensionsUnknown": "Extensions can add their own layers. Codex does not expose them, so they cannot be listed here.",
+  "codexSet.layer.skills": "Skills",
+  "codexSet.prompt.extensionsUnknown":
+    "Extensions can add their own layers. Codex does not expose them, so they cannot be listed here.",
   "codexSet.group.transition": "Transition notices",
-  "codexSet.group.transitionDesc": "These announce a change rather than describe state, so they appear only when the session enters realtime or switches model. Their numbers keep the assembly order, so the list above skips ahead.",
+  "codexSet.group.transitionDesc":
+    "These announce a change rather than describe state, so they appear only when the session enters realtime or switches model. Their numbers keep the assembly order, so the list above skips ahead.",
   "codexSet.custom.slotNote": "Custom layers are joined into one section in this order.",
-"codexSet.row.alwaysOn": "Always on",
+  "codexSet.row.alwaysOn": "Always on",
   "codexSet.row.onChange": "Fires on change",
-"codexSet.row.featureGated": "Configured under [features]",
+  "codexSet.row.featureGated": "Configured under [features]",
   "codexSet.row.openFeatures": "Open settings",
   "codexSet.row.resetDefault": "Reset to {value}",
   "codexSet.dialog.setValue": "{value} (default {fallback})",
-"codexSet.dialog.copyKey": "Copy key",
-"codexSet.dialog.unknownLayer": "This build has no description for this layer. It comes from a newer Codex runtime than the dashboard.",
+  "codexSet.dialog.copyKey": "Copy key",
+  "codexSet.dialog.unknownLayer":
+    "This build has no description for this layer. It comes from a newer Codex runtime than the dashboard.",
   "codexSet.custom.heading": "Custom layers",
   "codexSet.custom.add": "+ Add layer",
   "codexSet.custom.newTitle": "New layer",
@@ -2012,17 +2284,19 @@ export const en = {
   "codexSet.custom.titleTooLong": "Title is {count} characters; the limit is {max}.",
   "codexSet.custom.titleMultiline": "A title must be a single line.",
   "codexSet.custom.bodyTooLarge": "This layer is {bytes} bytes; the limit is {max}.",
-  "codexSet.custom.composedTooLarge": "Together the enabled layers would be {bytes} bytes, over the limit.",
+  "codexSet.custom.composedTooLarge":
+    "Together the enabled layers would be {bytes} bytes, over the limit.",
   "codexSet.custom.invalidCharacter": "A control character at position {position} cannot be saved.",
   "codexSet.custom.discardPrompt": "Discard your changes?",
-  "codexSet.custom.discardOthersAndSave": "Discard unsaved edits to other layers and save this layer?",
+  "codexSet.custom.discardOthersAndSave":
+    "Discard unsaved edits to other layers and save this layer?",
   "codexSet.custom.keepEditing": "Keep editing",
   "codexSet.custom.delete": "Delete {title}",
   "codexSet.custom.deleteConfirm": "Delete this layer? You can undo for a short time.",
   "codexSet.custom.layerGone": "That layer was removed elsewhere, so the editor was closed.",
   "codexSet.custom.deleteConfirmNamed": "Delete “{title}”? You can undo for a short time.",
   "codexSet.custom.deletedNamed": "Deleted “{title}”.",
-"codexSet.custom.moveUp": "Move {title} up",
+  "codexSet.custom.moveUp": "Move {title} up",
   "codexSet.custom.prevLayer": "Previous layer",
   "codexSet.custom.nextLayer": "Next layer",
   "codexSet.custom.navPosition": "{position} / {total}",
@@ -2030,54 +2304,74 @@ export const en = {
   "codexSet.custom.limitReached": "You can keep up to {max} custom layers.",
   "codexSet.custom.composedSize": "Composed: {bytes} of {max} bytes",
   "codexSet.custom.composedPreview": "Show the composed developer_instructions",
-  "codexSet.custom.notOwned": "developer_instructions was written outside opencodex, so it is not edited from here. Import it to manage it as a layer.",
+  "codexSet.custom.notOwned":
+    "developer_instructions was written outside opencodex, so it is not edited from here. Import it to manage it as a layer.",
   "codexSet.custom.adopt": "Import existing instructions",
   "codexSet.custom.adoptConfirm": "Import as a layer",
   "codexSet.custom.adoptRefused": "The existing value could not be imported.",
-  "codexSet.custom.baseReplaced": "model_instructions_file is set to {path}, so something outside opencodex has replaced the base prompt.",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file is set to {path}, so something outside opencodex has replaced the base prompt.",
   "codexSet.custom.baseReplacedOpen": "Manage it",
   "codexSet.lint.identity": "This claims a different identity from the one Codex establishes.",
   "codexSet.lint.foreignTool": "Tools come from the registry; naming one here does not create it.",
-  "codexSet.lint.placeholder": "No template engine runs over instructions, so this ships literally.",
+  "codexSet.lint.placeholder":
+    "No template engine runs over instructions, so this ships literally.",
   "codexSet.lint.applyPatch": "apply_patch is defined by the tool registry, not by instructions.",
-  "codexSet.lint.approvalVocab": "Codex injects its own approval vocabulary; this may contradict it.",
+  "codexSet.lint.approvalVocab":
+    "Codex injects its own approval vocabulary; this may contradict it.",
   "codexSet.lint.environment": "Environment facts are generated later and may contradict this.",
-"codexSet.lint.size": "This layer is over 8 KB. It still saves, but it costs tokens on every request.",
-  "codexSet.lint.secret": "Looks like a credential or API key - it would be stored in plain text in config.toml.",
-  "codexSet.lint.ignoreInstructions": "Telling Codex to ignore its own instructions can strip its built-in guidance.",
+  "codexSet.lint.size":
+    "This layer is over 8 KB. It still saves, but it costs tokens on every request.",
+  "codexSet.lint.secret":
+    "Looks like a credential or API key - it would be stored in plain text in config.toml.",
+  "codexSet.lint.ignoreInstructions":
+    "Telling Codex to ignore its own instructions can strip its built-in guidance.",
   "codexSet.preset.blank": "Blank layer",
   "codexSet.preset.concise.name": "Concise output",
   "codexSet.preset.concise.description": "Short answers, no preamble, minimal formatting.",
-  "codexSet.preset.concise.provenance": "Adapted from Claude Code's brevity directives. Our wording, not a copy.",
+  "codexSet.preset.concise.provenance":
+    "Adapted from Claude Code's brevity directives. Our wording, not a copy.",
   "codexSet.preset.planFirst.name": "Plan before editing",
   "codexSet.preset.planFirst.description": "State the plan, then make the change.",
-  "codexSet.preset.planFirst.provenance": "Adapted from Claude Code's planning posture. Our wording, not a copy.",
+  "codexSet.preset.planFirst.provenance":
+    "Adapted from Claude Code's planning posture. Our wording, not a copy.",
   "codexSet.preset.explainWhy.name": "Explain reasoning",
   "codexSet.preset.explainWhy.description": "Say why, not only what.",
-  "codexSet.preset.explainWhy.provenance": "Adapted from Grok Build's confirmation style. Our wording, not a copy.",
+  "codexSet.preset.explainWhy.provenance":
+    "Adapted from Grok Build's confirmation style. Our wording, not a copy.",
   "codexSet.preset.testFirst.name": "Test first",
   "codexSet.preset.testFirst.description": "Write the failing test before the fix.",
-  "codexSet.preset.testFirst.provenance": "Adapted from common agent practice. Our wording, not a copy.",
+  "codexSet.preset.testFirst.provenance":
+    "Adapted from common agent practice. Our wording, not a copy.",
   "codexSet.preset.korean.name": "Korean replies",
   "codexSet.preset.korean.description": "Answer in Korean whatever language the request uses.",
-  "codexSet.preset.korean.provenance": "Written for opencodex from a user-requested staple. Our wording, not a copy.",
+  "codexSet.preset.korean.provenance":
+    "Written for opencodex from a user-requested staple. Our wording, not a copy.",
   "codexSet.dialog.class": "Kind",
   "codexSet.dialog.key": "Config key",
   "codexSet.dialog.fileValue": "Value in this file",
   "codexSet.dialog.absentDefault": "not set (defaults to {value})",
-"codexSet.dialog.noRenderedText": "Codex does not expose the assembled text of a built-in layer, so this dialog describes the layer and names its key rather than showing its contents.",
-  "codexSet.dialog.probeNotFound": "Could not measure the rendered text: the codex executable was not found.",
-  "codexSet.dialog.probeUnsupported": "Could not measure: this Codex version does not support the measurement command.",
+  "codexSet.dialog.noRenderedText":
+    "Codex does not expose the assembled text of a built-in layer, so this dialog describes the layer and names its key rather than showing its contents.",
+  "codexSet.dialog.probeNotFound":
+    "Could not measure the rendered text: the codex executable was not found.",
+  "codexSet.dialog.probeUnsupported":
+    "Could not measure: this Codex version does not support the measurement command.",
   "codexSet.dialog.probeInvalid": "Could not measure: Codex output could not be parsed.",
   "codexSet.dialog.probeFailed": "Could not measure: the Codex probe did not finish.",
   "codexSet.dialog.probeBusy": "Another measurement is still finishing. Retry in a moment.",
   "codexSet.dialog.sourceText": "Text sent to the model",
   "codexSet.dialog.sourceBytes": "{bytes} bytes",
-"codexSet.dialog.notRendered": "This layer sent nothing on the turn we read. Sections are only re-sent when they change, so an unchanged layer is absent from a single sample.",
-  "codexSet.dialog.emptySource": "The file at {path} exists but is empty, so this layer sends nothing.",
-  "codexSet.dialog.notExposed": "The base prompt travels outside the message list Codex can print, so it cannot be shown here. Replacing it is possible through model_instructions_file.",
-  "codexSet.dialog.unmapped": "This layer has no confirmed mapping in the prompt output, so its text cannot be shown here yet.",
-  "codexSet.dialog.textUnavailable": "The Codex prompt could not be read on this machine, so the text is unavailable.",
+  "codexSet.dialog.notRendered":
+    "This layer sent nothing on the turn we read. Sections are only re-sent when they change, so an unchanged layer is absent from a single sample.",
+  "codexSet.dialog.emptySource":
+    "The file at {path} exists but is empty, so this layer sends nothing.",
+  "codexSet.dialog.notExposed":
+    "The base prompt travels outside the message list Codex can print, so it cannot be shown here. Replacing it is possible through model_instructions_file.",
+  "codexSet.dialog.unmapped":
+    "This layer has no confirmed mapping in the prompt output, so its text cannot be shown here yet.",
+  "codexSet.dialog.textUnavailable":
+    "The Codex prompt could not be read on this machine, so the text is unavailable.",
   "codexSet.class.base": "Base instructions",
   "codexSet.class.config-toggle": "Switchable here",
   "codexSet.class.feature-gated": "Feature-gated",
@@ -2094,48 +2388,62 @@ export const en = {
   "codexSet.layer.tools": "Tools",
   "codexSet.layer.multi-agent-mode": "Multi-agent mode",
   "codexSet.layer.git-attribution": "Commit attribution",
-  "codexSet.about.base-instructions": "Codex's own instructions. They travel with the request itself and cannot be turned off.",
+  "codexSet.about.base-instructions":
+    "Codex's own instructions. They travel with the request itself and cannot be turned off.",
   "codexSet.about.model-switch": "Added when the session changes model mid-conversation.",
   "codexSet.about.personality": "Tone and voice guidance, governed by a feature flag.",
-  "codexSet.about.context-window-guidance": "Advice about the remaining context budget, governed by a feature flag.",
+  "codexSet.about.context-window-guidance":
+    "Advice about the remaining context budget, governed by a feature flag.",
   "codexSet.about.realtime": "Added for realtime sessions.",
-  "codexSet.about.agents-md": "Your project's AGENTS.md files. This page reports the layer; it never edits your project docs.",
+  "codexSet.about.agents-md":
+    "Your project's AGENTS.md files. This page reports the layer; it never edits your project docs.",
   "codexSet.about.permissions": "Explains the sandbox and approval settings in force.",
   "codexSet.about.collaboration": "Explains the active collaboration mode.",
   "codexSet.about.environment": "Working directory, platform, and other environment facts.",
-  "codexSet.about.environments-instructions": "Guidance for deferred execution environments, governed by a feature flag.",
+  "codexSet.about.environments-instructions":
+    "Guidance for deferred execution environments, governed by a feature flag.",
   "codexSet.about.apps": "How to use connected apps.",
-  "codexSet.about.plugins": "Added when a plugin is selected or any plugin advertises a capability.",
+  "codexSet.about.plugins":
+    "Added when a plugin is selected or any plugin advertises a capability.",
   "codexSet.about.tools": "Deferred tool descriptions, governed by a feature flag.",
   "codexSet.about.skills": "The list of available skills.",
   "codexSet.about.multi-agent-mode": "Subagent instructions, governed by a feature flag.",
-  "codexSet.about.git-attribution": "Tells the model to add a Co-authored-by: Codex trailer to commits it writes, and a Generated with Codex. line to pull requests it opens. Codex resolves this from your account, so there is no setting for it here or under [features]. When your account has it off, Codex sends the opposite instruction rather than sending nothing.",
+  "codexSet.about.git-attribution":
+    "Tells the model to add a Co-authored-by: Codex trailer to commits it writes, and a Generated with Codex. line to pull requests it opens. Codex resolves this from your account, so there is no setting for it here or under [features]. When your account has it off, Codex sends the opposite instruction rather than sending nothing.",
   "codexSet.condition.model-switch": "Emitted only after a mid-session model change.",
   "codexSet.condition.realtime": "Emitted only in a realtime session.",
   "codexSet.condition.agents-md": "Emitted when a project doc is found for the working directory.",
-  "codexSet.condition.plugins": "Emitted when a plugin is selected or any plugin advertises a capability.",
+  "codexSet.condition.plugins":
+    "Emitted when a plugin is selected or any plugin advertises a capability.",
   "codexSet.condition.git-attribution": "Set by your account's attribution policy.",
   "codexSet.base.title": "Base prompt",
   "codexSet.base.prev": "Previous option",
   "codexSet.base.next": "Next option",
   "codexSet.base.position": "{position} / {total}",
-  "codexSet.base.swipeHint": "Swipe sideways, use the arrow keys, or press the arrows to move between options. Applies to newly started sessions.",
+  "codexSet.base.swipeHint":
+    "Swipe sideways, use the arrow keys, or press the arrows to move between options. Applies to newly started sessions.",
   "codexSet.base.defaultTitle": "Codex's own base prompt",
-  "codexSet.base.defaultBody": "The default is not stored here, so there is nothing to edit or delete: choosing it simply removes model_instructions_file from your config, and Codex uses the prompt it ships with.",
+  "codexSet.base.defaultBody":
+    "The default is not stored here, so there is nothing to edit or delete: choosing it simply removes model_instructions_file from your config, and Codex uses the prompt it ships with.",
   "codexSet.base.variantTitle": "Name",
   "codexSet.base.variantBody": "Prompt",
-  "codexSet.base.replacesWarning": "This REPLACES Codex's own base prompt rather than adding to it. A short prompt here means a model with short instructions.",
+  "codexSet.base.replacesWarning":
+    "This REPLACES Codex's own base prompt rather than adding to it. A short prompt here means a model with short instructions.",
   "codexSet.base.use": "Use this one",
   "codexSet.base.inUse": "In use",
-  "codexSet.base.externalBlocked": "model_instructions_file already points at {path}, which opencodex did not write. Clear it yourself before choosing an option here — or import it into a variant.",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file already points at {path}, which opencodex did not write. Clear it yourself before choosing an option here — or import it into a variant.",
   "codexSet.base.import": "Import it as a variant",
-  "codexSet.base.importPreview": "The file at {path} is converted into a managed variant and installed exactly as shown below — the title becomes a `#` heading line and the body is normalized (CRLF becomes LF, tabs become 4 spaces).",
-  "codexSet.base.importFormat": "Stored verbatim: {serializedBytes} bytes total (body {bodyBytes} bytes). Codex reads the whole file, heading included.",
+  "codexSet.base.importPreview":
+    "The file at {path} is converted into a managed variant and installed exactly as shown below — the title becomes a `#` heading line and the body is normalized (CRLF becomes LF, tabs become 4 spaces).",
+  "codexSet.base.importFormat":
+    "Stored verbatim: {serializedBytes} bytes total (body {bodyBytes} bytes). Codex reads the whole file, heading included.",
   "codexSet.base.importTitle": "Variant title",
   "codexSet.base.importTitlePending": "Refreshing the preview for this title…",
   "codexSet.base.importConfirm": "Import and manage",
   "codexSet.base.importFailed": "The file could not be imported.",
-  "codexSet.base.importChanged": "The file or title changed since it was previewed. Preview it again.",
+  "codexSet.base.importChanged":
+    "The file or title changed since it was previewed. Preview it again.",
   "nav.api": "API",
   "nav.openMenu": "Open menu",
   "nav.closeMenu": "Close menu",
@@ -2144,7 +2452,8 @@ export const en = {
   "nav.expandSidebar": "Expand sidebar",
   "pws.refreshAllQuotas": "Refresh all quotas",
   "pws.quotaRefreshDone": "Quota check complete",
-  "integrations.subtitle": "Connect clients to opencodex, manage credentials, and restore client configuration.",
+  "integrations.subtitle":
+    "Connect clients to opencodex, manage credentials, and restore client configuration.",
   "integrations.tabsLabel": "Integration surfaces",
   "integrations.tab.overview": "Overview",
   "integrations.tab.keys": "API Keys",
@@ -2155,7 +2464,8 @@ export const en = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "Restart Gentle Shell to load the catalog in its saved home. Link/shared homes use the Pi integration.",
+  "integrations.semantics.gentleShell":
+    "Restart Gentle Shell to load the catalog in its saved home. Link/shared homes use the Pi integration.",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -2170,32 +2480,40 @@ export const en = {
   "integrations.tab.raycast": "Raycast",
   "integrations.tab.omo": "omo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "Manages OpenCodex models in ~/.qoder-cn/settings.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
+  "integrations.semantics.qoderCn":
+    "Manages OpenCodex models in ~/.qoder-cn/settings.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "Manages OpenCodex models in ~/.workbuddy/models.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
+  "integrations.semantics.workbuddy":
+    "Manages OpenCodex models in ~/.workbuddy/models.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "Manages OpenCodex models in ~/.workbuddy-ai/models.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
+  "integrations.semantics.workbuddyAi":
+    "Manages OpenCodex models in ~/.workbuddy-ai/models.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
-  "integrations.semantics.qoder": "Manages OpenCodex providers and custom models in ~/.qoder/settings.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
-  "integrations.semantics.t3code": "Adds an opencodex Claude provider instance to ~/.t3/userdata/settings.json (T3CODE_HOME relocates it). Routed models appear in T3 Code's model picker; Codex threads use the proxy only when the Codex integration is enabled and T3 Code shares the same CODEX_HOME. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
+  "integrations.semantics.qoder":
+    "Manages OpenCodex providers and custom models in ~/.qoder/settings.json. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
+  "integrations.semantics.t3code":
+    "Adds an opencodex Claude provider instance to ~/.t3/userdata/settings.json (T3CODE_HOME relocates it). Routed models appear in T3 Code's model picker; Codex threads use the proxy only when the Codex integration is enabled and T3 Code shares the same CODEX_HOME. Requires loopback access. Other settings are preserved; Undo restores the snapshot.",
   "integrations.tab.cline": "Cline CLI",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.droid": "Factory Droid",
   "integrations.droidReasoning.title": "Default reasoning effort",
-  "integrations.droidReasoning.description": "A default is used only when a request omits its reasoning effort. Disable Factory Droid to remove these saved defaults.",
+  "integrations.droidReasoning.description":
+    "A default is used only when a request omits its reasoning effort. Disable Factory Droid to remove these saved defaults.",
   "integrations.droidReasoning.noDefault": "No default",
   "integrations.droidReasoning.noEfforts": "No reasoning-effort options available",
   "integrations.droidReasoning.noModels": "No exported models are available.",
   "integrations.droidReasoning.modelDefault": "Default reasoning effort for {model}",
-  "integrations.droidReasoning.unsupportedTitle": "Some saved defaults are no longer supported. Clear them, then save / review changes to apply.",
+  "integrations.droidReasoning.unsupportedTitle":
+    "Some saved defaults are no longer supported. Clear them, then save / review changes to apply.",
   "integrations.droidReasoning.unsupportedEffort": "Unsupported effort: {effort}",
   "integrations.droidReasoning.clear": "Clear default",
   "integrations.droidReasoning.saveReview": "Save / review changes",
   "integrations.aside.profilesTitle": "Aside profiles",
-  "integrations.aside.profilesHint": "Choose which profiles receive the selected models. Aside’s active profile stays unchanged.",
+  "integrations.aside.profilesHint":
+    "Choose which profiles receive the selected models. Aside’s active profile stays unchanged.",
   "integrations.aside.all": "Sync all profiles",
   "integrations.aside.syncNow": "Sync now",
   "integrations.aside.applied": "{count} of {total} profiles applied",
@@ -2205,18 +2523,21 @@ export const en = {
   "integrations.aside.details": "Manage {name}",
   "integrations.aside.back": "All Aside profiles",
   "integrations.aside.empty": "Open Aside and create a profile to connect it.",
-  "integrations.aside.partial": "Some profiles need attention. Your sync choices are saved; check each profile’s state.",
+  "integrations.aside.partial":
+    "Some profiles need attention. Your sync choices are saved; check each profile’s state.",
   "integrations.aside.pending": "Sync choice saved; file update pending.",
   "integrations.aside.retry": "Retry {name}",
   "integrations.aside.loadError": "Could not load Aside profiles. Retry to check their state.",
   "integrations.hermes.profilesTitle": "Hermes profiles",
-  "integrations.hermes.profilesHint": "Each Hermes profile keeps its own config.yaml. Choose a profile to connect it; the others stay unchanged.",
+  "integrations.hermes.profilesHint":
+    "Each Hermes profile keeps its own config.yaml. Choose a profile to connect it; the others stay unchanged.",
   "integrations.hermes.defaultProfile": "Default profile",
   "integrations.hermes.select": "Manage {name}",
   "integrations.hermes.loadError": "Could not load Hermes profiles. Retry to check their state.",
   "integrations.hermes.profileTitle": "Hermes profile: {name}",
   "integrations.codex.title": "Codex CLI",
-  "integrations.codex.body": "Codex wiring is owned by the proxy service. Starting opencodex applies it; stopping the service restores native routing.",
+  "integrations.codex.body":
+    "Codex wiring is owned by the proxy service. Starting opencodex applies it; stopping the service restores native routing.",
   "integrations.codex.openService": "Open service controls",
   "integrations.state.notInstalled": "Not installed",
   "integrations.state.unknown": "Checking…",
@@ -2232,19 +2553,24 @@ export const en = {
   "integrations.detail.desktopNotServed": "The profile exists, but Desktop serves another one",
   "integrations.detail.desktopAbsent": "No profile applied",
   "integrations.detail.desktopDesiredOff": "Claude Desktop integration is off",
-  "integrations.detail.desktopDesiredOffCleanupPending": "Claude Desktop is still using the gateway; cleanup is pending",
-  "integrations.detail.desktopDesiredOnNotApplied": "Integration is on, but Desktop is not using the gateway profile",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "Claude Desktop is still using the gateway; cleanup is pending",
+  "integrations.detail.desktopDesiredOnNotApplied":
+    "Integration is on, but Desktop is not using the gateway profile",
   "integrations.detail.desktopSelectedElsewhere": "Desktop is using another profile",
   "integrations.detail.desktopProfileDrift": "The selected Desktop profile changed",
-  "integrations.detail.desktopObservedUnsafe": "The selected Desktop profile cannot be changed safely",
-  "integrations.detail.desktopNotInstalled": "Claude Desktop configuration library is not installed",
+  "integrations.detail.desktopObservedUnsafe":
+    "The selected Desktop profile cannot be changed safely",
+  "integrations.detail.desktopNotInstalled":
+    "Claude Desktop configuration library is not installed",
   "integrations.detail.grokModels": "{count} model(s) wired",
   "integrations.detail.grokAbsent": "No opencodex block in the config",
   "integrations.detail.cursorSeen": "Cursor called this proxy recently",
   "integrations.detail.cursorNeverSeen": "Private Inference installed; no request seen yet",
   "integrations.detail.cursorAbsent": "Cursor Private Inference not found",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "Cursor Private Inference runs its agent locally and talks to opencodex on loopback. Regular Cursor cannot: its backend calls the custom endpoint and needs a public HTTPS URL. This page never writes to Cursor; paste the values below into Cursor yourself.",
+  "integrations.cursor.intro":
+    "Cursor Private Inference runs its agent locally and talks to opencodex on loopback. Regular Cursor cannot: its backend calls the custom endpoint and needs a public HTTPS URL. This page never writes to Cursor; paste the values below into Cursor yourself.",
   "integrations.cursor.loading": "Reading Cursor status…",
   "integrations.cursor.unavailable": "Could not read the Cursor status from the proxy.",
   "integrations.cursor.detection": "Installed builds",
@@ -2252,60 +2578,90 @@ export const en = {
   "integrations.cursor.regular": "Cursor (regular)",
   "integrations.cursor.detected": "Detected",
   "integrations.cursor.notFound": "Not found",
-  "integrations.cursor.regularOnly": "Only regular Cursor was found. It routes custom endpoints through Cursor's servers, so a loopback proxy is unreachable without a public tunnel. See the guide for the Private Inference build.",
-  "integrations.cursor.nothingFound": "No Cursor install was found in the usual locations. If it is installed elsewhere, the values below still apply.",
+  "integrations.cursor.regularOnly":
+    "Only regular Cursor was found. It routes custom endpoints through Cursor's servers, so a loopback proxy is unreachable without a public tunnel. See the guide for the Private Inference build.",
+  "integrations.cursor.nothingFound":
+    "No Cursor install was found in the usual locations. If it is installed elsewhere, the values below still apply.",
   "integrations.cursor.gateway": "Gateway values",
-  "integrations.cursor.gatewayHint": "In Cursor Private Inference open Settings > Models > Gateway, paste these two values, then press Refresh model list.",
+  "integrations.cursor.gatewayHint":
+    "In Cursor Private Inference open Settings > Models > Gateway, paste these two values, then press Refresh model list.",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "API Key",
-  "integrations.cursor.apiKeyCredential": "One of your opencodex API keys (this bind requires a credential)",
+  "integrations.cursor.apiKeyCredential":
+    "One of your opencodex API keys (this bind requires a credential)",
   "integrations.cursor.copy": "Copy",
   "integrations.cursor.copied": "Copied",
   "integrations.cursor.connection": "Connection",
   "integrations.cursor.seen": "Last request from Cursor: {time} ({ua})",
-  "integrations.cursor.neverSeen": "No request from Cursor since the proxy started. After saving the gateway, press Refresh model list in Cursor.",
+  "integrations.cursor.neverSeen":
+    "No request from Cursor since the proxy started. After saving the gateway, press Refresh model list in Cursor.",
   "integrations.cursor.models": "What Cursor will show",
-  "integrations.cursor.modelsHint": "Cursor picks the Reasoning ladder from its own model table, so opencodex can only predict it. Context lists the default and the opt-in window (Cursor's Max Mode).",
-  "integrations.cursor.ladderFromBundle": "Reasoning ladders read from the installed Cursor Private Inference {version} bundle. Cursor decides them; opencodex only reports its table.",
-  "integrations.cursor.ladderFromStatic": "Reasoning ladders are a static mirror of Cursor 3.18.25 (no readable Private Inference bundle was found). Context lists the default and the opt-in window.",
+  "integrations.cursor.modelsHint":
+    "Cursor picks the Reasoning ladder from its own model table, so opencodex can only predict it. Context lists the default and the opt-in window (Cursor's Max Mode).",
+  "integrations.cursor.ladderFromBundle":
+    "Reasoning ladders read from the installed Cursor Private Inference {version} bundle. Cursor decides them; opencodex only reports its table.",
+  "integrations.cursor.ladderFromStatic":
+    "Reasoning ladders are a static mirror of Cursor 3.18.25 (no readable Private Inference bundle was found). Context lists the default and the opt-in window.",
   "integrations.cursor.unknownVersion": "unknown version",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "single window",
-  "integrations.cursor.noControlTitle": "This id is not in Cursor's built-in effort table, so Cursor shows no Reasoning control.",
+  "integrations.cursor.noControlTitle":
+    "This id is not in Cursor's built-in effort table, so Cursor shows no Reasoning control.",
   "integrations.cursor.effortRowsOne": "1 effort row published",
   "integrations.cursor.effortRowsMany": "{n} effort rows published",
   "integrations.cursor.effortRowsOff": "no effort rows",
-  "integrations.cursor.tableLessHint": "Rows marked — get no Reasoning control in Cursor. Turn on cursorEffortRows to publish one picker entry per effort (id--effort), or set modelDefaultReasoningEfforts on the provider for a fixed default.",
+  "integrations.cursor.tableLessHint":
+    "Rows marked — get no Reasoning control in Cursor. Turn on cursorEffortRows to publish one picker entry per effort (id--effort), or set modelDefaultReasoningEfforts on the provider for a fixed default.",
   "integrations.cursor.colModel": "Model",
   "integrations.cursor.colReasoning": "Reasoning",
   "integrations.cursor.colContext": "Context",
   "integrations.cursor.guide": "Open the Cursor Private Inference guide",
   "integrations.dialog.codex.title": "Disable the Codex integration?",
-  "integrations.dialog.codex.changes": "opencodex will remove its routing from {path}, remove its generated profile, restore the native model catalog, and retag resumable threads for native Codex.",
-  "integrations.dialog.codex.breakage": "Plain codex will connect directly to OpenAI, and models routed from other providers will disappear from Codex. The proxy and /v1/responses stay running for other clients.",
-  "integrations.dialog.codex.undo": "Turning this back on rebuilds the routed catalog from the models available then and injects Codex again. Resume history is made usable in the matching direction, but its files are not restored byte for byte.",
-  "integrations.dialog.codex.sideEffect": "If you selected a routed root model after opencodex injected the config, disabling removes that model selection and turning the integration back on cannot reconstruct it; select the model again. If an external model_provider owns Codex, opencodex removes only its stale journal and leaves the config, catalog, and history unchanged.",
+  "integrations.dialog.codex.changes":
+    "opencodex will remove its routing from {path}, remove its generated profile, restore the native model catalog, and retag resumable threads for native Codex.",
+  "integrations.dialog.codex.breakage":
+    "Plain codex will connect directly to OpenAI, and models routed from other providers will disappear from Codex. The proxy and /v1/responses stay running for other clients.",
+  "integrations.dialog.codex.undo":
+    "Turning this back on rebuilds the routed catalog from the models available then and injects Codex again. Resume history is made usable in the matching direction, but its files are not restored byte for byte.",
+  "integrations.dialog.codex.sideEffect":
+    "If you selected a routed root model after opencodex injected the config, disabling removes that model selection and turning the integration back on cannot reconstruct it; select the model again. If an external model_provider owns Codex, opencodex removes only its stale journal and leaves the config, catalog, and history unchanged.",
   "integrations.dialog.codex.confirm": "Disable",
   "integrations.dialog.grok.title": "Disable the Grok Build integration?",
-  "integrations.dialog.grok.changes": "Only the block marked by opencodex will be removed from {path}. Content written outside the block will remain unchanged.",
-  "integrations.dialog.grok.breakage": "Disabling removes the opencodex model aliases from Grok Build. Models used with your xAI account remain available.",
-  "integrations.dialog.grok.undo": "If opencodex is running on a loopback address, turning this back on writes a new block from the models currently available.",
+  "integrations.dialog.grok.changes":
+    "Only the block marked by opencodex will be removed from {path}. Content written outside the block will remain unchanged.",
+  "integrations.dialog.grok.breakage":
+    "Disabling removes the opencodex model aliases from Grok Build. Models used with your xAI account remain available.",
+  "integrations.dialog.grok.undo":
+    "If opencodex is running on a loopback address, turning this back on writes a new block from the models currently available.",
   "integrations.dialog.grok.confirm": "Disable",
   "integrations.dialog.desktop.title": "Disable Claude Desktop integration?",
-  "integrations.dialog.desktop.changes": "If {path} contains an opencodex-managed gateway profile, Desktop will first select a new credential-free standard profile, then remove the old profile and backup.",
-  "integrations.dialog.desktop.breakage": "Claude Desktop will return to standard Claude instead of models routed through opencodex.",
-  "integrations.dialog.desktop.undo": "Turning this back on regenerates the opencodex profile from your saved model assignments.",
-  "integrations.dialog.desktop.restart": "Claude Desktop reads this configuration only at launch. Fully quit and reopen it for this change to take effect.",
+  "integrations.dialog.desktop.changes":
+    "If {path} contains an opencodex-managed gateway profile, Desktop will first select a new credential-free standard profile, then remove the old profile and backup.",
+  "integrations.dialog.desktop.breakage":
+    "Claude Desktop will return to standard Claude instead of models routed through opencodex.",
+  "integrations.dialog.desktop.undo":
+    "Turning this back on regenerates the opencodex profile from your saved model assignments.",
+  "integrations.dialog.desktop.restart":
+    "Claude Desktop reads this configuration only at launch. Fully quit and reopen it for this change to take effect.",
   "integrations.dialog.desktop.confirm": "Disable",
-  "integrations.native.msg.nonLoopbackRemoved": "Grok Build can be registered automatically only while opencodex runs on a loopback address. The previous block that pointed to loopback was removed.",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "Grok Build can be registered automatically only while opencodex runs on a loopback address. There was no previous block to remove.",
-  "integrations.native.msg.nonLoopbackSuperseded": "Grok Build can be registered automatically only while opencodex runs on a loopback address. Another process wrote a new block in the meantime, so the block now in the file was not created by this request.",
-  "integrations.native.error.orphanedMarker": "{path} has an opencodex start marker but no end marker. The file was left unchanged because opencodex cannot determine where its block ends.",
-  "integrations.native.error.homeMismatch": "The installed service home does not match the current home, so the file was left unchanged.",
-  "integrations.native.error.notInstalled": "Grok Build is not installed, so there is nothing to change.",
-  "integrations.native.error.configBusy": "The configuration is being saved elsewhere and could not be changed. Try again shortly.",
-  "integrations.native.error.desktopUnsafeMetadata": "Claude Desktop metadata at {path} could not be read safely, so its library was not changed.",
-  "integrations.native.error.desktopCleanupIncomplete": "Claude Desktop is pointed at standard mode, but old opencodex credential files remain at: {paths}.",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "Grok Build can be registered automatically only while opencodex runs on a loopback address. The previous block that pointed to loopback was removed.",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "Grok Build can be registered automatically only while opencodex runs on a loopback address. There was no previous block to remove.",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "Grok Build can be registered automatically only while opencodex runs on a loopback address. Another process wrote a new block in the meantime, so the block now in the file was not created by this request.",
+  "integrations.native.error.orphanedMarker":
+    "{path} has an opencodex start marker but no end marker. The file was left unchanged because opencodex cannot determine where its block ends.",
+  "integrations.native.error.homeMismatch":
+    "The installed service home does not match the current home, so the file was left unchanged.",
+  "integrations.native.error.notInstalled":
+    "Grok Build is not installed, so there is nothing to change.",
+  "integrations.native.error.configBusy":
+    "The configuration is being saved elsewhere and could not be changed. Try again shortly.",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "Claude Desktop metadata at {path} could not be read safely, so its library was not changed.",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "Claude Desktop is pointed at standard mode, but old opencodex credential files remain at: {paths}.",
   "integrations.native.msg.desktopDisabled": "Claude Desktop integration disabled.",
   "integrations.native.msg.desktopEnabled": "Claude Desktop integration enabled.",
   "integrations.state.absent": "Not applied",
@@ -2318,7 +2674,8 @@ export const en = {
   "integrations.summary.stale": "Update needed",
   "integrations.summary.lastChange": "Last change",
   "integrations.summary.disableAll": "Disable all…",
-  "integrations.onboarding": "Applying writes one opencodex provider block after saving a backup. Disable removes only that block, and a retained snapshot can be restored.",
+  "integrations.onboarding":
+    "Applying writes one opencodex provider block after saving a backup. Disable removes only that block, and a retained snapshot can be restored.",
   "integrations.empty.title": "No installed clients were detected",
   "integrations.empty.body": "Install a supported client, then return here to apply opencodex.",
   "integrations.action.apply": "Apply",
@@ -2339,44 +2696,60 @@ export const en = {
   "integrations.rollback.failed": "Could not load the rollback history.",
   "integrations.rollback.delete": "Delete",
   "integrations.rollback.deleteAria": "Delete the rollback entry from {at}",
-  "integrations.rollback.deleteNewest": "The most recent entry for this client is kept so you can still undo it.",
+  "integrations.rollback.deleteNewest":
+    "The most recent entry for this client is kept so you can still undo it.",
   "integrations.rollback.deleteGone": "This entry was already deleted. The list will refresh.",
   "integrations.dialog.deleteEntry.title": "Delete this rollback entry?",
-  "integrations.dialog.deleteEntry.changes": "This entry disappears from the rollback list, and any backup it still holds for {path} is deleted from disk.",
-  "integrations.dialog.deleteEntry.breakage": "You will no longer be able to restore the file to this point. Newer entries and the file itself are untouched.",
-  "integrations.dialog.deleteEntry.undo": "This cannot be undone. The most recent entry for each client is kept and cannot be deleted.",
+  "integrations.dialog.deleteEntry.changes":
+    "This entry disappears from the rollback list, and any backup it still holds for {path} is deleted from disk.",
+  "integrations.dialog.deleteEntry.breakage":
+    "You will no longer be able to restore the file to this point. Newer entries and the file itself are untouched.",
+  "integrations.dialog.deleteEntry.undo":
+    "This cannot be undone. The most recent entry for each client is kept and cannot be deleted.",
   "integrations.dialog.deleteEntry.confirm": "Delete entry",
   "integrations.restore.title": "Restore this snapshot?",
-  "integrations.restore.body": "The current file is backed up first, then the selected snapshot replaces it.",
+  "integrations.restore.body":
+    "The current file is backed up first, then the selected snapshot replaces it.",
   "integrations.restore.driftTitle": "Newer edits were detected",
-  "integrations.restore.driftBody": "Changes made after this snapshot will be backed up, then the file will be replaced.",
+  "integrations.restore.driftBody":
+    "Changes made after this snapshot will be backed up, then the file will be replaced.",
   "integrations.restore.confirm": "Restore",
   "integrations.restore.confirmDrift": "Back up newer edits and restore",
   "integrations.restore.pending": "Restoring…",
-  "integrations.restore.manual": "Automatic restore failed: {reason}. Restore manually from {path}.",
+  "integrations.restore.manual":
+    "Automatic restore failed: {reason}. Restore manually from {path}.",
   "integrations.error.load": "Could not load integration state.",
   "integrations.error.stale": "The latest refresh failed. The values below may be stale.",
   "integrations.error.busy": "Another change for this client is still running. Try again shortly.",
-  "integrations.error.conflict": "The config changed after opencodex wrote it. Nothing was removed.",
+  "integrations.error.conflict":
+    "The config changed after opencodex wrote it. Nothing was removed.",
   "integrations.error.unsafe": "The config cannot be changed safely.",
   "integrations.error.generic": "The integration change failed. Your previous state was kept.",
-  "integrations.error.nonLoopback": "{client} can only reach a proxy on localhost — its config has nowhere to put the admission header a remote bind requires, so writing one by hand would not help either. Give it loopback access instead, through a tunnel or a local forwarder.",
+  "integrations.error.nonLoopback":
+    "{client} can only reach a proxy on localhost — its config has nowhere to put the admission header a remote bind requires, so writing one by hand would not help either. Give it loopback access instead, through a tunnel or a local forwarder.",
   "integrations.status.installed": "Installed",
   "integrations.status.notInstalled": "Not installed",
   "integrations.status.appliedAt": "Applied",
-  "integrations.status.supersededStore": "This client now reads its providers from {path}, which opencodex does not write, so enabling it here would change nothing it loads.",
-  "integrations.status.missingStore": "This client keeps its providers in {path}, which is missing. opencodex will not write the client's old settings file instead, because the client moves that file aside and imports it on its next start. Create {path} containing {document}, then press Apply again.",
-  "integrations.status.candidateConflict": "Another Kilo config file, {path}, also defines provider.opencodex. Remove provider.opencodex from that file before applying.",
+  "integrations.status.supersededStore":
+    "This client now reads its providers from {path}, which opencodex does not write, so enabling it here would change nothing it loads.",
+  "integrations.status.missingStore":
+    "This client keeps its providers in {path}, which is missing. opencodex will not write the client's old settings file instead, because the client moves that file aside and imports it on its next start. Create {path} containing {document}, then press Apply again.",
+  "integrations.status.candidateConflict":
+    "Another Kilo config file, {path}, also defines provider.opencodex. Remove provider.opencodex from that file before applying.",
   "integrations.status.backup": "Backup",
   "integrations.status.lastRestore": "Last restore",
   "integrations.status.unknown": "Unknown",
   "integrations.bulk.title": "Disable applied client integrations?",
-  "integrations.bulk.body": "Only the opencodex-owned block is removed. A pre-write snapshot is kept for each client.",
+  "integrations.bulk.body":
+    "Only the opencodex-owned block is removed. A pre-write snapshot is kept for each client.",
   "integrations.bulk.partial": "Some clients could not be disabled: {clients}",
   "integrations.bulk.success": "Applied client integrations were disabled.",
-  "integrations.retention.degraded": "Backup cleanup is behind; older backups may still be on disk.",
-  "integrations.error.residual": "The file may be in an intermediate state: {message} Restore it from {path}.",
-  "integrations.error.residualNoSnapshot": "{message} Automatic recovery did not finish. Check the client configuration before retrying.",
+  "integrations.retention.degraded":
+    "Backup cleanup is behind; older backups may still be on disk.",
+  "integrations.error.residual":
+    "The file may be in an intermediate state: {message} Restore it from {path}.",
+  "integrations.error.residualNoSnapshot":
+    "{message} Automatic recovery did not finish. Check the client configuration before retrying.",
   "integrations.error.recover": "{message} A backup is at {path}.",
   "integrations.kind.apply": "Applied",
   "integrations.kind.disable": "Disabled",
@@ -2384,24 +2757,34 @@ export const en = {
   "integrations.kind.restore": "Restored",
   "integrations.kind.overwrite": "Overwritten",
   "integrations.dialog.overwrite.title": "Replace the block in this config?",
-  "integrations.dialog.overwrite.changesUnowned": "A block we did not write occupies the settings opencodex needs in {path}. Applying replaces it with the block opencodex would write.",
-  "integrations.dialog.overwrite.changesForeign": "Your edit inside the opencodex block in {path} will be discarded and replaced with the block opencodex would write.",
-  "integrations.dialog.overwrite.breakage": "Anything the other block configured stops taking effect. Content elsewhere in the file is left alone.",
-  "integrations.dialog.overwrite.undo": "A snapshot is saved first, so this appears in the rollback list below and can be undone.",
+  "integrations.dialog.overwrite.changesUnowned":
+    "A block we did not write occupies the settings opencodex needs in {path}. Applying replaces it with the block opencodex would write.",
+  "integrations.dialog.overwrite.changesForeign":
+    "Your edit inside the opencodex block in {path} will be discarded and replaced with the block opencodex would write.",
+  "integrations.dialog.overwrite.breakage":
+    "Anything the other block configured stops taking effect. Content elsewhere in the file is left alone.",
+  "integrations.dialog.overwrite.undo":
+    "A snapshot is saved first, so this appears in the rollback list below and can be undone.",
   "integrations.dialog.overwrite.confirm": "Replace",
   "integrations.action.overwrite": "Replace",
   "integrations.preview.loading": "Loading the exact change plan…",
   "integrations.preview.failed": "The change plan could not be loaded. Nothing was changed.",
-  "integrations.preview.stale": "The integration changed while you were confirming. Review the updated plan and confirm again.",
+  "integrations.preview.stale":
+    "The integration changed while you were confirming. Review the updated plan and confirm again.",
   "integrations.dialog.apply.title": "Apply this integration?",
-  "integrations.dialog.apply.changes": "opencodex will add its managed provider settings to the client configuration.",
-  "integrations.dialog.apply.breakage": "The client will use the models currently exposed by this opencodex instance.",
-  "integrations.dialog.apply.undo": "A backup is saved first, and the change can be undone from the rollback center.",
+  "integrations.dialog.apply.changes":
+    "opencodex will add its managed provider settings to the client configuration.",
+  "integrations.dialog.apply.breakage":
+    "The client will use the models currently exposed by this opencodex instance.",
+  "integrations.dialog.apply.undo":
+    "A backup is saved first, and the change can be undone from the rollback center.",
   "integrations.dialog.apply.confirm": "Apply",
   "integrations.dialog.disable.title": "Disable this integration?",
   "integrations.dialog.disable.changes": "Only settings owned by opencodex will be removed.",
-  "integrations.dialog.disable.breakage": "The client will stop using models routed through this opencodex instance.",
-  "integrations.dialog.disable.undo": "A backup is saved first, and the change can be undone from the rollback center.",
+  "integrations.dialog.disable.breakage":
+    "The client will stop using models routed through this opencodex instance.",
+  "integrations.dialog.disable.undo":
+    "A backup is saved first, and the change can be undone from the rollback center.",
   "integrations.dialog.disable.confirm": "Disable",
   "integrations.plan.heading": "Server change plan",
   "integrations.plan.operation": "Operation: {operation}",
@@ -2417,42 +2800,66 @@ export const en = {
   "integrations.plan.change.journal": "Record rollback entry",
   "integrations.plan.foreign.none": "No outside edits were detected.",
   "integrations.plan.foreign.unowned": "A settings block not owned by opencodex will be replaced.",
-  "integrations.plan.foreign.foreignEdit": "Edits inside the opencodex-managed block will be replaced.",
+  "integrations.plan.foreign.foreignEdit":
+    "Edits inside the opencodex-managed block will be replaced.",
   "integrations.plan.foreign.drift": "The file has changed since this rollback point.",
-  "integrations.plan.noop.applied": "No changes to the managed client document are needed; its integration settings are already present.",
-  "integrations.plan.noop.disabled": "No changes to the managed client document are needed; its integration settings are already absent.",
-  "integrations.plan.noop.profilePreference": "The profile sync preference will still be saved when you confirm.",
+  "integrations.plan.noop.applied":
+    "No changes to the managed client document are needed; its integration settings are already present.",
+  "integrations.plan.noop.disabled":
+    "No changes to the managed client document are needed; its integration settings are already absent.",
+  "integrations.plan.noop.profilePreference":
+    "The profile sync preference will still be saved when you confirm.",
   "integrations.plan.refused": "The server cannot safely apply this plan.",
-  "integrations.plan.refusal.notInstalled": "The client is not installed. Install it, refresh this page, and preview the change again.",
-  "integrations.plan.refusal.conflict": "The managed settings conflict with the current file. Review the file or use Replace when that action is available.",
-  "integrations.plan.refusal.unsafe": "The client configuration cannot be changed safely. Repair or replace the file before trying again.",
-  "integrations.plan.refusal.nonLoopback": "This client requires a loopback proxy address. Use localhost access, a tunnel, or a local forwarder before trying again.",
-  "integrations.plan.refusal.supersededStore": "This client now reads its providers from a file opencodex does not write, so this operation would change nothing it loads.",
-  "integrations.plan.refusal.missingStore": "The file this client keeps its providers in is missing, and opencodex will not write the client's old settings file instead, because the client moves that file aside on its next start. Create the file containing {document}, then press Apply again.",
-  "integrations.plan.refusal.driftRequiresConfirm": "The file changed after this rollback point. Review the drift-aware plan before restoring.",
-  "integrations.plan.refusal.snapshotExpired": "The backup for this rollback point has expired, so it can no longer be restored.",
-  "integrations.plan.refusal.writeFailed": "The server could not prepare a safe write. Refresh the integration state before trying again.",
+  "integrations.plan.refusal.notInstalled":
+    "The client is not installed. Install it, refresh this page, and preview the change again.",
+  "integrations.plan.refusal.conflict":
+    "The managed settings conflict with the current file. Review the file or use Replace when that action is available.",
+  "integrations.plan.refusal.unsafe":
+    "The client configuration cannot be changed safely. Repair or replace the file before trying again.",
+  "integrations.plan.refusal.nonLoopback":
+    "This client requires a loopback proxy address. Use localhost access, a tunnel, or a local forwarder before trying again.",
+  "integrations.plan.refusal.supersededStore":
+    "This client now reads its providers from a file opencodex does not write, so this operation would change nothing it loads.",
+  "integrations.plan.refusal.missingStore":
+    "The file this client keeps its providers in is missing, and opencodex will not write the client's old settings file instead, because the client moves that file aside on its next start. Create the file containing {document}, then press Apply again.",
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "The file changed after this rollback point. Review the drift-aware plan before restoring.",
+  "integrations.plan.refusal.snapshotExpired":
+    "The backup for this rollback point has expired, so it can no longer be restored.",
+  "integrations.plan.refusal.writeFailed":
+    "The server could not prepare a safe write. Refresh the integration state before trying again.",
   "integrations.mutation.pending": "Applying the confirmed change…",
-  "integrations.bulk.breakage": "Each client will stop using models routed through this opencodex instance.",
+  "integrations.bulk.breakage":
+    "Each client will stop using models routed through this opencodex instance.",
   "integrations.bulk.undo": "Each client keeps its own backup and rollback entry.",
   "integrations.bulk.confirm": "Disable all",
-  "integrations.semantics.opencode": "Direct disk launches only; ocx opencode environment injection takes precedence.",
+  "integrations.semantics.opencode":
+    "Direct disk launches only; ocx opencode environment injection takes precedence.",
   "integrations.semantics.pi": "Applies to new sessions.",
   "integrations.semantics.omp": "Restart OMP to load the catalog.",
   "integrations.semantics.hermes": "Applies to new sessions.",
   "integrations.semantics.openclaw": "Applies immediately to a running gateway.",
   "integrations.semantics.kimi": "Restart or run /reload to apply it (v2 watches the file).",
   "integrations.semantics.gajae": "Applies to a new session or when opening /model.",
-  "integrations.semantics.dsh": "OpenCodex manages only the opencodex provider of the llm-pi-ai row in $DSH_HOME/profiles/desktop/cordis.patch.yml, the Desktop profile DSH 0.1.7+ reads ($DSH_HOME/settings.yaml until that profile exists). DSH hot reloads this provider; your default model and deepseek-official stay unchanged. Currently loopback-only; no real credential is written.",
-  "integrations.semantics.mcode": "Manages only custom_provider.opencodex. Your default model and MiniMax login stay unchanged.",
-  "integrations.semantics.zcode": "Manages only provider.opencodex in ~/.zcode/v2/config.json. Your Z.ai login and other providers stay unchanged. Restart ZCode after changes.",
-  "integrations.semantics.commandcode": "Manages only the OpenCodex provider entry in ~/.commandcode/providers.json. Your other providers and settings stay unchanged.",
-  "integrations.semantics.prime": "Manages only providers.opencodex in Prime Agent's models.json — ~/.prime/agent unless PRIME_AGENT_CODING_AGENT_DIR redirects it. Your other providers and model overrides stay unchanged. Applies to new sessions.",
-  "integrations.semantics.aside": "Manages only providers.opencodex in this profile’s ~/.aside/u/<id>/models.json. Your other providers stay unchanged. Fully quit and reopen Aside after applying.",
-  "integrations.semantics.raycast": "Adds an OpenCodex provider entry to Raycast's providers.yaml so every routed model appears in the Raycast AI model picker. Raycast Pro required.",
-  "integrations.semantics.omo": "Manages only providers.opencodex in omo's models.json — ~/.omo/agent unless OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR or PI_CODING_AGENT_DIR redirects it. Your other providers stay unchanged. Applies to new sessions.",
+  "integrations.semantics.dsh":
+    "OpenCodex manages only the opencodex provider of the llm-pi-ai row in $DSH_HOME/profiles/desktop/cordis.patch.yml, the Desktop profile DSH 0.1.7+ reads ($DSH_HOME/settings.yaml until that profile exists). DSH hot reloads this provider; your default model and deepseek-official stay unchanged. Currently loopback-only; no real credential is written.",
+  "integrations.semantics.mcode":
+    "Manages only custom_provider.opencodex. Your default model and MiniMax login stay unchanged.",
+  "integrations.semantics.zcode":
+    "Manages only provider.opencodex in ~/.zcode/v2/config.json. Your Z.ai login and other providers stay unchanged. Restart ZCode after changes.",
+  "integrations.semantics.commandcode":
+    "Manages only the OpenCodex provider entry in ~/.commandcode/providers.json. Your other providers and settings stay unchanged.",
+  "integrations.semantics.prime":
+    "Manages only providers.opencodex in Prime Agent's models.json — ~/.prime/agent unless PRIME_AGENT_CODING_AGENT_DIR redirects it. Your other providers and model overrides stay unchanged. Applies to new sessions.",
+  "integrations.semantics.aside":
+    "Manages only providers.opencodex in this profile’s ~/.aside/u/<id>/models.json. Your other providers stay unchanged. Fully quit and reopen Aside after applying.",
+  "integrations.semantics.raycast":
+    "Adds an OpenCodex provider entry to Raycast's providers.yaml so every routed model appears in the Raycast AI model picker. Raycast Pro required.",
+  "integrations.semantics.omo":
+    "Manages only providers.opencodex in omo's models.json — ~/.omo/agent unless OMO_CODING_AGENT_DIR, SENPI_CODING_AGENT_DIR or PI_CODING_AGENT_DIR redirects it. Your other providers stay unchanged. Applies to new sessions.",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex) role models",
-  "integrations.lazycodexRoles.hint": "Pick the model and effort each role runs on. Saving updates its file under $CODEX_HOME/agents, and LazyCodex's omo.jsonc when it can be safely rewritten; Inherit effort leaves the effort to Codex.",
+  "integrations.lazycodexRoles.hint":
+    "Pick the model and effort each role runs on. Saving updates its file under $CODEX_HOME/agents, and LazyCodex's omo.jsonc when it can be safely rewritten; Inherit effort leaves the effort to Codex.",
   "integrations.lazycodexRoles.role": "Role",
   "integrations.lazycodexRoles.current": "Current",
   "integrations.lazycodexRoles.model": "New model",
@@ -2466,21 +2873,31 @@ export const en = {
   "integrations.lazycodexRoles.loadFailed": "Could not load Codex agent roles.",
   "integrations.lazycodexRoles.saveFailed": "Could not save the model for {role}.",
   "integrations.lazycodexRoles.saved": "{role} now runs on {model}.",
-  "integrations.lazycodexRoles.omoAbsent": "{role} now runs on {model}. omo.jsonc was not found, so only the role file changed.",
-  "integrations.lazycodexRoles.omoComments": "{role} now runs on {model}. omo.jsonc has comments a save would remove, so it was left alone; set [codex].agents.{role} there yourself.",
-  "integrations.lazycodexRoles.omoInvalid": "{role} now runs on {model}. omo.jsonc was left alone because it is not valid JSON in the shape LazyCodex reads.",
-  "integrations.lazycodexRoles.omoFailed": "{role} now runs on {model}, but omo.jsonc could not be written.",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} now runs on {model}. omo.jsonc was not found, so only the role file changed.",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} now runs on {model}. omo.jsonc has comments a save would remove, so it was left alone; set [codex].agents.{role} there yourself.",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} now runs on {model}. omo.jsonc was left alone because it is not valid JSON in the shape LazyCodex reads.",
+  "integrations.lazycodexRoles.omoFailed":
+    "{role} now runs on {model}, but omo.jsonc could not be written.",
   "integrations.lazycodexRoles.retryMirror": "Retry omo.jsonc",
   "integrations.lazycodexRoles.history.title": "Change history",
-  "integrations.lazycodexRoles.history.hint": "The newest 50 saves and auto-assigns in this section are listed here, kept in whole batches. Restore writes the earlier model and effort back as an ordinary save, so it is listed too. A role that had no model pin keeps its current one; only its effort goes back.",
-  "integrations.lazycodexRoles.history.unavailable": "The change history could not be read, so Restore is unavailable. Role editing still works.",
+  "integrations.lazycodexRoles.history.hint":
+    "The newest 50 saves and auto-assigns in this section are listed here, kept in whole batches. Restore writes the earlier model and effort back as an ordinary save, so it is listed too. A role that had no model pin keeps its current one; only its effort goes back.",
+  "integrations.lazycodexRoles.history.unavailable":
+    "The change history could not be read, so Restore is unavailable. Role editing still works.",
   "integrations.lazycodexRoles.history.restore": "Restore",
-  "integrations.lazycodexRoles.history.restored": "Restored {count} role(s) to how they were before {time}.",
-  "integrations.lazycodexRoles.history.partial": "Restore stopped at {role}: {count} of {total} role(s) went back, and the rest keep their current values. Fix the error above and restore again.",
-  "integrations.lazycodexRoles.omoCommentsState": "omo.jsonc has comments, so saving here updates only the role files. Set [codex].agents in omo.jsonc yourself.",
+  "integrations.lazycodexRoles.history.restored":
+    "Restored {count} role(s) to how they were before {time}.",
+  "integrations.lazycodexRoles.history.partial":
+    "Restore stopped at {role}: {count} of {total} role(s) went back, and the rest keep their current values. Fix the error above and restore again.",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "omo.jsonc has comments, so saving here updates only the role files. Set [codex].agents in omo.jsonc yourself.",
   "integrations.lazycodexRoles.auto.button": "Auto-assign",
   "integrations.lazycodexRoles.auto.running": "Sizing roles…",
-  "integrations.lazycodexRoles.auto.hint": "Suggest the cheapest model and effort that fit each role. Nothing changes until you apply.",
+  "integrations.lazycodexRoles.auto.hint":
+    "Suggest the cheapest model and effort that fit each role. Nothing changes until you apply.",
   "integrations.lazycodexRoles.auto.failed": "Could not size the Codex agent roles.",
   "integrations.lazycodexRoles.auto.title": "Proposed models",
   "integrations.lazycodexRoles.auto.sizedWith": "Sized with {model}",
@@ -2504,12 +2921,18 @@ export const en = {
   "integrations.lazycodexRoles.auto.apply": "Apply",
   "integrations.lazycodexRoles.auto.moveUp": "Move up if: {text}",
   "integrations.lazycodexRoles.auto.moveDown": "Move down if: {text}",
-  "integrations.semantics.cline": "Manages OpenCodex in Cline CLI providers.json and models.json. Stop Cline before changing or syncing these files, then restart. Undo restores both originals. Your default provider stays unchanged; select OpenCodex in Cline.",
-  "integrations.semantics.kilo": "Manages only provider.opencodex in Kilo's global config — the first existing file among kilo.jsonc, kilo.json, opencode.jsonc, opencode.json, or config.json under ~/.config/kilo (XDG_CONFIG_HOME relocates that directory; kilo.jsonc is created when none exist). Other keys stay unchanged. Apply rewrites the whole file, so comments and trailing commas are not preserved. Select opencodex/<model> in Kilo.",
-  "integrations.semantics.droid": "Adds OpenCodex custom models to Factory Droid settings.json. Disable removes only managed rows; undo restores the saved file.",
-  "integrations.raycast.proRequired": "Custom Providers is a Raycast Pro feature. The file will be written, but Raycast ignores it until a Pro subscription is active.",
-  "integrations.raycast.planUnknown": "Could not determine whether Raycast Pro is active; Custom Providers requires Raycast Pro.",
-  "integrations.raycast.revealConfig": "Open Raycast → Settings → AI and click Reveal Providers Config once so the providers folder exists.",
+  "integrations.semantics.cline":
+    "Manages OpenCodex in Cline CLI providers.json and models.json. Stop Cline before changing or syncing these files, then restart. Undo restores both originals. Your default provider stays unchanged; select OpenCodex in Cline.",
+  "integrations.semantics.kilo":
+    "Manages only provider.opencodex in Kilo's global config — the first existing file among kilo.jsonc, kilo.json, opencode.jsonc, opencode.json, or config.json under ~/.config/kilo (XDG_CONFIG_HOME relocates that directory; kilo.jsonc is created when none exist). Other keys stay unchanged. Apply rewrites the whole file, so comments and trailing commas are not preserved. Select opencodex/<model> in Kilo.",
+  "integrations.semantics.droid":
+    "Adds OpenCodex custom models to Factory Droid settings.json. Disable removes only managed rows; undo restores the saved file.",
+  "integrations.raycast.proRequired":
+    "Custom Providers is a Raycast Pro feature. The file will be written, but Raycast ignores it until a Pro subscription is active.",
+  "integrations.raycast.planUnknown":
+    "Could not determine whether Raycast Pro is active; Custom Providers requires Raycast Pro.",
+  "integrations.raycast.revealConfig":
+    "Open Raycast → Settings → AI and click Reveal Providers Config once so the providers folder exists.",
   "codexAuth.mainAccount": "Main Account",
   "codexAuth.logLabel": "Log label",
   "codexAuth.codexApp": "Codex App",
@@ -2521,10 +2944,12 @@ export const en = {
   "codexAuth.accountModePool": "Pool mode",
   "codexAuth.accountModePoolDesc": "The main login and eligible added accounts rotate here.",
   "codexAuth.accountModeDirect": "Direct mode",
-  "codexAuth.accountModeDirectDesc": "Requests use only the main login; added accounts remain stored for Pool mode.",
+  "codexAuth.accountModeDirectDesc":
+    "Requests use only the main login; added accounts remain stored for Pool mode.",
   "codexAuth.openaiMissing": "The built-in OpenAI provider is not configured.",
   "codexAuth.openaiDisabled": "The built-in OpenAI provider is disabled.",
-  "codexAuth.openaiUnavailableDesc": "Your OpenAI accounts are still available. Enable the provider to route Codex requests.",
+  "codexAuth.openaiUnavailableDesc":
+    "Your OpenAI accounts are still available. Enable the provider to route Codex requests.",
   "codexAuth.enableOpenai": "Enable OpenAI",
   "codexAuth.enablingOpenai": "Enabling...",
   "codexAuth.enableOpenaiFailed": "Failed to enable the OpenAI provider.",
@@ -2538,35 +2963,48 @@ export const en = {
   "codexAuth.creditsOverage": "Overage limit reached",
   "codexAuth.creditsApprox": "Approx. messages: local {local} · cloud {cloud}",
   "codexAuth.creditsToggle": "Codex credits",
-  "codexAuth.creditsToggleHint": "Show remaining Codex credits on account cards. Hidden by default.",
+  "codexAuth.creditsToggleHint":
+    "Show remaining Codex credits on account cards. Hidden by default.",
   "codexAuth.creditsShown": "Codex credits shown",
   "codexAuth.creditsHidden": "Codex credits hidden",
   "codexAuth.creditsToggleFailed": "Could not change the Codex credits setting",
   "codexAuth.refreshQuota": "Refresh quotas",
   "codexAuth.ultraFastTitle": "Ultra Fast service tier",
   "codexAuth.mainHardLockTitle": "Block main account (5h {short}%, long {long}%)",
-  "codexAuth.mainHardLockDesc": "Blocks at {short}% in the 5h window or {long}% in the weekly window (monthly for monthly-only accounts). Unlocks once every blocking window reads below its threshold; protection stays on. On by default.",
-  "codexAuth.mainHardLockConfirmTitle": "Enable main-account protection (5h {short}%, long {long}%)?",
-  "codexAuth.mainHardLockConfirmBody": "While blocked, the main account cannot use Luna Reserve. Keeping normal usage below exhaustion may prevent Reserve activation. Added accounts and other providers remain available. Running requests, unmatched keyring credentials, and traffic outside this proxy are not protected.",
+  "codexAuth.mainHardLockDesc":
+    "Blocks at {short}% in the 5h window or {long}% in the weekly window (monthly for monthly-only accounts). Unlocks once every blocking window reads below its threshold; protection stays on. On by default.",
+  "codexAuth.mainHardLockConfirmTitle":
+    "Enable main-account protection (5h {short}%, long {long}%)?",
+  "codexAuth.mainHardLockConfirmBody":
+    "While blocked, the main account cannot use Luna Reserve. Keeping normal usage below exhaustion may prevent Reserve activation. Added accounts and other providers remain available. Running requests, unmatched keyring credentials, and traffic outside this proxy are not protected.",
   "codexAuth.mainHardLockConfirm": "Enable protection",
   "codexAuth.mainHardLockEnabled": "Protection is on (5h {short}%, long {long}%).",
-  "codexAuth.mainHardLockDisabled": "Main-account protection is off. Other account limits still apply.",
-  "codexAuth.mainHardLockLoadFailed": "Could not load this setting. Retry to check its current state.",
-  "codexAuth.mainHardLockSaveFailed": "Could not confirm the save. Reload the setting before trying again.",
-  "codexAuth.mainHardLockRefreshFailed": "Setting saved, but account status could not be refreshed. Please retry.",
+  "codexAuth.mainHardLockDisabled":
+    "Main-account protection is off. Other account limits still apply.",
+  "codexAuth.mainHardLockLoadFailed":
+    "Could not load this setting. Retry to check its current state.",
+  "codexAuth.mainHardLockSaveFailed":
+    "Could not confirm the save. Reload the setting before trying again.",
+  "codexAuth.mainHardLockRefreshFailed":
+    "Setting saved, but account status could not be refreshed. Please retry.",
   "codexAuth.mainHardLockBlocked": "Blocked by main-account protection (5h {short}%, long {long}%)",
   "codexAuth.mainHardLockUnknown": "Protection on · usage unknown",
   "codexAuth.mainHardLockMonitoring": "Protection on · monitoring",
-  "codexAuth.mainExternalUsageWarning": "Possible usage outside opencodex. The lock may not prevent exhaustion.",
+  "codexAuth.mainExternalUsageWarning":
+    "Possible usage outside opencodex. The lock may not prevent exhaustion.",
   "codexAuth.mainHardLockManage": "View protection setting",
   "codexAuth.mainHardLockFallbackTitle": "Fallback while blocked",
-  "codexAuth.mainHardLockFallbackDesc": "While blocked and no Codex account can serve a request, requests for native Codex models are routed to this model instead of failing. Leave empty to refuse them as usual; the lock itself releases on its own.",
+  "codexAuth.mainHardLockFallbackDesc":
+    "While blocked and no Codex account can serve a request, requests for native Codex models are routed to this model instead of failing. Leave empty to refuse them as usual; the lock itself releases on its own.",
   "codexAuth.mainHardLockFallbackModel": "Fallback model",
   "codexAuth.mainHardLockFallbackEffort": "Thinking effort",
   "codexAuth.mainHardLockFallbackDefaultEffort": "Keep request effort",
-  "codexAuth.mainHardLockFallbackActive": "Blocking now — native Codex requests are routed to {model}.",
-  "codexAuth.mainHardLockFallbackSaveFailed": "Could not confirm the fallback save. Reload the setting before trying again.",
-  "codexAuth.ultraFastDesc": "Adds the Ultrafast speed choice to GPT-6 Astra and GPT-6.1 Sol in the Codex model picker, and keeps an ultrafast tier you configured yourself on routed models when the catalog is regenerated. Ultrafast requires an eligible ChatGPT plan; turn this on only if your plan includes it.",
+  "codexAuth.mainHardLockFallbackActive":
+    "Blocking now — native Codex requests are routed to {model}.",
+  "codexAuth.mainHardLockFallbackSaveFailed":
+    "Could not confirm the fallback save. Reload the setting before trying again.",
+  "codexAuth.ultraFastDesc":
+    "Adds the Ultrafast speed choice to GPT-6 Astra and GPT-6.1 Sol in the Codex model picker, and keeps an ultrafast tier you configured yourself on routed models when the catalog is regenerated. Ultrafast requires an eligible ChatGPT plan; turn this on only if your plan includes it.",
   "codexAuth.ultraFastLoadFailed": "Could not read the Ultra Fast setting.",
   "codexAuth.ultraFastEnabled": "Ultra Fast tier enabled",
   "codexAuth.ultraFastDisabled": "Ultra Fast tier disabled",
@@ -2584,7 +3022,8 @@ export const en = {
   "codexAuth.resume": "Resume",
   "codexAuth.paused": "PAUSED",
   "codexAuth.planExcluded": "Not auto-selected",
-  "codexAuth.planExcludedHint": "Plan {plan} is excluded from automatic selection. Explicit account routes remain available.",
+  "codexAuth.planExcludedHint":
+    "Plan {plan} is excluded from automatic selection. Explicit account routes remain available.",
   "codexAuth.pauseSucceeded": "{email} is paused",
   "codexAuth.resumeSucceeded": "{email} is available to the pool again",
   "codexAuth.pauseFailed": "Could not pause {email}. Nothing was changed.",
@@ -2595,34 +3034,46 @@ export const en = {
   "accountPause.reason.subscriptionInactive": "Subscription inactive",
   "accountPause.reason.subscriptionExpired": "Subscription expired",
   "accountPause.reason.planDowngraded": "Plan downgraded",
-  "prov.keyResumedSwitchFailed": "Key resumed, but activation failed. The key is eligible for automatic selection. Try selecting it again.",
-  "codexAuth.pausedHint": "Excluded from automatic switching, retries, cooldown recovery, and manual selection until resumed.",
+  "prov.keyResumedSwitchFailed":
+    "Key resumed, but activation failed. The key is eligible for automatic selection. Try selecting it again.",
+  "codexAuth.pausedHint":
+    "Excluded from automatic switching, retries, cooldown recovery, and manual selection until resumed.",
   "codexAuth.creditsAfterLimit": "Use credits after limit",
-  "codexAuth.creditsAfterLimitHint": "Off by default: an account whose usage window reaches 100% is switched out until it resets, so its ChatGPT credits are not spent. Turn an account on to let it keep working from its credits. New accounts start off.",
+  "codexAuth.creditsAfterLimitHint":
+    "Off by default: an account whose usage window reaches 100% is switched out until it resets, so its ChatGPT credits are not spent. Turn an account on to let it keep working from its credits. New accounts start off.",
   "codexAuth.creditsAfterLimitAria": "Use credits after the usage limit for {email}",
-  "codexAuth.creditsAfterLimitMainHint": "The main account's hard lock (on by default) still stops it first. Turn the lock off to let the main account spend credits.",
+  "codexAuth.creditsAfterLimitMainHint":
+    "The main account's hard lock (on by default) still stops it first. Turn the lock off to let the main account spend credits.",
   "codexAuth.creditSpend": "Use credits",
   "codexAuth.creditSpendAria": "Use ChatGPT credits after the usage limit",
   "codexAuth.creditsOn": "Uses credits",
   "codexAuth.creditsOnSucceeded": "{email} may use credits after its usage limit.",
-  "codexAuth.creditsOffSucceeded": "{email} will be switched out at its usage limit, so its credits are kept.",
-  "codexAuth.creditsUpdateFailed": "Could not update the credits setting for {email}. Nothing was changed.",
+  "codexAuth.creditsOffSucceeded":
+    "{email} will be switched out at its usage limit, so its credits are kept.",
+  "codexAuth.creditsUpdateFailed":
+    "Could not update the credits setting for {email}. Nothing was changed.",
   "codexAuth.creditsAllOnSucceeded": "Every account may now use credits after its usage limit.",
-  "codexAuth.creditsAllOffSucceeded": "No account will spend credits. Accounts are switched out at 100%.",
+  "codexAuth.creditsAllOffSucceeded":
+    "No account will spend credits. Accounts are switched out at 100%.",
   "codexAuth.creditsAllUpdateFailed": "Could not update the credits setting. Nothing was changed.",
   "codexAuth.pinned": "PINNED",
-  "codexAuth.pinnedHint": "You selected this account by hand, so a higher selection order will not move past it. The pin lasts until this account is drained, you select another, or you change any selection order.",
+  "codexAuth.pinnedHint":
+    "You selected this account by hand, so a higher selection order will not move past it. The pin lasts until this account is drained, you select another, or you change any selection order.",
   "codexAuth.unpinHint": "Select it again to release the pin and return to automatic selection.",
   "codexAuth.unpinTitle": "Release the pin?",
-  "codexAuth.unpinDesc": "Takes effect immediately. Threads already bound to an account and requests in flight keep their captured account; new or unbound requests pick an account automatically from the selection order and thresholds.",
+  "codexAuth.unpinDesc":
+    "Takes effect immediately. Threads already bound to an account and requests in flight keep their captured account; new or unbound requests pick an account automatically from the selection order and thresholds.",
   "codexAuth.unpinAction": "Release pin",
   "codexAuth.unpinned": "Pin released — automatic selection is back on",
-  "codexAuth.unpinFailed": "Could not confirm the pin release. Refresh accounts and check the current selection before trying again.",
-  "codexAuth.unpinChanged": "The pin changed while this confirmation was open. Refresh accounts and review the current selection before releasing a pin.",
+  "codexAuth.unpinFailed":
+    "Could not confirm the pin release. Refresh accounts and check the current selection before trying again.",
+  "codexAuth.unpinChanged":
+    "The pin changed while this confirmation was open. Refresh accounts and review the current selection before releasing a pin.",
   "codexAuth.fiveHour": "5h",
   "codexAuth.weekly": "Week",
   "codexAuth.quotaAutoRefresh": "Automatic window activation",
-  "codexAuth.quotaAutoRefreshHint": "Sends one minimal, non-stored Codex warm-up request when this quota window resets.",
+  "codexAuth.quotaAutoRefreshHint":
+    "Sends one minimal, non-stored Codex warm-up request when this quota window resets.",
   "codexAuth.quotaAutoRefreshUpdated": "Automatic window activation updated.",
   "codexAuth.quotaAutoRefreshFailed": "Could not update automatic window activation.",
   "codexAuth.monthly": "30d",
@@ -2632,24 +3083,35 @@ export const en = {
   "codexAuth.nextSession": "SELECTED",
   "codexAuth.poolPrepared": "PREPARED FOR POOL",
   "codexAuth.preparePoolTitle": "Prepare this account for Pool mode?",
-  "codexAuth.preparePoolDesc": "Direct requests keep using the main login. This account becomes the prepared Pool selection when Pool mode is enabled.",
+  "codexAuth.preparePoolDesc":
+    "Direct requests keep using the main login. This account becomes the prepared Pool selection when Pool mode is enabled.",
   "codexAuth.prepareForPool": "Prepare for Pool",
   "codexAuth.poolPreparedToast": "{email} is prepared for Pool mode",
   "codexAuth.switchTitle": "Switch active account?",
-  "codexAuth.switchDesc": "Takes effect immediately. Existing account-affine threads and requests already in flight keep their captured account; new or unbound requests use the selected account's order tier, and accounts at the same selection order still take turns.",
-  "codexAuth.cacheWarning": "Prompt cache resets on account switch. New session starts with empty cache.",
-  "codexAuth.switchExceedsThresholdWarning": "This account's usage meets or exceeds the switch threshold ({threshold}%). The pinned selection will be released if no quota headroom is available.",
+  "codexAuth.switchDesc":
+    "Takes effect immediately. Existing account-affine threads and requests already in flight keep their captured account; new or unbound requests use the selected account's order tier, and accounts at the same selection order still take turns.",
+  "codexAuth.cacheWarning":
+    "Prompt cache resets on account switch. New session starts with empty cache.",
+  "codexAuth.switchExceedsThresholdWarning":
+    "This account's usage meets or exceeds the switch threshold ({threshold}%). The pinned selection will be released if no quota headroom is available.",
   "codexAuth.setAsNext": "Use this account next",
   "codexAuth.cancel": "Cancel",
   "codexAuth.switchBack": "Switch back to Main?",
-  "codexAuth.switchBackDesc": "Takes effect immediately. Existing account-affine threads and requests already in flight keep their captured account; new or unbound requests use your App login account's order tier, and accounts at the same selection order still take turns.",
+  "codexAuth.switchBackDesc":
+    "Takes effect immediately. Existing account-affine threads and requests already in flight keep their captured account; new or unbound requests use your App login account's order tier, and accounts at the same selection order still take turns.",
   "codexAuth.autoSwitch": "Usage-based proactive switching",
-  "codexAuth.autoSwitchQuotaDesc": "Quota: at {threshold}% usage or above, the next unbound request may move to a lower-usage eligible account. Bound tasks keep affinity by default and move only when the account cannot serve, and only onto genuine quota headroom; Go/Free use 30d only.",
-  "codexAuth.autoSwitchQuotaOffDesc": "Usage-based proactive switching is off. New/unbound assignment and failure recovery still apply.",
-  "codexAuth.autoSwitchRoundRobinDesc": "Round-robin assignment does not use this threshold; it continues to rotate new/unbound tasks.",
-  "codexAuth.autoSwitchFillFirstDesc": "Fill-first: {threshold}% is the drain point for new/unbound tasks; healthy bound tasks keep their account.",
-  "codexAuth.autoSwitchFillFirstOffDesc": "Fill-first has no usage drain point for new/unbound tasks; cooldown, reauthentication, and failure recovery can still move routing.",
-  "codexAuth.failureRecoveryNote": "Failure recovery is separate: a request rejected before output with 429/402, cooldown, reauthentication, exclusion, or configured transient failover may select another eligible account.",
+  "codexAuth.autoSwitchQuotaDesc":
+    "Quota: at {threshold}% usage or above, the next unbound request may move to a lower-usage eligible account. Bound tasks keep affinity by default and move only when the account cannot serve, and only onto genuine quota headroom; Go/Free use 30d only.",
+  "codexAuth.autoSwitchQuotaOffDesc":
+    "Usage-based proactive switching is off. New/unbound assignment and failure recovery still apply.",
+  "codexAuth.autoSwitchRoundRobinDesc":
+    "Round-robin assignment does not use this threshold; it continues to rotate new/unbound tasks.",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "Fill-first: {threshold}% is the drain point for new/unbound tasks; healthy bound tasks keep their account.",
+  "codexAuth.autoSwitchFillFirstOffDesc":
+    "Fill-first has no usage drain point for new/unbound tasks; cooldown, reauthentication, and failure recovery can still move routing.",
+  "codexAuth.failureRecoveryNote":
+    "Failure recovery is separate: a request rejected before output with 429/402, cooldown, reauthentication, exclusion, or configured transient failover may select another eligible account.",
   "codexAuth.autoSwitchThreshold": "Usage threshold",
   "codexAuth.autoSwitchThresholdAria": "Usage threshold, percent",
   "codexAuth.autoSwitchThresholdInc": "Increase usage threshold",
@@ -2657,47 +3119,71 @@ export const en = {
   "codexAuth.autoSwitchLoadFailed": "Usage-based switching setting could not be loaded.",
   "codexAuth.autoSwitchThresholdInvalid": "Enter a whole number from 1 to 100",
   "codexAuth.autoSwitchUpdated": "Usage-based proactive switching updated",
-  "codexAuth.autoSwitchUpdateFailed": "The usage-based switching update could not be confirmed. The last confirmed value is shown.",
+  "codexAuth.autoSwitchUpdateFailed":
+    "The usage-based switching update could not be confirmed. The last confirmed value is shown.",
   "codexAuth.requestUserInput": "Ask for input in Default mode",
-  "codexAuth.requestUserInputDesc": "Lets Codex pause a Default-mode session and ask you questions with the request_user_input tool.",
+  "codexAuth.requestUserInputDesc":
+    "Lets Codex pause a Default-mode session and ask you questions with the request_user_input tool.",
   "codexAuth.requestUserInputUpdated": "Feature flag updated - applies to new sessions.",
-  "codexAuth.requestUserInputUpdatedRestart": "Feature flag updated - applies to new sessions. Restart the Codex app to pick it up.",
-  "codexAuth.requestUserInputUpdateFailed": "Could not update the feature flag. Nothing was changed.",
+  "codexAuth.requestUserInputUpdatedRestart":
+    "Feature flag updated - applies to new sessions. Restart the Codex app to pick it up.",
+  "codexAuth.requestUserInputUpdateFailed":
+    "Could not update the feature flag. Nothing was changed.",
   "codexAuth.requestUserInputLoadFailed": "Could not read the feature flag from config.toml.",
   "codexAuth.accountPickerTitle": "Target a specific Codex account from the model picker",
-  "codexAuth.accountPickerOffDesc": "When enabled, ordinary GPT picker rows are replaced by one entry per account selector, so you can choose the exact account for a conversation without logging out. Turning it off removes no accounts.",
-  "codexAuth.accountPickerOnDesc": "Each selector is a public label for one stored account. Choosing it locks that conversation to the mapped account: it never rotates or falls back, and it does not change the active Pool account.",
-  "codexAuth.accountPickerCompatibility": "The built-in Codex App login has its own selector; generated maps normally call it main and use a collision-safe suffix such as main-2 when needed. Added accounts receive stable privacy-safe labels, while custom selector labels stay unchanged. Existing conversations and saved model selections continue routing. Turning this off hides generated entries but preserves selectors and exact routes. Plain GPT model IDs keep their Pool or Direct behavior.",
+  "codexAuth.accountPickerOffDesc":
+    "When enabled, ordinary GPT picker rows are replaced by one entry per account selector, so you can choose the exact account for a conversation without logging out. Turning it off removes no accounts.",
+  "codexAuth.accountPickerOnDesc":
+    "Each selector is a public label for one stored account. Choosing it locks that conversation to the mapped account: it never rotates or falls back, and it does not change the active Pool account.",
+  "codexAuth.accountPickerCompatibility":
+    "The built-in Codex App login has its own selector; generated maps normally call it main and use a collision-safe suffix such as main-2 when needed. Added accounts receive stable privacy-safe labels, while custom selector labels stay unchanged. Existing conversations and saved model selections continue routing. Turning this off hides generated entries but preserves selectors and exact routes. Plain GPT model IDs keep their Pool or Direct behavior.",
   "codexAuth.accountPickerUpdated": "Account targeting updated.",
-  "codexAuth.accountPickerUpdateFailed": "Could not update account targeting. The last confirmed setting is shown.",
+  "codexAuth.accountPickerUpdateFailed":
+    "Could not update account targeting. The last confirmed setting is shown.",
   "codexAuth.accountPickerLoadFailed": "Could not load the account-targeting setting.",
-  "codexAuth.accountPickerRefreshFailed": "Could not refresh this setting. The last confirmed value is still shown.",
+  "codexAuth.accountPickerRefreshFailed":
+    "Could not refresh this setting. The last confirmed value is still shown.",
   "codexAuth.advancedSettings": "Advanced settings",
   "codexAuth.advancedSettingsAria": "Show or hide advanced Codex Auth settings",
-  "codexAuth.catalogRefreshPending": "The change was saved, but the Codex model catalog refresh is pending. Run ocx sync to retry.",
+  "codexAuth.catalogRefreshPending":
+    "The change was saved, but the Codex model catalog refresh is pending. Run ocx sync to retry.",
 
   "anthropicPool.title": "Claude account pool (experimental)",
-  "anthropicPool.enabledDesc": "Sticky sessions, and new sessions prefer usage under {threshold}% ({window}).",
-  "anthropicPool.enabledNoProactiveDesc": "Usage thresholds do not move an existing healthy session or a healthy active account. When the active account is unavailable, and during refusal recovery, the account with the lowest usage ({window}) is chosen.",
-  "anthropicPool.enabledFillFirstDesc": "Sticky sessions. New sessions stay on the active account until it reaches {threshold}% ({window}), cools down or needs sign-in, then move to the next account in order. Refusal recovery also takes the next account in order.",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "Sticky sessions. New sessions stay on the active account until it cools down or needs sign-in, then move to the next account in order. Refusal recovery also takes the next account in order.",
-  "anthropicPool.enabledRoundRobinDesc": "Sticky sessions. New sessions and refusal recovery take turns across eligible accounts; usage, the threshold and the quota window are not used.",
-  "anthropicPool.disabledDesc": "Proactive account selection is off. OpenCodex uses the selected account and can still switch after a rate-limit response (429) or a classified account refusal when another eligible account is signed in.",
-  "anthropicPool.experimentalWarning": "Use only subscriptions you own or are authorized to use. Automated account pooling is not endorsed by Anthropic and remains experimental. Use the genuine Claude Code client with a person supervising the session, and check Anthropic's current terms. Accounts may share an organization quota, so adding an account may not add capacity.",
+  "anthropicPool.enabledDesc":
+    "Sticky sessions, and new sessions prefer usage under {threshold}% ({window}).",
+  "anthropicPool.enabledNoProactiveDesc":
+    "Usage thresholds do not move an existing healthy session or a healthy active account. When the active account is unavailable, and during refusal recovery, the account with the lowest usage ({window}) is chosen.",
+  "anthropicPool.enabledFillFirstDesc":
+    "Sticky sessions. New sessions stay on the active account until it reaches {threshold}% ({window}), cools down or needs sign-in, then move to the next account in order. Refusal recovery also takes the next account in order.",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "Sticky sessions. New sessions stay on the active account until it cools down or needs sign-in, then move to the next account in order. Refusal recovery also takes the next account in order.",
+  "anthropicPool.enabledRoundRobinDesc":
+    "Sticky sessions. New sessions and refusal recovery take turns across eligible accounts; usage, the threshold and the quota window are not used.",
+  "anthropicPool.disabledDesc":
+    "Proactive account selection is off. OpenCodex uses the selected account and can still switch after a rate-limit response (429) or a classified account refusal when another eligible account is signed in.",
+  "anthropicPool.experimentalWarning":
+    "Use only subscriptions you own or are authorized to use. Automated account pooling is not endorsed by Anthropic and remains experimental. Use the genuine Claude Code client with a person supervising the session, and check Anthropic's current terms. Accounts may share an organization quota, so adding an account may not add capacity.",
   "anthropicPool.detailsSummary": "How account selection works",
-  "anthropicPool.detailsEnabling": "Turning the pool on keeps each session on its account while that account is healthy, and lets the selected strategy choose accounts for new sessions and after a refusal.",
-  "anthropicPool.detailsFailover": "Turning it off does not turn off failover: after a 429 or a classified account refusal, a request can still move to another signed-in account. Pause an account to keep it out of failover.",
-  "anthropicPool.detailsActivity": "OpenCodex sends no keep-warm requests. By default it does not refresh Claude tokens or check usage in the background; usage is read only when the dashboard, the menu bar app, or an ocx command asks for it.",
+  "anthropicPool.detailsEnabling":
+    "Turning the pool on keeps each session on its account while that account is healthy, and lets the selected strategy choose accounts for new sessions and after a refusal.",
+  "anthropicPool.detailsFailover":
+    "Turning it off does not turn off failover: after a 429 or a classified account refusal, a request can still move to another signed-in account. Pause an account to keep it out of failover.",
+  "anthropicPool.detailsActivity":
+    "OpenCodex sends no keep-warm requests. By default it does not refresh Claude tokens or check usage in the background; usage is read only when the dashboard, the menu bar app, or an ocx command asks for it.",
   "anthropicPool.nativeMessagesLabel": `Preserve native Claude requests`,
   "anthropicPool.nativeMessagesHelp": `With pooling enabled, keeps Claude Code history and cache markers on the native Messages path when the selected route supports it. Other routes may still translate requests. An account change may start a cold cache; cache hits are not guaranteed, and caches are not shared between accounts. Explicit rollout opt-outs still apply.`,
-  "anthropicPool.saveWarning": "Settings were saved, but configuration bookkeeping failed. Reload settings to confirm the current state.",
-  "anthropicPool.saveStateUnknown": "The saved settings could not be confirmed. Reload settings before making another change.",
+  "anthropicPool.saveWarning":
+    "Settings were saved, but configuration bookkeeping failed. Reload settings to confirm the current state.",
+  "anthropicPool.saveStateUnknown":
+    "The saved settings could not be confirmed. Reload settings before making another change.",
   "anthropicPool.reloadSettings": "Reload settings",
   "anthropicPool.detailsGuide": "Account pool guide",
-  "anthropicPool.needTwoAccounts": "Add at least two Claude OAuth accounts before enabling the pool.",
+  "anthropicPool.needTwoAccounts":
+    "Add at least two Claude OAuth accounts before enabling the pool.",
   "anthropicPool.threshold": "New-session usage threshold",
   "anthropicPool.thresholdAria": "New-session usage threshold, percent",
-  "anthropicPool.thresholdHelp": "This is a preference for account selection, not a hard usage or billing cap. 0 disables proactive switching by this threshold. Default: 80%.",
+  "anthropicPool.thresholdHelp":
+    "This is a preference for account selection, not a hard usage or billing cap. 0 disables proactive switching by this threshold. Default: 80%.",
   "anthropicPool.thresholdInvalid": "Enter a whole number from 0 to 100",
   "anthropicPool.loadFailed": "Claude pool settings could not be loaded.",
   "anthropicPool.saveFailed": "Claude pool settings could not be saved.",
@@ -2707,19 +3193,25 @@ export const en = {
   "accountPool.strategy": "Rotation strategy",
   "accountPool.strategyDesc": "How OpenCodex assigns an account to a new/unbound task.",
   "accountPool.strategyResetFirst": "Soonest reset first",
-  "accountPool.strategyHintResetFirst": "Prefer the nearest future 5-hour or weekly reset among accounts below the usage threshold. Bound tasks follow the configured affinity policy. Independent model quotas use quota ordering.",
+  "accountPool.strategyHintResetFirst":
+    "Prefer the nearest future 5-hour or weekly reset among accounts below the usage threshold. Bound tasks follow the configured affinity policy. Independent model quotas use quota ordering.",
   "accountPool.strategyQuota": "Quota",
   "accountPool.strategyRoundRobin": "Round-robin",
   "accountPool.strategyFillFirst": "Fill-first",
-  "accountPool.strategyHintQuota": "Quota rebinds an existing task at the usage threshold only when `pool.cacheAffinity` is off (it is on by default). Bound tasks otherwise stay until the account cannot serve, then only onto genuine quota headroom.",
-  "accountPool.strategyHintRoundRobin": "Round-robin rotates only tasks without a live binding; the usage threshold does not change normal rotation.",
-  "accountPool.strategyHintFillFirst": "Fill-first uses the threshold as a drain point for unbound tasks; healthy bound tasks keep affinity.",
-  "accountPool.unboundDefinition": "New/unbound task means a request with no current account binding; an existing visible task can become unbound after a proxy or affinity reset.",
+  "accountPool.strategyHintQuota":
+    "Quota rebinds an existing task at the usage threshold only when `pool.cacheAffinity` is off (it is on by default). Bound tasks otherwise stay until the account cannot serve, then only onto genuine quota headroom.",
+  "accountPool.strategyHintRoundRobin":
+    "Round-robin rotates only tasks without a live binding; the usage threshold does not change normal rotation.",
+  "accountPool.strategyHintFillFirst":
+    "Fill-first uses the threshold as a drain point for unbound tasks; healthy bound tasks keep affinity.",
+  "accountPool.unboundDefinition":
+    "New/unbound task means a request with no current account binding; an existing visible task can become unbound after a proxy or affinity reset.",
   "accountPool.stickyLimit": "New/unbound assignments before rotate",
   "accountPool.stickyLimitAria": "New/unbound assignments before rotate",
   "accountPool.stickyLimitInc": "Increase sticky limit",
   "accountPool.stickyLimitDec": "Decrease sticky limit",
-  "accountPool.stickyLimitHelp": "Keep the selected account for this many new/unbound task assignments before advancing; the counter increments when the task is bound, not after upstream success.",
+  "accountPool.stickyLimitHelp":
+    "Keep the selected account for this many new/unbound task assignments before advancing; the counter increments when the task is bound, not after upstream success.",
   "accountPool.stickyLimitInvalid": "Enter a whole number from 1 to 100",
   "accountPool.strategyLoadFailed": "Rotation strategy could not be loaded.",
   "accountPool.strategyUpdateFailed": "Rotation strategy could not be saved.",
@@ -2733,18 +3225,22 @@ export const en = {
   // anthropicPool.enabledDesc, so each locale owns its own inline casing instead of the
   // call site lowercasing a translated string (which breaks for Turkish and CJK).
   "accountPool.quotaWindow": "Quota window",
-  "accountPool.quotaWindowDesc": "Which cached usage bar controls quota-based new-session selection, fill-first threshold checks, and eligible 429 replacements.",
+  "accountPool.quotaWindowDesc":
+    "Which cached usage bar controls quota-based new-session selection, fill-first threshold checks, and eligible 429 replacements.",
   "accountPool.quotaWindowFiveHour": "5-hour bar",
   "accountPool.quotaWindowWeekly": "Weekly bar",
   "accountPool.quotaWindowMaxUtilization": "Higher bar",
-  "accountPool.quotaWindowHint": "Weekly skips accounts whose 5-hour bar is exhausted while another eligible account remains, but falls back to them when none do. Weekly ties prefer lower 5-hour usage; per-account weekly bars are only known once the Providers page has polled them.",
-  "accountPool.quotaWindowInert": "Only quota — or fill-first above a 0 threshold — scores a usage bar, so this setting changes nothing for the current rotation strategy.",
+  "accountPool.quotaWindowHint":
+    "Weekly skips accounts whose 5-hour bar is exhausted while another eligible account remains, but falls back to them when none do. Weekly ties prefer lower 5-hour usage; per-account weekly bars are only known once the Providers page has polled them.",
+  "accountPool.quotaWindowInert":
+    "Only quota — or fill-first above a 0 threshold — scores a usage bar, so this setting changes nothing for the current rotation strategy.",
 
   // Selection order. User-visible copy stays in sequence words (first/earlier/later/last);
   // only identifiers use the internal "priority" name.
   "accountPool.priority": "Selection order",
   "accountPool.priorityAria": "Selection order for this account",
-  "accountPool.priorityHint": "Higher numbers are used first. The pool moves to a lower number only when every account above it is drained or unavailable.",
+  "accountPool.priorityHint":
+    "Higher numbers are used first. The pool moves to a lower number only when every account above it is drained or unavailable.",
   "accountPool.priorityFirst": "First",
   "accountPool.priorityEarlier": "Earlier",
   "accountPool.priorityNormal": "Normal",
@@ -2753,18 +3249,23 @@ export const en = {
   "accountPool.priorityOption": "{name} ({value})",
   "accountPool.priorityCustom": "Custom",
   "accountPool.priorityUpdated": "Selection order updated for {email}",
-  "accountPool.priorityUpdateFailed": "Selection order for {email} could not be saved. The last confirmed value is shown.",
+  "accountPool.priorityUpdateFailed":
+    "Selection order for {email} could not be saved. The last confirmed value is shown.",
   "accountPool.autoSwitchThreshold": "Custom account threshold",
   "accountPool.autoSwitchThresholdAria": "Usage threshold for {email}",
   "accountPool.autoSwitchOverrideAria": "Override global usage threshold for {email}",
-  "accountPool.autoSwitchHint": "Overrides the global threshold for this account. 0 disables usage-based proactive switching from this account.",
+  "accountPool.autoSwitchHint":
+    "Overrides the global threshold for this account. 0 disables usage-based proactive switching from this account.",
   "accountPool.autoSwitchUpdated": "Usage threshold updated for {email}",
-  "accountPool.autoSwitchUpdateFailed": "Usage threshold for {email} could not be saved. The last confirmed value is shown.",
+  "accountPool.autoSwitchUpdateFailed":
+    "Usage threshold for {email} could not be saved. The last confirmed value is shown.",
 
   "codexAuth.switched": "{email} is selected for the next request",
   "codexAuth.loadFailed": "Codex account settings could not be loaded.",
-  "codexAuth.accountsRefreshFailed": "The latest account refresh failed. The accounts below are the last ones confirmed.",
-  "codexAuth.switchFailed": "The account could not be switched. Your previous selection is unchanged.",
+  "codexAuth.accountsRefreshFailed":
+    "The latest account refresh failed. The accounts below are the last ones confirmed.",
+  "codexAuth.switchFailed":
+    "The account could not be switched. Your previous selection is unchanged.",
   "codexAuth.removeConfirm": "Remove {id}?",
   "codexAuth.removeFailed": "The account could not be removed. Nothing was changed.",
   "codexAuth.addTitle": "Add Codex Account",
@@ -2796,7 +3297,8 @@ export const en = {
   "codexAuth.needsReauth": "Re-login",
   "codexAuth.reauthenticate": "Re-authenticate",
   "codexAuth.tokenExpired": "Token expired — re-authenticate this account",
-  "codexAuth.mainTokenExpired": "Token expired — re-login with a device code below, or via Codex App login",
+  "codexAuth.mainTokenExpired":
+    "Token expired — re-login with a device code below, or via Codex App login",
   "codexAuth.mainReauthSucceeded": "Signed in",
   "codexAuth.mainReauthFailed": "Re-login failed",
   "codexAuth.mainReauthCancel": "Cancel",
@@ -2804,17 +3306,20 @@ export const en = {
   "codexAuth.mainReauthOpen": "Open",
   "codexAuth.mainReauthPending": "Waiting for sign-in…",
   "codexAuth.mainReauthDevice": "Re-login with device code",
-  "codexAuth.emailCollision": "This account matches your main Codex login. Use a different account.",
+  "codexAuth.emailCollision":
+    "This account matches your main Codex login. Use a different account.",
 
   "codexAuth.resetCreditsTitle": "Reset Credits",
   "codexAuth.resetCreditsAvailable": "You have {count} reset credit(s) available.",
-  "codexAuth.resetCreditsDesc": "Each credit resets your current hourly and weekly usage limits instantly.",
+  "codexAuth.resetCreditsDesc":
+    "Each credit resets your current hourly and weekly usage limits instantly.",
   "codexAuth.noResetCredits": "You don't have any reset credits.",
   "codexAuth.earnCreditsHint": "Credits are earned monthly and via the referral program.",
   "codexAuth.creditsExpireNote": "Credits expire 30 days after earning.",
   "codexAuth.useOneCredit": "Use 1 Credit",
   "codexAuth.confirmResetTitle": "Use Reset Credit?",
-  "codexAuth.confirmResetDesc": "This will instantly reset your current rate limits. You have {count} credit(s) remaining.",
+  "codexAuth.confirmResetDesc":
+    "This will instantly reset your current rate limits. You have {count} credit(s) remaining.",
   "codexAuth.irreversible": "This action cannot be undone.",
   "codexAuth.useCredit": "Use Credit",
   "codexAuth.redeeming": "Resetting...",
@@ -2850,31 +3355,39 @@ export const en = {
   "grokCoupon.useOne": "Use 1 coupon",
   "grokCoupon.fifoNote": "The coupon closest to expiry is used first.",
   "grokCoupon.confirmTitle": "Use reset coupon?",
-  "grokCoupon.confirmDesc": "This resets this account's Grok usage window now. You have {count} coupon(s).",
+  "grokCoupon.confirmDesc":
+    "This resets this account's Grok usage window now. You have {count} coupon(s).",
   "grokCoupon.confirmWhich": "The coupon expiring {date} will be used.",
   "grokCoupon.irreversible": "This action cannot be undone.",
   "grokCoupon.redeem": "Use coupon",
   "grokCoupon.redeeming": "Redeeming…",
   "grokCoupon.redeemSuccess": "Coupon redeemed. {count} coupon(s) left.",
-  "grokCoupon.redeemReplayed": "This redemption already settled earlier. Nothing was consumed again.",
+  "grokCoupon.redeemReplayed":
+    "This redemption already settled earlier. Nothing was consumed again.",
   "grokCoupon.redeemFailed": "Redemption failed. Check the coupon list before trying again.",
   "grokCoupon.authFailed": "Sign in to this xAI account again to use its coupons.",
   "grokCoupon.noAccount": "No xAI account is available for this redemption.",
   "grokCoupon.noneAvailable": "No reset coupons are available to redeem.",
-  "grokCoupon.identityMismatch": "That redemption belongs to another account. Close this dialog and start again.",
+  "grokCoupon.identityMismatch":
+    "That redemption belongs to another account. Close this dialog and start again.",
   "grokCoupon.networkError": "The proxy could not be reached.",
   "grokCoupon.capacity": "The redemption journal is full right now. Try again in a moment.",
-  "grokCoupon.noOperationId": "This browser cannot generate a redemption ID, so redeeming is disabled here.",
-  "grokCoupon.unknownOutcome": "The redemption outcome is unknown. Re-read the account to inspect coupon availability; this cannot confirm the original attempt.",
+  "grokCoupon.noOperationId":
+    "This browser cannot generate a redemption ID, so redeeming is disabled here.",
+  "grokCoupon.unknownOutcome":
+    "The redemption outcome is unknown. Re-read the account to inspect coupon availability; this cannot confirm the original attempt.",
   "grokCoupon.checkResult": "Re-read account",
   "grokCoupon.checking": "Re-reading…",
-  "grokCoupon.consumedElsewhere": "The coupon is no longer listed. The original redemption remains unconfirmed; no further redemption will be sent.",
-  "grokCoupon.unresolved": "The coupon is still listed. The original redemption may still complete; no further redemption will be sent.",
+  "grokCoupon.consumedElsewhere":
+    "The coupon is no longer listed. The original redemption remains unconfirmed; no further redemption will be sent.",
+  "grokCoupon.unresolved":
+    "The coupon is still listed. The original redemption may still complete; no further redemption will be sent.",
   "anthropicGrant.badgeAria": "{count} Claude usage reset(s)",
   "anthropicGrant.badgeErrorAria": "Claude usage resets could not be read",
   "anthropicGrant.title": "Claude usage resets",
   "anthropicGrant.available": "This account has {count} usage reset(s).",
-  "anthropicGrant.desc": "A reset refills this account's 5-hour and weekly Claude limits right away. The weekly reset day stays the same.",
+  "anthropicGrant.desc":
+    "A reset refills this account's 5-hour and weekly Claude limits right away. The weekly reset day stays the same.",
   "anthropicGrant.none": "This account has no usage resets.",
   "anthropicGrant.ineligible": "This account is not eligible for usage resets right now.",
   "anthropicGrant.loadFailed": "Could not read usage resets for this account.",
@@ -2891,7 +3404,8 @@ export const en = {
   "anthropicGrant.requiresLimit": "Usable once this account hits a limit",
   "anthropicGrant.useOne": "Use 1 reset",
   "anthropicGrant.confirmTitle": "Reset usage limits now?",
-  "anthropicGrant.confirmDesc": "This refills this account's Claude usage limits now and uses one reset.",
+  "anthropicGrant.confirmDesc":
+    "This refills this account's Claude usage limits now and uses one reset.",
   "anthropicGrant.confirmWhich": "Uses: {label}",
   "anthropicGrant.irreversible": "This action cannot be undone.",
   "anthropicGrant.redeem": "Reset limits",
@@ -2906,22 +3420,30 @@ export const en = {
   "anthropicGrant.resultAuthError": "Sign in to this Anthropic account again. Nothing was used.",
   "anthropicGrant.replayed": "This reset already settled earlier. Nothing was used again.",
   "anthropicGrant.notUsableNow": "This reset cannot be used right now. Re-read the account.",
-  "anthropicGrant.inFlight": "This reset is still being processed. Wait a moment, then re-read the account.",
-  "anthropicGrant.unresolvedPrior": "An earlier attempt on this reset is not confirmed yet. Retry that attempt instead of starting a new one.",
-  "anthropicGrant.expired": "The earlier attempt could not be confirmed in time. Re-read the account before using a reset.",
-  "anthropicGrant.identityMismatch": "That reset belongs to another account. Close this dialog and start again.",
+  "anthropicGrant.inFlight":
+    "This reset is still being processed. Wait a moment, then re-read the account.",
+  "anthropicGrant.unresolvedPrior":
+    "An earlier attempt on this reset is not confirmed yet. Retry that attempt instead of starting a new one.",
+  "anthropicGrant.expired":
+    "The earlier attempt could not be confirmed in time. Re-read the account before using a reset.",
+  "anthropicGrant.identityMismatch":
+    "That reset belongs to another account. Close this dialog and start again.",
   "anthropicGrant.sessionRequired": "Open the dashboard from its own login to use resets.",
-  "anthropicGrant.journalBusy": "The reset journal is busy or unavailable. Nothing was used; try again in a moment.",
+  "anthropicGrant.journalBusy":
+    "The reset journal is busy or unavailable. Nothing was used; try again in a moment.",
   "anthropicGrant.failed": "The reset request failed. Check the account before trying again.",
-  "anthropicGrant.noOperationId": "This browser cannot generate a request ID, so resets are disabled here.",
-  "anthropicGrant.unknownOutcome": "The reset did not answer in time, so its outcome is unknown. Retrying sends the same request ID, so it cannot start a second reset.",
+  "anthropicGrant.noOperationId":
+    "This browser cannot generate a request ID, so resets are disabled here.",
+  "anthropicGrant.unknownOutcome":
+    "The reset did not answer in time, so its outcome is unknown. Retrying sends the same request ID, so it cannot start a second reset.",
   "anthropicGrant.retrySame": "Retry same request",
   "anthropicGrant.checkResult": "Re-read account",
   "anthropicGrant.checking": "Re-reading…",
 
   // api access page
   "api.title": "API Access",
-  "api.subtitle": "Use generated API keys to access the opencodex proxy from external apps. Keys authenticate via the {authHeader} header; see the table below for what each endpoint accepts.",
+  "api.subtitle":
+    "Use generated API keys to access the opencodex proxy from external apps. Keys authenticate via the {authHeader} header; see the table below for what each endpoint accepts.",
   "api.baseUrl": "Base URL",
   "api.responsesEndpoint": "Responses API",
   "api.chatCompletionsEndpoint": "Chat Completions API",
@@ -2934,18 +3456,24 @@ export const en = {
   "api.surface.source.inherited": "Inherited from Claude settings",
   "api.surface.source.invalid": "Invalid value — closed",
   "api.surface.messagesToggle": "Serve the Messages API",
-  "api.surface.messagesCloseNote": "Turning Messages off also turns off the Claude integration, so an older opencodex version keeps the endpoint closed too.",
+  "api.surface.messagesCloseNote":
+    "Turning Messages off also turns off the Claude integration, so an older opencodex version keeps the endpoint closed too.",
   "api.surface.openClaude": "Claude settings",
   "api.surface.toggleFailed": "The Messages setting could not be saved.",
-  "api.surface.toggleUnavailable": "This proxy version cannot change the Messages API here. Use the Claude page instead.",
+  "api.surface.toggleUnavailable":
+    "This proxy version cannot change the Messages API here. Use the Claude page instead.",
   "api.surface.closedNote": "Requests to this endpoint are refused with 403.",
-  "api.endpointNote": "Use the base URL with OpenAI-compatible clients. Responses and Chat Completions are exposed under /v1.",
+  "api.endpointNote":
+    "Use the base URL with OpenAI-compatible clients. Responses and Chat Completions are exposed under /v1.",
   "api.endpointsTitle": "Endpoints",
   "api.authTitle": "Authentication",
-  "api.authLoopback": "Loopback access is route-specific; standalone audio clients require an OpenCodex data key. Remote binds require a data key or OPENCODEX_API_AUTH_TOKEN.",
-  "api.authBaseUrlNote": "Configure clients with the base URL, then choose the protocol-specific endpoint below.",
+  "api.authLoopback":
+    "Loopback access is route-specific; standalone audio clients require an OpenCodex data key. Remote binds require a data key or OPENCODEX_API_AUTH_TOKEN.",
+  "api.authBaseUrlNote":
+    "Configure clients with the base URL, then choose the protocol-specific endpoint below.",
   "api.newKeyTitle": "New key created",
-  "api.newKeyNote": "Copy this key now. You can show it again later by clicking it in the key list.",
+  "api.newKeyNote":
+    "Copy this key now. You can show it again later by clicking it in the key list.",
   "api.copy": "Copy",
   "api.copied": "Copied",
   "api.dismiss": "Dismiss",
@@ -2964,8 +3492,10 @@ export const en = {
   "api.section.examples": "Examples",
   "api.section.plan": "Path preview",
   "api.plan.title": "Request path preview",
-  "api.plan.description": "Shows the path a request for this model would take through the proxy. A preview sends nothing upstream and costs nothing.",
-  "api.plan.modeNote": "Native describes how a request is delivered. It is not a verification result.",
+  "api.plan.description":
+    "Shows the path a request for this model would take through the proxy. A preview sends nothing upstream and costs nothing.",
+  "api.plan.modeNote":
+    "Native describes how a request is delivered. It is not a verification result.",
   "api.plan.unavailable": "This proxy version does not offer path previews.",
   "api.plan.noModels": "No models to preview yet.",
   "api.plan.model": "Model",
@@ -3022,8 +3552,10 @@ export const en = {
   "api.key.revealHint": "Click to show the full key",
   "api.key.hideHint": "Click to hide the full key",
   "api.key.revealFailed": "Could not load the full key.",
-  "api.key.revealDenied": "Showing a stored key requires a paired browser session. Pair this browser to continue.",
-  "api.key.mutationHidden": "The key was created or its rotation started, but the one-time value was hidden because the session or view changed.",
+  "api.key.revealDenied":
+    "Showing a stored key requires a paired browser session. Pair this browser to continue.",
+  "api.key.mutationHidden":
+    "The key was created or its rotation started, but the one-time value was hidden because the session or view changed.",
   "api.key.copyFailedShort": "Could not copy. Select the key and copy it manually.",
   "api.key.deleteRowAria": "Delete {name}",
   "api.key.deleteShort": "Delete",
@@ -3034,7 +3566,8 @@ export const en = {
   "api.modelsCount": "{count} callable",
   "api.modelsLoading": "Loading models…",
   "api.modelsSearch": "Search models",
-  "api.modelsSubtitle": "Use these exact model IDs with /v1/models and your chosen inbound protocol.",
+  "api.modelsSubtitle":
+    "Use these exact model IDs with /v1/models and your chosen inbound protocol.",
   "api.modelsEmpty": "No externally callable models are available yet.",
   "api.modelsNoMatch": "No models match “{query}”.",
   "api.modelsLoadFailed": "Could not load the external model catalog.",
@@ -3083,24 +3616,31 @@ export const en = {
   "api.clientConfig.clientCline": "Cline CLI",
   "api.clientConfig.clientKilo": "Kilo",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "This is a two-file bundle, not a Cline settings file. Merge settings into providers.json and catalog into sibling models.json. Use the integration switch for a backed-up write.",
-  "api.clientConfig.clineDownloaded": "Downloaded {filename}. Nothing changed yet; settings and catalog belong in two separate Cline files.",
+  "api.clientConfig.clineBundle":
+    "This is a two-file bundle, not a Cline settings file. Merge settings into providers.json and catalog into sibling models.json. Use the integration switch for a backed-up write.",
+  "api.clientConfig.clineDownloaded":
+    "Downloaded {filename}. Nothing changed yet; settings and catalog belong in two separate Cline files.",
   "api.clientConfig.copy": "Copy config",
   "api.clientConfig.download": "Download",
   "api.clientConfig.loading": "Building client config…",
   "api.clientConfig.jsonLabel": "{client} config",
   "api.clientConfig.destination": "Destination file",
   "api.clientConfig.envHint": "Set the key before launching",
-  "api.clientConfig.mergeWarning": "Merge this into the destination file. Replacing it would drop your other providers and MCP settings.",
+  "api.clientConfig.mergeWarning":
+    "Merge this into the destination file. Replacing it would drop your other providers and MCP settings.",
   "api.clientConfig.modelCount": "{count} model(s) exported",
-  "api.clientConfig.missingLimits": "{count} of {total} model(s) ship without a context limit; the client applies its own defaults.",
-  "api.clientConfig.noKeyYet": "{env} has no key behind it yet. Generate a key above before using this config off loopback.",
+  "api.clientConfig.missingLimits":
+    "{count} of {total} model(s) ship without a context limit; the client applies its own defaults.",
+  "api.clientConfig.noKeyYet":
+    "{env} has no key behind it yet. Generate a key above before using this config off loopback.",
   "api.clientConfig.loadFailed": "Could not read the model list, so no client config was produced.",
   "api.clientConfig.copiedAnnounce": "Client config copied to the clipboard.",
   "api.clientConfig.copyFailed": "Could not copy the client config.",
-  "api.clientConfig.downloadedAnnounce": "Downloaded {filename}. Nothing changed yet — merge it into {destination} yourself.",
+  "api.clientConfig.downloadedAnnounce":
+    "Downloaded {filename}. Nothing changed yet — merge it into {destination} yourself.",
   "api.clientConfig.whereDisclosure": "Where this file goes",
-  "api.clientConfig.whereBody": "The destination above is the global path. A project-local config file in the working directory takes precedence over it, and the client reads the key from the environment variable named in the config — never from this file.",
+  "api.clientConfig.whereBody":
+    "The destination above is the global path. A project-local config file in the working directory takes precedence over it, and the client reads the key from the environment variable named in the config — never from this file.",
   "api.keysLoadFailed": "Could not load API keys.",
   "api.createFailed": "Could not create API key.",
   "api.deleteFailed": "Could not delete API key.",
@@ -3109,7 +3649,8 @@ export const en = {
   "api.auth.accepted": "Accepted",
   "api.auth.rejected": "Not accepted",
   "api.auth.testProtocol": "Test {protocol}",
-  "api.auth.testNeedsFreshKey": "Generate a key and keep its one-time value on screen to run an authenticated test.",
+  "api.auth.testNeedsFreshKey":
+    "Generate a key and keep its one-time value on screen to run an authenticated test.",
   "api.key.name": "Key name",
   "api.key.rename": "Rename",
   "api.key.saveName": "Save name",
@@ -3119,7 +3660,8 @@ export const en = {
   "api.rotation.title": "Key rotation",
   "api.rotation.pending": "Rotation is pending. Update and verify the client before committing.",
   "api.rotation.expires": "Overlap expires:",
-  "api.key.copyFailed": "Could not copy the key. Select it and copy it manually before dismissing this panel.",
+  "api.key.copyFailed":
+    "Could not copy the key. Select it and copy it manually before dismissing this panel.",
   "api.attribution.title": "Attributed usage",
   "api.attribution.requests7d": "Requests, last 7 days",
   "api.attribution.totalRequests": "Total attributed requests",
@@ -3129,11 +3671,14 @@ export const en = {
   "api.attribution.since": "Attribution available since",
   "api.attribution.neverUsed": "Not used since attribution began",
   "api.attribution.unavailable": "Usage unavailable",
-  "api.attribution.unavailableDetail": "No usage has been attributed yet. Requests recorded before attribution began cannot be assigned retroactively.",
-  "api.attribution.ambiguous": "Two keys share this ID, so usage cannot be attributed to one of them. Give each key a unique ID in the config file.",
+  "api.attribution.unavailableDetail":
+    "No usage has been attributed yet. Requests recorded before attribution began cannot be assigned retroactively.",
+  "api.attribution.ambiguous":
+    "Two keys share this ID, so usage cannot be attributed to one of them. Give each key a unique ID in the config file.",
   "api.attribution.railAmbiguous": "duplicate ID",
   // Claude Code inbound
-  "claude.subtitle": "Routes ocx claude through OpenCodex so Claude Code can use GPT, Gemini, and other models. Turning it off also stops interception (including first-party) and Claude Desktop's model list. Same setting as the Claude switch on the Connect overview.",
+  "claude.subtitle":
+    "Routes ocx claude through OpenCodex so Claude Code can use GPT, Gemini, and other models. Turning it off also stops interception (including first-party) and Claude Desktop's model list. Same setting as the Claude switch on the Connect overview.",
   "claude.pageTitle": "Claude Code",
   "claude.workspace.settings": "General",
   "claude.enabledLabel": "Claude connection",
@@ -3143,7 +3688,8 @@ export const en = {
   "claude.saveBar.revert": "Revert",
   "claude.enabledHint": "When off, Claude Code cannot use this proxy.",
   "claude.authMode": "Auth Mode",
-  "claude.authModeHint": "Subscription requires Claude account, Proxy works without Anthropic account",
+  "claude.authModeHint":
+    "Subscription requires Claude account, Proxy works without Anthropic account",
   "claude.authModeSubscription": "Subscription (Claude account)",
   "claude.authModeProxy": "Proxy (no account needed)",
   "claude.authModeAuto": "Auto (detect Claude auth)",
@@ -3159,23 +3705,30 @@ export const en = {
   "claude.authSource.exported-env": "environment variable",
   "claude.authSource.unknown": "a detected credential",
   "claude.fastMode": "Fast Mode (OpenAI)",
-  "claude.fastModeDesc": "Controls service_tier for OpenAI models. ON = priority (faster). OFF = default. Auto = passthrough (client decides).",
+  "claude.fastModeDesc":
+    "Controls service_tier for OpenAI models. ON = priority (faster). OFF = default. Auto = passthrough (client decides).",
   "claude.fastAuto": "Auto",
   "claude.fastOn": "ON",
   "claude.fastOff": "OFF",
   "claude.autoContext": "Use big context automatically",
-  "claude.autoContextDesc": "Controls how far the 1M marking goes. ON: any model whose window can host the compaction threshold gets a big-context row. OFF: only true 1M models get one.",
-  "claude.autoContextInert": "Inactive because a legacy context-size value (maxContextTokens) exists in the config file. Remove it there to re-enable.",
+  "claude.autoContextDesc":
+    "Controls how far the 1M marking goes. ON: any model whose window can host the compaction threshold gets a big-context row. OFF: only true 1M models get one.",
+  "claude.autoContextInert":
+    "Inactive because a legacy context-size value (maxContextTokens) exists in the config file. Remove it there to re-enable.",
   "claude.contextAccounting": "Context accounting",
-  "claude.contextAccountingDesc": "1M: long-window models default to 1M wherever opencodex picks the default. 200k: opencodex stops marking models 1M automatically; a 1M row you pick yourself and a context override you set still apply.",
+  "claude.contextAccountingDesc":
+    "1M: long-window models default to 1M wherever opencodex picks the default. 200k: opencodex stops marking models 1M automatically; a 1M row you pick yourself and a context override you set still apply.",
   "claude.contextAccounting1m": "1M (default)",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "Auto-summarize point",
   "claude.autoCompactDefault": "{value} (default)",
-  "claude.autoCompactWindowDesc": "Older messages are summarized when the chat reaches this point. It never exceeds each model's own limit, so 200k models are unaffected.",
-  "claude.autoCompactWindowWarn": "Changing this can break GPT models — set higher than a model's real limit, chats will error before the summary kicks in.",
+  "claude.autoCompactWindowDesc":
+    "Older messages are summarized when the chat reaches this point. It never exceeds each model's own limit, so 200k models are unaffected.",
+  "claude.autoCompactWindowWarn":
+    "Changing this can break GPT models — set higher than a model's real limit, chats will error before the summary kicks in.",
   "claude.injectAgents": "Auto-register subagents",
-  "claude.injectAgentsDesc": "Registers the models picked on the Subagents tab (plus the current default model) as dispatchable Claude Code agents (ocx-*). Applies from the next session.",
+  "claude.injectAgentsDesc":
+    "Registers the models picked on the Subagents tab (plus the current default model) as dispatchable Claude Code agents (ocx-*). Applies from the next session.",
   "claude.webSearchSidecar": "Web search sidecar override",
   "claude.webSearchSidecarHint": "Override the main web search sidecar for Claude Code requests.",
   "claude.visionSidecar": "Vision sidecar override",
@@ -3183,16 +3736,21 @@ export const en = {
   "claude.useMainSetting": "Use main setting",
   "claude.sidecarModelPlaceholder": "Main setting model",
   "claude.quickstart": "Get started",
-  "claude.quickstartHint": "{cmd} opens Claude Code through the proxy. Your claude.ai login stays active.",
+  "claude.quickstartHint":
+    "{cmd} opens Claude Code through the proxy. Your claude.ai login stays active.",
   "claude.manualEnv": "Manual setup (advanced)",
   "claude.smallFastModel": "Background helper model",
-  "claude.smallFastModelHint": "The model Claude Code uses for background work like chat summaries and topic detection. The haiku subagent alias uses it too. Empty = Claude default (Haiku).",
-  "claude.smallFastModelAccurateHint": "The model Claude Code uses for background work such as chat summaries and topic detection. The haiku subagent alias uses it too.",
+  "claude.smallFastModelHint":
+    "The model Claude Code uses for background work like chat summaries and topic detection. The haiku subagent alias uses it too. Empty = Claude default (Haiku).",
+  "claude.smallFastModelAccurateHint":
+    "The model Claude Code uses for background work such as chat summaries and topic detection. The haiku subagent alias uses it too.",
   "claude.smallFastModelUnsetOption": "Let Claude Code choose (native model)",
-  "claude.smallFastModelNativeWarning": "When unset, OpenCodex leaves the helper-model overrides unset. Claude Code may use its native Sonnet model, which may incur charges from your native provider.",
+  "claude.smallFastModelNativeWarning":
+    "When unset, OpenCodex leaves the helper-model overrides unset. Claude Code may use its native Sonnet model, which may incur charges from your native provider.",
   "claude.slotUnset": "Use Claude default",
   "claude.modelMap": "Model interception",
-  "claude.modelMapHint": "Intercepts requests for a specific model and reroutes them to the one you pick. Empty by default — nothing happens until you add a rule.",
+  "claude.modelMapHint":
+    "Intercepts requests for a specific model and reroutes them to the one you pick. Empty by default — nothing happens until you add a rule.",
   "claude.mapFrom": "Original model (e.g. claude-sonnet-4-5)",
   "claude.mapTo": "Swap to (e.g. gemini/gemini-3-pro)",
   "claude.addMapping": "Add rule",
@@ -3209,7 +3767,8 @@ export const en = {
   "claude.none": "None",
   "claude.tabsLabel": "Claude client",
   "claudeDesktop.title": "Claude Desktop",
-  "claudeDesktop.subtitle": "Route each Claude model family through an available model on proxy port {port}.",
+  "claudeDesktop.subtitle":
+    "Route each Claude model family through an available model on proxy port {port}.",
   "claudeDesktop.importJson": "Import JSON",
   "claudeDesktop.exportJson": "Export JSON",
   "claudeDesktop.loading": "Loading Claude Desktop profile…",
@@ -3219,7 +3778,8 @@ export const en = {
   "claudeDesktop.applyFailed": "Profile was saved, but could not be applied.",
   "claudeDesktop.updateFailed": "Claude Desktop update failed.",
   "claudeDesktop.savedApplied": "Profile saved and applied to Claude Desktop.",
-  "claudeDesktop.appliedMarkerUnsaved": "Applied to Claude Desktop, but the applied marker was not saved — the saved-vs-applied state below may read stale until you apply again.",
+  "claudeDesktop.appliedMarkerUnsaved":
+    "Applied to Claude Desktop, but the applied marker was not saved — the saved-vs-applied state below may read stale until you apply again.",
   "claudeDesktop.savedAppliedAnnounce": "Claude Desktop profile saved and applied.",
   "claudeDesktop.saved": "Profile saved.",
   "claudeDesktop.savedAnnounce": "Claude Desktop profile saved.",
@@ -3236,7 +3796,8 @@ export const en = {
   "claudeDesktop.applying": "Applying…",
   "claudeDesktop.saveApply": "Save & apply",
   "claudeDesktop.emptyTitle": "No models available",
-  "claudeDesktop.emptyHint": "Add or enable a provider, then return to assign Claude Desktop routes.",
+  "claudeDesktop.emptyHint":
+    "Add or enable a provider, then return to assign Claude Desktop routes.",
   "claudeDesktop.assignmentsLabel": "Claude model family assignments",
   "claudeDesktop.family.opus": "Opus",
   "claudeDesktop.family.fable": "Fable",
@@ -3254,7 +3815,8 @@ export const en = {
   "grok.loading": "Loading Grok status…",
   "grok.loadFail": "Could not read the Grok config.",
   "grok.notConfiguredTitle": "Grok Build is not wired up",
-  "grok.notConfiguredHint": "Start or restart the proxy with Grok installed and opencodex writes a managed block into:",
+  "grok.notConfiguredHint":
+    "Start or restart the proxy with Grok installed and opencodex writes a managed block into:",
   "grok.endpoint": "Endpoint",
   "grok.colModel": "Model",
   "grok.colAlias": "Grok alias",
@@ -3283,9 +3845,11 @@ export const en = {
   "claudeDesktop.roles.unset": "Not set",
   "claudeDesktop.roles.pick": "Choose a model",
   "claudeDesktop.roles.unavailableOption": "{route} (unavailable)",
-  "claudeDesktop.roles.gatewayScope": "These choices apply to gateway mode, which writes Claude Desktop's model list.",
+  "claudeDesktop.roles.gatewayScope":
+    "These choices apply to gateway mode, which writes Claude Desktop's model list.",
   "claudeDesktop.roles.listTitle": "Desktop model list",
-  "claudeDesktop.roles.listHint": "Choose which models Claude Desktop lists. Only Claude Desktop changes: other clients and provider settings keep their models.",
+  "claudeDesktop.roles.listHint":
+    "Choose which models Claude Desktop lists. Only Claude Desktop changes: other clients and provider settings keep their models.",
   "claudeDesktop.status.pendingApply": "Saved — apply to update Desktop",
   "claudeDesktop.visibility.search": "Search models",
   "claudeDesktop.visibility.provider": "Provider",
@@ -3306,11 +3870,14 @@ export const en = {
   "claudeDesktop.visibility.previewTitle": "Next apply",
   "claudeDesktop.visibility.previewAdds": "Adds: {models}",
   "claudeDesktop.visibility.previewRemoves": "Removes: {models}",
-  "claudeDesktop.visibility.previewSame": "The profile contains the same model IDs. Apply profile changes before restarting Desktop.",
-  "claudeDesktop.visibility.replaceNote": "Applying replaces the model list in OpenCodex's Claude Desktop profile, including any list edited there by hand. Tier mapping under Advanced stays optional. Discovery-only mode does not use this selection.",
+  "claudeDesktop.visibility.previewSame":
+    "The profile contains the same model IDs. Apply profile changes before restarting Desktop.",
+  "claudeDesktop.visibility.replaceNote":
+    "Applying replaces the model list in OpenCodex's Claude Desktop profile, including any list edited there by hand. Tier mapping under Advanced stays optional. Discovery-only mode does not use this selection.",
   "claudeDesktop.roles.quickBadge": "Quick tasks",
   "claudeDesktop.advanced.title": "Advanced: Claude tier assignment",
-  "claudeDesktop.advanced.desc": "Choose which Claude tier (Opus, Fable, Sonnet, Haiku) Claude Desktop treats each model as.",
+  "claudeDesktop.advanced.desc":
+    "Choose which Claude tier (Opus, Fable, Sonnet, Haiku) Claude Desktop treats each model as.",
   "claudeDesktop.advanced.empty": "empty",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "Unavailable",
@@ -3325,56 +3892,84 @@ export const en = {
   "claudeDesktop.status.stale": "Desktop configuration is out of date — re-apply",
   "claudeDesktop.status.notApplied": "Not applied",
   "claudeDesktop.status.notActiveProfile": "Desktop is serving another profile — re-apply",
-  "claudeDesktop.status.disabled": "Claude Desktop integration is off. Fully quit and reopen Desktop after enabling it.",
+  "claudeDesktop.status.disabled":
+    "Claude Desktop integration is off. Fully quit and reopen Desktop after enabling it.",
   "claudeDesktop.enableApply": "Enable and apply",
   "claudeDesktop.switchModeApply": "Switch mode & apply",
-  "claudeDesktop.status.appliedFirstParty": "First-party: Desktop Code tab routed through the local proxy",
+  "claudeDesktop.status.appliedFirstParty":
+    "First-party: Desktop Code tab routed through the local proxy",
   "claudeDesktop.mode.legend": "Connection mode",
   "claudeDesktop.mode.firstParty": "First-party",
   "claudeDesktop.mode.gateway": "Gateway (third-party)",
   "claudeDesktop.mode.defaultBadge": "default",
   "claudeDesktop.mode.current": "current",
-  "claudeDesktop.mode.firstPartyHint": "Desktop stays signed in to claude.ai. Its Code tab uses OpenCodex when Desktop first-party is on; the standalone CLI has its own switch. Both read the same settings env.",
+  "claudeDesktop.mode.firstPartyHint":
+    "Desktop stays signed in to claude.ai. Its Code tab uses OpenCodex when Desktop first-party is on; the standalone CLI has its own switch. Both read the same settings env.",
   "claude.intercept.start": "Start interception",
   "claude.intercept.starting": "Starting interception…",
   "claude.intercept.reason.disabled": "Enable Claude routing and interception first.",
-  "claude.intercept.reason.client_role": "This process is a hub client. Enable interception on a local server.",
-  "claude.intercept.reason.ephemeral_port": "Set claudeCode.intercept.port when the public port is ephemeral.",
-  "claude.intercept.reason.port_in_use": "Port {port} is in use. Free it or change claudeCode.intercept.port.",
-  "claude.intercept.reason.port_mismatch": "This run uses port {bound}; configured port {configured} differs. Use the bound port or restore the configured value.",
-  "claude.intercept.reason.failed": "Interception could not start. Retry after checking the local proxy configuration.",
-  "claude.intercept.reason.stopped": "The interception lifecycle has stopped. Start a running OpenCodex service.",
+  "claude.intercept.reason.client_role":
+    "This process is a hub client. Enable interception on a local server.",
+  "claude.intercept.reason.ephemeral_port":
+    "Set claudeCode.intercept.port when the public port is ephemeral.",
+  "claude.intercept.reason.port_in_use":
+    "Port {port} is in use. Free it or change claudeCode.intercept.port.",
+  "claude.intercept.reason.port_mismatch":
+    "This run uses port {bound}; configured port {configured} differs. Use the bound port or restore the configured value.",
+  "claude.intercept.reason.failed":
+    "Interception could not start. Retry after checking the local proxy configuration.",
+  "claude.intercept.reason.stopped":
+    "The interception lifecycle has stopped. Start a running OpenCodex service.",
   "claude.firstParty.label": "Claude Code CLI first-party",
-  "claude.firstParty.desc": "Lets the standalone claude CLI keep its Claude sign-in while its traffic passes through the local intercept proxy.",
+  "claude.firstParty.desc":
+    "Lets the standalone claude CLI keep its Claude sign-in while its traffic passes through the local intercept proxy.",
   "claude.firstParty.aria": "Toggle Claude Code CLI first-party",
-  "claude.firstParty.risk": "Account risk: first-party routes Claude subscription traffic through a local interception proxy. Anthropic may treat this as a terms violation and suspend the account.",
-  "claude.firstParty.shared": "When the shared proxy env is applied, the other Claude client also transits the local proxy as an unchanged relay; TLS terminates locally. Set NO_PROXY='*' in the shell for fully native terminal use.",
-  "claude.firstParty.deadProxy": "The Claude settings env points at a proxy that is not running. Start opencodex, or turn Desktop/CLI first-party off to remove the settings before using plain claude.",
-  "claude.firstParty.notApplied": "CLI first-party is on, but its proxy settings are not applied. Check the Claude settings env before using plain claude.",
-  "claude.firstParty.brokenProxy": "Interception could not start. Retry after checking the local proxy configuration.",
-  "claude.firstParty.residual": "Claude settings still point to an OpenCodex proxy although neither Desktop nor CLI first-party is on. Remove the remaining proxy setting or run `ocx ensure`.",
-  "claude.firstParty.routingOff": "opencodex is not serving the Claude intercept in its current configuration (Claude routing or the intercept is turned off, or this machine is a client of another opencodex hub), so these settings point at a proxy that will not serve them. Turn it back on on this machine, or turn first-party off to remove the settings.",
+  "claude.firstParty.risk":
+    "Account risk: first-party routes Claude subscription traffic through a local interception proxy. Anthropic may treat this as a terms violation and suspend the account.",
+  "claude.firstParty.shared":
+    "When the shared proxy env is applied, the other Claude client also transits the local proxy as an unchanged relay; TLS terminates locally. Set NO_PROXY='*' in the shell for fully native terminal use.",
+  "claude.firstParty.deadProxy":
+    "The Claude settings env points at a proxy that is not running. Start opencodex, or turn Desktop/CLI first-party off to remove the settings before using plain claude.",
+  "claude.firstParty.notApplied":
+    "CLI first-party is on, but its proxy settings are not applied. Check the Claude settings env before using plain claude.",
+  "claude.firstParty.brokenProxy":
+    "Interception could not start. Retry after checking the local proxy configuration.",
+  "claude.firstParty.residual":
+    "Claude settings still point to an OpenCodex proxy although neither Desktop nor CLI first-party is on. Remove the remaining proxy setting or run `ocx ensure`.",
+  "claude.firstParty.routingOff":
+    "opencodex is not serving the Claude intercept in its current configuration (Claude routing or the intercept is turned off, or this machine is a client of another opencodex hub), so these settings point at a proxy that will not serve them. Turn it back on on this machine, or turn first-party off to remove the settings.",
   "claude.firstParty.disabled": "Enable Claude routing and interception first.",
-  "claude.firstParty.foreign": "~/.claude/settings.json points at the opencodex proxy but trusts a certificate opencodex does not manage, so requests fail. Fix HTTPS_PROXY / NODE_EXTRA_CA_CERTS there by hand.",
-  "claude.firstParty.local": "~/.claude/settings.json sends Claude Code through a local proxy at 127.0.0.1 that opencodex cannot confirm as its own. If you no longer use it, remove HTTPS_PROXY there.",
-  "claude.firstParty.unknown": "opencodex could not determine whether ~/.claude/settings.json still points at its proxy.",
+  "claude.firstParty.foreign":
+    "~/.claude/settings.json points at the opencodex proxy but trusts a certificate opencodex does not manage, so requests fail. Fix HTTPS_PROXY / NODE_EXTRA_CA_CERTS there by hand.",
+  "claude.firstParty.local":
+    "~/.claude/settings.json sends Claude Code through a local proxy at 127.0.0.1 that opencodex cannot confirm as its own. If you no longer use it, remove HTTPS_PROXY there.",
+  "claude.firstParty.unknown":
+    "opencodex could not determine whether ~/.claude/settings.json still points at its proxy.",
   "claude.firstParty.refusal.interceptDisabled": "The interception proxy is disabled.",
-  "claude.firstParty.refusal.interceptUnavailable": "Interception could not start. Retry after checking the local proxy configuration.",
+  "claude.firstParty.refusal.interceptUnavailable":
+    "Interception could not start. Retry after checking the local proxy configuration.",
   "claude.firstParty.refusal.foreignEnv": "Another program owns the Claude proxy settings.",
   "claude.firstParty.refusal.caUnavailable": "The local certificate authority is unavailable.",
   "claude.firstParty.refusal.unreadable": "Claude settings could not be read.",
   "claude.firstParty.refusal.writeFailed": "Claude settings could not be written.",
-  "claudeDesktop.mode.firstPartyRisk": "Account risk: first-party sends your Claude subscription traffic through a local interception proxy. Anthropic may treat this as a terms violation and suspend the account. Gateway is the default.",
-  "claudeDesktop.mode.gatewayHint": "The whole app switches to OpenCodex as its gateway. Chat runs locally; claude.ai features are unavailable.",
-  "claudeDesktop.mode.switchNote": "Switching replaces the other mode's configuration. Fully quit and reopen Desktop afterwards.",
+  "claudeDesktop.mode.firstPartyRisk":
+    "Account risk: first-party sends your Claude subscription traffic through a local interception proxy. Anthropic may treat this as a terms violation and suspend the account. Gateway is the default.",
+  "claudeDesktop.mode.gatewayHint":
+    "The whole app switches to OpenCodex as its gateway. Chat runs locally; claude.ai features are unavailable.",
+  "claudeDesktop.mode.switchNote":
+    "Switching replaces the other mode's configuration. Fully quit and reopen Desktop afterwards.",
   "claudeDesktop.firstParty.proxyRunning": "Local proxy on 127.0.0.1:{port}",
-  "claudeDesktop.firstParty.proxyStopped": "Interception could not start. Retry after checking the local proxy configuration. ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "Intercept proxy is disabled in config (claudeCode.intercept.enabled)",
+  "claudeDesktop.firstParty.proxyStopped":
+    "Interception could not start. Retry after checking the local proxy configuration. ({port})",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "Intercept proxy is disabled in config (claudeCode.intercept.enabled)",
   "claudeDesktop.picker.title": "Claude Desktop picker",
-  "claudeDesktop.picker.hint": "Show OpenCodex models in Desktop's Code tab picker through the dedicated local proxy.",
+  "claudeDesktop.picker.hint":
+    "Show OpenCodex models in Desktop's Code tab picker through the dedicated local proxy.",
   "claudeDesktop.picker.toggle": "Enable Claude Desktop picker",
   "claudeDesktop.picker.state.active": "Picker is active",
-  "claudeDesktop.picker.state.restart": "Fully quit and reopen Claude Desktop to finish applying the picker profile.",
+  "claudeDesktop.picker.state.restart":
+    "Fully quit and reopen Claude Desktop to finish applying the picker profile.",
   "claudeDesktop.picker.state.trustPending": "Waiting for certificate trust",
   "claudeDesktop.picker.state.trustDeclined": "Certificate trust was declined",
   "claudeDesktop.picker.state.proxyUnavailable": "Picker proxy is not running",
@@ -3382,10 +3977,13 @@ export const en = {
   "claudeDesktop.picker.state.notFirstParty": "Picker is available only in first-party mode",
   "claudeDesktop.picker.state.profileFailed": "The picker profile could not be applied",
   "claudeDesktop.picker.models": "{count} models available in the picker",
-  "claudeDesktop.picker.offlineNote": "While picker mode is on, Claude Desktop reaches the network through OpenCodex. If OpenCodex stops, Desktop is offline until it restarts or picker mode is turned off.",
+  "claudeDesktop.picker.offlineNote":
+    "While picker mode is on, Claude Desktop reaches the network through OpenCodex. If OpenCodex stops, Desktop is offline until it restarts or picker mode is turned off.",
   "claudeDesktop.firstParty.bindings.title": "Code tab model bindings",
-  "claudeDesktop.firstParty.bindings.hint": "Claude Desktop keeps Anthropic's names in the Code tab picker. Bind a picker model to an OpenCodex model and requests for that picker entry are served by the bound model. Only Claude Code traffic through the local proxy (the Desktop Code tab and the claude CLI) uses these bindings; ocx claude is unaffected. Bindings apply on the next request — no need to fully quit and reopen.",
-  "claudeDesktop.firstParty.bindings.empty": "No bindings yet — picker models follow their default route.",
+  "claudeDesktop.firstParty.bindings.hint":
+    "Claude Desktop keeps Anthropic's names in the Code tab picker. Bind a picker model to an OpenCodex model and requests for that picker entry are served by the bound model. Only Claude Code traffic through the local proxy (the Desktop Code tab and the claude CLI) uses these bindings; ocx claude is unaffected. Bindings apply on the next request — no need to fully quit and reopen.",
+  "claudeDesktop.firstParty.bindings.empty":
+    "No bindings yet — picker models follow their default route.",
   "claudeDesktop.firstParty.bindings.pickerLabel": "Picker model id",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
   "claudeDesktop.firstParty.bindings.routeLabel": "OpenCodex model",
@@ -3398,10 +3996,18 @@ export const en = {
   "claudeDesktop.effort.supported": "effort",
   "claudeDesktop.effort.displayOnly": "effort (display only)",
 
-  "models.newPolicyGlobal": "New models start disabled", "models.newPolicyProvider": "New model policy",
-  "models.fastProvider": "Fast mode", "models.fastProviderHint": "Uses usage credits at 2x price", "models.fastEnabled": "Fast mode on", "models.fastDisabled": "Fast mode off", "models.fastSaveFailed": "Could not save Fast mode",
-  "models.newPolicy_inherit": "Inherit", "models.newPolicy_off": "Off", "models.newPolicy_on": "On",
-  "models.newBadge": "NEW", "models.newCount": "{count} new, off",
+  "models.newPolicyGlobal": "New models start disabled",
+  "models.newPolicyProvider": "New model policy",
+  "models.fastProvider": "Fast mode",
+  "models.fastProviderHint": "Uses usage credits at 2x price",
+  "models.fastEnabled": "Fast mode on",
+  "models.fastDisabled": "Fast mode off",
+  "models.fastSaveFailed": "Could not save Fast mode",
+  "models.newPolicy_inherit": "Inherit",
+  "models.newPolicy_off": "Off",
+  "models.newPolicy_on": "On",
+  "models.newBadge": "NEW",
+  "models.newCount": "{count} new, off",
   "models.aliases": "Aliases",
   "models.aliasesTable": "Alias table",
   "models.aliasPrompt": "Provider alias (leave empty to clear)",
@@ -3415,27 +4021,36 @@ export const en = {
   "models.aliasAuto": "auto",
   "models.aliasUser": "user",
   "models.aliasStale": "stale",
-  "connection.pairing.notApiKey": "Paste a one-time pairing code here. Data API keys and admin tokens do not belong in this field.",
-  "connection.pairing.networkError": "Could not reach OpenCodex. Check that it is running and retry.",
+  "connection.pairing.notApiKey":
+    "Paste a one-time pairing code here. Data API keys and admin tokens do not belong in this field.",
+  "connection.pairing.networkError":
+    "Could not reach OpenCodex. Check that it is running and retry.",
   "connection.pairing.requestError": "OpenCodex could not complete the pairing request. Try again.",
   "connection.pairing.responseError": "OpenCodex returned an invalid pairing response. Try again.",
   "dash.authRequired": "Browser authentication is required to view this dashboard.",
-  "dash.permissionDenied": "This browser is not permitted to read the dashboard. Check access settings with the server operator.",
+  "dash.permissionDenied":
+    "This browser is not permitted to read the dashboard. Check access settings with the server operator.",
   "dash.dataUnavailable": "Dashboard data could not be loaded. Check the connection and retry.",
   "dash.staleData": "Showing the last received data; it may be out of date.",
   "connection.pairing.code": "One-time pairing code",
   "connection.pairing.retryValidation": "Retry validation",
-  "connection.pairing.validationPending": "The code was exchanged, but session validation could not complete. Keep this page open and use Retry validation; no new code is needed.",
+  "connection.pairing.validationPending":
+    "The code was exchanged, but session validation could not complete. Keep this page open and use Retry validation; no new code is needed.",
   "connection.pairing.submit": "Connect",
   "connection.pairing.submitting": "Connecting…",
-  "connection.pairing.error": "The pairing code was rejected. Run the command again to get a fresh code for this browser address.",
-  "connection.pairing.originDenied": "Pairing requires the configured loopback address. Open the dashboard there and request a new code.",
+  "connection.pairing.error":
+    "The pairing code was rejected. Run the command again to get a fresh code for this browser address.",
+  "connection.pairing.originDenied":
+    "Pairing requires the configured loopback address. Open the dashboard there and request a new code.",
   "connection.sessionLogout": "Log out remote session",
   "connection.sessionLoggingOut": "Logging out remote session…",
-  "connection.sessionLogoutFailed": "Could not log out the remote session. The current session was kept.",
+  "connection.sessionLogoutFailed":
+    "Could not log out the remote session. The current session was kept.",
   "usage.source.local": "Source: local usage.jsonl",
-  "models.displayNameSavedRefreshFailed": "The change was saved, but the model list could not be refreshed. Retry to refresh it.",
-  "models.displayNameOutcomeUnknown": "The request did not finish. The change may have been saved. Retry to check the current name before making another change.",
+  "models.displayNameSavedRefreshFailed":
+    "The change was saved, but the model list could not be refreshed. Retry to refresh it.",
+  "models.displayNameOutcomeUnknown":
+    "The request did not finish. The change may have been saved. Retry to check the current name before making another change.",
   "models.displayNameCurrentUnavailable": "Current name unavailable until refresh",
   "models.displayNameReloaded": "Model list refreshed",
   "models.displayNameAction": "Name",
@@ -3463,8 +4078,10 @@ export const en = {
   "pricing.override.title": "Model price",
   "pricing.override.modelId": "Model ID",
   "pricing.override.promptTitle": "Long-prompt pricing",
-  "pricing.override.promptHelp": "Input tokens and cache reads and writes in a request determine the band; the entire request is priced at that band's rates. Output tokens never count. Rates are for standard speed.",
-  "pricing.override.help": "USD per 1M tokens. Enter input and output rates; blank cache rates use 0. Zero rates are allowed.",
+  "pricing.override.promptHelp":
+    "Input tokens and cache reads and writes in a request determine the band; the entire request is priced at that band's rates. Output tokens never count. Rates are for standard speed.",
+  "pricing.override.help":
+    "USD per 1M tokens. Enter input and output rates; blank cache rates use 0. Zero rates are allowed.",
   "pricing.override.input": "Input",
   "pricing.override.output": "Output",
   "pricing.override.cacheRead": "Cache read",
@@ -3473,23 +4090,33 @@ export const en = {
   "pricing.override.modeFlat": "Flat rate",
   "pricing.override.modeCustom": "Custom threshold",
 
-  "pricing.override.modeAutomaticHelp": "Uses the catalog prompt-length rules with the base rates above. Fast and Priority adjustments still apply.",
-  "pricing.override.modeFlatHelp": "Uses the base rates above at every prompt length, replacing catalog prompt-length rules. Fast and Priority adjustments still apply.",
+  "pricing.override.modeAutomaticHelp":
+    "Uses the catalog prompt-length rules with the base rates above. Fast and Priority adjustments still apply.",
+  "pricing.override.modeFlatHelp":
+    "Uses the base rates above at every prompt length, replacing catalog prompt-length rules. Fast and Priority adjustments still apply.",
   "pricing.override.threshold": "Prompt threshold (tokens)",
   "pricing.override.bandTitle": "Rates in the long-prompt band",
-  "pricing.override.bandHelp": "These are standard-speed rates. Catalog Fast and Priority rules still apply. Cost figures are estimates.",
+  "pricing.override.bandHelp":
+    "These are standard-speed rates. Catalog Fast and Priority rules still apply. Cost figures are estimates.",
   "pricing.override.comparison": "Threshold comparison",
   "pricing.override.comparisonGt": "Greater than (>)",
   "pricing.override.comparisonGte": "Greater than or equal to (≥)",
-  "pricing.override.modeCustomHelp": "Enter four absolute rates per 1M tokens. Prompt length includes cached input and excludes output. These rates replace the catalog prompt-length rule for the whole request. Fast and Priority adjustments still apply. Cost figures are estimates.",
-  "pricing.override.customInvalid": "Enter a positive safe-integer token threshold and four finite rates from 0 to 1,000,000. Rates may be 0.",
+  "pricing.override.modeCustomHelp":
+    "Enter four absolute rates per 1M tokens. Prompt length includes cached input and excludes output. These rates replace the catalog prompt-length rule for the whole request. Fast and Priority adjustments still apply. Cost figures are estimates.",
+  "pricing.override.customInvalid":
+    "Enter a positive safe-integer token threshold and four finite rates from 0 to 1,000,000. Rates may be 0.",
   "pricing.override.loading": "Loading saved price…",
   "pricing.override.loadFailed": "Could not load the saved price. Reload to try again.",
-  "pricing.override.outcomeUnknown": "The request did not finish reliably. The price may have changed. Reload the saved price before editing again.",
-  "pricing.override.recoveryFailed": "Could not recover the saved price. Editing stays locked; reload to try again.",
-  "pricing.override.recovered": "Latest saved price loaded. The earlier request or another client may still change it.",
-  "pricing.override.refreshFailed": "The price was saved, but the model list could not be refreshed. Retry the list refresh.",
-  "pricing.override.invalid": "Enter input and output rates. Every rate must be a finite number from 0 to 1,000,000.",
+  "pricing.override.outcomeUnknown":
+    "The request did not finish reliably. The price may have changed. Reload the saved price before editing again.",
+  "pricing.override.recoveryFailed":
+    "Could not recover the saved price. Editing stays locked; reload to try again.",
+  "pricing.override.recovered":
+    "Latest saved price loaded. The earlier request or another client may still change it.",
+  "pricing.override.refreshFailed":
+    "The price was saved, but the model list could not be refreshed. Retry the list refresh.",
+  "pricing.override.invalid":
+    "Enter input and output rates. Every rate must be a finite number from 0 to 1,000,000.",
   "pricing.override.reset": "Reset to automatic",
   "pricing.override.save": "Save",
   "pricing.override.saving": "Saving…",
@@ -3507,10 +4134,13 @@ export const en = {
   "usage.range.invalid": "Enter valid local dates and times, on or after 1970-01-01 UTC.",
   "usage.range.reversed": "The end must be at or after the start.",
   "usage.range.applied": "Selected interval: {start} – {end} (both inclusive).",
-  "models.pickerOrder.editorHint": "Reorder routed models, then save your draft. Featured rows are fixed; native models are not shown.",
-  "models.pickerOrder.nativeLocked": "This saved order includes native models. Apply a routed preset or Default before editing Custom.",
+  "models.pickerOrder.editorHint":
+    "Reorder routed models, then save your draft. Featured rows are fixed; native models are not shown.",
+  "models.pickerOrder.nativeLocked":
+    "This saved order includes native models. Apply a routed preset or Default before editing Custom.",
   "models.pickerOrder.unknownChosen": "Featured choices are unknown. Reload before editing.",
-  "models.pickerOrder.changed": "Picker settings changed. Your draft is kept; reload to discard it and use current settings.",
+  "models.pickerOrder.changed":
+    "Picker settings changed. Your draft is kept; reload to discard it and use current settings.",
   "models.pickerOrder.savedReload": "Order saved. Reload current settings before editing again.",
   "models.pickerOrder.requestFailed": "Request failed. Your draft is kept; retry or reload.",
   "models.pickerOrder.empty": "No routed models are available.",
@@ -3521,7 +4151,8 @@ export const en = {
   "models.pickerOrder.position": "{model}: position {position} of {total}",
   "models.pickerOrder.saveDraft": "Save draft",
   "models.pickerOrder.reloadDraft": "Reload and discard draft",
-  "models.pickerOrder.catalogRequired": "Model identities are missing or ambiguous. Reload the Models page to refresh its catalog before editing Custom.",
+  "models.pickerOrder.catalogRequired":
+    "Model identities are missing or ambiguous. Reload the Models page to refresh its catalog before editing Custom.",
   "quotaSummary.aria": "Provider quota summary",
   "quotaSummary.updated": "Updated {time}",
   "quotaSummary.dataAt": "Data from {time}",
@@ -3534,7 +4165,8 @@ export const en = {
   "quotaSummary.scrollNext": "Scroll providers right",
   "quotaSummary.openAccounts": "Open account management",
   "pws.protocol.title": "Upstream wire",
-  "pws.protocol.note": "The API format opencodex speaks to this provider. It does not turn any client API on or off; the API page controls those.",
+  "pws.protocol.note":
+    "The API format opencodex speaks to this provider. It does not turn any client API on or off; the API page controls those.",
   "pws.protocol.adapterLabel": "Upstream wire this provider receives",
   "pws.protocol.source": "Decided by",
   "pws.protocol.source.hardPin": "Fixed by opencodex for this model",
@@ -3554,17 +4186,22 @@ export const en = {
   "compatProtocol.anyProtocol": "any",
   "compatProtocol.pair": "{inbound} → {upstream}",
   "compatProtocol.loading": "Reading the protocol pair of each subject…",
-  "compatProtocol.unverified": "No Lab evidence for {pair} yet. The pair is unverified, not failed.",
-  "compatProtocol.unresolved": "The protocol pair of {count} subjects could not be read; they are left out of this filter.",
-  "compatProtocol.axisNote": "These are Lab verdicts only. How a request is delivered (native or translated) is shown by the request path preview on the API page.",
+  "compatProtocol.unverified":
+    "No Lab evidence for {pair} yet. The pair is unverified, not failed.",
+  "compatProtocol.unresolved":
+    "The protocol pair of {count} subjects could not be read; they are left out of this filter.",
+  "compatProtocol.axisNote":
+    "These are Lab verdicts only. How a request is delivered (native or translated) is shown by the request path preview on the API page.",
   "protocolLinks.providerSettings": "Provider settings",
   "fallback.title": "Fallback",
-  "fallback.desc": "When a model or provider fails, OpenCodex can send the request to the next one in a combo, routing profile or subagent chain. Turn a kind off to get a clear error instead.",
+  "fallback.desc":
+    "When a model or provider fails, OpenCodex can send the request to the next one in a combo, routing profile or subagent chain. Turn a kind off to get a clear error instead.",
   "fallback.model": "Model fallback",
   "fallback.modelHint": "Another model from the same provider",
   "fallback.provider": "Provider fallback",
   "fallback.providerHint": "Another provider",
-  "fallback.rotationNote": "Switching between accounts or keys of one provider is not a fallback and stays on.",
+  "fallback.rotationNote":
+    "Switching between accounts or keys of one provider is not a fallback and stays on.",
   "fallback.overrides": "Overrides",
   "fallback.scope.provider": "Provider {name}",
   "fallback.scope.route": "Route {name}",

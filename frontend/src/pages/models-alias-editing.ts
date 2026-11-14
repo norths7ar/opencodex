@@ -24,13 +24,21 @@ export async function editProviderAlias(
   current: string,
   { apiBase, t, reloadAliases, publishFeedback }: AliasEditingDeps,
 ): Promise<void> {
-  const entered = await requestTextValue({ message: t("models.aliasPrompt"), initialValue: current });
+  const entered = await requestTextValue({
+    message: t("models.aliasPrompt"),
+    initialValue: current,
+  });
   // Dismissal is not an empty alias: a cancelled edit must write nothing.
   if (entered === null) return;
   const response = await fetch(`${apiBase}/api/providers/${encodeURIComponent(provider)}/alias`, {
-    method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ alias: entered.trim() || null }),
+    method: "PUT",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ alias: entered.trim() || null }),
   });
-  if (!response.ok) { publishFeedback(false, t("models.aliasConflict")); return; }
+  if (!response.ok) {
+    publishFeedback(false, t("models.aliasConflict"));
+    return;
+  }
   await reloadAliases();
   publishFeedback(true, t("models.aliasSaved"));
 }
@@ -42,13 +50,24 @@ export async function editModelAlias(
   current: string,
   { apiBase, t, reloadAliases, publishFeedback }: AliasEditingDeps,
 ): Promise<void> {
-  const entered = await requestTextValue({ message: t("models.modelAliasPrompt"), initialValue: current });
+  const entered = await requestTextValue({
+    message: t("models.modelAliasPrompt"),
+    initialValue: current,
+  });
   if (entered === null) return;
   const body = entered.trim() ? { set: { [model]: entered.trim() } } : { remove: [model] };
-  const response = await fetch(`${apiBase}/api/providers/${encodeURIComponent(provider)}/model-aliases`, {
-    method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(body),
-  });
-  if (!response.ok) { publishFeedback(false, t("models.aliasConflict")); return; }
+  const response = await fetch(
+    `${apiBase}/api/providers/${encodeURIComponent(provider)}/model-aliases`,
+    {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  if (!response.ok) {
+    publishFeedback(false, t("models.aliasConflict"));
+    return;
+  }
   await reloadAliases();
   publishFeedback(true, t("models.aliasSaved"));
 }

@@ -22,7 +22,13 @@ export interface SectionSwitcherItem {
  * altogether; if focus was inside at that moment, `onFocusOrphaned` lets App put it
  * somewhere meaningful, since there is no surviving button left to receive it.
  */
-export function SectionSwitcher({ items, currentPage, onNavigate, ariaLabel, onFocusOrphaned }: {
+export function SectionSwitcher({
+  items,
+  currentPage,
+  onNavigate,
+  ariaLabel,
+  onFocusOrphaned,
+}: {
   items: readonly SectionSwitcherItem[];
   currentPage: Page;
   onNavigate: (page: Page) => void;
@@ -32,7 +38,9 @@ export function SectionSwitcher({ items, currentPage, onNavigate, ariaLabel, onF
   const navRef = useRef<HTMLElement>(null);
   const focusedPage = useRef<Page | null>(null);
   const orphanedRef = useRef(onFocusOrphaned);
-  useLayoutEffect(() => { orphanedRef.current = onFocusOrphaned; });
+  useLayoutEffect(() => {
+    orphanedRef.current = onFocusOrphaned;
+  });
 
   // Unmount with focus still inside: React runs this cleanup before it removes the nav,
   // so the check sees the focused button and the handler can move focus before it drops.
@@ -50,9 +58,10 @@ export function SectionSwitcher({ items, currentPage, onNavigate, ariaLabel, onF
     const lost = focusedPage.current;
     if (!nav || lost === null) return;
     if (nav.contains(nav.ownerDocument.activeElement)) return;
-    if (items.some(item => item.page === lost)) return;
-    const fallback = nav.querySelector<HTMLButtonElement>('[aria-current="page"]')
-      ?? nav.querySelector<HTMLButtonElement>("button");
+    if (items.some((item) => item.page === lost)) return;
+    const fallback =
+      nav.querySelector<HTMLButtonElement>('[aria-current="page"]') ??
+      nav.querySelector<HTMLButtonElement>("button");
     fallback?.focus();
   }, [items]);
 
@@ -76,10 +85,11 @@ export function SectionSwitcher({ items, currentPage, onNavigate, ariaLabel, onF
       ref={navRef}
       className="section-switcher"
       aria-label={ariaLabel}
-      onFocus={event => {
-        focusedPage.current = (event.target as HTMLElement).dataset.sectionPage as Page | undefined ?? null;
+      onFocus={(event) => {
+        focusedPage.current =
+          ((event.target as HTMLElement).dataset.sectionPage as Page | undefined) ?? null;
       }}
-      onBlur={event => {
+      onBlur={(event) => {
         if (navRef.current?.contains(event.relatedTarget as Node | null)) return;
         /*
          * Focus left the switcher. If the button is still in the document this was a
@@ -88,17 +98,21 @@ export function SectionSwitcher({ items, currentPage, onNavigate, ariaLabel, onF
          * effect above, which runs in the same task, put focus on a survivor.
          */
         const left = event.target as HTMLElement;
-        window.setTimeout(() => { if (left.isConnected) focusedPage.current = null; }, 0);
+        window.setTimeout(() => {
+          if (left.isConnected) focusedPage.current = null;
+        }, 0);
       }}
     >
-      {items.map(item => (
+      {items.map((item) => (
         <button
           key={item.page}
           type="button"
           className="section-switcher-btn"
           data-section-page={item.page}
           aria-current={item.page === currentPage ? "page" : undefined}
-          onClick={() => { if (item.page !== currentPage) onNavigate(item.page); }}
+          onClick={() => {
+            if (item.page !== currentPage) onNavigate(item.page);
+          }}
           onKeyDown={onKeyDown}
         >
           {item.label}

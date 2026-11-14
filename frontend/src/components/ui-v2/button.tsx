@@ -8,10 +8,8 @@ import { cn } from "@/lib/utils";
  * per surface stands out (foundations.md, "Motion and decoration").
  */
 const VARIANTS = {
-  primary:
-    "bg-accent text-on-accent shadow-sm hover:bg-accent/88",
-  outline:
-    "bg-raised text-fg ring-1 ring-inset ring-line-strong hover:bg-surface",
+  primary: "bg-accent text-on-accent shadow-sm hover:bg-accent/88",
+  outline: "bg-raised text-fg ring-1 ring-inset ring-line-strong hover:bg-surface",
   ghost: "bg-transparent text-fg-muted hover:bg-surface hover:text-fg",
   danger:
     "bg-danger-soft text-danger ring-1 ring-inset ring-danger/20 hover:bg-danger hover:text-on-accent",

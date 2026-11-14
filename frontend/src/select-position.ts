@@ -36,7 +36,13 @@ function viewportWidth() {
 
 export function computeSelectMenuStyle(
   trigger: SelectMenuTriggerRect,
-  { align, placement = "below", menuHeight = MAX_MENU_HEIGHT_PX, maxMenuHeight = MAX_MENU_HEIGHT_PX, menuWidth }: SelectMenuStyleOptions = {},
+  {
+    align,
+    placement = "below",
+    menuHeight = MAX_MENU_HEIGHT_PX,
+    maxMenuHeight = MAX_MENU_HEIGHT_PX,
+    menuWidth,
+  }: SelectMenuStyleOptions = {},
 ): CSSProperties {
   const measuredHeight = Math.min(Math.max(menuHeight, MIN_MENU_HEIGHT_PX), maxMenuHeight);
   const vh = viewportHeight();
@@ -46,7 +52,10 @@ export function computeSelectMenuStyle(
     const spaceBelow = vh - trigger.top - VIEWPORT_PAD_PX;
     const spaceAbove = trigger.top - VIEWPORT_PAD_PX;
     const openAbove = measuredHeight + FLIP_GAP_PX > spaceBelow && spaceAbove > spaceBelow;
-    const left = Math.max(VIEWPORT_PAD_PX, Math.min(trigger.right + BESIDE_GAP_PX, vw - BESIDE_MIN_WIDTH_PX - VIEWPORT_PAD_PX));
+    const left = Math.max(
+      VIEWPORT_PAD_PX,
+      Math.min(trigger.right + BESIDE_GAP_PX, vw - BESIDE_MIN_WIDTH_PX - VIEWPORT_PAD_PX),
+    );
 
     if (openAbove) {
       return {
@@ -54,7 +63,10 @@ export function computeSelectMenuStyle(
         left,
         bottom: vh - trigger.top + FLIP_GAP_PX,
         minWidth: BESIDE_MIN_WIDTH_PX,
-        maxHeight: Math.max(MIN_MENU_HEIGHT_PX, Math.min(maxMenuHeight, trigger.top - VIEWPORT_PAD_PX - MENU_GAP_PX)),
+        maxHeight: Math.max(
+          MIN_MENU_HEIGHT_PX,
+          Math.min(maxMenuHeight, trigger.top - VIEWPORT_PAD_PX - MENU_GAP_PX),
+        ),
       };
     }
 
@@ -63,12 +75,18 @@ export function computeSelectMenuStyle(
       top: trigger.top,
       left,
       minWidth: BESIDE_MIN_WIDTH_PX,
-      maxHeight: Math.max(MIN_MENU_HEIGHT_PX, Math.min(maxMenuHeight, vh - trigger.top - VIEWPORT_PAD_PX)),
+      maxHeight: Math.max(
+        MIN_MENU_HEIGHT_PX,
+        Math.min(maxMenuHeight, vh - trigger.top - VIEWPORT_PAD_PX),
+      ),
     };
   }
 
   const effectiveAlign = align ?? (trigger.right > vw / 2 ? "right" : "left");
-  const width = Math.min(Math.max(menuWidth ?? trigger.width, 0), Math.max(0, vw - VIEWPORT_PAD_PX * 2));
+  const width = Math.min(
+    Math.max(menuWidth ?? trigger.width, 0),
+    Math.max(0, vw - VIEWPORT_PAD_PX * 2),
+  );
   const spaceBelow = vh - trigger.bottom - VIEWPORT_PAD_PX;
   const spaceAbove = trigger.top - VIEWPORT_PAD_PX;
   const flipUp = measuredHeight + MENU_GAP_PX > spaceBelow && spaceAbove > spaceBelow;

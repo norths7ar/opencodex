@@ -42,16 +42,32 @@ export function HubCard({ title, term, body, badge, icon, onOpen, openLabel }: H
             {icon}
           </span>
         )}
-        {badge && <span className={cn("ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold", BADGE_TONE[badge.tone])}>{badge.label}</span>}
+        {badge && (
+          <span
+            className={cn(
+              "ml-auto rounded-full px-2 py-0.5 text-[11px] font-semibold",
+              BADGE_TONE[badge.tone],
+            )}
+          >
+            {badge.label}
+          </span>
+        )}
       </span>
       <span className="flex flex-col gap-1">
-        <span className="text-[15px] leading-6 font-semibold tracking-[-0.01em] text-fg">{title}</span>
+        <span className="text-[15px] leading-6 font-semibold tracking-[-0.01em] text-fg">
+          {title}
+        </span>
         {term && <span className="font-mono text-[11px] text-fg-subtle">{term}</span>}
       </span>
       <span className="text-[13px] leading-5 text-fg-muted">{body}</span>
       <span className="mt-auto inline-flex items-center gap-1 pt-1 text-[13px] font-medium text-highlight">
         {openLabel}
-        <span aria-hidden className="transition-transform duration-300 ease-soft group-hover:translate-x-0.5">→</span>
+        <span
+          aria-hidden
+          className="transition-transform duration-300 ease-soft group-hover:translate-x-0.5"
+        >
+          →
+        </span>
       </span>
     </button>
   );

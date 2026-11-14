@@ -1,8 +1,17 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { createBoundedFetch } from "./bounded-fetch";
-import { putModelVisibility, type ModelVisibilityScope, type ModelVisibilityTarget } from "./model-visibility";
+import {
+  putModelVisibility,
+  type ModelVisibilityScope,
+  type ModelVisibilityTarget,
+} from "./model-visibility";
 
-type Mutation = { scope: ModelVisibilityScope; provider: string; targets: ModelVisibilityTarget[]; enabled: boolean };
+type Mutation = {
+  scope: ModelVisibilityScope;
+  provider: string;
+  targets: ModelVisibilityTarget[];
+  enabled: boolean;
+};
 type ErrorKey = "models.saveFailed" | "models.networkError";
 type Options = {
   onQueued(): void;
@@ -12,27 +21,45 @@ type Options = {
   onSettled(error: ErrorKey | null): void;
 };
 
-const key = (provider: string, id: string, native: boolean) => JSON.stringify([provider, id, native]);
+const key = (provider: string, id: string, native: boolean) =>
+  JSON.stringify([provider, id, native]);
 const emptyOverrides: ReadonlyMap<string, boolean> = new Map();
 
 /** Immediate row feedback, ordered writes, and one authoritative read when the queue drains. */
 export function useModelVisibility(apiBase: string, options: Options) {
-  const [draft, setDraft] = useState<{ apiBase: string; overrides: ReadonlyMap<string, boolean>; pending: boolean }>({
-    apiBase, overrides: emptyOverrides, pending: false,
+  const [draft, setDraft] = useState<{
+    apiBase: string;
+    overrides: ReadonlyMap<string, boolean>;
+    pending: boolean;
+  }>({
+    apiBase,
+    overrides: emptyOverrides,
+    pending: false,
   });
   if (draft.apiBase !== apiBase) setDraft({ apiBase, overrides: emptyOverrides, pending: false });
   // A new target never displays another server's optimistic draft, without an effect reset.
   const overrides = draft.apiBase === apiBase ? draft.overrides : emptyOverrides;
   const pending = draft.apiBase === apiBase && draft.pending;
   const callbacks = useRef(options);
-  useLayoutEffect(() => { callbacks.current = options; });
+  useLayoutEffect(() => {
+    callbacks.current = options;
+  });
   const flight = useRef<{
-    active: boolean; running: boolean; queue: Mutation[]; readVersion: number;
+    active: boolean;
+    running: boolean;
+    queue: Mutation[];
+    readVersion: number;
     bounded: ReturnType<typeof createBoundedFetch> | null;
   } | null>(null);
 
   useLayoutEffect(() => {
-    const current = { active: true, running: false, queue: [] as Mutation[], readVersion: 0, bounded: null as ReturnType<typeof createBoundedFetch> | null };
+    const current = {
+      active: true,
+      running: false,
+      queue: [] as Mutation[],
+      readVersion: 0,
+      bounded: null as ReturnType<typeof createBoundedFetch> | null,
+    };
     flight.current = current;
     callbacks.current.onBusy(false);
     return () => {
@@ -51,8 +78,15 @@ export function useModelVisibility(apiBase: string, options: Options) {
         const bounded = createBoundedFetch(60_000);
         current.bounded = bounded;
         try {
-          const response = await putModelVisibility(apiBase, mutation.scope, mutation.provider,
-            mutation.targets, mutation.enabled, fetch, bounded.signal);
+          const response = await putModelVisibility(
+            apiBase,
+            mutation.scope,
+            mutation.provider,
+            mutation.targets,
+            mutation.enabled,
+            fetch,
+            bounded.signal,
+          );
           // Target changes during the write must discard its response before parsing it.
           if (current.active) {
             if (!response.ok) error = "models.saveFailed";
@@ -76,8 +110,14 @@ export function useModelVisibility(apiBase: string, options: Options) {
       let refreshed = false;
       const bounded = createBoundedFetch(60_000);
       current.bounded = bounded;
-      try { refreshed = await callbacks.current.refresh(bounded.signal); } catch { /* reconcile failure is surfaced below */ }
-      finally { bounded.clear(); current.bounded = null; }
+      try {
+        refreshed = await callbacks.current.refresh(bounded.signal);
+      } catch {
+        /* reconcile failure is surfaced below */
+      } finally {
+        bounded.clear();
+        current.bounded = null;
+      }
       if (!current.active) return;
       // A click during the read invalidates it and keeps the newer optimistic intent visible.
       if (current.queue.length || readVersion !== current.readVersion) continue;
@@ -89,15 +129,21 @@ export function useModelVisibility(apiBase: string, options: Options) {
     }
   };
 
-  const enqueue = (scope: ModelVisibilityScope, provider: string, targets: ModelVisibilityTarget[], enabled: boolean) => {
+  const enqueue = (
+    scope: ModelVisibilityScope,
+    provider: string,
+    targets: ModelVisibilityTarget[],
+    enabled: boolean,
+  ) => {
     const current = flight.current;
     if (!current?.active) return;
     current.queue.push({ scope, provider, targets, enabled });
     current.readVersion++;
     callbacks.current.onQueued();
-    setDraft(previous => {
+    setDraft((previous) => {
       const next = new Map(previous.apiBase === apiBase ? previous.overrides : emptyOverrides);
-      for (const target of targets) next.set(key(provider, target.id, target.native === true), enabled);
+      for (const target of targets)
+        next.set(key(provider, target.id, target.native === true), enabled);
       return { apiBase, overrides: next, pending: true };
     });
     if (!current.running) {
@@ -107,7 +153,12 @@ export function useModelVisibility(apiBase: string, options: Options) {
     }
   };
 
-  return { pending, overrides, enqueue, isRunning: () => flight.current?.running === true,
-    visible: (provider: string, id: string, native: boolean, saved: boolean) => overrides.get(key(provider, id, native)) ?? saved,
+  return {
+    pending,
+    overrides,
+    enqueue,
+    isRunning: () => flight.current?.running === true,
+    visible: (provider: string, id: string, native: boolean, saved: boolean) =>
+      overrides.get(key(provider, id, native)) ?? saved,
   };
 }

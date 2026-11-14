@@ -16,7 +16,11 @@ export interface JsonEditorState {
 }
 
 export default function ProviderJsonEditor({
-  editor, providerName, saving, onSave, message,
+  editor,
+  providerName,
+  saving,
+  onSave,
+  message,
 }: {
   editor: JsonEditorState;
   providerName: string;
@@ -36,13 +40,24 @@ export default function ProviderJsonEditor({
   return (
     <div className="pwi-json-panel">
       <div className="pwi-json-panel-header">
-        <span className="pwi-json-panel-title">{t("pws.jsonEditorTitle", { name: providerName })}</span>
+        <span className="pwi-json-panel-title">
+          {t("pws.jsonEditorTitle", { name: providerName })}
+        </span>
         <div className="pwi-json-panel-actions">
           {editor.onRestore && editor.isDirty && (
-            <button type="button" className="btn btn-ghost btn-sm" onClick={editor.onRestore}>{t("pws.jsonRestore")}</button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={editor.onRestore}>
+              {t("pws.jsonRestore")}
+            </button>
           )}
-          <button type="button" className="btn btn-ghost btn-sm" onClick={editor.onClose}>{t("common.cancel")}</button>
-          <button type="button" className="btn btn-primary btn-sm" onClick={onSave} disabled={saving || !editor.isDirty}>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={editor.onClose}>
+            {t("common.cancel")}
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={onSave}
+            disabled={saving || !editor.isDirty}
+          >
             {saving ? t("pws.saving") : t("pws.jsonSave")}
           </button>
         </div>
@@ -52,13 +67,19 @@ export default function ProviderJsonEditor({
         ref={textareaRef}
         className="input pwi-json-textarea"
         value={editor.draft}
-        onChange={e => editor.onDraftChange(e.target.value)}
+        onChange={(e) => editor.onDraftChange(e.target.value)}
         spellCheck={false}
         rows={20}
         aria-label={t("pws.jsonEditorDesc")}
       />
       {message && (
-        <div className={message.ok ? "pwi-settings-msg pwi-settings-msg--ok" : "pwi-settings-msg pwi-settings-msg--err"}>
+        <div
+          className={
+            message.ok
+              ? "pwi-settings-msg pwi-settings-msg--ok"
+              : "pwi-settings-msg pwi-settings-msg--err"
+          }
+        >
           {message.text}
         </div>
       )}

@@ -33,7 +33,9 @@ function resolveIcon(slug: string): IconComponent | null {
 export function modelLabel(slug: string): ReactNode {
   const Icon = resolveIcon(slug);
   if (!Icon) return slug;
-  return createElement("span", { className: "model-label" },
+  return createElement(
+    "span",
+    { className: "model-label" },
     createElement(Icon, { style: ICON_STYLE, "aria-hidden": true }),
     slug,
   );

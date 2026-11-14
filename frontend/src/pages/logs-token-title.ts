@@ -24,12 +24,14 @@ export function isCursorUsageProvider(provider: string): boolean {
 export function cacheSplit(log: TokenTitleEntry): { read?: number; write?: number } {
   const u = log.usage;
   if (!u) return {};
-  const write = typeof u.cacheCreationInputTokens === "number" ? u.cacheCreationInputTokens : undefined;
-  const read = typeof u.cacheReadInputTokens === "number"
-    ? u.cacheReadInputTokens
-    : typeof u.cachedInputTokens === "number" && write !== undefined
-      ? Math.max(0, u.cachedInputTokens - write)
-      : u.cachedInputTokens;
+  const write =
+    typeof u.cacheCreationInputTokens === "number" ? u.cacheCreationInputTokens : undefined;
+  const read =
+    typeof u.cacheReadInputTokens === "number"
+      ? u.cacheReadInputTokens
+      : typeof u.cachedInputTokens === "number" && write !== undefined
+        ? Math.max(0, u.cachedInputTokens - write)
+        : u.cachedInputTokens;
   return { read, write };
 }
 
@@ -50,7 +52,13 @@ export function tokensTitle(log: TokenTitleEntry, t: TFn): string | undefined {
   }
   if (log.usageStatus === "estimated") parts.push(t("logs.tokens.estimatedNote"));
   if (log.usageStatus === "estimated" && split.read === undefined && split.write === undefined) {
-    parts.push(t(isCursorUsageProvider(log.provider) ? "logs.tokens.noCacheCursorNote" : "logs.tokens.noCacheNote"));
+    parts.push(
+      t(
+        isCursorUsageProvider(log.provider)
+          ? "logs.tokens.noCacheCursorNote"
+          : "logs.tokens.noCacheNote",
+      ),
+    );
   }
   return parts.join(" \u00B7 ");
 }

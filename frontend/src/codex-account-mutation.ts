@@ -12,9 +12,10 @@ export function codexAccountMutationCompletion(value: unknown): CodexAccountMuta
   const descriptor = Object.getOwnPropertyDescriptor(value, "catalogRefreshPending");
   const validation = Object.getOwnPropertyDescriptor(value, "validationPending");
   return {
-    ...(validation && "value" in validation && validation.value === true ? { validationPending: true } : {}),
-    catalogRefreshPending: descriptor !== undefined
-      && "value" in descriptor
-      && descriptor.value === true,
+    ...(validation && "value" in validation && validation.value === true
+      ? { validationPending: true }
+      : {}),
+    catalogRefreshPending:
+      descriptor !== undefined && "value" in descriptor && descriptor.value === true,
   };
 }

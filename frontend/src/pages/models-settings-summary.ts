@@ -71,10 +71,18 @@ export function modelsSettingsSummary(t: TFn, state: ModelsSettingsState): Setti
   const off = t("models.settingsPanel.off");
   const items: SettingsSummaryItem[] = [];
   if (state.multiAgentMode) {
-    items.push({ id: "subagent", label: t("models.v2Label"), value: t(`models.v2Mode_${state.multiAgentMode}` as TKey) });
+    items.push({
+      id: "subagent",
+      label: t("models.v2Label"),
+      value: t(`models.v2Mode_${state.multiAgentMode}` as TKey),
+    });
   }
   if (typeof state.v2Threads === "number") {
-    items.push({ id: "threads", label: t("models.v2ThreadsLabel"), value: String(state.v2Threads) });
+    items.push({
+      id: "threads",
+      label: t("models.v2ThreadsLabel"),
+      value: String(state.v2Threads),
+    });
   }
   if (state.multiAgentMode === "v2" && state.keepNativeOnV1) {
     items.push({ id: "keep-native", label: t("models.keepNativeOnV1"), value: "" });
@@ -85,12 +93,26 @@ export function modelsSettingsSummary(t: TFn, state: ModelsSettingsState): Setti
     value: state.shadowEnabled && state.shadowModel ? state.shadowModel : off,
   });
   if (state.autoReviewEnabled) {
-    items.push({ id: "auto-review", label: t("models.autoReviewOverride"), value: state.autoReviewModel || t("models.autoReviewPending") });
+    items.push({
+      id: "auto-review",
+      label: t("models.autoReviewOverride"),
+      value: state.autoReviewModel || t("models.autoReviewPending"),
+    });
   }
-  items.push({ id: "window", label: t("models.contextCapLabel"), value: state.windowOn ? fmtK(state.windowValue) : off });
+  items.push({
+    id: "window",
+    label: t("models.contextCapLabel"),
+    value: state.windowOn ? fmtK(state.windowValue) : off,
+  });
   const pickerKey = PICKER_MODE_KEYS[state.pickerMode];
-  items.push({ id: "order", label: t("models.pickerOrder.label"), value: pickerKey ? t(pickerKey) : state.pickerMode });
-  if (state.newModelsOff) items.push({ id: "new-models", label: t("models.newPolicyGlobal"), value: "" });
-  if (state.aliasesOn) items.push({ id: "aliases", label: t("models.useDefaultAliasesGlobal"), value: "" });
+  items.push({
+    id: "order",
+    label: t("models.pickerOrder.label"),
+    value: pickerKey ? t(pickerKey) : state.pickerMode,
+  });
+  if (state.newModelsOff)
+    items.push({ id: "new-models", label: t("models.newPolicyGlobal"), value: "" });
+  if (state.aliasesOn)
+    items.push({ id: "aliases", label: t("models.useDefaultAliasesGlobal"), value: "" });
   return items;
 }

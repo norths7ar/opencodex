@@ -223,7 +223,9 @@
   color: inherit;
   font: inherit;
   overflow: hidden;
-  transition: background var(--motion-fast), box-shadow var(--motion-fast);
+  transition:
+    background var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 
 .providers-workspace-rail-row:hover {
@@ -264,7 +266,9 @@
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--motion-fast), background var(--motion-fast);
+  transition:
+    opacity var(--motion-fast),
+    background var(--motion-fast);
 }
 
 .pws-rail-row-wrap:hover .pws-rail-row-remove,
@@ -412,9 +416,15 @@
   display: inline-block;
 }
 
-.providers-workspace-rail-status--active { background: var(--green); }
-.providers-workspace-rail-status--warning { background: var(--amber); }
-.providers-workspace-rail-status--inactive { background: var(--muted); }
+.providers-workspace-rail-status--active {
+  background: var(--green);
+}
+.providers-workspace-rail-status--warning {
+  background: var(--amber);
+}
+.providers-workspace-rail-status--inactive {
+  background: var(--muted);
+}
 
 .pws-main {
   min-width: 0;
@@ -506,7 +516,6 @@
   .pws-main {
     padding: var(--space-2) 0 0;
   }
-
 }
 
 @media (max-width: 768px) {
@@ -795,7 +804,9 @@
   font-weight: 500;
   color: var(--muted);
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
 }
 
 .pws-detail-tab:hover {
@@ -807,8 +818,13 @@
   border-bottom-color: var(--text);
 }
 
-.pws-detail-tab:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: -2px; }
-.pws-detail-panel:focus { outline: none; }
+.pws-detail-tab:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: -2px;
+}
+.pws-detail-panel:focus {
+  outline: none;
+}
 
 /* Section blocks */
 .pws-section {
@@ -1064,20 +1080,65 @@
   font-size: 0.75rem;
   margin-top: 8px;
 }
-.pws-model-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-.pws-model-table th { text-align: left; font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); }
-.pws-model-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-faint, rgba(128,128,128,0.1)); }
-.pws-model-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-.pws-model-table .mono { font-family: var(--font-mono, monospace); font-size: 0.78rem; }
-.pws-model-row:hover { background: var(--bg-subtle, rgba(128,128,128,0.05)); }
-.pws-model-attribution { font-family: var(--font-sans, sans-serif); font-size: 0.75rem; white-space: normal; word-break: keep-all; }
-.pws-share-bar { height: 6px; background: var(--border-faint, rgba(128,128,128,0.15)); border-radius: 3px; min-width: 60px; }
-.pws-share-bar-fill { height: 100%; background: var(--green, #22c55e); border-radius: 3px; }
-.pws-model-detail { background: var(--bg-subtle, rgba(128,128,128,0.05)); }
-.pws-model-detail td { padding: 8px 8px 8px 24px; }
-.pws-model-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; font-size: 0.8rem; }
+.pws-model-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.pws-model-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.pws-model-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border-faint, rgba(128, 128, 128, 0.1));
+}
+.pws-model-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.pws-model-table .mono {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+}
+.pws-model-row:hover {
+  background: var(--bg-subtle, rgba(128, 128, 128, 0.05));
+}
+.pws-model-attribution {
+  font-family: var(--font-sans, sans-serif);
+  font-size: 0.75rem;
+  white-space: normal;
+  word-break: keep-all;
+}
+.pws-share-bar {
+  height: 6px;
+  background: var(--border-faint, rgba(128, 128, 128, 0.15));
+  border-radius: 3px;
+  min-width: 60px;
+}
+.pws-share-bar-fill {
+  height: 100%;
+  background: var(--green, #22c55e);
+  border-radius: 3px;
+}
+.pws-model-detail {
+  background: var(--bg-subtle, rgba(128, 128, 128, 0.05));
+}
+.pws-model-detail td {
+  padding: 8px 8px 8px 24px;
+}
+.pws-model-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 24px;
+  font-size: 0.8rem;
+}
 @media (max-width: 600px) {
-  .pws-usage-metrics-3 { grid-template-columns: 1fr; }
+  .pws-usage-metrics-3 {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {

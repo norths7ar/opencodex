@@ -33,8 +33,8 @@ export function grokGroupView(
   group: "native" | "routed",
 ): GrokGroupView {
   const rows = candidates
-    .filter(c => (group === "native") === c.native)
-    .map(c => ({
+    .filter((c) => (group === "native") === c.native)
+    .map((c) => ({
       ...c,
       alias: aliasById.get(c.id) ?? null,
       enabled: !excluded.has(c.id),
@@ -44,6 +44,6 @@ export function grokGroupView(
   return {
     rows,
     total: rows.length,
-    enabled: rows.filter(r => r.enabled).length,
+    enabled: rows.filter((r) => r.enabled).length,
   };
 }

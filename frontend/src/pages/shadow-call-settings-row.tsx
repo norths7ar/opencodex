@@ -26,12 +26,21 @@ export function ShadowCallSettingsRow({
     <>
       <SettingsRow
         label={t("models.shadowCallIntercept")}
-        hint={<Tooltip content={hint} side="top" maxWidth={320}><span style={{ cursor: "help" }} aria-label={hint}><IconInfo width={13} height={13} aria-hidden="true" /></span></Tooltip>}
+        hint={
+          <Tooltip content={hint} side="top" maxWidth={320}>
+            <span style={{ cursor: "help" }} aria-label={hint}>
+              <IconInfo width={13} height={13} aria-hidden="true" />
+            </span>
+          </Tooltip>
+        }
         busy={!shadowCall}
       >
         <code className="text-caption models-shadow-warning" style={{ opacity: 0.6 }}>
           {t("models.shadowCallOriginal", {
-            models: shadowBackgroundModelBadge(shadowCall?.sourceModels, t("shadowCall.memoryLabel")),
+            models: shadowBackgroundModelBadge(
+              shadowCall?.sourceModels,
+              t("shadowCall.memoryLabel"),
+            ),
           })}
         </code>
         <Switch
@@ -44,7 +53,7 @@ export function ShadowCallSettingsRow({
           <Select
             value={shadowCall?.model ?? ""}
             options={modelOptions}
-            onChange={model => onSave({ model })}
+            onChange={(model) => onSave({ model })}
             disabled={!shadowCall || saving || !shadowCall.enabled}
             label={t("models.shadowCallIntercept")}
           />
@@ -56,7 +65,7 @@ export function ShadowCallSettingsRow({
         sourceModels={shadowCall?.sourceModels}
         disabled={!shadowCall?.enabled}
         saving={saving}
-        onChange={sourceModels => onSave({ sourceModels })}
+        onChange={(sourceModels) => onSave({ sourceModels })}
       />
     </>
   );

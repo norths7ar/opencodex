@@ -41,7 +41,10 @@ export interface GrokRedeemOutcome {
   uncertain?: boolean;
 }
 
-export interface GrokCouponAttempt { tokenId: string; operationId: string }
+export interface GrokCouponAttempt {
+  tokenId: string;
+  operationId: string;
+}
 
 export interface GrokResetCouponController {
   /** Absent id means "not read yet"; consumers render that as loading. */
@@ -49,7 +52,10 @@ export interface GrokResetCouponController {
   /** Shared for the browser session so remounting cannot mint a new spend. */
   uncertain: Record<string, GrokCouponAttempt>;
   refresh: (accountId: string) => Promise<void>;
-  redeem: (accountId: string, request: { tokenId: string; operationId: string }) => Promise<GrokRedeemOutcome>;
+  redeem: (
+    accountId: string,
+    request: { tokenId: string; operationId: string },
+  ) => Promise<GrokRedeemOutcome>;
 }
 
 const READ_TIMEOUT_MS = 20_000;
@@ -58,13 +64,23 @@ const MAX_READS_IN_FLIGHT = 3;
 const HOLD_STORAGE_KEY = "ocx.grok-coupon-holds.v1";
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const UNRESOLVED_COUPON_CODES = new Set([
-  "attempt_unresolved", "attempt_in_progress", "attempt_reconcile_failed",
-  "operation_state_changed", "redeem_failed", "attempt_mark_failed", "operation_token_mismatch",
+  "attempt_unresolved",
+  "attempt_in_progress",
+  "attempt_reconcile_failed",
+  "operation_state_changed",
+  "redeem_failed",
+  "attempt_mark_failed",
+  "operation_token_mismatch",
 ]);
 const LEDGER_REFUSAL_CODES = new Set(["ledger_unavailable", "capacity"]);
 /** The only codes the ledger records as a definitive outcome; any other settled code keeps the hold. */
 const DEFINITIVE_SETTLED_CODES = new Set([
-  "redeemed", "auth_failed", "fetch_resets_failed", "no_coupons_available", "coupon_unavailable", "token_unresolved",
+  "redeemed",
+  "auth_failed",
+  "fetch_resets_failed",
+  "no_coupons_available",
+  "coupon_unavailable",
+  "token_unresolved",
 ]);
 
 // The Map is the admission authority even if sessionStorage is denied. Snapshot
@@ -76,8 +92,12 @@ let lastStoredHolds: string | null | undefined;
 function validHold(value: unknown): value is GrokCouponAttempt {
   if (!value || typeof value !== "object") return false;
   const { tokenId, operationId } = value as Record<string, unknown>;
-  return typeof tokenId === "string" && tokenId.trim() !== ""
-    && typeof operationId === "string" && UUID_V4.test(operationId);
+  return (
+    typeof tokenId === "string" &&
+    tokenId.trim() !== "" &&
+    typeof operationId === "string" &&
+    UUID_V4.test(operationId)
+  );
 }
 
 function holdSnapshot(): ReadonlyMap<string, GrokCouponAttempt> {
@@ -91,17 +111,24 @@ function holdSnapshot(): ReadonlyMap<string, GrokCouponAttempt> {
           if (!key.includes("\u0000") || !validHold(value)) continue;
           // Storage only restores holds this page has lost; it never replaces a live hold.
           if (couponHolds.has(key)) continue;
-          couponHolds = new Map(couponHolds).set(key, { tokenId: value.tokenId, operationId: value.operationId });
+          couponHolds = new Map(couponHolds).set(key, {
+            tokenId: value.tokenId,
+            operationId: value.operationId,
+          });
         }
       }
     }
-  } catch { /* Storage access or invalid JSON cannot erase an in-memory hold. */ }
+  } catch {
+    /* Storage access or invalid JSON cannot erase an in-memory hold. */
+  }
   return couponHolds;
 }
 
 function subscribeHolds(listener: () => void): () => void {
   holdListeners.add(listener);
-  return () => { holdListeners.delete(listener); };
+  return () => {
+    holdListeners.delete(listener);
+  };
 }
 
 function publishHolds(): void {
@@ -109,7 +136,9 @@ function publishHolds(): void {
     const stored = JSON.stringify(Object.fromEntries(couponHolds));
     window.sessionStorage.setItem(HOLD_STORAGE_KEY, stored);
     lastStoredHolds = stored;
-  } catch { /* The Map remains authoritative when persistence is unavailable. */ }
+  } catch {
+    /* The Map remains authoritative when persistence is unavailable. */
+  }
   for (const listener of holdListeners) listener();
 }
 
@@ -126,8 +155,11 @@ function clearHold(key: string, operationId: string): void {
 }
 
 function unresolvedCode(code: string, body: unknown): boolean {
-  return UNRESOLVED_COUPON_CODES.has(code) || (LEDGER_REFUSAL_CODES.has(code)
-    && Boolean(body && typeof body === "object" && "operationId" in body));
+  return (
+    UNRESOLVED_COUPON_CODES.has(code) ||
+    (LEDGER_REFUSAL_CODES.has(code) &&
+      Boolean(body && typeof body === "object" && "operationId" in body))
+  );
 }
 
 function parseCoupons(value: unknown): GrokResetCoupon[] | null {
@@ -181,7 +213,11 @@ function byExpiry(coupons: GrokResetCoupon[]): GrokResetCoupon[] {
   return coupons.toSorted((a, b) => expiryRank(a) - expiryRank(b));
 }
 
-export function useGrokResetCoupons({ apiBase, accountIds, enabled }: {
+export function useGrokResetCoupons({
+  apiBase,
+  accountIds,
+  enabled,
+}: {
   apiBase: string;
   accountIds: string[];
   enabled: boolean;
@@ -190,8 +226,11 @@ export function useGrokResetCoupons({ apiBase, accountIds, enabled }: {
   const holds = useSyncExternalStore(subscribeHolds, holdSnapshot, holdSnapshot);
   const uncertain = useMemo(() => {
     const prefix = `${apiBase}\u0000`;
-    return Object.fromEntries([...holds].filter(([key]) => key.startsWith(prefix))
-      .map(([key, value]) => [key.slice(prefix.length), value]));
+    return Object.fromEntries(
+      [...holds]
+        .filter(([key]) => key.startsWith(prefix))
+        .map(([key, value]) => [key.slice(prefix.length), value]),
+    );
   }, [apiBase, holds]);
   /** Roster epoch: bumped only by the effect and its cleanup. */
   const epoch = useRef(0);
@@ -203,40 +242,47 @@ export function useGrokResetCoupons({ apiBase, accountIds, enabled }: {
   // No synchronous setState here: the effect below calls this directly, and a
   // state write before the first await is what react-compiler's EffectSetState
   // rule forbids. `refresh` owns the visible loading state instead.
-  const read = useCallback(async (accountId: string, rosterEpoch: number) => {
-    const token = (tokens.current.get(accountId) ?? 0) + 1;
-    tokens.current.set(accountId, token);
+  const read = useCallback(
+    async (accountId: string, rosterEpoch: number) => {
+      const token = (tokens.current.get(accountId) ?? 0) + 1;
+      tokens.current.set(accountId, token);
 
-    const queue = gate.current;
-    if (queue.active >= MAX_READS_IN_FLIGHT) {
-      await new Promise<void>(resolve => queue.waiting.push(resolve));
-    }
-    queue.active += 1;
+      const queue = gate.current;
+      if (queue.active >= MAX_READS_IN_FLIGHT) {
+        await new Promise<void>((resolve) => queue.waiting.push(resolve));
+      }
+      queue.active += 1;
 
-    const current = () => epoch.current === rosterEpoch && tokens.current.get(accountId) === token;
-    const bounded = createBoundedFetch(READ_TIMEOUT_MS);
-    try {
-      const response = await fetch(
-        `${apiBase}/api/grok/reset-coupons?accountId=${encodeURIComponent(accountId)}`,
-        { signal: bounded.signal },
-      );
-      const coupons = response.ok ? parseCoupons(await response.json().catch(() => null)) : null;
-      if (!current()) return;
-      setEntries(existing => ({
-        ...existing,
-        [accountId]: coupons
-          ? { status: "ready", coupons: byExpiry(coupons) }
-          : { status: "error", reason: response.status === 401 ? "auth" : "upstream" },
-      }));
-    } catch {
-      if (!current()) return;
-      setEntries(existing => ({ ...existing, [accountId]: { status: "error", reason: "upstream" } }));
-    } finally {
-      bounded.clear();
-      queue.active -= 1;
-      queue.waiting.shift()?.();
-    }
-  }, [apiBase]);
+      const current = () =>
+        epoch.current === rosterEpoch && tokens.current.get(accountId) === token;
+      const bounded = createBoundedFetch(READ_TIMEOUT_MS);
+      try {
+        const response = await fetch(
+          `${apiBase}/api/grok/reset-coupons?accountId=${encodeURIComponent(accountId)}`,
+          { signal: bounded.signal },
+        );
+        const coupons = response.ok ? parseCoupons(await response.json().catch(() => null)) : null;
+        if (!current()) return;
+        setEntries((existing) => ({
+          ...existing,
+          [accountId]: coupons
+            ? { status: "ready", coupons: byExpiry(coupons) }
+            : { status: "error", reason: response.status === 401 ? "auth" : "upstream" },
+        }));
+      } catch {
+        if (!current()) return;
+        setEntries((existing) => ({
+          ...existing,
+          [accountId]: { status: "error", reason: "upstream" },
+        }));
+      } finally {
+        bounded.clear();
+        queue.active -= 1;
+        queue.waiting.shift()?.();
+      }
+    },
+    [apiBase],
+  );
 
   useEffect(() => {
     if (!enabled || identity === "") return;
@@ -249,59 +295,81 @@ export function useGrokResetCoupons({ apiBase, accountIds, enabled }: {
     });
     // A later roster or unmount retires in-flight reads instead of writing stale
     // coupon counts onto whatever account now occupies that row.
-    return () => { epoch.current += 1; };
+    return () => {
+      epoch.current += 1;
+    };
   }, [enabled, identity, read]);
 
-  const refresh = useCallback(async (accountId: string) => {
-    setEntries(current => ({ ...current, [accountId]: { status: "loading" } }));
-    await read(accountId, epoch.current);
-  }, [read]);
-
-  const redeem = useCallback(async (
-    accountId: string,
-    request: { tokenId: string; operationId: string },
-  ): Promise<GrokRedeemOutcome> => {
-    const key = `${apiBase}\u0000${accountId}`;
-    const hold = (attempt: GrokCouponAttempt, code = "attempt_unresolved"): GrokRedeemOutcome => (
-      { ok: false, code, replayed: false, operationId: attempt.operationId, uncertain: true }
-    );
-    const held = holdSnapshot().get(key);
-    if (held) return hold(held);
-    // Record intent before dispatch. Uncertain completions leave this entry in
-    // place; they never reinsert an older attempt over a newer operation.
-    writeHold(key, request);
-    const clearMatchingHold = () => clearHold(key, request.operationId);
-    const bounded = createBoundedFetch(REDEEM_TIMEOUT_MS);
-    try {
-      const response = await fetch(`${apiBase}/api/grok/reset-coupons/consume`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accountId, tokenId: request.tokenId, operationId: request.operationId }),
-        signal: bounded.signal,
-      });
-      if (!response.ok) {
-        const failure: unknown = await response.json().catch(() => null);
-        const code = errorCode(failure);
-        if (unresolvedCode(code, failure)) return hold(request, code);
-        clearMatchingHold();
-        return { ok: false, code, replayed: false };
-      }
-      const data: unknown = await response.json().catch(() => null);
-      const replayed = Boolean(data && typeof data === "object" && (data as { replayed?: unknown }).replayed === true);
-      const code = settledCode(data);
-      // Fail closed: an unrecognized or unresolved settled code cannot release the operation.
-      if (code === null || !DEFINITIVE_SETTLED_CODES.has(code)) return hold(request, code ?? "attempt_unresolved");
-      clearMatchingHold();
+  const refresh = useCallback(
+    async (accountId: string) => {
+      setEntries((current) => ({ ...current, [accountId]: { status: "loading" } }));
       await read(accountId, epoch.current);
-      return { ok: code === "redeemed", code, replayed };
-    } catch {
-      // Any transport rejection after dispatch has an unknown outcome: the route
-      // may still be executing it. The caller must stop posting, not retry.
-      return hold(request, "aborted");
-    } finally {
-      bounded.clear();
-    }
-  }, [apiBase, read]);
+    },
+    [read],
+  );
+
+  const redeem = useCallback(
+    async (
+      accountId: string,
+      request: { tokenId: string; operationId: string },
+    ): Promise<GrokRedeemOutcome> => {
+      const key = `${apiBase}\u0000${accountId}`;
+      const hold = (
+        attempt: GrokCouponAttempt,
+        code = "attempt_unresolved",
+      ): GrokRedeemOutcome => ({
+        ok: false,
+        code,
+        replayed: false,
+        operationId: attempt.operationId,
+        uncertain: true,
+      });
+      const held = holdSnapshot().get(key);
+      if (held) return hold(held);
+      // Record intent before dispatch. Uncertain completions leave this entry in
+      // place; they never reinsert an older attempt over a newer operation.
+      writeHold(key, request);
+      const clearMatchingHold = () => clearHold(key, request.operationId);
+      const bounded = createBoundedFetch(REDEEM_TIMEOUT_MS);
+      try {
+        const response = await fetch(`${apiBase}/api/grok/reset-coupons/consume`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            accountId,
+            tokenId: request.tokenId,
+            operationId: request.operationId,
+          }),
+          signal: bounded.signal,
+        });
+        if (!response.ok) {
+          const failure: unknown = await response.json().catch(() => null);
+          const code = errorCode(failure);
+          if (unresolvedCode(code, failure)) return hold(request, code);
+          clearMatchingHold();
+          return { ok: false, code, replayed: false };
+        }
+        const data: unknown = await response.json().catch(() => null);
+        const replayed = Boolean(
+          data && typeof data === "object" && (data as { replayed?: unknown }).replayed === true,
+        );
+        const code = settledCode(data);
+        // Fail closed: an unrecognized or unresolved settled code cannot release the operation.
+        if (code === null || !DEFINITIVE_SETTLED_CODES.has(code))
+          return hold(request, code ?? "attempt_unresolved");
+        clearMatchingHold();
+        await read(accountId, epoch.current);
+        return { ok: code === "redeemed", code, replayed };
+      } catch {
+        // Any transport rejection after dispatch has an unknown outcome: the route
+        // may still be executing it. The caller must stop posting, not retry.
+        return hold(request, "aborted");
+      } finally {
+        bounded.clear();
+      }
+    },
+    [apiBase, read],
+  );
 
   return { entries, uncertain, refresh, redeem };
 }

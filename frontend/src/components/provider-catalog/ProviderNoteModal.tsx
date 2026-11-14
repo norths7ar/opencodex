@@ -47,10 +47,13 @@ export default function ProviderNoteModal({
 
   // Native <dialog> fires "cancel" on Escape — forward it so this popup closes first
   // and the add-provider modal underneath stays open.
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
-    e.preventDefault();
-    onClose();
-  }, [onClose]);
+  const handleCancel = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      onClose();
+    },
+    [onClose],
+  );
 
   return (
     <dialog
@@ -60,14 +63,29 @@ export default function ProviderNoteModal({
       className="modal-overlay"
       onCancel={handleCancel}
     >
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onClose} />
-      <div className="modal-card provider-note-card" onClick={e => e.stopPropagation()}>
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onClose}
+      />
+      <div className="modal-card provider-note-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <h3 id={titleId} className="provider-note-title">
-            <ProviderIcon name={providerId} adapter={adapter} cls="provider-icon provider-icon-sm" />
+            <ProviderIcon
+              name={providerId}
+              adapter={adapter}
+              cls="provider-icon provider-icon-sm"
+            />
             {label}
           </h3>
-          <button type="button" className="btn btn-ghost btn-icon" aria-label={t("common.close")} onClick={onClose}>
+          <button
+            type="button"
+            className="btn btn-ghost btn-icon"
+            aria-label={t("common.close")}
+            onClick={onClose}
+          >
             <IconX />
           </button>
         </div>
@@ -76,7 +94,9 @@ export default function ProviderNoteModal({
           <p className="modal-desc provider-note-text">{note}</p>
         </div>
         <div className="modal-actions">
-          <button type="button" className="btn btn-ghost" onClick={onClose}>{t("common.close")}</button>
+          <button type="button" className="btn btn-ghost" onClick={onClose}>
+            {t("common.close")}
+          </button>
         </div>
       </div>
     </dialog>

@@ -33,19 +33,27 @@ export interface AppliedDesktopModel {
 export function isDesktopVisibility(value: unknown): value is DesktopVisibility {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
-  return (v.mode === "include" || v.mode === "exclude")
-    && Array.isArray(v.routes) && v.routes.every(route => typeof route === "string");
+  return (
+    (v.mode === "include" || v.mode === "exclude") &&
+    Array.isArray(v.routes) &&
+    v.routes.every((route) => typeof route === "string")
+  );
 }
 
 /** Canonical form: sorted unique routes, and "exclude nothing" is the same as unset. */
-export function normalizeVisibility(visibility: DesktopVisibility | null): DesktopVisibility | null {
+export function normalizeVisibility(
+  visibility: DesktopVisibility | null,
+): DesktopVisibility | null {
   if (!visibility) return null;
   const routes = [...new Set(visibility.routes)].sort();
   if (visibility.mode === "exclude" && routes.length === 0) return null;
   return { mode: visibility.mode, routes };
 }
 
-export function sameVisibility(left: DesktopVisibility | null, right: DesktopVisibility | null): boolean {
+export function sameVisibility(
+  left: DesktopVisibility | null,
+  right: DesktopVisibility | null,
+): boolean {
   return JSON.stringify(normalizeVisibility(left)) === JSON.stringify(normalizeVisibility(right));
 }
 
@@ -82,10 +90,14 @@ export function setNewModelPolicy(
   mode: DesktopVisibility["mode"],
 ): DesktopVisibility | null {
   if ((visibility?.mode ?? "exclude") === mode) return visibility;
-  const routes = knownRoutes.filter(route => routeVisible(visibility, route) === (mode === "include"));
+  const routes = knownRoutes.filter(
+    (route) => routeVisible(visibility, route) === (mode === "include"),
+  );
   // An include list must keep its entries even when it names nothing yet; only an empty
   // exclude list collapses to unset.
-  return mode === "include" ? { mode, routes: [...new Set(routes)].sort() } : normalizeVisibility({ mode, routes });
+  return mode === "include"
+    ? { mode, routes: [...new Set(routes)].sort() }
+    : normalizeVisibility({ mode, routes });
 }
 
 export function providerOf(route: string): string {
@@ -94,14 +106,23 @@ export function providerOf(route: string): string {
 }
 
 export function providersOf(models: readonly VisibilityModel[]): string[] {
-  return [...new Set(models.map(model => providerOf(model.route)))].sort();
+  return [...new Set(models.map((model) => providerOf(model.route)))].sort();
 }
 
 /** Search matches route or label, case-insensitively; an empty provider means every provider. */
-export function filterVisibilityModels<T extends VisibilityModel>(models: readonly T[], query: string, provider: string): T[] {
+export function filterVisibilityModels<T extends VisibilityModel>(
+  models: readonly T[],
+  query: string,
+  provider: string,
+): T[] {
   const needle = query.trim().toLowerCase();
-  return models.filter(model => (!provider || providerOf(model.route) === provider)
-    && (!needle || model.route.toLowerCase().includes(needle) || model.label.toLowerCase().includes(needle)));
+  return models.filter(
+    (model) =>
+      (!provider || providerOf(model.route) === provider) &&
+      (!needle ||
+        model.route.toLowerCase().includes(needle) ||
+        model.label.toLowerCase().includes(needle)),
+  );
 }
 
 export interface VisibilityCounts {
@@ -113,7 +134,10 @@ export interface VisibilityCounts {
   selectedUnavailable: number;
 }
 
-export function visibilityCounts(models: readonly VisibilityModel[], visibility: DesktopVisibility | null): VisibilityCounts {
+export function visibilityCounts(
+  models: readonly VisibilityModel[],
+  visibility: DesktopVisibility | null,
+): VisibilityCounts {
   let selected = 0;
   let available = 0;
   let selectedUnavailable = 0;
@@ -131,8 +155,11 @@ export function visibilityCounts(models: readonly VisibilityModel[], visibility:
 }
 
 /** The rows the next apply writes under a draft selection, in written order. */
-export function desiredDesktopList(rendered: readonly ListedDesktopModel[], visibility: DesktopVisibility | null): ListedDesktopModel[] {
-  const kept = rendered.filter(model => routeVisible(visibility, model.route));
+export function desiredDesktopList(
+  rendered: readonly ListedDesktopModel[],
+  visibility: DesktopVisibility | null,
+): ListedDesktopModel[] {
+  const kept = rendered.filter((model) => routeVisible(visibility, model.route));
   // Mirrors the writer's guard: a selection hiding everything falls back to the full list.
   return kept.length > 0 ? kept : [...rendered];
 }
@@ -148,10 +175,10 @@ export function applyPreview(
   applied: readonly AppliedDesktopModel[] | null,
 ): ApplyPreview | null {
   if (!applied) return null;
-  const appliedNames = new Set(applied.map(model => model.name));
-  const desiredNames = new Set(desired.map(model => model.name));
+  const appliedNames = new Set(applied.map((model) => model.name));
+  const desiredNames = new Set(desired.map((model) => model.name));
   return {
-    added: desired.filter(model => !appliedNames.has(model.name)).map(model => model.label),
-    removed: applied.filter(model => !desiredNames.has(model.name)).map(model => model.label),
+    added: desired.filter((model) => !appliedNames.has(model.name)).map((model) => model.label),
+    removed: applied.filter((model) => !desiredNames.has(model.name)).map((model) => model.label),
   };
 }

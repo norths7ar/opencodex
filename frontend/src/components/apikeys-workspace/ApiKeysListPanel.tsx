@@ -16,7 +16,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IconTrash } from "../../icons";
 import { useT } from "../../i18n/shared";
-import { formatCreatedDate, type ApiKeyEntry, type RevealKeyResult } from "../../pages/api-keys-utils";
+import {
+  formatCreatedDate,
+  type ApiKeyEntry,
+  type RevealKeyResult,
+} from "../../pages/api-keys-utils";
 import type { UsageReadMetadata } from "../../usage-summary-resource";
 import { UsageIncompleteNotice } from "../usage-incomplete-notice";
 import { Notice } from "../../ui";
@@ -78,7 +82,9 @@ export default function ApiKeysListPanel({
     setRevealed({});
     setRevealPendingId(null);
     setRevealFailedId(null);
-    setRevealDeniedId(current => reason === "session" ? interrupted ?? current : reason === "pairing" ? current : null);
+    setRevealDeniedId((current) =>
+      reason === "session" ? (interrupted ?? current) : reason === "pairing" ? current : null,
+    );
     setCopiedId(null);
     setCopyFailedId(null);
     if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
@@ -101,7 +107,9 @@ export default function ApiKeysListPanel({
   const deletedIds = useRef(new Set<string>());
   const currentReveal = (k: ApiKeyEntry): string | undefined => {
     const value = revealed[k.id];
-    return value !== undefined && value.startsWith(k.prefix.replace(/\.\.\.$/, "")) ? value : undefined;
+    return value !== undefined && value.startsWith(k.prefix.replace(/\.\.\.$/, ""))
+      ? value
+      : undefined;
   };
 
   const rowLocked = busy || deletingId !== null;
@@ -111,9 +119,10 @@ export default function ApiKeysListPanel({
   // An alias URL does not reveal the configured bind host, so never invent
   // a recovery URL from it; keep the generic denial guidance.
   const localPairingTarget = standaloneApiTargets(apiBase).shared;
-  const canPairLocally = window.location.protocol === "http:"
-    && ["127.0.0.1", "[::1]"].includes(window.location.hostname)
-    && localPairingTarget.serverOrigin === window.location.origin;
+  const canPairLocally =
+    window.location.protocol === "http:" &&
+    ["127.0.0.1", "[::1]"].includes(window.location.hostname) &&
+    localPairingTarget.serverOrigin === window.location.origin;
 
   const toggleReveal = async (k: ApiKeyEntry) => {
     const generation = disclosure.generation.current;
@@ -131,13 +140,12 @@ export default function ApiKeysListPanel({
     try {
       const result = await onReveal(id);
       if (!disclosure.current(generation) || deletedIds.current.has(id)) return;
-      if (result.ok) setRevealed(prev => ({ ...prev, [id]: result.key }));
+      if (result.ok) setRevealed((prev) => ({ ...prev, [id]: result.key }));
       else if (result.kind === "denied") {
         disclosure.invalidate();
         onPairingStart?.();
         setRevealDeniedId(id);
-      }
-      else setRevealFailedId(id);
+      } else setRevealFailedId(id);
     } catch {
       if (disclosure.current(generation)) setRevealFailedId(id);
     } finally {
@@ -149,7 +157,7 @@ export default function ApiKeysListPanel({
   };
 
   const copyFailed = (id: string) => {
-    setCopiedId(current => current === id ? null : current);
+    setCopiedId((current) => (current === id ? null : current));
     setCopyFailedId(id);
   };
 
@@ -167,20 +175,28 @@ export default function ApiKeysListPanel({
       copyFailed(id);
       return;
     }
-    write.then(() => {
-      if (!disclosure.current(generation) || deletedIds.current.has(id)) return;
-      setCopiedId(id);
-      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
-      copiedTimer.current = window.setTimeout(() => {
-        setCopiedId(current => current === id ? null : current);
-        copiedTimer.current = null;
-      }, 2000);
-    }, () => { if (disclosure.current(generation)) copyFailed(id); });
+    write.then(
+      () => {
+        if (!disclosure.current(generation) || deletedIds.current.has(id)) return;
+        setCopiedId(id);
+        if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
+        copiedTimer.current = window.setTimeout(() => {
+          setCopiedId((current) => (current === id ? null : current));
+          copiedTimer.current = null;
+        }, 2000);
+      },
+      () => {
+        if (disclosure.current(generation)) copyFailed(id);
+      },
+    );
   };
 
-  useEffect(() => () => {
-    if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (copiedTimer.current !== null) window.clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
 
   const confirmDelete = async (id: string) => {
     if (!onDelete || !confirmArmed || deletingId) return;
@@ -243,15 +259,22 @@ export default function ApiKeysListPanel({
                 <th>{t("api.colKey")}</th>
                 <th>{t("api.attribution.requests7d")}</th>
                 <th>{t("api.attribution.lastUsed")}</th>
-                {onDelete && <th className="awi-keylist-actions-col"><span className="sr-only">{t("api.colActions")}</span></th>}
+                {onDelete && (
+                  <th className="awi-keylist-actions-col">
+                    <span className="sr-only">{t("api.colActions")}</span>
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
-              {keys.map(k => {
+              {keys.map((k) => {
                 const full = currentReveal(k);
                 const confirming = confirmId === k.id;
                 return (
-                  <tr key={k.id} className={confirming ? "awi-keylist-row is-confirming" : "awi-keylist-row"}>
+                  <tr
+                    key={k.id}
+                    className={confirming ? "awi-keylist-row is-confirming" : "awi-keylist-row"}
+                  >
                     <td>
                       {/* A real button, not a clickable row: a `<tr>` with onClick is
                           unreachable by keyboard. */}
@@ -271,10 +294,14 @@ export default function ApiKeysListPanel({
                             type="button"
                             className={full ? "awi-keylist-key is-revealed" : "awi-keylist-key"}
                             aria-expanded={full !== undefined}
-                            aria-label={t(full ? "api.key.hideAria" : "api.key.revealAria", { name: k.name })}
+                            aria-label={t(full ? "api.key.hideAria" : "api.key.revealAria", {
+                              name: k.name,
+                            })}
                             title={t(full ? "api.key.hideHint" : "api.key.revealHint")}
                             disabled={revealPendingId === k.id}
-                            onClick={() => { void toggleReveal(k); }}
+                            onClick={() => {
+                              void toggleReveal(k);
+                            }}
                           >
                             <code>{full ?? k.prefix}</code>
                           </button>
@@ -288,10 +315,20 @@ export default function ApiKeysListPanel({
                             </button>
                           )}
                           {copyFailedId === k.id && (
-                            <span className="awi-delete-error awi-keylist-inline-error" role="alert">{t("api.key.copyFailedShort")}</span>
+                            <span
+                              className="awi-delete-error awi-keylist-inline-error"
+                              role="alert"
+                            >
+                              {t("api.key.copyFailedShort")}
+                            </span>
                           )}
                           {revealFailedId === k.id && (
-                            <span className="awi-delete-error awi-keylist-inline-error" role="alert">{t("api.key.revealFailed")}</span>
+                            <span
+                              className="awi-delete-error awi-keylist-inline-error"
+                              role="alert"
+                            >
+                              {t("api.key.revealFailed")}
+                            </span>
                           )}
                         </span>
                       ) : (
@@ -310,7 +347,11 @@ export default function ApiKeysListPanel({
                         ? "—"
                         : k.usage.lastUsedAt
                           ? formatCreatedDate(k.usage.lastUsedAt, localeTag)
-                          : t(usageMetadata?.usageIncomplete ? "api.attribution.noRecordedUse" : "api.attribution.neverUsed")}
+                          : t(
+                              usageMetadata?.usageIncomplete
+                                ? "api.attribution.noRecordedUse"
+                                : "api.attribution.neverUsed",
+                            )}
                     </td>
                     {onDelete && (
                       <td className="awi-keylist-actions">
@@ -321,15 +362,23 @@ export default function ApiKeysListPanel({
                               className="btn btn-danger btn-sm"
                               aria-label={t("api.key.deleteRowAria", { name: k.name })}
                               disabled={!confirmArmed || deletingId !== null}
-                              onClick={() => { void confirmDelete(k.id); }}
+                              onClick={() => {
+                                void confirmDelete(k.id);
+                              }}
                             >
-                              {deletingId === k.id ? t("api.key.deleting") : t("api.key.deleteShort")}
+                              {deletingId === k.id
+                                ? t("api.key.deleting")
+                                : t("api.key.deleteShort")}
                             </button>
                             <button
                               type="button"
                               className="btn btn-ghost btn-sm"
                               disabled={deletingId !== null}
-                              onClick={() => { setConfirmId(null); setConfirmArmed(false); setDeleteFailedId(null); }}
+                              onClick={() => {
+                                setConfirmId(null);
+                                setConfirmArmed(false);
+                                setDeleteFailedId(null);
+                              }}
                             >
                               {t("common.cancel")}
                             </button>
@@ -341,13 +390,19 @@ export default function ApiKeysListPanel({
                             aria-label={t("api.key.deleteRowAria", { name: k.name })}
                             title={t("api.workspace.deleteKey")}
                             disabled={rowLocked}
-                            onClick={() => { setDeleteFailedId(null); setConfirmArmed(false); setConfirmId(k.id); }}
+                            onClick={() => {
+                              setDeleteFailedId(null);
+                              setConfirmArmed(false);
+                              setConfirmId(k.id);
+                            }}
                           >
                             <IconTrash width={16} height={16} aria-hidden="true" />
                           </button>
                         )}
                         {deleteFailedId === k.id && (
-                          <span className="awi-delete-error awi-keylist-inline-error" role="alert">{t("api.deleteFailed")}</span>
+                          <span className="awi-delete-error awi-keylist-inline-error" role="alert">
+                            {t("api.deleteFailed")}
+                          </span>
                         )}
                       </td>
                     )}

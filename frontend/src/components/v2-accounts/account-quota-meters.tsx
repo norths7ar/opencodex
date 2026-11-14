@@ -14,7 +14,15 @@ import { cn } from "@/lib/utils";
  * plan normalisation and custom windows stay identical. `afterWeekly` keeps the credits slot
  * right after the weekly window, as before.
  */
-export default function AccountQuotaMeters({ quota, plan, threshold, t, pending = false, afterWeekly, size = "row" }: {
+export default function AccountQuotaMeters({
+  quota,
+  plan,
+  threshold,
+  t,
+  pending = false,
+  afterWeekly,
+  size = "row",
+}: {
   quota: AccountQuota | null;
   plan?: string | null;
   threshold: number;
@@ -26,17 +34,24 @@ export default function AccountQuotaMeters({ quota, plan, threshold, t, pending 
 }) {
   const { locale } = useI18n();
   const rows = buildQuotaRows(quota, plan, t);
-  const grid = size === "hero"
-    ? "grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2"
-    : "grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-x-6 gap-y-3";
+  const grid =
+    size === "hero"
+      ? "grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2"
+      : "grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-x-6 gap-y-3";
 
   if (rows.length === 0) {
     if (!pending) {
-      return afterWeekly ? <div className={cn("acc-meters codex-account-quota-slot grid", grid)}>{afterWeekly}</div> : null;
+      return afterWeekly ? (
+        <div className={cn("acc-meters codex-account-quota-slot grid", grid)}>{afterWeekly}</div>
+      ) : null;
     }
     return (
-      <div className={cn("acc-meters acc-meters--pending quota-compact--pending grid", grid)} aria-busy="true" role="status">
-        {[0, 1].map(index => (
+      <div
+        className={cn("acc-meters acc-meters--pending quota-compact--pending grid", grid)}
+        aria-busy="true"
+        role="status"
+      >
+        {[0, 1].map((index) => (
           <div key={index} className="flex flex-col gap-1.5" aria-hidden="true">
             <span className="flex justify-between gap-3">
               <span className="acc-skel h-3 w-10 rounded-full" />
@@ -52,7 +67,7 @@ export default function AccountQuotaMeters({ quota, plan, threshold, t, pending 
 
   return (
     <div className={cn("acc-meters codex-account-quota-slot grid", grid)}>
-      {rows.map(row => {
+      {rows.map((row) => {
         const used = Math.max(0, Math.min(100, row.percent));
         const left = Math.max(0, Math.round(100 - used));
         const exhausted = isQuotaExhausted(used);
@@ -61,31 +76,57 @@ export default function AccountQuotaMeters({ quota, plan, threshold, t, pending 
         const usedLabel = t("quota.usedPercent", { pct: Math.round(used) });
         return (
           <Fragment key={row.id}>
-            <div className={cn("acc-meter flex min-w-0 flex-col gap-1.5", warn && "is-warn", exhausted && "is-exhausted")} title={usedLabel}>
+            <div
+              className={cn(
+                "acc-meter flex min-w-0 flex-col gap-1.5",
+                warn && "is-warn",
+                exhausted && "is-exhausted",
+              )}
+              title={usedLabel}
+            >
               <span className="flex items-baseline justify-between gap-3">
-                <span className="truncate text-[12px] leading-4 text-fg-muted">{row.limitLabel}</span>
-                <span className={cn(
-                  "shrink-0 tabular-nums",
-                  size === "hero" ? "text-[15px] leading-5 font-semibold" : "text-[13px] leading-4 font-medium",
-                  exhausted ? "text-danger" : warn ? "text-warning" : "text-fg",
-                )}>
+                <span className="truncate text-[12px] leading-4 text-fg-muted">
+                  {row.limitLabel}
+                </span>
+                <span
+                  className={cn(
+                    "shrink-0 tabular-nums",
+                    size === "hero"
+                      ? "text-[15px] leading-5 font-semibold"
+                      : "text-[13px] leading-4 font-medium",
+                    exhausted ? "text-danger" : warn ? "text-warning" : "text-fg",
+                  )}
+                >
                   {exhausted ? t("quota.limitReached") : t("accountsV2.left", { pct: left })}
                 </span>
               </span>
-              <meter aria-label={row.limitLabel} min={0} max={100} value={left}
+              <meter
+                aria-label={row.limitLabel}
+                min={0}
+                max={100}
+                value={left}
                 aria-valuetext={`${t("accountsV2.left", { pct: left })} · ${usedLabel}`}
                 className={cn(
                   "acc-quota-meter",
                   size === "hero" ? "h-2" : "h-1.5",
-                  exhausted ? "[--acc-meter-fill:var(--color-danger)]" : warn ? "[--acc-meter-fill:var(--color-warning)]" : undefined,
-                )} />
-              {reset && <span className="truncate text-[11.5px] leading-4 text-fg-subtle tabular-nums">{reset}</span>}
+                  exhausted
+                    ? "[--acc-meter-fill:var(--color-danger)]"
+                    : warn
+                      ? "[--acc-meter-fill:var(--color-warning)]"
+                      : undefined,
+                )}
+              />
+              {reset && (
+                <span className="truncate text-[11.5px] leading-4 text-fg-subtle tabular-nums">
+                  {reset}
+                </span>
+              )}
             </div>
             {row.windowKey === "weekly" && afterWeekly}
           </Fragment>
         );
       })}
-      {!rows.some(row => row.windowKey === "weekly") && afterWeekly}
+      {!rows.some((row) => row.windowKey === "weekly") && afterWeekly}
     </div>
   );
 }

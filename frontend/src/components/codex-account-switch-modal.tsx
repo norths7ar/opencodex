@@ -49,13 +49,17 @@ export function CodexAccountSwitchModal({
     if (dialog && !dialog.open) dialog.showModal();
   }, []);
 
-  const handleCancel = useCallback((e: React.SyntheticEvent) => {
-    e.preventDefault();
-    onCancel();
-  }, [onCancel]);
+  const handleCancel = useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      onCancel();
+    },
+    [onCancel],
+  );
 
   const usageScore = computeCodexUsageScore(confirm.quota, confirm.plan);
-  const exceedsThreshold = threshold !== undefined && threshold > 0 && usageScore !== null && usageScore >= threshold;
+  const exceedsThreshold =
+    threshold !== undefined && threshold > 0 && usageScore !== null && usageScore >= threshold;
 
   return (
     <dialog
@@ -63,28 +67,47 @@ export function CodexAccountSwitchModal({
       className="modal-overlay"
       aria-labelledby="codex-switch-title"
       onCancel={handleCancel}
-     
     >
-      <button type="button" className="modal-backdrop-dismiss" aria-label={t("common.close")} tabIndex={-1} onClick={onCancel} />
-      <div className="modal-card" onClick={e => e.stopPropagation()} role="document">
-        <h3 id="codex-switch-title">{unpin
-          ? t("codexAuth.unpinTitle")
-          : accountModeState === "direct"
-          ? t("codexAuth.preparePoolTitle")
-          : confirm.id === "__main__" ? t("codexAuth.switchBack") : t("codexAuth.switchTitle")}</h3>
+      <button
+        type="button"
+        className="modal-backdrop-dismiss"
+        aria-label={t("common.close")}
+        tabIndex={-1}
+        onClick={onCancel}
+      />
+      <div className="modal-card" onClick={(e) => e.stopPropagation()} role="document">
+        <h3 id="codex-switch-title">
+          {unpin
+            ? t("codexAuth.unpinTitle")
+            : accountModeState === "direct"
+              ? t("codexAuth.preparePoolTitle")
+              : confirm.id === "__main__"
+                ? t("codexAuth.switchBack")
+                : t("codexAuth.switchTitle")}
+        </h3>
         <p className="modal-desc">
           {unpin
             ? t("codexAuth.unpinDesc")
             : accountModeState === "direct"
-            ? t("codexAuth.preparePoolDesc")
-            : confirm.id === "__main__" ? t("codexAuth.switchBackDesc") : t("codexAuth.switchDesc")}
+              ? t("codexAuth.preparePoolDesc")
+              : confirm.id === "__main__"
+                ? t("codexAuth.switchBackDesc")
+                : t("codexAuth.switchDesc")}
         </p>
         <div className="card" style={{ margin: "12px 0" }}>
-          <strong>{confirm.id === "__main__" ? (mainEmail || t("codexAuth.codexApp")) : confirm.email}</strong>
-          {confirm.plan && <span className="badge badge-green" style={{ marginLeft: 8 }}>{confirm.plan}</span>}
+          <strong>
+            {confirm.id === "__main__" ? mainEmail || t("codexAuth.codexApp") : confirm.email}
+          </strong>
+          {confirm.plan && (
+            <span className="badge badge-green" style={{ marginLeft: 8 }}>
+              {confirm.plan}
+            </span>
+          )}
         </div>
         {!unpin && confirm.id !== "__main__" && (
-          <div className="notice-warn"><IconAlert width={14} /> {t("codexAuth.cacheWarning")}</div>
+          <div className="notice-warn">
+            <IconAlert width={14} /> {t("codexAuth.cacheWarning")}
+          </div>
         )}
         {!unpin && exceedsThreshold && (
           <div className="notice-warn" data-testid="codex-switch-threshold-warning">
@@ -92,9 +115,24 @@ export function CodexAccountSwitchModal({
           </div>
         )}
         <div className="modal-actions">
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>{t("codexAuth.cancel")}</button>
-          <button type="button" className="btn btn-primary" disabled={Boolean(switchingId) || orderBusy} onClick={onConfirm}>
-            {switchingId ? t("pws.accountSwitching") : unpin ? t("codexAuth.unpinAction") : t(accountModeState === "direct" ? "codexAuth.prepareForPool" : "codexAuth.setAsNext")}
+          <button type="button" className="btn btn-ghost" onClick={onCancel}>
+            {t("codexAuth.cancel")}
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={Boolean(switchingId) || orderBusy}
+            onClick={onConfirm}
+          >
+            {switchingId
+              ? t("pws.accountSwitching")
+              : unpin
+                ? t("codexAuth.unpinAction")
+                : t(
+                    accountModeState === "direct"
+                      ? "codexAuth.prepareForPool"
+                      : "codexAuth.setAsNext",
+                  )}
           </button>
         </div>
       </div>

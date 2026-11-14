@@ -38,7 +38,7 @@ export function protocolHopLabel(hop: ProtocolHop, t: TFn): string {
 }
 
 export function protocolPathLabel(path: readonly ProtocolHop[], t: TFn): string {
-  return path.map(hop => protocolHopLabel(hop, t)).join(ARROW);
+  return path.map((hop) => protocolHopLabel(hop, t)).join(ARROW);
 }
 
 /**

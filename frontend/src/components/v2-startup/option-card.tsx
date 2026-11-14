@@ -7,7 +7,16 @@ import { IconTile, StateBadge, Tag, type Tone } from "./primitives";
  * marketplace tile): icon plate and state badge on top, the plain name with its product term
  * under it, one sentence of what it does, and the one action it needs at the bottom.
  */
-export function OptionCard({ icon, title, term, tag, badge, children, actions, option }: {
+export function OptionCard({
+  icon,
+  title,
+  term,
+  tag,
+  badge,
+  children,
+  actions,
+  option,
+}: {
   icon: ReactNode;
   title: ReactNode;
   /** The original product term, small, so docs and CLI names still connect. */
@@ -20,7 +29,10 @@ export function OptionCard({ icon, title, term, tag, badge, children, actions, o
   option: string;
 }) {
   return (
-    <article data-option={option} className="startup-option flex min-w-0 flex-col gap-3 rounded-[12px] bg-surface p-4 ring-1 ring-line">
+    <article
+      data-option={option}
+      className="startup-option flex min-w-0 flex-col gap-3 rounded-[12px] bg-surface p-4 ring-1 ring-line"
+    >
       <div className="flex items-start justify-between gap-3">
         <IconTile>{icon}</IconTile>
         <StateBadge tone={badge.tone}>{badge.label}</StateBadge>
@@ -32,8 +44,12 @@ export function OptionCard({ icon, title, term, tag, badge, children, actions, o
         </h4>
         {term && <span className="text-[12px] leading-4 text-fg-subtle">{term}</span>}
       </div>
-      <div className="flex min-w-0 flex-col gap-2 text-[13px] leading-5 text-fg-muted">{children}</div>
-      {actions && <div className={cn("mt-auto flex flex-wrap items-center gap-2 pt-1")}>{actions}</div>}
+      <div className="flex min-w-0 flex-col gap-2 text-[13px] leading-5 text-fg-muted">
+        {children}
+      </div>
+      {actions && (
+        <div className={cn("mt-auto flex flex-wrap items-center gap-2 pt-1")}>{actions}</div>
+      )}
     </article>
   );
 }

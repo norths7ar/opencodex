@@ -79,7 +79,8 @@ const RULES: readonly Rule[] = [
     rule: "environment",
     level: "warn",
     messageKey: "codexSet.lint.environment",
-    pattern: /\b(your (?:cwd|working directory) is|today's date is|you have no network access|you are running on (?:macos|linux|windows))/gi,
+    pattern:
+      /\b(your (?:cwd|working directory) is|today's date is|you have no network access|you are running on (?:macos|linux|windows))/gi,
   },
   {
     // A credential pasted into a layer lands in config.toml in plain text and
@@ -90,7 +91,8 @@ const RULES: readonly Rule[] = [
     level: "warn",
     messageKey: "codexSet.lint.secret",
     redactSpan: true,
-    pattern: /(sk-[a-zA-Z0-9_-]{20,}|ghp_[0-9a-zA-Z]{36}|github_pat_[0-9a-zA-Z_]{22,}|glpat-[0-9a-zA-Z_-]{20,}|xox[baprs]-[0-9a-zA-Z-]{10,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)/g,
+    pattern:
+      /(sk-[a-zA-Z0-9_-]{20,}|ghp_[0-9a-zA-Z]{36}|github_pat_[0-9a-zA-Z_]{22,}|glpat-[0-9a-zA-Z_-]{20,}|xox[baprs]-[0-9a-zA-Z-]{10,}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)/g,
   },
   {
     // Phrasing that tells the model to drop its own instructions is prompt
@@ -99,7 +101,8 @@ const RULES: readonly Rule[] = [
     rule: "ignore-instructions",
     level: "warn",
     messageKey: "codexSet.lint.ignoreInstructions",
-    pattern: /\b(?:ignore|disregard|forget|override)\s+(?:all\s+|any\s+)?(?:the\s+)?(?:previous|prior|above|earlier|system)\s+(?:instructions?|prompts?|rules?)\b/gi,
+    pattern:
+      /\b(?:ignore|disregard|forget|override)\s+(?:all\s+|any\s+)?(?:the\s+)?(?:previous|prior|above|earlier|system)\s+(?:instructions?|prompts?|rules?)\b/gi,
   },
   {
     // The same identity clash as "identity", in Korean: this fork's users write
@@ -111,7 +114,8 @@ const RULES: readonly Rule[] = [
     // ASCII tokens want \b so "claudette" does not match; Hangul cannot take \b
     // because every syllable is a non-word char, so "클로드입니다" never sees a
     // boundary. The alternation keeps both.
-    pattern: /(?:(?:당신은|너는)\s*(?:claude|grok|gemini|chatgpt|gpt)\b)|(?:(?:당신은|너는)\s*(?:클로드|그록|제미나이|챗gpt))/gi,
+    pattern:
+      /(?:(?:당신은|너는)\s*(?:claude|grok|gemini|chatgpt|gpt)\b)|(?:(?:당신은|너는)\s*(?:클로드|그록|제미나이|챗gpt))/gi,
   },
 ];
 
@@ -163,4 +167,3 @@ export function lintPromptLayer(body: string): LintFinding[] {
   }
   return findings.sort((a, b) => (a.span?.[0] ?? Infinity) - (b.span?.[0] ?? Infinity));
 }
-

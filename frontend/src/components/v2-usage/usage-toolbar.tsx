@@ -29,13 +29,16 @@ export function UsageFilters({
   return (
     <>
       <div className="usage-segmented" role="group" aria-label={t("usageV2.rangeLabel")}>
-        {(["all", "30d", "7d"] as Range[]).map(choice => {
+        {(["all", "30d", "7d"] as Range[]).map((choice) => {
           const label = choice === "all" ? t("usage.range.available") : t(`usage.range.${choice}`);
           return (
             <button
               key={choice}
               type="button"
-              className={cn(`usage-segmented-btn${range === choice ? " active" : ""}`, SEGMENT_BUTTON)}
+              className={cn(
+                `usage-segmented-btn${range === choice ? " active" : ""}`,
+                SEGMENT_BUTTON,
+              )}
               aria-label={label}
               aria-pressed={range === choice}
               onClick={() => onRange(choice)}
@@ -49,7 +52,17 @@ export function UsageFilters({
   );
 }
 
-export function UsageRangeToggle({ open, active, onToggle, t }: { open: boolean; active: boolean; onToggle: () => void; t: TFn }) {
+export function UsageRangeToggle({
+  open,
+  active,
+  onToggle,
+  t,
+}: {
+  open: boolean;
+  active: boolean;
+  onToggle: () => void;
+  t: TFn;
+}) {
   return (
     <button
       type="button"
@@ -73,29 +86,61 @@ export function UsageRangeToggle({ open, active, onToggle, t }: { open: boolean;
   );
 }
 
-export function UsageAppliedWindow({ window, locale, t }: { window: UsageTimeWindow; locale: Locale; t: TFn }) {
+export function UsageAppliedWindow({
+  window,
+  locale,
+  t,
+}: {
+  window: UsageTimeWindow;
+  locale: Locale;
+  t: TFn;
+}) {
   const formatter = new Intl.DateTimeFormat(locale, {
-    year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit",
-    second: "2-digit", fractionalSecondDigits: 3, timeZoneName: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    fractionalSecondDigits: 3,
+    timeZoneName: "short",
   });
   return (
     <p className="usage-range-applied m-0 basis-full text-[13px] text-fg-muted" role="status">
-      {t("usage.range.applied", { start: formatter.format(window.since), end: formatter.format(window.until) })}
+      {t("usage.range.applied", {
+        start: formatter.format(window.since),
+        end: formatter.format(window.until),
+      })}
     </p>
   );
 }
 
-function RangeField({ label, value, invalid, describedBy, onChange }: {
-  label: string; value: string; invalid: boolean; describedBy: string; onChange: (value: string) => void;
+function RangeField({
+  label,
+  value,
+  invalid,
+  describedBy,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  invalid: boolean;
+  describedBy: string;
+  onChange: (value: string) => void;
 }) {
   return (
     <label className="usage-range-field grid min-w-0 gap-1">
       <span className="field-label m-0 text-xs font-medium text-fg-muted">{label}</span>
-      <input className="input h-[var(--ocx-control-h)]" type="datetime-local" step="60" required
+      <input
+        className="input h-[var(--ocx-control-h)]"
+        type="datetime-local"
+        step="60"
+        required
         value={value}
         aria-invalid={invalid}
         aria-describedby={describedBy}
-        onChange={event => onChange(event.currentTarget.value)} />
+        onChange={(event) => onChange(event.currentTarget.value)}
+      />
     </label>
   );
 }
@@ -117,20 +162,52 @@ export function UsageRangePanel({
 }) {
   const describedBy = error ? "usage-range-help usage-range-error" : "usage-range-help";
   return (
-    <form id="usage-range-panel"
+    <form
+      id="usage-range-panel"
       className="usage-range-panel m-0 grid w-full max-w-full gap-3 rounded-[12px] border-0 bg-surface p-4 ring-1 ring-line sm:w-max"
-      aria-label={t("usage.range.custom")} noValidate
-      onSubmit={event => { event.preventDefault(); onApply(); }}>
+      aria-label={t("usage.range.custom")}
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        onApply();
+      }}
+    >
       <div className="usage-range-fields">
-        <RangeField label={t("usage.range.start")} value={draft.since} invalid={error !== null} describedBy={describedBy}
-          onChange={since => onDraft({ since })} />
-        <RangeField label={t("usage.range.end")} value={draft.until} invalid={error !== null} describedBy={describedBy}
-          onChange={until => onDraft({ until })} />
-        <Button type="submit" variant="primary" size="sm" className="usage-range-action h-9">{t("usage.range.apply")}</Button>
-        <Button type="button" variant="ghost" size="sm" className="usage-range-action h-9" onClick={onClear}>{t("usage.range.clear")}</Button>
+        <RangeField
+          label={t("usage.range.start")}
+          value={draft.since}
+          invalid={error !== null}
+          describedBy={describedBy}
+          onChange={(since) => onDraft({ since })}
+        />
+        <RangeField
+          label={t("usage.range.end")}
+          value={draft.until}
+          invalid={error !== null}
+          describedBy={describedBy}
+          onChange={(until) => onDraft({ until })}
+        />
+        <Button type="submit" variant="primary" size="sm" className="usage-range-action h-9">
+          {t("usage.range.apply")}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="usage-range-action h-9"
+          onClick={onClear}
+        >
+          {t("usage.range.clear")}
+        </Button>
       </div>
-      <p id="usage-range-help" className="m-0 text-xs text-fg-subtle">{t("usage.range.help")}</p>
-      {error && <p id="usage-range-error" role="alert" className="notice notice-err m-0">{t(`usage.range.${error}`)}</p>}
+      <p id="usage-range-help" className="m-0 text-xs text-fg-subtle">
+        {t("usage.range.help")}
+      </p>
+      {error && (
+        <p id="usage-range-error" role="alert" className="notice notice-err m-0">
+          {t(`usage.range.${error}`)}
+        </p>
+      )}
     </form>
   );
 }

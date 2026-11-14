@@ -31,10 +31,10 @@ const PRESET_LABEL_KEYS = new Map<number, AccountPriorityPresetKey>([
 ]);
 
 export function normalizeAccountPriority(value: unknown): number {
-  return typeof value === "number"
-    && Number.isInteger(value)
-    && value >= MIN_ACCOUNT_PRIORITY
-    && value <= MAX_ACCOUNT_PRIORITY
+  return typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= MIN_ACCOUNT_PRIORITY &&
+    value <= MAX_ACCOUNT_PRIORITY
     ? value
     : DEFAULT_ACCOUNT_PRIORITY;
 }

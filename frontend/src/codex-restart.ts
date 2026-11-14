@@ -49,7 +49,7 @@ export async function requestCodexRestart(
   const {
     fetchFn = fetch,
     timeoutMs = DEFAULT_TIMEOUT_MS,
-    formatFailure = status => `Failed to restart Codex (HTTP ${status}).`,
+    formatFailure = (status) => `Failed to restart Codex (HTTP ${status}).`,
     formatUnreachable = () => "Could not reach the proxy.",
     formatMalformed = () => "The proxy returned an unexpected response.",
     formatTimeout = () => "The proxy did not answer in time. It may still be working.",

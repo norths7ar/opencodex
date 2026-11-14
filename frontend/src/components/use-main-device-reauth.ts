@@ -31,8 +31,20 @@ export type MainDeviceReauthFailureCode =
 export type MainDeviceReauthState =
   | { phase: "idle" }
   | { phase: "starting" }
-  | { phase: "pending"; flowId: string; verificationUrl: string; deviceCode: string; cancelFailed?: boolean }
-  | { phase: "committing"; flowId: string; verificationUrl: string; deviceCode: string; cancelFailed?: boolean }
+  | {
+      phase: "pending";
+      flowId: string;
+      verificationUrl: string;
+      deviceCode: string;
+      cancelFailed?: boolean;
+    }
+  | {
+      phase: "committing";
+      flowId: string;
+      verificationUrl: string;
+      deviceCode: string;
+      cancelFailed?: boolean;
+    }
   | { phase: "succeeded" }
   | { phase: "cancelled" }
   | { phase: "failed"; code: MainDeviceReauthFailureCode };
@@ -60,7 +72,7 @@ const FAILURE_CODES = new Set<MainDeviceReauthFailureCode>([
 
 function failureCode(value: unknown): MainDeviceReauthFailureCode {
   return typeof value === "string" && FAILURE_CODES.has(value as MainDeviceReauthFailureCode)
-    ? value as MainDeviceReauthFailureCode
+    ? (value as MainDeviceReauthFailureCode)
     : "request_failed";
 }
 
@@ -96,8 +108,11 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
     try {
       // Error JSON identifies an expired flow; status is checked before applying its DTO.
       // react-doctor-disable-next-line react-doctor/no-fetch-response-used-without-status-check
-      const res = await fetch(`${apiBase}/api/codex-auth/main/reauth-device?flowId=${encodeURIComponent(flowId)}`, { method: "DELETE" });
-      const dto = await res.json().catch(() => ({})) as FlowDto;
+      const res = await fetch(
+        `${apiBase}/api/codex-auth/main/reauth-device?flowId=${encodeURIComponent(flowId)}`,
+        { method: "DELETE" },
+      );
+      const dto = (await res.json().catch(() => ({}))) as FlowDto;
       if (unmountedRef.current || flowRef.current !== flowId) return;
       if (res.status === 404 && dto.code === "unknown_flow") {
         // The service may have expired its terminal receipt after a lost DELETE response.
@@ -113,20 +128,23 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
       }
       stopPolling();
       flowRef.current = null;
-      setState(dto.status === "failed"
-        ? { phase: "failed", code: failureCode(dto.code) }
-        : { phase: dto.status });
+      setState(
+        dto.status === "failed"
+          ? { phase: "failed", code: failureCode(dto.code) }
+          : { phase: dto.status },
+      );
       if (dto.status === "succeeded") onCompleted();
     } catch {
       if (unmountedRef.current || flowRef.current !== flowId) return;
       // Retain ownership and polling so retries and device-login completion remain observable.
-      setState(current => {
+      setState((current) => {
         if (unmountedRef.current || flowRef.current !== flowId) return current;
         // A concurrent polling HTTP error can hide the still-owned flow behind
         // failed. Restore its last device details and phase so Cancel stays usable.
-        const active = current.phase === "pending" || current.phase === "committing"
-          ? current
-          : lastCancellableStateRef.current;
+        const active =
+          current.phase === "pending" || current.phase === "committing"
+            ? current
+            : lastCancellableStateRef.current;
         return active?.flowId === flowId ? { ...active, cancelFailed: true } : current;
       });
     }
@@ -139,15 +157,19 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
     lastCancellableStateRef.current = null;
     const ctrl = new AbortController();
     abortRef.current = ctrl;
-    const isCurrent = () => !ctrl.signal.aborted && !unmountedRef.current && abortRef.current === ctrl;
+    const isCurrent = () =>
+      !ctrl.signal.aborted && !unmountedRef.current && abortRef.current === ctrl;
     setState({ phase: "starting" });
     let startedFlowId: string;
     try {
       // Empty body by contract: the route rejects any request keys with 400.
       // Error JSON supplies the normalized failure code; !res.ok never starts a flow.
       // react-doctor-disable-next-line react-doctor/no-fetch-response-used-without-status-check
-      const res = await fetch(`${apiBase}/api/codex-auth/main/reauth-device`, { method: "POST", signal: ctrl.signal });
-      const dto = await res.json().catch(() => ({})) as FlowDto;
+      const res = await fetch(`${apiBase}/api/codex-auth/main/reauth-device`, {
+        method: "POST",
+        signal: ctrl.signal,
+      });
+      const dto = (await res.json().catch(() => ({}))) as FlowDto;
       if (!isCurrent()) return;
       if (!res.ok) {
         setState({ phase: "failed", code: failureCode(dto.code) });
@@ -178,7 +200,7 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
           `${apiBase}/api/codex-auth/main/reauth-device?flowId=${encodeURIComponent(flowId)}`,
           { signal: AbortSignal.any([ctrl.signal, AbortSignal.timeout(POLL_TICK_TIMEOUT_MS)]) },
         );
-        const dto = await res.json().catch(() => ({})) as FlowDto;
+        const dto = (await res.json().catch(() => ({}))) as FlowDto;
         if (!isCurrent() || flowRef.current !== flowId) return;
         if (!res.ok) {
           if (res.status === 404 && dto.code === "unknown_flow") {
@@ -191,10 +213,11 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
           // is unresolved. Never offer a replacement POST during that window,
           // and keep the existing poll cadence so a later terminal status remains observable.
           const cancellationRequested = cancellationRequestedFlowRef.current === flowId;
-          setState(current => {
+          setState((current) => {
             if (!isCurrent() || flowRef.current !== flowId) return current;
-            return (current.phase === "pending" || current.phase === "committing")
-              && current.flowId === flowId && (cancellationRequested || current.cancelFailed)
+            return (current.phase === "pending" || current.phase === "committing") &&
+              current.flowId === flowId &&
+              (cancellationRequested || current.cancelFailed)
               ? current
               : { phase: "failed", code: failureCode(dto.code) };
           });
@@ -210,10 +233,13 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
               deviceCode: lastCode,
             };
             lastCancellableStateRef.current = pendingState;
-            setState(current => (current.phase === "pending" || current.phase === "committing")
-              && current.flowId === flowId && current.cancelFailed
-              ? { ...pendingState, cancelFailed: true }
-              : pendingState);
+            setState((current) =>
+              (current.phase === "pending" || current.phase === "committing") &&
+              current.flowId === flowId &&
+              current.cancelFailed
+                ? { ...pendingState, cancelFailed: true }
+                : pendingState,
+            );
           } else if (dto.status === "succeeded") {
             flowRef.current = null;
             setState({ phase: "succeeded" });
@@ -233,7 +259,7 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
         if (!isCurrent() || flowRef.current !== flowId) return;
         // A tick failure is transient: the service flow keeps its own deadline.
       }
-      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
     }
   }, [apiBase, onCompleted, stopPolling]);
 
@@ -245,8 +271,10 @@ export function useMainDeviceReauth(apiBase: string, onCompleted: () => void) {
       const flowId = flowRef.current;
       flowRef.current = null;
       if (flowId) {
-        void fetch(`${apiBase}/api/codex-auth/main/reauth-device?flowId=${encodeURIComponent(flowId)}`, { method: "DELETE" })
-          .catch(() => {});
+        void fetch(
+          `${apiBase}/api/codex-auth/main/reauth-device?flowId=${encodeURIComponent(flowId)}`,
+          { method: "DELETE" },
+        ).catch(() => {});
       }
     };
   }, [apiBase, stopPolling]);

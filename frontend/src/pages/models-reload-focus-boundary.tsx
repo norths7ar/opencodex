@@ -24,5 +24,7 @@ export class ModelsReloadFocusBoundary extends Component<Props, object, HTMLButt
     if (target && !target.disabled) target.focus();
   }
 
-  render() { return this.props.children; }
+  render() {
+    return this.props.children;
+  }
 }

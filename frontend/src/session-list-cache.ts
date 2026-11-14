@@ -26,10 +26,12 @@ export function readSessionListCache<T>(key: string): T | null {
 }
 
 function isEntryEnvelope(value: unknown): value is { [CACHED_AT_KEY]: number; data: unknown } {
-  return typeof value === "object"
-    && value !== null
-    && typeof (value as Record<string, unknown>)[CACHED_AT_KEY] === "number"
-    && "data" in value;
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as Record<string, unknown>)[CACHED_AT_KEY] === "number" &&
+    "data" in value
+  );
 }
 
 /**

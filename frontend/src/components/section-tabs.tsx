@@ -9,7 +9,11 @@
  * than only where you last clicked.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SECTION_TAB_SCROLL_LOCK_MS, sectionAnchorId, sectionAnchorPrefix } from "../section-anchors";
+import {
+  SECTION_TAB_SCROLL_LOCK_MS,
+  sectionAnchorId,
+  sectionAnchorPrefix,
+} from "../section-anchors";
 
 export interface SectionTabItem {
   id: string;
@@ -30,7 +34,9 @@ export function SectionTabs({
   /** Optional offset for a shell with a mobile top bar above its section strip. */
   mobileReadingLine?: number;
 }) {
-  const [readingLine, setReadingLine] = useState(() => mobileReadingLine && window.matchMedia("(max-width: 760px)").matches ? mobileReadingLine : 72);
+  const [readingLine, setReadingLine] = useState(() =>
+    mobileReadingLine && window.matchMedia("(max-width: 760px)").matches ? mobileReadingLine : 72,
+  );
   useEffect(() => {
     if (!mobileReadingLine) return;
     const query = window.matchMedia("(max-width: 760px)");
@@ -80,16 +86,18 @@ export function SectionTabs({
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return;
     const nodes = items
-      .map(item => document.getElementById(sectionAnchorId(scope, item.id)))
+      .map((item) => document.getElementById(sectionAnchorId(scope, item.id)))
       .filter((node): node is HTMLElement => node !== null);
     if (nodes.length === 0) return;
 
     const observer = new IntersectionObserver(
-      entries => {
+      (entries) => {
         const locked = scrollLockRef.current;
         if (locked) {
           const lockedNode = document.getElementById(sectionAnchorId(scope, locked));
-          const lockedVisible = entries.some(entry => entry.isIntersecting && entry.target === lockedNode);
+          const lockedVisible = entries.some(
+            (entry) => entry.isIntersecting && entry.target === lockedNode,
+          );
           if (lockedVisible) {
             clearScrollLock();
             setActive(locked);
@@ -97,11 +105,11 @@ export function SectionTabs({
           return;
         }
         const visible = entries
-          .filter(entry => entry.isIntersecting)
+          .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
         if (!visible) return;
         const id = visible.target.id.slice(sectionAnchorPrefix(scope).length);
-        setActive(current => (current === id ? current : id));
+        setActive((current) => (current === id ? current : id));
       },
       { rootMargin: [String(-readingLine) + "px", "0px", "-60%", "0px"].join(" "), threshold: 0 },
     );
@@ -121,12 +129,8 @@ export function SectionTabs({
   };
 
   return (
-    <div
-      className="page-tabs section-tabs"
-      role="tablist"
-      aria-label={ariaLabel}
-    >
-      {items.map(item => (
+    <div className="page-tabs section-tabs" role="tablist" aria-label={ariaLabel}>
+      {items.map((item) => (
         <button
           key={item.id}
           type="button"

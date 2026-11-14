@@ -44,7 +44,7 @@ export function OpenBrowserPrefToggle({ serverDefault = true }: { serverDefault?
           aria-labelledby={labelId}
           aria-describedby={hintId}
           checked={!open}
-          onChange={e => {
+          onChange={(e) => {
             const next = !e.target.checked;
             setChoice(next);
             writeOpenBrowserPref(next);
@@ -53,8 +53,12 @@ export function OpenBrowserPrefToggle({ serverDefault = true }: { serverDefault?
         <span className="slider" aria-hidden="true" />
       </span>
       <span className="open-browser-pref-copy">
-        <span id={labelId} className="text-label">{t("prov.dontOpenBrowser")}</span>
-        <span id={hintId} className="muted text-label">{t("prov.dontOpenBrowserHint")}</span>
+        <span id={labelId} className="text-label">
+          {t("prov.dontOpenBrowser")}
+        </span>
+        <span id={hintId} className="muted text-label">
+          {t("prov.dontOpenBrowserHint")}
+        </span>
       </span>
     </label>
   );

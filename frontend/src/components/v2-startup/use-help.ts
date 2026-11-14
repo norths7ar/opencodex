@@ -4,5 +4,5 @@ import { useId, useState } from "react";
 export function useHelp() {
   const [open, setOpen] = useState(false);
   const id = useId();
-  return { open, id, toggle: () => setOpen(value => !value) };
+  return { open, id, toggle: () => setOpen((value) => !value) };
 }

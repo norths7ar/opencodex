@@ -65,7 +65,12 @@ export type NativeErrorBody = NativeErrorEnvelope | NativeRefusalEnvelope;
 
 // Widening the type alone would leave this guard rejecting a `codex` response at
 // runtime, so the set moves with it.
-const NATIVE_CLIENTS: ReadonlySet<string> = new Set<NativeIntegrationClientId>(["claude", "grok", "codex", "claude-desktop"]);
+const NATIVE_CLIENTS: ReadonlySet<string> = new Set<NativeIntegrationClientId>([
+  "claude",
+  "grok",
+  "codex",
+  "claude-desktop",
+]);
 const NATIVE_REFUSAL_CODES: ReadonlySet<string> = new Set([
   "native_integration_refused",
   "native_integration_failed",
@@ -88,11 +93,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /** Native refusals omit the file-writer state and use their own client/code vocabulary. */
 export function isNativeRefusalEnvelope(body: unknown): body is NativeRefusalEnvelope {
   if (!isRecord(body)) return false;
-  return typeof body.error === "string"
-    && NATIVE_REFUSAL_CODES.has(String(body.code))
-    && NATIVE_CLIENTS.has(String(body.clientId))
-    && NATIVE_REFUSAL_REASONS.has(String(body.reason))
-    && typeof body.message === "string";
+  return (
+    typeof body.error === "string" &&
+    NATIVE_REFUSAL_CODES.has(String(body.code)) &&
+    NATIVE_CLIENTS.has(String(body.clientId)) &&
+    NATIVE_REFUSAL_REASONS.has(String(body.reason)) &&
+    typeof body.message === "string"
+  );
 }
 
 export class NativeApiError extends Error {
@@ -114,7 +121,7 @@ async function readOptional<T>(request: Promise<Response>): Promise<T | null> {
   try {
     const response = await request;
     if (!response.ok) return null;
-    return await readJsonIfOk<T>(response) ?? null;
+    return (await readJsonIfOk<T>(response)) ?? null;
   } catch {
     return null;
   }
@@ -122,8 +129,8 @@ async function readOptional<T>(request: Promise<Response>): Promise<T | null> {
 
 async function readErrorBody(response: Response): Promise<NativeErrorEnvelope> {
   try {
-    const body = await response.json() as unknown;
-    return isRecord(body) ? body as NativeErrorEnvelope : {};
+    const body = (await response.json()) as unknown;
+    return isRecord(body) ? (body as NativeErrorEnvelope) : {};
   } catch {
     return {};
   }

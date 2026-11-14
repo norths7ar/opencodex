@@ -45,18 +45,24 @@ export default function ClaudeFirstPartyBindings({
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const routes = useMemo(() => models.filter(model => model.available), [models]);
+  const routes = useMemo(() => models.filter((model) => model.available), [models]);
   const boundIds = useMemo(() => new Set(Object.keys(bindings)), [bindings]);
   const unboundSuggestions = useMemo(
-    () => suggestions.filter(id => !boundIds.has(id)),
+    () => suggestions.filter((id) => !boundIds.has(id)),
     [suggestions, boundIds],
   );
-  const sortedBindings = useMemo(() => Object.entries(bindings).sort(([a], [b]) => a.localeCompare(b)), [bindings]);
+  const sortedBindings = useMemo(
+    () => Object.entries(bindings).sort(([a], [b]) => a.localeCompare(b)),
+    [bindings],
+  );
 
   const trimmedId = pickerId.trim();
   const canAdd = trimmedId.startsWith("claude-") && route !== "" && pending === null;
 
-  const save = async (body: { set?: Record<string, string>; remove?: string[] }, pendingKey: string) => {
+  const save = async (
+    body: { set?: Record<string, string>; remove?: string[] },
+    pendingKey: string,
+  ) => {
     if (pending !== null) return;
     setPending(pendingKey);
     setError(null);
@@ -66,18 +72,25 @@ export default function ClaudeFirstPartyBindings({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const payload = await readJsonOrThrow<{ ok?: boolean; modelBindings?: Record<string, string> }>(
-        response,
-        t("claudeDesktop.firstParty.bindings.saveFailed"),
-      );
-      if (!payload || payload.ok !== true || typeof payload.modelBindings !== "object" || payload.modelBindings === null) {
+      const payload = await readJsonOrThrow<{
+        ok?: boolean;
+        modelBindings?: Record<string, string>;
+      }>(response, t("claudeDesktop.firstParty.bindings.saveFailed"));
+      if (
+        !payload ||
+        payload.ok !== true ||
+        typeof payload.modelBindings !== "object" ||
+        payload.modelBindings === null
+      ) {
         throw new Error(t("claudeDesktop.firstParty.bindings.saveFailed"));
       }
       setPickerId("");
       setRoute("");
       onSaved(payload.modelBindings);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : t("claudeDesktop.firstParty.bindings.saveFailed"));
+      setError(
+        cause instanceof Error ? cause.message : t("claudeDesktop.firstParty.bindings.saveFailed"),
+      );
     } finally {
       setPending(null);
     }
@@ -97,21 +110,33 @@ export default function ClaudeFirstPartyBindings({
       ) : (
         <ul className="claude-bindings-list">
           {sortedBindings.map(([id, bound]) => {
-            const known = routes.some(model => model.route === bound);
+            const known = routes.some((model) => model.route === bound);
             return (
               <li key={id} className="claude-bindings-row">
-                <code className="claude-bindings-id" title={id}>{id}</code>
-                <IconChevron className="claude-bindings-arrow" width={12} height={12} aria-hidden="true" />
+                <code className="claude-bindings-id" title={id}>
+                  {id}
+                </code>
+                <IconChevron
+                  className="claude-bindings-arrow"
+                  width={12}
+                  height={12}
+                  aria-hidden="true"
+                />
                 <Select
                   fullWidth
                   className="claude-bindings-select"
                   label={t("claudeDesktop.firstParty.bindings.routeLabel")}
                   value={bound}
                   disabled={pending !== null}
-                  onChange={next => { if (next !== bound) void save({ set: { [id]: next } }, id); }}
+                  onChange={(next) => {
+                    if (next !== bound) void save({ set: { [id]: next } }, id);
+                  }}
                   options={[
                     ...(known ? [] : [{ value: bound, label: bound }]),
-                    ...routes.map(model => ({ value: model.route, label: routeOptionLabel(model) })),
+                    ...routes.map((model) => ({
+                      value: model.route,
+                      label: routeOptionLabel(model),
+                    })),
                   ]}
                 />
                 <button
@@ -138,10 +163,12 @@ export default function ClaudeFirstPartyBindings({
           placeholder={t("claudeDesktop.firstParty.bindings.pickerPlaceholder")}
           value={pickerId}
           disabled={pending !== null}
-          onChange={event => setPickerId(event.target.value)}
+          onChange={(event) => setPickerId(event.target.value)}
         />
         <datalist id="claude-bindings-suggestions">
-          {unboundSuggestions.map(id => <option key={id} value={id} />)}
+          {unboundSuggestions.map((id) => (
+            <option key={id} value={id} />
+          ))}
         </datalist>
         <Select
           fullWidth
@@ -152,7 +179,7 @@ export default function ClaudeFirstPartyBindings({
           onChange={setRoute}
           options={[
             { value: "", label: t("claudeDesktop.firstParty.bindings.routePlaceholder") },
-            ...routes.map(model => ({ value: model.route, label: routeOptionLabel(model) })),
+            ...routes.map((model) => ({ value: model.route, label: routeOptionLabel(model) })),
           ]}
         />
         <button
@@ -161,7 +188,9 @@ export default function ClaudeFirstPartyBindings({
           disabled={!canAdd}
           onClick={() => void save({ set: { [trimmedId]: route } }, trimmedId)}
         >
-          {pending !== null && pending === trimmedId ? t("common.saving") : t("claudeDesktop.firstParty.bindings.add")}
+          {pending !== null && pending === trimmedId
+            ? t("common.saving")
+            : t("claudeDesktop.firstParty.bindings.add")}
         </button>
       </div>
     </section>

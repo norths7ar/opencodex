@@ -47,24 +47,31 @@ export function DebugLogViewer({
 
   if (!debug) return null;
 
-  const streams = ([
-    debug.enabled ? "provider" : null,
-    debug.usage ? "usage" : null,
-    debug.injection ? "injection" : null,
-  ] as const).filter((value): value is LogStream => value !== null);
+  const streams = (
+    [
+      debug.enabled ? "provider" : null,
+      debug.usage ? "usage" : null,
+      debug.injection ? "injection" : null,
+    ] as const
+  ).filter((value): value is LogStream => value !== null);
 
   return (
     <section className={panel} aria-labelledby="debug-tail-title">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 pt-3.5 pb-3">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2">
-          <h3 id="debug-tail-title" className="m-0 text-[15px] leading-5 font-semibold tracking-[-0.01em] text-fg">{t("logsV2.debugTail")}</h3>
+          <h3
+            id="debug-tail-title"
+            className="m-0 text-[15px] leading-5 font-semibold tracking-[-0.01em] text-fg"
+          >
+            {t("logsV2.debugTail")}
+          </h3>
           {streams.length > 1 && (
             <SegmentedControl
               size="sm"
               aria-label={t("logsV2.debugStream")}
               value={stream}
               onChange={onStreamChange}
-              items={streams.map(value => ({ value, label: t(STREAM_LABEL[value]) }))}
+              items={streams.map((value) => ({ value, label: t(STREAM_LABEL[value]) }))}
             />
           )}
           {streams.length === 1 && (
@@ -80,7 +87,9 @@ export function DebugLogViewer({
             aria-label={t("debug.refresh")}
             title={t("debug.refresh")}
           >
-            <span className={cn("inline-flex", refreshing && "animate-spin")}><IconRefresh aria-hidden /></span>
+            <span className={cn("inline-flex", refreshing && "animate-spin")}>
+              <IconRefresh aria-hidden />
+            </span>
           </button>
           <LiveToggle checked={follow} onChange={onFollowChange} label={t("debug.follow")} />
         </div>
@@ -90,12 +99,16 @@ export function DebugLogViewer({
         {!streamEnabled ? (
           <div className="empty">
             <div className="title">{t("debug.emptyTitle")}</div>
-            <div className="mx-auto mt-1.5 max-w-[560px] text-[13px] text-fg-muted">{t("debug.empty")}</div>
+            <div className="mx-auto mt-1.5 max-w-[560px] text-[13px] text-fg-muted">
+              {t("debug.empty")}
+            </div>
           </div>
         ) : entries.length === 0 ? (
           <div className="empty">
             <div className="title">{t("debug.noLinesTitle")}</div>
-            <div className="mx-auto mt-1.5 max-w-[560px] text-[13px] text-fg-muted">{t(`debug.noLines.${stream}`)}</div>
+            <div className="mx-auto mt-1.5 max-w-[560px] text-[13px] text-fg-muted">
+              {t(`debug.noLines.${stream}`)}
+            </div>
           </div>
         ) : (
           <div
@@ -103,7 +116,7 @@ export function DebugLogViewer({
             className="debug-tail-lines max-h-[calc(100dvh-320px)] min-h-48 overflow-auto px-4 py-2"
           >
             <div className="relative w-full" style={{ height: lineVirtualizer.getTotalSize() }}>
-              {lineVirtualizer.getVirtualItems().map(virtualRow => {
+              {lineVirtualizer.getVirtualItems().map((virtualRow) => {
                 const entry = entries[virtualRow.index]!;
                 return (
                   <div

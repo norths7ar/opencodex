@@ -56,37 +56,58 @@ export default function ClaudeDesktopVisibility<T extends VisibilityModel>({
   const [provider, setProvider] = useState("");
   const [limit, setLimit] = useState(LANE_PAGE);
   const providers = useMemo(() => providersOf(models), [models]);
-  const shown = useMemo(() => filterVisibilityModels(models, query, provider), [models, query, provider]);
+  const shown = useMemo(
+    () => filterVisibilityModels(models, query, provider),
+    [models, query, provider],
+  );
   const counts = visibilityCounts(models, visibility);
   const preview = applyPreview(desiredDesktopList(rendered, visibility), appliedModels);
-  const shownRoutes = shown.map(model => model.route);
+  const shownRoutes = shown.map((model) => model.route);
   const policy = visibility?.mode ?? "exclude";
 
   return (
     <div className="claude-visibility">
       <div className="claude-visibility-counts" role="status">
-        <span className="claude-visibility-count">{t("claudeDesktop.visibility.selected", { n: counts.selected })}</span>
-        <span className="claude-visibility-count">{t("claudeDesktop.visibility.available", { n: counts.available })}</span>
         <span className="claude-visibility-count">
-          {appliedModels ? t("claudeDesktop.visibility.applied", { n: appliedModels.length }) : t("claudeDesktop.visibility.appliedUnknown")}
+          {t("claudeDesktop.visibility.selected", { n: counts.selected })}
+        </span>
+        <span className="claude-visibility-count">
+          {t("claudeDesktop.visibility.available", { n: counts.available })}
+        </span>
+        <span className="claude-visibility-count">
+          {appliedModels
+            ? t("claudeDesktop.visibility.applied", { n: appliedModels.length })
+            : t("claudeDesktop.visibility.appliedUnknown")}
         </span>
         {counts.selectedUnavailable > 0 && (
-          <span className="claude-visibility-count muted">{t("claudeDesktop.visibility.selectedUnavailable", { n: counts.selectedUnavailable })}</span>
+          <span className="claude-visibility-count muted">
+            {t("claudeDesktop.visibility.selectedUnavailable", { n: counts.selectedUnavailable })}
+          </span>
         )}
       </div>
 
       <fieldset className="claude-visibility-policy" disabled={disabled}>
         <legend>{t("claudeDesktop.visibility.newModels")}</legend>
-        {(["exclude", "include"] as const).map(mode => (
+        {(["exclude", "include"] as const).map((mode) => (
           <label key={mode}>
             <input
               type="radio"
               name="claude-desktop-new-models"
               value={mode}
               checked={policy === mode}
-              onChange={() => onChange(setNewModelPolicy(visibility, models.map(model => model.route), mode))}
+              onChange={() =>
+                onChange(
+                  setNewModelPolicy(
+                    visibility,
+                    models.map((model) => model.route),
+                    mode,
+                  ),
+                )
+              }
             />
-            {mode === "exclude" ? t("claudeDesktop.visibility.newShow") : t("claudeDesktop.visibility.newHide")}
+            {mode === "exclude"
+              ? t("claudeDesktop.visibility.newShow")
+              : t("claudeDesktop.visibility.newHide")}
           </label>
         ))}
       </fieldset>
@@ -98,50 +119,73 @@ export default function ClaudeDesktopVisibility<T extends VisibilityModel>({
           placeholder={t("claudeDesktop.visibility.search")}
           aria-label={t("claudeDesktop.visibility.search")}
           value={query}
-          onChange={event => { setQuery(event.target.value); setLimit(LANE_PAGE); }}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setLimit(LANE_PAGE);
+          }}
         />
         <Select
           label={t("claudeDesktop.visibility.provider")}
           triggerClassName="min-w-[10rem] justify-between"
           value={provider}
-          onChange={next => { setProvider(next); setLimit(LANE_PAGE); }}
+          onChange={(next) => {
+            setProvider(next);
+            setLimit(LANE_PAGE);
+          }}
           options={[
             { value: "", label: t("claudeDesktop.visibility.allProviders") },
-            ...providers.map(name => ({ value: name, label: name })),
+            ...providers.map((name) => ({ value: name, label: name })),
           ]}
         />
-        <button type="button" className="btn btn-ghost btn-sm" disabled={disabled || shown.length === 0}
-          onClick={() => onChange(setRoutesVisible(visibility, shownRoutes, true))}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={disabled || shown.length === 0}
+          onClick={() => onChange(setRoutesVisible(visibility, shownRoutes, true))}
+        >
           {t("claudeDesktop.visibility.selectShown")}
         </button>
-        <button type="button" className="btn btn-ghost btn-sm" disabled={disabled || shown.length === 0}
-          onClick={() => onChange(setRoutesVisible(visibility, shownRoutes, false))}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={disabled || shown.length === 0}
+          onClick={() => onChange(setRoutesVisible(visibility, shownRoutes, false))}
+        >
           {t("claudeDesktop.visibility.clearShown")}
         </button>
       </div>
 
-      {counts.selected === 0 && counts.available > 0 && <Notice tone="warn">{t("claudeDesktop.visibility.noneSelected")}</Notice>}
+      {counts.selected === 0 && counts.available > 0 && (
+        <Notice tone="warn">{t("claudeDesktop.visibility.noneSelected")}</Notice>
+      )}
 
       {shown.length === 0 ? (
         <p className="claude-desktop-list-hint">{t("claudeDesktop.visibility.noMatch")}</p>
       ) : (
         <ul className="card claude-desktop-list-rows">
-          {shown.slice(0, limit).map(model => {
+          {shown.slice(0, limit).map((model) => {
             const visible = routeVisible(visibility, model.route);
             return (
-              <li key={model.route} className={`claude-desktop-list-row${visible ? "" : " hidden-row"}`}>
+              <li
+                key={model.route}
+                className={`claude-desktop-list-row${visible ? "" : " hidden-row"}`}
+              >
                 <input
                   type="checkbox"
                   checked={visible}
                   disabled={disabled}
                   aria-label={t("claudeDesktop.visibility.toggle", { model: model.label })}
-                  onChange={event => onChange(setRoutesVisible(visibility, [model.route], event.target.checked))}
+                  onChange={(event) =>
+                    onChange(setRoutesVisible(visibility, [model.route], event.target.checked))
+                  }
                 />
                 <span className="claude-desktop-list-names">
                   <strong title={model.label}>{model.label}</strong>
                   {model.label !== model.route && <code title={model.route}>{model.route}</code>}
                 </span>
-                <span className="badge badge-muted claude-visibility-provider">{providerOf(model.route)}</span>
+                <span className="badge badge-muted claude-visibility-provider">
+                  {providerOf(model.route)}
+                </span>
                 {badges(model)}
               </li>
             );
@@ -149,22 +193,40 @@ export default function ClaudeDesktopVisibility<T extends VisibilityModel>({
         </ul>
       )}
       {shown.length > limit && (
-        <button type="button" className="btn btn-ghost btn-sm claude-lane-more" onClick={() => setLimit(current => current + LANE_PAGE)}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm claude-lane-more"
+          onClick={() => setLimit((current) => current + LANE_PAGE)}
+        >
           {t("models.showMore", { n: shown.length - limit })}
         </button>
       )}
 
       {preview && (
         <div className="claude-visibility-preview">
-          <span className="claude-visibility-preview-title">{t("claudeDesktop.visibility.previewTitle")}</span>
-          {preview.added.length === 0 && preview.removed.length === 0
-            ? <span>{t("claudeDesktop.visibility.previewSame")}</span>
-            : (
-              <>
-                {preview.added.length > 0 && <span className="claude-visibility-added">{t("claudeDesktop.visibility.previewAdds", { models: previewText(preview.added) })}</span>}
-                {preview.removed.length > 0 && <span className="claude-visibility-removed">{t("claudeDesktop.visibility.previewRemoves", { models: previewText(preview.removed) })}</span>}
-              </>
-            )}
+          <span className="claude-visibility-preview-title">
+            {t("claudeDesktop.visibility.previewTitle")}
+          </span>
+          {preview.added.length === 0 && preview.removed.length === 0 ? (
+            <span>{t("claudeDesktop.visibility.previewSame")}</span>
+          ) : (
+            <>
+              {preview.added.length > 0 && (
+                <span className="claude-visibility-added">
+                  {t("claudeDesktop.visibility.previewAdds", {
+                    models: previewText(preview.added),
+                  })}
+                </span>
+              )}
+              {preview.removed.length > 0 && (
+                <span className="claude-visibility-removed">
+                  {t("claudeDesktop.visibility.previewRemoves", {
+                    models: previewText(preview.removed),
+                  })}
+                </span>
+              )}
+            </>
+          )}
         </div>
       )}
       <p className="claude-desktop-list-hint">{t("claudeDesktop.visibility.replaceNote")}</p>

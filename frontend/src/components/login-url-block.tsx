@@ -30,11 +30,12 @@ export function LoginUrlBlock({ url, openLabel }: { url: string; openLabel?: str
 
   const outcome = outcomeFor(url);
 
-  const label = outcome === "copied"
-    ? t("prov.linkCopied")
-    : outcome === "unavailable"
-      ? t("prov.linkCopyUnavailable")
-      : t("prov.copyLink");
+  const label =
+    outcome === "copied"
+      ? t("prov.linkCopied")
+      : outcome === "unavailable"
+        ? t("prov.linkCopyUnavailable")
+        : t("prov.copyLink");
   // The authorization URL comes from the provider's login flow, so it is not
   // inherently trustworthy: only offer navigation for schemes a browser can
   // safely open. Unsafe or malformed values stay visible and copyable but are
@@ -51,7 +52,8 @@ export function LoginUrlBlock({ url, openLabel }: { url: string; openLabel?: str
         </button>
         {canOpen && (
           <a href={url} target="_blank" rel="noreferrer" className="login-url-block-open">
-            <IconExternal style={{ width: 13, height: 13 }} aria-hidden="true" /> {openLabel ?? t("prov.didntOpen")}
+            <IconExternal style={{ width: 13, height: 13 }} aria-hidden="true" />{" "}
+            {openLabel ?? t("prov.didntOpen")}
           </a>
         )}
       </div>
@@ -113,25 +115,28 @@ export function LoginHint({ hint, paste }: { hint: LoginHintData; paste?: LoginH
   if (!deviceCode && !url && !hint.instructions && !paste) return null;
 
   const deviceOutcome = deviceCopy.outcomeFor(deviceCode);
-  const deviceCopyLabel = deviceOutcome === "copied"
-    ? t("prov.codeCopied")
-    : deviceOutcome === "unavailable"
-      ? t("prov.linkCopyUnavailable")
-      : t("prov.copyCode");
+  const deviceCopyLabel =
+    deviceOutcome === "copied"
+      ? t("prov.codeCopied")
+      : deviceOutcome === "unavailable"
+        ? t("prov.linkCopyUnavailable")
+        : t("prov.copyCode");
   // Nothing tried to open a browser for a device grant or a declined launch, so
   // the link is labelled as the way in rather than as a recovery.
-  const openLabel = deviceCode || hint.browserLaunch === "skipped" ? t("prov.openSignInPage") : undefined;
+  const openLabel =
+    deviceCode || hint.browserLaunch === "skipped" ? t("prov.openSignInPage") : undefined;
   // Copy the code and open the page in one click, the way device logins usually
   // go: the user lands on a page asking for a code that is already on their
   // clipboard. The copy is started before the open so it still runs inside the
   // click's user activation; the code stays on screen either way. Inside the
   // desktop app the new window is handed to the default browser by the shell.
-  const copyAndOpen = deviceCode && isOpenableUrl(url)
-    ? () => {
-      deviceCopy.copy(deviceCode, deviceCode);
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-    : null;
+  const copyAndOpen =
+    deviceCode && isOpenableUrl(url)
+      ? () => {
+          deviceCopy.copy(deviceCode, deviceCode);
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      : null;
 
   return (
     <div className="login-hint">
@@ -144,12 +149,19 @@ export function LoginHint({ hint, paste }: { hint: LoginHintData; paste?: LoginH
         <div className="login-hint-device pwi-device-code-wrap">
           <span className="text-label">{t("prov.deviceCode")}</span>
           <code className="login-hint-device-code pwi-device-code">{deviceCode}</code>
-          <button type="button" className={copyAndOpen ? "btn btn-ghost btn-sm" : "btn btn-primary btn-sm"}
-            onClick={() => deviceCopy.copy(deviceCode, deviceCode)}>
+          <button
+            type="button"
+            className={copyAndOpen ? "btn btn-ghost btn-sm" : "btn btn-primary btn-sm"}
+            onClick={() => deviceCopy.copy(deviceCode, deviceCode)}
+          >
             <span aria-live="polite">{deviceCopyLabel}</span>
           </button>
           {copyAndOpen && (
-            <button type="button" className="btn btn-primary btn-sm login-hint-copy-open" onClick={copyAndOpen}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm login-hint-copy-open"
+              onClick={copyAndOpen}
+            >
               {t("prov.copyCodeAndOpen")}
             </button>
           )}
@@ -166,8 +178,8 @@ export function LoginHint({ hint, paste }: { hint: LoginHintData; paste?: LoginH
               autoComplete="off"
               spellCheck={false}
               value={paste.value}
-              onChange={e => paste.onChange(e.target.value)}
-              onKeyDown={e => {
+              onChange={(e) => paste.onChange(e.target.value)}
+              onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   paste.onSubmit();
@@ -184,11 +196,17 @@ export function LoginHint({ hint, paste }: { hint: LoginHintData; paste?: LoginH
               disabled={paste.busy || paste.disabled === true || !paste.value.trim()}
               onClick={paste.onSubmit}
             >
-              {paste.busy ? (paste.submittingLabel ?? t("prov.pasteSubmitting")) : t("prov.pasteSubmit")}
+              {paste.busy
+                ? (paste.submittingLabel ?? t("prov.pasteSubmitting"))
+                : t("prov.pasteSubmit")}
             </button>
           </div>
           {paste.message && (
-            <div className="text-label" aria-live="polite" style={{ color: paste.ok ? "var(--accent-hover)" : "var(--amber)" }}>
+            <div
+              className="text-label"
+              aria-live="polite"
+              style={{ color: paste.ok ? "var(--accent-hover)" : "var(--amber)" }}
+            >
               {paste.message}
             </div>
           )}

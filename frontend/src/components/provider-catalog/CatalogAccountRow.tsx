@@ -48,7 +48,9 @@ export default function CatalogAccountRow({
   // authorization URL is computed and never drawn.
   const showHint = shouldShowLoginHint(row, busyProvider, loginHint);
   return (
-    <div className={`list-row provider-catalog-account-row${showHint ? " provider-catalog-account-row--waiting" : ""}`}>
+    <div
+      className={`list-row provider-catalog-account-row${showHint ? " provider-catalog-account-row--waiting" : ""}`}
+    >
       <div className="provider-catalog-account-row-head">
         {/* Account rows are providers too. A logo beside Cursor and a bare
             tile beside Kiro reads as a bug, not as a distinction. */}
@@ -61,13 +63,18 @@ export default function CatalogAccountRow({
           {row.kind === "key" ? null : row.kind === "codex" ? (
             <>
               {loggedIn && (
-                <a className="btn btn-ghost" href={row.href ?? "#codex-set"}>{t("modal.accountManage")}</a>
+                <a className="btn btn-ghost" href={row.href ?? "#codex-set"}>
+                  {t("modal.accountManage")}
+                </a>
               )}
               {onLogin && !loggedIn && (
-                <button type="button"
+                <button
+                  type="button"
                   className={loggedIn ? "btn btn-ghost" : "btn btn-primary"}
                   disabled={busy}
-                  onClick={() => { if (!busy) onLogin(row.id); }}
+                  onClick={() => {
+                    if (!busy) onLogin(row.id);
+                  }}
                 >
                   {busy ? t("codexAuth.enablingOpenai") : t("modal.accountLogin")}
                 </button>
@@ -81,7 +88,11 @@ export default function CatalogAccountRow({
                 </button>
               )}
               {busy && onCancelLogin && (
-                <button type="button" className="btn btn-ghost" onClick={() => onCancelLogin(row.id)}>
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => onCancelLogin(row.id)}
+                >
                   {t("common.cancel")}
                 </button>
               )}
@@ -92,26 +103,39 @@ export default function CatalogAccountRow({
               )}
             </>
           ) : busy ? (
-            onCancelLogin && <button type="button" className="btn btn-ghost" onClick={() => onCancelLogin(row.id)}>{t("common.cancel")}</button>
+            onCancelLogin && (
+              <button type="button" className="btn btn-ghost" onClick={() => onCancelLogin(row.id)}>
+                {t("common.cancel")}
+              </button>
+            )
           ) : (
-            onLogin && <button type="button" className="btn btn-primary" onClick={() => onLogin(row.id)}>{t("modal.accountLogin")}</button>
+            onLogin && (
+              <button type="button" className="btn btn-primary" onClick={() => onLogin(row.id)}>
+                {t("modal.accountLogin")}
+              </button>
+            )
           )}
         </div>
       </div>
       {showHint && loginHint && (
         <LoginHint
-          hint={{ url: loginHint.url, deviceCode: loginHint.deviceCode, instructions: loginHint.instructions, browserLaunch: loginHint.browserLaunch }}
+          hint={{
+            url: loginHint.url,
+            deviceCode: loginHint.deviceCode,
+            instructions: loginHint.instructions,
+            browserLaunch: loginHint.browserLaunch,
+          }}
           {...(paste
             ? {
-              paste: {
-                value: paste.value,
-                busy: paste.busy,
-                message: paste.message,
-                ok: paste.ok,
-                onChange: paste.onChange,
-                onSubmit: () => paste.onSubmit(row.id),
-              },
-            }
+                paste: {
+                  value: paste.value,
+                  busy: paste.busy,
+                  message: paste.message,
+                  ok: paste.ok,
+                  onChange: paste.onChange,
+                  onSubmit: () => paste.onSubmit(row.id),
+                },
+              }
             : {})}
         />
       )}

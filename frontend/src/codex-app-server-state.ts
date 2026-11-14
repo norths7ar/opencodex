@@ -26,7 +26,7 @@ export async function fetchCodexAppServerState(
       signal: options.signal,
     });
     if (!response.ok) return UNKNOWN;
-    const body = await response.json().catch(() => null) as unknown;
+    const body = (await response.json().catch(() => null)) as unknown;
     // Reuse the contract's guard rather than re-deriving a weaker one here.
     if (!isCodexAppServerStateResponse(body)) return UNKNOWN;
     return { state: body.state, runningCount: body.runningCount };
@@ -36,4 +36,3 @@ export async function fetchCodexAppServerState(
     return UNKNOWN;
   }
 }
-

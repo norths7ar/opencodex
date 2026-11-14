@@ -31,7 +31,9 @@ export function normalizeBody(body: string): string {
   return body.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\t/g, "    ");
 }
 
-export interface CharacterFinding { position: number }
+export interface CharacterFinding {
+  position: number;
+}
 
 /**
  * Control characters other than newline cannot be encoded safely, and neither can
@@ -71,7 +73,10 @@ export interface Draft {
  * Returns the first blocking problem, or null. Lint findings are NOT problems:
  * they are advisory and must never disable Save.
  */
-export function validateDraft(draft: Draft, others: readonly CustomLayerDto[]): DraftProblem | null {
+export function validateDraft(
+  draft: Draft,
+  others: readonly CustomLayerDto[],
+): DraftProblem | null {
   const title = draft.title;
   if (title.trim().length === 0) return { kind: "title-empty" };
   if (title.length > MAX_TITLE_CHARS) return { kind: "title-too-long", length: title.length };
@@ -88,18 +93,19 @@ export function validateDraft(draft: Draft, others: readonly CustomLayerDto[]): 
   // OTHER enabled layer, which is why an edit can overflow while a new layer of
   // the same size would not.
   const composed = [
-    ...others.filter(l => l.enabled && l.id !== draft.id).map(l => l.body),
+    ...others.filter((l) => l.enabled && l.id !== draft.id).map((l) => l.body),
     ...(draft.enabled ? [body] : []),
   ].join("\n\n");
   const composedBytes = utf8Length(composed);
-  if (composedBytes > MAX_COMPOSED_BYTES) return { kind: "composed-too-large", bytes: composedBytes };
+  if (composedBytes > MAX_COMPOSED_BYTES)
+    return { kind: "composed-too-large", bytes: composedBytes };
 
   return null;
 }
 
 /** Six lowercase alphanumerics, matching the route and the store. */
 export function newLayerId(taken: readonly CustomLayerDto[]): string {
-  const used = new Set(taken.map(l => l.id));
+  const used = new Set(taken.map((l) => l.id));
   const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
   for (;;) {
     let id = "";
@@ -114,7 +120,10 @@ export function newLayerId(taken: readonly CustomLayerDto[]): string {
  * byte-for-byte what developer_instructions will hold.
  */
 export function composeBodies(layers: readonly CustomLayerDto[]): string {
-  return layers.filter(l => l.enabled).map(l => l.body).join("\n\n");
+  return layers
+    .filter((l) => l.enabled)
+    .map((l) => l.body)
+    .join("\n\n");
 }
 
 /**
@@ -134,9 +143,13 @@ export function undoWindowMs(): number {
 }
 
 /** Order is composition order, so a move is a reorder of the whole list. */
-export function moveLayer(layers: readonly CustomLayerDto[], id: string, delta: -1 | 1): CustomLayerDto[] {
+export function moveLayer(
+  layers: readonly CustomLayerDto[],
+  id: string,
+  delta: -1 | 1,
+): CustomLayerDto[] {
   const next = [...layers];
-  const from = next.findIndex(l => l.id === id);
+  const from = next.findIndex((l) => l.id === id);
   if (from === -1) return next;
   const to = from + delta;
   if (to < 0 || to >= next.length) return next;

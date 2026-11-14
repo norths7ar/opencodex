@@ -11,7 +11,15 @@ import { cn } from "@/lib/utils";
 
 export function QuestionIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
       <circle cx="12" cy="12" r="9.5" />
       <path d="M9.6 9.3a2.5 2.5 0 0 1 4.85.85c0 1.65-2.45 2.2-2.45 3.6" />
       <path d="M12 17h.01" />
@@ -50,24 +58,47 @@ interface FrameProps {
 }
 
 /** Panel with a head; children are the inset body and an optional foot. */
-export function Frame({ id, title, lede, meta, actions, below, children, className, headClassName, busy }: FrameProps) {
+export function Frame({
+  id,
+  title,
+  lede,
+  meta,
+  actions,
+  below,
+  children,
+  className,
+  headClassName,
+  busy,
+}: FrameProps) {
   const titleId = useId();
   return (
     <section
       id={id}
       aria-labelledby={titleId}
       aria-busy={busy}
-      className={cn("flex min-w-0 scroll-mt-[72px] flex-col rounded-[12px] bg-surface ring-1 ring-inset ring-line", className)}
+      className={cn(
+        "flex min-w-0 scroll-mt-[72px] flex-col rounded-[12px] bg-surface ring-1 ring-inset ring-line",
+        className,
+      )}
     >
-      <div className={cn("flex min-w-0 flex-wrap items-start gap-x-3 gap-y-2 px-4 pt-3.5 pb-3", headClassName)}>
+      <div
+        className={cn(
+          "flex min-w-0 flex-wrap items-start gap-x-3 gap-y-2 px-4 pt-3.5 pb-3",
+          headClassName,
+        )}
+      >
         <div className="flex min-w-[min(100%,15rem)] flex-1 flex-col gap-0.5">
           <div className="flex min-w-0 items-center gap-2">
-            <h3 id={titleId} className="m-0 truncate text-[14px] leading-5 font-semibold text-fg">{title}</h3>
+            <h3 id={titleId} className="m-0 truncate text-[14px] leading-5 font-semibold text-fg">
+              {title}
+            </h3>
             {meta}
           </div>
           {lede && <p className="m-0 text-[13px] leading-5 text-fg-muted">{lede}</p>}
         </div>
-        {actions && <div className="flex shrink-0 flex-wrap items-center gap-2 max-sm:w-full">{actions}</div>}
+        {actions && (
+          <div className="flex shrink-0 flex-wrap items-center gap-2 max-sm:w-full">{actions}</div>
+        )}
       </div>
       {below && <div className="px-4 pb-3">{below}</div>}
       {children}
@@ -76,7 +107,15 @@ export function Frame({ id, title, lede, meta, actions, below, children, classNa
 }
 
 /** The inset body: a raised sheet one pixel in from the panel, rows ruled by hairlines. */
-export function FrameBody({ children, className, as: Tag = "div" }: { children: ReactNode; className?: string; as?: "div" | "ol" | "ul" }) {
+export function FrameBody({
+  children,
+  className,
+  as: Tag = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "div" | "ol" | "ul";
+}) {
   return (
     <Tag
       className={cn(
@@ -93,7 +132,12 @@ export function FrameBody({ children, className, as: Tag = "div" }: { children: 
 /** Status on the left, actions on the right. */
 export function FrameFoot({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn("flex min-h-12 flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 text-[13px] text-fg-muted", className)}>
+    <div
+      className={cn(
+        "flex min-h-12 flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 text-[13px] text-fg-muted",
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -101,7 +145,12 @@ export function FrameFoot({ children, className }: { children: ReactNode; classN
 
 /** One settings row: plain label and one-line hint on the left, control on the right. */
 export function SettingRow({
-  label, hint, help, control, children, className,
+  label,
+  hint,
+  help,
+  control,
+  children,
+  className,
 }: {
   label: ReactNode;
   hint?: ReactNode;
@@ -114,10 +163,17 @@ export function SettingRow({
     <div className={cn("flex min-w-0 flex-col gap-2 px-4 py-3.5", className)}>
       <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
         <div className="flex min-w-[min(100%,12rem)] flex-1 flex-col gap-0.5">
-          <span className="flex items-center gap-1.5 text-[14px] leading-5 font-medium text-fg">{label}{help}</span>
+          <span className="flex items-center gap-1.5 text-[14px] leading-5 font-medium text-fg">
+            {label}
+            {help}
+          </span>
           {hint && <span className="text-[13px] leading-5 text-fg-muted">{hint}</span>}
         </div>
-        {control && <div className="flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2">{control}</div>}
+        {control && (
+          <div className="flex max-w-full min-w-0 flex-wrap items-center justify-end gap-2">
+            {control}
+          </div>
+        )}
       </div>
       {children}
     </div>
@@ -127,6 +183,8 @@ export function SettingRow({
 /** Small neutral count pill beside a title. */
 export function CountPill({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[11px] font-medium text-fg-muted tabular-nums">{children}</span>
+    <span className="rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[11px] font-medium text-fg-muted tabular-nums">
+      {children}
+    </span>
   );
 }

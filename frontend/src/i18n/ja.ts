@@ -14,7 +14,7 @@ import type { TKey } from "./en";
  * Japanese i18n catalog; must match the `TKey` set (compile-checked).
  */
 export const ja: Record<TKey, string> = {
-    "pws.firstResponse.title": "初回応答の進行状況",
+  "pws.firstResponse.title": "初回応答の進行状況",
   "pws.firstResponse.stepProvider": "プロバイダー",
   "pws.firstResponse.stepModels": "モデル",
   "pws.firstResponse.stepClients": "クライアントルーティング",
@@ -26,36 +26,50 @@ export const ja: Record<TKey, string> = {
   "pws.firstResponse.providerDisabled": "プロバイダーは無効です",
   "pws.firstResponse.modelsLoading": "モデル一覧を確認中…",
   "pws.firstResponse.modelsFailed": "モデル一覧を読み込めませんでした",
-  "pws.firstResponse.modelsPending": "初期モデル一覧の確認待ち — 検出が完了するまで非表示になります",
+  "pws.firstResponse.modelsPending":
+    "初期モデル一覧の確認待ち — 検出が完了するまで非表示になります",
   "pws.firstResponse.modelsReady": "{count} 個のモデルがルーティングに有効",
-  "pws.firstResponse.modelsReadyDiscoveryFailed": "{count} 個の保持モデルが有効 — ライブ検出に失敗しました",
+  "pws.firstResponse.modelsReadyDiscoveryFailed":
+    "{count} 個の保持モデルが有効 — ライブ検出に失敗しました",
   "pws.firstResponse.modelsAllOff": "すべてのモデルがオフです — Models で有効にしてください",
   "pws.firstResponse.modelsConfigured": "{count} 個のモデルが設定済み",
   "pws.firstResponse.modelsEmpty": "検出または設定されたモデルはまだありません",
   "pws.firstResponse.openProviderModels": "モデルを選択",
-  "pws.firstResponse.clientStep": "Connect でクライアントを適用し {provider}/<model> を選択してください（新しいセッションから反映されます）",
+  "pws.firstResponse.clientStep":
+    "Connect でクライアントを適用し {provider}/<model> を選択してください（新しいセッションから反映されます）",
   "pws.firstResponse.openConnect": "Connect を開く",
   "pws.firstResponse.probeUntested": "未検証 — 下のモデル応答テストを実行してください",
   "pws.firstResponse.probeOk": "{model} からの応答を確認しました",
   "pws.firstResponse.probeFailed": "{model} の前回の応答テストが失敗しました",
   "pws.firstResponse.stepDisconnect": "切断と復元",
-  "pws.firstResponse.disconnectNote": "Connect で Claude Code をオフにすると新しい Claude セッションのプロキシブロックのみが削除され、Codex を無効にするとプロキシルーティングが停止してネイティブの Codex カタログとスレッド履歴が復元されます。実行中のセッションは再起動するまで現在の環境を維持します。{provider} を無効化または削除しても Connect のクライアント設定は復元されません。",
-  "pws.firstResponse.probeReverify": "失敗したテスト以降に接続設定が変更されました — 修正を確認するには {model} の応答テストを再実行してください",
-  "pws.completion.recovery.auth": "このプロバイダーの API キーまたはアカウント認証情報を確認・更新してから、{model} の応答テストを再実行してください。",
-  "pws.completion.recovery.rateLimit": "プロバイダーがこのリクエストをレート制限しました（HTTP 429）。制限ウィンドウのリセットを待つか、別のアカウントまたは API キーに切り替えてから、{model} の応答テストを再実行してください。",
-  "pws.completion.recovery.connection": "リクエストがタイムアウトしたか、エンドポイントに到達できませんでした。ベース URL とネットワーク設定を確認してから、{model} の応答テストを再実行してください。",
-  "pws.completion.recovery.model": "プロバイダーがこのモデルリクエストを拒否しました。モデルタブでモデル ID を確認するか別のモデルを選択して、応答テストを再実行してください。",
-  "pws.completion.recovery.upstream": "上流プロバイダーがエラーまたは不完全なストリームを返しました。{model} の応答テストを再試行するか、プロバイダー設定を確認してください。",
-  "pws.completion.recovery.aborted": "完了前にテストがキャンセルされました。準備ができたら {model} の応答テストを再実行してください。",
-  "pws.completion.recovery.credentialChanged": "テスト開始中にプロバイダー設定または認証情報が変更されました。{model} の応答テストを再実行してください。",
-  "pws.completion.recovery.request": "テストリクエストを開始できませんでした。実行中のテストが終わるのを待つか、{model} の応答テストを再試行してください。",
+  "pws.firstResponse.disconnectNote":
+    "Connect で Claude Code をオフにすると新しい Claude セッションのプロキシブロックのみが削除され、Codex を無効にするとプロキシルーティングが停止してネイティブの Codex カタログとスレッド履歴が復元されます。実行中のセッションは再起動するまで現在の環境を維持します。{provider} を無効化または削除しても Connect のクライアント設定は復元されません。",
+  "pws.firstResponse.probeReverify":
+    "失敗したテスト以降に接続設定が変更されました — 修正を確認するには {model} の応答テストを再実行してください",
+  "pws.completion.recovery.auth":
+    "このプロバイダーの API キーまたはアカウント認証情報を確認・更新してから、{model} の応答テストを再実行してください。",
+  "pws.completion.recovery.rateLimit":
+    "プロバイダーがこのリクエストをレート制限しました（HTTP 429）。制限ウィンドウのリセットを待つか、別のアカウントまたは API キーに切り替えてから、{model} の応答テストを再実行してください。",
+  "pws.completion.recovery.connection":
+    "リクエストがタイムアウトしたか、エンドポイントに到達できませんでした。ベース URL とネットワーク設定を確認してから、{model} の応答テストを再実行してください。",
+  "pws.completion.recovery.model":
+    "プロバイダーがこのモデルリクエストを拒否しました。モデルタブでモデル ID を確認するか別のモデルを選択して、応答テストを再実行してください。",
+  "pws.completion.recovery.upstream":
+    "上流プロバイダーがエラーまたは不完全なストリームを返しました。{model} の応答テストを再試行するか、プロバイダー設定を確認してください。",
+  "pws.completion.recovery.aborted":
+    "完了前にテストがキャンセルされました。準備ができたら {model} の応答テストを再実行してください。",
+  "pws.completion.recovery.credentialChanged":
+    "テスト開始中にプロバイダー設定または認証情報が変更されました。{model} の応答テストを再実行してください。",
+  "pws.completion.recovery.request":
+    "テストリクエストを開始できませんでした。実行中のテストが終わるのを待つか、{model} の応答テストを再試行してください。",
   "pws.completion.recovery.fixAuth": "認証情報を更新",
   "pws.completion.recovery.fixSettings": "設定を確認",
-"pws.completion.title": "モデル応答テスト",
+  "pws.completion.title": "モデル応答テスト",
   "pws.completion.model": "テストするモデル",
   "pws.completion.choose": "モデルを選択",
   "pws.completion.run": "モデルをテスト",
-  "pws.completion.confirm": "{provider} で {model} をテストしますか？出力上限が32トークンの実際のリクエストを送信します。割り当てを消費し、料金が発生する場合があります。",
+  "pws.completion.confirm":
+    "{provider} で {model} をテストしますか？出力上限が32トークンの実際のリクエストを送信します。割り当てを消費し、料金が発生する場合があります。",
   "pws.completion.failed": "モデルテスト失敗",
   "pws.completion.ok": "モデルテスト成功",
   "pws.completion.notApplicable": "テスト対象外",
@@ -63,7 +77,8 @@ export const ja: Record<TKey, string> = {
   "pws.completion.total": "合計遅延",
   "pws.completion.reported": "{model} に対して上流が {upstream} を報告しました",
   "pws.completion.unreported": "{model} に対して上流はモデルを報告しませんでした",
-  "pws.completion.identity": "モデルのメタデータは上流プロバイダーが報告した情報であり、実際のモデルの同一性を検証するものではありません。",
+  "pws.completion.identity":
+    "モデルのメタデータは上流プロバイダーが報告した情報であり、実際のモデルの同一性を検証するものではありません。",
   "pws.completion.match": "一致",
   "pws.completion.mismatch": "不一致",
   "pws.completion.unknown": "不明",
@@ -77,9 +92,11 @@ export const ja: Record<TKey, string> = {
   "pws.completion.tls_profile": "カスタムTLSプロファイルが設定されています。",
   "pws.completion.upstream_http_version": "上流のHTTPバージョンが設定されています。",
   "pws.completion.request_pacing": "リクエストのペーシングが有効です。",
-  "pws.completion.custom_executor_egress": "プロバイダーのプロキシを併用するカスタムfetch実行器を維持できません。",
+  "pws.completion.custom_executor_egress":
+    "プロバイダーのプロキシを併用するカスタムfetch実行器を維持できません。",
   "pws.completion.runAll": "すべてのモデルをテスト",
-  "pws.completion.allConfirm": "{provider} の {count} 個のモデルをすべてテストしますか？出力上限 32 トークンの実際のリクエストを 1 件ずつ最大 {count} 件送信します。一部のモデルは送信前にスキップされる場合があります。クォータを消費し、費用が発生する場合があります。",
+  "pws.completion.allConfirm":
+    "{provider} の {count} 個のモデルをすべてテストしますか？出力上限 32 トークンの実際のリクエストを 1 件ずつ最大 {count} 件送信します。一部のモデルは送信前にスキップされる場合があります。クォータを消費し、費用が発生する場合があります。",
   "pws.completion.stop": "停止",
   "pws.completion.progress": "{total} 件中 {done} 件をテスト中…",
   "pws.completion.stopped": "{total} 件中 {done} 件で停止しました",
@@ -88,39 +105,50 @@ export const ja: Record<TKey, string> = {
   "pws.completion.failedShort": "失敗",
   "pws.completion.notTested": "未テスト",
   "pws.completion.disableFailed": "失敗した {count} 個のモデルを無効化",
-  "pws.completion.disableConfirm": "{provider} でテストに失敗した {count} 個のモデルを無効化しますか？モデルページで再度有効にするまでカタログとモデル選択から外れますが、正確な id では引き続き直接呼び出せます。",
-  "pws.completion.disabledDone": "{count} 個のモデルを無効化しました。モデルページで再度有効にできます。",
+  "pws.completion.disableConfirm":
+    "{provider} でテストに失敗した {count} 個のモデルを無効化しますか？モデルページで再度有効にするまでカタログとモデル選択から外れますが、正確な id では引き続き直接呼び出せます。",
+  "pws.completion.disabledDone":
+    "{count} 個のモデルを無効化しました。モデルページで再度有効にできます。",
   "pws.completion.disableError": "失敗したモデルを無効化できませんでした",
 
   "reasoningRetention.advanced": "詳細設定",
   "reasoningRetention.title": "推論の保持",
   "reasoningRetention.enable": "推論の保持を有効にする",
-  "reasoningRetention.description": "既定では無効です。読み取り可能な要約を返すルーティング v1/v2 圧縮で有効にすると、コンテキストウィンドウの割合とトークン上限の小さい方までの推論が、要約とともに履歴コンテキストとして戻されます。上限を超えると、ローカルにアーカイブされ、パスの説明に置き換えられます。有効時の既定値：20% と 100,000 トークン。プロバイダーの非公開推論は復号せず、不透明な圧縮出力は変更しません。",
-  "reasoningRetention.storageHint": "有効にすると、平文の推論がローカルの履歴とアーカイブに残る場合があります。作成済みのアーカイブには合計サイズの上限や有効期限がありません。不要なアーカイブは手動で削除してください。",
+  "reasoningRetention.description":
+    "既定では無効です。読み取り可能な要約を返すルーティング v1/v2 圧縮で有効にすると、コンテキストウィンドウの割合とトークン上限の小さい方までの推論が、要約とともに履歴コンテキストとして戻されます。上限を超えると、ローカルにアーカイブされ、パスの説明に置き換えられます。有効時の既定値：20% と 100,000 トークン。プロバイダーの非公開推論は復号せず、不透明な圧縮出力は変更しません。",
+  "reasoningRetention.storageHint":
+    "有効にすると、平文の推論がローカルの履歴とアーカイブに残る場合があります。作成済みのアーカイブには合計サイズの上限や有効期限がありません。不要なアーカイブは手動で削除してください。",
   "reasoningRetention.percent": "コンテキスト割合（%）",
   "reasoningRetention.tokens": "トークン上限",
   "reasoningRetention.reset": "リセットして無効にする",
-  "reasoningRetention.invalid": "割合は 0 より大きく 100 以下、トークン上限は正の整数にしてください。",
+  "reasoningRetention.invalid":
+    "割合は 0 より大きく 100 以下、トークン上限は正の整数にしてください。",
   "reasoningRetention.loadFailed": "設定を読み込めませんでした。",
   "reasoningRetention.saveFailed": "設定を保存できませんでした。",
   "reasoningRetention.saved": "設定を保存しました。",
   "nativeReasoningRetention.title": "OpenAI ネイティブ推論の保持",
-  "nativeReasoningRetention.description": "公式 ChatGPT バックエンドへのネイティブリクエストにのみ適用され、Combo やアカウントプール内の実際の宛先変更も含みます。以前の暗号化推論を再送できますが、再利用はバックエンドに依存します。両方とも既定ではオフです。",
+  "nativeReasoningRetention.description":
+    "公式 ChatGPT バックエンドへのネイティブリクエストにのみ適用され、Combo やアカウントプール内の実際の宛先変更も含みます。以前の暗号化推論を再送できますが、再利用はバックエンドに依存します。両方とも既定ではオフです。",
   "nativeReasoningRetention.modelSwitch": "モデル切り替え時に暗号化推論を保持",
   "nativeReasoningRetention.accountSwitch": "アカウント切り替え時に暗号化推論を保持（実験的）",
-  "nativeReasoningRetention.accountHint": "暗号文を保持しても、別のアカウントから以前の応答 ID やファイルにアクセスできるわけではありません。リクエストの成功は推論の再利用を証明しません。 ネイティブ圧縮の処理は変わりません。",
+  "nativeReasoningRetention.accountHint":
+    "暗号文を保持しても、別のアカウントから以前の応答 ID やファイルにアクセスできるわけではありません。リクエストの成功は推論の再利用を証明しません。 ネイティブ圧縮の処理は変わりません。",
   "nativeReasoningRetention.reset": "既定値に戻す",
   "nativeReasoningRetention.loadFailed": "ネイティブ推論の設定を読み込めませんでした。",
   "nativeReasoningRetention.saveFailed": "ネイティブ推論の設定を保存できませんでした。",
   "nativeReasoningRetention.saved": "ネイティブ推論の設定を保存しました。",
   "workflowBudget.title": "サブエージェントのワークフロー上限",
-  "workflowBudget.description": "タスク（1つの会話とそこから起動されたサブエージェント）ごとの上限で、直近{minutes}分間のスライディングウィンドウで数えます。上限を超えたリクエストは、プロバイダーに接続する前にローカルで 429 として拒否されます。変更は次のリクエストから適用され、すでに数えられた使用量は保持されます。",
+  "workflowBudget.description":
+    "タスク（1つの会話とそこから起動されたサブエージェント）ごとの上限で、直近{minutes}分間のスライディングウィンドウで数えます。上限を超えたリクエストは、プロバイダーに接続する前にローカルで 429 として拒否されます。変更は次のリクエストから適用され、すでに数えられた使用量は保持されます。",
   "workflowBudget.maxConcurrentChildren": "並列ターン数",
-  "workflowBudget.maxConcurrentChildrenHint": "1つのタスクが同時に実行できるターン数です。1枠は常に自分の会話用に確保されるため、サブエージェントが使えるのは1つ少なくなります。",
+  "workflowBudget.maxConcurrentChildrenHint":
+    "1つのタスクが同時に実行できるターン数です。1枠は常に自分の会話用に確保されるため、サブエージェントが使えるのは1つ少なくなります。",
   "workflowBudget.maxPhysicalSends": "ウィンドウあたりのモデルリクエスト数",
-  "workflowBudget.maxPhysicalSendsHint": "1つのタスクがウィンドウ内に送信できるプロバイダーへのリクエスト数（再試行を含む）です。",
+  "workflowBudget.maxPhysicalSendsHint":
+    "1つのタスクがウィンドウ内に送信できるプロバイダーへのリクエスト数（再試行を含む）です。",
   "workflowBudget.maxDistinctChildren": "ウィンドウあたりの異なるサブエージェント数",
-  "workflowBudget.maxDistinctChildrenHint": "1つのタスクがウィンドウ内に起動できる異なるサブエージェントスレッドの数です。",
+  "workflowBudget.maxDistinctChildrenHint":
+    "1つのタスクがウィンドウ内に起動できる異なるサブエージェントスレッドの数です。",
   "workflowBudget.range": "既定値 {default}、範囲 {min}–{max}。",
   "workflowBudget.invalid": "{min}～{max} の整数を入力してください。",
   "workflowBudget.increase": "{label}を増やす",
@@ -140,30 +168,36 @@ export const ja: Record<TKey, string> = {
   ...startupV2Copy("ja"),
   ...proxyV2Copy("ja"),
   "claude.tierDefaults.unset": "未指定（既存のClaude設定を維持）",
-  "claude.tierDefaults.recovery": "適用が停止し、自動復元に失敗しました。再試行する前に以下のバックアップを確認してください。",
+  "claude.tierDefaults.recovery":
+    "適用が停止し、自動復元に失敗しました。再試行する前に以下のバックアップを確認してください。",
   "claude.tierDefaults.title": "CLIのティア既定モデル",
   "claude.tierDefaults.preview": "Claude設定をプレビュー",
   "claude.tierDefaults.apply": "Claude設定に適用",
   "claude.tierDefaults.applied": "Claude設定は保存済みの既定値と一致しています。",
-  "claude.tierDefaults.failed": "既定値を適用できませんでした。再度プレビューしてClaude設定を確認してください。",
+  "claude.tierDefaults.failed":
+    "既定値を適用できませんでした。再度プレビューしてClaude設定を確認してください。",
   "sidecar.pool": "アカウントプール",
   "sidecar.poolCurrent": "現在のリクエストのプール",
   "sidecar.poolA": "Anthropic",
   "sidecar.poolB": "Anthropic · プール2",
-  "sidecar.poolMixed": "この明示的な選択では、メインのリクエストと異なるプールを使用する場合があります。",
+  "sidecar.poolMixed":
+    "この明示的な選択では、メインのリクエストと異なるプールを使用する場合があります。",
   "provider.name.anthropic2": "Anthropic · プール2",
   "nav.claude": "Claude",
   "claude.pageSub": "Claude Code の OpenCodex ルーティングと設定を管理します。",
 
-  "pws.anthropicAccountThresholdHint": "Claude プールの既定値を上書きします。0 はこのアカウントだけで使用量による切り替えを無効にします。一時停止とレート制限からの復旧は引き続き適用されます。",
+  "pws.anthropicAccountThresholdHint":
+    "Claude プールの既定値を上書きします。0 はこのアカウントだけで使用量による切り替えを無効にします。一時停止とレート制限からの復旧は引き続き適用されます。",
   "kiroLogin.title": "Kiro にログイン",
   "kiroLogin.chooseMethod": "ログイン方法を選択",
   "kiroLogin.cli": "Kiro CLI から取り込む",
   "kiroLogin.iam": "AWS IAM Identity Center",
-  "kiroLogin.iamDescription": "組織の AWS アクセスポータルと IAM Identity Center のリージョンを入力してください。",
+  "kiroLogin.iamDescription":
+    "組織の AWS アクセスポータルと IAM Identity Center のリージョンを入力してください。",
   "kiroLogin.startUrl": "AWS アクセスポータルの URL",
   "kiroLogin.region": "IAM Identity Center のリージョン",
-  "kiroLogin.invalidIam": "/start で終わる AWS アクセスポータルの HTTPS URL と有効な AWS リージョンを入力してください。",
+  "kiroLogin.invalidIam":
+    "/start で終わる AWS アクセスポータルの HTTPS URL と有効な AWS リージョンを入力してください。",
   "kiroLogin.back": "戻る",
   "kiroLogin.continue": "AWS に進む",
   "kiroLogin.selectProfile": "Kiro プロファイルを選択",
@@ -174,7 +208,8 @@ export const ja: Record<TKey, string> = {
   "kiroLogin.builderId": "Builder ID でログイン",
   "kiroLogin.google": "Google でログイン",
   "kiroLogin.github": "GitHub でログイン",
-  "kiroLogin.addDescription": "デバイス認証で Kiro アカウントを追加するか、Kiro CLI のセッションを取り込みます。",
+  "kiroLogin.addDescription":
+    "デバイス認証で Kiro アカウントを追加するか、Kiro CLI のセッションを取り込みます。",
   "kiroLogin.loginDescription": "デバイスでログインするか、Kiro CLI のセッションを取り込みます。",
   "kiroLogin.starting": "デバイス認証を開始しています…",
   "kiroLogin.pending": "確認ページにこのコードを入力し、ここでお待ちください。",
@@ -196,8 +231,10 @@ export const ja: Record<TKey, string> = {
   "kiroSelection.cooldown": "自動選択されません: 待機中",
   "kiroSelection.generic": "自動選択されません",
 
-  "usage.incomplete": "一部の使用履歴を集計できませんでした。回数、日付、順位は読み取れる記録のみを反映しています。",
-  "models.pickerOrder.usageIncomplete": "使用履歴が不完全なため、使用回数順を保存できません。別の順序を選ぶか、履歴を修復してください。",
+  "usage.incomplete":
+    "一部の使用履歴を集計できませんでした。回数、日付、順位は読み取れる記録のみを反映しています。",
+  "models.pickerOrder.usageIncomplete":
+    "使用履歴が不完全なため、使用回数順を保存できません。別の順序を選ぶか、履歴を修復してください。",
   "api.attribution.noRecordedUse": "読み取れる記録に使用履歴なし",
   "audio.dictation": "音声入力",
   "audio.liveVoice": "リアルタイム音声",
@@ -236,24 +273,31 @@ export const ja: Record<TKey, string> = {
   "models.pickerOrder.custom": "カスタム順",
   "models.pickerOrder.apply": "順序を適用",
   "models.pickerOrder.applying": "適用中…",
-  "models.pickerOrder.saved": "選択順を保存しました。古い一覧が表示される場合はクライアントを開き直してください。",
+  "models.pickerOrder.saved":
+    "選択順を保存しました。古い一覧が表示される場合はクライアントを開き直してください。",
   "models.pickerOrder.pending": "順序を保存しました。カタログの更新は保留中です。",
   "models.pickerOrder.usageFailed": "モデル使用量を読み込めませんでした。",
   "models.pickerOrder.loadFailed": "モデル選択設定を読み込めませんでした。",
   "models.pickerOrder.retry": "再試行",
-  "models.pickerOrder.hint": "CodexとClaudeの検出一覧のルーティングモデル順を保存します。優先・ネイティブの順位帯は維持されます。使用量順はスナップショットで、ネイティブツールの候補表示は変わる場合があります。",
+  "models.pickerOrder.hint":
+    "CodexとClaudeの検出一覧のルーティングモデル順を保存します。優先・ネイティブの順位帯は維持されます。使用量順はスナップショットで、ネイティブツールの候補表示は変わる場合があります。",
   "models.fastRows.title": "高速モデル行を表示",
-  "models.fastRows.desc": "外部クライアントのモデル選択メニューに対象の「Model Fast」項目を追加します。ベースモデルの推論エフォート設定には影響しません。保存時に可能な範囲で接続済みインテグレーションを更新します。反映されない場合は、インテグレーションまたはクライアントのカタログを更新してください。",
+  "models.fastRows.desc":
+    "外部クライアントのモデル選択メニューに対象の「Model Fast」項目を追加します。ベースモデルの推論エフォート設定には影響しません。保存時に可能な範囲で接続済みインテグレーションを更新します。反映されない場合は、インテグレーションまたはクライアントのカタログを更新してください。",
   "models.fastRows.refreshHint": "保存しました。カタログの更新を待機しています。",
   "models.fastRows.enabled": "高速モデル行を有効にしました。",
   "models.fastRows.disabled": "高速モデル行を無効にしました。",
   "models.fastRows.loadFailed": "高速行設定を読み込めませんでした。",
   "models.fastRows.updateFailed": "高速行設定の更新に失敗しました。",
-  "codexAuth.quotaAutoRefreshAllHint": "現在の全アカウントで、対応する5時間・週間枠をまとめて切り替えます。プールモードではリセット後に少量の利用枠を消費するリクエストを送信します。",
+  "codexAuth.quotaAutoRefreshAllHint":
+    "現在の全アカウントで、対応する5時間・週間枠をまとめて切り替えます。プールモードではリセット後に少量の利用枠を消費するリクエストを送信します。",
   "codexAuth.quotaAutoRefreshMixed": "一部の枠が有効です。",
-  "codexAuth.quotaAutoRefreshEmpty": "対応する利用枠がありません。アカウントの利用枠を更新してください。",
-  "codexAuth.quotaAutoRefreshLoadFailed": "自動開始設定を取得できませんでした。再試行してください。",
-  "codexAuth.quotaAutoRefreshPartial": "一部の設定を保存できませんでした。再試行で同じ変更を完了します。",
+  "codexAuth.quotaAutoRefreshEmpty":
+    "対応する利用枠がありません。アカウントの利用枠を更新してください。",
+  "codexAuth.quotaAutoRefreshLoadFailed":
+    "自動開始設定を取得できませんでした。再試行してください。",
+  "codexAuth.quotaAutoRefreshPartial":
+    "一部の設定を保存できませんでした。再試行で同じ変更を完了します。",
   // sidebar / nav / common
   "nav.dashboard": "ダッシュボード",
   "uptime.day": "日",
@@ -269,7 +313,8 @@ export const ja: Record<TKey, string> = {
   "routing.title": "ルーティングインテリジェンス (beta)",
   "routing.subtitle": "ポリシープロファイル、ドライラン評価、ソース連携のルーティング分析。",
   "routing.loadFailed": "ルーティングデータを読み込めませんでした",
-  "routing.empty": "ルーティングプロファイルが設定されていません。config.json に `routingProfiles` を追加してください。",
+  "routing.empty":
+    "ルーティングプロファイルが設定されていません。config.json に `routingProfiles` を追加してください。",
   "routing.revision": "rev",
   "routing.detail": "プロファイル",
   "routing.createProfile": "プロファイルを作成",
@@ -329,39 +374,47 @@ export const ja: Record<TKey, string> = {
   "nav.usage": "使用量",
   "common.github": "GitHub",
   "onboarding.star.title": "OpenCodex を気に入っていただけましたか？",
-  "onboarding.star.body": "OpenCodex は無料のオープンソースです。GitHub のスターは、ほかの開発者がプロジェクトを見つける助けになり、開発の支えになります。",
+  "onboarding.star.body":
+    "OpenCodex は無料のオープンソースです。GitHub のスターは、ほかの開発者がプロジェクトを見つける助けになり、開発の支えになります。",
   "onboarding.star.cta": "GitHub でスターを付ける",
-  "onboarding.star.ghHint": "サインイン済みの GitHub CLI (gh) でリポジトリにスターを付けます。クリックするまで何も行いません。",
+  "onboarding.star.ghHint":
+    "サインイン済みの GitHub CLI (gh) でリポジトリにスターを付けます。クリックするまで何も行いません。",
   "onboarding.star.browserHint": "ブラウザで github.com のリポジトリを開きます。",
   "onboarding.star.openPage": "代わりに GitHub ページを開く",
   "onboarding.star.later": "あとで",
-  "onboarding.star.failed": "GitHub CLI（gh）でスターを付けられませんでした。GitHub のページから付けてください。",
+  "onboarding.star.failed":
+    "GitHub CLI（gh）でスターを付けられませんでした。GitHub のページから付けてください。",
   "onboarding.star.starring": "スターを付けています…",
   "onboarding.star.thanks": "スターありがとうございます！",
-  "onboarding.star.thanksBody": "とても励みになります。サイドバーの GitHub リンクからいつでもリポジトリを開けます。",
+  "onboarding.star.thanksBody":
+    "とても励みになります。サイドバーの GitHub リンクからいつでもリポジトリを開けます。",
   "onboarding.star.done": "完了",
   "common.save": "保存",
   "common.saving": "保存中…",
   "common.cancel": "キャンセル",
-"common.discard": "破棄",
+  "common.discard": "破棄",
   "common.delete": "削除",
   "common.close": "閉じる",
   "common.ok": "OK",
   "common.remove": "削除",
   "common.loading": "読み込み中…",
   "common.retry": "再試行",
-  "prov.affinityResetPending": "アカウントの変更は保存されましたが、会話の接続情報の更新が完了していません。再試行して完了してください。",
+  "prov.affinityResetPending":
+    "アカウントの変更は保存されましたが、会話の接続情報の更新が完了していません。再試行して完了してください。",
   "prov.affinityResetComplete": "会話の接続情報を更新しました。",
-  "prov.affinityResetRetryUnavailable": "このアカウントでは現在再試行できません。アカウント一覧を更新し、必要に応じてアカウントを再開するか、再度ログインしてください。",
+  "prov.affinityResetRetryUnavailable":
+    "このアカウントでは現在再試行できません。アカウント一覧を更新し、必要に応じてアカウントを再開するか、再度ログインしてください。",
   "common.undo": "元に戻す",
   "auth.adminTokenTitle": "OpenCodex 管理者トークン (OPENCODEX_ADMIN_AUTH_TOKEN)",
   "auth.adminAccountLabel": "アカウント",
   "auth.adminTokenFieldLabel": "管理者トークン",
   "auth.adminTokenRejected": "管理者トークンが拒否されました。確認してもう一度お試しください。",
   "auth.adminTokenUnavailable": "管理者トークンを確認できませんでした。もう一度お試しください。",
-  "auth.adminTokenHelp": "これは OpenCodex 管理 API の管理者トークンで、プロバイダーの API キーではありません。プロキシは初回起動時に ~/.opencodex/admin-api-token（または $OPENCODEX_HOME/admin-api-token）へ書き込み、OPENCODEX_ADMIN_AUTH_TOKEN を設定するとそちらが優先されます。",
+  "auth.adminTokenHelp":
+    "これは OpenCodex 管理 API の管理者トークンで、プロバイダーの API キーではありません。プロキシは初回起動時に ~/.opencodex/admin-api-token（または $OPENCODEX_HOME/admin-api-token）へ書き込み、OPENCODEX_ADMIN_AUTH_TOKEN を設定するとそちらが優先されます。",
   "auth.rememberDevice": "このデバイスを記憶する",
-  "auth.rememberDeviceHint": "管理者トークンではなく、取り消し可能な HttpOnly セッションを30日間保持します。API と同一オリジンの HTTPS ダッシュボードへの直接アクセス（またはローカルループバック）が必要です。",
+  "auth.rememberDeviceHint":
+    "管理者トークンではなく、取り消し可能な HttpOnly セッションを30日間保持します。API と同一オリジンの HTTPS ダッシュボードへの直接アクセス（またはローカルループバック）が必要です。",
   "connection.forgetDevice": "このデバイスを解除",
   "connection.forgetDeviceFailed": "デバイスを解除できませんでした。セッションは保持されています。",
   "auth.adminTokenDocsLink": "確認方法",
@@ -386,13 +439,15 @@ export const ja: Record<TKey, string> = {
   "provider.name.volcengineCodingPlan": "Volcengine Ark コーディングプラン",
   "provider.name.volcengineAgentPlan": "Volcengine Ark エージェントプラン",
   "errorBoundary.title": "ページを読み込めませんでした",
-  "errorBoundary.message": "このセクションの表示中にエラーが発生しました。再読み込みしてもう一度お試しください。",
+  "errorBoundary.message":
+    "このセクションの表示中にエラーが発生しました。再読み込みしてもう一度お試しください。",
   "errorBoundary.details": "エラー",
   "errorBoundary.reload": "再読み込み",
 
   // startup health
   "startup.title": "起動安全性",
-  "startup.subtitle": "再起動後にローカルプロキシへの接続が再接続ループになる前に、Codex が opencodex へ到達できるか確認します。",
+  "startup.subtitle":
+    "再起動後にローカルプロキシへの接続が再接続ループになる前に、Codex が opencodex へ到達できるか確認します。",
   "startup.refresh": "更新",
   "startup.backToDashboard": "ダッシュボードに戻る",
   "startup.loading": "起動保護を確認中…",
@@ -404,10 +459,14 @@ export const ja: Record<TKey, string> = {
   "startup.summary.native": "Codex はローカルプロキシに依存していません",
   "startup.summary.protected": "再起動後も opencodex を利用できます",
   "startup.summary.atRisk": "再起動後に Codex がモデルへ接続できなくなる可能性があります",
-  "startup.riskDetail": "Codex はローカルプロキシを参照していますが、再起動する永続サービスまたは正常な launcher shim がありません。",
-  "startup.riskDetailCustomLocal": "Codex はカスタムローカルゲートウェイを参照しています。opencodex はその再起動ライフサイクルを管理・検証できません。",
-  "startup.riskDetailWindowsShim": "Launcher shim は対応する CLI スクリプトのみを保護し、Windows の Codex Desktop と codex.exe の直接起動はこれを迂回できます。",
-  "startup.safeDetail": "現在のルーティングと起動方式は整合しています。再起動後に ocx start を手動実行する必要はありません。",
+  "startup.riskDetail":
+    "Codex はローカルプロキシを参照していますが、再起動する永続サービスまたは正常な launcher shim がありません。",
+  "startup.riskDetailCustomLocal":
+    "Codex はカスタムローカルゲートウェイを参照しています。opencodex はその再起動ライフサイクルを管理・検証できません。",
+  "startup.riskDetailWindowsShim":
+    "Launcher shim は対応する CLI スクリプトのみを保護し、Windows の Codex Desktop と codex.exe の直接起動はこれを迂回できます。",
+  "startup.safeDetail":
+    "現在のルーティングと起動方式は整合しています。再起動後に ocx start を手動実行する必要はありません。",
   "startup.routing": "Codex ルーティング",
   "startup.routing.proxy": "ローカルプロキシ",
   "startup.routing.native": "OpenAI ネイティブ",
@@ -438,7 +497,8 @@ export const ja: Record<TKey, string> = {
   "startup.conflict": "サービス競合",
   "startup.installedDisabled": "インストール済み・無効",
   "startup.shimActivationPending": "インストール済み・有効化未確認",
-  "startup.shimActivationHint": "シェルの起動ファイルで、ほかの PATH 設定の後に . ~/.opencodex/codex-shell-env.sh を追加し、新しいターミナルを開いてください。ダッシュボードからはシェルの PATH を確認できない場合があります。",
+  "startup.shimActivationHint":
+    "シェルの起動ファイルで、ほかの PATH 設定の後に . ~/.opencodex/codex-shell-env.sh を追加し、新しいターミナルを開いてください。ダッシュボードからはシェルの PATH を確認できない場合があります。",
   "startup.install": "インストール",
   "startup.installing": "インストール中…",
   "startup.repair": "修復",
@@ -449,7 +509,8 @@ export const ja: Record<TKey, string> = {
   "startup.shimRepaired": "Codex ランチャー shim を修復しました。",
   "startup.installFailed": "インストールに失敗しました:",
   "startup.recovery": "修復方法",
-  "startup.recoveryHint": "上のワンクリックインストールを使うか、手動修復用のコマンドをコピーできます。Codex Desktop と Windows 実行ファイルにはバックグラウンドサービスを推奨します。",
+  "startup.recoveryHint":
+    "上のワンクリックインストールを使うか、手動修復用のコマンドをコピーできます。Codex Desktop と Windows 実行ファイルにはバックグラウンドサービスを推奨します。",
   "startup.command.service": "推奨: 永続バックグラウンドサービス",
   "startup.command.shim": "代替: CLI launcher shim",
   "startup.command.native": "安全策: Codex ネイティブルーティングを復元",
@@ -457,12 +518,16 @@ export const ja: Record<TKey, string> = {
   "startup.copied": "コピー済み",
   "startup.recommended": "推奨修復: {cmd}",
   "startup.navRisk": "起動保護に対応が必要です",
-  "startup.codexRuntime.clampHidden": "OpenCodex が Codex {version} を使用したため、一部の reasoning effort オプションが非表示になりました。",
-  "startup.codexRuntime.clampHiddenWithEfforts": "OpenCodex が Codex {version} を使用したため、一部の reasoning effort オプションが非表示になりました（削除: {efforts}）。",
-  "startup.codexRuntime.olderBinary": "OpenCodex は古い Codex バイナリ（{version}）を使用しています。より新しいインストールが利用可能です。",
+  "startup.codexRuntime.clampHidden":
+    "OpenCodex が Codex {version} を使用したため、一部の reasoning effort オプションが非表示になりました。",
+  "startup.codexRuntime.clampHiddenWithEfforts":
+    "OpenCodex が Codex {version} を使用したため、一部の reasoning effort オプションが非表示になりました（削除: {efforts}）。",
+  "startup.codexRuntime.olderBinary":
+    "OpenCodex は古い Codex バイナリ（{version}）を使用しています。より新しいインストールが利用可能です。",
 
   // dashboard
-  "dash.subtitle": "ローカル opencodex プロキシ、そのプロバイダー、Codex にルーティングされるモデルのライブ状態です。",
+  "dash.subtitle":
+    "ローカル opencodex プロキシ、そのプロバイダー、Codex にルーティングされるモデルのライブ状態です。",
   "dash.workspace.overview": "概要",
   "dash.workspace.sections": "セクション",
   "dash.status": "状態",
@@ -474,7 +539,8 @@ export const ja: Record<TKey, string> = {
   "dash.tokens30d": "トークン (30日)",
   "dash.coverage": "{pct} カバレッジ",
   "dash.mem.title": "メモリ可観測性",
-  "dash.mem.hint": "読み取り専用のランタイム診断。観測メモリは max(RSS, external, ArrayBuffers) で、Windows の working set trimming がコミット済み保持を隠さないようにします。",
+  "dash.mem.hint":
+    "読み取り専用のランタイム診断。観測メモリは max(RSS, external, ArrayBuffers) で、Windows の working set trimming がコミット済み保持を隠さないようにします。",
   "dash.mem.rss": "常駐メモリ (RSS)",
   "dash.mem.jsHeap": "JS ヒープ使用量",
   "dash.mem.jsHeapArena": "アリーナ {total}",
@@ -489,7 +555,8 @@ export const ja: Record<TKey, string> = {
   "dash.mem.growth": "1時間あたりの観測変化",
   "dash.mem.perHour": "/時間",
   "dash.mem.store": "継続ストア",
-  "dash.mem.storeHint": "プロキシの previous_response_id キャッシュ。ヒープ増加中に合計バイトが増える場合、ランタイムアロケータではなく会話保持を示します。",
+  "dash.mem.storeHint":
+    "プロキシの previous_response_id キャッシュ。ヒープ増加中に合計バイトが増える場合、ランタイムアロケータではなく会話保持を示します。",
   "dash.mem.storeEntries": "エントリ",
   "dash.mem.storeTotal": "合計",
   "dash.mem.storeLargest": "最大",
@@ -501,11 +568,14 @@ export const ja: Record<TKey, string> = {
   "dash.mem.unavailable": "メモリ診断は利用できません（旧バージョンのプロキシ）。",
   "dash.mem.inFlight": "処理中のリクエスト",
   "dash.mem.restart": "完了後に再起動",
-  "dash.mem.restartConfirm": "処理中のリクエスト {count} 件の完了を待ってから再起動します（最大 {seconds} 秒。タイムアウト時は残りを打ち切ります）。",
+  "dash.mem.restartConfirm":
+    "処理中のリクエスト {count} 件の完了を待ってから再起動します（最大 {seconds} 秒。タイムアウト時は残りを打ち切ります）。",
   "dash.mem.draining": "リクエスト {count} 件の完了を待機中… 完了後に再起動",
   "dash.mem.reconnecting": "プロキシを再起動中… 再接続を待機",
-  "dash.mem.restartFailed": "完了後の再起動に失敗しました。プロキシが起動しているか確認してください。",
-  "dash.mem.restartNoSupervisor": "再起動保護がありません。再起動後、プロキシが自動で戻らない可能性があります。",
+  "dash.mem.restartFailed":
+    "完了後の再起動に失敗しました。プロキシが起動しているか確認してください。",
+  "dash.mem.restartNoSupervisor":
+    "再起動保護がありません。再起動後、プロキシが自動で戻らない可能性があります。",
   "dash.activeProviders": "アクティブなプロバイダー",
   "dash.noProviders": "プロバイダーが設定されていません。{cmd} を実行してください。",
   "dash.col.name": "名前",
@@ -521,41 +591,56 @@ export const ja: Record<TKey, string> = {
   "dash.stopConfirm": "プロキシを停止してネイティブの Codex に戻しますか?",
   "dash.stopFailed": "プロキシを停止できませんでした (HTTP {status})。",
   "dash.stopStillRunning": "プロキシはまだ応答しています。停止していません。",
-  "dash.stopUnknown": "停止できたか確認できませんでした。再試行する前にプロキシが動作中か確認してください。",
+  "dash.stopUnknown":
+    "停止できたか確認できませんでした。再試行する前にプロキシが動作中か確認してください。",
   "dash.maSwitchFailed": "モードの切り替えに失敗しました (HTTP {status})。",
   "dash.maNetworkError": "ネットワークエラー — プロキシは起動していますか?",
   "dash.stopping": "停止中…",
   "dash.actions": "プロキシ",
   "dash.codexRestart": "Codex のモデル一覧を再読み込み",
   "dash.codexRestarting": "停止中…",
-  "dash.codexRestartConfirm": "Codex app-server を停止してモデル一覧を読み直させますか? 進行中の Codex の処理は中断され、Codex は自動では再起動しないので後で開き直してください。",
-  "dash.codexRestartDone": "Codex app-server を {count} 個停止しました。Codex を開き直すと最新のモデル一覧が読み込まれます。",
-  "dash.codexRestartNothing": "実行中の Codex app-server はありません。次回起動時に最新のモデル一覧を読み込みます。",
+  "dash.codexRestartConfirm":
+    "Codex app-server を停止してモデル一覧を読み直させますか? 進行中の Codex の処理は中断され、Codex は自動では再起動しないので後で開き直してください。",
+  "dash.codexRestartDone":
+    "Codex app-server を {count} 個停止しました。Codex を開き直すと最新のモデル一覧が読み込まれます。",
+  "dash.codexRestartNothing":
+    "実行中の Codex app-server はありません。次回起動時に最新のモデル一覧を読み込みます。",
   "dash.codexRestartUnknown": "プロセスを列挙できなかったため、何も停止しませんでした。",
-  "dash.codexRestartPartial": "app-server が {count} 個終了しませんでした。モデル一覧が古いままなら手動で停止してください。",
+  "dash.codexRestartPartial":
+    "app-server が {count} 個終了しませんでした。モデル一覧が古いままなら手動で停止してください。",
   "dash.codexRestartFailed": "Codex のモデル一覧を再読み込みできませんでした (HTTP {status})。",
   "dash.codexRestartUnreachable": "プロキシに接続できませんでした。",
   "dash.codexRestartMalformed": "プロキシが予期しない応答を返しました。",
-  "dash.codexRestartTimeout": "プロキシから時間内に応答がありませんでした。app-server の停止が続いている可能性があります。",
-  "models.staleBanner": "Codex はこのカタログより古いモデル一覧を表示しています。Codex を再起動すると読み直されます。",
+  "dash.codexRestartTimeout":
+    "プロキシから時間内に応答がありませんでした。app-server の停止が続いている可能性があります。",
+  "models.staleBanner":
+    "Codex はこのカタログより古いモデル一覧を表示しています。Codex を再起動すると読み直されます。",
   "dash.codexAutoStart": "Codex と一緒に opencodex を起動",
-  "dash.codexAutoStartHint": "インストール済み launcher shim に ocx ensure の実行を許可します。この設定だけでは再起動保護はインストールされません。起動安全性で実際の状態を確認してください。",
+  "dash.codexAutoStartHint":
+    "インストール済み launcher shim に ocx ensure の実行を許可します。この設定だけでは再起動保護はインストールされません。起動安全性で実際の状態を確認してください。",
   "dash.searchModel": "検索サイドカーモデル",
-  "dash.searchModelHint": "非 OpenAI ルーティングモデルで web_search に使うモデル。ChatGPT ログインが必要です。",
+  "dash.searchModelHint":
+    "非 OpenAI ルーティングモデルで web_search に使うモデル。ChatGPT ログインが必要です。",
   "dash.searchReasoning": "検索の推論負荷",
   "dash.visionModel": "ビジョンサイドカーモデル",
-  "dash.visionModelHint": "テキスト専用ルーティングモデルで画像を説明するために使うモデル。ChatGPT ログインが必要です。",
+  "dash.visionModelHint":
+    "テキスト専用ルーティングモデルで画像を説明するために使うモデル。ChatGPT ログインが必要です。",
   "dash.webSearchSidecar": "ウェブ検索サイドカー",
-  "dash.webSearchSidecarHint": "ルーティングモデルでウェブ検索に使うバックエンドとモデルを選択します。",
+  "dash.webSearchSidecarHint":
+    "ルーティングモデルでウェブ検索に使うバックエンドとモデルを選択します。",
   "dash.webSearchOff": "オフ",
-  "dash.webSearchCodexSync": "保存しました。Codex の設定はまだ書き換えられていません —「モデルを同期」を実行してください。",
+  "dash.webSearchCodexSync":
+    "保存しました。Codex の設定はまだ書き換えられていません —「モデルを同期」を実行してください。",
   "dash.webSearchStream": "回答をライブ配信",
-  "dash.webSearchStreamHint": "モデルがツール呼び出しを決定するまで、先頭のテキストと推論をライブ配信します。以降は検索インターセプトのためバッファされます。検索前のテキストは一部繰り返される場合があります。",
+  "dash.webSearchStreamHint":
+    "モデルがツール呼び出しを決定するまで、先頭のテキストと推論をライブ配信します。以降は検索インターセプトのためバッファされます。検索前のテキストは一部繰り返される場合があります。",
   "dash.visionSidecar": "ビジョンサイドカー",
-  "dash.visionSidecarHint": "テキスト専用ルーティングモデルで画像を説明するために使うバックエンドとモデルを選択します。",
+  "dash.visionSidecarHint":
+    "テキスト専用ルーティングモデルで画像を説明するために使うバックエンドとモデルを選択します。",
   "dash.visionOff": "オフ",
   "compactionRouting.title": "圧縮ルーティング",
-  "compactionRouting.description": "Codex の圧縮リクエストに使うモデルと、その適用対象を選択します。以降のメッセージは会話の設定を維持します。",
+  "compactionRouting.description":
+    "Codex の圧縮リクエストに使うモデルと、その適用対象を選択します。以降のメッセージは会話の設定を維持します。",
   "compactionRouting.model": "圧縮モデル",
   "compactionRouting.effort": "推論の強度",
   "compactionRouting.triggers": "適用対象",
@@ -568,33 +653,47 @@ export const ja: Record<TKey, string> = {
   "compactionRouting.sourcesProviders": "プロバイダー全体",
   "compactionRouting.sourcesModels": "個別モデル",
   "compactionRouting.sourcesSaved": "現在のカタログにない保存済みセレクター",
-  "compactionRouting.sourcesNone": "ソースを少なくとも 1 つ選択するか、すべての会話モデルに戻してください。",
-  "compactionRouting.sourcesHint": "圧縮リクエストの元モデルが選択したモデルまたは provider/* に一致する場合だけ上書きします。一致しないリクエストは元のモデルを使います。",
+  "compactionRouting.sourcesNone":
+    "ソースを少なくとも 1 つ選択するか、すべての会話モデルに戻してください。",
+  "compactionRouting.sourcesHint":
+    "圧縮リクエストの元モデルが選択したモデルまたは provider/* に一致する場合だけ上書きします。一致しないリクエストは元のモデルを使います。",
   "compactionRouting.sourcesGridTitle": "元モデルが以下に一致する圧縮リクエストをリルートします：",
   "compactionRouting.currentModel": "会話のモデルを使用",
   "compactionRouting.currentEffort": "リクエストの推論強度を維持",
-  "compactionRouting.effortHint": "圧縮エンドポイントが対応している場合に推論設定が適用されます。モデルは会話全体を受け入れられる必要があります。",
-  "compactionRouting.dataNotice": "適用対象の圧縮リクエストは、会話が別のプロバイダーで動いていても、会話全体を選択したモデルのプロバイダーへ送信して要約します。",
-  "compactionRouting.autoNotice": "自動圧縮はユーザーが求めなくても実行されるため、長い会話が知らないうちにそのプロバイダーへ送信されることがあります。",
-  "compactionRouting.providerWarning": "この設定では、適用対象の圧縮リクエストのたびに会話の全内容が要約のために {provider} へ送信されます。",
-  "compactionRouting.providerWarningScoped": "この設定では、元モデルが {sources} に一致する圧縮リクエストだけが会話の全内容を要約のため {provider} へ送信します。一致しないリクエストは元のモデルを使います。",
+  "compactionRouting.effortHint":
+    "圧縮エンドポイントが対応している場合に推論設定が適用されます。モデルは会話全体を受け入れられる必要があります。",
+  "compactionRouting.dataNotice":
+    "適用対象の圧縮リクエストは、会話が別のプロバイダーで動いていても、会話全体を選択したモデルのプロバイダーへ送信して要約します。",
+  "compactionRouting.autoNotice":
+    "自動圧縮はユーザーが求めなくても実行されるため、長い会話が知らないうちにそのプロバイダーへ送信されることがあります。",
+  "compactionRouting.providerWarning":
+    "この設定では、適用対象の圧縮リクエストのたびに会話の全内容が要約のために {provider} へ送信されます。",
+  "compactionRouting.providerWarningScoped":
+    "この設定では、元モデルが {sources} に一致する圧縮リクエストだけが会話の全内容を要約のため {provider} へ送信します。一致しないリクエストは元のモデルを使います。",
   "compactionRouting.loadFailed": "圧縮設定を読み込めませんでした。",
   "compactionRouting.saved": "圧縮設定を保存しました。",
-  "compactionRouting.saveFailed": "保存できませんでした。変更内容は保持されています。再試行してください。",
+  "compactionRouting.saveFailed":
+    "保存できませんでした。変更内容は保持されています。再試行してください。",
   "memoryModels.title": "メモリルーティング",
-  "memoryModels.description": "Codex はセッション終了後にバックグラウンドでメモリを書き込みます。各段階のモデルを選ぶか、現在のルートを維持します。",
+  "memoryModels.description":
+    "Codex はセッション終了後にバックグラウンドでメモリを書き込みます。各段階のモデルを選ぶか、現在のルートを維持します。",
   "memoryModels.infoLabel": "Extract と Consolidation とは？",
-  "memoryModels.info": "Codex は終了したセッションを 2 段階でメモリにします。Extract は終了したセッションを 1 つ読み、起きたことを書き留めます。セッションごとにメモ 1 枚、つまり小さな呼び出しがたくさん発生します。Consolidation はそのメモをまとめ、次のセッションの開始時に Codex が読むメモリファイルへ書き込みます。めったに動きませんが、ファイルを編集します。各段階が自分のモデルを要求するため、ここでは別々に表示しています。",
+  "memoryModels.info":
+    "Codex は終了したセッションを 2 段階でメモリにします。Extract は終了したセッションを 1 つ読み、起きたことを書き留めます。セッションごとにメモ 1 枚、つまり小さな呼び出しがたくさん発生します。Consolidation はそのメモをまとめ、次のセッションの開始時に Codex が読むメモリファイルへ書き込みます。めったに動きませんが、ファイルを編集します。各段階が自分のモデルを要求するため、ここでは別々に表示しています。",
   "memoryModels.extract": "抽出",
-  "memoryModels.extractHint": "終了したセッションごとに生のメモリへ要約します。セッションごとに 1 回動きます。",
+  "memoryModels.extractHint":
+    "終了したセッションごとに生のメモリへ要約します。セッションごとに 1 回動きます。",
   "memoryModels.consolidation": "統合",
-  "memoryModels.consolidationHint": "生のメモリを、Codex が後で読むメモリファイルへ統合します。めったに動かず、ファイルを編集します。",
+  "memoryModels.consolidationHint":
+    "生のメモリを、Codex が後で読むメモリファイルへ統合します。めったに動かず、ファイルを編集します。",
   "memoryModels.model": "モデル",
   "memoryModels.effort": "推論の強さ",
   "memoryModels.off": "オフ",
   "memoryModels.defaultEffort": "Codex の既定",
-  "memoryModels.dataNotice": "選んだモデルにはその段階の入力が送られます。Extract では終了したセッション、Consolidation では生のメモリです。",
-  "memoryModels.accountNotice": "ここでは片方の段階だけをルーティングしています。もう一方は既存のルートのままです。Shadow Call Intercept がその段階のメモリ呼び出しを設定済みのモデルへ送ることもあります。",
+  "memoryModels.dataNotice":
+    "選んだモデルにはその段階の入力が送られます。Extract では終了したセッション、Consolidation では生のメモリです。",
+  "memoryModels.accountNotice":
+    "ここでは片方の段階だけをルーティングしています。もう一方は既存のルートのままです。Shadow Call Intercept がその段階のメモリ呼び出しを設定済みのモデルへ送ることもあります。",
   "memoryModels.loadFailed": "メモリ設定を読み込めませんでした。",
   "memoryModels.saved": "メモリ設定を保存しました。",
   "memoryModels.saveFailed": "保存できませんでした。変更は残っています。もう一度お試しください。",
@@ -607,21 +706,31 @@ export const ja: Record<TKey, string> = {
   "shadowCall.sourceMemory": "メモリ",
   "shadowCall.sourceLegacy": "レガシー",
   "shadowCall.sourceCustom": "カスタム",
-  "shadowCall.sourceHint": "有効なソースだけが傍受されます。少なくとも 1 つを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。メモリの統合では、設定済みのメモリルーティングが引き続き優先されます。",
-  "shadowCall.sourceCovered": "カスタムプレフィックス {prefix} に含まれています。このソースを個別に切り替えるには、config.json でそのプレフィックスを削除するか範囲を狭めてください。",
-  "shadowCall.sourceLastRequired": "少なくとも 1 つのソースを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。",
-  "dash.shadowCallInterceptHint": "Codex App のバックグラウンドヘルパー呼び出し(タイトル、コミットメッセージ、スキルオーケストレーション)を傍受します。下でソースモデルを選択してください。メモリの統合は通常 Terra で実行され、設定されている場合はメモリルーティングに従います。",
-  "dash.shadowCallWarning": "⚠ オンにすると、選択した各ソース({models})へのリクエストが選択したモデルに置き換えられます。Terra はオプトインです。統合では、設定済みのメモリルーティングが引き続き優先されます。",
+  "shadowCall.sourceHint":
+    "有効なソースだけが傍受されます。少なくとも 1 つを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。メモリの統合では、設定済みのメモリルーティングが引き続き優先されます。",
+  "shadowCall.sourceCovered":
+    "カスタムプレフィックス {prefix} に含まれています。このソースを個別に切り替えるには、config.json でそのプレフィックスを削除するか範囲を狭めてください。",
+  "shadowCall.sourceLastRequired":
+    "少なくとも 1 つのソースを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。",
+  "dash.shadowCallInterceptHint":
+    "Codex App のバックグラウンドヘルパー呼び出し(タイトル、コミットメッセージ、スキルオーケストレーション)を傍受します。下でソースモデルを選択してください。メモリの統合は通常 Terra で実行され、設定されている場合はメモリルーティングに従います。",
+  "dash.shadowCallWarning":
+    "⚠ オンにすると、選択した各ソース({models})へのリクエストが選択したモデルに置き換えられます。Terra はオプトインです。統合では、設定済みのメモリルーティングが引き続き優先されます。",
   "dash.shadowCallOriginal": "元のモデル",
   "dash.shadowCallModel": "差し替えモデル",
-  "dash.shadowCallTooltip": "Codex App はスレッドタイトル生成、コミットメッセージ生成、スキルオーケストレーションをバックグラウンドで呼び出します。使われるモデルはクライアントのバージョンによって変わるため、opencodex は複数のソースを傍受できます。下でリダイレクトするソースを個別に選択してください。Terra はメモリ統合用のモデルで、Codex が通常の作業でも選択するため既定ではオフです。メモリルーティングに統合モデルが設定されている場合は、そのルートが優先されます。少なくとも 1 つのソースを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。",
+  "dash.shadowCallTooltip":
+    "Codex App はスレッドタイトル生成、コミットメッセージ生成、スキルオーケストレーションをバックグラウンドで呼び出します。使われるモデルはクライアントのバージョンによって変わるため、opencodex は複数のソースを傍受できます。下でリダイレクトするソースを個別に選択してください。Terra はメモリ統合用のモデルで、Codex が通常の作業でも選択するため既定ではオフです。メモリルーティングに統合モデルが設定されている場合は、そのルートが優先されます。少なくとも 1 つのソースを有効にしておく必要があります。すべてのシャドウコールの傍受を止めるにはメインスイッチを使います。",
   "models.shadowCallIntercept": "シャドウコール傍受",
-  "models.shadowCallInterceptHint": "Codex App のバックグラウンドヘルパー呼び出し(タイトル、コミットメッセージ、スキルオーケストレーション)を傍受します。下でソースモデルを選択してください。メモリの統合は通常 Terra で実行され、設定されている場合はメモリルーティングに従います。",
+  "models.shadowCallInterceptHint":
+    "Codex App のバックグラウンドヘルパー呼び出し(タイトル、コミットメッセージ、スキルオーケストレーション)を傍受します。下でソースモデルを選択してください。メモリの統合は通常 Terra で実行され、設定されている場合はメモリルーティングに従います。",
   "models.shadowCallSaveFailed": "シャドウコール設定を保存できませんでした。",
-  "models.shadowCallTargetInvalid": "代替モデルが有効なソースと重なっています。別の代替モデルを選んでください。",
-  "models.shadowCallSourceInvalid": "このソース選択は無効です。空白やプロバイダープレフィックスを含まないソースを 1 つ以上選んでください。",
+  "models.shadowCallTargetInvalid":
+    "代替モデルが有効なソースと重なっています。別の代替モデルを選んでください。",
+  "models.shadowCallSourceInvalid":
+    "このソース選択は無効です。空白やプロバイダープレフィックスを含まないソースを 1 つ以上選んでください。",
   "models.autoReviewOverride": "自動レビューの上書き",
-  "models.autoReviewOverrideHint": "Codex の自動レビュー（承認レビュアー）が使うモデルを指定します。カタログ同期時にすべての行へ適用され、プロバイダー固有の autoReviewModel がその行では引き続き優先されます。",
+  "models.autoReviewOverrideHint":
+    "Codex の自動レビュー（承認レビュアー）が使うモデルを指定します。カタログ同期時にすべての行へ適用され、プロバイダー固有の autoReviewModel がその行では引き続き優先されます。",
   "models.autoReviewPending": "保留中",
   "dash.sidecarBackend": "バックエンド",
   "dash.sidecarModel": "モデル",
@@ -631,34 +740,41 @@ export const ja: Record<TKey, string> = {
   "dash.sidecarSaved": "サイドカー設定を保存しました。次回リクエスト時に適用されます。",
   "dash.sidecarSaveFailed": "サイドカー設定の保存に失敗しました。",
   "dash.injectionLabel": "サブエージェント委任",
-  "dash.injectionHint": "Codex がサブエージェントに作業を渡すときのモデルを選びます。この選択をどこに適用するかは下の 2 つのスイッチが決めます。",
+  "dash.injectionHint":
+    "Codex がサブエージェントに作業を渡すときのモデルを選びます。この選択をどこに適用するかは下の 2 つのスイッチが決めます。",
   "dash.syncCodexSubagentDefaults": "Codex の既定値としても保存",
-  "dash.syncCodexSubagentDefaultsHint": "オンにすると、上で選んだモデルが Codex 自身の設定にも保存され、新しいタスクも最初からそのモデルを使います。オフならここだけで記憶します。反映は次回の同期または再起動時で、自分で書いた [agents] 設定はそのまま残ります。",
+  "dash.syncCodexSubagentDefaultsHint":
+    "オンにすると、上で選んだモデルが Codex 自身の設定にも保存され、新しいタスクも最初からそのモデルを使います。オフならここだけで記憶します。反映は次回の同期または再起動時で、自分で書いた [agents] 設定はそのまま残ります。",
   "dash.multiAgentGuidance": "作業の分け方を伝える",
-  "dash.multiAgentGuidanceHint": "「作業はこう分けて任せる」という短いメモを Codex に送ります。v2 では使えるモデルと優先モデルを伝え、v1 では推論強度が max か ultra のときだけ働きます。オフならメモは付きません。",
+  "dash.multiAgentGuidanceHint":
+    "「作業はこう分けて任せる」という短いメモを Codex に送ります。v2 では使えるモデルと優先モデルを伝え、v1 では推論強度が max か ultra のときだけ働きます。オフならメモは付きません。",
   "dash.injectionNone": "なし",
   "dash.injectionEffortLabel": "推論負荷",
   "dash.injectionEffortNone": "モデル既定",
   "dash.effortCapLabel": "V2 ultra 推論上限",
   "dash.subagentEffortCapLabel": "V2 サブエージェント推論上限",
-  "dash.effortCapHelp": "V2 ultra モードのターンの推論負荷を制限します。設定すると、(ultra モードからの)最大負荷リクエストは選択したレベルに制限されます。サブエージェント上限は生成された子エージェントにのみ適用されます。上限は負荷を下げるだけで上げることはありません。モデルが制限レベルをサポートしない場合、最も近いサポートレベルに切り下げられます。",
+  "dash.effortCapHelp":
+    "V2 ultra モードのターンの推論負荷を制限します。設定すると、(ultra モードからの)最大負荷リクエストは選択したレベルに制限されます。サブエージェント上限は生成された子エージェントにのみ適用されます。上限は負荷を下げるだけで上げることはありません。モデルが制限レベルをサポートしない場合、最も近いサポートレベルに切り下げられます。",
   "dash.effortCapNone": "上限なし",
   "dash.maintenance": "メンテナンス",
-  "dash.maintenanceHint": "Codex のモデルカタログを更新するか、より新しい opencodex リリースをインストールします。",
+  "dash.maintenanceHint":
+    "Codex のモデルカタログを更新するか、より新しい opencodex リリースをインストールします。",
   "dash.syncModels": "モデルを同期",
   "dash.syncing": "同期中…",
   "dash.syncOk": "同期完了。{count} 個のモデルを追加しました。",
-  "dash.syncStaleHint": "Codex がまだ古いリストを表示する場合、長時間稼働の app-server を再起動してください（{cmd}）。",
+  "dash.syncStaleHint":
+    "Codex がまだ古いリストを表示する場合、長時間稼働の app-server を再起動してください（{cmd}）。",
   "dash.syncFailed": "同期失敗: {error}",
   "dash.projectConfigTitle": "プロジェクトの Codex 設定が OpenCodex をバイパスします",
-  "dash.projectConfigHint": "これらのリポジローカル設定は OpenCodex プロキシを上書きします(例: OpenCode Go に直接ルーティング)。~/.codex/config.toml のルーティングがそのプロジェクトで適用されるように削除してください。",
+  "dash.projectConfigHint":
+    "これらのリポジローカル設定は OpenCodex プロキシを上書きします(例: OpenCode Go に直接ルーティング)。~/.codex/config.toml のルーティングがそのプロジェクトで適用されるように削除してください。",
   "dash.checkUpdate": "更新を確認",
   "dash.updateReconnecting": "再起動したプロキシを待機中…",
   "dash.updateVersionTransition": "{currentVersion} -> {latestVersion}.",
 
-
   // providers
-  "prov.subtitle": "opencodex が Codex にルーティングする上流プロバイダーを設定します。アカウントでログインするか、プロバイダーを追加、または生の設定を編集します。",
+  "prov.subtitle":
+    "opencodex が Codex にルーティングする上流プロバイダーを設定します。アカウントでログインするか、プロバイダーを追加、または生の設定を編集します。",
   "prov.add": "プロバイダーを追加",
   "prov.editJson": "JSON を編集",
   "prov.accountLogin": "アカウントログイン",
@@ -672,17 +788,20 @@ export const ja: Record<TKey, string> = {
   "prov.didntOpen": "開きませんか? ここをクリック",
   "prov.copyLink": "リンクをコピー",
   "prov.dontOpenBrowser": "プロキシのマシンでブラウザーを開かない",
-  "prov.dontOpenBrowserHint": "別のブラウザープロファイルでログインする場合や、ダッシュボードがプロキシと別のマシンにある場合に使います。",
+  "prov.dontOpenBrowserHint":
+    "別のブラウザープロファイルでログインする場合や、ダッシュボードがプロキシと別のマシンにある場合に使います。",
   "prov.linkCopied": "コピーしました",
   "prov.linkCopyUnavailable": "クリップボードを使用できません",
   "prov.deviceCode": "デバイスコード",
   "prov.copyCode": "コードをコピー",
   "prov.copyCodeAndOpen": "コードをコピーして開く",
   "prov.openSignInPage": "サインインページを開く",
-  "prov.browserLaunchFailed": "ブラウザーが自動で開きませんでした。下のサインインページを開くか、リンクをコピーしてください。",
+  "prov.browserLaunchFailed":
+    "ブラウザーが自動で開きませんでした。下のサインインページを開くか、リンクをコピーしてください。",
   "prov.codeCopied": "コードをコピーしました",
   "prov.pasteRedirect": "リダイレクト URL またはコードを貼り付け",
-  "prov.pasteRedirectHint": "ブラウザに localhost エラーが表示された場合、アドレスバーから URL 全体をコピーしてここに貼り付けてください(または認可コードを貼り付け)。",
+  "prov.pasteRedirectHint":
+    "ブラウザに localhost エラーが表示された場合、アドレスバーから URL 全体をコピーしてここに貼り付けてください(または認可コードを貼り付け)。",
   "prov.pasteSubmit": "送信",
   "prov.pasteSubmitting": "送信中…",
   "prov.pasteOk": "コードを送信しました — ログインを完了しています…",
@@ -698,53 +817,76 @@ export const ja: Record<TKey, string> = {
   "prov.loginError": "{provider} ログインエラー: {error}",
   "prov.loginRequestFail": "{provider} ログインリクエストに失敗しました",
   "prov.loginCancelled": "{provider} ログインはキャンセルされました",
-  "prov.loginTimeout": "{provider} ログインがタイムアウトしました — ブラウザが閉じたか完了しませんでした。もう一度お試しください。",
-  "prov.loginOk": "{provider} にログインしました。{cmd} を実行(またはライブで適用)してモデルを一覧表示します。",
-  "prov.loginSameAccount": "同じ {provider} アカウントのままです。ブラウザでアカウントを切り替えてから、もう一度アカウント追加を試してください。",
+  "prov.loginTimeout":
+    "{provider} ログインがタイムアウトしました — ブラウザが閉じたか完了しませんでした。もう一度お試しください。",
+  "prov.loginOk":
+    "{provider} にログインしました。{cmd} を実行(またはライブで適用)してモデルを一覧表示します。",
+  "prov.loginSameAccount":
+    "同じ {provider} アカウントのままです。ブラウザでアカウントを切り替えてから、もう一度アカウント追加を試してください。",
   "oauthTos.highTitle": "{provider}: サブスクリプション OAuth リスク",
   "oauthTos.elevatedTitle": "{provider}: 非公式 OAuth ブリッジ",
-  "oauthTos.anthropicBody": "サードパーティのプロキシである OpenCodex を経由して Claude サブスクリプションを接続します。Anthropic はこの接続方法や自動アカウントプールを承認しておらず、利用できるかどうかは同社の最新の規約とその運用によって決まります。",
-  "oauthTos.highBody": "OpenCodex は第三者 OAuth パス経由で {provider} に接続します。サポート外の利用はアクセス制限や停止につながる可能性があります。",
-  "oauthTos.elevatedBody": "OpenCodex は非公式 OAuth パス経由で {provider} に接続します。可能な場合は公式クライアントを使用してください。異常または自動化されたトラフィックは悪用とみなされ、アクセスが制限または停止される可能性があります。",
+  "oauthTos.anthropicBody":
+    "サードパーティのプロキシである OpenCodex を経由して Claude サブスクリプションを接続します。Anthropic はこの接続方法や自動アカウントプールを承認しておらず、利用できるかどうかは同社の最新の規約とその運用によって決まります。",
+  "oauthTos.highBody":
+    "OpenCodex は第三者 OAuth パス経由で {provider} に接続します。サポート外の利用はアクセス制限や停止につながる可能性があります。",
+  "oauthTos.elevatedBody":
+    "OpenCodex は非公式 OAuth パス経由で {provider} に接続します。可能な場合は公式クライアントを使用してください。異常または自動化されたトラフィックは悪用とみなされ、アクセスが制限または停止される可能性があります。",
   "oauthTos.saferPath": "より安全な選択肢: 代わりに OpenCodex で API キーを設定してください。",
   "oauthTos.acknowledge": "リスクを理解した上で、OAuth を続行します。",
   "oauthTos.continue": "OAuth で続行",
   "oauthTos.anthropicTitle": "Claude サブスクリプションの接続",
-  "oauthTos.anthropicConditions": "ご自身が所有している、または利用を許可されたアカウントを使用してください。人が見守るセッションで正規の Claude Code クライアントを使うことは、他のクライアントからサブスクリプションのトークンを送ることとは異なります。OpenCodex はそうした他のクライアントにも対応しているため、この接続によってあらゆる使い方が許可されるとは限りません。サポートされている Agent SDK 統合はこれとは別です。",
-  "oauthTos.anthropicSaferPath": "他のクライアントや無人の自動化には、代わりに Anthropic の API キーを設定してください。",
-  "oauthTos.anthropicAcknowledge": "これがサードパーティ経由のサブスクリプション接続であることを理解し、適用される規約を確認します。",
+  "oauthTos.anthropicConditions":
+    "ご自身が所有している、または利用を許可されたアカウントを使用してください。人が見守るセッションで正規の Claude Code クライアントを使うことは、他のクライアントからサブスクリプションのトークンを送ることとは異なります。OpenCodex はそうした他のクライアントにも対応しているため、この接続によってあらゆる使い方が許可されるとは限りません。サポートされている Agent SDK 統合はこれとは別です。",
+  "oauthTos.anthropicSaferPath":
+    "他のクライアントや無人の自動化には、代わりに Anthropic の API キーを設定してください。",
+  "oauthTos.anthropicAcknowledge":
+    "これがサードパーティ経由のサブスクリプション接続であることを理解し、適用される規約を確認します。",
   "oauthTos.anthropicContinue": "Claude サブスクリプションで続行",
   "subagentSurface.selectionTitle": "サブエージェントサーフェスを {mode} に切り替えますか?",
-  "subagentSurface.selectionBody": "{mode} では、v2 サーフェスを使う ChatGPT モデル（base では Sol と Terra、v2 ではすべてのモデル）が、タスクを ChatGPT バックエンド向けに暗号化したまま Grok や Claude などの routed モデルに渡し、routed モデルはそれを読めません。上流で修正されるまで、この委任は unreadable_encrypted_agent_task で失敗します。v1 ならプロバイダーをまたいで確実に委任できます。",
+  "subagentSurface.selectionBody":
+    "{mode} では、v2 サーフェスを使う ChatGPT モデル（base では Sol と Terra、v2 ではすべてのモデル）が、タスクを ChatGPT バックエンド向けに暗号化したまま Grok や Claude などの routed モデルに渡し、routed モデルはそれを読めません。上流で修正されるまで、この委任は unreadable_encrypted_agent_task で失敗します。v1 ならプロバイダーをまたいで確実に委任できます。",
   "subagentSurface.advisoryTitle": "v1 がデフォルトのサブエージェントサーフェスになりました",
-  "subagentSurface.advisoryBody": "このインストールは {mode} で動作しており、v2 サーフェス上の ChatGPT モデルが、routed モデルに読めない暗号化タスクを渡すため、プロバイダーをまたぐ委任が壊れます。上流で修正されるまで v1 を推奨します。選ぶまで現在の設定は変わりません。",
+  "subagentSurface.advisoryBody":
+    "このインストールは {mode} で動作しており、v2 サーフェス上の ChatGPT モデルが、routed モデルに読めない暗号化タスクを渡すため、プロバイダーをまたぐ委任が壊れます。上流で修正されるまで v1 を推奨します。選ぶまで現在の設定は変わりません。",
   "subagentSurface.continue": "続行",
   "subagentSurface.switchToV1": "v1 に切り替え",
   "subagentSurface.learnMore": "失敗する理由",
   "prov.logoutOk": "{provider} からログアウトしました。",
-  "prov.logoutFail": "{provider} からログアウトできませんでした。アカウント状態は変更されていません。",
-  "prov.removed": "\"{name}\" を削除しました。",
-  "prov.removedDefault": "\"{name}\" を削除しました。既定のプロバイダーは \"{defaultProvider}\" になりました。",
-  "prov.removedShadowTarget": "\"{name}\" を削除しました。シャドウコール傍受の対象はまだ \"{model}\" のため、別の対象を選ぶまで補助呼び出しは失敗します。",
-  "prov.removeFail": "\"{name}\" の削除に失敗しました。",
-  "prov.removeLastProvider": "このプロバイダーは、他に有効なプロバイダーを既定にできない場合は削除できません。",
+  "prov.logoutFail":
+    "{provider} からログアウトできませんでした。アカウント状態は変更されていません。",
+  "prov.removed": '"{name}" を削除しました。',
+  "prov.removedDefault":
+    '"{name}" を削除しました。既定のプロバイダーは "{defaultProvider}" になりました。',
+  "prov.removedShadowTarget":
+    '"{name}" を削除しました。シャドウコール傍受の対象はまだ "{model}" のため、別の対象を選ぶまで補助呼び出しは失敗します。',
+  "prov.removeFail": '"{name}" の削除に失敗しました。',
+  "prov.removeLastProvider":
+    "このプロバイダーは、他に有効なプロバイダーを既定にできない場合は削除できません。",
   "prov.setDefault": "既定に設定",
-  "prov.setDefaultSuccess": "\"{name}\" を既定のプロバイダーに設定しました。",
-  "prov.setDefaultFail": "\"{name}\" を既定のプロバイダーに設定できませんでした。",
+  "prov.setDefaultSuccess": '"{name}" を既定のプロバイダーに設定しました。',
+  "prov.setDefaultFail": '"{name}" を既定のプロバイダーに設定できませんでした。',
   "prov.defaultDisabled": "既定に設定する前に、このプロバイダーを有効にしてください。",
   "prov.updateFail": "このプロバイダーを更新できませんでした。",
-  "prov.networkError": "ネットワークエラーです。プロキシが実行中であることを確認して、もう一度試してください。",
-  "prov.added": "\"{name}\" を追加しました。即時反映 — {cmd} を実行(または再起動)して Codex のピッカーにモデルを一覧表示します。",
+  "prov.networkError":
+    "ネットワークエラーです。プロキシが実行中であることを確認して、もう一度試してください。",
+  "prov.added":
+    '"{name}" を追加しました。即時反映 — {cmd} を実行(または再起動)して Codex のピッカーにモデルを一覧表示します。',
   "prov.modelsNoticeTitle": "モデル設定の案内",
-  "prov.modelsNoticeChecking": "モデル一覧を確認しています。モデルのスイッチを切ってもプロバイダーは無効になりません。",
-  "prov.modelsNoticePending": "初回のモデル一覧をまだ確認できていません。取得が完了するまでモデルの公開を保留します。",
-  "prov.modelsNoticeOff": "初回登録時にモデルのスイッチをすべて OFF にしました。Models ページで必要なモデルを有効にしてください。",
-  "prov.modelsNoticeReady": "Models ページで表示するモデルを選択できます。プロバイダー自体を無効にする操作ではありません。",
-  "prov.modelsNoticeFailed": "プロバイダーは保存しましたが、モデル一覧を更新できませんでした。再試行してください。",
+  "prov.modelsNoticeChecking":
+    "モデル一覧を確認しています。モデルのスイッチを切ってもプロバイダーは無効になりません。",
+  "prov.modelsNoticePending":
+    "初回のモデル一覧をまだ確認できていません。取得が完了するまでモデルの公開を保留します。",
+  "prov.modelsNoticeOff":
+    "初回登録時にモデルのスイッチをすべて OFF にしました。Models ページで必要なモデルを有効にしてください。",
+  "prov.modelsNoticeReady":
+    "Models ページで表示するモデルを選択できます。プロバイダー自体を無効にする操作ではありません。",
+  "prov.modelsNoticeFailed":
+    "プロバイダーは保存しましたが、モデル一覧を更新できませんでした。再試行してください。",
   "prov.modelsNoticeCount": "モデル {count} 個",
   "prov.modelsNoticeOpen": "Models を開く",
   "models.initialSelectionPending": "初回のモデル取得待ち",
-  "prov.removeConfirm": "プロバイダー \"{name}\" を削除しますか? そのモデルは Codex のピッカーから消えます。",
+  "prov.removeConfirm":
+    'プロバイダー "{name}" を削除しますか? そのモデルは Codex のピッカーから消えます。',
   "prov.hasApiKey": "API キー設定済み",
   "prov.hasHeaders": "カスタムヘッダー設定済み",
   "prov.accounts": "アカウント ({n})",
@@ -762,7 +904,8 @@ export const ja: Record<TKey, string> = {
   "prov.accountRemoved": "{email} を削除しました。",
   "prov.accountRemoveFail": "{email} を削除できませんでした。アカウントは変更されていません。",
   "prov.accountRemoveAria": "{email} を削除",
-  "prov.accountRemoveConfirm": "アカウント {email} を削除しますか? そのログインはこのプロキシから削除されます。",
+  "prov.accountRemoveConfirm":
+    "アカウント {email} を削除しますか? そのログインはこのプロキシから削除されます。",
   "prov.keyAdd": "API キーを追加",
   "prov.keyAdded": "{name} に API キーを追加しました。",
   "prov.keyAddFail": "API キーの追加に失敗しました",
@@ -778,19 +921,22 @@ export const ja: Record<TKey, string> = {
   "prov.defaultBadge": "デフォルト",
   "prov.enable": "有効化",
   "prov.disable": "無効化",
-  "prov.enabled": "\"{name}\" を有効にしました。そのモデルは再び Codex に表示できます。",
-  "prov.disabled": "\"{name}\" を無効にしました。設定は保持されますが、モデルは非表示になります。",
-  "prov.disabledShadowTarget": "\"{name}\" を無効にしました。シャドウコール傍受の対象はまだ \"{model}\" のため、別の対象を選ぶか \"{name}\" を再度有効にするまで補助呼び出しは失敗します。",
-  "prov.enableFail": "\"{name}\" の有効化に失敗しました。",
-  "prov.disableFail": "\"{name}\" の無効化に失敗しました。",
+  "prov.enabled": '"{name}" を有効にしました。そのモデルは再び Codex に表示できます。',
+  "prov.disabled": '"{name}" を無効にしました。設定は保持されますが、モデルは非表示になります。',
+  "prov.disabledShadowTarget":
+    '"{name}" を無効にしました。シャドウコール傍受の対象はまだ "{model}" のため、別の対象を選ぶか "{name}" を再度有効にするまで補助呼び出しは失敗します。',
+  "prov.enableFail": '"{name}" の有効化に失敗しました。',
+  "prov.disableFail": '"{name}" の無効化に失敗しました。',
   "prov.enableAria": "プロバイダー {name} を有効化",
   "prov.disableAria": "プロバイダー {name} を無効化",
   "prov.defaultCannotDisable": "デフォルトプロバイダーは無効化できません",
   "prov.openaiAccountMode": "Codex アカウントモード",
   "prov.openaiModePool": "プール",
   "prov.openaiModeDirect": "ダイレクト",
-  "prov.openaiPoolDesc": "デフォルト。アフィニティ、クォータ、クールダウン、フェイルオーバーを使ってメインログインと追加アカウントをローテーションします。",
-  "prov.openaiDirectDesc": "現在/メインの Codex ログインのみを使用します。保存されたプールアカウントは読み込まれずローテーションもされません。",
+  "prov.openaiPoolDesc":
+    "デフォルト。アフィニティ、クォータ、クールダウン、フェイルオーバーを使ってメインログインと追加アカウントをローテーションします。",
+  "prov.openaiDirectDesc":
+    "現在/メインの Codex ログインのみを使用します。保存されたプールアカウントは読み込まれずローテーションもされません。",
   "prov.openaiModeSaved": "OpenAI アカウントモードを {mode} に変更しました。",
   "prov.openaiModeSaveFailed": "OpenAI アカウントモードを変更できませんでした。",
   "prov.openaiApiDesc": "OpenAI API キーを使用し、Codex アカウントの資格情報は使用しません。",
@@ -802,18 +948,24 @@ export const ja: Record<TKey, string> = {
   "models.tab.catalog": "モデル",
   "models.tab.routing": "ルーティング (beta)",
   "models.tabsLabel": "モデルサーフェス",
-  "models.subtitle.routing": "ポリシープロファイル、dry-run 評価、そして根拠の残るルーティング分析です。",
-  "models.subtitle": "Codex に表示するモデルを切り替えます — ネイティブ GPT パススルーとルーティングプロバイダーをプロバイダー別に表示します（ヘッダーをクリックすると折りたためます）。非表示モデルはカタログとピッカーから外れますが、正確な id で直接呼び出せます。",
+  "models.subtitle.routing":
+    "ポリシープロファイル、dry-run 評価、そして根拠の残るルーティング分析です。",
+  "models.subtitle":
+    "Codex に表示するモデルを切り替えます — ネイティブ GPT パススルーとルーティングプロバイダーをプロバイダー別に表示します（ヘッダーをクリックすると折りたためます）。非表示モデルはカタログとピッカーから外れますが、正確な id で直接呼び出せます。",
   "models.delivery.title": "変更が Codex に届くまで",
   "models.delivery.chip.saved": "ここに保存済み",
   "models.delivery.chip.loaded": "Codex は再起動時に読み込み",
   "models.delivery.saved.title": "このプロキシに保存済み",
-  "models.delivery.saved.body": "このページで保存すると、この OpenCodex プロキシが Codex に渡すモデルカタログが書き換わります。それが Codex のモデルピッカーに出る一覧です。保存後の確認は、この段階が終わったことを示します。",
+  "models.delivery.saved.body":
+    "このページで保存すると、この OpenCodex プロキシが Codex に渡すモデルカタログが書き換わります。それが Codex のモデルピッカーに出る一覧です。保存後の確認は、この段階が終わったことを示します。",
   "models.delivery.loaded.title": "Codex が読み込み済み",
-  "models.delivery.loaded.body": "Codex は起動時にカタログを読むため、すでに開いている Codex のウィンドウは古いモデル一覧のままです。OpenCodex は実行中の Codex の中を見て、どの一覧を使っているか確認できません。Codex が変更より前に起動したと分かる場合は、タブの上に再起動の案内が出ます。",
-  "models.delivery.hint": "有効にしたモデルが Codex に出ないときは、このページ右上の「Codex のモデル一覧を再読み込み」を押してから、Codex を開き直してください。",
+  "models.delivery.loaded.body":
+    "Codex は起動時にカタログを読むため、すでに開いている Codex のウィンドウは古いモデル一覧のままです。OpenCodex は実行中の Codex の中を見て、どの一覧を使っているか確認できません。Codex が変更より前に起動したと分かる場合は、タブの上に再起動の案内が出ます。",
+  "models.delivery.hint":
+    "有効にしたモデルが Codex に出ないときは、このページ右上の「Codex のモデル一覧を再読み込み」を押してから、Codex を開き直してください。",
   "models.nativeGroupLabel": "OpenAI ネイティブ",
-  "models.nativeHint": "パススルーモデルはプロバイダーで選択したプールまたはダイレクトアカウントオプションを使用します。一つオフにすると Codex ピッカーから隠します(カタログエントリは保持されるので、再有効化で正確に復元されます)。 ここでモデルを追加すると、bare passthrough id ではなくルーティングされた `openai/<model>` セレクタとして登録されます。",
+  "models.nativeHint":
+    "パススルーモデルはプロバイダーで選択したプールまたはダイレクトアカウントオプションを使用します。一つオフにすると Codex ピッカーから隠します(カタログエントリは保持されるので、再有効化で正確に復元されます)。 ここでモデルを追加すると、bare passthrough id ではなくルーティングされた `openai/<model>` セレクタとして登録されます。",
   "models.active": "{active}/{total} 表示中",
   "models.workspace.providers": "プロバイダー",
   "models.workspace.allProviders": "すべてのプロバイダー",
@@ -845,11 +997,15 @@ export const ja: Record<TKey, string> = {
   "models.v2ModeDesc_default": "上流のデフォルト(sol/terra=v2、luna=v1)",
   "models.v2ModeDesc_v2": "すべてのモデル → v2 サーフェス",
   "models.keepNativeOnV1": "ChatGPT を v1 のまま",
-  "models.keepNativeOnV1Hint": "ChatGPT ネイティブの親は v2 子タスクを暗号化するため、Grok や Claude は読めません。Sol/Terra から routed モデルを spawn するならオンのまま。routed 親は v2 のままです。",
-  "models.v2Help": "すべてのモデルのマルチエージェントサーフェスを制御します。\n\nv1: クラシックな単一スレッドエージェント。すべてのモデルが v1 コラボサーフェスを使います。\nベース: 上流のデフォルト — sol/terra は v2、luna は v1、それ以外は codex のフィーチャーフラグに従います。\nv2: spawn_agent を備えたマルチスレッドエージェント。すべてのモデルが v2 コラボサーフェスを使います。\n\nv2 では「ChatGPT を v1 のまま」にすると Sol/Terra が v1 に留まり、Grok や Claude を spawn できます。ChatGPT は v2 子タスクを暗号化するため routed モデルは読めません。routed 親は v2 のままです。\n\n変更は新規セッションに適用されます。",
+  "models.keepNativeOnV1Hint":
+    "ChatGPT ネイティブの親は v2 子タスクを暗号化するため、Grok や Claude は読めません。Sol/Terra から routed モデルを spawn するならオンのまま。routed 親は v2 のままです。",
+  "models.v2Help":
+    "すべてのモデルのマルチエージェントサーフェスを制御します。\n\nv1: クラシックな単一スレッドエージェント。すべてのモデルが v1 コラボサーフェスを使います。\nベース: 上流のデフォルト — sol/terra は v2、luna は v1、それ以外は codex のフィーチャーフラグに従います。\nv2: spawn_agent を備えたマルチスレッドエージェント。すべてのモデルが v2 コラボサーフェスを使います。\n\nv2 では「ChatGPT を v1 のまま」にすると Sol/Terra が v1 に留まり、Grok や Claude を spawn できます。ChatGPT は v2 子タスクを暗号化するため routed モデルは読めません。routed 親は v2 のままです。\n\n変更は新規セッションに適用されます。",
   "dash.multiAgent": "サブエージェント",
-  "models.v2Conflict": "[agents] max_concurrent_threads_per_session / max_threads が設定されています — codex は起動を拒否します; config.toml から削除してください",
-  "models.v2Applied": "サブエージェントモードを更新しました — 新規セッションに適用(ピッカーを更新するには Codex アプリを再起動)",
+  "models.v2Conflict":
+    "[agents] max_concurrent_threads_per_session / max_threads が設定されています — codex は起動を拒否します; config.toml から削除してください",
+  "models.v2Applied":
+    "サブエージェントモードを更新しました — 新規セッションに適用(ピッカーを更新するには Codex アプリを再起動)",
   "models.v2ThreadsLabel": "サブエージェント上限",
   "models.v2ThreadsDefault": "デフォルト",
   "models.v2ThreadsApplied": "サブエージェント上限を更新しました — 新規セッションに適用",
@@ -861,7 +1017,8 @@ export const ja: Record<TKey, string> = {
   "models.contextDefault": "プロバイダーのデフォルト",
   "models.contextModel": "モデル",
   "models.contextModelOverride": "モデル別の上書き",
-  "models.contextHint": "すでに分かっている場合は、ここに Codex の実際のコンテキストウィンドウを書きます。上流の値がないときはこの値を使い、より大きな報告値だけ下げ、より小さな上流のコンテキストウィンドウはそのまま残します。空欄ならプロバイダーの「デフォルトウィンドウ / 上限」を使い、その上限がオフなら 128k です。",
+  "models.contextHint":
+    "すでに分かっている場合は、ここに Codex の実際のコンテキストウィンドウを書きます。上流の値がないときはこの値を使い、より大きな報告値だけ下げ、より小さな上流のコンテキストウィンドウはそのまま残します。空欄ならプロバイダーの「デフォルトウィンドウ / 上限」を使い、その上限がオフなら 128k です。",
   "models.contextAutomatic": "自動検出",
   "models.contextSaved": "コンテキストウィンドウを更新しました — 次回の Codex ターンから有効です。",
   "models.contextUnchanged": "保存するコンテキストウィンドウの変更はありません。",
@@ -869,10 +1026,12 @@ export const ja: Record<TKey, string> = {
   "models.contextInvalid": "コンテキストウィンドウは正の整数で指定してください",
   "models.contextCappedValue": "{value} 上限",
   "models.setAll": "すべて設定",
-  "models.setAllHint": "すべてのルーティング済みプロバイダーに {value} のデフォルトウィンドウをオンにします。中継が context_window / context_length を返さない場合、この値が実際の Codex ウィンドウになります。1 モデルだけ手で書くときは同じ行の「カスタムウィンドウ」を使います。ネイティブプロバイダーには影響しません。",
+  "models.setAllHint":
+    "すべてのルーティング済みプロバイダーに {value} のデフォルトウィンドウをオンにします。中継が context_window / context_length を返さない場合、この値が実際の Codex ウィンドウになります。1 モデルだけ手で書くときは同じ行の「カスタムウィンドウ」を使います。ネイティブプロバイダーには影響しません。",
   "models.collapseAll": "すべて折りたたむ",
   "models.expandAll": "すべて展開",
-  "models.orderHint": "デフォルト順は優先モデルとカタログの優先順位に従い、同順位のルーティングモデルはプロバイダー・モデル順になります。保存した順序で表示順を変更でき、表示スイッチは表示する行を絞り込みます。クライアントは次に取得するまで古いカタログを保持する場合があります。",
+  "models.orderHint":
+    "デフォルト順は優先モデルとカタログの優先順位に従い、同順位のルーティングモデルはプロバイダー・モデル順になります。保存した順序で表示順を変更でき、表示スイッチは表示する行を絞り込みます。クライアントは次に取得するまで古いカタログを保持する場合があります。",
   "models.settingsPanel.title": "モデル設定",
   "models.settingsPanel.off": "オフ",
   "models.settingsPanel.attention": "要確認",
@@ -880,13 +1039,15 @@ export const ja: Record<TKey, string> = {
   "models.customApply": "適用",
   "models.customPlaceholder": "トークン (例: 420000)",
   "models.applied": "保存しました。Codex はモデル一覧を再読み込みすると変更を表示します。",
-  "models.integrationRefreshWarning": "モデルの選択を保存しました。一部のクライアントのモデル一覧を更新できませんでした。新しいセッションを始める前に「連携」を確認してください。",
+  "models.integrationRefreshWarning":
+    "モデルの選択を保存しました。一部のクライアントのモデル一覧を更新できませんでした。新しいセッションを始める前に「連携」を確認してください。",
   "models.saveFailed": "保存に失敗しました",
   "models.networkError": "ネットワークエラー — プロキシは起動していますか?",
   "models.loadFail": "モデルの読み込みに失敗しました — プロキシは起動していますか?",
   "models.noRouted": "ルーティングモデルがありません",
   "models.noRoutedHint": "まずプロバイダーにログインするか追加してください。",
-  "models.emptyDiscovery": "モデルが見つかりませんでした。プロバイダーのエンドポイントを確認するか、静的/カスタムモデルを追加してください。",
+  "models.emptyDiscovery":
+    "モデルが見つかりませんでした。プロバイダーのエンドポイントを確認するか、静的/カスタムモデルを追加してください。",
   "models.emptyDiscoveryDisabled": "ライブモデル検出がオフで、静的モデルも設定されていません。",
   "models.discoveryFailedBadge": "検出に失敗",
   "models.discoveryFailedHttp": "モデル検出に失敗しました（HTTP {status}）。",
@@ -897,39 +1058,54 @@ export const ja: Record<TKey, string> = {
   "models.discoveryFailedGeneric": "モデル検出に失敗しました。",
   "models.openProviderSettings": "プロバイダー設定を開く",
   "models.inactiveNoCredit": "クレジットなし",
-  "models.inactiveNoCreditHint": "このエントリの背後にあるプロバイダーはすべて現在クレジットがないため、リクエストは失敗します。一覧には残り、クレジットがリセットまたは追加されれば再び使えます。",
-  "models.discoveryFailedDependency": "このプロバイダーではモデル検出が有効です。失敗が続く間は、プロバイダー設定で「{control}」をオフにすると、手動で追加したモデルや静的モデルを使えます。",
+  "models.inactiveNoCreditHint":
+    "このエントリの背後にあるプロバイダーはすべて現在クレジットがないため、リクエストは失敗します。一覧には残り、クレジットがリセットまたは追加されれば再び使えます。",
+  "models.discoveryFailedDependency":
+    "このプロバイダーではモデル検出が有効です。失敗が続く間は、プロバイダー設定で「{control}」をオフにすると、手動で追加したモデルや静的モデルを使えます。",
   "models.loading": "読み込み中…",
   "models.search": "モデルを検索…",
   "models.showMore": "さらに {n} 件表示",
   "models.freeOnly": "無料のみ",
-  "models.noFreeMatch": "ここに無料モデルはありません。「無料のみ」をオフにすると残りが表示されます。",
+  "models.noFreeMatch":
+    "ここに無料モデルはありません。「無料のみ」をオフにすると残りが表示されます。",
   "models.allowlistLabel": "選択のみ",
-  "models.allowlistHint": "チェックしたモデルのみカタログに送信します(空 = すべて)。数千のモデルを公開するプロバイダーで有用です。",
+  "models.allowlistHint":
+    "チェックしたモデルのみカタログに送信します(空 = すべて)。数千のモデルを公開するプロバイダーで有用です。",
   "models.selectedCount": "{n} 件選択",
 
   // subagents
   "sub.forceTitle": "すべてのサブエージェントに同じモデルを強制適用",
   "sub.forceModel": "Claude Code サブエージェントのモデル",
   "sub.forceChoose": "公開済みのモデルを選択",
-  "sub.forceHelp": "プラグインおよび組み込みエージェント（Explore/Plan を含む）に適用され、呼び出しごとのモデル指定を上書きします。フォークと model: inherit を指定したスキルは、メイン会話のモデルを引き続き使用します。メインモデルと Haiku/small-fast のサイドカーには影響しません。",
-  "sub.forceScope": "既定では無効です。次回ルーティング経由で ocx claude を起動したときから適用され、claude の直接起動には適用されません。シェルで export した環境変数が優先されますが、settings.json の env でさらに上書きできます。ステータス確認の対象はサーバー上の CLI とユーザー設定のみで、別のシェルやプロジェクト設定は含まれません。",
-  "sub.forceInvalid": "設定された対象は利用できません。起動時のモデル上書きをスキップします。公開済みのモデルを選択するか、この機能を無効にしてください。",
-  "sub.forceOld": "Claude Code のバージョンが 2.1.257 より古いため、FORCE は無視され、強制ではないサブエージェントの既定モデルのみが適用されます。",
-  "sub.forceUnknown": "Claude Code のバージョンが不明です。モデルの強制適用にはバージョン 2.1.257 以降が必要です。",
-  "sub.forceOverride": "settings.json によって上書きされています。env にサブエージェントのモデルまたは FORCE の設定が含まれています。OpenCodex はこのファイルを変更しません。",
-  "sub.forceSettingsUnknown": "settings.json を確認できませんでした。設定による上書きの有無は不明です。",
-  "sub.forceSaved": "保存しました。次回ルーティング経由で ocx claude を起動したときに反映されます。",
-  "sub.subtitle": "Codex の {cmd} は最初の 5 モデル(優先度順)のみをオーバーライドとして通知します。ここで最大 5 つを選んでください — ネイティブ gpt またはルーティング — opencodex がカタログ優先度を設定し、これらが先頭に来るようにします。他のモデルも正確な名前で呼び出し可能です; これは表示のみを制御します。",
+  "sub.forceHelp":
+    "プラグインおよび組み込みエージェント（Explore/Plan を含む）に適用され、呼び出しごとのモデル指定を上書きします。フォークと model: inherit を指定したスキルは、メイン会話のモデルを引き続き使用します。メインモデルと Haiku/small-fast のサイドカーには影響しません。",
+  "sub.forceScope":
+    "既定では無効です。次回ルーティング経由で ocx claude を起動したときから適用され、claude の直接起動には適用されません。シェルで export した環境変数が優先されますが、settings.json の env でさらに上書きできます。ステータス確認の対象はサーバー上の CLI とユーザー設定のみで、別のシェルやプロジェクト設定は含まれません。",
+  "sub.forceInvalid":
+    "設定された対象は利用できません。起動時のモデル上書きをスキップします。公開済みのモデルを選択するか、この機能を無効にしてください。",
+  "sub.forceOld":
+    "Claude Code のバージョンが 2.1.257 より古いため、FORCE は無視され、強制ではないサブエージェントの既定モデルのみが適用されます。",
+  "sub.forceUnknown":
+    "Claude Code のバージョンが不明です。モデルの強制適用にはバージョン 2.1.257 以降が必要です。",
+  "sub.forceOverride":
+    "settings.json によって上書きされています。env にサブエージェントのモデルまたは FORCE の設定が含まれています。OpenCodex はこのファイルを変更しません。",
+  "sub.forceSettingsUnknown":
+    "settings.json を確認できませんでした。設定による上書きの有無は不明です。",
+  "sub.forceSaved":
+    "保存しました。次回ルーティング経由で ocx claude を起動したときに反映されます。",
+  "sub.subtitle":
+    "Codex の {cmd} は最初の 5 モデル(優先度順)のみをオーバーライドとして通知します。ここで最大 5 つを選んでください — ネイティブ gpt またはルーティング — opencodex がカタログ優先度を設定し、これらが先頭に来るようにします。他のモデルも正確な名前で呼び出し可能です; これは表示のみを制御します。",
   "sub.featured": "おすすめ",
   "sub.advanced": "詳細設定",
   "sub.orderHintAria": "この順序の使われ方",
-  "sub.orderHint": "ここでの表示順が Codex モデルピッカーの上位 1〜5 番目の位置と {cmd} のデフォルトモデル候補を決定します。モデルピッカーに表示される注目モデルが 5 つ未満の場合、残りの枠にはカタログの優先度順にモデルが提示されます。表示される注目モデルが 5 つあればリストが埋まりますが、モデルピッカーのカスタム順序でカタログの優先度が変わる場合は例外です。",
+  "sub.orderHint":
+    "ここでの表示順が Codex モデルピッカーの上位 1〜5 番目の位置と {cmd} のデフォルトモデル候補を決定します。モデルピッカーに表示される注目モデルが 5 つ未満の場合、残りの枠にはカタログの優先度順にモデルが提示されます。表示される注目モデルが 5 つあればリストが埋まりますが、モデルピッカーのカスタム順序でカタログの優先度が変わる場合は例外です。",
   "sub.noneSelected": "未選択 — 以下のリストから選んでください。",
   "sub.models": "モデル",
   "sub.search": "モデルを検索(ネイティブ gpt + ルーティング)…",
   "sub.noModels": "モデルがありません — まずプロバイダーにログインするか追加してください。",
-  "sub.saved": "{n} 件のモデルを保存しました。新規 Codex セッションを開始(または {cmd} を実行)して spawn_agent オーバーライドとして確認してください。",
+  "sub.saved":
+    "{n} 件のモデルを保存しました。新規 Codex セッションを開始(または {cmd} を実行)して spawn_agent オーバーライドとして確認してください。",
   "sub.saveFailed": "保存に失敗しました",
   "sub.networkError": "ネットワークエラー — プロキシは起動していますか?",
   "sub.loadFail": "モデルの読み込みに失敗しました — プロキシは起動していますか?",
@@ -945,16 +1121,21 @@ export const ja: Record<TKey, string> = {
   "sub.workspace.priority": "優先度",
   "sub.workspace.removeFromFeatured": "{m} をおすすめから削除",
   "sub.workspace.selectModel": "モデルを選択",
-  "sub.workspace.selectModelDesc": "一覧からモデルを選んで詳細を確認し、spawn_agent のおすすめに設定します。",
+  "sub.workspace.selectModelDesc":
+    "一覧からモデルを選んで詳細を確認し、spawn_agent のおすすめに設定します。",
   "sub.workspace.selector": "公開セレクター",
   "sub.ultraMode": "常時プロアクティブ委任",
-  "sub.ultraModeHint": "すべてのモデルと reasoning effort で Proactive マルチエージェント委任ポリシーを有効にします（reasoning effort 自体は変更しません）。config.toml に features.multi_agent_v2.multi_agent_mode_hint_text を書き込みます。",
-  "sub.ultraModeV2Required": "v2 マルチエージェントサーフェスが必要です — 先に multi_agent_v2 を有効にし、サブエージェントモードで v2 を選択してください。",
+  "sub.ultraModeHint":
+    "すべてのモデルと reasoning effort で Proactive マルチエージェント委任ポリシーを有効にします（reasoning effort 自体は変更しません）。config.toml に features.multi_agent_v2.multi_agent_mode_hint_text を書き込みます。",
+  "sub.ultraModeV2Required":
+    "v2 マルチエージェントサーフェスが必要です — 先に multi_agent_v2 を有効にし、サブエージェントモードで v2 を選択してください。",
   "sub.ultraModeText": "プロアクティブ委任テキスト",
   "sub.ultraModePreset": "プリセットを復元",
-  "sub.ultraModeLoadFail": "プロアクティブ委任設定を読み込めませんでした — プロキシは実行中ですか？",
+  "sub.ultraModeLoadFail":
+    "プロアクティブ委任設定を読み込めませんでした — プロキシは実行中ですか？",
   "sub.ultraModeSaveFail": "プロアクティブ委任設定の保存に失敗しました",
-  "sub.ultraModeSaved": "プロアクティブ委任設定を保存しました。新しい Codex セッションから適用されます。",
+  "sub.ultraModeSaved":
+    "プロアクティブ委任設定を保存しました。新しい Codex セッションから適用されます。",
 
   // logs
   "logs.title": "リクエストログ",
@@ -994,7 +1175,7 @@ export const ja: Record<TKey, string> = {
   "logs.badge.interceptedHelperTitle": "インターセプトされたヘルパー要求",
   "logs.filter.conversation.label": "会話",
   "logs.filter.conversation.placeholder": "会話 ID を貼り付け",
- "logs.filter.conversation.clear": "クリア",
+  "logs.filter.conversation.clear": "クリア",
   "logs.filter.model.label": "モデル",
   "logs.filter.model.placeholder": "モデルまたはプロバイダーで絞り込む",
   "logs.filter.conversation.apply": "ログを絞り込み",
@@ -1017,9 +1198,11 @@ export const ja: Record<TKey, string> = {
   "logs.col.tokPerSec": "tok/s",
   "logs.col.estimatedCost": "~$",
   "logs.metric.tokPerSecTitle": "リクエスト全体の所要時間あたりの出力トークン数",
-  "logs.metric.estimatedCostTitle": "API 定価相当額(実際の請求ではありません); 未対応の価格は利用できません",
+  "logs.metric.estimatedCostTitle":
+    "API 定価相当額(実際の請求ではありません); 未対応の価格は利用できません",
   "usage.cost.total": "API 定価相当額(この期間)",
-  "usage.cost.disclaimer": "請求明細ではありません。サブスクリプション利用量やプロバイダークレジットが代わりに適用される場合があります。",
+  "usage.cost.disclaimer":
+    "請求明細ではありません。サブスクリプション利用量やプロバイダークレジットが代わりに適用される場合があります。",
   "usage.cost.unpricedNote": "{count} 件のリクエストを除外(価格または使用量なし)",
   "usage.cost.excluded": "({count} 件のリクエストを除外)",
   "usage.cost.excludedOne": "({count} 件のリクエストを除外)",
@@ -1029,7 +1212,8 @@ export const ja: Record<TKey, string> = {
   "logs.detail.route.profile": "プロファイル",
   "logs.detail.route.selected": "選択済み",
   "logs.detail.route.candidates": "候補",
-  "logs.detail.route.unknown": "このリクエストにはルートトレースが記録されていません（トレース前の行）。",
+  "logs.detail.route.unknown":
+    "このリクエストにはルートトレースが記録されていません（トレース前の行）。",
   "logs.filter.protocol.label": "プロトコル経路",
   "logs.filter.protocol.all": "すべての経路",
   "logs.filter.protocol.none": "経路データなし",
@@ -1071,12 +1255,17 @@ export const ja: Record<TKey, string> = {
   "logs.detail.decodeGeneration": "生成中の出力速度（推定）",
   "logs.detail.decodeLegacy": "最初に表示された出力以降の出力速度（推定）",
   "logs.detail.decodeUnknown": "出力速度（推定・時間の計測方法不明）",
-  "logs.detail.decodeBasisHint.generation": "推論を含め、プロキシが最初の出力を観測してから最後の出力差分を観測するまでの時間で推定しています。",
-  "logs.detail.decodeBasisHint.legacy": "最初に出力が表示されてからリクエストが終了するまでの時間で、推論を含む報告されたすべての出力トークンを数えて推定しています。",
-  "logs.detail.decodeBasisHint.unknown": "この推定に使われた時間の計測方法は、サーバーから報告されていません。",
+  "logs.detail.decodeBasisHint.generation":
+    "推論を含め、プロキシが最初の出力を観測してから最後の出力差分を観測するまでの時間で推定しています。",
+  "logs.detail.decodeBasisHint.legacy":
+    "最初に出力が表示されてからリクエストが終了するまでの時間で、推論を含む報告されたすべての出力トークンを数えて推定しています。",
+  "logs.detail.decodeBasisHint.unknown":
+    "この推定に使われた時間の計測方法は、サーバーから報告されていません。",
   "logs.detail.endToEndTokPerSec": "リクエスト全体の出力 tok/s",
-  "logs.detail.reason.ttft_missing": "このリクエストでは最初のトークンまでの時間が記録されていないため、測定できるデコード区間がありません。",
-  "logs.detail.reason.decode_window_too_short": "計測された出力区間が1秒未満で、デコード速度を推定するには短すぎます。",
+  "logs.detail.reason.ttft_missing":
+    "このリクエストでは最初のトークンまでの時間が記録されていないため、測定できるデコード区間がありません。",
+  "logs.detail.reason.decode_window_too_short":
+    "計測された出力区間が1秒未満で、デコード速度を推定するには短すぎます。",
   "logs.detail.costTotal": "定価相当額",
   "logs.detail.totalTokens": "合計トークン",
   "logs.detail.matchedKey": "一致した価格キー",
@@ -1092,7 +1281,8 @@ export const ja: Record<TKey, string> = {
   "logs.detail.attempt.target": "プロバイダー / モデル",
   "logs.detail.attempt.reason": "結果 / 理由",
   "logs.detail.attempt.completed": "完了",
-  "logs.detail.attempt.e2eNote": "トップレベルの tok/s はエンドツーエンドです; 各試行は自身の所要時間を使います。",
+  "logs.detail.attempt.e2eNote":
+    "トップレベルの tok/s はエンドツーエンドです; 各試行は自身の所要時間を使います。",
   "logs.detail.attempt.recovery.transient5xx": "一時的な5xxエラー",
   "logs.detail.attempt.recovery.connectionReset": "接続がリセットされました",
   "logs.detail.attempt.recovery.oauth401": "OAuth 再認証",
@@ -1153,14 +1343,19 @@ export const ja: Record<TKey, string> = {
   "logs.detail.reason.output_missing": "正の出力トークン数が報告されませんでした。",
   "logs.detail.reason.invalid_duration": "リクエストの所要時間が有効ではありません。",
   "logs.detail.reason.price_unmatched": "一致する価格が見つかりませんでした。",
-  "logs.detail.reason.invalid_cache_breakdown": "キャッシュトークンの詳細が合計入力トークンと矛盾しています。",
+  "logs.detail.reason.invalid_cache_breakdown":
+    "キャッシュトークンの詳細が合計入力トークンと矛盾しています。",
   "logs.detail.reason.invalid_usage": "使用量に無効なトークン値が含まれています。",
-  "logs.detail.reason.combo_attempt_unavailable": "少なくとも 1 つのコンボ試行に価格を設定できませんでした。",
+  "logs.detail.reason.combo_attempt_unavailable":
+    "少なくとも 1 つのコンボ試行に価格を設定できませんでした。",
   "logs.detail.estimate.usage_estimated": "プロバイダーの使用量は推定です。",
-  "logs.detail.estimate.cache_detail_missing": "キャッシュの詳細が利用できませんでした; 入力は上限の推定です。",
+  "logs.detail.estimate.cache_detail_missing":
+    "キャッシュの詳細が利用できませんでした; 入力は上限の推定です。",
   "logs.detail.estimate.expected_price_overlay": "検証済みの予想定価が使用されました。",
-  "logs.detail.estimate.provider_cost_overlay": "プロバイダー設定の価格オーバーレイが使用されました。",
-  "logs.detail.estimate.priority_lower_bound": "確認済みの Priority 価格を利用できないため、表示される見積もりは既知の下限です。",
+  "logs.detail.estimate.provider_cost_overlay":
+    "プロバイダー設定の価格オーバーレイが使用されました。",
+  "logs.detail.estimate.priority_lower_bound":
+    "確認済みの Priority 価格を利用できないため、表示される見積もりは既知の下限です。",
   "logs.col.error": "エラー",
   "logs.col.upstreamReason": "上流の理由",
   "logs.col.failureDetail": "失敗の詳細",
@@ -1178,7 +1373,8 @@ export const ja: Record<TKey, string> = {
   "logs.failureDetail.providerError": "プロバイダーがエラーを返しました",
   "logs.failureDetail.providerErrorTyped": "プロバイダーがエラーを返しました（{type}）",
   "logs.failureDetail.headerTimeout": "レスポンスヘッダーの待機がタイムアウトしました",
-  "logs.failureDetail.headerTimeoutAfter": "{value} ms 後にレスポンスヘッダーの待機がタイムアウトしました",
+  "logs.failureDetail.headerTimeoutAfter":
+    "{value} ms 後にレスポンスヘッダーの待機がタイムアウトしました",
   "logs.failureDetail.connectTimeout": "プロバイダーへの接続が {value} ms 後にタイムアウトしました",
   "logs.failureDetail.connectFailed": "プロバイダーに接続できませんでした",
   "logs.failureDetail.clientClosed": "クライアントがリクエストを閉じました",
@@ -1190,7 +1386,8 @@ export const ja: Record<TKey, string> = {
   "logs.failureDetail.outputLimit": "出力が要求されたトークン上限に達しました",
   "logs.failureDetail.stallTimeout": "プロバイダーが停止タイムアウト内にデータを送信しませんでした",
   "logs.failureDetail.adapterEof": "プロバイダーのストリームが最終イベントなしで終了しました",
-  "logs.failureDetail.generationTimeout": "ルーティング先のモデルが {value} ms 以内に応答しませんでした",
+  "logs.failureDetail.generationTimeout":
+    "ルーティング先のモデルが {value} ms 以内に応答しませんでした",
   "logs.failureDetail.turnInactivity": "ターンが {value} ms 非アクティブでした",
   "logs.col.duration": "所要時間",
   "logs.modelTooltip.model": "モデル",
@@ -1219,7 +1416,8 @@ export const ja: Record<TKey, string> = {
   "logs.tokens.contextTotal": "アクティブコンテキスト",
   "logs.tokens.noCacheNote": "このプロバイダーはキャッシュトークンを報告しません",
   "logs.tokens.noCacheCursor": "Cursor のキャッシュ詳細は未報告",
-  "logs.tokens.noCacheCursorNote": "Cursor はキャッシュ read/write トークン数を公開しません。これは不明という意味で、キャッシュミスの確定ではありません",
+  "logs.tokens.noCacheCursorNote":
+    "Cursor はキャッシュ read/write トークン数を公開しません。これは不明という意味で、キャッシュミスの確定ではありません",
   "logs.tokens.estimatedNote": "推定(プロバイダーは正確な使用量を報告しません)",
   "logs.details": "詳細",
   "logs.detailTitle": "リクエストの詳細",
@@ -1227,14 +1425,17 @@ export const ja: Record<TKey, string> = {
 
   // debug page
   "debug.title": "デバッグ",
-  "debug.subtitle": "オプトインのプロバイダートランスポートおよび使用量抽出診断です。リクエストエラーと 502 はログタブに残ります。",
+  "debug.subtitle":
+    "オプトインのプロバイダートランスポートおよび使用量抽出診断です。リクエストエラーと 502 はログタブに残ります。",
   "debug.debug": "プロバイダーデバッグ",
   "debug.usage": "使用量抽出",
   "debug.injection": "インジェクションログ",
   "debug.claude": "Claude インバウンド",
   "debug.claudeInbound.title": "Claude インバウンドリクエスト",
-  "debug.claudeInbound.sub": "Claude Code/Desktop が実際に送信する内容(thinking、effort、metadata) — プロンプトテキストは保存されません。",
-  "debug.claudeInbound.empty": "まだキャプチャされたリクエストはありません。これがオンの状態で Claude からメッセージを送信してください。",
+  "debug.claudeInbound.sub":
+    "Claude Code/Desktop が実際に送信する内容(thinking、effort、metadata) — プロンプトテキストは保存されません。",
+  "debug.claudeInbound.empty":
+    "まだキャプチャされたリクエストはありません。これがオンの状態で Claude からメッセージを送信してください。",
   "debug.claudeInbound.time": "時刻",
   "debug.claudeInbound.endpoint": "エンドポイント",
   "debug.claudeInbound.model": "モデル",
@@ -1248,22 +1449,30 @@ export const ja: Record<TKey, string> = {
   "debug.loading": "デバッグ設定を読み込み中…",
   "debug.loadFailed": "デバッグ設定を読み込めませんでした。",
   "debug.emptyTitle": "デバッグログはオフです",
-  "debug.empty": "上のカードでプロバイダーデバッグまたは使用量抽出をオンにしてください。プロキシ経由でリクエストを送信すると、ここに行が表示されます。",
+  "debug.empty":
+    "上のカードでプロバイダーデバッグまたは使用量抽出をオンにしてください。プロキシ経由でリクエストを送信すると、ここに行が表示されます。",
   "debug.noLinesTitle": "行を待機中",
-  "debug.noLines.provider": "プロバイダーデバッグはオンですが、トランスポートの異常(欠落または不正なフレーム、Cursor のダイヤル/再試行イベント)のみを記録します。Anthropic のようなプロバイダーでの正常なリクエストは行を生成しないことがあります。",
-  "debug.noLines.usage": "使用量抽出はオンですが、まだ何もキャプチャされていません。Codex 経由でチャット/リクエストを送信するとここに表示されます。",
-  "debug.noLines.injection": "インジェクションログはオンですが、まだ何もキャプチャされていません。コラボおよびサブエージェントのターンでのマルチエージェントガイダンスインジェクションと負荷上限の決定を記録します。",
+  "debug.noLines.provider":
+    "プロバイダーデバッグはオンですが、トランスポートの異常(欠落または不正なフレーム、Cursor のダイヤル/再試行イベント)のみを記録します。Anthropic のようなプロバイダーでの正常なリクエストは行を生成しないことがあります。",
+  "debug.noLines.usage":
+    "使用量抽出はオンですが、まだ何もキャプチャされていません。Codex 経由でチャット/リクエストを送信するとここに表示されます。",
+  "debug.noLines.injection":
+    "インジェクションログはオンですが、まだ何もキャプチャされていません。コラボおよびサブエージェントのターンでのマルチエージェントガイダンスインジェクションと負荷上限の決定を記録します。",
 
   // usage page
   "usage.title": "使用量",
-  "usage.subtitle": "プロキシからのローカルトークン会計です。欠損した使用量はゼロとして表示されることはありません。",
+  "usage.subtitle":
+    "プロキシからのローカルトークン会計です。欠損した使用量はゼロとして表示されることはありません。",
   "usage.loading": "使用量データを読み込み中…",
-  "usage.empty": "まだ使用量が記録されていません。プロキシ経由でリクエストを送信するとここにアクティビティが表示されます。",
+  "usage.empty":
+    "まだ使用量が記録されていません。プロキシ経由でリクエストを送信するとここにアクティビティが表示されます。",
   "usage.loadError": "使用量データを読み込めませんでした。",
   "usage.range.all": "すべて",
   "usage.range.available": "利用可能な履歴",
-  "usage.historyTruncated": "古い利用履歴が読み込まれていないため、合計は利用可能な履歴のみを対象とします。",
-  "usage.historyTruncatedWindow": "読み込まれた行のリクエスト開始時刻は {start} から {end} の範囲です。読み取り上限によりファイル前方の記録が除外されているため、選択した期間は不完全な場合があります。",
+  "usage.historyTruncated":
+    "古い利用履歴が読み込まれていないため、合計は利用可能な履歴のみを対象とします。",
+  "usage.historyTruncatedWindow":
+    "読み込まれた行のリクエスト開始時刻は {start} から {end} の範囲です。読み取り上限によりファイル前方の記録が除外されているため、選択した期間は不完全な場合があります。",
   "usage.range.30d": "30日",
   "usage.range.7d": "7日",
   "usage.card.requests": "リクエスト",
@@ -1271,7 +1480,8 @@ export const ja: Record<TKey, string> = {
   "usage.card.reported": "報告",
   "usage.card.totalTokens": "合計トークン",
   "usage.card.cachedTokens": "キャッシュ読み取り",
-  "usage.card.cachedTokensHint": "プロバイダーキャッシュから提供されたプロンプトトークン(読み取り)。キャッシュ書き込みは存在する場合、下に表示されます。",
+  "usage.card.cachedTokensHint":
+    "プロバイダーキャッシュから提供されたプロンプトトークン(読み取り)。キャッシュ書き込みは存在する場合、下に表示されます。",
   "usage.card.cacheWriteTokens": "キャッシュ書き込み",
   "usage.card.coverage": "カバレッジ",
   "usage.card.activeDays": "アクティブ日数",
@@ -1285,7 +1495,8 @@ export const ja: Record<TKey, string> = {
   "usage.coverage.measured": "計測",
   "usage.coverage.reported": "プロバイダー報告",
   "usage.coverage.estimated": "推定",
-  "usage.coverage.note": "計測エントリにはプロバイダー報告および推定のトークン数が含まれます。未報告および非対応のリクエストは追跡されますが、ゼロトークンに水増しされることはありません。",
+  "usage.coverage.note":
+    "計測エントリにはプロバイダー報告および推定のトークン数が含まれます。未報告および非対応のリクエストは追跡されますが、ゼロトークンに水増しされることはありません。",
   "usage.search.models": "モデルを検索…",
   "usage.col.requests": "リクエスト",
   "usage.col.measured": "計測",
@@ -1296,10 +1507,14 @@ export const ja: Record<TKey, string> = {
   "usage.col.cacheHits": "キャッシュヒット",
   "usage.col.cacheWrites": "キャッシュ書き込み",
   "usage.col.cacheHitRate": "ヒット率",
-  "usage.throughput.title": "エンドツーエンドの出力スループット: 出力トークンの合計 ÷ 経過時間の合計。トークンと時間の両方を報告した {samples} 件の試行が対象です。デコード前の待ち時間を含むため定常デコード速度より低く、トークンまたは時間が未報告のリクエストは対象外です。",
-  "usage.throughput.unmeasured": "この行には出力トークンと時間の両方を報告したリクエストがなく、スループットを平均できません。",
-  "usage.cacheHitRate.partial": "入力トークン全体 {total} のうち {measured} を対象に平均しています。残りのリクエストではキャッシュの詳細が報告されていません。",
-  "usage.cacheHitRate.unmeasured": "この行のリクエストはいずれもキャッシュの詳細を報告していないため、平均ヒット率はありません。",
+  "usage.throughput.title":
+    "エンドツーエンドの出力スループット: 出力トークンの合計 ÷ 経過時間の合計。トークンと時間の両方を報告した {samples} 件の試行が対象です。デコード前の待ち時間を含むため定常デコード速度より低く、トークンまたは時間が未報告のリクエストは対象外です。",
+  "usage.throughput.unmeasured":
+    "この行には出力トークンと時間の両方を報告したリクエストがなく、スループットを平均できません。",
+  "usage.cacheHitRate.partial":
+    "入力トークン全体 {total} のうち {measured} を対象に平均しています。残りのリクエストではキャッシュの詳細が報告されていません。",
+  "usage.cacheHitRate.unmeasured":
+    "この行のリクエストはいずれもキャッシュの詳細を報告していないため、平均ヒット率はありません。",
   "usage.unavailable": "—",
   "usage.col.tokens": "トークン",
   "usage.col.apiListPrice": "API 定価",
@@ -1316,10 +1531,12 @@ export const ja: Record<TKey, string> = {
 
   "nav.storage": "ストレージ",
   "storage.title": "ストレージ",
-  "storage.subtitle": "CODEX_HOME の使用状況を確認。クリーンアップはアクティブセッションに触れません。",
+  "storage.subtitle":
+    "CODEX_HOME の使用状況を確認。クリーンアップはアクティブセッションに触れません。",
   "storage.loading": "ストレージをスキャン中…",
   "storage.empty": "CODEX_HOME が空か存在しません — 報告するものはありません。",
-  "storage.error": "ストレージのスキャンに失敗しました。CODEX_HOME が有効なディレクトリを指しているか確認してください。",
+  "storage.error":
+    "ストレージのスキャンに失敗しました。CODEX_HOME が有効なディレクトリを指しているか確認してください。",
   "storage.refresh": "再スキャン",
   "storage.rescanned": "スキャンが完了しました。",
   "storage.card.total": "合計サイズ",
@@ -1352,17 +1569,20 @@ export const ja: Record<TKey, string> = {
   "storage.bucket.deletion_manifests": "削除マニフェスト",
   "storage.bucket.other": "その他",
   "storage.cleanup.title": "アーカイブのクリーンアップ",
-  "storage.cleanup.help": "古いアーカイブセッションを割合で削除します。アクティブセッションには触れません。既定は隔離で、ファイルは CODEX_HOME/.trash へ移動します。",
+  "storage.cleanup.help":
+    "古いアーカイブセッションを割合で削除します。アクティブセッションには触れません。既定は隔離で、ファイルは CODEX_HOME/.trash へ移動します。",
   "storage.cleanup.slider": "古いアーカイブの割合",
   "storage.cleanup.percent": "{percent}%",
   "storage.cleanup.preset": "{percent}",
   "storage.cleanup.preview": "プレビュー",
   "storage.cleanup.confirmTitle": "アーカイブクリーンアップの確認",
-  "storage.cleanup.confirmBody": "アーカイブ {count} 件（約 {size}）、古い {percent}% を処理します。",
+  "storage.cleanup.confirmBody":
+    "アーカイブ {count} 件（約 {size}）、古い {percent}% を処理します。",
   "storage.cleanup.moreFiles": "…ほか {n} 件",
   "storage.cleanup.permanent": "完全に削除する（隔離しない）",
   "storage.cleanup.permanentWarn": "完全削除は元に戻せません。",
-  "storage.cleanup.quarantineNote": "ファイルは CODEX_HOME 下の .trash へ移動します。隔離タブから復元できます。",
+  "storage.cleanup.quarantineNote":
+    "ファイルは CODEX_HOME 下の .trash へ移動します。隔離タブから復元できます。",
   "storage.cleanup.cancel": "キャンセル",
   "storage.cleanup.confirmQuarantine": "隔離する",
   "storage.cleanup.confirmPermanent": "完全に削除",
@@ -1371,19 +1591,26 @@ export const ja: Record<TKey, string> = {
   "storage.cleanup.skippedReferenced": "参照されている {count} 件をスキップしました。",
   "storage.cleanup.previewFailed": "プレビューに失敗しました。",
   "storage.cleanup.cleanupFailed": "クリーンアップに失敗しました。",
-  "storage.cleanup.err.codex_busy": "Codex が state.sqlite を使用中です — Codex を終了して再試行してください。",
-  "storage.cleanup.err.stale_preview": "プレビュー以降にアーカイブが変わりました — プレビューをやり直してください。",
-  "storage.cleanup.err.restore_pending_overlap": "選択したアーカイブは未完了の隔離復元と重なっています — 復元を完了するか再試行してください。",
-  "storage.cleanup.err.referenced_history": "選択したアーカイブはフォークまたはページング履歴から参照されています。",
+  "storage.cleanup.err.codex_busy":
+    "Codex が state.sqlite を使用中です — Codex を終了して再試行してください。",
+  "storage.cleanup.err.stale_preview":
+    "プレビュー以降にアーカイブが変わりました — プレビューをやり直してください。",
+  "storage.cleanup.err.restore_pending_overlap":
+    "選択したアーカイブは未完了の隔離復元と重なっています — 復元を完了するか再試行してください。",
+  "storage.cleanup.err.referenced_history":
+    "選択したアーカイブはフォークまたはページング履歴から参照されています。",
   "storage.cleanup.err.invalid_digest": "プレビューのダイジェストが無い、または無効です。",
   "storage.cleanup.err.invalid_mode": "モードは quarantine または permanent である必要があります。",
-  "storage.cleanup.err.fs_failed": "ファイルシステムのクリーンアップに失敗しました。一部の変更は既に適用されている可能性があります — CODEX_HOME/.trash と表示されたリカバリパスを確認してください。",
-  "storage.cleanup.err.fs_failed_trash": "ファイルシステムのクリーンアップに失敗しました。一部の変更は既に適用されている可能性があります — {trashDir} と manifest.json で復旧可能なファイルを確認してください。",
+  "storage.cleanup.err.fs_failed":
+    "ファイルシステムのクリーンアップに失敗しました。一部の変更は既に適用されている可能性があります — CODEX_HOME/.trash と表示されたリカバリパスを確認してください。",
+  "storage.cleanup.err.fs_failed_trash":
+    "ファイルシステムのクリーンアップに失敗しました。一部の変更は既に適用されている可能性があります — {trashDir} と manifest.json で復旧可能なファイルを確認してください。",
   "storage.cleanup.err.db_reconcile_failed": "Codex の状態データベースを更新できませんでした。",
   "storage.cleanup.err.cleanup_failed": "クリーンアップに失敗しました。",
 
   "storage.trash.title": "隔離",
-  "storage.trash.help": "CODEX_HOME/.trash へ移したアーカイブセッションです。復元すると JSONL とスレッド行が戻ります。",
+  "storage.trash.help":
+    "CODEX_HOME/.trash へ移したアーカイブセッションです。復元すると JSONL とスレッド行が戻ります。",
   "storage.trash.empty": "隔離エントリはありません。",
   "storage.trash.loading": "隔離を読み込み中…",
   "storage.trash.col.when": "隔離日時",
@@ -1393,7 +1620,8 @@ export const ja: Record<TKey, string> = {
   "storage.trash.col.id": "エントリ",
   "storage.trash.restore": "復元",
   "storage.trash.confirmTitle": "隔離エントリを復元しますか？",
-  "storage.trash.confirmBody": "{id} から {count} 件（約 {size}）をアーカイブセッションへ戻します。",
+  "storage.trash.confirmBody":
+    "{id} から {count} 件（約 {size}）をアーカイブセッションへ戻します。",
   "storage.trash.cancel": "キャンセル",
   "storage.trash.confirmRestore": "復元",
   "storage.trash.done": "{count} 件を復元しました（{size}）。",
@@ -1401,19 +1629,25 @@ export const ja: Record<TKey, string> = {
   "storage.trash.listFailed": "隔離一覧を取得できませんでした。",
   "storage.trash.mode.quarantine": "隔離",
   "storage.trash.mode.permanent": "完全削除（未完了）",
-  "storage.trash.err.codex_busy": "Codex が state.sqlite を使用中です — Codex を終了して再試行してください。",
+  "storage.trash.err.codex_busy":
+    "Codex が state.sqlite を使用中です — Codex を終了して再試行してください。",
   "storage.trash.err.invalid_trash": "隔離エントリ ID が無い、または無効です。",
   "storage.trash.err.missing_trash": "隔離エントリが見つかりません。",
-  "storage.trash.err.dest_exists": "復元先が既に存在します — アーカイブファイルを削除または改名して再試行してください。",
-  "storage.trash.err.fs_failed": "ファイルシステムの復元に失敗しました。一部は既に復元されている可能性があります — archived_sessions と .trash を確認してください。",
-  "storage.trash.err.storage_mutation_busy": "別のストレージクリーンアップまたは復元が進行中です — しばらくして再試行してください。",
+  "storage.trash.err.dest_exists":
+    "復元先が既に存在します — アーカイブファイルを削除または改名して再試行してください。",
+  "storage.trash.err.fs_failed":
+    "ファイルシステムの復元に失敗しました。一部は既に復元されている可能性があります — archived_sessions と .trash を確認してください。",
+  "storage.trash.err.storage_mutation_busy":
+    "別のストレージクリーンアップまたは復元が進行中です — しばらくして再試行してください。",
   "storage.trash.err.db_reconcile_failed": "Codex の状態データベース行を復元できませんでした。",
   "storage.trash.err.restore_failed": "復元に失敗しました。",
   "storage.trash.err.restore_worker_timeout": "復元が長時間（10 分超）かかったため停止しました。",
   "storage.trash.err.restore_worker_aborted": "シャットダウン中に復元がキャンセルされました。",
-  "storage.trash.err.restore_worker_failed": "復元ワーカーがクラッシュまたは予期しないエラーで失敗しました。",
+  "storage.trash.err.restore_worker_failed":
+    "復元ワーカーがクラッシュまたは予期しないエラーで失敗しました。",
   "storage.policy.title": "自動クリーンアップ方針",
-  "storage.policy.help": "アーカイブがしきい値を超えたときの任意の一括クリーンアップ。既定はオフ — 自動では有効になりません。",
+  "storage.policy.help":
+    "アーカイブがしきい値を超えたときの任意の一括クリーンアップ。既定はオフ — 自動では有効になりません。",
   "storage.policy.loading": "方針を読み込み中…",
   "storage.policy.loadFailed": "クリーンアップ方針を読み込めませんでした。",
   "storage.policy.saveFailed": "クリーンアップ方針を保存できませんでした。",
@@ -1421,7 +1655,8 @@ export const ja: Record<TKey, string> = {
   "storage.policy.alreadyRunning": "クリーンアップ方針の実行が既に進行中です。",
   "storage.policy.invalid": "方針の値が無効です。",
   "storage.policy.enabled": "自動クリーンアップを有効化",
-  "storage.policy.enabledHint": "既定はオフです。有効にすると選択したスケジュール（または今すぐ実行）でのみ動きます。",
+  "storage.policy.enabledHint":
+    "既定はオフです。有効にすると選択したスケジュール（または今すぐ実行）でのみ動きます。",
   "storage.policy.threshold": "アーカイブサイズが超えたら（GiB）",
   "storage.policy.trigger": "トリガー",
   "storage.policy.target": "クリーンアップ目標",
@@ -1441,7 +1676,8 @@ export const ja: Record<TKey, string> = {
   "storage.policy.mode": "削除モード",
   "storage.policy.mode.quarantine": "隔離（既定）",
   "storage.policy.mode.permanent": "完全削除",
-  "storage.policy.permanentWarn": "完全削除モードは元に戻せません。確信がなければ隔離を使ってください。",
+  "storage.policy.permanentWarn":
+    "完全削除モードは元に戻せません。確信がなければ隔離を使ってください。",
   "storage.policy.lastRun": "前回の実行",
   "storage.policy.lastRunDetail": "{count} 件削除 · {size} 解放",
   "storage.policy.nextRun": "次回の実行",
@@ -1455,7 +1691,8 @@ export const ja: Record<TKey, string> = {
   "storage.policy.skippedEmpty": "目標に合うアーカイブ候補がありません。",
   "storage.policy.doneQuarantine": "方針が {count} 件を隔離しました（{size}）。",
   "storage.policy.donePermanent": "方針が {count} 件を完全削除しました（{size}）。",
-  "storage.policy.metadataSaveWarning": "方針の実行は完了しましたが、スケジュールのメタデータを保存できませんでした。",
+  "storage.policy.metadataSaveWarning":
+    "方針の実行は完了しましたが、スケジュールのメタデータを保存できませんでした。",
 
   // add-provider modal
   "modal.addNamed": "追加: {label}",
@@ -1472,7 +1709,8 @@ export const ja: Record<TKey, string> = {
   "modal.endpoint.custom": "カスタム",
   "modal.defaultModel": "デフォルトモデル(任意)",
   "modal.allowPrivateNetwork": "ローカル/プライベートネットワークを許可",
-  "modal.allowPrivateNetworkHint": "意図的にセルフホストしたプロバイダーに対してのみ有効化してください。メタデータエンドポイントはブロックされたままです。",
+  "modal.allowPrivateNetworkHint":
+    "意図的にセルフホストしたプロバイダーに対してのみ有効化してください。メタデータエンドポイントはブロックされたままです。",
   "modal.nameRequired": "プロバイダー名は必須です",
   "modal.baseUrlRequired": "ベース URL は必須です",
   "modal.networkError": "ネットワークエラー — プロキシは起動していますか?",
@@ -1492,10 +1730,12 @@ export const ja: Record<TKey, string> = {
   "modal.badge.pool": "プール",
   "modal.badge.free": "無料",
   "modal.badge.subscriptionCli": "サブスク CLI",
-  "modal.invalidPreset": "この組み込みプロバイダープリセットは不完全です。プロキシを再起動してもう一度お試しください。",
+  "modal.invalidPreset":
+    "この組み込みプロバイダープリセットは不完全です。プロキシを再起動してもう一度お試しください。",
   "modal.freeTierTitle": "無料枠",
   "modal.subscriptionCliTitle": "サブスクリプション CLI（API キーではありません）",
-  "modal.subscriptionCliWarning": "このプロバイダーは API キーを使用しません。このマシンでサインイン済みの公式 Claude Code CLI（{cmd}）を実行し、その Claude サブスクリプションアカウントに課金されます。OpenCodex はキーを保存せず、ここに入力したキーが使われることもありません。API キーで課金する場合は、代わりに {apiProvider} を追加してください。",
+  "modal.subscriptionCliWarning":
+    "このプロバイダーは API キーを使用しません。このマシンでサインイン済みの公式 Claude Code CLI（{cmd}）を実行し、その Claude サブスクリプションアカウントに課金されます。OpenCodex はキーを保存せず、ここに入力したキーが使われることもありません。API キーで課金する場合は、代わりに {apiProvider} を追加してください。",
   "modal.freeTierDefault": "API キー不要です。そのまま利用できます。",
   "modal.tab.accounts": "アカウント",
   "modal.tab.free": "無料",
@@ -1503,7 +1743,8 @@ export const ja: Record<TKey, string> = {
   "modal.tab.paid": "有料",
   "modal.noteMore": "説明をすべて表示",
   "modal.searchResults": "{tiers} で {count} 件",
-  "modal.accountsHint": "ChatGPT/Codex、OAuth プロバイダー、API キーアカウントにここからサインインします。OpenAI は組み込み済み — 再度追加せずログインしてください。",
+  "modal.accountsHint":
+    "ChatGPT/Codex、OAuth プロバイダー、API キーアカウントにここからサインインします。OpenAI は組み込み済み — 再度追加せずログインしてください。",
   "modal.accountsCodexAuthLink": "Codex 認証",
   "modal.notListed": "プロバイダーが載っていませんか? カスタムを追加",
   "modal.catalogLoading": "カタログを読み込み中…",
@@ -1514,12 +1755,13 @@ export const ja: Record<TKey, string> = {
   "modal.accountCodexPool": "ChatGPT アカウントプール",
   "modal.accountLoggedIn": "ログイン済み",
   "modal.accountLoggedOut": "未ログイン",
- "quota.fiveHourLimit": "5 時間上限",
+  "quota.fiveHourLimit": "5 時間上限",
   "quota.ageMinutes": "{n}分",
   "quota.ageHours": "{n}時間",
   "quota.ageDays": "{n}日",
   "quota.observedAgo": "{age}前に取得",
-  "quota.observedHint": "Meta はストリーミング応答中にのみ使用量を報告します。リアルタイムの値ではなく、最後に取得した値です。",
+  "quota.observedHint":
+    "Meta はストリーミング応答中にのみ使用量を報告します。リアルタイムの値ではなく、最後に取得した値です。",
   "quota.weeklyLimit": "週間上限",
   "quota.monthlyLimit": "30 日上限",
   "quota.cursorFirstParty": "ファーストパーティモデル",
@@ -1585,7 +1827,8 @@ export const ja: Record<TKey, string> = {
   "pws.noMatchFilters": "フィルタに一致するプロバイダーがありません。",
   "pws.noProvidersConfigured": "プロバイダーが設定されていません。",
   "pws.workspaceMainAria": "プロバイダーの詳細",
-  "pws.detailComingSoon": "詳細ビューは近日対応 — このプロバイダーの管理にはクラシックビューを使用してください。",
+  "pws.detailComingSoon":
+    "詳細ビューは近日対応 — このプロバイダーの管理にはクラシックビューを使用してください。",
   "pws.selectPrompt": "リストからプロバイダーを選択してください。",
   "pws.connectFirst": "最初のプロバイダーを接続",
   "pws.empty.browseFree": "無料プロバイダーを見る",
@@ -1603,7 +1846,8 @@ export const ja: Record<TKey, string> = {
   "pws.status.connected": "接続済み",
   "pws.attentionTitle": "要対応",
   "pws.attention.reauth": "アクティブアカウントの再認証が必要です",
-  "pws.attention.reauthForward": "アクティブな Codex アカウントの再認証が必要です — アカウントタブを開いて修正してください",
+  "pws.attention.reauthForward":
+    "アクティブな Codex アカウントの再認証が必要です — アカウントタブを開いて修正してください",
   "pws.attention.missingCredentials": "資格情報が不足しています",
   "pws.cell.auth": "認証",
   "pws.cell.note": "メモ",
@@ -1621,13 +1865,15 @@ export const ja: Record<TKey, string> = {
   "pws.usageUnavailable": "まだ使用量が記録されていません。",
   "pws.rateLimits": "レート制限",
   "pws.quotaUnavailable": "このプロバイダーのクォータデータがありません。",
-  "pws.accountQuotaUnavailable": "レート制限データを一時的に取得できません。前回の値がある場合はそれを表示します。",
+  "pws.accountQuotaUnavailable":
+    "レート制限データを一時的に取得できません。前回の値がある場合はそれを表示します。",
   "pws.quotaFailure.account_unavailable": "割り当て確認に必要なアカウント情報を利用できません。",
   "pws.quotaFailure.access_denied": "プロバイダーが割り当てデータへのアクセスを拒否しました。",
   "pws.quotaFailure.rate_limited": "割り当て確認のレート制限に達しました。",
   "pws.quotaFailure.upstream_error": "プロバイダーが割り当て確認を完了できませんでした。",
   "pws.quotaFailure.redirect_blocked": "割り当てエンドポイントのリダイレクトをブロックしました。",
-  "pws.quotaFailure.destination_blocked": "ネットワークポリシーが割り当ての接続先をブロックしました。",
+  "pws.quotaFailure.destination_blocked":
+    "ネットワークポリシーが割り当ての接続先をブロックしました。",
   "pws.quotaFailure.dns_failed": "割り当てサーバーのホスト名を解決できませんでした。",
   "pws.quotaFailure.timeout": "割り当てリクエストがタイムアウトしました。",
   "pws.quotaFailure.transport_error": "割り当てサーバーへの接続に失敗しました。",
@@ -1639,7 +1885,8 @@ export const ja: Record<TKey, string> = {
   "pws.modelSearchPlaceholder": "モデルを絞り込み…",
   "pws.modelsLoading": "モデルを読み込み中…",
   "pws.modelsLoadFailed": "モデルを読み込めませんでした。",
-  "pws.modelsNeedsReauth": "ライブモデル検出が動作するには再ログインが必要です。今は設定済みモデルを表示しています。",
+  "pws.modelsNeedsReauth":
+    "ライブモデル検出が動作するには再ログインが必要です。今は設定済みモデルを表示しています。",
   "pws.modelsConfiguredFallback": "設定済みモデルを表示中(ライブ検出は利用不可)。",
   "pws.modelsTruncated": "最初の {shown} / {total} モデルを表示中。リストを絞り込んでください。",
   "pws.retry": "再試行",
@@ -1656,16 +1903,20 @@ export const ja: Record<TKey, string> = {
   "pws.accountsLoadFailed": "アカウントを読み込めませんでした。",
   "pws.retryAccounts": "再試行",
   "pws.noAccounts": "まだアカウントが接続されていません。",
-  "pws.cockpitImportDescription": "このデバイスから Cockpit Tools Antigravity JSON エクスポートをインポートします。ファイル内容は表示されません。",
+  "pws.cockpitImportDescription":
+    "このデバイスから Cockpit Tools Antigravity JSON エクスポートをインポートします。ファイル内容は表示されません。",
   "pws.cockpitImportFileLabel": "Cockpit Tools Antigravity JSON エクスポート",
   "pws.cockpitImportChooseFile": "JSON ファイルを選択",
   "pws.cockpitImporting": "インポート中…",
-  "pws.cockpitImportInvalid": "選択したファイルは有効な JSON エクスポートではないか、大きすぎます。",
+  "pws.cockpitImportInvalid":
+    "選択したファイルは有効な JSON エクスポートではないか、大きすぎます。",
   "pws.cockpitImportFailed": "アカウントのインポートを完了できませんでした。",
-  "pws.cockpitImportComplete": "インポート完了: インポート {imported}、更新 {updated}、失敗 {failed}、未対応 {unsupported}。",
+  "pws.cockpitImportComplete":
+    "インポート完了: インポート {imported}、更新 {updated}、失敗 {failed}、未対応 {unsupported}。",
   "pws.accountSwitching": "切り替え中…",
   "pws.accountCurrent": "現在のアカウント",
-  "pws.accountPausedHint": "再開するまで、自動選択、再試行、クールダウン復旧、手動選択、トークンの事前更新の対象外です。",
+  "pws.accountPausedHint":
+    "再開するまで、自動選択、再試行、クールダウン復旧、手動選択、トークンの事前更新の対象外です。",
   "pws.defaultModelNone": "なし(プロバイダーのデフォルトを使用)",
   "pws.discardSettings": "破棄",
   "pws.jsonEditorDesc": "生のプロバイダー JSON 設定を編集します。変更はすぐに保存されます。",
@@ -1676,24 +1927,29 @@ export const ja: Record<TKey, string> = {
   "pws.notLoggedInTitle": "未ログイン",
   "pws.note": "メモ",
   "pws.responsesReasoningReplay": "平文の推論を再送",
-  "pws.responsesReasoningReplayHint": "初期設定はオフです。過去の平文推論をこのエンドポイントに送信し、トークン使用量が増える場合があります。推論の再送に対応する場合のみ有効にしてください。",
+  "pws.responsesReasoningReplayHint":
+    "初期設定はオフです。過去の平文推論をこのエンドポイントに送信し、トークン使用量が増える場合があります。推論の再送に対応する場合のみ有効にしてください。",
   "pws.allowPrivateNetwork": "ローカル/プライベートネットワークを許可",
   "pws.liveModels": "プロバイダーからモデルを検出",
-  "pws.liveModelsDesc": "プロバイダーのライブモデルカタログを取得します。オフにすると設定済みの静的モデルのみを使用します。",
+  "pws.liveModelsDesc":
+    "プロバイダーのライブモデルカタログを取得します。オフにすると設定済みの静的モデルのみを使用します。",
   "pws.xaiChatOptIn": "Grok 4.5 と 4.6 で Chat Completions を使用",
-  "pws.xaiChatOptInDesc": "オフにすると Responses を使用します。OAuth Responses リクエストの既定値です。他の Grok モデルと tier 動作は変わりません。",
+  "pws.xaiChatOptInDesc":
+    "オフにすると Responses を使用します。OAuth Responses リクエストの既定値です。他の Grok モデルと tier 動作は変わりません。",
   "pws.xaiChatOptInMixed": "片方のモデルのみ Chat を使用しています。",
   "pws.cursorTransport": "Cursor トランスポート",
   "pws.cursorTransportHttp2": "HTTP/2（デフォルト）",
   "pws.cursorTransportHttp1": "HTTP/1.1（プロキシ互換）",
-  "pws.cursorTransportDesc": "プロキシが Cursor の HTTP/2 ストリームを安定して転送できない場合は HTTP/1.1 を使用します。",
+  "pws.cursorTransportDesc":
+    "プロキシが Cursor の HTTP/2 ストリームを安定して転送できない場合は HTTP/1.1 を使用します。",
   "pws.optionalPlaceholder": "任意",
   "pws.providerId": "プロバイダー ID",
   "pws.reauth": "再認証が必要",
   "pws.reauthenticate": "再認証",
   "pws.copyDoctor": "ocx doctor をコピー",
   "pws.doctorCopied": "コピー済み",
-  "pws.healthCooldownHint": "クールダウンが終わるまで待ってください。まだこのアカウントをプローブしないでください。",
+  "pws.healthCooldownHint":
+    "クールダウンが終わるまで待ってください。まだこのアカウントをプローブしないでください。",
   "pws.doctorCopyUnavailable": "クリップボードを利用できません",
   "pws.healthLabel.rateLimited": "レート制限中",
   "pws.healthLabel.quotaLimited": "クォータ制限中",
@@ -1701,39 +1957,47 @@ export const ja: Record<TKey, string> = {
   "pws.healthLabel.refreshFailed": "更新に失敗しました",
   "pws.healthLabel.metadataMismatch": "メタデータの不一致",
   "pws.healthLabel.validationPending": "検証待ち",
-  "pws.healthSummary.validationPending": "{provider} {account}: 利用上限に達した状態で登録されました。上限の回復後、使用量を更新すると小さな検証リクエストを送信します。成功するまでリクエストには使用されません。",
+  "pws.healthSummary.validationPending":
+    "{provider} {account}: 利用上限に達した状態で登録されました。上限の回復後、使用量を更新すると小さな検証リクエストを送信します。成功するまでリクエストには使用されません。",
   "pws.healthLabel.credentialConflict": "資格情報の競合",
-  "pws.healthSummary.rateLimited": "{provider} {account}: {until} までレート制限中です。それまでこのアカウントのルーティングは停止します。",
-  "pws.healthSummary.quotaLimited": "{provider} {account}: {until} までクォータ制限中です。それまでこのアカウントのルーティングは停止します。",
+  "pws.healthSummary.rateLimited":
+    "{provider} {account}: {until} までレート制限中です。それまでこのアカウントのルーティングは停止します。",
+  "pws.healthSummary.quotaLimited":
+    "{provider} {account}: {until} までクォータ制限中です。それまでこのアカウントのルーティングは停止します。",
   "pws.healthSummary.reauthRequired": "{provider} {account}: 再認証が必要です。",
   "pws.healthSummary.credentialConflict": "{provider} {account}: 資格情報の競合があります。",
   "pws.healthSummary.metadataMismatch": "{provider} {account}: メタデータが一致しません。",
   "pws.healthSummary.staleCredentials": "{provider} {account}: 資格情報が不完全です。",
   "pws.removeConfirm": "削除",
-  "pws.removeConfirmBody": "プロバイダー \"{name}\" を削除しますか? これは元に戻せません。",
-  "pws.removeDefaultConfirmBody": "既定のプロバイダー \"{name}\" を削除しますか? \"{defaultProvider}\" が既定のプロバイダーになります。この操作は元に戻せません。",
+  "pws.removeConfirmBody": 'プロバイダー "{name}" を削除しますか? これは元に戻せません。',
+  "pws.removeDefaultConfirmBody":
+    '既定のプロバイダー "{name}" を削除しますか? "{defaultProvider}" が既定のプロバイダーになります。この操作は元に戻せません。',
   "pws.removeConfirmTitle": "プロバイダーを削除",
   "pws.saveSettings": "保存",
   "pws.keySelection": "API キーの選択",
   "pws.keyActive": "有効なキー優先（既存の動作）",
-  "pws.keyLimitInvalid": "キー別の制限は対応範囲内の正の値にし、間隔と同時リクエスト数は整数にしてください。",
+  "pws.keyLimitInvalid":
+    "キー別の制限は対応範囲内の正の値にし、間隔と同時リクエスト数は整数にしてください。",
   "pws.keyRoundRobin": "ラウンドロビン",
   "pws.keyLimits": "キーごとの制限",
-  "pws.keySharedQuota": "プロバイダー全体の制限も適用されます。同じプロジェクトのキーは割当量を共有する場合があります。RPM はトークン数や日次上限を制御しません。",
+  "pws.keySharedQuota":
+    "プロバイダー全体の制限も適用されます。同じプロジェクトのキーは割当量を共有する場合があります。RPM はトークン数や日次上限を制御しません。",
   "pws.keyHandle": "キー ID",
   "pws.keyStarts": "開始回数",
   "pws.keyInFlight": "実行中",
   "pws.keyWait": "待機",
   "pws.keyCooldown": "クールダウン",
   "pws.pacingTitle": "リクエスト間隔調整",
-  "pws.pacingDesc": "このプロバイダーへの送信開始を均等に遅延します。ストリーミング応答は重複できます。",
+  "pws.pacingDesc":
+    "このプロバイダーへの送信開始を均等に遅延します。ストリーミング応答は重複できます。",
   "pws.pacingEnabled": "有効",
   "pws.pacingRpm": "1分あたりのリクエスト数",
   "pws.pacingConcurrency": "最大同時リクエスト数",
   "pws.pacingRpmUnit": "RPM",
   "pws.pacingCapUnit": "×",
   "pws.pacingDelay": "最小間隔 (ms)",
-  "pws.pacingSlowerWins": "より遅いプロバイダー制限が優先され、モデル設定は遅延を増やすか同時リクエスト数の上限を下げる場合のみ適用されます。",
+  "pws.pacingSlowerWins":
+    "より遅いプロバイダー制限が優先され、モデル設定は遅延を増やすか同時リクエスト数の上限を下げる場合のみ適用されます。",
   "pws.pacingQueued": "待機中",
   "pws.pacingNextSlot": "次のスロットまで",
   "pws.pacingLastModel": "最後のモデル",
@@ -1749,7 +2013,8 @@ export const ja: Record<TKey, string> = {
   "pws.settingsSaved": "設定を保存しました。",
   "pws.accountModeSaved": "アカウントモードを保存しました。",
   "pws.accountModeFailed": "アカウントモードを切り替えられませんでした。",
-  "pws.accountModeConfirm": "OpenAI のアカウントモードを切り替えますか？実行中の会話はもう一方のモードのアカウントセットに再割り当てされ、クォータ使用量は新しいモードで計上されます。",
+  "pws.accountModeConfirm":
+    "OpenAI のアカウントモードを切り替えますか？実行中の会話はもう一方のモードのアカウントセットに再割り当てされ、クォータ使用量は新しいモードで計上されます。",
   "pws.settingsUnsavedBar": "未保存の変更があります。",
   "pws.unsavedLeaveBody": "未保存の変更があります。保存してから移動しますか?",
   "pws.unsavedLeaveTitle": "未保存の変更",
@@ -1766,8 +2031,10 @@ export const ja: Record<TKey, string> = {
   "pws.capacity.nextRecovery": "次の容量回復",
   "pws.capacity.recoveryShare": "+{percent}% のプール容量",
   "pws.capacity.incomplete": "対象範囲が不完全です: {excluded} 件を除外",
-  "pws.capacity.uncalibratedPlan": "未校正プランの {count} 件は基準シート重みで計上されるため、この推定値は控えめになる場合があります",
-  "pws.capacity.partial": "一部の期間の対象範囲が不完全です: {count} 件のアカウントでは表示中のすべての制限期間を取得できません",
+  "pws.capacity.uncalibratedPlan":
+    "未校正プランの {count} 件は基準シート重みで計上されるため、この推定値は控えめになる場合があります",
+  "pws.capacity.partial":
+    "一部の期間の対象範囲が不完全です: {count} 件のアカウントでは表示中のすべての制限期間を取得できません",
   "pws.capacity.windowPartial": "一部のみ",
   "pws.capacity.windowPartialA11y": "{window}: アカウントの対象範囲が不完全です",
   "pws.dashboard.recentlyUsed": "最近の使用",
@@ -1802,8 +2069,10 @@ export const ja: Record<TKey, string> = {
   "time.daysAgo": "{n}日前",
   "modal.noMatch": "一致なし。",
   "modal.oauthDefaultNote": "アカウントでログイン — API キー不要です。",
-  "modal.oauthComingSoon": "{label} の OAuth ログインは次回の更新で対応予定です。今は API キーをお使いください。",
-  "modal.oauthComingSoonShort": "このプロバイダーの OAuth ログインは次回の更新で対応予定です — 今は API キーをお使いください。",
+  "modal.oauthComingSoon":
+    "{label} の OAuth ログインは次回の更新で対応予定です。今は API キーをお使いください。",
+  "modal.oauthComingSoonShort":
+    "このプロバイダーの OAuth ログインは次回の更新で対応予定です — 今は API キーをお使いください。",
   "modal.useApiKeyInstead": "代わりに API キーを使用",
   "modal.setupGuide": "セットアップガイド",
   "modal.setupStep1Prefix": "にアクセスし",
@@ -1812,11 +2081,12 @@ export const ja: Record<TKey, string> = {
   "modal.setupStep2": "下の API キー欄に貼り付け",
   "modal.setupStep3": "プロバイダーを追加をクリック — モデルは自動検出されます",
   "modal.namePlaceholder": "例: openrouter",
-  "modal.duplicateWarn": "プロバイダー \"{name}\" は既存で、上書きされます。",
+  "modal.duplicateWarn": 'プロバイダー "{name}" は既存で、上書きされます。',
   "modal.forwardHintPrefix": "キー不要 — プロキシはあなたの",
   "modal.forwardCredentials": "codex ログイン",
   "modal.forwardHintSuffix": "資格情報をこのプロバイダーに転送します。",
-  "modal.localHint": "API キーは保存されません。Cursor の静的な公開モデルカタログを Codex に追加しますが、ライブの Cursor トランスポートとネイティブのファイル/シェル実行は監査されるまで無効のままです。",
+  "modal.localHint":
+    "API キーは保存されません。Cursor の静的な公開モデルカタログを Codex に追加しますが、ライブの Cursor トランスポートとネイティブのファイル/シェル実行は監査されるまで無効のままです。",
   "modal.getApiKey": "{label} の API キーを取得",
   "modal.apiKey": "API キー",
   "modal.apiKeyTransport": "API キーヘッダー",
@@ -1825,11 +2095,13 @@ export const ja: Record<TKey, string> = {
   "modal.apiKeyPlaceholder": "sk-… (または $ENV_VAR)",
   "modal.defaultModelPlaceholder": "例: gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
-  "modal.baseUrlPlaceholderError": "ベース URL に未解決の {placeholder} が含まれています。実際の値に置き換えてください。",
-  "modal.baseUrlPlaceholderHint": "プロバイダーを追加する前に、ベース URL の {placeholder} を実際の Account ID に置き換えてください。",
+  "modal.baseUrlPlaceholderError":
+    "ベース URL に未解決の {placeholder} が含まれています。実際の値に置き換えてください。",
+  "modal.baseUrlPlaceholderHint":
+    "プロバイダーを追加する前に、ベース URL の {placeholder} を実際の Account ID に置き換えてください。",
   "modal.adding": "追加中…",
   "modal.useOauthLogin": "← OAuth ログインを使用",
-"nav.codexAuth": "Codex 認証",
+  "nav.codexAuth": "Codex 認証",
   "nav.codexSet": "Codex",
   "nav.connect": "ルート",
   "nav.usageLogs": "使用量とログ",
@@ -1837,36 +2109,46 @@ export const ja: Record<TKey, string> = {
   "codexSet.tab.multiauth": "マルチ認証",
   "codexSet.tab.prompt": "プロンプト",
   "codexSet.prompt.title": "プロンプトレイヤー",
-  "codexSet.prompt.timing": "新しく開始したセッションから適用されます。実行中のセッションは現在の設定を保持します。",
+  "codexSet.prompt.timing":
+    "新しく開始したセッションから適用されます。実行中のセッションは現在の設定を保持します。",
   "codexSet.prompt.staleRevision": "他の場所で設定が変更されたため、一覧を再読み込みしました。",
-"codexSet.prompt.writeFailed": "変更を保存できませんでした。",
-"codexSet.prompt.loadFailed": "プロンプトレイヤーを読み込めませんでした。",
+  "codexSet.prompt.writeFailed": "変更を保存できませんでした。",
+  "codexSet.prompt.loadFailed": "プロンプトレイヤーを読み込めませんでした。",
   "codexSet.prompt.repair": "修復",
   "codexSet.prompt.repairFailed": "修復を完了できませんでした。",
   "codexSet.prompt.remeasure": "再測定",
-  "codexSet.drift.journalPresent": "前回の書き込みが完了していません。次の書き込み時に自動で復旧します。",
-  "codexSet.drift.projectionStale": "保存済みのレイヤーと config.toml の値が一致しません。修復するとレイヤーの内容で値を書き直します。",
-  "codexSet.drift.storeMissing": "レイヤーファイルがないのに config.toml に指示が残っています。修復するとバックアップを作成し、その内容を1つのレイヤーとして保持します。",
-  "codexSet.drift.ownedMalformed": "config.toml に生成された行が手動で変更されているため、安全に書き直せません。",
-  "codexSet.custom.adoptUnsupported": "{path} の {line} 行目の値が単一行の文字列ではないため、インポートできません。ここで管理するには手動で移動してください。",
-  "codexSet.prompt.unreadable": "Codex の設定ファイルは存在しますが読み取れないため、変更を拒否しました。",
+  "codexSet.drift.journalPresent":
+    "前回の書き込みが完了していません。次の書き込み時に自動で復旧します。",
+  "codexSet.drift.projectionStale":
+    "保存済みのレイヤーと config.toml の値が一致しません。修復するとレイヤーの内容で値を書き直します。",
+  "codexSet.drift.storeMissing":
+    "レイヤーファイルがないのに config.toml に指示が残っています。修復するとバックアップを作成し、その内容を1つのレイヤーとして保持します。",
+  "codexSet.drift.ownedMalformed":
+    "config.toml に生成された行が手動で変更されているため、安全に書き直せません。",
+  "codexSet.custom.adoptUnsupported":
+    "{path} の {line} 行目の値が単一行の文字列ではないため、インポートできません。ここで管理するには手動で移動してください。",
+  "codexSet.prompt.unreadable":
+    "Codex の設定ファイルは存在しますが読み取れないため、変更を拒否しました。",
   "codexSet.layer.permissions": "権限",
   "codexSet.layer.collaboration": "コラボレーションモード",
   "codexSet.layer.environment": "環境コンテキスト",
   "codexSet.layer.apps": "アプリ",
-"codexSet.layer.skills": "スキル",
-"codexSet.prompt.extensionsUnknown": "拡張機能は独自のレイヤーを追加できます。Codex が公開していないため、ここには表示できません。",
+  "codexSet.layer.skills": "スキル",
+  "codexSet.prompt.extensionsUnknown":
+    "拡張機能は独自のレイヤーを追加できます。Codex が公開していないため、ここには表示できません。",
   "codexSet.group.transition": "遷移通知",
-  "codexSet.group.transitionDesc": "状態を説明するのではなく変化を知らせる項目のため、セッションがリアルタイムに切り替わるかモデルが変わったときだけ現れます。番号は組み立て順を維持するため、上の一覧の番号は飛びます。",
+  "codexSet.group.transitionDesc":
+    "状態を説明するのではなく変化を知らせる項目のため、セッションがリアルタイムに切り替わるかモデルが変わったときだけ現れます。番号は組み立て順を維持するため、上の一覧の番号は飛びます。",
   "codexSet.custom.slotNote": "カスタムレイヤーはこの順序で連結され、1つのセクションになります。",
-"codexSet.row.alwaysOn": "常に有効",
+  "codexSet.row.alwaysOn": "常に有効",
   "codexSet.row.onChange": "変更時に送信",
-"codexSet.row.featureGated": "[features] で設定",
+  "codexSet.row.featureGated": "[features] で設定",
   "codexSet.row.openFeatures": "設定を開く",
   "codexSet.row.resetDefault": "{value} にリセット",
   "codexSet.dialog.setValue": "{value}（デフォルト {fallback}）",
-"codexSet.dialog.copyKey": "キーをコピー",
-"codexSet.dialog.unknownLayer": "このビルドにはこのレイヤーの説明がありません。ダッシュボードより新しい Codex ランタイムのレイヤーです。",
+  "codexSet.dialog.copyKey": "キーをコピー",
+  "codexSet.dialog.unknownLayer":
+    "このビルドにはこのレイヤーの説明がありません。ダッシュボードより新しい Codex ランタイムのレイヤーです。",
   "codexSet.custom.heading": "カスタムレイヤー",
   "codexSet.custom.add": "+ レイヤーを追加",
   "codexSet.custom.newTitle": "新しいレイヤー",
@@ -1879,17 +2161,19 @@ export const ja: Record<TKey, string> = {
   "codexSet.custom.titleTooLong": "タイトルは {count} 文字です。上限は {max} 文字です。",
   "codexSet.custom.titleMultiline": "タイトルは1行で入力してください。",
   "codexSet.custom.bodyTooLarge": "このレイヤーは {bytes} バイトです。上限は {max} バイトです。",
-  "codexSet.custom.composedTooLarge": "有効なレイヤーを合わせると {bytes} バイトとなり、上限を超えます。",
+  "codexSet.custom.composedTooLarge":
+    "有効なレイヤーを合わせると {bytes} バイトとなり、上限を超えます。",
   "codexSet.custom.invalidCharacter": "位置 {position} の制御文字は保存できません。",
   "codexSet.custom.discardPrompt": "変更を破棄しますか？",
-  "codexSet.custom.discardOthersAndSave": "他のレイヤーの未保存の変更を破棄して、このレイヤーを保存しますか？",
+  "codexSet.custom.discardOthersAndSave":
+    "他のレイヤーの未保存の変更を破棄して、このレイヤーを保存しますか？",
   "codexSet.custom.keepEditing": "編集を続ける",
   "codexSet.custom.delete": "{title} を削除",
   "codexSet.custom.deleteConfirm": "このレイヤーを削除しますか？短い間だけ取り消せます。",
   "codexSet.custom.layerGone": "他の場所でそのレイヤーが削除されたため、エディターを閉じました。",
   "codexSet.custom.deleteConfirmNamed": "“{title}” を削除しますか？短い間だけ取り消せます。",
   "codexSet.custom.deletedNamed": "“{title}” を削除しました。",
-"codexSet.custom.moveUp": "{title} を上へ移動",
+  "codexSet.custom.moveUp": "{title} を上へ移動",
   "codexSet.custom.prevLayer": "前のレイヤー",
   "codexSet.custom.nextLayer": "次のレイヤー",
   "codexSet.custom.navPosition": "{position} / {total}",
@@ -1897,54 +2181,74 @@ export const ja: Record<TKey, string> = {
   "codexSet.custom.limitReached": "カスタムレイヤーは最大 {max} 個まで保存できます。",
   "codexSet.custom.composedSize": "合成結果: {bytes}/{max} バイト",
   "codexSet.custom.composedPreview": "合成された developer_instructions を表示",
-  "codexSet.custom.notOwned": "developer_instructions は opencodex の外部で作成されたため、ここでは編集できません。レイヤーとして管理するにはインポートしてください。",
+  "codexSet.custom.notOwned":
+    "developer_instructions は opencodex の外部で作成されたため、ここでは編集できません。レイヤーとして管理するにはインポートしてください。",
   "codexSet.custom.adopt": "既存の指示をインポート",
   "codexSet.custom.adoptConfirm": "レイヤーとしてインポート",
   "codexSet.custom.adoptRefused": "既存の値をインポートできませんでした。",
-  "codexSet.custom.baseReplaced": "model_instructions_file が {path} に設定されているため、opencodex の外部で基本プロンプトが置き換えられています。",
+  "codexSet.custom.baseReplaced":
+    "model_instructions_file が {path} に設定されているため、opencodex の外部で基本プロンプトが置き換えられています。",
   "codexSet.custom.baseReplacedOpen": "管理する",
   "codexSet.lint.identity": "Codex が設定するものとは異なるアイデンティティを名乗っています。",
-  "codexSet.lint.foreignTool": "ツールはレジストリから提供されます。ここに名前を書いてもツールは作成されません。",
-  "codexSet.lint.placeholder": "指示にはテンプレートエンジンが適用されないため、このまま送信されます。",
+  "codexSet.lint.foreignTool":
+    "ツールはレジストリから提供されます。ここに名前を書いてもツールは作成されません。",
+  "codexSet.lint.placeholder":
+    "指示にはテンプレートエンジンが適用されないため、このまま送信されます。",
   "codexSet.lint.applyPatch": "apply_patch は指示ではなく、ツールレジストリで定義されます。",
-  "codexSet.lint.approvalVocab": "Codex は独自の承認用語を挿入するため、これと矛盾する可能性があります。",
+  "codexSet.lint.approvalVocab":
+    "Codex は独自の承認用語を挿入するため、これと矛盾する可能性があります。",
   "codexSet.lint.environment": "環境情報は後で生成されるため、これと矛盾する可能性があります。",
-"codexSet.lint.size": "このレイヤーは 8 KB を超えています。保存はできますが、リクエストのたびにトークンを消費します。",
+  "codexSet.lint.size":
+    "このレイヤーは 8 KB を超えています。保存はできますが、リクエストのたびにトークンを消費します。",
   "codexSet.lint.secret": "資格情報や API キーのようです - config.toml に平文で保存されます。",
-  "codexSet.lint.ignoreInstructions": "Codex に自身の指示を無視させると、組み込みガイダンスが無効化されることがあります。",
+  "codexSet.lint.ignoreInstructions":
+    "Codex に自身の指示を無視させると、組み込みガイダンスが無効化されることがあります。",
   "codexSet.preset.blank": "空のレイヤー",
   "codexSet.preset.concise.name": "簡潔な出力",
   "codexSet.preset.concise.description": "短く答え、前置きと不要な書式を省きます。",
-  "codexSet.preset.concise.provenance": "Claude Code の簡潔さに関する指示をもとに翻案しました。独自の文言であり、複製ではありません。",
+  "codexSet.preset.concise.provenance":
+    "Claude Code の簡潔さに関する指示をもとに翻案しました。独自の文言であり、複製ではありません。",
   "codexSet.preset.planFirst.name": "編集前に計画",
   "codexSet.preset.planFirst.description": "計画を示してから変更します。",
-  "codexSet.preset.planFirst.provenance": "Claude Code の計画重視の方針をもとに翻案しました。独自の文言であり、複製ではありません。",
+  "codexSet.preset.planFirst.provenance":
+    "Claude Code の計画重視の方針をもとに翻案しました。独自の文言であり、複製ではありません。",
   "codexSet.preset.explainWhy.name": "理由を説明",
   "codexSet.preset.explainWhy.description": "何をするかだけでなく、理由も説明します。",
-  "codexSet.preset.explainWhy.provenance": "Grok Build の確認スタイルをもとに翻案しました。独自の文言であり、複製ではありません。",
+  "codexSet.preset.explainWhy.provenance":
+    "Grok Build の確認スタイルをもとに翻案しました。独自の文言であり、複製ではありません。",
   "codexSet.preset.testFirst.name": "テストを先に",
   "codexSet.preset.testFirst.description": "修正前に、失敗するテストを作成します。",
-  "codexSet.preset.testFirst.provenance": "一般的なエージェントの実践をもとに翻案しました。独自の文言であり、複製ではありません。",
+  "codexSet.preset.testFirst.provenance":
+    "一般的なエージェントの実践をもとに翻案しました。独自の文言であり、複製ではありません。",
   "codexSet.preset.korean.name": "韓国語で回答",
   "codexSet.preset.korean.description": "リクエストの言語にかかわらず、韓国語で回答します。",
-  "codexSet.preset.korean.provenance": "よく要望される項目をもとに opencodex 向けに作成しました。独自の文言であり、複製ではありません。",
+  "codexSet.preset.korean.provenance":
+    "よく要望される項目をもとに opencodex 向けに作成しました。独自の文言であり、複製ではありません。",
   "codexSet.dialog.class": "種類",
   "codexSet.dialog.key": "設定キー",
   "codexSet.dialog.fileValue": "このファイルの値",
   "codexSet.dialog.absentDefault": "未設定（デフォルト: {value}）",
-"codexSet.dialog.noRenderedText": "Codex は組み立て済みの組み込みレイヤー本文を公開していません。そのため、このダイアログには内容ではなくレイヤーの説明とキーを表示します。",
-  "codexSet.dialog.probeNotFound": "codex 実行ファイルが見つからず、レンダリング結果を測定できませんでした。",
-  "codexSet.dialog.probeUnsupported": "この Codex バージョンは測定コマンドに対応していないため、測定できませんでした。",
+  "codexSet.dialog.noRenderedText":
+    "Codex は組み立て済みの組み込みレイヤー本文を公開していません。そのため、このダイアログには内容ではなくレイヤーの説明とキーを表示します。",
+  "codexSet.dialog.probeNotFound":
+    "codex 実行ファイルが見つからず、レンダリング結果を測定できませんでした。",
+  "codexSet.dialog.probeUnsupported":
+    "この Codex バージョンは測定コマンドに対応していないため、測定できませんでした。",
   "codexSet.dialog.probeInvalid": "Codex の出力を解析できず、測定できませんでした。",
   "codexSet.dialog.probeFailed": "Codex プローブが完了せず、測定できませんでした。",
   "codexSet.dialog.probeBusy": "別の測定がまだ実行中です。しばらくしてから再試行してください。",
   "codexSet.dialog.sourceText": "モデルに送られる原文",
   "codexSet.dialog.sourceBytes": "{bytes} バイト",
-"codexSet.dialog.notRendered": "確認したターンでは、このレイヤーは何も送信していません。各セクションは内容が変わったときだけ再送されるため、一度の確認では欠けて見えることがあります。",
-  "codexSet.dialog.emptySource": "{path} のファイルは存在しますが空のため、このレイヤーは何も送信しません。",
-  "codexSet.dialog.notExposed": "基本プロンプトは Codex が出力するメッセージ一覧の外を通るため、ここには表示できません。model_instructions_file で置き換えることは可能です。",
-  "codexSet.dialog.unmapped": "このレイヤーにはプロンプト出力内で確認済みの対応付けがまだないため、ここにはテキストを表示できません。",
-  "codexSet.dialog.textUnavailable": "このマシンでは Codex のプロンプトを読み取れず、原文を表示できません。",
+  "codexSet.dialog.notRendered":
+    "確認したターンでは、このレイヤーは何も送信していません。各セクションは内容が変わったときだけ再送されるため、一度の確認では欠けて見えることがあります。",
+  "codexSet.dialog.emptySource":
+    "{path} のファイルは存在しますが空のため、このレイヤーは何も送信しません。",
+  "codexSet.dialog.notExposed":
+    "基本プロンプトは Codex が出力するメッセージ一覧の外を通るため、ここには表示できません。model_instructions_file で置き換えることは可能です。",
+  "codexSet.dialog.unmapped":
+    "このレイヤーにはプロンプト出力内で確認済みの対応付けがまだないため、ここにはテキストを表示できません。",
+  "codexSet.dialog.textUnavailable":
+    "このマシンでは Codex のプロンプトを読み取れず、原文を表示できません。",
   "codexSet.class.base": "基本指示",
   "codexSet.class.config-toggle": "ここで切り替え可能",
   "codexSet.class.feature-gated": "機能フラグ制御",
@@ -1961,48 +2265,62 @@ export const ja: Record<TKey, string> = {
   "codexSet.layer.tools": "ツール",
   "codexSet.layer.multi-agent-mode": "マルチエージェントモード",
   "codexSet.layer.git-attribution": "コミットの帰属表示",
-  "codexSet.about.base-instructions": "Codex 自体の指示です。リクエストに含まれ、無効にはできません。",
+  "codexSet.about.base-instructions":
+    "Codex 自体の指示です。リクエストに含まれ、無効にはできません。",
   "codexSet.about.model-switch": "会話の途中でセッションのモデルが変わると追加されます。",
   "codexSet.about.personality": "機能フラグで制御されるトーンと語調のガイダンスです。",
-  "codexSet.about.context-window-guidance": "機能フラグで制御される残りのコンテキスト予算のガイダンスです。",
+  "codexSet.about.context-window-guidance":
+    "機能フラグで制御される残りのコンテキスト予算のガイダンスです。",
   "codexSet.about.realtime": "リアルタイムセッションに追加されます。",
-  "codexSet.about.agents-md": "プロジェクトの AGENTS.md ファイルです。このページはレイヤーを表示するだけで、プロジェクト文書は編集しません。",
+  "codexSet.about.agents-md":
+    "プロジェクトの AGENTS.md ファイルです。このページはレイヤーを表示するだけで、プロジェクト文書は編集しません。",
   "codexSet.about.permissions": "現在適用されているサンドボックスと承認設定を説明します。",
   "codexSet.about.collaboration": "有効なコラボレーションモードを説明します。",
   "codexSet.about.environment": "作業ディレクトリ、プラットフォーム、その他の環境情報です。",
-  "codexSet.about.environments-instructions": "機能フラグで制御される遅延実行環境向けのガイダンスです。",
+  "codexSet.about.environments-instructions":
+    "機能フラグで制御される遅延実行環境向けのガイダンスです。",
   "codexSet.about.apps": "接続済みアプリの使用方法です。",
-  "codexSet.about.plugins": "プラグインが選択されているか、プラグインが機能を提供すると追加されます。",
+  "codexSet.about.plugins":
+    "プラグインが選択されているか、プラグインが機能を提供すると追加されます。",
   "codexSet.about.tools": "機能フラグで制御される遅延読み込みツールの説明です。",
   "codexSet.about.skills": "利用可能なスキルの一覧です。",
   "codexSet.about.multi-agent-mode": "機能フラグで制御されるサブエージェント向けの指示です。",
-  "codexSet.about.git-attribution": "モデルが書いたコミットに Co-authored-by: Codex トレーラーを、開いたプルリクエストに Generated with Codex. の行を追加させます。Codex がアカウントから取得するため、ここでも [features] でも変更できません。アカウント側で無効にすると、何も送らないのではなく逆の指示を送ります。",
+  "codexSet.about.git-attribution":
+    "モデルが書いたコミットに Co-authored-by: Codex トレーラーを、開いたプルリクエストに Generated with Codex. の行を追加させます。Codex がアカウントから取得するため、ここでも [features] でも変更できません。アカウント側で無効にすると、何も送らないのではなく逆の指示を送ります。",
   "codexSet.condition.model-switch": "セッション中にモデルが変わった後のみ含まれます。",
   "codexSet.condition.realtime": "リアルタイムセッションのみ含まれます。",
   "codexSet.condition.agents-md": "作業ディレクトリ用のプロジェクト文書が見つかると含まれます。",
-  "codexSet.condition.plugins": "プラグインが選択されているか、プラグインが機能を提供すると含まれます。",
+  "codexSet.condition.plugins":
+    "プラグインが選択されているか、プラグインが機能を提供すると含まれます。",
   "codexSet.condition.git-attribution": "アカウントの帰属表示ポリシーで決まります。",
   "codexSet.base.title": "ベースプロンプト",
   "codexSet.base.prev": "前のオプション",
   "codexSet.base.next": "次のオプション",
   "codexSet.base.position": "{position} / {total}",
-  "codexSet.base.swipeHint": "左右にスワイプするか、矢印キーか矢印ボタンでオプションを切り替えます。新しく開始したセッションに適用されます。",
+  "codexSet.base.swipeHint":
+    "左右にスワイプするか、矢印キーか矢印ボタンでオプションを切り替えます。新しく開始したセッションに適用されます。",
   "codexSet.base.defaultTitle": "Codex 自身のベースプロンプト",
-  "codexSet.base.defaultBody": "デフォルトはここに保存されないため、編集も削除もできません。選ぶと設定から model_instructions_file が削除され、Codex は同梱のプロンプトを使います。",
+  "codexSet.base.defaultBody":
+    "デフォルトはここに保存されないため、編集も削除もできません。選ぶと設定から model_instructions_file が削除され、Codex は同梱のプロンプトを使います。",
   "codexSet.base.variantTitle": "名前",
   "codexSet.base.variantBody": "プロンプト",
-  "codexSet.base.replacesWarning": "Codex 自身のベースプロンプトに追記するのではなく、丸ごと置き換えます。ここに短く書けば、モデルへの指示もその分だけになります。",
+  "codexSet.base.replacesWarning":
+    "Codex 自身のベースプロンプトに追記するのではなく、丸ごと置き換えます。ここに短く書けば、モデルへの指示もその分だけになります。",
   "codexSet.base.use": "これを使う",
   "codexSet.base.inUse": "使用中",
-  "codexSet.base.externalBlocked": "model_instructions_file はすでに {path} を指しており、opencodex が書いた値ではありません。自分で消してから選ぶか、バリアントとしてインポートしてください。",
+  "codexSet.base.externalBlocked":
+    "model_instructions_file はすでに {path} を指しており、opencodex が書いた値ではありません。自分で消してから選ぶか、バリアントとしてインポートしてください。",
   "codexSet.base.import": "バリアントとしてインポート",
-  "codexSet.base.importPreview": "{path} のファイルは管理対象バリアントに変換され、以下に表示されたとおりにインストールされます — タイトルは `#` 見出し行になり、本文は正規化されます(CRLF → LF、タブ → 半角スペース4つ)。",
-  "codexSet.base.importFormat": "そのまま保存されます: 合計 {serializedBytes} バイト(本文 {bodyBytes} バイト)。Codex は見出し行を含むファイル全体を読み込みます。",
+  "codexSet.base.importPreview":
+    "{path} のファイルは管理対象バリアントに変換され、以下に表示されたとおりにインストールされます — タイトルは `#` 見出し行になり、本文は正規化されます(CRLF → LF、タブ → 半角スペース4つ)。",
+  "codexSet.base.importFormat":
+    "そのまま保存されます: 合計 {serializedBytes} バイト(本文 {bodyBytes} バイト)。Codex は見出し行を含むファイル全体を読み込みます。",
   "codexSet.base.importTitle": "バリアント名",
   "codexSet.base.importTitlePending": "このタイトルのプレビューを更新しています…",
   "codexSet.base.importConfirm": "インポートして管理",
   "codexSet.base.importFailed": "ファイルをインポートできませんでした。",
-  "codexSet.base.importChanged": "プレビュー後にファイルまたはタイトルが変更されました。もう一度プレビューしてください。",
+  "codexSet.base.importChanged":
+    "プレビュー後にファイルまたはタイトルが変更されました。もう一度プレビューしてください。",
   "nav.api": "API",
   "nav.openMenu": "メニューを開く",
   "nav.closeMenu": "メニューを閉じる",
@@ -2011,7 +2329,8 @@ export const ja: Record<TKey, string> = {
   "nav.expandSidebar": "サイドバーを展開",
   "pws.refreshAllQuotas": "すべてのクォータを更新",
   "pws.quotaRefreshDone": "クォータの確認が完了しました",
-  "integrations.subtitle": "クライアントを opencodex に接続し、認証情報の管理とクライアント設定の復元を行います。",
+  "integrations.subtitle":
+    "クライアントを opencodex に接続し、認証情報の管理とクライアント設定の復元を行います。",
   "integrations.tabsLabel": "連携画面",
   "integrations.tab.overview": "概要",
   "integrations.tab.keys": "API キー",
@@ -2021,7 +2340,8 @@ export const ja: Record<TKey, string> = {
   "integrations.tab.opencode": "OpenCode",
   "integrations.tab.pi": "Pi",
   "integrations.tab.gentleShell": "Gentle Shell",
-  "integrations.semantics.gentleShell": "Gentle Shell を再起動すると保存済みホームのカタログが読み込まれます。リンク／共有ホームには Pi 連携を使用してください。",
+  "integrations.semantics.gentleShell":
+    "Gentle Shell を再起動すると保存済みホームのカタログが読み込まれます。リンク／共有ホームには Pi 連携を使用してください。",
   "integrations.tab.omp": "OMP",
   "integrations.tab.hermes": "Hermes",
   "integrations.tab.openclaw": "OpenClaw",
@@ -2036,32 +2356,40 @@ export const ja: Record<TKey, string> = {
   "integrations.tab.raycast": "Raycast",
   "integrations.tab.omo": "omo",
   "integrations.tab.qoderCn": "Qoder CN",
-  "integrations.semantics.qoderCn": "~/.qoder-cn/settings.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
+  "integrations.semantics.qoderCn":
+    "~/.qoder-cn/settings.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
   "integrations.tab.workbuddy": "WorkBuddy (CN)",
-  "integrations.semantics.workbuddy": "~/.workbuddy/models.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
+  "integrations.semantics.workbuddy":
+    "~/.workbuddy/models.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
   "integrations.tab.workbuddyAi": "WorkBuddy AI",
-  "integrations.semantics.workbuddyAi": "~/.workbuddy-ai/models.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
+  "integrations.semantics.workbuddyAi":
+    "~/.workbuddy-ai/models.json の OpenCodex モデルを管理します。ループバック接続が必要です。他の設定を保持し、元に戻すとスナップショットを復元します。",
   "integrations.tab.qoder": "Qoder",
   "integrations.tab.t3code": "T3 Code",
   "api.clientConfig.clientQoder": "Qoder",
   "api.clientConfig.clientT3code": "T3 Code",
-  "integrations.semantics.qoder": "~/.qoder/settings.json の OpenCodex プロバイダーとカスタムモデルを管理します。ループバック接続が必要です。他の設定は保持され、元に戻すとスナップショットが復元されます。",
-  "integrations.semantics.t3code": "~/.t3/userdata/settings.json に opencodex の Claude プロバイダーインスタンスを追加します（T3CODE_HOME で移動できます）。ルーティングされたモデルが T3 Code のモデル選択に表示されます。Codex 統合が有効で、T3 Code が同じ CODEX_HOME を使用している場合にのみ、Codex スレッドはプロキシを使用します。ループバック接続が必要です。他の設定は保持され、元に戻すとスナップショットが復元されます。",
+  "integrations.semantics.qoder":
+    "~/.qoder/settings.json の OpenCodex プロバイダーとカスタムモデルを管理します。ループバック接続が必要です。他の設定は保持され、元に戻すとスナップショットが復元されます。",
+  "integrations.semantics.t3code":
+    "~/.t3/userdata/settings.json に opencodex の Claude プロバイダーインスタンスを追加します（T3CODE_HOME で移動できます）。ルーティングされたモデルが T3 Code のモデル選択に表示されます。Codex 統合が有効で、T3 Code が同じ CODEX_HOME を使用している場合にのみ、Codex スレッドはプロキシを使用します。ループバック接続が必要です。他の設定は保持され、元に戻すとスナップショットが復元されます。",
   "integrations.tab.cline": "Cline CLI",
   "integrations.tab.kilo": "Kilo",
   "integrations.tab.droid": "Factory Droid",
   "integrations.droidReasoning.title": "推論レベルの既定値",
-  "integrations.droidReasoning.description": "リクエストに推論レベルが指定されていない場合にのみ既定値が使われます。Factory Droid を無効にすると、保存済みの既定値も削除されます。",
+  "integrations.droidReasoning.description":
+    "リクエストに推論レベルが指定されていない場合にのみ既定値が使われます。Factory Droid を無効にすると、保存済みの既定値も削除されます。",
   "integrations.droidReasoning.noDefault": "既定値なし",
   "integrations.droidReasoning.noEfforts": "利用可能な推論強度の選択肢はありません",
   "integrations.droidReasoning.noModels": "エクスポートされたモデルはありません。",
   "integrations.droidReasoning.modelDefault": "{model} の推論レベルの既定値",
-  "integrations.droidReasoning.unsupportedTitle": "一部の保存済み既定値はサポートされなくなりました。削除した後、変更を保存 / 確認して適用してください。",
+  "integrations.droidReasoning.unsupportedTitle":
+    "一部の保存済み既定値はサポートされなくなりました。削除した後、変更を保存 / 確認して適用してください。",
   "integrations.droidReasoning.unsupportedEffort": "未サポートのレベル: {effort}",
   "integrations.droidReasoning.clear": "既定値を削除",
   "integrations.droidReasoning.saveReview": "変更を保存 / 確認",
   "integrations.aside.profilesTitle": "Asideのプロファイル",
-  "integrations.aside.profilesHint": "選択したモデルを同期するプロファイルを選んでください。Asideで使用中のプロファイルは変わりません。",
+  "integrations.aside.profilesHint":
+    "選択したモデルを同期するプロファイルを選んでください。Asideで使用中のプロファイルは変わりません。",
   "integrations.aside.all": "すべてのプロファイルを同期",
   "integrations.aside.syncNow": "今すぐ同期",
   "integrations.aside.applied": "{total}件中{count}件のプロファイルに適用済み",
@@ -2071,18 +2399,23 @@ export const ja: Record<TKey, string> = {
   "integrations.aside.details": "{name}を管理",
   "integrations.aside.back": "Asideの全プロファイル",
   "integrations.aside.empty": "Asideを開き、接続するプロファイルを作成してください。",
-  "integrations.aside.partial": "一部のプロファイルに確認が必要です。同期設定は保存されています。各プロファイルの状態を確認してください。",
+  "integrations.aside.partial":
+    "一部のプロファイルに確認が必要です。同期設定は保存されています。各プロファイルの状態を確認してください。",
   "integrations.aside.pending": "同期設定を保存しました。ファイルの更新待ちです。",
   "integrations.aside.retry": "{name}を再試行",
-  "integrations.aside.loadError": "Asideのプロファイルを読み込めませんでした。再試行して状態を確認してください。",
+  "integrations.aside.loadError":
+    "Asideのプロファイルを読み込めませんでした。再試行して状態を確認してください。",
   "integrations.hermes.profilesTitle": "Hermesのプロファイル",
-  "integrations.hermes.profilesHint": "Hermesのプロファイルはそれぞれ独自のconfig.yamlを持ちます。接続するプロファイルを選んでください。他のプロファイルは変更されません。",
+  "integrations.hermes.profilesHint":
+    "Hermesのプロファイルはそれぞれ独自のconfig.yamlを持ちます。接続するプロファイルを選んでください。他のプロファイルは変更されません。",
   "integrations.hermes.defaultProfile": "デフォルトプロファイル",
   "integrations.hermes.select": "{name}を管理",
-  "integrations.hermes.loadError": "Hermesのプロファイルを読み込めませんでした。再試行して状態を確認してください。",
+  "integrations.hermes.loadError":
+    "Hermesのプロファイルを読み込めませんでした。再試行して状態を確認してください。",
   "integrations.hermes.profileTitle": "Hermesプロファイル: {name}",
   "integrations.codex.title": "Codex CLI",
-  "integrations.codex.body": "Codex の接続はプロキシサービスが管理します。opencodex を起動すると適用され、サービスを停止するとネイティブのルーティングに戻ります。",
+  "integrations.codex.body":
+    "Codex の接続はプロキシサービスが管理します。opencodex を起動すると適用され、サービスを停止するとネイティブのルーティングに戻ります。",
   "integrations.codex.openService": "サービス制御を開く",
   "integrations.state.notInstalled": "未インストール",
   "integrations.state.unknown": "確認中",
@@ -2098,42 +2431,66 @@ export const ja: Record<TKey, string> = {
   "integrations.detail.desktopNotServed": "プロファイルはありますが Desktop は別のものを使用中です",
   "integrations.detail.desktopAbsent": "適用されたプロファイルはありません",
   "integrations.detail.desktopDesiredOff": "Claude Desktop 連携はオフです",
-  "integrations.detail.desktopDesiredOffCleanupPending": "Claude Desktop はまだゲートウェイを使用しています。クリーンアップ待ちです",
-  "integrations.detail.desktopDesiredOnNotApplied": "連携はオンですが、Desktop はゲートウェイプロファイルを使用していません",
+  "integrations.detail.desktopDesiredOffCleanupPending":
+    "Claude Desktop はまだゲートウェイを使用しています。クリーンアップ待ちです",
+  "integrations.detail.desktopDesiredOnNotApplied":
+    "連携はオンですが、Desktop はゲートウェイプロファイルを使用していません",
   "integrations.detail.desktopSelectedElsewhere": "Desktop は別のプロファイルを使用しています",
   "integrations.detail.desktopProfileDrift": "選択された Desktop プロファイルが変更されました",
-  "integrations.detail.desktopObservedUnsafe": "選択された Desktop プロファイルは安全に変更できません",
-  "integrations.detail.desktopNotInstalled": "Claude Desktop の設定ライブラリがインストールされていません",
+  "integrations.detail.desktopObservedUnsafe":
+    "選択された Desktop プロファイルは安全に変更できません",
+  "integrations.detail.desktopNotInstalled":
+    "Claude Desktop の設定ライブラリがインストールされていません",
   "integrations.dialog.desktop.title": "Claude Desktop 連携を無効にしますか？",
-  "integrations.dialog.desktop.changes": "{path} に opencodex 管理のゲートウェイプロファイルがある場合、Desktop は先に認証情報のない標準プロファイルを選択し、その後で古いプロファイルとバックアップを削除します。",
-  "integrations.dialog.desktop.breakage": "Claude Desktop は opencodex 経由のモデルではなく、標準の Claude に戻ります。",
-  "integrations.dialog.desktop.undo": "再度有効にすると、保存済みのモデル割り当てから opencodex プロファイルを再生成します。",
-  "integrations.dialog.desktop.restart": "Claude Desktop は起動時にのみこの設定を読み取ります。変更を反映するには完全に終了して再起動してください。",
+  "integrations.dialog.desktop.changes":
+    "{path} に opencodex 管理のゲートウェイプロファイルがある場合、Desktop は先に認証情報のない標準プロファイルを選択し、その後で古いプロファイルとバックアップを削除します。",
+  "integrations.dialog.desktop.breakage":
+    "Claude Desktop は opencodex 経由のモデルではなく、標準の Claude に戻ります。",
+  "integrations.dialog.desktop.undo":
+    "再度有効にすると、保存済みのモデル割り当てから opencodex プロファイルを再生成します。",
+  "integrations.dialog.desktop.restart":
+    "Claude Desktop は起動時にのみこの設定を読み取ります。変更を反映するには完全に終了して再起動してください。",
   "integrations.dialog.desktop.confirm": "無効にする",
-  "integrations.native.error.desktopUnsafeMetadata": "{path} の Claude Desktop メタデータを安全に読み取れなかったため、ライブラリは変更されませんでした。",
-  "integrations.native.error.desktopCleanupIncomplete": "Claude Desktop は標準モードを指していますが、古い opencodex 認証情報ファイルが残っています: {paths}。",
+  "integrations.native.error.desktopUnsafeMetadata":
+    "{path} の Claude Desktop メタデータを安全に読み取れなかったため、ライブラリは変更されませんでした。",
+  "integrations.native.error.desktopCleanupIncomplete":
+    "Claude Desktop は標準モードを指していますが、古い opencodex 認証情報ファイルが残っています: {paths}。",
   "integrations.native.msg.desktopDisabled": "Claude Desktop 連携を無効にしました。",
   "integrations.native.msg.desktopEnabled": "Claude Desktop 連携を有効にしました。",
   "integrations.detail.grokModels": "モデル {count} 個を接続済み",
   "integrations.detail.grokAbsent": "設定に opencodex ブロックがありません",
   "integrations.dialog.codex.title": "Codex 連携を解除しますか？",
-  "integrations.dialog.codex.changes": "opencodex は {path} から自身のルーティングを削除し、生成したプロファイルを削除し、ネイティブのモデルカタログを復元し、再開可能なスレッドをネイティブ Codex 用に再タグ付けします。",
-  "integrations.dialog.codex.breakage": "通常の codex は OpenAI に直接接続し、他のプロバイダー経由でルーティングされていたモデルは Codex から消えます。プロキシと /v1/responses は他のクライアント向けに動作し続けます。",
-  "integrations.dialog.codex.undo": "再び有効にすると、その時点で利用できるモデルからルーティングカタログを再構築し、Codex を再注入します。再開可能な履歴は対応する方向で利用できるようになりますが、ファイルはバイト単位では復元されません。",
-  "integrations.dialog.codex.sideEffect": "opencodex が設定を注入した後にルートのルーティングモデルを選択していた場合、解除するとその選択も削除され、再有効化しても復元できません。モデルをもう一度選択してください。外部の model_provider が Codex を所有している場合、opencodex は古いジャーナルだけを削除し、設定・カタログ・履歴は変更しません。",
+  "integrations.dialog.codex.changes":
+    "opencodex は {path} から自身のルーティングを削除し、生成したプロファイルを削除し、ネイティブのモデルカタログを復元し、再開可能なスレッドをネイティブ Codex 用に再タグ付けします。",
+  "integrations.dialog.codex.breakage":
+    "通常の codex は OpenAI に直接接続し、他のプロバイダー経由でルーティングされていたモデルは Codex から消えます。プロキシと /v1/responses は他のクライアント向けに動作し続けます。",
+  "integrations.dialog.codex.undo":
+    "再び有効にすると、その時点で利用できるモデルからルーティングカタログを再構築し、Codex を再注入します。再開可能な履歴は対応する方向で利用できるようになりますが、ファイルはバイト単位では復元されません。",
+  "integrations.dialog.codex.sideEffect":
+    "opencodex が設定を注入した後にルートのルーティングモデルを選択していた場合、解除するとその選択も削除され、再有効化しても復元できません。モデルをもう一度選択してください。外部の model_provider が Codex を所有している場合、opencodex は古いジャーナルだけを削除し、設定・カタログ・履歴は変更しません。",
   "integrations.dialog.codex.confirm": "解除",
   "integrations.dialog.grok.title": "Grok Build 連携を解除しますか？",
-  "integrations.dialog.grok.changes": "{path} から、opencodex が印を付けたブロックだけを削除します。ブロック外に直接書いた内容はそのまま残します。",
-  "integrations.dialog.grok.breakage": "解除すると、Grok Build から opencodex のモデルエイリアスが消えます。xAI アカウントで使用していたモデルはそのままです。",
-  "integrations.dialog.grok.undo": "opencodex が loopback アドレスで実行中なら、再び有効にしたとき、現在利用できるモデル一覧からブロックを新しく書き込みます。",
+  "integrations.dialog.grok.changes":
+    "{path} から、opencodex が印を付けたブロックだけを削除します。ブロック外に直接書いた内容はそのまま残します。",
+  "integrations.dialog.grok.breakage":
+    "解除すると、Grok Build から opencodex のモデルエイリアスが消えます。xAI アカウントで使用していたモデルはそのままです。",
+  "integrations.dialog.grok.undo":
+    "opencodex が loopback アドレスで実行中なら、再び有効にしたとき、現在利用できるモデル一覧からブロックを新しく書き込みます。",
   "integrations.dialog.grok.confirm": "解除",
-  "integrations.native.msg.nonLoopbackRemoved": "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。loopback アドレスを指していた以前のブロックを削除しました。",
-  "integrations.native.msg.nonLoopbackRemovedNoop": "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。削除する以前のブロックはありませんでした。",
-  "integrations.native.msg.nonLoopbackSuperseded": "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。その間に別の場所から設定へ新しいブロックが書かれたため、現在ファイルにあるブロックはこのリクエストが作成したものではありません。",
-  "integrations.native.error.orphanedMarker": "{path} に opencodex の開始マーカーはありますが、終了マーカーがありません。ブロックの終端を特定できないため、ファイルは変更していません。",
-  "integrations.native.error.homeMismatch": "インストール済みサービスのホームと現在のホームが一致しないため、ファイルは変更していません。",
-  "integrations.native.error.notInstalled": "Grok Build がインストールされていないため、変更できません。",
-  "integrations.native.error.configBusy": "別の場所で設定を保存中のため、変更できませんでした。しばらくしてから再試行してください。",
+  "integrations.native.msg.nonLoopbackRemoved":
+    "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。loopback アドレスを指していた以前のブロックを削除しました。",
+  "integrations.native.msg.nonLoopbackRemovedNoop":
+    "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。削除する以前のブロックはありませんでした。",
+  "integrations.native.msg.nonLoopbackSuperseded":
+    "Grok Build を自動登録できるのは、opencodex が loopback アドレスで実行中の場合だけです。その間に別の場所から設定へ新しいブロックが書かれたため、現在ファイルにあるブロックはこのリクエストが作成したものではありません。",
+  "integrations.native.error.orphanedMarker":
+    "{path} に opencodex の開始マーカーはありますが、終了マーカーがありません。ブロックの終端を特定できないため、ファイルは変更していません。",
+  "integrations.native.error.homeMismatch":
+    "インストール済みサービスのホームと現在のホームが一致しないため、ファイルは変更していません。",
+  "integrations.native.error.notInstalled":
+    "Grok Build がインストールされていないため、変更できません。",
+  "integrations.native.error.configBusy":
+    "別の場所で設定を保存中のため、変更できませんでした。しばらくしてから再試行してください。",
   "integrations.state.absent": "未適用",
   "integrations.state.current": "適用済み",
   "integrations.state.stale": "更新が必要",
@@ -2144,9 +2501,11 @@ export const ja: Record<TKey, string> = {
   "integrations.summary.stale": "更新が必要",
   "integrations.summary.lastChange": "最終変更",
   "integrations.summary.disableAll": "すべて無効にする…",
-  "integrations.onboarding": "適用時は、先にバックアップを保存してから opencodex プロバイダーブロックを 1 つだけ書き込みます。無効化時はそのブロックだけを削除し、保存されたスナップショットから復元できます。",
+  "integrations.onboarding":
+    "適用時は、先にバックアップを保存してから opencodex プロバイダーブロックを 1 つだけ書き込みます。無効化時はそのブロックだけを削除し、保存されたスナップショットから復元できます。",
   "integrations.empty.title": "インストール済みのクライアントが検出されませんでした",
-  "integrations.empty.body": "対応クライアントをインストールしてから、ここに戻って opencodex を適用してください。",
+  "integrations.empty.body":
+    "対応クライアントをインストールしてから、ここに戻って opencodex を適用してください。",
   "integrations.action.apply": "適用",
   "integrations.action.disable": "無効にする",
   "integrations.action.refresh": "更新",
@@ -2158,51 +2517,69 @@ export const ja: Record<TKey, string> = {
   "integrations.action.snapshotExpired": "バックアップ期限切れ",
   "integrations.rollback.title": "復元センター",
   "integrations.rollback.empty": "適用履歴はまだありません",
-  "integrations.rollback.emptyBody": "書き込みが成功するたびに、変更前のスナップショットが先に保存されます。",
+  "integrations.rollback.emptyBody":
+    "書き込みが成功するたびに、変更前のスナップショットが先に保存されます。",
   "integrations.catalog.title": "クライアント",
   "integrations.rollback.older": "以前の操作",
   "integrations.rollback.showMore": "さらに {n} 件表示",
   "integrations.rollback.failed": "ロールバック履歴を読み込めませんでした。",
   "integrations.rollback.delete": "削除",
   "integrations.rollback.deleteAria": "{at} のロールバック履歴を削除",
-  "integrations.rollback.deleteNewest": "このクライアントの最新の履歴は、元に戻せるように残されます。",
+  "integrations.rollback.deleteNewest":
+    "このクライアントの最新の履歴は、元に戻せるように残されます。",
   "integrations.rollback.deleteGone": "この履歴はすでに削除されています。一覧を再読み込みします。",
   "integrations.dialog.deleteEntry.title": "このロールバック履歴を削除しますか？",
-  "integrations.dialog.deleteEntry.changes": "この履歴がロールバック一覧から消え、{path} 用に残っているバックアップもディスクから削除されます。",
-  "integrations.dialog.deleteEntry.breakage": "この時点にファイルを戻すことはできなくなります。より新しい履歴とファイル自体はそのままです。",
-  "integrations.dialog.deleteEntry.undo": "元に戻せません。クライアントごとの最新の履歴は削除されずに残ります。",
+  "integrations.dialog.deleteEntry.changes":
+    "この履歴がロールバック一覧から消え、{path} 用に残っているバックアップもディスクから削除されます。",
+  "integrations.dialog.deleteEntry.breakage":
+    "この時点にファイルを戻すことはできなくなります。より新しい履歴とファイル自体はそのままです。",
+  "integrations.dialog.deleteEntry.undo":
+    "元に戻せません。クライアントごとの最新の履歴は削除されずに残ります。",
   "integrations.dialog.deleteEntry.confirm": "履歴を削除",
   "integrations.restore.title": "このスナップショットを復元しますか？",
-  "integrations.restore.body": "現在のファイルを先にバックアップしてから、選択したスナップショットで置き換えます。",
+  "integrations.restore.body":
+    "現在のファイルを先にバックアップしてから、選択したスナップショットで置き換えます。",
   "integrations.restore.driftTitle": "新しい編集が検出されました",
-  "integrations.restore.driftBody": "このスナップショット以降の変更をバックアップしてから、ファイルを置き換えます。",
+  "integrations.restore.driftBody":
+    "このスナップショット以降の変更をバックアップしてから、ファイルを置き換えます。",
   "integrations.restore.confirm": "復元",
   "integrations.restore.confirmDrift": "新しい編集をバックアップして復元",
   "integrations.restore.pending": "復元中…",
-  "integrations.restore.manual": "自動復元に失敗しました: {reason}。{path} から手動で復元してください。",
+  "integrations.restore.manual":
+    "自動復元に失敗しました: {reason}。{path} から手動で復元してください。",
   "integrations.error.load": "連携状態を読み込めませんでした。",
   "integrations.error.stale": "最新の更新に失敗しました。以下の値は古い可能性があります。",
-  "integrations.error.busy": "このクライアントに対する別の変更が実行中です。しばらくしてから再試行してください。",
-  "integrations.error.conflict": "opencodex の書き込み後に設定が変更されました。何も削除していません。",
+  "integrations.error.busy":
+    "このクライアントに対する別の変更が実行中です。しばらくしてから再試行してください。",
+  "integrations.error.conflict":
+    "opencodex の書き込み後に設定が変更されました。何も削除していません。",
   "integrations.error.unsafe": "設定を安全に変更できません。",
   "integrations.error.generic": "連携の変更に失敗しました。以前の状態は保持されています。",
-  "integrations.error.nonLoopback": "{client} は localhost のプロキシにしか接続できません。リモートバインドに必要な認証ヘッダーを置く場所が設定ファイルになく、手動で書いても同じです。トンネルやローカルフォワーダーで loopback 経路を用意してください。",
+  "integrations.error.nonLoopback":
+    "{client} は localhost のプロキシにしか接続できません。リモートバインドに必要な認証ヘッダーを置く場所が設定ファイルになく、手動で書いても同じです。トンネルやローカルフォワーダーで loopback 経路を用意してください。",
   "integrations.status.installed": "インストール済み",
   "integrations.status.notInstalled": "未インストール",
   "integrations.status.appliedAt": "適用",
-  "integrations.status.supersededStore": "このクライアントは現在 {path} からプロバイダーを読み込みます。opencodex はこのファイルを書き込まないため、ここで有効にしても読み込む内容は変わりません。",
-  "integrations.status.missingStore": "このクライアントはプロバイダーを {path} に保存していますが、このファイルがありません。クライアントは次回起動時に古い設定ファイルを移動して取り込むため、opencodex は代わりにその設定ファイルへ書き込むことはしません。{path} を内容 {document} で作成してから、もう一度「適用」を押してください。",
-  "integrations.status.candidateConflict": "別の Kilo 設定ファイル {path} にも provider.opencodex が定義されています。適用する前に、そのファイルから provider.opencodex を削除してください。",
+  "integrations.status.supersededStore":
+    "このクライアントは現在 {path} からプロバイダーを読み込みます。opencodex はこのファイルを書き込まないため、ここで有効にしても読み込む内容は変わりません。",
+  "integrations.status.missingStore":
+    "このクライアントはプロバイダーを {path} に保存していますが、このファイルがありません。クライアントは次回起動時に古い設定ファイルを移動して取り込むため、opencodex は代わりにその設定ファイルへ書き込むことはしません。{path} を内容 {document} で作成してから、もう一度「適用」を押してください。",
+  "integrations.status.candidateConflict":
+    "別の Kilo 設定ファイル {path} にも provider.opencodex が定義されています。適用する前に、そのファイルから provider.opencodex を削除してください。",
   "integrations.status.backup": "バックアップ",
   "integrations.status.lastRestore": "最終復元",
   "integrations.status.unknown": "不明",
   "integrations.bulk.title": "適用済みのクライアント連携を無効にしますか？",
-  "integrations.bulk.body": "opencodex が所有するブロックだけを削除します。各クライアントについて、変更前のスナップショットを保存します。",
+  "integrations.bulk.body":
+    "opencodex が所有するブロックだけを削除します。各クライアントについて、変更前のスナップショットを保存します。",
   "integrations.bulk.partial": "一部のクライアントを無効にできませんでした: {clients}",
   "integrations.bulk.success": "適用済みのクライアント連携を無効にしました。",
-  "integrations.retention.degraded": "バックアップの整理が遅れています。古いバックアップがディスクに残っている可能性があります。",
-  "integrations.error.residual": "ファイルが中間状態のままの可能性があります: {message} {path} から復元してください。",
-  "integrations.error.residualNoSnapshot": "{message} 自動復旧が完了しませんでした。再試行する前にクライアントの設定を確認してください。",
+  "integrations.retention.degraded":
+    "バックアップの整理が遅れています。古いバックアップがディスクに残っている可能性があります。",
+  "integrations.error.residual":
+    "ファイルが中間状態のままの可能性があります: {message} {path} から復元してください。",
+  "integrations.error.residualNoSnapshot":
+    "{message} 自動復旧が完了しませんでした。再試行する前にクライアントの設定を確認してください。",
   "integrations.error.recover": "{message} バックアップは {path} にあります。",
   "integrations.kind.apply": "適用",
   "integrations.kind.disable": "解除",
@@ -2210,24 +2587,34 @@ export const ja: Record<TKey, string> = {
   "integrations.kind.restore": "復元",
   "integrations.kind.overwrite": "上書き",
   "integrations.dialog.overwrite.title": "この設定ファイルのブロックを置き換えますか？",
-  "integrations.dialog.overwrite.changesUnowned": "{path} で opencodex が必要とする位置を、opencodex が書いたのではないブロックが占めています。適用すると opencodex が書くブロックに置き換わります。",
-  "integrations.dialog.overwrite.changesForeign": "{path} の opencodex ブロックに加えた変更は破棄され、opencodex が書くブロックに置き換わります。",
-  "integrations.dialog.overwrite.breakage": "そのブロックが設定していた内容は効かなくなります。ファイルの他の部分はそのままです。",
-  "integrations.dialog.overwrite.undo": "先にスナップショットを保存するので、下のロールバック一覧に残り、元に戻せます。",
+  "integrations.dialog.overwrite.changesUnowned":
+    "{path} で opencodex が必要とする位置を、opencodex が書いたのではないブロックが占めています。適用すると opencodex が書くブロックに置き換わります。",
+  "integrations.dialog.overwrite.changesForeign":
+    "{path} の opencodex ブロックに加えた変更は破棄され、opencodex が書くブロックに置き換わります。",
+  "integrations.dialog.overwrite.breakage":
+    "そのブロックが設定していた内容は効かなくなります。ファイルの他の部分はそのままです。",
+  "integrations.dialog.overwrite.undo":
+    "先にスナップショットを保存するので、下のロールバック一覧に残り、元に戻せます。",
   "integrations.dialog.overwrite.confirm": "置き換える",
   "integrations.action.overwrite": "置き換える",
   "integrations.preview.loading": "正確な変更プランを読み込んでいます…",
   "integrations.preview.failed": "変更プランを読み込めませんでした。変更は行われていません。",
-  "integrations.preview.stale": "確認中に統合の状態が変わりました。更新されたプランを確認して、もう一度確定してください。",
+  "integrations.preview.stale":
+    "確認中に統合の状態が変わりました。更新されたプランを確認して、もう一度確定してください。",
   "integrations.dialog.apply.title": "この統合を適用しますか？",
-  "integrations.dialog.apply.changes": "opencodex が管理するプロバイダー設定をクライアント設定に追加します。",
-  "integrations.dialog.apply.breakage": "クライアントは、この opencodex インスタンスが現在公開しているモデルを使用します。",
-  "integrations.dialog.apply.undo": "先にバックアップが保存され、ロールバックセンターから元に戻せます。",
+  "integrations.dialog.apply.changes":
+    "opencodex が管理するプロバイダー設定をクライアント設定に追加します。",
+  "integrations.dialog.apply.breakage":
+    "クライアントは、この opencodex インスタンスが現在公開しているモデルを使用します。",
+  "integrations.dialog.apply.undo":
+    "先にバックアップが保存され、ロールバックセンターから元に戻せます。",
   "integrations.dialog.apply.confirm": "適用",
   "integrations.dialog.disable.title": "この統合を無効にしますか？",
   "integrations.dialog.disable.changes": "opencodex が所有する設定だけを削除します。",
-  "integrations.dialog.disable.breakage": "クライアントは、この opencodex インスタンス経由のモデルを使用しなくなります。",
-  "integrations.dialog.disable.undo": "先にバックアップが保存され、ロールバックセンターから元に戻せます。",
+  "integrations.dialog.disable.breakage":
+    "クライアントは、この opencodex インスタンス経由のモデルを使用しなくなります。",
+  "integrations.dialog.disable.undo":
+    "先にバックアップが保存され、ロールバックセンターから元に戻せます。",
   "integrations.dialog.disable.confirm": "無効にする",
   "integrations.plan.heading": "サーバー変更プラン",
   "integrations.plan.operation": "操作: {operation}",
@@ -2245,40 +2632,64 @@ export const ja: Record<TKey, string> = {
   "integrations.plan.foreign.unowned": "opencodex が所有していない設定ブロックを置き換えます。",
   "integrations.plan.foreign.foreignEdit": "opencodex 管理ブロック内の編集を置き換えます。",
   "integrations.plan.foreign.drift": "このロールバック地点以降にファイルが変更されています。",
-  "integrations.plan.noop.applied": "管理対象のクライアント文書を変更する必要はありません。統合設定はすでに存在します。",
-  "integrations.plan.noop.disabled": "管理対象のクライアント文書を変更する必要はありません。統合設定はすでに存在しません。",
-  "integrations.plan.noop.profilePreference": "確認すると、プロファイルの同期設定は引き続き保存されます。",
+  "integrations.plan.noop.applied":
+    "管理対象のクライアント文書を変更する必要はありません。統合設定はすでに存在します。",
+  "integrations.plan.noop.disabled":
+    "管理対象のクライアント文書を変更する必要はありません。統合設定はすでに存在しません。",
+  "integrations.plan.noop.profilePreference":
+    "確認すると、プロファイルの同期設定は引き続き保存されます。",
   "integrations.plan.refused": "サーバーはこのプランを安全に適用できません。",
-  "integrations.plan.refusal.notInstalled": "クライアントがインストールされていません。インストール後にページを更新し、変更をもう一度確認してください。",
-  "integrations.plan.refusal.conflict": "管理対象の設定が現在のファイルと競合しています。ファイルを確認するか、利用可能な場合は置き換えを使用してください。",
-  "integrations.plan.refusal.unsafe": "クライアント設定を安全に変更できません。ファイルを修復または置き換えてから再試行してください。",
-  "integrations.plan.refusal.nonLoopback": "このクライアントにはループバックのプロキシアドレスが必要です。localhost、トンネル、またはローカル転送を使用してください。",
-  "integrations.plan.refusal.supersededStore": "このクライアントは opencodex が書き込まないファイルからプロバイダーを読み込むため、この操作では読み込む内容は変わりません。",
-  "integrations.plan.refusal.missingStore": "このクライアントがプロバイダーを保存するファイルがありません。クライアントは次回起動時に古い設定ファイルを移動するため、opencodex は代わりにその設定ファイルへ書き込むことはしません。このファイルを内容 {document} で作成してから、もう一度「適用」を押してください。",
-  "integrations.plan.refusal.driftRequiresConfirm": "このロールバック地点以降にファイルが変更されました。変更を考慮したプランを確認してから復元してください。",
-  "integrations.plan.refusal.snapshotExpired": "このロールバック地点のバックアップは期限切れのため、復元できません。",
-  "integrations.plan.refusal.writeFailed": "サーバーは安全な書き込みを準備できませんでした。統合状態を更新してから再試行してください。",
+  "integrations.plan.refusal.notInstalled":
+    "クライアントがインストールされていません。インストール後にページを更新し、変更をもう一度確認してください。",
+  "integrations.plan.refusal.conflict":
+    "管理対象の設定が現在のファイルと競合しています。ファイルを確認するか、利用可能な場合は置き換えを使用してください。",
+  "integrations.plan.refusal.unsafe":
+    "クライアント設定を安全に変更できません。ファイルを修復または置き換えてから再試行してください。",
+  "integrations.plan.refusal.nonLoopback":
+    "このクライアントにはループバックのプロキシアドレスが必要です。localhost、トンネル、またはローカル転送を使用してください。",
+  "integrations.plan.refusal.supersededStore":
+    "このクライアントは opencodex が書き込まないファイルからプロバイダーを読み込むため、この操作では読み込む内容は変わりません。",
+  "integrations.plan.refusal.missingStore":
+    "このクライアントがプロバイダーを保存するファイルがありません。クライアントは次回起動時に古い設定ファイルを移動するため、opencodex は代わりにその設定ファイルへ書き込むことはしません。このファイルを内容 {document} で作成してから、もう一度「適用」を押してください。",
+  "integrations.plan.refusal.driftRequiresConfirm":
+    "このロールバック地点以降にファイルが変更されました。変更を考慮したプランを確認してから復元してください。",
+  "integrations.plan.refusal.snapshotExpired":
+    "このロールバック地点のバックアップは期限切れのため、復元できません。",
+  "integrations.plan.refusal.writeFailed":
+    "サーバーは安全な書き込みを準備できませんでした。統合状態を更新してから再試行してください。",
   "integrations.mutation.pending": "確認済みの変更を適用しています…",
-  "integrations.bulk.breakage": "各クライアントは、この opencodex インスタンス経由のモデルを使用しなくなります。",
+  "integrations.bulk.breakage":
+    "各クライアントは、この opencodex インスタンス経由のモデルを使用しなくなります。",
   "integrations.bulk.undo": "各クライアントに個別のバックアップとロールバック履歴が残ります。",
   "integrations.bulk.confirm": "すべて無効にする",
-  "integrations.semantics.opencode": "ディスクから直接起動した場合にのみ適用されます。ocx opencode の環境注入が優先されます。",
+  "integrations.semantics.opencode":
+    "ディスクから直接起動した場合にのみ適用されます。ocx opencode の環境注入が優先されます。",
   "integrations.semantics.pi": "新しいセッションから適用されます。",
   "integrations.semantics.omp": "カタログを読み込むには OMP を再起動してください。",
   "integrations.semantics.hermes": "新しいセッションから適用されます。",
   "integrations.semantics.openclaw": "実行中のゲートウェイにすぐ適用されます。",
-  "integrations.semantics.kimi": "再起動するか /reload を実行すると適用されます（v2 はファイルを監視します）。",
+  "integrations.semantics.kimi":
+    "再起動するか /reload を実行すると適用されます（v2 はファイルを監視します）。",
   "integrations.semantics.gajae": "新しいセッション、または /model を開いたときに適用されます。",
-  "integrations.semantics.dsh": "OpenCodex が管理するのは $DSH_HOME/profiles/desktop/cordis.patch.yml（DSH 0.1.7 以降が読む Desktop プロファイル。存在しない間は $DSH_HOME/settings.yaml）の llm-pi-ai 行にある opencodex プロバイダーだけです。DSH はこのプロバイダーをホットリロードし、既定のモデルと deepseek-official は変更しません。現在はループバック専用で、実際の認証情報は書き込みません。",
-  "integrations.semantics.mcode": "custom_provider.opencodex のみを管理します。既定モデルと MiniMax ログインは変更しません。",
-  "integrations.semantics.zcode": "~/.zcode/v2/config.json の provider.opencodex のみを管理します。Z.ai ログインと他のプロバイダーは変更しません。変更後は ZCode を再起動してください。",
-  "integrations.semantics.commandcode": "~/.commandcode/providers.json の OpenCodex プロバイダー項目のみを管理します。他のプロバイダーや設定は変更しません。",
-  "integrations.semantics.prime": "Prime Agent の models.json 内の providers.opencodex のみを管理します。場所は ~/.prime/agent ですが、PRIME_AGENT_CODING_AGENT_DIR が設定されている場合はそちらが優先されます。他のプロバイダーとモデルオーバーライドは変更しません。新しいセッションから適用されます。",
-  "integrations.semantics.aside": "このプロファイルの ~/.aside/u/<id>/models.json 内の providers.opencodex のみを管理します。他のプロバイダーは変更しません。適用後は Aside を完全に終了してから開き直してください。",
-  "integrations.semantics.raycast": "Raycast の providers.yaml に OpenCodex のプロバイダーエントリを追加し、ルーティングされたすべてのモデルを Raycast AI のモデル選択に表示します。Raycast Pro が必要です。",
-  "integrations.semantics.omo": "omo の models.json にある providers.opencodex のみを管理します。場所は ~/.omo/agent で、OMO_CODING_AGENT_DIR・SENPI_CODING_AGENT_DIR・PI_CODING_AGENT_DIR のいずれかが設定されている場合はそちらが優先されます。他のプロバイダーは変更しません。新しいセッションから適用されます。",
+  "integrations.semantics.dsh":
+    "OpenCodex が管理するのは $DSH_HOME/profiles/desktop/cordis.patch.yml（DSH 0.1.7 以降が読む Desktop プロファイル。存在しない間は $DSH_HOME/settings.yaml）の llm-pi-ai 行にある opencodex プロバイダーだけです。DSH はこのプロバイダーをホットリロードし、既定のモデルと deepseek-official は変更しません。現在はループバック専用で、実際の認証情報は書き込みません。",
+  "integrations.semantics.mcode":
+    "custom_provider.opencodex のみを管理します。既定モデルと MiniMax ログインは変更しません。",
+  "integrations.semantics.zcode":
+    "~/.zcode/v2/config.json の provider.opencodex のみを管理します。Z.ai ログインと他のプロバイダーは変更しません。変更後は ZCode を再起動してください。",
+  "integrations.semantics.commandcode":
+    "~/.commandcode/providers.json の OpenCodex プロバイダー項目のみを管理します。他のプロバイダーや設定は変更しません。",
+  "integrations.semantics.prime":
+    "Prime Agent の models.json 内の providers.opencodex のみを管理します。場所は ~/.prime/agent ですが、PRIME_AGENT_CODING_AGENT_DIR が設定されている場合はそちらが優先されます。他のプロバイダーとモデルオーバーライドは変更しません。新しいセッションから適用されます。",
+  "integrations.semantics.aside":
+    "このプロファイルの ~/.aside/u/<id>/models.json 内の providers.opencodex のみを管理します。他のプロバイダーは変更しません。適用後は Aside を完全に終了してから開き直してください。",
+  "integrations.semantics.raycast":
+    "Raycast の providers.yaml に OpenCodex のプロバイダーエントリを追加し、ルーティングされたすべてのモデルを Raycast AI のモデル選択に表示します。Raycast Pro が必要です。",
+  "integrations.semantics.omo":
+    "omo の models.json にある providers.opencodex のみを管理します。場所は ~/.omo/agent で、OMO_CODING_AGENT_DIR・SENPI_CODING_AGENT_DIR・PI_CODING_AGENT_DIR のいずれかが設定されている場合はそちらが優先されます。他のプロバイダーは変更しません。新しいセッションから適用されます。",
   "integrations.lazycodexRoles.title": "omo (Codex / LazyCodex) のロールモデル",
-  "integrations.lazycodexRoles.hint": "各ロールが使うモデルと推論負荷を選びます。保存すると $CODEX_HOME/agents のロールファイルが更新され、安全に書き換えられる場合は LazyCodex の omo.jsonc も更新されます。「推論エフォートを継承」を選ぶと推論負荷は Codex に任せます。",
+  "integrations.lazycodexRoles.hint":
+    "各ロールが使うモデルと推論負荷を選びます。保存すると $CODEX_HOME/agents のロールファイルが更新され、安全に書き換えられる場合は LazyCodex の omo.jsonc も更新されます。「推論エフォートを継承」を選ぶと推論負荷は Codex に任せます。",
   "integrations.lazycodexRoles.role": "ロール",
   "integrations.lazycodexRoles.current": "現在",
   "integrations.lazycodexRoles.model": "新しいモデル",
@@ -2292,21 +2703,31 @@ export const ja: Record<TKey, string> = {
   "integrations.lazycodexRoles.loadFailed": "Codex エージェントロールを読み込めませんでした。",
   "integrations.lazycodexRoles.saveFailed": "{role} のモデルを保存できませんでした。",
   "integrations.lazycodexRoles.saved": "{role} は {model} で動作します。",
-  "integrations.lazycodexRoles.omoAbsent": "{role} は {model} で動作します。omo.jsonc が見つからないため、ロールファイルだけを変更しました。",
-  "integrations.lazycodexRoles.omoComments": "{role} は {model} で動くようになりました。omo.jsonc には保存で消えるコメントがあるため変更していません。[codex].agents.{role} はご自身で設定してください。",
-  "integrations.lazycodexRoles.omoInvalid": "{role} は {model} で動くようになりました。omo.jsonc は LazyCodex が読む形の有効な JSON ではないため変更していません。",
-  "integrations.lazycodexRoles.omoFailed": "{role} は {model} で動くようになりましたが、omo.jsonc は書き込めませんでした。",
+  "integrations.lazycodexRoles.omoAbsent":
+    "{role} は {model} で動作します。omo.jsonc が見つからないため、ロールファイルだけを変更しました。",
+  "integrations.lazycodexRoles.omoComments":
+    "{role} は {model} で動くようになりました。omo.jsonc には保存で消えるコメントがあるため変更していません。[codex].agents.{role} はご自身で設定してください。",
+  "integrations.lazycodexRoles.omoInvalid":
+    "{role} は {model} で動くようになりました。omo.jsonc は LazyCodex が読む形の有効な JSON ではないため変更していません。",
+  "integrations.lazycodexRoles.omoFailed":
+    "{role} は {model} で動くようになりましたが、omo.jsonc は書き込めませんでした。",
   "integrations.lazycodexRoles.retryMirror": "omo.jsonc を再試行",
   "integrations.lazycodexRoles.history.title": "変更履歴",
-  "integrations.lazycodexRoles.history.hint": "このセクションでの保存と自動割り当てのうち、新しい 50 件が操作単位でここに記録されます。元に戻すと以前のモデルと推論強度が通常の保存と同じ方法で書き戻され、その操作も記録されます。以前モデルが固定されていなかったロールは現在のモデルを保ち、推論強度だけを戻します。",
-  "integrations.lazycodexRoles.history.unavailable": "変更履歴を読み込めなかったため、元に戻す機能は使えません。ロールの編集はそのまま使えます。",
+  "integrations.lazycodexRoles.history.hint":
+    "このセクションでの保存と自動割り当てのうち、新しい 50 件が操作単位でここに記録されます。元に戻すと以前のモデルと推論強度が通常の保存と同じ方法で書き戻され、その操作も記録されます。以前モデルが固定されていなかったロールは現在のモデルを保ち、推論強度だけを戻します。",
+  "integrations.lazycodexRoles.history.unavailable":
+    "変更履歴を読み込めなかったため、元に戻す機能は使えません。ロールの編集はそのまま使えます。",
   "integrations.lazycodexRoles.history.restore": "元に戻す",
-  "integrations.lazycodexRoles.history.restored": "{count} 件のロールを {time} より前の状態に戻しました。",
-  "integrations.lazycodexRoles.history.partial": "{role} で元に戻す処理が止まりました。{total} 件中 {count} 件のロールが戻り、残りは現在の値のままです。上のエラーを解消してからもう一度元に戻してください。",
-  "integrations.lazycodexRoles.omoCommentsState": "omo.jsonc にコメントがあるため、ここで保存するとロールファイルだけが更新されます。omo.jsonc の [codex].agents はご自身で設定してください。",
+  "integrations.lazycodexRoles.history.restored":
+    "{count} 件のロールを {time} より前の状態に戻しました。",
+  "integrations.lazycodexRoles.history.partial":
+    "{role} で元に戻す処理が止まりました。{total} 件中 {count} 件のロールが戻り、残りは現在の値のままです。上のエラーを解消してからもう一度元に戻してください。",
+  "integrations.lazycodexRoles.omoCommentsState":
+    "omo.jsonc にコメントがあるため、ここで保存するとロールファイルだけが更新されます。omo.jsonc の [codex].agents はご自身で設定してください。",
   "integrations.lazycodexRoles.auto.button": "自動割り当て",
   "integrations.lazycodexRoles.auto.running": "ロールを評価中…",
-  "integrations.lazycodexRoles.auto.hint": "ロールごとに十分で最も安いモデルと推論負荷を提案します。適用するまで何も変わりません。",
+  "integrations.lazycodexRoles.auto.hint":
+    "ロールごとに十分で最も安いモデルと推論負荷を提案します。適用するまで何も変わりません。",
   "integrations.lazycodexRoles.auto.failed": "Codex エージェントロールを評価できませんでした。",
   "integrations.lazycodexRoles.auto.title": "提案されたモデル",
   "integrations.lazycodexRoles.auto.sizedWith": "{model} で評価",
@@ -2330,12 +2751,18 @@ export const ja: Record<TKey, string> = {
   "integrations.lazycodexRoles.auto.apply": "適用",
   "integrations.lazycodexRoles.auto.moveUp": "上げる条件: {text}",
   "integrations.lazycodexRoles.auto.moveDown": "下げる条件: {text}",
-  "integrations.semantics.cline": "Cline CLI の providers.json と models.json の OpenCodex 項目を管理します。変更・同期前に Cline を終了し、完了後に再起動してください。元に戻すと両方の元ファイルが復元されます。既定のプロバイダーは変わりません。Cline で OpenCodex を選択してください。",
-  "integrations.semantics.kilo": "Kilo のグローバル設定（~/.config/kilo 配下で最初に存在する kilo.jsonc、kilo.json、opencode.jsonc、opencode.json、config.json。XDG_CONFIG_HOME はこのディレクトリを移動し、いずれも存在しなければ kilo.jsonc が作成されます）の provider.opencodex のみを管理します。他のキーは変更しません。適用時にファイル全体を書き直すため、コメントと末尾カンマは保持されません。Kilo で opencodex/<モデル> を選択してください。",
-  "integrations.semantics.droid": "Factory Droid の settings.json に OpenCodex カスタムモデルを追加します。無効化すると管理対象の項目だけが削除され、元に戻すと保存したファイルが復元されます。",
-  "integrations.raycast.proRequired": "Custom Providers は Raycast Pro の機能です。ファイルは書き込まれますが、Pro サブスクリプションが有効になるまで Raycast はこれを無視します。",
-  "integrations.raycast.planUnknown": "Raycast Pro が有効かどうか確認できませんでした。Custom Providers には Raycast Pro が必要です。",
-  "integrations.raycast.revealConfig": "Raycast → 設定 → AI を開き、「Reveal Providers Config」を一度クリックして providers フォルダを作成してください。",
+  "integrations.semantics.cline":
+    "Cline CLI の providers.json と models.json の OpenCodex 項目を管理します。変更・同期前に Cline を終了し、完了後に再起動してください。元に戻すと両方の元ファイルが復元されます。既定のプロバイダーは変わりません。Cline で OpenCodex を選択してください。",
+  "integrations.semantics.kilo":
+    "Kilo のグローバル設定（~/.config/kilo 配下で最初に存在する kilo.jsonc、kilo.json、opencode.jsonc、opencode.json、config.json。XDG_CONFIG_HOME はこのディレクトリを移動し、いずれも存在しなければ kilo.jsonc が作成されます）の provider.opencodex のみを管理します。他のキーは変更しません。適用時にファイル全体を書き直すため、コメントと末尾カンマは保持されません。Kilo で opencodex/<モデル> を選択してください。",
+  "integrations.semantics.droid":
+    "Factory Droid の settings.json に OpenCodex カスタムモデルを追加します。無効化すると管理対象の項目だけが削除され、元に戻すと保存したファイルが復元されます。",
+  "integrations.raycast.proRequired":
+    "Custom Providers は Raycast Pro の機能です。ファイルは書き込まれますが、Pro サブスクリプションが有効になるまで Raycast はこれを無視します。",
+  "integrations.raycast.planUnknown":
+    "Raycast Pro が有効かどうか確認できませんでした。Custom Providers には Raycast Pro が必要です。",
+  "integrations.raycast.revealConfig":
+    "Raycast → 設定 → AI を開き、「Reveal Providers Config」を一度クリックして providers フォルダを作成してください。",
   "codexAuth.mainAccount": "メインアカウント",
   "codexAuth.logLabel": "ログラベル",
   "codexAuth.codexApp": "Codex App",
@@ -2345,12 +2772,15 @@ export const ja: Record<TKey, string> = {
   "codexAuth.accountPool": "アカウントプール",
   "codexAuth.accountModeTitle": "OpenAI アカウントモード",
   "codexAuth.accountModePool": "プールモード",
-  "codexAuth.accountModePoolDesc": "メインログインと対象の追加アカウントがここでローテーションします。",
+  "codexAuth.accountModePoolDesc":
+    "メインログインと対象の追加アカウントがここでローテーションします。",
   "codexAuth.accountModeDirect": "ダイレクトモード",
-  "codexAuth.accountModeDirectDesc": "リクエストはメインログインのみを使用します; 追加アカウントはプールモード用に保持されます。",
+  "codexAuth.accountModeDirectDesc":
+    "リクエストはメインログインのみを使用します; 追加アカウントはプールモード用に保持されます。",
   "codexAuth.openaiMissing": "組み込みの OpenAI プロバイダーが設定されていません。",
   "codexAuth.openaiDisabled": "組み込みの OpenAI プロバイダーが無効です。",
-  "codexAuth.openaiUnavailableDesc": "OpenAI アカウントは引き続き利用できます。Codex リクエストをルーティングするにはプロバイダーを有効にしてください。",
+  "codexAuth.openaiUnavailableDesc":
+    "OpenAI アカウントは引き続き利用できます。Codex リクエストをルーティングするにはプロバイダーを有効にしてください。",
   "codexAuth.enableOpenai": "OpenAI を有効にする",
   "codexAuth.enablingOpenai": "有効化中...",
   "codexAuth.enableOpenaiFailed": "OpenAI プロバイダーを有効にできませんでした。",
@@ -2364,35 +2794,48 @@ export const ja: Record<TKey, string> = {
   "codexAuth.creditsOverage": "超過利用上限に到達",
   "codexAuth.creditsApprox": "推定メッセージ数: ローカル {local} · クラウド {cloud}",
   "codexAuth.creditsToggle": "Codex クレジット",
-  "codexAuth.creditsToggleHint": "アカウントカードに残りの Codex クレジットを表示します。既定は非表示です。",
+  "codexAuth.creditsToggleHint":
+    "アカウントカードに残りの Codex クレジットを表示します。既定は非表示です。",
   "codexAuth.creditsShown": "Codex クレジットを表示しました",
   "codexAuth.creditsHidden": "Codex クレジットを非表示にしました",
   "codexAuth.creditsToggleFailed": "Codex クレジットの設定を変更できませんでした",
   "codexAuth.refreshQuota": "クォータを更新",
   "codexAuth.ultraFastTitle": "Ultra Fast サービスティア",
   "codexAuth.mainHardLockTitle": "メインアカウントを制限 (5h {short}%、長期 {long}%)",
-  "codexAuth.mainHardLockDesc": "5h枠が{short}%、週間枠が{long}%に達すると制限します。月間のみのアカウントは月間枠を使います。制限中の枠がすべて基準を下回ると自動解除し、保護は維持します。既定で有効です。",
-  "codexAuth.mainHardLockConfirmTitle": "メインアカウント保護を有効にしますか？ (5h {short}%、長期 {long}%)",
-  "codexAuth.mainHardLockConfirmBody": "停止中はメインアカウントのLuna Reserveも使えません。通常枠を使い切らない場合、Reserveが有効にならないことがあります。追加アカウントや他のプロバイダーは引き続き使えます。実行中のリクエスト、照合できないキーチェーン認証情報、このプロキシ外の通信は対象外です。",
+  "codexAuth.mainHardLockDesc":
+    "5h枠が{short}%、週間枠が{long}%に達すると制限します。月間のみのアカウントは月間枠を使います。制限中の枠がすべて基準を下回ると自動解除し、保護は維持します。既定で有効です。",
+  "codexAuth.mainHardLockConfirmTitle":
+    "メインアカウント保護を有効にしますか？ (5h {short}%、長期 {long}%)",
+  "codexAuth.mainHardLockConfirmBody":
+    "停止中はメインアカウントのLuna Reserveも使えません。通常枠を使い切らない場合、Reserveが有効にならないことがあります。追加アカウントや他のプロバイダーは引き続き使えます。実行中のリクエスト、照合できないキーチェーン認証情報、このプロキシ外の通信は対象外です。",
   "codexAuth.mainHardLockConfirm": "保護を有効にする",
   "codexAuth.mainHardLockEnabled": "保護が有効です (5h {short}%、長期 {long}%)。",
-  "codexAuth.mainHardLockDisabled": "メインアカウント保護が無効です。他の制限は引き続き適用されます。",
-  "codexAuth.mainHardLockLoadFailed": "設定を読み込めませんでした。再試行して現在の状態を確認してください。",
-  "codexAuth.mainHardLockSaveFailed": "保存を確認できませんでした。設定を再読み込みしてから再試行してください。",
-  "codexAuth.mainHardLockRefreshFailed": "設定は保存されましたが、アカウント状態を更新できませんでした。再試行してください。",
+  "codexAuth.mainHardLockDisabled":
+    "メインアカウント保護が無効です。他の制限は引き続き適用されます。",
+  "codexAuth.mainHardLockLoadFailed":
+    "設定を読み込めませんでした。再試行して現在の状態を確認してください。",
+  "codexAuth.mainHardLockSaveFailed":
+    "保存を確認できませんでした。設定を再読み込みしてから再試行してください。",
+  "codexAuth.mainHardLockRefreshFailed":
+    "設定は保存されましたが、アカウント状態を更新できませんでした。再試行してください。",
   "codexAuth.mainHardLockBlocked": "メインアカウント保護で制限中 (5h {short}%、長期 {long}%)",
   "codexAuth.mainHardLockUnknown": "保護有効・使用率不明",
   "codexAuth.mainHardLockMonitoring": "保護有効・監視中",
-  "codexAuth.mainExternalUsageWarning": "opencodex以外で使用量が増えた可能性があります。制限しても上限に達する場合があります。",
+  "codexAuth.mainExternalUsageWarning":
+    "opencodex以外で使用量が増えた可能性があります。制限しても上限に達する場合があります。",
   "codexAuth.mainHardLockManage": "保護設定を表示",
   "codexAuth.mainHardLockFallbackTitle": "ブロック中のフォールバック",
-  "codexAuth.mainHardLockFallbackDesc": "ブロック中にどのCodexアカウントもリクエストを処理できない場合、ネイティブCodexモデルへのリクエストは失敗せずこのモデルへルーティングされます。空欄のままでは従来どおり拒否されます。ブロックは自動的に解除されます。",
+  "codexAuth.mainHardLockFallbackDesc":
+    "ブロック中にどのCodexアカウントもリクエストを処理できない場合、ネイティブCodexモデルへのリクエストは失敗せずこのモデルへルーティングされます。空欄のままでは従来どおり拒否されます。ブロックは自動的に解除されます。",
   "codexAuth.mainHardLockFallbackModel": "フォールバックモデル",
   "codexAuth.mainHardLockFallbackEffort": "思考エフォート",
   "codexAuth.mainHardLockFallbackDefaultEffort": "リクエストのエフォートを維持",
-  "codexAuth.mainHardLockFallbackActive": "ブロック中 — ネイティブCodexリクエストは{model}へルーティングされます。",
-  "codexAuth.mainHardLockFallbackSaveFailed": "フォールバックの保存を確認できませんでした。設定を再読み込みしてから再試行してください。",
-  "codexAuth.ultraFastDesc": "Codex のモデルピッカーで GPT-6 Astra と GPT-6.1 Sol に Ultrafast の速度選択肢を追加し、ルーティングモデルに自分で設定した ultrafast ティアがカタログ再生成時に削除されないようにします。Ultrafast には対象の ChatGPT プランが必要です。プランに含まれている場合のみ有効にしてください。",
+  "codexAuth.mainHardLockFallbackActive":
+    "ブロック中 — ネイティブCodexリクエストは{model}へルーティングされます。",
+  "codexAuth.mainHardLockFallbackSaveFailed":
+    "フォールバックの保存を確認できませんでした。設定を再読み込みしてから再試行してください。",
+  "codexAuth.ultraFastDesc":
+    "Codex のモデルピッカーで GPT-6 Astra と GPT-6.1 Sol に Ultrafast の速度選択肢を追加し、ルーティングモデルに自分で設定した ultrafast ティアがカタログ再生成時に削除されないようにします。Ultrafast には対象の ChatGPT プランが必要です。プランに含まれている場合のみ有効にしてください。",
   "codexAuth.ultraFastLoadFailed": "Ultra Fast 設定を読み取れませんでした。",
   "codexAuth.ultraFastEnabled": "Ultra Fast ティアを有効にしました",
   "codexAuth.ultraFastDisabled": "Ultra Fast ティアを無効にしました",
@@ -2410,7 +2853,8 @@ export const ja: Record<TKey, string> = {
   "codexAuth.resume": "再開",
   "codexAuth.paused": "一時停止中",
   "codexAuth.planExcluded": "自動選択の対象外",
-  "codexAuth.planExcludedHint": "プラン {plan} は自動選択の対象外です。アカウントを明示的に指定すると利用できます。",
+  "codexAuth.planExcludedHint":
+    "プラン {plan} は自動選択の対象外です。アカウントを明示的に指定すると利用できます。",
   "codexAuth.pauseSucceeded": "{email} を一時停止しました",
   "codexAuth.resumeSucceeded": "{email} をアカウントプールに戻しました",
   "codexAuth.pauseFailed": "{email} を一時停止できませんでした。変更はありません。",
@@ -2421,34 +2865,45 @@ export const ja: Record<TKey, string> = {
   "accountPause.reason.subscriptionInactive": "サブスクリプションが無効",
   "accountPause.reason.subscriptionExpired": "サブスクリプションの期限切れ",
   "accountPause.reason.planDowngraded": "プランがダウングレードされました",
-  "prov.keyResumedSwitchFailed": "キーの一時停止は解除されましたが、有効化に失敗しました。自動選択は可能です。もう一度選択してください。",
-  "codexAuth.pausedHint": "再開するまで、自動切り替え、再試行、クールダウン復旧、手動選択の対象外です。",
+  "prov.keyResumedSwitchFailed":
+    "キーの一時停止は解除されましたが、有効化に失敗しました。自動選択は可能です。もう一度選択してください。",
+  "codexAuth.pausedHint":
+    "再開するまで、自動切り替え、再試行、クールダウン復旧、手動選択の対象外です。",
   "codexAuth.creditsAfterLimit": "上限後にクレジットを使用",
-  "codexAuth.creditsAfterLimitHint": "既定はオフです。使用量ウィンドウが100%に達したアカウントはリセットまで別のアカウントに切り替わり、ChatGPTクレジットを消費しません。オンにしたアカウントだけが上限後もクレジットで使われます。新しいアカウントはオフで始まります。",
+  "codexAuth.creditsAfterLimitHint":
+    "既定はオフです。使用量ウィンドウが100%に達したアカウントはリセットまで別のアカウントに切り替わり、ChatGPTクレジットを消費しません。オンにしたアカウントだけが上限後もクレジットで使われます。新しいアカウントはオフで始まります。",
   "codexAuth.creditsAfterLimitAria": "{email} の上限後クレジット使用",
-  "codexAuth.creditsAfterLimitMainHint": "メインアカウントはハードロック（既定でオン）が先に止めます。クレジットを使わせるには、ロックをオフにしてください。",
+  "codexAuth.creditsAfterLimitMainHint":
+    "メインアカウントはハードロック（既定でオン）が先に止めます。クレジットを使わせるには、ロックをオフにしてください。",
   "codexAuth.creditSpend": "クレジット使用",
   "codexAuth.creditSpendAria": "上限後にChatGPTクレジットを使用",
   "codexAuth.creditsOn": "クレジット使用",
   "codexAuth.creditsOnSucceeded": "{email} は上限後もクレジットを使用できます。",
   "codexAuth.creditsOffSucceeded": "{email} は上限に達すると切り替わり、クレジットを温存します。",
-  "codexAuth.creditsUpdateFailed": "{email} のクレジット設定を更新できませんでした。変更はありません。",
+  "codexAuth.creditsUpdateFailed":
+    "{email} のクレジット設定を更新できませんでした。変更はありません。",
   "codexAuth.creditsAllOnSucceeded": "すべてのアカウントが上限後にクレジットを使用できます。",
-  "codexAuth.creditsAllOffSucceeded": "クレジットを消費するアカウントはありません。100%で切り替わります。",
+  "codexAuth.creditsAllOffSucceeded":
+    "クレジットを消費するアカウントはありません。100%で切り替わります。",
   "codexAuth.creditsAllUpdateFailed": "クレジット設定を変更できませんでした。変更はありません。",
   "codexAuth.pinned": "固定中",
-  "codexAuth.pinnedHint": "手動で選択したアカウントなので、これより高い選択順序が先に使われることはありません。固定はこのアカウントを使い切るか、別のアカウントを選ぶか、いずれかの選択順序を変更するまで続きます。",
+  "codexAuth.pinnedHint":
+    "手動で選択したアカウントなので、これより高い選択順序が先に使われることはありません。固定はこのアカウントを使い切るか、別のアカウントを選ぶか、いずれかの選択順序を変更するまで続きます。",
   "codexAuth.unpinHint": "もう一度選択すると固定が解除され、自動選択に戻ります。",
   "codexAuth.unpinTitle": "固定を解除しますか?",
-  "codexAuth.unpinDesc": "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストは選択順序としきい値のルールに従って自動的にアカウントを選びます。",
+  "codexAuth.unpinDesc":
+    "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストは選択順序としきい値のルールに従って自動的にアカウントを選びます。",
   "codexAuth.unpinAction": "固定を解除",
   "codexAuth.unpinned": "固定を解除しました。自動選択に戻ります。",
-  "codexAuth.unpinFailed": "アカウントの固定解除を確認できませんでした。アカウントを更新して現在の選択を確認してから、再試行してください。",
-  "codexAuth.unpinChanged": "この確認画面を開いている間に固定アカウントが変更されました。アカウントを更新して現在の選択を確認してから、固定を解除してください。",
+  "codexAuth.unpinFailed":
+    "アカウントの固定解除を確認できませんでした。アカウントを更新して現在の選択を確認してから、再試行してください。",
+  "codexAuth.unpinChanged":
+    "この確認画面を開いている間に固定アカウントが変更されました。アカウントを更新して現在の選択を確認してから、固定を解除してください。",
   "codexAuth.fiveHour": "5時間",
   "codexAuth.weekly": "週",
   "codexAuth.quotaAutoRefresh": "利用枠の自動開始",
-  "codexAuth.quotaAutoRefreshHint": "この利用枠がリセットされたときに最小のテストメッセージを送信します。",
+  "codexAuth.quotaAutoRefreshHint":
+    "この利用枠がリセットされたときに最小のテストメッセージを送信します。",
   "codexAuth.quotaAutoRefreshUpdated": "利用枠の自動開始設定を更新しました。",
   "codexAuth.quotaAutoRefreshFailed": "利用枠の自動開始設定を更新できませんでした。",
   "codexAuth.monthly": "30日",
@@ -2458,24 +2913,35 @@ export const ja: Record<TKey, string> = {
   "codexAuth.nextSession": "選択済み",
   "codexAuth.poolPrepared": "プール準備済み",
   "codexAuth.preparePoolTitle": "このアカウントをプールモード用に準備しますか?",
-  "codexAuth.preparePoolDesc": "ダイレクトリクエストはメインログインを使い続けます。このアカウントはプールモードが有効化された際の準備済みプール選択になります。",
+  "codexAuth.preparePoolDesc":
+    "ダイレクトリクエストはメインログインを使い続けます。このアカウントはプールモードが有効化された際の準備済みプール選択になります。",
   "codexAuth.prepareForPool": "プール用に準備",
   "codexAuth.poolPreparedToast": "{email} はプールモード用に準備されました",
   "codexAuth.switchTitle": "アクティブアカウントを切り替えますか?",
-  "codexAuth.switchDesc": "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストは選択したアカウントの順序ティアを使います。同じ選択順序のアカウントは引き続き交代で使われます。",
-  "codexAuth.cacheWarning": "アカウント切り替えでプロンプトキャッシュはリセットされます。新規セッションは空のキャッシュで開始します。",
-  "codexAuth.switchExceedsThresholdWarning": "このアカウントは切り替えしきい値（{threshold}%）に達しているか超えています。クォータの余白がない場合、ピン留めは解除されます。",
+  "codexAuth.switchDesc":
+    "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストは選択したアカウントの順序ティアを使います。同じ選択順序のアカウントは引き続き交代で使われます。",
+  "codexAuth.cacheWarning":
+    "アカウント切り替えでプロンプトキャッシュはリセットされます。新規セッションは空のキャッシュで開始します。",
+  "codexAuth.switchExceedsThresholdWarning":
+    "このアカウントは切り替えしきい値（{threshold}%）に達しているか超えています。クォータの余白がない場合、ピン留めは解除されます。",
   "codexAuth.setAsNext": "このアカウントを次に使う",
   "codexAuth.cancel": "キャンセル",
   "codexAuth.switchBack": "メインに戻しますか?",
-  "codexAuth.switchBackDesc": "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストはアプリログインアカウントの順序ティアを使います。同じ選択順序のアカウントは引き続き交代で使われます。",
+  "codexAuth.switchBackDesc":
+    "すぐに反映されます。アカウントに紐付いた既存スレッドと処理中のリクエストは現在のアカウントを維持し、新規または未紐付けのリクエストはアプリログインアカウントの順序ティアを使います。同じ選択順序のアカウントは引き続き交代で使われます。",
   "codexAuth.autoSwitch": "使用量ベースのプロアクティブ切り替え",
-  "codexAuth.autoSwitchQuotaDesc": "クォータ: 使用率が {threshold}% 以上になると、未紐付けの次のリクエストが使用率の低い適格アカウントへ移る場合があります。紐付け済みタスクは既定でアフィニティを維持し、アカウントが処理できなくなったときだけ、実際にクォータ余裕があるアカウントへ移ります。Go/Free は 30 日枠のみを使用します。",
-  "codexAuth.autoSwitchQuotaOffDesc": "使用量ベースのプロアクティブ切り替えはオフです。新規/未紐付けタスクの割り当てと障害回復は引き続き適用されます。",
-  "codexAuth.autoSwitchRoundRobinDesc": "ラウンドロビン割り当てはこのしきい値を使用せず、新規/未紐付けタスクを引き続きローテーションします。",
-  "codexAuth.autoSwitchFillFirstDesc": "フィルファースト: {threshold}% は新規/未紐付けタスクの使い切り基準です。正常な紐付け済みタスクはアカウントを維持します。",
-  "codexAuth.autoSwitchFillFirstOffDesc": "フィルファーストには新規/未紐付けタスクの使用量基準がありません。クールダウン、再認証、障害回復では引き続きルーティングが変わる場合があります。",
-  "codexAuth.failureRecoveryNote": "障害回復は別です。出力前の 429/402 拒否、クールダウン、再認証、除外、または設定済みの一時障害フェイルオーバーにより、別の適格アカウントが選ばれる場合があります。",
+  "codexAuth.autoSwitchQuotaDesc":
+    "クォータ: 使用率が {threshold}% 以上になると、未紐付けの次のリクエストが使用率の低い適格アカウントへ移る場合があります。紐付け済みタスクは既定でアフィニティを維持し、アカウントが処理できなくなったときだけ、実際にクォータ余裕があるアカウントへ移ります。Go/Free は 30 日枠のみを使用します。",
+  "codexAuth.autoSwitchQuotaOffDesc":
+    "使用量ベースのプロアクティブ切り替えはオフです。新規/未紐付けタスクの割り当てと障害回復は引き続き適用されます。",
+  "codexAuth.autoSwitchRoundRobinDesc":
+    "ラウンドロビン割り当てはこのしきい値を使用せず、新規/未紐付けタスクを引き続きローテーションします。",
+  "codexAuth.autoSwitchFillFirstDesc":
+    "フィルファースト: {threshold}% は新規/未紐付けタスクの使い切り基準です。正常な紐付け済みタスクはアカウントを維持します。",
+  "codexAuth.autoSwitchFillFirstOffDesc":
+    "フィルファーストには新規/未紐付けタスクの使用量基準がありません。クールダウン、再認証、障害回復では引き続きルーティングが変わる場合があります。",
+  "codexAuth.failureRecoveryNote":
+    "障害回復は別です。出力前の 429/402 拒否、クールダウン、再認証、除外、または設定済みの一時障害フェイルオーバーにより、別の適格アカウントが選ばれる場合があります。",
   "codexAuth.autoSwitchThreshold": "使用量しきい値",
   "codexAuth.autoSwitchThresholdAria": "使用量しきい値（パーセント）",
   "codexAuth.autoSwitchThresholdInc": "使用量しきい値を上げる",
@@ -2484,46 +2950,70 @@ export const ja: Record<TKey, string> = {
 
   "codexAuth.autoSwitchThresholdInvalid": "1 から 100 までの整数を入力してください",
   "codexAuth.autoSwitchUpdated": "使用量ベースのプロアクティブ切り替え設定を更新しました",
-  "codexAuth.autoSwitchUpdateFailed": "使用量ベースの切り替え更新を確認できませんでした。最後に確認された値を表示しています。",
+  "codexAuth.autoSwitchUpdateFailed":
+    "使用量ベースの切り替え更新を確認できませんでした。最後に確認された値を表示しています。",
   "codexAuth.requestUserInput": "Default モードで入力を求める",
-  "codexAuth.requestUserInputDesc": "Default モードのセッションで Codex が一時停止し、request_user_input ツールで質問できるようにします。",
-  "codexAuth.requestUserInputUpdated": "機能フラグを更新しました - 新しいセッションから適用されます。",
-  "codexAuth.requestUserInputUpdatedRestart": "機能フラグを更新しました - 新しいセッションから適用されます。Codex アプリを再起動してください。",
+  "codexAuth.requestUserInputDesc":
+    "Default モードのセッションで Codex が一時停止し、request_user_input ツールで質問できるようにします。",
+  "codexAuth.requestUserInputUpdated":
+    "機能フラグを更新しました - 新しいセッションから適用されます。",
+  "codexAuth.requestUserInputUpdatedRestart":
+    "機能フラグを更新しました - 新しいセッションから適用されます。Codex アプリを再起動してください。",
   "codexAuth.requestUserInputUpdateFailed": "機能フラグを更新できませんでした。変更はありません。",
   "codexAuth.requestUserInputLoadFailed": "config.toml から機能フラグを読み込めませんでした。",
   "codexAuth.accountPickerTitle": "モデルピッカーで使用する Codex アカウントを指定",
-  "codexAuth.accountPickerOffDesc": "有効にすると、通常の GPT ピッカー項目がアカウントセレクターごとの項目に置き換わり、ログアウトせずに会話で使うアカウントを明示的に選べます。無効にしてもアカウントは削除されません。",
-  "codexAuth.accountPickerOnDesc": "各セレクターは保存済みアカウント 1 つに対応する公開ラベルです。選択した会話はそのアカウントに固定され、Pool のローテーションやフォールバックは行われず、現在の Pool アカウントも変更されません。",
-  "codexAuth.accountPickerCompatibility": "組み込みの Codex App ログインには専用セレクターがあります。生成されたマップでは通常 main と呼ばれ、必要に応じて main-2 のような衝突を避けるサフィックスが使われます。追加アカウントには安定したプライバシー保護ラベルが割り当てられ、カスタムセレクター名は保持されます。既存の会話と保存済みのモデル選択は引き続きルーティングされます。無効にすると生成された項目だけが非表示になり、セレクターと完全一致ルートは保持されます。通常の GPT モデル ID は従来どおり Pool または Direct で動作します。",
+  "codexAuth.accountPickerOffDesc":
+    "有効にすると、通常の GPT ピッカー項目がアカウントセレクターごとの項目に置き換わり、ログアウトせずに会話で使うアカウントを明示的に選べます。無効にしてもアカウントは削除されません。",
+  "codexAuth.accountPickerOnDesc":
+    "各セレクターは保存済みアカウント 1 つに対応する公開ラベルです。選択した会話はそのアカウントに固定され、Pool のローテーションやフォールバックは行われず、現在の Pool アカウントも変更されません。",
+  "codexAuth.accountPickerCompatibility":
+    "組み込みの Codex App ログインには専用セレクターがあります。生成されたマップでは通常 main と呼ばれ、必要に応じて main-2 のような衝突を避けるサフィックスが使われます。追加アカウントには安定したプライバシー保護ラベルが割り当てられ、カスタムセレクター名は保持されます。既存の会話と保存済みのモデル選択は引き続きルーティングされます。無効にすると生成された項目だけが非表示になり、セレクターと完全一致ルートは保持されます。通常の GPT モデル ID は従来どおり Pool または Direct で動作します。",
   "codexAuth.accountPickerUpdated": "アカウント指定を更新しました。",
-  "codexAuth.accountPickerUpdateFailed": "アカウント指定を更新できませんでした。最後に確認された設定を表示しています。",
+  "codexAuth.accountPickerUpdateFailed":
+    "アカウント指定を更新できませんでした。最後に確認された設定を表示しています。",
   "codexAuth.accountPickerLoadFailed": "アカウント指定の設定を読み込めませんでした。",
-  "codexAuth.accountPickerRefreshFailed": "この設定を更新できませんでした。最後に確認された値を引き続き表示しています。",
+  "codexAuth.accountPickerRefreshFailed":
+    "この設定を更新できませんでした。最後に確認された値を引き続き表示しています。",
   "codexAuth.advancedSettings": "詳細設定",
   "codexAuth.advancedSettingsAria": "高度な Codex 認証設定を表示または非表示",
-  "codexAuth.catalogRefreshPending": "変更は保存されましたが、Codex モデルカタログの更新が保留中です。ocx sync を実行して再試行してください。",
+  "codexAuth.catalogRefreshPending":
+    "変更は保存されましたが、Codex モデルカタログの更新が保留中です。ocx sync を実行して再試行してください。",
   "anthropicPool.title": "Claude アカウントプール（実験的）",
-  "anthropicPool.enabledDesc": "セッションを同じアカウントに固定し、新規セッションは{window}の使用率が {threshold}% 未満のアカウントを優先します。",
-  "anthropicPool.enabledNoProactiveDesc": "使用量のしきい値によって、正常に動作中のセッションや正常なアクティブアカウントが切り替わることはありません。アクティブアカウントが使えないときと拒否からの復旧時は、使用量（{window}）が最も低いアカウントを選びます。",
-  "anthropicPool.enabledFillFirstDesc": "セッションを同じアカウントに固定します。新規セッションはアクティブアカウントが {threshold}%（{window}）に達するか、クールダウンに入るか、再サインインが必要になるまでそのアカウントを使い、その後は順番どおり次のアカウントに移ります。拒否からの復旧も順番どおり次のアカウントを使います。",
-  "anthropicPool.enabledFillFirstNoThresholdDesc": "セッションを同じアカウントに固定します。新規セッションはアクティブアカウントがクールダウンに入るか再サインインが必要になるまでそのアカウントを使い、その後は順番どおり次のアカウントに移ります。拒否からの復旧も順番どおり次のアカウントを使います。",
-  "anthropicPool.enabledRoundRobinDesc": "セッションを同じアカウントに固定します。新規セッションと拒否からの復旧は利用可能なアカウントを順番に使い、使用量・しきい値・クォータウィンドウは参照しません。",
-  "anthropicPool.disabledDesc": "事前のアカウント選択はオフです。OpenCodex は選択中のアカウントを使用しますが、利用可能な別のアカウントにサインインしていれば、レート制限応答（429）やアカウント拒否と判定された応答の後に切り替えることがあります。",
-  "anthropicPool.experimentalWarning": "ご自身が所有している、または利用を許可されたサブスクリプションのみを使用してください。自動アカウントプールは Anthropic に承認されておらず、引き続き実験的な機能です。人が見守るセッションで正規の Claude Code クライアントを使用し、Anthropic の最新の規約を確認してください。同じ組織のアカウントはクォータを共有する場合があるため、アカウントを追加しても利用枠が増えないことがあります。",
+  "anthropicPool.enabledDesc":
+    "セッションを同じアカウントに固定し、新規セッションは{window}の使用率が {threshold}% 未満のアカウントを優先します。",
+  "anthropicPool.enabledNoProactiveDesc":
+    "使用量のしきい値によって、正常に動作中のセッションや正常なアクティブアカウントが切り替わることはありません。アクティブアカウントが使えないときと拒否からの復旧時は、使用量（{window}）が最も低いアカウントを選びます。",
+  "anthropicPool.enabledFillFirstDesc":
+    "セッションを同じアカウントに固定します。新規セッションはアクティブアカウントが {threshold}%（{window}）に達するか、クールダウンに入るか、再サインインが必要になるまでそのアカウントを使い、その後は順番どおり次のアカウントに移ります。拒否からの復旧も順番どおり次のアカウントを使います。",
+  "anthropicPool.enabledFillFirstNoThresholdDesc":
+    "セッションを同じアカウントに固定します。新規セッションはアクティブアカウントがクールダウンに入るか再サインインが必要になるまでそのアカウントを使い、その後は順番どおり次のアカウントに移ります。拒否からの復旧も順番どおり次のアカウントを使います。",
+  "anthropicPool.enabledRoundRobinDesc":
+    "セッションを同じアカウントに固定します。新規セッションと拒否からの復旧は利用可能なアカウントを順番に使い、使用量・しきい値・クォータウィンドウは参照しません。",
+  "anthropicPool.disabledDesc":
+    "事前のアカウント選択はオフです。OpenCodex は選択中のアカウントを使用しますが、利用可能な別のアカウントにサインインしていれば、レート制限応答（429）やアカウント拒否と判定された応答の後に切り替えることがあります。",
+  "anthropicPool.experimentalWarning":
+    "ご自身が所有している、または利用を許可されたサブスクリプションのみを使用してください。自動アカウントプールは Anthropic に承認されておらず、引き続き実験的な機能です。人が見守るセッションで正規の Claude Code クライアントを使用し、Anthropic の最新の規約を確認してください。同じ組織のアカウントはクォータを共有する場合があるため、アカウントを追加しても利用枠が増えないことがあります。",
   "anthropicPool.detailsSummary": "アカウント選択のしくみ",
-  "anthropicPool.detailsEnabling": "プールをオンにすると、各セッションはアカウントが正常な間そのアカウントに留まり、新規セッションと拒否後のアカウントは選択した戦略に従って選ばれます。",
-  "anthropicPool.detailsFailover": "オフにしてもフェイルオーバーは止まりません。429 やアカウント拒否と判定された応答の後、リクエストはサインイン済みの別アカウントへ移ることがあります。対象から外すにはそのアカウントを一時停止してください。",
-  "anthropicPool.detailsActivity": "OpenCodex はキープウォーム（keep-warm）用のリクエストを送信しません。既定ではバックグラウンドで Claude トークンを更新したり使用量を確認したりせず、使用量はダッシュボード、メニューバーアプリ、または ocx コマンドが要求したときにのみ読み取ります。",
+  "anthropicPool.detailsEnabling":
+    "プールをオンにすると、各セッションはアカウントが正常な間そのアカウントに留まり、新規セッションと拒否後のアカウントは選択した戦略に従って選ばれます。",
+  "anthropicPool.detailsFailover":
+    "オフにしてもフェイルオーバーは止まりません。429 やアカウント拒否と判定された応答の後、リクエストはサインイン済みの別アカウントへ移ることがあります。対象から外すにはそのアカウントを一時停止してください。",
+  "anthropicPool.detailsActivity":
+    "OpenCodex はキープウォーム（keep-warm）用のリクエストを送信しません。既定ではバックグラウンドで Claude トークンを更新したり使用量を確認したりせず、使用量はダッシュボード、メニューバーアプリ、または ocx コマンドが要求したときにのみ読み取ります。",
   "anthropicPool.nativeMessagesLabel": `Claude のネイティブリクエストを維持`,
   "anthropicPool.nativeMessagesHelp": `プールが有効な場合、選択したルートが対応していれば、Claude Code の履歴とキャッシュマーカーをネイティブ Messages 経路で維持します。他のルートでは引き続きリクエストが変換されることがあります。アカウントを切り替えるとキャッシュが新規状態になる場合があり、キャッシュヒットは保証されず、アカウント間でキャッシュは共有されません。 ロールアウト設定で明示的に無効にした機能は、引き続き無効です。`,
-  "anthropicPool.saveWarning": "設定は保存されましたが、構成の保存後処理に失敗しました。設定を再読み込みして現在の状態を確認してください。",
-  "anthropicPool.saveStateUnknown": "保存された設定を確認できませんでした。次の変更を行う前に設定を再読み込みしてください。",
+  "anthropicPool.saveWarning":
+    "設定は保存されましたが、構成の保存後処理に失敗しました。設定を再読み込みして現在の状態を確認してください。",
+  "anthropicPool.saveStateUnknown":
+    "保存された設定を確認できませんでした。次の変更を行う前に設定を再読み込みしてください。",
   "anthropicPool.reloadSettings": "設定を再読み込み",
   "anthropicPool.detailsGuide": "アカウントプールのガイド",
-  "anthropicPool.needTwoAccounts": "プールを有効にする前に、Claude OAuth アカウントを 2 つ以上追加してください。",
+  "anthropicPool.needTwoAccounts":
+    "プールを有効にする前に、Claude OAuth アカウントを 2 つ以上追加してください。",
   "anthropicPool.threshold": "新規セッションの使用率しきい値",
   "anthropicPool.thresholdAria": "新規セッションの使用率しきい値（パーセント）",
-  "anthropicPool.thresholdHelp": "アカウント選択の優先基準であり、使用量や課金の上限ではありません。0 にするとこのしきい値による事前切り替えを無効にします。デフォルト: 80%。",
+  "anthropicPool.thresholdHelp":
+    "アカウント選択の優先基準であり、使用量や課金の上限ではありません。0 にするとこのしきい値による事前切り替えを無効にします。デフォルト: 80%。",
   "anthropicPool.thresholdInvalid": "0 から 100 までの整数を入力してください",
   "anthropicPool.loadFailed": "Claude プール設定を読み込めませんでした。",
   "anthropicPool.saveFailed": "Claude プール設定を保存できませんでした。",
@@ -2533,19 +3023,25 @@ export const ja: Record<TKey, string> = {
   "accountPool.strategy": "ローテーション戦略",
   "accountPool.strategyDesc": "OpenCodex が新規/未紐付けタスクへアカウントを割り当てる方法です。",
   "accountPool.strategyResetFirst": "リセットが近い順",
-  "accountPool.strategyHintResetFirst": "使用率のしきい値未満から、次の5時間枠または週次枠のリセットが最も近いアカウントを選びます。紐付け済みタスクは設定されたアフィニティ方針に従います。独立したモデル枠は使用率順です。",
+  "accountPool.strategyHintResetFirst":
+    "使用率のしきい値未満から、次の5時間枠または週次枠のリセットが最も近いアカウントを選びます。紐付け済みタスクは設定されたアフィニティ方針に従います。独立したモデル枠は使用率順です。",
   "accountPool.strategyQuota": "クォータ",
   "accountPool.strategyRoundRobin": "ラウンドロビン",
   "accountPool.strategyFillFirst": "フィルファースト",
-  "accountPool.strategyHintQuota": "クォータ戦略が使用量しきい値で既存タスクを再紐付けするのは `pool.cacheAffinity` がオフのときだけです（既定はオン）。既定ではアカウントが処理できなくなるまで維持し、その場合も実際にクォータ余裕があるアカウントへだけ移ります。",
-  "accountPool.strategyHintRoundRobin": "ラウンドロビンは有効な紐付けがないタスクだけをローテーションし、使用量しきい値は通常のローテーションを変えません。",
-  "accountPool.strategyHintFillFirst": "フィルファーストはしきい値を未紐付けタスクの使い切り基準として使用し、正常な紐付け済みタスクは親和性を維持します。",
-  "accountPool.unboundDefinition": "新規/未紐付けタスクとは、現在のアカウント紐付けがないリクエストです。既存の表示中タスクも、プロキシまたは親和性のリセット後は未紐付けになる場合があります。",
+  "accountPool.strategyHintQuota":
+    "クォータ戦略が使用量しきい値で既存タスクを再紐付けするのは `pool.cacheAffinity` がオフのときだけです（既定はオン）。既定ではアカウントが処理できなくなるまで維持し、その場合も実際にクォータ余裕があるアカウントへだけ移ります。",
+  "accountPool.strategyHintRoundRobin":
+    "ラウンドロビンは有効な紐付けがないタスクだけをローテーションし、使用量しきい値は通常のローテーションを変えません。",
+  "accountPool.strategyHintFillFirst":
+    "フィルファーストはしきい値を未紐付けタスクの使い切り基準として使用し、正常な紐付け済みタスクは親和性を維持します。",
+  "accountPool.unboundDefinition":
+    "新規/未紐付けタスクとは、現在のアカウント紐付けがないリクエストです。既存の表示中タスクも、プロキシまたは親和性のリセット後は未紐付けになる場合があります。",
   "accountPool.stickyLimit": "ローテーション前の新規/未紐付け割り当て数",
   "accountPool.stickyLimitAria": "ローテーション前の新規/未紐付け割り当て数",
   "accountPool.stickyLimitInc": "スティッキー上限を上げる",
   "accountPool.stickyLimitDec": "スティッキー上限を下げる",
-  "accountPool.stickyLimitHelp": "次へ進む前に、この回数の新規/未紐付けタスクを選択アカウントへ割り当てます。カウンターは上流の成功後ではなく、タスクを紐付けた時点で増えます。",
+  "accountPool.stickyLimitHelp":
+    "次へ進む前に、この回数の新規/未紐付けタスクを選択アカウントへ割り当てます。カウンターは上流の成功後ではなく、タスクを紐付けた時点で増えます。",
   "accountPool.stickyLimitInvalid": "1 から 100 までの整数を入力してください",
   "accountPool.strategyLoadFailed": "ローテーション戦略を読み込めませんでした。",
   "accountPool.strategyUpdateFailed": "ローテーション戦略を保存できませんでした。",
@@ -2556,16 +3052,20 @@ export const ja: Record<TKey, string> = {
   "accountPool.proactiveSwitchingOff": "事前切り替えオフ",
 
   "accountPool.quotaWindow": "クォータ集計ウィンドウ",
-  "accountPool.quotaWindowDesc": "クォータに基づく新規セッション選択、フィルファーストのしきい値判定、対象となる 429 代替先で使うキャッシュ済み使用量バーを指定します。",
+  "accountPool.quotaWindowDesc":
+    "クォータに基づく新規セッション選択、フィルファーストのしきい値判定、対象となる 429 代替先で使うキャッシュ済み使用量バーを指定します。",
   "accountPool.quotaWindowFiveHour": "5 時間バー",
   "accountPool.quotaWindowWeekly": "週間バー",
   "accountPool.quotaWindowMaxUtilization": "高い方のバー",
-  "accountPool.quotaWindowHint": "週間バーでは、他に対象アカウントが残る間だけ 5 時間バーを使い切ったアカウントをスキップし、残らない場合はそれらへフォールバックします。同点では 5 時間使用量が少ない方を優先します。アカウントごとの週間バーはプロバイダーページで取得した後にのみ判明します。",
-  "accountPool.quotaWindowInert": "使用量バーを評価するのはクォータ、またはしきい値が 0 を超えるフィルファーストだけです。現在のローテーション戦略では、この設定は何も変えません。",
+  "accountPool.quotaWindowHint":
+    "週間バーでは、他に対象アカウントが残る間だけ 5 時間バーを使い切ったアカウントをスキップし、残らない場合はそれらへフォールバックします。同点では 5 時間使用量が少ない方を優先します。アカウントごとの週間バーはプロバイダーページで取得した後にのみ判明します。",
+  "accountPool.quotaWindowInert":
+    "使用量バーを評価するのはクォータ、またはしきい値が 0 を超えるフィルファーストだけです。現在のローテーション戦略では、この設定は何も変えません。",
 
   "accountPool.priority": "選択順序",
   "accountPool.priorityAria": "このアカウントの選択順序",
-  "accountPool.priorityHint": "数値が大きいほど先に使われます。上位のアカウントがすべて使い切られるか利用できなくなったときにのみ、より小さい数値へ移ります。",
+  "accountPool.priorityHint":
+    "数値が大きいほど先に使われます。上位のアカウントがすべて使い切られるか利用できなくなったときにのみ、より小さい数値へ移ります。",
   "accountPool.priorityFirst": "最初",
   "accountPool.priorityEarlier": "早め",
   "accountPool.priorityNormal": "標準",
@@ -2574,16 +3074,20 @@ export const ja: Record<TKey, string> = {
   "accountPool.priorityOption": "{name}（{value}）",
   "accountPool.priorityCustom": "カスタム",
   "accountPool.priorityUpdated": "{email} の選択順序を更新しました",
-  "accountPool.priorityUpdateFailed": "{email} の選択順序を保存できませんでした。最後に確認された値を表示しています。",
+  "accountPool.priorityUpdateFailed":
+    "{email} の選択順序を保存できませんでした。最後に確認された値を表示しています。",
   "accountPool.autoSwitchThreshold": "カスタムアカウントしきい値",
   "accountPool.autoSwitchThresholdAria": "{email} の使用量しきい値",
   "accountPool.autoSwitchOverrideAria": "{email} のグローバル使用量しきい値を上書き",
-  "accountPool.autoSwitchHint": "このアカウントのグローバルしきい値を上書きします。0 にすると、このアカウントからの使用量ベースの事前切り替えを無効にします。",
+  "accountPool.autoSwitchHint":
+    "このアカウントのグローバルしきい値を上書きします。0 にすると、このアカウントからの使用量ベースの事前切り替えを無効にします。",
   "accountPool.autoSwitchUpdated": "{email} の使用量しきい値を更新しました",
-  "accountPool.autoSwitchUpdateFailed": "{email} の使用量しきい値を保存できませんでした。最後に確認された値を表示しています。",
+  "accountPool.autoSwitchUpdateFailed":
+    "{email} の使用量しきい値を保存できませんでした。最後に確認された値を表示しています。",
   "codexAuth.switched": "次のリクエストでは {email} を使用します",
   "codexAuth.loadFailed": "Codex アカウント設定を読み込めませんでした。",
-  "codexAuth.accountsRefreshFailed": "最新のアカウント更新に失敗しました。以下は最後に確認されたアカウントです。",
+  "codexAuth.accountsRefreshFailed":
+    "最新のアカウント更新に失敗しました。以下は最後に確認されたアカウントです。",
   "codexAuth.switchFailed": "アカウントを切り替えられませんでした。以前の選択はそのままです。",
   "codexAuth.removeConfirm": "{id} を削除しますか?",
   "codexAuth.removeFailed": "アカウントを削除できませんでした。何も変更されていません。",
@@ -2592,7 +3096,8 @@ export const ja: Record<TKey, string> = {
   "codexAuth.addIdPlaceholder": "codex-work、codex-alt、team...",
   "codexAuth.resetCreditsAria": "{count} 個のリセットクレジット",
   "codexAuth.addJsonLabel": "auth.json の内容",
-  "codexAuth.addHelp": "別のマシンの ~/.codex/auth.json からコピー、または codex-auth export を使用。",
+  "codexAuth.addHelp":
+    "別のマシンの ~/.codex/auth.json からコピー、または codex-auth export を使用。",
   "codexAuth.importBtn": "インポート",
   "codexAuth.importInvalidJson": "無効な JSON です",
   "codexAuth.importMissingTokens": "JSON に access_token または refresh_token がありません",
@@ -2610,13 +3115,15 @@ export const ja: Record<TKey, string> = {
   "codexAuth.oauthWaiting": "ブラウザで ChatGPT ログインが完了するのを待機中...",
   "codexAuth.oauthSubmittingCode": "コードを送信中…",
   "codexAuth.oauthCodeSubmitted": "コードを送信しました — ログイン完了を待っています…",
-  "codexAuth.oauthStatusRetrying": "ログイン状態の確認中にネットワークまたはプロキシ エラーが発生しました — 再試行中…",
+  "codexAuth.oauthStatusRetrying":
+    "ログイン状態の確認中にネットワークまたはプロキシ エラーが発生しました — 再試行中…",
   "codexAuth.oauthCancelled": "ログインはキャンセルされました。",
   "codexAuth.loginFailed": "ログインに失敗しました",
   "codexAuth.needsReauth": "再ログイン",
   "codexAuth.reauthenticate": "再認証",
   "codexAuth.tokenExpired": "トークンが期限切れ — このアカウントを再認証してください",
-  "codexAuth.mainTokenExpired": "トークンの有効期限切れ — 下のデバイスコードまたは Codex アプリログインで再ログインしてください",
+  "codexAuth.mainTokenExpired":
+    "トークンの有効期限切れ — 下のデバイスコードまたは Codex アプリログインで再ログインしてください",
   "codexAuth.mainReauthSucceeded": "サインインしました",
   "codexAuth.mainReauthFailed": "再ログインに失敗しました",
   "codexAuth.mainReauthCancel": "キャンセル",
@@ -2624,23 +3131,27 @@ export const ja: Record<TKey, string> = {
   "codexAuth.mainReauthOpen": "開く",
   "codexAuth.mainReauthPending": "サインインを待っています…",
   "codexAuth.mainReauthDevice": "デバイスコードで再ログイン",
-  "codexAuth.emailCollision": "このアカウントはメインの Codex ログインと一致します。別のアカウントを使用してください。",
+  "codexAuth.emailCollision":
+    "このアカウントはメインの Codex ログインと一致します。別のアカウントを使用してください。",
 
   "codexAuth.resetCreditsTitle": "リセットクレジット",
   "codexAuth.resetCreditsAvailable": "{count} 個のリセットクレジットが利用可能です。",
-  "codexAuth.resetCreditsDesc": "各クレジットは現在の時間別・週間使用量上限を即座にリセットします。",
+  "codexAuth.resetCreditsDesc":
+    "各クレジットは現在の時間別・週間使用量上限を即座にリセットします。",
   "codexAuth.noResetCredits": "リセットクレジットはありません。",
   "codexAuth.earnCreditsHint": "クレジットは毎月および紹介プログラム経由で獲得できます。",
   "codexAuth.creditsExpireNote": "クレジットは獲得から 30 日で失効します。",
   "codexAuth.useOneCredit": "1 クレジットを使用",
   "codexAuth.confirmResetTitle": "リセットクレジットを使用しますか?",
-  "codexAuth.confirmResetDesc": "現在のレート制限を即座にリセットします。残り {count} クレジットです。",
+  "codexAuth.confirmResetDesc":
+    "現在のレート制限を即座にリセットします。残り {count} クレジットです。",
   "codexAuth.irreversible": "この操作は元に戻せません。",
   "codexAuth.useCredit": "クレジットを使用",
   "codexAuth.redeeming": "リセット中...",
   "codexAuth.resetSuccess": "レート制限をリセットしました! 残り {remaining} クレジット。",
   "codexAuth.resetSuccessGeneric": "レート制限をリセットしました!",
-  "codexAuth.resetAlreadyRedeemed": "このクレジットは既に引き換え済みです。クレジットは変わりません。",
+  "codexAuth.resetAlreadyRedeemed":
+    "このクレジットは既に引き換え済みです。クレジットは変わりません。",
   "codexAuth.resetNothingToReset": "今リセットが必要なレート制限枠はありません。",
   "codexAuth.resetNoCredit": "利用可能なリセットクレジットはありません。",
   "codexAuth.resetError": "リセットクレジットの引き換えに失敗しました。もう一度お試しください。",
@@ -2660,7 +3171,8 @@ export const ja: Record<TKey, string> = {
   "grokCoupon.desc": "クーポンはこのアカウントの Grok 使用量枠を即座にリセットします。",
   "grokCoupon.none": "このアカウントにはリセットクーポンはありません。",
   "grokCoupon.loadFailed": "このアカウントのリセットクーポンを読み取れませんでした。",
-  "grokCoupon.loadFailedAuth": "クーポンを読み取るには、この xAI アカウントに再度サインインしてください。",
+  "grokCoupon.loadFailedAuth":
+    "クーポンを読み取るには、この xAI アカウントに再度サインインしてください。",
   "grokCoupon.retry": "再試行",
   "grokCoupon.couponLabel": "クーポン #{n}",
   "grokCoupon.couponNext": "次に使用",
@@ -2670,36 +3182,47 @@ export const ja: Record<TKey, string> = {
   "grokCoupon.useOne": "1 クーポンを使用",
   "grokCoupon.fifoNote": "最も失効が近いクーポンが先に使用されます。",
   "grokCoupon.confirmTitle": "リセットクーポンを使用しますか?",
-  "grokCoupon.confirmDesc": "このアカウントの Grok 使用量枠を即座にリセットします。残り {count} クーポンです。",
+  "grokCoupon.confirmDesc":
+    "このアカウントの Grok 使用量枠を即座にリセットします。残り {count} クーポンです。",
   "grokCoupon.confirmWhich": "{date} に失効するクーポンが使用されます。",
   "grokCoupon.irreversible": "この操作は元に戻せません。",
   "grokCoupon.redeem": "クーポンを使用",
   "grokCoupon.redeeming": "引き換え中…",
   "grokCoupon.redeemSuccess": "クーポンを引き換えました。残り {count} クーポンです。",
-  "grokCoupon.redeemReplayed": "この引き換えは既に完了しています。クーポンは再度消費されていません。",
-  "grokCoupon.redeemFailed": "引き換えに失敗しました。再試行する前にクーポン一覧を確認してください。",
-  "grokCoupon.authFailed": "クーポンを使用するには、この xAI アカウントに再度サインインしてください。",
+  "grokCoupon.redeemReplayed":
+    "この引き換えは既に完了しています。クーポンは再度消費されていません。",
+  "grokCoupon.redeemFailed":
+    "引き換えに失敗しました。再試行する前にクーポン一覧を確認してください。",
+  "grokCoupon.authFailed":
+    "クーポンを使用するには、この xAI アカウントに再度サインインしてください。",
   "grokCoupon.noAccount": "この引き換えに使用できる xAI アカウントがありません。",
   "grokCoupon.noneAvailable": "引き換え可能なリセットクーポンはありません。",
-  "grokCoupon.identityMismatch": "この引き換えは別のアカウントのものです。このダイアログを閉じてやり直してください。",
+  "grokCoupon.identityMismatch":
+    "この引き換えは別のアカウントのものです。このダイアログを閉じてやり直してください。",
   "grokCoupon.networkError": "プロキシに到達できませんでした。",
   "grokCoupon.capacity": "引き換えジャーナルが現在満杯です。しばらくしてから再試行してください。",
-  "grokCoupon.noOperationId": "このブラウザでは引き換え ID を生成できないため、ここでは引き換えできません。",
-  "grokCoupon.unknownOutcome": "使用結果は不明です。アカウントを再読み込みしてクーポンの有無を確認できますが、元の試行の結果は確定できません。",
+  "grokCoupon.noOperationId":
+    "このブラウザでは引き換え ID を生成できないため、ここでは引き換えできません。",
+  "grokCoupon.unknownOutcome":
+    "使用結果は不明です。アカウントを再読み込みしてクーポンの有無を確認できますが、元の試行の結果は確定できません。",
   "grokCoupon.checkResult": "アカウントを再読み込み",
   "grokCoupon.checking": "再読み込み中…",
-  "grokCoupon.consumedElsewhere": "クーポンは一覧にありません。元の使用結果は未確認のままで、追加の使用要求は送信しません。",
-  "grokCoupon.unresolved": "クーポンはまだ一覧にあります。元の使用要求が後から完了する可能性があるため、追加の使用要求は送信しません。",
+  "grokCoupon.consumedElsewhere":
+    "クーポンは一覧にありません。元の使用結果は未確認のままで、追加の使用要求は送信しません。",
+  "grokCoupon.unresolved":
+    "クーポンはまだ一覧にあります。元の使用要求が後から完了する可能性があるため、追加の使用要求は送信しません。",
 
   "anthropicGrant.badgeAria": "Claude の使用量リセット {count} 回分",
   "anthropicGrant.badgeErrorAria": "Claude の使用量リセットを読み取れませんでした",
   "anthropicGrant.title": "Claude の使用量リセット",
   "anthropicGrant.available": "このアカウントには使用量リセットが {count} 回分あります。",
-  "anthropicGrant.desc": "リセットすると、このアカウントの Claude の 5 時間枠と週次枠がすぐに補充されます。週次枠のリセット曜日は変わりません。",
+  "anthropicGrant.desc":
+    "リセットすると、このアカウントの Claude の 5 時間枠と週次枠がすぐに補充されます。週次枠のリセット曜日は変わりません。",
   "anthropicGrant.none": "このアカウントには使用量リセットがありません。",
   "anthropicGrant.ineligible": "このアカウントは現在、使用量リセットの対象ではありません。",
   "anthropicGrant.loadFailed": "このアカウントの使用量リセットを読み取れませんでした。",
-  "anthropicGrant.loadFailedAuth": "リセットを読み取るには、この Anthropic アカウントに再度サインインしてください。",
+  "anthropicGrant.loadFailedAuth":
+    "リセットを読み取るには、この Anthropic アカウントに再度サインインしてください。",
   "anthropicGrant.retry": "再試行",
   "anthropicGrant.resetsLeft": "残り {left} / {total} 回",
   "anthropicGrant.validFrom": "有効開始 {date}",
@@ -2712,38 +3235,57 @@ export const ja: Record<TKey, string> = {
   "anthropicGrant.requiresLimit": "このアカウントが使用量の上限に達すると使用できます",
   "anthropicGrant.useOne": "リセットを 1 回使用",
   "anthropicGrant.confirmTitle": "今すぐ使用量の上限をリセットしますか?",
-  "anthropicGrant.confirmDesc": "このアカウントの Claude 使用量枠を今すぐ補充し、リセットを 1 回分使用します。",
+  "anthropicGrant.confirmDesc":
+    "このアカウントの Claude 使用量枠を今すぐ補充し、リセットを 1 回分使用します。",
   "anthropicGrant.confirmWhich": "使用するリセット: {label}",
   "anthropicGrant.irreversible": "この操作は元に戻せません。",
   "anthropicGrant.redeem": "使用量の上限をリセット",
   "anthropicGrant.redeeming": "リセット中…",
   "anthropicGrant.resultReset": "使用量の上限をリセットしました。残り {count} 回分です。",
   "anthropicGrant.resultAlreadyUsed": "このリセットは既に使用されています。",
-  "anthropicGrant.resultNotLimited": "このアカウントは上限に達していないため、リセットは使用されませんでした。",
-  "anthropicGrant.resultCooldown": "このアカウントのリセットは現在クールダウン中です。リセットは使用されませんでした。",
-  "anthropicGrant.resultIneligible": "このアカウントは対象外になりました。リセットは使用されませんでした。",
-  "anthropicGrant.resultUnavailable": "現在、リセットを利用できません。リセットは使用されませんでした。",
-  "anthropicGrant.resultRateLimited": "リクエストが多すぎます。リセットは使用されていません。1 分後に再試行してください。",
-  "anthropicGrant.resultAuthError": "この Anthropic アカウントに再度サインインしてください。リセットは使用されませんでした。",
+  "anthropicGrant.resultNotLimited":
+    "このアカウントは上限に達していないため、リセットは使用されませんでした。",
+  "anthropicGrant.resultCooldown":
+    "このアカウントのリセットは現在クールダウン中です。リセットは使用されませんでした。",
+  "anthropicGrant.resultIneligible":
+    "このアカウントは対象外になりました。リセットは使用されませんでした。",
+  "anthropicGrant.resultUnavailable":
+    "現在、リセットを利用できません。リセットは使用されませんでした。",
+  "anthropicGrant.resultRateLimited":
+    "リクエストが多すぎます。リセットは使用されていません。1 分後に再試行してください。",
+  "anthropicGrant.resultAuthError":
+    "この Anthropic アカウントに再度サインインしてください。リセットは使用されませんでした。",
   "anthropicGrant.replayed": "このリセットは以前に処理済みです。再度使用されてはいません。",
-  "anthropicGrant.notUsableNow": "現在、このリセットは使用できません。アカウントを再読み込みしてください。",
-  "anthropicGrant.inFlight": "このリセットは処理中です。少し待ってからアカウントを再読み込みしてください。",
-  "anthropicGrant.unresolvedPrior": "このリセットに対する前回の試行はまだ結果が確認できていません。新しい試行を始めず、前回の試行を再試行してください。",
-  "anthropicGrant.expired": "前回の試行は期限内に結果を確認できませんでした。リセットを使用する前にアカウントを再読み込みしてください。",
-  "anthropicGrant.identityMismatch": "このリセットは別のアカウントのものです。このダイアログを閉じてやり直してください。",
-  "anthropicGrant.sessionRequired": "リセットを使用するには、ダッシュボードに直接ログインして開いてください。",
-  "anthropicGrant.journalBusy": "リセットジャーナルが使用中か、利用できません。リセットは使用されていません。しばらくしてから再試行してください。",
-  "anthropicGrant.failed": "リセットのリクエストに失敗しました。再試行する前にアカウントを確認してください。",
-  "anthropicGrant.noOperationId": "このブラウザではリクエスト ID を生成できないため、ここではリセットを使用できません。",
-  "anthropicGrant.unknownOutcome": "リセットの応答が間に合わなかったため、結果は不明です。再試行時には同じリクエスト ID が送られるため、2 回目のリセットは始まりません。",
+  "anthropicGrant.notUsableNow":
+    "現在、このリセットは使用できません。アカウントを再読み込みしてください。",
+  "anthropicGrant.inFlight":
+    "このリセットは処理中です。少し待ってからアカウントを再読み込みしてください。",
+  "anthropicGrant.unresolvedPrior":
+    "このリセットに対する前回の試行はまだ結果が確認できていません。新しい試行を始めず、前回の試行を再試行してください。",
+  "anthropicGrant.expired":
+    "前回の試行は期限内に結果を確認できませんでした。リセットを使用する前にアカウントを再読み込みしてください。",
+  "anthropicGrant.identityMismatch":
+    "このリセットは別のアカウントのものです。このダイアログを閉じてやり直してください。",
+  "anthropicGrant.sessionRequired":
+    "リセットを使用するには、ダッシュボードに直接ログインして開いてください。",
+  "anthropicGrant.journalBusy":
+    "リセットジャーナルが使用中か、利用できません。リセットは使用されていません。しばらくしてから再試行してください。",
+  "anthropicGrant.failed":
+    "リセットのリクエストに失敗しました。再試行する前にアカウントを確認してください。",
+  "anthropicGrant.noOperationId":
+    "このブラウザではリクエスト ID を生成できないため、ここではリセットを使用できません。",
+  "anthropicGrant.unknownOutcome":
+    "リセットの応答が間に合わなかったため、結果は不明です。再試行時には同じリクエスト ID が送られるため、2 回目のリセットは始まりません。",
   "anthropicGrant.retrySame": "同じリクエストを再試行",
   "anthropicGrant.checkResult": "アカウントを再読み込み",
   "anthropicGrant.checking": "再読み込み中…",
 
   // api access page
   "api.title": "API アクセス",
-  "api.subtitle": "生成した API キーで外部アプリから opencodex プロキシに接続します。認証は {authHeader} ヘッダーで行い、エンドポイントごとに受け付けるヘッダーは下の表のとおりです。",
-  "api.endpointNote": "ベース URL を OpenAI 互換クライアントで使ってください。Responses と Chat Completions は /v1 配下で公開されます。",
+  "api.subtitle":
+    "生成した API キーで外部アプリから opencodex プロキシに接続します。認証は {authHeader} ヘッダーで行い、エンドポイントごとに受け付けるヘッダーは下の表のとおりです。",
+  "api.endpointNote":
+    "ベース URL を OpenAI 互換クライアントで使ってください。Responses と Chat Completions は /v1 配下で公開されます。",
   "api.endpointsTitle": "エンドポイント",
   "api.baseUrl": "ベース URL",
   "api.responsesEndpoint": "Responses API",
@@ -2757,14 +3299,18 @@ export const ja: Record<TKey, string> = {
   "api.surface.source.inherited": "Claude 設定から継承",
   "api.surface.source.invalid": "無効な値 — 閉鎖",
   "api.surface.messagesToggle": "Messages API を提供する",
-  "api.surface.messagesCloseNote": "Messages をオフにすると Claude 連携もオフになるため、古い opencodex バージョンでもエンドポイントは閉じたままになります。",
+  "api.surface.messagesCloseNote":
+    "Messages をオフにすると Claude 連携もオフになるため、古い opencodex バージョンでもエンドポイントは閉じたままになります。",
   "api.surface.openClaude": "Claude 設定",
   "api.surface.toggleFailed": "Messages の設定を保存できませんでした。",
-  "api.surface.toggleUnavailable": "このプロキシのバージョンではここで Messages API を変更できません。Claude ページを使ってください。",
+  "api.surface.toggleUnavailable":
+    "このプロキシのバージョンではここで Messages API を変更できません。Claude ページを使ってください。",
   "api.surface.closedNote": "このエンドポイントへのリクエストは 403 で拒否されます。",
   "api.authTitle": "認証",
-  "api.authBaseUrlNote": "クライアントにはベース URL を設定し、下のプロトコル別エンドポイントを選んでください。",
-  "api.authLoopback": "ループバックの認証は経路によって異なります。独立した音声クライアントにはOpenCodexデータキーが必要です。リモート接続にはデータキーまたはOPENCODEX_API_AUTH_TOKENが必要です。",
+  "api.authBaseUrlNote":
+    "クライアントにはベース URL を設定し、下のプロトコル別エンドポイントを選んでください。",
+  "api.authLoopback":
+    "ループバックの認証は経路によって異なります。独立した音声クライアントにはOpenCodexデータキーが必要です。リモート接続にはデータキーまたはOPENCODEX_API_AUTH_TOKENが必要です。",
   "api.modelsTitle": "外部モデルカタログ",
   "api.modelsCount": "{count} 件が利用可能",
   "api.modelsSearch": "モデルを検索",
@@ -2791,7 +3337,8 @@ export const ja: Record<TKey, string> = {
   "api.usageChatTitle": "Chat Completions の例",
   "api.usageMessagesTitle": "Messages の例",
   "api.newKeyTitle": "新しいキーを作成しました",
-  "api.newKeyNote": "今すぐこのキーをコピーしてください。後からでもキー一覧でキーをクリックすると再表示できます。",
+  "api.newKeyNote":
+    "今すぐこのキーをコピーしてください。後からでもキー一覧でキーをクリックすると再表示できます。",
   "api.copy": "コピー",
   "api.copied": "コピーしました",
   "api.dismiss": "閉じる",
@@ -2810,7 +3357,8 @@ export const ja: Record<TKey, string> = {
   "api.section.examples": "例",
   "api.section.plan": "経路プレビュー",
   "api.plan.title": "リクエスト経路のプレビュー",
-  "api.plan.description": "このモデルへのリクエストがプロキシ内でたどる経路を表示します。プレビューは上流に何も送信せず、費用もかかりません。",
+  "api.plan.description":
+    "このモデルへのリクエストがプロキシ内でたどる経路を表示します。プレビューは上流に何も送信せず、費用もかかりません。",
   "api.plan.modeNote": "「ネイティブ」はリクエストの配送方法を表し、検証結果ではありません。",
   "api.plan.unavailable": "このバージョンのプロキシは経路プレビューに対応していません。",
   "api.plan.noModels": "プレビューできるモデルがまだありません。",
@@ -2869,7 +3417,8 @@ export const ja: Record<TKey, string> = {
   "api.key.hideHint": "クリックでキー全体を隠す",
   "api.key.revealFailed": "キー全体を読み込めませんでした。",
   "api.key.revealDenied": "保存済みのキーを表示するには、このブラウザーをペアリングしてください。",
-  "api.key.mutationHidden": "キーの作成またはローテーションの開始は完了しましたが、セッションまたは画面が変わったため、一度だけ表示される値を非表示にしました。",
+  "api.key.mutationHidden":
+    "キーの作成またはローテーションの開始は完了しましたが、セッションまたは画面が変わったため、一度だけ表示される値を非表示にしました。",
   "api.key.copyFailedShort": "コピーできませんでした。キーを選択して手動でコピーしてください。",
   "api.key.deleteRowAria": "{name} を削除",
   "api.key.deleteShort": "削除",
@@ -2904,24 +3453,32 @@ export const ja: Record<TKey, string> = {
   "api.clientConfig.clientCline": "Cline CLI",
   "api.clientConfig.clientKilo": "Kilo",
   "api.clientConfig.clientDroid": "Factory Droid",
-  "api.clientConfig.clineBundle": "これは Cline 設定ファイルではなく、2 ファイル分のデータです。settings を providers.json に、catalog を隣の models.json にマージしてください。バックアップ付きの書き込みには統合スイッチを使ってください。",
-  "api.clientConfig.clineDownloaded": "{filename} をダウンロードしました。設定はまだ変わっていません。settings と catalog は別々の Cline ファイルに保存します。",
+  "api.clientConfig.clineBundle":
+    "これは Cline 設定ファイルではなく、2 ファイル分のデータです。settings を providers.json に、catalog を隣の models.json にマージしてください。バックアップ付きの書き込みには統合スイッチを使ってください。",
+  "api.clientConfig.clineDownloaded":
+    "{filename} をダウンロードしました。設定はまだ変わっていません。settings と catalog は別々の Cline ファイルに保存します。",
   "api.clientConfig.copy": "設定をコピー",
   "api.clientConfig.download": "ダウンロード",
   "api.clientConfig.loading": "クライアント設定を生成中…",
   "api.clientConfig.jsonLabel": "{client} 設定",
   "api.clientConfig.destination": "配置先ファイル",
   "api.clientConfig.envHint": "起動前にキーを設定",
-  "api.clientConfig.mergeWarning": "配置先ファイルにマージしてください。置き換えると既存のプロバイダーや MCP 設定が失われます。",
+  "api.clientConfig.mergeWarning":
+    "配置先ファイルにマージしてください。置き換えると既存のプロバイダーや MCP 設定が失われます。",
   "api.clientConfig.modelCount": "{count} 件のモデルを書き出しました",
-  "api.clientConfig.missingLimits": "{total} 件中 {count} 件のモデルにコンテキスト上限がないため、クライアント側の既定値が使われます。",
-  "api.clientConfig.noKeyYet": "{env} に対応するキーがまだありません。ループバック外で使う前に上でキーを発行してください。",
-  "api.clientConfig.loadFailed": "モデル一覧を読み取れなかったため、クライアント設定を生成できませんでした。",
+  "api.clientConfig.missingLimits":
+    "{total} 件中 {count} 件のモデルにコンテキスト上限がないため、クライアント側の既定値が使われます。",
+  "api.clientConfig.noKeyYet":
+    "{env} に対応するキーがまだありません。ループバック外で使う前に上でキーを発行してください。",
+  "api.clientConfig.loadFailed":
+    "モデル一覧を読み取れなかったため、クライアント設定を生成できませんでした。",
   "api.clientConfig.copiedAnnounce": "クライアント設定をクリップボードにコピーしました。",
   "api.clientConfig.copyFailed": "クライアント設定をコピーできませんでした。",
-  "api.clientConfig.downloadedAnnounce": "{filename} をダウンロードしました。まだ何も変わっていません。{destination} に自分でマージしてください。",
+  "api.clientConfig.downloadedAnnounce":
+    "{filename} をダウンロードしました。まだ何も変わっていません。{destination} に自分でマージしてください。",
   "api.clientConfig.whereDisclosure": "このファイルの置き場所",
-  "api.clientConfig.whereBody": "上のパスはグローバル設定の場所です。作業ディレクトリのプロジェクト設定ファイルが優先され、キーは設定に書かれた環境変数から読み込まれ、このファイルには保存されません。",
+  "api.clientConfig.whereBody":
+    "上のパスはグローバル設定の場所です。作業ディレクトリのプロジェクト設定ファイルが優先され、キーは設定に書かれた環境変数から読み込まれ、このファイルには保存されません。",
   "api.keysLoadFailed": "APIキーを読み込めませんでした。",
   "api.createFailed": "APIキーを作成できませんでした。",
   "api.deleteFailed": "APIキーを削除できませんでした。",
@@ -2930,7 +3487,8 @@ export const ja: Record<TKey, string> = {
   "api.auth.accepted": "利用可",
   "api.auth.rejected": "不可",
   "api.auth.testProtocol": "{protocol} をテスト",
-  "api.auth.testNeedsFreshKey": "認証付きテストを実行するには、キーを新しく作成し、一度だけ表示される値を画面に残したままにしてください。",
+  "api.auth.testNeedsFreshKey":
+    "認証付きテストを実行するには、キーを新しく作成し、一度だけ表示される値を画面に残したままにしてください。",
   "api.key.name": "キー名",
   "api.key.rename": "名前を変更",
   "api.key.saveName": "名前を保存",
@@ -2938,9 +3496,11 @@ export const ja: Record<TKey, string> = {
   "api.key.renameFailed": "名前を変更できませんでした。入力内容はそのまま残しています。",
   "api.key.deleting": "削除中…",
   "api.rotation.title": "キーのローテーション",
-  "api.rotation.pending": "ローテーションは保留中です。確定前にクライアントを更新して動作を確認してください。",
+  "api.rotation.pending":
+    "ローテーションは保留中です。確定前にクライアントを更新して動作を確認してください。",
   "api.rotation.expires": "移行期間の終了:",
-  "api.key.copyFailed": "キーをコピーできませんでした。このパネルを閉じる前に手動で選択してコピーしてください。",
+  "api.key.copyFailed":
+    "キーをコピーできませんでした。このパネルを閉じる前に手動で選択してコピーしてください。",
   "api.attribution.title": "キー別の使用状況",
   "api.attribution.requests7d": "直近 7 日のリクエスト",
   "api.attribution.totalRequests": "集計済みリクエスト総数",
@@ -2950,11 +3510,14 @@ export const ja: Record<TKey, string> = {
   "api.attribution.since": "集計開始",
   "api.attribution.neverUsed": "集計開始以降は未使用",
   "api.attribution.unavailable": "使用状況なし",
-  "api.attribution.unavailableDetail": "まだ集計された使用状況がありません。集計開始前のリクエストは遡って割り当てられません。",
-  "api.attribution.ambiguous": "2 つのキーが同じ ID を共有しているため、どちらの使用状況か判別できません。設定ファイルでキーごとに一意の ID を指定してください。",
+  "api.attribution.unavailableDetail":
+    "まだ集計された使用状況がありません。集計開始前のリクエストは遡って割り当てられません。",
+  "api.attribution.ambiguous":
+    "2 つのキーが同じ ID を共有しているため、どちらの使用状況か判別できません。設定ファイルでキーごとに一意の ID を指定してください。",
   "api.attribution.railAmbiguous": "ID 重複",
   // Claude Code inbound
-  "claude.subtitle": "ocx claude を OpenCodex 経由でルーティングし、Claude Code で GPT、Gemini などのモデルを使えるようにします。オフにすると、傍受（ファーストパーティを含む）と Claude Desktop のモデル一覧も無効になります。接続の概要にある Claude スイッチと同じ設定です。",
+  "claude.subtitle":
+    "ocx claude を OpenCodex 経由でルーティングし、Claude Code で GPT、Gemini などのモデルを使えるようにします。オフにすると、傍受（ファーストパーティを含む）と Claude Desktop のモデル一覧も無効になります。接続の概要にある Claude スイッチと同じ設定です。",
   "claude.pageTitle": "Claude Code",
   "claude.workspace.settings": "一般",
   "claude.enabledLabel": "Claude 接続",
@@ -2964,7 +3527,8 @@ export const ja: Record<TKey, string> = {
   "claude.saveBar.revert": "元に戻す",
   "claude.enabledHint": "オフにすると Claude Code はこのプロキシを使用できません。",
   "claude.authMode": "認証モード",
-  "claude.authModeHint": "サブスクリプションは Claude アカウントが必要、プロキシは Anthropic アカウント不要で動作します",
+  "claude.authModeHint":
+    "サブスクリプションは Claude アカウントが必要、プロキシは Anthropic アカウント不要で動作します",
   "claude.authModeSubscription": "サブスクリプション(Claude アカウント)",
   "claude.authModeProxy": "プロキシ(アカウント不要)",
   "claude.authModeAuto": "自動 (Claude 認証を検出)",
@@ -2980,40 +3544,53 @@ export const ja: Record<TKey, string> = {
   "claude.authSource.exported-env": "環境変数",
   "claude.authSource.unknown": "検出された認証情報",
   "claude.fastMode": "高速モード(OpenAI)",
-  "claude.fastModeDesc": "OpenAI モデルの service_tier を制御します。オン = 優先(高速)。オフ = デフォルト。自動 = パススルー(クライアントが決定)。",
+  "claude.fastModeDesc":
+    "OpenAI モデルの service_tier を制御します。オン = 優先(高速)。オフ = デフォルト。自動 = パススルー(クライアントが決定)。",
   "claude.fastAuto": "自動",
   "claude.fastOn": "オン",
   "claude.fastOff": "オフ",
   "claude.autoContext": "大きなコンテキストを自動で使用",
-  "claude.autoContextDesc": "1M マーキングがどこまで及ぶかを制御します。オン: 圧縮しきい値を収められるウィンドウを持つモデルに大型コンテキスト行を付けます。オフ: 真の 1M モデルのみに付けます。",
-  "claude.autoContextInert": "設定ファイルにレガシーのコンテキストサイズ値(maxContextTokens)が存在するため無効です。再び有効化するにはそれを削除してください。",
+  "claude.autoContextDesc":
+    "1M マーキングがどこまで及ぶかを制御します。オン: 圧縮しきい値を収められるウィンドウを持つモデルに大型コンテキスト行を付けます。オフ: 真の 1M モデルのみに付けます。",
+  "claude.autoContextInert":
+    "設定ファイルにレガシーのコンテキストサイズ値(maxContextTokens)が存在するため無効です。再び有効化するにはそれを削除してください。",
   "claude.contextAccounting": "コンテキスト計算方式",
-  "claude.contextAccountingDesc": "1M: 長いコンテキストのモデルは、opencodex が既定を選ぶすべての場所で既定で 1M になります。200k: opencodex は自動で 1M の標識を付けません。自分で選んだ 1M の行と自分で設定したコンテキスト上書きはそのまま適用されます。",
+  "claude.contextAccountingDesc":
+    "1M: 長いコンテキストのモデルは、opencodex が既定を選ぶすべての場所で既定で 1M になります。200k: opencodex は自動で 1M の標識を付けません。自分で選んだ 1M の行と自分で設定したコンテキスト上書きはそのまま適用されます。",
   "claude.contextAccounting1m": "1M（既定）",
   "claude.contextAccounting200k": "200k",
   "claude.autoCompactWindow": "自動要約ポイント",
   "claude.autoCompactDefault": "{value}(デフォルト)",
-  "claude.autoCompactWindowDesc": "チャットがこのポイントに達すると古いメッセージが要約されます。各モデル自身の上限を超えることはないので、200k モデルは影響を受けません。",
-  "claude.autoCompactWindowWarn": "これを変更すると GPT モデルが壊れる可能性があります — モデルの実際の上限より高く設定すると、要約が働く前にチャットがエラーになります。",
+  "claude.autoCompactWindowDesc":
+    "チャットがこのポイントに達すると古いメッセージが要約されます。各モデル自身の上限を超えることはないので、200k モデルは影響を受けません。",
+  "claude.autoCompactWindowWarn":
+    "これを変更すると GPT モデルが壊れる可能性があります — モデルの実際の上限より高く設定すると、要約が働く前にチャットがエラーになります。",
   "claude.injectAgents": "サブエージェントを自動登録",
-  "claude.injectAgentsDesc": "サブエージェントタブで選んだモデル(と現在のデフォルトモデル)をディスパッチ可能な Claude Code エージェント(ocx-*)として登録します。次回セッションから適用されます。",
+  "claude.injectAgentsDesc":
+    "サブエージェントタブで選んだモデル(と現在のデフォルトモデル)をディスパッチ可能な Claude Code エージェント(ocx-*)として登録します。次回セッションから適用されます。",
   "claude.webSearchSidecar": "ウェブ検索サイドカーの上書き",
-  "claude.webSearchSidecarHint": "Claude Code リクエストのメインウェブ検索サイドカーを上書きします。",
+  "claude.webSearchSidecarHint":
+    "Claude Code リクエストのメインウェブ検索サイドカーを上書きします。",
   "claude.visionSidecar": "ビジョンサイドカーの上書き",
   "claude.visionSidecarHint": "Claude Code リクエストのメインビジョンサイドカーを上書きします。",
   "claude.useMainSetting": "メイン設定を使用",
   "claude.sidecarModelPlaceholder": "メイン設定のモデル",
   "claude.quickstart": "はじめる",
-  "claude.quickstartHint": "{cmd} はプロキシ経由で Claude Code を開きます。あなたの claude.ai ログインはそのまま有効です。",
+  "claude.quickstartHint":
+    "{cmd} はプロキシ経由で Claude Code を開きます。あなたの claude.ai ログインはそのまま有効です。",
   "claude.manualEnv": "手動セットアップ(高度)",
   "claude.smallFastModel": "バックグラウンドヘルパーモデル",
-  "claude.smallFastModelHint": "チャットの要約やトピック検出のようなバックグラウンド作業に Claude Code が使うモデルです。haiku サブエージェントエイリアスもこれを使います。空 = Claude デフォルト(Haiku)。",
-  "claude.smallFastModelAccurateHint": "チャットの要約やトピック検出など、Claude Code がバックグラウンド処理に使うモデルです。サブエージェントの haiku エイリアスもこのモデルを使います。",
+  "claude.smallFastModelHint":
+    "チャットの要約やトピック検出のようなバックグラウンド作業に Claude Code が使うモデルです。haiku サブエージェントエイリアスもこれを使います。空 = Claude デフォルト(Haiku)。",
+  "claude.smallFastModelAccurateHint":
+    "チャットの要約やトピック検出など、Claude Code がバックグラウンド処理に使うモデルです。サブエージェントの haiku エイリアスもこのモデルを使います。",
   "claude.smallFastModelUnsetOption": "Claude Code に選択させる（ネイティブモデル）",
-  "claude.smallFastModelNativeWarning": "未設定の場合、OpenCodex はヘルパーモデルの上書きを設定しません。Claude Code がネイティブの Sonnet モデルを使用し、ネイティブプロバイダーで料金が発生する可能性があります。",
+  "claude.smallFastModelNativeWarning":
+    "未設定の場合、OpenCodex はヘルパーモデルの上書きを設定しません。Claude Code がネイティブの Sonnet モデルを使用し、ネイティブプロバイダーで料金が発生する可能性があります。",
   "claude.slotUnset": "Claude デフォルトを使用",
   "claude.modelMap": "モデルの傍受",
-  "claude.modelMapHint": "特定モデルへのリクエストを傍受し、選んだモデルに再ルーティングします。デフォルトは空 — ルールを追加するまで何も起きません。",
+  "claude.modelMapHint":
+    "特定モデルへのリクエストを傍受し、選んだモデルに再ルーティングします。デフォルトは空 — ルールを追加するまで何も起きません。",
   "claude.mapFrom": "元のモデル(例: claude-sonnet-4-5)",
   "claude.mapTo": "差し替え先(例: gemini/gemini-3-pro)",
   "claude.addMapping": "ルールを追加",
@@ -3030,7 +3607,8 @@ export const ja: Record<TKey, string> = {
   "claude.none": "なし",
   "claude.tabsLabel": "Claude クライアント",
   "claudeDesktop.title": "Claude Desktop",
-  "claudeDesktop.subtitle": "各 Claude モデルファミリーをプロキシポート {port} の利用可能なモデルへルーティングします。",
+  "claudeDesktop.subtitle":
+    "各 Claude モデルファミリーをプロキシポート {port} の利用可能なモデルへルーティングします。",
   "claudeDesktop.importJson": "JSON をインポート",
   "claudeDesktop.exportJson": "JSON をエクスポート",
   "claudeDesktop.loading": "Claude Desktop プロファイルを読み込み中…",
@@ -3040,14 +3618,17 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.applyFailed": "プロファイルは保存されましたが、適用できませんでした。",
   "claudeDesktop.updateFailed": "Claude Desktop の更新に失敗しました。",
   "claudeDesktop.savedApplied": "プロファイルを保存し、Claude Desktop に適用しました。",
-  "claudeDesktop.appliedMarkerUnsaved": "Claude Desktop への適用は完了しましたが、適用マーカーを保存できませんでした。再度適用するまで、下の保存済み／適用済み表示が実際と異なる場合があります。",
+  "claudeDesktop.appliedMarkerUnsaved":
+    "Claude Desktop への適用は完了しましたが、適用マーカーを保存できませんでした。再度適用するまで、下の保存済み／適用済み表示が実際と異なる場合があります。",
   "claudeDesktop.savedAppliedAnnounce": "Claude Desktop プロファイルを保存して適用しました。",
   "claudeDesktop.saved": "プロファイルを保存しました。",
   "claudeDesktop.savedAnnounce": "Claude Desktop プロファイルを保存しました。",
   "claudeDesktop.exported": "プロファイルを JSON としてエクスポートしました。",
   "claudeDesktop.importExpected": "バージョン 1 の Claude Desktop プロファイルが必要です。",
-  "claudeDesktop.importReady": "JSON をインポートしました。ドラフトを確認して保存・適用してください。",
-  "claudeDesktop.importedAnnounce": "プロファイル JSON をインポートしました。未保存の変更を確認できます。",
+  "claudeDesktop.importReady":
+    "JSON をインポートしました。ドラフトを確認して保存・適用してください。",
+  "claudeDesktop.importedAnnounce":
+    "プロファイル JSON をインポートしました。未保存の変更を確認できます。",
   "claudeDesktop.importInvalid": "選択されたファイルは有効なプロファイルではありません。",
   "claudeDesktop.importFailed": "インポートに失敗しました。{error}",
   "claudeDesktop.moved": "{route} を {family} に移動しました。",
@@ -3057,7 +3638,8 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.applying": "適用中…",
   "claudeDesktop.saveApply": "保存して適用",
   "claudeDesktop.emptyTitle": "利用可能なモデルがありません",
-  "claudeDesktop.emptyHint": "プロバイダーを追加または有効化してから、Claude Desktop ルートを割り当ててください。",
+  "claudeDesktop.emptyHint":
+    "プロバイダーを追加または有効化してから、Claude Desktop ルートを割り当ててください。",
   "claudeDesktop.assignmentsLabel": "Claude モデルファミリーの割り当て",
   "claudeDesktop.family.opus": "Opus",
   "claudeDesktop.family.fable": "Fable",
@@ -3075,7 +3657,8 @@ export const ja: Record<TKey, string> = {
   "grok.loading": "Grok の状態を読み込み中…",
   "grok.loadFail": "Grok 設定を読み取れませんでした。",
   "grok.notConfiguredTitle": "Grok Build が未設定です",
-  "grok.notConfiguredHint": "Grok をインストールしてプロキシを再起動すると、opencodex が管理ブロックを次の場所に書き込みます:",
+  "grok.notConfiguredHint":
+    "Grok をインストールしてプロキシを再起動すると、opencodex が管理ブロックを次の場所に書き込みます:",
   "grok.endpoint": "エンドポイント",
   "grok.colModel": "モデル",
   "grok.colAlias": "Grok エイリアス",
@@ -3098,15 +3681,18 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.defaultBadge": "既定",
   "claudeDesktop.roles.title": "モデル",
   "claudeDesktop.roles.default": "デフォルトモデル",
-  "claudeDesktop.roles.defaultDesc": "Claude Desktop のモデル一覧の先頭に表示され、Opus ティアとして送信されます。",
+  "claudeDesktop.roles.defaultDesc":
+    "Claude Desktop のモデル一覧の先頭に表示され、Opus ティアとして送信されます。",
   "claudeDesktop.roles.quick": "クイックタスク用モデル",
   "claudeDesktop.roles.quickDesc": "Claude Desktop の Haiku ティアのリクエストに応答します。",
   "claudeDesktop.roles.unset": "未設定",
   "claudeDesktop.roles.pick": "モデルを選択",
   "claudeDesktop.roles.unavailableOption": "{route}（利用不可）",
-  "claudeDesktop.roles.gatewayScope": "これらの選択は、Claude Desktop のモデル一覧を書き込むゲートウェイモードに適用されます。",
+  "claudeDesktop.roles.gatewayScope":
+    "これらの選択は、Claude Desktop のモデル一覧を書き込むゲートウェイモードに適用されます。",
   "claudeDesktop.roles.listTitle": "Desktop モデル一覧",
-  "claudeDesktop.roles.listHint": "Claude Desktop に表示するモデルを選びます。変わるのは Claude Desktop だけで、他のクライアントやプロバイダー設定のモデルはそのままです。",
+  "claudeDesktop.roles.listHint":
+    "Claude Desktop に表示するモデルを選びます。変わるのは Claude Desktop だけで、他のクライアントやプロバイダー設定のモデルはそのままです。",
   "claudeDesktop.status.pendingApply": "保存済み — 適用すると Desktop に反映されます",
   "claudeDesktop.visibility.search": "モデルを検索",
   "claudeDesktop.visibility.provider": "プロバイダー",
@@ -3127,11 +3713,14 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.visibility.previewTitle": "次回の適用",
   "claudeDesktop.visibility.previewAdds": "追加: {models}",
   "claudeDesktop.visibility.previewRemoves": "削除: {models}",
-  "claudeDesktop.visibility.previewSame": "プロファイルには同じモデル ID が含まれています。Desktop を再起動する前にプロファイルの変更を適用してください。",
-  "claudeDesktop.visibility.replaceNote": "適用すると OpenCodex の Claude Desktop プロファイルのモデルリストが置き換わります（手動で編集したリストも含む）。詳細設定のティア割り当ては任意です。ディスカバリー専用モードではこの選択は使われません。",
+  "claudeDesktop.visibility.previewSame":
+    "プロファイルには同じモデル ID が含まれています。Desktop を再起動する前にプロファイルの変更を適用してください。",
+  "claudeDesktop.visibility.replaceNote":
+    "適用すると OpenCodex の Claude Desktop プロファイルのモデルリストが置き換わります（手動で編集したリストも含む）。詳細設定のティア割り当ては任意です。ディスカバリー専用モードではこの選択は使われません。",
   "claudeDesktop.roles.quickBadge": "クイックタスク",
   "claudeDesktop.advanced.title": "詳細設定：Claude ティアの割り当て",
-  "claudeDesktop.advanced.desc": "Claude Desktop が各モデルをどの Claude ティア（Opus、Fable、Sonnet、Haiku）として扱うかを選択します。",
+  "claudeDesktop.advanced.desc":
+    "Claude Desktop が各モデルをどの Claude ティア（Opus、Fable、Sonnet、Haiku）として扱うかを選択します。",
   "claudeDesktop.advanced.empty": "空",
   "claudeDesktop.supports1m": "1M",
   "claudeDesktop.unavailable": "利用不可",
@@ -3145,8 +3734,10 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.status.applied": "Desktop に適用済み",
   "claudeDesktop.status.stale": "Desktop の設定が最新ではありません — 再適用してください",
   "claudeDesktop.status.notApplied": "未適用",
-  "claudeDesktop.status.notActiveProfile": "Desktop は別のプロファイルを使用中 — 再適用してください",
-  "claudeDesktop.status.disabled": "Claude Desktop 連携はオフです。有効にした後、Desktop を完全に終了して再起動してください。",
+  "claudeDesktop.status.notActiveProfile":
+    "Desktop は別のプロファイルを使用中 — 再適用してください",
+  "claudeDesktop.status.disabled":
+    "Claude Desktop 連携はオフです。有効にした後、Desktop を完全に終了して再起動してください。",
   "claudeDesktop.enableApply": "有効にして適用",
   "claudeDesktop.switchModeApply": "モードを切り替えて適用",
   "claudeDesktop.status.appliedFirstParty": "1P: Desktop の Code タブはローカルプロキシ経由",
@@ -3155,58 +3746,88 @@ export const ja: Record<TKey, string> = {
   "claudeDesktop.mode.gateway": "ゲートウェイ（3P）",
   "claudeDesktop.mode.defaultBadge": "デフォルト",
   "claudeDesktop.mode.current": "現在",
-  "claudeDesktop.mode.firstPartyHint": "Desktop は claude.ai にログインしたままです。Desktop の 1P がオンなら Code タブは OpenCodex を使い、単独の CLI は別のスイッチで制御します。どちらも同じ設定環境変数を読みます。",
+  "claudeDesktop.mode.firstPartyHint":
+    "Desktop は claude.ai にログインしたままです。Desktop の 1P がオンなら Code タブは OpenCodex を使い、単独の CLI は別のスイッチで制御します。どちらも同じ設定環境変数を読みます。",
   "claude.intercept.start": "傍受を開始",
   "claude.intercept.starting": "傍受を開始中…",
   "claude.intercept.reason.disabled": "先にClaudeのルーティングと傍受を有効にしてください。",
-  "claude.intercept.reason.client_role": "このプロセスはハブクライアントです。ローカルサーバーで傍受を有効にしてください。",
-  "claude.intercept.reason.ephemeral_port": "公開ポートが一時的な場合はclaudeCode.intercept.portを指定してください。",
-  "claude.intercept.reason.port_in_use": "ポート{port}は使用中です。解放するかclaudeCode.intercept.portを変更してください。",
-  "claude.intercept.reason.port_mismatch": "現在のポートは{bound}、設定は{configured}です。現在のポートを使用するか設定を戻してください。",
-  "claude.intercept.reason.failed": "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
+  "claude.intercept.reason.client_role":
+    "このプロセスはハブクライアントです。ローカルサーバーで傍受を有効にしてください。",
+  "claude.intercept.reason.ephemeral_port":
+    "公開ポートが一時的な場合はclaudeCode.intercept.portを指定してください。",
+  "claude.intercept.reason.port_in_use":
+    "ポート{port}は使用中です。解放するかclaudeCode.intercept.portを変更してください。",
+  "claude.intercept.reason.port_mismatch":
+    "現在のポートは{bound}、設定は{configured}です。現在のポートを使用するか設定を戻してください。",
+  "claude.intercept.reason.failed":
+    "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
   "claude.intercept.reason.stopped": "傍受は停止しました。OpenCodexサービスを起動してください。",
   "claude.firstParty.label": "Claude Code CLI の 1P",
-  "claude.firstParty.desc": "単体の claude CLI が Claude のログインを保ったまま、ローカルのインターセプトプロキシを経由するようにします。",
+  "claude.firstParty.desc":
+    "単体の claude CLI が Claude のログインを保ったまま、ローカルのインターセプトプロキシを経由するようにします。",
   "claude.firstParty.aria": "Claude Code CLI の 1P を切り替え",
-  "claude.firstParty.risk": "アカウントのリスク：1P では Claude のサブスクリプション通信がローカルの傍受プロキシを通ります。Anthropic が規約違反と判断し、アカウントを停止する可能性があります。",
-  "claude.firstParty.shared": "共有プロキシ設定が適用されている場合、もう一方の Claude クライアントもローカルプロキシを通りますが、要求は変更されずに中継されます。TLS はローカルで終端します。ターミナルから直接接続するにはシェルで NO_PROXY='*' を設定してください。",
-  "claude.firstParty.deadProxy": "Claude の設定は停止中のプロキシを指しています。OpenCodex を起動するか Desktop/CLI の 1P をオフにするまで、通常の claude は接続できません。",
-  "claude.firstParty.notApplied": "CLI の 1P はオンですが、プロキシ設定は適用されていません。通常の claude を使う前に Claude の設定を確認してください。",
-  "claude.firstParty.brokenProxy": "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
-  "claude.firstParty.residual": "Desktop と CLI の 1P は両方オフですが、Claude の設定には OpenCodex プロキシが残っています。設定を削除するか `ocx ensure` を実行してください。",
-  "claude.firstParty.routingOff": "現在の設定では opencodex が Claude インターセプトを提供していません（Claude ルーティングまたはインターセプトがオフか、この端末が別の opencodex ハブのクライアントです）。そのため、この設定は要求を処理しないプロキシを指しています。この端末で再度有効にするか、1P をオフにして設定を削除してください。",
+  "claude.firstParty.risk":
+    "アカウントのリスク：1P では Claude のサブスクリプション通信がローカルの傍受プロキシを通ります。Anthropic が規約違反と判断し、アカウントを停止する可能性があります。",
+  "claude.firstParty.shared":
+    "共有プロキシ設定が適用されている場合、もう一方の Claude クライアントもローカルプロキシを通りますが、要求は変更されずに中継されます。TLS はローカルで終端します。ターミナルから直接接続するにはシェルで NO_PROXY='*' を設定してください。",
+  "claude.firstParty.deadProxy":
+    "Claude の設定は停止中のプロキシを指しています。OpenCodex を起動するか Desktop/CLI の 1P をオフにするまで、通常の claude は接続できません。",
+  "claude.firstParty.notApplied":
+    "CLI の 1P はオンですが、プロキシ設定は適用されていません。通常の claude を使う前に Claude の設定を確認してください。",
+  "claude.firstParty.brokenProxy":
+    "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
+  "claude.firstParty.residual":
+    "Desktop と CLI の 1P は両方オフですが、Claude の設定には OpenCodex プロキシが残っています。設定を削除するか `ocx ensure` を実行してください。",
+  "claude.firstParty.routingOff":
+    "現在の設定では opencodex が Claude インターセプトを提供していません（Claude ルーティングまたはインターセプトがオフか、この端末が別の opencodex ハブのクライアントです）。そのため、この設定は要求を処理しないプロキシを指しています。この端末で再度有効にするか、1P をオフにして設定を削除してください。",
   "claude.firstParty.disabled": "先にClaudeのルーティングと傍受を有効にしてください。",
-  "claude.firstParty.foreign": "~/.claude/settings.json は opencodex プロキシを指していますが、opencodex が管理しない証明書を信頼しているため要求は失敗します。HTTPS_PROXY / NODE_EXTRA_CA_CERTS を手動で修正してください。",
-  "claude.firstParty.local": "~/.claude/settings.json により Claude Code は 127.0.0.1 のローカルプロキシを通りますが、opencodex はそれが自身のプロキシか確認できません。使っていない場合は、そのファイルから HTTPS_PROXY を削除してください。",
-  "claude.firstParty.unknown": "opencodex は ~/.claude/settings.json がまだ自身のプロキシを指しているか確認できません。",
+  "claude.firstParty.foreign":
+    "~/.claude/settings.json は opencodex プロキシを指していますが、opencodex が管理しない証明書を信頼しているため要求は失敗します。HTTPS_PROXY / NODE_EXTRA_CA_CERTS を手動で修正してください。",
+  "claude.firstParty.local":
+    "~/.claude/settings.json により Claude Code は 127.0.0.1 のローカルプロキシを通りますが、opencodex はそれが自身のプロキシか確認できません。使っていない場合は、そのファイルから HTTPS_PROXY を削除してください。",
+  "claude.firstParty.unknown":
+    "opencodex は ~/.claude/settings.json がまだ自身のプロキシを指しているか確認できません。",
   "claude.firstParty.refusal.interceptDisabled": "傍受プロキシは無効です。",
-  "claude.firstParty.refusal.interceptUnavailable": "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
-  "claude.firstParty.refusal.foreignEnv": "別のプログラムが Claude のプロキシ設定を管理しています。",
+  "claude.firstParty.refusal.interceptUnavailable":
+    "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。",
+  "claude.firstParty.refusal.foreignEnv":
+    "別のプログラムが Claude のプロキシ設定を管理しています。",
   "claude.firstParty.refusal.caUnavailable": "ローカル認証局を利用できません。",
   "claude.firstParty.refusal.unreadable": "Claude の設定を読み取れません。",
   "claude.firstParty.refusal.writeFailed": "Claude の設定を書き込めません。",
-  "claudeDesktop.mode.firstPartyRisk": "アカウントのリスク：1P（ファーストパーティ）モードでは、Claude のサブスクリプション通信がローカルの傍受プロキシを通ります。Anthropic がこれを利用規約違反とみなし、アカウントを停止する可能性があります。ゲートウェイがデフォルトです。",
-  "claudeDesktop.mode.gatewayHint": "アプリ全体が OpenCodex をゲートウェイとして使います。チャットはローカル実行になり、claude.ai の機能は使えません。",
-  "claudeDesktop.mode.switchNote": "切り替えると他方のモードの設定は削除されます。適用後は Desktop を完全に終了して再起動してください。",
+  "claudeDesktop.mode.firstPartyRisk":
+    "アカウントのリスク：1P（ファーストパーティ）モードでは、Claude のサブスクリプション通信がローカルの傍受プロキシを通ります。Anthropic がこれを利用規約違反とみなし、アカウントを停止する可能性があります。ゲートウェイがデフォルトです。",
+  "claudeDesktop.mode.gatewayHint":
+    "アプリ全体が OpenCodex をゲートウェイとして使います。チャットはローカル実行になり、claude.ai の機能は使えません。",
+  "claudeDesktop.mode.switchNote":
+    "切り替えると他方のモードの設定は削除されます。適用後は Desktop を完全に終了して再起動してください。",
   "claudeDesktop.firstParty.proxyRunning": "ローカルプロキシ 127.0.0.1:{port}",
-  "claudeDesktop.firstParty.proxyStopped": "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。 ({port})",
-  "claudeDesktop.firstParty.interceptDisabled": "設定でインターセプトプロキシが無効です（claudeCode.intercept.enabled）",
+  "claudeDesktop.firstParty.proxyStopped":
+    "傍受を開始できませんでした。ローカルプロキシの設定を確認して再試行してください。 ({port})",
+  "claudeDesktop.firstParty.interceptDisabled":
+    "設定でインターセプトプロキシが無効です（claudeCode.intercept.enabled）",
   "claudeDesktop.picker.title": "Claude Desktop ピッカー",
-  "claudeDesktop.picker.hint": "専用ローカルプロキシ経由で、Desktop の Code タブのピッカーに OpenCodex モデルを表示します。",
+  "claudeDesktop.picker.hint":
+    "専用ローカルプロキシ経由で、Desktop の Code タブのピッカーに OpenCodex モデルを表示します。",
   "claudeDesktop.picker.toggle": "Claude Desktop ピッカーを有効化",
   "claudeDesktop.picker.state.active": "ピッカーは有効です",
-  "claudeDesktop.picker.state.restart": "ピッカープロファイルの適用を完了するには、Claude Desktop を完全に終了して再起動してください。",
+  "claudeDesktop.picker.state.restart":
+    "ピッカープロファイルの適用を完了するには、Claude Desktop を完全に終了して再起動してください。",
   "claudeDesktop.picker.state.trustPending": "証明書の信頼手順を待っています",
   "claudeDesktop.picker.state.trustDeclined": "証明書の信頼が拒否されました",
   "claudeDesktop.picker.state.proxyUnavailable": "ピッカープロキシが起動していません",
   "claudeDesktop.picker.state.unsupported": "この OS ではピッカーモードを利用できません",
-  "claudeDesktop.picker.state.notFirstParty": "ピッカーはファーストパーティーモードでのみ利用できます",
+  "claudeDesktop.picker.state.notFirstParty":
+    "ピッカーはファーストパーティーモードでのみ利用できます",
   "claudeDesktop.picker.state.profileFailed": "ピッカープロファイルを適用できませんでした",
   "claudeDesktop.picker.models": "ピッカーで {count} モデルを利用できます",
-  "claudeDesktop.picker.offlineNote": "ピッカーモードが有効な間、Claude Desktop は OpenCodex 経由でネットワークに接続します。OpenCodex が停止すると、Desktop を再起動するかピッカーモードをオフにするまでオフラインになります。",
+  "claudeDesktop.picker.offlineNote":
+    "ピッカーモードが有効な間、Claude Desktop は OpenCodex 経由でネットワークに接続します。OpenCodex が停止すると、Desktop を再起動するかピッカーモードをオフにするまでオフラインになります。",
   "claudeDesktop.firstParty.bindings.title": "Code タブのモデルバインディング",
-  "claudeDesktop.firstParty.bindings.hint": "Claude Desktop は Code タブのピッカーに Anthropic の名前をそのまま表示します。ピッカーのモデルを OpenCodex のモデルにバインドすると、そのピッカー項目へのリクエストはバインド先のモデルで処理されます。ローカルプロキシ経由の Claude Code トラフィック（Desktop の Code タブと claude CLI）のみがこのバインディングを使用し、ocx claude には影響しません。バインディングは次のリクエストから適用されるため、完全に終了して開き直す必要はありません。",
-  "claudeDesktop.firstParty.bindings.empty": "バインディングはまだありません — ピッカーのモデルはデフォルトのルートを使います。",
+  "claudeDesktop.firstParty.bindings.hint":
+    "Claude Desktop は Code タブのピッカーに Anthropic の名前をそのまま表示します。ピッカーのモデルを OpenCodex のモデルにバインドすると、そのピッカー項目へのリクエストはバインド先のモデルで処理されます。ローカルプロキシ経由の Claude Code トラフィック（Desktop の Code タブと claude CLI）のみがこのバインディングを使用し、ocx claude には影響しません。バインディングは次のリクエストから適用されるため、完全に終了して開き直す必要はありません。",
+  "claudeDesktop.firstParty.bindings.empty":
+    "バインディングはまだありません — ピッカーのモデルはデフォルトのルートを使います。",
   "claudeDesktop.firstParty.bindings.pickerLabel": "ピッカーのモデル ID",
   "claudeDesktop.firstParty.bindings.pickerPlaceholder": "claude-sonnet-4-6",
   "claudeDesktop.firstParty.bindings.routeLabel": "OpenCodex モデル",
@@ -3231,19 +3852,25 @@ export const ja: Record<TKey, string> = {
   "models.settingsContextInherit": "上書きなし — 現在は {value}",
   "models.settingsContextUnknown": "不明",
   "models.settingsReload": "再読み込み",
-  "models.settingsReloaded": "モデル一覧を再読み込みしました。保存された値を確認するには {model} を開き直してください。",
+  "models.settingsReloaded":
+    "モデル一覧を再読み込みしました。保存された値を確認するには {model} を開き直してください。",
   "models.settingsNoChange": "{model} の設定は変更されませんでした",
   "models.settingsSaved": "{model} のモデル設定を保存しました",
-  "models.settingsSaveFailed": "設定が保存されたか確認できませんでした。再試行する前にモデル一覧を再読み込みしてください。",
-  "models.settingsRefreshFailed": "保存しましたが、モデル一覧を再読み込みできませんでした。行に古い値が表示される可能性があります。再読み込みして確認してください。",
-  "models.settingsSavedCodexStale": "{model} を保存しましたが、Codex のモデルカタログは更新されませんでした。Codex に反映するには、ダッシュボードの「今すぐ同期」を押してください。",
-  "models.settingsRejected": "サーバーがこの設定を拒否したため、何も保存されていません。値を確認してもう一度お試しください。",
+  "models.settingsSaveFailed":
+    "設定が保存されたか確認できませんでした。再試行する前にモデル一覧を再読み込みしてください。",
+  "models.settingsRefreshFailed":
+    "保存しましたが、モデル一覧を再読み込みできませんでした。行に古い値が表示される可能性があります。再読み込みして確認してください。",
+  "models.settingsSavedCodexStale":
+    "{model} を保存しましたが、Codex のモデルカタログは更新されませんでした。Codex に反映するには、ダッシュボードの「今すぐ同期」を押してください。",
+  "models.settingsRejected":
+    "サーバーがこの設定を拒否したため、何も保存されていません。値を確認してもう一度お試しください。",
   "models.settingsDefaultEffort": "既定レベル",
   "models.settingsModalitiesInherit": "未上書き — 現在は上流の宣言に従います: {modalities}",
   "models.settingsModalitiesUnknown": "未宣言",
   "models.settingsRestore": "リセット",
   "models.settingsRestoreHint": "このモデルの上書きをすべて削除し、計算値に戻します。",
-  "models.settingsRestoreConfirm": "{model} を計算値に戻しますか？コンテキストウィンドウ、モダリティ、推論の上書きが削除されます。",
+  "models.settingsRestoreConfirm":
+    "{model} を計算値に戻しますか？コンテキストウィンドウ、モダリティ、推論の上書きが削除されます。",
   "models.settingsRestored": "{model} を計算値に戻しました",
   "models.settingsNothingToRestore": "{model} に上書きはありません — すでに計算値です",
   "models.customAdded": "Custom model added",
@@ -3260,16 +3887,23 @@ export const ja: Record<TKey, string> = {
   "pws.modelOwnershipFailed": "モデル定義を読み込めませんでした。変更する前に再試行してください。",
   "pws.modelSelectionPending": "変更する前に モデルでモデル選択を完了してください。",
   "pws.modelSaved": "カスタムモデル定義を保存しました。",
-  "pws.modelSavedHidden": "定義を保存しました。このモデルは非表示です。モデルで表示を管理してください。",
-  "pws.modelSavedRefreshPending": "定義を保存しましたが、モデルカタログを更新できませんでした。更新を再試行してください。モデルを再追加しないでください。",
-  "pws.modelMutationUnconfirmed": "変更を確認できませんでした。再試行する前にモデルを再読み込みしてください。",
-  "pws.modelRemovedRefreshPending": "変更を保存しましたが、モデルカタログを更新できませんでした。更新を再試行してください。",
+  "pws.modelSavedHidden":
+    "定義を保存しました。このモデルは非表示です。モデルで表示を管理してください。",
+  "pws.modelSavedRefreshPending":
+    "定義を保存しましたが、モデルカタログを更新できませんでした。更新を再試行してください。モデルを再追加しないでください。",
+  "pws.modelMutationUnconfirmed":
+    "変更を確認できませんでした。再試行する前にモデルを再読み込みしてください。",
+  "pws.modelRemovedRefreshPending":
+    "変更を保存しましたが、モデルカタログを更新できませんでした。更新を再試行してください。",
   "pws.modelHidden": "モデルを非表示にしました。モデルで表示を復元できます。",
-  "pws.modelDefinitionDeleted": "カスタム定義を削除しました。元のモデルが引き続き表示される場合があります。",
+  "pws.modelDefinitionDeleted":
+    "カスタム定義を削除しました。元のモデルが引き続き表示される場合があります。",
   "pws.modelKnown": "このモデルはすでに登録されています。モデルで表示を管理してください。",
-  "models.customDeleteConfirm": "{name} のカスタム定義を削除しますか？元のネイティブモデルや検出済みモデルが再び表示される場合があります。",
+  "models.customDeleteConfirm":
+    "{name} のカスタム定義を削除しますか？元のネイティブモデルや検出済みモデルが再び表示される場合があります。",
   "models.hide": "非表示",
-  "models.hideConfirm": "{name} をモデルカタログから非表示にしますか？定義は削除されず、直接ルーティングのポリシーも変わりません。",
+  "models.hideConfirm":
+    "{name} をモデルカタログから非表示にしますか？定義は削除されず、直接ルーティングのポリシーも変わりません。",
   "models.customBadge": "Custom",
   "models.customSummary": "{count} custom",
   "models.customFieldModelId": "Model ID (endpoint slug)",
@@ -3313,10 +3947,12 @@ export const ja: Record<TKey, string> = {
   "sub.settings": "設定",
   "sub.sections": "サブエージェントのセクション",
   "sub.delegation.model": "最初に呼ぶモデル",
-  "sub.delegation.modelHint": "Codex が作業を任せるとき、最初に呼ぶモデルです。上のおすすめが呼べる候補で、ここで選んだものがその中の第一候補になります。",
+  "sub.delegation.modelHint":
+    "Codex が作業を任せるとき、最初に呼ぶモデルです。上のおすすめが呼べる候補で、ここで選んだものがその中の第一候補になります。",
   "sub.suggest.button": "提案",
   "sub.suggest.label": "委任する作業",
-  "sub.suggest.placeholder": "Codex が主に任せる作業は? 例: リポジトリ全体の読み取り専用検索、複数モジュールにまたがるリファクタリング",
+  "sub.suggest.placeholder":
+    "Codex が主に任せる作業は? 例: リポジトリ全体の読み取り専用検索、複数モジュールにまたがるリファクタリング",
   "sub.suggest.submit": "見積もる",
   "sub.suggest.running": "見積もり中…",
   "sub.suggest.failed": "委任する作業を見積もれませんでした。",
@@ -3331,8 +3967,10 @@ export const ja: Record<TKey, string> = {
   "sub.fallbackUnavailable": "現在の一覧にはありませんが、チェーンに保持されます。",
   "sub.fallbackPollInvalid": "5000〜600000 ms の整数を入力してください。",
   "sub.v2Compatibility.title": "ネイティブ親の V2 互換性",
-  "sub.v2Compatibility.risk": "ネイティブ ChatGPT 親が V2 でこのルーティングモデルに委任すると、タスクが暗号化され実行前に失敗する場合があります。ルーティング親からの読み取り可能なタスクは影響を受けません。",
-  "sub.v2Compatibility.recoveryUnknown": "このサーバーは復旧の有効状態や適格性を公開していません。V1・平文互換の委任を使うか、適格な場合のみ実験的 V2 復旧を有効にしてください。復旧にはクォータ、遅延、バックエンド依存、忠実度低下の可能性があり、上流プロトコルは修正されません。",
+  "sub.v2Compatibility.risk":
+    "ネイティブ ChatGPT 親が V2 でこのルーティングモデルに委任すると、タスクが暗号化され実行前に失敗する場合があります。ルーティング親からの読み取り可能なタスクは影響を受けません。",
+  "sub.v2Compatibility.recoveryUnknown":
+    "このサーバーは復旧の有効状態や適格性を公開していません。V1・平文互換の委任を使うか、適格な場合のみ実験的 V2 復旧を有効にしてください。復旧にはクォータ、遅延、バックエンド依存、忠実度低下の可能性があり、上流プロトコルは修正されません。",
   "sub.v2Compatibility.details": "互換性の詳細",
   "dash.syncModelsHint": "接続済みのプロバイダーをもとに Codex のモデルカタログを書き直します。",
   "dash.syncRun": "今すぐ同期",
@@ -3343,13 +3981,25 @@ export const ja: Record<TKey, string> = {
   "dash.visionTimeoutInvalid": "{min} から {max} ミリ秒の整数を入力してください。",
   "dash.visionAdvancedPopover": "詳細なビジョン設定",
   "dash.codexDesktopAuthless": "ログインせずに Codex を開く",
-  "dash.codexDesktopAuthlessHint": "既定ではオフです。対象のローカル接続で Desktop の個別ログインを省略します。上流プロバイダーの認証情報は引き続き必要です。変更後は Codex を再起動してください。アカウントに依存する Desktop 機能が利用できない場合があります。",
+  "dash.codexDesktopAuthlessHint":
+    "既定ではオフです。対象のローカル接続で Desktop の個別ログインを省略します。上流プロバイダーの認証情報は引き続き必要です。変更後は Codex を再起動してください。アカウントに依存する Desktop 機能が利用できない場合があります。",
   "dash.codexClientCompaction": "クライアント側コンパクションを使用",
-  "dash.codexClientCompactionHint": "既定ではオフで、認証済みループバックルーティング専用です。今後のコンパクションは、OpenCodeX と V2 プロバイダーのルーティングを維持したまま移植可能な平文要約を保存します。設定済みプロバイダーが要約を処理し、割り当てを消費する場合があります。既存の ocx1 履歴は別途復旧が必要です。変更後は Codex を再起動してください。",
-  "dash.codexRemoteHistoryHint": "プロバイダーテーブル方式では、一部のモバイルリモート一覧で既存の openai タグ付きスレッドが表示されない場合があります。履歴は削除されていません。リモートクライアントは全プロバイダーを一覧取得する必要があり、このスイッチはそのフィルターを修正しません。",
-  "models.newPolicyGlobal": "新しいモデルを無効で追加", "models.newPolicyProvider": "新しいモデルのポリシー",
-  "models.fastProvider": "Fast モード", "models.fastProviderHint": "使用クレジットを 2 倍の料金で消費します", "models.fastEnabled": "Fast モードをオンにしました", "models.fastDisabled": "Fast モードをオフにしました", "models.fastSaveFailed": "Fast モードを保存できませんでした",
-  "models.newPolicy_inherit": "継承", "models.newPolicy_off": "オフ", "models.newPolicy_on": "オン", "models.newBadge": "新着", "models.newCount": "新着 {count} 件、オフ",
+  "dash.codexClientCompactionHint":
+    "既定ではオフで、認証済みループバックルーティング専用です。今後のコンパクションは、OpenCodeX と V2 プロバイダーのルーティングを維持したまま移植可能な平文要約を保存します。設定済みプロバイダーが要約を処理し、割り当てを消費する場合があります。既存の ocx1 履歴は別途復旧が必要です。変更後は Codex を再起動してください。",
+  "dash.codexRemoteHistoryHint":
+    "プロバイダーテーブル方式では、一部のモバイルリモート一覧で既存の openai タグ付きスレッドが表示されない場合があります。履歴は削除されていません。リモートクライアントは全プロバイダーを一覧取得する必要があり、このスイッチはそのフィルターを修正しません。",
+  "models.newPolicyGlobal": "新しいモデルを無効で追加",
+  "models.newPolicyProvider": "新しいモデルのポリシー",
+  "models.fastProvider": "Fast モード",
+  "models.fastProviderHint": "使用クレジットを 2 倍の料金で消費します",
+  "models.fastEnabled": "Fast モードをオンにしました",
+  "models.fastDisabled": "Fast モードをオフにしました",
+  "models.fastSaveFailed": "Fast モードを保存できませんでした",
+  "models.newPolicy_inherit": "継承",
+  "models.newPolicy_off": "オフ",
+  "models.newPolicy_on": "オン",
+  "models.newBadge": "新着",
+  "models.newCount": "新着 {count} 件、オフ",
   "models.aliases": "エイリアス",
   "models.aliasesTable": "エイリアス一覧",
   "models.aliasPrompt": "プロバイダーのエイリアス（空にすると解除）",
@@ -3363,31 +4013,42 @@ export const ja: Record<TKey, string> = {
   "models.aliasAuto": "自動",
   "models.aliasUser": "ユーザー",
   "models.aliasStale": "古い",
-  "connection.pairing.notApiKey": "ここには使い捨てのペアリングコードを貼り付けてください。データAPIキーや管理者トークンは入力しないでください。",
-  "connection.pairing.networkError": "OpenCodex に接続できません。起動していることを確認して再試行してください。",
-  "connection.pairing.requestError": "OpenCodex がペアリングを完了できませんでした。再試行してください。",
+  "connection.pairing.notApiKey":
+    "ここには使い捨てのペアリングコードを貼り付けてください。データAPIキーや管理者トークンは入力しないでください。",
+  "connection.pairing.networkError":
+    "OpenCodex に接続できません。起動していることを確認して再試行してください。",
+  "connection.pairing.requestError":
+    "OpenCodex がペアリングを完了できませんでした。再試行してください。",
   "connection.pairing.responseError": "OpenCodex のペアリング応答が無効です。再試行してください。",
   "dash.authRequired": "このダッシュボードを表示するにはブラウザーの認証が必要です。",
-  "dash.permissionDenied": "このブラウザーにはダッシュボードの閲覧権限がありません。サーバー管理者にアクセス設定を確認してください。",
-  "dash.dataUnavailable": "ダッシュボードのデータを読み込めませんでした。接続を確認して再試行してください。",
+  "dash.permissionDenied":
+    "このブラウザーにはダッシュボードの閲覧権限がありません。サーバー管理者にアクセス設定を確認してください。",
+  "dash.dataUnavailable":
+    "ダッシュボードのデータを読み込めませんでした。接続を確認して再試行してください。",
   "dash.staleData": "最後に受信したデータを表示しています。最新の状態とは異なる場合があります。",
   "connection.pairing.code": "使い捨てペアリングコード",
   "connection.pairing.retryValidation": "検証を再試行",
-  "connection.pairing.validationPending": "コードの交換は完了しましたが、セッションの検証を完了できませんでした。このページを開いたまま「検証を再試行」を選んでください。新しいコードは不要です。",
+  "connection.pairing.validationPending":
+    "コードの交換は完了しましたが、セッションの検証を完了できませんでした。このページを開いたまま「検証を再試行」を選んでください。新しいコードは不要です。",
   "connection.pairing.submit": "接続",
   "connection.pairing.submitting": "接続中…",
-  "connection.pairing.error": "ペアリングコードが拒否されました。このブラウザーのアドレス用にコマンドを再実行してください。",
-  "connection.pairing.originDenied": "設定されたループバックアドレスでダッシュボードを開き、新しいコードを取得してください。",
+  "connection.pairing.error":
+    "ペアリングコードが拒否されました。このブラウザーのアドレス用にコマンドを再実行してください。",
+  "connection.pairing.originDenied":
+    "設定されたループバックアドレスでダッシュボードを開き、新しいコードを取得してください。",
   "connection.sessionLogout": "リモートセッションからログアウト",
   "connection.sessionLoggingOut": "リモートセッションからログアウト中…",
-  "connection.sessionLogoutFailed": "リモートセッションからログアウトできませんでした。現在のセッションは維持されています。",
+  "connection.sessionLogoutFailed":
+    "リモートセッションからログアウトできませんでした。現在のセッションは維持されています。",
   "usage.source.local": "Source: local usage.jsonl",
   "integrations.tab.cursor": "Cursor",
   "integrations.detail.cursorSeen": "Cursor から最近このプロキシへのリクエストがありました",
-  "integrations.detail.cursorNeverSeen": "Private Inference はインストール済みですが、まだリクエストはありません",
+  "integrations.detail.cursorNeverSeen":
+    "Private Inference はインストール済みですが、まだリクエストはありません",
   "integrations.detail.cursorAbsent": "Cursor Private Inference が見つかりません",
   "integrations.cursor.title": "Cursor",
-  "integrations.cursor.intro": "Cursor Private Inference はエージェントをローカルで実行し、loopback 経由で opencodex と通信します。通常版の Cursor では利用できません。バックエンドがカスタムエンドポイントを呼び出すため、公開 HTTPS URL が必要です。このページから Cursor への書き込みは行いません。以下の値を自分で Cursor に貼り付けてください。",
+  "integrations.cursor.intro":
+    "Cursor Private Inference はエージェントをローカルで実行し、loopback 経由で opencodex と通信します。通常版の Cursor では利用できません。バックエンドがカスタムエンドポイントを呼び出すため、公開 HTTPS URL が必要です。このページから Cursor への書き込みは行いません。以下の値を自分で Cursor に貼り付けてください。",
   "integrations.cursor.loading": "Cursor の状態を読み込み中…",
   "integrations.cursor.unavailable": "プロキシから Cursor の状態を読み取れませんでした。",
   "integrations.cursor.detection": "インストール済みのビルド",
@@ -3395,36 +4056,48 @@ export const ja: Record<TKey, string> = {
   "integrations.cursor.regular": "Cursor（通常版）",
   "integrations.cursor.detected": "検出済み",
   "integrations.cursor.notFound": "見つかりません",
-  "integrations.cursor.regularOnly": "通常版の Cursor のみが見つかりました。カスタムエンドポイントは Cursor のサーバー経由でルーティングされるため、公開トンネルがなければ loopback プロキシには接続できません。Private Inference ビルドについてはガイドを参照してください。",
-  "integrations.cursor.nothingFound": "通常の場所に Cursor のインストールが見つかりませんでした。別の場所にインストールされている場合でも、以下の値を使用できます。",
+  "integrations.cursor.regularOnly":
+    "通常版の Cursor のみが見つかりました。カスタムエンドポイントは Cursor のサーバー経由でルーティングされるため、公開トンネルがなければ loopback プロキシには接続できません。Private Inference ビルドについてはガイドを参照してください。",
+  "integrations.cursor.nothingFound":
+    "通常の場所に Cursor のインストールが見つかりませんでした。別の場所にインストールされている場合でも、以下の値を使用できます。",
   "integrations.cursor.gateway": "ゲートウェイの値",
-  "integrations.cursor.gatewayHint": "Cursor Private Inference で Settings > Models > Gateway を開き、この 2 つの値を貼り付けてから、Refresh model list を押してください。",
+  "integrations.cursor.gatewayHint":
+    "Cursor Private Inference で Settings > Models > Gateway を開き、この 2 つの値を貼り付けてから、Refresh model list を押してください。",
   "integrations.cursor.baseUrl": "Base URL",
   "integrations.cursor.apiKey": "API Key",
-  "integrations.cursor.apiKeyCredential": "opencodex API キーのいずれか（このバインドには認証情報が必要です）",
+  "integrations.cursor.apiKeyCredential":
+    "opencodex API キーのいずれか（このバインドには認証情報が必要です）",
   "integrations.cursor.copy": "コピー",
   "integrations.cursor.copied": "コピーしました",
   "integrations.cursor.connection": "接続",
   "integrations.cursor.seen": "Cursor からの最終リクエスト: {time} ({ua})",
-  "integrations.cursor.neverSeen": "プロキシの起動後、Cursor からのリクエストはありません。ゲートウェイを保存したら、Cursor で Refresh model list を押してください。",
+  "integrations.cursor.neverSeen":
+    "プロキシの起動後、Cursor からのリクエストはありません。ゲートウェイを保存したら、Cursor で Refresh model list を押してください。",
   "integrations.cursor.models": "Cursor に表示される内容",
-  "integrations.cursor.modelsHint": "Cursor は独自のモデルテーブルから推論レベルの段階を決めるため、opencodex が示せるのは予測のみです。コンテキスト欄にはデフォルトとオプトインのウィンドウ（Cursor の Max Mode）を表示します。",
-  "integrations.cursor.ladderFromBundle": "推論レベルの段階は、インストール済みの Cursor Private Inference {version} バンドルから読み取りました。決めるのは Cursor で、opencodex はその表を表示するだけです。",
-  "integrations.cursor.ladderFromStatic": "推論レベルの段階は Cursor 3.18.25 の静的ミラーです（読み取れる Private Inference のバンドルが見つかりません）。コンテキスト欄はデフォルトとオプトインのウィンドウを示します。",
+  "integrations.cursor.modelsHint":
+    "Cursor は独自のモデルテーブルから推論レベルの段階を決めるため、opencodex が示せるのは予測のみです。コンテキスト欄にはデフォルトとオプトインのウィンドウ（Cursor の Max Mode）を表示します。",
+  "integrations.cursor.ladderFromBundle":
+    "推論レベルの段階は、インストール済みの Cursor Private Inference {version} バンドルから読み取りました。決めるのは Cursor で、opencodex はその表を表示するだけです。",
+  "integrations.cursor.ladderFromStatic":
+    "推論レベルの段階は Cursor 3.18.25 の静的ミラーです（読み取れる Private Inference のバンドルが見つかりません）。コンテキスト欄はデフォルトとオプトインのウィンドウを示します。",
   "integrations.cursor.unknownVersion": "バージョン不明",
   "integrations.cursor.noControl": "—",
   "integrations.cursor.singleWindow": "単一ウィンドウ",
-  "integrations.cursor.noControlTitle": "この ID は Cursor 内蔵の effort 表にないため、Cursor は推論コントロールを表示しません。",
+  "integrations.cursor.noControlTitle":
+    "この ID は Cursor 内蔵の effort 表にないため、Cursor は推論コントロールを表示しません。",
   "integrations.cursor.effortRowsOne": "effort 行を 1 件公開",
   "integrations.cursor.effortRowsMany": "effort 行を {n} 件公開",
   "integrations.cursor.effortRowsOff": "effort 行なし",
-  "integrations.cursor.tableLessHint": "— の行は Cursor で推論コントロールが使えません。cursorEffortRows を有効にすると effort ごとにピッカー項目（id--effort）を公開できます。固定の既定値はプロバイダーの modelDefaultReasoningEfforts で設定します。",
+  "integrations.cursor.tableLessHint":
+    "— の行は Cursor で推論コントロールが使えません。cursorEffortRows を有効にすると effort ごとにピッカー項目（id--effort）を公開できます。固定の既定値はプロバイダーの modelDefaultReasoningEfforts で設定します。",
   "integrations.cursor.colModel": "モデル",
   "integrations.cursor.colReasoning": "推論",
   "integrations.cursor.colContext": "コンテキスト",
   "integrations.cursor.guide": "Cursor Private Inference のガイドを開く",
-  "models.displayNameSavedRefreshFailed": "変更は保存されましたが、モデル一覧を更新できませんでした。再試行してください。",
-  "models.displayNameOutcomeUnknown": "リクエストが完了しませんでした。変更が保存されている可能性があります。再度変更する前に再試行して現在の名前を確認してください。",
+  "models.displayNameSavedRefreshFailed":
+    "変更は保存されましたが、モデル一覧を更新できませんでした。再試行してください。",
+  "models.displayNameOutcomeUnknown":
+    "リクエストが完了しませんでした。変更が保存されている可能性があります。再度変更する前に再試行して現在の名前を確認してください。",
   "models.displayNameCurrentUnavailable": "更新するまで現在の名前を確認できません",
   "models.displayNameReloaded": "モデル一覧を更新しました",
   "models.displayNameAction": "名前",
@@ -3452,8 +4125,10 @@ export const ja: Record<TKey, string> = {
   "pricing.override.title": "モデル価格",
   "pricing.override.modelId": "モデル ID",
   "pricing.override.promptTitle": "長いプロンプトの料金",
-  "pricing.override.promptHelp": "リクエストの入力トークンとキャッシュ読み書きトークンで区分が決まり、リクエスト全体にその区分の料金が適用されます。出力トークンは数えません。料金は標準速度向けです。",
-  "pricing.override.help": "100万トークンあたりの USD です。入力・出力単価を入力してください。空のキャッシュ単価は 0 とし、0 の料金も指定できます。",
+  "pricing.override.promptHelp":
+    "リクエストの入力トークンとキャッシュ読み書きトークンで区分が決まり、リクエスト全体にその区分の料金が適用されます。出力トークンは数えません。料金は標準速度向けです。",
+  "pricing.override.help":
+    "100万トークンあたりの USD です。入力・出力単価を入力してください。空のキャッシュ単価は 0 とし、0 の料金も指定できます。",
   "pricing.override.input": "入力",
   "pricing.override.output": "出力",
   "pricing.override.cacheRead": "キャッシュ読み取り",
@@ -3462,23 +4137,33 @@ export const ja: Record<TKey, string> = {
   "pricing.override.modeFlat": "一律料金",
   "pricing.override.modeCustom": "カスタムしきい値",
 
-  "pricing.override.modeAutomaticHelp": "上記の基本料金を使い、カタログのプロンプト長ルールを適用します。FastとPriorityの調整は引き続き適用されます。",
-  "pricing.override.modeFlatHelp": "プロンプト長にかかわらず上記の基本料金を使い、カタログのプロンプト長ルールを置き換えます。FastとPriorityの調整は引き続き適用されます。",
+  "pricing.override.modeAutomaticHelp":
+    "上記の基本料金を使い、カタログのプロンプト長ルールを適用します。FastとPriorityの調整は引き続き適用されます。",
+  "pricing.override.modeFlatHelp":
+    "プロンプト長にかかわらず上記の基本料金を使い、カタログのプロンプト長ルールを置き換えます。FastとPriorityの調整は引き続き適用されます。",
   "pricing.override.threshold": "プロンプトのしきい値（トークン）",
   "pricing.override.bandTitle": "長いプロンプト区分の料金",
-  "pricing.override.bandHelp": "標準速度の料金です。カタログの Fast と Priority のルールは引き続き適用されます。料金は推定値です。",
+  "pricing.override.bandHelp":
+    "標準速度の料金です。カタログの Fast と Priority のルールは引き続き適用されます。料金は推定値です。",
   "pricing.override.comparison": "しきい値の比較",
   "pricing.override.comparisonGt": "より大きい (>)",
   "pricing.override.comparisonGte": "以上 (≥)",
-  "pricing.override.modeCustomHelp": "トークン100万件あたりの絶対料金を4つ入力してください。プロンプト長にはキャッシュ済み入力を含み、出力は含みません。この料金はリクエスト全体に対してカタログのプロンプト長ルールを置き換えます。FastとPriorityの調整は引き続き適用されます。料金は推定値です。",
-  "pricing.override.customInvalid": "正の安全な整数のトークンしきい値と、0～1,000,000の有限な料金を4つ入力してください。料金に0を指定できます。",
+  "pricing.override.modeCustomHelp":
+    "トークン100万件あたりの絶対料金を4つ入力してください。プロンプト長にはキャッシュ済み入力を含み、出力は含みません。この料金はリクエスト全体に対してカタログのプロンプト長ルールを置き換えます。FastとPriorityの調整は引き続き適用されます。料金は推定値です。",
+  "pricing.override.customInvalid":
+    "正の安全な整数のトークンしきい値と、0～1,000,000の有限な料金を4つ入力してください。料金に0を指定できます。",
   "pricing.override.loading": "保存済み価格を読み込み中…",
   "pricing.override.loadFailed": "保存済み価格を読み込めませんでした。再読み込みしてください。",
-  "pricing.override.outcomeUnknown": "リクエストの結果を確認できませんでした。価格が変更された可能性があります。編集する前に保存済み価格を再読み込みしてください。",
-  "pricing.override.recoveryFailed": "保存済み価格を確認できないため、編集はロックされています。再読み込みしてください。",
-  "pricing.override.recovered": "現在の保存済み価格を読み込みました。先ほどのリクエストや別のクライアントが後から変更する可能性があります。",
-  "pricing.override.refreshFailed": "価格は保存されましたが、モデル一覧を更新できませんでした。一覧の更新を再試行してください。",
-  "pricing.override.invalid": "入力・出力単価を入力してください。各単価は 0 以上 1,000,000 以下の有限の数値にしてください。",
+  "pricing.override.outcomeUnknown":
+    "リクエストの結果を確認できませんでした。価格が変更された可能性があります。編集する前に保存済み価格を再読み込みしてください。",
+  "pricing.override.recoveryFailed":
+    "保存済み価格を確認できないため、編集はロックされています。再読み込みしてください。",
+  "pricing.override.recovered":
+    "現在の保存済み価格を読み込みました。先ほどのリクエストや別のクライアントが後から変更する可能性があります。",
+  "pricing.override.refreshFailed":
+    "価格は保存されましたが、モデル一覧を更新できませんでした。一覧の更新を再試行してください。",
+  "pricing.override.invalid":
+    "入力・出力単価を入力してください。各単価は 0 以上 1,000,000 以下の有限の数値にしてください。",
   "pricing.override.reset": "自動価格に戻す",
   "pricing.override.save": "保存",
   "pricing.override.saving": "保存中…",
@@ -3496,12 +4181,18 @@ export const ja: Record<TKey, string> = {
   "usage.range.invalid": "1970-01-01 UTC以降の有効な現地日時を入力してください。",
   "usage.range.reversed": "終了日時は開始日時と同じか、それ以降にしてください。",
   "usage.range.applied": "選択した期間：{start} – {end}（両端を含む）。",
-  "models.pickerOrder.editorHint": "ルーティングモデルを並べ替えて下書きを保存します。おすすめ行は固定され、ネイティブモデルは表示されません。",
-  "models.pickerOrder.nativeLocked": "保存済みの順序にネイティブモデルが含まれています。ルーティングのプリセットかデフォルトを適用してからカスタム順序を編集してください。",
-  "models.pickerOrder.unknownChosen": "おすすめモデルが不明です。再読み込みしてから編集してください。",
-  "models.pickerOrder.changed": "設定が変更されました。下書きは保持されます。再読み込みすると下書きを破棄し、現在の設定を使用します。",
-  "models.pickerOrder.savedReload": "順序を保存しました。再編集する前に現在の設定を読み込んでください。",
-  "models.pickerOrder.requestFailed": "リクエストに失敗しました。下書きは保持されます。再試行するか再読み込みしてください。",
+  "models.pickerOrder.editorHint":
+    "ルーティングモデルを並べ替えて下書きを保存します。おすすめ行は固定され、ネイティブモデルは表示されません。",
+  "models.pickerOrder.nativeLocked":
+    "保存済みの順序にネイティブモデルが含まれています。ルーティングのプリセットかデフォルトを適用してからカスタム順序を編集してください。",
+  "models.pickerOrder.unknownChosen":
+    "おすすめモデルが不明です。再読み込みしてから編集してください。",
+  "models.pickerOrder.changed":
+    "設定が変更されました。下書きは保持されます。再読み込みすると下書きを破棄し、現在の設定を使用します。",
+  "models.pickerOrder.savedReload":
+    "順序を保存しました。再編集する前に現在の設定を読み込んでください。",
+  "models.pickerOrder.requestFailed":
+    "リクエストに失敗しました。下書きは保持されます。再試行するか再読み込みしてください。",
   "models.pickerOrder.empty": "利用可能なルーティングモデルはありません。",
   "models.pickerOrder.dragModel": "{model} をドラッグ",
   "models.pickerOrder.featured": "おすすめ",
@@ -3510,7 +4201,8 @@ export const ja: Record<TKey, string> = {
   "models.pickerOrder.position": "{model}: {total} 件中 {position} 番目",
   "models.pickerOrder.saveDraft": "下書きを保存",
   "models.pickerOrder.reloadDraft": "下書きを破棄して再読み込み",
-  "models.pickerOrder.catalogRequired": "モデルの識別情報が不足しているか曖昧です。モデルページを再読み込みしてカタログを更新してからカスタム順序を編集してください。",
+  "models.pickerOrder.catalogRequired":
+    "モデルの識別情報が不足しているか曖昧です。モデルページを再読み込みしてカタログを更新してからカスタム順序を編集してください。",
   "quotaSummary.aria": "プロバイダークォータ概要",
   "quotaSummary.updated": "{time} 更新",
   "quotaSummary.dataAt": "{time} 時点のデータ",
@@ -3523,7 +4215,8 @@ export const ja: Record<TKey, string> = {
   "quotaSummary.scrollNext": "プロバイダーを右へスクロール",
   "quotaSummary.openAccounts": "アカウント管理を開く",
   "pws.protocol.title": "アップストリームのワイヤー形式",
-  "pws.protocol.note": "opencodex がこのプロバイダーと通信する API 形式です。クライアント API のオン/オフは切り替えません。それは API ページで設定します。",
+  "pws.protocol.note":
+    "opencodex がこのプロバイダーと通信する API 形式です。クライアント API のオン/オフは切り替えません。それは API ページで設定します。",
   "pws.protocol.adapterLabel": "このプロバイダーが受け取るワイヤー形式",
   "pws.protocol.source": "決定元",
   "pws.protocol.source.hardPin": "opencodex がこのモデル用に固定",
@@ -3543,17 +4236,22 @@ export const ja: Record<TKey, string> = {
   "compatProtocol.anyProtocol": "任意",
   "compatProtocol.pair": "{inbound} → {upstream}",
   "compatProtocol.loading": "各サブジェクトのプロトコルの組を読み込み中…",
-  "compatProtocol.unverified": "{pair} の Lab エビデンスはまだありません。この組は未検証であり、失敗ではありません。",
-  "compatProtocol.unresolved": "{count} 件のサブジェクトはプロトコルの組を読み取れず、このフィルターから除外しています。",
-  "compatProtocol.axisNote": "これは Lab の判定のみです。リクエストの配送方法（ネイティブまたは変換）は API ページのリクエスト経路プレビューに表示されます。",
+  "compatProtocol.unverified":
+    "{pair} の Lab エビデンスはまだありません。この組は未検証であり、失敗ではありません。",
+  "compatProtocol.unresolved":
+    "{count} 件のサブジェクトはプロトコルの組を読み取れず、このフィルターから除外しています。",
+  "compatProtocol.axisNote":
+    "これは Lab の判定のみです。リクエストの配送方法（ネイティブまたは変換）は API ページのリクエスト経路プレビューに表示されます。",
   "protocolLinks.providerSettings": "プロバイダー設定",
   "fallback.title": "フォールバック",
-  "fallback.desc": "モデルやプロバイダーが失敗すると、OpenCodex はコンボ、ルーティングプロファイル、サブエージェントチェーンの次の対象へリクエストを送れます。種類ごとにオフにすると、代わりに明確なエラーを返します。",
+  "fallback.desc":
+    "モデルやプロバイダーが失敗すると、OpenCodex はコンボ、ルーティングプロファイル、サブエージェントチェーンの次の対象へリクエストを送れます。種類ごとにオフにすると、代わりに明確なエラーを返します。",
   "fallback.model": "モデルのフォールバック",
   "fallback.modelHint": "同じプロバイダーの別モデル",
   "fallback.provider": "プロバイダーのフォールバック",
   "fallback.providerHint": "別のプロバイダー",
-  "fallback.rotationNote": "同じプロバイダーのアカウントやキーの切り替えはフォールバックではなく、常に有効です。",
+  "fallback.rotationNote":
+    "同じプロバイダーのアカウントやキーの切り替えはフォールバックではなく、常に有効です。",
   "fallback.overrides": "上書き設定",
   "fallback.scope.provider": "プロバイダー {name}",
   "fallback.scope.route": "ルート {name}",

@@ -5,7 +5,13 @@ import { cn } from "@/lib/utils";
  * checkbox inside its label, so the click target, the accessible name and form semantics are
  * the native ones; only the box is drawn as a small track in the inverse primary.
  */
-export function LiveToggle({ checked, onChange, label, title, className }: {
+export function LiveToggle({
+  checked,
+  onChange,
+  label,
+  title,
+  className,
+}: {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label: string;
@@ -23,7 +29,7 @@ export function LiveToggle({ checked, onChange, label, title, className }: {
       <input
         type="checkbox"
         checked={checked}
-        onChange={event => onChange(event.target.checked)}
+        onChange={(event) => onChange(event.target.checked)}
         className="peer sr-only"
       />
       <span

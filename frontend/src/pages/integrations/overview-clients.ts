@@ -25,12 +25,7 @@ import type { NativeIntegrationClientId, NativeStatus } from "./native-api";
 import { CURSOR_SEEN_WINDOW_MS, type CursorIntegrationStatus } from "./cursor-api";
 
 export type OverviewClientId =
-  | "codex"
-  | "claude"
-  | "claudeDesktop"
-  | "grok"
-  | "cursor"
-  | FileIntegrationClientId;
+  "codex" | "claude" | "claudeDesktop" | "grok" | "cursor" | FileIntegrationClientId;
 
 /** How far the `/api/keys` read has got, since the count alone cannot say. */
 export type ApiKeyReadPhase = "checking" | "unavailable" | "settled";
@@ -162,7 +157,7 @@ const FILE_LABEL_KEY: Record<FileIntegrationClientId, TKey> = {
   droid: "integrations.tab.droid",
   qoder: "integrations.tab.qoder",
   "qoder-cn": "integrations.tab.qoderCn",
-  "workbuddy": "integrations.tab.workbuddy",
+  workbuddy: "integrations.tab.workbuddy",
   "workbuddy-ai": "integrations.tab.workbuddyAi",
   t3code: "integrations.tab.t3code",
 };
@@ -222,7 +217,8 @@ function codexRow(
   // Compatibility for callers written before native status joined the
   // overview. The live page always passes nativeSettled explicitly.
   if (nativeSettled === undefined) {
-    if (!payload) return { ...base, state: "unknown", installed: false, applied: false, detailKey: null };
+    if (!payload)
+      return { ...base, state: "unknown", installed: false, applied: false, detailKey: null };
     if (payload.routingInjected !== true) {
       return {
         ...base,
@@ -246,12 +242,26 @@ function codexRow(
     return { ...base, state: "unknown", installed: false, applied: false, detailKey: null };
   }
   if (!native) {
-    return { ...base, toggle: null, state: "unknown", installed: false, applied: false, detailKey: null };
+    return {
+      ...base,
+      toggle: null,
+      state: "unknown",
+      installed: false,
+      applied: false,
+      detailKey: null,
+    };
   }
 
   const toggleOn = native.desiredEnabled;
   if (!payload) {
-    return { ...base, state: "unknown", installed: native.installed, applied: false, toggleOn, detailKey: null };
+    return {
+      ...base,
+      state: "unknown",
+      installed: native.installed,
+      applied: false,
+      toggleOn,
+      detailKey: null,
+    };
   }
 
   if (payload.routingInjected !== true) {
@@ -286,13 +296,23 @@ function keysRow(phase: ApiKeyReadPhase, count: number | null): ApiKeysOverviewR
   // expression — there is no badge — so a null one would render a row with no
   // state at all.
   if (phase === "checking") {
-    return { ...base, state: "checking", detailKey: "integrations.detail.keyChecking", detailVars: null };
+    return {
+      ...base,
+      state: "checking",
+      detailKey: "integrations.detail.keyChecking",
+      detailVars: null,
+    };
   }
   // `count === null` is defensive: a failed read is already `unavailable`, and
   // claiming "no keys issued" because a request failed is a statement about the
   // account of the user that we cannot support.
   if (phase === "unavailable" || count === null) {
-    return { ...base, state: "unavailable", detailKey: "integrations.detail.keyUnavailable", detailVars: null };
+    return {
+      ...base,
+      state: "unavailable",
+      detailKey: "integrations.detail.keyUnavailable",
+      detailVars: null,
+    };
   }
   return {
     ...base,
@@ -337,7 +357,13 @@ function claudeRow(
   if (nativeSettled === undefined) {
     if (!payload) return { ...base, state: "unknown", installed: false, applied: false, detailKey };
     const enabled = payload.enabled === true;
-    return { ...base, state: enabled ? "current" : "absent", installed: true, applied: enabled, detailKey };
+    return {
+      ...base,
+      state: enabled ? "current" : "absent",
+      installed: true,
+      applied: enabled,
+      detailKey,
+    };
   }
   if (!nativeSettled) {
     return { ...base, state: "unknown", installed: false, applied: false, detailKey };
@@ -382,14 +408,21 @@ function claudeDesktopRow(
     detailVars: null,
   };
   if (!payload || !nativeSettled || !native || typeof payload.desiredEnabled !== "boolean") {
-    return { ...base, toggle: null, state: "unknown", installed: false, applied: false, detailKey: null };
+    return {
+      ...base,
+      toggle: null,
+      state: "unknown",
+      installed: false,
+      applied: false,
+      detailKey: null,
+    };
   }
   const toggleOn = payload.desiredEnabled;
   // Desired OFF keeps the switch off, but a still-selected gateway is not
   // "absent": Desktop is still routing through OpenCodex until cleanup lands.
   if (!toggleOn) {
-    const gatewayStillSelected = payload.applied === true
-      || payload.driftReason === "desired_off_gateway_selected";
+    const gatewayStillSelected =
+      payload.applied === true || payload.driftReason === "desired_off_gateway_selected";
     if (gatewayStillSelected) {
       return {
         ...base,
@@ -428,11 +461,12 @@ function claudeDesktopRow(
     toggleOn,
     // Separate sentences: a drifted file and a profile Desktop is not serving
     // are different problems with different fixes.
-    detailKey: payload.activeProfile === false
-      ? "integrations.detail.desktopNotServed"
-      : drifted
-        ? "integrations.detail.desktopStale"
-        : "integrations.detail.desktopCurrent",
+    detailKey:
+      payload.activeProfile === false
+        ? "integrations.detail.desktopNotServed"
+        : drifted
+          ? "integrations.detail.desktopStale"
+          : "integrations.detail.desktopCurrent",
   };
 }
 
@@ -472,7 +506,13 @@ function grokRow(
   if (nativeSettled === undefined) {
     if (!payload) return { ...base, state: "unknown", installed: false, applied: false, ...detail };
     const present = payload.present === true;
-    return { ...base, state: present ? "current" : "absent", installed: present, applied: present, ...detail };
+    return {
+      ...base,
+      state: present ? "current" : "absent",
+      installed: present,
+      applied: present,
+      ...detail,
+    };
   }
   if (!nativeSettled) {
     return { ...base, state: "unknown", installed: false, applied: false, ...detail };
@@ -488,7 +528,6 @@ function grokRow(
     ...detail,
   };
 }
-
 
 /**
  * Cursor has no switch: its gateway is configured inside Cursor, and this proxy never
@@ -506,17 +545,27 @@ function cursorRow(payload: CursorIntegrationStatus | null, now = Date.now()): O
     detail: null,
     detailVars: null,
   };
-  if (!payload) return { ...base, state: "unknown", installed: false, applied: false, detailKey: null };
+  if (!payload)
+    return { ...base, state: "unknown", installed: false, applied: false, detailKey: null };
   if (!payload.privateInference.installed) {
-    return { ...base, state: "not-installed", installed: false, applied: false, detailKey: "integrations.detail.cursorAbsent" };
+    return {
+      ...base,
+      state: "not-installed",
+      installed: false,
+      applied: false,
+      detailKey: "integrations.detail.cursorAbsent",
+    };
   }
-  const seenRecently = payload.lastSeen !== null && now - payload.lastSeen.at < CURSOR_SEEN_WINDOW_MS;
+  const seenRecently =
+    payload.lastSeen !== null && now - payload.lastSeen.at < CURSOR_SEEN_WINDOW_MS;
   return {
     ...base,
     state: seenRecently ? "current" : "absent",
     installed: true,
     applied: seenRecently,
-    detailKey: seenRecently ? "integrations.detail.cursorSeen" : "integrations.detail.cursorNeverSeen",
+    detailKey: seenRecently
+      ? "integrations.detail.cursorSeen"
+      : "integrations.detail.cursorNeverSeen",
   };
 }
 
@@ -529,7 +578,9 @@ function fileRow(status: IntegrationStatus): OverviewRow {
     // of its file state; do the same here so the grid and the count agree.
     state: status.installed ? status.state : "not-installed",
     installed: status.installed,
-    applied: status.installed && (isAppliedState(status.state) || canDisableKiloWithCandidateIssue(status)),
+    applied:
+      status.installed &&
+      (isAppliedState(status.state) || canDisableKiloWithCandidateIssue(status)),
     detail: status.configPath,
     detailKey: null,
     detailVars: null,
@@ -546,17 +597,17 @@ function fileRow(status: IntegrationStatus): OverviewRow {
  * strip above the grid, so the eye moves the same way in both.
  */
 export function buildOverviewRows(sources: OverviewSources): OverviewRows {
-  const nativeCodex = sources.native?.find(status => status.clientId === "codex");
-  const nativeClaude = sources.native?.find(status => status.clientId === "claude");
-  const nativeGrok = sources.native?.find(status => status.clientId === "grok");
+  const nativeCodex = sources.native?.find((status) => status.clientId === "codex");
+  const nativeClaude = sources.native?.find((status) => status.clientId === "claude");
+  const nativeGrok = sources.native?.find((status) => status.clientId === "grok");
   // One lookup table, not a find per client (react-doctor js-index-maps).
-  const statusByClient = new Map(sources.clients.map(status => [status.clientId, status]));
+  const statusByClient = new Map(sources.clients.map((status) => [status.clientId, status]));
   const rows: OverviewRow[] = [
     codexRow(sources.codex, nativeCodex, sources.nativeSettled),
     claudeRow(sources.claude, nativeClaude, sources.nativeSettled),
     claudeDesktopRow(
       sources.claudeDesktop,
-      sources.native?.find(client => client.clientId === "claude-desktop"),
+      sources.native?.find((client) => client.clientId === "claude-desktop"),
       sources.nativeSettled,
     ),
     grokRow(sources.grok, nativeGrok, sources.nativeSettled),
@@ -601,9 +652,9 @@ export interface OverviewCounts {
 
 export function countOverviewRows(rows: readonly OverviewRow[]): OverviewCounts {
   return {
-    detected: rows.filter(row => row.installed).length,
-    applied: rows.filter(row => row.applied).length,
-    stale: rows.filter(row => row.state === "stale").length,
-    unknown: rows.filter(row => row.state === "unknown").length,
+    detected: rows.filter((row) => row.installed).length,
+    applied: rows.filter((row) => row.applied).length,
+    stale: rows.filter((row) => row.state === "stale").length,
+    unknown: rows.filter((row) => row.state === "unknown").length,
   };
 }
