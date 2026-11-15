@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import ProxyHandler, Request, build_opener
 
-DEFAULT_PORT = 10101
+DEFAULT_PORT = 10100
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WEB_ROOT = PROJECT_ROOT / "frontend" / "dist-runtime"
 

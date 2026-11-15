@@ -5,6 +5,8 @@ import hashlib
 import io
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
 import time
@@ -232,16 +234,31 @@ class Startup:
             "enabled": value("Settings/Enabled") != "false",
             "stale": stale,
             "conflict": conflict,
+            "port": int(match[1])
+            if (
+                match := re.search(
+                    r"(?:^|\s)--port\s+(\d+)(?:\s|$)", value("Actions/Exec/Arguments") or ""
+                )
+            )
+            else None,
+            "xml": result.stdout,
         }
 
     def health(self) -> dict:
         error = None
+        try:
+            operation = json.loads(
+                (self.directory / "service-operation.json").read_text(encoding="utf-8")
+            )
+        except OSError, ValueError:
+            operation = None
         try:
             registration = self.registration()
         except (RuntimeError, OSError, subprocess.TimeoutExpired) as exc:
             registration = {"installed": False, "enabled": False, "stale": False, "conflict": False}
             error = str(exc)
         live = status(self.directory)
+        service_port = registration.get("port") or self.port
         viable = (
             registration["installed"]
             and registration["enabled"]
@@ -255,7 +272,8 @@ class Startup:
             "mode": "user-logon",
             "taskName": self.task_name,
             "stateDirectory": str(self.directory),
-            "port": self.port,
+            "port": service_port,
+            "runtimePort": live["port"],
             "runtimeState": live["state"],
             "logPath": live["logPath"],
             "supervisorLogPath": str(self.directory / "startup.log"),
@@ -268,14 +286,25 @@ class Startup:
             "serviceStale": registration["stale"],
             "serviceConflict": registration["conflict"],
             "serviceSupported": True,
-            "serviceRunning": live["state"] == "running",
+            "serviceRunning": live["state"] == "running" and live["port"] == service_port,
+            "managerRunning": self.supervisor_running(),
             "diagnosticStale": error is not None,
             "error": error,
+            "serviceOperation": operation,
             "commands": {
-                action: f'ocx startup {action} --state-dir "{self.directory}" --port {self.port}'
+                action: f'ocx service {action} --state-dir "{self.directory}" --port {service_port}'
                 for action in ("install", "repair", "enable", "disable", "remove", "status")
             },
         }
+
+    def supervisor_running(self):
+        if not (self.directory / "startup-supervisor.lock").exists():
+            return False
+        try:
+            with instance_lock(self.directory, "startup-supervisor.lock"):
+                return False
+        except RuntimeError:
+            return True
 
     def action(self, action: str, *, repair: bool = False) -> dict:
         with instance_lock(self.directory, "startup-control.lock"):
@@ -285,16 +314,15 @@ class Startup:
                     "A different task occupies the Lite startup name; it was not changed."
                 )
             if action in {"install-service", "install", "repair"}:
-                if not self.executable.is_file():
-                    raise RuntimeError(
-                        "This Python environment has no pythonw.exe; repair the environment first."
-                    )
+                self.preflight()
                 if (repair or action == "repair") and not current["installed"]:
                     raise ValueError("Automatic startup is not installed; choose Install first.")
-                xml_path = self.directory / "startup-task.xml"
-                xml_path.write_text(self.xml(), encoding="utf-16")
-                self._command(["/create", "/tn", self.task_name, "/xml", str(xml_path), "/f"])
-                self._save_environment()
+                if not current["installed"] or current["stale"] or action != "repair":
+                    xml_path = self.directory / "startup-task.xml"
+                    xml_path.write_text(self.xml(), encoding="utf-16")
+                    self._command(["/create", "/tn", self.task_name, "/xml", str(xml_path), "/f"])
+                if self.environment_changed():
+                    self._save_environment()
                 enabled = not ((repair or action == "repair") and not current["enabled"])
                 if not enabled:
                     self._command(["/change", "/tn", self.task_name, "/disable"])
@@ -318,6 +346,64 @@ class Startup:
                 raise ValueError("Unknown startup action.")
             return {"ok": True, "action": action, "health": self.health()}
 
+    def preflight(self):
+        if not self.executable.is_file():
+            raise RuntimeError(
+                "This Python environment has no pythonw.exe; repair the environment first."
+            )
+        self.environment()
+
+    def restore_registration(self, registration, files):
+        current = self.registration()
+        if current["conflict"]:
+            raise RuntimeError("Service registration changed owner during recovery.")
+        if registration["installed"]:
+            if not current["installed"] or current["xml"].strip() != registration["xml"].strip():
+                path = self.directory / "startup-task.xml"
+                path.write_text(registration["xml"], encoding="utf-16")
+                self._command(["/create", "/tn", self.task_name, "/xml", str(path), "/f"])
+                if not registration["enabled"]:
+                    self._command(["/change", "/tn", self.task_name, "/disable"])
+        elif current["installed"]:
+            self._command(["/delete", "/tn", self.task_name, "/f"])
+        for name, content in files.items():
+            path = self.directory / name
+            if content is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.write_bytes(content)
+
+    def wait_idle(self):
+        if not self.registration()["installed"]:
+            return
+        # A queued scheduler launch has not acquired the supervisor lock yet. Wait for
+        # the task itself before restoring the old definition and enabling supervision.
+        shell = shutil.which("pwsh.exe") or str(
+            Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"  # noqa: SIM112
+        )
+        deadline = time.monotonic() + 45
+        while (remaining := deadline - time.monotonic()) > 0:
+            window = min(12, remaining)
+            script = (
+                "$ErrorActionPreference='Stop';"
+                "$scheduler=New-Object -ComObject 'Schedule.Service';$scheduler.Connect();"
+                "$folder=$scheduler.GetFolder('\\');"
+                "$clock=[Diagnostics.Stopwatch]::StartNew();"
+                f"while ($folder.GetTask('{self.task_name}').State -in 2,4) {{"
+                f"if ($clock.Elapsed.TotalSeconds -ge {window:.2f}) {{Write-Output 'busy';exit 0}};"
+                "Start-Sleep -Milliseconds 100};Write-Output 'idle'"
+            )
+            result = self.run(
+                shell, ["-NoLogo", "-NoProfile", "-NonInteractive", "-Command", script]
+            )
+            if result.returncode:
+                raise RuntimeError(
+                    result.stderr.strip() or "Could not confirm the service task stopped."
+                )
+            if result.stdout.strip() == "idle":
+                return
+        raise RuntimeError("Service task did not stop within 45 seconds.")
+
     def _save_preference(self, enabled: bool):
         path = self.directory / "startup-preference.json"
         temporary = path.with_suffix(".json.tmp")
@@ -340,10 +426,20 @@ class Startup:
         ):
             self._command(["/run", "/tn", self.task_name])
 
-    def _save_environment(self):
+    def saved_environment(self):
+        from .config import protect
+
+        try:
+            return json.loads(
+                protect((self.directory / "startup-environment.bin").read_bytes(), decrypt=True)
+            )
+        except OSError, ValueError, RuntimeError:
+            return None
+
+    def environment(self):
         # The scheduler does not inherit the installing shell's proxy/credential environment.
         # Persist only names this gateway uses, protected for the same Windows account.
-        from .config import ConfigStore, protect
+        from .config import ConfigStore
 
         names = {
             "HTTP_PROXY",
@@ -358,10 +454,22 @@ class Startup:
         names.update(
             p.apiKeyEnv for p in ConfigStore(self.directory).load().providers if p.apiKeyEnv
         )
-        environment = {name: os.environ[name] for name in names if name in os.environ}
+        saved = self.saved_environment() or {}
+        return {
+            name: os.environ[name] if name in os.environ else saved[name]
+            for name in names
+            if name in os.environ or name in saved
+        }
+
+    def environment_changed(self):
+        return self.saved_environment() != self.environment()
+
+    def _save_environment(self):
+        from .config import protect
+
         path = self.directory / "startup-environment.bin"
         temporary = path.with_suffix(".bin.tmp")
-        temporary.write_bytes(protect(json.dumps(environment).encode()))
+        temporary.write_bytes(protect(json.dumps(self.environment()).encode()))
         temporary.replace(path)
 
 

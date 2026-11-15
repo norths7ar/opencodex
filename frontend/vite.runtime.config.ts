@@ -3,7 +3,7 @@ import { defineConfig, mergeConfig } from "vite";
 import dashboard from "./vite.config.ts";
 
 const proxy = {
-  target: process.env.OPENCODEX_PROXY_TARGET ?? "http://127.0.0.1:10101",
+  target: process.env.OPENCODEX_PROXY_TARGET ?? "http://127.0.0.1:10100",
   // The backend checks the browser origin against the original loopback Host.
   changeOrigin: false,
 };

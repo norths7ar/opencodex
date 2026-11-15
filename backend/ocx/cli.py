@@ -8,6 +8,7 @@ import sys
 import time
 from pathlib import Path
 
+from . import __version__
 from .runtime import (
     DEFAULT_PORT,
     control_request,
@@ -94,25 +95,70 @@ def stop(directory: Path) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="ocx", description="OpenCodex Lite local Python runtime")
+    parser = argparse.ArgumentParser(prog="ocx", description="OpenCodex Lite local gateway")
     parser.add_argument(
-        "command", choices=["start", "stop", "restart", "status", "serve", "startup", "service-run"]
+        "--version", "-v", action="version", version=f"OpenCodex Lite {__version__}"
     )
     parser.add_argument(
-        "startup_action",
+        "command",
         nargs="?",
-        choices=["status", "install", "repair", "enable", "disable", "remove"],
+        choices=["start", "stop", "restart", "status", "serve", "service", "service-run"],
+    )
+    parser.add_argument(
+        "service_action",
+        nargs="?",
+        choices=[
+            "status",
+            "install",
+            "repair",
+            "restart",
+            "start",
+            "stop",
+            "enable",
+            "disable",
+            "uninstall",
+            "remove",
+        ],
     )
     parser.add_argument("--port", type=int, help=f"Listening port (first start: {DEFAULT_PORT})")
     parser.add_argument(
         "--state-dir", help="Independent runtime directory; defaults to LOCALAPPDATA/OpenCodexLite"
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable status")
-    args = parser.parse_args()
+    parser.add_argument("--operation-id", help=argparse.SUPPRESS)
+    backend = parser.add_mutually_exclusive_group()
+    backend.add_argument(
+        "--scheduler", action="store_true", help="Use the Windows Task Scheduler service"
+    )
+    backend.add_argument(
+        "--native", action="store_true", help="WinSW service (not supported by Lite)"
+    )
+    argv = sys.argv[1:]
+    if argv == ["version"]:
+        argv = ["--version"]
+    elif argv and argv[0] == "help":
+        argv = [*argv[1:], "--help"]
+    args = parser.parse_args(argv)
+    if args.command is None:
+        parser.print_help()
+        return
+    if args.scheduler or args.native:
+        if args.command != "service":
+            parser.error("Service backend options apply to ocx service only.")
+        if args.service_action not in {None, "install"}:
+            parser.error("Service backend options apply to ocx service install only.")
+        if args.native:
+            parser.error("Lite uses Windows Task Scheduler; the WinSW backend is not migrated.")
+        if args.service_action is None:
+            args.service_action = "install"
     if os.name != "nt":
         parser.error("This Lite runtime supports Windows only.")
     if args.port is not None and not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
+    if args.json and args.command in {"start", "serve"}:
+        parser.error(
+            "Foreground startup does not support --json; use ocx status --json separately."
+        )
     directory = state_directory(args.state_dir)
     try:
         if args.command == "service-run":
@@ -120,22 +166,19 @@ def main() -> None:
 
             supervise(directory, args.port or DEFAULT_PORT)
             return
-        if args.command == "startup":
-            from .startup import Startup
+        if args.command == "service":
+            from .service_cli import record_operation, service_command
 
-            startup = Startup(
-                directory, args.port or read_state(directory).get("port", DEFAULT_PORT)
-            )
-            result = (
-                startup.health()
-                if args.startup_action in {None, "status"}
-                else startup.action(args.startup_action)
-            )
+            if args.json and args.service_action != "status":
+                parser.error("--json applies to ocx service status only.")
+            result = service_command(directory, args.port, args.service_action)
+            if args.operation_id:
+                record_operation(directory, args.operation_id, args.service_action, "succeeded")
             if args.json:
                 print(json.dumps(result, ensure_ascii=False))
             else:
                 health = result.get("health", result)
-                print(f"OpenCodex Lite automatic startup: {health['status']}")
+                print(f"OpenCodex Lite service: {health['status']}")
                 print(f"Task: {health['taskName']}")
                 print(
                     f"Gateway: {health['runtimeState']}; user login startup enabled: {health['autostartEnabled']}"
@@ -145,12 +188,19 @@ def main() -> None:
             if result.get("health", result).get("diagnosticStale"):
                 raise SystemExit(1)
             return
-        if args.startup_action is not None:
-            parser.error("The extra action is only supported by ocx startup.")
-        if args.command == "serve":
+        if args.service_action is not None:
+            parser.error("The extra action is only supported by ocx service.")
+        if args.command in {"start", "serve"}:
             from .server import serve
 
-            serve(directory, args.port or DEFAULT_PORT)
+            current = status(directory)
+            if current["state"] in {"running", "unresponsive"}:
+                raise RuntimeError(
+                    "A gateway is already running in this state directory; use ocx stop first."
+                )
+            port = args.port or current["port"]
+            print(f"OpenCodex Lite: http://127.0.0.1:{port}/ (foreground)", flush=True)
+            serve(directory, port)
             return
         if args.command == "status":
             result = status(directory)
@@ -159,7 +209,7 @@ def main() -> None:
                 if args.command == "restart":
                     stop(directory)
                 result = stop(directory) if args.command == "stop" else start(directory, args.port)
-            if args.command in {"start", "restart"}:
+            if args.command == "restart":
                 from .startup import Startup
 
                 try:
@@ -179,7 +229,11 @@ def main() -> None:
                 print(f"Automatic startup: {result['startupWarning']}")
         if result["state"] in {"failed", "unresponsive"}:
             raise SystemExit(1)
-    except (RuntimeError, OSError, ValueError) as exc:
+    except (RuntimeError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
+        if args.operation_id:
+            from .service_cli import record_operation
+
+            record_operation(directory, args.operation_id, args.service_action, "failed", str(exc))
         if args.json:
             print(json.dumps({"state": "error", "error": str(exc)}, ensure_ascii=False))
         else:

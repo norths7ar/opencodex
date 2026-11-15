@@ -39,11 +39,15 @@ def category(relative):
         return "history"
     if name.startswith(("usage.sqlite3", "spend-ledger.sqlite3")):
         return "usage"
-    if name in DISPOSABLE:
+    if name in DISPOSABLE or name in {"model-catalog.json", "official-model-metadata.json"}:
         return "cache"
     if name.endswith(".log"):
         return "logs"
-    if name.startswith(("runtime.", "startup-")) or name.endswith(".lock"):
+    if (
+        name == "service-operation.json"
+        or name.startswith(("runtime.", "startup-"))
+        or name.endswith(".lock")
+    ):
         return "runtime"
     return "other"
 
