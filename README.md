@@ -17,18 +17,33 @@
 
 ## 本机运行
 
-在项目根目录执行：
+本机直接使用源码和项目虚拟环境。首次在项目根目录准备依赖、构建网页并注册用户级命令：
+
+开发环境采用 Python 3.14.10、uv 0.13.8 或更新版本、Node.js 26.13.1 和 pnpm 12.21.0。Python 与 Node.js 版本分别记录在 `.python-version`、`.node-version`，pnpm 版本记录在 `package.json`。使用 npm 时采用共享基线 12.2.2；本项目依赖安装仍使用 pnpm。Windows 环境应使用新版 uv 创建，以获得正确的无控制台 `pythonw.exe`；升级 uv 不会替换已有虚拟环境的启动器，旧环境需在停止网关后重建。
 
 ```powershell
-uv sync
+uv sync --locked
 pnpm --dir frontend install --frozen-lockfile
 pnpm --dir frontend build:runtime
-uv run ocx start
-uv run ocx status
-uv run ocx stop
+./scripts/register-cli.ps1
 ```
 
-启动后访问 `http://127.0.0.1:10101/`。关闭终端或浏览器不会停止后台进程。再次 `start` 返回已有实例；`restart` 等待旧进程退出再重启。进程管理由项目命令提供，不依赖浏览器或 Service Desk 存活。
+随后在任意目录运行：
+
+```powershell
+ocx start
+```
+
+在另一个终端查询或停止：
+
+```powershell
+ocx status
+ocx stop
+```
+
+`ocx` 和 `opencodex` 指向同一个项目入口；无参数显示帮助，`--version` 查看版本。注册脚本在用户的 `.local\bin` 中生成启动入口，并按需将该目录加入用户 PATH；若 PATH 新增了目录，重新打开终端使其生效。源码目录与 `.venv` 需要保留，更新源码直接生效，前端变更后重新构建网页。移动项目时先在新位置重建虚拟环境，再运行注册脚本；已安装服务还需执行 `ocx service repair` 更新路径。`./scripts/register-cli.ps1 -Remove` 仅移除全局命令入口，服务和数据分别管理。
+
+启动后访问 `http://127.0.0.1:10100/`。`ocx start` 在当前终端前台运行；`ocx restart` 等待替换实例就绪后返回终端。日常后台常驻使用下文的 `ocx service`。关闭浏览器或 Service Desk 不影响网关进程。
 
 默认只监听 `127.0.0.1`，运行记录和日志位于 `%LOCALAPPDATA%\OpenCodexLite`，不读取或改写旧 Bun 配置。`--port` 指定端口，端口占用会报错而不自动换端口；`--state-dir` 或 `OPENCODEX_LITE_HOME` 可指定独立运行目录。`--json` 输出机器可读状态。`status` 区分运行、停止、失败和无响应，失败或无响应时退出码为 1。
 
@@ -36,11 +51,11 @@ uv run ocx stop
 
 ### 自动后台运行
 
-在 Home → Startup 启用自动启动，或执行 `uv run ocx startup install`。项目为当前 Windows 用户注册计划任务，在登录、重新连接或解锁后启动隐藏的监督进程；监督进程复用正在运行的网关，并在意外退出后重试。凭据仍由当前用户解密，任务不在用户登录前运行。
+在 Home → Startup 启用自动启动，或执行 `ocx service install`。安装先停止已有实例，再交由当前用户的 Windows 计划任务拉起隐藏的监督进程。后续在登录、重新连接或解锁时自动运行，进程意外退出后自动重试。凭据仍由当前用户解密，任务不在用户登录前运行。
 
-`uv run ocx startup status` 查看注册与运行状态；`repair` 更新任务路径和启动环境；`disable` 暂停自动启动，`enable` 恢复，`remove` 移除任务。禁用或移除任务保留当前网关运行；`ocx stop` 明确停止网关及本轮监督，之后手动启动或下次登录可恢复已启用的自动运行。更换项目或虚拟环境位置后使用 `repair`，修复不会重新启用已禁用的任务。
+`ocx service status` 查看注册与运行状态；`start`、`stop`、`restart` 管理已安装服务的运行，`repair` 更新任务路径和启动环境，健康实例无需重启；`disable` 暂停自动启动并保留当前网关，`enable` 恢复。`uninstall`／`remove` 停止网关后移除任务，网页移除操作使用同样的行为。裸 `ocx service` 在尚未安装时安装，已有安装时修复。更换项目或虚拟环境位置后使用 `repair`，修复不会重新启用已禁用的任务。
 
-自动启动保存网关所需的代理、证书和已配置凭据环境变量，使用当前用户 DPAPI 加密。相关环境改变后重新执行 `repair`。各命令支持 `--state-dir` 和 `--port`，不同数据目录的任务独立管理。
+自动启动保存网关所需的代理、证书和已配置凭据环境变量，使用当前用户 DPAPI 加密。`repair` 保留已保存的环境，并用当前终端显式提供的值更新；需要清除某个已保存值时，显式设为空字符串后修复。各命令支持 `--state-dir` 和 `--port`，不同数据目录的任务独立管理。
 
 ## API 渠道与客户端
 
@@ -82,7 +97,7 @@ ChatGPT 配额来自账号查询和已认证响应头，按上游返回的窗口
 
 ## 开发
 
-两个终端分别运行 `uv run ocx serve` 和 `pnpm --dir frontend dev:runtime`，在 `http://127.0.0.1:5173/` 开发网页。前端开发服务器默认代理到 `10101`；后端使用其他端口时，设置 `OPENCODEX_PROXY_TARGET` 后再启动前端。`serve` 是前台运行，Ctrl+C 退出。
+两个终端分别运行 `ocx start` 和 `pnpm --dir frontend dev:runtime`，在 `http://127.0.0.1:5173/` 开发网页。前端开发服务器默认代理到 `10100`；后端使用其他端口时，设置 `OPENCODEX_PROXY_TARGET` 后再启动前端。前台运行可通过 Ctrl+C 退出。
 
 旧后端仍可用 `pnpm legacy:dev` 调用原 Bun 入口；这不是 Python 运行链。
 

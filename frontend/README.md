@@ -2,16 +2,16 @@
 
 ## Python runtime console
 
-Use Node.js 24 and pnpm 11.25.0. From `frontend/`:
+Use Node.js 26.13.1 and pnpm 12.21.0. TypeScript is pinned to 6.0.3, within typescript-eslint 8.72.2's supported range (`>=4.8.4 <6.1.0`). From `frontend/`:
 
 ```powershell
 pnpm install --frozen-lockfile
 pnpm run build:runtime
 ```
 
-The build writes `frontend/dist-runtime/`, which the Lite backend serves at `http://127.0.0.1:10101/` by default. Use the [root README](../README.md) for backend commands. The modern console manages API providers, model selection, gateway access and Codex routing. Supported subscription channels expose browser and device authorization through the gateway's own account management. Provider keys are write-only; completion checks and client configuration changes run through explicit actions.
+The build writes `frontend/dist-runtime/`, which the Lite backend serves at `http://127.0.0.1:10100/` by default. Use the [root README](../README.md) for backend commands. The modern console manages API providers, model selection, gateway access and Codex routing. Supported subscription channels expose browser and device authorization through the gateway's own account management. Provider keys are write-only; completion checks and client configuration changes run through explicit actions.
 
-For frontend development, run `pnpm run dev:runtime` in `frontend/` and open `http://127.0.0.1:5173/`. Vite forwards requests to the Python backend at `http://127.0.0.1:10101`. If you start the backend on a different port, set `OPENCODEX_PROXY_TARGET` to its loopback URL before starting Vite.
+For frontend development, run `pnpm run dev:runtime` in `frontend/` and open `http://127.0.0.1:5173/`. Vite forwards requests to the Python backend at `http://127.0.0.1:10100`. If you start the backend on a different port, set `OPENCODEX_PROXY_TARGET` to its loopback URL before starting Vite.
 
 ## Code quality
 
