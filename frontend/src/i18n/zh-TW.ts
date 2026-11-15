@@ -130,14 +130,13 @@ export const zhTW: Record<TKey, string> = {
   "nativeReasoningRetention.saved": "原生推理設定已儲存。",
   "workflowBudget.title": "子代理工作流程限制",
   "workflowBudget.description":
-    "依任務（即一個對話及其啟動的子代理）設定的上限，在滾動的 {minutes} 分鐘視窗內計數。超過上限的請求會在聯絡任何供應商之前於本機以 429 拒絕。變更從下一個請求開始生效；已計入的用量會保留。",
+    "對話及其子代理共用滾動 {minutes} 分鐘內的額度。超限請求回傳 429，變更從下一次請求生效。",
   "workflowBudget.maxConcurrentChildren": "平行輪次",
-  "workflowBudget.maxConcurrentChildrenHint":
-    "一個任務可同時執行的輪次數。一律為你自己的對話保留一個名額，因此子代理少一個。",
+  "workflowBudget.maxConcurrentChildrenHint": "同時執行的輪次，其中一個名額留給主對話。",
   "workflowBudget.maxPhysicalSends": "每個視窗的模型請求數",
-  "workflowBudget.maxPhysicalSendsHint": "一個任務在視窗內可向供應商傳送的請求數（含重試）。",
+  "workflowBudget.maxPhysicalSendsHint": "時間視窗內送往上游的請求次數，包含重試。",
   "workflowBudget.maxDistinctChildren": "每個視窗的不同子代理數",
-  "workflowBudget.maxDistinctChildrenHint": "一個任務在視窗內可啟動的不同子代理執行緒數。",
+  "workflowBudget.maxDistinctChildrenHint": "時間視窗內啟動的不同子代理執行緒數。",
   "workflowBudget.range": "預設 {default}，允許 {min}–{max}。",
   "workflowBudget.invalid": "請輸入 {min} 到 {max} 之間的整數。",
   "workflowBudget.increase": "增加{label}",
@@ -277,7 +276,7 @@ export const zhTW: Record<TKey, string> = {
   "codexAuth.quotaAutoRefreshLoadFailed": "無法載入自動啟用設定。請重試。",
   "codexAuth.quotaAutoRefreshPartial": "部分設定未能儲存。重試將完成同一項變更。",
   "nav.dashboard": "儀表板",
-  "nav.startup": "啟動安全",
+  "nav.startup": "啟動",
   "nav.providers": "供應商",
   "nav.models": "模型",
   "nav.combos": "組合",
@@ -316,7 +315,7 @@ export const zhTW: Record<TKey, string> = {
   "errorBoundary.message": "此部分在渲染時發生錯誤。請重新載入後再試。",
   "errorBoundary.details": "錯誤",
   "errorBoundary.reload": "重新載入",
-  "startup.title": "啟動安全",
+  "startup.title": "啟動",
   "startup.subtitle": "檢查重新啟動後 Codex 是否仍能連線 opencodex，避免本機代理路由陷入重複重連。",
   "startup.refresh": "重新整理",
   "startup.loading": "正在檢查啟動保護…",
@@ -567,8 +566,7 @@ export const zhTW: Record<TKey, string> = {
   "models.shadowCallSourceInvalid":
     "此來源選擇無效。請至少選擇一個不含空白或提供者前置字元的來源。",
   "models.autoReviewOverride": "自動審查覆寫",
-  "models.autoReviewOverrideHint":
-    "指定 Codex 自動審查（核准審查模型）所使用的模型。同步型錄時套用到所有資料列；提供者層級的 autoReviewModel 在這些資料列上仍具優先權。",
+  "models.autoReviewOverrideHint": "Codex 操作審批使用的預設模型，供應商單獨設定的模型優先。",
   "models.autoReviewPending": "待定",
   "dash.sidecarBackend": "後端",
   "dash.sidecarModel": "模型",
@@ -581,7 +579,7 @@ export const zhTW: Record<TKey, string> = {
   "dash.injectionHint": "選擇供下方兩個控制元件共用的模型和可選推理強度。",
   "dash.syncCodexSubagentDefaults": "用作原生 Codex 子代理預設值",
   "dash.syncCodexSubagentDefaultsHint":
-    "預設關閉。當 OpenCodex 管理 Codex 路由時，同步或重啟會將所選模型和推理強度應用為新 Codex 任務的原生 Codex [agents] 預設值。此設定本身不會觸發委託；現有的使用者自有 [agents] 預設值會保留而不會被覆蓋。",
+    "將此選擇同步到 Codex，供新任務使用；下次同步或重新啟動後生效。",
   "dash.multiAgentGuidance": "OpenCodex 多代理指引",
   "dash.multiAgentGuidanceHint":
     "新增由 OpenCodex 編寫的委託指引。它與上方的原生 Codex 預設值相互獨立，不會更改 v1/v2 介面、子代理清單、路由或 effort 上限。",
@@ -591,7 +589,7 @@ export const zhTW: Record<TKey, string> = {
   "dash.effortCapLabel": "V2 ultra 推理強度限制",
   "dash.subagentEffortCapLabel": "V2 子代理推理強度限制",
   "dash.effortCapHelp":
-    "限制 V2 ultra 模式輪次的推理強度。設定後，來自 ultra 模式的 max 請求將被限制到所選級別。子代理限制僅適用於衍生的子代理。只會降低強度，不會提高。如果模型不支援所選級別，將自動降至最近的支援級別。",
+    "限制 V2 ultra 請求的推理強度。子代理上限單獨作用於子任務，實際檔位取模型支援且不高於上限的值。",
   "dash.effortCapNone": "無上限",
   "dash.maintenance": "維護",
   "dash.maintenanceHint": "重新整理 Codex 模型目錄，或安裝新的 opencodex 版本。",
@@ -762,8 +760,7 @@ export const zhTW: Record<TKey, string> = {
   "prov.manageCodexAccounts": "管理 Codex 帳號",
   "prov.openaiApiMissing": "需要 API 金鑰",
   "prov.openaiApiSetup": "設定 API 金鑰",
-  "models.subtitle":
-    "開關 Codex 可見的模型 — 原生 GPT passthrough 與已路由模型按供應商分組（點選標題可摺疊）。已隱藏的模型不會出現在目錄和模型選擇器中，但仍可用精確 id 直接呼叫。",
+  "models.subtitle": "選擇模型目錄和選擇器中顯示的模型。隱藏的模型仍可透過完整 ID 呼叫。",
   "models.delivery.title": "變更如何到達 Codex",
   "models.delivery.chip.saved": "已儲存在這裡",
   "models.delivery.chip.loaded": "Codex 會在重新啟動時載入",
@@ -773,8 +770,7 @@ export const zhTW: Record<TKey, string> = {
   "models.delivery.loaded.title": "由 Codex 載入",
   "models.delivery.loaded.body":
     "Codex 會在啟動時讀取目錄，因此已經開啟的 Codex 視窗會繼續使用舊的模型清單。OpenCodex 無法查看執行中的 Codex，也就無法得知它正在使用哪一份清單。若能判斷 Codex 是在你的變更之前啟動的，分頁上方會出現重新啟動提示。",
-  "models.delivery.hint":
-    "若你開啟的模型沒有出現在 Codex 中，請按此頁右上角的「重新載入 Codex 模型清單」，然後重新開啟 Codex。",
+  "models.delivery.hint": "更新模型清單後，重新載入 Codex 模型清單並重新開啟 Codex。",
   "models.nativeGroupLabel": "OpenAI 原生",
   "models.nativeHint":
     "Passthrough 模型使用在供應商頁面選擇的帳號池或直連選項。關閉後會從 Codex 選擇器中隱藏（目錄條目保留，重新開啟即可完整恢復）。 在此新增模型會註冊為路由的 `openai/<model>` 選擇器，而非新的裸 passthrough id。",
@@ -798,7 +794,7 @@ export const zhTW: Record<TKey, string> = {
   "models.capApplied": "上下文限制已套用 — 將在下一個 Codex 回合生效。",
   "models.capSaveFailed": "儲存上下文限制失敗",
   "models.contextCapped": "350k 限制",
-  "models.contextCapLabel": "預設視窗 / 上限",
+  "models.contextCapLabel": "預設上下文視窗",
   "models.v2Label": "子代理",
   "models.shadowCallOriginal": "{models} →",
   "models.v2DocsLink": "v1 / v2 是什麼？",
@@ -810,9 +806,9 @@ export const zhTW: Record<TKey, string> = {
   "models.v2ModeDesc_v2": "所有模型 → v2 介面",
   "models.keepNativeOnV1": "ChatGPT 維持 v1",
   "models.keepNativeOnV1Hint":
-    "ChatGPT 原生父代理會加密 v2 子任務，Grok/Claude 無法讀取。若 Sol/Terra 仍需派發路由模型，請保持開啟。路由父代理仍使用 v2。",
+    "讓 ChatGPT 主代理使用 v1，以便向閘道模型委派任務。閘道主代理仍使用 v2。",
   "models.v2Help":
-    "控制所有模型的多代理介面。\n\nv1: 經典單執行緒代理。所有模型使用 v1 協作介面。\nbase: 上游預設值 — sol/terra 使用 v2，luna 使用 v1，其餘跟隨 codex 功能標誌。\nv2: 多執行緒代理（spawn_agent）。所有模型使用 v2 協作介面。\n\n在 v2 下，「ChatGPT 維持 v1」會讓 Sol/Terra 留在 v1，以便繼續派發 Grok 或 Claude。ChatGPT 會加密 v2 子任務，路由模型無法讀取；路由父代理仍留在 v2。\n\n更改在新會話中生效。",
+    "v1 使用經典代理工具；base 遵循各模型預設設定；v2 啟用 spawn_agent 多執行緒委派。變更對新工作階段生效。ChatGPT 需要向閘道模型委派時，可啟用「保持 ChatGPT 使用 v1」。",
   "dash.multiAgent": "子代理",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads 仍存在 — codex 將拒絕啟動，請從 config.toml 移除",
@@ -825,12 +821,10 @@ export const zhTW: Record<TKey, string> = {
   "models.capValue": "預設 {value}",
   "models.contextCappedValue": "{value} 限制",
   "models.setAll": "全部設定",
-  "models.setAllHint":
-    "為所有已路由供應商打開 {value} 預設視窗。中繼站沒回報 context_window / context_length 時，這個值就是 Codex 實際視窗。要幫單一模型手寫，用同一列上的「自訂視窗」。原生供應商不受影響。",
+  "models.setAllHint": "為閘道供應商設定 {value} 的預設上下文視窗，單個模型可另行設定。",
   "models.collapseAll": "全部摺疊",
   "models.expandAll": "全部展開",
-  "models.orderHint":
-    "預設順序遵循精選項目與目錄優先級；同優先級的路由列依供應商、模型排序。儲存的選擇順序可改變顯示順序，可見性開關用於篩選顯示的列。用戶端在再次取得前可能繼續使用舊目錄。",
+  "models.orderHint": "模型按精選項和目錄優先級排序，可在「模型設定」中調整順序。",
   "models.settingsPanel.title": "模型設定",
   "models.settingsPanel.off": "關",
   "models.settingsPanel.attention": "需要留意",
@@ -963,7 +957,7 @@ export const zhTW: Record<TKey, string> = {
   "sub.advanced": "進階",
   "sub.orderHintAria": "此順序的用途",
   "sub.orderHint":
-    "此處所選並顯示的順序決定 Codex 模型選擇器頂部第 1–5 位，以及 {cmd} 的預設模型候選。若模型選擇器中可見的精選模型少於 5 個，其餘欄位會依目錄優先順序顯示模型；5 個可見的精選模型即可填滿名單，除非自訂模型選擇器順序改變了目錄優先順序。",
+    "設定 Codex 模型選擇器的前五項，以及 {cmd} 的優先模型。空餘位置按模型目錄順序補齊。",
   "sub.noneSelected": "未選擇 — 請從下方列表選擇。",
   "sub.models": "模型",
   "sub.search": "搜尋模型（原生 gpt + 已路由）…",
@@ -1195,7 +1189,7 @@ export const zhTW: Record<TKey, string> = {
   "debug.noLines.injection":
     "注入日誌已開啟但尚未捕獲任何內容。它紀錄協作和子代理回合中的多代理指導注入與 effort-cap 決策。",
   "usage.title": "用量",
-  "usage.subtitle": "代理本地的 Token 用量統計。缺失的用量不會顯示為零。",
+  "usage.subtitle": "閘道請求與 Token 用量。",
   "usage.loading": "正在載入用量資料…",
   "usage.empty": "尚無用量紀錄。透過代理傳送請求後將在此顯示。",
   "usage.loadError": "無法載入用量資料。",
@@ -1219,8 +1213,7 @@ export const zhTW: Record<TKey, string> = {
   "usage.coverage.measured": "已計量",
   "usage.coverage.reported": "供應商上報",
   "usage.coverage.estimated": "估算",
-  "usage.coverage.note":
-    "已計量包含供應商上報和估算的 Token 數。未上報 / 不支援請求僅做計數，不會被算作 0 Token。",
+  "usage.coverage.note": "已計量請求包含供應商回報和估算的用量。",
   "usage.search.models": "搜尋模型…",
   "usage.col.requests": "請求數",
   "usage.col.measured": "已計量",
@@ -1385,7 +1378,7 @@ export const zhTW: Record<TKey, string> = {
   "modal.logInWith": "使用 {label} 登入",
   "modal.waitingBrowser": "等待瀏覽器…",
   "modal.providerName": "供應商名稱",
-  "modal.adapter": "介面卡",
+  "modal.adapter": "上游協定",
   "modal.baseUrl": "Base URL",
   "modal.endpoint": "端點",
   "modal.endpoint.tokenPlan": "Token 方案",
@@ -2721,8 +2714,7 @@ export const zhTW: Record<TKey, string> = {
   "sub.settings": "設定",
   "sub.sections": "子代理分區",
   "sub.delegation.model": "優先調用的模型",
-  "sub.delegation.modelHint":
-    "Codex 分派工作時最先調用的模型。上面的推薦是可調用的名單，這裡選的是其中第一順位。",
+  "sub.delegation.modelHint": "Codex 委派任務時優先呼叫的模型。",
   "sub.suggest.button": "建議",
   "sub.suggest.label": "委派的工作",
   "sub.suggest.placeholder":
@@ -2941,13 +2933,13 @@ export const zhTW: Record<TKey, string> = {
   "models.tab.routing": "路由 (beta)",
   "models.tabsLabel": "模型介面",
   "models.subtitle.routing": "原則設定檔、dry-run 評估，以及有來源依據的路由分析。",
-  "models.contextSettings": "自訂視窗",
-  "models.contextSettingsTitle": "自訂視窗 — {provider}",
+  "models.contextSettings": "自訂上下文視窗",
+  "models.contextSettingsTitle": "自訂上下文視窗 — {provider}",
   "models.contextDefault": "供應商預設",
   "models.contextModel": "模型",
   "models.contextModelOverride": "模型覆寫",
   "models.contextHint":
-    "已經知道視窗時，在這裡手寫 Codex 實際視窗。上游沒回報視窗就用這個值；上游回報更大視窗才壓低。留空則使用供應商的「預設視窗 / 上限」；那個開關沒開時才回退 128k。",
+    "已經知道視窗時，在這裡手寫 Codex 實際視窗。上游沒回報視窗就用這個值；上游回報更大視窗才壓低。留空則使用供應商的「預設上下文視窗」；那個開關沒開時才回退 128k。",
   "models.contextAutomatic": "自動偵測",
   "models.contextSaved": "上下文視窗已更新 — 將在下一個 Codex 回合生效。",
   "models.contextUnchanged": "沒有需要儲存的上下文視窗變更。",
@@ -3150,7 +3142,7 @@ export const zhTW: Record<TKey, string> = {
   "integrations.hermes.select": "管理 {name}",
   "integrations.hermes.loadError": "無法載入 Hermes 設定檔。請重試以查看狀態。",
   "integrations.hermes.profileTitle": "Hermes 設定檔：{name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Codex 連線由代理服務管理。啟動 opencodex 時套用；停止服務時還原原生路由。",
   "integrations.codex.openService": "開啟服務控制",
@@ -3377,7 +3369,7 @@ export const zhTW: Record<TKey, string> = {
   "integrations.semantics.kimi": "重新啟動或執行 /reload 以套用（v2 會監視該檔案）。",
   "integrations.semantics.gajae": "在新工作階段中或開啟 /model 時生效。",
   "integrations.semantics.dsh":
-    "OpenCodex 只管理 $DSH_HOME/profiles/desktop/cordis.patch.yml（DSH 0.1.7 起讀取的 Desktop profile；該 profile 不存在時為 $DSH_HOME/settings.yaml）中 llm-pi-ai 這一列的 opencodex provider。DSH 會熱重載該 provider；你的預設模型與 deepseek-official 維持不變。目前僅支援 loopback，且不會寫入真實憑證。",
+    "DSH 會自動載入更新後的模型目錄。在 DSH 中選擇 OpenCodex 提供方即可使用。",
   "integrations.semantics.mcode":
     "僅管理 custom_provider.opencodex，不會變更預設模型或 MiniMax 登入狀態。",
   "integrations.semantics.zcode":

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -24,34 +24,60 @@ export function SectionIndex({
 }) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState(items[0]?.id ?? "");
+  const destination = useRef<string | null>(null);
   const ids = items.map((item) => item.id).join("|");
 
   useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return;
-    const visible = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) visible.set(entry.target.id, entry.boundingClientRect.top);
-          else visible.delete(entry.target.id);
-        }
-        // The topmost section that still shows its upper part wins.
-        const order = ids.split("|");
-        const first = order.find((id) => visible.has(id));
-        if (first) setActive(first);
-      },
-      { rootMargin: "0px 0px -55% 0px", threshold: 0 },
-    );
-    for (const id of ids.split("|")) {
+    const sections = ids.split("|").flatMap((id) => {
       const node = document.getElementById(id);
-      if (node) observer.observe(node);
-    }
-    return () => observer.disconnect();
+      return node ? [node] : [];
+    });
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      // A selected destination remains selected throughout the animated scroll,
+      // including short sections near the document bottom that cannot reach the top.
+      if (destination.current || !sections.length) return;
+      const offset = Number.parseFloat(getComputedStyle(sections[0]).scrollMarginTop) || 0;
+      const passed = sections.filter((node) => node.getBoundingClientRect().top <= offset + 1);
+      const atBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+      setActive((atBottom ? sections.at(-1) : (passed.at(-1) ?? sections[0]))!.id);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const release = () => {
+      destination.current = null;
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key))
+        release();
+    };
+    // User scrolling takes over immediately; pointerdown also covers dragging the scrollbar.
+    window.addEventListener("wheel", release, { passive: true });
+    window.addEventListener("touchstart", release, { passive: true });
+    window.addEventListener("pointerdown", release);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    update();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("wheel", release);
+      window.removeEventListener("touchstart", release);
+      window.removeEventListener("pointerdown", release);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      destination.current = null;
+    };
   }, [ids]);
 
   const go = (id: string) => {
     const node = document.getElementById(id);
     if (!node) return;
+    destination.current = id;
     setActive(id);
     node.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     // Move focus with the view so keyboard users continue from the section they chose.

@@ -1,0 +1,59 @@
+.startup-runtime-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--ocx-line);
+  border-radius: 12px;
+}
+.startup-runtime-status h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.startup-runtime-status p,
+.startup-action-hint,
+.startup-recovery > p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ocx-fg-muted);
+}
+.startup-settings-body {
+  padding: 16px;
+  gap: 16px;
+}
+.startup-action-hint {
+  margin: 0;
+}
+.startup-details > summary,
+.startup-recovery > summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.startup-detail-list {
+  display: grid;
+  gap: 14px;
+  margin: 16px 0 0;
+}
+.startup-detail-list > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 160px) minmax(0, 1fr);
+  gap: 12px;
+  font-size: 13px;
+}
+.startup-recovery {
+  border-top: 1px solid var(--ocx-line);
+  padding: 20px 0;
+}
+.startup-recovery > p {
+  margin-bottom: 16px;
+}
+@media (max-width: 600px) {
+  .startup-detail-list > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}

@@ -261,22 +261,16 @@ export async function fetchDashboardMaMode(
   apiBase: string,
   signal: AbortSignal,
 ): Promise<DashboardMaModePoll> {
-  try {
-    const v2Res = await fetch(`${apiBase}/api/v2`, { signal });
-    if (!v2Res.ok) return { maMode: "default" };
-    const v2Data = (await v2Res.json()) as {
-      multiAgentMode?: unknown;
-      multiAgentSurfaceAdvisory?: unknown;
-    };
-    const advisory = readSubagentSurfaceAdvisory(v2Data.multiAgentSurfaceAdvisory);
-    if (v2Data.multiAgentMode === "v1" || v2Data.multiAgentMode === "v2") {
-      return { maMode: v2Data.multiAgentMode, advisory };
-    }
-    return { maMode: "default", advisory };
-  } catch (error) {
-    if (isAbortError(error, signal)) throw error;
-    return { maMode: "default" };
+  const v2Res = await fetch(`${apiBase}/api/v2`, { signal });
+  const v2Data = await requireJson<{
+    multiAgentMode?: unknown;
+    multiAgentSurfaceAdvisory?: unknown;
+  }>(v2Res);
+  const advisory = readSubagentSurfaceAdvisory(v2Data.multiAgentSurfaceAdvisory);
+  if (v2Data.multiAgentMode === "v1" || v2Data.multiAgentMode === "v2") {
+    return { maMode: v2Data.multiAgentMode, advisory };
   }
+  return { maMode: "default", advisory };
 }
 
 export async function fetchDashboardOverview(

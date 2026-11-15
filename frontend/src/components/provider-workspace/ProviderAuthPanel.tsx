@@ -1,3 +1,4 @@
+import { authStatusCopy } from "../../provider-workspace/auth-status";
 import { anthropicSubscriptionLabel } from "../../../../backend/src/providers/anthropic-subscription";
 import {
   anthropicInstanceRowShapeMatches,
@@ -10,7 +11,8 @@ import {
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useT, useI18n } from "../../i18n/shared";
-import { useRuntimeCapabilities, useMigrationLabel } from "../../runtime-capabilities";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
+import { PlannedFeature } from "../planned-feature";
 import { OAuthFlowSelect } from "../oauth-flow-select";
 import { formatAccountPauseTooltip } from "../../account-pause-display";
 import { IconLock, IconRefresh, IconTrash } from "../../icons";
@@ -140,7 +142,7 @@ export default function ProviderAuthPanel({
 }: {
   item: WorkspaceItem;
   apiBase: string;
-  oauth?: { loggedIn: boolean; email?: string; error?: string };
+  oauth?: { loggedIn?: boolean; email?: string; error?: string };
   accounts?: OAuthAccountRow[];
   keys?: ApiKeyRow[];
   accountLoadState?: AccountLoadState;
@@ -194,7 +196,6 @@ export default function ProviderAuthPanel({
   }, [connectionIdentity]);
 
   const capabilities = useRuntimeCapabilities();
-  const migrationLabel = useMigrationLabel();
   const onRefreshQuota = capabilities ? undefined : authHandlers?.onRefreshQuota;
   const surface = providerAuthSurface({ ...item, hasApiKey: item.hasApiKey || keys.length > 0 });
   const isOauth = surface === "oauth-accounts";
@@ -396,7 +397,13 @@ export default function ProviderAuthPanel({
                 aria-hidden="true"
               />
               <span className="pwi-auth-status-text">
-                {loggedIn ? t("pws.loggedInTitle") : oauth?.error || t("pws.notLoggedInTitle")}
+                {loggedIn
+                  ? t("pws.loggedInTitle")
+                  : item.oauthLoggedIn === undefined && item.oauthStatusCheck
+                    ? item.oauthStatusCheck === "failed"
+                      ? authStatusCopy().failed
+                      : authStatusCopy().loading
+                    : oauth?.error || t("pws.notLoggedInTitle")}
               </span>
               <span className="pwi-auth-actions">
                 {capabilities?.oauthProviders?.includes(item.name) &&
@@ -779,17 +786,36 @@ export default function ProviderAuthPanel({
 
         {isKeyAuth && (
           <>
+            {accountLoadState === "loading" && (
+              <p className="muted" role="status">
+                {t("common.loading")}
+              </p>
+            )}
+            {accountLoadState === "error" && (
+              <div className="pwi-auth-state" role="alert">
+                <span>{t("integrations.detail.keyUnavailable")}</span>
+                {authHandlers.onRetryAccounts && (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => void authHandlers.onRetryAccounts?.(item.name)}
+                  >
+                    {t("common.retry")}
+                  </button>
+                )}
+              </div>
+            )}
             {keys.length > 0 && (
               <ul className="pwi-auth-list">
                 {keys.map((entry) => (
                   <li
                     key={entry.id}
-                    className={`pwi-auth-acct${entry.active ? " pwi-auth-acct--active" : ""}`}
+                    className="overflow-hidden rounded-xl border border-line bg-surface p-4"
                   >
-                    <div className={`pwi-auth-row${entry.active ? " pwi-auth-row--active" : ""}`}>
+                    <div className="flex flex-wrap items-center gap-3">
                       <button
                         type="button"
-                        className="pwi-auth-row-main"
+                        className="flex min-w-0 flex-1 appearance-none items-center gap-3 rounded-none border-0 bg-transparent p-0 text-left shadow-none"
                         onClick={() => void authHandlers.onSwitchApiKey(item.name, entry)}
                         disabled={entry.active && !entry.disabled}
                         aria-label={
@@ -803,12 +829,13 @@ export default function ProviderAuthPanel({
                           aria-hidden="true"
                         />
                         <span className="pwi-auth-row-copy">
-                          <span className="pwi-auth-row-label">{entry.label ?? entry.masked}</span>
-                          {entry.label && (
-                            <code className="pwi-auth-row-secondary">
-                              {entry.masked} · {t("prov.accountId")}: {entry.id}
-                            </code>
-                          )}
+                          <span className="pwi-auth-row-label">
+                            {entry.label?.trim() ||
+                              (locale === "zh" || locale === "zh-TW" ? "API 密钥" : "API key")}
+                          </span>
+                          <code className="pwi-auth-row-secondary">
+                            {entry.masked || "••••••••"}
+                          </code>
                         </span>
                         {entry.disabled && (
                           <span
@@ -845,11 +872,7 @@ export default function ProviderAuthPanel({
                         <IconTrash style={{ width: 13, height: 13 }} aria-hidden="true" />
                       </button>
                     </div>
-                    {capabilities ? (
-                      <p className="muted">
-                        {t("pws.dashboard.rateLimits")} · {migrationLabel}
-                      </p>
-                    ) : (
+                    {!capabilities && (
                       <div className="pwi-auth-acct-quota">
                         <ProviderAccountQuota
                           quotaMode={entry.quotaMode}
@@ -864,7 +887,8 @@ export default function ProviderAuthPanel({
                 ))}
               </ul>
             )}
-            {keys.length === 0 &&
+            {accountLoadState === "ready" &&
+              keys.length === 0 &&
               (addingKey ? (
                 <div className="pwi-auth-add-key">
                   <input
@@ -905,6 +929,19 @@ export default function ProviderAuthPanel({
                   {t("pws.addKey")}
                 </button>
               ))}
+            {capabilities && (
+              <div className="mt-5">
+                <PlannedFeature
+                  compact
+                  title={t("pws.keyLimits")}
+                  description={
+                    locale === "zh" || locale === "zh-TW"
+                      ? "分别设置密钥的请求频率与并发上限。"
+                      : "Set request frequency and concurrency limits for each key."
+                  }
+                />
+              </div>
+            )}
           </>
         )}
       </div>

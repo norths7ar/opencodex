@@ -4,7 +4,7 @@
  * the component that renders it.
  */
 export type AccountLoginStatus = {
-  loggedIn: boolean;
+  loggedIn?: boolean;
   email?: string;
   error?: string;
   needsReauth?: boolean;

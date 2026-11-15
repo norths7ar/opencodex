@@ -5,8 +5,7 @@
  * and actions. Explanations stay one line; the rest opens from a "?" next to the title.
  */
 import { useId, type ReactNode, type SVGProps } from "react";
-import { useT } from "../../i18n/shared";
-import { Tooltip } from "../../ui";
+import { HelpPopover } from "../help-popover";
 import { cn } from "@/lib/utils";
 
 export function QuestionIcon(props: SVGProps<SVGSVGElement>) {
@@ -27,17 +26,8 @@ export function QuestionIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** A focusable "?" that shows a short explanation on hover or focus. */
 export function HelpTip({ label, children }: { label: string; children: ReactNode }) {
-  const t = useT();
-  return (
-    <span className="inline-flex shrink-0 items-center text-fg-subtle transition-colors hover:text-fg-muted">
-      <Tooltip content={children} side="bottom" maxWidth={380}>
-        <QuestionIcon width={15} height={15} aria-hidden="true" />
-        <span className="sr-only">{t("subagentsV2.moreAbout", { label })}</span>
-      </Tooltip>
-    </span>
-  );
+  return <HelpPopover label={label}>{children}</HelpPopover>;
 }
 
 interface FrameProps {
@@ -49,8 +39,8 @@ interface FrameProps {
   meta?: ReactNode;
   /** Controls on the right of the head. */
   actions?: ReactNode;
-  /** Opened "?" panel, rendered under the head. */
-  below?: ReactNode;
+  /** Portal content; never participates in the frame's layout. */
+  helpOverlay?: ReactNode;
   children?: ReactNode;
   className?: string;
   headClassName?: string;
@@ -64,7 +54,7 @@ export function Frame({
   lede,
   meta,
   actions,
-  below,
+  helpOverlay,
   children,
   className,
   headClassName,
@@ -100,7 +90,7 @@ export function Frame({
           <div className="flex shrink-0 flex-wrap items-center gap-2 max-sm:w-full">{actions}</div>
         )}
       </div>
-      {below && <div className="px-4 pb-3">{below}</div>}
+      {helpOverlay}
       {children}
     </section>
   );

@@ -15,7 +15,7 @@ import type {
   ProtocolAdapterSource,
   ProtocolProviderSummaryV1,
 } from "../../../../backend/src/protocols/dto";
-import { useT, type TKey } from "../../i18n/shared";
+import { useI18n, useT, type TKey } from "../../i18n/shared";
 import { fetchProtocolProviderSummary } from "../../protocol-api";
 import { protocolHopLabel } from "../protocols/protocol-labels";
 
@@ -58,6 +58,7 @@ export function ProviderProtocolPanel({
   refreshKey?: string;
 }) {
   const t = useT();
+  const { locale } = useI18n();
   const requestKey = JSON.stringify([apiBase ?? "", providerName, savedAdapter, refreshKey ?? ""]);
   const [state, setState] = useState<LoadState | null>(null);
 
@@ -80,14 +81,20 @@ export function ProviderProtocolPanel({
   }, [apiBase, providerName, requestKey]);
 
   const current = state?.key === requestKey ? state : null;
-  if (apiBase === undefined || !current || current.kind === "hidden") return null;
+  if (apiBase === undefined) return null;
 
   const pendingAdapter = draftAdapter && draftAdapter !== savedAdapter ? draftAdapter : null;
   return (
-    <section className="ppp-card" aria-labelledby="ppp-title" data-testid="provider-protocol-panel">
-      <h3 id="ppp-title">{t("pws.protocol.title")}</h3>
-      <p className="pwi-settings-hint">{t("pws.protocol.note")}</p>
-      {current.kind === "error" ? (
+    <details
+      className="rounded-lg border border-line px-4 py-3"
+      data-testid="provider-protocol-panel"
+    >
+      <summary className="cursor-pointer text-[13px] text-fg-muted">
+        {locale === "zh" || locale === "zh-TW" ? "协议详情" : "Protocol details"}
+      </summary>
+      {!current || current.kind === "hidden" ? (
+        <div className="min-h-10" aria-busy={!current || undefined} />
+      ) : current.kind === "error" ? (
         <p className="muted small" role="status">
           {t("pws.protocol.loadFailed")}
         </p>
@@ -156,6 +163,6 @@ export function ProviderProtocolPanel({
           )}
         </>
       )}
-    </section>
+    </details>
   );
 }

@@ -120,7 +120,7 @@ export default function CodexConnection({ apiBase, active }: { apiBase: string; 
           <span className={`badge ${connected ? "badge-green" : "badge-muted"}`}>{stateLabel}</span>
         )}
       </header>
-      {resource.loading && <p role="status">{t("common.loading")}</p>}
+      {resource.loading && !preview && <div className="min-h-64" aria-busy="true" />}
       {Boolean(resource.error) && <Notice tone="err">{String(resource.error)}</Notice>}
       {preview && (
         <>
@@ -142,7 +142,11 @@ export default function CodexConnection({ apiBase, active }: { apiBase: string; 
             <button type="button" className="link-btn" onClick={() => navigateHash("models")}>
               {zh ? "管理可用模型" : "Manage available models"}
             </button>
-            <p className="muted text-label">{t("integrations.codex.body")}</p>
+            <p className="muted text-label">
+              {zh
+                ? "应用前自动备份，断开时恢复。"
+                : "Configuration is backed up before applying and restored on disconnect."}
+            </p>
             <div className="codex-connection-actions">
               <button
                 className="btn btn-primary"

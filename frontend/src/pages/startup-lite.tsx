@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useI18n } from "../i18n/shared";
 import { useDataSurface } from "../data-surface";
 import { readJsonOrThrow } from "../fetch-json";
@@ -11,8 +11,10 @@ import {
   StateBadge,
 } from "../components/v2-startup/primitives";
 import { Button } from "../components/ui-v2/button";
+import "./startup-lite.css";
 
 interface StartupHealth {
+  serviceOperation?: { id: string; state: string; error?: string } | null;
   taskName: string;
   stateDirectory: string;
   runtimeState: string;
@@ -33,6 +35,9 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
   const zh = locale === "zh" || locale === "zh-TW";
   const copy = (en: string, cn: string) => (zh ? cn : en);
   const [busy, setBusy] = useState(false);
+  const [operation, setOperation] = useState<{ id: string; action: string } | null>(null);
+  const [removalDisconnected, setRemovalDisconnected] = useState(false);
+  const removing = operation?.action === "remove";
   const [notice, setNotice] = useState<{ error: boolean; text: string } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const load = useCallback(
@@ -47,7 +52,65 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
   });
   const data = resource.state.data;
   const blocked =
-    busy || resource.state.refreshing || !data || data.diagnosticStale || data.serviceConflict;
+    busy ||
+    !!operation ||
+    resource.state.refreshing ||
+    !data ||
+    data.diagnosticStale ||
+    data.serviceConflict;
+  const refresh = resource.refresh;
+
+  useEffect(() => {
+    if (!operation) return;
+    const controller = new AbortController();
+    const deadline = Date.now() + 90_000;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      try {
+        const result = await load(controller.signal);
+        const observed = result?.serviceOperation;
+        if (observed?.id === operation.id && observed.state !== "running") {
+          setOperation(null);
+          setNotice({
+            error: observed.state === "failed",
+            text: observed.error ?? (zh ? "服务设置已更新。" : "Service settings updated."),
+          });
+          refresh();
+          return;
+        }
+      } catch {
+        if (controller.signal.aborted) return;
+        if (operation.action === "remove") {
+          setRemovalDisconnected(true);
+          setNotice({
+            error: false,
+            text: zh
+              ? "网关连接已断开。运行 ocx service status 查看移除结果。"
+              : "The gateway connection has closed. Run ocx service status to check the removal result.",
+          });
+          return;
+        }
+        // Installation and repair can briefly stop the server hosting this page.
+      }
+      if (controller.signal.aborted) return;
+      if (Date.now() >= deadline) {
+        setOperation(null);
+        setNotice({
+          error: true,
+          text: zh
+            ? "暂时无法确认结果，请运行 ocx service status。"
+            : "Could not confirm the result. Run ocx service status.",
+        });
+        return;
+      }
+      timer = setTimeout(() => void poll(), 1000);
+    };
+    timer = setTimeout(() => void poll(), 1000);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [operation, load, refresh, zh]);
 
   const act = async (action: string) => {
     setBusy(true);
@@ -58,10 +121,24 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
-      await readJsonOrThrow(
-        response,
-        copy("Could not change automatic startup.", "无法更改自动启动设置。"),
-      );
+      const result = await readJsonOrThrow<{
+        pending?: boolean;
+        operationId?: string;
+        action?: string;
+      }>(response, copy("Could not change automatic startup.", "无法更改自动启动设置。"));
+      if (result?.pending && result.operationId) {
+        setOperation({ id: result.operationId, action: result.action ?? action });
+        setNotice({
+          error: false,
+          text:
+            action === "remove"
+              ? copy("Stopping the gateway and removing the service…", "正在停止网关并移除服务……")
+              : action === "repair"
+                ? copy("Repairing the service…", "正在修复服务……")
+                : copy("Installing the service…", "正在安装服务……"),
+        });
+        return;
+      }
       setNotice({ error: false, text: copy("Automatic startup updated.", "自动启动设置已更新。") });
       resource.refresh();
     } catch (error) {
@@ -81,7 +158,10 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
           "登录 Windows 后自动运行本地网关。",
         )}
         actions={
-          <Button disabled={busy || resource.state.refreshing} onClick={() => resource.refresh()}>
+          <Button
+            disabled={busy || !!operation || resource.state.refreshing}
+            onClick={() => resource.refresh()}
+          >
             {copy("Refresh", "刷新")}
           </Button>
         }
@@ -101,17 +181,51 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
       {data && (
         <>
           {data.error && <Banner tone="warn">{data.error}</Banner>}
+          <section className="startup-runtime-status">
+            <div>
+              <h3>{copy("Gateway", "网关运行状态")}</h3>
+              <p>
+                {copy(
+                  "Closing this console leaves the gateway running in the background.",
+                  "关闭控制台后，网关继续在后台运行。",
+                )}
+              </p>
+            </div>
+            <StateBadge tone={!removing && data.runtimeState === "running" ? "ok" : "neutral"}>
+              {removalDisconnected
+                ? copy("Disconnected", "连接已断开")
+                : removing
+                  ? copy("Stopping", "正在停止")
+                  : data.runtimeState === "running"
+                    ? copy("Running", "运行中")
+                    : data.runtimeState}
+            </StateBadge>
+          </section>
           <Panel
             title={copy("Automatic background startup", "自动后台启动")}
             meta={
-              <StateBadge tone={data.serviceViable ? "ok" : "warn"}>
-                {data.diagnosticStale
-                  ? copy("Status unavailable", "状态未知")
-                  : data.serviceViable
-                    ? copy("Enabled", "已启用")
-                    : data.serviceStale
-                      ? copy("Repair needed", "需要修复")
-                      : copy("Not enabled", "未启用")}
+              <StateBadge
+                tone={
+                  operation
+                    ? "neutral"
+                    : data.serviceViable
+                      ? "ok"
+                      : data.serviceStale
+                        ? "warn"
+                        : "neutral"
+                }
+              >
+                {removalDisconnected
+                  ? copy("Check from CLI", "请用命令行确认")
+                  : removing
+                    ? copy("Removing", "正在移除")
+                    : data.diagnosticStale
+                      ? copy("Status unavailable", "状态未知")
+                      : data.serviceViable
+                        ? copy("Enabled", "已启用")
+                        : data.serviceStale
+                          ? copy("Repair needed", "需要修复")
+                          : copy("Not enabled", "未启用")}
               </StateBadge>
             }
             description={copy(
@@ -143,37 +257,44 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
                 )}
               </div>
             }
+            bodyClassName="startup-settings-body"
           >
-            <dl className="grid gap-2 text-sm">
-              <div>
-                <dt className="text-fg-muted">{copy("Gateway", "网关")}</dt>
-                <dd className="m-0">{data.runtimeState}</dd>
-              </div>
-              <div>
-                <dt className="text-fg-muted">{copy("Startup task", "启动任务")}</dt>
-                <dd className="m-0 break-all">{data.taskName}</dd>
-              </div>
-              <div>
-                <dt className="text-fg-muted">{copy("Data directory", "数据目录")}</dt>
-                <dd className="m-0 break-all">{data.stateDirectory}</dd>
-              </div>
-              <div>
-                <dt className="text-fg-muted">{copy("Runtime log", "运行日志")}</dt>
-                <dd className="m-0 break-all">{data.logPath}</dd>
-              </div>
-              <div>
-                <dt className="text-fg-muted">{copy("Startup log", "启动日志")}</dt>
-                <dd className="m-0 break-all">{data.supervisorLogPath}</dd>
-              </div>
-            </dl>
-            <p className="text-sm text-fg-muted">
+            <p className="startup-action-hint">
               {copy(
-                "Disabling or removing startup leaves the current gateway running. Credentials remain under your account; this does not run before Windows login.",
-                "禁用或移除启动注册不会停止当前网关。凭据仍由当前账号使用；此方式在登录 Windows 后运行。",
+                "Disabling automatic startup leaves the gateway running. Removing the service stops it.",
+                "禁用自动启动保留网关运行；移除服务会停止网关。",
               )}
             </p>
+            <details className="startup-details">
+              <summary>{copy("Runtime details", "运行详情")}</summary>
+              <dl className="startup-detail-list">
+                <div>
+                  <dt className="text-fg-muted">{copy("Startup task", "启动任务")}</dt>
+                  <dd className="m-0 break-all">{data.taskName}</dd>
+                </div>
+                <div>
+                  <dt className="text-fg-muted">{copy("Data directory", "数据目录")}</dt>
+                  <dd className="m-0 break-all">{data.stateDirectory}</dd>
+                </div>
+                <div>
+                  <dt className="text-fg-muted">{copy("Runtime log", "运行日志")}</dt>
+                  <dd className="m-0 break-all">{data.logPath}</dd>
+                </div>
+                <div>
+                  <dt className="text-fg-muted">{copy("Startup log", "启动日志")}</dt>
+                  <dd className="m-0 break-all">{data.supervisorLogPath}</dd>
+                </div>
+              </dl>
+            </details>
           </Panel>
-          <Panel title={copy("Command-line recovery", "命令行恢复")}>
+          <details className="startup-recovery">
+            <summary>{copy("Command-line recovery", "命令行恢复")}</summary>
+            <p>
+              {copy(
+                "Use these commands if the console is unavailable or a startup task needs repair.",
+                "控制台无法访问或启动任务需要修复时，可使用以下命令。",
+              )}
+            </p>
             {Object.entries(data.commands).map(([action, command]) => (
               <CommandRow
                 key={action}
@@ -196,7 +317,7 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
                 }}
               />
             ))}
-          </Panel>
+          </details>
         </>
       )}
     </div>

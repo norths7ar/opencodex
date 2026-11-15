@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFn } from "../i18n/shared";
-import { readJsonIfOk, readJsonOrThrow } from "../fetch-json";
+import { readJsonOrThrow } from "../fetch-json";
 import { writeSessionListCache } from "../session-list-cache";
 import type { OAuthStatus, ProvidersConfig } from "./providers-shared";
 import { useRuntimeCapabilities } from "../runtime-capabilities";
@@ -29,24 +29,33 @@ export function useProvidersFetch({
 }) {
   const capabilities = useRuntimeCapabilities();
   const configRequest = useRef(0);
+  const [configRead, setConfigRead] = useState<{
+    apiBase: string;
+    state: "loading" | "ready" | "error";
+  }>();
+  const oauthRequest = useRef(0);
   useEffect(
     () => () => {
       configRequest.current += 1;
+      oauthRequest.current += 1;
     },
     [apiBase],
   );
   const fetchConfig = useCallback(async (): Promise<ProvidersConfigRefreshResult> => {
     const request = ++configRequest.current;
+    setConfigRead({ apiBase, state: "loading" });
     try {
       const res = await fetch(`${apiBase}/api/config`);
       const data = await readJsonOrThrow<ProvidersConfig>(res);
       if (request !== configRequest.current) return "superseded";
       if (!data) throw new Error("config response missing");
       setConfig(data ?? null);
+      setConfigRead({ apiBase, state: "ready" });
       if (configCacheKey && data) writeSessionListCache(configCacheKey, data);
       return "applied";
     } catch {
       if (request !== configRequest.current) return "superseded";
+      setConfigRead({ apiBase, state: "error" });
       notify(t("prov.loadConfigFail"), false);
       return "failed";
     }
@@ -54,28 +63,52 @@ export function useProvidersFetch({
 
   const fetchOauth = useCallback(async () => {
     if (capabilities?.oauth === false) return;
+    const request = ++oauthRequest.current;
+    const markFailed = (providers: string[]) => {
+      if (request !== oauthRequest.current) return;
+      setOauthStatus((previous) => {
+        const next = { ...previous };
+        for (const provider of providers) {
+          next[provider] = { ...previous[provider], statusCheck: "failed" };
+        }
+        return next;
+      });
+    };
     try {
       // Codex openai status is owned by useCodexAccountPool — do not duplicate /accounts.
       const provRes = await fetch(`${apiBase}/api/oauth/providers`);
       const provData = await readJsonOrThrow<{ providers?: string[] }>(provRes);
       const provs: string[] = provData?.providers ?? [];
+      if (request !== oauthRequest.current) return;
       setOauthProviders(provs);
-      const oauthEntries = await Promise.all(
+      await Promise.all(
         provs.map(async (p) => {
-          const sRes = await fetch(
-            `${apiBase}/api/oauth/status?provider=${encodeURIComponent(p)}`,
-          ).catch(() => null);
-          const s = sRes
-            ? ((await readJsonIfOk<OAuthStatus>(sRes)) ?? { loggedIn: false })
-            : { loggedIn: false };
-          return [p, s] as const;
+          try {
+            const response = await fetch(
+              `${apiBase}/api/oauth/status?provider=${encodeURIComponent(p)}`,
+            );
+            const status = await readJsonOrThrow<OAuthStatus>(response);
+            if (typeof status?.loggedIn !== "boolean") throw new Error("Missing login status");
+            if (request !== oauthRequest.current) return;
+            setOauthStatus((previous) => ({
+              ...previous,
+              [p]: { ...status, statusCheck: "ready" },
+            }));
+          } catch {
+            markFailed([p]);
+          }
         }),
       );
-      setOauthStatus(Object.fromEntries(oauthEntries));
     } catch {
-      /* ignore */
+      markFailed(capabilities?.oauthProviders ?? []);
     }
-  }, [apiBase, capabilities?.oauth, setOauthProviders, setOauthStatus]);
+  }, [
+    apiBase,
+    capabilities?.oauth,
+    capabilities?.oauthProviders,
+    setOauthProviders,
+    setOauthStatus,
+  ]);
 
   /*
    * The workspace shell owns the single quota read; this only invalidates it. Keeping the
@@ -89,5 +122,10 @@ export function useProvidersFetch({
     [invalidateProviderQuotas],
   );
 
-  return { fetchConfig, fetchOauth, fetchProviderQuotas };
+  return {
+    fetchConfig,
+    fetchOauth,
+    fetchProviderQuotas,
+    configLoadState: configRead?.apiBase === apiBase ? configRead.state : "loading",
+  };
 }

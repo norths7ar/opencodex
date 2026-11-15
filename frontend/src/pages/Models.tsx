@@ -1,4 +1,6 @@
-import MigrationNotice from "../components/MigrationNotice";
+import { PlannedFeature } from "../components/planned-feature";
+import { HelpPopover } from "../components/help-popover";
+import { PageHeader } from "../components/page-header";
 import { ModelDiscoveryStatus } from "../components/model-discovery-status";
 import { useRuntimeCapabilities } from "../runtime-capabilities";
 import { CodexStaleBanner } from "../components/codex-stale-banner";
@@ -16,16 +18,8 @@ import { useCodexRestart } from "../use-codex-restart";
 import { confirmAction } from "../action-dialogs";
 import { editModelAlias, editProviderAlias } from "./models-alias-editing";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Switch, Notice, EmptyState, Select, Tooltip, type NoticeTone } from "../ui";
-import {
-  IconChevron,
-  IconBoxes,
-  IconInfo,
-  IconCheck,
-  IconAlert,
-  IconRefresh,
-  IconPencil,
-} from "../icons";
+import { Switch, Notice, EmptyState, Select, type NoticeTone } from "../ui";
+import { IconChevron, IconBoxes, IconCheck, IconAlert, IconRefresh, IconPencil } from "../icons";
 import { useI18n } from "../i18n/shared";
 import type { TKey } from "../i18n/shared";
 import { modelLabel } from "../model-display";
@@ -110,13 +104,7 @@ import SubagentSurfaceWarningModal from "../components/SubagentSurfaceWarningMod
 import { SUBAGENT_SURFACE_GUIDE_URL, readSubagentSurfaceAdvisory } from "../subagent-surface";
 import { shadowCallModelOptions } from "./dashboard-shared";
 import { ShadowCallSettingsRow } from "./shadow-call-settings-row";
-import { ModelCatalogDelivery } from "./models-catalog-state";
-import {
-  CustomModelsSummary,
-  InfoHint,
-  ModelsSettingsPanel,
-  SettingsRow,
-} from "./models-settings-panel";
+import { CustomModelsSummary, ModelsSettingsPanel, SettingsRow } from "./models-settings-panel";
 import { modelsSettingsSummary } from "./models-settings-summary";
 import { useAutoReviewSettings } from "./use-auto-review-settings";
 import { useShadowCallSettings } from "./use-shadow-call-settings";
@@ -468,7 +456,6 @@ export default function Models({
   const v2WriteSeqRef = useRef(0);
   const [threadsCustom, setThreadsCustom] = useState("");
   const [showThreadsCustom, setShowThreadsCustom] = useState(false);
-  const [v2HelpOpen, setV2HelpOpen] = useState(false);
   /** A base/v2 selection waiting on the approval dialog. Null while nothing is pending. */
   const [pendingSurface, setPendingSurface] = useState<"default" | "v2" | null>(null);
   const [customModalOpen, setCustomModalOpen] = useState(false);
@@ -485,9 +472,16 @@ export default function Models({
   useEffect(() => {
     const controller = new AbortController();
     // eslint-disable-next-line react-hooks/set-state-in-effect -- Start and cancel the alias request with this API base.
-    void reloadAliases(controller.signal);
+    void reloadAliases(controller.signal).catch(() => {
+      if (!controller.signal.aborted) {
+        publishFeedback(
+          false,
+          locale.startsWith("zh") ? "无法加载模型别名。" : "Could not load model aliases.",
+        );
+      }
+    });
     return () => controller.abort();
-  }, [reloadAliases]);
+  }, [reloadAliases, publishFeedback, locale]);
 
   const aliasEditingDeps = { apiBase, t, reloadAliases, publishFeedback };
   const saveProviderAlias = (provider: string) =>
@@ -552,7 +546,17 @@ export default function Models({
   });
 
   // App owns the in-session view mode; fallback to persisted mode for isolated renders/tests.
-  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(() =>
+    new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("provider"),
+  );
+  useEffect(() => {
+    const syncProvider = () =>
+      setSelectedProvider(
+        new URLSearchParams(window.location.hash.split("?")[1] ?? "").get("provider"),
+      );
+    window.addEventListener("hashchange", syncProvider);
+    return () => window.removeEventListener("hashchange", syncProvider);
+  }, []);
 
   useEffect(
     () => () => {
@@ -696,15 +700,12 @@ export default function Models({
         applyCatalog(next);
       return next;
     },
-    // Gated on the catalog tab: a 10-second poll that keeps running while the user
-    // Live model discovery is slow; the catalog gets a raised deadline so a slow
-    // response is never misread as a hung one.
+    // Poll the local snapshot only while the catalog tab is visible.
     {
       isEmpty: () => false,
       pollMs: 10_000,
       initialData: cached ?? undefined,
       enabled: catalogActive,
-      deadlineMs: 60_000,
     },
   );
   const catalogState = catalogResource.state;
@@ -734,7 +735,7 @@ export default function Models({
     [applyCatalog, cacheKey, fetchCatalog, refreshPicker],
   );
 
-  // Shadow/v2 controls must not wait on the models catalog (live discovery can be slow).
+  // Load independent settings alongside the local catalog.
   useEffect(() => {
     // Both belong to the catalog tab; a hidden panel polling /api/v2 every ten seconds
     // is the same leak as the catalog poll above.
@@ -1208,7 +1209,7 @@ export default function Models({
     }
   };
 
-  const saveModelDiscovery = async (policy: "on" | "off", provider?: string) => {
+  const saveModelDiscovery = async (policy: "on" | "off" | "inherit", provider?: string) => {
     const r = await fetch(`${apiBase}/api/model-discovery`, {
       method: "PUT",
       headers: { "content-type": "application/json" },
@@ -1467,6 +1468,11 @@ export default function Models({
   const renderGroup = (group: ProviderModelGroup<ModelRow>) => {
     const { provider, rows, nativeProviderGroup, liveModels, discovery } = group;
     const isCollapsed = collapsed.has(provider);
+    const providerDiscoveryPolicy = modelDiscovery?.providers[provider];
+    const effectiveDiscoveryPolicy =
+      providerDiscoveryPolicy === "on" || providerDiscoveryPolicy === "off"
+        ? providerDiscoveryPolicy
+        : modelDiscovery?.policy;
     // Final visibility, not just the disable flag: a model is visible to Codex only when the
     // provider allowlist admits it AND it is not disabled. Reading `disabled` alone made the
     // switches disagree with what the picker actually offers.
@@ -1684,7 +1690,7 @@ export default function Models({
                 disabled={(busy && !visibility.pending) || allOn || selectionPending}
                 onClick={() => bulkToggle(true)}
               >
-                {t("models.allOn")}
+                {locale.startsWith("zh") ? "全部显示" : "Show all"}
               </button>
               <button
                 type="button"
@@ -1692,137 +1698,162 @@ export default function Models({
                 disabled={(busy && !visibility.pending) || allOff || selectionPending}
                 onClick={() => bulkToggle(false)}
               >
-                {t("models.allOff")}
+                {locale.startsWith("zh") ? "全部隐藏" : "Hide all"}
               </button>
             </div>
           </div>
           {/* The rare per-provider settings: a quiet second line, shown while the card is open. */}
           {!isCollapsed && (
-            <div
-              className="row models-provider-actions models-provider-tools"
-              role="group"
-              aria-label={t("modelsV2.providerTools")}
-            >
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm models-alias-edit"
-                aria-label={t("models.editProviderAlias")}
-                title={t("models.editProviderAlias")}
-                onClick={() => void saveProviderAlias(provider)}
+            <details className="models-provider-settings">
+              <summary>
+                {locale.startsWith("zh") ? "供应商模型设置" : "Provider model settings"}
+              </summary>
+              <div
+                className="row models-provider-actions models-provider-tools"
+                role="group"
+                aria-label={t("modelsV2.providerTools")}
               >
-                <IconPencil style={{ width: 14, height: 14 }} />
-              </button>
-              <Switch
-                on={aliases.defaults.providers[provider] ?? aliases.defaults.global}
-                onClick={() =>
-                  void setDefaultAliases(
-                    !(aliases.defaults.providers[provider] ?? aliases.defaults.global),
-                    provider,
-                  )
-                }
-                label={t("models.useDefaultAliases")}
-                showLabel
-              />
-              {
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm text-caption"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCustomModalProvider(provider);
-                    setCustomFormModelId("");
-                    setCustomFormDisplayName("");
-                    setCustomFormContextWindow("");
-                    setCustomFormShowCustomCtx(false);
-                    setCustomFormModalities(["text"]);
-                    setCustomFormReasoning(false);
-                    setCustomFormReasoningEfforts([]);
-                    customFormReasoningInitializedRef.current = false;
-                    setCustomError("");
-                    setCustomModalOpen(true);
-                  }}
-                  aria-haspopup="dialog"
-                >
-                  <span aria-hidden="true">+</span> {t("models.customAdd")}
-                </button>
-              }
-              <div className="models-cap-cluster">
-                {/* The label names the FUNCTION. It used to be `models.capValue` -
+                {!nativeProviderGroup && modelDiscovery && (
+                  <div className="models-discovery-policy">
+                    <span className="muted text-label">
+                      {locale.startsWith("zh")
+                        ? "自动显示新发现的模型"
+                        : "Show newly discovered models automatically"}
+                      <small className="models-setting-description">
+                        {locale.startsWith("zh")
+                          ? effectiveDiscoveryPolicy === "on"
+                            ? "当前显示新模型"
+                            : "当前隐藏新模型"
+                          : effectiveDiscoveryPolicy === "on"
+                            ? "New models are currently shown"
+                            : "New models are currently hidden"}
+                      </small>
+                    </span>
+                    <div
+                      className="segmented models-segmented"
+                      role="radiogroup"
+                      aria-label={
+                        locale.startsWith("zh")
+                          ? "自动显示新发现的模型"
+                          : "Show newly discovered models automatically"
+                      }
+                    >
+                      {(["inherit", "on", "off"] as const).map((mode) => (
+                        <button
+                          key={mode}
+                          type="button"
+                          role="radio"
+                          aria-checked={(providerDiscoveryPolicy ?? "inherit") === mode}
+                          className={`btn btn-sm${(providerDiscoveryPolicy ?? "inherit") === mode ? " btn-primary" : " btn-ghost"}`}
+                          onClick={() => void saveModelDiscovery(mode, provider)}
+                        >
+                          {mode === "inherit"
+                            ? locale.startsWith("zh")
+                              ? "继承全局"
+                              : "Inherit"
+                            : mode === "on"
+                              ? locale.startsWith("zh")
+                                ? "显示"
+                                : "Show"
+                              : locale.startsWith("zh")
+                                ? "隐藏"
+                                : "Hide"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="models-context-setting">
+                  <div>
+                    <span>{locale.startsWith("zh") ? "上下文窗口" : "Context window"}</span>
+                    <small className="models-setting-description">
+                      {capOn ? (
+                        <>
+                          {locale.startsWith("zh") ? "覆盖为" : "Override:"} {fmtK(capDisplayValue)}
+                        </>
+                      ) : locale.startsWith("zh") ? (
+                        "使用模型设置"
+                      ) : (
+                        "Use model settings"
+                      )}
+                    </small>
+                  </div>
+                  <div className="models-cap-cluster">
+                    {/* The label names the FUNCTION. It used to be `models.capValue` -
                   "기본 128k" - which is a value masquerading as a name: even a
                   screen-reader user was not told this governs the context window.
                   The number belongs to the adjacent Select, which is where a value
                   goes (020_control_affordances.md). */}
-                <Switch
-                  on={capOn}
-                  onClick={() => toggleProviderCap(provider)}
-                  disabled={busy}
-                  label={t("models.contextCapLabel")}
-                  showLabel
-                />
-                {/* Always rendered, disabled when the cap is off. A cap-off provider used to
+                    <Switch
+                      on={capOn}
+                      onClick={() => toggleProviderCap(provider)}
+                      disabled={busy}
+                      label={t("models.contextCapLabel")}
+                    />
+                    {/* Always rendered, disabled when the cap is off. A cap-off provider used to
                   drop this control entirely, which is the defect the user reported: openai
                   showed 1.05M and anthropic showed nothing, so the two rows started at
                   different left edges. Disabled-with-a-value is honest — it says "no
                   opinion", which is what an off cap means — and it keeps the slot occupied
                   on every card (040_cap_cluster_and_occupied_slot.md). */}
-                <>
-                  <Select
-                    // A saved cap outside CAP_OPTIONS is still a real selectable option
-                    // (inserted below), so select it instead of falling back to "Custom";
-                    // otherwise the trigger hides the persisted 128k value behind the
-                    // custom-editor label.
-                    value={
-                      providerCapCustomOpen[provider] ? CUSTOM_OPTION : String(capDisplayValue)
-                    }
-                    options={[
-                      ...(!capOptionSet.has(capDisplayValue) && !providerCapCustomOpen[provider]
-                        ? [{ value: String(capDisplayValue), label: fmtK(capDisplayValue) }]
-                        : []),
-                      ...capOptions.map((v) => ({ value: String(v), label: fmtK(v) })),
-                      { value: CUSTOM_OPTION, label: t("models.custom") },
-                    ]}
-                    onChange={(v) => onSelectProviderCap(provider, v)}
-                    disabled={busy || !capOn}
-                    label={t("models.capValue", { value: fmtK(capDisplayValue) })}
-                    title={t("models.contextCapLabel")}
-                  />
-                  {/* `capOn &&` is load-bearing now that the Select no longer disappears with
+                    <>
+                      <Select
+                        // A saved cap outside CAP_OPTIONS is still a real selectable option
+                        // (inserted below), so select it instead of falling back to "Custom";
+                        // otherwise the trigger hides the persisted 128k value behind the
+                        // custom-editor label.
+                        value={
+                          providerCapCustomOpen[provider] ? CUSTOM_OPTION : String(capDisplayValue)
+                        }
+                        options={[
+                          ...(!capOptionSet.has(capDisplayValue) && !providerCapCustomOpen[provider]
+                            ? [{ value: String(capDisplayValue), label: fmtK(capDisplayValue) }]
+                            : []),
+                          ...capOptions.map((v) => ({ value: String(v), label: fmtK(v) })),
+                          { value: CUSTOM_OPTION, label: t("models.custom") },
+                        ]}
+                        onChange={(v) => onSelectProviderCap(provider, v)}
+                        disabled={busy || !capOn}
+                        label={t("models.capValue", { value: fmtK(capDisplayValue) })}
+                        title={t("models.contextCapLabel")}
+                      />
+                      {/* `capOn &&` is load-bearing now that the Select no longer disappears with
                        the cap. providerCapCustomOpen is independent state: with Custom already
                        open, flipping the cap off used to leave this input and its Apply button
                        standing, and Apply sends enabled: true — turning the cap back on from a
                        field that looks like part of an off cluster. */}
-                  {capOn && providerCapCustomOpen[provider] && (
-                    <>
-                      <input
-                        className="input"
-                        style={{ width: 120 }}
-                        inputMode="numeric"
-                        placeholder={t("models.customPlaceholder")}
-                        value={providerCapCustomDraft[provider] ?? ""}
-                        onChange={(e) =>
-                          setProviderCapCustomDraft((prev) => ({
-                            ...prev,
-                            [provider]: e.target.value,
-                          }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") applyProviderCustomCap(provider);
-                        }}
-                        disabled={busy}
-                        aria-label={t("models.customPlaceholder")}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => applyProviderCustomCap(provider)}
-                        disabled={busy}
-                        className="btn btn-ghost btn-sm"
-                      >
-                        {t("models.customApply")}
-                      </button>
+                      {capOn && providerCapCustomOpen[provider] && (
+                        <>
+                          <input
+                            className="input"
+                            style={{ width: 120 }}
+                            inputMode="numeric"
+                            placeholder={t("models.customPlaceholder")}
+                            value={providerCapCustomDraft[provider] ?? ""}
+                            onChange={(e) =>
+                              setProviderCapCustomDraft((prev) => ({
+                                ...prev,
+                                [provider]: e.target.value,
+                              }))
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") applyProviderCustomCap(provider);
+                            }}
+                            disabled={busy}
+                            aria-label={t("models.customPlaceholder")}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => applyProviderCustomCap(provider)}
+                            disabled={busy}
+                            className="btn btn-ghost btn-sm"
+                          >
+                            {t("models.customApply")}
+                          </button>
+                        </>
+                      )}
                     </>
-                  )}
-                </>
-                {/* Available on every card, including the native one: the canonical `openai` seed
+                    {/* Available on every card, including the native one: the canonical `openai` seed
                   check now admits contextWindow/modelContextWindows as user-owned overlays, and
                   the native accessors only ever narrow the measured window with them. The cap
                   beside it is the coarser sibling — one value for the whole provider.
@@ -1833,16 +1864,70 @@ export default function Models({
                   become one control. Three separate tab stops remain. Moving it here from
                   beside the alias controls does change tab order — switch, then select when
                   enabled, then this — which reads in the order the controls are now seen. */}
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm text-caption"
-                  onClick={() => openContextSettings(group)}
-                  aria-haspopup="dialog"
-                >
-                  {t("models.contextSettings")}
-                </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm text-caption"
+                      onClick={() => openContextSettings(group)}
+                      aria-haspopup="dialog"
+                    >
+                      {t("models.contextSettings")}
+                    </button>
+                  </div>
+                </div>
+                <details className="models-secondary-settings">
+                  <summary>
+                    {locale.startsWith("zh") ? "别名与自定义模型" : "Aliases and custom models"}
+                  </summary>
+                  <div className="models-secondary-actions">
+                    {" "}
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm models-alias-edit"
+                      aria-label={t("models.editProviderAlias")}
+                      title={t("models.editProviderAlias")}
+                      onClick={() => void saveProviderAlias(provider)}
+                    >
+                      <IconPencil style={{ width: 14, height: 14 }} />
+                      {t("models.editProviderAlias")}
+                    </button>
+                    <Switch
+                      on={aliases.defaults.providers[provider] ?? aliases.defaults.global}
+                      onClick={() =>
+                        void setDefaultAliases(
+                          !(aliases.defaults.providers[provider] ?? aliases.defaults.global),
+                          provider,
+                        )
+                      }
+                      label={t("models.useDefaultAliases")}
+                      showLabel
+                    />
+                    {
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm text-caption"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCustomModalProvider(provider);
+                          setCustomFormModelId("");
+                          setCustomFormDisplayName("");
+                          setCustomFormContextWindow("");
+                          setCustomFormShowCustomCtx(false);
+                          setCustomFormModalities(["text"]);
+                          setCustomFormReasoning(false);
+                          setCustomFormReasoningEfforts([]);
+                          customFormReasoningInitializedRef.current = false;
+                          setCustomError("");
+                          setCustomModalOpen(true);
+                        }}
+                        aria-haspopup="dialog"
+                      >
+                        <span aria-hidden="true">+</span> {t("models.customAdd")}
+                      </button>
+                    }
+                  </div>
+                </details>
               </div>
-            </div>
+            </details>
           )}
         </div>
         {!isCollapsed && (
@@ -1871,9 +1956,7 @@ export default function Models({
                 that turning discovery off is what makes a manually added model usable. */}
             {rows.length > 0 && discoveryFailure && <DiscoveryDependencyHint />}
             {/* One filter bar over the list: find, narrow to free rows, and how new rows arrive. */}
-            {(rows.length > PAGE / 2 ||
-              pricingKnown ||
-              (!nativeProviderGroup && modelDiscovery)) && (
+            {(rows.length > PAGE / 2 || pricingKnown) && (
               <div className="row models-provider-filters">
                 {rows.length > PAGE / 2 && (
                   <input
@@ -1891,29 +1974,6 @@ export default function Models({
                     label={t("models.freeOnly")}
                     showLabel
                   />
-                )}
-                {!nativeProviderGroup && modelDiscovery && (
-                  <div className="row models-provider-hint">
-                    <span className="muted text-label">{t("models.newPolicyProvider")}</span>
-                    <div
-                      className="segmented models-segmented"
-                      role="radiogroup"
-                      aria-label={t("models.newPolicyProvider")}
-                    >
-                      {(["off", "on"] as const).map((mode) => (
-                        <button
-                          key={mode}
-                          type="button"
-                          role="radio"
-                          aria-checked={(modelDiscovery.providers[provider] ?? "inherit") === mode}
-                          className={`btn btn-sm${(modelDiscovery.providers[provider] ?? "inherit") === mode ? " btn-primary" : " btn-ghost"}`}
-                          onClick={() => void saveModelDiscovery(mode, provider)}
-                        >
-                          {t(`models.newPolicy_${mode}` as TKey)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 )}
               </div>
             )}
@@ -2369,11 +2429,9 @@ export default function Models({
             <SettingsRow
               label={t("models.autoReviewOverride")}
               hint={
-                <Tooltip content={t("models.autoReviewOverrideHint")} side="top" maxWidth={320}>
-                  <span style={{ cursor: "help" }} aria-label={t("models.autoReviewOverrideHint")}>
-                    ⓘ
-                  </span>
-                </Tooltip>
+                <HelpPopover label={t("models.autoReviewOverride")}>
+                  {t("models.autoReviewOverrideHint")}
+                </HelpPopover>
               }
               busy={!autoReview}
             >
@@ -2421,25 +2479,7 @@ export default function Models({
                     </button>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    minWidth: 24,
-                    flex: "0 0 24px",
-                    padding: 0,
-                    borderRadius: "var(--radius-pill)",
-                    color: "var(--muted)",
-                  }}
-                  disabled={!v2}
-                  onClick={() => setV2HelpOpen(true)}
-                  aria-label={t("models.v2Label")}
-                  aria-haspopup="dialog"
-                >
-                  <IconInfo width={14} height={14} aria-hidden="true" />
-                </button>
+                <HelpPopover label={t("models.v2Label")}>{t("models.v2Help")}</HelpPopover>
               </SettingsRow>
             )}
             {v2 && v2.multiAgentMode === "v2" && (
@@ -2454,14 +2494,9 @@ export default function Models({
                     disabled={v2Busy}
                     label={t("models.keepNativeOnV1")}
                   />
-                  <Tooltip content={t("models.keepNativeOnV1Hint")} side="top" maxWidth={360}>
-                    <span
-                      className="models-v2-keep-native-info"
-                      aria-label={t("models.keepNativeOnV1Hint")}
-                    >
-                      <IconInfo width={13} height={13} aria-hidden="true" />
-                    </span>
-                  </Tooltip>
+                  <HelpPopover label={t("models.keepNativeOnV1")}>
+                    {t("models.keepNativeOnV1Hint")}
+                  </HelpPopover>
                 </div>
               </div>
             )}
@@ -2603,7 +2638,9 @@ export default function Models({
           </>
         )}
         <Switch on={allCapped} onClick={setAll} disabled={busy} label={t("models.setAll")} />
-        <InfoHint text={t("models.setAllHint", { value: fmtK(contextCapValue) })} />
+        <HelpPopover label={t("models.contextCapLabel")}>
+          {t("models.setAllHint", { value: fmtK(contextCapValue) })}
+        </HelpPopover>
       </div>
 
       {!capabilities && (
@@ -2652,7 +2689,7 @@ export default function Models({
                 </button>
               </>
             )}
-            <InfoHint text={t("models.pickerOrder.hint")} />
+            <HelpPopover label={t("nav.models")}>{t("models.pickerOrder.hint")}</HelpPopover>
           </div>
           <ModelCatalogSettingsPanels
             showOrderEditor={pickerMode === "custom"}
@@ -2722,7 +2759,7 @@ export default function Models({
         />{" "}
         {t("models.expandAll")}
       </button>
-      <InfoHint text={t("models.orderHint")} />
+      <HelpPopover label={t("nav.models")}>{t("models.orderHint")}</HelpPopover>
       <CustomModelsSummary
         count={customCount}
         label={t("models.customSummary", { count: customCount })}
@@ -2742,56 +2779,6 @@ export default function Models({
 
   const modalsBlock = (
     <>
-      {v2HelpOpen && (
-        <div
-          className="modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t("models.v2Label")}
-          onClick={() => setV2HelpOpen(false)}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") setV2HelpOpen(false);
-          }}
-        >
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-head">
-              <h3>{t("models.v2Label")}</h3>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setV2HelpOpen(false)}
-                aria-label={t("common.close")}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="modal-desc leading-relaxed" style={{ whiteSpace: "pre-line" }}>
-              {t("models.v2Help")}
-            </div>
-            <div className="models-help-link">
-              <a
-                className="text-control"
-                href="https://opencodex.me/guides/sub-agent-surface/"
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: "var(--accent)" }}
-              >
-                {t("models.v2DocsLink")}
-              </a>
-            </div>
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => setV2HelpOpen(false)}
-              >
-                {t("common.ok")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {contextModalProvider && (
         <div
           className="modal-overlay"
@@ -3160,7 +3147,7 @@ export default function Models({
         </div>
       )}
       <ModelsSettingsPanel
-        title={t("models.settingsPanel.title")}
+        title={locale.startsWith("zh") ? "全局模型默认设置" : "Global model defaults"}
         attentionLabel={t("models.settingsPanel.attention")}
         warn={
           !!(v2?.enabled && v2.agentsMaxThreadsConflict) ||
@@ -3235,38 +3222,42 @@ export default function Models({
         headRef={reloadHeadRef}
         bannerRef={reloadBannerRef}
       >
-        <div className="page-head">
-          <div className="ui-v2 flex min-w-0 flex-col gap-1">
-            <h2 className="m-0 text-title font-semibold tracking-[-0.025em] text-fg">
-              {t("nav.models")}
-            </h2>
-            <p className="m-0 text-[14px] leading-5 text-fg-muted">{t(SUBTITLE_TKEY[tab][0])}</p>
-          </div>
-          <div className="page-head-actions">
-            {SUBTITLE_TKEY[tab][1] && (
-              <ModelsAbout key={tab} text={t(SUBTITLE_TKEY[tab][1])}>
-                {tab === "catalog" && <ModelCatalogDelivery />}
-              </ModelsAbout>
-            )}
-            {appServerState !== "stale" && (
-              <Button
-                data-models-reload-action
-                ref={reloadHeadRef}
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  void handleCodexRestart();
-                }}
-                disabled={codexRestarting}
-              >
-                <span className={codexRestarting ? "inline-flex animate-spin" : "inline-flex"}>
-                  <IconRefresh aria-hidden="true" />
-                </span>
-                {codexRestarting ? t("dash.codexRestarting") : t("dash.codexRestart")}
-              </Button>
-            )}
-          </div>
-        </div>
+        <PageHeader
+          title={t("nav.models")}
+          subtitle={
+            capabilities
+              ? locale.startsWith("zh")
+                ? "管理网关模型的可见性、名称与能力设置。"
+                : "Manage gateway model visibility, names and capabilities."
+              : t(SUBTITLE_TKEY[tab][0])
+          }
+          actions={
+            <>
+              {SUBTITLE_TKEY[tab][1] && (
+                <ModelsAbout key={tab} text={t(SUBTITLE_TKEY[tab][1])}>
+                  {tab === "catalog" && <p>{t("models.delivery.hint")}</p>}
+                </ModelsAbout>
+              )}
+              {appServerState !== "stale" && (
+                <Button
+                  data-models-reload-action
+                  ref={reloadHeadRef}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    void handleCodexRestart();
+                  }}
+                  disabled={codexRestarting}
+                >
+                  <span className={codexRestarting ? "inline-flex animate-spin" : "inline-flex"}>
+                    <IconRefresh aria-hidden="true" />
+                  </span>
+                  {codexRestarting ? t("dash.codexRestarting") : t("dash.codexRestart")}
+                </Button>
+              )}
+            </>
+          }
+        />
         <CodexStaleBanner
           state={appServerState}
           actionRef={reloadBannerRef}
@@ -3338,7 +3329,14 @@ export default function Models({
           >
             <>
               {capabilities ? (
-                <MigrationNotice />
+                <PlannedFeature
+                  title={locale.startsWith("zh") ? "高级路由" : "Advanced routing"}
+                  description={
+                    locale.startsWith("zh")
+                      ? "配置模型选择策略，预览匹配结果并查看路由分析。"
+                      : "Define model selection policies, preview matches and inspect routing decisions."
+                  }
+                />
               ) : (
                 <RoutingProfiles
                   apiBase={apiBase}

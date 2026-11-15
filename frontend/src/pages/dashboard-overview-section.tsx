@@ -1,6 +1,6 @@
 import { DashboardOverviewHead } from "./dashboard-overview-head";
 import { DashboardOverviewPanels } from "./dashboard-overview-panels";
-import { PROXY_SECTION_IDS } from "./dashboard-section-ids";
+import { LITE_PROXY_SECTION_IDS, PROXY_SECTION_IDS } from "./dashboard-section-ids";
 import type { useDashboardData } from "./use-dashboard-data";
 import { SectionIndex } from "@/components/v2-proxy/section-index";
 
@@ -14,16 +14,10 @@ export function DashboardOverviewSection({
   readOnly = false,
   ...d
 }: Dash & { readOnly?: boolean }) {
-  const items = d.liteRuntime
-    ? [
-        { id: "proxy-subagents", label: d.t("proxyV2.secSubagents") },
-        { id: "proxy-codex", label: d.t("proxyV2.secCodex") },
-        { id: "proxy-compaction", label: d.t("proxyV2.secCompaction") },
-        { id: "proxy-sidecars", label: d.t("proxyV2.secSidecars") },
-        { id: "proxy-budget", label: d.t("workflowBudget.title") },
-        { id: "simple-fallback", label: d.t("proxyV2.secFallback") },
-      ]
-    : PROXY_SECTION_IDS.map(([id, key]) => ({ id, label: d.t(key) }));
+  const items = (d.liteRuntime ? LITE_PROXY_SECTION_IDS : PROXY_SECTION_IDS).map(([id, key]) => ({
+    id,
+    label: d.t(key),
+  }));
   return (
     <div className="dash-overview-stack">
       <DashboardOverviewHead {...d} />
@@ -31,7 +25,7 @@ export function DashboardOverviewSection({
         <SectionIndex
           items={items}
           label={d.t("proxyV2.indexLabel")}
-          className="lg:sticky lg:top-4 lg:self-start"
+          className="lg:sticky lg:self-start"
         />
         <div className="flex min-w-0 flex-col gap-5">
           <DashboardOverviewPanels {...d} readOnly={readOnly} />

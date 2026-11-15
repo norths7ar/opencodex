@@ -1939,7 +1939,7 @@ export const ko: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Hermes 프로필을 불러오지 못했습니다. 다시 시도해 상태를 확인하세요.",
   "integrations.hermes.profileTitle": "Hermes 프로필: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Codex 연결은 프록시 서비스가 관리합니다. opencodex를 시작하면 적용되고 서비스를 중지하면 기본 라우팅으로 복원됩니다.",
   "integrations.codex.openService": "서비스 제어 열기",

@@ -1,3 +1,4 @@
+import { authStatusCopy } from "../../provider-workspace/auth-status";
 /**
  * ProviderRail — the provider list rail of the workspace view (WP080a):
  * icon/status helpers and RailRow. The surrounding shell (search/filter/sort
@@ -23,6 +24,8 @@ import {
 export function statusLabel(p: WorkspaceProvider, t: TFn): string {
   const s = binProviderStatus(p);
   if (s === "disabled") return t("prov.disabledBadge");
+  if (s === "checking")
+    return p.oauthStatusCheck === "failed" ? authStatusCopy().failed : authStatusCopy().loading;
   if (s === "ready") return t("pws.status.ready");
   if ("activeNeedsReauth" in p && (p as WorkspaceItem).activeNeedsReauth) {
     return t("pws.status.needsAttention");
@@ -49,7 +52,7 @@ export function authModeLabel(item: WorkspaceItem, t: TFn): string {
 
 export function railStatusCls(item: WorkspaceItem): string {
   const s = binProviderStatus(item);
-  if (s === "disabled")
+  if (s === "disabled" || s === "checking")
     return "providers-workspace-rail-status providers-workspace-rail-status--inactive";
   if (s === "ready")
     return "providers-workspace-rail-status providers-workspace-rail-status--active";

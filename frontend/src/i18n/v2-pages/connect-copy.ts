@@ -5,6 +5,19 @@ import { copyTable, type Row } from "./copy-table";
  * Keys render as `connectV2.<key>`.
  */
 const rows = {
+  checkFailed: [
+    "Check failed",
+    "확인 실패",
+    "Prüfung fehlgeschlagen",
+    "Échec de la vérification",
+    "检查失败",
+    "檢查失敗",
+    "Ошибка проверки",
+    "確認に失敗しました",
+    "Kontrol başarısız",
+    "Kiểm tra thất bại",
+    "Falha na verificação",
+  ],
   moreAbout: [
     "More about {label}",
     "{label} 자세히",

@@ -270,6 +270,7 @@ function OverviewCard({
 function elsewhere(row: OverviewRow): boolean {
   return (
     row.state !== "unknown" &&
+    row.state !== "unavailable" &&
     (row.state === "not-installed" || !row.installed) &&
     !(row.toggleOn ?? row.applied)
   );
@@ -345,7 +346,11 @@ export default function IntegrationsOverview({
    * keeps all five quiet while the panel is mounted but hidden.
    */
   const fetchCodex = useCallback(
-    (signal: AbortSignal) => loadCodexRoutingStatus(apiBase, signal),
+    async (signal: AbortSignal) => {
+      const data = await loadCodexRoutingStatus(apiBase, signal);
+      if (data === null) throw new Error("Could not read Codex routing status");
+      return data;
+    },
     [apiBase],
   );
   const fetchKeyCount = useCallback(
@@ -369,7 +374,11 @@ export default function IntegrationsOverview({
     [apiBase],
   );
   const fetchNative = useCallback(
-    async (signal: AbortSignal) => (await loadNativeIntegrations(apiBase, signal))?.clients ?? null,
+    async (signal: AbortSignal) => {
+      const data = await loadNativeIntegrations(apiBase, signal);
+      if (!data) throw new Error("Could not read native integration status");
+      return data.clients;
+    },
     [apiBase],
   );
 
@@ -379,7 +388,7 @@ export default function IntegrationsOverview({
     fetchStates,
     {
       isEmpty: (rows) => rows.length === 0,
-      enabled: active && legacy,
+      enabled: active,
       sessionCacheKey: `ocx.integrations.states.v1:${apiBase}`,
     },
   );
@@ -389,7 +398,7 @@ export default function IntegrationsOverview({
     fetchHistory,
     {
       isEmpty: (rows) => rows.length === 0,
-      enabled: active && legacy,
+      enabled: active,
       sessionCacheKey: `ocx.integrations.journal.v1:${apiBase}`,
     },
   );
@@ -476,6 +485,7 @@ export default function IntegrationsOverview({
   const { keysRow, rows } = buildOverviewRows({
     clients,
     clientsSettled,
+    clientsFailed: statesResource.state.kind === "failed-cold",
     codex: codexResource.state.data ?? null,
     keyCount: keysResource.state.data ?? null,
     keyPhase,
@@ -486,10 +496,18 @@ export default function IntegrationsOverview({
     native,
     nativeSettled,
   });
+  const codexReadFailed = codexResource.state.showError || nativeResource.state.showError;
+  if (codexReadFailed) {
+    const row = rows.find((item) => item.id === "codex");
+    if (row?.state === "unknown") row.state = "unavailable";
+  }
   const supportedRows = capabilities
     ? rows.filter((row) => capabilities.clients.includes(row.id))
     : rows;
   const counts = countOverviewRows(supportedRows);
+  const countsKnown =
+    supportedRows.length > 0 &&
+    supportedRows.every((row) => row.state !== "unknown" && row.state !== "unavailable");
 
   /*
    * `refresh()` on the resource layer is deliberately fire-and-forget: it
@@ -855,15 +873,15 @@ export default function IntegrationsOverview({
       <div className="integration-summary">
         <div className="integration-summary-cell">
           <span className="integration-summary-label">{t("integrations.summary.detected")}</span>
-          <strong>{counts.detected}</strong>
+          <strong>{countsKnown ? counts.detected : "—"}</strong>
         </div>
         <div className="integration-summary-cell" data-tone={counts.applied > 0 ? "ok" : undefined}>
           <span className="integration-summary-label">{t("integrations.summary.applied")}</span>
-          <strong>{counts.applied}</strong>
+          <strong>{countsKnown ? counts.applied : "—"}</strong>
         </div>
         <div className="integration-summary-cell" data-tone={counts.stale > 0 ? "warn" : undefined}>
           <span className="integration-summary-label">{t("integrations.summary.stale")}</span>
-          <strong>{counts.stale}</strong>
+          <strong>{countsKnown ? counts.stale : "—"}</strong>
         </div>
         {/*
           Only shown when something could not be read. A permanent cell reading
@@ -879,7 +897,11 @@ export default function IntegrationsOverview({
         <div className="integration-summary-cell">
           <span className="integration-summary-label">{t("integrations.summary.lastChange")}</span>
           <strong className="integration-summary-when">
-            {lastChange ? new Date(lastChange).toLocaleString() : t("integrations.status.unknown")}
+            {historyResource.state.showSkeleton
+              ? t("common.loading")
+              : lastChange
+                ? new Date(lastChange).toLocaleString()
+                : t("integrations.status.unknown")}
           </strong>
         </div>
       </div>
@@ -912,14 +934,18 @@ export default function IntegrationsOverview({
       {help.panel(<p>{t("integrations.onboarding")}</p>, "connect-help-panel")}
       {legacy && <ApiKeysRow row={keysRow} />}
 
-      {statesResource.state.kind === "failed-cold" && (
+      {(statesResource.state.kind === "failed-cold" ||
+        codexResource.state.kind === "failed-cold" ||
+        nativeResource.state.kind === "failed-cold") && (
         <Notice tone="err">{t("integrations.error.load")}</Notice>
       )}
       {/*
         A refresh that failed while older values are still on screen is a
         different sentence: the numbers below are real but may be behind.
       */}
-      {statesResource.state.kind === "failed-with-stale" && (
+      {(statesResource.state.kind === "failed-with-stale" ||
+        codexResource.state.kind === "failed-with-stale" ||
+        nativeResource.state.kind === "failed-with-stale") && (
         <Notice tone="err">{t("integrations.error.stale")}</Notice>
       )}
       {bulkResult && <Notice tone={bulkResult.tone}>{bulkResult.text}</Notice>}

@@ -2535,7 +2535,7 @@ export const vi: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Không thể tải các profile Hermes. Thử lại để kiểm tra trạng thái của chúng.",
   "integrations.hermes.profileTitle": "Profile Hermes: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Việc kết nối Codex do proxy service quản lý. Khởi động opencodex sẽ áp dụng nó; dừng service sẽ khôi phục lại định tuyến nguyên bản.",
   "integrations.codex.openService": "Mở cài đặt service",

@@ -21,6 +21,8 @@ import { IconMenu, IconGlobe, IconPower, IconX, IconRefresh } from "./icons";
 import { groupForPage, visibleGroupPages } from "./nav-groups";
 import { SidebarNav } from "./components/sidebar-nav";
 import { SectionSwitcher } from "./components/SectionSwitcher";
+import { PageHeaderTarget } from "./components/page-header-context";
+import { ProviderSession } from "./components/provider-session";
 import { useI18n, useT, LOCALES, localeDisplayName, type Locale, type TKey } from "./i18n/shared";
 import { Select, ToastNotice, type NoticeTone } from "./ui";
 import {
@@ -118,6 +120,7 @@ function focusAfterSwitcher(): void {
 }
 
 export default function App() {
+  const [headerTarget, setHeaderTarget] = useState<HTMLDivElement | null>(null);
   const openedWithoutRoute = useRef(!window.location.hash);
   const { page, navigateToPage } = useAppRouteState();
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
@@ -268,7 +271,7 @@ export default function App() {
     [machineBase],
     async (signal) => {
       const res = await fetch(`${machineBase}/healthz`, { signal });
-      if (!res.ok) return null;
+      if (!res.ok) throw new Error("Health check failed");
       const body: unknown = await res.json();
       return { version: readRuntimeVersion(body), uptime: readUptime(body) };
     },
@@ -277,9 +280,8 @@ export default function App() {
 
   const themeSwitch = <ThemeSwitch theme={theme} onChange={setTheme} />;
   const displayedVersion: string = healthPoll.data?.version ?? __APP_VERSION__;
-  // The sidebar status follows the health check: a failed or refused /healthz is "Offline",
-  // never a default "Online". Before the first answer it stays Online, as the page itself
-  // loaded from this proxy.
+  // A first read is unknown; only a completed health check establishes connectivity.
+  const healthPending = healthPoll.data === undefined && healthPoll.error === undefined;
   const proxyOnline = proxyHealthOnline(healthPoll.data, healthPoll.error);
   const uptime = proxyOnline ? (healthPoll.data?.uptime ?? null) : null;
   // The sidebar row is narrow, so it shows the time alone; the status word is its tooltip.
@@ -419,7 +421,9 @@ export default function App() {
       {...(page === homePage ? { "aria-current": "page" as const } : {})}
     >
       <BrandMark className="ui-v2 brand-logo-v2 h-[24px] w-[27px]" label={t("app.logoAria")} />
-      <span className="name">opencodex</span>
+      {/* Product name is identical in every locale. */}
+      {/* eslint-disable-next-line local-i18n/no-hardcoded-ui-strings */}
+      <span className="name">OpenCodex Lite</span>
       <span className="ver" title={displayedVersion}>
         v{displayedVersion}
       </span>
@@ -437,24 +441,24 @@ export default function App() {
       {...(page === homePage ? { "aria-current": "page" as const } : {})}
     >
       <BrandMark className="ui-v2 brand-logo-v2 h-[22px] w-[25px]" label={t("app.logoAria")} />
-      <span className="name">opencodex</span>
+      {/* Product name is identical in every locale. */}
+      {/* eslint-disable-next-line local-i18n/no-hardcoded-ui-strings */}
+      <span className="name">OpenCodex Lite</span>
     </button>
   );
 
-  const quotaSummary = (!capabilities.data || capabilities.data.quota) &&
-    !capabilities.loading &&
-    page !== "startup" && (
-      <ErrorBoundary
-        key={sharedBase}
-        pageName={t("quotaSummary.aria")}
-        title={t("errorBoundary.title")}
-        message={t("errorBoundary.message")}
-        detailsLabel={t("errorBoundary.details")}
-        reloadLabel={t("errorBoundary.reload")}
-      >
-        <QuotaSummaryBar apiBase={sharedBase} />
-      </ErrorBoundary>
-    );
+  const quotaSummary = (!capabilities.data || capabilities.data.quota) && !capabilities.loading && (
+    <ErrorBoundary
+      key={sharedBase}
+      pageName={t("quotaSummary.aria")}
+      title={t("errorBoundary.title")}
+      message={t("errorBoundary.message")}
+      detailsLabel={t("errorBoundary.details")}
+      reloadLabel={t("errorBoundary.reload")}
+    >
+      <QuotaSummaryBar apiBase={sharedBase} />
+    </ErrorBoundary>
+  );
 
   return (
     <RuntimeCapabilitiesContext.Provider value={capabilities.data ?? null}>
@@ -575,7 +579,9 @@ export default function App() {
           <div className="sidebar-foot">
             <ProxyControls
               label={t("dash.actions")}
-              statusLabel={t(proxyOnline ? "dash.online" : "dash.offline")}
+              statusLabel={t(
+                healthPending ? "common.loading" : proxyOnline ? "dash.online" : "dash.offline",
+              )}
               online={proxyOnline}
               detail={uptimeLabel}
               stopLabel={t("dash.stop")}
@@ -635,76 +641,87 @@ export default function App() {
 
         <main className="main" inert={navOpen}>
           {quotaSummary}
-          <div className="main-inner">
-            {/*
+          <ProviderSession key={`${sharedBase}:${sharedSessionEpoch}`}>
+            <div className="main-inner">
+              <div className="console-header-slot" ref={setHeaderTarget} />
+              {/*
             Outside the page-keyed ErrorBoundary on purpose: that boundary remounts on
             every page change, which would destroy the button the user just activated
             and drop keyboard focus to <body>.
           */}
-            {sectionPages.length > 1 && (
-              <SectionSwitcher
-                items={sectionPages.map((member) => ({
-                  page: member,
-                  label: t(PAGE_TKEY[member]),
-                }))}
-                currentPage={page}
-                onNavigate={navigateToPage}
-                ariaLabel={t("nav.sectionNavigation")}
-                onFocusOrphaned={focusAfterSwitcher}
-              />
-            )}
-
-            <ErrorBoundary
-              key={shellPage}
-              pageName={t(PAGE_TKEY[shellPage])}
-              title={t("errorBoundary.title")}
-              message={t("errorBoundary.message")}
-              detailsLabel={t("errorBoundary.details")}
-              reloadLabel={t("errorBoundary.reload")}
-            >
-              {capabilities.loading ? (
-                <p role="status">{t("common.loading")}</p>
-              ) : !available ? (
-                <MigrationNotice title={t(PAGE_TKEY[shellPage])} />
-              ) : (
-                <>
-                  {page === "home" && (
-                    <Home
-                      apiBase={sharedBase}
-                      navigate={navigateToPage}
-                      onReloadCodex={() => {
-                        void handleCodexRestart();
-                      }}
-                      reloadingCodex={codexRestarting}
-                    />
-                  )}
-                  {page === "setup" && <SetupHub apiBase={sharedBase} navigate={navigateToPage} />}
-                  {page === "advanced" && <AdvancedHub navigate={navigateToPage} />}
-                  {page === "dashboard" && (
-                    <Dashboard apiBase={sharedBase} refreshEpoch={sharedSessionEpoch} />
-                  )}
-                  {page === "startup" && <Startup apiBase={sharedBase} />}
-                  {page === "providers" && <Providers apiBase={sharedBase} />}
-                  {page === "models" && (
-                    <Models
-                      key={sharedBase}
-                      apiBase={sharedBase}
-                      restartEpoch={codexRestartEpoch}
-                      reportRestart={report}
-                    />
-                  )}
-                  {page === "subagents" && <Subagents key={sharedBase} apiBase={sharedBase} />}
-
-                  {page === "logs" && <Logs apiBase={sharedBase} />}
-                  {page === "usage" && <Usage apiBase={sharedBase} />}
-                  {page === "storage" && <Storage apiBase={sharedBase} />}
-
-                  {page === "codex-set" && <CodexSet apiBase={sharedBase} />}
-                  {shellPage === "integrations" && <Integrations apiBase={sharedBase} />}
-                </>
+              {sectionPages.length > 1 && (
+                <SectionSwitcher
+                  items={sectionPages.map((member) => ({
+                    page: member,
+                    label: t(PAGE_TKEY[member]),
+                  }))}
+                  currentPage={page}
+                  onNavigate={navigateToPage}
+                  ariaLabel={t("nav.sectionNavigation")}
+                  onFocusOrphaned={focusAfterSwitcher}
+                />
               )}
-            </ErrorBoundary>
-          </div>
+
+              <PageHeaderTarget.Provider value={headerTarget}>
+                <div className="console-page-body">
+                  <ErrorBoundary
+                    key={shellPage}
+                    pageName={t(PAGE_TKEY[shellPage])}
+                    title={t("errorBoundary.title")}
+                    message={t("errorBoundary.message")}
+                    detailsLabel={t("errorBoundary.details")}
+                    reloadLabel={t("errorBoundary.reload")}
+                  >
+                    {capabilities.loading ? (
+                      <div className="min-h-64" aria-busy="true" />
+                    ) : !available ? (
+                      <MigrationNotice title={t(PAGE_TKEY[shellPage])} />
+                    ) : (
+                      <>
+                        {page === "home" && (
+                          <Home
+                            apiBase={sharedBase}
+                            navigate={navigateToPage}
+                            onReloadCodex={() => {
+                              void handleCodexRestart();
+                            }}
+                            reloadingCodex={codexRestarting}
+                          />
+                        )}
+                        {page === "setup" && (
+                          <SetupHub apiBase={sharedBase} navigate={navigateToPage} />
+                        )}
+                        {page === "advanced" && <AdvancedHub navigate={navigateToPage} />}
+                        {page === "dashboard" && (
+                          <Dashboard apiBase={sharedBase} refreshEpoch={sharedSessionEpoch} />
+                        )}
+                        {page === "startup" && <Startup apiBase={sharedBase} />}
+                        {page === "providers" && <Providers apiBase={sharedBase} />}
+                        {page === "models" && (
+                          <Models
+                            key={sharedBase}
+                            apiBase={sharedBase}
+                            restartEpoch={codexRestartEpoch}
+                            reportRestart={report}
+                          />
+                        )}
+                        {page === "subagents" && (
+                          <Subagents key={sharedBase} apiBase={sharedBase} />
+                        )}
+
+                        {page === "logs" && <Logs apiBase={sharedBase} />}
+                        {page === "usage" && <Usage apiBase={sharedBase} />}
+                        {page === "storage" && <Storage apiBase={sharedBase} />}
+
+                        {page === "codex-set" && <CodexSet apiBase={sharedBase} />}
+                        {shellPage === "integrations" && <Integrations apiBase={sharedBase} />}
+                      </>
+                    )}
+                  </ErrorBoundary>
+                </div>
+              </PageHeaderTarget.Provider>
+            </div>
+          </ProviderSession>
         </main>
       </div>
     </RuntimeCapabilitiesContext.Provider>

@@ -122,7 +122,7 @@ export const INTEGRATION_TAB_HASHES = [
 ] as const;
 
 /** Preserve query parameters for provider settings links. */
-export const QUERY_HASH_PATHS: readonly string[] = ["providers"];
+export const QUERY_HASH_PATHS: readonly string[] = ["providers", "models", "subagents"];
 
 /** Where the retired `#claude/account` bookmark lands: Anthropic's Accounts tab on Providers. */
 export const CLAUDE_ACCOUNT_REDIRECT = "providers?provider=anthropic&tab=accounts";

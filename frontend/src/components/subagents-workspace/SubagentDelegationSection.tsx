@@ -20,6 +20,7 @@ import { StepperInput } from "../v2-subagents/StepperInput";
 import type { DelegationPatch, DelegationModelOption } from "../../pages/use-subagent-delegation";
 import type { UltraModePatch, UltraModeState } from "../../pages/use-subagent-delegation";
 import DelegationSuggest from "./DelegationSuggest";
+import { EffortCaps } from "./EffortCaps";
 
 export interface SubagentDelegationSectionProps {
   apiBase: string;
@@ -37,6 +38,7 @@ export interface SubagentDelegationSectionProps {
   ultraLoadFailed: boolean;
   onUltraModeRetry: () => void;
   fallback: string[];
+  fallbackLoadState?: "loading" | "ready" | "error";
   fallbackPollMs: number;
   fallbackBusy: boolean;
   availableModels: string[];
@@ -62,6 +64,7 @@ export default function SubagentDelegationSection({
   ultraLoadFailed,
   onUltraModeRetry,
   fallback,
+  fallbackLoadState = "ready",
   fallbackPollMs,
   fallbackBusy,
   availableModels,
@@ -254,137 +257,142 @@ export default function SubagentDelegationSection({
           label={t("sub.fallbackLabel")}
           hint={t("sub.fallbackHint")}
         >
-          <div
-            className="swi-fallback-controls flex min-w-0 flex-col gap-2"
-            ref={fallbackControlsRef}
-          >
-            {fallback.length > 0 && (
-              <ol className="m-0 flex list-none flex-col divide-y divide-line overflow-hidden rounded-[8px] p-0 ring-1 ring-line">
-                {fallback.map((modelName, index) => (
-                  <li
-                    key={rows[index].id}
-                    className="swi-fallback-row flex min-h-10 min-w-0 items-center gap-3 py-1 pr-1.5 pl-2.5"
-                  >
-                    <span
-                      className={cn(
-                        stepIndicator,
-                        "swi-fallback-pos bg-surface text-fg ring-line-strong",
-                      )}
+          {fallbackLoadState === "loading" && <p role="status">{t("common.loading")}</p>}
+          {fallbackLoadState === "ready" && (
+            <div
+              className="swi-fallback-controls flex min-w-0 flex-col gap-2"
+              ref={fallbackControlsRef}
+            >
+              {fallback.length > 0 && (
+                <ol className="m-0 flex list-none flex-col divide-y divide-line overflow-hidden rounded-[8px] p-0 ring-1 ring-line">
+                  {fallback.map((modelName, index) => (
+                    <li
+                      key={rows[index].id}
+                      className="swi-fallback-row flex min-h-10 min-w-0 items-center gap-3 py-1 pr-1.5 pl-2.5"
                     >
-                      {index + 1}
-                    </span>
-                    <span className="swi-fallback-model flex min-w-0 flex-1 flex-col">
-                      <span className="swi-fallback-name truncate font-mono text-[13px] text-fg">
-                        {modelName}
+                      <span
+                        className={cn(
+                          stepIndicator,
+                          "swi-fallback-pos bg-surface text-fg ring-line-strong",
+                        )}
+                      >
+                        {index + 1}
                       </span>
-                      {!availableModelSet.has(modelName) && (
-                        <span className="text-[12px] text-warning">
-                          {t("sub.fallbackUnavailable")}
+                      <span className="swi-fallback-model flex min-w-0 flex-1 flex-col">
+                        <span className="swi-fallback-name truncate font-mono text-[13px] text-fg">
+                          {modelName}
                         </span>
-                      )}
-                    </span>
-                    <span className="swi-fallback-actions flex shrink-0 items-center gap-0.5">
-                      <button
-                        type="button"
-                        className={iconButton}
-                        data-action="up"
-                        onClick={() => moveFallback(index, -1)}
-                        disabled={fallbackBusy || index === 0}
-                        aria-label={t("sub.moveUp", { m: modelName })}
-                      >
-                        <IconArrowUp />
-                      </button>
-                      <button
-                        type="button"
-                        className={iconButton}
-                        data-action="down"
-                        onClick={() => moveFallback(index, 1)}
-                        disabled={fallbackBusy || index === fallback.length - 1}
-                        aria-label={t("sub.moveDown", { m: modelName })}
-                      >
-                        <IconArrowDown />
-                      </button>
-                      <button
-                        type="button"
-                        className={cn(iconButton, "hover:bg-danger-soft hover:text-danger")}
-                        data-action="remove"
-                        onClick={() => {
-                          const next = fallback.filter((_, i) => i !== index);
-                          setIdentity({
-                            ...identity,
-                            models: next,
-                            rows: rows.filter((_, i) => i !== index),
-                          });
-                          pendingFocus.current = {
-                            row: Math.max(0, Math.min(index, fallback.length - 2)),
-                            action: "remove",
-                          };
-                          onFallbackChange(next);
-                        }}
-                        disabled={fallbackBusy}
-                        aria-label={t("sub.removeAria", { m: modelName })}
-                      >
-                        <IconX />
-                      </button>
-                    </span>
-                  </li>
-                ))}
-              </ol>
-            )}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <Select
-                value=""
-                label={t("sub.fallbackAdd")}
-                options={[
-                  { value: "", label: t("sub.fallbackAdd") },
-                  ...availableModels
-                    .filter((modelName) => !fallbackSet.has(modelName))
-                    .map((modelName) => ({ value: modelName, label: modelName })),
-                ]}
-                onChange={(value) => {
-                  if (value && !fallbackSet.has(value)) onFallbackChange([...fallback, value]);
-                }}
-                disabled={fallbackBusy}
-              />
-              <div className="ml-auto flex items-center gap-2 text-[13px] text-fg-muted">
-                {/* A wrapping <label> would name the first labelable descendant, the decrement
-                    button; tie the label to the input itself instead. */}
-                <label htmlFor="subagent-fallback-poll-ms">{pollLabel}</label>
-                <StepperInput
-                  id="subagent-fallback-poll-ms"
-                  min={5000}
-                  max={600000}
-                  step={1000}
-                  value={pollDraft.text}
-                  onChange={(e) => editPoll(e.currentTarget.value)}
+                        {!availableModelSet.has(modelName) && (
+                          <span className="text-[12px] text-warning">
+                            {t("sub.fallbackUnavailable")}
+                          </span>
+                        )}
+                      </span>
+                      <span className="swi-fallback-actions flex shrink-0 items-center gap-0.5">
+                        <button
+                          type="button"
+                          className={iconButton}
+                          data-action="up"
+                          onClick={() => moveFallback(index, -1)}
+                          disabled={fallbackBusy || index === 0}
+                          aria-label={t("sub.moveUp", { m: modelName })}
+                        >
+                          <IconArrowUp />
+                        </button>
+                        <button
+                          type="button"
+                          className={iconButton}
+                          data-action="down"
+                          onClick={() => moveFallback(index, 1)}
+                          disabled={fallbackBusy || index === fallback.length - 1}
+                          aria-label={t("sub.moveDown", { m: modelName })}
+                        >
+                          <IconArrowDown />
+                        </button>
+                        <button
+                          type="button"
+                          className={cn(iconButton, "hover:bg-danger-soft hover:text-danger")}
+                          data-action="remove"
+                          onClick={() => {
+                            const next = fallback.filter((_, i) => i !== index);
+                            setIdentity({
+                              ...identity,
+                              models: next,
+                              rows: rows.filter((_, i) => i !== index),
+                            });
+                            pendingFocus.current = {
+                              row: Math.max(0, Math.min(index, fallback.length - 2)),
+                              action: "remove",
+                            };
+                            onFallbackChange(next);
+                          }}
+                          disabled={fallbackBusy}
+                          aria-label={t("sub.removeAria", { m: modelName })}
+                        >
+                          <IconX />
+                        </button>
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <Select
+                  value=""
+                  label={t("sub.fallbackAdd")}
+                  options={[
+                    { value: "", label: t("sub.fallbackAdd") },
+                    ...availableModels
+                      .filter((modelName) => !fallbackSet.has(modelName))
+                      .map((modelName) => ({ value: modelName, label: modelName })),
+                  ]}
+                  onChange={(value) => {
+                    if (value && !fallbackSet.has(value)) onFallbackChange([...fallback, value]);
+                  }}
                   disabled={fallbackBusy}
-                  aria-invalid={!validPollMs}
-                  stepDisabled={fallbackBusy}
-                  unit="ms"
-                  inputClassName="w-24"
-                  decrementLabel={t("workflowBudget.decrease", { label: pollLabel })}
-                  incrementLabel={t("workflowBudget.increase", { label: pollLabel })}
-                  onDecrement={() =>
-                    editPoll(clampNumberDraft(pollDraft.text, -1000, 5000, 600000))
-                  }
-                  onIncrement={() => editPoll(clampNumberDraft(pollDraft.text, 1000, 5000, 600000))}
                 />
+                <div className="ml-auto flex items-center gap-2 text-[13px] text-fg-muted">
+                  {/* A wrapping <label> would name the first labelable descendant, the decrement
+                    button; tie the label to the input itself instead. */}
+                  <label htmlFor="subagent-fallback-poll-ms">{pollLabel}</label>
+                  <StepperInput
+                    id="subagent-fallback-poll-ms"
+                    min={5000}
+                    max={600000}
+                    step={1000}
+                    value={pollDraft.text}
+                    onChange={(e) => editPoll(e.currentTarget.value)}
+                    disabled={fallbackBusy}
+                    aria-invalid={!validPollMs}
+                    stepDisabled={fallbackBusy}
+                    unit="ms"
+                    inputClassName="w-24"
+                    decrementLabel={t("workflowBudget.decrease", { label: pollLabel })}
+                    incrementLabel={t("workflowBudget.increase", { label: pollLabel })}
+                    onDecrement={() =>
+                      editPoll(clampNumberDraft(pollDraft.text, -1000, 5000, 600000))
+                    }
+                    onIncrement={() =>
+                      editPoll(clampNumberDraft(pollDraft.text, 1000, 5000, 600000))
+                    }
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={onFallbackSave}
+                  disabled={fallbackBusy || !validPollMs}
+                >
+                  {t("common.save")}
+                </Button>
               </div>
-              <Button
-                size="sm"
-                variant="primary"
-                onClick={onFallbackSave}
-                disabled={fallbackBusy || !validPollMs}
-              >
-                {t("common.save")}
-              </Button>
+              {!validPollMs && (
+                <div className="text-[12px] text-danger" role="alert">
+                  {t("sub.fallbackPollInvalid")}
+                </div>
+              )}
             </div>
-            {!validPollMs && (
-              <div className="text-[12px] text-danger" role="alert">
-                {t("sub.fallbackPollInvalid")}
-              </div>
-            )}
-          </div>
+          )}
         </SettingRow>
 
         <SettingRow
@@ -554,6 +562,7 @@ export default function SubagentDelegationSection({
             )}
           </div>
         </details>
+        {ultraMode.loaded && ultraMode.multiAgentMode !== "v1" && <EffortCaps apiBase={apiBase} />}
       </FrameBody>
     </Frame>
   );

@@ -141,7 +141,6 @@ export function UsageModelsTable({
   t: TFn;
 }) {
   const searchLabel = t("usage.search.models");
-  const listPriceDisclaimerId = "usage-models-list-price-disclaimer";
   const unavailable = t("usage.unavailable");
   return (
     <UsageWorkspaceSection
@@ -179,9 +178,7 @@ export function UsageModelsTable({
               <th>{t("logs.col.provider")}</th>
               <th>{t("usage.col.share")}</th>
               <th className="num">{t("usage.col.tokens")}</th>
-              <th className="num" aria-describedby={listPriceDisclaimerId}>
-                {t("usage.col.apiListPrice")}
-              </th>
+              <th className="num">{t("usage.col.apiListPrice")}</th>
               <th className="num">{t("usage.col.requests")}</th>
               <th className="num">{t("usage.col.measured")}</th>
               <th className="num">{t("usage.col.inputTokens")}</th>
@@ -259,9 +256,6 @@ export function UsageModelsTable({
           </tbody>
         </table>
       </div>
-      <p id={listPriceDisclaimerId} className="m-0 text-xs text-fg-subtle">
-        {t("usage.cost.disclaimer")}
-      </p>
     </UsageWorkspaceSection>
   );
 }
@@ -278,7 +272,6 @@ export function UsageAppsTable({ apps, locale, t }: { apps?: UsageApp[]; locale:
     unknown: t("usageV2.unknown"),
     unclassified: t("usageV2.unclassified"),
   };
-  const disclaimerId = "usage-apps-list-price-disclaimer";
   return (
     <UsageWorkspaceSection
       title={t("usageV2.apps")}
@@ -298,9 +291,7 @@ export function UsageAppsTable({ apps, locale, t }: { apps?: UsageApp[]; locale:
                   <th>{t("usageV2.app")}</th>
                   <th>{t("usage.col.share")}</th>
                   <th className="num">{t("usage.col.tokens")}</th>
-                  <th className="num" aria-describedby={disclaimerId}>
-                    {t("usage.col.apiListPrice")}
-                  </th>
+                  <th className="num">{t("usage.col.apiListPrice")}</th>
                   <th className="num">{t("usage.col.requests")}</th>
                   <th className="num">{t("usage.col.measured")}</th>
                 </tr>
@@ -325,9 +316,6 @@ export function UsageAppsTable({ apps, locale, t }: { apps?: UsageApp[]; locale:
               </tbody>
             </table>
           </div>
-          <p id={disclaimerId} className="m-0 text-xs text-fg-subtle">
-            {t("usage.cost.disclaimer")}
-          </p>
         </>
       )}
     </UsageWorkspaceSection>
@@ -344,7 +332,6 @@ export function UsageProvidersTable({
   t: TFn;
 }) {
   const unavailable = t("usage.unavailable");
-  const listPriceDisclaimerId = "usage-providers-list-price-disclaimer";
   return (
     <UsageWorkspaceSection
       title={t("usage.section.providers")}
@@ -358,9 +345,7 @@ export function UsageProvidersTable({
               <th>{t("logs.col.provider")}</th>
               <th>{t("usage.col.share")}</th>
               <th className="num">{t("usage.col.tokens")}</th>
-              <th className="num" aria-describedby={listPriceDisclaimerId}>
-                {t("usage.col.apiListPrice")}
-              </th>
+              <th className="num">{t("usage.col.apiListPrice")}</th>
               <th className="num">{t("usage.col.requests")}</th>
               <th className="num">{t("usage.col.measured")}</th>
               <th className="num">{t("usage.col.tokPerSec")}</th>
@@ -396,9 +381,6 @@ export function UsageProvidersTable({
           </tbody>
         </table>
       </div>
-      <p id={listPriceDisclaimerId} className="m-0 text-xs text-fg-subtle">
-        {t("usage.cost.disclaimer")}
-      </p>
     </UsageWorkspaceSection>
   );
 }

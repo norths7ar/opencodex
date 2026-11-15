@@ -1,3 +1,4 @@
+import { PageHeader } from "../components/page-header";
 import { useMemo, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChartHistogramIcon } from "@hugeicons/core-free-icons";
@@ -247,11 +248,12 @@ export default function Usage({ apiBase }: { apiBase: string }) {
 
   return (
     <>
-      <div className="page-head usage-head">
-        <h2 id="usage-page-title">{t("usage.title")}</h2>
-      </div>
+      <PageHeader
+        titleId="usage-page-title"
+        title={t("usage.title")}
+        subtitle={t("usage.subtitle")}
+      />
       <div className="usage-v2 usage-workspace-shell flex flex-col gap-4">
-        <p className="page-sub m-0 text-[13px]">{t("usage.subtitle")}</p>
         {/*
         One toolbar: source, window, and the custom interval as a disclosure at the end of the
         row. An explicit interval is the rare path, so its two date fields open on request; the
@@ -263,6 +265,7 @@ export default function Usage({ apiBase }: { apiBase: string }) {
             <UsageSourcePicker
               apiBase={apiBase}
               filter={filter}
+              reportApps={data?.apps}
               onClient={setClient}
               onDevice={setDevice}
               session={session}
@@ -332,14 +335,9 @@ export default function Usage({ apiBase }: { apiBase: string }) {
           <>
             {state.showError && <Notice tone="err">{t("usage.loadError")}</Notice>}
             <UsageIncompleteNotice data={data} />
-            {(client === "grok" || client === "aside" || client === "other") && (
+            {client === "codex" && (data?.legacyUnclassifiedRequests ?? 0) > 0 && (
               <p className="text-fg-muted text-[13px]" role="status">
-                {t("usageV2.clientUnverified")}
-              </p>
-            )}
-            {client === "codex" && typeof data?.legacyUnclassifiedRequests === "number" && (
-              <p className="text-fg-muted text-[13px]" role="status">
-                {t("usageV2.legacy", { count: data.legacyUnclassifiedRequests })}
+                {t("usageV2.legacy", { count: data!.legacyUnclassifiedRequests! })}
               </p>
             )}
             {data?.historyTruncated && (

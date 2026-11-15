@@ -49,6 +49,7 @@ export interface SubagentsWorkspaceProps {
   onToggle: (m: string) => void;
   onMove: (i: number, dir: -1 | 1) => void;
   fallback: string[];
+  fallbackLoadState?: "loading" | "ready" | "error";
   fallbackPollMs: number;
   fallbackBusy: boolean;
   onFallbackChange: (models: string[]) => void;
@@ -83,6 +84,7 @@ export default function SubagentsWorkspace({
   onToggle,
   onMove,
   fallback,
+  fallbackLoadState,
   fallbackPollMs,
   fallbackBusy,
   onFallbackChange,
@@ -324,6 +326,7 @@ export default function SubagentsWorkspace({
             ultraLoadFailed={delegation.ultraLoadFailed}
             onUltraModeRetry={delegation.onUltraModeRetry}
             fallback={fallback}
+            fallbackLoadState={fallbackLoadState}
             fallbackPollMs={fallbackPollMs}
             fallbackBusy={fallbackBusy}
             availableModels={fallbackAvailable ?? available}

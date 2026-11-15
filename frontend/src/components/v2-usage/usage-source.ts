@@ -14,6 +14,31 @@ export type SourceDevice =
   { kind: "all" | "no-key" | "unconfigured" } | { kind: "key"; id: string };
 export type SourceFilter = { client: SourceClient; device: SourceDevice };
 
+/** Keep supported clients and observed traffic visible without advertising unused integrations. */
+export function availableSourceClients(
+  supported: readonly string[] | undefined,
+  counts: Partial<Record<SourceClient, number>> | undefined,
+  selected?: SourceClient,
+  observed: readonly SourceClient[] = [],
+): SourceClient[] {
+  if (!supported) return [...SOURCE_CLIENTS];
+  const supportedNames = new Set(
+    supported.map((id) =>
+      id === "claude" ? "claude_code" : id === "claude-desktop" ? "claude_desktop" : id,
+    ),
+  );
+  return SOURCE_CLIENTS.filter(
+    (client) =>
+      client === "all" ||
+      client === "other" ||
+      client === "unknown" ||
+      supportedNames.has(client) ||
+      observed.includes(client) ||
+      (counts?.[client] ?? 0) > 0 ||
+      client === selected,
+  );
+}
+
 export function sourceQuery(filter: SourceFilter): URLSearchParams {
   const query = new URLSearchParams({ client: filter.client, device: filter.device.kind });
   if (filter.device.kind === "key") query.set("apiKeyId", filter.device.id);

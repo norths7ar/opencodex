@@ -46,7 +46,7 @@ export interface Config {
 }
 
 export interface OAuthStatus {
-  loggedIn: boolean;
+  loggedIn?: boolean;
   email?: string;
   error?: string;
   done?: boolean;
@@ -241,6 +241,7 @@ export function useProviderAccountPools(deps: {
   const pausingAccount = Object.values(pausingAccounts)[0] ?? null;
   const [openAccounts, setOpenAccounts] = useState<Record<string, boolean>>({});
   const [keyPools, setKeyPools] = useState<Record<string, ApiKeyEntry[]>>({});
+  const [keyLoadStates, setKeyLoadStates] = useState<Record<string, AccountLoadState>>({});
   const [addingKeyFor, setAddingKeyFor] = useState<string | null>(null);
   const [newKeyValue, setNewKeyValue] = useState("");
   const accountRequestGenerationRef = useRef<Record<string, number>>({});
@@ -270,6 +271,7 @@ export function useProviderAccountPools(deps: {
         setPausingAccounts({});
         setSwitchingAccounts({});
         setKeyPools({});
+        setKeyLoadStates({});
         setAccountLoadStates({});
       });
     return () => {
@@ -461,8 +463,14 @@ export function useProviderAccountPools(deps: {
   const fetchKeyPools = useCallback(
     async (providers: string[], refresh = false): Promise<boolean> => {
       if (!aliveRef.current || !mountedRef.current || serverRef.current !== apiBase) return false;
+      const names = [...new Set(providers)];
+      setKeyLoadStates((current) => {
+        const next = { ...current };
+        for (const name of names) next[name] = "loading";
+        return next;
+      });
       const results = await Promise.all(
-        [...new Set(providers)].map(async (name) => {
+        names.map(async (name) => {
           const key = `key:${name}`;
           const generation = (accountRequestGenerationRef.current[key] ?? 0) + 1;
           accountRequestGenerationRef.current[key] = generation;
@@ -477,6 +485,9 @@ export function useProviderAccountPools(deps: {
             currentRequest() && rosterGenerationRef.current[key] === rosterGeneration;
           const url = `${apiBase}/api/providers/keys?name=${encodeURIComponent(name)}`;
           const failed = () => {
+            setKeyLoadStates((current) =>
+              currentRoster() ? { ...current, [name]: "error" } : current,
+            );
             if (currentRoster())
               setKeyPools((current) =>
                 currentRoster()
@@ -494,6 +505,9 @@ export function useProviderAccountPools(deps: {
               currentRoster()
                 ? { ...current, [name]: mergeQuotaRows(rows, current[name] ?? [], false) }
                 : current,
+            );
+            setKeyLoadStates((current) =>
+              currentRoster() ? { ...current, [name]: "ready" } : current,
             );
             if (!rows.some(supportsQuotaRead)) return true;
             const enrich = async (): Promise<boolean> => {
@@ -626,6 +640,9 @@ export function useProviderAccountPools(deps: {
                 currentRequest()
                   ? { ...current, [provider]: mergeRosterRows(rows, current[provider] ?? []) }
                   : current,
+              );
+              setKeyLoadStates((current) =>
+                currentRequest() ? { ...current, [provider]: "ready" } : current,
               );
             }
             return true;
@@ -1419,6 +1436,7 @@ export function useProviderAccountPools(deps: {
     retryAffinityReset,
     openAccounts,
     keyPools,
+    keyLoadStates,
     addingKeyFor,
     newKeyValue,
     setAccountSets,

@@ -1,6 +1,5 @@
-import { useId, useState, type ReactNode } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { HelpCircleIcon } from "@hugeicons/core-free-icons";
+import { HelpPopover } from "../help-popover";
+import { useId, type ReactNode } from "react";
 import { useT } from "../../i18n/shared";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +31,7 @@ export function SettingsSection({
     <section
       id={id}
       aria-labelledby={headingId}
-      className={cn("pv2-section min-w-0 scroll-mt-6 rounded-card bg-surface p-1", className)}
+      className={cn("pv2-section min-w-0 rounded-card bg-surface p-1", className)}
     >
       <header className="flex flex-col gap-0.5 px-4 pt-3 pb-3">
         <h3
@@ -52,45 +51,6 @@ export function SettingsSection({
   );
 }
 
-/** The bare "?" beside a label: no plate at rest, a soft one on hover. */
-export function HelpButton({
-  label,
-  expanded,
-  controls,
-  onClick,
-  buttonRef,
-  popup,
-}: {
-  label: string;
-  expanded: boolean;
-  controls: string;
-  onClick: () => void;
-  buttonRef?: React.Ref<HTMLButtonElement>;
-  /** "dialog" when the button opens one of the page's help dialogs instead of an inline region. */
-  popup?: "dialog";
-}) {
-  return (
-    <button
-      ref={buttonRef}
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      aria-expanded={expanded}
-      aria-controls={controls}
-      aria-haspopup={popup}
-      className={cn(
-        "pv2-help inline-grid size-[22px] shrink-0 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-fg-subtle",
-        "transition-colors duration-150 hover:bg-surface-2 hover:text-fg",
-        "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-highlight",
-        expanded && "bg-surface-2 text-fg",
-      )}
-    >
-      <HugeiconsIcon icon={HelpCircleIcon} size={15} strokeWidth={1.8} aria-hidden="true" />
-    </button>
-  );
-}
-
 export interface SettingsRowProps {
   label: ReactNode;
   /** Wires a native <label> to the control (Select ids, inputs). Without it the label is text. */
@@ -98,7 +58,7 @@ export interface SettingsRowProps {
   labelId?: string;
   /** One plain line under the label. */
   hint?: ReactNode;
-  /** Longer explanation, shown inline when the row's "?" is pressed. */
+  /** Longer explanation, opened from the row's help button. */
   details?: ReactNode;
   /** A "?" that opens something else (one of the page's help dialogs) instead of `details`. */
   help?: ReactNode;
@@ -131,8 +91,6 @@ export function SettingsRow({
   busy,
 }: SettingsRowProps) {
   const t = useT();
-  const detailsId = useId();
-  const [open, setOpen] = useState(false);
   const labelText = typeof label === "string" ? label : undefined;
   const labelClass = "m-0 text-[14px] leading-5 font-medium text-fg";
   return (
@@ -159,29 +117,13 @@ export function SettingsRow({
               </span>
             )}
             {details && (
-              <HelpButton
-                label={
-                  labelText ? t("proxyV2.detailsFor", { name: labelText }) : t("proxyV2.details")
-                }
-                expanded={open}
-                controls={detailsId}
-                onClick={() => setOpen((value) => !value)}
-              />
+              <HelpPopover label={labelText ?? t("proxyV2.details")}>{details}</HelpPopover>
             )}
             {help}
             {badge}
           </div>
           {hint && (
             <p className="m-0 max-w-[62ch] text-[13px] leading-[18px] text-fg-muted">{hint}</p>
-          )}
-          {details && (
-            <div
-              id={detailsId}
-              hidden={!open}
-              className="pv2-details mt-1.5 max-w-[68ch] text-[13px] leading-[19px] text-fg-muted"
-            >
-              {details}
-            </div>
           )}
         </div>
         {control && (

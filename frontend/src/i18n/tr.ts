@@ -2486,7 +2486,7 @@ export const tr: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Hermes profilleri yüklenemedi. Durumlarını kontrol etmek için yeniden deneyin.",
   "integrations.hermes.profileTitle": "Hermes profili: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body": "Codex bağlantısı proxy servisine aittir.",
   "integrations.codex.openService": "Servis kontrollerini aç",
   "integrations.state.notInstalled": "Yüklü değil",

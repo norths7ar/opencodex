@@ -38,21 +38,8 @@ export type NavGroupId =
   | "proxy"
   | "advanced";
 
-/**
- * Design system v2 sorts every row by how often people touch it: things used every day,
- * and fine-tuning most people never open.
- * The sidebar prints one heading per tier, in this order.
- */
-export type NavTier = "daily" | "advanced";
-
-export const NAV_TIERS: readonly { tier: NavTier; tkey: TKey }[] = [
-  { tier: "daily", tkey: "shellV2.tierDaily" },
-  { tier: "advanced", tkey: "shellV2.tierAdvanced" },
-];
-
 export interface NavGroup {
   id: NavGroupId;
-  tier: NavTier;
   tkey: TKey;
   Icon: typeof IconGrid;
   pages: readonly [Page, ...Page[]];
@@ -64,7 +51,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   // and Home's switcher reaches it in one click.
   {
     id: "home",
-    tier: "daily",
     tkey: "shellV2.navHome",
     Icon: IconGrid,
     pages: ["home", "startup"],
@@ -73,7 +59,6 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   // It sits above Models because choosing the route comes before choosing the model.
   {
     id: "connect",
-    tier: "daily",
     tkey: "nav.connect",
     Icon: IconRoute,
     pages: ["integrations", "setup"],
@@ -81,37 +66,32 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   },
   // Providers: every non-Codex upstream and its quota, on its own row right under Route,
   // since adding a provider is the step that gives a route somewhere to go.
-  { id: "providers", tier: "daily", tkey: "nav.providers", Icon: IconPlug, pages: ["providers"] },
-  { id: "models", tier: "daily", tkey: "nav.models", Icon: IconBoxes, pages: ["models"] },
+  { id: "providers", tkey: "nav.providers", Icon: IconPlug, pages: ["providers"] },
+  { id: "models", tkey: "nav.models", Icon: IconBoxes, pages: ["models"] },
   // Codex's account pool: which account is serving and how much it has left.
   {
     id: "accounts",
-    tier: "daily",
     tkey: "shellV2.navAccounts",
     Icon: IconCodex,
     pages: ["codex-set"],
   },
   // Which model a helper agent runs on is changed as often as the main model.
-  { id: "subagents", tier: "daily", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents"] },
+  { id: "subagents", tkey: "nav.subagents", Icon: IconBot, pages: ["subagents"] },
   {
     id: "usage-logs",
-    tier: "daily",
     tkey: "nav.usageLogs",
     Icon: IconActivity,
     pages: ["usage", "logs", "storage"],
   },
-  // Fine-tuning keeps its surfaces visible too; the All settings hub is the searchable index
-  // of every one of them, including the ones that live inside other pages.
+  // Runtime capabilities decide which of these destinations are offered.
   {
     id: "proxy",
-    tier: "advanced",
     tkey: "shellV2.pageProxyDetails",
     Icon: IconServer,
     pages: ["dashboard"],
   },
   {
     id: "advanced",
-    tier: "advanced",
     tkey: "shellV2.pageAllSettings",
     Icon: IconList,
     pages: ["advanced"],

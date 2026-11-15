@@ -1,11 +1,4 @@
-/**
- * The sidebar's rows, with menu search beside Use, keyboard shortcuts
- * for frequent pages, and a Manage tier that stays folded until asked.
- *
- * Rows come from nav-groups.ts, one tier at a time; this file only decides how they are
- * shown. Search covers every page a row owns (Logs inside Usage & Logs, Startup inside
- * Home, Claude inside Route), so a page two clicks deep is one search away.
- */
+/** Flat console navigation with search and keyboard shortcuts for every available page. */
 import {
   useCallback,
   useEffect,
@@ -17,8 +10,8 @@ import {
 } from "react";
 import type { Page } from "../app-routing";
 import type { TFn } from "../i18n/shared";
-import { IconChevron, IconSearch, IconX } from "../icons";
-import { NAV_GROUPS, NAV_TIERS, type NavGroup, type NavGroupId, type NavTier } from "../nav-groups";
+import { IconSearch, IconX } from "../icons";
+import { NAV_GROUPS, type NavGroup, type NavGroupId } from "../nav-groups";
 import {
   isEditableTarget,
   numberModifierHeld,
@@ -26,18 +19,6 @@ import {
   shortcutLabel,
   shortcutStyle,
 } from "../lib/nav-shortcuts";
-
-const ADVANCED_OPEN_KEY = "ocx-nav-advanced-open";
-/** The tier that folds. Everything in it stays reachable through search and the active row. */
-const FOLDING_TIER: NavTier = "advanced";
-
-function readAdvancedOpen(): boolean {
-  try {
-    return localStorage.getItem(ADVANCED_OPEN_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
 
 interface SearchEntry {
   group: NavGroup;
@@ -85,21 +66,12 @@ export function SidebarNav({
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [highlight, setHighlight] = useState(0);
-  const [advancedOpen, setAdvancedOpen] = useState(readAdvancedOpen);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const searchDialogRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const openedFromButton = useRef(false);
   const listId = useId();
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(ADVANCED_OPEN_KEY, advancedOpen ? "1" : "0");
-    } catch {
-      // A storageless context still folds for the session.
-    }
-  }, [advancedOpen]);
 
   const entries = useMemo<SearchEntry[]>(
     () =>
@@ -218,11 +190,6 @@ export function SidebarNav({
     [closeSearch, onNavigate],
   );
 
-  const daily = useMemo(
-    () => visibleGroups.filter((group) => group.tier === "daily"),
-    [visibleGroups],
-  );
-
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (searching || event.defaultPrevented || event.isComposing) return;
@@ -249,14 +216,14 @@ export function SidebarNav({
       if (!digit || !numberModifierHeld(event)) return;
       // Option+digit types a character on a Mac; leave text fields alone in the browser.
       if (isEditableTarget(event.target)) return;
-      const group = daily[Number(digit) - 1];
+      const group = visibleGroups[Number(digit) - 1];
       if (!group) return;
       event.preventDefault();
       onNavigate(group.pages[0]);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [daily, onNavigate, openSearch, searching, style]);
+  }, [visibleGroups, onNavigate, openSearch, searching, style]);
 
   const onDialogKey = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (event.nativeEvent.isComposing || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -335,151 +302,100 @@ export function SidebarNav({
 
   return (
     <>
-      {NAV_TIERS.map(({ tier, tkey: tierKey }) => {
-        const groups = visibleGroups.filter((group) => group.tier === tier);
-        if (!groups.length) return null;
-        if (tier === "daily") {
-          return (
-            <div key={tier} className="nav-tier" data-tier={tier}>
-              {searching ? (
-                <div
-                  ref={searchDialogRef}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label={searchLabel}
-                  onKeyDown={onDialogKey}
-                >
-                  <div className="nav-search">
-                    <IconSearch aria-hidden="true" />
-                    <input
-                      ref={inputRef}
-                      type="search"
-                      className="nav-search-input"
-                      value={query}
-                      placeholder={t("shellV2.navSearchPlaceholder")}
-                      aria-label={searchLabel}
-                      role="combobox"
-                      aria-expanded="true"
-                      aria-autocomplete="list"
-                      aria-controls={listId}
-                      aria-activedescendant={
-                        results.length
-                          ? `${listId}-${Math.min(highlight, results.length - 1)}`
-                          : undefined
-                      }
-                      onChange={(event) => {
-                        setQuery(event.target.value);
-                        setHighlight(0);
-                      }}
-                      onKeyDown={onSearchKey}
-                    />
-                    <button
-                      type="button"
-                      className="nav-search-close"
-                      onClick={() => closeSearch(true)}
-                      aria-label={t("common.close")}
-                      title={t("common.close")}
-                    >
-                      <IconX />
-                    </button>
-                  </div>
-                  {trimmed && results.length === 0 && (
-                    <div className="nav-search-empty" role="status">
-                      {t("shellV2.navSearchEmpty")}
-                    </div>
-                  )}
-                  <div
-                    id={listId}
-                    className="nav-search-results"
-                    role="listbox"
-                    aria-label={searchLabel}
-                  >
-                    {results.map((entry, index) => {
-                      const { Icon } = entry.group;
-                      return (
-                        <button
-                          key={entry.page}
-                          id={`${listId}-${index}`}
-                          type="button"
-                          role="option"
-                          tabIndex={-1}
-                          aria-selected={index === Math.min(highlight, results.length - 1)}
-                          className={`nav-item nav-search-result${index === Math.min(highlight, results.length - 1) ? " is-highlighted" : ""}`}
-                          onMouseEnter={() => setHighlight(index)}
-                          onMouseDown={(event) => event.preventDefault()}
-                          onClick={() => go(entry.page)}
-                        >
-                          <Icon /> <span className="nav-item-label">{entry.label}</span>
-                          {entry.context && (
-                            <span className="nav-search-context">{entry.context}</span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <div className="nav-tier-head">
-                  <div className="nav-tier-label" aria-hidden="true">
-                    {t(tierKey)}
-                  </div>
-                  <button
-                    ref={searchButtonRef}
-                    type="button"
-                    className="nav-search-open"
-                    onClick={() => openSearch(true)}
-                    aria-label={`${searchLabel} (${searchHint})`}
-                    title={`${searchLabel} (${searchHint})`}
-                    aria-keyshortcuts={searchHint === "⌘K" ? "Meta+K" : "Control+K"}
-                  >
-                    <IconSearch aria-hidden="true" />
-                    <kbd className="nav-kbd nav-kbd--search" aria-hidden="true">
-                      {searchHint}
-                    </kbd>
-                  </button>
-                </div>
-              )}
-              {!trimmed &&
-                groups.map((group, index) =>
-                  row(group, index < 9 ? shortcutLabel(style, String(index + 1)) : null),
-                )}
-            </div>
-          );
-        }
-        if (trimmed) return null;
-        if (tier !== FOLDING_TIER) {
-          return (
-            <div key={tier} className="nav-tier" data-tier={tier}>
-              <div className="nav-tier-label" aria-hidden="true">
-                {t(tierKey)}
-              </div>
-              {groups.map((group) => row(group, null))}
-            </div>
-          );
-        }
-        // Folded, the tier still shows the row you are on, so the sidebar never hides where you are.
-        const visible = advancedOpen
-          ? groups
-          : groups.filter((group) => group.id === activeGroupId);
-        return (
+      <div className="nav-tier">
+        {searching ? (
           <div
-            key={tier}
-            className={`nav-tier nav-tier--folding${advancedOpen ? " is-open" : ""}`}
-            data-tier={tier}
+            ref={searchDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={searchLabel}
+            onKeyDown={onDialogKey}
           >
-            <button
-              type="button"
-              className="nav-tier-toggle"
-              aria-expanded={advancedOpen}
-              onClick={() => setAdvancedOpen((open) => !open)}
-            >
-              <span className="nav-tier-label">{t(tierKey)}</span>
-              <IconChevron aria-hidden="true" className="nav-tier-chevron" />
-            </button>
-            {visible.map((group) => row(group, null))}
+            <div className="nav-search">
+              <IconSearch aria-hidden="true" />
+              <input
+                ref={inputRef}
+                type="search"
+                className="nav-search-input"
+                value={query}
+                placeholder={t("shellV2.navSearchPlaceholder")}
+                aria-label={searchLabel}
+                role="combobox"
+                aria-expanded="true"
+                aria-autocomplete="list"
+                aria-controls={listId}
+                aria-activedescendant={
+                  results.length
+                    ? `${listId}-${Math.min(highlight, results.length - 1)}`
+                    : undefined
+                }
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  setHighlight(0);
+                }}
+                onKeyDown={onSearchKey}
+              />
+              <button
+                type="button"
+                className="nav-search-close"
+                onClick={() => closeSearch(true)}
+                aria-label={t("common.close")}
+                title={t("common.close")}
+              >
+                <IconX />
+              </button>
+            </div>
+            {trimmed && results.length === 0 && (
+              <div className="nav-search-empty" role="status">
+                {t("shellV2.navSearchEmpty")}
+              </div>
+            )}
+            <div id={listId} className="nav-search-results" role="listbox" aria-label={searchLabel}>
+              {results.map((entry, index) => {
+                const { Icon } = entry.group;
+                return (
+                  <button
+                    key={entry.page}
+                    id={`${listId}-${index}`}
+                    type="button"
+                    role="option"
+                    tabIndex={-1}
+                    aria-selected={index === Math.min(highlight, results.length - 1)}
+                    className={`nav-item nav-search-result${index === Math.min(highlight, results.length - 1) ? " is-highlighted" : ""}`}
+                    onMouseEnter={() => setHighlight(index)}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => go(entry.page)}
+                  >
+                    <Icon /> <span className="nav-item-label">{entry.label}</span>
+                    {entry.context && <span className="nav-search-context">{entry.context}</span>}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        );
-      })}
+        ) : (
+          <div className="nav-tier-head console-nav-search">
+            <button
+              ref={searchButtonRef}
+              type="button"
+              className="nav-search-open"
+              onClick={() => openSearch(true)}
+              aria-label={`${searchLabel} (${searchHint})`}
+              title={`${searchLabel} (${searchHint})`}
+              aria-keyshortcuts={searchHint === "⌘K" ? "Meta+K" : "Control+K"}
+            >
+              <IconSearch aria-hidden="true" />
+              <kbd className="nav-kbd nav-kbd--search" aria-hidden="true">
+                {searchHint}
+              </kbd>
+            </button>
+          </div>
+        )}
+        {!trimmed &&
+          visibleGroups.map((group, index) =>
+            row(group, index < 9 ? shortcutLabel(style, String(index + 1)) : null),
+          )}
+      </div>{" "}
     </>
   );
 }

@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { PageHeader } from "../components/page-header";
+import { DataSurfaceSkeleton } from "../components/data-surface";
 import { IconAlert } from "../icons";
 import { Trans } from "../i18n/provider";
 import { navigateHash } from "../hash-routing";
@@ -33,7 +35,6 @@ export default function Dashboard({
     selectedSection,
     providers,
     models,
-    modelsLoading,
     modelQuery,
     setModelQuery,
     filteredGroups,
@@ -42,45 +43,61 @@ export default function Dashboard({
   } = d;
 
   if (authenticationPending) return null;
-  const accessFailure = d.connectionFailure === "auth" || d.connectionFailure === "denied";
-  if (error && (accessFailure || !d.health)) {
-    return (
-      <EmptyState
-        style={{ marginTop: 40 }}
-        icon={<IconAlert />}
-        title={
-          <span style={{ color: "var(--red)" }}>
-            {t(
-              d.connectionFailure === "denied"
-                ? "dash.permissionDenied"
-                : d.connectionFailure === "auth"
-                  ? "dash.authRequired"
-                  : "dash.dataUnavailable",
-            )}
-          </span>
-        }
-      >
-        {d.connectionFailure === "unavailable" && <Trans k="dash.runStart" cmd="ocx start" />}
-        <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
-          {t("common.retry")}
-        </button>
-      </EmptyState>
-    );
-  }
+  const unavailable = (
+    <EmptyState
+      style={{ marginTop: 40 }}
+      icon={<IconAlert />}
+      title={
+        <span style={{ color: "var(--red)" }}>
+          {t(
+            d.connectionFailure === "denied"
+              ? "dash.permissionDenied"
+              : d.connectionFailure === "auth"
+                ? "dash.authRequired"
+                : "dash.dataUnavailable",
+          )}
+        </span>
+      }
+    >
+      {d.connectionFailure === "unavailable" && <Trans k="dash.runStart" cmd="ocx start" />}
+      <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
+        {t("common.retry")}
+      </button>
+    </EmptyState>
+  );
 
+  const skeleton = <DataSurfaceSkeleton label={t("common.loading")} rows={5} />;
   const overviewSection = <DashboardOverviewSection {...d} readOnly={readOnly} />;
-  const providersSection = <DashboardProvidersSection t={t} providers={providers} />;
-  const modelsSection = (
-    <DashboardModelsSection
-      t={t}
-      models={models}
-      modelsLoading={modelsLoading}
-      modelQuery={modelQuery}
-      setModelQuery={setModelQuery}
-      filteredGroups={filteredGroups}
-      expandedProviders={expandedProviders}
-      setExpandedProviders={setExpandedProviders}
-    />
+  const providersSection = d.healthLoading ? (
+    skeleton
+  ) : (
+    <DashboardProvidersSection t={t} providers={providers} />
+  );
+  const modelsSection = d.modelsSurface.showSkeleton ? (
+    skeleton
+  ) : (
+    <>
+      {d.modelsSurface.showError && (
+        <Notice tone="warn">
+          {t(d.modelsSurface.data ? "dash.staleData" : "dash.dataUnavailable")}{" "}
+          <button className="btn btn-ghost" type="button" onClick={() => d.refreshModels()}>
+            {t("common.retry")}
+          </button>
+        </Notice>
+      )}
+      {d.modelsSurface.data && (
+        <DashboardModelsSection
+          t={t}
+          models={models}
+          modelsLoading={false}
+          modelQuery={modelQuery}
+          setModelQuery={setModelQuery}
+          filteredGroups={filteredGroups}
+          expandedProviders={expandedProviders}
+          setExpandedProviders={setExpandedProviders}
+        />
+      )}
+    </>
   );
   const updateDialog = <DashboardDialogs {...d} />;
 
@@ -107,22 +124,7 @@ export default function Dashboard({
 
   return (
     <div className="dashboard-workspace-shell">
-      {error && (
-        <Notice tone="warn">
-          {t("dash.staleData")}{" "}
-          <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
-            {t("common.retry")}
-          </button>
-        </Notice>
-      )}
-      <header className="mb-5 flex flex-col gap-1.5">
-        <h2 className="m-0 text-title font-semibold tracking-[-0.025em] text-fg">
-          {t("shellV2.pageProxyDetails")}
-        </h2>
-        <p className="m-0 max-w-[68ch] text-[14px] leading-[1.55] text-fg-muted">
-          {selectedSection === "overview" ? t("proxyV2.pageLede") : t("dash.subtitle")}
-        </p>
-      </header>
+      <PageHeader title={t("shellV2.pageProxyDetails")} subtitle={t("proxyV2.pageLede")} />
       <div className="page-tabs" role="tablist" aria-label={t("dash.workspace.sections")}>
         {sections.map((s) => (
           <button
@@ -148,9 +150,17 @@ export default function Dashboard({
         aria-labelledby={`dashboard-tab-${selected.id}`}
         tabIndex={0}
       >
-        {selected.body}
+        {!d.overviewBlocked && d.health && error && (
+          <Notice tone="warn">
+            {t("dash.staleData")}{" "}
+            <button className="btn btn-ghost" type="button" onClick={() => d.refreshDashboard()}>
+              {t("common.retry")}
+            </button>
+          </Notice>
+        )}
+        {d.overviewBlocked ? unavailable : selected.body}
       </section>
-      {updateDialog}
+      {!d.overviewBlocked && updateDialog}
     </div>
   );
 }

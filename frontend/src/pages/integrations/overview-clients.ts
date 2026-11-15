@@ -117,9 +117,10 @@ export interface GrokPayload {
 }
 
 export interface OverviewSources {
-  /** File-client rows; an empty array means the list has not settled. */
+  /** File-client rows; clientsSettled distinguishes pending from an empty result. */
   clients: readonly IntegrationStatus[];
   clientsSettled: boolean;
+  clientsFailed?: boolean;
   codex: CodexRoutingPayload | null;
   keyCount: number | null;
   /**
@@ -627,7 +628,7 @@ export function buildOverviewRows(sources: OverviewSources): OverviewRows {
         id: clientId,
         hash: `integrations/${clientId}`,
         labelKey: FILE_LABEL_KEY[clientId],
-        state: "unknown",
+        state: sources.clientsFailed ? "unavailable" : "unknown",
         installed: false,
         applied: false,
         detail: null,

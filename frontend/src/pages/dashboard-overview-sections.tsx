@@ -1,8 +1,10 @@
+import { HelpPopover } from "../components/help-popover";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { IconAlert, IconCheck, IconChevron, IconRefresh, IconX } from "../icons";
 import { Trans } from "../i18n/provider";
 import { Select } from "../ui";
+import { DataSurfaceSkeleton } from "../components/data-surface";
 import { formatNamespacedModelId } from "../provider-icons";
 import { navigateHash } from "../hash-routing";
 import {
@@ -28,16 +30,25 @@ import {
 } from "./dashboard-shared";
 import { DashboardMultiAgentControl, DashboardMultiAgentHelp } from "./dashboard-overview-head";
 import { VisionAdvancedPopover } from "./dashboard-vision-popover";
+import { shadowSourceModelLabel } from "./shadow-call-source";
 import { shadowBackgroundModelBadge } from "./shadow-call-source";
 import { ShadowCallSourceToggles } from "./shadow-call-source-toggles";
 import type { useDashboardData } from "./use-dashboard-data";
-import { HelpButton, SettingsRow, SettingsSection } from "@/components/v2-proxy/settings-layout";
+import { SettingsRow, SettingsSection } from "@/components/v2-proxy/settings-layout";
 
 type Dash = ReturnType<typeof useDashboardData>;
 
 /* Row control widths: one model column and one effort column, shared by every row. */
 const MODEL_FIELD = "w-[15rem] max-w-full";
 const EFFORT_FIELD = "w-[9.5rem] max-w-full";
+
+function UnresolvedControl({ d, loading }: { d: Dash; loading: boolean }) {
+  return loading ? (
+    <DataSurfaceSkeleton label={d.t("common.loading")} rows={1} />
+  ) : (
+    <span className="muted">{d.t("dash.dataUnavailable")}</span>
+  );
+}
 
 /* ---- Subagents -------------------------------------------------------------------------------- */
 
@@ -52,13 +63,17 @@ export function DashboardSubagentSection({ d }: { d: Dash }) {
       <SettingsRow
         label={t("dash.multiAgent")}
         hint={t("proxyV2.maModeHint")}
-        help={<DashboardMultiAgentHelp {...d} />}
+        help={<DashboardMultiAgentHelp />}
         control={
-          <DashboardMultiAgentControl
-            maMode={maMode}
-            maBusy={d.maBusy}
-            switchMaMode={d.switchMaMode}
-          />
+          d.maModeResolved ? (
+            <DashboardMultiAgentControl
+              maMode={maMode}
+              maBusy={d.maBusy}
+              switchMaMode={d.switchMaMode}
+            />
+          ) : (
+            <UnresolvedControl d={d} loading={d.maModeLoading} />
+          )
         }
       >
         {maError && (
@@ -67,8 +82,24 @@ export function DashboardSubagentSection({ d }: { d: Dash }) {
           </div>
         )}
       </SettingsRow>
-      <DashboardEffortCapRows apiBase={d.apiBase} d={d} />
-      <DashboardInjectionPanel apiBase={d.apiBase} d={d} />
+      {d.maModeResolved &&
+        maMode !== "v1" &&
+        (d.effortCapsReady ? (
+          <DashboardEffortCapRows apiBase={d.apiBase} d={d} />
+        ) : (
+          <SettingsRow
+            label={t("dash.effortCapLabel")}
+            control={<UnresolvedControl d={d} loading={d.multiAgentLoading} />}
+          />
+        ))}
+      {d.injectionReady ? (
+        <DashboardInjectionPanel apiBase={d.apiBase} d={d} />
+      ) : (
+        <SettingsRow
+          label={t("dash.injectionLabel")}
+          control={<UnresolvedControl d={d} loading={d.multiAgentLoading} />}
+        />
+      )}
     </SettingsSection>
   );
 }
@@ -78,9 +109,6 @@ function DashboardEffortCapRows({ apiBase, d }: { apiBase: string; d: Dash }) {
     t,
     maMode,
     maModeResolved,
-    effortCapHelpTriggerRef,
-    effortCapHelpOpen,
-    setEffortCapHelpOpen,
     effortCap,
     subagentEffortCap,
     effortCapSaving,
@@ -126,16 +154,7 @@ function DashboardEffortCapRows({ apiBase, d }: { apiBase: string; d: Dash }) {
         className="dash-effort-panel"
         label={t("dash.effortCapLabel")}
         hint={t("proxyV2.effortCapHint")}
-        help={
-          <HelpButton
-            buttonRef={effortCapHelpTriggerRef}
-            label={t("dash.effortCapLabel")}
-            expanded={effortCapHelpOpen}
-            controls="effort-cap-help-dialog"
-            popup="dialog"
-            onClick={() => setEffortCapHelpOpen((open) => !open)}
-          />
-        }
+        help={<HelpPopover label={t("dash.effortCapLabel")}>{t("dash.effortCapHelp")}</HelpPopover>}
         control={
           <Select
             value={effortCap}
@@ -275,86 +294,94 @@ export function DashboardCodexSection({
       title={t("proxyV2.secCodex")}
       lede={t("proxyV2.secCodexLede")}
     >
-      {!compactionOnly && (
-        <SettingsRow
-          label={t("dash.codexAutoStart")}
-          hint={t("proxyV2.autoStartShort")}
-          details={t("dash.codexAutoStartHint")}
-          inline
-          control={
-            <CodexSwitch
-              on={settings?.codexAutoStart ?? true}
+      {!settings ? (
+        <UnresolvedControl d={d} loading={d.settingsLoading} />
+      ) : (
+        <>
+          {!compactionOnly && (
+            <SettingsRow
               label={t("dash.codexAutoStart")}
-              disabled={locked}
-              onClick={toggleCodexAutoStart}
+              hint={t("proxyV2.autoStartShort")}
+              details={t("dash.codexAutoStartHint")}
+              inline
+              control={
+                <CodexSwitch
+                  on={settings?.codexAutoStart ?? true}
+                  label={t("dash.codexAutoStart")}
+                  disabled={locked}
+                  onClick={toggleCodexAutoStart}
+                />
+              }
             />
-          }
-        />
-      )}
-      {!compactionOnly && (
-        <SettingsRow
-          label={t("dash.codexDesktopAuthless")}
-          hint={t("proxyV2.authlessShort")}
-          details={t("dash.codexDesktopAuthlessHint")}
-          inline
-          control={
-            <CodexSwitch
-              on={settings?.codexDesktopAuthless ?? false}
+          )}
+          {!compactionOnly && (
+            <SettingsRow
               label={t("dash.codexDesktopAuthless")}
-              disabled={locked}
-              onClick={toggleCodexDesktopAuthless}
-            />
-          }
-        >
-          {(settings?.codexDesktopAuthless || settings?.catalogRefreshPending) && (
-            <div className="flex flex-col gap-1">
-              {settings?.codexDesktopAuthless && remoteHistory}
-              {catalogPending}
-            </div>
+              hint={t("proxyV2.authlessShort")}
+              details={t("dash.codexDesktopAuthlessHint")}
+              inline
+              control={
+                <CodexSwitch
+                  on={settings?.codexDesktopAuthless ?? false}
+                  label={t("dash.codexDesktopAuthless")}
+                  disabled={locked}
+                  onClick={toggleCodexDesktopAuthless}
+                />
+              }
+            >
+              {(settings?.codexDesktopAuthless || settings?.catalogRefreshPending) && (
+                <div className="flex flex-col gap-1">
+                  {settings?.codexDesktopAuthless && remoteHistory}
+                  {catalogPending}
+                </div>
+              )}
+            </SettingsRow>
           )}
-        </SettingsRow>
-      )}
-      <SettingsRow
-        label={t("dash.codexClientCompaction")}
-        hint={t("proxyV2.clientCompactionShort")}
-        details={t("dash.codexClientCompactionHint")}
-        inline
-        control={
-          <CodexSwitch
-            on={settings?.codexClientCompaction ?? false}
+          <SettingsRow
             label={t("dash.codexClientCompaction")}
-            disabled={locked}
-            onClick={toggleCodexClientCompaction}
-          />
-        }
-      >
-        {compactionOnly && settings?.catalogRefreshPending && (
-          <p role="status" className="m-0 text-sm text-fg-muted">
-            {settings.clientApplication?.enabled
-              ? settings.clientApplication.message ||
-                (d.locale === "zh" || d.locale === "zh-TW"
-                  ? "设置已保存，客户端应用尚未完成。"
-                  : "Saved; client application is pending.")
-              : d.locale === "zh" || d.locale === "zh-TW"
-                ? "设置已保存；在 Route 启用 Codex 接入后应用。"
-                : "Saved; enable Codex in Route to apply this setting."}
-          </p>
-        )}
-        {compactionOnly &&
-          (settings?.clientApplyWarning || settings?.clientApplication?.warning) && (
-            <p role="status" className="m-0 text-sm text-fg-muted">
-              {settings.clientApplyWarning || settings.clientApplication?.warning}
-            </p>
-          )}
-        {((!settings?.codexDesktopAuthless && settings?.codexClientCompaction) ||
-          settings?.catalogRefreshPending) && (
-          <div className="flex flex-col gap-1">
-            {!settings?.codexDesktopAuthless && settings?.codexClientCompaction && remoteHistory}
-            {!compactionOnly && catalogPending}
-          </div>
-        )}
-      </SettingsRow>
-      {!compactionOnly && <DashboardMaintenancePanel d={d} />}
+            hint={t("proxyV2.clientCompactionShort")}
+            details={t("dash.codexClientCompactionHint")}
+            inline
+            control={
+              <CodexSwitch
+                on={settings?.codexClientCompaction ?? false}
+                label={t("dash.codexClientCompaction")}
+                disabled={locked}
+                onClick={toggleCodexClientCompaction}
+              />
+            }
+          >
+            {compactionOnly && settings?.catalogRefreshPending && (
+              <p role="status" className="m-0 text-sm text-fg-muted">
+                {settings.clientApplication?.enabled
+                  ? settings.clientApplication.message ||
+                    (d.locale === "zh" || d.locale === "zh-TW"
+                      ? "设置已保存，客户端应用尚未完成。"
+                      : "Saved; client application is pending.")
+                  : d.locale === "zh" || d.locale === "zh-TW"
+                    ? "设置已保存；在 Route 启用 Codex 接入后应用。"
+                    : "Saved; enable Codex in Route to apply this setting."}
+              </p>
+            )}
+            {compactionOnly &&
+              (settings?.clientApplyWarning || settings?.clientApplication?.warning) && (
+                <p role="status" className="m-0 text-sm text-fg-muted">
+                  {settings.clientApplyWarning || settings.clientApplication?.warning}
+                </p>
+              )}
+            {((!settings?.codexDesktopAuthless && settings?.codexClientCompaction) ||
+              settings?.catalogRefreshPending) && (
+              <div className="flex flex-col gap-1">
+                {!settings?.codexDesktopAuthless &&
+                  settings?.codexClientCompaction &&
+                  remoteHistory}
+                {!compactionOnly && catalogPending}
+              </div>
+            )}
+          </SettingsRow>
+          {!compactionOnly && <DashboardMaintenancePanel d={d} />}
+        </>
+      )}
     </SettingsSection>
   );
 }
@@ -511,9 +538,6 @@ export function DashboardSidecarPanels({
     shadowCall,
     shadowCallSaving,
     shadowCallError,
-    shadowCallHelpTriggerRef,
-    shadowCallHelpOpen,
-    setShadowCallHelpOpen,
     saveShadowCall,
   } = d;
   const shadowMemoryLabel = t("shadowCall.memoryLabel");
@@ -571,235 +595,243 @@ export function DashboardSidecarPanels({
       title={t("proxyV2.secSidecars")}
       lede={t("proxyV2.secSidecarsLede")}
     >
-      {/* Both sidecar rows keep the delegation shell: copy left, a shared control band right
+      {!sidecar ? (
+        <UnresolvedControl d={d} loading={d.sidecarLoading} />
+      ) : (
+        <>
+          {/* Both sidecar rows keep the delegation shell: copy left, a shared control band right
           (styles-dashboard-workspace.css pins the band so the two model pickers line up). */}
-      <div
-        className="pv2-row dash-delegation-summary dash-sidecar-row-card"
-        aria-busy={!sidecar || undefined}
-      >
-        <div className="dash-sidecar-copy">
-          <div className="pv2-row-label">{t("dash.webSearchSidecar")}</div>
-          <div className="muted setting-hint">{t("dash.webSearchSidecarHint")}</div>
-          {/* The switch is stored even when Codex's own key was not rewritten. Saying nothing
+          <div
+            className="pv2-row dash-delegation-summary dash-sidecar-row-card"
+            aria-busy={!sidecar || undefined}
+          >
+            <div className="dash-sidecar-copy">
+              <div className="pv2-row-label">{t("dash.webSearchSidecar")}</div>
+              <div className="muted setting-hint">{t("dash.webSearchSidecarHint")}</div>
+              {/* The switch is stored even when Codex's own key was not rewritten. Saying nothing
               here would read as "the native tool is off now", which is exactly the state the
               operator asked for and may not have. */}
-          {sidecarCodexWritePending(sidecarCodexApply) && (
-            <div className="notice-warn" role="status">
-              <IconAlert />
-              <span>{t("dash.webSearchCodexSync")}</span>
+              {sidecarCodexWritePending(sidecarCodexApply) && (
+                <div className="notice-warn" role="status">
+                  <IconAlert />
+                  <span>{t("dash.webSearchCodexSync")}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <div className="dash-delegation-controls">
-          <div className="dash-sidecar-select-row">
-            <Select
-              value={webSearchModel}
-              options={[{ value: "", label: t("dash.webSearchOff") }, ...sidecarModels]}
-              onChange={(model) => {
-                if (model === "") {
-                  void saveSidecar(webSearchEnabledPatch(false));
-                  return;
-                }
-                const patch: SidecarPatch = {
-                  webSearch: webSearchSidecarSelectionForModel(models, sidecarModels, model),
-                };
-                // Choosing a model is the activation control: turning the sidecar back on from Off.
-                if (!webSearchEnabled) patch.webSearch = { ...patch.webSearch, enabled: true };
-                void saveSidecar(patch);
-              }}
-              disabled={!sidecar || sidecarSaving}
-              label={t("dash.sidecarModel")}
-              align="right"
-            />
+            <div className="dash-delegation-controls">
+              <div className="dash-sidecar-select-row">
+                <Select
+                  value={webSearchModel}
+                  options={[{ value: "", label: t("dash.webSearchOff") }, ...sidecarModels]}
+                  onChange={(model) => {
+                    if (model === "") {
+                      void saveSidecar(webSearchEnabledPatch(false));
+                      return;
+                    }
+                    const patch: SidecarPatch = {
+                      webSearch: webSearchSidecarSelectionForModel(models, sidecarModels, model),
+                    };
+                    // Choosing a model is the activation control: turning the sidecar back on from Off.
+                    if (!webSearchEnabled) patch.webSearch = { ...patch.webSearch, enabled: true };
+                    void saveSidecar(patch);
+                  }}
+                  disabled={!sidecar || sidecarSaving}
+                  label={t("dash.sidecarModel")}
+                  align="right"
+                />
+              </div>
+              <div className="dash-sidecar-trailing-row">
+                <span className="muted setting-hint dash-sidecar-toggle-label">
+                  {t("dash.webSearchStream")}
+                </span>
+                <HelpPopover label={t("dash.webSearchStream")}>
+                  {t("dash.webSearchStreamHint")}
+                </HelpPopover>
+                <button
+                  type="button"
+                  className={`switch ${sidecar?.webSearch?.streamRoutedModelOutput ? "on" : ""}`}
+                  onClick={() => {
+                    void saveSidecar({
+                      webSearch: {
+                        streamRoutedModelOutput: !sidecar?.webSearch?.streamRoutedModelOutput,
+                      },
+                    });
+                  }}
+                  disabled={!webSearchEnabled || !sidecar || sidecarSaving}
+                  aria-label={t("dash.webSearchStream")}
+                  aria-pressed={sidecar?.webSearch?.streamRoutedModelOutput === true}
+                >
+                  <span className="knob" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="dash-sidecar-trailing-row" title={t("dash.webSearchStreamHint")}>
-            <span className="muted setting-hint dash-sidecar-toggle-label">
-              {t("dash.webSearchStream")}
-            </span>
-            <button
-              type="button"
-              className={`switch ${sidecar?.webSearch?.streamRoutedModelOutput ? "on" : ""}`}
-              onClick={() => {
-                void saveSidecar({
-                  webSearch: {
-                    streamRoutedModelOutput: !sidecar?.webSearch?.streamRoutedModelOutput,
-                  },
-                });
-              }}
-              disabled={!webSearchEnabled || !sidecar || sidecarSaving}
-              aria-label={t("dash.webSearchStream")}
-              aria-pressed={sidecar?.webSearch?.streamRoutedModelOutput === true}
-            >
-              <span className="knob" />
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div
-        className="pv2-row dash-delegation-summary dash-sidecar-row-card dash-vision-sidecar-card"
-        aria-busy={!sidecar || undefined}
-      >
-        <div className="dash-sidecar-copy">
-          <div className="pv2-row-label">{t("dash.visionSidecar")}</div>
-          <div className="muted setting-hint">{t("dash.visionSidecarHint")}</div>
-        </div>
-        <div className="dash-delegation-controls">
-          <div className="dash-sidecar-select-row">
-            <Select
-              value={visionModel}
-              options={[{ value: "", label: t("dash.visionOff") }, ...visionModels]}
-              onChange={(model) => {
-                if (model === "") {
-                  void saveSidecar(visionEnabledPatch(false));
-                  return;
-                }
-                const ladder = visionReasoningLadder(models, model);
-                const reasoning = clampVisionReasoningToLadder(ladder, visionReasoning);
-                const patch: SidecarPatch = {
-                  vision: {
-                    model,
-                    backend: visionSidecarBackendForModel(models, visionModels, model),
-                    reasoning,
-                  },
-                };
-                // Choosing a model is the activation control: turning Vision back on from Off.
-                if (!visionEnabled) patch.vision = { ...patch.vision, enabled: true };
-                void saveSidecar(patch);
-              }}
-              disabled={!sidecar || sidecarSaving}
-              label={t("dash.sidecarModel")}
-            />
-            <Select
-              value={visionReasoning}
-              // Raw wire value (low…max), matching the delegation panel's bare `high`.
-              options={visionReasoningOptionsFor(visionLadder, visionReasoning).map((value) => ({
-                value,
-                label: value,
-              }))}
-              onChange={(reasoning) => {
-                void saveSidecar(visionReasoningPatch(reasoning as typeof visionReasoning));
-              }}
-              disabled={!visionEnabled || !sidecar || sidecarSaving}
-              align="right"
-              label={`${t("dash.visionSidecar")} — ${t("dash.injectionEffortLabel")}`}
-            />
+          <div
+            className="pv2-row dash-delegation-summary dash-sidecar-row-card dash-vision-sidecar-card"
+            aria-busy={!sidecar || undefined}
+          >
+            <div className="dash-sidecar-copy">
+              <div className="pv2-row-label">{t("dash.visionSidecar")}</div>
+              <div className="muted setting-hint">{t("dash.visionSidecarHint")}</div>
+            </div>
+            <div className="dash-delegation-controls">
+              <div className="dash-sidecar-select-row">
+                <Select
+                  value={visionModel}
+                  options={[{ value: "", label: t("dash.visionOff") }, ...visionModels]}
+                  onChange={(model) => {
+                    if (model === "") {
+                      void saveSidecar(visionEnabledPatch(false));
+                      return;
+                    }
+                    const ladder = visionReasoningLadder(models, model);
+                    const reasoning = clampVisionReasoningToLadder(ladder, visionReasoning);
+                    const patch: SidecarPatch = {
+                      vision: {
+                        model,
+                        backend: visionSidecarBackendForModel(models, visionModels, model),
+                        reasoning,
+                      },
+                    };
+                    // Choosing a model is the activation control: turning Vision back on from Off.
+                    if (!visionEnabled) patch.vision = { ...patch.vision, enabled: true };
+                    void saveSidecar(patch);
+                  }}
+                  disabled={!sidecar || sidecarSaving}
+                  label={t("dash.sidecarModel")}
+                />
+                <Select
+                  value={visionReasoning}
+                  // Raw wire value (low…max), matching the delegation panel's bare `high`.
+                  options={visionReasoningOptionsFor(visionLadder, visionReasoning).map(
+                    (value) => ({
+                      value,
+                      label: value,
+                    }),
+                  )}
+                  onChange={(reasoning) => {
+                    void saveSidecar(visionReasoningPatch(reasoning as typeof visionReasoning));
+                  }}
+                  disabled={!visionEnabled || !sidecar || sidecarSaving}
+                  align="right"
+                  label={`${t("dash.visionSidecar")} — ${t("dash.injectionEffortLabel")}`}
+                />
+              </div>
+              <div className="dash-sidecar-trailing-row">
+                <button
+                  type="button"
+                  ref={visionAdvancedTriggerRef}
+                  className="dash-vision-advanced-trigger"
+                  onClick={() => setVisionAdvancedOpen((open) => !open)}
+                  disabled={!visionEnabled || !sidecar || sidecarSaving}
+                  aria-expanded={visionAdvancedOpen}
+                  aria-haspopup="dialog"
+                  aria-controls="dash-vision-advanced-popover"
+                >
+                  <span>{t("dash.visionAdvanced")}</span>
+                  <IconChevron
+                    width={12}
+                    height={12}
+                    aria-hidden="true"
+                    style={{
+                      transform: visionAdvancedOpen ? "rotate(90deg)" : "none",
+                      transition: "transform .12s",
+                    }}
+                  />
+                </button>
+              </div>
+            </div>
+            {createPortal(
+              <VisionAdvancedPopover
+                t={t}
+                open={visionAdvancedOpen}
+                triggerRef={visionAdvancedTriggerRef}
+                onClose={() => setVisionAdvancedOpen(false)}
+                maxValue={maxValue}
+                maxInvalid={maxInvalid}
+                timeoutValue={timeoutValue}
+                timeoutInvalid={timeoutInvalid}
+                disabled={!visionEnabled || !sidecar || sidecarSaving}
+                setMaxDraft={setMaxDraft}
+                setMaxInvalid={setMaxInvalid}
+                setTimeoutDraft={setTimeoutDraft}
+                setTimeoutInvalid={setTimeoutInvalid}
+                commitMaxDescriptions={commitMaxDescriptions}
+                commitTimeout={commitTimeout}
+              />,
+              document.body,
+            )}
           </div>
-          <div className="dash-sidecar-trailing-row">
-            <button
-              type="button"
-              ref={visionAdvancedTriggerRef}
-              className="dash-vision-advanced-trigger"
-              onClick={() => setVisionAdvancedOpen((open) => !open)}
-              disabled={!visionEnabled || !sidecar || sidecarSaving}
-              aria-expanded={visionAdvancedOpen}
-              aria-haspopup="dialog"
-              aria-controls="dash-vision-advanced-popover"
-            >
-              <span>{t("dash.visionAdvanced")}</span>
-              <IconChevron
-                width={12}
-                height={12}
-                aria-hidden="true"
-                style={{
-                  transform: visionAdvancedOpen ? "rotate(90deg)" : "none",
-                  transition: "transform .12s",
-                }}
-              />
-            </button>
-          </div>
-        </div>
-        {createPortal(
-          <VisionAdvancedPopover
-            t={t}
-            open={visionAdvancedOpen}
-            triggerRef={visionAdvancedTriggerRef}
-            onClose={() => setVisionAdvancedOpen(false)}
-            maxValue={maxValue}
-            maxInvalid={maxInvalid}
-            timeoutValue={timeoutValue}
-            timeoutInvalid={timeoutInvalid}
-            disabled={!visionEnabled || !sidecar || sidecarSaving}
-            setMaxDraft={setMaxDraft}
-            setMaxInvalid={setMaxInvalid}
-            setTimeoutDraft={setTimeoutDraft}
-            setTimeoutInvalid={setTimeoutInvalid}
-            commitMaxDescriptions={commitMaxDescriptions}
-            commitTimeout={commitTimeout}
-          />,
-          document.body,
-        )}
-      </div>
 
-      {!hideShadow && (
-        <SettingsRow
-          className="dash-shadow-row"
-          busy={!shadowCall}
-          label={t("dash.shadowCallIntercept")}
-          hint={t("proxyV2.shadowShort")}
-          help={
-            <HelpButton
-              buttonRef={shadowCallHelpTriggerRef}
+          {!hideShadow && (
+            <SettingsRow
+              className="dash-shadow-row"
+              busy={!shadowCall}
               label={t("dash.shadowCallIntercept")}
-              expanded={shadowCallHelpOpen}
-              controls="shadow-call-help-dialog"
-              popup="dialog"
-              onClick={() => setShadowCallHelpOpen((open) => !open)}
-            />
-          }
-          badge={
-            <code className="dash-shadow-badge rounded-[6px] bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-fg-muted">{`⚠ ${shadowBackgroundModelBadge(shadowCall?.sourceModels, shadowMemoryLabel)}`}</code>
-          }
-          control={
-            <div className="flex items-center gap-2">
-              <Select
-                value={shadowCall?.model ?? ""}
-                options={shadowCallModelOptions(
-                  models,
-                  shadowCall?.model,
-                  shadowCall?.sourceModels,
-                ).map((option) =>
-                  option.value === ""
-                    ? option
-                    : { ...option, label: formatNamespacedModelId(option.value, t) },
-                )}
-                onChange={(v) => {
-                  void saveShadowCall({ model: v });
-                }}
-                disabled={!shadowCall || shadowCallSaving || !shadowCall?.enabled}
-                label={t("dash.shadowCallModel")}
-                align="right"
-                fullWidth
-                className={MODEL_FIELD}
+              hint={t("proxyV2.shadowShort")}
+              help={
+                <HelpPopover label={t("dash.shadowCallIntercept")}>
+                  {t("dash.shadowCallTooltip", {
+                    models: shadowSourceModelLabel(shadowCall?.sourceModels),
+                  })}
+                </HelpPopover>
+              }
+              badge={
+                <code className="dash-shadow-badge rounded-[6px] bg-surface-2 px-1.5 py-0.5 font-mono text-[11px] text-fg-muted">{`⚠ ${shadowBackgroundModelBadge(shadowCall?.sourceModels, shadowMemoryLabel)}`}</code>
+              }
+              control={
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={shadowCall?.model ?? ""}
+                    options={shadowCallModelOptions(
+                      models,
+                      shadowCall?.model,
+                      shadowCall?.sourceModels,
+                    ).map((option) =>
+                      option.value === ""
+                        ? option
+                        : { ...option, label: formatNamespacedModelId(option.value, t) },
+                    )}
+                    onChange={(v) => {
+                      void saveShadowCall({ model: v });
+                    }}
+                    disabled={!shadowCall || shadowCallSaving || !shadowCall?.enabled}
+                    label={t("dash.shadowCallModel")}
+                    align="right"
+                    fullWidth
+                    className={MODEL_FIELD}
+                  />
+                  <button
+                    type="button"
+                    className={`switch ${shadowCall?.enabled ? "on" : ""}`}
+                    onClick={() => saveShadowCall({ enabled: !shadowCall?.enabled })}
+                    disabled={!shadowCall || shadowCallSaving}
+                    aria-label={t("dash.shadowCallIntercept")}
+                    aria-pressed={shadowCall?.enabled ?? false}
+                  >
+                    <span className="knob" />
+                  </button>
+                </div>
+              }
+            >
+              <ShadowCallSourceToggles
+                className="dash-shadow-sources"
+                options={shadowCall?.sourceModelOptions}
+                sourceModels={shadowCall?.sourceModels}
+                disabled={!shadowCall?.enabled}
+                saving={shadowCallSaving}
+                onChange={(sourceModels) => void saveShadowCall({ sourceModels })}
               />
-              <button
-                type="button"
-                className={`switch ${shadowCall?.enabled ? "on" : ""}`}
-                onClick={() => saveShadowCall({ enabled: !shadowCall?.enabled })}
-                disabled={!shadowCall || shadowCallSaving}
-                aria-label={t("dash.shadowCallIntercept")}
-                aria-pressed={shadowCall?.enabled ?? false}
-              >
-                <span className="knob" />
-              </button>
-            </div>
-          }
-        >
-          <ShadowCallSourceToggles
-            className="dash-shadow-sources"
-            options={shadowCall?.sourceModelOptions}
-            sourceModels={shadowCall?.sourceModels}
-            disabled={!shadowCall?.enabled}
-            saving={shadowCallSaving}
-            onChange={(sourceModels) => void saveShadowCall({ sourceModels })}
-          />
-          {shadowCallError && (
-            <div className="notice notice-err" role="alert">
-              <IconAlert />
-              <span>{shadowCallError}</span>
-            </div>
+              {shadowCallError && (
+                <div className="notice notice-err" role="alert">
+                  <IconAlert />
+                  <span>{shadowCallError}</span>
+                </div>
+              )}
+            </SettingsRow>
           )}
-        </SettingsRow>
+        </>
       )}
     </SettingsSection>
   );

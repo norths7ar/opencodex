@@ -1,3 +1,4 @@
+import { authStatusCopy } from "../../provider-workspace/auth-status";
 /**
  * ProviderWorkspaceShell — the workspace chrome (WP080b): search, filter
  * popover (status/pricing/type/sort), grouped rail with keyboard navigation,
@@ -129,6 +130,7 @@ export default function ProviderWorkspaceShell({
   onModelsSettled,
   activeAccountNeedsReauth,
   oauthLoginStatus,
+  onRefreshLoginStatus,
   /** Stable key of active OAuth account ids — refetch overview quotas after account switch. */
   quotaRefreshEpoch = 0,
   quotaForceRefresh = false,
@@ -154,7 +156,8 @@ export default function ProviderWorkspaceShell({
   /** Registration feedback re-reads config only after this discovery actually settles. */
   onModelsSettled?: (ok: boolean) => void;
   activeAccountNeedsReauth?: Record<string, boolean>;
-  oauthLoginStatus?: Record<string, { loggedIn?: boolean }>;
+  onRefreshLoginStatus?: () => Promise<void>;
+  oauthLoginStatus?: Record<string, { loggedIn?: boolean; statusCheck?: "ready" | "failed" }>;
   /**
    * Monotonic quota revision. It moves only when something actually invalidates the quota
    * view — an account switch, a login or logout, a key change, a config save — so account
@@ -268,10 +271,13 @@ export default function ProviderWorkspaceShell({
             name,
             {
               ...provider,
-              oauthLoggedIn:
+              oauthStatusCheck:
                 provider.authMode === "oauth"
-                  ? oauthLoginStatus[name]?.loggedIn === true
+                  ? (oauthLoginStatus[name]?.statusCheck ??
+                    (oauthLoginStatus[name] ? ("ready" as const) : ("loading" as const)))
                   : undefined,
+              oauthLoggedIn:
+                provider.authMode === "oauth" ? oauthLoginStatus[name]?.loggedIn : undefined,
             },
           ]),
         )
@@ -473,7 +479,12 @@ export default function ProviderWorkspaceShell({
   }, [filterOpen]);
 
   const allItems = useMemo(
-    () => [...sections.ready, ...sections.needsSetup, ...sections.disabled],
+    () => [
+      ...sections.ready,
+      ...(sections.checking ?? []),
+      ...sections.needsSetup,
+      ...sections.disabled,
+    ],
     [sections],
   );
   const freeCount = useMemo(() => allItems.filter(isFreeProvider).length, [allItems]);
@@ -500,6 +511,7 @@ export default function ProviderWorkspaceShell({
     };
     return {
       ready: statusFilter.ready ? byQueryAndFacets(sections.ready) : [],
+      checking: byQueryAndFacets(sections.checking ?? []),
       needsSetup: statusFilter.needsSetup ? byQueryAndFacets(sections.needsSetup) : [],
       disabled: statusFilter.disabled ? byQueryAndFacets(sections.disabled) : [],
     };
@@ -556,6 +568,13 @@ export default function ProviderWorkspaceShell({
     { key: "disabled" as const, label: t("prov.disabledBadge"), count: sections.disabled.length },
   ];
   const railGroups = [
+    {
+      id: "checking",
+      label: authStatusCopy().heading,
+      count: filteredSections.checking?.length ?? 0,
+      ariaLabel: authStatusCopy().heading,
+      items: filteredSections.checking ?? [],
+    },
     {
       id: "ready",
       label: t("pws.status.ready"),
@@ -869,6 +888,7 @@ export default function ProviderWorkspaceShell({
           ) : (
             <ProviderOverviewDashboard
               sections={sections}
+              onRefreshLoginStatus={onRefreshLoginStatus}
               quotaReports={quotaEnabled ? quotaReports : {}}
               usageTotals={usageEnabled ? usageTotals : {}}
               usageLoading={usageEnabled && usageLoading}

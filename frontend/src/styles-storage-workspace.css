@@ -4,10 +4,6 @@
    Uses only design tokens from styles.css.
    ============================================================================ */
 
-.main-inner:has(.storage-workspace-root) {
-  max-width: 1200px;
-}
-
 .storage-workspace-root {
   display: grid;
   /*

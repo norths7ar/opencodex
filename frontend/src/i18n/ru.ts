@@ -2530,7 +2530,7 @@ export const ru: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Не удалось загрузить профили Hermes. Повторите попытку, чтобы проверить их состояние.",
   "integrations.hermes.profileTitle": "Профиль Hermes: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Подключением Codex управляет прокси-сервис. При запуске opencodex оно применяется, а при остановке сервиса восстанавливается нативная маршрутизация.",
   "integrations.codex.openService": "Открыть управление сервисом",

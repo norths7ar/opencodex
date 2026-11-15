@@ -7,3 +7,12 @@ export const PROXY_SECTION_IDS = [
   ["proxy-memory", "proxyV2.secMemory"],
   ["proxy-fallback", "proxyV2.secFallback"],
 ] as const;
+
+export const LITE_PROXY_SECTION_IDS = [
+  PROXY_SECTION_IDS[0],
+  PROXY_SECTION_IDS[1],
+  PROXY_SECTION_IDS[2],
+  PROXY_SECTION_IDS[3],
+  ["proxy-budget", "workflowBudget.title"],
+  ["simple-fallback", "proxyV2.secFallback"],
+] as const;

@@ -142,16 +142,14 @@ export const en = {
   "nativeReasoningRetention.saved": "Native reasoning settings saved.",
   "workflowBudget.title": "Workflow limits for subagents",
   "workflowBudget.description":
-    "Ceilings per task, meaning one conversation and the subagents it starts, counted over a rolling {minutes}-minute window. A request over a ceiling is refused locally with a 429 before any provider is contacted. Changes apply to the next request; usage already counted is kept.",
+    "Limits apply to a conversation and its subagents over a rolling {minutes}-minute window. Excess requests receive 429. Changes apply to the next request.",
   "workflowBudget.maxConcurrentChildren": "Parallel turns",
   "workflowBudget.maxConcurrentChildrenHint":
-    "Turns one task may run at the same time. One slot is always kept for your own conversation, so subagents get one fewer.",
+    "Concurrent turns, including one reserved for the main conversation.",
   "workflowBudget.maxPhysicalSends": "Model requests per window",
-  "workflowBudget.maxPhysicalSendsHint":
-    "Upstream requests, retries included, one task may send inside the window.",
+  "workflowBudget.maxPhysicalSendsHint": "Upstream requests within the window, including retries.",
   "workflowBudget.maxDistinctChildren": "Different subagents per window",
-  "workflowBudget.maxDistinctChildrenHint":
-    "Distinct subagent threads one task may start inside the window.",
+  "workflowBudget.maxDistinctChildrenHint": "Distinct subagent threads started within the window.",
   "workflowBudget.range": "Default {default}, allowed {min}–{max}.",
   "workflowBudget.invalid": "Enter a whole number from {min} to {max}.",
   "workflowBudget.increase": "Increase {label}",
@@ -735,7 +733,7 @@ export const en = {
     "This source selection is invalid. Choose at least one source without whitespace or a provider prefix.",
   "models.autoReviewOverride": "Auto-review override",
   "models.autoReviewOverrideHint":
-    "Chooses the model Codex uses for auto-review (the approval reviewer). Applied to every catalog row at sync; a provider-scoped autoReviewModel still takes precedence on its own rows.",
+    "Default model for Codex approval reviews. A provider-specific setting takes priority.",
   "models.autoReviewPending": "Pending",
   "dash.sidecarBackend": "Backend",
   "dash.sidecarModel": "Model",
@@ -750,7 +748,7 @@ export const en = {
   "dash.injectionManage": "Open settings",
   "dash.syncCodexSubagentDefaults": "Also save as a Codex default",
   "dash.syncCodexSubagentDefaultsHint":
-    "On, the pick above is written into Codex's own config, so new tasks start with that model too. Off, it is remembered only here. It takes effect on the next sync or restart, and your hand-written [agents] settings are left alone.",
+    "Sync this choice to Codex for new tasks. Applies on the next sync or restart.",
   "dash.multiAgentGuidance": "Tell Codex how to split work",
   "dash.multiAgentGuidanceHint":
     "Sends a short note telling Codex how to hand work to sub-agents. On v2 it names the models it may use and which to prefer; on v1 it only applies at max or ultra reasoning effort. Off, no note is added.",
@@ -760,7 +758,7 @@ export const en = {
   "dash.effortCapLabel": "V2 ultra effort limit",
   "dash.subagentEffortCapLabel": "V2 sub-agent effort limit",
   "dash.effortCapHelp":
-    "Limits the reasoning effort for V2 ultra-mode turns. When set, incoming max-effort requests (from ultra mode) are capped to the selected level. The sub-agent limit applies only to spawned child agents. Caps only lower effort, never raise it. If a model doesn't support the capped level, it snaps down to the nearest supported level.",
+    "Caps reasoning effort for V2 ultra requests. The subagent cap applies to child agents. Models use the nearest supported level at or below the cap.",
   "dash.effortCapNone": "No cap",
   "dash.maintenance": "Maintenance",
   "dash.maintenanceHint": "Refresh Codex's model catalog or install a newer opencodex release.",
@@ -957,7 +955,7 @@ export const en = {
   "models.subtitle.routing":
     "Policy profiles, dry-run evaluation, and source-backed routing analytics.",
   "models.subtitle":
-    "Toggle which models Codex sees — native GPT passthrough and routed providers, grouped by provider (click a header to collapse). Hidden models stay off the catalog + model picker but remain directly callable by exact id.",
+    "Choose which models appear in the catalog and model picker. Hidden models remain callable by their exact ID.",
   "models.delivery.title": "How changes reach Codex",
   "models.delivery.chip.saved": "Saved here",
   "models.delivery.chip.loaded": "Codex loads it on restart",
@@ -967,8 +965,7 @@ export const en = {
   "models.delivery.loaded.title": "Loaded by Codex",
   "models.delivery.loaded.body":
     "Codex reads the catalog when it starts, so a Codex window that was already open keeps its old model list. OpenCodex cannot look inside a running Codex to see which list it uses. When it can tell that Codex started before your change, a restart notice appears above the tabs.",
-  "models.delivery.hint":
-    "If a model you turned on does not show up in Codex, press Reload Codex models at the top right of this page, then reopen Codex.",
+  "models.delivery.hint": "After updating the model list, reload Codex models and reopen Codex.",
   "models.nativeGroupLabel": "OpenAI native",
   "models.nativeHint":
     "Passthrough models use the Pool or Direct account option selected on Providers. Toggling one off hides it from the Codex picker (the catalog entry is kept, so re-enabling restores it exactly). Adding a model here registers a routed `openai/<model>` selector, not a new bare passthrough id.",
@@ -992,7 +989,7 @@ export const en = {
   "models.capApplied": "Context cap applied — takes effect on the next Codex turn.",
   "models.capSaveFailed": "Failed to save context cap",
   "models.contextCapped": "350k cap",
-  "models.contextCapLabel": "Default window / cap",
+  "models.contextCapLabel": "Default context window",
   "models.v2Label": "Sub-agent",
   "models.shadowCallOriginal": "{models} →",
   "models.v2DocsLink": "What is v1 / v2?",
@@ -1004,9 +1001,9 @@ export const en = {
   "models.v2ModeDesc_v2": "All models → v2 surface",
   "models.keepNativeOnV1": "Keep ChatGPT on v1",
   "models.keepNativeOnV1Hint":
-    "ChatGPT encrypts v2 child tasks only when a ChatGPT-native parent stays on v2, so Grok and Claude cannot read them. Turn this on to keep Sol/Terra on v1 and avoid that encryption. Routed parents keep v2.",
+    "Use v1 for ChatGPT parents to allow delegation to routed models. Routed parents keep v2.",
   "models.v2Help":
-    "Controls the multi-agent surface for all models.\n\nv1: Classic single-thread agent. Every model uses the v1 collab surface.\nbase: Upstream defaults — sol/terra use v2, luna uses v1, others follow the codex feature flag.\nv2: Multi-thread agent with spawn_agent. Every model uses the v2 collab surface.\n\nOn v2, Keep ChatGPT on v1 leaves Sol/Terra on the v1 surface so they can still spawn Grok or Claude. ChatGPT encrypts v2 child tasks; routed models cannot read them. Routed parents stay on v2.\n\nChanges apply to new sessions.",
+    "v1 uses the classic agent tools. Base follows each model’s default. v2 enables multi-thread delegation with spawn_agent. Changes apply to new sessions. Keep ChatGPT on v1 when it needs to delegate to routed models.",
   "dash.multiAgent": "Sub-agent",
   "dash.codexDesktopAuthless": "Open Codex without signing in",
   "dash.codexDesktopAuthlessHint":
@@ -1032,7 +1029,7 @@ export const en = {
   "models.contextModel": "Model",
   "models.contextModelOverride": "Model override",
   "models.contextHint":
-    "Write the actual Codex window here when you already know it. This fills a missing upstream window and only lowers a larger reported one. Leave blank to use the provider Default window / cap, or 128k if that cap is off.",
+    "Write the actual Codex window here when you already know it. This fills a missing upstream window and only lowers a larger reported one. Leave blank to use the provider Default context window, or 128k if that cap is off.",
   "models.contextAutomatic": "Automatic discovery",
   "models.contextSaved": "Context windows updated — takes effect on the next Codex turn.",
   "models.contextUnchanged": "No context window changes to save.",
@@ -1041,11 +1038,11 @@ export const en = {
   "models.contextCappedValue": "{value} cap",
   "models.setAll": "Set all",
   "models.setAllHint":
-    "Turn on the {value} default window for every routed provider. Relays that omit context_window / context_length get this as the actual Codex window. Use Custom windows on a provider row to set one model by hand. Native providers are unaffected.",
+    "Set the default context window to {value} for routed providers. Individual models can override it.",
   "models.collapseAll": "Collapse all",
   "models.expandAll": "Expand all",
   "models.orderHint":
-    "Default order follows featured selections and catalog priority, with provider/model ordering for tied routed rows. A saved picker order can override display order; visibility switches filter which rows appear. A client can keep an older catalog until it fetches again.",
+    "Models follow featured selections and catalog priority. You can customize their order in Model settings.",
   "models.settingsPanel.title": "Model settings",
   "models.settingsPanel.off": "off",
   "models.settingsPanel.attention": "Needs attention",
@@ -1194,15 +1191,14 @@ export const en = {
   "sub.advanced": "Advanced",
   "sub.orderHintAria": "How this order is used",
   "sub.orderHint":
-    "The order shown here sets positions 1–5 at the top of the Codex model picker and the default model candidates for {cmd}. When fewer than 5 featured models are visible in the picker, remaining slots are advertised by catalog priority; 5 visible featured models fill the list unless a custom model picker order changes catalog priority.",
+    "Sets the first five choices in the Codex model picker and the preferred models for {cmd}. Unfilled slots follow catalog priority.",
   "sub.noneSelected": "None selected — pick from the list below.",
   "sub.models": "Models",
   "sub.search": "Search models (native gpt + routed)…",
   "sub.settings": "Settings",
   "sub.sections": "Subagent sections",
   "sub.delegation.model": "Model to call first",
-  "sub.delegation.modelHint":
-    "The model Codex reaches for first when it hands off work. Featured above is the list it may call; this is the one it calls first.",
+  "sub.delegation.modelHint": "The model Codex tries first when delegating a task.",
   "sub.suggest.button": "Suggest",
   "sub.suggest.label": "Delegated work",
   "sub.suggest.placeholder":
@@ -1579,7 +1575,7 @@ export const en = {
 
   // usage page
   "usage.title": "Usage",
-  "usage.subtitle": "Local token accounting from your proxy. Missing usage is never shown as zero.",
+  "usage.subtitle": "Gateway request and token usage.",
   "usage.loading": "Loading usage data…",
   "usage.empty": "No usage recorded yet. Send a request through the proxy to see activity here.",
   "usage.loadError": "Could not load usage data.",
@@ -1611,8 +1607,7 @@ export const en = {
   "usage.coverage.measured": "Measured",
   "usage.coverage.reported": "Provider reported",
   "usage.coverage.estimated": "Estimated",
-  "usage.coverage.note":
-    "Measured entries include provider-reported and estimated token counts. Unreported and unsupported requests are tracked but never inflated to zero tokens.",
+  "usage.coverage.note": "Measured requests include reported and estimated usage.",
   "usage.search.models": "Search models…",
   "usage.col.requests": "Requests",
   "usage.col.measured": "Measured",
@@ -1812,7 +1807,7 @@ export const en = {
   "modal.logInWith": "Log in with {label}",
   "modal.waitingBrowser": "Waiting for browser…",
   "modal.providerName": "Provider name",
-  "modal.adapter": "Adapter",
+  "modal.adapter": "Upstream protocol",
   "modal.baseUrl": "Base URL",
   "modal.endpoint": "Endpoint",
   "modal.endpoint.tokenPlan": "Token plan",
@@ -2535,7 +2530,7 @@ export const en = {
   "integrations.hermes.select": "Manage {name}",
   "integrations.hermes.loadError": "Could not load Hermes profiles. Retry to check their state.",
   "integrations.hermes.profileTitle": "Hermes profile: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Codex wiring is owned by the proxy service. Starting opencodex applies it; stopping the service restores native routing.",
   "integrations.codex.openService": "Open service controls",
@@ -2842,7 +2837,7 @@ export const en = {
   "integrations.semantics.kimi": "Restart or run /reload to apply it (v2 watches the file).",
   "integrations.semantics.gajae": "Applies to a new session or when opening /model.",
   "integrations.semantics.dsh":
-    "OpenCodex manages only the opencodex provider of the llm-pi-ai row in $DSH_HOME/profiles/desktop/cordis.patch.yml, the Desktop profile DSH 0.1.7+ reads ($DSH_HOME/settings.yaml until that profile exists). DSH hot reloads this provider; your default model and deepseek-official stay unchanged. Currently loopback-only; no real credential is written.",
+    "DSH loads the updated model catalog automatically. Select the OpenCodex provider in DSH to use it.",
   "integrations.semantics.mcode":
     "Manages only custom_provider.opencodex. Your default model and MiniMax login stay unchanged.",
   "integrations.semantics.zcode":

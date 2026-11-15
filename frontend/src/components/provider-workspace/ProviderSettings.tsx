@@ -11,7 +11,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { baseUrlForChoice, matchChoiceId, resolvedBaseUrlForChoice } from "../../base-url-choice";
 import { readJsonIfOk } from "../../fetch-json";
-import { useRuntimeCapabilities, useMigrationLabel } from "../../runtime-capabilities";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
 import { createBoundedFetch } from "../../bounded-fetch";
 import { startVisibilityPoll } from "../../visibility-poll";
 import { useT, useI18n } from "../../i18n/shared";
@@ -25,6 +25,7 @@ import { providerSupportsLiveModelDiscovery } from "../../provider-workspace/cat
 import type { CatalogPreset } from "../provider-catalog/provider-presets";
 import { authModeLabel } from "./ProviderRail";
 import { ProviderProtocolPanel } from "./ProviderProtocolPanel";
+import { PlannedFeature } from "../planned-feature";
 import { ProviderKeyPacing, type KeyPacingDraft, type KeyPacingStatus } from "./ProviderKeyPacing";
 import type { WorkspaceItem, ProviderUpdatePatch, ProviderUpdateResult } from "./types";
 
@@ -37,6 +38,14 @@ const ADAPTERS = [
   "cursor",
 ] as const;
 const EMPTY_MODELS: string[] = [];
+const PROTOCOL_LABELS: Record<string, string> = {
+  "openai-chat": "Chat Completions",
+  "openai-responses": "Responses",
+  anthropic: "Anthropic Messages",
+  google: "Google Gemini",
+  "azure-openai": "Azure OpenAI",
+  cursor: "Cursor",
+};
 
 type ChoicesStatus = "idle" | "loading" | "ready" | "error";
 type PacingRule = {
@@ -118,7 +127,6 @@ export default function ProviderSettings({
   const { locale } = useI18n();
   const lite = liteTranslator(locale);
   const capabilities = useRuntimeCapabilities();
-  const migrationLabel = useMigrationLabel();
   const initialAuth = String(item.authMode ?? (item.keyOptional ? "local" : "key"));
   const liveModelDiscoverySupported = capabilities
     ? true
@@ -337,6 +345,7 @@ export default function ProviderSettings({
   }, [adapter, capabilities]);
 
   const isPreset = isCatalogProviderId(item.name);
+  const isSubscription = initialAuth === "oauth";
   const hasEndpointPicker =
     choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
   const supportsApiKeyTransport = adapter.trim() === "anthropic" && authMode === "key";
@@ -512,15 +521,15 @@ export default function ProviderSettings({
       </label>
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("modal.adapter")}</span>
-        {isPreset ? (
-          <input className="input" value={adapter} readOnly disabled />
+        {isSubscription ? (
+          <span className="py-2 text-[14px] text-fg">{PROTOCOL_LABELS[adapter] ?? adapter}</span>
         ) : (
           <Select
             fullWidth
             label={t("modal.adapter")}
             value={adapter}
             onChange={setAdapter}
-            options={adapterOptions.map((a) => ({ value: a, label: a }))}
+            options={adapterOptions.map((a) => ({ value: a, label: PROTOCOL_LABELS[a] ?? a }))}
           />
         )}
       </label>
@@ -564,13 +573,17 @@ export default function ProviderSettings({
       ) : (
         <label className="pwi-settings-field">
           <span className="pwi-settings-label">{t("modal.baseUrl")}</span>
-          <input
-            className="input"
-            value={baseUrl}
-            onChange={(e) => setBaseUrl(e.target.value)}
-            readOnly={plainBaseUrlLocked}
-            disabled={plainBaseUrlLocked}
-          />
+          {isSubscription ? (
+            <span className="break-all py-2 text-[14px] text-fg">{baseUrl}</span>
+          ) : (
+            <input
+              className="input"
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+              readOnly={plainBaseUrlLocked}
+              disabled={plainBaseUrlLocked}
+            />
+          )}
         </label>
       )}
       {adapter.trim() === "cursor" && (
@@ -626,7 +639,7 @@ export default function ProviderSettings({
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("pws.authMode")}</span>
         {isPreset ? (
-          <input className="input" value={authModeLabel(item, t)} readOnly disabled />
+          <span className="py-2 text-[14px] text-fg">{authModeLabel(item, t)}</span>
         ) : (
           <Select
             fullWidth
@@ -708,9 +721,15 @@ export default function ProviderSettings({
         </span>
       </label>
       {capabilities ? (
-        <p className="pwi-settings-hint">
-          {t("pws.pacingTitle")} · {migrationLabel}
-        </p>
+        <PlannedFeature
+          compact
+          title={t("pws.pacingTitle")}
+          description={
+            locale === "zh" || locale === "zh-TW"
+              ? "设置请求频率与并发上限。"
+              : "Set request frequency and concurrency limits."
+          }
+        />
       ) : (
         <section className="pwi-pacing-card" aria-labelledby="pwi-pacing-title">
           <div className="pwi-pacing-head">

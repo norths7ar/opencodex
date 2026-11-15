@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useT } from "../../i18n/shared";
 import { useRuntimeCapabilities } from "../../runtime-capabilities";
+import { navigateHash } from "../../hash-routing";
 import type { WorkspaceItem } from "../../provider-workspace/catalog";
 import { formatProviderDisplayName } from "../../provider-icons";
 import { isAccountProvider, isFreeProvider } from "../../provider-workspace/catalog";
@@ -51,7 +52,6 @@ export default function ProviderDetails({
   modelRows,
   modelRevision,
   modelRowsReady,
-  onOpenModels,
   onOpenConnect,
   modelsLoading,
   modelsLoadFailed,
@@ -93,7 +93,6 @@ export default function ProviderDetails({
   modelRows: ModelRow[] | null;
   modelRevision: string;
   modelRowsReady: boolean;
-  onOpenModels: () => void;
   onOpenConnect?: () => void;
   modelsLoading?: boolean;
   modelsLoadFailed?: boolean;
@@ -101,7 +100,7 @@ export default function ProviderDetails({
   oauthEmail?: string;
   onDeselect: () => void;
   apiBase: string;
-  oauth?: { loggedIn: boolean; email?: string; error?: string; needsReauth?: boolean };
+  oauth?: { loggedIn?: boolean; email?: string; error?: string; needsReauth?: boolean };
   accounts?: OAuthAccountRow[];
   accountLoadState?: AccountLoadState;
   /** When this token increases for accountsFocusProvider, switch to the Accounts tab. */
@@ -129,6 +128,8 @@ export default function ProviderDetails({
   onRefreshQuota?: () => Promise<boolean>;
 }) {
   const t = useT();
+  // eslint-disable-next-line local-i18n/no-hardcoded-ui-strings -- Hash route, not visible copy.
+  const openProviderModels = () => navigateHash(`models?provider=${encodeURIComponent(item.name)}`);
   const capabilities = useRuntimeCapabilities();
   const usageEnabled = capabilities === null || capabilities.usage === true;
   const [tab, setTab] = useState<Tab>("overview");
@@ -417,7 +418,7 @@ export default function ProviderDetails({
             onRetryModels={onRetryModels}
             onOpenAccounts={authSurface ? () => switchTab("accounts") : undefined}
             onOpenModelsTab={() => switchTab("models")}
-            onOpenModels={onOpenModels}
+            onOpenModels={openProviderModels}
             onOpenConnect={onOpenConnect}
             usageTotals={usageTotals}
             quotaReport={quotaReport}
@@ -463,7 +464,7 @@ export default function ProviderDetails({
             modelRows={modelRows}
             modelRevision={modelRevision}
             modelRowsReady={modelRowsReady}
-            onOpenModels={onOpenModels}
+            onOpenModels={openProviderModels}
             modelsLoading={modelsLoading}
             modelsLoadFailed={modelsLoadFailed}
             needsReauth={

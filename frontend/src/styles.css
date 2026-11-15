@@ -747,12 +747,6 @@ input[type="radio"] {
 .main {
   min-width: 0;
 }
-.main-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 28px 40px 64px;
-  container-type: inline-size;
-}
 .main-inner.main-inner--combos {
   max-width: none;
   margin: 0;
@@ -2455,9 +2449,7 @@ textarea.input {
   width: 100%;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
-  background: linear-gradient(90deg, var(--raised) 0%, var(--surface) 50%, var(--raised) 100%);
-  background-size: 200% 100%;
-  animation: codex-auth-skeleton-shimmer 1.2s ease-in-out infinite;
+  background: var(--raised);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2672,9 +2664,7 @@ dialog.modal-overlay::backdrop {
   height: 0.9em;
   border-radius: 4px;
   vertical-align: middle;
-  background: linear-gradient(90deg, var(--raised) 0%, var(--surface) 50%, var(--raised) 100%);
-  background-size: 200% 100%;
-  animation: codex-auth-skeleton-shimmer 1.2s ease-in-out infinite;
+  background: var(--raised);
 }
 .codex-auth-load-skeleton__line--sub {
   width: 12rem;
@@ -2737,9 +2727,7 @@ dialog.modal-overlay::backdrop {
   display: block;
   height: 8px;
   border-radius: var(--radius-2xs);
-  background: linear-gradient(90deg, var(--raised) 0%, var(--surface) 50%, var(--raised) 100%);
-  background-size: 200% 100%;
-  animation: codex-auth-skeleton-shimmer 1.2s ease-in-out infinite;
+  background: var(--raised);
 }
 .quota-skel--label {
   width: 28px;
@@ -3415,9 +3403,7 @@ dialog.modal-overlay::backdrop {
   min-height: 96px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius);
-  background: linear-gradient(90deg, var(--raised) 0%, var(--surface) 50%, var(--raised) 100%);
-  background-size: 200% 100%;
-  animation: codex-auth-skeleton-shimmer 1.2s ease-in-out infinite;
+  background: var(--raised);
 }
 .notice-warn {
   font-size: var(--text-label);

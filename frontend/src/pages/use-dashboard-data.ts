@@ -191,7 +191,6 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     () => cachedStartup?.status ?? null,
   );
   const [providers, setProviders] = useState<ProviderInfo[]>(() => cachedOverview?.providers ?? []);
-  const [models, setModels] = useState<ModelInfo[]>([]);
   const [settingsState, dispatchSettings] = useReducer(dashboardSettingsReducer, {
     settings: cachedControls?.settings ?? null,
     beforeSave: null,
@@ -207,7 +206,6 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
   const [sidecarCodexApply, setSidecarCodexApply] = useState<SidecarCodexApply | undefined>();
   const [shadowCallSaving, setShadowCallSaving] = useState(false);
   const [shadowCallError, setShadowCallError] = useState<string | null>(null);
-  const [modelsLoading, setModelsLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [maMode, setMaMode] = useState<MaMode>(() => cachedMaMode ?? "default");
   const [maBusy, setMaBusy] = useState(false);
@@ -304,7 +302,7 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
    * what made the chip look stuck until an unrelated action (refresh quota, tab hop) remounted it.
    * Re-ask in ~2s while the server says it is still working.
    */
-  const startupHealthStale = probeNeedsFastRetry(startupHealthPoll.data);
+  const startupHealthStale = !liteRuntime && probeNeedsFastRetry(startupHealthPoll.data);
   const refreshStartupHealth = startupHealthPoll.refresh;
   useEffect(() => {
     if (!startupHealthStale) return;
@@ -321,8 +319,7 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     (signal) => fetchDashboardOverview(apiBase, signal),
     { pollMs: 5000 },
   );
-  const overviewSurface = classifyDataSurface(overviewPoll, (data) => data.health === null, true);
-  const overviewReady = health !== null || overviewPoll.data !== undefined;
+  const overviewReady = health !== null || overviewPoll.data?.health != null;
 
   // Preferences that are just config — never gate on overview or injection.
   const maModePoll = useKeyedClientResource(
@@ -384,6 +381,12 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     (signal) => fetchDashboardModels(apiBase, signal),
     { enabled: overviewReady && !error },
   );
+  const modelsSurface = classifyDataSurface(modelsPoll, (data) => data.length === 0, true);
+  const models = useMemo(() => modelsPoll.data ?? [], [modelsPoll.data]);
+  const overviewFailure =
+    overviewPoll.data?.failure ?? (overviewPoll.error !== undefined ? "unavailable" : undefined);
+  const accessFailure = overviewFailure === "auth" || overviewFailure === "denied";
+  const overviewBlocked = accessFailure || (!health && !!overviewFailure);
 
   /* eslint-disable react-hooks/set-state-in-effect -- mirror client-resource snapshots into mutable dashboard UI state that handlers also update */
   useEffect(() => {
@@ -508,10 +511,6 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     if (diagnosticsPoll.data) setProjectConfigWarnings(diagnosticsPoll.data);
   }, [diagnosticsPoll.data]);
 
-  useEffect(() => {
-    if (modelsPoll.data) setModels(modelsPoll.data);
-    setModelsLoading(modelsPoll.loading);
-  }, [modelsPoll.data, modelsPoll.loading]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(
@@ -865,12 +864,21 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     sidecar,
     shadowCall,
     usage30d,
-    usageLoading: usagePoll.loading && !usage30d,
-    healthLoading: overviewPoll.loading && !health,
+    usageLoading: classifyDataSurface(usagePoll, () => false, true).showSkeleton && !usage30d,
+    healthLoading: !health && !overviewBlocked,
+    overviewBlocked,
+    overviewRefreshing: overviewPoll.refreshing,
+    modelsSurface,
+    refreshModels: modelsPoll.refresh,
+    settingsLoading: classifyDataSurface(settingsPoll, () => false, true).showSkeleton,
+    sidecarLoading: classifyDataSurface(sidecarPoll, () => false, true).showSkeleton,
+    multiAgentLoading: classifyDataSurface(multiAgentPoll, () => false, true).showSkeleton,
+    injectionReady: !!multiAgentPoll.data?.injection,
+    effortCapsReady: !!multiAgentPoll.data?.effortCaps,
+    maModeLoading: classifyDataSurface(maModePoll, () => false, true).showSkeleton,
     sidecarSaving,
     shadowCallSaving,
     shadowCallError,
-    modelsLoading,
     settingsSaving,
     syncing,
     maMode,
@@ -906,9 +914,8 @@ export function useDashboardData(apiBase: string, refreshEpoch = 0) {
     syncResult,
     syncError,
     projectConfigWarnings,
-    error: error || overviewSurface.showError,
-    connectionFailure:
-      overviewPoll.data?.failure ?? (overviewSurface.showError ? "unavailable" : undefined),
+    error: error || !!overviewFailure,
+    connectionFailure: overviewFailure,
     refreshDashboard: overviewPoll.refresh,
     effortCapHelpTriggerRef,
     maHelpTriggerRef,

@@ -18,6 +18,7 @@ interface Props {
   /** Committed Claude Code pin: null = off, undefined = still loading. */
   pin: string | null | undefined;
   showPin?: boolean;
+  title?: string;
   onJump: (target: "featured" | "delegation" | "pin") => void;
 }
 
@@ -28,13 +29,16 @@ export function InEffectSummary({
   firstEffort,
   pin,
   showPin = true,
+  title,
   onJump,
 }: Props) {
   const t = useT();
   const top = chosen[0];
   return (
-    <section aria-label={t("subagentsV2.nowTitle")} className="flex flex-col gap-2">
-      <h3 className="m-0 text-[12px] font-medium text-fg-subtle">{t("subagentsV2.nowTitle")}</h3>
+    <section aria-label={title ?? t("subagentsV2.nowTitle")} className="flex flex-col gap-2">
+      <h3 className="m-0 text-[12px] font-medium text-fg-subtle">
+        {title ?? t("subagentsV2.nowTitle")}
+      </h3>
       <div className={cn("grid gap-3", showPin ? "md:grid-cols-3" : "md:grid-cols-2")}>
         <Tile
           label={t("subagentsV2.nowOrder")}

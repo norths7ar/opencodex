@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Locale, TFn } from "../../i18n/shared";
 import { formatTokens } from "../../format-tokens";
 import { formatEstimatedUsdValue as formatUsdEstimate } from "../../intl-formatters";
-import { IconInfo } from "../../icons";
+import { HelpPopover } from "../help-popover";
 import {
   formatPct,
   hasThroughput,
@@ -48,18 +48,8 @@ function Sparkline({ values }: { values: number[] }) {
   );
 }
 
-/** A hint people can reach by keyboard as well as by pointer: the button carries the sentence. */
-export function UsageHint({ text }: { text: string }) {
-  return (
-    <button
-      type="button"
-      aria-label={text}
-      title={text}
-      className="ui-v2 inline-grid size-5 shrink-0 cursor-help place-items-center rounded-full text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg-muted focus-visible:outline-2 focus-visible:outline-highlight [&_svg]:size-3.5"
-    >
-      <IconInfo aria-hidden="true" />
-    </button>
-  );
+function UsageHint({ text, label }: { text: string; label: string }) {
+  return <HelpPopover label={label}>{text}</HelpPopover>;
 }
 
 function Stat({
@@ -84,7 +74,7 @@ function Stat({
       <div className="flex min-w-0 items-center gap-1.5">
         <span className="truncate text-[13px] font-medium text-fg-muted">{label}</span>
         {term && <span className="truncate font-mono text-[11px] text-fg-subtle">{term}</span>}
-        {hint && <UsageHint text={hint} />}
+        {hint && <UsageHint text={hint} label={label} />}
       </div>
       <div className="mt-auto flex min-w-0 items-end justify-between gap-3">
         <span className="stat-value truncate text-stat font-semibold tracking-[-0.025em] text-fg tabular-nums">
@@ -175,7 +165,7 @@ export function UsageSummaryCards({
           <Stat
             label={t("usageV2.costLabel")}
             term={t("usage.col.apiListPrice")}
-            hint={`${t("usage.cost.total")}. ${t("usage.cost.disclaimer")}`}
+            hint={t("usage.cost.total")}
             value={
               hasCost
                 ? formatUsdEstimate(summary.estimatedCostUsd ?? 0, locale)
@@ -202,15 +192,10 @@ export function UsageSummaryCards({
       </div>
       <dl className="m-0 flex flex-wrap items-baseline gap-x-5 gap-y-1 px-1 text-[13px]">
         {facts.map((fact) => (
-          <div
-            key={fact.label}
-            className="usage-fact flex items-baseline gap-1.5"
-            title={fact.title}
-          >
-            <dt className="text-fg-subtle">
+          <div key={fact.label} className="usage-fact flex items-baseline gap-1.5">
+            <dt className="inline-flex items-center gap-1 text-fg-subtle">
               {fact.label}
-              {/* A `title` reaches a pointer and nothing else, so the sentence is also read. */}
-              {fact.title && <span className="sr-only"> ({fact.title})</span>}
+              {fact.title && <HelpPopover label={fact.label}>{fact.title}</HelpPopover>}
             </dt>
             <dd className="usage-fact-value m-0 font-medium text-fg-muted tabular-nums">
               {fact.value}

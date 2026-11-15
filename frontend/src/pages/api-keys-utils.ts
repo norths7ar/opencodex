@@ -205,16 +205,17 @@ export interface ModelTestResult {
 /** Per model, per protocol: a result belongs to the chip that produced it. */
 export type ModelTests = Record<string, Partial<Record<GatewayInboundProtocol, ModelTestResult>>>;
 
-export const DEFAULT_ENDPOINTS: ApiEndpointInfo = {
-  baseUrl: "http://127.0.0.1:10100/v1",
-  responses: "http://127.0.0.1:10100/v1/responses",
-  chatCompletions: "http://127.0.0.1:10100/v1/chat/completions",
-  messages: "http://127.0.0.1:10100/v1/messages",
-  models: "http://127.0.0.1:10100/v1/models",
+export const EMPTY_ENDPOINTS: ApiEndpointInfo = {
+  baseUrl: "",
+  responses: "",
+  chatCompletions: "",
+  messages: "",
+  models: "",
 };
 
 export function deriveApiEndpoints(endpoint: string): ApiEndpointInfo {
-  const responses = endpoint || DEFAULT_ENDPOINTS.responses;
+  if (!endpoint) return EMPTY_ENDPOINTS;
+  const responses = endpoint;
   const match = responses.match(/^(.*)\/v1\/responses\/?$/);
   const baseUrl = match ? `${match[1]}/v1` : responses.replace(/\/responses\/?$/, "");
   return {

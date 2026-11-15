@@ -38,6 +38,7 @@ export interface WorkspaceProvider {
   hasApiKey?: boolean;
   /** Live gateway login state, when provided by the host. */
   oauthLoggedIn?: boolean;
+  oauthStatusCheck?: "loading" | "ready" | "failed";
   hasHeaders?: boolean;
   defaultModel?: string;
   apiKeyTransport?: "x-api-key" | "bearer";
@@ -95,6 +96,7 @@ export interface WorkspaceItem extends WorkspaceProvider {
 export interface WorkspaceSections {
   /** Providers that are enabled and have all credentials needed to route requests. */
   ready: WorkspaceItem[];
+  checking?: WorkspaceItem[];
   /** Enabled providers that are missing required credentials (e.g. an API key). */
   needsSetup: WorkspaceItem[];
   /** Providers explicitly disabled by the user. */
@@ -270,6 +272,7 @@ export function buildProviderWorkspace(
   providers: Record<string, WorkspaceProvider>,
 ): WorkspaceSections {
   const ready: WorkspaceItem[] = [];
+  const checking: WorkspaceItem[] = [];
   const needsSetup: WorkspaceItem[] = [];
   const disabled: WorkspaceItem[] = [];
 
@@ -278,14 +281,16 @@ export function buildProviderWorkspace(
       disabled.push({ name, ...p });
       continue;
     }
-    if (isConfigurationReady(p)) {
+    if (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined) {
+      checking.push({ name, ...p });
+    } else if (isConfigurationReady(p)) {
       ready.push({ name, ...p, tier: providerTier(name, p) });
     } else {
       needsSetup.push({ name, ...p });
     }
   }
 
-  return { ready, needsSetup, disabled };
+  return { ready, needsSetup, disabled, ...(checking.length ? { checking } : {}) };
 }
 
 /**
@@ -309,6 +314,7 @@ export function applyActiveAccountReauth(
     items.map((item) => (demote.has(item.name) ? { ...item, activeNeedsReauth: true } : item));
 
   return {
+    ...sections,
     ready: tag(sections.ready),
     needsSetup: tag(sections.needsSetup),
     disabled: sections.disabled,
@@ -316,7 +322,7 @@ export function applyActiveAccountReauth(
 }
 
 /** Canonical status string for a single provider — config plus optional live-auth overlay. */
-export type ProviderStatus = "ready" | "needs-setup" | "disabled";
+export type ProviderStatus = "ready" | "needs-setup" | "disabled" | "checking";
 
 /**
  * Returns the canonical status for a single WorkspaceProvider (or WorkspaceItem).
@@ -325,6 +331,8 @@ export type ProviderStatus = "ready" | "needs-setup" | "disabled";
  */
 export function binProviderStatus(p: WorkspaceProvider | WorkspaceItem): ProviderStatus {
   if (p.disabled) return "disabled";
+  if (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined)
+    return "checking";
   if ("activeNeedsReauth" in p && p.activeNeedsReauth) return "needs-setup";
   if (isConfigurationReady(p)) return "ready";
   return "needs-setup";

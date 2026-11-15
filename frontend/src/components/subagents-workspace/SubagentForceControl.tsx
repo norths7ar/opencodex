@@ -181,7 +181,7 @@ export default function SubagentForceControl({
           }}
         />
       }
-      below={help.panel(
+      helpOverlay={help.panel(
         <>
           <p>{t("sub.forceHelp")}</p>
           <p>{t("sub.forceScope")}</p>

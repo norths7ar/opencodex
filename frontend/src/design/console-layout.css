@@ -1,0 +1,81 @@
+/* The shell owns page geometry; pages own only the layout inside their content area. */
+:root {
+  --console-page-width: 1280px;
+  --console-page-gutter: 32px;
+  --console-page-gap: 20px;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+.main-inner {
+  container-type: inline-size;
+  width: 100%;
+  max-width: var(--console-page-width);
+  margin-inline: auto;
+  padding: 28px var(--console-page-gutter) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--console-page-gap);
+}
+
+.console-header-slot {
+  min-height: 36px;
+}
+.console-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+.console-page-heading {
+  min-width: 0;
+  flex: 1 1 280px;
+}
+.console-page-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-title);
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.console-page-heading p {
+  margin: 4px 0 0;
+  max-width: 72ch;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ocx-fg-muted);
+}
+.console-page-actions {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.main-inner > .section-switcher {
+  margin: 0;
+  align-self: flex-start;
+}
+.console-page-body {
+  min-width: 0;
+}
+.console-nav-search {
+  justify-content: flex-end;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --console-page-gutter: 20px;
+  }
+  .main-inner {
+    padding-top: 20px;
+  }
+}

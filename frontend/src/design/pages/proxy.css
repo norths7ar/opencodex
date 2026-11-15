@@ -2,6 +2,16 @@
    layer, after bridge.css: above every v1 sheet, below Tailwind utilities. Prefer
    Tailwind classes in the components; keep this file for what utilities cannot say. */
 
+.pv2-overview-grid > div > [id],
+.pv2-section {
+  /* The shared budget frame also carries a standalone-page scroll-margin utility. */
+  scroll-margin-top: calc(var(--ocx-sticky-top-h, 0) * 1px + 24px) !important;
+}
+
+.pv2-index {
+  top: calc(var(--ocx-sticky-top-h, 0) * 1px + 24px);
+}
+
 /* ---- settings sections: v1 panels that sit in a section body become plain rows ----------
    CompactionRoutingPanel, the reasoning and memory panels and FallbackPanel own their data
    and still render a `.panel`. Inside a section's inset body the frame already exists, so

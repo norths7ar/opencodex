@@ -2413,7 +2413,7 @@ export const ja: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Hermesのプロファイルを読み込めませんでした。再試行して状態を確認してください。",
   "integrations.hermes.profileTitle": "Hermesプロファイル: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "Codex の接続はプロキシサービスが管理します。opencodex を起動すると適用され、サービスを停止するとネイティブのルーティングに戻ります。",
   "integrations.codex.openService": "サービス制御を開く",

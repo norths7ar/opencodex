@@ -1,3 +1,4 @@
+import { authStatusCopy } from "../../provider-workspace/auth-status";
 import {
   anthropicInstanceRowShapeMatches,
   isAnthropicInstanceId,
@@ -16,13 +17,12 @@ import { formatRequestCount, formatTokenCount } from "../../provider-workspace/u
 import { modelVisible } from "../../model-visibility";
 import { discoveryFailureLabel, type ModelRow } from "../../pages/models-shared";
 import { ModelDiscoveryStatus } from "../model-discovery-status";
-import { liteTranslator } from "../../i18n/lite-copy";
 import type { ProviderQuotaReportView } from "../../provider-workspace/report";
 import type { AccountQuotaReading, ProviderUsageTotals } from "./types";
 import { authModeLabel } from "./ProviderRail";
 import type { ProviderUpdatePatch, ProviderUpdateResult } from "./types";
 import ProviderCurrentQuota from "./ProviderCurrentQuota";
-import ProviderCompletionTest, { type CompletionProbeStatus } from "./ProviderCompletionTest";
+import ProviderCompletionTest from "./ProviderCompletionTest";
 import { useProviderProbeState, type ProviderProbeController } from "./use-provider-probe-state";
 
 type ConnectionTestResult = {
@@ -61,7 +61,6 @@ export default function ProviderOverview({
   onOpenAccounts,
   onOpenModelsTab,
   onOpenModels,
-  onOpenConnect,
   onEditSettings,
   onViewUsage,
   onUpdateProvider,
@@ -113,15 +112,19 @@ export default function ProviderOverview({
       ? "disabled"
       : needsAttention || needsOAuthLogin || status === "needs-setup"
         ? "needs-setup"
-        : "ready";
+        : status;
   const statusText =
-    effectiveStatus === "ready"
-      ? t("pws.status.ready")
-      : effectiveStatus === "needs-setup"
-        ? needsAttention
-          ? t("pws.status.needsAttention")
-          : t("pws.status.needsSetup")
-        : t("prov.disabledBadge");
+    effectiveStatus === "checking"
+      ? item.oauthStatusCheck === "failed"
+        ? authStatusCopy().failed
+        : authStatusCopy().loading
+      : effectiveStatus === "ready"
+        ? t("pws.status.ready")
+        : effectiveStatus === "needs-setup"
+          ? needsAttention
+            ? t("pws.status.needsAttention")
+            : t("pws.status.needsSetup")
+          : t("prov.disabledBadge");
   const requests = usageTotals?.requests;
   const tokens = usageTotals?.totalTokens;
   const fallbackProbeController = useProviderProbeState(
@@ -136,7 +139,6 @@ export default function ProviderOverview({
     completionModels,
     selectedModel: probeSelectedModel,
     completionProbe,
-    reverifyModel,
   } = activeProbe;
   const [connectionTest, setConnectionTest] = useState<ConnectionTestState | null>(null);
   const connectionAbortRef = useRef<{ key: string; controller: AbortController } | null>(null);
@@ -294,20 +296,6 @@ export default function ProviderOverview({
                       count: configuredModels.length || availableModels.length,
                     })
                   : t("pws.firstResponse.modelsEmpty");
-  const probeStepState: CompletionProbeStatus = completionProbe?.status ?? "untested";
-  const reverifyPending = probeStepState === "untested" && reverifyModel !== null;
-  const probeStepText =
-    probeStepState === "testing"
-      ? t("pws.testing")
-      : probeStepState === "ok"
-        ? t("pws.firstResponse.probeOk", { model: completionProbe?.model ?? "" })
-        : probeStepState === "failed"
-          ? t("pws.firstResponse.probeFailed", { model: completionProbe?.model ?? "" })
-          : probeStepState === "not-applicable"
-            ? t("pws.completion.notApplicable")
-            : reverifyPending
-              ? t("pws.firstResponse.probeReverify", { model: reverifyModel })
-              : t("pws.firstResponse.probeUntested");
   const displayEmail =
     isAnthropicInstanceId(item.name) && anthropicInstanceRowShapeMatches(item.name, item)
       ? undefined
@@ -327,16 +315,31 @@ export default function ProviderOverview({
       <div className="pws-overview-layout">
         <div className="pws-overview-main">
           <section className="pws-section" aria-label={t("pws.connection")}>
-            <h3 className="pws-section-title">{t("pws.connection")}</h3>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="pws-section-title">{t("pws.connection")}</h3>
+              {onEditSettings && (
+                <button type="button" className="link-btn" onClick={onEditSettings}>
+                  {t("pws.editSettings")}
+                </button>
+              )}
+            </div>
             <dl className="pws-kv">
               <div className="pws-kv-row">
                 <dt>{t("dash.status")}</dt>
-                <dd className={effectiveStatus === "ready" ? "pws-status-ok" : "pws-status-warn"}>
+                <dd
+                  className={
+                    effectiveStatus === "checking"
+                      ? "text-fg-muted"
+                      : effectiveStatus === "ready"
+                        ? "pws-status-ok"
+                        : "pws-status-warn"
+                  }
+                >
                   {effectiveStatus === "ready" ? (
                     <IconCheck style={{ width: 13, height: 13 }} aria-hidden="true" />
-                  ) : (
+                  ) : effectiveStatus !== "checking" ? (
                     <IconAlert style={{ width: 13, height: 13 }} aria-hidden="true" />
-                  )}
+                  ) : null}
                   {statusText}
                 </dd>
               </div>
@@ -359,7 +362,7 @@ export default function ProviderOverview({
                 <dd>{item.defaultModel ?? <span className="muted">—</span>}</dd>
               </div>
             </dl>
-            <div className="pws-first-response" aria-label={t("pws.firstResponse.title")}>
+            <div className="pws-first-response" aria-label={t("pws.connection")}>
               <div
                 className="pws-first-response-row"
                 data-first-response-step="provider"
@@ -407,128 +410,64 @@ export default function ProviderOverview({
                   </button>
                 )}
               </div>
-              <div
-                className="pws-first-response-row"
-                data-first-response-step="clients"
-                data-step-state="info"
-              >
-                <span className="pws-first-response-label">
-                  {t("pws.firstResponse.stepClients")}
-                </span>
-                <span className="muted">
-                  {t("pws.firstResponse.clientStep", { provider: item.name })}
-                </span>
-                {onOpenConnect && (
-                  <button type="button" className="link-btn" onClick={onOpenConnect}>
-                    {t("pws.firstResponse.openConnect")}
-                  </button>
-                )}
-              </div>
-              <div
-                className="pws-first-response-row"
-                data-first-response-step="probe"
-                data-step-state={probeStepState}
-                {...(reverifyPending ? { "data-reverify-pending": "true" } : {})}
-              >
-                <span className="pws-first-response-label">{t("pws.firstResponse.stepProbe")}</span>
-                <span
-                  className={
-                    probeStepState === "ok"
-                      ? "pws-status-ok"
-                      : probeStepState === "failed" || reverifyPending
-                        ? "pws-status-warn"
-                        : "muted"
-                  }
-                >
-                  {probeStepText}
-                </span>
-              </div>
-              <div
-                className="pws-first-response-row"
-                data-first-response-step="disconnect"
-                data-step-state="info"
-              >
-                <span className="pws-first-response-label">
-                  {t("pws.firstResponse.stepDisconnect")}
-                </span>
-                <span className="muted">
-                  {capabilities
-                    ? liteTranslator(locale)("disconnectHint", { provider: item.name })
-                    : t("pws.firstResponse.disconnectNote", { provider: item.name })}
-                </span>
-                {onOpenConnect && (
-                  <button type="button" className="link-btn" onClick={onOpenConnect}>
-                    {t("pws.firstResponse.openConnect")}
-                  </button>
-                )}
-              </div>
             </div>
             {apiBase !== undefined && (
-              <div className="row" style={{ marginTop: 12, alignItems: "center" }}>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  disabled={testingConnection}
-                  onClick={() => void testConnection()}
-                >
-                  {testingConnection ? t("pws.testing") : t("pws.testConnection")}
-                </button>
-                {connectionResult && (
-                  <span
-                    role="status"
-                    className={
-                      connectionState === "ok"
-                        ? "pws-status-ok"
-                        : connectionState === "failed"
-                          ? "pws-status-warn"
-                          : "muted"
-                    }
-                    data-connection-test-state={connectionState}
-                  >
-                    {connectionText}
-                  </span>
-                )}
-                {connectionResult && connectionState === "failed" && fixCredentialsAction && (
+              <div className="mt-4 border-t border-line pt-4">
+                <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
-                    className="link-btn"
-                    data-connection-recovery-action="fix-connection"
-                    onClick={fixCredentialsAction}
+                    className="btn btn-ghost btn-sm"
+                    disabled={testingConnection}
+                    onClick={() => void testConnection()}
                   >
-                    {t(
-                      onOpenAccounts
-                        ? "pws.completion.recovery.fixAuth"
-                        : "pws.completion.recovery.fixSettings",
-                    )}
+                    {testingConnection ? t("pws.testing") : t("pws.testConnection")}
                   </button>
-                )}
+                  {connectionResult && (
+                    <span
+                      role="status"
+                      className={
+                        connectionState === "ok"
+                          ? "pws-status-ok"
+                          : connectionState === "failed"
+                            ? "pws-status-warn"
+                            : "muted"
+                      }
+                      data-connection-test-state={connectionState}
+                    >
+                      {connectionText}
+                    </span>
+                  )}
+                  {connectionResult && connectionState === "failed" && fixCredentialsAction && (
+                    <button
+                      type="button"
+                      className="link-btn"
+                      data-connection-recovery-action="fix-connection"
+                      onClick={fixCredentialsAction}
+                    >
+                      {t(
+                        onOpenAccounts
+                          ? "pws.completion.recovery.fixAuth"
+                          : "pws.completion.recovery.fixSettings",
+                      )}
+                    </button>
+                  )}
+                </div>
+                <ProviderCompletionTest
+                  key={item.name}
+                  apiBase={apiBase}
+                  provider={item.name}
+                  probeKey={connectionProbeKey}
+                  models={completionModels}
+                  selectedModel={probeSelectedModel}
+                  onSelectedModelChange={activeProbe.selectModel}
+                  initialResult={completionProbe?.result ?? null}
+                  initialError={completionProbe?.error ?? null}
+                  onStatusChange={activeProbe.reportStatus}
+                  onFixCredentials={fixCredentialsAction}
+                  onFixSettings={onEditSettings}
+                  onFixModels={openModelsAction}
+                />
               </div>
-            )}
-            {apiBase !== undefined && (
-              <ProviderCompletionTest
-                key={item.name}
-                apiBase={apiBase}
-                provider={item.name}
-                probeKey={connectionProbeKey}
-                models={completionModels}
-                selectedModel={probeSelectedModel}
-                onSelectedModelChange={activeProbe.selectModel}
-                initialResult={completionProbe?.result ?? null}
-                initialError={completionProbe?.error ?? null}
-                onStatusChange={activeProbe.reportStatus}
-                onFixCredentials={fixCredentialsAction}
-                onFixSettings={onEditSettings}
-                onFixModels={openModelsAction}
-              />
-            )}
-            {onEditSettings && (
-              <button
-                type="button"
-                className="link-btn pws-edit-settings-link"
-                onClick={onEditSettings}
-              >
-                {t("pws.editSettings")}
-              </button>
             )}
           </section>
 

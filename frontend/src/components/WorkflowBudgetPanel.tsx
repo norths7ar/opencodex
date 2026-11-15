@@ -4,6 +4,7 @@ import { createBoundedFetch } from "../bounded-fetch";
 import { clampNumberDraft } from "../clamp-draft";
 import { requireJson } from "../pages/dashboard-shared";
 import { Button } from "./ui-v2/button";
+import { DataSurfaceSkeleton } from "./data-surface";
 import { Frame, FrameBody, FrameFoot, HelpTip } from "./v2-subagents/frame";
 import { useHelpDisclosure } from "./v2-subagents/use-help-disclosure";
 import { StepperInput } from "./v2-subagents/StepperInput";
@@ -195,7 +196,7 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
       lede={t("subagentsV2.budgetLede")}
       meta={help.button}
       busy={busy || (saved === undefined && !loadError)}
-      below={help.panel(
+      helpOverlay={help.panel(
         <p>{t("workflowBudget.description", { minutes: saved?.windowMinutes ?? 10 })}</p>,
       )}
     >
@@ -216,112 +217,119 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
           </Button>
         </div>
       )}
-      <FrameBody>
-        {KEYS.map((key) => {
-          const [labelKey, hintKey] = LABEL_KEYS[key];
-          const label = t(labelKey);
-          const range = saved?.bounds[key] ?? { min: 0, max: 0 };
-          const invalid = saved !== undefined && parsed?.[key] === undefined;
-          const hintId = "workflow-budget-" + key + "-hint";
-          return (
-            <div
-              className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3"
-              key={key}
+      {saved === undefined && !loadError && (
+        <FrameBody>
+          <DataSurfaceSkeleton label={t("common.loading")} />
+        </FrameBody>
+      )}
+      {saved !== undefined && (
+        <>
+          <FrameBody>
+            {KEYS.map((key) => {
+              const [labelKey, hintKey] = LABEL_KEYS[key];
+              const label = t(labelKey);
+              const range = saved?.bounds[key] ?? { min: 0, max: 0 };
+              const invalid = saved !== undefined && parsed?.[key] === undefined;
+              const hintId = "workflow-budget-" + key + "-hint";
+              return (
+                <div
+                  className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3"
+                  key={key}
+                >
+                  <div className="flex min-w-[min(100%,12rem)] flex-1 flex-col gap-0.5">
+                    <span className="flex items-center gap-1.5 text-[14px] leading-5 font-medium text-fg">
+                      {label}
+                      <HelpTip label={label}>{t(hintKey)}</HelpTip>
+                    </span>
+                    <span className="text-[12px] leading-4 text-fg-subtle tabular-nums" id={hintId}>
+                      {saved &&
+                        t("workflowBudget.range", {
+                          default: saved.defaults[key],
+                          min: range.min,
+                          max: range.max,
+                        })}
+                    </span>
+                    {invalid && (
+                      <span className="text-[12px] leading-4 text-danger" role="alert">
+                        {t("workflowBudget.invalid", { min: range.min, max: range.max })}
+                      </span>
+                    )}
+                  </div>
+                  <StepperInput
+                    min={range.min}
+                    max={range.max}
+                    step={1}
+                    inputMode="numeric"
+                    value={drafts[key]}
+                    readOnly={disabled}
+                    aria-disabled={disabled}
+                    aria-label={label}
+                    aria-describedby={hintId}
+                    aria-invalid={invalid}
+                    onChange={(event) => edit(key, event.target.value)}
+                    onKeyDown={(event) => {
+                      if (
+                        event.key === "Enter" &&
+                        !event.nativeEvent.isComposing &&
+                        !disabled &&
+                        changed &&
+                        valid
+                      ) {
+                        event.preventDefault();
+                        void save();
+                      }
+                    }}
+                    stepDisabled={disabled}
+                    incrementLabel={t("workflowBudget.increase", { label })}
+                    decrementLabel={t("workflowBudget.decrease", { label })}
+                    onIncrement={() =>
+                      edit(key, clampNumberDraft(drafts[key], 1, range.min, range.max))
+                    }
+                    onDecrement={() =>
+                      edit(key, clampNumberDraft(drafts[key], -1, range.min, range.max))
+                    }
+                  />
+                </div>
+              );
+            })}
+          </FrameBody>
+          <FrameFoot className="sticky bottom-0 z-[1] rounded-b-[12px] bg-surface">
+            <span className="mr-auto min-w-0" aria-live="polite">
+              {feedback === "failed" ? (
+                <span className="text-danger" role="alert">
+                  {t("workflowBudget.saveFailed")}
+                </span>
+              ) : feedback === "saved" ? (
+                <span className="text-success" role="status">
+                  {t("workflowBudget.saved")}
+                </span>
+              ) : changed ? (
+                <span className="text-fg">{t("subagentsV2.unsaved")}</span>
+              ) : null}
+            </span>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={disabled || (!changed && atDefaults)}
+              onClick={() => {
+                void save(true);
+              }}
             >
-              <div className="flex min-w-[min(100%,12rem)] flex-1 flex-col gap-0.5">
-                <span className="flex items-center gap-1.5 text-[14px] leading-5 font-medium text-fg">
-                  {label}
-                  <HelpTip label={label}>{t(hintKey)}</HelpTip>
-                </span>
-                <span className="text-[12px] leading-4 text-fg-subtle tabular-nums" id={hintId}>
-                  {saved &&
-                    t("workflowBudget.range", {
-                      default: saved.defaults[key],
-                      min: range.min,
-                      max: range.max,
-                    })}
-                </span>
-                {invalid && (
-                  <span className="text-[12px] leading-4 text-danger" role="alert">
-                    {t("workflowBudget.invalid", { min: range.min, max: range.max })}
-                  </span>
-                )}
-              </div>
-              <StepperInput
-                min={range.min}
-                max={range.max}
-                step={1}
-                inputMode="numeric"
-                value={drafts[key]}
-                readOnly={disabled}
-                aria-disabled={disabled}
-                aria-label={label}
-                aria-describedby={hintId}
-                aria-invalid={invalid}
-                onChange={(event) => edit(key, event.target.value)}
-                onKeyDown={(event) => {
-                  if (
-                    event.key === "Enter" &&
-                    !event.nativeEvent.isComposing &&
-                    !disabled &&
-                    changed &&
-                    valid
-                  ) {
-                    event.preventDefault();
-                    void save();
-                  }
-                }}
-                stepDisabled={disabled}
-                incrementLabel={t("workflowBudget.increase", { label })}
-                decrementLabel={t("workflowBudget.decrease", { label })}
-                onIncrement={() =>
-                  edit(key, clampNumberDraft(drafts[key], 1, range.min, range.max))
-                }
-                onDecrement={() =>
-                  edit(key, clampNumberDraft(drafts[key], -1, range.min, range.max))
-                }
-              />
-            </div>
-          );
-        })}
-      </FrameBody>
-      <FrameFoot className="sticky bottom-0 z-[1] rounded-b-[12px] bg-surface">
-        <span className="mr-auto min-w-0" aria-live="polite">
-          {feedback === "failed" ? (
-            <span className="text-danger" role="alert">
-              {t("workflowBudget.saveFailed")}
-            </span>
-          ) : feedback === "saved" ? (
-            <span className="text-success" role="status">
-              {t("workflowBudget.saved")}
-            </span>
-          ) : (
-            <span className={changed ? "text-fg" : undefined}>
-              {t(changed ? "subagentsV2.unsaved" : "subagentsV2.noChanges")}
-            </span>
-          )}
-        </span>
-        <Button
-          size="sm"
-          variant="ghost"
-          disabled={disabled || (!changed && atDefaults)}
-          onClick={() => {
-            void save(true);
-          }}
-        >
-          {t("workflowBudget.reset")}
-        </Button>
-        <Button
-          size="sm"
-          variant="primary"
-          disabled={disabled || !changed || !valid}
-          onClick={() => {
-            void save();
-          }}
-        >
-          {t("common.save")}
-        </Button>
-      </FrameFoot>
+              {t("workflowBudget.reset")}
+            </Button>
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={disabled || !changed || !valid}
+              onClick={() => {
+                void save();
+              }}
+            >
+              {t("common.save")}
+            </Button>
+          </FrameFoot>
+        </>
+      )}
     </Frame>
   );
 }

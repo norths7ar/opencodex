@@ -1,3 +1,4 @@
+import { authStatusCopy } from "../../provider-workspace/auth-status";
 /**
  * ProviderOverviewDashboard — aggregate overview when no provider is selected.
  * Shows summary cards, attention list, per-provider rate limits (QuotaBars stacked),
@@ -30,6 +31,7 @@ import { ProviderCapacityQuota } from "./ProviderCapacityQuota";
 
 export default function ProviderOverviewDashboard({
   sections,
+  onRefreshLoginStatus,
   quotaReports,
   usageTotals,
   usageLoading = false,
@@ -39,6 +41,7 @@ export default function ProviderOverviewDashboard({
   onRefreshAllQuotas,
 }: {
   sections: WorkspaceSections;
+  onRefreshLoginStatus?: () => Promise<void>;
   quotaReports: Record<string, ProviderQuotaReportView>;
   usageTotals: Record<string, ProviderUsageTotals>;
   usageLoading?: boolean;
@@ -93,7 +96,12 @@ export default function ProviderOverviewDashboard({
   };
 
   const allItems = useMemo(
-    () => [...sections.ready, ...sections.needsSetup, ...sections.disabled],
+    () => [
+      ...sections.ready,
+      ...(sections.checking ?? []),
+      ...sections.needsSetup,
+      ...sections.disabled,
+    ],
     [sections],
   );
   const knownNames = useMemo(() => new Set(allItems.map((p) => p.name)), [allItems]);
@@ -187,6 +195,29 @@ export default function ProviderOverviewDashboard({
         />
       </dl>
 
+      {allItems.some(
+        (item) => item.oauthStatusCheck === "failed" && item.oauthLoggedIn !== undefined,
+      ) && (
+        <p role="status" className="text-fg-muted">
+          {authStatusCopy().retained}
+        </p>
+      )}
+      {(sections.checking?.length ?? 0) > 0 && (
+        <p role="status" className="text-fg-muted">
+          {sections.checking?.some((item) => item.oauthStatusCheck === "failed")
+            ? authStatusCopy().failed
+            : authStatusCopy().loading}
+        </p>
+      )}
+      {allItems.some((item) => item.oauthStatusCheck === "failed") && onRefreshLoginStatus && (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => void onRefreshLoginStatus()}
+        >
+          {t("common.retry")}
+        </button>
+      )}
       {attentionCount > 0 && (
         <section
           className="pws-dashboard-section pws-dashboard-attention"

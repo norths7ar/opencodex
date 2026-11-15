@@ -232,11 +232,11 @@ const rows = {
     "Qual mecanismo de subagentes o Codex usa: v1, base ou v2.",
   ],
   effortCapHint: [
-    "Lowers max-effort requests in ultra mode. It never raises them.",
+    "Maximum reasoning effort for ultra-mode requests.",
     "ultra 모드의 max 요청을 낮춰요. 높이지는 않아요.",
     "Senkt Max-Effort-Anfragen im Ultra-Modus. Hebt sie nie an.",
     "Abaisse les requêtes à effort maximal en mode ultra, sans jamais les relever.",
-    "降低 ultra 模式下的 max 强度请求，绝不提高。",
+    "设置 ultra 模式的推理强度上限。",
     "降低 ultra 模式下的 max 強度請求，絕不提高。",
     "Снижает запросы с максимальным усилием в режиме ultra, но не повышает.",
     "ultra モードの max 要求を下げます。上げることはありません。",

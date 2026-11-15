@@ -1,3 +1,6 @@
+import { PageHeader } from "../components/page-header";
+import { useContext } from "react";
+import { ProviderSessionContext } from "../components/provider-session-context";
 import { readUsageResponseJson, usageSummary30dResourceKey } from "../usage-summary-resource";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ProviderWorkspaceShell, {
@@ -307,9 +310,8 @@ export default function Providers({ apiBase }: { apiBase: string }) {
   /** Bumped on every notify so repeated identical success toasts restart the dismiss timer. */
   const [statusRevision, setStatusRevision] = useState(0);
   const [oauthProviders, setOauthProviders] = useState<string[]>([]);
-  const [oauthStatus, setOauthStatus] = useState<
-    Record<string, import("./providers-shared").OAuthStatus>
-  >({});
+  const localOauthStatus = useState<Record<string, import("./providers-shared").OAuthStatus>>({});
+  const [oauthStatus, setOauthStatus] = useContext(ProviderSessionContext) ?? localOauthStatus;
   const [busy, setBusy] = useState<string | null>(null);
   const [loginInfo, setLoginInfo] = useState<{
     provider: string;
@@ -446,6 +448,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     fetchConfig: refreshConfigResult,
     fetchOauth,
     fetchProviderQuotas,
+    configLoadState,
   } = useProvidersFetch({
     apiBase,
     t,
@@ -518,6 +521,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     switchingAccounts,
     pausingAccounts,
     keyPools,
+    keyLoadStates,
     fetchAccountSets,
     fetchKeyPools,
     refreshAccountRosters,
@@ -738,13 +742,28 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     void loginOAuth(provider, addAccount, accountId);
   };
 
-  if (!config) {
+  const initialLoginPending =
+    capabilities?.oauth &&
+    config &&
+    Object.entries(config.providers).some(
+      ([name, provider]) => provider.authMode === "oauth" && !oauthStatus[name],
+    );
+  if (!config || initialLoginPending) {
     return (
       <>
-        <div className="page-head">
-          <h2>{t("nav.providers")}</h2>
-        </div>
-        {status ? (
+        <PageHeader title={t("nav.providers")} />
+        {!config && configLoadState === "error" ? (
+          <div className="notice notice-err" role="alert">
+            {t("prov.loadConfigFail")}{" "}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => void fetchConfig()}
+            >
+              {t("common.retry")}
+            </button>
+          </div>
+        ) : config && status ? (
           <ToastNotice tone={statusTone} onDismiss={clearStatus} dismissLabel={t("common.close")}>
             {status}
           </ToastNotice>
@@ -833,7 +852,8 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     onAccountThreshold: setAccountThreshold,
     onRemoveAccount: removeAccount,
     onRetryAccounts: async (provider) => {
-      await fetchAccountSets([provider]);
+      if (config.providers[provider]?.authMode === "oauth") await fetchAccountSets([provider]);
+      else await fetchKeyPools([provider]);
     },
     onAddApiKey: addApiKeyValue,
     onSwitchApiKey: switchApiKey,
@@ -844,20 +864,22 @@ export default function Providers({ apiBase }: { apiBase: string }) {
 
   return (
     <>
-      <div className="page-head">
-        <h2>{t("nav.providers")}</h2>
-        <div className="row">
-          {capabilities?.runtime === "python" && (
-            <button type="button" className="btn" onClick={() => setImportOpen(true)}>
-              {locale.startsWith("zh") ? "导入供应商" : "Import providers"}
+      <PageHeader
+        title={t("nav.providers")}
+        actions={
+          <>
+            {capabilities?.runtime === "python" && (
+              <button type="button" className="btn" onClick={() => setImportOpen(true)}>
+                {locale.startsWith("zh") ? "导入供应商" : "Import providers"}
+              </button>
+            )}
+            <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
+              <IconPlus />
+              {t("prov.add")}
             </button>
-          )}
-          <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
-            <IconPlus />
-            {t("prov.add")}
-          </button>
-        </div>
-      </div>
+          </>
+        }
+      />
       {importOpen && (
         <LegacyProviderImportModal
           apiBase={apiBase}
@@ -900,6 +922,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
         onModelsSettled={modelsNotice.modelsSettled}
         activeAccountNeedsReauth={activeAccountNeedsReauth}
         oauthLoginStatus={capabilities ? oauthStatusWithCodex : undefined}
+        onRefreshLoginStatus={fetchOauth}
         quotaRefreshEpoch={quotaRefresh.epoch}
         quotaForceRefresh={quotaRefresh.force}
         onQuotaRefreshSettled={settleQuotaRefresh}
@@ -920,7 +943,6 @@ export default function Providers({ apiBase }: { apiBase: string }) {
               modelRows={data.modelRows}
               modelRevision={data.modelRevision}
               modelRowsReady={data.modelRowsReady}
-              onOpenModels={() => navigateHash("models")}
               onOpenConnect={() => navigateHash("integrations")}
               modelsLoading={data.modelsLoading}
               modelsLoadFailed={data.modelsLoadFailed}
@@ -932,7 +954,11 @@ export default function Providers({ apiBase }: { apiBase: string }) {
               accounts={accountSets[item.name]?.accounts ?? []}
               keys={keyPools[item.name] ?? []}
               accountLoadState={
-                accountLoadStates[item.name] ?? (item.authMode === "oauth" ? "idle" : "ready")
+                item.authMode === "oauth"
+                  ? (accountLoadStates[item.name] ?? "idle")
+                  : item.hasApiKey
+                    ? (keyLoadStates[item.name] ?? "loading")
+                    : "ready"
               }
               accountsFocusToken={accountsFocus.token}
               accountsFocusProvider={accountsFocus.provider}

@@ -35,6 +35,7 @@
 @import "./pages/logs.css" layer(bridge);
 @import "./pages/connect.css" layer(bridge);
 @import "./pages/proxy.css" layer(bridge);
+@import "./console-layout.css" layer(components);
 
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";

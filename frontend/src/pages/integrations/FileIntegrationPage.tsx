@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDataSurface } from "../../data-surface";
 import { DataSurfaceSkeleton } from "../../components/data-surface";
-import { useT, type TKey } from "../../i18n/shared";
+import { useI18n, useT, type TKey } from "../../i18n/shared";
 import { Notice, Switch } from "../../ui";
 import ClientMark from "../../components/ClientMark";
 import { markFor } from "../../components/integration-marks";
@@ -155,6 +155,8 @@ function FileIntegrationControls({
   onRefresh,
 }: FileIntegrationPageProps) {
   const t = useT();
+  const { locale } = useI18n();
+  const zh = locale === "zh" || locale === "zh-TW";
   const scopeKey =
     profileId !== undefined
       ? `${client}:${profileId}`
@@ -363,7 +365,7 @@ function FileIntegrationControls({
             </button>
           </Notice>
         ) : (
-          <p className="page-sub">{t("common.loading")}</p>
+          <div className="min-h-64" aria-busy="true" />
         )}
       </section>
     );
@@ -463,7 +465,15 @@ function FileIntegrationControls({
         )}
 
       <p className="page-sub">{t(SEMANTICS_KEY[client])}</p>
-      <p className="integration-path">{status.configPath}</p>
+      <p className="muted text-label">
+        {zh
+          ? "应用前自动备份，可从下方恢复记录还原。"
+          : "A backup is saved before applying. Restore it from the history below."}
+      </p>
+      <details className="integration-config-details">
+        <summary>{zh ? "配置详情" : "Configuration details"}</summary>
+        <p className="integration-path">{status.configPath}</p>
+      </details>
       {status.reason === "candidate-conflict" &&
         status.conflictPaths?.map((path) => (
           <Notice key={path} tone="err">

@@ -1,9 +1,17 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { LaptopIcon } from "@hugeicons/core-free-icons";
 import type { Locale, TFn } from "../../i18n/shared";
 import { IconCheck, IconGlobe, IconKey, IconMonitor } from "../../icons";
 import { Select } from "../../ui";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
 import { cn } from "../../lib/utils";
 import { withFetchDeadline } from "../../bounded-fetch";
 import { clientIconClass } from "../../client-icon";
@@ -15,6 +23,7 @@ import {
   sourceInventoryEventMatches,
 } from "../../api";
 import {
+  availableSourceClients,
   matchesFacetWindow,
   matchesSource,
   noStore,
@@ -136,7 +145,10 @@ function validFacets(value: Facets, filter: SourceFilter): boolean {
 }
 
 type FacetResult = { key: string; facets?: Facets; failed?: boolean };
-type RosterState = { identity: string; devices: SourceDevice[] };
+type RosterState = { identity: string; devices: SourceDevice[]; clients: SourceClient[] };
+type ReportApp = { client: string; requests: number };
+const reportClients = (apps: readonly ReportApp[] | undefined) =>
+  SOURCE_CLIENTS.filter((client) => apps?.some((app) => app.client === client && app.requests > 0));
 
 // Keep the refresh lifecycle together: every request, timer, and event listener
 // belongs to this one subscription and is cancelled when it is disposed.
@@ -154,8 +166,8 @@ function subscribeToFacets({
   generation: number;
   identity: string;
   resultKey: string;
-  setResult: (value: FacetResult) => void;
-  setRoster: (value: RosterState) => void;
+  setResult: Dispatch<SetStateAction<FacetResult>>;
+  setRoster: Dispatch<SetStateAction<RosterState>>;
 }) {
   let disposed = false;
   let sequence = 0;
@@ -166,7 +178,7 @@ function subscribeToFacets({
     controller?.abort();
     controller = new AbortController();
     const currentController = controller;
-    setResult({ key: resultKey });
+    setResult((previous) => (previous.key === resultKey ? previous : { key: resultKey }));
     try {
       const facets = await withFetchDeadline(60_000, currentController.signal, async (signal) => {
         const response = await fetch(
@@ -181,12 +193,25 @@ function subscribeToFacets({
         return value;
       });
       if (!disposed && id === sequence && usageSessionSnapshot().generation === generation) {
-        setRoster({ identity, devices: facets.devices.map((row) => row.device) });
+        setRoster((previous) => ({
+          identity,
+          devices: facets.devices.map((row) => row.device),
+          clients: [
+            ...new Set([
+              ...(previous.identity === identity ? previous.clients : []),
+              ...SOURCE_CLIENTS.filter((client) => facets.apps[client] > 0),
+            ]),
+          ],
+        }));
         setResult({ key: resultKey, facets });
       }
     } catch {
       currentController.abort();
-      if (!disposed && id === sequence) setResult({ key: resultKey, failed: true });
+      if (!disposed && id === sequence)
+        setResult((previous) => ({
+          ...(previous.key === resultKey ? previous : { key: resultKey }),
+          failed: true,
+        }));
     } finally {
       if (!disposed && id === sequence) timer = setTimeout(load, 15_000);
     }
@@ -218,6 +243,7 @@ export function UsageSourcePicker({
   onDevice,
   deviceLocked,
   facetsAllowed,
+  reportApps,
   session,
   t,
   locale,
@@ -228,20 +254,36 @@ export function UsageSourcePicker({
   onDevice: (device: SourceDevice) => void;
   deviceLocked: boolean;
   facetsAllowed: boolean;
+  reportApps?: readonly ReportApp[];
   session: ReturnType<typeof usageSessionSnapshot>;
   t: TFn;
   locale: Locale;
 }) {
+  const capabilities = useRuntimeCapabilities();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [result, setResult] = useState<{ key: string; facets?: Facets; failed?: boolean }>({
     key: "",
   });
-  const [roster, setRoster] = useState<{ identity: string; devices: SourceDevice[] }>({
-    identity: "",
-    devices: [],
-  });
+  const [roster, setRoster] = useState<RosterState>({ identity: "", devices: [], clients: [] });
   const identity = JSON.stringify([apiBase, session.generation]);
+  const [reportInventory, setReportInventory] = useState({
+    identity,
+    reportApps,
+    clients: reportClients(reportApps),
+  });
+  if (reportInventory.identity !== identity || reportInventory.reportApps !== reportApps) {
+    setReportInventory({
+      identity,
+      reportApps,
+      clients: [
+        ...new Set([
+          ...(reportInventory.identity === identity ? reportInventory.clients : []),
+          ...reportClients(reportApps),
+        ]),
+      ],
+    });
+  }
   const input = useRef<HTMLInputElement>(null);
   const filterKey = JSON.stringify(filter);
   const clientLabel = (client: SourceClient) =>
@@ -293,7 +335,7 @@ export function UsageSourcePicker({
   ]);
   useEffect(() => {
     const clear = () => {
-      setRoster({ identity: "", devices: [] });
+      setRoster({ identity: "", devices: [], clients: [] });
       setResult({ key: "" });
     };
     const changed = (event: Event) => {
@@ -307,20 +349,11 @@ export function UsageSourcePicker({
     };
   }, [apiBase]);
   const appDetail = (client: SourceClient) =>
-    client === "codex"
-      ? [
-          t("usageV2.codexDetail"),
-          data.facets && !data.facets.usageIncomplete
-            ? t("usageV2.codexUnclassified", {
-                count: data.facets.legacyUnclassifiedRequests.toLocaleString(locale),
-              })
-            : null,
-        ]
-          .filter(Boolean)
-          .join(" · ")
-      : client === "other"
-        ? t("usageV2.otherDetail")
-        : "";
+    client === "codex" && (data.facets?.legacyUnclassifiedRequests ?? 0) > 0
+      ? t("usageV2.codexUnclassified", {
+          count: data.facets!.legacyUnclassifiedRequests.toLocaleString(locale),
+        })
+      : "";
   const q = search.trim().toLocaleLowerCase(locale);
   const visible = (text: string) => !q || text.toLocaleLowerCase(locale).includes(q);
   const count = (value: number | undefined) =>
@@ -337,9 +370,17 @@ export function UsageSourcePicker({
     : selectedDevice && !available.some((item) => sameDevice(item, selectedDevice))
       ? [...available, selectedDevice]
       : available;
-  const visibleClients = SOURCE_CLIENTS.filter((client) =>
-    visible(`${clientLabel(client)} ${appDetail(client)}`),
-  );
+  const visibleClients = availableSourceClients(
+    capabilities?.clients,
+    data.facets?.apps,
+    filter?.client,
+    session.blocked
+      ? []
+      : [
+          ...(roster.identity === identity ? roster.clients : []),
+          ...(reportInventory.identity === identity ? reportInventory.clients : []),
+        ],
+  ).filter((client) => visible(`${clientLabel(client)} ${appDetail(client)}`));
   const visibleDevices = devices.filter((device) => visible(deviceLabel(device)));
   const selectedClientVisible = !!filter && visibleClients.includes(filter.client);
   const selectedDeviceVisible =
@@ -349,8 +390,7 @@ export function UsageSourcePicker({
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) setResult({ key: "" });
-        else setSearch("");
+        if (next) setSearch("");
       }}
       label={t("usageV2.source")}
       initialFocusRef={input}
@@ -461,11 +501,7 @@ export function UsageSourcePicker({
           );
         })}
       </div>
-      <p className="mb-0 mt-3 border-t border-line pt-3 text-fg-muted">
-        {deviceLocked ? t("usageV2.locked") : t("usageV2.noKeyHelp")}
-      </p>
-      {!deviceLocked && <p className="mb-0 text-fg-muted">{t("usageV2.unconfiguredHelp")}</p>}
-      <p className="mb-0 text-fg-muted">{t("usageV2.classificationHelp")}</p>
+      {deviceLocked && <p className="mb-0 mt-3 text-fg-muted">{t("usageV2.locked")}</p>}
       {!!data.facets?.unavailableConfiguredKeys && (
         <p role="status" className="mb-0 text-fg-muted">
           {t("usageV2.unavailableKeys", {
@@ -475,7 +511,7 @@ export function UsageSourcePicker({
       )}
       {(data.failed || data.facets?.usageIncomplete || !facetsAllowed) && (
         <p role="status" className="mb-0 text-fg-muted">
-          {t("usageV2.countsUnavailable")}
+          {t(data.failed && data.facets ? "usage.loadError" : "usageV2.countsUnavailable")}
         </p>
       )}
     </Select.Popup>

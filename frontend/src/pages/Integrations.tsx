@@ -1,3 +1,4 @@
+import { PageHeader } from "../components/page-header";
 import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { navigateHash } from "../hash-routing";
 import { canonicalHashPath } from "../app-routing";
@@ -117,10 +118,7 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
 
   return (
     <section className="integrations-page">
-      <div className="page-head">
-        <h2>{t("nav.connect")}</h2>
-      </div>
-      <p className="page-sub">{t("connectV2.subtitle")}</p>
+      <PageHeader title={t("nav.connect")} />
       <div
         className="page-tabs connect-tabs"
         role="tablist"

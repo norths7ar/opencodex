@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { PageHeader } from "../components/page-header";
 import { useI18n } from "../i18n/shared";
 import { liteTranslator } from "../i18n/lite-copy";
 import { useDataSurface } from "../data-surface";
@@ -88,15 +89,13 @@ export default function LiteStorage({ apiBase }: { apiBase: string }) {
   const data = resource.state.data;
   return (
     <div className="dashboard-workspace-shell flex flex-col gap-5">
-      <header>
-        <h2 className="m-0 text-title font-semibold">{text("存储", "Storage")}</h2>
-        <p className="text-fg-muted">
-          {text(
-            "管理 Lite 自身的数据。清理先预览，再移入可恢复的隔离区。",
-            "Manage Lite's own data. Preview cleanup before moving files into recoverable quarantine.",
-          )}
-        </p>
-      </header>
+      <PageHeader
+        title={text("存储", "Storage")}
+        subtitle={text(
+          "管理 Lite 自身的数据。清理先预览，再移入可恢复的隔离区。",
+          "Manage Lite's own data. Preview cleanup before moving files into recoverable quarantine.",
+        )}
+      />
       {(error || resource.state.showError) && (
         <Notice tone="err">{error ?? text("无法加载存储信息。", "Could not load storage.")}</Notice>
       )}
@@ -153,8 +152,8 @@ export default function LiteStorage({ apiBase }: { apiBase: string }) {
             id="lite-storage-cleanup"
             title={text("缓存清理", "Cache cleanup")}
             lede={text(
-              "目前可清理 ChatGPT 额度快照；后续查询会重新获取。模型目录缓存在内存中。隔离文件仍占用磁盘空间。",
-              "ChatGPT quota snapshots can be cleared and fetched again later. Model inventory is cached in memory. Quarantined files still occupy disk space.",
+              "清理 ChatGPT 额度快照，下次查询时重新获取。隔离文件仍占用磁盘空间。",
+              "Clear ChatGPT quota snapshots; the next query fetches them again. Quarantined files still occupy disk space.",
             )}
           >
             <div className="flex flex-col gap-3 p-4">

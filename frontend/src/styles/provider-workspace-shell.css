@@ -1,10 +1,6 @@
 /* Providers workspace shell (WP080b): root grid, rail, filter popover, empty tiles.
    Shell-owned pws-* names only; the rail row keeps its verbatim source class names. */
 
-.main-inner:has(.pws-shell-container) {
-  max-width: 1440px;
-}
-
 .pws-shell-container {
   container-name: provider-workspace;
   container-type: inline-size;

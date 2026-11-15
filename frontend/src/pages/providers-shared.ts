@@ -29,7 +29,8 @@ export interface ProvidersConfig {
 }
 
 export interface OAuthStatus {
-  loggedIn: boolean;
+  loggedIn?: boolean;
+  statusCheck?: "ready" | "failed";
   email?: string;
   error?: string;
   done?: boolean;

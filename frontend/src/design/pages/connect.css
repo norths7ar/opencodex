@@ -8,13 +8,6 @@
    cards with a hairline, an 8px inset for code, ruled rows, quiet ghost actions and the
    inverse primary only for what is on or selected. */
 
-/* ---- one width for every Connect tab ------------------------------------------
-   The API keys and Claude panels stay mounted (hidden) after a visit and each asked
-   .main-inner for its own width, so the page head jumped when switching tabs. */
-.main-inner:has(.integrations-page) {
-  max-width: 1120px;
-}
-
 /* ---- tab strip: one recessed track that wraps, the current tab raised ---------- */
 .integrations-page > .page-sub {
   max-width: 68ch;

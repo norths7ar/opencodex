@@ -4,10 +4,6 @@
    Uses only design tokens from styles.css. No gradients.
    ============================================================================ */
 
-.main-inner:has(.usage-workspace-shell) {
-  max-width: 1200px;
-}
-
 .usage-workspace-shell {
   width: 100%;
   min-width: 0;

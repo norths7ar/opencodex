@@ -464,11 +464,40 @@
   font-size: 12.5px;
 }
 
-/* the quiet second line: rare per-provider settings, smaller and muted */
-.models-provider-tools.models-provider-actions {
+/* Provider-level settings have their own disclosure, separate from model selection. */
+.models-provider-settings {
   flex: 1 0 100%;
-  justify-content: flex-start;
-  gap: 4px 6px;
+  min-width: 0;
+}
+.models-provider-settings > summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 13px;
+  color: var(--ocx-fg-muted);
+}
+.models-provider-settings .models-discovery-policy {
+  margin: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.models-provider-body > .model-discovery-status {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ocx-line);
+}
+.models-provider-body .model-discovery-status > .row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.models-provider-body .model-discovery-status p {
+  margin: 0;
+}
+
+.models-provider-tools.models-provider-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+  gap: 12px;
   margin: 2px 0 0;
   padding-top: 8px;
   border-top: 1px solid var(--ocx-line);
@@ -498,8 +527,18 @@
   font-size: 12.5px;
 }
 .models-provider-tools .models-cap-cluster {
-  margin-left: auto;
-  padding-left: 8px;
+  margin-left: 0;
+  padding-left: 0;
+  width: 100%;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.models-provider-tools > .models-discovery-policy {
+  width: 100%;
+  justify-content: space-between;
+}
+.models-provider-tools > .models-cap-cluster > .switch-labeled {
+  margin-right: auto;
 }
 .models-provider-tools .select-trigger {
   height: 28px;
@@ -941,4 +980,58 @@
 }
 #models-panel-routing .badge {
   border-radius: 6px;
+}
+
+.models-setting-description {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ocx-fg-muted);
+  font-weight: 400;
+}
+.models-secondary-settings {
+  width: 100%;
+  border-top: 1px solid var(--ocx-line);
+  padding-top: 12px;
+}
+.models-secondary-settings > summary {
+  cursor: pointer;
+}
+.models-secondary-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+}
+.models-provider-tools > .models-discovery-policy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .models-provider-tools > .models-discovery-policy {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.models-context-setting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+.models-provider-tools .models-context-setting .models-cap-cluster {
+  width: auto;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+@media (max-width: 640px) {
+  .models-context-setting {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .models-provider-tools .models-context-setting .models-cap-cluster {
+    justify-content: flex-start;
+  }
 }

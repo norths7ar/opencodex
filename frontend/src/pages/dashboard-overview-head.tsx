@@ -6,7 +6,7 @@ import { navigateHash } from "../hash-routing";
 import type { useDashboardData } from "./use-dashboard-data";
 import { UsageIncompleteNotice } from "../components/usage-incomplete-notice";
 import { SegmentedControl } from "@/components/ui-v2/segmented-control";
-import { HelpButton } from "@/components/v2-proxy/settings-layout";
+import { HelpPopover } from "../components/help-popover";
 import { cn } from "@/lib/utils";
 
 type Dash = ReturnType<typeof useDashboardData>;
@@ -17,6 +17,7 @@ type Dash = ReturnType<typeof useDashboardData>;
  */
 export function DashboardOverviewHead({
   locale,
+  liteRuntime,
   health,
   providers,
   usage30d,
@@ -26,6 +27,7 @@ export function DashboardOverviewHead({
   projectConfigWarnings,
 }: Pick<
   Dash,
+  | "liteRuntime"
   | "locale"
   | "health"
   | "providers"
@@ -96,7 +98,9 @@ export function DashboardOverviewHead({
                   startupHealth === "error"
                     ? "bg-danger"
                     : startupHealth === "at-risk"
-                      ? "bg-warning"
+                      ? liteRuntime
+                        ? "bg-fg-subtle"
+                        : "bg-warning"
                       : startupHealth === "unverified"
                         ? "bg-fg-subtle"
                         : "bg-success",
@@ -104,17 +108,21 @@ export function DashboardOverviewHead({
                 aria-hidden="true"
               />
               <span className="min-w-0 flex-1 truncate">
-                {t(
-                  startupHealth === "error"
-                    ? "startup.error"
-                    : startupHealth === "unverified"
-                      ? "startup.unverified"
-                      : startupHealth === "at-risk"
-                        ? "startup.summary.atRisk"
-                        : startupHealth === "protected"
-                          ? "startup.summary.protected"
-                          : "startup.summary.native",
-                )}
+                {liteRuntime && startupHealth === "at-risk"
+                  ? locale.startsWith("zh")
+                    ? "自动启动未就绪"
+                    : "Automatic startup not ready"
+                  : t(
+                      startupHealth === "error"
+                        ? "startup.error"
+                        : startupHealth === "unverified"
+                          ? "startup.unverified"
+                          : startupHealth === "at-risk"
+                            ? "startup.summary.atRisk"
+                            : startupHealth === "protected"
+                              ? "startup.summary.protected"
+                              : "startup.summary.native",
+                    )}
               </span>
               <IconChevron
                 width={12}
@@ -180,9 +188,11 @@ function HeadTile({
     >
       <span className="text-xs font-medium text-fg-subtle">{label}</span>
       <span className="min-w-0 truncate text-[17px] leading-6 font-semibold tracking-[-0.01em] tabular-nums text-fg">
-        {children}
+        {busy ? <span aria-hidden="true">{"\u00a0"}</span> : children}
       </span>
-      {sub && <span className="dash-stat-coverage truncate text-xs text-fg-subtle">{sub}</span>}
+      <span className="dash-stat-coverage min-h-4 truncate text-xs text-fg-subtle">
+        {sub ?? "\u00a0"}
+      </span>
     </div>
   );
 }
@@ -218,20 +228,7 @@ export function DashboardMultiAgentControl({
 }
 
 /** The "?" beside the subagent switch opens the page's multi-agent help dialog. */
-export function DashboardMultiAgentHelp({
-  maHelpTriggerRef,
-  maHelpOpen,
-  setMaHelpOpen,
-}: Pick<Dash, "maHelpTriggerRef" | "maHelpOpen" | "setMaHelpOpen">) {
+export function DashboardMultiAgentHelp() {
   const t = useT();
-  return (
-    <HelpButton
-      buttonRef={maHelpTriggerRef}
-      label={t("dash.multiAgent")}
-      expanded={maHelpOpen}
-      controls="multi-agent-help-dialog"
-      popup="dialog"
-      onClick={() => setMaHelpOpen(true)}
-    />
-  );
+  return <HelpPopover label={t("dash.multiAgent")}>{t("models.v2Help")}</HelpPopover>;
 }

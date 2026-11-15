@@ -1,3 +1,4 @@
+import { HelpPopover } from "./help-popover";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useT, type TKey } from "../i18n/shared";
 import { IconAlert } from "../icons";
@@ -5,6 +6,7 @@ import { Select } from "../ui";
 import { createBoundedFetch } from "../bounded-fetch";
 import { requireJson, type ModelInfo } from "../pages/dashboard-shared";
 import { formatNamespacedModelId } from "../provider-icons";
+import { DataSurfaceSkeleton } from "./data-surface";
 
 type Setting = {
   model: string;
@@ -299,110 +301,114 @@ function CompactionRoutingControls({
           </div>
           <div className="muted setting-hint">{t("compactionRouting.description")}</div>
           {/* The policy text stays one click away so the controls are not buried under it. */}
-          <details className="pv2-more">
-            <summary>{t("proxyV2.details")}</summary>
+          <HelpPopover label={t("compactionRouting.title")}>
             <div className="muted setting-hint">{t("compactionRouting.dataNotice")}</div>
             <div className="muted setting-hint">{t("compactionRouting.effortHint")}</div>
             <div className="muted setting-hint">{t("compactionRouting.sourcesHint")}</div>
-          </details>
+          </HelpPopover>
         </div>
-        <div
-          className="dash-delegation-controls compaction-routing-controls"
-          style={{ flex: "0 1 auto" }}
-        >
-          <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-model">
-              {t("compactionRouting.model")}
-            </label>
-            <Select
-              id="compaction-routing-model"
-              value={model}
-              options={options}
-              disabled={disabled}
-              label={t("compactionRouting.model")}
-              onChange={(value) => {
-                setModel(value);
-                if (!value) {
-                  setEffort("");
-                  setTriggers("manual");
-                  setScope("all");
-                  setSources([]);
-                }
-                setFeedback(null);
-              }}
-            />
-          </div>
-          <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-triggers">
-              {t("compactionRouting.triggers")}
-            </label>
-            <Select
-              id="compaction-routing-triggers"
-              value={triggers}
-              disabled={disabled || !model}
-              align="right"
-              label={t("compactionRouting.triggers")}
-              options={TRIGGER_CHOICES.map((value) => ({
-                value,
-                label: t(TRIGGER_LABELS[value]!),
-              }))}
-              onChange={(value) => {
-                setTriggers(value);
-                setFeedback(null);
-              }}
-            />
-          </div>
-          <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-sources">
-              {t("compactionRouting.sources")}
-            </label>
-            <Select
-              id="compaction-routing-sources"
-              value={scope}
-              disabled={disabled || !model}
-              align="right"
-              label={t("compactionRouting.sources")}
-              options={SCOPE_CHOICES.map((value) => ({ value, label: t(SCOPE_LABELS[value]!) }))}
-              onChange={(value) => {
-                setScope(value);
-                setFeedback(null);
-              }}
-            />
-          </div>
-          <div className="compaction-field">
-            <label className="field-label" htmlFor="compaction-routing-effort">
-              {t("compactionRouting.effort")}
-            </label>
-            <Select
-              id="compaction-routing-effort"
-              value={effort}
-              disabled={disabled || !model}
-              align="right"
-              label={t("compactionRouting.effort")}
-              options={[
-                { value: "", label: t("compactionRouting.currentEffort") },
-                ...EFFORTS.map((value) => ({
-                  value,
-                  label: t(`models.reasoningEffort.${value}` as TKey),
-                })),
-              ]}
-              onChange={(value) => {
-                setEffort(value);
-                setFeedback(null);
-              }}
-            />
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            disabled={disabled || !dirty || scopeEmpty}
-            onClick={() => {
-              void save();
-            }}
+        {saved === undefined && !loadError && (
+          <DataSurfaceSkeleton label={t("common.loading")} rows={1} />
+        )}
+        {saved !== undefined && (
+          <div
+            className="dash-delegation-controls compaction-routing-controls"
+            style={{ flex: "0 1 auto" }}
           >
-            {busy ? t("common.saving") : t("common.save")}
-          </button>
-        </div>
+            <div className="compaction-field">
+              <label className="field-label" htmlFor="compaction-routing-model">
+                {t("compactionRouting.model")}
+              </label>
+              <Select
+                id="compaction-routing-model"
+                value={model}
+                options={options}
+                disabled={disabled}
+                label={t("compactionRouting.model")}
+                onChange={(value) => {
+                  setModel(value);
+                  if (!value) {
+                    setEffort("");
+                    setTriggers("manual");
+                    setScope("all");
+                    setSources([]);
+                  }
+                  setFeedback(null);
+                }}
+              />
+            </div>
+            <div className="compaction-field">
+              <label className="field-label" htmlFor="compaction-routing-triggers">
+                {t("compactionRouting.triggers")}
+              </label>
+              <Select
+                id="compaction-routing-triggers"
+                value={triggers}
+                disabled={disabled || !model}
+                align="right"
+                label={t("compactionRouting.triggers")}
+                options={TRIGGER_CHOICES.map((value) => ({
+                  value,
+                  label: t(TRIGGER_LABELS[value]!),
+                }))}
+                onChange={(value) => {
+                  setTriggers(value);
+                  setFeedback(null);
+                }}
+              />
+            </div>
+            <div className="compaction-field">
+              <label className="field-label" htmlFor="compaction-routing-sources">
+                {t("compactionRouting.sources")}
+              </label>
+              <Select
+                id="compaction-routing-sources"
+                value={scope}
+                disabled={disabled || !model}
+                align="right"
+                label={t("compactionRouting.sources")}
+                options={SCOPE_CHOICES.map((value) => ({ value, label: t(SCOPE_LABELS[value]!) }))}
+                onChange={(value) => {
+                  setScope(value);
+                  setFeedback(null);
+                }}
+              />
+            </div>
+            <div className="compaction-field">
+              <label className="field-label" htmlFor="compaction-routing-effort">
+                {t("compactionRouting.effort")}
+              </label>
+              <Select
+                id="compaction-routing-effort"
+                value={effort}
+                disabled={disabled || !model}
+                align="right"
+                label={t("compactionRouting.effort")}
+                options={[
+                  { value: "", label: t("compactionRouting.currentEffort") },
+                  ...EFFORTS.map((value) => ({
+                    value,
+                    label: t(`models.reasoningEffort.${value}` as TKey),
+                  })),
+                ]}
+                onChange={(value) => {
+                  setEffort(value);
+                  setFeedback(null);
+                }}
+              />
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={disabled || !dirty || scopeEmpty}
+              onClick={() => {
+                void save();
+              }}
+            >
+              {busy ? t("common.saving") : t("common.save")}
+            </button>
+          </div>
+        )}
       </div>
       {model && scope === "selected" && (
         <div className="compaction-sources-block">

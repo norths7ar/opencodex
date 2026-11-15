@@ -2578,7 +2578,7 @@ export const pt: Record<TKey, string> = {
   "integrations.hermes.loadError":
     "Não foi possível carregar os perfis do Hermes. Tente novamente para verificar o estado deles.",
   "integrations.hermes.profileTitle": "Perfil do Hermes: {name}",
-  "integrations.codex.title": "Codex CLI",
+  "integrations.codex.title": "Codex",
   "integrations.codex.body":
     "A integração do Codex pertence ao serviço do proxy. Iniciar o opencodex a aplica; parar o serviço restaura o roteamento nativo.",
   "integrations.codex.openService": "Abrir controles do serviço",

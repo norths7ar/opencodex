@@ -336,24 +336,4 @@ export function HelpRegion({
 }
 
 /** Page header: the title, an optional sentence under it, and the page's actions. */
-export function PageHeader({
-  title,
-  subtitle,
-  actions,
-}: {
-  title: ReactNode;
-  subtitle?: ReactNode;
-  actions?: ReactNode;
-}) {
-  return (
-    <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-      <div className="flex min-w-0 flex-col gap-1">
-        <h2 className="m-0 text-title font-semibold tracking-[-0.025em] text-fg">{title}</h2>
-        {subtitle && (
-          <p className="m-0 max-w-[68ch] text-[14px] leading-5 text-fg-muted">{subtitle}</p>
-        )}
-      </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
-    </header>
-  );
-}
+export { PageHeader } from "../page-header";

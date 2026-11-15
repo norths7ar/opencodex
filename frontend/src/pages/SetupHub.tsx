@@ -1,4 +1,6 @@
-import { useKeyedClientResource } from "../client-resource";
+import { PageHeader } from "../components/page-header";
+import { DataSurfaceStatus } from "../components/data-surface";
+import { classifyDataSurface, useDataSurface } from "../data-surface";
 import { useT } from "../i18n/shared";
 import type { Page } from "../app-routing";
 import { IconCheck, IconKey } from "../icons";
@@ -31,9 +33,14 @@ interface UsageBody {
   summary?: { requests?: number };
 }
 
-async function getJson<T>(url: string, signal: AbortSignal): Promise<T | null> {
+async function getJson<T>(url: string, signal: AbortSignal): Promise<T> {
   const res = await fetch(url, { signal });
-  return res.ok ? ((await res.json()) as T) : null;
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const body: unknown = await res.json();
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new Error("Invalid response");
+  }
+  return body as T;
 }
 
 interface Step {
@@ -47,13 +54,28 @@ interface Step {
 
 export default function SetupHub({ apiBase, navigate }: SetupHubProps) {
   const t = useT();
-  const config = useKeyedClientResource(`home-config:${apiBase}`, [apiBase], (signal) =>
-    getJson<ConfigBody>(`${apiBase}/api/config`, signal),
+  const config = useDataSurface(
+    `home-config:${apiBase}`,
+    [apiBase],
+    (signal) => getJson<ConfigBody>(`${apiBase}/api/config`, signal),
+    { isEmpty: () => false },
   );
-  const usage = useKeyedClientResource(`setup-usage:${apiBase}`, [apiBase], (signal) =>
-    getJson<UsageBody>(`${apiBase}/api/usage?range=all`, signal),
+  const usage = useDataSurface(
+    `setup-usage:${apiBase}`,
+    [apiBase],
+    (signal) => getJson<UsageBody>(`${apiBase}/api/usage?range=all`, signal),
+    { isEmpty: () => false },
   );
   const startup = useStartupChecklist(apiBase);
+  const startupState = classifyDataSurface(startup, () => false, true);
+  const errors = [
+    { state: config.state, label: t("prov.loadConfigFail"), refresh: config.refresh },
+    { state: usage.state, label: t("usage.loadError"), refresh: usage.refresh },
+    { state: startupState, label: t("startup.error"), refresh: startup.refresh },
+  ].filter(({ state }) => state.showError);
+  const refreshing = [config.state, usage.state, startupState].some(
+    (state) => state.showSkeleton || state.refreshing,
+  );
 
   const optional = { label: t("shellV2.badgeOptional"), tone: "optional" } satisfies HubBadge;
 
@@ -92,6 +114,7 @@ export default function SetupHub({ apiBase, navigate }: SetupHubProps) {
     },
   ];
   const doneCount = steps.filter((step) => step.done === true).length;
+  const progressKnown = steps.every((step) => step.done !== undefined);
   const allDone = doneCount === steps.length;
   // The first step not yet done is the one this page points at.
   const currentIndex = steps.findIndex((step) => step.done === false);
@@ -99,38 +122,53 @@ export default function SetupHub({ apiBase, navigate }: SetupHubProps) {
 
   return (
     <div className="ui-v2 flex flex-col gap-8 font-sans text-fg">
-      <header className="flex max-w-[640px] flex-col gap-2">
-        <h1 className="m-0 text-title font-semibold tracking-[-0.025em]">
-          {t("shellV2.setupTitle")}
-        </h1>
-        <p className="m-0 text-[15px] text-fg-muted">{t("shellV2.setupIntro")}</p>
-      </header>
+      <PageHeader title={t("shellV2.setupTitle")} subtitle={t("shellV2.setupIntro")} />
 
       <section aria-labelledby="setup-essentials" className="flex max-w-[760px] flex-col gap-3">
         <div className="flex items-baseline justify-between gap-3">
           <h2 id="setup-essentials" className={sectionTitle}>
             {t("connectV2.setupEssentials")}
           </h2>
-          <span className="text-[13px] text-fg-muted tabular-nums">
-            {t("shellV2.checklistProgress", {
-              done: String(doneCount),
-              total: String(steps.length),
-            })}
-          </span>
+          {progressKnown && (
+            <span className="text-[13px] text-fg-muted tabular-nums">
+              {t("shellV2.checklistProgress", {
+                done: String(doneCount),
+                total: String(steps.length),
+              })}
+            </span>
+          )}
         </div>
-        <div
-          className="h-1 overflow-hidden rounded-full bg-surface-2"
-          role="progressbar"
-          aria-labelledby="setup-essentials"
-          aria-valuemin={0}
-          aria-valuemax={steps.length}
-          aria-valuenow={doneCount}
-        >
+        {refreshing && (
+          <DataSurfaceStatus live={errors.length === 0}>{t("common.loading")}</DataSurfaceStatus>
+        )}
+        {errors.map(({ label, state, refresh }) => (
+          <div key={label} className="flex items-center gap-2 text-danger" role="alert">
+            <span>{label}</span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={state.refreshing}
+              onClick={() => refresh()}
+            >
+              {t("common.retry")}
+            </Button>
+          </div>
+        ))}
+        {progressKnown && (
           <div
-            className="h-full origin-left rounded-full bg-accent transition-transform duration-[600ms] ease-soft"
-            style={{ transform: `scaleX(${doneCount / steps.length})` }}
-          />
-        </div>
+            className="h-1 overflow-hidden rounded-full bg-surface-2"
+            role="progressbar"
+            aria-labelledby="setup-essentials"
+            aria-valuemin={0}
+            aria-valuemax={steps.length}
+            aria-valuenow={doneCount}
+          >
+            <div
+              className="h-full origin-left rounded-full bg-accent transition-transform duration-[600ms] ease-soft"
+              style={{ transform: `scaleX(${doneCount / steps.length})` }}
+            />
+          </div>
+        )}
         {allDone && (
           <p className="m-0 text-[14px] text-fg-muted">{t("shellV2.checklistAllDone")}</p>
         )}

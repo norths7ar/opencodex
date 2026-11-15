@@ -9,7 +9,6 @@ import SubagentsWorkspace, {
 } from "../components/subagents-workspace/SubagentsWorkspace";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { useDataSurface } from "../data-surface";
-import { DataSurfaceSkeleton } from "../components/data-surface";
 import SubagentSurfaceWarningModal from "../components/SubagentSurfaceWarningModal";
 import { SUBAGENT_SURFACE_GUIDE_URL } from "../subagent-surface";
 import {
@@ -21,6 +20,12 @@ import { InEffectSummary } from "../components/v2-subagents/InEffectSummary";
 import { formatNamespacedModelId } from "../provider-icons";
 import { sectionAnchorId } from "../section-anchors";
 import { useRuntimeCapabilities } from "../runtime-capabilities";
+import { PageHeader } from "../components/page-header";
+import {
+  subagentModelIdentity,
+  subagentModelOptions,
+  uniqueSubagentModels,
+} from "../components/subagents-workspace/model-options";
 
 type CachedSubagents = {
   available: string[];
@@ -28,6 +33,11 @@ type CachedSubagents = {
   fallback?: string[];
   pollMs?: number;
   fallbackAvailable?: string[];
+};
+
+type CachedMode = {
+  mode: UltraModeState;
+  pendingClientApply: boolean;
 };
 
 const UNLOADED_ULTRA_MODE: UltraModeState = {
@@ -55,6 +65,8 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const claudeAvailable = !capabilities || capabilities.clients.includes("claude");
   const cacheKey = `ocx.subagents.v1:${apiBase}`;
   const cached = seedSubagents(cacheKey);
+  const modeCacheKey = `ocx.subagents.mode.v1:${apiBase}`;
+  const cachedMode = readSessionListCache<CachedMode>(modeCacheKey);
   const [chosen, setChosen] = useState<string[]>(() => cached?.chosen ?? []);
   const [fallback, setFallback] = useState<string[]>(() => cached?.fallback ?? []);
   const [fallbackPollMs, setFallbackPollMs] = useState(() => cached?.pollMs ?? 60000);
@@ -81,6 +93,11 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const committed = useRef<CachedSubagents | null>(cached);
   const [status, setStatus] = useState("");
   const [ok, setOk] = useState(false);
+  useEffect(() => {
+    if (!ok || !status) return;
+    const timeout = window.setTimeout(() => setStatus(""), 4000);
+    return () => window.clearTimeout(timeout);
+  }, [ok, status]);
   /** True for the whole autosave drain, so a roster refresh never lands between two writes. */
   const saveInFlight = useRef(false);
   /** The newest roster waiting behind the in-flight write; older queued lists are dropped. */
@@ -95,7 +112,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   /** The Claude Code pin as the pin panel last read or wrote it, for the summary tiles. */
   const [pin, setPin] = useState<string | null | undefined>(undefined);
   const [ultraState, setUltraState] = useState<{ apiBase: string; mode: UltraModeState } | null>(
-    null,
+    () => (cachedMode ? { apiBase, mode: cachedMode.mode } : null),
   );
   const ultraModeCurrent = ultraState?.apiBase === apiBase;
   const ultraMode = ultraModeCurrent ? ultraState.mode : UNLOADED_ULTRA_MODE;
@@ -111,7 +128,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     apiBase: string;
   } | null>(null);
   const [ultraLoadFailed, setUltraLoadFailed] = useState(false);
-  const [pendingClientApply, setPendingClientApply] = useState(false);
+  const [pendingClientApply, setPendingClientApply] = useState(
+    () => cachedMode?.pendingClientApply ?? false,
+  );
   const ultraLoadGeneration = useRef(0);
   const currentUltraApiBase = useRef(apiBase);
   useEffect(() => {
@@ -153,24 +172,26 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         rawRecommendation.revision.trim().length > 0
           ? { text: rawRecommendation.text, revision: rawRecommendation.revision }
           : null;
-      setUltraState({
-        apiBase,
-        mode: {
-          enabled: data.enabled ?? false,
-          loaded: true,
-          keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
-          hintText: data.multiAgentModeHintText ?? null,
-          recommendation,
-          // Ultra mode replaces Codex's effort-derived policy for every model. The
-          // `default` surface still preserves upstream V1 pins (for example luna),
-          // so only an explicitly forced V2 catalog is an effective surface here.
-          multiAgentV2Enabled: data.enabled === true && data.multiAgentMode === "v2",
-          multiAgentMode: data.multiAgentMode ?? "default",
-        },
-      });
+      const mode: UltraModeState = {
+        enabled: data.enabled ?? false,
+        loaded: true,
+        keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
+        hintText: data.multiAgentModeHintText ?? null,
+        recommendation,
+        // Ultra mode replaces Codex's effort-derived policy for every model. The
+        // `default` surface still preserves upstream V1 pins (for example luna),
+        // so only an explicitly forced V2 catalog is an effective surface here.
+        multiAgentV2Enabled: data.enabled === true && data.multiAgentMode === "v2",
+        multiAgentMode: data.multiAgentMode ?? "default",
+      };
+      setUltraState({ apiBase, mode });
+      writeSessionListCache(modeCacheKey, {
+        mode,
+        pendingClientApply: data.pendingClientApply === true,
+      } satisfies CachedMode);
       return true;
     },
-    [apiBase, t],
+    [apiBase, modeCacheKey, t],
   );
 
   useEffect(() => {
@@ -341,6 +362,8 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const load = resource.refresh;
   const snapshot = state.data ?? cached;
   const available = snapshot?.available ?? [];
+  const displayedChosen = uniqueSubagentModels(chosen);
+  const displayedAvailable = subagentModelOptions(available, displayedChosen);
 
   // Every roster edit saves itself. Writes are serialized: while one PUT is in flight only the
   // newest edit waits, so rapid clicks end on the last list the operator made.
@@ -392,13 +415,17 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     void persistRoster(next);
   };
   const toggle = (m: string) => {
-    const prev = latestChosen.current;
-    if (!prev.includes(m) && prev.length >= FEATURED_MAX) return;
-    editRoster(prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
+    const prev = uniqueSubagentModels(latestChosen.current);
+    const identity = subagentModelIdentity(m);
+    const selected = prev.some((model) => subagentModelIdentity(model) === identity);
+    if (!selected && prev.length >= FEATURED_MAX) return;
+    editRoster(
+      selected ? prev.filter((model) => subagentModelIdentity(model) !== identity) : [...prev, m],
+    );
   };
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
-    const next = [...latestChosen.current];
+    const next = uniqueSubagentModels(latestChosen.current);
     if (j < 0 || j >= next.length) return;
     [next[i], next[j]] = [next[j]!, next[i]!];
     editRoster(next);
@@ -457,15 +484,42 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     }
   };
 
-  // The skeleton owns the live region while this resource has no content yet.
-  if (state.showSkeleton && !snapshot) {
-    return <DataSurfaceSkeleton label={t("sub.loading")} rows={4} />;
-  }
+  const pageHeader = (
+    <PageHeader
+      title={t("nav.subagents")}
+      subtitle={
+        claudeAvailable
+          ? t("subagentsV2.lede")
+          : locale === "zh" || locale === "zh-TW"
+            ? "管理 Codex 子代理的模型选择、委派方式和工作流预算。"
+            : "Manage Codex subagent model selection, delegation and workflow budgets."
+      }
+    />
+  );
+
+  const cold = state.showSkeleton && !snapshot;
+  useEffect(() => {
+    if (cold) return;
+    const followSection = () => {
+      const section = new URLSearchParams(window.location.hash.split("?")[1]).get("section");
+      if (section !== "settings" && section !== "budget") return;
+      document
+        .getElementById(sectionAnchorId("subagents", section))
+        ?.scrollIntoView({ block: "start" });
+    };
+    const frame = requestAnimationFrame(followSection);
+    window.addEventListener("hashchange", followSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", followSection);
+    };
+  }, [cold]);
 
   if (state.kind === "failed-cold") {
     const reason = state.error instanceof Error ? state.error.message : t("sub.loadFail");
     return (
       <>
+        {pageHeader}
         <Notice tone="err">{reason}</Notice>
         <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>
           {t("common.retry")}
@@ -483,142 +537,145 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
 
   return (
     <>
-      <div className="page-head flex-col items-start gap-1.5">
-        <h2>{t("nav.subagents")}</h2>
-        <p className="m-0 text-[14px] text-fg-muted">
-          {claudeAvailable
-            ? t("subagentsV2.lede")
-            : locale === "zh" || locale === "zh-TW"
-              ? "管理 Codex 子代理的模型选择、委派方式和工作流预算。"
-              : "Manage Codex subagent model selection, delegation and workflow budgets."}
-        </p>
-      </div>
-      <div className="mt-5 mb-6">
-        <InEffectSummary
-          chosen={chosen}
-          max={FEATURED_MAX}
-          firstModel={firstModel}
-          firstEffort={delegation.effort}
-          pin={pin}
-          showPin={claudeAvailable}
-          onJump={jump}
-        />
-      </div>
-      {status && <Notice tone={ok ? "ok" : "err"}>{status}</Notice>}
-      {pendingClientApply && (
-        <Notice tone="warn">
-          {locale === "zh" || locale === "zh-TW"
-            ? "设置已保存；请在 Route 中启用 Codex 接入，应用模型目录与客户端设置。"
-            : "Settings are saved. Enable Codex in Route to apply the model catalog and client settings."}
-        </Notice>
-      )}
-      {state.showError && <Notice tone="err">{t("sub.loadFail")}</Notice>}
-      {fallbackError && (
-        <Notice tone="err">
-          {t("sub.fallbackLabel")}: {t("sub.loadFail")}
-          {fallbackError !== t("sub.loadFail") && <> {fallbackError}</>}
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            disabled={fallbackLoading}
-            onClick={() => {
-              setFallbackLoading(true);
-              void loadFallback();
-            }}
-          >
-            {t("common.retry")}
-          </button>
-        </Notice>
-      )}
-      <SubagentsWorkspace
-        available={available}
-        fallbackAvailable={fallbackAvailable ?? []}
-        chosen={chosen}
-        onToggle={toggle}
-        onMove={move}
-        fallback={fallback}
-        fallbackPollMs={fallbackPollMs}
-        fallbackBusy={fallbackBusy || !fallbackLoaded}
-        onFallbackChange={(models) => {
-          fallbackRevision.current += 1;
-          setFallback(models);
-        }}
-        onFallbackPollMsChange={(pollMs) => {
-          fallbackRevision.current += 1;
-          setFallbackPollMs(pollMs);
-        }}
-        onFallbackSave={() => {
-          void saveFallback();
-        }}
-        settingsExtra={
-          <>
-            {claudeAvailable && (
-              <SubagentForceControl
-                key={apiBase}
-                apiBase={apiBase}
-                roster={chosen}
-                id={sectionAnchorId("subagents", "pin")}
-                onForceChange={setPin}
-              />
-            )}
-            <WorkflowBudgetPanel apiBase={apiBase} id={sectionAnchorId("subagents", "budget")} />
-          </>
-        }
-        delegation={{
-          apiBase,
-          model: delegation.model,
-          effort: delegation.effort,
-          efforts: delegation.efforts,
-          available: delegation.available,
-          guidanceEnabled: delegation.guidanceEnabled,
-          syncCodexDefaults: delegation.syncCodexDefaults,
-          saving: delegation.saving,
-          onSave: (patch) => {
-            void delegation.save(patch);
-          },
-          ultraMode,
-          ultraSaving: ultraSaving || !ultraModeCurrent,
-          // This page carries the same v1/base/v2 switch as Models and the Dashboard, so it
-          // needs the same gate: base and v2 wait for an answer, everything else writes.
-          onUltraModeSave: (patch) => {
-            if (patch.multiAgentMode === "default" || patch.multiAgentMode === "v2") {
-              setPendingSurface({ mode: patch.multiAgentMode, apiBase });
-              return;
+      {pageHeader}
+      <div
+        aria-busy={cold || undefined}
+        style={{ display: "contents", visibility: cold ? "hidden" : undefined }}
+      >
+        <div className="mb-6">
+          <InEffectSummary
+            chosen={displayedChosen}
+            title={
+              capabilities && (!ultraModeCurrent || pendingClientApply)
+                ? locale === "zh" || locale === "zh-TW"
+                  ? pendingClientApply
+                    ? "已保存 · Codex 未接入"
+                    : "已保存的配置"
+                  : pendingClientApply
+                    ? "Saved · Codex not connected"
+                    : "Saved configuration"
+                : undefined
             }
-            void saveUltraMode(patch);
-          },
-          ultraLoadFailed,
-          onUltraModeRetry: () => {
-            void retryUltraMode();
-          },
-        }}
-      />
-      {pendingSurface && pendingSurface.apiBase === apiBase && (
-        <SubagentSurfaceWarningModal
-          reason="selection"
-          mode={pendingSurface.mode}
-          docsUrl={SUBAGENT_SURFACE_GUIDE_URL}
-          busy={ultraSaving}
-          onContinue={() => {
-            const next = pendingSurface.mode;
-            setPendingSurface(null);
-            // Answer the advisory too: this operator has just read the same warning.
-            void saveUltraMode({
-              multiAgentMode: next,
-              multiAgentSurfaceAdvisoryAcknowledged: true,
-            });
+            max={FEATURED_MAX}
+            firstModel={firstModel}
+            firstEffort={delegation.effort}
+            pin={pin}
+            showPin={claudeAvailable}
+            onJump={jump}
+          />
+        </div>
+        {status && <Notice tone={ok ? "ok" : "err"}>{status}</Notice>}
+        {state.showError && <Notice tone="err">{t("sub.loadFail")}</Notice>}
+        {fallbackError && !fallbackLoading && (
+          <Notice tone="err">
+            {t("sub.fallbackLabel")}: {t("sub.loadFail")}
+            {fallbackError !== t("sub.loadFail") && <> {fallbackError}</>}
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={fallbackLoading}
+              onClick={() => {
+                setFallbackLoading(true);
+                void loadFallback();
+              }}
+            >
+              {t("common.retry")}
+            </button>
+          </Notice>
+        )}
+        <SubagentsWorkspace
+          available={displayedAvailable}
+          fallbackAvailable={fallbackAvailable ?? []}
+          chosen={displayedChosen}
+          onToggle={toggle}
+          onMove={move}
+          fallback={fallback}
+          fallbackLoadState={
+            fallbackAvailable !== undefined ? "ready" : fallbackLoading ? "loading" : "error"
+          }
+          fallbackPollMs={fallbackPollMs}
+          fallbackBusy={fallbackBusy || !fallbackLoaded}
+          onFallbackChange={(models) => {
+            fallbackRevision.current += 1;
+            setFallback(models);
           }}
-          onChooseV1={() => {
-            setPendingSurface(null);
-            if (ultraMode.multiAgentMode !== "v1")
+          onFallbackPollMsChange={(pollMs) => {
+            fallbackRevision.current += 1;
+            setFallbackPollMs(pollMs);
+          }}
+          onFallbackSave={() => {
+            void saveFallback();
+          }}
+          settingsExtra={
+            <>
+              {claudeAvailable && (
+                <SubagentForceControl
+                  key={apiBase}
+                  apiBase={apiBase}
+                  roster={chosen}
+                  id={sectionAnchorId("subagents", "pin")}
+                  onForceChange={setPin}
+                />
+              )}
+              <WorkflowBudgetPanel apiBase={apiBase} id={sectionAnchorId("subagents", "budget")} />
+            </>
+          }
+          delegation={{
+            apiBase,
+            model: delegation.model,
+            effort: delegation.effort,
+            efforts: delegation.efforts,
+            available: delegation.available,
+            guidanceEnabled: delegation.guidanceEnabled,
+            syncCodexDefaults: delegation.syncCodexDefaults,
+            saving: delegation.saving,
+            onSave: (patch) => {
+              void delegation.save(patch);
+            },
+            ultraMode,
+            ultraSaving: ultraSaving || !ultraModeCurrent,
+            // This page carries the same v1/base/v2 switch as Models and the Dashboard, so it
+            // needs the same gate: base and v2 wait for an answer, everything else writes.
+            onUltraModeSave: (patch) => {
+              if (patch.multiAgentMode === "default" || patch.multiAgentMode === "v2") {
+                setPendingSurface({ mode: patch.multiAgentMode, apiBase });
+                return;
+              }
+              void saveUltraMode(patch);
+            },
+            ultraLoadFailed,
+            onUltraModeRetry: () => {
+              void retryUltraMode();
+            },
+          }}
+        />
+        {pendingSurface && pendingSurface.apiBase === apiBase && (
+          <SubagentSurfaceWarningModal
+            reason="selection"
+            mode={pendingSurface.mode}
+            docsUrl={SUBAGENT_SURFACE_GUIDE_URL}
+            busy={ultraSaving}
+            onContinue={() => {
+              const next = pendingSurface.mode;
+              setPendingSurface(null);
+              // Answer the advisory too: this operator has just read the same warning.
               void saveUltraMode({
-                multiAgentMode: "v1",
+                multiAgentMode: next,
                 multiAgentSurfaceAdvisoryAcknowledged: true,
               });
-          }}
-          onDismiss={() => setPendingSurface(null)}
-        />
-      )}
+            }}
+            onChooseV1={() => {
+              setPendingSurface(null);
+              if (ultraMode.multiAgentMode !== "v1")
+                void saveUltraMode({
+                  multiAgentMode: "v1",
+                  multiAgentSurfaceAdvisoryAcknowledged: true,
+                });
+            }}
+            onDismiss={() => setPendingSurface(null)}
+          />
+        )}
+      </div>
     </>
   );
 }

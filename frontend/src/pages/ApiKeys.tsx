@@ -18,7 +18,7 @@ import { DataSurfaceSkeleton } from "../components/data-surface";
 import { useKeyDisclosure } from "../use-key-disclosure";
 import ApiKeysWorkspace from "../components/apikeys-workspace/ApiKeysWorkspace";
 import {
-  DEFAULT_ENDPOINTS,
+  EMPTY_ENDPOINTS,
   deriveApiEndpoints,
   isApiAuthMatrix,
   isApiKeyUsage,
@@ -80,13 +80,13 @@ const MUTATION_TIMEOUT_MS = 15_000;
 /** Seed copyable endpoints only when apiBase has a usable origin/host. */
 function seedEndpointsFromApiBase(apiBase: string): ApiEndpointInfo {
   const trimmed = apiBase.replace(/\/$/, "");
-  if (!trimmed) return DEFAULT_ENDPOINTS;
+  if (!trimmed) return EMPTY_ENDPOINTS;
   try {
     const url = new URL(trimmed);
-    if (!url.host) return DEFAULT_ENDPOINTS;
+    if (!url.host) return EMPTY_ENDPOINTS;
     return deriveApiEndpoints(`${trimmed}/v1/responses`);
   } catch {
-    return DEFAULT_ENDPOINTS;
+    return EMPTY_ENDPOINTS;
   }
 }
 
@@ -185,7 +185,11 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
       )
         throw new Error(t("api.keysLoadFailed"));
       const validatedKeys = rows as ApiKeyEntry[];
-      const derived = deriveApiEndpoints(data.endpoint ?? "");
+      const derived = deriveApiEndpoints(
+        data.responsesEndpoint ??
+          data.endpoint ??
+          (data.baseUrl ? `${data.baseUrl}/responses` : ""),
+      );
       // An older server sends no surfaces; the endpoints panel then keeps its flat list.
       const surfaces = parseApiSurfaces(data.surfaces);
       const next: CachedKeysShape = {
@@ -195,7 +199,7 @@ export default function ApiKeys({ apiBase, active = true }: { apiBase: string; a
         keys: validatedKeys,
         endpoints: {
           baseUrl: data.baseUrl ?? derived.baseUrl,
-          responses: data.responsesEndpoint ?? data.endpoint ?? DEFAULT_ENDPOINTS.responses,
+          responses: derived.responses,
           chatCompletions: data.chatCompletionsEndpoint ?? derived.chatCompletions,
           messages: data.messagesEndpoint ?? derived.messages,
           models: data.modelsEndpoint ?? derived.models,
