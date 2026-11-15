@@ -123,7 +123,9 @@ class UpstreamPreparation:
                 and provider.adapter == seed.get("adapter")
                 and provider.baseUrl.rstrip("/") == seed.get("baseUrl", "").rstrip("/")
             )
-        if not configured and applies:
+        # API channels use the operator's selected protocol. Registry wire preferences
+        # are subscription transport defaults, not an override of an editable API adapter.
+        if not configured and applies and provider.authMode == "oauth":
             rule = defaults.get("modelWireDefaults", {}).get(model.strip().lower())
             if isinstance(rule, str):
                 adapter = rule

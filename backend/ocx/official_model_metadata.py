@@ -173,15 +173,22 @@ class OfficialModelMetadata:
         except OSError, ValueError, TypeError:
             pass
 
-    async def read(self, provider, *, force=False):
+    @staticmethod
+    def applies(provider):
         destination = urlsplit(provider.baseUrl)
-        if not (
+        return (
             provider.authMode != "oauth"
             and destination.scheme == "https"
             and destination.hostname == "api.deepseek.com"
             and destination.port in (None, 443)
             and destination.path.rstrip("/") in {"", "/v1", "/anthropic"}
-        ):
+        )
+
+    def cached(self, provider):
+        return copy.deepcopy(self.models) if self.applies(provider) else {}
+
+    async def read(self, provider, *, force=False):
+        if not self.applies(provider):
             return {}
         started = time.time()
         async with self.lock:

@@ -145,7 +145,9 @@ def reconcile_discovery(config, provider, ids, *, converge=False):
             **next_value,
             "updatedAt": prior["updatedAt"] if comparable == next_value else now,
         }
-        policy = getattr(provider, "newModelPolicy", None) or discovery.get("newModelPolicy", "on")
+        policy = getattr(provider, "newModelPolicy", None)
+        if policy not in {"on", "off"}:
+            policy = discovery.get("newModelPolicy", "on")
         if policy == "off" and not provider.selectedModels:
             config.disabledModels = list(
                 dict.fromkeys(

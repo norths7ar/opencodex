@@ -2,7 +2,10 @@
 
 import asyncio
 import contextlib
+import copy
 import hashlib
+import json
+import logging
 import time
 from datetime import UTC, datetime
 
@@ -195,17 +198,81 @@ class ModelInventory:
         self.discovery: dict[str, dict] = {}
         self.locks: dict[str, asyncio.Lock] = {}
         self.official = OfficialModelMetadata(store.directory)
+        self.path = store.directory / "model-catalog.json"
+        self.wake = asyncio.Event()
+        self._load_cache()
 
-    def invalidate(self, provider: str | None = None, *, reset=False):
-        # Retain the last-good snapshot for unchanged connections, but force its revalidation.
+    def _load_cache(self):
+        try:
+            saved = json.loads(self.path.read_text(encoding="utf-8"))
+            if saved.get("version") != 1:
+                return
+            for name, value in saved["providers"].items():
+                rows = value["models"]
+                if not isinstance(rows, list) or any(
+                    not isinstance(row, dict) or not isinstance(row.get("id"), str) for row in rows
+                ):
+                    continue
+                self.cache[name] = (value["fingerprint"], float(value["checked"]), rows)
+                self.discovery[name] = value["discovery"]
+        except OSError, ValueError, KeyError, TypeError:
+            self.cache.clear()
+            self.discovery.clear()
+
+    def _save_cache(self):
+        names = {p.id for p in self.store.load().providers}
+        saved = {
+            "version": 1,
+            "providers": {
+                name: {
+                    "fingerprint": fingerprint,
+                    "checked": checked,
+                    "models": rows,
+                    "discovery": self.discovery.get(name, {}),
+                }
+                for name, (fingerprint, checked, rows) in self.cache.items()
+                if name in names
+            },
+        }
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = self.path.with_suffix(".json.tmp")
+        temporary.write_text(json.dumps(saved), encoding="utf-8")
+        temporary.replace(self.path)
+
+    async def refresh_due(self):
+        providers = [p for p in self.store.load().providers if not p.disabled]
+        await asyncio.gather(*(self.discover(provider) for provider in providers))
+        await asyncio.gather(*(self.official.read(provider) for provider in providers))
+
+    async def run(self, on_refresh):
+        """Own discovery independently of reads and page polling."""
+        while True:
+            self.wake.clear()
+            try:
+                before = dict(self.cache)
+                metadata_before = copy.deepcopy(self.official.models)
+                await self.refresh_due()
+                if self.cache != before or self.official.models != metadata_before:
+                    await on_refresh()
+            except OSError, ValueError, RuntimeError:
+                logging.getLogger(__name__).exception("Model directory refresh failed")
+            with contextlib.suppress(TimeoutError):
+                await asyncio.wait_for(self.wake.wait(), timeout=60)
+
+    def invalidate(self, provider: str | None = None, *, reset=False, revalidate=False):
+        # Configuration-only changes do not re-query an unchanged connection.
+        providers = {p.id: p for p in self.store.load().providers}
         for name in [provider] if provider else list(self.cache):
+            current = providers.get(name)
             cached = self.cache.get(name)
-            if reset:
+            if reset or current is None or (cached and cached[0] != self.fingerprint(current)):
                 self.cache.pop(name, None)
                 self.discovery.pop(name, None)
-            elif cached:
+            elif revalidate and cached:
                 self.cache[name] = (cached[0], 0, cached[2])
             self.store.discovered_models.pop(name, None)
+        self._save_cache()
+        self.wake.set()
 
     def fingerprint(self, provider: Provider) -> str:
         credential = provider.protectedKey or provider.apiKeyEnv
@@ -218,6 +285,8 @@ class ModelInventory:
             provider.authMode,
             credential,
             provider.headers,
+            provider.apiKeyTransport,
+            provider.responsesPath,
             self.auth_revision(provider) if provider.authMode == "oauth" else None,
         )
         return hashlib.sha256(repr(values).encode()).hexdigest()
@@ -226,18 +295,18 @@ class ModelInventory:
         if provider.disabled or not provider.liveModels:
             return []
         fingerprint = self.fingerprint(provider)
-        started = time.monotonic()
+        started = time.time()
         async with self.locks.setdefault(provider.id, asyncio.Lock()):
             cached = self.cache.get(provider.id)
             previous = (
                 self.discovery.get(provider.id, {}) if cached and cached[0] == fingerprint else {}
             )
-            ttl = 15 if previous.get("status") == "failed" else 60
+            ttl = 86400
             if (
                 cached
                 and cached[0] == fingerprint
                 and (not force or cached[1] >= started)
-                and time.monotonic() - cached[1] < ttl
+                and time.time() - cached[1] < ttl
             ):
                 return cached[2]
             checked_at = datetime.now(UTC).isoformat()
@@ -250,17 +319,29 @@ class ModelInventory:
                     for row in rows
                 ):
                     raise ValueError("Upstream did not return a valid model directory.")
-                self.cache[provider.id] = (fingerprint, time.monotonic(), rows)
+                current = next(
+                    (p for p in self.store.load().providers if p.id == provider.id), None
+                )
+                if current is None or self.fingerprint(current) != fingerprint:
+                    self.wake.set()
+                    return []
+                self.cache[provider.id] = (fingerprint, time.time(), rows)
                 self.discovery[provider.id] = {
                     "status": "ok",
                     "checkedAt": checked_at,
                     "lastSuccessAt": checked_at,
                 }
                 self.reconcile(provider, [row["id"] for row in rows])
-                if force:
-                    await self.official.read(provider, force=True)
+                self._save_cache()
+                await self.official.read(provider, force=force)
                 return rows
             except (httpx.HTTPError, ValueError, RuntimeError) as exc:
+                current = next(
+                    (p for p in self.store.load().providers if p.id == provider.id), None
+                )
+                if current is None or self.fingerprint(current) != fingerprint:
+                    self.wake.set()
+                    return []
                 self.discovery[provider.id] = {
                     "status": "failed",
                     "reason": "network" if isinstance(exc, httpx.HTTPError) else "invalid_response",
@@ -270,7 +351,8 @@ class ModelInventory:
                 }
                 # Retain the last known inventory on temporary discovery failure.
                 rows = cached[2] if cached and cached[0] == fingerprint else []
-                self.cache[provider.id] = (fingerprint, time.monotonic(), rows)
+                self.cache[provider.id] = (fingerprint, time.time(), rows)
+                self._save_cache()
                 return rows
 
     def reconcile(self, observed, ids):
@@ -286,8 +368,16 @@ class ModelInventory:
     async def rows(self) -> list[dict]:
         config = self.store.load()
         fingerprints = {p.id: self.fingerprint(p) for p in config.providers}
-        live = await asyncio.gather(*(self.discover(p) for p in config.providers))
-        official_rows = await asyncio.gather(*(self.official.read(p) for p in config.providers))
+        live = [
+            cached[2]
+            if p.liveModels
+            and not p.disabled
+            and (cached := self.cache.get(p.id))
+            and cached[0] == fingerprints[p.id]
+            else []
+            for p in config.providers
+        ]
+        official_rows = [self.official.cached(p) for p in config.providers]
         official_by_name = {
             p.id: rows for p, rows in zip(config.providers, official_rows, strict=True)
         }

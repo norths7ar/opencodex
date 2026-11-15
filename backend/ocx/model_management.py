@@ -151,8 +151,11 @@ def model_policy_router(store, inventory, converge):
     @router.put("/model-discovery")
     async def set_discovery(body: dict):
         policy = body.get("policy")
-        if policy not in {"on", "off"}:
-            raise ValueError("policy must be on or off")
+        allowed = {"on", "off", "inherit"} if body.get("provider") else {"on", "off"}
+        if policy not in allowed:
+            raise ValueError(
+                "provider policy must be inherit, on or off; global policy must be on or off"
+            )
         # Capture a baseline before turning arrivals off; existing models remain unchanged.
         await inventory.rows()
         with store.mutation_lock:

@@ -38,6 +38,12 @@ class SubagentService:
             self._freshness = (now, value)
         return self._freshness[1]
 
+    def cached_catalog_state(self):
+        """Console reads never enumerate client processes."""
+        if time.monotonic() - self._freshness[0] > 5:
+            return {"state": "unknown", "runningCount": 0}
+        return self._freshness[1]
+
     async def prepare_request(self, body):
         """Gateway hook: call on Responses bodies before native/translated dispatch."""
         if not self.integration.record().get("enabled"):
@@ -86,7 +92,7 @@ def subagent_router(service: SubagentService):
         return {
             "chosen": chosen,
             "available": available,
-            "catalogState": await service.catalog_state(),
+            "catalogState": service.cached_catalog_state(),
             "force": None,
             "forceAvailable": [],
             "forceStatus": None,

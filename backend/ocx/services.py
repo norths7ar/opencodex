@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from contextlib import ExitStack, asynccontextmanager
+from contextlib import ExitStack, asynccontextmanager, suppress
 from pathlib import Path
 
 from .auxiliary import Auxiliary
@@ -27,7 +27,8 @@ class AppServices:
         channels = self.gateway.channels
 
         def auth_revision(provider):
-            return channels.for_provider(provider).revision
+            # The account identity survives restarts and routine token refreshes.
+            return channels.for_provider(provider).status().get("activeAccountId")
 
         self.inventory = ModelInventory(self.store, self.gateway.models, auth_revision)
         self.quota = channels.quota("openai")
@@ -59,12 +60,12 @@ class AppServices:
         if "openai" in identities:
             self.quota.invalidate()
         for identity in identities:
-            self.inventory.invalidate(identity, reset=True)
+            self.inventory.invalidate(identity, revalidate=True)
         await self.refresh_catalog()
 
     async def imported_providers(self, identities):
         for identity in identities:
-            self.inventory.invalidate(identity, reset=True)
+            self.inventory.invalidate(identity)
         result = await self.refresh_catalog()
         if result["status"] != "committed":
             raise RuntimeError(
@@ -82,6 +83,7 @@ class AppServices:
             owned.callback(ledger.close)
             async with self.gateway.lifespan(app):
                 self.diagnostics.install()
+                discovery = asyncio.create_task(self.inventory.run(self.refresh_catalog))
                 try:
                     try:
                         await self.integration.converge()
@@ -90,6 +92,9 @@ class AppServices:
                         app.state.integration_error = str(exc)
                     yield
                 finally:
+                    discovery.cancel()
+                    with suppress(asyncio.CancelledError):
+                        await discovery
                     self.diagnostics.close()
                     try:
                         await asyncio.to_thread(self.integration.shutdown)
