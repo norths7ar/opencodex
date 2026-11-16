@@ -1,10 +1,10 @@
+import { cn } from "@/lib/utils";
 import { useId, useRef, useState, type ReactNode } from "react";
+import { PROTOCOL_MODE_KEYS } from "../components/protocols/protocol-labels";
+import { chip, fieldControl, fieldLabel, quietButton } from "../components/v2-logs/classes";
 import type { TFn, TKey } from "../i18n/shared";
 import { IconFilter, IconSearch, IconX } from "../icons";
 import { formatProviderDisplayName } from "../provider-icons";
-import { PROTOCOL_MODE_KEYS } from "../components/protocols/protocol-labels";
-import { chip, fieldControl, fieldLabel, quietButton } from "../components/v2-logs/classes";
-import { cn } from "@/lib/utils";
 import { Select } from "../ui";
 import {
   LOG_PROTOCOL_MODE_FILTERS,

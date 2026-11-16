@@ -1,18 +1,22 @@
+import { Button } from "@/components/button";
 /**
  * Suggest for the delegation model: the user describes the work Codex hands off, one sizing call
  * returns a tier and an effort, and the server picks the cheapest sufficient model among the
  * options this page offers. The proposal is only shown; Use this goes through the page's own
  * delegation save, the same write the model and effort selects make.
  */
-import { useState } from "react";
 import { ROLE_INSTRUCTIONS_EXCERPT_CHARS } from "@/contracts/role-sizing-limits";
+import type {
+  DelegationModelOption,
+  DelegationPatch,
+} from "@/features/subagents/use-native-settings";
+import { useState } from "react";
 import { readJsonOrThrow } from "../../fetch-json";
 import { useT } from "../../i18n/shared";
-import { Notice } from "../../ui";
-import { formatNamespacedModelId } from "../../provider-icons";
-import type { RoleProposal } from "../../pages/integrations/LazyCodexRoleAutoAssign";
+import type { RoleProposal } from "../../pages/integrations/role-proposal";
 import { EFFORT_LABEL, TIER_LABEL } from "../../pages/integrations/sizing-labels";
-import type { DelegationModelOption, DelegationPatch } from "../../pages/use-subagent-delegation";
+import { formatNamespacedModelId } from "../../provider-icons";
+import { Notice } from "../../ui";
 
 interface Suggestion {
   sizingModel: string;
@@ -50,7 +54,7 @@ export default function DelegationSuggest({
     setRunning(true);
     setError(null);
     try {
-      const response = await fetch(`${apiBase}/api/injection-model/suggest`, {
+      const response = await fetch(`${apiBase}/api/subagent-defaults/suggest`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ work: work.trim() }),
@@ -90,14 +94,15 @@ export default function DelegationSuggest({
           onChange={(e) => setWork(e.target.value)}
           disabled={running}
         />
-        <button
+        <Button
           type="button"
-          className="btn btn-sm"
+          variant="outline"
+          size="sm"
           disabled={running || saving || work.trim() === ""}
           onClick={() => void run()}
         >
           {running ? t("sub.suggest.running") : t("sub.suggest.submit")}
-        </button>
+        </Button>
       </div>
       {error && <Notice tone="err">{error}</Notice>}
       {result && p && (
@@ -164,26 +169,28 @@ export default function DelegationSuggest({
             ) : (
               p.status === "proposed" &&
               p.proposedModel && (
-                <button
+                <Button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  variant="primary"
+                  size="sm"
                   disabled={saving}
                   onClick={() =>
                     onAccept({ model: p.proposedModel!, effort: p.proposedEffort ?? null })
                   }
                 >
                   {t("sub.suggest.accept")}
-                </button>
+                </Button>
               )
             )}
-            <button
+            <Button
               type="button"
-              className="btn btn-ghost btn-sm"
+              variant="ghost"
+              size="sm"
               disabled={saving}
               onClick={() => setResult(null)}
             >
               {t("integrations.lazycodexRoles.auto.discard")}
-            </button>
+            </Button>
           </div>
         </section>
       )}

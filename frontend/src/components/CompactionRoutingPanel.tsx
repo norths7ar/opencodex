@@ -1,12 +1,13 @@
-import { HelpPopover } from "./help-popover";
+import { Button } from "@/components/button";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createBoundedFetch } from "../bounded-fetch";
 import { useT, type TKey } from "../i18n/shared";
 import { IconAlert } from "../icons";
-import { Select } from "../ui";
-import { createBoundedFetch } from "../bounded-fetch";
 import { requireJson, type ModelInfo } from "../pages/dashboard-shared";
 import { formatNamespacedModelId } from "../provider-icons";
+import { Select } from "../ui";
 import { DataSurfaceSkeleton } from "./data-surface";
+import { HelpPopover } from "./help-popover";
 
 type Setting = {
   model: string;
@@ -397,16 +398,17 @@ function CompactionRoutingControls({
                 }}
               />
             </div>
-            <button
+            <Button
               type="button"
-              className="btn btn-primary btn-sm"
+              variant="primary"
+              size="sm"
               disabled={disabled || !dirty || scopeEmpty}
               onClick={() => {
                 void save();
               }}
             >
               {busy ? t("common.saving") : t("common.save")}
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -470,15 +472,16 @@ function CompactionRoutingControls({
       {loadError && (
         <div className="notice notice-err" role="alert" style={{ marginTop: 12, marginBottom: 0 }}>
           {t("compactionRouting.loadFailed")}{" "}
-          <button
+          <Button
             type="button"
-            className="btn btn-ghost btn-sm"
+            variant="ghost"
+            size="sm"
             onClick={() => {
               void load();
             }}
           >
             {t("common.retry")}
-          </button>
+          </Button>
         </div>
       )}
       {feedback === "failed" && (

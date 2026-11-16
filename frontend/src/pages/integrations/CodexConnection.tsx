@@ -1,34 +1,22 @@
 import { useCallback, useState } from "react";
-import { useKeyedClientResource } from "../../client-resource";
-import { useI18n, useT } from "../../i18n/shared";
+import { Button } from "../../components/button";
+import { DataSurfaceSkeleton } from "../../components/data-surface";
+import { navigateHash } from "../../hash-routing";
 import { Notice } from "../../ui";
 import { useCodexRestart } from "../../use-codex-restart";
-import ConsequenceDialog from "./ConsequenceDialog";
-import { apiErrorMessage } from "../../api-error";
-import { useCodexRestoreCopy } from "./codex-restore-copy";
-import { navigateHash } from "../../hash-routing";
-import "./codex-connection.css";
+import { useClientCopy } from "./client-copy";
+import { refreshClient, useCodexConnection } from "./client-resources";
+import { changeCodex } from "./integration-api";
+import ClientDialog from "./ClientDialog";
+import IntegrationStateBadge from "./IntegrationStateBadge";
 
-interface CodexPreview {
-  configPath: string;
-  catalogPath?: string;
-  state: string;
-  model?: string;
-  baseUrl?: string;
-  reason?: string;
-  integration?: { desiredEnabled?: boolean; message?: string };
-}
-
-/** The native Codex integration lives in the gateway, not in a desktop-shell bridge. */
+type Operation = "apply" | "restore";
 export default function CodexConnection({ apiBase, active }: { apiBase: string; active: boolean }) {
-  const t = useT();
-  const { locale } = useI18n();
-  const restoreCopy = useCodexRestoreCopy();
-  const zh = locale === "zh" || locale === "zh-TW";
+  const copy = useClientCopy();
   const [home, setHome] = useState("");
   const [target, setTarget] = useState("");
+  const [operation, setOperation] = useState<Operation | null>(null);
   const [busy, setBusy] = useState(false);
-  const [restore, setRestore] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: "ok" | "err" | "warn"; text: string } | null>(
     null,
   );
@@ -36,216 +24,175 @@ export default function CodexConnection({ apiBase, active }: { apiBase: string; 
     (text: string, tone: "ok" | "err" | "warn") => setFeedback({ text, tone }),
     [],
   );
-  const resource = useKeyedClientResource<CodexPreview>(
-    `codex-connection:${apiBase}:${target}`,
-    [apiBase, target],
-    async (signal) => {
-      const response = await fetch(
-        `${apiBase}/api/clients/codex${target ? `?home=${encodeURIComponent(target)}` : ""}`,
-        { signal },
-      );
-      if (!response.ok)
-        throw new Error(await apiErrorMessage(response, t("integrations.error.load")));
-      return response.json();
-    },
-    { enabled: active },
-  );
   const restart = useCodexRestart(apiBase, { report });
-  const mutate = async (operation: "apply" | "restore" | "sync") => {
+  const resource = useCodexConnection(apiBase, target, active);
+  const preview = resource.data;
+  const draftChanged = target !== home.trim();
+  const mutate = async (selected: Operation | "sync") => {
     setBusy(true);
     setFeedback(null);
     try {
-      const response = await fetch(
-        `${apiBase}${operation === "sync" ? "/api/sync" : "/api/native-integrations/codex"}`,
-        {
-          method: operation === "sync" ? "POST" : "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...(target ? { home: target } : {}),
-            ...(operation !== "sync" ? { enabled: operation === "apply" } : {}),
-          }),
-        },
-      );
-      if (!response.ok)
-        throw new Error(await apiErrorMessage(response, t("integrations.error.load")));
-      await response.json();
-      resource.refresh();
-      setFeedback({
-        tone: "ok",
-        text: zh
-          ? operation === "restore"
-            ? "已恢复 Codex 配置。"
-            : operation === "sync"
-              ? "已同步 Codex 模型目录。"
-              : "已应用 Codex 接入配置。"
-          : operation === "restore"
-            ? "Codex configuration restored."
-            : operation === "sync"
-              ? "Codex model catalog synchronized."
-              : "Codex connection applied.",
-      });
-      setRestore(false);
+      const result = await changeCodex(apiBase, selected, target);
+      setOperation(null);
+      setFeedback({ tone: result.warning ? "warn" : "ok", text: result.warning || copy("done") });
     } catch (error) {
-      resource.refresh();
-      const message = error instanceof Error ? error.message : String(error);
-      setFeedback({ tone: "err", text: message });
-      if (operation === "restore") throw error;
+      setFeedback({ tone: "err", text: error instanceof Error ? error.message : copy("error") });
     } finally {
       setBusy(false);
+      refreshClient(apiBase, "codex", target);
     }
   };
-  const preview = resource.data;
-  const connected = preview?.state === "configured";
-  const stateLabel = connected
-    ? zh
-      ? "已接入"
-      : "Connected"
-    : preview?.state === "notConfigured"
-      ? zh
-        ? "未接入"
-        : "Not connected"
-      : (preview?.reason ?? preview?.state);
   return (
-    <section className="codex-connection" aria-labelledby="codex-integration-title">
-      <header className="codex-connection-head">
-        <div>
-          <h3 id="codex-integration-title">{t("integrations.codex.title")}</h3>
-          <p className="muted">
-            {zh
-              ? "让 Codex 通过本机网关使用已配置的供应商和模型。"
-              : "Connect Codex to the providers and models configured in your local gateway."}
-          </p>
-        </div>
-        {preview && (
-          <span className={`badge ${connected ? "badge-green" : "badge-muted"}`}>{stateLabel}</span>
-        )}
+    <section className="client-panel">
+      <header className="client-section-heading">
+        <h3>{copy("codex")}</h3>
+        <IntegrationStateBadge
+          state={preview?.integration.state ?? (resource.error ? "unavailable" : "unknown")}
+        />
+        <Button
+          variant="ghost"
+          disabled={busy || resource.refreshing}
+          onClick={() => resource.refresh()}
+        >
+          {copy("refresh")}
+        </Button>
       </header>
-      {resource.loading && !preview && <div className="min-h-64" aria-busy="true" />}
+      {!preview && !resource.error && <DataSurfaceSkeleton label={copy("loading")} rows={5} />}
       {Boolean(resource.error) && <Notice tone="err">{String(resource.error)}</Notice>}
       {preview && (
         <>
-          <div className="codex-connection-card">
-            <dl className="codex-connection-summary">
-              <div>
-                <dt>{zh ? "默认模型" : "Default model"}</dt>
-                <dd>
-                  <code>{preview.model || (zh ? "尚未选择" : "Not selected")}</code>
-                </dd>
-              </div>
-              <div>
-                <dt>{zh ? "网关地址" : "Gateway address"}</dt>
-                <dd>
-                  <code>{preview.baseUrl || "—"}</code>
-                </dd>
-              </div>
-            </dl>
-            <button type="button" className="link-btn" onClick={() => navigateHash("models")}>
-              {zh ? "管理可用模型" : "Manage available models"}
-            </button>
-            <p className="muted text-label">
-              {zh
-                ? "应用前自动备份，断开时恢复。"
-                : "Configuration is backed up before applying and restored on disconnect."}
-            </p>
-            <div className="codex-connection-actions">
-              <button
-                className="btn btn-primary"
-                disabled={busy || home.trim() !== target || preview.state === "conflict"}
-                onClick={() => void mutate("apply")}
-              >
-                {busy ? t("common.loading") : t("integrations.action.apply")}
-              </button>
-              <button
-                className="btn btn-ghost"
-                disabled={busy || !connected || home.trim() !== target}
-                onClick={() => void mutate("sync")}
-              >
-                {zh ? "同步模型目录" : "Sync model catalog"}
-              </button>
-              {!target && (
-                <button
-                  className="btn btn-ghost"
-                  disabled={busy || restart.restarting}
-                  onClick={() => void restart.restart()}
-                >
-                  {t("dash.codexRestart")}
-                </button>
-              )}
-              <button
-                className="btn btn-ghost codex-connection-restore"
-                disabled={
-                  busy ||
-                  (!connected && !preview.integration?.desiredEnabled) ||
-                  home.trim() !== target
-                }
-                onClick={() => setRestore(true)}
-              >
-                {zh ? "断开并恢复" : "Disconnect & restore"}
-              </button>
+          <dl className="client-facts">
+            <div>
+              <dt>{copy("model")}</dt>
+              <dd>{preview.model || copy("noModel")}</dd>
             </div>
-          </div>
-          {preview.integration?.message && (
+            <div>
+              <dt>{copy("gateway")}</dt>
+              <dd>
+                <code>{preview.baseUrl}</code>
+              </dd>
+            </div>
+          </dl>
+          {preview.integration.message && (
             <Notice tone="warn">{preview.integration.message}</Notice>
           )}
-          <details className="codex-connection-files">
-            <summary>{zh ? "配置文件与目录" : "Configuration files and location"}</summary>
-            <dl className="codex-connection-paths">
+          {preview.integration.warning && (
+            <Notice tone="warn">{preview.integration.warning}</Notice>
+          )}
+          <div className="client-actions">
+            <Button
+              variant="primary"
+              disabled={
+                busy ||
+                draftChanged ||
+                resource.refreshing ||
+                !resource.lastAttemptOk ||
+                preview.state === "conflict" ||
+                !preview.model
+              }
+              onClick={() => {
+                setFeedback(null);
+                setOperation("apply");
+              }}
+            >
+              {copy("apply")}
+            </Button>
+            <Button
+              disabled={busy || draftChanged || preview.state !== "configured"}
+              onClick={() => void mutate("sync")}
+            >
+              {copy("sync")}
+            </Button>
+            <Button
+              variant="ghost"
+              disabled={
+                busy ||
+                draftChanged ||
+                (!preview.integration.desiredEnabled && preview.state !== "configured")
+              }
+              onClick={() => {
+                setFeedback(null);
+                setOperation("restore");
+              }}
+            >
+              {copy("disconnect")}
+            </Button>
+          </div>
+          <div className="client-actions">
+            <Button variant="ghost" onClick={() => navigateHash("models")}>
+              {copy("models")}
+            </Button>
+            <Button variant="ghost" onClick={() => navigateHash("subagents")}>
+              {copy("roles")}
+            </Button>
+            {!target && (
+              <Button
+                variant="ghost"
+                disabled={busy || restart.restarting}
+                onClick={() => void restart.restart()}
+              >
+                {copy("restartCodex")}
+              </Button>
+            )}
+          </div>
+          <details className="client-files">
+            <summary>{copy("files")}</summary>
+            <dl className="client-facts">
               <div>
-                <dt>{zh ? "配置文件" : "Configuration"}</dt>
+                <dt>{copy("configPath")}</dt>
                 <dd>
                   <code>{preview.configPath}</code>
                 </dd>
               </div>
-              {preview.catalogPath && (
-                <div>
-                  <dt>{zh ? "模型目录" : "Model catalog"}</dt>
-                  <dd>
-                    <code>{preview.catalogPath}</code>
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <form
-              className="codex-connection-home"
-              onSubmit={(event) => {
-                event.preventDefault();
-                setTarget(home.trim());
-                setFeedback(null);
-              }}
-            >
-              <label htmlFor="codex-home">
-                {zh ? "自定义 Codex 配置目录" : "Custom Codex home"}
-              </label>
               <div>
-                <input
-                  id="codex-home"
-                  className="input"
-                  value={home}
-                  onChange={(event) => setHome(event.target.value)}
-                  disabled={busy}
-                  placeholder={zh ? "使用默认目录" : "Use default directory"}
-                  aria-describedby="codex-home-hint"
-                />
-                <button type="submit" className="btn btn-ghost" disabled={busy}>
-                  {zh ? "预览" : "Preview"}
-                </button>
+                <dt>{copy("catalogPath")}</dt>
+                <dd>
+                  <code>{preview.catalogPath}</code>
+                </dd>
               </div>
-              <p id="codex-home-hint" className="muted text-label">
-                {zh
-                  ? "留空使用 CODEX_HOME 或默认目录；修改后先预览，再应用。"
-                  : "Leave blank to use CODEX_HOME or the default directory. Preview a changed location before applying."}
-              </p>
-            </form>
+            </dl>
           </details>
         </>
       )}
-      {feedback && <Notice tone={feedback.tone}>{feedback.text}</Notice>}
-      {restore && preview && (
-        <ConsequenceDialog
-          copy={restoreCopy(preview.configPath)}
-          onClose={() => setRestore(false)}
-          onConfirm={() => mutate("restore")}
-        />
+      <form
+        className="client-home"
+        onSubmit={(event) => {
+          event.preventDefault();
+          setTarget(home.trim());
+          setFeedback(null);
+        }}
+      >
+        <label htmlFor="client-codex-home">{copy("home")}</label>
+        <div className="client-home-controls">
+          <input
+            id="client-codex-home"
+            className="input"
+            value={home}
+            onChange={(event) => setHome(event.target.value)}
+            disabled={busy}
+            placeholder={copy("homeDefault")}
+            aria-describedby="client-codex-home-hint"
+          />
+          <Button type="submit" disabled={busy}>
+            {copy("preview")}
+          </Button>
+        </div>
+        <p id="client-codex-home-hint" className="muted">
+          {copy(draftChanged ? "previewRequired" : "homeHint")}
+        </p>
+      </form>
+      {feedback && !operation && <Notice tone={feedback.tone}>{feedback.text}</Notice>}
+      {active && operation && preview && (
+        <ClientDialog
+          title={copy(operation === "apply" ? "applyCodex" : "restoreCodex")}
+          pending={busy}
+          onClose={() => setOperation(null)}
+          onConfirm={() => void mutate(operation)}
+        >
+          <p>{copy(operation === "apply" ? "applyCodexBody" : "restoreCodexBody")}</p>
+          <code>{preview.configPath}</code>
+          {feedback && <Notice tone={feedback.tone}>{feedback.text}</Notice>}
+        </ClientDialog>
       )}
     </section>
   );

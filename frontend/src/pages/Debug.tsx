@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
+import { Button } from "@/components/button";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { setClientResourceData } from "../client-resource";
-import { useI18n } from "../i18n/shared";
-import { Notice } from "../ui";
-import { useDataSurface } from "../data-surface";
-import { DataSurfaceSkeleton } from "../components/data-surface";
-import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { createBoundedFetch } from "../bounded-fetch";
+import { setClientResourceData } from "../client-resource";
+import { DataSurfaceSkeleton } from "../components/data-surface";
+import { useDataSurface } from "../data-surface";
+import { useI18n } from "../i18n/shared";
+import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
+import { Notice } from "../ui";
 import { startVisibilityPoll } from "../visibility-poll";
 import { DebugLogViewer } from "./debug-log-viewer";
 import { DebugPageHeader, DebugSettingsPanel } from "./debug-settings-panel";
@@ -222,13 +223,9 @@ export default function Debug({
       {!debug && debugState.showError ? (
         <div className="notice notice-err" role="alert">
           <span>{t("debug.loadFailed")}</span>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => debugPoll.refresh()}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={() => debugPoll.refresh()}>
             {t("common.retry")}
-          </button>
+          </Button>
         </div>
       ) : debugState.showSkeleton && !debug ? (
         <DataSurfaceSkeleton label={t("debug.loading")} rows={3} />

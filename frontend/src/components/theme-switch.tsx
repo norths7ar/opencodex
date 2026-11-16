@@ -1,5 +1,5 @@
-import { IconMonitor, IconMoon, IconSun } from "../icons";
 import { useT, type TKey } from "../i18n/shared";
+import { IconMonitor, IconMoon, IconSun } from "../icons";
 
 export type ThemeMode = "light" | "dark" | "system";
 

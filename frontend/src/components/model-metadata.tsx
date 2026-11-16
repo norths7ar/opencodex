@@ -1,4 +1,3 @@
-import { liteTranslator } from "../i18n/lite-copy";
 import { useI18n, type TKey } from "../i18n/shared";
 import type {
   ModelEffectiveCost,
@@ -33,9 +32,9 @@ export function MetadataSource({
   reset?: boolean;
   linked?: boolean;
 }) {
-  const lite = liteTranslator(useI18n().locale);
-  if (reset) return <span className="muted text-caption">{lite("modelResetOnSave")}</span>;
-  const label = lite(
+  const { t } = useI18n();
+  if (reset) return <span className="muted text-caption">{t("modelResetOnSave")}</span>;
+  const label = t(
     SOURCE_LABELS[value?.source as keyof typeof SOURCE_LABELS] ?? "modelSourceAutomatic",
   );
   const checked = value?.updatedAt ? new Date(value.updatedAt) : undefined;
@@ -50,7 +49,7 @@ export function MetadataSource({
         label
       )}
       {date && <> · {date}</>}
-      {value?.stale && <> · {lite("modelStaleSource")}</>}
+      {value?.stale && <> · {t("modelStaleSource")}</>}
     </span>
   );
 }
@@ -66,16 +65,15 @@ export function ModelCostSummary({
   schedule?: ModelPricingSchedule;
   linked?: boolean;
 }) {
-  const { t, locale } = useI18n();
-  const lite = liteTranslator(locale);
-  if (subscription) return <>{lite("modelNotApplicable")}</>;
-  if (!cost && !schedule) return <>{lite("modelUnknown")}</>;
+  const { t } = useI18n();
+  if (subscription) return <>{t("modelNotApplicable")}</>;
+  if (!cost && !schedule) return <>{t("modelUnknown")}</>;
   const rates = (values: ModelEffectiveCost) =>
     RATE_FIELDS.map((field) => `${t(RATE_LABELS[field])}: ${values[field] ?? "—"}`).join(" · ");
   const prompt = cost?.promptLengthPricing;
   return (
     <>
-      <span className="model-summary-line">{lite("modelPricingUnit")}</span>
+      <span className="model-summary-line">{t("modelPricingUnit")}</span>
       {cost && <span className="model-summary-line">{rates(cost)}</span>}
       {prompt?.mode === "custom" && (
         <span className="model-summary-line">
@@ -86,10 +84,10 @@ export function ModelCostSummary({
       {schedule && !cost && (
         <>
           <span className="model-summary-line">
-            {lite("modelPricingPeak")}: {rates(schedule.bands.peak)}
+            {t("modelPricingPeak")}: {rates(schedule.bands.peak)}
           </span>
           <span className="model-summary-line">
-            {lite("modelPricingOffPeak")}: {rates(schedule.bands.offPeak)}
+            {t("modelPricingOffPeak")}: {rates(schedule.bands.offPeak)}
           </span>
           {schedule.condition && <span className="model-summary-line">{schedule.condition}</span>}
           <MetadataSource
@@ -102,7 +100,7 @@ export function ModelCostSummary({
             }}
           />
           <span className="model-summary-line muted text-caption">
-            {lite("modelPricingScheduleNote")}
+            {t("modelPricingScheduleNote")}
           </span>
         </>
       )}
@@ -111,15 +109,14 @@ export function ModelCostSummary({
 }
 
 export function ModelReasoningSummary({ row }: { row: ModelRow }) {
-  const { t, locale } = useI18n();
-  const lite = liteTranslator(locale);
+  const { t } = useI18n();
   const levels = row.reasoningEfforts ?? [];
   const effort = (value: string) => t(("models.reasoningEffort." + value) as TKey);
   return (
     <>
       {levels.length
         ? levels.map(effort).join(", ")
-        : lite(
+        : t(
             row.supportsReasoning === undefined && !row.reasoningEfforts
               ? "modelUnknown"
               : row.supportsReasoning

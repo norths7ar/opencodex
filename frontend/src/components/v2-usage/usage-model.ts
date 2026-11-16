@@ -1,9 +1,9 @@
-import type { CSSProperties } from "react";
-import type { SourceFilter } from "./usage-source";
 import type { UsageApp as UsageAppClient } from "@/contracts/telemetry/app-breakdown";
-import type { Locale, TFn } from "../../i18n/shared";
+import type { CSSProperties } from "react";
 import { formatTokens } from "../../format-tokens";
+import type { Locale, TFn } from "../../i18n/shared";
 import type { UsageReadMetadata } from "../../usage-summary-resource";
+import type { SourceFilter } from "./usage-source";
 
 /*
  * Shapes and pure helpers behind the v2 Usage report. The response shapes mirror

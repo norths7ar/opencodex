@@ -1,16 +1,19 @@
+import { Button } from "@/components/button";
 import { useEffect, useId, useRef, useState } from "react";
 import { confirmAction } from "../action-dialogs";
 import { createBoundedFetch, type BoundedFetch } from "../bounded-fetch";
+import { clientApplicationWarning } from "../contracts/application";
+import type { ApplicationReceipt } from "../contracts/channels";
 import { readJsonOrThrow } from "../fetch-json";
-import { liteTranslator } from "../i18n/lite-copy";
 import { useI18n, type TKey } from "../i18n/shared";
-import { Notice, Select } from "../ui";
 import {
   CUSTOM_OPTION,
-  REASONING_EFFORT_LEVELS,
   modelDisplayNameValidationKey,
+  REASONING_EFFORT_LEVELS,
   type ModelRow,
 } from "../pages/models-shared";
+import { Notice, Select } from "../ui";
+import { MetadataSource, ModelCostSummary, ModelReasoningSummary } from "./model-metadata";
 import {
   buildDraftCost,
   isRecord,
@@ -20,9 +23,8 @@ import {
   type InvalidField,
 } from "./model-price-cost";
 import ModelPriceFields from "./ModelPriceFields";
-import { MetadataSource, ModelCostSummary, ModelReasoningSummary } from "./model-metadata";
 
-const MODALITIES = ["text", "image", "audio"] as const;
+const MODALITIES = ["text", "image", "audio", "video"] as const;
 const CONTEXT_PRESETS = ["100000", "128000", "200000", "256000", "352000", "500000", "1000000"];
 const REQUEST_TIMEOUT_MS = 60_000;
 type Phase = "ready" | "saving" | "restoring" | "unknown" | "saved-stale";
@@ -61,8 +63,7 @@ export default function ModelSettingsDialog({
   onFeedback,
   onClose,
 }: ModelSettingsDialogProps) {
-  const { t, locale } = useI18n();
-  const lite = liteTranslator(locale);
+  const { t } = useI18n();
   const id = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const reloadRef = useRef<HTMLButtonElement>(null);
@@ -188,14 +189,15 @@ export default function ModelSettingsDialog({
         reset={resetAxes.includes(axis)}
       />
       {hasOverride(axis) && !resetAxes.includes(axis) && (
-        <button
+        <Button
           type="button"
-          className="btn btn-ghost btn-sm"
+          variant="ghost"
+          size="sm"
           onClick={() => resetAxis(axis)}
           disabled={locked}
         >
           {label}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -276,7 +278,14 @@ export default function ModelSettingsDialog({
       const response = await fetch(apiBase + "/api/model-settings", {
         method: "PUT",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ provider: row.provider, modelId: row.id, ...patch }),
+        body: JSON.stringify({
+          model: { channel_id: row.provider, model_id: row.id },
+          changes: Object.fromEntries(
+            Object.entries(patch).filter(([key]) => key !== "cost" && key !== "newModelId"),
+          ),
+          ...(Object.hasOwn(patch, "cost") ? { cost: patch.cost } : {}),
+          ...(patch.newModelId ? { new_model_id: patch.newModelId } : {}),
+        }),
         signal: bounded.signal,
       });
       // A 4xx is answered before anything is written, so the outcome is known: nothing saved.
@@ -299,7 +308,7 @@ export default function ModelSettingsDialog({
         typeof result.saved !== "boolean" ||
         result.saved !== result.changed ||
         !isRecord(result.catalogRefresh) ||
-        !["committed", "skipped", "failed"].includes(String(result.catalogRefresh.status))
+        !["applied", "skipped", "failed"].includes(String(result.catalogRefresh.status))
       ) {
         throw new Error("invalid model-settings receipt");
       }
@@ -318,17 +327,15 @@ export default function ModelSettingsDialog({
         onClose();
         return;
       }
-      // `catalogRefresh` describes the Codex app's catalog, not this list: the dashboard reads the
-      // saved config directly. A skip the operator cannot act on (no managed catalog) is normal;
-      // only a failed or retryable refresh is worth a warning, and only after the list reloads.
-      const refresh = result.catalogRefresh;
-      const codexStale =
-        refresh.status === "failed" || (refresh.status === "skipped" && refresh.retryable === true);
+      const warning = clientApplicationWarning(
+        result.catalogRefresh as ApplicationReceipt,
+        t("integrations.catalogSyncFailed"),
+      );
       if (!(await onRefresh(bounded.signal))) throw new Error("catalog refresh failed");
       bounded.signal.throwIfAborted();
       if (requestRef.current !== bounded) return;
-      if (codexStale) {
-        onFeedback(false, t("models.settingsSavedCodexStale", { model: row.namespaced }));
+      if (warning) {
+        onFeedback(false, warning);
       } else if (restoring) {
         onFeedback(true, t("models.settingsRestored", { model: row.namespaced }));
       } else {
@@ -388,7 +395,7 @@ export default function ModelSettingsDialog({
       !resetAxes.includes("inputModalities") &&
       sortedKey(modalities) !== sortedKey(baseline.modalities)
     ) {
-      patch.inputModalities = modalities.length > 0 ? modalities : null;
+      patch.inputModalities = modalities;
     }
     if (
       !resetAxes.includes("reasoningEfforts") &&
@@ -431,8 +438,8 @@ export default function ModelSettingsDialog({
   const restore = async () => {
     if (phase !== "ready") return;
     const confirmed = await confirmAction({
-      message: lite("modelRestoreAllConfirm", { model: row.namespaced }),
-      confirmLabel: lite("modelRestoreAll"),
+      message: t("modelRestoreAllConfirm", { model: row.namespaced }),
+      confirmLabel: t("modelRestoreAll"),
       tone: "danger",
     });
     if (!confirmed) return;
@@ -480,14 +487,9 @@ export default function ModelSettingsDialog({
       >
         <div className="modal-head">
           <h3 id={id + "-title"}>{t("models.settingsTitle", { model: row.namespaced })}</h3>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            disabled={busy}
-            onClick={requestClose}
-          >
+          <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={requestClose}>
             {t("common.close")}
-          </button>
+          </Button>
         </div>
 
         {errorKey && <Notice tone={phase === "saved-stale" ? "warn" : "err"}>{t(errorKey)}</Notice>}
@@ -510,7 +512,7 @@ export default function ModelSettingsDialog({
             ) : (
               <code className="mono text-control">{row.namespaced}</code>
             )}
-            {idError && <Notice tone="err">{lite("modelIdRequired")}</Notice>}
+            {idError && <Notice tone="err">{t("modelIdRequired")}</Notice>}
           </div>
 
           <div className="models-field">
@@ -533,7 +535,7 @@ export default function ModelSettingsDialog({
 
           <section className="models-field" aria-labelledby={id + "-pricing"}>
             <h4 id={id + "-pricing"} className="field-label">
-              {lite("modelPricing")}
+              {t("modelPricing")}
             </h4>
             <ModelCostSummary
               cost={resetAxes.includes("cost") ? inherited?.effectiveCost : row.effectiveCost}
@@ -554,7 +556,7 @@ export default function ModelSettingsDialog({
                     disabled={locked}
                     onChange={(event) => togglePriceOverride(event.target.checked)}
                   />
-                  <span className="text-control">{lite("modelOverridePricing")}</span>
+                  <span className="text-control">{t("modelOverridePricing")}</span>
                 </label>
                 {priceOverride && (
                   <ModelPriceFields
@@ -582,8 +584,8 @@ export default function ModelSettingsDialog({
             {t("models.customFieldContext")}
             {row.contextCap !== undefined && (
               <span className="muted text-caption">
-                {lite("modelContextEffective", {
-                  value: row.contextWindow?.toLocaleString() ?? lite("modelUnknown"),
+                {t("modelContextEffective", {
+                  value: row.contextWindow?.toLocaleString() ?? t("modelUnknown"),
                   cap: row.contextCap.toLocaleString(),
                 })}
               </span>
@@ -657,28 +659,28 @@ export default function ModelSettingsDialog({
               ))}
             </div>
             {modalities.length === 0 && (
-              <span className="muted text-caption">{lite("modelUnknown")}</span>
+              <span className="muted text-caption">{t("modelUnknown")}</span>
             )}
             {resetControl("inputModalities")}
           </div>
           <div className="models-field">
-            <span className="text-label">{lite("modelOutputModalities")}</span>
+            <span className="text-label">{t("modelOutputModalities")}</span>
             <span className="text-control">
-              {row.outputModalities?.join(", ") || lite("modelUnknown")}
+              {row.outputModalities?.join(", ") || t("modelUnknown")}
             </span>
             <MetadataSource linked value={row.metadataSources?.outputModalities} />
           </div>
           <div className="models-field">
-            <span className="text-label">{lite("modelInputLimit")}</span>
+            <span className="text-label">{t("modelInputLimit")}</span>
             <span className="text-control">
-              {row.maxInputTokens?.toLocaleString() ?? lite("modelUnknown")}
+              {row.maxInputTokens?.toLocaleString() ?? t("modelUnknown")}
             </span>
             <MetadataSource linked value={row.metadataSources?.maxInputTokens} />
           </div>
           <div className="models-field">
-            <span className="text-label">{lite("modelOutputLimit")}</span>
+            <span className="text-label">{t("modelOutputLimit")}</span>
             <span className="text-control">
-              {row.maxOutputTokens?.toLocaleString() ?? lite("modelUnknown")}
+              {row.maxOutputTokens?.toLocaleString() ?? t("modelUnknown")}
             </span>
             <MetadataSource linked value={row.metadataSources?.maxOutputTokens} />
           </div>
@@ -696,7 +698,7 @@ export default function ModelSettingsDialog({
                   onChange={(event) => toggleReasoning(event.target.checked)}
                   disabled={locked}
                 />
-                <span className="text-control">{lite("modelReasoningLevels")}</span>
+                <span className="text-control">{t("modelReasoningLevels")}</span>
               </label>
             </div>
             {reasoning && (
@@ -750,30 +752,32 @@ export default function ModelSettingsDialog({
 
         <div className="modal-actions">
           {terminal && (
-            <button
+            <Button
               ref={reloadRef}
               type="button"
-              className="btn btn-ghost"
+              variant="ghost"
+              size="md"
               onClick={() => void reload()}
             >
               {t("models.settingsReload")}
-            </button>
+            </Button>
           )}
-          <button
+          <Button
             type="button"
-            className="btn btn-ghost"
+            variant="ghost"
+            size="md"
             title={t("models.settingsRestoreHint")}
             disabled={busy || terminal}
             onClick={() => void restore()}
           >
-            {lite("modelRestoreAll")}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={requestClose} disabled={busy}>
+            {t("modelRestoreAll")}
+          </Button>
+          <Button type="button" variant="ghost" size="md" onClick={requestClose} disabled={busy}>
             {t("common.cancel")}
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={busy || terminal}>
+          </Button>
+          <Button type="submit" variant="primary" size="md" disabled={busy || terminal}>
             {busy ? t("models.customSaving") : t("models.customApply")}
-          </button>
+          </Button>
         </div>
       </form>
     </dialog>

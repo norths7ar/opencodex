@@ -1,6 +1,6 @@
 import { normalizeRecordedClient, type UsageClient } from "@/contracts/telemetry/client";
-import type { TFn } from "../i18n/shared";
 import { clientIconClass } from "../client-icon";
+import type { TFn } from "../i18n/shared";
 
 const CLIENT_LABELS = {
   codex_cli: "Codex",

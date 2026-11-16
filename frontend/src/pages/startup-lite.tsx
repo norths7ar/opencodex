@@ -1,56 +1,91 @@
-import { useCallback, useEffect, useState } from "react";
-import { useI18n } from "../i18n/shared";
-import { useDataSurface } from "../data-surface";
-import { readJsonOrThrow } from "../fetch-json";
+import { Notice } from "@/ui";
+import { CommandRow } from "@/components/command-row";
+import { FileLocation } from "@/components/file-location";
+import { StateBadge } from "@/components/state-badge";
+import { useEffect, useState } from "react";
 import { DataSurfaceSkeleton } from "../components/data-surface";
-import {
-  Banner,
-  CommandRow,
-  PageHeader,
-  Panel,
-  StateBadge,
-} from "../components/v2-startup/primitives";
-import { Button } from "../components/ui-v2/button";
+import { Button } from "../components/button";
+import type { DataSurfaceResource } from "../data-surface";
+import { readJsonOrThrow } from "../fetch-json";
+import { useI18n } from "../i18n/shared";
+import { IconActivity, IconPower, IconRefresh } from "../icons";
+import type { Overview } from "./use-overview";
 import "./startup-lite.css";
 
-interface StartupHealth {
-  serviceOperation?: { id: string; state: string; error?: string } | null;
-  taskName: string;
-  stateDirectory: string;
-  runtimeState: string;
-  logPath: string;
-  supervisorLogPath: string;
-  serviceInstalled: boolean;
-  serviceEnabled: boolean;
-  serviceViable: boolean;
-  serviceStale: boolean;
-  serviceConflict: boolean;
-  diagnosticStale: boolean;
-  error?: string | null;
-  commands: Record<string, string>;
-}
-
-export default function LiteStartup({ apiBase }: { apiBase: string }) {
-  const { locale } = useI18n();
-  const zh = locale === "zh" || locale === "zh-TW";
-  const copy = (en: string, cn: string) => (zh ? cn : en);
+export default function LiteStartup({
+  apiBase,
+  overview: resource,
+  onReloadCodex,
+  reloadingCodex,
+}: {
+  apiBase: string;
+  overview: DataSurfaceResource<Overview>;
+  onReloadCodex: () => void;
+  reloadingCodex: boolean;
+}) {
+  const { t } = useI18n();
+  const unconfirmed = t("startup.surface.unconfirmed");
   const [busy, setBusy] = useState(false);
   const [operation, setOperation] = useState<{ id: string; action: string } | null>(null);
-  const [removalDisconnected, setRemovalDisconnected] = useState(false);
-  const removing = operation?.action === "remove";
-  const [notice, setNotice] = useState<{ error: boolean; text: string } | null>(null);
+  const [notice, setNotice] = useState<{
+    error: boolean;
+    text: string;
+    removalDisconnected?: boolean;
+  } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const load = useCallback(
-    async (signal: AbortSignal) => {
-      const response = await fetch(`${apiBase}/api/startup-health`, { signal });
-      return readJsonOrThrow<StartupHealth>(response, "Could not read automatic startup status.");
-    },
-    [apiBase],
-  );
-  const resource = useDataSurface(`lite-startup:${apiBase}`, [apiBase], load, {
-    isEmpty: () => false,
-  });
-  const data = resource.state.data;
+  const [opening, setOpening] = useState<string | null>(null);
+  const openLocation = async (location: "state" | "runtime-log" | "startup-log") => {
+    setOpening(location);
+    try {
+      await fetch(`${apiBase}/api/runtime/open-location`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ location }),
+      }).then(readJsonOrThrow);
+    } catch (error) {
+      setNotice({
+        error: true,
+        text: error instanceof Error ? error.message : t("startup.surface.openFolderFailed"),
+      });
+    } finally {
+      setOpening(null);
+    }
+  };
+  const copyValue = (value: string) => {
+    void navigator.clipboard
+      .writeText(value)
+      .then(() => setCopied(value))
+      .catch(() =>
+        setNotice({
+          error: true,
+          text: t("startup.surface.copyFailed"),
+        }),
+      );
+  };
+  const data = resource.state.data?.startup;
+  const runtime = resource.state.data?.runtime;
+  const observed = data?.serviceOperation;
+  // Consume the receipt as soon as it matches the tracked operation. A later
+  // overview can describe a different operation and must not restart this poll.
+  if (operation && observed?.id === operation.id && observed.state !== "running") {
+    const failed = observed.state === "failed";
+    setOperation(null);
+    setNotice({
+      error: failed,
+      text:
+        observed.error ??
+        (failed ? t("startup.surface.applyFailed") : t("startup.surface.serviceUpdated")),
+    });
+  } else if (operation?.action === "remove" && resource.state.showError) {
+    setOperation(null);
+    setNotice({
+      error: false,
+      removalDisconnected: true,
+      text: t("startup.surface.removalDisconnected"),
+    });
+  }
+  const removalDisconnected = notice?.removalDisconnected && resource.state.showError;
+  const removing = operation?.action === "remove";
   const blocked =
     busy ||
     !!operation ||
@@ -62,58 +97,23 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
 
   useEffect(() => {
     if (!operation) return;
-    const controller = new AbortController();
-    const deadline = Date.now() + 90_000;
-    let timer: ReturnType<typeof setTimeout>;
-    const poll = async () => {
-      try {
-        const result = await load(controller.signal);
-        const observed = result?.serviceOperation;
-        if (observed?.id === operation.id && observed.state !== "running") {
-          setOperation(null);
-          setNotice({
-            error: observed.state === "failed",
-            text: observed.error ?? (zh ? "服务设置已更新。" : "Service settings updated."),
-          });
-          refresh();
-          return;
-        }
-      } catch {
-        if (controller.signal.aborted) return;
-        if (operation.action === "remove") {
-          setRemovalDisconnected(true);
-          setNotice({
-            error: false,
-            text: zh
-              ? "网关连接已断开。运行 ocx service status 查看移除结果。"
-              : "The gateway connection has closed. Run ocx service status to check the removal result.",
-          });
-          return;
-        }
-        // Installation and repair can briefly stop the server hosting this page.
-      }
-      if (controller.signal.aborted) return;
-      if (Date.now() >= deadline) {
-        setOperation(null);
-        setNotice({
-          error: true,
-          text: zh
-            ? "暂时无法确认结果，请运行 ocx service status。"
-            : "Could not confirm the result. Run ocx service status.",
-        });
-        return;
-      }
-      timer = setTimeout(() => void poll(), 1000);
-    };
-    timer = setTimeout(() => void poll(), 1000);
+    const interval = setInterval(() => refresh(), 1000);
+    const timeout = setTimeout(() => {
+      setOperation(null);
+      setNotice({
+        error: true,
+        text: unconfirmed,
+      });
+    }, 90_000);
     return () => {
-      controller.abort();
-      clearTimeout(timer);
+      clearInterval(interval);
+      clearTimeout(timeout);
     };
-  }, [operation, load, refresh, zh]);
+  }, [operation, refresh, unconfirmed]);
 
   const act = async (action: string) => {
     setBusy(true);
+    setOperation(null);
     setNotice(null);
     try {
       const response = await fetch(`${apiBase}/api/startup-action`, {
@@ -125,21 +125,21 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
         pending?: boolean;
         operationId?: string;
         action?: string;
-      }>(response, copy("Could not change automatic startup.", "无法更改自动启动设置。"));
+      }>(response, t("startup.surface.applyFailed"));
       if (result?.pending && result.operationId) {
         setOperation({ id: result.operationId, action: result.action ?? action });
         setNotice({
           error: false,
           text:
             action === "remove"
-              ? copy("Stopping the gateway and removing the service…", "正在停止网关并移除服务……")
+              ? t("startup.surface.removalPending")
               : action === "repair"
-                ? copy("Repairing the service…", "正在修复服务……")
-                : copy("Installing the service…", "正在安装服务……"),
+                ? t("startup.surface.repairPending")
+                : t("startup.surface.installPending"),
         });
         return;
       }
-      setNotice({ error: false, text: copy("Automatic startup updated.", "自动启动设置已更新。") });
+      setNotice({ error: false, text: t("startup.surface.startupUpdated") });
       resource.refresh();
     } catch (error) {
       setNotice({ error: true, text: error instanceof Error ? error.message : String(error) });
@@ -150,93 +150,100 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
   };
 
   return (
-    <div className="startup-page flex flex-col gap-5">
-      <PageHeader
-        title={copy("Startup", "启动")}
-        subtitle={copy(
-          "Keep the local gateway available after signing in to Windows.",
-          "登录 Windows 后自动运行本地网关。",
-        )}
-        actions={
-          <Button
-            disabled={busy || !!operation || resource.state.refreshing}
-            onClick={() => resource.refresh()}
-          >
-            {copy("Refresh", "刷新")}
-          </Button>
-        }
-      />
-      {resource.state.showError && (
-        <Banner tone="err">
-          {copy(
-            "Could not read startup status. Refresh to retry.",
-            "无法读取启动状态，请刷新重试。",
-          )}
-        </Banner>
-      )}
+    <div className="startup-page">
+      {resource.state.showError && <Notice tone="err">{t("startup.surface.readFailed")}</Notice>}
       {!data && !resource.state.showError && (
-        <DataSurfaceSkeleton label={copy("Loading startup status", "正在读取启动状态")} rows={3} />
+        <DataSurfaceSkeleton label={t("startup.surface.loading")} rows={3} />
       )}
-      {notice && <Banner tone={notice.error ? "err" : "ok"}>{notice.text}</Banner>}
+      {notice && <Notice tone={notice.error ? "err" : "ok"}>{notice.text}</Notice>}
       {data && (
         <>
-          {data.error && <Banner tone="warn">{data.error}</Banner>}
-          <section className="startup-runtime-status">
-            <div>
-              <h3>{copy("Gateway", "网关运行状态")}</h3>
-              <p>
-                {copy(
-                  "Closing this console leaves the gateway running in the background.",
-                  "关闭控制台后，网关继续在后台运行。",
-                )}
-              </p>
-            </div>
-            <StateBadge tone={!removing && data.runtimeState === "running" ? "ok" : "neutral"}>
-              {removalDisconnected
-                ? copy("Disconnected", "连接已断开")
-                : removing
-                  ? copy("Stopping", "正在停止")
-                  : data.runtimeState === "running"
-                    ? copy("Running", "运行中")
-                    : data.runtimeState}
-            </StateBadge>
-          </section>
-          <Panel
-            title={copy("Automatic background startup", "自动后台启动")}
-            meta={
-              <StateBadge
-                tone={
-                  operation
-                    ? "neutral"
-                    : data.serviceViable
-                      ? "ok"
-                      : data.serviceStale
-                        ? "warn"
+          {data.error && <Notice tone="warn">{data.error}</Notice>}
+          <div className="startup-control">
+            <section className="startup-runtime-status">
+              <div>
+                <div className="startup-control-heading">
+                  <h2>
+                    <IconActivity aria-hidden="true" />
+                    {t("startup.surface.gateway")}
+                  </h2>
+                  <StateBadge
+                    tone={
+                      !removalDisconnected && !removing && data.runtimeState === "running"
+                        ? "ok"
                         : "neutral"
-                }
-              >
-                {removalDisconnected
-                  ? copy("Check from CLI", "请用命令行确认")
-                  : removing
-                    ? copy("Removing", "正在移除")
-                    : data.diagnosticStale
-                      ? copy("Status unavailable", "状态未知")
-                      : data.serviceViable
-                        ? copy("Enabled", "已启用")
-                        : data.serviceStale
-                          ? copy("Repair needed", "需要修复")
-                          : copy("Not enabled", "未启用")}
-              </StateBadge>
-            }
-            description={copy(
-              "Runs as your Windows account at login, reconnect and unlock. The gateway stays running when the browser or Service Desk closes. Unexpected process exits are retried; an explicit Stop is respected.",
-              "在当前 Windows 账号登录、重新连接或解锁时启动。关闭浏览器或 Service Desk 不影响网关。进程意外退出后自动重试；手动停止则保持停止。",
-            )}
-            actions={
+                    }
+                  >
+                    {removalDisconnected
+                      ? t("startup.surface.disconnected")
+                      : removing
+                        ? t("startup.surface.stopping")
+                        : data.runtimeState === "running"
+                          ? t("startup.surface.running")
+                          : data.runtimeState}
+                  </StateBadge>
+                </div>
+                <p>{t("startup.surface.gatewayDescription")}</p>
+              </div>
+              <dl className="startup-runtime-facts">
+                <div>
+                  <dt>{t("startup.surface.port")}</dt>
+                  <dd>{runtime?.port ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt>{t("shellV2.tileUptime")}</dt>
+                  <dd>
+                    {runtime?.uptimeSeconds === undefined
+                      ? "—"
+                      : t("shellV2.uptimeValue", {
+                          h: String(Math.floor(runtime.uptimeSeconds / 3600)),
+                          m: String(Math.floor((runtime.uptimeSeconds % 3600) / 60)),
+                        })}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("shellV2.tileVersion")}</dt>
+                  <dd>{runtime?.version ? `v${runtime.version}` : "—"}</dd>
+                </div>
+              </dl>
+            </section>
+            <section className="startup-auto">
+              <div>
+                <div className="startup-control-heading">
+                  <h2>
+                    <IconPower aria-hidden="true" />
+                    {t("startup.surface.automatic")}
+                  </h2>
+                  <StateBadge
+                    tone={
+                      operation || removalDisconnected || data.diagnosticStale
+                        ? "neutral"
+                        : data.serviceViable
+                          ? "ok"
+                          : data.serviceStale
+                            ? "warn"
+                            : "neutral"
+                    }
+                  >
+                    {removalDisconnected
+                      ? t("startup.surface.checkCli")
+                      : removing
+                        ? t("startup.surface.removing")
+                        : data.diagnosticStale
+                          ? t("startup.surface.statusUnavailable")
+                          : data.serviceViable
+                            ? t("startup.surface.enabled")
+                            : data.serviceStale
+                              ? t("startup.surface.repairNeeded")
+                              : t("startup.surface.notEnabled")}
+                  </StateBadge>
+                </div>
+                <p>{t("startup.surface.automaticDescription")}</p>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {!data.serviceInstalled && (
                   <Button variant="primary" disabled={blocked} onClick={() => void act("install")}>
-                    {copy("Enable automatic startup", "启用自动启动")}
+                    {t("startup.surface.install")}
                   </Button>
                 )}
                 {data.serviceInstalled && (
@@ -245,80 +252,99 @@ export default function LiteStartup({ apiBase }: { apiBase: string }) {
                       disabled={blocked}
                       onClick={() => void act(data.serviceEnabled ? "disable" : "enable")}
                     >
-                      {data.serviceEnabled ? copy("Disable", "禁用") : copy("Enable", "启用")}
+                      {data.serviceEnabled
+                        ? t("startup.surface.disable")
+                        : t("startup.surface.enable")}
                     </Button>
                     <Button disabled={blocked} onClick={() => void act("repair")}>
-                      {copy("Repair", "修复")}
-                    </Button>
-                    <Button variant="danger" disabled={blocked} onClick={() => void act("remove")}>
-                      {copy("Remove registration", "移除启动注册")}
+                      {t("startup.surface.repair")}
                     </Button>
                   </>
                 )}
               </div>
-            }
-            bodyClassName="startup-settings-body"
-          >
-            <p className="startup-action-hint">
-              {copy(
-                "Disabling automatic startup leaves the gateway running. Removing the service stops it.",
-                "禁用自动启动保留网关运行；移除服务会停止网关。",
+            </section>
+            <div className="startup-settings-body">
+              <details className="startup-details">
+                <summary>{t("startup.surface.runtimeDetails")}</summary>
+                <div className="startup-details-content">
+                  <p className="startup-action-hint">{t("startup.surface.actionHint")}</p>
+                  <div className="startup-detail-list">
+                    <FileLocation
+                      label={t("startup.surface.localData")}
+                      name={t("startup.surface.dataDirectory")}
+                      openLabel={t("startup.surface.openFolder")}
+                      busy={opening === "state"}
+                      onOpen={() => void openLocation("state")}
+                    />
+                    <FileLocation
+                      label={t("startup.surface.runtimeLog")}
+                      name={data.logPath.split(/[\\/]/).pop() || "runtime.log"}
+                      openLabel={t("startup.surface.openFolder")}
+                      busy={opening === "runtime-log"}
+                      onOpen={() => void openLocation("runtime-log")}
+                    />
+                    <FileLocation
+                      label={t("startup.surface.startupLog")}
+                      name={data.supervisorLogPath.split(/[\\/]/).pop() || "startup.log"}
+                      openLabel={t("startup.surface.openFolder")}
+                      busy={opening === "startup-log"}
+                      onOpen={() => void openLocation("startup-log")}
+                    />
+                  </div>
+                  <p className="startup-action-hint">
+                    {t("startup.surface.startupTask")}: {data.taskName}
+                  </p>
+                  <div className="startup-detail-actions">
+                    <Button
+                      size="sm"
+                      onClick={onReloadCodex}
+                      disabled={reloadingCodex}
+                      aria-busy={reloadingCodex}
+                    >
+                      <IconRefresh
+                        className={reloadingCodex ? "motion-safe:animate-spin" : undefined}
+                        aria-hidden="true"
+                      />
+                      {t(reloadingCodex ? "dash.codexRestarting" : "dash.codexRestart")}
+                    </Button>
+                    {data.serviceInstalled && (
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        disabled={blocked}
+                        onClick={() => void act("remove")}
+                      >
+                        {t("startup.surface.remove")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </details>
+              {Object.keys(data.commands).length > 0 && (
+                <details className="startup-recovery">
+                  <summary>{t("startup.surface.recovery")}</summary>
+                  <p>{t("startup.surface.recoveryHint")}</p>
+                  {Object.entries(data.commands).map(([action, command]) => (
+                    <CommandRow
+                      key={action}
+                      label={action}
+                      command={command}
+                      copied={copied === command}
+                      onCopy={() => copyValue(command)}
+                    />
+                  ))}
+                </details>
               )}
-            </p>
-            <details className="startup-details">
-              <summary>{copy("Runtime details", "运行详情")}</summary>
-              <dl className="startup-detail-list">
-                <div>
-                  <dt className="text-fg-muted">{copy("Startup task", "启动任务")}</dt>
-                  <dd className="m-0 break-all">{data.taskName}</dd>
-                </div>
-                <div>
-                  <dt className="text-fg-muted">{copy("Data directory", "数据目录")}</dt>
-                  <dd className="m-0 break-all">{data.stateDirectory}</dd>
-                </div>
-                <div>
-                  <dt className="text-fg-muted">{copy("Runtime log", "运行日志")}</dt>
-                  <dd className="m-0 break-all">{data.logPath}</dd>
-                </div>
-                <div>
-                  <dt className="text-fg-muted">{copy("Startup log", "启动日志")}</dt>
-                  <dd className="m-0 break-all">{data.supervisorLogPath}</dd>
-                </div>
-              </dl>
-            </details>
-          </Panel>
-          <details className="startup-recovery">
-            <summary>{copy("Command-line recovery", "命令行恢复")}</summary>
-            <p>
-              {copy(
-                "Use these commands if the console is unavailable or a startup task needs repair.",
-                "控制台无法访问或启动任务需要修复时，可使用以下命令。",
-              )}
-            </p>
-            {Object.entries(data.commands).map(([action, command]) => (
-              <CommandRow
-                key={action}
-                label={action}
-                command={command}
-                copied={copied === command}
-                onCopy={() => {
-                  void navigator.clipboard
-                    .writeText(command)
-                    .then(() => setCopied(command))
-                    .catch(() =>
-                      setNotice({
-                        error: true,
-                        text: copy(
-                          "Copy failed; select the command manually.",
-                          "复制失败，请手动选择命令。",
-                        ),
-                      }),
-                    );
-                }}
-              />
-            ))}
-          </details>
+            </div>
+          </div>
         </>
+      )}
+      {!data && (
+        <div className="startup-detail-actions">
+          <Button size="sm" onClick={onReloadCodex} disabled={reloadingCodex}>
+            {t(reloadingCodex ? "dash.codexRestarting" : "dash.codexRestart")}
+          </Button>
+        </div>
       )}
     </div>
   );

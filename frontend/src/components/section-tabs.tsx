@@ -1,13 +1,4 @@
-/**
- * SectionTabs — a sticky strip of section links over a normally-scrolling page.
- *
- * These pages used to switch sections by swapping the panel, which meant only one section
- * existed at a time and the page could not be read by scrolling. Every section is rendered
- * here; the strip scrolls to one and stays pinned to the top so it is always reachable.
- *
- * The active tab follows the scroll position, so the strip reports where you are rather
- * than only where you last clicked.
- */
+/** Sticky in-page navigation follows the section currently being read. */
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   SECTION_TAB_SCROLL_LOCK_MS,
@@ -129,22 +120,20 @@ export function SectionTabs({
   };
 
   return (
-    <div className="page-tabs section-tabs" role="tablist" aria-label={ariaLabel}>
+    <nav className="section-navigation" aria-label={ariaLabel}>
       {items.map((item) => (
         <button
           key={item.id}
           type="button"
-          role="tab"
-          aria-selected={active === item.id}
+          aria-current={active === item.id ? "location" : undefined}
           aria-controls={sectionAnchorId(scope, item.id)}
-          tabIndex={active === item.id ? 0 : -1}
-          className={`page-tab${active === item.id ? " page-tab--active" : ""}`}
+          className="section-navigation-link"
           onClick={() => go(item.id)}
         >
           {item.label}
           {item.meta ? <span className="section-tab-meta">{item.meta}</span> : null}
         </button>
       ))}
-    </div>
+    </nav>
   );
 }

@@ -1,20 +1,25 @@
+// Declare cascade layers before the eager shell's component styles are imported.
+import "./design/theme.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { lazy, Suspense } from "react";
-// Entry-point component is mounted here, never imported for fast refresh.
-// eslint-disable-next-line react-refresh/only-export-components
-const Screen = lazy(() => import("./App"));
 import { LanguageProvider } from "./i18n/provider";
-// Design system v2 entry: tokens, Tailwind utilities, and every legacy stylesheet in a lower
-// `legacy` cascade layer, so migrated components win and unmigrated pages look unchanged.
-import "./design/theme.css";
+import { preloadInitialLocale } from "./i18n/shared";
+import App from "./App";
+
+void preloadInitialLocale();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <LanguageProvider>
-      <Suspense fallback={null}>
-        <Screen />
-      </Suspense>
+    <LanguageProvider
+      fallback={
+        <div className="console-boot" aria-busy="true">
+          {/* Product name is identical in every locale, including before a catalog is ready. */}
+          {/* eslint-disable-next-line local-i18n/no-hardcoded-ui-strings */}
+          <span>OpenCodex Lite</span>
+        </div>
+      }
+    >
+      <App />
     </LanguageProvider>
   </React.StrictMode>,
 );

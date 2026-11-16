@@ -1,3 +1,5 @@
+import { CountPill, HelpTip } from "@/components/settings/decorations";
+import { Panel, PanelBody } from "@/components/settings/panel";
 /**
  * SubagentsWorkspace — a single stacked column for the Subagents tab: the featured roster
  * (reorder; every edit saves itself), the model picker, then the settings.
@@ -16,7 +18,14 @@
  * in the document and scrolling still works: the strip only jumps to one and reports where
  * you are.
  */
+import type {
+  DelegationModelOption,
+  DelegationPatch,
+} from "@/features/subagents/use-native-settings";
+import { cn } from "@/lib/utils";
 import { useMemo, useState, type ReactNode } from "react";
+import { Trans } from "../../i18n/provider";
+import { useT } from "../../i18n/shared";
 import {
   IconArrowDown,
   IconArrowUp,
@@ -26,16 +35,11 @@ import {
   IconSearch,
   IconX,
 } from "../../icons";
-import { useT } from "../../i18n/shared";
-import { Trans } from "../../i18n/provider";
 import { modelLabel } from "../../model-display";
-import { SectionTabs } from "../section-tabs";
 import { sectionAnchorId } from "../../section-anchors";
-import { cn } from "@/lib/utils";
-import { CountPill, Frame, FrameBody, HelpTip } from "../v2-subagents/frame";
+import { SectionTabs } from "../section-tabs";
 import { iconButton, stepIndicator } from "../v2-subagents/frame-classes";
 import SubagentDelegationSection from "./SubagentDelegationSection";
-import type { DelegationPatch, DelegationModelOption } from "../../pages/use-subagent-delegation";
 
 export interface SubagentsWorkspaceProps {
   available: string[];
@@ -107,7 +111,7 @@ export default function SubagentsWorkspace({
     <div className="subagents-workspace-shell">
       <SectionTabs scope="subagents" items={tabs} ariaLabel={t("sub.sections")} />
       <div className="subagents-workspace-root flex flex-col gap-4">
-        <Frame
+        <Panel
           id={sectionAnchorId("subagents", "featured")}
           className="subagents-workspace-section"
           headClassName="swi-featured-head"
@@ -126,9 +130,9 @@ export default function SubagentsWorkspace({
               </HelpTip>
             </>
           }
-          lede={t("subagentsV2.featuredLede")}
+          description={t("subagentsV2.featuredLede")}
         >
-          <FrameBody as="ol">
+          <PanelBody as="ol">
             {chosen.map((m, i) => (
               <li
                 key={m}
@@ -191,15 +195,15 @@ export default function SubagentsWorkspace({
                 </span>
               </li>
             ))}
-          </FrameBody>
-        </Frame>
+          </PanelBody>
+        </Panel>
 
-        <Frame
+        <Panel
           id={sectionAnchorId("subagents", "models")}
           className="subagents-workspace-section"
           title={t("sub.workspace.allModels")}
           meta={<CountPill>{availableFiltered.length}</CountPill>}
-          lede={
+          description={
             full
               ? t("sub.workspace.featuredFull")
               : t("subagentsV2.modelsLede", { max: FEATURED_MAX })
@@ -221,7 +225,7 @@ export default function SubagentsWorkspace({
             </label>
           }
         >
-          <FrameBody as="ul" className="max-h-[min(30rem,60vh)] overflow-y-auto">
+          <PanelBody as="ul" className="max-h-[min(30rem,60vh)] overflow-y-auto">
             {availableFiltered.length === 0 ? (
               <li className="px-4 py-6 text-center text-[13px] text-fg-muted">
                 {t("sub.noModels")}
@@ -290,8 +294,8 @@ export default function SubagentsWorkspace({
                 );
               })
             )}
-          </FrameBody>
-        </Frame>
+          </PanelBody>
+        </Panel>
 
         <section
           id={sectionAnchorId("subagents", "settings")}

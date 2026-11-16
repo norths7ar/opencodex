@@ -1,11 +1,11 @@
-import type { ReactNode } from "react";
-import type { Locale, TFn } from "../../i18n/shared";
-import { formatTokens } from "../../format-tokens";
-import { formatEstimatedUsdValue as formatUsdEstimate } from "../../intl-formatters";
-import { formatProviderDisplayName } from "../../provider-icons";
-import { modelLabel } from "../../model-display";
-import { IconSearch } from "../../icons";
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
+import { formatTokens } from "../../format-tokens";
+import type { Locale, TFn } from "../../i18n/shared";
+import { IconSearch } from "../../icons";
+import { formatEstimatedUsdValue as formatUsdEstimate } from "../../intl-formatters";
+import { modelLabel } from "../../model-display";
+import { formatProviderDisplayName } from "../../provider-icons";
 import {
   cacheHitRateTitle,
   formatOptionalPct,

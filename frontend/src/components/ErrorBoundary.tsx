@@ -1,4 +1,6 @@
+import { Button } from "@/components/button";
 import { Component, type ReactNode } from "react";
+import { PageLoadError } from "../page-loader";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -23,6 +25,8 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   private reload = () => {
+    // Rejected lazy modules are cached by React; a new document can fetch them again.
+    if (this.state.error instanceof PageLoadError) return window.location.reload();
     this.setState({ error: null });
   };
 
@@ -40,9 +44,9 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         <p style={{ margin: "0 0 var(--space-5)", overflowWrap: "anywhere" }}>
           <strong>{this.props.detailsLabel}:</strong> {this.state.error.message}
         </p>
-        <button type="button" className="btn btn-primary" onClick={this.reload}>
+        <Button type="button" variant="primary" size="md" onClick={this.reload}>
           {this.props.reloadLabel}
-        </button>
+        </Button>
       </section>
     );
   }

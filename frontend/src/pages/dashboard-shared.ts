@@ -1,14 +1,14 @@
-import type { RefObject } from "react";
-import { useEffect, useRef } from "react";
 import {
   DEFAULT_VISION_TIMEOUT_MS,
   MAX_VISION_TIMEOUT_MS,
   MIN_VISION_TIMEOUT_MS,
 } from "@/contracts/vision-limits";
+import type { RefObject } from "react";
+import { useEffect, useRef } from "react";
 import { readJsonOrThrow } from "../fetch-json";
 import type { StartupHealthStatus } from "../startup-health-ui";
-import { shadowSourceModelList, type ShadowCallSourceOption } from "./shadow-call-source";
 import type { AnthropicInstanceId, AnthropicPoolOptions } from "./claude-manual-env";
+import { shadowSourceModelList, type ShadowCallSourceOption } from "./shadow-call-source";
 
 export type DashboardSection = "overview" | "providers" | "models";
 

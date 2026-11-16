@@ -1,10 +1,10 @@
-import { createPortal } from "react-dom";
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Locale, TFn } from "../../i18n/shared";
-import { formatTokens } from "../../format-tokens";
-import { modelLabel } from "../../model-display";
 import { SegmentedControl } from "@/components/ui-v2/segmented-control";
 import { cn } from "@/lib/utils";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { formatTokens } from "../../format-tokens";
+import type { Locale, TFn } from "../../i18n/shared";
+import { modelLabel } from "../../model-display";
 import {
   chartTipPosition,
   dayDetail,

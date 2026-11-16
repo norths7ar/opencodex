@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { IconX } from "../../icons";
-import { ProxyLever, type LeverPreview } from "./proxy-lever";
 import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { ProxyLever, type LeverPreview } from "./proxy-lever";
 
 interface ProxyControlsProps {
   /** Card title, e.g. "Proxy". */
@@ -25,8 +24,6 @@ interface ProxyControlsProps {
   /** May return the stop's promise so the lever can rise again if the confirmation is declined. */
   onStop: () => void | Promise<unknown>;
   onRestart: () => void;
-  /** Optional third action (end the dashboard session on a connected client). */
-  session?: { label: string; busyLabel: string; busy: boolean; onClick: () => void } | undefined;
   className?: string;
 }
 
@@ -57,7 +54,6 @@ export function ProxyControls({
   restarting,
   onStop,
   onRestart,
-  session,
   className,
 }: ProxyControlsProps) {
   const done = useSettledFlash(restarting);
@@ -154,16 +150,7 @@ export function ProxyControls({
           </span>
         )}
       </span>
-      {session && (
-        <TrayButton
-          onClick={session.onClick}
-          disabled={session.busy}
-          label={session.busy ? session.busyLabel : session.label}
-          title={session.label}
-        >
-          <IconX />
-        </TrayButton>
-      )}
+
       <ProxyLever
         restartLabel={restarting ? restartingLabel : restartLabel}
         stopLabel={stopping ? stoppingLabel : stopLabel}
@@ -176,39 +163,6 @@ export function ProxyControls({
         onPreview={setPreview}
       />
     </div>
-  );
-}
-
-function TrayButton({
-  onClick,
-  disabled,
-  label,
-  title,
-  children,
-}: {
-  onClick: () => void;
-  disabled: boolean;
-  label: string;
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      title={title}
-      className={cn(
-        "inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-[6px] bg-transparent text-fg-subtle",
-        "transition-[background-color,color] duration-150 ease-soft",
-        "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-highlight",
-        "disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-3.5",
-        "hover:bg-accent-soft hover:text-fg",
-      )}
-    >
-      {children}
-    </button>
   );
 }
 

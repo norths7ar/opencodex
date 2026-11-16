@@ -1,6 +1,7 @@
 export const SOURCE_CLIENTS = [
   "all",
   "codex",
+  "dsh",
   "claude_code",
   "claude_desktop",
   "grok",

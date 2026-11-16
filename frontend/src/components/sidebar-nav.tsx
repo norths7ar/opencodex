@@ -11,7 +11,6 @@ import {
 import type { Page } from "../app-routing";
 import type { TFn } from "../i18n/shared";
 import { IconSearch, IconX } from "../icons";
-import { NAV_GROUPS, type NavGroup, type NavGroupId } from "../nav-groups";
 import {
   isEditableTarget,
   numberModifierHeld,
@@ -19,6 +18,7 @@ import {
   shortcutLabel,
   shortcutStyle,
 } from "../lib/nav-shortcuts";
+import { NAV_GROUPS, type NavGroup, type NavGroupId } from "../nav-groups";
 
 interface SearchEntry {
   group: NavGroup;

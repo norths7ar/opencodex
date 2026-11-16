@@ -4,7 +4,7 @@
  * 5.6 trio is instantly distinguishable. No emoji — Lucide-style SVG only.
  */
 import { createElement, type ReactNode } from "react";
-import { IconSun, IconGlobe, IconMoon, IconLock } from "./icons";
+import { IconGlobe, IconLock, IconMoon, IconSun } from "./icons";
 
 type IconComponent = typeof IconSun;
 

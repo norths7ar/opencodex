@@ -1,0 +1,408 @@
+@layer components {
+  .channels-page {
+    display: grid;
+    gap: var(--space-4);
+  }
+  .channels-layout {
+    display: grid;
+    grid-template-columns: clamp(190px, 24vw, 236px) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
+  }
+  .channel-list {
+    display: grid;
+    gap: var(--space-1);
+    min-width: 0;
+    padding: var(--space-2);
+    border: 1px solid var(--ocx-line);
+    border-radius: var(--radius-lg);
+    background: var(--ocx-surface);
+  }
+  .channel-list-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2) var(--space-2);
+    color: var(--ocx-fg-muted);
+    font-size: var(--text-label);
+    font-weight: var(--weight-semibold);
+  }
+  .channel-list-heading span,
+  .channel-count {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--text-caption);
+    border-radius: var(--radius-pill);
+    background: var(--ocx-accent-soft);
+    color: var(--ocx-accent);
+    padding: 2px 7px;
+  }
+  .channel-list-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    text-align: left;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ocx-fg);
+    cursor: pointer;
+    overflow-wrap: anywhere;
+    transition:
+      background-color var(--motion-fast),
+      border-color var(--motion-fast);
+  }
+  .channel-list-item:hover {
+    background: var(--ocx-raised);
+  }
+  .channel-list-item:focus-visible,
+  .channel-diagnostics summary:focus-visible {
+    outline: 2px solid var(--ocx-accent);
+    outline-offset: 2px;
+  }
+  .channel-list-item[aria-current="true"] {
+    background: var(--ocx-accent-soft);
+    border-color: color-mix(in srgb, var(--ocx-accent), transparent 72%);
+  }
+  .channel-list-item[aria-current="true"]::before {
+    content: "";
+    position: absolute;
+    inset-block: 9px;
+    inset-inline-start: -1px;
+    width: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--ocx-accent);
+  }
+  .channel-list-label {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+  }
+  .channel-list-label strong {
+    font-size: var(--text-control);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-ui);
+  }
+  .channel-list-mark {
+    border-radius: var(--radius-sm);
+  }
+  .channel-state {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin: 0;
+    color: var(--ocx-fg-muted);
+    font-size: var(--text-caption);
+    line-height: var(--leading-ui);
+    overflow-wrap: anywhere;
+  }
+  .channel-state::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    align-self: center;
+    flex: none;
+    border-radius: var(--radius-round);
+    background: currentColor;
+  }
+  .channel-state[data-tone="ready"] {
+    color: var(--ocx-success);
+  }
+  .channel-state[data-tone="attention"] {
+    color: var(--ocx-warning);
+  }
+  .channel-default-mark,
+  .channel-default-tag {
+    color: var(--ocx-accent);
+  }
+  .channel-default-mark svg,
+  .channel-default-tag svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+  .channel-identity {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid color-mix(in srgb, var(--ocx-accent), var(--ocx-line) 82%);
+    border-radius: var(--radius-panel);
+    background: var(--ocx-raised);
+  }
+  .channel-identity-mark {
+    border-radius: var(--radius);
+  }
+  .channel-identity-name {
+    flex: 1 1 140px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .channel-identity h2 {
+    margin: 0;
+    font-size: var(--text-title, 1.25rem);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+  .channel-identity code {
+    color: var(--ocx-fg-muted);
+    font-size: var(--text-caption);
+  }
+  .channel-default-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-semibold);
+  }
+  .channel-overview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  .channel-panel {
+    min-width: 0;
+    display: grid;
+    align-content: start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border: 1px solid var(--ocx-line);
+    border-radius: var(--radius-panel);
+    background: var(--ocx-raised);
+  }
+  .channel-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--text-subtitle);
+    font-weight: var(--weight-semibold);
+  }
+  .channel-section-title svg {
+    width: 17px;
+    height: 17px;
+    color: var(--ocx-accent);
+    flex: none;
+  }
+  .channel-credential {
+    padding-block-start: var(--space-2);
+    border-top: 1px solid var(--ocx-line);
+  }
+  .channel-credential-row,
+  .channel-account-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+  .channel-account-heading > div:first-child {
+    display: grid;
+    gap: var(--space-1);
+  }
+  .channel-credential-title {
+    color: var(--ocx-fg-muted);
+    font-size: var(--text-label);
+  }
+  .channel-credential .channel-actions {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .channel-credential .channel-actions > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .channel-credential input {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .channel-detail {
+    min-width: 0;
+    container: channel-detail / inline-size;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .channel-editor {
+    display: grid;
+    width: min(100%, 46rem);
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--ocx-raised);
+    border: 1px solid var(--ocx-line);
+    border-radius: var(--radius-panel);
+  }
+  .channel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .channel-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+  .channel-form-grid label,
+  .channel-login label {
+    display: grid;
+    min-width: 0;
+    gap: var(--space-1);
+    font-size: var(--text-label);
+  }
+  .channel-toggle-grid {
+    max-width: 24rem;
+  }
+  .channel-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: 34px;
+    padding: var(--space-1) var(--space-2);
+    background: var(--ocx-surface);
+    border-radius: var(--radius-control);
+    font-size: var(--text-label);
+  }
+  .channel-toggle button {
+    flex: none;
+  }
+  .channel-form-wide {
+    grid-column: 1 / -1;
+  }
+  .channel-form-grid .input {
+    width: 100%;
+    min-width: 0;
+  }
+  .channel-editor details > div {
+    margin-top: var(--space-3);
+  }
+  .channel-editor-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--ocx-line);
+  }
+  .channel-editor-submit {
+    margin-inline-start: auto;
+    justify-content: end;
+  }
+  .channel-facts {
+    display: grid;
+    grid-template-columns: minmax(88px, max-content) minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+    margin: 0;
+    font-size: var(--text-label);
+  }
+  .channel-facts dt {
+    color: var(--ocx-fg-muted);
+  }
+  .channel-facts dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+  .channel-login {
+    display: grid;
+    gap: 12px;
+    overflow-wrap: anywhere;
+  }
+  .channel-login-choice {
+    display: grid;
+    gap: var(--space-2);
+    width: fit-content;
+    max-width: 100%;
+    padding: var(--space-3);
+    border: 1px solid var(--ocx-line);
+    border-radius: var(--radius);
+    background: var(--ocx-surface);
+  }
+  .channel-login-choice > h4 {
+    margin: 0;
+    font-size: var(--text-control);
+  }
+  .channel-login-choice > p {
+    margin: 0;
+    font-size: var(--text-label);
+    color: var(--ocx-fg-muted);
+  }
+  .channel-quota {
+    padding: var(--space-3);
+    border-radius: var(--radius);
+    background: var(--ocx-surface);
+  }
+  .channel-account {
+    row-gap: var(--space-4);
+  }
+  .channel-account > .channel-quota:not(:first-child) {
+    margin-block-start: 0;
+  }
+  .channel-diagnostics summary {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    cursor: pointer;
+    font-weight: var(--weight-semibold);
+    list-style: none;
+  }
+  .channel-diagnostics summary::-webkit-details-marker {
+    display: none;
+  }
+  .channel-diagnostics summary svg {
+    height: var(--icon-sm);
+    width: var(--icon-sm);
+    color: var(--ocx-accent);
+    transition: transform var(--motion-fast);
+  }
+  .channel-diagnostics[open] summary svg {
+    transform: rotate(90deg);
+  }
+  .channel-diagnostics .pws-completion-test {
+    margin-block-start: var(--space-3);
+  }
+  .channel-diagnostics .pws-section-title {
+    display: none;
+  }
+  .channels-page :where(button[aria-busy="true"]) > svg {
+    animation: channel-refresh-turn 1s linear infinite;
+  }
+  @keyframes channel-refresh-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @container channel-detail (max-width: 565px) {
+    .channel-overview {
+      grid-template-columns: 1fr;
+    }
+  }
+  @container channel-detail (max-width: 410px) {
+    .channel-form-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .channel-list-item,
+    .channel-diagnostics summary svg {
+      transition: none;
+    }
+    .channels-page :where(button[aria-busy="true"]) > svg {
+      animation: none;
+    }
+  }
+  @media (max-width: 760px) {
+    .channels-layout {
+      grid-template-columns: 1fr;
+    }
+    .channel-list {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+    }
+    .channel-list-heading {
+      grid-column: 1 / -1;
+    }
+  }
+}

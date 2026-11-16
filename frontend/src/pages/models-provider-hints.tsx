@@ -1,6 +1,6 @@
-import { IconInfo } from "../icons";
-import { useT } from "../i18n/shared";
 import { navigateHash } from "../hash-routing";
+import { useT } from "../i18n/shared";
+import { IconInfo } from "../icons";
 import type { ProviderDiscoverySummary } from "../models-groups";
 import { discoveryFailureLabel } from "./models-shared";
 

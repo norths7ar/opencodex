@@ -1,7 +1,7 @@
 /** Shared dashboard top strips keep sidebar controls aligned with the main header. */
 import type { ReactNode } from "react";
-import { IconPanelLeft } from "../icons";
 import { useT } from "../i18n/shared";
+import { IconPanelLeft } from "../icons";
 import "./app-titlebar.css";
 
 /**

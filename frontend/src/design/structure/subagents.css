@@ -1,0 +1,12 @@
+/* subagents: layout and surfaces owned by the retained Lite interface. */
+
+.subagents-workspace-shell {
+  width: 100%;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: subagents-workspace;
+}
+.subagents-workspace-section {
+  min-width: 0;
+  scroll-margin-top: 72px;
+}

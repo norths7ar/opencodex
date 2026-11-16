@@ -1,3 +1,4 @@
+import { Button } from "@/components/button";
 /** An explicitly consented, bounded completion probe; it never runs during discovery. */
 import { useEffect, useRef, useState } from "react";
 import { confirmAction } from "../../action-dialogs";
@@ -214,7 +215,7 @@ function CompletionRun({
       onStatusChange?.({ status: "testing", model });
       // The dashboard's installed fetch wrapper supplies session and CSRF headers, as for the connection test.
       const response = await fetch(
-        `${apiBase}/api/providers/test-completion?name=${encodeURIComponent(provider)}`,
+        `${apiBase}/api/channels/${encodeURIComponent(provider)}/completion-test`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -253,14 +254,15 @@ function CompletionRun({
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        className="btn btn-ghost btn-sm"
+        variant="ghost"
+        size="sm"
         disabled={!model || busy || blocked}
         onClick={() => void run()}
       >
         {busy ? t("pws.testing") : t("pws.completion.run")}
-      </button>
+      </Button>
       {error && (
         <p role="alert" className="pws-inline-error pws-completion-result">
           {error}

@@ -1,75 +1,63 @@
-import LiteStorage from "./pages/LiteStorage";
-import MigrationNotice from "./components/MigrationNotice";
+import { Notice } from "./ui";
+import { Button } from "./components/button";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useKeyedClientResource } from "./client-resource";
-import Dashboard from "./pages/Dashboard";
-import Home from "./pages/Home";
-import Providers from "./pages/Providers";
-import Models from "./pages/Models";
-import Subagents from "./pages/Subagents";
-import Logs from "./pages/Logs";
-import Usage from "./pages/Usage";
-import Integrations from "./pages/Integrations";
-import Startup from "./pages/Startup";
-import ErrorBoundary from "./components/ErrorBoundary";
-import QuotaSummaryBar from "./components/quota-summary-bar/QuotaSummaryBar";
-import { IconMenu, IconGlobe, IconPower, IconX, IconRefresh } from "./icons";
-import { groupForPage, visibleGroupPages } from "./nav-groups";
-import { SidebarNav } from "./components/sidebar-nav";
-import { SectionSwitcher } from "./components/SectionSwitcher";
-import { PageHeaderTarget } from "./components/page-header-context";
-import { ProviderSession } from "./components/provider-session";
-import { useI18n, useT, LOCALES, localeDisplayName, type Locale, type TKey } from "./i18n/shared";
-import { Select, ToastNotice, type NoticeTone } from "./ui";
-import {
-  configureApiTargets,
-  DEVICE_PROOF_CHANGED_EVENT,
-  hasApiSession,
-  hasRememberedDashboardDevice,
-  installApiAuthFetch,
-  logoutApiSession,
-  SESSION_CHANGED_EVENT,
-  SESSION_UNAVAILABLE_EVENT,
-} from "./api";
-import { apiBaseForPlane, standaloneApiTargets } from "./api-targets";
-import { type Page } from "./app-routing";
-import { useAppRouteState } from "./use-app-route-state";
-import { requestProxyStop } from "./stop-proxy";
-import { useCodexRestart } from "./use-codex-restart";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { confirmAction } from "./action-dialogs";
-import { proxyHealthOnline } from "./lib/proxy-health";
-import { useSidebarCollapse } from "./use-sidebar-collapse";
-import { ThemeSwitch, type ThemeMode } from "./components/theme-switch";
-import { ProxyControls } from "./components/ui-v2/proxy-controls";
-import { BrandMark } from "./components/ui-v2/brand-mark";
+import { installApiAuthFetch } from "./api";
+import { type Page } from "./app-routing";
+import { useKeyedClientResource } from "./client-resource";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { DataSurfaceSkeleton } from "./components/data-surface";
+import { SectionSwitcher } from "./components/SectionSwitcher";
 import { SidebarTopStrip } from "./components/app-titlebar";
+import { PageHeaderTarget } from "./components/page-header-context";
+import { PageHeader } from "./components/page-header";
+import QuotaSummaryBar from "./components/quota-summary-bar/QuotaSummaryBar";
+import { SidebarNav } from "./components/sidebar-nav";
+import { ThemeSwitch, type ThemeMode } from "./components/theme-switch";
+import { BrandMark } from "./components/ui-v2/brand-mark";
+import { ProxyControls } from "./components/ui-v2/proxy-controls";
+import { localeDisplayName, LOCALES, useI18n, useT, type Locale, type TKey } from "./i18n/shared";
+import { IconGlobe, IconMenu, IconPower, IconRefresh, IconX } from "./icons";
+import { proxyHealthOnline } from "./lib/proxy-health";
+import { groupForPage, visibleGroupPages } from "./nav-groups";
+import Home from "./pages/Home";
 import { RuntimeCapabilitiesContext, type RuntimeCapabilities } from "./runtime-capabilities";
+import { requestProxyStop } from "./stop-proxy";
+import { Select, ToastNotice, type NoticeTone } from "./ui";
+import { useAppRouteState } from "./use-app-route-state";
+import { useCodexRestart } from "./use-codex-restart";
+import { useSidebarCollapse } from "./use-sidebar-collapse";
+import { pageImport } from "./page-loader";
+
+// The shell and Home are immediate; other business screens load on first visit.
+// Keep shared controls in the normal module graph rather than forced vendor chunks.
+const Dashboard = lazy(pageImport(() => import("./pages/Dashboard")));
+const Integrations = lazy(pageImport(() => import("./pages/Integrations")));
+const Logs = lazy(pageImport(() => import("./pages/Logs")));
+const Models = lazy(pageImport(() => import("./pages/Models")));
+const Providers = lazy(pageImport(() => import("./pages/Providers")));
+const Subagents = lazy(pageImport(() => import("./pages/Subagents")));
+const Usage = lazy(pageImport(() => import("./pages/Usage")));
+const LiteStorage = lazy(pageImport(() => import("./pages/LiteStorage")));
 
 type Theme = ThemeMode;
 
 const PAGE_TKEY: Record<Page, TKey> = {
   home: "shellV2.navHome",
-  setup: "shellV2.pageChecklist",
-  advanced: "shellV2.pageAllSettings",
   // The old dashboard is now the "Proxy details" member of the Advanced row.
   dashboard: "shellV2.pageProxyDetails",
-  startup: "nav.startup",
   providers: "nav.providers",
   models: "nav.models",
   subagents: "nav.subagents",
   logs: "nav.logs",
   usage: "nav.usage",
   storage: "nav.storage",
-  "codex-set": "nav.codexSet",
   integrations: "nav.connect",
-  claude: "nav.claude",
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE || "";
-const INITIAL_TARGETS = standaloneApiTargets(API_BASE);
-configureApiTargets(INITIAL_TARGETS);
-installApiAuthFetch();
+installApiAuthFetch(API_BASE);
 const THEME_KEY = "ocx-theme";
 
 function readRuntimeVersion(data: unknown): string | null {
@@ -118,15 +106,11 @@ function focusAfterSwitcher(): void {
 
 export default function App() {
   const [headerTarget, setHeaderTarget] = useState<HTMLDivElement | null>(null);
-  const openedWithoutRoute = useRef(!window.location.hash);
   const { page, navigateToPage } = useAppRouteState();
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
-  const { locale, setLocale } = useI18n();
+  const { locale, setLocale, localeLoading, localeError } = useI18n();
+  const [localeErrorDismissed, setLocaleErrorDismissed] = useState(false);
   const t = useT();
-  const targets = INITIAL_TARGETS;
-  const [sharedSessionReady, setSharedSessionReady] = useState(() => hasApiSession("shared"));
-  const [sharedSessionEpoch, setSharedSessionEpoch] = useState(0);
-  const [sessionLoggingOut, setSessionLoggingOut] = useState(false);
   /*
    * Results from the two sidebar orbs used to be `alert()`, which the app's webview draws
    * nowhere, so a refused stop and a completed one looked identical: nothing happened.
@@ -142,57 +126,18 @@ export default function App() {
     setFeedbackRevision((revision) => revision + 1);
   }, []);
 
-  useEffect(() => {
-    const unavailable = (event: Event) => {
-      if (
-        (event as CustomEvent<{ plane?: string }>).detail?.plane === "shared" &&
-        !hasApiSession("shared")
-      ) {
-        setSharedSessionReady(false);
-      }
-    };
-    // A change only ever reveals a session (Remember/Forget controls). Target discovery clears the
-    // session transiently, and dropping readiness there would cancel the requests that recover it.
-    const changed = (event: Event) => {
-      if (
-        (event as CustomEvent<{ plane?: string }>).detail?.plane === "shared" &&
-        hasApiSession("shared")
-      ) {
-        setSharedSessionReady(true);
-      }
-    };
-    window.addEventListener(SESSION_UNAVAILABLE_EVENT, unavailable);
-    window.addEventListener(SESSION_CHANGED_EVENT, changed);
-    const proofChanged = (event: Event) => {
-      if ((event as CustomEvent<{ plane?: string }>).detail?.plane === "shared")
-        setSharedSessionEpoch((epoch) => epoch + 1);
-    };
-    window.addEventListener(DEVICE_PROOF_CHANGED_EVENT, proofChanged);
-    return () => {
-      window.removeEventListener(SESSION_UNAVAILABLE_EVENT, unavailable);
-      window.removeEventListener(SESSION_CHANGED_EVENT, changed);
-      window.removeEventListener(DEVICE_PROOF_CHANGED_EVENT, proofChanged);
-    };
-  }, []);
-  const machineBase = apiBaseForPlane("machine", targets);
-  const sharedBase = apiBaseForPlane("shared", targets);
   const capabilities = useKeyedClientResource<RuntimeCapabilities | null>(
-    `runtime-capabilities:${sharedBase}`,
-    [sharedBase],
+    `runtime-capabilities:${API_BASE}`,
+    [API_BASE],
     async (signal) => {
-      const response = await fetch(`${sharedBase}/api/capabilities`, { signal });
-      if (response.status === 404 || response.status === 501) return null;
+      const response = await fetch(`${API_BASE}/api/capabilities`, { signal });
       if (!response.ok) throw new Error(t("prov.loadConfigFail"));
-      return response.json();
+      const result: RuntimeCapabilities = await response.json();
+      if (!Array.isArray(result?.pages)) throw new Error(t("prov.loadConfigFail"));
+      return result;
     },
   );
   const available = capabilities.data?.pages.includes(page) === true;
-  useEffect(() => {
-    if (capabilities.data?.runtime === "python" && openedWithoutRoute.current) {
-      openedWithoutRoute.current = false;
-      navigateToPage(capabilities.data.pages.includes("home") ? "home" : "providers");
-    }
-  }, [capabilities.data, navigateToPage]);
   // The sidebar row that owns this page, and the members its switcher may offer.
   const activeGroup = groupForPage(page);
   const sidebarPageAvailable = useCallback(
@@ -258,10 +203,10 @@ export default function App() {
   }, [actionFeedback, feedbackRevision]);
 
   const healthPoll = useKeyedClientResource(
-    `app-healthz:${machineBase}`,
-    [machineBase],
+    `app-healthz:${API_BASE}`,
+    [API_BASE],
     async (signal) => {
-      const res = await fetch(`${machineBase}/healthz`, { signal });
+      const res = await fetch(`${API_BASE}/healthz`, { signal });
       if (!res.ok) throw new Error("Health check failed");
       const body: unknown = await res.json();
       return { version: readRuntimeVersion(body), uptime: readUptime(body) };
@@ -332,7 +277,7 @@ export default function App() {
   // sharing a controller — the backend is already single-flight, so what is missing
   // is invalidation, not mutual exclusion.
   const [codexRestartEpoch, setCodexRestartEpoch] = useState(0);
-  const { restarting: codexRestarting, restart: handleCodexRestart } = useCodexRestart(sharedBase, {
+  const { restarting: codexRestarting, restart: handleCodexRestart } = useCodexRestart(API_BASE, {
     onSettled: () => setCodexRestartEpoch((epoch) => epoch + 1),
     report,
   });
@@ -345,7 +290,7 @@ export default function App() {
     });
     if (!consented) return;
     setStopping(true);
-    const outcome = await requestProxyStop(machineBase, {
+    const outcome = await requestProxyStop(API_BASE, {
       formatFailure: (status) => t("dash.stopFailed", { status: String(status) }),
       formatStillRunning: () => t("dash.stopStillRunning"),
       formatUnknown: () => t("dash.stopUnknown"),
@@ -364,27 +309,6 @@ export default function App() {
       report(outcome.message, outcome.status === "rejected" ? "err" : "warn");
     }
   };
-
-  const handleSessionLogout = async () => {
-    if (sessionLoggingOut) return;
-    setSessionLoggingOut(true);
-    const loggedOut = await logoutApiSession("shared");
-    setSessionLoggingOut(false);
-    if (loggedOut) setSharedSessionReady(false);
-    else
-      report(
-        t(
-          hasRememberedDashboardDevice("shared")
-            ? "connection.forgetDeviceFailed"
-            : "connection.sessionLogoutFailed",
-        ),
-        "err",
-      );
-  };
-  const deviceForgetAvailable = hasRememberedDashboardDevice("shared");
-  const endSessionLabel = t(
-    deviceForgetAvailable ? "connection.forgetDevice" : "connection.sessionLogout",
-  );
 
   /*
    * The brand is the control users reach for first when they want out of a deep page,
@@ -440,21 +364,21 @@ export default function App() {
 
   const quotaSummary = (!capabilities.data || capabilities.data.quota) && !capabilities.loading && (
     <ErrorBoundary
-      key={sharedBase}
+      key={`quota:${API_BASE}`}
       pageName={t("quotaSummary.aria")}
       title={t("errorBoundary.title")}
       message={t("errorBoundary.message")}
       detailsLabel={t("errorBoundary.details")}
       reloadLabel={t("errorBoundary.reload")}
     >
-      <QuotaSummaryBar apiBase={sharedBase} />
+      <QuotaSummaryBar apiBase={API_BASE} />
     </ErrorBoundary>
   );
 
   return (
     <RuntimeCapabilitiesContext.Provider value={capabilities.data ?? null}>
       <div ref={appRef} className={`app${navCollapsed ? " app--nav-collapsed" : ""}`}>
-        {actionFeedback && (
+        {actionFeedback ? (
           <ToastNotice
             tone={actionFeedback.tone}
             onDismiss={() => setActionFeedback(null)}
@@ -462,6 +386,17 @@ export default function App() {
           >
             {actionFeedback.text}
           </ToastNotice>
+        ) : (
+          localeError &&
+          !localeErrorDismissed && (
+            <ToastNotice
+              tone="err"
+              onDismiss={() => setLocaleErrorDismissed(true)}
+              dismissLabel={t("common.close")}
+            >
+              {t("lang.loadFailed")}
+            </ToastNotice>
+          )
         )}
         {/* inert while the drawer is open: keeps focus and assistive tech inside the drawer */}
         <header className="mobile-topbar" inert={navOpen}>
@@ -479,20 +414,6 @@ export default function App() {
           </button>
           {brand}
           <div className="mobile-topbar-actions">
-            {deviceForgetAvailable && sharedSessionReady && (
-              <button
-                type="button"
-                className="sidebar-orb"
-                onClick={() => {
-                  void handleSessionLogout();
-                }}
-                disabled={sessionLoggingOut}
-                aria-label={sessionLoggingOut ? t("connection.sessionLoggingOut") : endSessionLabel}
-                title={endSessionLabel}
-              >
-                <IconX />
-              </button>
-            )}
             <button
               type="button"
               className="sidebar-orb sidebar-orb--danger"
@@ -595,22 +516,14 @@ export default function App() {
               onRestart={() => {
                 void handleCodexRestart();
               }}
-              session={
-                deviceForgetAvailable && sharedSessionReady
-                  ? {
-                      label: endSessionLabel,
-                      busyLabel: t("connection.sessionLoggingOut"),
-                      busy: sessionLoggingOut,
-                      onClick: () => {
-                        void handleSessionLogout();
-                      },
-                    }
-                  : undefined
-              }
             />
             {/* Display preferences share one row: the language picker, then the theme orb. */}
             <div className="sidebar-pref-row">
-              <div className="lang-toggle">
+              <div
+                className="lang-toggle"
+                aria-busy={localeLoading}
+                title={localeLoading ? t("common.loading") : undefined}
+              >
                 <IconGlobe aria-hidden />
                 <Select
                   value={locale}
@@ -618,7 +531,10 @@ export default function App() {
                     value: l.code,
                     label: localeDisplayName(l.code),
                   }))}
-                  onChange={(v) => setLocale(v as Locale)}
+                  onChange={(v) => {
+                    setLocaleErrorDismissed(false);
+                    setLocale(v as Locale);
+                  }}
                   label={t("lang.label")}
                   placement="right"
                   portal={false}
@@ -632,7 +548,7 @@ export default function App() {
 
         <main className="main" inert={navOpen}>
           {quotaSummary}
-          <ProviderSession key={`${sharedBase}:${sharedSessionEpoch}`}>
+          <div key={API_BASE}>
             <div className="main-inner">
               <div className="console-header-slot" ref={setHeaderTarget} />
               {/*
@@ -665,13 +581,31 @@ export default function App() {
                   >
                     {capabilities.loading ? (
                       <div className="min-h-64" aria-busy="true" />
+                    ) : !capabilities.data && capabilities.error ? (
+                      <Notice tone="err">
+                        {t("prov.loadConfigFail")}{" "}
+                        <Button
+                          onClick={() => capabilities.refresh()}
+                          disabled={capabilities.refreshing}
+                        >
+                          {t("common.retry")}
+                        </Button>
+                      </Notice>
                     ) : !available ? (
-                      <MigrationNotice title={t(PAGE_TKEY[shellPage])} />
+                      <Notice tone="warn">{t("shellV2.pageUnavailable")}</Notice>
                     ) : (
-                      <>
+                      <Suspense
+                        key={page}
+                        fallback={
+                          <section data-page-loading aria-busy="true" className="min-h-64">
+                            <PageHeader title={t(PAGE_TKEY[page])} />
+                            <DataSurfaceSkeleton label={t("common.loading")} />
+                          </section>
+                        }
+                      >
                         {page === "home" && (
                           <Home
-                            apiBase={sharedBase}
+                            apiBase={API_BASE}
                             navigate={navigateToPage}
                             onReloadCodex={() => {
                               void handleCodexRestart();
@@ -679,35 +613,30 @@ export default function App() {
                             reloadingCodex={codexRestarting}
                           />
                         )}
-                        {page === "dashboard" && (
-                          <Dashboard apiBase={sharedBase} refreshEpoch={sharedSessionEpoch} />
-                        )}
-                        {page === "startup" && <Startup apiBase={sharedBase} />}
-                        {page === "providers" && <Providers apiBase={sharedBase} />}
+                        {page === "dashboard" && <Dashboard apiBase={API_BASE} />}
+                        {page === "providers" && <Providers apiBase={API_BASE} />}
                         {page === "models" && (
                           <Models
-                            key={sharedBase}
-                            apiBase={sharedBase}
+                            key={API_BASE}
+                            apiBase={API_BASE}
                             restartEpoch={codexRestartEpoch}
                             reportRestart={report}
                           />
                         )}
-                        {page === "subagents" && (
-                          <Subagents key={sharedBase} apiBase={sharedBase} />
-                        )}
+                        {page === "subagents" && <Subagents key={API_BASE} apiBase={API_BASE} />}
 
-                        {page === "logs" && <Logs apiBase={sharedBase} />}
-                        {page === "usage" && <Usage apiBase={sharedBase} />}
-                        {page === "storage" && <LiteStorage apiBase={sharedBase} />}
+                        {page === "logs" && <Logs apiBase={API_BASE} />}
+                        {page === "usage" && <Usage apiBase={API_BASE} />}
+                        {page === "storage" && <LiteStorage apiBase={API_BASE} />}
 
-                        {shellPage === "integrations" && <Integrations apiBase={sharedBase} />}
-                      </>
+                        {shellPage === "integrations" && <Integrations apiBase={API_BASE} />}
+                      </Suspense>
                     )}
                   </ErrorBoundary>
                 </div>
               </PageHeaderTarget.Provider>
             </div>
-          </ProviderSession>
+          </div>
         </main>
       </div>
     </RuntimeCapabilitiesContext.Provider>

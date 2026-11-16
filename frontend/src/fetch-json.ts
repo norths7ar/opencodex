@@ -17,31 +17,51 @@ async function readJsonBody<T>(res: Response): Promise<T | undefined> {
   return (await res.json()) as T;
 }
 
-function errorMessageFromBody(
-  errBody: { error?: unknown; message?: unknown },
-  fallback: string,
-): string {
-  if (typeof errBody.error === "string" && errBody.error) return errBody.error;
-  // Some management routes (e.g. Grok apply orphan repair) put the actionable
-  // copy in `message` rather than `error`.
-  if (typeof errBody.message === "string" && errBody.message) return errBody.message;
-  return fallback;
+export type ManagementError = {
+  code: string;
+  message: string;
+  retryable: boolean;
+  fields?: unknown;
+};
+export class ManagementApiError extends Error {
+  readonly status: number;
+  readonly detail: ManagementError;
+  constructor(status: number, detail: ManagementError) {
+    super(detail.message);
+    this.name = "ManagementApiError";
+    this.status = status;
+    this.detail = detail;
+  }
+}
+export async function readManagementError(
+  res: Response,
+  fallback = `HTTP ${res.status}`,
+): Promise<ManagementApiError> {
+  let detail: ManagementError = {
+    code: "http_error",
+    message: fallback,
+    retryable: res.status >= 500,
+  };
+  try {
+    const body = (await res.json()) as { error?: Partial<ManagementError> };
+    if (body.error && typeof body.error === "object")
+      detail = {
+        code: typeof body.error.code === "string" ? body.error.code : detail.code,
+        message: typeof body.error.message === "string" ? body.error.message : fallback,
+        retryable: body.error.retryable === true,
+        fields: body.error.fields,
+      };
+  } catch {
+    /* Non-JSON HTTP failures retain the status fallback. */
+  }
+  return new ManagementApiError(res.status, detail);
 }
 
 export async function readJsonOrThrow<T>(
   res: Response,
   fallbackMessage = `HTTP ${res.status}`,
 ): Promise<T | undefined> {
-  if (!res.ok) {
-    let message = fallbackMessage;
-    try {
-      const errBody = (await res.json()) as { error?: unknown; message?: unknown };
-      message = errorMessageFromBody(errBody, fallbackMessage);
-    } catch {
-      // non-JSON error bodies keep the fallback message
-    }
-    throw new Error(message);
-  }
+  if (!res.ok) throw await readManagementError(res, fallbackMessage);
   return readJsonBody<T>(res);
 }
 

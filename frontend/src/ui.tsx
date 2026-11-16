@@ -1,4 +1,4 @@
-/* Shared UI primitives built on the design-system classes in styles.css. */
+/* Shared interaction primitives; geometry and state styling live in design/controls.css. */
 import {
   useCallback,
   useEffect,
@@ -11,10 +11,9 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { IconCheck, IconAlert } from "./icons";
-import { IconChevron } from "./icons";
-import { computeSelectMenuStyle } from "./select-position";
+import { IconAlert, IconCheck, IconChevron } from "./icons";
 import { cn } from "./lib/utils";
+import { computeSelectMenuStyle } from "./select-position";
 
 /**
  * `label` is the accessible name. It is NOT rendered by default, which is correct
@@ -506,7 +505,7 @@ export function Select({
             flexShrink: 0,
             width: 12,
             height: 12,
-            color: "var(--muted)",
+            color: "var(--ocx-fg-muted)",
             transform: open ? "rotate(90deg)" : "none",
             transition: "transform .12s",
           }}
@@ -660,7 +659,9 @@ function SelectPopup({
         }}
       >
         {trigger}
-        <IconChevron style={{ flexShrink: 0, width: 12, height: 12, color: "var(--muted)" }} />
+        <IconChevron
+          style={{ flexShrink: 0, width: 12, height: 12, color: "var(--ocx-fg-muted)" }}
+        />
       </button>
       {inDialog ? popup : popup && createPortal(popup, document.body)}
     </div>

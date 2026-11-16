@@ -1,4 +1,6 @@
-import { PageHeader } from "../components/page-header";
+import { Button } from "@/components/button";
+import { cn } from "@/lib/utils";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   useCallback,
   useEffect,
@@ -8,32 +10,29 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { liteTranslator } from "../i18n/lite-copy";
-import { useI18n, LOCALES, type TFn } from "../i18n/shared";
-import { formatProviderDisplayName } from "../provider-icons";
-import { formatTokens } from "../format-tokens";
-import { hashLogConversationQuery } from "../log-conversation-id";
-import { statusCodeInfo } from "../status-codes";
-import { IconChevron, IconX } from "../icons";
-import { modelLabel } from "../model-display";
-import { cn } from "@/lib/utils";
+import { DataSurfaceSkeleton } from "../components/data-surface";
+import { PageHeader } from "../components/page-header";
+import { ProtocolBadge } from "../components/protocols/ProtocolBadge";
+import { ProtocolTracePanel } from "../components/protocols/ProtocolTracePanel";
 import { panel, panelBody } from "../components/v2-logs/classes";
 import { ColumnsMenu } from "../components/v2-logs/columns-menu";
 import { LiveToggle } from "../components/v2-logs/live-toggle";
 import { StatusPill } from "../components/v2-logs/status-pill";
-import { LOGS_OPTIONAL_COLUMNS, useLogsColumns } from "./logs-columns";
-import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { useDataSurface } from "../data-surface";
-import { DataSurfaceSkeleton } from "../components/data-surface";
+import { formatTokens } from "../format-tokens";
+import { LOCALES, useI18n, type TFn } from "../i18n/shared";
+import { IconChevron, IconX } from "../icons";
+import { hashLogConversationQuery } from "../log-conversation-id";
+import { modelLabel } from "../model-display";
+import { formatProviderDisplayName } from "../provider-icons";
+import { useRuntimeCapabilities } from "../runtime-capabilities";
+import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
+import { statusCodeInfo } from "../status-codes";
 import { EmptyState, Notice } from "../ui";
 import Debug from "./Debug";
-import { useRuntimeCapabilities } from "../runtime-capabilities";
-import { LogsFilterBar } from "./logs-filter-bar";
 import { LogsClientChip } from "./logs-client-chip";
-import { ProtocolBadge } from "../components/protocols/ProtocolBadge";
-import { ProtocolTracePanel } from "../components/protocols/ProtocolTracePanel";
 import { logsClockAnchor, logsClockNow, type LogsClockAnchor } from "./logs-clock";
+import { LOGS_OPTIONAL_COLUMNS, useLogsColumns } from "./logs-columns";
 import {
   DEFAULT_LOG_FILTER_STATE,
   extractLogFilterOptions,
@@ -41,27 +40,13 @@ import {
   hasActiveLogFilters,
   type LogFilterState,
 } from "./logs-filter";
+import { LogsFilterBar } from "./logs-filter-bar";
 
-import type { LogsTab } from "./logs-tab-keydown";
-import { logsTabKeyDown, readTabFromHash, selectLogsTab } from "./logs-tab-keydown";
-import { isModelRerouted, modelTitle, type ModelTitleTierOutcome } from "./logs-model-title";
-import { speedLabel } from "./logs-speed-label";
-import { decodeRateLabelKeys } from "./logs-decode-rate";
 import {
-  failureAttributionLabels,
-  failureDetailLabel,
-  failureSummary,
-  upstreamConditionLabel,
-} from "./logs-failure-summary";
-import "./logs-decode-rate.css";
-import {
-  formatEstimatedUsd,
-  formatEstimatedUsdValue,
-  summarizeEstimatedCosts,
-} from "./logs-cost-format";
-import { cacheSplit, isCursorUsageProvider, tokensTitle } from "./logs-token-title";
-import { sanitizeLogEntryRouteDecision, validCachedRouteDecision } from "./log-route-decision";
-import { mergeLogDelta, parseLogPollResponse } from "./log-poll";
+  classifyRequestOutcome,
+  type RequestOutcomeFacts,
+  type RequestOutcomeClass,
+} from "@/contracts/telemetry/request-outcome";
 import type {
   AttemptRecoveryKind,
   RequestFailureCause,
@@ -69,10 +54,26 @@ import type {
   RequestSpendTotals,
   ResendPermission,
 } from "@/contracts/telemetry/telemetry-contract";
+import { mergeLogDelta, parseLogPollResponse } from "./log-poll";
+import { sanitizeLogEntryRouteDecision, validCachedRouteDecision } from "./log-route-decision";
 import {
-  classifyRequestOutcome,
-  type RequestOutcomeClass,
-} from "@/contracts/telemetry/request-outcome";
+  formatEstimatedUsd,
+  formatEstimatedUsdValue,
+  summarizeEstimatedCosts,
+} from "./logs-cost-format";
+import { decodeRateLabelKeys } from "./logs-decode-rate";
+import "./logs-decode-rate.css";
+import {
+  failureAttributionLabels,
+  failureDetailLabel,
+  failureSummary,
+  upstreamConditionLabel,
+} from "./logs-failure-summary";
+import { isModelRerouted, modelTitle, type ModelTitleTierOutcome } from "./logs-model-title";
+import { speedLabel } from "./logs-speed-label";
+import type { LogsTab } from "./logs-tab-keydown";
+import { logsTabKeyDown, readTabFromHash, selectLogsTab } from "./logs-tab-keydown";
+import { cacheSplit, isCursorUsageProvider, tokensTitle } from "./logs-token-title";
 
 function logsCacheKey(apiBase: string): string {
   return `ocx.logs.list.v1:${apiBase}`;
@@ -248,7 +249,7 @@ export interface LogEntry extends LogFailureAttribution {
    * numeric HTTP status alone and reported an incomplete 200 as a plain success.
    */
   terminalStatus?: string;
-  closeReason?: "terminal" | "client_cancel" | "non_stream" | "body_stall" | "body_overflow";
+  closeReason?: RequestOutcomeFacts["closeReason"];
   /** Upstream spend for the whole logical request, aggregated across attempts and combo children. */
   spend?: RequestSpendTotals;
   usageStatus?: LogUsageStatus;
@@ -546,8 +547,7 @@ function tabClass(selected: boolean): string {
 
 export default function Logs({ apiBase }: { apiBase: string }) {
   const capabilities = useRuntimeCapabilities();
-  const legacyRuntime = capabilities === null;
-  const debugEnabled = legacyRuntime || capabilities.debugLogs === true;
+  const debugEnabled = capabilities.debugLogs === true;
   const { t, locale } = useI18n();
   const resourceKey = logsCacheKey(apiBase);
   const cachedLogs = validCachedLogs(readSessionListCache<LogEntry[]>(resourceKey));
@@ -603,29 +603,6 @@ export default function Logs({ apiBase }: { apiBase: string }) {
   // page is open, so it must not join the 2s log poll. Undefined until it arrives, which
   // formats browser-local exactly as before.
   const [serverTimeZone, setServerTimeZone] = useState<string | undefined>();
-  useEffect(() => {
-    if (!legacyRuntime) return;
-    const controller = new AbortController();
-    // Abort already rejects the in-flight fetch, but the flag keeps the guarantee
-    // local: the setter is visibly gated without having to reason about whether
-    // the abort propagates through the body read.
-    let cancelled = false;
-    fetch(`${apiBase}/api/settings`, { signal: controller.signal })
-      .then((res) => (res.ok ? (res.json() as Promise<{ timeZone?: unknown }>) : null))
-      .then((body) => {
-        if (cancelled || !body) return;
-        if (typeof body.timeZone === "string" && body.timeZone.trim()) {
-          setServerTimeZone(body.timeZone.trim());
-        }
-      })
-      .catch(() => {
-        // Offline or an older proxy without the field: keep browser-local formatting.
-      });
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [apiBase, legacyRuntime]);
   // The hash is the source of truth for the active tab (#logs vs #logs/debug),
   // so refresh/bookmark/back-forward keep the tab choice.
   const [requestedTab, setTab] = useState<LogsTab>(readTabFromHash);
@@ -681,7 +658,7 @@ export default function Logs({ apiBase }: { apiBase: string }) {
         if (!isCurrent())
           throw signal.reason ?? new DOMException("Obsolete log request", "AbortError");
         logPollRef.current = { key: resourceKey, cursor: parsed.cursor, rows: next };
-        if (!legacyRuntime) setServerTimeZone(parsed.timeZone);
+        setServerTimeZone(parsed.timeZone);
         // Reconcile when the accepted snapshot changes, using the latest user state
         // rather than filters captured when the request started. Persist disappearance
         // as All so a later ring cannot resurrect a cleared selection.
@@ -719,7 +696,7 @@ export default function Logs({ apiBase }: { apiBase: string }) {
         throw normalized;
       }
     },
-    [apiBase, legacyRuntime, resourceKey],
+    [apiBase, resourceKey],
   );
 
   // The resource layer owns the request and the 2s base poll. loadLogs backs off actual network
@@ -994,14 +971,15 @@ export default function Logs({ apiBase }: { apiBase: string }) {
                 {logsState.error instanceof Error
                   ? `${t("logs.loadError")} ${logsState.error.message}`
                   : t("logs.loadError")}{" "}
-                <button
+                <Button
                   type="button"
-                  className="btn btn-ghost btn-sm"
+                  variant="ghost"
+                  size="sm"
                   onClick={retryLogs}
                   disabled={logsState.refreshing}
                 >
                   {t("common.retry")}
-                </button>
+                </Button>
               </Notice>
             )}
             {/* Stale rows after a sustained poll outage, or any settled failure while auto-refresh is
@@ -1009,14 +987,15 @@ export default function Logs({ apiBase }: { apiBase: string }) {
             {pollFailing && logs.length > 0 && (
               <Notice tone="err">
                 {t("logs.loadError")}{" "}
-                <button
+                <Button
                   type="button"
-                  className="btn btn-ghost btn-sm"
+                  variant="ghost"
+                  size="sm"
                   onClick={retryLogs}
                   disabled={logsResource.refreshing}
                 >
                   {t("common.retry")}
-                </button>
+                </Button>
               </Notice>
             )}
           </div>
@@ -1366,17 +1345,15 @@ function LogDetailDialog({
   onClose: () => void;
   onFilterConversation?: (conversationId: string) => void;
 }) {
-  const { locale } = useI18n();
-  const lite = liteTranslator(locale);
   const metricReason = (reason: MetricUnavailableReason) =>
     reason === "price_time_unknown"
-      ? lite("logs.detail.reason.price_time_unknown")
+      ? t("logs.detail.reason.price_time_unknown")
       : t(metricReasonKey(reason));
   const estimateReason = (reason: CostEstimateReason) =>
     reason === "current_official_price" ||
     reason === "stale_official_price" ||
     reason === "request_time_estimated"
-      ? lite(
+      ? t(
           reason === "current_official_price"
             ? "logs.detail.estimate.current_official_price"
             : reason === "stale_official_price"
@@ -1438,14 +1415,15 @@ function LogDetailDialog({
             />
             {summary.label && <span className="logs-detail-info m-0">{summary.label}</span>}
           </h3>
-          <button
+          <Button
             type="button"
-            className="btn btn-ghost btn-sm"
+            variant="ghost"
+            size="sm"
             onClick={onClose}
             aria-label={t("common.cancel")}
           >
             <IconX />
-          </button>
+          </Button>
         </div>
         {summary.description && <p className="modal-desc">{summary.description}</p>}
 
@@ -1493,13 +1471,14 @@ function LogDetailDialog({
             <span className="log-detail-request-row">
               <span className="mono log-detail-break">{detail.requestId ?? "\u2014"}</span>
               {detail.requestId && (
-                <button
+                <Button
                   type="button"
-                  className="btn btn-ghost btn-sm"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => void copyRequestId()}
                 >
                   {t(copied ? "logs.detail.copied" : "logs.detail.copyRequestId")}
-                </button>
+                </Button>
               )}
             </span>
             {detail.conversationId && (
@@ -1508,13 +1487,14 @@ function LogDetailDialog({
                 <span className="log-detail-request-row">
                   <span className="mono log-detail-break">{detail.conversationId}</span>
                   {onFilterConversation && (
-                    <button
+                    <Button
                       type="button"
-                      className="btn btn-ghost btn-sm"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => onFilterConversation(detail.conversationId!)}
                     >
                       {t("logs.filter.conversation.apply")}
-                    </button>
+                    </Button>
                   )}
                 </span>
               </>
@@ -1715,14 +1695,14 @@ function LogDetailDialog({
                     <span className="muted">{t("logs.detail.priceSource")}</span>
                     <span>
                       {cost.estimate.price.source === "official"
-                        ? lite("logs.detail.source.official")
+                        ? t("logs.detail.source.official")
                         : t(`logs.detail.source.${cost.estimate.price.source}`)}{" "}
                       · {t(verificationKey(cost.estimate.price.status))}
                       {cost.estimate.price.source === "official" && (
                         <>
                           {" · "}
                           {cost.estimate.price.timeBand &&
-                            lite(
+                            t(
                               cost.estimate.price.timeBand === "peak"
                                 ? "logs.detail.band.peak"
                                 : "logs.detail.band.offPeak",
@@ -1742,7 +1722,7 @@ function LogDetailDialog({
                                 target="_blank"
                                 rel="noreferrer"
                               >
-                                {lite("logs.detail.source.official")}
+                                {t("logs.detail.source.official")}
                               </a>
                             </>
                           )}
@@ -1842,7 +1822,7 @@ function LogDetailDialog({
                                 <span className="muted text-caption log-detail-break">
                                   {matched.jawcodeProvider ?? matched.provider}/{matched.modelId} ·{" "}
                                   {matched.source === "official"
-                                    ? lite("logs.detail.source.official")
+                                    ? t("logs.detail.source.official")
                                     : t(`logs.detail.source.${matched.source}`)}{" "}
                                   · {t(verificationKey(matched.status))}
                                 </span>

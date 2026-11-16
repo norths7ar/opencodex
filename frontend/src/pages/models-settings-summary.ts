@@ -3,7 +3,7 @@
  * that names every folded control. Kept apart from the component file so Fast Refresh
  * sees a components-only module there.
  */
-import type { TFn, TKey } from "../i18n/shared";
+import type { TFn } from "../i18n/shared";
 import type { StorageLike } from "./collapse-store";
 import { fmtK } from "./models-shared";
 
@@ -37,67 +37,19 @@ export function writeSettingsOpen(open: boolean, storage?: StorageLike): void {
 }
 
 export interface ModelsSettingsState {
-  /** Configured sub-agent limit as a logical child count; null/undefined means the runtime default. */
-  v2Threads?: number | null;
-  shadowEnabled: boolean;
-  shadowModel?: string;
-  /** Global auto-review override; folded whenever enabled, a blank model reading as pending. */
-  autoReviewEnabled?: boolean;
-  autoReviewModel?: string;
   windowOn: boolean;
   windowValue: number;
-  /** The SAVED picker mode — an unapplied draft is not the catalog's state. */
-  pickerMode: string;
   newModelsOff: boolean;
   aliasesOn: boolean;
 }
-
-const PICKER_MODE_KEYS: Record<string, TKey> = {
-  default: "models.pickerOrder.default",
-  alphabetical: "models.pickerOrder.alphabetical",
-  provider: "models.pickerOrder.provider",
-  "most-used": "models.pickerOrder.mostUsed",
-  custom: "models.pickerOrder.custom",
-};
-
-/**
- * Ordered by how much each control changes request behaviour. The four core controls
- * always appear; the rest appear only when they differ from their default, so the line
- * stays short while nothing that changes behaviour is hidden by the fold.
- */
 export function modelsSettingsSummary(t: TFn, state: ModelsSettingsState): SettingsSummaryItem[] {
-  const off = t("models.settingsPanel.off");
-  const items: SettingsSummaryItem[] = [];
-  if (typeof state.v2Threads === "number") {
-    items.push({
-      id: "threads",
-      label: t("models.v2ThreadsLabel"),
-      value: String(state.v2Threads),
-    });
-  }
-  items.push({
-    id: "shadow",
-    label: t("models.shadowCallIntercept"),
-    value: state.shadowEnabled && state.shadowModel ? state.shadowModel : off,
-  });
-  if (state.autoReviewEnabled) {
-    items.push({
-      id: "auto-review",
-      label: t("models.autoReviewOverride"),
-      value: state.autoReviewModel || t("models.autoReviewPending"),
-    });
-  }
-  items.push({
-    id: "window",
-    label: t("models.contextCapLabel"),
-    value: state.windowOn ? fmtK(state.windowValue) : off,
-  });
-  const pickerKey = PICKER_MODE_KEYS[state.pickerMode];
-  items.push({
-    id: "order",
-    label: t("models.pickerOrder.label"),
-    value: pickerKey ? t(pickerKey) : state.pickerMode,
-  });
+  const items: SettingsSummaryItem[] = [
+    {
+      id: "window",
+      label: t("models.contextCapLabel"),
+      value: state.windowOn ? fmtK(state.windowValue) : t("models.settingsPanel.off"),
+    },
+  ];
   if (state.newModelsOff)
     items.push({ id: "new-models", label: t("models.newPolicyGlobal"), value: "" });
   if (state.aliasesOn)

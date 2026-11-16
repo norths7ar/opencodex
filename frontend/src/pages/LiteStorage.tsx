@@ -1,13 +1,12 @@
+import { Panel, PanelBody } from "@/components/settings/panel";
 import { useCallback, useState } from "react";
 import { PageHeader } from "../components/page-header";
-import { useI18n } from "../i18n/shared";
-import { liteTranslator } from "../i18n/lite-copy";
+import { Button } from "../components/button";
 import { useDataSurface } from "../data-surface";
 import { readJsonOrThrow } from "../fetch-json";
 import { formatBytes } from "../format-bytes";
+import { useI18n, type TKey } from "../i18n/shared";
 import { Notice } from "../ui";
-import { Button } from "../components/ui-v2/button";
-import { SettingsSection } from "../components/v2-proxy/settings-layout";
 
 interface Preview {
   digest: string;
@@ -27,30 +26,28 @@ interface Outcome {
   count: number;
   errors: { relPath: string; error: string }[];
 }
-const labels: Record<string, [string, string]> = {
-  configuration: ["配置（可能包含 API Key）", "Configuration (may contain API keys)"],
-  credentials: ["登录凭据", "Credentials"],
-  clientRollback: ["客户端配置及恢复备份", "Client configuration and rollback backups"],
-  history: ["订阅续聊历史", "Subscription continuation history"],
-  usage: ["请求用量与审计", "Usage and audit records"],
-  cache: ["可重新获取的缓存", "Refreshable cache"],
-  logs: ["当前日志", "Current logs"],
-  runtime: ["运行状态", "Runtime state"],
-  other: ["其他保留数据", "Other retained data"],
-};
+const labels = new Map<string, TKey>([
+  ["configuration", "storage.category.configuration"],
+  ["credentials", "storage.category.credentials"],
+  ["clientRollback", "storage.category.clientRollback"],
+  ["history", "storage.category.history"],
+  ["usage", "storage.category.usage"],
+  ["cache", "storage.category.cache"],
+  ["logs", "storage.category.logs"],
+  ["runtime", "storage.category.runtime"],
+  ["other", "storage.category.other"],
+]);
 
 export default function LiteStorage({ apiBase }: { apiBase: string }) {
-  const { locale } = useI18n();
-  const zh = locale === "zh" || locale === "zh-TW";
-  const text = (cn: string, en: string) => (zh ? cn : en);
+  const { locale, t } = useI18n();
   const bytes = (value: number) => formatBytes(value, locale);
   const load = useCallback(
     async (signal: AbortSignal) =>
       readJsonOrThrow<Report>(
         await fetch(`${apiBase}/api/lite-storage`, { signal }),
-        "Could not load storage.",
+        t("storage.loadFailed"),
       ),
-    [apiBase],
+    [apiBase, t],
   );
   const resource = useDataSurface(`lite-storage:${apiBase}`, [apiBase], load, {
     isEmpty: () => false,
@@ -78,10 +75,10 @@ export default function LiteStorage({ apiBase }: { apiBase: string }) {
         headers: { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined,
       }),
-      text("操作失败。", "Operation failed."),
+      t("storage.operationFailed"),
     );
-    if (!result) throw new Error(text("响应为空。", "Empty response."));
-    setMessage(liteTranslator(locale)("storageFilesProcessed", { count: String(result.count) }));
+    if (!result) throw new Error(t("storage.emptyResponse"));
+    setMessage(t("storageFilesProcessed", { count: String(result.count) }));
     if (!result.ok) setError(result.errors.map((row) => `${row.relPath}: ${row.error}`).join("; "));
     setPreview(null);
     resource.refresh();
@@ -89,150 +86,138 @@ export default function LiteStorage({ apiBase }: { apiBase: string }) {
   const data = resource.state.data;
   return (
     <div className="dashboard-workspace-shell flex flex-col gap-5">
-      <PageHeader
-        title={text("存储", "Storage")}
-        subtitle={text(
-          "管理 Lite 自身的数据。清理先预览，再移入可恢复的隔离区。",
-          "Manage Lite's own data. Preview cleanup before moving files into recoverable quarantine.",
-        )}
-      />
+      <PageHeader title={t("nav.storage")} subtitle={t("storage.subtitle")} />
       {(error || resource.state.showError) && (
-        <Notice tone="err">{error ?? text("无法加载存储信息。", "Could not load storage.")}</Notice>
+        <Notice tone="err">{error ?? t("storage.loadFailed")}</Notice>
       )}
       {message && <p role="status">{message}</p>}
-      {!data && !resource.state.showError && <p role="status">{text("正在读取…", "Loading…")}</p>}
+      {!data && !resource.state.showError && <p role="status">{t("common.loading")}</p>}
       {data && (
         <>
-          <SettingsSection id="lite-storage-usage" title={text("数据占用", "Data usage")}>
-            <div className="p-4">
-              <p className="break-all text-sm text-fg-muted">{data.dataDirectory}</p>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr>
-                    <th className="text-left">{text("类别", "Category")}</th>
-                    <th>{text("文件", "Files")}</th>
-                    <th>{text("大小", "Size")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.categories.map((row) => (
-                    <tr key={row.id}>
-                      <td className="py-2">{labels[row.id]?.[zh ? 0 : 1] ?? row.id}</td>
-                      <td className="text-center">{row.count}</td>
-                      <td className="text-center">{bytes(row.bytes)}</td>
+          <Panel id="lite-storage-usage" title={t("storage.dataUsage")}>
+            <PanelBody>
+              <div className="p-4">
+                <p className="break-all text-sm text-fg-muted">{data.dataDirectory}</p>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className="text-left">{t("storage.category")}</th>
+                      <th>{t("storage.files")}</th>
+                      <th>{t("storage.size")}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="text-sm text-fg-muted">
-                {text(
-                  "配置、凭据、客户端恢复备份、历史数据库与当前日志保留。用量数据库由自身的保留策略管理。",
-                  "Configuration, credentials, client rollback backups, history databases and current logs are retained. The usage ledger manages its own retention policy.",
-                )}
-              </p>
-              {data.usageRetention && (
-                <p className="text-sm">
-                  {text("用量数据库", "Usage ledger")}: {bytes(data.usageRetention.currentBytes)} ·{" "}
-                  {data.usageRetention.maxBytes
-                    ? text("上限", "Limit") + ": " + bytes(data.usageRetention.maxBytes)
-                    : text("未设置容量上限", "No size limit configured")}
-                </p>
-              )}
-              {data.errors.length > 0 && (
-                <Notice tone="warn">
-                  {text(
-                    "部分文件无法读取，统计可能不完整。",
-                    "Some files could not be read; totals may be incomplete.",
-                  )}
-                </Notice>
-              )}
-            </div>
-          </SettingsSection>
-          <SettingsSection
-            id="lite-storage-cleanup"
-            title={text("缓存清理", "Cache cleanup")}
-            lede={text(
-              "清理 ChatGPT 额度快照，下次查询时重新获取。隔离文件仍占用磁盘空间。",
-              "Clear ChatGPT quota snapshots; the next query fetches them again. Quarantined files still occupy disk space.",
-            )}
-          >
-            <div className="flex flex-col gap-3 p-4">
-              <div>
-                <Button
-                  disabled={busy}
-                  onClick={() =>
-                    void act(async () => {
-                      const result = await readJsonOrThrow<Preview>(
-                        await fetch(`${apiBase}/api/lite-storage/preview`),
-                        "Preview failed.",
+                  </thead>
+                  <tbody>
+                    {data.categories.map((row) => {
+                      const label = labels.get(row.id);
+                      return (
+                        <tr key={row.id}>
+                          <td className="py-2">{label ? t(label) : row.id}</td>
+                          <td className="text-center">{row.count}</td>
+                          <td className="text-center">{bytes(row.bytes)}</td>
+                        </tr>
                       );
-                      if (!result) throw new Error("Empty preview.");
-                      setPreview(result);
-                    })
-                  }
-                >
-                  {text("预览清理", "Preview cleanup")}
-                </Button>
-              </div>
-              {preview && (
-                <>
-                  <p>
-                    {preview.count} {text("个文件", "files")} · {bytes(preview.bytes)}
+                    })}
+                  </tbody>
+                </table>
+                <p className="text-sm text-fg-muted">{t("storage.retentionDescription")}</p>
+                {data.usageRetention && (
+                  <p className="text-sm">
+                    {t("storage.usageLedger")}: {bytes(data.usageRetention.currentBytes)} ·{" "}
+                    {data.usageRetention.maxBytes
+                      ? t("storage.sizeLimit", { size: bytes(data.usageRetention.maxBytes) })
+                      : t("storage.noSizeLimit")}
                   </p>
-                  <ul>
-                    {preview.candidates.map((row) => (
-                      <li key={row.relPath}>
-                        {row.relPath} · {bytes(row.bytes)}
-                      </li>
-                    ))}
-                  </ul>
-                  <div>
-                    <Button
-                      disabled={busy || preview.count === 0}
-                      onClick={() =>
-                        void act(() => mutate("quarantine", { digest: preview.digest }))
-                      }
-                    >
-                      {text("确认移入隔离区", "Confirm quarantine")}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </div>
-          </SettingsSection>
-          <SettingsSection
-            id="lite-storage-restore"
-            title={text("恢复隔离文件", "Restore quarantined files")}
-            lede={text(
-              "已有同名文件时保留当前文件，恢复冲突会单独显示。",
-              "Existing files are preserved; restore conflicts are reported individually.",
-            )}
+                )}
+                {data.errors.length > 0 && (
+                  <Notice tone="warn">{t("storage.incompleteTotals")}</Notice>
+                )}
+              </div>
+            </PanelBody>
+          </Panel>
+          <Panel
+            id="lite-storage-cleanup"
+            title={t("storage.cacheCleanup")}
+            description={t("storage.cacheCleanupDescription")}
           >
-            <div className="flex flex-col gap-3 p-4">
-              {data.quarantine.length === 0 && (
-                <p>{text("隔离区为空。", "Quarantine is empty.")}</p>
-              )}
-              {data.quarantine.map((row) => (
-                <div key={row.id} className="flex flex-wrap items-center justify-between gap-3">
-                  <span>
-                    {row.createdAt ? new Date(row.createdAt * 1000).toLocaleString() : row.id} ·{" "}
-                    {row.count ?? "—"} · {bytes(row.bytes ?? 0)} {row.error}
-                  </span>
+            <PanelBody>
+              <div className="flex flex-col gap-3 p-4">
+                <div>
                   <Button
-                    disabled={busy || !row.count || !!row.error}
-                    onClick={() => void act(() => mutate(`restore/${row.id}`))}
+                    disabled={busy}
+                    onClick={() =>
+                      void act(async () => {
+                        const result = await readJsonOrThrow<Preview>(
+                          await fetch(`${apiBase}/api/lite-storage/preview`),
+                          t("storage.previewFailed"),
+                        );
+                        if (!result) throw new Error(t("storage.emptyPreview"));
+                        setPreview(result);
+                      })
+                    }
                   >
-                    {text("恢复", "Restore")}
+                    {t("storage.previewCleanup")}
                   </Button>
                 </div>
-              ))}
-            </div>
-          </SettingsSection>
+                {preview && (
+                  <>
+                    <p>
+                      {t("storage.fileCount", { count: String(preview.count) })} ·{" "}
+                      {bytes(preview.bytes)}
+                    </p>
+                    <ul>
+                      {preview.candidates.map((row) => (
+                        <li key={row.relPath}>
+                          {row.relPath} · {bytes(row.bytes)}
+                        </li>
+                      ))}
+                    </ul>
+                    <div>
+                      <Button
+                        disabled={busy || preview.count === 0}
+                        onClick={() =>
+                          void act(() => mutate("quarantine", { digest: preview.digest }))
+                        }
+                      >
+                        {t("storage.confirmQuarantine")}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </PanelBody>
+          </Panel>
+          <Panel
+            id="lite-storage-restore"
+            title={t("storage.restoreQuarantined")}
+            description={t("storage.restoreDescription")}
+          >
+            <PanelBody>
+              <div className="flex flex-col gap-3 p-4">
+                {data.quarantine.length === 0 && <p>{t("storage.quarantineEmpty")}</p>}
+                {data.quarantine.map((row) => (
+                  <div key={row.id} className="flex flex-wrap items-center justify-between gap-3">
+                    <span>
+                      {row.createdAt
+                        ? new Date(row.createdAt * 1000).toLocaleString(locale)
+                        : row.id}{" "}
+                      · {row.count ?? "—"} · {bytes(row.bytes ?? 0)} {row.error}
+                    </span>
+                    <Button
+                      disabled={busy || !row.count || !!row.error}
+                      onClick={() => void act(() => mutate(`restore/${row.id}`))}
+                    >
+                      {t("storage.restore")}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </PanelBody>
+          </Panel>
         </>
       )}
       <div>
         <Button disabled={busy || resource.state.refreshing} onClick={() => resource.refresh()}>
-          {text("刷新", "Refresh")}
+          {t("channels.refresh")}
         </Button>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { LazyMotion, m, useReducedMotion } from "motion/react";
+import type { ReactNode } from "react";
 
 /*
  * The selected plate of a segmented track. It slides from the old option to the new one on a

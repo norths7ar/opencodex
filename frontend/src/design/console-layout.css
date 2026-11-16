@@ -79,3 +79,11 @@ html {
     padding-top: 20px;
   }
 }
+/* Visible while the selected locale loads; no English-content flash. */
+.console-boot {
+  min-height: 100vh;
+  padding: var(--space-6);
+  color: var(--ocx-fg);
+  background: var(--ocx-bg);
+  font-weight: 600;
+}

@@ -1,3 +1,4 @@
+import { Button } from "@/components/button";
 /**
  * Runs the bounded completion probe across every model of one provider, one request at a time,
  * and offers to hide the models that failed. Nothing is disabled without a second consent.
@@ -62,7 +63,7 @@ export default function ProviderBulkCompletionTest({
   async function testOne(model: string, signal: AbortSignal): Promise<Row | { stop: string }> {
     try {
       const response = await fetch(
-        `${apiBase}/api/providers/test-completion?name=${encodeURIComponent(provider)}`,
+        `${apiBase}/api/channels/${encodeURIComponent(provider)}/completion-test`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -210,9 +211,10 @@ export default function ProviderBulkCompletionTest({
   return (
     <div className="pws-completion-bulk">
       <div className="row pws-completion-bulk-actions">
-        <button
+        <Button
           type="button"
-          className="btn btn-ghost btn-sm"
+          variant="ghost"
+          size="sm"
           disabled={models.length === 0 || running || disable.kind === "busy" || blocked}
           onClick={() => void run()}
         >
@@ -222,11 +224,11 @@ export default function ProviderBulkCompletionTest({
                 total: String(models.length),
               })
             : t("pws.completion.runAll")}
-        </button>
+        </Button>
         {running && (
-          <button type="button" className="btn btn-ghost btn-sm" onClick={stop}>
+          <Button type="button" variant="ghost" size="sm" onClick={stop}>
             {t("pws.completion.stop")}
-          </button>
+          </Button>
         )}
       </div>
       {notice && (
@@ -286,14 +288,15 @@ export default function ProviderBulkCompletionTest({
             </tbody>
           </table>
           {!running && failedCount > 0 && disable.kind !== "done" && (
-            <button
+            <Button
               type="button"
-              className="btn btn-ghost btn-sm"
+              variant="ghost"
+              size="sm"
               disabled={disable.kind === "busy"}
               onClick={() => void disableFailed()}
             >
               {t("pws.completion.disableFailed", { count: String(failedCount) })}
-            </button>
+            </Button>
           )}
           {disable.kind === "done" && (
             <p role="status" className="pws-status-ok">

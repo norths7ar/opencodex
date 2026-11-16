@@ -1,7 +1,7 @@
-import type { TFn, TKey } from "../i18n/shared";
 import type { ModelCost, RateField } from "../components/model-price-cost";
-import type { ProviderDiscoverySummary } from "../models-groups";
+import type { TFn, TKey } from "../i18n/shared";
 import { modelVisible, type ProviderModelMap } from "../model-visibility";
+import type { ProviderDiscoverySummary } from "../models-groups";
 import { formatNamespacedModelId } from "../provider-icons";
 import type { ShadowCallSourceOption } from "./shadow-call-source";
 

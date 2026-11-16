@@ -1,6 +1,6 @@
+import { card, cardHint, cardTitle, quietButton } from "../components/v2-logs/classes";
 import { useI18n } from "../i18n/shared";
 import { Switch } from "../ui";
-import { card, cardHint, cardTitle, quietButton } from "../components/v2-logs/classes";
 import type { DebugSettings } from "./debug-shared";
 import { isDebugFlagEnabled } from "./debug-shared";
 

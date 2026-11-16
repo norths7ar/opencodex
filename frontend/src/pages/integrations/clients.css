@@ -1,0 +1,222 @@
+@layer components {
+  /* The client domain owns these layouts; shared controls use the design system. */
+  .client-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .client-card,
+  .client-panel {
+    min-width: 0;
+  }
+  .client-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid var(--ocx-line);
+    border-radius: 12px;
+    padding: 20px;
+    background: var(--ocx-raised);
+  }
+  .client-card > p {
+    margin: 0;
+  }
+  .client-card .client-section-heading h3 {
+    font-size: 20px;
+  }
+  .client-card-detail {
+    min-height: 48px;
+    overflow-wrap: anywhere;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--ocx-surface);
+    color: var(--ocx-fg-muted);
+    font-size: 12px;
+  }
+  .client-card > .client-actions {
+    margin-top: auto;
+  }
+  .client-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1000px;
+  }
+  .client-section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    min-height: 34px;
+  }
+  .client-section-heading h3,
+  .client-history h3,
+  .client-dialog h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .client-section-heading > button:last-child {
+    margin-left: auto;
+  }
+  .client-state {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--ocx-surface);
+    color: var(--ocx-fg-muted);
+    font-size: 12px;
+  }
+  .client-state[data-state="current"] {
+    background: var(--ocx-success-soft);
+    color: var(--ocx-success);
+  }
+  .client-state:is(
+    [data-state="conflict"],
+    [data-state="unsafe"],
+    [data-state="unavailable"],
+    [data-state="stale"]
+  ) {
+    background: var(--ocx-warning-soft);
+    color: var(--ocx-warning);
+  }
+  .client-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .client-facts {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+  }
+  .client-facts > div {
+    display: grid;
+    grid-template-columns: minmax(100px, 150px) minmax(0, 1fr);
+    gap: 16px;
+    align-items: baseline;
+  }
+  .client-facts dt {
+    color: var(--ocx-fg-muted);
+  }
+  .client-facts dd {
+    margin: 0;
+    min-width: 0;
+  }
+  .client-panel code,
+  .client-card code,
+  .client-dialog code {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .client-files,
+  .client-history {
+    border-top: 1px solid var(--ocx-line);
+    padding-top: 20px;
+  }
+  .client-files summary,
+  .client-history summary {
+    cursor: pointer;
+    color: var(--ocx-fg-muted);
+  }
+  .client-files[open] summary,
+  .client-history[open] summary {
+    margin-bottom: 16px;
+  }
+  .client-home {
+    display: grid;
+    gap: 8px;
+  }
+  .client-home-controls {
+    display: flex;
+    gap: 8px;
+  }
+  .client-home-controls input {
+    min-width: 0;
+    flex: 1;
+  }
+  .client-home p,
+  .client-help {
+    margin: 0;
+    font-size: 12px;
+  }
+  .client-history ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+  .client-history-row {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--ocx-line);
+  }
+  .client-history-row > div:first-child {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+  .client-history-row time {
+    color: var(--ocx-fg-muted);
+    font-size: 12px;
+  }
+  .client-history-row code {
+    font-size: 12px;
+  }
+  .client-dialog {
+    width: min(560px, calc(100vw - 32px));
+    max-height: calc(100dvh - 48px);
+    box-sizing: border-box;
+    padding: 24px;
+    border: 1px solid var(--ocx-line-strong);
+    border-radius: 14px;
+    background: var(--ocx-raised);
+    color: var(--ocx-fg);
+    box-shadow: var(--ocx-shadow-lg);
+    overflow: auto;
+  }
+  .client-dialog::backdrop {
+    background: rgb(0 0 0 / 45%);
+  }
+  .client-dialog-body {
+    display: grid;
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .client-dialog-body p {
+    margin: 0;
+  }
+  .client-dialog footer {
+    justify-content: flex-end;
+  }
+  .client-check {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .client-check input {
+    margin-top: 4px;
+    accent-color: var(--ocx-accent);
+  }
+  .client-plan-changes {
+    padding-left: 20px;
+    margin: 0;
+  }
+  @media (max-width: 760px) {
+    .client-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .client-facts > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+    .client-history-row {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}

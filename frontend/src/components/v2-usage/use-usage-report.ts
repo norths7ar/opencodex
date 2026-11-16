@@ -1,15 +1,15 @@
 import { useCallback, useEffect } from "react";
 import {
-  denyUsageSession,
-  usageSessionSnapshot,
   USAGE_SOURCE_INVENTORY_CHANGED,
+  denyUsageSession,
   sourceInventoryEventMatches,
+  usageSessionSnapshot,
 } from "../../api";
 import { useDataSurface } from "../../data-surface";
 import { readUsageResponseJson } from "../../usage-summary-resource";
+import type { Range, UsageResponse } from "./usage-model";
 import { matchesSource, noStore, sourceQuery, type SourceFilter } from "./usage-source";
 import { isUsageReport } from "./usage-validation";
-import type { Range, UsageResponse } from "./usage-model";
 
 export class UsageWindowMismatchError extends Error {}
 export class UsageAccessDeniedError extends Error {}

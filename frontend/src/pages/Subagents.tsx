@@ -1,26 +1,27 @@
-import SubagentForceControl from "../components/subagents-workspace/SubagentForceControl";
-import WorkflowBudgetPanel from "../components/WorkflowBudgetPanel";
+import { Button } from "@/components/button";
+import { clientApplicationWarning } from "@/contracts/application";
+import type { ApplicationReceipt } from "@/contracts/channels";
+import { useSubagentDelegation } from "@/features/subagents/use-native-settings";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { readJsonOrThrow } from "../fetch-json";
-import { Notice } from "../ui";
-import { useI18n } from "../i18n/shared";
-import SubagentsWorkspace, {
-  FEATURED_MAX,
-} from "../components/subagents-workspace/SubagentsWorkspace";
-import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
-import { useDataSurface } from "../data-surface";
 import { DataSurfaceSkeleton } from "../components/data-surface";
-import { useSubagentDelegation } from "./use-subagent-delegation";
-import { InEffectSummary } from "../components/v2-subagents/InEffectSummary";
-import { formatNamespacedModelId } from "../provider-icons";
-import { sectionAnchorId } from "../section-anchors";
-import { useRuntimeCapabilities } from "../runtime-capabilities";
 import { PageHeader } from "../components/page-header";
 import {
   subagentModelIdentity,
   subagentModelOptions,
   uniqueSubagentModels,
 } from "../components/subagents-workspace/model-options";
+import SubagentsWorkspace, {
+  FEATURED_MAX,
+} from "../components/subagents-workspace/SubagentsWorkspace";
+import { InEffectSummary } from "../components/v2-subagents/InEffectSummary";
+import WorkflowBudgetPanel from "../components/WorkflowBudgetPanel";
+import { useDataSurface } from "../data-surface";
+import { readJsonOrThrow } from "../fetch-json";
+import { useI18n } from "../i18n/shared";
+import { formatNamespacedModelId } from "../provider-icons";
+import { sectionAnchorId } from "../section-anchors";
+import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
+import { Notice } from "../ui";
 
 type CachedSubagents = {
   available: string[];
@@ -43,8 +44,7 @@ function jump(target: "featured" | "delegation" | "pin") {
 
 export default function Subagents({ apiBase }: { apiBase: string }) {
   const { t, locale } = useI18n();
-  const capabilities = useRuntimeCapabilities();
-  const claudeAvailable = !capabilities || capabilities.clients.includes("claude");
+  const claudeAvailable = false;
   const cacheKey = `ocx.subagents.v1:${apiBase}`;
   const cached = seedSubagents(cacheKey);
   const [chosen, setChosen] = useState<string[]>(() => cached?.chosen ?? []);
@@ -90,7 +90,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   }, []);
   const delegation = useSubagentDelegation(apiBase);
   /** The Claude Code pin as the pin panel last read or wrote it, for the summary tiles. */
-  const [pin, setPin] = useState<string | null | undefined>(undefined);
+  const pin = undefined;
   const currentApiBase = useRef(apiBase);
   const [clientApply, setClientApply] = useState<{ apiBase: string; pending: boolean } | null>(
     null,
@@ -241,6 +241,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
     saveInFlight.current = true;
     setStatus("");
     let failure: unknown = null;
+    let application: ApplicationReceipt | undefined;
     let applied = models;
     while (queuedRoster.current) {
       const sending = queuedRoster.current;
@@ -251,7 +252,11 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ models: sending }),
         });
-        const d = await readJsonOrThrow<{ applied?: string[] }>(r, t("sub.saveFailed"));
+        const d = await readJsonOrThrow<{
+          applied?: string[];
+          catalogRefresh?: ApplicationReceipt;
+        }>(r, t("sub.saveFailed"));
+        application = d?.catalogRefresh;
         applied = d?.applied ?? sending;
         // The server holds this list even if a newer edit is queued, so it is the restore point.
         // A legacy roster-only seed does not prove that an empty fallback was loaded.
@@ -273,8 +278,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
       return;
     }
     setRoster(applied);
-    setOk(true);
-    setStatus(t("sub.saved", { n: applied.length, cmd: "ocx sync" }));
+    const warning = clientApplicationWarning(application, t("integrations.catalogSyncFailed"));
+    setOk(!warning);
+    setStatus(warning ?? t("sub.saved", { n: applied.length, cmd: "ocx sync" }));
   };
 
   const editRoster = (next: string[]) => {
@@ -389,9 +395,9 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
       <>
         {pageHeader}
         <Notice tone="err">{reason}</Notice>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => load()}>
+        <Button type="button" variant="ghost" size="sm" onClick={() => load()}>
           {t("common.retry")}
-        </button>
+        </Button>
       </>
     );
   }
@@ -415,7 +421,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           <InEffectSummary
             chosen={displayedChosen}
             title={
-              capabilities && (!clientApplyCurrent || pendingClientApply)
+              !clientApplyCurrent || pendingClientApply
                 ? locale === "zh" || locale === "zh-TW"
                   ? pendingClientApply
                     ? "已保存 · Codex 未接入"
@@ -433,15 +439,24 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
             onJump={jump}
           />
         </div>
+        {delegation.error && (
+          <Notice tone="err">
+            {delegation.error}
+            <Button type="button" variant="outline" size="sm" onClick={() => delegation.refresh()}>
+              {t("common.retry")}
+            </Button>
+          </Notice>
+        )}
         {status && <Notice tone={ok ? "ok" : "err"}>{status}</Notice>}
         {state.showError && <Notice tone="err">{t("sub.loadFail")}</Notice>}
         {fallbackError && !fallbackLoading && (
           <Notice tone="err">
             {t("sub.fallbackLabel")}: {t("sub.loadFail")}
             {fallbackError !== t("sub.loadFail") && <> {fallbackError}</>}
-            <button
+            <Button
               type="button"
-              className="btn btn-ghost btn-sm"
+              variant="ghost"
+              size="sm"
               disabled={fallbackLoading}
               onClick={() => {
                 setFallbackLoading(true);
@@ -449,7 +464,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
               }}
             >
               {t("common.retry")}
-            </button>
+            </Button>
           </Notice>
         )}
         <SubagentsWorkspace
@@ -477,15 +492,6 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           }}
           settingsExtra={
             <>
-              {claudeAvailable && (
-                <SubagentForceControl
-                  key={apiBase}
-                  apiBase={apiBase}
-                  roster={chosen}
-                  id={sectionAnchorId("subagents", "pin")}
-                  onForceChange={setPin}
-                />
-              )}
               <WorkflowBudgetPanel apiBase={apiBase} id={sectionAnchorId("subagents", "budget")} />
             </>
           }

@@ -1,6 +1,6 @@
+import { cn } from "@/lib/utils";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { IconMinus, IconPlus } from "../../icons";
-import { cn } from "@/lib/utils";
 
 interface StepperInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "className"> {
   decrementLabel: string;

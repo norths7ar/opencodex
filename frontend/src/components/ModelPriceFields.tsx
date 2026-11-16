@@ -1,5 +1,4 @@
 import { useId, type Dispatch, type RefObject, type SetStateAction } from "react";
-import "./model-price-dialog.css";
 import { useT, type TKey } from "../i18n/shared";
 import { Select } from "../ui";
 import {
@@ -7,10 +6,11 @@ import {
   RATE_FIELDS,
   type CustomDraft,
   type InvalidField,
-  type RateDraft,
   type PricingMode,
+  type RateDraft,
   type RateField,
 } from "./model-price-cost";
+import "./model-price-dialog.css";
 
 const RATE_LABELS: Record<RateField, TKey> = {
   input: "pricing.override.input",

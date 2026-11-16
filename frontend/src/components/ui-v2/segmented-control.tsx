@@ -1,5 +1,5 @@
-import { useId, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { useId, useRef, type KeyboardEvent, type ReactNode } from "react";
 import { SegmentThumb, SegmentThumbGroup } from "./segment-thumb";
 
 export interface SegmentedItem<V extends string> {

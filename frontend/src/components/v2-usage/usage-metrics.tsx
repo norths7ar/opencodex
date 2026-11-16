@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import type { Locale, TFn } from "../../i18n/shared";
 import { formatTokens } from "../../format-tokens";
+import type { Locale, TFn } from "../../i18n/shared";
 import { formatEstimatedUsdValue as formatUsdEstimate } from "../../intl-formatters";
 import { HelpPopover } from "../help-popover";
 import {

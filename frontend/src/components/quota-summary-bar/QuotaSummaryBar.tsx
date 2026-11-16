@@ -22,19 +22,14 @@ import {
   type RefObject,
 } from "react";
 import { useDataSurface } from "../../data-surface";
-import {
-  formatMuseResetCountdown,
-  museObservationResetAt,
-  withMuseLimitObservation,
-  withoutExpiredMuseObservation,
-} from "../../muse-limit-observation";
 import { useI18n, type Locale, type TFn } from "../../i18n/shared";
+
+import { openProviderAccounts, providerAccountsHash } from "../../protocol-deep-links";
 import { formatProviderDisplayName } from "../../provider-icons";
 import {
   freshQuotaReportsFromResponse,
   type ProviderQuotaReportView,
 } from "../../provider-workspace/report";
-import { openProviderAccounts, providerAccountsHash } from "../../protocol-deep-links";
 import {
   buildQuotaSummary,
   formatQuotaPercent,
@@ -43,8 +38,8 @@ import {
   type QuotaSummaryWindow,
 } from "../../quota-summary";
 import { formatResetFuture } from "../QuotaBars";
-import { publishStickyTop } from "./sticky-top";
 import "./quota-summary-bar.css";
+import { publishStickyTop } from "./sticky-top";
 
 interface QuotaSummaryData {
   fetchedAt: number;
@@ -143,12 +138,6 @@ function usePopoverPlacement(
 }
 
 function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; locale: Locale }) {
-  const [clock, setClock] = useState(Date.now);
-  useEffect(() => {
-    if (row.provider !== "meta-muse" || row.headline.resetAt === undefined) return;
-    const timer = window.setInterval(() => setClock(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, [row.provider, row.headline.resetAt]);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   /** Touch has no hover: the first tap opens the detail here, the second one navigates. */
@@ -254,14 +243,7 @@ function QuotaSummaryItem({ row, t, locale }: { row: QuotaSummaryRow; t: TFn; lo
       >
         <span className="quota-summary-name">{row.label}</span>
         <span className="quota-summary-pct">{formatQuotaPercent(headline.percent)}</span>
-        {row.provider === "meta-muse" && headline.resetAt !== undefined && (
-          <span
-            className="quota-summary-name"
-            title={formatResetFuture(headline.resetAt, t, locale)}
-          >
-            {formatMuseResetCountdown(headline.resetAt, clock)}
-          </span>
-        )}
+
         {warning && (
           <span className="quota-summary-flag" aria-hidden="true">
             !
@@ -454,11 +436,7 @@ export default function QuotaSummaryBar({ apiBase }: { apiBase: string }) {
       const response = await fetch(`${apiBase}/api/provider-quotas`, { signal });
       if (!response.ok) throw new Error("quota summary load failed");
       const body = (await response.json()) as { reports?: unknown } | null;
-      const reports = await withMuseLimitObservation(
-        freshQuotaReportsFromResponse(body?.reports),
-        apiBase,
-        signal,
-      );
+      const reports = freshQuotaReportsFromResponse(body?.reports);
       return { fetchedAt: Date.now(), reports };
     },
     [apiBase],
@@ -475,19 +453,8 @@ export default function QuotaSummaryBar({ apiBase }: { apiBase: string }) {
   );
 
   const data = resource.data;
-  // Re-render at an observed Muse reset so the exhausted row leaves without waiting for a successful poll.
-  const [clock, setClock] = useState(Date.now);
-  const observedResetAt = data ? museObservationResetAt(data.reports) : undefined;
-  useEffect(() => {
-    if (observedResetAt === undefined || clock >= observedResetAt) return;
-    const timer = window.setTimeout(
-      () => setClock(Date.now()),
-      Math.max(0, observedResetAt - Date.now()),
-    );
-    return () => window.clearTimeout(timer);
-  }, [observedResetAt, clock]);
   if (!data) return null;
-  const reports = withoutExpiredMuseObservation(data.reports, clock);
+  const reports = data.reports;
   const rows = buildQuotaSummary(reports, (provider) => formatProviderDisplayName(provider, t));
   if (rows.length === 0) return null;
   const stale = !resource.lastAttemptOk;

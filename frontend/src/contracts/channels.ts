@@ -142,10 +142,33 @@ export type RequestPacing = {
   keySelection?: "active" | null;
 };
 
+export type ApiError = {
+  code: string;
+  message: string;
+  field?: string | null;
+  retryable: boolean;
+};
+
 export type ChannelDetail = {
+  revision: number;
   channel: Channel;
   credential: CredentialStatus;
   has_custom_headers: boolean;
+  discovery: {
+    state: "not_checked" | "ready" | "refreshing" | "failed" | "unsupported";
+    last_success_at?: string | null;
+    last_attempt_at?: string | null;
+    stale_default_model?: string | null;
+    stale_aliases?: Record<string, string>;
+    error?: ApiError | null;
+  };
+};
+
+export type ChannelDirectory = {
+  revision: number;
+  default_channel_id: string | null;
+  default_model_id: string | null;
+  channels: ChannelDetail[];
 };
 
 export type ClearCredential = {
@@ -178,3 +201,17 @@ export type ChannelConfigurationEdit = {
   default_channel_id?: string | null;
   default_model_id?: string | null;
 };
+
+export type ClientApplicationOutcome = {
+  ok: boolean;
+  state: string;
+  message?: string | null;
+  reason?: string | null;
+};
+
+export type ApplicationReceipt = {
+  status: "applied" | "pending" | "skipped" | "failed";
+  clients?: Record<string, ClientApplicationOutcome> | null;
+  message?: string | null;
+};
+export type ChannelSaved = ChannelDetail & { saved: true; application: ApplicationReceipt };

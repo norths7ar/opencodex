@@ -1,9 +1,11 @@
-import type { ProviderDiscoverySummary } from "../models-groups";
-import { useI18n } from "../i18n/shared";
-import { Notice } from "../ui";
+import { Button } from "@/components/button";
+import { useChannelCopy } from "@/features/channels/copy";
+import { refreshChannelModels } from "@/features/channels/api";
 import { useState } from "react";
-import { apiErrorMessage } from "../api-error";
-import { liteTranslator } from "../i18n/lite-copy";
+import { useI18n } from "../i18n/shared";
+import type { ProviderDiscoverySummary } from "../models-groups";
+import { clientApplicationWarning } from "../contracts/application";
+import { Notice } from "../ui";
 
 export function ModelDiscoveryStatus({
   discovery,
@@ -16,10 +18,11 @@ export function ModelDiscoveryStatus({
   provider?: string;
   onRefreshed?: () => void;
 }) {
-  const { locale } = useI18n();
-  const t = liteTranslator(locale);
+  const c = useChannelCopy();
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState<string>();
   if (!discovery?.checkedAt && apiBase === undefined) return null;
   const checked = discovery?.checkedAt ? new Date(discovery.checkedAt).toLocaleString() : null;
   const lastSuccess = discovery?.lastSuccessAt
@@ -29,14 +32,14 @@ export function ModelDiscoveryStatus({
   const refresh = async () => {
     setBusy(true);
     setError("");
+    setWarning(undefined);
     try {
-      const response = await fetch(
-        `${apiBase}/api/providers/${encodeURIComponent(provider!)}/models/refresh`,
-        { method: "POST" },
+      const result = await refreshChannelModels(apiBase!, provider!, t("refreshFailed"));
+      if (!result) throw new Error(t("refreshFailed"));
+      if (result.ok === false) setError(result.discovery?.error?.message || t("retainedUnknown"));
+      setWarning(
+        clientApplicationWarning(result.catalogRefresh, t("integrations.catalogRefreshSyncFailed")),
       );
-      if (!response.ok) throw new Error(await apiErrorMessage(response, t("refreshFailed")));
-      const result = (await response.json()) as { ok?: boolean; discovery?: { error?: string } };
-      if (result.ok === false) setError(result.discovery?.error || t("retainedUnknown"));
       onRefreshed?.();
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : String(failure));
@@ -46,20 +49,29 @@ export function ModelDiscoveryStatus({
   };
   return (
     <div className="model-discovery-status">
+      {(discovery?.status === "not_checked" ||
+        discovery?.status === "unsupported" ||
+        discovery?.status === "refreshing") && (
+        <p className="muted">
+          {c(discovery.status === "not_checked" ? "never" : discovery.status)}
+        </p>
+      )}
       <div className="row">
         {checked && <p className="muted text-label">{t("lastChecked", { time: checked })}</p>}
         {apiBase !== undefined && provider && (
-          <button
+          <Button
             type="button"
-            className="btn btn-ghost btn-sm"
+            variant="ghost"
+            size="sm"
             disabled={busy}
             onClick={() => void refresh()}
           >
             {t(busy ? "refreshing" : "refresh")}
-          </button>
+          </Button>
         )}
       </div>
       {error && <Notice tone="err">{error}</Notice>}
+      {warning && <Notice tone="warn">{warning}</Notice>}
       {discovery?.status === "failed" && (
         <Notice tone="warn">
           {t("refreshFailed")}

@@ -1,0 +1,258 @@
+/* gateway: layout and surfaces owned by the retained Lite interface. */
+
+.dash-sidecar-row-card .dash-delegation-controls .custom-select:nth-child(2) {
+  min-width: min(100%, 6.5rem);
+  max-width: 9rem;
+}
+
+.dash-sidecar-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.dash-sidecar-row-card .dash-sidecar-copy {
+  flex: 1 1 0;
+  min-width: min(100%, 14rem);
+  overflow-wrap: break-word;
+}
+.dash-sidecar-row-card .dash-delegation-controls {
+  flex: 0 0 min(100%, 26rem);
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  justify-content: flex-start;
+  min-height: 3.6875rem;
+}
+.dash-sidecar-row-card .dash-delegation-controls .custom-select:first-child {
+  min-width: min(100%, 10.5rem);
+  max-width: 14rem;
+}
+
+.dash-sidecar-row-card .dash-delegation-controls .select-trigger {
+  width: 100%;
+  max-width: 100%;
+  justify-content: space-between;
+}
+
+.dash-sidecar-row-card .dash-delegation-controls .select-trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.dash-sidecar-row-card {
+  min-width: 0;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+  align-content: start;
+  container-type: inline-size;
+  container-name: sidecar-card;
+}
+.dash-sidecar-row-card .dash-sidecar-copy .setting-hint {
+  margin-top: 4px;
+  line-height: 1.5;
+}
+.dash-vision-sidecar-card .dash-sidecar-copy {
+  min-width: min(100%, 14rem);
+}
+.dash-vision-sidecar-card .dash-delegation-controls {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dash-sidecar-select-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+  width: 100%;
+}
+
+.dash-sidecar-select-row .custom-select:first-child {
+  flex: 1 1 70%;
+  min-width: min(100%, 9rem);
+  max-width: 16rem;
+}
+
+.dash-sidecar-select-row .custom-select:nth-child(2) {
+  flex: 1 1 30%;
+  min-width: min(100%, 6rem);
+  max-width: 9rem;
+}
+
+.dash-sidecar-select-row .custom-select .select-trigger {
+  width: 100%;
+  max-width: 100%;
+}
+
+.dash-sidecar-trailing-row {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+}
+.dash-sidecar-toggle-label {
+  min-width: 0;
+  text-align: right;
+}
+
+.dash-vision-advanced-trigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ocx-fg-muted);
+  font-size: var(--text-control);
+  cursor: pointer;
+}
+.dash-vision-advanced-trigger:hover:not(:disabled) {
+  color: var(--ocx-fg);
+}
+.dash-vision-advanced-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.dash-vision-advanced-trigger:focus-visible {
+  outline: 2px solid var(--ocx-highlight-soft);
+  outline-offset: 2px;
+  border-radius: var(--radius-2xs);
+}
+
+.dash-vision-number {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dash-vision-number .codex-auto-switch-input-wrap {
+  width: min(11.5rem, 100%);
+}
+
+.dash-vision-number .codex-auto-switch-input {
+  min-width: 0;
+}
+.dash-vision-advanced-popover {
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 16rem;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--ocx-surface);
+  border: 1px solid var(--ocx-line-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 0.14);
+  overflow-y: auto;
+}
+.dash-vision-advanced-popover-title {
+  font-weight: var(--weight-semibold);
+}
+.dash-vision-advanced-popover .dash-vision-number .codex-auto-switch-input-wrap {
+  width: 100%;
+}
+.dash-vision-advanced-popover .dash-vision-number .codex-auto-switch-input {
+  flex: 1 1 0;
+}
+.dash-vision-advanced-popover .dash-vision-number {
+  gap: 4px;
+}
+@container sidecar-card (max-width: 36rem) {
+  .dash-sidecar-row-card .dash-sidecar-copy,
+  .dash-sidecar-row-card .dash-delegation-controls {
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-basis: 100%;
+  }
+
+  .dash-sidecar-row-card .dash-delegation-controls {
+    align-items: stretch;
+  }
+
+  .dash-vision-sidecar-card .dash-sidecar-select-row {
+    justify-content: flex-start;
+  }
+}
+@container sidecar-card (max-width: 22rem) {
+  .dash-sidecar-row-card .dash-sidecar-copy,
+  .dash-sidecar-row-card .dash-delegation-controls {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .dash-sidecar-row-card .dash-delegation-controls {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+.compaction-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.compaction-sources-block {
+  margin-top: var(--space-3);
+}
+.compaction-sources-block .compaction-sources-title {
+  margin-bottom: var(--space-1-5);
+}
+.compaction-sources-block .source-scope-groups {
+  margin-top: 0;
+}
+.dash-delegation-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.dash-delegation-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.pv2-section {
+  scroll-margin-top: calc(var(--ocx-sticky-top-h, 0) * 1px + 24px) !important;
+}
+.pv2-section-body > :is(.panel, section, details) {
+  margin: 0 !important;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  min-width: 0;
+}
+.pv2-section-body > :is(.panel, section, details) > .font-semibold:first-child,
+.pv2-section-body > :is(.panel, section, details) > .spread:first-child .font-semibold,
+.pv2-section-body > :is(.panel, section, details) > summary,
+.pv2-section-body .pv2-row-label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ocx-fg);
+  letter-spacing: 0;
+}
+.pv2-section-body > :first-child {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+.pv2-section-body > :last-child {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+.pv2-row-control .custom-select {
+  min-width: 0;
+}

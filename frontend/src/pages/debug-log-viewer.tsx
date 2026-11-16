@@ -1,10 +1,10 @@
-import type { Virtualizer } from "@tanstack/react-virtual";
-import { useI18n } from "../i18n/shared";
-import { IconRefresh } from "../icons";
 import { SegmentedControl } from "@/components/ui-v2/segmented-control";
 import { cn } from "@/lib/utils";
+import type { Virtualizer } from "@tanstack/react-virtual";
 import { panel, panelBody, quietIconButton } from "../components/v2-logs/classes";
 import { LiveToggle } from "../components/v2-logs/live-toggle";
+import { useI18n } from "../i18n/shared";
+import { IconRefresh } from "../icons";
 import type { DebugLogEntry, DebugSettings, LogStream } from "./debug-shared";
 import { formatLogTime } from "./debug-shared";
 

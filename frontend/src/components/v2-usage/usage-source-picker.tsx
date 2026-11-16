@@ -1,34 +1,34 @@
+import { LaptopIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   useEffect,
   useRef,
   useState,
-  type KeyboardEvent,
   type Dispatch,
+  type KeyboardEvent,
   type SetStateAction,
 } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { LaptopIcon } from "@hugeicons/core-free-icons";
-import type { Locale, TFn } from "../../i18n/shared";
-import { IconCheck, IconGlobe, IconKey, IconMonitor } from "../../icons";
-import { Select } from "../../ui";
-import { useRuntimeCapabilities } from "../../runtime-capabilities";
-import { cn } from "../../lib/utils";
-import { withFetchDeadline } from "../../bounded-fetch";
-import { clientIconClass } from "../../client-icon";
 import {
-  denyUsageSession,
-  usageSessionSnapshot,
   USAGE_SESSION_CHANGED,
   USAGE_SOURCE_INVENTORY_CHANGED,
+  denyUsageSession,
   sourceInventoryEventMatches,
+  usageSessionSnapshot,
 } from "../../api";
+import { withFetchDeadline } from "../../bounded-fetch";
+import { clientIconClass } from "../../client-icon";
+import type { Locale, TFn } from "../../i18n/shared";
+import { IconCheck, IconGlobe, IconKey, IconMonitor } from "../../icons";
+import { cn } from "../../lib/utils";
+import { useRuntimeCapabilities } from "../../runtime-capabilities";
+import { Select } from "../../ui";
 import {
+  SOURCE_CLIENTS,
   availableSourceClients,
   matchesFacetWindow,
   matchesSource,
   noStore,
   sourceQuery,
-  SOURCE_CLIENTS,
   type SourceClient,
   type SourceDevice,
   type SourceFilter,
@@ -46,6 +46,7 @@ type Facets = {
 const clientNames: Record<SourceClient, string> = {
   all: "",
   codex: "Codex",
+  dsh: "DSH",
   claude_code: "Claude Code",
   claude_desktop: "Claude Desktop",
   grok: "Grok",
@@ -64,6 +65,7 @@ const defaultDevices: SourceDevice[] = [
 ];
 const clientMarks: Partial<Record<SourceClient, string>> = {
   codex: "openai.svg",
+  dsh: "deepseek-harness.svg",
   claude_code: "claude-color.svg",
   claude_desktop: "claude-color.svg",
   grok: "grok.svg",
@@ -381,7 +383,14 @@ export function UsageSourcePicker({
           ...(reportInventory.identity === identity ? reportInventory.clients : []),
         ],
   ).filter((client) => visible(`${clientLabel(client)} ${appDetail(client)}`));
-  const visibleDevices = devices.filter((device) => visible(deviceLabel(device)));
+  const visibleDevices = devices.filter(
+    (device) =>
+      visible(deviceLabel(device)) &&
+      (device.kind === "all" ||
+        device.kind === "no-key" ||
+        (filter && sameDevice(device, filter.device)) ||
+        (data.facets?.devices.find((row) => sameDevice(row.device, device))?.requests ?? 0) > 0),
+  );
   const selectedClientVisible = !!filter && visibleClients.includes(filter.client);
   const selectedDeviceVisible =
     !!filter && visibleDevices.some((item) => sameDevice(filter.device, item));

@@ -3,11 +3,11 @@
  * Codex offers first, which model it calls first, and whether Claude Code is pinned. Each
  * tile jumps to the place that changes it. It summarises; it never lists the order twice.
  */
-import type { ReactNode } from "react";
-import { IconChevron } from "../../icons";
-import { useT } from "../../i18n/shared";
-import { modelLabel } from "../../model-display";
 import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
+import { useT } from "../../i18n/shared";
+import { IconChevron } from "../../icons";
+import { modelLabel } from "../../model-display";
 
 interface Props {
   chosen: string[];

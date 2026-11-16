@@ -1,0 +1,84 @@
+/* clients: layout and surfaces owned by the retained Lite interface. */
+.client-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--client-mark-size, 20px);
+  height: var(--client-mark-size, 20px);
+}
+
+.client-mark--img img {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+.client-mark--mask {
+  background: var(--ocx-fg);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+.client-mark--monogram {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  color: var(--ocx-fg-muted);
+  line-height: 1;
+  border: 1px solid var(--ocx-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--ocx-surface);
+}
+
+.page-tab > .client-mark {
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+.connect-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  margin: 20px 0 24px;
+  border-radius: 12px;
+  background: var(--ocx-surface);
+  box-shadow: inset 0 0 0 1px var(--ocx-line);
+}
+.connect-tabs > .page-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: var(--ocx-fg-muted);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: none;
+}
+.connect-tabs > .page-tab:hover {
+  background: transparent;
+  color: var(--ocx-fg);
+}
+.connect-tabs > .page-tab--active,
+.connect-tabs > .page-tab--active:hover {
+  background: light-dark(var(--ocx-raised), var(--ocx-surface-2));
+  color: var(--ocx-fg);
+  box-shadow:
+    0 1px 2px rgb(16 24 40 / 0.08),
+    0 0 0 1px var(--ocx-line);
+}
+.connect-tabs > .page-tab:focus-visible {
+  outline: 2px solid var(--ocx-highlight);
+  outline-offset: 1px;
+}
+.connect-tabs > .page-tab > .client-mark {
+  margin-right: 0;
+}
+.connect-tabs > .page-tab:not(.page-tab--active) > .client-mark {
+  opacity: 0.8;
+}

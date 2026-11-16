@@ -1,6 +1,6 @@
-/* Imported by its component, so it sits in the `legacy` cascade layer itself:
-   unlayered CSS would outrank design/bridge.css and every Tailwind utility. */
-@layer legacy {
+/* Imported by its component, so it sits in the `components` cascade layer itself:
+   component styles remain below explicit utility overrides. */
+@layer components {
   .model-tip {
     white-space: normal;
     max-width: min(480px, calc(100vw - 36px));
@@ -69,7 +69,7 @@
   }
   .model-price-mode-option input {
     margin-top: 3px;
-    accent-color: var(--accent);
+    accent-color: var(--ocx-accent);
   }
   .model-price-mode-option > span {
     display: grid;
@@ -79,7 +79,7 @@
   .model-price-band {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--ocx-line-strong);
   }
   .model-price-band-title {
     font-weight: var(--weight-medium);

@@ -1,6 +1,6 @@
-/* Imported by its component, so it sits in the `legacy` cascade layer itself:
-   unlayered CSS would outrank design/bridge.css and every Tailwind utility. */
-@layer legacy {
+/* Imported by its component, so it sits in the `components` cascade layer itself:
+   component styles remain below explicit utility overrides. */
+@layer components {
   /* Shared header layout; supported desktop hosts use native window decorations. */
 
   .app {
@@ -22,7 +22,7 @@
     width: 232px;
     height: var(--titlebar-h, 40px);
     padding: 0 10px 0 14px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--ocx-line-strong);
     background: var(--glass-rail);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -31,7 +31,7 @@
   }
 
   /* The strip no longer sits inside .sidebar's flow, so the sidebar's own top padding
-   additionally reserves the strip's row (styles.css keeps its base 18px). */
+   additionally reserves the strip's row. */
   .sidebar {
     padding-top: calc(var(--titlebar-h, 40px) + 18px);
   }
@@ -47,18 +47,18 @@
     border: none;
     border-radius: var(--radius-sm);
     background: none;
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
     cursor: pointer;
     transition:
       background var(--motion-fast),
       color var(--motion-fast);
   }
   .sidebar-collapse:hover {
-    background: var(--accent-soft);
-    color: var(--text);
+    background: var(--ocx-accent-soft);
+    color: var(--ocx-fg);
   }
   .sidebar-collapse:focus-visible {
-    outline: 2px solid var(--accent-ring);
+    outline: 2px solid var(--ocx-highlight-soft);
     outline-offset: 2px;
   }
   .sidebar-collapse svg {
@@ -75,8 +75,8 @@
     /* Fixed, not min-height: the row IS the title-bar row, so it must stay exactly as
      tall as the traffic lights whether or not the quota summary has badges to show. */
     height: var(--titlebar-h, 40px);
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    background: var(--ocx-bg);
+    border-bottom: 1px solid var(--ocx-line-strong);
     user-select: none;
     -webkit-user-select: none;
   }

@@ -1,6 +1,6 @@
-/* Imported by its component, so it sits in the `legacy` cascade layer itself:
-   unlayered CSS would outrank design/bridge.css and every Tailwind utility. */
-@layer legacy {
+/* Imported by its component, so it sits in the `components` cascade layer itself:
+   component styles remain below explicit utility overrides. */
+@layer components {
   /* Keep timing-basis labels readable inside the fixed-width rate column in every locale. */
   .logs-stack-end.logs-decode-rate {
     display: flex;
@@ -10,7 +10,7 @@
     white-space: nowrap;
   }
   .logs-decode-rate .text-caption {
-    font-family: var(--font-ui);
+    font-family: var(--font-sans);
     overflow-wrap: break-word;
   }
 

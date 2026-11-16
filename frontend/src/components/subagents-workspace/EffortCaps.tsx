@@ -1,8 +1,10 @@
+import { HelpTip } from "@/components/settings/decorations";
+import { SettingsRow } from "@/components/settings/row";
+import { Button } from "@/components/button";
 import { useCallback, useEffect, useState } from "react";
+import { readJsonOrThrow } from "../../fetch-json";
 import { useT } from "../../i18n/shared";
 import { Select } from "../../ui";
-import { readJsonOrThrow } from "../../fetch-json";
-import { HelpTip, SettingRow } from "../v2-subagents/frame";
 
 type Caps = { effortCap?: string | null; subagentEffortCap?: string | null };
 
@@ -51,7 +53,7 @@ export function EffortCaps({ apiBase }: { apiBase: string }) {
           key === "effortCap" ? "dash.effortCapLabel" : "dash.subagentEffortCapLabel",
         );
         return (
-          <SettingRow
+          <SettingsRow
             key={key}
             label={label}
             hint={t(
@@ -81,15 +83,16 @@ export function EffortCaps({ apiBase }: { apiBase: string }) {
       {error && (
         <div role="alert" className="px-4 py-3 text-danger">
           {t("sub.loadFail")}{" "}
-          <button
+          <Button
             type="button"
-            className="btn btn-sm"
+            variant="outline"
+            size="sm"
             onClick={() => {
               void load();
             }}
           >
             {t("common.retry")}
-          </button>
+          </Button>
         </div>
       )}
     </>

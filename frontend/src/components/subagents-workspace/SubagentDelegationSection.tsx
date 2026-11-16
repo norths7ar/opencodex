@@ -1,3 +1,6 @@
+import { HelpTip } from "@/components/settings/decorations";
+import { Panel, PanelBody } from "@/components/settings/panel";
+import { SettingsRow } from "@/components/settings/row";
 /**
  * Delegation settings for the Subagents tab.
  *
@@ -6,18 +9,20 @@
  * better next to the roster it affects: the roster picks who may be called, this picks who
  * gets called first.
  */
-import { useLayoutEffect, useRef, useState } from "react";
-import { Select } from "../../ui";
-import { IconArrowDown, IconArrowUp, IconX } from "../../icons";
-import { useT } from "../../i18n/shared";
-import { formatNamespacedModelId } from "../../provider-icons";
-import { clampNumberDraft } from "../../clamp-draft";
+import type {
+  DelegationModelOption,
+  DelegationPatch,
+} from "@/features/subagents/use-native-settings";
 import { cn } from "@/lib/utils";
-import { Button } from "../ui-v2/button";
-import { Frame, FrameBody, HelpTip, SettingRow } from "../v2-subagents/frame";
+import { useLayoutEffect, useRef, useState } from "react";
+import { clampNumberDraft } from "../../clamp-draft";
+import { useT } from "../../i18n/shared";
+import { IconArrowDown, IconArrowUp, IconX } from "../../icons";
+import { formatNamespacedModelId } from "../../provider-icons";
+import { Select } from "../../ui";
+import { Button } from "../button";
 import { iconButton, stepIndicator } from "../v2-subagents/frame-classes";
 import { StepperInput } from "../v2-subagents/StepperInput";
-import type { DelegationPatch, DelegationModelOption } from "../../pages/use-subagent-delegation";
 import DelegationSuggest from "./DelegationSuggest";
 import { EffortCaps } from "./EffortCaps";
 
@@ -133,9 +138,9 @@ export default function SubagentDelegationSection({
   // A settings form after React Bits settings-form-3: one row per decision, the plain label
   // and a one-line hint on the left, the control on the right; the long hints moved behind "?".
   return (
-    <Frame id={id} className="swi-delegation" title={t("subagentsV2.delegationTitle")}>
-      <FrameBody>
-        <SettingRow
+    <Panel id={id} className="swi-delegation" title={t("subagentsV2.delegationTitle")}>
+      <PanelBody>
+        <SettingsRow
           className="swi-delegation-row swi-delegation-model-row"
           label={t("sub.delegation.model")}
           hint={t("subagentsV2.delegationShort")}
@@ -192,9 +197,9 @@ export default function SubagentDelegationSection({
               onAccept={onSave}
             />
           )}
-        </SettingRow>
+        </SettingsRow>
 
-        <SettingRow
+        <SettingsRow
           className="swi-delegation-row swi-fallback-editor"
           label={t("sub.fallbackLabel")}
           hint={t("sub.fallbackHint")}
@@ -335,9 +340,9 @@ export default function SubagentDelegationSection({
               )}
             </div>
           )}
-        </SettingRow>
+        </SettingsRow>
 
-        <SettingRow
+        <SettingsRow
           className="swi-delegation-row"
           label={t("dash.syncCodexSubagentDefaults")}
           hint={t("subagentsV2.syncShort")}
@@ -361,7 +366,7 @@ export default function SubagentDelegationSection({
         />
 
         <EffortCaps apiBase={apiBase} />
-      </FrameBody>
-    </Frame>
+      </PanelBody>
+    </Panel>
   );
 }

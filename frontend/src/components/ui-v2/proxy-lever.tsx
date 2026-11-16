@@ -1,5 +1,5 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { cn } from "@/lib/utils";
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 
 interface ProxyLeverProps {
   /** Action at the middle notch, e.g. "Reload Codex models". */

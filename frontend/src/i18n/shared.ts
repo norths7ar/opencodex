@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
-import { DICTS, localeDisplayName, type Locale, type TKey } from "./catalogs";
+import { loadCatalog, type Locale, type TKey } from "./catalogs";
 
-export { DICTS, localeDisplayName, type Locale, type TKey };
+export { localeDisplayName, type Locale, type TKey } from "./catalogs";
 
 export const LOCALES: { code: Locale; htmlLang: string }[] = [
   { code: "en", htmlLang: "en" },
@@ -63,6 +63,13 @@ export function detectInitial(): Locale {
   return "en";
 }
 
+/** Start loading the preferred catalog before the language provider mounts. */
+export function preloadInitialLocale(): void {
+  void loadCatalog(detectInitial()).catch(() => {
+    // The provider handles fallback if the catalog is unavailable.
+  });
+}
+
 /** Current LanguageProvider locale for non-React UI such as the auth fetch dialog. */
 export function getActiveLocale(): Locale {
   return activeLocale ?? detectInitial();
@@ -77,6 +84,8 @@ export type TFn = (key: TKey, vars?: Vars) => string;
 
 export interface I18nContextValue {
   locale: Locale;
+  localeLoading: boolean;
+  localeError: boolean;
   setLocale: (l: Locale) => void;
   t: TFn;
 }

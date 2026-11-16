@@ -1,5 +1,5 @@
-import { cn } from "@/lib/utils";
 import type { RequestOutcomeClass } from "@/contracts/telemetry/request-outcome";
+import { cn } from "@/lib/utils";
 
 const TONE: Record<RequestOutcomeClass, string> = {
   completed: "bg-success-soft text-success",

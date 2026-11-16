@@ -22,7 +22,13 @@ export interface RequestOutcomeFacts {
   readonly status: number;
   readonly terminalStatus?: string | undefined;
   readonly closeReason?:
-    "terminal" | "client_cancel" | "non_stream" | "body_stall" | "body_overflow" | undefined;
+    | "terminal"
+    | "client_cancel"
+    | "non_stream"
+    | "body_stall"
+    | "body_overflow"
+    | "body_interrupted"
+    | undefined;
 }
 
 /**
@@ -39,7 +45,8 @@ export function classifyRequestOutcome(facts: RequestOutcomeFacts): RequestOutco
   if (
     facts.terminalStatus === "incomplete" ||
     facts.closeReason === "body_stall" ||
-    facts.closeReason === "body_overflow"
+    facts.closeReason === "body_overflow" ||
+    facts.closeReason === "body_interrupted"
   )
     return "incomplete";
   if (facts.terminalStatus === "completed") return "completed";

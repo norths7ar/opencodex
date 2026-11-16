@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useI18n } from "./i18n/shared";
-import { requestCodexRestart } from "./codex-restart";
-import type { CodexRestartCode } from "./codex-restart";
 import { confirmAction } from "./action-dialogs";
+import type { CodexRestartCode } from "./codex-restart";
+import { requestCodexRestart } from "./codex-restart";
+import { useI18n } from "./i18n/shared";
 import type { NoticeTone } from "./ui";
 
 export interface CodexRestartController {

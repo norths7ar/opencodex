@@ -1,1101 +1,466 @@
-import { PageHeader } from "../components/page-header";
-import { DataSurfaceSkeleton } from "../components/data-surface";
-import { useContext } from "react";
-import { ProviderSessionContext } from "../components/provider-session-context";
-import { readUsageResponseJson, usageSummary30dResourceKey } from "../usage-summary-resource";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import ProviderWorkspaceShell, {
-  type AddProviderIntent,
-} from "../components/provider-workspace/ProviderWorkspaceShell";
-import ProviderDetails from "../components/provider-workspace/ProviderDetails";
-import type { ProviderAuthHandlers } from "../components/provider-workspace/types";
-import { type CatalogPreset } from "../components/provider-catalog/provider-presets";
-import { isAccountProvider, type WorkspaceProvider } from "../provider-workspace/catalog";
+import { confirmAction } from "@/action-dialogs";
+import { DataSurfaceSkeleton } from "@/components/data-surface";
+import { PageHeader } from "@/components/page-header";
+import { PlannedFeature } from "@/components/planned-feature";
+import ProviderCompletionTest from "@/components/provider-workspace/ProviderCompletionTest";
+import { Button } from "@/components/button";
+import { ProviderMark } from "@/components/v2-models/provider-mark";
+import { useDataSurface } from "@/data-surface";
+import { AccountPanel } from "@/features/channels/AccountPanel";
+import { readChannels, refreshChannelModels, setDefaultChannel } from "@/features/channels/api";
+import { ChannelEditor, type ServicePreset } from "@/features/channels/ChannelEditor";
+import "@/features/channels/channels.css";
+import { useChannelCopy } from "@/features/channels/copy";
+import { CredentialLabel } from "@/features/channels/CredentialLabel";
+import { readJsonOrThrow } from "@/fetch-json";
+import type { ApplicationReceipt, ChannelDetail } from "@/contracts/channels";
+import { useT } from "@/i18n/shared";
+import { clientApplicationWarning } from "@/contracts/application";
+import { navigateHash } from "@/hash-routing";
 import {
-  ensureOpenAiProvider,
-  openAiAccountProviderState,
-  OpenAiEnableError,
-} from "../provider-payload";
-import { oauthTosRisk } from "../oauth-tos-risk";
-import { ToastNotice, type NoticeTone } from "../ui";
-import { IconPlus } from "../icons";
-import LegacyProviderImportModal from "../components/LegacyProviderImportModal";
-import { useI18n } from "../i18n/shared";
-import { useT } from "../i18n/shared";
-import { useRuntimeCapabilities } from "../runtime-capabilities";
-import {
-  useProviderAccountPools,
-  type AccountSelectionTarget,
-} from "../hooks/useProviderAccountPools";
-import { useCodexAccountPool } from "../hooks/useCodexAccountPool";
-import { useJsonConfigEditor } from "../hooks/useJsonConfigEditor";
-import { useKeyedClientResource } from "../client-resource";
-import { readSessionListCache } from "../session-list-cache";
-import type { ProvidersConfig } from "./providers-shared";
-import { useProvidersOAuth } from "./use-providers-oauth";
-import { useProvidersCrud } from "./use-providers-crud";
-import { useProvidersFetch } from "./use-providers-fetch";
-import { ProvidersPageModals } from "./providers-page-modals";
-import { buildAccountLoginStatus } from "./providers-page-utils";
-import type { CodexAccountMutationCompletion } from "../codex-account-mutation";
-import { useProviderModelsNotice } from "./use-provider-models-notice";
-import { navigateHash } from "../hash-routing";
-import { useProviderSettingsDeepLink } from "./providers-deep-link";
-import { subscribeKiroDeviceFinal } from "../kiro-device-login-finalizer";
-import type { BrowserLaunch } from "../oauth-browser-launch";
-
-/** The page's real refresh tickets: only the captured report epoch and account read can settle them. */
-// eslint-disable-next-line react-refresh/only-export-components -- keep the page-owned coordinator and its direct race tests in the authorized owner.
-export function useQuotaRefreshCoordinator(apiBase: string) {
-  const [quotaRefresh, setQuotaRefresh] = useState({ epoch: 0, force: false });
-  const epochRef = useRef(0);
-  const mountedRef = useRef(true);
-  const ticketsRef = useRef(
-    new Map<
-      number,
-      {
-        resolve: (ok: boolean) => void;
-        accounts?: boolean;
-        report?: boolean;
-      }
-    >(),
-  );
-  const cancelTickets = useCallback(() => {
-    for (const ticket of ticketsRef.current.values()) ticket.resolve(false);
-    ticketsRef.current.clear();
-  }, []);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      cancelTickets();
-    };
-  }, [apiBase, cancelTickets]);
-  const invalidateProviderQuotas = useCallback(
-    (force = false) => {
-      cancelTickets();
-      const epoch = ++epochRef.current;
-      if (mountedRef.current) setQuotaRefresh({ epoch, force });
-      return epoch;
-    },
-    [cancelTickets],
-  );
-  const finish = useCallback((epoch: number, part: "accounts" | "report", ok: boolean) => {
-    const ticket = ticketsRef.current.get(epoch);
-    if (!ticket || !mountedRef.current) return;
-    ticket[part] = ok;
-    if (ticket.accounts !== undefined && ticket.report !== undefined) {
-      ticketsRef.current.delete(epoch);
-      ticket.resolve(ticket.accounts && ticket.report);
-    }
-  }, []);
-  const settleQuotaRefresh = useCallback(
-    (ok: boolean, epoch: number) => finish(epoch, "report", ok),
-    [finish],
-  );
-  const beginQuotaRefresh = useCallback(
-    (readAccounts?: () => Promise<boolean>): Promise<boolean> => {
-      if (!mountedRef.current) return Promise.resolve(false);
-      const epoch = invalidateProviderQuotas(true);
-      const settled = new Promise<boolean>((resolve) => {
-        ticketsRef.current.set(epoch, { resolve, accounts: readAccounts ? undefined : true });
-      });
-      if (readAccounts) {
-        void Promise.resolve()
-          .then(readAccounts)
-          .then(
-            (ok) => finish(epoch, "accounts", ok),
-            () => finish(epoch, "accounts", false),
-          );
-      }
-      return settled;
-    },
-    [finish, invalidateProviderQuotas],
-  );
-  return { quotaRefresh, invalidateProviderQuotas, settleQuotaRefresh, beginQuotaRefresh };
-}
-
-/** One authenticated SSE connection, with bounded reconnect backoff and scheduler recovery. */
-function useAccountSelectionEvents(
-  apiBase: string,
-  enabled: boolean,
-  refresh: (target?: AccountSelectionTarget) => Promise<boolean>,
-) {
-  const refreshRef = useRef(refresh);
-  useLayoutEffect(() => {
-    refreshRef.current = refresh;
-  });
-  const recoverRef = useRef<() => void>(() => {});
-  useEffect(() => {
-    if (!enabled) return;
-    let stopped = false;
-    let retryTimer: ReturnType<typeof window.setTimeout> | null = null;
-    let retryDelay = 250;
-    type Connection = {
-      controller: AbortController;
-      reader?: ReadableStreamDefaultReader<Uint8Array>;
-      lastActivity: number;
-      openedAt?: number;
-    };
-    let connection: Connection | null = null;
-    const clearRetry = () => {
-      if (retryTimer !== null) window.clearTimeout(retryTimer);
-      retryTimer = null;
-    };
-    const close = (current: Connection) => {
-      current.controller.abort();
-      void current.reader?.cancel().catch(() => {});
-    };
-    const connect = () => {
-      if (stopped || connection) return;
-      clearRetry();
-      const current: Connection = { controller: new AbortController(), lastActivity: Date.now() };
-      connection = current;
-      void (async () => {
-        try {
-          // Native EventSource cannot send the session/relay headers installed by api.ts.
-          const response = await fetch(`${apiBase}/api/accounts/events`, {
-            signal: current.controller.signal,
-            credentials: "same-origin",
-            headers: { Accept: "text/event-stream" },
-          });
-          if (
-            !response.ok ||
-            !response.headers.get("content-type")?.includes("text/event-stream") ||
-            !response.body
-          ) {
-            throw new Error("Account selection stream unavailable");
-          }
-          if (stopped || current.controller.signal.aborted) {
-            await response.body.cancel();
-            return;
-          }
-          const reader = response.body.getReader();
-          current.reader = reader;
-          current.openedAt = Date.now();
-          const decoder = new TextDecoder();
-          const revisions = new Map<string, number>();
-          const pending = new Map<string, AccountSelectionTarget>();
-          let refreshAll = false;
-          let queued = false;
-          const flush = () => {
-            if (queued) return;
-            queued = true;
-            void Promise.resolve()
-              .then(async () => {
-                queued = false;
-                if (stopped || current.controller.signal.aborted) return;
-                const targets = refreshAll ? [undefined] : [...pending.values()];
-                refreshAll = false;
-                pending.clear();
-                await Promise.all(targets.map((target) => refreshRef.current(target)));
-              })
-              .catch(() => {
-                /* The recovery tick retries failed invalidation reads. */
-              });
-          };
-          let buffer = "";
-          let event = "";
-          let data: string[] = [];
-          let frameSize = 0;
-          const dispatch = () => {
-            let value: { provider?: unknown; kind?: unknown; revision?: unknown };
-            try {
-              value = JSON.parse(data.join("\n")) as typeof value;
-            } catch {
-              return;
-            }
-            if (
-              !value ||
-              typeof value !== "object" ||
-              typeof value.revision !== "number" ||
-              !Number.isSafeInteger(value.revision) ||
-              value.revision < 0
-            )
-              return;
-            if (event === "ready") {
-              revisions.clear();
-              refreshAll = true;
-              flush();
-            } else if (
-              event === "account-selection" &&
-              typeof value.provider === "string" &&
-              value.provider &&
-              (value.kind === "oauth" || value.kind === "api-key")
-            ) {
-              const key = `${value.kind}:${value.provider}`;
-              if (value.revision <= (revisions.get(key) ?? -1)) return;
-              revisions.set(key, value.revision);
-              pending.set(key, { provider: value.provider, kind: value.kind });
-              flush();
-            }
-          };
-          while (!stopped && !current.controller.signal.aborted) {
-            const chunk = await reader.read();
-            if (chunk.done) break;
-            current.lastActivity = Date.now();
-            buffer += decoder.decode(chunk.value, { stream: true });
-            let end: number;
-            while ((end = buffer.indexOf("\n")) !== -1) {
-              const line = buffer.slice(0, end).replace(/\r$/, "");
-              buffer = buffer.slice(end + 1);
-              frameSize += line.length;
-              if (frameSize > 16_384) throw new Error("Account selection event too large");
-              if (!line) {
-                dispatch();
-                event = "";
-                data = [];
-                frameSize = 0;
-              } else if (line.startsWith("event:")) event = line.slice(6).replace(/^ /, "");
-              else if (line.startsWith("data:")) data.push(line.slice(5).replace(/^ /, ""));
-            }
-            if (buffer.length + frameSize > 16_384)
-              throw new Error("Account selection event too large");
-          }
-        } catch {
-          // api.ts owns authentication. Transport failures follow the same retry path as EOF.
-        } finally {
-          close(current);
-          if (connection === current) {
-            connection = null;
-            if (!stopped) {
-              // Only a stable connection resets backoff; repeated ready-then-EOF cannot spin.
-              if (current.openedAt !== undefined && Date.now() - current.openedAt >= 10_000)
-                retryDelay = 250;
-              const delay = retryDelay;
-              retryDelay = Math.min(retryDelay * 2, 5_000);
-              retryTimer = window.setTimeout(() => {
-                retryTimer = null;
-                connect();
-              }, delay);
-            }
-          }
-        }
-      })();
-    };
-    const recover = () => {
-      // Also retire a hung handshake or a silent connection that lost its heartbeat.
-      if (connection && Date.now() - connection.lastActivity > 60_000) {
-        close(connection);
-        connection = null;
-      }
-      connect();
-    };
-    recoverRef.current = recover;
-    connect();
-    return () => {
-      stopped = true;
-      recoverRef.current = () => {};
-      clearRetry();
-      if (connection) close(connection);
-    };
-  }, [apiBase, enabled]);
-  return useCallback(() => recoverRef.current(), []);
-}
+  IconBoxes,
+  IconChevron,
+  IconLink,
+  IconPencil,
+  IconPlus,
+  IconRefresh,
+  IconStar,
+} from "@/icons";
+import { Notice } from "@/ui";
+import { useCallback, useEffect, useState } from "react";
 
 export default function Providers({ apiBase }: { apiBase: string }) {
+  const c = useChannelCopy();
   const t = useT();
-  const { locale } = useI18n();
-  const [importOpen, setImportOpen] = useState(false);
-  const capabilities = useRuntimeCapabilities();
-  const usageEnabled = capabilities === null || capabilities.usage === true;
-  const quotaEnabled = capabilities === null || capabilities.quota === true;
-  const configCacheKey = `ocx.providers.config.v1:${apiBase}`;
-  const [config, setConfig] = useState<ProvidersConfig | null>(() =>
-    readSessionListCache<ProvidersConfig>(configCacheKey),
+  const [selected, setSelected] = useState<string | null>(() =>
+    new URLSearchParams(window.location.hash.split("?")[1]).get("provider"),
   );
+  const [editing, setEditing] = useState(false);
   const [adding, setAdding] = useState(false);
-  const [status, setStatus] = useState("");
-  const [statusOk, setStatusOk] = useState(false);
-  const [statusTone, setStatusTone] = useState<NoticeTone>("err");
-  /** Bumped on every notify so repeated identical success toasts restart the dismiss timer. */
-  const [statusRevision, setStatusRevision] = useState(0);
-  const [oauthProviders, setOauthProviders] = useState<string[]>([]);
-  const localOauthStatus = useState<Record<string, import("./providers-shared").OAuthStatus>>({});
-  const [oauthStatus, setOauthStatus] = useContext(ProviderSessionContext) ?? localOauthStatus;
-  const [busy, setBusy] = useState<string | null>(null);
-  const [loginInfo, setLoginInfo] = useState<{
-    provider: string;
-    url?: string;
-    instructions?: string;
-    deviceCode?: string;
-    browserLaunch?: BrowserLaunch;
-  } | null>(null);
-  const [workspaceSelected, setWorkspaceSelected] = useState<string | null>(null);
-  const [addIntent, setAddIntent] = useState<AddProviderIntent | null>(null);
-  const [removeConfirmName, setRemoveConfirmName] = useState<string | null>(null);
-  /** ChatGPT/Codex login from Add Provider → Accounts (uses /api/codex-auth, not /api/oauth). */
-  const [codexLoginOpen, setCodexLoginOpen] = useState(false);
-  const [modelsRefreshToken, setModelsRefreshToken] = useState(0);
-  // `accountId` rides along so acknowledging the warning continues the SAME operation.
-  // Without it, a reauth that reached the modal would resume as a plain login and target
-  // the active account instead of the one the user clicked.
-  const [oauthTosPending, setOauthTosPending] = useState<{
-    provider: string;
-    addAccount: boolean;
-    accountId?: string;
-  } | null>(null);
-  /** Bumped after OAuth login so ProviderDetails switches to the Accounts tab. */
-  const [accountsFocus, setAccountsFocus] = useState<{ token: number; provider: string | null }>({
-    token: 0,
-    provider: null,
+  const [pending, setPending] = useState<"save" | "probe" | "directory" | "remove" | null>(null);
+  const busy = pending !== null;
+  const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
+  const load = useCallback((signal: AbortSignal) => readChannels(apiBase, signal), [apiBase]);
+  const resource = useDataSurface("channels:" + apiBase, [apiBase], load, {
+    isEmpty: (value) => value.channels.length === 0,
   });
-  const aliveRef = useRef(true);
-  // Which apiBase this instance has already bootstrapped. StrictMode double-invokes the mount
-  // effect and its deferred load is deliberately uncancellable, so the guard lives here.
-  const bootstrapKeyRef = useRef<string | null>(null);
-  const removeBusyRef = useRef(false);
-
-  const notify = useCallback((msg: string, ok: boolean = true, tone?: NoticeTone) => {
-    setStatus(msg);
-    setStatusOk(ok);
-    setStatusTone(tone ?? (ok ? "ok" : "err"));
-    setStatusRevision((revision) => revision + 1);
-  }, []);
-
-  const clearStatus = useCallback(() => {
-    setStatus("");
-    setStatusOk(false);
-    setStatusTone("err");
-  }, []);
-
-  const notifyCodexCompletion = useCallback(
-    (completion: CodexAccountMutationCompletion) => {
-      if (completion.validationPending || completion.catalogRefreshPending) {
-        setStatus(
-          t(
-            completion.validationPending
-              ? "pws.healthLabel.validationPending"
-              : "codexAuth.catalogRefreshPending",
-          ),
-        );
-        setStatusOk(false);
-        setStatusTone("warn");
-        setStatusRevision((revision) => revision + 1);
-        return;
-      }
-      notify(t("codexAuth.accountAdded"), true);
-    },
-    [notify, t],
-  );
-
-  useEffect(() => {
-    aliveRef.current = true;
-    return () => {
-      aliveRef.current = false;
-    };
-  }, []);
-
-  // Success toasts are transient; errors stay until the next notify or dismiss.
-  useEffect(() => {
-    if (!status || !statusOk) return;
-    const timer = window.setTimeout(clearStatus, 4500);
-    return () => window.clearTimeout(timer);
-  }, [status, statusOk, statusRevision, clearStatus]);
-
-  const revealProviderAccounts = useCallback((provider: string) => {
-    setAdding(false);
-    setAddIntent(null);
-    setWorkspaceSelected(provider);
-    setAccountsFocus((previous) => ({ token: previous.token + 1, provider }));
-  }, []);
-  // Providers hash sync is owned by App (passive replaceHash / deliberate navigateHash).
-  // The one query it keeps here, `#providers?provider=<name>`, opens that provider's settings;
-  // with `&tab=accounts` (the header quota strip) it opens the provider's Accounts tab instead.
-  const settingsFocus = useProviderSettingsDeepLink(
-    config ? Object.keys(config.providers) : null,
-    workspaceSelected,
-    setWorkspaceSelected,
-    revealProviderAccounts,
-  );
-
-  // Warm the Add Provider catalog cache while the page is open so opening the
-  // modal does not wait on a cold /api/provider-presets round-trip (~same key as
-  // AddProviderModal). Prefetch usage too so the catalog does not paint alpha then
-  // re-rank when the slow usage probe (~5s cold) finally returns.
-  useKeyedClientResource(`add-provider-presets:${apiBase}`, [apiBase], async (signal) => {
-    const res = await fetch(`${apiBase}/api/provider-presets`, { signal });
-    if (!res.ok) throw new Error(String(res.status));
-    const data = (await res.json()) as { providers?: CatalogPreset[] };
-    return Array.isArray(data.providers) && data.providers.length > 0 ? data.providers : null;
-  });
-  useKeyedClientResource(
-    usageSummary30dResourceKey(apiBase),
+  const presets = useDataSurface(
+    "services:" + apiBase,
     [apiBase],
-    async (signal) => {
-      const res = await fetch(`${apiBase}/api/usage?range=30d`, { signal });
-      return await readUsageResponseJson<{
-        providers?: Array<{ provider: string; requests: number }>;
-      }>(res);
-    },
-    { deadlineMs: 60_000, enabled: usageEnabled },
+    (signal) =>
+      fetch(`${apiBase}/api/services`, { signal }).then(
+        readJsonOrThrow<{ providers: ServicePreset[] }>,
+      ),
+    { isEmpty: () => false },
   );
-  /*
-   * Quota revalidation is driven by an explicit revision, not by anything derived from
-   * `accountSets`.
-   *
-   * The derived key was a sorted `provider:activeAccountId` string, which looked stable but
-   * is not: on a cold load each provider's account response arrives separately and fills in
-   * its own `activeAccountId`, so the joined string changed once per provider and the shell's
-   * quota effect re-ran with it. Measured on this checkout: six `/api/provider-quotas` reads
-   * inside 15ms where one answers the question.
-   *
-   * A counter only moves when something actually invalidates the quotas, so account arrival
-   * is silent while every real mutation path still forces a re-read.
-   */
-  const { quotaRefresh, invalidateProviderQuotas, settleQuotaRefresh, beginQuotaRefresh } =
-    useQuotaRefreshCoordinator(apiBase);
-  const {
-    fetchConfig: refreshConfigResult,
-    fetchOauth,
-    fetchProviderQuotas,
-    configLoadState,
-  } = useProvidersFetch({
-    apiBase,
-    t,
-    setConfig,
-    setOauthProviders,
-    setOauthStatus,
-    notify,
-    invalidateProviderQuotas,
-    configCacheKey,
-  });
-  const fetchConfig = useCallback(async () => {
-    await refreshConfigResult();
-  }, [refreshConfigResult]);
-  const modelsNotice = useProviderModelsNotice(apiBase, refreshConfigResult);
-  const openModelsNotice = modelsNotice.open;
-  const onProviderLoginSettled = useCallback(
-    (provider: string) => {
-      revealProviderAccounts(provider);
-      openModelsNotice(provider, false);
-    },
-    [revealProviderAccounts, openModelsNotice],
+  const models = useDataSurface(
+    `channel-models:${apiBase}`,
+    [apiBase, resource.data?.revision],
+    (signal) =>
+      fetch(`${apiBase}/api/models`, { signal }).then(
+        readJsonOrThrow<Array<{ provider: string; id: string }>>,
+      ),
+    { isEmpty: () => false },
   );
-
-  // WP3: one Codex account controller for the whole Providers page, shared by the
-  // Overview tab and the Accounts tab so a mutation on either is instantly visible on
-  // both. Mounting CodexAccountPool twice used to fork this state.
-  const codexPool = useCodexAccountPool(apiBase, capabilities === null);
-  // Single source for Codex reauth health: the controller derives it from the same
-  // accounts/active pair this page used to poll on its own 30s timer.
-  const codexActiveNeedsReauth = codexPool.activeNeedsReauth;
-
-  // Derive openai login status from the shared Codex controller (no duplicate /accounts).
-  const oauthStatusWithCodex = useMemo(() => {
-    if (capabilities) return oauthStatus;
-    const accounts = codexPool.accounts;
-    if (accounts.length === 0 && codexPool.loadState === "loading") return oauthStatus;
-    const main = accounts.find((a) => a.isMain) ?? accounts[0];
-    const mainIsReal = !!main && !!main.email && main.email !== "Codex App login";
-    const poolLoggedIn = accounts.some((a) => !a.isMain && (a.hasCredential || a.email));
-    const codexLoggedIn = mainIsReal || poolLoggedIn;
-    const codexEmail = mainIsReal
-      ? main?.email
-      : (accounts.find((a) => !a.isMain && a.email)?.email ?? undefined);
-    return {
-      ...oauthStatus,
-      openai: {
-        loggedIn: codexLoggedIn,
-        ...(codexEmail ? { email: codexEmail } : {}),
-        ...(codexActiveNeedsReauth ? { needsReauth: true } : {}),
-      },
-    };
-  }, [capabilities, oauthStatus, codexPool.accounts, codexPool.loadState, codexActiveNeedsReauth]);
-
-  const pools = useProviderAccountPools({
-    apiBase,
-    t: t as unknown as Parameters<typeof useProviderAccountPools>[0]["t"],
-    config,
-    oauthStatus: oauthStatusWithCodex,
-    aliveRef,
-    notify,
-    fetchConfig,
-    fetchOauth,
-    fetchProviderQuotas,
-    codexActiveNeedsReauth,
-  });
-  const {
-    accountSets,
-    setAccountSets,
-    accountLoadStates,
-    switchingAccounts,
-    pausingAccounts,
-    keyPools,
-    keyLoadStates,
-    fetchAccountSets,
-    fetchKeyPools,
-    refreshAccountRosters,
-    oauthCardProviders,
-    keyCardProviders,
-    switchAccount,
-    pauseAccount,
-    setAccountPoolThreshold,
-    setAccountThreshold,
-    switchApiKey,
-    removeApiKey,
-    addApiKeyValue,
-    editCredentialAlias,
-    removeAccount,
-    activeAccountNeedsReauth,
-  } = pools;
-  const refreshSelection = useCallback(
-    (target?: AccountSelectionTarget) => {
-      if (
-        target &&
-        !(target.kind === "oauth" ? oauthCardProviders : keyCardProviders).includes(target.provider)
-      )
-        return Promise.resolve(true);
-      return refreshAccountRosters(target);
-    },
-    [refreshAccountRosters, oauthCardProviders, keyCardProviders],
-  );
-  const recoverSelectionStream = useAccountSelectionEvents(
-    apiBase,
-    config !== null && capabilities?.oauth !== false,
-    refreshSelection,
-  );
-  const rosterKey = JSON.stringify([
-    apiBase,
-    oauthCardProviders.toSorted(),
-    keyCardProviders.toSorted(),
-  ]);
-  const rosterRecoveryKeyRef = useRef<string | null>(null);
-  useKeyedClientResource(
-    `provider-rosters:${rosterKey}`,
-    [rosterKey],
-    async (signal) => {
-      // Existing bootstrap effects own the first enriched reads. This resource is recovery only.
-      if (rosterRecoveryKeyRef.current !== rosterKey) {
-        rosterRecoveryKeyRef.current = rosterKey;
-        return true;
-      }
-      recoverSelectionStream();
-      return refreshAccountRosters(undefined, signal);
-    },
-    { enabled: config !== null, pollMs: 30_000 },
-  );
-  const jsonEditor = useJsonConfigEditor({
-    apiBase,
-    config,
-    notify,
-    fetchConfig,
-    fetchProviderQuotas,
-    onSaved: (added) => {
-      if (added.length) {
-        if (added.length === 1) setWorkspaceSelected((current) => current ?? added[0]!);
-        modelsNotice.open(added, true);
-      }
-      setModelsRefreshToken((n) => n + 1);
-    },
-    t: t as unknown as Parameters<typeof useJsonConfigEditor>[0]["t"],
-  });
-  const {
-    draft,
-    setDraft,
-    jsonEditorOpen,
-    jsonSaving,
-    jsonLeaveOpen,
-    saveConfig,
-    openJsonEditor,
-    discardJsonEditor,
-    requestCloseJsonEditor,
-    restoreJsonEditor,
-    jsonIsDirty,
-    setJsonLeaveOpen,
-  } = jsonEditor;
-
-  /**
-   * Force a fresh quota read for one provider and resolve with what actually happened.
-   *
-   * Declared here because it needs `fetchAccountSets` from the account-pool hook above.
-   * Per-account bars come from a different read (`&quota=1` inside `fetchAccountSets`),
-   * so both must fire or the rows beside each account keep their old numbers. That read's
-   * forced enrichment must settle as well as the matching provider-report epoch.
-   */
-  const refreshProviderQuota = useCallback(
-    (provider: string): Promise<boolean> => {
-      if (capabilities) return quotaEnabled ? beginQuotaRefresh() : Promise.resolve(false);
-      const configured = config?.providers[provider];
-      const mode = configured?.authMode;
-      const readAccounts =
-        configured && isAccountProvider(provider, configured)
-          ? () => codexPool.load(true, { validatePending: true })
-          : mode === "oauth"
-            ? () => fetchAccountSets([provider], true)
-            : mode === "forward" || mode === "local"
-              ? undefined
-              : () => fetchKeyPools([provider], true);
-      return beginQuotaRefresh(readAccounts);
-    },
-    [
-      capabilities,
-      quotaEnabled,
-      config,
-      codexPool,
-      fetchAccountSets,
-      fetchKeyPools,
-      beginQuotaRefresh,
-    ],
-  );
-
-  /**
-   * Force a fresh read of EVERY provider's quota, for the overview where no provider
-   * is selected.
-   *
-   * Deliberately without `fetchAccountSets`: that is the per-account enrichment read
-   * the account panels use, it costs two upstream requests per OAuth provider, and the
-   * overview renders provider-level bars from `quotaReports` rather than account sets.
-   * `/api/provider-quotas?refresh=1` already fans out across every configured provider
-   * server-side, so this is one request that answers exactly what the overview shows.
-   */
-  const refreshAllProviderQuotas = useCallback((): Promise<boolean> => {
-    return beginQuotaRefresh();
-  }, [beginQuotaRefresh]);
-
   useEffect(() => {
-    // Deferred by a microtask, not a timer. A timer had to be cancelled in cleanup, so navigating
-    // away within the same tick dropped both requests with nothing to retry them and the page came
-    // back empty on the next visit. A microtask cannot be cancelled, so the requests always go out.
-    // Guarded per identity because StrictMode double-invokes this effect on mount and an
-    // uncancellable microtask would otherwise bootstrap the page twice.
-    // Quotas: the workspace shell owns this page's /api/provider-quotas read, including the
-    // forced ?refresh=1 fan-out — do not double-fetch on mount. The header QuotaSummaryBar
-    // keeps its own separate, passive 60s read of the same endpoint.
-    if (bootstrapKeyRef.current === apiBase) return;
-    bootstrapKeyRef.current = apiBase;
-    void Promise.resolve().then(() => {
-      void fetchConfig();
-      void fetchOauth();
+    const sync = () =>
+      setSelected(new URLSearchParams(window.location.hash.split("?")[1]).get("provider"));
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+  const selectedId = selected ?? resource.data?.channels[0]?.channel.id;
+  const detail = resource.data?.channels.find((value) => value.channel.id === selectedId);
+  const channelModels = models.data?.filter((model) => model.provider === detail?.channel.id);
+  const reportApplied = (
+    message: string,
+    application?: ApplicationReceipt,
+    warningCopy = t("integrations.catalogSyncFailed"),
+  ) => {
+    const warning = clientApplicationWarning(application, warningCopy);
+    setNotice({
+      ok: !warning,
+      text: warning
+        ? `${message} — ${warning}`
+        : application?.status === "pending"
+          ? c("pendingApply")
+          : message,
     });
-  }, [apiBase, fetchConfig, fetchOauth]);
-
-  const bumpModelsRefresh = () => setModelsRefreshToken((n) => n + 1);
-
-  const { cancelLoginOAuth, loginOAuth, logoutOAuth, onNativeLoginSettled } = useProvidersOAuth({
-    apiBase,
-    t,
-    aliveRef,
-    accountSets,
-    setAccountSets,
-    setBusy,
-    setStatus,
-    setLoginInfo,
-    setOauthStatus,
-    notify,
-    fetchConfig,
-    fetchOauth,
-    fetchAccountSets,
-    fetchProviderQuotas,
-    bumpModelsRefresh,
-    onLoginSettled: onProviderLoginSettled,
-  });
-  const nativeSettledRef = useRef(onNativeLoginSettled);
-  useEffect(() => {
-    nativeSettledRef.current = onNativeLoginSettled;
-  }, [onNativeLoginSettled]);
-  useEffect(
-    () =>
-      subscribeKiroDeviceFinal(apiBase, (outcome) => {
-        void nativeSettledRef.current("kiro", outcome).catch(() => {
-          // The handler owns the outcome notice and catches expected roster errors;
-          // an unexpected callback failure must not become an unhandled rejection.
-        });
-      }),
-    [apiBase],
-  );
-
-  const {
-    removeProvider,
-    confirmRemoveProvider,
-    setProviderDisabled,
-    setDefaultProvider,
-    updateProvider,
-  } = useProvidersCrud({
-    apiBase,
-    t,
-    removeBusyRef,
-    workspaceSelected,
-    setWorkspaceSelected,
-    setRemoveConfirmName,
-    notify,
-    fetchConfig,
-    fetchOauth,
-    fetchProviderQuotas,
-    // Mode PATCHes clear quota caches and thread affinity; the shared controller
-    // must re-read /active (with quota) so both tabs show the post-switch state.
-  });
-
-  /**
-   * The single warning-aware entry point for every OAuth login.
-   *
-   * Reauthentication used to call `loginOAuth` directly, so a user who had already logged
-   * in could refresh a high-risk credential without ever seeing the ToS modal — the map
-   * gated the first login and nothing after it.
-   */
-  const requestLoginOAuth = (provider: string, addAccount = false, accountId?: string) => {
-    if (busy === provider) return;
-    if (oauthTosRisk(provider)) {
-      setOauthTosPending({ provider, addAccount, ...(accountId ? { accountId } : {}) });
-      return;
-    }
-    void loginOAuth(provider, addAccount, accountId);
   };
-
-  // Provider rows can render from the configuration snapshot while OAuth status revalidates.
-  // The workspace handles the affected row's checking state without resetting the page.
-  if (!config) {
-    return (
-      <>
-        <PageHeader title={t("nav.providers")} />
-        {configLoadState === "error" ? (
-          <div className="notice notice-err" role="alert">
-            {t("prov.loadConfigFail")}{" "}
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => void fetchConfig()}
-            >
-              {t("common.retry")}
-            </button>
-          </div>
-        ) : (
-          <div className="providers-workspace providers-workspace--boot" aria-busy="true">
-            <div
-              className="providers-workspace-rail providers-workspace-rail--boot"
-              aria-hidden="true"
-            />
-            <div className="providers-workspace-main">
-              <DataSurfaceSkeleton label={t("prov.loadingConfig")} rows={5} />
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
-  const subscriptionChannel = Object.entries(config.providers).find(
-    ([, item]) => item.authMode === "oauth" && item.serviceId === "chatgpt",
-  );
-  const addModalAccountRows = capabilities?.oauth
-    ? [
-        {
-          id: subscriptionChannel?.[0] ?? "openai",
-          label: subscriptionChannel?.[1].displayName ?? "ChatGPT",
-          kind: "oauth" as const,
-        },
-      ]
-    : [];
-  const accountLoginStatus = buildAccountLoginStatus(config, oauthStatusWithCodex);
-  const isForwardProvider = (name: string) => config.providers[name]?.authMode === "forward";
-
-  const onAccountLogin = async (provider: string, addAccount = false) => {
-    if (provider === "openai" && !capabilities) {
-      if (busy === "openai") return;
-      const configured = config.providers.openai;
-      const state = openAiAccountProviderState(configured);
-      if (state === "invalid") {
-        notify(t("codexAuth.openaiMissing"), false);
-        return;
-      }
-      if (state === "absent" || state === "disabled") {
-        setBusy("openai");
-        try {
-          await ensureOpenAiProvider(apiBase, state);
-          await fetchConfig();
-        } catch (error) {
-          if (error instanceof OpenAiEnableError) {
-            notify(t(error.i18nKey), false);
-          } else {
-            notify(error instanceof Error ? error.message : t("prov.saveFailed"), false);
+  const run = async (
+    action: () => Promise<unknown>,
+    message: string | null = c("saved"),
+    operation: typeof pending = "save",
+  ) => {
+    setPending(operation);
+    setNotice(null);
+    try {
+      const result = (await action()) as
+        | {
+            ok?: boolean;
+            applicable?: boolean;
+            error?: string;
+            discovery?: ChannelDetail["discovery"];
+            application?: ApplicationReceipt;
+            catalogRefresh?: ApplicationReceipt;
           }
-          return;
-        } finally {
-          if (aliveRef.current) setBusy((current) => (current === "openai" ? null : current));
-        }
+        | undefined;
+      resource.refresh();
+      models.refresh();
+      if (result?.ok === false)
+        throw new Error(result.error || result.discovery?.error?.message || c("error"));
+      if (result?.applicable === false) throw new Error(c("staticDirectory"));
+      const application = result?.application ?? result?.catalogRefresh;
+      if (message !== null) {
+        reportApplied(
+          message,
+          application,
+          operation === "probe" ? t("integrations.catalogRefreshSyncFailed") : undefined,
+        );
+      } else {
+        const warning = clientApplicationWarning(
+          application,
+          t("integrations.catalogRefreshSyncFailed"),
+        );
+        if (warning) setNotice({ ok: false, text: warning });
       }
-      setCodexLoginOpen(true);
+    } catch (cause) {
+      setNotice({ ok: false, text: cause instanceof Error ? cause.message : c("error") });
+    } finally {
+      setPending(null);
+    }
+  };
+  const saved = (id: string, application?: ApplicationReceipt) => {
+    setSelected(id);
+    setEditing(false);
+    setAdding(false);
+    resource.refresh();
+    reportApplied(c("saved"), application);
+  };
+  const remove = async (target: ChannelDetail) => {
+    if (
+      !(await confirmAction({
+        message: c("removeConfirm"),
+        confirmLabel: c("remove"),
+        tone: "danger",
+      }))
+    )
       return;
-    }
-    if (isForwardProvider(provider)) {
-      setCodexLoginOpen(true);
-      return;
-    }
-    // API-key rows have no OAuth login path (catalog hides the button).
-    if (config.providers[provider]?.authMode === "oauth" || oauthProviders.includes(provider)) {
-      requestLoginOAuth(provider, addAccount);
-    }
+    await run(
+      async () => {
+        const result = await fetch(
+          `${apiBase}/api/channels/${encodeURIComponent(target.channel.id)}?revision=${target.revision}`,
+          { method: "DELETE" },
+        ).then(readJsonOrThrow);
+        setEditing(false);
+        setSelected(null);
+        return result;
+      },
+      c("saved"),
+      "remove",
+    );
   };
-
-  const onAccountManage = (provider: string) => {
-    revealProviderAccounts(provider);
-  };
-
-  const authHandlers: ProviderAuthHandlers = {
-    onLogin: requestLoginOAuth,
-    onNativeLoginSettled,
-    onCancelLogin: cancelLoginOAuth,
-    onLogout: logoutOAuth,
-    onReauth: (provider, accountId) => requestLoginOAuth(provider, true, accountId),
-    onSwitchAccount: switchAccount,
-    onPauseAccount: pauseAccount,
-    pendingAffinityResets: pools.pendingAffinityResets,
-    onRetryAffinityReset: pools.retryAffinityReset,
-    onAccountPoolThreshold: setAccountPoolThreshold,
-    onAccountThreshold: setAccountThreshold,
-    onRemoveAccount: removeAccount,
-    onRetryAccounts: async (provider) => {
-      if (config.providers[provider]?.authMode === "oauth") await fetchAccountSets([provider]);
-      else await fetchKeyPools([provider]);
-    },
-    onAddApiKey: addApiKeyValue,
-    onSwitchApiKey: switchApiKey,
-    onRemoveApiKey: removeApiKey,
-    onEditAlias: editCredentialAlias,
-    onRefreshQuota: capabilities ? undefined : refreshProviderQuota,
-  };
-
   return (
-    <>
+    <div className="channels-page">
       <PageHeader
-        title={t("nav.providers")}
+        title={c("title")}
         actions={
           <>
-            {capabilities?.runtime === "python" && (
-              <button type="button" className="btn" onClick={() => setImportOpen(true)}>
-                {locale.startsWith("zh") ? "导入供应商" : "Import providers"}
-              </button>
-            )}
-            <button type="button" className="btn btn-primary" onClick={() => setAdding(true)}>
-              <IconPlus />
-              {t("prov.add")}
-            </button>
+            <Button
+              aria-busy={resource.state.refreshing}
+              disabled={resource.state.refreshing}
+              onClick={() => resource.refresh()}
+            >
+              <IconRefresh aria-hidden="true" />
+              {c("refresh")}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setAdding(true);
+                setEditing(false);
+              }}
+            >
+              <IconPlus aria-hidden="true" />
+              {c("add")}
+            </Button>
           </>
         }
       />
-      {importOpen && (
-        <LegacyProviderImportModal
-          apiBase={apiBase}
-          onClose={() => setImportOpen(false)}
-          onImported={() => {
-            void fetchConfig();
-            bumpModelsRefresh();
-          }}
-        />
+      {notice && <Notice tone={notice.ok ? "ok" : "err"}>{notice.text}</Notice>}
+      {resource.state.showError && (
+        <Notice tone="err">
+          {c("error")}{" "}
+          <Button size="sm" onClick={() => resource.refresh()}>
+            {c("refresh")}
+          </Button>
+        </Notice>
       )}
-      {status && (
-        <ToastNotice tone={statusTone} onDismiss={clearStatus} dismissLabel={t("common.close")}>
-          {status}
-        </ToastNotice>
+      {resource.state.showSkeleton && <DataSurfaceSkeleton rows={4} label={c("loading")} />}
+      {!resource.state.showSkeleton && (
+        <div className="channels-layout">
+          <nav className="channel-list" aria-label={c("title")}>
+            <div className="channel-list-heading">
+              {c("title")} <span>{resource.data?.channels.length ?? 0}</span>
+            </div>
+            {resource.data?.channels.map(({ channel, credential }) => {
+              const isDefault = resource.data?.default_channel_id === channel.id;
+              const tone = channel.disabled
+                ? "quiet"
+                : credential.state === "configured"
+                  ? "ready"
+                  : credential.state === "unknown"
+                    ? "quiet"
+                    : "attention";
+              return (
+                <button
+                  key={channel.id}
+                  type="button"
+                  className="channel-list-item"
+                  aria-current={selectedId === channel.id ? "true" : undefined}
+                  onClick={() => {
+                    setSelected(channel.id);
+                    setEditing(false);
+                    setAdding(false);
+                  }}
+                >
+                  <ProviderMark
+                    name={channel.service_id === "custom" ? channel.id : channel.service_id}
+                    className="channel-list-mark"
+                    size="md"
+                  />
+                  <span className="channel-list-label">
+                    <strong>{channel.name || channel.id}</strong>
+                    <small className="channel-state" data-tone={tone}>
+                      {channel.disabled
+                        ? t("models.tipDisabled")
+                        : c(
+                            credential.state === "configured"
+                              ? "configured"
+                              : credential.state === "missing"
+                                ? "missing"
+                                : credential.state === "reauth_required"
+                                  ? "reauth"
+                                  : "unknown",
+                          )}
+                    </small>
+                  </span>
+                  {isDefault && (
+                    <span
+                      title={c("default")}
+                      aria-label={c("default")}
+                      className="channel-default-mark"
+                    >
+                      <IconStar aria-hidden="true" />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            {resource.data?.channels.length === 0 && <p className="muted">{c("empty")}</p>}
+          </nav>
+          <div className="channel-detail">
+            {adding ? (
+              <ChannelEditor
+                apiBase={apiBase}
+                presets={presets.data?.providers ?? []}
+                onSaved={saved}
+                onClose={() => setAdding(false)}
+              />
+            ) : detail ? (
+              <>
+                <div className="channel-identity">
+                  <ProviderMark
+                    name={
+                      detail.channel.service_id === "custom"
+                        ? detail.channel.id
+                        : detail.channel.service_id
+                    }
+                    className="channel-identity-mark"
+                    size="lg"
+                  />
+                  <div className="channel-identity-name">
+                    <h2>{detail.channel.name || detail.channel.id}</h2>
+                    <code>{detail.channel.id}</code>
+                  </div>
+                  <div className="channel-actions">
+                    {resource.data?.default_channel_id === detail.channel.id ? (
+                      <span className="channel-default-tag">
+                        <IconStar aria-hidden="true" />
+                        {c("default")}
+                      </span>
+                    ) : (
+                      !editing && (
+                        <Button
+                          size="sm"
+                          disabled={busy}
+                          onClick={() =>
+                            void run(() =>
+                              setDefaultChannel(
+                                apiBase,
+                                detail.channel.id,
+                                resource.data?.revision,
+                              ).then(readJsonOrThrow),
+                            )
+                          }
+                        >
+                          {c("makeDefault")}
+                        </Button>
+                      )
+                    )}
+                    {!editing && (
+                      <Button size="sm" disabled={busy} onClick={() => setEditing(true)}>
+                        <IconPencil aria-hidden="true" />
+                        {c("edit")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                {editing ? (
+                  <ChannelEditor
+                    key={`${detail.channel.id}:${detail.revision}`}
+                    apiBase={apiBase}
+                    detail={detail}
+                    presets={presets.data?.providers ?? []}
+                    onSaved={saved}
+                    onClose={() => setEditing(false)}
+                    onRemove={() => void remove(detail)}
+                    removing={pending === "remove"}
+                  />
+                ) : (
+                  <>
+                    <div className="channel-overview">
+                      <section className="channel-panel">
+                        <h3 className="channel-section-title">
+                          <IconLink aria-hidden="true" />
+                          {c("connection")}
+                        </h3>
+                        <dl className="channel-facts">
+                          <dt>{c("protocol")}</dt>
+                          <dd>{detail.channel.protocol}</dd>
+                          <dt>{c("baseUrl")}</dt>
+                          <dd>
+                            <code>{detail.channel.endpoints.base_url}</code>
+                          </dd>
+                        </dl>
+                        {detail.channel.auth_mode === "key" &&
+                          detail.credential.state !== "missing" && (
+                            <CredentialLabel
+                              key={detail.channel.id}
+                              apiBase={apiBase}
+                              channelId={detail.channel.id}
+                              label={detail.credential.label}
+                              onSaved={resource.refresh}
+                            />
+                          )}
+                        <div className="channel-actions">
+                          <Button
+                            size="sm"
+                            aria-busy={pending === "probe"}
+                            disabled={busy || detail.channel.models?.live === false}
+                            onClick={() =>
+                              void run(
+                                () =>
+                                  fetch(
+                                    `${apiBase}/api/channels/${encodeURIComponent(detail.channel.id)}/probe`,
+                                    { method: "POST" },
+                                  ).then(readJsonOrThrow),
+                                c("checked"),
+                                "probe",
+                              )
+                            }
+                          >
+                            {c("test")}
+                          </Button>
+                        </div>
+                      </section>
+                      <section className="channel-panel">
+                        <h3 className="channel-section-title">
+                          <IconBoxes aria-hidden="true" />
+                          {c("models")}
+                          {channelModels && (
+                            <span className="channel-count">{channelModels.length}</span>
+                          )}
+                        </h3>
+                        <dl className="channel-facts">
+                          <dt>{c("defaultModel")}</dt>
+                          <dd>{detail.channel.models?.default ?? c("inherit")}</dd>
+                          <dt>{c("discovery")}</dt>
+                          <dd>
+                            {detail.channel.models?.live === false
+                              ? c("staticDirectory")
+                              : detail.discovery.state === "unsupported"
+                                ? c("unsupported")
+                                : detail.discovery.state === "refreshing"
+                                  ? c("refreshing")
+                                  : detail.discovery?.last_success_at
+                                    ? `${c("discovered")} · ${new Date(detail.discovery.last_success_at).toLocaleString()}`
+                                    : c("never")}
+                          </dd>
+                        </dl>
+                        <div className="channel-actions">
+                          <Button
+                            size="sm"
+                            aria-busy={pending === "directory"}
+                            disabled={busy}
+                            onClick={() =>
+                              void run(
+                                () => refreshChannelModels(apiBase, detail.channel.id, c("error")),
+                                null,
+                                "directory",
+                              )
+                            }
+                          >
+                            <IconRefresh aria-hidden="true" />
+                            {c("refreshModels")}
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              navigateHash(
+                                "models?provider=" + encodeURIComponent(detail.channel.id),
+                              )
+                            }
+                          >
+                            {c("openModels")}
+                          </Button>
+                        </div>
+                        {detail.discovery?.error && (
+                          <Notice tone="warn">{detail.discovery.error.message}</Notice>
+                        )}
+                      </section>
+                    </div>
+                    {detail.channel.auth_mode === "oauth" && (
+                      <AccountPanel
+                        key={detail.channel.id}
+                        apiBase={apiBase}
+                        onChanged={resource.refresh}
+                      />
+                    )}
+                    <details
+                      className="channel-panel channel-diagnostics"
+                      key={`diagnostics:${detail.channel.id}`}
+                    >
+                      <summary>
+                        <IconChevron aria-hidden="true" />
+                        {t("pws.completion.title")}
+                      </summary>
+                      <ProviderCompletionTest
+                        apiBase={apiBase}
+                        provider={detail.channel.id}
+                        probeKey={String(detail.revision)}
+                        models={(channelModels ?? []).map((model) => model.id)}
+                      />
+                    </details>
+                    <PlannedFeature compact title={c("keyLimits")} description={c("pacing")} />
+                  </>
+                )}
+              </>
+            ) : (
+              !resource.state.showSkeleton && <p className="muted">{c("empty")}</p>
+            )}
+          </div>
+        </div>
       )}
-      <ProviderWorkspaceShell
-        onRemoveProvider={removeProvider}
-        providers={config.providers as Record<string, WorkspaceProvider>}
-        apiBase={apiBase}
-        defaultProvider={config.defaultProvider}
-        selectedName={workspaceSelected}
-        onSelect={setWorkspaceSelected}
-        onAddProvider={(intent) => {
-          setAddIntent(intent ?? null);
-          setAdding(true);
-        }}
-        onEditConfig={openJsonEditor}
-        jsonEditor={{
-          open: jsonEditorOpen,
-          draft,
-          isDirty: jsonIsDirty,
-          onDraftChange: setDraft,
-          onSave: () => saveConfig(),
-          onClose: requestCloseJsonEditor,
-          onRestore: restoreJsonEditor,
-        }}
-        jsonSaving={jsonSaving}
-        modelsRefreshToken={modelsRefreshToken}
-        fetchDiscovery
-        onModelsSettled={modelsNotice.modelsSettled}
-        activeAccountNeedsReauth={activeAccountNeedsReauth}
-        oauthLoginStatus={capabilities ? oauthStatusWithCodex : undefined}
-        onRefreshLoginStatus={fetchOauth}
-        quotaRefreshEpoch={quotaRefresh.epoch}
-        quotaForceRefresh={quotaRefresh.force}
-        onQuotaRefreshSettled={settleQuotaRefresh}
-        onRefreshAllQuotas={quotaEnabled ? refreshAllProviderQuotas : undefined}
-        detail={(item, data) => {
-          const loginStatus = accountLoginStatus[item.name] ?? oauthStatus[item.name];
-          return (
-            <ProviderDetails
-              key={item.name}
-              item={item}
-              usageTotals={data.usageTotals}
-              modelUsage={data.modelUsage}
-              quotaReport={data.quotaReport}
-              quotaReading={data.quotaReading}
-              availableModels={data.availableModels}
-              hasLiveModels={data.hasLiveModels}
-              selectedModels={data.selectedModels}
-              modelRows={data.modelRows}
-              modelRevision={data.modelRevision}
-              modelRowsReady={data.modelRowsReady}
-              onOpenConnect={() => navigateHash("integrations")}
-              modelsLoading={data.modelsLoading}
-              modelsLoadFailed={data.modelsLoadFailed}
-              onRetryModels={data.onRetryModels}
-              oauthEmail={loginStatus?.email}
-              onDeselect={() => setWorkspaceSelected(null)}
-              apiBase={apiBase}
-              oauth={loginStatus}
-              accounts={accountSets[item.name]?.accounts ?? []}
-              keys={keyPools[item.name] ?? []}
-              accountLoadState={
-                item.authMode === "oauth"
-                  ? (accountLoadStates[item.name] ?? "idle")
-                  : item.hasApiKey
-                    ? (keyLoadStates[item.name] ?? "loading")
-                    : "ready"
-              }
-              accountsFocusToken={accountsFocus.token}
-              accountsFocusProvider={accountsFocus.provider}
-              settingsFocusToken={settingsFocus.token}
-              settingsFocusProvider={settingsFocus.provider}
-              switchingAccountId={switchingAccounts[item.name]?.accountId ?? null}
-              pausingAccountId={pausingAccounts[item.name]?.accountId ?? null}
-              busyProvider={busy}
-              loginHint={loginInfo}
-              authHandlers={authHandlers}
-              onRefreshQuota={
-                quotaEnabled &&
-                (!capabilities ||
-                  (item.authMode === "oauth" && capabilities.oauthProviders?.includes(item.name)))
-                  ? () => refreshProviderQuota(item.name)
-                  : undefined
-              }
-              isDefault={item.name === config.defaultProvider}
-              onRemoveProvider={removeProvider}
-              onSetDisabled={setProviderDisabled}
-              onSetDefault={(name) => {
-                void setDefaultProvider(name);
-              }}
-              onUpdateProvider={updateProvider}
-              codexController={codexPool}
-            />
-          );
-        }}
-      />
-      <ProvidersPageModals
-        apiBase={apiBase}
-        config={config}
-        adding={adding}
-        modelsNotice={
-          modelsNotice.notice
-            ? {
-                provider: modelsNotice.notice.context.provider,
-                initialRegistration: modelsNotice.notice.context.initialRegistration,
-                catalogRefreshPending: modelsNotice.notice.context.catalogRefreshPending,
-                loading: modelsNotice.notice.loading,
-                failed: modelsNotice.notice.failed,
-                providerKnown: modelsNotice.notice.context.providers.every(
-                  (name) => !!config.providers[name],
-                ),
-                selection:
-                  modelsNotice.notice.context.providers.length === 1
-                    ? config.providers[modelsNotice.notice.context.provider]?.initialModelSelection
-                    : modelsNotice.notice.context.providers.some(
-                          (name) =>
-                            config.providers[name]?.initialModelSelection?.status === "pending",
-                        )
-                      ? { status: "pending" }
-                      : undefined,
-                onClose: modelsNotice.close,
-                onOpenModels: () => {
-                  modelsNotice.close();
-                  navigateHash("models");
-                },
-                onRetry: () => {
-                  const current = modelsNotice.notice!.context;
-                  modelsNotice.open(
-                    current.providers,
-                    current.initialRegistration,
-                    current.catalogRefreshPending,
-                  );
-                  bumpModelsRefresh();
-                },
-              }
-            : null
-        }
-        addIntent={addIntent}
-        busy={busy}
-        addModalAccountRows={addModalAccountRows}
-        accountLoginStatus={accountLoginStatus}
-        accountLoginHint={loginInfo}
-        removeConfirmName={removeConfirmName}
-        removeDefaultProvider={
-          removeConfirmName === config.defaultProvider
-            ? (Object.entries(config.providers).find(
-                ([name, provider]) => name !== removeConfirmName && provider.disabled !== true,
-              )?.[0] ?? null)
-            : null
-        }
-        codexLoginOpen={codexLoginOpen}
-        jsonLeaveOpen={jsonLeaveOpen}
-        jsonSaving={jsonSaving}
-        oauthTosPending={oauthTosPending}
-        onCloseAdd={() => {
-          if (busy) void cancelLoginOAuth(busy);
-          setAdding(false);
-          setAddIntent(null);
-        }}
-        onAdded={(name) => {
-          setAdding(false);
-          setAddIntent(null);
-          clearStatus();
-          setWorkspaceSelected((current) => current ?? name);
-          modelsNotice.open(name, !config.providers[name]);
-          fetchConfig();
-          fetchOauth();
-          fetchProviderQuotas(true);
-          bumpModelsRefresh();
-        }}
-        onAccountLogin={onAccountLogin}
-        onAccountCancelLogin={(provider) => {
-          void cancelLoginOAuth(provider);
-        }}
-        onAccountLogout={(provider) => {
-          void logoutOAuth(provider);
-        }}
-        onAccountManage={onAccountManage}
-        onOpenAdd={fetchOauth}
-        onCloseCodexLogin={() => setCodexLoginOpen(false)}
-        onCodexAdded={(completion) => {
-          setCodexLoginOpen(false);
-          notifyCodexCompletion(completion);
-          if (!completion.validationPending) {
-            setWorkspaceSelected((current) => current ?? "openai");
-            modelsNotice.open("openai", !config.providers.openai, completion.catalogRefreshPending);
-          }
-          void fetchConfig();
-          void fetchOauth();
-          void fetchProviderQuotas(true);
-          bumpModelsRefresh();
-        }}
-        onCancelRemove={() => setRemoveConfirmName(null)}
-        onConfirmRemove={() => {
-          void confirmRemoveProvider(removeConfirmName);
-        }}
-        onCancelJsonLeave={() => {
-          if (!jsonSaving) setJsonLeaveOpen(false);
-        }}
-        onDiscardJson={discardJsonEditor}
-        onSaveJson={() => {
-          void saveConfig();
-        }}
-        onCancelOauthTos={() => setOauthTosPending(null)}
-        onContinueOauthTos={() => {
-          const pending = oauthTosPending;
-          if (!pending) return;
-          setOauthTosPending(null);
-          void loginOAuth(pending.provider, pending.addAccount, pending.accountId);
-        }}
-      />
-    </>
+    </div>
   );
 }

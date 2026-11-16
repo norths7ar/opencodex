@@ -1,5 +1,5 @@
-import type { UsageResponse } from "./usage-model";
 import { USAGE_APPS } from "@/contracts/telemetry/app-breakdown";
+import type { UsageResponse } from "./usage-model";
 
 const record = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === "object" && !Array.isArray(value);

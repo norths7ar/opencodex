@@ -1,14 +1,15 @@
-import { PageHeader } from "../components/page-header";
 import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { navigateHash } from "../hash-routing";
 import { canonicalHashPath } from "../app-routing";
-import { useT } from "../i18n/shared";
 import ClientMark from "../components/ClientMark";
 import { INTEGRATION_MARKS } from "../components/integration-marks";
-import IntegrationsOverview from "./integrations/IntegrationsOverview";
-import FileIntegrationPage from "./integrations/FileIntegrationPage";
-import { TABS, type IntegrationTab } from "./integrations/integration-tabs";
+import { PageHeader } from "../components/page-header";
+import { navigateHash } from "../hash-routing";
+import { useT } from "../i18n/shared";
 import CodexConnection from "./integrations/CodexConnection";
+import DshConnection from "./integrations/DshConnection";
+import "./integrations/clients.css";
+import { TABS, type IntegrationTab } from "./integrations/integration-tabs";
+import IntegrationsOverview from "./integrations/IntegrationsOverview";
 
 function readIntegrationTab(hash = window.location.hash): IntegrationTab {
   // Read the destination, not a legacy spelling the route hook is about to replace.
@@ -139,9 +140,7 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
               <IntegrationsOverview apiBase={apiBase} active={active} />
             )}
             {definition.id === "codex" && <CodexConnection apiBase={apiBase} active={active} />}
-            {definition.id === "dsh" && (
-              <FileIntegrationPage apiBase={apiBase} client="dsh" active={active} />
-            )}
+            {definition.id === "dsh" && <DshConnection apiBase={apiBase} active={active} />}
           </div>
         );
       })}

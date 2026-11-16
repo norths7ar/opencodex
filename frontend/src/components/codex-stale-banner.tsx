@@ -1,7 +1,8 @@
+import { Button } from "@/components/button";
+import type { Ref } from "react";
+import type { AppServerStateOutcome } from "../codex-app-server-state";
 import { useI18n } from "../i18n/shared";
 import type { CodexRestartController } from "../use-codex-restart";
-import type { AppServerStateOutcome } from "../codex-app-server-state";
-import type { Ref } from "react";
 
 /**
  * Shown only when the proxy says a running Codex app-server predates the current
@@ -28,18 +29,19 @@ export function CodexStaleBanner({
   return (
     <div className="codex-stale-banner" role="status">
       <span className="codex-stale-banner-text">{t("models.staleBanner")}</span>
-      <button
+      <Button
         data-models-reload-action
         ref={actionRef}
         type="button"
-        className="btn btn-sm"
+        variant="outline"
+        size="sm"
         disabled={controller.restarting}
         onClick={() => {
           void controller.restart();
         }}
       >
         {controller.restarting ? t("dash.codexRestarting") : t("dash.codexRestart")}
-      </button>
+      </Button>
     </div>
   );
 }

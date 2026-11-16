@@ -1,25 +1,8 @@
-/**
- * In-page replacements for the three platform dialogs the desktop app cannot draw.
- *
- * wry implements exactly three `WKUIDelegate` methods — the file open panel, the media
- * capture permission request, and window creation for a navigation action — and WKWebView
- * draws no JavaScript dialog when its UI delegate does not implement the matching panel
- * method. Inside the app `confirm()` therefore returns false without drawing anything,
- * `alert()` draws nothing at all, and `prompt()` cannot collect input. Every consent gate
- * and every result report written against those three was silently declined or silently
- * swallowed while the same dashboard worked in a browser, which is why the failure read as
- * "the app is broken" rather than "the dashboard is broken".
- * See devlog/_fin/260921_app_runtime_ownership/050_webview_dialogs.md.
- *
- * These helpers keep the call-site shape the platform dialogs had — ask, await an answer,
- * act on it — so the surrounding control flow survives the replacement unchanged, above
- * all the part that matters: a refusal still issues no request. They are built
- * imperatively rather than as React components because the callers are hooks, inline event
- * handlers and a shared restart controller rather than one subtree. `admin-token-dialog.ts`
- * already answers the same problem the same way, and this reuses its dismissal, focus and
- * validation behaviour along with the modal classes in `styles.css`.
- */
-import { DICTS, getActiveLocale, type Locale } from "./i18n/shared";
+/** In-page confirmation and text dialogs share dismissal, focus restoration, and control styling across asynchronous callers. A declined action issues no request. */
+import { buttonStyles } from "./components/button-styles";
+import { getLoadedCatalog, loadCatalog, type Catalog } from "./i18n/catalogs";
+import { en } from "./i18n/en";
+import { getActiveLocale, type Locale } from "./i18n/shared";
 
 /** Keeps element ids unique when two dialogs are opened in one document. */
 let dialogSequence = 0;
@@ -78,6 +61,17 @@ interface ModalShell<T> {
   finish: (value: T) => void;
 }
 
+function watchDialogInvalidation(cancel: () => void, signal?: AbortSignal): () => void {
+  window.addEventListener("hashchange", cancel);
+  window.addEventListener("popstate", cancel);
+  signal?.addEventListener("abort", cancel);
+  return () => {
+    window.removeEventListener("hashchange", cancel);
+    window.removeEventListener("popstate", cancel);
+    signal?.removeEventListener("abort", cancel);
+  };
+}
+
 /**
  * Opens a modal `<dialog>` that resolves exactly once.
  *
@@ -86,13 +80,12 @@ interface ModalShell<T> {
  * the undrawn `confirm()` became indistinguishable from a deliberate refusal.
  */
 function openModal<T>(
-  locale: Locale,
+  messages: Catalog,
   cancelValue: T,
   resolve: (value: T) => void,
   signal?: AbortSignal,
   restoreFocusFallback?: (previouslyFocused: HTMLElement | null) => HTMLElement | null,
 ): ModalShell<T> {
-  const messages = DICTS[locale];
   const id = `opencodex-action-dialog-${++dialogSequence}`;
   /*
    * Duck-typed rather than `instanceof HTMLElement`. These helpers are reached from a dozen
@@ -121,10 +114,8 @@ function openModal<T>(
   const finish = (value: T): void => {
     if (settled) return;
     settled = true;
-    window.removeEventListener("hashchange", dismissOnNavigation);
-    window.removeEventListener("popstate", dismissOnNavigation);
+    stopWatching();
     document.removeEventListener("keydown", dismissOnEscape);
-    signal?.removeEventListener("abort", dismissOnNavigation);
     // The caller is answered whatever the teardown does. A dialog left connected is a
     // cosmetic fault; a promise that never settles hangs the handler that awaited it.
     const focusWasInDialog = dialog.contains(document.activeElement);
@@ -150,9 +141,7 @@ function openModal<T>(
    * an account or revoking a device from a surface they cannot see. Navigation is therefore
    * a refusal, using the same two events the shell already treats as leaving a page.
    */
-  function dismissOnNavigation(): void {
-    finish(cancelValue);
-  }
+  const stopWatching = watchDialogInvalidation(() => finish(cancelValue), signal);
 
   /*
    * Escape at the document, not just at the dialog. With `showModal` the dialog reports its
@@ -169,10 +158,6 @@ function openModal<T>(
     event.preventDefault();
     finish(cancelValue);
   });
-  window.addEventListener("hashchange", dismissOnNavigation);
-  window.addEventListener("popstate", dismissOnNavigation);
-  signal?.addEventListener("abort", dismissOnNavigation);
-
   dialog.append(backdrop, form);
   document.body.append(dialog);
   if (typeof dialog.showModal === "function") {
@@ -218,8 +203,41 @@ function appendMessage(
  * as `if (!await confirmAction(...)) return;` keeps the refusal path it already had.
  */
 export function confirmAction(options: ConfirmActionOptions): Promise<boolean> {
+  return withDialogCatalog<boolean>(options, false, (catalog) =>
+    confirmWithCatalog(options, catalog),
+  );
+}
+
+function withDialogCatalog<T>(
+  options: { locale?: Locale; signal?: AbortSignal },
+  cancelValue: T,
+  open: (catalog: Catalog) => Promise<T>,
+): Promise<T> {
+  const { signal } = options;
+  if (signal?.aborted) return Promise.resolve(cancelValue);
   const locale = options.locale ?? getActiveLocale();
-  const messages = DICTS[locale];
+  const cached = getLoadedCatalog(locale);
+  if (cached) return open(cached);
+
+  // Navigation or withdrawal can invalidate the prompt before it is drawn.
+  return new Promise<T>((resolve, reject) => {
+    let cancelled = false;
+    const cleanup = watchDialogInvalidation(() => {
+      cancelled = true;
+      cleanup();
+      resolve(cancelValue);
+    }, signal);
+    void loadCatalog(locale)
+      .catch(() => en)
+      .then((catalog) => {
+        cleanup();
+        if (!cancelled) resolve(open(catalog));
+      })
+      .catch(reject);
+  });
+}
+
+function confirmWithCatalog(options: ConfirmActionOptions, messages: Catalog): Promise<boolean> {
   const danger = options.tone === "danger";
 
   return new Promise<boolean>((resolve) => {
@@ -229,7 +247,7 @@ export function confirmAction(options: ConfirmActionOptions): Promise<boolean> {
       return;
     }
     const { form, bodyId, finish } = openModal<boolean>(
-      locale,
+      messages,
       false,
       resolve,
       options.signal,
@@ -242,13 +260,13 @@ export function confirmAction(options: ConfirmActionOptions): Promise<boolean> {
 
     const cancel = document.createElement("button");
     cancel.type = "button";
-    cancel.className = "btn btn-ghost";
+    cancel.className = buttonStyles("ghost");
     cancel.textContent = messages["common.cancel"];
     cancel.addEventListener("click", () => finish(false));
 
     const accept = document.createElement("button");
     accept.type = "submit";
-    accept.className = danger ? "btn btn-danger" : "btn btn-primary";
+    accept.className = buttonStyles(danger ? "danger" : "primary");
     accept.textContent = options.confirmLabel ?? messages["common.ok"];
 
     form.addEventListener("submit", (event) => {
@@ -270,16 +288,22 @@ export function confirmAction(options: ConfirmActionOptions): Promise<boolean> {
  * `if (entered === null) return;` guard and still issue no request on a refusal.
  */
 export function requestTextValue(options: RequestTextValueOptions): Promise<string | null> {
-  const locale = options.locale ?? getActiveLocale();
-  const messages = DICTS[locale];
+  return withDialogCatalog<string | null>(options, null, (catalog) =>
+    requestTextWithCatalog(options, catalog),
+  );
+}
 
+function requestTextWithCatalog(
+  options: RequestTextValueOptions,
+  messages: Catalog,
+): Promise<string | null> {
   return new Promise<string | null>((resolve) => {
     if (options.signal?.aborted) {
       resolve(null);
       return;
     }
     const { form, bodyId, finish } = openModal<string | null>(
-      locale,
+      messages,
       null,
       resolve,
       options.signal,
@@ -327,13 +351,13 @@ export function requestTextValue(options: RequestTextValueOptions): Promise<stri
 
     const cancel = document.createElement("button");
     cancel.type = "button";
-    cancel.className = "btn btn-ghost";
+    cancel.className = buttonStyles("ghost");
     cancel.textContent = messages["common.cancel"];
     cancel.addEventListener("click", () => finish(null));
 
     const accept = document.createElement("button");
     accept.type = "submit";
-    accept.className = "btn btn-primary";
+    accept.className = buttonStyles("primary");
     accept.textContent = options.confirmLabel ?? messages["common.save"];
 
     form.addEventListener("submit", (event) => {

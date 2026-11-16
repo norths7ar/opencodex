@@ -1,8 +1,8 @@
 import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { normalizeQuotaForPlan, type AccountQuota } from "../codex-quota-utils";
 import type { Locale, TFn } from "../i18n/shared";
 import { useI18n } from "../i18n/shared";
 import { IconAlert } from "../icons";
-import { type AccountQuota, normalizeQuotaForPlan } from "../codex-quota-utils";
 
 /* Helpers are co-located with QuotaBars for overview sorting / stacked layout. */
 /* eslint-disable react-refresh/only-export-components */

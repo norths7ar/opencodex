@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import type { ApplicationReceipt } from "./contracts/channels";
 import { createBoundedFetch } from "./bounded-fetch";
 import {
   putModelVisibility,
@@ -16,7 +17,7 @@ type ErrorKey = "models.saveFailed" | "models.networkError";
 type Options = {
   onQueued(): void;
   onBusy(busy: boolean): void;
-  onResponse(body: unknown): void;
+  onResponse(body: { catalogRefresh?: ApplicationReceipt } | undefined): void;
   refresh(signal: AbortSignal): Promise<boolean>;
   onSettled(error: ErrorKey | null): void;
 };
@@ -93,7 +94,8 @@ export function useModelVisibility(apiBase: string, options: Options) {
             else {
               // Integration refresh details are optional; a successful empty/legacy response
               // still reconciles visibility through the authoritative catalog read below.
-              const body: unknown = await response.json().catch(() => undefined);
+              const body = (await response.json().catch(() => undefined)) as
+                { catalogRefresh?: ApplicationReceipt } | undefined;
               if (current.active) callbacks.current.onResponse(body);
             }
           }

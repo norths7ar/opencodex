@@ -1,10 +1,12 @@
+import { cn } from "@/lib/utils";
 import { useT } from "../../i18n/shared";
 import { formatProviderDisplayName } from "../../provider-icons";
-import { cn } from "@/lib/utils";
 import { ProviderMark } from "./provider-mark";
 
 export interface RailItem {
   provider: string;
+  displayName?: string;
+  serviceId?: string;
   active: number;
   total: number;
 }
@@ -45,8 +47,8 @@ export function ModelsProviderRail({
         {items.map((item) => (
           <RailRow
             key={item.provider}
-            provider={item.provider}
-            label={formatProviderDisplayName(item.provider, t)}
+            provider={item.serviceId ?? item.provider}
+            label={item.displayName || formatProviderDisplayName(item.provider, t)}
             meta={t("models.active", { active: item.active, total: item.total })}
             ratio={item.total ? item.active / item.total : 0}
             current={selected === item.provider}

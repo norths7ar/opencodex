@@ -1,56 +1,15 @@
-import { useT, type TKey } from "../../i18n/shared";
+import { useClientCopy } from "./client-copy";
 import type { IntegrationState } from "./integration-api";
-
-/**
- * `unknown` is not a server state: it is what the overview renders while a
- * source has not settled. `unavailable` distinguishes a failed status read.
- * Neither state claims the client is installed or applied.
- */
-export type VisualIntegrationState = "not-installed" | "unknown" | "unavailable" | IntegrationState;
-
-const LABEL_KEYS: Record<VisualIntegrationState, TKey> = {
-  "not-installed": "integrations.state.notInstalled",
-  unknown: "integrations.state.unknown",
-  unavailable: "connectV2.checkFailed",
-  absent: "integrations.state.absent",
-  current: "integrations.state.current",
-  stale: "integrations.state.stale",
-  conflict: "integrations.state.conflict",
-  unsafe: "integrations.state.unsafe",
-};
-
-const CLASSES: Record<VisualIntegrationState, string> = {
-  "not-installed": "badge badge-muted",
-  unknown: "badge badge-muted",
-  unavailable: "badge badge-amber",
-  absent: "badge badge-muted",
-  current: "badge badge-green",
-  stale: "badge badge-amber",
-  conflict: "badge integration-badge--danger",
-  unsafe: "badge integration-badge--danger-outline",
-};
-
 export default function IntegrationStateBadge({
   state,
-  installed,
-  id,
 }: {
-  state: IntegrationState | VisualIntegrationState;
-  installed: boolean;
-  id?: string;
+  state: IntegrationState | "unknown" | "unavailable";
 }) {
-  const t = useT();
-  // A caller that already resolved the visual state passes it through; the
-  // file-client pages still hand over the raw server state plus `installed`.
-  const visual: VisualIntegrationState =
-    state === "unknown" || state === "unavailable" || state === "not-installed"
-      ? state
-      : installed
-        ? state
-        : "not-installed";
+  const copy = useClientCopy();
+  const label = state === "unsafe" ? "conflict" : state === "current" ? "connected" : state;
   return (
-    <span id={id} className={CLASSES[visual]} data-integration-state={visual}>
-      {t(LABEL_KEYS[visual])}
+    <span className="client-state" data-state={state}>
+      {copy(label)}
     </span>
   );
 }

@@ -1,13 +1,14 @@
+import { HelpTip } from "@/components/settings/decorations";
+import { Panel, PanelBody, PanelFooter } from "@/components/settings/panel";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useT } from "../i18n/shared";
 import { createBoundedFetch } from "../bounded-fetch";
 import { clampNumberDraft } from "../clamp-draft";
+import { useT } from "../i18n/shared";
 import { requireJson } from "../pages/dashboard-shared";
-import { Button } from "./ui-v2/button";
 import { DataSurfaceSkeleton } from "./data-surface";
-import { Frame, FrameBody, FrameFoot, HelpTip } from "./v2-subagents/frame";
-import { useHelpDisclosure } from "./v2-subagents/use-help-disclosure";
+import { Button } from "./button";
 import { StepperInput } from "./v2-subagents/StepperInput";
+import { useHelpDisclosure } from "./v2-subagents/use-help-disclosure";
 
 const KEYS = ["maxConcurrentChildren", "maxPhysicalSends", "maxDistinctChildren"] as const;
 type Key = (typeof KEYS)[number];
@@ -190,14 +191,17 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
   // explanation sits behind the "?", each field keeps one caption line, and the foot says
   // whether there is anything to save.
   return (
-    <Frame
+    <Panel
       id={id}
       title={t("workflowBudget.title")}
-      lede={t("subagentsV2.budgetLede")}
+      description={t("subagentsV2.budgetLede")}
       meta={help.button}
       busy={busy || (saved === undefined && !loadError)}
       helpOverlay={help.panel(
-        <p>{t("workflowBudget.description", { minutes: saved?.windowMinutes ?? 10 })}</p>,
+        <div>
+          <p>{t("workflowBudget.description", { minutes: saved?.windowMinutes ?? 10 })}</p>
+          <p>{t("spend.nativeSearchTokenBudgetNote")}</p>
+        </div>,
       )}
     >
       {loadError && (
@@ -218,13 +222,13 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
         </div>
       )}
       {saved === undefined && !loadError && (
-        <FrameBody>
+        <PanelBody>
           <DataSurfaceSkeleton label={t("common.loading")} />
-        </FrameBody>
+        </PanelBody>
       )}
       {saved !== undefined && (
         <>
-          <FrameBody>
+          <PanelBody>
             {KEYS.map((key) => {
               const [labelKey, hintKey] = LABEL_KEYS[key];
               const label = t(labelKey);
@@ -292,8 +296,8 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
                 </div>
               );
             })}
-          </FrameBody>
-          <FrameFoot className="sticky bottom-0 z-[1] rounded-b-[12px] bg-surface">
+          </PanelBody>
+          <PanelFooter className="sticky bottom-0 z-[1] rounded-b-[12px] bg-surface">
             <span className="mr-auto min-w-0" aria-live="polite">
               {feedback === "failed" ? (
                 <span className="text-danger" role="alert">
@@ -327,9 +331,9 @@ function WorkflowBudgetControls({ apiBase, id }: { apiBase: string; id?: string 
             >
               {t("common.save")}
             </Button>
-          </FrameFoot>
+          </PanelFooter>
         </>
       )}
-    </Frame>
+    </Panel>
   );
 }

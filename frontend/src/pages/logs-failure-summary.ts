@@ -1,12 +1,12 @@
-import type { TFn } from "../i18n/shared";
+import { boundedFailureDetail, type FailureDetailCode } from "@/contracts/telemetry/failure-detail";
 import type {
   RequestFailureCause,
   RequestFailureStage,
-  ResendPermission,
   RequestSpendTotals,
+  ResendPermission,
 } from "@/contracts/telemetry/telemetry-contract";
 import type { UpstreamCondition } from "@/contracts/telemetry/upstream-condition";
-import { boundedFailureDetail, type FailureDetailCode } from "@/contracts/telemetry/failure-detail";
+import type { TFn } from "../i18n/shared";
 
 interface LogFailureAttribution {
   failureCause?: RequestFailureCause;

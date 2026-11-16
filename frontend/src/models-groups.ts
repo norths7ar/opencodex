@@ -1,6 +1,6 @@
 /** Pure grouping for the Models page, including configured providers with zero model rows. */
 export type ProviderDiscoverySummary = (
-  | { status: "ok" }
+  | { status: "ok" | "not_checked" | "unsupported" | "refreshing" }
   | { status: "failed"; reason: "http"; httpStatus: number }
   | {
       status: "failed";
@@ -29,6 +29,8 @@ export type ProviderEntitlementSummary =
 
 export interface ConfiguredProviderSummary {
   name: string;
+  displayName?: string;
+  serviceId?: string;
   authMode?: string;
   disabled?: boolean;
   liveModels?: boolean;
@@ -43,6 +45,8 @@ export interface ConfiguredProviderSummary {
 
 export interface ProviderModelGroup<Row> {
   provider: string;
+  displayName?: string;
+  serviceId?: string;
   rows: Row[];
   native: boolean;
   /**
@@ -79,7 +83,6 @@ export function buildProviderModelGroups<Row extends { provider: string; native?
       grouped.delete(provider.name);
       continue;
     }
-    if (provider.authMode === "forward") continue;
     if (!grouped.has(provider.name)) grouped.set(provider.name, []);
   }
 
@@ -88,11 +91,12 @@ export function buildProviderModelGroups<Row extends { provider: string; native?
       const configured = providerByName.get(provider);
       return {
         provider,
+        displayName: configured?.displayName,
+        serviceId: configured?.serviceId,
         rows: providerRows,
         native: providerRows.length > 0 && providerRows.every((row) => row.native === true),
         nativeProviderGroup:
-          providerRows.some((row) => row.native === true) ||
-          (provider === "openai" && configured?.authMode === "forward"),
+          providerRows.some((row) => row.native === true) || configured?.authMode === "oauth",
         liveModels: configured?.liveModels !== false,
         configuredModels: configured?.models ?? [],
         contextWindow: configured?.contextWindow,

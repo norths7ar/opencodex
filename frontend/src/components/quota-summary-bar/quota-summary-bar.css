@@ -1,6 +1,6 @@
-/* Imported by its component, so it sits in the `legacy` cascade layer itself:
-   unlayered CSS would outrank design/bridge.css and every Tailwind utility. */
-@layer legacy {
+/* Imported by its component, so it sits in the `components` cascade layer itself:
+   component styles remain below explicit utility overrides. */
+@layer components {
   .quota-summary-bar {
     position: sticky;
     top: 0;
@@ -10,8 +10,8 @@
     gap: 12px;
     min-height: 34px;
     padding: 4px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg);
+    border-bottom: 1px solid var(--ocx-line-strong);
+    background: var(--ocx-bg);
     font-size: var(--text-label);
   }
 
@@ -62,11 +62,11 @@
   }
   .quota-summary-scroller--overflow::before {
     left: 24px;
-    background: linear-gradient(to right, var(--bg), transparent);
+    background: linear-gradient(to right, var(--ocx-bg), transparent);
   }
   .quota-summary-scroller--overflow::after {
     right: 24px;
-    background: linear-gradient(to left, var(--bg), transparent);
+    background: linear-gradient(to left, var(--ocx-bg), transparent);
   }
   .quota-summary-scroller--overflow:has(.quota-summary-scroll--prev[aria-disabled="true"])::before,
   .quota-summary-scroller--overflow:has(.quota-summary-scroll--next[aria-disabled="true"])::after,
@@ -86,10 +86,10 @@
     width: 22px;
     height: 22px;
     padding: 0;
-    border: 1px solid var(--border);
+    border: 1px solid var(--ocx-line-strong);
     border-radius: 999px;
-    background: var(--surface);
-    color: var(--text);
+    background: var(--ocx-raised);
+    color: var(--ocx-fg);
     font: inherit;
     font-weight: 600;
     line-height: 1;
@@ -97,17 +97,17 @@
   }
 
   .quota-summary-scroll:hover:not([aria-disabled="true"]) {
-    background: var(--bg);
+    background: var(--ocx-bg);
   }
 
   .quota-summary-scroll[aria-disabled="true"] {
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
     opacity: 0.45;
     cursor: default;
   }
 
   .quota-summary-scroll:focus-visible {
-    outline: 2px solid var(--text);
+    outline: 2px solid var(--ocx-fg);
     outline-offset: 1px;
   }
 
@@ -119,7 +119,7 @@
     border: 1px solid transparent;
     border-radius: 999px;
     background: none;
-    color: var(--text);
+    color: var(--ocx-fg);
     font: inherit;
     text-decoration: none;
     white-space: nowrap;
@@ -128,16 +128,16 @@
 
   .quota-summary-chip:hover,
   .quota-summary-chip--open {
-    border-color: var(--border);
+    border-color: var(--ocx-line-strong);
   }
 
   .quota-summary-chip:focus-visible {
-    outline: 2px solid var(--text);
+    outline: 2px solid var(--ocx-fg);
     outline-offset: 1px;
   }
 
   .quota-summary-name {
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
   }
 
   .quota-summary-pct {
@@ -151,34 +151,34 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    color: var(--bg);
+    color: var(--ocx-bg);
     font-size: var(--text-micro);
     font-weight: 700;
   }
 
   .quota-summary-item--warn .quota-summary-chip {
-    background: var(--amber-soft);
+    background: var(--ocx-warning-soft);
   }
 
   .quota-summary-item--warn .quota-summary-pct {
-    color: var(--amber);
+    color: var(--ocx-warning);
   }
 
   .quota-summary-item--warn .quota-summary-flag {
-    background: var(--amber);
+    background: var(--ocx-warning);
   }
 
   .quota-summary-item--critical .quota-summary-chip {
-    border-color: var(--red);
-    background: var(--red-soft);
+    border-color: var(--ocx-danger);
+    background: var(--ocx-danger-soft);
   }
 
   .quota-summary-item--critical .quota-summary-pct {
-    color: var(--red);
+    color: var(--ocx-danger);
   }
 
   .quota-summary-item--critical .quota-summary-flag {
-    background: var(--red);
+    background: var(--ocx-danger);
   }
 
   /*
@@ -195,9 +195,9 @@
     /* A fixed box resolves % against the viewport without its scrollbar; 100vw would include it. */
     max-width: calc(100% - 16px);
     padding: 10px 12px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--ocx-line-strong);
     border-radius: 8px;
-    background: var(--surface);
+    background: var(--ocx-raised);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
   }
 
@@ -227,13 +227,13 @@
   }
 
   .quota-summary-badge--warn {
-    color: var(--amber);
-    background: var(--amber-soft);
+    color: var(--ocx-warning);
+    background: var(--ocx-warning-soft);
   }
 
   .quota-summary-badge--critical {
-    color: var(--red);
-    background: var(--red-soft);
+    color: var(--ocx-danger);
+    background: var(--ocx-danger-soft);
   }
 
   .quota-summary-table {
@@ -258,7 +258,7 @@
   }
 
   .quota-summary-row-reset {
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
     white-space: nowrap;
   }
 
@@ -274,11 +274,11 @@
   }
 
   .quota-summary-row--warn .quota-summary-row-pct {
-    color: var(--amber);
+    color: var(--ocx-warning);
   }
 
   .quota-summary-row--critical .quota-summary-row-pct {
-    color: var(--red);
+    color: var(--ocx-danger);
   }
 
   .quota-summary-popover-foot {
@@ -287,30 +287,30 @@
     justify-content: space-between;
     gap: 4px 12px;
     margin-top: 6px;
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
     font-size: var(--text-caption);
   }
 
   .quota-summary-updated {
     flex-shrink: 0;
-    color: var(--muted);
+    color: var(--ocx-fg-muted);
     font-size: var(--text-caption);
     white-space: nowrap;
   }
 
   .quota-summary-popover-link {
-    color: var(--text);
+    color: var(--ocx-fg);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
 
   .quota-summary-popover-link:focus-visible {
-    outline: 2px solid var(--text);
+    outline: 2px solid var(--ocx-fg);
     outline-offset: 1px;
   }
 
   .quota-summary-updated--stale {
-    color: var(--amber);
+    color: var(--ocx-warning);
   }
 
   /*
@@ -345,7 +345,7 @@
 
     /*
     The mobile app grid already reserves an `auto` row for `.mobile-topbar` above a
-    `1fr` main row (see the narrow-screen block in styles.css). A `100dvh` main row
+    `1fr` main row (see the narrow-screen shell layout). A `100dvh` main row
     therefore measures a full viewport *below* the bar: the document becomes bar
     height + viewport, the page scrolls by exactly the bar, and the combos shell is
     clipped at the fold. Fill the row the grid reserved, mirroring how
