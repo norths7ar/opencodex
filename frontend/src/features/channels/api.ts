@@ -48,7 +48,8 @@ export function discoveryView(detail: ChannelDetail): ProviderDiscoverySummary |
   )
     return { status: value.state, ...timestamps };
   return value.state === "failed"
-    ? { status: "failed", reason: "provider", ...timestamps }
+    ? // eslint-disable-next-line local-i18n/no-hardcoded-ui-strings -- Internal discovery classification, not a display label.
+      { status: "failed", reason: "provider", ...timestamps }
     : { status: "ok", ...timestamps };
 }
 

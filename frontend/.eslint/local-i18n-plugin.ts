@@ -4,11 +4,7 @@ import { isBrandOrModelLiteral, isTechnicalLiteral } from "./i18n-allowlist.ts";
 import { formatHardcodedSnippet, i18nLocaleFileHint } from "./i18n-locales.ts";
 
 type LocalRuleContext = {
-  report(descriptor: {
-    node: Node;
-    messageId: "uiString" | "dataCopy";
-    data?: Record<string, string>;
-  }): void;
+  report(descriptor: { node: Node; messageId: "uiString"; data?: Record<string, string> }): void;
 };
 
 type LocalRuleListener = {
@@ -16,7 +12,6 @@ type LocalRuleListener = {
   JSXAttribute?(node: JSXAttribute): void;
   Literal?(node: Literal): void;
   TemplateElement?(node: TemplateElement): void;
-  Property?(node: Property): void;
 };
 
 type LocalRuleModule = {
@@ -73,13 +68,12 @@ function reportLiteral(
   context: LocalRuleContext,
   node: Node,
   value: string,
-  messageId: "uiString" | "dataCopy",
   comparisonValue = value,
 ) {
   if (isAllowedLiteral(comparisonValue)) return;
   context.report({
     node,
-    messageId,
+    messageId: "uiString",
     data: {
       snippet: formatHardcodedSnippet(value),
       locales: i18nLocaleFileHint(),
@@ -186,6 +180,9 @@ function isInsideNonUiContext(node: Node): boolean {
 
   let current: Node | undefined = node;
   while (current) {
+    // TypeScript template literal types describe keys; the fragments are never rendered.
+    const type: string = current.type;
+    if (type === "TSTemplateLiteralType") return true;
     // Code samples and shell/CLI dumps are never user-facing prose.
     if (current.type === "JSXElement") {
       const tag = jsxElementName(current as JSXElement);
@@ -241,7 +238,7 @@ const noHardcodedUiStrings: LocalRuleModule = {
     schema: [],
     messages: {
       uiString:
-        'Hardcoded UI text: "{{snippet}}". Add a key to {{locales}} and render with t() or <Trans />. Company names and model ids are the only allowed literals.',
+        'Hardcoded UI text: "{{snippet}}". Render a source key from src/i18n/en.ts with t() or <Trans />. Add available translations in {{locales}}.',
     },
   },
   create(context) {
@@ -252,7 +249,7 @@ const noHardcodedUiStrings: LocalRuleModule = {
         if (!value) return;
 
         const comparisonValue = value.replace(HTML_CHARACTER_REFERENCE_PATTERN, "");
-        reportLiteral(context, node, value, "uiString", comparisonValue);
+        reportLiteral(context, node, value, comparisonValue);
       },
       JSXAttribute(node: JSXAttribute) {
         if (node.name.type !== "JSXIdentifier") return;
@@ -260,13 +257,13 @@ const noHardcodedUiStrings: LocalRuleModule = {
         const valueNode = node.value;
         if (!valueNode) return;
         if (valueNode.type === "Literal" && typeof valueNode.value === "string") {
-          reportLiteral(context, valueNode, valueNode.value, "uiString");
+          reportLiteral(context, valueNode, valueNode.value);
           return;
         }
         if (valueNode.type === "JSXExpressionContainer") {
           const expr = valueNode.expression;
           if (expr.type === "Literal" && typeof expr.value === "string") {
-            reportLiteral(context, expr, expr.value, "uiString");
+            reportLiteral(context, expr, expr.value);
           }
         }
       },
@@ -281,7 +278,7 @@ const noHardcodedUiStrings: LocalRuleModule = {
         if (parent.type === "Property") {
           const key = propertyKeyName((parent as Property).key);
           if (key && DATA_COPY_KEYS.has(key)) {
-            reportLiteral(context, node, node.value, "uiString");
+            reportLiteral(context, node, node.value);
           }
         }
       },
@@ -289,33 +286,7 @@ const noHardcodedUiStrings: LocalRuleModule = {
         if (isInsideNonUiContext(node)) return;
         const raw = node.value.raw.replace(/\s+/g, " ").trim();
         if (!raw) return;
-        reportLiteral(context, node, raw, "uiString");
-      },
-    };
-  },
-};
-
-const noHardcodedDataCopy: LocalRuleModule = {
-  meta: {
-    type: "problem",
-    docs: {
-      description: "Disallow hardcoded label/title/description fields in data helpers.",
-    },
-    schema: [],
-    messages: {
-      dataCopy:
-        'Hardcoded user-facing copy: "{{snippet}}". Use i18n keys (e.g. labelKey) in {{locales}} and resolve with t() at render time.',
-    },
-  },
-  create(context) {
-    return {
-      Property(node: Property) {
-        const key = propertyKeyName(node.key);
-        if (!key || !DATA_COPY_KEYS.has(key)) return;
-        const value = node.value;
-        if (value.type === "Literal" && typeof value.value === "string") {
-          reportLiteral(context, value, value.value, "dataCopy");
-        }
+        reportLiteral(context, node, raw);
       },
     };
   },
@@ -324,6 +295,5 @@ const noHardcodedDataCopy: LocalRuleModule = {
 export default {
   rules: {
     "no-hardcoded-ui-strings": noHardcodedUiStrings,
-    "no-hardcoded-data-copy": noHardcodedDataCopy,
   },
 };

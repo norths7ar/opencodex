@@ -95,8 +95,9 @@ def install_console(app, token: str, web_root: Path):
             return HTMLResponse(
                 '<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
                 "<title>OpenCodex Lite</title><h1>OpenCodex Lite 已启动</h1>"
-                "<p>网页尚未构建。在项目目录执行 <code>pnpm --dir frontend build:runtime</code>"
-                '，然后刷新此页。</p><a href="/healthz">查看健康状态</a></html>',
+                "<p>网页尚未发布。在项目目录执行 <code>./scripts/update.ps1</code>"
+                "。前台运行时请先停止网关，更新后重新启动。</p>"
+                '<a href="/healthz">查看健康状态</a></html>',
                 status_code=503,
             )
         return JSONResponse({"error": "Not found"}, 404)

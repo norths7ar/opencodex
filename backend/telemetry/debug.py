@@ -15,7 +15,6 @@ ENV = {
     "debug": "OCX_DEBUG",
     "usage": "OPENCODEX_USAGE_DEBUG",
     "injection": "OCX_INJECTION_DEBUG",
-    "claude": "OCX_CLAUDE_DEBUG",
 }
 SUPPORTED = ("debug", "usage", "injection")
 STREAM_FLAGS = {"provider": "debug", "usage": "usage", "injection": "injection"}
@@ -132,7 +131,6 @@ class DebugState:
                 "enabled": self.enabled("debug"),
                 "usage": self.enabled("usage"),
                 "injection": self.enabled("injection"),
-                "claude": False,
                 "runtimeOverride": dict(self.overrides),
                 "env": {flag: self._env(flag) for flag in ENV},
                 "supportedFlags": list(SUPPORTED),
@@ -148,8 +146,6 @@ class DebugState:
             elif isinstance(reset, str) and reset in {*SUPPORTED, "provider"}:
                 self.overrides.pop("debug" if reset == "provider" else reset, None)
             else:
-                if "claude" in body:
-                    raise ValueError("Claude inbound diagnostics have not been migrated.")
                 patch = {key: value for key, value in body.items() if key in SUPPORTED}
                 if not patch or any(type(value) is not bool for value in patch.values()):
                     raise ValueError("Provide debug/usage/injection booleans or reset:true.")

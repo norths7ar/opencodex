@@ -22,8 +22,9 @@ export default mergeConfig(
       },
     },
     build: {
-      outDir: fileURLToPath(new URL("./dist-runtime/", import.meta.url)),
+      outDir: fileURLToPath(new URL("./build/", import.meta.url)),
       emptyOutDir: true,
+      manifest: true,
     },
   }),
 );

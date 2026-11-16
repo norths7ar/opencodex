@@ -12,8 +12,6 @@ from collections.abc import Mapping
 from pathlib import Path
 from uuid import UUID
 
-from dotenv import dotenv_values
-
 from backend.configuration.models import CredentialRecord
 
 
@@ -38,13 +36,12 @@ def protect(value: bytes, *, decrypt: bool = False) -> bytes:
 
 
 def resolve_credential(
-    record: CredentialRecord, *, environment: Mapping[str, str] | None = None, dotenv_path=None
+    record: CredentialRecord, *, environment: Mapping[str, str] | None = None
 ) -> tuple[str, dict[str, str]]:
     """Resolve a credential without mutating its configuration record."""
     if record.env_var:
         values = os.environ if environment is None else environment
-        fallback = dotenv_values(dotenv_path, encoding="utf-8-sig") if dotenv_path else {}
-        value = values.get(record.env_var) or fallback.get(record.env_var)
+        value = values.get(record.env_var)
         if not value:
             raise ValueError(f"Credential variable {record.env_var} is not configured.")
         return value, dict(record.headers)

@@ -3,7 +3,6 @@
 from collections.abc import Mapping
 from contextlib import suppress
 from hashlib import sha256
-from pathlib import Path
 
 import httpx
 
@@ -74,12 +73,9 @@ def is_chatgpt_subscription(channel: Channel) -> bool:
 
 
 class ChannelAuthentication:
-    def __init__(
-        self, store: ConfigurationStore, chatgpt: ChatGPTAuth, *, dotenv_path: Path | None = None
-    ):
+    def __init__(self, store: ConfigurationStore, chatgpt: ChatGPTAuth):
         self.store = store
         self.chatgpt = chatgpt
-        self.dotenv_path = dotenv_path
 
     def record(self, channel: Channel) -> CredentialRecord:
         return self.store.read().credentials.get(channel.id, CredentialRecord())
@@ -92,7 +88,7 @@ class ChannelAuthentication:
             identity = self.chatgpt.status().get("activeAccountId")
         elif channel.auth_mode == "key":
             with suppress(ValueError, RuntimeError):
-                identity, _ = resolve_credential(record, dotenv_path=self.dotenv_path)
+                identity, _ = resolve_credential(record)
         return sha256(repr((identity, sorted(record.headers.items()))).encode()).hexdigest()
 
     def legacy_fingerprint(self, channel: Channel) -> str:
@@ -101,7 +97,7 @@ class ChannelAuthentication:
         identity = record.protected_key or record.env_var
         if channel.auth_mode in {"key", "local"}:
             with suppress(ValueError, RuntimeError):
-                identity, _ = resolve_credential(record, dotenv_path=self.dotenv_path)
+                identity, _ = resolve_credential(record)
         account = (
             self.chatgpt.status().get("activeAccountId") if channel.auth_mode == "oauth" else None
         )
@@ -171,7 +167,7 @@ class ChannelAuthentication:
 
         key = ""
         if channel.auth_mode == "key":
-            key, _ = resolve_credential(record, dotenv_path=self.dotenv_path)
+            key, _ = resolve_credential(record)
         headers = httpx.Headers({"content-type": "application/json"})
         if protocol == "anthropic":
             headers["anthropic-version"] = incoming.get("anthropic-version", "2023-06-01")

@@ -1,5 +1,7 @@
 # ADR 0004: GUI toggle contrast and sidebar item spacing
 
+> Historical upstream decision. This records the original GUI, not the current Lite implementation. Current module responsibilities are described in [the Lite architecture](../../../docs/lite-architecture.md).
+
 ## Status
 
 Accepted

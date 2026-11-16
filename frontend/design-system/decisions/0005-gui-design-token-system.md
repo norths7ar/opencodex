@@ -1,5 +1,7 @@
 # ADR 0005: GUI uses role-based CSS design tokens
 
+> Historical upstream decision. This records the original GUI, not the current Lite implementation. Current module responsibilities are described in [the Lite architecture](../../../docs/lite-architecture.md).
+
 ## Status
 
 Accepted. The styling stack (no utility framework) and font decisions are superseded by

@@ -1,7 +1,6 @@
 /**
  * Helpers that check Response status before consuming the body.
- * Satisfies react-doctor `no-fetch-response-used-without-status-check`
- * (`fetch` resolves on HTTP 4xx/5xx).
+ * `fetch` also resolves on HTTP 4xx/5xx, which remain failures here.
  */
 
 /** Parse an OK response body; 204 / empty bodies yield `undefined`. */

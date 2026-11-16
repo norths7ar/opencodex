@@ -103,7 +103,7 @@ class ChannelManagement:
         if not (record.env_var or record.protected_key):
             return CredentialStatus(state="missing", label=record.key_label)
         try:
-            resolve_credential(record, dotenv_path=self.authentication.dotenv_path)
+            resolve_credential(record)
         except ValueError, RuntimeError, OSError:
             return CredentialStatus(state="unavailable", label=record.key_label)
         return CredentialStatus(state="configured", label=record.key_label)

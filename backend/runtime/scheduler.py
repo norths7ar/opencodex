@@ -437,6 +437,12 @@ class Startup:
 
     def save_preference(self, enabled: bool):
         path = self.directory / "startup-preference.json"
+        try:
+            saved = json.loads(path.read_text(encoding="utf-8"))
+        except FileNotFoundError, ValueError:
+            saved = None
+        if isinstance(saved, dict) and saved.get("enabled") is enabled:
+            return
         temporary = path.with_suffix(".json.tmp")
         temporary.write_text(json.dumps({"enabled": enabled}), encoding="utf-8")
         temporary.replace(path)

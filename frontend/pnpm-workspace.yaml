@@ -1,4 +1,4 @@
-# Match the dependency overrides in package.json for the legacy Bun install.
+# Transitive dependency pins for the frontend pnpm lockfile.
 overrides:
   brace-expansion: 5.0.9
   nanoid: 3.3.18

@@ -4,14 +4,14 @@ OpenCodex Lite 是基于 OpenCodex 2.99.0 的 Windows 本机模型网关。Pytho
 
 ## 安装与运行
 
-从源码目录运行，使用项目锁定的 Python 3.14.10、Node.js 26.13.1 和 pnpm 12.21.0；uv 需为 0.13.8 或更新版本。在仓库根目录执行：
+从源码目录运行，使用项目锁定的 Python 3.14.10、Node.js 26.13.1 和 pnpm 12.21.0；uv 需为 0.13.8 或更新版本。使用 PowerShell 7，在仓库根目录执行：
 
 ```powershell
-uv sync --locked
-pnpm --dir frontend install --frozen-lockfile
-pnpm --dir frontend build:runtime
+./scripts/update.ps1
 ./scripts/register-cli.ps1
 ```
+
+更新脚本按锁文件同步依赖、独立构建网页并发布。首次安装只发布，不自动安装或启动服务；已有受管后台实例会在发布后重启并检查健康状态。前台实例请先停止，再更新和重新启动。
 
 注册脚本将 `ocx` 和 `opencodex` 指向项目虚拟环境。若首次注册更新了用户 PATH，重新打开终端即可在任意目录运行。请保留源码目录和 `.venv`；移动项目后需重建虚拟环境并重新注册，已安装的服务还需运行 `ocx service repair` 更新路径。
 
@@ -27,11 +27,17 @@ ocx start
 
 默认运行目录为 `%LOCALAPPDATA%\OpenCodexLite`。用 `--state-dir` 或 `OPENCODEX_LITE_HOME` 可选择独立目录。日常配置以该目录下的 `configuration.sqlite3` 为准；同目录中已有的 Lite `config.json` 只在首次激活时作为迁移来源，之后不再参与配置读取。
 
+## 更新当前安装
+
+在仓库根目录运行 `./scripts/update.ps1`，或 `pnpm update:local`。独立运行目录使用 `./scripts/update.ps1 -StateDir <目录>`。脚本依次同步锁定依赖、检查类型、构建、校验完整产物、发布网页，并在实例受后台服务管理且正在运行时重启。未运行的实例不会被启动，前台实例需先停止。自动启动偏好和当前端口保持不变。
+
+发布先放齐新资源，再原子替换网页入口；旧资源保留至少七天，后续发布按记录清理已过期且不再被保留版本引用的文件。首次发布会登记已有资源。发布或健康检查失败会报告具体阶段；入口切换失败或新实例验证失败时恢复旧网页入口，但不会声称回滚已修改的 Python 源码或依赖。
+
 ## 渠道和模型
 
 在“渠道”中添加连接。内置连接覆盖 OpenAI API、ChatGPT 登录、DeepSeek API、MiMo API、OpenCode Zen 和 OpenCode Go；也可配置兼容端点。每条 API 渠道可单独配置地址、凭据和上游协议，多个 API 凭据分别建渠道。网关按需要在 Chat Completions、Responses 和 Messages 间转换，上下游协议一致时优先使用原生路径。
 
-ChatGPT 支持浏览器或设备码 OAuth，由网关单独维护一个账号和令牌，不使用本机 Codex 登录。手动输入的 API Key 和订阅凭据由当前 Windows 用户加密保护。渠道探测用于读取目录；生成验证是另一个操作。
+ChatGPT 支持浏览器或设备码 OAuth，由网关单独维护一个账号和令牌，不使用本机 Codex 登录。手动输入的 API Key 和订阅凭据由当前 Windows 用户加密保护。环境变量凭据从进程环境读取，不自动加载源码仓库的 `.env`；后台服务在安装或修复时保存所引用的凭据环境变量。渠道探测用于读取目录；生成验证是另一个操作。
 
 Models 页面从持久化快照读取模型目录，不会因打开页面而访问上游。启用发现的渠道由后台每日刷新，也可手动刷新；成功后用完整目录替换旧快照，失败时保留上次成功结果并显示状态，后台以独立退避周期重试。静态目录和用户模型配置仍可独立维护。客户端使用目录返回的模型选择器或已配置别名；普通模型保持 `渠道 ID/模型 ID` 形式，名称冲突的模型由目录提供无歧义选择器。
 
@@ -48,6 +54,6 @@ Usage & Logs 记录请求状态、渠道与模型、耗时和上游报告的 tok
 
 ## 开发
 
-分别运行 `ocx start` 和 `pnpm --dir frontend dev:runtime`。开发网页默认位于 <http://127.0.0.1:5173/>，代理到 10100；若后端使用其他端口，在启动前端前设置 `OPENCODEX_PROXY_TARGET`。生产网页构建到 `frontend/dist-runtime/`。
+分别运行 `ocx start` 和 `pnpm --dir frontend dev:runtime`。开发网页默认位于 <http://127.0.0.1:5173/>，代理到 10100；若后端使用其他端口，在启动前端前设置 `OPENCODEX_PROXY_TARGET`。`pnpm --dir frontend build:runtime` 只生成 `frontend/build/` 候选产物，不改动正在服务的网页；`pnpm --dir frontend preview` 预览这份候选。正式网页位于 `frontend/dist-runtime/`，通过[更新当前安装](#更新当前安装)流程发布。
 
 迁移范围与验收状态见 [MIGRATION.md](MIGRATION.md)，模块职责和数据流见[架构文档](docs/lite-architecture.md)。本项目源自 [OpenCodex](https://github.com/lidge-jun/opencodex)，保留原有版权声明，许可证见 [LICENSE](LICENSE)。

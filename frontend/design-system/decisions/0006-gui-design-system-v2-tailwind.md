@@ -1,5 +1,7 @@
 # ADR 0006: GUI design system v2 on Tailwind v4 with registry components
 
+> Historical upstream decision. This records the original GUI, not the current Lite implementation. Current module responsibilities are described in [the Lite architecture](../../../docs/lite-architecture.md).
+
 ## Status
 
 Accepted. Supersedes the styling-stack and font parts of ADR 0005; the role-based token idea of

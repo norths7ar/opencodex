@@ -16,6 +16,7 @@
     "status": "uv run ocx status",
     "restart": "uv run ocx restart",
     "build:gui": "pnpm --dir frontend build:runtime",
+    "update:local": "pwsh -NoProfile -File scripts/update.ps1",
     "typecheck": "pnpm --dir frontend typecheck",
     "lint": "uv run --locked ruff check && pnpm --dir frontend lint",
     "lint:fix": "uv run --locked ruff check --fix && pnpm --dir frontend lint:fix",
@@ -25,11 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lidge-jun/opencodex.git"
+    "url": "git+https://github.com/norths7ar/opencodex.git"
   },
-  "homepage": "https://lidge-jun.github.io/opencodex/",
   "bugs": {
-    "url": "https://github.com/lidge-jun/opencodex/issues"
+    "url": "https://github.com/norths7ar/opencodex/issues"
   },
   "license": "MIT"
 }

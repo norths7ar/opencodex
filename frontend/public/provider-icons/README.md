@@ -155,7 +155,7 @@ slightly off:
   color, so it follows the theme. Correct for a neutral silhouette, which would
   otherwise be invisible against one of the two surfaces.
 
-The set lives in `gui/src/components/integration-marks.ts`. It is derived from
+The set lives in `frontend/src/components/integration-marks.ts`. It is derived from
 `MONOCHROME_CLIENT_MARKS` for export clients, plus `MASKED_NATIVE_MARKS` for rows
 that have no export client to be keyed by.
 
@@ -194,7 +194,7 @@ Decisions that are not obvious from looking at the file:
   it is why a plated mark is not a candidate for the monochrome set however
   neutral its inks look.
 
-Both directions are enforced in `gui/tests/integration-marks.test.ts`, including a
+The historical checks for both directions are recorded in `frontend/tests/integration-marks.test.ts`, including a
 luminance check that fails any single-ink near-neutral mark left as an image. That
 direction was missing until it caught `grok`; the same class of defect had already
 shipped once for `prime`, `opencode` and `kimi`.

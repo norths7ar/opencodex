@@ -7,17 +7,14 @@ const I18N_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "
 /** Source locale / `TKey` definition (`src/i18n/en.ts`). */
 export const I18N_SOURCE_LOCALE = "en";
 
-/** Non-dictionary modules under `src/i18n/`. */
-const I18N_MODULE_SKIP = new Set(["index", "shared", "provider"]);
-
 /** Locale module ids matching `src/i18n/{id}.ts` (discovered at lint time). */
-export function listI18nLocaleModules(): string[] {
+function listI18nLocaleModules(): string[] {
   if (!fs.existsSync(I18N_DIR)) return [I18N_SOURCE_LOCALE];
   return fs
     .readdirSync(I18N_DIR)
     .filter((name) => name.endsWith(".ts"))
     .map((name) => name.replace(/\.ts$/, ""))
-    .filter((id) => !I18N_MODULE_SKIP.has(id))
+    .filter((id) => /^[a-z]{2}(?:-[A-Z]{2})?$/.test(id))
     .sort((a, b) => {
       if (a === I18N_SOURCE_LOCALE) return -1;
       if (b === I18N_SOURCE_LOCALE) return 1;
@@ -25,12 +22,7 @@ export function listI18nLocaleModules(): string[] {
     });
 }
 
-/** Locales that need a translation entry when adding a new key (all except source). */
-export function listTranslationLocales(): string[] {
-  return listI18nLocaleModules().filter((code) => code !== I18N_SOURCE_LOCALE);
-}
-
-/** Hint for ESLint/docs — picks up new files like `src/i18n/fr.ts` automatically. */
+/** Available dictionaries; missing translations fall back to the source entry. */
 export function i18nLocaleFileHint(): string {
   const modules = listI18nLocaleModules();
   if (modules.length <= 1) {

@@ -19,3 +19,4 @@ tests/**/.tmp-*
 __pycache__/
 .ruff_cache/
 *.egg-info/
+/frontend/.deployment-state.json

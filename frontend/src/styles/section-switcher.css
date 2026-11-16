@@ -4,7 +4,7 @@
   /*
  * Section switcher: moves between the pages of one sidebar group. Pill-shaped so it
  * never reads as one more row of the underline .page-tabs the pages carry below it.
- * Tokens only; see gui/design-system/components.md "App shell and navigation".
+ * Shared theme tokens keep this navigation consistent with the app shell.
  */
   .section-switcher {
     display: inline-flex;

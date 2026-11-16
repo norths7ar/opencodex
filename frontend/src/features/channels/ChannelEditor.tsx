@@ -158,9 +158,9 @@ export function ChannelEditor({
           <Select
             value={channel.protocol}
             options={[
-              { value: "openai-chat", label: "Chat Completions" },
-              { value: "openai-responses", label: "Responses" },
-              { value: "anthropic", label: "Messages" },
+              { value: "openai-chat", label: c("protocolName.chat") },
+              { value: "openai-responses", label: c("protocolName.responses") },
+              { value: "anthropic", label: c("protocolName.messages") },
             ]}
             onChange={(value) => set("protocol", value as Channel["protocol"])}
             label={c("protocol")}

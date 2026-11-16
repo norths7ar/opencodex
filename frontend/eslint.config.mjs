@@ -58,14 +58,10 @@ export default defineConfig([
       "src/ui.tsx",
       "src/pages/**/*.{ts,tsx}",
       "src/components/**/*.{ts,tsx}",
+      "src/features/**/*.{ts,tsx}",
     ],
     plugins: { "local-i18n": i18n },
     rules: { "local-i18n/no-hardcoded-ui-strings": "error" },
-  },
-  {
-    files: ["src/provider-workspace-data.ts"],
-    plugins: { "local-i18n": i18n },
-    rules: { "local-i18n/no-hardcoded-data-copy": "error" },
   },
   prettier,
 ]);
