@@ -10,11 +10,8 @@
  * block) hides the panel.
  */
 import { useEffect, useState } from "react";
-import { upstreamWireForAdapter } from "../../../../backend/src/protocols/contract";
-import type {
-  ProtocolAdapterSource,
-  ProtocolProviderSummaryV1,
-} from "../../../../backend/src/protocols/dto";
+import { upstreamWireForAdapter } from "@/contracts/protocol/contract";
+import type { ProtocolAdapterSource, ProtocolProviderSummaryV1 } from "@/contracts/protocol/dto";
 import { useI18n, useT, type TKey } from "../../i18n/shared";
 import { fetchProtocolProviderSummary } from "../../protocol-api";
 import { protocolHopLabel } from "../protocols/protocol-labels";

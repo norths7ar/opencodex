@@ -1,10 +1,14 @@
 export interface ProvidersConfig {
   port: number;
+  revision?: number;
   defaultProvider: string;
   providers: Record<
     string,
     {
       adapter: string;
+      displayName?: string;
+      serviceId?: string;
+      credentialState?: import("@/contracts/channels").CredentialStatus["state"];
       baseUrl: string;
       hasApiKey?: boolean;
       hasHeaders?: boolean;

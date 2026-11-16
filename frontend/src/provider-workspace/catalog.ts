@@ -34,6 +34,9 @@ import type { ProviderDiscoverySummary } from "../models-groups";
 export interface WorkspaceProvider {
   anthropicOAuthInstance?: "anthropic2";
   adapter: string;
+  displayName?: string;
+  serviceId?: string;
+  credentialState?: import("@/contracts/channels").CredentialStatus["state"];
   baseUrl: string;
   hasApiKey?: boolean;
   /** Live gateway login state, when provided by the host. */
@@ -163,6 +166,7 @@ export function hasLoopbackBaseUrl(baseUrl: string): boolean {
 
 function isConfigurationReady(p: WorkspaceProvider): boolean {
   if (p.authMode === "oauth" && p.oauthLoggedIn !== undefined) return p.oauthLoggedIn;
+  if (p.credentialState !== undefined) return p.credentialState === "configured";
   // A subscription CLI row is ready by adapter alone: `keyOptional` is enriched from the
   // registry only for the canonical `claude-cli` name, and a renamed or hand-authored row using
   // that adapter still never reads a key.
@@ -281,7 +285,10 @@ export function buildProviderWorkspace(
       disabled.push({ name, ...p });
       continue;
     }
-    if (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined) {
+    if (
+      (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined) ||
+      p.credentialState === "unknown"
+    ) {
       checking.push({ name, ...p });
     } else if (isConfigurationReady(p)) {
       ready.push({ name, ...p, tier: providerTier(name, p) });
@@ -331,7 +338,10 @@ export type ProviderStatus = "ready" | "needs-setup" | "disabled" | "checking";
  */
 export function binProviderStatus(p: WorkspaceProvider | WorkspaceItem): ProviderStatus {
   if (p.disabled) return "disabled";
-  if (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined)
+  if (
+    (p.authMode === "oauth" && p.oauthStatusCheck && p.oauthLoggedIn === undefined) ||
+    p.credentialState === "unknown"
+  )
     return "checking";
   if ("activeNeedsReauth" in p && p.activeNeedsReauth) return "needs-setup";
   if (isConfigurationReady(p)) return "ready";

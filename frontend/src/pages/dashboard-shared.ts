@@ -4,7 +4,7 @@ import {
   DEFAULT_VISION_TIMEOUT_MS,
   MAX_VISION_TIMEOUT_MS,
   MIN_VISION_TIMEOUT_MS,
-} from "../../../backend/src/vision/timeout-bounds";
+} from "@/contracts/vision-limits";
 import { readJsonOrThrow } from "../fetch-json";
 import type { StartupHealthStatus } from "../startup-health-ui";
 import { shadowSourceModelList, type ShadowCallSourceOption } from "./shadow-call-source";

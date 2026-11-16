@@ -1,4 +1,5 @@
-import { parseQuotaFailureCode } from "../../../backend/src/providers/quota-types";
+import { updateChannel } from "../channel-management";
+import { parseQuotaFailureCode } from "@/contracts/quota-failure";
 import {
   useCallback,
   useEffect,
@@ -1192,11 +1193,12 @@ export function useProviderAccountPools(deps: {
       tone: "danger",
     });
     if (!consented) return;
-    const res = await fetch(
-      `${apiBase}/api/providers/keys?name=${encodeURIComponent(provider)}&id=${encodeURIComponent(entry.id)}`,
-      { method: "DELETE" },
-    );
-    if (res.ok) {
+    if (entry.id !== "primary") return;
+    const res = await updateChannel(apiBase, provider, ({ channel }) => ({
+      channel,
+      credential: { action: "clear" },
+    })).catch(() => null);
+    if (res?.ok) {
       notify(t("prov.keyRemoved", { key: entry.label ?? entry.masked }), true);
       void fetchKeyPools(Object.keys(keyPools));
       void fetchConfig();
@@ -1204,14 +1206,23 @@ export function useProviderAccountPools(deps: {
     }
   };
 
-  const addApiKeyValue = async (provider: string, rawKey: string): Promise<boolean> => {
+  const addApiKeyValue = async (
+    provider: string,
+    rawKey: string,
+    source: "key" | "environment" = "key",
+  ): Promise<boolean> => {
     const key = rawKey.trim();
     if (!key) return false;
     try {
-      const res = await fetch(`${apiBase}/api/providers/keys`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: provider, key }),
+      const res = await updateChannel(apiBase, provider, ({ channel, credential }) => {
+        if (credential.state !== "missing") throw new Error("A credential already exists.");
+        return {
+          channel,
+          credential:
+            source === "environment"
+              ? { action: "set_environment", variable: key }
+              : { action: "set_key", value: key },
+        };
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };

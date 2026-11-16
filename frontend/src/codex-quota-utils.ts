@@ -1,7 +1,6 @@
-import { hasElapsedShortWindow, isTerminalShortWindow } from "../../backend/src/codex/quota-types";
+import { hasElapsedShortWindow, isTerminalShortWindow } from "@/contracts/codex-quota";
 
 export interface AccountQuota {
-  workbuddyCredits?: import("../../backend/src/providers/workbuddy-credit-balance").WorkBuddyCreditBalance;
   weeklyPercent?: number;
   fiveHourPercent?: number;
   /** Codex account API aliases for the same five-hour window. */
@@ -60,9 +59,6 @@ export function normalizeQuotaForPlan(
       : {}),
     ...(normalized.monthlyResetAt !== undefined
       ? { monthlyResetAt: normalized.monthlyResetAt }
-      : {}),
-    ...(normalized.workbuddyCredits !== undefined
-      ? { workbuddyCredits: normalized.workbuddyCredits }
       : {}),
     ...(normalized.creditsUsd !== undefined ? { creditsUsd: normalized.creditsUsd } : {}),
     ...(normalized.resetCredits !== undefined ? { resetCredits: normalized.resetCredits } : {}),

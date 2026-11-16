@@ -1,4 +1,4 @@
-import { parseProtocolTraceV1 } from "../../../../backend/src/protocols/dto";
+import { parseProtocolTraceV1 } from "@/contracts/protocol/dto";
 import type { TFn } from "../../i18n/shared";
 import { PROTOCOL_MODE_KEYS, protocolCompactLabel } from "./protocol-labels";
 

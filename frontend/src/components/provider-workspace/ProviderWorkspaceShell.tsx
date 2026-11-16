@@ -41,7 +41,7 @@ import { providerKind } from "../../provider-workspace/kind";
 import { readJsonIfOk, readJsonOrThrow } from "../../fetch-json";
 import { readSessionListCache, writeSessionListCache } from "../../session-list-cache";
 import { buildProviderModelUsage, buildProviderUsageTotals } from "../../provider-workspace/usage";
-import { parseQuotaFailureCode } from "../../../../backend/src/providers/quota-types";
+import { parseQuotaFailureCode } from "@/contracts/quota-failure";
 import {
   accountQuotaFromReport,
   currentAccountQuotaReport,
@@ -274,7 +274,11 @@ export default function ProviderWorkspaceShell({
               oauthStatusCheck:
                 provider.authMode === "oauth"
                   ? (oauthLoginStatus[name]?.statusCheck ??
-                    (oauthLoginStatus[name] ? ("ready" as const) : ("loading" as const)))
+                    (oauthLoginStatus[name]
+                      ? ("ready" as const)
+                      : provider.credentialState && provider.credentialState !== "unknown"
+                        ? undefined
+                        : ("loading" as const)))
                   : undefined,
               oauthLoggedIn:
                 provider.authMode === "oauth" ? oauthLoginStatus[name]?.loggedIn : undefined,
@@ -300,23 +304,20 @@ export default function ProviderWorkspaceShell({
       void (async () => {
         let succeeded = false;
         try {
-          // Adopt this pair together. The server does not promise a transaction across reads.
-          const [selection, rows] = await Promise.all([
+          // All three read persisted snapshots; none waits for upstream discovery.
+          const [selection, rows, discovery] = await Promise.all([
             fetch(`${apiBase}/api/selected-models`, { signal: bounded.signal })
               .then(readJsonOrThrow)
               .then(parseModelSelection),
             fetch(`${apiBase}/api/models`, { signal: bounded.signal })
               .then(readJsonOrThrow)
               .then(parseModelInventory),
+            fetchDiscovery
+              ? fetch(`${apiBase}/api/providers`, { signal: bounded.signal })
+                  .then(readJsonOrThrow)
+                  .then(parseProviderDiscoveryMap)
+              : undefined,
           ]);
-          // Fetch /api/providers after discovery has run inside /api/selected-models + /api/models,
-          // and commit it in the same revision-bound snapshot so discovery status can never lag or
-          // survive a later refresh pass.
-          const discovery = fetchDiscovery
-            ? await fetch(`${apiBase}/api/providers`, { signal: bounded.signal })
-                .then(readJsonOrThrow)
-                .then(parseProviderDiscoveryMap)
-            : undefined;
           if (cancelled) return;
           setModelSnapshot({
             revision: modelRevision,
@@ -544,7 +545,7 @@ export default function ProviderWorkspaceShell({
   const duplicateDisplayNames = useMemo(() => {
     const counts = new Map<string, number>();
     for (const item of allItems) {
-      const label = formatProviderDisplayName(item.name, t);
+      const label = item.displayName || formatProviderDisplayName(item.name, t);
       counts.set(label, (counts.get(label) ?? 0) + 1);
     }
     const dups = new Set<string>();
@@ -796,7 +797,7 @@ export default function ProviderWorkspaceShell({
                         }
                         isDefault={defaultProvider === item.name}
                         showConfigId={duplicateDisplayNames.has(
-                          formatProviderDisplayName(item.name, t),
+                          item.displayName || formatProviderDisplayName(item.name, t),
                         )}
                         onClick={() => onSelect(item.name)}
                         onFocus={() => setRailFocusName(item.name)}

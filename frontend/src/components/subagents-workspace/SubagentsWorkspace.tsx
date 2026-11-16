@@ -35,12 +35,7 @@ import { cn } from "@/lib/utils";
 import { CountPill, Frame, FrameBody, HelpTip } from "../v2-subagents/frame";
 import { iconButton, stepIndicator } from "../v2-subagents/frame-classes";
 import SubagentDelegationSection from "./SubagentDelegationSection";
-import type {
-  DelegationPatch,
-  DelegationModelOption,
-  UltraModePatch,
-  UltraModeState,
-} from "../../pages/use-subagent-delegation";
+import type { DelegationPatch, DelegationModelOption } from "../../pages/use-subagent-delegation";
 
 export interface SubagentsWorkspaceProps {
   available: string[];
@@ -61,15 +56,9 @@ export interface SubagentsWorkspaceProps {
     effort: string;
     efforts: string[];
     available: DelegationModelOption[];
-    guidanceEnabled: boolean;
     syncCodexDefaults: boolean;
     saving: boolean;
     onSave: (patch: DelegationPatch) => void;
-    ultraMode: UltraModeState;
-    ultraSaving: boolean;
-    onUltraModeSave: (patch: UltraModePatch) => void;
-    ultraLoadFailed: boolean;
-    onUltraModeRetry: () => void;
   };
   /** Further settings panels (Claude Code pin, workflow limits) under the delegation panel. */
   settingsExtra?: ReactNode;
@@ -316,15 +305,9 @@ export default function SubagentsWorkspace({
             effort={delegation.effort}
             efforts={delegation.efforts}
             available={delegation.available}
-            guidanceEnabled={delegation.guidanceEnabled}
             syncCodexDefaults={delegation.syncCodexDefaults}
             saving={delegation.saving}
             onSave={delegation.onSave}
-            ultraMode={delegation.ultraMode}
-            ultraSaving={delegation.ultraSaving}
-            onUltraModeSave={delegation.onUltraModeSave}
-            ultraLoadFailed={delegation.ultraLoadFailed}
-            onUltraModeRetry={delegation.onUltraModeRetry}
             fallback={fallback}
             fallbackLoadState={fallbackLoadState}
             fallbackPollMs={fallbackPollMs}

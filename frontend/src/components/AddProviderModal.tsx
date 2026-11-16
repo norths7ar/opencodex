@@ -10,12 +10,8 @@ import { IconX } from "../icons";
 import { useRuntimeCapabilities } from "../runtime-capabilities";
 import { useT } from "../i18n/shared";
 import { useKeyedClientResource } from "../client-resource";
-import {
-  buildProviderPostBody,
-  codexPresetDescriptionKey,
-  isReservedCodexForwardPreset,
-  type ProviderPayload,
-} from "../provider-payload";
+import { channelProtocol, createChannel } from "../channel-management";
+import type { SaveChannel } from "@/contracts/channels";
 import { oauthTosRisk } from "../oauth-tos-risk";
 import OAuthTosWarningModal from "./OAuthTosWarningModal";
 import ProviderCatalog from "./provider-catalog/ProviderCatalog";
@@ -33,7 +29,7 @@ import {
   createInitialAddProviderState,
 } from "./add-provider-modal-reducer";
 
-export type ProviderConfig = ProviderPayload;
+export type ProviderConfig = import("../provider-payload").ProviderPayload;
 
 type Preset = CatalogPreset;
 
@@ -134,15 +130,7 @@ export default function AddProviderModal({
   );
 
   const oauthSupported = oauthPoll.data ?? [];
-  const presets = useMemo(
-    () =>
-      (presetsPoll.data ?? fallbackPresets).map((preset) =>
-        preset.id === "openai" && capabilities?.oauthProviders?.includes("openai")
-          ? { ...preset, auth: "oauth" as const, oauthProvider: "openai" }
-          : preset,
-      ),
-    [presetsPoll.data, fallbackPresets, capabilities],
-  );
+  const presets = presetsPoll.data ?? fallbackPresets;
   const presetsLoading = presetsPoll.loading;
   const usageRank = Object.fromEntries(
     (usagePoll.data?.providers ?? []).map((row) => [row.provider, row.requests]),
@@ -209,12 +197,19 @@ export default function AddProviderModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose, oauthTosPending, notePreset, catalogQuery]);
 
-  const presetDescription = (candidate: Preset): string | undefined => {
-    const key = codexPresetDescriptionKey(candidate);
-    return key ? t(key) : candidate.note;
-  };
+  const presetDescription = (candidate: Preset): string | undefined => candidate.note;
 
-  const choosePreset = (p: Preset) => {
+  const choosePreset = (choice: Preset) => {
+    const p =
+      choice.baseUrlChoices?.length && !choice.baseUrlChoices.some(({ id }) => id === "custom")
+        ? {
+            ...choice,
+            baseUrlChoices: [
+              ...choice.baseUrlChoices,
+              { id: "custom", label: t("modal.endpoint.custom") },
+            ],
+          }
+        : choice;
     const choiceId = matchChoiceId(p.baseUrlChoices, p.baseUrl);
     dispatch({
       type: "choose-preset",
@@ -238,26 +233,45 @@ export default function AddProviderModal({
 
   const submit = async () => {
     if (!form) return;
-    const reserved = preset ? isReservedCodexForwardPreset(preset) : false;
     const resolvedBaseUrl = preset?.baseUrlChoices?.length
       ? resolvedBaseUrlForChoice(preset.baseUrlChoices, endpointChoice, form.baseUrl)
       : form.baseUrl.trim();
-    if (!reserved && !form.name.trim()) {
+    if (!form.name.trim()) {
       dispatch({ type: "set-error", error: t("modal.nameRequired") });
       return;
     }
-    if (!reserved && !resolvedBaseUrl) {
+    if (!resolvedBaseUrl) {
       dispatch({ type: "set-error", error: t("modal.baseUrlRequired") });
       return;
     }
-    if (!reserved && /\{[^}]*\}/.test(resolvedBaseUrl)) {
+    if (/\{[^}]*\}/.test(resolvedBaseUrl)) {
       dispatch({ type: "set-error", error: t("modal.baseUrlPlaceholderError") });
       return;
     }
-    const submitForm = { ...form, baseUrl: resolvedBaseUrl };
-    let postBody: { name: string; provider: ProviderPayload };
+    const id = form.name.trim();
+    let postBody: SaveChannel;
     try {
-      postBody = buildProviderPostBody(preset ?? { id: "custom" }, submitForm);
+      if (form.authMode !== "key" && form.authMode !== "local") {
+        throw new Error("Use the account sign-in flow.");
+      }
+      postBody = {
+        channel: {
+          id,
+          name: preset?.id === id ? preset.label : id,
+          service_id: preset?.serviceId ?? "custom",
+          protocol: channelProtocol(form.adapter.trim()),
+          auth_mode: form.authMode,
+          endpoints: { base_url: resolvedBaseUrl, responses: form.responsesPath?.trim() || null },
+          api_key_transport: form.apiKeyTransport ?? null,
+          models: { default: form.defaultModel.trim() || null },
+          allow_private_network: form.allowPrivateNetwork ?? false,
+          preserve_responses_reasoning_content: form.preserveResponsesReasoningContent ?? null,
+        },
+        credential:
+          form.authMode === "key" && form.apiKey.trim()
+            ? { action: "set_key", value: form.apiKey.trim() }
+            : { action: "keep" },
+      };
     } catch {
       dispatch({ type: "set-error", error: t("modal.invalidPreset") });
       return;
@@ -266,11 +280,7 @@ export default function AddProviderModal({
     dispatch({ type: "set-saving", saving: true });
     dispatch({ type: "set-error", error: "" });
     try {
-      const res = await fetch(`${apiBase}/api/providers`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postBody),
-      });
+      const res = await createChannel(apiBase, postBody);
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string };
         dispatch({
@@ -279,7 +289,7 @@ export default function AddProviderModal({
         });
         return;
       }
-      onAdded(postBody.name);
+      onAdded(id);
     } catch {
       dispatch({ type: "set-error", error: t("modal.networkError") });
     } finally {
@@ -332,7 +342,7 @@ export default function AddProviderModal({
 
   const isCustom = preset?.id === "custom";
   const isLocal = form?.authMode === "local";
-  const isReservedForward = preset ? isReservedCodexForwardPreset(preset) : false;
+  const isReservedForward = false;
 
   return (
     <>
@@ -451,9 +461,16 @@ export default function AddProviderModal({
                 isReservedForward={isReservedForward}
                 presetDescription={presetDescription}
                 onFormChange={(next) => dispatch({ type: "set-form", form: next })}
-                onEndpointChoiceChange={(choice) =>
-                  dispatch({ type: "set-endpoint-choice", choice })
-                }
+                onEndpointChoiceChange={(choice) => {
+                  const previous = preset.baseUrlChoices?.find(
+                    (item) => item.id === endpointChoice,
+                  );
+                  const next = preset.baseUrlChoices?.find((item) => item.id === choice);
+                  if (next?.adapter && form.adapter === (previous?.adapter ?? preset.adapter)) {
+                    dispatch({ type: "set-form", form: { ...form, adapter: next.adapter } });
+                  }
+                  dispatch({ type: "set-endpoint-choice", choice });
+                }}
                 onSubmit={() => {
                   void submit();
                 }}

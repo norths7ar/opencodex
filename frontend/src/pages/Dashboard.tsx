@@ -5,7 +5,6 @@ import { IconAlert } from "../icons";
 import { Trans } from "../i18n/provider";
 import { navigateHash } from "../hash-routing";
 import { EmptyState, Notice } from "../ui";
-import { DashboardDialogs } from "./dashboard-dialogs";
 import { DashboardModelsSection } from "./dashboard-models-section";
 import { DashboardOverviewSection } from "./dashboard-overview-section";
 import { DashboardProvidersSection } from "./dashboard-providers-section";
@@ -99,7 +98,6 @@ export default function Dashboard({
       )}
     </>
   );
-  const updateDialog = <DashboardDialogs {...d} />;
 
   const sections: { id: DashboardSection; label: string; body: ReactNode }[] = [
     { id: "overview", label: t("dash.workspace.overview"), body: overviewSection },
@@ -160,7 +158,6 @@ export default function Dashboard({
         )}
         {d.overviewBlocked ? unavailable : selected.body}
       </section>
-      {!d.overviewBlocked && updateDialog}
     </div>
   );
 }

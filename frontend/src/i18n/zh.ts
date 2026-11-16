@@ -688,16 +688,13 @@ export const zh: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "同时保存为 Codex 默认值",
   "dash.syncCodexSubagentDefaultsHint":
     "将此选择同步到 Codex，供新任务使用；下次同步或重启后生效。",
-  "dash.multiAgentGuidance": "告诉 Codex 怎么分工",
-  "dash.multiAgentGuidanceHint":
-    "给 Codex 附上一张短便条，说明怎么把活分给子代理。v2 会告诉它可用的模型和优先模型；v1 只在推理强度为 max 或 ultra 时才起作用。关闭则不附任何便条。",
   "dash.injectionNone": "无",
   "dash.injectionEffortLabel": "推理强度",
   "dash.injectionEffortNone": "模型默认",
-  "dash.effortCapLabel": "V2 ultra 推理强度限制",
-  "dash.subagentEffortCapLabel": "V2 子代理推理强度限制",
+  "dash.effortCapLabel": "协作推理强度上限",
+  "dash.subagentEffortCapLabel": "子代理推理强度上限",
   "dash.effortCapHelp":
-    "限制 V2 ultra 请求的推理强度。子代理上限单独作用于子任务，实际档位取模型支持且不高于上限的值。",
+    "限制协作请求的推理强度。派生的子代理还受其自身上限约束。模型使用不超过上限的最高支持档位。",
   "dash.effortCapNone": "无上限",
   "dash.maintenance": "维护",
   "dash.maintenanceHint": "刷新 Codex 模型目录，或安装新的 opencodex 版本。",
@@ -783,15 +780,6 @@ export const zh: Record<TKey, string> = {
     "如需用于其他客户端或无人值守的自动化，请改为配置 Anthropic API 密钥。",
   "oauthTos.anthropicAcknowledge": "我了解这是经由第三方的订阅连接，并会查阅适用条款。",
   "oauthTos.anthropicContinue": "使用 Claude 订阅继续",
-  "subagentSurface.selectionTitle": "将子代理界面切换到 {mode}？",
-  "subagentSurface.selectionBody":
-    "在 {mode} 下，使用 v2 界面的 ChatGPT 模型（base 上是 Sol 和 Terra，v2 上是所有模型）会把任务以 ChatGPT 后端的加密形式交给 Grok、Claude 等路由模型，路由模型无法读取。在上游修复之前，这种委托会以 unreadable_encrypted_agent_task 失败。v1 可以可靠地跨提供方委托。",
-  "subagentSurface.advisoryTitle": "v1 现在是默认子代理界面",
-  "subagentSurface.advisoryBody":
-    "此安装当前使用 {mode}，v2 界面上的 ChatGPT 模型会把无法读取的加密任务交给路由模型，跨提供方委托因此失败。在上游修复之前建议使用 v1。在你做出选择之前，当前设置保持不变。",
-  "subagentSurface.continue": "继续",
-  "subagentSurface.switchToV1": "切换到 v1",
-  "subagentSurface.learnMore": "为什么失败",
   "prov.logoutOk": "已退出 {provider}。",
   "prov.logoutFail": "无法退出 {provider}。账户状态保持不变。",
   "prov.removed": '已移除 "{name}"。',
@@ -912,21 +900,7 @@ export const zh: Record<TKey, string> = {
   "models.capSaveFailed": "保存上下文限制失败",
   "models.contextCapped": "350k 限制",
   "models.contextCapLabel": "默认上下文窗口",
-  "models.v2Label": "子代理",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "所有模型 → v1 界面",
-  "models.v2ModeDesc_default": "上游默认值 (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "所有模型 → v2 界面",
-  "models.keepNativeOnV1": "ChatGPT 保持 v1",
-  "models.keepNativeOnV1Hint":
-    "让 ChatGPT 主代理使用 v1，以便向网关模型委派任务。网关主代理仍使用 v2。",
-  "models.v2Help":
-    "v1 使用经典代理工具；base 遵循各模型默认设置；v2 启用 spawn_agent 多线程委派。更改对新会话生效。ChatGPT 需要向网关模型委派时，可启用“保持 ChatGPT 使用 v1”。",
-  "models.v2DocsLink": "v1 / v2 是什么？",
-  "dash.multiAgent": "子代理",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads 仍存在 — codex 将拒绝启动，请从 config.toml 移除",
   "models.v2Applied": "子代理模式已更新 — 新会话生效（重启 Codex 应用以刷新选择器）",
@@ -1084,7 +1058,6 @@ export const zh: Record<TKey, string> = {
   "sub.subtitle":
     "Codex 的 {cmd} 仅将优先级最高的前 5 个模型作为覆盖项公开。在此最多选择 5 个 — 原生 gpt 或已路由模型 — opencodex 会设置它们的目录优先级，使其正好排在前面。其他模型仍可按确切名称调用；此设置仅控制显示项。",
   "sub.featured": "精选",
-  "sub.advanced": "高级",
   "sub.orderHintAria": "此顺序的用途",
   "sub.orderHint":
     "设置 Codex 模型选择器的前五项，以及 {cmd} 的优先模型。空余位置按模型目录顺序补齐。",
@@ -1112,16 +1085,6 @@ export const zh: Record<TKey, string> = {
   "sub.workspace.selectModelDesc":
     "从列表中选择一个模型以查看详情，并将其设为 spawn_agent 的精选模型。",
   "sub.workspace.selector": "公开选择器",
-  "sub.ultraMode": "始终主动委派",
-  "sub.ultraModeHint":
-    "为所有模型和推理力度启用主动多代理委派策略（不改变推理力度本身）。将 features.multi_agent_v2.multi_agent_mode_hint_text 写入 config.toml。",
-  "sub.ultraModeV2Required":
-    "需要 v2 多代理表面 — 请先启用 multi_agent_v2，并在子代理模式控件中选择 v2。",
-  "sub.ultraModeText": "主动委派文本",
-  "sub.ultraModePreset": "恢复预设",
-  "sub.ultraModeLoadFail": "无法加载主动委派设置 — 代理是否在运行？",
-  "sub.ultraModeSaveFail": "保存主动委派设置失败",
-  "sub.ultraModeSaved": "主动委派设置已保存。适用于新的 Codex 会话。",
 
   // logs
   "logs.title": "请求日志",
@@ -3396,8 +3359,11 @@ export const zh: Record<TKey, string> = {
   "modal.getApiKey": "获取 {label} API 密钥",
   "modal.apiKey": "API 密钥",
   "modal.apiKeyTransport": "API 密钥请求头",
+  "modal.apiKeyTransportAuto": "协议默认",
   "modal.apiKeyTransportNative": "x-api-key（Anthropic 原生）",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.useEnvironmentKey": "从环境变量读取 API 密钥",
+  "modal.environmentKeyPlaceholder": "变量名，例如 OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-…（或 $ENV_VAR）",
   "modal.defaultModelPlaceholder": "例如 gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
@@ -3648,12 +3614,6 @@ export const zh: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "保存回退设置失败",
   "sub.fallbackUnavailable": "当前未列出，仍保留在回退链中。",
   "sub.fallbackPollInvalid": "请输入 5000 到 600000 ms 之间的整数。",
-  "sub.v2Compatibility.title": "原生父代理的 V2 兼容性",
-  "sub.v2Compatibility.risk":
-    "原生 ChatGPT 父代理通过 V2 委派给此路由模型时，任务可能被加密并在执行前失败。路由父代理发送的可读任务不受影响。",
-  "sub.v2Compatibility.recoveryUnknown":
-    "此服务器未提供恢复功能的启用或适用状态。请使用 V1/明文兼容委派，或仅在符合条件时启用实验性 V2 恢复。恢复会增加配额消耗、延迟、后端依赖及保真度损失风险，并不修复上游协议。",
-  "sub.v2Compatibility.details": "兼容性详情",
   "dash.syncModelsHint": "按已连接的提供商重写 Codex 的模型目录。",
   "dash.syncRun": "立即同步",
   "dash.visionAdvanced": "高级设置",

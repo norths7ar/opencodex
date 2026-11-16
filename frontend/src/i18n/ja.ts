@@ -745,16 +745,13 @@ export const ja: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Codex の既定値としても保存",
   "dash.syncCodexSubagentDefaultsHint":
     "オンにすると、上で選んだモデルが Codex 自身の設定にも保存され、新しいタスクも最初からそのモデルを使います。オフならここだけで記憶します。反映は次回の同期または再起動時で、自分で書いた [agents] 設定はそのまま残ります。",
-  "dash.multiAgentGuidance": "作業の分け方を伝える",
-  "dash.multiAgentGuidanceHint":
-    "「作業はこう分けて任せる」という短いメモを Codex に送ります。v2 では使えるモデルと優先モデルを伝え、v1 では推論強度が max か ultra のときだけ働きます。オフならメモは付きません。",
   "dash.injectionNone": "なし",
   "dash.injectionEffortLabel": "推論負荷",
   "dash.injectionEffortNone": "モデル既定",
-  "dash.effortCapLabel": "V2 ultra 推論上限",
-  "dash.subagentEffortCapLabel": "V2 サブエージェント推論上限",
+  "dash.effortCapLabel": "協調時の推論上限",
+  "dash.subagentEffortCapLabel": "子エージェントの推論上限",
   "dash.effortCapHelp":
-    "V2 ultra モードのターンの推論負荷を制限します。設定すると、(ultra モードからの)最大負荷リクエストは選択したレベルに制限されます。サブエージェント上限は生成された子エージェントにのみ適用されます。上限は負荷を下げるだけで上げることはありません。モデルが制限レベルをサポートしない場合、最も近いサポートレベルに切り下げられます。",
+    "協調リクエストの推論強度を制限します。子エージェントには個別の上限も適用されます。モデルは上限以下で最も近い対応レベルを使います。",
   "dash.effortCapNone": "上限なし",
   "dash.maintenance": "メンテナンス",
   "dash.maintenanceHint":
@@ -842,15 +839,6 @@ export const ja: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "これがサードパーティ経由のサブスクリプション接続であることを理解し、適用される規約を確認します。",
   "oauthTos.anthropicContinue": "Claude サブスクリプションで続行",
-  "subagentSurface.selectionTitle": "サブエージェントサーフェスを {mode} に切り替えますか?",
-  "subagentSurface.selectionBody":
-    "{mode} では、v2 サーフェスを使う ChatGPT モデル（base では Sol と Terra、v2 ではすべてのモデル）が、タスクを ChatGPT バックエンド向けに暗号化したまま Grok や Claude などの routed モデルに渡し、routed モデルはそれを読めません。上流で修正されるまで、この委任は unreadable_encrypted_agent_task で失敗します。v1 ならプロバイダーをまたいで確実に委任できます。",
-  "subagentSurface.advisoryTitle": "v1 がデフォルトのサブエージェントサーフェスになりました",
-  "subagentSurface.advisoryBody":
-    "このインストールは {mode} で動作しており、v2 サーフェス上の ChatGPT モデルが、routed モデルに読めない暗号化タスクを渡すため、プロバイダーをまたぐ委任が壊れます。上流で修正されるまで v1 を推奨します。選ぶまで現在の設定は変わりません。",
-  "subagentSurface.continue": "続行",
-  "subagentSurface.switchToV1": "v1 に切り替え",
-  "subagentSurface.learnMore": "失敗する理由",
   "prov.logoutOk": "{provider} からログアウトしました。",
   "prov.logoutFail":
     "{provider} からログアウトできませんでした。アカウント状態は変更されていません。",
@@ -987,21 +975,7 @@ export const ja: Record<TKey, string> = {
   "models.capSaveFailed": "コンテキスト上限の保存に失敗しました",
   "models.contextCapped": "350k 上限",
   "models.contextCapLabel": "デフォルトウィンドウ / 上限",
-  "models.v2Label": "サブエージェント",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "v1 / v2 とは?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "ベース",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "すべてのモデル → v1 サーフェス",
-  "models.v2ModeDesc_default": "上流のデフォルト(sol/terra=v2、luna=v1)",
-  "models.v2ModeDesc_v2": "すべてのモデル → v2 サーフェス",
-  "models.keepNativeOnV1": "ChatGPT を v1 のまま",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT ネイティブの親は v2 子タスクを暗号化するため、Grok や Claude は読めません。Sol/Terra から routed モデルを spawn するならオンのまま。routed 親は v2 のままです。",
-  "models.v2Help":
-    "すべてのモデルのマルチエージェントサーフェスを制御します。\n\nv1: クラシックな単一スレッドエージェント。すべてのモデルが v1 コラボサーフェスを使います。\nベース: 上流のデフォルト — sol/terra は v2、luna は v1、それ以外は codex のフィーチャーフラグに従います。\nv2: spawn_agent を備えたマルチスレッドエージェント。すべてのモデルが v2 コラボサーフェスを使います。\n\nv2 では「ChatGPT を v1 のまま」にすると Sol/Terra が v1 に留まり、Grok や Claude を spawn できます。ChatGPT は v2 子タスクを暗号化するため routed モデルは読めません。routed 親は v2 のままです。\n\n変更は新規セッションに適用されます。",
-  "dash.multiAgent": "サブエージェント",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads が設定されています — codex は起動を拒否します; config.toml から削除してください",
   "models.v2Applied":
@@ -1096,7 +1070,6 @@ export const ja: Record<TKey, string> = {
   "sub.subtitle":
     "Codex の {cmd} は最初の 5 モデル(優先度順)のみをオーバーライドとして通知します。ここで最大 5 つを選んでください — ネイティブ gpt またはルーティング — opencodex がカタログ優先度を設定し、これらが先頭に来るようにします。他のモデルも正確な名前で呼び出し可能です; これは表示のみを制御します。",
   "sub.featured": "おすすめ",
-  "sub.advanced": "詳細設定",
   "sub.orderHintAria": "この順序の使われ方",
   "sub.orderHint":
     "ここでの表示順が Codex モデルピッカーの上位 1〜5 番目の位置と {cmd} のデフォルトモデル候補を決定します。モデルピッカーに表示される注目モデルが 5 つ未満の場合、残りの枠にはカタログの優先度順にモデルが提示されます。表示される注目モデルが 5 つあればリストが埋まりますが、モデルピッカーのカスタム順序でカタログの優先度が変わる場合は例外です。",
@@ -1124,18 +1097,6 @@ export const ja: Record<TKey, string> = {
   "sub.workspace.selectModelDesc":
     "一覧からモデルを選んで詳細を確認し、spawn_agent のおすすめに設定します。",
   "sub.workspace.selector": "公開セレクター",
-  "sub.ultraMode": "常時プロアクティブ委任",
-  "sub.ultraModeHint":
-    "すべてのモデルと reasoning effort で Proactive マルチエージェント委任ポリシーを有効にします（reasoning effort 自体は変更しません）。config.toml に features.multi_agent_v2.multi_agent_mode_hint_text を書き込みます。",
-  "sub.ultraModeV2Required":
-    "v2 マルチエージェントサーフェスが必要です — 先に multi_agent_v2 を有効にし、サブエージェントモードで v2 を選択してください。",
-  "sub.ultraModeText": "プロアクティブ委任テキスト",
-  "sub.ultraModePreset": "プリセットを復元",
-  "sub.ultraModeLoadFail":
-    "プロアクティブ委任設定を読み込めませんでした — プロキシは実行中ですか？",
-  "sub.ultraModeSaveFail": "プロアクティブ委任設定の保存に失敗しました",
-  "sub.ultraModeSaved":
-    "プロアクティブ委任設定を保存しました。新しい Codex セッションから適用されます。",
 
   // logs
   "logs.title": "リクエストログ",
@@ -2092,6 +2053,9 @@ export const ja: Record<TKey, string> = {
   "modal.apiKeyTransport": "API キーヘッダー",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic 標準)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "プロトコルの既定値",
+  "modal.useEnvironmentKey": "環境変数から API キーを読み込む",
+  "modal.environmentKeyPlaceholder": "変数名（例: OPENAI_API_KEY）",
   "modal.apiKeyPlaceholder": "sk-… (または $ENV_VAR)",
   "modal.defaultModelPlaceholder": "例: gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
@@ -3966,12 +3930,6 @@ export const ja: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "フォールバック設定の保存に失敗しました",
   "sub.fallbackUnavailable": "現在の一覧にはありませんが、チェーンに保持されます。",
   "sub.fallbackPollInvalid": "5000〜600000 ms の整数を入力してください。",
-  "sub.v2Compatibility.title": "ネイティブ親の V2 互換性",
-  "sub.v2Compatibility.risk":
-    "ネイティブ ChatGPT 親が V2 でこのルーティングモデルに委任すると、タスクが暗号化され実行前に失敗する場合があります。ルーティング親からの読み取り可能なタスクは影響を受けません。",
-  "sub.v2Compatibility.recoveryUnknown":
-    "このサーバーは復旧の有効状態や適格性を公開していません。V1・平文互換の委任を使うか、適格な場合のみ実験的 V2 復旧を有効にしてください。復旧にはクォータ、遅延、バックエンド依存、忠実度低下の可能性があり、上流プロトコルは修正されません。",
-  "sub.v2Compatibility.details": "互換性の詳細",
   "dash.syncModelsHint": "接続済みのプロバイダーをもとに Codex のモデルカタログを書き直します。",
   "dash.syncRun": "今すぐ同期",
   "dash.visionAdvanced": "詳細設定",

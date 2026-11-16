@@ -1,4 +1,4 @@
-import type { QuotaFailureCode } from "../../../../backend/src/providers/quota-types";
+import type { QuotaFailureCode } from "@/contracts/quota-failure";
 /**
  * provider-workspace/types.ts — shared view-model types for the Providers
  * workspace shell/rail/detail (WP080a). Data shapes only; no React.
@@ -121,7 +121,7 @@ export interface ProviderAuthHandlers {
   onAccountPoolThreshold?: (provider: string, threshold: number) => void | Promise<boolean>;
   onRemoveAccount: (provider: string, account: OAuthAccountRow) => void | Promise<void>;
   onRetryAccounts?: (provider: string) => void | Promise<void>;
-  onAddApiKey: (provider: string, key: string) => Promise<boolean>;
+  onAddApiKey: (provider: string, key: string, source?: "key" | "environment") => Promise<boolean>;
   onSwitchApiKey: (provider: string, entry: ApiKeyRow) => void | Promise<void>;
   onRemoveApiKey: (provider: string, entry: ApiKeyRow) => void | Promise<void>;
   onEditAlias: (

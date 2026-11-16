@@ -140,6 +140,7 @@ const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
   "ollama-cloud": "Ollama Cloud",
   xai: "xAI Grok",
   "mimo-free": "MiMo Free",
+  mimo: "MiMo",
   xiaomi: "Xiaomi",
   cursor: "Cursor",
   deepseek: "DeepSeek",
@@ -339,6 +340,12 @@ export function providerIconPaint(src: string | undefined): ProviderIconPaint {
   if (PLATED_PROVIDER_ICONS.has(file)) return "plate";
   if (DARK_PLATED_PROVIDER_ICONS.has(file)) return "dark-plate";
   return "image";
+}
+
+/** Service IDs distinguish API and OAuth even when a channel's ID does not. */
+export function providerServiceDisplayName(serviceId: string): string | undefined {
+  const key = serviceId === "openai" ? "openai-apikey" : serviceId;
+  return Object.hasOwn(PROVIDER_DISPLAY_NAMES, key) ? PROVIDER_DISPLAY_NAMES[key] : undefined;
 }
 
 /** Display label with proper brand casing when known; otherwise original name. */

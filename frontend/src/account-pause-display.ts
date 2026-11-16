@@ -1,4 +1,3 @@
-import type { AccountPauseReason } from "../../backend/src/types/account-auto-pause";
 import type { Locale, TFn, TKey } from "./i18n/shared";
 
 const REASON_KEYS = {
@@ -7,7 +6,7 @@ const REASON_KEYS = {
   subscription_inactive: "accountPause.reason.subscriptionInactive",
   subscription_expired: "accountPause.reason.subscriptionExpired",
   plan_downgraded: "accountPause.reason.planDowngraded",
-} satisfies Record<AccountPauseReason, TKey>;
+} satisfies Record<string, TKey>;
 
 /** Display fixed reason labels and timestamps in the selected dashboard language. */
 export function formatAccountPauseTooltip(
@@ -16,7 +15,7 @@ export function formatAccountPauseTooltip(
   details: { reason: string; pausedAt: number },
 ): string {
   const reason = Object.hasOwn(REASON_KEYS, details.reason)
-    ? t(REASON_KEYS[details.reason as AccountPauseReason])
+    ? t(REASON_KEYS[details.reason as keyof typeof REASON_KEYS])
     : t("codexAuth.paused");
   const date = new Date(details.pausedAt);
   return Number.isNaN(date.getTime())

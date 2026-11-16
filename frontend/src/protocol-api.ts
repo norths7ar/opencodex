@@ -7,14 +7,14 @@
  * than half-rendered. An older server that does not have the routes answers 404, which turns
  * the preview off quietly instead of showing an error.
  */
-import { isProtocol, type Protocol } from "../../backend/src/protocols/contract";
+import { isProtocol, type Protocol } from "@/contracts/protocol/contract";
 import {
   isProtocolPlanV1,
   isProtocolProviderSummaryV1,
   type ProtocolPlanV1,
   type ProtocolProviderSummaryV1,
-} from "../../backend/src/protocols/dto";
-import { isProtocolFeature, type ProtocolFeature } from "../../backend/src/protocols/features";
+} from "@/contracts/protocol/dto";
+import { isProtocolFeature, type ProtocolFeature } from "@/contracts/protocol/features";
 
 export interface ProtocolPlanQuery {
   model: string;

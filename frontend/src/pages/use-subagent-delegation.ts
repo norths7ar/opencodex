@@ -13,39 +13,12 @@ import { normalizeInjectionSelection } from "./dashboard-core-poll";
 export type DelegationModelOption = { provider: string; model: string; namespaced: string };
 
 export type DelegationPatch = {
-  multiAgentGuidanceEnabled?: boolean;
   syncCodexSubagentDefaults?: boolean;
   model?: string | null;
   effort?: string | null;
 };
 
-/** Ultra mode (Proactive delegation for every model/effort) via /api/v2. */
-export type UltraModeHintRecommendation = {
-  text: string;
-  revision: string;
-};
-
-export type UltraModeState = {
-  loaded?: boolean;
-  keepNativeChatGptOnV1?: boolean;
-  enabled: boolean;
-  hintText: string | null;
-  recommendation: UltraModeHintRecommendation | null;
-  multiAgentV2Enabled: boolean;
-  /** The raw multi-agent mode; Subagents renders the v1/base/v2 switch from it. */
-  multiAgentMode: "v1" | "default" | "v2";
-};
-
-export type UltraModePatch = {
-  multiAgentModeHintText?: string | null;
-  /** The v1/base/v2 switch. Models owns the catalog-side copy; this is the delegation-side one. */
-  multiAgentMode?: "v1" | "default" | "v2";
-  /** Answers the one-time surface advisory in the same request as a mode change. */
-  multiAgentSurfaceAdvisoryAcknowledged?: true;
-};
-
 type DelegationResponse = {
-  multiAgentGuidanceEnabled?: boolean;
   syncCodexSubagentDefaults?: boolean;
   model?: string | null;
   effort?: string | null;
@@ -54,18 +27,15 @@ type DelegationResponse = {
 };
 
 export function useSubagentDelegation(apiBase: string) {
-  const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [model, setModel] = useState("");
   const [effort, setEffort] = useState("");
   const [efforts, setEfforts] = useState<string[]>([]);
   const [available, setAvailable] = useState<DelegationModelOption[]>([]);
-  const [guidanceEnabled, setGuidanceEnabled] = useState(true);
   const [syncCodexDefaults, setSyncCodexDefaults] = useState(false);
 
   const apply = useCallback((data: DelegationResponse) => {
     const normalized = normalizeInjectionSelection(data);
-    setGuidanceEnabled(normalized.multiAgentGuidanceEnabled);
     setSyncCodexDefaults(normalized.syncCodexSubagentDefaults);
     setModel(normalized.injectionModel);
     setEffort(normalized.injectionEffort);
@@ -83,8 +53,6 @@ export function useSubagentDelegation(apiBase: string) {
         apply(data);
       } catch {
         /* keep defaults; the panel still renders and can be retried by saving */
-      } finally {
-        if (!cancelled) setLoaded(true);
       }
     })();
     return () => {
@@ -117,13 +85,11 @@ export function useSubagentDelegation(apiBase: string) {
   );
 
   return {
-    loaded,
     saving,
     model,
     effort,
     efforts,
     available,
-    guidanceEnabled,
     syncCodexDefaults,
     save,
   };

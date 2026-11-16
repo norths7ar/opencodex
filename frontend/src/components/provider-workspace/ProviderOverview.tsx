@@ -1,8 +1,5 @@
 import { authStatusCopy } from "../../provider-workspace/auth-status";
-import {
-  anthropicInstanceRowShapeMatches,
-  isAnthropicInstanceId,
-} from "../../../../backend/src/providers/anthropic-instance-id";
+import { isLegacyAnthropicAccountRow } from "@/contracts/legacy-account-privacy";
 /**
  * ProviderOverview — 2-column layout: left (CONNECTION + Auth summary) / right
  * (STATS + Notes). Phase 030 of workspace design parity.
@@ -296,10 +293,7 @@ export default function ProviderOverview({
                       count: configuredModels.length || availableModels.length,
                     })
                   : t("pws.firstResponse.modelsEmpty");
-  const displayEmail =
-    isAnthropicInstanceId(item.name) && anthropicInstanceRowShapeMatches(item.name, item)
-      ? undefined
-      : oauthEmail;
+  const displayEmail = isLegacyAnthropicAccountRow(item.name, item) ? undefined : oauthEmail;
   const openModelsAction = onOpenModelsTab ?? onOpenModels;
   const fixCredentialsAction = onOpenAccounts ?? onEditSettings;
 

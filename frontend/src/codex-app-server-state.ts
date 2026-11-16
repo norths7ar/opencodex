@@ -1,5 +1,5 @@
-import type { CodexAppServerStateResponse } from "../../backend/src/lib/codex-restart-contract";
-import { isCodexAppServerStateResponse } from "../../backend/src/lib/codex-restart-contract";
+import type { CodexAppServerStateResponse } from "@/contracts/codex-restart";
+import { isCodexAppServerStateResponse } from "@/contracts/codex-restart";
 
 export interface AppServerStateOutcome {
   /** Null means "render nothing" — never a guess about what Codex is showing. */

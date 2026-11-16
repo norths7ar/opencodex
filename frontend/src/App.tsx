@@ -1,18 +1,15 @@
+import LiteStorage from "./pages/LiteStorage";
 import MigrationNotice from "./components/MigrationNotice";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useKeyedClientResource } from "./client-resource";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
-import SetupHub from "./pages/SetupHub";
-import AdvancedHub from "./pages/AdvancedHub";
 import Providers from "./pages/Providers";
 import Models from "./pages/Models";
 import Subagents from "./pages/Subagents";
 import Logs from "./pages/Logs";
 import Usage from "./pages/Usage";
-import Storage from "./pages/Storage";
-import CodexSet from "./pages/CodexSet";
 import Integrations from "./pages/Integrations";
 import Startup from "./pages/Startup";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -189,7 +186,7 @@ export default function App() {
       return response.json();
     },
   );
-  const available = !capabilities.data || capabilities.data.pages.includes(shellPageFor(page));
+  const available = capabilities.data?.pages.includes(page) === true;
   useEffect(() => {
     if (capabilities.data?.runtime === "python" && openedWithoutRoute.current) {
       openedWithoutRoute.current = false;
@@ -199,19 +196,13 @@ export default function App() {
   // The sidebar row that owns this page, and the members its switcher may offer.
   const activeGroup = groupForPage(page);
   const sidebarPageAvailable = useCallback(
-    (candidate: Page) =>
-      !capabilities.data ||
-      (candidate === "claude"
-        ? capabilities.data.clients.includes("claude")
-        : capabilities.data.pages.includes(candidate)),
+    (candidate: Page) => capabilities.data?.pages.includes(candidate) === true,
     [capabilities.data],
   );
   const sectionPages = activeGroup
     ? visibleGroupPages(activeGroup).filter(sidebarPageAvailable)
     : [];
-  // Claude is a tab inside Connect: both pages render one Integrations shell under one
-  // boundary, so moving between Claude and another Connect tab keeps drafts and focus.
-  const shellPage: Page = page === "claude" ? "integrations" : page;
+  const shellPage = page;
 
   // Narrow screens: the sidebar becomes an off-canvas drawer behind a hamburger toggle.
   const [navOpen, setNavOpen] = useState(false);
@@ -688,10 +679,6 @@ export default function App() {
                             reloadingCodex={codexRestarting}
                           />
                         )}
-                        {page === "setup" && (
-                          <SetupHub apiBase={sharedBase} navigate={navigateToPage} />
-                        )}
-                        {page === "advanced" && <AdvancedHub navigate={navigateToPage} />}
                         {page === "dashboard" && (
                           <Dashboard apiBase={sharedBase} refreshEpoch={sharedSessionEpoch} />
                         )}
@@ -711,9 +698,8 @@ export default function App() {
 
                         {page === "logs" && <Logs apiBase={sharedBase} />}
                         {page === "usage" && <Usage apiBase={sharedBase} />}
-                        {page === "storage" && <Storage apiBase={sharedBase} />}
+                        {page === "storage" && <LiteStorage apiBase={sharedBase} />}
 
-                        {page === "codex-set" && <CodexSet apiBase={sharedBase} />}
                         {shellPage === "integrations" && <Integrations apiBase={sharedBase} />}
                       </>
                     )}
@@ -726,8 +712,4 @@ export default function App() {
       </div>
     </RuntimeCapabilitiesContext.Provider>
   );
-}
-
-function shellPageFor(page: Page): Page {
-  return page === "claude" ? "integrations" : page;
 }

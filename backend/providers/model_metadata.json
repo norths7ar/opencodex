@@ -1,0 +1,600 @@
+{
+  "https://api.openai.com/v1": {
+    "defaults": {},
+    "models": {
+      "gpt-5.6": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-sol": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-terra": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-luna": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-sol-pro": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-terra-pro": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.6-luna-pro": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000
+      },
+      "gpt-5.5": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "maxInputTokens": 922000
+      },
+      "daybreak-red-latest": {
+        "contextWindow": 400000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [],
+        "maxInputTokens": 272000
+      },
+      "daybreak-blue-latest": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [],
+        "maxInputTokens": 922000
+      },
+      "gpt-6-astra": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000,
+        "maxOutputTokens": 128000
+      },
+      "gpt-6.1-sol": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000,
+        "maxOutputTokens": 128000
+      },
+      "gpt-6.1-terra": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "none",
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000,
+        "maxOutputTokens": 128000
+      },
+      "gpt-6-sol": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000,
+        "maxOutputTokens": 128000
+      },
+      "gpt-6-luna": {
+        "contextWindow": 1050000,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "maxInputTokens": 922000,
+        "maxOutputTokens": 128000
+      }
+    }
+  },
+  "https://opencode.ai/zen/go/v1": {
+    "defaults": {},
+    "models": {
+      "kimi-k3": {
+        "contextWindow": 262144,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ],
+        "defaultReasoningEffort": "max"
+      },
+      "deepseek-v4.1-flash": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash-vision-exp": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "muse-spark-1.3-contributor": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "muse-spark-1.2-contributor": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "glm-5.3-flash": {
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "gpt-5.6-luna": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "gemini-4-argon-contributor": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "grok-4.6": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "defaultReasoningEffort": "high"
+      },
+      "grok-4.7": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "defaultReasoningEffort": "high"
+      },
+      "glm-5.3": {
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "glm-5.2": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "qwen3.8-max": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "xhigh"
+        ]
+      },
+      "kimi-k2.7-code": {
+        "reasoningEfforts": []
+      },
+      "kimi-k2.7-code-highspeed": {
+        "reasoningEfforts": []
+      },
+      "mimo-v2.5": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "mimo-v2.5-pro": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "glm-5": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "glm-5.1": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "mimo-v2.6-pro": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "mimo-v2.6-flash": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "qwen3.5-plus": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "qwen3.6-plus": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "qwen3.7-max": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "qwen3.7-plus": {
+        "reasoningEfforts": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash": {
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      }
+    }
+  },
+  "https://api.deepseek.com": {
+    "defaults": {},
+    "models": {
+      "deepseek-flash": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash": {
+        "contextWindow": 1048576,
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-pro": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text"
+        ],
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash-vision-exp": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      }
+    }
+  },
+  "https://opencode.ai/zen/v1": {
+    "defaults": {},
+    "models": {
+      "deepseek-v4-flash-vision-exp": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "mimo-v2.5-free": {
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "longcat-2.0-free": {
+        "inputModalities": [
+          "text",
+          "image"
+        ]
+      },
+      "deepseek-v4.1-flash": {
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash": {
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      },
+      "deepseek-v4-flash-free": {
+        "reasoningEfforts": [
+          "low",
+          "high",
+          "max"
+        ]
+      }
+    }
+  },
+  "https://api.xiaomimimo.com/v1": {
+    "defaults": {
+      "reasoningEfforts": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "models": {
+      "mimo-v2.6-pro": {
+        "supportsReasoning": true,
+        "supportsThinkingToggle": true,
+        "supportsReasoningEffort": false,
+        "defaultThinkingEnabled": true
+      },
+      "mimo-v2.6-flash": {
+        "supportsReasoning": true,
+        "supportsThinkingToggle": true,
+        "supportsReasoningEffort": false,
+        "defaultThinkingEnabled": true
+      },
+      "mimo-v2.6-pro-ultraspeed": {
+        "supportsReasoning": true,
+        "supportsThinkingToggle": true,
+        "supportsReasoningEffort": false,
+        "defaultThinkingEnabled": true
+      }
+    }
+  },
+  "https://token-plan-cn.xiaomimimo.com/v1": {
+    "defaults": {
+      "reasoningEfforts": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "models": {
+      "mimo-v2.6-pro": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "maxOutputTokens": 131072
+      },
+      "mimo-v2.6-flash": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "maxOutputTokens": 131072
+      },
+      "mimo-v2.5-pro": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text"
+        ],
+        "maxOutputTokens": 131072
+      },
+      "mimo-v2.5": {
+        "contextWindow": 1048576,
+        "inputModalities": [
+          "text",
+          "image"
+        ],
+        "maxOutputTokens": 131072
+      }
+    }
+  }
+}

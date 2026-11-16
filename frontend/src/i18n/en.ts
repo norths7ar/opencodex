@@ -749,16 +749,13 @@ export const en = {
   "dash.syncCodexSubagentDefaults": "Also save as a Codex default",
   "dash.syncCodexSubagentDefaultsHint":
     "Sync this choice to Codex for new tasks. Applies on the next sync or restart.",
-  "dash.multiAgentGuidance": "Tell Codex how to split work",
-  "dash.multiAgentGuidanceHint":
-    "Sends a short note telling Codex how to hand work to sub-agents. On v2 it names the models it may use and which to prefer; on v1 it only applies at max or ultra reasoning effort. Off, no note is added.",
   "dash.injectionNone": "None",
   "dash.injectionEffortLabel": "Reasoning effort",
   "dash.injectionEffortNone": "Model default",
-  "dash.effortCapLabel": "V2 ultra effort limit",
-  "dash.subagentEffortCapLabel": "V2 sub-agent effort limit",
+  "dash.effortCapLabel": "Collaboration effort limit",
+  "dash.subagentEffortCapLabel": "Child-agent effort limit",
   "dash.effortCapHelp":
-    "Caps reasoning effort for V2 ultra requests. The subagent cap applies to child agents. Models use the nearest supported level at or below the cap.",
+    "Caps reasoning effort for collaborative requests. Spawned child agents also follow their own limit. Models use the nearest supported effort at or below the cap.",
   "dash.effortCapNone": "No cap",
   "dash.maintenance": "Maintenance",
   "dash.maintenanceHint": "Refresh Codex's model catalog or install a newer opencodex release.",
@@ -851,15 +848,6 @@ export const en = {
   "oauthTos.anthropicAcknowledge":
     "I understand this is a third-party subscription connection and will check the applicable terms.",
   "oauthTos.anthropicContinue": "Continue with Claude subscription",
-  "subagentSurface.selectionTitle": "Switch the sub-agent surface to {mode}?",
-  "subagentSurface.selectionBody":
-    "On {mode}, ChatGPT models that use the v2 surface — Sol and Terra on base, every model on v2 — hand their task to a routed model such as Grok or Claude encrypted for the ChatGPT backend, and the routed model cannot read it. That delegation fails with unreadable_encrypted_agent_task until it is fixed upstream. v1 delegates across providers reliably.",
-  "subagentSurface.advisoryTitle": "v1 is now the default sub-agent surface",
-  "subagentSurface.advisoryBody":
-    "This install runs {mode}, where a ChatGPT model on the v2 surface hands a routed model an encrypted task it cannot read, so cross-provider delegation fails. We recommend v1 until that is fixed upstream. Your current setting is unchanged until you choose.",
-  "subagentSurface.continue": "Continue",
-  "subagentSurface.switchToV1": "Switch to v1",
-  "subagentSurface.learnMore": "Why this fails",
   "prov.logoutOk": "Logged out of {provider}.",
   "prov.logoutFail": "Could not log out of {provider}. Your account state is unchanged.",
   "prov.removed": 'Removed "{name}".',
@@ -990,21 +978,7 @@ export const en = {
   "models.capSaveFailed": "Failed to save context cap",
   "models.contextCapped": "350k cap",
   "models.contextCapLabel": "Default context window",
-  "models.v2Label": "Sub-agent",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "What is v1 / v2?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "All models → v1 surface",
-  "models.v2ModeDesc_default": "Upstream defaults (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "All models → v2 surface",
-  "models.keepNativeOnV1": "Keep ChatGPT on v1",
-  "models.keepNativeOnV1Hint":
-    "Use v1 for ChatGPT parents to allow delegation to routed models. Routed parents keep v2.",
-  "models.v2Help":
-    "v1 uses the classic agent tools. Base follows each model’s default. v2 enables multi-thread delegation with spawn_agent. Changes apply to new sessions. Keep ChatGPT on v1 when it needs to delegate to routed models.",
-  "dash.multiAgent": "Sub-agent",
   "dash.codexDesktopAuthless": "Open Codex without signing in",
   "dash.codexDesktopAuthlessHint":
     "Off by default. Skip the separate Desktop sign-in for eligible local connections. Upstream credentials are still required. Restart Codex after changing this setting. Account-gated Desktop features may be unavailable.",
@@ -1188,7 +1162,6 @@ export const en = {
   "sub.subtitle":
     "Codex's {cmd} advertises only the first 5 models (by priority) as overrides. Pick up to 5 here — native gpt or routed — and opencodex sets their catalog priority so exactly these lead. Any other model is still callable by its exact name; this only controls what's shown.",
   "sub.featured": "Featured",
-  "sub.advanced": "Advanced",
   "sub.orderHintAria": "How this order is used",
   "sub.orderHint":
     "Sets the first five choices in the Codex model picker and the preferred models for {cmd}. Unfilled slots follow catalog priority.",
@@ -1224,16 +1197,6 @@ export const en = {
   "sub.workspace.mainAria": "Subagent model details",
   "sub.workspace.notFeatured": "Not featured",
   "sub.workspace.priority": "Priority",
-  "sub.ultraMode": "Always proactive delegation",
-  "sub.ultraModeHint":
-    "Enable the Proactive multi-agent delegation policy for every model and reasoning effort (does not change reasoning effort itself). Writes features.multi_agent_v2.multi_agent_mode_hint_text in config.toml.",
-  "sub.ultraModeV2Required":
-    "Requires the v2 multi-agent surface — enable multi_agent_v2 and select v2 in the Sub-agent mode control first.",
-  "sub.ultraModeText": "Proactive delegation text",
-  "sub.ultraModePreset": "Restore preset",
-  "sub.ultraModeLoadFail": "Failed to load proactive delegation settings — is the proxy running?",
-  "sub.ultraModeSaveFail": "Failed to save proactive delegation settings",
-  "sub.ultraModeSaved": "Proactive delegation saved. Applies to new Codex sessions.",
   "sub.workspace.removeFromFeatured": "Remove {m} from featured",
   "sub.workspace.selectModel": "Select a model",
   "sub.workspace.selectModelDesc":
@@ -1247,12 +1210,6 @@ export const en = {
   "sub.fallbackSaveFailed": "Failed to save fallback settings",
   "sub.fallbackUnavailable": "Not currently advertised; kept in the chain.",
   "sub.fallbackPollInvalid": "Enter an integer from 5000 to 600000 ms.",
-  "sub.v2Compatibility.title": "Native-parent V2 compatibility",
-  "sub.v2Compatibility.risk":
-    "If a native ChatGPT parent delegates to this routed model using V2, its task may be encrypted and fail before execution. Readable tasks from routed parents are unaffected.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "Recovery enabled/eligibility state is not exposed by this server. Use V1/plaintext-compatible delegation, or enable experimental V2 recovery only if eligible. Recovery adds quota, latency, backend dependence and possible fidelity loss; it does not fix the upstream protocol.",
-  "sub.v2Compatibility.details": "Compatibility details",
 
   // logs
   "logs.title": "Request Logs",
@@ -2208,8 +2165,11 @@ export const en = {
   "modal.getApiKey": "Get your {label} API key",
   "modal.apiKey": "API key",
   "modal.apiKeyTransport": "API key header",
+  "modal.apiKeyTransportAuto": "Protocol default",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic native)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.useEnvironmentKey": "Read the API key from an environment variable",
+  "modal.environmentKeyPlaceholder": "Variable name, e.g. OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (or $ENV_VAR)",
   "modal.defaultModelPlaceholder": "e.g. gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",

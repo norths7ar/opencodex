@@ -4,11 +4,8 @@
  * The disposition is always spelled out as text; colour only repeats it. These are declared
  * claims about the translators, not Lab evidence, so nothing here reads as "verified".
  */
-import type {
-  FeatureDisposition,
-  ProtocolFeature,
-} from "../../../../backend/src/protocols/features";
-import type { ProtocolFeatureEffectV1 } from "../../../../backend/src/protocols/dto";
+import type { FeatureDisposition, ProtocolFeature } from "@/contracts/protocol/features";
+import type { ProtocolFeatureEffectV1 } from "@/contracts/protocol/dto";
 import { useT, type TKey } from "../../i18n/shared";
 
 const DISPOSITION_KEYS: Record<FeatureDisposition, TKey> = {

@@ -100,8 +100,6 @@ import {
   type V2Status,
 } from "./models-shared";
 import { DiscoveryDependencyHint, EmptyProviderHint } from "./models-provider-hints";
-import SubagentSurfaceWarningModal from "../components/SubagentSurfaceWarningModal";
-import { SUBAGENT_SURFACE_GUIDE_URL, readSubagentSurfaceAdvisory } from "../subagent-surface";
 import { shadowCallModelOptions } from "./dashboard-shared";
 import { ShadowCallSettingsRow } from "./shadow-call-settings-row";
 import { CustomModelsSummary, ModelsSettingsPanel, SettingsRow } from "./models-settings-panel";
@@ -432,7 +430,7 @@ export default function Models({
       native,
       savedModelVisible(selected, provider, id, native, blocked),
     );
-  // multi_agent_v2 / ultra gate. null = endpoint unavailable (older proxy build) -> section hidden.
+  // The runtime supplies the current child-thread limit and conflict status.
   const [v2, setV2] = useState<V2Status | null>(null);
   // #2465: per-provider model-preset state. Keyed by provider so one card's busy state cannot
   // freeze the others.
@@ -445,19 +443,15 @@ export default function Models({
   });
   const [showAliases, setShowAliases] = useState(false);
   const [presetBusy, setPresetBusy] = useState<string | null>(null);
-  const [v2Loading, setV2Loading] = useState(true);
   const [v2Busy, setV2Busy] = useState(false);
-  const [v2Note, setV2Note] = useState("");
   const v2BusyRef = useRef(false);
-  // Freshness for /api/v2 reads: readSeq makes the latest issued GET the only one
+  // Freshness for /api/codex-agent-settings reads: readSeq makes the latest issued GET the only one
   // allowed to apply; writeSeq bumps on every PUT so a response read in flight
   // across a completed write is discarded instead of reverting the fresher state.
   const v2ReadSeqRef = useRef(0);
   const v2WriteSeqRef = useRef(0);
   const [threadsCustom, setThreadsCustom] = useState("");
   const [showThreadsCustom, setShowThreadsCustom] = useState(false);
-  /** A base/v2 selection waiting on the approval dialog. Null while nothing is pending. */
-  const [pendingSurface, setPendingSurface] = useState<"default" | "v2" | null>(null);
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [settingsModel, setSettingsModel] = useState<ModelRow | null>(null);
 
@@ -596,7 +590,7 @@ export default function Models({
     const fresh = () => readSeq === v2ReadSeqRef.current && writeSeq === v2WriteSeqRef.current;
     const bounded = createBoundedFetch(15_000);
     try {
-      const r = await fetch(`${apiBase}/api/v2`, { signal: bounded.signal });
+      const r = await fetch(`${apiBase}/api/codex-agent-settings`, { signal: bounded.signal });
       if (!fresh()) return;
       if (!(r.headers.get("content-type") ?? "").includes("application/json")) {
         setV2(null);
@@ -615,36 +609,28 @@ export default function Models({
           typeof data.maxConcurrentThreadsPerSession === "number"
             ? data.maxConcurrentThreadsPerSession
             : null,
-        multiAgentMode:
-          data.multiAgentMode === "v1" || data.multiAgentMode === "v2"
-            ? data.multiAgentMode
-            : "default",
-        keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
       });
     } catch {
       if (fresh()) setV2(null); // old server / network: hide the section instead of guessing
     } finally {
       bounded.clear();
-      setV2Loading(false);
     }
   }, [apiBase]);
 
   const fetchCatalog = useCallback(
     async (signal: AbortSignal): Promise<CachedModelsPage> => {
       const generation = loadGenerationRef.current;
-      const [modelsRes, capsRes, selectionData] = await Promise.all([
+      const [data, capsData, selectionData, providerData] = await Promise.all([
         // Every request carries the resource signal, so leaving the catalog tab cancels
         // the work rather than only discarding its result.
-        fetch(`${apiBase}/api/models`, { signal }),
-        fetch(`${apiBase}/api/provider-context-caps`, { signal }),
+        fetch(`${apiBase}/api/models`, { signal }).then(readJsonOrThrow<ModelRow[]>),
+        fetch(`${apiBase}/api/provider-context-caps`, { signal }).then(
+          readJsonOrThrow<ProviderContextCapsResponse>,
+        ),
         fetchSelectedModels(apiBase, fetch, signal),
-      ]);
-      // Discovery can complete during either model read; fetch its status afterwards.
-      const providersRes = await fetch(`${apiBase}/api/providers`, { signal });
-      const [data, capsData, providerData] = await Promise.all([
-        readJsonOrThrow<ModelRow[]>(modelsRes),
-        readJsonOrThrow<ProviderContextCapsResponse>(capsRes),
-        readJsonOrThrow<ConfiguredProviderSummary[]>(providersRes),
+        fetch(`${apiBase}/api/providers`, { signal }).then(
+          readJsonOrThrow<ConfiguredProviderSummary[]>,
+        ),
       ]);
       if (data === undefined || capsData === undefined || providerData === undefined) {
         throw new Error("models payload missing");
@@ -737,7 +723,7 @@ export default function Models({
 
   // Load independent settings alongside the local catalog.
   useEffect(() => {
-    // Both belong to the catalog tab; a hidden panel polling /api/v2 every ten seconds
+    // Both belong to the catalog tab; a hidden panel polling /api/codex-agent-settings every ten seconds
     // is the same leak as the catalog poll above.
     if (!catalogActive) return;
     const timeout = window.setTimeout(() => {
@@ -751,7 +737,7 @@ export default function Models({
       void loadPresets();
       void loadModelDiscovery();
     }, 0);
-    // Hidden tab: no timer, no /api/v2 traffic; the make-up tick refreshes on return.
+    // Hidden tab: no timer, no /api/codex-agent-settings traffic; the make-up tick refreshes on return.
     const stop = startVisibilityPoll(() => {
       if (!capabilities && !v2BusyRef.current) void loadV2();
     }, 10_000);
@@ -1113,77 +1099,6 @@ export default function Models({
   };
 
   /**
-   * Both v2 surface writes adopt the response directly instead of calling
-   * `loadV2()`. `loadV2` returns early while `v2BusyRef` is still held by the
-   * in-flight write, so the refetch was a no-op and the control kept its old
-   * value until the next 10s poll. That is visible here: "Keep ChatGPT on v1"
-   * only renders while the mode is v2, so a stale mode also delayed the row.
-   */
-  const putV2Setting = async (body: Record<string, unknown>) => {
-    if (!v2 || v2BusyRef.current) return;
-    setV2Busy(true);
-    v2BusyRef.current = true;
-    v2WriteSeqRef.current++;
-    setV2Note("");
-    setStatus("");
-    try {
-      const r = await fetch(`${apiBase}/api/v2`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      try {
-        const data = await readJsonOrThrow<V2Status & { warnings?: string[] }>(
-          r,
-          t("models.saveFailed"),
-        );
-        if (!data || typeof data.enabled !== "boolean") {
-          setOk(false);
-          setStatus(t("models.saveFailed"));
-          return;
-        }
-        setV2({
-          enabled: data.enabled,
-          agentsMaxThreadsConflict: data.agentsMaxThreadsConflict === true,
-          maxConcurrentThreadsPerSession:
-            typeof data.maxConcurrentThreadsPerSession === "number"
-              ? data.maxConcurrentThreadsPerSession
-              : null,
-          multiAgentMode:
-            data.multiAgentMode === "v1" || data.multiAgentMode === "v2"
-              ? data.multiAgentMode
-              : "default",
-          keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
-        });
-        setOk(true);
-        setStatus(t("models.v2Applied"));
-        setV2Note((data.warnings ?? []).join(" "));
-      } catch (e) {
-        setOk(false);
-        setStatus(e instanceof Error ? e.message : t("models.saveFailed"));
-      }
-    } catch {
-      setOk(false);
-      setStatus(t("models.networkError"));
-    } finally {
-      setV2Busy(false);
-      v2BusyRef.current = false;
-    }
-  };
-
-  const setMultiAgentMode = async (mode: "v1" | "default" | "v2") => {
-    if (!v2 || v2.multiAgentMode === mode) return;
-    // v1 applies immediately: confirming a move toward the safe default would be noise.
-    // base and v2 both put ChatGPT-native parents on the v2 surface, where a task handed
-    // to a routed child is undeliverable ciphertext, so those wait for an answer.
-    if (mode === "v1") {
-      await putV2Setting({ multiAgentMode: "v1" });
-      return;
-    }
-    setPendingSurface(mode);
-  };
-
-  /**
    * #2465: load the per-provider preset preview. Rules are evaluated server-side against the
    * CURRENT catalog, so the count shown is the count an apply would produce.
    */
@@ -1280,11 +1195,6 @@ export default function Models({
     }
   };
 
-  const setKeepNativeChatGptOnV1 = async (next: boolean) => {
-    if (!v2 || v2.keepNativeChatGptOnV1 === next) return;
-    await putV2Setting({ keepNativeChatGptOnV1: next });
-  };
-
   // The API reports the limit in the active backend's units; the control edits the
   // logical child count, so the V2 storage case (total incl. the root slot) converts.
   const v2ThreadsChildren =
@@ -1304,10 +1214,9 @@ export default function Models({
     setV2Busy(true);
     v2BusyRef.current = true;
     v2WriteSeqRef.current++;
-    setV2Note("");
     setStatus("");
     try {
-      const r = await fetch(`${apiBase}/api/v2`, {
+      const r = await fetch(`${apiBase}/api/codex-agent-settings`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ maxConcurrentThreadsPerSession: threadLimit }),
@@ -1329,11 +1238,6 @@ export default function Models({
             typeof data.maxConcurrentThreadsPerSession === "number"
               ? data.maxConcurrentThreadsPerSession
               : null,
-          multiAgentMode:
-            data.multiAgentMode === "v1" || data.multiAgentMode === "v2"
-              ? data.multiAgentMode
-              : "default",
-          keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
         });
         setOk(true);
         setStatus(t("models.v2ThreadsApplied"));
@@ -2451,83 +2355,6 @@ export default function Models({
                 />
               </div>
             </SettingsRow>
-
-            {(v2Loading || v2) && (
-              <SettingsRow label={t("models.v2Label")}>
-                <div
-                  className="segmented models-segmented"
-                  role="radiogroup"
-                  aria-label={t("models.v2Label")}
-                >
-                  {(["v1", "default", "v2"] as const).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      role="radio"
-                      aria-checked={(v2?.multiAgentMode ?? "default") === mode}
-                      className={`btn btn-sm${(v2?.multiAgentMode ?? "default") === mode ? " btn-primary" : " btn-ghost"}`}
-                      style={{
-                        background:
-                          (v2?.multiAgentMode ?? "default") === mode ? undefined : "transparent",
-                        color:
-                          (v2?.multiAgentMode ?? "default") === mode ? undefined : "var(--muted)",
-                      }}
-                      disabled={!v2 || v2Busy}
-                      onClick={() => void setMultiAgentMode(mode)}
-                    >
-                      {t(`models.v2Mode_${mode}` as TKey)}
-                    </button>
-                  ))}
-                </div>
-                <HelpPopover label={t("models.v2Label")}>{t("models.v2Help")}</HelpPopover>
-              </SettingsRow>
-            )}
-            {v2 && v2.multiAgentMode === "v2" && (
-              <div className="models-v2-keep-native-row">
-                <div className="models-v2-keep-native">
-                  <span className="models-v2-keep-native-label text-caption">
-                    {t("models.keepNativeOnV1")}
-                  </span>
-                  <Switch
-                    on={v2.keepNativeChatGptOnV1 === true}
-                    onClick={() => void setKeepNativeChatGptOnV1(!v2.keepNativeChatGptOnV1)}
-                    disabled={v2Busy}
-                    label={t("models.keepNativeOnV1")}
-                  />
-                  <HelpPopover label={t("models.keepNativeOnV1")}>
-                    {t("models.keepNativeOnV1Hint")}
-                  </HelpPopover>
-                </div>
-              </div>
-            )}
-            {pendingSurface && (
-              <SubagentSurfaceWarningModal
-                reason="selection"
-                mode={pendingSurface}
-                docsUrl={
-                  readSubagentSurfaceAdvisory(v2?.multiAgentSurfaceAdvisory)?.docsUrl ??
-                  SUBAGENT_SURFACE_GUIDE_URL
-                }
-                busy={v2Busy}
-                onContinue={() => {
-                  const next = pendingSurface;
-                  setPendingSurface(null);
-                  void putV2Setting({
-                    multiAgentMode: next,
-                    multiAgentSurfaceAdvisoryAcknowledged: true,
-                  });
-                }}
-                onChooseV1={() => {
-                  setPendingSurface(null);
-                  if (v2?.multiAgentMode !== "v1")
-                    void putV2Setting({
-                      multiAgentMode: "v1",
-                      multiAgentSurfaceAdvisoryAcknowledged: true,
-                    });
-                }}
-                onDismiss={() => setPendingSurface(null)}
-              />
-            )}
           </>
         )}
       </div>
@@ -2593,7 +2420,6 @@ export default function Models({
               {t("models.v2Conflict")}
             </span>
           )}
-          {v2Note && <span className="muted text-label">{v2Note}</span>}
         </div>
       )}
 
@@ -3149,15 +2975,9 @@ export default function Models({
       <ModelsSettingsPanel
         title={locale.startsWith("zh") ? "全局模型默认设置" : "Global model defaults"}
         attentionLabel={t("models.settingsPanel.attention")}
-        warn={
-          !!(v2?.enabled && v2.agentsMaxThreadsConflict) ||
-          v2Note !== "" ||
-          pickerResource.state.showError
-        }
+        warn={!!(v2?.enabled && v2.agentsMaxThreadsConflict) || pickerResource.state.showError}
         summary={modelsSettingsSummary(t, {
-          multiAgentMode: v2?.multiAgentMode,
           v2Threads: v2ThreadsChildren,
-          keepNativeOnV1: v2?.keepNativeChatGptOnV1 === true,
           shadowEnabled: shadowCall?.enabled === true,
           shadowModel: shadowCall?.model,
           windowOn: allCapped,

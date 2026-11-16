@@ -37,10 +37,8 @@ export function writeSettingsOpen(open: boolean, storage?: StorageLike): void {
 }
 
 export interface ModelsSettingsState {
-  multiAgentMode?: "v1" | "default" | "v2";
   /** Configured sub-agent limit as a logical child count; null/undefined means the runtime default. */
   v2Threads?: number | null;
-  keepNativeOnV1?: boolean;
   shadowEnabled: boolean;
   shadowModel?: string;
   /** Global auto-review override; folded whenever enabled, a blank model reading as pending. */
@@ -70,22 +68,12 @@ const PICKER_MODE_KEYS: Record<string, TKey> = {
 export function modelsSettingsSummary(t: TFn, state: ModelsSettingsState): SettingsSummaryItem[] {
   const off = t("models.settingsPanel.off");
   const items: SettingsSummaryItem[] = [];
-  if (state.multiAgentMode) {
-    items.push({
-      id: "subagent",
-      label: t("models.v2Label"),
-      value: t(`models.v2Mode_${state.multiAgentMode}` as TKey),
-    });
-  }
   if (typeof state.v2Threads === "number") {
     items.push({
       id: "threads",
       label: t("models.v2ThreadsLabel"),
       value: String(state.v2Threads),
     });
-  }
-  if (state.multiAgentMode === "v2" && state.keepNativeOnV1) {
-    items.push({ id: "keep-native", label: t("models.keepNativeOnV1"), value: "" });
   }
   items.push({
     id: "shadow",

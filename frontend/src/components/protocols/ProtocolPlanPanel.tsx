@@ -8,18 +8,13 @@
  * which means "an OpenAI model id", not "a native path".
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import type {
-  DeliveryMode,
-  Fidelity,
-  Protocol,
-  ProtocolHop,
-} from "../../../../backend/src/protocols/contract";
-import type { ProtocolPlanV1 } from "../../../../backend/src/protocols/dto";
+import type { DeliveryMode, Fidelity, Protocol, ProtocolHop } from "@/contracts/protocol/contract";
+import type { ProtocolPlanV1 } from "@/contracts/protocol/dto";
 import {
   FEATURE_SOURCES,
   PROTOCOL_FEATURES,
   type ProtocolFeature,
-} from "../../../../backend/src/protocols/features";
+} from "@/contracts/protocol/features";
 import type { ExternalModelRow, GatewayInboundProtocol } from "../../api-access-models";
 import { useT, type TKey } from "../../i18n/shared";
 import { Select } from "../../ui";

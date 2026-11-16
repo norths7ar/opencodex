@@ -17,6 +17,7 @@ import type { ProviderPayload } from "../../provider-payload";
 /** Row shape returned by GET /api/provider-presets (mirrors DerivedProviderPreset). */
 export interface CatalogPreset {
   id: string;
+  serviceId?: string;
   label: string;
   adapter: string;
   baseUrl: string;
@@ -36,7 +37,7 @@ export interface CatalogPreset {
   /**
    * Endpoint picker (e.g. Qwen Cloud). Choice without `baseUrl` = Custom (show text field).
    */
-  baseUrlChoices?: Array<{ id: string; label: string; baseUrl?: string }>;
+  baseUrlChoices?: Array<{ id: string; label: string; baseUrl?: string; adapter?: string }>;
   codexAccountMode?: "direct" | "pool";
   provider?: ProviderPayload;
 }
@@ -205,5 +206,8 @@ export function dropPresetsCoveredByAccounts(
 ): CatalogPreset[] {
   if (accountRows.length === 0) return presets;
   const covered = new Set(accountRows.map((row) => row.id));
-  return presets.filter((preset) => !covered.has(preset.id));
+  return presets.filter(
+    (preset) =>
+      !covered.has(preset.id) && !(preset.oauthProvider && covered.has(preset.oauthProvider)),
+  );
 }

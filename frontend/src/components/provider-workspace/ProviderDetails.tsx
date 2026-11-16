@@ -217,8 +217,8 @@ export default function ProviderDetails({
     // bump mutationRevision directly.
     return {
       ...authHandlers,
-      async onAddApiKey(provider, key) {
-        const ok = await authHandlers.onAddApiKey(provider, key);
+      async onAddApiKey(provider, key, source) {
+        const ok = await authHandlers.onAddApiKey(provider, key, source);
         if (ok) bump();
         return ok;
       },
@@ -315,7 +315,7 @@ export default function ProviderDetails({
 
   const activeTabId = `pws-tab-${tab}`;
   const activePanelId = `pws-panel-${tab}`;
-  const displayName = formatProviderDisplayName(item.name, t);
+  const displayName = item.displayName || formatProviderDisplayName(item.name, t);
 
   return (
     <div className="pws-detail">

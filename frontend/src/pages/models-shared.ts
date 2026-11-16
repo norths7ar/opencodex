@@ -192,10 +192,6 @@ export interface V2Status {
   enabled: boolean;
   agentsMaxThreadsConflict: boolean;
   maxConcurrentThreadsPerSession?: number | null;
-  multiAgentMode?: "v1" | "default" | "v2";
-  keepNativeChatGptOnV1?: boolean;
-  /** Response-only; absent on a runtime older than the v1-default advisory. */
-  multiAgentSurfaceAdvisory?: unknown;
 }
 
 export interface ShadowCallData {
@@ -253,7 +249,7 @@ export const THREAD_OPTIONS = [4, 8, 16, 32, 64, 128, 256, 500, 1000];
 export const THREAD_OPTION_SET = new Set(THREAD_OPTIONS);
 
 /**
- * The /api/v2 maxConcurrentThreadsPerSession field is expressed in the ACTIVE backend's
+ * The maxConcurrentThreadsPerSession field is expressed in the ACTIVE backend's
  * units: the [agents] keys (v1/base/hybrid, enabled:false) count child agents, while
  * the V2 storage counts the root agent's own slot too (total = children + 1). The
  * control always presents the logical child count, so only the V2-total case translates

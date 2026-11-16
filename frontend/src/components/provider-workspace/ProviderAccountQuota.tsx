@@ -1,4 +1,4 @@
-import { parseQuotaFailureCode } from "../../../../backend/src/providers/quota-types";
+import { parseQuotaFailureCode } from "@/contracts/quota-failure";
 import { useT } from "../../i18n/shared";
 import { accountQuotaFromReport } from "../../provider-workspace/report";
 import { formatRelativeTime, relativeTimeLabelsFromT } from "../../provider-workspace/usage";

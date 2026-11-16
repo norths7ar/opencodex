@@ -748,16 +748,13 @@ export const tr: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Ayrıca Codex varsayılanı olarak kaydet",
   "dash.syncCodexSubagentDefaultsHint":
     "Açık olduğunda, yukarıdaki seçim Codex'in kendi yapılandırmasına yazılır.",
-  "dash.multiAgentGuidance": "Codex'e işi nasıl böleceğini söyle",
-  "dash.multiAgentGuidanceHint":
-    "Codex'e işleri alt ajanlara nasıl devredeceğini söyleyen kısa bir not gönderir.",
   "dash.injectionNone": "Yok",
   "dash.injectionEffortLabel": "Akıl yürütme çabası",
   "dash.injectionEffortNone": "Model varsayılanı",
-  "dash.effortCapLabel": "V2 ultra çaba limiti",
-  "dash.subagentEffortCapLabel": "V2 alt ajan çaba limiti",
+  "dash.effortCapLabel": "İş birliği için akıl yürütme sınırı",
+  "dash.subagentEffortCapLabel": "Alt ajan akıl yürütme sınırı",
   "dash.effortCapHelp":
-    "V2 ultra modu turları için akıl yürütme çabasını sınırlar. Ayarlandığında, gelen maksimum çaba istekleri (ultra modundan) seçilen seviye ile sınırlandırılır. Alt ajan limiti yalnızca türetilen çocuk ajanları etkiler. Limitler çabayı yalnızca düşürür, asla yükseltmez. Bir model sınırlandırılan seviyeyi desteklemiyorsa, desteklenen en yakın alt seviyeye iner.",
+    "İş birliği isteklerinde akıl yürütme düzeyini sınırlar. Alt ajanlar kendi sınırlarına da uyar. Modeller sınırı aşmayan en yakın desteklenen düzeyi kullanır.",
   "dash.effortCapNone": "Limit yok",
   "dash.maintenance": "Bakım",
   "dash.maintenanceHint":
@@ -866,15 +863,6 @@ export const tr: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "Bunun üçüncü taraf bir abonelik bağlantısı olduğunu anlıyorum ve geçerli koşulları kontrol edeceğim.",
   "oauthTos.anthropicContinue": "Claude aboneliğiyle devam et",
-  "subagentSurface.selectionTitle": "Alt ajan yüzeyi {mode} olarak değiştirilsin mi?",
-  "subagentSurface.selectionBody":
-    "{mode} üzerinde, v2 yüzeyini kullanan ChatGPT modelleri (base üzerinde Sol ve Terra, v2 üzerinde tüm modeller) görevlerini Grok veya Claude gibi yönlendirilmiş bir modele ChatGPT arka ucu için şifrelenmiş olarak devreder ve yönlendirilmiş model bunu okuyamaz. Yukarı akışta düzeltilene kadar bu devir unreadable_encrypted_agent_task hatasıyla başarısız olur. v1 sağlayıcılar arası devri güvenilir biçimde yapar.",
-  "subagentSurface.advisoryTitle": "v1 artık varsayılan alt ajan yüzeyi",
-  "subagentSurface.advisoryBody":
-    "Bu kurulum {mode} ile çalışıyor; v2 yüzeyindeki bir ChatGPT modeli, yönlendirilmiş bir modele okuyamayacağı şifreli bir görev aktardığı için sağlayıcılar arası devri bozuyor. Yukarı akışta düzeltilene kadar v1 önerilir. Seçim yapılana kadar mevcut ayarınız değişmez.",
-  "subagentSurface.continue": "Devam",
-  "subagentSurface.switchToV1": "v1'e geç",
-  "subagentSurface.learnMore": "Neden başarısız oluyor",
   "prov.logoutOk": "{provider} çıkışı yapıldı.",
   "prov.logoutFail": "{provider} çıkışı yapılamadı.",
   "prov.removed": '"{name}" kaldırıldı.',
@@ -987,21 +975,7 @@ export const tr: Record<TKey, string> = {
   "models.capSaveFailed": "Bağlam sınırı kaydedilemedi",
   "models.contextCapped": "350k sınırı",
   "models.contextCapLabel": "Varsayılan pencere / sınır",
-  "models.v2Label": "Alt Ajan",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "v1 / v2 nedir?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "taban",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "Tüm modeller → v1 yüzeyi",
-  "models.v2ModeDesc_default": "Yukarı akış varsayılanları",
-  "models.v2ModeDesc_v2": "Tüm modeller → v2 yüzeyi",
-  "models.keepNativeOnV1": "ChatGPT v1'de kalsın",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT yerel ebeveynleri v2 çocuk görevlerini şifreler; Grok ve Claude okuyamaz. Sol/Terra yönlendirilmiş modelleri spawn edecekse açık bırakın. Yönlendirilmiş ebeveynler v2'de kalır.",
-  "models.v2Help":
-    "v1 alt ajanları birincil modelle sınırlandırır; taban standart ajan sınırlarını devralır; v2 tam çoklu ajan orkestrasyonunu etkinleştirir.\n\nv2'de ChatGPT v1'de kalsın, Sol/Terra'yı v1'de bırakır; böylece Grok veya Claude spawn edebilirler. ChatGPT v2 çocuk görevlerini şifreler; yönlendirilmiş modeller okuyamaz. Yönlendirilmiş ebeveynler v2'de kalır.\n\nDeğişiklikler yeni oturumlara uygulanır.",
-  "dash.multiAgent": "Alt Ajan",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads ayarlanmış — config.toml dosyasından kaldırın",
   "models.v2Applied":
@@ -1180,7 +1154,6 @@ export const tr: Record<TKey, string> = {
   "sub.subtitle":
     "Codex'in {cmd} komutu, geçersiz kılma olarak yalnızca ilk 5 modeli (önceliğe göre) sunar. Buradan 5 taneye kadar seçin (yerel gpt veya yönlendirilen) ve opencodex bunların katalog önceliğini tam olarak bunların liderlik edeceği şekilde ayarlar. Diğer herhangi bir model tam adıyla çağrılabilir kalır; bu yalnızca neyin gösterileceğini kontrol eder.",
   "sub.featured": "Öne Çıkarılanlar",
-  "sub.advanced": "Gelişmiş",
   "sub.orderHintAria": "Bu sıra nasıl kullanılır",
   "sub.orderHint":
     "Burada gösterilen sıralama, Codex model seçicisinin üst kısmındaki 1-5 pozisyonlarını ve {cmd} için varsayılan model adaylarını belirler. Seçicide 5’ten az öne çıkarılmış model görünüyorsa kalan yuvalarda katalog önceliğine göre modeller sunulur; model seçicisindeki özel bir sıralama katalog önceliğini değiştirmediği sürece görünür 5 öne çıkarılmış model listeyi doldurur.",
@@ -1220,16 +1193,6 @@ export const tr: Record<TKey, string> = {
   "sub.workspace.selectModel": "Bir model seçin",
   "sub.workspace.selectModelDesc": "Detayları görmek için listeden bir model seçin.",
   "sub.workspace.selector": "Genel seçici",
-  "sub.ultraMode": "Her zaman proaktif delegasyon",
-  "sub.ultraModeHint":
-    "Tüm modeller ve reasoning effort için Proactive çoklu ajan delegasyon politikasını etkinleştirir (reasoning effort değerini değiştirmez). config.toml dosyasına features.multi_agent_v2.multi_agent_mode_hint_text yazar.",
-  "sub.ultraModeV2Required":
-    "v2 çoklu ajan yüzeyi gerekir — önce multi_agent_v2'yi etkinleştirin ve alt ajan modu denetiminde v2'yi seçin.",
-  "sub.ultraModeText": "Proaktif delegasyon metni",
-  "sub.ultraModePreset": "Ön ayarı geri yükle",
-  "sub.ultraModeLoadFail": "Proaktif delegasyon ayarları yüklenemedi — proxy çalışıyor mu?",
-  "sub.ultraModeSaveFail": "Proaktif delegasyon ayarları kaydedilemedi",
-  "sub.ultraModeSaved": "Proaktif delegasyon kaydedildi. Yeni Codex oturumlarına uygulanır.",
   "sub.fallbackLabel": "Alt ajan yedek zinciri",
   "sub.fallbackHint":
     "Alt ajan modeli kullanılamadığında veya başarısız olduğunda sırayla denenecek modeller.",
@@ -1239,12 +1202,6 @@ export const tr: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "Yedek ayarlar kaydedilemedi",
   "sub.fallbackUnavailable": "Şu anda listelenmiyor; zincirde korunur.",
   "sub.fallbackPollInvalid": "5000–600000 ms arasında bir tam sayı girin.",
-  "sub.v2Compatibility.title": "Yerel üst ajanın V2 uyumluluğu",
-  "sub.v2Compatibility.risk":
-    "Yerel ChatGPT üst ajanı V2 ile bu yönlendirilmiş modele görev verirse görev şifrelenmiş olabilir ve yürütülmeden başarısız olabilir. Yönlendirilmiş üst ajanların okunabilir görevleri etkilenmez.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "Bu sunucu kurtarmanın etkinliğini veya uygunluğunu bildirmez. V1/düz metin kullanın ya da deneysel V2 kurtarmayı yalnızca uygunsa açın. Kurtarma kota, gecikme, arka uç bağımlılığı ve aslına uygunluk kaybı getirebilir; üst sistem protokolünü düzeltmez.",
-  "sub.v2Compatibility.details": "Uyumluluk ayrıntıları",
 
   // logs
   "logs.title": "İstek Günlükleri",
@@ -2167,6 +2124,9 @@ export const tr: Record<TKey, string> = {
   "modal.apiKeyTransport": "API anahtar başlığı",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic yerel)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "Protokol varsayılanı",
+  "modal.useEnvironmentKey": "API anahtarını ortam değişkeninden oku",
+  "modal.environmentKeyPlaceholder": "Değişken adı, ör. OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (veya $ENV_VAR)",
   "modal.defaultModelPlaceholder": "örn. gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",

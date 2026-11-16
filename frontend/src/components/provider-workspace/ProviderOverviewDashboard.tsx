@@ -283,7 +283,7 @@ export default function ProviderOverviewDashboard({
                     />
                     <div className="pws-dashboard-row-info">
                       <span className="pws-dashboard-row-name">
-                        {formatProviderDisplayName(item.name, t)}
+                        {item.displayName || formatProviderDisplayName(item.name, t)}
                       </span>
                       <span className="pws-dashboard-row-meta muted">
                         {t("pws.dashboard.checkedAgo", {

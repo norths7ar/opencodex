@@ -5,7 +5,7 @@
  * delegation save, the same write the model and effort selects make.
  */
 import { useState } from "react";
-import { ROLE_INSTRUCTIONS_EXCERPT_CHARS } from "../../../../backend/src/codex/role-sizing-limits";
+import { ROLE_INSTRUCTIONS_EXCERPT_CHARS } from "@/contracts/role-sizing-limits";
 import { readJsonOrThrow } from "../../fetch-json";
 import { useT } from "../../i18n/shared";
 import { Notice } from "../../ui";

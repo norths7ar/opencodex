@@ -1,6 +1,5 @@
 import { readJsonIfOk } from "../fetch-json";
 import { readUsageResponseJson } from "../usage-summary-resource";
-import { readSubagentSurfaceAdvisory, type SubagentSurfaceAdvisory } from "../subagent-surface";
 import {
   beginPollEpoch,
   settingsPollMayCommit,
@@ -20,7 +19,6 @@ import {
 } from "./dashboard-shared";
 
 export type InjectionPoll = {
-  multiAgentGuidanceEnabled: boolean;
   syncCodexSubagentDefaults: boolean;
   injectionModel: string;
   injectionEffort: string;
@@ -29,7 +27,6 @@ export type InjectionPoll = {
 };
 
 export type InjectionSelectionResponse = {
-  multiAgentGuidanceEnabled?: boolean;
   syncCodexSubagentDefaults?: boolean;
   model?: string | null;
   effort?: string | null;
@@ -37,7 +34,6 @@ export type InjectionSelectionResponse = {
 
 export function normalizeInjectionSelection(data: InjectionSelectionResponse) {
   return {
-    multiAgentGuidanceEnabled: data.multiAgentGuidanceEnabled !== false,
     syncCodexSubagentDefaults: data.syncCodexSubagentDefaults === true,
     injectionModel: data.model ?? "",
     injectionEffort: data.effort ?? "",
@@ -77,12 +73,6 @@ export type DashboardSettingsPoll = {
   /** Absent when the poll lost authority — callers must keep prior settings/cache. */
   settings: SettingsData | undefined;
   startupHealthSeed: SettingsData["startupHealth"] | null | undefined;
-};
-
-export type DashboardMaModePoll = {
-  maMode: "v1" | "default" | "v2";
-  /** Null when the runtime predates the advisory or the call failed. */
-  advisory?: SubagentSurfaceAdvisory | null;
 };
 
 export type DashboardEpochRefs = {
@@ -254,23 +244,6 @@ export async function fetchDashboardSettings(
   }
 
   return { settings, startupHealthSeed };
-}
-
-/** Multi-agent mode toggle only — must not wait on injection-model / effort-caps. */
-export async function fetchDashboardMaMode(
-  apiBase: string,
-  signal: AbortSignal,
-): Promise<DashboardMaModePoll> {
-  const v2Res = await fetch(`${apiBase}/api/v2`, { signal });
-  const v2Data = await requireJson<{
-    multiAgentMode?: unknown;
-    multiAgentSurfaceAdvisory?: unknown;
-  }>(v2Res);
-  const advisory = readSubagentSurfaceAdvisory(v2Data.multiAgentSurfaceAdvisory);
-  if (v2Data.multiAgentMode === "v1" || v2Data.multiAgentMode === "v2") {
-    return { maMode: v2Data.multiAgentMode, advisory };
-  }
-  return { maMode: "default", advisory };
 }
 
 export async function fetchDashboardOverview(

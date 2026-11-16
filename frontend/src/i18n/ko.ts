@@ -733,16 +733,13 @@ export const ko: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Codex 설정에도 기본값으로 저장",
   "dash.syncCodexSubagentDefaultsHint":
     "켜면 위에서 고른 모델이 Codex 설정 파일에 저장돼, 새로 시작하는 작업도 처음부터 그 모델을 씁니다. 끄면 여기서만 기억합니다. 반영은 다음 동기화나 재시작 때이고, 직접 적어둔 [agents] 설정은 그대로 둡니다.",
-  "dash.multiAgentGuidance": "일 나누는 방법 알려주기",
-  "dash.multiAgentGuidanceHint":
-    'Codex에게 "일을 이렇게 나눠 맡기면 된다"는 짧은 쪽지를 붙여 보냅니다. v2에서는 쓸 수 있는 모델 목록과 우선 모델을 알려주고, v1에서는 추론 강도가 max나 ultra일 때만 동작합니다. 끄면 아무 쪽지도 붙지 않습니다.',
   "dash.injectionNone": "없음",
   "dash.injectionEffortLabel": "추론 강도",
   "dash.injectionEffortNone": "모델 기본값",
-  "dash.effortCapLabel": "V2 ultra 추론 강도 제한",
-  "dash.subagentEffortCapLabel": "V2 서브에이전트 추론 강도 제한",
+  "dash.effortCapLabel": "협업 추론 강도 제한",
+  "dash.subagentEffortCapLabel": "하위 에이전트 추론 강도 제한",
   "dash.effortCapHelp":
-    "V2 ultra 모드 턴의 추론 강도를 제한합니다. 설정하면 ultra 모드에서 들어오는 max 요청이 선택한 수준으로 내려갑니다. 서브에이전트 제한은 스폰된 자식 에이전트에만 적용됩니다. 강도를 낮추기만 하고 올리지는 않습니다. 모델이 해당 수준을 지원하지 않으면 가장 가까운 지원 수준으로 내려갑니다.",
+    "협업 요청의 추론 강도를 제한해요. 하위 에이전트에는 별도 제한도 적용돼요. 모델은 제한 이하에서 지원하는 가장 가까운 강도를 사용해요.",
   "dash.effortCapNone": "상한 없음",
   "dash.maintenance": "유지보수",
   "dash.maintenanceHint":
@@ -838,15 +835,6 @@ export const ko: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "타사를 거치는 구독 연결임을 이해했으며, 적용되는 약관을 직접 확인하겠습니다.",
   "oauthTos.anthropicContinue": "Claude 구독으로 계속",
-  "subagentSurface.selectionTitle": "서브에이전트 서피스를 {mode}로 바꿀까요?",
-  "subagentSurface.selectionBody":
-    "{mode}에서는 v2 서피스를 쓰는 ChatGPT 모델(base에서는 Sol과 Terra, v2에서는 모든 모델)이 작업을 Grok이나 Claude 같은 routed 모델에 ChatGPT 백엔드용으로 암호화된 채 넘기고, routed 모델은 읽지 못합니다. 업스트림에서 고쳐질 때까지 이 위임은 unreadable_encrypted_agent_task로 실패합니다. v1은 프로바이더가 달라도 안정적으로 위임합니다.",
-  "subagentSurface.advisoryTitle": "v1이 이제 기본 서브에이전트 서피스입니다",
-  "subagentSurface.advisoryBody":
-    "이 설치는 {mode}로 동작하며, v2 서피스의 ChatGPT 모델이 routed 모델에 읽지 못하는 암호화된 작업을 넘기기 때문에 프로바이더가 다른 위임은 깨집니다. 업스트림에서 고쳐질 때까지는 v1을 권합니다. 직접 바꾸기 전까지 현재 설정은 그대로 유지됩니다.",
-  "subagentSurface.continue": "계속하기",
-  "subagentSurface.switchToV1": "v1으로 바꾸기",
-  "subagentSurface.learnMore": "실패하는 이유",
   "prov.logoutOk": "{provider} 에서 로그아웃했습니다.",
   "prov.logoutFail": "{provider}에서 로그아웃하지 못했습니다. 계정 상태는 그대로입니다.",
   "prov.removed": '"{name}" 을(를) 삭제했습니다.',
@@ -979,21 +967,7 @@ export const ko: Record<TKey, string> = {
   "models.capSaveFailed": "컨텍스트 제한 저장 실패",
   "models.contextCapped": "350k 제한",
   "models.contextCapLabel": "기본 창 / 상한",
-  "models.v2Label": "서브에이전트",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "전 모델 → v1 서피스",
-  "models.v2ModeDesc_default": "업스트림 기본값 (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "전 모델 → v2 서피스",
-  "models.keepNativeOnV1": "ChatGPT는 v1 유지",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT 네이티브 부모는 v2 자식 작업을 암호화해서 Grok/Claude가 읽지 못합니다. Sol/Terra가 routed 모델을 spawn해야 하면 켜 두세요. routed 부모는 v2를 유지합니다.",
-  "models.v2Help":
-    "모든 모델의 멀티에이전트 서피스를 제어합니다.\n\nv1: 단일 스레드 에이전트. 모든 모델이 v1 서피스를 사용합니다.\nbase: 업스트림 기본값 — sol/terra는 v2, luna는 v1, 나머지는 codex 플래그를 따릅니다.\nv2: 멀티 스레드 에이전트(spawn_agent). 모든 모델이 v2 서피스를 사용합니다.\n\nv2에서 ChatGPT는 v1 유지를 켜면 Sol/Terra가 v1에 남아 Grok이나 Claude를 spawn할 수 있습니다. ChatGPT는 v2 자식 작업을 암호화하므로 routed 모델은 읽지 못합니다. routed 부모는 v2를 유지합니다.\n\n새 세션부터 적용됩니다.",
-  "models.v2DocsLink": "v1 / v2가 뭔가요?",
-  "dash.multiAgent": "서브에이전트",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads가 남아 있어 codex가 부팅을 거부합니다 — config.toml에서 제거하세요",
   "models.v2Applied": "서브에이전트 모드 변경됨 — 새 세션부터 적용 (피커 갱신은 Codex 앱 재시작)",
@@ -1167,7 +1141,6 @@ export const ko: Record<TKey, string> = {
   "sub.subtitle":
     "Codex의 {cmd} 는 우선순위 상위 5개 모델만 오버라이드로 노출합니다. 여기서 최대 5개를 선택하면 — 네이티브 gpt 또는 라우팅된 모델 — opencodex가 카탈로그 우선순위를 설정해 정확히 이들이 앞에 옵니다. 다른 모델도 정확한 이름으로 호출할 수 있으며, 이 설정은 표시 항목만 제어합니다.",
   "sub.featured": "추천",
-  "sub.advanced": "고급",
   "sub.orderHintAria": "이 순서가 쓰이는 방식",
   "sub.orderHint":
     "여기서 선택해 표시된 순서가 Codex 모델 피커 최상단 1~5위와 {cmd}의 기본 모델 후보를 결정합니다. 모델 피커에 표시되는 추천 모델이 5개 미만이면 남은 슬롯은 카탈로그 우선순위에 따라 노출됩니다. 표시되는 추천 모델이 5개이면 목록이 채워지지만, 사용자 지정 모델 피커 순서가 카탈로그 우선순위를 바꾸는 경우는 예외입니다.",
@@ -1209,16 +1182,6 @@ export const ko: Record<TKey, string> = {
   "sub.workspace.selectModelDesc":
     "목록에서 모델을 선택하여 세부 정보를 확인하고 spawn_agent에 추천하세요.",
   "sub.workspace.selector": "공개 셀렉터",
-  "sub.ultraMode": "항상 능동 위임",
-  "sub.ultraModeHint":
-    "모든 모델과 reasoning effort에서 Proactive 멀티에이전트 위임 정책을 켭니다 (reasoning effort 자체는 변경하지 않음). config.toml에 features.multi_agent_v2.multi_agent_mode_hint_text를 기록합니다.",
-  "sub.ultraModeV2Required":
-    "v2 멀티에이전트 서피스가 필요합니다 — 먼저 multi_agent_v2를 켜고 서브에이전트 모드에서 v2를 선택하세요.",
-  "sub.ultraModeText": "능동 위임 텍스트",
-  "sub.ultraModePreset": "프리셋 복원",
-  "sub.ultraModeLoadFail": "능동 위임 설정을 불러오지 못했습니다 — 프록시가 실행 중인가요?",
-  "sub.ultraModeSaveFail": "능동 위임 설정 저장에 실패했습니다",
-  "sub.ultraModeSaved": "능동 위임 설정이 저장되었습니다. 새 Codex 세션부터 적용됩니다.",
   "sub.fallbackLabel": "서브에이전트 폴백 체인",
   "sub.fallbackHint": "서브에이전트 모델을 사용할 수 없거나 실패할 때 순서대로 시도할 모델입니다.",
   "sub.fallbackAdd": "폴백 모델 추가…",
@@ -1227,12 +1190,6 @@ export const ko: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "폴백 설정을 저장하지 못했습니다",
   "sub.fallbackUnavailable": "현재 목록에 없지만 체인에 유지됩니다.",
   "sub.fallbackPollInvalid": "5000~600000ms 범위의 정수를 입력하세요.",
-  "sub.v2Compatibility.title": "네이티브 부모의 V2 호환성",
-  "sub.v2Compatibility.risk":
-    "네이티브 ChatGPT 부모가 V2로 이 라우팅 모델에 위임하면 작업이 암호화되어 실행 전에 실패할 수 있습니다. 라우팅 부모가 보내는 읽을 수 있는 작업에는 영향이 없습니다.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "이 서버는 복구 활성화 여부와 사용 가능 상태를 제공하지 않습니다. V1·평문 호환 위임을 사용하거나, 조건을 충족할 때만 실험적 V2 복구를 켜세요. 복구에는 할당량·지연·백엔드 의존성과 원문 충실도 손실 가능성이 따르며, 업스트림 프로토콜을 고치지는 않습니다.",
-  "sub.v2Compatibility.details": "호환성 자세히 보기",
 
   // logs
   "logs.title": "요청 로그",
@@ -3654,6 +3611,9 @@ export const ko: Record<TKey, string> = {
   "modal.apiKeyTransport": "API 키 헤더",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic 기본)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "프로토콜 기본값",
+  "modal.useEnvironmentKey": "환경 변수에서 API 키 읽기",
+  "modal.environmentKeyPlaceholder": "변수 이름(예: OPENAI_API_KEY)",
   "modal.apiKeyPlaceholder": "sk-… (또는 $ENV_VAR)",
   "modal.defaultModelPlaceholder": "예: gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",

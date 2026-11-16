@@ -1,7 +1,4 @@
-import {
-  anthropicInstanceRowShapeMatches,
-  isAnthropicInstanceId,
-} from "../../../backend/src/providers/anthropic-instance-id";
+import { isLegacyAnthropicAccountRow } from "@/contracts/legacy-account-privacy";
 import type {
   AccountLoginRow,
   AccountLoginStatus,
@@ -42,11 +39,7 @@ export function buildAccountLoginStatus(
     }
   }
   for (const [name, status] of Object.entries(accountLoginStatus)) {
-    if (
-      !isAnthropicInstanceId(name) ||
-      !anthropicInstanceRowShapeMatches(name, config.providers[name])
-    )
-      continue;
+    if (!isLegacyAnthropicAccountRow(name, config.providers[name])) continue;
     const publicStatus = { ...status };
     delete publicStatus.email;
     accountLoginStatus[name] = publicStatus;

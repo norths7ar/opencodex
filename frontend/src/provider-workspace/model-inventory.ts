@@ -180,6 +180,8 @@ export function catalogRefreshPending(value: unknown): boolean {
 function parseDiscoverySummary(value: unknown): ProviderDiscoverySummary | undefined {
   if (value === undefined) return undefined;
   const obj = record(value);
+  // Static channels and live channels without a persisted check return an empty object.
+  if (Object.keys(obj).length === 0) return undefined;
   const details = {
     ...(typeof obj.checkedAt === "string" ? { checkedAt: obj.checkedAt } : {}),
     ...(typeof obj.lastSuccessAt === "string" ? { lastSuccessAt: obj.lastSuccessAt } : {}),

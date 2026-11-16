@@ -9,13 +9,8 @@ import SubagentsWorkspace, {
 } from "../components/subagents-workspace/SubagentsWorkspace";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { useDataSurface } from "../data-surface";
-import SubagentSurfaceWarningModal from "../components/SubagentSurfaceWarningModal";
-import { SUBAGENT_SURFACE_GUIDE_URL } from "../subagent-surface";
-import {
-  useSubagentDelegation,
-  type UltraModePatch,
-  type UltraModeState,
-} from "./use-subagent-delegation";
+import { DataSurfaceSkeleton } from "../components/data-surface";
+import { useSubagentDelegation } from "./use-subagent-delegation";
 import { InEffectSummary } from "../components/v2-subagents/InEffectSummary";
 import { formatNamespacedModelId } from "../provider-icons";
 import { sectionAnchorId } from "../section-anchors";
@@ -35,19 +30,6 @@ type CachedSubagents = {
   fallbackAvailable?: string[];
 };
 
-type CachedMode = {
-  mode: UltraModeState;
-  pendingClientApply: boolean;
-};
-
-const UNLOADED_ULTRA_MODE: UltraModeState = {
-  enabled: false,
-  hintText: null,
-  recommendation: null,
-  multiAgentV2Enabled: false,
-  multiAgentMode: "default",
-};
-
 function seedSubagents(cacheKey: string): CachedSubagents | null {
   return readSessionListCache<CachedSubagents>(cacheKey);
 }
@@ -65,8 +47,6 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const claudeAvailable = !capabilities || capabilities.clients.includes("claude");
   const cacheKey = `ocx.subagents.v1:${apiBase}`;
   const cached = seedSubagents(cacheKey);
-  const modeCacheKey = `ocx.subagents.mode.v1:${apiBase}`;
-  const cachedMode = readSessionListCache<CachedMode>(modeCacheKey);
   const [chosen, setChosen] = useState<string[]>(() => cached?.chosen ?? []);
   const [fallback, setFallback] = useState<string[]>(() => cached?.fallback ?? []);
   const [fallbackPollMs, setFallbackPollMs] = useState(() => cached?.pollMs ?? 60000);
@@ -111,142 +91,30 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   const delegation = useSubagentDelegation(apiBase);
   /** The Claude Code pin as the pin panel last read or wrote it, for the summary tiles. */
   const [pin, setPin] = useState<string | null | undefined>(undefined);
-  const [ultraState, setUltraState] = useState<{ apiBase: string; mode: UltraModeState } | null>(
-    () => (cachedMode ? { apiBase, mode: cachedMode.mode } : null),
+  const currentApiBase = useRef(apiBase);
+  const [clientApply, setClientApply] = useState<{ apiBase: string; pending: boolean } | null>(
+    null,
   );
-  const ultraModeCurrent = ultraState?.apiBase === apiBase;
-  const ultraMode = ultraModeCurrent ? ultraState.mode : UNLOADED_ULTRA_MODE;
-  const [ultraSaving, setUltraSaving] = useState(false);
-  /** A base/v2 selection from this page waiting on the approval dialog. */
-  /**
-   * A base/v2 selection waiting on the approval dialog, tagged with the endpoint it was staged
-   * for. Switching endpoints with the dialog open must not apply one proxy's answer to another,
-   * and tagging beats clearing it from an effect, which would be a cascading render.
-   */
-  const [pendingSurface, setPendingSurface] = useState<{
-    mode: "default" | "v2";
-    apiBase: string;
-  } | null>(null);
-  const [ultraLoadFailed, setUltraLoadFailed] = useState(false);
-  const [pendingClientApply, setPendingClientApply] = useState(
-    () => cachedMode?.pendingClientApply ?? false,
-  );
-  const ultraLoadGeneration = useRef(0);
-  const currentUltraApiBase = useRef(apiBase);
   useEffect(() => {
-    currentUltraApiBase.current = apiBase;
-    ultraLoadGeneration.current++;
-  }, [apiBase]);
-
-  // Shared loader for /api/v2 state (multi-agent v2 flag + mode hint). Initial-load
-  // failures surface sub.ultraModeLoadFail; refresh failures are rethrown so
-  // saveUltraMode can report them against the save action.
-  const loadUltraMode = useCallback(
-    async (signal?: AbortSignal) => {
-      if (currentUltraApiBase.current !== apiBase) return false;
-      const generation = ++ultraLoadGeneration.current;
-      const res = await fetch(`${apiBase}/api/v2`, { signal });
-      const data = await readJsonOrThrow<{
-        enabled?: boolean;
-        multiAgentMode?: "v1" | "default" | "v2";
-        multiAgentModeHintText?: string | null;
-        keepNativeChatGptOnV1?: boolean;
-        pendingClientApply?: boolean;
-        multiAgentModeHintRecommendation?: { text?: unknown; revision?: unknown };
-      }>(res, t("sub.ultraModeLoadFail"));
-      if (!data) return false;
-      if (
-        signal?.aborted ||
-        generation !== ultraLoadGeneration.current ||
-        currentUltraApiBase.current !== apiBase
-      )
-        return false;
-      setUltraLoadFailed(false);
-      setPendingClientApply(data.pendingClientApply === true);
-      const rawRecommendation = data.multiAgentModeHintRecommendation;
-      const recommendation =
-        rawRecommendation &&
-        typeof rawRecommendation.text === "string" &&
-        rawRecommendation.text.trim().length > 0 &&
-        typeof rawRecommendation.revision === "string" &&
-        rawRecommendation.revision.trim().length > 0
-          ? { text: rawRecommendation.text, revision: rawRecommendation.revision }
-          : null;
-      const mode: UltraModeState = {
-        enabled: data.enabled ?? false,
-        loaded: true,
-        keepNativeChatGptOnV1: data.keepNativeChatGptOnV1 === true,
-        hintText: data.multiAgentModeHintText ?? null,
-        recommendation,
-        // Ultra mode replaces Codex's effort-derived policy for every model. The
-        // `default` surface still preserves upstream V1 pins (for example luna),
-        // so only an explicitly forced V2 catalog is an effective surface here.
-        multiAgentV2Enabled: data.enabled === true && data.multiAgentMode === "v2",
-        multiAgentMode: data.multiAgentMode ?? "default",
-      };
-      setUltraState({ apiBase, mode });
-      writeSessionListCache(modeCacheKey, {
-        mode,
-        pendingClientApply: data.pendingClientApply === true,
-      } satisfies CachedMode);
-      return true;
-    },
-    [apiBase, modeCacheKey, t],
-  );
-
-  useEffect(() => {
+    currentApiBase.current = apiBase;
     const controller = new AbortController();
     void (async () => {
-      await loadUltraMode(controller.signal);
-    })().catch(() => {
-      if (!controller.signal.aborted) {
-        setOk(false);
-        setUltraLoadFailed(true);
-        setStatus(t("sub.ultraModeLoadFail"));
+      try {
+        const response = await fetch(apiBase + "/api/codex-agent-settings", {
+          signal: controller.signal,
+        });
+        const data = await readJsonOrThrow<{ pendingClientApply?: boolean }>(response);
+        if (data && !controller.signal.aborted) {
+          setClientApply({ apiBase, pending: data.pendingClientApply === true });
+        }
+      } catch {
+        // The saved roster remains available when client apply status cannot be read.
       }
-    });
-    return () => {
-      controller.abort();
-    };
-  }, [loadUltraMode, t]);
-
-  const saveUltraMode = async (patch: UltraModePatch) => {
-    if (ultraSaving || !ultraModeCurrent || currentUltraApiBase.current !== apiBase) return;
-    const requestApiBase = apiBase;
-    setUltraSaving(true);
-    setStatus("");
-    try {
-      const res = await fetch(`${apiBase}/api/v2`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
-      });
-      await readJsonOrThrow(res, t("sub.ultraModeSaveFail"));
-      if (currentUltraApiBase.current !== requestApiBase || !(await loadUltraMode())) return;
-      setOk(true);
-      setStatus(t("sub.ultraModeSaved"));
-    } catch (error) {
-      if (currentUltraApiBase.current !== requestApiBase) return;
-      setOk(false);
-      setStatus(error instanceof Error && error.message ? error.message : t("sub.networkError"));
-    } finally {
-      setUltraSaving(false);
-    }
-  };
-
-  const retryUltraMode = useCallback(async () => {
-    try {
-      if (!(await loadUltraMode())) return;
-      // A successful retry replaces the failed initial load; do not leave the
-      // page-level load error visible after the controls have recovered.
-      setOk(false);
-      setStatus((current) => (current === t("sub.ultraModeLoadFail") ? "" : current));
-    } catch {
-      setOk(false);
-      setUltraLoadFailed(true);
-      setStatus(t("sub.ultraModeLoadFail"));
-    }
-  }, [loadUltraMode, t]);
+    })();
+    return () => controller.abort();
+  }, [apiBase]);
+  const clientApplyCurrent = clientApply?.apiBase === apiBase;
+  const pendingClientApply = clientApplyCurrent && clientApply.pending;
 
   const loadFallback = useCallback(async () => {
     fallbackLoadController.current?.abort();
@@ -455,7 +323,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
         r,
         t("sub.fallbackSaveFailed"),
       );
-      if (currentUltraApiBase.current !== requestApiBase) return;
+      if (currentApiBase.current !== requestApiBase) return;
       if (!d || !Array.isArray(d.models) || typeof d.pollMs !== "number")
         throw new Error(t("sub.fallbackSaveFailed"));
       fallbackRevision.current += 1;
@@ -538,6 +406,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
   return (
     <>
       {pageHeader}
+      {cold && <DataSurfaceSkeleton label={t("common.loading")} rows={5} />}
       <div
         aria-busy={cold || undefined}
         style={{ display: "contents", visibility: cold ? "hidden" : undefined }}
@@ -546,7 +415,7 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
           <InEffectSummary
             chosen={displayedChosen}
             title={
-              capabilities && (!ultraModeCurrent || pendingClientApply)
+              capabilities && (!clientApplyCurrent || pendingClientApply)
                 ? locale === "zh" || locale === "zh-TW"
                   ? pendingClientApply
                     ? "已保存 · Codex 未接入"
@@ -626,55 +495,13 @@ export default function Subagents({ apiBase }: { apiBase: string }) {
             effort: delegation.effort,
             efforts: delegation.efforts,
             available: delegation.available,
-            guidanceEnabled: delegation.guidanceEnabled,
             syncCodexDefaults: delegation.syncCodexDefaults,
             saving: delegation.saving,
             onSave: (patch) => {
               void delegation.save(patch);
             },
-            ultraMode,
-            ultraSaving: ultraSaving || !ultraModeCurrent,
-            // This page carries the same v1/base/v2 switch as Models and the Dashboard, so it
-            // needs the same gate: base and v2 wait for an answer, everything else writes.
-            onUltraModeSave: (patch) => {
-              if (patch.multiAgentMode === "default" || patch.multiAgentMode === "v2") {
-                setPendingSurface({ mode: patch.multiAgentMode, apiBase });
-                return;
-              }
-              void saveUltraMode(patch);
-            },
-            ultraLoadFailed,
-            onUltraModeRetry: () => {
-              void retryUltraMode();
-            },
           }}
         />
-        {pendingSurface && pendingSurface.apiBase === apiBase && (
-          <SubagentSurfaceWarningModal
-            reason="selection"
-            mode={pendingSurface.mode}
-            docsUrl={SUBAGENT_SURFACE_GUIDE_URL}
-            busy={ultraSaving}
-            onContinue={() => {
-              const next = pendingSurface.mode;
-              setPendingSurface(null);
-              // Answer the advisory too: this operator has just read the same warning.
-              void saveUltraMode({
-                multiAgentMode: next,
-                multiAgentSurfaceAdvisoryAcknowledged: true,
-              });
-            }}
-            onChooseV1={() => {
-              setPendingSurface(null);
-              if (ultraMode.multiAgentMode !== "v1")
-                void saveUltraMode({
-                  multiAgentMode: "v1",
-                  multiAgentSurfaceAdvisoryAcknowledged: true,
-                });
-            }}
-            onDismiss={() => setPendingSurface(null)}
-          />
-        )}
       </div>
     </>
   );

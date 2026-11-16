@@ -137,7 +137,9 @@ export default function ProviderSettings({
   const [baseUrl, setBaseUrl] = useState(item.baseUrl);
   const [defaultModel, setDefaultModel] = useState(item.defaultModel ?? "");
   const [authMode, setAuthMode] = useState(initialAuth);
-  const [apiKeyTransport, setApiKeyTransport] = useState(item.apiKeyTransport ?? "x-api-key");
+  const [apiKeyTransport, setApiKeyTransport] = useState<"x-api-key" | "bearer" | "">(
+    item.apiKeyTransport ?? "",
+  );
   const [note, setNote] = useState(item.note ?? "");
   const [allowPrivateNetwork, setAllowPrivateNetwork] = useState(item.allowPrivateNetwork ?? false);
   const [preserveReasoningReplay, setPreserveReasoningReplay] = useState(
@@ -184,7 +186,7 @@ export default function ProviderSettings({
     setBaseUrl(item.baseUrl);
     setDefaultModel(item.defaultModel ?? "");
     setAuthMode(String(item.authMode ?? (item.keyOptional ? "local" : "key")));
-    setApiKeyTransport(item.apiKeyTransport ?? "x-api-key");
+    setApiKeyTransport(item.apiKeyTransport ?? "");
     setNote(item.note ?? "");
     setAllowPrivateNetwork(item.allowPrivateNetwork ?? false);
     setPreserveReasoningReplay(item.preserveResponsesReasoningContent === true);
@@ -227,6 +229,7 @@ export default function ProviderSettings({
     if (apiBase === undefined) return;
     let cancelled = false;
     const providerId = item.name;
+    const serviceId = item.serviceId;
     const savedBaseUrl = item.baseUrl;
     fetch(`${apiBase}/api/provider-presets`)
       .then((r) => readJsonIfOk<{ providers?: CatalogPreset[] }>(r))
@@ -237,8 +240,12 @@ export default function ProviderSettings({
           setChoicesStatus("error");
           return;
         }
-        const preset = (d.providers ?? []).find((p) => p.id === providerId);
-        const choices = preset?.baseUrlChoices;
+        const preset = (d.providers ?? []).find(
+          (p) => p.id === providerId || (serviceId && p.serviceId === serviceId),
+        );
+        const choices = preset?.baseUrlChoices?.length
+          ? [...preset.baseUrlChoices, { id: "custom", label: t("modal.endpoint.custom") }]
+          : undefined;
         setBaseUrlChoices(choices);
         setChoicesStatus("ready");
         setEndpointChoice(matchChoiceId(choices, savedBaseUrl));
@@ -253,7 +260,7 @@ export default function ProviderSettings({
     };
     // Remount via key={item.name}; capture savedBaseUrl once per mount/fetch.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- item.baseUrl sync is handled by the form-reset effect
-  }, [apiBase, item.name]);
+  }, [apiBase, item.name, item.serviceId, t]);
 
   useEffect(() => {
     if (apiBase === undefined || capabilities) return;
@@ -315,9 +322,7 @@ export default function ProviderSettings({
     baseUrl.trim() !== item.baseUrl ||
     defaultModel.trim() !== (item.defaultModel ?? "") ||
     authMode !== String(item.authMode ?? (item.keyOptional ? "local" : "key")) ||
-    (adapter.trim() === "anthropic" &&
-      authMode === "key" &&
-      apiKeyTransport !== (item.apiKeyTransport ?? "x-api-key")) ||
+    (authMode === "key" && apiKeyTransport !== (item.apiKeyTransport ?? "")) ||
     note.trim() !== (item.note ?? "") ||
     allowPrivateNetwork !== (item.allowPrivateNetwork ?? false) ||
     liveModels !== savedLiveModels ||
@@ -344,14 +349,10 @@ export default function ProviderSettings({
     return list;
   }, [adapter, capabilities]);
 
-  const isPreset = isCatalogProviderId(item.name);
   const isSubscription = initialAuth === "oauth";
   const hasEndpointPicker =
-    choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
-  const supportsApiKeyTransport = adapter.trim() === "anthropic" && authMode === "key";
-  // Lock plain baseUrl for presets while loading or when there is no picker.
-  // On fetch error, keep it editable so allowBaseUrlOverride providers are not trapped.
-  const plainBaseUrlLocked = isPreset && choicesStatus !== "error";
+    !isSubscription && choicesStatus === "ready" && !!(baseUrlChoices && baseUrlChoices.length > 0);
+  const supportsApiKeyTransport = authMode === "key";
 
   const save = async (): Promise<boolean> => {
     if (!onUpdateProvider) {
@@ -401,12 +402,16 @@ export default function ProviderSettings({
       const patch: ProviderUpdatePatch = pacingOnly
         ? { requestPacing: pacingDraft }
         : {
-            adapter: adapter.trim(),
-            baseUrl: nextBaseUrl,
-            defaultModel: defaultModel.trim(),
-            authMode,
-            note: note.trim(),
-            allowPrivateNetwork,
+            ...(adapter.trim() !== item.adapter ? { adapter: adapter.trim() } : {}),
+            ...(nextBaseUrl !== item.baseUrl ? { baseUrl: nextBaseUrl } : {}),
+            ...(defaultModel.trim() !== (item.defaultModel ?? "")
+              ? { defaultModel: defaultModel.trim() }
+              : {}),
+            ...(authMode !== initialAuth ? { authMode } : {}),
+            ...(note.trim() !== (item.note ?? "") ? { note: note.trim() } : {}),
+            ...(allowPrivateNetwork !== (item.allowPrivateNetwork ?? false)
+              ? { allowPrivateNetwork }
+              : {}),
             ...(pacingDirty ? { requestPacing: pacingDraft } : {}),
           };
       if (!pacingOnly) {
@@ -424,8 +429,8 @@ export default function ProviderSettings({
         if (adapter.trim() === "cursor" && cursorHttpVersion !== savedCursorHttpVersion) {
           patch.upstreamHttpVersion = cursorHttpVersion === "http1.1" ? "http1.1" : null;
         }
-        if (supportsApiKeyTransport) patch.apiKeyTransport = apiKeyTransport;
-        else if (item.apiKeyTransport !== undefined) patch.apiKeyTransport = "";
+        if (supportsApiKeyTransport && apiKeyTransport !== (item.apiKeyTransport ?? ""))
+          patch.apiKeyTransport = apiKeyTransport;
       }
       const res = await onUpdateProvider(item.name, patch);
       setMsg(
@@ -454,7 +459,7 @@ export default function ProviderSettings({
     setBaseUrl(item.baseUrl);
     setDefaultModel(item.defaultModel ?? "");
     setAuthMode(initialAuth);
-    setApiKeyTransport(item.apiKeyTransport ?? "x-api-key");
+    setApiKeyTransport(item.apiKeyTransport ?? "");
     setNote(item.note ?? "");
     setAllowPrivateNetwork(item.allowPrivateNetwork ?? false);
     setLiveModels(savedLiveModels);
@@ -576,13 +581,7 @@ export default function ProviderSettings({
           {isSubscription ? (
             <span className="break-all py-2 text-[14px] text-fg">{baseUrl}</span>
           ) : (
-            <input
-              className="input"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-              readOnly={plainBaseUrlLocked}
-              disabled={plainBaseUrlLocked}
-            />
+            <input className="input" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} />
           )}
         </label>
       )}
@@ -638,7 +637,7 @@ export default function ProviderSettings({
       )}
       <label className="pwi-settings-field">
         <span className="pwi-settings-label">{t("pws.authMode")}</span>
-        {isPreset ? (
+        {isSubscription ? (
           <span className="py-2 text-[14px] text-fg">{authModeLabel(item, t)}</span>
         ) : (
           <Select
@@ -648,16 +647,8 @@ export default function ProviderSettings({
             onChange={setAuthMode}
             options={[
               { value: "key", label: t("modal.badge.apiKey") },
-              { value: "forward", label: t("pws.auth.chatgptPassthrough") },
-              { value: "oauth", label: t("modal.badge.oauth") },
               { value: "local", label: t("modal.badge.local") },
-            ].filter(
-              (option) =>
-                !capabilities ||
-                option.value === "key" ||
-                option.value === "local" ||
-                (option.value === "oauth" && capabilities.oauthProviders?.includes(item.name)),
-            )}
+            ]}
           />
         )}
       </label>
@@ -669,8 +660,9 @@ export default function ProviderSettings({
             fullWidth
             label={t("modal.apiKeyTransport")}
             value={apiKeyTransport}
-            onChange={(value) => setApiKeyTransport(value as "x-api-key" | "bearer")}
+            onChange={(value) => setApiKeyTransport(value as "x-api-key" | "bearer" | "")}
             options={[
+              { value: "", label: t("modal.apiKeyTransportAuto") },
               { value: "x-api-key", label: t("modal.apiKeyTransportNative") },
               { value: "bearer", label: t("modal.apiKeyTransportBearer") },
             ]}

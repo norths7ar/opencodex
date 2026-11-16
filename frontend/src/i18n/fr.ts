@@ -760,16 +760,13 @@ export const fr: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Enregistrer aussi comme valeur par défaut de Codex",
   "dash.syncCodexSubagentDefaultsHint":
     "Si cette option est activée, le choix ci-dessus est inscrit dans la configuration de Codex afin que les nouvelles tâches commencent aussi avec ce modèle. Si elle est désactivée, il n’est mémorisé qu’ici. Il prend effet à la prochaine synchronisation ou au prochain redémarrage, sans modifier vos paramètres [agents] saisis manuellement.",
-  "dash.multiAgentGuidance": "Indiquer à Codex comment répartir le travail",
-  "dash.multiAgentGuidanceHint":
-    "Envoie une brève note indiquant à Codex comment confier le travail aux sous-agents. En v2, elle précise les modèles utilisables et celui à privilégier ; en v1, elle ne s’applique qu’avec un effort de raisonnement maximal ou ultra. Si cette option est désactivée, aucune note n’est ajoutée.",
   "dash.injectionNone": "Aucun",
   "dash.injectionEffortLabel": "Effort de raisonnement",
   "dash.injectionEffortNone": "Valeur par défaut du modèle",
-  "dash.effortCapLabel": "Limite de l’effort ultra en V2",
-  "dash.subagentEffortCapLabel": "Limite de l’effort des sous-agents en V2",
+  "dash.effortCapLabel": "Limite de raisonnement collaboratif",
+  "dash.subagentEffortCapLabel": "Limite de raisonnement des agents enfants",
   "dash.effortCapHelp":
-    "Limite l’effort de raisonnement des tours en mode ultra V2. Lorsqu’une limite est définie, les requêtes entrantes avec l’effort maximal (issues du mode ultra) sont plafonnées au niveau sélectionné. La limite des sous-agents s’applique uniquement aux agents enfants créés. Les plafonds ne font que réduire l’effort, jamais l’augmenter. Si un modèle ne prend pas en charge le niveau plafonné, le niveau inférieur pris en charge le plus proche est utilisé.",
+    "Limite le raisonnement en collaboration. Les agents enfants suivent aussi leur propre limite. Le modèle utilise le niveau pris en charge le plus proche sans dépasser la limite.",
   "dash.effortCapNone": "Aucune limite",
   "dash.maintenance": "Maintenance",
   "dash.maintenanceHint":
@@ -864,15 +861,6 @@ export const fr: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "Je comprends qu’il s’agit d’une connexion d’abonnement via un tiers et je vérifierai les conditions applicables.",
   "oauthTos.anthropicContinue": "Continuer avec l’abonnement Claude",
-  "subagentSurface.selectionTitle": "Passer l’interface de sous-agents à {mode} ?",
-  "subagentSurface.selectionBody":
-    "Sur {mode}, les modèles ChatGPT qui utilisent l’interface v2 (Sol et Terra sur base, tous les modèles sur v2) confient leur tâche, chiffrée pour le backend ChatGPT, à un modèle routé tel que Grok ou Claude, et le modèle routé ne peut pas la lire. Cette délégation échoue avec unreadable_encrypted_agent_task tant que ce n’est pas corrigé en amont. v1 délègue de manière fiable entre fournisseurs.",
-  "subagentSurface.advisoryTitle": "v1 est désormais l’interface de sous-agents par défaut",
-  "subagentSurface.advisoryBody":
-    "Cette installation utilise {mode}, où un modèle ChatGPT sur l’interface v2 confie à un modèle routé une tâche chiffrée qu’il ne peut pas lire, si bien que la délégation entre fournisseurs échoue. Nous recommandons v1 tant que ce n’est pas corrigé en amont. Votre paramètre actuel reste inchangé jusqu’à ce que vous fassiez un choix.",
-  "subagentSurface.continue": "Continuer",
-  "subagentSurface.switchToV1": "Passer à v1",
-  "subagentSurface.learnMore": "Pourquoi cet échec",
   "prov.logoutOk": "Déconnexion de {provider} réussie.",
   "prov.logoutFail":
     "Impossible de se déconnecter de {provider}. L’état de votre compte n’a pas changé.",
@@ -1012,21 +1000,7 @@ export const fr: Record<TKey, string> = {
   "models.capSaveFailed": "Échec de l’enregistrement du plafond de contexte",
   "models.contextCapped": "Plafond de 350k",
   "models.contextCapLabel": "Fenêtre par défaut / plafond",
-  "models.v2Label": "Sous-agent",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "Que sont v1 et v2 ?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "Tous les modèles → interface v1",
-  "models.v2ModeDesc_default": "Valeurs par défaut en amont (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "Tous les modèles → interface v2",
-  "models.keepNativeOnV1": "Garder ChatGPT sur v1",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT chiffre les tâches enfants v2 uniquement lorsqu’un parent natif ChatGPT reste sur v2, de sorte que Grok et Claude ne peuvent pas les lire. Activez cette option pour garder Sol/Terra sur v1 et éviter ce chiffrement. Les parents routés restent sur v2.",
-  "models.v2Help":
-    "Contrôle l’interface multi-agent pour tous les modèles.\n\nv1 : agent classique à fil unique. Tous les modèles utilisent l’interface collab v1.\nbase : valeurs par défaut en amont — sol/terra utilisent v2, luna utilise v1 et les autres suivent l’indicateur de fonctionnalité codex.\nv2 : agent multifil avec spawn_agent. Tous les modèles utilisent l’interface collab v2.\n\nEn v2, « Garder ChatGPT sur v1 » laisse Sol/Terra sur l’interface v1 afin qu’ils puissent encore lancer Grok ou Claude. ChatGPT chiffre les tâches enfants v2 ; les modèles routés ne peuvent pas les lire. Les parents routés restent sur v2.\n\nLes modifications s’appliquent aux nouvelles sessions.",
-  "dash.multiAgent": "Sous-agent",
   "dash.codexDesktopAuthless": "Ouvrir Codex sans se connecter",
   "dash.codexDesktopAuthlessHint":
     "Désactivé par défaut. Ignore la connexion Desktop séparée pour les connexions locales admissibles. Les identifiants du fournisseur restent nécessaires. Redémarrez Codex après toute modification. Certaines fonctions Desktop liées au compte peuvent être indisponibles.",
@@ -1219,7 +1193,6 @@ export const fr: Record<TKey, string> = {
   "sub.subtitle":
     "La commande {cmd} de Codex ne présente que les 5 premiers modèles (par priorité) comme remplacements. Choisissez-en jusqu’à 5 ici — natifs gpt ou routés — et opencodex définit leur priorité dans le catalogue pour qu’ils apparaissent en tête. Tout autre modèle reste accessible par son nom exact ; ceci contrôle uniquement ce qui est affiché.",
   "sub.featured": "À la une",
-  "sub.advanced": "Avancé",
   "sub.orderHintAria": "Comment cet ordre est utilisé",
   "sub.orderHint":
     "L’ordre affiché ici détermine les positions 1 à 5 en haut du sélecteur de modèles Codex et les modèles candidats par défaut pour {cmd}. Si moins de 5 modèles mis en avant sont visibles dans le sélecteur, les emplacements restants sont proposés selon la priorité du catalogue ; 5 modèles mis en avant visibles remplissent la liste, sauf si un ordre personnalisé du sélecteur de modèles modifie la priorité du catalogue.",
@@ -1256,18 +1229,6 @@ export const fr: Record<TKey, string> = {
   "sub.workspace.mainAria": "Détails du modèle de sous-agent",
   "sub.workspace.notFeatured": "Non mis à la une",
   "sub.workspace.priority": "Priorité",
-  "sub.ultraMode": "Délégation toujours proactive",
-  "sub.ultraModeHint":
-    "Activer la politique de délégation multi-agent proactive pour tous les modèles et niveaux de raisonnement (sans modifier le niveau de raisonnement lui-même). Écrit features.multi_agent_v2.multi_agent_mode_hint_text dans config.toml.",
-  "sub.ultraModeV2Required":
-    "Nécessite l’interface multi-agent v2 — activez multi_agent_v2 et sélectionnez d’abord v2 dans le contrôle du mode Sous-agent.",
-  "sub.ultraModeText": "Texte de délégation proactive",
-  "sub.ultraModePreset": "Rétablir le préréglage",
-  "sub.ultraModeLoadFail":
-    "Échec du chargement des paramètres de délégation proactive — le proxy est-il en cours d’exécution ?",
-  "sub.ultraModeSaveFail": "Échec de l’enregistrement des paramètres de délégation proactive",
-  "sub.ultraModeSaved":
-    "Délégation proactive enregistrée. S’applique aux nouvelles sessions Codex.",
   "sub.workspace.removeFromFeatured": "Retirer {m} de la sélection À la une",
   "sub.workspace.selectModel": "Sélectionner un modèle",
   "sub.workspace.selectModelDesc":
@@ -1282,12 +1243,6 @@ export const fr: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "Échec de l’enregistrement des paramètres de secours",
   "sub.fallbackUnavailable": "Absent du catalogue actuel ; conservé dans la chaîne.",
   "sub.fallbackPollInvalid": "Saisissez un entier de 5000 à 600000 ms.",
-  "sub.v2Compatibility.title": "Compatibilité V2 du parent natif",
-  "sub.v2Compatibility.risk":
-    "Si un parent ChatGPT natif délègue à ce modèle routé via V2, la tâche peut être chiffrée et échouer avant son exécution. Les tâches lisibles des parents routés ne sont pas affectées.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "Ce serveur ne fournit pas l’activation ni l’éligibilité de la récupération. Utilisez V1/texte clair, ou activez la récupération V2 expérimentale uniquement si éligible. Elle ajoute quota, latence, dépendance au backend et risque de perte de fidélité ; elle ne corrige pas le protocole amont.",
-  "sub.v2Compatibility.details": "Détails de compatibilité",
   "logs.title": "Journaux des requêtes",
   "logs.tabLogs": "Journaux",
   "logs.tabDebug": "Débogage",
@@ -2276,6 +2231,9 @@ export const fr: Record<TKey, string> = {
   "modal.apiKeyTransport": "En-tête de clé API",
   "modal.apiKeyTransportNative": "x-api-key (natif Anthropic)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "Valeur par défaut du protocole",
+  "modal.useEnvironmentKey": "Lire la clé API depuis une variable d’environnement",
+  "modal.environmentKeyPlaceholder": "Nom de variable, p. ex. OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (ou $ENV_VAR)",
   "modal.defaultModelPlaceholder": "p. ex. gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",

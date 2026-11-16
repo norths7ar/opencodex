@@ -28,7 +28,6 @@ import {
   VISION_MAX_DESCRIPTIONS_DEFAULT,
   VISION_TIMEOUT_MS_DEFAULT,
 } from "./dashboard-shared";
-import { DashboardMultiAgentControl, DashboardMultiAgentHelp } from "./dashboard-overview-head";
 import { VisionAdvancedPopover } from "./dashboard-vision-popover";
 import { shadowSourceModelLabel } from "./shadow-call-source";
 import { shadowBackgroundModelBadge } from "./shadow-call-source";
@@ -53,45 +52,21 @@ function UnresolvedControl({ d, loading }: { d: Dash; loading: boolean }) {
 /* ---- Subagents -------------------------------------------------------------------------------- */
 
 export function DashboardSubagentSection({ d }: { d: Dash }) {
-  const { t, maMode, maError } = d;
+  const { t } = d;
   return (
     <SettingsSection
       id="proxy-subagents"
       title={t("proxyV2.secSubagents")}
       lede={t("proxyV2.secSubagentsLede")}
     >
-      <SettingsRow
-        label={t("dash.multiAgent")}
-        hint={t("proxyV2.maModeHint")}
-        help={<DashboardMultiAgentHelp />}
-        control={
-          d.maModeResolved ? (
-            <DashboardMultiAgentControl
-              maMode={maMode}
-              maBusy={d.maBusy}
-              switchMaMode={d.switchMaMode}
-            />
-          ) : (
-            <UnresolvedControl d={d} loading={d.maModeLoading} />
-          )
-        }
-      >
-        {maError && (
-          <div role="alert" className="text-[13px] break-words text-danger">
-            {maError}
-          </div>
-        )}
-      </SettingsRow>
-      {d.maModeResolved &&
-        maMode !== "v1" &&
-        (d.effortCapsReady ? (
-          <DashboardEffortCapRows apiBase={d.apiBase} d={d} />
-        ) : (
-          <SettingsRow
-            label={t("dash.effortCapLabel")}
-            control={<UnresolvedControl d={d} loading={d.multiAgentLoading} />}
-          />
-        ))}
+      {d.effortCapsReady ? (
+        <DashboardEffortCapRows apiBase={d.apiBase} d={d} />
+      ) : (
+        <SettingsRow
+          label={t("dash.effortCapLabel")}
+          control={<UnresolvedControl d={d} loading={d.multiAgentLoading} />}
+        />
+      )}
       {d.injectionReady ? (
         <DashboardInjectionPanel apiBase={d.apiBase} d={d} />
       ) : (
@@ -107,8 +82,6 @@ export function DashboardSubagentSection({ d }: { d: Dash }) {
 function DashboardEffortCapRows({ apiBase, d }: { apiBase: string; d: Dash }) {
   const {
     t,
-    maMode,
-    maModeResolved,
     effortCap,
     subagentEffortCap,
     effortCapSaving,
@@ -116,8 +89,6 @@ function DashboardEffortCapRows({ apiBase, d }: { apiBase: string; d: Dash }) {
     setSubagentEffortCap,
     setEffortCapSaving,
   } = d;
-
-  if (!maModeResolved || maMode === "v1") return null;
 
   const options = [
     { value: "", label: t("dash.effortCapNone") },

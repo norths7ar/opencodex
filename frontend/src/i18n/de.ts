@@ -749,16 +749,13 @@ export const de: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Auch als Codex-Standard speichern",
   "dash.syncCodexSubagentDefaultsHint":
     "Eingeschaltet wird die Wahl von oben in Codex' eigene Konfiguration geschrieben, sodass auch neue Aufgaben mit diesem Modell starten. Ausgeschaltet wird sie nur hier gemerkt. Wirksam beim nächsten Sync oder Neustart; deine selbst geschriebenen [agents]-Einstellungen bleiben unberührt.",
-  "dash.multiAgentGuidance": "Codex sagen, wie Arbeit aufgeteilt wird",
-  "dash.multiAgentGuidanceHint":
-    "Schickt Codex eine kurze Notiz, wie Arbeit an Sub-Agenten übergeben werden soll. Auf v2 nennt sie die verfügbaren Modelle und das bevorzugte; auf v1 wirkt sie nur bei Reasoning-Effort max oder ultra. Ausgeschaltet wird keine Notiz angehängt.",
   "dash.injectionNone": "Keine",
   "dash.injectionEffortLabel": "Reasoning-Aufwand",
   "dash.injectionEffortNone": "Modell-Standard",
-  "dash.effortCapLabel": "V2 Ultra Effort-Limit",
-  "dash.subagentEffortCapLabel": "V2 Sub-Agent Effort-Limit",
+  "dash.effortCapLabel": "Effort-Limit für Zusammenarbeit",
+  "dash.subagentEffortCapLabel": "Effort-Limit für Kind-Agenten",
   "dash.effortCapHelp":
-    "Begrenzt die Reasoning-Intensität für V2-Ultra-Modus-Turns. Wenn gesetzt, werden eingehende Max-Anfragen (aus dem Ultra-Modus) auf das gewählte Niveau begrenzt. Das Sub-Agent-Limit gilt nur für erzeugte Kind-Agenten. Limits senken die Intensität nur, sie erhöhen sie nie. Wenn ein Modell das gewählte Niveau nicht unterstützt, wird automatisch auf das nächste unterstützte Niveau herabgesetzt.",
+    "Begrenzt den Reasoning-Effort bei Zusammenarbeit. Für Kind-Agenten gilt zusätzlich ihr eigenes Limit. Modelle nutzen die höchste unterstützte Stufe bis zum Limit.",
   "dash.effortCapNone": "Kein Limit",
   "dash.maintenance": "Wartung",
   "dash.maintenanceHint":
@@ -852,15 +849,6 @@ export const de: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "Mir ist klar, dass dies eine Abo-Verbindung über einen Drittanbieter ist, und ich prüfe die geltenden Bedingungen.",
   "oauthTos.anthropicContinue": "Mit Claude-Abo fortfahren",
-  "subagentSurface.selectionTitle": "Sub-Agent-Oberfläche auf {mode} umstellen?",
-  "subagentSurface.selectionBody":
-    "Auf {mode} übergeben ChatGPT-Modelle, die die v2-Oberfläche nutzen — Sol und Terra auf base, alle Modelle auf v2 —, ihre Aufgabe an ein geroutetes Modell wie Grok oder Claude, verschlüsselt für das ChatGPT-Backend, und das geroutete Modell kann sie nicht lesen. Diese Delegation schlägt mit unreadable_encrypted_agent_task fehl, bis das Problem upstream behoben ist. v1 delegiert zuverlässig über Anbieter hinweg.",
-  "subagentSurface.advisoryTitle": "v1 ist jetzt die Standard-Sub-Agent-Oberfläche",
-  "subagentSurface.advisoryBody":
-    "Diese Installation nutzt {mode}; ein ChatGPT-Modell auf der v2-Oberfläche übergibt dabei einem gerouteten Modell eine verschlüsselte Aufgabe, die es nicht lesen kann, und die Delegation über Anbieter hinweg bricht. Wir empfehlen v1, bis das Problem upstream behoben ist. Deine aktuelle Einstellung bleibt unverändert, bis du etwas wählst.",
-  "subagentSurface.continue": "Fortsetzen",
-  "subagentSurface.switchToV1": "Zu v1 wechseln",
-  "subagentSurface.learnMore": "Warum das fehlschlägt",
   "prov.logoutOk": "Von {provider} abgemeldet.",
   "prov.logoutFail": "Abmeldung von {provider} fehlgeschlagen. Der Kontostatus bleibt unverändert.",
   "prov.removed": '"{name}" entfernt.',
@@ -995,21 +983,7 @@ export const de: Record<TKey, string> = {
   "models.capSaveFailed": "Kontext-Limit konnte nicht gespeichert werden",
   "models.contextCapped": "350k-Limit",
   "models.contextCapLabel": "Standardfenster / Limit",
-  "models.v2Label": "Sub-Agent",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "Was ist v1 / v2?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "Alle Modelle → v1-Oberfläche",
-  "models.v2ModeDesc_default": "Upstream-Standard (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "Alle Modelle → v2-Oberfläche",
-  "models.keepNativeOnV1": "ChatGPT auf v1 lassen",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT-native Eltern verschlüsseln v2-Kindaufgaben — Grok und Claude können sie nicht lesen. An lassen, wenn Sol/Terra weiterhin geroutete Modelle starten sollen. Geroutete Eltern bleiben auf v2.",
-  "models.v2Help":
-    "Steuert die Multi-Agent-Oberfläche für alle Modelle.\n\nv1: Klassischer Single-Thread-Agent. Jedes Modell nutzt die v1-Collab-Oberfläche.\nbase: Upstream-Standard — sol/terra nutzen v2, luna v1, andere folgen dem Codex-Feature-Flag.\nv2: Multi-Thread-Agent mit spawn_agent. Jedes Modell nutzt die v2-Collab-Oberfläche.\n\nUnter v2 lässt „ChatGPT auf v1 lassen“ Sol/Terra auf v1, damit sie weiter Grok oder Claude starten können. ChatGPT verschlüsselt v2-Kindaufgaben; geroutete Modelle können sie nicht lesen. Geroutete Eltern bleiben auf v2.\n\nÄnderungen gelten für neue Sitzungen.",
-  "dash.multiAgent": "Sub-Agent",
   "models.v2Conflict":
     "[agents] max_concurrent_threads_per_session / max_threads ist gesetzt — codex verweigert den Start; entferne es aus config.toml",
   "models.v2Applied":
@@ -1191,7 +1165,6 @@ export const de: Record<TKey, string> = {
   "sub.subtitle":
     "Codex {cmd} bewirbt nur die ersten 5 Modelle (nach Priorität) als Overrides. Wähle hier bis zu 5 — natives gpt oder geroutet — und opencodex setzt ihre Katalog-Priorität, sodass genau diese führen. Jedes andere Modell bleibt über seinen exakten Namen aufrufbar; dies steuert nur die Anzeige.",
   "sub.featured": "Empfohlen",
-  "sub.advanced": "Erweitert",
   "sub.orderHintAria": "Wie diese Reihenfolge verwendet wird",
   "sub.orderHint":
     "Die hier gewählte und angezeigte Reihenfolge bestimmt die Plätze 1–5 oben in der Codex-Modellauswahl und die Standard-Modellkandidaten für {cmd}. Wenn weniger als 5 ausgewählte Modelle in der Modellauswahl sichtbar sind, werden die restlichen Plätze nach Katalogpriorität angeboten; mit 5 sichtbaren ausgewählten Modellen ist die Liste gefüllt, sofern keine benutzerdefinierte Reihenfolge der Modellauswahl die Katalogpriorität ändert.",
@@ -1219,18 +1192,6 @@ export const de: Record<TKey, string> = {
   "sub.workspace.selectModelDesc":
     "Wählen Sie ein Modell aus der Liste, um Details anzuzeigen und es für spawn_agent hervorzuheben.",
   "sub.workspace.selector": "Öffentlicher Selektor",
-  "sub.ultraMode": "Immer proaktiv delegieren",
-  "sub.ultraModeHint":
-    "Aktiviert die proaktive Multi-Agent-Delegierungsrichtlinie für alle Modelle und Reasoning-Efforts (ändert den Reasoning-Effort selbst nicht). Schreibt features.multi_agent_v2.multi_agent_mode_hint_text in config.toml.",
-  "sub.ultraModeV2Required":
-    "Erfordert die v2-Multi-Agent-Oberfläche — aktivieren Sie zuerst multi_agent_v2 und wählen Sie v2 in der Subagentenmodus-Steuerung.",
-  "sub.ultraModeText": "Text für proaktive Delegierung",
-  "sub.ultraModePreset": "Voreinstellung wiederherstellen",
-  "sub.ultraModeLoadFail":
-    "Einstellungen für proaktive Delegierung konnten nicht geladen werden — läuft der Proxy?",
-  "sub.ultraModeSaveFail":
-    "Einstellungen für proaktive Delegierung konnten nicht gespeichert werden",
-  "sub.ultraModeSaved": "Proaktive Delegierung gespeichert. Gilt für neue Codex-Sitzungen.",
   "logs.title": "Anfrage-Protokolle",
   "logs.tabLogs": "Protokolle",
   "logs.tabDebug": "Diagnose",
@@ -3766,6 +3727,9 @@ export const de: Record<TKey, string> = {
   "modal.apiKeyTransport": "API-Schlüssel-Header",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic-Standard)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "Protokollstandard",
+  "modal.useEnvironmentKey": "API-Schlüssel aus einer Umgebungsvariablen lesen",
+  "modal.environmentKeyPlaceholder": "Variablenname, z. B. OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (oder $ENV_VAR)",
   "modal.defaultModelPlaceholder": "z. B. gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",
@@ -4041,12 +4005,6 @@ export const de: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "Fallback-Einstellungen konnten nicht gespeichert werden",
   "sub.fallbackUnavailable": "Derzeit nicht gelistet; bleibt in der Kette.",
   "sub.fallbackPollInvalid": "Eine ganze Zahl von 5000 bis 600000 ms eingeben.",
-  "sub.v2Compatibility.title": "V2-Kompatibilität nativer Eltern",
-  "sub.v2Compatibility.risk":
-    "Delegiert ein nativer ChatGPT-Elternagent über V2 an dieses geroutete Modell, kann die Aufgabe verschlüsselt sein und vor der Ausführung scheitern. Lesbare Aufgaben gerouteter Eltern sind nicht betroffen.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "Dieser Server meldet weder Aktivierung noch Eignung der Wiederherstellung. V1/Klartext verwenden oder experimentelle V2-Wiederherstellung nur bei Eignung aktivieren. Sie kostet Kontingent und Latenz, hängt vom Backend ab und kann Wiedergabetreue verlieren; das Upstream-Protokoll bleibt unverändert.",
-  "sub.v2Compatibility.details": "Details zur Kompatibilität",
   "dash.syncModelsHint": "Schreibt Codex' Modellkatalog anhand deiner verbundenen Provider neu.",
   "dash.syncRun": "Jetzt synchronisieren",
   "dash.visionAdvanced": "Erweiterte Einstellungen",

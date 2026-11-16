@@ -19,10 +19,7 @@
 @import "../styles/usage-chart-accessibility.css" layer(legacy);
 @import "../styles/sidebar-brand.css" layer(legacy);
 @import "../styles/fast-rows-setting.css" layer(legacy);
-@import "../styles/claude-desktop-mode-picker.css" layer(legacy);
-@import "../styles/claude-first-party-bindings.css" layer(legacy);
 @import "../styles/lazycodex-role-models.css" layer(legacy);
-@import "../styles/claude-desktop-picker.css" layer(legacy);
 @import "../styles/anthropic-reset-grants.css" layer(legacy);
 @import "../styles/protocol-evidence.css" layer(legacy);
 

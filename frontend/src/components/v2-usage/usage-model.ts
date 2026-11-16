@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { SourceFilter } from "./usage-source";
-import type { UsageApp as UsageAppClient } from "../../../../backend/src/usage/app-breakdown";
+import type { UsageApp as UsageAppClient } from "@/contracts/telemetry/app-breakdown";
 import type { Locale, TFn } from "../../i18n/shared";
 import { formatTokens } from "../../format-tokens";
 import type { UsageReadMetadata } from "../../usage-summary-resource";

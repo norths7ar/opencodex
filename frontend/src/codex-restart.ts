@@ -1,8 +1,5 @@
-import type {
-  CodexRestartCode,
-  CodexRestartResponse,
-} from "../../backend/src/lib/codex-restart-contract";
-import { isCodexRestartResponse } from "../../backend/src/lib/codex-restart-contract";
+import type { CodexRestartCode, CodexRestartResponse } from "@/contracts/codex-restart";
+import { isCodexRestartResponse } from "@/contracts/codex-restart";
 
 // Re-exported so callers import the vocabulary from one place.
 export type { CodexRestartCode, CodexRestartResponse };

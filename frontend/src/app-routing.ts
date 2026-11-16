@@ -43,19 +43,13 @@ export function readPageFromHash(hash?: string): Page {
   const pageId = raw.split("/")[0] as Page;
   // Legacy: Debug used to be a standalone page; it now lives as a tab on Logs.
   if (pageId === ("debug" as Page)) return "logs";
-  // Legacy: Codex Auth became the Multi-auth tab of Codex Set. #codex-auth is a
-  // bookmarkable URL that has shipped, and use-app-route-state reads the initial
-  // page straight from the hash, so without this an old bookmark lands on an
-  // unknown page.
-  if (pageId === ("codex-auth" as Page)) return "codex-set";
+  // Retired page bookmarks open the closest supported Lite section.
+  if (pageId === ("codex-auth" as Page) || pageId === "codex-set") return "providers";
+  if (pageId === "advanced") return "dashboard";
+  if (pageId === "setup" || pageId === "claude") return "integrations";
   if (pageId === ("routing" as Page)) return "models";
-  // Legacy integration pages now live below one Integrations route. Returning
-  // the destination page here keeps the initial hook state aligned until the
-  // resolver replaces the hash with the exact nested destination.
   if (pageId === ("api" as Page) || pageId === ("grok" as Page)) return "integrations";
-  if (raw === "integrations/claude" || raw === "integrations/claude/desktop") return "claude";
-  // Claude accounts live on Providers now; the old Account sub-tab bookmark opens them there.
-  if (raw === "claude/account") return "providers";
+
   // No hash (or an unknown one) opens Home, the v2 landing page.
   return VALID_PAGES.has(pageId) ? pageId : "home";
 }
@@ -63,10 +57,8 @@ export function readPageFromHash(hash?: string): Page {
 /**
  * The hash a page will end up on once the resolver's passive rewrite lands. The route
  * hook applies that rewrite with replaceState, which emits no event, so a component that
- * reads the hash during the same mount (Connect's tab strip, the Providers deep link) has
- * to read the destination rather than the legacy spelling: #integrations/claude/desktop
- * must select the Claude Desktop tab on a cold load, not Overview, and #claude/account
- * must open Anthropic's Accounts tab.
+ * reads the hash during the same mount (for example, Connect's tab strip) can read the
+ * destination rather than the retired bookmark.
  */
 export function canonicalHashPath(hash: string): string {
   const raw = normalizeHashPath(hash);
@@ -83,43 +75,7 @@ export const DASHBOARD_TAB_HASHES = ["dashboard/providers", "dashboard/models"] 
 /** Models keeps the catalog and explicit routing configuration. */
 export const MODELS_TAB_HASHES = ["models/routing"] as const;
 
-/**
- * Integrations uses a wrapping outer tab strip. Claude Desktop is a nested
- * route owned by the Claude family panel, but it still has to be registered
- * here or App normalization strips it before Claude can read it.
- */
-export const INTEGRATION_TAB_HASHES = [
-  "integrations/keys",
-  "integrations/codex",
-  "integrations/claude",
-  "integrations/claude/desktop",
-  "integrations/grok",
-  "integrations/cursor",
-  "integrations/opencode",
-  "integrations/pi",
-  "integrations/gentle-shell",
-  "integrations/omp",
-  "integrations/hermes",
-  "integrations/openclaw",
-  "integrations/kimi",
-  "integrations/gajae",
-  "integrations/dsh",
-  "integrations/mcode",
-  "integrations/zcode",
-  "integrations/commandcode",
-  "integrations/prime",
-  "integrations/aside",
-  "integrations/raycast",
-  "integrations/omo",
-  "integrations/cline",
-  "integrations/kilo",
-  "integrations/droid",
-  "integrations/qoder",
-  "integrations/qoder-cn",
-  "integrations/workbuddy",
-  "integrations/workbuddy-ai",
-  "integrations/t3code",
-] as const;
+export const INTEGRATION_TAB_HASHES = ["integrations/codex", "integrations/dsh"] as const;
 
 /** Preserve query parameters for provider settings links. */
 export const QUERY_HASH_PATHS: readonly string[] = ["providers", "models", "subagents"];
@@ -168,25 +124,18 @@ export function resolveAppHashChange(rawHash: string): AppHashChangeAction {
     return { page: "logs", replaceTo: "logs/debug" };
   }
 
-  /* Legacy: Codex Auth is now the Multi-auth tab of Codex Set. */
-  if (rawHash === "codex-auth" || rawHash.startsWith("codex-auth/")) {
-    return { page: "codex-set", replaceTo: "codex-set" };
+  // ChatGPT account settings now live on Providers.
+  if (/^(?:codex-auth|codex-set)(?:\/|$)/.test(rawHash)) {
+    return { page: "providers", replaceTo: "providers" };
   }
   if (rawHash === "routing" || rawHash.startsWith("routing/")) {
     return { page: "models", replaceTo: "models/routing" };
   }
 
   /* Legacy top-level integration pages. */
-  if (rawHash === "api") return { page: "integrations", replaceTo: "integrations/keys" };
-  if (rawHash === "integrations/claude") return { page: "claude", replaceTo: "claude/code" };
-  if (rawHash === "integrations/claude/desktop")
-    return { page: "claude", replaceTo: "claude/desktop" };
-  // The Claude page lost its Account sub-tab; Anthropic's Accounts tab on Providers replaces it.
-  if (rawHash === "claude/account")
-    return { page: "providers", replaceTo: CLAUDE_ACCOUNT_REDIRECT };
-  // The read-only Settings sub-tab folded into Code, which already holds its controls.
-  if (rawHash === "claude/settings") return { page: "claude", replaceTo: "claude/code" };
-  if (rawHash === "grok") return { page: "integrations", replaceTo: "integrations/grok" };
+  if (rawHash === "api") return { page: "integrations", replaceTo: "integrations" };
+  if (/^claude(?:\/|$)/.test(rawHash)) return { page: "integrations", replaceTo: "integrations" };
+  if (rawHash === "grok") return { page: "integrations", replaceTo: "integrations" };
 
   // Legacy deep link from the removed dual-layout era.
   if (rawHash === "providers/workspace") return { page: "providers", replaceTo: "providers" };

@@ -1,4 +1,4 @@
-import { normalizeRecordedClient, type UsageClient } from "../../../backend/src/usage/client";
+import { normalizeRecordedClient, type UsageClient } from "@/contracts/telemetry/client";
 import type { TFn } from "../i18n/shared";
 import { clientIconClass } from "../client-icon";
 

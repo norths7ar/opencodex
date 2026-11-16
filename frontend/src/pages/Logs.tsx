@@ -68,11 +68,11 @@ import type {
   RequestFailureStage,
   RequestSpendTotals,
   ResendPermission,
-} from "../../../backend/src/usage/telemetry-contract";
+} from "@/contracts/telemetry/telemetry-contract";
 import {
   classifyRequestOutcome,
   type RequestOutcomeClass,
-} from "../../../backend/src/usage/request-outcome";
+} from "@/contracts/telemetry/request-outcome";
 
 function logsCacheKey(apiBase: string): string {
   return `ocx.logs.list.v1:${apiBase}`;

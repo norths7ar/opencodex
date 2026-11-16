@@ -1,6 +1,6 @@
 import { matchesLogConversationId } from "../log-conversation-id";
-import type { DeliveryMode } from "../../../backend/src/protocols/contract";
-import { parseProtocolTraceV1 } from "../../../backend/src/protocols/dto";
+import type { DeliveryMode } from "@/contracts/protocol/contract";
+import { parseProtocolTraceV1 } from "@/contracts/protocol/dto";
 
 export type LogTimeWindow = "all" | "15m" | "1h" | "24h";
 export type LogStatusFilter = "all" | "success" | "errors";

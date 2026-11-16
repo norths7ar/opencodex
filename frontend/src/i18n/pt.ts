@@ -777,16 +777,13 @@ export const pt: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Salvar também como padrão do Codex",
   "dash.syncCodexSubagentDefaultsHint":
     "Ativado, a escolha acima é gravada na configuração do próprio Codex, e novas tarefas também começam com esse modelo. Desativado, ela fica salva apenas aqui. Entra em vigor na próxima sincronização ou reinicialização, e suas configurações [agents] escritas à mão são preservadas.",
-  "dash.multiAgentGuidance": "Orientar o Codex a dividir o trabalho",
-  "dash.multiAgentGuidanceHint":
-    "Envia uma nota curta dizendo ao Codex como repassar trabalho a subagentes. Na v2, ela cita os modelos que podem ser usados e qual preferir; na v1, só se aplica com esforço de raciocínio max ou ultra. Desativado, nenhuma nota é adicionada.",
   "dash.injectionNone": "Nenhum",
   "dash.injectionEffortLabel": "Esforço de raciocínio",
   "dash.injectionEffortNone": "Padrão do modelo",
-  "dash.effortCapLabel": "Limite de esforço ultra na V2",
-  "dash.subagentEffortCapLabel": "Limite de esforço de subagentes na V2",
+  "dash.effortCapLabel": "Limite de raciocínio em colaboração",
+  "dash.subagentEffortCapLabel": "Limite de raciocínio de agentes filhos",
   "dash.effortCapHelp":
-    "Limita o esforço de raciocínio dos turnos em modo ultra da V2. Quando definido, requisições de esforço máximo (do modo ultra) são limitadas ao nível selecionado. O limite de subagentes se aplica apenas aos agentes filhos criados. Os limites só reduzem o esforço, nunca o aumentam. Se um modelo não suportar o nível limitado, ele desce para o nível suportado mais próximo.",
+    "Limita o raciocínio em solicitações de colaboração. Agentes filhos também seguem seu próprio limite. Os modelos usam o nível compatível mais próximo que não ultrapassa o limite.",
   "dash.effortCapNone": "Sem limite",
   "dash.maintenance": "Manutenção",
   "dash.maintenanceHint":
@@ -881,15 +878,6 @@ export const pt: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "Entendo que esta é uma conexão de assinatura de terceiros e verificarei os termos aplicáveis.",
   "oauthTos.anthropicContinue": "Continuar com a assinatura do Claude",
-  "subagentSurface.selectionTitle": "Mudar a superfície de subagentes para {mode}?",
-  "subagentSurface.selectionBody":
-    "Em {mode}, os modelos do ChatGPT que usam a superfície v2 — Sol e Terra na base, todos os modelos na v2 — entregam sua tarefa a um modelo roteado, como Grok ou Claude, criptografada para o backend do ChatGPT, e o modelo roteado não consegue lê-la. Essa delegação falha com unreadable_encrypted_agent_task até que seja corrigido upstream. A v1 delega entre provedores de forma confiável.",
-  "subagentSurface.advisoryTitle": "A v1 agora é a superfície de subagentes padrão",
-  "subagentSurface.advisoryBody":
-    "Esta instalação roda {mode}, em que um modelo do ChatGPT na superfície v2 entrega a um modelo roteado uma tarefa criptografada que ele não consegue ler, e a delegação entre provedores falha. Recomendamos a v1 até que isso seja corrigido upstream. Sua configuração atual não muda até você escolher.",
-  "subagentSurface.continue": "Continuar",
-  "subagentSurface.switchToV1": "Mudar para a v1",
-  "subagentSurface.learnMore": "Por que isso falha",
   "prov.logoutOk": "Sessão de {provider} encerrada.",
   "prov.logoutFail": "Não foi possível sair de {provider}. O estado da sua conta não mudou.",
   "prov.removed": '"{name}" removido.',
@@ -1023,21 +1011,7 @@ export const pt: Record<TKey, string> = {
   "models.capSaveFailed": "Falha ao salvar o limite de contexto",
   "models.contextCapped": "limite de 350k",
   "models.contextCapLabel": "Janela padrão / limite",
-  "models.v2Label": "Subagente",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "O que são v1 / v2?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "base",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "Todos os modelos → superfície v1",
-  "models.v2ModeDesc_default": "Padrões do upstream (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "Todos os modelos → superfície v2",
-  "models.keepNativeOnV1": "Manter o ChatGPT na v1",
-  "models.keepNativeOnV1Hint":
-    "O ChatGPT só criptografa as tarefas filhas da v2 quando um pai nativo do ChatGPT permanece na v2, então Grok e Claude não conseguem lê-las. Ative para manter Sol/Terra na v1 e evitar essa criptografia. Pais roteados continuam na v2.",
-  "models.v2Help":
-    "Controla a superfície multiagente para todos os modelos.\n\nv1: agente clássico de thread única. Todos os modelos usam a superfície collab da v1.\nbase: padrões do upstream — sol/terra usam a v2, luna usa a v1, os demais seguem a feature flag do codex.\nv2: agente multithread com spawn_agent. Todos os modelos usam a superfície collab da v2.\n\nNa v2, Manter o ChatGPT na v1 deixa Sol/Terra na superfície v1 para que ainda possam acionar Grok ou Claude. O ChatGPT criptografa as tarefas filhas da v2; modelos roteados não conseguem lê-las. Pais roteados permanecem na v2.\n\nAs alterações valem para novas sessões.",
-  "dash.multiAgent": "Subagente",
   "dash.codexDesktopAuthless": "Abrir o Codex sem fazer login",
   "dash.codexDesktopAuthlessHint":
     "Desativado por padrão. Dispensa o login separado do Desktop em conexões locais elegíveis. As credenciais upstream continuam sendo necessárias. Reinicie o Codex após alterar esta configuração. Recursos do Desktop que dependem de conta podem ficar indisponíveis.",
@@ -1228,7 +1202,6 @@ export const pt: Record<TKey, string> = {
   "sub.subtitle":
     "O {cmd} do Codex anuncia apenas os 5 primeiros modelos (por prioridade) como substituições. Escolha até 5 aqui — gpt nativo ou roteado — e o opencodex define a prioridade deles no catálogo para que exatamente esses fiquem à frente. Qualquer outro modelo continua acessível pelo nome exato; isto controla apenas o que é exibido.",
   "sub.featured": "Em destaque",
-  "sub.advanced": "Avançado",
   "sub.orderHintAria": "Como esta ordem é usada",
   "sub.orderHint":
     "A ordem exibida aqui define as posições 1 a 5 no topo do seletor de modelos do Codex e os modelos padrão candidatos para {cmd}. Quando menos de 5 modelos destacados estão visíveis no seletor, os slots restantes são oferecidos por prioridade do catálogo; 5 modelos destacados visíveis preenchem a lista, a menos que uma ordem personalizada do seletor de modelos altere a prioridade do catálogo.",
@@ -1265,17 +1238,6 @@ export const pt: Record<TKey, string> = {
   "sub.workspace.mainAria": "Detalhes do modelo de subagente",
   "sub.workspace.notFeatured": "Fora dos destaques",
   "sub.workspace.priority": "Prioridade",
-  "sub.ultraMode": "Delegação sempre proativa",
-  "sub.ultraModeHint":
-    "Ativa a política de delegação multiagente proativa para todos os modelos e esforços de raciocínio (não altera o esforço de raciocínio em si). Grava features.multi_agent_v2.multi_agent_mode_hint_text no config.toml.",
-  "sub.ultraModeV2Required":
-    "Requer a superfície multiagente v2 — ative multi_agent_v2 e selecione v2 no controle de modo de subagente primeiro.",
-  "sub.ultraModeText": "Texto da delegação proativa",
-  "sub.ultraModePreset": "Restaurar predefinição",
-  "sub.ultraModeLoadFail":
-    "Falha ao carregar as configurações de delegação proativa — o proxy está em execução?",
-  "sub.ultraModeSaveFail": "Falha ao salvar as configurações de delegação proativa",
-  "sub.ultraModeSaved": "Delegação proativa salva. Vale para novas sessões do Codex.",
   "sub.workspace.removeFromFeatured": "Remover {m} dos destaques",
   "sub.workspace.selectModel": "Selecione um modelo",
   "sub.workspace.selectModelDesc":
@@ -1290,12 +1252,6 @@ export const pt: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "Falha ao salvar as configurações de fallback",
   "sub.fallbackUnavailable": "Não anunciado no momento; mantido na cadeia.",
   "sub.fallbackPollInvalid": "Informe um número inteiro de 5000 a 600000 ms.",
-  "sub.v2Compatibility.title": "Compatibilidade V2 com pai nativo",
-  "sub.v2Compatibility.risk":
-    "Se um pai nativo do ChatGPT delegar a este modelo roteado usando V2, a tarefa pode ser criptografada e falhar antes da execução. Tarefas legíveis vindas de pais roteados não são afetadas.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "O estado de recuperação ativada/elegibilidade não é exposto por este servidor. Use delegação V1/compatível com texto simples, ou ative a recuperação V2 experimental somente se elegível. A recuperação adiciona consumo de cota, latência, dependência do backend e possível perda de fidelidade; ela não corrige o protocolo upstream.",
-  "sub.v2Compatibility.details": "Detalhes de compatibilidade",
   "logs.title": "Logs de requisições",
   "logs.tabLogs": "Logs",
   "logs.tabDebug": "Debug",
@@ -2265,6 +2221,9 @@ export const pt: Record<TKey, string> = {
   "modal.apiKeyTransport": "Cabeçalho da chave de API",
   "modal.apiKeyTransportNative": "x-api-key (nativo da Anthropic)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "Padrão do protocolo",
+  "modal.useEnvironmentKey": "Ler a chave de API de uma variável de ambiente",
+  "modal.environmentKeyPlaceholder": "Nome da variável, por exemplo OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (ou $ENV_VAR)",
   "modal.defaultModelPlaceholder": "ex.: gpt-5.5",
   "modal.baseUrlPlaceholder": "https://...",

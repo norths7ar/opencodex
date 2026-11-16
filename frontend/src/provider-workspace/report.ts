@@ -3,7 +3,6 @@
  * panels (WP090): quota-report → AccountQuota adaptation, quota source labels,
  * and the models-tab filter. No React, no fetch.
  */
-import { normalizeWorkBuddyCredits } from "../../../backend/src/providers/workbuddy-credit-balance";
 import type { AccountQuota } from "../codex-quota-utils";
 
 /** Wire shape of one /api/provider-quotas report row as the workspace consumes it. */
@@ -183,9 +182,7 @@ function quotaFromUnknown(quota: unknown, fallbackUpdatedAt?: number): AccountQu
             : {}),
         }
       : undefined;
-  const workbuddyCredits = normalizeWorkBuddyCredits(q.workbuddyCredits);
   const out: AccountQuota = {
-    ...(workbuddyCredits ? { workbuddyCredits } : {}),
     ...(finite(q.fiveHourPercent) !== undefined
       ? { fiveHourPercent: q.fiveHourPercent as number }
       : {}),
@@ -208,8 +205,7 @@ function quotaFromUnknown(quota: unknown, fallbackUpdatedAt?: number): AccountQu
     out.weeklyPercent !== undefined ||
     out.monthlyPercent !== undefined ||
     (out.customWindows?.length ?? 0) > 0 ||
-    out.creditsUsd !== undefined ||
-    out.workbuddyCredits !== undefined
+    out.creditsUsd !== undefined
     ? out
     : null;
 }

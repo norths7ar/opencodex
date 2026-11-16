@@ -1,4 +1,5 @@
 import { PageHeader } from "../components/page-header";
+import { DataSurfaceSkeleton } from "../components/data-surface";
 import { useContext } from "react";
 import { ProviderSessionContext } from "../components/provider-session-context";
 import { readUsageResponseJson, usageSummary30dResourceKey } from "../usage-summary-resource";
@@ -35,7 +36,7 @@ import { useProvidersOAuth } from "./use-providers-oauth";
 import { useProvidersCrud } from "./use-providers-crud";
 import { useProvidersFetch } from "./use-providers-fetch";
 import { ProvidersPageModals } from "./providers-page-modals";
-import { buildAccountLoginStatus, buildAddModalAccountRows } from "./providers-page-utils";
+import { buildAccountLoginStatus } from "./providers-page-utils";
 import type { CodexAccountMutationCompletion } from "../codex-account-mutation";
 import { useProviderModelsNotice } from "./use-provider-models-notice";
 import { navigateHash } from "../hash-routing";
@@ -723,7 +724,6 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     fetchProviderQuotas,
     // Mode PATCHes clear quota caches and thread affinity; the shared controller
     // must re-read /active (with quota) so both tabs show the post-switch state.
-    refreshCodexAccount: () => codexPool.load(true),
   });
 
   /**
@@ -742,17 +742,13 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     void loginOAuth(provider, addAccount, accountId);
   };
 
-  const initialLoginPending =
-    capabilities?.oauth &&
-    config &&
-    Object.entries(config.providers).some(
-      ([name, provider]) => provider.authMode === "oauth" && !oauthStatus[name],
-    );
-  if (!config || initialLoginPending) {
+  // Provider rows can render from the configuration snapshot while OAuth status revalidates.
+  // The workspace handles the affected row's checking state without resetting the page.
+  if (!config) {
     return (
       <>
         <PageHeader title={t("nav.providers")} />
-        {!config && configLoadState === "error" ? (
+        {configLoadState === "error" ? (
           <div className="notice notice-err" role="alert">
             {t("prov.loadConfigFail")}{" "}
             <button
@@ -763,10 +759,6 @@ export default function Providers({ apiBase }: { apiBase: string }) {
               {t("common.retry")}
             </button>
           </div>
-        ) : config && status ? (
-          <ToastNotice tone={statusTone} onDismiss={clearStatus} dismissLabel={t("common.close")}>
-            {status}
-          </ToastNotice>
         ) : (
           <div className="providers-workspace providers-workspace--boot" aria-busy="true">
             <div
@@ -774,9 +766,7 @@ export default function Providers({ apiBase }: { apiBase: string }) {
               aria-hidden="true"
             />
             <div className="providers-workspace-main">
-              <p className="muted">
-                <span className="spin" aria-hidden="true" /> {t("prov.loadingConfig")}
-              </p>
+              <DataSurfaceSkeleton label={t("prov.loadingConfig")} rows={5} />
             </div>
           </div>
         )}
@@ -784,15 +774,18 @@ export default function Providers({ apiBase }: { apiBase: string }) {
     );
   }
 
-  const addModalAccountRows = capabilities
-    ? oauthProviders
-        .filter((provider) => capabilities.oauthProviders?.includes(provider))
-        .map((id) => ({
-          id,
-          label: id === "openai" ? "OpenAI / ChatGPT" : id,
+  const subscriptionChannel = Object.entries(config.providers).find(
+    ([, item]) => item.authMode === "oauth" && item.serviceId === "chatgpt",
+  );
+  const addModalAccountRows = capabilities?.oauth
+    ? [
+        {
+          id: subscriptionChannel?.[0] ?? "openai",
+          label: subscriptionChannel?.[1].displayName ?? "ChatGPT",
           kind: "oauth" as const,
-        }))
-    : buildAddModalAccountRows(config, oauthProviders, t);
+        },
+      ]
+    : [];
   const accountLoginStatus = buildAccountLoginStatus(config, oauthStatusWithCodex);
   const isForwardProvider = (name: string) => config.providers[name]?.authMode === "forward";
 

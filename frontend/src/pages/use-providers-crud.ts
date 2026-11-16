@@ -5,6 +5,7 @@ import type {
   ProviderUpdateResult,
 } from "../components/provider-workspace/types";
 import { apiErrorMessage } from "../api-error";
+import { editChannel, removeChannel, updateChannel } from "../channel-management";
 
 type ProviderError = { code?: unknown; error?: unknown };
 type ShadowDependency = { model: string; enabled: boolean };
@@ -41,7 +42,6 @@ export function useProvidersCrud({
   fetchConfig,
   fetchOauth,
   fetchProviderQuotas,
-  refreshCodexAccount,
 }: {
   apiBase: string;
   t: TFn;
@@ -54,8 +54,6 @@ export function useProvidersCrud({
   fetchConfig: () => Promise<void>;
   fetchOauth: () => Promise<void>;
   fetchProviderQuotas: (refresh?: boolean) => Promise<void>;
-  /** Shared Codex account controller refresh (Providers.tsx passes codexPool.load). */
-  refreshCodexAccount?: () => Promise<unknown> | unknown;
 }) {
   const removeProvider = useCallback(
     async (name: string) => {
@@ -72,9 +70,7 @@ export function useProvidersCrud({
       setRemoveConfirmName(null);
       const fallback = t("prov.removeFail", { name });
       try {
-        const res = await fetch(`${apiBase}/api/providers?name=${encodeURIComponent(name)}`, {
-          method: "DELETE",
-        });
+        const res = await removeChannel(apiBase, name);
         if (res.ok) {
           const data = (await res.json().catch(() => ({}))) as {
             defaultProvider?: unknown;
@@ -122,11 +118,7 @@ export function useProvidersCrud({
 
   const setProviderDisabled = useCallback(
     async (name: string, disabled: boolean) => {
-      const res = await fetch(`${apiBase}/api/providers?name=${encodeURIComponent(name)}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ disabled }),
-      });
+      const res = await updateChannel(apiBase, name, (detail) => editChannel(detail, { disabled }));
       if (!res.ok) {
         notify(
           await apiErrorMessage(
@@ -152,37 +144,19 @@ export function useProvidersCrud({
   const updateProvider = useCallback(
     async (name: string, patch: ProviderUpdatePatch): Promise<ProviderUpdateResult> => {
       try {
-        const res = await fetch(`${apiBase}/api/providers?name=${encodeURIComponent(name)}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(patch),
-        });
+        const res = await updateChannel(apiBase, name, (detail) => editChannel(detail, patch));
         if (!res.ok) {
           return { ok: false, error: await apiErrorMessage(res, t("prov.updateFail")) };
         }
-        const data = (await res.json().catch(() => ({}))) as { xaiResponsesOptInState?: unknown };
         // Await refresh so callers (e.g. notes editor) only leave edit mode once
         // item.note reflects the saved value.
         await fetchConfig();
-        // A codexAccountMode PATCH clears quota caches and thread affinity server-side,
-        // so both dependent surfaces must refresh before the action reports success.
-        if (Object.hasOwn(patch, "codexAccountMode")) {
-          const refreshes: Promise<unknown>[] = [fetchProviderQuotas(true)];
-          if (refreshCodexAccount) refreshes.push(Promise.resolve(refreshCodexAccount()));
-          await Promise.all(refreshes);
-        }
-        const state = data.xaiResponsesOptInState;
-        return {
-          ok: true,
-          ...(state === true || state === false || state === "mixed"
-            ? { xaiResponsesOptInState: state }
-            : {}),
-        };
+        return { ok: true };
       } catch {
         return { ok: false, error: t("prov.networkError") };
       }
     },
-    [apiBase, fetchConfig, fetchProviderQuotas, refreshCodexAccount, t],
+    [apiBase, fetchConfig, t],
   );
 
   const setDefaultProvider = useCallback(

@@ -4,12 +4,9 @@ import type {
   RequestFailureStage,
   ResendPermission,
   RequestSpendTotals,
-} from "../../../backend/src/usage/telemetry-contract";
-import type { UpstreamCondition } from "../../../backend/src/lib/upstream-condition";
-import {
-  boundedFailureDetail,
-  type FailureDetailCode,
-} from "../../../backend/src/lib/failure-detail";
+} from "@/contracts/telemetry/telemetry-contract";
+import type { UpstreamCondition } from "@/contracts/telemetry/upstream-condition";
+import { boundedFailureDetail, type FailureDetailCode } from "@/contracts/telemetry/failure-detail";
 
 interface LogFailureAttribution {
   failureCause?: RequestFailureCause;

@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { readJsonOrThrow } from "../fetch-json";
+import type { ChannelConfigurationEdit } from "@/contracts/channels";
 
 export interface Config {
   port: number;
@@ -15,34 +17,14 @@ export interface Config {
   >;
 }
 
-const PROVIDER_EDITOR_DERIVED_FIELDS = [
-  "hasApiKey",
-  "hasHeaders",
-  "xaiResponsesOptInState",
-  "initialModelSelection",
-] as const;
+type ConfigurationDraft = Omit<ChannelConfigurationEdit, "revision">;
 
-type ProviderEditorConfig = {
-  defaultProvider: string;
-  providers: Record<string, Record<string, unknown>>;
-};
-
-const PROVIDER_EDITOR_DERIVED_FIELD_SET = new Set<string>(PROVIDER_EDITOR_DERIVED_FIELDS);
-
-function projectProviderEditorConfig(config: Config): ProviderEditorConfig {
-  return {
-    defaultProvider: config.defaultProvider,
-    providers: Object.fromEntries(
-      Object.entries(config.providers).map(([name, provider]) => {
-        const projected: Record<string, unknown> = {};
-        for (const [field, value] of Object.entries(provider)) {
-          if (!PROVIDER_EDITOR_DERIVED_FIELD_SET.has(field))
-            projected[field] = structuredClone(value);
-        }
-        return [name, projected];
-      }),
-    ),
-  };
+function editableConfiguration({
+  channels,
+  default_channel_id,
+  default_model_id,
+}: ChannelConfigurationEdit): ConfigurationDraft {
+  return { channels, default_channel_id, default_model_id };
 }
 
 export function useJsonConfigEditor(deps: {
@@ -54,7 +36,7 @@ export function useJsonConfigEditor(deps: {
   onSaved: (addedProviders: string[]) => void;
   t: (key: string, values?: Record<string, string>) => string;
 }) {
-  const { apiBase, config, notify, fetchConfig, fetchProviderQuotas, onSaved, t } = deps;
+  const { apiBase, notify, fetchConfig, fetchProviderQuotas, onSaved, t } = deps;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [jsonEditorOpen, setJsonEditorOpen] = useState(false);
@@ -63,10 +45,15 @@ export function useJsonConfigEditor(deps: {
   const [jsonLeaveOpen, setJsonLeaveOpen] = useState(false);
   const jsonEditorOpenRef = useRef(false);
 
-  useEffect(() => {
-    if (config && !jsonEditorOpenRef.current)
-      setDraft(JSON.stringify(projectProviderEditorConfig(config), null, 2));
-  }, [config]);
+  const revision = useRef<number | null>(null);
+  const loadGeneration = useRef(0);
+  useEffect(
+    () => () => {
+      loadGeneration.current++;
+      revision.current = null;
+    },
+    [apiBase],
+  );
 
   const saveConfig = useCallback(async (): Promise<boolean> => {
     setJsonSaving(true);
@@ -79,28 +66,35 @@ export function useJsonConfigEditor(deps: {
       return false;
     }
     try {
-      const baseline = JSON.parse(jsonBaseline) as unknown;
-      const res = await fetch(`${apiBase}/api/providers`, {
+      if (!parsed || typeof parsed !== "object" || revision.current === null) {
+        notify(t("prov.invalidJson"), false);
+        return false;
+      }
+      const baseline = JSON.parse(jsonBaseline) as ConfigurationDraft;
+      const res = await fetch(apiBase + "/api/channels/configuration", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ baseline, next: parsed }),
+        body: JSON.stringify({ ...parsed, revision: revision.current }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         notify(data.error || t("prov.saveFailed"), false);
         return false;
       }
+      const saved = await readJsonOrThrow<ChannelConfigurationEdit>(res);
+      if (!saved) throw new Error("Missing channel configuration.");
       notify(t("prov.saved"), true);
       setEditing(false);
       setJsonEditorOpen(false);
       jsonEditorOpenRef.current = false;
       setJsonLeaveOpen(false);
-      setJsonBaseline(JSON.stringify(parsed, null, 2));
+      setJsonBaseline(JSON.stringify(editableConfiguration(saved), null, 2));
       fetchConfig();
       fetchProviderQuotas(true);
-      const addedProviders = Object.keys((parsed as ProviderEditorConfig).providers).filter(
-        (name) => !Object.hasOwn((baseline as ProviderEditorConfig).providers, name),
-      );
+      const previouslyConfigured = new Set(baseline.channels.map(({ id }) => id));
+      const addedProviders = saved.channels
+        .map(({ id }) => id)
+        .filter((id) => !previouslyConfigured.has(id));
       onSaved(addedProviders);
       return true;
     } catch {
@@ -111,25 +105,35 @@ export function useJsonConfigEditor(deps: {
     }
   }, [apiBase, draft, fetchConfig, fetchProviderQuotas, jsonBaseline, notify, onSaved, t]);
 
-  const openJsonEditor = useCallback(() => {
-    const baseline = config ? JSON.stringify(projectProviderEditorConfig(config), null, 2) : draft;
-    setJsonBaseline(baseline);
-    setDraft(baseline);
-    setJsonLeaveOpen(false);
-    setJsonEditorOpen(true);
-    jsonEditorOpenRef.current = true;
-  }, [config, draft]);
+  const openJsonEditor = useCallback(async () => {
+    if (jsonEditorOpenRef.current) return;
+    const generation = ++loadGeneration.current;
+    try {
+      const response = await fetch(apiBase + "/api/channels/configuration");
+      const config = await readJsonOrThrow<ChannelConfigurationEdit>(response);
+      if (generation !== loadGeneration.current) return;
+      if (!config || !Array.isArray(config.channels) || !Number.isSafeInteger(config.revision))
+        throw new Error("Missing channel configuration.");
+      const baseline = JSON.stringify(editableConfiguration(config), null, 2);
+      revision.current = config.revision;
+      setJsonBaseline(baseline);
+      setDraft(baseline);
+      setJsonLeaveOpen(false);
+      setJsonEditorOpen(true);
+      jsonEditorOpenRef.current = true;
+    } catch {
+      if (generation === loadGeneration.current) notify(t("prov.loadConfigFail"), false);
+    }
+  }, [apiBase, notify, t]);
 
   const discardJsonEditor = useCallback(() => {
+    loadGeneration.current++;
     setJsonLeaveOpen(false);
     setJsonEditorOpen(false);
     jsonEditorOpenRef.current = false;
-    const baseline = config
-      ? JSON.stringify(projectProviderEditorConfig(config), null, 2)
-      : jsonBaseline;
-    setJsonBaseline(baseline);
-    setDraft(baseline);
-  }, [config, jsonBaseline]);
+    revision.current = null;
+    setDraft(jsonBaseline);
+  }, [jsonBaseline]);
 
   const requestCloseJsonEditor = useCallback(() => {
     if (jsonEditorOpen && draft !== jsonBaseline) {

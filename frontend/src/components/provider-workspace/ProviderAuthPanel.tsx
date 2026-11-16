@@ -1,9 +1,5 @@
 import { authStatusCopy } from "../../provider-workspace/auth-status";
-import { anthropicSubscriptionLabel } from "../../../../backend/src/providers/anthropic-subscription";
-import {
-  anthropicInstanceRowShapeMatches,
-  isAnthropicInstanceId,
-} from "../../../../backend/src/providers/anthropic-instance-id";
+import { isLegacyAnthropicAccountRow } from "@/contracts/legacy-account-privacy";
 /**
  * ProviderAuthPanel — OAuth accounts, API-key pool, and forward-auth
  * embedding for the workspace Settings tab (WP091). Consumes WP040+WP060
@@ -31,10 +27,8 @@ import { LoginHint as LoginHintView } from "../login-url-block";
 import { OpenBrowserPrefToggle } from "../open-browser-pref-toggle";
 import ProviderAccountQuota from "./ProviderAccountQuota";
 import { GrokCouponBadge, GrokResetCouponModal } from "./GrokResetCoupons";
-import { AnthropicGrantBadge, AnthropicResetGrantModal } from "./AnthropicResetGrants";
 import type { CodexAccountPoolController } from "../../hooks/useCodexAccountPool";
 import { useGrokResetCoupons } from "../../hooks/useGrokResetCoupons";
-import { useAnthropicResetGrants } from "../../hooks/useAnthropicResetGrants";
 import { Switch } from "../../ui";
 import { kiroSkipReasonKey } from "../../kiro-device-login-helpers";
 import KiroDeviceLoginDialog from "../KiroDeviceLoginDialog";
@@ -167,6 +161,7 @@ export default function ProviderAuthPanel({
     else void authHandlers?.onLogin(item.name, addAccount);
   };
   const [newKey, setNewKey] = useState("");
+  const [keySource, setKeySource] = useState<"key" | "environment">("key");
   const [keyBusy, setKeyBusy] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const [manualCodeBusy, setManualCodeBusy] = useState(false);
@@ -218,34 +213,7 @@ export default function ProviderAuthPanel({
     enabled: grokCouponsEnabled,
   });
   const [couponAccount, setCouponAccount] = useState<OAuthAccountRow | null>(null);
-  // Claude usage resets ride a separate usage read, like the Grok coupons above.
-  const isAnthropicPool =
-    isAnthropicInstanceId(item.name) && anthropicInstanceRowShapeMatches(item.name, item);
-  const claudeGrantsEnabled = isOauth && isAnthropicPool && accounts.length > 0;
-  const claudeAccountIds = useMemo(
-    () =>
-      claudeGrantsEnabled
-        ? accounts.filter((account) => !accountShowsReauth(account)).map((account) => account.id)
-        : [],
-    [claudeGrantsEnabled, accounts],
-  );
-  const claudeGrants = useAnthropicResetGrants({
-    apiBase,
-    provider: isAnthropicInstanceId(item.name) ? item.name : "anthropic",
-    accountIds: claudeAccountIds,
-    enabled: claudeGrantsEnabled,
-  });
-  // The open reset dialog belongs to the pool it was opened in. Switching server or pool
-  // hides it during render rather than resetting it from an effect.
-  const grantScope = `${apiBase}\0${item.name}`;
-  const [grantSelection, setGrantSelection] = useState<{
-    scope: string;
-    account: OAuthAccountRow;
-  } | null>(null);
-  const grantAccount = grantSelection?.scope === grantScope ? grantSelection.account : null;
-  const setGrantAccount = (account: OAuthAccountRow | null) => {
-    setGrantSelection(account ? { scope: grantScope, account } : null);
-  };
+  const isAnthropicPool = isLegacyAnthropicAccountRow(item.name, item);
   const refreshQuota = async () => {
     if (!onRefreshQuota || refreshingQuota) return;
     const generation = ++quotaRefreshGeneration.current;
@@ -331,7 +299,7 @@ export default function ProviderAuthPanel({
     if (!key) return;
     setKeyBusy(true);
     try {
-      const ok = await authHandlers.onAddApiKey(item.name, key);
+      const ok = await authHandlers.onAddApiKey(item.name, key, keySource);
       if (ok) {
         setNewKey("");
         setAddingKey(false);
@@ -537,11 +505,7 @@ export default function ProviderAuthPanel({
               <ul className="pwi-auth-list">
                 {accounts.map((account) => {
                   const label = oauthAccountDisplayLabel(accounts, account, t);
-                  const planLabel = isAnthropicPool
-                    ? anthropicSubscriptionLabel(account.plan)
-                    : item.name === "google-antigravity"
-                      ? account.plan
-                      : undefined;
+                  const planLabel = item.name === "google-antigravity" ? account.plan : undefined;
                   const switching = switchingAccountId === account.id;
                   const pausing = pausingAccountId === account.id;
                   const healthStatus = account.health?.status;
@@ -678,13 +642,6 @@ export default function ProviderAuthPanel({
                             onClick={() => setCouponAccount(account)}
                           />
                         )}
-                        {claudeGrantsEnabled && !showReauth && (
-                          <AnthropicGrantBadge
-                            entry={claudeGrants.entries[account.id]}
-                            t={t}
-                            onClick={() => setGrantAccount(account)}
-                          />
-                        )}
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
@@ -731,16 +688,6 @@ export default function ProviderAuthPanel({
                 entry={grokCoupons.entries[couponAccount.id]}
                 controller={grokCoupons}
                 onClose={() => setCouponAccount(null)}
-              />
-            )}
-            {grantAccount && (
-              <AnthropicResetGrantModal
-                key={`${apiBase}:${item.name}:${grantAccount.id}`}
-                accountId={grantAccount.id}
-                accountLabel={oauthAccountDisplayLabel(accounts, grantAccount, t)}
-                entry={claudeGrants.entries[grantAccount.id]}
-                controller={claudeGrants}
-                onClose={() => setGrantAccount(null)}
               />
             )}
             {accountLoadState === "ready" && loggedIn && accounts.length === 0 && (
@@ -891,12 +838,28 @@ export default function ProviderAuthPanel({
               keys.length === 0 &&
               (addingKey ? (
                 <div className="pwi-auth-add-key">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={keySource === "environment"}
+                      disabled={keyBusy}
+                      onChange={(event) => {
+                        setNewKey("");
+                        setKeySource(event.target.checked ? "environment" : "key");
+                      }}
+                    />
+                    {t("modal.useEnvironmentKey")}
+                  </label>
                   <input
                     className="input"
-                    type="password"
+                    type={keySource === "environment" ? "text" : "password"}
                     value={newKey}
                     onChange={(e) => setNewKey(e.target.value)}
-                    placeholder={t("modal.apiKeyPlaceholder")}
+                    placeholder={
+                      keySource === "environment"
+                        ? t("modal.environmentKeyPlaceholder")
+                        : t("modal.apiKeyPlaceholder")
+                    }
                     autoComplete="off"
                     disabled={keyBusy}
                   />

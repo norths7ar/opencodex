@@ -1,0 +1,1 @@
+"""OpenCodex Lite application package."""

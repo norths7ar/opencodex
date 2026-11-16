@@ -1,7 +1,7 @@
 import {
   classifyRequestOutcome,
   type RequestOutcomeFacts,
-} from "../../../backend/src/usage/request-outcome";
+} from "@/contracts/telemetry/request-outcome";
 
 /** The slice of a log row Home reads: when it ran, and the facts its outcome is classified from. */
 export interface HomeLogRow extends RequestOutcomeFacts {

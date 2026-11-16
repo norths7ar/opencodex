@@ -5,29 +5,14 @@ import { canonicalHashPath } from "../app-routing";
 import { useT } from "../i18n/shared";
 import ClientMark from "../components/ClientMark";
 import { INTEGRATION_MARKS } from "../components/integration-marks";
-import ApiKeys from "./ApiKeys";
-import Claude from "./Claude";
-import ClaudeDesktop from "./ClaudeDesktop";
-import Grok from "./Grok";
-import CursorIntegrationPage from "./integrations/CursorIntegrationPage";
 import IntegrationsOverview from "./integrations/IntegrationsOverview";
-import AsideProfilesPage from "./integrations/AsideProfilesPage";
-import HermesProfilesPage from "./integrations/HermesProfilesPage";
-import LazyCodexRoleModels from "./integrations/LazyCodexRoleModels";
-import FileIntegrationPage, {
-  type FileIntegrationClientId,
-} from "./integrations/FileIntegrationPage";
-import { FILE_CLIENTS, TABS, type IntegrationTab } from "./integrations/integration-tabs";
-import { useRuntimeCapabilities } from "../runtime-capabilities";
+import FileIntegrationPage from "./integrations/FileIntegrationPage";
+import { TABS, type IntegrationTab } from "./integrations/integration-tabs";
 import CodexConnection from "./integrations/CodexConnection";
 
 function readIntegrationTab(hash = window.location.hash): IntegrationTab {
   // Read the destination, not a legacy spelling the route hook is about to replace.
   const raw = canonicalHashPath(hash);
-  // Claude Desktop keeps #claude/desktop; the rest of #claude/* is the Claude tab, whose
-  // sub-tab is Claude's own business.
-  if (raw === "claude/desktop") return "claudeDesktop";
-  if (raw === "claude" || raw.startsWith("claude/")) return "claude";
   const match = TABS.find((tab) => tab.hash === raw);
   return match?.id ?? "overview";
 }
@@ -40,29 +25,18 @@ function panelDomId(tab: IntegrationTab): string {
   return `integrations-panel-${tab}`;
 }
 
-/*
- * The strip carries 18 tabs on one row, which is precisely where a mark earns
- * its place: the eye finds a logo faster than it reads the tenth label. Two
- * tabs have no client behind them -- `overview` is the page itself and `keys`
- * is a credential surface, not an integration -- so they stay text-only rather
- * than borrowing a mark that would imply a client.
- */
 function tabMark(tab: IntegrationTab): string | null {
-  if (tab === "overview" || tab === "keys") return null;
+  if (tab === "overview") return null;
   return INTEGRATION_MARKS[tab] ?? null;
 }
 
 export default function Integrations({ apiBase }: { apiBase: string }) {
   const t = useT();
-  const capabilities = useRuntimeCapabilities();
-  const available = (id: IntegrationTab) =>
-    !capabilities || id === "overview" || capabilities.clients.includes(id);
-  const tabs = TABS.filter((definition) => available(definition.id));
+  const tabs = TABS;
   const [tab, setTab] = useState<IntegrationTab>(readIntegrationTab);
-  const visibleTab = available(tab) ? tab : "overview";
+  const visibleTab = tab;
   /*
-   * Panels mount lazily and then STAY mounted, hidden, so a half-typed key or
-   * an unsaved Grok selection survives a tab hop. Each mounted panel is gated
+   * Panels mount lazily and stay mounted so a draft survives a tab hop. Each panel is gated
    * by `active`, which is what stops a hidden one from polling.
    */
   const [mounted, setMounted] = useState<ReadonlySet<IntegrationTab>>(
@@ -141,15 +115,11 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
               onClick={() => selectTab(definition.id, true)}
               onKeyDown={handleTabKeyDown}
             >
-              {definition.id !== "overview" && definition.id !== "keys" && (
+              {definition.id !== "overview" && (
                 <ClientMark src={tabMark(definition.id)} label={t(definition.labelKey)} size={14} />
               )}
               {t(definition.labelKey)}
             </button>
-            {/* The two page-level tabs come first; a hairline sets them apart from the apps. */}
-            {definition.id === "keys" && (
-              <span className="connect-tabs-divider" role="presentation" />
-            )}
           </Fragment>
         ))}
       </div>
@@ -168,51 +138,10 @@ export default function Integrations({ apiBase }: { apiBase: string }) {
             {definition.id === "overview" && (
               <IntegrationsOverview apiBase={apiBase} active={active} />
             )}
-            {definition.id === "keys" && <ApiKeys apiBase={apiBase} active={active} />}
-            {definition.id === "codex" &&
-              (capabilities ? (
-                <CodexConnection apiBase={apiBase} active={active} />
-              ) : (
-                <section
-                  className="integration-native-page"
-                  aria-labelledby="codex-integration-title"
-                >
-                  <h3 id="codex-integration-title">{t("integrations.codex.title")}</h3>
-                  <p>{t("integrations.codex.body")}</p>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={() => navigateHash("startup")}
-                  >
-                    {t("integrations.codex.openService")}
-                  </button>
-                </section>
-              ))}
-            {definition.id === "grok" && <Grok apiBase={apiBase} active={active} />}
-            {definition.id === "claude" && <Claude apiBase={apiBase} active={active} embedded />}
-            {definition.id === "claudeDesktop" && (
-              // claude-page scopes Desktop's status-bar styles; embedded drops the page head.
-              <div className="claude-page claude-page--embedded">
-                <ClaudeDesktop key={apiBase} apiBase={apiBase} active={active} />
-              </div>
+            {definition.id === "codex" && <CodexConnection apiBase={apiBase} active={active} />}
+            {definition.id === "dsh" && (
+              <FileIntegrationPage apiBase={apiBase} client="dsh" active={active} />
             )}
-            {definition.id === "cursor" && (
-              <CursorIntegrationPage apiBase={apiBase} active={active} />
-            )}
-            {FILE_CLIENTS.has(definition.id as FileIntegrationClientId) &&
-              (definition.id === "aside" ? (
-                <AsideProfilesPage apiBase={apiBase} active={active} />
-              ) : definition.id === "hermes" ? (
-                <HermesProfilesPage apiBase={apiBase} active={active} />
-              ) : (
-                <FileIntegrationPage
-                  apiBase={apiBase}
-                  client={definition.id as FileIntegrationClientId}
-                  active={active}
-                />
-              ))}
-            {/* Shown only when LazyCodex is detected, so a Pi-based omo install sees nothing new here. */}
-            {definition.id === "omo" && <LazyCodexRoleModels apiBase={apiBase} active={active} />}
           </div>
         );
       })}

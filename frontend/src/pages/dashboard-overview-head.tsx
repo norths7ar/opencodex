@@ -1,12 +1,10 @@
 import { IconAlert, IconChevron } from "../icons";
-import { type TKey, useT } from "../i18n/shared";
+import { useT } from "../i18n/shared";
 import { formatTokens } from "../format-tokens";
 import { formatUptime } from "../formatUptime";
 import { navigateHash } from "../hash-routing";
 import type { useDashboardData } from "./use-dashboard-data";
 import { UsageIncompleteNotice } from "../components/usage-incomplete-notice";
-import { SegmentedControl } from "@/components/ui-v2/segmented-control";
-import { HelpPopover } from "../components/help-popover";
 import { cn } from "@/lib/utils";
 
 type Dash = ReturnType<typeof useDashboardData>;
@@ -195,40 +193,4 @@ function HeadTile({
       </span>
     </div>
   );
-}
-
-/**
- * The subagent engine switch (v1 / base / v2) as a settings-row control. Radio semantics come
- * from the shared segmented control; a disabled fieldset holds it still while a switch is saving.
- */
-export function DashboardMultiAgentControl({
-  maMode,
-  maBusy,
-  switchMaMode,
-}: Pick<Dash, "maMode" | "maBusy" | "switchMaMode">) {
-  const t = useT();
-  return (
-    <fieldset
-      disabled={maBusy}
-      className="dash-ma-switch m-0 min-w-0 border-0 p-0 disabled:opacity-60"
-    >
-      <SegmentedControl
-        aria-label={t("dash.multiAgent")}
-        value={maMode}
-        onChange={(mode) => {
-          if (mode !== maMode) void switchMaMode(mode);
-        }}
-        items={(["v1", "default", "v2"] as const).map((mode) => ({
-          value: mode,
-          label: t(`models.v2Mode_${mode}` as TKey),
-        }))}
-      />
-    </fieldset>
-  );
-}
-
-/** The "?" beside the subagent switch opens the page's multi-agent help dialog. */
-export function DashboardMultiAgentHelp() {
-  const t = useT();
-  return <HelpPopover label={t("dash.multiAgent")}>{t("models.v2Help")}</HelpPopover>;
 }

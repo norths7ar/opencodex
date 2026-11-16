@@ -1,6 +1,6 @@
-import type { DeliveryMode, ProtocolHop } from "../../../../backend/src/protocols/contract";
-import type { ProtocolTraceV1 } from "../../../../backend/src/protocols/dto";
-import type { FeatureDisposition } from "../../../../backend/src/protocols/features";
+import type { DeliveryMode, ProtocolHop } from "@/contracts/protocol/contract";
+import type { ProtocolTraceV1 } from "@/contracts/protocol/dto";
+import type { FeatureDisposition } from "@/contracts/protocol/features";
 import type { TFn, TKey } from "../../i18n/shared";
 
 /**

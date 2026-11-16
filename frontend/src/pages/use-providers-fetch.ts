@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TFn } from "../i18n/shared";
+import { loadProviderWorkspace } from "../channel-management";
 import { readJsonOrThrow } from "../fetch-json";
 import { writeSessionListCache } from "../session-list-cache";
 import type { OAuthStatus, ProvidersConfig } from "./providers-shared";
@@ -45,8 +46,7 @@ export function useProvidersFetch({
     const request = ++configRequest.current;
     setConfigRead({ apiBase, state: "loading" });
     try {
-      const res = await fetch(`${apiBase}/api/config`);
-      const data = await readJsonOrThrow<ProvidersConfig>(res);
+      const data = await loadProviderWorkspace(apiBase);
       if (request !== configRequest.current) return "superseded";
       if (!data) throw new Error("config response missing");
       setConfig(data ?? null);
@@ -74,33 +74,25 @@ export function useProvidersFetch({
         return next;
       });
     };
+    let providers = capabilities?.oauthProviders ?? [];
     try {
-      // Codex openai status is owned by useCodexAccountPool — do not duplicate /accounts.
-      const provRes = await fetch(`${apiBase}/api/oauth/providers`);
-      const provData = await readJsonOrThrow<{ providers?: string[] }>(provRes);
-      const provs: string[] = provData?.providers ?? [];
+      // Every channel alias points at the same ChatGPT account. Read the grant once.
+      const [directory, grant] = await Promise.all([
+        fetch(`${apiBase}/api/oauth/providers`).then(readJsonOrThrow<{ providers?: string[] }>),
+        fetch(`${apiBase}/api/oauth/status?provider=openai`).then(readJsonOrThrow<OAuthStatus>),
+      ]);
+      providers = directory?.providers ?? providers;
       if (request !== oauthRequest.current) return;
-      setOauthProviders(provs);
-      await Promise.all(
-        provs.map(async (p) => {
-          try {
-            const response = await fetch(
-              `${apiBase}/api/oauth/status?provider=${encodeURIComponent(p)}`,
-            );
-            const status = await readJsonOrThrow<OAuthStatus>(response);
-            if (typeof status?.loggedIn !== "boolean") throw new Error("Missing login status");
-            if (request !== oauthRequest.current) return;
-            setOauthStatus((previous) => ({
-              ...previous,
-              [p]: { ...status, statusCheck: "ready" },
-            }));
-          } catch {
-            markFailed([p]);
-          }
-        }),
-      );
+      setOauthProviders(providers);
+      if (typeof grant?.loggedIn !== "boolean") throw new Error("Missing login status");
+      setOauthStatus((previous) => ({
+        ...previous,
+        ...Object.fromEntries(
+          providers.map((name) => [name, { ...grant, statusCheck: "ready" as const }]),
+        ),
+      }));
     } catch {
-      markFailed(capabilities?.oauthProviders ?? []);
+      markFailed(providers);
     }
   }, [
     apiBase,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { setClientResourceData, useKeyedClientResource } from "../client-resource";
+import { setClientResourceData } from "../client-resource";
 import { useI18n } from "../i18n/shared";
 import { Notice } from "../ui";
 import { useDataSurface } from "../data-surface";
@@ -8,7 +8,6 @@ import { DataSurfaceSkeleton } from "../components/data-surface";
 import { readSessionListCache, writeSessionListCache } from "../session-list-cache";
 import { createBoundedFetch } from "../bounded-fetch";
 import { startVisibilityPoll } from "../visibility-poll";
-import { DebugClaudeInboundPanel } from "./debug-claude-inbound-panel";
 import { DebugLogViewer } from "./debug-log-viewer";
 import { DebugPageHeader, DebugSettingsPanel } from "./debug-settings-panel";
 import { DEBUG_STREAMS, type DebugSettings, type LogStream, isStreamEnabled } from "./debug-shared";
@@ -65,23 +64,6 @@ export default function Debug({
   );
   const debugState = debugPoll.state;
   const debug = debugPoll.data ?? cachedSettings ?? null;
-  const claudeSupported = !debug?.supportedFlags || debug.supportedFlags.includes("claude");
-
-  const claudePoll = useKeyedClientResource(
-    `debug-claude-inbound:${apiBase}`,
-    [apiBase, debug?.claude],
-    async (signal) => {
-      const res = await fetch(`${apiBase}/api/claude/inbound-debug`, { signal });
-      if (!res.ok) return [] as import("./debug-shared").ClaudeInboundEntry[];
-      const data = (await res.json()) as {
-        entries?: import("./debug-shared").ClaudeInboundEntry[];
-      };
-      return Array.isArray(data.entries) ? data.entries : [];
-    },
-    { pollMs: 2000, enabled: active && claudeSupported && !!debug?.claude },
-  );
-  const claudeEntries = claudePoll.data ?? [];
-
   const lineVirtualizer = useVirtualizer({
     count: entries.length,
     getScrollElement: () => scrollContainerRef.current,
@@ -223,10 +205,7 @@ export default function Debug({
     }
   };
 
-  const setDebugFlag = async (
-    flag: "debug" | "usage" | "injection" | "claude",
-    enabled: boolean,
-  ) => {
+  const setDebugFlag = async (flag: "debug" | "usage" | "injection", enabled: boolean) => {
     await runDebugMutation({ [flag]: enabled });
   };
 
@@ -267,8 +246,6 @@ export default function Debug({
       )}
 
       {debug && debugState.showError && <Notice tone="err">{t("debug.loadFailed")}</Notice>}
-
-      {claudeSupported && debug?.claude && <DebugClaudeInboundPanel entries={claudeEntries} />}
 
       <DebugLogViewer
         debug={debug}

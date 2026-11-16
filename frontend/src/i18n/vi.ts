@@ -745,16 +745,13 @@ export const vi: Record<TKey, string> = {
   "dash.syncCodexSubagentDefaults": "Đồng thời lưu dưới dạng cài đặt mặc định của Codex",
   "dash.syncCodexSubagentDefaultsHint":
     "Khi Bật, lựa chọn ở trên sẽ được ghi vào cấu hình riêng của Codex, để các tác vụ mới cũng bắt đầu với model đó. Khi Tắt, nó chỉ được ghi nhớ ở đây. Cài đặt này có hiệu lực ở lần đồng bộ hóa hoặc lần khởi động lại tiếp theo, và các cài đặt [agents] do bạn tự viết sẽ được giữ nguyên.",
-  "dash.multiAgentGuidance": "Hướng dẫn Codex cách phân chia công việc",
-  "dash.multiAgentGuidanceHint":
-    "Gửi một ghi chú ngắn cho Codex để cho biết cách thức giao việc cho các sub-agents. Đối với v2, nó chỉ định các models có thể sử dụng và model nào nên được ưu tiên; đối với v1, nó chỉ áp dụng ở mức độ lý luận max hoặc ultra. Khi Tắt, sẽ không có ghi chú nào được thêm vào.",
   "dash.injectionNone": "Không có",
   "dash.injectionEffortLabel": "Effort lý luận",
   "dash.injectionEffortNone": "Mặc định của Model",
-  "dash.effortCapLabel": "Giới hạn effort V2 ultra",
-  "dash.subagentEffortCapLabel": "Giới hạn effort V2 sub-agent",
+  "dash.effortCapLabel": "Giới hạn suy luận khi cộng tác",
+  "dash.subagentEffortCapLabel": "Giới hạn suy luận của tác tử con",
   "dash.effortCapHelp":
-    "Giới hạn effort suy luận cho các lượt chạy ở chế độ V2 ultra. Khi được thiết lập, các yêu cầu có effort tối đa (từ chế độ ultra) sẽ bị giới hạn ở mức đã chọn. Giới hạn sub-agent chỉ áp dụng cho các agent con được tạo ra. Các giới hạn này chỉ có tác dụng giảm effort, không bao giờ tăng nó. Nếu một model không hỗ trợ mức giới hạn đó, nó sẽ tự động giảm xuống mức được hỗ trợ gần nhất.",
+    "Giới hạn suy luận cho yêu cầu cộng tác. Tác tử con còn phải tuân theo giới hạn riêng. Mô hình dùng mức hỗ trợ gần nhất không vượt giới hạn.",
   "dash.effortCapNone": "Không giới hạn",
   "dash.maintenance": "Bảo trì",
   "dash.maintenanceHint":
@@ -848,15 +845,6 @@ export const vi: Record<TKey, string> = {
   "oauthTos.anthropicAcknowledge":
     "Tôi hiểu đây là kết nối gói đăng ký qua bên thứ ba và sẽ kiểm tra các điều khoản áp dụng.",
   "oauthTos.anthropicContinue": "Tiếp tục với gói đăng ký Claude",
-  "subagentSurface.selectionTitle": "Chuyển bề mặt sub-agent sang {mode}?",
-  "subagentSurface.selectionBody":
-    "Ở chế độ {mode}, các model ChatGPT dùng bề mặt v2 — Sol và Terra trên base, mọi model trên v2 — chuyển tác vụ được mã hóa cho backend ChatGPT sang một model được định tuyến như Grok hoặc Claude, nên model được định tuyến không thể đọc tác vụ. Việc ủy quyền đó thất bại với unreadable_encrypted_agent_task cho đến khi upstream sửa lỗi. v1 ủy quyền giữa các nhà cung cấp một cách ổn định.",
-  "subagentSurface.advisoryTitle": "v1 hiện là bề mặt sub-agent mặc định",
-  "subagentSurface.advisoryBody":
-    "Bản cài đặt này đang chạy {mode}, nơi model ChatGPT trên bề mặt v2 chuyển một tác vụ được mã hóa cho model được định tuyến nên model đó không thể đọc, khiến việc ủy quyền giữa các nhà cung cấp thất bại. Chúng tôi khuyên dùng v1 cho đến khi upstream sửa lỗi. Cài đặt hiện tại của bạn không thay đổi cho đến khi bạn chọn.",
-  "subagentSurface.continue": "Tiếp tục",
-  "subagentSurface.switchToV1": "Chuyển sang v1",
-  "subagentSurface.learnMore": "Vì sao việc này thất bại",
   "prov.logoutOk": "Đã đăng xuất khỏi {provider}.",
   "prov.logoutFail":
     "Không thể đăng xuất khỏi {provider}. Trạng thái tài khoản của bạn vẫn không thay đổi.",
@@ -992,21 +980,7 @@ export const vi: Record<TKey, string> = {
   "models.capSaveFailed": "Không thể lưu giới hạn ngữ cảnh",
   "models.contextCapped": "Giới hạn 350k",
   "models.contextCapLabel": "Cửa sổ/Giới hạn (Window / cap) mặc định",
-  "models.v2Label": "Sub-agent",
   "models.shadowCallOriginal": "{models} →",
-  "models.v2DocsLink": "v1 / v2 là gì?",
-  "models.v2Mode_v1": "v1",
-  "models.v2Mode_default": "mặc định",
-  "models.v2Mode_v2": "v2",
-  "models.v2ModeDesc_v1": "Tất cả model → giao diện v1",
-  "models.v2ModeDesc_default": "Mặc định của upstream (sol/terra=v2, luna=v1)",
-  "models.v2ModeDesc_v2": "Tất cả model → giao diện v2",
-  "models.keepNativeOnV1": "Giữ ChatGPT ở v1",
-  "models.keepNativeOnV1Hint":
-    "ChatGPT chỉ mã hoá các task con v2 khi model cha ChatGPT-native giữ ở v2, khiến Grok và Claude không thể đọc được chúng. Bật tuỳ chọn này để giữ Sol/Terra ở v1 và tránh việc mã hoá đó. Các model cha được định tuyến (routed parents) vẫn ở v2.",
-  "models.v2Help":
-    "Điều khiển giao diện đa agent (multi-agent surface) cho tất cả model.\n\nv1: Agent luồng đơn cổ điển. Mọi model đều sử dụng giao diện cộng tác v1.\nbase: Mặc định của upstream — sol/terra dùng v2, luna dùng v1, các model khác tuân theo cờ tính năng (feature flag) của codex.\nv2: Agent đa luồng với spawn_agent. Mọi model đều sử dụng giao diện cộng tác v2.\n\nỞ v2, tuỳ chọn Giữ ChatGPT ở v1 sẽ giữ Sol/Terra ở giao diện v1 để chúng vẫn có thể gọi Grok hoặc Claude. ChatGPT mã hoá các task con v2; các model được định tuyến không thể đọc được chúng. Các model cha được định tuyến vẫn giữ ở v2.\n\nCác thay đổi sẽ áp dụng cho các phiên (sessions) mới.",
-  "dash.multiAgent": "Agent con (Sub-agent)",
   "dash.codexDesktopAuthless": "Mở Codex không cần đăng nhập",
   "dash.codexDesktopAuthlessHint":
     "Mặc định tắt. Bỏ qua bước đăng nhập Desktop riêng cho các kết nối cục bộ hợp lệ. Vẫn cần thông tin xác thực upstream. Khởi động lại Codex sau khi thay đổi cài đặt này. Các tính năng Desktop yêu cầu tài khoản có thể không khả dụng.",
@@ -1192,7 +1166,6 @@ export const vi: Record<TKey, string> = {
   "sub.subtitle":
     "{cmd} của Codex chỉ quảng bá 5 model đầu tiên (theo mức độ ưu tiên) làm ghi đè (overrides). Chọn tối đa 5 model ở đây — native gpt hoặc routed — và opencodex sẽ đặt mức độ ưu tiên trong catalog của chúng để những model này dẫn đầu. Bất kỳ model nào khác vẫn có thể được gọi bằng đúng tên của nó; cài đặt này chỉ kiểm soát những gì được hiển thị.",
   "sub.featured": "Nổi bật (Featured)",
-  "sub.advanced": "Nâng cao (Advanced)",
   "sub.orderHintAria": "Cách thứ tự này được sử dụng",
   "sub.orderHint":
     "Thứ tự hiển thị ở đây thiết lập các vị trí 1–5 ở đầu bộ chọn mô hình của Codex và các mô hình ứng viên mặc định cho {cmd}. Khi có ít hơn 5 mô hình nổi bật hiển thị trong bộ chọn, các vị trí còn lại sẽ hiển thị mô hình theo mức ưu tiên của danh mục; 5 mô hình nổi bật đang hiển thị sẽ lấp đầy danh sách, trừ khi thứ tự tùy chỉnh trong bộ chọn mô hình làm thay đổi mức ưu tiên của danh mục.",
@@ -1229,16 +1202,6 @@ export const vi: Record<TKey, string> = {
   "sub.workspace.mainAria": "Chi tiết model của agent con",
   "sub.workspace.notFeatured": "Không nổi bật",
   "sub.workspace.priority": "Ưu tiên",
-  "sub.ultraMode": "Luôn uỷ quyền chủ động",
-  "sub.ultraModeHint":
-    "Bật chính sách uỷ quyền đa agent chủ động (Proactive multi-agent delegation) cho mọi model và nỗ lực suy luận (không làm thay đổi bản thân nỗ lực suy luận). Ghi thiết lập vào features.multi_agent_v2.multi_agent_mode_hint_text trong config.toml.",
-  "sub.ultraModeV2Required":
-    "Yêu cầu giao diện đa agent v2 (v2 multi-agent surface) — bật multi_agent_v2 và chọn v2 trong trình điều khiển Chế độ agent con (Sub-agent mode) trước.",
-  "sub.ultraModeText": "Văn bản uỷ quyền chủ động",
-  "sub.ultraModePreset": "Khôi phục preset",
-  "sub.ultraModeLoadFail": "Lỗi tải cài đặt uỷ quyền chủ động — proxy có đang chạy không?",
-  "sub.ultraModeSaveFail": "Lỗi lưu cài đặt uỷ quyền chủ động",
-  "sub.ultraModeSaved": "Đã lưu uỷ quyền chủ động. Áp dụng cho các phiên Codex mới.",
   "sub.workspace.removeFromFeatured": "Xoá {m} khỏi phần Nổi bật",
   "sub.workspace.selectModel": "Chọn một model",
   "sub.workspace.selectModelDesc":
@@ -1253,12 +1216,6 @@ export const vi: Record<TKey, string> = {
   "sub.fallbackSaveFailed": "Lỗi lưu cài đặt dự phòng",
   "sub.fallbackUnavailable": "Hiện không được quảng bá; vẫn được giữ trong chuỗi dự phòng.",
   "sub.fallbackPollInvalid": "Vui lòng nhập một số nguyên từ 5000 đến 600000 ms.",
-  "sub.v2Compatibility.title": "Khả năng tương thích V2 của Native-parent",
-  "sub.v2Compatibility.risk":
-    "Nếu model cha ChatGPT-native uỷ quyền cho model định tuyến (routed model) này bằng V2, task của nó có thể bị mã hoá và thất bại trước khi thực thi. Các task có thể đọc được từ model cha định tuyến không bị ảnh hưởng.",
-  "sub.v2Compatibility.recoveryUnknown":
-    "Trạng thái bật phục hồi/đủ điều kiện không được tiết lộ bởi máy chủ này. Hãy dùng V1/uỷ quyền tương thích văn bản thuần (plaintext-compatible delegation), hoặc chỉ bật khôi phục V2 thử nghiệm (experimental V2 recovery) nếu đủ điều kiện. Khôi phục sẽ tăng thêm tiêu tốn quota, độ trễ, phụ thuộc backend và có khả năng làm giảm độ chính xác; nó không sửa được giao thức upstream.",
-  "sub.v2Compatibility.details": "Chi tiết tương thích",
   "logs.title": "Nhật ký yêu cầu",
   "logs.tabLogs": "Nhật ký",
   "logs.tabDebug": "Gỡ lỗi",
@@ -2230,6 +2187,9 @@ export const vi: Record<TKey, string> = {
   "modal.apiKeyTransport": "API key header",
   "modal.apiKeyTransportNative": "x-api-key (Anthropic native)",
   "modal.apiKeyTransportBearer": "Authorization: Bearer",
+  "modal.apiKeyTransportAuto": "Mặc định của giao thức",
+  "modal.useEnvironmentKey": "Đọc khóa API từ biến môi trường",
+  "modal.environmentKeyPlaceholder": "Tên biến, ví dụ OPENAI_API_KEY",
   "modal.apiKeyPlaceholder": "sk-… (hoặc $ENV_VAR)",
   "modal.defaultModelPlaceholder": "vd: gpt-5.5",
   "modal.baseUrlPlaceholderError":
