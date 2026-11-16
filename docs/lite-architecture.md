@@ -77,7 +77,7 @@ Codex 原生裸模型名的兼容路由由 `integrations/request_routing.py` 处
 
 ## 构建与本机更新
 
-Vite 将经过类型检查的候选产物和依赖清单写入 `frontend/build`，预览使用同一配置。构建不修改正在服务的 `frontend/dist-runtime`。`scripts/update.ps1` 按锁文件同步 Python 和前端依赖、构建候选，再调用 `runtime/deployment.py` 发布；脚本从自身位置确定项目路径，不依赖调用者的工作目录。
+Vite 将经过类型检查的候选产物和依赖清单写入 `frontend/build`，预览使用同一配置。构建不修改正在服务的 `frontend/dist-runtime`。`ocx service update` 通过 `runtime/update.py` 按锁文件同步 Python 和前端依赖、构建候选，再调用 `runtime/deployment.py` 发布；项目路径由安装的代码位置确定，不依赖调用者的工作目录。
 
 发布器核对入口和完整模块依赖，先安装资源，再原子替换入口。部署清单登记当前文件及退役时间，旧哈希资源从退出当前版本起保留至少七天，之后在成功发布时清理；首次接管会登记已有哈希资源。未登记的其他文件不被猜测删除。运行中的受管服务通过现有服务管理器重启，核对端口、健康响应、网页入口及其资源，并检查 Codex 配置、认证文件和自动启动偏好。停止的实例只发布，未受管前台实例要求先停止。失败时保留或恢复旧网页入口并报告；源码和依赖更新不由网页发布器回滚。
 

@@ -16,7 +16,6 @@
     "status": "uv run ocx status",
     "restart": "uv run ocx restart",
     "build:gui": "pnpm --dir frontend build:runtime",
-    "update:local": "pwsh -NoProfile -File scripts/update.ps1",
     "typecheck": "pnpm --dir frontend typecheck",
     "lint": "uv run --locked ruff check && pnpm --dir frontend lint",
     "lint:fix": "uv run --locked ruff check --fix && pnpm --dir frontend lint:fix",

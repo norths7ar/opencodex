@@ -3,6 +3,7 @@ dist/
 dist-runtime/
 build/
 .tmp/
+.deployment-state.json
 tests/
 **/*.test.*
 **/*.spec.*

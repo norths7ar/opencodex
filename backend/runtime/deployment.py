@@ -1,13 +1,11 @@
 """Publish a validated Lite console build and verify an optional service restart."""
 
-import argparse
 import hashlib
 import json
 import os
 import re
 import shutil
 import stat
-import subprocess
 import sys
 import tempfile
 import time
@@ -22,7 +20,7 @@ from backend.platform.files import instance_lock
 
 from .scheduler import Startup
 from .service import service_command
-from .state import PROJECT_ROOT, WEB_ROOT, control_request, read_state, state_directory, status
+from .state import control_request, read_state, status
 
 _RETENTION_SECONDS = 7 * 24 * 60 * 60
 _HASHED_ASSET = re.compile(r"-[A-Za-z0-9_-]{8,}\.")
@@ -381,28 +379,3 @@ def publish(directory: Path, *, build_root: Path, web: Path, scratch: Path) -> b
             except OSError as exc:
                 print(f"Could not record completed console pruning: {exc}", file=sys.stderr)
         return prior_service is not None
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--state-dir")
-    options = parser.parse_args()
-    try:
-        restarted = publish(
-            state_directory(options.state_dir),
-            build_root=PROJECT_ROOT / "frontend" / "build",
-            web=WEB_ROOT,
-            scratch=PROJECT_ROOT / ".tmp",
-        )
-    except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
-        parser.exit(1, f"ocx update: {exc}\n")
-    print(
-        "Published and verified OpenCodex Lite; the background gateway was restarted."
-        if restarted
-        else "Published the OpenCodex Lite console; the gateway was left stopped."
-    )
-    print("Codex configuration, authentication, and the startup preference were unchanged.")
-
-
-if __name__ == "__main__":
-    main()

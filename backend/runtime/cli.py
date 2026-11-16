@@ -39,6 +39,7 @@ def main() -> None:
             "disable",
             "uninstall",
             "remove",
+            "update",
         ],
     )
     parser.add_argument("--port", type=int, help=f"Listening port (first start: {DEFAULT_PORT})")
@@ -76,6 +77,15 @@ def main() -> None:
 
             if args.json and args.service_action != "status":
                 parser.error("--json applies to ocx service status only.")
+            if args.service_action == "update":
+                if args.port is not None or args.operation_id:
+                    parser.error(
+                        "service update preserves the current port and runs interactively."
+                    )
+                from .update import update
+
+                update(directory)
+                return
             result = service_command(directory, args.port, args.service_action)
             if args.operation_id:
                 record_operation(directory, args.operation_id, args.service_action, "succeeded")

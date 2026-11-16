@@ -8,7 +8,7 @@ Run `pnpm dev` with the Python gateway running. The development console listens 
 
 Both `pnpm build` and `pnpm build:runtime` check types and create a complete candidate in `frontend/build/`. `pnpm preview` serves that candidate using the same Vite configuration. Building does not replace the console currently served by the gateway.
 
-From the repository root, `./scripts/update.ps1` synchronizes locked dependencies, builds and publishes the candidate to `frontend/dist-runtime/`, then restarts an already-running managed service and checks it. The publisher retains recent hashed assets for open browser tabs. See the [root README](../README.md) for installation, independent state directories, retention and failure behavior.
+From any directory, `ocx service update` synchronizes locked dependencies, builds and publishes the candidate to `frontend/dist-runtime/`, then restarts an already-running managed service and checks it. The publisher retains recent hashed assets for open browser tabs. See the [root README](../README.md) for installation, independent state directories, retention and failure behavior.
 
 ## Code quality
 

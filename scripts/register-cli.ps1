@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$entryPoint = Join-Path $projectRoot '.venv\Scripts\ocx.exe'
+$entryPoint = Join-Path $projectRoot '.venv\Scripts\python.exe'
 $binPath = [IO.Path]::GetFullPath($BinDirectory)
 $marker = 'OpenCodex Lite source checkout launcher'
 $targets = foreach ($name in @('ocx', 'opencodex')) {
@@ -48,13 +48,13 @@ $psEntry = $entryPoint.Replace("'", "''")
 $cmdEntry = $entryPoint.Replace('%', '%%')
 $powershellLauncher = @"
 # $marker
-& '$psEntry' @args
+& '$psEntry' -I -m backend.runtime @args
 exit `$LASTEXITCODE
 "@
 $cmdLauncher = @"
 @echo off
 rem $marker
-"$cmdEntry" %*
+"$cmdEntry" -I -m backend.runtime %*
 exit /b %errorlevel%
 "@
 New-Item -ItemType Directory -Path $binPath -Force | Out-Null
